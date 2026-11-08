@@ -7,6 +7,9 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `Taskfile.yml` is the entrypoint; it loads the shards and hosts top-level helper menus (`deploy`, `logs`, `status`, `menu`).
 - `taskfiles/infra.yml` is the canonical host lifecycle surface (`infra:*`) for plan/apply/deploy/rollback/logs and secrets management, and it owns the detached job surface (`infra:job:*`) that long tasks are started through.
 - `taskfiles/agents.yml` holds operator helpers, xs runtime wrappers, and OAuth/session management.
+- `taskfiles/check.yml` is the uniform entry to that surface: `check:leaf`,
+  `check:host`, `check:cache` and `check:list` over `taskfiles/checks.toml` (one
+  row per gate and its kind; `check:verify` keeps the two in step).
 - `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
 - `taskfiles/codespace.yml` owns GitHub Codespaces as a mode (`codespace:*`) for work that runs in someone else's remote devcontainer: the file transport `gh codespace cp` cannot do, a push that happens on the host holding the git auth, a reset for the post-rewrite clone, and a stop that waits for `Shutdown`.
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.

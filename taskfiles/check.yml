@@ -1,0 +1,76 @@
+version: "3"
+
+# Three verbs over one table. `taskfiles/checks.toml` is the inventory of gates
+# and their kind; every `checks:*` task is still the implementation, and still
+# invocable by name. What this shard adds is the one entry surface: a check is a
+# row, its kind says whether it needs a host or a cache, and the listing is
+# rendered from the same rows instead of from a hand-kept index.
+#
+#   task check:list [KIND=leaf|host|cache]   the table, with live descriptions
+#   task check:verify                        [gate] rows and tasks agree
+#   task check:leaf NAME=checks:<verb>       run one leaf check
+#   task check:host HOST=<h>                 one host gate (NAME= overrides)
+#   task check:cache HOST=<h>                one cache gate (NAME= overrides)
+#
+# `check:verify` is in `checks:quick`'s deps, so a gate added without a row (or a
+# row left behind by a rename) fails there, not in a review.
+tasks:
+  check:list:
+    desc: List the check inventory by kind, with each task's live description (KIND=leaf|host|cache)
+    summary: >
+      Reads taskfiles/checks.toml (the table: one row per gate, name and kind) and
+      joins it with `task --list-all --json` for the description, so the listing is
+      never a second copy of a `desc`. KIND= narrows to leaf (no input), host (one
+      host) or cache (asks a substituter). ~2 s, no eval.
+    cmds:
+      - bash scripts/task/check.sh list {{.KIND}}
+
+  check:verify:
+    desc: "[gate] Every checks:* task has a row in the check table, and every row names a task"
+    summary: >
+      The gate that keeps taskfiles/checks.toml honest in both directions: a row
+      naming no task (a rename or a deletion left it behind) and a checks:* task
+      with no row (a gate nobody classified) are both exit 1, as is a kind that is
+      not leaf|host|cache. Duplicate rows fail too. ~2 s, no eval.
+    cmds:
+      - bash scripts/task/check.sh verify
+
+  check:leaf:
+    desc: Run one leaf check by name (NAME=checks:<verb>); `check:list KIND=leaf` lists them
+    summary: >
+      Dispatches through the table: NAME must be a row whose kind is leaf, so a
+      host or cache gate cannot be run with no input by accident. The check itself
+      is the `checks:*` task, unchanged. Vars: NAME= (required). Exit: the check's
+      own status; 2 = bad name or kind. ~0 s of its own.
+    env:
+      NAME: "{{.NAME}}"
+    cmds:
+      - bash scripts/task/check.sh leaf
+
+  check:host:
+    desc: Run one host gate against one host (HOST=<h>; NAME= defaults to checks:host)
+    summary: >
+      The host verb: HOST= is required, and NAME= selects the gate (default
+      checks:host, the module-system gate). The row's kind must be host, which is
+      what stops an expensive whole-config force from being reachable through the
+      leaf verb. Vars: HOST= (required), NAME= (optional). Exit: the gate's status;
+      2 = bad name, kind, or missing HOST.
+    env:
+      NAME: "{{.NAME}}"
+      HOST: "{{.HOST}}"
+    cmds:
+      - bash scripts/task/check.sh host
+
+  check:cache:
+    desc: Run one cache gate against one host (HOST=<h>; NAME= defaults to checks:build:route)
+    summary: >
+      The cache verb: "would the substituter serve this host's closure" without
+      building anything. HOST= is required; NAME= selects among the cache rows
+      (build:route, nixcache:*, closure:budget, invalidation). The row's kind must
+      be cache. Vars: HOST= (required), NAME= (optional). Exit: the gate's status;
+      2 = bad name, kind, or missing HOST.
+    env:
+      NAME: "{{.NAME}}"
+      HOST: "{{.HOST}}"
+    cmds:
+      - bash scripts/task/check.sh cache

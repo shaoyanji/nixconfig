@@ -11,6 +11,21 @@
   email = "jisifu@gmail.com";
   githubEmail = "github@mail.shaoyanji.is-a.dev";
   workEmail = "matt@bountystash.com";
+
+  # The desktop role is a feature list (modules/roles/home.nix). This is the
+  # full set: what every host already evaluated before the split, so a host that
+  # sets nothing keeps its closure. A headless or lean host sets
+  # `fleet.hmUserFeatures` to a subset (nixos) and drops the module, not just its
+  # config — which is the point, since option surface is what a gate pays for.
+  hmFeatures = [
+    "systemd-policy"
+    "shell"
+    "dev"
+    "ai"
+    "browser"
+    "media"
+    "desktop"
+  ];
   # The envs.net pubnix account: mail lives on mail.envs.net, not on the host,
   # and the IMAP/SMTP login is the full address rather than the unix name.
   envsEmail = "jisifu@envs.net";

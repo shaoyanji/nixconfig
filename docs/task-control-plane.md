@@ -62,10 +62,22 @@ The mataroa.blog console (files first, the blog as a target):
 ```bash
 task checks:quick                # Narrow repo HYGIENE (no host config evaluated)
 task checks:tasks                # Task graph: Nix-compiled graph + name parity with `task`
-task checks:host HOST=<host>     # ONE host: module system + every assertion
+task check:list KIND=host        # The check inventory, by kind, with live descriptions
+task check:leaf NAME=checks:prose
+task check:host HOST=<host>      # ONE host: module system + every assertion
 task checks:flake:transitive     # Read-only transitive flake pin sweep (exit 1 on drift)
 task checks:qmd:docs             # qmd docs collection exists + index fresh
 ```
+
+### Three verbs over the check table
+`taskfiles/checks.toml` holds one row per `checks:*` gate and its kind — `leaf`
+(no input), `host` (one host), `cache` (asks a substituter). The command,
+description and summary stay in the taskfile; the table owns only the kind,
+which a taskfile cannot express. `check:leaf|host|cache` dispatch through it and
+`check:list` renders it, so the listing is not a second index. `check:verify`
+runs in `checks:quick`'s deps and fails both ways (a `checks:*` task with no
+row, a row naming no task), which is what keeps the table from drifting after a
+rename.
 
 ### Operator helpers
 ```bash

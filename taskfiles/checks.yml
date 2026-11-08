@@ -57,6 +57,9 @@ tasks:
       - task: checks:nix:lint
       - task: checks:nix:shell
       - task: checks:modules:edges
+      # The check inventory (taskfiles/checks.toml): every checks:* task has a row
+      # and every row names a task, so the three verbs cannot drift from the tree.
+      - task: check:verify
     # Serial on purpose, in this order. The build leg is ONE flake eval (`policies`
     # is ~7.5 s of it, the other attrs are ~1 s together); `knobs` rides along in
     # that same process for ~0.1 s and is the compiled registry gate, strictly

@@ -8,17 +8,21 @@
       status = "ACCEPTED";
       priority = "P1";
       date = "2026-11-08";
-      summary = "A desktop host gate is ~78% its chain, so eval speed is the chain's option surface and not a host's line count; the plan is derivation equality for refactors, feature-based hosts (landed), three check verbs over one table, a task plane split into TOML metadata and YAML commands, and documents generated wherever they mirror data.";
+      summary = "A host gate is its chain's option surface, not a host file; derivation equality is the refactor instrument, hosts and the user role are feature lists, the check surface has three verbs over one table, and the task-plane split is blocked on where a task's desc lives.";
       from = ["dendritic-flake"];
       refs = {
         modules = [
           "flake/module-sets.nix"
+          "modules/roles/home.nix"
+          "modules/user/desktop/suite.nix"
           "scripts/task/drv-equality.py"
+          "scripts/task/check.sh"
+          "taskfiles/checks.toml"
           "lib/taskfile.nix"
           "flake/checks.nix"
         ];
-        tasks = ["checks:drv-equality" "checks:host" "checks:tasks"];
-        docs = ["docs/task-control-plane.md" "docs/nix-patterns.md"];
+        tasks = ["checks:drv-equality" "checks:host" "check:leaf" "check:list" "check:verify"];
+        docs = ["docs/task-control-plane.md" "docs/nix-patterns.md" "AGENTS.md"];
       };
       body = ''
         Claim: a gate's cost is its chain. Reproduce the split by evaluating the
@@ -33,23 +37,46 @@
         2. A host as a feature list: LANDED as `mkHost` + `chainFeatures`
            (`flake/module-sets.nix`); the chains are derived, and all 30
            configurations' derivations were unchanged across the landing.
-        3. Cut the chain, since it is the cost. MEASURED 2026-11-08 with
-           `dev:eval:profile` (stub host, assertions forced): base 466 MiB,
-           +nixos 654, +the user role 1233; dms +10, nixvim +75, nix-index +0.
-           No single member is the cost — the user role's aggregate option
-           surface is ~450 MiB — so the cut is to feature-ize it. Exit: desktop
-           gate under 1 GiB, fleet peak under 4 GiB.
-        4. Three verbs (`check:leaf`, `check:host`, `check:cache`) over one
-           table, instead of 93 tasks: a check becomes a row, and the section
-           that lists it is generated from the same row.
-        5. Task plane: metadata in TOML for eval, commands in YAML for go-task;
-           then delete `lib/taskfile.nix`, the digest pin and `checks:tasks`
-           together. Never swap the parser for `task --list-all --json` — 2.2 s
-           and no `cmds`, which is the graph.
+        3. Cut the chain: MEASURED and LANDED 2026-11-08. Stub host, assertions
+           forced: base 466 MiB, +nixos 654, +roles.minimal 766, +full user role
+           1246. Per feature: dms +10, nixvim +75, nix-index +0, shell/dev/ai +25
+           together, browser +36, media +32, desktop suite +22. The role was never
+           the cost: `systemd-policy` is +356 MiB, because its assertion reads
+           every user unit AND `osConfig.systemd.services` — a full-config force
+           inside every host gate. Every feature except that one evaluates at
+           897 MiB. So the role is a feature list now (`fleet.hmUserFeatures`;
+           an import not taken is not evaluated), default unchanged and proved by
+           `checks:drv-equality` on a desktop, a container and darwin. OPEN: the
+           desktop gate goes under 1 GiB when the classification gate moves out
+           of the host eval — it belongs beside `checks:units` (one force, two
+           verdicts), which is a safety decision, not a refactor.
+        4. Three verbs over one table: LANDED one stage. `taskfiles/checks.toml`
+           is the inventory (one row per gate, with its kind), `check:leaf`,
+           `check:host`, `check:cache` and `check:list` are the entry,
+           `check:verify` (in `checks:quick`) fails when a checks:* task has no
+           row or a row names no task. The 93 named tasks remain the
+           implementation: deleting those names is a reference migration across
+           ~50 files, and doing it in the same commit as the mechanism would make
+           one red build hide which half broke.
+        5. Task plane: metadata in TOML for eval, commands in YAML for go-task.
+           NOT DONE, and the reason is structural. `.#taskfileGraph` is a public
+           interface, not only a check: `q.sh`, `toolcall.sh`, `edge-check.sh`,
+           `kg-iets-check.sh` and `taskfile-list.sh` read it, and `flake/checks.nix`
+           builds `taskfile-graph`, `-selftest`, `taskfile-digest-pin` and
+           `skills-task-mirror` from it. TOML metadata still has to reach go-task,
+           which reads YAML only — so either a committed generated shard (banned
+           by [[flake/policies.nix#generated-not-tracked]]) or `desc` leaves
+           `task --list`. Both are owner decisions; a half-move leaves two parsers,
+           the debt this note exists to pay. What is cheap and safe — deleting the
+           digest pin alone — was not taken either, because the pin is the only
+           thing that makes a graph change visible in review.
         6. Documents: generate every table that mirrors `inventory.toml`,
-           `modules.toml`, the task plane or the graph; keep prose for the why.
-           STARTED: the chain table is `docs/generated/fleet-module-chains.md`
-           and AGENTS.md points at it. The 120-line manual is open.
+           `modules.toml`, the task plane or the graph. The chain table is
+           `docs/generated/fleet-module-chains.md`. AGENTS.md is 477 -> 218 lines
+           (every table it carried is compiled or deleted); ~120 needs the prose
+           to move, and the pages it would move into sit at their own budget
+           (docs/nix-patterns.md is 400/400), so the floor without deleting
+           knowledge is about 200.
 
         Not doing: IFD (1.8 s on every eval that touches it), splitting HM out
         of hosts to shrink host eval, a second renderer beside the site.

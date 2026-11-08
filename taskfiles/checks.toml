@@ -1,0 +1,378 @@
+# The check inventory: one row per gate, and the kind that decides how it is
+# invoked. `task check:leaf NAME=...` / `check:host HOST=...` / `check:cache
+# HOST=...` are the three verbs; `task check:list` renders this table with each
+# task's live description. A row that names no task, or a `checks:*` task with
+# no row, fails `task check:verify` -- so adding a gate is a row, not a name
+# nobody classifies.
+
+[[check]]
+name = "checks:audit:handoff"
+kind = "leaf"
+
+[[check]]
+name = "checks:audit:system"
+kind = "leaf"
+
+[[check]]
+name = "checks:blast"
+kind = "leaf"
+
+[[check]]
+name = "checks:btrfs:stats"
+kind = "leaf"
+
+[[check]]
+name = "checks:codespace"
+kind = "leaf"
+
+[[check]]
+name = "checks:codespace:sync"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:cache"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:ensemble"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:govern"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:kiwix"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:media"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:memory"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:ocr"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:reconcile"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:security"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:smart"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:sops"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:sqlite"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:storage"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:tailscale"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:thermal"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:triage"
+kind = "leaf"
+
+[[check]]
+name = "checks:decision:vuln"
+kind = "leaf"
+
+[[check]]
+name = "checks:dns:failover"
+kind = "leaf"
+
+[[check]]
+name = "checks:dns:pool"
+kind = "leaf"
+
+[[check]]
+name = "checks:docs:links"
+kind = "leaf"
+
+[[check]]
+name = "checks:edge"
+kind = "leaf"
+
+[[check]]
+name = "checks:edge:resident"
+kind = "leaf"
+
+[[check]]
+name = "checks:email:bodies"
+kind = "leaf"
+
+[[check]]
+name = "checks:entry"
+kind = "leaf"
+
+[[check]]
+name = "checks:flake"
+kind = "leaf"
+
+[[check]]
+name = "checks:flake:advisory"
+kind = "leaf"
+
+[[check]]
+name = "checks:flake:transitive"
+kind = "leaf"
+
+[[check]]
+name = "checks:ha:mqtt"
+kind = "leaf"
+
+[[check]]
+name = "checks:hermes"
+kind = "leaf"
+
+[[check]]
+name = "checks:inventory:compiled"
+kind = "leaf"
+
+[[check]]
+name = "checks:kg"
+kind = "leaf"
+
+[[check]]
+name = "checks:kg:canvas"
+kind = "leaf"
+
+[[check]]
+name = "checks:kg:iets"
+kind = "leaf"
+
+[[check]]
+name = "checks:kiwix:watchdog"
+kind = "leaf"
+
+[[check]]
+name = "checks:modules:edges"
+kind = "leaf"
+
+[[check]]
+name = "checks:modules:validate"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:fix"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:format"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:lint"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:prose"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:shell"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:watch"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:watch:status"
+kind = "leaf"
+
+[[check]]
+name = "checks:nix:watch:stop"
+kind = "leaf"
+
+[[check]]
+name = "checks:paperless:watchdog"
+kind = "leaf"
+
+[[check]]
+name = "checks:ports"
+kind = "leaf"
+
+[[check]]
+name = "checks:postgres:drill"
+kind = "leaf"
+
+[[check]]
+name = "checks:postgres:vector"
+kind = "leaf"
+
+[[check]]
+name = "checks:prose"
+kind = "leaf"
+
+[[check]]
+name = "checks:qmd:docs"
+kind = "leaf"
+
+[[check]]
+name = "checks:qmd:vault"
+kind = "leaf"
+
+[[check]]
+name = "checks:quick"
+kind = "leaf"
+
+[[check]]
+name = "checks:rebuild"
+kind = "leaf"
+
+[[check]]
+name = "checks:remotes"
+kind = "leaf"
+
+[[check]]
+name = "checks:repo:blobs"
+kind = "leaf"
+
+[[check]]
+name = "checks:repo:paths"
+kind = "leaf"
+
+[[check]]
+name = "checks:restic:drill"
+kind = "leaf"
+
+[[check]]
+name = "checks:selector"
+kind = "leaf"
+
+[[check]]
+name = "checks:selector:sidecar"
+kind = "leaf"
+
+[[check]]
+name = "checks:sessions:reaper"
+kind = "leaf"
+
+[[check]]
+name = "checks:site:path"
+kind = "leaf"
+
+[[check]]
+name = "checks:sops:drift"
+kind = "leaf"
+
+[[check]]
+name = "checks:sqlite:maintenance"
+kind = "leaf"
+
+[[check]]
+name = "checks:ssh:bitwarden"
+kind = "leaf"
+
+[[check]]
+name = "checks:ssh:modes"
+kind = "leaf"
+
+[[check]]
+name = "checks:status"
+kind = "leaf"
+
+[[check]]
+name = "checks:submodules"
+kind = "leaf"
+
+[[check]]
+name = "checks:tasks"
+kind = "leaf"
+
+[[check]]
+name = "checks:tls:watchdog"
+kind = "leaf"
+
+[[check]]
+name = "checks:toml:lint"
+kind = "leaf"
+
+[[check]]
+name = "checks:toolcall"
+kind = "leaf"
+
+[[check]]
+name = "checks:toon"
+kind = "leaf"
+
+[[check]]
+name = "checks:toon:surfaces"
+kind = "leaf"
+
+[[check]]
+name = "checks:uds:docs"
+kind = "leaf"
+
+[[check]]
+name = "checks:ups:drill"
+kind = "leaf"
+
+[[check]]
+name = "checks:yaml:lint"
+kind = "leaf"
+
+[[check]]
+name = "checks:boot"
+kind = "host"
+
+[[check]]
+name = "checks:boot:self"
+kind = "host"
+
+[[check]]
+name = "checks:drv-equality"
+kind = "host"
+
+[[check]]
+name = "checks:host"
+kind = "host"
+
+[[check]]
+name = "checks:hosts"
+kind = "host"
+
+[[check]]
+name = "checks:units"
+kind = "host"
+
+[[check]]
+name = "checks:build:route"
+kind = "cache"
+
+[[check]]
+name = "checks:closure:budget"
+kind = "cache"
+
+[[check]]
+name = "checks:invalidation"
+kind = "cache"
+
+[[check]]
+name = "checks:nixcache:fleet"
+kind = "cache"
+
+[[check]]
+name = "checks:nixcache:probe"
+kind = "cache"

@@ -37,6 +37,25 @@ Run validation and health checks for host configs and Nix code quality.
 | `checks:kg:native` | Cold native graph build: median < 20 ms over 7 runs, **no subprocess in `KGEngine.Native`**, node/edge parity with the compiled projection |
 | `checks:kg:canvas` | Builds `.#sites.fleet-docs-site` locally and proves the knowledge-graph canvas works: every node has a slice, no dangling slice links, and headless Chrome **clicks a node** and must land on `fleet / knowledge-graph / host:frieren` |
 
+## Three verbs over one table
+
+`taskfiles/checks.toml` is the inventory of gates: one row per `checks:*` task and
+its kind — `leaf` (no input), `host` (one host), `cache` (asks a substituter).
+The command, description and summary stay in the taskfile; the table owns only
+the kind, which is the fact a taskfile cannot express.
+
+```bash
+task check:list KIND=host        # the table, with each task's live description
+task check:leaf NAME=checks:prose
+task check:host HOST=aristotle   # NAME= selects another host gate
+task check:cache HOST=aristotle  # NAME= selects another cache gate
+```
+
+`check:verify` runs in `checks:quick`'s deps: a `checks:*` task with no row, or a
+row naming no task, is exit 1 — so a new gate is a row, and a rename cannot leave
+the table pointing at nothing. The named `checks:*` tasks remain the
+implementation and stay invocable; the verbs are the uniform entry.
+
 **Preserved hosts are a warning, not a check.** `status = "preserved"` is dormant, and
 some are known-broken (cassini's `homeDirectory` conflict predates this tree).
 `warm-host.sh --check`, `checks:build:route`, `infra:deploy` and `infra:apply` exit 0 before evaluating; revive one with `ALLOW_PRESERVED=1` only when the user names it.

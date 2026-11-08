@@ -508,6 +508,18 @@ tasks:
     cmds:
       - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} dot {{if .TARGET}}{{.TARGET}}{{end}}
 
+  dev:eval:profile:
+    desc: Peak RSS and wall clock of a gate on a stub host, per chain feature (FEATURES="base nixos dms")
+    summary: >
+      Rung 3 of `eval-cost-ladder` (AGENTS.nix): the unit of eval cost is the
+      feature, not the host file, so this evaluates one stub host per feature
+      subset and forces `config.assertions` — the same thing `checks:host`
+      forces, so the numbers compare. `EXTRA_NIX` appends one override module to
+      price a member the chain imports. Nothing is built and no builder is
+      contacted; a failed assertion is counted, not thrown.
+    cmds:
+      - bash scripts/task/chain-profile.sh
+
   dev:closure:toml:
     desc: Emit a 3-level closure TOML tree for handoff/agent reports (HOST=name, OUT=path)
     cmds:

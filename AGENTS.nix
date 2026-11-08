@@ -33,10 +33,13 @@
         2. A host as a feature list. LANDED as `featureModules` + `mkHost` in
            `flake/module-sets.nix`; the seven chains are derived, and all 30
            configurations' derivations were unchanged across the landing.
-        3. Cut the chain, since it is the cost: profile each member against a
-           stub host, then stop evaluating a shell a host never runs (dms vs
-           ryoku is already a feature). Exit: desktop gate under 1 GiB, fleet
-           peak under 4 GiB, `nix flake check` allowed again at 16 GiB.
+        3. Cut the chain, since it is the cost. MEASURED 2026-11-08 with
+           `dev:eval:profile` (stub host, assertions forced): base 466 MiB,
+           +nixos 654, +the user role 1233. The member this rung named — the
+           dms shell — costs 10 MiB, nixvim 75 and nix-index 0, so no single
+           member is the cost: the user role's aggregate option surface is
+           ~450 MiB, and the cut is to feature-ize it. Exit unchanged:
+           desktop gate under 1 GiB, fleet peak under 4 GiB.
         4. Three verbs (`check:leaf`, `check:host`, `check:cache`) over one
            table, instead of 93 tasks: a check becomes a row, and the section
            that lists it is generated from the same row.

@@ -28,18 +28,17 @@
         the fleet check inherits that floor once per configuration.
 
         Rungs, cheapest first, each with an executable exit:
-        1. Derivation equality as the refactor instrument. LANDED as
-           `checks:drv-equality` (snapshot/compare; DEEP=1 for the toplevel).
-        2. A host as a feature list. LANDED as `featureModules` + `mkHost` in
-           `flake/module-sets.nix`; the seven chains are derived, and all 30
+        1. Derivation equality as the refactor instrument: LANDED as
+           `checks:drv-equality` (snapshot/compare, DEEP=1 for the toplevel).
+        2. A host as a feature list: LANDED as `mkHost` + `chainFeatures`
+           (`flake/module-sets.nix`); the chains are derived, and all 30
            configurations' derivations were unchanged across the landing.
         3. Cut the chain, since it is the cost. MEASURED 2026-11-08 with
            `dev:eval:profile` (stub host, assertions forced): base 466 MiB,
-           +nixos 654, +the user role 1233. The member this rung named — the
-           dms shell — costs 10 MiB, nixvim 75 and nix-index 0, so no single
-           member is the cost: the user role's aggregate option surface is
-           ~450 MiB, and the cut is to feature-ize it. Exit unchanged:
-           desktop gate under 1 GiB, fleet peak under 4 GiB.
+           +nixos 654, +the user role 1233; dms +10, nixvim +75, nix-index +0.
+           No single member is the cost — the user role's aggregate option
+           surface is ~450 MiB — so the cut is to feature-ize it. Exit: desktop
+           gate under 1 GiB, fleet peak under 4 GiB.
         4. Three verbs (`check:leaf`, `check:host`, `check:cache`) over one
            table, instead of 93 tasks: a check becomes a row, and the section
            that lists it is generated from the same row.
@@ -49,7 +48,8 @@
            and no `cmds`, which is the graph.
         6. Documents: generate every table that mirrors `inventory.toml`,
            `modules.toml`, the task plane or the graph; keep prose for the why.
-           AGENTS.md lands near 120 lines, with routing from `ops:kg`.
+           STARTED: the chain table is `docs/generated/fleet-module-chains.md`
+           and AGENTS.md points at it. The 120-line manual is open.
 
         Not doing: IFD (1.8 s on every eval that touches it), splitting HM out
         of hosts to shrink host eval, a second renderer beside the site.

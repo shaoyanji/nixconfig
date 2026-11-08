@@ -137,7 +137,8 @@ tasks:
   clanker:nix:
     desc: Build one flake attribute on clanker in the background
     summary: >
-      `task clanker:nix -- '.#hostChecks.x86_64-linux.fern' --wait`. The tree is
+      `task clanker:nix -- 'hostChecks.x86_64-linux.fern' --wait` (a bare attr;
+      the task adds the `.#`). The tree is
       sent with `git archive HEAD` (so commit first — uncommitted work does not
       travel), and the build runs detached from the ssh channel. This box has no
       version of the fleet's cache write keys: a build here warms nothing until

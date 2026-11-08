@@ -19,16 +19,16 @@ tasks:
     desc: Run narrow repo checks (repo HYGIENE — evaluates no host config)
     aliases: [check]
     summary: >
-      Bounded repo hygiene: compiled inventory checks, task-graph integrity, the
-      knowledge-graph and sidecar-parity gates, skill task-mirrors, nix lint, sops
-      drift, modules.toml.
-      NO nixosConfiguration is forced — this answers "is the repo internally
-      consistent", not "does host X evaluate". For a host: `checks:host HOST=<h>`
-      (~13 s / 720 MiB); for a named set: `checks:hosts HOSTS="a b"`.
+      Bounded repo hygiene — "is the repo internally consistent", not "does host
+      X evaluate": compiled inventory, task graph, knowledge graph and sidecar
+      parity, skill task-mirrors, nix lint, sops drift, modules.toml. No
+      nixosConfiguration is forced; that is `checks:host HOST=<h>` (~13 s / 720
+      MiB) or `checks:hosts HOSTS="a b"`.
 
-      Do not turn this into `nix flake check`: it forces every flake output (23
-      configs) in one process — 6078 MiB peak, SIGKILL 137 on this host. Exit 0 =
-      clean.
+      Not `nix flake check`: 23 configs, 6078 MiB, SIGKILL 137 here. Shape:
+      independent gates are parallel `deps` (12.8 s -> 8.2 s on delphi), then
+      one serial flake eval (8 s, `policies` 7.5 s of it), then the timing gate
+      `entry` alone — ~22 s total. Exit 0 = clean.
     vars:
       # These checks are per-system and the flake has them for aarch64-linux too,
       # but the attribute was pinned to x86_64-linux — so on delphi (aarch64, the
@@ -37,23 +37,37 @@ tasks:
       # scripts/task/taskfile-graph.sh.
       SYSTEM:
         sh: nix eval --impure --raw --expr builtins.currentSystem
+    # The independent gates run CONCURRENTLY (go-task runs `deps` in parallel);
+    # none of them writes, and every one is a text scan or a leaf eval, so the
+    # sum of their runtimes was waiting rather than work. Measured on delphi
+    # (2 cores): 12.8 s sequential -> 8.2 s parallel. Not 2x, because `tasks` and
+    # `kg` each start their own nix eval and three of those contend for the two
+    # cores; the floor is a shared eval, not more concurrency.
+    deps:
+      - task: checks:repo:paths
+      - task: checks:docs:links
+      - task: checks:prose
+      - task: checks:yaml:lint
+      - task: checks:toon
+      - task: checks:toon:surfaces
+      - task: checks:tasks
+      - task: checks:kg
+      # `checks:kg:iets` stays out on purpose: it is two uncached full evals
+      # (~3 s) for a parity experiment, and its own summary says so.
+      - task: checks:nix:lint
+      - task: checks:nix:shell
+      - task: checks:modules:edges
+    # Serial on purpose, in this order. The build leg is ONE flake eval (`policies`
+    # is ~7.5 s of it, the other attrs are ~1 s together); `knobs` rides along in
+    # that same process for ~0.1 s and is the compiled registry gate, strictly
+    # stronger than the bash smoke check it replaces here (`checks:modules:validate`
+    # still exists for hosts that cannot evaluate `checks.<system>`). `entry` is a
+    # TIMING gate with a min-of-3 budget, so it must never share a core: it goes
+    # last, after the deps have finished and every other task has exited.
     cmds:
-      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph-selftest .?submodules=1#checks.{{.SYSTEM}}.skills-task-mirror
-      - task checks:repo:paths
-      - task checks:docs:links
-      - task checks:prose
-      - task checks:yaml:lint
-      - task checks:toon
-      - task checks:toon:surfaces
-      - task checks:tasks
-      - task checks:kg
-      - task checks:kg:iets
-      - task checks:entry
-      - task checks:nix:lint
-      - task checks:nix:shell
-      - task checks:sops:drift
-      - task checks:modules:validate
-      - task checks:modules:edges
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.knobs .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph .?submodules=1#checks.{{.SYSTEM}}.taskfile-graph-selftest .?submodules=1#checks.{{.SYSTEM}}.skills-task-mirror
+      - task: checks:sops:drift
+      - task: checks:entry
 
   checks:docs:links:
     desc: "[gate] Every markdown link resolves, and none points at a machine path"
@@ -365,7 +379,14 @@ tasks:
         exec nix flake check
 
   checks:modules:validate:
-    desc: Verify modules.toml syntax and valid module paths on disk
+    desc: "[smoke] modules.toml syntax and knob paths, without a flake eval"
+    summary: >
+      The host-agnostic smoke check: parses modules.toml and confirms every knob
+      path exists, with no eval, so it works on a machine that cannot evaluate
+      `checks.<system>` (darwin, a cross-arch box). The GATE is the compiled
+      `checks.<system>.knobs` in flake/checks.nix — it also asserts every path
+      declares a toggle, every host it names is in the inventory, and the
+      `total_knobs` count — and `checks:quick` builds it.
     cmds:
       - bash scripts/task/modules-menu.sh validate
 

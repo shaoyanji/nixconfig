@@ -13,6 +13,7 @@ the host's MagicDNS name, where tailscaled terminates TLS.
 | `POST /api/add-email` | one message in: nine camelCase keys, `recipients`/`labels` comma-separated, upserts on `messageId` |
 | `GET /openapi.json` | the machine-readable contract (OpenAPI 3.0.3, generated from the SQL files) |
 | [`mail-atlas`](mail-atlas.md) | browser reading surface over the same rows: fuzzy search, tags, graph (tailnet 8452) |
+| `gemini://delphi.cloudforest-kardashev.ts.net:1966/mail/` | Gemini reader over the same rows: search, newest, one message (tailnet 1966; procedure in `.agents/deploy/hosts/delphi.md`) |
 
 | Layer | Home |
 | :--- | :--- |

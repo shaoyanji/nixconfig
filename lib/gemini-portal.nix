@@ -6,6 +6,10 @@
   lib ? pkgs.lib,
   data ? builtins.fromJSON (builtins.readFile ./bountystash/portfolio.json),
   dataDe ? builtins.fromJSON (builtins.readFile ./bountystash/portfolio.de.json),
+  # Extra gemtext placed after the index's last section, before its footer: a
+  # capsule that is more than the portfolio (the tailnet mail reader) reaches
+  # its other pages from the index instead of from a URL you had to know.
+  extra ? [],
 }: let
   shared = import ./bountystash/shared.nix {inherit lib;};
   inherit (shared) labels slug;
@@ -118,6 +122,7 @@
           m.other)
       ]
       ++ ["" (heading 2 m.elsewhere) "" (link "https://www.bountystash.com" m.https)]
+      ++ extra
       ++ ["" v.footer]
     );
 

@@ -5175,11 +5175,51 @@
 
         **Projection, not a second tree.** `lib/gemtext.nix` converts `docs.generatedPages` plus the
         repo's own markdown into `.gmi`, rewriting internal links to absolute capsule paths. md2gemini
-        is marked broken on python 3.14 in this nixpkgs, hence `lib/gemtext/md2gemtext.py`.
+        is marked broken on python 3.14 in this nixpkgs, hence `lib/gemtext/md2gemtext.py`.        **Exit.** A client that verifies against `modules/config/tls/frieren-lan-ca.pem` gets
+        `20 text/gemini` from `/`, `20` with the echoed query from `/cgi-bin/hello?x=1`, `51` for
+        a missing page and `53` for a foreign host.
+      '';
+    };
 
-        **Exit.** A client that verifies against `modules/config/tls/frieren-lan-ca.pem` gets
-        `20 text/gemini` from `/`, `20` with the echoed query from `/cgi-bin/hello?x=1`, `51` for a
-        missing page and `53` for a foreign host.
+    gemini-mail-reader = {
+      title = "The email archive answers over Gemini on delphi's tailnet capsule";
+      kind = "open";
+      status = "DELIVERED";
+      date = "2026-11-08";
+      priority = "P3";
+      links = ["gemini-capsule"];
+      summary = "`gemini://delphi.cloudforest-kardashev.ts.net:1966/mail/` searches and reads the archive: one CGI program in three modes (`email`, `latest`, `read`) querying the loopback API, mounted as a fragment on the tailnet capsule only, so the internet-facing 1965 cannot reach it.";
+      refs = {
+        hosts = ["delphi"];
+        modules = [
+          "hosts/delphi/gemini.nix"
+          "lib/gemini-mail.nix"
+          "lib/gemini-mail/mail.py"
+          "lib/gemini-portal.nix"
+        ];
+        docs = [
+          ".agents/deploy/hosts/delphi.md"
+          "docs/email-archive.md"
+        ];
+        tasks = ["infra:deploy:host:delphi"];
+      };
+      body = ''
+        **A page cannot be generated.** Mail arrives hourly, so a capsule compiled at deploy
+        time answers yesterday's archive. The reader is CGI for that reason, and the fragment
+        exists only to carry `cgi-bin/` into the capsule.
+
+        **The fragment is copied, never symlinked.** molly-brown resolves a CGI's filesystem
+        path before matching `CGIPaths`; a symlink-joined fragment resolves outside `DocBase`
+        and the script is never executed. `cp -r` onto the base capsule is the fix.
+
+        **The public port stays untouched on purpose.** 1965 keeps the portfolio with no
+        `CGIPaths` and no mail tree, so a request there cannot reach the archive even though both
+        instances share the archive on loopback.
+
+        **Exit.** Met on 2026-11-08, over TLS on 1966: `/mail/` `20`; `/cgi-bin/email` `10` with
+        no query and 13 hits for `invoice`; `/cgi-bin/latest` 30 links; `/cgi-bin/read?<id>` `20`
+        with two fences; `51` for an unknown id; `40` with the API unreachable. And on 1965,
+        `/mail/` and every `/cgi-bin/*` path `51` while `/` still serves `20`.
       '';
     };
 

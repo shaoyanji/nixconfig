@@ -12,6 +12,15 @@
   tailnetHost = "${hostMeta.network.tailscale_hostname}.cloudforest-kardashev.ts.net";
 
   capsule = import ../../lib/gemini-portal.nix {inherit pkgs lib;};
+  mail = import ../../lib/gemini-mail.nix {inherit pkgs lib;};
+
+  # The tailnet instance is the portfolio plus the mail archive reader, and it
+  # is the only one that names a CGI path. The public capsule has neither the
+  # mail tree nor `CGIPaths`, so port 1965 can never reach the archive.
+  tailnetCapsule = mail.capsule (import ../../lib/gemini-portal.nix {
+    inherit pkgs lib;
+    extra = mail.indexSection;
+  });
 
   publicPort = 1965;
   tailnetPort = 1966;
@@ -33,9 +42,13 @@
       Hostname = tailnetHost;
       CertPath = tailnetCert;
       KeyPath = tailnetKey;
-      DocBase = capsule;
+      DocBase = tailnetCapsule;
       AccessLog = "/var/log/molly-brown-tailnet/access.log";
       ErrorLog = "/var/log/molly-brown-tailnet/error.log";
+      # MUST be relative: config.go joins a relative entry to DocBase and leaves
+      # an absolute one alone, then compares against the resolved filesystem
+      # path (hosts/frieren/gemini.nix carries the same note).
+      CGIPaths = ["cgi-bin"];
     }
     // geminiSettings);
 in {

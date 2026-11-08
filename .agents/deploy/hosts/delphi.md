@@ -264,16 +264,60 @@ capsule answers on the host's own name: it already resolves here and already has
 a certificate, while a `gemini.` label would need a new A record and a new ACME
 line.
 
-Verify from a client — the first line must be `20 text/gemini; charset=utf-8`:
+Verify from a client — the first line must be `20 text/gemini; charset=utf-8`.
+`openssl s_client -quiet` swallows the response on the OpenSSL 3.5 this host
+ships (measured 2026-11-08: it prints nothing for a request the server answers),
+so probe with Python, which is what actually proved the capsule on both ports:
 
 ```bash
-printf 'gemini://delphi.bountystash.com/\r\n' |
-  nix shell nixpkgs#openssl -c openssl s_client -quiet \
-    -connect delphi.bountystash.com:1965 -servername delphi.bountystash.com | head -3
-printf 'gemini://delphi.bountystash.com/resume.json\r\n' |
-  nix shell nixpkgs#openssl -c openssl s_client -quiet \
-    -connect delphi.bountystash.com:1965 -servername delphi.bountystash.com | head -2
+probe() {
+  python3 - "$@" <<'PY'
+import socket, ssl, sys
+host, port, path = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+conn = socket.create_connection(("127.0.0.1", port), timeout=10)
+with ctx.wrap_socket(conn, server_hostname=host) as s:
+    s.sendall(f"gemini://{host}:{port}{path}\r\n".encode())
+    while chunk := s.recv(65536):
+        sys.stdout.write(chunk.decode("utf-8", "replace"))
+PY
+}
+probe delphi.bountystash.com 1965 / | head -3
+probe delphi.bountystash.com 1965 /resume.json | head -2
+probe delphi.cloudforest-kardashev.ts.net 1966 /mail/ | head -3
 ```
+
+### The mail reader, on the tailnet instance only
+
+`gemini://delphi.cloudforest-kardashev.ts.net:1966/mail/` is the email archive as
+a capsule — `lib/gemini-mail.nix` for the capsule fragment and `$out/cgi-bin`, and
+`lib/gemini-mail/mail.py` for the program. Three wrappers, one program, no page
+generated at build time: mail arrives hourly, and a capsule built at deploy time
+would answer yesterday's archive.
+
+| Path | Answer |
+| :--- | :--- |
+| `/mail/` | the landing page: what the archive holds, how the search works |
+| `/cgi-bin/email` | `10`, so the client asks for a query; `?words` answers up to 30 hits with a snippet each |
+| `/cgi-bin/latest` | the newest 30 messages |
+| `/cgi-bin/read?<id>` | one message: envelope, attachment name, body in a preformatted block (48 KiB cap); `51` for an id the archive does not hold |
+
+It reads the same rows the HTTP API on 8450 does, over loopback
+(`EMAIL_ARCHIVE_API`, default `http://127.0.0.1:8080/api`), so the tailnet stays
+the only boundary: the public capsule has neither the mail tree nor a `CGIPaths`
+entry, and `/mail/` and every `/cgi-bin/*` path on 1965 answer `51` — measured
+2026-11-08, after the switch.
+
+Two details that decide whether it runs at all:
+
+- **`CGIPaths = ["cgi-bin"]` must be relative**, and it is set on the tailnet
+  config only (molly-brown joins a relative entry to `DocBase`; an absolute one
+  never matches a path under it).
+- **The fragment is copied onto the tailnet capsule, never symlinked.** The server
+  resolves a CGI's filesystem path before matching `CGIPaths`, so a symlinked
+  fragment resolves outside `DocBase` and the script is never executed.
 
 A renewed ACME certificate restarts `molly-brown` (`reloadServices`); the tailnet
 certificate is re-issued by the daily `gemini-tailnet-cert` timer, which only

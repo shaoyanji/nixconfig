@@ -1,0 +1,93 @@
+{
+  "surface": "scripts/task/vox-tools.json",
+  "cases": [
+    {
+      "id": "frieren-role",
+      "prompt": "what is frieren's role in the fleet",
+      "tool": "host_fact",
+      "args": {"host": "frieren", "field": "role"},
+      "why": "names one host and asks what it is"
+    },
+    {
+      "id": "delphi-arch",
+      "prompt": "which architecture does delphi run on",
+      "tool": "host_fact",
+      "args": {"host": "delphi", "field": "arch"},
+      "why": "a registry field, not documentation"
+    },
+    {
+      "id": "eisen-managed",
+      "prompt": "is eisen managed by this repo",
+      "tool": "host_fact",
+      "args": {"host": "eisen", "field": "managed"},
+      "why": "management state is a host field, not a search"
+    },
+    {
+      "id": "fern-category",
+      "prompt": "what category is fern in",
+      "tool": "host_fact",
+      "args": {"host": "fern", "field": "category"},
+      "why": "fourth host, so a surface cannot win by memorising one name"
+    },
+    {
+      "id": "notes-impermanence",
+      "prompt": "search my notes for proposals about impermanence",
+      "tool": "notes_search",
+      "why": "a proposal lives in the notes store, not the docs"
+    },
+    {
+      "id": "notes-open-work",
+      "prompt": "which open work exists on the task plane",
+      "tool": "notes_search",
+      "why": "open work is a notes kind, and the phrase is the trap"
+    },
+    {
+      "id": "notes-closure-experiment",
+      "prompt": "find the experiment about closure size",
+      "tool": "notes_search",
+      "why": "an experiment is a note; the wiki also has closure articles"
+    },
+    {
+      "id": "notes-sops",
+      "prompt": "any notes about sops rekeying",
+      "tool": "notes_search",
+      "why": "short and unpunctuated, the way a person actually asks"
+    },
+    {
+      "id": "docs-agent-turns",
+      "prompt": "where is the agent turn procedure documented",
+      "tool": "doc_pages",
+      "why": "a procedure is documentation, not a note"
+    },
+    {
+      "id": "docs-deploy-runbook",
+      "prompt": "find the runbook for deploying a host",
+      "tool": "doc_pages",
+      "why": "the word runbook is documentation's, not the notes store's"
+    },
+    {
+      "id": "docs-stale-generation",
+      "prompt": "how do I fix a stale generation",
+      "tool": "doc_pages",
+      "why": "a how-to, and the answer is a doc page"
+    },
+    {
+      "id": "docs-nix-patterns",
+      "prompt": "find the documentation about nix patterns",
+      "tool": "doc_pages",
+      "why": "the most explicit phrasing of the docs lane"
+    },
+    {
+      "id": "silence-arithmetic",
+      "prompt": "what is 2 plus 2",
+      "tool": "",
+      "why": "a caller that looks this up will one day run something by accident"
+    },
+    {
+      "id": "silence-greeting",
+      "prompt": "hello there",
+      "tool": "",
+      "why": "no named machine, no store, no document: silence is correct"
+    }
+  ]
+}

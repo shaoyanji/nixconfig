@@ -27,6 +27,18 @@ tasks:
     cmds:
       - bash scripts/task/vox.sh tools
 
+  vox:battery:
+    desc: Measure how often the caller picks the tool each prompt needs
+    summary: >
+      Runs `scripts/task/vox-battery.json` against the surface in
+      `vox-tools.json` and scores every pass: the tool, the arguments, and
+      whether the caller stayed silent where silence is right. `-repeat N`
+      exposes a case that disagrees with itself, which one pass hides. Exit 1
+      means the score is below `-threshold`. The engine is arm64, so this is a
+      delphi task; on x86_64 there is no caller to measure.
+    cmds:
+      - bash scripts/task/vox.sh battery -cases scripts/task/vox-battery.json {{.CLI_ARGS}}
+
   vox:ask:
     desc: Explain one question end to end (caller -> router -> tool -> voice)
     summary: >

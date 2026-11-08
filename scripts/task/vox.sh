@@ -27,6 +27,11 @@ export NEEDLE_ENGINE NEEDLE_WEIGHTS
 if [ -z "${VOX_TOOLS:-}" ]; then
   export VOX_TOOLS="$root/scripts/task/vox-tools.json"
 fi
+# The battery is a measurement of that surface, not a second surface: shipping it
+# beside the manifest is what stops a case from naming a tool the fleet lacks.
+if [ -z "${VOX_BATTERY:-}" ]; then
+  export VOX_BATTERY="$root/scripts/task/vox-battery.json"
+fi
 
 bin=${VOX_BIN:-}
 if [ -z "$bin" ]; then

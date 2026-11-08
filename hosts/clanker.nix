@@ -1,7 +1,6 @@
-# clanker — the Instabox VM, permanent fleet fixture since 2026-11-06. Instabox
-# boots Ubuntu with the account `user` and the home `/data/home` (its `/data` disk,
-# not `/home`), so the lean role is built for that home; the box's own distro keeps
-# owning boot, kernel and users. How it is driven: .agents/skills/instabox/SKILL.md.
+# clanker — the Instabox VM, fleet fixture since 2026-11-06: Ubuntu, account
+# `user`, home `/data/home`, own boot/kernel/users, the lean role built for that
+# home. Driving it: .agents/skills/instabox/SKILL.md.
 {
   imports = [../modules/roles/lean.nix];
 

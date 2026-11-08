@@ -1,7 +1,6 @@
-# `role:lean` — the operator's toolbox and nothing else: no desktop, no AI stack,
-# no nixvim, no sops, so it activates with no age key on a box that is not a fleet
-# host. Deliberately not `role:minimal`, which imports the AI stack. Where it is
-# used and why: .agents/skills/instabox/SKILL.md.
+# `role:lean` — the operator's toolbox only: no desktop, AI stack, nixvim or
+# sops, so it activates without an age key on a box that is not a fleet host
+# (not `role:minimal`, which imports the AI stack). .agents/skills/instabox/SKILL.md
 {
   pkgs,
   lib,

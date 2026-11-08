@@ -1,7 +1,6 @@
-# The agent-turn log as a reading surface, not a table: one panel per turn,
-# pushed to every open browser over SSE. Each panel can hand a prompt to Hermes,
-# whose answer lands in that panel. The shim stays the only holder of the store's
-# contract; this service is a reader with its own token.
+# The agent-turn log as a reading surface: one SSE-pushed panel per turn, each
+# able to hand a prompt to Hermes. The shim holds the store contract; this is a
+# reader with its own token.
 {
   config,
   lib,

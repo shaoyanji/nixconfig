@@ -104,6 +104,31 @@
     };
     # Tools this flake builds rather than borrows: the families where `pkg` is a
     # local derivation instead of a nixpkgs attribute.
+    ai = {
+      # vox is the explainer layer: needle3 picks one tool call, jev routes the
+      # lane, cpg says the result to a person. Go stdlib only, so `vendorHash =
+      # null` and the binary builds on either architecture — the *engine* it
+      # calls is linux-arm64, and `vox doctor` reports that rather than hiding it.
+      # Source is the separate project, pinned like any other upstream: the pin
+      # is the whole interface, so a fleet cannot run a half-merged tree.
+      vox.pkg = pkgs.buildGoModule {
+        pname = "vox";
+        version = "0.1.0";
+        src = pkgs.fetchFromGitHub {
+          owner = "shaoyanji";
+          repo = "pancakes-harness";
+          rev = "edef3a2b8f9844d9b395023a1c0a13595133d375";
+          hash = "sha256-FU6KJN2lfrf8Qn33AtLOtoTh78xkKZr80tS/TRqaLJs=";
+        };
+        subPackages = ["cmd/vox"];
+        vendorHash = null;
+        env.CGO_ENABLED = 0;
+        meta = {
+          description = "Explain one question: needle3 caller, jev lane routing, cpg voice";
+          mainProgram = "vox";
+        };
+      };
+    };
     learn = {
       deutsch-srs.pkg = pkgs.callPackage ./deutsch-srs.nix {};
       anki-author.pkg = pkgs.callPackage ./anki-author.nix {};

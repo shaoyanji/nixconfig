@@ -123,6 +123,10 @@ includes:
         taskfile: taskfiles/services.yml
         dir: .
         flatten: true
+    vox:
+        taskfile: taskfiles/vox.yml
+        dir: .
+        flatten: true
 tasks:
     default:
         desc: Show the operator map (intent -> canonical task)

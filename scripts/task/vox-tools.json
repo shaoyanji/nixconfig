@@ -1,0 +1,42 @@
+[
+  {
+    "name": "host_fact",
+    "description": "Return one compiled registry field for a NAMED machine. Use only when the question names a host and asks what it is or has: its role, status, kind, category, hostname, architecture, system type, management state or network. Never for documentation, notes or general knowledge.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "host": {"type": "string", "description": "hostname such as frieren, eisen, delphi"},
+        "field": {"type": "string", "enum": ["role", "status", "kind", "category", "hostname", "arch", "system_type", "managed", "network"]}
+      },
+      "required": ["host", "field"]
+    },
+    "command": ["nix", "eval", "--json", ".#inventory.hosts.{host}.{field}"],
+    "read_only": true
+  },
+  {
+    "name": "notes_search",
+    "description": "Search the decision-notes store: experiments, proposals, open work and studies. Use for 'which proposals exist about X' or 'open work on X'. Never for documentation files.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "q": {"type": "string", "description": "keywords, not a sentence"}
+      },
+      "required": ["q"]
+    },
+    "command": ["task", "ops:notes:search", "Q={q}"],
+    "read_only": true
+  },
+  {
+    "name": "doc_pages",
+    "description": "Search this repository's documentation and runbooks for a topic. Use for 'where is X documented', 'how do I do procedure Y', 'find the runbook for Z'.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {"type": "string", "description": "keywords, not a sentence"}
+      },
+      "required": ["query"]
+    },
+    "command": ["qmd", "search", "{query}", "-c", "nixconfig"],
+    "read_only": true
+  }
+]

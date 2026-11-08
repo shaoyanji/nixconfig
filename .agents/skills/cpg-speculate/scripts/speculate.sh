@@ -2,11 +2,12 @@
 # speculate.sh — one speculative round: N models answer the same question in
 # parallel, Jev picks the best, and the winner is all the caller reads.
 #
-# Usage: speculate.sh [--json] "question" [model ...]
+# Usage: speculate.sh [--json] [--all] "question" [model ...]
 # Default models are the four the plan actually serves (premium_only ids 403).
 set -euo pipefail
 
 json=0
+all=0
 context_file=""
 round_label=""
 xs_subject=""
@@ -20,6 +21,7 @@ while [ $# -gt 0 ]; do
     --ledger) ledger=${2:-}; shift 2 ;;
     --no-ledger) ledger=""; shift ;;
     --xs) xs_subject=${2:-}; shift 2 ;;
+    --all) all=1; shift ;;
     --) shift; break ;;
     -*) echo "speculate: unknown flag $1" >&2; exit 64 ;;
     *) break ;;
@@ -28,7 +30,7 @@ done
 
 question=${1:-}
 if [ -z "$question" ]; then
-  echo 'usage: speculate.sh [--json] [--context FILE] [--label NAME] "question" [model ...]' >&2
+  echo 'usage: speculate.sh [--json] [--all] [--context FILE] [--label NAME] "question" [model ...]' >&2
   exit 64
 fi
 shift || true
@@ -103,10 +105,25 @@ if [ ${#labels[@]} -eq 1 ]; then
   # Nothing to choose between. Emitting it beats paying for a one-option Jev
   # call that can only return that option.
   if [ "$json" -eq 1 ]; then
-    jq -n --arg q "$question" --arg m "${kept_models[0]}" --rawfile t "$tmp/${kept_idx[0]}.out" \
-      '{question: $q, candidates: [{label: "c0", model: $m}], decision: null, winner: {label: "c0", model: $m, text: $t}}'
+    # --all on a one-lane round: the array is still the shape, so a caller that
+    # asked for every candidate never has to branch on how many answered.
+    if [ "$all" -eq 1 ]; then
+      jq -n --arg q "$question" --arg m "${kept_models[0]}" --rawfile t "$tmp/${kept_idx[0]}.out" \
+        '{question: $q, candidates: [{label: "c0", model: $m}], decision: null,
+          winner: {label: "c0", model: $m, text: $t},
+          all: [{label: "c0", model: $m, chosen: true, text: $t}]}'
+    else
+      jq -n --arg q "$question" --arg m "${kept_models[0]}" --rawfile t "$tmp/${kept_idx[0]}.out" \
+        '{question: $q, candidates: [{label: "c0", model: $m}], decision: null, winner: {label: "c0", model: $m, text: $t}}'
+    fi
   else
-    cat "$tmp/${kept_idx[0]}.out"
+    if [ "$all" -eq 1 ]; then
+      printf -- '--- c0 (%s) *** only lane\n' "${kept_models[0]}"
+      cat "$tmp/${kept_idx[0]}.out"
+      printf '\n'
+    else
+      cat "$tmp/${kept_idx[0]}.out"
+    fi
   fi
   exit 0
 fi
@@ -176,10 +193,36 @@ if [ -n "$xs_subject" ]; then
     || echo "speculate: xs post failed (queued by the shim)" >&2
 fi
 
+# --all exists because the winner alone discards the evidence: a Jev verdict at
+# p=0.65 with a 0.48 margin is `needs_review`, and a reader deciding something
+# irreversible wants the other three lanes rather than a draft with no priors.
+# Without the flag the output is byte-for-byte what it was, so no consumer moves.
 if [ "$json" -eq 1 ]; then
-  jq -n --arg q "$question" --argjson d "${decision:-null}" --arg l "$chosen" --arg m "$model" \
-    --rawfile t "$out" --argjson cand "$cand" \
-    '{question: $q, candidates: ($cand | keys), decision: $d.decisions.best, winner: {label: $l, model: $m, text: $t}}'
+  if [ "$all" -eq 1 ]; then
+    lanes='[]'
+    for idx in "${!kept_idx[@]}"; do
+      lanes=$(jq -n --argjson prev "$lanes" --arg l "c$idx" --arg m "${kept_models[$idx]}" \
+        --arg chosen "$chosen" --rawfile t "$tmp/${kept_idx[$idx]}.out" \
+        '$prev + [{label: $l, model: $m, chosen: ($l == $chosen), text: $t}]')
+    done
+    jq -n --arg q "$question" --argjson d "${decision:-null}" --arg l "$chosen" --arg m "$model" \
+      --rawfile t "$out" --argjson cand "$cand" --argjson lanes "$lanes" \
+      '{question: $q, candidates: ($cand | keys), decision: $d.decisions.best,
+        winner: {label: $l, model: $m, text: $t}, all: $lanes}'
+  else
+    jq -n --arg q "$question" --argjson d "${decision:-null}" --arg l "$chosen" --arg m "$model" \
+      --rawfile t "$out" --argjson cand "$cand" \
+      '{question: $q, candidates: ($cand | keys), decision: $d.decisions.best, winner: {label: $l, model: $m, text: $t}}'
+  fi
+elif [ "$all" -eq 1 ]; then
+  for idx in "${!kept_idx[@]}"; do
+    lbl="c$idx"
+    mark=""
+    if [ "$lbl" = "$chosen" ]; then mark=" *** chosen"; fi
+    printf -- '--- %s (%s)%s\n' "$lbl" "${kept_models[$idx]}" "$mark"
+    cat "$tmp/${kept_idx[$idx]}.out"
+    printf '\n'
+  done
 else
   cat "$out"
 fi

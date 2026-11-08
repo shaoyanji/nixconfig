@@ -1,0 +1,64 @@
+version: "3"
+
+# vox is the explainer layer built in a separate project (shaoyanji/pancakes-harness,
+# `internal/vox`), pinned in flake/cli.nix. Three model roles, one CLI:
+# needle3 picks a tool call, jev-decide routes the lane, cpg says the result.
+#
+# Each role is optional, which is why these tasks do not gate on all three: a
+# missing engine makes the caller a replay fixture, a missing decision model
+# leaves the caller's own pick, a missing chat lane returns the raw answer.
+# `vox:doctor` is the task that says which one is missing on this host.
+tasks:
+  vox:doctor:
+    desc: Which of the caller, the router and the voice exist on this host
+    summary: >
+      One line per backend and a `note` for every absence, plus the platform:
+      needle3's engine is linux-arm64, so an x86_64 host reports it and expects
+      `-replay` or a chat-only lane. Read-only, no network, no model call.
+    cmds:
+      - bash scripts/task/vox.sh doctor {{.CLI_ARGS}}
+
+  vox:tools:
+    desc: The call surface a question can be routed to
+    summary: >
+      Every tool in `scripts/task/vox-tools.json` with its command template and
+      whether it is read-only. A non-read-only tool needs `--allow-write` at ask
+      time even when the lane is confident.
+    cmds:
+      - bash scripts/task/vox.sh tools
+
+  vox:ask:
+    desc: Explain one question end to end (caller -> router -> tool -> voice)
+    summary: >
+      `task vox:ask -- "what is fern"`. One caller pass picks a tool, the lane is
+      routed, a read-only tool runs, and the answer is explained in prose. Exit
+      2 means the gate held it as a proposal, 3 a refusal, 4 an escalation to a
+      reasoning model — the exit code carries the verdict, so no prose is parsed.
+    cmds:
+      - bash scripts/task/vox.sh ask {{.CLI_ARGS}}
+
+  vox:decide:
+    desc: Ask a decision model for a label and a probability
+    summary: >
+      `task vox:decide -- -choices "run it,ask a person" "is this worth a tool
+      call"`. Prints `{status, pick, probability, margin}`; exit 2 is
+      `needs_review`, which is a signal and never an authorisation.
+    cmds:
+      - bash scripts/task/vox.sh decide {{.CLI_ARGS}}
+
+  vox:say:
+    desc: One chat-lane call, no tools and no routing
+    summary: >
+      `task vox:say -- "explain mkForce in two sentences"`. The human-loop lane
+      on its own: one prompt, one answer, no packet assembly.
+    cmds:
+      - bash scripts/task/vox.sh say {{.CLI_ARGS}}
+
+  vox:round:
+    desc: A speculative round through the voice, every candidate returned
+    summary: >
+      `task vox:round -- "when should a module use mkDefault"`. Four chat lanes
+      plus a Jev grade, using `speculate.sh --all` so the candidates are not
+      discarded — a round below the gate is evidence, not a winner.
+    cmds:
+      - bash .agents/skills/cpg-speculate/scripts/speculate.sh --all {{.CLI_ARGS}}

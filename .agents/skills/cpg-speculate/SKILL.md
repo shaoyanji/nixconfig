@@ -21,6 +21,12 @@ the winner instead of on four drafts. The client it drives is declared in
 ```
 
 `--json` returns `{question, candidates, decision, winner:{label,model,text}}`.
+`--all` adds `all: [{label, model, chosen, text}]` and, without `--json`, prints
+every lane under a `--- cN (model)` header with the chosen one marked. It exists
+because the winner alone discards the evidence: a Jev verdict at p=0.65 with a
+0.48 margin is `needs_review`, and a reader deciding something irreversible wants
+the other three answers rather than a draft with no priors. Without the flag the
+output is unchanged.
 
 ## Why the budget allows it
 

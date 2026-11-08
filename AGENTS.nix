@@ -2,6 +2,56 @@
 {
   schemaVersion = 1;
   notes = {
+    eval-cost-ladder = {
+      title = "Eval cost is chain size; the debt is duplicated facts";
+      kind = "proposal";
+      status = "ACCEPTED";
+      priority = "P1";
+      date = "2026-11-08";
+      summary = "A desktop host gate is ~78% its chain, so eval speed is the chain's option surface and not a host's line count; the plan is derivation equality for refactors, feature-based hosts (landed), three check verbs over one table, a task plane split into TOML metadata and YAML commands, and documents generated wherever they mirror data.";
+      from = ["dendritic-flake"];
+      refs = {
+        modules = [
+          "flake/module-sets.nix"
+          "scripts/task/drv-equality.py"
+          "lib/taskfile.nix"
+          "flake/checks.nix"
+        ];
+        tasks = ["checks:drv-equality" "checks:host" "checks:tasks"];
+        docs = ["docs/task-control-plane.md" "docs/nix-patterns.md"];
+      };
+      body = ''
+        Claim: a gate's cost is its chain. Reproduce the split by evaluating the
+        same host on a desktop chain and on the lean role — the difference is the
+        chain, and the host file's 700 lines are the smaller half. The scaffolding
+        (`nix flake check` forbidden, oom-guard, phased protocol) exists because
+        the fleet check inherits that floor once per configuration.
+
+        Rungs, cheapest first, each with an executable exit:
+        1. Derivation equality as the refactor instrument. LANDED as
+           `checks:drv-equality` (snapshot/compare; DEEP=1 for the toplevel).
+        2. A host as a feature list. LANDED as `featureModules` + `mkHost` in
+           `flake/module-sets.nix`; the seven chains are derived, and all 30
+           configurations' derivations were unchanged across the landing.
+        3. Cut the chain, since it is the cost: profile each member against a
+           stub host, then stop evaluating a shell a host never runs (dms vs
+           ryoku is already a feature). Exit: desktop gate under 1 GiB, fleet
+           peak under 4 GiB, `nix flake check` allowed again at 16 GiB.
+        4. Three verbs (`check:leaf`, `check:host`, `check:cache`) over one
+           table, instead of 93 tasks: a check becomes a row, and the section
+           that lists it is generated from the same row.
+        5. Task plane: metadata in TOML for eval, commands in YAML for go-task;
+           then delete `lib/taskfile.nix`, the digest pin and `checks:tasks`
+           together. Never swap the parser for `task --list-all --json` — 2.2 s
+           and no `cmds`, which is the graph.
+        6. Documents: generate every table that mirrors `inventory.toml`,
+           `modules.toml`, the task plane or the graph; keep prose for the why.
+           AGENTS.md lands near 120 lines, with routing from `ops:kg`.
+
+        Not doing: IFD (1.8 s on every eval that touches it), splitting HM out
+        of hosts to shrink host eval, a second renderer beside the site.
+      '';
+    };
     dendritic-flake = {
       title = "Dendritic flake — `self` as the only import root";
       kind = "proposal";

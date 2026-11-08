@@ -146,9 +146,9 @@ spend the trial credits on a job that fits in a coffee break.
 | milestone | deliverable | passes when |
 | :--- | :--- | :--- |
 | M0 | grammar + battery, no model | `p = 1` on the grammar's own class; `S` measured on real questions |
-| M1 | `S` and coverage measured | ≥3 s median save, ≥40 % of the battery answered ✅ 943 s, 71 % |
-| M2 | model front over M0 | answered-case `p ≥ 0.3` at the M1 `S`, refusal ≤100 ms ✅ 1.0 at 70 ms |
-| M3 | gate flips | `ev > 0` from the battery ✅ 942.94 s at p 1.0 · resident unit ✅ `selector.service`, parity by `checks:selector:sidecar` |
+| M1 | `S` and coverage measured | ≥3 s median save, ≥40 % of the battery answered (met: 943 s, 71 %) |
+| M2 | model front over M0 | answered-case `p ≥ 0.3` at the M1 `S`, refusal ≤100 ms (met: 1.0 at 70 ms) |
+| M3 | gate flips | `ev > 0` from the battery (met: 942.94 s at p 1.0) · resident unit (met: `selector.service`, parity by `checks:selector:sidecar`) |
 
 Kill it if: `S` amortises to zero because the grammar is learnable in one session;
 refusal exceeds 100 ms; answered-case `p < 0.3`; or the daemon needs prose to answer.

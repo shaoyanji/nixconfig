@@ -111,7 +111,7 @@ Strata's reference card reaches 40–50 tok/s on 16 GB by combining four optimiz
 
 1. **Multi-Token Prediction (MTP) Drafting (`--spec 4`)**:
    - Evaluates 4 candidate tokens in parallel using the model's native MTP draft layer (`mtp/rt`).
-   - `--spec-min-p 0.5` ensures the engine accepts speculative drafts only when model confidence exceeds 50%.
+   - `--spec-min-p 0.5` takes a speculative draft only when the model's confidence exceeds 50%.
 2. **Quantized Expert Placement**:
    - `IQ1_M` (Coder) retains 256 of 512 experts selected specifically for code, math, and instruction following.
    - The hottest ~607 experts reside in RX 5700 GDDR6 VRAM; the rest reside in dual-channel DDR3-1600 RAM.

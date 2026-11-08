@@ -160,7 +160,7 @@ only**, never in `allowedTCPPorts`.
 
 ## 8. Auth & safety
 
-Running tasks from the web is powerful, so it is treated as such:
+A web-triggered task can change a host, so it is fenced:
 
 - Trust boundary is the **tailnet** (no public Funnel), same as the LLM/TTS
   endpoints. Optional bearer token (`apiKeyFile`) mirroring the TTS module.

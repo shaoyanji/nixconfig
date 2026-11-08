@@ -46,6 +46,6 @@ rest are named for what they do.
 | `p/ppp` | Private adult stash | Permissions `0700 devji:users`. Shielded with `.nomedia` and `.plexignore` |
 | `p/web` | Backward-compatibility symlink to `projects/bountystash-web` | Frontend for bountystash website |
 | `security/` | Credentials, certificates, recovery keys, age/sops keys | Permissions `0700 devji:users`. `id_ed25519.age` encrypted with fleet age keys |
-| `storage/` | Backward-compatibility symlink pointing to `.` | Ensures legacy `/Volumes/data/storage` paths resolve |
+| `storage/` | Backward-compatibility symlink pointing to `.` | legacy `/Volumes/data/storage` paths resolve |
 
 Truth: `taskfiles/data.yml` — the executable contract; this page is the procedure.

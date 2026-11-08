@@ -15,7 +15,7 @@ This guide walks through creating a bootable Sledgehammer USB from your NixOS fl
 - Local clone of this repository
 - SSH key pair for authentication (your public key needs to be authorized for SSH access to the live USB)
 
-## ⚠️ critical safety warnings
+## Critical safety warnings
 1. **ALL DATA ON THE USB DRIVE WILL BE PERMANENTLY ERASED.** Backup any important files first.
 2. Double-check the USB device path (e.g., `/dev/sdX`) before running any destructive commands. Using the wrong device can destroy your system's data.
 3. Disable Secure Boot on target machines before booting from the USB.
@@ -76,7 +76,7 @@ sudo nix run github:nix-community/disko -- \
   --flake .#sledgehammer
 ```
 
-⚠️ **Confirm the USB device path one last time** when prompted. This will erase all data on the USB.
+**Confirm the USB device path one last time** when prompted. This will erase all data on the USB.
 
 ---
 
@@ -119,7 +119,7 @@ After installation completes:
 ```bash
 sudo umount /mnt/boot
 sudo umount /mnt
-sudo sync  # Ensure all data is written to USB
+sudo sync  # flush pending writes to the USB
 ```
 
 Remove the USB drive from your system.
@@ -159,7 +159,7 @@ Sledgehammer comes pre-installed with:
 - **USB won't boot**: Verify Secure Boot is disabled, try both UEFI and Legacy boot modes
 - **Can't SSH to USB**: Check USB IP via router/admin panel, verify SSH public key is in SOPS secrets
 - **Partition errors**: Re-run Disko after confirming correct USB device path
-- **Build failures**: Ensure flake inputs are up-to-date with `nix flake update`
+- **Build failures**: check the flake inputs are up to date with `nix flake update`
 
 ---
 

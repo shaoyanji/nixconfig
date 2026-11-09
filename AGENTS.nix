@@ -5227,13 +5227,13 @@
     };
 
     open-steam-dns-steer-run = {
-      title = "The CDN-only steering allowlist is deployed off and has never been run";
+      title = "The CDN steering allowlist is on, with no observed client download yet";
       kind = "open";
       status = "OPEN";
-      date = "2026-10-29";
+      date = "2026-11-09";
       priority = "P3";
       links = ["open-manual-steam-fill"];
-      summary = "`steamCache.dnsSteer` exists as an allowlist (`content`) because the 2026-10-28 zone override also caught `cm-01-fra1`, a matchmaking sibling. It ships as `off`: no client has yet downloaded through it, so nothing is known about whether the four `cdn.steampipe` names cover real chunk traffic.";
+      summary = "`steamCache.dnsSteer` is deployed as `content` since 2026-11-09: the 2026-10-28 matchmaking failure was the *zone* record catching `cm-01-fra1`, a sibling of the download names, not steering itself. The allowlist cannot match `cm-*`, so it is on; what is still unproven is that real chunk traffic lands on the four `cdn.steampipe` names.";
       refs = {
         hosts = ["frieren"];
         modules = ["modules/services/steam-cache.nix" "hosts/frieren/dns.nix"];
@@ -5246,14 +5246,16 @@
         name in the zone, matchmaking included, resolves publicly by construction. `zone` refuses
         without `dnsSteerZoneAcknowledged`.
 
-        **Why it is off.** The allowlist came from one window of resolver query history: 524 hits on
-        `lancache`, ~500 across four CDN names, one each on `cm-01-fra1` (matchmaking) and
-        `cache9-fra1` (Valve's own cache). One window does not prove chunk traffic uses those CDNs.
+        **Why it is on (2026-11-09).** The 2026-10-28 failure was diagnosed as the zone record, not
+        the cache: `address=/steamcontent.com/` also swallowed `cm-01-fra1.steamcontent.com`, the
+        EU-West connection manager, and match accepts stopped. `content` emits only the download
+        CDNs, the detection name and the installer CDN, so `cm-*` resolves publicly by construction.
+        It ships with `dnsSteerDomains = ["cache9-fra1.steamcontent.com"]`, the one observed download
+        host not under `*.cdn.steampipe`, added by exact name and never by suffix.
 
-        **Exit.** With `dnsSteer = "content"` on frieren: one client download shows up as a HIT at
-        the front (an `X-Steam-Cache` probe or `tier_growth_bytes`), a Dota match still accepts, and
-        the observed CDN set matches the allowlist — then flip the deployed default to `content`.
-        If `cache9-fra1` is where chunks come from, it is added by exact name, never by suffix.
+        **Exit.** One client download shows a HIT at the front (`X-Steam-Cache` or
+        `tier_growth_bytes`) and a Dota match still accepts — then this note is DELIVERED. If the
+        observed download set differs from the allowlist, the missing name is added by exact name.
       '';
     };
 
@@ -5681,6 +5683,73 @@
         **Exit.** Build the deterministic grammar first (p=1) and let the model only
         front it. Ship only if answered-case p >= 0.3 at S >= 3 s AND refusal <= 100 ms
         AND the Kelly entry in flake/daemons.nix clears with `wanted = true`. If the grammar is learnable in one session, S amortises to zero and the answer is no.
+      '';
+    };
+
+    idle-service-modules = {
+      title = "An idle daemon retires to its module, not out of the tree";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-09";
+      summary = "The 2026-11-09 audit retired Mosquitto, InfluxDB and ModemManager from frieren's runtime while keeping every module: the host sets the option false and records the measurement that retired it, so a future project re-enables an option instead of rebuilding the wiring.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["hosts/frieren/configuration.nix" "hosts/frieren/infra-stack.nix" "modules/services/home-assistant.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **The rule.** `enable = false` in the host module, next to the number that
+        retired it. The module stays registered in `modules.toml`, so the surface is
+        still documented and one option restores the unit.
+
+        **What the audit measured on frieren, 2026-11-09.**
+        - Mosquitto: zero `new client connected` lines in seven days, while the
+          journal held only "Saving in-memory database" every 30 minutes. Home
+          Assistant's telemetry is `command_line` sensors, so no feed was lost.
+        - InfluxDB: `/var/lib/influxdb2` at 200 KB with one file touched in 14 days,
+          while Scrutiny's weekly collector ran. Scrutiny keeps its own store.
+        - ModemManager: enabled, inactive, no `/dev/cdc-wdm*`, no `/dev/ttyUSB*`.
+
+        **What looked idle and is not.** `pihole-ftl` is the primary resolver and PXE
+        proxyDHCP (2.6 M queries imported); `thermald` earns its place on an Intel
+        host with DPTF tables; `nixos-upgrade` and `fleet-classification-gate` ledger
+        non-successes cluster into two incidents, not chronic failure.
+
+        **Reclassification is a habit, not a sweep.** Candidates come from the
+        sentinel ledger and the journal — no client, no write, or a condition never
+        met — never from the module's own description.
+      '';
+    };
+
+    selector-model-plane = {
+      title = "A model daemon is hot-swappable, and an absent artifact is a skip, not a loop";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      priority = "P2";
+      date = "2026-11-09";
+      summary = "`selector.service` now guards on the model file as well as the script and takes its path from `programs.selectorDaemon.model`, so a host with no artifact skips the start instead of restarting forever. Measured before the fix on frieren: 3,140 restarts and 51,241 journal lines in six days.";
+      refs = {
+        modules = ["modules/user/selector-daemon.nix" "scripts/task/selector-sidecar.sh" "flake/daemons.nix"];
+        tasks = ["checks:selector:sidecar" "checks:host"];
+        docs = ["docs/selector-daemon-predesign.md"];
+      };
+      body = ''
+        **What was broken.** The unit conditioned on `tools/selector/serve.py`, which
+        always exists, so the missing artifact surfaced as ExecStart exit 1 under
+        `Restart=on-failure` with a 10 s delay. `q.sh --question` falls back to the
+        interpreter, so nothing was gained by the loop either.
+
+        **What landed.** `ConditionPathExists` covers the script and the model;
+        `StartLimitBurst = 3` in 300 s bounds a genuinely broken artifact; `Q_MODEL`
+        and the guard read one value, the option. A new artifact is an option change
+        and a restart, with no edit to the unit.
+
+        **Hermes as the next candidate.** The hypothesis is that a larger model serves
+        the same closed-vocabulary query object behind the same socket, so the daemon
+        is the stable part and the model is the swapped part. What would settle it is
+        `checks:selector:sidecar` (byte-identical to the interpreter) plus the Kelly
+        entry in flake/daemons.nix still clearing at the new model's latency — and
+        refusal still under 100 ms, because a slow refusal is a loss on its own.
       '';
     };
 

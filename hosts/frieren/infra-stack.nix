@@ -1033,6 +1033,12 @@ in {
     openFirewall = false;
   };
 
+  # The 30 G store sits on the data pool, outside the unit's StateDirectory, so
+  # systemd never chowns it; `ollama` is a dynamic user whose uid moved off the
+  # tree (976 -> 61547) and 0.40.4's `mkdir models/manifests-v2` started failing.
+  # `+` runs this as root, before the service user is switched to.
+  systemd.services.ollama.serviceConfig.ExecStartPre = "+${pkgs.coreutils}/bin/chown -R ollama:ollama /Volumes/data/ollama";
+
   # Ephemeral MicroVM Sandbox SSH Client Configuration (EXP-102)
   # Eliminates known_hosts collisions and prompts for ephemeral test VMs
   # `~/.ssh/known_hosts_canary`, not /var/lib/microvms/.known_hosts: that directory

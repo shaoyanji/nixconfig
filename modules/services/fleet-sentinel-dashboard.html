@@ -37,6 +37,10 @@ fetch('status.json', {cache:'no-store'}).then(r => r.json()).then(s => {
   const jobs = Object.entries(s.jobs || {})
     .map(([k,v]) => `<div class="v">${v}</div><div class="k">${k}</div>`).join("");
   const reasons = (s.reasons || []).map(r => `<li>${r}</li>`).join("") || '<li class="ok">none</li>';
+  const audit = s.audit
+    ? `<div class="v ${s.audit.outcome === 'fallback' ? 'bad' : 'ok'}">${s.audit.outcome}</div>
+       <div class="k">${s.audit.ts}</div><div class="k">${s.audit.reason || ''}</div>`
+    : '<div class="v">none</div><div class="k">no audit record yet</div>';
   document.getElementById('grid').innerHTML = `
     <div class="card"><div class="k">state</div><div class="state ${cls}">${s.state}</div>
       <div class="k">${s.ts}</div></div>
@@ -44,7 +48,8 @@ fetch('status.json', {cache:'no-store'}).then(r => r.json()).then(s => {
     <div class="card"><div class="k">generation age</div><div class="v">${s.generation_age_h} h</div>
       <div class="k">io psi ${s.psi.io} · mem psi ${s.psi.memory}</div></div>
     <div class="card"><div class="k">disk</div>${disk}</div>
-    <div class="card"><div class="k">job results</div>${jobs}</div>`;
+    <div class="card"><div class="k">job results</div>${jobs}</div>
+    <div class="card"><div class="k">last audit</div>${audit}</div>`;
 }).catch(e => {
   document.getElementById('grid').innerHTML =
     `<div class="card"><div class="k">state</div><div class="state bad">unreachable</div></div>`;

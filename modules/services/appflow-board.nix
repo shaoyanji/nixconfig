@@ -1,16 +1,6 @@
-# appflow-board — the job pipeline as a page, read straight from the archive.
-#
-# There is no snapshot job and no second copy: the vhost proxies five read-only
-# endpoints of the mail hub's NpgsqlRest (`services.emailArchive`, loopback 8080)
-# and serves one static page that calls them. The pipeline is the database's, the
-# page is a viewer, and a writer that lands a row is visible at the next refresh.
-#
-# The allowlist is the point. `/api/application-update` and `/api/application-upsert`
-# are published by the plugin too, so proxying `/api/` would put writes on the
-# tailnet from a page that only reads. Four exact locations cannot reach them.
-#
-# Tailnet exposure is the portal mount, not a firewall row: `docs/media-relay.md`
-# and `.agents/deploy/hosts/delphi.md` carry the same rule for the sibling mount.
+# appflow-board — the job pipeline as a page over the archive's read routes.
+# Why it has no snapshot and why the proxy allowlist is exact:
+# `docs/appflow-board.md`.
 {
   config,
   lib,

@@ -117,6 +117,75 @@ tasks:
     cmds:
       - bash scripts/task/appflow-gate.sh packet {{.CLI_ARGS}}
 
+  # The career corpus is the database's now: the JSON Resume files are exports,
+  # so a role is added here and the artifact is rebuilt from the rows. `set`
+  # changes only the flags it is given; `rm` needs --yes because prose does not
+  # come back. Flags go through CLI_ARGS (`task career:add:role -- --employer …`).
+  career:roles:
+    desc: The roles in CV order (CLI_ARGS="--language de --json" to narrow)
+    cmds:
+      - bash scripts/task/career.sh roles {{.CLI_ARGS}}
+
+  career:projects:
+    desc: The projects in CV order
+    cmds:
+      - bash scripts/task/career.sh projects {{.CLI_ARGS}}
+
+  career:show:
+    desc: One role or project, every field (task career:show -- role ID)
+    cmds:
+      - bash scripts/task/career.sh show {{.CLI_ARGS}}
+
+  career:add:role:
+    desc: Add a role (--employer and --position required, --highlight repeatable)
+    cmds:
+      - bash scripts/task/career.sh add-role {{.CLI_ARGS}}
+
+  career:add:project:
+    desc: Add a project (--name required, --resume-name on the German row)
+    cmds:
+      - bash scripts/task/career.sh add-project {{.CLI_ARGS}}
+
+  career:set:role:
+    desc: Edit one role; only the flags given change (task career:set:role -- ID --position …)
+    cmds:
+      - bash scripts/task/career.sh set-role {{.CLI_ARGS}}
+
+  career:set:project:
+    desc: Edit one project; only the flags given change
+    cmds:
+      - bash scripts/task/career.sh set-project {{.CLI_ARGS}}
+
+  career:rm:role:
+    desc: Delete one role (--yes required)
+    cmds:
+      - bash scripts/task/career.sh rm-role {{.CLI_ARGS}}
+
+  career:rm:project:
+    desc: Delete one project (--yes required)
+    cmds:
+      - bash scripts/task/career.sh rm-project {{.CLI_ARGS}}
+
+  career:import:
+    desc: Seed the rows from a JSON Resume (FROM=file; CLI_ARGS="--language de --dry")
+    cmds:
+      - bash scripts/task/career.sh import --from "{{.FROM | default "lib/matt/resume.json"}}" {{.CLI_ARGS}}
+
+  career:export:en:
+    desc: Rebuild lib/matt/resume.json's work and projects from the rows
+    cmds:
+      - bash scripts/task/career.sh export --into lib/matt/resume.json
+
+  career:export:de:
+    desc: Rebuild lib/matt/lebenslauf.json's work and projects from the German rows
+    cmds:
+      - bash scripts/task/career.sh export --into lib/matt/lebenslauf.json --language de
+
+  career:export:
+    desc: Rebuild one JSON Resume from the rows (INTO=file; CLI_ARGS="--language de --out x")
+    cmds:
+      - bash scripts/task/career.sh export --into "{{.INTO}}" {{.CLI_ARGS}}
+
   # The private half of the personal data. Published sites build only what the
   # page renders; a phone number or a referee lives sops-encrypted and reaches a
   # document here, at runtime, never through a site build.

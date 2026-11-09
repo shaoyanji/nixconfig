@@ -1,0 +1,57 @@
+{
+  "basics": {
+    "name": "Fiktive Person"
+  },
+  "projects": [
+    {
+      "description": "Ein Satz über die Engine.",
+      "endDate": "2026-03-18",
+      "highlights": [
+        "Baute den Shape-Fuzzer in Go."
+      ],
+      "keywords": [
+        "Go",
+        "NixOS"
+      ],
+      "name": "Wirbel-Engine",
+      "resumeName": "Swirl Engine",
+      "roles": [
+        "Leitender Entwickler"
+      ],
+      "startDate": "2026-03-15",
+      "type": "open_source"
+    },
+    {
+      "description": "Flotte als Code.",
+      "endDate": "",
+      "name": "nixconfig",
+      "resumeName": "nixconfig",
+      "startDate": "2023-01-01",
+      "type": "open_source",
+      "url": "https://example.com/nixconfig"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2025-08-19",
+      "highlights": [
+        "Baute eine Sache, die niemand brauchte."
+      ],
+      "keywords": [
+        "Risiko",
+        "Go"
+      ],
+      "location": "Freiburg, DE",
+      "name": "Northwind Consulting",
+      "position": "Gründer",
+      "startDate": "2020-06-01",
+      "summary": "Zwei Zeilen\nZusammenfassung.\n",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Contoso Energy",
+      "position": "Analyst",
+      "startDate": "2016-08-01"
+    }
+  ]
+}

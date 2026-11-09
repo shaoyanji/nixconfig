@@ -1,0 +1,84 @@
+{
+  "basics": {
+    "email": "fictional@example.com",
+    "label": "Systems Engineer",
+    "name": "Fictional Person",
+    "summary": "A corpus shaped like the real one, with a name nobody owns."
+  },
+  "education": [
+    {
+      "institution": "Some University",
+      "studyType": "MSc"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Native",
+      "language": "German"
+    }
+  ],
+  "projects": [
+    {
+      "description": "A single sentence about the engine.",
+      "endDate": "2026-03-18",
+      "entity": "Personal Research",
+      "highlights": [
+        "Built the shape fuzzer in Go.",
+        "Orchestrated the pipeline in Nushell."
+      ],
+      "keywords": [
+        "Go",
+        "NixOS"
+      ],
+      "name": "Swirl Engine",
+      "roles": [
+        "Lead Developer"
+      ],
+      "startDate": "2026-03-15",
+      "type": "open_source"
+    },
+    {
+      "description": "Fleet as code.",
+      "endDate": "",
+      "entity": "Personal",
+      "name": "nixconfig",
+      "startDate": "2023-01-01",
+      "type": "open_source",
+      "url": "https://example.com/nixconfig"
+    }
+  ],
+  "skills": [
+    {
+      "keywords": [
+        "Go",
+        "SQL"
+      ],
+      "name": "Engineering"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2025-08-19",
+      "highlights": [
+        "Built a thing nobody needed.",
+        "Advised a client who did."
+      ],
+      "keywords": [
+        "risk",
+        "Go"
+      ],
+      "description": "Risk advisory for energy traders.",
+      "location": "Freiburg, DE",
+      "name": "Northwind Consulting",
+      "position": "Founder",
+      "startDate": "2020-06-01",
+      "summary": "Two lines\nof summary.\n",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Contoso Energy",
+      "position": "Analyst",
+      "startDate": "2016-08-01"
+    }
+  ]
+}

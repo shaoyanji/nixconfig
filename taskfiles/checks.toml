@@ -30,6 +30,10 @@ name = "checks:btrfs:stats"
 kind = "leaf"
 
 [[check]]
+name = "checks:career"
+kind = "leaf"
+
+[[check]]
 name = "checks:codespace"
 kind = "leaf"
 

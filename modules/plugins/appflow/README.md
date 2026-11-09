@@ -18,6 +18,7 @@ database diff replace sixty copies of the same layout.
 | `schema.sql` | `applications`, `application_mail`, `application_document` — applied after the core schema on every activation |
 | `sql/` | the endpoints (`/api/applications`, `/api/application-get`, …) |
 | `sync.py` | import the JSON, link mail, write status from ATS mail, export, discover — and close what proves nothing (job alerts, events the stage already holds) so the queue cannot refill |
+| `career.py` | add, edit and delete roles and projects in the database, and rebuild the JSON Resume files from the rows |
 | `packet.nix` | the PDF build: typst in the sandbox, artifact is a store path |
 | `select.py` | the projection: one job description, one page of material out of the corpus |
 | `glossary.json` | German job-ad words mapped onto the English ones the corpus uses |
@@ -63,6 +64,49 @@ matches its inflections and plurals, and a hyphenated compound carries its parts
 so an entry written once reaches the form the corpus happens to use: `encryption`
 finds `encrypted`, `key` finds `keys`, and `SOPS-encrypted` is also `encrypted`.
 Without that, a correct glossary entry scored zero and selected nothing.
+
+## The career corpus is the database's
+
+A role or a project is a row, not a paragraph in a committed file. The two JSON
+Resume documents are exports of those rows:
+
+| Table | Artifact |
+| :--- | :--- |
+| `career_role` | `work` in `lib/matt/resume.json` and `lib/matt/lebenslauf.json` |
+| `career_project` | `projects` in the same two files |
+
+One row is one language, keyed `(id, language)`. A translated project carries
+`resume_name`, the English name the drift check joins on; the id is derived from
+the employer (roles) or the English project name (projects) plus the start year,
+so both languages agree on what a row is and a re-import updates it instead of
+appending a copy.
+
+Lists are text in the row — one highlight per line, one comma-separated keyword —
+so the same edit works from psql. `NULL` means the artifact has no such field and
+`''` that it has an empty one; the export keeps that difference, which is what
+makes a round trip byte-comparable rather than merely similar.
+
+```bash
+task career:import FROM=lib/matt/resume.json          # seed the rows (idempotent)
+task career:import FROM=lib/matt/lebenslauf.json -- --language de
+task career:roles [-- --language de --json]           # the corpus in CV order
+task career:add:role -- --employer "Acme" --position "Engineer" --start 2026-01-01 \
+  --highlight "Did the first thing." --highlight "Did the second."
+task career:set:role -- role-acme-2026 --position "Senior Engineer"
+task career:rm:project -- project-acme-2026 --yes
+task career:export:en                                 # rebuild lib/matt/resume.json
+task career:export:de                                 # rebuild lib/matt/lebenslauf.json
+task checks:career                                    # the fixture
+```
+
+`set` sends the row it read with only the given flags replaced, so editing one
+field cannot reorder the CV or drop a bullet. `add` refuses an id that already
+exists (use `set`, or `--replace` deliberately). `rm` needs `--yes`. An id that
+exists in both languages needs `--language`, because guessing which corpus an
+edit belongs to is the one mistake the export cannot detect.
+
+After `export`, `task matt:gist:push` is the only step that publishes; the gist
+is still a mirror, never a source.
 
 ## Commands
 

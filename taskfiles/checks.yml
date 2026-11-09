@@ -552,6 +552,20 @@ tasks:
     cmds:
       - bash tests/appflow-select/run.sh
 
+  checks:career:
+    desc: Fixture for the career corpus — import, export, set, add and rm against a stub API
+    summary: >
+      Proves the JSON Resume files are exports of the rows rather than a second
+      source: a fictional two-role, two-project corpus is imported and exported
+      back byte for byte in both languages, including a field that is absent
+      versus one that is empty and the contact block the rows do not own. The
+      stub refuses a sparse write body as NpgsqlRest does, so every parameter is
+      exercised; set changes only the flags given, add refuses an existing id,
+      rm refuses without --yes, and an id shared by en and de needs --language.
+      Coverage is asserted both ways. No nix, loopback only; ~2 s.
+    cmds:
+      - bash tests/career-cli/run.sh
+
   checks:media-relay:
     desc: Fixture for the media library — the manifest the page reads and the rows it renders
     summary: >

@@ -59,3 +59,25 @@ CREATE TABLE IF NOT EXISTS application_mail (
 
 CREATE INDEX IF NOT EXISTS application_mail_app_idx
   ON application_mail (application_id);
+
+-- The text behind one application: the job description it was written against, a
+-- note that outgrew the row, a letter draft. `kind` is open on purpose, so a new
+-- sort of text is a row and not a column, and (application, kind) is the key
+-- because two files for the same text is exactly the problem this replaces.
+--
+-- `sha256` is the caller's digest of `body`. It makes a re-import a no-op at the
+-- row level, and it lets a rebuild prove the text it started from — the file hash
+-- of a 5% reproducible artifact workflow, without the file.
+CREATE TABLE IF NOT EXISTS application_document (
+  application_id text NOT NULL REFERENCES applications (id) ON DELETE CASCADE,
+  kind           text NOT NULL,
+  body           text NOT NULL,
+  source         text NOT NULL DEFAULT '',
+  sha256         text NOT NULL DEFAULT '',
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  updated_at     timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (application_id, kind)
+);
+
+CREATE INDEX IF NOT EXISTS application_document_kind_idx
+  ON application_document (kind);

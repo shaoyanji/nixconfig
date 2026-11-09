@@ -15,7 +15,7 @@ database diff replace sixty copies of the same layout.
 
 | Path | Owner |
 | :--- | :--- |
-| `schema.sql` | `applications`, `application_mail` — applied after the core schema on every activation |
+| `schema.sql` | `applications`, `application_mail`, `application_document` — applied after the core schema on every activation |
 | `sql/` | the endpoints (`/api/applications`, `/api/application-get`, …) |
 | `sync.py` | import the JSON, link mail, write status from ATS mail, export, discover — and close what proves nothing (job alerts, events the stage already holds) so the queue cannot refill |
 | `packet.nix` | the PDF build: typst in the sandbox, artifact is a store path |
@@ -74,7 +74,10 @@ task agents:apps:packet ID=<application>           # build a packet through nix
 task agents:apps:packet EXAMPLE=1                  # fictional data, proves the toolchain
 task agents:apps:select JD=<file>                  # the projection alone, no PDF
 task checks:appflow                                 # the selector's fixture
-task agents:apps:draft ID=<app> BODY=<file> ATTACH=<pdf>   # a DRAFT in the mailbox, never sent
+task apps:docs:import [DIR=~/.config/appflow/jd]       # the JD text into the database
+  task apps:docs                                        # what text exists, no bodies
+  task apps:docs:show -- <id> [kind]                    # one document's text
+  task agents:apps:draft ID=<app> BODY=<file> ATTACH=<pdf>   # a DRAFT in the mailbox, never sent
 task agents:apps:drafts                            # what sits in Drafts
 task agents:hub                                    # every plugin's queue depth
 ```
@@ -114,6 +117,19 @@ A `de` application builds from the German file when it exists, and says so when
 it does not: German headings over English bullets is the one failure the record's
 language is supposed to prevent.
 
-A job description is not a document either: `$APPFLOW_CONFIG/jd/<id>.txt`, one
-file per application, read by both `packet` and `select`. No database column, so
-a description can be pasted in before the row exists.
+A job description is a row: `application_document`, keyed by application and
+kind (`jd`, `note`, anything a caller names), with the body as text and the
+caller's `sha256` beside it. `task apps:docs:import` reads the old
+`$APPFLOW_CONFIG/jd/<id>.txt` files into it and skips a file whose bytes are
+already stored, so the import can run from a timer. `packet` and `select` still
+accept a file, because a description can be pasted in before the row exists.
+
+## Deletion gate
+
+The files are retired only when both halves pass: `checks:appflow:gate` proves
+the database is the only copy (the export and the row list agree, sampled rows
+match field for field, every stored document's digest matches its bytes), and
+`task apps:gate:packet -- <id>` builds a packet whose description came from the
+database. A rebuild is ~95% reproducible — pinned typst, a corpus commit and a
+deterministic selection; the slack is the prose a person or an agent writes —
+so the packet is built when it is sent, not stored when it is tracked.

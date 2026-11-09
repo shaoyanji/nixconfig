@@ -91,6 +91,32 @@ tasks:
     cmds:
       - git -C "{{.APPS_DIR}}" status -sb
 
+  # The text behind an application: the job description, a note that outgrew the
+  # row. `import` reads $APPFLOW_JD_DIR (~/.config/appflow/jd) where those files
+  # live today; a re-run skips a description whose bytes are already stored.
+  apps:docs:import:
+    desc: Import JD text files into the database (DIR= to override, DRY=1 to preview)
+    cmds:
+      - bash scripts/task/appflow-docs.sh import {{.CLI_ARGS}}
+
+  apps:docs:
+    desc: List the text the database holds, without bodies
+    cmds:
+      - bash scripts/task/appflow-docs.sh list
+
+  apps:docs:show:
+    desc: Print one application's stored text (task apps:docs:show -- <id> [kind])
+    cmds:
+      - bash scripts/task/appflow-docs.sh show {{.CLI_ARGS}}
+
+  # The other half of the deletion gate: a packet whose description came from
+  # the database, not from `$APPFLOW_CONFIG/jd`. A task because building one is a
+  # nix build; `checks:appflow:gate` is the read-only half.
+  apps:gate:packet:
+    desc: Build a packet from the database's own text (task apps:gate:packet -- <id>)
+    cmds:
+      - bash scripts/task/appflow-gate.sh packet {{.CLI_ARGS}}
+
   # The private half of the personal data. Published sites build only what the
   # page renders; a phone number or a referee lives sops-encrypted and reaches a
   # document here, at runtime, never through a site build.

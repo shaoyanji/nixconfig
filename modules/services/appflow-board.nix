@@ -1,6 +1,6 @@
 # appflow-board — the job pipeline as a page, read straight from the archive.
 #
-# There is no snapshot job and no second copy: the vhost proxies four read-only
+# There is no snapshot job and no second copy: the vhost proxies five read-only
 # endpoints of the mail hub's NpgsqlRest (`services.emailArchive`, loopback 8080)
 # and serves one static page that calls them. The pipeline is the database's, the
 # page is a viewer, and a writer that lands a row is visible at the next refresh.
@@ -85,6 +85,9 @@ in {
           };
           "= /api/applications-discovered" = {
             extraConfig = proxyTo "applications-discovered";
+          };
+          "= /api/application-mail" = {
+            extraConfig = proxyTo "application-mail";
           };
         };
       };

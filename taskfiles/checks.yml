@@ -1359,6 +1359,18 @@ tasks:
     cmds:
       - EDGE_REQUIRE_UP=1 bash scripts/task/edge-check.sh
 
+  checks:appflow:gate:
+    desc: Deletion gate — the application database is the only copy of the pipeline
+    summary: >
+      Proves the database can replace the files before anything is deleted: the
+      export and the row list describe the same applications, sixteen rows from
+      both ends agree field for field with application-get, and every stored
+      document is non-empty with a 64-hex digest whose bytes match. Read-only,
+      API only, ~2 s. The packet half is task apps:gate:packet, because a nix
+      build may not run inside a check.
+    cmds:
+      - bash scripts/task/appflow-gate.sh roundtrip
+
   checks:audit:handoff:
     desc: Trigger strategic handoff execution on HANDOFF.md on-demand (FORCE_RUN=1)
     summary: >

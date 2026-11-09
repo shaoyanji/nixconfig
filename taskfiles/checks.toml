@@ -10,6 +10,10 @@ name = "checks:appflow"
 kind = "leaf"
 
 [[check]]
+name = "checks:appflow:gate"
+kind = "leaf"
+
+[[check]]
 name = "checks:audit:handoff"
 kind = "leaf"
 

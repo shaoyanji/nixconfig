@@ -35,6 +35,11 @@ li.app button.row:hover{background:var(--panel)}
 .detail dt{color:var(--dim)}
 .detail dd{margin:0}
 .detail a{color:var(--accent)}
+.detail h3{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-weight:400;margin:1rem 0 .2rem}
+.mail{list-style:none;margin:0;padding:0}
+.mail li{display:grid;grid-template-columns:1fr auto;gap:.2rem .5rem;border-top:1px solid var(--line);padding:.35rem 0;white-space:normal}
+.mail .who{grid-column:1/-1;color:var(--dim);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail .tier{color:var(--warn);font-size:11px;text-transform:uppercase}
 #state{color:var(--dim);padding:2rem .5rem;text-align:center}
 #state code{color:var(--accent)}
 @media(max-width:36rem){body{padding:.75rem}.detail dl{grid-template-columns:1fr}}
@@ -127,11 +132,34 @@ function render() {
   if (open) fillDetail(open);
 }
 
+// The parameter names come from the endpoint's OpenAPI, not from the SQL: the
+// plugin writes `:application_id` and NpgsqlRest exposes `applicationId`, which
+// is why asking for the snake_case name is a 404.
+function mailOf(id) {
+  return getJSON(`/api/application-mail?applicationId=${encodeURIComponent(id)}&lim=20`)
+    .then((rows) => rows || [])
+    .catch(() => null);
+}
+
+function mailBlock(rows) {
+  if (!rows) return '<h3>mail</h3><p>cannot read the messages</p>';
+  if (!rows.length) return '<h3>mail</h3><p>no linked message</p>';
+  const short = (s) => esc(String(s || '').replace(/\s*<[^>]*>/g, ''));
+  return '<h3>mail</h3><ul class="mail">' + rows.map((m) =>
+    `<li><span>${esc(m.subject || '(no subject)')}</span>`
+    + `<span class="tier">${esc(m.tier || '')}</span>`
+    + `<span class="who">${short(m.sender)} · ${day(m.sentAt)} · ${esc(m.matchedBy || '')}`
+    + `${m.confidence != null ? ` ${Math.round(m.confidence * 100)}%` : ''}</span></li>`).join('') + '</ul>';
+}
+
 function fillDetail(id) {
   const box = listEl.querySelector(`.detail[data-for="${CSS.escape(id)}"]`);
   if (!box) return;
-  getJSON(`/api/application-get?id=${encodeURIComponent(id)}`)
-    .then((rows) => {
+  Promise.all([
+    getJSON(`/api/application-get?id=${encodeURIComponent(id)}`),
+    mailOf(id),
+  ])
+    .then(([rows, mail]) => {
       const a = (rows || [])[0];
       if (!a) {
         box.textContent = 'no record';
@@ -149,7 +177,8 @@ function fillDetail(id) {
         ['notes', a.notes],
       ].filter(([, v]) => v != null && v !== '');
       const link = a.applyUrl ? `<dt>apply</dt><dd><a href="${esc(a.applyUrl)}" rel="noreferrer noopener">${esc(a.applyUrl)}</a></dd>` : '';
-      box.innerHTML = `<dl>${fields.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}${link}</dl>`;
+      box.innerHTML = `<dl>${fields.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}${link}</dl>`
+        + mailBlock(mail);
     })
     .catch((err) => { box.textContent = `cannot read the record: ${err.message}`; });
 }

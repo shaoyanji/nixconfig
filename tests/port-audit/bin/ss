@@ -1,0 +1,3 @@
+#!/bin/sh
+# Stands in for `ss -tulnH`: one listener per line, `Netid … Local:Port Peer:Port`.
+printf '%s\n' "${FIXTURE_SS:-}"

@@ -214,6 +214,10 @@ name = "checks:ports"
 kind = "leaf"
 
 [[check]]
+name = "checks:ports:test"
+kind = "leaf"
+
+[[check]]
 name = "checks:postgres:drill"
 kind = "leaf"
 

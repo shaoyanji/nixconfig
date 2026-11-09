@@ -1,0 +1,4 @@
+#!/bin/sh
+# The audit derives `self` from `hostname -s` and refuses a foreign HOST, so the
+# fixture runs as this name and passes HOST=fixture.
+printf '%s\n' fixture

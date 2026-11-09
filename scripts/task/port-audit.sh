@@ -8,15 +8,17 @@
 # is accepted by the `-i lo -j nixos-fw-accept` rule before the interface-scoped rules are
 # reached, so a loopback-path scan over-reports every local listener as "open from the
 # LAN". This script never scans; it compares two authoritative sources instead:
-#
-#   declared  → `nix eval` of the merged firewall option for the interface
-#               (catches every module's contribution, not just the ones you remembered)
+## declared  → `nix eval` of the merged firewall option (the interface's lists AND the
+#               global ones) — catches every module's contribution, not the remembered ones
 #   actual    → `ss -tuln` on THIS machine (bind address preserved, so loopback-only is
 #               distinguishable). Local by design: no ssh in an unattended path, so a
 #               HOST that is not this host is refused rather than half-answered.
+#   served    → `tailscale serve status --json` for ports tailscaled itself terminates.
 #
 # Buckets reported:
 #   SERVED            declared AND listening somewhere      — the intended surface
+#   SERVED-GLOBAL     permitted by the GLOBAL firewall list  — declared, but open on every interface
+#   SERVED-SERVE      a `tailscale serve` port               — tailscaled forwards internally, no row needed
 #   DEAD-HOLE         declared, NOTHING listening           — stale firewall entry (drift)
 #   REDUNDANT         declared, loopback-bound only         — hole with no possible client (FAILS)
 #   FIREWALL-ONLY     public listener, NOT declared, a port below the dynamic range
@@ -98,17 +100,34 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # --- declared surface (authoritative: the merged Nix option, not a grep) -----------------
-declared_json="$(
+firewall_json="$(
   nix eval --json --extra-experimental-features 'nix-command flakes' \
-    ".?submodules=1#nixosConfigurations.${HOST}.config.networking.firewall.interfaces.${IFACE}" 2>/dev/null
+    ".?submodules=1#nixosConfigurations.${HOST}.config.networking.firewall" 2>/dev/null
 )" || {
-  echo "ERROR: nix eval failed for ${HOST} interface ${IFACE}" >&2
-  echo "       (check the host name and interface, and that this is a scoped host)" >&2
+  echo "ERROR: nix eval failed for ${HOST}" >&2
+  echo "       (check the host name, and that this machine can evaluate the tree)" >&2
   exit 2
 }
 
-declared_tcp="$(jq -r '.allowedTCPPorts[]? // empty' <<<"$declared_json" | sort -n -u)"
-declared_udp="$(jq -r '.allowedUDPPorts[]? // empty' <<<"$declared_json" | sort -n -u)"
+declared_tcp="$(jq -r --arg i "$IFACE" '.interfaces[$i].allowedTCPPorts[]? // empty' <<<"$firewall_json" | sort -n -u)"
+declared_udp="$(jq -r --arg i "$IFACE" '.interfaces[$i].allowedUDPPorts[]? // empty' <<<"$firewall_json" | sort -n -u)"
+# The global lists are a second declaration, not an absence of one: delphi permits
+# ssh, nginx and the gemini capsule on every interface, so those listeners are
+# declared-and-open rather than FIREWALL-ONLY on tailscale0.
+global_tcp="$(jq -r '.allowedTCPPorts[]? // empty' <<<"$firewall_json" | sort -n -u)"
+
+# Ports tailscaled terminates and forwards itself (`task ops:*` style mounts: TLS ends
+# in tailscaled, the upstream is loopback). Traffic arrives over the WireGuard socket,
+# so the kernel firewall never sees a connection to the port and no row can exist.
+serve_json="$(tailscale serve status --json 2>/dev/null || true)"
+serve_ports="$(jq -r '((.TCP // {}) | keys[]), ((.Web // {}) | keys[] | sub(".*:"; ""))' <<<"${serve_json:-{\}}" 2>/dev/null | grep -E '^[0-9]+$' | sort -n -u)"
+if [ -z "$serve_json" ]; then
+  serve_status="unavailable (tailscale serve status failed)"
+elif [ -z "$serve_ports" ]; then
+  serve_status="none"
+else
+  serve_status="$(printf '%s ' $serve_ports)"
+fi
 
 # An interface that declares nothing is not a scoped interface: every listener
 # then lands in FIREWALL-ONLY, which reads as a finding and is only a typo. The
@@ -162,9 +181,16 @@ done | sort -n -u)"
 listening_any_tcp="$(printf '%s\n' "$public_tcp" "$loopback_tcp" | grep -E '^[0-9]+$' | sort -n -u)"
 
 in_set() { printf '%s\n' "$2" | grep -qxF "$1"; }
+# One line per set in the header. `printf '%s '` with an EMPTY set prints a single
+# space, which reads as a value — so an empty set is spelled out instead.
+fmt() {
+  if [ -n "${1:-}" ]; then printf '%s ' $1; else printf 'none'; fi
+}
 
 echo "=== port audit: ${HOST} / ${IFACE} ==="
 echo "declared: $(printf '%s ' $declared_tcp)(tcp) / $(printf '%s ' $declared_udp)(udp)"
+echo "global:   $(fmt "$global_tcp")(tcp, open on every interface)"
+echo "serve:    ${serve_status}"
 echo "dynamic range: ${ephemeral_low}-${ephemeral_high} (ports from ${ephemeral_low} up cannot be declared)"
 echo
 
@@ -179,11 +205,15 @@ for p in $declared_tcp; do
   fi
 done
 
-firewall_only=""; accepted=""; dynamic=""
+firewall_only=""; accepted=""; dynamic=""; served_global=""; served_serve=""
 for p in $public_tcp; do
   in_set "$p" "$declared_tcp" && continue
-  if in_set "$p" "$accepted_set"; then
+  if in_set "$p" "$global_tcp"; then
+    served_global="${served_global}${p} "
+  elif in_set "$p" "$accepted_set"; then
     accepted="${accepted}${p} "
+  elif in_set "$p" "$serve_ports"; then
+    served_serve="${served_serve}${p} "
   elif is_dynamic "$p"; then
     dynamic="${dynamic}${p} "
   else
@@ -192,6 +222,8 @@ for p in $public_tcp; do
 done
 
 echo "SERVED (declared + listening):        ${served:-none}"
+echo "SERVED-GLOBAL (global list):         ${served_global:-none}"
+echo "SERVED-SERVE (tailscaled mount):     ${served_serve:-none}"
 echo "DEAD-HOLE (declared, no listener):    ${dead:-none}"
 echo "REDUNDANT (declared, loopback only):  ${redundant:-none}"
 echo "FIREWALL-ONLY (public, undeclared):   ${firewall_only:-none}"
@@ -209,6 +241,16 @@ if [ -n "$redundant" ]; then
   echo "       The hole has no possible client, and it widens ${IFACE} for nothing. Reach the" >&2
   echo "       service through its vhost or serve mount and set \`lan = false; tailnet = false;\`" >&2
   echo "       on its row, or make the listener bind the interface." >&2
+fi
+if [ -n "$served_serve" ]; then
+  echo "Note: SERVED-SERVE ports are tailscaled mounts — TLS terminates in tailscaled and it"
+  echo "      forwards to the upstream itself, so no inbound filtered connection reaches the"
+  echo "      port and a firewall row for one would be a hole with no client."
+fi
+if [ -n "$served_global" ]; then
+  echo "Note: SERVED-GLOBAL ports are in networking.firewall.allowed*Ports, i.e. open on"
+  echo "      every interface. Declared, not drift — but on a host that scopes everything"
+  echo "      else, this is the row to narrow into profiles.serviceExposure."
 fi
 if [ -n "$firewall_only" ]; then
   echo "Note: FIREWALL-ONLY ports bind a public address but are permitted nowhere. They are"

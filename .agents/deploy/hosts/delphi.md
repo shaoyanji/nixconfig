@@ -177,9 +177,9 @@ serve` mount, never a public vhost; tailscaled terminates TLS, so no cert per se
 
 Both the mounts and the console are compiled from `services.servicePortal`, and
 `modules/services/service-portal.nix` fails the build when a mount has no card, no
-owner, a shared port, a non-loopback upstream or a missing `requires`. A port a
-service *binds* is a `profiles.serviceExposure` row, whose `tailnet` is required:
-a loopback-bound listener there is REDUNDANT and fails `checks:ports`.
+owner, a shared port, a non-loopback upstream or a missing `requires`. A bound port
+is a `profiles.serviceExposure` row (`tailnet` required; loopback-only = REDUNDANT,
+which fails `checks:ports`), while a mount counts as SERVED-SERVE — not a hole.
 
 ## Offloaded services (2026-11-02)
 

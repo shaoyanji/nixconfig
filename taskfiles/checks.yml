@@ -55,6 +55,7 @@ tasks:
       - task: checks:kg
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
       # (~3 s) for a parity experiment, and its own summary says so.
+      - task: checks:ports:test
       - task: checks:nix:lint
       - task: checks:nix:shell
       - task: checks:modules:edges
@@ -515,15 +516,27 @@ tasks:
   checks:ports:
     desc: Diff THIS machine's declared firewall surface against its live listeners
     summary: >
-      Compares `nix eval` of networking.firewall.interfaces.<iface> against the LOCAL
-      `ss`: SERVED, DEAD-HOLE, REDUNDANT, FIREWALL-ONLY, ACCEPTED (documented), DYNAMIC
-      (start-up port). REDUNDANT — declared but loopback-only — always exits 1: the hole
-      has no possible client. It audits this machine and refuses a foreign HOST with exit
-      2; no self-scan (`-i lo` makes every listener look reachable). Vars: HOST= (local
-      hostname), IFACE= (enp1s0). STRICT=1 adds DEAD-HOLE/FIREWALL-ONLY; exit 2 = wrong
-      host, an interface declaring nothing, or failed eval.
+      Compares `nix eval` of networking.firewall against the LOCAL `ss`: SERVED,
+      SERVED-GLOBAL (global list), SERVED-SERVE (`tailscale serve`), DEAD-HOLE,
+      REDUNDANT, FIREWALL-ONLY, ACCEPTED, DYNAMIC. REDUNDANT — declared but loopback-only
+      — always exits 1: the hole has no possible client. Audits this machine and refuses
+      a foreign HOST with exit 2; no self-scan (`-i lo`). Vars: HOST= (local hostname),
+      IFACE= (enp1s0), STRICT=1 adds DEAD-HOLE/FIREWALL-ONLY; exit 2 = wrong host, an
+      interface declaring nothing, or failed eval. Fixture: `checks:ports:test`.
     cmds:
       - HOST="{{.HOST | default ""}}" IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
+
+  checks:ports:test:
+    desc: Regression fixture for checks:ports (fake host, listeners and serve state)
+    summary: >
+      Runs scripts/task/port-audit.sh against tests/port-audit/bin — fake hostname, nix,
+      ss, sysctl, tailscale — so each bucket fires on demand: a declared port whose only
+      listener is loopback exits 1 (v4 and ::1 forms), a `tailscale serve` port is
+      SERVED-SERVE and not a hole, a global-list port is SERVED-GLOBAL, and STRICT drift
+      still exits 1 while a plain run only reports it. Pure shell, no nix eval, <1 s.
+      Exit 0 = every case behaves.
+    cmds:
+      - bash tests/port-audit/run.sh
 
   checks:ssh:bitwarden:
     desc: Log into a fleet host with the Bitwarden-vault SSH key and its CA certificate

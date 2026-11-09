@@ -1,0 +1,8 @@
+#!/bin/sh
+# Stands in for `tailscale serve status --json`, which the audit reads to tell a
+# tailscaled mount from an undeclared hole.
+if [ -n "${FIXTURE_SERVE:-}" ]; then
+  printf '%s\n' "$FIXTURE_SERVE"
+else
+  printf '%s\n' '{}'
+fi

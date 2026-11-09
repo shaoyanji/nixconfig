@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stands in for `nix eval … .config.networking.firewall`: the audit only reads the
+# JSON, so the fixture supplies it instead of instantiating a real host.
+printf '%s\n' "${FIXTURE_FIREWALL:?FIXTURE_FIREWALL is required}"

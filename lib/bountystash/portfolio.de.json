@@ -22,12 +22,16 @@
       {
         "degree": "M.Sc. Renewable Energy Management",
         "school": "Albert-Ludwigs-Universität Freiburg (Abschlussnote: 1,8)",
-        "period": "2011 — 2014"
+        "period": "2011 — 2014",
+        "url": "https://www.uni-freiburg.de",
+        "urlLabel": "Universitätsportal"
       },
       {
         "degree": "B.S. Petroleum Engineering",
         "school": "Colorado School of Mines (Nebenfächer: Volkswirtschaft & Public Policy)",
-        "period": "2006 — 2010"
+        "period": "2006 — 2010",
+        "url": "https://www.mines.edu",
+        "urlLabel": "School of Mines"
       }
     ],
     "contacts": {
@@ -96,6 +100,8 @@
       "title": "Erneuerbare Energieanlagen & Telemetrie-Plattform",
       "role": "Lead Operations @ O3 Energy",
       "period": "2016 — 2020",
+      "badge": "O3 ENERGY & FRAUNHOFER ISE",
+      "sector": 3,
       "description": "Leitung der Datenarchitektur und kaufmännischen Betriebsführung eines Solarportfolios von über 100 Mio. $ Kapitalwert. Entwicklung dynamischer Ertrags- und Bewertungsmodelle unter strengen Banken-Audits, Automatisierung mobiler Felddatenerfassung und Absicherung von Kontrahentenrisiken.",
       "stack": [
         "Python",
@@ -105,13 +111,26 @@
         "Financial Due Diligence"
       ],
       "impact": "Quantitative Betriebsführung von über 100 Mio. $ Kapitalanlagen; M&A-Prüfungen mit institutionellen Kreditgebern, Steuereigenkapital und Fraunhofer-ISE-Forschungsgrundlagen.",
+      "highlights": [
+        "Quantitative Betriebsführung von über 100 Mio. $ Kapitalanlagen",
+        "Technische Due Diligence bei M&A-Transaktionen mit institutionellen Kreditgebern und Steuereigenkapital-Partnern",
+        "Automatisierung von Laborinstrumentierung und numerischer Solardatenverarbeitung in C++ und Python während der Forschung am Fraunhofer ISE"
+      ],
       "link": "#",
+      "links": [
+        {
+          "label": "Architektur & Quant-Ops besprechen",
+          "href": "mailto:$EMAIL?subject=Asset%20Operations%20Inquiry"
+        }
+      ],
       "featured": true
     },
     {
       "title": "fibtransponder: Fibonacci-Streaming-Zustandsautomat",
       "role": "Forschung & Implementierung (Go)",
       "period": "2026",
+      "badge": "GO RESEARCH BASELINE",
+      "sector": 2,
       "description": "Experimentelles Substrat für semantische Sensorik und Tokenisierung auf Basis eines Fibonacci-Radix-Streaming-Zustandsautomaten (FSVM). Untersucht Bitstrom-Verarbeitung mit begrenztem Schrittaufwand, strukturelle Kalibrierung über Adjazenzbreite und Zobrist-Hash-Tabellen.",
       "stack": [
         "Go",
@@ -121,13 +140,30 @@
         "Bitstrom-Analyse"
       ],
       "impact": "Nachweis der strukturellen Adjazenzbreite als Selektor für Lokalitätssensitivität; Falsifizierung reiner Seed-Diversität anhand automatisierter Korpus-Benchmarks.",
+      "highlights": [
+        "Kernthese: strukturelle Kalibrierung über Adjazenzbreite ist nachgewiesen; die Breite wählt die Lokalitätssensitivität",
+        "Korpus-Falsifikation: reine Seed-Kalibrierung mit Zobrist erzeugt keine Detektor-Diversität",
+        "Sensitivitätsverschiebung: variierende Adjazenzbreite löst einen nachweisbaren Wechsel von Prosa- auf Code-Sensitivität aus"
+      ],
       "link": "https://github.com/shaoyanji/fibtransponder",
+      "links": [
+        {
+          "label": "Repository & Spezifikation (GitHub)",
+          "href": "https://github.com/shaoyanji/fibtransponder"
+        },
+        {
+          "label": "Korpus-Bericht",
+          "href": "https://github.com/shaoyanji/fibtransponder/blob/master/REPORT_CORPUS.md"
+        }
+      ],
       "featured": true
     },
     {
       "title": "Deklarative Multi-Host NixOS-Infrastruktur",
       "role": "Persönliche Infrastruktur-Flotte",
       "period": "Aktiv",
+      "badge": "NIXCONFIG",
+      "sector": 1,
       "description": "Vollständig reproduzierbare Multi-Host-Flotte (NAS, Workstations, Cloud-Endpunkte), verwaltet mit Nix Flakes. Eigene SSH Certificate Authority mit automatisierter Rotation, Age/SOPS-Verschlüsselung, automatisierte Selbst-Upgrades und Taskfile-Steuerung.",
       "stack": [
         "NixOS",
@@ -138,13 +174,26 @@
         "Taskfile"
       ],
       "impact": "Keine manuelle Serverkonfiguration oder Konfigurationsdrift. Bereitstellung per Einzelbefehl, tägliche Kernel-Boot-Validierung und isolierte Secret-Hygiene.",
+      "highlights": [
+        "Keine manuelle Serverkonfiguration und kein Konfigurationsdrift",
+        "Kurzlebige SSH-Zertifikate statt authorized_keys-Wildwuchs",
+        "ZFS/Btrfs-Speicher, ZRAM-tmpfs-IO-Diät und hermetische CI/CD-Automatisierung"
+      ],
       "link": "https://github.com/shaoyanji/nixconfig",
+      "links": [
+        {
+          "label": "Flottenkonfiguration (GitHub)",
+          "href": "https://github.com/shaoyanji/nixconfig"
+        }
+      ],
       "featured": true
     },
     {
       "title": "Bountystash: Deterministische Aufgaben-Engine",
       "role": "Urheber & Systemarchitekt",
       "period": "2024 — Heute",
+      "badge": "BOUNTYSTASH",
+      "sector": 1,
       "description": "Schlanke, serverseitig gerenderte Go-Anwendung zur Überführung unstrukturierter Aufgabenanforderungen in unveränderliche, inhaltsadressierte Spezifikationen. Append-Only-Event-Ledger, tastaturfokussierte Terminal-Oberfläche und curl-fähige Endpunkte.",
       "stack": [
         "Go",
@@ -154,8 +203,46 @@
         "HTML"
       ],
       "impact": "Single-Binary-Bereitstellung, Routenauflösung im Sub-Millisekundenbereich, null Frontend-Ballast und manipulationssichere Audit-Historie.",
+      "highlights": [
+        "Single-Binary-Bereitstellung mit Routenauflösung unter einer Millisekunde",
+        "Content-Hashes und Projektionsquotienten für manipulationssichere Versionierung",
+        "Zwei Oberflächen: Markdown für Agenten, reines HTML für Browser, TUI für Menschen"
+      ],
       "link": "https://github.com/shaoyanji/bountystash",
+      "links": [
+        {
+          "label": "Quellcode ansehen (GitHub)",
+          "href": "https://github.com/shaoyanji/bountystash"
+        }
+      ],
       "featured": true
+    },
+    {
+      "title": "Deterministische Typst-Lebenslauf-Engine",
+      "role": "Build-Pipeline & Typografie",
+      "period": "Aktiv",
+      "badge": "ANTIGRAVITY WORKFLOW",
+      "sector": 3,
+      "description": "Lokale Build-Pipeline, die strukturiertes JSON mit Typst in pixelgenaue A4-PDFs kompiliert. Erzwingt geometrische Satzverhältnisse (φ = 1,61803) und Kompilierung unter einer Sekunde statt LaTeX- oder Browser-PDF-Ketten.",
+      "stack": [
+        "Typst",
+        "JSON Schema",
+        "Bitstream Charter",
+        "Deterministic PDF"
+      ],
+      "impact": "Eine Quelle für PDF-Lebenslauf, Anschreiben und diese Seite; hermetische Kompilierung ohne Node.js zur Laufzeit und ohne Headless-Browser.",
+      "highlights": [
+        "Eine Quelle der Wahrheit für PDF-Lebenslauf, Anschreiben und Web-Portfolio",
+        "Hermetische Kompilierung ohne Node.js-Laufzeit und ohne Headless-Browser"
+      ],
+      "link": "https://github.com/shaoyanji",
+      "links": [
+        {
+          "label": "Workflow-Pipeline ansehen (GitHub)",
+          "href": "https://github.com/shaoyanji"
+        }
+      ],
+      "featured": false
     }
   ],
   "philosophy": [

@@ -22,12 +22,16 @@
       {
         "degree": "M.Sc. Renewable Energy Management",
         "school": "Albert-Ludwigs-Universität Freiburg (Grade: 1.8)",
-        "period": "2011 — 2014"
+        "period": "2011 — 2014",
+        "url": "https://www.uni-freiburg.de",
+        "urlLabel": "University Portal"
       },
       {
         "degree": "B.S. Petroleum Engineering",
         "school": "Colorado School of Mines (Minors: Economics & Public Policy)",
-        "period": "2006 — 2010"
+        "period": "2006 — 2010",
+        "url": "https://www.mines.edu",
+        "urlLabel": "School of Mines Portal"
       }
     ],
     "contacts": {
@@ -96,6 +100,8 @@
       "title": "Clean Energy Asset & Telemetry Platform",
       "role": "Lead Operations @ O3 Energy",
       "period": "2016 — 2020",
+      "badge": "O3 ENERGY & FRAUNHOFER ISE",
+      "sector": 3,
       "description": "Led data architecture and commercial asset steering for a solar energy portfolio exceeding $100M+. Built dynamic quantitative valuation and yield models under bank audits, automated mobile field data capture, and structured counterparty risk hedging.",
       "stack": [
         "Python",
@@ -105,13 +111,26 @@
         "Financial Due Diligence"
       ],
       "impact": "Governed quantitative operations across $100M+ in assets; coordinated M&A due diligence with institutional lenders, tax equity, and Fraunhofer ISE research frameworks.",
+      "highlights": [
+        "Governed quantitative operations across $100M+ in capital assets",
+        "Coordinated technical due diligence across M&A transactions with institutional lenders and tax equity partners",
+        "Automated laboratory instrumentation and numerical solar data processing in C++ and Python during graduate research at Fraunhofer ISE"
+      ],
       "link": "#",
+      "links": [
+        {
+          "label": "Discuss Architecture & Quant Ops",
+          "href": "mailto:$EMAIL?subject=Asset%20Operations%20Inquiry"
+        }
+      ],
       "featured": true
     },
     {
       "title": "fibtransponder: Fibonacci Streaming State Machine",
       "role": "Research & Implementation (Go)",
       "period": "2026",
+      "badge": "GO RESEARCH BASELINE",
+      "sector": 2,
       "description": "An experimental tokenization and semantic sensing substrate built around a Fibonacci-radix streaming state machine (FSVM). Evaluates bounded per-step work bitstream ingestion, structural calibration via adjacency width, and Zobrist hash seed tables.",
       "stack": [
         "Go",
@@ -121,13 +140,30 @@
         "Bitstream Analysis"
       ],
       "impact": "Demonstrated that structural adjacency width acts as a locality-sensitivity selector; falsified seed-only detector diversity through automated corpus benchmarks.",
+      "highlights": [
+        "Canonical thesis: structural calibration via adjacency width is demonstrated; width selects locality sensitivity",
+        "Corpus falsification: proved that seed-only Zobrist calibration does not create detector diversity",
+        "Sensitivity shift: varying adjacency width triggers a demonstrable prose-first to code-first transition"
+      ],
       "link": "https://github.com/shaoyanji/fibtransponder",
+      "links": [
+        {
+          "label": "Repository & Spec (GitHub)",
+          "href": "https://github.com/shaoyanji/fibtransponder"
+        },
+        {
+          "label": "Corpus Report",
+          "href": "https://github.com/shaoyanji/fibtransponder/blob/master/REPORT_CORPUS.md"
+        }
+      ],
       "featured": true
     },
     {
       "title": "Multi-Host Declarative NixOS Infrastructure",
       "role": "Personal Infrastructure Fleet",
       "period": "Active",
+      "badge": "NIXCONFIG",
+      "sector": 1,
       "description": "Production-grade, fully reproducible multi-host fleet (NAS, workstations, cloud endpoints) managed with Nix Flakes. Features a custom SSH Certificate Authority with automated rotation, age/SOPS secret encryption, automated self-upgrades, and a Taskfile control plane.",
       "stack": [
         "NixOS",
@@ -138,13 +174,26 @@
         "Taskfile"
       ],
       "impact": "Zero manual server configuration. One-command host commissioning, automated morning kernel boot validation, and air-gapped secret hygiene.",
+      "highlights": [
+        "Zero manual server configuration or configuration drift",
+        "Short-lived SSH certificates instead of authorized_keys clutter",
+        "ZFS/Btrfs storage, ZRAM tmpfs IO diet, and hermetic CI/CD automation"
+      ],
       "link": "https://github.com/shaoyanji/nixconfig",
+      "links": [
+        {
+          "label": "Inspect Fleet Config (GitHub)",
+          "href": "https://github.com/shaoyanji/nixconfig"
+        }
+      ],
       "featured": true
     },
     {
       "title": "Bountystash: Deterministic Work Engine",
       "role": "Creator & Systems Architect",
       "period": "2024 — Present",
+      "badge": "BOUNTYSTASH",
+      "sector": 1,
       "description": "Thin, server-rendered Go application turning unstructured task requirements into immutable, content-addressed specifications. Features append-only event sourcing, a keyboard-first terminal UI, and curl-friendly endpoints.",
       "stack": [
         "Go",
@@ -154,8 +203,46 @@
         "HTML"
       ],
       "impact": "Single-binary deployment, sub-millisecond route resolution, zero frontend dependencies, and deterministic audit trail.",
+      "highlights": [
+        "Single-binary deployment with sub-millisecond route resolution",
+        "Content hashes and projection quotient hashes for tamper-evident versioning",
+        "Dual surface: markdown for agents, clean HTML for browsers, TUI for humans"
+      ],
       "link": "https://github.com/shaoyanji/bountystash",
+      "links": [
+        {
+          "label": "Inspect Source Code (GitHub)",
+          "href": "https://github.com/shaoyanji/bountystash"
+        }
+      ],
       "featured": true
+    },
+    {
+      "title": "Deterministic Typst Resume Engine",
+      "role": "Build Pipeline & Typesetting",
+      "period": "Active",
+      "badge": "ANTIGRAVITY WORKFLOW",
+      "sector": 3,
+      "description": "A local build pipeline compiling structured JSON into pixel-perfect A4 PDFs with Typst. Enforces geometric typographic ratios (φ = 1.61803) with sub-second compilation, replacing LaTeX and browser-based PDF toolchains.",
+      "stack": [
+        "Typst",
+        "JSON Schema",
+        "Bitstream Charter",
+        "Deterministic PDF"
+      ],
+      "impact": "One source of truth across the PDF resume, cover letters and this site; hermetic compilation with no runtime Node.js and no headless browser.",
+      "highlights": [
+        "One source of truth across the PDF resume, cover letters, and the web portfolio",
+        "Hermetic compilation without runtime Node.js or browser headless overhead"
+      ],
+      "link": "https://github.com/shaoyanji",
+      "links": [
+        {
+          "label": "Inspect Workflow Pipeline (GitHub)",
+          "href": "https://github.com/shaoyanji"
+        }
+      ],
+      "featured": false
     }
   ],
   "philosophy": [

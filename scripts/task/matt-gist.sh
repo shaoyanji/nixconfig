@@ -79,7 +79,7 @@ merge_de() { # corpus gist out
   jq --slurpfile old <(jq -c '.' "$2") '
     ($old[0].basics // {}) as $b
     | .basics = ((.basics // {}) + {
-        email: $b.email, phone: $b.phone, location: $b.location,
+        email: $b.email, location: $b.location,
         profiles: $b.profiles, image: $b.image, signature: $b.signature
       } | with_entries(select(.value != null)))
   ' "$1" >"$3"
@@ -288,6 +288,10 @@ push() {
 
   jq -S . "$src" >"$work/resume.json"
   cp "$work/resume.json" "$cache/resume.json"
+  # A gist is public. The number lives in modules/secrets/pii.yaml and in $HOME,
+  # so the published copy is the CV minus that one field: an address a reader can
+  # write to is the point, a number anyone can scrape is not.
+  jq -S 'del(.basics.phone)' "$work/resume.json" >"$work/resume.public.json"
 
   echo "resume.json    $(jq -r '.work | length' "$src") roles, $(jq -r '.projects | length' "$src") projects"
   echo "  gist https://gist.github.com/$resume_gist"
@@ -344,7 +348,7 @@ push() {
     return 0
   fi
 
-  gh gist edit "$resume_gist" -f resume.json "$work/resume.json" || return 1
+  gh gist edit "$resume_gist" -f resume.json "$work/resume.public.json" || return 1
   echo "wrote   resume.json"
   if [ -n "$de" ]; then
     gh gist edit "$lebenslauf_gist" -f lebenslauf.json "$work/lebenslauf.json" || return 1

@@ -45,6 +45,7 @@ from content_api import (
     find,
     joined_lines,
     joined_tags,
+    keep_order,
     one,
     ordered,
     rows,
@@ -307,6 +308,15 @@ def do_export(api: str, args: argparse.Namespace) -> int:
         print(f"export: {args.into} is not a JSON Resume object", file=sys.stderr)
         return 2
 
+    # The document this merges into already holds the same entries, in its own
+    # key order; the rebuilt entry takes that order back (content_api.keep_order).
+    previous = {
+        (table, derived_id(table, entry)): entry
+        for table, key in (("role", "work"), ("project", "projects"))
+        for entry in document.get(key) or []
+        if isinstance(entry, dict)
+    }
+
     for table, key in (("role", "work"), ("project", "projects")):
         selected = [
             row for row in rows(api, table_of(table)) if row.get("language") == language
@@ -324,15 +334,15 @@ def do_export(api: str, args: argparse.Namespace) -> int:
                     entry[name] = split_tags(value)
                 else:
                     entry[name] = value
-            entries.append(entry)
+            entries.append(keep_order(entry, previous.get((table, derived_id(table, entry)))))
         document[key] = entries
         print(f"{key}: {len(entries)} from {language} rows")
 
     out = args.out or args.into
     with open(out, "w", encoding="utf-8") as handle:
-        # Sorted keys and a two-space indent, the shape `task matt:gist:sync`
-        # writes with `jq -S`, so a re-export is a no-op in git.
-        handle.write(json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+        # Two-space indent and the keys in the order the document already had
+        # them, so a re-export after an `import` is a no-op in git.
+        handle.write(json.dumps(document, ensure_ascii=False, indent=2) + "\n")
     print(f"wrote {out}")
     return 0
 

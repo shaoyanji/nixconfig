@@ -129,6 +129,24 @@ def split_tags(text: str | None) -> list[str] | None:
     return [tag.strip() for tag in text.split(",") if tag.strip()]
 
 
+# --- artifact shape ---------------------------------------------------------
+
+
+def keep_order(entry: dict, previous: dict | None) -> dict:
+    """Order a rebuilt entry like the one it replaces.
+
+    The committed artifacts disagree on key order: one CV is `jq -S` output and
+    the portfolio is hand-ordered, so the writer cannot choose a canonical order
+    without rewriting a document it did not author. Keys the previous entry did
+    not have keep the position the field table gave them.
+    """
+    if not previous:
+        return entry
+    shaped = {key: entry[key] for key in previous if key in entry}
+    shaped.update({key: value for key, value in entry.items() if key not in shaped})
+    return shaped
+
+
 # --- ids --------------------------------------------------------------------
 
 

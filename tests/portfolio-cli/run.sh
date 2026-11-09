@@ -72,10 +72,12 @@ EXPECTED=(
   "links survive as label and href"
   "an absent field stays absent"
   "the export reproduces the English portfolio"
+  "a re-export is byte-identical"
   "the export keeps what the rows do not own"
   "a second import is not a second set of rows"
   "the German import pairs by position"
   "the export reproduces the German portfolio"
+  "the German re-export is byte-identical"
   "a German import that is not parallel is refused"
   "a refused German import writes nothing"
   "set changes only the flags it is given"
@@ -143,6 +145,14 @@ else
   bad "the export reproduces the English portfolio" "$(diff <(jq -S . "$en") <(jq -S . "$work/roundtrip-en.json") | head -12)"
 fi
 
+# Byte-identical, not merely equal: the committed files are checked in, and an
+# export that reorders keys turns every re-seed into a diff nobody can read.
+if cmp -s "$en" "$work/roundtrip-en.json"; then
+  pass "a re-export is byte-identical"
+else
+  bad "a re-export is byte-identical" "$(diff "$en" "$work/roundtrip-en.json" | head -12)"
+fi
+
 printf '{"profile": {"name": "Only Profile"}}\n' >"$work/bare.json"
 cli_run export --into "$work/bare.json"
 check "the export keeps what the rows do not own" \
@@ -168,6 +178,11 @@ if diff -q <(jq -S . "$de") <(jq -S . "$work/roundtrip-de.json") >/dev/null; the
   pass "the export reproduces the German portfolio"
 else
   bad "the export reproduces the German portfolio" "$(diff <(jq -S . "$de") <(jq -S . "$work/roundtrip-de.json") | head -12)"
+fi
+if cmp -s "$de" "$work/roundtrip-de.json"; then
+  pass "the German re-export is byte-identical"
+else
+  bad "the German re-export is byte-identical" "$(diff "$de" "$work/roundtrip-de.json" | head -12)"
 fi
 
 jq 'del(.projects[2])' "$de" >"$work/short-de.json"

@@ -76,10 +76,12 @@ EXPECTED=(
   "the import stores every field"
   "an absent field stays absent"
   "the export reproduces the English corpus"
+  "a re-export is byte-identical"
   "the export keeps what the rows do not own"
   "a second import is not a second set of rows"
   "the German import shares the English ids"
   "the export reproduces the German corpus"
+  "the German re-export is byte-identical"
   "a shared id needs a language"
   "set changes only the flags it is given"
   "set on a language leaves the other one alone"
@@ -144,6 +146,14 @@ else
   bad "the export reproduces the English corpus" "$(diff <(jq -S . "$en") <(jq -S . "$work/roundtrip-en.json") | head -12)"
 fi
 
+# Byte-identical, not merely equal: the committed files are checked in, and an
+# export that reorders keys turns every re-seed into a diff nobody can read.
+if cmp -s "$en" "$work/roundtrip-en.json"; then
+  pass "a re-export is byte-identical"
+else
+  bad "a re-export is byte-identical" "$(diff "$en" "$work/roundtrip-en.json" | head -12)"
+fi
+
 printf '{"basics": {"name": "Only Basics"}}\n' >"$work/bare.json"
 cli_run export --into "$work/bare.json"
 check "the export keeps what the rows do not own" \
@@ -168,6 +178,11 @@ if diff -q <(jq -S . "$de") <(jq -S . "$work/roundtrip-de.json") >/dev/null; the
   pass "the export reproduces the German corpus"
 else
   bad "the export reproduces the German corpus" "$(diff <(jq -S . "$de") <(jq -S . "$work/roundtrip-de.json") | head -12)"
+fi
+if cmp -s "$de" "$work/roundtrip-de.json"; then
+  pass "the German re-export is byte-identical"
+else
+  bad "the German re-export is byte-identical" "$(diff "$de" "$work/roundtrip-de.json" | head -12)"
 fi
 
 # --- set -------------------------------------------------------------------

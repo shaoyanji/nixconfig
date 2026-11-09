@@ -27,8 +27,8 @@
       "link": "#",
       "links": [
         {
-          "href": "mailto:fictional@example.com?subject=Asset%20Operations",
-          "label": "Discuss Architecture"
+          "label": "Discuss Architecture",
+          "href": "mailto:fictional@example.com?subject=Asset%20Operations"
         }
       ],
       "period": "2016 — 2020",
@@ -61,12 +61,12 @@
       "link": "https://example.com/fleet",
       "links": [
         {
-          "href": "https://example.com/fleet",
-          "label": "Repository"
+          "label": "Repository",
+          "href": "https://example.com/fleet"
         },
         {
-          "href": "https://example.com/fleet/report",
-          "label": "Fleet Report"
+          "label": "Fleet Report",
+          "href": "https://example.com/fleet/report"
         }
       ],
       "role": "Architect",

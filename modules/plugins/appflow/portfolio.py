@@ -39,6 +39,7 @@ from content_api import (
     find,
     joined_lines,
     joined_tags,
+    keep_order,
     one,
     ordered,
     rows,
@@ -269,8 +270,11 @@ def do_export(api: str, args: argparse.Namespace) -> int:
         return 2
 
     selected = ordered([row for row in rows(api, TABLE) if row.get("language") == language])
+    # The two English and German files are parallel by position (see `do_import`),
+    # so the previous entry at the same index supplies the key order to keep.
+    previous = [entry for entry in document.get("projects") or [] if isinstance(entry, dict)]
     entries = []
-    for row in selected:
+    for index, row in enumerate(selected):
         entry = {}
         for name, column in ARTIFACT:
             value = row.get(column)
@@ -284,12 +288,12 @@ def do_export(api: str, args: argparse.Namespace) -> int:
                 entry[name] = split_links(value)
             else:
                 entry[name] = value
-        entries.append(entry)
+        entries.append(keep_order(entry, previous[index] if index < len(previous) else None))
     document["projects"] = entries
 
     out = args.out or args.into
     with open(out, "w", encoding="utf-8") as handle:
-        handle.write(json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+        handle.write(json.dumps(document, ensure_ascii=False, indent=2) + "\n")
     print(f"projects: {len(entries)} from {language} rows")
     print(f"wrote {out}")
     return 0

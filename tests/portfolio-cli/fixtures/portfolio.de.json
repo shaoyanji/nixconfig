@@ -14,8 +14,8 @@
       "link": "#",
       "links": [
         {
-          "href": "mailto:fictional@example.com?subject=Asset%20Operations",
-          "label": "Architektur besprechen"
+          "label": "Architektur besprechen",
+          "href": "mailto:fictional@example.com?subject=Asset%20Operations"
         }
       ],
       "period": "2016 — 2020",
@@ -48,8 +48,8 @@
       "link": "https://example.com/fleet",
       "links": [
         {
-          "href": "https://example.com/fleet",
-          "label": "Repository"
+          "label": "Repository",
+          "href": "https://example.com/fleet"
         }
       ],
       "role": "Architekt",

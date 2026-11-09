@@ -43,7 +43,7 @@ fallback_providers:
   - provider: openrouter
     model: nvidia/nemotron-3.5-super-vl:free
   - provider: ollama-cloud
-    model: nemotron-3.5-super
+    model: nemotron-3-ultra
   - provider: deepseek
     model: deepseek-flash
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes

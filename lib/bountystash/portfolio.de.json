@@ -278,5 +278,82 @@
       "tag": "Energie & Quant",
       "reading_time": "7 Min."
     }
-  ]
+  ],
+  "sections": [
+    {
+      "id": 0,
+      "name": "KONSOLE",
+      "rail": "00 KONSOLE",
+      "tag": "// SEKTOR 00 : IDENTITÄT & DISPATCH",
+      "depth": "0000px",
+      "inspector": "Haupt-Terminalstation. Kernidentität, Aufenthalts- und Arbeitsstatus sowie direkte Kommunikationskanäle."
+    },
+    {
+      "id": 1,
+      "name": "SYSTEME",
+      "rail": "01 SYSTEME",
+      "tag": "// SEKTOR 01 : SYSTEME & VERTEILTE INFRASTRUKTUR",
+      "depth": "-0600px",
+      "title": "Kernsysteme & Flotteninfrastruktur",
+      "blurb": "Deterministische Go-Server, Append-Only-Ledger und driftfreie deklarative Linux-Flotten.",
+      "inspector": "Deterministisches Go-Backend und deklarative NixOS-Flotte. Append-Only-Event-Ledger und hermetische CI.",
+      "hint": "[ NAVIGATION: MAUSRAD / PFEILTASTEN ZU SEKTOR 02 ]",
+      "prev": "↑ Konsole",
+      "next": "Sektor 02: Algorithmen ↓"
+    },
+    {
+      "id": 2,
+      "name": "ALGORITHMEN",
+      "rail": "02 ALGORITHMEN",
+      "tag": "// SEKTOR 02 : ALGORITHMISCHE FORSCHUNG & STREAMING-AUTOMATEN",
+      "depth": "-1200px",
+      "title": "Algorithmische Zustandsautomaten & Forschung",
+      "blurb": "Neuartige Radix-Kodierung, beschränkte Schrittaufwände und Tokenisierungs-Forschung.",
+      "inspector": "Fibonacci-Radix-Streaming-Zustandsautomat (FSVM). Strukturelle Kalibrierung über Adjazenzbreite und Bitstrom-Sensorik.",
+      "arsenal": "Kern-Arsenal",
+      "hint": "[ NAVIGATION: MAUSRAD / PFEILTASTEN ZU SEKTOR 03 ]",
+      "prev": "↑ Systeme",
+      "next": "Sektor 03: Skalierung ↓"
+    },
+    {
+      "id": 3,
+      "name": "KAPITAL",
+      "rail": "03 KAPITAL 100M+$",
+      "tag": "// SEKTOR 03 : ERNEUERBARE ASSETS & KAPITAL-SKALIERUNG",
+      "depth": "-1800px",
+      "title": "Erneuerbare Energien & Quantitative Assets",
+      "blurb": "Verantwortliche kaufmännische Betriebsführung, dynamische Finanzmodelle und bankgeprüfte Telemetrie.",
+      "inspector": "Quantitative Betriebsführung für Erneuerbare-Energien-Portfolios über 100 Mio. $. Solarertragsmodelle unter Bank-Audits.",
+      "hint": "[ NAVIGATION: MAUSRAD / PFEILTASTEN ZU SEKTOR 04 ]",
+      "prev": "↑ Algorithmen",
+      "next": "Sektor 04: Fundament ↓"
+    },
+    {
+      "id": 4,
+      "name": "FUNDAMENT",
+      "rail": "04 FUNDAMENT",
+      "tag": "// SEKTOR 04 : AKADEMISCHE WURZELN & DISPATCH",
+      "depth": "-2400px",
+      "title": "Ausbildung & Forschungswurzeln",
+      "how": "Wie ich Systeme baue",
+      "inspector": "Akademische Wurzeln an der Colorado School of Mines und Universität Freiburg. Goldener Schnitt und 14KB TCP-Disziplin."
+    }
+  ],
+  "ui": {
+    "railLabel": "SEKTOREN:",
+    "emailButton": "✉ E-Mail senden",
+    "contactButton": "Kontaktformular",
+    "githubButton": "GitHub-Profil",
+    "linkedinButton": "LinkedIn",
+    "enterButton": "Zu Sektor 01: Systeme →",
+    "heroHint": "[ NAV: MAUSRAD / PFEILTASTE NACH UNTEN ZUM HINEINZOOMEN ]",
+    "zoomButton": "Zoom In ↓",
+    "workLink": "[ ALLE FALLSTUDIEN → ]",
+    "fastStatus": "Status",
+    "fastLanguages": "Sprachen",
+    "fastAvailability": "Verfügbarkeit",
+    "ready": "Bereit für den Aufbau?",
+    "dispatch": "Kontaktieren Sie mich für Beratung zu Systemen, Backend und Infrastruktur.",
+    "returnButton": "↑ Zurück zur Konsole"
+  }
 }

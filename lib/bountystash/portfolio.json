@@ -278,5 +278,82 @@
       "tag": "Energy & Quant",
       "reading_time": "7 min"
     }
-  ]
+  ],
+  "sections": [
+    {
+      "id": 0,
+      "name": "CONSOLE",
+      "rail": "00 CONSOLE",
+      "tag": "// SECTOR 00 : IDENTITY & DISPATCH",
+      "depth": "0000px",
+      "inspector": "Primary terminal station. Core identity, legal work status, and direct communication dispatch channels."
+    },
+    {
+      "id": 1,
+      "name": "SYSTEMS",
+      "rail": "01 SYSTEMS",
+      "tag": "// SECTOR 01 : SYSTEMS & DISTRIBUTED INFRASTRUCTURE",
+      "depth": "-0600px",
+      "title": "Core Systems & Fleet Infrastructure",
+      "blurb": "Deterministic Go servers, append-only event ledgers, and zero-drift declarative Linux fleets.",
+      "inspector": "Deterministic Go backend and declarative multi-host NixOS fleet. Append-only event ledgers and hermetic CI.",
+      "hint": "[ NAVIGATE: WHEEL / ARROWS TO FLY TO SECTOR 02 ]",
+      "prev": "↑ Console",
+      "next": "Sector 02: Algorithms ↓"
+    },
+    {
+      "id": 2,
+      "name": "ALGORITHMS",
+      "rail": "02 ALGORITHMS",
+      "tag": "// SECTOR 02 : ALGORITHMIC RESEARCH & STREAMING AUTOMATA",
+      "depth": "-1200px",
+      "title": "Algorithmic State Machines & Research",
+      "blurb": "Novel radix encodings, bounded per-step work stream sensing, and tokenization research.",
+      "inspector": "Fibonacci-radix streaming state machine (FSVM). Structural calibration via adjacency width and bitstream sensing.",
+      "arsenal": "Core Technical Arsenal",
+      "hint": "[ NAVIGATE: WHEEL / ARROWS TO FLY TO SECTOR 03 ]",
+      "prev": "↑ Systems",
+      "next": "Sector 03: Scale ↓"
+    },
+    {
+      "id": 3,
+      "name": "SCALE",
+      "rail": "03 CAPITAL $100M+",
+      "tag": "// SECTOR 03 : RENEWABLE ASSET OPERATIONS & CAPITAL SCALE",
+      "depth": "-1800px",
+      "title": "Clean Energy & Quantitative Asset Scale",
+      "blurb": "High-stakes commercial asset steering, dynamic financial modeling, and bank-audited telemetry.",
+      "inspector": "Quantitative asset steering for renewable energy portfolios exceeding $100M+. Solar yield modeling under bank audits.",
+      "hint": "[ NAVIGATE: WHEEL / ARROWS TO FLY TO SECTOR 04 ]",
+      "prev": "↑ Algorithms",
+      "next": "Sector 04: Foundation ↓"
+    },
+    {
+      "id": 4,
+      "name": "FOUNDATION",
+      "rail": "04 FOUNDATION",
+      "tag": "// SECTOR 04 : ACADEMIC ROOTS & DISPATCH",
+      "depth": "-2400px",
+      "title": "Education & Research Roots",
+      "how": "How I Build",
+      "inspector": "Academic roots at Colorado School of Mines and Albert-Ludwigs-Universität Freiburg. Golden Ratio and 14KB TCP discipline."
+    }
+  ],
+  "ui": {
+    "railLabel": "SECTORS:",
+    "emailButton": "✉ Email Me",
+    "contactButton": "Contact Form",
+    "githubButton": "GitHub Profile",
+    "linkedinButton": "LinkedIn",
+    "enterButton": "Enter Systems Sector →",
+    "heroHint": "[ NAV: MOUSE WHEEL / ARROW DOWN TO ZOOM INTO SECTOR 01 ]",
+    "zoomButton": "Zoom In ↓",
+    "workLink": "[ ALL CASE STUDIES → ]",
+    "fastStatus": "Status",
+    "fastLanguages": "Languages",
+    "fastAvailability": "Availability",
+    "ready": "Ready to build?",
+    "dispatch": "Reach out for systems, backend, and infrastructure advisory.",
+    "returnButton": "↑ Return to Console"
+  }
 }

@@ -177,11 +177,14 @@ in {
     system = "x86_64-linux";
     # Role/hardware/history are COMPILED, not commented: inventory.toml
     # `[hosts.fern] notes`, surfaced by `task dev:inventory:feed`.
-    # Ryoku pilot (2026-10-31): the desktop chain is swapped, not extended.
-    # globalModulesRyoku carries no dms/dank-greeter modules, and the host sets
-    # `fleet.dankShell.enable = false` so the DMS/niri home modules stay out too.
+    # Back on dwl (2026-11-09). The Ryoku pilot ran 2026-10-31 → 2026-11-09 and is
+    # over: on this 15 W Picasso APU the Ryoku session with the DisplayLink manager
+    # daemon was intolerable in daily use. The desktop is a fork, not a disable
+    # [[flake/policies.nix#desktop-fork-not-disable]]: globalModulesNixos is the
+    # fleet chain and the session comes from profiles.dwl-desktop, the same profile
+    # netbook and scratch adopt.
     modules =
-      globalModulesRyoku
+      globalModulesNixos
       ++ [
         inputs.disko.nixosModules.default
         ../hosts/fern/configuration.nix

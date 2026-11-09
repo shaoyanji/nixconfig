@@ -10,9 +10,11 @@ in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    # Ryoku pilot (2026-10-31): replaces base-desktop-environment, which would
-    # enable niri and expect the DMS greeter under greetd.
-    self.modules."profiles.ryoku-desktop"
+    # dwl, forked out of the userland rather than disabled inside it
+    # [[flake/policies.nix#desktop-fork-not-disable]]. The Ryoku pilot ran
+    # 2026-10-31 → 2026-11-09 and ended here: with the DisplayLink manager daemon
+    # in the session it was intolerable on this 15 W APU.
+    self.modules."profiles.dwl-desktop"
     self.modules."profiles.laptop"
     self.modules."profiles.base-node"
   ];
@@ -44,33 +46,29 @@ in {
     };
   };
 
-  # --- Desktop: Ryoku (niri provider), pilot 2026-10-31 ---
-  # No DMS greeter and no greetd: with no other display manager enabled,
-  # Ryoku's module turns on SDDM (Wayland) and owns its theme, so login happens
-  # at Ryoku's own greeter and `defaultCompositor = "niri"` picks the session.
-  # Autologin is gone on purpose; it hid the greeter the pilot needs to test.
+  # --- Desktop: dwl (profiles.dwlDesktop) ---
+  # The profile owns the session end to end: no display manager, getty autologins
+  # tty1, and that login shell execs `programs.dwl`'s wrapper. The chain still
+  # carries the DMS feature, so niri and the DMS greeter are forced off here —
+  # installed but unused is the half-fork the policy exists to stop.
+  profiles.dwlDesktop.enable = true;
+  programs.niri.enable = lib.mkForce false;
+  programs.dms-greeter.enable = lib.mkForce false;
 
-  # Ryoku phone integration, on trial. `programs.ryoku.phone.enable` itself
-  # cannot be used: phone.nix does `services.udev.packages = [
-  # ryokuNixpkgs.android-udev-rules ]`, ryokuNixpkgs is Ryoku's OWN pinned
-  # nixpkgs (flake.nix there: `ryokuNixpkgs = pkgs`), and that pin removed the
-  # package — "superseded by built-in systemd uaccess rules" — so the option
-  # throws during evaluation. This is the same four things it turns on, from
-  # this tree's pkgs, minus the package that no longer exists: the QML side
-  # reads /etc/ryoku/phone.json, which is the only state it needs.
-  #
-  # Kept out on purpose: the module's `phone.webcam.enable` half adds
-  # v4l2loopback through boot.extraModprobeConfig, which the dock profile
-  # already sets for btusb.
-  # mkForce, not a plain definition: phone.nix writes this same path for every
-  # `programs.ryoku.enable` host with `enabled = cfg.enable`, and `.text` is
-  # `types.lines`, so two definitions CONCATENATE into `{"enabled":true…}\n{
-  # "enabled":false…}` — a file that is not valid JSON, measured on the first
-  # switch 2026-11-01.
-  environment.etc."ryoku/phone.json".text = lib.mkForce (builtins.toJSON {
-    enabled = true;
-    webcam = false;
-  });
+  # `desktop` is the role's niri/DMS home layer and is the one feature the fork
+  # drops; shell, dev, ai, browser and media still come from roles.home.
+  fleet.hmUserFeatures = lib.mkForce [
+    "systemd-policy"
+    "shell"
+    "dev"
+    "ai"
+    "browser"
+    "media"
+  ];
+
+  # Phone integration without a shell-specific layer: KDE Connect and the
+  # adb/scrcpy tools below are standalone. The ryoku `phone.json` this host used
+  # to write is gone with the pilot — it existed only for Ryoku's QML side.
   programs.kdeconnect.enable = true;
   services.avahi.enable = lib.mkDefault true;
 
@@ -125,7 +123,7 @@ in {
   };
 
   # --- CPU frequency: off the powersave floor ---
-  # Ryoku's power-profiles-daemon leaves acpi-cpufreq on `powersave`, which pins
+  # power-profiles-daemon leaves acpi-cpufreq on `powersave`, which pins
   # this Picasso APU at its 1400 MHz floor while `balanced` is selected and the
   # machine is on AC. Measured on fern 2026-11-01, 3M-iteration loop:
   #   powersave 1396 MHz 0.891 s · schedutil 2586 MHz 0.476 s · performance 0.469 s

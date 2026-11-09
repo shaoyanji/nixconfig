@@ -27,7 +27,7 @@ timezone = "Europe/Berlin"
 cell_phone = "+491733281570"
 contact_email = "matt@bountystash.com"
 calendar = "https://cal.com/mattji"
-contact_form = "https://bountystash.com/contact/"
+contact_form = "https://bountystash.com/contact"
 
 # Order is the order shown on the profile.
 languages = ["en", "de", "zh"]

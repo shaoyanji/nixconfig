@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Pre-push: the two gates the CI `docs-budget` job runs, run here instead.
+# Pre-push: two of the gates in CI's `docs-budget` job, plus the blob-size gate
+# that CI does not run at all.
 #
-# Every red run on main costs a mail and a context switch, and on this tree the
-# failing job is almost always `docs-budget`: a taskfile shard moved without
-# `flake/taskfile-digest-pin.nix`, or a living document over budget. Both cost
-# seconds to check locally and both are cheap to fix *before* the push. CI keeps
-# running them (a `--no-verify` push must still be caught), this only moves the
-# answer to where the change is still in hand.
+# Every red run on main costs a mail and a context switch, and on this tree that
+# job is where a change lands red: a taskfile shard that no longer compiles to the
+# graph go-task sees, a living document over budget. Both are answered here in
+# a few seconds, and `scripts/task/repo-blobs.sh` adds the one check no CI step
+# makes — a >512 KiB blob entering the remote, which only a rewrite can undo. The
+# job's other two steps (prose tells, module edges) stay in CI. CI keeps running
+# everything either way (a `--no-verify` push must still be caught), so this only
+# moves the answer to where the change is still in hand.
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -44,7 +47,8 @@ if [ -f scripts/task/repo-blobs.sh ]; then
 fi
 
 # The task graph gate: yq parses the shards, python applies the rules, go-task is
-# the oracle for the name set. ~1 s, no eval, no build, no host.
+# the oracle for the name set. ~3 s, no eval, no build, no host — 1.9 s of it is
+# go-task's own `--list-all --json`.
 if command -v yq >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
   if ! bash scripts/task/taskfile-graph.sh >/tmp/pre-push-task-graph.log 2>&1; then
     echo "pre-push: the task graph gate failed:"

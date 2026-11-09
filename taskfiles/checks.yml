@@ -529,14 +529,13 @@ tasks:
   checks:ports:test:
     desc: Regression fixture for checks:ports (fake host, listeners and serve state)
     summary: >
-      Runs scripts/task/port-audit.sh against tests/port-audit/bin — fake hostname, nix,
-      ss, sysctl, tailscale — so each bucket fires on demand: a declared port whose only
-      listener is loopback exits 1 (v4 and ::1 forms), a `tailscale serve` port is
-      SERVED-SERVE and not a hole, a global-list port is SERVED-GLOBAL, and STRICT drift
-      still exits 1 while a plain run only reports it. The exit-2 refusals are cases too:
-      a foreign HOST and an interface that declares no ports must refuse, not answer from
-      the wrong machine's listeners. Pure shell, no nix eval, ~1 s.
-      Exit 0 = every case behaves.
+      Runs port-audit.sh against tests/port-audit/bin — fake hostname, nix, ss, sysctl,
+      tailscale — so each bucket fires on demand: a declared port whose only listener is
+      loopback exits 1 (v4 and ::1), a `tailscale serve` port is SERVED-SERVE, a
+      global-list port is SERVED-GLOBAL, and STRICT drift exits 1 while a plain run only
+      reports it. A foreign HOST and an interface declaring no ports are refused (exit 2).
+      Coverage is asserted both ways — every EXPECTED case must run and every case that
+      runs must be listed — so deleting one fails. Pure shell, ~1 s. Exit 0 = all behave.
     cmds:
       - bash tests/port-audit/run.sh
 

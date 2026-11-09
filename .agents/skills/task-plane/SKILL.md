@@ -42,8 +42,9 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 
 | Tier | Examples | Cost |
 | :--- | :--- | :--- |
-| **free** | `task status`, `task help`, `task find:<x>`, `task checks:ports:test`, `dev:inventory:host`, `task checks:tasks` | < 1 s, local files; `checks:tasks` compiles the shards with yq (`taskfile_graph.py`, ~0.6 s) and adds the go-task name parity; `checks:ports:test` is shell over a fake PATH (~1 s / 14 MiB) |
-| **cheap (eval)** | `dev:inventory:json`, `dev:flake:get-hosts` | 0.1–2.5 s, no host config |
+| **free (no nix)** | `task status` 0.15 s, `task help` 0.18 s, `task find:<x>` 0.24 s, `task checks:ports:test` 0.85 s | local files and processes; the fixture runs the audit against a fake PATH (~14 MiB) |
+| **cheap (one eval)** | `dev:inventory:host` 0.28 s, `dev:inventory:json` 0.26 s, `dev:flake:get-hosts` 0.26 s | no host config; the inventory eval costs less than go-task's own start-up |
+| **compile (task graph)** | `task checks:tasks` | 2.7 s — 1.9 s of it is `task --list-all --json` for the name parity, 0.35 s the yq parse |
 | **one option (eval)** | `checks:ports` | ~3.8 s / 443 MiB — one host eval of `networking.firewall` only, no toplevel (delphi, 2026-11-09) |
 | **bounded (one host)** | `checks:host HOST=<h>` | 7.6–13.2 s / 720–965 MiB per host, OOM-guarded (delphi 7.6 s / 965 MiB, fern 10.6 s / 958 MiB, frieren 13.2 s / 720 MiB) |
 | **HTTP probe** | `checks:build:route`, `checks:dns:failover` | bounded network request, no compile |
@@ -159,7 +160,7 @@ deploys.
 ```bash
 task help                          # intent map
 task find:closure                  # name+desc search
-task checks:tasks                  # task-graph gate (~1 s: one nix eval)
+task checks:tasks                  # task-graph gate (~2.7 s: yq compile + go-task parity)
 task checks:host HOST=frieren      # one host, all assertions
 task dev:inventory:host HOST=fern  # host record, no host eval
 task infra:deploy:host:fern        # plan -> apply -> validate

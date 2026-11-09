@@ -7,8 +7,10 @@
 # PATH (`bin/`: hostname, nix, ss, sysctl, tailscale) with the declaration, the
 # listener list and the serve status supplied as variables. The refusal paths get
 # the same treatment: a foreign HOST and an interface that declares nothing must
-# exit 2 rather than answer from the wrong inputs. No nix eval, no host, no
-# network — under a second, which is why `checks:quick` can carry it.
+# exit 2 rather than answer from the wrong inputs. Coverage is part of the gate —
+# a case missing from EXPECTED, or an EXPECTED case that no longer runs, fails the
+# fixture — so deleting the REDUNDANT case cannot pass as a smaller suite. No nix
+# eval, no host, no network — under a second, which is why `checks:quick` carries it.
 #
 # Exit: 0 every case behaves, 1 a case regressed, 2 the fixture cannot run.
 set -uo pipefail
@@ -31,8 +33,25 @@ command -v jq >/dev/null 2>&1 || {
 # Cases that need a different declaration replace it.
 SCOPED='{"allowedTCPPorts":[],"allowedUDPPorts":[],"interfaces":{"tailscale0":{"allowedTCPPorts":[22],"allowedUDPPorts":[53]}}}'
 
+# Every case this fixture is supposed to run. Coverage is asserted, not counted:
+# deleting a case with its `run` call would otherwise just print a smaller number
+# and still exit 0, which is the regression a fixture exists to prevent. Dropping
+# one now means editing this list too — a reviewable act, not a silent one.
+EXPECTED=(
+  "redundant mesh row exits 1"
+  "redundant over ::1 exits 1"
+  "serve port is not a hole"
+  "serve port from the Web map"
+  "global opening is declared"
+  "dead hole still fails under STRICT"
+  "dead hole is only reported without STRICT"
+  "foreign host is refused"
+  "unscoped interface is refused"
+)
+
 fail=0
 cases=0
+ran=()
 # The audit refuses rather than half-answers when it cannot trust its inputs, so
 # those paths need a caller-supplied identity: they exit before any bucket.
 RUN_HOST=fixture
@@ -42,6 +61,7 @@ run() { # name want_rc needle...
   shift 2
   local out rc needle
   cases=$((cases + 1))
+  ran+=("$name")
   out="$(
     PATH="$bin:$PATH" HOST="$RUN_HOST" IFACE="$RUN_IFACE" STRICT="${STRICT:-0}" \
       FIXTURE_SS="$SS" FIXTURE_FIREWALL="$FIREWALL" FIXTURE_SERVE="$SERVE" \
@@ -135,8 +155,26 @@ STRICT=1 run "unscoped interface is refused" 2 \
   "tailscale0 declares no ports on fixture" \
   "IFACE=tailscale0"
 
+# Coverage, in both directions: a case in EXPECTED must have run, and a case that
+# ran must be listed. The first catches a deleted `run` call, the second a case
+# added without declaring it (which would otherwise be coverage nobody tracks).
+ran_set="$(printf '%s\n' "${ran[@]}")"
+expected_set="$(printf '%s\n' "${EXPECTED[@]}")"
+for c in "${EXPECTED[@]}"; do
+  if ! grep -qxF -- "$c" <<<"$ran_set"; then
+    echo "FAIL coverage: expected case did not run: ${c}" >&2
+    fail=1
+  fi
+done
+for c in "${ran[@]}"; do
+  if ! grep -qxF -- "$c" <<<"$expected_set"; then
+    echo "FAIL coverage: case is not declared in EXPECTED: ${c}" >&2
+    fail=1
+  fi
+done
+
 if [ "$fail" != 0 ]; then
   echo "port-audit fixture: FAILED" >&2
   exit 1
 fi
-echo "port-audit fixture: ${cases} cases ok"
+echo "port-audit fixture: ${cases} cases ok (all expected)"

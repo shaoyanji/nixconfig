@@ -163,9 +163,9 @@ tasks:
 
               WHAT NEEDS DOING (cheap, read-only, no config evaluated)
                 task status                    git state + hostname                     free
-                task checks:tasks              task graph: Nix-compiled + parity        ~1s
+                task checks:tasks              task graph: yq-compiled + parity         ~3s
                 task checks:build:route        would THIS host have to compile?         HTTP only
-                task checks:ports              declarations vs live listeners           free, local
+                task checks:ports              declarations vs live listeners           one eval, ~4s / 440 MiB
                 task checks:dns:failover       resolver group answers + can fail over    LAN probes
                 task checks:dns:pool           resolver addresses vs DHCP pool         POOL=<a-b>
 
@@ -177,16 +177,16 @@ tasks:
                 task checks:sops:drift         age recipients match .sops.yaml
 
               HOST CONFIG  (phased: eval -> build -> size; see AGENTS.md)
-                task checks:host HOST=<h>      modules + ALL assertions, ONE host      ~13 s / 720 MiB
+                task checks:host HOST=<h>      modules + ALL assertions, ONE host   ~8-13 s / 720-965 MiB
                 task checks:host HOST=<h> MODE=eval   arch-independent, for aarch64/darwin
                 task checks:hosts HOSTS="a b"  a NAMED set, one at a time (no default!)
                 task checks:flake             refuses below 16 GiB — do not "improve" this
 
               HOST FACTS  (never evaluate a config to answer these)
-                task dev:inventory:host HOST=<h>  compiled record, no host eval          ~0.15 s
+                task dev:inventory:host HOST=<h>  compiled record, no host eval          ~0.3 s
                 task dev:inventory:json           whole registry, schema-checked         store-cached
                 task dev:inventory:feed           every host, agent-facing digest       store-cached
-                task dev:flake:get-hosts          host NAMES only, no config forced     ~2.4 s
+                task dev:flake:get-hosts          host NAMES only, no config forced     ~0.3 s
 
               DEPLOY / BUILD  (one intended host at a time)
                 task infra:plan:host:<h>       build/substitute the closure, no apply

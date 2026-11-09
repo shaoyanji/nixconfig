@@ -50,6 +50,12 @@ if [ "$mode" = "import" ] && [ "$#" -gt 0 ]; then
   jd_dir=$1
 fi
 
+# An application id is a slug somebody chose — `*`, `–` and `®` are in the
+# archive — so it is percent-encoded before it goes into a query string.
+enc() {
+  jq -rn --arg v "$1" '$v | @uri'
+}
+
 # The API answers JSON or it answers an error page; a body that is not JSON is a
 # transport problem, and saying so beats a jq error two steps later.
 api_json() {
@@ -78,7 +84,7 @@ case "$mode" in
     id=${1:-}
     want=${2:-$kind}
     [ -n "$id" ] || usage
-    api_json "/api/application-document?applicationId=$id" |
+    api_json "/api/application-document?applicationId=$(enc "$id")" |
       jq -r --arg k "$want" '[.[] | select(.kind == $k) | .body][0] // empty'
     ;;
 
@@ -103,7 +109,7 @@ case "$mode" in
       id=$(basename "$f" .txt)
       sha=$(sha256sum "$f" | cut -d' ' -f1)
 
-      have=$(api_json "/api/application-document?applicationId=$id" |
+      have=$(api_json "/api/application-document?applicationId=$(enc "$id")" |
         jq -r --arg k "$kind" '[.[] | select(.kind == $k) | .sha256][0] // ""')
       if [ "$have" = "$sha" ]; then
         unchanged=$((unchanged + 1))

@@ -33,6 +33,30 @@ Both files are sops-encrypted in the tree — `sops:` metadata plus `ENC[AES256_
 values — so a plaintext commit is a gate failure, not a review question:
 [[flake/policies.nix#secrets-are-encrypted]]
 
+## Private data that is not published
+
+A static page publishes whatever its build reads, so there are exactly two homes
+for a personal fact, and sops only serves one of them:
+
+- **Published** — `lib/matt/*.json`, `lib/bountystash/*.json`: tracked plain JSON,
+  read by `.#sites.*`. Keeping it in the repo hides nothing, because the deployed
+  HTML already carries every value; and it keeps those builds free of the secrets
+  submodule, which is what makes them buildable from a bare tree (CI, nixbuild, a
+  clone without `--recurse-submodules`).
+- **Private** — `modules/secrets/pii.yaml`, sops-encrypted in the submodule: a phone
+  number, a street address, a referee. `task apps:pii:sync` decrypts it to
+  `~/.config/appflow/pii.json` (mode 600, and it refuses a path inside the repo),
+  `scripts/task/pii.sh get KEY` feeds one value into a document, and the value never
+  reaches eval or a store path. Registering the file costs one line in `sopsFiles`
+  ([[flake/policies.nix#secrets-files-are-registered]]), and the plaintext gate then
+  scans it.
+
+Never `import` or `readFile` a file under `modules/secrets/` from `lib/`: a bare tree
+has no such file, so the read fails in the one environment nobody debugs. A
+`pathExists` guard is not the fix either — it makes the artifact differ between a
+machine that has the file and one that does not, invisibly.
+[[flake/policies.nix#private-data-is-not-a-build-input]]
+
 ## Exposure gates
 
 Every rule below is a predicate in `flake/policies.nix`, so breaking one fails
@@ -47,6 +71,7 @@ rotation rather than scheduling another:
 | committed into a tracked file | [[flake/policies.nix#credentials-never-land-in-a-tracked-file]] | keep the value in sops |
 | baked into `/nix/store` at eval time | [[flake/policies.nix#secrets-are-not-decrypted-at-eval]] | `passwordCommand`, or activation |
 | printed by a comparison | [[flake/policies.nix#decrypted-documents-are-compared-not-printed]] | `cmp -s <(sops -d a) <(sops -d b)` |
+| a private fact made a build input | [[flake/policies.nix#private-data-is-not-a-build-input]] | publish only what the page renders; keep the rest in `pii.yaml` |
 
 Two properties are deliberate, and both are about not leaking in the gate itself:
 a failure names the file and line and never quotes the match, and the mirror gate

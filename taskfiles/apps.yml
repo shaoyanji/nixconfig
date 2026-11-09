@@ -91,6 +91,14 @@ tasks:
     cmds:
       - git -C "{{.APPS_DIR}}" status -sb
 
+  # The private half of the personal data. Published sites build only what the
+  # page renders; a phone number or a referee lives sops-encrypted and reaches a
+  # document here, at runtime, never through a site build.
+  apps:pii:sync:
+    desc: Decrypt the private personal data (modules/secrets/pii.yaml) to ~/.config/appflow/pii.json
+    cmds:
+      - bash scripts/task/pii.sh sync
+
   apps:menu:
     desc: Interactive Charmbracelet Gum menu for the job application workflow
     cmds:

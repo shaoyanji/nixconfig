@@ -299,6 +299,11 @@
   # are here are scanned, the ones that are not are reported by the registry gate
   # the moment they appear.
   presentSopsFiles = builtins.filter (f: builtins.pathExists (root + "/${f}")) sopsFiles;
+  # A bare tree (CI, nixbuild, a clone without `--recurse-submodules`) has no
+  # secrets submodule at all, so a library read of it works on the machine that
+  # has the checkout and nowhere else. Match the directory with its slash: the
+  # tracked mirror `modules/secrets.yaml` is a different file.
+  secretsReads = builtins.filter (p: lib.hasInfix "modules/secrets/" (read p)) (nixUnder "lib");
   plaintextSecrets = lib.concatMap (f: map (l: "${f}: ${l}") (plaintextValues f)) presentSopsFiles;
   # The mirror is a `cp` of the submodule (`task infra:secrets:sync`), so identity
   # is the invariant. A value written to one copy only decrypts on the machine that
@@ -792,6 +797,13 @@
       proof = "flake/policies.nix (sopsFiles) · modules/secrets/*.yaml";
       holds = unregisteredSops == [];
       detail = "encrypted file(s) the plaintext gate never reads: ${lib.concatStringsSep ", " unregisteredSops}";
+    };
+
+    private-data-is-not-a-build-input = {
+      rule = "A static page publishes everything its build reads, so private data never enters eval: `lib/` reads no file from the secrets submodule, which keeps `.#sites.*` buildable from a bare tree (CI, nixbuild, a clone without `--recurse-submodules`). Private facts live sops-encrypted (`modules/secrets/pii.yaml`) and a script decrypts them when it builds an outbound document. A `pathExists` guard on a build input buys nothing either: the artifact then differs between a machine with the file and one without, and the difference never appears in the diff. That is what makes `lib/matt/*.json` published data rather than a leak — the deployed page carries every value in it.";
+      proof = "lib/matt/*.json · lib/bountystash/*.json · modules/sops.nix · modules/secrets/pii.yaml";
+      holds = secretsReads == [];
+      detail = "a library file reads the secrets submodule, so a bare-tree build fails there and only there: ${lib.concatStringsSep ", " secretsReads}";
     };
 
     credentials-never-land-in-a-tracked-file = {

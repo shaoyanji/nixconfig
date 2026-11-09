@@ -46,8 +46,15 @@ framework, no network fetch beyond the manifest — because it has to work on an
 iPad's Safari as well as the netbook.
 
 - `/index.json` is the manifest: `path`, `name`, `dir`, `ext`, `kind`, `size`,
-  `mtime` per file, plus `count` and `bytes`. The page never walks directories
-  (that is one request per folder).
+  `mtime` per file, plus `poster` on a video that has one, and `count` and
+  `bytes`. The page never walks directories (that is one request per folder).
+- A poster is one frame per fetch folder, written to `poster.jpg` beside the
+  video: `yt-get` takes it at 3 s (or 0 s when the video is shorter) and scales
+  it to 480 px wide, and `media-relay-posters` fills in the ones already in the
+  library at boot. The name is the contract — the index reads `poster.jpg` as
+  metadata for that folder's video, so it is never listed as an image and never
+  counted in `bytes`. A video with no poster keeps the filename row, and its
+  folder still lists every file.
 - `media-relay-index` writes it from `find` every five minutes and at boot, and
   `yt-get` refreshes it at the end of a fetch, so a new download is listed
   immediately rather than at the next tick.
@@ -66,6 +73,9 @@ from before the page existed still opens.
   datacenter IP is refused at the player API ("Sign in to confirm you're not a
   bot"), which looks like a network fault — so `yt-get` checks it and fails
   loudly instead. `requireCookies = false` is the deliberate override.
+- `media-relay-posters` is a boot oneshot for files that did not arrive through
+  `yt-get` (a hand-copied file, or one fetched before posters existed). It
+  skips a folder whose poster is already there, so a second run is a `find`.
 - `media-relay-prune` runs daily and deletes files untouched for
   `retentionDays` (14), then empties directories. The library is a cache, not an
   archive: anything worth keeping belongs on `/srv/data`.

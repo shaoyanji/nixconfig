@@ -93,6 +93,22 @@
         ;;
     esac
 
+    # A poster is a frame, not a second download: seek in, take one frame, scale
+    # to 480 wide. Failure is cosmetic — the page then shows the filename — so it
+    # is a warning and never fails the fetch. A video shorter than the first seek
+    # yields no frame at all (exit 0, empty output), hence the second attempt at 0.
+    poster="$out/poster.jpg"
+    if [ ! -s "$poster" ]; then
+      for at in 3 0; do
+        if ffmpeg -nostdin -loglevel error -y -ss "$at" -i "$file" \
+          -frames:v 1 -vf "scale=480:-2" -q:v 4 "$poster" 2>/dev/null && [ -s "$poster" ]; then
+          break
+        fi
+        rm -f "$poster"
+      done
+      [ -s "$poster" ] || echo "yt-get: no poster frame; the page shows the filename only" >&2
+    fi
+
     rel="''${file#${cfg.mediaDir}/}"
 
     # The library page reads this manifest, so a file that appeared only after
@@ -127,13 +143,45 @@
         | map({path: .[0], size: (.[1] | tonumber), mtime: (.[2] | tonumber | floor)})
         | map(.name = (.path | split("/") | last))
         | map(.ext = (.name | split(".") | if length > 1 then .[-1] else "" end | ascii_downcase))
+        | map(.dir = (.path | split("/") | if length > 1 then .[:-1] | join("/") else "" end))
+        # `poster.jpg` is metadata about the video beside it, not an image in its
+        # own right: it is never listed and never counted, or a fetch would add a
+        # second entry (and a duplicate thumbnail) to the library.
+        | ([.[] | select(.name == "poster.jpg") | .dir] | unique) as $posters
+        | map(select(.name != "poster.jpg"))
         | map(.kind = kindof(.ext))
         | map(select(.kind != null))
-        | map(.dir = (.path | split("/") | if length > 1 then .[:-1] | join("/") else "" end))
+        | map(if .kind == "video" and (.dir as $d | $posters | index($d) != null)
+               then .poster = ((if .dir == "" then "" else .dir + "/" end) + "poster.jpg")
+               else . end)
         | sort_by(.path)
         | {generated: $now, count: length, bytes: (map(.size) | add // 0), files: .}
       ' >"$tmp"
     ${pkgs.coreutils}/bin/mv -f "$tmp" "$out"
+  '';
+
+  # Posters for everything already in the library: a fetch writes its own, but a
+  # file copied in by hand, or fetched before posters existed, has none. One
+  # frame per video, skipped when the poster is already there, so a second run is
+  # a `find` and nothing else.
+  postersScript = pkgs.writeShellScript "media-relay-posters" ''
+    set -eu
+    media=${lib.escapeShellArg cfg.mediaDir}
+    export PATH="${pkgs.ffmpeg}/bin:$PATH"
+    ${pkgs.findutils}/bin/find "$media" -type f \
+      \( -name '*.mp4' -o -name '*.m4v' -o -name '*.webm' -o -name '*.mkv' \
+      -o -name '*.mov' -o -name '*.avi' -o -name '*.mpg' -o -name '*.mpeg' -o -name '*.ts' \) -print0 \
+      | while IFS= read -r -d $'\0' f; do
+        poster="$(dirname "$f")/poster.jpg"
+        if [ -s "$poster" ]; then continue; fi
+        for at in 3 0; do
+          if ffmpeg -nostdin -loglevel error -y -ss "$at" -i "$f" \
+            -frames:v 1 -vf "scale=480:-2" -q:v 4 "$poster" 2>/dev/null && [ -s "$poster" ]; then
+            break
+          fi
+          rm -f "$poster"
+        done
+      done
   '';
 
   # One immutable page: the listing is data, and the page is fed the manifest at
@@ -306,6 +354,19 @@ in {
 
     # Written as the library's owner so the manifest is never a file nginx can
     # read but a fetch cannot replace.
+    # Boot is when a hand-copied file is noticed; a fetch never waits on this
+    # unit, because `yt-get` writes its own poster before it refreshes the index.
+    systemd.services.media-relay-posters = {
+      description = "Write the poster frame each video in the library is missing";
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        User = cfg.user;
+        UMask = "0022";
+      };
+      script = "${postersScript}";
+    };
+
     systemd.services.media-relay-index = {
       description = "Write the media library's index.json";
       serviceConfig = {

@@ -82,13 +82,16 @@
         # 2026-10-26: MagicDNS answered, pihole did not).
         "server=/cloudforest-kardashev.ts.net/100.100.100.100"
         # --- Steam content cache (services.steamCache) -----------------------
-        # OFF since 2026-10-28: `address=/steamcontent.com/` is the whole zone, so
-        # it also swallowed `cm-01-fra1.steamcontent.com` — the connection manager,
-        # which no exclusion can carve back out because it is a *sibling* of the
-        # download names — and Dota 2 stopped accepting matches. The names and the
-        # reasoning live in the module (`steamCache.dnsmasqLines` derives them from
-        # `dnsSteer`); this file only splices them in, so the resolver policy has
-        # one home. Steering is off by default; `content` is the narrow form.
+        # ON since 2026-11-09 as `content`, the allowlist. What broke on
+        # 2026-10-28 was the *zone* record: `address=/steamcontent.com/` also
+        # swallowed `cm-01-fra1.steamcontent.com` — the connection manager, a
+        # sibling of the download names, so no exclusion could carve it back out —
+        # and EU-West match accepts failed. `content` emits only the download CDN
+        # names, the detection name and `steamcdn-a.akamaihd.net`; `cm-*` cannot
+        # match, so matchmaking resolves publicly by construction. The names and
+        # the reasoning live in the module (`steamCache.dnsmasqLines` derives them
+        # from `dnsSteer`); this file only splices them in, so the resolver policy
+        # has one home.
       ]
       ++ config.services.steamCache.dnsmasqLines
       ++ [

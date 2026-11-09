@@ -264,9 +264,21 @@ in {
   # uptime-kuma is off as of 2026-11-04: its database here held zero monitors
   # (so did delphi's), and the checks that mattered are declarative gatus, now
   # served by delphi — see `services.fleetMonitors` in infra-stack.nix.
+  # ModemManager is enabled but idle on this host and has no device to manage: no
+  # /dev/cdc-wdm*, no /dev/ttyUSB*, nothing in `mmcli -L`. It comes in from outside
+  # this host's config — the string appears nowhere in the tree — so the switch is
+  # mkForce rather than a plain false.
+  networking.modemmanager.enable = lib.mkForce false;
+
   services.ha-stack = {
     enable = true;
     uptime-kuma.enable = false;
+    # Mosquitto off with it since 2026-11-09: seven days of journal held zero
+    # `new client connected` lines — a broker with no publisher and no subscriber,
+    # whose only activity was writing an empty database every 30 minutes. HA's own
+    # telemetry is `command_line` sensors, so nothing lost the feed. The module
+    # stays for the ESP32/Zigbee layer in [[exp-009]].
+    mqtt.enable = false;
   };
 
   # Shell-history sync (modules/services/atuin-server.nix). The one account is

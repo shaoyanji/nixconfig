@@ -509,15 +509,18 @@ in {
     # is still pulling and hand it misses for what it just fetched. 100 GB
     # leaves ~18 GB of the 118.5 GB tier for transcode/thumb scratch.
     maxSize = "100g";
-    # `off`, and the narrow form is what to try first, not the zone. A zone
-    # record takes `cm-01-fra1.steamcontent.com` too — the connection manager,
-    # whose name has no relationship to the download hosts — and Dota 2 stopped
-    # accepting matches on 2026-10-28 while it was on. `content` steers only the
-    # names this LAN actually downloads from (`*.cdn.steampipe.steamcontent.com`,
-    # the detection name, the installer CDN), so a name nobody listed keeps
-    # resolving publicly. pi-hole's query log is the evidence, and
-    # `dnsSteerDomains` covers a host seen afterwards without widening the match.
-    dnsSteer = "off";
+    # ON since 2026-11-09, in the narrow form. The 2026-10-28 breakage was
+    # matchmaking, not steering: a *zone* record (`address=/steamcontent.com/`)
+    # also caught `cm-01-fra1.steamcontent.com` — the connection manager, a
+    # sibling of the download names, so no exclusion could carve it back out —
+    # and EU-West match accepts stopped. `content` names only the download CDNs,
+    # the detection name and the installer CDN, so `cm-*` resolves publicly by
+    # construction and cannot be broken by this record.
+    dnsSteer = "content";
+    # By exact name, never by suffix: a client that downloads straight from
+    # Valve's own cache host bypasses the CDNs above, and widening the match to
+    # the zone is what took matchmaking down.
+    dnsSteerDomains = ["cache9-fra1.steamcontent.com"];
     prefill = {
       # Armed 2026-10-28. The pin a fill needs lives in the unit itself
       # (`BindReadOnlyPaths` over the four resolver files, in this unit's mount
@@ -574,13 +577,14 @@ in {
   };
   networking.firewall.allowedTCPPorts = [8124];
 
-  # Scrutiny brings InfluxDB up with it (`services.scrutiny.influxdb.enable`
-  # defaults on), and InfluxDB's HTTP API then binds every interface on 8086.
-  # Scrutiny reads it over localhost, so narrow the bind instead of leaving a
-  # public listener the firewall has to hold back (HC-7). Nothing else in the
-  # tree queries this instance — checked: no `8086`/`influxdb` consumer outside
-  # this module, and the provisioner already targets localhost when the bind is
-  # not a wildcard.
+  # InfluxDB is OFF since 2026-11-09. Scrutiny brings it up by default, but the
+  # metric path never carried anything: measured on this host, /var/lib/influxdb2
+  # held 200 KB with one file touched in 14 days while the weekly collector ran.
+  # Scrutiny keeps its own store, sentinel writes JSONL and gatus lives on delphi,
+  # so the module stays and the process goes.
+  services.scrutiny.influxdb.enable = false;
+  # Kept narrowed for the day it is turned back on: InfluxDB's HTTP API otherwise
+  # binds every interface on 8086 and the firewall has to hold it back (HC-7).
   services.influxdb2.settings.http-bind-address = "127.0.0.1:8086";
 
   # --- Vaultwarden: offloaded to delphi 2026-11-02 ----------------------------

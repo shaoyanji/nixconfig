@@ -9,6 +9,10 @@ Resend, which signs with bountystash.com's own DKIM key, so the mail arrives
 authenticated rather than as an unsigned alias
 (`modules/himalaya.nix`, `docs/job-cold-email.md` sits beside `docs/sops-rekey.md`).
 
+The signature carries no number: it lives in `modules/secrets/pii.yaml`, and
+`task apps:pii:sync` writes it to `~/.config/appflow/pii.json` (`scripts/task/pii.sh
+get basics.phone`) when you want it in a mail.
+
 Placeholders are `{{UPPER_CASE}}`. Fill every one; a mail that still says
 `{{FIRMA}}` is worse than no mail.
 
@@ -61,7 +65,7 @@ erneut.
 Freundliche Grüße
 Matt Ji
 Systems & Infrastructure Engineer
-matt@bountystash.com · +49 1733281570
+matt@bountystash.com
 https://matt.bountystash.com · https://github.com/shaoyanji
 ```
 
@@ -88,7 +92,7 @@ bitte kurz — ich frage kein zweites Mal.
 
 Freundliche Grüße
 Matt Ji
-matt@bountystash.com · +49 1733281570
+matt@bountystash.com
 https://matt.bountystash.com · https://github.com/shaoyanji
 ```
 
@@ -115,7 +119,7 @@ one line is enough and I will not write again.
 Best regards
 Matt Ji
 Systems & Infrastructure Engineer
-matt@bountystash.com · +49 1733281570
+matt@bountystash.com
 https://matt.bountystash.com · https://github.com/shaoyanji
 ```
 

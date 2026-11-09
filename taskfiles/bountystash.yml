@@ -53,13 +53,13 @@ tasks:
     desc: Deploy preview branch to Cloudflare Pages (generates unique URL)
     cmds:
       - task: bountystash:build
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=preview"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=preview"
 
   bountystash:deploy:prod:
     desc: Deploy live production to Cloudflare Pages (bountystash.com)
     cmds:
       - task: bountystash:build
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=main"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=main"
 
   # The Nix-rendered site (flake output `.#bountystash-site`). It deliberately
   # does NOT run `bountystash:build`: that compiles the console's template into
@@ -68,13 +68,13 @@ tasks:
     desc: Deploy the Nix-rendered portfolio (.#sites.bountystash-site) to a Pages preview branch
     cmds:
       - nix build --builders "" --out-link "/tmp/bountystash-site" .#sites.bountystash-site
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=preview"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=preview"
 
   bountystash:deploy:nix:prod:
     desc: "[destructive] Publish the Nix-rendered portfolio to bountystash.com"
     cmds:
       - nix build --builders "" --out-link "/tmp/bountystash-site" .#sites.bountystash-site
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=main"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=main"
 
   bountystash:projects:
     desc: List all Cloudflare Pages projects in account
@@ -120,13 +120,13 @@ tasks:
     desc: Deploy matt.bountystash.com to a Cloudflare Pages preview branch
     cmds:
       - task: matt:build
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/matt-site --project-name={{.PROJECT_MATT}} --branch=preview"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/matt-site --project-name={{.PROJECT_MATT}} --branch=preview"
 
   matt:deploy:prod:
     desc: "[destructive] Publish matt.bountystash.com live"
     cmds:
       - task: matt:build
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/matt-site --project-name={{.PROJECT_MATT}} --branch=main"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/matt-site --project-name={{.PROJECT_MATT}} --branch=main"
 
   matt:status:
     desc: HTTP status of matt.bountystash.com
@@ -138,7 +138,9 @@ tasks:
     desc: "[gate] robots, sitemap, canonical, og:image and hreflang on every hostname"
     cmds:
       - bash scripts/task/site-check.sh matt.bountystash.com / /de/ /work/nixos-fleet /de/work/nixos-fleet /brief/platform
-      - bash scripts/task/site-check.sh bountystash.com / /de/ /work/bountystash-deterministic-work-engine /de/work/bountystash-deterministic-work-engine
+      # bountystash.com runs the console, not the Nix portfolio: the case-study
+      # paths belong to the other template and are not part of this surface.
+      - bash scripts/task/site-check.sh bountystash.com / /de/ /contact/ /de/kontakt/
       - bash scripts/task/site-check.sh concept.bountystash.com / /de/
 
   # Offline, and the only check that sees a stylesheet 404: a page that loads no
@@ -200,13 +202,13 @@ tasks:
     desc: Deploy the mockup to a Cloudflare Pages preview branch
     cmds:
       - task: mockup:build
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-mockup --project-name={{.PROJECT_MOCKUP}} --branch=preview"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/bountystash-mockup --project-name={{.PROJECT_MOCKUP}} --branch=preview"
 
   mockup:deploy:prod:
     desc: "[destructive] Publish the mockup to its own *.pages.dev production URL"
     cmds:
       - task: mockup:build
-      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-mockup --project-name={{.PROJECT_MOCKUP}} --branch=main"
+      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/bountystash-mockup --project-name={{.PROJECT_MOCKUP}} --branch=main"
 
   mockup:status:
     desc: HTTP status of the mockup on concept.bountystash.com and its pages.dev URL

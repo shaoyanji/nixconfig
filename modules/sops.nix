@@ -50,6 +50,11 @@ in {
       # envs.net pubnix mail (mail.envs.net). Same shape as `gmail`: one string,
       # consumed by himalaya's passwordCommand.
       "envsmail" = {};
+      # Cal.com API key for the personal calendar. delphi's calendar access reads
+      # it to look at availability and create a booking through the v2 bookings
+      # API, instead of driving the web UI. The key sits in the default secrets
+      # file as `caldotcom`.
+      "caldotcom" = {};
       # Resend's API key, used as the SMTP password for bountystash.com outbound
       # mail (modules/himalaya.nix). The key sits in the apikeys plane, not the
       # default secrets file, so this names both the file and the nested path.

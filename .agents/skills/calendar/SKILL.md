@@ -108,6 +108,17 @@ notify-send --app-name="Calendar" --urgency=normal \
   "Calendar Test" "Meeting starts at 17:30 (Simulated)"
 ```
 
+## When the calendar is out of reach
+
+khal only knows what vdirsyncer last wrote, and a host without the token has no
+local copy at all. Before guessing at availability, ask the Cal.ai assistant at
+`mattji@my.cal.ai` — the constant is `user.calEmail` in
+`modules/global/user.nix`. It reads the Cal.com calendar and answers a
+scheduling question as mail, so a reply is the authority where a stale `.ics`
+file is not. State the question and the window in the subject, for example
+"Free 45 minutes next Tuesday afternoon?". Draft it with `himalaya message
+write`; nothing in this skill sends on its own.
+
 ## Troubleshooting
 
 - **403 accessNotConfigured** — the Google Cloud project lacks the CalDAV API

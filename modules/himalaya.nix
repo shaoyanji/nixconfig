@@ -3,7 +3,12 @@
   config,
   user,
   ...
-}: {
+}: let
+  # One renderer for the mail signature: this reads the profile TOML at eval
+  # time, so what himalaya appends and `task gravatar:signature` prints cannot
+  # disagree.
+  gravatar = import ../lib/gravatar-profile.nix;
+in {
   accounts.email.accounts = {
     "jisifu" = {
       name = "jisifu";
@@ -18,7 +23,7 @@
       smtp.port = 465;
       smtp.authentication = "plain";
       passwordCommand = "cat ${config.sops.secrets.gmail.path}";
-      signature.text = user.shortName;
+      signature.text = gravatar.signature;
       himalaya.enable = true;
     };
     "bountystash" = {
@@ -45,7 +50,7 @@
         username = "resend";
         password.command = "cat ${config.sops.secrets.resend-api-key.path}";
       };
-      signature.text = user.shortName;
+      signature.text = gravatar.signature;
       himalaya.enable = true;
     };
     # envs.net pubnix mail. Implicit TLS on 993, submission on 587 needs STARTTLS
@@ -65,7 +70,7 @@
       smtp.authentication = "plain";
       smtp.tls.useStartTls = true;
       passwordCommand = "cat ${config.sops.secrets.envsmail.path}";
-      signature.text = user.shortName;
+      signature.text = gravatar.signature;
       himalaya.enable = true;
     };
   };

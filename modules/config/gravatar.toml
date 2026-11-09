@@ -1,0 +1,77 @@
+# Gravatar profile — the source of truth for `task gravatar:sync`.
+#
+# Scalars reconcile through PATCH /v3/me/profile. Links, interests, languages
+# and timezone have no public write endpoint, so `task gravatar:check` reports
+# drift there and the fix is https://gravatar.com/jisifu by hand.
+#
+# `task gravatar:check` is read-only and exits 1 on any difference; nothing
+# here is guessed: an empty string means the live profile must be empty too.
+
+display_name = "matt.ji.shaoyan"
+first_name = "Matt"
+last_name = "Ji"
+description = """i build small, deliberate systems and keep them running — a NixOS fleet, a handful of self-hosted services, bountystash. i write to find the rhythm of your soul and the music of the world. english · deutsch · 中文. freiburg."""
+pronunciation = ""
+pronouns = "he/him"
+location = "Freiburg, DE"
+job_title = ""
+company = "Bountystash"
+timezone = "Europe/Berlin"
+
+# Contact section. PATCH /v3/me/profile takes only cell_phone and
+# contact_email; calendar and contact_form are read-only there and are set at
+# https://gravatar.com/jisifu. They are declared here so `gravatar:check` names
+# the gap instead of ignoring it.
+# Stored in the form the API echoes back: it drops spaces and keeps the country
+# prefix, so a spaced number reads as permanent drift.
+cell_phone = "+491733281570"
+contact_email = "matt@bountystash.com"
+calendar = "https://cal.com/mattji"
+contact_form = "https://bountystash.com/contact/"
+
+# Order is the order shown on the profile.
+languages = ["en", "de", "zh"]
+
+interests = [
+  "linux",
+  "Adult Education",
+  "Programming",
+  "Writing",
+  "Watching Documentaries",
+]
+
+# The sites this fleet actually serves, in profile order.
+# jisifu.vern.cc is absent: its certificate stopped matching the hostname on
+# 2026-11-09 and the link left the profile. Re-add it here and by hand at
+# https://gravatar.com/jisifu once the certificate is fixed.
+[[links]]
+label = "bountystash"
+url = "https://bountystash.com"
+
+[[links]]
+label = "isadev blog"
+url = "https://shaoyanji.is-a.dev"
+
+[[links]]
+label = "bearblog"
+url = "https://dragoncourt.bearblog.dev/"
+
+[[links]]
+label = "mataroa blog"
+url = "https://jisifu.mataroa.blog/"
+
+[[links]]
+label = "pythonanywhere dev"
+url = "https://jisifu.pythonanywhere.com"
+
+[[links]]
+label = "envs ~"
+url = "https://jisifu.envs.net"
+
+[[links]]
+label = "alwaysdata dev"
+url = "https://jisifu.alwaysdata.net"
+
+[[links]]
+label = "serv00 dev"
+url = "https://jisifu.serv00.net"

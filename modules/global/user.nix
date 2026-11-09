@@ -11,6 +11,10 @@
   email = "jisifu@gmail.com";
   githubEmail = "github@mail.shaoyanji.is-a.dev";
   workEmail = "matt@bountystash.com";
+  # Cal.ai scheduling assistant. It reads the Cal.com calendar over email, so an
+  # agent that cannot reach the calendar itself asks this address instead of
+  # guessing availability (calendar skill, "When the calendar is out of reach").
+  calEmail = "mattji@my.cal.ai";
 
   # The desktop role is a feature list (modules/roles/home.nix). This is the
   # full set: what every host already evaluated before the split, so a host that

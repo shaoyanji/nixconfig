@@ -158,7 +158,7 @@ doc_n=$(jq 'length' <<<"$docs")
 if [ "$doc_n" -eq 0 ]; then
   note "ok   no documents stored yet (nothing to verify, nothing to delete)"
 else
-  empty=$(jq '[.[] | select(.bytes == 0 or (.sha256 | length) != 64)] | length' <<<"$docs")
+  empty=$(jq '[.[] | select(.chars == 0 or (.sha256 | length) != 64)] | length' <<<"$docs")
   if [ "$empty" -ne 0 ]; then
     bad "$empty stored documents are empty or carry no digest"
   else

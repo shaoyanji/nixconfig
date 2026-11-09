@@ -71,7 +71,7 @@ api_json() {
 case "$mode" in
   list)
     api_json /api/application-documents |
-      jq -r 'if length == 0 then "no documents" else (.[] | [.applicationId, .kind, "\(.bytes)B", .updatedAt] | @tsv) end'
+      jq -r 'if length == 0 then "no documents" else (.[] | [.applicationId, .kind, "\(.chars) chars", .updatedAt] | @tsv) end'
     ;;
 
   show)

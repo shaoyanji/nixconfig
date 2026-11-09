@@ -6,7 +6,9 @@
 select
   application_id,
   kind,
-  length(body) as bytes,
+  -- Characters, not bytes: `length` counts characters, and a German description
+  -- is mostly not ASCII. The digest is the byte-level identity.
+  length(body) as chars,
   sha256,
   updated_at
 from application_document

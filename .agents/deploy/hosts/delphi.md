@@ -174,10 +174,10 @@ terminates TLS, so there is no certificate to own per service.
 | 8444 | System One decisions (`/v1/systemone`) | `tailscale-serve-systemone` | `127.0.0.1:8091` |
 | 8445 | Stirling PDF | `tailscale-serve-pdf` | `127.0.0.1:7351` |
 | 8446 | Service console (the compiled tailnet portal) | `tailscale-serve-portal` | `127.0.0.1:8082` |
+| 8461 | Media relay (range-served video library) | `tailscale-serve-media` | `127.0.0.1:8094` |
 
-Both the mounts and the console are compiled from `services.servicePortal`: add a
-mount and its card appears, remove one and the card goes — and the asserts in
-`modules/services/service-portal.nix` fail the build when a mount has no card, a
+Both the mounts and the console are compiled from `services.servicePortal`, and
+`modules/services/service-portal.nix` fails the build when a mount has no card, a
 card has no owner, two mounts share a port, an upstream is not loopback, or a
 `requires` names a unit that does not exist.
 

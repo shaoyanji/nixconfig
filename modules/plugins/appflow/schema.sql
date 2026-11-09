@@ -139,3 +139,38 @@ CREATE TABLE IF NOT EXISTS career_project (
 
 CREATE INDEX IF NOT EXISTS career_project_order_idx
   ON career_project (language, sort);
+
+-- The portfolio: the sector projects the Bountystash capsule renders. Same rule
+-- as the CV corpus — the rows are the source and `lib/bountystash/portfolio.json`
+-- (plus its German copy) is an export — but a different vocabulary, so a
+-- different table rather than a nullable half of `career_project`.
+--
+-- `source_title` is the German row's join key, the English title, for the same
+-- reason `career_project.resume_name` exists: the capsule slugs a project by its
+-- title, and a translation that renamed one would be a second project.
+--
+-- `links` is one `label<TAB>href` per line: an array of objects is JSON's shape,
+-- not a row's, and the tab keeps a label that contains a colon or a slash intact.
+CREATE TABLE IF NOT EXISTS portfolio_project (
+  id           text NOT NULL,
+  language     text NOT NULL DEFAULT 'en',
+  title        text NOT NULL DEFAULT '',
+  source_title text,
+  role         text,
+  period       text,
+  badge        text,
+  sector       smallint,
+  description  text,
+  stack        text,
+  impact       text,
+  highlights   text,
+  link         text,
+  links        text,
+  featured     boolean,
+  sort         smallint NOT NULL DEFAULT 0,
+  updated_at   timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (id, language)
+);
+
+CREATE INDEX IF NOT EXISTS portfolio_project_order_idx
+  ON portfolio_project (language, sort);

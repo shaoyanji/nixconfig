@@ -36,37 +36,25 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
-import re
 import sys
 import urllib.error
-import urllib.parse
-import urllib.request
 
-DEFAULT_API = os.environ.get(
-    "APPFLOW_API", "https://delphi.cloudforest-kardashev.ts.net:8450"
+from content_api import (
+    DEFAULT_API,
+    delete,
+    find,
+    joined_lines,
+    joined_tags,
+    one,
+    ordered,
+    rows,
+    slug,
+    split_lines,
+    split_tags,
+    upsert,
+    write,
+    year,
 )
-
-
-def joined_lines(items: list[str]) -> str:
-    return "\n".join(items)
-
-
-def joined_tags(items: list[str]) -> str:
-    return ",".join(items)
-
-
-def split_lines(text: str | None) -> list[str] | None:
-    if text is None:
-        return None
-    return text.split("\n") if text != "" else []
-
-
-def split_tags(text: str | None) -> list[str] | None:
-    if text is None:
-        return None
-    return [tag.strip() for tag in text.split(",") if tag.strip()]
-
 
 # flag dest -> wire key, in the order an argument list reads. `str` copies the
 # value, the two functions turn a repeated flag into the row's text form.
@@ -145,52 +133,12 @@ ENTRY_KEY = {
 }
 
 
-# --- the wire ---------------------------------------------------------------
-
-
-def get(api: str, path: str) -> object:
-    with urllib.request.urlopen(f"{api}{path}", timeout=30) as response:
-        return json.loads(response.read().decode() or "null")
-
-
-def post(api: str, path: str, payload: dict) -> object:
-    request = urllib.request.Request(
-        f"{api}{path}",
-        data=json.dumps(payload).encode(),
-        headers={"content-type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(request, timeout=30) as response:
-        body = response.read().decode() or "null"
-    return json.loads(body)
-
-
-def rows(api: str, table: str) -> list[dict]:
-    return get(api, f"/api/career-{table}s") or []
-
-
-def upsert(api: str, table: str, payload: dict) -> dict:
-    result = post(api, f"/api/career-{table}-upsert", payload)
-    return (result or [{}])[0]
-
-
-def delete(api: str, table: str, row_id: str, language: str) -> list[dict]:
-    return post(
-        api,
-        f"/api/career-{table}-delete",
-        {"id": row_id, "language": language},
-    ) or []
-
-
 # --- ids --------------------------------------------------------------------
 
 
-def slug(text: str | None) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")[:56] or "unknown"
-
-
-def year(date: str | None) -> str:
-    return (date or "")[:4] or "undated"
+def table_of(name: str) -> str:
+    """The endpoint names the SQL table: `role` is published as career_role."""
+    return f"career_{name}"
 
 
 def derived_id(table: str, entry: dict) -> str:
@@ -203,10 +151,6 @@ def derived_id(table: str, entry: dict) -> str:
 
 
 # --- reading ----------------------------------------------------------------
-
-
-def ordered(items: list[dict]) -> list[dict]:
-    return sorted(items, key=lambda row: (row.get("sort") or 0, row.get("id") or ""))
 
 
 def role_line(row: dict) -> str:
@@ -230,28 +174,6 @@ def print_rows(table: str, items: list[dict]) -> None:
         print(LINE[table](item))
 
 
-def find(api: str, table: str, row_id: str, language: str | None = None) -> list[dict]:
-    """Every row with this id, narrowed by language. The id is shared across the
-    two corpora, so a write that names neither is ambiguous, not lucky."""
-    return [
-        row
-        for row in rows(api, table)
-        if row.get("id") == row_id and (language is None or row.get("language") == language)
-    ]
-
-
-def one(api: str, table: str, row_id: str, language: str | None) -> dict | None:
-    found = find(api, table, row_id, language)
-    if len(found) > 1:
-        languages = ", ".join(sorted(row.get("language") or "?" for row in found))
-        print(
-            f"{table} {row_id} exists in {languages}; pass --language",
-            file=sys.stderr,
-        )
-        return None
-    return found[0] if found else None
-
-
 # --- writing ----------------------------------------------------------------
 
 
@@ -269,18 +191,6 @@ def payload(table: str, args: argparse.Namespace, row: dict | None = None) -> di
     return out
 
 
-def write(api: str, table: str, body: dict, dry: bool) -> dict:
-    if dry:
-        print(json.dumps(body, ensure_ascii=False, indent=2, sort_keys=True))
-        return body
-    result = upsert(api, table, body)
-    print(
-        f"{result.get('id', body['id'])}  language={result.get('language', body['language'])}"
-        f"  sort={result.get('sort', body.get('sort'))}"
-    )
-    return result
-
-
 def add(api: str, table: str, args: argparse.Namespace, dry: bool) -> int:
     if table == "role" and not (args.employer and args.position):
         print("add role: --employer and --position are required", file=sys.stderr)
@@ -296,7 +206,7 @@ def add(api: str, table: str, args: argparse.Namespace, dry: bool) -> int:
     # An add must not silently overwrite: a derived id that already exists is a
     # second role at the same employer in the same year, and the caller has to
     # say which one it means.
-    existing = find(api, table, body["id"], language)
+    existing = find(api, table_of(table), body["id"], language)
     if existing and not args.replace:
         print(
             f"add {table}: {body['id']} already exists in {language};"
@@ -305,12 +215,12 @@ def add(api: str, table: str, args: argparse.Namespace, dry: bool) -> int:
         )
         return 1
     body["sort"] = None
-    write(api, table, body, dry)
+    write(api, table_of(table), body, dry)
     return 0
 
 
 def set_row(api: str, table: str, args: argparse.Namespace, dry: bool) -> int:
-    row = one(api, table, args.id, args.language)
+    row = one(api, table_of(table), args.id, args.language)
     if row is None:
         print(f"set {table}: no {table} {args.id}", file=sys.stderr)
         return 1
@@ -325,13 +235,13 @@ def set_row(api: str, table: str, args: argparse.Namespace, dry: bool) -> int:
     # the key, so posting the flag as a value would write a second row rather
     # than edit this one.
     body["language"] = row["language"]
-    write(api, table, body, dry)
+    write(api, table_of(table), body, dry)
     print(f"changed: {', '.join(changed)}", file=sys.stderr)
     return 0
 
 
 def remove(api: str, table: str, args: argparse.Namespace, dry: bool) -> int:
-    row = one(api, table, args.id, args.language)
+    row = one(api, table_of(table), args.id, args.language)
     if row is None:
         print(f"rm {table}: no {table} {args.id}", file=sys.stderr)
         return 1
@@ -344,7 +254,9 @@ def remove(api: str, table: str, args: argparse.Namespace, dry: bool) -> int:
     if dry:
         print(f"would delete {table} {args.id} ({row.get('language')})")
         return 0
-    removed = delete(api, table, args.id, args.language or row.get("language") or "en")
+    removed = delete(
+        api, table_of(table), args.id, args.language or row.get("language") or "en"
+    )
     if not removed:
         print(f"rm {table}: the endpoint removed nothing for {args.id}", file=sys.stderr)
         return 1
@@ -378,7 +290,7 @@ def do_import(api: str, args: argparse.Namespace) -> int:
             if args.dry:
                 print(json.dumps(body, ensure_ascii=False, sort_keys=True))
             else:
-                upsert(api, table, body)
+                upsert(api, table_of(table), body)
             written += 1
     print(f"imported {written} entries as {language} from {args.source}")
     return 0
@@ -396,7 +308,9 @@ def do_export(api: str, args: argparse.Namespace) -> int:
         return 2
 
     for table, key in (("role", "work"), ("project", "projects")):
-        selected = [row for row in rows(api, table) if row.get("language") == language]
+        selected = [
+            row for row in rows(api, table_of(table)) if row.get("language") == language
+        ]
         entries = []
         for row in ordered(selected):
             entry = {}
@@ -490,7 +404,7 @@ def main() -> int:
 
     if args.command in ("roles", "projects"):
         table = args.command[:-1]
-        items = rows(api, table)
+        items = rows(api, table_of(table))
         if args.language:
             items = [row for row in items if row.get("language") == args.language]
         items = ordered(items)
@@ -501,7 +415,7 @@ def main() -> int:
         return 0
 
     if args.command == "show":
-        found = find(api, args.table, args.id)
+        found = find(api, table_of(args.table), args.id)
         if not found:
             print(f"show: no {args.table} {args.id}", file=sys.stderr)
             return 1

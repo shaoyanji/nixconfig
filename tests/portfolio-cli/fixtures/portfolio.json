@@ -1,0 +1,99 @@
+{
+  "capsule": {
+    "back": "back to the console",
+    "work": "work"
+  },
+  "metrics": [
+    {
+      "label": "Renewable Portfolio Ops",
+      "value": "$100M+"
+    }
+  ],
+  "notes": [],
+  "profile": {
+    "name": "Fictional Person",
+    "title": "Systems Engineer"
+  },
+  "projects": [
+    {
+      "badge": "O3 ENERGY",
+      "description": "Two lines\nof description.",
+      "featured": true,
+      "highlights": [
+        "Governed quantitative operations across $100M+ in assets",
+        "Coordinated technical due diligence"
+      ],
+      "impact": "Governed quantitative operations across $100M+ in assets.",
+      "link": "#",
+      "links": [
+        {
+          "href": "mailto:fictional@example.com?subject=Asset%20Operations",
+          "label": "Discuss Architecture"
+        }
+      ],
+      "period": "2016 — 2020",
+      "role": "Lead Operations",
+      "sector": 3,
+      "stack": [
+        "Python",
+        "PostgreSQL"
+      ],
+      "title": "Clean Energy Telemetry Platform"
+    },
+    {
+      "badge": "GO RESEARCH",
+      "featured": false,
+      "period": "2026",
+      "role": "Research & Implementation",
+      "sector": 2,
+      "stack": [
+        "Go"
+      ],
+      "title": "Fibonacci Streaming Automaton"
+    },
+    {
+      "badge": "NIX FLEET",
+      "description": "Fleet as code, one row per host.",
+      "featured": true,
+      "highlights": [
+        "One row per host, no wiring by hand"
+      ],
+      "link": "https://example.com/fleet",
+      "links": [
+        {
+          "href": "https://example.com/fleet",
+          "label": "Repository"
+        },
+        {
+          "href": "https://example.com/fleet/report",
+          "label": "Fleet Report"
+        }
+      ],
+      "role": "Architect",
+      "sector": 1,
+      "stack": [
+        "NixOS",
+        "SOPS"
+      ],
+      "title": "Multi-Host Declarative Fleet"
+    }
+  ],
+  "sections": [
+    {
+      "id": 0,
+      "name": "CONSOLE"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Systems & Concurrency",
+      "items": [
+        "Go",
+        "PostgreSQL"
+      ]
+    }
+  ],
+  "ui": {
+    "ready": "READY"
+  }
+}

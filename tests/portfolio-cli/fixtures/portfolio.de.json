@@ -1,0 +1,73 @@
+{
+  "profile": {
+    "name": "Fiktive Person"
+  },
+  "projects": [
+    {
+      "badge": "O3 ENERGY",
+      "description": "Zwei Zeilen\nBeschreibung.",
+      "featured": true,
+      "highlights": [
+        "Steuerte quantitative Betriebsabläufe über Vermögenswerte von 100 Mio.+ USD"
+      ],
+      "impact": "Steuerte quantitative Betriebsabläufe über 100 Mio.+ USD.",
+      "link": "#",
+      "links": [
+        {
+          "href": "mailto:fictional@example.com?subject=Asset%20Operations",
+          "label": "Architektur besprechen"
+        }
+      ],
+      "period": "2016 — 2020",
+      "role": "Leitender Betrieb",
+      "sector": 3,
+      "stack": [
+        "Python",
+        "PostgreSQL"
+      ],
+      "title": "Telemetrie-Plattform für erneuerbare Energie"
+    },
+    {
+      "badge": "GO RESEARCH",
+      "featured": false,
+      "period": "2026",
+      "role": "Forschung & Implementierung",
+      "sector": 2,
+      "stack": [
+        "Go"
+      ],
+      "title": "Fibonacci-Streaming-Automat"
+    },
+    {
+      "badge": "NIX FLEET",
+      "description": "Flotte als Code, eine Zeile pro Host.",
+      "featured": true,
+      "highlights": [
+        "Eine Zeile pro Host, keine Verdrahtung von Hand"
+      ],
+      "link": "https://example.com/fleet",
+      "links": [
+        {
+          "href": "https://example.com/fleet",
+          "label": "Repository"
+        }
+      ],
+      "role": "Architekt",
+      "sector": 1,
+      "stack": [
+        "NixOS",
+        "SOPS"
+      ],
+      "title": "Deklarative Multi-Host-Flotte"
+    }
+  ],
+  "sections": [
+    {
+      "id": 0,
+      "name": "CONSOLE"
+    }
+  ],
+  "ui": {
+    "ready": "BEREIT"
+  }
+}

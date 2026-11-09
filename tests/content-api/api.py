@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
-"""A stand-in for the archive's career endpoints, for tests/career-cli/run.sh.
+"""A stand-in for the archive's career and portfolio endpoints.
 
-It is not a database. It holds the payloads it is given and answers the two
-reads with the camelCase keys NpgsqlRest returns, which is what the CLI has to
-speak to. Two behaviours are deliberate:
+Shared by tests/career-cli and tests/portfolio-cli, because both CLIs speak the
+same wire: one GET per table, one upsert, one delete, camelCase keys, `sort:
+null` appends within a language. A stub per CLI would let the two drift apart
+without either fixture noticing.
+
+It is not a database. Two behaviours are deliberate:
 
 * an upsert with a key missing is refused, because NpgsqlRest answers a missing
   parameter with a 404 and a test that tolerated a sparse body would pass a
   client the real endpoint rejects;
-* `sort: null` appends within its language, the same rule the SQL implements.
+* `sort: null` appends, the same rule the SQL implements.
 
-Binds 127.0.0.1 on an ephemeral port and prints `PORT=<n>` so the test never
-picks a port twice.
+Binds 127.0.0.1 on an ephemeral port and prints `PORT=<n>` so a test never picks
+a port twice.
 """
 
 import json
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
-TABLES = ("career_role", "career_project")
 
 REQUIRED = {
     "career_role": [
@@ -31,9 +32,14 @@ REQUIRED = {
         "startDate", "endDate", "description", "highlights", "keywords",
         "roles", "sort",
     ],
+    "portfolio_project": [
+        "id", "language", "title", "sourceTitle", "role", "period", "badge",
+        "sector", "description", "stack", "impact", "highlights", "link",
+        "links", "featured", "sort",
+    ],
 }
 
-STATE = {table: [] for table in TABLES}
+STATE = {table: [] for table in REQUIRED}
 
 
 def route(table):
@@ -84,7 +90,7 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         if path == "/_state":
             return self.answer(200, STATE)
-        for table in TABLES:
+        for table in REQUIRED:
             if path == f"/api/{route(table)}s":
                 return self.answer(200, STATE[table])
         return self.answer(404, {"error": "no route"})
@@ -96,7 +102,7 @@ class Handler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             return self.answer(400, {"error": "not json"})
         path = self.path.split("?")[0]
-        for table in TABLES:
+        for table in REQUIRED:
             if path == f"/api/{route(table)}-upsert":
                 try:
                     return self.answer(200, [upsert(table, body)])

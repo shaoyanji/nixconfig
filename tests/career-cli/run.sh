@@ -49,7 +49,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-python3 "$here/api.py" >"$work/api.log" 2>&1 &
+python3 "$here/../content-api/api.py" >"$work/api.log" 2>&1 &
 server=$!
 
 port=""

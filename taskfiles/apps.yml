@@ -124,67 +124,116 @@ tasks:
   career:roles:
     desc: The roles in CV order (CLI_ARGS="--language de --json" to narrow)
     cmds:
-      - bash scripts/task/career.sh roles {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career roles {{.CLI_ARGS}}
 
   career:projects:
     desc: The projects in CV order
     cmds:
-      - bash scripts/task/career.sh projects {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career projects {{.CLI_ARGS}}
 
   career:show:
     desc: One role or project, every field (task career:show -- role ID)
     cmds:
-      - bash scripts/task/career.sh show {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career show {{.CLI_ARGS}}
 
   career:add:role:
     desc: Add a role (--employer and --position required, --highlight repeatable)
     cmds:
-      - bash scripts/task/career.sh add-role {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career add-role {{.CLI_ARGS}}
 
   career:add:project:
     desc: Add a project (--name required, --resume-name on the German row)
     cmds:
-      - bash scripts/task/career.sh add-project {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career add-project {{.CLI_ARGS}}
 
   career:set:role:
     desc: Edit one role; only the flags given change (task career:set:role -- ID --position …)
     cmds:
-      - bash scripts/task/career.sh set-role {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career set-role {{.CLI_ARGS}}
 
   career:set:project:
     desc: Edit one project; only the flags given change
     cmds:
-      - bash scripts/task/career.sh set-project {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career set-project {{.CLI_ARGS}}
 
   career:rm:role:
     desc: Delete one role (--yes required)
     cmds:
-      - bash scripts/task/career.sh rm-role {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career rm-role {{.CLI_ARGS}}
 
   career:rm:project:
     desc: Delete one project (--yes required)
     cmds:
-      - bash scripts/task/career.sh rm-project {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career rm-project {{.CLI_ARGS}}
 
   career:import:
     desc: Seed the rows from a JSON Resume (FROM=file; CLI_ARGS="--language de --dry")
     cmds:
-      - bash scripts/task/career.sh import --from "{{.FROM | default "lib/matt/resume.json"}}" {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career import --from "{{.FROM | default "lib/matt/resume.json"}}" {{.CLI_ARGS}}
 
   career:export:en:
     desc: Rebuild lib/matt/resume.json's work and projects from the rows
     cmds:
-      - bash scripts/task/career.sh export --into lib/matt/resume.json
+      - bash scripts/task/content.sh career export --into lib/matt/resume.json
 
   career:export:de:
     desc: Rebuild lib/matt/lebenslauf.json's work and projects from the German rows
     cmds:
-      - bash scripts/task/career.sh export --into lib/matt/lebenslauf.json --language de
+      - bash scripts/task/content.sh career export --into lib/matt/lebenslauf.json --language de
 
   career:export:
     desc: Rebuild one JSON Resume from the rows (INTO=file; CLI_ARGS="--language de --out x")
     cmds:
-      - bash scripts/task/career.sh export --into "{{.INTO}}" {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career export --into "{{.INTO}}" {{.CLI_ARGS}}
+
+  # The portfolio is the second corpus on the same wire: rows in
+  # `portfolio_project`, `lib/bountystash/portfolio.json` as the export. A
+  # translated project names its English title because the German file does not,
+  # and `import --language de` pairs by position and refuses a count mismatch.
+  portfolio:projects:
+    desc: The portfolio projects in page order (CLI_ARGS="--language de --json")
+    cmds:
+      - bash scripts/task/content.sh portfolio projects {{.CLI_ARGS}}
+
+  portfolio:show:
+    desc: One project, every field (task portfolio:show -- ID)
+    cmds:
+      - bash scripts/task/content.sh portfolio show {{.CLI_ARGS}}
+
+  portfolio:add:
+    desc: Add a project (--title required; --links "Label=href" repeatable)
+    cmds:
+      - bash scripts/task/content.sh portfolio add-project {{.CLI_ARGS}}
+
+  portfolio:set:
+    desc: Edit one project; only the flags given change (--featured / --no-featured)
+    cmds:
+      - bash scripts/task/content.sh portfolio set-project {{.CLI_ARGS}}
+
+  portfolio:rm:
+    desc: Delete one project (--yes required)
+    cmds:
+      - bash scripts/task/content.sh portfolio rm-project {{.CLI_ARGS}}
+
+  portfolio:import:
+    desc: Seed the rows from a portfolio JSON (FROM=file; CLI_ARGS="--language de --dry")
+    cmds:
+      - bash scripts/task/content.sh portfolio import --from "{{.FROM | default "lib/bountystash/portfolio.json"}}" {{.CLI_ARGS}}
+
+  portfolio:export:en:
+    desc: Rebuild lib/bountystash/portfolio.json's projects from the rows
+    cmds:
+      - bash scripts/task/content.sh portfolio export --into lib/bountystash/portfolio.json
+
+  portfolio:export:de:
+    desc: Rebuild lib/bountystash/portfolio.de.json's projects from the German rows
+    cmds:
+      - bash scripts/task/content.sh portfolio export --into lib/bountystash/portfolio.de.json --language de
+
+  portfolio:export:
+    desc: Rebuild one portfolio JSON from the rows (INTO=file; CLI_ARGS="--language de")
+    cmds:
+      - bash scripts/task/content.sh portfolio export --into "{{.INTO}}" {{.CLI_ARGS}}
 
   # The private half of the personal data. Published sites build only what the
   # page renders; a phone number or a referee lives sops-encrypted and reaches a

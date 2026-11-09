@@ -566,6 +566,20 @@ tasks:
     cmds:
       - bash tests/career-cli/run.sh
 
+  checks:portfolio:
+    desc: Fixture for the portfolio corpus — the rows and the exported JSON agree, both languages
+    summary: >
+      The second corpus on the same wire as checks:career. A fictional three-project
+      portfolio is imported and exported back byte for byte, links included as
+      label/href objects rather than text, while the profile, sections, skills and
+      UI the rows do not own survive untouched. The German file names no English
+      project, so it is paired by position: the fixture asserts the pairing and
+      that a count mismatch is refused instead of shifted. add appends, set
+      changes only its flags, rm waits for --yes. Coverage is asserted both ways;
+      no nix, loopback only; ~2 s.
+    cmds:
+      - bash tests/portfolio-cli/run.sh
+
   checks:media-relay:
     desc: Fixture for the media library — the manifest the page reads and the rows it renders
     summary: >

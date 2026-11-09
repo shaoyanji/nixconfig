@@ -19,6 +19,8 @@ database diff replace sixty copies of the same layout.
 | `sql/` | the endpoints (`/api/applications`, `/api/application-get`, …) |
 | `sync.py` | import the JSON, link mail, write status from ATS mail, export, discover — and close what proves nothing (job alerts, events the stage already holds) so the queue cannot refill |
 | `career.py` | add, edit and delete roles and projects in the database, and rebuild the JSON Resume files from the rows |
+| `portfolio.py` | the same for `portfolio_project` and `lib/bountystash/portfolio.json` |
+| `content_api.py` | the wire both CLIs speak: one GET, one upsert and one delete per table |
 | `packet.nix` | the PDF build: typst in the sandbox, artifact is a store path |
 | `select.py` | the projection: one job description, one page of material out of the corpus |
 | `glossary.json` | German job-ad words mapped onto the English ones the corpus uses |
@@ -107,6 +109,29 @@ edit belongs to is the one mistake the export cannot detect.
 
 After `export`, `task matt:gist:push` is the only step that publishes; the gist
 is still a mirror, never a source.
+
+## The portfolio is the same shape
+
+`portfolio_project` holds the capsule's projects and
+`lib/bountystash/portfolio.json` is their export — `content_api.py` is the wire
+both corpora use, so a third one is a field map rather than a third client.
+
+The German file names no English project, so a translated row carries
+`source_title` and `import --language de` pairs the two corpora by position. A
+count mismatch is refused rather than shifted, because German prose attached to
+the wrong project is invisible downstream — which is also why the English import
+has to run first. `links` is one `label<TAB>href` per line in the row and an
+array of objects in the artifact.
+
+```bash
+task portfolio:import                                     # lib/bountystash/portfolio.json
+task portfolio:import FROM=lib/bountystash/portfolio.de.json -- --language de
+task portfolio:add -- --title "…" --sector 1 --links "Repository=https://…"
+task portfolio:set -- project-name --no-featured
+task portfolio:rm -- project-name --yes
+task portfolio:export:en · task portfolio:export:de
+task checks:portfolio
+```
 
 ## Commands
 

@@ -13,8 +13,7 @@ metadata:
 
 # bountystash — one page, 14 KB, Cloudflare Pages
 
-`/Volumes/data/projects/bountystash-console` (GitHub `shaoyanji/bountystash-console`),
-built by `node scripts/build.js` into `dist/`, deployed to the `cv-resume` Pages
+`shaoyanji/bountystash-console`, built by `node scripts/build.js` into `dist/`, deployed to the `cv-resume` Pages
 project, whose custom domain is `bountystash.com`. It is the only thing that domain
 serves. The Nix-rendered portfolio it replaced is retired, with its flake output and
 its deploy tasks; the paths it answered, `/work/<slug>` in both locales, are now
@@ -25,7 +24,14 @@ the slug derived from the English title so a saved URL keeps working.
 site: the console's `data/` copy is written from it by `bountystash:data`, and both
 deploy tasks run `bountystash:data:check` first, which fails when the copy had been
 hand-edited. The Gemini capsule (`lib/gemini-portal.nix`) compiles from the same
-files.
+files, down to its section headings and Gemini-only labels in the `capsule` block:
+in a locale file, every sentence either surface prints is authored once.
+
+The checkout has no fixed path: `task bountystash:dir` answers where it is for
+this invocation (the sibling of this repo, frieren's data volume, a home
+directory), and `BOUNTY_DIR=/path task ...` overrides it. Every console task
+resolves through that one script, so a host that keeps the clone somewhere else
+needs no taskfile edit — and a host without it fails naming every place it looked.
 
 The project name is a fact about the Cloudflare account, not a typo: its
 pages.dev subdomain is `cv-resume-40q.pages.dev` (Cloudflare appends the suffix

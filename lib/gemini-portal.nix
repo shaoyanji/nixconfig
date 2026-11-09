@@ -12,46 +12,23 @@
   extra ? [],
 }: let
   shared = import ./bountystash/shared.nix {inherit lib;};
-  inherit (shared) labels slug;
+  inherit (shared) slug;
 
   locales = {
     en = data;
     de = dataDe;
   };
   d = lang: locales.${lang};
-  t = lang: labels.${lang};
+  # Every string this document prints, its section headings included, is the
+  # corpus's `capsule` block. The console reads the same two files, so a copy edit
+  # lands in one place and both surfaces follow it.
+  t = lang: (d lang).capsule;
   root = lang:
     if lang == "de"
     then "/de/"
     else "/";
 
   slugs = map (p: slug p.title) data.projects;
-
-  # Gemini-only vocabulary; section labels and slugs come from
-  # lib/bountystash/shared.nix so both surfaces stay in step.
-  local = {
-    en = {
-      machine = "Machine-readable";
-      resume = "resume.json — this document as JSON";
-      lebenslauf = "lebenslauf.json — the German CV as JSON";
-      languages = "Languages";
-      other = "Deutsch — dasselbe Portal auf Deutsch";
-      elsewhere = "Elsewhere";
-      https = "the same portfolio over HTTPS";
-      project = "project page";
-    };
-    de = {
-      machine = "Maschinenlesbar";
-      resume = "resume.json — dieses Dokument als JSON";
-      lebenslauf = "lebenslauf.json — der Lebenslauf als JSON";
-      languages = "Sprachen";
-      other = "English — the same portal in English";
-      elsewhere = "Weiter";
-      https = "dasselbe Portfolio über HTTPS";
-      project = "Projektseite";
-    };
-  };
-  c = lang: local.${lang};
 
   heading = level: text: "${lib.concatStringsSep "" (lib.genList (_: "#") level)} ${text}";
   # A gemtext link is a line of its own, and needs a label: clients do not
@@ -72,7 +49,6 @@
     x = d lang;
     p = x.profile;
     v = t lang;
-    m = c lang;
     work =
       lib.imap0 (
         i: pr: link "${root lang}work/${builtins.elemAt slugs i}.gmi" "${pr.title} — ${pr.period}"
@@ -109,19 +85,19 @@
       ++ ["" (heading 3 v.auth) "" "${p.work_auth.citizenship} · ${p.work_auth.residency} · ${p.work_auth.languages}"]
       ++ ["" (heading 3 v.contact) ""]
       ++ contacts p
-      ++ ["" (heading 2 m.machine) "" (link "/resume.json" m.resume) (link "/lebenslauf.json" m.lebenslauf)]
+      ++ ["" (heading 2 v.machine) "" (link "/resume.json" v.resume) (link "/lebenslauf.json" v.lebenslauf)]
       ++ [
         ""
-        (heading 2 m.languages)
+        (heading 2 v.languages)
         ""
         (link (root (
             if lang == "de"
             then "en"
             else "de"
           ))
-          m.other)
+          v.other)
       ]
-      ++ ["" (heading 2 m.elsewhere) "" (link "https://www.bountystash.com" m.https)]
+      ++ ["" (heading 2 v.elsewhere) "" (link "https://www.bountystash.com" v.https)]
       ++ extra
       ++ ["" v.footer]
     );
@@ -129,7 +105,6 @@
   projectDoc = lang: i: let
     x = d lang;
     v = t lang;
-    m = c lang;
     pr = builtins.elemAt x.projects i;
   in
     join (
@@ -139,7 +114,7 @@
       ++ bullets pr.stack
       # `link` is "#" for a project with no public page, and a gemtext link to
       # "#" is a dead end.
-      ++ lib.optionals (pr.link != "" && pr.link != "#") ["" (link pr.link m.project)]
+      ++ lib.optionals (pr.link != "" && pr.link != "#") ["" (link pr.link v.project)]
       ++ ["" (link (root lang) v.back)]
     );
 

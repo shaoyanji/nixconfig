@@ -1,7 +1,13 @@
 version: "3"
 
 vars:
-  BOUNTY_DIR: "/Volumes/data/projects/bountystash-console"
+  # An override, not the path: the checkout is on frieren's data volume, beside
+  # this repo on a workstation, and absent on a host that never cloned it. Every
+  # task asks scripts/task/bountystash-dir.sh, which reads this first and then
+  # names where it looked. Deliberately NOT a `sh:` var: that is evaluated when
+  # the task compiles, so `task --dry`, a summary and the task-graph check would
+  # all fail on a host without the clone.
+  BOUNTY_DIR: ""
   # The Pages project is `cv-resume` — Cloudflare appended `-40q` to its
   # pages.dev subdomain because the bare name is taken — and `bountystash.com` is
   # a custom domain on that one project. Checked against the live host on
@@ -36,10 +42,20 @@ tasks:
   # The content is authored once, in lib/bountystash/portfolio*.json (the same
   # corpus the Gemini capsule compiles). The console has its own data/ copy, so
   # this writes it, and the deploy refuses a copy that no longer matches.
+  bountystash:dir:
+    desc: Print the bountystash-console checkout these tasks operate on
+    summary: >
+      Resolves BOUNTY_DIR against every layout the fleet has: the sibling of this
+      repo, frieren's data volume, and a home directory. A directory counts only
+      if it holds scripts/build.js and .git, so a same-named folder is not
+      mistaken for the checkout.
+    cmds:
+      - bash scripts/task/bountystash-dir.sh
+
   bountystash:data:
     desc: Write the console's data/portfolio*.json from the corpus in lib/bountystash/
     cmds:
-      - bash scripts/task/bountystash-data.sh sync {{.BOUNTY_DIR}}
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && bash scripts/task/bountystash-data.sh sync "$dir"
 
   bountystash:data:check:
     desc: "[gate] the console's data is the corpus, not a hand-edited copy"
@@ -49,9 +65,10 @@ tasks:
       edited; a console copy that disagrees means the deploy would publish prose
       nobody reviewed.
 
-      Exit 0 = identical, 1 = drift (run `task bountystash:data`), 2 = no checkout.
+      Exit 0 = identical, 1 = drift (run `task bountystash:data`). A host with no
+      checkout fails earlier, at BOUNTY_DIR, naming where it looked.
     cmds:
-      - bash scripts/task/bountystash-data.sh check {{.BOUNTY_DIR}}
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && bash scripts/task/bountystash-data.sh check "$dir"
 
   bountystash:secret:resend:
     desc: Set the Resend API key as a secret on the cv-resume Pages project
@@ -73,35 +90,35 @@ tasks:
   bountystash:build:
     desc: Compile the console, validate the 14KB envelope, and resolve its internal links
     cmds:
-      - nix-shell -p nodejs --run "cd {{.BOUNTY_DIR}} && node scripts/build.js"
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && nix-shell -p nodejs --run "cd $dir && node scripts/build.js"
       # The console is the published site, so its artifact carries the link gate:
       # a page that returns 200 while loading no CSS is invisible to site:check.
-      - bash scripts/task/site-links.sh {{.BOUNTY_DIR}}/dist
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && bash scripts/task/site-links.sh "$dir/dist"
 
   bountystash:preview:
     desc: Launch zero-dependency local preview server on http://localhost:3000
     cmds:
-      - nix-shell -p nodejs --run "cd {{.BOUNTY_DIR}} && npm run preview"
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && nix-shell -p nodejs --run "cd $dir && npm run preview"
 
   bountystash:dev:
     desc: Local Cloudflare Edge emulation server via wrangler pages dev
     cmds:
       - task: bountystash:build
-      - nix-shell -p wrangler --run "cd {{.BOUNTY_DIR}} && wrangler pages dev dist"
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && nix-shell -p wrangler --run "cd $dir && wrangler pages dev dist"
 
   bountystash:deploy:preview:
     desc: Deploy preview branch to Cloudflare Pages (generates unique URL)
     cmds:
-      - bash scripts/task/bountystash-data.sh check {{.BOUNTY_DIR}}
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && bash scripts/task/bountystash-data.sh check "$dir"
       - task: bountystash:build
-      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=preview"
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh $dir/dist --project-name={{.PROJECT_NAME}} --branch=preview"
 
   bountystash:deploy:prod:
     desc: "[destructive] Deploy live production to Cloudflare Pages (bountystash.com)"
     cmds:
-      - bash scripts/task/bountystash-data.sh check {{.BOUNTY_DIR}}
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && bash scripts/task/bountystash-data.sh check "$dir"
       - task: bountystash:build
-      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=main"
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh $dir/dist --project-name={{.PROJECT_NAME}} --branch=main"
 
   bountystash:projects:
     desc: List all Cloudflare Pages projects in account
@@ -111,23 +128,23 @@ tasks:
   bountystash:git:pull:
     desc: Pull latest design updates from GitHub (shaoyanji/bountystash-console)
     cmds:
-      - git -C {{.BOUNTY_DIR}} pull --ff-only
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && git -C "$dir" pull --ff-only
 
   bountystash:git:push:
     desc: Push commits to GitHub (triggers interactive Cloudflare deploy nudge)
     cmds:
-      - git -C {{.BOUNTY_DIR}} push origin main
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && git -C "$dir" push origin main
 
   bountystash:git:status:
     desc: Check git status of local bountystash-console
     cmds:
-      - git -C {{.BOUNTY_DIR}} status -s
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && git -C "$dir" status -s
 
   bountystash:hook:install:
     desc: Install git pre-push Cloudflare deploy nudge hook in bountystash-console
     cmds:
-      - cp {{.BOUNTY_DIR}}/scripts/pre-push.sh {{.BOUNTY_DIR}}/.git/hooks/pre-push
-      - chmod +x {{.BOUNTY_DIR}}/.git/hooks/pre-push
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && cp "$dir/scripts/pre-push.sh" "$dir/.git/hooks/pre-push"
+      - dir=$(BOUNTY_DIR={{.BOUNTY_DIR}} bash scripts/task/bountystash-dir.sh) && chmod +x "$dir/.git/hooks/pre-push"
       - echo "Installed .git/hooks/pre-push successfully."
 
   # matt.bountystash.com — the personal page. It is its own Pages project rather

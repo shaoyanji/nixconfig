@@ -355,5 +355,28 @@
     "ready": "Ready to build?",
     "dispatch": "Reach out for systems, backend, and infrastructure advisory.",
     "returnButton": "↑ Return to Console"
+  },
+  "capsule": {
+    "profile": "Profile",
+    "metrics": "At a glance",
+    "work": "Selected work",
+    "stack": "Stack",
+    "principles": "Operating principles",
+    "record": "Record",
+    "education": "Education",
+    "auth": "Work authorisation",
+    "contact": "Contact",
+    "impact": "Impact",
+    "stackLabel": "Stack",
+    "back": "← Selected work",
+    "footer": "No JavaScript, no webfonts, no tracking.",
+    "machine": "Machine-readable",
+    "resume": "resume.json — this document as JSON",
+    "lebenslauf": "lebenslauf.json — the German CV as JSON",
+    "languages": "Languages",
+    "other": "Deutsch — dasselbe Portal auf Deutsch",
+    "elsewhere": "Elsewhere",
+    "https": "the same portfolio over HTTPS",
+    "project": "project page"
   }
 }

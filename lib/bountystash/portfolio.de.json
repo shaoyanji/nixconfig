@@ -355,5 +355,28 @@
     "ready": "Bereit für den Aufbau?",
     "dispatch": "Kontaktieren Sie mich für Beratung zu Systemen, Backend und Infrastruktur.",
     "returnButton": "↑ Zurück zur Konsole"
+  },
+  "capsule": {
+    "profile": "Profil",
+    "metrics": "Auf einen Blick",
+    "work": "Ausgewählte Arbeiten",
+    "stack": "Werkzeuge",
+    "principles": "Arbeitsprinzipien",
+    "record": "Werdegang",
+    "education": "Ausbildung",
+    "auth": "Arbeitsberechtigung",
+    "contact": "Kontakt",
+    "impact": "Wirkung",
+    "stackLabel": "Technik",
+    "back": "← Ausgewählte Arbeiten",
+    "footer": "Kein JavaScript, keine Webfonts, kein Tracking.",
+    "machine": "Maschinenlesbar",
+    "resume": "resume.json — dieses Dokument als JSON",
+    "lebenslauf": "lebenslauf.json — der Lebenslauf als JSON",
+    "languages": "Sprachen",
+    "other": "English — the same portal in English",
+    "elsewhere": "Weiter",
+    "https": "dasselbe Portfolio über HTTPS",
+    "project": "Projektseite"
   }
 }

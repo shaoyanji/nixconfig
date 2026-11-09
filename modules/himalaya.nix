@@ -1,13 +1,14 @@
 # himalaya mail CLI: account and IMAP wiring; the password is decrypted at runtime.
 {
+  self,
   config,
   user,
   ...
 }: let
   # One renderer for the mail signature: this reads the profile TOML at eval
   # time, so what himalaya appends and `task gravatar:signature` prints cannot
-  # disagree.
-  gravatar = import ../lib/gravatar-profile.nix;
+  # disagree. Named, not pathed, so `checks:modules:edges` can follow it.
+  gravatar = import self.modules."config.gravatar-profile";
 in {
   accounts.email.accounts = {
     "jisifu" = {

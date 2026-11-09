@@ -52,9 +52,9 @@ tasks:
   gravatar:signature:
     desc: Print the mail signature himalaya sends, rendered from the Gravatar profile
     summary: >
-      Read-only. lib/gravatar-profile.nix reads modules/config/gravatar.toml at
+      Read-only. modules/config/gravatar-profile.nix reads the TOML at
       eval time and returns the same three lines himalaya appends to mail, so
       this preview cannot drift from what a recipient sees. The TOML must be
       tracked in git: a flake eval only sees tracked files.
     cmds:
-      - nix eval --impure --raw --expr '(import ./lib/gravatar-profile.nix).signature'
+      - nix eval --impure --raw --expr '(import ./modules/config/gravatar-profile.nix).signature'

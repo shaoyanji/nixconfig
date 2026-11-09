@@ -26,14 +26,25 @@
       primary = false;
       address = user.workEmail;
       inherit (user) realName;
+      # Reading stays on the Gmail mailbox that holds the mail; only sending
+      # moves. A personal Gmail account signs an alias with d=gmail.com, so mail
+      # from this address never aligned for DMARC. Resend holds the domain's
+      # DKIM key (resend._domainkey.bountystash.com), and its relay signs as
+      # bountystash.com, so the account's SMTP password is the Resend key and
+      # the login is the literal `resend`. The Home Manager module takes one
+      # passwordCommand per account, hence the per-account smtp sasl override.
       userName = "jisifu";
       imap.host = "imap.gmail.com";
       imap.port = 993;
       imap.authentication = "plain";
-      smtp.host = "smtp.gmail.com";
+      smtp.host = "smtp.resend.com";
       smtp.port = 465;
       smtp.authentication = "plain";
       passwordCommand = "cat ${config.sops.secrets.gmail.path}";
+      himalaya.settings.smtp.sasl.plain = {
+        username = "resend";
+        password.command = "cat ${config.sops.secrets.resend-api-key.path}";
+      };
       signature.text = user.shortName;
       himalaya.enable = true;
     };

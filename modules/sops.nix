@@ -50,6 +50,13 @@ in {
       # envs.net pubnix mail (mail.envs.net). Same shape as `gmail`: one string,
       # consumed by himalaya's passwordCommand.
       "envsmail" = {};
+      # Resend's API key, used as the SMTP password for bountystash.com outbound
+      # mail (modules/himalaya.nix). The key sits in the apikeys plane, not the
+      # default secrets file, so this names both the file and the nested path.
+      "resend-api-key" = {
+        sopsFile = ./secrets/apikeys.yaml;
+        key = "RESEND.API.KEY";
+      };
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
       # OCI CLI credentials. The private half and the fingerprint that names it

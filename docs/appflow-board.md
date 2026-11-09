@@ -15,7 +15,12 @@ The vhost proxies four GET routes of the mail hub's NpgsqlRest
 | `/api/applications?lim=500` | every row: company, role, stage, status, next action, mail count |
 | `/api/application-pipeline` | stage counts and how many of each carry a next action |
 | `/api/application-get?id=` | the record behind a click: notes, fit, category, language, origin |
+| `/api/application-mail?applicationId=&lim=` | the messages behind that record, with the verdict each one carries |
 | `/api/applications-discovered?lim=` | employers the mail hub found on its own (proxied, not on the page yet) |
+
+Parameter names are the endpoint's, not the SQL's: the plugin writes
+`:application_id` and NpgsqlRest exposes `applicationId`, which is why a
+snake_case query is a 404 and not an empty list.
 
 There is no snapshot job and no second copy of the data. The board is a viewer,
 which is why it cannot disagree with the CLI: both read the same rows.

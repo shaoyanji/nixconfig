@@ -27,6 +27,13 @@ for cmd in curl jq sha256sum; do
   }
 done
 
+# An application id is a slug people chose: `*`, `–` and `®` appear in the
+# archive, so every id goes on the wire percent-encoded. Unencoded, the query
+# string ends at the special character and the answer is an error page.
+enc() {
+  jq -rn --arg v "$1" '$v | @uri'
+}
+
 get() {
   local path=$1 body
   body=$(curl -sS --max-time 30 "$api$path") || {
@@ -51,6 +58,9 @@ case "$mode" in
     ;;
 esac
 
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
 if [ "$mode" = "packet" ]; then
   id=${2:-}
   [ -n "$id" ] || {
@@ -58,8 +68,6 @@ if [ "$mode" = "packet" ]; then
     exit 2
   }
 
-  work=$(mktemp -d)
-  trap 'rm -rf "$work"' EXIT
   mkdir -p "$work/jd"
 
   # The corpus stays the corpus: pinned by its own file until it moves to the
@@ -73,7 +81,7 @@ if [ "$mode" = "packet" ]; then
     exit 2
   }
 
-  get "/api/application-document?applicationId=$id" |
+  get "/api/application-document?applicationId=$(enc "$id")" |
     jq -j '[.[] | select(.kind == "jd") | .body][0] // empty' >"$work/jd/$id.txt"
   [ -s "$work/jd/$id.txt" ] || {
     echo "appflow-gate: application $id has no stored jd text" >&2
@@ -86,13 +94,18 @@ if [ "$mode" = "packet" ]; then
     exit 1
   }
   printf '%s\n' "$out"
-  case "$out" in
-    /nix/store/*) echo "appflow-gate: packet built from the database for $id" ;;
-    *)
-      echo "appflow-gate: the build printed no store path" >&2
-      exit 1
-      ;;
-  esac
+  # The build prints `artifact  <store path>`; a nix log line is not proof that
+  # anything was produced, and the path is checked to exist as well.
+  store=$(printf '%s\n' "$out" | sed -n 's/^artifact  *\(\/nix\/store\/[^ ]*\)$/\1/p' | head -1)
+  if [ -z "$store" ]; then
+    echo "appflow-gate: the build printed no artifact path" >&2
+    exit 1
+  fi
+  if [ ! -e "$store" ]; then
+    echo "appflow-gate: $store is not in the local store" >&2
+    exit 1
+  fi
+  echo "appflow-gate: packet built from the database for $id ($store)"
   exit 0
 fi
 
@@ -126,26 +139,26 @@ fi
 
 # Timestamps are compared as seconds: the two serializers may disagree on the
 # fractional part, which is not a data difference.
-norm='def n: if type == "string" then sub("\\.[0-9]+"; "") else . end;'
+cat >"$work/compare.jq" <<'JQ'
+def n: if type == "string" then sub("\\.[0-9]+"; "") else . end;
+[$e | keys[] | select(. != "id") | . as $k
+  | select(($e[$k] | n) != ($r[$k] | n))
+  | {field: $k, export: $e[$k], row: ($r[$k] // null)}]
+| select(length > 0)
+JQ
 
 sample=$(jq -r '[.[].id] | (.[0:8] + .[-8:]) | unique | .[]' <<<"$list_json")
 checked=0
 while IFS= read -r id; do
   [ -n "$id" ] || continue
   rec=$(jq -c --arg id "$id" '.[] | select(.id == $id)' <<<"$export_json")
-  rows=$(get "/api/application-get?id=$id")
+  rows=$(get "/api/application-get?id=$(enc "$id")")
   row=$(jq -c '.[0] // empty' <<<"$rows")
   if [ -z "$row" ]; then
     bad "$id is in the export but application-get returns nothing"
     continue
   fi
-  diff=$(jq -c --argjson e "$rec" --argjson r "$row" "
-    $norm
-    [\$e | keys[] | select(. != \"id\") | . as \$k
-      | select((\$e[\$k] | n) != (\$r[\$k] | n))
-      | {field: \$k, export: \$e[\$k], row: (\$r[\$k] // null)}]
-    | select(length > 0)
-  ")
+  diff=$(jq -c --argjson e "$rec" --argjson r "$row" -f "$work/compare.jq" <<<null)
   if [ -n "$diff" ] && [ "$diff" != "null" ]; then
     bad "$id differs between export and row: $diff"
   fi
@@ -169,7 +182,7 @@ else
   while IFS=$'\t' read -r app kind want; do
     [ -n "$app" ] || continue
     tmp=$(mktemp)
-    get "/api/application-document?applicationId=$app" |
+    get "/api/application-document?applicationId=$(enc "$app")" |
       jq -j --arg k "$kind" '[.[] | select(.kind == $k) | .body][0] // empty' >"$tmp"
     have=$(sha256sum "$tmp" | cut -d' ' -f1)
     rm -f "$tmp"

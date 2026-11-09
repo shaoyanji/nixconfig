@@ -278,7 +278,7 @@ in {
   # user rather than StateDirectory= (which a user manager does not reliably
   # provide).
   systemd.tmpfiles.rules = [
-    "d /var/lib/agy-system 0755 ${user.name} ${user.group} -"
+    "d /var/lib/agy-system 0755 ${user.name} users -"
   ];
 
   # --- Closed-loop observation ledger & health endpoint ----------------------

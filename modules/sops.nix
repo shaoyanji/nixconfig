@@ -61,7 +61,7 @@ in {
       # default secrets file, so this names both the file and the nested path.
       "resend-api-key" = {
         sopsFile = ./secrets/apikeys.yaml;
-        key = "RESEND.API.KEY";
+        key = "RESEND/API/KEY";
       };
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};

@@ -655,7 +655,7 @@ in {
     # The scheduled audit's outcome record: written by the user unit
     # `agy-nightly-system`, read by the sentinel (root, with ProtectHome), which
     # degrades the host when the newest outcome is `fallback`.
-    "d /var/lib/agy-system 0755 ${user.name} ${user.group} -"
+    "d /var/lib/agy-system 0755 ${user.name} users -"
   ];
 
   services.postgresqlBackup = {

@@ -1,11 +1,6 @@
-# Resident selector stage 1 (tools/selector/serve.py) as a user service.
-# Clears [[flake/policies.nix#daemon-clears-kelly]] by the arithmetic in
-# flake/daemons.nix; `checks:selector:sidecar` proves it answers the interpreter.
-#
-# The artifact is an option, not a fixed path: a retrained or different model
-# (nb today, a larger hermes-class one next) is `model = "…"` and a restart, and
-# the unit's ConditionPathExists reads that same value — so an absent model is a
-# skipped start, never a restart loop.
+# Resident selector stage 1 (tools/selector/serve.py) as a user service; clears
+# [[flake/policies.nix#daemon-clears-kelly]] by flake/daemons.nix's arithmetic.
+# The model is an option, so an absent artifact is a skipped start, not a loop.
 {
   config,
   lib,

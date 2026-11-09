@@ -1,10 +1,6 @@
-# lib/matt-site.nix — matt.bountystash.com, two locales over one shell.
-#
-# A sibling of lib/bountystash-site.nix and no second renderer: the same shape
-# (JSON in, shell.html plus style.css out, one CSS file), so a change to the
-# vocabulary of one page cannot drift into a different mechanism on the other.
-# Colour is one `light-dark()` pair per token and one `color-scheme` switch, so
-# the toggle cannot introduce a palette the stylesheet does not already own.
+# lib/matt-site.nix — matt.bountystash.com, two locales over one shell: JSON in,
+# shell.html plus style.css out, the one CSS vocabulary lib/bountystash-site.nix
+# already owns. Colour is one `light-dark()` pair per token, one scheme switch.
 {
   pkgs,
   lib ? pkgs.lib,

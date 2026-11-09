@@ -1,10 +1,6 @@
-# lib/bountystash-mockup.nix — bountystash.com as a bug-bounty and vulnerability
-# programme, rendered from lib/bountystash-mockup/data.json (EN) and data.de.json
-# (DE at /de/), the same two-locale shape as lib/matt-site.nix.
-#
-# A concept, not a product: sample data, `noindex`, its own Pages project. It is a
-# separate artifact rather than a route on the portfolio so a mockup cannot be
-# mistaken for the live site or overwrite it on deploy.
+# lib/bountystash-mockup.nix — bountystash.com as a bug-bounty programme from
+# data.json (EN) and data.de.json (/de/). Sample data only: `noindex`, its own
+# Pages project, so it can neither be mistaken for the live site nor overwrite it.
 {
   pkgs,
   lib ? pkgs.lib,

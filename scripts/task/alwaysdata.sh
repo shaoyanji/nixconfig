@@ -15,10 +15,14 @@
 #   BODY='{"addresses":[{"ip":"","type":"ipv4"}]}' alwaysdata.sh POST /v1/site/ \
 #     '.[] | {id, name}'
 #
-# The response is always filtered through jq, so a task can ask for a table
-# (`.[] | [.name, .type] | @tsv`) instead of a document. Rate limits are 250 rpm
-# for GET and 50 rpm for writes; this script makes one call, so a loop owns its
-# own pace.
+# The response is filtered through jq, so a task can ask for a table
+# (`.[] | [.name, .type] | @tsv`) instead of a document. An action answers with an
+# empty body, which jq cannot parse, so that case prints the HTTP status instead:
+#
+#   alwaysdata.sh POST /v1/service/31175/restart/     # -> http 204
+#
+# Rate limits are 250 rpm for GET and 50 rpm for writes; this script makes one
+# call, so a loop owns its own pace.
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
@@ -61,4 +65,13 @@ if [ -n "${BODY:-}" ]; then
   args+=(--header 'content-type: application/json' --data "$body")
 fi
 
-curl "${args[@]}" "https://api.alwaysdata.com$path" | jq -r "$filter"
+# `--fail-with-body` turns a 4xx into a non-zero exit and keeps the message, so a
+# task prints Alwaysdata's own error instead of an empty table.
+response=$(curl "${args[@]}" --write-out '\n%{http_code}' "https://api.alwaysdata.com$path")
+code=${response##*$'\n'}
+body=${response%$'\n'*}
+if [ -z "$body" ]; then
+  echo "http $code"
+else
+  printf '%s' "$body" | jq -r "$filter"
+fi

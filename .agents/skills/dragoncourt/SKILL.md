@@ -27,19 +27,26 @@ Alwaysdata takes the token as the basic-auth *user* with an empty password, and
 `ALWAYSDATA_ACCOUNT` names a linked account when one token spans several. The
 script always filters through jq, so a task prints a table and an agent reads it.
 
-| Task | Answers |
+The listing verbs are read-only and print a row per resource, filtered through
+jq: `dragoncourt:sites`, `:services`, `:databases`, `:mailboxes`, `:webdav`,
+`:jobs`, `:ssh:users`, `:ftp`, `:subdomains`, `:api:account`.
+
+| Task | What the desc does not say |
 | :--- | :--- |
-| `dragoncourt:api -- METHOD PATH [JQ]` | anything, with `BODY=` (JSON, or `-` for stdin) on a write |
-| `dragoncourt:api:account` | the account behind the token, its product and period |
-| `dragoncourt:sites` | sites: addresses, httpd, root path |
-| `dragoncourt:services` | always-on services: ssh user, command, disabled |
-| `dragoncourt:databases` · `dragoncourt:mailboxes` | database rows · mailbox addresses |
-| `dragoncourt:ssh:users` · `dragoncourt:ftp` · `dragoncourt:subdomains` | the access and DNS surface |
+| `dragoncourt:api` | `BODY=` carries the JSON, or `-` for stdin; one call per invocation, so a loop owns its pace |
+| `dragoncourt:service:restart` | the answer is `http 204` and that status is the only proof it took |
+| `dragoncourt:service:logs` | needs SSH, not the token; it tails the newest file only |
+
+The services on this account are the fleet's own HTTP stubs (`xs` on the
+turn log, `sse-demo` on 8311, `api-stub` on 8312): they run in the foreground,
+bind `::` on 8300–8499, and are restarted by Alwaysdata when they die. A restart
+is the only write task here, and it is a SIGHUP — the unit decides what that
+means, so a service that ignores SIGHUP keeps running. Their output is at
+`~/admin/logs/services/`, which `dragoncourt:service:logs` tails.
 
 `GET /v1/account/` is the cheapest proof the token still works. Rate limits are
-250 rpm for safe methods and 50 rpm for a write, and the script makes one call
-per invocation, so a loop owns its own pace. Writes are live: a `POST /v1/site/`
-creates a site before anything on this host knows about it.
+250 rpm for safe methods and 50 rpm for a write. Writes are live: a `POST
+/v1/site/` creates a site before anything on this host knows about it.
 
 The page is not a template: `index.md`, `sidebar.md` and `footer.md` are compiled
 to HTML by **Comrak** at `~/.local/bin/comrak`, run through `task

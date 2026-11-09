@@ -111,9 +111,28 @@ tasks:
       - bash scripts/task/alwaysdata.sh GET /v1/site/ '.[] | [.name, ((.addresses // []) | join(",")), (.httpd // ""), (.path // "")] | @tsv'
 
   dragoncourt:services:
-    desc: The account's always-on services — name, ssh user, command, disabled
+    desc: Always-on services — id, name, state, port, working dir, command
     cmds:
-      - bash scripts/task/alwaysdata.sh GET /v1/service/ '.[] | [.name, (.ssh_user.href // ""), (.command // ""), (.is_disabled | tostring)] | @tsv'
+      - bash scripts/task/alwaysdata.sh GET /v1/service/ '.[] | [.id, (.name // "-"), (if .is_disabled then "paused" else "running" end), ((.command // "") | [scan("[0-9]{4}")] | map(select(tonumber >= 8300 and tonumber <= 8499)) | first // "-"), (.working_directory // "-"), (.command // "")] | @tsv'
+
+  dragoncourt:service:show:
+    desc: One always-on service as the API stores it (CLI_ARGS=<id>)
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET '/v1/service/{{.CLI_ARGS}}/' '.'
+
+  dragoncourt:service:restart:
+    desc: Restart one always-on service by id — POST /v1/service/<id>/restart/ (SIGHUP)
+    cmds:
+      - bash scripts/task/alwaysdata.sh POST '/v1/service/{{.CLI_ARGS}}/restart/'
+
+  dragoncourt:service:logs:
+    desc: Tail the newest service log on the host (~/admin/logs/services/)
+    cmds:
+      - |
+        ssh {{.DRAGON_TARGET}} "
+          LOG=\$(ls -t ~/admin/logs/services/* 2>/dev/null | head -n 1)
+          if [ -n \"\$LOG\" ]; then echo \"== \$LOG\"; tail -n 40 -f \"\$LOG\"; else echo 'no service log yet'; fi
+        "
 
   dragoncourt:databases:
     desc: Databases on the account — name, type
@@ -139,6 +158,16 @@ tasks:
     desc: Subdomains and their addresses
     cmds:
       - bash scripts/task/alwaysdata.sh GET /v1/subdomain/ '.[] | [.hostname, ((.ip_addresses // []) | map(tostring) | join(","))] | @tsv'
+
+  dragoncourt:jobs:
+    desc: Scheduled tasks on the account — type, schedule, command, state
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/job/ '.[] | [.id, (.type // ""), (.date_type // ""), (.argument // ""), (if .is_disabled then "paused" else "enabled" end)] | @tsv'
+
+  dragoncourt:webdav:
+    desc: WebDAV accounts on the account — id, name, path
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/webdav/ '.[] | [.id, .name, (.path // "")] | @tsv'
 
   dragoncourt:harden:
     desc: Enforce secure permissions on Alwaysdata (~/.ssh, ~/www, ~/.local/bin)
@@ -208,6 +237,8 @@ tasks:
           "backup: Download full ~/www backup tarball" \
           "build: Run build.sh in ~/www" \
           "info: System info & runtimes" \
+          "services: Always-on services (API)" \
+          "svclogs: Tail the newest service log" \
           "push: Upload file to Alwaysdata (www/)" \
           "pull: Download file from Alwaysdata" \
           "wishlist: Open Wishlist SSH directory" \
@@ -237,6 +268,12 @@ tasks:
             ;;
           "info"*)
             task dragoncourt:info
+            ;;
+          "services"*)
+            task dragoncourt:services
+            ;;
+          "svclogs"*)
+            task dragoncourt:service:logs
             ;;
           "push"*)
             filepath=$(gum input --placeholder "Path to local file to upload:")

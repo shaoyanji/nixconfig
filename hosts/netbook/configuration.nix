@@ -155,7 +155,10 @@ in {
   };
   powerManagement.enable = true;
   services.tlp.enable = true;
-  services.thermald.enable = true;
+  # thermald regulates through Intel DPTF/RAPL thermal tables; this Celeron N3060
+  # (Braswell) exposes none, so the daemon had nothing to act on. TLP is the power
+  # path here and already owns the CPU knobs.
+  services.thermald.enable = false;
   services.earlyoom.enable = true;
   services.upower.enable = true;
   services.libinput.enable = true;

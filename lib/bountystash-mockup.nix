@@ -1,7 +1,6 @@
 # lib/bountystash-mockup.nix — bountystash.com as a vulnerability programme.
 #
-# A concept, not a product: sample data, `noindex`, its own Pages project, so a
-# mockup cannot be mistaken for the live site. Data: lib/bountystash-mockup/.
+# Sample data, `noindex`, its own Pages project. Data: data.json, data.de.json.
 {
   pkgs,
   lib ? pkgs.lib,

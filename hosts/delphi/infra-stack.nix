@@ -121,6 +121,23 @@
       exit 0
     fi
 
+    # The outcome of an audit is state, not prose — same contract as frieren's
+    # runner: one TSV line per run, in a directory tmpfiles owns for this user so
+    # the root sentinel collector can read it (its unit runs with ProtectHome, so
+    # a path under $HOME would be invisible).
+    STATE_DIR="''${AGY_STATE_DIR:-/var/lib/agy-system}"
+    if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
+      echo "=== [$(date)] WARN: cannot create $STATE_DIR; recording to the journal only ===" >&2
+      STATE_DIR=""
+    fi
+    record_outcome() {
+      local outcome="$1" reason="$2"
+      echo "=== [$(date)] Audit outcome: $outcome ($reason) ==="
+      if [ -n "$STATE_DIR" ]; then
+        printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$outcome" "$reason" > "$STATE_DIR/last-run"
+      fi
+    }
+
     echo "=== [$(date)] Found $SYSTEM_FILE. Preparing execution... ==="
     ARCHIVE_DIR="${user.home}/.agents/system"
     mkdir -p "$ARCHIVE_DIR"
@@ -232,9 +249,7 @@
 
     if [ "$SHOULD_RUN_CASCADE" -eq 0 ]; then
       echo "=== [$(date)] Quiet Reflex Gate: System is 100% nominal (0 failed units, all services healthy). Preserving AI tokens. ==="
-      CURRENT_DATE=$(date "+%Y-%m-%d %H:%M %Z")
-      sed -i "s/\* \*\*Last Audit Run:\*\* .*/\* \*\*Last Audit Run:\*\* $CURRENT_DATE (Quiet Nominal Gate - 0 errors, AI tokens preserved)/" "$SYSTEM_FILE" || true
-      echo "Recorded quiet nominal audit in $SYSTEM_FILE."
+      record_outcome quiet "0 failed units, all service probes healthy"
       exit 0
     fi
 
@@ -246,11 +261,10 @@
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
+      record_outcome ok "$RUN_REASON"
     else
       echo "=== [$(date)] WARN: All AI agent tiers failed. Applying deterministic timestamp update to $SYSTEM_FILE ===" >&2
-      CURRENT_DATE=$(date "+%Y-%m-%d %H:%M %Z")
-      sed -i "s/\* \*\*Last Audit Run:\*\* .*/\* \*\*Last Audit Run:\*\* $CURRENT_DATE (Deterministic Fallback)/" "$SYSTEM_FILE" || true
-      echo "=== [$(date)] Deterministic audit recorded in $SYSTEM_FILE ==="
+      record_outcome fallback "all agent tiers failed ($RUN_REASON)"
     fi
   '';
 in {
@@ -259,11 +273,23 @@ in {
     self.modules."services.agent-scheduler"
   ];
 
+  # The audit is a user unit and the sentinel collector reads as root with
+  # ProtectHome, so the outcome record needs a shared directory owned by the
+  # user rather than StateDirectory= (which a user manager does not reliably
+  # provide).
+  systemd.tmpfiles.rules = [
+    "d /var/lib/agy-system 0755 ${user.name} ${user.group} -"
+  ];
+
   # --- Closed-loop observation ledger & health endpoint ----------------------
   # Collects system health, unit states, disk and PSI pressure every 15 minutes.
   # Powers `task ops:health` and serves /var/lib/fleet-sentinel/www/status.json.
   services.fleetSentinel = {
     enable = true;
+    # This host's 03:00 audit verdict, written by agy-nightly-system as
+    # `<ts>\t<outcome>\t<reason>`. `fallback` degrades the host and pages; a
+    # record older than 192 h does too.
+    auditRecord = "/var/lib/agy-system/last-run";
     watchUnits = [
       {unit = "nixos-upgrade.service";}
       {unit = "stirling-pdf.service";}

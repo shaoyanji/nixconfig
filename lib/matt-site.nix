@@ -1,7 +1,7 @@
 # lib/matt-site.nix — matt.bountystash.com, two locales over one shell.
 #
-# The resume is the fact and profile.json/projects.json are the prose: a role or a
-# project without prose fails the build. docs: modules/plugins/appflow/README.md
+# JSON in, shell.html and style.css out; the resume is the fact, prose the rest.
+# docs: modules/plugins/appflow/README.md
 {
   pkgs,
   lib ? pkgs.lib,

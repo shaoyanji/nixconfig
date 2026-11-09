@@ -17,6 +17,15 @@
       [ "$(cat "$type" 2>/dev/null)" = "bluetooth" ] && printf '0\n' > "$f" 2>/dev/null || true
     done
   '';
+  # The warmed set is the inventory's opt-in, never a copy of it: `managed = true`
+  # plus `status = "active"` is what `infra:warm:cache` and `infra:apply:fleet`
+  # derive. While this file kept its own list of seven, the three hosts added to
+  # the rotation since were managed everywhere except here, so their closures
+  # were cold on the cache the LAN deploys from.
+  warmHosts = builtins.attrNames (
+    lib.filterAttrs (_: host: host.managed && host.kind == "nixos" && host.status == "active") self.inventory.hosts
+  );
+
   # Fleet cache warmer: builds every NixOS host's toplevel from the pushed
   # flake so harmonia serves the closures to the whole LAN at wire speed.
   # Uses the same github: source as system.autoUpgrade (eval works without
@@ -29,7 +38,7 @@
     fail=0
     mkdir -p /nix/var/nix/gcroots/fleet
     for h in \
-      frieren poseidon eisen fern stark scratch guckloch
+      ${lib.concatStringsSep " " warmHosts}
     do
       echo "==> warming & pinning current generation: $h"
       out_link="/nix/var/nix/gcroots/fleet/$h"
@@ -103,6 +112,11 @@ in {
     # `task ops:health` and gatus already look. One path, declared once: the
     # producer owns it.
     prefillRuns = config.services.steamCache.prefill.ledger;
+    # The 03:00 audit's own verdict. It exits 0 even when every agent tier failed
+    # (so the timer keeps running), which is why the outcome file — not the unit
+    # Result — is what has to reach gatus. Written by agy-nightly-system as
+    # `<ts>\t<outcome>\t<reason>`; `fallback` degrades this host and pages.
+    auditRecord = "/var/lib/agy-system/last-run";
     # The cold vault is powered on demand: its automount failing while BurgerNAS
     # sleeps is the design, not a fault, and counting it put the whole host in
     # "degraded" — which gatus then reported as a broken monitor.
@@ -130,9 +144,20 @@ in {
   # (see modules/profiles/nixbuild-client.nix).
   profiles.nixbuild-client.enable = true;
 
-  # Server-class host: pin the current nixpkgs LTS kernel instead of the
-  # latest-kernel default from profiles/base-node.nix.
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_12;
+  # Server-class host: prefer the current nixpkgs LTS kernel instead of the
+  # latest-kernel default from profiles/base-node.nix. The chain degrades to
+  # nixpkgs' own default when an LTS leaves the tree, so a version bump is a
+  # deliberate edit rather than an eval error inside the nightly autoUpgrade
+  # window — pinned to a missing attribute, the whole host stops rebuilding.
+  boot.kernelPackages = lib.mkForce (
+    pkgs.${
+      lib.findFirst (name: builtins.hasAttr name pkgs) "linuxPackages" [
+        "linuxPackages_6_12"
+        "linuxPackages_6_6"
+        "linuxPackages_5_15"
+      ]
+    }
+  );
 
   # Frieren is a server-heavy-io-sensitive node with spinning media (/dev/sda).
   # 1. Disable full-store batch traversal to prevent mechanical head thrashing.
@@ -264,9 +289,21 @@ in {
   # uptime-kuma is off as of 2026-11-04: its database here held zero monitors
   # (so did delphi's), and the checks that mattered are declarative gatus, now
   # served by delphi — see `services.fleetMonitors` in infra-stack.nix.
+  # ModemManager is enabled but idle on this host and has no device to manage: no
+  # /dev/cdc-wdm*, no /dev/ttyUSB*, nothing in `mmcli -L`. It comes in from outside
+  # this host's config — the string appears nowhere in the tree — so the switch is
+  # mkForce rather than a plain false.
+  networking.modemmanager.enable = lib.mkForce false;
+
   services.ha-stack = {
     enable = true;
     uptime-kuma.enable = false;
+    # Mosquitto off with it since 2026-11-09: seven days of journal held zero
+    # `new client connected` lines — a broker with no publisher and no subscriber,
+    # whose only activity was writing an empty database every 30 minutes. HA's own
+    # telemetry is `command_line` sensors, so nothing lost the feed. The module
+    # stays for the ESP32/Zigbee layer in [[exp-009]].
+    mqtt.enable = false;
   };
 
   # Shell-history sync (modules/services/atuin-server.nix). The one account is

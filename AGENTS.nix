@@ -508,6 +508,55 @@
         HOST=eisen is green. No gain means the note keeps the number and the answer stands.
       '';
     };
+    deepseek-v4-flash-eisen = {
+      title = "DeepSeek-V4-Flash 284B on eisen: does a 57 GiB CPU pack beat what the box already serves?";
+      kind = "experiment";
+      status = "IN FLIGHT";
+      date = "2026-11-09";
+      summary = "Synchopate/DeepSeek-V4-Flash-0731-Fractal-64GB-CPU-GGUF (56.56 GiB, 284B/13.17B active, 1.71 bpw) fits eisen's 62.5 GiB usable RAM, but the published 9.1-14.7 tok/s is a 16C Zen 5 with AVX-512BW and DDR5-5600. Eisen is AVX2-only Haswell-EP on DDR3-1600, so decode speed is the open question, not fit.";
+      from = ["download-route-bulk"];
+      refs = {
+        hosts = ["eisen" "frieren"];
+        modules = [
+          "hosts/eisen/deepseek-v4.nix"
+          "hosts/eisen/llm-server.nix"
+          "hosts/eisen/strata.nix"
+        ];
+        tasks = ["checks:host"];
+        docs = ["docs/deepseek-v4-flash.md" ".agents/deploy/hosts/eisen.md"];
+      };
+      body = ''
+        Download started 2026-11-09 through frieren's aria2 RPC (JSON-RPC addUri,
+        explicit `out=`, because the HF redirect renames a file to a 64-hex blob)
+        into /srv/data/downloads/deepseek-v4-flash: three shards, 60.74 GB, plus the
+        15.8 MB prebuilt llama-server. eisen measured 1.45 MB/s from the HF CDN, so
+        the LAN copy is the route to /mnt/storage/models — not a fetch on the host.
+        Not optional, since stock llama.cpp rejects tensor type 40 (custom Q2_0).
+        The number to beat is Strata's on the same box (14.6-21.0 tok/s decode, 4K
+        prompt). Ours is bandwidth-bound at ~25.6 GB/s against the reference box's
+        ~89 GB/s of DDR5, so the archive figure is an upper bound.
+        SHA256SUMS was seeded beside the shards from the publisher's LFS oids
+        (tree API `?expand=true`) while the download still ran, so the check never
+        trusts our own copy: the four complete members verify OK, the shards fail
+        until aria2 reports them done. The patch is a git blob with no published
+        hash, so its line is computed locally and a comment says so. The evening
+        gate, in order: both shard GIDs `complete` with no `*.aria2` control file
+        — size settles nothing, `falloc` assigns the full 57 G on first write;
+        `sha256sum -c SHA256SUMS` green here and on eisen after the LAN copy;
+        61 GB free under /mnt/storage, `strata` stopped, `server` persona active;
+        then the measurement. A shard in flight holds the copy, never rsynced.
+
+        Measurement: in the `server` persona, as a transient unit — the pack ships
+        no `llama-bench` (server and cli only, and stock llama.cpp cannot read tensor
+        type 40), so `pp`/`tg` come from `/completion` timings and a real agent
+        session from `/metrics` deltas.        Steps: `docs/deepseek-v4-flash.md`. 57.61 GiB VmRSS leaves llama-swap,
+        Strata and Steam no room.
+        Exit: a decode rate either justifies a port of its own on eisen.lan and a
+        place in the router (`checks:host HOST=eisen` green), or the note goes
+        REJECTED carrying the measured number. It is not imported into
+        configuration.nix before that answer exists.
+      '';
+    };
     doc-budget-ci = {
       title = "Doc budget gate in CI";
       kind = "open";
@@ -5178,13 +5227,13 @@
     };
 
     open-steam-dns-steer-run = {
-      title = "The CDN-only steering allowlist is deployed off and has never been run";
+      title = "The CDN steering allowlist is on, with no observed client download yet";
       kind = "open";
       status = "OPEN";
-      date = "2026-10-29";
+      date = "2026-11-09";
       priority = "P3";
       links = ["open-manual-steam-fill"];
-      summary = "`steamCache.dnsSteer` exists as an allowlist (`content`) because the 2026-10-28 zone override also caught `cm-01-fra1`, a matchmaking sibling. It ships as `off`: no client has yet downloaded through it, so nothing is known about whether the four `cdn.steampipe` names cover real chunk traffic.";
+      summary = "`steamCache.dnsSteer` is deployed as `content` since 2026-11-09: the 2026-10-28 matchmaking failure was the *zone* record catching `cm-01-fra1`, a sibling of the download names, not steering itself. The allowlist cannot match `cm-*`, so it is on; what is still unproven is that real chunk traffic lands on the four `cdn.steampipe` names.";
       refs = {
         hosts = ["frieren"];
         modules = ["modules/services/steam-cache.nix" "hosts/frieren/dns.nix"];
@@ -5197,14 +5246,16 @@
         name in the zone, matchmaking included, resolves publicly by construction. `zone` refuses
         without `dnsSteerZoneAcknowledged`.
 
-        **Why it is off.** The allowlist came from one window of resolver query history: 524 hits on
-        `lancache`, ~500 across four CDN names, one each on `cm-01-fra1` (matchmaking) and
-        `cache9-fra1` (Valve's own cache). One window does not prove chunk traffic uses those CDNs.
+        **Why it is on (2026-11-09).** The 2026-10-28 failure was diagnosed as the zone record, not
+        the cache: `address=/steamcontent.com/` also swallowed `cm-01-fra1.steamcontent.com`, the
+        EU-West connection manager, and match accepts stopped. `content` emits only the download
+        CDNs, the detection name and the installer CDN, so `cm-*` resolves publicly by construction.
+        It ships with `dnsSteerDomains = ["cache9-fra1.steamcontent.com"]`, the one observed download
+        host not under `*.cdn.steampipe`, added by exact name and never by suffix.
 
-        **Exit.** With `dnsSteer = "content"` on frieren: one client download shows up as a HIT at
-        the front (an `X-Steam-Cache` probe or `tier_growth_bytes`), a Dota match still accepts, and
-        the observed CDN set matches the allowlist — then flip the deployed default to `content`.
-        If `cache9-fra1` is where chunks come from, it is added by exact name, never by suffix.
+        **Exit.** One client download shows a HIT at the front (`X-Steam-Cache` or
+        `tier_growth_bytes`) and a Dota match still accepts — then this note is DELIVERED. If the
+        observed download set differs from the allowlist, the missing name is added by exact name.
       '';
     };
 
@@ -5632,6 +5683,118 @@
         **Exit.** Build the deterministic grammar first (p=1) and let the model only
         front it. Ship only if answered-case p >= 0.3 at S >= 3 s AND refusal <= 100 ms
         AND the Kelly entry in flake/daemons.nix clears with `wanted = true`. If the grammar is learnable in one session, S amortises to zero and the answer is no.
+      '';
+    };
+
+    jobby-cli-consolidation = {
+      title = "One jobby CLI over the two halves of the application pipeline";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      priority = "P2";
+      date = "2026-11-09";
+      summary = "jobby and appflow do one job in two languages and neither is a tool. M0 (clone hydrated to a5107bf, 13 packages green) and M1 (lossless ordered JSON, 40/40 statuses classified, rebuild matching 141 rows with 0 diff) are delivered; one Go binary with `jobby tui` and `jobby <verb>` still owns JD intake, the packet, the radar and derived actions.";
+      refs = {
+        modules = ["modules/config/nu/jobby.nu" "taskfiles/apps.yml" "flake/cli.nix" "modules/nixoshmsymlinks.nix"];
+        tasks = ["apps:list" "apps:emails" "apps:sync:push"];
+        docs = ["docs/job-cold-email.md" "docs/NUSHELL.md"];
+      };
+      body = ''
+        **Why one binary.** jobby is Go with a pdfcpu layout compiler and capsules; appflow is
+        10,090 lines of Python over JSON truth, a triggerless SQLite cache and Typst packets.
+        Neither composes with the other, and neither is a tool.
+
+        **The rule.** `applications.json` wins and the DB is rebuilt from it, so a SQLite trigger
+        dies at the next sync. The trigger is a transition in the writer: `jobby tick` derives
+        due actions into an append-only ledger, and a second run changes nothing.
+
+        **Delivered.** M0 hydrated the clone 4a637e6 -> a5107bf (0 ahead, 13 behind) with build,
+        vet and tests green over 13 packages. M1 added `internal/apps` and `cmd/jobby`: the
+        encoder reproduces Python's bytes (export sha256 `5224f960…`), the rebuild matches the
+        deployed cache row for row (141 rows, 0 diff, both views identical), all 40 status
+        spellings classify, and `jobby set` rewrites one record through the same tree.
+
+        **M2 measured.** Six lens/language renders at budget 2 all fit 2 pages at 10.0pt with
+        56-60 lines on page 1; each letter is 1 page, 19 lines. The 54 Typst packets compile to
+        108 documents, all 108 PASS the three rules (letters 23-34 lines): verdicts agree,
+        coverage does not — the audit reads `dist/` alone, 2 of 108. One page is unreachable
+        even at 9.0pt, which leaves 11 lines on page 2, one above the rule.
+
+        **Remaining.** M3 radar over `himalaya envelope list` with a measured agreement rate
+        before any send; M4 `jobby tick` idempotence; M5 TUI over the same verbs; M6
+        `taskfiles/apps.yml` calls jobby under the same task names.
+
+        **No auth layer.** himalaya, the llm wrapper and the Jev router hold every credential;
+        jobby stores none and prints none.
+
+        **Open.** Which resume is canonical; whether the 141 records stay in the workflow repo;
+        where the timer runs; whether DuckDB analytics and the HTML dashboard survive.
+      '';
+    };
+
+    idle-service-modules = {
+      title = "An idle daemon retires to its module, not out of the tree";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-09";
+      summary = "The 2026-11-09 audit retired Mosquitto, InfluxDB and ModemManager from frieren's runtime while keeping every module: the host sets the option false and records the measurement that retired it, so a future project re-enables an option instead of rebuilding the wiring.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["hosts/frieren/configuration.nix" "hosts/frieren/infra-stack.nix" "modules/services/home-assistant.nix"];
+        tasks = ["checks:host"];
+      };
+      body = ''
+        **The rule.** `enable = false` in the host module, next to the number that
+        retired it. The module stays registered in `modules.toml`, so the surface is
+        still documented and one option restores the unit.
+
+        **What the audit measured on frieren, 2026-11-09.**
+        - Mosquitto: zero `new client connected` lines in seven days, while the
+          journal held only "Saving in-memory database" every 30 minutes. Home
+          Assistant's telemetry is `command_line` sensors, so no feed was lost.
+        - InfluxDB: `/var/lib/influxdb2` at 200 KB with one file touched in 14 days,
+          while Scrutiny's weekly collector ran. Scrutiny keeps its own store.
+        - ModemManager: enabled, inactive, no `/dev/cdc-wdm*`, no `/dev/ttyUSB*`.
+
+        **What looked idle and is not.** `pihole-ftl` is the primary resolver and PXE
+        proxyDHCP (2.6 M queries imported); `thermald` earns its place on an Intel
+        host with DPTF tables; `nixos-upgrade` and `fleet-classification-gate` ledger
+        non-successes cluster into two incidents, not chronic failure.
+
+        **Reclassification is a habit, not a sweep.** Candidates come from the
+        sentinel ledger and the journal — no client, no write, or a condition never
+        met — never from the module's own description.
+      '';
+    };
+
+    selector-model-plane = {
+      title = "A model daemon is hot-swappable, and an absent artifact is a skip, not a loop";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      priority = "P2";
+      date = "2026-11-09";
+      summary = "`selector.service` now guards on the model file as well as the script and takes its path from `programs.selectorDaemon.model`, so a host with no artifact skips the start instead of restarting forever. Measured before the fix on frieren: 3,140 restarts and 51,241 journal lines in six days.";
+      refs = {
+        modules = ["modules/user/selector-daemon.nix" "scripts/task/selector-sidecar.sh" "flake/daemons.nix"];
+        tasks = ["checks:selector:sidecar" "checks:host"];
+        docs = ["docs/selector-daemon-predesign.md"];
+      };
+      body = ''
+        **What was broken.** The unit conditioned on `tools/selector/serve.py`, which
+        always exists, so the missing artifact surfaced as ExecStart exit 1 under
+        `Restart=on-failure` with a 10 s delay. `q.sh --question` falls back to the
+        interpreter, so nothing was gained by the loop either.
+
+        **What landed.** `ConditionPathExists` covers the script and the model;
+        `StartLimitBurst = 3` in 300 s bounds a genuinely broken artifact; `Q_MODEL`
+        and the guard read one value, the option. A new artifact is an option change
+        and a restart, with no edit to the unit.
+
+        **Hermes as the next candidate.** The hypothesis is that a larger model serves
+        the same closed-vocabulary query object behind the same socket, so the daemon
+        is the stable part and the model is the swapped part. What would settle it is
+        `checks:selector:sidecar` (byte-identical to the interpreter) plus the Kelly
+        entry in flake/daemons.nix still clearing at the new model's latency — and
+        refusal still under 100 ms, because a slow refusal is a loss on its own.
       '';
     };
 

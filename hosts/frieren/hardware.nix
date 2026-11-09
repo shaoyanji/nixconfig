@@ -1,5 +1,12 @@
 # Hardware acceleration for i5-8250U (Kaby Lake R, Intel UHD Graphics 620).
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: let
+  user = import ../../modules/global/user.nix;
+  netbookIp = config.fleet.inventory.hosts.netbook.network.tailscale_ip;
+in {
   # --- Intel QuickSync VA-API ---
   nixpkgs.config.packageOverrides = pkgs: {
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override {enableHybridCodec = true;};
@@ -50,6 +57,47 @@
     percentageCritical = 8;
     percentageAction = 5;
     criticalPowerAction = "PowerOff";
+  };
+
+  # The battery is the UPS, so a mains cut ends in a poweroff at 5% (UPower).
+  # This fires at 7% first: notify alice's netbook, wait 60 s, then power off
+  # unless mains came back. UPower's 5% action stays as the backstop.
+  systemd.services.frieren-battery-notice = {
+    description = "Warn alice@netbook that frieren is on battery, then power off";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = pkgs.writeShellScript "frieren-battery-notice" ''
+        set -euo pipefail
+        cat=${pkgs.coreutils}/bin/cat
+        bat=/sys/class/power_supply/BAT0
+        state=/run/frieren-battery-notice.fired
+        [ -r "$bat/capacity" ] || exit 0
+        cap=$($cat "$bat/capacity")
+        [ "$($cat "$bat/status")" = Discharging ] || exit 0
+        [ "$cap" -le 7 ] || exit 0
+        [ -e "$state" ] && exit 0
+        : > "$state"
+        trap 'rm -f "$state"' EXIT
+        msg="Mains power is out and frieren is at ''${cap}%. Plug it back in: it powers off in 60 s."
+        ${pkgs.util-linux}/bin/runuser -u ${user.name} -- \
+          ${pkgs.coreutils}/bin/env HOME=${config.users.users.${user.name}.home} \
+          ${pkgs.openssh}/bin/ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
+            -o ConnectTimeout=10 alice@${netbookIp} \
+            "XDG_RUNTIME_DIR=/run/user/\$(id -u) busctl --user call org.freedesktop.Notifications /org/freedesktop/Notifications org.freedesktop.Notifications Notify susssasa{sv}i frieren 0 none 'frieren: battery low' \"$msg\" 0 0 0" \
+          || echo "frieren-battery-notice: alice@${netbookIp} unreachable" >&2
+        ${pkgs.coreutils}/bin/sleep 60
+        [ "$($cat "$bat/status")" = Discharging ] || { echo "frieren-battery-notice: mains restored, staying up"; exit 0; }
+        ${pkgs.systemd}/bin/systemctl poweroff
+      '';
+    };
+  };
+
+  systemd.timers.frieren-battery-notice = {
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnBootSec = "2min";
+      OnUnitActiveSec = "1min";
+    };
   };
 
   # --- TPM 2.0 (Intel PTT hardware cryptoprocessor) ---

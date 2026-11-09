@@ -59,6 +59,10 @@ includes:
         taskfile: taskfiles/burgernas.yml
         dir: .
         flatten: true
+    cal:
+        taskfile: taskfiles/cal.yml
+        dir: .
+        flatten: true
     check:
         taskfile: taskfiles/check.yml
         dir: .
@@ -85,6 +89,10 @@ includes:
         flatten: true
     envs:
         taskfile: taskfiles/envs.yml
+        dir: .
+        flatten: true
+    gravatar:
+        taskfile: taskfiles/gravatar.yml
         dir: .
         flatten: true
     infra:
@@ -227,6 +235,11 @@ tasks:
               SECRETS
                 task infra:sops:fzf            dump apikeys.yaml as KEY=value
                 task infra:secrets:edit:apikeys
+                task gravatar:token             mint/renew the Gravatar OAuth token
+                task gravatar:status            verify it against the live API
+                task gravatar:check             drift against modules/config/gravatar.toml
+                task gravatar:sync              push the writable profile fields
+                task gravatar:signature         the signature himalaya sends
 
               COST RULE: eval to catch a config error · build to prove a closure ·
               size to plan a build. Nothing here defaults to the whole fleet —

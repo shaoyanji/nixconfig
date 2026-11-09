@@ -1,0 +1,75 @@
+version: "3"
+
+tasks:
+  cal:events:
+    desc: List the Cal.com event types behind the booking page
+    summary: >
+      Read-only. GET /v2/event-types with cal-api-version 2024-06-14, using the
+      caldotcom value from the secrets plane — declared only on the hosts that
+      carry the agent-backend trait (frieren, delphi). The slug and the id it
+      prints are what every other cal: task accepts, so no id is hardcoded here.
+      JSON=1 for the raw list.
+    cmds:
+      - python3 scripts/task/cal.py events {{if .JSON}}--json{{end}}
+
+  cal:slots:
+    desc: Show free slots for one event type over the next days
+    summary: >
+      Read-only and needs nothing from the secrets plane: GET /v2/slots with
+      cal-api-version 2024-09-04, the same public call the event page's own .md
+      document names. EVENT is a slug (15min) or an id; a slug is resolved from
+      the account list when it can be, otherwise from the page document.
+      DAYS=5, TIMEZONE=Europe/Berlin, JSON=1.
+    requires:
+      vars: [EVENT]
+    cmds:
+      - python3 scripts/task/cal.py slots --event "{{.EVENT}}" {{if .DAYS}}--days {{.DAYS}}{{end}} {{if .TIMEZONE}}--timezone "{{.TIMEZONE}}"{{end}} {{if .JSON}}--json{{end}}
+
+  cal:list:
+    desc: List bookings with the attendee who made them
+    summary: >
+      Read-only. GET /v2/bookings with cal-api-version 2026-05-01, cursor
+      paginated by the server; STATUS=upcoming|unconfirmed|recurring|past|cancelled,
+      LIMIT=20. This is the booking record — who asked, and which booking uid to
+      cancel or move — where khal only has the calendar event.
+    cmds:
+      - python3 scripts/task/cal.py list {{if .STATUS}}--status "{{.STATUS}}"{{end}} {{if .LIMIT}}--limit {{.LIMIT}}{{end}} {{if .TIMEZONE}}--timezone "{{.TIMEZONE}}"{{end}} {{if .JSON}}--json{{end}}
+
+  cal:book:
+    desc: Create a booking on the booking page (writes the calendar, needs YES=1)
+    summary: >
+      POST /v2/bookings, cal-api-version 2026-02-25. START is local wall clock
+      (2026-11-10 14:30) or ISO 8601 with an offset; it is sent as UTC because
+      the endpoint requires UTC. The POST is public, so the confirmation is the
+      only thing between an agent and a real event: without YES=1 the exact
+      request is printed and nothing is sent. DRY=1 prints it and exits 0.
+      GUESTS is comma-separated. The address is ADDR, not EMAIL — this
+      Taskfile's root vars own EMAIL and a root var wins over the command line.
+    requires:
+      vars: [EVENT, START, NAME, ADDR]
+    cmds:
+      - python3 scripts/task/cal.py book --event "{{.EVENT}}" --start "{{.START}}" --name "{{.NAME}}" --email "{{.ADDR}}" {{if .TIMEZONE}}--timezone "{{.TIMEZONE}}"{{end}} {{if .GUESTS}}--guests "{{.GUESTS}}"{{end}} {{if .DRY}}--dry-run{{end}} {{if .YES}}--yes{{end}}
+
+  cal:cancel:
+    desc: Cancel a booking by uid (writes the calendar, needs YES=1)
+    summary: >
+      POST /v2/bookings/{uid}/cancel with cal-api-version 2026-02-25. Prints the
+      booking it found — start, attendee, uid — and stops without YES=1, because
+      cancelling mails the attendee. UID is the short string `task cal:list`
+      prints; REASON is the cancellation note the attendee reads.
+    requires:
+      vars: [UID]
+    cmds:
+      - python3 scripts/task/cal.py cancel --uid "{{.UID}}" {{if .REASON}}--reason "{{.REASON}}"{{end}} {{if .YES}}--yes{{end}}
+
+  cal:reschedule:
+    desc: Move a booking to a new start (writes the calendar, needs YES=1)
+    summary: >
+      POST /v2/bookings/{uid}/reschedule with cal-api-version 2026-02-25. Only
+      an accepted or pending booking moves; a cancelled one answers 400 and a
+      rejected one is a new booking instead. Shows the current start against the
+      new one and stops without YES=1. START takes the same shapes as cal:book.
+    requires:
+      vars: [UID, START]
+    cmds:
+      - python3 scripts/task/cal.py reschedule --uid "{{.UID}}" --start "{{.START}}" {{if .REASON}}--reason "{{.REASON}}"{{end}} {{if .YES}}--yes{{end}}

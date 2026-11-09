@@ -329,6 +329,12 @@ than assume it: one flag pair, the same suite, and the stall sites tell you.
 for Qwen3.8 on CUDA 8.6/8.9/12.0/12.1, Radeon gfx1100/gfx1151/gfx1201, Metal and
 Arc — gfx1010 is not in that list, so MTP stays the drafter here.
 
+## DeepSeek-V4-Flash 284B (evening copy + benchmark)
+
+Procedure: [`docs/deepseek-v4-flash.md`](../../../docs/deepseek-v4-flash.md) — the LAN copy from
+frieren's aria2 job, the publisher-hash check, the `server` persona, the transient probe and the
+measurement. Open question: `AGENTS.nix` note `deepseek-v4-flash-eisen`.
+
 ## Operational notes
 
 - **Build and eval eisen ON eisen, over ssh** (`ssh eisen 'bash -l -c …'`, repo at

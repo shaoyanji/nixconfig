@@ -1,0 +1,60 @@
+version: "3"
+
+tasks:
+  gravatar:token:
+    desc: Mint or renew the Gravatar OAuth token, verify it, and store it in sops
+    summary: >
+      Implicit grant against app 152602, whose redirect is the Gravatar
+      developer console. With a logged-in Firefox profile on this host the
+      consent form is submitted headlessly; otherwise the authorize URL is
+      printed and the redirected URL (or bare token) is read from stdin. The
+      token is verified against /v3/me/profile BEFORE it is written, then
+      stored in modules/secrets/secrets.yaml with its expiry and mirrored by
+      infra:secrets:sync. Prints only the account name and expiry.
+      TOKEN=<url|token>, TOKEN_FILE=<path>, NO_SYNC=1.
+    aliases: [gravatar:renew]
+    cmds:
+      - |
+        python3 scripts/task/gravatar-token.py \
+          ${TOKEN:+--token "$TOKEN"} \
+          ${TOKEN_FILE:+--token-file "$TOKEN_FILE"} \
+          ${NO_SYNC:+--no-sync}
+
+  gravatar:status:
+    desc: Check the stored Gravatar OAuth token against the live API
+    summary: >
+      Read-only: decrypts the token and its expiry from sops, asks
+      /v3/me/profile, and prints ok or rejected. Exit 1 when the token is
+      missing, rejected, or expired — that is the signal to run
+      `task gravatar:token`.
+    cmds:
+      - python3 scripts/task/gravatar-token.py --status
+
+  gravatar:check:
+    desc: Report drift between modules/config/gravatar.toml and the live profile
+    summary: >
+      Read-only, no writes and no token mint. Compares names, display name,
+      about, pronunciation, pronouns, location, job title, company, timezone,
+      languages, interests and links against the file. Exit 1 on any drift.
+    cmds:
+      - python3 scripts/task/gravatar-profile.py
+
+  gravatar:sync:
+    desc: Push writable profile fields from modules/config/gravatar.toml to Gravatar
+    summary: >
+      PATCHes only the scalar fields that differ, then re-reads the profile to
+      prove the result. Links, interests, languages and timezone have no public
+      write endpoint: drift there is reported and the task exits 1 instead of
+      claiming success. The file is the only source; nothing is invented.
+    cmds:
+      - python3 scripts/task/gravatar-profile.py --apply
+
+  gravatar:signature:
+    desc: Print the mail signature himalaya sends, rendered from the Gravatar profile
+    summary: >
+      Read-only. modules/config/gravatar-profile.nix reads the TOML at
+      eval time and returns the same three lines himalaya appends to mail, so
+      this preview cannot drift from what a recipient sees. The TOML must be
+      tracked in git: a flake eval only sees tracked files.
+    cmds:
+      - nix eval --impure --raw --expr '(import ./modules/config/gravatar-profile.nix).signature'

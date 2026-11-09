@@ -162,6 +162,41 @@
         fi
       ''}
 
+      # --- newest scheduled audit outcome ------------------------------------
+      # The audit writes one TSV line per run (`ts`, `outcome`, `reason`). Its
+      # unit Result is `success` even when every agent tier failed — the script
+      # records the failure and exits 0 so the next run still happens — so the
+      # outcome file, not the unit state, is the signal. A stale record degrades
+      # too: an audit that stopped running reports nothing, and silence is not a
+      # verdict.
+      AUDIT_JSON="null"
+      ${lib.optionalString (cfg.auditRecord != null) ''
+        AUDIT_TS=""
+        AUDIT_OUTCOME=""
+        AUDIT_REASON=""
+        if [ -r "${cfg.auditRecord}" ]; then
+          IFS=$'\t' read -r AUDIT_TS AUDIT_OUTCOME AUDIT_REASON < "${cfg.auditRecord}" || true
+        fi
+        if [ -n "$AUDIT_OUTCOME" ]; then
+          AUDIT_JSON="$(jq -cn --arg ts "$AUDIT_TS" --arg outcome "$AUDIT_OUTCOME" \
+            --arg reason "''${AUDIT_REASON:-}" \
+            '{ts: $ts, outcome: $outcome, reason: $reason}')"
+          # Assigned, not inlined: a `case` on a literal word trips SC2194, and
+          # writeShellApplication fails the build on any shellcheck finding.
+          AUDIT_FAIL_SET=" ${lib.concatStringsSep " " cfg.auditFailOutcomes} "
+          case "$AUDIT_FAIL_SET" in
+            *" $AUDIT_OUTCOME "*) REASONS+=("audit-failed:$AUDIT_OUTCOME") ;;
+          esac
+          AUDIT_EPOCH="$(date -d "$AUDIT_TS" +%s 2>/dev/null || echo 0)"
+          if [ "$AUDIT_EPOCH" -gt 0 ]; then
+            AUDIT_AGE_H="$(awk -v now="$(date +%s)" -v then="$AUDIT_EPOCH" 'BEGIN { printf "%.1f", (now - then) / 3600 }')"
+            if awk -v age="$AUDIT_AGE_H" -v max="${toString cfg.auditMaxAgeHours}" 'BEGIN { exit !(age > max) }'; then
+              REASONS+=("audit-stale:''${AUDIT_AGE_H}h")
+            fi
+          fi
+        fi
+      ''}
+
       # --- assemble ----------------------------------------------------------
       if [ "''${#REASONS[@]}" -eq 0 ]; then
         STATE="ok"
@@ -186,10 +221,11 @@
         --argjson io_psi "$IO_PSI" \
         --argjson mem_psi "$MEM_PSI" \
         --argjson prefill "$PREFILL_JSON" \
+        --argjson audit "$AUDIT_JSON" \
         '{schema: 1, ts: $ts, host: $host, state: $state, reasons: $reasons,
           failed_units: $failed_units, jobs: $jobs, generation_age_h: $gen_age_h,
           disk_pct: $disk, psi: {io: $io_psi, memory: $mem_psi},
-          prefill: $prefill}')"
+          prefill: $prefill, audit: $audit}')"
 
       printf '%s\n' "$EVENT" >> "$LEDGER"
       # Bounded history: ~100 days at the 15-minute default, enough to correlate
@@ -262,6 +298,40 @@ in {
         newest object is projected into `status.json` as `prefill`. Null means
         no such job on this host. Point it at
         {option}`services.steamCache.prefill.ledger` on a host that prefills.
+      '';
+    };
+
+    auditRecord = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        File a scheduled audit rewrites after each run, one tab-separated line:
+        ISO timestamp, outcome, reason. Its newest contents are projected into
+        `status.json` as `audit`; an outcome listed in
+        {option}`auditFailOutcomes` degrades the sentinel, and so does a record
+        older than {option}`auditMaxAgeHours`. Null means no such job on this
+        host. The path must be readable by the collector (root), so it cannot
+        live under a user's home — the collector runs with `ProtectHome`.
+      '';
+    };
+
+    auditFailOutcomes = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = ["fallback"];
+      description = ''
+        Outcomes that degrade the sentinel when they are the newest record. The
+        producer decides the vocabulary; the default names the one case where a
+        job finished without doing its work.
+      '';
+    };
+
+    auditMaxAgeHours = lib.mkOption {
+      type = lib.types.float;
+      default = 192.0;
+      description = ''
+        Degrade when the newest audit record is older than this. 192 h is a
+        weekly cadence plus a missed week, so one skipped run is reported rather
+        than waited out.
       '';
     };
 

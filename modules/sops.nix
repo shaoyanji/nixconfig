@@ -50,11 +50,12 @@ in {
       # envs.net pubnix mail (mail.envs.net). Same shape as `gmail`: one string,
       # consumed by himalaya's passwordCommand.
       "envsmail" = {};
-      # Cal.com API key for the personal calendar. delphi's calendar access reads
-      # it to look at availability and create a booking through the v2 bookings
-      # API, instead of driving the web UI. The key sits in the default secrets
-      # file as `caldotcom`.
-      "caldotcom" = {};
+      # Cal.com API key for the personal calendar, read by an agent backend that
+      # asks for availability and creates a booking through the v2 bookings API.
+      # Gated on the `agent-backend` trait rather than declared everywhere: a
+      # desktop that never runs an agent has no use for a scheduling credential,
+      # and every declared secret is one more file decrypted on that host.
+      "caldotcom" = lib.mkIf (builtins.elem "agent-backend" traits) {};
       # Resend's API key, used as the SMTP password for bountystash.com outbound
       # mail (modules/himalaya.nix). The key sits in the apikeys plane, not the
       # default secrets file, so this names both the file and the nested path.

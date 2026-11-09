@@ -63,7 +63,7 @@ ssh_alias = "frieren"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Harmonia (LAN binary cache on :5000)", "Shelter host for delphi's offloaded services: docs/vault/anki vhosts and /srv/backup/offload (paperless + vaultwarden moved to delphi 2026-11-02)", "Hermes Agent & Gateway (user systemd service)", "Home Assistant (:8123); Mosquitto module off since 2026-11-09 (zero clients in 7 days)", "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)", "Immich Photo Server & ML backend", "Jellyfin Media Server (:8096)", "Plex Media Server", "Aria2 RPC daemon (:6801 + AriaNg web)", "Paste (pb server at paste.frieren.lan)", "iVentoy PXE server", "Samba & NFS export (/srv/data)"]
-traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock", "ai-full", "tpm-identity", "nas-server"]
+traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock", "ai-full", "tpm-identity", "nas-server", "agent-backend"]
 
 [hosts.frieren.persona]
 title = "Fleet Mainframe & Storage Steward"
@@ -270,7 +270,7 @@ note = "Gatus, watching frieren from outside its LAN"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["nginx :443 — Let's Encrypt TLS for the public dossier, /healthz, :80 redirect", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry NXDOMAIN, failover pair with frieren)", "Tailscale exit node, advertising the shared 10.99.0.53/32 route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness, tailnet-only (:8443, dsh-web on loopback :3080)", "System One decision engine, tailnet-only (:8444, loopback :8091)", "Stirling PDF, tailnet-only (:8445, loopback :7351)", "Service console, tailnet-only (:8446, loopback :8082)", "Gemini capsule on :1965 (portfolio as gemtext, resume.json/lebenslauf.json) and :1966 on the tailnet", "Gatus fleet monitors — an out-of-LAN vantage", "Paperless-ngx, tailnet-only (:28981), served as docs.frieren.lan through frieren's vhost (moved off frieren 2026-11-02)", "Vaultwarden, tailnet-only (:8222, notifications websocket on the same port since 1.30), served as vault.frieren.lan (moved 2026-11-02)", "Anki sync server, tailnet-only (:27701), served as anki.frieren.lan (moved 2026-11-02)", "Shelter bridge: paperless, vaultwarden and anki state mirrored nightly to frieren:/srv/backup/offload", "Radicale CalDAV/CardDAV (:8457), ntfy push (:8458), Vikunja tasks with CalDAV (:8459), agent-turn dashboard with per-turn Hermes prompts (:8460), media relay for range-served video (:8461) — tailnet-only, added 2026-11-06", "OCI serial console logging"]
-traits = ["cloud-server", "aarch64-arm", "11gb-ram", "tailscale-exit-node", "oci-always-free"]
+traits = ["cloud-server", "aarch64-arm", "11gb-ram", "tailscale-exit-node", "oci-always-free", "agent-backend"]
 
 [hosts.delphi.persona]
 title = "Cloud Bastion & ARM64 Build Offloader"

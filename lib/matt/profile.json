@@ -6,14 +6,31 @@
     "title": "Systems & Security Engineer",
     "subtitle": "Go · NixOS fleets · vulnerability data · energy infrastructure",
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
-    "status": "Systems and security engineer, looking for a senior role",
-    "bio": "I build infrastructure that can be rebuilt from a single commit: Go services with append-only state, NixOS fleets with their own certificate authority, and data pipelines that turn operational noise into a decision. Most of that work has been in energy — telemetry, valuation and risk across renewable portfolios worth more than $100M. The rest is vulnerability data, where CISA's KEV catalogue is the raw material.",
+    "status": "Open to senior and lead roles",
+    "bio": "Most of my working life has gone into making operational data usable. I ran asset management for a solar portfolio above $100M for four years: yield models that passed bank audits, mobile field capture, and telemetry reconciliation when sensors went missing. Since 2023 I have run thirteen NixOS hosts from one flake, with an SSH certificate authority and encrypted secrets per host. The free hours go to CISA's KEV catalogue, building tools that turn the exploited list into a patch order a team can work through.",
     "contacts": [
-      { "label": "email", "href": "mailto:matt@bountystash.com" },
-      { "label": "github", "href": "https://github.com/shaoyanji" },
-      { "label": "linkedin", "href": "https://linkedin.com/in/mattji" },
-      { "label": "portfolio", "href": "https://www.bountystash.com" }
-    ]
+      {
+        "label": "email",
+        "href": "mailto:matt@bountystash.com"
+      },
+      {
+        "label": "github",
+        "href": "https://github.com/shaoyanji"
+      },
+      {
+        "label": "linkedin",
+        "href": "https://linkedin.com/in/mattji"
+      },
+      {
+        "label": "xing",
+        "href": "https://xing.com/profile/Shaoyan_Ji"
+      }
+    ],
+    "workAuth": "US citizen with German permanent residence; no sponsorship or relocation needed"
+  },
+  "analytics": {
+    "endpoint": "",
+    "site": ""
   },
   "ui": {
     "skip": "Skip to content",
@@ -25,119 +42,218 @@
     "filterPlaceholder": "nixos, certificate authority, valuation…",
     "filterNone": "No entry matches that. Clear the field to see all of them.",
     "filterOf": "of",
-    "footer": "Compiled by Nix from lib/matt/profile.json — one inline script switches the colour scheme; no webfonts, no tracking. Source: github.com/shaoyanji/nixconfig.",
+    "projectsFilterLabel": "Filter the archive",
+    "projectsFilterPlaceholder": "kev, go, energy, thesis…",
+    "projectsFilterNone": "No project matches that. Clear the field to see all of them.",
+    "footer": "Source: github.com/shaoyanji/nixconfig",
+    "footerPrivacy": "No cookies, no webfonts, no third-party scripts.",
+    "footerPrivacyAnalytics": "Cookieless analytics, no cookies and no profiles.",
     "headings": {
       "focus": "Focus",
       "work": "Selected work",
+      "projects": "Projects",
       "stack": "Stack",
-      "hire": "Looking for work"
+      "hire": "What I am looking for"
     },
     "nav": {
       "focus": "Focus",
       "work": "Work",
+      "projects": "Projects",
       "lab": "KEV lab",
       "stack": "Stack",
       "hire": "Open to work"
-    }
+    },
+    "caseLabel": "Read the case study",
+    "briefsLabel": "First ninety days",
+    "cvLabel": "CV (PDF)",
+    "archiveNote": "Tools, research and side projects — the parts a role description has no room for.",
+    "caseKicker": "Case study",
+    "briefKicker": "Brief",
+    "langNames": {
+      "English": "English",
+      "German": "German"
+    },
+    "fluency": {
+      "Native speaker": "native",
+      "B2": "B2"
+    },
+    "items": "items"
   },
   "focus": [
     {
       "title": "Reproducible fleets",
-      "body": "NixOS and flakes across servers, workstations and a cloud endpoint. One commit describes the machine; a switch is the deployment."
+      "body": "Thirteen machines, one repository. Rebuilding a host, auditing it or handing it to someone else takes the commit, not a folder of install notes."
     },
     {
       "title": "Go services with bounded work",
-      "body": "Server-rendered binaries and append-only event logs. No frontend build, no framework, small enough to audit in an afternoon."
+      "body": "One binary per service, serving HTML, JSON and a terminal UI. Small enough to read in an afternoon, and state is a log of what happened rather than a row someone edited."
     },
     {
       "title": "Vulnerability data that ends in action",
-      "body": "KEV as a time series and as work clusters: what is exploited now, and which patch order removes the most risk per hour spent."
+      "body": "CISA's exploited list as a time series and as clusters a team can finish this week. The output is a patch order, not another dashboard."
     }
   ],
   "work": [
     {
       "title": "Multi-host NixOS fleet",
       "role": "Author and operator",
-      "period": "2023 — now",
-      "description": "One flake for a fleet of NixOS hosts: NAS, workstations, a cloud endpoint and a remote builder, an SSH certificate authority with rotation, encrypted secrets, and a taskfile as the only interface. Every host is commissioned by registering one line.",
+      "description": "I moved thirteen machines off per-host install notes and onto one repository. Rebuilding, auditing or handing over a host is now the commit plus one command; secrets are encrypted per host and certificates rotate on a schedule.",
       "link": "https://github.com/shaoyanji/nixconfig",
-      "highlights": [
-        "One flake describes ten hosts: a NAS, workstations, a cloud endpoint and a remote builder.",
-        "An SSH certificate authority with rotation, and SOPS-encrypted secrets per host and user.",
-        "A taskfile is the only operator interface, so no host carries its own runbook.",
-        "The same module gate runs locally and in CI, which is what makes a passing switch evidence."
-      ]
+      "caseStudy": "nixos-fleet",
+      "keywords": [
+        "NixOS",
+        "flakes",
+        "certificate authority",
+        "SOPS",
+        "CI gate"
+      ],
+      "org": "",
+      "period": "2023 — now",
+      "sortStart": "2023-01-01"
     },
     {
       "title": "bountystash: deterministic work engine",
-      "role": "Creator",
-      "period": "2024 — now",
-      "description": "A single Go binary that turns a request into an immutable, content-addressed specification: append-only events, keyboard-first terminal UI, curl-friendly endpoints, zero frontend dependencies.",
+      "role": "Founder and engineer",
+      "description": "A request arrives as prose and has drifted by the time the work is done. I built a Go service that records it as an immutable document, so a job's state replays a month later and two people can agree on what was asked. One binary serves HTML, JSON and a terminal UI.",
       "link": "https://github.com/shaoyanji/bountystash",
-      "highlights": [
-        "An append-only event log, so every state is a replay of recorded facts.",
-        "One Go binary serves HTML, JSON and a keyboard-first TUI; there is no frontend build.",
-        "Specifications are content-addressed, so the same request yields the same document.",
-        "curl-friendly endpoints, which is what makes it usable in the middle of an incident."
-      ]
+      "caseStudy": "bountystash",
+      "keywords": [
+        "Go",
+        "event log",
+        "content addressing",
+        "TUI"
+      ],
+      "org": "Bountystash"
     },
     {
       "title": "fibtransponder",
       "role": "Research and implementation",
-      "period": "2026",
-      "description": "A Fibonacci-radix streaming state machine for tokenization experiments: bounded per-step work over a bitstream, adjacency width as a locality selector, Zobrist seed tables, and a corpus benchmark that falsified the seed-only detector.",
+      "description": "I set out to build a stream detector and wrote the benchmark first. The measurement killed the first design, so what ships is the smaller claim: a state machine whose work per step stays bounded, with the corpus that falsified the rest in the repository.",
       "link": "https://github.com/shaoyanji/fibtransponder",
-      "highlights": [
-        "A Fibonacci-radix streaming state machine over a bitstream, with bounded work per step.",
-        "Adjacency width works as a locality selector instead of a global lookup table.",
-        "Zobrist seed tables keep the state transitions cheap enough to stream.",
-        "A corpus benchmark falsified the seed-only detector, so the claim got smaller instead of louder."
-      ]
+      "caseStudy": "fibtransponder",
+      "keywords": [
+        "Go",
+        "streaming",
+        "Zobrist hashing",
+        "benchmark"
+      ],
+      "org": "",
+      "period": "2026",
+      "sortStart": "2026-01-01"
     },
     {
       "title": "Energy telemetry and valuation",
-      "role": "Lead operations, O3 Energy",
-      "period": "2016 — 2020",
-      "description": "Quantitative steering of a solar portfolio above $100M: yield and valuation models that survived bank audits, mobile field data capture, and counterparty risk that institutional lenders accepted.",
+      "role": "Asset manager, O3 Energy",
+      "description": "Four years running the numbers behind a solar portfolio above $100M: yield and valuation models that satisfied bank auditors, mobile capture for field technicians, and a reconciliation step that turned a dead sensor into a known error instead of a good month.",
       "link": "",
-      "highlights": [
-        "Yield and valuation models that survived bank audits on a portfolio above $100M.",
-        "Mobile field capture feeding the same pipeline as the meteorological data.",
-        "Counterparty risk reported in the form institutional lenders accepted.",
-        "Telemetry reconciliation that turned missing sensor data into a known error budget."
-      ]
+      "caseStudy": "energy-telemetry",
+      "keywords": [
+        "valuation",
+        "yield models",
+        "bank audit",
+        "telemetry"
+      ],
+      "org": "O3 Energy"
+    },
+    {
+      "title": "Smart Energy 360",
+      "role": "Director of Sustainability",
+      "description": "Built and ran a project pipeline above $100M for commercial clients moving to cleaner electricity, with the sustainability strategy and the risk advice that went with it.",
+      "link": "",
+      "keywords": [
+        "sustainability",
+        "project pipeline",
+        "risk"
+      ],
+      "org": "Smart Energy 360"
+    },
+    {
+      "title": "Fraunhofer ISE",
+      "role": "Research assistant",
+      "description": "Measured heliostat imperfections with interferometry: C++ for the instrument, Python for analysis and 3D geometry.",
+      "link": "",
+      "keywords": [
+        "optics",
+        "C++",
+        "Python",
+        "solar"
+      ],
+      "org": "Fraunhofer ISE"
+    },
+    {
+      "title": "Halliburton",
+      "role": "Associate Technical Professional",
+      "description": "Two frac crews in the Bakken shale: chemicals and equipment faults fixed on site, twelve-hour shifts, and the safety training for the crew.",
+      "link": "",
+      "keywords": [
+        "field engineering",
+        "safety",
+        "oil and gas"
+      ],
+      "org": "Halliburton"
     }
   ],
   "lab": {
     "title": "The KEV lab",
-    "body": "Two public tools make CISA's Known Exploited Vulnerabilities catalogue legible. kev-time plots exploitation over time, so a trend is visible before a report exists. kelly-svg groups entries into clusters a team can work through, so the patch plan follows from data instead of instinct. Both are static SVG and plain HTML, built to be read on a phone during an incident. A third page puts the same data in the shape of a programme: a sample queue of exploited entries grouped by effort, at concept.bountystash.com.",
+    "body": "Two public tools read CISA's Known Exploited Vulnerabilities catalogue. kev-time plots exploitation over time, so a trend shows up before a report does. kelly-svg groups entries into clusters a team can work through, so patch order follows effort and exposure. Both are static SVG and plain HTML, readable on a phone during an incident. concept.bountystash.com puts the same data into a programme: a sample queue grouped by effort.",
     "links": [
-      { "label": "kev-time", "href": "https://jisifu.serv00.net/kev-time/" },
-      { "label": "kelly-svg", "href": "https://jisifu.serv00.net/kelly-svg/" },
-      { "label": "concept mockup", "href": "https://concept.bountystash.com/" }
+      {
+        "label": "kev-time",
+        "href": "https://jisifu.serv00.net/kev-time/"
+      },
+      {
+        "label": "kelly-svg",
+        "href": "https://jisifu.serv00.net/kelly-svg/"
+      },
+      {
+        "label": "concept mockup",
+        "href": "https://concept.bountystash.com/"
+      }
     ]
   },
   "stack": [
     {
       "category": "Systems and concurrency",
-      "items": ["Go", "channels and state machines", "PostgreSQL", "Redis", "gRPC and REST", "Kafka", "Python"]
+      "items": [
+        "Go",
+        "channels and state machines",
+        "PostgreSQL",
+        "Redis",
+        "gRPC and REST",
+        "Kafka",
+        "Python"
+      ]
     },
     {
       "category": "Declarative infrastructure",
-      "items": ["NixOS", "Nix flakes", "SSH certificate authority", "SOPS and age", "Tailscale", "ZFS and btrfs", "systemd"]
+      "items": [
+        "NixOS",
+        "Nix flakes",
+        "SSH certificate authority",
+        "SOPS and age",
+        "Tailscale",
+        "ZFS and btrfs",
+        "systemd"
+      ]
     },
     {
       "category": "Domain",
-      "items": ["asset valuation", "solar telemetry reconciliation", "risk models", "bank audit reporting", "KEV and CVSS", "Typst"]
+      "items": [
+        "asset valuation",
+        "solar telemetry reconciliation",
+        "risk models",
+        "bank audit reporting",
+        "KEV and CVSS",
+        "Typst"
+      ]
     }
   ],
   "hire": {
-    "title": "I am the engineer, and I am looking for a role",
-    "body": "This page is a CV, not a job advert: I am not hiring. I am a systems and security engineer looking for a senior or lead role where infrastructure and security meet — platform engineering, site reliability, or vulnerability operations. Remote with a CET base, or Freiburg and the Upper Rhine on site.",
+    "title": "What I am looking for",
+    "body": "A senior or lead role where infrastructure and security meet: platform engineering, site reliability, or vulnerability operations. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
+    "briefsNote": "Two notes on what I would do in the first ninety days:",
     "wants": [
-      "US citizen with German permanent residence — no sponsorship, no relocation needed",
-      "English native, German C1",
-      "Go, Python, PostgreSQL, NixOS — comfortable owning a service end to end",
+      "Go, Python, PostgreSQL, NixOS; comfortable owning a service end to end",
       "Available on short notice"
     ],
     "cta": {

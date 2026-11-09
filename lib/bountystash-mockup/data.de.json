@@ -28,7 +28,7 @@
   ],
   "hero": {
     "kicker": "Konzept für ein Bug-Bounty- und Schwachstellenprogramm",
-    "title": "Die Liste des Ausgenutzten, als Warteschlange, die sich abarbeiten lässt.",
+    "title": "Die Liste der ausgenutzten Schwachstellen, als Warteschlange, die sich abarbeiten lässt.",
     "body": "bountystash liest den Katalog bekannter ausgenutzter Schwachstellen von CISA, gruppiert die Einträge nach dem Aufwand, den eine Behebung tatsächlich kostet, und schreibt daraus einen Arbeitsauftrag: was gegen deinen Stack ausgenutzt wird, in der Reihenfolge, die pro investierter Stunde das meiste Risiko entfernt. Kein Scanner-Rauschen. Kein tausendseitiger Bericht. Eine Warteschlange mit Zuständigen und einem Abschlussvermerk.",
     "cta": { "label": "Beispiel-Warteschlange ansehen", "href": "#exposure" },
     "alt": { "label": "Über einen Pilot sprechen", "href": "mailto:matt@bountystash.com?subject=bountystash%20Pilot" }

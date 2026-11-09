@@ -8,6 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="profile">
+<meta property="og:site_name" content="Matt Ji">
 <meta property="og:title" content="{{title}}">
 <meta property="og:description" content="{{description}}">
 <meta property="og:url" content="{{url}}">
@@ -49,7 +50,7 @@
   <p class="sub">{{subtitle}}</p>
   <p class="lede">{{bio}}</p>
   <p class="where">{{location}}</p>
-  <nav class="links" aria-label="Contact">{{contacts}}</nav>
+  <nav class="links" aria-label="Contact">{{contacts}}<a class="cv" href="{{cvHref}}" data-event="cv">{{cvLabel}}</a></nav>
 </header>
 <nav class="index" aria-label="{{navLabel}}">{{nav}}</nav>
 <main id="main">
@@ -76,48 +77,47 @@
   })();
 </script>
 <script>
-  /* Fuzzy filter for the work list. Subsequence matching, so "nix fle" finds
-     "NixOS fleets" without a dependency, a build step or a network call. */
+  /* One filter per group, subsequence matching, no dependency. A visitor without
+     JavaScript sees the full list and never a dead control. */
   (function () {
-    var bar = document.querySelector("[data-filter-bar]");
-    var input = document.querySelector("[data-filter-input]");
-    var list = document.querySelector("[data-filter-list]");
-    var empty = document.querySelector("[data-filter-none]");
-    var count = document.querySelector("[data-filter-count]");
-    if (!bar || !input || !list || !count) return;
-    var items = Array.prototype.slice.call(list.children);
-    var of = bar.getAttribute("data-of") || "of";
-    bar.hidden = false;
+    var groups = document.querySelectorAll("[data-filter-group]");
     function hit(hay, query) {
-      var i = 0;
-      var j = 0;
+      var i = 0, j = 0;
       while (i < hay.length && j < query.length) {
         if (hay.charAt(i) === query.charAt(j)) j += 1;
         i += 1;
       }
       return j === query.length;
     }
-    function apply() {
-      var query = input.value.trim().toLowerCase();
-      var shown = 0;
-      items.forEach(function (item) {
-        var hay = item.getAttribute("data-search") || "";
-        var match = query === "" || hit(hay, query);
-        item.hidden = !match;
-        if (match) shown += 1;
-      });
-      count.textContent = shown + " " + of + " " + items.length;
-      if (empty) empty.hidden = shown !== 0;
-    }
-    input.addEventListener("input", apply);
-    input.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") {
-        input.value = "";
-        apply();
+    Array.prototype.forEach.call(groups, function (group) {
+      var bar = group.querySelector("[data-filter-bar]");
+      var input = group.querySelector("[data-filter-input]");
+      var list = group.querySelector("[data-filter-list]");
+      var empty = group.querySelector("[data-filter-none]");
+      var count = group.querySelector("[data-filter-count]");
+      if (!bar || !input || !list || !count) return;
+      var items = Array.prototype.slice.call(list.children);
+      var of = bar.getAttribute("data-of") || "of";
+      bar.hidden = false;
+      function apply() {
+        var query = input.value.trim().toLowerCase();
+        var shown = 0;
+        items.forEach(function (item) {
+          var match = query === "" || hit(item.getAttribute("data-search") || "", query);
+          item.hidden = !match;
+          if (match) shown += 1;
+        });
+        count.textContent = shown + " " + of + " " + items.length;
+        if (empty) empty.hidden = shown !== 0;
       }
+      input.addEventListener("input", apply);
+      input.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") { input.value = ""; apply(); }
+      });
+      apply();
     });
-    apply();
   })();
 </script>
+{{analytics}}
 </body>
 </html>

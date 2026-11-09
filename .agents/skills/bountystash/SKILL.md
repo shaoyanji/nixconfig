@@ -26,9 +26,11 @@ appears; a deploy to a name nobody created would make a second project.
 
 The repo also renders a second, different page: `.#sites.bountystash-site`
 (`lib/bountystash-site.nix`, from `lib/bountystash/portfolio.json` — the same
-data the Gemini capsule serves). It is not what production runs. Its
-`bountystash:deploy:nix:*` tasks publish it on purpose, and a `main` deploy
-replaces the console until the next console deploy.
+data the Gemini capsule serves). **Production is that page now**: a
+`bountystash:deploy:nix:prod` deploy onto `cv-resume` put the Nix portfolio on
+`bountystash.com`, and a `bountystash:deploy:prod` (console) would replace it
+until the next Nix deploy. The two templates share one Pages project and one
+custom domain; they do not share a stylesheet or a URL.
 
 ## The constraint that shapes everything
 
@@ -48,5 +50,22 @@ never blocked.
 `bountystash:login` is the Wrangler OAuth device grant; `:whoami` proves which
 account is authenticated before a prod deploy, which is the mistake worth
 checking twice.
+
+## Both published surfaces
+
+Every page carries a canonical, `og:url`, a 1200×630 PNG card per locale, hreflang
+alternates and a sitemap entry; `site:check` asserts that over HTTP and
+`site:links` asserts the pages can actually load their own CSS.
+
+```bash
+task site:check         # live: robots, sitemap, canonical, og:image, hreflang per host
+task site:links         # offline: build both sites, resolve every internal href/src
+```
+
+`site:links` is the one that catches a stylesheet 404. The case studies live at
+`/work/<slug>` — one directory deeper than the home pages — so a href built from
+the locale's depth (`style.css`) is served from `/work/style.css`, which does not
+exist: the page returns 200 and renders unstyled, and no status check sees it.
+Every internal link on the Nix site is therefore root-relative.
 
 Truth: `taskfiles/bountystash.yml` — the executable contract; this page is the procedure.

@@ -1,0 +1,466 @@
+{
+  "basics": {
+    "altLabels": [
+      "Programmer, Engineer, Consultant"
+    ],
+    "label": "Systems and Security Engineer",
+    "name": "Matt Ji",
+    "profiles": [
+      {
+        "network": "GitHub",
+        "url": "https://github.com/shaoyanji",
+        "username": "shaoyanji"
+      },
+      {
+        "network": "LinkedIn",
+        "url": "https://linkedin.com/in/mattji",
+        "username": "mattji"
+      },
+      {
+        "network": "XING",
+        "url": "https://xing.com/profile/Shaoyan_Ji",
+        "username": "Shaoyan_Ji"
+      }
+    ],
+    "summary": "Engineer and risk analyst, ten years across renewable energy and software. Builds the models and the systems that run them: options and hedging models for energy portfolios, Go services, a NixOS fleet, an email archive that classifies its own mail. Headed asset management for a USD 100M+ solar portfolio and researched heliostat metrology at Fraunhofer ISE.",
+    "url": "https://www.bountystash.com"
+  },
+  "education": [
+    {
+      "area": "Renewable Energy Management",
+      "courses": [
+        "Intermittent Renewable Energy and Weather Patterns Analyzed through Artificial Neural Networks"
+      ],
+      "endDate": "2014-02-01",
+      "institution": "University of Freiburg",
+      "score": "1,8/5,0",
+      "startDate": "2011-11-01",
+      "studyType": "Master of Science",
+      "url": "https://rem.zee-uni-freiburg.de/"
+    },
+    {
+      "area": "Petroleum Engineering",
+      "courses": [
+        "McBride Honors Program in Public Policy",
+        "Economics"
+      ],
+      "endDate": "2010-05-15",
+      "institution": "Colorado School of Mines",
+      "score": "3.2 GPA",
+      "startDate": "2006-08-01",
+      "studyType": "Bachelor of Science",
+      "url": "https://mines.edu/"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Native speaker",
+      "language": "English"
+    },
+    {
+      "fluency": "B2",
+      "language": "German"
+    }
+  ],
+  "meta": {
+    "language": "en",
+    "synced_tasks": [
+      "20260222-085142-normal"
+    ],
+    "theme": "papirus"
+  },
+  "projects": [
+    {
+      "description": "A polyglot risk calculation engine implementing Green's Theorem (Shoelace Formula) for stochastic shape analysis.",
+      "endDate": "2026-03-18",
+      "entity": "Personal Research",
+      "highlights": [
+        "Architected a 'Swirl Engine' using Green's Theorem to calculate polygon areas from random geometric data.",
+        "Implemented a Go-based shape fuzzer generating stochastic polygons to stress-test the calculation engine.",
+        "Orchestrated the pipeline using Nushell and Awk, bypassing compiler limitations for high-performance math.",
+        "Containerized the environment using Nix Flakes for reproducible Go 1.16+ development."
+      ],
+      "keywords": [
+        "Go",
+        "Nushell",
+        "Awk",
+        "Green's Theorem",
+        "Risk Analysis",
+        "NixOS",
+        "Polyglot Programming"
+      ],
+      "name": "Risk Calculation Engine (Swirl Engine)",
+      "roles": [
+        "Lead Developer",
+        "Researcher"
+      ],
+      "startDate": "2026-03-15",
+      "type": "open_source",
+      "url": "https://github.com/shaoyanji/risk-calc"
+    },
+    {
+      "description": "Artificial Intelligence applied to weather prediction",
+      "endDate": "2014-02-24",
+      "entity": "Meteorological Institute of Freiburg",
+      "highlights": [
+        "Developed a novel method for time-cross-correlating wind velocity data that yields a +70% accuracy",
+        "Trained neural network models for long-term weather data to optimize grid economics of intermittent solar and wind resources"
+      ],
+      "keywords": [
+        "Artificial Neural Networks",
+        "Fractal Geometry",
+        "Vector Analysis"
+      ],
+      "name": "Master's Thesis",
+      "roles": [
+        "Student"
+      ],
+      "startDate": "2013-08-01",
+      "type": "thesis",
+      "url": "https://www.academia.edu/6762743/A_Study_on_Energy_Intermittency_Reduction_Strategies_with_Emphasis_on_Weather_Pattern_Prediction"
+    },
+    {
+      "description": "Post-graduate research in renewable energy",
+      "endDate": "2013-02-28",
+      "entity": "United Nations University",
+      "highlights": [
+        "Analyzed hydrogen production and storage projects using RETScreen",
+        "Post-graduate research in renewable energy",
+        "Solar, Wind, Geothermal, and Bioenergy modules completed under the"
+      ],
+      "keywords": [
+        "Hydrogen Cells",
+        "Solar"
+      ],
+      "name": "Postgraduate Renewable Energy",
+      "roles": [
+        "Team lead",
+        "Engineer"
+      ],
+      "startDate": "2013-02-01",
+      "type": "course",
+      "url": "https://unu.edu"
+    },
+    {
+      "description": "One flake declares thirteen NixOS hosts, an SSH certificate authority, SOPS-encrypted secrets and a taskfile as the operator interface. CI runs the same module gate the machines run.",
+      "endDate": "",
+      "entity": "Personal",
+      "keywords": [
+        "Nix",
+        "NixOS",
+        "systemd",
+        "SOPS",
+        "Tailscale"
+      ],
+      "name": "nixconfig",
+      "startDate": "2023-01-01",
+      "type": "open source",
+      "url": "https://github.com/shaoyanji/nixconfig"
+    },
+    {
+      "description": "A Go service that turns a request into an immutable, content-addressed specification. Append-only events, a terminal UI and curl endpoints all come from one binary.",
+      "endDate": "2025-08-01",
+      "entity": "Founder",
+      "keywords": [
+        "Go",
+        "event log",
+        "TUI",
+        "content addressing"
+      ],
+      "name": "bountystash",
+      "startDate": "2020-06-01",
+      "type": "product",
+      "url": "https://github.com/shaoyanji/bountystash"
+    },
+    {
+      "description": "A Fibonacci-radix state machine that streams a bitstream with bounded work per step. A corpus benchmark falsified the first detector design, so the claim narrowed.",
+      "endDate": "2026-06-01",
+      "entity": "Personal research",
+      "keywords": [
+        "Go",
+        "streaming",
+        "Zobrist hashing",
+        "benchmarks"
+      ],
+      "name": "fibtransponder",
+      "startDate": "2026-01-01",
+      "type": "research",
+      "url": "https://github.com/shaoyanji/fibtransponder"
+    },
+    {
+      "description": "CISA's Known Exploited Vulnerabilities catalogue drawn as a time series in static SVG, so a trend is readable before a report exists and the page still loads on a phone during an incident.",
+      "endDate": "",
+      "entity": "KEV lab",
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "data viz"
+      ],
+      "name": "kev-time",
+      "startDate": "2026-02-01",
+      "type": "tool",
+      "url": "https://jisifu.serv00.net/kev-time/"
+    },
+    {
+      "description": "KEV entries grouped into effort clusters with exposure per cluster, giving a patch order that follows effort and reach instead of the order the catalogue happens to use.",
+      "endDate": "",
+      "entity": "KEV lab",
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "risk"
+      ],
+      "name": "kelly-svg",
+      "startDate": "2026-03-01",
+      "type": "tool",
+      "url": "https://jisifu.serv00.net/kelly-svg/"
+    },
+    {
+      "description": "A sample vulnerability programme built from KEV data: an exposure table, effort clusters, a 90-day method and a service model. Sample data throughout, and the page says so.",
+      "endDate": "",
+      "entity": "bountystash",
+      "keywords": [
+        "KEV",
+        "programme design",
+        "HTML"
+      ],
+      "name": "Vulnerability operations concept",
+      "startDate": "2026-11-01",
+      "type": "concept",
+      "url": "https://concept.bountystash.com/"
+    },
+    {
+      "description": "This page. Two locales from one template, one stylesheet with light and dark palettes, a CV rendered from the same JSON, and share cards generated at build time.",
+      "endDate": "",
+      "entity": "Personal",
+      "keywords": [
+        "Nix",
+        "HTML",
+        "Typst",
+        "i18n"
+      ],
+      "name": "matt.bountystash.com",
+      "startDate": "2026-11-01",
+      "type": "site",
+      "url": "https://matt.bountystash.com"
+    }
+  ],
+  "skills": [
+    {
+      "keywords": [
+        "HTML",
+        "CSS",
+        "Javascript",
+        "Next.js",
+        "React",
+        "Laravel",
+        "HTMX"
+      ],
+      "level": "Master",
+      "name": "Web Development"
+    },
+    {
+      "keywords": [
+        "SQL",
+        "PostgreSQL",
+        "MySQL",
+        "Django",
+        "FastAPI",
+        "Flask"
+      ],
+      "level": "Master",
+      "name": "Backend & Database"
+    },
+    {
+      "keywords": [
+        "Lua",
+        "Erlang",
+        "Java",
+        "Kotlin",
+        "Go",
+        "Python",
+        "C",
+        "C++",
+        "Bash",
+        "Nim"
+      ],
+      "level": "Master",
+      "name": "Programming Languages"
+    },
+    {
+      "keywords": [
+        "Kubernetes",
+        "NixOS",
+        "AWS",
+        "Azure",
+        "Google Cloud"
+      ],
+      "level": "Master",
+      "name": "DevOps"
+    },
+    {
+      "keywords": [
+        "energy trading",
+        "PPA",
+        "weather derivatives",
+        "risk management",
+        "assets",
+        "portfolio",
+        "due diligence",
+        "financial modelling"
+      ],
+      "name": "Energy & Risk"
+    },
+    {
+      "keywords": [
+        "bug bounty",
+        "vulnerability management",
+        "CISA KEV",
+        "SOPS",
+        "SSH CA",
+        "threat modelling"
+      ],
+      "name": "Security"
+    }
+  ],
+  "work": [
+    {
+      "description": "Cybersecurity Energy Financial Consulting firm",
+      "endDate": "2025-08-19",
+      "highlights": [
+        "Built an algorithm for options trading and hedging on weather derivatives",
+        "Advised clients and acted as in-house Risk Manager for a top German energy trader",
+        "Built an immutable web templating language that is invulnerable to scripting attacks",
+        "Built risk-adjusted PPA trading models for energy companies",
+        "Risk-managed gas storage and gas swing trading models as risk manager for EWE Trading",
+        "Built apps for clients holding land portfolios valued above USD 300M",
+        "Architected a covered-call hedging strategy for client portfolios",
+        "Developed a Fibonacci binary tree algorithm for computational scientists",
+        "Developed an LLM-based knowledge base for consulting work",
+        "Audited bug bounty programmes"
+      ],
+      "keywords": [
+        "risk",
+        "PPA",
+        "weather derivatives",
+        "options pricing",
+        "gas storage",
+        "trading models",
+        "Go",
+        "web security",
+        "LLM",
+        "bug bounty",
+        "portfolio strategy"
+      ],
+      "location": "Freiburg, DE",
+      "name": "Bountystash",
+      "position": "Founder",
+      "startDate": "2020-06-01",
+      "summary": "Bountystash applies information theory, risk analysis and market data to\nnegotiation patterns and resource allocation: an advisory practice for energy\ntrading and risk management.\n",
+      "url": "https://bountystash.com"
+    },
+    {
+      "description": "Top Solar Developer",
+      "endDate": "2020-06-01",
+      "highlights": [
+        "Built financial models and managed 10 MW of solar PV power plants",
+        "Headed asset management of a USD 100M+ portfolio",
+        "Scoped and ran due diligence on O&M projects as cover for project managers",
+        "Documented and managed software and IT administration for the company and its subsidiaries",
+        "Worked with clients, banks and deal brokers on a dozen USD 4-5M projects",
+        "Analysed corporate liability risks and built the internal risk management framework",
+        "Designed a mobile app for enterprise employees hunting new project opportunities",
+        "Managed an international team and built an incentive structure tied to a real-time financial model"
+      ],
+      "keywords": [
+        "asset management",
+        "solar PV",
+        "financial modelling",
+        "due diligence",
+        "O&M",
+        "IT administration",
+        "risk management",
+        "mobile app",
+        "team leadership"
+      ],
+      "location": "Dallas, TX",
+      "name": "O3 Energy",
+      "position": "Asset Manager",
+      "startDate": "2016-08-01",
+      "summary": "O3 Energy has been rated as one of the top solar developers/contractors in the US.\nBased out of Dallas, TX, its projects include a portfolio of international commercial PV plants.\n",
+      "url": "https://o3energy.com"
+    },
+    {
+      "description": "Top Energy Contractor",
+      "endDate": "2016-08-01",
+      "highlights": [
+        "Managed a pipeline of USD 100M+ projects",
+        "Ran customer service and support for clients",
+        "Devised sustainability sales and marketing strategies",
+        "Advised clients on cybersecurity software and risk management"
+      ],
+      "keywords": [
+        "sustainability",
+        "sales strategy",
+        "cybersecurity",
+        "risk management",
+        "project pipeline"
+      ],
+      "location": "Dallas, TX",
+      "name": "Smart Energy 360",
+      "position": "Director of Sustainability",
+      "startDate": "2015-08-01",
+      "summary": "Smart Energy 360 is a top energy provider in the region and has built a clientele of\nsome of the top institutions looking to transition to cleaner electricity.\n",
+      "url": "https://smartenergy360.com"
+    },
+    {
+      "description": "Top Solar Research Institute",
+      "endDate": "2012-09-01",
+      "highlights": [
+        "Conducted research on heliostat imperfections using interferometry",
+        "Wrote C++ application software that interfaces with lab equipment",
+        "Wrote Python analysis and 3D geometry tooling",
+        "Verified geometry matrices in Mathematica"
+      ],
+      "keywords": [
+        "C++",
+        "Python",
+        "Mathematica",
+        "interferometry",
+        "heliostat",
+        "3D geometry"
+      ],
+      "location": "Freiburg, DE",
+      "name": "Fraunhofer ISE",
+      "position": "Hi-Wi",
+      "startDate": "2012-03-01",
+      "summary": "A world-renowned research institute in Germany and a foremost one in solar\ntechnologies.\n",
+      "url": "https://ise.fraunhofer.de"
+    },
+    {
+      "description": "International Oil Services Company",
+      "endDate": "2011-09-01",
+      "highlights": [
+        "Built new Excel spreadsheets for the engineering department",
+        "Managed two frac crews carrying USD 3M+ of work per week",
+        "Worked twelve-hour shifts in the field",
+        "Troubleshot chemicals and equipment on site",
+        "Led safety training for crew members",
+        "Worked on experimental projects using technologies developed by engineering"
+      ],
+      "keywords": [
+        "field engineering",
+        "hydraulic fracturing",
+        "safety training",
+        "troubleshooting",
+        "Excel"
+      ],
+      "location": "Williston, ND, US",
+      "name": "Halliburton",
+      "position": "Associate Technical Professional",
+      "startDate": "2010-06-01",
+      "summary": "One of the leading oil and gas service companies, known for technological\ninnovation. The site was in the Bakken Shale near Williston, North Dakota, one\nof the busiest boom towns of the time.\n",
+      "url": "https://halliburton.com"
+    }
+  ]
+}

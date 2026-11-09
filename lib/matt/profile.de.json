@@ -3,17 +3,34 @@
     "name": "Matt Ji",
     "url": "https://matt.bountystash.com",
     "handle": "matt@bountystash.com",
-    "title": "Systemingenieur für Infrastruktur und Sicherheit",
+    "title": "System- und Sicherheitsingenieur",
     "subtitle": "Go · NixOS-Flotten · Schwachstellendaten · Energieinfrastruktur",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
-    "status": "Systemingenieur für Infrastruktur und Sicherheit, offen für eine Senior-Rolle",
-    "bio": "Ich baue Infrastruktur, die sich aus einem einzigen Commit wiederherstellen lässt: Go-Dienste mit append-only Zustand, NixOS-Flotten mit eigener Zertifizierungsstelle und Datenpipelines, die aus Betriebsrauschen eine Entscheidung machen. Der größte Teil dieser Arbeit lag im Energiebereich — Telemetrie, Bewertung und Risiko über Portfolios aus erneuerbaren Anlagen im Wert von über 100 Mio. USD. Der Rest sind Schwachstellendaten, wo CISAs KEV-Katalog das Rohmaterial ist.",
+    "status": "Offen für Senior- und Lead-Rollen",
+    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen. Vier Jahre lang habe ich das Asset Management für ein Solarportfolio über 100 Mio. USD verantwortet: Ertragsmodelle, die Bankprüfungen bestanden, mobile Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Seit 2023 betreibe ich dreizehn NixOS-Hosts aus einem Flake, mit eigener SSH-Zertifizierungsstelle und verschlüsselten Secrets pro Host. In den freien Stunden arbeite ich am KEV-Katalog von CISA: Werkzeuge, die aus der Liste der bekannten ausgenutzten Schwachstellen eine Patch-Reihenfolge machen, die ein Team abarbeiten kann.",
     "contacts": [
-      { "label": "email", "href": "mailto:matt@bountystash.com" },
-      { "label": "github", "href": "https://github.com/shaoyanji" },
-      { "label": "linkedin", "href": "https://linkedin.com/in/mattji" },
-      { "label": "portfolio", "href": "https://www.bountystash.com" }
-    ]
+      {
+        "label": "email",
+        "href": "mailto:matt@bountystash.com"
+      },
+      {
+        "label": "github",
+        "href": "https://github.com/shaoyanji"
+      },
+      {
+        "label": "linkedin",
+        "href": "https://linkedin.com/in/mattji"
+      },
+      {
+        "label": "xing",
+        "href": "https://xing.com/profile/Shaoyan_Ji"
+      }
+    ],
+    "workAuth": "US-Staatsbürgerschaft mit deutscher Niederlassungserlaubnis; kein Sponsoring, kein Umzug nötig"
+  },
+  "analytics": {
+    "endpoint": "",
+    "site": ""
   },
   "ui": {
     "skip": "Zum Inhalt springen",
@@ -25,119 +42,217 @@
     "filterPlaceholder": "NixOS, Zertifizierungsstelle, Bewertung…",
     "filterNone": "Kein Eintrag passt dazu. Feld leeren, um alle zu sehen.",
     "filterOf": "von",
-    "footer": "Von Nix aus lib/matt/profile.de.json kompiliert — ein kurzes Inline-Skript schaltet das Design; keine Webfonts, kein Tracking. Quelle: github.com/shaoyanji/nixconfig.",
+    "projectsFilterLabel": "Archiv filtern",
+    "projectsFilterPlaceholder": "KEV, Go, Energie, Thesis…",
+    "projectsFilterNone": "Kein Projekt passt dazu. Feld leeren, um alle zu sehen.",
+    "footer": "Quelle: github.com/shaoyanji/nixconfig",
+    "footerPrivacy": "Keine Cookies, keine Webfonts, keine Skripte von Dritten.",
+    "footerPrivacyAnalytics": "Cookielose Statistik, keine Cookies und keine Profile.",
     "headings": {
       "focus": "Fokus",
-      "work": "Ausgewählte Arbeit",
+      "work": "Ausgewählte Arbeiten",
+      "projects": "Projekte",
       "stack": "Werkzeuge",
-      "hire": "Stellensuche"
+      "hire": "Was ich suche"
     },
     "nav": {
       "focus": "Fokus",
       "work": "Arbeit",
+      "projects": "Projekte",
       "lab": "KEV-Labor",
       "stack": "Werkzeuge",
-      "hire": "Offen für Arbeit"
-    }
+      "hire": "Offen für Stellen"
+    },
+    "caseLabel": "Fallstudie lesen",
+    "briefsLabel": "Erste neunzig Tage",
+    "cvLabel": "Lebenslauf (PDF)",
+    "archiveNote": "Werkzeuge, Forschung und Nebenprojekte — das, was in einer Stellenbeschreibung keinen Platz hat.",
+    "caseKicker": "Fallstudie",
+    "briefKicker": "Notiz",
+    "langNames": {
+      "English": "Englisch",
+      "German": "Deutsch"
+    },
+    "fluency": {
+      "Native speaker": "Muttersprache",
+      "B2": "B2"
+    },
+    "items": "Einträge"
   },
   "focus": [
     {
       "title": "Reproduzierbare Flotten",
-      "body": "NixOS und Flakes über Server, Arbeitsplätze und einen Cloud-Endpunkt. Ein Commit beschreibt die Maschine; ein Switch ist die Auslieferung."
+      "body": "Dreizehn Maschinen, ein Repository. Eine Maschine neu bauen, prüfen oder übergeben braucht einen Commit, keinen Ordner mit Installationsnotizen."
     },
     {
       "title": "Go-Dienste mit begrenzter Arbeit",
-      "body": "Serverseitig gerenderte Binaries und append-only Ereignisprotokolle. Kein Frontend-Build, kein Framework, klein genug für einen Prüfdurchgang an einem Nachmittag."
+      "body": "Ein Binary pro Dienst, das HTML, JSON und eine Terminal-Oberfläche liefert. Klein genug, um an einem Nachmittag gelesen zu sein; der Zustand ist ein Protokoll dessen, was passiert ist, statt einer Zeile, die jemand geändert hat."
     },
     {
       "title": "Schwachstellendaten, die in Handlung enden",
-      "body": "KEV als Zeitreihe und als Arbeitscluster: was gerade ausgenutzt wird und welche Patch-Reihenfolge pro investierter Stunde das meiste Risiko entfernt."
+      "body": "CISAs KEV-Katalog als Zeitreihe und als Cluster, die ein Team diese Woche abarbeiten kann. Das Ergebnis ist eine Patch-Reihenfolge, kein weiteres Dashboard."
     }
   ],
   "work": [
     {
-      "title": "NixOS-Flotte über mehrere Hosts",
+      "title": "NixOS-Flotte über dreizehn Maschinen",
       "role": "Autor und Betreiber",
-      "period": "2023 — heute",
-      "description": "Ein Flake für eine Flotte aus NixOS-Hosts: NAS, Arbeitsplätze, ein Cloud-Endpunkt und ein entfernter Builder, eine SSH-Zertifizierungsstelle mit Rotation, verschlüsselte Secrets und ein Taskfile als einzige Schnittstelle. Jeder Host wird durch eine einzige Zeile in Betrieb genommen.",
+      "description": "Ich habe dreizehn Maschinen von Installationsnotizen pro Host auf ein Repository umgestellt. Eine Maschine neu bauen, prüfen oder übergeben heißt jetzt: Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, die Zertifikate rotieren nach Zeitplan.",
       "link": "https://github.com/shaoyanji/nixconfig",
-      "highlights": [
-        "Ein Flake beschreibt zehn Hosts: ein NAS, Arbeitsplätze, einen Cloud-Endpunkt und einen entfernten Builder.",
-        "Eine SSH-Zertifizierungsstelle mit Rotation und SOPS-verschlüsselte Secrets pro Host und Benutzer.",
-        "Ein Taskfile ist die einzige Bedienoberfläche, deshalb trägt kein Host ein eigenes Runbook.",
-        "Dasselbe Modul-Gate läuft lokal und in der CI, und genau das macht einen erfolgreichen Switch zum Beleg."
-      ]
+      "caseStudy": "nixos-fleet",
+      "keywords": [
+        "NixOS",
+        "Flakes",
+        "Zertifizierungsstelle",
+        "SOPS",
+        "CI-Gate"
+      ],
+      "org": "",
+      "period": "2023 — heute",
+      "sortStart": "2023-01-01"
     },
     {
-      "title": "bountystash: deterministische Arbeitsmaschine",
-      "role": "Entwickler",
-      "period": "2024 — heute",
-      "description": "Ein einziges Go-Binary, das aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht: append-only Ereignisse, tastaturorientierte Terminal-Oberfläche, curl-freundliche Endpunkte, keine Frontend-Abhängigkeiten.",
+      "title": "bountystash: deterministische Aufgaben-Engine",
+      "role": "Gründer und Entwickler",
+      "description": "Eine Anfrage kommt als Prosa an und ist bis zur Fertigstellung eine andere geworden. Ich habe einen Go-Dienst gebaut, der sie als unveränderliches Dokument festhält: einen Monat später lässt sich der Zustand eines Auftrags rekonstruieren, und zwei Personen können sich darauf einigen, was gefragt war. Ein Binary liefert HTML, JSON und eine Terminal-Oberfläche.",
       "link": "https://github.com/shaoyanji/bountystash",
-      "highlights": [
-        "Ein append-only Ereignisprotokoll, sodass jeder Zustand ein Replay aufgezeichneter Fakten ist.",
-        "Ein einziges Go-Binary liefert HTML, JSON und eine tastaturorientierte TUI; es gibt keinen Frontend-Build.",
-        "Spezifikationen sind inhaltsadressiert, dieselbe Anfrage ergibt also dasselbe Dokument.",
-        "curl-freundliche Endpunkte, was es mitten in einem Vorfall benutzbar macht."
-      ]
+      "caseStudy": "bountystash",
+      "keywords": [
+        "Go",
+        "Ereignisprotokoll",
+        "Inhaltsadressierung",
+        "TUI"
+      ],
+      "org": "Bountystash"
     },
     {
       "title": "fibtransponder",
       "role": "Recherche und Umsetzung",
-      "period": "2026",
-      "description": "Ein Fibonacci-Radix-Zustandsautomat als Streaming-Verfahren für Tokenisierungsexperimente: begrenzte Arbeit pro Schritt über einen Bitstrom, Adjazenzbreite als Lokalitätsselektor, Zobrist-Seed-Tabellen und ein Korpus-Benchmark, der den reinen Seed-Detektor widerlegt hat.",
+      "description": "Ich wollte einen Stream-Detektor bauen und habe zuerst den Benchmark geschrieben. Die Messung hat den ersten Entwurf widerlegt, also bleibt die kleinere Behauptung: ein Zustandsautomat, dessen Arbeit pro Schritt begrenzt ist. Der Korpus, der den Rest widerlegt hat, liegt im Repository.",
       "link": "https://github.com/shaoyanji/fibtransponder",
-      "highlights": [
-        "Ein Fibonacci-Radix-Zustandsautomat über einen Bitstrom, mit begrenzter Arbeit pro Schritt.",
-        "Adjazenzbreite wirkt als Lokalitätsselektor statt als globale Nachschlagetabelle.",
-        "Zobrist-Seed-Tabellen halten die Zustandsübergänge billig genug zum Streamen.",
-        "Ein Korpus-Benchmark hat den reinen Seed-Detektor widerlegt, die Behauptung wurde also kleiner statt lauter."
-      ]
+      "caseStudy": "fibtransponder",
+      "keywords": [
+        "Go",
+        "Streaming",
+        "Zobrist-Hashing",
+        "Benchmark"
+      ],
+      "org": "",
+      "period": "2026",
+      "sortStart": "2026-01-01"
     },
     {
       "title": "Energie-Telemetrie und Bewertung",
-      "role": "Leitung Betrieb, O3 Energy",
-      "period": "2016 — 2020",
-      "description": "Quantitative Steuerung eines Solarportfolios über 100 Mio. USD: Ertrags- und Bewertungsmodelle, die Bankprüfungen bestanden, mobile Felderfassung und Kontrahentenrisiko, das institutionelle Kreditgeber akzeptiert haben.",
+      "role": "Asset Manager, O3 Energy",
+      "description": "Vier Jahre lang die Zahlen hinter einem Solarportfolio über 100 Mio. USD: Ertrags- und Bewertungsmodelle, die Bankprüfungen bestanden, mobile Erfassung für Techniker im Feld und ein Abgleich, der einen toten Sensor zu einem bekannten Fehler machte statt zu einem guten Monat.",
       "link": "",
-      "highlights": [
-        "Ertrags- und Bewertungsmodelle, die Bankprüfungen auf einem Portfolio über 100 Mio. USD bestanden haben.",
-        "Mobile Felderfassung, die dieselbe Pipeline speist wie die Wetterdaten.",
-        "Kontrahentenrisiko in der Form, die institutionelle Kreditgeber akzeptiert haben.",
-        "Telemetrie-Abgleich, der fehlende Sensordaten in ein bekanntes Fehlerbudget verwandelt."
-      ]
+      "caseStudy": "energy-telemetry",
+      "keywords": [
+        "Bewertung",
+        "Ertragsmodelle",
+        "Bankprüfung",
+        "Telemetrie"
+      ],
+      "org": "O3 Energy"
+    },
+    {
+      "title": "Smart Energy 360",
+      "role": "Director of Sustainability",
+      "description": "Eine Projektpipeline über 100 Mio. USD für gewerbliche Kunden auf dem Weg zu saubererem Strom aufgebaut und geführt, dazu die Nachhaltigkeitsstrategie und die Risikoberatung, die dazugehörten.",
+      "link": "",
+      "keywords": [
+        "Nachhaltigkeit",
+        "Projektpipeline",
+        "Risiko"
+      ],
+      "org": "Smart Energy 360"
+    },
+    {
+      "title": "Fraunhofer ISE",
+      "role": "Wissenschaftliche Hilfskraft",
+      "description": "Heliostat-Ungenauigkeiten per Interferometrie gemessen: C++ für das Gerät, Python für Analyse und 3D-Geometrie.",
+      "link": "",
+      "keywords": [
+        "Optik",
+        "C++",
+        "Python",
+        "Solar"
+      ],
+      "org": "Fraunhofer ISE"
+    },
+    {
+      "title": "Halliburton",
+      "role": "Associate Technical Professional",
+      "description": "Zwei Frac-Crews im Bakken-Schiefer: Chemikalien- und Gerätefehler vor Ort behoben, Zwölf-Stunden-Schichten, dazu die Sicherheitsschulung der Crew.",
+      "link": "",
+      "keywords": [
+        "Feldtechnik",
+        "Sicherheit",
+        "Öl und Gas"
+      ],
+      "org": "Halliburton"
     }
   ],
   "lab": {
     "title": "Das KEV-Labor",
-    "body": "Zwei öffentliche Werkzeuge machen CISAs Katalog bekannter ausgenutzter Schwachstellen lesbar. kev-time zeichnet Ausnutzung über die Zeit, sodass ein Trend sichtbar wird, bevor ein Bericht existiert. kelly-svg gruppiert Einträge zu Clustern, die ein Team abarbeiten kann, sodass der Patch-Plan aus Daten folgt statt aus Bauchgefühl. Beide sind statisches SVG und reines HTML, gebaut, um während eines Vorfalls auf dem Telefon gelesen zu werden. Eine dritte Seite bringt dieselben Daten in die Form eines Programms: eine Beispiel-Warteschlange ausgenutzter Einträge, nach Aufwand gruppiert, unter concept.bountystash.com.",
+    "body": "Zwei öffentliche Werkzeuge lesen CISAs Katalog bekannter ausgenutzter Schwachstellen. kev-time zeichnet Ausnutzung über die Zeit, sodass ein Trend sichtbar wird, bevor ein Bericht existiert. kelly-svg gruppiert Einträge zu Clustern, die ein Team abarbeiten kann, sodass die Patch-Reihenfolge aus Aufwand und Exposition folgt. Beide sind statisches SVG und reines HTML, während eines Vorfalls auch auf dem Telefon lesbar. concept.bountystash.com bringt dieselben Daten in die Form eines Programms: eine Beispiel-Warteschlange, nach Aufwand gruppiert.",
     "links": [
-      { "label": "kev-time", "href": "https://jisifu.serv00.net/kev-time/" },
-      { "label": "kelly-svg", "href": "https://jisifu.serv00.net/kelly-svg/" },
-      { "label": "Konzept-Mockup", "href": "https://concept.bountystash.com/" }
+      {
+        "label": "kev-time",
+        "href": "https://jisifu.serv00.net/kev-time/"
+      },
+      {
+        "label": "kelly-svg",
+        "href": "https://jisifu.serv00.net/kelly-svg/"
+      },
+      {
+        "label": "Konzept-Mockup",
+        "href": "https://concept.bountystash.com/"
+      }
     ]
   },
   "stack": [
     {
       "category": "Systeme und Nebenläufigkeit",
-      "items": ["Go", "Channels und Zustandsautomaten", "PostgreSQL", "Redis", "gRPC und REST", "Kafka", "Python"]
+      "items": [
+        "Go",
+        "Channels und Zustandsautomaten",
+        "PostgreSQL",
+        "Redis",
+        "gRPC und REST",
+        "Kafka",
+        "Python"
+      ]
     },
     {
       "category": "Deklarative Infrastruktur",
-      "items": ["NixOS", "Nix-Flakes", "SSH-Zertifizierungsstelle", "SOPS und age", "Tailscale", "ZFS und btrfs", "systemd"]
+      "items": [
+        "NixOS",
+        "Nix-Flakes",
+        "SSH-Zertifizierungsstelle",
+        "SOPS und age",
+        "Tailscale",
+        "ZFS und btrfs",
+        "systemd"
+      ]
     },
     {
       "category": "Fachliches",
-      "items": ["Anlagenbewertung", "Abgleich von Solar-Telemetrie", "Risikomodelle", "Berichte für Bankprüfungen", "KEV und CVSS", "Typst"]
+      "items": [
+        "Anlagenbewertung",
+        "Abgleich von Solar-Telemetrie",
+        "Risikomodelle",
+        "Berichte für Bankprüfungen",
+        "KEV und CVSS",
+        "Typst"
+      ]
     }
   ],
   "hire": {
-    "title": "Ich bin der Ingenieur und suche eine Rolle",
-    "body": "Diese Seite ist ein Lebenslauf, keine Stellenanzeige: Ich stelle niemanden ein. Ich bin Systemingenieur für Infrastruktur und Sicherheit und suche eine Senior- oder Lead-Rolle, in der beides aufeinandertrifft — Plattform-Engineering, Site Reliability oder Schwachstellenbetrieb. Remote mit Basis in MEZ oder vor Ort in Freiburg und am Oberrhein.",
-    "wants": [
-      "US-Staatsbürgerschaft mit deutscher Niederlassungserlaubnis — kein Sponsoring, kein Umzug nötig",
-      "Englisch auf Muttersprachniveau, Deutsch C1",
-      "Go, Python, PostgreSQL, NixOS — gewohnt, einen Dienst von Anfang bis Ende zu verantworten",
+    "title": "Was ich suche",
+    "body": "Eine Senior- oder Lead-Rolle, in der Infrastruktur und Sicherheit aufeinandertreffen: Plattform-Engineering, Site Reliability oder Schwachstellenbetrieb. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
+    "briefsNote": "Zwei Notizen dazu, was ich in den ersten neunzig Tagen tun würde:",
+    "wants": [        "Go, Python, PostgreSQL, NixOS — und gewohnt, einen Dienst von Anfang bis Ende zu verantworten",
       "Kurzfristig verfügbar"
     ],
     "cta": {

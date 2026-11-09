@@ -1,10 +1,7 @@
-# lib/bountystash-mockup.nix — bountystash.com as a bug-bounty and vulnerability
-# programme, rendered from lib/bountystash-mockup/data.json (EN) and data.de.json
-# (DE at /de/), the same two-locale shape as lib/matt-site.nix.
+# lib/bountystash-mockup.nix — bountystash.com as a vulnerability programme.
 #
-# A concept, not a product: sample data, `noindex`, its own Pages project. It is a
-# separate artifact rather than a route on the portfolio so a mockup cannot be
-# mistaken for the live site or overwrite it on deploy.
+# A concept, not a product: sample data, `noindex`, its own Pages project, so a
+# mockup cannot be mistaken for the live site. Data: lib/bountystash-mockup/.
 {
   pkgs,
   lib ? pkgs.lib,
@@ -194,7 +191,7 @@
       inherit body nav langs cssHref title description canonical jsonld ogImage;
       ogImageAlt =
         if lang == "de"
-        then "Konzept-Mockup: die Liste des Ausgenutzten als abarbeitbare Warteschlange, mit Aufwands-Clustern"
+        then "Konzept-Mockup: die Liste der ausgenutzten Schwachstellen als abarbeitbare Warteschlange, mit Aufwands-Clustern"
         else "Concept mockup: the exploited list as a work queue, grouped into effort clusters";
       htmlLang = lang;
       alternates = alternates;
@@ -245,7 +242,7 @@
         "$dest"
     }
     card $out/og.png 'CONCEPT MOCKUP · SAMPLE DATA' 'The exploited list,' 'as a queue you can close.' 'CISA KEV · effort clusters · patch order'
-    card $out/og-de.png 'KONZEPT-MOCKUP · BEISPIELDATEN' 'Die Liste des Ausgenutzten,' 'als Warteschlange.' 'CISA KEV · Aufwands-Cluster · Patch-Reihenfolge'
+    card $out/og-de.png 'KONZEPT-MOCKUP · BEISPIELDATEN' 'Die ausgenutzten Schwachstellen,' 'als Warteschlange.' 'CISA KEV · Aufwands-Cluster · Patch-Reihenfolge'
   '';
 
   cssFile = pkgs.writeText "mockup-style.css" css;

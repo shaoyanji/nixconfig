@@ -1,0 +1,383 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Matt Ji",
+    "label": "System- und Sicherheitsingenieur",
+    "url": "https://www.bountystash.com",
+    "summary": "Ingenieur und Risikoanalyst, zehn Jahre an der Schnittstelle von erneuerbaren Energien und Software. Ich baue die Modelle und die Systeme, die sie ausführen: Options- und Hedging-Modelle für Energieportfolios, Go-Dienste, eine NixOS-Flotte, ein E-Mail-Archiv, das seine Post selbst klassifiziert. Ich leitete das Asset Management eines Solarportfolios über 100 Mio. USD und forschte zu Heliostat-Messtechnik am Fraunhofer ISE."
+  },
+  "work": [
+    {
+      "name": "Bountystash",
+      "position": "Gründer",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-19",
+      "highlights": [
+        "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten.",
+        "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig.",
+        "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist.",
+        "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen.",
+        "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading.",
+        "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD.",
+        "Konzipierte eine Covered-Call-Hedging-Strategie für Kundenportfolios.",
+        "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists.",
+        "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit.",
+        "Prüfte Bug-Bounty-Programme."
+      ]
+    },
+    {
+      "name": "O3 Energy",
+      "position": "Asset Manager",
+      "startDate": "2016-08-01",
+      "endDate": "2020-06-01",
+      "highlights": [
+        "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen.",
+        "Leitete das Asset Management eines Portfolios über 100 Mio. USD.",
+        "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch.",
+        "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften.",
+        "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD.",
+        "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf.",
+        "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten.",
+        "Führte ein internationales Team und entwickelte eine Anreizstruktur, gekoppelt an ein Echtzeit-Finanzmodell."
+      ]
+    },
+    {
+      "name": "Smart Energy 360",
+      "position": "Director of Sustainability",
+      "startDate": "2015-08-01",
+      "endDate": "2016-08-01",
+      "highlights": [
+        "Betreute eine Projektpipeline über 100 Mio. USD.",
+        "Verantwortete den Kundenservice und die Betreuung der Mandanten.",
+        "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit.",
+        "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+      ]
+    },
+    {
+      "name": "Fraunhofer ISE",
+      "position": "Wissenschaftliche Hilfskraft",
+      "startDate": "2012-03-01",
+      "endDate": "2012-09-01",
+      "highlights": [
+        "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie.",
+        "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte.",
+        "Schrieb Python-Werkzeuge für Analyse und 3D-Geometrie.",
+        "Verifizierte Geometriematrizen in Mathematica."
+      ]
+    },
+    {
+      "name": "Halliburton",
+      "position": "Associate Technical Professional",
+      "startDate": "2010-06-01",
+      "endDate": "2011-09-01",
+      "highlights": [
+        "Erstellte neue Excel-Tabellen für die Engineering-Abteilung.",
+        "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche.",
+        "Arbeitete zwölfstündige Schichten im Feld.",
+        "Behob Chemikalien- und Geräteprobleme vor Ort.",
+        "Leitete die Sicherheitsschulung der Crew.",
+        "Arbeitete an Versuchsprojekten mit Technologien aus der Engineering-Abteilung."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Albert-Ludwigs-Universität Freiburg",
+      "url": "https://rem.zee-uni-freiburg.de/",
+      "area": "Erneuerbare-Energien-Management",
+      "studyType": "Master of Science",
+      "startDate": "2011-11-01",
+      "endDate": "2014-02-01",
+      "score": "1,8/5,0",
+      "courses": [
+        "Fluktuierende erneuerbare Energien und Wettermuster, analysiert mit künstlichen neuronalen Netzen"
+      ]
+    },
+    {
+      "institution": "Colorado School of Mines",
+      "url": "https://mines.edu/",
+      "area": "Erdöltechnik",
+      "studyType": "Bachelor of Science",
+      "startDate": "2006-08-01",
+      "endDate": "2010-05-15",
+      "score": "3,2 GPA",
+      "courses": [
+        "McBride Honors Program in Public Policy",
+        "Wirtschaftswissenschaften"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Risikoberechnungs-Engine (Swirl Engine)",
+      "resumeName": "Risk Calculation Engine (Swirl Engine)",
+      "description": "Satz von Green auf stochastische Polygone: ein Go-Fuzzer erzeugt Formen, eine Pipeline aus Nushell und Awk treibt die Berechnung, eine Nix-Entwicklungsumgebung pinnt die Werkzeuge.",
+      "url": "https://github.com/shaoyanji/risk-calc",
+      "startDate": "2026-03-15",
+      "endDate": "2026-03-18",
+      "type": "open_source",
+      "roles": [
+        "Lead Developer",
+        "Forscher"
+      ],
+      "highlights": [
+        "Konzipierte eine „Swirl Engine“ auf Basis des Satzes von Green, um Polygonflächen aus zufälligen geometrischen Daten zu berechnen.",
+        "Implementierte einen Shape-Fuzzer in Go, der stochastische Polygone erzeugt, um die Berechnungsengine zu belasten.",
+        "Orchestrierte die Pipeline mit Nushell und Awk und umging damit Compiler-Grenzen für rechenintensive Mathematik.",
+        "Containerisierte die Umgebung mit Nix Flakes für reproduzierbare Go-1.16+-Entwicklung."
+      ],
+      "keywords": [
+        "Go",
+        "Nushell",
+        "Awk",
+        "Satz von Green",
+        "Risikoanalyse",
+        "NixOS",
+        "Polyglotte Programmierung"
+      ]
+    },
+    {
+      "name": "Masterarbeit: Wetter und Volatilität",
+      "resumeName": "Master's Thesis",
+      "description": "Ein Verfahren zur Zeit-Kreuzkorrelation von Windgeschwindigkeit sowie neuronale Netze auf Langzeit-Wetterdaten, um die Volatilität von Solar- und Windanlagen im Netz zu bewerten.",
+      "url": "https://www.academia.edu/6762743/A_Study_on_Energy_Intermittency_Reduction_Strategies_with_Emphasis_on_Weather_Pattern_Prediction",
+      "startDate": "2013-08-01",
+      "endDate": "2014-02-24",
+      "type": "thesis",
+      "entity": "Meteorologisches Institut Freiburg",
+      "roles": [
+        "Student"
+      ],
+      "highlights": [
+        "Entwickelte ein neuartiges Verfahren zur zeitlichen Kreuzkorrelation von Windgeschwindigkeitsdaten mit über 70 % Genauigkeitsgewinn.",
+        "Trainierte neuronale Netze auf Langzeit-Wetterdaten, um die Netzwirtschaftlichkeit fluktuierender Solar- und Windanlagen zu optimieren."
+      ],
+      "keywords": [
+        "Künstliche Neuronale Netze",
+        "Fraktale Geometrie",
+        "Vektoranalysis"
+      ]
+    },
+    {
+      "name": "Postgraduales Studium: Erneuerbare Energien",
+      "resumeName": "Postgraduate Renewable Energy",
+      "description": "Ein Postgraduierten-Modul zu Wasserstofferzeugung und -speicherung, bewertet mit RETScreen für Solar, Wind, Geothermie und Biomasse.",
+      "url": "https://unu.edu",
+      "startDate": "2013-02-01",
+      "endDate": "2013-02-28",
+      "type": "course",
+      "entity": "United Nations University",
+      "roles": [
+        "Teamleiter",
+        "Ingenieur"
+      ],
+      "highlights": [
+        "Analysierte Wasserstofferzeugungs- und -speicherprojekte mit RETScreen.",
+        "Postgraduale Forschung zu erneuerbaren Energien mit Vertiefung in Solar, Wind, Geothermie und Bioenergie."
+      ],
+      "keywords": [
+        "Wasserstoff",
+        "Solar",
+        "RETScreen"
+      ]
+    },
+    {
+      "name": "nixconfig",
+      "resumeName": "nixconfig",
+      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
+      "url": "https://github.com/shaoyanji/nixconfig",
+      "startDate": "2023-01-01",
+      "endDate": "",
+      "type": "open source",
+      "highlights": [],
+      "keywords": [
+        "Nix",
+        "NixOS",
+        "systemd",
+        "SOPS",
+        "Tailscale"
+      ]
+    },
+    {
+      "name": "bountystash",
+      "resumeName": "bountystash",
+      "description": "Ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht. Append-only Events, Terminal-Oberfläche und curl-Endpunkte kommen aus einem Binary.",
+      "url": "https://github.com/shaoyanji/bountystash",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-01",
+      "type": "product",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Ereignisprotokoll",
+        "TUI",
+        "Inhaltsadressierung"
+      ]
+    },
+    {
+      "name": "fibtransponder",
+      "resumeName": "fibtransponder",
+      "description": "Ein Zustandsautomat mit Fibonacci-Radix, der einen Bitstrom mit begrenzter Arbeit pro Schritt verarbeitet. Ein Korpus-Benchmark hat den ersten Detektor-Entwurf widerlegt, die Behauptung wurde kleiner.",
+      "url": "https://github.com/shaoyanji/fibtransponder",
+      "startDate": "2026-01-01",
+      "endDate": "2026-06-01",
+      "type": "research",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Streaming",
+        "Zobrist-Hashing",
+        "Benchmarks"
+      ]
+    },
+    {
+      "name": "kev-time",
+      "resumeName": "kev-time",
+      "description": "CISAs Katalog bekannter ausgenutzter Schwachstellen als Zeitreihe in reinem SVG. Ein Trend ist ablesbar, bevor ein Bericht existiert, und die Seite lädt während eines Vorfalls noch auf dem Telefon.",
+      "url": "https://jisifu.serv00.net/kev-time/",
+      "startDate": "2026-02-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "Datenvisualisierung"
+      ]
+    },
+    {
+      "name": "kelly-svg",
+      "resumeName": "kelly-svg",
+      "description": "KEV-Einträge in Aufwands-Clustern mit Exposition pro Cluster. Die Patch-Reihenfolge folgt Aufwand und Reichweite statt der Reihenfolge des Katalogs.",
+      "url": "https://jisifu.serv00.net/kelly-svg/",
+      "startDate": "2026-03-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "Risiko"
+      ]
+    },
+    {
+      "name": "Konzept für Schwachstellenbetrieb",
+      "resumeName": "Vulnerability operations concept",
+      "description": "Ein Beispiel-Schwachstellenprogramm aus KEV-Daten: Expositionstabelle, Aufwands-Cluster, 90-Tage-Methode und Dienstleistungsmodell. Durchgehend Beispieldaten, und die Seite sagt das auch.",
+      "url": "https://concept.bountystash.com/",
+      "startDate": "2026-11-01",
+      "endDate": "",
+      "type": "concept",
+      "highlights": [],
+      "keywords": [
+        "KEV",
+        "Programmdesign",
+        "HTML"
+      ]
+    },
+    {
+      "name": "matt.bountystash.com",
+      "resumeName": "matt.bountystash.com",
+      "description": "Diese Seite. Zwei Sprachen aus einer Vorlage, ein Stylesheet mit hellem und dunklem Farbsatz, ein Lebenslauf aus denselben JSON-Daten und Share-Cards, die beim Build entstehen.",
+      "url": "https://matt.bountystash.com",
+      "startDate": "2026-11-01",
+      "endDate": "",
+      "type": "site",
+      "highlights": [],
+      "keywords": [
+        "Nix",
+        "HTML",
+        "Typst",
+        "i18n"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "Web-Entwicklung",
+      "level": "Master",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Next.js",
+        "React",
+        "Laravel",
+        "HTMX"
+      ]
+    },
+    {
+      "name": "Backend & Datenbank",
+      "level": "Master",
+      "keywords": [
+        "SQL",
+        "PostgreSQL",
+        "MySQL",
+        "Django",
+        "FastAPI",
+        "Flask"
+      ]
+    },
+    {
+      "name": "Programmiersprachen",
+      "level": "Master",
+      "keywords": [
+        "Lua",
+        "Erlang",
+        "Java",
+        "Kotlin",
+        "Go",
+        "Python",
+        "C",
+        "C++",
+        "Bash",
+        "Nim"
+      ]
+    },
+    {
+      "name": "DevOps",
+      "level": "Master",
+      "keywords": [
+        "Kubernetes",
+        "NixOS",
+        "AWS",
+        "Azure",
+        "Google Cloud"
+      ]
+    },
+    {
+      "name": "Energie & Risiko",
+      "keywords": [
+        "Energiehandel",
+        "PPA",
+        "Wetterderivate",
+        "Risikomanagement",
+        "Anlagen",
+        "Portfolio",
+        "Due Diligence",
+        "Finanzmodellierung"
+      ]
+    },
+    {
+      "name": "Sicherheit",
+      "keywords": [
+        "Bug Bounty",
+        "Schwachstellenmanagement",
+        "CISA KEV",
+        "SOPS",
+        "SSH-CA",
+        "Bedrohungsmodellierung"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Englisch",
+      "fluency": "Muttersprache"
+    },
+    {
+      "language": "Deutsch",
+      "fluency": "B2"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "entries": [
+    {
+      "name": "nixconfig",
+      "entity": "Personal",
+      "type": "open source",
+      "start": "2023-01",
+      "end": "",
+      "summary": "Thirteen NixOS hosts rebuilt from one repository: certificates, per-host secrets and the operator commands come from the same place, and the same check runs in CI and before a deploy.",
+      "summaryDe": "Dreizehn NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy.",
+      "keywords": [
+        "Nix",
+        "NixOS",
+        "systemd",
+        "SOPS",
+        "Tailscale"
+      ],
+      "url": "https://github.com/shaoyanji/nixconfig",
+      "resumeName": "nixconfig"
+    },
+    {
+      "name": "bountystash",
+      "entity": "Founder",
+      "type": "product",
+      "start": "2020-06",
+      "end": "2025-08",
+      "summary": "A Go service that turns a request into an immutable, content-addressed specification. Append-only events, a terminal UI and curl endpoints all come from one binary.",
+      "summaryDe": "Ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht. Append-only Events, Terminal-Oberfläche und curl-Endpunkte kommen aus einem Binary.",
+      "keywords": [
+        "Go",
+        "event log",
+        "TUI",
+        "content addressing"
+      ],
+      "url": "https://github.com/shaoyanji/bountystash",
+      "resumeName": "bountystash"
+    },
+    {
+      "name": "fibtransponder",
+      "entity": "Personal research",
+      "type": "research",
+      "start": "2026-01",
+      "end": "2026-06",
+      "summary": "A Fibonacci-radix state machine that streams a bitstream with bounded work per step. A corpus benchmark falsified the first detector design, so the claim narrowed.",
+      "summaryDe": "Ein Zustandsautomat mit Fibonacci-Radix, der einen Bitstrom mit begrenzter Arbeit pro Schritt verarbeitet. Ein Korpus-Benchmark hat den ersten Detektor-Entwurf widerlegt, die Behauptung wurde kleiner.",
+      "keywords": [
+        "Go",
+        "streaming",
+        "Zobrist hashing",
+        "benchmarks"
+      ],
+      "url": "https://github.com/shaoyanji/fibtransponder",
+      "resumeName": "fibtransponder"
+    },
+    {
+      "name": "Risk calculation engine",
+      "entity": "Personal research",
+      "type": "research",
+      "start": "2026-03",
+      "end": "2026-03",
+      "summary": "Green's theorem applied to stochastic polygons: a Go fuzzer generates shapes, a Nushell and Awk pipeline drives the calculation, and a Nix dev shell pins the toolchain.",
+      "summaryDe": "Satz von Green auf stochastische Polygone: ein Go-Fuzzer erzeugt Formen, eine Nushell-und-Awk-Pipeline treibt die Berechnung, eine Nix-Entwicklungsumgebung pinnt die Werkzeuge.",
+      "keywords": [
+        "Go",
+        "Nushell",
+        "geometry",
+        "risk models"
+      ],
+      "url": "https://github.com/shaoyanji/risk-calc",
+      "resumeName": "Risk Calculation Engine (Swirl Engine)"
+    },
+    {
+      "name": "kev-time",
+      "entity": "KEV lab",
+      "type": "tool",
+      "start": "2026-02",
+      "end": "",
+      "summary": "CISA's Known Exploited Vulnerabilities catalogue drawn as a time series in static SVG, so a trend is readable before a report exists and the page still loads on a phone during an incident.",
+      "summaryDe": "CISAs Katalog bekannter ausgenutzter Schwachstellen als Zeitreihe in statischem SVG. Ein Trend ist ablesbar, bevor ein Bericht existiert, und die Seite lädt während eines Vorfalls noch auf dem Telefon.",
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "data viz"
+      ],
+      "url": "https://jisifu.serv00.net/kev-time/",
+      "resumeName": "kev-time"
+    },
+    {
+      "name": "kelly-svg",
+      "entity": "KEV lab",
+      "type": "tool",
+      "start": "2026-03",
+      "end": "",
+      "summary": "KEV entries grouped into effort clusters with exposure per cluster, giving a patch order that follows effort and reach instead of the order the catalogue happens to use.",
+      "summaryDe": "KEV-Einträge in Aufwands-Clustern mit Exposition pro Cluster. Die Patch-Reihenfolge folgt Aufwand und Reichweite statt der Reihenfolge des Katalogs.",
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "risk"
+      ],
+      "url": "https://jisifu.serv00.net/kelly-svg/",
+      "resumeName": "kelly-svg"
+    },
+    {
+      "name": "Vulnerability operations concept",
+      "entity": "bountystash",
+      "type": "concept",
+      "start": "2026-11",
+      "end": "",
+      "summary": "A sample vulnerability programme built from KEV data: an exposure table, effort clusters, a 90-day method and a service model. Sample data throughout, labelled as such.",
+      "summaryDe": "Ein Beispiel-Schwachstellenprogramm aus KEV-Daten: Expositionstabelle, Aufwands-Cluster, 90-Tage-Methode und Dienstleistungsmodell. Durchgehend Beispieldaten, als solche gekennzeichnet.",
+      "keywords": [
+        "KEV",
+        "programme design",
+        "HTML"
+      ],
+      "url": "https://concept.bountystash.com/",
+      "resumeName": "Vulnerability operations concept"
+    },
+    {
+      "name": "matt.bountystash.com",
+      "entity": "Personal",
+      "type": "site",
+      "start": "2026-11",
+      "end": "",
+      "summary": "This page: two languages from one template, a CV rendered from the same data, and no JavaScript.",
+      "summaryDe": "Diese Seite: zwei Sprachen aus einer Vorlage, ein Lebenslauf aus denselben Daten, kein JavaScript.",
+      "keywords": [
+        "Nix",
+        "HTML",
+        "Typst",
+        "i18n"
+      ],
+      "url": "https://matt.bountystash.com",
+      "resumeName": "matt.bountystash.com"
+    },
+    {
+      "name": "Master's thesis: weather and intermittency",
+      "entity": "Albert-Ludwigs-Universität Freiburg",
+      "type": "thesis",
+      "start": "2013-08",
+      "end": "2014-02",
+      "summary": "A time-cross-correlation method for wind velocity, plus neural networks trained on long-term weather records, to price the intermittency of solar and wind assets on a grid.",
+      "summaryDe": "Ein Verfahren zur Zeit-Kreuzkorrelation von Windgeschwindigkeit sowie neuronale Netze auf Langzeit-Wetterdaten, um die Volatilität von Solar- und Windanlagen im Netz zu bewerten.",
+      "keywords": [
+        "neural networks",
+        "fractal geometry",
+        "energy"
+      ],
+      "url": "https://www.academia.edu/6762743/A_Study_on_Energy_Intermittency_Reduction_Strategies_with_Emphasis_on_Weather_Pattern_Prediction",
+      "resumeName": "Master's Thesis"
+    },
+    {
+      "name": "Postgraduate renewable energy",
+      "entity": "United Nations University",
+      "type": "course",
+      "start": "2013-02",
+      "end": "2013-02",
+      "resumeName": "Postgraduate Renewable Energy",
+      "summary": "A postgraduate module on hydrogen production and storage, assessed with RETScreen across solar, wind, geothermal and bioenergy.",
+      "summaryDe": "Ein Postgraduierten-Modul zu Wasserstofferzeugung und -speicherung, bewertet mit RETScreen für Solar, Wind, Geothermie und Biomasse.",
+      "keywords": [
+        "hydrogen",
+        "RETScreen",
+        "renewables"
+      ],
+      "url": "https://unu.edu"
+    }
+  ]
+}

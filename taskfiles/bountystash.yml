@@ -135,20 +135,54 @@ tasks:
 
   # The crawlable surface of both published pages, asserted rather than assumed.
   site:check:
-    desc: "[gate] robots, sitemap, canonical, og:image and hreflang on both hostnames"
+    desc: "[gate] robots, sitemap, canonical, og:image and hreflang on every hostname"
     cmds:
-      - bash scripts/task/site-check.sh matt.bountystash.com / /de/
+      - bash scripts/task/site-check.sh matt.bountystash.com / /de/ /work/nixos-fleet /de/work/nixos-fleet /brief/platform
+      - bash scripts/task/site-check.sh bountystash.com / /de/ /work/bountystash-deterministic-work-engine /de/work/bountystash-deterministic-work-engine
       - bash scripts/task/site-check.sh concept.bountystash.com / /de/
+
+  # Offline, and the only check that sees a stylesheet 404: a page that loads no
+  # CSS still returns 200, so the HTTP gate cannot catch a href built from the
+  # locale's depth instead of the page's.
+  site:links:
+    desc: "[gate] build both sites and resolve every internal href/src against the artifact"
+    cmds:
+      - nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site
+      - nix build --builders "" --out-link /tmp/bountystash-site .#sites.bountystash-site
+      - bash scripts/task/site-links.sh /tmp/matt-site
+      - bash scripts/task/site-links.sh /tmp/bountystash-site
 
   matt:gist:pull:
     desc: Fetch resume.json and lebenslauf.json from the gists into the local cache
     cmds:
       - bash scripts/task/matt-gist.sh pull
 
+  # The resume is the fact and the page is the prose: this copies the canonical
+  # JSON Resume (the appflow base file) into the repo so the build stays pure.
+  matt:gist:sync:
+    desc: Copy the canonical resume into lib/matt/resume.json (the page's source of truth)
+    cmds:
+      - bash scripts/task/matt-gist.sh sync
+
   matt:gist:drift:
-    desc: Report where the resume gists and the compiled profile disagree
+    desc: "[gate] resume copy vs canonical, and every resume role/project must have prose"
     cmds:
       - bash scripts/task/matt-gist.sh drift
+
+  # The German corpus is authored in the repo and the runner reads it from
+  # $CONFIG, so this writes the local copy a German packet builds from.
+  matt:gist:sync-de:
+    desc: Write the German corpus (lib/matt/lebenslauf.json) to ~/.config/appflow/lebenslauf.json
+    cmds:
+      - bash scripts/task/matt-gist.sh sync-de
+
+  # The gists are the CV feed a cold mail links to. Pushing is a dry run until
+  # PUSH_APPLY=1, because both gists are public and the German one is rewritten
+  # from the English file's facts before it is written.
+  matt:gist:push:
+    desc: "What the public gists would say (PUSH_APPLY=1 writes resume.json and the German parity rewrite)"
+    cmds:
+      - bash scripts/task/matt-gist.sh push
 
   # The bug-bounty concept mockup: sample data, `noindex`, its own Pages project.
   # Publishing it to bountystash.com itself is deliberately not a task.

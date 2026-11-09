@@ -20,7 +20,7 @@
       auth = "Work authorisation";
       contact = "Contact";
       navLabel = "Sections";
-      footer = "Compiled by Nix from portfolio.json — no JavaScript, no webfonts, no tracking.";
+      footer = "No JavaScript, no webfonts, no tracking.";
     };
     de = {
       profile = "Profil";
@@ -39,7 +39,7 @@
       auth = "Arbeitsberechtigung";
       contact = "Kontakt";
       navLabel = "Abschnitte";
-      footer = "Von Nix aus portfolio.json erzeugt — kein JavaScript, keine Webfonts, kein Tracking.";
+      footer = "Kein JavaScript, keine Webfonts, kein Tracking.";
     };
   };
 

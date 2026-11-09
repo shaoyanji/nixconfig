@@ -1,0 +1,54 @@
+{
+  "platform": {
+    "title": "Die ersten neunzig Tage in einem Plattform-Team",
+    "kicker": "Plattform und Infrastruktur",
+    "standfirst": "Was ich tue, bevor ich etwas ändere, und was am Ende des Quartals laufen soll.",
+    "sections": [
+      {
+        "heading": "Tag 1 bis 14",
+        "body": [
+          "Den Deploy-Pfad auf einem Laptop von Anfang bis Ende durchgehen und aufschreiben, wo er nicht mehr reproduzierbar ist. Eine Sicherung auf einen Testhost zurückspielen. Nach den letzten drei Vorfällen und der jeweiligen Korrektur fragen, denn die Korrektur sagt mehr über das System als der Postmortem-Text."
+        ]
+      },
+      {
+        "heading": "Tag 15 bis 45",
+        "body": [
+          "Den Deploy-Pfad unter ein Gate stellen, das lokal und in der CI aus demselben Grund fehlschlägt. Einen Dienst auswählen und seinen Build, seine Secrets und sein Rollback in einer Datei beschreiben. Die Zeit von Commit bis laufendem Prozess messen und die Zahl notieren, denn sie ist die einzige Ausgangsbasis, auf die sich später alle einigen."
+        ]
+      },
+      {
+        "heading": "Tag 46 bis 90",
+        "body": [
+          "Den zweiten Dienst auf denselben Pfad holen und den dritten nur, wenn die ersten beiden keine Sonderfälle brauchten. Den Monitor ergänzen, der den letzten Vorfall vor dem Kunden bemerkt hätte. Ein Runbook hinterlassen, dem eine neue Kollegin ohne Rückfrage folgen kann."
+        ]
+      }
+    ],
+    "closing": "Der Fehler, auf den ich achte, ist ein Plattform-Team, das Abstraktionen ausliefert und keine Dienste. Wenn am neunzigsten Tag nichts darauf läuft, ist die Arbeit nicht fertig."
+  },
+  "vulnerability-operations": {
+    "title": "Die ersten neunzig Tage in einem Schwachstellenprogramm",
+    "kicker": "Security und Schwachstellenbetrieb",
+    "standfirst": "Ein Programm beginnt mit der Warteschlange, für die niemand zuständig ist, und endet mit einer Zahl, die sich jede Woche bewegt.",
+    "sections": [
+      {
+        "heading": "Tag 1 bis 14",
+        "body": [
+          "Zählen, was gegen das eigene Unternehmen ausgenutzt wird, nicht was gescannt wurde. CISA KEV und das Asset-Inventar in eine Tabelle holen und sehen, wie viele Zeilen eine zuständige Person haben. Die Leute fragen, die Tickets schließen, welcher Schritt sie die meiste Zeit kostet."
+        ]
+      },
+      {
+        "heading": "Tag 15 bis 45",
+        "body": [
+          "Die ausgenutzten Einträge nach dem Aufwand gruppieren, den das Patchen braucht. Jede Woche eine Warteschlange veröffentlichen, mit Zuständigkeit und Datum pro Zeile. Mit den zehn beginnen, die pro Arbeitsstunde die meiste Exposition entfernen, und diese schließen, bevor ein weiterer Scanner gekauft wird."
+        ]
+      },
+      {
+        "heading": "Tag 46 bis 90",
+        "body": [
+          "Aus der Warteschlange einen Bericht machen, den eine Führungskraft ohne Übersetzung liest: eröffnet, geschlossen, Alter, und was beim Hersteller hängt. Das mittlere Alter eines ausgenutzten Eintrags verfolgen, weil sich diese Zahl bewegt, wenn der Prozess funktioniert."
+        ]
+      }
+    ],
+    "closing": "Am neunzigsten Tag soll das mittlere Alter eines ausgenutzten Eintrags ein Ziel sein, das jemand gewählt hat, und ein Wochenbericht sagen, ob wir es erreicht haben."
+  }
+}

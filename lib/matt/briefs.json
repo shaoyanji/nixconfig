@@ -1,0 +1,54 @@
+{
+  "platform": {
+    "title": "The first ninety days on a platform team",
+    "kicker": "Platform and infrastructure",
+    "standfirst": "What I would do before changing anything, and what I would expect to be running by the end of the quarter.",
+    "sections": [
+      {
+        "heading": "Days 1 to 14",
+        "body": [
+          "Read the deploy path end to end on a laptop and write down where it stops being reproducible. Restore one backup onto a scratch host. Ask for the last three incidents and the fix that followed, because the fix says more about the system than the postmortem does."
+        ]
+      },
+      {
+        "heading": "Days 15 to 45",
+        "body": [
+          "Put the deploy path under a gate that fails for the same reason locally and in CI. Pick one service and make its build, its secrets and its rollback describable in a single file. Measure commit to running process, and write the number down, because it is the only baseline everyone will agree on later."
+        ]
+      },
+      {
+        "heading": "Days 46 to 90",
+        "body": [
+          "Move the second service onto the same path, and the third only if the first two needed no exceptions. Add the monitor that would have caught the last incident before a customer did. Leave a runbook a new hire can follow without asking me."
+        ]
+      }
+    ],
+    "closing": "The failure I watch for is a platform team that ships abstractions and no services. If nothing runs on it at day ninety, the work is not finished."
+  },
+  "vulnerability-operations": {
+    "title": "The first ninety days on a vulnerability programme",
+    "kicker": "Security and vulnerability operations",
+    "standfirst": "A programme starts with the queue nobody owns, and ends with a number that moves every week.",
+    "sections": [
+      {
+        "heading": "Days 1 to 14",
+        "body": [
+          "Count what is exploited against you, not what has been scanned. Pull CISA KEV and the asset inventory into one table and see how many rows have an owner. Ask the people who close tickets which step costs them the most time."
+        ]
+      },
+      {
+        "heading": "Days 15 to 45",
+        "body": [
+          "Group the exploited entries by the effort needed to patch them. Publish one weekly queue with an owner and a date on every line. Start with the ten that remove the most exposure per hour, and close those before buying another scanner."
+        ]
+      },
+      {
+        "heading": "Days 46 to 90",
+        "body": [
+          "Turn the queue into a report a manager can read without translation: entries opened, closed, aged, and what is blocked on a vendor. Track the median age of an exploited entry, because that number moves when the process works."
+        ]
+      }
+    ],
+    "closing": "By day ninety I want the median age of an exploited entry to be a target someone chose, and a weekly report that says whether we hit it."
+  }
+}

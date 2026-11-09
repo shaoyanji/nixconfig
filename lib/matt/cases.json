@@ -1,0 +1,155 @@
+{
+  "nixos-fleet": {
+    "title": "A fleet that one commit describes",
+    "standfirst": "Thirteen NixOS machines built from one flake. A host can be rebuilt, audited and handed over from the repository alone.",
+    "period": "2023 — now",
+    "role": "Author and operator",
+    "facts": [
+      { "label": "Hosts", "value": "13 active" },
+      { "label": "Operator interface", "value": "one taskfile" },
+      { "label": "Secrets", "value": "SOPS, per host" },
+      { "label": "Access", "value": "SSH CA with rotation" }
+    ],
+    "sections": [
+      {
+        "heading": "The problem",
+        "body": [
+          "By 2023 the fleet had grown past the point where a host could be held in my head: a NAS at home, two laptops, an internet-facing host, a remote builder, and a handful of machines that exist only for a demo or a test. Each had install notes, and the notes went stale between rebuilds."
+        ]
+      },
+      {
+        "heading": "What I built",
+        "body": [
+          "One flake registers every host with a kind, a system and a feature list. The host is assembled from that list, so the module graph is the same everywhere and an option that exists on only one machine shows up in the diff. Secrets are encrypted per host with age. The SSH certificate authority is declared rather than issued by hand, so host and user certificates rotate on a schedule.",
+          "A taskfile is the only interface: plan, deploy, roll back, read the logs. No host carries its own runbook."
+        ]
+      },
+      {
+        "heading": "What it costs",
+        "body": [
+          "The flake is a single point of failure in the useful sense: if it evaluates, every host can be rebuilt. The gate is the module evaluation, and CI runs the same one, so a green build means the graph evaluated and the assertions passed. It does not mean a machine booted. Warming a host before a deploy is what proves the closure."
+        ]
+      },
+      {
+        "heading": "What I would do differently",
+        "body": [
+          "I treated evaluation as free for a year. A fleet-wide check takes 340 seconds and 6 GB on an 11 GB laptop, so it is now refused below a memory floor and hosts are checked one at a time. The cost of a gate belongs in the design, not in a note about why the gate is red."
+        ]
+      }
+    ]
+  },
+  "bountystash": {
+    "title": "A specification you can replay",
+    "standfirst": "Bountystash turns a request into an immutable, content-addressed document. Every view is a replay of recorded events, and the same request produces the same document.",
+    "period": "2020 — 2025",
+    "role": "Founder and engineer",
+    "facts": [
+      { "label": "Runtime", "value": "one Go binary" },
+      { "label": "State", "value": "append-only events" },
+      { "label": "Interfaces", "value": "HTML, JSON, TUI" },
+      { "label": "Frontend", "value": "no build step" }
+    ],
+    "sections": [
+      {
+        "heading": "The problem",
+        "body": [
+          "A request arrives as prose in a ticket, a mail or a chat message. By the time the work is done the prose has drifted, and nobody can say which version was agreed. I wanted the request to become a document that cannot drift, and the state of every job to be reconstructable a month later."
+        ]
+      },
+      {
+        "heading": "What I built",
+        "body": [
+          "A Go service that appends events, addresses the resulting specification by its content hash, and renders the same data three ways: HTML for a browser, JSON for a script, and a keyboard-driven terminal UI for the person doing the work. There is no frontend build and no framework, so the whole surface is small enough to read in an afternoon."
+        ]
+      },
+      {
+        "heading": "What it costs",
+        "body": [
+          "Content addressing means a correction creates a new document instead of editing the old one. That is both the point and the tax: the interface has to show which version is current and why, and storage grows with the history. I kept it, because the alternative is arguing about what a row said last week."
+        ]
+      },
+      {
+        "heading": "What it taught me",
+        "body": [
+          "Append-only state makes incidents boring in the right way. When a job looked wrong, the answer was in the event log, and the fix was usually a missing event rather than a corrupted row."
+        ]
+      }
+    ]
+  },
+  "fibtransponder": {
+    "title": "A benchmark that killed the first design",
+    "standfirst": "A streaming state machine over a bitstream, built to keep the work per step bounded. The measurable result was negative, and that is the part worth showing.",
+    "period": "2026",
+    "role": "Research and implementation",
+    "facts": [
+      { "label": "Language", "value": "Go" },
+      { "label": "Basis", "value": "Fibonacci radix" },
+      { "label": "Selector", "value": "adjacency width" },
+      { "label": "Result", "value": "seed-only detector falsified" }
+    ],
+    "sections": [
+      {
+        "heading": "The idea",
+        "body": [
+          "Tokenisation experiments needed a state machine that could read a bitstream without buffering it. Fibonacci radix gives a transition structure whose width grows slowly, and Zobrist tables keep the hashing cheap. Adjacency width was meant to work as a locality selector instead of a global lookup table."
+        ]
+      },
+      {
+        "heading": "The measurement",
+        "body": [
+          "I wrote the corpus benchmark before deciding the design was good. The seed-only detector failed it: the same seeds collided on natural text in ways they did not on synthetic input. The benchmark and the failure are both in the repository."
+        ]
+      },
+      {
+        "heading": "What changed",
+        "body": [
+          "The claim narrowed from a general detector to a streaming structure with a bounded cost per step. I would rather ship the smaller claim with the measurement attached than the larger one without it."
+        ]
+      },
+      {
+        "heading": "What comes next",
+        "body": [
+          "Widen the corpus beyond natural text, then compare against a plain radix trie on the same bit budget. Until that comparison exists, the bounded-step result stands and the detector claim does not."
+        ]
+      }
+    ]
+  },
+  "energy-telemetry": {
+    "title": "A hundred million dollars of sunlight, reconciled",
+    "standfirst": "Asset management for a solar portfolio above $100M. The work was to make the numbers survive an audit and to notice when a sensor was lying.",
+    "period": "2016 — 2020",
+    "role": "Asset manager, O3 Energy",
+    "facts": [
+      { "label": "Portfolio", "value": "above $100M" },
+      { "label": "Outputs", "value": "yield, valuation, risk" },
+      { "label": "Constraint", "value": "bank audit" },
+      { "label": "Data sources", "value": "meters, inverters, weather" }
+    ],
+    "sections": [
+      {
+        "heading": "The setting",
+        "body": [
+          "A portfolio of operating solar assets financed by institutional lenders. Production data arrived from site meters, inverters and a weather feed, and the numbers fed valuation, reporting and the covenants in the financing."
+        ]
+      },
+      {
+        "heading": "What I built",
+        "body": [
+          "Yield and valuation models in the form the lenders' auditors expected, with the assumptions written down and the error carried through the calculation. A mobile capture path for field technicians, so an inspection produced the same structured record as a meter reading. A reconciliation step that turned missing sensor data into a known error budget instead of a silent gap."
+        ]
+      },
+      {
+        "heading": "What went wrong",
+        "body": [
+          "Sensors fail in ways that look like good news: a stuck pyranometer reads a clear sky all day. The first pipeline trusted the feed and produced a yield estimate that was too high. After that, every model carried a cross-check against a second source, and a disagreement became an incident rather than a footnote."
+        ]
+      },
+      {
+        "heading": "What carried over",
+        "body": [
+          "The habit of asking what the data would look like if the instrument were broken. I ask the same question of a monitoring system now, and it is why the KEV work starts with the shape of the catalogue instead of the headline count."
+        ]
+      }
+    ]
+  }
+}

@@ -6,7 +6,7 @@
     "title": "Senior Systems & Infrastructure Engineer",
     "subtitle": "Go • NixOS • Distributed Systems • Energy & Quantitative Infrastructure",
     "location": "Gutach im Breisgau / Freiburg, Germany (Remote)",
-    "bio": "Systems engineer with a background in engineering, quantitative economics, and energy systems (Colorado School of Mines & University of Freiburg). I design concurrent Go services, declarative NixOS fleet infrastructure, and quantitative data pipelines. Experienced managing risk and telemetry across $100M+ in renewable capital assets.",
+    "bio": "I write Go services and run the machines under them, mostly where a number has to survive an audit. Ten years across energy and software: four managing the asset data behind a solar portfolio above $100M, a founder's desk building risk and trading models for energy companies, and now platform and security work on a fleet I rebuild from one repository.",
     "status": {
       "indicator": "Available",
       "text": "Available for Senior / Lead Systems & Infrastructure Roles (Remote CET / US-East)",
@@ -15,7 +15,7 @@
     "work_auth": {
       "citizenship": "US Citizen",
       "residency": "German Permanent Residence (Niederlassungserlaubnis)",
-      "languages": "English (Native) · German (Fluent C1)",
+      "languages": "English (Native) · German (B2)",
       "availability": "Notice period: Flexible / Available on short notice"
     },
     "education": [
@@ -39,23 +39,57 @@
     }
   },
   "metrics": [
-    { "label": "Renewable Portfolio Ops", "value": "$100M+" },
-    { "label": "Engineering Alma Mater", "value": "Mines & Freiburg" },
-    { "label": "Primary Stack", "value": "Go & NixOS" },
-    { "label": "Legal Status", "value": "US & German PR" }
+    {
+      "label": "Solar assets managed",
+      "value": "$100M+"
+    },
+    {
+      "label": "Installed capacity steered",
+      "value": "10 MW"
+    },
+    {
+      "label": "Hosts from one repository",
+      "value": "13"
+    },
+    {
+      "label": "Years in energy and software",
+      "value": "10"
+    }
   ],
   "skills": [
     {
       "category": "Systems & Concurrency (Go / Python)",
-      "items": ["Go (Golang)", "Concurrency & Channels", "Kafka & Event Streaming", "PostgreSQL", "Redis", "gRPC & REST APIs", "State Machines"]
+      "items": [
+        "Go (Golang)",
+        "Concurrency & Channels",
+        "Kafka & Event Streaming",
+        "PostgreSQL",
+        "Redis",
+        "gRPC & REST APIs",
+        "State Machines"
+      ]
     },
     {
       "category": "Declarative Infrastructure & Linux",
-      "items": ["NixOS Fleets", "Nix Flakes", "SSH Certificate Authority", "SOPS / Age Encryption", "Docker & Containers", "ZFS / Btrfs", "Linux Kernel / ZRAM"]
+      "items": [
+        "NixOS Fleets",
+        "Nix Flakes",
+        "SSH Certificate Authority",
+        "SOPS / Age Encryption",
+        "Docker & Containers",
+        "ZFS / Btrfs",
+        "Linux Kernel / ZRAM"
+      ]
     },
     {
       "category": "Energy, Finance & Domain Modeling",
-      "items": ["Quantitative Asset Valuation", "Solar Telemetry Reconciliation", "Algorithmic Risk Models", "Bank Audit Reporting", "Typst Typesetting Engine"]
+      "items": [
+        "Quantitative Asset Valuation",
+        "Solar Telemetry Reconciliation",
+        "Algorithmic Risk Models",
+        "Bank Audit Reporting",
+        "Typst Typesetting Engine"
+      ]
     }
   ],
   "projects": [
@@ -63,9 +97,15 @@
       "title": "Clean Energy Asset & Telemetry Platform",
       "role": "Lead Operations @ O3 Energy",
       "period": "2016 — 2020",
-      "description": "Led data architecture and commercial asset steering for a solar energy portfolio exceeding $100M+. Built dynamic quantitative valuation and yield models under bank audits, automated mobile field data capture, and structured counterparty risk hedging.",
-      "stack": ["Python", "PostgreSQL", "Time-Series Data", "Docker", "Financial Due Diligence"],
-      "impact": "Governed quantitative operations across $100M+ in assets; coordinated M&A due diligence with institutional lenders, tax equity, and Fraunhofer ISE research frameworks.",
+      "description": "For four years I ran the numbers behind a solar portfolio above $100M: valuation and yield models that had to satisfy bank auditors, mobile capture for field technicians, and counterparty hedging when a deal needed one. The part I am proudest of is the reconciliation: when a sensor died, the model said so instead of quietly reporting a good month.",
+      "stack": [
+        "Python",
+        "PostgreSQL",
+        "Time-Series Data",
+        "Docker",
+        "Financial Due Diligence"
+      ],
+      "impact": "Bank-audited models across $100M+ of assets, and due diligence work alongside institutional lenders and tax equity.",
       "link": "#",
       "featured": true
     },
@@ -73,9 +113,15 @@
       "title": "fibtransponder: Fibonacci Streaming State Machine",
       "role": "Research & Implementation (Go)",
       "period": "2026",
-      "description": "An experimental tokenization and semantic sensing substrate built around a Fibonacci-radix streaming state machine (FSVM). Evaluates bounded per-step work bitstream ingestion, structural calibration via adjacency width, and Zobrist hash seed tables.",
-      "stack": ["Go", "State Machines", "Fibonacci Radix", "Zobrist Hashing", "Bitstream Analysis"],
-      "impact": "Demonstrated that structural adjacency width acts as a locality-sensitivity selector; falsified seed-only detector diversity through automated corpus benchmarks.",
+      "description": "I wanted a stream detector with a bounded cost per step, so I wrote the benchmark before believing the design. It failed on natural text, and the claim narrowed to the structure itself — which is the result I would rather show.",
+      "stack": [
+        "Go",
+        "State Machines",
+        "Fibonacci Radix",
+        "Zobrist Hashing",
+        "Bitstream Analysis"
+      ],
+      "impact": "Showed that adjacency width works as a locality selector, and falsified the seed-only detector with a corpus benchmark.",
       "link": "https://github.com/shaoyanji/fibtransponder",
       "featured": true
     },
@@ -83,9 +129,16 @@
       "title": "Multi-Host Declarative NixOS Infrastructure",
       "role": "Personal Infrastructure Fleet",
       "period": "Active",
-      "description": "Production-grade, fully reproducible multi-host fleet (NAS, workstations, cloud endpoints) managed with Nix Flakes. Features a custom SSH Certificate Authority with automated rotation, age/SOPS secret encryption, automated self-upgrades, and a Taskfile control plane.",
-      "stack": ["NixOS", "Nix Flakes", "SSH CA", "SOPS / Age", "Tailscale", "Taskfile"],
-      "impact": "Zero manual server configuration. One-command host commissioning, automated morning kernel boot validation, and air-gapped secret hygiene.",
+      "description": "Thirteen machines — a NAS, workstations, an internet-facing host, a remote builder — rebuilt from one repository. Secrets are encrypted per host, certificates rotate on a schedule, and commissioning a new host is a commit plus one command.",
+      "stack": [
+        "NixOS",
+        "Nix Flakes",
+        "SSH CA",
+        "SOPS / Age",
+        "Tailscale",
+        "Taskfile"
+      ],
+      "impact": "No host carries its own install notes. A host can be rebuilt, audited or handed over from the repository alone.",
       "link": "https://github.com/shaoyanji/nixconfig",
       "featured": true
     },
@@ -93,25 +146,31 @@
       "title": "Bountystash: Deterministic Work Engine",
       "role": "Creator & Systems Architect",
       "period": "2024 — Present",
-      "description": "Thin, server-rendered Go application turning unstructured task requirements into immutable, content-addressed specifications. Features append-only event sourcing, a keyboard-first terminal UI, and curl-friendly endpoints.",
-      "stack": ["Go", "PostgreSQL", "Nix Flakes", "TUI", "HTML"],
-      "impact": "Single-binary deployment, sub-millisecond route resolution, zero frontend dependencies, and deterministic audit trail.",
+      "description": "A request arrives as prose and has drifted by the time the work is done. Bountystash records it as an immutable document: state is a replay of events, one binary serves HTML, JSON and a terminal UI, and every endpoint answers curl.",
+      "stack": [
+        "Go",
+        "PostgreSQL",
+        "Nix Flakes",
+        "TUI",
+        "HTML"
+      ],
+      "impact": "A single binary with no frontend build, and an audit trail that reconstructs what was agreed a month later.",
       "link": "https://github.com/shaoyanji/bountystash",
       "featured": true
     }
   ],
   "philosophy": [
     {
-      "title": "Reproducibility is non-negotiable",
-      "body": "If an infrastructure state, document build, or service binary cannot be built deterministically from code, it doesn't truly exist. Declarative NixOS flakes and locked dependencies prevent an entire class of production failures."
+      "title": "If I cannot rebuild it, it is not running",
+      "body": "A server, a document or a binary that exists only in its current state is a thing I have to guess about later. Nix flakes and locked dependencies remove a class of failure I would rather not debug at three in the morning."
     },
     {
-      "title": "Domain depth beats generic engineering",
-      "body": "Writing code is only half the battle. Understanding financial yield formulas, physical energy systems, or bitstream locality sensitivity prevents architectural mistakes before the first line of SQL is written."
+      "title": "Learn the domain before the schema",
+      "body": "Yield formulas, physical constraints, and how a lender reads a report all change the design before the first table exists. Writing the code is the easy part."
     },
     {
-      "title": "Keep the runtime lightweight",
-      "body": "Low-latency systems come from sensible fundamentals: compiled Go services, clean data models, server-rendered layouts, and respecting network envelopes like the 14KB rule."
+      "title": "Keep the runtime small enough to reason about",
+      "body": "Compiled Go, clean data models, server-rendered HTML, and respect for a 14 KB budget. Latency comes from fundamentals, not from a framework."
     }
   ],
   "notes": [

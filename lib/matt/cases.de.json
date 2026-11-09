@@ -1,0 +1,155 @@
+{
+  "nixos-fleet": {
+    "title": "Eine Flotte, die ein Commit beschreibt",
+    "standfirst": "Dreizehn NixOS-Maschinen aus einem Flake. Ein Host lässt sich allein aus dem Repository neu bauen, prüfen und übergeben.",
+    "period": "2023 — heute",
+    "role": "Autor und Betreiber",
+    "facts": [
+      { "label": "Hosts", "value": "13 aktiv" },
+      { "label": "Bedienoberfläche", "value": "ein Taskfile" },
+      { "label": "Secrets", "value": "SOPS, pro Host" },
+      { "label": "Zugriff", "value": "SSH-CA mit Rotation" }
+    ],
+    "sections": [
+      {
+        "heading": "Die Ausgangslage",
+        "body": [
+          "2023 war die Flotte über den Punkt hinausgewachsen, an dem ein Host noch in meinen Kopf passte: ein NAS zu Hause, zwei Laptops, ein öffentlich erreichbarer Host, ein entfernter Builder und einige Maschinen, die nur für eine Demo oder einen Test existieren. Jeder hatte Installationsnotizen, und die Notizen veralteten zwischen zwei Rebuilds."
+        ]
+      },
+      {
+        "heading": "Was ich gebaut habe",
+        "body": [
+          "Ein Flake registriert jeden Host mit Art, System und Funktionsliste. Der Host wird aus dieser Liste zusammengesetzt, also ist der Modulgraph überall derselbe, und eine Option, die nur auf einer Maschine existiert, steht im Diff. Secrets sind pro Host mit age verschlüsselt. Die SSH-Zertifizierungsstelle ist deklariert statt von Hand ausgestellt, deshalb rotieren Host- und Benutzerzertifikate nach Plan.",
+          "Ein Taskfile ist die einzige Schnittstelle: planen, ausliefern, zurückrollen, Logs lesen. Kein Host trägt ein eigenes Runbook."
+        ]
+      },
+      {
+        "heading": "Was es kostet",
+        "body": [
+          "Der Flake ist ein Single Point of Failure im nützlichen Sinn: Wenn er evaluiert, lässt sich jeder Host neu bauen. Das Gate ist die Modul-Evaluation, und die CI führt dieselbe Prüfung aus; ein grüner Build heißt also, dass der Graph evaluiert und alle Assertions erfüllt sind. Nicht, dass eine Maschine gebootet hat. Das beweist erst der Build, wenn ein Host vor dem Deploy vorgewärmt wird."
+        ]
+      },
+      {
+        "heading": "Was ich anders machen würde",
+        "body": [
+          "Ein Jahr lang habe ich die Evaluation als kostenlos behandelt. Ein flottenweiter Check braucht 340 Sekunden und 6 GB auf einem Laptop mit 11 GB, deshalb läuft er unterhalb einer Speichergrenze gar nicht erst, und Hosts werden einzeln geprüft. Die Kosten eines Gates gehören in den Entwurf, nicht in eine Notiz darüber, warum das Gate rot ist."
+        ]
+      }
+    ]
+  },
+  "bountystash": {
+    "title": "Eine Spezifikation, die sich wieder abspielen lässt",
+    "standfirst": "Bountystash macht aus einer Anfrage ein unveränderliches, inhaltsadressiertes Dokument. Jede Ansicht ist ein Replay aufgezeichneter Ereignisse, und dieselbe Anfrage ergibt dasselbe Dokument.",
+    "period": "2020 — 2025",
+    "role": "Gründer und Entwickler",
+    "facts": [
+      { "label": "Laufzeit", "value": "ein Go-Binary" },
+      { "label": "Zustand", "value": "append-only Events" },
+      { "label": "Schnittstellen", "value": "HTML, JSON, TUI" },
+      { "label": "Frontend", "value": "kein Build-Schritt" }
+    ],
+    "sections": [
+      {
+        "heading": "Die Ausgangslage",
+        "body": [
+          "Eine Anfrage kommt als Prosa in einem Ticket, einer Mail oder einer Chat-Nachricht an. Bis die Arbeit fertig ist, hat sich die Prosa verschoben, und niemand kann sagen, welche Fassung vereinbart war. Ich wollte, dass die Anfrage zu einem Dokument wird, das nicht driften kann, und dass der Zustand jedes Auftrags einen Monat später rekonstruierbar ist."
+        ]
+      },
+      {
+        "heading": "Was ich gebaut habe",
+        "body": [
+          "Ein Go-Dienst, der Ereignisse anhängt, die entstandene Spezifikation über ihren Inhalts-Hash adressiert und dieselben Daten auf drei Wegen ausgibt: HTML für den Browser, JSON für ein Skript und eine tastaturgesteuerte Terminal-Oberfläche für die Person, die arbeitet. Es gibt keinen Frontend-Build und kein Framework, die ganze Oberfläche ist also klein genug, um sie an einem Nachmittag zu lesen."
+        ]
+      },
+      {
+        "heading": "Was es kostet",
+        "body": [
+          "Inhaltsadressierung heißt, dass eine Korrektur ein neues Dokument erzeugt, statt das alte zu bearbeiten. Das ist der Punkt — und der Preis: Die Oberfläche muss zeigen, welche Fassung aktuell ist und warum, und der Speicher wächst mit der Historie. Ich habe es behalten, weil die Alternative darin besteht, über den Stand einer Zeile von letzter Woche zu streiten."
+        ]
+      },
+      {
+        "heading": "Was ich daraus gelernt habe",
+        "body": [
+          "Append-only Zustand macht Vorfälle auf die richtige Weise langweilig. Wenn ein Auftrag falsch aussah, lag die Antwort im Ereignisprotokoll, und die Korrektur war meist ein fehlendes Ereignis und keine kaputte Zeile."
+        ]
+      }
+    ]
+  },
+  "fibtransponder": {
+    "title": "Ein Benchmark, der den ersten Entwurf zu Fall gebracht hat",
+    "standfirst": "Ein streamender Zustandsautomat, der einen Bitstrom liest, ohne ihn zu puffern. Gebaut, um die Arbeit pro Schritt begrenzt zu halten — das messbare Ergebnis war negativ, und genau das ist der interessante Teil.",
+    "period": "2026",
+    "role": "Recherche und Umsetzung",
+    "facts": [
+      { "label": "Sprache", "value": "Go" },
+      { "label": "Grundlage", "value": "Fibonacci-Radix" },
+      { "label": "Selektor", "value": "Adjazenzbreite" },
+      { "label": "Ergebnis", "value": "Seed-Detektor widerlegt" }
+    ],
+    "sections": [
+      {
+        "heading": "Die Idee",
+        "body": [
+          "Für Tokenisierungsexperimente brauchte ich einen Zustandsautomaten, der einen Bitstrom liest, ohne ihn zu puffern. Fibonacci-Radix ergibt eine Übergangsstruktur, deren Breite langsam wächst, und Zobrist-Tabellen halten das Hashing billig. Die Adjazenzbreite sollte als Lokalitätsselektor wirken statt als globale Nachschlagetabelle."
+        ]
+      },
+      {
+        "heading": "Die Messung",
+        "body": [
+          "Den Korpus-Benchmark habe ich geschrieben, bevor ich an den Entwurf geglaubt habe. Der reine Seed-Detektor ist daran gescheitert: Dieselben Seeds kollidierten auf natürlichem Text anders als auf synthetischem Input. Benchmark und Fehlschlag liegen beide im Repository."
+        ]
+      },
+      {
+        "heading": "Was sich geändert hat",
+        "body": [
+          "Die Behauptung ist von einem allgemeinen Detektor auf eine Streaming-Struktur mit begrenzten Kosten pro Schritt geschrumpft. Ich liefere lieber die kleinere Behauptung mit Messung als die größere ohne."
+        ]
+      },
+      {
+        "heading": "Wie es weitergeht",
+        "body": [
+          "Den Korpus über natürlichen Text hinaus erweitern und dann gegen einen einfachen Radix-Trie mit demselben Bit-Budget vergleichen. Bis dieser Vergleich existiert, gilt das Ergebnis nur für die begrenzten Schritte — die Detektor-Behauptung gilt nicht."
+        ]
+      }
+    ]
+  },
+  "energy-telemetry": {
+    "title": "Hundert Millionen Dollar Sonnenlicht, abgeglichen",
+    "standfirst": "Asset Management für ein Solarportfolio von über 100 Mio. USD. Die Arbeit bestand darin, die Zahlen durch eine Prüfung zu bringen und zu merken, wenn ein Sensor lügt.",
+    "period": "2016 — 2020",
+    "role": "Asset Manager, O3 Energy",
+    "facts": [
+      { "label": "Portfolio", "value": "über 100 Mio. USD" },
+      { "label": "Ergebnisse", "value": "Ertrag, Bewertung, Risiko" },
+      { "label": "Randbedingung", "value": "Bankprüfung" },
+      { "label": "Datenquellen", "value": "Zähler, Wechselrichter, Wetter" }
+    ],
+    "sections": [
+      {
+        "heading": "Die Ausgangslage",
+        "body": [
+          "Ein Portfolio laufender Solaranlagen, finanziert durch institutionelle Kreditgeber. Die Produktionsdaten kamen von Zählern vor Ort, von Wechselrichtern und aus einem Wetterfeed, und die Zahlen flossen in Bewertung, Reporting und die Auflagen der Finanzierung."
+        ]
+      },
+      {
+        "heading": "Was ich gebaut habe",
+        "body": [
+          "Ertrags- und Bewertungsmodelle in der Form, die die Prüfer der Kreditgeber erwarteten, mit aufgeschriebenen Annahmen und durchgerechneter Fehlerfortpflanzung. Eine mobile Erfassung für Techniker im Feld, damit eine Inspektion denselben strukturierten Datensatz erzeugt wie ein Zählerstand. Ein Abgleich, der fehlende Sensordaten in ein bekanntes Fehlerbudget verwandelt statt in eine stille Lücke."
+        ]
+      },
+      {
+        "heading": "Was schiefging",
+        "body": [
+          "Sensoren fallen so aus, dass es nach guter Nachricht aussieht: Ein festgefahrenes Pyranometer liest den ganzen Tag klaren Himmel. Die erste Pipeline hat dem Feed vertraut und einen zu hohen Ertrag geschätzt. Danach hatte jedes Modell einen Gegencheck gegen eine zweite Quelle, und eine Abweichung war ein Vorfall statt eine Fußnote."
+        ]
+      },
+      {
+        "heading": "Was geblieben ist",
+        "body": [
+          "Die Frage, wie die Daten aussähen, wenn das Messgerät kaputt wäre. Genau diese Frage stelle ich heute auch an ein Monitoring-System, und deshalb beginnt die KEV-Arbeit mit der Form des Katalogs und nicht mit der Schlagzeile der Anzahl."
+        ]
+      }
+    ]
+  }
+}

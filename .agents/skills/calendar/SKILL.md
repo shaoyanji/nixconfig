@@ -5,7 +5,7 @@ version: 0.2.0
 platforms: [linux]
 metadata:
   hermes:
-    tags: [calendar, khal, vdirsyncer, oauth2, libnotify, dms]
+    tags: [calendar, khal, vdirsyncer, oauth2, libnotify, dms, calcom]
     related_skills: [google-drive, infra]
 ---
 
@@ -108,11 +108,46 @@ notify-send --app-name="Calendar" --urgency=normal \
   "Calendar Test" "Meeting starts at 17:30 (Simulated)"
 ```
 
+## The Cal.com booking surface (`task cal:*`)
+
+Two authorities, and they answer different questions. **khal** is the calendar:
+what is on it, when, from Google through vdirsyncer. **Cal.com** is the booking
+surface in front of it: the event types someone can pick, the slots that are
+free, and the booking record — who asked, with which address, under which uid.
+khal never had that half, so a question about a booking is not a khal question.
+
+```bash
+task cal:events                          # slugs and ids of the page's event types
+task cal:slots EVENT=15min DAYS=5        # public: no key, no account
+task cal:list STATUS=upcoming LIMIT=10   # uids, attendee, start
+task cal:book EVENT=15min START='2026-11-10 14:30' \
+  NAME='…' ADDR='…'                     # prints the plan; needs YES=1 to send
+task cal:cancel UID=<uid> REASON='…'     # same gate
+task cal:reschedule UID=<uid> START='…'  # same gate
+```
+
+The three writes send an invitation and touch the real calendar, so the task
+prints exactly what it will do and stops until `YES=1`. That is the
+`confirm-before-destructive` policy, not politeness: `POST /v2/bookings` is a
+public endpoint, which is the point of a booking page.
+
+The attendee address is `ADDR`, not `EMAIL`: this Taskfile's root variables own
+`EMAIL`, and a root variable wins over the command line.
+
+Each endpoint pins its own `cal-api-version` — `2024-06-14` event types,
+`2024-09-04` slots, `2026-05-01` bookings, `2026-02-25` the three writes.
+Reusing one constant across them changes response shapes silently.
+
+The account reads need `caldotcom` from the secrets plane, declared only where
+the `agent-backend` trait is set (frieren, delphi). `cal:slots` works anywhere:
+its `.md` document on the public page names the event id.
+
 ## When the calendar is out of reach
 
 khal only knows what vdirsyncer last wrote, and a host without the token has no
-local copy at all. Before guessing at availability, ask the Cal.ai assistant at
-`mattji@my.cal.ai` — the constant is `user.calEmail` in
+local copy at all. Reach for `task cal:slots` and `task cal:list` first: they
+answer synchronously and structurally. If the host cannot run them either, ask
+the Cal.ai assistant at `mattji@my.cal.ai` — the constant is `user.calEmail` in
 `modules/global/user.nix`. It reads the Cal.com calendar and answers a
 scheduling question as mail, so a reply is the authority where a stale `.ics`
 file is not. State the question and the window in the subject, for example

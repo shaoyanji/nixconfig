@@ -59,6 +59,10 @@ includes:
         taskfile: taskfiles/burgernas.yml
         dir: .
         flatten: true
+    cal:
+        taskfile: taskfiles/cal.yml
+        dir: .
+        flatten: true
     check:
         taskfile: taskfiles/check.yml
         dir: .

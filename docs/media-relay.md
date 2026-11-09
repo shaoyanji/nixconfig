@@ -33,6 +33,11 @@ Height and rate are **ceilings, not targets**: `--height`/`--fps` raise them per
 fetch when the client is a TV, and the fps filter falls back to the uncapped
 chain rather than failing when a video has no ≤30 fps format.
 
+The three rules are enforced, not preferred: there is no `best` fallback at the
+end of the format chain. A video with no `avc1`/`mp4a` stream below the ceiling
+fails the fetch and says so, because the alternative is storing VP9 or AV1 in an
+mp4 and discovering it cannot play on the client days later.
+
 `-c copy` + `+faststart` means nothing is re-encoded and the moov atom sits at
 the front, which is what makes seeking over Range work.
 
@@ -40,7 +45,9 @@ the front, which is what makes seeking over Range work.
 
 `http://delphi:8461/` (tailnet `tailscale-serve-media`) serves a browse page over
 the library, not an nginx directory listing: every file, grouped by the fetch
-folder it came from, with a fuzzy search over name, folder and extension. The
+folder it came from — newest fetch first, newest file first inside a folder —
+with a fuzzy search over name, folder and extension, and a copy button on every
+row for the absolute URL of the host it is being read on. The
 page is one static HTML file with inline CSS and JS — no build step, no
 framework, no network fetch beyond the manifest — because it has to work on an
 iPad's Safari as well as the netbook.
@@ -48,9 +55,10 @@ iPad's Safari as well as the netbook.
 - `/index.json` is the manifest: `path`, `name`, `dir`, `ext`, `kind`, `size`,
   `mtime` per file, plus `poster` on a video that has one, and `count` and
   `bytes`. The page never walks directories (that is one request per folder).
-- A poster is one frame per fetch folder, written to `poster.jpg` beside the
-  video: `yt-get` takes it at 3 s (or 0 s when the video is shorter) and scales
-  it to 480 px wide, and `media-relay-posters` fills in the ones already in the
+- A poster is one image per fetch folder, written to `poster.jpg` beside the
+  video. `yt-get` asks for YouTube's own thumbnail first (one metadata call, no
+  decode) and falls back to a frame at 3 s, or 0 s when the video is shorter,
+  scaled to 480 px wide; `media-relay-posters` fills in the ones already in the
   library at boot. The name is the contract — the index reads `poster.jpg` as
   metadata for that folder's video, so it is never listed as an image and never
   counted in `bytes`. A video with no poster keeps the filename row, and its

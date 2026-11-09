@@ -19,9 +19,13 @@ button.chip{background:transparent;border:1px solid var(--line);color:var(--dim)
 button.chip[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
 h2{font-size:12px;color:var(--dim);font-weight:400;text-transform:uppercase;letter-spacing:.1em;margin:1.5rem 0 .35rem}
 ul{list-style:none;margin:0;padding:0}
-li a{display:grid;grid-template-columns:1fr auto auto;gap:.75rem;align-items:baseline;padding:.45rem .5rem;border-radius:.25rem;text-decoration:none;color:inherit;border:1px solid transparent}
+li{display:grid;grid-template-columns:1fr auto;align-items:center;border:1px solid transparent;border-radius:.25rem}
+li:hover{background:var(--panel);border-color:var(--line)}
+li a{display:grid;grid-template-columns:1fr auto auto;gap:.75rem;align-items:baseline;padding:.45rem .5rem;text-decoration:none;color:inherit}
 li a.poster{grid-template-columns:auto 1fr auto auto}
-li a:hover,li a.sel{background:var(--panel);border-color:var(--line)}
+li a.sel{outline:1px solid var(--accent);outline-offset:-1px;border-radius:.25rem}
+button.cp{background:transparent;border:1px solid var(--line);color:var(--dim);font:inherit;font-size:11px;padding:.15rem .45rem;margin-right:.5rem;border-radius:999px;cursor:pointer;white-space:nowrap}
+button.cp:hover,button.cp:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
 li a:focus-visible{outline:1px solid var(--accent)}
 .thumb{display:block;width:96px;height:54px;background:#000;border:1px solid var(--line);border-radius:.2rem;overflow:hidden}
 .thumb img{display:block;width:100%;height:100%;object-fit:cover}
@@ -31,7 +35,7 @@ li a:focus-visible{outline:1px solid var(--accent)}
 .ext{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 #state{color:var(--dim);padding:2rem .5rem;text-align:center}
 #state code{color:var(--accent)}
-@media(max-width:36rem){li a{grid-template-columns:1fr auto}li a.poster{grid-template-columns:auto 1fr auto}li a.poster .meta{display:none}}
+@media(max-width:36rem){li a{grid-template-columns:1fr auto}li a.poster{grid-template-columns:auto 1fr auto}li a.poster .meta{display:none}li{grid-template-columns:1fr}button.cp{display:none}}
 </style>
 </head>
 <body>
@@ -120,7 +124,8 @@ function fuzzy(needle, hay) {
 }
 
 // Group a flat listing by folder: the folder is the fetch, the files are its
-// renders. Preserves the manifest order inside a group.
+// renders. Newest fetch first, newest file first inside a folder, because the
+// file someone just fetched is the reason they opened the page.
 function groupByDir(items) {
   const groups = new Map();
   for (const f of items) {
@@ -128,7 +133,10 @@ function groupByDir(items) {
     if (!groups.has(d)) groups.set(d, []);
     groups.get(d).push(f);
   }
-  return [...groups.entries()];
+  const newest = (list) => Math.max(...list.map((f) => f.mtime || 0));
+  return [...groups.entries()]
+    .map(([dir, list]) => [dir, list.slice().sort((a, b) => (b.mtime || 0) - (a.mtime || 0) || a.path.localeCompare(b.path))])
+    .sort((a, b) => newest(b[1]) - newest(a[1]) || a[0].localeCompare(b[0]));
 }
 /* fuzzy:end */
 
@@ -140,9 +148,32 @@ function selected(item) {
   const thumb = item.poster
     ? `<span class="thumb"><img src="/${item.poster.split('/').map(encodeURIComponent).join('/')}" alt="" width="96" height="54" loading="lazy" decoding="async"></span>`
     : '';
+  // The link is absolute only at click time: the page is served on loopback, on
+  // `delphi:8461` and on the tailnet name, and the useful bookmark is the host
+  // the reader actually used.
   return `<li><a href="${href}" data-p="${esc(item.path)}"${item.poster ? ' class="poster"' : ''}>${thumb}<span class="n">${item.html}</span>`
     + `<span class="meta">${fmtSize(item.size)}</span>`
-    + `<span class="ext">${esc(item.ext)}</span></a></li>`;
+    + `<span class="ext">${esc(item.ext)}</span></a>`
+    + `<button class="cp" type="button" data-href="${esc(href)}" aria-label="Copy the link to ${esc(item.name)}">copy</button></li>`;
+}
+
+async function copyLink(btn) {
+  const url = new URL(btn.dataset.href, location.origin).href;
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch (_) {
+    // Clipboard permission is not a given (plain http on a LAN name), so the
+    // fallback is the selection route every browser still honours.
+    const t = document.createElement('textarea');
+    t.value = url;
+    t.setAttribute('readonly', '');
+    document.body.append(t);
+    t.select();
+    try { document.execCommand('copy'); } catch (__) { /* the text stays selected */ }
+    t.remove();
+  }
+  btn.textContent = 'copied';
+  setTimeout(() => { btn.textContent = 'copy'; }, 1200);
 }
 
 function markup(item) {
@@ -179,7 +210,7 @@ function render() {
       .filter((f) => f.match)
       .sort((a, b) => b.match.score - a.match.score || b.mtime - a.mtime || a.name.localeCompare(b.name));
   } else {
-    view = pool.slice().sort((a, b) => a.path.localeCompare(b.path));
+    view = pool.slice();
   }
 
   if (!view.length) {
@@ -241,6 +272,13 @@ document.addEventListener('keydown', (e) => {
 });
 
 qEl.addEventListener('input', () => { query = qEl.value; render(); });
+
+listEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('button.cp');
+  if (!btn) return;
+  e.preventDefault();
+  copyLink(btn);
+});
 
 fetch('/index.json', { cache: 'no-store' })
   .then((r) => {

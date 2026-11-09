@@ -65,10 +65,11 @@
     out="${cfg.mediaDir}/$id"
     mkdir -p "$out"
 
+    # H.264/AAC or nothing. A `best` fallback here would store VP9 or AV1 in an
+    # mp4 and hand the iPad a file it cannot open — the failure would be silent,
+    # at the client, days later. A fetch with no avc1 stream fails and says why.
     format="bv*[vcodec^=avc1][height<=?$max_height][fps<=?$max_fps]+ba[acodec^=mp4a]"
     format="$format/bv*[vcodec^=avc1][height<=?$max_height]+ba[acodec^=mp4a]"
-    format="$format/bv*[vcodec^=avc1][height<=?$max_height]+ba"
-    format="$format/b[height<=?$max_height]"
 
     file="$(yt-dlp $cookie_flag --no-playlist --no-warnings --no-simulate \
       -f "$format" --merge-output-format mp4 \
@@ -76,7 +77,8 @@
       --print after_move:filepath "$url" | tail -1)"
 
     if [ -z "$file" ] || [ ! -f "$file" ]; then
-      echo "yt-get: yt-dlp produced no file" >&2
+      echo "yt-get: yt-dlp produced no file — no H.264/AAC stream at or below height $max_height, fps $max_fps, or the fetch failed" >&2
+      echo "        Raise --height/--fps, or transcode by hand: the relay stores only H.264 so old Apple clients can play it." >&2
       exit 1
     fi
 
@@ -93,11 +95,22 @@
         ;;
     esac
 
-    # A poster is a frame, not a second download: seek in, take one frame, scale
-    # to 480 wide. Failure is cosmetic — the page then shows the filename — so it
-    # is a warning and never fails the fetch. A video shorter than the first seek
-    # yields no frame at all (exit 0, empty output), hence the second attempt at 0.
+    # The poster is YouTube's own still when this account can reach it — one
+    # metadata call, full 16:9 frame, no decode — and a frame from the file only
+    # as the fallback. Failure is cosmetic (the page shows the filename), so
+    # neither path may fail the fetch. A video shorter than the first seek yields
+    # no frame at all (exit 0, empty output), hence the second attempt at 0.
     poster="$out/poster.jpg"
+    if [ ! -s "$poster" ]; then
+      if yt-dlp $cookie_flag --no-playlist --no-warnings --skip-download \
+        --write-thumbnail --convert-thumbnails jpg \
+        -o "$out/thumb.%(ext)s" "$url" >/dev/null 2>&1 && [ -s "$out/thumb.jpg" ]; then
+        mv -f "$out/thumb.jpg" "$poster"
+      fi
+      # A converted thumbnail can leave the original behind, and a stray image is
+      # a second entry in the index.
+      rm -f "$out"/thumb.*
+    fi
     if [ ! -s "$poster" ]; then
       for at in 3 0; do
         if ffmpeg -nostdin -loglevel error -y -ss "$at" -i "$file" \

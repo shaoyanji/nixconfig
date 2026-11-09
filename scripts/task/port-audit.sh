@@ -18,7 +18,7 @@
 # Buckets reported:
 #   SERVED            declared AND listening somewhere      — the intended surface
 #   DEAD-HOLE         declared, NOTHING listening           — stale firewall entry (drift)
-#   REDUNDANT         declared, loopback-bound only         — hole the LAN cannot use
+#   REDUNDANT         declared, loopback-bound only         — hole with no possible client (FAILS)
 #   FIREWALL-ONLY     public listener, NOT declared, a port below the dynamic range
 #   ACCEPTED          public listener, NOT declared, listed in ACCEPTED_PUBLIC below
 #   DYNAMIC           public listener on a port at/above the first dynamic port
@@ -44,8 +44,15 @@
 # uses; deleting the entry is not an option either (the listener exists), so the honest
 # state is "known, unreachable, firewall-scoped — revisit when the owner changes".
 #
-# Exit codes: 0 = report produced (STRICT=0 or no drift), 1 = DEAD-HOLE or FIREWALL-ONLY
-#             found with STRICT=1, 2 = not auditable: HOST is not this machine, the
+# A port gets into REDUNDANT by being declared on the audited interface while its only
+# listener binds loopback — the firewall hole cannot be reached, and the client path is the
+# vhost or `tailscale serve` mount in front of it (the delphi media relay had no way in
+# until it got a mount; a firewall row for its loopback 8094 would have been a hole with
+# no client). That is never a state to keep, so it fails unconditionally. DEAD-HOLE and
+# FIREWALL-ONLY stay behind STRICT=1: they need a decision, and STRICT is how a run asks.
+#
+# Exit codes: 0 = report produced (STRICT=0 or no drift), 1 = REDUNDANT, or DEAD-HOLE /
+#             FIREWALL-ONLY with STRICT=1, 2 = not auditable: HOST is not this machine, the
 #             interface declares no ports, or the nix eval failed.
 set -uo pipefail
 
@@ -198,8 +205,10 @@ if [ -n "$dead" ]; then
   echo "      the scoped allow-list, or re-enable the service they were declared for."
 fi
 if [ -n "$redundant" ]; then
-  echo "Note: REDUNDANT ports have a declared LAN hole but their listener is loopback-bound,"
-  echo "      so the hole is unusable and unnecessary — usually a proxied service."
+  echo "ERROR: REDUNDANT ports are declared on ${IFACE} but bind loopback only: ${redundant}" >&2
+  echo "       The hole has no possible client, and it widens ${IFACE} for nothing. Reach the" >&2
+  echo "       service through its vhost or serve mount and set \`lan = false; tailnet = false;\`" >&2
+  echo "       on its row, or make the listener bind the interface." >&2
 fi
 if [ -n "$firewall_only" ]; then
   echo "Note: FIREWALL-ONLY ports bind a public address but are permitted nowhere. They are"
@@ -221,6 +230,10 @@ if [ -n "$dynamic" ]; then
   echo "      start-up and there is no stable number to declare. Pin the port where the owner"
   echo "      allows it (services.nfs.server.statdPort/lockdPort) or isolate the service; the"
   echo "      firewall scope is their only control until then."
+fi
+
+if [ -n "$redundant" ]; then
+  exit 1
 fi
 
 if [ "$STRICT" = "1" ] && { [ -n "$dead" ] || [ -n "$firewall_only" ]; }; then

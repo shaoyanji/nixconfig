@@ -168,5 +168,6 @@ in {
   profiles.serviceExposure.services.gemini-tailnet = {
     port = tailnetPort;
     lan = false;
+    tailnet = true;
   };
 }

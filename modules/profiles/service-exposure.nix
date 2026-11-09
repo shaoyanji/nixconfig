@@ -65,10 +65,18 @@ in {
             default = true;
             description = "Reachable on the wired/wifi LAN interfaces.";
           };
+          # No default, on purpose. `true` here meant every new row silently
+          # widened the mesh, and on frieren that was fifteen rows' worth of
+          # discovery, SMB and DHCP holes nobody had decided to open. The LAN is
+          # the host's own wire; the tailnet is a second network with its own
+          # clients, so a row has to say which of them it serves.
           tailnet = lib.mkOption {
             type = lib.types.bool;
-            default = true;
-            description = "Reachable on tailscale0.";
+            description = ''
+              Reachable on tailscale0. Required: a row that omits it fails to
+              evaluate, so exposing a service on the mesh is always a written
+              decision and never an inherited default.
+            '';
           };
           proxy = lib.mkOption {
             type = lib.types.nullOr (lib.types.submodule {

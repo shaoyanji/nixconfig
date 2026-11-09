@@ -164,9 +164,8 @@ visible only inside the tailnet.
 
 ## Tailnet service mounts (one port per service)
 
-Everything reachable from the tailnet is a loopback listener plus a
-`tailscale serve` mount; nothing here is added to the public vhost. tailscaled
-terminates TLS, so there is no certificate to own per service.
+Everything reachable from the tailnet is a loopback listener plus a `tailscale
+serve` mount, never a public vhost; tailscaled terminates TLS, so no cert per service.
 
 | Port | Service | Unit | Upstream |
 | :--- | :--- | :--- | :--- |
@@ -177,9 +176,10 @@ terminates TLS, so there is no certificate to own per service.
 | 8461 | Media relay (range-served video library) | `tailscale-serve-media` | `127.0.0.1:8094` |
 
 Both the mounts and the console are compiled from `services.servicePortal`, and
-`modules/services/service-portal.nix` fails the build when a mount has no card, a
-card has no owner, two mounts share a port, an upstream is not loopback, or a
-`requires` names a unit that does not exist.
+`modules/services/service-portal.nix` fails the build when a mount has no card, no
+owner, a shared port, a non-loopback upstream or a missing `requires`. A port a
+service *binds* is a `profiles.serviceExposure` row, whose `tailnet` is required:
+a loopback-bound listener there is REDUNDANT and fails `checks:ports`.
 
 ## Offloaded services (2026-11-02)
 

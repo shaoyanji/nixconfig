@@ -1,4 +1,4 @@
-# Firewall scoping: every open service port is reachable ONLY on the LAN NICs
+# Firewall scoping: every open service port is reachable ONLY on the LAN NICs, and each row states its tailnet reach.
 {
   self,
   config,
@@ -30,17 +30,30 @@ in {
     enable = true;
     interfaces = scopedIfaces;
     services = {
-      ssh = {port = 22;};
-      nginx = {port = 80;};
-      nginx-https = {port = 443;};
+      ssh = {
+        port = 22;
+        tailnet = true;
+      };
+      nginx = {
+        port = 80;
+        tailnet = true;
+      };
+      nginx-https = {
+        port = 443;
+        tailnet = true;
+      };
       # DNS on every scoped interface: the LAN one resolves, and the mesh needs
       # `10.99.0.53` to answer from a roaming client. Both protocols because a
       # truncated UDP answer is retried over TCP.
       dns = {
         port = 53;
         udp = true;
+        tailnet = true;
       };
-      gemini = {port = config.services.molly-brown.port;};
+      gemini = {
+        port = config.services.molly-brown.port;
+        tailnet = true;
+      };
       # SMB stays on the LAN: the roaming NAS mount is NFS (`profiles.nas-client`
       # falls back to `mount -t nfs` over the tailnet), so nothing off-LAN uses it.
       samba-netbios-ssn = {
@@ -55,9 +68,13 @@ in {
       # Tier-1 printing debloat; it was a hole with no service behind it.
       # Kept on the tailnet on purpose: `profiles.nas-client` mounts this over
       # WireGuard when a laptop is away from the LAN (measured fallback, not a guess).
-      nfs = {port = 2049;};
+      nfs = {
+        port = 2049;
+        tailnet = true;
+      };
       immich = {
         port = config.services.immich.port;
+        tailnet = true;
         proxy = {
           name = "photos.frieren.lan";
           websockets = true;
@@ -70,20 +87,26 @@ in {
       fleet-alert-bridge = {
         port = config.services.fleetMonitors.alerting.port;
         lan = false;
+        tailnet = true;
       };
       harmonia = {
         port = config.services.harmonia-fleet.port;
+        tailnet = true;
         proxy = {
           name = "cache.frieren.lan";
         };
       };
-      simplex-smp = {port = 5223;};
+      simplex-smp = {
+        port = 5223;
+        tailnet = true;
+      };
       tcp-5357 = {
         port = 5357;
         tailnet = false;
       };
       ariang = {
         port = 6801;
+        tailnet = true;
         proxy = {
           name = "aria.frieren.lan";
           websockets = true;
@@ -92,15 +115,20 @@ in {
       # stirling-pdf moved to delphi (tailnet 8445); `pdf.frieren.lan` is gone
       # with it, so the bookmark is now the ts.net name — see
       # `open-frieren-offload` in AGENTS.nix.
-      tcp-7878 = {port = 7878;};
+      tcp-7878 = {
+        port = 7878;
+        tailnet = true;
+      };
       kiwix = {
         port = config.services.kiwix-serve.port;
+        tailnet = true;
         proxy = {
           name = "wiki.frieren.lan";
         };
       };
       jellyfin = {
         port = 8096;
+        tailnet = true;
         proxy = {
           name = "media.frieren.lan";
           websockets = true;
@@ -108,6 +136,7 @@ in {
       };
       home-assistant = {
         port = config.services.ha-stack.port;
+        tailnet = true;
         proxy = {
           name = "ha.frieren.lan";
           websockets = true;
@@ -115,16 +144,35 @@ in {
       };
       scrutiny = {
         port = 8124;
+        tailnet = true;
         proxy = {
           name = "smart.frieren.lan";
         };
       };
-      tcp-8686 = {port = 8686;};
-      tcp-8787 = {port = 8787;};
-      tcp-8989 = {port = 8989;};
-      tcp-9696 = {port = 9696;};
-      iventoy-http = {port = 16000;};
-      tcp-26000 = {port = 26000;};
+      tcp-8686 = {
+        port = 8686;
+        tailnet = true;
+      };
+      tcp-8787 = {
+        port = 8787;
+        tailnet = true;
+      };
+      tcp-8989 = {
+        port = 8989;
+        tailnet = true;
+      };
+      tcp-9696 = {
+        port = 9696;
+        tailnet = true;
+      };
+      iventoy-http = {
+        port = 16000;
+        tailnet = true;
+      };
+      tcp-26000 = {
+        port = 26000;
+        tailnet = true;
+      };
       # 27701 (anki sync) pruned 2026-11-02 — the service moved to delphi, and
       # `anki.frieren.lan` is now a vhost there instead of a bare port here.
       paperless = {
@@ -140,7 +188,10 @@ in {
           upstream = "http://100.123.145.53:28981";
         };
       };
-      plex = {port = 32400;};
+      plex = {
+        port = 32400;
+        tailnet = true;
+      };
       # 32469 (Plex DLNA) pruned 2026-10-12 — Plex's DLNA plugin is not
       # enabled, so the port had no listener.
 

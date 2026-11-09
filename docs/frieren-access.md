@@ -59,7 +59,13 @@ route on hosts that are physically on the LAN — their native path wins.
 | AriaNg | 6801 | LAN + tailnet |
 | Fleet monitors (gatus) | 8181 | delphi, tailnet only (no equivalent port here since 2026-11-04) |
 | Scrutiny | 8124 | LAN + tailnet |
-| SMB / NFS | 445, 139 / 2049 | LAN + tailnet |
+| SMB / NFS | 445, 139 / 2049 | NFS on both; SMB LAN only (the roaming mount is NFS) |
+
+Link-local discovery and provisioning stay on the wire and open no mesh hole:
+mDNS/SSDP/WS-Discovery, NetBIOS `137`/`138` and Chromecast `32410-32414`, plus
+DHCP/PXE `67`/`69`/`4011` (nothing on a tailnet broadcasts). SMB `139`/`445` is LAN
+only too: the roaming mount is NFS, and `profiles.nas-client` falls back to
+`mount -t nfs` over the tailnet — which is why NFS `2049` stays open on both.
 
 ### Loopback-only (no firewall opening)
 

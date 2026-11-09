@@ -515,13 +515,12 @@ tasks:
   checks:ports:
     desc: Diff THIS machine's declared firewall surface against its live listeners
     summary: >
-      Reports declared vs actual listeners in buckets: SERVED, DEAD-HOLE (declared,
-      nothing behind it), REDUNDANT (loopback-only), FIREWALL-ONLY, ACCEPTED
-      (documented exception), DYNAMIC (start-up port). Declared is `nix eval` of
-      networking.firewall.interfaces.<iface>; actual is the LOCAL `ss`, so it audits
-      the machine it runs on and refuses any other HOST with exit 2. No self-scan:
-      `-i lo` makes every listener look reachable. Vars: HOST= (local hostname),
-      IFACE= (enp1s0). STRICT=1 exits 1 on DEAD-HOLE/FIREWALL-ONLY; exit 2 = wrong
+      Compares `nix eval` of networking.firewall.interfaces.<iface> against the LOCAL
+      `ss`: SERVED, DEAD-HOLE, REDUNDANT, FIREWALL-ONLY, ACCEPTED (documented), DYNAMIC
+      (start-up port). REDUNDANT — declared but loopback-only — always exits 1: the hole
+      has no possible client. It audits this machine and refuses a foreign HOST with exit
+      2; no self-scan (`-i lo` makes every listener look reachable). Vars: HOST= (local
+      hostname), IFACE= (enp1s0). STRICT=1 adds DEAD-HOLE/FIREWALL-ONLY; exit 2 = wrong
       host, an interface declaring nothing, or failed eval.
     cmds:
       - HOST="{{.HOST | default ""}}" IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh

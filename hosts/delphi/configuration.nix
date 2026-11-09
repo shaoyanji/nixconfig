@@ -592,24 +592,29 @@ in {
         tcp = false;
         udp = true;
         lan = false;
+        tailnet = true;
       };
       fleet-monitors = {
         port = config.services.fleetMonitors.port;
         lan = false;
+        tailnet = true;
       };
       # The three services that moved off the NAS. frieren's nginx is their only
       # client, over the tailnet — never the LAN, which this host does not have.
       paperless = {
         port = config.services.paperless.port;
         lan = false;
+        tailnet = true;
       };
       vaultwarden = {
         port = config.services.vaultwarden.config.ROCKET_PORT;
         lan = false;
+        tailnet = true;
       };
       anki-sync = {
         port = config.services.anki-sync-server.port;
         lan = false;
+        tailnet = true;
       };
     };
   };

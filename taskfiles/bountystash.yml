@@ -33,6 +33,26 @@ tasks:
         echo "=== Preview (https://preview.cv-resume-40q.pages.dev) ==="
         curl -Is https://preview.cv-resume-40q.pages.dev | head -n 6
 
+  # The content is authored once, in lib/bountystash/portfolio*.json (the same
+  # corpus the Gemini capsule compiles). The console has its own data/ copy, so
+  # this writes it, and the deploy refuses a copy that no longer matches.
+  bountystash:data:
+    desc: Write the console's data/portfolio*.json from the corpus in lib/bountystash/
+    cmds:
+      - bash scripts/task/bountystash-data.sh sync {{.BOUNTY_DIR}}
+
+  bountystash:data:check:
+    desc: "[gate] the console's data is the corpus, not a hand-edited copy"
+    summary: >
+      Compares both locales as normalised JSON, so key order and formatting are not
+      drift and a changed sentence is. The corpus is the one place content is
+      edited; a console copy that disagrees means the deploy would publish prose
+      nobody reviewed.
+
+      Exit 0 = identical, 1 = drift (run `task bountystash:data`), 2 = no checkout.
+    cmds:
+      - bash scripts/task/bountystash-data.sh check {{.BOUNTY_DIR}}
+
   bountystash:build:
     desc: Compile the console, validate the 14KB envelope, and resolve its internal links
     cmds:
@@ -55,12 +75,14 @@ tasks:
   bountystash:deploy:preview:
     desc: Deploy preview branch to Cloudflare Pages (generates unique URL)
     cmds:
+      - bash scripts/task/bountystash-data.sh check {{.BOUNTY_DIR}}
       - task: bountystash:build
       - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=preview"
 
   bountystash:deploy:prod:
-    desc: Deploy live production to Cloudflare Pages (bountystash.com)
+    desc: "[destructive] Deploy live production to Cloudflare Pages (bountystash.com)"
     cmds:
+      - bash scripts/task/bountystash-data.sh check {{.BOUNTY_DIR}}
       - task: bountystash:build
       - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=main"
 
@@ -126,9 +148,9 @@ tasks:
     desc: "[gate] robots, sitemap, canonical, og:image and hreflang on every hostname"
     cmds:
       - bash scripts/task/site-check.sh matt.bountystash.com / /de/ /work/nixos-fleet /de/work/nixos-fleet /brief/platform
-      # bountystash.com runs the console, not the Nix portfolio: the case-study
-      # paths belong to the other template and are not part of this surface.
-      - bash scripts/task/site-check.sh bountystash.com / /de/ /contact/ /de/kontakt/
+      # bountystash.com runs the console. Its case studies are built pages with the
+      # same head as the home page, so they are gated like any other.
+      - bash scripts/task/site-check.sh bountystash.com / /de/ /contact/ /de/kontakt/ /work/ /de/work/ /work/multi-host-declarative-nixos-infrastructure/
       - bash scripts/task/site-check.sh concept.bountystash.com / /de/
 
   # Offline, and the only check that sees a stylesheet 404: a page that loads no

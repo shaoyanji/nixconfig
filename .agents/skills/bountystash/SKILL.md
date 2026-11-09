@@ -17,12 +17,15 @@ metadata:
 built by `node scripts/build.js` into `dist/`, deployed to the `cv-resume` Pages
 project, whose custom domain is `bountystash.com`. It is the only thing that domain
 serves. The Nix-rendered portfolio it replaced is retired, with its flake output and
-its deploy tasks; the paths it answered, `/work/<slug>` in both locales, 301 to the
-console — from `_worker.js`, because advanced mode runs the worker instead of the
-Pages routing layer, with `_redirects` carrying the same rules beside it.
+its deploy tasks; the paths it answered, `/work/<slug>` in both locales, are now
+real pages the console builds — one template per locale, one directory per slug,
+the slug derived from the English title so a saved URL keeps working.
 
-`lib/bountystash/portfolio.json` stays and is not a second site: the Gemini capsule
-(`lib/gemini-portal.nix`) still compiles from it.
+`lib/bountystash/portfolio*.json` is the source of that content and is not a second
+site: the console's `data/` copy is written from it by `bountystash:data`, and both
+deploy tasks run `bountystash:data:check` first, which fails when the copy had been
+hand-edited. The Gemini capsule (`lib/gemini-portal.nix`) compiles from the same
+files.
 
 The project name is a fact about the Cloudflare account, not a typo: its
 pages.dev subdomain is `cv-resume-40q.pages.dev` (Cloudflare appends the suffix
@@ -56,17 +59,19 @@ checking twice.
 ## The crawl surface
 
 Every page carries a canonical, `og:url`, a 1200×630 PNG card per locale, hreflang
-alternates and a sitemap entry. `robots.txt`, `sitemap.xml`, the cards and
-`_redirects` are emitted by the build, so they belong to the artifact instead of
-being answered by the previous site's edge cache.
+alternates and a sitemap entry. `robots.txt`, `sitemap.xml` and the cards are emitted
+by the build, so they belong to the artifact instead of being answered by the
+previous site's edge cache. There is no `_redirects`: every path the old portfolio
+answered is a page the build writes.
 
 ```bash
 task site:check         # live: robots, sitemap, canonical, og:image, hreflang per host
 task site:links         # offline: build the Nix sites, resolve every internal href/src
 ```
 
-`site:check` lists exactly what the console serves (`/ /de/ /contact/ /de/kontakt/`);
-the thank-you pages are `noindex` and stay out of both sitemap and gate.
+`site:check` lists exactly what the console serves (`/ /de/ /contact/ /de/kontakt/
+/work/ /de/work/` plus one case study); the thank-you pages are `noindex` and stay
+out of both sitemap and gate.
 `site:links` covers the remaining Nix surfaces (matt, mockup); the console's own
 artifact is checked by `bountystash:build`, which runs the same script over `dist`.
 

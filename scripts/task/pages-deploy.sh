@@ -40,15 +40,19 @@ fi
 
 # A fresh deployment answers 404 for a while: the asset manifest attaches per
 # path, so `/` can serve while `/contact/thanks/` is still missing. Wait for every
-# page the artifact carries, not just the home page. 120 s is generous for a
-# static site and still short enough that a broken deploy fails the task.
-paths=(/)
-if [ -f "$dir/contact/thanks/index.html" ]; then
-  paths+=(/contact/thanks/)
-fi
-if [ -f "$dir/de/kontakt/danke/index.html" ]; then
-  paths+=(/de/kontakt/danke/)
-fi
+# page the artifact carries — derived from the tree, not a list that goes stale
+# the moment a section is added. 120 s is generous for a static site and still
+# short enough that a broken deploy fails the task.
+paths=()
+while IFS= read -r file; do
+  rel=${file#"$dir"}
+  page=${rel%/index.html}
+  paths+=("${page:-}/")
+done < <(find "$dir" -name index.html | sort)
+[ "${#paths[@]}" -gt 0 ] || {
+  echo "pages-deploy: $dir carries no index.html — refusing to deploy an empty artifact" >&2
+  exit 1
+}
 
 wait=${PAGES_WAIT_SECONDS:-120}
 deadline=$((SECONDS + wait))

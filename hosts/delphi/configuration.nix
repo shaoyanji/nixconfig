@@ -1511,6 +1511,17 @@ in {
         description = "Posts as markdown files; publish and unpublish against mataroa.blog.";
         requires = ["mataroa-console.service"];
       };
+      # The library, not a player: a plain listing with Range support, which an
+      # iPad can browse and a player can stream from. The vhost binds loopback
+      # and the library lives on this host's disk, so this mount is the whole
+      # exposure — there is no firewall row and no public counterpart.
+      media = {
+        port = 8461;
+        upstream = "http://127.0.0.1:${toString config.services.media-relay.port}";
+        title = "Media relay";
+        description = "Fetched video, range-served: the library as a browsable listing.";
+        requires = ["nginx.service"];
+      };
     };
     entries.gatus = {
       title = "Fleet monitors (external vantage)";

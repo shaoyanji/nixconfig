@@ -24,7 +24,15 @@
 
 // ---- header, from `basics` ------------------------------------------------
 #let location = basics.at("location", default: (:))
-#let place = location.at("city", default: "")
+#let place = {
+  let town = ()
+  if location.at("postalCode", default: "") != "" { town.push(location.postalCode) }
+  if location.at("city", default: "") != "" { town.push(location.city) }
+  let parts = ()
+  if location.at("address", default: "") != "" { parts.push(location.address) }
+  if town.len() > 0 { parts.push(town.join(" ")) }
+  parts.join(", ")
+}
 #let profiles = basics.at("profiles", default: ())
 #let contact = {
   let parts = ()

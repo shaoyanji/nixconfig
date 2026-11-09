@@ -85,6 +85,22 @@ if [ ! -f "$resume_src" ]; then
 fi
 cp "$resume_src" "$work/resume.json"
 
+# The packet is the document that carries what no page does: a phone number and a
+# street address. They are decrypted here, at build time, from
+# modules/secrets/pii.yaml — the corpus never holds them, and the fictional
+# example never borrows them.
+pii_json="$CONFIG/pii.json"
+if [ "$example" != 1 ] && [ ! -s "$pii_json" ] && [ -x "$REPO/scripts/task/pii.sh" ]; then
+  APPFLOW_PII="$pii_json" "$REPO/scripts/task/pii.sh" sync >/dev/null 2>&1 || true
+fi
+if [ "$example" != 1 ] && [ -s "$pii_json" ]; then
+  jq --slurpfile pii "$pii_json" '.basics = ((.basics // {}) * ($pii[0].basics // {}))' \
+    "$work/resume.json" >"$work/resume.private.json"
+  mv "$work/resume.private.json" "$work/resume.json"
+elif [ "$example" != 1 ]; then
+  echo "appflow-packet: no $pii_json — the CV carries no phone or street address" >&2
+fi
+
 letter_clause=""
 letter_src="${letter:-$CONFIG/letter.json}"
 if [ -f "$letter_src" ]; then

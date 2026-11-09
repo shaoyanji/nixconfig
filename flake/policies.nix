@@ -279,6 +279,7 @@
     "modules/secrets/apikeys.yaml"
     "modules/secrets/DE-Taskfile.yaml"
     "modules/secrets/fullsecrets.yaml"
+    "modules/secrets/pii.yaml"
     "modules/secrets/secrets.yaml"
   ];
   # The registry is only real if it is complete: an encrypted file nobody lists is

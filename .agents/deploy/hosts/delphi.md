@@ -176,8 +176,7 @@ terminates TLS, so there is no certificate to own per service.
 | 8446 | Service console (the compiled tailnet portal) | `tailscale-serve-portal` | `127.0.0.1:8082` |
 
 Both the mounts and the console are compiled from `services.servicePortal`: add a
-mount and its card appears, remove one and the card goes. `data/services.json`
-carries the same list for a TUI or a probe, and the asserts in
+mount and its card appears, remove one and the card goes — and the asserts in
 `modules/services/service-portal.nix` fail the build when a mount has no card, a
 card has no owner, two mounts share a port, an upstream is not loopback, or a
 `requires` names a unit that does not exist.
@@ -192,7 +191,7 @@ makes the move reversible — `docs/service-offload.md` is the procedure.
 | Port | Service | State | Reached as |
 | :--- | :--- | :--- | :--- |
 | 28981 | paperless-ngx (`hosts/delphi/paperless.nix`) | `/var/lib/paperless`, SQLite + media | `http://docs.frieren.lan` |
-| 8222 / 3012 | vaultwarden (`hosts/delphi/vaultwarden.nix`) | `/var/lib/vaultwarden`, SQLite | `https://vault.frieren.lan` |
+| 8222 | vaultwarden (`hosts/delphi/vaultwarden.nix`) | `/var/lib/vaultwarden`, SQLite; websockets ride 8222 since 1.30 | `https://vault.frieren.lan` |
 | 27701 | anki sync (`hosts/delphi/anki-sync.nix`) | `/var/lib/anki-sync-server` | `http://anki.frieren.lan` |
 
 anki's only account takes its password from sops (`anki-sync/password`), rendered
@@ -298,8 +297,9 @@ Where the values come from — all of them evaluated at build time:
 
 Markup lives in files (`lib/delphi/{shell,public,tailnet}.html`, `juno.css`,
 `juno.js`), and `render` in the compiler throws on an unbound `{{hole}}`, so a
-renamed field fails the build instead of shipping braces. `data/delphi.json` is
-the compiled structure itself, for a TUI, a probe or an agent.
+renamed field fails the build instead of shipping braces. `/data/delphi.json`
+and `/data/services.json` on the console are the structure and cards, tailnet-
+only: the dossier JSON names the tailnet address the public page withholds.
 
 Three rules the pages are built to keep:
 

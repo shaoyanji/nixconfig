@@ -81,7 +81,7 @@
 | Fleet sentinel | `fleet-sentinel.timer` | via nginx | `sentinel.frieren.lan`* → `/sentinel/` |
 | Pastebin | `nginx` + `/var/lib/paste` | 80 | `paste.frieren.lan`* |
 | iVentoy (PXE/ISO) | `iventoy` | 26000, 10809 | `pxe.frieren.lan`* |
-| Vaultwarden | `vaultwarden` on **delphi** | 8222 + 3012 tailnet | `vault.frieren.lan`* (moved 2026-11-02; DOMAIN unchanged so passkeys survive) |
+| Vaultwarden | `vaultwarden` on **delphi** | 8222 tailnet | `vault.frieren.lan`* (moved 2026-11-02; DOMAIN unchanged so passkeys survive) |
 | SimpleX SMP relay | `smp-server` | 5223/5225/5226 | inter-agent messaging |
 | Atuin history sync | `atuin` | 8888 loopback | `atuin.frieren.lan`*; one account, sign-ups closed [[flake/policies.nix#history-sync-is-one-server]] |
 | Miniflux | `miniflux` on **delphi** | 8093 loopback / 8455 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8455` — feeds, not mail (added 2026-11-06) |

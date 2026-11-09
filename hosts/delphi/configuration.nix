@@ -198,6 +198,35 @@
     };
   };
 
+  # The two machine surfaces, for a TUI, a probe or an agent that wants the
+  # structure instead of scraping HTML: the compiled dossier (`site` in
+  # lib/delphi-site.nix) and the portal's card list. TAILNET ONLY, and that is a
+  # rule rather than caution — the dossier JSON carries `identity.tailnetIp` and
+  # `identity.tailnetUrl`, which the public page is built never to print, so the
+  # machine surface sits behind the same gate as the console, not beside the
+  # dossier.
+  dataLocation = withGate: let
+    common =
+      gate withGate
+      + ''
+        autoindex off;
+        gzip_static on;
+        add_header Cache-Control "no-store";
+      '';
+  in {
+    "= /data/delphi.json" = {
+      alias = "${delphiSite}/data/delphi.json";
+      # This one IS `delphiSite`, so it carries the staleness header.
+      extraConfig = common + siteHeader;
+    };
+    # No `X-Site-Path`: these bytes come from the portal's page package, not from
+    # `delphiSite`, and that header is what the deploy gate compares.
+    "= /data/services.json" = {
+      alias = "${config.services.servicePortal.pages.tailnet}/data/services.json";
+      extraConfig = common;
+    };
+  };
+
   # Stub services in the sandbox microVM, generated from the guest declaration
   # (hosts/microvms/guests.nix) so the address and the port pair are not typed
   # a second time here. `withGate` adds the tailnet allow-list, which locations
@@ -343,6 +372,7 @@ in {
     self.modules."profiles.firewall-baseline"
     self.modules."profiles.hermes"
     self.modules."profiles.operator-tools"
+    self.modules."profiles.service-exposure"
     self.modules."profiles.sops-user-identity"
     self.modules."net.dns.tailnet-address"
     self.modules."services.agent-turns"
@@ -545,22 +575,43 @@ in {
     };
   };
 
-  # DNS and the monitor dashboard arrive over the tailnet only. 53 and 8181 are
-  # deliberately absent from the global allowedTCPPorts/allowedUDPPorts: a port
-  # open to the internet is exactly what this host's whole posture is about.
-  networking.firewall.interfaces.tailscale0 = {
-    allowedUDPPorts = [53];
-    allowedTCPPorts = [
-      53
-      8181
+  # --- The tailnet firewall surface, from ONE registry ----------------------
+  # Every port this host opens on the mesh, declared once and scoped to
+  # `tailscale0`, each value read from the option that owns it so a moved service
+  # cannot leave a stale row behind. Two rows were pruned 2026-11-09: 53/tcp
+  # (crab-hole has no TCP downstream) and 3012/tcp (vaultwarden 1.30 serves
+  # websockets on ROCKET_PORT; `./vaultwarden.nix` carries the measurement).
+  # Instrument: `task checks:ports HOST=delphi IFACE=tailscale0`.
+  profiles.serviceExposure = {
+    enable = true;
+    interfaces = ["tailscale0"];
+    services = {
+      # The fleet resolver. UDP is crab-hole's only plain DNS downstream.
+      crabhole-dns = {
+        port = 53;
+        tcp = false;
+        udp = true;
+        lan = false;
+      };
+      fleet-monitors = {
+        port = config.services.fleetMonitors.port;
+        lan = false;
+      };
       # The three services that moved off the NAS. frieren's nginx is their only
-      # client, over the tailnet; nothing here is public, and the global
-      # allowedTCPPorts above still holds just 22/80/443.
-      28981 # paperless-ngx
-      8222 # vaultwarden web
-      3012 # vaultwarden websocket
-      27701 # anki sync
-    ];
+      # client, over the tailnet — never the LAN, which this host does not have.
+      paperless = {
+        port = config.services.paperless.port;
+        lan = false;
+      };
+      vaultwarden = {
+        port = config.services.vaultwarden.config.ROCKET_PORT;
+        lan = false;
+      };
+      anki-sync = {
+        port = config.services.anki-sync-server.port;
+        lan = false;
+      };
+    };
   };
 
   # --- Fleet monitors, from OUTSIDE the LAN ---------------------------------
@@ -783,7 +834,8 @@ in {
                 extraConfig = staticCache.html + siteHeader;
               };
             }
-            // hashedAssets tailnetPage;
+            // hashedAssets tailnetPage
+            // dataLocation false;
         };
 
         # The MagicDNS name at the root, tailnet-only by SOURCE ADDRESS.
@@ -832,6 +884,7 @@ in {
             // healthzLocation true
             // sentinelLocations true
             // hashedAssets tailnetPage
+            // dataLocation true
             // microvmProxyLocations true
             // stirlingProxyLocations
             // lib.optionalAttrs slidesEnabled (slideshowLocations true);
@@ -1309,8 +1362,10 @@ in {
     subtitle = "OCI Ampere A1 · aarch64-linux · NixOS · tailnet DNS 10.99.0.53";
     groups = ["Tailnet services"];
     inherit tailnetHost;
-    # No `profiles.serviceExposure` here: this host's exposure is the tailnet,
-    # and the mounts below are the whole of it.
+    # The exposure registry above is the firewall surface, not a card source:
+    # those ports are reached by frieren's nginx under the `*.frieren.lan`
+    # names, while the cards here are the `tailscale serve` mounts. Different
+    # audiences, so no card is derived from the registry.
     includeExposure = false;
     mounts = {
       dsh = {

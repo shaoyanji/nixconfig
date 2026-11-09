@@ -216,7 +216,8 @@
   # --- the compiled structure ------------------------------------------------
   # This is the artifact: both surfaces are projections of it, and
   # `data/delphi.json` ships it verbatim (a TUI, a probe or an agent reads that
-  # instead of scraping the HTML).
+  # instead of scraping the HTML) — served on the TAILNET only, because it names
+  # the tailnet address the public page is built never to print.
   site = {
     schemaVersion = 1;
     generatedBy = "lib/delphi-site.nix";

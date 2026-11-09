@@ -197,7 +197,10 @@ in {
       virtualHosts."media-relay" = {
         listen = [
           {
-            addr = "0.0.0.0";
+            # Loopback: reaching this is a decision about a mount or a firewall
+            # row, not something the bind address should pre-empt on a host whose
+            # public interface is the fleet's only one.
+            addr = "127.0.0.1";
             port = cfg.port;
           }
         ];

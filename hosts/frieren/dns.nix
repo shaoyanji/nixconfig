@@ -291,27 +291,8 @@
     ports = ["127.0.0.1:8080"];
   };
 
-  # Port 53 on enp1s0 comes from profiles.dnsFailover; 67/4011 are the host's PXE
-  # proxyDHCP surface. tailscale0 is opened explicitly — the profile only opens
-  # the LAN interface.
-  networking.firewall.interfaces.enp1s0 = {
-    allowedUDPPorts = [
-      67 # DHCP-proxy replies to PXE clients (the router still owns leases)
-      4011 # legacy BIOS ProxyDHCP
-    ];
-  };
-  # Allow DNS queries from Tailscale network
-  networking.firewall.interfaces.tailscale0 = {
-    allowedUDPPorts = [53];
-    allowedTCPPorts = [53];
-  };
-  # Allow DNS queries during failover on Wi-Fi and USB-C dock
-  networking.firewall.interfaces.wlp2s0 = {
-    allowedUDPPorts = [53];
-    allowedTCPPorts = [53];
-  };
-  networking.firewall.interfaces.enp0s20f0u2u1i5 = {
-    allowedUDPPorts = [53];
-    allowedTCPPorts = [53];
-  };
+  # No per-interface lists here: 53 (DNS), 67/4011 (PXE proxyDHCP) and the rest
+  # are rows in `hosts/frieren/firewall-scope.nix`, which opens them on every
+  # scoped interface. `profiles.dnsFailover` opens 53 on the LAN NIC itself; the
+  # registry's row makes that a subset rather than the only path.
 }

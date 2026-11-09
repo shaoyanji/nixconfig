@@ -160,9 +160,13 @@ in {
     };
   };
 
-  networking.firewall = {
-    allowedTCPPorts = [publicPort];
-    # Never in the global list: only the mesh reaches 1966.
-    interfaces.tailscale0.allowedTCPPorts = [tailnetPort];
+  networking.firewall.allowedTCPPorts = [publicPort];
+
+  # Never in the global list: only the mesh reaches 1966. The row goes into the
+  # host's one exposure registry rather than onto the interface list, because a
+  # port written by hand is a port that cannot follow the listener it belongs to.
+  profiles.serviceExposure.services.gemini-tailnet = {
+    port = tailnetPort;
+    lan = false;
   };
 }

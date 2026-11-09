@@ -153,7 +153,9 @@ if [ -x "$rel/bin/turns_bench" ]; then
   COLD_MS=$built
   touch lib/turns_bench/router.ex
   t0=$(now_ms); MIX_ENV=prod mix release --overwrite >/dev/null 2>&1; WARM_MS=$(( $(now_ms) - t0 ))
-  measure elixir 9102 "cd '$ROOT' && PORT=9102 SITE='$SITE' FIXTURE='$FIXTURE' '$rel/bin/turns_bench' start" "$rel" turns_bench
+  # ERL_EPMD_ADDRESS: a release spawns epmd, which binds 0.0.0.0:4369 by default
+  # and outlives the benchmark as a daemon nothing owns.
+  measure elixir 9102 "cd '$ROOT' && ERL_EPMD_ADDRESS=127.0.0.1 PORT=9102 SITE='$SITE' FIXTURE='$FIXTURE' '$rel/bin/turns_bench' start" "$rel" turns_bench
 else
   echo "elixir: build failed" >&2
   tail -25 "$WORK/elixir.build.log" >&2

@@ -1028,6 +1028,9 @@ in {
     enable = true;
     environment = {
       SERVER_PORT = "7351";
+      # Loopback: the portal's 8445 mount is the only client, so the JVM (Spring's
+      # `server.address`) has no reason to hold 0.0.0.0:7351.
+      SERVER_ADDRESS = "127.0.0.1";
       SECURITY_ENABLELOGIN = "false";
       JAVA_TOOL_OPTIONS = "-Xms128m -Xmx512m -XX:+UseG1GC -XX:SoftRefLRUPolicyMSPerMB=50";
     };
@@ -1109,7 +1112,7 @@ in {
     enable = true;
     settings = {
       HOSTNAME = "127.0.0.1";
-      # NOT 8094: media-relay's vhost binds 0.0.0.0:8094 on this host, and an
+      # NOT 8094: media-relay's vhost owns 127.0.0.1:8094 on this host, and an
       # umami on the loopback of the same port made nginx fail at bind — every
       # vhost on delphi was down for as long as this unit was up (measured
       # 2026-11-07: `bind() to 0.0.0.0:8094 failed (98)`, nginx start-limit-hit).

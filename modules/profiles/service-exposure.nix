@@ -117,6 +117,31 @@ in {
       })
     );
 
+    # A port on a scoped interface that no row declares is the failure this
+    # registry exists to end: it cannot follow the service whose port it copies.
+    # Both delphi findings were that shape (a hand-written 3012 with no listener,
+    # a 53/tcp nothing bound). Eval sees it, so `checks:host` and CI's
+    # `hostChecks` fail it; a row whose service is disabled is still only visible
+    # to `checks:ports`, which compares the declaration against live `ss`.
+    assertions = let
+      merged = iface: proto:
+        if proto == "tcp"
+        then config.networking.firewall.interfaces.${iface}.allowedTCPPorts
+        else config.networking.firewall.interfaces.${iface}.allowedUDPPorts;
+      check = iface: proto: let
+        extra = lib.subtractLists (portsOf proto iface) (lib.unique (merged iface proto));
+      in {
+        assertion = extra == [];
+        message = ''
+          networking.firewall.interfaces.${iface}.allowed${lib.toUpper proto}Ports holds
+          ${lib.concatMapStringsSep " " toString extra}, which no `profiles.serviceExposure` row declares.
+          Declare the owning service in that registry (the row reads the port from the option
+          that owns it) instead of writing the port into the interface list by hand.
+        '';
+      };
+    in
+      lib.concatMap (iface: [(check iface "tcp") (check iface "udp")]) cfg.interfaces;
+
     # Uniform reverse-proxy vhosts, derived from the same declaration that opens
     # the firewall port. Richer vhosts are left to the host.
     services.nginx.virtualHosts = lib.mapAttrs' (_: s:

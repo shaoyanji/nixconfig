@@ -33,6 +33,13 @@ in {
       ssh = {port = 22;};
       nginx = {port = 80;};
       nginx-https = {port = 443;};
+      # DNS on every scoped interface: the LAN one resolves, and the mesh needs
+      # `10.99.0.53` to answer from a roaming client. Both protocols because a
+      # truncated UDP answer is retried over TCP.
+      dns = {
+        port = 53;
+        udp = true;
+      };
       gemini = {port = config.services.molly-brown.port;};
       samba-netbios-ssn = {port = 139;};
       samba-smb = {port = 445;};

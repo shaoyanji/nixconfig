@@ -5,7 +5,7 @@
   ...
 }: let
   user = import ../../modules/global/user.nix;
-  netbookIp = config.fleet.inventory.hosts.netbook.network.lan_ip;
+  netbookIp = config.fleet.inventory.hosts.netbook.network.tailscale_ip;
 in {
   # --- Intel QuickSync VA-API ---
   nixpkgs.config.packageOverrides = pkgs: {
@@ -78,11 +78,12 @@ in {
         [ -e "$state" ] && exit 0
         : > "$state"
         trap 'rm -f "$state"' EXIT
+        msg="Mains power is out and frieren is at ''${cap}%. Plug it back in: it powers off in 60 s."
         ${pkgs.util-linux}/bin/runuser -u ${user.name} -- \
           ${pkgs.coreutils}/bin/env HOME=${config.users.users.${user.name}.home} \
           ${pkgs.openssh}/bin/ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
             -o ConnectTimeout=10 alice@${netbookIp} \
-            "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/\$(id -u)/bus notify-send -u critical -a frieren 'frieren: battery low' 'Mains power is out and frieren is at ''${cap}%. Plug it back in: it powers off in 60 s.'" \
+            "XDG_RUNTIME_DIR=/run/user/\$(id -u) busctl --user call org.freedesktop.Notifications /org/freedesktop/Notifications org.freedesktop.Notifications Notify susssasa{sv}i frieren 0 none 'frieren: battery low' \"$msg\" 0 0 0" \
           || echo "frieren-battery-notice: alice@${netbookIp} unreachable" >&2
         ${pkgs.coreutils}/bin/sleep 60
         [ "$($cat "$bat/status")" = Discharging ] || { echo "frieren-battery-notice: mains restored, staying up"; exit 0; }

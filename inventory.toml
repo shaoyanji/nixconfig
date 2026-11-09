@@ -866,6 +866,7 @@ storage_layout = "f2fs root, vfat /boot, systemd-boot"
 
 [hosts.netbook.network]
 tailscale = true
+tailscale_ip = "100.72.110.107"
 ssh_alias = "netbook"
 
 [hosts.netbook.software]

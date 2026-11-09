@@ -376,6 +376,7 @@ in {
     self.modules."profiles.sops-user-identity"
     self.modules."net.dns.tailnet-address"
     self.modules."services.agent-turns"
+    self.modules."services.appflow-board"
     self.modules."services.dsh-web"
     self.modules."services.fleet-monitors"
     self.modules."services.mataroa-console"
@@ -391,6 +392,12 @@ in {
   # Why, and what is still unproven (the home-side figure was measured while the
   # uplink was saturated): `docs/media-relay.md`.
   services.media-relay.enable = true;
+
+  # --- the job pipeline as a page ---
+  # Reads the mail hub's own tables through four read-only routes; it stores
+  # nothing and is not a writer. The single-writer cutover is the appflow turn
+  # (`appflow-single-writer`), and this page is its consumer.
+  services.appflowBoard.enable = true;
 
   # 10.99.0.53 on lo + the /32 advertised below form one half of the failover
   # group; frieren runs the same module and advertises the same route.
@@ -1525,6 +1532,19 @@ in {
         upstream = "http://127.0.0.1:${toString config.services.media-relay.port}";
         title = "Media relay";
         description = "Fetched media, range-served: a searchable browser over the library.";
+        requires = ["nginx.service"];
+      };
+      # The pipeline, read from the archive: stage counts, a search over company,
+      # role and next action, and the record behind a click. Read-only by
+      # construction — the vhost proxies four GET routes and nothing else, so the
+      # plugin's write endpoints are not reachable through this mount.
+      appflow = {
+        # The tailnet port is not the vhost's: `tailscale serve` and nginx both
+        # bind, and sharing a number puts them on the same socket.
+        port = 8463;
+        upstream = "http://127.0.0.1:${toString config.services.appflowBoard.port}";
+        title = "Job pipeline";
+        description = "Applications and their mail, read from the archive database.";
         requires = ["nginx.service"];
       };
     };

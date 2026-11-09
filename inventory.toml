@@ -258,6 +258,11 @@ label = "Media relay"
 port = 8461
 note = "Fetched video, range-served: the library as a browsable listing"
 
+[[hosts.delphi.network.links]]
+label = "Job pipeline"
+port = 8463
+note = "Applications and their mail, read from the archive database"
+
 # Gatus listens on every interface and the tailscale0 firewall rule is the only
 # way in, so this one is plain http on the node address.
 [[hosts.delphi.network.links]]

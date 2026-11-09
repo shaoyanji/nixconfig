@@ -46,7 +46,7 @@ in rec {
       cost = 1.2;
       wanted = true;
       measured = "2026-11-03 · checks:selector (executor p 1.0, S 942.94 s, refusal 71 ms; stage 1 p 1.0 on 21 of 21 answered, coverage 21/28, 6/6 abstain declined, held-out 0.978 at 0.92 over 491 pairs) · checks:selector:sidecar (answer 180 ms resident vs 250 ms cold, refusal 37 vs 105 ms)";
-      note = "the arithmetic is cleared and selector.service is behind it; `q.sh --question` falls back to the interpreter on a host without the unit";
+      note = "the arithmetic is cleared and selector.service is behind it; `q.sh --question` falls back to the interpreter on a host without the unit, and the unit guards on `programs.selectorDaemon.model` so a missing artifact is a skipped start rather than a restart loop";
     };
 
     edge-caller = {

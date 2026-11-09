@@ -513,20 +513,18 @@ tasks:
       - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules
 
   checks:ports:
-    desc: Diff frieren's declared firewall surface against its live listeners
+    desc: Diff THIS machine's declared firewall surface against its live listeners
     summary: >
       Reports declared vs actual listeners in buckets: SERVED, DEAD-HOLE (declared,
       nothing behind it), REDUNDANT (loopback-only), FIREWALL-ONLY, ACCEPTED
-      (documented exception), DYNAMIC (start-up port). Declared comes from `nix
-      eval` of networking.firewall.interfaces.<iface>, so every module counts;
-      actual from `ss`.
-
-      Do not self-scan instead: `-i lo` accepts traffic to the host's own address,
-      so a self-scan calls every listener LAN-reachable. Vars: HOST= (frieren),
-      IFACE= (enp1s0). STRICT=1 exits 1 on DEAD-HOLE/FIREWALL-ONLY; exit 0 =
-      reported, 2 = the host or interface cannot be evaluated.
+      (documented exception), DYNAMIC (start-up port). Declared is `nix eval` of
+      networking.firewall.interfaces.<iface>; actual is the LOCAL `ss`, so it audits
+      the machine it runs on and refuses any other HOST with exit 2. No self-scan:
+      `-i lo` makes every listener look reachable. Vars: HOST= (local hostname),
+      IFACE= (enp1s0). STRICT=1 exits 1 on DEAD-HOLE/FIREWALL-ONLY; exit 2 = wrong
+      host, an interface declaring nothing, or failed eval.
     cmds:
-      - HOST={{.HOST | default "frieren"}} IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
+      - HOST="{{.HOST | default ""}}" IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
 
   checks:ssh:bitwarden:
     desc: Log into a fleet host with the Bitwarden-vault SSH key and its CA certificate

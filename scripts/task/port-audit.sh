@@ -11,7 +11,9 @@
 #
 #   declared  → `nix eval` of the merged firewall option for the interface
 #               (catches every module's contribution, not just the ones you remembered)
-#   actual    → `ss -tuln` (bind address preserved, so loopback-only is distinguishable)
+#   actual    → `ss -tuln` on THIS machine (bind address preserved, so loopback-only is
+#               distinguishable). Local by design: no ssh in an unattended path, so a
+#               HOST that is not this host is refused rather than half-answered.
 #
 # Buckets reported:
 #   SERVED            declared AND listening somewhere      — the intended surface
@@ -43,12 +45,27 @@
 # state is "known, unreachable, firewall-scoped — revisit when the owner changes".
 #
 # Exit codes: 0 = report produced (STRICT=0 or no drift), 1 = DEAD-HOLE or FIREWALL-ONLY
-#             found with STRICT=1, 2 = could not evaluate (nix eval failure).
+#             found with STRICT=1, 2 = not auditable: HOST is not this machine, the
+#             interface declares no ports, or the nix eval failed.
 set -uo pipefail
 
-HOST="${HOST:-frieren}"
+self="$(hostname -s 2>/dev/null || hostname 2>/dev/null || true)"
+HOST="${HOST:-$self}"
 IFACE="${IFACE:-enp1s0}"
 STRICT="${STRICT:-0}"
+
+# The listener half is THIS machine's `ss` — no ssh in the path, because an
+# unattended audit must never wait on an auth prompt. So a foreign HOST would
+# compare its declaration against your listeners: run on delphi, frieren's list
+# reported 21 DEAD-HOLE ports that every one had a listener for. Refuse it.
+if [ -n "$self" ] && [ "${HOST%%.*}" != "$self" ]; then
+  echo "ERROR: HOST=$HOST, but this machine is '$self'." >&2
+  echo "       The audit compares a declaration against the LOCAL listeners, so a" >&2
+  echo "       remote HOST would report this host's ports as another host's drift." >&2
+  echo "       Run it on that host instead:" >&2
+  echo "         ssh $HOST 'cd ~/Documents/nixconfig && HOST=$HOST IFACE=$IFACE bash scripts/task/port-audit.sh'" >&2
+  exit 2
+fi
 
 # Documented exceptions. Format: "<port>" with the reason on the same line. Reviewed
 # 2026-10-12 (HC-7); re-review whenever the bucket below changes.
@@ -85,6 +102,16 @@ declared_json="$(
 
 declared_tcp="$(jq -r '.allowedTCPPorts[]? // empty' <<<"$declared_json" | sort -n -u)"
 declared_udp="$(jq -r '.allowedUDPPorts[]? // empty' <<<"$declared_json" | sort -n -u)"
+
+# An interface that declares nothing is not a scoped interface: every listener
+# then lands in FIREWALL-ONLY, which reads as a finding and is only a typo. The
+# default interface (`enp1s0`) makes this the common case on a cloud host.
+if [ -z "$declared_tcp" ] && [ -z "$declared_udp" ]; then
+  echo "ERROR: ${IFACE} declares no ports on ${HOST} — not one of its scoped interfaces." >&2
+  echo "       Run inside the clone when \$HOME's Taskfile is stale, or name the interface:" >&2
+  echo "         task -t ~/Documents/nixconfig/Taskfile.yml checks:ports HOST=${HOST} IFACE=tailscale0" >&2
+  exit 2
+fi
 
 # --- actual listeners (bind address preserved) -------------------------------------------
 # ss -tulnH columns: Netid State Recv-Q Send-Q Local:Port Peer:Port

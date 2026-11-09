@@ -42,9 +42,10 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 
 | Tier | Examples | Cost |
 | :--- | :--- | :--- |
-| **free** | `task status`, `task help`, `task find:<x>`, `task checks:ports`, `dev:inventory:host`, `task checks:tasks` | < 1 s, local files; `checks:tasks` compiles the shards with yq (`taskfile_graph.py`, ~0.6 s) and adds the go-task name parity |
+| **free** | `task status`, `task help`, `task find:<x>`, `task checks:ports:test`, `dev:inventory:host`, `task checks:tasks` | < 1 s, local files; `checks:tasks` compiles the shards with yq (`taskfile_graph.py`, ~0.6 s) and adds the go-task name parity; `checks:ports:test` is shell over a fake PATH (~1 s / 14 MiB) |
 | **cheap (eval)** | `dev:inventory:json`, `dev:flake:get-hosts` | 0.1–2.5 s, no host config |
-| **bounded (one host)** | `checks:host HOST=<h>` | ~13 s / 720 MiB per host, OOM-guarded |
+| **one option (eval)** | `checks:ports` | ~3.8 s / 443 MiB — one host eval of `networking.firewall` only, no toplevel (delphi, 2026-11-09) |
+| **bounded (one host)** | `checks:host HOST=<h>` | 7.6–13.2 s / 720–965 MiB per host, OOM-guarded (delphi 7.6 s / 965 MiB, fern 10.6 s / 958 MiB, frieren 13.2 s / 720 MiB) |
 | **HTTP probe** | `checks:build:route`, `checks:dns:failover` | bounded network request, no compile |
 | **heavy / gated** | `checks:flake`, `infra:warm:host:<h>`, `infra:deploy:host:<h>`, `vm:canary:build` | builds, or refuses by design |
 | **never a default** | `nix flake check`, any fleet sweep | 6 GiB / SIGKILL on this NAS |
@@ -55,7 +56,7 @@ holds the per-file ownership map, `AGENTS.md` the operator manual.
 | :--- | :--- | :--- |
 | `checks:tasks` | The compiled graph (`scripts/task/lib/taskfile_graph.py`: yq parses, the rules are the script) has no duplicate keys, dangling refs, include cycles, orphan shards, `internal: true` or MATCH-arity mismatches, **and** its name set equals `task --list-all --json` exactly. Every bucket must also fire where `tests/taskfile-graph/expected.json` says, and every `task <name>` citation on `docs/agent-contract.md` must resolve | That a task works; that go-task can run it |
 | `checks:quick` | Repo hygiene: compiled inventory checks, task graph, lint, sops drift, modules.toml | **Any host config** — it forces no `nixosConfiguration`; not a pre-rebuild step |
-| `checks:host HOST=<h>` | Module system + every assertion for ONE host (2035 assertions, ~13 s / 720 MiB) | That the closure builds |
+| `checks:host HOST=<h>` | Module system + every assertion for ONE host (7.6–13.2 s / 720–965 MiB; the count is per host, so no single number belongs here) | That the closure builds |
 | `checks:build:route` | Whether THIS host would have to compile (EXP-107) | That a build succeeds |
 | `dev:closure:*` | What is big / duplicated / would be fetched | Nothing about correctness |
 | `infra:warm:host:<h>` | Builder-side build + the cache serves the result | That the host activated it |
@@ -119,7 +120,7 @@ and stop at the first rung that works:
 | 2 | `nix eval` on a caller-supplied expression | ~1 s | a one-off derivation/attribute question; no repo file needed |
 | 3 | `jq`/`yq` over a compiled artifact | ms | projection, filtering, formatting |
 | 4 | a **new Nix library** (`lib/*.nix`) | eval-time | a rule that must be true for every host/consumer |
-| 5 | a `checks:*` gate | ~13 s (one host) | a regression that must fail a build |
+| 5 | a `checks:*` gate | ~8–13 s (one host) | a regression that must fail a build |
 | 6 | a task in an existing shard | seconds | a repeatable operator workflow |
 | 7 | a shell script in `scripts/task/` | — | only the body of rung 6, never an entrypoint |
 | 8 | a packaged Go binary | build | the thing ships to hosts or needs concurrency or strict parsing |

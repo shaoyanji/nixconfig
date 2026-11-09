@@ -5,8 +5,10 @@
 # declared port with only a loopback listener, a tailscaled mount, a global-list
 # opening, a declaration with nothing behind it. So the audit runs against a fake
 # PATH (`bin/`: hostname, nix, ss, sysctl, tailscale) with the declaration, the
-# listener list and the serve status supplied as variables. No nix eval, no host,
-# no network — under a second, which is why `checks:quick` can carry it.
+# listener list and the serve status supplied as variables. The refusal paths get
+# the same treatment: a foreign HOST and an interface that declares nothing must
+# exit 2 rather than answer from the wrong inputs. No nix eval, no host, no
+# network — under a second, which is why `checks:quick` can carry it.
 #
 # Exit: 0 every case behaves, 1 a case regressed, 2 the fixture cannot run.
 set -uo pipefail
@@ -30,12 +32,18 @@ command -v jq >/dev/null 2>&1 || {
 SCOPED='{"allowedTCPPorts":[],"allowedUDPPorts":[],"interfaces":{"tailscale0":{"allowedTCPPorts":[22],"allowedUDPPorts":[53]}}}'
 
 fail=0
+cases=0
+# The audit refuses rather than half-answers when it cannot trust its inputs, so
+# those paths need a caller-supplied identity: they exit before any bucket.
+RUN_HOST=fixture
+RUN_IFACE=tailscale0
 run() { # name want_rc needle...
   local name="$1" want="$2"
   shift 2
   local out rc needle
+  cases=$((cases + 1))
   out="$(
-    PATH="$bin:$PATH" HOST=fixture IFACE=tailscale0 STRICT="${STRICT:-0}" \
+    PATH="$bin:$PATH" HOST="$RUN_HOST" IFACE="$RUN_IFACE" STRICT="${STRICT:-0}" \
       FIXTURE_SS="$SS" FIXTURE_FIREWALL="$FIREWALL" FIXTURE_SERVE="$SERVE" \
       bash "$audit" 2>&1
   )"
@@ -106,8 +114,29 @@ STRICT=1 run "dead hole still fails under STRICT" 1 \
 #    behaviours stay distinct.
 STRICT=0 run "dead hole is only reported without STRICT" 0 "DEAD-HOLE (declared, no listener):    9999 "
 
+# 8. A foreign HOST is refused, not answered from this machine's listeners: on
+#    delphi, frieren's declaration reported 21 DEAD-HOLE rows that all had a
+#    listener — the audit had read the wrong machine's `ss`.
+RUN_HOST=otherhost
+FIREWALL="$SCOPED"
+SS=$'tcp LISTEN 0 4096 0.0.0.0:22 0.0.0.0:*'
+SERVE="{}"
+STRICT=1 run "foreign host is refused" 2 \
+  "but this machine is 'fixture'" \
+  "Run it on that host instead"
+RUN_HOST=fixture
+
+# 9. An interface that declares nothing is a typo, not a finding: every listener
+#    would land in FIREWALL-ONLY, which reads as drift and is unactionable. Refuse
+#    it with the interface the operator probably meant.
+FIREWALL='{"allowedTCPPorts":[],"allowedUDPPorts":[],"interfaces":{"enp1s0":{"allowedTCPPorts":[22],"allowedUDPPorts":[]}}}'
+SS=$'tcp LISTEN 0 4096 0.0.0.0:22 0.0.0.0:*'
+STRICT=1 run "unscoped interface is refused" 2 \
+  "tailscale0 declares no ports on fixture" \
+  "IFACE=tailscale0"
+
 if [ "$fail" != 0 ]; then
   echo "port-audit fixture: FAILED" >&2
   exit 1
 fi
-echo "port-audit fixture: 7 cases ok"
+echo "port-audit fixture: ${cases} cases ok"

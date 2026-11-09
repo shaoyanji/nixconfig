@@ -92,6 +92,54 @@ tasks:
         echo "=== Webroot Files (www/) ==="
         ssh {{.DRAGON_TARGET}} "ls -lh ~/www"
 
+  # The API half of the same account: one token (`alwaysdatatoken` in
+  # `modules/secrets.yaml`), read at call time by scripts/task/alwaysdata.sh and
+  # never written to a file. GET is 250 rpm, a write 50 rpm.
+  dragoncourt:api:
+    desc: Raw Alwaysdata API call (CLI_ARGS="METHOD PATH [JQ]"; BODY= JSON, or - for stdin)
+    cmds:
+      - bash scripts/task/alwaysdata.sh {{.CLI_ARGS}}
+
+  dragoncourt:api:account:
+    desc: The account behind the token — name, product and period
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/account/ '.[] | [.name, .id, (.period // ""), (.product.href // "")] | @tsv'
+
+  dragoncourt:sites:
+    desc: Every site on the account — name, addresses, httpd, path
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/site/ '.[] | [.name, ((.addresses // []) | join(",")), (.httpd // ""), (.path // "")] | @tsv'
+
+  dragoncourt:services:
+    desc: The account's always-on services — name, ssh user, command, disabled
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/service/ '.[] | [.name, (.ssh_user.href // ""), (.command // ""), (.is_disabled | tostring)] | @tsv'
+
+  dragoncourt:databases:
+    desc: Databases on the account — name, type
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/database/ '.[] | [.name, (.type // "")] | @tsv'
+
+  dragoncourt:mailboxes:
+    desc: Mailboxes on the account — address, domain
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/mailbox/ '.[] | [.name, (.domain.href // "")] | @tsv'
+
+  dragoncourt:ssh:users:
+    desc: SSH users on the account — name, home, shell
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/ssh/ '.[] | [.name, (.home_directory // ""), (.shell // "")] | @tsv'
+
+  dragoncourt:ftp:
+    desc: FTP users on the account — name, path
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/ftp/ '.[] | [.name, (.path // "")] | @tsv'
+
+  dragoncourt:subdomains:
+    desc: Subdomains and their addresses
+    cmds:
+      - bash scripts/task/alwaysdata.sh GET /v1/subdomain/ '.[] | [.hostname, ((.ip_addresses // []) | map(tostring) | join(","))] | @tsv'
+
   dragoncourt:harden:
     desc: Enforce secure permissions on Alwaysdata (~/.ssh, ~/www, ~/.local/bin)
     cmds:

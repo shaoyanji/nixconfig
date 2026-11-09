@@ -5686,6 +5686,51 @@
       '';
     };
 
+    jobby-cli-consolidation = {
+      title = "One jobby CLI over the two halves of the application pipeline";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      priority = "P2";
+      date = "2026-11-09";
+      summary = "jobby and appflow do one job in two languages and neither is a tool. M0 (clone hydrated to a5107bf, 13 packages green) and M1 (lossless ordered JSON, 40/40 statuses classified, rebuild matching 141 rows with 0 diff) are delivered; one Go binary with `jobby tui` and `jobby <verb>` still owns JD intake, the packet, the radar and derived actions.";
+      refs = {
+        modules = ["modules/config/nu/jobby.nu" "taskfiles/apps.yml" "flake/cli.nix" "modules/nixoshmsymlinks.nix"];
+        tasks = ["apps:list" "apps:emails" "apps:sync:push"];
+        docs = ["docs/job-cold-email.md" "docs/NUSHELL.md"];
+      };
+      body = ''
+        **Why one binary.** jobby is Go with a pdfcpu layout compiler and capsules; appflow is
+        10,090 lines of Python over JSON truth, a triggerless SQLite cache and Typst packets.
+        Neither composes with the other, and neither is a tool.
+
+        **The rule.** `applications.json` wins and the DB is rebuilt from it, so a SQLite trigger
+        dies at the next sync. The trigger is a transition in the writer: `jobby tick` derives
+        due actions into an append-only ledger, and a second run changes nothing.
+
+        **Delivered.** M0 hydrated the clone 4a637e6 -> a5107bf (0 ahead, 13 behind) with build,
+        vet and tests green over 13 packages. M1 added `internal/apps` and `cmd/jobby`: the
+        encoder reproduces Python's bytes (export sha256 `5224f960…`), the rebuild matches the
+        deployed cache row for row (141 rows, 0 diff, both views identical), all 40 status
+        spellings classify, and `jobby set` rewrites one record through the same tree.
+
+        **M2 measured.** Six lens/language renders at budget 2 all fit 2 pages at 10.0pt with
+        56-60 lines on page 1; each letter is 1 page, 19 lines. The 54 Typst packets compile to
+        108 documents, all 108 PASS the three rules (letters 23-34 lines): verdicts agree,
+        coverage does not — the audit reads `dist/` alone, 2 of 108. One page is unreachable
+        even at 9.0pt, which leaves 11 lines on page 2, one above the rule.
+
+        **Remaining.** M3 radar over `himalaya envelope list` with a measured agreement rate
+        before any send; M4 `jobby tick` idempotence; M5 TUI over the same verbs; M6
+        `taskfiles/apps.yml` calls jobby under the same task names.
+
+        **No auth layer.** himalaya, the llm wrapper and the Jev router hold every credential;
+        jobby stores none and prints none.
+
+        **Open.** Which resume is canonical; whether the 141 records stay in the workflow repo;
+        where the timer runs; whether DuckDB analytics and the HTML dashboard survive.
+      '';
+    };
+
     idle-service-modules = {
       title = "An idle daemon retires to its module, not out of the tree";
       kind = "reference";

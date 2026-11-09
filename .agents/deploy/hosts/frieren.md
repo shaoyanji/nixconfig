@@ -118,8 +118,9 @@ The job fetches, then `merge --ff-only`, and nothing else. A dirty tree is skipp
 (someone's work in progress), a detached HEAD is reported, and a branch that has
 diverged is reported and exits non-zero — it never resets, stashes or rebases.
 `journalctl -u checkout-ff` names which case happened, and a checkout it left alone is
-the reason it is still behind. The directory list is the script's default argument, so
-pointing it at two scratch clones proves the behaviour without the real checkouts.
+the reason it is still behind. It scans `/Volumes/data/projects` rather than naming the
+two checkouts, so a third one is covered the night it appears; passing directories as
+arguments replaces the scan, which is how it is proven against scratch clones.
 
 **Rebuild rules:**
 

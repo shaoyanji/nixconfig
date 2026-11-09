@@ -17,15 +17,28 @@
       [ "$(cat "$type" 2>/dev/null)" = "bluetooth" ] && printf '0\n' > "$f" 2>/dev/null || true
     done
   '';
-  # --ff-only into the /Volumes/data checkouts; rules in .agents/deploy/hosts/frieren.md.
-  # The paths are the default argument, so the same script can be pointed at two
-  # scratch clones and proven there.
+  # --ff-only into every checkout under the data volume; rules in .agents/deploy/hosts/frieren.md.
+  # Discovery is a scan, not a list: a checkout added under the volume is covered
+  # without editing this file. Arguments override the scan, which is how the
+  # behaviour is proven against scratch clones.
   checkoutFf = pkgs.writeShellScript "checkout-ff" ''
     set -u
     git=${pkgs.git}/bin/git
-    dirs="''${*:-/Volumes/data/projects/nixconfig /Volumes/data/projects/bountystash-console}"
+    root=/Volumes/data/projects
     fail=0
-    for dir in $dirs; do
+    if [ $# -gt 0 ]; then
+      candidates="$*"
+    else
+      candidates=""
+      for d in "$root"/*; do
+        [ -d "$d/.git" ] && candidates="$candidates $d"
+      done
+    fi
+    [ -n "$candidates" ] || {
+      echo "no git checkout under $root; nothing to do"
+      exit 0
+    }
+    for dir in $candidates; do
       if [ ! -d "$dir/.git" ]; then
         echo "==> $dir is not a checkout; skipped"
         continue

@@ -27,7 +27,7 @@ display:
 # the single paid endpoint. Nous stays primary even though the portal
 # rate-limits (its pool was in a 429 cooldown when this was written); a nous
 # fallback would share that limiter and add nothing. Matched models, not matched
-# vendors, on purpose: nemotron-3-ultra is the strongest free tool-calling model
+# vendors, on purpose: nemotron-3.5-super-vl is the strongest free tool-calling model
 # this fleet can reach, so a failover does not trade away capability. Each entry
 # ran a one-shot `hermes chat` turn on 2026-11-06.
 #
@@ -39,11 +39,11 @@ display:
 # gemini (its terms sit badly with agent work; it does aux tasks below instead).
 fallback_providers:
   - provider: nvidia
-    model: nvidia/nemotron-3-ultra-550b-a55b
+    model: nvidia/nemotron-3.5-super-vl
   - provider: openrouter
-    model: nvidia/nemotron-3-ultra-550b-a55b:free
+    model: nvidia/nemotron-3.5-super-vl:free
   - provider: ollama-cloud
-    model: nemotron-3-ultra
+    model: nemotron-3.5-super
   - provider: deepseek
     model: deepseek-flash
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes
@@ -76,7 +76,7 @@ stt:
 # lane, so the only billable route in this file is the deepseek fallback.
 auxiliary:
   free_only: true
-  openrouter_model: nvidia/nemotron-3-ultra-550b-a55b:free
+  openrouter_model: nvidia/nemotron-3.5-super-vl:free
   title_generation:
     provider: gemini
     model: gemini-3.5-flash-lite

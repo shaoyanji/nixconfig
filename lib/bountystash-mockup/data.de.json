@@ -1,0 +1,203 @@
+{
+  "brand": {
+    "name": "bountystash",
+    "tag": "Schwachstellenbetrieb",
+    "badge": "Konzept"
+  },
+  "ui": {
+    "banner": "Konzept-Mockup · Beispieldaten · kein laufendes Programm",
+    "top": "Oben",
+    "cluster": "Cluster",
+    "cvesUnit": "CVEs",
+    "effortUnit": "Aufwand",
+    "exposureUnit": "% Ausnutzbarkeit",
+    "yes": "ja",
+    "no": "nein"
+  },
+  "subtitles": {
+    "exposure": "sortiert nach entferntem Risiko pro Stunde, nicht nach CVSS",
+    "clusters": "ein Cluster pro Sitzung",
+    "method": "jede Streichung hat eine Begründung in der Akte",
+    "program": "was ein geschlossener Befund kostet"
+  },
+  "nav": [
+    { "id": "exposure", "label": "Exposition" },
+    { "id": "clusters", "label": "Cluster" },
+    { "id": "method", "label": "Vorgehen" },
+    { "id": "program", "label": "Programm" }
+  ],
+  "hero": {
+    "kicker": "Konzept für ein Bug-Bounty- und Schwachstellenprogramm",
+    "title": "Die Liste des Ausgenutzten, als Warteschlange, die sich abarbeiten lässt.",
+    "body": "bountystash liest den Katalog bekannter ausgenutzter Schwachstellen von CISA, gruppiert die Einträge nach dem Aufwand, den eine Behebung tatsächlich kostet, und schreibt daraus einen Arbeitsauftrag: was gegen deinen Stack ausgenutzt wird, in der Reihenfolge, die pro investierter Stunde das meiste Risiko entfernt. Kein Scanner-Rauschen. Kein tausendseitiger Bericht. Eine Warteschlange mit Zuständigen und einem Abschlussvermerk.",
+    "cta": { "label": "Beispiel-Warteschlange ansehen", "href": "#exposure" },
+    "alt": { "label": "Über einen Pilot sprechen", "href": "mailto:matt@bountystash.com?subject=bountystash%20Pilot" }
+  },
+  "stats": [
+    { "value": "1.482", "label": "verfolgte Katalogeinträge" },
+    { "value": "61 %", "label": "der Beispiel-Exposition durch drei Patches geschlossen" },
+    { "value": "3,5 h", "label": "Median-Aufwand pro Cluster" },
+    { "value": "0", "label": "Befunde ohne Zuständigen" }
+  ],
+  "kev": {
+    "title": "Beispiel-Warteschlange",
+    "note": "Beispieldaten. Die CVE-IDs und Produkte sind echt und allgemein bekannt; Aufwand, Exposition und Reihenfolge sind erfunden, um die Oberfläche zu zeigen. Hier läuft kein Programm.",
+    "columns": ["CVE", "Hersteller / Produkt", "Schweregrad", "Ransomware", "Cluster", "Aufwand"],
+    "rows": [
+      {
+        "cve": "CVE-2024-21887",
+        "product": "Ivanti — Connect Secure",
+        "severity": "critical",
+        "severityLabel": "kritisch",
+        "cvss": "9.1",
+        "ransomware": true,
+        "cluster": "Fernzugriff",
+        "effort": "1,5 h"
+      },
+      {
+        "cve": "CVE-2023-4966",
+        "product": "Citrix — NetScaler ADC",
+        "severity": "critical",
+        "severityLabel": "kritisch",
+        "cvss": "9.4",
+        "ransomware": true,
+        "cluster": "Fernzugriff",
+        "effort": "2 h"
+      },
+      {
+        "cve": "CVE-2023-44487",
+        "product": "IETF — HTTP/2 (Rapid Reset)",
+        "severity": "high",
+        "severityLabel": "hoch",
+        "cvss": "7.5",
+        "ransomware": false,
+        "cluster": "Edge-Geräte",
+        "effort": "2 h"
+      },
+      {
+        "cve": "CVE-2024-3400",
+        "product": "Palo Alto Networks — PAN-OS GlobalProtect",
+        "severity": "critical",
+        "severityLabel": "kritisch",
+        "cvss": "10.0",
+        "ransomware": false,
+        "cluster": "Edge-Geräte",
+        "effort": "3 h"
+      },
+      {
+        "cve": "CVE-2022-22965",
+        "product": "VMware — Spring Framework",
+        "severity": "critical",
+        "severityLabel": "kritisch",
+        "cvss": "9.8",
+        "ransomware": false,
+        "cluster": "Java-Landschaften",
+        "effort": "4 h"
+      },
+      {
+        "cve": "CVE-2023-34362",
+        "product": "Progress — MOVEit Transfer",
+        "severity": "critical",
+        "severityLabel": "kritisch",
+        "cvss": "9.8",
+        "ransomware": true,
+        "cluster": "Dateitransfer",
+        "effort": "5 h"
+      },
+      {
+        "cve": "CVE-2021-44228",
+        "product": "Apache — Log4j 2",
+        "severity": "critical",
+        "severityLabel": "kritisch",
+        "cvss": "10.0",
+        "ransomware": true,
+        "cluster": "Java-Landschaften",
+        "effort": "6 h"
+      },
+      {
+        "cve": "CVE-2019-0708",
+        "product": "Microsoft — Remotedesktopdienste",
+        "severity": "critical",
+        "severityLabel": "kritisch",
+        "cvss": "9.8",
+        "ransomware": true,
+        "cluster": "Windows-Landschaften",
+        "effort": "7 h"
+      }
+    ]
+  },
+  "clustersTitle": "Aufwands-Cluster",
+  "clustersNote": "Die drei größten Cluster der Beispiel-Warteschlange. Ein Cluster ist eine Gruppe von Einträgen, die ein Team in einer Sitzung schließen kann — sortiert nach dem Risiko, das er entfernt, nicht nach CVSS.",
+  "clusters": [
+    {
+      "id": "01",
+      "name": "Fernzugriff",
+      "cves": 2,
+      "exposure": 61,
+      "effort": "3,5 h",
+      "action": "Beide sind ohne Anmeldung ausnutzbar und beide tauchen in Ransomware-Ketten auf. Das Edge-Gerät ist die Tür: zuerst patchen, dann nach der Webshell suchen."
+    },
+    {
+      "id": "02",
+      "name": "Edge-Geräte",
+      "cves": 2,
+      "exposure": 24,
+      "effort": "5 h",
+      "action": "Ein Pfad über die Management-Ebene, ein Reset auf Protokollebene. Der Reset ist eine Grenzwertänderung am Load Balancer; der andere braucht ein Wartungsfenster."
+    },
+    {
+      "id": "03",
+      "name": "Java-Landschaften",
+      "cves": 2,
+      "exposure": 15,
+      "effort": "11 h",
+      "action": "Der Aufwand steckt in der Bestandsaufnahme: welche Jars wirklich geladen werden und welche davon der Application Server in ein ausgeliefertes Verzeichnis entpackt."
+    }
+  ],
+  "methodTitle": "Wie eine Warteschlange entsteht",
+  "method": [
+    {
+      "n": "01",
+      "title": "Eingang",
+      "body": "Zwei Eingaben: der Katalog, bei jeder Veröffentlichung neu geladen, und deine Asset-Liste. Was keinen Zuständigen hat, gilt als exponiert, bis das Gegenteil belegt ist."
+    },
+    {
+      "n": "02",
+      "title": "Triage",
+      "body": "Einträge, die deinen Stack nicht treffen können, fallen mit schriftlicher Begründung heraus. Die Warteschlange bleibt kurz, und jede Streichung ist nachvollziehbar."
+    },
+    {
+      "n": "03",
+      "title": "Nachstellen",
+      "body": "Für die Spitze der Warteschlange ein Nachweis in deiner eigenen Umgebung: die Anfrage, die Antwort und die Zeile in der Konfiguration, die es möglich gemacht hat."
+    },
+    {
+      "n": "04",
+      "title": "Abschließen",
+      "body": "Patch-Reihenfolge, die Prüfung, die belegt, dass sie gegriffen hat, und ein einseitiger Vermerk für die Revision. Ein Eintrag verlässt die Warteschlange erst, wenn der Vermerk existiert."
+    }
+  ],
+  "programTitle": "Programmformen",
+  "programNote": "Konzept, kein Angebot. Jede Form beantwortet eine Frage, die jedes Sicherheitsbudget stellt: Was kostet uns ein geschlossener Befund?",
+  "tiers": [
+    {
+      "name": "Pilot",
+      "price": "zwei Wochen",
+      "body": "Ein Produktteam, eine nach Aufwand sortierte Warteschlange, Nachweise für die fünf obersten Einträge und ein Patch-Plan, mit dem das Team am Montag starten kann.",
+      "featured": false
+    },
+    {
+      "name": "Retainer",
+      "price": "monatlich",
+      "body": "Neue Katalogeinträge werden beim Erscheinen Zuständigen zugeordnet, dazu ein Abschlussbericht, den die Revision akzeptiert, und ein Quartalsblick darauf, was die Warteschlange über deine Umgebung sagt.",
+      "featured": true
+    },
+    {
+      "name": "Incident",
+      "price": "pro Ereignis",
+      "body": "Wenn etwas von der Liste dich trifft: Eingrenzung, Prüfung der Exposition, die Reihenfolge zum Patchen und der Bericht am Tag danach.",
+      "featured": false
+    }
+  ],
+  "footer": "bountystash — Konzept-Mockup von Matt Ji. Beispieldaten, kein laufendes Programm, kein Tracking. Das echte Portfolio ist bountystash.com."
+}

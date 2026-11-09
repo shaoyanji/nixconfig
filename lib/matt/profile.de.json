@@ -1,0 +1,119 @@
+{
+  "profile": {
+    "name": "Matt Ji",
+    "url": "https://matt.bountystash.com",
+    "handle": "matt@bountystash.com",
+    "title": "Systemingenieur für Infrastruktur und Sicherheit",
+    "subtitle": "Go · NixOS-Flotten · Schwachstellendaten · Energieinfrastruktur",
+    "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
+    "status": "Offen für Senior- und Lead-Rollen in System und Sicherheit",
+    "bio": "Ich baue Infrastruktur, die sich aus einem einzigen Commit wiederherstellen lässt: Go-Dienste mit append-only Zustand, NixOS-Flotten mit eigener Zertifizierungsstelle und Datenpipelines, die aus Betriebsrauschen eine Entscheidung machen. Der größte Teil dieser Arbeit lag im Energiebereich — Telemetrie, Bewertung und Risiko über Portfolios aus erneuerbaren Anlagen im Wert von über 100 Mio. USD. Der Rest sind Schwachstellendaten, wo CISAs KEV-Katalog das Rohmaterial ist.",
+    "contacts": [
+      { "label": "email", "href": "mailto:matt@bountystash.com" },
+      { "label": "github", "href": "https://github.com/shaoyanji" },
+      { "label": "linkedin", "href": "https://linkedin.com/in/mattji" },
+      { "label": "portfolio", "href": "https://www.bountystash.com" }
+    ]
+  },
+  "ui": {
+    "skip": "Zum Inhalt springen",
+    "navLabel": "Abschnitte",
+    "theme": "Design",
+    "themeAria": "Zwischen hellem und dunklem Design wechseln",
+    "langLabel": "Sprache",
+    "footer": "Von Nix aus lib/matt/profile.de.json kompiliert — ein kurzes Inline-Skript schaltet das Design; keine Webfonts, kein Tracking. Quelle: github.com/shaoyanji/nixconfig.",
+    "headings": {
+      "focus": "Fokus",
+      "work": "Ausgewählte Arbeit",
+      "stack": "Werkzeuge",
+      "hire": "Zusammenarbeit"
+    },
+    "nav": {
+      "focus": "Fokus",
+      "work": "Arbeit",
+      "lab": "KEV-Labor",
+      "stack": "Werkzeuge",
+      "hire": "Zusammenarbeit"
+    }
+  },
+  "focus": [
+    {
+      "title": "Reproduzierbare Flotten",
+      "body": "NixOS und Flakes über Server, Arbeitsplätze und einen Cloud-Endpunkt. Ein Commit beschreibt die Maschine; ein Switch ist die Auslieferung."
+    },
+    {
+      "title": "Go-Dienste mit begrenzter Arbeit",
+      "body": "Serverseitig gerenderte Binaries und append-only Ereignisprotokolle. Kein Frontend-Build, kein Framework, klein genug für einen Prüfdurchgang an einem Nachmittag."
+    },
+    {
+      "title": "Schwachstellendaten, die in Handlung enden",
+      "body": "KEV als Zeitreihe und als Arbeitscluster: was gerade ausgenutzt wird und welche Patch-Reihenfolge pro investierter Stunde das meiste Risiko entfernt."
+    }
+  ],
+  "work": [
+    {
+      "title": "NixOS-Flotte über mehrere Hosts",
+      "role": "Autor und Betreiber",
+      "period": "2023 — heute",
+      "description": "Ein Flake für eine Flotte aus NixOS-Hosts: NAS, Arbeitsplätze, ein Cloud-Endpunkt und ein entfernter Builder, eine SSH-Zertifizierungsstelle mit Rotation, verschlüsselte Secrets und ein Taskfile als einzige Schnittstelle. Jeder Host wird durch eine einzige Zeile in Betrieb genommen.",
+      "link": "https://github.com/shaoyanji/nixconfig"
+    },
+    {
+      "title": "bountystash: deterministische Arbeitsmaschine",
+      "role": "Entwickler",
+      "period": "2024 — heute",
+      "description": "Ein einziges Go-Binary, das aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht: append-only Ereignisse, tastaturorientierte Terminal-Oberfläche, curl-freundliche Endpunkte, keine Frontend-Abhängigkeiten.",
+      "link": "https://github.com/shaoyanji/bountystash"
+    },
+    {
+      "title": "fibtransponder",
+      "role": "Recherche und Umsetzung",
+      "period": "2026",
+      "description": "Ein Fibonacci-Radix-Zustandsautomat als Streaming-Verfahren für Tokenisierungsexperimente: begrenzte Arbeit pro Schritt über einen Bitstrom, Adjazenzbreite als Lokalitätsselektor, Zobrist-Seed-Tabellen und ein Korpus-Benchmark, der den reinen Seed-Detektor widerlegt hat.",
+      "link": "https://github.com/shaoyanji/fibtransponder"
+    },
+    {
+      "title": "Energie-Telemetrie und Bewertung",
+      "role": "Leitung Betrieb, O3 Energy",
+      "period": "2016 — 2020",
+      "description": "Quantitative Steuerung eines Solarportfolios über 100 Mio. USD: Ertrags- und Bewertungsmodelle, die Bankprüfungen bestanden, mobile Felderfassung und Kontrahentenrisiko, das institutionelle Kreditgeber akzeptiert haben.",
+      "link": ""
+    }
+  ],
+  "lab": {
+    "title": "Das KEV-Labor",
+    "body": "Zwei öffentliche Werkzeuge machen CISAs Katalog bekannter ausgenutzter Schwachstellen lesbar. kev-time zeichnet Ausnutzung über die Zeit, sodass ein Trend sichtbar wird, bevor ein Bericht existiert. kelly-svg gruppiert Einträge zu Clustern, die ein Team abarbeiten kann, sodass der Patch-Plan aus Daten folgt statt aus Bauchgefühl. Beide sind statisches SVG und reines HTML, gebaut, um während eines Vorfalls auf dem Telefon gelesen zu werden.",
+    "links": [
+      { "label": "kev-time", "href": "https://jisifu.serv00.net/kev-time/" },
+      { "label": "kelly-svg", "href": "https://jisifu.serv00.net/kelly-svg/" }
+    ]
+  },
+  "stack": [
+    {
+      "category": "Systeme und Nebenläufigkeit",
+      "items": ["Go", "Channels und Zustandsautomaten", "PostgreSQL", "Redis", "gRPC und REST", "Kafka", "Python"]
+    },
+    {
+      "category": "Deklarative Infrastruktur",
+      "items": ["NixOS", "Nix-Flakes", "SSH-Zertifizierungsstelle", "SOPS und age", "Tailscale", "ZFS und btrfs", "systemd"]
+    },
+    {
+      "category": "Fachliches",
+      "items": ["Anlagenbewertung", "Abgleich von Solar-Telemetrie", "Risikomodelle", "Berichte für Bankprüfungen", "KEV und CVSS", "Typst"]
+    }
+  ],
+  "hire": {
+    "title": "Zusammenarbeit",
+    "body": "Ich suche eine Senior- oder Lead-Rolle dort, wo Infrastruktur und Sicherheit aufeinandertreffen: Plattform-Engineering, Site Reliability oder Schwachstellenbetrieb. Remote mit Basis in MEZ oder vor Ort in Freiburg und am Oberrhein.",
+    "wants": [
+      "US-Staatsbürgerschaft mit deutscher Niederlassungserlaubnis — kein Sponsoring, kein Umzug nötig",
+      "Englisch auf Muttersprachniveau, Deutsch C1",
+      "Go, Python, PostgreSQL, NixOS — gewohnt, einen Dienst von Anfang bis Ende zu verantworten",
+      "Kurzfristig verfügbar"
+    ],
+    "cta": {
+      "label": "matt@bountystash.com",
+      "href": "mailto:matt@bountystash.com?subject=Rolle%20f%C3%BCr%20Matt%20Ji"
+    }
+  }
+}

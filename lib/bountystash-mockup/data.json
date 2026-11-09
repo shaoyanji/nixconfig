@@ -1,0 +1,203 @@
+{
+  "brand": {
+    "name": "bountystash",
+    "tag": "vulnerability operations",
+    "badge": "concept"
+  },
+  "ui": {
+    "banner": "Concept mockup · sample data · no live programme",
+    "top": "Top",
+    "cluster": "cluster",
+    "cvesUnit": "CVEs",
+    "effortUnit": "effort",
+    "exposureUnit": "% exposure",
+    "yes": "yes",
+    "no": "no"
+  },
+  "subtitles": {
+    "exposure": "ordered by risk removed per hour, not by CVSS",
+    "clusters": "one sitting per cluster",
+    "method": "every removal has a reason on file",
+    "program": "what a closed finding costs"
+  },
+  "nav": [
+    { "id": "exposure", "label": "Exposure" },
+    { "id": "clusters", "label": "Clusters" },
+    { "id": "method", "label": "Method" },
+    { "id": "program", "label": "Programme" }
+  ],
+  "hero": {
+    "kicker": "Concept for a bug-bounty and vulnerability programme",
+    "title": "The exploited list, turned into a queue you can close.",
+    "body": "bountystash reads CISA's Known Exploited Vulnerabilities catalogue, groups entries by the effort a fix actually takes, and writes the result as a work order: what is being exploited against your stack, in the order that removes the most risk per hour spent. No scanner noise. No thousand-page report. One queue with owners and a closing note.",
+    "cta": { "label": "See a sample queue", "href": "#exposure" },
+    "alt": { "label": "Talk about a pilot", "href": "mailto:matt@bountystash.com?subject=bountystash%20pilot" }
+  },
+  "stats": [
+    { "value": "1,482", "label": "catalogue entries tracked" },
+    { "value": "61%", "label": "of sample exposure closed by three patches" },
+    { "value": "3.5 h", "label": "median effort for one cluster" },
+    { "value": "0", "label": "findings without an owner" }
+  ],
+  "kev": {
+    "title": "Sample queue",
+    "note": "Sample data. The CVE identifiers and products are real and well known; effort, exposure and ordering are invented to show the interface. Nothing here is a live programme.",
+    "columns": ["CVE", "Vendor / product", "Severity", "Ransomware", "Cluster", "Effort"],
+    "rows": [
+      {
+        "cve": "CVE-2024-21887",
+        "product": "Ivanti — Connect Secure",
+        "severity": "critical",
+        "severityLabel": "critical",
+        "cvss": "9.1",
+        "ransomware": true,
+        "cluster": "Remote access",
+        "effort": "1.5 h"
+      },
+      {
+        "cve": "CVE-2023-4966",
+        "product": "Citrix — NetScaler ADC",
+        "severity": "critical",
+        "severityLabel": "critical",
+        "cvss": "9.4",
+        "ransomware": true,
+        "cluster": "Remote access",
+        "effort": "2 h"
+      },
+      {
+        "cve": "CVE-2023-44487",
+        "product": "IETF — HTTP/2 (Rapid Reset)",
+        "severity": "high",
+        "severityLabel": "high",
+        "cvss": "7.5",
+        "ransomware": false,
+        "cluster": "Edge appliances",
+        "effort": "2 h"
+      },
+      {
+        "cve": "CVE-2024-3400",
+        "product": "Palo Alto Networks — PAN-OS GlobalProtect",
+        "severity": "critical",
+        "severityLabel": "critical",
+        "cvss": "10.0",
+        "ransomware": false,
+        "cluster": "Edge appliances",
+        "effort": "3 h"
+      },
+      {
+        "cve": "CVE-2022-22965",
+        "product": "VMware — Spring Framework",
+        "severity": "critical",
+        "severityLabel": "critical",
+        "cvss": "9.8",
+        "ransomware": false,
+        "cluster": "Java estates",
+        "effort": "4 h"
+      },
+      {
+        "cve": "CVE-2023-34362",
+        "product": "Progress — MOVEit Transfer",
+        "severity": "critical",
+        "severityLabel": "critical",
+        "cvss": "9.8",
+        "ransomware": true,
+        "cluster": "File transfer",
+        "effort": "5 h"
+      },
+      {
+        "cve": "CVE-2021-44228",
+        "product": "Apache — Log4j 2",
+        "severity": "critical",
+        "severityLabel": "critical",
+        "cvss": "10.0",
+        "ransomware": true,
+        "cluster": "Java estates",
+        "effort": "6 h"
+      },
+      {
+        "cve": "CVE-2019-0708",
+        "product": "Microsoft — Remote Desktop Services",
+        "severity": "critical",
+        "severityLabel": "critical",
+        "cvss": "9.8",
+        "ransomware": true,
+        "cluster": "Windows estates",
+        "effort": "7 h"
+      }
+    ]
+  },
+  "clustersTitle": "Effort clusters",
+  "clustersNote": "The top three clusters of the sample queue. A cluster is a group of entries one team can close in one sitting, ordered by the exposure it removes, not by CVSS.",
+  "clusters": [
+    {
+      "id": "01",
+      "name": "Remote access",
+      "cves": 2,
+      "exposure": 61,
+      "effort": "3.5 h",
+      "action": "Both are pre-authentication and both appear in ransomware chains. The edge device is the door; patch it first, then check for the webshell."
+    },
+    {
+      "id": "02",
+      "name": "Edge appliances",
+      "cves": 2,
+      "exposure": 24,
+      "effort": "5 h",
+      "action": "One management-plane path, one protocol-level reset. The reset is a limit change on the load balancer; the other needs a maintenance window."
+    },
+    {
+      "id": "03",
+      "name": "Java estates",
+      "cves": 2,
+      "exposure": 15,
+      "effort": "11 h",
+      "action": "Most of the effort is discovery: which jars are actually loaded, and which of them the application server unpacks into a directory it serves."
+    }
+  ],
+  "methodTitle": "How a queue is made",
+  "method": [
+    {
+      "n": "01",
+      "title": "Intake",
+      "body": "Two inputs: the catalogue, refreshed on every publish, and your asset list. Anything you cannot name an owner for is treated as exposed until proven otherwise."
+    },
+    {
+      "n": "02",
+      "title": "Triage",
+      "body": "Entries that cannot touch your stack are dropped with the reason written down, so the queue is short and every removal is auditable."
+    },
+    {
+      "n": "03",
+      "title": "Reproduce",
+      "body": "For the top of the queue, a proof in your own environment: the request, the response, and the line in the config that made it possible."
+    },
+    {
+      "n": "04",
+      "title": "Close",
+      "body": "Patch order, the verification that proves it took, and a one-page note your auditor can file. The entry leaves the queue only when the note exists."
+    }
+  ],
+  "programTitle": "Programme shapes",
+  "programNote": "Concept, not an offer. Each shape exists to answer one question a security budget always asks: what does a closed finding cost us?",
+  "tiers": [
+    {
+      "name": "Pilot",
+      "price": "two weeks",
+      "body": "One product team, one queue ordered by effort, with proof for the top five entries and a patch plan the team can start on Monday.",
+      "featured": false
+    },
+    {
+      "name": "Retainer",
+      "price": "monthly",
+      "body": "New catalogue entries mapped to owners as they publish, a closing report your auditors accept, and a quarterly review of what the queue says about your estate.",
+      "featured": true
+    },
+    {
+      "name": "Incident",
+      "price": "per event",
+      "body": "When something on the list lands on you: scoping, exposure check, the order to patch in, and the write-up the day after.",
+      "featured": false
+    }
+  ],
+  "footer": "bountystash — concept mockup by Matt Ji. Sample data, no live programme, no tracking. The real portfolio is bountystash.com."
+}

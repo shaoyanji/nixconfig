@@ -19,6 +19,22 @@
       "previewBind": "127.0.0.1",
       "previewPort": 3000
     },
+    "matt": {
+      "kind": "pages",
+      "description": "Personal page (matt.bountystash.com), rendered from lib/matt/profile.json",
+      "buildCommand": "nix build --builders \"\" .#sites.matt-site",
+      "outputPath": "/tmp/matt-site",
+      "previewBind": "127.0.0.1",
+      "previewPort": 3001
+    },
+    "bountystash-mockup": {
+      "kind": "pages",
+      "description": "Bug-bounty concept mockup for bountystash.com, rendered from lib/bountystash-mockup/data.json",
+      "buildCommand": "nix build --builders \"\" .#sites.bountystash-mockup",
+      "outputPath": "/tmp/bountystash-mockup",
+      "previewBind": "127.0.0.1",
+      "previewPort": 3002
+    },
     "dragoncourt": {
       "kind": "apache-php",
       "description": "Alwaysdata Debian web server (dragoncourt.alwaysdata.net)",

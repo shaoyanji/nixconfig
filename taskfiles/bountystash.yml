@@ -9,6 +9,8 @@ vars:
   # `CV - Shaoyan (Matt) Ji` document, and `bountystash.pages.dev` does not exist.
   # Do not "fix" this name: a deploy to a nonexistent project creates one.
   PROJECT_NAME: "cv-resume"
+  PROJECT_MATT: "matt"
+  PROJECT_MOCKUP: "bountystash-mockup"
 
 tasks:
   bountystash:login:
@@ -100,6 +102,66 @@ tasks:
       - cp {{.BOUNTY_DIR}}/scripts/pre-push.sh {{.BOUNTY_DIR}}/.git/hooks/pre-push
       - chmod +x {{.BOUNTY_DIR}}/.git/hooks/pre-push
       - echo "Installed .git/hooks/pre-push successfully."
+
+  # matt.bountystash.com — the personal page. It is its own Pages project rather
+  # than a route on `cv-resume`, so a deploy of the portfolio cannot overwrite the
+  # page a cold-mail recipient opens.
+  matt:build:
+    desc: Build matt.bountystash.com (flake output .#sites.matt-site)
+    cmds:
+      - nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site -L
+
+  matt:init:
+    desc: Create the Cloudflare Pages project for matt.bountystash.com (idempotent)
+    cmds:
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages project create {{.PROJECT_MATT}} --production-branch=main"
+
+  matt:deploy:preview:
+    desc: Deploy matt.bountystash.com to a Cloudflare Pages preview branch
+    cmds:
+      - task: matt:build
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/matt-site --project-name={{.PROJECT_MATT}} --branch=preview"
+
+  matt:deploy:prod:
+    desc: "[destructive] Publish matt.bountystash.com live"
+    cmds:
+      - task: matt:build
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/matt-site --project-name={{.PROJECT_MATT}} --branch=main"
+
+  matt:status:
+    desc: HTTP status of matt.bountystash.com
+    cmds:
+      - curl -Is https://matt.bountystash.com | head -n 6
+
+  # The bug-bounty concept mockup: sample data, `noindex`, its own Pages project.
+  # Publishing it to bountystash.com itself is deliberately not a task.
+  mockup:build:
+    desc: Build the bountystash bug-bounty concept mockup (.#sites.bountystash-mockup)
+    cmds:
+      - nix build --builders "" --out-link /tmp/bountystash-mockup .#sites.bountystash-mockup -L
+
+  mockup:init:
+    desc: Create the Cloudflare Pages project for the mockup (idempotent)
+    cmds:
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages project create {{.PROJECT_MOCKUP}} --production-branch=main"
+
+  mockup:deploy:preview:
+    desc: Deploy the mockup to a Cloudflare Pages preview branch
+    cmds:
+      - task: mockup:build
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-mockup --project-name={{.PROJECT_MOCKUP}} --branch=preview"
+
+  mockup:deploy:prod:
+    desc: "[destructive] Publish the mockup to its own *.pages.dev production URL"
+    cmds:
+      - task: mockup:build
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages deploy /tmp/bountystash-mockup --project-name={{.PROJECT_MOCKUP}} --branch=main"
+
+  mockup:status:
+    desc: HTTP status of the mockup on concept.bountystash.com and its pages.dev URL
+    cmds:
+      - curl -Is https://concept.bountystash.com | head -n 6
+      - curl -Is https://bountystash-mockup.pages.dev | head -n 6
 
   bountystash:menu:
     desc: Interactive Charmbracelet Gum menu for Bountystash Console operations

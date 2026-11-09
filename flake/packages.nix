@@ -65,6 +65,15 @@ in
         # Nix-native approach as the fleet site (lib/bountystash-site.nix): one CSS
         # file, two locales, no JavaScript.
         bountystash-site = import ../lib/bountystash-site.nix {inherit pkgs lib;};
+
+        # matt.bountystash.com — the personal page, same shape as the portfolio
+        # above: data in lib/matt/profile.json, one CSS file, no JavaScript.
+        matt-site = import ../lib/matt-site.nix {inherit pkgs lib;};
+
+        # bountystash.com as a bug-bounty and vulnerability programme. A concept
+        # mockup with sample data and its own Pages project, so it can never be
+        # confused with the live portfolio or overwrite it on deploy.
+        bountystash-mockup = import ../lib/bountystash-mockup.nix {inherit pkgs lib;};
       }
       // lib.optionalAttrs (system == "aarch64-linux") {
         # delphi's two surfaces: the public dossier and the tailnet console, from one

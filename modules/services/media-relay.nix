@@ -264,8 +264,11 @@ in {
           };
           # The browse page owns the root. A directory URL still gets the plain
           # listing, so a bookmark taken before the page existed keeps working.
+          # `alias` to the file, not `root` to the store dir: with a root, nginx
+          # answers `/` by internally redirecting to `/index.html`, which matches
+          # `location /` — the library — and 404s there.
           "= /" = {
-            root = mediaUi;
+            alias = "${mediaUi}/index.html";
           };
           "= /index.json" = {
             alias = "${cfg.mediaDir}/.index.json";

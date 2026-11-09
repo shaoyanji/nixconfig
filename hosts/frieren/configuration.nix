@@ -17,6 +17,15 @@
       [ "$(cat "$type" 2>/dev/null)" = "bluetooth" ] && printf '0\n' > "$f" 2>/dev/null || true
     done
   '';
+  # The warmed set is the inventory's opt-in, never a copy of it: `managed = true`
+  # plus `status = "active"` is what `infra:warm:cache` and `infra:apply:fleet`
+  # derive. While this file kept its own list of seven, the three hosts added to
+  # the rotation since were managed everywhere except here, so their closures
+  # were cold on the cache the LAN deploys from.
+  warmHosts = builtins.attrNames (
+    lib.filterAttrs (_: host: host.managed && host.kind == "nixos" && host.status == "active") self.inventory.hosts
+  );
+
   # Fleet cache warmer: builds every NixOS host's toplevel from the pushed
   # flake so harmonia serves the closures to the whole LAN at wire speed.
   # Uses the same github: source as system.autoUpgrade (eval works without
@@ -29,7 +38,7 @@
     fail=0
     mkdir -p /nix/var/nix/gcroots/fleet
     for h in \
-      frieren poseidon eisen fern stark scratch guckloch
+      ${lib.concatStringsSep " " warmHosts}
     do
       echo "==> warming & pinning current generation: $h"
       out_link="/nix/var/nix/gcroots/fleet/$h"
@@ -103,6 +112,11 @@ in {
     # `task ops:health` and gatus already look. One path, declared once: the
     # producer owns it.
     prefillRuns = config.services.steamCache.prefill.ledger;
+    # The 03:00 audit's own verdict. It exits 0 even when every agent tier failed
+    # (so the timer keeps running), which is why the outcome file — not the unit
+    # Result — is what has to reach gatus. Written by agy-nightly-system as
+    # `<ts>\t<outcome>\t<reason>`; `fallback` degrades this host and pages.
+    auditRecord = "/var/lib/agy-system/last-run";
     # The cold vault is powered on demand: its automount failing while BurgerNAS
     # sleeps is the design, not a fault, and counting it put the whole host in
     # "degraded" — which gatus then reported as a broken monitor.
@@ -130,9 +144,20 @@ in {
   # (see modules/profiles/nixbuild-client.nix).
   profiles.nixbuild-client.enable = true;
 
-  # Server-class host: pin the current nixpkgs LTS kernel instead of the
-  # latest-kernel default from profiles/base-node.nix.
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_12;
+  # Server-class host: prefer the current nixpkgs LTS kernel instead of the
+  # latest-kernel default from profiles/base-node.nix. The chain degrades to
+  # nixpkgs' own default when an LTS leaves the tree, so a version bump is a
+  # deliberate edit rather than an eval error inside the nightly autoUpgrade
+  # window — pinned to a missing attribute, the whole host stops rebuilding.
+  boot.kernelPackages = lib.mkForce (
+    pkgs.${
+      lib.findFirst (name: builtins.hasAttr name pkgs) "linuxPackages" [
+        "linuxPackages_6_12"
+        "linuxPackages_6_6"
+        "linuxPackages_5_15"
+      ]
+    }
+  );
 
   # Frieren is a server-heavy-io-sensitive node with spinning media (/dev/sda).
   # 1. Disable full-store batch traversal to prevent mechanical head thrashing.

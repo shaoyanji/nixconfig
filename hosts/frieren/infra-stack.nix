@@ -287,14 +287,26 @@
     cd ${user.home}
 
     # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
-    TRIAGE_REPORT="/tmp/systemone-handoff-triage.json"
+    # The triage document is stored as TOON and read back through the tool, so a
+    # count is structural (any nesting, key order or spacing) instead of a match
+    # on pretty-printed text: the old grep read "0 actionable" on a reformatted
+    # report and silently skipped the cascade below. TOON is the artifact an
+    # agent reads; jq is the program's reader after one decode.
+    TRIAGE_TOON="/tmp/systemone-handoff-triage.toon"
     OPEN_ITEMS=0
     ACTIONABLE_COUNT=0
     if command -v systemone-decision >/dev/null 2>&1; then
       echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
-      systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
-      OPEN_ITEMS=$( (grep -o '"status": "OPEN"' "$TRIAGE_REPORT" || true) | wc -l)
-      ACTIONABLE_COUNT=$( (grep -o '"category": "AUTONOMOUS_PROMOTION_CANDIDATE"' "$TRIAGE_REPORT" || true) | wc -l)
+      systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" 2>/dev/null \
+        | ${pkgs.llm-agents.toon}/bin/toon -e > "$TRIAGE_TOON" 2>/dev/null || true
+      if [ -s "$TRIAGE_TOON" ]; then
+        OPEN_ITEMS=$(${pkgs.llm-agents.toon}/bin/toon -d < "$TRIAGE_TOON" 2>/dev/null \
+          | ${pkgs.jq}/bin/jq '[.. | objects | select(.status? == "OPEN")] | length' 2>/dev/null || echo 0)
+        ACTIONABLE_COUNT=$(${pkgs.llm-agents.toon}/bin/toon -d < "$TRIAGE_TOON" 2>/dev/null \
+          | ${pkgs.jq}/bin/jq '[.. | objects | select(.category? == "AUTONOMOUS_PROMOTION_CANDIDATE")] | length' 2>/dev/null || echo 0)
+      else
+        echo "=== [$(date)] WARN: triage produced no decodable TOON; counts stay 0 and the gate below decides ===" >&2
+      fi
       echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found, $ACTIONABLE_COUNT actionable autonomous candidates)."
     fi
 
@@ -306,7 +318,7 @@
 
     ${agentCascadeScript}
 
-    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available at /tmp/systemone-handoff-triage.json ($OPEN_ITEMS open items, $ACTIONABLE_COUNT actionable). The intent is to provide live execution guidance without replacing or deleting the markdown files."
+    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available as TOON at /tmp/systemone-handoff-triage.toon ($OPEN_ITEMS open items, $ACTIONABLE_COUNT actionable); decode it with toon -d if you need JSON. The intent is to provide live execution guidance without replacing or deleting the markdown files."
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] Handoff execution finished successfully. Preserved $HANDOFF_FILE in-place. ==="
@@ -325,6 +337,27 @@
       echo "No SYSTEM.md found in ${user.home}. Skipping execution."
       exit 0
     fi
+
+    # The outcome of an audit is state, not prose. This unit no longer rewrites a
+    # line inside SYSTEM.md — the document has one owner (the agent run that is
+    # asked to refine it, or the human), and the machine keeps its own record in
+    # /var/lib/agy-system, which tmpfiles creates owned by this user so the
+    # user-unit write and root's sentinel read the same file. It cannot live
+    # under $HOME: the sentinel collector runs with ProtectHome. A regex
+    # substitution into a hand-authored file failed silently when the wording
+    # moved or the path was read-only; a file write fails where it happened.
+    STATE_DIR="''${AGY_STATE_DIR:-/var/lib/agy-system}"
+    if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
+      echo "=== [$(date)] WARN: cannot create $STATE_DIR; recording to the journal only ===" >&2
+      STATE_DIR=""
+    fi
+    record_outcome() {
+      local outcome="$1" reason="$2"
+      echo "=== [$(date)] Audit outcome: $outcome ($reason) ==="
+      if [ -n "$STATE_DIR" ]; then
+        printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$outcome" "$reason" > "$STATE_DIR/last-run"
+      fi
+    }
 
     # --- BOOT-SETTLE GATE: never audit a host that is still coming up ---
     # The timer is Persistent=true, so after a power cut it catches up the instant
@@ -382,11 +415,20 @@
 
     # --- STEP 2: System One Decision Triage (Julia-1 & Laya) ---
     echo "=== [$(date)] Step 2: Running System One Decision Triage (Julia-1) ==="
-    TRIAGE_REPORT="/tmp/systemone-system-triage.json"
+    # Same contract as the handoff runner: TOON on disk, one decode, structural
+    # count. A grep here reported 0 on any reformatting, which reads as "no TIER 1
+    # repairs" and decides nothing else.
+    TRIAGE_TOON="/tmp/systemone-system-triage.toon"
     TIER1_COUNT=0
     if command -v systemone-decision >/dev/null 2>&1; then
-      systemone-decision --model julia-1 triage-system "$SYSTEM_FILE" > "$TRIAGE_REPORT" || true
-      TIER1_COUNT=$( (grep -o '"protocol": "TIER_1_IMMEDIATE_REPAIR"' "$TRIAGE_REPORT" || true) | wc -l)
+      systemone-decision --model julia-1 triage-system "$SYSTEM_FILE" 2>/dev/null \
+        | ${pkgs.llm-agents.toon}/bin/toon -e > "$TRIAGE_TOON" 2>/dev/null || true
+      if [ -s "$TRIAGE_TOON" ]; then
+        TIER1_COUNT=$(${pkgs.llm-agents.toon}/bin/toon -d < "$TRIAGE_TOON" 2>/dev/null \
+          | ${pkgs.jq}/bin/jq '[.. | objects | select(.protocol? == "TIER_1_IMMEDIATE_REPAIR")] | length' 2>/dev/null || echo 0)
+      else
+        echo "=== [$(date)] WARN: triage produced no decodable TOON; TIER 1 count stays 0 ===" >&2
+      fi
       echo "System One System Triage: Evaluated scorecard with $TIER1_COUNT potential TIER 1 immediate repair item(s)."
     fi
 
@@ -429,9 +471,7 @@
 
     if [ "$SHOULD_RUN_CASCADE" -eq 0 ]; then
       echo "=== [$(date)] Quiet Reflex Gate: System is 100% nominal (0 failed units, 0 Btrfs errors, all backups clean). Preserving AI tokens. ==="
-      CURRENT_DATE=$(date "+%Y-%m-%d %H:%M %Z")
-      sed -i "s/\* \*\*Last Audit Run:\*\* .*/\* \*\*Last Audit Run:\*\* $CURRENT_DATE (Quiet Nominal Gate - 0 errors, AI tokens preserved)/" "$SYSTEM_FILE" || true
-      echo "Recorded quiet nominal audit in $SYSTEM_FILE."
+      record_outcome quiet "0 failed units, 0 Btrfs errors, backups clean"
       exit 0
     fi
 
@@ -439,15 +479,14 @@
     echo "=== [$(date)] Step 4: Trigger active ($RUN_REASON). Invoking Agent Cascade ==="
     ${agentCascadeScript}
 
-    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status. System One decision pre-triage is available at /tmp/systemone-system-triage.json ($TIER1_COUNT immediate items flagged). Audit trigger reason: $RUN_REASON."
+    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status. System One decision pre-triage is available as TOON at /tmp/systemone-system-triage.toon ($TIER1_COUNT immediate items flagged); decode it with toon -d if you need JSON. Audit trigger reason: $RUN_REASON."
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
+      record_outcome ok "$RUN_REASON"
     else
-      echo "=== [$(date)] WARN: All AI agent tiers failed. Applying deterministic timestamp update to $SYSTEM_FILE ===" >&2
-      CURRENT_DATE=$(date "+%Y-%m-%d %H:%M %Z")
-      sed -i "s/\* \*\*Last Audit Run:\*\* .*/\* \*\*Last Audit Run:\*\* $CURRENT_DATE (Deterministic Fallback)/" "$SYSTEM_FILE" || true
-      echo "=== [$(date)] Deterministic audit recorded in $SYSTEM_FILE ==="
+      echo "=== [$(date)] WARN: All AI agent tiers failed. The outcome is recorded in $STATE_DIR/last-run; $SYSTEM_FILE is left untouched for the next run. ===" >&2
+      record_outcome fallback "all agent tiers failed ($RUN_REASON)"
     fi
   '';
 in {
@@ -575,7 +614,6 @@ in {
     collector.enable = true; # weekly metric collector (default timer)
     settings.web.listen.port = 8124;
   };
-  networking.firewall.allowedTCPPorts = [8124];
 
   # InfluxDB is OFF since 2026-11-09. Scrutiny brings it up by default, but the
   # metric path never carried anything: measured on this host, /var/lib/influxdb2
@@ -614,6 +652,10 @@ in {
     # as devji and must own the directory — /srv/backup itself is root-owned and
     # 0755, which is enough to traverse and not enough to create anything.
     "d /srv/backup/agent-turns 0750 ${user.name} users -"
+    # The scheduled audit's outcome record: written by the user unit
+    # `agy-nightly-system`, read by the sentinel (root, with ProtectHome), which
+    # degrades the host when the newest outcome is `fallback`.
+    "d /var/lib/agy-system 0755 ${user.name} ${user.group} -"
   ];
 
   services.postgresqlBackup = {

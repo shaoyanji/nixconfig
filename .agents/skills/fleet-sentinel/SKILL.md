@@ -30,6 +30,7 @@ pager, the sentinel is the diary.
 | Current verdict | `www/status.json` (also served at `/sentinel/status.json`) |
 | Machine gate | `www/health.txt` (`ok` / `degraded`) |
 | Dashboard | `http://sentinel.frieren.lan/` (static, reads `status.json`) |
+| Audit outcome | `/var/lib/agy-system/last-run` (one TSV line per run, newest wins) |
 | gatus probe | `http://127.0.0.1:80/sentinel/status.json`, condition `[BODY].state == ok` |
 
 ## 2. Ledger schema (schema: 1)
@@ -53,7 +54,9 @@ One JSON object per run:
   "disk_pct": {"root": 42, "nix": 61, "data": 80},
   "psi": {"io": 1.2, "memory": 0.0},
   "prefill": {"ts": "2026-10-28T23:59:37Z", "recorded": true, "measure": "statvfs",
-              "tier_growth_bytes": 0, "wan_bytes": 406}
+              "tier_growth_bytes": 0, "wan_bytes": 406},
+  "audit": {"ts": "2026-11-09T03:04:11+01:00", "outcome": "fallback",
+            "reason": "all agent tiers failed (Scheduled weekly audit)"}
 }
 ```
 
@@ -63,6 +66,12 @@ One JSON object per run:
 at a 15-minute cadence the same numbers would be 95 identical readings. `null`
 means no self-measuring job on this host. Read the whole history with
 `tail -n 20 /var/lib/steam-prefill/runs.jsonl | jq -c .`.
+
+`audit` is the newest verdict of the scheduled audit (`agy-nightly-system` on
+frieren), projected from `/var/lib/agy-system/last-run`: one tab-separated line,
+timestamp, outcome, reason. That job exits 0 even when every agent tier failed,
+so the timer keeps firing — which is why its unit `Result` cannot be watched and
+`fallback` in this field is the signal instead.
 
 **A job's own progress output is not a measurement.** The Steam prefill counted
 chunks across the whole selection and served the uncached ones first: it read
@@ -83,6 +92,8 @@ is the signal that something other than the cache moved.
 | `failed-units` naming `loaded` (fixed 2026-10-29) | the collector read column 2 of `list-units --plain --no-legend` (the literal word `loaded`), so `ignoreFailedUnits` never matched | upgrade; verify with `systemctl --failed --no-legend --plain \| head` and that `status.json` names the unit |
 | `generation-stale:<h>h` | running system older than `generationAgeHours` (72) | check `nixos-upgrade` journal; confirm the flake input/autoUpgrade path |
 | `disk-high:<path>:<pct>%` | filesystem ≥ 90 % | `task dev:closure:size`; GC/snapshot prune; never delete `/srv/data` content ad hoc |
+| `audit-failed:<outcome>` | the newest audit outcome is in `auditFailOutcomes` (`fallback`): the run finished without doing its work | `journalctl --user -u agy-nightly-system -n 100`; `cat /var/lib/agy-system/last-run`; rerun with `FORCE_RUN=1` |
+| `audit-stale:<h>h` | newest audit record older than `auditMaxAgeHours` (192) — the audit stopped running, and silence is not a verdict | `systemctl --user list-timers agy-nightly-system.timer`; read `audit.ts` in `status.json` |
 
 `null` disk values mean the path does not exist on that host (neutral, not bad).
 `absent` job results mean the unit is not installed on that host (neutral).

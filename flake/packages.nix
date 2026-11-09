@@ -61,18 +61,17 @@ in
         # disagree with the hosts or with the markdown docs built from the same value.
         fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib inventory;};
 
-        # bountystash.com — the portfolio, rendered from evaluated data by the same
-        # Nix-native approach as the fleet site (lib/bountystash-site.nix): one CSS
-        # file, two locales, no JavaScript.
-        bountystash-site = import ../lib/bountystash-site.nix {inherit pkgs lib;};
+        # bountystash.com is the console in `shaoyanji/bountystash-console`, not a
+        # Nix output: it is deployed from its own build, and its data
+        # (lib/bountystash/portfolio.json) now feeds only the Gemini capsule.
 
-        # matt.bountystash.com — the personal page, same shape as the portfolio
-        # above: data in lib/matt/profile.json, one CSS file, no JavaScript.
+        # matt.bountystash.com — the personal page: data in lib/matt/profile.json,
+        # one CSS file, no JavaScript.
         matt-site = import ../lib/matt-site.nix {inherit pkgs lib;};
 
         # bountystash.com as a bug-bounty and vulnerability programme. A concept
         # mockup with sample data and its own Pages project, so it can never be
-        # confused with the live portfolio or overwrite it on deploy.
+        # confused with the console or overwrite it on deploy.
         bountystash-mockup = import ../lib/bountystash-mockup.nix {inherit pkgs lib;};
       }
       // lib.optionalAttrs (system == "aarch64-linux") {

@@ -34,9 +34,12 @@ tasks:
         curl -Is https://preview.cv-resume-40q.pages.dev | head -n 6
 
   bountystash:build:
-    desc: Compile modern brutalist console & validate 14KB TCP envelope
+    desc: Compile the console, validate the 14KB envelope, and resolve its internal links
     cmds:
       - nix-shell -p nodejs --run "cd {{.BOUNTY_DIR}} && node scripts/build.js"
+      # The console is the published site, so its artifact carries the link gate:
+      # a page that returns 200 while loading no CSS is invisible to site:check.
+      - bash scripts/task/site-links.sh {{.BOUNTY_DIR}}/dist
 
   bountystash:preview:
     desc: Launch zero-dependency local preview server on http://localhost:3000
@@ -60,21 +63,6 @@ tasks:
     cmds:
       - task: bountystash:build
       - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh {{.BOUNTY_DIR}}/dist --project-name={{.PROJECT_NAME}} --branch=main"
-
-  # The Nix-rendered site (flake output `.#bountystash-site`). It deliberately
-  # does NOT run `bountystash:build`: that compiles the console's template into
-  # `dist/`, and deploying the Nix artifact means the artifact is the input.
-  bountystash:deploy:nix:preview:
-    desc: Deploy the Nix-rendered portfolio (.#sites.bountystash-site) to a Pages preview branch
-    cmds:
-      - nix build --builders "" --out-link "/tmp/bountystash-site" .#sites.bountystash-site
-      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=preview"
-
-  bountystash:deploy:nix:prod:
-    desc: "[destructive] Publish the Nix-rendered portfolio to bountystash.com"
-    cmds:
-      - nix build --builders "" --out-link "/tmp/bountystash-site" .#sites.bountystash-site
-      - nix-shell -p wrangler --run "bash scripts/task/pages-deploy.sh /tmp/bountystash-site --project-name={{.PROJECT_NAME}} --branch=main"
 
   bountystash:projects:
     desc: List all Cloudflare Pages projects in account
@@ -145,14 +133,15 @@ tasks:
 
   # Offline, and the only check that sees a stylesheet 404: a page that loads no
   # CSS still returns 200, so the HTTP gate cannot catch a href built from the
-  # locale's depth instead of the page's.
+  # locale's depth instead of the page's. The console's artifact is checked by
+  # `bountystash:build`, on the machine that has its checkout.
   site:links:
-    desc: "[gate] build both sites and resolve every internal href/src against the artifact"
+    desc: "[gate] build the Nix sites and resolve every internal href/src against the artifacts"
     cmds:
       - nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site
-      - nix build --builders "" --out-link /tmp/bountystash-site .#sites.bountystash-site
+      - nix build --builders "" --out-link /tmp/bountystash-mockup .#sites.bountystash-mockup
       - bash scripts/task/site-links.sh /tmp/matt-site
-      - bash scripts/task/site-links.sh /tmp/bountystash-site
+      - bash scripts/task/site-links.sh /tmp/bountystash-mockup
 
   matt:gist:pull:
     desc: Fetch resume.json and lebenslauf.json from the gists into the local cache

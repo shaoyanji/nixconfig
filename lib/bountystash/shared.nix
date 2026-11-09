@@ -1,6 +1,6 @@
-# lib/bountystash/shared.nix — section vocabulary and project slugs, one copy for
-# the HTML site (lib/bountystash-site.nix) and the Gemini capsule
-# (lib/gemini-portal.nix).
+# lib/bountystash/shared.nix — section vocabulary and project slugs for the Gemini
+# capsule (lib/gemini-portal.nix). bountystash.com is the console in its own repo;
+# the data here is what the capsule compiles, not a second site.
 {lib}: rec {
   labels = {
     en = {

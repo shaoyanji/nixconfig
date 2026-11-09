@@ -154,27 +154,54 @@
         <p class="note">${esc d.programNote}</p>
       </section>
     '';
+    title =
+      if lang == "de"
+      then "bountystash — Schwachstellenbetrieb (Konzept-Mockup)"
+      else "bountystash — vulnerability operations (concept mockup)";
+
+    description =
+      if lang == "de"
+      then "Ein Konzept für ein Bug-Bounty- und Schwachstellenprogramm: KEV-Einträge von CISA als Aufwands-Cluster, sortiert nach dem Risiko, das sie pro Stunde entfernen. Beispieldaten."
+      else "A concept for a bug-bounty and vulnerability programme: CISA KEV entries grouped into effort clusters and ordered by risk removed per hour. Sample data.";
+
+    canonical =
+      if lang == "de"
+      then base + "de/"
+      else base;
+
+    jsonld = builtins.toJSON {
+      "@context" = "https://schema.org";
+      "@type" = "WebPage";
+      name = title;
+      description = description;
+      url = canonical;
+      inLanguage = lang;
+      isPartOf = {
+        "@type" = "WebSite";
+        name = "bountystash";
+        url = base;
+      };
+    };
+    ogImage =
+      base
+      + (
+        if lang == "de"
+        then "og-de.png"
+        else "og.png"
+      );
   in
     render ./bountystash-mockup/shell.html {
-      inherit body nav langs cssHref;
+      inherit body nav langs cssHref title description canonical jsonld ogImage;
+      ogImageAlt =
+        if lang == "de"
+        then "Konzept-Mockup: die Liste des Ausgenutzten als abarbeitbare Warteschlange, mit Aufwands-Clustern"
+        else "Concept mockup: the exploited list as a work queue, grouped into effort clusters";
       htmlLang = lang;
       alternates = alternates;
-      canonical =
-        if lang == "de"
-        then base + "de/"
-        else base;
       ogLocale =
         if lang == "de"
         then "de_DE"
         else "en_GB";
-      title =
-        if lang == "de"
-        then "bountystash — Schwachstellenbetrieb (Konzept-Mockup)"
-        else "bountystash — vulnerability operations (concept mockup)";
-      description =
-        if lang == "de"
-        then "Ein Konzept für ein Bug-Bounty- und Schwachstellenprogramm: KEV-Einträge von CISA als Aufwands-Cluster, sortiert nach dem Risiko, das sie pro Stunde entfernen. Beispieldaten."
-        else "A concept for a bug-bounty and vulnerability programme: CISA KEV entries grouped into effort clusters and ordered by risk removed per hour. Sample data.";
       brandName = d.brand.name;
       badge = esc d.brand.badge;
       banner = esc d.ui.banner;
@@ -197,6 +224,30 @@
     langs = langs;
   };
 
+  # Share cards. Rendered at build time so the unfurl is a real 1200x630 PNG —
+  # Slack, LinkedIn and X all ignore an SVG og:image. One card per locale, since
+  # the headline is the whole point of the card.
+  fontMono = "${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono.ttf";
+  fontMonoBold = "${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono-Bold.ttf";
+
+  card = pkgs.runCommand "mockup-og" {nativeBuildInputs = [pkgs.imagemagick];} ''
+    mkdir -p $out
+    card() {
+      dest=$1; kicker=$2; line1=$3; line2=$4; sub=$5
+      magick -size 1200x630 xc:'#080a09' \
+        -fill '#b8f36b' -draw 'rectangle 0,0 10,630' \
+        -font ${fontMono} -pointsize 26 -kerning 5 -fill '#5ee8c0' -annotate +80+120 "$kicker" \
+        -font ${fontMonoBold} -kerning 0 -pointsize 60 -fill '#e6f2ec' -annotate +80+252 "$line1" \
+        -annotate +80+330 "$line2" \
+        -font ${fontMono} -pointsize 30 -fill '#8ba49b' -annotate +80+436 "$sub" \
+        -fill '#2b3833' -draw 'rectangle 80,512 1120,513' \
+        -pointsize 30 -fill '#b8f36b' -annotate +80+576 'concept.bountystash.com' \
+        "$dest"
+    }
+    card $out/og.png 'CONCEPT MOCKUP · SAMPLE DATA' 'The exploited list,' 'as a queue you can close.' 'CISA KEV · effort clusters · patch order'
+    card $out/og-de.png 'KONZEPT-MOCKUP · BEISPIELDATEN' 'Die Liste des Ausgenutzten,' 'als Warteschlange.' 'CISA KEV · Aufwands-Cluster · Patch-Reihenfolge'
+  '';
+
   cssFile = pkgs.writeText "mockup-style.css" css;
   enFile = pkgs.writeText "mockup-index.html" en;
   deFile = pkgs.writeText "mockup-de.html" de;
@@ -204,11 +255,34 @@ in
   pkgs.runCommand "bountystash-mockup" {} ''
     mkdir -p $out/de
     install -m 0644 ${cssFile} $out/style.css
+    install -m 0644 ${card}/og.png $out/og.png
+    install -m 0644 ${card}/og-de.png $out/og-de.png
     install -m 0644 ${enFile} $out/index.html
     install -m 0644 ${deFile} $out/de/index.html
     cat > $out/robots.txt <<'EOF'
     User-agent: *
-    Disallow: /
+    Allow: /
+
+    Sitemap: ${base}sitemap.xml
+    EOF
+    cat > $out/sitemap.xml <<'EOF'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+      <url>
+        <loc>${base}</loc>
+        <xhtml:link rel="alternate" hreflang="en" href="${base}"/>
+        <xhtml:link rel="alternate" hreflang="de" href="${base}de/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="${base}"/>
+        <changefreq>monthly</changefreq>
+      </url>
+      <url>
+        <loc>${base}de/</loc>
+        <xhtml:link rel="alternate" hreflang="en" href="${base}"/>
+        <xhtml:link rel="alternate" hreflang="de" href="${base}de/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="${base}"/>
+        <changefreq>monthly</changefreq>
+      </url>
+    </urlset>
     EOF
     cat > $out/404.html <<'EOF'
     <!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title>

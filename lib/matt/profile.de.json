@@ -6,7 +6,7 @@
     "title": "Systemingenieur für Infrastruktur und Sicherheit",
     "subtitle": "Go · NixOS-Flotten · Schwachstellendaten · Energieinfrastruktur",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
-    "status": "Offen für Senior- und Lead-Rollen in System und Sicherheit",
+    "status": "Systemingenieur für Infrastruktur und Sicherheit, offen für eine Senior-Rolle",
     "bio": "Ich baue Infrastruktur, die sich aus einem einzigen Commit wiederherstellen lässt: Go-Dienste mit append-only Zustand, NixOS-Flotten mit eigener Zertifizierungsstelle und Datenpipelines, die aus Betriebsrauschen eine Entscheidung machen. Der größte Teil dieser Arbeit lag im Energiebereich — Telemetrie, Bewertung und Risiko über Portfolios aus erneuerbaren Anlagen im Wert von über 100 Mio. USD. Der Rest sind Schwachstellendaten, wo CISAs KEV-Katalog das Rohmaterial ist.",
     "contacts": [
       { "label": "email", "href": "mailto:matt@bountystash.com" },
@@ -21,19 +21,23 @@
     "theme": "Design",
     "themeAria": "Zwischen hellem und dunklem Design wechseln",
     "langLabel": "Sprache",
+    "filterLabel": "Liste filtern",
+    "filterPlaceholder": "NixOS, Zertifizierungsstelle, Bewertung…",
+    "filterNone": "Kein Eintrag passt dazu. Feld leeren, um alle zu sehen.",
+    "filterOf": "von",
     "footer": "Von Nix aus lib/matt/profile.de.json kompiliert — ein kurzes Inline-Skript schaltet das Design; keine Webfonts, kein Tracking. Quelle: github.com/shaoyanji/nixconfig.",
     "headings": {
       "focus": "Fokus",
       "work": "Ausgewählte Arbeit",
       "stack": "Werkzeuge",
-      "hire": "Zusammenarbeit"
+      "hire": "Stellensuche"
     },
     "nav": {
       "focus": "Fokus",
       "work": "Arbeit",
       "lab": "KEV-Labor",
       "stack": "Werkzeuge",
-      "hire": "Zusammenarbeit"
+      "hire": "Offen für Arbeit"
     }
   },
   "focus": [
@@ -56,36 +60,61 @@
       "role": "Autor und Betreiber",
       "period": "2023 — heute",
       "description": "Ein Flake für eine Flotte aus NixOS-Hosts: NAS, Arbeitsplätze, ein Cloud-Endpunkt und ein entfernter Builder, eine SSH-Zertifizierungsstelle mit Rotation, verschlüsselte Secrets und ein Taskfile als einzige Schnittstelle. Jeder Host wird durch eine einzige Zeile in Betrieb genommen.",
-      "link": "https://github.com/shaoyanji/nixconfig"
+      "link": "https://github.com/shaoyanji/nixconfig",
+      "highlights": [
+        "Ein Flake beschreibt zehn Hosts: ein NAS, Arbeitsplätze, einen Cloud-Endpunkt und einen entfernten Builder.",
+        "Eine SSH-Zertifizierungsstelle mit Rotation und SOPS-verschlüsselte Secrets pro Host und Benutzer.",
+        "Ein Taskfile ist die einzige Bedienoberfläche, deshalb trägt kein Host ein eigenes Runbook.",
+        "Dasselbe Modul-Gate läuft lokal und in der CI, und genau das macht einen erfolgreichen Switch zum Beleg."
+      ]
     },
     {
       "title": "bountystash: deterministische Arbeitsmaschine",
       "role": "Entwickler",
       "period": "2024 — heute",
       "description": "Ein einziges Go-Binary, das aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht: append-only Ereignisse, tastaturorientierte Terminal-Oberfläche, curl-freundliche Endpunkte, keine Frontend-Abhängigkeiten.",
-      "link": "https://github.com/shaoyanji/bountystash"
+      "link": "https://github.com/shaoyanji/bountystash",
+      "highlights": [
+        "Ein append-only Ereignisprotokoll, sodass jeder Zustand ein Replay aufgezeichneter Fakten ist.",
+        "Ein einziges Go-Binary liefert HTML, JSON und eine tastaturorientierte TUI; es gibt keinen Frontend-Build.",
+        "Spezifikationen sind inhaltsadressiert, dieselbe Anfrage ergibt also dasselbe Dokument.",
+        "curl-freundliche Endpunkte, was es mitten in einem Vorfall benutzbar macht."
+      ]
     },
     {
       "title": "fibtransponder",
       "role": "Recherche und Umsetzung",
       "period": "2026",
       "description": "Ein Fibonacci-Radix-Zustandsautomat als Streaming-Verfahren für Tokenisierungsexperimente: begrenzte Arbeit pro Schritt über einen Bitstrom, Adjazenzbreite als Lokalitätsselektor, Zobrist-Seed-Tabellen und ein Korpus-Benchmark, der den reinen Seed-Detektor widerlegt hat.",
-      "link": "https://github.com/shaoyanji/fibtransponder"
+      "link": "https://github.com/shaoyanji/fibtransponder",
+      "highlights": [
+        "Ein Fibonacci-Radix-Zustandsautomat über einen Bitstrom, mit begrenzter Arbeit pro Schritt.",
+        "Adjazenzbreite wirkt als Lokalitätsselektor statt als globale Nachschlagetabelle.",
+        "Zobrist-Seed-Tabellen halten die Zustandsübergänge billig genug zum Streamen.",
+        "Ein Korpus-Benchmark hat den reinen Seed-Detektor widerlegt, die Behauptung wurde also kleiner statt lauter."
+      ]
     },
     {
       "title": "Energie-Telemetrie und Bewertung",
       "role": "Leitung Betrieb, O3 Energy",
       "period": "2016 — 2020",
       "description": "Quantitative Steuerung eines Solarportfolios über 100 Mio. USD: Ertrags- und Bewertungsmodelle, die Bankprüfungen bestanden, mobile Felderfassung und Kontrahentenrisiko, das institutionelle Kreditgeber akzeptiert haben.",
-      "link": ""
+      "link": "",
+      "highlights": [
+        "Ertrags- und Bewertungsmodelle, die Bankprüfungen auf einem Portfolio über 100 Mio. USD bestanden haben.",
+        "Mobile Felderfassung, die dieselbe Pipeline speist wie die Wetterdaten.",
+        "Kontrahentenrisiko in der Form, die institutionelle Kreditgeber akzeptiert haben.",
+        "Telemetrie-Abgleich, der fehlende Sensordaten in ein bekanntes Fehlerbudget verwandelt."
+      ]
     }
   ],
   "lab": {
     "title": "Das KEV-Labor",
-    "body": "Zwei öffentliche Werkzeuge machen CISAs Katalog bekannter ausgenutzter Schwachstellen lesbar. kev-time zeichnet Ausnutzung über die Zeit, sodass ein Trend sichtbar wird, bevor ein Bericht existiert. kelly-svg gruppiert Einträge zu Clustern, die ein Team abarbeiten kann, sodass der Patch-Plan aus Daten folgt statt aus Bauchgefühl. Beide sind statisches SVG und reines HTML, gebaut, um während eines Vorfalls auf dem Telefon gelesen zu werden.",
+    "body": "Zwei öffentliche Werkzeuge machen CISAs Katalog bekannter ausgenutzter Schwachstellen lesbar. kev-time zeichnet Ausnutzung über die Zeit, sodass ein Trend sichtbar wird, bevor ein Bericht existiert. kelly-svg gruppiert Einträge zu Clustern, die ein Team abarbeiten kann, sodass der Patch-Plan aus Daten folgt statt aus Bauchgefühl. Beide sind statisches SVG und reines HTML, gebaut, um während eines Vorfalls auf dem Telefon gelesen zu werden. Eine dritte Seite bringt dieselben Daten in die Form eines Programms: eine Beispiel-Warteschlange ausgenutzter Einträge, nach Aufwand gruppiert, unter concept.bountystash.com.",
     "links": [
       { "label": "kev-time", "href": "https://jisifu.serv00.net/kev-time/" },
-      { "label": "kelly-svg", "href": "https://jisifu.serv00.net/kelly-svg/" }
+      { "label": "kelly-svg", "href": "https://jisifu.serv00.net/kelly-svg/" },
+      { "label": "Konzept-Mockup", "href": "https://concept.bountystash.com/" }
     ]
   },
   "stack": [
@@ -103,8 +132,8 @@
     }
   ],
   "hire": {
-    "title": "Zusammenarbeit",
-    "body": "Ich suche eine Senior- oder Lead-Rolle dort, wo Infrastruktur und Sicherheit aufeinandertreffen: Plattform-Engineering, Site Reliability oder Schwachstellenbetrieb. Remote mit Basis in MEZ oder vor Ort in Freiburg und am Oberrhein.",
+    "title": "Ich bin der Ingenieur und suche eine Rolle",
+    "body": "Diese Seite ist ein Lebenslauf, keine Stellenanzeige: Ich stelle niemanden ein. Ich bin Systemingenieur für Infrastruktur und Sicherheit und suche eine Senior- oder Lead-Rolle, in der beides aufeinandertrifft — Plattform-Engineering, Site Reliability oder Schwachstellenbetrieb. Remote mit Basis in MEZ oder vor Ort in Freiburg und am Oberrhein.",
     "wants": [
       "US-Staatsbürgerschaft mit deutscher Niederlassungserlaubnis — kein Sponsoring, kein Umzug nötig",
       "Englisch auf Muttersprachniveau, Deutsch C1",

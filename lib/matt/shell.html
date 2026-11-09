@@ -6,11 +6,19 @@
 <title>{{title}}</title>
 <meta name="description" content="{{description}}">
 <meta name="color-scheme" content="light dark">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="profile">
 <meta property="og:title" content="{{title}}">
 <meta property="og:description" content="{{description}}">
 <meta property="og:url" content="{{url}}">
 <meta property="og:locale" content="{{locale}}">
+<meta property="og:image" content="{{ogImage}}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ogImageAlt}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ogImage}}">
 <link rel="canonical" href="{{url}}">
 <link rel="alternate" hreflang="en" href="{{altEn}}">
 <link rel="alternate" hreflang="de" href="{{altDe}}">
@@ -65,6 +73,50 @@
       try { localStorage.setItem("theme", next); } catch (e) {}
       button.setAttribute("aria-pressed", String(next === "dark"));
     });
+  })();
+</script>
+<script>
+  /* Fuzzy filter for the work list. Subsequence matching, so "nix fle" finds
+     "NixOS fleets" without a dependency, a build step or a network call. */
+  (function () {
+    var bar = document.querySelector("[data-filter-bar]");
+    var input = document.querySelector("[data-filter-input]");
+    var list = document.querySelector("[data-filter-list]");
+    var empty = document.querySelector("[data-filter-none]");
+    var count = document.querySelector("[data-filter-count]");
+    if (!bar || !input || !list || !count) return;
+    var items = Array.prototype.slice.call(list.children);
+    var of = bar.getAttribute("data-of") || "of";
+    bar.hidden = false;
+    function hit(hay, query) {
+      var i = 0;
+      var j = 0;
+      while (i < hay.length && j < query.length) {
+        if (hay.charAt(i) === query.charAt(j)) j += 1;
+        i += 1;
+      }
+      return j === query.length;
+    }
+    function apply() {
+      var query = input.value.trim().toLowerCase();
+      var shown = 0;
+      items.forEach(function (item) {
+        var hay = item.getAttribute("data-search") || "";
+        var match = query === "" || hit(hay, query);
+        item.hidden = !match;
+        if (match) shown += 1;
+      });
+      count.textContent = shown + " " + of + " " + items.length;
+      if (empty) empty.hidden = shown !== 0;
+    }
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        input.value = "";
+        apply();
+      }
+    });
+    apply();
   })();
 </script>
 </body>

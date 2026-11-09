@@ -133,6 +133,23 @@ tasks:
     cmds:
       - curl -Is https://matt.bountystash.com | head -n 6
 
+  # The crawlable surface of both published pages, asserted rather than assumed.
+  site:check:
+    desc: "[gate] robots, sitemap, canonical, og:image and hreflang on both hostnames"
+    cmds:
+      - bash scripts/task/site-check.sh matt.bountystash.com / /de/
+      - bash scripts/task/site-check.sh concept.bountystash.com / /de/
+
+  matt:gist:pull:
+    desc: Fetch resume.json and lebenslauf.json from the gists into the local cache
+    cmds:
+      - bash scripts/task/matt-gist.sh pull
+
+  matt:gist:drift:
+    desc: Report where the resume gists and the compiled profile disagree
+    cmds:
+      - bash scripts/task/matt-gist.sh drift
+
   # The bug-bounty concept mockup: sample data, `noindex`, its own Pages project.
   # Publishing it to bountystash.com itself is deliberately not a task.
   mockup:build:

@@ -25,6 +25,10 @@
 
   css = builtins.readFile ./matt/style.css;
 
+  # Both locales share one origin, so the sitemap and robots.txt are built from
+  # the profile rather than from either locale's page URL.
+  siteUrl = data.profile.url;
+
   sections = [
     {
       id = "focus";
@@ -61,8 +65,8 @@
       else "";
     pageUrl =
       if lang == "de"
-      then "${p.url}/de/"
-      else "${p.url}/";
+      then "${siteUrl}/de/"
+      else "${siteUrl}/";
 
     nav = lib.concatMapStringsSep "" (s: ''<a href="#${s.id}">${s.n} ${esc ui.nav.${s.id}}</a>'') sections;
 
@@ -77,9 +81,14 @@
       '')
       d.focus;
 
+    # The whole card is folded into one lowercase `data-search` attribute, so the
+    # filter script never has to walk the DOM or normalise text at runtime.
+    searchText = w:
+      lib.toLower (lib.concatStringsSep " " ([w.title w.role w.period w.description] ++ w.highlights));
+
     workRows =
       lib.concatMapStringsSep "" (w: ''
-        <li>
+        <li data-search="${esc (searchText w)}">
           <span class="yr">${esc w.period}</span>
           <div>
             <strong>${
@@ -89,6 +98,7 @@
         }</strong>
             <span class="org">${esc w.role}</span>
             <p>${esc w.description}</p>
+            <ul class="bullets">${lib.concatMapStringsSep "" (h: "<li>${esc h}</li>") w.highlights}</ul>
           </div>
         </li>
       '')
@@ -142,7 +152,13 @@
 
       <section id="work">
         <h2><span>01</span> ${esc ui.headings.work}</h2>
-        <ol class="work">${workRows}</ol>
+        <div class="filterbar" data-filter-bar data-of="${esc ui.filterOf}" hidden>
+          <label for="work-filter">${esc ui.filterLabel}</label>
+          <input id="work-filter" type="search" data-filter-input placeholder="${esc ui.filterPlaceholder}" autocomplete="off" spellcheck="false">
+          <p class="fcount" data-filter-count aria-live="polite"></p>
+        </div>
+        <p class="fempty" data-filter-none hidden>${esc ui.filterNone}</p>
+        <ol class="work" data-filter-list>${workRows}</ol>
       </section>
 
       <section id="lab">
@@ -178,8 +194,8 @@
       title = "${p.name} — ${p.title}";
       description = "${p.title}. ${p.subtitle}.";
       url = pageUrl;
-      altEn = "${p.url}/";
-      altDe = "${p.url}/de/";
+      altEn = "${siteUrl}/";
+      altDe = "${siteUrl}/de/";
       locale =
         if lang == "de"
         then "de_DE"
@@ -197,6 +213,15 @@
       inherit (ui) themeAria;
       inherit (ui) langLabel;
       inherit (ui) footer;
+      ogImage = "${siteUrl}/${
+        if lang == "de"
+        then "og-de.png"
+        else "og.png"
+      }";
+      ogImageAlt =
+        if lang == "de"
+        then "Matt Ji, Systemingenieur für Infrastruktur und Sicherheit: Go, NixOS-Flotten, Schwachstellendaten. Auf der Suche nach einer Senior-Rolle."
+        else "Matt Ji, systems and security engineer: Go, NixOS fleets, vulnerability data. Looking for a senior role.";
       cssHref = "${root}style.css";
     };
 
@@ -205,15 +230,60 @@
 
   page = name: content: pkgs.writeText name content;
   cssFile = pkgs.writeText "matt-style.css" css;
+
+  # Share cards, rendered at build time: Slack and LinkedIn ignore an SVG
+  # og:image, and the persona page needs its own card rather than the mockup's.
+  fontMono = "${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono.ttf";
+  fontMonoBold = "${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono-Bold.ttf";
+  card = pkgs.runCommand "matt-og" {nativeBuildInputs = [pkgs.imagemagick];} ''
+    mkdir -p $out
+    card() {
+      dest=$1; kicker=$2; headline=$3; sub=$4; avail=$5
+      magick -size 1200x630 xc:'#f6f2e9' \
+        -fill '#1c5f4d' -draw 'rectangle 0,0 10,630' \
+        -font ${fontMonoBold} -pointsize 24 -kerning 6 -fill '#1c5f4d' -annotate +80+120 "$kicker" \
+        -font ${fontMonoBold} -kerning 0 -pointsize 50 -fill '#14120e' -annotate +80+256 "$headline" \
+        -font ${fontMono} -pointsize 28 -fill '#6a6355' -annotate +80+344 "$sub" \
+        -pointsize 26 -fill '#1c5f4d' -annotate +80+398 "$avail" \
+        -fill '#d8d1c1' -draw 'rectangle 80,486 1120,487' \
+        -pointsize 28 -fill '#1c5f4d' -annotate +80+566 'matt.bountystash.com' \
+        "$dest"
+    }
+    card $out/og.png 'MATT JI' 'Systems and security engineer' 'Go · NixOS fleets · vulnerability data' 'Looking for a senior or lead role — remote, CET'
+    card $out/og-de.png 'MATT JI' 'Systemingenieur, Infrastruktur' 'Go · NixOS-Flotten · Schwachstellendaten' 'Auf der Suche nach einer Senior-Rolle — remote, MEZ'
+  '';
 in
   pkgs.runCommand "matt-site" {} ''
     mkdir -p $out/de
     install -m 0644 ${cssFile} $out/style.css
+    install -m 0644 ${card}/og.png $out/og.png
+    install -m 0644 ${card}/og-de.png $out/og-de.png
     install -m 0644 ${page "index.html" en} $out/index.html
     install -m 0644 ${page "de-index.html" de} $out/de/index.html
     cat > $out/robots.txt <<'EOF'
     User-agent: *
     Allow: /
+
+    Sitemap: ${siteUrl}/sitemap.xml
+    EOF
+    cat > $out/sitemap.xml <<'EOF'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+      <url>
+        <loc>${siteUrl}/</loc>
+        <xhtml:link rel="alternate" hreflang="en" href="${siteUrl}/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="${siteUrl}/de/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="${siteUrl}/"/>
+        <changefreq>monthly</changefreq>
+      </url>
+      <url>
+        <loc>${siteUrl}/de/</loc>
+        <xhtml:link rel="alternate" hreflang="en" href="${siteUrl}/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="${siteUrl}/de/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="${siteUrl}/"/>
+        <changefreq>monthly</changefreq>
+      </url>
+    </urlset>
     EOF
     cat > $out/404.html <<'EOF'
     <!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title>

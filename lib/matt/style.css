@@ -96,6 +96,28 @@ ol.work strong a:hover { color: var(--accent); }
 ol.work .org { display: block; color: var(--muted); font-size: .8rem; margin-top: .25rem; }
 ol.work p { margin-top: .55rem; font-size: .9rem; color: var(--muted); max-width: 66ch; }
 
+/* work filter ------------------------------------------------------------- */
+.filterbar[hidden], .fempty[hidden] { display: none; }
+.filterbar { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1rem; border-bottom: 1px solid var(--rule); padding-bottom: .9rem; }
+.filterbar label { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.filterbar input {
+  flex: 1 1 16rem;
+  font: inherit;
+  font-size: .9rem;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--rule);
+  padding: .4rem .6rem;
+}
+.filterbar input::placeholder { color: var(--muted); opacity: .8; }
+.filterbar input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.fcount { font-size: .74rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fempty { font-size: .9rem; color: var(--muted); font-style: italic; }
+.bullets { list-style: none; margin: .7rem 0 0; padding: 0; display: grid; gap: .3rem; max-width: 70ch; }
+.bullets li { position: relative; padding-left: 1.1rem; font-size: .85rem; color: var(--muted); }
+.bullets li::before { content: "—"; position: absolute; left: 0; color: var(--rule); }
+ol.work li[hidden] { display: none; }
+
 /* lab --------------------------------------------------------------------- */
 .lab { display: grid; gap: 1rem; border-left: 2px solid var(--accent); padding-left: 1.4rem; }
 .lab .tools { font-size: .85rem; }
@@ -129,7 +151,7 @@ summary span:last-child { color: var(--muted); }
 @media print {
   :root { color-scheme: light; --paper: #fff; --ink: #000; --muted: #444; --rule: #bbb; --accent: #000; --accent-ink: #fff; }
   body { padding: 0; max-width: none; font-size: 10.5pt; }
-  .index, .skip, .colophon, .avail, .theme, .lang { display: none; }
+  .index, .skip, .colophon, .avail, .theme, .lang, .filterbar, .fempty, .fcount { display: none; }
   main { gap: 1.6rem; margin-top: 1.6rem; }
   a { text-decoration: none; }
   a[href^="http"]::after { content: " (" attr(href) ")"; color: #555; font-size: .9em; }

@@ -41,10 +41,20 @@ in {
         udp = true;
       };
       gemini = {port = config.services.molly-brown.port;};
-      samba-netbios-ssn = {port = 139;};
-      samba-smb = {port = 445;};
+      # SMB stays on the LAN: the roaming NAS mount is NFS (`profiles.nas-client`
+      # falls back to `mount -t nfs` over the tailnet), so nothing off-LAN uses it.
+      samba-netbios-ssn = {
+        port = 139;
+        tailnet = false;
+      };
+      samba-smb = {
+        port = 445;
+        tailnet = false;
+      };
       # 631 (CUPS) pruned 2026-10-12 — nothing has listened on it since the
       # Tier-1 printing debloat; it was a hole with no service behind it.
+      # Kept on the tailnet on purpose: `profiles.nas-client` mounts this over
+      # WireGuard when a laptop is away from the LAN (measured fallback, not a guess).
       nfs = {port = 2049;};
       immich = {
         port = config.services.immich.port;
@@ -68,7 +78,10 @@ in {
         };
       };
       simplex-smp = {port = 5223;};
-      tcp-5357 = {port = 5357;};
+      tcp-5357 = {
+        port = 5357;
+        tailnet = false;
+      };
       ariang = {
         port = 6801;
         proxy = {
@@ -131,70 +144,86 @@ in {
       # 32469 (Plex DLNA) pruned 2026-10-12 — Plex's DLNA plugin is not
       # enabled, so the port had no listener.
 
+      # --- link-local discovery and provisioning, LAN only ---------------------
+      # Broadcast and multicast (and DHCP/PXE on the wire) do not cross a WireGuard
+      # mesh, so a tailnet row for any of these is a hole with no possible client.
       dnsmasq-pxe = {
         port = 67;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       tftp = {
         port = 69;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       samba-netbios-ns = {
         port = 137;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       samba-netbios-dgm = {
         port = 138;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       ssdp = {
         port = 1900;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       ws-discovery = {
         port = 3702;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       proxydhcp = {
         port = 4011;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       mdns = {
         port = 5353;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       udp-7359 = {
         port = 7359;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       cast-32410 = {
         port = 32410;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       cast-32412 = {
         port = 32412;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       cast-32413 = {
         port = 32413;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
       cast-32414 = {
         port = 32414;
         tcp = false;
         udp = true;
+        tailnet = false;
       };
     };
   };

@@ -6,6 +6,10 @@
 # nobody classifies.
 
 [[check]]
+name = "checks:appflow"
+kind = "leaf"
+
+[[check]]
 name = "checks:audit:handoff"
 kind = "leaf"
 

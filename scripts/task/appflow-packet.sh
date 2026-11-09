@@ -7,8 +7,14 @@
 # modules/plugins/appflow/packet.nix, so typst runs in the sandbox and nothing is
 # written into a state directory.
 #
+# The base file is a corpus, not a page. When a job description is supplied the
+# packet is built from its projection onto that description: `--jd FILE`, or
+# `$CONFIG/jd/<id>.txt` when the file exists, which is where a description goes
+# for the application it belongs to. With neither, the CV is the whole corpus, as
+# before.
+#
 # Usage:
-#   appflow-packet.sh --id <application> [--resume P] [--letter P] [--out <link>]
+#   appflow-packet.sh --id <application> [--resume P] [--letter P] [--jd P] [--out <link>]
 set -euo pipefail
 
 API="${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}"
@@ -24,11 +30,13 @@ example=0
 
 usage() { sed -n '4,12p' "$0" | sed 's/^# \{0,1\}//'; }
 
+jd=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --id) id="${2:-}"; shift 2 ;;
     --resume) resume="${2:-}"; shift 2 ;;
     --letter) letter="${2:-}"; shift 2 ;;
+    --jd) jd="${2:-}"; shift 2 ;;
     --out) out="${2:-}"; shift 2 ;;
     --example) example=1; shift ;;
     -h | --help) usage; exit 0 ;;
@@ -77,7 +85,39 @@ if [ "$example" = 1 ]; then
   letter="${letter:-$REPO/modules/plugins/appflow/templates/example/letter.json}"
 fi
 
-resume_src="${resume:-$CONFIG/resume.json}"
+# A description kept next to the application's other material: `-` reads stdin,
+# so a scraped ad never has to be pasted into a file by hand.
+if [ -z "$jd" ] && [ -n "$id" ] && [ -f "$CONFIG/jd/$id.txt" ]; then
+  jd="$CONFIG/jd/$id.txt"
+fi
+jd_clause=""
+if [ -n "$jd" ]; then
+  if [ "$jd" = "-" ]; then
+    cat >"$work/jd.txt"
+  else
+    [ -s "$jd" ] || { echo "appflow-packet: $jd is empty or missing" >&2; exit 2; }
+    cp "$jd" "$work/jd.txt"
+  fi
+  [ -s "$work/jd.txt" ] || { echo "appflow-packet: no job description on stdin" >&2; exit 2; }
+  jd_clause="jd = $work/jd.txt;"
+fi
+
+# A German application is built from the German corpus, not from German headings
+# over English prose: `~/.config/appflow/lebenslauf.json` is written by
+# `task matt:gist:sync-de` from lib/matt/lebenslauf.json. The fictional example
+# stays on its own file, and an explicit --resume always wins.
+lang="$(jq -r '.language // "de"' "$work/application.json")"
+if [ -n "$resume" ]; then
+  resume_src="$resume"
+elif [ "$example" != 1 ] && [ "$lang" = "de" ] && [ -f "$CONFIG/lebenslauf.json" ]; then
+  resume_src="$CONFIG/lebenslauf.json"
+else
+  resume_src="$CONFIG/resume.json"
+  if [ "$example" != 1 ] && [ "$lang" = "de" ]; then
+    echo "appflow-packet: German application with no $CONFIG/lebenslauf.json" >&2
+    echo "  the CV carries German headings over English prose; run task matt:gist:sync-de." >&2
+  fi
+fi
 if [ ! -f "$resume_src" ]; then
   echo "appflow-packet: no resume.json at $resume_src" >&2
   echo "  it is a JSON Resume (jsonresume.org); put it in $CONFIG/, or pass --resume." >&2
@@ -119,12 +159,27 @@ in
     application = $work/application.json;
     resume = $work/resume.json;
     $letter_clause
+    $jd_clause
     name = \"$name\";
   }"
 
 store_path="$(nix build --impure --no-link --print-out-paths --expr "$expr")"
 echo "artifact  $store_path"
 ls -1 "$store_path"
+
+# The projection is part of the packet, not a side effect: which lines were kept
+# is the one thing a reviewer needs to check before sending it.
+if [ -n "$jd" ] && [ -f "$store_path/selection.json" ]; then
+  printf 'selected  '
+  jq -r '. as $a
+    | ([$a.work[].kept] | add) as $h
+    | ([$a.work[].of] | add) as $ho
+    | ($a.projects.kept | length) as $p
+    | ($p + ($a.projects.dropped | length)) as $po
+    | "\($h)/\($ho) highlights, \($p)/\($po) projects"' \
+    "$store_path/selection.json"
+  echo "audit     $store_path/selection.json"
+fi
 
 target="${out:-$STATE/$name}"
 mkdir -p "$(dirname "$target")"

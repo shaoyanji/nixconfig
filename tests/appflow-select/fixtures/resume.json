@@ -1,0 +1,68 @@
+{
+  "$comment": "Fictional corpus for tests/appflow-select/run.sh. Small on purpose: every selection the fixture asserts has to be readable in this file. No real person, no real employer.",
+  "basics": {
+    "name": "Test Person",
+    "label": "Platform Engineer",
+    "email": "test@example.org",
+    "summary": "Fictional corpus for the broadcast selector."
+  },
+  "work": [
+    {
+      "name": "Acme",
+      "position": "Platform Engineer",
+      "startDate": "2022-01",
+      "endDate": "",
+      "highlights": [
+        "Ran the Kubernetes platform for twelve services.",
+        "Rebuilt the payroll spreadsheet every quarter.",
+        "Cut deployment time by moving twelve services onto Kubernetes namespaces.",
+        "Wrote the team's incident runbook.",
+        "Rotated the cluster's TLS certificates and keys."
+      ]
+    },
+    {
+      "name": "Boxtop",
+      "position": "Sales Clerk",
+      "startDate": "2016-01",
+      "endDate": "2021-12",
+      "highlights": [
+        "Sold insurance policies in rural Bavaria.",
+        "Filed the monthly commission statements by hand."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Sharded queue operator",
+      "description": "A Kubernetes operator that reshards worker queues without dropping a message.",
+      "keywords": ["Kubernetes", "operator"],
+      "startDate": "2023-01",
+      "endDate": ""
+    },
+    {
+      "name": "Gardening log",
+      "description": "A static page that counts tomatoes.",
+      "keywords": ["HTML"],
+      "startDate": "2020-03",
+      "endDate": "2020-06"
+    },
+    {
+      "name": "NixOS fleet",
+      "description": "One flake for six machines, systemd units declared once.",
+      "keywords": ["Nix", "systemd"],
+      "startDate": "2021-01",
+      "endDate": ""
+    }
+  ],
+  "skills": [
+    {"name": "Containers", "keywords": ["Kubernetes", "Docker", "Helm", "Containerd"]},
+    {"name": "Systems", "keywords": ["Nix", "systemd", "Linux", "ZFS"]}
+  ],
+  "education": [
+    {"institution": "Beispiel Universität", "area": "Informatik", "studyType": "B.Sc.", "startDate": "2010", "endDate": "2014"}
+  ],
+  "languages": [
+    {"language": "German", "fluency": "Native speaker"},
+    {"language": "English", "fluency": "B2"}
+  ]
+}

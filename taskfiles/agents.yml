@@ -692,13 +692,14 @@ tasks:
         esac
 
   agents:apps:packet:
-    desc: "Build a packet through nix: a store path with the CV and letter PDFs (ID=, or EXAMPLE=1 for the fictional fixture; RESUME=, LETTER=, OUT=link)"
+    desc: "Build a packet through nix: a store path with the CV and letter PDFs (ID=, or EXAMPLE=1 for the fictional fixture; RESUME=, LETTER=, JD=, OUT=link)"
     vars:
       ID: '{{.ID | default ""}}'
       EXAMPLE: '{{.EXAMPLE | default "0"}}'
       OUT: '{{.OUT | default ""}}'
       RESUME: '{{.RESUME | default ""}}'
       LETTER: '{{.LETTER | default ""}}'
+      JD: '{{.JD | default ""}}'
     cmds:
       - |
         args=()
@@ -707,9 +708,32 @@ tasks:
         [ -n "{{.OUT}}" ] && args+=(--out "{{.OUT}}")
         [ -n "{{.RESUME}}" ] && args+=(--resume "{{.RESUME}}")
         [ -n "{{.LETTER}}" ] && args+=(--letter "{{.LETTER}}")
+        [ -n "{{.JD}}" ] && args+=(--jd "{{.JD}}")
         [ -n "{{.ID}}" ] || [ "{{.EXAMPLE}}" = "1" ] || {
           echo "agents:apps:packet: ID is required (or EXAMPLE=1)" >&2; exit 2; }
         bash scripts/task/appflow-packet.sh "${args[@]}"
+
+  # The CV a packet would carry, without building one: which lines a description
+  # keeps, which fall back to the role's lead lines, and which projects survive.
+  agents:apps:select:
+    desc: "What a job description selects from the resume corpus (JD=file or ID=; FORMAT=text|json|toon, DUMP=projection.json)"
+    vars:
+      JD: '{{.JD | default ""}}'
+      ID: '{{.ID | default ""}}'
+      RESUME: '{{.RESUME | default ""}}'
+      DUMP: '{{.DUMP | default ""}}'
+      MAX_HIGHLIGHTS: '{{.MAX_HIGHLIGHTS | default "4"}}'
+      MAX_PROJECTS: '{{.MAX_PROJECTS | default "4"}}'
+      FORMAT: '{{.FORMAT | default "text"}}'
+    cmds:
+      - |
+        args=()
+        [ -n "{{.JD}}" ] && args+=(--jd "{{.JD}}")
+        [ -n "{{.ID}}" ] && args+=(--id "{{.ID}}")
+        [ -n "{{.RESUME}}" ] && args+=(--resume "{{.RESUME}}")
+        [ -n "{{.DUMP}}" ] && args+=(--dump "{{.DUMP}}")
+        args+=(--max-highlights "{{.MAX_HIGHLIGHTS}}" --max-projects "{{.MAX_PROJECTS}}")
+        FORMAT="{{.FORMAT}}" nix-shell -p python3 --run "bash scripts/task/appflow-select.sh ${args[*]}"
 
   agents:apps:draft:
     desc: "Save a reply as a mailbox DRAFT — nothing is sent (ID=, BODY=file, ATTACH=a.pdf,b.pdf, SUBJECT=, TO=, DRY=1 to print only)"

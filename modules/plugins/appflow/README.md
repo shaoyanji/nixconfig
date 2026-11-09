@@ -19,6 +19,8 @@ database diff replace sixty copies of the same layout.
 | `sql/` | the endpoints (`/api/applications`, `/api/application-get`, …) |
 | `sync.py` | import the JSON, link mail, write status from ATS mail, export, discover — and close what proves nothing (job alerts, events the stage already holds) so the queue cannot refill |
 | `packet.nix` | the PDF build: typst in the sandbox, artifact is a store path |
+| `select.py` | the projection: one job description, one page of material out of the corpus |
+| `glossary.json` | German job-ad words mapped onto the English ones the corpus uses |
 | `templates/` | two templates, localized through `strings.json`, no personal data |
 
 ## Removal
@@ -26,6 +28,41 @@ database diff replace sixty copies of the same layout.
 Delete `services.appflowPlugin.enable` from the host and this directory stops being
 imported. Its tables and endpoints go with it; the routing rules vanish because the
 classifier reads them from config, not from a hardcoded list.
+
+## The corpus and the projection
+
+The base resume is a **corpus**, not a page. Every role keeps all its highlights,
+every project stays in the file, because the budget is applied per application
+rather than once by hand — a bullet that only matters for one employer is not a
+reason to keep the CV short everywhere.
+
+```bash
+task agents:apps:select JD=<file>      # what this description keeps, and what it drops
+task agents:apps:packet ID=<app>       # uses ~/.config/appflow/jd/<id>.txt when it exists
+task agents:apps:packet ID=<app> JD=-  # read the description from stdin
+```
+
+`select.py` scores each highlight against the description: a term counts more the
+rarer it is in the corpus, and a term from the resume's own keywords counts 2.5×
+because it is vocabulary the operator already uses for the work. Verbs that both
+a CV and an ad own (*build*, *manage*, *experience*) are dropped, because matching
+one of them ranks nothing. Every role survives; a role the description says
+nothing about keeps its two lead lines and the audit records `matched: false`, so
+a thin role is visible rather than silently padded. Education, languages and the
+list of employers are never touched.
+
+The output is a normal JSON Resume, so the template, the site and the gist all
+read it without knowing the projection happened. `selection.json` sits beside the
+PDF in the store path: which lines were kept, their scores, and what was dropped.
+
+A description in German scores against an English corpus through
+`glossary.json` — *Risikomanagement* → *risk*, *Verschlüsselung* → *encryption*,
+*Schlüssel* → *key*. The list is domain words only, and a missing pair shows up as
+a role that falls back to its lead lines instead of a wrong selection. A term
+matches its inflections and plurals, and a hyphenated compound carries its parts,
+so an entry written once reaches the form the corpus happens to use: `encryption`
+finds `encrypted`, `key` finds `keys`, and `SOPS-encrypted` is also `encrypted`.
+Without that, a correct glossary entry scored zero and selected nothing.
 
 ## Commands
 
@@ -35,6 +72,8 @@ task agents:apps:sync                              # write status from ATS mail 
 task agents:apps:export OUT=data/applications.json # the DB as the workflow's JSON
 task agents:apps:packet ID=<application>           # build a packet through nix
 task agents:apps:packet EXAMPLE=1                  # fictional data, proves the toolchain
+task agents:apps:select JD=<file>                  # the projection alone, no PDF
+task checks:appflow                                 # the selector's fixture
 task agents:apps:draft ID=<app> BODY=<file> ATTACH=<pdf>   # a DRAFT in the mailbox, never sent
 task agents:apps:drafts                            # what sits in Drafts
 task agents:hub                                    # every plugin's queue depth
@@ -58,6 +97,23 @@ it is never committed, and `templates/example/resume.json` is the fictional stan
 that lets the build be tested. A per-application `letter.json` is passed with
 `--letter` and stays where the operator keeps it.
 
-Language is not a second document: the application record picks `de` or `en`, the
-templates read their headings from `strings.json`, and the CV section titles and
-month names come from the same table.
+Language is a second corpus, not a second template. The record picks `de` or
+`en`; the headings, section titles and month names come from `strings.json`, and
+the prose comes from the matching resume. The German one is authored in this
+repo (`lib/matt/lebenslauf.json`: the same five roles and ten projects, translated
+bullet for bullet) and written to `~/.config/appflow/lebenslauf.json` by
+`task matt:gist:sync-de`, which also carries the contact block the public copy
+does not hold.
+
+```bash
+task matt:gist:drift     # every English role and project has a German counterpart
+task matt:gist:sync-de   # lib/matt/lebenslauf.json -> $APPFLOW_CONFIG/lebenslauf.json
+```
+
+A `de` application builds from the German file when it exists, and says so when
+it does not: German headings over English bullets is the one failure the record's
+language is supposed to prevent.
+
+A job description is not a document either: `$APPFLOW_CONFIG/jd/<id>.txt`, one
+file per application, read by both `packet` and `select`. No database column, so
+a description can be pasted in before the row exists.

@@ -1,0 +1,4 @@
+Personalberatung (m/w/d) für Verschlüsselung
+
+Sie betreuen die Verschlüsselung und die Schlüssel unserer Plattform.
+Aufgaben: Zertifikate erneuern, Schlüssel rotieren.

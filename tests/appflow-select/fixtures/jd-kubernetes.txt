@@ -1,0 +1,4 @@
+Platform Engineer (Kubernetes)
+
+You will run the Kubernetes platform for a product team: namespaces, operators,
+and the deployment path every service takes to production.

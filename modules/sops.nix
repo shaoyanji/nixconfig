@@ -50,6 +50,9 @@ in {
       # envs.net pubnix mail (mail.envs.net). Same shape as `gmail`: one string,
       # consumed by himalaya's passwordCommand.
       "envsmail" = {};
+      # Alwaysdata hosting mailbox (dragoncourt@alwaysdata.net). One string consumed
+      # by himalaya's passwordCommand.
+      "alwaysdataemail" = {};
       # Cal.com API key for the personal calendar, read by an agent backend that
       # asks for availability and creates a booking through the v2 bookings API.
       # Gated on the `agent-backend` trait rather than declared everywhere: a

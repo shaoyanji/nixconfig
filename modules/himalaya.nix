@@ -74,6 +74,24 @@ in {
       signature.text = gravatar.signature;
       himalaya.enable = true;
     };
+    # Alwaysdata hosting mailbox for Dragon Court. Implicit TLS on 993,
+    # SMTPS on 465; the login is the full address.
+    "dragoncourt" = {
+      name = "dragoncourt";
+      primary = false;
+      address = user.alwaysdataEmail;
+      inherit (user) realName;
+      userName = user.alwaysdataEmail;
+      imap.host = "imap-dragoncourt.alwaysdata.net";
+      imap.port = 993;
+      imap.authentication = "plain";
+      smtp.host = "smtp-dragoncourt.alwaysdata.net";
+      smtp.port = 465;
+      smtp.authentication = "plain";
+      passwordCommand = "cat ${config.sops.secrets.alwaysdataemail.path}";
+      signature.text = gravatar.signature;
+      himalaya.enable = true;
+    };
   };
   programs.himalaya.enable = true;
 }

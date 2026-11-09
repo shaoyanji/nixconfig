@@ -115,6 +115,50 @@ task checks:sops:drift
 
 The fingerprint is the one *My profile → API keys* shows for the key, not one you compute.
 
+## Reading & testing secrets safely (Agent recipes)
+
+An agent reading or verifying credentials must never print plaintext into transcripts or write unencrypted files to tracked paths:
+[[flake/policies.nix#credentials-never-land-in-a-tracked-file]]
+
+### 1. Extract a single secret value
+Never pipe `sops -d` to `grep`, `head`, or `diff`. Use `--extract` with JSON-path notation to read only the target key:
+
+```bash
+# Read key directly into a variable without logging plaintext
+token=$(sops -d --extract '["alwaysdatatoken"]' modules/secrets.yaml 2>/dev/null)
+```
+
+### 2. In-memory validation pattern (Python)
+When testing credentials (IMAP, SMTP, REST APIs) against remote endpoints, keep extraction inside process memory:
+
+```python
+import subprocess, imaplib
+
+pw = subprocess.run(
+    ["sops", "-d", "--extract", '["alwaysdataemail"]', "modules/secrets.yaml"],
+    capture_output=True, text=True, check=True
+).stdout.strip()
+
+with imaplib.IMAP4_SSL("imap-dragoncourt.alwaysdata.net", 993) as M:
+    M.login("dragoncourt@alwaysdata.net", pw)
+    status, count = M.select("INBOX")
+```
+
+### 3. Setting a secret and updating the mirror
+Always edit the submodule canonical source, then synchronize the mirror:
+
+```bash
+sops set modules/secrets/secrets.yaml '["key"]' '"value"'
+task infra:secrets:sync
+task checks:sops:drift
+```
+
+If an operator edited `modules/secrets.yaml` directly, adopt the mirror into the submodule before running checks or sync:
+
+```bash
+cp -f modules/secrets.yaml modules/secrets/secrets.yaml
+```
+
 ## SSH CA
 
 Servers trust one CA public key (`modules/ssh-ca.nix`); `ssh.ca.enable = true` is

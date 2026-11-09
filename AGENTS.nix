@@ -2,6 +2,35 @@
 {
   schemaVersion = 1;
   notes = {
+    model-provider-epistemics = {
+      title = "Model availability is provider-scoped, not inferred across vendors";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-10";
+      summary = "Model slugs and availability cannot be extrapolated across multi-provider chains: OpenRouter, Ollama Cloud, and NVIDIA NIM curate distinct catalogs and versions. Fallback chains must verify each live endpoint before bumping configs.";
+      from = ["epistemics-declared"];
+      refs = {
+        modules = [
+          "modules/user/ai/hermes-persona/config.yaml"
+          "flake/epistemics.nix"
+        ];
+        tasks = ["checks:hermes"];
+        docs = ["AGENTS.md"];
+      };
+      body = ''
+        An agent upgrading a model family (e.g. Nemotron 3.5 Super VL) across a
+        multi-provider fallback chain cannot extrapolate names across hosts.
+        While OpenRouter serves `nvidia/nemotron-3.5-super-vl:free` and NIM
+        serves `nvidia/nemotron-3.5-super-vl`, Ollama Cloud (`ollama.com/v1`)
+        maintains a closed list of ~23 models where Nemotron is pinned to
+        `nemotron-3-super` and `nemotron-3-ultra`.
+
+        A slug declared on a provider that does not serve it causes immediate
+        failover or 404. Every provider in `fallback_providers` must be
+        verified against its real `/v1/models` endpoint before landing.
+      '';
+    };
     eval-cost-ladder = {
       title = "Eval cost is chain size; the debt is duplicated facts";
       kind = "proposal";

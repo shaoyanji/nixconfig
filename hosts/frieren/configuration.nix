@@ -17,6 +17,48 @@
       [ "$(cat "$type" 2>/dev/null)" = "bluetooth" ] && printf '0\n' > "$f" 2>/dev/null || true
     done
   '';
+  # --ff-only into the /Volumes/data checkouts; rules in .agents/deploy/hosts/frieren.md.
+  # The paths are the default argument, so the same script can be pointed at two
+  # scratch clones and proven there.
+  checkoutFf = pkgs.writeShellScript "checkout-ff" ''
+    set -u
+    git=${pkgs.git}/bin/git
+    dirs="''${*:-/Volumes/data/projects/nixconfig /Volumes/data/projects/bountystash-console}"
+    fail=0
+    for dir in $dirs; do
+      if [ ! -d "$dir/.git" ]; then
+        echo "==> $dir is not a checkout; skipped"
+        continue
+      fi
+      if [ -n "$($git -C "$dir" status --porcelain)" ]; then
+        echo "==> $dir is dirty; left alone until the change is committed"
+        continue
+      fi
+      branch=$($git -C "$dir" symbolic-ref --quiet --short HEAD) || {
+        echo "==> $dir has a detached HEAD; left alone"
+        continue
+      }
+      before=$($git -C "$dir" rev-parse HEAD)
+      if ! $git -C "$dir" fetch --quiet --prune origin; then
+        echo "==> $dir: fetch failed" >&2
+        fail=1
+        continue
+      fi
+      if ! $git -C "$dir" merge --ff-only --quiet "origin/$branch" >/dev/null 2>&1; then
+        echo "==> $dir: origin/$branch is not a fast-forward; local commits need a human" >&2
+        fail=1
+        continue
+      fi
+      after=$($git -C "$dir" rev-parse HEAD)
+      if [ "$before" = "$after" ]; then
+        echo "==> $dir: already current at $($git -C "$dir" log -1 --format='%h %s')"
+      else
+        echo "==> $dir: +$($git -C "$dir" rev-list --count "$before..$after") commit(s), now $($git -C "$dir" log -1 --format='%h %s')"
+      fi
+    done
+    exit $fail
+  '';
+
   # The warmed set is the inventory's opt-in, never a copy of it: `managed = true`
   # plus `status = "active"` is what `infra:warm:cache` and `infra:apply:fleet`
   # derive. While this file kept its own list of seven, the three hosts added to
@@ -231,6 +273,33 @@ in {
     dates = "04:00";
     allowReboot = true;
     persistent = true;
+  };
+
+  # --- Checkout fast-forward (02:45) --- .agents/deploy/hosts/frieren.md
+  systemd.services.checkout-ff = {
+    description = "Fast-forward the nixconfig and console checkouts on /Volumes/data";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = user.name;
+      Group = "users";
+      ExecStart = "${checkoutFf}";
+      # A fetch is seconds of work; anything near this means the network is wedged.
+      TimeoutStartSec = "10min";
+      Nice = 10;
+      IOSchedulingClass = "idle";
+    };
+  };
+
+  systemd.timers.checkout-ff = {
+    description = "Nightly fast-forward of the checkouts on /Volumes/data";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "*-*-* 02:45:00";
+      Persistent = true;
+      RandomizedDelaySec = "5min";
+    };
   };
 
   sops.secrets."aria2-rpc-secret" = {

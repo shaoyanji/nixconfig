@@ -47,6 +47,7 @@
 | Restic (local) | `restic-backups-frieren-local.timer` | — | `/srv/backup/restic` |
 | Restic (BurgerNAS) | `restic-backups-frieren-burgernas.timer` | — | SFTP + WoL/poweroff |
 | Restic drill | `restic-drill.timer` | — | weekly `check` + sampled restore |
+| Checkout fast-forward | `checkout-ff.timer` | — | 02:45, `/Volumes/data/projects/{nixconfig,bountystash-console}` |
 | PostgreSQL backup | `postgresqlBackup-immich.timer` | — | 03:00 |
 | SMART | `smartd`, `scrutiny` | 8124 | `smart.frieren.lan`* |
 | Btrfs watchdog | `btrfs-watchdog.timer` | — | `modules/services/btrfs-watchdog.nix` |

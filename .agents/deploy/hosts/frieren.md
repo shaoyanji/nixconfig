@@ -87,6 +87,7 @@ to prevent.
 
 | Time                    | Unit                                   | Source of truth                                                |
 | ----------------------- | -------------------------------------- | -------------------------------------------------------------- |
+| 02:45 (+5m jitter)      | `checkout-ff`                          | fast-forwards `/Volumes/data/projects/nixconfig` and `bountystash-console` |
 | 03:00                   | `agy-nightly-handoff` (user)           | Action-gated `~/HANDOFF.md` via Julia-1; executes cascade only on promotion candidates or on-demand (`task checks:audit:handoff`) |
 | 03:00                   | `postgresqlBackup-immich`              | local                                                          |
 | 03:28                   | `restic-backups-frieren-burgernas`     | daily SFTP push within DSM 03:25–04:00 power window            |
@@ -107,6 +108,18 @@ generation usually means exactly this. Confirm what the 04:00 run used:
 journalctl -u nixos-upgrade -n 40 --no-pager | grep -E 'unpacking|new configuration'
 git -C /Volumes/data/projects/nixconfig rev-parse HEAD     # must match the unpacked rev
 ```
+
+**`checkout-ff` (02:45):** the two checkouts under `/Volumes/data/projects` are read by
+hand and by `task`, and both followed origin only when somebody remembered to pull. A
+console checkout a release behind is not cosmetic: `bountystash:data:check` compares its
+`data/` copy against the corpus and failed the deploy gate for exactly that reason.
+
+The job fetches, then `merge --ff-only`, and nothing else. A dirty tree is skipped
+(someone's work in progress), a detached HEAD is reported, and a branch that has
+diverged is reported and exits non-zero — it never resets, stashes or rebases.
+`journalctl -u checkout-ff` names which case happened, and a checkout it left alone is
+the reason it is still behind. The directory list is the script's default argument, so
+pointing it at two scratch clones proves the behaviour without the real checkouts.
 
 **Rebuild rules:**
 

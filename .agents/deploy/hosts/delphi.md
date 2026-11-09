@@ -173,7 +173,7 @@ serve` mount, never a public vhost; tailscaled terminates TLS, so no cert per se
 | 8444 | System One decisions (`/v1/systemone`) | `tailscale-serve-systemone` | `127.0.0.1:8091` |
 | 8445 | Stirling PDF | `tailscale-serve-pdf` | `127.0.0.1:7351` |
 | 8446 | Service console (the compiled tailnet portal) | `tailscale-serve-portal` | `127.0.0.1:8082` |
-| 8461 | Media relay (range-served video library) | `tailscale-serve-media` | `127.0.0.1:8094` |
+| 8461 | Media relay (browse page + fuzzy search, range-served library) | `tailscale-serve-media` | `127.0.0.1:8094` |
 
 Both the mounts and the console are compiled from `services.servicePortal`, and
 `modules/services/service-portal.nix` fails the build when a mount has no card, no

@@ -36,6 +36,28 @@ chain rather than failing when a video has no ≤30 fps format.
 `-c copy` + `+faststart` means nothing is re-encoded and the moov atom sits at
 the front, which is what makes seeking over Range work.
 
+## Browsing
+
+`http://delphi:8461/` (tailnet `tailscale-serve-media`) serves a browse page over
+the library, not an nginx directory listing: every file, grouped by the fetch
+folder it came from, with a fuzzy search over name, folder and extension. The
+page is one static HTML file with inline CSS and JS — no build step, no
+framework, no network fetch beyond the manifest — because it has to work on an
+iPad's Safari as well as the netbook.
+
+- `/index.json` is the manifest: `path`, `name`, `dir`, `ext`, `kind`, `size`,
+  `mtime` per file, plus `count` and `bytes`. The page never walks directories
+  (that is one request per folder).
+- `media-relay-index` writes it from `find` every five minutes and at boot, and
+  `yt-get` refreshes it at the end of a fetch, so a new download is listed
+  immediately rather than at the next tick.
+- The extension set is the index's filter, not the page's: mp4/m4v/webm/mkv/mov/
+avi/mpg/mpeg/ts (video), mp3/m4a/aac/ogg/opus/flac/wav (audio),
+jpg/jpeg/png/webp/gif/avif (image), srt/vtt (subtitle). Anything else is left out
+of the listing and still served at its path.
+- A directory URL (`/dQw4w9WgXcQ/`) keeps the plain nginx listing, so a bookmark
+from before the page existed still opens.
+
 ## Operations
 
 - `yt-get [--height N] [--fps N] <url>` is the only command; there is no task.

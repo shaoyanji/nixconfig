@@ -94,7 +94,53 @@
     esac
 
     rel="''${file#${cfg.mediaDir}/}"
+
+    # The library page reads this manifest, so a file that appeared only after
+    # the next timer tick would look like a failed download.
+    if ! ${indexScript}; then
+      echo "yt-get: index refresh failed; the timer retries within five minutes" >&2
+    fi
+
     echo "${cfg.publicBase}/$rel"
+  '';
+
+  # What the library page lists. `find` is the authority — a manifest a fetch has
+  # to remember to update is a manifest that goes stale — and the page never
+  # walks the directory tree itself, which is one request per folder.
+  indexScript = pkgs.writeShellScript "media-relay-index" ''
+    set -euo pipefail
+    media=${lib.escapeShellArg cfg.mediaDir}
+    out="$media/.index.json"
+    tmp="$out.tmp"
+    trap '${pkgs.coreutils}/bin/rm -f "$tmp"' EXIT
+    # shellcheck disable=SC2016 # $now and $e are jq variables, not shell ones
+    ${pkgs.findutils}/bin/find "$media" -type f ! -name '.index.json' -printf '%P\t%s\t%T@\n' \
+      | ${pkgs.jq}/bin/jq -R -n --arg now "$(${pkgs.coreutils}/bin/date -u +%FT%TZ)" '
+        def kinds: {
+          video: ["mp4","m4v","webm","mkv","mov","avi","mpg","mpeg","ts"],
+          audio: ["mp3","m4a","aac","ogg","opus","flac","wav"],
+          image: ["jpg","jpeg","png","webp","gif","avif"],
+          subtitle: ["srt","vtt"]
+        };
+        def kindof($e): (kinds | to_entries | map(select(.value | index($e))) | .[0].key) // null;
+        [inputs | select(length > 0) | split("\t")]
+        | map({path: .[0], size: (.[1] | tonumber), mtime: (.[2] | tonumber | floor)})
+        | map(.name = (.path | split("/") | last))
+        | map(.ext = (.name | split(".") | if length > 1 then .[-1] else "" end | ascii_downcase))
+        | map(.kind = kindof(.ext))
+        | map(select(.kind != null))
+        | map(.dir = (.path | split("/") | if length > 1 then .[:-1] | join("/") else "" end))
+        | sort_by(.path)
+        | {generated: $now, count: length, bytes: (map(.size) | add // 0), files: .}
+      ' >"$tmp"
+    ${pkgs.coreutils}/bin/mv -f "$tmp" "$out"
+  '';
+
+  # One immutable page: the listing is data, and the page is fed the manifest at
+  # `= /index.json`, so nothing is generated into the store per request.
+  mediaUi = pkgs.runCommand "media-relay-ui" {} ''
+    mkdir -p $out
+    install -m 0644 ${../../lib/media-relay/index.html} $out/index.html
   '';
 
   nginxPort = toString cfg.port;
@@ -205,15 +251,30 @@ in {
           }
         ];
         root = cfg.mediaDir;
-        locations."/" = {
-          extraConfig = ''
-            autoindex on;
-            autoindex_exact_size off;
-            autoindex_localtime on;
-            add_header Cache-Control "public, max-age=86400";
-            # nginx already emits `Accept-Ranges: bytes` for static files; an
-            # explicit header here is a second copy of the same line.
-          '';
+        locations = {
+          "/" = {
+            extraConfig = ''
+              autoindex on;
+              autoindex_exact_size off;
+              autoindex_localtime on;
+              add_header Cache-Control "public, max-age=86400";
+              # nginx already emits `Accept-Ranges: bytes` for static files; an
+              # explicit header here is a second copy of the same line.
+            '';
+          };
+          # The browse page owns the root. A directory URL still gets the plain
+          # listing, so a bookmark taken before the page existed keeps working.
+          "= /" = {
+            root = mediaUi;
+          };
+          "= /index.json" = {
+            alias = "${cfg.mediaDir}/.index.json";
+            extraConfig = ''
+              # Regenerated on a timer and after every fetch: a cached manifest is
+              # a library missing the file you just downloaded.
+              add_header Cache-Control "no-store";
+            '';
+          };
         };
       };
     };
@@ -233,6 +294,27 @@ in {
       timerConfig = {
         OnCalendar = "daily";
         Persistent = true;
+      };
+    };
+
+    # Written as the library's owner so the manifest is never a file nginx can
+    # read but a fetch cannot replace.
+    systemd.services.media-relay-index = {
+      description = "Write the media library's index.json";
+      serviceConfig = {
+        Type = "oneshot";
+        User = cfg.user;
+        UMask = "0022";
+      };
+      script = "${indexScript}";
+    };
+
+    systemd.timers.media-relay-index = {
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = "30s";
+        OnUnitActiveSec = "5min";
+        AccuracySec = "30s";
       };
     };
   };

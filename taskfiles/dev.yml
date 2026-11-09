@@ -59,9 +59,55 @@ tasks:
       - bash scripts/task/git-push.sh
 
   dev:git:quick-pull:
-    desc: Pull with submodules
+    desc: Pull, then move the private secrets submodule and re-attach it to master
+    summary: >
+      `submodule.recurse` is off fleet-wide, so a plain `git pull` leaves
+      `modules/secrets` alone — which is the point: a recursive fetch aborts the
+      whole parent pull on a host without the private ssh key (exit 1, nothing
+      pulled). This pulls the superproject fast-forward only, moves the submodule
+      to the pin, then puts its checkout back on `master` instead of the detached
+      HEAD that `git submodule update` always produces. A submodule that cannot
+      be fetched leaves the superproject pull intact and says so. Exit 1 only when
+      the superproject itself could not fast-forward.
     cmds:
-      - git pull --recurse-submodules
+      - |
+        set -uo pipefail
+        git pull --ff-only --no-recurse-submodules || { echo "quick-pull: superproject did not pull — git's own error is above; the submodule was not moved" >&2; exit 1; }
+
+        sub=modules/secrets
+        [ -e "$sub/.git" ] || { echo "quick-pull: $sub not initialized — skipped"; exit 0; }
+
+        if ! git submodule update --init "$sub"; then
+          echo "quick-pull: $sub could not be fetched (private remote, no key?) — superproject is pulled, submodule left as it was" >&2
+          exit 0
+        fi
+
+        # The pin is a commit, so the checkout is detached. Attach the branch
+        # `.gitmodules` names WITHOUT moving the worktree. `git switch` is wrong
+        # here: it jumps to the branch tip, and the tip is not the pin whenever
+        # the submodule holds commits the superproject has not pointed at yet.
+        # Measured the hard way — a local `master` one commit ahead turned the
+        # parent gitlink dirty and made this task the thing it was fixing.
+        branch="$(git config -f .gitmodules --get "submodule.$sub.branch" || echo master)"
+        head="$(git -C "$sub" rev-parse HEAD)"
+        if git -C "$sub" symbolic-ref -q HEAD >/dev/null; then
+          echo "quick-pull: $sub already on $(git -C "$sub" branch --show-current)"
+        else
+          tip="$(git -C "$sub" rev-parse --verify -q "refs/heads/$branch" || true)"
+          if [ -z "$tip" ] || git -C "$sub" merge-base --is-ancestor "$tip" "$head" 2>/dev/null; then
+            # Missing or BEHIND the pin: moving the branch pointer to the pin is a
+            # fast-forward, so no commit can be lost. A stale local branch is the
+            # common case — `git switch` on it would move the worktree BACKWARDS.
+            git -C "$sub" update-ref "refs/heads/$branch" "$head"
+            git -C "$sub" symbolic-ref HEAD "refs/heads/$branch"
+            echo "quick-pull: $sub attached to $branch at the pin (${head:0:7}, branch was ${tip:0:7})"
+          else
+            echo "quick-pull: $sub left DETACHED — $branch ${tip:0:7} and the pin ${head:0:7} diverge," >&2
+            echo "            so $branch holds commits the superproject does not point at; push them and bump the pin" >&2
+          fi
+        fi
+
+        git submodule status
 
   dev:git:stage:
     desc: Stage tracked changes and warn on .sops.yaml recipient drift
@@ -838,7 +884,10 @@ tasks:
   dev:cloak:edit:
     desc: Edit the cloak accounts file via SOPS (navigate to the `cloak` key)
     cmds:
-      - sops modules/secrets.yaml
+      # The submodule copy is canonical; the mirror in `modules/` is produced by
+      # `infra:secrets:sync` and never edited directly.
+      - sops {{.SECRETS}}/{{.ENC_SECRETS}}
+      - task infra:secrets:sync
 
   dev:cloak:list:
     desc: List all cloak accounts

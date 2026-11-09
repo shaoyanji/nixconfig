@@ -96,9 +96,17 @@ in {
         init.defaultBranch = "master";
         pull.rebase = true;
         push.autoSetupRemote = true;
-        # Automatic submodule handling: operations (pull, checkout, switch, reset)
-        # recurse into submodules automatically without needing manual sbupdate.
-        submodule.recurse = true;
+        # Deliberately OFF. `true` here caused three failures, all measured:
+        #   - with `pull.rebase` above, a pull rebased inside `modules/secrets`
+        #     and left that checkout on a detached HEAD, so a later commit there
+        #     belonged to no branch;
+        #   - the recursive fetch ABORTED the whole parent pull on any host
+        #     without the private ssh key (exit 1, nothing pulled);
+        #   - `git push` died on a refspec the submodule does not have
+        #     (`docs/nix-patterns.md`, `scripts/task/git-push.sh`).
+        # Submodules are moved by `task dev:git:quick-pull`, which re-attaches
+        # the branch afterwards. Plain `git submodule update` still works.
+        submodule.recurse = false;
         status.submoduleSummary = true;
         diff.submodule = "log";
         fetch.recurseSubmodules = "on-demand";
@@ -121,7 +129,7 @@ in {
           #   undo-last="reset HEAD~1";
           sbupdate = "submodule update --init --recursive";
           sbforfetch = "submodule foreach git fetch origin";
-          sbpull = "pull --recurse-submodules";
+          sbpull = "pull --no-recurse-submodules";
         };
       };
       includes = [

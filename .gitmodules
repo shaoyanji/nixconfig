@@ -1,6 +1,7 @@
 [submodule "modules/secrets"]
 	url = git@github.com:shaoyanji/secrets.git
 	path = modules/secrets
+	branch = master
 [submodule "projects/neocities-dragoncourt"]
 	path = projects/neocities-dragoncourt
 	url = https://github.com/shaoyanji/neocities-dragoncourt.git

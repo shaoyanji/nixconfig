@@ -374,6 +374,15 @@ SOPS_AGE_KEY_FILE=… sops -d "$STORE" | sha256sum             # == the pulled c
 
 - **`0 successful groups`** — the identity is not a recipient. Derive the pubkey
   and compare it against `.sops.yaml`; do not add a file at random.
+- **A detached checkout eats commits.** `git submodule update` checks out the
+  pinned commit, never a branch, so a commit made in `modules/secrets` after it
+  belongs to no branch and the next update drops it. `.gitmodules` names
+  `branch = master`, `task dev:git:quick-pull` re-attaches the checkout after
+  every update, and `git -C modules/secrets branch --show-current` printing
+  nothing means it is detached again.
+- **A recursive fetch aborts the pull.** `submodule.recurse` is off fleet-wide;
+  `git pull --recurse-submodules` on a host without the private ssh key fails the
+  whole pull, superproject included.
 - **The submodule `.sops.yaml`** — `modules/secrets/.sops.yaml` is a copy. Forgetting
   step 3 re-wraps to the old set and the file still decrypts for you, so it looks fine
   until a host that was just added cannot decrypt.

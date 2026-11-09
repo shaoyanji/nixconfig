@@ -52,10 +52,33 @@ tasks:
       - scripts/task/sops-decrypt-to.sh "{{.SECRETS}}/{{.ENC_DETASKFILE}}" "$HOME/Taskfile.yml"
 
   infra:secrets:sync:
-    desc: Sync the mirrored secrets yaml in modules/ from the submodule (idempotent)
+    desc: Sync the mirror in modules/ from the submodule, refusing to clobber a newer mirror
+    summary: >
+      `modules/secrets.yaml` is a copy, and the canonical edit target is
+      `modules/secrets/secrets.yaml`. Equal is the normal no-op. An older mirror
+      is the expected direction. A mirror that is DIFFERENT and NEWER means
+      somebody edited the copy, and copying over it would silently discard that
+      edit — so it stops and names the command that adopts it instead. Without
+      this, the write went the wrong way and surfaced days later as a host that
+      could not decrypt.
     cmds:
-      - cp -f {{.SECRETS}}/{{.ENC_SECRETS}} {{.SECRETS}}.yaml
-      - echo "Synced {{.SECRETS}}/{{.ENC_SECRETS}} -> {{.SECRETS}}.yaml"
+      - |
+        set -euo pipefail
+        src="{{.SECRETS}}/{{.ENC_SECRETS}}"
+        dst="{{.SECRETS}}.yaml"
+        [ -f "$src" ] || { echo "sync: $src missing — is the secrets submodule checked out?" >&2; exit 1; }
+        if cmp -s "$src" "$dst"; then
+          echo "sync: $dst already identical to $src — nothing to do"
+          exit 0
+        fi
+        if [ -f "$dst" ] && [ "$dst" -nt "$src" ]; then
+          echo "sync: REFUSING — $dst is newer than $src and they differ, so an edit was made to the mirror." >&2
+          echo "       adopt it if that edit was intended:  cp -f $dst $src" >&2
+          echo "       then re-run: task infra:secrets:sync" >&2
+          exit 1
+        fi
+        cp -f "$src" "$dst"
+        echo "sync: $src -> $dst"
 
   infra:secrets:edit:secrets:
     desc: Edit encrypted secrets and sync local mirrored yaml
@@ -67,7 +90,8 @@ tasks:
   infra:secrets:form:gok:
     desc: One form for the gok appliance — wifi into sops, Tailscale OAuth + update password into GitHub secrets
     summary: >
-      Writes wifi SSID/PSK to modules/secrets.yaml (sops) and Tailscale auth key
+      Writes wifi SSID/PSK to the canonical sops file
+      (modules/secrets/secrets.yaml, mirrored by infra:secrets:sync) and Tailscale auth key
       (tag:ci, Ephemeral) + update password to GitHub repo secrets. Blank answers
       are skipped. All writes use stdin; nothing lands in shell history.
     cmds:
@@ -83,8 +107,13 @@ tasks:
           # answer is JSON-encoded first. Piping it raw fails with "Value for
           # --set is not valid JSON" — verified, and verified fixed: a string
           # round-trips byte-identical.
-          jq -Rn --arg v "$value" '$v' | sops set modules/secrets.yaml "$1" --value-stdin
-          echo "stored: $2 -> modules/secrets.yaml $1"
+          #
+          # The CANONICAL file, never the mirror: writing `modules/secrets.yaml`
+          # here left the two copies disagreeing until someone ran
+          # `infra:secrets:sync`, and the drift gate then failed on this form's
+          # own output (fixed 2026-11-10).
+          jq -Rn --arg v "$value" '$v' | sops set "{{.SECRETS}}/{{.ENC_SECRETS}}" "$1" --value-stdin
+          echo "stored: $2 -> {{.SECRETS}}/{{.ENC_SECRETS}} $1"
         }
 
         put_gh() {
@@ -101,8 +130,8 @@ tasks:
         # build that cannot see the SSID DELETES the wifi package instead of
         # shipping empty credentials — so a CI image deployed to a wifi
         # appliance comes back with no link and no obvious reason (2026-10-26).
-        ssid=$(sops -d --extract '["gokrazy"]["gok"]["wifi_ssid"]' modules/secrets.yaml 2>/dev/null || true)
-        psk=$(sops -d --extract '["gokrazy"]["gok"]["wifi_psk"]' modules/secrets.yaml 2>/dev/null || true)
+        ssid=$(sops -d --extract '["gokrazy"]["gok"]["wifi_ssid"]' "{{.SECRETS}}/{{.ENC_SECRETS}}" 2>/dev/null || true)
+        psk=$(sops -d --extract '["gokrazy"]["gok"]["wifi_psk"]' "{{.SECRETS}}/{{.ENC_SECRETS}}" 2>/dev/null || true)
         if [ -n "$ssid" ] && gum confirm 'Also store the wifi pair as GitHub secrets GOK_WIFI_SSID / GOK_WIFI_PSK (CI images otherwise ship without wifi)?'; then
           printf '%s' "$ssid" | gh secret set GOK_WIFI_SSID
           printf '%s' "$psk" | gh secret set GOK_WIFI_PSK
@@ -117,11 +146,13 @@ tasks:
 
         # The update password already exists in sops; offer it instead of asking
         # the operator to copy it by hand.
-        existing=$(sops -d --extract '["gokrazy"]["gok"]["http_password"]' modules/secrets.yaml 2>/dev/null || true)
+        existing=$(sops -d --extract '["gokrazy"]["gok"]["http_password"]' "{{.SECRETS}}/{{.ENC_SECRETS}}" 2>/dev/null || true)
         if [ -n "$existing" ] && gum confirm 'Use the gok update password from sops as the CI secret GOK_HTTP_PASSWORD?'; then
           printf '%s' "$existing" | gh secret set GOK_HTTP_PASSWORD
           echo 'stored: GitHub secret GOK_HTTP_PASSWORD (from sops)'
         fi
+
+        task infra:secrets:sync
 
         echo
         echo 'Next: bash scripts/task/gok.sh show   # wifi entry now renders with the SSID'

@@ -220,6 +220,11 @@ submodule is checked out) and CI cannot drop it
 
 ## `git push` dies on the secrets submodule
 
+**The cause is gone as of 2026-11-10:** `modules/env.nix` sets
+`submodule.recurse = false`. The failure stays recorded because a clone still
+carrying the old setting reproduces it, and `scripts/task/git-push.sh` pushes
+submodules first for its own reason.
+
 `submodule.recurse = true` makes `git push` ask every submodule whether it can
 push **the superproject's refspec source**. This repo is on `main`, the secrets
 submodule is a detached HEAD tracking `origin/master`, so the check is:
@@ -234,11 +239,6 @@ and the superproject push never happens — rc=128, nothing sent, measured
 2026-11-02. It is easy to misread as an auth or mirror problem: the submodule
 pushes fine on its own, over https, from inside. What fails is the *check*, on a
 branch name the submodule does not have.
-
-- `submodule.<name>.branch = master` does **not** fix it (still `refs/heads/main`)
-  — that option is for `git submodule update --remote`.
-- `--recurse-submodules=on-demand` does not either; the source ref comes from the
-  push refspec, not from the submodule's config.
 
 Use `scripts/task/git-push.sh [--dry-run] [remote] [branch]`: it pushes each
 submodule's missing commits to its remote's default branch (`HEAD:refs/heads/<master>`,

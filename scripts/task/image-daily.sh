@@ -32,7 +32,6 @@ BRIEFS=${BRIEFS:-$repo/lib/image-daily/briefs.json}
 # neighbour.
 IMAGES_ROOT=${IMAGES_ROOT:-/Volumes/data/pics/generated}
 LANES_ORDER=(site wall blog fleet)
-PROJECT=${PROJECT:-bountystash-assets}
 LEDGER=$IMAGES_ROOT/ledger.jsonl
 STAGE=$IMAGES_ROOT/.judge
 
@@ -429,22 +428,27 @@ cmd_publish() {
     stage_publish
   done
   build_index
-  say "$(find "$IMAGES_ROOT/published" -name '*.png' | wc -l) asset(s) staged"
+  say "$(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | wc -l) asset(s) staged"
   if [ "${DRY:-0}" = "1" ]; then
-    say "dry run: not deploying"
+    say "dry run: not uploading"
     return 0
   fi
-  # wrangler is not in this host's PATH and not in the runner's closure: the
-  # pages task has always reached it through nix-shell, which is why
-  # `images:publish:init` worked while the first real publish died on
-  # "exec: wrangler: not found".
-  if command -v wrangler >/dev/null 2>&1; then
-    bash "$repo/scripts/task/pages-deploy.sh" "$IMAGES_ROOT/published" \
-      --project-name="$PROJECT" --branch=main
-  else
-    nix-shell -p wrangler --run \
-      "bash '$repo/scripts/task/pages-deploy.sh' '$IMAGES_ROOT/published' --project-name='$PROJECT' --branch=main"
-  fi
+  # Cloudinary is the asset plane, not a deployed gallery: the delivery URL
+  # carries its own resize (`f_auto,q_auto,w_1200`), so a consumer picks the
+  # size it needs from one upload and this tree never becomes a website. The
+  # urls.tsv beside the assets is the manifest a consumer reads.
+  local rel url
+  : >"$IMAGES_ROOT/published/urls.tsv"
+  while IFS= read -r file; do
+    rel=${file#"$IMAGES_ROOT/published/"}
+    url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$file" --public-id "assets/${rel%.*}") || {
+      say "publish: upload failed for $rel"
+      return 1
+    }
+    printf '%s\t%s\n' "$rel" "$url" >>"$IMAGES_ROOT/published/urls.tsv"
+    say "uploaded $rel"
+  done < <(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | sort)
+  say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
 }
 
 # The consumer of the blog lane is a Chirpy checkout, not this gallery: hand over
@@ -463,7 +467,11 @@ cmd_blog() { # [--dir PATH]
       mkdir -p "$dir/assets/img/banners"
       cp -f "$f" "$dir/assets/img/banners/"
     fi
-    printf 'image:\n  path: /assets/img/banners/%s.jpg\n  alt: %s\n\n' "$slug" "${alt:-$slug}"
+    url=$(awk -F'\t' -v k="blog/$slug.jpg" '$1 == k { print $2 }' \
+      "$IMAGES_ROOT/published/urls.tsv" 2>/dev/null)
+    [ -n "$url" ] || url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$f" \
+      --public-id "shaoyanji/banners/$slug")
+    printf 'image:\n  path: %s\n  alt: %s\n\n' "$url" "${alt:-$slug}"
   done
 }
 

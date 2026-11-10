@@ -182,10 +182,14 @@ attempt() { # brief id lane size name prompt day
 }
 
 run_lane() { # lane budget
-  local lane=$1 budget=$2 day intent spent=0 v verdict defect
+  local lane=$1 budget=$2 day intent spent=0 left=0 v verdict defect
   day=$(today)
   intent=$(lane_setting "$lane" intent)
-  say "lane $lane: budget $budget"
+  # One usage call per lane, decremented locally: the counter moves only when a
+  # plate is actually spent, and a per-iteration read would be a burst of API
+  # calls against an endpoint with a rate limit.
+  left=$(remaining || echo 0)
+  say "lane $lane: budget $budget ($left left)"
 
   local rows
   rows=$(due "$lane") || rows=""
@@ -196,7 +200,7 @@ run_lane() { # lane budget
 
   while IFS=$'\t' read -r id _ size name prompt; do
     [ "$spent" -ge "$budget" ] && break
-    [ "$(remaining)" -gt 0 ] || { say "allowance spent"; break; }
+    [ "$left" -gt 0 ] || { say "allowance spent"; break; }
 
     if [ "${DRY:-0}" = "1" ]; then
       say "would generate $id ($size) -> $lane/$day/$name"
@@ -206,15 +210,17 @@ run_lane() { # lane budget
 
     local file
     file=$(attempt "$id" "$lane" "$size" "$name" "$prompt" "$day") || continue
+    left=$((left - 1))
     v=$(judge_image "$file" "$lane" "$intent")
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
     defect=$(printf '%s' "$v" | jq -r '.defect // ""')
     spent=$((spent + 1))
 
-    if [ "$verdict" = "reroll" ] && [ -n "$defect" ] && [ "$(remaining)" -gt 0 ] && [ "$spent" -lt "$budget" ]; then
+    if [ "$verdict" = "reroll" ] && [ -n "$defect" ] && [ "$left" -gt 0 ] && [ "$spent" -lt "$budget" ]; then
       say "$id: reroll — $defect"
       rm -f "$file"
       file=$(attempt "$id" "$lane" "$size" "$name" "$prompt (Change only this: $defect.)" "$day") || continue
+      left=$((left - 1))
       v=$(judge_image "$file" "$lane" "$intent")
       verdict=$(printf '%s' "$v" | jq -r '.verdict')
       defect=$(printf '%s' "$v" | jq -r '.defect // ""')
@@ -326,8 +332,12 @@ cmd_run() {
     cmd_publish || say "publish failed; assets are on disk and the lane reads stale until it succeeds"
   fi
 
-  mkdir -p "$IMAGES_ROOT/.done"
-  date -u +%FT%TZ >"$marker"
+  # A dry run has spent nothing, so it must not claim the day: the marker is what
+  # makes the 06:10 run a no-op, and marking a DRY pass would silence the night.
+  if [ "${DRY:-0}" != "1" ]; then
+    mkdir -p "$IMAGES_ROOT/.done"
+    date -u +%FT%TZ >"$marker"
+  fi
   say "$day done"
 }
 

@@ -111,9 +111,18 @@ lane_setting() { jq -r --arg l "$1" --arg k "$2" '.lanes[$l][$k] // empty' "$BRI
 # number the arithmetic can use; every caller already treats 0 as "stop".
 remaining() {
   local n
-  n=$(cpg usage --json 2>/dev/null | jq -r '.usage.images.remaining // empty')
+  # `remaining: "unlimited"` is the plan talking, not the day. The entitlement
+  # still carries `imagesPerDay`, so the ceiling the arithmetic needs is the quota
+  # minus what has been spent. Measured 2026-11-10: 89 of 100 spent while the plan
+  # answered "unlimited", and a 25-plate slot walked straight into 429s with
+  # eleven images left in the day.
+  n=$(cpg usage --json 2>/dev/null | jq -r '
+    if (.entitlement.limits.imagesPerDay | type) == "number"
+    then (.entitlement.limits.imagesPerDay - (.usage.images.used // 0))
+    else (.usage.images.remaining // empty) end' 2>/dev/null)
   case "$n" in
     '' | null) return 0 ;;
+    -*) echo 0 ;;
     *[!0-9]*) echo 1000 ;;
     *) echo "$n" ;;
   esac
@@ -228,6 +237,11 @@ run_lane() { # lane budget
 
   local rows
   rows=$(due "$lane") || rows=""
+  # ONLY=id,id narrows a pass to named briefs: a requested plate should not wait
+  # behind every other due entry in the lane, and should not drag them along.
+  if [ -n "${ONLY:-}" ]; then
+    rows=$(printf '%s\n' "$rows" | awk -F'\t' -v want=",${ONLY}," 'index(want, "," $1 ",")')
+  fi
   if [ -z "$rows" ]; then
     say "lane $lane: nothing due"
     return 0
@@ -389,7 +403,20 @@ cmd_run() {
   local rem lane budget
   rem=$(remaining)
   [ -n "$rem" ] || die "cpg usage answered nothing — run cpg status --json"
-  say "$day: $rem images available"
+  # Daytime slots hold a slice back. A plate someone asked for during the day is
+  # worth more than the queue's next due entry, and a slot that spends the day at
+  # 13:20 leaves nothing for that. The last slot runs with RESERVE=0 and sweeps
+  # whatever demand and budget the day left.
+  local reserve=${RESERVE:-0}
+  if [ "$reserve" -le 0 ]; then
+    say "$day: $rem images available"
+  elif [ "$rem" -gt "$reserve" ]; then
+    say "$day: $rem images available, $reserve held for ad-hoc requests"
+    rem=$((rem - reserve))
+  else
+    say "$day: $rem images available, all $reserve reserved for ad-hoc requests"
+    rem=0
+  fi
 
   local cap=${CAP:-0} spent_total=0 room
   select_lanes
@@ -413,6 +440,10 @@ cmd_run() {
   # not buy; a varied bank is worth more than 32 plates of the same look.
   local left
   left=$(remaining || echo 0)
+  if [ "$reserve" -gt 0 ]; then
+    left=$((left - reserve))
+    [ "$left" -lt 0 ] && left=0
+  fi
   if [ "${STORYBOOK:-0}" = "1" ] && [ "$left" -gt 0 ] && [ -n "${STORYBOOK_DIR:-}" ] &&
     [ -f "$repo/.agents/skills/cpg-storybook/scripts/storybook.py" ]; then
     say "storybook: $left images left, printing $((left / 3)) spread(s)"

@@ -6091,5 +6091,34 @@
 
       '';
     };
+    wall-prompt-family = {
+      title = "A wall plate reuses the brief family's prompt, never a fresh sentence";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-10";
+      summary = "The wall briefs are one family of four words, `<subject>, 4k, realistic, neumorphism.` A hand-written descriptive prompt is a different look and a different product; three plates were generated off-family before anyone read the six briefs that were already there. A requested wallpaper is a new brief in the bank, not an ad-hoc call.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["lib/image-daily/briefs.json" "scripts/task/image-daily.sh"];
+        tasks = ["images:plan" "images:publish"];
+      };
+      body = ''
+        **What happened.** Asked for three Frieren-character wallpapers, this agent wrote
+        its own long neumorphism brief ("one soft monochrome surface, extruded soft-UI
+        shapes, deep inset shadows…") without opening `briefs.json`, whose six wall
+        briefs all use the family line. Three images were spent: one plate reached disk
+        off-family and was deleted, two never rendered. That is an AI tell as much as a
+        bug — a confident invented style where a stored one was one `jq` away.
+
+        **The rule.** A requested wallpaper is added to `briefs.json` as a brief with the
+        family prompt and its own `every`, so the queue renders it in the same look as
+        its neighbours and owns it afterwards. `cpg image` by hand is for a one-off that
+        is not a wallpaper and will not join the bank.
+
+        **Exit.** `jq -r '.briefs[] | select(.lane == "wall") | .prompt'`
+        `lib/image-daily/briefs.json` prints one family line per wall brief; the note
+        gates and `checks:prose` stay green.
+      '';
+    };
   };
 }

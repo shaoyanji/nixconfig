@@ -306,6 +306,70 @@
       "size": "1536x1024",
       "name": "2024-11-13-my-new-post.png",
       "prompt": "A typewriter beside a closed laptop, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-frieren-cyberpunk",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "frieren-cyberpunk.png",
+      "prompt": "Frieren in a cyberpunk city, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-fern",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "fern.png",
+      "prompt": "Fern, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-stark",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "stark.png",
+      "prompt": "Stark, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-eisen",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "eisen.png",
+      "prompt": "Eisen, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-himmel",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "himmel.png",
+      "prompt": "Himmel, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-heiter",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "heiter.png",
+      "prompt": "Heiter, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-uebel",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "uebel.png",
+      "prompt": "Uebel, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-char-methode",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "methode.png",
+      "prompt": "Methode, 4k, realistic, neumorphism."
     }
   ]
 }

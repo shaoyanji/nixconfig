@@ -496,7 +496,7 @@
   # without the burst — and every slot republishes the Cloudinary manifest, so the
   # asset frontend follows the queue through the day. Tools are prepended to PATH
   # because cpg and agy live in the user profile, not in this script's closure.
-  imageDailySlot = slot: cap:
+  imageDailySlot = slot: cap: reserve:
     pkgs.writeShellScript "image-daily-slot-${slot}" ''
       set -uo pipefail
       export PATH=${
@@ -517,6 +517,7 @@
       export STORYBOOK_DIR=${user.home}/Documents/storybook/lantern
       export SLOT=${slot}
       export CAP=${toString cap}
+      export RESERVE=${toString reserve}
       exec ${pkgs.bash}/bin/bash ${../../scripts/task/image-daily.sh} run
     '';
 in {
@@ -1001,15 +1002,20 @@ in {
         command = agySystemRunner;
         workingDirectory = "${user.home}";
       };
-      # Four slots, 6h20 apart, clear of the 03:00-05:30 window. The allowance
-      # resets 00:00 UTC and the burst limit is 25 an hour, so a slot spends 25 and
-      # the next spends the rest. `persistent = false`: catching up three missed
-      # slots at boot would burst into exactly the limit the spacing avoids.
+      # Four slots, spread across the day and clear of the 03:00-05:30 window.
+      # The day resets 00:00 UTC (01:00 CET), so slot 1 fires just after it rather
+      # than twenty minutes before it. The burst limit is 25 an hour, so no slot
+      # asks for more than 20 and the last asks for 40. Every daytime slot keeps
+      # RESERVE images back: something asked for during the day outranks the
+      # queue's next due entry, and the final slot runs with RESERVE=0 so the
+      # day's end is where special requests and leftover demand get spent.
+      # `persistent = false`: catching up three missed slots at boot would burst
+      # into exactly the limit the spacing avoids.
       image-daily-slot-1 = {
         name = "image-daily-slot-1";
-        description = "Image queue 1/4 (00:40): due plates, judge, Cloudinary, manifest";
-        schedule = "*-*-* 00:40:00";
-        command = imageDailySlot "1" 25;
+        description = "Image queue 1/4 (01:10, past the UTC reset): due plates, judge, Cloudinary, manifest";
+        schedule = "*-*-* 01:10:00";
+        command = imageDailySlot "1" 20 20;
         workingDirectory = "${user.home}";
         lockFile = "/tmp/image-daily.lock";
         persistent = false;
@@ -1020,7 +1026,7 @@ in {
         name = "image-daily-slot-2";
         description = "Image queue 2/4 (07:00): due plates, judge, Cloudinary, manifest";
         schedule = "*-*-* 07:00:00";
-        command = imageDailySlot "2" 25;
+        command = imageDailySlot "2" 20 15;
         workingDirectory = "${user.home}";
         lockFile = "/tmp/image-daily.lock";
         persistent = false;
@@ -1031,7 +1037,7 @@ in {
         name = "image-daily-slot-3";
         description = "Image queue 3/4 (13:20): due plates, judge, Cloudinary, manifest";
         schedule = "*-*-* 13:20:00";
-        command = imageDailySlot "3" 25;
+        command = imageDailySlot "3" 20 10;
         workingDirectory = "${user.home}";
         lockFile = "/tmp/image-daily.lock";
         persistent = false;
@@ -1040,9 +1046,9 @@ in {
       };
       image-daily-slot-4 = {
         name = "image-daily-slot-4";
-        description = "Image queue 4/4 (19:40): due plates, judge, Cloudinary, manifest";
-        schedule = "*-*-* 19:40:00";
-        command = imageDailySlot "4" 25;
+        description = "Image queue 4/4 (21:20, end of the day): sweep, special requests, Cloudinary, manifest";
+        schedule = "*-*-* 21:20:00";
+        command = imageDailySlot "4" 40 0;
         workingDirectory = "${user.home}";
         lockFile = "/tmp/image-daily.lock";
         persistent = false;

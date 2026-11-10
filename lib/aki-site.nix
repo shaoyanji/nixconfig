@@ -165,9 +165,7 @@
   # A host's own mark, where one exists: a badge, not a hero image. It comes from
   # the asset plane like every other picture, so no binary enters the repo and the
   # site build stays a pure projection of the registry.
-  hostBadges = {
-    frieren = "https://res.cloudinary.com/de1eajx01/image/upload/f_png,q_auto,w_192/assets/fleet/frieren.png";
-  };
+  hostBadges = builtins.fromJSON (builtins.readFile ./site/host-badges.json);
 
   # Aki hypermedia driver with delegated click listener for dynamic DOM mutations.
   # Assets are FILES (lib/site/), not literals: Nix cannot lint, format or

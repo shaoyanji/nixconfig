@@ -13,6 +13,12 @@
       "publish": true,
       "intent": "a desktop wallpaper for a dwl session on a 1024x600 or 1920x1080 panel, either clean flat vector or 4k realistic neumorphism"
     },
+    "blog": {
+      "budget": 6,
+      "max_age_days": 90,
+      "publish": true,
+      "intent": "a banner image for one blog post at shaoyanji.is-a.dev, cropped to 1200x630 and used for both the in-page hero and og:image"
+    },
     "fleet": {
       "budget": 20,
       "max_age_days": 90,
@@ -199,6 +205,38 @@
       "name": "crt-sand.png",
       "prompt": "A CRT monitor half-buried in sand, 4k, realistic, neumorphism."
     },
+    {
+      "id": "wall-neumorph-diver",
+      "lane": "wall",
+      "every": 9,
+      "size": "1536x1024",
+      "name": "diver-cathedral.png",
+      "prompt": "A deep-sea diver in a cathedral, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-neumorph-vending",
+      "lane": "wall",
+      "every": 9,
+      "size": "1536x1024",
+      "name": "vending-snow.png",
+      "prompt": "A vending machine in a snowfield, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-neumorph-kitchen",
+      "lane": "wall",
+      "every": 12,
+      "size": "1536x1024",
+      "name": "keeper-kitchen.png",
+      "prompt": "A lighthouse keeper's kitchen, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "wall-neumorph-sleep",
+      "lane": "wall",
+      "every": 4,
+      "size": "1536x1024",
+      "name": "frieren-sleep.png",
+      "prompt": "Frieren sleeping in a field of flowers, 4k, realistic, neumorphism."
+    },
 
     {
       "id": "fleet-docs-hero",
@@ -247,6 +285,119 @@
       "size": "1536x1024",
       "name": "terminal-texture.png",
       "prompt": "An abstract wide texture for a terminal-themed page: evenly spaced short vertical tick marks of varying height along the bottom, rising into empty charcoal, muted green fading to nothing at the top, flat vector, no text, no characters, no people."
+    },
+
+    {
+      "id": "blog-2026-10-28-your-closure-is-mostly-shared-substrate",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2026-10-28-your-closure-is-mostly-shared-substrate.png",
+      "prompt": "Two overlapping store graphs, most nodes shared, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2026-10-28-the-imperative-generator-trap",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2026-10-28-the-imperative-generator-trap.png",
+      "prompt": "A machine that copies itself, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2026-10-28-three-minutes-of-boot-because-dns-and-my-nas-disagreed",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2026-10-28-three-minutes-of-boot-because-dns-and-my-nas-disagreed.png",
+      "prompt": "A DNS query knocking on a closed server room door, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2026-10-28-netbooting-the-house-without-touching-the-router",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2026-10-28-netbooting-the-house-without-touching-the-router.png",
+      "prompt": "A house waking up through an invisible network, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-11-14-finally_overhauling_my_website_after_two_years",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-11-14-finally_overhauling_my_website_after_two_years.png",
+      "prompt": "A dusty desk with a clean blueprint on it, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-07-21-grokking-nixos-github-actions-cicd",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-07-21-grokking-nixos-github-actions-cicd.png",
+      "prompt": "A pipeline of identical small boxes, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-07-18-entertainment-is-a-furthering-concept",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-07-18-entertainment-is-a-furthering-concept.png",
+      "prompt": "A cinema screen in an empty field, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-07-04-static-site-generation-is-frustrating",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-07-04-static-site-generation-is-frustrating.png",
+      "prompt": "A printing press jammed with paper, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-07-01-a-new-post-with-taskfile",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-07-01-a-new-post-with-taskfile.png",
+      "prompt": "A wall of labelled switches, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-06-30-scripts-for-ai-slop-blog-machine",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-06-30-scripts-for-ai-slop-blog-machine.png",
+      "prompt": "A factory line stamping out identical articles, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-06-30-how-to-set-up-a-free-go-web-server",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-06-30-how-to-set-up-a-free-go-web-server.png",
+      "prompt": "One small server alone in an empty room, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2025-06-29-cross-comparison-on-blog",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2025-06-29-cross-comparison-on-blog.png",
+      "prompt": "Two open books side by side, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2024-03-21-longzhong-plan-first-post",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2024-03-21-longzhong-plan-first-post.png",
+      "prompt": "An old war map on a wooden table, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2024-03-20-a-conflicted-inter-industrial-nexus-energy-vs-tech",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2024-03-20-a-conflicted-inter-industrial-nexus-energy-vs-tech.png",
+      "prompt": "A power station and a datacentre side by side, 4k, realistic, neumorphism."
     }
   ]
 }

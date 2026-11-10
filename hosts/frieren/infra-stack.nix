@@ -330,10 +330,11 @@
 
   # The daily image allowance (100/day, no carry-over) spent by the queue in
   # lib/image-daily/briefs.json. The runner owns its own lock and day marker, so
-  # a timer that fires twice costs nothing; agy judges every plate and the
-  # leftover goes to the storybook printer. Tools are prepended to the scheduler's
-  # PATH because cpg and agy live in the user profile, not in this script's store
-  # closure.
+  # a timer that fires twice costs nothing; agy judges every plate, the blog lane
+  # crops its banner to 1200x630 with ffmpeg so the crop costs no image, and the
+  # leftover stays unspent unless STORYBOOK=1. Tools are prepended to the
+  # scheduler's PATH because cpg and agy live in the user profile, not in this
+  # script's store closure.
   imageDailyRunner = pkgs.writeShellScript "image-daily-runner" ''
     set -uo pipefail
     export PATH=${
@@ -346,6 +347,7 @@
         pkgs.findutils
         pkgs.coreutils
         pkgs.gnused
+        pkgs.ffmpeg
         pkgs.bash
       ]
     }:"$PATH"

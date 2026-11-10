@@ -25,17 +25,17 @@ tasks:
       - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh plan
 
   images:run:
-    desc: Generate the due briefs, judge each with agy, publish, and hand the rest to the storybook
+    desc: Generate the due briefs, judge each with agy, and publish what the judge kept
     summary: >
-      The nightly job's entry point. Spends the day's allowance in lane order
-      (site, wall, fleet), one plate per brief, judged by `agy` with
-      `--dangerously-skip-permissions` against a JSON schema. A named defect buys
-      one re-roll; an unjudged plate is kept on disk and never published. What
-      remains goes to the storybook printer, then the published tree is deployed.
+      The nightly entry point: spends the allowance in lane order (site, wall,
+      blog, fleet), one plate per brief, each judged by `agy`. A named defect
+      buys one re-roll; an unjudged plate stays on disk and never publishes.
+      Leftover stays unspent unless `STORYBOOK=1`, since uniform spreads were the
+      same style on every page.
 
-      Idempotent per day: a second run exits 0 unless FORCE=1. Env: `DRY=1` prints
-      the plan without spending, `LANES="wall"` narrows the run, `CAP=<n>` caps
-      the total, `PUBLISH=0` skips the deploy.
+      Idempotent per day: a second run exits 0 unless FORCE=1. Env: `DRY=1` plans
+      without spending, `LANES="wall"` narrows, `CAP=<n>` caps the total,
+      `PUBLISH=0` skips the deploy.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} STORYBOOK_DIR={{.STORYBOOK_DIR}} IMAGES_PROJECT={{.IMAGES_PROJECT}} bash scripts/task/image-daily.sh run
 
@@ -58,10 +58,21 @@ tasks:
     cmds:
       - bash scripts/task/image-daily.sh judge {{.FILE}} {{.LANE}}
 
+  images:blog:
+    desc: Print the Chirpy front matter for each published banner (DIR=… also copies the JPEGs)
+    summary: >
+      The blog lane's consumer is the Chirpy checkout, not this gallery. Each
+      banner is a 1200x630 JPEG under `{{.IMAGES_ROOT}}/published/blog/`, and
+      ffmpeg makes that crop locally, so it costs no image. Prints the `image:`
+      block Chirpy reads for the hero and og:image; `DIR=` copies the JPEGs into
+      the checkout. Same origin as the post, which is the point.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh blog {{if .DIR}}--dir "{{.DIR}}"{{end}}
+
   images:publish:
     desc: "[destructive] Stage kept assets and deploy the gallery to Cloudflare Pages"
     summary: >
-      Copies every accepted `site` and `wall` plate out of the ledger into
+      Copies every accepted `site`, `wall` and `blog` plate out of the ledger into
       `{{.IMAGES_ROOT}}/published/`, rebuilds `index.html` and `manifest.json`, and
       deploys that tree. It replaces the previous deployment, so the staging copy
       carries all earlier days rather than today's only.

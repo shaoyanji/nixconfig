@@ -2,10 +2,12 @@
 # image-daily.sh — one unattended pass over the day's image allowance.
 #
 #   image-daily.sh plan       what is due today, and what it would cost
-#   image-daily.sh run        generate, judge, keep; leftovers go to the storybook
+#   image-daily.sh run        generate, judge, keep; every verdict to the ledger
 #   image-daily.sh status     [gate] per-lane freshness, exit 1 when a lane is stale
 #   image-daily.sh judge PATH judge one file with agy and print the verdict
 #   image-daily.sh publish    copy kept assets into the published tree and deploy
+#   image-daily.sh blog [--dir PATH]
+#                             Chirpy front matter per banner, and the JPEGs copied
 #   image-daily.sh wallpaper  set the newest accepted wallpaper with swaybg
 #
 # WHY THIS EXISTS: the allowance is 100 images per day and it does not carry
@@ -29,7 +31,7 @@ BRIEFS=${BRIEFS:-$repo/lib/image-daily/briefs.json}
 # asset cannot live there without sudo. pics/generated is the writable, devji-owned
 # neighbour.
 IMAGES_ROOT=${IMAGES_ROOT:-/Volumes/data/pics/generated}
-LANES_ORDER=(site wall fleet)
+LANES_ORDER=(site wall blog fleet)
 PROJECT=${PROJECT:-bountystash-assets}
 LEDGER=$IMAGES_ROOT/ledger.jsonl
 STAGE=$IMAGES_ROOT/.judge
@@ -237,12 +239,30 @@ run_lane() { # lane budget
 # The published tree accumulates; a deploy replaces the whole site, so it must
 # carry every earlier day or the history disappears on the second run.
 stage_publish() {
-  local day file rel
+  local day file rel out
   while IFS= read -r file; do
     rel=${file#"$IMAGES_ROOT/src/"}
+    if [ "$lane" = "blog" ]; then
+      # 3:2 out of the generator, 1200x630 in the page. The crop is local work,
+      # so it costs no image and keeps og:image at a few hundred KB instead of
+      # the 2 MB PNG.
+      out=$IMAGES_ROOT/published/blog/$(basename "${file%.png}").jpg
+      banner_crop "$file" "$out" || say "blog: could not crop $file"
+      continue
+    fi
     mkdir -p "$IMAGES_ROOT/published/$(dirname "$rel")"
     cp -f "$file" "$IMAGES_ROOT/published/$rel"
   done < <(jq -r --arg l "$lane" 'select(.verdict == "keep" and .lane == $l) | .path' "$LEDGER" 2>/dev/null | sort -u)
+}
+
+# ffmpeg is the only image tool on this host (no magick, no vips, no cwebp) and
+# it is enough for the one transform this pipeline needs: cover-crop to 1200x630.
+banner_crop() { # png jpg
+  command -v ffmpeg >/dev/null 2>&1 || { say "ffmpeg is not on PATH"; return 1; }
+  mkdir -p "$(dirname "$2")"
+  ffmpeg -loglevel error -y -i "$1" \
+    -vf "scale=1200:630:force_original_aspect_ratio=increase,crop=1200:630" \
+    -q:v 3 "$2"
 }
 
 build_index() {
@@ -253,10 +273,10 @@ build_index() {
     printf '<style>body{font:14px/1.5 ui-monospace,monospace;background:#1e1e2e;color:#cdd6f4;margin:2rem}img{max-width:320px;margin:.4rem;border:1px solid #45475a}h2{color:#89dceb;margin-top:2rem}</style>\n'
     printf '<h1>bountystash assets</h1><p>Generated assets. Regenerated on a schedule; nothing here is hand-made.</p>\n'
     local lane
-    for lane in site wall; do
+    for lane in site wall blog; do
       [ -d "$IMAGES_ROOT/published/$lane" ] || continue
       printf '<h2>%s</h2>\n' "$lane"
-      find "$IMAGES_ROOT/published/$lane" -name '*.png' | sort -r |
+      find "$IMAGES_ROOT/published/$lane" \( -name '*.png' -o -name '*.jpg' \) | sort -r |
         while IFS= read -r f; do
           rel=${f#"$IMAGES_ROOT/published/"}
           printf '<a href="/%s"><img src="/%s" alt="%s"></a>\n' "$rel" "$rel" "$rel"
@@ -265,7 +285,7 @@ build_index() {
   } >"$out"
   # A manifest is what a consumer (the site, a wallpaper sync) reads instead of
   # scraping the gallery.
-  find "$IMAGES_ROOT/published" -name '*.png' -printf '%P\n' | sort |
+  find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) -printf '%P\n' | sort |
     jq -R . | jq -s --arg ts "$(date -u +%FT%TZ)" '{generatedAt: $ts, assets: .}' \
     >"$IMAGES_ROOT/published/manifest.json"
 }
@@ -286,7 +306,7 @@ cmd_plan() {
       "$(lane_budget "$lane")" "$(lane_setting "$lane" max_age_days)"
     [ "$n" -gt 0 ] && printf '%s\n' "$rows" | awk -F'\t' '{printf "         - %-22s %s\n", $1, $3}'
   done
-  printf '  leftover after the queue: %s (storybook takes them)\n' "$((rem - total))"
+  printf '  leftover after the queue: %s (unspent unless STORYBOOK=1)\n' "$((rem - total))"
 }
 
 cmd_run() {
@@ -318,14 +338,18 @@ cmd_run() {
 
   # Whatever is left is discretionary: the storybook project takes it, and the
   # printer is idempotent, so a nearly-finished book simply stops.
+  # Opt-in, not default. Two books of uniform spreads filled the allowance with
+  # the same style on every page, which is the one thing a 100-image day should
+  # not buy; a varied bank is worth more than 32 plates of the same look.
   local left
   left=$(remaining || echo 0)
-  if [ "$left" -gt 0 ] && [ -n "${STORYBOOK_DIR:-}" ] && [ -f "$repo/.agents/skills/cpg-storybook/scripts/storybook.py" ]; then
+  if [ "${STORYBOOK:-0}" = "1" ] && [ "$left" -gt 0 ] && [ -n "${STORYBOOK_DIR:-}" ] &&
+    [ -f "$repo/.agents/skills/cpg-storybook/scripts/storybook.py" ]; then
     say "storybook: $left images left, printing $((left / 3)) spread(s)"
     [ "${DRY:-0}" = "1" ] || python3 "$repo/.agents/skills/cpg-storybook/scripts/storybook.py" \
       run --limit "$((left / 3))" || say "storybook stopped early (see its ledger)"
   elif [ "$left" -gt 0 ]; then
-    say "leftover: $left images unused (set STORYBOOK_DIR to spend them)"
+    say "leftover: $left images unused (STORYBOOK=1 with STORYBOOK_DIR to spend them)"
   fi
 
   if [ "${PUBLISH:-1}" = "1" ] && [ "${DRY:-0}" != "1" ]; then
@@ -378,7 +402,7 @@ cmd_publish() {
   need jq
   local lane
   [ -d "$IMAGES_ROOT/src" ] || die "nothing generated yet under $IMAGES_ROOT/src"
-  for lane in site wall; do
+  for lane in site wall blog; do
     [ "$(lane_setting "$lane" publish)" = "true" ] || continue
     stage_publish
   done
@@ -390,6 +414,26 @@ cmd_publish() {
   fi
   bash "$repo/scripts/task/pages-deploy.sh" "$IMAGES_ROOT/published" \
     --project-name="$PROJECT" --branch=main
+}
+
+# The consumer of the blog lane is a Chirpy checkout, not this gallery: hand over
+# the front matter the theme reads for the in-page hero and for og:image, and the
+# JPEG next to it when a checkout path is given.
+cmd_blog() { # [--dir PATH]
+  need jq
+  local dir="" src=$IMAGES_ROOT/published/blog f slug alt
+  if [ "${1:-}" = "--dir" ]; then dir=${2:?--dir needs a path}; fi
+  [ -d "$src" ] || die "no banners under $src yet — run images:publish first"
+  for f in "$src"/*.jpg; do
+    [ -f "$f" ] || continue
+    slug=$(basename "${f%.jpg}")
+    alt=$(jq -r --arg id "blog-$slug" '.briefs[] | select(.id == $id) | .prompt' "$BRIEFS")
+    if [ -n "$dir" ]; then
+      mkdir -p "$dir/assets/img/banners"
+      cp -f "$f" "$dir/assets/img/banners/"
+    fi
+    printf 'image:\n  path: /assets/img/banners/%s.jpg\n  alt: %s\n\n' "$slug" "${alt:-$slug}"
+  done
 }
 
 cmd_wallpaper() {
@@ -410,6 +454,7 @@ case "${1:-plan}" in
   status) cmd_status ;;
   judge) shift && cmd_judge "$@" ;;
   publish) cmd_publish ;;
+  blog) shift && cmd_blog "$@" ;;
   wallpaper) cmd_wallpaper ;;
-  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|wallpaper" ;;
+  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|blog [--dir PATH]|wallpaper" ;;
 esac

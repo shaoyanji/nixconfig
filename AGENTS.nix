@@ -5721,7 +5721,7 @@
       status = "IN FLIGHT";
       priority = "P2";
       date = "2026-11-09";
-      summary = "jobby and appflow do one job in two languages and neither is a tool. The Postgres cutover (86bdb73b, 2026-11-03) made the archive API the writer, so this plan reads and writes rows instead of rebuilding the database from applications.json. M0 (13 packages green) and M1 (lossless JSON, 40/40 statuses classified) are delivered; one Go binary with `jobby tui` and `jobby <verb>` still owns JD intake, the packet, the radar and derived actions.";
+      summary = "jobby and appflow do one job in two languages and neither is a tool. Since the Postgres cutover (86bdb73b) the archive API is the writer, so this plan reads and writes rows instead of rebuilding from applications.json. M0 (13 packages green) and M1 (lossless JSON, 40/40 statuses) are delivered; one Go binary with `jobby tui` and `jobby <verb>` owns JD intake, the packet and derived actions.";
       refs = {
         modules = ["modules/config/nu/jobby.nu" "taskfiles/apps.yml" "flake/cli.nix" "modules/nixoshmsymlinks.nix"];
         tasks = ["apps:list" "apps:update" "apps:export"];
@@ -5733,23 +5733,20 @@
         Neither composes with the other, and neither is a tool.
 
         **The rule.** The archive database is the only writer since 86bdb73b (2026-11-03):
-        `applications.json` is an export (`appflow-sync --export`), and jobby must not rebuild
-        the table from it — a copy frozen in the workflow checkout would revert rows the mail
-        hub discovered. A SQLite trigger dies at the next sync; the trigger is a transition in
-        the writer: `jobby tick` derives due actions into an append-only ledger and writes
-        through `/api/application-update`, and a second run changes nothing.
+        `applications.json` is an export, and jobby must not rebuild the table from it — a copy
+        frozen in the workflow checkout would revert rows the mail hub discovered. A SQLite
+        trigger dies at the next sync; `jobby tick` derives due actions into an append-only ledger
+        and writes through `/api/application-update`, and a second run changes nothing.
 
-        **Delivered.** M0 hydrated the clone 4a637e6 -> a5107bf (0 ahead, 13 behind) with build,
-        vet and tests green over 13 packages. M1 added `internal/apps` and `cmd/jobby`: the
-        encoder reproduces Python's bytes (export sha256 `5224f960…`), the rebuild matches the
-        deployed cache row for row (the 141-row file, 0 diff; Postgres held 157 after discovery), all 40 status
-        spellings classify, and `jobby set` rewrites one record through the same tree.
+        **Delivered.** M0 hydrated the clone 4a637e6 -> a5107bf with build, vet and tests green
+        over 13 packages. M1 added `internal/apps` and `cmd/jobby`: the encoder reproduces
+        Python's bytes (sha256 `5224f960…`), the rebuild matches the deployed cache row for row
+        (141-row file, 0 diff; Postgres held 157), all 40 statuses classify, `jobby set` rewrites one.
 
-        **M2 measured.** Six lens/language renders at budget 2 all fit 2 pages at 10.0pt with
-        56-60 lines on page 1; each letter is 1 page, 19 lines. The 54 Typst packets compile to
-        108 documents, all 108 PASS the three rules (letters 23-34 lines): verdicts agree,
-        coverage does not — the audit reads `dist/` alone, 2 of 108. One page is unreachable
-        even at 9.0pt, which leaves 11 lines on page 2, one above the rule.
+        **M2 measured.** Six lens/language renders at budget 2 fit 2 pages at 10.0pt (56-60
+        lines on page 1; each letter 1 page, 19 lines). The 54 Typst packets compile to 108
+        documents, all PASS the three rules: verdicts agree, coverage does not — the audit reads
+        `dist/` alone, 2 of 108. One page needs 9.0pt and still leaves 11 lines on page 2.
 
         **Remaining.** M3 radar over `himalaya envelope list` with a measured agreement rate
         before any send; M4 `jobby tick` idempotence; M5 TUI over the same verbs; M6
@@ -5758,9 +5755,8 @@
         **No auth layer.** himalaya, the llm wrapper and the Jev router hold every credential;
         jobby stores none and prints none.
 
-        **Open.** Which resume is canonical; when the workflow checkout is archived now that its
-        JSON is an export; where the timer runs; whether DuckDB analytics and the HTML dashboard
-        survive. The dashboard is `services.appflowBoard`, and it already reads the database.
+        **Open.** Which resume is canonical; when the workflow checkout is archived; where the
+        timer runs; whether DuckDB analytics and the dashboard (`services.appflowBoard`) survive.
       '';
     };
 
@@ -6049,9 +6045,9 @@
     image-daily-queue = {
       title = "The 100-image day runs itself: a queue with a freshness promise, agy as judge";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "BLOCKED";
       date = "2026-11-10";
-      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets that refresh themselves: nothing is published that a judge has not passed, and the leftover prints one storybook spread.";
+      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Suspended 2026-11-10 — the wall prompts failed taste review, so the timer is gone until they pass.";
       refs = {
         hosts = ["frieren"];
         modules = [
@@ -6081,9 +6077,14 @@
         asset is older than its `max_age_days`; a green timer says nothing about
         content.
 
-        **Open.** The Pages project needs `images:publish:init` once before the first
-        nightly publish, and the 06:10 job needs a frieren deploy to start. Wallpaper
-        rotation on a dwl host is `images:wallpaper` by hand, not yet a timer.
+        **Suspended 2026-11-10.** The first full run kept 20 plates before the
+        generator answered 429: Frieren in neumorph style passed, the flat-vector
+        wall briefs read as geometry SVG could ship. The wall bank is down to six,
+        the `agentScheduler` job and its runner are removed, and `images:run` is
+        by hand until the prompts pass review.
+
+        **Blocker.** A verdict on the four-word shape: the named subject, not the
+        quality tokens, is what renders. `images:wallpaper` stays by hand on dwl.
       '';
     };
   };

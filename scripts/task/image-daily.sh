@@ -323,7 +323,10 @@ build_index() {
         public_id: (.path | sub("\\.(png|jpg|jpeg|webp)$"; "")),
         lane: (.path | split("/")[0]),
         name: (.path | split("/") | last),
-        day: (.path | try (capture("(?<d>[0-9]{4}-[0-9]{2}-[0-9]{2})").d) catch "")
+        # `capture` yields no value when the pattern is absent — that is not an
+        # error, so `try/catch` never sees it, and an empty `day` drops the whole
+        # object out of `map`. A blog banner carries its date in the slug instead.
+        day: ((.path | capture("(?<d>[0-9]{4}-[0-9]{2}-[0-9]{2})").d) // "")
       }
       | . as $a
       | . + {

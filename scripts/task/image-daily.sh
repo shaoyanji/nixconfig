@@ -21,12 +21,15 @@
 # lane's last accepted asset for that id is older than that, so the runner
 # refreshes itself without anybody editing a rota.
 #
-# The two rules that keep it unattended:
+# The rules that keep it unattended:
 #   1. Nothing is kept that a judge has not passed. agy reads the PNG and
 #      answers the schema; a judge that cannot answer leaves the plate
 #      `unjudged` — kept on disk, never published. Never blind-accept.
-#   2. Every decision lands in the ledger (`ledger.jsonl`), so `status` can say
-#      a lane is stale without trusting a timer's green light.
+#   2. Every generation attempt lands in the ledger (`ledger.jsonl`) with the
+#      prompt that produced it, so `status` can say a lane is stale without
+#      trusting a timer's green light and the re-roll rate is readable later.
+#   3. A brief that spends three images without a keep is parked for a week, so
+#      a prompt the judge keeps refusing costs a few plates, not every slot.
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
@@ -65,42 +68,86 @@ epoch() { date -d "$1" +%s 2>/dev/null; }
 # --- ledger -----------------------------------------------------------------
 # One row per generation attempt. The ledger is append-only: a re-roll is a new
 # row, never an edit, so the re-roll rate is readable later.
-record() { # day lane brief path verdict reason
+record() { # day lane brief path verdict reason [prompt] [attempt] [rev]
   [ -d "$IMAGES_ROOT" ] || mkdir -p "$IMAGES_ROOT"
   jq -nc --arg ts "$(date -u +%FT%TZ)" --arg day "$1" --arg lane "$2" \
     --arg brief "$3" --arg path "$4" --arg verdict "$5" --arg reason "$6" \
+    --arg prompt "${7:-}" --argjson attempt "${8:-1}" --argjson rev "${9:-1}" \
     '{ts: $ts, day: $day, lane: $lane, brief: $brief, path: $path,
-      verdict: $verdict, reason: $reason}' >>"$LEDGER"
+      verdict: $verdict, reason: $reason, prompt: $prompt, attempt: $attempt,
+      rev: $rev}' >>"$LEDGER"
 }
 
-# The last day a brief was accepted, empty when it never was.
-last_keep() {
+# The last day a brief was accepted at its current revision, empty when it never
+# was. A rewritten prompt is a new revision: the plate the old sentence made must
+# not count as freshness, or a fixed brief keeps its defect for a whole `every`.
+last_keep() { # id [rev]
   [ -f "$LEDGER" ] || return 0
-  jq -r --arg id "$1" 'select(.brief == $id and .verdict == "keep") | .day' "$LEDGER" |
+  jq -r --arg id "$1" --argjson rev "${2:-1}" \
+    'select(.brief == $id and .verdict == "keep" and (.rev // 1) == $rev) | .day' "$LEDGER" |
     sort | tail -1
 }
 
+# The last day a brief at this revision spent an image, whatever the verdict.
+last_attempt() { # id [rev]
+  [ -f "$LEDGER" ] || return 0
+  jq -r --arg id "$1" --argjson rev "${2:-1}" \
+    'select(.brief == $id and (.rev // 1) == $rev) | .day' "$LEDGER" | sort | tail -1
+}
+
+# Images a brief has spent since its last keep, counting only the verdicts that
+# judge the prompt: `unjudged` and `failed` are the judge or the pool falling
+# over, and repeating those would park a brief for somebody else's outage.
+strikes() { # id [rev]
+  [ -f "$LEDGER" ] || {
+    echo 0
+    return 0
+  }
+  jq -r --arg id "$1" --argjson rev "${2:-1}" \
+    'select(.brief == $id and (.rev // 1) == $rev) | .verdict' "$LEDGER" |
+    awk '/^keep$/{n=0; next} /^(reroll|reject)$/{n++} END{print n+0}'
+}
+
+# A brief that never earns a keep is parked: it returns after PARK_DAYS with a
+# clean slate, so a prompt the judge refuses costs a few plates a week instead of
+# every slot. Measured 2026-11-10: eight character briefs, never kept, re-rendered
+# twice per slot for weeks — 16 to 20 images a slot, every slot.
+PARK_AFTER=${PARK_AFTER:-3}
+PARK_DAYS=${PARK_DAYS:-7}
+is_parked() { # id [rev]
+  [ "$(strikes "$1" "${2:-1}")" -ge "$PARK_AFTER" ] || return 1
+  local tried
+  tried=$(last_attempt "$1" "${2:-1}")
+  [ -n "$tried" ] || return 1
+  [ $((($(epoch "$(today)") - $(epoch "$tried")) / 86400)) -lt "$PARK_DAYS" ]
+}
+
 # --- the queue --------------------------------------------------------------
-# TSV: id, lane, size, name, prompt, expect — for the briefs that are due today.
-# `expect` is what the plate must show, and it is the only field the judge can
-# hold a name against: a keep verdict says the image answers the prompt, which it
-# does when the prompt was the weak part.
+# TSV: id, lane, size, name, prompt, every, rev, expect — for the briefs that are
+# due today. `expect` is what the plate must show, and it is the only field the
+# judge can hold a name against: a keep verdict says the image answers the prompt,
+# which it does when the prompt was the weak part. It stays last because tab is
+# IFS whitespace and `read` collapses a run of it: an empty `expect` in any other
+# position shifted every field after it.
 due() {
   local filter=${1:-}
-  jq -r '.briefs[] | [.id, .lane, .size, .name, .prompt, (.every | tostring), (.expect // "")] | @tsv' "$BRIEFS" |
-    while IFS=$'\t' read -r id lane size name prompt every expect; do
+  jq -r '.briefs[] | [.id, .lane, .size, .name, .prompt, (.every | tostring), (.rev // 1), (.expect // "")] | @tsv' "$BRIEFS" |
+    while IFS=$'\t' read -r id lane size name prompt every rev expect; do
       [ -n "$filter" ] && [ "$lane" != "$filter" ] && continue
       local last now last_s
-      last=$(last_keep "$id")
+      last=$(last_keep "$id" "$rev")
       now=$(epoch "$(today)")
       last_s=$(epoch "${last:-1970-01-01}")
       [ -n "$last" ] || last_s=0
+      # FORCE=1 ignores the park, the same way it ignores freshness: a rewritten
+      # prompt is exactly what a parked brief is waiting for.
+      if [ "${FORCE:-0}" != "1" ] && is_parked "$id" "$rev"; then continue; fi
       # FORCE=1 re-renders a brief whose freshness promise has not expired. A plate
       # judged `keep` that still answered the wrong reading of its own name is the
       # case this exists for; narrow it with ONLY= so a forced pass replaces named
       # briefs and nothing else.
       if [ "${FORCE:-0}" = "1" ] || [ "$last_s" -eq 0 ] || [ $(((now - last_s) / 86400)) -ge "$every" ]; then
-        printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$lane" "$size" "$name" "$prompt" "$expect"
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$lane" "$size" "$name" "$prompt" "$rev" "$expect"
       fi
     done
 }
@@ -137,6 +184,12 @@ remaining() {
     *[!0-9]*) echo 1000 ;;
     *) echo "$n" ;;
   esac
+}
+
+# One ledger column: the judge's sentence plus the named defect, so a re-roll's
+# cause is readable without parsing two fields.
+reason_of() {
+  printf '%s' "$1" | jq -r '.reason + (if (.defect // "") == "" then "" else " | " + .defect end)'
 }
 
 # --- judging ----------------------------------------------------------------
@@ -211,8 +264,8 @@ image itself is well made, because it is the wrong subject."
 # One call, one plate. A named defect is re-rolled once; a verdict of "keep" is
 # final, and the re-roll budget is one per brief per day so a bad prompt cannot
 # eat the allowance.
-attempt() { # brief id lane size name prompt day
-  local id=$1 lane=$2 size=$3 name=$4 prompt=$5 day=$6
+attempt() { # brief id lane size name prompt day [attempt] [rev]
+  local id=$1 lane=$2 size=$3 name=$4 prompt=$5 day=$6 n=${7:-1} rev=${8:-1}
   local dir="$IMAGES_ROOT/src/$lane/$day"
   mkdir -p "$dir"
   local file="$dir/$name"
@@ -229,7 +282,7 @@ attempt() { # brief id lane size name prompt day
     if printf '%s' "$out" | grep -q '429\|RATE_LIMITED'; then
       tries=$((tries + 1))
       if [ "$tries" -gt 3 ]; then
-        record "$day" "$lane" "$id" "$file" "failed" "rate limited after $tries attempts"
+        record "$day" "$lane" "$id" "$file" "failed" "rate limited after $tries attempts" "$prompt" "$n" "$rev"
         say "$id: still rate limited after $tries attempts"
         return 2
       fi
@@ -238,7 +291,8 @@ attempt() { # brief id lane size name prompt day
       sleep "$wait"
       continue
     fi
-    record "$day" "$lane" "$id" "$file" "failed" "$(printf '%s' "$out" | tr '\n' ' ' | cut -c1-200)"
+    record "$day" "$lane" "$id" "$file" "failed" \
+      "$(printf '%s' "$out" | tr '\n' ' ' | cut -c1-200)" "$prompt" "$n" "$rev"
     say "$id: generation failed (rc=$rc)"
     return 1
   done
@@ -268,7 +322,7 @@ run_lane() { # lane budget
     return 0
   fi
 
-  while IFS=$'\t' read -r id _ size name prompt expect; do
+  while IFS=$'\t' read -r id _ size name prompt rev expect; do
     [ "$spent" -ge "$budget" ] && break
     [ "$left" -gt 0 ] || { say "allowance spent"; break; }
 
@@ -278,8 +332,11 @@ run_lane() { # lane budget
       continue
     fi
 
-    local file rc=0
-    file=$(attempt "$id" "$lane" "$size" "$name" "$prompt" "$day") || rc=$?
+    # Each generation is its own row, carrying the exact prompt it was sent:
+    # the first plate and its re-roll used to collapse into one row, which hid
+    # the re-roll rate the ledger exists to measure.
+    local file rc=0 sent=$prompt n=1
+    file=$(attempt "$id" "$lane" "$size" "$name" "$sent" "$day" "$n" "$rev") || rc=$?
     if [ "$rc" -eq 2 ]; then
       say "lane $lane: rate limited, stopping early"
       break
@@ -290,20 +347,21 @@ run_lane() { # lane budget
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
     defect=$(printf '%s' "$v" | jq -r '.defect // ""')
     spent=$((spent + 1))
+    record "$day" "$lane" "$id" "$file" "$verdict" "$(reason_of "$v")" "$sent" "$n" "$rev"
 
     if [ "$verdict" = "reroll" ] && [ -n "$defect" ] && [ "$left" -gt 0 ] && [ "$spent" -lt "$budget" ]; then
       say "$id: reroll — $defect"
       rm -f "$file"
-      file=$(attempt "$id" "$lane" "$size" "$name" "$prompt (Change only this: $defect.)" "$day") || continue
+      sent="$prompt (Change only this: $defect.)"
+      n=2
+      file=$(attempt "$id" "$lane" "$size" "$name" "$sent" "$day" "$n" "$rev") || continue
       left=$((left - 1))
       v=$(judge_image "$file" "$lane" "$intent" "$expect")
       verdict=$(printf '%s' "$v" | jq -r '.verdict')
-      defect=$(printf '%s' "$v" | jq -r '.defect // ""')
       spent=$((spent + 1))
+      record "$day" "$lane" "$id" "$file" "$verdict" "$(reason_of "$v")" "$sent" "$n" "$rev"
     fi
 
-    record "$day" "$lane" "$id" "$file" "$verdict" \
-      "$(printf '%s' "$v" | jq -r '.reason + (if (.defect // "") == "" then "" else " | " + .defect end)')"
     say "$id: $verdict"
   done <<<"$rows"
   LANE_SPENT=$spent
@@ -512,6 +570,12 @@ cmd_status() {
       printf '  %-6s %s  %sd old (max %s)\n' "$lane" "$newest" "$age" "${max:-—}"
     fi
   done
+  local parked=0 id rev
+  while IFS=$'\t' read -r id rev; do
+    if is_parked "$id" "$rev"; then parked=$((parked + 1)); fi
+  done < <(jq -r '.briefs[] | [.id, (.rev // 1)] | @tsv' "$BRIEFS")
+  [ "$parked" -eq 0 ] ||
+    printf '  %-6s %s brief(s) parked: %s rejections without a keep\n' "" "$parked" "$PARK_AFTER"
   printf '  remaining today: %s\n' "$(remaining 2>/dev/null || echo '?')"
   exit "$stale"
 }

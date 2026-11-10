@@ -6042,7 +6042,7 @@
       kind = "experiment";
       status = "OPEN";
       date = "2026-11-10";
-      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Re-armed 2026-11-10 in four capped slots, because the generator's burst limit is 25 an hour; publishing is Cloudinary plus a tagged manifest frontend, and the wall prompts still owe a taste review.";
+      summary = "A brief bank with an `every` per entry, a ledger row per generation attempt, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Re-armed 2026-11-10 in four capped slots, because the generator's burst limit is 25 an hour; publishing is Cloudinary plus a tagged manifest frontend.";
       refs = {
         hosts = ["frieren"];
         modules = [
@@ -6059,39 +6059,40 @@
         due when the ledger's last accepted row for that id is older, so the rota
         refreshes itself and nobody edits a schedule.
 
-        **Nothing publishes that a judge has not passed.** `agy
-        --dangerously-skip-permissions --mode accept-edits` reads the PNG and answers
-        keep/reroll/reject plus one named defect; a reroll spends one more image with
-        that defect as the only change. A failed judge leaves the plate `unjudged`.
+        **Nothing publishes that a judge has not passed.** `agy` reads the PNG and
+        answers keep/reroll/reject plus one named defect; a reroll spends one image
+        with that defect, and a failed judge leaves the plate `unjudged`.
 
-        **Leftover funds the book, freshness is a gate.** Unused images feed
-        `storybook.py --limit left/3`; `images:status` exits 1 when a lane's newest
-        accepted asset is older than `max_age_days`.
+        **Four slots, not one.** 01:10, 07:00, 13:20 and 21:20 hold 20/15/10/0 images
+        back for ad-hoc requests and cap the pass at 20/20/20/40; a missed slot is not
+        caught up.
 
         **Published 2026-11-10.** Fifteen blog banners sit on Cloudinary with the crop
-        in the URL and the blog's history rewritten so a clone carries no JPEG.
-        `images:post` is the whole motion — generate, judge, crop, upload, manifest,
-        front matter — and `images:publish` deploys only `index.html` plus a tagged
-        manifest: 35 plates searched and filtered in 21 KB. The counter had to learn
-        `remaining: "unlimited"`.
+        in the URL; `images:publish` deploys `index.html` and a tagged manifest, and
+        `images:status` exits 1 when a lane is older than `max_age_days`.
 
-        **Four slots, not one.** 25 an hour is the burst limit, so the timer fires at
-        00:40, 07:00, 13:20 and 19:40 with `CAP=25` each, and a missed slot is not
-        caught up. The wall prompts still owe a taste review; the rest publishes.
+        **The wall prompts were the defect.** `4k, realistic, neumorphism` named no
+        subject and named a UI surface language, so eight character briefs answered
+        with a frosted emblem and the judge kept them. Every brief now names a scene
+        and carries `expect`; `rev: 2` retires the plates the old sentences made.
 
-        **Measured 2026-11-10.** Motoko, Guts and 2B, then Rei, Asuka, Mari, Hinata and
-        Tsunade rendered from four words; an unnamed subject in the same words gave
-        geometry, and two names were refused by the safety filter. The named subject,
-        not the quality tokens, is what renders.
+        **Parked, not re-rolled forever.** Three images without a keep parks a brief for
+        a week (`PARK_AFTER`/`PARK_DAYS`) and `status` counts the set. Eight never-kept
+        briefs used to be due every slot — 16 to 20 plates a slot — while an older wall
+        keep kept `status` green. Each attempt is now its own ledger row with its
+        prompt.
+
+        **Measured 2026-11-10.** Motoko, Guts and 2B rendered from four words; a named
+        subject renders, not the quality tokens, and a name with no scene gave an emblem.
 
       '';
     };
     wall-prompt-family = {
-      title = "A wall plate reuses the brief family's prompt, never a fresh sentence";
+      title = "A wall plate comes from the brief bank, never a sentence written at the call site";
       kind = "reference";
       status = "DELIVERED";
       date = "2026-11-10";
-      summary = "The wall briefs are one family of four words, `<subject>, 4k, realistic, neumorphism.` A hand-written descriptive prompt is a different look and a different product; three plates were generated off-family before anyone read the six briefs that were already there. A requested wallpaper is a new brief in the bank, not an ad-hoc call.";
+      summary = "Every wall brief names its subject and its scene. The family's shared `4k, realistic, neumorphism` tail was retired the same day: it named no subject and named a UI surface language, and the plates came back as emblems. A requested wallpaper is a new brief in the bank, never a prompt written at the call site.";
       refs = {
         hosts = ["frieren"];
         modules = ["lib/image-daily/briefs.json" "scripts/task/image-daily.sh"];
@@ -6105,14 +6106,22 @@
         off-family and was deleted, two never rendered. That is an AI tell as much as a
         bug — a confident invented style where a stored one was one `jq` away.
 
-        **The rule.** A requested wallpaper is added to `briefs.json` as a brief with the
-        family prompt and its own `every`, so the queue renders it in the same look as
-        its neighbours and owns it afterwards. `cpg image` by hand is for a one-off that
-        is not a wallpaper and will not join the bank.
+        **Then the family itself was the defect.** `<subject>, 4k, realistic,
+        neumorphism.` named the character and then described a UI surface; the eight
+        character briefs answered with frosted emblems, and the judge kept every one
+        because the lane intent asked for neumorphism and only eight briefs said what
+        the plate had to show. The lane intent now asks for an illustrated scene, every
+        brief names a scene and carries `expect`, and `rev: 2` on the rewritten wall
+        briefs stops the emblem plates from counting as fresh.
+
+        **The rule.** A requested wallpaper is added to `briefs.json` as a brief with a
+        named subject, a scene and its own `every`, so the queue owns it afterwards and
+        the judge can hold the plate against it. `cpg image` by hand is for a one-off
+        that is not a wallpaper and will not join the bank.
 
         **Exit.** `jq -r '.briefs[] | select(.lane == "wall") | .prompt'`
-        `lib/image-daily/briefs.json` prints one family line per wall brief; the note
-        gates and `checks:prose` stay green.
+        `lib/image-daily/briefs.json` prints one scene per wall brief and no shared style
+        tail; the note gates and `checks:prose` stay green.
       '';
     };
   };

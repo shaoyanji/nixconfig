@@ -1,5 +1,5 @@
 {
-  "_comment": "The daily image queue. A brief is due when its lane's last accepted asset for that id is older than `every` days, so nothing here needs editing to keep the queue alive. `name` is the path under src/<lane>/<day>/ and, when the lane publishes, under published/<lane>/<day>/. `every` is the freshness promise; `site` also carries the page the asset belongs to.",
+  "_comment": "The daily image queue. A brief is due when its lane's last accepted asset for that id is older than `every` days, so nothing here needs editing to keep the queue alive. `name` is the path under src/<lane>/<day>/ and, when the lane publishes, under published/<lane>/<day>/. `every` is the freshness promise; `site` also carries the page the asset belongs to. `expect` is what the plate must show, and it is what lets the judge call a literal reading of a name a reroll. No prompt carries a shared style tail: the subject and the scene are the brief. `rev` bumps when a prompt is rewritten: a keep made at an older revision no longer counts as fresh, so the old plate is replaced instead of protecting its defect for a whole `every`.",
   "lanes": {
     "site": {
       "budget": 24,
@@ -11,7 +11,7 @@
       "budget": 56,
       "max_age_days": 4,
       "publish": true,
-      "intent": "a desktop wallpaper for a dwl session on a 1024x600 or 1920x1080 panel, 4k realistic neumorphism"
+      "intent": "an illustrated desktop wallpaper for a dwl session at 1920x1080 or 1024x600: one scene with a clear subject and focal point, drawn in a definite illustrative style, never a UI panel, an icon or an emblem"
     },
     "blog": {
       "budget": 6,
@@ -92,12 +92,94 @@
       "prompt": "An index card for a work listing: a neat stack of three offset rectangles in muted sage, cream and graphite, one corner folded, flat vector with a soft long shadow, no text, no people, wide aspect."
     },
     {
+      "id": "wall-char-frieren-cyberpunk",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "frieren-cyberpunk.png",
+      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End, standing on a rain-slick street in a neon-lit city at night, seen from the waist up, cel-shaded anime illustration, cyan and magenta light on her face, no text.",
+      "expect": "an anime character portrait of Frieren in a neon city, never a city with nobody in it",
+      "rev": 2
+    },
+    {
+      "id": "wall-char-fern",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "fern.png",
+      "prompt": "Fern, the mage from the anime Frieren: Beyond Journey's End, standing in a sunlit meadow with a distant village behind her, holding her staff, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "an anime character portrait of Fern, never a fern plant or a leaf",
+      "rev": 2
+    },
+    {
+      "id": "wall-char-stark",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "stark.png",
+      "prompt": "Stark, the warrior from the anime Frieren: Beyond Journey's End, resting an axe on his shoulder in an autumn mountain pass, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "an anime character portrait of Stark, never a power symbol or a button",
+      "rev": 2
+    },
+    {
+      "id": "wall-char-eisen",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "eisen.png",
+      "prompt": "Eisen, the dwarf warrior from the anime Frieren: Beyond Journey's End, standing in a torch-lit stone hall with his shield at his side, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "an anime character portrait of Eisen, never a periodic-table tile or a metal object",
+      "rev": 2
+    },
+    {
+      "id": "wall-char-himmel",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "himmel.png",
+      "prompt": "Himmel, the hero from the anime Frieren: Beyond Journey's End, standing on a hill at sunrise with a town in the distance, sword sheathed, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "an anime character portrait of Himmel, never a sky or a weather widget",
+      "rev": 2
+    },
+    {
+      "id": "wall-char-heiter",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "heiter.png",
+      "prompt": "Heiter, the priest from the anime Frieren: Beyond Journey's End, holding a wine cup and a holy staff in a candle-lit church, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "an anime character portrait of Heiter, never a dashboard or a settings panel",
+      "rev": 2
+    },
+    {
+      "id": "wall-char-uebel",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "uebel.png",
+      "prompt": "Übel, the mage from the anime Frieren: Beyond Journey's End, drawing a thin thread of magic between her fingers in a dim forest, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "an anime character portrait of Übel, never a devil or an evil-face icon",
+      "rev": 2
+    },
+    {
+      "id": "wall-char-methode",
+      "lane": "wall",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "methode.png",
+      "prompt": "Methode, the mage from the anime Frieren: Beyond Journey's End, reading a spellbook in a library lit by floating lamps, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "an anime character portrait of Methode, never a settings row or a button",
+      "rev": 2
+    },
+    {
       "id": "wall-neumorph-frieren",
       "lane": "wall",
       "every": 3,
       "size": "1536x1024",
       "name": "frieren-neumorph.png",
-      "prompt": "Frieren, 4k, realistic, neumorphism."
+      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End, walking a stone path through a wide flower meadow toward distant mountains, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "Frieren walking in a meadow, never an abstract emblem or a UI panel",
+      "rev": 2
     },
     {
       "id": "wall-neumorph-crt",
@@ -105,7 +187,9 @@
       "every": 9,
       "size": "1536x1024",
       "name": "crt-sand.png",
-      "prompt": "A CRT monitor half-buried in sand, 4k, realistic, neumorphism."
+      "prompt": "A beige CRT monitor half-buried in pale dune sand, its screen dark and dust-filmed, rippled sand in the foreground, illustrated scene, warm late-afternoon light, no text.",
+      "expect": "a CRT monitor half-buried in sand, never a flat abstract shape",
+      "rev": 2
     },
     {
       "id": "wall-neumorph-diver",
@@ -113,7 +197,9 @@
       "every": 9,
       "size": "1536x1024",
       "name": "diver-cathedral.png",
-      "prompt": "A deep-sea diver in a cathedral, 4k, realistic, neumorphism."
+      "prompt": "A deep-sea diver in a brass helmet walking down the nave of a flooded gothic cathedral, shafts of green light through the water, illustrated scene, no text.",
+      "expect": "a diver inside a cathedral nave underwater, never a diving emblem or icon",
+      "rev": 2
     },
     {
       "id": "wall-neumorph-vending",
@@ -121,7 +207,9 @@
       "every": 9,
       "size": "1536x1024",
       "name": "vending-snow.png",
-      "prompt": "A vending machine in a snowfield, 4k, realistic, neumorphism."
+      "prompt": "A lit vending machine standing alone in a snowfield at night, its glow the only light, falling snow, illustrated scene, no text.",
+      "expect": "a vending machine standing in snow, never a vending icon or a UI card",
+      "rev": 2
     },
     {
       "id": "wall-neumorph-kitchen",
@@ -129,7 +217,9 @@
       "every": 12,
       "size": "1536x1024",
       "name": "keeper-kitchen.png",
-      "prompt": "A lighthouse keeper's kitchen, 4k, realistic, neumorphism."
+      "prompt": "A lighthouse keeper's small kitchen at dusk, a kettle on a stove and a rain-streaked window looking out to sea, illustrated scene, warm lamp light, no text.",
+      "expect": "a kitchen interior with a window to the sea, never a kitchen appliance icon",
+      "rev": 2
     },
     {
       "id": "wall-neumorph-sleep",
@@ -137,7 +227,9 @@
       "every": 4,
       "size": "1536x1024",
       "name": "frieren-sleep.png",
-      "prompt": "Frieren sleeping in a field of flowers, 4k, realistic, neumorphism."
+      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End, asleep in a field of white flowers with her staff beside her, seen from a low angle, cel-shaded anime illustration, soft morning light, no text.",
+      "expect": "Frieren asleep in a flower field, never an abstract emblem or a UI panel",
+      "rev": 2
     },
     {
       "id": "fleet-docs-hero",
@@ -193,7 +285,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2026-10-28-your-closure-is-mostly-shared-substrate.png",
-      "prompt": "Two overlapping store graphs, most nodes shared, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a pinboard on a dark wall, two overlapping diagrams of identical small boxes pinned to it, most boxes shared between the two, warm lamp light, shallow depth of field, no readable text."
     },
     {
       "id": "blog-2026-10-28-the-imperative-generator-trap",
@@ -201,7 +293,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2026-10-28-the-imperative-generator-trap.png",
-      "prompt": "A machine that copies itself, 4k, realistic, neumorphism."
+      "prompt": "A photograph of an old photocopier in a bare workshop, its output tray stacked with identical pages, dust drifting in a shaft of window light, no readable text."
     },
     {
       "id": "blog-2026-10-28-three-minutes-of-boot-because-dns-and-my-nas-disagreed",
@@ -209,7 +301,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2026-10-28-three-minutes-of-boot-because-dns-and-my-nas-disagreed.png",
-      "prompt": "A DNS query knocking on a closed server room door, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a closed steel server-room door at the end of a dim corridor, one small blinking indicator beside the handle, cold fluorescent light, no text."
     },
     {
       "id": "blog-2026-10-28-netbooting-the-house-without-touching-the-router",
@@ -217,7 +309,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2026-10-28-netbooting-the-house-without-touching-the-router.png",
-      "prompt": "A house waking up through an invisible network, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a quiet suburban house at blue hour, faint warm light in every window, a thin cable running from the eaves to a small box on the wall, no text."
     },
     {
       "id": "blog-2025-11-14-finally_overhauling_my_website_after_two_years",
@@ -225,7 +317,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-11-14-finally_overhauling_my_website_after_two_years.png",
-      "prompt": "A dusty desk with a clean blueprint on it, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a dusty workbench with a fresh blueprint unrolled over it, a desk lamp casting a hard pool of light, no readable text."
     },
     {
       "id": "blog-2025-07-21-grokking-nixos-github-actions-cicd",
@@ -233,7 +325,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-07-21-grokking-nixos-github-actions-cicd.png",
-      "prompt": "A pipeline of identical small boxes, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a conveyor belt in a clean workshop carrying a row of identical small cardboard boxes under strip lights, no text."
     },
     {
       "id": "blog-2025-07-18-entertainment-is-a-furthering-concept",
@@ -241,7 +333,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-07-18-entertainment-is-a-furthering-concept.png",
-      "prompt": "A cinema screen in an empty field, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a blank cinema screen standing alone in a grass field at dusk, long shadows toward the camera, no text."
     },
     {
       "id": "blog-2025-07-04-static-site-generation-is-frustrating",
@@ -249,7 +341,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-07-04-static-site-generation-is-frustrating.png",
-      "prompt": "A printing press jammed with paper, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a letterpress machine with paper fanned and jammed through its rollers, ink-stained metal, close crop, no readable text."
     },
     {
       "id": "blog-2025-07-01-a-new-post-with-taskfile",
@@ -257,7 +349,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-07-01-a-new-post-with-taskfile.png",
-      "prompt": "A wall of labelled switches, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a wall of identical toggle switches in a control room, one switch flipped, enamel labels worn too far to read, no text."
     },
     {
       "id": "blog-2025-06-30-scripts-for-ai-slop-blog-machine",
@@ -265,7 +357,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-06-30-scripts-for-ai-slop-blog-machine.png",
-      "prompt": "A factory line stamping out identical articles, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a factory line stamping identical paper sheets, stacks of copies receding into the background, no readable text."
     },
     {
       "id": "blog-2025-06-30-how-to-set-up-a-free-go-web-server",
@@ -273,7 +365,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-06-30-how-to-set-up-a-free-go-web-server.png",
-      "prompt": "One small server alone in an empty room, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a single small server on a metal shelf in a large empty room, one cable trailing to a socket, cold overhead light, no text."
     },
     {
       "id": "blog-2025-06-29-cross-comparison-on-blog",
@@ -281,7 +373,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2025-06-29-cross-comparison-on-blog.png",
-      "prompt": "Two open books side by side, 4k, realistic, neumorphism."
+      "prompt": "A photograph of two open books side by side on a wooden table, margins filled with pencil notes, warm window light, no readable text."
     },
     {
       "id": "blog-2024-03-21-longzhong-plan-first-post",
@@ -289,7 +381,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2024-03-21-longzhong-plan-first-post.png",
-      "prompt": "An old war map on a wooden table, 4k, realistic, neumorphism."
+      "prompt": "A photograph of an old war map spread on a scarred wooden table, brass dividers and a folded letter on top, low side light, no readable text."
     },
     {
       "id": "blog-2024-03-20-a-conflicted-inter-industrial-nexus-energy-vs-tech",
@@ -297,7 +389,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2024-03-20-a-conflicted-inter-industrial-nexus-energy-vs-tech.png",
-      "prompt": "A power station and a datacentre side by side, 4k, realistic, neumorphism."
+      "prompt": "A photograph of a coal power station and a windowless datacentre standing side by side under a grey sky, one cooling tower steaming, wide shot, no text."
     },
     {
       "id": "blog-2024-11-13-my-new-post",
@@ -305,79 +397,7 @@
       "every": 365,
       "size": "1536x1024",
       "name": "2024-11-13-my-new-post.png",
-      "prompt": "A typewriter beside a closed laptop, 4k, realistic, neumorphism."
-    },
-    {
-      "id": "wall-char-frieren-cyberpunk",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "frieren-cyberpunk.png",
-      "prompt": "Frieren in a cyberpunk city, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait in a neon city, never a city without a person in it"
-    },
-    {
-      "id": "wall-char-fern",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "fern.png",
-      "prompt": "Fern, the mage from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait, never a fern plant or a leaf"
-    },
-    {
-      "id": "wall-char-stark",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "stark.png",
-      "prompt": "Stark, the warrior from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait, never a power symbol or a button"
-    },
-    {
-      "id": "wall-char-eisen",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "eisen.png",
-      "prompt": "Eisen, the dwarf warrior from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait, never a periodic-table tile or a metal object"
-    },
-    {
-      "id": "wall-char-himmel",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "himmel.png",
-      "prompt": "Himmel, the hero from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait, never a sky or a weather widget"
-    },
-    {
-      "id": "wall-char-heiter",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "heiter.png",
-      "prompt": "Heiter, the priest from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait, never a dashboard or a settings panel"
-    },
-    {
-      "id": "wall-char-uebel",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "uebel.png",
-      "prompt": "Übel, the mage from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait, never a devil or an evil-face icon"
-    },
-    {
-      "id": "wall-char-methode",
-      "lane": "wall",
-      "every": 45,
-      "size": "1536x1024",
-      "name": "methode.png",
-      "prompt": "Methode, the mage from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
-      "expect": "an adult anime character portrait, never a settings row or a button"
+      "prompt": "A photograph of a mechanical typewriter beside a closed laptop on a desk, one sheet of paper in the roller, morning light, no readable text."
     }
   ]
 }

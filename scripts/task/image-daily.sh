@@ -5,7 +5,8 @@
 #   image-daily.sh run        generate, judge, keep; every verdict to the ledger
 #   image-daily.sh status     [gate] per-lane freshness, exit 1 when a lane is stale
 #   image-daily.sh judge PATH judge one file with agy and print the verdict
-#   image-daily.sh publish    copy kept assets into the published tree and deploy
+#   image-daily.sh publish    upload kept assets to Cloudinary, write the manifest,
+#                             deploy the search frontend
 #   image-daily.sh blog [--dir PATH]
 #                             Chirpy front matter per banner, and the JPEGs copied
 #   image-daily.sh wallpaper  set the newest accepted wallpaper with swaybg
@@ -99,8 +100,17 @@ select_lanes() {
 lane_budget() { jq -r --arg l "$1" '.lanes[$l].budget // 0' "$BRIEFS"; }
 lane_setting() { jq -r --arg l "$1" --arg k "$2" '.lanes[$l][$k] // empty' "$BRIEFS"; }
 
+# The pool answers `remaining: "unlimited"` on a lifetime plan, and the real
+# ceiling is then the hourly burst (429), not a day count. Translate it to a
+# number the arithmetic can use; every caller already treats 0 as "stop".
 remaining() {
-  cpg usage --json 2>/dev/null | jq -r '.usage.images.remaining // empty'
+  local n
+  n=$(cpg usage --json 2>/dev/null | jq -r '.usage.images.remaining // empty')
+  case "$n" in
+    '' | null) return 0 ;;
+    *[!0-9]*) echo 1000 ;;
+    *) echo "$n" ;;
+  esac
 }
 
 # --- judging ----------------------------------------------------------------
@@ -286,29 +296,33 @@ banner_crop() { # png jpg
     -q:v 3 "$2"
 }
 
+# The deployable is the frontend plus the manifest, both small: the bytes are on
+# Cloudinary, and the page fetches the manifest and searches it. Nothing here
+# copies an image into the deployed tree, so a deploy is a few KB however many
+# plates the bank holds.
 build_index() {
-  local out=$IMAGES_ROOT/published/index.html
-  mkdir -p "$IMAGES_ROOT/published"
-  {
-    printf '<!doctype html><meta charset=utf-8><title>bountystash assets</title>\n'
-    printf '<style>body{font:14px/1.5 ui-monospace,monospace;background:#1e1e2e;color:#cdd6f4;margin:2rem}img{max-width:320px;margin:.4rem;border:1px solid #45475a}h2{color:#89dceb;margin-top:2rem}</style>\n'
-    printf '<h1>bountystash assets</h1><p>Generated assets. Regenerated on a schedule; nothing here is hand-made.</p>\n'
-    local lane
-    for lane in site wall blog; do
-      [ -d "$IMAGES_ROOT/published/$lane" ] || continue
-      printf '<h2>%s</h2>\n' "$lane"
-      find "$IMAGES_ROOT/published/$lane" \( -name '*.png' -o -name '*.jpg' \) | sort -r |
-        while IFS= read -r f; do
-          rel=${f#"$IMAGES_ROOT/published/"}
-          printf '<a href="/%s"><img src="/%s" alt="%s"></a>\n' "$rel" "$rel" "$rel"
-        done
-    done
-  } >"$out"
-  # A manifest is what a consumer (the site, a wallpaper sync) reads instead of
-  # scraping the gallery.
-  find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) -printf '%P\n' | sort |
-    jq -R . | jq -s --arg ts "$(date -u +%FT%TZ)" '{generatedAt: $ts, assets: .}' \
-    >"$IMAGES_ROOT/published/manifest.json"
+  local out=$IMAGES_ROOT/published/manifest.json
+  local shell=$repo/lib/image-daily/site/index.html
+  local dist=$IMAGES_ROOT/site-dist
+  [ -f "$shell" ] || die "missing the asset frontend at $shell"
+  [ -s "$IMAGES_ROOT/published/urls.tsv" ] || die "no urls.tsv yet — the manifest is built from it"
+  mkdir -p "$dist"
+  # Rows are path, URL, bytes. `public_id` is what a person searches and what
+  # Cloudinary addresses; `day` is empty for a blog banner, whose slug carries it.
+  jq -Rn --arg ts "$(date -u +%FT%TZ)" '
+    [inputs | select(length > 0) | split("\t") | {path: .[0], url: .[1], bytes: ((.[2] // "0") | tonumber)}]
+    | map(. + {
+        public_id: (.path | sub("\\.(png|jpg|jpeg|webp)$"; "")),
+        lane: (.path | split("/")[0]),
+        name: (.path | split("/") | last),
+        day: (.path | try (capture("(?<d>[0-9]{4}-[0-9]{2}-[0-9]{2})").d) catch "")
+      })
+    | sort_by(.path)
+    | {generatedAt: $ts, count: length, assets: .}
+  ' <"$IMAGES_ROOT/published/urls.tsv" >"$out"
+  cp -f "$shell" "$dist/index.html"
+  cp -f "$out" "$dist/manifest.json"
+  say "manifest: $(jq -r '.count' "$out") asset(s), $(du -sh "$dist" | cut -f1) of frontend"
 }
 
 # --- subcommands ------------------------------------------------------------
@@ -327,7 +341,11 @@ cmd_plan() {
       "$(lane_budget "$lane")" "$(lane_setting "$lane" max_age_days)"
     [ "$n" -gt 0 ] && printf '%s\n' "$rows" | awk -F'\t' '{printf "         - %-22s %s\n", $1, $3}'
   done
-  printf '  leftover after the queue: %s (unspent unless STORYBOOK=1)\n' "$((rem - total))"
+  if [ "$rem" -ge 1000 ]; then
+    printf '  leftover after the queue: unlimited on this plan (the hourly burst is the ceiling)\n'
+  else
+    printf '  leftover after the queue: %s (unspent unless STORYBOOK=1)\n' "$((rem - total))"
+  fi
 }
 
 cmd_run() {
@@ -445,10 +463,19 @@ cmd_publish() {
       say "publish: upload failed for $rel"
       return 1
     }
-    printf '%s\t%s\n' "$rel" "$url" >>"$IMAGES_ROOT/published/urls.tsv"
+    printf '%s\t%s\t%s\n' "$rel" "$url" "$(stat -c%s "$file")" >>"$IMAGES_ROOT/published/urls.tsv"
     say "uploaded $rel"
   done < <(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | sort)
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
+  build_index
+  # The Pages project is the search frontend, so it deploys index.html and
+  # manifest.json and nothing else. `PAGES=0` leaves the manifest local.
+  if [ "${PAGES:-1}" = "1" ]; then
+    local project=${PROJECT:-bountystash-assets}
+    nix-shell -p wrangler --run \
+      "bash '$repo/scripts/task/pages-deploy.sh' '$IMAGES_ROOT/site-dist' --project-name=$project --branch=main" ||
+      say "publish: the frontend deploy failed; the manifest is written locally and the site still serves the last one"
+  fi
 }
 
 # The consumer of the blog lane is a Chirpy checkout, not this gallery: hand over

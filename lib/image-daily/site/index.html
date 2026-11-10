@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bountystash assets</title>
+<meta name="description" content="Fuzzy search over the generated asset manifest. Bytes live on Cloudinary; this page only knows their names and delivery URLs.">
+<style>
+  :root {
+    --bg: #f4f2ee; --card: #fbfaf8; --ink: #1c1b19; --dim: #6d6a64;
+    --line: #e0dcd4; --acc: #0f6f6a; --mark: #ffe28a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#15171a; --card:#1c1f23; --ink:#e8e6e1; --dim:#8d9199;
+            --line:#2a2e34; --acc:#6fd7cd; --mark:#5c4a12; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  header { position:sticky; top:0; z-index:2; background:var(--bg);
+           border-bottom:1px solid var(--line); padding:1.1rem 1.25rem .9rem; }
+  h1 { font-size:1.05rem; letter-spacing:.02em; margin:0 0 .1rem; font-weight:650; }
+  .sub { color:var(--dim); font-size:.8rem; margin-bottom:.85rem; }
+  .bar { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+  input[type=search] { flex:1 1 21rem; min-width:12rem; padding:.55rem .75rem;
+    font:inherit; color:inherit; background:var(--card);
+    border:1px solid var(--line); border-radius:7px; outline:none; }
+  input[type=search]:focus { border-color:var(--acc); }
+  .chip { cursor:pointer; border:1px solid var(--line); background:var(--card);
+          color:var(--dim); border-radius:999px; padding:.35rem .8rem;
+          font-size:.78rem; letter-spacing:.02em; user-select:none; }
+  .chip[aria-pressed=true] { color:var(--bg); background:var(--acc); border-color:var(--acc); }
+  .count { color:var(--dim); font-size:.78rem; margin-left:auto; font-variant-numeric:tabular-nums; }
+  main { padding:1rem 1.25rem 3rem; }
+  .grid { display:grid; gap:.9rem; grid-template-columns:repeat(auto-fill,minmax(15rem,1fr)); }
+  article { background:var(--card); border:1px solid var(--line); border-radius:10px;
+            overflow:hidden; display:flex; flex-direction:column; }
+  .shot { display:block; aspect-ratio:1200/630; background:var(--line); }
+  .shot img { width:100%; height:100%; object-fit:cover; display:block; }
+  .meta { padding:.55rem .65rem .65rem; display:flex; gap:.5rem; align-items:baseline; }
+  .name { font-size:.82rem; word-break:break-word; }
+  .name b { background:var(--mark); color:inherit; font-weight:600; border-radius:2px; }
+  .lane { color:var(--dim); font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
+  .copy { margin-left:auto; border:1px solid var(--line); background:transparent;
+          color:var(--dim); border-radius:6px; padding:.15rem .45rem; font-size:.7rem;
+          cursor:pointer; white-space:nowrap; }
+  .copy:hover { color:var(--acc); border-color:var(--acc); }
+  .empty { color:var(--dim); padding:3rem 0; text-align:center; }
+  footer { color:var(--dim); font-size:.75rem; padding:0 1.25rem 2rem; }
+  footer code { background:var(--card); border:1px solid var(--line);
+                padding:.1rem .35rem; border-radius:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>bountystash assets</h1>
+  <div class="sub">A manifest of generated plates. The bytes are on Cloudinary, so any card below is one URL away at whatever size you ask for.</div>
+  <div class="bar">
+    <input id="q" type="search" placeholder="fuzzy search: frien, neumo, og card, blog…" autocomplete="off" spellcheck="false" aria-label="Search assets">
+    <button class="chip" data-lane="all" aria-pressed="true">all</button>
+    <button class="chip" data-lane="site">site</button>
+    <button class="chip" data-lane="wall">wall</button>
+    <button class="chip" data-lane="blog">blog</button>
+    <span class="count" id="count"></span>
+  </div>
+</header>
+<main><div class="grid" id="grid"></div><p class="empty" id="empty" hidden>nothing matches that</p></main>
+<footer>
+  Resize in the URL: <code>…/upload/<b>w_480,c_limit,f_auto,q_auto</b>/assets/wall/…png</code>.
+  The manifest is written by <code>task images:publish</code>.
+</footer>
+<script>
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const count = document.getElementById('count');
+const q = document.getElementById('q');
+let state = { assets: [], lane: 'all', needle: '' };
+
+// Cloudinary's whole point: the transform sits in the path, so one public id
+// answers every size. Inserting it beats storing four URLs per asset.
+function transform(url, t) {
+  return url.replace('/upload/', '/upload/' + t + '/');
+}
+const thumb = (a) => transform(a.url, 'w_480,c_limit,f_auto,q_auto');
+const card = (a) => transform(a.url, 'f_jpg,q_auto,w_1200,h_630,c_fill');
+
+// Subsequence match with a score that rewards runs and word starts, which is
+// what makes "frnm" find frieren-neumorph and "og console" find og/console.
+function score(needle, haystack) {
+  if (!needle) return 1;
+  const h = haystack.toLowerCase(), n = needle.toLowerCase();
+  let hi = 0, total = 0, run = 0, hits = [];
+  for (const ch of n) {
+    if (ch === ' ') { run = 0; continue; }
+    let found = -1;
+    for (let i = hi; i < h.length; i++) if (h[i] === ch) { found = i; break; }
+    if (found < 0) return 0;
+    const wordStart = found === 0 || /[\/\-_. ]/.test(h[found - 1]);
+    run = found === hi ? run + 1 : 0;
+    total += 1 + (wordStart ? 3 : 0) + Math.min(run, 4);
+    hits.push(found);
+    hi = found + 1;
+  }
+  return total / h.length + (h.startsWith(n) ? 0.6 : 0);
+}
+
+function marks(text, needle) {
+  const n = [...needle.toLowerCase()].filter((c) => c !== ' ');
+  if (!n.length) return document.createTextNode(text);
+  const frag = document.createDocumentFragment();
+  let hi = 0, buf = '';
+  for (const ch of text) {
+    const want = hi < n.length && ch.toLowerCase() === n[hi];
+    if (want) { hi++; if (buf) { frag.append(buf); buf = ''; }
+      const b = document.createElement('b'); b.textContent = ch; frag.append(b); }
+    else buf += ch;
+  }
+  if (buf) frag.append(buf);
+  return hi === n.length ? frag : document.createTextNode(text);
+}
+
+function render() {
+  const needle = state.needle.trim();
+  const rows = state.assets
+    .filter((a) => state.lane === 'all' || a.lane === state.lane)
+    .map((a) => ({ a, s: score(needle, a.public_id) + (a.public_id.includes(needle) ? 0.5 : 0) }))
+    .filter((r) => r.s > 0)
+    .sort((x, y) => (needle ? y.s - x.s : y.a.day.localeCompare(x.a.day)));
+  count.textContent = rows.length + ' / ' + state.assets.length;
+  empty.hidden = rows.length > 0;
+  grid.replaceChildren(...rows.map(({ a }) => {
+    const el = document.createElement('article');
+    const link = document.createElement('a');
+    link.className = 'shot'; link.href = a.url; link.target = '_blank'; link.rel = 'noopener';
+    const img = document.createElement('img');
+    img.loading = 'lazy'; img.decoding = 'async';
+    img.src = thumb(a); img.alt = a.public_id;
+    link.append(img);
+    const meta = document.createElement('div'); meta.className = 'meta';
+    const name = document.createElement('span'); name.className = 'name';
+    name.append(marks(a.public_id, needle));
+    const lane = document.createElement('span'); lane.className = 'lane'; lane.textContent = a.lane;
+    const copy = document.createElement('button'); copy.className = 'copy'; copy.textContent = 'copy URL';
+    copy.onclick = async () => {
+      const t = card(a);
+      try { await navigator.clipboard.writeText(t); copy.textContent = 'copied'; }
+      catch { copy.textContent = 'select it'; q.value = t; q.select(); }
+      setTimeout(() => (copy.textContent = 'copy URL'), 1200);
+    };
+    meta.append(name, lane, copy);
+    el.append(link, meta);
+    return el;
+  }));
+}
+
+function setLane(lane) {
+  state.lane = lane;
+  document.querySelectorAll('.chip').forEach((c) =>
+    c.setAttribute('aria-pressed', String(c.dataset.lane === lane)));
+  render();
+}
+
+document.querySelectorAll('.chip').forEach((c) => c.onclick = () => setLane(c.dataset.lane));
+q.addEventListener('input', () => { state.needle = q.value; render(); });
+addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+  if (e.key === 'Escape') { q.value = ''; state.needle = ''; render(); q.blur(); }
+});
+
+fetch('manifest.json', { cache: 'no-cache' })
+  .then((r) => { if (!r.ok) throw new Error('manifest.json ' + r.status); return r.json(); })
+  .then((m) => { state.assets = m.assets || []; render(); })
+  .catch((e) => { empty.hidden = false; empty.textContent = 'no manifest: ' + e.message; });
+</script>
+</body>
+</html>

@@ -6047,7 +6047,7 @@
       kind = "experiment";
       status = "BLOCKED";
       date = "2026-11-10";
-      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Suspended 2026-11-10 — the wall prompts failed taste review, so the timer is gone until they pass.";
+      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Suspended 2026-11-10 — the wall prompts failed taste review, so the timer is gone. By hand the pipeline is proven end to end: Cloudinary holds the bytes and Pages serves a manifest frontend.";
       refs = {
         hosts = ["frieren"];
         modules = [
@@ -6064,7 +6064,7 @@
         icons), `wall` (dwl wallpapers), `fleet` (nixconfig docs art).
 
         **Nothing publishes that a judge has not passed.** `agy
-        --dangerously-skip-permissions --json-schema` reads the PNG and answers
+        --dangerously-skip-permissions --mode accept-edits` reads the PNG and answers
         keep/reroll/reject plus one named defect; a reroll spends one more image with
         that defect as the only change. A judge that fails leaves the plate
         `unjudged` — on disk, never published.
@@ -6085,6 +6085,15 @@
         and Tsunade, all rendered as composed portraits from four words; an unnamed
         subject in the same words gave geometry. Two names were refused by the
         generator's safety filter, so a character bank carries that risk.
+
+        **Published 2026-11-10.** Fifteen blog banners, the last four generated once
+        the hourly 429 cleared, are on Cloudinary with the resize in the delivery URL,
+        and the blog's history is rewritten so a clone carries no JPEG at all: 2.2 MB
+        to 628 KB. `images:publish` uploads, writes `manifest.json`, and deploys only
+        `index.html` plus that manifest — a fuzzy search over 35 plates in 21 KB, where
+        the old gallery copied every plate into the deploy. The counter had to learn
+        that the pool answers `remaining: "unlimited"`; it read that as "allowance
+        spent" and spent nothing.
 
         **Blocker.** A verdict on the four-word shape: the named subject, not the
         quality tokens, is what renders. `images:wallpaper` stays by hand on dwl.

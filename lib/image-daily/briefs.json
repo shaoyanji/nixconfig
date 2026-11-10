@@ -1,0 +1,219 @@
+{
+  "_comment": "The daily image queue. A brief is due when its lane's last accepted asset for that id is older than `every` days, so nothing here needs editing to keep the queue alive. `name` is the path under src/<lane>/<day>/ and, when the lane publishes, under published/<lane>/<day>/. `every` is the freshness promise; `site` also carries the page the asset belongs to.",
+  "lanes": {
+    "site": {
+      "budget": 24,
+      "max_age_days": 45,
+      "publish": true,
+      "intent": "a hero, og card or icon for bountystash.com, matt.bountystash.com or concept.bountystash.com"
+    },
+    "wall": {
+      "budget": 56,
+      "max_age_days": 4,
+      "publish": true,
+      "intent": "a desktop wallpaper for a dwl session on a 1024x600 or 1920x1080 panel"
+    },
+    "fleet": {
+      "budget": 20,
+      "max_age_days": 90,
+      "publish": false,
+      "intent": "a nixconfig fleet illustration: docs art, an agent card or a topology figure"
+    }
+  },
+  "briefs": [
+    {
+      "id": "site-og-console",
+      "lane": "site",
+      "every": 21,
+      "size": "1536x1024",
+      "name": "og/console.png",
+      "prompt": "A brutalist developer console rendered as a flat vector poster: a single monospaced-looking block of abstract code lines on off-white paper, one cyan accent rule, hard 90-degree geometry, generous margins, no readable words, no logos, no people."
+    },
+    {
+      "id": "site-og-matt",
+      "lane": "site",
+      "every": 21,
+      "size": "1536x1024",
+      "name": "og/matt.png",
+      "prompt": "Minimal editorial card for a personal engineering portfolio: a large off-centre circle in warm ochre on warm grey paper, one thin black horizontal rule crossing it, flat ink texture, no text, no faces, wide aspect."
+    },
+    {
+      "id": "site-og-concept",
+      "lane": "site",
+      "every": 21,
+      "size": "1536x1024",
+      "name": "og/concept.png",
+      "prompt": "Concept mockup card for a bug-bounty platform: abstract layered terrain contour lines in deep indigo on pale sand, one small bright signal dot with a faint halo, flat vector, no text, no UI chrome, no people."
+    },
+    {
+      "id": "site-case-nixos",
+      "lane": "site",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "case/nixos-fleet.png",
+      "prompt": "A declarative infrastructure figure as flat vector art: eight small identical server blocks wired to one root node by perfectly orthogonal lines, muted teal and graphite, uniform stroke weight, isometric-lite, no labels, no perspective distortion, lots of white space."
+    },
+    {
+      "id": "site-hero-console",
+      "lane": "site",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "hero/console.png",
+      "prompt": "A wide abstract texture for a website hero: a fine grid of hairlines warped slightly at the centre like paper under pressure, off-white on warm grey, one soft cyan bloom, flat, no text, no objects, no figures."
+    },
+    {
+      "id": "site-icon-set",
+      "lane": "site",
+      "every": 30,
+      "size": "1024x1024",
+      "name": "icons/marks.png",
+      "prompt": "A four-by-four contact sheet of sixteen simple geometric marks: circles, chevrons, brackets, dots, each drawn in one stroke on its own off-white tile with even gutters, black ink only, uniform weight, no letters, no numbers."
+    },
+    {
+      "id": "site-card-quiet",
+      "lane": "site",
+      "every": 45,
+      "size": "1536x1024",
+      "name": "hero/quiet.png",
+      "prompt": "A calm wide background for a quiet technology website: soft horizontal bands of extremely desaturated blue and sand, a single thin horizon line, flat colour fields with a faint paper grain, nothing else, no text."
+    },
+    {
+      "id": "site-og-work",
+      "lane": "site",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "og/work.png",
+      "prompt": "An index card for a work listing: a neat stack of three offset rectangles in muted sage, cream and graphite, one corner folded, flat vector with a soft long shadow, no text, no people, wide aspect."
+    },
+
+    {
+      "id": "wall-ridge-fog",
+      "lane": "wall",
+      "every": 2,
+      "size": "1536x1024",
+      "name": "ridge-fog.png",
+      "prompt": "A desktop wallpaper: five layered mountain ridges receding into fog, muted catppuccin mocha palette on a deep charcoal #1e1e2e base, flat vector with soft gradient mist, the left third kept empty and dark for desktop icons, no text, no birds, no people."
+    },
+    {
+      "id": "wall-dunes",
+      "lane": "wall",
+      "every": 2,
+      "size": "1536x1024",
+      "name": "dunes.png",
+      "prompt": "A desktop wallpaper: minimal sand dunes as two smooth overlapping curves, warm sand and dusty rose against a deep charcoal #1e1e2e sky, flat vector with a soft grain, horizon in the lower third, no text, no objects, no people."
+    },
+    {
+      "id": "wall-fjord",
+      "lane": "wall",
+      "every": 2,
+      "size": "1024x1536",
+      "name": "fjord-tall.png",
+      "prompt": "A portrait desktop wallpaper: a narrow fjord seen from above, two dark cliffs framing a pale mint water channel, catppuccin mocha palette, flat vector with subtle banding, no text, no boats, no people."
+    },
+    {
+      "id": "wall-grid-horizon",
+      "lane": "wall",
+      "every": 2,
+      "size": "1536x1024",
+      "name": "grid-horizon.png",
+      "prompt": "A desktop wallpaper: a perspective grid floor receding to a thin luminous horizon, deep charcoal #1e1e2e above and a muted mauve grid below, flat vector, restrained synthwave without neon glare, no text, no sun, no cars."
+    },
+    {
+      "id": "wall-bamboo",
+      "lane": "wall",
+      "every": 2,
+      "size": "1024x1536",
+      "name": "bamboo-tall.png",
+      "prompt": "A portrait desktop wallpaper: silhouetted bamboo stalks in three depth layers, muted green and charcoal, soft light between the stalks, flat vector with paper grain, no text, no animals, no people."
+    },
+    {
+      "id": "wall-circuit-city",
+      "lane": "wall",
+      "every": 2,
+      "size": "1536x1024",
+      "name": "circuit-city.png",
+      "prompt": "A desktop wallpaper: a city skyline drawn as a circuit board, buildings reduced to rectangular traces with small pads, graphite on deep charcoal #1e1e2e with one teal accent path, flat vector, no text, no windows detail, no people."
+    },
+    {
+      "id": "wall-night-train",
+      "lane": "wall",
+      "every": 3,
+      "size": "1536x1024",
+      "name": "night-train.png",
+      "prompt": "A desktop wallpaper: a long train window at night reduced to a horizontal band of soft blurred lights over deep charcoal #1e1e2e, two thin rails of pale grey at the bottom, flat vector, impressionistic not photographic, no text, no people, no faces."
+    },
+    {
+      "id": "wall-terrace",
+      "lane": "wall",
+      "every": 3,
+      "size": "1024x1536",
+      "name": "terrace-tall.png",
+      "prompt": "A portrait desktop wallpaper: a bare stone terrace looking out to a hazy sea, three pale horizontal bands for sky, water and stone, one potted plant silhouette at the lower right, flat vector, muted terracotta and slate, no text, no people."
+    },
+    {
+      "id": "wall-orbit",
+      "lane": "wall",
+      "every": 3,
+      "size": "1536x1024",
+      "name": "orbit.png",
+      "prompt": "A desktop wallpaper: a small planet at the lower right with two thin orbital rings, deep charcoal #1e1e2e field, pale blue and dusty pink rings, flat vector with a faint star scatter that stays out of the left third, no text, no spacecraft, no people."
+    },
+    {
+      "id": "wall-rain-glass",
+      "lane": "wall",
+      "every": 3,
+      "size": "1536x1024",
+      "name": "rain-glass.png",
+      "prompt": "A desktop wallpaper: rain running down window glass over an out-of-focus city, dark charcoal base with soft teal and amber bokeh, flat vector approximation with long vertical streaks, calm and low contrast, no text, no people, no faces."
+    },
+
+    {
+      "id": "fleet-docs-hero",
+      "lane": "fleet",
+      "every": 60,
+      "size": "1536x1024",
+      "name": "docs-hero.png",
+      "prompt": "A wide banner for a technical documentation site: a lattice of thin connected nodes forming a gentle arc, graphite lines on warm off-white, three nodes filled teal, uniform stroke, flat vector, no text, no icons, no people."
+    },
+    {
+      "id": "fleet-agent-card",
+      "lane": "fleet",
+      "every": 60,
+      "size": "1024x1024",
+      "name": "agent-card.png",
+      "prompt": "A square card image for an autonomous agent: a single matte geometric form like a folded plane, graphite and teal on warm grey, one soft shadow, flat vector, minimal, no text, no faces, no robots."
+    },
+    {
+      "id": "fleet-cache-map",
+      "lane": "fleet",
+      "every": 60,
+      "size": "1536x1024",
+      "name": "cache-map.png",
+      "prompt": "A flat vector diagram of a content-addressed cache: three concentric arcs of small identical blocks with arrows only on the outermost arc, muted blue and grey on off-white, uniform stroke, generous margins, no labels, no text."
+    },
+    {
+      "id": "fleet-graph-lattice",
+      "lane": "fleet",
+      "every": 90,
+      "size": "1536x1024",
+      "name": "graph-lattice.png",
+      "prompt": "A knowledge-graph illustration: a sparse lattice of nodes and edges with four clusters, graphite on pale stone, two clusters tinted teal and ochre, flat vector, even spacing, no text, no labels, no people."
+    },
+    {
+      "id": "fleet-microvm-stack",
+      "lane": "fleet",
+      "every": 90,
+      "size": "1024x1024",
+      "name": "microvm-stack.png",
+      "prompt": "A square illustration of a hypervisor host running three guest machines: one large plate with three smaller plates stacked above it at an angle, muted teal and graphite, flat vector, thin outlines, no text, no logos, no people."
+    },
+    {
+      "id": "fleet-terminal-texture",
+      "lane": "fleet",
+      "every": 90,
+      "size": "1536x1024",
+      "name": "terminal-texture.png",
+      "prompt": "An abstract wide texture for a terminal-themed page: evenly spaced short vertical tick marks of varying height along the bottom, rising into empty charcoal, muted green fading to nothing at the top, flat vector, no text, no characters, no people."
+    }
+  ]
+}

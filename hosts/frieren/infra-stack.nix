@@ -328,6 +328,32 @@
     fi
   '';
 
+  # The daily image allowance (100/day, no carry-over) spent by the queue in
+  # lib/image-daily/briefs.json. The runner owns its own lock and day marker, so
+  # a timer that fires twice costs nothing; agy judges every plate and the
+  # leftover goes to the storybook printer. Tools are prepended to the scheduler's
+  # PATH because cpg and agy live in the user profile, not in this script's store
+  # closure.
+  imageDailyRunner = pkgs.writeShellScript "image-daily-runner" ''
+    set -uo pipefail
+    export PATH=${
+      lib.makeBinPath [
+        pkgs.jq
+        pkgs.git
+        pkgs.python3
+        pkgs.curl
+        pkgs.util-linux
+        pkgs.findutils
+        pkgs.coreutils
+        pkgs.gnused
+        pkgs.bash
+      ]
+    }:"$PATH"
+    export IMAGES_ROOT=/Volumes/data/pics/generated
+    export STORYBOOK_DIR=${user.home}/Documents/storybook/lantern
+    exec ${pkgs.bash}/bin/bash ${../../scripts/task/image-daily.sh} run
+  '';
+
   agySystemRunner = pkgs.writeShellScript "agy-system-runner" ''
     set -euo pipefail
 
@@ -970,6 +996,18 @@ in {
         schedule = "*-*-* 05:00:00";
         command = agySystemRunner;
         workingDirectory = "${user.home}";
+      };
+      # 06:10 local, clear of the 03:00-05:30 window. The allowance resets at
+      # 00:00 UTC, so the day's 100 are always available by the time this fires.
+      image-daily = {
+        name = "image-daily";
+        description = "Daily image queue: refresh due site/wall/fleet assets, judge with agy, publish, storybook takes the rest";
+        schedule = "*-*-* 06:10:00";
+        command = imageDailyRunner;
+        workingDirectory = "${user.home}";
+        lockFile = "/tmp/image-daily.lock";
+        nice = 10;
+        ioSchedulingClass = "best-effort";
       };
       audible-phased-liberation = {
         name = "audible-phased-liberation";

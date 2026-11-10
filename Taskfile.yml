@@ -107,6 +107,10 @@ includes:
         taskfile: taskfiles/gravatar.yml
         dir: .
         flatten: true
+    images:
+        taskfile: taskfiles/images.yml
+        dir: .
+        flatten: true
     infra:
         taskfile: taskfiles/infra.yml
         dir: .

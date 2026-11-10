@@ -1,0 +1,87 @@
+version: "3"
+
+vars:
+  # Originals live on the pool, never in the repo: an accepted plate is a 1.5 MB
+  # PNG and a day of them is not a commit. `published/` is the accumulated tree
+  # that gets deployed, so a gallery keeps its history instead of being replaced
+  # by today's folder.
+  IMAGES_ROOT: /Volumes/data/pics/generated
+  # The Pages project the site lane publishes to. Custom domains can point at it
+  # later; the pages.dev name is enough for the site and the wallpaper sync.
+  IMAGES_PROJECT: bountystash-assets
+  # Where the discretionary leftover goes. The printer is idempotent and stops
+  # when the book has no spread left, so pointing it at a finished book is free.
+  STORYBOOK_DIR: /Volumes/data/projects/storybook/lantern
+
+tasks:
+  images:plan:
+    desc: What the image queue would spend today, lane by lane, and the leftover
+    summary: >
+      Reads the brief bank (`lib/image-daily/briefs.json`), the ledger at
+      `{{.IMAGES_ROOT}}/ledger.jsonl` and `cpg usage`, and prints what is due.
+      Spends nothing, needs no agent, and answers the one question a person asks
+      before trusting a nightly job: is it going to do anything tonight.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh plan
+
+  images:run:
+    desc: Generate the due briefs, judge each with agy, publish, and hand the rest to the storybook
+    summary: >
+      The nightly job's entry point. Spends the day's allowance in lane order
+      (site, wall, fleet), one plate per brief, judged by `agy` with
+      `--dangerously-skip-permissions` against a JSON schema. A named defect buys
+      one re-roll; an unjudged plate is kept on disk and never published. What
+      remains goes to the storybook printer, then the published tree is deployed.
+
+      Idempotent per day: a second run exits 0 unless FORCE=1. Env: `DRY=1` prints
+      the plan without spending, `LANES="wall"` narrows the run, `CAP=<n>` caps
+      the total, `PUBLISH=0` skips the deploy.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} STORYBOOK_DIR={{.STORYBOOK_DIR}} IMAGES_PROJECT={{.IMAGES_PROJECT}} bash scripts/task/image-daily.sh run
+
+  images:status:
+    desc: "[gate] per-lane freshness from the ledger — exit 1 when a lane is stale"
+    summary: >
+      Answers whether the queue is keeping its promise, not whether a timer fired.
+      A lane is stale when its newest accepted asset is older than the lane's
+      `max_age_days`, or when it has never produced one. Exit 0 = fresh, 1 = stale
+      (or no ledger yet), so a sentinel can page on it without reading prose.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh status
+
+  images:judge:
+    desc: Judge one image file with agy and print the verdict JSON
+    summary: >
+      The same judge the nightly run uses, on one file — for checking a prompt
+      before it goes into the bank. Prints `{verdict, reason, defect, tags}`;
+      `unjudged` means agy failed, which is not a rejection.
+    cmds:
+      - bash scripts/task/image-daily.sh judge {{.FILE}} {{.LANE}}
+
+  images:publish:
+    desc: "[destructive] Stage kept assets and deploy the gallery to Cloudflare Pages"
+    summary: >
+      Copies every accepted `site` and `wall` plate out of the ledger into
+      `{{.IMAGES_ROOT}}/published/`, rebuilds `index.html` and `manifest.json`, and
+      deploys that tree. It replaces the previous deployment, so the staging copy
+      carries all earlier days rather than today's only.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} IMAGES_PROJECT={{.IMAGES_PROJECT}} bash scripts/task/image-daily.sh publish
+
+  images:publish:init:
+    desc: Create the Cloudflare Pages project the asset gallery deploys to (idempotent)
+    summary: >
+      One-time setup for the publish step: the project must exist before a deploy,
+      and a deploy naming a project that does not exist would create a second one
+      under a different suffix. Re-running is safe — Pages answers that it exists.
+    cmds:
+      - nix-shell -p wrangler --run "bash scripts/task/wrangler.sh pages project create {{.IMAGES_PROJECT}} --production-branch=main"
+
+  images:wallpaper:
+    desc: Set the newest accepted wallpaper with swaybg (a dwl session's rotation)
+    summary: >
+      Picks the newest accepted plate under `published/wall` (falling back to the
+      originals), restarts swaybg on it, and prints the file name. `DRY=1` prints
+      the path instead, which is how a config can ask what it would use.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh wallpaper

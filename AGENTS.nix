@@ -6046,5 +6046,45 @@
         smoke before the old implementation is frozen.
       '';
     };
+    image-daily-queue = {
+      title = "The 100-image day runs itself: a queue with a freshness promise, agy as judge";
+      kind = "experiment";
+      status = "IN FLIGHT";
+      date = "2026-11-10";
+      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets that refresh themselves: nothing is published that a judge has not passed, and the leftover prints one storybook spread.";
+      refs = {
+        hosts = ["frieren"];
+        modules = [
+          "scripts/task/image-daily.sh"
+          "lib/image-daily/briefs.json"
+          "hosts/frieren/infra-stack.nix"
+        ];
+        tasks = ["images:plan" "images:status"];
+      };
+      body = ''
+        **The queue is a file with a promise.** Each brief carries `every` days and is
+        due when the ledger's last accepted row for that id is older, so the rota
+        refreshes itself and nobody edits a schedule. Lanes: `site` (og cards, heroes,
+        icons), `wall` (dwl wallpapers), `fleet` (nixconfig docs art).
+
+        **Nothing publishes that a judge has not passed.** `agy
+        --dangerously-skip-permissions --json-schema` reads the PNG and answers
+        keep/reroll/reject plus one named defect; a reroll spends one more image with
+        that defect as the only change. A judge that fails leaves the plate
+        `unjudged` — on disk, never published.
+
+        **Leftover is not wasted.** The allowance resets 00:00 UTC with no carry-over,
+        so what the queue does not use goes to `storybook.py run --limit left/3`,
+        which stops when the book is finished.
+
+        **Freshness is a gate.** `images:status` exits 1 when a lane's newest accepted
+        asset is older than its `max_age_days`; a green timer says nothing about
+        content.
+
+        **Open.** The Pages project needs `images:publish:init` once before the first
+        nightly publish, and the 06:10 job needs a frieren deploy to start. Wallpaper
+        rotation on a dwl host is `images:wallpaper` by hand, not yet a timer.
+      '';
+    };
   };
 }

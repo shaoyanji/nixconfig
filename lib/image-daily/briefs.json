@@ -313,7 +313,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "frieren-cyberpunk.png",
-      "prompt": "Frieren in a cyberpunk city, 4k, realistic, neumorphism."
+      "prompt": "Frieren in a cyberpunk city, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait in a neon city, never a city without a person in it"
     },
     {
       "id": "wall-char-fern",
@@ -321,7 +322,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "fern.png",
-      "prompt": "Fern, 4k, realistic, neumorphism."
+      "prompt": "Fern, the mage from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait, never a fern plant or a leaf"
     },
     {
       "id": "wall-char-stark",
@@ -329,7 +331,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "stark.png",
-      "prompt": "Stark, 4k, realistic, neumorphism."
+      "prompt": "Stark, the warrior from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait, never a power symbol or a button"
     },
     {
       "id": "wall-char-eisen",
@@ -337,7 +340,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "eisen.png",
-      "prompt": "Eisen, 4k, realistic, neumorphism."
+      "prompt": "Eisen, the dwarf warrior from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait, never a periodic-table tile or a metal object"
     },
     {
       "id": "wall-char-himmel",
@@ -345,7 +349,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "himmel.png",
-      "prompt": "Himmel, 4k, realistic, neumorphism."
+      "prompt": "Himmel, the hero from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait, never a sky or a weather widget"
     },
     {
       "id": "wall-char-heiter",
@@ -353,7 +358,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "heiter.png",
-      "prompt": "Heiter, 4k, realistic, neumorphism."
+      "prompt": "Heiter, the priest from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait, never a dashboard or a settings panel"
     },
     {
       "id": "wall-char-uebel",
@@ -361,7 +367,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "uebel.png",
-      "prompt": "Uebel, 4k, realistic, neumorphism."
+      "prompt": "Übel, the mage from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait, never a devil or an evil-face icon"
     },
     {
       "id": "wall-char-methode",
@@ -369,7 +376,8 @@
       "every": 45,
       "size": "1536x1024",
       "name": "methode.png",
-      "prompt": "Methode, 4k, realistic, neumorphism."
+      "prompt": "Methode, the mage from the anime Frieren: Beyond Journey's End, 4k, realistic, neumorphism.",
+      "expect": "an adult anime character portrait, never a settings row or a button"
     }
   ]
 }

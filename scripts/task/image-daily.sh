@@ -46,7 +46,11 @@ die() {
   echo "image-daily: $*" >&2
   exit 1
 }
-say() { echo "image-daily: $*"; }
+# stderr, not stdout: `attempt` is read as `file=$(attempt …)`, so a log line on
+# stdout becomes part of the path. Measured 2026-11-10: a 429 retry inside a
+# capture recorded "image-daily: wall-char-stark: rate limited, waiting 120s\n/path"
+# as the plate, and the next publish tried to copy that string.
+say() { echo "image-daily: $*" >&2; }
 
 need() {
   local c
@@ -77,19 +81,26 @@ last_keep() {
 }
 
 # --- the queue --------------------------------------------------------------
-# TSV: id, lane, size, name, prompt — for the briefs that are due today.
+# TSV: id, lane, size, name, prompt, expect — for the briefs that are due today.
+# `expect` is what the plate must show, and it is the only field the judge can
+# hold a name against: a keep verdict says the image answers the prompt, which it
+# does when the prompt was the weak part.
 due() {
   local filter=${1:-}
-  jq -r '.briefs[] | [.id, .lane, .size, .name, .prompt, (.every | tostring)] | @tsv' "$BRIEFS" |
-    while IFS=$'\t' read -r id lane size name prompt every; do
+  jq -r '.briefs[] | [.id, .lane, .size, .name, .prompt, (.every | tostring), (.expect // "")] | @tsv' "$BRIEFS" |
+    while IFS=$'\t' read -r id lane size name prompt every expect; do
       [ -n "$filter" ] && [ "$lane" != "$filter" ] && continue
       local last now last_s
       last=$(last_keep "$id")
       now=$(epoch "$(today)")
       last_s=$(epoch "${last:-1970-01-01}")
       [ -n "$last" ] || last_s=0
-      if [ "$last_s" -eq 0 ] || [ $(((now - last_s) / 86400)) -ge "$every" ]; then
-        printf '%s\t%s\t%s\t%s\t%s\n' "$id" "$lane" "$size" "$name" "$prompt"
+      # FORCE=1 re-renders a brief whose freshness promise has not expired. A plate
+      # judged `keep` that still answered the wrong reading of its own name is the
+      # case this exists for; narrow it with ONLY= so a forced pass replaces named
+      # briefs and nothing else.
+      if [ "${FORCE:-0}" = "1" ] || [ "$last_s" -eq 0 ] || [ $(((now - last_s) / 86400)) -ge "$every" ]; then
+        printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$lane" "$size" "$name" "$prompt" "$expect"
       fi
     done
 }
@@ -134,8 +145,8 @@ remaining() {
 # because there is no TTY to approve a file read. A judge that fails is not a
 # rejection — `unjudged` says the plate was never looked at, which is why it
 # never publishes.
-judge_image() { # png lane intent
-  local png=$1 lane=$2 intent=$3 verdict text
+judge_image() { # png lane intent [expect]
+  local png=$1 lane=$2 intent=$3 expect=${4:-} verdict text
   mkdir -p "$STAGE"
   [ -d "$STAGE/.git" ] || git -C "$STAGE" init -q 2>/dev/null || true
 
@@ -155,6 +166,16 @@ Answer on ONE line and nothing else, exactly this JSON:
 {"verdict":"keep|reroll|reject","reason":"...","defect":"..."}
 EOF
 )
+  # A name is not a subject. `Fern, 4k, realistic, neumorphism` was answered with a
+  # fern leaf and judged a keep, because nothing in the prompt or the lane intent
+  # said the subject is a person. When the brief states what the plate must show,
+  # the judge can tell a correct render of the wrong thing from a correct plate.
+  if [ -n "$expect" ]; then
+    prompt+="
+The plate must show: $expect. A literal reading of a name — a plant, a chemical
+element, a generic icon, a settings row, a dashboard — is a reroll even when the
+image itself is well made, because it is the wrong subject."
+  fi
 
   local model_args=()
   [ -n "${GEMINI_MODEL:-}" ] && model_args=(--model "$GEMINI_MODEL")
@@ -225,7 +246,7 @@ attempt() { # brief id lane size name prompt day
 }
 
 run_lane() { # lane budget
-  local lane=$1 budget=$2 day intent spent=0 left=0 v verdict defect
+  local lane=$1 budget=$2 day intent spent=0 left=0 v verdict defect expect
   LANE_SPENT=0
   day=$(today)
   intent=$(lane_setting "$lane" intent)
@@ -247,7 +268,7 @@ run_lane() { # lane budget
     return 0
   fi
 
-  while IFS=$'\t' read -r id _ size name prompt; do
+  while IFS=$'\t' read -r id _ size name prompt expect; do
     [ "$spent" -ge "$budget" ] && break
     [ "$left" -gt 0 ] || { say "allowance spent"; break; }
 
@@ -265,7 +286,7 @@ run_lane() { # lane budget
     fi
     [ "$rc" -eq 0 ] || continue
     left=$((left - 1))
-    v=$(judge_image "$file" "$lane" "$intent")
+    v=$(judge_image "$file" "$lane" "$intent" "$expect")
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
     defect=$(printf '%s' "$v" | jq -r '.defect // ""')
     spent=$((spent + 1))
@@ -275,7 +296,7 @@ run_lane() { # lane budget
       rm -f "$file"
       file=$(attempt "$id" "$lane" "$size" "$name" "$prompt (Change only this: $defect.)" "$day") || continue
       left=$((left - 1))
-      v=$(judge_image "$file" "$lane" "$intent")
+      v=$(judge_image "$file" "$lane" "$intent" "$expect")
       verdict=$(printf '%s' "$v" | jq -r '.verdict')
       defect=$(printf '%s' "$v" | jq -r '.defect // ""')
       spent=$((spent + 1))
@@ -294,6 +315,10 @@ run_lane() { # lane budget
 stage_publish() {
   local day file rel out
   while IFS= read -r file; do
+    # The ledger is append-only and a path in it can be stale: a plate deleted for
+    # being the wrong subject leaves a keep behind. Skip what is not on disk rather
+    # than failing the whole manifest on one old row.
+    [ -f "$file" ] || { say "publish: ledger path is gone ($file)"; continue; }
     rel=${file#"$IMAGES_ROOT/src/"}
     if [ "$lane" = "blog" ]; then
       # 3:2 out of the generator, 1200x630 in the page. The crop is local work,

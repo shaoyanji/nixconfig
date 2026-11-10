@@ -41,8 +41,9 @@ tasks:
     cmds:
       - "{{.APPS_DB}} status"
 
-  # The sync itself is a unit on delphi (appflow-sync.timer, hourly). This shows
-  # what is waiting for it instead of running a second scanner by hand.
+  # The sync itself is a unit on delphi (appflow-sync.timer, hourly), and each
+  # run starts appflow-resolve.service for what the rules could not decide. This
+  # shows what is waiting for them instead of running a second scanner by hand.
   apps:emails:
     desc: Messages waiting for agent:apps (the hourly sync on delphi drains them)
     cmds:

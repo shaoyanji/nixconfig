@@ -174,6 +174,12 @@ agent reads; `FORMAT=text` gives a person a table and `FORMAT=json` a machine.
 new application does not wait for someone to type the task. `sync.enable = false`
 turns the drainer off and leaves the verbs above.
 
+Each sync then starts `appflow-resolve.service`: the two local engines answer
+attribute/ignore/unsure, and the unsures go through one hermes turn. An entry it
+judges irrelevant moves to the reversible `ignore` tier, and `task
+apps:queue:resolve -- --restore <id>` puts it back. The ledger is
+`/var/lib/appflow-resolve/apps-resolve.jsonl`, not a file in the login user's home.
+
 ## Personal data
 
 The repository is public. The base file is `~/.config/appflow/resume.json` — a

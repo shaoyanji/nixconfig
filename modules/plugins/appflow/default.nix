@@ -23,6 +23,24 @@
     '';
   };
 
+  # The resolver imports `sync` from its own directory, so both files land in one
+  # store path; a single-file copy would break the import at activation.
+  resolveSrc = pkgs.runCommand "appflow-resolve-src" {} ''
+    mkdir -p $out
+    cp ${./resolve.py} $out/resolve.py
+    cp ${./sync.py} $out/sync.py
+  '';
+
+  resolve = pkgs.writeShellApplication {
+    name = "appflow-resolve";
+    runtimeInputs = [pkgs.python3];
+    text = ''
+      exec ${pkgs.python3}/bin/python3 ${resolveSrc}/resolve.py \
+        --api ${lib.escapeShellArg "http://127.0.0.1:${toString config.services.emailArchive.port}"} \
+        "$@"
+    '';
+  };
+
   # The senders this plugin claims. Kept as data so the classifier stays generic
   # and the list is reviewable in one place.
   atsSenders = [
@@ -163,6 +181,12 @@ in {
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${sync}/bin/appflow-sync --sync --apply --ledger /var/lib/appflow-sync/apps-sync.jsonl";
+        # The queue resolver reads what the sync just left. `--no-block` keeps
+        # this unit green when a model or the agent fails: the resolver carries
+        # its own result, and a sync that did its work is not a failed sync.
+        ExecStartPost = [
+          "${config.systemd.package}/bin/systemctl --no-block start appflow-resolve.service"
+        ];
         StateDirectory = "appflow-sync";
         User = "root";
         NoNewPrivileges = true;
@@ -179,6 +203,32 @@ in {
         OnCalendar = cfg.sync.schedule;
         Persistent = true;
         RandomizedDelaySec = "5m";
+      };
+    };
+
+    # Rules, a ternary from the two System One engines, then exactly one hermes
+    # turn for the unsures. It runs as the login user because hermes and its
+    # provider config live in the per-user profile and `~/.hermes`; a root unit
+    # would find neither. The ledger is state, not a home dotfile.
+    systemd.services.appflow-resolve = lib.mkIf cfg.sync.enable {
+      description = "Attribute or close the appflow queue with one model batch";
+      after = ["npgsqlrest.service"];
+      requires = ["npgsqlrest.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${resolve}/bin/appflow-resolve --apply --ledger /var/lib/appflow-resolve/apps-resolve.jsonl";
+        StateDirectory = "appflow-resolve";
+        User = user.name;
+        Environment = [
+          "HOME=${user.home}"
+          "PATH=/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin"
+        ];
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        # hermes reads ~/.hermes and writes its session state there.
+        ProtectHome = false;
+        TimeoutStartSec = "15min";
       };
     };
   };

@@ -18,6 +18,10 @@ The pipeline lives in the archive database on delphi. Since `86bdb73b`
 statuses from ATS mail hourly, and `applications.json` in the workflow checkout
 is an export, not a source. Nothing imports it on a schedule.
 
+Each sync is followed by `appflow-resolve.service`: the two local engines answer
+attribute/ignore/unsure, the unsures go through one hermes turn, and an ignore is
+a reversible queue tier (`task apps:queue:resolve -- --restore <id>`).
+
 | Where | Role |
 | :--- | :--- |
 | `applications` (Postgres, `email_archive`) | Source of truth |

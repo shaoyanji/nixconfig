@@ -6060,8 +6060,7 @@
       body = ''
         **The queue is a file with a promise.** Each brief carries `every` days and is
         due when the ledger's last accepted row for that id is older, so the rota
-        refreshes itself and nobody edits a schedule. Lanes: `site` (og cards, heroes,
-        icons), `wall` (dwl wallpapers), `fleet` (nixconfig docs art).
+        refreshes itself and nobody edits a schedule.
 
         **Nothing publishes that a judge has not passed.** `agy
         --dangerously-skip-permissions --mode accept-edits` reads the PNG and answers
@@ -6069,34 +6068,26 @@
         that defect as the only change. A judge that fails leaves the plate
         `unjudged` — on disk, never published.
 
-        **Leftover is not wasted.** The allowance resets 00:00 UTC with no carry-over;
-        the unused goes to `storybook.py --limit left/3`, which stops when the book is done.
+        **Leftover funds the book, freshness is a gate.** Unused images feed
+        `storybook.py --limit left/3`; `images:status` exits 1 when a lane's newest
+        accepted asset is older than `max_age_days`, so a green timer says nothing.
 
-        **Freshness is a gate.** `images:status` exits 1 when a lane's newest accepted
-        asset is older than its `max_age_days`; a green timer says nothing about content.
+        **Published 2026-11-10.** Fifteen blog banners — the last four after the hourly
+        429 cleared — sit on Cloudinary with the resize in the URL, and the blog's
+        history is rewritten so a clone carries no JPEG (2.2 MB to 628 KB).
+        `images:publish` uploads, writes `manifest.json`, and deploys only `index.html`
+        plus it: a fuzzy search over 35 plates in 21 KB. The counter had to learn
+        `remaining: "unlimited"`, which it read as "allowance spent".
 
-        **Suspended 2026-11-10.** The first full run kept 20 plates before the
-        generator answered 429: Frieren in neumorph style passed, the flat-vector
-        wall briefs read as geometry SVG could ship. The wall bank is down to six,
-        the `agentScheduler` job and its runner are removed, and `images:run` is
-        by hand until the prompts pass review.
+        **Suspended 2026-11-10.** The wall briefs read as geometry SVG could ship, so
+        the `agentScheduler` job and its runner are gone and `images:run` is by hand
+        until the six surviving briefs pass review.
 
-        **Measured 2026-11-10.** Motoko, Guts and 2B, then Rei, Asuka, Mari, Hinata
-        and Tsunade, all rendered as composed portraits from four words; an unnamed
-        subject in the same words gave geometry. Two names were refused by the
-        generator's safety filter, so a character bank carries that risk.
+        **Measured 2026-11-10.** Motoko, Guts and 2B, then Rei, Asuka, Mari, Hinata and
+        Tsunade rendered from four words; an unnamed subject in the same words gave
+        geometry, and two names were refused by the safety filter. The named subject,
+        not the quality tokens, is what renders.
 
-        **Published 2026-11-10.** Fifteen blog banners, the last four generated once
-        the hourly 429 cleared, are on Cloudinary with the resize in the delivery URL,
-        and the blog's history is rewritten so a clone carries no JPEG at all: 2.2 MB
-        to 628 KB. `images:publish` uploads, writes `manifest.json`, and deploys only
-        `index.html` plus that manifest — a fuzzy search over 35 plates in 21 KB, where
-        the old gallery copied every plate into the deploy. The counter had to learn
-        that the pool answers `remaining: "unlimited"`; it read that as "allowance
-        spent" and spent nothing.
-
-        **Blocker.** A verdict on the four-word shape: the named subject, not the
-        quality tokens, is what renders. `images:wallpaper` stays by hand on dwl.
       '';
     };
   };

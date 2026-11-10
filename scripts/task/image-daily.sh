@@ -152,6 +152,29 @@ due() {
     done
 }
 
+# A character plate needs the character described, not just named. The generator
+# does not know these people, so `Fern, 4k, realistic, neumorphism` is an
+# instruction to draw the word: on 2026-11-10 seven of eight such briefs came back
+# as a fern leaf, a power symbol, a periodic-table tile, a sky, a dashboard, a
+# devil and a settings row, and every one of them was judged `keep` because the
+# judge was holding the same weak prompt. This refuses to spend on one again.
+briefs_guard() {
+  local id prompt expect words bad=0
+  while IFS=$'\t' read -r id prompt expect words; do
+    [ -n "$expect" ] || { say "briefs: $id has no expect line"; bad=1; }
+    case "$prompt" in
+      *anime*) ;;
+      *) say "briefs: $id does not name the anime"; bad=1 ;;
+    esac
+    if [ "${words:-0}" -lt 25 ]; then
+      say "briefs: $id prompt is ${words:-0} words — describe the character, not the name"
+      bad=1
+    fi
+  done < <(jq -r '.briefs[] | select(.id | startswith("wall-char-"))
+    | [.id, .prompt, (.expect // ""), ((.prompt | split(" ") | length) | tostring)] | @tsv' "$BRIEFS")
+  return $bad
+}
+
 # `LANES="wall site"` narrows any subcommand to a subset of the shard order.
 select_lanes() {
   if [ -n "${LANES:-}" ]; then
@@ -445,6 +468,7 @@ build_index() {
 # --- subcommands ------------------------------------------------------------
 cmd_plan() {
   need jq cpg
+  briefs_guard || die "briefs: a character brief is not bank-ready (see above)"
   local rem lane rows n total=0
   rem=$(remaining)
   [ -n "$rem" ] || die "cpg usage answered nothing — is the session alive? (cpg status --json)"
@@ -467,6 +491,7 @@ cmd_plan() {
 
 cmd_run() {
   need jq cpg agy git
+  briefs_guard || die "briefs: a character brief is not bank-ready (see above)"
   mkdir -p "$IMAGES_ROOT" "$STAGE"
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }

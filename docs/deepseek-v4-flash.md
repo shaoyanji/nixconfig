@@ -58,6 +58,35 @@ sudo systemd-run --unit=dsv4-probe --property=User=devji --property=Group=users 
     --flash-attn on --jinja --metrics
 ```
 
+### 0a. Why the GPU could not have helped, and what would still raise 2.9
+
+The probe ran CPU-only on purpose, and that was the right call. This pack's MoE puts
+~13 B active parameters per token against 284 B total, so decode reads roughly **2.6 GB
+of expert weights per token**, and `docs/eisen-llm-architecture.md` measures this board
+at **25.6 GB/s peak DDR3-1600, dual-channel**. That is a hard ceiling near **9.8 tok/s**
+— which is exactly why the publisher's Zen 5 / DDR5-5600 reference reports 9.06-10.74
+tok/s for the same file: the vendor machine is already at its own bandwidth wall. At
+2.9 tok/s eisen sits at 30 % of a budget that no flag raises.
+
+The RX 5700 cannot change that arithmetic. The Qwen recipe that does reach 19.02 tok/s
+runs `--n-gpu-layers 99 --override-tensor exps=CPU`: the GPU holds attention and the
+dense layers while **every expert byte still crosses DDR3**, which is the same ~2.6 GB
+per token. 8 GB of VRAM cannot hold 284 B of experts, so moving more onto the card only
+sends the same bytes over PCIe instead of RAM. In priority order, what would move the
+number:
+
+1. `--mlock` (or `--no-mmap`). The weights live on the HDD array and load in 4 min; an
+   unmlocked 56.5 GiB mapping inside 62.5 GiB of RAM is reclaimed under any pressure and
+   re-read from spinning disk mid-decode. Erratic per-token time is the tell.
+2. Speculative decoding. The modchip fork ships PVS and the publisher measures +35 %
+   (11.5-14.7 against 9.06-10.74). Qwen already uses the same lever: `draft-dflash` +40 %.
+3. `-t 12` against `-t 24`, plus `numactl --interleave=all`. Kolibri measured 9.17 vs
+   8.42, so SMT costs about 8 % on this box.
+4. `--cache-type-k q8_0 --cache-type-v q8_0`, which frees RAM for page cache.
+
+Best case is ~4-5 tok/s, still a third of the bar. The pack is a batch artifact here,
+not an interactive model — which is why the note stays REJECTED rather than UNPROVEN.
+
 ### 1. Wait on the right progress number
 
 aria2 runs with `falloc`, so each shard is assigned its **full length on the first write**: `ls -l`

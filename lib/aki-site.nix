@@ -162,6 +162,13 @@
     then "badge-green"
     else "badge-blue";
 
+  # A host's own mark, where one exists: a badge, not a hero image. It comes from
+  # the asset plane like every other picture, so no binary enters the repo and the
+  # site build stays a pure projection of the registry.
+  hostBadges = {
+    frieren = "https://res.cloudinary.com/de1eajx01/image/upload/f_png,q_auto,w_192/assets/fleet/frieren.png";
+  };
+
   # Aki hypermedia driver with delegated click listener for dynamic DOM mutations.
   # Assets are FILES (lib/site/), not literals: Nix cannot lint, format or
   # syntax-check CSS/JS, and a missing quote inside `''` is a Nix parse error at
@@ -428,6 +435,11 @@
       "#breadcrumbs" = {textContent = "fleet / inventory / ${h}";};
       "#detail-pane" = {
         innerHTML = ''
+          ${
+            lib.optionalString (hostBadges ? ${h}) ''
+              <img class="host-badge" src="${hostBadges.${h}}" alt="${escH h} badge" width="96" height="96" loading="lazy">
+            ''
+          }
           <h2>${h} — ${escH (info.role or "registered device")}</h2>
           <p style="margin: 0.5rem 0 1rem 0;"><span class="badge ${statusBadge}">${info.status or "unknown"}</span> &bull; <code>${info.kind or "unknown"}</code> &bull; <code>${info.arch or "unknown"}</code>${
             lib.optionalString (info.flake or false) " &bull; built by this flake"

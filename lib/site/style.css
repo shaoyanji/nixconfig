@@ -213,3 +213,14 @@ pre {
 .note table {
   font-size: 0.85rem;
 }
+
+/* A host's own mark: circular, small, and it never pushes the text around. */
+.host-badge {
+  float: right;
+  width: 96px;
+  height: 96px;
+  margin: 0 0 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+}

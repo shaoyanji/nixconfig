@@ -97,7 +97,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "frieren-cyberpunk.png",
-      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End, standing on a rain-slick street in a neon-lit city at night, seen from the waist up, cel-shaded anime illustration, cyan and magenta light on her face, no text.",
+      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End — long silver-white hair in twin tails, pointed ears, green eyes, white and gold-trimmed robe over a black dress, standing on a rain-slick street in a neon-lit city at night, seen from the waist up, cel-shaded anime illustration, cyan and magenta light on her face, no text.",
       "expect": "an anime character portrait of Frieren in a neon city, never a city with nobody in it",
       "rev": 2
     },
@@ -107,7 +107,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "fern.png",
-      "prompt": "Fern, the mage from the anime Frieren: Beyond Journey's End, standing in a sunlit meadow with a distant village behind her, holding her staff, cel-shaded anime illustration, one clear focal point, no text.",
+      "prompt": "Fern, the mage from the anime Frieren: Beyond Journey's End — long lavender hair in twin tails, pale skin, calm narrow eyes, white robe with gold trim over a black dress, standing in a sunlit meadow with a distant village behind her, holding her staff, cel-shaded anime illustration, one clear focal point, no text.",
       "expect": "an anime character portrait of Fern, never a fern plant or a leaf",
       "rev": 2
     },
@@ -117,7 +117,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "stark.png",
-      "prompt": "Stark, the warrior from the anime Frieren: Beyond Journey's End, resting an axe on his shoulder in an autumn mountain pass, cel-shaded anime illustration, one clear focal point, no text.",
+      "prompt": "Stark, the warrior from the anime Frieren: Beyond Journey's End — short spiky red hair, red eyes, a muscular build in a black sleeveless tunic and red cape, resting an axe on his shoulder in an autumn mountain pass, cel-shaded anime illustration, one clear focal point, no text.",
       "expect": "an anime character portrait of Stark, never a power symbol or a button",
       "rev": 2
     },
@@ -127,7 +127,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "eisen.png",
-      "prompt": "Eisen, the dwarf warrior from the anime Frieren: Beyond Journey's End, standing in a torch-lit stone hall with his shield at his side, cel-shaded anime illustration, one clear focal point, no text.",
+      "prompt": "Eisen, the dwarf warrior from the anime Frieren: Beyond Journey's End — elderly and broad, thick white beard and braided hair, weathered face, heavy dark-red plate armour over chainmail, standing in a torch-lit stone hall with his shield at his side, cel-shaded anime illustration, one clear focal point, no text.",
       "expect": "an anime character portrait of Eisen, never a periodic-table tile or a metal object",
       "rev": 2
     },
@@ -137,7 +137,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "himmel.png",
-      "prompt": "Himmel, the hero from the anime Frieren: Beyond Journey's End, standing on a hill at sunrise with a town in the distance, sword sheathed, cel-shaded anime illustration, one clear focal point, no text.",
+      "prompt": "Himmel, the hero from the anime Frieren: Beyond Journey's End — messy blond hair, blue eyes, a confident smile, white cape with blue trim over light armour, standing on a hill at sunrise with a town in the distance, sword sheathed, cel-shaded anime illustration, one clear focal point, no text.",
       "expect": "an anime character portrait of Himmel, never a sky or a weather widget",
       "rev": 2
     },
@@ -147,7 +147,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "heiter.png",
-      "prompt": "Heiter, the priest from the anime Frieren: Beyond Journey's End, holding a wine cup and a holy staff in a candle-lit church, cel-shaded anime illustration, one clear focal point, no text.",
+      "prompt": "Heiter, the priest from the anime Frieren: Beyond Journey's End — long grey hair, round glasses, stubble, a dark priest's robe with a white collar, holding a wine cup and a holy staff in a candle-lit church, cel-shaded anime illustration, one clear focal point, no text.",
       "expect": "an anime character portrait of Heiter, never a dashboard or a settings panel",
       "rev": 2
     },
@@ -157,7 +157,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "uebel.png",
-      "prompt": "Übel, the mage from the anime Frieren: Beyond Journey's End, drawing a thin thread of magic between her fingers in a dim forest, cel-shaded anime illustration, one clear focal point, no text.",
+      "prompt": "Übel, the mage from the anime Frieren: Beyond Journey's End — long dark-green hair, sharp green eyes, a sly smirk, a black and dark-green mage outfit, drawing a thin thread of magic between her fingers in a dim forest, cel-shaded anime illustration, one clear focal point, no text.",
       "expect": "an anime character portrait of Übel, never a devil or an evil-face icon",
       "rev": 2
     },
@@ -167,7 +167,7 @@
       "every": 45,
       "size": "1536x1024",
       "name": "methode.png",
-      "prompt": "Methode, the mage from the anime Frieren: Beyond Journey's End, reading a spellbook in a library lit by floating lamps, cel-shaded anime illustration, one clear focal point, no text.",
+      "prompt": "Methode, the mage from the anime Frieren: Beyond Journey's End — long brown hair, a calm expression, blue and white mage robes, reading a spellbook in a library lit by floating lamps, cel-shaded anime illustration, one clear focal point, no text.",
       "expect": "an anime character portrait of Methode, never a settings row or a button",
       "rev": 2
     },

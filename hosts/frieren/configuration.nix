@@ -23,6 +23,7 @@
   # behaviour is proven against scratch clones.
   checkoutFf = pkgs.writeShellScript "checkout-ff" ''
     set -u
+    export PATH="${lib.makeBinPath [pkgs.git pkgs.openssh]}:$PATH"
     git=${pkgs.git}/bin/git
     root=/Volumes/data/projects
     fail=0
@@ -293,6 +294,7 @@ in {
     description = "Fast-forward the nixconfig and console checkouts on /Volumes/data";
     after = ["network-online.target"];
     wants = ["network-online.target"];
+    path = [pkgs.git pkgs.openssh];
     serviceConfig = {
       Type = "oneshot";
       User = user.name;

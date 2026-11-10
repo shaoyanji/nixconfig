@@ -60,12 +60,8 @@ in {
       # and every declared secret is one more file decrypted on that host.
       "caldotcom" = lib.mkIf (builtins.elem "agent-backend" traits) {};
       # Resend's API key, used as the SMTP password for bountystash.com outbound
-      # mail (modules/himalaya.nix). The key sits in the apikeys plane, not the
-      # default secrets file, so this names both the file and the nested path.
-      "resend-api-key" = {
-        sopsFile = ./secrets/apikeys.yaml;
-        key = "RESEND/API/KEY";
-      };
+      # mail (modules/himalaya.nix). Tracked in the fleet secrets plane (./secrets.yaml).
+      "resend-api-key" = {};
       "aws/access/key/id" = {};
       "aws/secret/access/key" = {};
       # OCI CLI credentials. The private half and the fingerprint that names it

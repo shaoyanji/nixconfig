@@ -173,13 +173,30 @@ attempt() { # brief id lane size name prompt day
   local file="$dir/$name"
   mkdir -p "$(dirname "$file")"
 
-  local out rc=0
-  out=$(cpg image --json -s "$size" -o "$file" "$prompt" 2>&1) || rc=$?
-  if [ "$rc" -ne 0 ] || [ ! -s "$file" ]; then
+  # 429 is a burst limit, not a spent day: `cpg usage` still reports the
+  # allowance, so waiting is the right answer and recording a failure is not.
+  # Measured 2026-11-10: 26 plates in 30 minutes, then every call for the next 21
+  # seconds answered RATE_LIMITED while 74 images remained.
+  local out rc=0 tries=0 wait
+  while :; do
+    out=$(cpg image --json -s "$size" -o "$file" "$prompt" 2>&1); rc=$?
+    if [ "$rc" -eq 0 ] && [ -s "$file" ]; then break; fi
+    if printf '%s' "$out" | grep -q '429\|RATE_LIMITED'; then
+      tries=$((tries + 1))
+      if [ "$tries" -gt 3 ]; then
+        record "$day" "$lane" "$id" "$file" "failed" "rate limited after $tries attempts"
+        say "$id: still rate limited after $tries attempts"
+        return 2
+      fi
+      wait=$((60 * (1 << (tries - 1))))
+      say "$id: rate limited, waiting ${wait}s"
+      sleep "$wait"
+      continue
+    fi
     record "$day" "$lane" "$id" "$file" "failed" "$(printf '%s' "$out" | tr '\n' ' ' | cut -c1-200)"
     say "$id: generation failed (rc=$rc)"
     return 1
-  fi
+  done
   printf '%s' "$file"
 }
 
@@ -210,8 +227,13 @@ run_lane() { # lane budget
       continue
     fi
 
-    local file
-    file=$(attempt "$id" "$lane" "$size" "$name" "$prompt" "$day") || continue
+    local file rc=0
+    file=$(attempt "$id" "$lane" "$size" "$name" "$prompt" "$day") || rc=$?
+    if [ "$rc" -eq 2 ]; then
+      say "lane $lane: rate limited, stopping early"
+      break
+    fi
+    [ "$rc" -eq 0 ] || continue
     left=$((left - 1))
     v=$(judge_image "$file" "$lane" "$intent")
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
@@ -412,8 +434,17 @@ cmd_publish() {
     say "dry run: not deploying"
     return 0
   fi
-  bash "$repo/scripts/task/pages-deploy.sh" "$IMAGES_ROOT/published" \
-    --project-name="$PROJECT" --branch=main
+  # wrangler is not in this host's PATH and not in the runner's closure: the
+  # pages task has always reached it through nix-shell, which is why
+  # `images:publish:init` worked while the first real publish died on
+  # "exec: wrangler: not found".
+  if command -v wrangler >/dev/null 2>&1; then
+    bash "$repo/scripts/task/pages-deploy.sh" "$IMAGES_ROOT/published" \
+      --project-name="$PROJECT" --branch=main
+  else
+    nix-shell -p wrangler --run \
+      "bash '$repo/scripts/task/pages-deploy.sh' '$IMAGES_ROOT/published' --project-name='$PROJECT' --branch=main"
+  fi
 }
 
 # The consumer of the blog lane is a Chirpy checkout, not this gallery: hand over

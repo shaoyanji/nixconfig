@@ -52,6 +52,32 @@ remembered `git add`.
 It does not search the vault or qmd — qmd is not installed on every host — and
 the skeleton prints the two `qmd search` commands to run where it does.
 
+## The banner
+
+A post's hero is not a file in that repo. It is a Cloudinary public id, and the
+crop lives in the delivery URL:
+
+```bash
+task images:post SLUG=why-the-graph-needed-references TITLE="Why the graph needed references"
+```
+
+One motion, in this order: the brief goes to `cpg image`, `agy` judges the plate
+and a named defect buys one re-roll, ffmpeg crops 1200x630, the JPEG is uploaded
+as `assets/blog/<slug>`, the manifest is rebuilt and the asset frontend
+redeployed, and only then is `_posts/<day>-<slug>.md` written with that URL in
+`image:`. The banner exists before the file does, so a post cannot ship with a
+hero that 404s, and no JPEG enters either tree.
+
+`PUSH=0` is the default: the file is committed, the push is yours, because that
+repo's CI deploys on push. `PROMPT=` overrides the default banner brief,
+`TAGS=`/`CATEGORIES=` set the blog's vocabulary, and `FORCE=1` rewrites the front
+matter of an existing post while keeping its body.
+
+The banner is searchable the moment it uploads: `images:publish` writes the
+manifest with a lane, a day and tags per asset, and Pages serves a small frontend
+that fuzzy-searches and filters it. The bytes never leave Cloudinary, so the
+deploy stays a few KB however large the bank gets.
+
 ## Publishing one
 
 ```bash
@@ -67,6 +93,8 @@ default. Categories and tags are that blog's vocabulary — set them there
 
 It never commits and never pushes: that repo's CI deploys on push, so
 publication stays an operator decision, and an unattended run cannot make it.
+It does not make a banner either — run `task images:post` for that, which writes
+the same front matter with the hero already on Cloudinary.
 
 ## Two traps
 

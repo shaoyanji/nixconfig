@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>bountystash assets</title>
-<meta name="description" content="Fuzzy search over the generated asset manifest. Bytes live on Cloudinary; this page only knows their names and delivery URLs.">
+<meta name="description" content="Fuzzy search over the generated asset manifest. Bytes live on Cloudinary; this page only knows their names, tags and delivery URLs.">
 <style>
   :root {
     --bg: #f4f2ee; --card: #fbfaf8; --ink: #1c1b19; --dim: #6d6a64;
@@ -18,7 +18,7 @@
   body { margin:0; background:var(--bg); color:var(--ink);
          font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
   header { position:sticky; top:0; z-index:2; background:var(--bg);
-           border-bottom:1px solid var(--line); padding:1.1rem 1.25rem .9rem; }
+           border-bottom:1px solid var(--line); padding:1.1rem 1.25rem .8rem; }
   h1 { font-size:1.05rem; letter-spacing:.02em; margin:0 0 .1rem; font-weight:650; }
   .sub { color:var(--dim); font-size:.8rem; margin-bottom:.85rem; }
   .bar { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
@@ -31,6 +31,10 @@
           font-size:.78rem; letter-spacing:.02em; user-select:none; }
   .chip[aria-pressed=true] { color:var(--bg); background:var(--acc); border-color:var(--acc); }
   .count { color:var(--dim); font-size:.78rem; margin-left:auto; font-variant-numeric:tabular-nums; }
+  .tags { display:flex; gap:.35rem; flex-wrap:wrap; margin-top:.6rem; align-items:center; }
+  .tags .chip { padding:.22rem .6rem; font-size:.72rem; }
+  .tags .label { color:var(--dim); font-size:.7rem; text-transform:uppercase;
+                 letter-spacing:.08em; margin-right:.15rem; }
   main { padding:1rem 1.25rem 3rem; }
   .grid { display:grid; gap:.9rem; grid-template-columns:repeat(auto-fill,minmax(15rem,1fr)); }
   article { background:var(--card); border:1px solid var(--line); border-radius:10px;
@@ -41,6 +45,8 @@
   .name { font-size:.82rem; word-break:break-word; }
   .name b { background:var(--mark); color:inherit; font-weight:600; border-radius:2px; }
   .lane { color:var(--dim); font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
+  .cardtags { padding:0 .65rem .6rem; display:flex; gap:.3rem; flex-wrap:wrap; }
+  .cardtags span { color:var(--dim); font-size:.68rem; }
   .copy { margin-left:auto; border:1px solid var(--line); background:transparent;
           color:var(--dim); border-radius:6px; padding:.15rem .45rem; font-size:.7rem;
           cursor:pointer; white-space:nowrap; }
@@ -63,18 +69,21 @@
     <button class="chip" data-lane="blog">blog</button>
     <span class="count" id="count"></span>
   </div>
+  <div class="tags" id="tagbar"><span class="label">tags</span></div>
 </header>
 <main><div class="grid" id="grid"></div><p class="empty" id="empty" hidden>nothing matches that</p></main>
 <footer>
   Resize in the URL: <code>…/upload/<b>w_480,c_limit,f_auto,q_auto</b>/assets/wall/…png</code>.
-  The manifest is written by <code>task images:publish</code>.
+  Manifest and tags are written by <code>task images:publish</code>; a new post's banner
+  arrives through <code>task images:post</code>.
 </footer>
 <script>
 const grid = document.getElementById('grid');
 const empty = document.getElementById('empty');
 const count = document.getElementById('count');
 const q = document.getElementById('q');
-let state = { assets: [], lane: 'all', needle: '' };
+const tagbar = document.getElementById('tagbar');
+let state = { assets: [], lane: 'all', tag: '', needle: '' };
 
 // Cloudinary's whole point: the transform sits in the path, so one public id
 // answers every size. Inserting it beats storing four URLs per asset.
@@ -83,13 +92,16 @@ function transform(url, t) {
 }
 const thumb = (a) => transform(a.url, 'w_480,c_limit,f_auto,q_auto');
 const card = (a) => transform(a.url, 'f_jpg,q_auto,w_1200,h_630,c_fill');
+const tagsOf = (a) => a.tags || [];
+// What a query may hit: the id a person types and the tags the manifest derived.
+const haystack = (a) => a.public_id + ' ' + tagsOf(a).join(' ');
 
 // Subsequence match with a score that rewards runs and word starts, which is
 // what makes "frnm" find frieren-neumorph and "og console" find og/console.
-function score(needle, haystack) {
+function score(needle, hay) {
   if (!needle) return 1;
-  const h = haystack.toLowerCase(), n = needle.toLowerCase();
-  let hi = 0, total = 0, run = 0, hits = [];
+  const h = hay.toLowerCase(), n = needle.toLowerCase();
+  let hi = 0, total = 0, run = 0;
   for (const ch of n) {
     if (ch === ' ') { run = 0; continue; }
     let found = -1;
@@ -98,7 +110,6 @@ function score(needle, haystack) {
     const wordStart = found === 0 || /[\/\-_. ]/.test(h[found - 1]);
     run = found === hi ? run + 1 : 0;
     total += 1 + (wordStart ? 3 : 0) + Math.min(run, 4);
-    hits.push(found);
     hi = found + 1;
   }
   return total / h.length + (h.startsWith(n) ? 0.6 : 0);
@@ -110,22 +121,48 @@ function marks(text, needle) {
   const frag = document.createDocumentFragment();
   let hi = 0, buf = '';
   for (const ch of text) {
-    const want = hi < n.length && ch.toLowerCase() === n[hi];
-    if (want) { hi++; if (buf) { frag.append(buf); buf = ''; }
-      const b = document.createElement('b'); b.textContent = ch; frag.append(b); }
-    else buf += ch;
+    if (hi < n.length && ch.toLowerCase() === n[hi]) {
+      hi++;
+      if (buf) { frag.append(buf); buf = ''; }
+      const b = document.createElement('b'); b.textContent = ch; frag.append(b);
+    } else buf += ch;
   }
   if (buf) frag.append(buf);
   return hi === n.length ? frag : document.createTextNode(text);
+}
+
+function renderTags() {
+  const top = (window.__tagCensus || []).slice(0, 18);
+  tagbar.replaceChildren(Object.assign(document.createElement('span'), {
+    className: 'label', textContent: 'tags',
+  }));
+  const all = document.createElement('button');
+  all.className = 'chip'; all.dataset.tag = ''; all.textContent = 'any';
+  all.setAttribute('aria-pressed', String(state.tag === ''));
+  tagbar.append(all);
+  for (const { tag, count } of top) {
+    const c = document.createElement('button');
+    c.className = 'chip'; c.dataset.tag = tag;
+    c.textContent = count > 1 ? tag + ' ' + count : tag;
+    c.setAttribute('aria-pressed', String(state.tag === tag));
+    tagbar.append(c);
+  }
+  tagbar.querySelectorAll('.chip').forEach((c) => {
+    c.onclick = () => { state.tag = c.dataset.tag; renderTags(); render(); };
+  });
 }
 
 function render() {
   const needle = state.needle.trim();
   const rows = state.assets
     .filter((a) => state.lane === 'all' || a.lane === state.lane)
-    .map((a) => ({ a, s: score(needle, a.public_id) + (a.public_id.includes(needle) ? 0.5 : 0) }))
+    .filter((a) => !state.tag || tagsOf(a).includes(state.tag))
+    .map((a) => {
+      const hay = haystack(a);
+      return { a, s: score(needle, hay) + (hay.includes(needle) ? 0.5 : 0) };
+    })
     .filter((r) => r.s > 0)
-    .sort((x, y) => (needle ? y.s - x.s : y.a.day.localeCompare(x.a.day)));
+    .sort((x, y) => (needle ? y.s - x.s : y.a.day.localeCompare(x.a.day) || x.a.public_id.localeCompare(y.a.public_id)));
   count.textContent = rows.length + ' / ' + state.assets.length;
   empty.hidden = rows.length > 0;
   grid.replaceChildren(...rows.map(({ a }) => {
@@ -149,27 +186,42 @@ function render() {
     };
     meta.append(name, lane, copy);
     el.append(link, meta);
+    if (tagsOf(a).length) {
+      const tl = document.createElement('div'); tl.className = 'cardtags';
+      for (const t of tagsOf(a).slice(0, 4)) {
+        const s = document.createElement('span'); s.textContent = '#' + t; tl.append(s);
+      }
+      el.append(tl);
+    }
     return el;
   }));
 }
 
 function setLane(lane) {
   state.lane = lane;
-  document.querySelectorAll('.chip').forEach((c) =>
+  document.querySelectorAll('[data-lane]').forEach((c) =>
     c.setAttribute('aria-pressed', String(c.dataset.lane === lane)));
   render();
 }
 
-document.querySelectorAll('.chip').forEach((c) => c.onclick = () => setLane(c.dataset.lane));
+document.querySelectorAll('[data-lane]').forEach((c) => c.onclick = () => setLane(c.dataset.lane));
 q.addEventListener('input', () => { state.needle = q.value; render(); });
 addEventListener('keydown', (e) => {
   if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
-  if (e.key === 'Escape') { q.value = ''; state.needle = ''; render(); q.blur(); }
+  if (e.key === 'Escape') {
+    q.value = ''; state.needle = ''; state.tag = ''; setLane('all'); renderTags();
+    render(); q.blur();
+  }
 });
 
 fetch('manifest.json', { cache: 'no-cache' })
   .then((r) => { if (!r.ok) throw new Error('manifest.json ' + r.status); return r.json(); })
-  .then((m) => { state.assets = m.assets || []; render(); })
+  .then((m) => {
+    state.assets = m.assets || [];
+    window.__tagCensus = m.tags || [];
+    renderTags();
+    render();
+  })
   .catch((e) => { empty.hidden = false; empty.textContent = 'no manifest: ' + e.message; });
 </script>
 </body>

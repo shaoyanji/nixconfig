@@ -489,6 +489,36 @@
       record_outcome fallback "all agent tiers failed ($RUN_REASON)"
     fi
   '';
+
+  # The allowance is 100 images a day and the generator's burst limit is 25 an
+  # hour, so one nightly pass spends the day in minutes and then answers 429 for
+  # the rest of the hour. Four slots 6h20 apart, each capped at 25, is the same 100
+  # without the burst — and every slot republishes the Cloudinary manifest, so the
+  # asset frontend follows the queue through the day. Tools are prepended to PATH
+  # because cpg and agy live in the user profile, not in this script's closure.
+  imageDailySlot = slot: cap:
+    pkgs.writeShellScript "image-daily-slot-${slot}" ''
+      set -uo pipefail
+      export PATH=${
+        lib.makeBinPath [
+          pkgs.jq
+          pkgs.git
+          pkgs.python3
+          pkgs.curl
+          pkgs.util-linux
+          pkgs.findutils
+          pkgs.coreutils
+          pkgs.gnused
+          pkgs.ffmpeg
+          pkgs.bash
+        ]
+      }:"$PATH"
+      export IMAGES_ROOT=/Volumes/data/pics/generated
+      export STORYBOOK_DIR=${user.home}/Documents/storybook/lantern
+      export SLOT=${slot}
+      export CAP=${toString cap}
+      exec ${pkgs.bash}/bin/bash ${../../scripts/task/image-daily.sh} run
+    '';
 in {
   imports = [
     (import ../../modules/profiles/microvm-host.nix {
@@ -971,8 +1001,54 @@ in {
         command = agySystemRunner;
         workingDirectory = "${user.home}";
       };
-      # 06:10 local, clear of the 03:00-05:30 window. The allowance resets at
-      # 00:00 UTC, so the day's 100 are always available by the time this fires.
+      # Four slots, 6h20 apart, clear of the 03:00-05:30 window. The allowance
+      # resets 00:00 UTC and the burst limit is 25 an hour, so a slot spends 25 and
+      # the next spends the rest. `persistent = false`: catching up three missed
+      # slots at boot would burst into exactly the limit the spacing avoids.
+      image-daily-slot-1 = {
+        name = "image-daily-slot-1";
+        description = "Image queue 1/4 (00:40): due plates, judge, Cloudinary, manifest";
+        schedule = "*-*-* 00:40:00";
+        command = imageDailySlot "1" 25;
+        workingDirectory = "${user.home}";
+        lockFile = "/tmp/image-daily.lock";
+        persistent = false;
+        nice = 10;
+        ioSchedulingClass = "best-effort";
+      };
+      image-daily-slot-2 = {
+        name = "image-daily-slot-2";
+        description = "Image queue 2/4 (07:00): due plates, judge, Cloudinary, manifest";
+        schedule = "*-*-* 07:00:00";
+        command = imageDailySlot "2" 25;
+        workingDirectory = "${user.home}";
+        lockFile = "/tmp/image-daily.lock";
+        persistent = false;
+        nice = 10;
+        ioSchedulingClass = "best-effort";
+      };
+      image-daily-slot-3 = {
+        name = "image-daily-slot-3";
+        description = "Image queue 3/4 (13:20): due plates, judge, Cloudinary, manifest";
+        schedule = "*-*-* 13:20:00";
+        command = imageDailySlot "3" 25;
+        workingDirectory = "${user.home}";
+        lockFile = "/tmp/image-daily.lock";
+        persistent = false;
+        nice = 10;
+        ioSchedulingClass = "best-effort";
+      };
+      image-daily-slot-4 = {
+        name = "image-daily-slot-4";
+        description = "Image queue 4/4 (19:40): due plates, judge, Cloudinary, manifest";
+        schedule = "*-*-* 19:40:00";
+        command = imageDailySlot "4" 25;
+        workingDirectory = "${user.home}";
+        lockFile = "/tmp/image-daily.lock";
+        persistent = false;
+        nice = 10;
+        ioSchedulingClass = "best-effort";
+      };
 
       audible-phased-liberation = {
         name = "audible-phased-liberation";

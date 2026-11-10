@@ -7,8 +7,11 @@
 #   image-daily.sh judge PATH judge one file with agy and print the verdict
 #   image-daily.sh publish    upload kept assets to Cloudinary, write the manifest,
 #                             deploy the search frontend
+#   image-daily.sh post       SLUG= TITLE= one motion: banner, judge, upload,
+#                             manifest, front matter in the blog checkout
 #   image-daily.sh blog [--dir PATH]
 #                             Chirpy front matter per banner, and the JPEGs copied
+#   image-daily.sh gc         destroy Cloudinary public ids nothing references
 #   image-daily.sh wallpaper  set the newest accepted wallpaper with swaybg
 #
 # WHY THIS EXISTS: the allowance is 100 images per day and it does not carry
@@ -33,6 +36,9 @@ BRIEFS=${BRIEFS:-$repo/lib/image-daily/briefs.json}
 # neighbour.
 IMAGES_ROOT=${IMAGES_ROOT:-/Volumes/data/pics/generated}
 LANES_ORDER=(site wall blog fleet)
+# Words a slug carries for grammar rather than meaning. Tags are derived from the
+# public id, so this list is the only editorial judgement in the manifest.
+TAG_STOP='["the","and","for","new","post","with","its","this","that","them","they","when","where","which","while","your","you","our","not","one","own","out","from","into","than","then","was","were","have","has","had","can","did","get","got","just","like","more","most","about","after","before","how","what","why","all","but","any","two","via","now","yet","also","still","even","only","such","some","been","being","both","each","here","there","these","those","under","very","will","would","should","much","many","other","over","same","part"]'
 LEDGER=$IMAGES_ROOT/ledger.jsonl
 STAGE=$IMAGES_ROOT/.judge
 
@@ -211,6 +217,7 @@ attempt() { # brief id lane size name prompt day
 
 run_lane() { # lane budget
   local lane=$1 budget=$2 day intent spent=0 left=0 v verdict defect
+  LANE_SPENT=0
   day=$(today)
   intent=$(lane_setting "$lane" intent)
   # One usage call per lane, decremented locally: the counter moves only when a
@@ -264,6 +271,7 @@ run_lane() { # lane budget
       "$(printf '%s' "$v" | jq -r '.reason + (if (.defect // "") == "" then "" else " | " + .defect end)')"
     say "$id: $verdict"
   done <<<"$rows"
+  LANE_SPENT=$spent
 }
 
 # --- publish ----------------------------------------------------------------
@@ -309,16 +317,25 @@ build_index() {
   mkdir -p "$dist"
   # Rows are path, URL, bytes. `public_id` is what a person searches and what
   # Cloudinary addresses; `day` is empty for a blog banner, whose slug carries it.
-  jq -Rn --arg ts "$(date -u +%FT%TZ)" '
+  jq -Rn --arg ts "$(date -u +%FT%TZ)" --argjson stop "$TAG_STOP" '
     [inputs | select(length > 0) | split("\t") | {path: .[0], url: .[1], bytes: ((.[2] // "0") | tonumber)}]
     | map(. + {
         public_id: (.path | sub("\\.(png|jpg|jpeg|webp)$"; "")),
         lane: (.path | split("/")[0]),
         name: (.path | split("/") | last),
         day: (.path | try (capture("(?<d>[0-9]{4}-[0-9]{2}-[0-9]{2})").d) catch "")
+      }
+      | . as $a
+      | . + {
+        tags: ([$a.public_id | split("/")[] | select(test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$") | not)
+          | split("-")[] | split("_")[] | ascii_downcase
+          | select(length > 2) | select(test("^[0-9]+$") | not) | select(. != $a.lane)
+          | select(. as $t | ($stop | index($t)) == null)] | unique)
       })
     | sort_by(.path)
-    | {generatedAt: $ts, count: length, assets: .}
+    | {generatedAt: $ts, count: length,
+       tags: ([.[] | .tags[]] | group_by(.) | map({tag: .[0], count: length}) | sort_by(-.count, .tag)),
+       assets: .}
   ' <"$IMAGES_ROOT/published/urls.tsv" >"$out"
   cp -f "$shell" "$dist/index.html"
   cp -f "$out" "$dist/manifest.json"
@@ -356,7 +373,11 @@ cmd_run() {
 
   local day marker
   day=$(today)
+  # A day can be spent in more than one pass: the generator's burst limit is 25 an
+  # hour, so four slots 6h20 apart each spend a slice. The marker is per slot, or
+  # the second slot of the day would read as a repeat of the first.
   marker=$IMAGES_ROOT/.done/$day
+  [ -n "${SLOT:-}" ] && marker=$marker.${SLOT}
   if [ -f "$marker" ] && [ "${FORCE:-0}" != "1" ]; then
     say "$day already ran; FORCE=1 to spend again"
     exit 0
@@ -367,11 +388,18 @@ cmd_run() {
   [ -n "$rem" ] || die "cpg usage answered nothing — run cpg status --json"
   say "$day: $rem images available"
 
+  local cap=${CAP:-0} spent_total=0 room
   select_lanes
   for lane in "${lane_list[@]}"; do
     budget=$(lane_budget "$lane")
     [ "$budget" -gt "$rem" ] && budget=$rem
+    if [ "$cap" -gt 0 ]; then
+      room=$((cap - spent_total))
+      [ "$room" -gt 0 ] || { say "cap $cap reached; the next slot takes the rest"; break; }
+      [ "$budget" -gt "$room" ] && budget=$room
+    fi
     run_lane "$lane" "$budget"
+    spent_total=$((spent_total + LANE_SPENT))
     rem=$(remaining || echo 0)
   done
 
@@ -437,6 +465,17 @@ cmd_judge() {
   echo
 }
 
+# The Pages project is the search frontend: index.html and manifest.json, nothing
+# else. One implementation, because a new post publishes the same manifest a
+# nightly slot does.
+deploy_frontend() {
+  [ "${PAGES:-1}" = "1" ] || { say "PAGES=0: frontend not deployed"; return 0; }
+  local project=${PROJECT:-bountystash-assets}
+  nix-shell -p wrangler --run \
+    "bash '$repo/scripts/task/pages-deploy.sh' '$IMAGES_ROOT/site-dist' --project-name=$project --branch=main" ||
+    say "publish: the frontend deploy failed; the manifest is written locally and the site still serves the last one"
+}
+
 cmd_publish() {
   need jq
   local lane
@@ -468,14 +507,7 @@ cmd_publish() {
   done < <(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | sort)
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
   build_index
-  # The Pages project is the search frontend, so it deploys index.html and
-  # manifest.json and nothing else. `PAGES=0` leaves the manifest local.
-  if [ "${PAGES:-1}" = "1" ]; then
-    local project=${PROJECT:-bountystash-assets}
-    nix-shell -p wrangler --run \
-      "bash '$repo/scripts/task/pages-deploy.sh' '$IMAGES_ROOT/site-dist' --project-name=$project --branch=main" ||
-      say "publish: the frontend deploy failed; the manifest is written locally and the site still serves the last one"
-  fi
+  deploy_frontend
 }
 
 # The consumer of the blog lane is a Chirpy checkout, not this gallery: hand over
@@ -502,6 +534,126 @@ cmd_blog() { # [--dir PATH]
   done
 }
 
+# One motion from a title to a post that has a banner. The banner is generated,
+# judged and uploaded before the file exists, so a post cannot ship with a hero
+# that 404s, and no JPEG enters the tree.
+cmd_post() {
+  need jq cpg agy ffmpeg git
+  local slug=${SLUG:-} title=${TITLE:-} prompt=${PROMPT:-} alt=${ALT:-}
+  local blog=${BLOG_DIR:-$HOME/Documents/shaoyanji.is-a.dev}
+  [ -n "$slug" ] || die "SLUG=<url-slug> is required"
+  [ -n "$title" ] || die 'TITLE="the post title" is required'
+  [ -d "$blog/.git" ] || die "no blog checkout at $blog (BLOG_DIR=...)"
+  [ -n "$alt" ] || alt=$title
+  [ -n "$prompt" ] || prompt="A blog banner for an engineering post titled \"$title\". One clear subject, realistic photographic style, natural light, shallow depth of field, no text, no lettering, no logos, nothing to read."
+  local day post file verdict defect jpg url card body='' tsv=$IMAGES_ROOT/published/urls.tsv
+  day=$(today)
+  post=$blog/_posts/$day-$slug.md
+  if [ -f "$post" ] && [ "${FORCE:-0}" != "1" ]; then
+    die "$post exists — FORCE=1 to rewrite its front matter (the body is kept)"
+  fi
+  [ "$(remaining || echo 0)" -gt 0 ] || die "no images left today"
+
+  say "$slug: generating a banner"
+  file=$(attempt "blog-$slug" blog 1536x1024 "$slug.png" "$prompt" "$day") || die "generation failed"
+  verdict=$(judge_image "$file" blog "$(lane_setting blog intent)")
+  if [ "$(printf '%s' "$verdict" | jq -r '.verdict')" = "reroll" ]; then
+    defect=$(printf '%s' "$verdict" | jq -r '.defect // "the composition"')
+    say "$slug: reroll — $defect"
+    rm -f "$file"
+    file=$(attempt "blog-$slug" blog 1536x1024 "$slug.png" \
+      "$prompt (Change only this: $defect.)" "$day") || die "reroll failed"
+    verdict=$(judge_image "$file" blog "$(lane_setting blog intent)")
+  fi
+  say "judge: $(printf '%s' "$verdict" | jq -r '.verdict + " — " + .reason')"
+  [ "$(printf '%s' "$verdict" | jq -r '.verdict')" = "keep" ] ||
+    die "the judge did not keep $file; nothing was uploaded"
+
+  record "$day" blog "blog-$slug" "$file" keep "$(printf '%s' "$verdict" | jq -r '.reason')"
+  jpg=$IMAGES_ROOT/published/blog/$slug.jpg
+  banner_crop "$file" "$jpg" || die "could not crop the banner"
+  url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$jpg" --public-id "assets/blog/$slug") ||
+    die "upload failed"
+  say "cloudinary: $url"
+
+  # The manifest is the reference list: a new upload of the same slug replaces the
+  # old row instead of joining it, so a regenerated banner does not appear twice.
+  mkdir -p "$(dirname "$tsv")"
+  [ -f "$tsv" ] && grep -v "^blog/$slug\.jpg	" "$tsv" >"$tsv.new" || true
+  printf 'blog/%s.jpg\t%s\t%s\n' "$slug" "$url" "$(stat -c%s "$jpg")" >>"$tsv.new"
+  mv -f "$tsv.new" "$tsv"
+  build_index
+  deploy_frontend
+
+  card=$(bash "$repo/scripts/task/cloudinary.sh" url "assets/blog/$slug" \
+    --transform 'f_jpg,q_auto,w_1200,h_630,c_fill')
+  # The public id carries no extension; the delivery URL names the format anyway,
+  # and the other fifteen posts are `.jpg`, so a scraper never has to guess.
+  card=$card.jpg
+  # FORCE rewrites the front matter of a post that already has a body; the body is
+  # everything after the second fence.
+  [ -f "$post" ] && body=$(awk 'BEGIN{n=0} /^---$/{n++; next} n>=2' "$post")
+  {
+    printf -- '---\n'
+    printf 'layout: post\n'
+    printf 'title: "%s"\n' "${title//\"/\\\"}"
+    printf 'date: %s 00:00:00 +0000\n' "$day"
+    printf 'categories: [%s]\n' "${CATEGORIES:-Blog}"
+    printf 'tags: [%s]\n' "${TAGS:-technology}"
+    printf 'image:\n  path: %s\n  alt: "%s"\n' "$card" "${alt//\"/\\\"}"
+    printf -- '---\n\n'
+    [ -z "$body" ] || printf '%s\n' "$body"
+  } >"$post"
+  say "post: $post"
+  git -C "$blog" add -A -- "_posts/$(basename "$post")"
+  if ! git -C "$blog" diff --cached --quiet -- "_posts/$(basename "$post")" 2>/dev/null; then
+    git -C "$blog" commit -q -m "post: $title" \
+      -m "Banner from the image queue, on Cloudinary where the crop lives in the URL."
+  fi
+  say "commit: $(git -C "$blog" log --oneline -1)"
+  if [ "${PUSH:-0}" = "1" ]; then
+    git -C "$blog" push -q origin HEAD && say "pushed: the site deploys from this"
+  else
+    say "not pushed — PUSH=1 lands it"
+  fi
+}
+
+# Cloudinary keeps every public id forever, so a renamed asset or a superseded
+# convention leaves an id that nothing serves and every listing shows. The
+# references are the manifest and the blog checkout; everything else under
+# GC_PREFIX is garbage. `DRY=1` prints the list instead of destroying it.
+cmd_gc() {
+  need jq curl git
+  local prefix=${GC_PREFIX:-shaoyanji/} blog=${BLOG_DIR:-$HOME/Documents/shaoyanji.is-a.dev}
+  local keep=$IMAGES_ROOT/.gc-keep ids id n=0 gone=0
+  [ -s "$IMAGES_ROOT/published/urls.tsv" ] || die "no urls.tsv yet — run images:publish first"
+  {
+    cut -f1 "$IMAGES_ROOT/published/urls.tsv" | sed 's/\.\(png\|jpg\|jpeg\|webp\)$//; s#^#assets/#'
+    if [ -d "$blog" ]; then
+      grep -rhoE 'image/upload/[^)[:space:]"]+' "$blog/_config.yml" "$blog/_posts" 2>/dev/null |
+        sed -e 's#.*image/upload/##' -e 's#^v[0-9]*/##' -e 's#^[a-z0-9]*_[^/]*/##' \
+          -e 's/\.\(png\|jpg\|jpeg\|webp\)$//'
+    fi
+  } | sort -u >"$keep"
+  say "references: $(wc -l <"$keep") public id(s)"
+  ids=$(bash "$repo/scripts/task/cloudinary.sh" list --prefix "$prefix") || die "could not list $prefix"
+  while IFS= read -r id; do
+    [ -n "$id" ] || continue
+    n=$((n + 1))
+    # `grep ... && continue` returns 1 when the id is absent, and errexit would
+    # take that as the function failing; the absent case is the point.
+    if grep -qxF "$id" "$keep"; then continue; fi
+    if [ "${DRY:-0}" = "1" ]; then
+      say "would destroy $id"
+      gone=$((gone + 1))
+      continue
+    fi
+    bash "$repo/scripts/task/cloudinary.sh" destroy "$id" >/dev/null &&
+      { say "destroyed $id"; gone=$((gone + 1)); }
+  done <<<"$ids"
+  say "$n under $prefix, $gone orphan(s)"
+}
+
 cmd_wallpaper() {
   local newest
   newest=$(find "$IMAGES_ROOT/published/wall" "$IMAGES_ROOT/src/wall" -name '*.png' 2>/dev/null |
@@ -520,7 +672,9 @@ case "${1:-plan}" in
   status) cmd_status ;;
   judge) shift && cmd_judge "$@" ;;
   publish) cmd_publish ;;
+  post) cmd_post ;;
+  gc) cmd_gc ;;
   blog) shift && cmd_blog "$@" ;;
   wallpaper) cmd_wallpaper ;;
-  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|blog [--dir PATH]|wallpaper" ;;
+  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|wallpaper" ;;
 esac

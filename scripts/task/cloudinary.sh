@@ -11,6 +11,8 @@
 # Usage:
 #   cloudinary.sh upload FILE [--folder F] [--public-id ID]   -> prints secure_url
 #   cloudinary.sh url PUBLIC_ID [--transform T]               -> prints delivery URL
+#   cloudinary.sh list [--prefix P] [--max N]                 -> prints public ids
+#   cloudinary.sh destroy PUBLIC_ID                           -> prints the id it removed
 #
 # The signature is sha1 of the signed-parameter string in alphabetical key order
 # with the API secret appended. `file` and `api_key` are never part of it.
@@ -103,8 +105,44 @@ case "$cmd" in
     printf 'https://res.cloudinary.com/%s/image/upload/%s/%s\n' "$name" "$transform" "$id"
     ;;
 
+  list)
+    # A listing is a read on the same account, and the admin API takes basic
+    # auth: there is nothing to sign and nothing to spend.
+    prefix=""; max=500
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --prefix) prefix=${2:?--prefix needs a value}; shift 2 ;;
+        --max) max=${2:?--max needs a value}; shift 2 ;;
+        *) echo "cloudinary.sh: unknown argument $1" >&2; exit 2 ;;
+      esac
+    done
+    out=$(curl -sS --max-time 60 -u "$key:$secret" \
+      "https://api.cloudinary.com/v1_1/$name/resources/image?type=upload&max_results=$max&prefix=$prefix")
+    msg=$(printf '%s' "$out" | jq -r '.error.message // empty' 2>/dev/null || true)
+    if [ -n "$msg" ]; then
+      echo "cloudinary.sh: list refused: $msg" >&2
+      exit 1
+    fi
+    printf '%s' "$out" | jq -r '.resources[]?.public_id'
+    ;;
+
+  destroy)
+    id=${1:?destroy needs a public id}
+    [ "$#" -eq 1 ] || { echo "cloudinary.sh: destroy takes one public id" >&2; exit 2; }
+    ts=$(date +%s)
+    sig=$(printf '%s' "public_id=$id&timestamp=$ts$secret" | sha1sum | cut -d' ' -f1)
+    out=$(curl -sS -X POST "https://api.cloudinary.com/v1_1/$name/image/destroy" \
+      -F "public_id=$id" -F "api_key=$key" -F "timestamp=$ts" -F "signature=$sig")
+    res=$(printf '%s' "$out" | jq -r '.result // .error.message // empty' 2>/dev/null || true)
+    if [ "$res" != "ok" ]; then
+      echo "cloudinary.sh: destroy $id: ${res:-no answer}" >&2
+      exit 1
+    fi
+    printf '%s\n' "$id"
+    ;;
+
   *)
-    echo "cloudinary.sh: unknown command $cmd (upload|url)" >&2
+    echo "cloudinary.sh: unknown command $cmd (upload|url|list|destroy)" >&2
     exit 2
     ;;
 esac

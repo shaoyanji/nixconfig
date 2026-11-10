@@ -6045,17 +6045,19 @@
     image-daily-queue = {
       title = "The 100-image day runs itself: a queue with a freshness promise, agy as judge";
       kind = "experiment";
-      status = "BLOCKED";
+      status = "OPEN";
       date = "2026-11-10";
-      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Suspended 2026-11-10 — the wall prompts failed taste review, so the timer is gone. By hand the pipeline is proven end to end: Cloudinary holds the bytes and Pages serves a manifest frontend.";
+      summary = "A brief bank with an `every` per entry, a ledger of accepted plates, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Re-armed 2026-11-10 in four capped slots, because the generator's burst limit is 25 an hour; publishing is Cloudinary plus a tagged manifest frontend, and the wall prompts still owe a taste review.";
       refs = {
         hosts = ["frieren"];
         modules = [
           "scripts/task/image-daily.sh"
+          "scripts/task/cloudinary.sh"
           "lib/image-daily/briefs.json"
+          "lib/image-daily/site/index.html"
           "hosts/frieren/infra-stack.nix"
         ];
-        tasks = ["images:plan" "images:status"];
+        tasks = ["images:plan" "images:status" "images:publish" "images:post" "images:gc"];
       };
       body = ''
         **The queue is a file with a promise.** Each brief carries `every` days and is
@@ -6065,23 +6067,22 @@
         **Nothing publishes that a judge has not passed.** `agy
         --dangerously-skip-permissions --mode accept-edits` reads the PNG and answers
         keep/reroll/reject plus one named defect; a reroll spends one more image with
-        that defect as the only change. A judge that fails leaves the plate
-        `unjudged` — on disk, never published.
+        that defect as the only change. A failed judge leaves the plate `unjudged`.
 
         **Leftover funds the book, freshness is a gate.** Unused images feed
         `storybook.py --limit left/3`; `images:status` exits 1 when a lane's newest
-        accepted asset is older than `max_age_days`, so a green timer says nothing.
+        accepted asset is older than `max_age_days`.
 
-        **Published 2026-11-10.** Fifteen blog banners — the last four after the hourly
-        429 cleared — sit on Cloudinary with the resize in the URL, and the blog's
-        history is rewritten so a clone carries no JPEG (2.2 MB to 628 KB).
-        `images:publish` uploads, writes `manifest.json`, and deploys only `index.html`
-        plus it: a fuzzy search over 35 plates in 21 KB. The counter had to learn
-        `remaining: "unlimited"`, which it read as "allowance spent".
+        **Published 2026-11-10.** Fifteen blog banners sit on Cloudinary with the crop
+        in the URL and the blog's history rewritten so a clone carries no JPEG.
+        `images:post` is the whole motion — generate, judge, crop, upload, manifest,
+        front matter — and `images:publish` deploys only `index.html` plus a tagged
+        manifest: 35 plates searched and filtered in 21 KB. The counter had to learn
+        `remaining: "unlimited"`.
 
-        **Suspended 2026-11-10.** The wall briefs read as geometry SVG could ship, so
-        the `agentScheduler` job and its runner are gone and `images:run` is by hand
-        until the six surviving briefs pass review.
+        **Four slots, not one.** 25 an hour is the burst limit, so the timer fires at
+        00:40, 07:00, 13:20 and 19:40 with `CAP=25` each, and a missed slot is not
+        caught up. The wall prompts still owe a taste review; the rest publishes.
 
         **Measured 2026-11-10.** Motoko, Guts and 2B, then Rei, Asuka, Mari, Hinata and
         Tsunade rendered from four words; an unnamed subject in the same words gave

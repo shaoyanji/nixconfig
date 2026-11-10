@@ -298,6 +298,14 @@
       "size": "1536x1024",
       "name": "2024-03-20-a-conflicted-inter-industrial-nexus-energy-vs-tech.png",
       "prompt": "A power station and a datacentre side by side, 4k, realistic, neumorphism."
+    },
+    {
+      "id": "blog-2024-11-13-my-new-post",
+      "lane": "blog",
+      "every": 365,
+      "size": "1536x1024",
+      "name": "2024-11-13-my-new-post.png",
+      "prompt": "A typewriter beside a closed laptop, 4k, realistic, neumorphism."
     }
   ]
 }

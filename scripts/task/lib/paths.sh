@@ -57,6 +57,23 @@ secret_file() {
     "$root/modules/secrets.yaml"
 }
 
+# The directory the canonical file lives in — what the task plane expands as
+# {{.SECRETS}}. Inside the repo the answer comes back relative, so the tasks that
+# print it stay readable; an override elsewhere yields an absolute path.
+secrets_dir() {
+  local root target
+  root=$(nixconfig_root) || return 1
+  if [ -n "${NIXCONFIG_SECRETS:-}" ]; then
+    target=$(dirname "${NIXCONFIG_SECRETS}")
+  else
+    target="$root/modules/secrets"
+  fi
+  case "$target" in
+    "$root"/*) printf '%s\n' "${target#"$root"/}" ;;
+    *) printf '%s\n' "$target" ;;
+  esac
+}
+
 # The apikeys plane has no committed mirror: every reader needs the submodule.
 apikeys_file() {
   local root
@@ -95,16 +112,17 @@ secret_get() {
   sops -d --extract "$json_path" "$file" 2>/dev/null
 }
 
-# Executed form, for callers that are not shell:
-#   paths.sh root | secrets | apikeys | pii
+# Executed form, for callers that are not shell (and for Taskfile vars):
+#   paths.sh root | secrets | secrets-dir | apikeys | pii
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
   case "${1:-}" in
     root) nixconfig_root ;;
     secrets) secret_file || { secrets_absent; exit 1; } ;;
+    secrets-dir) secrets_dir || exit 1 ;;
     apikeys) apikeys_file || exit 1 ;;
     pii) pii_file || exit 1 ;;
     *)
-      printf 'usage: paths.sh root|secrets|apikeys|pii\n' >&2
+      printf 'usage: paths.sh root|secrets|secrets-dir|apikeys|pii\n' >&2
       exit 2
       ;;
   esac

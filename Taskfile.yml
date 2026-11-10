@@ -14,7 +14,19 @@ vars:
     ENC_TASKFILE: DE-Taskfile.yaml
     ENC_SECRETS: secrets.yaml
     ENC_ENVS: apikeys.yaml
-    SECRETS: modules/secrets
+    # SECRETS is a DIRECTORY: tasks expand it as {{.SECRETS}}/{{.ENC_SECRETS}}
+    # etc. It is derived, not spelled — scripts/task/lib/paths.sh is the one place
+    # that knows where the secrets tree lives, so moving it is one edit there and
+    # every {{.SECRETS}}/{{.ENC_*}} in taskfiles/* follows. The ENC_* values stay
+    # leaf filenames: they do not move with the tree.
+    SECRETS:
+        # The helper is located through git, not through {{.ROOT_DIR}}: from
+        # ~/Taskfile.yml the root Taskfile is $HOME, so ROOT_DIR there resolves to
+        # /home/<user>/scripts/…, which does not exist and broke every task run
+        # from the home directory (measured). The second spelling is the documented
+        # checkout location, used only to FIND the helper — it does not know where
+        # the secrets tree is.
+        sh: bash -c 'r=$(git -C . rev-parse --show-toplevel 2>/dev/null) || r=$(git -C "$HOME/Documents/nixconfig" rev-parse --show-toplevel); bash "$r/scripts/task/lib/paths.sh" secrets-dir'
     PI: minyx
     # Personal/desktop vars used by this file's own tasks:
     #
@@ -395,7 +407,7 @@ tasks:
     wishlist:
         desc: access ssh on my tailscale
         cmds:
-            - export $(sops -d ~/Documents/nixconfig/modules/secrets/apikeys.yaml | yq -o=shell . | grep TAILSCALE | awk '{ gsub(/\047/, ""); print }'); nix-shell -p wishlist --run "wishlist --tailscale.net=cloudforest-kardashev.ts.net --tailscale.client.id=$TAILSCALE_CLIENT_ID --tailscale.client.secret=$TAILSCALE_CLIENT_SECRET"
+            - export $(sops -d "$(bash scripts/task/lib/paths.sh apikeys)" | yq -o=shell . | grep TAILSCALE | awk '{ gsub(/\047/, ""); print }'); nix-shell -p wishlist --run "wishlist --tailscale.net=cloudforest-kardashev.ts.net --tailscale.client.id=$TAILSCALE_CLIENT_ID --tailscale.client.secret=$TAILSCALE_CLIENT_SECRET"
     ytfzf:
         desc: activates youtube from the terminal
         cmds:

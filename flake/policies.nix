@@ -357,6 +357,21 @@
         || builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" code != null);
   secretsPathOffenders =
     builtins.filter (p: !(lib.elem p secretsPathExempt) && spellsSecretsPath p) scriptFiles;
+  # The task plane has its own spelling — `{{.SECRETS}}`, fed from the same helper —
+  # so a task bypasses it when it runs sops on a secrets file named any other way.
+  # A `desc:` or a comment that mentions the file is not a command: only the text
+  # before `#` that also invokes sops counts, which is why the summaries here do not
+  # trip it.
+  taskfilePlane = builtins.filter (p: builtins.pathExists (root + "/${p}")) (["Taskfile.yml"] ++ taskfiles);
+  spellsSecretsInTask = p:
+    anyLine p (l: let
+      code = codePart l;
+    in
+      lib.hasInfix "sops" code
+      && !(lib.hasInfix "{{.SECRETS}}" code)
+      && (lib.hasInfix "modules/secrets.yaml" code
+        || builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" code != null));
+  taskfileOffenders = builtins.filter spellsSecretsInTask taskfilePlane;
   plaintextSecrets = lib.concatMap (f: map (l: "${f}: ${l}") (plaintextValues f)) presentSopsFiles;
   # The mirror is a `cp` of the submodule (`task infra:secrets:sync`), so identity
   # is the invariant. A value written to one copy only decrypts on the machine that
@@ -846,10 +861,10 @@
     };
 
     secrets-path-is-resolved-in-one-place = {
-      rule = "A script never spells where a secrets file lives. It sources `scripts/task/lib/paths.sh`, which owns one resolution order: `$NIXCONFIG_SECRETS`, then the canonical submodule copy, then the committed mirror. 27 scripts each carried the path and, with it, their own answer to canonical-versus-mirror — so a writer and a reader in the same repository could disagree about which file was authoritative, and an edit could land in the copy builds never read. The two files that still name a path are the ones whose job that is: the drift gate compares the copies, and the openwrt wrapper resolves one where the submodule may be absent.";
-      proof = "scripts/task/lib/paths.sh · scripts/**/*.sh · scripts/**/*.py";
-      holds = secretsPathOffenders == [];
-      detail = "script(s) spelling a secrets path instead of sourcing the helper: ${lib.concatStringsSep ", " secretsPathOffenders}";
+      rule = "A script never spells where a secrets file lives. It sources `scripts/task/lib/paths.sh`, which owns one resolution order: `$NIXCONFIG_SECRETS`, then the canonical submodule copy, then the committed mirror. 27 scripts each carried the path and, with it, their own answer to canonical-versus-mirror — so a writer and a reader in the same repository could disagree about which file was authoritative, and an edit could land in the copy builds never read. The two files that still name a path are the ones whose job that is: the drift gate compares the copies, and the openwrt wrapper resolves one where the submodule may be absent. A task takes the path from `{{.SECRETS}}`, which is derived from the same helper, so neither plane spells it.";
+      proof = "scripts/task/lib/paths.sh · scripts/**/*.sh · scripts/**/*.py · taskfiles/*.yml · Taskfile.yml";
+      holds = secretsPathOffenders == [] && taskfileOffenders == [];
+      detail = "bypasses the resolver: ${lib.concatStringsSep ", " (secretsPathOffenders ++ taskfileOffenders)}";
     };
 
     secrets-files-are-registered = {

@@ -56,12 +56,13 @@ cpg usage --json | jq '{images: .usage.images, prompts: .usage.dailyQueries}'
 ```
 
 Measured 2026-11-08 on the lifetime pool: **100 images per day**, resetting at
-00:00 UTC, and 350 prompts per day. No per-hour image rate appears in the
-payload any more, and four generations issued back to back ran at 13–15 s each
-with no 429 — the daily counter is the one that stops a batch.
+00:00 UTC, and 350 prompts per day. The hourly bucket is not in the payload but
+it exists: on 2026-11-10 a batch of 26 plates in 30 minutes was answered
+`RATE_LIMITED` with 74 images still unspent.
 
-- Read `usage.images.remaining` before a batch and between batches. A 429 means
-  the day is spent, not the hour; wait for 00:00 UTC instead of retrying.
+- Read `usage.images.remaining` before a batch and between batches. A 429 with
+  images left is the hourly bucket: back off 60 s, then 120 s, then 240 s, and
+  a fourth failure is a spent window, not a reason to keep retrying.
 - Spend generations on what only a model can do. Cropping, resizing, colour
   grading, text overlays and repetition are local work for an image tool.
 - One composed prompt beats three variations. Re-roll on a named defect ("the
@@ -92,8 +93,9 @@ with no 429 — the daily counter is the one that stops a batch.
   forever; that is the binary, not the account.
 - `400 … The model is not supported`: the id was retired. Re-read the catalog
   with the `jq` above; do not retry the same id.
-- `429`: the daily image allowance is spent. `cpg usage --json | jq .usage.images`
-  says when it resets; there is no queue to join.
+- `429`: read the body. `RATE_LIMITED` with `remaining` above zero is the hourly
+  bucket — back off and retry; `remaining` at zero is the day, and
+  `cpg usage --json | jq .usage.images` says when it resets. There is no queue.
 
 ## What it is not
 

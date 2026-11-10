@@ -6069,19 +6069,22 @@
         that defect as the only change. A judge that fails leaves the plate
         `unjudged` — on disk, never published.
 
-        **Leftover is not wasted.** The allowance resets 00:00 UTC with no carry-over,
-        so what the queue does not use goes to `storybook.py run --limit left/3`,
-        which stops when the book is finished.
+        **Leftover is not wasted.** The allowance resets 00:00 UTC with no carry-over;
+        the unused goes to `storybook.py --limit left/3`, which stops when the book is done.
 
         **Freshness is a gate.** `images:status` exits 1 when a lane's newest accepted
-        asset is older than its `max_age_days`; a green timer says nothing about
-        content.
+        asset is older than its `max_age_days`; a green timer says nothing about content.
 
         **Suspended 2026-11-10.** The first full run kept 20 plates before the
         generator answered 429: Frieren in neumorph style passed, the flat-vector
         wall briefs read as geometry SVG could ship. The wall bank is down to six,
         the `agentScheduler` job and its runner are removed, and `images:run` is
         by hand until the prompts pass review.
+
+        **Measured 2026-11-10.** Motoko, Guts and 2B, then Rei, Asuka, Mari, Hinata
+        and Tsunade, all rendered as composed portraits from four words; an unnamed
+        subject in the same words gave geometry. Two names were refused by the
+        generator's safety filter, so a character bank carries that risk.
 
         **Blocker.** A verdict on the four-word shape: the named subject, not the
         quality tokens, is what renders. `images:wallpaper` stays by hand on dwl.

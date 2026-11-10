@@ -85,13 +85,14 @@ tasks:
     desc: One motion from a title to a post with its banner already on Cloudinary
     summary: >
       Generates a banner, has `agy` judge it (one defect buys one re-roll), crops
-      1200x630, uploads it as `assets/blog/<slug>`, adds it to the manifest and deploys
-      the frontend, then writes `_posts/<day>-<slug>.md` in the blog checkout with that
-      URL in `image:`. The banner exists before the file does, so a post cannot carry a
-      hero that 404s. `SLUG=` and `TITLE=` are required; `PUSH=1` lands it and
-      `FORCE=1` rewrites an existing post's front matter.
+      1200x630, uploads it as `assets/blog/<slug>` and adds it to the manifest, then
+      writes `_posts/<day>-<slug>.md` with that URL in `image:`. The banner exists
+      before the file does, so a post cannot carry a hero that 404s. `SLUG=` and
+      `TITLE=` are required; `DRAFT=1` promotes an existing `_posts/*-<slug>.md` —
+      body, description, toc flags — removes the draft and lands both in one commit;
+      `PUSH=1` pushes and `FORCE=1` rewrites an existing post.
     cmds:
-      - SLUG="{{.SLUG}}" TITLE="{{.TITLE}}" PROMPT="{{if .PROMPT}}{{.PROMPT}}{{end}}" TAGS="{{if .TAGS}}{{.TAGS}}{{end}}" PUSH="{{if .PUSH}}{{.PUSH}}{{end}}" IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh post
+      - SLUG="{{.SLUG}}"{{if .DRAFT}} DRAFT="{{.DRAFT}}"{{end}} TITLE="{{.TITLE}}" PROMPT="{{if .PROMPT}}{{.PROMPT}}{{end}}" TAGS="{{if .TAGS}}{{.TAGS}}{{end}}" PUSH="{{if .PUSH}}{{.PUSH}}{{end}}" IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh post
 
   images:gc:
     desc: Destroy Cloudinary public ids that nothing references (orphans of old conventions)

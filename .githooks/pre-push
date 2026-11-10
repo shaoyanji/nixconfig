@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Pre-push: two of the gates in CI's `docs-budget` job, plus the blob-size gate
-# that CI does not run at all.
+# Pre-push: two of the gates in CI's `docs-budget` job, plus two that CI cannot run
+# at all — the blob-size gate, and the gallery manifest, whose source rows live
+# outside the repo so only a machine that has them can compare the two.
 #
 # Every red run on main costs a mail and a context switch, and on this tree that
 # job is where a change lands red: a taskfile shard that no longer compiles to the
@@ -42,6 +43,19 @@ if [ -f scripts/task/repo-blobs.sh ]; then
     echo "pre-push: a blob over 512 KiB would enter the remote with this push:"
     grep -E 'OVER|push:' /tmp/pre-push-blobs.log | sed 's/^/  /'
     echo "  task checks:repo:blobs explains the rule; removing a pushed blob needs a rewrite."
+    status=1
+  fi
+fi
+
+# The gallery's manifest is derived from a file outside the repo, so no CI step
+# compares the two: a stale or half-built manifest is what `images:publish` then
+# ships to the frontend, with no red run to say so. Where the asset root is absent
+# the script says that and exits 0, so a keyless clone pays nothing.
+if [ -f scripts/task/images-check.sh ]; then
+  if ! bash scripts/task/images-check.sh >/tmp/pre-push-images.log 2>&1; then
+    echo "pre-push: the image manifest no longer matches its source rows:"
+    sed 's/^/  /' /tmp/pre-push-images.log | tail -20
+    echo "  Rebuild it: task images:publish   (see it alone: task checks:images)"
     status=1
   fi
 fi

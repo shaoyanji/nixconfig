@@ -540,6 +540,15 @@ cmd_blog() { # [--dir PATH]
 # One motion from a title to a post that has a banner. The banner is generated,
 # judged and uploaded before the file exists, so a post cannot ship with a hero
 # that 404s, and no JPEG enters the tree.
+# One front-matter field from a draft, unquoted. A draft is the source of the body
+# and of the metadata the generator never asks for (description, author, the toc
+# flags); the banner, the date and the title are the generator's.
+fm_field() {
+  awk -v k="$1" '/^---$/{n++; next} n==1 && index($0, k":")==1 {
+      v=substr($0, length(k)+2); sub(/^ +/, "", v); gsub(/^"|"$/, "", v); print v; exit
+    }' "$2"
+}
+
 cmd_post() {
   need jq cpg agy ffmpeg git
   local slug=${SLUG:-} title=${TITLE:-} prompt=${PROMPT:-} alt=${ALT:-}
@@ -555,6 +564,21 @@ cmd_post() {
   if [ -f "$post" ] && [ "${FORCE:-0}" != "1" ]; then
     die "$post exists — FORCE=1 to rewrite its front matter (the body is kept)"
   fi
+  # A promotion starts from a draft: same slug, an older date, a body already
+  # written. `DRAFT=1` finds it beside the target, `DRAFT=<path>` names it.
+  local draft=''
+  case ${DRAFT:-} in
+  '' | 0) ;;
+  1)
+    draft=$(ls -1 "$blog"/_posts/*-"$slug".md 2>/dev/null | grep -v "/$day-" | head -1 || true)
+    [ -n "$draft" ] || die "DRAFT=1: no _posts/*-$slug.md beside $post to promote"
+    ;;
+  *)
+    draft=${DRAFT#./}
+    case $draft in /*) ;; *) draft=$blog/$draft ;; esac
+    ;;
+  esac
+  [ -z "$draft" ] || [ -f "$draft" ] || die "no draft at $draft"
   [ "$(remaining || echo 0)" -gt 0 ] || die "no images left today"
 
   say "$slug: generating a banner"
@@ -593,23 +617,65 @@ cmd_post() {
   # The public id carries no extension; the delivery URL names the format anyway,
   # and the other fifteen posts are `.jpg`, so a scraper never has to guess.
   card=$card.jpg
-  # FORCE rewrites the front matter of a post that already has a body; the body is
-  # everything after the second fence.
-  [ -f "$post" ] && body=$(awk 'BEGIN{n=0} /^---$/{n++; next} n>=2' "$post")
+  # Two sources for the metadata: a draft (a promotion) or an existing post
+  # (`FORCE=1`). The body is everything after the second fence either way.
+  local fm_src=''
+  if [ -n "$draft" ]; then
+    fm_src=$draft
+  elif [ -f "$post" ]; then
+    fm_src=$post
+  fi
+  [ -z "$fm_src" ] || body=$(awk 'BEGIN{n=0} /^---$/{n++; next} n>=2' "$fm_src" | sed '/./,$!d')
+  [ -z "$fm_src" ] || [ -n "$body" ] || die "$fm_src has no body after its front matter"
+  local cats=${CATEGORIES:-} tgs=${TAGS:-} desc=${DESCRIPTION:-} author=${AUTHOR:-}
+  local pin=false toc=true comments=false math=false mermaid=false
+  if [ -n "$fm_src" ]; then
+    [ -n "$cats" ] || cats=$(fm_field categories "$fm_src")
+    [ -n "$tgs" ] || tgs=$(fm_field tags "$fm_src")
+    [ -n "$desc" ] || desc=$(fm_field description "$fm_src")
+    [ -n "$author" ] || author=$(fm_field author "$fm_src")
+    pin=$(fm_field pin "$fm_src")
+    toc=$(fm_field toc "$fm_src")
+    comments=$(fm_field comments "$fm_src")
+    math=$(fm_field math "$fm_src")
+    mermaid=$(fm_field mermaid "$fm_src")
+    pin=${pin:-false}
+    toc=${toc:-true}
+    comments=${comments:-false}
+    math=${math:-false}
+    mermaid=${mermaid:-false}
+  fi
+  cats=${cats:-Blog}
+  tgs=${tgs:-technology}
+  cats=${cats#[}
+  cats=${cats%]}
+  tgs=${tgs#[}
+  tgs=${tgs%]}
   {
     printf -- '---\n'
     printf 'layout: post\n'
     printf 'title: "%s"\n' "${title//\"/\\\"}"
     printf 'date: %s 00:00:00 +0000\n' "$day"
-    printf 'categories: [%s]\n' "${CATEGORIES:-Blog}"
-    printf 'tags: [%s]\n' "${TAGS:-technology}"
+    printf 'categories: [%s]\n' "$cats"
+    printf 'tags: [%s]\n' "$tgs"
+    [ -z "$desc" ] || printf 'description: "%s"\n' "${desc//\"/\\\"}"
+    [ -z "$author" ] || printf 'author: %s\n' "$author"
     printf 'image:\n  path: %s\n  alt: "%s"\n' "$card" "${alt//\"/\\\"}"
+    if [ -n "$fm_src" ]; then
+      printf 'pin: %s\ntoc: %s\ncomments: %s\nmath: %s\nmermaid: %s\n' \
+        "$pin" "$toc" "$comments" "$math" "$mermaid"
+    fi
     printf -- '---\n\n'
     [ -z "$body" ] || printf '%s\n' "$body"
   } >"$post"
   say "post: $post"
-  git -C "$blog" add -A -- "_posts/$(basename "$post")"
-  if ! git -C "$blog" diff --cached --quiet -- "_posts/$(basename "$post")" 2>/dev/null; then
+  local paths=("${post#"$blog"/}")
+  if [ -n "$draft" ] && [ "$draft" != "$post" ]; then
+    rm -f "$draft"
+    paths+=("${draft#"$blog"/}")
+  fi
+  git -C "$blog" add -A -- "${paths[@]}"
+  if ! git -C "$blog" diff --cached --quiet -- "${paths[@]}" 2>/dev/null; then
     git -C "$blog" commit -q -m "post: $title" \
       -m "Banner from the image queue, on Cloudinary where the crop lives in the URL."
   fi

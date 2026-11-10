@@ -54,6 +54,11 @@ the skeleton prints the two `qmd search` commands to run where it does.
 
 ## The banner
 
+A draft becomes a post in one command: `task images:post SLUG=<slug> TITLE="…" DRAFT=1`
+takes the body and the metadata from `_posts/*-<slug>.md`, generates and uploads the
+banner, writes `_posts/<today>-<slug>.md`, removes the draft and commits both paths.
+`DRAFT=<path>` names the file when the glob would not find it.
+
 A post's hero is not a file in that repo. It is a Cloudinary public id, and the
 crop lives in the delivery URL:
 

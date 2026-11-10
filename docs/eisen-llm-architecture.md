@@ -103,6 +103,23 @@ Both use `unitConfig.ConditionPathExists = "!<file>"` and `curl -fL --retry 5 -C
 
 ---
 
+## Image service (Qwen-Image, on demand)
+
+`qwen-image` is a persistent `sd-server` behind socket activation. systemd holds
+`:8282`; the first connection starts the wrapper, which unloads `llama-swap` (a
+429 if a generation is running), spawns `sd-server` on `:8283` with the fixed
+Turbo schedule, and keeps the weights resident, so the HDD cold load is paid once
+per session. While `sd-server` holds the GPU the wrapper writes
+`RUNTIME_DIRECTORY/active`; the LLM router reads that file and 429s chat, so the
+LLM wins by not starting rather than by killing the image job. An idle timer
+stops the service after 900 s and frees the GPU; the socket stays open, so the
+next request wakes it. Nothing may `want` the service, or boot defeats on-demand.
+
+The package overrides `stable-diffusion-cpp` to `f0aac52` because nixpkgs' pin
+(`656a135`, 2026-09-18) predates Qwen-Image 2.1 support (2026-09-20).
+`fetchSubmodules` is required (ggml is a submodule), and `vulkanSupport` comes
+from the override.
+
 ## Model roster
 
 | Model | Total / Active | Quant | Aliases | Notes |

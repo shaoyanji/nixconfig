@@ -17,6 +17,7 @@
   # the only way to give clients ONE resolver address backed by several hosts.
   # Tailscale does not fail over between two global nameservers, so listing
   # "frieren then delphi" would just break DNS when the first one dies.
+  # Home: docs/delphi-install.md §"Phase 4d — the 10.99.0.53 failover pair"; docs/dns-failover.md.
   dnsServiceAddress = "10.99.0.53";
 
   # Registry facts, not constants: `inventory.toml` carries the public name and
@@ -36,6 +37,7 @@
   #
   # `""` (the registry's "unknown") becomes null, or `lib.optionalAttrs` would
   # generate a vhost with an empty `server_name`.
+  # Home: docs/delphi-install.md §"Phase 4c — HTTPS (done 2026-10-20)".
   publicDomain = let
     d = hostMeta.network.domain;
   in
@@ -43,21 +45,10 @@
     then null
     else d;
 
-  # DeepSeek Harness, TAILNET ONLY. tailscaled terminates TLS for the MagicDNS
-  # name with a certificate no public client can present, and forwards to the
-  # same loopback app — so the harness is not reachable from the internet at
-  # all. That matters because the only gate out there was a bearer token, and
-  # the worker runs as a user that holds the fleet SSH CA key.
-  #
-  # Mounted at the root: no prefix to strip, so the proxy is a plain
-  # pass-through and the session cookie is keyed to exactly one authority
-  # (`tailnetHost:servePort`).
-  #
-  # 8443 on purpose. nginx owns 0.0.0.0:443 for the public landing page, and a
-  # listener on the tailnet address at 443 fails while that bind exists
-  # (measured: "bind: address already in use").
-  # Both halves are registry facts, the suffix included (`tailnet_domain`), so a
-  # host that moves domains cannot leave a literal behind in its own config.
+  # DeepSeek Harness, tailnet only: tailscaled terminates TLS and forwards to the
+  # loopback app, so the harness is unreachable from the internet. 8443 because
+  # nginx owns 0.0.0.0:443. Runbook: .agents/deploy/hosts/delphi.md §"DeepSeek
+  # Harness (tailnet only)".
   tailnetHost = "${hostMeta.network.tailscale_hostname}.${hostMeta.network.tailnet_domain}";
   # Stable per node key, and the only address that works here: delphi runs
   # `--accept-dns=false` (a resolver must not resolve through the address it

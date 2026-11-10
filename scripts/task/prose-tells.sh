@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 # prose-tells.sh — the unslop vocabulary, as a gate (`.agents/skills/unslop`).
 #
+# The words are NOT in this file. modules/config/prose-tells.tsv is the one copy;
+# this script and the skill both read it, so the gate and the procedure cannot
+# disagree about which words are tells. A row is
+# `rule<TAB>word<TAB>pattern<TAB>mode`, where mode is `gate` (a regex can judge
+# it) or `reader` (it is listed for a human, because the word has a concrete
+# sense here and a regex would produce the false positive that gets a gate
+# switched off).
+#
 # One implementation behind every surface that asks the question:
 #   task checks:prose                     (human/agent, and inside checks:quick)
+#   task checks:prose VOCAB=1             print the list, grouped by rule
 #   checks.<system>.prose-tells           (nix flake check, and the CI job that
 #                                         runs on every push, doc-only included)
-#
-# Only the rules a regex can judge without guessing: the vocabulary list (7), the
-# fancy ways to say "is" (8), curly quotes (19), chatbot phrases (20), filler
-# (23), the abstract metaphor nouns (26) and the plain-word list (31). Rules 3,
-# 5, 9, 10, 11, 12, 14-18, 27-30, 32 and 33 need a reader, and a gate that
-# guesses at them produces the false positive that gets the gate switched off.
 #
 # A line may carry `prose-tell-ok: <reason>` when the word is the concrete one:
 # a quoted vocabulary list, a product name, a command that scaffolds a file.
 #
-# Exit: 0 clean, 1 on any tell.
+# Exit: 0 clean, 1 on any tell, 2 the list is missing or malformed.
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,57 +28,59 @@ else
   cd "$here/../.."
 fi
 
-# rule<TAB>pattern. The hint that goes with each rule lives in the unslop skill;
-# repeating it here would be a second copy that drifts.
-tells="$(
-  cat <<'EOF'
-7	\bcrucial\b
-7	\bdelv(e|es|ed|ing)\b
-7	\benduring\b
-7	\benhanc(e|es|ed|ing|ement)\b
-7	\bfoster(s|ed|ing)?\b
-7	\bgarner(s|ed|ing)?\b
-7	\binterplay\b
-7	\bintricate\b
-7	\blandscape\b
-7	\bpivotal\b
-7	\bshowcase(s|d|ing)?\b
-7	\btapestry\b
-7	\btestament\b
-7	\bunderscore(s|d|ing)?\b
-7	\bvibrant\b
-7	\badditionally,
-8	\bserves as\b
-8	\bstands as\b
-8	\bboasts\b
-19	“|”|‘|’
-20	\bi hope this helps\b
-20	\blet me know if\b
-20	\bgreat question\b
-20	\byou'?re absolutely right\b
-23	\bin order to\b
-23	\bdue to the fact that\b
-23	\bit is important to note\b
-23	\bit'?s worth noting\b
-23	\bat the end of the day\b
-26	\bsubstrate\b
-26	\bparadigm(s)?\b
-26	\bnorth star\b
-26	\bflywheel(s)?\b
-26	\bbedrock\b
-26	\bscaffolding\b
-26	\bmodalit(y|ies)\b
-26	\blocus\b
-26	\bnexus\b
-26	\brealm\b
-31	\butiliz(e|es|ed|ing)\b
-31	\bleverag(e|es|ed|ing)\b
-31	\bfacilitat(e|es|ed|ing)\b
-31	\bnumerous\b
-31	\bmyriad\b
-31	\bplethora\b
-EOF
-)"
+data="${PROSE_TELLS:-modules/config/prose-tells.tsv}"
+if [ ! -r "$data" ]; then
+  echo "prose-tells: cannot read $data (the vocabulary list)" >&2
+  echo "  It is the source the gate and .agents/skills/unslop/SKILL.md share." >&2
+  exit 2
+fi
+
+# A malformed row is silent otherwise: a `gate` row with an empty pattern matches
+# every line, and a row with three fields drops the mode. Refuse both.
+if ! awk -F'\t' '
+  /^#/ { next }
+  /^[[:space:]]*$/ { next }
+  NF != 4 {
+    printf "prose-tells: %s:%d: expected 4 tab-separated fields, got %d\n", FILENAME, FNR, NF
+    bad = 1
+    next
+  }
+  $1 !~ /^[0-9]+$/ {
+    printf "prose-tells: %s:%d: rule \"%s\" is not a number\n", FILENAME, FNR, $1
+    bad = 1
+    next
+  }
+  $4 != "gate" && $4 != "reader" {
+    printf "prose-tells: %s:%d: mode \"%s\" is not gate|reader\n", FILENAME, FNR, $4
+    bad = 1
+    next
+  }
+  $4 == "gate" && ($3 == "" || $3 == "-") {
+    printf "prose-tells: %s:%d: a gate row needs a pattern\n", FILENAME, FNR
+    bad = 1
+    next
+  }
+  {
+    rows++
+  }
+  END {
+    if (rows == 0) {
+      print "prose-tells: the vocabulary list has no rows"
+      bad = 1
+    }
+    exit (bad ? 1 : 0)
+  }
+' "$data"; then
+  exit 2
+fi
+
+if [ "${VOCAB:-}" = "1" ]; then
+  awk -F'\t' '
+    /^#/ || /^[[:space:]]*$/ { next }
+    { printf "%-3s %-24s %s\n", $1, $2, $4 }
+  ' "$data" | sort -n -k1,1
+  exit 0
+fi
 
 # The archive keeps its voice, the unslop skill lists these words on purpose, and
 # the persona files are written in a character's voice (rules 13 and 32 exempt
@@ -105,27 +110,23 @@ awk '
 ' $files >"$stream"
 
 total=0
-while IFS=$'\t' read -r rule pattern; do
+while IFS=$'\t' read -r rule word pattern; do
   [ -n "$rule" ] || continue
   hits="$(grep -iE -- "$pattern" "$stream" || true)"
   [ -n "$hits" ] || continue
   while IFS= read -r hit; do
     where="${hit%%$'\t'*}"
     text="${hit#*$'\t'}"
-    # One line per distinct word: a sentence can carry four tells, and naming
-    # them is what makes the report actionable.
-    while IFS= read -r word; do
-      [ -n "$word" ] || continue
-      total=$((total + 1))
-      printf 'TELL  rule=%s  %s  "%s"\n      %s\n' "$rule" "$where" "$word" "$text"
-    done <<<"$(grep -oiE -- "$pattern" <<<"$text" | sort -u)"
+    total=$((total + 1))
+    printf 'TELL  rule=%s  %s  "%s"\n      %s\n' "$rule" "$where" "$word" "$text"
   done <<<"$hits"
-done <<<"$tells"
+done <<<"$(awk -F'\t' '!/^#/ && NF == 4 && $4 == "gate" {print $1 "\t" $2 "\t" $3}' "$data")"
 
 if [ "$total" -eq 0 ]; then
-  printf 'ok    %s prose files: no unslop vocabulary (rules 7/8/19/20/23/26/31)\n' "$(printf '%s\n' $files | wc -l | tr -d ' ')"
+  printf 'ok    %s prose files: no unslop vocabulary (the gate rows of %s)\n' \
+    "$(printf '%s\n' $files | wc -l | tr -d ' ')" "$data"
   exit 0
 fi
 
-printf '\n%s tell(s). Rewrite the line, or carry `prose-tell-ok: <reason>` on it\nwhen the word is the concrete one. Procedure: .agents/skills/unslop/SKILL.md\n' "$total"
+printf '\n%s tell(s). Rewrite the line, or carry `prose-tell-ok: <reason>` on it\nwhen the word is the concrete one.\nThe list is %s; print it with `task checks:prose VOCAB=1`.\n' "$total" "$data"
 exit 1

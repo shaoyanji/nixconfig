@@ -28,6 +28,7 @@
 # nothing of the host is built, which is exactly true for an aarch64 host judged from
 # an x86_64 NAS. That is why `fleetHostChecks.x86_64-linux.delphi` builds here while
 # `hostChecks.aarch64-linux.delphi` (host-arch, CI's shape) does not.
+# Home: docs/ci-pipeline.md §"The fleet gate, and why there are two shapes of it".
 let
   perSystem = system: let
     pkgs = pkgsFor system;

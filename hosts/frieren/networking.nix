@@ -1,17 +1,7 @@
 {pkgs, ...}: let
-  # frieren's LAN identity used to live only in
-  # /etc/NetworkManager/system-connections/Wired connection 1.nmconnection — an
-  # imperative file with a random UUID that nothing in this repo declared. Every
-  # other thing on this host assumes it exists: dns.nix hardcodes 192.168.3.25
-  # as the zone address and opens 53 on enp1s0, the tailnet advertises
-  # 192.168.3.0/24, and pihole-ftl binds the LAN interface. So the one fact the
-  # resolver depends on was the one fact Nix did not own, and when the profile
-  # was not applied (observed 2026-10-24: the router at .1 answered, .25 did
-  # not, and the host was up the whole time) every client lost DNS with no
-  # config to blame.
-  #
-  # Declared here instead: the same address, gateway and metric the imperative
-  # profile carried, with a stable UUID, so a rebuild always restores it.
+  # The LAN identity used to live only in an imperative NetworkManager profile
+  # nothing declared, and the resolver depends on it. Why:
+  # .agents/deploy/hosts/frieren.md §"LAN identity is declared, not imperative".
   lanProfile = {
     connection = {
       id = "frieren-lan";

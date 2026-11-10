@@ -179,3 +179,26 @@ arguments replaces the scan, which is how it is proven against scratch clones.
 - **SSH CA:** every host (incl. frieren) can sign certs — `ssh.ca.enableClient`
   - `rotate-ssh-cert` (1-week user certs, CA key via sops-nix at
     `~/.ssh/user_ca_key`).
+
+## Pi-hole log retention
+
+nixpkgs' deleter is replaced because retention did not mean seven days in three
+ways. Its `date('now','-7 day')` cutoff is a calendar day in UTC while the timer
+fired at 00:00 local, so rows reached 8.77 days (measured 2026-10-28); the delete
+now uses `now - 604800` and runs hourly, which bounds the overshoot at an hour.
+Its `ConditionFileNotEmpty` sat in `[Service]`, where systemd ignores it, so the
+guard against creating an empty database never ran; the script checks instead.
+And deleting rows does not shrink the file: SQLite keeps freed pages for reuse,
+so the database holds its high-water mark (603 MB across 147k pages, freelist 0).
+`VACUUM` takes an exclusive lock and rewrites every page, so it runs only when
+the freelist is already large, which is exactly when reclaiming matters.
+
+## LAN identity is declared, not imperative
+
+The address `192.168.3.25` used to live only in
+`/etc/NetworkManager/system-connections/Wired connection 1.nmconnection`, a file
+with a random UUID that nothing here declared. The resolver depends on it: the
+wildcard zone, the `enp1s0` firewall hole, the advertised subnet and `pihole-ftl`
+all assume it exists. On 2026-10-24 the profile was missing, the router at `.1`
+answered, `.25` did not, and every client lost DNS with no config to blame. The
+profile is declared in `hosts/frieren/networking.nix` with a stable UUID.

@@ -176,6 +176,7 @@ in
               # `Multi-User System` is printed only by stage-2 systemd: the initrd
               # reaches `Initrd Default Target`, which must not count. `crash()` ends
               # the run through the QEMU monitor, so nothing ever needs the shell.
+              # Home: docs/ci-pipeline.md §"The boot canary".
               testScript = ''
                 start_all()
                 with subtest("stage-1 hands off to stage-2"):

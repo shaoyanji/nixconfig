@@ -1,0 +1,68 @@
+# prose-tells.tsv — the unslop vocabulary, as data.
+#
+# ONE COPY. scripts/task/prose-tells.sh gates the `gate` rows, and
+# .agents/skills/unslop/SKILL.md points here instead of restating the words.
+# Print it: task checks:prose VOCAB=1
+#
+# rule<TAB>word<TAB>pattern<TAB>mode
+#
+#   gate    a regex can judge it; a hit fails the gate
+#   reader  a human judges it. The word has a concrete sense in this repo
+#           (`surface` as a serve target, `vector` as a data format), so a regex
+#           here would be the false positive that gets the gate switched off.
+#           `-` means no pattern.
+#
+# Curly quotes (rule 19) are a character class, not a word, so the display column
+# names the character rather than quoting it back into this file.
+7	crucial	\bcrucial\b	gate
+7	delve	\bdelv(e|es|ed|ing)\b	gate
+7	enduring	\benduring\b	gate
+7	enhance	\benhanc(e|es|ed|ing|ement)\b	gate
+7	foster	\bfoster(s|ed|ing)?\b	gate
+7	garner	\bgarner(s|ed|ing)?\b	gate
+7	interplay	\binterplay\b	gate
+7	intricate	\bintricate\b	gate
+7	landscape	\blandscape\b	gate
+7	pivotal	\bpivotal\b	gate
+7	showcase	\bshowcase(s|d|ing)?\b	gate
+7	tapestry	\btapestry\b	gate
+7	testament	\btestament\b	gate
+7	underscore	\bunderscore(s|d|ing)?\b	gate
+7	vibrant	\bvibrant\b	gate
+7	Additionally,	\badditionally,	gate
+8	serves as	\bserves as\b	gate
+8	stands as	\bstands as\b	gate
+8	boasts	\bboasts\b	gate
+8	features	-	reader
+19	curly quotes	“|”|‘|’	gate
+20	I hope this helps	\bi hope this helps\b	gate
+20	Let me know if	\blet me know if\b	gate
+20	Great question	\bgreat question\b	gate
+20	You're absolutely right	\byou'?re absolutely right\b	gate
+23	in order to	\bin order to\b	gate
+23	due to the fact that	\bdue to the fact that\b	gate
+23	it is important to note	\bit is important to note\b	gate
+23	it's worth noting	\bit'?s worth noting\b	gate
+23	at the end of the day	\bat the end of the day\b	gate
+26	substrate	\bsubstrate\b	gate
+26	paradigm	\bparadigm(s)?\b	gate
+26	north star	\bnorth star\b	gate
+26	flywheel	\bflywheel(s)?\b	gate
+26	bedrock	\bbedrock\b	gate
+26	scaffolding	\bscaffolding\b	gate
+26	modality	\bmodalit(y|ies)\b	gate
+26	locus	\blocus\b	gate
+26	nexus	\bnexus\b	gate
+26	realm	\brealm\b	gate
+26	wedge	-	reader
+26	vector	-	reader
+26	primitive (noun)	-	reader
+26	harness	-	reader
+26	surface	-	reader
+26	ratchet	-	reader
+31	utilize	\butiliz(e|es|ed|ing)\b	gate
+31	leverage	\bleverag(e|es|ed|ing)\b	gate
+31	facilitate	\bfacilitat(e|es|ed|ing)\b	gate
+31	numerous	\bnumerous\b	gate
+31	myriad	\bmyriad\b	gate
+31	plethora	\bplethora\b	gate

@@ -52,6 +52,7 @@
   # $RUNTIME_DIRECTORY/last-request; the idle timer uses its mtime to stop the
   # service after idleTimeout. The file is touched at startup too, so a service
   # that has not served yet is never stopped as "idle".
+  # Home: docs/eisen-llm-architecture.md §"Decision model: Laya".
   layaWrapper = pkgs.writeTextFile {
     name = "laya-serve-wrapper";
     executable = true;
@@ -222,6 +223,7 @@ in {
   # it up and defeat on-demand. Cold start (model load) is on the first
   # request's path; the router's 25 s decision timeout may 502 that one
   # request — measure cold-start latency during activation testing.
+  # Home: docs/eisen-llm-architecture.md §"Decision model: Laya".
   systemd.sockets."laya-serve" = {
     description = "Laya decision model socket (on-demand activation)";
     wantedBy = ["sockets.target"];

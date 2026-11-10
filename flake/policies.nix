@@ -52,6 +52,7 @@
   # --- library reads: the gate behind #library-content-is-not-scheduled ------
   # A library on a network mount is metadata to anything automatic. Deleting the
   # offender is not the gate; this predicate is.
+  # Rule: [[flake/policies.nix#library-content-is-not-scheduled]], cited in AGENTS.md.
   netMounts = ["/Volumes/data" "/mnt/burgernas"];
   contentExtractors = ["unsquashfs" "readelf"];
   unitHosts = nixUnder "modules" ++ nixUnder "hosts";

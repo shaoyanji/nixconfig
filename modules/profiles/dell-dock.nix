@@ -151,16 +151,8 @@ in {
       ACTION=="add|change", SUBSYSTEM=="usb", ATTR{idVendor}=="06c4", ATTR{power/control}="on", ATTR{power/wakeup}="enabled"
     '';
 
-    # The dock's Ethernet is a USB CDC-NCM device (`cdc_ncm`, e.g.
-    # enp0s20f0u2u1i5 on frieren). Left to NetworkManager's auto-generated
-    # "Wired connection N", every dock/replug mints a NEW profile and takes a
-    # fresh DHCP lease (observed .60, then .253), which the router then
-    # recycles to the next device — the duplicate-address window behind
-    # poseidon/.74 answering from two MACs. One matched profile renews the
-    # same lease instead, so the dock can move between hosts without churn.
-    #
-    # Hosts where the port is spare (frieren) keep it unmanaged: no lease at all
-    # beats a stale third default route.
+    # One matched profile with a pinned name, so a replug does not mint a second
+    # profile and a fresh lease. Why: .agents/deploy/dock-ethernet.md.
     networking.networkmanager.unmanaged = lib.mkIf (!cfg.manageUsbEthernet) [
       "driver:cdc_ncm"
     ];

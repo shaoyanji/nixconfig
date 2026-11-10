@@ -615,6 +615,7 @@ in {
       # first, so it crawls through the bytes that matter and then finishes the
       # cached rest fast — that same run went on to walk all 33.72 GiB in 8:29 at
       # 569 Mbit/s off this cache. Both sets are now stored.
+      # Home: docs/steam-cache.md §"The percentage is not a clock".
       oses = [
         "linux"
         "windows"

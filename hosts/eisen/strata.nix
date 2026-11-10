@@ -59,6 +59,7 @@ in {
       # `--native` ("the PLE key is native too"), so PLE in IQ2/IQ3 is not a
       # separable 28 GB shard. The three configs stay on /mnt/storage, so a
       # retest after an engine fix is one ExecStart line and a restart.
+      # Home: .agents/deploy/hosts/eisen.md §"Retesting a larger tier".
       ExecStart = "${strataEnv}/bin/strata-fhs -c 'source ${strataDir}/.venv/bin/activate && python -m serve.server --engine strata --config ${strataDir}/strata-coder-iq1_m.json --port ${toString port}'";
       Restart = "on-failure";
       RestartSec = 10;

@@ -85,20 +85,9 @@ in {
   hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
 
-  # Dell D6000 Universal Dock (DisplayLink / EVDI)
-  #
-  # The dock's RJ45 is a CDC-NCM port (`cdc_ncm`) the profile leaves unmanaged
-  # by default. Enabled here because the cable terminates on the same
-  # 192.168.3.0/24 segment as Wi-Fi, and it is the faster link: 6.2 MB/s against
-  # Wi-Fi's 2.6 (5 GHz pinned) and 1.8 (2.4 GHz) — the AP above this desk is a
-  # wireless mesh point, so the radio, not the powerline backbone (225/319 Mbps
-  # link rate), is the ceiling.
-  #
-  # The three failure modes recorded for this knob (AGENTS.nix,
-  # poseidon-tpm-luks-dock) are each closed: a pinned interface name so NM cannot
-  # rewrite the profile into a second UUID-named copy; a static address so the
-  # hostname-keyed DHCP lease cannot trade places with Wi-Fi's; and the ARP
-  # sysctls below so the two NICs cannot answer for each other's address.
+  # The dock's RJ45 is a CDC-NCM port the profile leaves unmanaged, and it is the
+  # faster link here (6.2 MB/s against Wi-Fi 2.6). Why:
+  # .agents/deploy/dock-ethernet.md.
   profiles.dell-dock = {
     enable = true;
     manageUsbEthernet = true;

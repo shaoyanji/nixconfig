@@ -36,6 +36,7 @@
   # Left alone, that context leaks into the rendered text and Nix refuses to
   # coerce it ("the string '1' is not allowed to refer to a store path").
   # Callers therefore pass context-free text; see `readInfo` below.
+  # Home: docs/task-control-plane.md §"Nix-native counterpart".
   parseRegistration = text: let
     lines = lib.splitString "\n" (lib.removeSuffix "\n" text);
     n = length lines;

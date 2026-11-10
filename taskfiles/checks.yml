@@ -88,13 +88,16 @@ tasks:
   checks:prose:
     desc: "[gate] Docs and skills carry none of the unslop vocabulary"
     summary: >
-      The machine-checkable half of `.agents/skills/unslop`: the AI vocabulary
-      list (rule 7), fancy ways to say "is" (8), curly quotes (19), chatbot
-      phrases (20), filler (23), abstract metaphor nouns (26) and the plain-word
-      list (31). Fenced code is skipped, so an example may contain the word.
-      A line where the word IS the concrete one carries `prose-tell-ok: <reason>`.
-      docs/history/, the unslop skill itself and the persona SOUL files are out
-      of scope (archive voice, the list, a character's voice). ~0.3 s, no eval.
+      The machine-checkable half of `.agents/skills/unslop` (rules 7, 8, 19, 20,
+      23, 26, 31), over fenced-code-stripped prose. The words are one file,
+      `modules/config/prose-tells.tsv`, which this gate and the skill both read,
+      so neither carries a second copy; `VOCAB=1` prints them by rule without
+      scanning. Rows are `gate` (a hit fails) or `reader` (a concrete sense here,
+      judged by a person). A concrete use carries `prose-tell-ok: <reason>`.
+      docs/history/, the skill itself and SOUL files are out of scope. ~0.3 s,
+      no eval.
+    env:
+      VOCAB: '{{.VOCAB | default ""}}'
     cmds:
       - bash scripts/task/prose-tells.sh
 

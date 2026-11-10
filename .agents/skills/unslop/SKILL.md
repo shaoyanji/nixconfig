@@ -24,8 +24,8 @@ Scan for the patterns, then rewrite. Match the tone of the file you are editing.
 
 ## Language
 
-7. **AI vocabulary.** Additionally, crucial, delve, enduring, enhance, foster, garner, interplay, intricate, landscape, pivotal, showcase, tapestry, testament, underscore, vibrant. Use the plain word.
-8. **Fancy ways to say "is".** "serves as", "stands as", "boasts", "features". Write "is" or "has".
+7. **AI vocabulary.** The rule-7 rows of the list below. Use the plain word.
+8. **Fancy ways to say "is".** The rule-8 rows. Write "is" or "has".
 9. **"Not just X, but Y."** State the point once.
 10. **Rule of three.** Do not force ideas into threes. Use the natural number; here that is usually one or two.
 11. **Synonym cycling.** One name per thing, repeated.
@@ -54,14 +54,21 @@ Scan for the patterns, then rewrite. Match the tone of the file you are editing.
 
 ## Jargon
 
-26. **Abstract metaphor nouns.** Substrate, wedge, vector, locus, nexus, primitive as a noun, harness, surface, bedrock, scaffolding, modality, paradigm, north star, flywheel, ratchet. Pick the concrete word: the file, the check, the table.
+26. **Abstract metaphor nouns.** The rule-26 rows, split by mode: the `gate` ones fail the check everywhere, and the `reader` ones (`surface`, `harness`, `vector`) are judged by a person because those words have a concrete sense here. Pick the concrete word: the file, the check, the table.
 27. **Say what it does, not how it feels.** "the cache stays close at hand" names a feeling. The fix names a mechanism or a number: "`checks:build:route` asks the cache over HTTP in 1.1 s". If the sentence could appear unchanged in another project's docs, it says nothing about this one.
 28. **Shorten or split.** If the reader backtracks to parse it, split the sentence.
 29. **Active voice.** Name the actor: "queries are validated by the compiler" becomes "the compiler validates queries".
 30. **Cut adverbs or fix the verb.** "significantly improves" becomes the measured delta.
-31. **Plain word.** Utilize and leverage become use; facilitate becomes help; numerous becomes many.
+31. **Plain word.** The rule-31 rows: utilize and leverage become use, facilitate becomes help, numerous becomes many.
 32. **Mannered prose.** Aphorisms, rhetorical fragments, personified code, figurative verbs. Say what you mean.
 33. **Over-compression.** Dropped articles, verbless fragments, arrows and abbreviations the reader must decode. Write whole sentences.
+
+## The list is data, not prose
+
+Every word lives once, in `modules/config/prose-tells.tsv`, with its rule and a
+`mode`. `gate` rows fail `task checks:prose`; `reader` rows need a person. Print
+the list with `task checks:prose VOCAB=1`. A rule number with no rows there is a
+rule with no words, which is allowed.
 
 ## Where it applies here
 

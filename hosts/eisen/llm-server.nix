@@ -155,6 +155,7 @@
   # override pattern (Vulkan, no web-UI npm step). The patch also touches
   # conversion/ + gguf-py/ (converter, not compiled) and
   # tests/test-llama-archs.cpp.
+  # Home: docs/eisen-llm-architecture.md §"Kolibri-1 needs a patched llama.cpp".
   llamaKolibri = (pkgs.llama-cpp.override {vulkanSupport = true;}).overrideAttrs (old: rec {
     version = "kolibri-836d571";
     src = pkgs.fetchFromGitHub {
@@ -198,6 +199,7 @@
   # cross-family draft fails to load. n-gram speculation (`--spec-type
   # ngram-*`) was also measured here and is a wash (12.5–13.8 tok/s), i.e. no
   # self-repetition to exploit on this workload.
+  # Home: docs/eisen-llm-architecture.md §"Speculative decoding (Qwen only, measured)".
   dflashName = "Qwen3.6-35B-A3B-DFlash2-Q8_0.gguf";
   dflashFile = "${modelDir}/${dflashName}";
   dflashUrl = "https://huggingface.co/aminya/Qwen3.6-35B-A3B-DFlash2-GGUF/resolve/main/${dflashName}";

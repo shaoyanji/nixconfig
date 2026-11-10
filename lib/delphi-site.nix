@@ -82,6 +82,7 @@
   # cards ARE the registry, so `[]` means the portal is disabled or the caller
   # invented its own empty list. Fail here rather than ship a page that explains
   # its own emptiness.
+  # Home: .agents/deploy/hosts/delphi.md §"The compiled surfaces".
   cardRegistry =
     if cards == []
     then throw "lib/delphi-site.nix: `cards` is empty — enable `services.servicePortal` on the host so the site renders the registry that also generates the `tailscale serve` units"

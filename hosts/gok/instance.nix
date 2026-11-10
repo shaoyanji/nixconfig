@@ -46,6 +46,7 @@ _: {
       # `/config.yml`, finds nothing, and exits 1 — which the supervisor turn
       # into a one-per-second restart loop under the extras list. (Measured on
       # the appliance, 2026-10-26: attempt 108 and climbing, no listener.)
+      # Home: docs/dns-failover.md §"The module" (blocky backend).
       "github.com/0xERR0R/blocky".commandLineFlags = ["-c" "/etc/blocky/config.yml"];
       "github.com/0xERR0R/blocky".extraFileContents."/etc/blocky/config.yml" = ''
         ports:

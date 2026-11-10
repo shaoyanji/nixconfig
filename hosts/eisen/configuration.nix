@@ -165,6 +165,7 @@ in {
   #   fsType = "btrfs";
   #   options = [ "compress=zstd" "noatime" "autodefrag" ];
   # };
+  # Home: docs/steam-cache.md §"Layout" and §"One-time setup".
 
   fileSystems."/mnt/steam" = {
     device = "/dev/disk/by-label/steam";

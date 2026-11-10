@@ -79,6 +79,7 @@ in {
     # "nomodeset"
     # "console=tty1"
     # "quiet" "loglevel=3"
+    # Home: .agents/deploy/hosts/netbook.md §"`pti=off` black-panels this machine".
   ];
   boot.kernel.sysctl = {
     "vm.swappiness" = 100;

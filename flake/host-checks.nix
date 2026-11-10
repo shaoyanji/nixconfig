@@ -45,6 +45,7 @@ lib.genAttrs systems.work (
     # gate must exist for every architecture the fleet has.
     #
     # mapAttrs is lazy in the values: building ONE attribute evaluates ONE host.
+    # Home: docs/ci-pipeline.md §"The fleet gate, and why there are two shapes of it".
     pick = kind: configs:
       lib.mapAttrs (name: cfg:
         check {

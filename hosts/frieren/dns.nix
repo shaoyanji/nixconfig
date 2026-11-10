@@ -21,6 +21,7 @@
   # pihole-ftl already listens on 0.0.0.0:53, so nothing else has to change for
   # it to answer on the bound address — verified before adding this. The module
   # also advertises the /32; only the LAN route is declared here.
+  # Home: docs/dns-failover.md §"Current state" and §"The tailnet layer".
   profiles.tailnetDnsAddress = {
     enable = true;
     advertiseRoutes = ["192.168.3.0/24"];
@@ -92,6 +93,7 @@
         # the reasoning live in the module (`steamCache.dnsmasqLines` derives them
         # from `dnsSteer`); this file only splices them in, so the resolver policy
         # has one home.
+        # Home: docs/steam-cache.md §"Steering, and the shape that broke matchmaking".
       ]
       ++ config.services.steamCache.dnsmasqLines
       ++ [
@@ -217,23 +219,9 @@
     wants = ["pihole-ftl.service"];
   };
 
-  # Upstream's deleter (nixpkgs pihole-ftl.nix) is replaced because three
-  # things in it keep retention from meaning "7 days":
-  #
-  # 1. `date('now','-7 day')` is a *calendar* day in UTC, and the timer fires at
-  #    00:00 local. One run a day against a midnight cutoff leaves rows aged
-  #    7-8 days — measured 2026-10-28 the oldest row sat exactly on the previous
-  #    run's cutoff, 8.77 days old. Retention is now `now - 604800` (a rolling
-  #    window) and the timer runs hourly, so the overshoot is an hour, not a day.
-  # 2. Its `ConditionFileNotEmpty` is set in [Service], where systemd ignores it
-  #    (journal: "Unknown key ... ignoring"), so the guard against creating an
-  #    empty database never worked. The check is in the script instead.
-  # 3. Deleting rows does not shrink the file: SQLite keeps the freed pages for
-  #    reuse and FTL's insert rate consumes them, so the file holds its
-  #    high-water mark (measured: 603 MB across 147k pages, freelist 0). VACUUM
-  #    takes an exclusive lock and rewrites every page, so it is not worth a
-  #    nightly run — it fires only when the freelist is already large (a mass
-  #    delete), which is precisely when reclaiming matters.
+  # Upstream's deleter is replaced: its calendar-day cutoff measured 8.77 days,
+  # `ConditionFileNotEmpty` in [Service] never ran, and SQLite keeps its
+  # high-water mark. Why: .agents/deploy/hosts/frieren.md §"Pi-hole log retention".
   systemd.services.pihole-ftl-log-deleter = {
     serviceConfig.ExecStart = lib.mkForce (
       pkgs.writeShellScript "pihole-ftl-log-delete" ''

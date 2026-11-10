@@ -8,15 +8,9 @@
   imageDir = "/mnt/storage/image/models";
   port = 8282;
 
-  # stable-diffusion.cpp, pinned to a commit with Qwen-Image 2.1 support.
-  # nixpkgs' stable-diffusion-cpp pins 656a135 (2026-09-18), which predates
-  # sd.cpp's day-0 Qwen-Image 2.1 support (2026-09-20). Override the src to
-  # f0aac52 (2026-10-17 master) and keep nixpkgs' build (CMake + ggml +
-  # Vulkan). fetchSubmodules=true is REQUIRED (ggml is a submodule; without
-  # it cmake/ggml.cmake fails on get_target_property). vulkanSupport=true
-  # via .override (adds the Vulkan buildInputs + SD_VULKAN=ON; nixpkgs
-  # defaults to CPU-only). sha256 is fakeHash — the build error prints the
-  # correct hash for the submodule-inclusive fetch; update it and rebuild.
+  # stable-diffusion.cpp pinned past nixpkgs' 656a135 for Qwen-Image 2.1; a
+  # submodule-inclusive fetch is required (ggml). Why:
+  # docs/eisen-llm-architecture.md §"Image service (Qwen-Image, on demand)".
   sdCpp = (pkgs.stable-diffusion-cpp.override {vulkanSupport = true;}).overrideAttrs (_old: {
     version = "2026-10-17-f0aac52";
     src = pkgs.fetchFromGitHub {
@@ -76,22 +70,10 @@ in {
   };
 
   # --- Image service: persistent sd-server + socket activation + idle-stop
-  # The wrapper (qwen-image-server.py) is the front-end on :8282. systemd
-  # holds the port (qwen-image.socket); the first connection starts the
-  # service, whose wrapper takes over systemd's listening FD. On first
-  # request it unloads llama-swap (claiming the GPU, 429 if a generation
-  # is running) and spawns sd-server (persistent, :8283) with the fixed
-  # Turbo defaults (--steps 8 --cfg-scale 1.0 --sampling-method euler
-  # --sigmas <Turbo 9-value list>). The weights stay loaded across
-  # generations, so the HDD cold load is paid once per session, not per
-  # image. While sd-server holds the GPU the wrapper writes
-  # RUNTIME_DIRECTORY/active; the LLM router checks it and 429s chat
-  # generations (LLM wins by not starting, not by killing).
-  # The idle timer stops the service after 900 s with no request, killing
-  # sd-server and freeing the GPU. The socket stays listening, so the next
-  # request wakes it again. Nothing may `want` qwen-image — nginx and
-  # tailscale-serve-image deliberately do not — or boot would pull it up
-  # and defeat on-demand.
+  # systemd holds :8282; the wrapper takes the FD, yields the GPU to chat with a
+  # 429, spawns sd-server on :8283 and stops it after 900 s idle. Nothing may
+  # `want` it, or boot defeats on-demand. Why:
+  # docs/eisen-llm-architecture.md §"Image service (Qwen-Image, on demand)".
   systemd.sockets."qwen-image" = {
     description = "Qwen-Image socket (on-demand activation)";
     wantedBy = ["sockets.target"];

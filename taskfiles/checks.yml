@@ -98,6 +98,17 @@ tasks:
     cmds:
       - bash scripts/task/prose-tells.sh
 
+  checks:images:
+    desc: "[gate] The asset manifest is a projection of urls.tsv, row for row"
+    summary: >
+      Every row of the gallery's urls.tsv must appear in the manifest exactly once,
+      and the manifest may carry nothing else. A matching count is not enough: one
+      row dropped while another is counted twice passes the arithmetic, so the
+      paths are compared as sets. External state, so it says so and exits 0 where
+      the asset root is absent instead of failing a repo-only CI run.
+    cmds:
+      - bash scripts/task/images-check.sh
+
   checks:toon:surfaces:
     desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"
     summary: >

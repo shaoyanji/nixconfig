@@ -170,6 +170,10 @@ name = "checks:inventory:compiled"
 kind = "leaf"
 
 [[check]]
+name = "checks:images"
+kind = "leaf"
+
+[[check]]
 name = "checks:kg"
 kind = "leaf"
 

@@ -7,6 +7,57 @@ probe above already uses. The pack's published 9.1–14.7 tok/s is a 16C Zen 5 w
 DDR5-5600; this box is AVX2-only Haswell-EP on DDR3-1600 (~25.6 GB/s against ~89 GB/s), so the
 archive figure is an upper bound and only a measurement on eisen settles it.
 
+### 0. Result: rejected, and the two reasons
+
+The bundled engine does not run here. `llama-server-modchip-linux-x86_64` traps
+`invalid opcode` inside its own text (ip offset `0x7e6aac`) before it prints a
+version: it is a `-march=native` build from the publisher's Zen 5 machine, and
+this Xeon E5-2673 v3 reports `avx2 bmi2 fma` with no AVX-512. The pack's README
+carries the `avx512` tag, and its own reference decode is 9.06–10.74 tok/s
+(11.5–14.7 with PVS) on 16C Zen 5 with DDR5-5600 — so the 15 tok/s bar was
+already above what the pack does on better silicon.
+
+The route that does run is the publisher's source build, on the host, because the
+repo ships patches rather than the engine:
+
+```bash
+cd /mnt/storage/models/deepseek-v4-flash
+git clone --depth 1 https://github.com/synchopate/llama-modchip
+cd llama-modchip
+nix shell nixpkgs#cmake nixpkgs#gnumake nixpkgs#gcc13 nixpkgs#git nixpkgs#python3 \
+  --command bash -c 'export CC=gcc CXX=g++; bash scripts/build_zen5_llama.sh'
+```
+
+The script clones `llama.cpp` at its pinned `d2f83055`, applies
+`patches/zen5-nemotron-256k-optimizations.patch`, copies the RouteCrack engine from
+`speculative/cpp/` and picks the ISA from `/proc/cpuinfo`: AVX-512 VNNI + BF16 if
+present, otherwise AVX2 + FMA + F16C. `make` has to be on `PATH` even though the
+result is linked by the default generator, or CMake answers `unable to find a
+build program`. The build is ~6 minutes on 24 threads.
+
+Measured on the built binary, `server` persona, `/completion` with
+`cache_prompt:false` so every run pays its own prompt:
+
+| Run | Prefill | Decode |
+| :--- | :--- | :--- |
+| 1 | 6 tok/s over 601 prompt tokens | 2.9 tok/s over 128 predicted |
+| 2 | 7 tok/s over 601 | 2.9 tok/s |
+| 3 | 7 tok/s over 601 | 2.9 tok/s |
+
+Load took 4 minutes for 56.57 GiB and the model answered coherently, so the pack
+works on this box; it is 2.9 tok/s against the 15 tok/s bar and against Strata's
+19.4 tok/s agent session, which is why `hosts/eisen/deepseek-v4.nix` stayed
+unimported and `strata` keeps `:8085`. Launch, once the build exists:
+
+```bash
+sudo systemd-run --unit=dsv4-probe --property=User=devji --property=Group=users \
+  --property=LimitCORE=0 --property=WorkingDirectory=/mnt/storage/models/deepseek-v4-flash \
+  /mnt/storage/models/deepseek-v4-flash/llama-modchip/llama.cpp/build/bin/llama-server \
+    -m DeepSeek-V4-Flash-0731-Fractal-00001-of-00003.gguf --alias deepseek-v4-flash \
+    --host 127.0.0.1 --port 8086 --threads 12 --threads-batch 24 --ctx-size 32768 \
+    --flash-attn on --jinja --metrics
+```
+
 ### 1. Wait on the right progress number
 
 aria2 runs with `falloc`, so each shard is assigned its **full length on the first write**: `ls -l`

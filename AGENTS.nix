@@ -540,9 +540,9 @@
     deepseek-v4-flash-eisen = {
       title = "DeepSeek-V4-Flash 284B on eisen: does a 57 GiB CPU pack beat what the box already serves?";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "REJECTED";
       date = "2026-11-09";
-      summary = "Synchopate/DeepSeek-V4-Flash-0731-Fractal-64GB-CPU-GGUF (56.56 GiB, 284B/13.17B active, 1.71 bpw) fits eisen's 62.5 GiB usable RAM, but the published 9.1-14.7 tok/s is a 16C Zen 5 with AVX-512BW and DDR5-5600. Eisen is AVX2-only Haswell-EP on DDR3-1600, so decode speed is the open question, not fit.";
+      summary = "Synchopate's 56.56 GiB DeepSeek-V4-Flash pack fits eisen's 62.5 GiB RAM but not its silicon: the bundled binary needs AVX-512 and dies with SIGILL here, and the AVX2 source build that runs decodes at 2.9 tok/s against Strata's 19.4. Strata stays resident; the pack stays on disk.";
       from = ["download-route-bulk"];
       refs = {
         hosts = ["eisen" "frieren"];
@@ -555,35 +555,30 @@
         docs = ["docs/deepseek-v4-flash.md" ".agents/deploy/hosts/eisen.md"];
       };
       body = ''
-        Download started 2026-11-09 through frieren's aria2 RPC (JSON-RPC addUri,
-        explicit `out=`, because the HF redirect renames a file to a 64-hex blob)
-        into /srv/data/downloads/deepseek-v4-flash: three shards, 60.74 GB, plus the
-        15.8 MB prebuilt llama-server. eisen measured 1.45 MB/s from the HF CDN, so
-        the LAN copy is the route to /mnt/storage/models — not a fetch on the host.
-        Not optional, since stock llama.cpp rejects tensor type 40 (custom Q2_0).
-        The number to beat is Strata's on the same box (14.6-21.0 tok/s decode, 4K
-        prompt). Ours is bandwidth-bound at ~25.6 GB/s against the reference box's
-        ~89 GB/s of DDR5, so the archive figure is an upper bound.
-        SHA256SUMS was seeded beside the shards from the publisher's LFS oids
-        (tree API `?expand=true`) while the download still ran, so the check never
-        trusts our own copy: the four complete members verify OK, the shards fail
-        until aria2 reports them done. The patch is a git blob with no published
-        hash, so its line is computed locally and a comment says so. The evening
-        gate, in order: both shard GIDs `complete` with no `*.aria2` control file
-        — size settles nothing, `falloc` assigns the full 57 G on first write;
-        `sha256sum -c SHA256SUMS` green here and on eisen after the LAN copy;
-        61 GB free under /mnt/storage, `strata` stopped, `server` persona active;
-        then the measurement. A shard in flight holds the copy, never rsynced.
+        Download done 2026-11-09 through frieren's aria2 RPC, then sorted to
+        /srv/data/software/models: three shards (60.74 GB) plus the 15.8 MB
+        prebuilt llama-server. The HF CDN served eisen at 1.45 MB/s, so the LAN
+        copy to /mnt/storage/models is the route, not a fetch on the host.
 
-        Measurement: in the `server` persona, as a transient unit — the pack ships
-        no `llama-bench` (server and cli only, and stock llama.cpp cannot read tensor
-        type 40), so `pp`/`tg` come from `/completion` timings and a real agent
-        session from `/metrics` deltas.        Steps: `docs/deepseek-v4-flash.md`. 57.61 GiB VmRSS leaves llama-swap,
-        Strata and Steam no room.
+        Measured 2026-11-10: REJECTED, on two counts.
+        - The bundled binary never serves a token. It traps `invalid opcode`
+          inside its own text: a `-march=native` Zen 5 build on a Xeon E5-2673
+          v3 with `avx2 bmi2 fma` and no AVX-512. The pack's README carries the
+          `avx512` tag, and its own reference decode is 9.06-10.74 tok/s on 16C
+          Zen 5 / DDR5-5600, so 15 tok/s was already above better silicon.
+        - The source build does run. `synchopate/llama-modchip` clones llama.cpp
+          at d2f83055 and applies its patch; `scripts/build_zen5_llama.sh` reads
+          `/proc/cpuinfo` and leaves AVX-512 off. Load 4 min for 56.57 GiB, then
+          pp 6-7 tok/s over 601 prompt tokens and tg 2.9 tok/s over 128
+          predicted, three runs, `cache_prompt:false`.
+
+        So the pack works on this box at a quarter of Strata's 19.4 tok/s agent
+        session. It stays on disk with its built binary, nothing is imported, and
+        Strata keeps :8085. Steps and launch line: docs/deepseek-v4-flash.md.
+
         Exit: a decode rate either justifies a port of its own on eisen.lan and a
         place in the router (`checks:host HOST=eisen` green), or the note goes
-        REJECTED carrying the measured number. It is not imported into
-        configuration.nix before that answer exists.
+        REJECTED carrying the measured number.
       '';
     };
     doc-budget-ci = {

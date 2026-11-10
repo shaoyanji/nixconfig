@@ -340,11 +340,15 @@
     else [];
   # A comment naming the path is documentation, so only the code before `#`
   # counts — the same reading the eval-decrypt gate uses. Python has no such
-  # convention for a docstring or a `help=` string, so there the path has to
-  # appear in the one shape a real spelling takes.
+  # convention for a docstring or a `help=` string, so there only a real spelling
+  # counts: a path literal (the quote sits immediately before it, so prose that
+  # merely mentions the file does not match) or an `os.path.join` that names it.
   spellsSecretsPath = p:
     if lib.hasSuffix ".py" p
-    then anyLine p (l: lib.hasInfix "modules/secrets" l && lib.hasInfix "os.path.join" l)
+    then
+      anyLine p (l:
+        (lib.hasInfix "os.path.join" l && lib.hasInfix "modules/secrets" l)
+        || builtins.match ".*[\"']modules/secrets[/.].*" l != null)
     else
       anyLine p (l: let
         code = codePart l;

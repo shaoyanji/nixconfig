@@ -75,14 +75,14 @@ tasks:
     summary: >
       The contact form's worker reads env.RESEND_API_KEY; without it the form
       answers 502 and names the mailto fallback. Reads RESEND.API.KEY from the
-      apikeys plane (modules/secrets/apikeys.yaml), the path sops.nix declares
-      for resend-api-key, and refuses an empty value instead of uploading one.
+      apikeys plane through the task plane's path vars, the same file sops.nix
+      declares for resend-api-key, and refuses an empty value instead of uploading one.
       Piped to `wrangler pages secret put`, so the key never lands in the repo
       or the shell history. Run before the first deploy that carries _worker.js,
       and again on rotation.
     cmds:
       - |
-        key=$(sops -d --extract '["RESEND"]["API"]["KEY"]' modules/secrets/apikeys.yaml)
+        key=$(sops -d --extract '["RESEND"]["API"]["KEY"]' "{{.SECRETS}}/{{.ENC_ENVS}}")
         [ -n "$key" ] || { echo "bountystash: no key at RESEND.API.KEY" >&2; exit 1; }
         printf '%s' "$key" \
           | nix-shell -p wrangler --run "wrangler pages secret put RESEND_API_KEY --project-name {{.PROJECT_NAME}}"

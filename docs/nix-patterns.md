@@ -218,34 +218,24 @@ CI builds with `nix build -L .?submodules=1#…`: `?submodules=1` makes
 submodule is checked out) and CI cannot drop it
 [[flake/policies.nix#ci-builds-config-and-gate]] — [`ci-pipeline.md`](./ci-pipeline.md).
 
-## `git push` dies on the secrets submodule
+## `git push` died on the secrets submodule
 
-**The cause is gone as of 2026-11-10:** `modules/env.nix` sets
-`submodule.recurse = false`. The failure stays recorded because a clone still
-carrying the old setting reproduces it, and `scripts/task/git-push.sh` pushes
-submodules first for its own reason.
-
-`submodule.recurse = true` makes `git push` ask every submodule whether it can
-push **the superproject's refspec source**. This repo is on `main`, the secrets
-submodule is a detached HEAD tracking `origin/master`, so the check is:
+**Cause gone 2026-11-10:** `modules/env.nix` sets `submodule.recurse = false`, so a
+current clone cannot reproduce this. Recorded because an old one can: `git push`
+then asked every submodule whether it can push **the superproject's refspec
+source** — here `refs/heads/main`, which the submodule does not have:
 
 ```
 cd modules/secrets; GIT_DIR=.git git submodule--helper push-check refs/heads/main origin main
 fatal: src refspec 'main' must name a ref
-fatal: process for submodule 'modules/secrets' failed
 ```
 
-and the superproject push never happens — rc=128, nothing sent, measured
-2026-11-02. It is easy to misread as an auth or mirror problem: the submodule
-pushes fine on its own, over https, from inside. What fails is the *check*, on a
-branch name the submodule does not have.
-
-Use `scripts/task/git-push.sh [--dry-run] [remote] [branch]`: it pushes each
-submodule's missing commits to its remote's default branch (`HEAD:refs/heads/<master>`,
-since a submodule has no `@{u}`), then the superproject with recursion off. A bare
-`--no-recurse-submodules` skips that first step and leaves a dangling pointer
-whenever the submodule has commits of its own. Every `dev:git:*` push task and
-`services:build` call the script.
+The superproject push never happens (rc=128, measured 2026-11-02) and reads as an
+auth problem, because the submodule pushes fine on its own.
+`scripts/task/git-push.sh [--dry-run] [remote] [branch]` pushes each submodule's
+missing commits to its remote's default branch first, then the superproject with
+recursion off; a bare `--no-recurse-submodules` leaves a dangling pointer whenever
+the submodule has commits of its own. Every `dev:git:*` push task calls it.
 
 ## Agent failure modes
 

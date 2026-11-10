@@ -257,3 +257,30 @@ card, then power on. Diagnosis: `ls -d /sys/bus/pci/devices/0000:05:00.0`,
 back on. `05:00.0` re-enumerated, `amdgpu` initialised, `/dev/dri/card1` +
 `renderD128` appeared, greetd started gamescope and Steam, GPU idle at 37 °C.
 `SltSta: PresDet-` is the tell to check first next time.
+
+## Qwen3.8-35B-A3B Q4_K_M trial on eisen (2026-11-10)
+
+Staged at `/mnt/storage/models/Qwen3.8-35B-A3B-Q4_K_M.gguf` (21,713,462,944 B; sha256
+`196103269085bc54c9b8f49ed21e9f53e1b56b465e8b796c6d8e31e06f63cfa5`, identical on frieren and
+eisen after the LAN copy). Benchmarked against the 50 tok/s bar that would have made it the
+default agent coder in Strata's place.
+
+The flags were the Qwen recipe above rather than a CPU path: `llama-server 0.7.0` from
+nixpkgs, Vulkan on RADV NAVI10, `--n-gpu-layers 99 --override-tensor exps=CPU --threads 12
+--threads-batch 24 --ctx-size 32768 --parallel 1 --flash-attn on --jinja --metrics`. VRAM
+resident 3.10 GiB with the expert tensors in host RAM; model load 12 s off page cache.
+
+| Run | Prefill | Decode |
+| :--- | :--- | :--- |
+| 1 | 32 tok/s over 23 prompt tokens | 15.7 tok/s over 128 predicted |
+| 2 | 31 tok/s over 23 | 15.6 tok/s over 128 |
+| 3 | 30 tok/s over 23 | 15.9 tok/s over 128 |
+
+A long prompt prefills at 93-94 tok/s over 601 tokens, and an agent-shaped request (18 in,
+161 out) decodes at 15.9 tok/s.
+
+**Verdict: rejected.** 15.7 tok/s is a third of the 50 tok/s bar, and it is also below
+Strata's 19.4 tok/s agent session, so it displaces nothing even if the bar is set aside. The
+figure is not a tuning miss: ~3 B active parameters at Q4_K_M is ~1.7 GB of expert weights
+read per token, and the board's 25.6 GB/s of DDR3-1600 divides into ~15 tok/s. Decode is at
+the memory wall, and 50 tok/s would need roughly three times this board's bandwidth.

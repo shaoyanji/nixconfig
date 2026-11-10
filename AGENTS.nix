@@ -581,6 +581,45 @@
         REJECTED carrying the measured number.
       '';
     };
+    qwen38-35b-a3b-eisen = {
+      title = "Qwen3.8-35B-A3B on eisen: does it reach 50 tok/s and take Strata's job?";
+      kind = "experiment";
+      status = "REJECTED";
+      date = "2026-11-10";
+      summary = "Qwen3.8-35B-A3B Q4_K_M copied to eisen (21.7 GB, sha256 matched) and benched on Vulkan with the experts in RAM: 15.6-15.9 tok/s decode over three 128-token runs and 93 tok/s prefill, against a 50 tok/s bar and Strata's 19.4. Rejected — ~1.7 GB of expert weights per token against 25.6 GB/s is a ~15 tok/s wall.";
+      refs = {
+        hosts = ["eisen"];
+        modules = ["hosts/eisen/llm-server.nix" "hosts/eisen/strata.nix"];
+        tasks = ["checks:host"];
+        docs = ["docs/eisen-llm-architecture.md" "hosts/eisen/HANDOFF.md"];
+      };
+      body = ''
+        Copied 2026-11-10 from frieren's /srv/data/software/models over the LAN at
+        ~78 MB/s; 21,713,462,944 B and sha256 1961032690...cfa5 verified on both
+        ends. It sits at /mnt/storage/models beside the DeepSeek pack.
+
+        The bar was explicit: 50 tok/s would have made it the default agent coder
+        in Strata's place. Measured on the Qwen recipe, not a CPU path —
+        llama-server 0.7.0, Vulkan RADV NAVI10, `-ngl 99 -ot exps=CPU -t 12 -tb 24
+        -c 32768 --flash-attn on`, 3.10 GiB VRAM resident with the experts in host
+        RAM and a 12 s load off page cache:
+        - decode 15.7 / 15.6 / 15.9 tok/s over 128 predicted, three runs,
+          `cache_prompt:false`;
+        - prefill 93-94 tok/s over 601 prompt tokens, 30-32 over 23;
+        - an agent-shaped turn, 18 tokens in and 161 out, decoded at 15.9 tok/s.
+
+        Rejected on two counts. It is a third of the 50 tok/s bar, and it is also
+        below Strata's 19.4 tok/s agent session, so it displaces nothing even if
+        the bar is set aside. Nor is it a tuning miss: ~3 B active parameters at
+        Q4_K_M is ~1.7 GB of expert weights per token, and 25.6 GB/s of DDR3-1600
+        divides into ~15 tok/s. 50 tok/s needs about three times this board's
+        bandwidth, which is a hardware change rather than a flag.
+
+        Exit: a decode rate above 50 tok/s on this box, or the note stays
+        REJECTED. The file stays on disk for a retest, nothing is imported, and
+        Strata keeps :8085.
+      '';
+    };
     doc-budget-ci = {
       title = "Doc budget gate in CI";
       kind = "open";

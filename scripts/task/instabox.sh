@@ -41,13 +41,15 @@ EOF
 # Sets KEY in this shell rather than echoing it: a `die` inside `$( )` only
 # ends the subshell, and the caller then sends an empty key to the API.
 KEY=""
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+
 load_key() {
   [ -n "$KEY" ] && return
   if [ -n "${INSTABOX_API_KEY:-}" ]; then
     KEY="$INSTABOX_API_KEY"
     return
   fi
-  KEY="$(sops -d --output-type json "$root/modules/secrets/${ENC_ENVS:-apikeys.yaml}" 2>/dev/null |
+  KEY="$(sops -d --output-type json "$(apikeys_file)" 2>/dev/null |
     jq -r '.INSTABOX.API.KEY // empty')" || die "cannot decrypt apikeys.yaml (no sops keys here?)"
   [ -n "$KEY" ] || die "no INSTABOX.API.KEY in apikeys.yaml"
 }

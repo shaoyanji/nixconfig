@@ -63,11 +63,13 @@ query=$(jq -rn \
   + (if $subject != "" then "&subject=\($subject | @uri)" else "" end)
   + (if $source != "" then "&source=\($source | @uri)" else "" end)')
 
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+
 token=${AGENT_TURNS_TOKEN:-}
 if [ -z "$token" ]; then
   command -v sops >/dev/null || unreadable 'no AGENT_TURNS_TOKEN and sops is not on PATH'
-  token=$(sops -d "$ROOT/modules/secrets.yaml" | yq -r '.["agent-turns-token"]') ||
-    unreadable 'could not read agent-turns-token from modules/secrets.yaml'
+  token=$(secret_get '["agent-turns-token"]') ||
+    unreadable 'could not read agent-turns-token from sops (submodule checked out? age key?)'
 fi
 [ "${#token}" -ge 32 ] || unreadable 'the agent-turns token is missing or too short'
 

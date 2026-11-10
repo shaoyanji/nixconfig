@@ -8,16 +8,15 @@ set -euo pipefail
 
 API="${GITENVS_URL:-https://git.envs.net/api/v1}"
 
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+
 die() {
   printf 'gitenvs: %s\n' "$*" >&2
   exit 1
 }
 
 token() {
-  local root
-  root=$(git rev-parse --show-toplevel 2>/dev/null) || die "run this inside the nixconfig checkout"
-  sops -d --extract '["gitenvstoken"]' "$root/modules/secrets.yaml" \
-    || die "gitenvstoken is missing from modules/secrets.yaml"
+  secret_get '["gitenvstoken"]' || die "gitenvstoken is unreadable from sops (submodule checked out? age key?)"
 }
 
 # The token rides in a header read from stdin, so it never reaches another

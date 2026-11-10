@@ -47,7 +47,18 @@ SCALARS = WRITABLE + ("timezone", "calendar", "contact_form")
 
 ROOT = subprocess.check_output(["git", "rev-parse", "--show-toplevel"], text=True).strip()
 DATA = os.path.join(ROOT, "modules", "config", "gravatar.toml")
-SECRETS = os.path.join(ROOT, "modules/secrets", "secrets.yaml")
+def _secrets_path() -> str:
+    """The canonical sops file, resolved by scripts/task/lib/paths.sh so this
+    script never spells where it lives."""
+    helper = os.path.join(ROOT, "scripts", "task", "lib", "paths.sh")
+    out = subprocess.run([helper, "secrets"], capture_output=True, text=True)
+    path = out.stdout.strip()
+    if out.returncode != 0 or not path:
+        raise SystemExit("gravatar-profile: paths.sh could not resolve a secrets.yaml (submodule checked out?)")
+    return path
+
+
+SECRETS = _secrets_path()
 
 
 def token():

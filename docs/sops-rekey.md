@@ -383,6 +383,8 @@ SOPS_AGE_KEY_FILE=… sops -d "$STORE" | sha256sum             # == the pulled c
 - **A recursive fetch aborts the pull.** `submodule.recurse` is off fleet-wide;
   `git pull --recurse-submodules` on a host without the private ssh key fails the
   whole pull, superproject included.
+- **Scripts never spell the path.** `scripts/task/lib/paths.sh` resolves it once
+  [[flake/policies.nix#secrets-path-is-resolved-in-one-place]].
 - **The submodule `.sops.yaml`** — `modules/secrets/.sops.yaml` is a copy. Forgetting
   step 3 re-wraps to the old set and the file still decrypts for you, so it looks fine
   until a host that was just added cannot decrypt.

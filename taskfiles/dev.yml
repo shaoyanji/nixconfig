@@ -893,8 +893,9 @@ tasks:
     desc: List all cloak accounts
     cmds:
       - |
-        sops -d {{.SECRETS}}/{{.ENC_SECRETS}} 2>/dev/null | yq '.cloak' | grep -E '^\[.*\]$' | tr -d '[]' \
-          || sops -d modules/secrets.yaml 2>/dev/null | yq '.cloak' | grep -E '^\[.*\]$' | tr -d '[]'
+        # One resolution order, owned by scripts/task/lib/paths.sh: the canonical
+        # submodule copy first, the committed mirror as the fallback.
+        sops -d "$(bash scripts/task/lib/paths.sh secrets)" 2>/dev/null | yq '.cloak' | grep -E '^\[.*\]$' | tr -d '[]'
 
   dev:cloak:view:
     desc: Pick an account and view its TOTP

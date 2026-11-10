@@ -16,6 +16,7 @@ set -euo pipefail
 
 ROOT=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 TEMPLATE=${XS_TURN_TEMPLATE:-$ROOT/scripts/task/xs-turn.jq}
+. "$ROOT/scripts/task/lib/paths.sh"
 URL=${XS_TURNS_URL:-https://delphi.cloudforest-kardashev.ts.net:8449}
 STATE_DIR=${XDG_STATE_HOME:-$HOME/.local/state}/agent-turns
 BODY=$STATE_DIR/last-turn.json
@@ -125,8 +126,8 @@ bytes=$(printf '%s' "$body" | wc -c | tr -d ' ')
 token=${AGENT_TURNS_TOKEN:-}
 if [ -z "$token" ]; then
   command -v sops >/dev/null || fail 3 'no AGENT_TURNS_TOKEN and sops is not on PATH'
-  token=$(sops -d "$ROOT/modules/secrets.yaml" | yq -r '.["agent-turns-token"]') ||
-    fail 3 'could not read agent-turns-token from modules/secrets.yaml'
+  token=$(secret_get '["agent-turns-token"]') ||
+    fail 3 'could not read agent-turns-token from sops (submodule checked out? age key?)'
 fi
 [ "${#token}" -ge 32 ] || fail 3 'the agent-turns token is missing or too short'
 

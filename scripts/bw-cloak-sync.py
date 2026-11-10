@@ -19,7 +19,17 @@ import urllib.parse
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
-SECRETS_FILE = os.path.join(REPO_ROOT, "modules/secrets.yaml")
+PATHS_HELPER = os.path.join(SCRIPT_DIR, "task", "lib", "paths.sh")
+
+
+def secrets_file() -> str:
+    """The canonical sops file. scripts/task/lib/paths.sh owns the order: an
+    explicit $NIXCONFIG_SECRETS, then the submodule copy, then the mirror."""
+    out = subprocess.run([PATHS_HELPER, "secrets"], capture_output=True, text=True)
+    path = out.stdout.strip()
+    if out.returncode != 0 or not path:
+        sys.exit("bw-cloak-sync: paths.sh could not resolve a secrets.yaml (is the submodule checked out?)")
+    return path
 CLOAK_RUNTIME_FILE = os.path.expanduser("~/.cloak/accounts")
 
 
@@ -268,7 +278,7 @@ def main():
 
     args = parser.parse_args()
 
-    existing_accounts, raw_toml = load_existing_sops_cloak(SECRETS_FILE)
+    existing_accounts, raw_toml = load_existing_sops_cloak(secrets_file())
 
     if args.export_age:
         out_file = args.export_age
@@ -448,7 +458,7 @@ def main():
         if not added and not updated:
             print("\nSOPS cloak configuration is already fully up to date.")
         else:
-            print("\nApplying changes to modules/secrets.yaml via SOPS...")
+            print("\nApplying changes to the canonical sops file via SOPS...")
             tmp_toml = os.path.join(REPO_ROOT, "modules", "cloak.tmp.toml")
             tmp_yaml = os.path.join(REPO_ROOT, "modules", "secrets.tmp.yaml")
             with open(tmp_toml, "w") as tf:
@@ -456,7 +466,7 @@ def main():
 
             # Decrypt existing secrets.yaml to temporary file in modules/
             with open(tmp_yaml, "w") as yf:
-                subprocess.run(["sops", "-d", SECRETS_FILE], env=get_sops_env(), stdout=yf, check=True)
+                subprocess.run(["sops", "-d", secrets_file()], env=get_sops_env(), stdout=yf, check=True)
 
             # Update .cloak block using Go yq load_str
             subprocess.run(["yq", "e", f'.cloak = load_str("{tmp_toml}")', "-i", tmp_yaml], check=True)
@@ -465,11 +475,23 @@ def main():
             subprocess.run(["sops", "-e", "-i", tmp_yaml], env=get_sops_env(), cwd=REPO_ROOT, check=True)
 
             # Atomically replace secrets.yaml
-            os.replace(tmp_yaml, SECRETS_FILE)
+            os.replace(tmp_yaml, secrets_file())
+
+            # The mirror is a copy, and writing only the canonical file leaves the
+            # two disagreeing until someone remembers to sync. Same task an
+            # operator runs, so there is one sync implementation, not two.
+            sync = subprocess.run(
+                ["task", "infra:secrets:sync"], cwd=REPO_ROOT, capture_output=True, text=True
+            )
+            if sync.returncode != 0:
+                print(
+                    "! canonical file updated, but the mirror sync failed:\n" + sync.stderr.strip(),
+                    file=sys.stderr,
+                )
             if os.path.exists(tmp_toml):
                 os.remove(tmp_toml)
 
-            print("✓ Successfully updated and re-encrypted modules/secrets.yaml with SOPS.")
+            print("✓ Successfully updated and re-encrypted the canonical secrets file with SOPS.")
 
             # Update runtime ~/.cloak/accounts if it exists or is symlinked
             try:

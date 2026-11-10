@@ -21,8 +21,9 @@ project="$repo/modules/services/nix-cache-edge"
 # Two planes, two homes: Cloudflare API/R2 credentials are third-party keys
 # (apikeys.yaml), while the cache signing key is a fleet secret and sits beside
 # harmonia's at top level in secrets.yaml — the same shape, one cache per key.
-secrets="$repo/modules/secrets/apikeys.yaml"
-fleet_secrets="$repo/modules/secrets/secrets.yaml"
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+secrets=$(apikeys_file)
+fleet_secrets=$(secret_file)
 
 BUCKET="nix-cache"
 BUDGET_GIB="${BUDGET_GIB:-10}"

@@ -56,7 +56,8 @@ done
 mkdir -p "$OUT"
 PASS_FILE=$OUT/pass
 trap 'rm -f "$PASS_FILE"' EXIT
-sops -d "$(dirname "$0")/../../modules/secrets.yaml" | yq -r '.anki-sync.password' >"$PASS_FILE"
+. "$(dirname "$0")/../task/lib/paths.sh"
+secret_get '["anki-sync"]["password"]' >"$PASS_FILE"
 chmod 600 "$PASS_FILE"
 
 # A v11 request is a JSON header plus a zstd body; the header is what the

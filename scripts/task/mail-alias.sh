@@ -37,7 +37,8 @@
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-secrets="$repo/modules/secrets/apikeys.yaml"
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+secrets=$(apikeys_file)
 reg="$repo/modules/config/mail-aliases.toml"
 
 api_base="${MAIL_API_BASE:-https://api.improvmx.com}"

@@ -22,7 +22,10 @@
 #         token="$(tailnet_token)" || exit 2
 
 tailnet_api_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-tailnet_api_secrets="$tailnet_api_repo/modules/secrets/apikeys.yaml"
+. "${BASH_SOURCE[0]%/*}/paths.sh"
+# The helper owns the path and reports the absent submodule itself, so this stays
+# quiet and the check below states the condition once, in the caller's words.
+tailnet_api_secrets="$(apikeys_file 2>/dev/null || true)"
 
 # Prints the token on stdout, diagnostics on stderr. Returns 2 when there is no
 # usable credential (callers map that to their own "cannot query" exit code).
@@ -33,7 +36,7 @@ tailnet_token() {
   fi
 
   if [ ! -f "$tailnet_api_secrets" ]; then
-    echo "no TAILSCALE_API_TOKEN and $tailnet_api_secrets is missing (is the modules/secrets submodule checked out?)" >&2
+    echo "no TAILSCALE_API_TOKEN and no readable apikeys.yaml (is the modules/secrets submodule checked out?)" >&2
     return 2
   fi
 

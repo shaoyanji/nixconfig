@@ -26,6 +26,7 @@
 set -euo pipefail
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
 method=${1:-GET}
 path=${2:-/v1/account/}
 filter=${3:-.}
@@ -43,12 +44,12 @@ for cmd in sops jq curl; do
   }
 done
 
-token=$(sops -d --extract '["alwaysdatatoken"]' "$repo/modules/secrets.yaml" 2>/dev/null) || {
-  echo "alwaysdata: cannot decrypt alwaysdatatoken from modules/secrets.yaml (age key?)" >&2
+token=$(secret_get '["alwaysdatatoken"]') || {
+  echo "alwaysdata: cannot decrypt alwaysdatatoken from sops (age key?)" >&2
   exit 2
 }
 [ -n "$token" ] || {
-  echo "alwaysdata: alwaysdatatoken is empty in modules/secrets.yaml" >&2
+  echo "alwaysdata: alwaysdatatoken is empty in the sops file" >&2
   exit 2
 }
 

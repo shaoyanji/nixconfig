@@ -581,9 +581,9 @@ tasks:
       vars: [Q]
     cmds:
       - |
-        token="$(sops -d modules/secrets.yaml 2>/dev/null | sed -n 's/^[[:space:]]*TYPESAFE_API_KEY=//p' | head -1)"
+        token="$(sops -d "$(bash scripts/task/lib/paths.sh secrets)" 2>/dev/null | sed -n 's/^[[:space:]]*TYPESAFE_API_KEY=//p' | head -1)"
         if [ -z "$token" ]; then
-          echo "ops:ask:jev — no TYPESAFE_API_KEY readable from modules/secrets.yaml" >&2
+          echo "ops:ask:jev — no TYPESAFE_API_KEY readable from sops" >&2
           exit 1
         fi
         if [ "{{.FORMAT}}" = "json" ]; then

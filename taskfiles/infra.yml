@@ -214,7 +214,7 @@ tasks:
         # delphi, so the interactive PATH is carried across rather than guessed.
         remote_path=$(ssh -o BatchMode=yes -o ConnectTimeout=10 {{.REMOTE}} 'printf %s "$PATH"')
         [ -n "$remote_path" ] || { echo 'could not read PATH on {{.REMOTE}}' >&2; exit 1; }
-        pw=$(sops -d --extract '["gokrazy"]["gok"]["http_password"]' modules/secrets.yaml)
+        pw=$(sops -d --extract '["gokrazy"]["gok"]["http_password"]' "$(bash scripts/task/lib/paths.sh secrets)")
         ssh_args=(-o BatchMode=yes -o ConnectTimeout=10)
         cleanup() {
           ssh "${ssh_args[@]}" {{.REMOTE}} 'sudo -n rm -f /run/gok-push.pw' >/dev/null 2>&1 || true

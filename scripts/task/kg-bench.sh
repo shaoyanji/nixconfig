@@ -39,11 +39,12 @@
 set -euo pipefail
 
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
-SECRETS="${SECRETS:-$REPO/modules/secrets.yaml}"
 
 # Sourced before the option loop because --help calls kg_usage() (the one help
 # printer shared by the kg:* scripts).
 . "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+SECRETS="${SECRETS:-$(secret_file)}"
 GRAPH="${KG_GRAPH:-}"
 VERBOSE="${VERBOSE:-0}"
 SET="${SET:-rule}"

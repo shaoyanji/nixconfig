@@ -305,6 +305,54 @@
   # has the checkout and nowhere else. Match the directory with its slash: the
   # tracked mirror `modules/secrets.yaml` is a different file.
   secretsReads = builtins.filter (p: lib.hasInfix "modules/secrets/" (read p)) (nixUnder "lib");
+
+  # --- one spelling for where a secrets file lives ---------------------------
+  # 27 scripts each carried their own copy of the path, and with it their own
+  # answer to "canonical or mirror?" — so a writer and a reader in the same repo
+  # could disagree about which file was authoritative, which is how an edit lands
+  # in a copy that builds never read.
+  secretsPathHelper = "scripts/task/lib/paths.sh";
+  # Naming the path IS these files' job: the drift gate compares the two copies,
+  # and the openwrt wrapper resolves one in a store context where the submodule
+  # may not be checked out at all.
+  secretsPathExempt = [
+    secretsPathHelper
+    "scripts/task/sops-drift-check.sh"
+    "scripts/openwrt/openwrt.sh"
+  ];
+  scriptFiles = let
+    walk = d: let
+      entries = builtins.readDir (root + "/${d}");
+    in
+      lib.concatMap (n: let
+        rel =
+          if d == "."
+          then n
+          else "${d}/${n}";
+      in
+        if entries.${n} == "directory"
+        then walk rel
+        else lib.optional (lib.hasSuffix ".sh" n || lib.hasSuffix ".py" n) rel)
+      (builtins.attrNames entries);
+  in
+    if builtins.pathExists (root + "/scripts")
+    then walk "scripts"
+    else [];
+  # A comment naming the path is documentation, so only the code before `#`
+  # counts — the same reading the eval-decrypt gate uses. Python has no such
+  # convention for a docstring or a `help=` string, so there the path has to
+  # appear in the one shape a real spelling takes.
+  spellsSecretsPath = p:
+    if lib.hasSuffix ".py" p
+    then anyLine p (l: lib.hasInfix "modules/secrets" l && lib.hasInfix "os.path.join" l)
+    else
+      anyLine p (l: let
+        code = codePart l;
+      in
+        lib.hasInfix "modules/secrets.yaml" code
+        || builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" code != null);
+  secretsPathOffenders =
+    builtins.filter (p: !(lib.elem p secretsPathExempt) && spellsSecretsPath p) scriptFiles;
   plaintextSecrets = lib.concatMap (f: map (l: "${f}: ${l}") (plaintextValues f)) presentSopsFiles;
   # The mirror is a `cp` of the submodule (`task infra:secrets:sync`), so identity
   # is the invariant. A value written to one copy only decrypts on the machine that
@@ -791,6 +839,13 @@
       proof = "modules/secrets.yaml · modules/secrets/secrets.yaml · taskfiles/infra.yml (infra:secrets:sync)";
       holds = !mirrorDrift;
       detail = "the mirror and the submodule are no longer the same bytes — run `task infra:secrets:sync`, and never edit the mirror";
+    };
+
+    secrets-path-is-resolved-in-one-place = {
+      rule = "A script never spells where a secrets file lives. It sources `scripts/task/lib/paths.sh`, which owns one resolution order: `$NIXCONFIG_SECRETS`, then the canonical submodule copy, then the committed mirror. 27 scripts each carried the path and, with it, their own answer to canonical-versus-mirror — so a writer and a reader in the same repository could disagree about which file was authoritative, and an edit could land in the copy builds never read. The two files that still name a path are the ones whose job that is: the drift gate compares the copies, and the openwrt wrapper resolves one where the submodule may be absent.";
+      proof = "scripts/task/lib/paths.sh · scripts/**/*.sh · scripts/**/*.py";
+      holds = secretsPathOffenders == [];
+      detail = "script(s) spelling a secrets path instead of sourcing the helper: ${lib.concatStringsSep ", " secretsPathOffenders}";
     };
 
     secrets-files-are-registered = {

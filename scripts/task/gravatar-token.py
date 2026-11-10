@@ -39,7 +39,18 @@ def repo_root() -> str:
     return subprocess.check_output(["git", "rev-parse", "--show-toplevel"], text=True).strip()
 
 
-SECRETS = os.path.join(repo_root(), "modules/secrets/secrets.yaml")
+def _secrets_path() -> str:
+    """The canonical sops file, resolved by scripts/task/lib/paths.sh so this
+    script never spells where it lives."""
+    helper = os.path.join(repo_root(), "scripts", "task", "lib", "paths.sh")
+    out = subprocess.run([helper, "secrets"], capture_output=True, text=True)
+    path = out.stdout.strip()
+    if out.returncode != 0 or not path:
+        raise SystemExit("gravatar-token: paths.sh could not resolve a secrets.yaml (submodule checked out?)")
+    return path
+
+
+SECRETS = _secrets_path()
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):

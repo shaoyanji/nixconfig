@@ -14,7 +14,8 @@
 set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-secrets="$repo/modules/secrets/apikeys.yaml"
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+secrets=$(apikeys_file)
 
 if [ ! -f "$secrets" ]; then
   echo "wrangler.sh: $secrets missing (is the modules/secrets submodule checked out?)" >&2

@@ -20,6 +20,10 @@ cache=${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-gok
 inst=$cache/gok
 secret='["gokrazy"]["gok"]["http_password"]'
 
+# One resolver for the path: canonical submodule copy first, committed mirror
+# second. CI has no age key, so every read also has an environment override.
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+
 usage() {
   sed -n '2,12p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
@@ -30,7 +34,7 @@ update_password() {
   if [ -n "${GOK_HTTP_PASSWORD:-}" ]; then
     printf '%s' "$GOK_HTTP_PASSWORD"
   else
-    sops -d --extract "$secret" "$repo/modules/secrets.yaml"
+    secret_get "$secret"
   fi
 }
 
@@ -41,7 +45,7 @@ materialize() {
   local password
   password=$(update_password || true)
   [ -n "$password" ] || {
-    echo "gok.sh: no password at $secret in modules/secrets.yaml and GOK_HTTP_PASSWORD unset" >&2
+    echo "gok.sh: no password at $secret in sops and GOK_HTTP_PASSWORD unset" >&2
     exit 1
   }
 
@@ -88,7 +92,7 @@ materialize() {
   if [ -n "${GOK_TAILSCALE_AUTH_KEY:-}" ]; then
     authkey=$GOK_TAILSCALE_AUTH_KEY
   else
-    authkey=$(sops -d --extract '["gokrazy"]["gok"]["tailscale_auth_key"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+    authkey=$(secret_get '["gokrazy"]["gok"]["tailscale_auth_key"]' || true)
   fi
   # WiFi credentials never enter the repo: the instance ships an empty
   # /etc/wifi.json and this fills it from the environment or sops. No keys → no
@@ -104,8 +108,8 @@ materialize() {
     wifi_ssid=$GOK_WIFI_SSID
     wifi_psk=${GOK_WIFI_PSK:-}
   else
-    wifi_ssid=$(sops -d --extract '["gokrazy"]["gok"]["wifi_ssid"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
-    wifi_psk=$(sops -d --extract '["gokrazy"]["gok"]["wifi_psk"]' "$repo/modules/secrets.yaml" 2>/dev/null || true)
+    wifi_ssid=$(secret_get '["gokrazy"]["gok"]["wifi_ssid"]' || true)
+    wifi_psk=$(secret_get '["gokrazy"]["gok"]["wifi_psk"]' || true)
   fi
   if [ -n "$wifi_ssid" ]; then
     jq --arg s "$wifi_ssid" --arg p "$wifi_psk" \

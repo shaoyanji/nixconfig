@@ -19,7 +19,8 @@ set -euo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 site="$repo/projects/neocities-dragoncourt/site"
-secrets="$repo/modules/secrets/apikeys.yaml"
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+secrets=$(apikeys_file)
 api="https://neocities.org/api"
 
 preflight_only=0

@@ -13,7 +13,8 @@
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/../.." && pwd)
-file=$root/modules/secrets/pii.yaml
+. "${BASH_SOURCE[0]%/*}/lib/paths.sh"
+file=$(pii_file) || exit 2
 out=${APPFLOW_PII:-${XDG_CONFIG_HOME:-$HOME/.config}/appflow/pii.json}
 
 die() {

@@ -20,14 +20,9 @@
   boot.kernelModules = [];
   boot.extraModulePackages = [];
 
-  # UEFI boot via systemd-boot.
-  #
-  # canTouchEfiVariables is deliberately FALSE: OCI's paravirtualized instances
-  # present a firmware whose efivarfs is frequently read-only, and a bootloader
-  # install that tries to write NVRAM entries aborts the install. systemd-boot
-  # still drops the removable-media fallback at EFI/BOOT/BOOTAA64.EFI, which is
-  # what a cloud VM boots without NVRAM. mkDefault keeps it overridable if this
-  # particular tenancy turns out to have writable variables.
+  # canTouchEfiVariables is false: OCI's efivarfs is often read-only, and
+  # systemd-boot still writes the removable-media fallback. Why:
+  # docs/delphi-install.md §"EFI without NVRAM".
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault false;
   boot.loader.systemd-boot.configurationLimit = 10;

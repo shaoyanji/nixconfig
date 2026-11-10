@@ -138,6 +138,15 @@ that only reproduces on the target's storage controller or GPU is out of reach â
 that half of netbook gen 50 was never a VM bug. The gate is still the only one
 that runs the configuration it is about to promote.
 
+### Secrets in the boot VM
+
+The boot test neutralises both sops planes. The VM has no TPM and no host SSH
+keys, so sops would fail on a host that boots perfectly well. One plane is the
+systemd unit (the sysusers path); the other is the activation snippet, which for
+`neededForUsers` secrets runs from the initrd and fails with "0 successful
+groups required" before the system is mounted. The override is guarded on the
+option, so a host without sops-nix is untouched.
+
 ## Operating it
 
 | Task                        | What                                                              |

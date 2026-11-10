@@ -47,14 +47,9 @@ in {
       ];
   };
 
-  # --- Tailscale: keep the native LAN path ---
-  # desktop-client.nix sets `--accept-routes=true`, so frieren's advertised
-  # 192.168.3.0/24 subnet route lands in table 52 (ip rule 5270) and every
-  # direct LAN destination is sent over the tailnet instead. Measured
-  # 2026-10-23: `ip route show table 52` carried `192.168.3.0/24 dev tailscale0`
-  # and frieren -> poseidon LAN SSH timed out on port 22 while tailnet SSH
-  # worked; a policy rule preferring table main for the prefix fixed it
-  # instantly. eisen (Steam Link) and fern (LAN SSH) carry the same override.
+  # Tailscale must not take the LAN path: table 52 otherwise routes
+  # 192.168.3.0/24 over the tailnet. Why: .agents/deploy/hosts/poseidon.md
+  # §"Tailscale must not take the LAN path".
   services.tailscale.extraSetFlags = lib.mkForce [
     "--accept-dns=true"
     "--accept-routes=false"

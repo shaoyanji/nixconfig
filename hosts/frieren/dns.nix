@@ -123,19 +123,9 @@
     wants = ["network-online.target"];
   };
 
-  # Serve the NAS web portal (pdf./photos./media.frieren.lan vhosts on
-  # nginx :80) and the 192.168.3.0/24 LAN to tailnet clients. Off-LAN
-  # devices resolve *.frieren.lan via the pi-hole (--dns=100.97.61.65 on
-  # desktop-client/eisen) and route here as a subnet router. Requires a
-  # one-time admin-console approval of the route. SNAT stays on so the
-  # browser-hostile services (Jellyfin device discovery, Paperless mail
-  # callbacks) see tailnet-sourced traffic. Applied via `tailscale set` at
-  # boot — survives without re-auth, unlike extraUpFlags.
-  # (useRoutingFeatures = "both" is inherited from desktop-client.nix.)
-  #
-  # mkForce: Frieren is the PRIMARY resolver for the fleet. A resolver must
-  # NEVER accept tailnet DNS (--accept-dns=false); accepting the tailnet
-  # nameserver override creates a recursive query loop through 10.99.0.53.
+  # Subnet router plus SNAT for the LAN portal, and `--accept-dns=false` so the
+  # resolver never queries through the address it serves. Why:
+  # .agents/deploy/hosts/frieren.md §"Resolver networking".
   services.tailscale.extraSetFlags = [
     "--accept-dns=false"
     "--ssh=true"
@@ -144,15 +134,9 @@
   # net/dns/tailnet-address.nix from `advertiseRoutes`, so they cannot
   # drift from the address this host actually binds.
 
-  # Disable systemd-resolved stub listener so Pi-hole FTL can bind port 53 exclusively,
-  # and route *.frieren.lan queries to the local Pi-hole stack.
-  # (services.resolved.extraConfig was removed upstream; use settings.Resolve)
-  #
-  # LLMNR off (HC-7): resolved's LLMNR responder is a fixed public listener on
-  # UDP 5355 with no LAN consumer — Avahi covers mDNS/multicast discovery here
-  # (services.avahi below) and the fleet resolves names via the Pi-hole stack.
-  # Leaving it on put a listener the firewall had to hold back; disabling it
-  # removes the listener instead of scoping it.
+  # The resolved stub listener is off so pihole-ftl owns :53, and LLMNR is off
+  # because nothing on the LAN uses UDP 5355. Why:
+  # .agents/deploy/hosts/frieren.md §"Resolver networking".
   services.resolved.settings.Resolve = {
     DNSStubListener = "no";
     LLMNR = false;
@@ -192,14 +176,8 @@
     serviceConfig.MemoryHigh = "1200M";
   };
 
-  # --- eval-time guards for the resolver --------------------------------------
-  # The resolver is the fleet's single point of failure, so what makes it
-  # survivable is asserted rather than remembered: the tailnet zone must be
-  # forwarded (without it, every *.ts.net URL is NXDOMAIN for anyone using this
-  # resolver — measured 2026-10-26). A local self-healing watchdog used to be
-  # asserted here too; it was removed 2026-10-28 — minyx now answers as the
-  # backup resolver, so a dead pihole degrades DNS instead of taking it away,
-  # and the loop cost a full core to prove what the peer already covers.
+  # Assertions, not memory: the tailnet zone must be forwarded or every *.ts.net
+  # URL is NXDOMAIN. Why: .agents/deploy/hosts/frieren.md §"Resolver guards".
   assertions = [
     {
       assertion =

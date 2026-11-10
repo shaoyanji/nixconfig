@@ -42,14 +42,8 @@
     "nvidia_drm"
   ];
 
-  # Force nvidia_drm KMS on so gamescope/wlroots can grab the DRM device
-  # via seatd. Without modeset=1 the proprietary driver exposes no KMS
-  # node (nvidia_drm modprobe defaults to modeset=0 / fbdev=0), so
-  # /dev/dri/card0 either lacks KMS or seatd cannot enumerate the seat
-  # as graphics-capable. wlroots then selects the headless backend as a
-  # safe-mode fallback (logs: wlserver [backend/headless/backend.c:67]
-  # Creating headless backend). fbdev=1 also stabilises gamescope on
-  # legacy Kepler (sm_30) under modesetting.
+  # The proprietary driver exposes no KMS node by default, so wlroots falls back
+  # to its headless backend. Why: docs/gpu-kms.md.
   boot.kernelParams = [
     "nvidia_drm.modeset=1"
     "nvidia_drm.fbdev=1"

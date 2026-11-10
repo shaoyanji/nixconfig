@@ -157,16 +157,8 @@
 
   environment.localBinInPath = true;
 
-  # Compressed RAM swap: keeps swap in zstd-compressed RAM pages instead of
-  # on disk. Hosts that import base-node are workstations with comfortable
-  # RAM headroom (16-64 GB typical), so we scale the NixOS default 25%
-  # memoryPercent up to 50% — this matters when /nix/store + active builds
-  # + browserland cross physical RAM, where the alternative is an SSD
-  # swap partition or file that thrashes wear leveling. zstd is the
-  # kernel default compressor and is well-suited to the mixed workload of
-  # dev + build + long-running services these hosts tend to carry.
-  # priority=100 keeps zram ahead of any physical swap device so the
-  # kernel prefers the compressed-RAM pages first.
+  # zram keeps swap in compressed RAM and outranks physical swap, so a build
+  # spilling out of RAM does not thrash the SSD. Why: docs/zram-swap.md.
   zramSwap = {
     enable = true;
     algorithm = "zstd";

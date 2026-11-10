@@ -63,14 +63,8 @@
   lookup = pkgs: name:
     lib.attrByPath (lib.splitString "." name) null pkgs;
 
-  # `{ pkgs, path }` or `{ pkgs, text }` -> `{ packages, missing }`. `origin` is
-  # only for diagnostics (a path or a label).
-  #
-  # This is the honest half of the format: a list may name things nixpkgs does
-  # not have — an upstream binary, an appimage, a wishlist line copied out of a
-  # markdown handoff — and those have no attribute to resolve. Returning the
-  # leftovers by name instead of dying on the first one is what makes ingesting
-  # an untrusted list usable: you see the derivations AND the work still owed.
+  # A list may name things nixpkgs lacks; the leftovers come back by name instead
+  # of failing the first one. Why: docs/pkg-list.md.
   split = {
     pkgs,
     path ? null,

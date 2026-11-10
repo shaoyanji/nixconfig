@@ -53,14 +53,9 @@ _: {
           dns: 53
           http: 0
 
-        # A resolver cannot use the resolver it is replacing to find its own
-        # upstreams. Measured on the appliance right after the first boot with
-        # blocky enabled (2026-10-26 22:39, build 22:29): every query failed with
-        # `lookup one.one.one.one on [fd7a:115c:a1e0::53]:53: server misbehaving`,
-        # because the DoH upstreams are hostnames and the system resolver hands
-        # those lookups to MagicDNS -> frieren, which is the primary this device
-        # is the failover for. bootstrapDns is the flag that breaks the loop: IP
-        # literals, so no lookup is required to start.
+        # A resolver cannot bootstrap its upstreams through the resolver it replaces,
+        # so `bootstrapDns` takes IP literals. Why: docs/dns-failover.md §"Bringing up a
+        # secondary".
         bootstrapDns:
           - upstream: 1.1.1.1
           - upstream: 9.9.9.9

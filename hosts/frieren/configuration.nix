@@ -483,14 +483,9 @@ in {
     SUBSYSTEM=="rfkill", ATTR{type}=="bluetooth", ATTR{soft}="0"
     ACTION=="add", SUBSYSTEM=="usb", DRIVERS=="btusb", ATTR{power/control}="on"
   ''; # --- Bluetooth rfkill safeguard (belt-and-suspenders) ---
-  # The Ideapad EC (embedded controller) can boot with BT rfkill-blocked
-  # (Fn+F8 state persisted across reboots), which bluez config alone cannot
-  # override — bluetoothctl shows "No default controller available" despite
-  # the service running. `systemd-rfkill.service` restores the previously
-  # saved rfkill state at boot, so this unit runs AFTER it to guarantee our
-  # unblock wins. Only clears soft-blocks; a hard-block (EC hardware cutoff)
-  # still needs the Fn+F8 toggle — verify via `bluetoothctl list` / the
-  # /sys/class/rfkill/*/soft attributes if BT stays missing after reboot.
+  # The Ideapad EC can persist Fn+F8 rfkill blocking, and systemd-rfkill restores
+  # it at boot, so this unit runs after it. Why:
+  # .agents/deploy/hosts/frieren.md §"Bluetooth rfkill".
   systemd.services.unblock-bluetooth = {
     description = "Unblock Bluetooth rfkill at boot";
     wantedBy = ["multi-user.target"];

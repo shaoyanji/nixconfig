@@ -107,3 +107,16 @@ sudo tailscale funnel off
 - **Nothing here is internet-exposed.** If that ever changes, put an auth layer
   (Tailscale Funnel + identities, or Cloudflare Tunnel + Access) in front — do not
   port-forward.
+
+## aria2 / AriaNg
+
+AriaNg boots from a config object rendered at runtime, because the RPC secret
+must not be baked into the store. The template pre-seeds the connection with the
+base64 secret AriaNg's `getCurrentRpcSecret` expects; `ariang-site.service`
+replaces the placeholder from sops.
+
+AriaNg stores this object at localStorage `AriaNg.Options`, with the fields
+directly on it and no `rpcList` key. `language` is load-bearing: the language
+guard runs before the per-key default backfill, so an object without it throws in
+`getCurrentRpcUrl` and the app dies before the first RPC call. The symptom is a
+blank pane in a fresh browser while an already-open tab keeps working.

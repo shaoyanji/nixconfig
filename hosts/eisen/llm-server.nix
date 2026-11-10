@@ -417,20 +417,7 @@ in {
     '';
   };
 
-  # --- Tailnet: https://eisen.<tailnet>.ts.net/v1 (classic node serve) ---
-  #
-  # This is the primary tailnet exposure. `tailscale serve --bg` is the only
-  # way to set a *node* serve target: `tailscale serve set-config` — the file
-  # form that services.tailscale.serve writes — only accepts the Services
-  # schema (it rejects TCP/Web with "unknown object member name"), and the
-  # `svc:` form further requires the tailnet "Services" preview to be enabled
-  # in the admin console. The node form needs no toggle: the tailnet already
-  # issues HTTPS certs (`tailscale cert eisen.<tailnet>.ts.net` succeeds), so
-  # this answers on https://eisen.cloudforest-kardashev.ts.net/v1 with a
-  # valid cert.
-  #
-  # Idempotent — re-applying the same target is a no-op — so `partOf` can just
-  # re-assert the same mapping whenever tailscaled restarts.
+  # The primary tailnet exposure. Why: .agents/deploy/hosts/eisen.md §"Exposure".
   systemd.services."tailscale-serve-node" = {
     description = "Serve eisen's LLM API on the node's tailnet HTTPS name";
     after = [

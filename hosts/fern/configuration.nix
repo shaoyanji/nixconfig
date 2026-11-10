@@ -111,15 +111,8 @@ in {
     "net.ipv4.conf.all.arp_announce" = 2;
   };
 
-  # --- CPU frequency: off the powersave floor ---
-  # power-profiles-daemon leaves acpi-cpufreq on `powersave`, which pins
-  # this Picasso APU at its 1400 MHz floor while `balanced` is selected and the
-  # machine is on AC. Measured on fern 2026-11-01, 3M-iteration loop:
-  #   powersave 1396 MHz 0.891 s · schedutil 2586 MHz 0.476 s · performance 0.469 s
-  # schedutil scales the same 1.4-2.6 GHz range and is power-aware, so it is the
-  # whole 2x without the heat. The ordering matters: cpufreq's oneshot runs off
-  # systemd-modules-load, ppd starts later, and ppd itself does not re-apply on
-  # restart (verified) — so the oneshot has to be the last word.
+  # schedutil, not powersave: the APU otherwise stays at its 1400 MHz floor on AC.
+  # Why: .agents/deploy/hosts/fern.md §"CPU governor".
   powerManagement.cpuFreqGovernor = "schedutil";
   systemd.services.cpufreq.after = ["power-profiles-daemon.service"];
 

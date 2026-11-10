@@ -228,3 +228,34 @@ curl -sS --resolve delphi.bountystash.com:443:92.5.115.103 \
 `task checks:dns:failover` does **not** cover this host: it reads the LAN `resolvers`
 group out of frieren's declaration and probes a LAN zone. The tailnet group is verified
 with `dig` against `10.99.0.53`.
+
+## DoT upstreams (2026-11-05)
+
+IPv4 only: OCI free-tier instances have no IPv6 uplink, and a resolver that
+prefers IPv6 root servers SERVFAILs every lookup, the same failure class as the
+2026-10-14 frieren outage. The third upstream is envs.net (157.180.15.214,
+Hetzner DE), the only one here that publishes it keeps no query log and a host
+this fleet already trusts with mail. Measured from this box: 21 ms RTT, DNSSEC
+validating (`dnssec-failed.org` SERVFAILs), no filtering (`doubleclick.net`
+resolves to its real addresses). It is ordered last because the anycast
+primaries answer in about 1 ms and only cache misses reach it; a fourth would
+cost failover time, not buy it.
+
+## Fleet monitors
+
+The resolver monitor has no DNS endpoint on purpose. crab-hole v0.1.12 has no
+TCP listener on 53 (its downstream protocols are udp, tls, https and quic), so a
+`tcp://…:53` probe is refused and stays permanently red. A real assertion needs
+a `dns://` endpoint with a query name, which `services.fleetMonitors` does not
+model yet; until then the resolver is proven by `dig @10.99.0.53 example.com`.
+The monitor uses the tailnet IP rather than MagicDNS because delphi runs
+`--accept-dns=false`.
+
+## EFI without NVRAM
+
+`canTouchEfiVariables` is false on purpose. OCI's paravirtualized instances
+present a firmware whose efivarfs is frequently read-only, and a bootloader
+install that writes NVRAM entries aborts. systemd-boot still writes the
+removable-media fallback at `EFI/BOOT/BOOTAA64.EFI`, which is what a cloud VM
+boots without NVRAM. `mkDefault` keeps it overridable if a tenancy does have
+writable variables.

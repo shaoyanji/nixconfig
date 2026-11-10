@@ -226,16 +226,8 @@
         echo "=== [$(date)] WARN: freebuff-headless failed. Attempting Tier 3 fallback... ===" >&2
       fi
 
-      # Tier 3: Hermes Agent (Nous Research agent with ~/.hermes / hermes.env)
-      #
-      # `-q`/`--oneshot` are options of the `chat` subcommand, not of `hermes`.
-      # Called as `hermes -q "$prompt" --oneshot` (what this tier did until
-      # 2026-11-05) argparse exits 2 before any model call — "'<prompt>' is not
-      # a `hermes` command" — so every run that reached Tier 3 failed and fell
-      # through to the next tier. Verified against hermes 0.22.5: `chat -q <prompt>
-      # --oneshot -Q --run-budget N` answers and exits 0. -Q keeps the banner
-      # and session footer out of the job log; --run-budget is the ceiling
-      # Tier 2 already gets from `-t 600`.
+      # Tier 3 is `hermes chat -q … --oneshot -Q`, not top-level `hermes -q`. Why:
+      # .agents/deploy/hosts/frieren.md §"Agent scheduler".
       if command -v hermes >/dev/null 2>&1 || [ -x "/run/current-system/sw/bin/hermes" ]; then
         echo "=== [$(date)] Agent Cascade: Attempting Tier 3 (hermes) ==="
         local hermes_bin
@@ -359,14 +351,8 @@
       fi
     }
 
-    # --- BOOT-SETTLE GATE: never audit a host that is still coming up ---
-    # The timer is Persistent=true, so after a power cut it catches up the instant
-    # the user manager starts — seconds into boot. On 2026-11-06 that meant every
-    # Gatus probe hit its 10s timeout, the 05:00 dispatch was refused because
-    # simplex-chat was not yet listening on 127.0.0.1:5225, and the cascade
-    # "repaired" units that were still legitimately activating. Judge the host
-    # only once it has settled. A normal 05:00 run is hours past boot and waits
-    # not at all.
+    # A Persistent timer fires seconds into boot, so the audit waits for the host to
+    # settle. Why: .agents/deploy/hosts/frieren.md §"Agent scheduler".
     SETTLE_SECS=''${AGY_BOOT_SETTLE_SECS:-600}
     UPTIME_FILE=''${AGY_UPTIME_FILE:-/proc/uptime}
     UPTIME_SECS=$(cut -d. -f1 "$UPTIME_FILE")
@@ -432,16 +418,8 @@
       echo "System One System Triage: Evaluated scorecard with $TIER1_COUNT potential TIER 1 immediate repair item(s)."
     fi
 
-    # --- STEP 3: Trigger Decision Gate ---
-    # Trigger conditions for running full AI agent cascade:
-    # 1. Scheduled weekly comprehensive audit (Sunday, date +%u == 7)
-    # 2. Or manual on-demand trigger (FORCE_RUN=1 or argument --force)
-    # 3. Or an active failure / regression detected:
-    #    - FAILED_SYS > 0 or FAILED_USER > 0
-    #    - BTRFS_ERRS > 0
-    #    - BACKUP_FAILS > 0
-    #    - UPGRADE_FAILED > 0
-    #    - GATUS_DOWN > 0
+    # The cascade runs weekly, on FORCE_RUN, or on a recorded failure. Why:
+    # .agents/deploy/hosts/frieren.md §"Agent scheduler".
     DAY_OF_WEEK=$(date +%u) # 1=Mon, ..., 7=Sun
     SHOULD_RUN_CASCADE=0
     RUN_REASON=""
@@ -1003,15 +981,8 @@ in {
         command = agySystemRunner;
         workingDirectory = "${user.home}";
       };
-      # Four slots, spread across the day and clear of the 03:00-05:30 window.
-      # The day resets 00:00 UTC (01:00 CET), so slot 1 fires just after it rather
-      # than twenty minutes before it. The burst limit is 25 an hour, so no slot
-      # asks for more than 20 and the last asks for 40. Every daytime slot keeps
-      # RESERVE images back: something asked for during the day outranks the
-      # queue's next due entry, and the final slot runs with RESERVE=0 so the
-      # day's end is where special requests and leftover demand get spent.
-      # `persistent = false`: catching up three missed slots at boot would burst
-      # into exactly the limit the spacing avoids.
+      # Four daytime slots, clear of 03:00-05:30, at most 20 images against the
+      # 25-per-hour limit. Why: .agents/deploy/hosts/frieren.md §"Agent scheduler".
       image-daily-slot-1 = {
         name = "image-daily-slot-1";
         description = "Image queue 1/4 (01:10, past the UTC reset): due plates, judge, Cloudinary, manifest";
@@ -1076,14 +1047,7 @@ in {
     };
   };
 
-  # ===========================================================================
-  # CONSOLIDATED FLEET GOVERNOR & RUNTIME SELF-REPAIR ORCHESTRATOR
-  # Consolidates fragmented, monitoring-only watchdogs into a unified runtime repair engine:
-  # - Kelly-gated dual-model reflex tier: Julia-1 (144M) + Laya (421M) in series (< 30ms sweep).
-  # - 0 System 2 tokens consumed: completely protects weekly Nemotron quota.
-  # - Deterministic runtime fixes: WAL compaction, thermals, Btrfs snapshots, paperless ghost quarantine.
-  # - Automatic strategic handover: writes un-remediated anomalies directly to ${user.home}/HANDOFF.md.
-  # ===========================================================================
+  # The governor unit. Why: .agents/deploy/hosts/frieren.md §"Agent scheduler".
   services.fleetGovernor = {
     enable = true;
     schedule = "hourly";

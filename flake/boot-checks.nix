@@ -103,14 +103,9 @@ let
     # at the verbosity that shows it on the serial console the driver reads.
     boot.consoleLogLevel = lib.mkForce 7;
 
-    # Secrets are host identity, not boot logic: the VM has no TPM and no host
-    # SSH keys, so sops would fail on every host that boots perfectly well.
-    # Guarded on the option so hosts without sops-nix stay untouched. Both
-    # planes are neutralised, because sops chooses one by configuration:
-    #   * the systemd unit (sysusers path),
-    #   * and the ACTIVATION snippet, which for `neededForUsers` secrets runs from
-    #     the initrd (`initrd-nixos-activation`) and fails with "0 successful
-    #     groups required" before the system is even mounted.
+    # Secrets are host identity, not boot logic: the VM has no TPM or host SSH
+    # keys, so both sops planes are neutralised. Why:
+    # docs/ci-pipeline.md §"Secrets in the boot VM".
     systemd.services = lib.mkIf (config.sops.secrets or {} != {}) {
       sops-install-secrets = {
         wantedBy = lib.mkForce [];

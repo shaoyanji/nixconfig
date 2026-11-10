@@ -332,15 +332,8 @@ in {
     };
   };
 
-  # --- Refined CGroup & Resource Controls (2 OCPU / 11 GiB RAM Cloud Bastion) -
-  # Protects interactive sshd, Nginx and crab-hole DNS from being starved by
-  # guest workloads or batch harness compilations.
-  # systemd.services."microvm@sandbox".serviceConfig = {
-  #   CPUWeight = 100;
-  #   IOWeight = 100;
-  #   MemoryHigh = "3500M";
-  #   MemoryMax = "4000M";
-  # };
+  # The sandbox microVM's resource controls. Why:
+  # .agents/deploy/hosts/delphi.md §"Guest layer — the `sandbox` microVM".
 
   systemd.services.dsh-web.serviceConfig = {
     CPUWeight = 200;

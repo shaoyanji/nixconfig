@@ -92,3 +92,16 @@ The runner asserts these before it touches the host:
 `vm:canary:stop`, then delete `/var/lib/microvms/frieren-canary/`. The `brlan`
 bridge belongs to `modules/profiles/microvm-host.nix`, not to this guest: leave it
 if anything else on the host uses the bridge.
+
+## The deck login
+
+The guest user's `Match` block is the last entry in `sshd_config`, the only place
+a `Match` may appear. The login is the deck: no shell to escape to, no
+forwarding, and the deck itself is a read-only store path.
+
+`AuthorizedKeysFile` names every path explicitly, because the directive replaces
+the default list instead of adding to it: NixOS writes a user's keys to
+`/etc/ssh/authorized_keys.d/<user>`, not to the home directory, so that entry has
+to be named back. The hop key comes from the shared directory, which is how the
+host-side door reaches the account. A guest user accepts either key and neither
+is a password.

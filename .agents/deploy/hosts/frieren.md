@@ -202,3 +202,85 @@ wildcard zone, the `enp1s0` firewall hole, the advertised subnet and `pihole-ftl
 all assume it exists. On 2026-10-24 the profile was missing, the router at `.1`
 answered, `.25` did not, and every client lost DNS with no config to blame. The
 profile is declared in `hosts/frieren/networking.nix` with a stable UUID.
+
+## Resolver networking
+
+The tailnet side advertises `192.168.3.0/24` and runs SNAT, so off-LAN clients
+reach `pdf.`/`photos.`/`media.frieren.lan` while browser-hostile services
+(Jellyfin discovery, Paperless mail callbacks) see tailnet-sourced traffic. The
+route needs a one-time admin-console approval; `tailscale set` at boot keeps it
+without re-auth, which `extraUpFlags` cannot do. `--accept-dns=false` is
+`mkForce`d because a resolver that accepts the tailnet nameserver override
+queries through `10.99.0.53` and loops.
+
+The resolved stub listener is disabled so `pihole-ftl` owns `:53`, and the LLMNR
+responder is off: it is a fixed public listener on UDP 5355 with no LAN consumer,
+while Avahi covers mDNS discovery. Disabling it removes the listener instead of
+asking the firewall to hold it back.
+
+## Resolver guards
+
+The resolver is the fleet's single point of failure, so the survivable parts are
+asserted. The tailnet zone must be forwarded; without it every `*.ts.net` URL is
+NXDOMAIN for clients of this resolver (measured 2026-10-26). A local watchdog
+used to be asserted too, and was removed on 2026-10-28: minyx answers as the
+backup resolver, so a dead pihole degrades DNS instead of removing it.
+
+## Bluetooth rfkill
+
+The Ideapad EC can boot with Bluetooth rfkill-blocked, because the Fn+F8 state
+persists across reboots. `services.bluetooth` cannot override that, and
+`systemd-rfkill.service` restores the saved state at boot, which is why the
+`unblock-bluetooth` unit runs after it. It clears soft blocks only; a hard block
+still needs Fn+F8.
+
+## Paperless OCR languages
+
+Upstream's paperless module narrows tesseract to the languages
+`PAPERLESS_OCR_LANGUAGE` names plus `equ`/`osd`/`eng`, because stock tesseract5
+defaults to `languages.all`, one 1,015 MiB fixed-output derivation. This host's
+fork of the module drops that narrowing to stay on a cached package, so the
+narrow list is restored here: `deu+eng` is all this instance asks for, and
+tesseract needs `eng` to build. The cost is that `paperless-ngx` and `ocrmypdf`
+are re-wrapped against the narrowed tesseract, so the first build is not
+substitutable: one build for about 1 GiB of permanent closure.
+
+## nginx default server
+
+nginx picks the first server block per port for a Host it does not know, so both
+:80 and :443 carry a DEFAULT vhost. Without it an unknown Host (the tailnet FQDN,
+`vault.frieren.lan` after a browser upgrade) landed on whichever service vhost
+was serialized first; on 2026-10-26 that served audiobookshelf for
+`frieren.<tailnet>.ts.net`. The default listens on IPv4 and IPv6: MagicDNS
+answers AAAA, and an IPv6-preferring client got connection refused while every
+IPv4 check passed.
+
+## nginx location brace trap
+
+The content-hashed asset location spells out eight hex digits instead of `{8}`.
+A brace quantifier in a location key came out of the config generator split
+across lines (`location ~* \.[a-f0-9] { / 8 / }`), which nginx rejects with
+`unexpected "}"` and every site 502s. Generation 100 on 2026-10-19 restarted
+nginx into a crash loop with `{8}`; the spelled-out class generates one valid
+line and matches exactly eight hex characters.
+
+## Agent scheduler
+
+`agy-scheduler` runs from a persistent timer, so after a power cut it catches up
+the instant the user manager starts. On 2026-11-06 every Gatus probe hit its 10 s
+timeout, the 05:00 dispatch was refused because simplex-chat was not yet
+listening, and the cascade repaired units that were still activating. The audit
+therefore waits for the host to settle (600 s by default), which a normal 05:00
+run never spends.
+
+The cascade runs on a Sunday, on `FORCE_RUN=1`, or when a recorded failure says
+so (failed system or user units, btrfs errors, backup, upgrade, Gatus). Tier 3
+calls `hermes chat -q <prompt> --oneshot -Q --run-budget N`; the top-level
+`hermes -q` form exits 2 before any model call. `-Q` keeps the banner out of the
+job log and `--run-budget` is the same ceiling Tier 2 gets from `-t 600`.
+
+The image queue asks for four daytime slots, clear of the 03:00-05:30 window,
+each at most 20 images against the 25-per-hour burst limit. Every daytime slot
+keeps RESERVE images back, and the last runs with RESERVE=0. `persistent =
+false`, because catching up three missed slots at boot would burst into the
+limit the spacing avoids.

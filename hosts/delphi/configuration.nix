@@ -446,15 +446,9 @@ in {
   # Out of scope for frieren/fern, which use the TPM identity path.
   profiles.sopsUserIdentity.enable = true;
 
-  # No `profiles.cachePush` here, deliberately. A post-build-hook fires for every
-  # locally built output and runs as nix-daemon, so on this 2-vCPU guest a switch
-  # that builds anything turns into a NAR re-compress + upload per derivation,
-  # with the copies outliving the rebuild that started them. What delphi needs is
-  # the other direction: SUBSTITUTION from cachix, so an artifact CI already
-  # built for github is fetched instead of compiled here. That is a read, and it
-  # costs this host nothing — `config.fleet.inventory.cache.delphi` already lists
-  # shaoyanji.cachix.org in the WAN tier, so `nix.settings.substituters` carries
-  # it with no token and no hook.
+  # No `profiles.cachePush`: a post-build-hook on a 2-vCPU guest would upload
+  # every local build. Delphi substitutes from cachix instead. Why:
+  # docs/nix-cache-edge.md §"Who does not push".
 
   # --- OCI Networking & Paravirtualized DHCP ---
   networking.useDHCP = lib.mkDefault true;
@@ -522,19 +516,8 @@ in {
           protocol = "udp";
         }
       ];
-      # DoT upstreams, IPv4 only: OCI free-tier instances have no IPv6 uplink,
-      # and a resolver that prefers IPv6 root/upstream servers SERVFAILs every
-      # lookup (the 2026-10-14 frieren outage, same failure class).
-      #
-      # Third is envs.net (157.180.15.214, Hetzner DE): the only upstream here
-      # that publishes that it keeps no query log, and a host this fleet already
-      # trusts with mail. Measured 2026-11-05 from this box — 21 ms RTT, DNSSEC
-      # validating (dnssec-failed.org SERVFAILs), no filtering (doubleclick.net
-      # resolves to its real addresses), so it blocks nothing the blocklist
-      # below does not and needs no exemption. Ordered last on purpose: the
-      # anycast primaries answer in ~1 ms and cache misses are the only traffic
-      # that reaches any of these, so it is a privacy and diversity fallback,
-      # not a primary. A fourth would start costing failover time, not buying it.
+      # DoT upstreams, IPv4 only (OCI has no IPv6 uplink), with envs.net last as a
+      # privacy fallback. Why: docs/delphi-install.md §"DoT upstreams".
       upstream.name_servers = [
         {
           protocol = "tls";
@@ -647,15 +630,8 @@ in {
         group = "delphi";
         conditions = ["[BODY].state == ok"];
       }
-      # No DNS endpoint on purpose. crab-hole v0.1.12 has no TCP listener on 53
-      # (its downstream protocols are udp|tls|https|quic), so `tcp://…:53` is
-      # refused and reports a permanent red — a monitor that can never go green
-      # is worse than none. A real assertion needs a `dns://` endpoint with a
-      # query name, which `services.fleetMonitors` does not model yet; until it
-      # does, the resolver is proven by `dig @10.99.0.53 example.com`.
-      # Tailnet IP, not MagicDNS: delphi runs `--accept-dns=false` (a resolver
-      # must not resolve through the address it serves), so names do not resolve
-      # here. The address is stable per node key.
+      # No DNS endpoint: crab-hole has no TCP listener on 53, so a `tcp://` probe can
+      # only stay red. Why: docs/delphi-install.md §"Fleet monitors".
       {
         name = "frieren portal (tailnet)";
         url = "http://100.97.61.65/";
@@ -841,15 +817,8 @@ in {
             // dataLocation false;
         };
 
-        # The MagicDNS name at the root, tailnet-only by SOURCE ADDRESS.
-        #
-        # 443 is owned by the public ACME vhost and tailscaled cannot take it
-        # (measured 2026-10-21: "bind: address already in use"), so the console's
-        # TLS entry point remains the :8446 mount. This vhost makes
-        # `http://<tailnet name>/` work too: WireGuard already encrypts the mesh,
-        # and the allow-list — the client's 100.64/10 address on tailscale0 — is
-        # what makes the name inert on the public internet even though the
-        # listener is the same :80.
+        # The console's TLS entry point is the :8446 mount, and this vhost adds the
+        # port-80 form. Why: .agents/deploy/hosts/delphi.md §"Tailnet service mounts".
         "${tailnetHost}" = {
           listen = [
             {
@@ -1775,15 +1744,9 @@ in {
           echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
           mkdir -p "$HOME/Documents" "$HOME/vaults"
 
-          # SSH URLs are rewritten to HTTPS here. The credential helper is NOT set
-          # here: home-manager's `programs.gh` already renders an absolute-path
-          # helper into ~/.config/git/config, and a second PATH-dependent `!gh`
-          # entry in ~/.gitconfig shadowed it — under a thin PATH every git fetch
-          # logged `gh: command not found` before the absolute helper still
-          # authenticated (delphi, minyx-keeper journal). Unset rather than skip,
-          # so a host that already carries the stale pair converges.
-          # `git config` rewrites the file even when the value already matches,
-          # so the rewrite is written only when it is absent.
+          # The credential helper belongs to `programs.gh`, not to this file; a second
+          # `!gh` entry shadowed it under a thin PATH. Why:
+          # docs/nix-patterns.md §"Agent failure modes".
           if [ "$(git config --file "$HOME/.gitconfig" --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
             git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
           fi

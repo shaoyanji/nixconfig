@@ -279,14 +279,9 @@ in {
           "192.168.3.25"
           "frieren.local"
         ];
-        # 443 as well as 80, and both DEFAULT: nginx picks the first server
-        # block per port for a name it does not know, so without this an
-        # unknown Host (the tailnet FQDN, vault.frieren.lan over the HTTPS a
-        # browser auto-upgrades to) silently lands on whichever service vhost
-        # happens to be serialized first — 2026-10-26 that served
-        # audiobookshelf for frieren.<tailnet>.ts.net.
-        # IPv4 *and* IPv6: MagicDNS answers AAAA as well as A, so a client that
-        # prefers IPv6 got connection refused while every IPv4 check passed.
+        # Both ports, both DEFAULT: an unknown Host otherwise lands on whichever vhost
+        # serialized first, and an IPv6 client gets refused. Why:
+        # .agents/deploy/hosts/frieren.md §"nginx default server".
         listen = [
           {
             addr = "0.0.0.0";
@@ -468,15 +463,9 @@ in {
           root = fleetSite;
           extraConfig = staticCache.html;
         };
-        # Content-hashed immutable static assets (Gap B).
-        #
-        # The eight hex digits are spelled out instead of `{8}`: a brace
-        # quantifier in a location key came out of the config generator SPLIT
-        # across lines (`location ~* \.[a-f0-9] { / 8 / }`), which nginx rejects
-        # with `unexpected "}"` and the whole site 502s. Verified on generation
-        # 100 (2026-10-19): with `{8}` the switch restarts nginx into a crash
-        # loop; the equivalent class below generates one valid line. The match
-        # is identical — exactly eight hex characters before the extension.
+        # Eight hex digits spelled out: a `{8}` quantifier is split across lines by the
+        # generator and nginx rejects it. Why:
+        # .agents/deploy/hosts/frieren.md §"nginx location brace trap".
         locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
           root = fleetSite;
           extraConfig = staticCache.hashed;

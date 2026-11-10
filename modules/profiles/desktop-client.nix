@@ -86,17 +86,8 @@
     pulseaudio.enable = false;
     tailscale.enable = true;
     tailscale.useRoutingFeatures = "both";
-    # Accept DNS config pushed by the tailnet (pi-hole at frieren, once set
-    # as a global nameserver in the Tailscale admin console) plus the
-    # 192.168.3.0/24 subnet route frieren advertises so off-LAN clients
-    # reach the NAS (pdf.frieren.lan etc.). Declared via extraSetFlags
-    # because extraUpFlags only apply with authKeyFile (none of our hosts
-    # use one) — the boot-time `tailscale set` works on already-
-    # authenticated nodes. The previous extraUpFlags entry
-    # "--dns=100.97.61.65" never applied: that flag doesn't exist on this
-    # tailscale version. Tailscaled skips installing routes for subnets the
-    # machine is directly attached to, so LAN-resident hosts keep their
-    # native path.
+    # The tailnet pushes DNS and the LAN route through `tailscale set`; the old
+    # `--dns=` flag never applied. Why: docs/dns-failover.md §"Point clients at it".
     tailscale.extraSetFlags = lib.mkDefault [
       "--accept-dns=true"
       "--accept-routes=true"
@@ -105,15 +96,9 @@
     resolved.settings.Resolve.Domains = ["~lan" "~frieren.lan"];
   };
 
-  # Keybase's GUI writes ~/.config/autostart/keybase_autostart.desktop the first
-  # time it runs. Its Exec is `env KEYBASE_AUTOSTART=1 run_keybase`, and
-  # `run_keybase` ships only with keybase-gui. With services.keybase/kbfs above
-  # already running Keybase as user services, that entry is a duplicate that can
-  # only fail: fern logged `env: 'run_keybase': No such file or directory`
-  # (exit 127) on every login, leaving a permanently failed user unit.
-  # Drop the entry while `run_keybase` is absent; if the GUI is ever installed
-  # the entry is valid and this leaves it alone. Keybase's sentinel
-  # (~/.config/keybase/autostart_created) stops it being rewritten meanwhile.
+  # Keybase's GUI writes an autostart entry whose `run_keybase` only exists with
+  # keybase-gui, so it fails at every login. Why:
+  # .agents/deploy/hosts/fern.md §"Keybase autostart".
   system.activationScripts.removeBrokenKeybaseAutostart = ''
     for autostart in /home/*/.config/autostart/keybase_autostart.desktop; do
       [ -e "$autostart" ] || continue

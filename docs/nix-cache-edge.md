@@ -232,6 +232,15 @@ microfix, hundreds is a new stdenv or an overlay change. Over `MAX_BUILDS` (5)
 the check fails and **names the derivations**, which is what tells an agent which
 layer the edit reached.
 
+## Who does not push
+
+Delphi runs no `profiles.cachePush`. A post-build-hook fires for every locally
+built output as nix-daemon, so a switch that builds anything on this 2-vCPU
+guest turns into a NAR re-compress and upload per derivation, with the copies
+outliving the rebuild. What delphi needs is the read direction: `cachix` already
+sits in the WAN tier of `fleet.inventory.cache.delphi`, so CI-built artifacts
+are substituted with no token and no hook.
+
 ## Retention and collection
 
 Two mechanisms, because they answer different questions.

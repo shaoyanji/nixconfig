@@ -11,14 +11,9 @@
   # Pre-built AriaNg static files — avoids npm build failures from nixpkgs.
   ariang = (import self.nixFiles.lib."fetches-extra.nix" {inherit pkgs;}).fetch "ariang";
 
-  # Bootstrap config rendered into the served site at runtime: pre-seeds the
-  # RPC connection, base64 secret as AriaNg's getCurrentRpcSecret expects. The
-  # placeholder is replaced by ariang-site.service from the sops secret.
-  # AriaNg stores this object at localStorage `AriaNg.Options` (fields directly
-  # on it, no rpcList key), and `language` is load-bearing: its language guard
-  # runs before the per-key default backfill, so an object without it throws in
-  # getCurrentRpcUrl and the app dies before the first RPC call — a blank pane
-  # on a fresh browser while an old tab keeps working.
+  # The AriaNg bootstrap is pre-seeded and patched at runtime from sops;
+  # `language` is load-bearing in its option object. Why:
+  # docs/frieren-access.md §"aria2 / AriaNg".
   ariangConfigTemplate = pkgs.writeText "ariang-config.js" ''
     // Managed: rendered by ariang-site.service — edits are overwritten.
     // Pre-seeds the AriaNg RPC connection to this vhost's /jsonrpc proxy.

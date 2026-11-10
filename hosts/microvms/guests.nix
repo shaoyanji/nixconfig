@@ -382,15 +382,8 @@ in {
           "d /var/lib/stirling-pdf/configs 0700 stirling stirling -"
         ];
 
-        # Last block in sshd_config — the only place a Match may appear. The
-        # login is the deck: no shell to escape to, no forwarding, and the deck
-        # itself is a read-only store path.
-        # `AuthorizedKeysFile` lists every path because the directive REPLACES the
-        # default instead of adding to it, and NixOS puts a user's keys in
-        # /etc/ssh/authorized_keys.d/<user> — not in the home directory — so that
-        # entry has to be named back explicitly. The hop key comes from the shared
-        # directory, which is how the host-side door reaches this account. A guest
-        # user therefore accepts either key, and neither is a password.
+        # A Match block must come last, and `AuthorizedKeysFile` replaces the default
+        # list instead of adding to it. Why: hosts/microvms/README.md §"The deck login".
         services.openssh.extraConfig = lib.mkIf (slidesUser != null) ''
           Match User ${slidesUser}
             # An absolute ceiling, because `slides` has no idle detection and a

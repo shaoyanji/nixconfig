@@ -45,7 +45,9 @@ globalThis.location = { origin: 'https://delphi.example:8461' };
 
 const body = slice("'use strict';", 'function selected');
 const rows = slice('function selected', 'function markup');
-const { selected, groupByDir } = new Function(`${body}\n${rows}\nreturn { selected, groupByDir };`)();
+const { selected, groupByDir, ytCard, fmtDur, shortcutFor } = new Function(
+  `${body}\n${rows}\nreturn { selected, groupByDir, ytCard, fmtDur, shortcutFor };`,
+)();
 
 let pass = 0;
 let fail = 0;
@@ -91,6 +93,41 @@ ok('folders are newest first', groups.length === 2 && groups[0][0] === 'new' && 
 ok('files are newest first inside a folder', groups[0][1][0].path === 'new/b.mp4' && groups[0][1][1].path === 'new/c.mp4');
 const tied = groupByDir([{ path: 'z/x.mp4', mtime: 7 }, { path: 'z/a.mp4', mtime: 7 }]);
 ok('equal mtimes fall back to the name', tied.length === 1 && tied[0][1][0].path === 'z/a.mp4');
+
+// The YouTube search card: the fetch button is a sibling of the link, so
+// opening the video and pulling it onto delphi stay two different intents.
+const hit = {
+  id: 'vidA', title: 'Big Buck Bunny', channel: 'Blender', duration: 596,
+  live: 'not_live', url: 'https://www.youtube.com/watch?v=vidA',
+  thumb: 'https://i.ytimg.com/vi/vidA/mqdefault.jpg',
+};
+const card = ytCard(hit);
+ok('a card carries the thumbnail', card.includes('src="https://i.ytimg.com/vi/vidA/mqdefault.jpg"'));
+ok('the thumbnail is a wide lazy box', card.includes('class="thumb wide"') && card.includes('loading="lazy"'));
+ok('the card links the video', card.includes('href="https://www.youtube.com/watch?v=vidA"'));
+ok('the card names the channel and the length', card.includes('Blender \u00b7 9:56'));
+ok('the fetch button is outside the link', card.includes('</a><button'));
+ok('the fetch button carries the url and the title',
+  card.includes('data-url="https://www.youtube.com/watch?v=vidA"')
+  && card.includes('data-title="Big Buck Bunny"'));
+ok('a title with markup is escaped', ytCard({ ...hit, title: '<b>x</b>' }).includes('&lt;b&gt;x&lt;/b&gt;'));
+ok('a missing thumbnail falls back to the still',
+  ytCard({ ...hit, thumb: '' }).includes('src="https://i.ytimg.com/vi/vidA/mqdefault.jpg"'));
+ok('a live entry says live', ytCard({ ...hit, duration: null, live: 'is_live' }).includes('Blender \u00b7 live'));
+// A live fetch records until the broadcast ends, so the card offers no button.
+ok('a live result offers no fetch',
+  !ytCard({ ...hit, live: 'is_live' }).includes('<button') && ytCard({ ...hit, live: 'is_live' }).includes('class="go off"'));
+ok('an upcoming stream offers no fetch', !ytCard({ ...hit, live: 'is_upcoming' }).includes('<button'));
+ok('a finished stream still fetches', ytCard({ ...hit, live: 'was_live' }).includes('<button class="go fet"'));
+ok('durations are clock-shaped', fmtDur(59) === '0:59' && fmtDur(60) === '1:00' && fmtDur(3661) === '1:01:01');
+ok('no duration prints nothing', fmtDur(null) === '' && fmtDur(undefined) === '');
+
+// Shortcuts: one letter per field, matched to the field's name.
+ok('l is the library filter', shortcutFor('l') === 'library');
+ok('p is the paste-a-URL field', shortcutFor('p') === 'paste');
+ok('y is the YouTube search', shortcutFor('y') === 'search');
+ok('s is free text', shortcutFor('s') === null);
+ok('a symbol is not a shortcut', shortcutFor('/') === null && shortcutFor('Enter') === null);
 
 console.log(`page: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

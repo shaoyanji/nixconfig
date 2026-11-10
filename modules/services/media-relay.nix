@@ -9,18 +9,30 @@
 }: let
   cfg = config.services.media-relay;
 
+  # The cookie jar is a credential a human provisioned, and both scripts read it
+  # through this one fragment: a search that forgot it meets the consent page
+  # while a fetch from the same session works, which reads as a YouTube bug.
+  cookieFlag = ''
+    cookie_flag=""
+    if [ -n "${cfg.cookieFile}" ] && [ -r "${cfg.cookieFile}" ]; then
+      cookie_flag="--cookies ${cfg.cookieFile}"
+    fi
+  '';
+
   ytGet = pkgs.writeShellScriptBin "yt-get" ''
     set -eu
 
     max_height=${toString cfg.maxHeight}
     max_fps=${toString cfg.maxFps}
+    allow_live=0
     url=""
     while [ "$#" -gt 0 ]; do
       case "$1" in
         --height) max_height="$2"; shift 2 ;;
         --fps) max_fps="$2"; shift 2 ;;
+        --allow-live) allow_live=1; shift ;;
         -h | --help)
-          echo "usage: yt-get [--height N] [--fps N] <url>"
+          echo "usage: yt-get [--height N] [--fps N] [--allow-live] <url>"
           exit 0
           ;;
         -*)
@@ -34,7 +46,7 @@
       esac
     done
     if [ -z "$url" ]; then
-      echo "usage: yt-get [--height N] [--fps N] <url>" >&2
+      echo "usage: yt-get [--height N] [--fps N] [--allow-live] <url>" >&2
       exit 2
     fi
 
@@ -42,10 +54,8 @@
     # than assumed: without it a datacenter IP is refused at the player API
     # ("Sign in to confirm you're not a bot") and the failure looks like a
     # network problem instead of a missing login.
-    cookie_flag=""
-    if [ -n "${cfg.cookieFile}" ] && [ -r "${cfg.cookieFile}" ]; then
-      cookie_flag="--cookies ${cfg.cookieFile}"
-    elif [ "${toString cfg.requireCookies}" = "1" ]; then
+    ${cookieFlag}
+    if [ -z "$cookie_flag" ] && [ "${toString cfg.requireCookies}" = "1" ]; then
       echo "yt-get: no readable cookie jar at ${cfg.cookieFile}" >&2
       echo "        YouTube refuses an anonymous player request from this IP." >&2
       echo "        Provision it (0600, owner ${cfg.user}) or set requireCookies = false." >&2
@@ -54,11 +64,28 @@
 
     export PATH="${pkgs.yt-dlp}/bin:${pkgs.ffmpeg}/bin:$PATH"
 
-    id="$(yt-dlp $cookie_flag --no-playlist --no-warnings --print "%(id)s" "$url" | head -1)"
+    # One metadata call answers both questions: which folder this is, and
+    # whether it is live. A live capture has no size for --max-filesize to
+    # check and runs until the broadcast ends, which is how one click fills a
+    # boot volume shared with five services. `was_live` is a finished stream and
+    # downloads like any video; an unknown status (a non-YouTube extractor) is
+    # not blocked on the strength of a missing field.
+    meta="$(yt-dlp $cookie_flag --no-playlist --no-warnings --print "%(id)s|%(live_status)s" "$url" | head -1)"
+    id="''${meta%%|*}"
+    live="''${meta#*|}"
     if [ -z "$id" ]; then
       echo "yt-get: could not resolve a video id for $url" >&2
       exit 1
     fi
+    case "$live" in
+      is_live | is_upcoming | post_live)
+        if [ "$allow_live" != 1 ]; then
+          echo "yt-get: refusing a live stream ($live): it has no size to check and records until the broadcast ends." >&2
+          echo "        Record it deliberately with --allow-live, and watch the disk." >&2
+          exit 1
+        fi
+        ;;
+    esac
 
     # The id is the directory, so a re-fetch reuses it and a listing groups by
     # video rather than by whichever title YouTube was A/B-testing that hour.
@@ -72,6 +99,7 @@
     format="$format/bv*[vcodec^=avc1][height<=?$max_height]+ba[acodec^=mp4a]"
 
     file="$(yt-dlp $cookie_flag --no-playlist --no-warnings --no-simulate \
+      --max-filesize ${toString cfg.maxDownloadGiB}G \
       -f "$format" --merge-output-format mp4 \
       -o "$out/%(title).120B [%(id)s].%(ext)s" \
       --print after_move:filepath "$url" | tail -1)"
@@ -131,6 +159,69 @@
     fi
 
     echo "${cfg.publicBase}/$rel"
+  '';
+
+  # Search, for the page's search field. `--flat-playlist` is the whole trick:
+  # one search request, no per-video extraction, and the entry already carries
+  # the title, channel, duration and thumbnail the page draws — the same shape
+  # ytfzf reads. The cookie jar is optional here (a search page is less guarded
+  # than the player API) but shared with `yt-get` so the two agree about who is
+  # asking.
+  ytSearch = pkgs.writeShellScriptBin "yt-search" ''
+    set -euo pipefail
+
+    limit=15
+    query=""
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+        --limit)
+          limit="$2"
+          shift 2
+          ;;
+        -h | --help)
+          echo "usage: yt-search [--limit N] <query>"
+          exit 0
+          ;;
+        -*)
+          echo "yt-search: unknown option: $1" >&2
+          exit 2
+          ;;
+        *)
+          query="$1"
+          shift
+          ;;
+      esac
+    done
+
+    case "$limit" in
+      *[!0-9]*)
+        echo "yt-search: --limit must be a number" >&2
+        exit 2
+        ;;
+    esac
+    if [ -z "$limit" ]; then
+      echo "yt-search: --limit must be a number" >&2
+      exit 2
+    fi
+
+    if [ -z "$query" ]; then
+      echo "usage: yt-search [--limit N] <query>" >&2
+      exit 2
+    fi
+
+    ${cookieFlag}
+
+    export PATH="${pkgs.yt-dlp}/bin:$PATH"
+
+    yt-dlp $cookie_flag --flat-playlist --no-warnings -J "ytsearch''${limit}:$query" \
+      | ${pkgs.jq}/bin/jq '
+          [.entries[]? | select(. != null and .id != null)
+           | {id, title, channel, duration,
+              live: (.live_status // "not_live"),
+              url: ("https://www.youtube.com/watch?v=" + .id),
+              thumb: (([.thumbnails[]? | .url] | last)
+                      // ("https://i.ytimg.com/vi/" + .id + "/mqdefault.jpg"))}]
+        '
   '';
 
   # What the library page lists. `find` is the authority — a manifest a fetch has
@@ -204,6 +295,24 @@
     install -m 0644 ${../../lib/media-relay/index.html} $out/index.html
   '';
 
+  # The page's write half. Loopback only: the vhost's `/api/` proxy is the whole
+  # surface, because a fetch is an outbound request this host makes on someone
+  # else's behalf.
+  api = pkgs.writeShellScript "media-relay-api" ''
+    set -eu
+    export YT_GET=${ytGet}/bin/yt-get
+    export YT_SEARCH=${ytSearch}/bin/yt-search
+    export COOKIE_FILE=${cfg.cookieFile}
+    export REQUIRE_COOKIES=${
+      if cfg.requireCookies
+      then "1"
+      else "0"
+    }
+    export BIND_ADDR=127.0.0.1
+    export PORT=${toString cfg.apiPort}
+    exec ${pkgs.python3}/bin/python3 ${../../lib/media-relay/api.py}
+  '';
+
   nginxPort = toString cfg.port;
 in {
   options.services.media-relay = {
@@ -215,6 +324,14 @@ in {
       # decision engine; 8094 measured free 2026-11-04.
       default = 8094;
       description = "HTTP port for the library. Nothing opens it in the firewall: it is reachable over the tailnet only, which is what keeps the fleet's one internet-facing host from also being a media server.";
+    };
+
+    apiPort = lib.mkOption {
+      type = lib.types.port;
+      # 8099 is the turn dashboard, 8098 miniflux, 8097 vikunja, 8096 ntfy and
+      # 8094 the library itself, so 8100 is the next free loopback port here.
+      default = 8100;
+      description = "Loopback port for the search/fetch API the vhost proxies at /api/.";
     };
 
     mediaDir = lib.mkOption {
@@ -251,6 +368,16 @@ in {
       description = "Ceiling for the fetched stream. 1080p at ~5-8 Mbit fits the measured 11.4 Mbit delphi->home path; 4K does not.";
     };
 
+    maxDownloadGiB = lib.mkOption {
+      type = lib.types.int;
+      default = 4;
+      description = ''
+        Ceiling for one download, in GiB (`yt-dlp --max-filesize`). It bounds a
+        VOD that turns out to be enormous; a live stream is refused separately,
+        because it has no size to check and would record until it ends.
+      '';
+    };
+
     maxFps = lib.mkOption {
       type = lib.types.int;
       default = 30;
@@ -283,7 +410,7 @@ in {
       }
     ];
 
-    environment.systemPackages = [ytGet pkgs.yt-dlp pkgs.ffmpeg];
+    environment.systemPackages = [ytGet ytSearch pkgs.yt-dlp pkgs.ffmpeg];
 
     # Group left as `-` on purpose: delphi's devji has no group of its own
     # (primary gid 100 = users), and naming it made the rule fail with
@@ -343,6 +470,20 @@ in {
               add_header Cache-Control "no-store";
             '';
           };
+          # The page's write half: search YouTube, queue a fetch. Proxied with its
+          # path intact (`/api/` on both sides), and `no-store` because it
+          # describes a queue that moves.
+          "/api/" = {
+            proxyPass = "http://127.0.0.1:${toString cfg.apiPort}/api/";
+            extraConfig = ''
+              proxy_http_version 1.1;
+              proxy_set_header Host 127.0.0.1;
+              # A search runs yt-dlp for a few seconds; a POST answers at once.
+              proxy_read_timeout 90s;
+              client_max_body_size 8k;
+              add_header Cache-Control "no-store" always;
+            '';
+          };
         };
       };
     };
@@ -396,6 +537,44 @@ in {
         OnBootSec = "30s";
         OnUnitActiveSec = "5min";
         AccuracySec = "30s";
+      };
+    };
+
+    # Search and fetch. It runs as the library's owner so `yt-get` can write
+    # under mediaDir without a second ownership rule, and it is the only process
+    # here that takes input — hence loopback-only and the URL allow-list in
+    # api.py rather than a bare `yt-get $anything`.
+    systemd.services.media-relay-api = {
+      description = "media-relay search and fetch API on 127.0.0.1:${toString cfg.apiPort}";
+      unitConfig.X-Fleet-Role = "daemon";
+      wantedBy = ["multi-user.target"];
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        Type = "simple";
+        User = cfg.user;
+        ExecStart = "${api}";
+        Restart = "always";
+        RestartSec = 3;
+        # A fetch can outlive a stop (a long video), and killing yt-dlp mid-merge
+        # leaves a partial file in the library.
+        TimeoutStopSec = "45s";
+        KillMode = "mixed";
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        # The jar's DIRECTORY, not just mediaDir: `--cookies` opens the file
+        # read-write so yt-dlp can save the refreshed session back, and
+        # ProtectSystem=strict alone made it read-only — every search died with
+        # `OSError: [Errno 30]` inside yt_dlp/cookies.py and the page saw a 502
+        # (measured 2026-11-10, first deploy of this API).
+        ReadWritePaths =
+          [cfg.mediaDir]
+          ++ lib.optional (cfg.cookieFile != "") (builtins.dirOf cfg.cookieFile);
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
+        # The interpreter plus one yt-dlp child; the cap is the runaway guard,
+        # not the expectation.
+        MemoryMax = "512M";
       };
     };
   };

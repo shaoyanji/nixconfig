@@ -1531,7 +1531,7 @@ in {
         port = 8461;
         upstream = "http://127.0.0.1:${toString config.services.media-relay.port}";
         title = "Media relay";
-        description = "Fetched media, range-served: a searchable browser over the library.";
+        description = "Fetched media, range-served: fuzzy search over the library, YouTube search with thumbnails, and a field that queues a fetch.";
         requires = ["nginx.service"];
       };
       # The pipeline, read from the archive: stage counts, a search over company,

@@ -6,7 +6,11 @@
 # delimiters, so a test cannot pass against a filter the host no longer runs.
 # The page functions are extracted the same way and run under node: the row is
 # asserted to carry a thumbnail only when the manifest names a poster, to keep
-# the copy button outside the anchor, and to order folders newest first.
+# the copy button outside the anchor, to order folders newest first, and to
+# render a search card whose fetch button sits outside the link.
+#
+# api_test.py starts the API against stub yt-dlp wrappers and drives it over
+# HTTP, so the URL allow-list and the fetch queue are proven without YouTube.
 #
 # The fixture is six files over three folders, so every rule is exercised at
 # least once: a video with a poster, a video without one, an image whose
@@ -23,7 +27,7 @@ page="$repo/lib/media-relay/index.html"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-for cmd in jq node find; do
+for cmd in jq node find python3; do
   command -v "$cmd" >/dev/null 2>&1 || {
     echo "fixture: $cmd is required" >&2
     exit 2
@@ -59,6 +63,39 @@ if [ ! -s "$work/filter.jq" ]; then
   echo "fixture: could not extract the index filter from $module" >&2
   exit 2
 fi
+
+# The search filter is lifted the same way: it is the contract between
+# `yt-search` and the page (which draws title, channel, duration, thumbnail).
+sed -n "/bin\\/jq '/,/^ *'$/p" "$module" | sed '1d;$d' >"$work/search.jq"
+if [ ! -s "$work/search.jq" ]; then
+  echo "fixture: could not extract the search filter from $module" >&2
+  exit 2
+fi
+
+cat >"$work/search.json" <<'JSON'
+{"entries": [
+  {"id": "vidA", "title": "Big Buck Bunny", "channel": "Blender", "duration": 596,
+   "live_status": "not_live", "thumbnails": [{"url": "https://i.ytimg.com/small.jpg"},
+                                                {"url": "https://i.ytimg.com/big.jpg"}]},
+  {"id": "vidB", "title": "Live now", "channel": "Chan", "duration": null,
+   "live_status": "is_live", "thumbnails": null},
+  null,
+  {"title": "no id"}
+]}
+JSON
+jq -f "$work/search.jq" "$work/search.json" >"$work/search-out.json" || {
+  echo "fixture: the search filter failed to run" >&2
+  exit 2
+}
+
+s() { jq -r "$1" "$work/search-out.json"; }
+
+is "search drops a null entry and an id-less one" "2" "$(s 'length')"
+is "search sees the best thumbnail" "https://i.ytimg.com/big.jpg" "$(s '.[0].thumb')"
+is "search falls back to the video still" "https://i.ytimg.com/vi/vidB/mqdefault.jpg" "$(s '.[1].thumb')"
+is "search builds a watch URL" "https://www.youtube.com/watch?v=vidA" "$(s '.[0].url')"
+is "search keeps a live status" "is_live" "$(s '.[1].live')"
+is "search carries channel and duration" "Blender/596" "$(s '.[0] | "\(.channel)/\(.duration)"')"
 
 lib="$work/lib"
 mkdir -p "$lib/vidA" "$lib/vidB" "$lib/pics"
@@ -98,6 +135,7 @@ is "the manifest is stamped" "2026-01-01T00:00:00Z" "$(j '.generated')"
 
 # The page's own functions, not a reimplementation of them.
 node "$here/page.js" "$page" || fail=1
+python3 "$here/api_test.py" || fail=1
 
 if [ "$fail" -ne 0 ]; then
   echo ""

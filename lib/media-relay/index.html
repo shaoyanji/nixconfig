@@ -5,19 +5,31 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Media library</title>
 <style>
-:root{--bg:#101013;--panel:#17171c;--line:#26262e;--ink:#e8e8ee;--dim:#8b8b99;--accent:#7ee0b8;--hit:#3a2f00;--hitink:#ffd76a}
+:root{--bg:#101013;--panel:#17171c;--line:#26262e;--ink:#e8e8ee;--dim:#8b8b99;--accent:#7ee0b8;--hit:#3a2f00;--hitink:#ffd76a;--bad:#ff8b8b}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 body{padding:1.25rem;max-width:70rem;margin:0 auto}
-header{position:sticky;top:0;background:var(--bg);padding-bottom:.75rem;border-bottom:1px solid var(--line);z-index:2}
-h1{font-size:1rem;margin:0;letter-spacing:.08em;text-transform:uppercase}
+header{position:sticky;top:0;background:var(--bg);padding-bottom:.6rem;border-bottom:1px solid var(--line);z-index:2}
+h1{font-size:1rem;margin:0 0 .6rem;letter-spacing:.08em;text-transform:uppercase}
 h1 small{color:var(--dim);font-weight:400;letter-spacing:0;text-transform:none}
-#q{width:100%;margin:.75rem 0 .5rem;padding:.6rem .75rem;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:inherit;border-radius:.3rem}
-#q:focus{outline:1px solid var(--accent);border-color:var(--accent)}
-#chips{display:flex;flex-wrap:wrap;gap:.35rem}
+form{margin:0 0 .45rem}
+.bar{display:flex;gap:.4rem;align-items:center}
+.in{flex:1 1 auto;width:100%;min-width:0;padding:.5rem .65rem;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:inherit;border-radius:.3rem}
+.in:focus{outline:1px solid var(--accent);border-color:var(--accent)}
+button.go{background:transparent;border:1px solid var(--line);color:var(--dim);padding:.45rem .7rem;border-radius:.3rem;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
+button.go:hover,button.go:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+button.go[disabled],.go.off{opacity:.55;cursor:default}
+#jobline{font-size:12px;line-height:1.65;margin:0 0 .5rem;color:var(--dim)}
+#jobline:empty{display:none}
+#jobline .live{color:var(--accent)}
+#jobline .ok{color:var(--accent)}
+#jobline .bad{color:var(--bad)}
+#jobline a{color:var(--ink)}
+#chips{display:flex;flex-wrap:wrap;gap:.35rem;margin:.35rem 0 0}
 button.chip{background:transparent;border:1px solid var(--line);color:var(--dim);padding:.2rem .55rem;border-radius:999px;font:inherit;font-size:12px;cursor:pointer}
 button.chip[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
 h2{font-size:12px;color:var(--dim);font-weight:400;text-transform:uppercase;letter-spacing:.1em;margin:1.5rem 0 .35rem}
+h2 small{text-transform:none;letter-spacing:0}
 ul{list-style:none;margin:0;padding:0}
 li{display:grid;grid-template-columns:1fr auto;align-items:center;border:1px solid transparent;border-radius:.25rem}
 li:hover{background:var(--panel);border-color:var(--line)}
@@ -35,16 +47,39 @@ li a:focus-visible{outline:1px solid var(--accent)}
 .ext{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 #state{color:var(--dim);padding:2rem .5rem;text-align:center}
 #state code{color:var(--accent)}
-@media(max-width:36rem){li a{grid-template-columns:1fr auto}li a.poster{grid-template-columns:auto 1fr auto}li a.poster .meta{display:none}li{grid-template-columns:1fr}button.cp{display:none}}
+/* YouTube results: a grid of cards, because a thumbnail is the useful cue and a
+   row of filenames says nothing about which video it is. */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.75rem}
+.cards li{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:.3rem;overflow:hidden;background:var(--panel)}
+.cards li:hover{border-color:var(--accent);background:var(--panel)}
+.cards a{display:flex;flex-direction:column;gap:.45rem;padding:.5rem;text-decoration:none;color:inherit;flex:1 1 auto;min-width:0}
+.thumb.wide{width:100%;height:auto;aspect-ratio:16/9;border:0;border-radius:0}
+.ytmeta{display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.ytmeta .t{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ytmeta .c{color:var(--dim);font-size:11px}
+.cards button.fet{margin:0 .5rem .5rem;align-self:flex-start}
+@media(max-width:36rem){header{position:static}li a{grid-template-columns:1fr auto}li a.poster{grid-template-columns:auto 1fr auto}li a.poster .meta{display:none}li{grid-template-columns:1fr}button.cp{display:none}}
 </style>
 </head>
 <body>
 <header>
   <h1>Media library <small id="stats"></small></h1>
-  <input id="q" type="search" placeholder="fuzzy search — name, folder, extension" autocomplete="off" spellcheck="false" aria-label="Search the library">
+  <form id="fetchform" class="bar" autocomplete="off">
+    <input id="url" class="in" type="text" inputmode="url" placeholder="paste a YouTube URL to fetch it on this host" aria-label="YouTube URL to fetch" aria-keyshortcuts="p" spellcheck="false">
+    <button class="go" type="submit">fetch</button>
+  </form>
+  <div id="jobline" role="status" aria-live="polite"></div>
+  <form id="ytform" class="bar" autocomplete="off">
+    <input id="ytq" class="in" type="search" placeholder="search YouTube for something to fetch" aria-label="Search YouTube" aria-keyshortcuts="y" spellcheck="false">
+    <button class="go" type="submit">search</button>
+  </form>
+  <input id="q" class="in" type="search" placeholder="fuzzy search the library — name, folder, extension" style="margin-top:.45rem" autocomplete="off" spellcheck="false" aria-label="Search the library" aria-keyshortcuts="l">
   <div id="chips" role="group" aria-label="Filter by kind"></div>
 </header>
-<main id="list" aria-live="polite"></main>
+<main>
+  <section id="yt" aria-label="YouTube results"></section>
+  <div id="list" aria-live="polite"></div>
+</main>
 <script>
 'use strict';
 
@@ -54,12 +89,25 @@ stateEl.id = 'state';
 const qEl = document.getElementById('q');
 const statsEl = document.getElementById('stats');
 const chipsEl = document.getElementById('chips');
+const ytEl = document.getElementById('yt');
+const ytqEl = document.getElementById('ytq');
+const ytForm = document.getElementById('ytform');
+const urlEl = document.getElementById('url');
+const fetchForm = document.getElementById('fetchform');
+const jobline = document.getElementById('jobline');
 
 const KINDS = ['all', 'video', 'audio', 'image', 'subtitle'];
 let files = [];
 let kind = 'all';
 let query = '';
 let sel = -1;
+let ytItems = [];
+let ytState = '';
+let ytError = '';
+let ytSeq = 0;
+let ytTimer = null;
+const seenDone = new Set();
+let pollTimer = null;
 
 const fmtSize = (b) => {
   const u = ['B', 'K', 'M', 'G', 'T'];
@@ -71,7 +119,14 @@ const fmtSize = (b) => {
 
 const fmtDate = (s) => new Date(s * 1000).toISOString().slice(0, 10);
 const dirOf = (p) => (p.includes('/') ? p.slice(0, p.lastIndexOf('/')) : '');
-const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pathOf = (u) => {
+  try { return new URL(u, location.origin).pathname; } catch (_) { return '/' + String(u).replace(/^.*\//, ''); }
+};
+const nameOf = (u) => {
+  const n = String(u || '').split('/').pop() || '';
+  try { return decodeURIComponent(n); } catch (_) { return n; }
+};
 
 /* fuzzy:start */
 // Subsequence match, scored the way a person expects: adjacent characters and
@@ -157,23 +212,54 @@ function selected(item) {
     + `<button class="cp" type="button" data-href="${esc(href)}" aria-label="Copy the link to ${esc(item.name)}">copy</button></li>`;
 }
 
-async function copyLink(btn) {
-  const url = new URL(btn.dataset.href, location.origin).href;
-  try {
-    await navigator.clipboard.writeText(url);
-  } catch (_) {
-    // Clipboard permission is not a given (plain http on a LAN name), so the
-    // fallback is the selection route every browser still honours.
-    const t = document.createElement('textarea');
-    t.value = url;
-    t.setAttribute('readonly', '');
-    document.body.append(t);
-    t.select();
-    try { document.execCommand('copy'); } catch (__) { /* the text stays selected */ }
-    t.remove();
-  }
-  btn.textContent = 'copied';
-  setTimeout(() => { btn.textContent = 'copy'; }, 1200);
+// 596 -> 9:56. A live stream has no duration and says so on its own line, so an
+// empty string here is a real answer rather than a missing one.
+function fmtDur(seconds) {
+  // `Number(null)` is 0, so a live stream would print 0:00 rather than nothing.
+  if (seconds === null || seconds === undefined || seconds === '') return '';
+  const s = Number(seconds);
+  if (!Number.isFinite(s) || s < 0) return '';
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = Math.floor(s % 60);
+  const pad = (n) => String(n).padStart(2, '0');
+  return (h ? `${h}:${pad(m)}` : `${m}`) + `:${pad(sec)}`;
+}
+
+// One search result. The thumbnail is YouTube's own still, loaded by the
+// reader's browser (it is what the JSON already carries), and the fetch button
+// is a sibling of the link so opening the video and downloading it stay two
+// different intents.
+function ytCard(item) {
+  const id = String(item.id || '');
+  const href = item.url || `https://www.youtube.com/watch?v=${id}`;
+  const thumb = item.thumb || `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+  const title = item.title || id;
+  const bits = [item.channel, fmtDur(item.duration)].filter(Boolean);
+  // `was_live` is a finished stream: it downloads like any video, so only a
+  // running or upcoming one loses its button. A live capture would record until
+  // the broadcast ends and there is no size to check beforehand.
+  const isLive = Boolean(item.live && item.live !== 'not_live' && item.live !== 'was_live');
+  if (isLive || (item.live && item.live !== 'not_live')) bits.push('live');
+  const act = isLive
+    ? '<span class="go off" aria-disabled="true" title="a live stream records until it ends; yt-get refuses it">live</span>'
+    : `<button class="go fet" type="button" data-url="${esc(href)}" data-title="${esc(title)}">fetch</button>`;
+  return `<li class="card"><a href="${esc(href)}" target="_blank" rel="noreferrer">`
+    + `<span class="thumb wide"><img src="${esc(thumb)}" alt="" loading="lazy" decoding="async"></span>`
+    + `<span class="ytmeta"><span class="t">${esc(title)}</span>`
+    + `<span class="c">${esc(bits.join(' · '))}</span></span></a>`
+    + `${act}</li>`;
+}
+
+// One letter per field, matched to its own name — p paste, y YouTube, l library
+// — and only while no field has focus (the handler checks that): a shortcut
+// that fires inside an input is a character the reader cannot type, which is
+// what the old `s`-for-search binding did to the YouTube box.
+function shortcutFor(key) {
+  if (key === 'p') return 'paste';
+  if (key === 'y') return 'search';
+  if (key === 'l') return 'library';
+  return null;
 }
 
 function markup(item) {
@@ -198,7 +284,8 @@ function render() {
   listEl.replaceChildren();
 
   if (!files.length) {
-    stateEl.innerHTML = 'The library is empty. Fetch something on delphi: <code>yt-get &lt;url&gt;</code>';
+    stateEl.innerHTML = 'The library is empty. Fetch something with the field above, '
+      + 'or on delphi: <code>yt-get &lt;url&gt;</code>';
     listEl.append(stateEl);
     return;
   }
@@ -262,16 +349,198 @@ function move(step) {
   links[sel].scrollIntoView({ block: 'nearest' });
 }
 
+function renderYouTube() {
+  ytEl.replaceChildren();
+  if (!ytState) return;
+  const head = (label) => `<h2>YouTube <small>${label}</small></h2>`;
+  if (ytState === 'searching') {
+    ytEl.innerHTML = head('one request, results in a moment') + '<div id="state">Searching…</div>';
+    return;
+  }
+  if (ytState === 'error') {
+    ytEl.innerHTML = head('search failed') + `<div id="state">${esc(ytError)}`
+      + '<br>If this says 404, the API is not in the running generation yet.</div>';
+    return;
+  }
+  if (ytState === 'empty') {
+    ytEl.innerHTML = head('no results') + '<div id="state">Nothing on YouTube matched that.</div>';
+    return;
+  }
+  ytEl.innerHTML = head('click fetch to pull one onto this host')
+    + `<ul class="cards">${ytItems.map(ytCard).join('')}</ul>`;
+}
+
+async function searchYouTube(text) {
+  const q = text.trim();
+  if (q.length < 2) return;
+  clearTimeout(ytTimer);
+  const seq = ++ytSeq;
+  ytState = 'searching';
+  renderYouTube();
+  try {
+    const r = await fetch(`/api/search?q=${encodeURIComponent(q)}`, { cache: 'no-store' });
+    const data = await r.json().catch(() => ({}));
+    if (seq !== ytSeq) return;
+    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+    ytItems = Array.isArray(data.items) ? data.items : [];
+    ytState = ytItems.length ? 'results' : 'empty';
+  } catch (err) {
+    if (seq !== ytSeq) return;
+    ytItems = [];
+    ytError = String(err.message || err);
+    ytState = 'error';
+  }
+  if (seq === ytSeq) renderYouTube();
+}
+
+function line(html) {
+  jobline.innerHTML = html;
+}
+
+async function loadIndex() {
+  try {
+    const r = await fetch('/index.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    // A refresh keeps the rows on the screen when the fetch failed but the last
+    // manifest is still true: only an empty library earns the message.
+    files = (data.files || []).map((f) => ({ ...f, name: f.name || f.path.split('/').pop() }));
+    stats();
+    chips();
+    render();
+  } catch (err) {
+    if (files.length) return;
+    stats();
+    chips();
+    listEl.replaceChildren();
+    stateEl.innerHTML = `No index yet (${esc(String(err.message || err))}). `
+      + 'The media-relay-index timer writes it within five minutes — '
+      + 'or fetch a file with the field above, or <code>yt-get &lt;url&gt;</code>.';
+    listEl.append(stateEl);
+  }
+}
+
+async function postFetch(url, title) {
+  line(`<span class="live">queued</span> ${esc(title || url)} — starting`);
+  try {
+    const r = await fetch('/api/fetch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, title }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+  } catch (err) {
+    line(`<span class="bad">could not queue</span> ${esc(String(err.message || err))}`);
+    return false;
+  }
+  pollJobs();
+  return true;
+}
+
+// One line per active fetch, plus the last finished or failed one: the library
+// below is the record of what succeeded, so this is a status strip, not a log.
+async function pollJobs() {
+  clearTimeout(pollTimer);
+  let data;
+  try {
+    const r = await fetch('/api/jobs', { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    data = await r.json();
+  } catch (err) {
+    line(`<span class="bad">fetch status unavailable</span> ${esc(String(err.message || err))}`);
+    return;
+  }
+  const jobs = Array.isArray(data.jobs) ? data.jobs : [];
+  const active = jobs.filter((j) => j.state === 'queued' || j.state === 'running');
+  const done = jobs.find((j) => j.state === 'done');
+  const failed = jobs.find((j) => j.state === 'failed');
+  const rows = active.slice(0, 3).map((j) => `<span class="live">${j.state === 'running' ? 'fetching' : 'queued'}</span> ${esc(j.title || j.url)}`);
+  if (done) {
+    rows.push(`<span class="ok">saved</span> <a href="${esc(pathOf(done.out))}">${esc(nameOf(done.out) || done.title || done.url)}</a>`);
+    if (!seenDone.has(done.id)) {
+      seenDone.add(done.id);
+      loadIndex();
+    }
+  }
+  if (failed) {
+    rows.push(`<span class="bad">failed</span> ${esc(failed.title || failed.url)}${failed.error ? ` — ${esc(failed.error)}` : ''}`);
+  }
+  line(rows.map((r) => `<div>${r}</div>`).join(''));
+  if (active.length) pollTimer = setTimeout(pollJobs, 2000);
+}
+
 document.addEventListener('keydown', (e) => {
-  if ((e.key === '/' || e.key === 's') && document.activeElement !== qEl) { e.preventDefault(); qEl.focus(); return; }
-  if (document.activeElement === qEl && e.key === 'ArrowDown') { e.preventDefault(); move(1); return; }
+  const focused = document.activeElement;
+  const field = !!focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA' || focused.isContentEditable === true);
+  const target = field || e.metaKey || e.ctrlKey || e.altKey ? null : shortcutFor(e.key);
+  if (target === 'library') { e.preventDefault(); qEl.focus(); return; }
+  if (target === 'paste') { e.preventDefault(); urlEl.focus(); return; }
+  if (target === 'search') { e.preventDefault(); ytqEl.focus(); return; }
+
   if (e.key === 'ArrowDown') { e.preventDefault(); move(1); return; }
   if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); return; }
-  if (e.key === 'Enter' && sel >= 0) { e.preventDefault(); listEl.querySelectorAll('li a')[sel].click(); return; }
-  if (e.key === 'Escape') { qEl.value = ''; query = ''; render(); qEl.blur(); }
+  // Enter on a highlighted row opens it — but never in place of submitting the
+  // form the reader is actually typing in.
+  if (e.key === 'Enter' && sel >= 0 && !field) {
+    e.preventDefault();
+    listEl.querySelectorAll('li a')[sel].click();
+    return;
+  }
+  if (e.key === 'Escape') {
+    if (focused === ytqEl) {
+      ytqEl.value = '';
+      ytSeq += 1;
+      ytState = '';
+      ytItems = [];
+      renderYouTube();
+      ytqEl.blur();
+      return;
+    }
+    if (focused === urlEl) { urlEl.value = ''; urlEl.blur(); return; }
+    qEl.value = '';
+    query = '';
+    render();
+    if (focused === qEl) qEl.blur();
+  }
 });
 
 qEl.addEventListener('input', () => { query = qEl.value; render(); });
+
+ytqEl.addEventListener('input', () => {
+  const q = ytqEl.value.trim();
+  clearTimeout(ytTimer);
+  if (!q) {
+    ytSeq += 1;
+    ytState = '';
+    ytItems = [];
+    renderYouTube();
+    return;
+  }
+  if (q.length < 2) return;
+  ytTimer = setTimeout(() => searchYouTube(q), 500);
+});
+
+ytForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  searchYouTube(ytqEl.value);
+});
+
+fetchForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const url = urlEl.value.trim();
+  if (!url) return;
+  if (await postFetch(url, '')) urlEl.value = '';
+});
+
+ytEl.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button.fet');
+  if (!btn) return;
+  e.preventDefault();
+  btn.disabled = true;
+  if (await postFetch(btn.dataset.url, btn.dataset.title || '')) btn.textContent = 'queued';
+  else btn.disabled = false;
+});
 
 listEl.addEventListener('click', (e) => {
   const btn = e.target.closest('button.cp');
@@ -280,23 +549,20 @@ listEl.addEventListener('click', (e) => {
   copyLink(btn);
 });
 
-fetch('/index.json', { cache: 'no-store' })
-  .then((r) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
-  })
+loadIndex();
+
+// The cookie jar is a hand-provisioned credential, so a page that cannot fetch
+// should say that before someone pastes a URL and reads a yt-dlp error.
+fetch('/api/health', { cache: 'no-store' })
+  .then((r) => (r.ok ? r.json() : null))
   .then((data) => {
-    files = (data.files || []).map((f) => ({ ...f, name: f.name || f.path.split('/').pop() }));
-    stats();
-    chips();
-    render();
+    if (data && data.require_cookies && !data.cookies && !jobline.innerHTML) {
+      line('<span class="bad">no cookie jar</span> fetches will be refused — provision '
+        + '<code>/var/lib/media-relay/cookies.txt</code> on delphi');
+    }
+    if (data && data.active) pollJobs();
   })
-  .catch((err) => {
-    stateEl.innerHTML = `No index yet (${esc(String(err.message || err))}). `
-      + 'The media-relay-index timer writes it within five minutes — '
-      + 'or fetch a file with <code>yt-get &lt;url&gt;</code>.';
-    listEl.append(stateEl);
-  });
+  .catch(() => { /* an older generation has no API; the library still works */ });
 </script>
 </body>
 </html>

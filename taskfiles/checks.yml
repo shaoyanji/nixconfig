@@ -583,13 +583,13 @@ tasks:
   checks:media-relay:
     desc: Fixture for the media library — the manifest the page reads and the rows it renders
     summary: >
-      Lifts the index jq out of modules/services/media-relay.nix by its
-      delimiters and runs it over a six-file fixture: a poster attaches to its
-      folder's video and is never listed or counted, bytes cover media only,
-      an upper-case extension is lowercased, a .txt is dropped. Runs the page's
-      own row function under node: a thumb only where the manifest names a
-      poster, encoded paths, copy outside the anchor, newest folder first.
-      No nix; needs node and jq; ~1 s.
+      Lifts the index jq out of modules/services/media-relay.nix and runs it over
+      a six-file fixture: a poster attaches to its folder's video and is never
+      listed or counted, bytes cover media only, an upper-case extension is
+      lowercased, a .txt is dropped. Runs the page's row and search-card
+      functions under node, then starts api.py against stub yt-dlp wrappers and
+      drives it over HTTP: the URL allow-list refuses a non-YouTube host and a
+      queued fetch reaches done. Needs node, jq and python3; ~2 s.
     cmds:
       - bash tests/media-relay/run.sh
 

@@ -6,10 +6,18 @@ importer/sync that keeps the rows current. The hub knows none of that: it knows
 `rules`, `sql`, `schema` and `packages` (`services.emailArchive.plugins`).
 
 **It is not a first-class citizen, and it is not the upstream project.** The
-workflow at `shaoyanji/antigravity-application-workflow` is a data source: its
-`applications.json` is imported, its per-company Typst directories, its CSV, its
-Supabase migration and its CLI are not reproduced here. One template and a
-database diff replace sixty copies of the same layout.
+workflow at `shaoyanji/antigravity-application-workflow` was the data source: its
+`applications.json` was imported once, and is an export of the database now. Its
+per-company Typst directories, its CSV, its Supabase migration and its CLI are not
+reproduced here. One template and a database diff replace sixty copies of the same
+layout.
+
+**The database is the source of truth.** Since `86bdb73b` (2026-11-03) the archive
+holds the pipeline, `sync --sync` writes statuses from mail, and the workflow
+checkout is retired as a source: nothing imports its JSON on a timer. `task
+apps:list|search|get|update|overview|status` speaks the archive API, so they work
+from any tailnet host; `task apps:export` writes the old JSON shape on demand, and
+no schedule writes it.
 
 ## What it adds
 
@@ -133,20 +141,25 @@ task portfolio:export:en · task portfolio:export:de
 task checks:portfolio
 ```
 
-## Commands
-
-```bash
-task agents:apps:import FILE=<applications.json>   # import + link (FILE=- for stdin)
-task agents:apps:sync                              # write status from ATS mail (DRY=1 to preview)
-task agents:apps:export OUT=data/applications.json # the DB as the workflow's JSON
+## Commands```bash
+task apps:list                                     # the pipeline, read from Postgres
+task apps:search <words>                           # company, role, status, id, next action
+task apps:get -- <id>                              # one record and its mail
+task apps:update -- <id> --status "Rejected (email …)"   # status, stage, next action
+task apps:overview                                 # stage counts
+task apps:status                                   # totals, newest change, queue depth
+task apps:emails                                   # what the hourly sync will drain
+task apps:export -- <file>                         # applications.json from the database
+task agents:apps:import FILE=<applications.json>   # one-off import + link (FILE=- for stdin)
 task agents:apps:packet ID=<application>           # build a packet through nix
 task agents:apps:packet EXAMPLE=1                  # fictional data, proves the toolchain
 task agents:apps:select JD=<file>                  # the projection alone, no PDF
 task checks:appflow                                 # the selector's fixture
+task checks:appflow:triage                          # the mail-to-status rules
 task apps:docs:import [DIR=~/.config/appflow/jd]       # the JD text into the database
   task apps:docs                                        # what text exists, no bodies
   task apps:docs:show -- <id> [kind]                    # one document's text
-  task agents:apps:draft ID=<app> BODY=<file> ATTACH=<pdf>   # a DRAFT in the mailbox, never sent
+task agents:apps:draft ID=<app> BODY=<file> ATTACH=<pdf>   # a DRAFT in the mailbox, never sent
 task agents:apps:drafts                            # what sits in Drafts
 task agents:hub                                    # every plugin's queue depth
 ```

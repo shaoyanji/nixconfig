@@ -1,42 +1,53 @@
 ---
 name: apps
-description: "Job application pipeline: status, emails, Typst docs."
-version: 0.1.0
+description: "Job application pipeline: status, mail triage, Typst documents."
+version: 0.2.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
 platforms: [linux]
 metadata:
   hermes:
-    tags: ['apps', 'job-application', 'workflow']
+    tags: ['apps', 'job-application', 'workflow', 'postgres']
     related_skills: []
 ---
 
 # apps — the job-application pipeline
 
-Tasks are thin wrappers over `bin/appflow` in
-`/srv/data/projects/antigravity-application-workflow` (bash + uv + SQLite +
-Typst + Himalaya). Running `bin/appflow` directly is allowed; the tasks add no
-logic.
+The pipeline lives in the archive database on delphi. Since `86bdb73b`
+(2026-11-03) that database is the only writer: `appflow-sync.timer` advances
+statuses from ATS mail hourly, and `applications.json` in the workflow checkout
+is an export, not a source. Nothing imports it on a schedule.
 
-| Path | Role |
+| Where | Role |
 | :--- | :--- |
-| `data/applications.json` | Source of truth, tracked, wins conflicts |
-| `data/applications.db` | SQLite cache, rebuilt by sync |
-| `data/application_planner_master.csv` | Sheets mirror |
-| `src/applications/<tech\|service>/` | Typst sources per application |
-| `dist/` | Compiled PDFs |
+| `applications` (Postgres, `email_archive`) | Source of truth |
+| `application_mail` | The messages behind a record, with the rule that linked them |
+| `application_document` | The job description and notes, keyed by application and kind |
+| `/srv/data/projects/antigravity-application-workflow` | Typst documents only; retired as a source |
+| `data/applications.json` there | Historical copy; `task apps:export` regenerates it |
 
-## The two flows, and the one rule
+## The flows
 
-A status change is `apps:update -- <id> --status "<S>"`, then `apps:sync:push`,
-which reconciles JSON → DB/CSV, commits and pushes. Skip the sync and the change
-exists only in the DB, which the next pull overwrites.
+`task apps:list|search|get|update|overview|status` speak the archive API from any
+tailnet host — they do not read the checkout. A status change is one command:
 
-An inbound recruiter reply is `apps:emails` (Himalaya scan, matches replies to
-applications and updates statuses); `apps:followups --copy <id>` drafts one.
-`apps:audit` is the layout/page-budget check to run before `apps:build`.
+```bash
+task apps:update -- <id> --status "Rejected (email 2026-10-23)"
+```
 
-Never hand-edit `applications.db`. Submission automation (Playwright) lives in
-the workflow repo's own skills, not here.
+`stage` and the next action follow from the status (`stage_of` in
+`modules/plugins/appflow/sync.py`), so a rejection also clears the next action.
+There is no push step and no JSON to reconcile.
 
-Truth: `taskfiles/apps.yml` — the executable contract; this page is the procedure.
+`task apps:emails` shows what the hourly sync will drain. A message the rules
+cannot prove stays in the queue and shows up there; a rejection the vocabulary
+does not recognise is exactly the defect `checks:appflow:triage` now covers.
+`apps:followups`, `apps:build` and `apps:audit` are the Typst half and need the
+workflow checkout; they do not touch the pipeline rows.
+
+Never hand-edit a JSON copy and never import it over the database: a stale file
+reverts rows the mail hub discovered. If a snapshot is needed, `task apps:export`
+writes one.
+
+Truth: `taskfiles/apps.yml` and `docs/email-archive.md` — the executable contract
+and the API; this page is the procedure.

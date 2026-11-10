@@ -1,58 +1,76 @@
 version: "3"
 
 vars:
+  # The workflow checkout is retired as a source of truth (86bdb73b, 2026-11-03):
+  # its applications.json is an export, and its bin/appflow still builds the
+  # Typst documents. Everything that reads or writes the pipeline goes through
+  # the archive API on delphi — scripts/task/apps-db.sh.
   APPS_DIR: "/srv/data/projects/antigravity-application-workflow"
   APPS_BIN: "{{.APPS_DIR}}/bin/appflow"
-  APPS_DATA: "{{.APPS_DIR}}/data/applications.json"
-  # uv is configured with downloads=never on this fleet and python3 is not
-  # on the base PATH, so uv-backed appflow commands run inside a python3
-  # nix-shell (same pattern as taskfiles/bountystash.yml).
   APPS_RUN: "nix-shell -p python3 --run"
+  APPS_DB: "bash scripts/task/apps-db.sh"
 
 tasks:
   apps:list:
-    desc: List tracked job applications
+    desc: List tracked applications from the archive database
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} list {{.CLI_ARGS}}\""
+      - "{{.APPS_DB}} list {{.CLI_ARGS}}"
 
   apps:search:
-    desc: Search applications by company, role, ID, or keywords
+    desc: Search applications (company, role, status, id, next action)
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} search {{.CLI_ARGS}}\""
+      - "{{.APPS_DB}} search {{.CLI_ARGS}}"
 
   apps:get:
-    desc: View full details of one application record
+    desc: View one application and the mail linked to it
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} get {{.CLI_ARGS}}\""
+      - "{{.APPS_DB}} get {{.CLI_ARGS}}"
 
   apps:update:
-    desc: Update application status or notes (e.g. task apps:update -- <id> --status Applied)
+    desc: Update status in Postgres (task apps:update -- <id> --status Rejected [--next-action none])
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} update {{.CLI_ARGS}}\""
+      - "{{.APPS_DB}} update {{.CLI_ARGS}}"
 
   apps:overview:
-    desc: Pipeline summary - coarse stage counts (Applied, Rejected, Interview, ...)
+    desc: Pipeline summary - stage counts and how many carry a next action
     cmds:
-      - |
-        jq -r '
-          def stage:
-            if test("Interview|Trial|Warteliste") then "Interview/Pending"
-            elif test("^Rejected") then "Rejected"
-            elif test("^Applied") then "Applied"
-            elif test("^Lead|Rezi") then "Lead"
-            elif test("Screening|Follow-up Required") then "Screening"
-            elif test("Draft|packet|Packet|JD") then "Prep"
-            else "Other" end;
-          group_by(.status | stage)[] | "\(.[0].status | stage)\t\(length)"
-        ' "{{.APPS_DATA}}" | sort
+      - "{{.APPS_DB}} overview"
 
-  apps:emails:
-    desc: Run inbound Himalaya email radar and sync application statuses
+  apps:status:
+    desc: Totals, newest change and open queue depth from the archive
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} emails {{.CLI_ARGS}}\""
+      - "{{.APPS_DB}} status"
+
+  # The sync itself is a unit on delphi (appflow-sync.timer, hourly). This shows
+  # what is waiting for it instead of running a second scanner by hand.
+  apps:emails:
+    desc: Messages waiting for agent:apps (the hourly sync on delphi drains them)
+    cmds:
+      - "{{.APPS_DB}} queue {{.CLI_ARGS}}"
+
+  # Rules first: a form, an alert, an automatic reply, a retention request, or an
+  # acknowledgement that names an employer the tracker does not have. What they
+  # cannot decide gets a ternary from the two System One engines (attribute /
+  # ignore / unsure), and the unsures go to exactly one hermes turn, which may
+  # attribute to a supplied candidate or retire the entry to the reversible
+  # `ignore` tier. Nothing is written unless APPLY=1; `--restore` undoes an ignore.
+  apps:queue:resolve:
+    desc: Attribute or close the appflow queue (dry default; --apply, --restore <id>)
+
+  # The workflow's applications.json is a generated artifact now. This writes it
+  # on demand in the shape that repo reads; nothing schedules it.
+  apps:export:
+    desc: Write applications.json from the database (CLI_ARGS=<file>, default stdout)
+    cmds:
+      - "{{.APPS_DB}} export {{.CLI_ARGS}}"
+
+  apps:query:
+    desc: Read-only SQL against email_archive (task apps:query -- "select ...")
+    cmds:
+      - "{{.APPS_DB}} query {{.CLI_ARGS}}"
 
   apps:followups:
-    desc: View drafted recruiter follow-up notes (--copy <id> for clipboard)
+    desc: View drafted recruiter follow-up notes from the workflow checkout (--copy <id>)
     cmds:
       - "{{.APPS_RUN}} \"{{.APPS_BIN}} followups {{.CLI_ARGS}}\""
 
@@ -66,28 +84,8 @@ tasks:
     cmds:
       - "{{.APPS_RUN}} \"{{.APPS_BIN}} audit\""
 
-  apps:query:
-    desc: Read-only SQL against applications.db (e.g. task apps:query -- "select ...")
-    cmds:
-      - "{{.APPS_BIN}} query {{.CLI_ARGS}}"
-
-  apps:sync:status:
-    desc: Check JSON <-> SQLite <-> GitHub synchronization state
-    cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} status\""
-
-  apps:sync:push:
-    desc: Reconcile JSON (source of truth) into DB/CSV, commit data, push to GitHub
-    cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} push\""
-
-  apps:sync:pull:
-    desc: Pull remote application changes from GitHub and reconcile locally
-    cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} pull\""
-
   apps:git:status:
-    desc: Raw git status of the antigravity-application-workflow checkout
+    desc: Raw git status of the (retired as source) workflow checkout
     cmds:
       - git -C "{{.APPS_DIR}}" status -sb
 
@@ -169,7 +167,7 @@ tasks:
   career:import:
     desc: Seed the rows from a JSON Resume (FROM=file; CLI_ARGS="--language de --dry")
     cmds:
-      - bash scripts/task/content.sh career import --from "{{.FROM | default "lib/matt/resume.json"}}" {{.CLI_ARGS}}
+      - bash scripts/task/content.sh career import --from "{{.FROM | default \"lib/matt/resume.json\"}}" {{.CLI_ARGS}}
 
   career:export:en:
     desc: Rebuild lib/matt/resume.json's work and projects from the rows
@@ -218,7 +216,7 @@ tasks:
   portfolio:import:
     desc: Seed the rows from a portfolio JSON (FROM=file; CLI_ARGS="--language de --dry")
     cmds:
-      - bash scripts/task/content.sh portfolio import --from "{{.FROM | default "lib/bountystash/portfolio.json"}}" {{.CLI_ARGS}}
+      - bash scripts/task/content.sh portfolio import --from "{{.FROM | default \"lib/bountystash/portfolio.json\"}}" {{.CLI_ARGS}}
 
   portfolio:export:en:
     desc: Rebuild lib/bountystash/portfolio.json's projects from the rows
@@ -250,18 +248,15 @@ tasks:
         action=$(printf '%s\n' \
           "list: List tracked applications" \
           "search: Search by company, role, ID, or keywords" \
-          "get: View one application record" \
-          "update: Update application status or notes" \
-          "overview: Pipeline counts per status" \
-          "emails: Inbound email radar + status sync" \
-          "followups: Recruiter follow-up notes" \
+          "get: View one application and its mail" \
+          "update: Update application status" \
+          "overview: Pipeline counts per stage" \
+          "status: Totals and open queue" \
+          "emails: Messages waiting for the sync" \
+          "export: Write applications.json from the database" \
           "build: Compile Typst documents to dist/" \
           "audit: QA layout and page budget" \
-          "sync:status: JSON <-> DB <-> GitHub sync state" \
-          "sync:push: Reconcile + commit + push data" \
-          "sync:pull: Pull remote changes" \
-          "git:status: Raw git status" \
-          "exit: Quit" | gum choose --header "Job Applications (appflow)")
+          "exit: Quit" | gum choose --header "Job Applications (appflow, Postgres)")
 
         case "$action" in
           "list"*)
@@ -279,29 +274,20 @@ tasks:
           "overview"*)
             task apps:overview
             ;;
+          "status"*)
+            task apps:status
+            ;;
           "emails"*)
             task apps:emails
             ;;
-          "followups"*)
-            task apps:followups
+          "export"*)
+            task apps:export -- "$(gum input --placeholder 'output file')"
             ;;
           "build"*)
             task apps:build
             ;;
           "audit"*)
             task apps:audit
-            ;;
-          "sync:status"*)
-            task apps:sync:status
-            ;;
-          "sync:push"*)
-            task apps:sync:push
-            ;;
-          "sync:pull"*)
-            task apps:sync:pull
-            ;;
-          "git:status"*)
-            task apps:git:status
             ;;
           *)
             echo "Exited."

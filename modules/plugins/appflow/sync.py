@@ -243,9 +243,33 @@ def link(api: str, limit: int) -> tuple[int, int]:
 # message says one of these things plainly; anything else leaves the mail
 # unresolved for a person, which is why `review` exists as a tier.
 EVENTS: list[tuple[str, str, str]] = [
-    ("rejected", r"leider|absage|abgelehnt|unfortunately|unsuccessful|not to proceed|rejected|other candidates|absage", "Rejected"),
+    (
+        "rejected",
+        # English ATS rejections state a decision; German ones often do not say
+        # `leider` or `Absage` at all. A real rejection read "Nach intensiver
+        # Rücksprache im Team haben wir uns allerdings entschieden, den Prozess
+        # mit anderen Kandidatinnen fortzusetzen" and fell through to no event,
+        # so the application stayed at interview. These phrases are the German
+        # shape of the same decision; a generic "wir können nicht jede Bewerbung
+        # berücksichtigen" footer is deliberately absent, because acknowledgements
+        # carry it and would turn into rejections.
+        r"leider|absage|abgelehnt|unfortunately|unsuccessful|not to proceed|rejected|other candidates"
+        r"|ander(?:e|en|er) kandidat|ander(?:e|en|er) bewerber|ander(?:e|en) person entschieden"
+        r"|nicht weiterverfolg|nicht fortzusetzen|nicht fortführen|nicht fortfuehren"
+        r"|nicht geklappt|anderweitig besetzt|keine zusage|bedauerlicherweise",
+        "Rejected",
+    ),
     ("interview", r"interview|vorstellungsgespr|kennenzulernen|einladung|invite|trial|warteliste|probearbeit", "Interview"),
-    ("action", r"nachreichen|unterlagen|rückfrage|questionnaire|aufgabe|please provide|please send|missing document", "Follow-up Required"),
+    (
+        "action",
+        # "Unterlagen" alone is not a request: an acknowledgement says "wir haben
+        # deine Unterlagen erhalten", and matching the noun filed it as a missing
+        # document. The request is the verb around the noun.
+        r"nachreichen|unterlagen (?:nach|ein)reichen|fehlende unterlagen|vollständige unterlagen"
+        r"|unterlagen senden|senden sie uns|rückfrage|questionnaire|aufgabe"
+        r"|please provide|please send|missing document",
+        "Follow-up Required",
+    ),
     (
         "received",
         # The German ATS wording is the subject line itself: "Deine Bewerbung als
@@ -291,9 +315,22 @@ def job_alert(subject: str) -> str:
     return next((marker for marker in ALERT_MARKERS if marker in lowered), "")
 
 
+# An acknowledgement often mentions the interview it might lead to: "Wenn wir
+# weitere Fragen haben oder dich zu einem Vorstellungsgespräch einladen möchten".
+# Counting that as an invite put a candidate at interview on the day they applied.
+CONDITIONAL_INVITE = re.compile(
+    r"(?:wenn|falls|sollten|möchten|ggf\.?|gegebenenfalls|eventuell)[^.]{0,140}"
+    r"(?:vorstellungsgespr|kennenzulernen|einlad)"
+)
+
+
 def detect_event(text: str) -> tuple[str, str] | None:
     lowered = text.lower()
+    received = next((pattern for kind, pattern, _ in EVENTS if kind == "received"), "")
+    conditional = bool(CONDITIONAL_INVITE.search(lowered) and re.search(received, lowered))
     for kind, pattern, label in EVENTS:
+        if kind == "interview" and conditional:
+            continue
         if re.search(pattern, lowered):
             return kind, label
     return None
@@ -308,15 +345,24 @@ EVENT_RANK = {"received": 1, "action": 2, "interview": 3, "rejected": 4}
 STAGE_RANK = {"lead": 0, "prep": 0, "other": 1, "applied": 1, "screening": 2, "interview": 3, "rejected": 4}
 
 
-def sync(api: str, apply: bool, limit: int, ledger_path: str) -> int:
+def sync(api: str, apply: bool, limit: int, ledger_path: str, only: str = "") -> int:
     """Read the agent's ATS queue, write what the mail proves, close the mail.
 
     Writes are conservative by construction: one message, one unambiguous
     application, one plain statement. A message that matches two applications of
     the same employer is left open and recorded as ambiguous rather than
     guessing, because a wrong status is worse than a stale one.
+
+    `only` narrows the run to one message id. A replay after a rule fix must not
+    re-walk the queue and rewrite records the fix was not about, so the timer
+    runs all of it and a correction runs one.
     """
     queue = get(f"{api}/api/agent-queue?owner=agent:apps&lim={limit}") or []
+    if only:
+        queue = [row for row in queue if row.get("messageId") == only]
+        if not queue:
+            print(f"pipeline sync: {only} is not in the queue (resolve is a one-way close)")
+            return 1
     if not queue:
         print("pipeline sync: nothing in the queue")
         return 0
@@ -449,6 +495,28 @@ def sync(api: str, apply: bool, limit: int, ledger_path: str) -> int:
             continue
 
         target = applications[0]
+
+        # A discovered record is one row per employer and its role is literally
+        # "undiscovered": a later message about a different role at the same
+        # employer would attach its status to this application. avenit's
+        # "Senior Generative AI Engineer" rejection landed on the IT
+        # Systemadministrator record this way. Only the resolver, which knows
+        # which message discovered the record, may move it.
+        if (target.get("role") or "") == "undiscovered":
+            ambiguous += 1
+            ledger.write(
+                json.dumps(
+                    {
+                        "action": "ambiguous-undiscovered",
+                        "message_id": message_id,
+                        "application": target["id"],
+                        "subject": subject,
+                    }
+                )
+                + "\n"
+            )
+            continue
+
         body = get(f"{api}/api/message-body?messageId={urllib.parse.quote(message_id)}") or [{}]
         text = f"{subject}\n{(body[0] or {}).get('bodyPlain') or ''}"
         event = detect_event(text)
@@ -528,11 +596,12 @@ def sync(api: str, apply: bool, limit: int, ledger_path: str) -> int:
         print(f"{'wrote' if apply else 'would write'}  {target['company'][:30]:<30} {target['status'][:28]:<28} -> {status}")
 
     ledger.close()
+
     print(
-        f"pipeline sync: {written} {'updated' if apply else 'to update'}, {discovered} discovered,"
-        f" {alerts} job alert(s) closed, {closed} already reflected in the stage,"
-        f" {ambiguous} ambiguous or unnamed, {unprovable} with no provable event (ledger: {ledger_path})"
-    )
+            f"pipeline sync: {written} {'updated' if apply else 'to update'}, {discovered} discovered,"
+            f" {alerts} job alert(s) closed, {closed} already reflected in the stage,"
+            f" {ambiguous} ambiguous or unnamed, {unprovable} with no provable event (ledger: {ledger_path})"
+        )
     return 0
 
 
@@ -549,6 +618,14 @@ EMPLOYER_PATTERNS = [
     r"application (?:for [^\-–|,]{1,40}?\s)?(?:at|with) ([A-Z][\w&.\- ]{2,40})",
     r"your application (?:to|at) ([A-Z][\w&.\- ]{2,40})",
     r"welcome to ([A-Z][\w&.\- ]{2,40})",
+    # The acknowledgement templates that name the employer after the verb.
+    # "Thank you for applying at Vitruvi" had no pattern and stayed unattributed
+    # even though the employer is right there in the subject.
+    r"thank(?:s| you) for applying (?:at|to) ([A-Z][\w&.\- ]{2,40})",
+    # Personio's own template is "<FirstName> x <Employer> // <Role>": the
+    # employer sits before the separator, so every "Bewerbung … bei …" pattern
+    # above misses it and the acknowledgement stays unattributed.
+    r"^[^/]{1,40}? x ([^/]{2,40}?) //",
 ]
 
 
@@ -815,6 +892,7 @@ def main() -> int:
     parser.add_argument("--export", default="", help="write applications.json from the database (- for stdout)")
     parser.add_argument("--report", action="store_true")
     parser.add_argument("--sync", action="store_true", help="write status from the ATS mail queue")
+    parser.add_argument("--only", default="", help="with --sync: one message id, for a replay after a rule fix")
     parser.add_argument("--apply", action="store_true", help="with --sync: write the changes (default is a dry run)")
     parser.add_argument("--sync-limit", type=int, default=50)
     parser.add_argument(
@@ -866,7 +944,7 @@ def main() -> int:
 
     if args.sync:
         os.makedirs(os.path.dirname(args.ledger), exist_ok=True)
-        sync(api, args.apply, args.sync_limit, args.ledger)
+        sync(api, args.apply, args.sync_limit, args.ledger, args.only)
 
     if args.report:
         report(api, args.json)

@@ -5721,10 +5721,10 @@
       status = "IN FLIGHT";
       priority = "P2";
       date = "2026-11-09";
-      summary = "jobby and appflow do one job in two languages and neither is a tool. M0 (clone hydrated to a5107bf, 13 packages green) and M1 (lossless ordered JSON, 40/40 statuses classified, rebuild matching 141 rows with 0 diff) are delivered; one Go binary with `jobby tui` and `jobby <verb>` still owns JD intake, the packet, the radar and derived actions.";
+      summary = "jobby and appflow do one job in two languages and neither is a tool. The Postgres cutover (86bdb73b, 2026-11-03) made the archive API the writer, so this plan reads and writes rows instead of rebuilding the database from applications.json. M0 (13 packages green) and M1 (lossless JSON, 40/40 statuses classified) are delivered; one Go binary with `jobby tui` and `jobby <verb>` still owns JD intake, the packet, the radar and derived actions.";
       refs = {
         modules = ["modules/config/nu/jobby.nu" "taskfiles/apps.yml" "flake/cli.nix" "modules/nixoshmsymlinks.nix"];
-        tasks = ["apps:list" "apps:emails" "apps:sync:push"];
+        tasks = ["apps:list" "apps:update" "apps:export"];
         docs = ["docs/job-cold-email.md" "docs/NUSHELL.md"];
       };
       body = ''
@@ -5732,14 +5732,17 @@
         10,090 lines of Python over JSON truth, a triggerless SQLite cache and Typst packets.
         Neither composes with the other, and neither is a tool.
 
-        **The rule.** `applications.json` wins and the DB is rebuilt from it, so a SQLite trigger
-        dies at the next sync. The trigger is a transition in the writer: `jobby tick` derives
-        due actions into an append-only ledger, and a second run changes nothing.
+        **The rule.** The archive database is the only writer since 86bdb73b (2026-11-03):
+        `applications.json` is an export (`appflow-sync --export`), and jobby must not rebuild
+        the table from it — a copy frozen in the workflow checkout would revert rows the mail
+        hub discovered. A SQLite trigger dies at the next sync; the trigger is a transition in
+        the writer: `jobby tick` derives due actions into an append-only ledger and writes
+        through `/api/application-update`, and a second run changes nothing.
 
         **Delivered.** M0 hydrated the clone 4a637e6 -> a5107bf (0 ahead, 13 behind) with build,
         vet and tests green over 13 packages. M1 added `internal/apps` and `cmd/jobby`: the
         encoder reproduces Python's bytes (export sha256 `5224f960…`), the rebuild matches the
-        deployed cache row for row (141 rows, 0 diff, both views identical), all 40 status
+        deployed cache row for row (the 141-row file, 0 diff; Postgres held 157 after discovery), all 40 status
         spellings classify, and `jobby set` rewrites one record through the same tree.
 
         **M2 measured.** Six lens/language renders at budget 2 all fit 2 pages at 10.0pt with
@@ -5755,8 +5758,9 @@
         **No auth layer.** himalaya, the llm wrapper and the Jev router hold every credential;
         jobby stores none and prints none.
 
-        **Open.** Which resume is canonical; whether the 141 records stay in the workflow repo;
-        where the timer runs; whether DuckDB analytics and the HTML dashboard survive.
+        **Open.** Which resume is canonical; when the workflow checkout is archived now that its
+        JSON is an export; where the timer runs; whether DuckDB analytics and the HTML dashboard
+        survive. The dashboard is `services.appflowBoard`, and it already reads the database.
       '';
     };
 

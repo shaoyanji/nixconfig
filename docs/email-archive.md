@@ -128,7 +128,7 @@ and so re-classifying never rewrites the archive.
 
 | column | meaning |
 | :--- | :--- |
-| `tier` | `person`, `action`, `digest`, `robot`, `review` |
+| `tier` | `person`, `action`, `digest`, `robot`, `review`, `ignore` — ignore is reversible: the queue skips it and `resolved_at` stays null, unlike `triage-resolve` |
 | `owner` | `human`, `none`, or `agent:<name>` — `agent:ci` is a run failure |
 | `reason` | one line: the rule that fired, or the engine's choice and margin |
 | `confidence` | rule confidence, or the engine's top probability |

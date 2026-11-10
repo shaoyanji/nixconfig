@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS email_triage (
   message_id  text NOT NULL REFERENCES emails (message_id) ON DELETE CASCADE,
   classifier  text NOT NULL,
   tier        text NOT NULL
-    CHECK (tier IN ('person', 'action', 'digest', 'robot', 'review')),
+    CHECK (tier IN ('person', 'action', 'digest', 'robot', 'review', 'ignore')),
   owner       text NOT NULL DEFAULT 'human',
   reason      text,
   confidence  real,
@@ -56,6 +56,13 @@ CREATE TABLE IF NOT EXISTS email_triage (
   resolved_at timestamptz,
   PRIMARY KEY (message_id, classifier)
 );
+
+-- `ignore` was added after the table existed, and CREATE TABLE IF NOT EXISTS
+-- never alters a constraint: without these two statements an ignore write is a
+-- 400 on the live database while a fresh one accepts it.
+ALTER TABLE email_triage DROP CONSTRAINT IF EXISTS email_triage_tier_check;
+ALTER TABLE email_triage ADD CONSTRAINT email_triage_tier_check
+  CHECK (tier IN ('person', 'action', 'digest', 'robot', 'review', 'ignore'));
 
 -- The three read paths are "unresolved, newest first", per tier and per owner.
 CREATE INDEX IF NOT EXISTS email_triage_open_idx

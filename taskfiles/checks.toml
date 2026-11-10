@@ -14,6 +14,14 @@ name = "checks:appflow:gate"
 kind = "leaf"
 
 [[check]]
+name = "checks:appflow:triage"
+kind = "leaf"
+
+[[check]]
+name = "checks:appflow:resolve"
+kind = "leaf"
+
+[[check]]
 name = "checks:audit:handoff"
 kind = "leaf"
 

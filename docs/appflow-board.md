@@ -7,7 +7,7 @@ ways to see it were a task that reads a checkout delphi does not have, or psql.
 ## What it is
 
 `services.appflowBoard` is an nginx vhost on loopback plus one static page.
-The vhost proxies four GET routes of the mail hub's NpgsqlRest
+The vhost proxies five GET routes of the mail hub's NpgsqlRest
 (`services.emailArchive`, loopback 8080) and serves the page from the store:
 
 | Route | What the page shows |
@@ -29,7 +29,7 @@ which is why it cannot disagree with the CLI: both read the same rows.
 
 The plugin publishes `application-update` and `application-upsert` beside the
 read routes. Proxying `/api/` would put writes on the tailnet from a page that
-only reads, so the vhost names four paths exactly and a route added to the plugin
+only reads, so the vhost names five paths exactly and a route added to the plugin
 later is not reachable until it is named here too.
 
 ## Exposure

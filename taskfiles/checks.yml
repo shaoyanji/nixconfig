@@ -552,6 +552,32 @@ tasks:
     cmds:
       - bash tests/appflow-select/run.sh
 
+  checks:appflow:triage:
+    desc: Fixture for the mail-to-status rules — a German rejection with none of the English words still rejects
+    summary: >
+      Runs the sync's event vocabulary over the shapes that reach it: an English
+      rejection, the German team decision that says no `leider` and no `Absage`,
+      an acknowledgement and its "we cannot consider every application" footer
+      (which must stay No event, or every acknowledgement becomes a rejection),
+      an interview invite, and a job alert. Also asserts the stage a rejection
+      lands in. The WattFox rejection of 2026-10-23 is the motivating case. No
+      network, no nix; ~1 s.
+    cmds:
+      - bash tests/appflow-triage/run.sh
+
+  checks:appflow:resolve:
+    desc: Fixture for the queue resolver — rules, closed vocabulary, and every refusal path
+    summary: >
+      Proves the resolver decides the bulk classes without a model (job alert,
+      EEO form, Loopcv submission, automatic reply, retention request), attributes
+      by sender domain (PŸUR, Tieto) and refuses an unknown sender, and that the
+      model's answer is only accepted when it names a candidate this run supplied,
+      both engines agree, and the margin clears the threshold. A stub `ask` keeps
+      the fixture offline, so it gates the contract rather than the weights.
+      No network, no nix; ~1 s.
+    cmds:
+      - bash tests/appflow-resolve/run.sh
+
   checks:career:
     desc: Fixture for the career corpus — import, export, set, add and rm against a stub API
     summary: >

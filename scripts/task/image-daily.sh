@@ -117,10 +117,10 @@ judge_image() { # png lane intent
   prompt=$(cat <<EOF
 Read the image file at $png (a PNG on this machine; open it with your file tool).
 Judge it as $intent.
-Keep only when: the subject is recognisable at a glance, the composition has a
-clear focal point and leaves the margins the brief asked for, there is no
-garbled lettering, no malformed faces or hands, and it does not read as a
-generic stock template.
+Keep only when: the subject is recognisable at a glance and there is a clear
+focal point, with no garbled lettering and no malformed faces or hands. A short
+prompt that lands a deliberate image is a keep: spare is not the same as
+generic, so do not mark an image down for carrying few words.
 Otherwise answer "reroll" and put in "defect" one concrete, actionable defect
 (the thing to change, e.g. "the horizon is not level"). Use "reject" only when
 the image is unusable and the prompt is wrong, not the render.

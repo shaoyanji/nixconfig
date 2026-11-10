@@ -11,7 +11,7 @@
       "budget": 56,
       "max_age_days": 4,
       "publish": true,
-      "intent": "a desktop wallpaper for a dwl session on a 1024x600 or 1920x1080 panel, either clean flat vector or 4k realistic neumorphism"
+      "intent": "a desktop wallpaper for a dwl session on a 1024x600 or 1920x1080 panel, 4k realistic neumorphism"
     },
     "blog": {
       "budget": 6,
@@ -91,88 +91,6 @@
       "name": "og/work.png",
       "prompt": "An index card for a work listing: a neat stack of three offset rectangles in muted sage, cream and graphite, one corner folded, flat vector with a soft long shadow, no text, no people, wide aspect."
     },
-
-    {
-      "id": "wall-ridge-fog",
-      "lane": "wall",
-      "every": 2,
-      "size": "1536x1024",
-      "name": "ridge-fog.png",
-      "prompt": "A desktop wallpaper: five layered mountain ridges receding into fog, muted catppuccin mocha palette on a deep charcoal #1e1e2e base, flat vector with soft gradient mist, the left third kept empty and dark for desktop icons, no text, no birds, no people."
-    },
-    {
-      "id": "wall-dunes",
-      "lane": "wall",
-      "every": 2,
-      "size": "1536x1024",
-      "name": "dunes.png",
-      "prompt": "A desktop wallpaper: minimal sand dunes as two smooth overlapping curves, warm sand and dusty rose against a deep charcoal #1e1e2e sky, flat vector with a soft grain, horizon in the lower third, no text, no objects, no people."
-    },
-    {
-      "id": "wall-fjord",
-      "lane": "wall",
-      "every": 2,
-      "size": "1536x1024",
-      "name": "fjord.png",
-      "prompt": "A wide desktop wallpaper for a short landscape panel: a fjord read left to right, a pale mint water channel running horizontally through the middle distance, two low dark cliff masses entering from the left and right edges, catppuccin mocha palette on deep charcoal #1e1e2e, a narrow calm sky strip above, flat vector with subtle horizontal banding, no tall vertical cliffs, no text, no boats, no people."
-    },
-    {
-      "id": "wall-grid-horizon",
-      "lane": "wall",
-      "every": 2,
-      "size": "1536x1024",
-      "name": "grid-horizon.png",
-      "prompt": "A wide desktop wallpaper: a perspective grid floor under a charcoal #1e1e2e sky, the horizon placed about two fifths of the way down from the top so the floor owns the lower frame, no more than seven horizontal lines spaced ever wider toward the viewer and only four lines converging on the horizon, a muted mauve line colour on deep charcoal, flat vector, even stroke weight throughout, restrained synthwave without neon glare, no dense mesh, no fine hatching, no moire, no text, no sun, no cars."
-    },
-    {
-      "id": "wall-bamboo",
-      "lane": "wall",
-      "every": 2,
-      "size": "1024x1536",
-      "name": "bamboo-tall.png",
-      "prompt": "A portrait desktop wallpaper: silhouetted bamboo stalks in three depth layers, muted green and charcoal, soft light between the stalks, flat vector with paper grain, no text, no animals, no people."
-    },
-    {
-      "id": "wall-circuit-city",
-      "lane": "wall",
-      "every": 2,
-      "size": "1536x1024",
-      "name": "circuit-city.png",
-      "prompt": "A wide desktop wallpaper: a city skyline drawn as a circuit board, each building a solid rectangular block with one or two thick traces leaving its roof, no more than twelve traces across the whole frame and none thinner than one hundredth of the image width, graphite on deep charcoal #1e1e2e with a single teal accent path, flat vector, silhouette first and circuit second, no small pads, no thin lines, no fine hatching, no windows detail, no text, no people."
-    },
-    {
-      "id": "wall-night-train",
-      "lane": "wall",
-      "every": 3,
-      "size": "1536x1024",
-      "name": "night-train.png",
-      "prompt": "A desktop wallpaper: a long train window at night reduced to a horizontal band of soft blurred lights over deep charcoal #1e1e2e, two thin rails of pale grey at the bottom, flat vector, impressionistic not photographic, no text, no people, no faces."
-    },
-    {
-      "id": "wall-terrace",
-      "lane": "wall",
-      "every": 3,
-      "size": "1024x1536",
-      "name": "terrace-tall.png",
-      "prompt": "A portrait desktop wallpaper: a bare stone terrace looking out to a hazy sea, three pale horizontal bands for sky, water and stone, one potted plant silhouette at the lower right, flat vector, muted terracotta and slate, no text, no people."
-    },
-    {
-      "id": "wall-orbit",
-      "lane": "wall",
-      "every": 3,
-      "size": "1536x1024",
-      "name": "orbit.png",
-      "prompt": "A desktop wallpaper: a small planet at the lower right with two thin orbital rings, deep charcoal #1e1e2e field, pale blue and dusty pink rings, flat vector with a faint star scatter that stays out of the left third, no text, no spacecraft, no people."
-    },
-    {
-      "id": "wall-rain-glass",
-      "lane": "wall",
-      "every": 3,
-      "size": "1536x1024",
-      "name": "rain-glass.png",
-      "prompt": "A wide desktop wallpaper: rain on window glass over an out-of-focus city at night, thick drops and a handful of long vertical runs instead of a fine drizzle, every streak at least one hundredth of the image width, large soft bokeh discs of teal and amber rather than small dots, deep charcoal #1e1e2e base, flat vector approximation, calm and low contrast, the bottom third kept quiet and nearly flat, no fine texture, no text, no people, no faces."
-    },
-
     {
       "id": "wall-neumorph-frieren",
       "lane": "wall",
@@ -180,22 +98,6 @@
       "size": "1536x1024",
       "name": "frieren-neumorph.png",
       "prompt": "Frieren, 4k, realistic, neumorphism."
-    },
-    {
-      "id": "wall-neumorph-knight",
-      "lane": "wall",
-      "every": 6,
-      "size": "1536x1024",
-      "name": "knight-neumorph.png",
-      "prompt": "An armored knight, 4k, realistic, neumorphism."
-    },
-    {
-      "id": "wall-neumorph-desk",
-      "lane": "wall",
-      "every": 6,
-      "size": "1536x1024",
-      "name": "desk-4am.png",
-      "prompt": "A taxi dashboard at 4am, 4k, realistic, neumorphism."
     },
     {
       "id": "wall-neumorph-crt",
@@ -237,7 +139,6 @@
       "name": "frieren-sleep.png",
       "prompt": "Frieren sleeping in a field of flowers, 4k, realistic, neumorphism."
     },
-
     {
       "id": "fleet-docs-hero",
       "lane": "fleet",
@@ -286,7 +187,6 @@
       "name": "terminal-texture.png",
       "prompt": "An abstract wide texture for a terminal-themed page: evenly spaced short vertical tick marks of varying height along the bottom, rising into empty charcoal, muted green fading to nothing at the top, flat vector, no text, no characters, no people."
     },
-
     {
       "id": "blog-2026-10-28-your-closure-is-mostly-shared-substrate",
       "lane": "blog",

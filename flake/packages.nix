@@ -145,6 +145,18 @@ in
       # roots (`.#agentsNotes.api`, `.#knowledgeGraph.graph`) already expose.
       agents-notes = json.generate "agents-notes.json" agentsNotesCtl.api;
       knowledge-graph = json.generate "knowledge-graph.json" knowledgeGraphCtl.graph;
+
+      # An application packet from the committed fictional corpus — the same
+      # builder `task apps:gate:packet -- <id>` drives with a live row, reachable
+      # from the flake so the packet path and its page assertions are not only a
+      # shell script nobody runs. A packet is a document, not a site; it compiles
+      # typst, so it stays out of `checks` (a check spends no build budget).
+      appflow-packet-example = (import ../modules/plugins/appflow/packet.nix {inherit pkgs;}).mkPacket {
+        application = ../modules/plugins/appflow/templates/example/application.json;
+        resume = ../modules/plugins/appflow/templates/example/resume.json;
+        letter = ../modules/plugins/appflow/templates/example/letter.json;
+        name = "example";
+      };
     };
 
     servers = {

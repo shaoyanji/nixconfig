@@ -73,6 +73,9 @@ pages than its budget (`pages`, `letterPages`) or leaves under 40 mm on a final
 page. A CV that spills two lines onto page two is a build error now instead of a
 file someone has to notice; the site's CVs answer to the same file.
 
+`nix build .#artifacts.appflow-packet-example` builds a packet from the fictional
+corpus in `templates/example/`, so the builder is reachable without the API.
+
 A description in German scores against an English corpus through
 `glossary.json` — *Risikomanagement* → *risk*, *Verschlüsselung* → *encryption*,
 *Schlüssel* → *key*. The list is domain words only, and a missing pair shows up as

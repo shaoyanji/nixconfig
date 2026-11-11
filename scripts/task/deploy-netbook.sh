@@ -170,7 +170,11 @@ ROLLBACK
     ;;
 
   apply | boot)
-    toplevel=".?submodules=1#nixosConfigurations.${ATTR}.config.system.build.toplevel"
+    # No `?submodules=1`: the staged tree is an rsync copy with no .git, so Nix
+    # resolves `.` as a `path:` flake, and that fetcher has no submodules
+    # parameter — 2.35 rejects the ref outright. The submodule content is
+    # already in the copy (rsync does not skip it), so the plain ref is right.
+    toplevel=".#nixosConfigurations.${ATTR}.config.system.build.toplevel"
     # Three ways to get the closure onto frieren, cheapest first: substitute
     # (free), then nixbuild.net (25 h/month budget), then compile locally. `auto`
     # is the useful default because it spends nothing when the pinned 25.11
@@ -179,18 +183,18 @@ ROLLBACK
     [ "${REMOTE_ONLY:-0}" = "1" ] && mode=remote
     case "$mode" in
       auto)
-        say "substituting .?submodules=1#nixosConfigurations.${ATTR} on the builder (no compile)"
+        say "substituting .#nixosConfigurations.${ATTR} on the builder (no compile)"
         if ! system=$(nix build --no-link --print-out-paths --max-jobs 0 --builders "" "$toplevel" 2>/dev/null); then
           say "not fully substitutable — filling the gaps on nixbuild.net"
           system=$(nix build --no-link --print-out-paths --max-jobs 0 "$toplevel")
         fi
         ;;
       local)
-        say "building .?submodules=1#nixosConfigurations.${ATTR} on the builder (local compile allowed)"
+        say "building .#nixosConfigurations.${ATTR} on the builder (local compile allowed)"
         system=$(nix build --no-link --print-out-paths --builders "" "$toplevel")
         ;;
       remote)
-        say "building .?submodules=1#nixosConfigurations.${ATTR} on nixbuild.net only"
+        say "building .#nixosConfigurations.${ATTR} on nixbuild.net only"
         system=$(nix build --no-link --print-out-paths --max-jobs 0 "$toplevel")
         ;;
       *) die "unknown BUILD=${mode} (auto|local|remote)" ;;

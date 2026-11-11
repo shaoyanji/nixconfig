@@ -12,6 +12,13 @@
   # closure over the LAN — `PermitRootLogin` stays `prohibit-password`, so this
   # grants keys only. One literal, used twice.
   deployKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHnNR7isgO8VDY76XzwyH3mOg1/DQo8dZgqQOfziw0DQ devji@nixos";
+  # The wallpaper: a hash-pinned store path, so the background is there before
+  # the NAS mounts and survives a reorganised ~/Pictures. A newer plate is a
+  # one-line URL + hash change; the bank's manifest is published/urls.tsv.
+  fernWallpaper = pkgs.fetchurl {
+    url = "https://res.cloudinary.com/de1eajx01/image/upload/assets/wall/2026-11-11/fern.png";
+    sha256 = "11m1bc8aw4cy9ap3lrswbqnlnv013jdxcbp6nlqfy6dim6r47xlp";
+  };
 in {
   users.users.root.openssh.authorizedKeys.keys = [deployKey];
   imports = [
@@ -39,9 +46,10 @@ in {
 
   boot.supportedFilesystems = ["f2fs" "nfs"];
   hardware.enableRedistributableFirmware = true;
-  # Two entries is one seatbelt more than this host has ever needed at once, and
-  # the menu is 3 s — more generations only add paths to keep alive.
-  boot.loader.systemd-boot.configurationLimit = 5;
+  # Three is one more than this host has ever needed at once, and the menu is
+  # 3 s — every extra generation is another 6.7 GiB closure to keep alive on an
+  # eMMC that has already sat at 84 % once.
+  boot.loader.systemd-boot.configurationLimit = 3;
   # Measured 2026-10-22: 13.1 s of a 47.3 s boot was the loader stage, 5 s of it
   # this countdown. 3 s keeps a usable window for the other generations while
   # still paying 2 s less than the default.
@@ -52,7 +60,6 @@ in {
   services.udev.extraRules = ''
     ACTION=="add|change", KERNEL=="mmcblk*", ATTR{queue/scheduler}="none"
   '';
-  boot.tmp.cleanOnBoot = true;
   services.fstrim.enable = true;
   services.tailscale.enable = true;
 
@@ -116,7 +123,7 @@ in {
     # This host only receives closures (`nix copy` from frieren); it never builds
     # or imports by hand, so hashing every path written is a tax on each deploy
     # with no dedupe to show for it. The weekly optimise timer still runs.
-    auto-optimise-store = lib.mkForce false;
+    auto-optimise-store = false;
     # Flakes on, because this host is now a fleet host rather than a channel
     # island: deploys resolve `.#nixosConfigurations.netbook`.
     experimental-features = ["nix-command" "flakes"];
@@ -161,8 +168,6 @@ in {
   # path here and already owns the CPU knobs.
   services.thermald.enable = false;
   services.earlyoom.enable = true;
-  services.upower.enable = true;
-  services.libinput.enable = true;
   networking.hostName = "netbook"; # Define your hostname.
 
   # Configure network connections interactively with nmcli or nmtui.
@@ -170,11 +175,6 @@ in {
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
-
-  services.pipewire = {
-    enable = true;
-    pulse.enable = true;
-  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   # Firmware TPM (Intel PTT, ACPI MSFT0101) — the netbook's sops identity. The
@@ -209,9 +209,9 @@ in {
     user = "alice";
     # A 1024x600 panel: the profile's default 11 is two rows of text short.
     font = "JetBrainsMono NFM:size=9";
-    # The wallpaper their niri rice used. swaybg renders it, and it is a file of
-    # theirs rather than a package — absent, the session simply has no wallpaper.
-    wallpaper = "/home/alice/Pictures/wallpapers/catppuccin-mocha.png";
+    # The store copy of `fernWallpaper` above: `swaybg -m fill` crops the 4k
+    # plate to this 1024x600 panel, with no dependency on $HOME or the NAS.
+    wallpaper = "${fernWallpaper}";
     # Their keyboard's ribbon connector is broken, so this is the workaround
     # layer for the dead keys, spliced into the fleet keymap ahead of it (first
     # match wins). The file explains itself; `extraKeybinds` in the profile owns
@@ -230,8 +230,6 @@ in {
       "taildrop --daemon"
     ];
   };
-
-  security.polkit.enable = true; # polkit
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
@@ -263,9 +261,6 @@ in {
     firefox
     tmux
     lowfi
-    grim
-    wl-clipboard
-    imv
     # mpv
     # nushell
     rsync
@@ -305,11 +300,9 @@ in {
     XCURSOR_SIZE = "24";
   };
 
-  # Nerd-font glyphs are what the launcher and terminal render; emoji for the web.
-  fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    noto-fonts-color-emoji
-  ];
+  # The Nerd Font comes from `profiles.dwlDesktop` — foot, wmenu and dwl all
+  # name it — so only the colour emoji is this host's.
+  fonts.packages = [pkgs.noto-fonts-color-emoji];
 
   # Bluetooth radio is present (hci0); enable the stack.
   hardware.bluetooth.enable = true;

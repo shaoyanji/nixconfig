@@ -1,54 +1,64 @@
 /*
  * The netbook's accessibility layer: this keyboard lost P and most of the
- * punctuation cluster to a broken ribbon connector, so these binds are how
- * those characters still get typed.
+ * punctuation cluster to a broken ribbon connector, so these entries borrow
+ * keys that still work.
  *
  * Not a header and not included — profiles.dwlDesktop splices this text in at
  * config.h's @EXTRA_KEYBINDS@ marker, which sits FIRST in keys[]. dwl takes the
- * first match, so an entry here shadows the fleet binding for the same key:
- * Mod+S types a slash below, it does not take a region screenshot. Mod+Print
- * (full-screen shot) is still the fleet's.
+ * first match, so an entry here shadows the fleet binding for the same chord.
+ * Exactly one fleet binding is shadowed (Mod+S, the region screenshot); it keeps
+ * a chord of its own at the bottom of this file rather than being lost.
  *
- * The commands are named, not pathed: the session inherits the login shell's
- * PATH, which home-manager puts ~/.local/bin first on. Their bodies are in the
- * dotfiles repo (quick-keys.sh, qr-sync, voice-*.sh) and in ~/mako-suite.
+ * Two rules, because the alternative is a pile of one-off bindings:
+ *
+ *   1. One mechanism per meaning. TYPED() is the only place that knows how a
+ *      dead character reaches a window: it copies first, so a client that
+ *      refuses synthetic input still leaves the character pasteable.
+ *   2. Chords live here; bodies live with alice. Every command below is a name
+ *      on the session PATH — `environment.localBinInPath` puts ~/.local/bin
+ *      there, and the dotfiles and ~/mako-suite installers fill it. The HUD
+ *      cards are that same rule: they are her six scripts, and they speak
+ *      fnott (the session's notifier) since the 2026-10-27 port.
  */
 
-/* Mod+Space — the symbol menu: wmenu lists the dead characters and wtypes the
- * chosen one into the focused window. Caps_Lock alone dictates. */
+/* Chord -> character. The macro writes the quoting once, so a character is
+ * spelled once instead of three times, and adding one is a single table row. */
+#define TYPED(key, mods, ch) \
+	{mods, XKB_KEY_##key, spawn, SHCMD("printf '" ch "' | wl-copy; wtype -- '" ch "'")}
+
+/* The punctuation cluster, on letters that still send events. */
+TYPED(s, MODKEY, "/"),
+TYPED(s, MODKEY | WLR_MODIFIER_SHIFT, "?"),
+TYPED(n, MODKEY, "-"),
+TYPED(n, MODKEY | WLR_MODIFIER_SHIFT, "_"),
+TYPED(z, MODKEY, "0"),
+TYPED(m, MODKEY, ";"),
+TYPED(m, MODKEY | WLR_MODIFIER_SHIFT, ":"),
+TYPED(b, MODKEY, "\\\\"),
+
+/* Her own tools, by name: the symbol menu on Mod+Space, the QR transfer on
+ * Mod+Shift+Space, dictation on Caps_Lock alone and on Mod+grave, the agent on
+ * Mod+Caps_Lock. */
 {MODKEY, XKB_KEY_space, spawn, SHCMD("quick-keys.sh")},
 {MODKEY | WLR_MODIFIER_SHIFT, XKB_KEY_space, spawn, SHCMD("qr-sync")},
 {0, XKB_KEY_Caps_Lock, spawn, SHCMD("voice-dictate.sh")},
 {MODKEY, XKB_KEY_grave, spawn, SHCMD("voice-dictate")},
 {MODKEY, XKB_KEY_Caps_Lock, spawn, SHCMD("voice-agent.sh")},
 
-/* One character each, into whatever has focus. It goes to the clipboard first
- * so that a wtype that cannot reach the window still leaves it pasteable. */
-{MODKEY, XKB_KEY_s, spawn, SHCMD("printf '/' | wl-copy; sleep 0.05; wtype -- '/'")},
-{MODKEY | WLR_MODIFIER_SHIFT, XKB_KEY_s, spawn, SHCMD("printf '?' | wl-copy; sleep 0.05; wtype -- '?'")},
-{MODKEY, XKB_KEY_n, spawn, SHCMD("printf '-' | wl-copy; sleep 0.05; wtype -- '-'")},
-{MODKEY | WLR_MODIFIER_SHIFT, XKB_KEY_n, spawn, SHCMD("printf '_' | wl-copy; sleep 0.05; wtype -- '_'")},
-{MODKEY, XKB_KEY_z, spawn, SHCMD("printf '0' | wl-copy; sleep 0.05; wtype -- '0'")},
-{MODKEY, XKB_KEY_m, spawn, SHCMD("printf ';' | wl-copy; sleep 0.05; wtype -- ';'")},
-{MODKEY | WLR_MODIFIER_SHIFT, XKB_KEY_m, spawn, SHCMD("printf ':' | wl-copy; sleep 0.05; wtype -- ':'")},
-{MODKEY, XKB_KEY_b, spawn, SHCMD("printf '\\\\' | wl-copy; sleep 0.05; wtype -- '\\\\'")},
-
-/* The HUD cards, one per BackSpace modifier — the same five Mod+BackSpace
- * chords niri had. */
+/* The HUD cards, one per BackSpace modifier — the same five chords niri had. */
 {MODKEY, XKB_KEY_BackSpace, spawn, SHCMD("makotop")},
 {MODKEY | WLR_MODIFIER_SHIFT, XKB_KEY_BackSpace, spawn, SHCMD("makofetch")},
 {MODKEY | WLR_MODIFIER_CTRL, XKB_KEY_BackSpace, spawn, SHCMD("makodf")},
 {MODKEY | WLR_MODIFIER_ALT, XKB_KEY_BackSpace, spawn, SHCMD("makokill")},
 {MODKEY | WLR_MODIFIER_CTRL | WLR_MODIFIER_SHIFT, XKB_KEY_BackSpace, spawn, SHCMD("makonet")},
 
-/* Both of niri's launcher chords: the fleet keymap binds Mod+A, and the rice was
- * in the habit of Mod+D too. */
+/* niri habits worth keeping: the second launcher chord (the fleet keymap binds
+ * Mod+A), Alt+Tab through the window stack, and Super+Alt+L to lock. */
 {MODKEY, XKB_KEY_d, spawn, {.v = menucmd}},
-
-/* Alt+Tab walks the window stack, as niri's next/previous-window did. */
 {WLR_MODIFIER_ALT, XKB_KEY_Tab, focusstack, {.i = +1}},
 {WLR_MODIFIER_ALT | WLR_MODIFIER_SHIFT, XKB_KEY_Tab, focusstack, {.i = -1}},
-
-/* Super+Alt+L locks. niri also powered the monitors off in the same chord; dwl
- * has no such primitive, so this is waylock and nothing else. */
 {MODKEY | WLR_MODIFIER_ALT, XKB_KEY_l, spawn, SHCMD("waylock")},
+
+/* Mod+S types '/', so the fleet's region screenshot moves one modifier over
+ * instead of disappearing. Full-screen is still the fleet's Mod+Print. */
+{MODKEY | WLR_MODIFIER_ALT, XKB_KEY_s, spawn, SHCMD("grim -g \"$(slurp)\" - | wl-copy")},

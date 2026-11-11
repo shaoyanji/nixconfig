@@ -1,6 +1,6 @@
 # nixconfig
 
-![nixconfig: one snowflake blueprint unfolding into a row of identical machines](banner.png)
+![nixconfig: one snowflake blueprint unfolding into a row of identical machines](https://res.cloudinary.com/de1eajx01/image/upload/f_auto,q_auto,w_1200/assets/repos/nixconfig)
 
 Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style container hosts.
 

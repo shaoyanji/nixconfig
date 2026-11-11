@@ -82,10 +82,13 @@ Exit 0 means the set really is playing: `PLAYING  rel=0:00:04 dur=1:38:40`.
   transport that stays stuck; the on-screen overlay clears with Back on the remote. The
   script refuses to send while `TRANSITIONING` for exactly this reason.
 - **Container decides direct play.** `/arr/In the Mood for Love` resolves to `stream.mkv`
-  (h264/aac) and plays; `/arr/Gravity` resolves to `stream.mov` and never starts. Read the
-  `res` extension before sending anything — `--transcode` rewrites any container to `.mp4`
-  with `Static=false`. Do not read Jellyfin's journal for fetch evidence: it logs no
-  access, so a count of 0 says nothing about whether the set pulled the file.
+  and plays. `/arr/Gravity` is an h264/aac mp4 that Jellyfin's DLNA layer advertises as
+  `video/quicktime` with a `.mov` path, and the set refuses it — the extension, not the
+  codec, is the tell. The script direct-plays only `mkv`/`mp4`/`m4v` and otherwise asks for
+  the `.mp4` variant with `Static=false`, declaring `video/mp4` in the DIDL. That transcode
+  reports a bogus `TrackDuration` (10 s) while `RelTime` climbs past it: not a truncation.
+  Do not read Jellyfin's journal for fetch evidence — it logs no access, so a count of 0
+  says nothing about whether the set pulled the file.
 - **The `YouTube` container is not a film library.** `/YouTube/Nix in 100 Seconds` was
   accepted and sat in `TRANSITIONING` until the wait expired, on direct play and on the
   transcode retry; `/arr` is what this set plays. A stuck `TRANSITIONING` means the item's

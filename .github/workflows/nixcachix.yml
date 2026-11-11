@@ -91,7 +91,10 @@ jobs:
         # The plane is shell-side now (scripts/task/lib/taskfile_graph.py): yq and
         # go-task are the two tools it needs, and `nix shell` supplies both without
         # a build. The gate is ~1 s and needs no host eval.
-        run: nix shell nixpkgs#yq nixpkgs#go-task -c bash scripts/task/taskfile-graph.sh
+        # `yq-go` is Mike Farah's Go yq (it reads `-o=json`); nixpkgs' `yq` is the
+        # Python jq wrapper, which rejects that flag and reported it as "yq cannot
+        # parse Taskfile.yml" — a wrong binary wearing a parse error's clothes.
+        run: nix shell nixpkgs#yq-go nixpkgs#go-task -c bash scripts/task/taskfile-graph.sh
       - name: Module edges are named, not pathed
         run: bash scripts/task/modules-edges.sh
 

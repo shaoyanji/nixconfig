@@ -108,9 +108,20 @@ native Plex app — but playback cannot be driven from here yet, for three concr
 - the TV's app listens on nothing when closed (`32500`, `3005`, `8324` all refused), so
   there is no client to address.
 
-To wire it: claim the server to the plex.tv account the TV app uses, open the app, then
-`playMedia` against `/clients/<id>` with that token. Until then the DLNA path above is the
-one that works, paying a transcode for `.mov` sources.
+To wire it — claiming needs **no Plex Pass**, an account is free and so is the claim:
+
+1. `https://www.plex.tv/claim` while signed in returns a `claim-…` token valid about four
+   minutes;
+2. from frieren: `curl -X POST 'http://127.0.0.1:32400/myplex/claim?token=claim-…'`, or open
+   `http://192.168.3.25:32400/web` from the LAN and sign in there;
+3. `curl :32400/identity` then reads `claimed="1"` and `PlexOnlineToken` lands in
+   `Preferences.xml` — that file is the proof, not the web page;
+4. reopen the Plex app on the set, signed in to the same account, and `/clients` grows by
+   one; then `playMedia` against `/clients/<id>` with that token.
+
+The claim token is a credential: keep it on the command line, never in a note, a commit or
+the journal. Until all four steps exist, the DLNA path above is the one that works, paying a
+transcode for `.mov` sources.
 
 ## If nothing plays
 

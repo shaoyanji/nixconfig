@@ -26,13 +26,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from email.utils import parseaddr
 
-DEFAULT_API = "http://127.0.0.1:8080"
+# Same default as the taskfile's other mail calls: the API is loopback on delphi,
+# so any other tailnet host has to name it. Without this the sweep silently
+# answered whatever else listens on 8080 (a 404, read as "no rows").
+DEFAULT_API = os.environ.get("EMAIL_ARCHIVE_API", "http://127.0.0.1:8080")
 
 
 def get(url: str, timeout: float = 60.0) -> object:

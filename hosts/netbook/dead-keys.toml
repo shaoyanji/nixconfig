@@ -1,0 +1,78 @@
+# hosts/netbook/dead-keys.toml — what this keyboard lost, and the living key it
+# rents. One file, three readers: the dwl keymap rows, the `netbook-keys` card,
+# and the JSON contract `netbook-keys --json` (for anything that has to type on
+# this machine without a hand — an agent, a test, a remote helper).
+#
+# The rent is the bottom row, left to right, then the three free keys beside it.
+# The row is the point: it is the one run no fleet chord borders, so a slip
+# between neighbours types another dead character. `p` used to sit on `Mod+y`,
+# one key from `Mod+t`, and a mistyped word spawned a terminal.
+#
+# `Mod+S` is the fleet's region screenshot. The slash used to live there and was
+# moved off it: the slash is on `Mod+o` (and `?` on `Mod+Shift+o`), which is the
+# only home in this table that is not the bottom row.
+#
+# One rule, so this is a thing to learn rather than twenty:
+#
+#   Mod+<key>        types the dead key's plain character
+#   Mod+Shift+<key>  types its shifted character
+
+[[key]]
+key = "z"
+plain = "0"
+shifted = ")"
+
+[[key]]
+key = "x"
+plain = "`"
+shifted = "~"
+
+[[key]]
+key = "c"
+plain = "["
+shifted = "{"
+
+[[key]]
+key = "v"
+plain = "]"
+shifted = "}"
+
+[[key]]
+key = "b"
+plain = "\\"
+shifted = "|"
+
+[[key]]
+key = "n"
+plain = "-"
+shifted = "_"
+
+[[key]]
+key = "m"
+plain = ";"
+shifted = ":"
+
+[[key]]
+key = "comma"
+plain = "="
+shifted = "+"
+
+[[key]]
+key = "period"
+plain = "p"
+shifted = "P"
+
+[[key]]
+key = "u"
+plain = "'"
+shifted = "\""
+
+[[key]]
+key = "o"
+plain = "/"
+shifted = "?"
+
+[[key]]
+key = "p"
+plain = "("
+shifted = ")"

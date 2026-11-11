@@ -33,68 +33,10 @@
   # keys hold nine dead keys; `u`, `o` and `p` take the last three because they
   # are what is left that no fleet chord touches, and a tenth bottom-row key does
   # not exist without dropping a character.
-  deadKeys = [
-    {
-      key = "z";
-      plain = "0";
-      shifted = ")";
-    }
-    {
-      key = "x";
-      plain = "`";
-      shifted = "~";
-    }
-    {
-      key = "c";
-      plain = "[";
-      shifted = "{";
-    }
-    {
-      key = "v";
-      plain = "]";
-      shifted = "}";
-    }
-    {
-      key = "b";
-      plain = "\\";
-      shifted = "|";
-    }
-    {
-      key = "n";
-      plain = "-";
-      shifted = "_";
-    }
-    {
-      key = "m";
-      plain = ";";
-      shifted = ":";
-    }
-    {
-      key = "comma";
-      plain = "=";
-      shifted = "+";
-    }
-    {
-      key = "period";
-      plain = "p";
-      shifted = "P";
-    }
-    {
-      key = "u";
-      plain = "'";
-      shifted = "\"";
-    }
-    {
-      key = "o";
-      plain = "/";
-      shifted = "?";
-    }
-    {
-      key = "p";
-      plain = "(";
-      shifted = ")";
-    }
-  ];
+  # The table is `dead-keys.toml`, not a literal here: three readers consume it —
+  # the keymap rows below, the card, and `netbook-keys --json`, which is the
+  # contract a consumer reads instead of guessing at this file.
+  deadKeys = (builtins.fromTOML (builtins.readFile ./dead-keys.toml)).key;
 
   # A shell-quoted word for one character, then the C literal that carries it
   # into the keymap. The apostrophe cannot sit inside single quotes, and a
@@ -123,8 +65,28 @@
     ++ ["Vim :wq = Mod+Shift+m, w, q"]
   );
 
+  # The same list as data, with both chords spelled out and the command each one
+  # runs. This is the contract: anything that has to type on this machine without
+  # a hand reads a chord here instead of re-deriving it from the keymap.
+  contractJson = builtins.toJSON (
+    map
+    (d: {
+      key = d.key;
+      plain = d.plain;
+      shifted = d.shifted;
+      plain_chord = "Mod+${d.key}";
+      shifted_chord = "Mod+Shift+${d.key}";
+      command = "wtype -- ${lib.escapeShellArg d.plain}";
+    })
+    deadKeys
+  );
+
   keysCard = pkgs.writeShellScriptBin "netbook-keys" ''
     table=${lib.escapeShellArg keyTable}
+    if [ "''${1:-}" = --json ]; then
+      printf '%s\n' ${lib.escapeShellArg contractJson}
+      exit 0
+    fi
     if [ "''${1:-}" = --text ]; then
       printf '%s\n' "$table"
       exit 0

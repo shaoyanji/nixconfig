@@ -22,10 +22,11 @@
  * `:wq` is Mod+Shift+m, then w, then q. Mod+Shift+grave puts the whole table on
  * screen, because a mapping nobody can look up is just the menu this replaced.
  *
- * The rows are not written out here. `deadKeys` in
- * hosts/netbook/configuration.nix is one list, and the build projects it twice:
- * into the rows at @DEAD_KEYS@ below, and into the text of that card. A new
- * character is one entry there, and it becomes typable and documented together.
+ * The rows are not written out here. `hosts/netbook/dead-keys.toml` is the one
+ * list, and the build projects it three times: into the rows at @DEAD_KEYS@
+ * below, into the text of that card, and into `netbook-keys --json`, which is
+ * the contract a consumer reads instead of parsing a keymap. A new character is
+ * one entry there, and it becomes typable, documented and consumable together.
  *
  * There is no menu. The layer this replaced opened wmenu, sent a fnott card,
  * copied the character to the clipboard twice and slept before typing — so a

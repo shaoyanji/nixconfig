@@ -106,9 +106,17 @@ and the set has a native Plex app. The server was **claimed on 2026-11-11** to
 Read the token from that file rather than copying it into a secret — one credential, one
 place. Claiming needs no Plex Pass; the account and the claim are both free.
 
-What still blocks Companion playback: `/clients` now requires `?X-Plex-Token=…` and answers
-`401` without it, the list is empty until the app is open and signed in, and the set's app
-listens on nothing while closed (`32500`, `3005`, `8324` all refused).
+**The set's app is pull-only, so Companion cannot drive it.** After signing in on the TV,
+the only entry in `/clients` was `name="Generic" product="Plex" deviceClass="pc"
+host="127.0.0.1" version="5.94.4"` — Plex Web on frieren, not the set. The set's app listens
+on nothing (`32500`/`3005`/`8324` refused), answers no GDM broadcast, and never registers
+with a LAN address, so `playMedia` returns 200 and `/status/sessions` stays empty. It is a
+browse-the-server client, not a fling target.
+
+`scripts/task/plex-play.py` drives a genuinely controllable client (Plex Web, Plex desktop)
+and verifies through `/status/sessions` rather than trusting the 200; against this set it
+only proves the app is not a target. For the TV, the DLNA path above is the one that works.
+On the LAN no Plex Pass is needed — that gate is remote streaming only.
 
 To wire it — claiming needs **no Plex Pass**, an account is free and so is the claim:
 

@@ -192,14 +192,17 @@ surface on this host. What replaced them:
   `TYPED(key, mods, ch)` once and rents a living key for each character the broken
   ribbon connector lost. `Mod+<key>` gives the plain character and `Mod+Shift+<key>`
   its shifted pair: `Mod+z`/`Mod+Shift+z` are `0`/`)`, `Mod+m` is `;`,
-  `Mod+Shift+m` is `:`, `Mod+period` is `p`. The rent is the bottom row
-  (`z x c v b n m , .`), the one run no fleet chord borders, with `u`, `o`, `p`
-  for the three it cannot hold — so a slip between neighbours types a dead
-  character instead of opening a terminal, which is what `Mod+y` for `p` did at
-  one key from `Mod+t`. Vim's `:wq` is two chords, not a menu.
-  The rows are generated from one `deadKeys` list in the host file, and
-  `Mod+Shift+grave` shows that same list as a fnott card (`netbook-keys --text`
-  prints it in a shell) — the lookup the deleted menu failed to be.
+  `Mod+Shift+m` is `:`, `Mod+period` is `/` and `Mod+Shift+period` is `?` — the
+  key beside the one the ribbon lost — with `p`/`P` on `Mod+o`. The rent is the
+  bottom row (`z x c v b n m , .`), the one run no fleet chord borders, with `u`,
+  `o`, `p` for the three it cannot hold — so a slip between neighbours types a
+  dead character instead of opening a terminal, which is what `Mod+y` for `p`
+  did at one key from `Mod+t`. Vim's `:wq` is two chords, not a menu.
+  The rows are generated from one table in `hosts/netbook/dead-keys.toml`, and
+  that file has three projections: the keymap rows, the `Mod+Shift+grave` fnott
+  card (`netbook-keys --text`) and `netbook-keys --json`, which hands a consumer
+  the chord and the `wtype` command per character — the lookup the deleted menu
+  failed to be.
 - **The menu is gone.** The layer this replaced opened `wmenu`, sent a fnott card,
   copied the character with `wl-copy` twice and slept before typing, and its list
   carried neither parenthesis. The body is one `wtype -- '<char>'` now, the clipboard

@@ -97,10 +97,10 @@ Two layers now, and the split is the point:
   The keymap is the fleet's
   `modules/config/dwl/config.h` plus this host's dead-key layer, spliced in from
   `hosts/netbook/dwl-keybinds.h` through the profile's `extraKeybinds` — inserted
-  first, because dwl takes the first match; the rent sits on the bottom row and
-  three free keys beside it, so no fleet chord is shadowed any more. Dead keys
-  are one `TYPED()` chord each, typed by a single `wtype`: no menu, no clipboard
-  write. There is **no bar and no secret
+  first, because dwl takes the first match; the rent is the bottom row and the
+  three free keys beside it, so no fleet chord is shadowed. The table is
+  `hosts/netbook/dead-keys.toml` (keymap rows, card, `netbook-keys --json`); each
+  dead key is one `TYPED()` chord typed by a single `wtype`: no menu, no clipboard. There is **no bar and no secret
   service**, and that is measured rather than taste: waybar's closure is 1001 MiB
   (zenity alone is 902 MiB of it) against dwl's 345 MiB, and gnome-keyring is
   378 MiB — the table and the four verdicts are in

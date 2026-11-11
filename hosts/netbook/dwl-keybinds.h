@@ -63,9 +63,9 @@
 {MODKEY | WLR_MODIFIER_ALT, XKB_KEY_BackSpace, spawn, SHCMD("makokill")},
 {MODKEY | WLR_MODIFIER_CTRL | WLR_MODIFIER_SHIFT, XKB_KEY_BackSpace, spawn, SHCMD("makonet")},
 
-/* niri habits worth keeping: the second launcher chord (the fleet keymap binds
- * Mod+A), Alt+Tab through the window stack, and Super+Alt+L to lock. */
-{MODKEY, XKB_KEY_d, spawn, {.v = menucmd}},
+/* niri habits worth keeping: Alt+Tab through the window stack, and Super+Alt+L
+ * to lock. The launcher has one chord on the fleet keymap now (Mod+Space), so
+ * the second one this file used to add is gone. */
 {WLR_MODIFIER_ALT, XKB_KEY_Tab, focusstack, {.i = +1}},
 {WLR_MODIFIER_ALT | WLR_MODIFIER_SHIFT, XKB_KEY_Tab, focusstack, {.i = -1}},
 {MODKEY | WLR_MODIFIER_ALT, XKB_KEY_l, spawn, SHCMD("waylock")},

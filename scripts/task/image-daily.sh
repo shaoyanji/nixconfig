@@ -12,7 +12,7 @@
 #   image-daily.sh blog [--dir PATH]
 #                             Chirpy front matter per banner, and the JPEGs copied
 #   image-daily.sh gc         destroy Cloudinary public ids nothing references
-#   image-daily.sh wallpaper  set the newest in-rotation wallpaper with swaybg
+#   image-daily.sh wallpaper  set the first in-rotation wallpaper with swaybg
 #
 # WHY THIS EXISTS: the allowance is 100 images per day and it does not carry
 # over, so a day nobody spends is a day thrown away — and a queue kept in a
@@ -886,36 +886,64 @@ cmd_gc() {
   say "$n under $prefix, $gone orphan(s)"
 }
 
-# Rotation is a judgement, not a timer: `in` is approval and `out` is a rejection
-# with its reason (lib/image-daily/rotation.json). A rejected plate never rotates
-# however new it is, and a plate in neither list is unjudged rather than bad, so
-# nothing lands on a screen on the strength of its date alone. With no approval
-# list yet, the newest unrejected plate is used, which is what a lane nobody has
-# looked at gets.
+# Rotation is a judgement, not a timer: `in` is approval and priority, `out` is a
+# rejection with its reason (lib/image-daily/rotation.json). The first approved id
+# that resolves is the wallpaper, so the order is the operator's to move, not a
+# sort of filenames. A rejected plate never rotates however new it is, and a plate
+# in neither list is unjudged rather than bad, so nothing lands on a screen on the
+# strength of its date alone. With no approval list yet, the newest unrejected
+# plate is used, which is what a lane nobody has looked at gets.
+resolve_plate() {
+  local taste_root=$1 want=$2 candidate
+  case $want in
+    # A taste-test plate never entered the bank: it was drawn to pick a style,
+    # so it sits in the folder beside generated/ rather than in a lane.
+    taste/*)
+      candidate=$taste_root/${want#taste/}
+      [ -f "$candidate" ] && printf '%s\n' "$candidate" && return 0
+      ;;
+    *)
+      # published wins over the original of the same id. Sorting whole paths
+      # would put src/ above published/, because "s" > "p".
+      for candidate in "$IMAGES_ROOT/published/wall/$want" "$IMAGES_ROOT/src/wall/$want"; do
+        [ -f "$candidate" ] && printf '%s\n' "$candidate" && return 0
+      done
+      ;;
+  esac
+  return 1
+}
+
 cmd_wallpaper() {
   local rotation=$repo/lib/image-daily/rotation.json
-  local approved id f pick="" reason
-  approved=$(jq -r '.wall.in[]?' "$rotation" 2>/dev/null || true)
+  local taste_root=${IMAGES_ROOT%/generated}/taste-test
+  local id reason pick=""
+  local -a approved ids
+  mapfile -t approved < <(jq -r '.wall.in[]?' "$rotation" 2>/dev/null || true)
 
-  # Newest first, and published wins over the original of the same id. Sorting
-  # whole paths would put src/ above published/, because "s" > "p".
-  mapfile -t ids < <(
-    { find "$IMAGES_ROOT/published/wall" -name '*.png' 2>/dev/null | sed -E 's#.*/wall/##'
-      find "$IMAGES_ROOT/src/wall" -name '*.png' 2>/dev/null | sed -E 's#.*/wall/##'
-    } | awk '!seen[$0]++' | sort -r
-  )
-  [ "${#ids[@]}" -gt 0 ] || die "no wallpaper generated yet"
-
-  for id in "${ids[@]}"; do
-    reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
-    if [ -n "$reason" ]; then say "skipping $id: $reason"; continue; fi
-    if [ -n "$approved" ] && ! printf '%s\n' "$approved" | grep -qxF "$id"; then continue; fi
-    for f in "$IMAGES_ROOT/published/wall/$id" "$IMAGES_ROOT/src/wall/$id"; do
-      [ -f "$f" ] && { pick=$f; break; }
+  if [ "${#approved[@]}" -gt 0 ]; then
+    # List order is priority: the first id that resolves is the wallpaper, so
+    # "first in the rotation" is a line a person can move.
+    for id in "${approved[@]}"; do
+      reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
+      if [ -n "$reason" ]; then say "skipping $id: $reason"; continue; fi
+      pick=$(resolve_plate "$taste_root" "$id") && break
+      say "skipping $id: no such plate"
     done
-    [ -n "$pick" ] && break
-  done
-  [ -n "$pick" ] || die "no plate in rotation (newest is ${ids[0]}); approve one in lib/image-daily/rotation.json"
+  else
+    # Nothing approved: newest unjudged plate, which is what a fresh generation
+    # has to be before anyone has looked at it.
+    mapfile -t ids < <(
+      { find "$IMAGES_ROOT/published/wall" -name '*.png' 2>/dev/null | sed -E 's#.*/wall/##'
+        find "$IMAGES_ROOT/src/wall" -name '*.png' 2>/dev/null | sed -E 's#.*/wall/##'
+      } | awk '!seen[$0]++' | sort -r
+    )
+    for id in "${ids[@]}"; do
+      reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
+      [ -n "$reason" ] && continue
+      pick=$(resolve_plate "$taste_root" "$id") && break
+    done
+  fi
+  [ -n "$pick" ] || die "nothing in rotation resolves; approve a plate in lib/image-daily/rotation.json"
 
   [ "${DRY:-0}" = "1" ] && { printf '%s\n' "$pick"; return 0; }
   command -v swaybg >/dev/null || die "swaybg is not installed on this host"

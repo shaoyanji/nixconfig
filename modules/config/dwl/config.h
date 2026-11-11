@@ -180,9 +180,6 @@ static const char *termcmd[] = { "foot", NULL };
  * modules/scripts/fleet-menu.sh. */
 static const char *menucmd[] = { "fleet-menu", NULL };
 
-/* niri Mod+Space opened DMS spotlight; this is the nearest intent. */
-static const char *spotlight[] = { "fleet-menu", NULL };
-
 /* Media keys are bound in the keymap here because scratch runs no DMS daemon
  * to own them; niri binds the same XF86 keys explicitly. */
 static const char *volup[] = { "wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
@@ -202,30 +199,30 @@ static const Key keys[] = {
 	 *
 	 *   niri action            dwl binding      niri action         dwl binding
 	 *   ---------------------  ---------------  ------------------  -----------------
-	 *   Mod+A launcher         wmenu-run        Mod+T terminal      foot
+	 *   Mod+Space launcher     fleet-menu       Mod+T / Mod+Return  foot
 	 *   Mod+Q close            killclient       Mod+W float         togglefloating
 	 *   Mod+H / Mod+L focus    focusstack -1/+1 Mod+J / Mod+K       viewdir +1/-1
 	 *   Mod+Shift+H/L monitor  focusmon L/R     Mod+Shift+J/K       viewdir (+1/-1)
 	 *   Mod+Ctrl+H/L reorder   movestack -1/+1  Mod+Ctrl+J/K send   movetotag +1/-1
 	 *   Mod+Ctrl+Shift+H/L     tagmon L/R       Mod+1..9            view tag N
 	 *   Mod+Ctrl+1..9          tag (send)       Mod+0, Mod+I        viewlast
-	 *   Mod+F maximize         togglefullscreen Mod+Shift+F         togglefullscreen
-	 *   Mod+Return overview    zoom             Mod+R / Shift+R     setmfact +/-0.05
+	 *   Mod+F maximize         togglefullscreen Mod+R / Shift+R     setmfact +/-0.05
 	 *   Mod+S region shot      grim + slurp     Mod+Print screen    grim
 	 *   XF86 audio/mic/media   wpctl, playerctl XF86 brightness     brightnessctl
 	 *
-	 * Two niri keys have no dwl meaning and are mapped to the nearest intent:
-	 * Mod+F is "maximize-column" in niri and Mod+Return is the overview; dwl
-	 * has neither, so Mod+F is fullscreen (the effect the operator wants) and
-	 * Mod+Return promotes the focused window to master.
+	 * One niri key has no dwl meaning and is mapped to the nearest intent:
+	 * Mod+F is "maximize-column" in niri, and dwl has no maximize, so it is
+	 * fullscreen — the effect the operator wants. Mod+Return was the overview,
+	 * and a second terminal chord is worth more than a re-promotion.
 	 *
 	 * Deliberately unbound, because dwl has no primitive for them: Mod+E
 	 * (niri switches focus between the floating and tiling layers), Mod+[
 	 * and Mod+] (consume/expel into a column), Mod+U (previous monitor), and
 	 * the DMS/kando/zen keys — Mod+Y P V N M B Shift+B Z C, Ctrl+Space,
 	 * Mod+MouseMiddle — whose programs are not installed here. Mod+Space is
-	 * bound (spotlight[]). Mod+Shift+E stays as an escape hatch; niri has no
-	 * equivalent.
+	 * the only launcher chord: Mod+A and a host's Mod+D both opened
+	 * `fleet-menu`, so three chords did one job. Mod+Shift+E stays as an
+	 * escape hatch; niri has no equivalent.
 	 */
 	/* Host keybinds, spliced here by modules/profiles/dwl-desktop.nix from a
 	 * host's `profiles.dwlDesktop.extraKeybinds`. They sit FIRST because dwl
@@ -234,9 +231,11 @@ static const Key keys[] = {
 	/* @EXTRA_KEYBINDS@ */
 
 	/* modifier                    key                  function          argument */
-	/* niri: Mod+A launcher, Mod+T terminal (kitty) */
-	{ MODKEY,                      XKB_KEY_a,           spawn,            {.v = menucmd} },
+	/* niri: Mod+T terminal (kitty). Mod+Return is the same spawn — the overview
+	 * it used to promote into costs more to reach than a terminal is worth — and
+	 * the launcher is Mod+Space (menucmd), the one chord for fleet-menu. */
 	{ MODKEY,                      XKB_KEY_t,           spawn,            {.v = termcmd} },
+	{ MODKEY,                      XKB_KEY_Return,      spawn,            {.v = termcmd} },
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_Return,      spawn,            {.v = termcmd} },
 
 	/* niri: Mod+Q close, Mod+W float, Mod+F fullscreen. In niri Mod+F gives
@@ -277,8 +276,8 @@ static const Key keys[] = {
 	/* niri: Mod+R switches the column width — here it widens, Shift narrows */
 	{ MODKEY,                      XKB_KEY_r,           setmfact,         {.f = +0.05f} },
 	{ MODKEY|WLR_MODIFIER_SHIFT,   XKB_KEY_r,           setmfact,         {.f = -0.05f} },
-	/* niri: Mod+Space opens the DMS spotlight bar (see spotlight[]) */
-	{ MODKEY,                      XKB_KEY_space,       spawn,            {.v = spotlight} },
+	/* niri: Mod+Space opens the DMS spotlight bar; fleet-menu is the nearest intent. */
+	{ MODKEY,                      XKB_KEY_space,       spawn,            {.v = menucmd} },
 
 	/* niri: Mod+S region screenshot, Mod+Print full screen (into the clipboard) */
 	{ MODKEY,                      XKB_KEY_s,           spawn,            SHCMD("grim -g \"$(slurp)\" - | wl-copy") },

@@ -412,7 +412,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "ThinkPad T440 Mobile Laptop Workstation"
 category = "laptop"
-desktop_environment = "Niri + DankMaterialShell greeter — medium tier (Dux)"
+desktop_environment = "Dux 2.0 (DMS shell on niri) with greetd autologin"
 users = ["devji"]
 notes = [
   "Lenovo ThinkPad T440 (20B7S06N00) laptop: lightweight Niri Wayland desktop via programs.dms-greeter autologin as devji.",
@@ -461,7 +461,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "ThinkPad L440 Docked Multi-Monitor Workstation"
 category = "laptop"
-desktop_environment = "Niri + DankMaterialShell greeter — medium tier (Dux)"
+desktop_environment = "Dux 2.0 (DMS shell on niri) with greetd autologin"
 users = ["devji"]
 notes = [
   "Lenovo ThinkPad L440 (20ASS1D900) docked workstation driving multi-monitor setup.",
@@ -585,7 +585,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Living Room All-in-One Gaming Terminal"
 category = "gaming-kiosk"
-desktop_environment = "Gamescope Session (Steam Big Picture) / Niri + DMS — medium tier (Dux)"
+desktop_environment = "Gamescope Session (Steam Big Picture) / Dux 2.0 (DMS shell on niri)"
 users = ["devji"]
 notes = ["Dell Inspiron 24 3477 AIO (i5-7200U Kaby Lake-U, 16 GiB) Steam Big Picture desktop mirroring eisen: globalModulesNixos brings in niri + DankMaterialShell greeter + role:heim userland.", "autoLogin drops devji into the upstream gamescope-session (steam -gamepadui) with the DMS greeter as fallback.", "The MX110 (Maxwell GM108M sm_50) dGPU needs the legacy_580 driver and is muxless Optimus: PRIME render offload with the HD 620 iGPU driving the panel, so games opt in via 'nvidia-offload %command%'.", "Dual-disk disko uses persistent by-id paths: SK hynix SATA SSD for system + 1 TB Seagate HDD as the btrfs Steam library at /mnt/steam. Persistent (no impermanence) — eisen-style."]
 
@@ -783,7 +783,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "I/O Diet Lightweight Workstation"
 category = "workstation"
-desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` on a niri-parity keymap — foot, fleet-menu, waylock; getty autologin on tty1, no display manager; low-end tier, the floor of the dwl regime"
+desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` on a niri-parity keymap — foot, fleet-menu, waylock; getty autologin on tty1, no display manager"
 users = ["devji"]
 notes = ["Lightweight dwl desktop (suckless Wayland, niri-parity keymap) on a Fujitsu ESPRIMO D556 (i5-6500, 8 GB, 128 GB f2fs SSD). Formerly a Steam Remote Play kiosk, then a niri desktop; dwl since 2026-10.", "f2fs has no subvolumes, so the btrfs impermanence module is NOT used: the host config puts every heavy-write dir on tmpfs (zram 100%, journald volatile, fstrim, noatime).", "Legacy BIOS boot: GRUB on /dev/sda, systemd-boot disabled."]
 
@@ -856,7 +856,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Alice's Travel Netbook (Fleet nixpkgs, Scripted Initrd)"
 category = "laptop"
-desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` — getty autologin on tty1, foot, fleet-menu; low-end tier (dwl)"
+desktop_environment = "dwl (suckless Wayland) via `profiles.dwlDesktop` — getty autologin on tty1, foot, fleet-menu"
 users = ["alice"]
 flake = true
 notes = ["Flake host on the fleet nixpkgs; the ONE pin is the initrd implementation (`boot.initrd.systemd.enable = false`), not the kernel. NixOS 26.11 made systemd-initrd the default, so generation 50 reached no stage-2 on this eMMC (no journal entry, blank console at loglevel=3) while the same kernel 6.18.56 with the scripted stage-1 boots clean (gen 51, 0 failed units).", "Deploy is push-based: frieren builds the closure (nixbuild.net for x86_64) and `nix copy`s it over the LAN, because the netbook cannot pull a closure it does not already have from harmonia. `task infra:apply:host:netbook`.", "Desktop moved from niri to the shared dwl profile (2026-10-27): the session, launcher and idle/lock are `profiles.dwlDesktop` — the compositor and its wrapper are NixOS's `programs.dwl`, driven with this host's spliced keymap as its package, so `/etc/xdg/dwl-session` execs one absolute store path — so the Celeron runs dwl (345 MiB) instead of niri (695 MiB). No bar: waybar measured 1001 MiB — a status line over three times the compositor. The display-manager layer went the same way: tty1 autologins through getty and `/etc/profile` execs the session, so greetd + tuigreet (111 MiB together) and gnome-keyring (378 MiB, with nothing to unlock — firefox keeps its own store and nautilus has no gvfs here) are out of the closure. The compositor is the smaller half of the change; the point is that alice's desktop is now a fleet module rather than `~/.dotfiles` alone. The mako → fnott port landed the same day, so no bridge packages remain: mako, fuzzel, alacritty and swaylock left the closure and her cards speak fnottctl. What is host-specific now is one keybind table (a TYPED() macro plus chords) and a hash-pinned store wallpaper, not a stack of overrides."]

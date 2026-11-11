@@ -44,25 +44,46 @@
   systemd.user.services.atuin-auto-login = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     Unit = {
       Description = "Ensure atuin client is logged in and synced to fleet server";
+      # sops-nix writes the credentials this unit reads and one HM activation
+      # starts both. `After=` alone lost that race on aristotle (2026-11-11): the
+      # unit ran three seconds before sops-nix, found no secrets and exited 0.
+      Wants = ["sops-nix.service"];
       After = ["sops-nix.service"];
     };
     Service = {
       Type = "oneshot";
       RemainAfterExit = true;
+      # Retry instead of reporting a hollow success — a missing secret, a failed
+      # login or a failed sync now leaves a failed unit behind.
+      Restart = "on-failure";
+      RestartSec = 10;
       ExecStart = "${pkgs.writeShellScript "atuin-auto-login" ''
         set -euo pipefail
         DATA="''${XDG_DATA_HOME:-$HOME/.local/share}/atuin"
         SECRETS="''${XDG_CONFIG_HOME:-$HOME/.config}/sops-nix/secrets"
 
+        # atuin 18 wants a session id even for a headless `sync`. Without one it
+        # dies in database.rs; with the old `|| true` it then wrote the seed
+        # marker and reported success (measured on aristotle 2026-11-11).
+        export ATUIN_SESSION="''${ATUIN_SESSION:-$(cat /proc/sys/kernel/random/uuid 2>/dev/null || echo "atuin-auto-login-$$-$RANDOM")}"
+
         if atuin status >/dev/null 2>&1; then
-          atuin sync >/dev/null 2>&1 || true
+          atuin sync >/dev/null 2>&1 || exit 1
           exit 0
         fi
 
         PASS="$SECRETS/atuin-password"
         MNEMONIC="$SECRETS/atuin-mnemonic"
+        # A fresh activation can start this before the user-level sops-nix unit
+        # has written the secrets: wait for them rather than exiting 0.
+        waited=0
+        while [ "$waited" -lt 30 ] && { [ ! -f "$PASS" ] || [ ! -f "$MNEMONIC" ]; }; do
+          sleep 1
+          waited=$((waited + 1))
+        done
         if [ ! -f "$PASS" ] || [ ! -f "$MNEMONIC" ]; then
-          exit 0
+          echo "atuin-auto-login: no credentials after 30s — sops-nix did not land" >&2
+          exit 1
         fi
 
         SYNC_ADDR="$(atuin config get sync_address 2>/dev/null | tail -1)"
@@ -73,14 +94,18 @@
         [ "$port" = "$authority" ] && port=80
 
         if timeout 3 ${pkgs.bash}/bin/bash -c "</dev/tcp/$host/$port" 2>/dev/null; then
-          atuin login -u devji -p "$(cat "$PASS")" -k "$(cat "$MNEMONIC")" >/dev/null 2>&1 || true
+          atuin login -u devji -p "$(cat "$PASS")" -k "$(cat "$MNEMONIC")" >/dev/null 2>&1 ||
+            { echo "atuin-auto-login: login to $SYNC_ADDR failed" >&2; exit 1; }
           if [ ! -e "$DATA/.fleet-seeded" ]; then
             [ -f "$HOME/.config/nushell/history.sqlite3" ] && atuin import nu-hist-db >/dev/null 2>&1 || true
             [ -s "$HOME/.bash_history" ] && atuin import bash >/dev/null 2>&1 || true
             mkdir -p "$DATA"
             touch "$DATA/.fleet-seeded"
           fi
-          atuin sync >/dev/null 2>&1 || true
+          atuin sync >/dev/null 2>&1 || { echo "atuin-auto-login: sync to $SYNC_ADDR failed" >&2; exit 1; }
+        else
+          echo "atuin-auto-login: cannot reach $host:$port ($SYNC_ADDR)" >&2
+          exit 1
         fi
       ''}";
     };

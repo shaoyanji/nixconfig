@@ -28,7 +28,7 @@ everything else in one pass — login, the one-time history seed, two syncs, and
 count check. It is idempotent: a second run only syncs.
 
 ```bash
-FLEET=24520    # the item count a converged host reports; ask a live one, it grows
+FLEET=27010    # the item count a converged host reports; ask a live one, it grows
 
 # on the host
 bash .agents/skills/atuin/scripts/atuin-bootstrap.sh --expect "$FLEET"
@@ -79,6 +79,11 @@ humans paste the mnemonic one. The script checks both shapes before it logs in.
   `import nu-hist-db` reads `~/.config/nushell/history.sqlite3` (nu ≥ 0.100);
   plain `import nu` is the pre-0.100 `history.txt` and is empty on this fleet.
   Skip `import auto` — it guesses wrong in a non-interactive shell.
+- **`atuin sync` outside a shell needs `ATUIN_SESSION`.** Headless it exits with
+  `Failed to find $ATUIN_SESSION in the environment` (database.rs), and a wrapper
+  that swallows that with `|| true` writes the seed marker and reports success
+  while nothing ever syncs — aristotle looked converged and held 648 unsynced
+  rows. The bootstrap script and the `atuin-auto-login` unit both export it now.
 - **A host without `modules/shell/atuin.nix` logs into the public
   `api.atuin.sh`** and reports `invalid credentials`, which reads exactly like a
   wrong sops password. The script refuses an unset or public `sync_address` first.

@@ -1,0 +1,36 @@
+version: "3"
+
+# Playing the NAS library on the living-room Philips 65OLED759.
+#
+# The set is a UPnP MediaRenderer on port 49152 that answers nothing on SSDP, so
+# discovery never finds it. Jellyfin serves the file on 8096 (already open in the
+# host firewall) and the set fetches it itself. Traps and the full recipe:
+# `.agents/skills/philips-tv-cast`.
+
+tasks:
+  media:play:
+    desc: Play a NAS film on the living-room TV — task media:play Q=mood
+    cmds:
+      - |
+        [ -n "{{.Q}}" ] || { echo "usage: task media:play Q=<title substring>   — task media:list shows the containers" >&2; exit 1; }
+        python3 scripts/task/play-on-tv.py --search '{{.Q}}'
+
+  media:list:
+    desc: List the DLNA library containers the living-room TV can be sent
+    cmds:
+      - python3 scripts/task/play-on-tv.py --list
+
+  media:stop:
+    desc: Stop playback on the living-room TV
+    cmds:
+      - python3 scripts/task/play-on-tv.py --stop
+
+  media:tv:
+    desc: Read the living-room TV's transport state and position
+    cmds:
+      - |
+        curl -s -m 5 -X POST "http://{{.TV | default "192.168.3.26"}}:49152/avt_control" \
+          -H 'Content-Type: text/xml; charset="utf-8"' \
+          -H 'SOAPACTION: "urn:schemas-upnp-org:service:AVTransport:1#GetTransportInfo"' \
+          --data-binary '<?xml version="1.0"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:GetTransportInfo xmlns:u="urn:schemas-upnp-org:service:AVTransport:1"><InstanceID>0</InstanceID></u:GetTransportInfo></s:Body></s:Envelope>' \
+          | tr '>' '>\n' | grep -E 'CurrentTransportState|CurrentTransportStatus'

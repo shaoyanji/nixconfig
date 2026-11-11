@@ -717,6 +717,90 @@
         Exit: `checks:dns:failover` exits 0 (not 2); stopping frieren's resolver leaves clients resolving. `BLOCKED` names the blocker: no second always-on node is provisioned.
       '';
     };
+    steamlink-ble-vantage = {
+      title = "Steam Link as a 2 W living-room sensor and power gate";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-11-11";
+      summary = "The living-room Steam Link cannot host a service, but at 2 W it is the one host that can stay awake to sense the room and gate a 300 W eisen — and the pieces (BLE scan, CEC standby, ether-wake) are already on the device.";
+      from = ["dns-second-resolver"];
+      links = ["mqtt-bus" "pi-eisen-ondemand"];
+      refs = {
+        modules = ["modules/services/home-assistant.nix" "modules/services/fleet-monitors.nix"];
+      };
+      body = ''
+        Measured 2026-11-11 over `ssh root@192.168.3.48`: one ~1 GHz ARMv7 core, 269 MB RAM with 127 MB free,
+        yaffs2 read-only root (1.8 G scratch, 131 M `/tmp`), 100 Mbit wired, no RTC, no cron, no compiler.
+        Settled: not a resolver and not a cache (12.5 MB/s, 1.8 G); the asset is 2 W. It is also the one home
+        device absent from `inventory.toml` — `kind = "external"` with `is_nix`/`managed = false` is the gokrazy shape.
+
+        **The jitter is the path, not the host — and it is queueing, not loss.** 5 GHz -> 2.4 GHz -> powerline ->
+        2.4 GHz backhaul, bridged, so `tracepath` reports one hop and no intermediate IP can be blamed. 0% packet +
+        loss everywhere, a ~10 ms floor and 100-700 ms peaks in both directions (box -> gateway averages 103 ms
+        while frieren -> gateway is 0.58), so minutely sensing does not read it and the LLM door stays on eisen.
+
+        **Already on the device.** `bin/wake-eisen` sends `ether-wake` to eisen's `00:e0:22:1c:bb:ed`;
+        `bin/cecmanager` links `libDMPCECSrv.so` and exposes HDMI port select plus standby status, so the TV is
+        controllable without `/dev/cec*`; `hci0` is UP under BlueZ 5.47 and an 8 s `lescan` returned 146
+        advertising reports; `bluealsa` runs. Nothing here needs writing from scratch — it needs wiring.
+
+        **Ranked, by value per watt.**
+        1. Power gate: CEC standby plus no BLE presence for 20 min plus no live stream -> power eisen off.
+           300 W x 4 idle hours a day is 438 kWh/yr against the Link's 17.5 kWh/yr for the whole year.
+        2. Publish that presence to Home Assistant from the floor the basement cannot see (the MQTT bus' first client).
+        3. CEC: controller connects or TV powers on -> wake eisen and select its HDMI port.
+        4. Room-side latency, probed from frieren (inside the LAN, against the 0.58 ms gateway baseline) — never
+           from delphi: a cloud pull crosses WAN + tailnet + the same mesh, so it cannot be differenced, and the
+           module has no push endpoint to let the box report in itself.
+
+        **The trap.** `pi-eisen-ondemand` says nothing should auto-sleep a gaming desktop. A sensor-driven sleep
+        is not a timer, but it must refuse while a stream, generation or SSH session is live, and start as
+        notify-only. It answers over ssh and the UI cannot power it off, so it goes down only at the wall.
+
+        **Exit.** Two weeks of notify-only decisions that match what a human would have done, then the poweroff
+        path; or REJECTED if eisen is already asleep whenever the room is empty.
+      '';
+    };
+    ytcast-oled759-live-stream-wedge = {
+      title = "Playing anything on the 65OLED759: UPnP renderer on 49152, YouTube by Lounge";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-11";
+      summary = "The set has no Cast receiver and answers no SSDP, but port 49152 is a UPnP MediaRenderer: SOAP AVTransport plus a Jellyfin DLNA URL plays any library file. YouTube works through Lounge (`ytcast -pair`), VOD only — a live stream wedges the app into ambient mode and nothing on the network recovers it.";
+      links = ["steamlink-ble-vantage"];
+      refs = {
+        tasks = ["ytcast"];
+      };
+      body = ''
+        **The TV.** Philips 65OLED759/12 at 192.168.3.26, Titan OS (`titanos.local`). It advertises
+        `_philipstv_s_rpc._tcp`:1926, jointSPACE:1925 and `_secure-mqtt._tcp`:8883 — no `_googlecast._tcp`,
+        no `_dial._tcp`, nothing on 8008/8009 — no Cast receiver. Port **49152** is the way in.
+
+        **Any local file, via DLNA.** A direct GET is the only way to find it: `curl http://192.168.3.26:49152/description.xml`
+        returns `urn:schemas-upnp-org:device:MediaRenderer:1` (DMR-1.50) with AVTransport at `/avt_control`, while an SSDP
+        M-SEARCH to the set gets zero replies, so every discovery tool concludes there is no renderer. Verified 2026-11-11:
+        browse Jellyfin's ContentDirectory (`/dlna/<uuid>/contentdirectory/control`, library `arr`), take the item's `res`
+        URL, then SOAP `SetAVTransportURI` + `Play` on `http://192.168.3.26:49152/avt_control` — transport went PLAYING with
+        `dur=1:38:40`. Serving from frieren on a new port does not work: the firewall drops it and the set retries to STOPPED.
+
+        **Why casting still works.** `ytcast -pair <code>` redeems the app's TV code through
+        `https://www.youtube.com/api/lounge/pairing/get_screen` and caches a screen id; playback is then
+        cloud-relayed via `POST /api/lounge/bc/bind`. Port 8009 is never touched.
+
+        **What wedges it.** A live stream (2026-11-11, `jfKfPfyJRdk`): the app dropped to ambient mode and
+        answered nothing afterwards, and a VOD cast from the same session vanished too — exit 0 both times,
+        because Lounge accepts what the TV never hears. Recovery needs a physical key press: `/6/input/key`,
+        `/6/powerstate` and `/6/pair/request` all return 403 on this set, and the Steam Link's `cecmanager`
+        has no CLI and is not running.
+
+        **Rule.** VOD only, one cast at a time, and opening the YouTube app is the last step: a cast is
+        queued, not raised — 2026-11-11, `ytcast` returned 0 while Bloomberg TV was on screen and the video
+        played the moment the app was opened by hand, so nothing on the network opens it. Stopping the DMR
+        hands the set back to the previous input, which makes `media:stop` restore the channel that was on. The `ytcast` task allows only
+        `not_live`/`was_live` and refuses anything it cannot classify — the first guard failed open on
+        `jfKfPfyJRdk`, where yt-dlp errors instead of reporting `is_live`. Pair again when a cast goes silent.
+      '';
+    };
     resolver-independence = {
       title = "Resolver independence for clients + health gate";
       kind = "open";
@@ -2294,10 +2378,11 @@
         **Mode:** dynamic nice/cgroup I/O throttling and QuickSync concurrency limits during parallel batch jobs.
         **Status:** design study. Motivated by avoiding GPU/disk contention during 4K TV video playback.
 
-        **Use case.** frieren is connected directly to a Philips 65" 4K TV over HDMI (`3840x2160 @ 30 Hz`) and serves Jellyfin media streams
-        via Intel UHD 620 QuickSync hardware transcoding (`/dev/dri/renderD128`). Concurrently, frieren runs heavy background batch compute:
-        Paperless OCR, Immich face recognition, Kiwix full-text search indexing, and LLM agent planning sessions. When batch workers spin up,
-        memory bus bandwidth and GPU execution units become saturated, inducing video playback stutter and dropped frames on the living room display.
+        **Use case.** frieren serves Jellyfin streams via Intel UHD 620 QuickSync transcoding (`/dev/dri/renderD128`) to clients over the LAN
+        and tailnet. It has no display of its own: moved to the basement on 2026-11-11 to sit next to the router, and every HDMI output reads
+        disconnected, so playback happens on a client and never on the host. Concurrently it runs heavy background batch compute — Paperless OCR,
+        Immich face recognition, Kiwix full-text indexing, LLM agent planning sessions. When those workers spin up, memory bus bandwidth and GPU
+        execution units saturate, which starves the transcoder and drops frames on the client.
         A GPU governor monitors active Jellyfin playback sessions via the Jellyfin local REST API: when an active transcode or direct playback session
         is detected, the governor dynamically lowers batch service cgroup weights (`CPUWeight=10`, `IOWeight=10`) and throttles background FFmpeg jobs.
 
@@ -4714,6 +4799,54 @@
         **Exit criteria.** `checks:host HOST=eisen MODE=eval` green with the generated files as store
         paths; one measured cold session (wake → first token); guard refusal exercised; a cloud fallback
         so no run depends on the desktop being awake.
+      '';
+    };
+
+    cloud-quota-one-door = {
+      title = "One authenticated door for cloud quotas, not another inference server";
+      kind = "proposal";
+      status = "PROPOSED";
+      date = "2026-11-11";
+      summary = "The Steam Link's `aichat --serve` is bound to 0.0.0.0:8000 with no auth over four provider keys, launched by a script whose `age` is not on PATH; the fleet's door is eisen's :8000 router, which forwards the caller's auth and holds no key.";
+      links = ["pi-eisen-ondemand"];
+      refs = {
+        hosts = ["eisen"];
+        modules = [
+          "modules/services/llm-decision-router.nix"
+          "modules/user/ai/aichat.nix"
+          "hosts/eisen/llm-server.nix"
+        ];
+      };
+      body = ''
+        Measured 2026-11-11, aichat 0.30.0: `--serve` answers `GET /v1/models` with **no Authorization header**, enumerating
+        every configured client, and also serves `/v1/embeddings`, `/v1/rerank`, `/playground` and `/arena`; it dispatches
+        on `<client>:<model>` and 400s an unknown id, so it routes over local config rather than passing through.
+
+        **What is installed on the Steam Link now.** `~/run-aichat.sh` is `export $(age -i key.txt -d .env.age)` then
+        `exec /usr/local/bin/aichat --serve`; the config binds `serve_addr: 0.0.0.0:8000` with one client, `groq`, on
+        `openai/gpt-oss-20b`. `.env.age` carries GROQ, GEMINI, COHERE and GITHUB, `~/.config/aichat/.env` keeps NVIDIA in
+        plaintext, and `key.txt` (0644) is the age identity sitting beside its own ciphertext. `age` is not on PATH (it is
+        `/usr/local/bin/age`), so the command substitution is empty and the service starts keyless: 401 on every request.
+
+        **It does not remove the hop.** Groq's quota is Groq's: a proxy redistributes failures and creates no capacity, and
+        with one client a 429 stays a 429. What it buys is one stable base_url for a consumer that cannot hop — a static
+        config, a script, an HA `rest_command` — and one process holding the key.
+
+        **The fleet already owns that door, on a better host.** `services.llm-decision-router` on eisen listens on
+        127.0.0.1:8000 (nginx `/router/`), routes chat to llama-swap and decisions to Jev then Laya, and forwards the
+        caller's auth instead of holding a key — at 0.1 ms, where the Steam Link answers in 10-1126 ms.
+
+        **Secrets are the wrong cargo for this train.** One plane is the win, not more endpoints: write the decrypted file
+        to tmpfs, `set -a; . file; set +a` so a value with a space survives, and exit non-zero when decryption fails. A key
+        behind an identity stored beside it is storage protection, not host protection, and an OpenAI-compatible endpoint
+        is a token-spend oracle: anything that reaches it can spend. Loopback, or an authenticating proxy, no Playground.
+
+        **Home fit.** Good: a scheduled curator (one digest from the sentinel ledger, xs turns or the mail archive) and an
+        HA `rest_command` needing a judgement rather than a model. Bad: HA Assist voice, since the house already runs
+        Parakeet and Qwen locally and a cloud lane there moves the microphone off-premises for no capability gain.
+
+        **Kill measurement.** Count client-side 429/quota errors in the journals over a week against the number of places
+        the key is plumbed. Few errors and a stable key list means there is no hop to consolidate: REJECTED.
       '';
     };
 

@@ -127,6 +127,10 @@ includes:
         taskfile: taskfiles/mail.yml
         dir: .
         flatten: true
+    media:
+        taskfile: taskfiles/media.yml
+        dir: .
+        flatten: true
     moto:
         taskfile: taskfiles/moto.yml
         dir: .
@@ -421,9 +425,28 @@ tasks:
         cmds:
             - kando -m "Kando Menu"
     ytcast:
-        desc: casts to screen a search of youtube to TV
+        desc: "casts a YouTube VOD to the last-used TV — task ytcast url=<link>; without url it picks from a gum search"
+        env:
+            YTCAST_URL: '{{.url | default ""}}'
         cmds:
-            - ytsearch "$(gum input)" | ytcast -p
+            - |
+              url="$YTCAST_URL"
+              if [ -z "$url" ]; then
+                url=$(ytsearch "$(gum input)") || exit 1
+              fi
+              [ -n "$url" ] || { echo "nothing picked" >&2; exit 1; }
+              if ! state=$(yt-dlp --no-warnings --print live_status "$url"); then
+                echo "refusing: yt-dlp cannot read $url, so its live state is unknown; the OLED759 app wedges on live streams and only a finished VOD is safe (ytcast-oled759-live-stream-wedge)" >&2
+                exit 1
+              fi
+              case "$state" in
+                not_live | was_live) ;;
+                *)
+                  echo "refusing live_status='$state': live streams wedge the OLED759 YouTube app; pick a finished VOD (ytcast-oled759-live-stream-wedge)" >&2
+                  exit 1
+                  ;;
+              esac
+              exec nix run nixpkgs#ytcast -- -p "$url"
     kitty:
         desc: opens up a kitty terminal in tmux
         cmds:

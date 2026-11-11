@@ -40,7 +40,7 @@ resolve_shellcheck() {
   fi
   command -v nix >/dev/null 2>&1 || return 1
   local link="$CACHE_DIR/shellcheck" bin
-  # shellcheck's derivation has bin/man/doc outputs, so `--out-link shellcheck`
+  # The `shellcheck` derivation has bin/man/doc outputs, so `--out-link`
   # writes `shellcheck-bin` rather than `shellcheck`. Look for both.
   bin="$link"
   [ -x "$bin/bin/shellcheck" ] || bin="$link-bin"

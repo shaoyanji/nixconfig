@@ -37,8 +37,7 @@ code() { curl -s -o /dev/null -w '%{http_code}' --max-time 25 --resolve "$host:4
 for path in "$@"; do
   page=$(get "$path")
   status=$(code "$path")
-  [ "$status" = "200" ]
-  verdict $? "$host$path returns 200 (got $status)"
+  if [ "$status" = "200" ]; then verdict 0 "$host$path returns 200 (got $status)"; else verdict 1 "$host$path returns 200 (got $status)"; fi
   printf '%s' "$page" | grep -q 'rel="canonical"'
   verdict $? "$host$path has rel=canonical"
   printf '%s' "$page" | grep -q 'property="og:image"'
@@ -55,8 +54,7 @@ for path in "$@"; do
     case "$og" in
       "https://$host"/*)
         got=$(curl -s -o /dev/null -w '%{http_code} %{content_type}' --max-time 25 --resolve "$host:443:$ip" "$og")
-        [ "$got" = "200 image/png" ]
-        verdict $? "$og serves 200 image/png (got $got)"
+        if [ "$got" = "200 image/png" ]; then verdict 0 "$og serves 200 image/png (got $got)"; else verdict 1 "$og serves 200 image/png (got $got)"; fi
         ;;
       *)
         verdict 1 "$og is not served from $host"

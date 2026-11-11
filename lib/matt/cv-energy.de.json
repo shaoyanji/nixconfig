@@ -1,0 +1,92 @@
+{
+  "_comment": "Der auf Energieinfrastruktur zugeschnittene Lebenslauf. Jeder Bullet ist ein wörtlich übernommener Satz aus lib/matt/lebenslauf.json; lib/matt-site.nix bricht den Build ab, sobald ein Satz dort nicht steht. Diese Datei wählt aus und ordnet, sie erfindet nichts.",
+  "lang": "de",
+  "title": "Assetmanager und Risikoanalyst",
+  "bio": "Vier Jahre lang habe ich die Zahlen hinter einem Solarportfolio über 100 Mio. USD verantwortet: Ertrags- und Bewertungsmodelle, die Bankprüfungen bestanden, Due Diligence für O&M-Projekte und Finanzmodelle für ein Dutzend Projekte von je 4 bis 5 Mio. USD. Seit 2020 baue ich risikoadjustierte PPA- und Wetterderivat-Modelle für Energieunternehmen und war als Risk Manager für Gasspeicher und Swing-Trading bei einem deutschen Energiehändler tätig. Die Software, auf der diese Zahlen laufen, schreibe ich selbst.",
+  "labels": {
+    "projects": "Relevante Projekte"
+  },
+  "work": [
+    {
+      "name": "Bountystash",
+      "highlights": [
+        "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig.",
+        "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading.",
+        "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen.",
+        "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten."
+      ]
+    },
+    {
+      "name": "O3 Energy",
+      "highlights": [
+        "Leitete das Asset Management eines Portfolios über 100 Mio. USD.",
+        "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen.",
+        "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch.",
+        "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD.",
+        "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
+      ]
+    },
+    {
+      "name": "Smart Energy 360",
+      "highlights": [
+        "Betreute eine Projektpipeline über 100 Mio. USD.",
+        "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit.",
+        "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+      ]
+    },
+    {
+      "name": "Fraunhofer ISE",
+      "highlights": [
+        "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie.",
+        "Schrieb Python-Werkzeuge für Analyse und 3D-Geometrie."
+      ]
+    },
+    {
+      "name": "Halliburton",
+      "highlights": [
+        "Behob Chemikalien- und Geräteprobleme vor Ort.",
+        "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche.",
+        "Leitete die Sicherheitsschulung der Crew."
+      ]
+    }
+  ],
+  "projects": [
+    "Master's Thesis",
+    "Postgraduate Renewable Energy",
+    "nixconfig"
+  ],
+  "stack": [
+    {
+      "category": "Energie und Risiko",
+      "items": [
+        "Anlagenbewertung",
+        "Ertrags- und Bewertungsmodelle",
+        "PPA- und Wetterderivat-Hedging",
+        "Gasspeicher und Swing-Trading",
+        "Due Diligence",
+        "Bankprüfungs-Reporting",
+        "Portfoliorisikomanagement"
+      ]
+    },
+    {
+      "category": "Engineering und Daten",
+      "items": [
+        "Finanzmodellierung",
+        "Solar-Telemetrie-Abgleich",
+        "Python",
+        "SQL",
+        "Interferometrie",
+        "3D-Geometrie"
+      ]
+    },
+    {
+      "category": "Software",
+      "items": [
+        "Go",
+        "PostgreSQL",
+        "NixOS",
+        "Typst"
+      ]
+    }
+  ]
+}

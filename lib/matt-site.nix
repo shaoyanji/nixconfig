@@ -35,6 +35,13 @@
   resumeEducation = resume.education or [];
   resumeLanguages = resume.languages or [];
 
+  # The German corpus: the same resume, translated bullet for bullet. A German
+  # variant projects from it, so its bullets are checked against German strings
+  # rather than against their English originals.
+  lebenslauf = builtins.fromJSON (builtins.readFile ./matt/lebenslauf.json);
+  lebenslaufWork = lebenslauf.work or [];
+  lebenslaufProjects = lebenslauf.projects or [];
+
   yearPeriod = nowLabel: start: end: let
     ys = builtins.substring 0 4 start;
     ye =
@@ -674,16 +681,131 @@
         joinProjects;
     };
 
-  cvPdf = lang:
-    pkgs.runCommand "matt-cv-${lang}" {nativeBuildInputs = [pkgs.typst];} ''
+  # A tailored CV is a projection of the corpus for its language: the variant
+  # names roles, highlights and projects by their own strings and the build fails
+  # on anything the corpus does not say. It can select and order; it cannot invent.
+  cvEnergyJson = builtins.fromJSON (builtins.readFile ./matt/cv-energy.json);
+  cvEnergyDeJson = builtins.fromJSON (builtins.readFile ./matt/cv-energy.de.json);
+
+  cvVariantData = json: lang: let
+    corpusWork =
+      if lang == "de"
+      then lebenslaufWork
+      else resumeWork;
+    prose =
+      if lang == "de"
+      then dataDe
+      else data;
+    nowLabel =
+      if lang == "de"
+      then "heute"
+      else "now";
+    # Keyed by the resume name, not the archive's display name: the variant names
+    # resume facts, and the archive is allowed to title the same project differently.
+    byProject = lib.listToAttrs (
+      map (p: lib.nameValuePair (p.resumeName or p.name) p) (
+        builtins.filter (p: (p.resumeName or "") != "") joinProjects
+      )
+    );
+    deProject = lib.listToAttrs (
+      map (p: lib.nameValuePair (p.resumeName or p.name) p) (
+        builtins.filter (p: (p.resumeName or "") != "") lebenslaufProjects
+      )
+    );
+    byRole = lib.listToAttrs (
+      map (w: lib.nameValuePair w.org w) (
+        builtins.filter (w: (w.org or "") != "") (joinWork prose nowLabel)
+      )
+    );
+    knownRoles = map (w: w.name) corpusWork;
+    named = map (w: w.name) json.work;
+    highlightsOf = n: (lib.findFirst (w: w.name == n) {highlights = [];} corpusWork).highlights or [];
+    unknownRoles = builtins.filter (n: !(builtins.elem n knownRoles)) named;
+    omittedRoles = builtins.filter (n: !(builtins.elem n named)) knownRoles;
+    invented =
+      lib.concatMap (
+        w: map (h: "${w.name}: ${h}") (builtins.filter (h: !(builtins.elem h (highlightsOf w.name))) (w.highlights or []))
+      )
+      json.work;
+    unknownProjects =
+      builtins.filter (
+        n: !(builtins.hasAttr n byProject) || (lang == "de" && !(builtins.hasAttr n deProject))
+      )
+      json.projects;
+  in
+    if json.lang != lang
+    then throw "cv-variant: the ${lang} CV carries a ${json.lang} variant"
+    else if unknownRoles != []
+    then throw "cv-variant: not a ${lang} corpus role: ${lib.concatStringsSep ", " unknownRoles}"
+    else if omittedRoles != []
+    then throw "cv-variant: ${lang} role(s) missing from the variant: ${lib.concatStringsSep ", " omittedRoles}"
+    else if invented != []
+    then throw "cv-variant: not in the ${lang} corpus: ${lib.concatStringsSep " | " invented}"
+    else if unknownProjects != []
+    then throw "cv-variant: not a ${lang} corpus project: ${lib.concatStringsSep ", " unknownProjects}"
+    else {
+      inherit lang;
+      labels = cvLabels.${lang} // (json.labels or {});
+      profile =
+        prose.profile
+        // {
+          title = json.title;
+          bio = json.bio;
+          languages = languageLine prose.ui;
+        };
+      education =
+        if lang == "de"
+        then deEducation
+        else education;
+      # The tailored CV says its piece in bullets: the site's one-line framing for
+      # a role repeats what they state, and on paper it pushed the tools block onto
+      # a second page with two lines on it.
+      work =
+        map (
+          w:
+            byRole.${w.name}
+            // {
+              description = "";
+              highlights = w.highlights or [];
+            }
+        )
+        json.work;
+      # A German CV titles its projects in German, so the title and the summary come
+      # from the translated corpus; the dates stay with the archive entry.
+      projects =
+        map (
+          n: let
+            e =
+              if lang == "de"
+              then
+                byProject.${n}
+                // {
+                  name = deProject.${n}.name;
+                  summary = deProject.${n}.description;
+                }
+              else byProject.${n};
+          in
+            e
+            // {
+              period = yearPeriod nowLabel e.start e.end;
+            }
+        )
+        json.projects;
+      stack = json.stack;
+    };
+
+  cvPdf = name: cvJson:
+    pkgs.runCommand "matt-cv-${name}" {nativeBuildInputs = [pkgs.typst];} ''
       mkdir -p $out work
       cp ${./matt/cv.typ} work/cv.typ
-      cp ${pkgs.writeText "cv.json" (builtins.toJSON (cvData lang))} work/cv.json
+      cp ${pkgs.writeText "cv.json" (builtins.toJSON cvJson)} work/cv.json
       typst compile --root work work/cv.typ $out/cv.pdf
     '';
 
-  cv = cvPdf "en";
-  cvDe = cvPdf "de";
+  cv = cvPdf "en" (cvData "en");
+  cvDe = cvPdf "de" (cvData "de");
+  cvEnergy = cvPdf "energy" (cvVariantData cvEnergyJson "en");
+  cvEnergyDe = cvPdf "energy-de" (cvVariantData cvEnergyDeJson "de");
 
   # Share cards, rendered at build time: Slack and LinkedIn ignore an SVG
   # og:image, and the persona page needs its own card rather than the mockup's.
@@ -752,6 +874,8 @@ in
     install -m 0644 ${card}/og-de.png $out/og-de.png
     install -m 0644 ${cv}/cv.pdf $out/cv.pdf
     install -m 0644 ${cvDe}/cv.pdf $out/cv-de.pdf
+    install -m 0644 ${cvEnergy}/cv.pdf $out/cv-energy.pdf
+    install -m 0644 ${cvEnergyDe}/cv.pdf $out/cv-energy-de.pdf
     install -m 0644 ${page "index.html" en} $out/index.html
     install -m 0644 ${page "de-index.html" de} $out/de/index.html
     ${lib.concatMapStringsSep "\n" (s: ''

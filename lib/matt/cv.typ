@@ -61,7 +61,17 @@
     ][
       #text(size: 8.1pt, fill: muted)[#w.period]
     ]
-    #text(size: 8.9pt)[#w.description]
+    #if w.at("description", default: "") != "" [
+      #text(size: 8.9pt)[#w.description]
+    ]
+    // Only a tailored CV carries bullets: the full one names the role and the
+    // prose behind it, and an empty list renders nothing rather than a gap.
+    #if w.at("highlights", default: ()).len() > 0 {
+      set list(marker: [–], indent: 0.9em, body-indent: 0.9em, spacing: 0.2em)
+      for h in w.highlights {
+        list.item[#text(size: 8.6pt)[#h]]
+      }
+    }
   ]
 }
 

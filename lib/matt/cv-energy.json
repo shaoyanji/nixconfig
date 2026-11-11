@@ -1,0 +1,92 @@
+{
+  "_comment": "The tailored CV for energy-infrastructure work. Every string here is either a resume highlight copied verbatim or prose about facts the resume already states: lib/matt-site.nix fails the build on anything it cannot find in resume.json, so this file selects and orders, it cannot invent.",
+  "lang": "en",
+  "title": "Energy asset manager and risk analyst",
+  "bio": "I ran the numbers behind a solar portfolio above USD 100M for four years: yield and valuation models that satisfied bank auditors, due diligence on O&M contracts, and financial models for a dozen projects of USD 4-5M each. Since 2020 I have built risk-adjusted PPA and weather-derivative models for energy companies, and acted as risk manager for gas storage and swing trading at a German energy trader. I write the software those numbers run on, because a model nobody can reproduce is not evidence.",
+  "labels": {
+    "projects": "Relevant projects"
+  },
+  "work": [
+    {
+      "name": "Bountystash",
+      "highlights": [
+        "Advised clients and acted as in-house Risk Manager for a top German energy trader",
+        "Risk-managed gas storage and gas swing trading models as risk manager for EWE Trading",
+        "Built risk-adjusted PPA trading models for energy companies",
+        "Built an algorithm for options trading and hedging on weather derivatives"
+      ]
+    },
+    {
+      "name": "O3 Energy",
+      "highlights": [
+        "Headed asset management of a USD 100M+ portfolio",
+        "Built financial models and managed 10 MW of solar PV power plants",
+        "Scoped and ran due diligence on O&M projects as cover for project managers",
+        "Worked with clients, banks and deal brokers on a dozen USD 4-5M projects",
+        "Analysed corporate liability risks and built the internal risk management framework"
+      ]
+    },
+    {
+      "name": "Smart Energy 360",
+      "highlights": [
+        "Managed a pipeline of USD 100M+ projects",
+        "Devised sustainability sales and marketing strategies",
+        "Advised clients on cybersecurity software and risk management"
+      ]
+    },
+    {
+      "name": "Fraunhofer ISE",
+      "highlights": [
+        "Conducted research on heliostat imperfections using interferometry",
+        "Wrote Python analysis and 3D geometry tooling"
+      ]
+    },
+    {
+      "name": "Halliburton",
+      "highlights": [
+        "Troubleshot chemicals and equipment on site",
+        "Managed two frac crews carrying USD 3M+ of work per week",
+        "Led safety training for crew members"
+      ]
+    }
+  ],
+  "projects": [
+    "Master's Thesis",
+    "Postgraduate Renewable Energy",
+    "nixconfig"
+  ],
+  "stack": [
+    {
+      "category": "Energy and risk",
+      "items": [
+        "asset valuation",
+        "yield and valuation models",
+        "PPA and weather-derivative hedging",
+        "gas storage and swing trading",
+        "due diligence",
+        "bank audit reporting",
+        "portfolio risk management"
+      ]
+    },
+    {
+      "category": "Engineering and data",
+      "items": [
+        "financial modelling",
+        "solar telemetry reconciliation",
+        "Python",
+        "SQL",
+        "interferometry",
+        "3D geometry"
+      ]
+    },
+    {
+      "category": "Software",
+      "items": [
+        "Go",
+        "PostgreSQL",
+        "NixOS",
+        "Typst"
+      ]
+    }
+  ]
+}

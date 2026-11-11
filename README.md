@@ -1,5 +1,7 @@
 # nixconfig
 
+![nixconfig: one snowflake blueprint unfolding into a row of identical machines](banner.png)
+
 Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style container hosts.
 
 ## Layout

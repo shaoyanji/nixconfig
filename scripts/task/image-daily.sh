@@ -450,9 +450,7 @@ build_index() {
   # Rows are path, URL, bytes. `public_id` is what a person searches and what
   # Cloudinary addresses; `day` is empty for a blog banner, whose slug carries it.
   jq -Rn --arg ts "$(date -u +%FT%TZ)" --argjson stop "$TAG_STOP" '
-    # Badges are the fleet marks, addressed by host in host-badges.json; they
-    # are not gallery assets and are left out of the searchable index.
-    [inputs | select(length > 0) | split("\t") | select((.[0] | startswith("badge/")) | not)
+    [inputs | select(length > 0) | split("\t")
       | {path: .[0], url: .[1], bytes: ((.[2] // "0") | tonumber)}]
     | map(. + {
         public_id: (.path | sub("\\.(png|jpg|jpeg|webp)$"; "")),

@@ -170,14 +170,14 @@ def wait_playing(ctrl, seconds):
     return False, state, rel, dur
 
 
-def play(ctrl, url, title):
+def play(ctrl, url, title, mime="video/mp4"):
     didl = (
         '<DIDL-Lite xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/" '
         'xmlns:dc="http://purl.org/dc/elements/1.1/" '
         'xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">'
         f'<item id="1" parentID="0" restricted="1"><dc:title>{sx.escape(title)}</dc:title>'
         '<upnp:class>object.item.videoItem.movie</upnp:class>'
-        f'<res protocolInfo="http-get:*:*:*">{sx.escape(url)}</res></item></DIDL-Lite>'
+        f'<res protocolInfo="http-get:*:{mime}:*">{sx.escape(url)}</res></item></DIDL-Lite>'
     )
     soap(
         ctrl,
@@ -203,8 +203,8 @@ def main():
     ap.add_argument(
         "--transcode",
         action="store_true",
-        help="retry with Static=false (then mp4) when direct play stalls; three fast attempts "
-        "leave the set's player stuck in TRANSITIONING, so this is opt-in",
+        help="force a transcode even when the container is playable; a second attempt while "
+        "the transport is TRANSITIONING wedges the player, so this is opt-in",
     )
     args = ap.parse_args()
 
@@ -249,16 +249,26 @@ def main():
     title, path, url = hit
     print(f"playing {path}")
 
-    attempts = [(url, "direct play")]
-    if args.transcode and "Static=true" in url:
-        attempts.append((url.replace("Static=true", "Static=false"), "transcode, same container"))
-        mp4 = re.sub(r"\.(mkv|mov|avi|webm|ts)(\?)", r".mp4\2", url)
-        if mp4 != url:
-            attempts.append((mp4.replace("Static=true", "Static=false"), "transcode to mp4"))
+    ext = url.split("?")[0].rsplit(".", 1)[-1].lower()
+    mime = {"mkv": "video/x-matroska", "mp4": "video/mp4", "m4v": "video/mp4"}.get(ext, "video/mp4")
+    attempts = []
+    if ext in ("mkv", "mp4", "m4v") and not args.transcode:
+        attempts.append((url, mime, f"direct play ({ext})"))
+    else:
+        mp4 = re.sub(r"\.(mkv|mov|mp4|m4v|avi|webm|ts)(\?)", r".mp4\2", url, count=1)
+        attempts.append(
+            (
+                mp4.replace("Static=true", "Static=false"),
+                "video/mp4",
+                f"transcoded mp4 (source is {ext}, which this set will not direct-play)",
+            )
+        )
+        if args.transcode and ext in ("mkv", "mp4", "m4v"):
+            attempts.append((url, mime, f"direct play ({ext}), forced"))
 
-    for candidate, label in attempts:
+    for candidate, cmime, label in attempts:
         print(f"  attempt: {label}")
-        play(ctrl, candidate, title)
+        play(ctrl, candidate, title, cmime)
         ok, state, rel, dur = wait_playing(ctrl, args.wait)
         if ok:
             print(f"PLAYING  rel={rel} dur={dur}  ({label})")

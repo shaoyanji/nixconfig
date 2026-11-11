@@ -56,7 +56,7 @@ allowed() {
   [ -n "$ALLOW" ] || return 1
   IFS=',' read -ra pats <<<"$ALLOW"
   for pat in "${pats[@]}"; do
-    # shellcheck disable=SC2053 # glob match is the point
+    # shellcheck disable=SC2254 # glob match is the point
     case "$path" in $pat) return 0 ;; esac
   done
   return 1

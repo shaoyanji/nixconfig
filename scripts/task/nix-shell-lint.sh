@@ -3,7 +3,7 @@
 # NIX SHELL LINT — the shell inside Nix strings, linted
 # ==============================================================================
 # Routes `task checks:nix:shell` to scripts/task/nix-shell-lint.py, resolving
-# shellcheck the way scripts/task/nix-fmt.sh resolves its tools: PATH first, then
+# the checker the way scripts/task/nix-fmt.sh resolves its tools: PATH first, then
 # the nixpkgs pinned in flake.lock, cached as a GC-rooted out-link so a later run
 # is milliseconds. Same order on purpose — the gate must judge with the same
 # version every time, and it must run on a host that has none installed.

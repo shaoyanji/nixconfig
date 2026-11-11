@@ -629,7 +629,11 @@ if [ -n "$SHOW" ]; then
 fi
 
 if [ "$COUNT" -eq 0 ]; then
-  refuse 3 empty "no $REG row matches $(printf '%s ' ${FILTERS[@]+"${FILTERS[@]}"}${TOUCHES:+"touches=$TOUCHES"})"
+  # A message that names what was searched: the array is joined on purpose, and
+  # mixing `${FILTERS[@]}` into a string glued the last filter to `touches=`.
+  what="${FILTERS[*]:-}"
+  [ -n "${TOUCHES:-}" ] && what="${what:+$what }touches=$TOUCHES"
+  refuse 3 empty "no $REG row matches $(printf '%s' "$what")"
 fi
 
 # Stage 4: <=80 tokens (320 B, tokens = bytes/4) with a pointer per row, so the

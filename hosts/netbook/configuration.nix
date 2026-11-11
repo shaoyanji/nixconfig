@@ -131,6 +131,7 @@
     fi
     # fnott owns org.freedesktop.Notifications here; a timeout of 0 means "do not
     # expire", so the card stays until it is dismissed.
+    # shellcheck disable=SC1083 # `susssasa{sv}i` is a DBus signature, not shell
     busctl --user call org.freedesktop.Notifications /org/freedesktop/Notifications \
       org.freedesktop.Notifications Notify susssasa{sv}i \
       netbook-keys 0 "" "Dead keys" "$table" 0 0 0

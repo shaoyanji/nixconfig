@@ -18,7 +18,8 @@
  * The rent is one row and one reason: the bottom row is the only stretch of the
  * keyboard no fleet chord borders, so aiming for a dead key and missing lands
  * on another dead key. Left to right: z 0, x backquote, c [, v ], b \, n -,
- * m ;, comma =, period p. Then u ', o /, p ( — the free keys left over. Vim's
+ * m ;, comma =, period /. Then u ', o p, p ( — the free keys left over, with
+ * `/` on `period` because that is the key beside the one the ribbon lost. Vim's
  * `:wq` is Mod+Shift+m, then w, then q. Mod+Shift+grave puts the whole table on
  * screen, because a mapping nobody can look up is just the menu this replaced.
  *

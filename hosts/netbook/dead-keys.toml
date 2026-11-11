@@ -8,9 +8,11 @@
 # between neighbours types another dead character. `p` used to sit on `Mod+y`,
 # one key from `Mod+t`, and a mistyped word spawned a terminal.
 #
-# `Mod+S` is the fleet's region screenshot. The slash used to live there and was
-# moved off it: the slash is on `Mod+o` (and `?` on `Mod+Shift+o`), which is the
-# only home in this table that is not the bottom row.
+# `Mod+S` is the fleet's region screenshot, so the slash cannot live there. It
+# rents `period` — the key physically next to `/` — and `?` rides
+# `Mod+Shift+period`. The letter that gave up its seat, `p`, takes `Mod+o`, one
+# key left: the punctuation stays where the hand already reaches for it, and the
+# letter moves rather than the punctuation.
 #
 # One rule, so this is a thing to learn rather than twenty:
 #
@@ -59,8 +61,8 @@ shifted = "+"
 
 [[key]]
 key = "period"
-plain = "p"
-shifted = "P"
+plain = "/"
+shifted = "?"
 
 [[key]]
 key = "u"
@@ -69,8 +71,8 @@ shifted = "\""
 
 [[key]]
 key = "o"
-plain = "/"
-shifted = "?"
+plain = "p"
+shifted = "P"
 
 [[key]]
 key = "p"

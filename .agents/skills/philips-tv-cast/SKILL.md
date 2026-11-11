@@ -96,6 +96,22 @@ Exit 0 means the set really is playing: `PLAYING  rel=0:00:04 dur=1:38:40`.
 - **Stopping the renderer restores the previous input.** Ending the DLNA stream handed the
   set straight back to Bloomberg TV, so `media:stop` doubles as "put my channel back".
 
+## Plex: the better path, not wired yet
+
+frieren runs Plex Media Server 1.43.4 on 32400 with a `Movies` library, and the set has a
+native Plex app — but playback cannot be driven from here yet, for three concrete reasons:
+
+- the server is **unclaimed** (`curl :32400/identity` → `claimed="0"`), so there is no
+  plex.tv token, and `{{.SECRETS}}` holds no Plex key;
+- `:32400/clients` returns `size="0"` — Companion control needs the app listed there, and
+  it only registers while it is open and signed in;
+- the TV's app listens on nothing when closed (`32500`, `3005`, `8324` all refused), so
+  there is no client to address.
+
+To wire it: claim the server to the plex.tv account the TV app uses, open the app, then
+`playMedia` against `/clients/<id>` with that token. Until then the DLNA path above is the
+one that works, paying a transcode for `.mov` sources.
+
 ## If nothing plays
 
 ```bash

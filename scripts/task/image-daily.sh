@@ -38,7 +38,7 @@ BRIEFS=${BRIEFS:-$repo/lib/image-daily/briefs.json}
 # asset cannot live there without sudo. pics/generated is the writable, devji-owned
 # neighbour.
 IMAGES_ROOT=${IMAGES_ROOT:-/Volumes/data/pics/generated}
-LANES_ORDER=(site wall blog fleet)
+LANES_ORDER=(site wall blog fleet badge)
 # Words a slug carries for grammar rather than meaning. Tags are derived from the
 # public id, so this list is the only editorial judgement in the manifest.
 TAG_STOP='["the","and","for","new","post","with","its","this","that","them","they","when","where","which","while","your","you","our","not","one","own","out","from","into","than","then","was","were","have","has","had","can","did","get","got","just","like","more","most","about","after","before","how","what","why","all","but","any","two","via","now","yet","also","still","even","only","such","some","been","being","both","each","here","there","these","those","under","very","will","would","should","much","many","other","over","same","part"]'
@@ -171,6 +171,18 @@ briefs_guard() {
       bad=1
     fi
   done < <(jq -r '.briefs[] | select(.id | startswith("wall-char-"))
+    | [.id, .prompt, (.expect // ""), ((.prompt | split(" ") | length) | tostring)] | @tsv' "$BRIEFS")
+  # A badge is a profile picture, so the same rule holds: the prompt names the
+  # subject and `expect` says what the plate must show. The 2026-11-10 batch sent
+  # `Fern, 4k, realistic, neumorphism` and shipped a fern leaf, a power symbol and
+  # a periodic-table tile, all judged `keep` against the same weak sentence.
+  while IFS=$'\t' read -r id prompt expect words; do
+    [ -n "$expect" ] || { say "briefs: $id has no expect line"; bad=1; }
+    if [ "${words:-0}" -lt 25 ]; then
+      say "briefs: $id prompt is ${words:-0} words — describe the subject, not the name"
+      bad=1
+    fi
+  done < <(jq -r '.briefs[] | select(.id | startswith("badge-"))
     | [.id, .prompt, (.expect // ""), ((.prompt | split(" ") | length) | tostring)] | @tsv' "$BRIEFS")
   return $bad
 }
@@ -438,7 +450,10 @@ build_index() {
   # Rows are path, URL, bytes. `public_id` is what a person searches and what
   # Cloudinary addresses; `day` is empty for a blog banner, whose slug carries it.
   jq -Rn --arg ts "$(date -u +%FT%TZ)" --argjson stop "$TAG_STOP" '
-    [inputs | select(length > 0) | split("\t") | {path: .[0], url: .[1], bytes: ((.[2] // "0") | tonumber)}]
+    # Badges are the fleet marks, addressed by host in host-badges.json; they
+    # are not gallery assets and are left out of the searchable index.
+    [inputs | select(length > 0) | split("\t") | select((.[0] | startswith("badge/")) | not)
+      | {path: .[0], url: .[1], bytes: ((.[2] // "0") | tonumber)}]
     | map(. + {
         public_id: (.path | sub("\\.(png|jpg|jpeg|webp)$"; "")),
         lane: (.path | split("/")[0]),
@@ -628,7 +643,7 @@ cmd_publish() {
   need jq
   local lane
   [ -d "$IMAGES_ROOT/src" ] || die "nothing generated yet under $IMAGES_ROOT/src"
-  for lane in site wall blog; do
+  for lane in site wall blog badge; do
     [ "$(lane_setting "$lane" publish)" = "true" ] || continue
     stage_publish
   done
@@ -642,11 +657,16 @@ cmd_publish() {
   # carries its own resize (`f_auto,q_auto,w_1200`), so a consumer picks the
   # size it needs from one upload and this tree never becomes a website. The
   # urls.tsv beside the assets is the manifest a consumer reads.
-  local rel url
+  local rel url id
   : >"$IMAGES_ROOT/published/urls.tsv"
   while IFS= read -r file; do
     rel=${file#"$IMAGES_ROOT/published/"}
-    url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$file" --public-id "assets/${rel%.*}") || {
+    # A badge is addressed by host, not by day: the site map names
+    # `assets/fleet/<host>`, so a re-render replaces the mark in place and
+    # `lib/site/host-badges.json` never has to learn a new date.
+    id="assets/${rel%.*}"
+    case $rel in badge/*) id="assets/fleet/$(basename "${rel%.*}")" ;; esac
+    url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$file" --public-id "$id") || {
       say "publish: upload failed for $rel"
       return 1
     }

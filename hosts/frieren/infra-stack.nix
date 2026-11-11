@@ -625,14 +625,17 @@ in {
     settings.web.listen.port = 8124;
   };
 
-  # InfluxDB is OFF since 2026-11-09. Scrutiny brings it up by default, but the
-  # metric path never carried anything: measured on this host, /var/lib/influxdb2
-  # held 200 KB with one file touched in 14 days while the weekly collector ran.
-  # Scrutiny keeps its own store, sentinel writes JSONL and gatus lives on delphi,
-  # so the module stays and the process goes.
-  services.scrutiny.influxdb.enable = false;
-  # Kept narrowed for the day it is turned back on: InfluxDB's HTTP API otherwise
-  # binds every interface on 8086 and the firewall has to hold it back (HC-7).
+  # InfluxDB stays ON because Scrutiny 0.9.5 will not start without it. Measured
+  # 2026-11-11: with the process disabled the web server panics at startup
+  # (`failed to check influxdb setup status - Get "http://0.0.0.0:8086/api/v2/setup"`)
+  # and systemd restart-looped 264 times, so smart.frieren.lan answered 502. The
+  # probe is unconditional — an empty host, an empty token and an unknown
+  # `web.influxdb.enabled` key all still probe — so `services.scrutiny.influxdb.enable
+  # = false` (set 2026-11-09) buys nothing but a dead dashboard. The metric path is
+  # still nearly empty (200 KB, one file touched in 14 days while the weekly
+  # collector ran); that is the cost of the page, not of the store.
+  # Kept narrowed: InfluxDB's HTTP API otherwise binds every interface on 8086 and
+  # the firewall has to hold it back (HC-7).
   services.influxdb2.settings.http-bind-address = "127.0.0.1:8086";
 
   # --- Vaultwarden: offloaded to delphi 2026-11-02 ----------------------------

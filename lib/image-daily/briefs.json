@@ -24,6 +24,12 @@
       "max_age_days": 90,
       "publish": false,
       "intent": "a nixconfig fleet illustration: docs art, an agent card or a topology figure"
+    },
+    "badge": {
+      "budget": 24,
+      "max_age_days": 240,
+      "publish": true,
+      "intent": "a square profile-picture badge for one host on the fleet site, shown at 96px beside the host's name: one recognisable subject with a clear focal point, never a UI panel, an icon sheet or an abstract emblem"
     }
   },
   "briefs": [
@@ -398,6 +404,226 @@
       "size": "1536x1024",
       "name": "2024-11-13-my-new-post.png",
       "prompt": "A photograph of a mechanical typewriter beside a closed laptop on a desk, one sheet of paper in the roller, morning light, no readable text."
+    },
+    {
+      "id": "badge-frieren",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "frieren.png",
+      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End — a slender young elf woman with very long silver-white hair in twin tails, pointed ears, green eyes, a red drop earring, a white robe with gold trim over a black dress, seen from the shoulders up in three-quarter view, calm gaze to the side. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the anime elf mage Frieren as a portrait, never a crystal, a staff alone, an emblem or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-fern",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "fern.png",
+      "prompt": "Fern, the mage from the anime Frieren: Beyond Journey's End — a young woman with long lavender hair in twin tails, pale skin, calm narrow green eyes, a white robe with gold trim over a black dress, a wooden staff held upright beside her, seen from the shoulders up in three-quarter view. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the anime character Fern as a young woman's portrait, never a fern plant, a leaf, a frond or a botanical illustration",
+      "rev": 1
+    },
+    {
+      "id": "badge-eisen",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "eisen.png",
+      "prompt": "Eisen, the dwarf warrior from the anime Frieren: Beyond Journey's End — an elderly broad-shouldered dwarf with a thick white beard and braided hair, a weathered face, heavy dark-red plate armour over chainmail, a round shield resting at his shoulder, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the dwarf warrior Eisen as a portrait, never a periodic-table tile, a bar of iron, a horseshoe or a metal object",
+      "rev": 1
+    },
+    {
+      "id": "badge-stark",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "stark.png",
+      "prompt": "Stark, the warrior from the anime Frieren: Beyond Journey's End — a young man with short spiky red hair, red eyes, a black sleeveless tunic and a red cape, the haft of a battle axe resting over his shoulder, a determined expression, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the anime warrior Stark as a portrait, never a power symbol, a lightning bolt, a button or an icon",
+      "rev": 1
+    },
+    {
+      "id": "badge-aristotle",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "aristotle.png",
+      "prompt": "Aristotle of Stagira, the ancient Greek philosopher — a bearded middle-aged man in a white himation, a scroll in one hand, a marble colonnade behind him, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the philosopher Aristotle as a portrait, never a laptop, a book icon, a scroll alone or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-diogenes",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "diogenes.png",
+      "prompt": "Diogenes the Cynic, the ancient Greek philosopher — a barefoot old man in a coarse brown cloak holding a lit oil lantern up in broad daylight, a clay barrel and a stone wall behind him, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the philosopher Diogenes holding a lantern, never a dashboard, a settings panel or an abstract emblem",
+      "rev": 1
+    },
+    {
+      "id": "badge-poseidon",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "poseidon.png",
+      "prompt": "Poseidon, the Greek god of the sea — a bearded god wearing a crown of coral and pearl, holding a bronze trident, a cresting wave behind his shoulder, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "Poseidon with his trident, never a ship, a wave logo alone or a nautical emblem",
+      "rev": 1
+    },
+    {
+      "id": "badge-delphi",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "delphi.png",
+      "prompt": "The Pythia, the oracle priestess of Delphi — a veiled woman with dark eyes seated on a bronze tripod above a cleft in the rock, vapour curling upward, temple columns behind her, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the veiled oracle priestess seated at the tripod, never a map pin, a dashboard or an abstract emblem",
+      "rev": 1
+    },
+    {
+      "id": "badge-bitlockerpremium",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "bitlockerpremium.png",
+      "prompt": "A silver business laptop standing open on a dark desk with a heavy brass padlock resting against its lid, cool window light across brushed metal, the screen turned away, seen close and centred. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "an open silver laptop with a brass padlock, never a padlock alone, a licence card or a Windows logo",
+      "rev": 1
+    },
+    {
+      "id": "badge-burgernas",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "burgernas.png",
+      "prompt": "A small white two-bay NAS appliance with two drive caddies and a row of tiny status lights, standing on a wooden shelf in a cool cellar, its fan grille facing the viewer, seen from the front and slightly above. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a two-bay NAS appliance on a shelf, never a hamburger, a burger logo or a fast-food scene",
+      "rev": 1
+    },
+    {
+      "id": "badge-clanker",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "clanker.png",
+      "prompt": "A squat industrial robot built from riveted tin plate with a single round lens eye, heavy bolted shoulders and a short antenna, standing in a dim server aisle, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a riveted tin robot with one lens eye, never an abstract blob, a toaster or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-dragoncourt",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "dragoncourt.png",
+      "prompt": "A green dragon curled around a small stone castle courtyard, wings folded, one claw resting on a banner staff, towers behind it, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a green dragon curled around a castle courtyard, never a crest, a coat of arms alone or a logo",
+      "rev": 1
+    },
+    {
+      "id": "badge-envs",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "envs.png",
+      "prompt": "A weathered wooden signpost on a coastal path with three brass arrow signs pointing in different directions, sea and a low grey sky behind, seen close and centred. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a signpost with three brass arrows, never a browser window, a logo grid or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-guckloch",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "guckloch.png",
+      "prompt": "A round brass door peephole set in a dark wooden door, seen straight on from the corridor, a fisheye glimpse of a bright green room through the lens, rivets around the rim. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a brass peephole set in a wooden door, never an eye icon, a magnifying glass or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-kali",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "kali.png",
+      "prompt": "Kali, the Hindu goddess of time — a calm dark-blue face with a red mark on the forehead, a crown of flame, four arms holding a curved sword, a lotus and a small drum, a lotus throne behind her, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the goddess Kali as a portrait with a curved sword and a lotus, never a terminal window, a skull icon or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-kellerbench",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "kellerbench.png",
+      "prompt": "A heavy wooden workbench in a stone cellar with a small open-frame benchmark rig standing on it, one spinning fan lit by a hanging bulb, coiled cables beside it, seen from the front. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a workbench with an open-frame rig in a cellar, never a bar chart, a gauge or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-minyx",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "minyx.png",
+      "prompt": "A credit-card-sized single-board computer with a green board, a GPIO pin header, two USB ports and a tiny fan, mounted on a wooden block with a ribbon cable beside it, seen close and slightly above. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a small single-board computer with GPIO pins, never a raspberry, a tart or a fruit bowl",
+      "rev": 1
+    },
+    {
+      "id": "badge-moto",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "moto.png",
+      "prompt": "A black smartphone standing upright on a dark surface, its blank screen showing a soft grey gradient, a rounded camera module at the top edge, seen straight on and close. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a smartphone standing upright, never a motorcycle, a helmet or a screenshot",
+      "rev": 1
+    },
+    {
+      "id": "badge-netbook",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "netbook.png",
+      "prompt": "A small scuffed netbook open on a train tray table, its keyboard worn smooth, daylight from the window behind it, a paper ticket lying beside it, seen from the front at an angle. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a small open netbook on a train table, never a paper notebook, a book or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-pythonanywhere",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "pythonanywhere.png",
+      "prompt": "A green tree python coiled around the corner of a small server rack, its head raised and calm, faint blue status lights on the rack, seen close and centred. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a green python snake coiled around a server rack, never the Python language logo, a browser window or a UI panel",
+      "rev": 1
+    },
+    {
+      "id": "badge-scratch",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "scratch.png",
+      "prompt": "A bare aluminium solid-state drive lying on a cleared wooden desk beside a single sheet of paper and a pen, everything else empty, seen from above at a slight angle. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "a cleared desk with an SSD, one page and a pen, never a UI panel, an icon grid or an abstract emblem",
+      "rev": 1
+    },
+    {
+      "id": "badge-serv00",
+      "lane": "badge",
+      "every": 240,
+      "size": "1024x1024",
+      "name": "serv00.png",
+      "prompt": "Beastie, the FreeBSD daemon — a small red cartoon devil with short horns, a wide grin, sneakers and a pitchfork held upright, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
+      "expect": "the red BSD daemon holding a pitchfork, never a corporate logo, a terminal window or a UI panel",
+      "rev": 1
     }
   ]
 }

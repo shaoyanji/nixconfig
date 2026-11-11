@@ -1414,6 +1414,20 @@ tasks:
     cmds:
       - EDGE_REQUIRE_UP=1 bash scripts/task/edge-check.sh
 
+  checks:typeset:
+    desc: "[gate] The page-budget rule refuses a spillover, not just measures one"
+    summary: >
+      Runs `lib/typeset.nix`, rendered out of the Nix file with `nix eval --raw`
+      so the fixture cannot drift from the rule, against four documents compiled
+      by the pinned typst: a two-line spillover refused on the count, the same
+      document allowed a second page refused on the 40 mm floor, a second page
+      with real content passing, one short page passing (the floor only applies
+      once there is a second page), and a template with no `<typeset>` report
+      refused. Coverage is asserted both ways. The rule runs inside both PDF
+      builders, so this is the proof it refuses. No nix build; ~2 s.
+    cmds:
+      - bash tests/typeset/run.sh
+
   checks:appflow:gate:
     desc: Deletion gate — the application database is the only copy of the pipeline
     summary: >

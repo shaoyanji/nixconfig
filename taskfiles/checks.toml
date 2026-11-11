@@ -22,6 +22,10 @@ name = "checks:appflow:resolve"
 kind = "leaf"
 
 [[check]]
+name = "checks:typeset"
+kind = "leaf"
+
+[[check]]
 name = "checks:audit:handoff"
 kind = "leaf"
 

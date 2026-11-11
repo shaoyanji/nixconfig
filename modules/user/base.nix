@@ -101,7 +101,7 @@ in {
     btop = {
       enable = true;
       settings = {
-        color_theme = "catppuccin_mocha";
+        color_theme = "tokyo-storm.theme";
         theme_background = false;
         vim_keys = true;
       };

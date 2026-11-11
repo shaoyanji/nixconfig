@@ -125,15 +125,18 @@ in {
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [toast];
 
+    # NixOS keys, not Home Manager ones: `unitConfig`/`serviceConfig`, and no
+    # `after = ["graphical-session.target"]`, which dwl never activates — the
+    # oneshot would wait for a target that does not exist. A notify-send with no
+    # session bus fails, leaves the mark alone and retries on the next tick.
     systemd.user.services.xs-notify = {
-      Unit = {
-        Description = "Toast new agent turns from the xs log";
-        After = ["graphical-session.target"];
+      description = "Toast new agent turns from the xs log";
+      unitConfig = {
         # No token, no reader: the timer keeps ticking and the service is
         # skipped, so a machine that is not a holder has no red unit.
         ConditionPathExists = "%h/.config/agent-turns/token";
       };
-      Service = {
+      serviceConfig = {
         Type = "oneshot";
         ExecStart = "${toast}/bin/xs-notify";
         StandardOutput = "journal";
@@ -142,12 +145,12 @@ in {
     };
 
     systemd.user.timers.xs-notify = {
-      Unit.Description = "Poll the xs turn log every ${toString cfg.intervalMinutes} minutes";
-      Timer = {
+      description = "Poll the xs turn log every ${toString cfg.intervalMinutes} minutes";
+      timerConfig = {
         OnCalendar = "*:0/${toString cfg.intervalMinutes}";
         Persistent = true;
       };
-      Install.WantedBy = ["timers.target"];
+      wantedBy = ["timers.target"];
     };
   };
 }

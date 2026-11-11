@@ -191,8 +191,12 @@ surface on this host. What replaced them:
 - **One chord per dead character.** `hosts/netbook/dwl-keybinds.h` declares
   `TYPED(key, mods, ch)` once and rents a living key for each character the broken
   ribbon connector lost. `Mod+<key>` gives the plain character and `Mod+Shift+<key>`
-  its shifted pair: `Mod+m` is `;`, `Mod+Shift+m` is `:`, `Mod+g`/`Mod+Shift+g` are
-  `(`/`)`, `Mod+z`/`Mod+Shift+z` are `0`/`)`. Vim's `:wq` is two chords, not a menu.
+  its shifted pair: `Mod+z`/`Mod+Shift+z` are `0`/`)`, `Mod+m` is `;`,
+  `Mod+Shift+m` is `:`, `Mod+period` is `p`. The rent is the bottom row
+  (`z x c v b n m , .`), the one run no fleet chord borders, with `u`, `o`, `p`
+  for the three it cannot hold — so a slip between neighbours types a dead
+  character instead of opening a terminal, which is what `Mod+y` for `p` did at
+  one key from `Mod+t`. Vim's `:wq` is two chords, not a menu.
   The rows are generated from one `deadKeys` list in the host file, and
   `Mod+Shift+grave` shows that same list as a fnott card (`netbook-keys --text`
   prints it in a shell) — the lookup the deleted menu failed to be.
@@ -201,8 +205,9 @@ surface on this host. What replaced them:
   carried neither parenthesis. The body is one `wtype -- '<char>'` now, the clipboard
   is untouched, and `Mod+Space` is the fleet spotlight again. What the binary carries
   is checkable: `grep -ao "wtype -- '[^']*'" /proc/$(pgrep -x dwl)/exe | sort -u`.
-- **One fleet chord is still shadowed.** `Mod+S` types `/`, so the region screenshot
-  keeps `Mod+Alt+S`; full-screen stays `Mod+Print`.
+- **No fleet chord is shadowed.** The old rent put `Mod+S` on `/` and forced the
+  region screenshot over to `Mod+Alt+S`; the bottom row carries no fleet bind, so
+  `Mod+S` is the region shot again and full-screen stays `Mod+Print`.
 - **Bodies stay local.** Card, dictation and QR chords call names on the session
   PATH (`environment.localBinInPath`), never a copy of the script inside Nix.
 - **Wallpaper in the store.** `profiles.dwlDesktop.wallpaper` is a hash-pinned

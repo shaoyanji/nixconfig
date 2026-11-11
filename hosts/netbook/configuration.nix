@@ -24,38 +24,25 @@
 
   # The characters this keyboard's broken ribbon connector lost, and the living
   # key each one is rented from. One list, two projections: the dwl chords
-  # spliced into the keymap, and the card `Mod+Shift+grave` shows. `p` is a lost
-  # letter rather than punctuation and is a row like the rest.
+  # spliced into the keymap, and the card `Mod+Shift+grave` shows.
+  #
+  # The rent is the bottom row, left to right, then the three free keys beside
+  # it. The row is the point: it is the one run no fleet chord borders, so a slip
+  # between neighbours types another dead character — `p` sat on `Mod+y`, one key
+  # from `Mod+t`, and a mistyped word spawned a terminal instead. Nine bottom-row
+  # keys hold nine dead keys; `u`, `o` and `p` take the last three because they
+  # are what is left that no fleet chord touches, and a tenth bottom-row key does
+  # not exist without dropping a character.
   deadKeys = [
-    {
-      key = "s";
-      plain = "/";
-      shifted = "?";
-    }
-    {
-      key = "n";
-      plain = "-";
-      shifted = "_";
-    }
     {
       key = "z";
       plain = "0";
       shifted = ")";
     }
     {
-      key = "m";
-      plain = ";";
-      shifted = ":";
-    }
-    {
-      key = "b";
-      plain = "\\";
-      shifted = "|";
-    }
-    {
-      key = "u";
-      plain = "=";
-      shifted = "+";
+      key = "x";
+      plain = "`";
+      shifted = "~";
     }
     {
       key = "c";
@@ -63,29 +50,49 @@
       shifted = "{";
     }
     {
-      key = "o";
+      key = "v";
       plain = "]";
       shifted = "}";
     }
     {
-      key = "g";
-      plain = "(";
-      shifted = ")";
+      key = "b";
+      plain = "\\";
+      shifted = "|";
     }
     {
-      key = "v";
-      plain = "`";
-      shifted = "~";
+      key = "n";
+      plain = "-";
+      shifted = "_";
     }
     {
-      key = "y";
+      key = "m";
+      plain = ";";
+      shifted = ":";
+    }
+    {
+      key = "comma";
+      plain = "=";
+      shifted = "+";
+    }
+    {
+      key = "period";
       plain = "p";
       shifted = "P";
     }
     {
-      key = "x";
+      key = "u";
       plain = "'";
       shifted = "\"";
+    }
+    {
+      key = "o";
+      plain = "/";
+      shifted = "?";
+    }
+    {
+      key = "p";
+      plain = "(";
+      shifted = ")";
     }
   ];
 

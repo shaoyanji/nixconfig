@@ -6,20 +6,21 @@
  * Not a header and not included — profiles.dwlDesktop splices this text in at
  * config.h's @EXTRA_KEYBINDS@ marker, which sits FIRST in keys[]. dwl takes the
  * first match, so an entry here shadows the fleet binding for the same chord.
- * One fleet binding is shadowed, on purpose: Mod+S types `/`, so the region
- * screenshot keeps Mod+Alt+S at the bottom of this file. Mod+Space is not bound
- * here, so the fleet spotlight answers it again.
+ * Nothing is shadowed any more: the rent is the bottom row plus three free keys,
+ * and no fleet chord lives on any of them — so Mod+S is the region screenshot
+ * again and Mod+Space the spotlight. Nothing below needs an escape hatch.
  *
  * One rule, so this is a thing to learn rather than twenty things:
  *
  *   Mod+<key>        types the dead key's plain character
  *   Mod+Shift+<key>  types its shifted character
  *
- * The rented key sits as close to the lost one as the layout allows: z for 0,
- * m for ;, n for -, u for =, c for [, o for ], b for \, s for /, x for ', v for
- * the backquote, and g for the parenthesis pair. Vim's `:wq` is Mod+Shift+m,
- * then w, then q. Mod+Shift+grave puts the whole table on screen, because a
- * mapping nobody can look up is just the menu this replaced.
+ * The rent is one row and one reason: the bottom row is the only stretch of the
+ * keyboard no fleet chord borders, so aiming for a dead key and missing lands
+ * on another dead key. Left to right: z 0, x backquote, c [, v ], b \, n -,
+ * m ;, comma =, period p. Then u ', o /, p ( — the free keys left over. Vim's
+ * `:wq` is Mod+Shift+m, then w, then q. Mod+Shift+grave puts the whole table on
+ * screen, because a mapping nobody can look up is just the menu this replaced.
  *
  * The rows are not written out here. `deadKeys` in
  * hosts/netbook/configuration.nix is one list, and the build projects it twice:
@@ -68,7 +69,3 @@
 {WLR_MODIFIER_ALT, XKB_KEY_Tab, focusstack, {.i = +1}},
 {WLR_MODIFIER_ALT | WLR_MODIFIER_SHIFT, XKB_KEY_Tab, focusstack, {.i = -1}},
 {MODKEY | WLR_MODIFIER_ALT, XKB_KEY_l, spawn, SHCMD("waylock")},
-
-/* Mod+S types '/', so the fleet's region screenshot moves one modifier over
- * instead of disappearing. Full-screen is still the fleet's Mod+Print. */
-{MODKEY | WLR_MODIFIER_ALT, XKB_KEY_s, spawn, SHCMD("grim -g \"$(slurp)\" - | wl-copy")},

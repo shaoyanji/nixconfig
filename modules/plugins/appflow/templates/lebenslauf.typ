@@ -157,3 +157,13 @@
 
 #v(8pt)
 #align(center)[#text(size: 7.5pt, fill: rgb("#6b7280"))[#strings.at("generated", default: "")]]
+
+// typeset report — read back by the build (lib/typeset.nix) -------------------
+// The page count and how far down its last page the content reached. A packet who
+// spills a line onto a second page fails its build rather than shipping that page.
+#context [
+  #metadata((
+    pages: counter(page).final().first(),
+    last: int(calc.round(here().position().y / 1mm)),
+  )) <typeset>
+]

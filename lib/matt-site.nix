@@ -14,6 +14,10 @@
   briefs ? builtins.fromJSON (builtins.readFile ./matt/briefs.json),
   briefsDe ? builtins.fromJSON (builtins.readFile ./matt/briefs.de.json),
 }: let
+  # The page budgets below are asserted by this, not by eye: a CV that spills a
+  # line onto a second page fails its build.
+  typeset = import ./typeset.nix {inherit pkgs;};
+
   esc = lib.escapeXML;
 
   render = file: values: let
@@ -655,6 +659,9 @@
     d
     // {
       inherit lang;
+      # The full CV has always been two pages; the build now proves it instead of
+      # leaving the second page to be noticed by whoever opens the file.
+      pages = 2;
       labels = cvLabels.${lang};
       profile =
         d.profile
@@ -745,6 +752,8 @@
     then throw "cv-variant: not a ${lang} corpus project: ${lib.concatStringsSep ", " unknownProjects}"
     else {
       inherit lang;
+      # A tailored CV earns its one page the hard way: the build fails if it spills.
+      pages = json.pages or 1;
       labels = cvLabels.${lang} // (json.labels or {});
       profile =
         prose.profile
@@ -795,11 +804,16 @@
     };
 
   cvPdf = name: cvJson:
-    pkgs.runCommand "matt-cv-${name}" {nativeBuildInputs = [pkgs.typst];} ''
+    pkgs.runCommand "matt-cv-${name}" {nativeBuildInputs = [pkgs.typst pkgs.jq];} ''
       mkdir -p $out work
       cp ${./matt/cv.typ} work/cv.typ
       cp ${pkgs.writeText "cv.json" (builtins.toJSON cvJson)} work/cv.json
       typst compile --root work work/cv.typ $out/cv.pdf
+      ${typeset.check {
+        source = "work/cv.typ";
+        budget = cvJson.pages;
+        doc = "cv-${name}.pdf";
+      }}
     '';
 
   cv = cvPdf "en" (cvData "en");

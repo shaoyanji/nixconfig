@@ -79,3 +79,11 @@
 
 #v(18pt)
 #basics.at("name", default: "")
+
+// typeset report — read back by the build (lib/typeset.nix) -------------------
+#context [
+  #metadata((
+    pages: counter(page).final().first(),
+    last: int(calc.round(here().position().y / 1mm)),
+  )) <typeset>
+]

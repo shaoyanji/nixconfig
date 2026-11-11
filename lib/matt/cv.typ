@@ -106,3 +106,14 @@
 #head(labels.at("languages", default: "Languages and authorisation"))
 #par[#p.languages]
 #par[#p.workAuth]
+
+// typeset report ------------------------------------------------------------
+// Read back by the build (lib/typeset.nix): how many pages this made, and how far
+// down its last page the content reached. A one-line final page is a layout defect
+// the build refuses instead of a file a person has to notice.
+#context [
+  #metadata((
+    pages: counter(page).final().first(),
+    last: int(calc.round(here().position().y / 1mm)),
+  )) <typeset>
+]

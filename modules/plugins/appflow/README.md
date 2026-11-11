@@ -66,6 +66,13 @@ The output is a normal JSON Resume, so the template, the site and the gist all
 read it without knowing the projection happened. `selection.json` sits beside the
 PDF in the store path: which lines were kept, their scores, and what was dropped.
 
+The build checks the layout, not only the compile. Each template ends with a
+`<typeset>` report — page count and how much content its last page carries — and
+`lib/typeset.nix` reads it back and fails the build when a document makes more
+pages than its budget (`pages`, `letterPages`) or leaves under 40 mm on a final
+page. A CV that spills two lines onto page two is a build error now instead of a
+file someone has to notice; the site's CVs answer to the same file.
+
 A description in German scores against an English corpus through
 `glossary.json` — *Risikomanagement* → *risk*, *Verschlüsselung* → *encryption*,
 *Schlüssel* → *key*. The list is domain words only, and a missing pair shows up as

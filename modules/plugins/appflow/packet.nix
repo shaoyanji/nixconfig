@@ -4,6 +4,9 @@
 # compiles as it always did. docs: modules/plugins/appflow/README.md
 {pkgs}: let
   lib = pkgs.lib;
+  # The rules the site's CVs answer to as well: page budget, no barely-filled last
+  # page (lib/typeset.nix).
+  typeset = import ../../../lib/typeset.nix {inherit pkgs;};
 in {
   mkPacket = {
     application,
@@ -14,9 +17,14 @@ in {
     # The page budget, not the corpus: four highlights per role and four projects
     # is about one A4 page of material.
     select ? {},
+    # Pages each document may make, exactly. The build measures the compiled
+    # document and fails on a spillover, so a budget that stops fitting is a build
+    # error instead of a second page carrying one line.
+    pages ? 1,
+    letterPages ? 1,
   }:
     pkgs.runCommand "appflow-packet-${name}" {
-      nativeBuildInputs = [pkgs.typst] ++ lib.optional (jd != null) pkgs.python3;
+      nativeBuildInputs = [pkgs.typst pkgs.jq] ++ lib.optional (jd != null) pkgs.python3;
     } ''
       mkdir -p work "$out"
       cp ${./templates}/*.typ ${./templates}/strings.json work/
@@ -46,12 +54,22 @@ in {
       }
 
       typst compile --root work work/lebenslauf.typ "$out/lebenslauf.pdf"
+      ${typeset.check {
+        source = "work/lebenslauf.typ";
+        budget = pages;
+        doc = "lebenslauf.pdf";
+      }}
       ${
         if letter == null
         then "printf 'no letter.json supplied; rendered the CV only\\n' > \"$out/README\""
         else ''
           cp ${letter} work/letter.json
           typst compile --root work work/anschreiben.typ "$out/anschreiben.pdf"
+          ${typeset.check {
+            source = "work/anschreiben.typ";
+            budget = letterPages;
+            doc = "anschreiben.pdf";
+          }}
         ''
       }
     '';

@@ -6,8 +6,10 @@
  * Not a header and not included — profiles.dwlDesktop splices this text in at
  * config.h's @EXTRA_KEYBINDS@ marker, which sits FIRST in keys[]. dwl takes the
  * first match, so an entry here shadows the fleet binding for the same chord.
- * Exactly one fleet binding is shadowed (Mod+S, the region screenshot); it keeps
- * a chord of its own at the bottom of this file rather than being lost.
+ * Two fleet bindings are shadowed, both on purpose: Mod+S (the region
+ * screenshot) and Mod+Space (the spotlight, which this session has no DMS for —
+ * the symbol menu takes its place). The screenshot keeps a chord at the bottom
+ * of this file rather than being lost.
  *
  * Two rules, because the alternative is a pile of one-off bindings:
  *

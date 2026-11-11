@@ -182,3 +182,28 @@ https://cache.nixos.org`, fleet nixpkgs):
   slot, not `/etc/profile.d`** — checked against the generated file, because the
   hook that is not read fails silently.
 
+
+## The host layer, after the 2026-11-11 rework
+
+The 21-entry keymap file and the duplicated session settings were the last bespoke
+surface on this host. What replaced them:
+
+- **One typing macro.** `hosts/netbook/dwl-keybinds.h` declares `TYPED(key, mods, ch)`
+  once and lists the dead punctuation characters as rows; each character is spelled
+  once per row instead of three times (`printf`, `wl-copy`, `wtype`). Adding one is a
+  new row, and the result is checkable in the running binary with
+  `grep -a "wl-copy; wtype" /proc/$(pgrep -x dwl)/exe`.
+- **Two fleet chords shadowed, both on purpose.** `Mod+S` types `/`, so the region
+  screenshot keeps `Mod+Alt+S`; full-screen stays `Mod+Print`. `Mod+Space` opens her
+  symbol menu instead of the spotlight, which has no DMS here to serve it.
+- **Bodies stay local.** Card, dictation and menu chords call names on the session
+  PATH (`environment.localBinInPath`), never a copy of the script inside Nix.
+- **Wallpaper in the store.** `profiles.dwlDesktop.wallpaper` is a hash-pinned
+  Cloudinary plate (`assets/wall/2026-11-11/fern.png`), so the background depends on
+  neither `$HOME` nor a mounted NAS — this machine travels without both.
+- **The host file lost what it duplicated**: pipewire, upower, the Nerd Font, `grim`,
+  `imv`, `wl-clipboard` and the polkit/libinput/cleanOnBoot defaults all come from
+  the profile or from NixOS. `configurationLimit` now matches its own comment (3).
+- **The push deploy builds a plain `.#` ref.** The staged tree has no `.git`, so Nix
+  resolves it as a `path:` flake, and Nix 2.35 rejects `?submodules=1` there — the
+  submodule content is rsynced, so the plain ref is also the correct one.

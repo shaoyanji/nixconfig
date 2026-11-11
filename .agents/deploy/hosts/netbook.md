@@ -98,15 +98,8 @@ Two layers now, and the split is the point:
   `modules/config/dwl/config.h` plus this host's dead-key layer, spliced in from
   `hosts/netbook/dwl-keybinds.h` through the profile's `extraKeybinds` — inserted
   first, because dwl takes the first match, so a host entry shadows the fleet
-  binding for the same key. Exactly one fleet binding is shadowed on purpose:
-  `Mod+S` types `/`, so the region screenshot keeps `Mod+Alt+S`, and full-screen
-  stays the fleet's `Mod+Print`. The typing mechanism is a single `TYPED()`
-  macro in that file, so a dead character is one table row rather than a third
-  copy of the `wl-copy` + `wtype` dance. Her cards, dictation and menus are
-  called by name off the session PATH (`environment.localBinInPath`), never
-  re-implemented in Nix. The wallpaper is a hash-pinned Cloudinary asset from
-  the Frieren character batch (2026-11-11), not a file under `$HOME` or on the
-  NAS — this machine travels with neither. There is **no bar and no secret
+  binding for the same key; `Mod+S` types `/`, so that shot keeps `Mod+Alt+S`,
+  and the typing mechanism is one `TYPED()` macro. There is **no bar and no secret
   service**, and that is measured rather than taste: waybar's closure is 1001 MiB
   (zenity alone is 902 MiB of it) against dwl's 345 MiB, and gnome-keyring is
   378 MiB — the table and the four verdicts are in
@@ -180,7 +173,6 @@ Traps found while trying it, worth knowing before the next attempt:
 Everything declined on this host was declined with a number: the closure table and
 the four verdicts (bar, browser, secret service, display manager) are in
 [`docs/netbook-rice-port.md`](../../../docs/netbook-rice-port.md).
-
 
 ### Staging a boot-chain change (the practiced path)
 

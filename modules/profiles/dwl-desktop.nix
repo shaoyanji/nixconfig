@@ -69,6 +69,8 @@
     ) &
   '';
 in {
+  imports = [self.modules."services.xs-notify"];
+
   options.profiles.dwlDesktop = {
     enable = lib.mkEnableOption "a dwl session with launcher and wallpaper";
 
@@ -120,6 +122,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    # A toast when an agent turn lands in the fleet log; the module is skipped
+    # where this host holds no xs token.
+    services.xsNotify.enable = true;
     programs.dwl = {
       enable = true;
       package = dwl;

@@ -655,6 +655,21 @@
       if lang == "de"
       then "heute"
       else "now";
+    # A German page titles a project in German: the translated corpus keys each
+    # entry by the English name, so the archive's English title never reaches the
+    # German CV. A project the German corpus has not translated fails the build
+    # rather than shipping a half-English page, the same rule education follows.
+    deProjects = lib.listToAttrs (
+      map (p: lib.nameValuePair (p.resumeName or p.name) p) (
+        builtins.filter (p: (p.resumeName or "") != "") lebenslaufProjects
+      )
+    );
+    # The shared key is the resume name: the archive is free to title a project
+    # its own way ("Risk calculation engine"), which the German corpus does not.
+    untranslated =
+      if lang == "de"
+      then builtins.filter (e: !(builtins.hasAttr (e.resumeName or e.name) deProjects)) joinProjects
+      else [];
   in
     d
     // {
@@ -674,18 +689,25 @@
         else education;
       work = joinWork d nowLabel;
       projects =
-        map (
-          e:
-            e
-            // {
-              summary =
-                if lang == "de"
-                then e.summaryDe or e.summary
-                else e.summary;
-              period = yearPeriod nowLabel e.start e.end;
-            }
-        )
-        joinProjects;
+        if untranslated != []
+        then throw "matt-site: no German project title for: ${lib.concatStringsSep ", " (map (e: e.name) untranslated)}"
+        else
+          map (
+            e:
+              e
+              // {
+                name =
+                  if lang == "de"
+                  then deProjects.${e.resumeName or e.name}.name
+                  else e.name;
+                summary =
+                  if lang == "de"
+                  then e.summaryDe or e.summary
+                  else e.summary;
+                period = yearPeriod nowLabel e.start e.end;
+              }
+          )
+          joinProjects;
     };
 
   # A tailored CV is a projection of the corpus for its language: the variant

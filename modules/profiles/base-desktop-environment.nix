@@ -9,8 +9,9 @@
   imports = [
     self.modules."profiles.desktop-client"
     self.modules."profiles.boot"
-    # The xs turn notifier: a session host toasts a new agent turn. Session-gated
-    # inside the module, and skipped on a machine with no xs token.
+    # The xs turn notifier is available to every host on this profile, but it is
+    # enabled by the client hosts themselves: eisen and frieren also land here and
+    # are not clients. A host that does not set the option gets no unit at all.
     self.modules."services.xs-notify"
   ];
 
@@ -21,10 +22,6 @@
         user = user.name;
       };
     };
-    # A toast when an agent turn lands in the fleet log. The module is
-    # session-gated on this profile declaring a compositor, and skipped where
-    # this host holds no xs token.
-    xsNotify.enable = true;
   };
 
   # OS keyring for secret-service clients (agy/Antigravity CLI auth tokens,

@@ -76,6 +76,10 @@ in {
   };
 
   # Tailscale: disable accepting subnet routes on Diogenes to preserve native LAN routing
+  # A toast when an agent turn lands in the fleet log. Delphi serves the log; the
+  # toast is a session-bus call, so it happens on the device with the session.
+  services.xsNotify.enable = true;
+
   services.tailscale.extraSetFlags = lib.mkForce [
     "--accept-dns=true"
     "--accept-routes=false"

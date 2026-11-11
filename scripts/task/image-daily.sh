@@ -310,10 +310,23 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
   # allowance, so waiting is the right answer and recording a failure is not.
   # Measured 2026-11-10: 26 plates in 30 minutes, then every call for the next 21
   # seconds answered RATE_LIMITED while 74 images remained.
-  local out rc=0 tries=0 wait
+  # The size in the request is not the size in the file. Read the PNG before the
+  # plate counts: a generation that ignored `-s` is deleted here and recorded as
+  # a failure, not discovered as a stripe on someone's screen. Checked before the
+  # call because a plate spent without a way to measure it is spent blind.
+  command -v ffprobe >/dev/null || die "ffprobe is required to verify a plate's size (pkgs.ffmpeg)"
+  local out rc=0 tries=0 wait got
   while :; do
     out=$(cpg image --json -s "$size" -o "$file" "$prompt" 2>&1); rc=$?
-    if [ "$rc" -eq 0 ] && [ -s "$file" ]; then break; fi
+    if [ "$rc" -eq 0 ] && [ -s "$file" ]; then
+      got=$(dimensions "$file")
+      [ "$got" = "$size" ] && break
+      rm -f "$file"
+      record "$day" "$lane" "$id" "$file" "failed" \
+        "asked for $size, got ${got:-no readable png}" "$prompt" "$n" "$rev"
+      say "$id: asked for $size, got ${got:-unreadable}; plate discarded"
+      return 1
+    fi
     if printf '%s' "$out" | grep -q '429\|RATE_LIMITED'; then
       tries=$((tries + 1))
       if [ "$tries" -gt 3 ]; then
@@ -908,7 +921,7 @@ landscape() {
   [ -n "$d" ] || return 1
   w=${d%x*}
   h=${d#*x}
-  [ "$h" -gt 0 ] && [$((w * 10 / h)) -ge 12]
+  [ "$h" -gt 0 ] && [ $((w * 10 / h)) -ge 12 ]
 }
 
 resolve_plate() {

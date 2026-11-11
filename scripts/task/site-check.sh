@@ -68,9 +68,13 @@ done
 robots=$(get /robots.txt)
 printf '%s' "$robots" | grep -q 'Sitemap:'
 verdict $? "$host/robots.txt names a sitemap"
-printf '%s' "$robots" | grep -qi '^Disallow: /$'
-[ $? -ne 0 ]
-verdict $? "$host/robots.txt does not block everything"
+# `[ $? -ne 0 ]` reads the exit status of the test it is inside, not the grep's,
+# so the old form was always 0: this line could never fail. Branch on the grep.
+if printf '%s' "$robots" | grep -qi '^Disallow: /$'; then
+  verdict 1 "$host/robots.txt blocks everything (Disallow: /)"
+else
+  verdict 0 "$host/robots.txt does not block everything"
+fi
 
 sitemap=$(get /sitemap.xml)
 printf '%s' "$sitemap" | python3 -c 'import sys, xml.dom.minidom; xml.dom.minidom.parseString(sys.stdin.read())' 2>/dev/null

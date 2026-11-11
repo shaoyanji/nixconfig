@@ -57,7 +57,8 @@ Better still: `inventory.toml` is compiled by `lib/inventory.nix` — read it wi
   asserts when fzf and atuin both bind Ctrl-R, and the message only appears at
   evaluation of the affected host's system. Pick the owner in the same module
   that enables the second one [[flake/policies.nix#one-history-widget]].
-- **A file header is one line** [[flake/policies.nix#nix-header-budget]].
+- **A file header is one line**, and rationale that is longer than that belongs
+  in `docs/` or a skill with one line pointing there.
 
 ## Build-budget traps
 
@@ -285,8 +286,7 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     answerable only by reading that module. Keep the constraint in the `.nix`
     and put the narrative in `docs/` or a skill, with one line pointing there;
     restating what Nix declares is a second home that drifts (the DSM mount's
-    `vers=4.1` lives in `modules/profiles/burgernas-client.nix`). Gate:
-    `task checks:nix:prose` — [[flake/policies.nix#nix-header-budget]].
+    `vers=4.1` lives in `modules/profiles/burgernas-client.nix`).
 13. **An inherited `PS0` prints the preexec hook at every prompt.** `bash-preexec`
     (sourced by atuin) appends to `PS0`, and bash prints whatever else `PS0` holds
     at every prompt, with `$_` expanded — so one inherited from a parent shell

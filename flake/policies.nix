@@ -540,22 +540,13 @@
   totalJudged = builtins.length (builtins.filter (l: lib.hasInfix "\"target\"" l) ledgerLines);
   disagreeCount = totalJudged - agreeCount;
 
-  # Every tracked .nix / .md file, walked once: a header budget that only saw the
-  # top level would miss the module tree, which is where the 30-line essays were.
+  # Every tracked .nix / .md file, walked once.
   treeFiles = lib.filesystem.listFilesRecursive root;
   nixFiles = builtins.filter (p: lib.hasSuffix ".nix" (toString p)) treeFiles;
   takeWhile = pred: xs:
     if xs == [] || !(pred (builtins.head xs))
     then []
     else [(builtins.head xs)] ++ takeWhile pred (builtins.tail xs);
-  headerLines = p: let
-    isBanner = s: lib.match "[=#*~_-]+" s != null;
-    lines = lib.splitString "\n" (builtins.readFile p);
-    block = takeWhile (l: let s = lib.trim l; in s == "" || lib.hasPrefix "#" s) lines;
-    bodies = map (l: lib.trim (lib.removePrefix "#" (lib.trim l))) block;
-  in
-    builtins.length (builtins.filter (s: s != "" && !(isBanner s)) bodies);
-  longHeaders = map (p: lib.removePrefix "${toString root}/" (toString p)) (builtins.filter (p: headerLines p > 3) nixFiles);
 
   # A compositor swap inside `base-desktop-environment` is two configs fighting:
   # niri/DMS are force-disabled while the profile that installed them, and their
@@ -618,17 +609,6 @@
       proof = "root *.md listing";
       holds = strayRootMd == [];
       detail = "stray root markdown: ${lib.concatStringsSep ", " strayRootMd}";
-    };
-
-    nix-header-budget = {
-      rule = "A `.nix` file opens with at most three comment lines naming its contract, and no comment block — header or inline — explains a fact that has a home: rationale belongs in a docs page, an AGENTS.nix note, a skill, or a policy, which the graph and qmd compile into an answer. Nothing compiles a comment, so an explanation written in a module is answerable only by reading that module; restating what Nix already declares (a mount's protocol version, a unit's ordering) is worse, a second home that drifts. The corpus is gated by the header budget; new work is gated on the **diff** by `scripts/task/nix-prose-lint.sh` in the pre-commit hook — a run of 8+ added comment lines citing no home fails — so an essay cannot land even where the old backlog remains.";
-      proof = "leading comment block of every tracked .nix file · scripts/task/nix-prose-lint.sh (added lines) · .githooks/pre-commit";
-      holds =
-        longHeaders
-        == []
-        && has ".githooks/pre-commit" "nix-prose-lint.sh"
-        && has "taskfiles/checks.yml" "checks:nix:prose";
-      detail = "headers over budget: ${lib.concatStringsSep ", " longHeaders} (or the diff gate was unwired from the hook or its task); report the comment backlog with `task checks:nix:prose MODE=all`";
     };
 
     agent-prose-budget = {

@@ -90,8 +90,7 @@ symlinks to it — a symlink is resolved by the *client* over NFS, where `/volum
 does not exist, so it can never split the lane.
 
 Protocol version, mount options and frieren's automount are declared in
-`hosts/frieren/configuration.nix`; this file does not restate them
-([[flake/policies.nix#nix-header-budget]]).
+`hosts/frieren/configuration.nix`; this file does not restate them.
 
 Adding a client is the one operation with **no CLI and no API** on DSM 7: `synoshare`
 has no `--setnfspriv`, `synonfs` only manages rules for existing paths, and

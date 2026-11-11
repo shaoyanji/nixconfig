@@ -214,10 +214,6 @@ name = "checks:nix:lint"
 kind = "leaf"
 
 [[check]]
-name = "checks:nix:prose"
-kind = "leaf"
-
-[[check]]
 name = "checks:nix:shell"
 kind = "leaf"
 

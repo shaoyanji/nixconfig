@@ -4826,8 +4826,8 @@
            canonical path are not rice.
 
         Documentation rule that came with this: rationale goes here or in a policy, not into comment
-        blocks in `.nix` files — `nix-header-budget` bounds headers, and the body-comment essays this run
-        produced are what the `agent-prose-budget` squeeze caught (a duplicated `tpm-sops` SKILL went so
+        blocks in `.nix` files — the body-comment essays this run produced are what the
+        `agent-prose-budget` squeeze caught (a duplicated `tpm-sops` SKILL went so
         `docs/sops-rekey.md` stays the single home).
       '';
     };

@@ -48,7 +48,10 @@ while IFS= read -r file; do
   rel=${file#"$dir"}
   page=${rel%/index.html}
   paths+=("${page:-}/")
-done < <(find "$dir" -name index.html | sort)
+# -L because $dir is the `nix build --out-link` symlink: find does not descend a
+# symlink given as its own argument, so without it this counted zero pages and
+# refused a deployment that had already succeeded.
+done < <(find -L "$dir" -name index.html | sort)
 [ "${#paths[@]}" -gt 0 ] || {
   echo "pages-deploy: $dir carries no index.html — refusing to deploy an empty artifact" >&2
   exit 1

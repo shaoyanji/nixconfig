@@ -105,16 +105,14 @@
       TYPED(${d.key}, MODKEY, ${cString d.plain}),
       TYPED(${d.key}, MODKEY | WLR_MODIFIER_SHIFT, ${cString d.shifted}),
     '')
-    deadKeys;
-
-  # The same list as a cheat sheet. Three keys per line keeps the card inside
-  # fnott's 240 px body instead of truncating the rows that matter.
-  deadKeyCells = map (d: "${d.key} ${d.plain}${d.shifted}") deadKeys;
+    deadKeys; # The same list as a cheat sheet, spelled out two keys to a line. The first
+  # version packed three keys into a cell (`y pP`), and a card you have to decode
+  # is the menu this replaced: every line now states both modifiers in words.
+  keyPair = d: "Mod+${d.key} ${d.plain}  Mod+Shift+${d.key} ${d.shifted}";
   keyTable = lib.concatStringsSep "\n" (
-    ["Dead keys: the key, then plain (Mod) and shifted (Mod+Shift)"]
-    ++ builtins.genList
-    (i: lib.concatStringsSep "   " (lib.take 3 (lib.drop (i * 3) deadKeyCells)))
-    (builtins.div (builtins.length deadKeyCells + 2) 3)
+    builtins.genList
+    (i: lib.concatStringsSep "   " (map keyPair (lib.take 2 (lib.drop (i * 2) deadKeys))))
+    (builtins.div (builtins.length deadKeys + 1) 2)
     ++ ["Vim :wq = Mod+Shift+m, w, q"]
   );
 

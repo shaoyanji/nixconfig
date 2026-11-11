@@ -105,10 +105,22 @@ tasks:
       - GC_PREFIX="{{if .GC_PREFIX}}{{.GC_PREFIX}}{{end}}" IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh gc
 
   images:wallpaper:
-    desc: Set the newest accepted wallpaper with swaybg (a dwl session's rotation)
+    desc: Set the newest in-rotation wallpaper with swaybg (a dwl session's rotation)
     summary: >
-      Picks the newest accepted plate under `published/wall` (falling back to the
-      originals), restarts swaybg on it, and prints the file name. `DRY=1` prints
-      the path instead, which is how a config can ask what it would use.
+      Picks the newest plate approved in `lib/image-daily/rotation.json`, skipping
+      everything that file rejects, restarts swaybg on it, and prints the file name.
+      `DRY=1` prints the path instead, which is how a config can ask what it would
+      use.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh wallpaper
+
+  images:rotation:
+    desc: Show the wallpapers in rotation and the rejected ones, with reasons
+    summary: >
+      Reads `lib/image-daily/rotation.json`. `in` is approval: `images:wallpaper`
+      installs the newest plate named there. `out` is a rejection and wins over
+      `in`, carrying the reason it was rejected. A plate in neither list is
+      unjudged — not rejected, just not in rotation yet.
+    cmds:
+      - >-
+        jq -r '"in rotation:", (.wall.in[] | "  " + .), "", "out of rotation:", (.wall.out | to_entries[] | "  " + .key + "  -  " + .value)' lib/image-daily/rotation.json

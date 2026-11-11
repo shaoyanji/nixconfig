@@ -12,7 +12,7 @@
 #   image-daily.sh blog [--dir PATH]
 #                             Chirpy front matter per banner, and the JPEGs copied
 #   image-daily.sh gc         destroy Cloudinary public ids nothing references
-#   image-daily.sh wallpaper  set the newest accepted wallpaper with swaybg
+#   image-daily.sh wallpaper  set the newest in-rotation wallpaper with swaybg
 #
 # WHY THIS EXISTS: the allowance is 100 images per day and it does not carry
 # over, so a day nobody spends is a day thrown away — and a queue kept in a
@@ -886,16 +886,42 @@ cmd_gc() {
   say "$n under $prefix, $gone orphan(s)"
 }
 
+# Rotation is a judgement, not a timer: `in` is approval and `out` is a rejection
+# with its reason (lib/image-daily/rotation.json). A rejected plate never rotates
+# however new it is, and a plate in neither list is unjudged rather than bad, so
+# nothing lands on a screen on the strength of its date alone. With no approval
+# list yet, the newest unrejected plate is used, which is what a lane nobody has
+# looked at gets.
 cmd_wallpaper() {
-  local newest
-  newest=$(find "$IMAGES_ROOT/published/wall" "$IMAGES_ROOT/src/wall" -name '*.png' 2>/dev/null |
-    sort -r | head -1)
-  [ -n "$newest" ] || die "no wallpaper generated yet"
-  [ "${DRY:-0}" = "1" ] && { say "$newest"; return 0; }
+  local rotation=$repo/lib/image-daily/rotation.json
+  local approved id f pick="" reason
+  approved=$(jq -r '.wall.in[]?' "$rotation" 2>/dev/null || true)
+
+  # Newest first, and published wins over the original of the same id. Sorting
+  # whole paths would put src/ above published/, because "s" > "p".
+  mapfile -t ids < <(
+    { find "$IMAGES_ROOT/published/wall" -name '*.png' 2>/dev/null | sed -E 's#.*/wall/##'
+      find "$IMAGES_ROOT/src/wall" -name '*.png' 2>/dev/null | sed -E 's#.*/wall/##'
+    } | awk '!seen[$0]++' | sort -r
+  )
+  [ "${#ids[@]}" -gt 0 ] || die "no wallpaper generated yet"
+
+  for id in "${ids[@]}"; do
+    reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
+    if [ -n "$reason" ]; then say "skipping $id: $reason"; continue; fi
+    if [ -n "$approved" ] && ! printf '%s\n' "$approved" | grep -qxF "$id"; then continue; fi
+    for f in "$IMAGES_ROOT/published/wall/$id" "$IMAGES_ROOT/src/wall/$id"; do
+      [ -f "$f" ] && { pick=$f; break; }
+    done
+    [ -n "$pick" ] && break
+  done
+  [ -n "$pick" ] || die "no plate in rotation (newest is ${ids[0]}); approve one in lib/image-daily/rotation.json"
+
+  [ "${DRY:-0}" = "1" ] && { printf '%s\n' "$pick"; return 0; }
   command -v swaybg >/dev/null || die "swaybg is not installed on this host"
   pkill -x swaybg 2>/dev/null || true
-  setsid swaybg -m fill -i "$newest" >/dev/null 2>&1 &
-  say "$(basename "$newest")"
+  setsid swaybg -m fill -i "$pick" >/dev/null 2>&1 &
+  say "$(basename "$pick")"
 }
 
 case "${1:-plan}" in

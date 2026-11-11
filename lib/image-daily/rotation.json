@@ -1,0 +1,18 @@
+{
+  "_comment": "Which wall plates may rotate onto a session, and which may not. `in` is approval: `task images:wallpaper` installs the newest plate named there. `out` is a rejection and carries the reason; it wins over `in`, so a plate in both lists never rotates. Ids are `<day>/<name>.png` under published/wall, falling back to src/wall. A plate in neither list is unjudged: not rejected, just not in rotation yet — that is how a fresh generation waits for a look instead of going straight onto a screen.",
+  "wall": {
+    "in": [
+      "2026-11-10/fjord.png",
+      "2026-11-10/night-train.png",
+      "2026-11-10/rain-glass.png",
+      "2026-11-10/ridge-fog.png",
+      "2026-11-11/eisen.png",
+      "2026-11-11/heiter.png",
+      "2026-11-11/stark.png",
+      "2026-11-11/uebel.png"
+    ],
+    "out": {
+      "2026-11-11/fern.png": "reads as Fern and Frieren mixed into one character: the hair says Frieren, the outfit says Fern. The face is the defect, not the style."
+    }
+  }
+}

@@ -98,15 +98,17 @@ Exit 0 means the set really is playing: `PLAYING  rel=0:00:04 dur=1:38:40`.
 
 ## Plex: the better path, not wired yet
 
-frieren runs Plex Media Server 1.43.4 on 32400 with a `Movies` library, and the set has a
-native Plex app — but playback cannot be driven from here yet, for three concrete reasons:
+frieren runs Plex Media Server 1.43.4 on 32400 with `Movies`/`Music`/`Photos`/`Other Videos`,
+and the set has a native Plex app. The server was **claimed on 2026-11-11** to
+`jisifu@gmail.com`: `/myplex/claim` returned 200 with `signInState="ok"`, `identity` reads
+`claimed="1"`, and the token is `PlexOnlineToken` in
+`/srv/private/plex/Plex Media Server/Preferences.xml` (`PLEX_DATADIR=/srv/private/plex`).
+Read the token from that file rather than copying it into a secret — one credential, one
+place. Claiming needs no Plex Pass; the account and the claim are both free.
 
-- the server is **unclaimed** (`curl :32400/identity` → `claimed="0"`), so there is no
-  plex.tv token, and `{{.SECRETS}}` holds no Plex key;
-- `:32400/clients` returns `size="0"` — Companion control needs the app listed there, and
-  it only registers while it is open and signed in;
-- the TV's app listens on nothing when closed (`32500`, `3005`, `8324` all refused), so
-  there is no client to address.
+What still blocks Companion playback: `/clients` now requires `?X-Plex-Token=…` and answers
+`401` without it, the list is empty until the app is open and signed in, and the set's app
+listens on nothing while closed (`32500`, `3005`, `8324` all refused).
 
 To wire it — claiming needs **no Plex Pass**, an account is free and so is the claim:
 

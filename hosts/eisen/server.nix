@@ -9,6 +9,10 @@
   services.displayManager.enable = lib.mkForce false;
   services.displayManager.sddm.enable = lib.mkForce false;
   services.displayManager.autoLogin.enable = lib.mkForce false;
+  # The DMS greeter is a greetd front-end: both have to go, or the persona still
+  # ships a login screen it can never show.
+  services.greetd.enable = lib.mkForce false;
+  programs.dms-greeter.enable = lib.mkForce false;
   services.xserver.enable = lib.mkForce false;
   systemd.defaultUnit = lib.mkForce "multi-user.target";
 
@@ -20,7 +24,6 @@
   services.displayManager.defaultSession = lib.mkOverride 10 null;
 
   # --- No shell, no games ----------------------------------------------
-  programs.ryoku.enable = lib.mkForce false; # niri session, portals, greeter theme
   programs.steam.enable = lib.mkForce false; # Steam client and the `steam` session
   programs.steam.gamescopeSession.enable = lib.mkForce false;
   programs.gamescope.enable = lib.mkForce false;

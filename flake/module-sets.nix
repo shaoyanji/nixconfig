@@ -79,12 +79,12 @@ in rec {
 
   # A host is a list of named features, not one of seven chains.
   #
-  # The `globalModules*` names were seven hand-composed lists over the same eight
-  # groups of modules, so a host that differed by one module either forked a
-  # chain or grew a file of imports. Naming the groups makes the difference data:
+  # The `globalModules*` names were hand-composed lists over the same groups of
+  # modules, so a host that differed by one module either forked a chain or grew
+  # a file of imports. Naming the groups makes the difference data:
   # `features = ["base" "nixos" "dms"]` IS the desktop chain, in that order.
   #
-  # The seven names below are derived, so `flake/host-inventory.nix` and every
+  # The names below are derived, so `flake/host-inventory.nix` and every
   # `hosts/*` file kept working unchanged — and `checks:drv-equality` shows the
   # derivation of all 30 configurations did not move.
   featureModules = {
@@ -103,20 +103,15 @@ in rec {
       inputs.nix-index-database.nixosModules.nix-index
     ];
 
-    # Dux shell. Mutually exclusive with `ryoku` by intent: one shell per
-    # session, and two Quickshell sessions must not both start.
+    # Dux shell: the compositor, greeter and Quickshell session every desktop
+    # host runs. Imported as a unit — a host that owns its own shell would be a
+    # second Quickshell session in the same compositor.
     dms = [
       inputs.dms.nixosModules.dank-material-shell
       # Greeter lives in its own repo (duxlabs-dev/dux-greeter, ex-
       # AvengeMedia/dank-greeter): option is programs.dms-greeter.
       inputs.dank-greeter.nixosModules.default
     ];
-
-    # Ryoku replaces the shell, not the system: it owns its compositor build,
-    # session packages, portals, keyring and greeter preference. A host on this
-    # feature carries `modules/profiles/ryoku-desktop.nix`, which sets
-    # `fleet.dankShell.enable = false` to keep the DMS home modules out of HM.
-    ryoku = [inputs.ryoku.nixosModules.default];
 
     impermanence = [
       moduleFiles."global.impermanence"
@@ -175,7 +170,6 @@ in rec {
   # [[flake/policies.nix#generated-not-tracked]]).
   chainFeatures = {
     globalModulesNixos = ["base" "nixos" "dms"];
-    globalModulesRyoku = ["base" "nixos" "ryoku"];
     globalModulesImpermanence = ["base" "nixos" "dms" "impermanence"];
     globalModulesMacos = ["base" "macos"];
     globalModulesContainers = ["base" "containers"];
@@ -184,7 +178,6 @@ in rec {
   };
 
   globalModulesNixos = mkHost {features = chainFeatures.globalModulesNixos;};
-  globalModulesRyoku = mkHost {features = chainFeatures.globalModulesRyoku;};
   globalModulesImpermanence = mkHost {features = chainFeatures.globalModulesImpermanence;};
   globalModulesMacos = mkHost {features = chainFeatures.globalModulesMacos;};
   globalModulesContainers = mkHost {features = chainFeatures.globalModulesContainers;};

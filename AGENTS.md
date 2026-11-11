@@ -87,7 +87,7 @@ A host registers once in `flake/host-inventory.nix` (`kind`, `system`, feature l
 `profiles.base-node`), walked in `lib/nix-files.nix`; chains, hosts and modules name every import
 (`self.modules."profiles.base-node"`), and `nix-registry` proves one name per file.
 
-A host is a **feature list** (`base`, `nixos`, `dms`, `ryoku`, `containers`, `impermanence`,
+A host is a **feature list** (`base`, `nixos`, `dms`, `containers`, `impermanence`,
 `macos`, `demo`, `home`), concatenated in order by `mkHost`; the seven `globalModules*` names are
 derived aliases. The user role is a second feature list (`fleet.hmUserFeatures`: `systemd-policy`,
 `shell`, `dev`, `ai`, `browser`, `media`, `desktop`) whose imports are taken or skipped as a whole,

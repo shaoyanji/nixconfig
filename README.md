@@ -20,8 +20,8 @@ Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style containe
 
 ## Module chains
 
-The chains themselves (`globalModulesNixos`, `globalModulesRyoku`,
-`globalModulesImpermanence`, `globalModulesContainers`, `globalModulesMacos`,
+The chains themselves (`globalModulesNixos`, `globalModulesImpermanence`,
+`globalModulesContainers`, `globalModulesMacos`,
 `globalModulesHome`, `globalModulesDemo`) are defined in
 [`flake/module-sets.nix`](flake/module-sets.nix) and tabulated — with the hosts
 that use each — in [`AGENTS.md`](AGENTS.md) §Module Chains. That table is
@@ -74,8 +74,7 @@ Add an entry to `flake/host-inventory.nix`:
 ```
 
 Pick the right module chain; membership is `inventory.toml`, not this list:
-- `globalModulesRyoku` — high-end desktop: Ryoku shell on niri, Ryoku SDDM greeter
-- `globalModulesNixos` — medium desktop: Dux shell (DMS) with greetd/niri
+- `globalModulesNixos` — desktop: Dux shell (DMS) with greetd/niri
 - `globalModulesImpermanence` — desktop + impermanence + disko
 - `globalModulesContainers` — headless server (no desktop) — most common for servers
 - `globalModulesMacos` — nix-darwin on macOS

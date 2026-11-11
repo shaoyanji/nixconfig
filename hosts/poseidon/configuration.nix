@@ -19,12 +19,9 @@ in {
     ./hardware-configuration.nix
     ./nvidia.nix
     self.modules."profiles.steam"
-    # Ryoku is the high-end desktop tier (2026-11-02). It replaces
-    # base-desktop-environment: Ryoku owns the compositor build, the session
-    # packages, the portals and the SDDM theme, so importing both would put two
-    # shells in one session and let this profile's mkForce'd portal config win
-    # over Ryoku's.
-    self.modules."profiles.ryoku-desktop"
+    # The fleet desktop baseline: Dux shell on niri, greetd. The Ryoku tier that
+    # replaced it from 2026-11-02 to 2026-11-11 is retired.
+    self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"
   ];
 
@@ -117,16 +114,22 @@ in {
 
   services.udev.packages = [];
 
-  # --- Desktop: Ryoku (high-end tier) ---
-  # No SDDM setting here: with no other greeter enabled, Ryoku turns SDDM on
-  # (mkDefault) and owns its theme, and `defaultCompositor = "niri"` in the
-  # profile picks the `ryoku-niri` session.
-  #
-  # Login stays automatic, as it was under the DMS greeter this replaces — the
-  # Ryoku greeter is what you get after a logout.
+  # --- Desktop: Dux (DMS on niri, greetd) ---
+  # Autologin into the niri session is what makes this a workstation rather than
+  # a login screen; a logout lands on the DMS greeter.
+  services.displayManager.sddm = {
+    enable = false;
+    wayland.enable = true;
+  };
   services.displayManager.autoLogin = {
     enable = true;
     user = user.name;
+  };
+
+  programs.dms-greeter = {
+    enable = true;
+    compositor.name = "niri";
+    configHome = user.home; # Sync themes with the user's DankMaterialShell config
   };
 
   networking.firewall = {

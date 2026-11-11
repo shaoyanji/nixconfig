@@ -270,13 +270,6 @@ task infra:update:fleet                # flake update → warm → apply
 task checks:build:route                # would THIS host compile? (HTTP only)
 ```
 
-A cache that belongs to one desktop is declared by that desktop's own module —
-Ryoku's adds `ryotunes.cachix.org` — and the host profile only states the flag
-(`programs.ryoku.binaryCache.enable`). Repeating the URL in `nix.settings` lists
-the cache twice and hides its owner; a host whose generation predates the flag
-keeps compiling the client from source until it switches again.
-[[flake/policies.nix#desktop-cache-declared-once]]
-
 ### Backup verification
 
 ```bash

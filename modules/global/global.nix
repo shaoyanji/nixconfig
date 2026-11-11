@@ -142,7 +142,7 @@ in {
     # A cache listed twice is a second declaration, not redundancy: the module
     # that already owns it is invisible from `nix.conf`, and the duplicate was
     # written because the existing value was never evaluated. Cheap per host
-    # because the list is already forced. [[flake/policies.nix#desktop-cache-declared-once]]
+    # because the list is already forced.
     assertions = let
       subs = config.nix.settings.substituters;
     in

@@ -276,10 +276,10 @@ Failure modes that do not exist on an FHS distro, in the order they cost time:
     portal/keyring stack installed behind whatever WM you added; the session
     changes and nothing it opens does. Fork the profile and the HM module list
     instead — enforced by [[flake/policies.nix#desktop-fork-not-disable]], which
-    also catches dropping infrastructure the profile carried. That fork is
-    `modules/profiles/ryoku-desktop.nix`: it imports `desktop-client` and declares
-    nothing `programs.ryoku` supplies, and settles the two daemons that cannot
-    coexist with it (auto-cpufreq forced off, gnome-keyring's PAM wiring kept).
+    also catches dropping infrastructure the profile carried. The fork is a
+    profile under `modules/profiles/` that imports `desktop-client` and declares
+    its own session (`dwl-desktop.nix` is the live example); it leaves
+    `base-desktop-environment` unimported rather than disabling what it sets.
 12. **A comment is not a home for a fact.** Nothing compiles a `#` block:
     `.#knowledgeGraph`, qmd and the skills index are built from `docs/*.md`,
     `.agents/skills/*` and the registry, so an explanation inside a module is

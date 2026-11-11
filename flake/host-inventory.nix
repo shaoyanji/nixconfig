@@ -16,7 +16,6 @@
     globalModulesImpermanence
     globalModulesMacos
     globalModulesNixos
-    globalModulesRyoku
     # The microVM hosts below build their own module list instead of using a
     # global chain, so they take the inventory injection explicitly. Without it
     # they have no `config.fleet.inventory`; `checks.<system>.inventory-modules`
@@ -39,11 +38,9 @@ in {
   poseidon = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Ryoku is the high-end desktop tier (2026-11-02): the chain carries
-    # inputs.ryoku instead of dms/dank-greeter, and the host imports
-    # ryoku-desktop.nix, which sets `fleet.dankShell.enable = false` to keep the
-    # DMS home modules out of HM.
-    modules = globalModulesRyoku ++ [../hosts/poseidon/configuration.nix];
+    # The fleet desktop chain. The host imports base-desktop-environment itself;
+    # the Ryoku tier it ran from 2026-11-02 to 2026-11-11 is retired.
+    modules = globalModulesNixos ++ [../hosts/poseidon/configuration.nix];
   };
 
   mtfuji = {
@@ -110,9 +107,7 @@ in {
     system = "x86_64-linux";
     # Role/hardware/history are COMPILED, not commented: inventory.toml
     # `[hosts.eisen] notes`, surfaced by `task dev:inventory:feed`.
-    # Ryoku is the high-end desktop tier (2026-11-02): the chain carries
-    # inputs.ryoku instead of dms/dank-greeter.
-    modules = globalModulesRyoku ++ [../hosts/eisen/configuration.nix];
+    modules = globalModulesNixos ++ [../hosts/eisen/configuration.nix];
   };
 
   applevalley = {

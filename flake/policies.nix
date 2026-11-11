@@ -1205,18 +1205,6 @@
       holds = has "modules/global/global.nix" "\"pipe-operators\"";
       detail = "modules/global/global.nix dropped pipe-operators";
     };
-
-    desktop-cache-declared-once = {
-      rule = "A desktop's binary cache has ONE declaration: the desktop's own module. The host profile states the enable flag explicitly, because a default is upstream's to flip, and never repeats the URL in `nix.settings` — a second declaration lists the cache twice in `nix.conf` and hides which module actually owns it.";
-      proof = "modules/profiles/ryoku-desktop.nix (programs.ryoku.binaryCache.enable) · Ryoku's own `cfg.binaryCache.enable`, which adds `ryotunes.cachix.org`";
-      # The ASSIGNMENT, not the mention: naming the cache while explaining why the
-      # module owns it is the point, assigning `substituters` here is the fault.
-      holds =
-        has "modules/profiles/ryoku-desktop.nix" "binaryCache.enable = true"
-        && !(has "modules/profiles/ryoku-desktop.nix" "substituters =")
-        && !(has "modules/profiles/ryoku-desktop.nix" "nix.settings");
-      detail = "the Ryoku profile stopped stating its cache flag, or re-declared the cache address beside the module that already owns it";
-    };
   };
 
   ids = builtins.attrNames policies;

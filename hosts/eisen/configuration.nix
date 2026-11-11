@@ -11,12 +11,9 @@ in {
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
     self.modules."profiles.steam"
-    # Ryoku is the high-end desktop tier (2026-11-02). It replaces
-    # base-desktop-environment: Ryoku owns the compositor build, the session
-    # packages, the portals and the SDDM theme, so importing both would put two
-    # shells in one session and let this profile's mkForce'd portal config win
-    # over Ryoku's.
-    self.modules."profiles.ryoku-desktop"
+    # The fleet desktop baseline: Dux shell on niri, greetd. The Ryoku tier that
+    # replaced it from 2026-11-02 to 2026-11-11 is retired.
+    self.modules."profiles.base-desktop-environment"
     self.modules."profiles.base-node"
     self.modules."profiles.nas-client"
     self.modules."profiles.sunshine"
@@ -29,21 +26,26 @@ in {
     ./strata.nix
   ];
 
-  # --- Desktop: Ryoku (high-end tier) ---
-  # No SDDM setting here: with no other greeter enabled, Ryoku turns SDDM on
-  # (mkDefault) and owns its theme, and `defaultCompositor = "niri"` in the
-  # profile picks the `ryoku-niri` session.
-  #
+  # --- Desktop: Dux (DMS on niri) + gamescope ---
+  # The greeter is the DMS one the rest of the fleet runs: greetd's initial
+  # session is the gamescope kiosk, and a logout lands on the DMS login screen.
+  services.displayManager.sddm = {
+    enable = false;
+    wayland.enable = true;
+  };
   # Autologin: boot straight into Steam Big Picture under gamescope-session so
   # Steam Link / Moonlight work with zero interaction after power-on.
   services.displayManager.autoLogin = {
     enable = true;
     user = user.name;
   };
-  # Ryoku pins its own session at priority 900 (`ryoku-niri`). This host's
-  # first session is gamescope, so the pin has to be overridden rather than
-  # merely set — a plain definition loses to it.
-  services.displayManager.defaultSession = lib.mkForce "steam";
+  services.displayManager.defaultSession = "steam";
+
+  programs.dms-greeter = {
+    enable = true;
+    compositor.name = "niri";
+    configHome = user.home; # Sync themes with the user's DankMaterialShell config
+  };
 
   # --- Steam under gamescope ---
   # The RX 5700's modern Vulkan ICD fully supports gamescope's compositor
@@ -68,7 +70,7 @@ in {
   ];
 
   # --- Boot persona: gaming desktop by default, inference server on demand ---
-  # This file is the boot default (Ryoku + gamescope). `specialisation.server`
+  # This file is the boot default (Dux + gamescope). `specialisation.server`
   # (server.nix) is the TTY-only persona: no greeter, no compositor, no Steam,
   # nothing competing with the model for the card. It ships in the same generation, so
   # the systemd-boot menu has it and `nixos-rebuild switch --specialisation

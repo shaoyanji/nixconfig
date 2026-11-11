@@ -139,12 +139,6 @@
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Ryoku desktop pilot (fern). Deliberately no `nixpkgs.follows`: the port
-    # keeps its own fixed package universe (ryokuPackagesNixpkgs) so Hyprland
-    # plugin ABI and its QML stack stay matched to Ryoku, not to our nixpkgs.
-    ryoku = {
-      url = "github:Ryoku-dev/Ryoku-on-NixOS";
-    };
     microvm = {
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -37,8 +37,8 @@ in {
     # `config` and recurses); niri.nix gates its own body with mkIf on Linux,
     # because a Wayland compositor has no aarch64-darwin counterpart and its
     # swayidle dependency is not packaged for darwin — which failed EVALUATION,
-    # not just the build, on cassini. A Ryoku host owns the compositor, so it
-    # drops the feature rather than redefining the same options twice.
+    # not just the build, on cassini. A host that owns its own compositor drops
+    # the feature rather than redefining the same options twice.
     ++ when "desktop" ([self.modules."user.desktop.suite"] ++ lib.optionals dankShell [self.modules."user.desktop.niri"]);
 
   # `optionalAttrs`, not `mkIf`: `selectorDaemon` is declared by a module the

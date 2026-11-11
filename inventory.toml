@@ -296,7 +296,7 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "Primary High-Performance Laptop Workstation"
 category = "workstation"
-desktop_environment = "Ryoku desktop (niri compositor, Ryoku SDDM greeter) — high-end tier"
+desktop_environment = "Dux desktop (DMS shell on niri, greetd autologin)"
 users = ["devji"]
 
 [hosts.poseidon.hardware]
@@ -313,9 +313,9 @@ tailscale_hostname = "poseidon"
 ssh_alias = "poseidon"
 
 [hosts.poseidon.software]
-module_chain = "globalModulesRyoku"
+module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Ryoku desktop shell (quickshell) on the niri compositor", "Ryoku SDDM greeter", "Steam (full gaming suite)", "Ollama (CUDA acceleration with lfm2.5)", "NVIDIA proprietary drivers (open kernel module)", "NAS client automount"]
+key_services = ["Dux desktop shell (DMS/quickshell) on the niri compositor", "greetd autologin into the niri session", "Steam (full gaming suite)", "Ollama (CUDA acceleration with lfm2.5)", "NVIDIA proprietary drivers (open kernel module)", "NAS client automount"]
 traits = ["flagship-workstation", "cuda-compute", "laptop-profile", "optimus-prime", "dual-gpu", "niri-desktop", "steam-gaming", "ai-full", "dev-full", "tpm-identity"]
 
 [hosts.poseidon.persona]
@@ -371,9 +371,9 @@ kind = "nixos"
 arch = "x86_64-linux"
 role = "High-Core Gaming Desktop, Sunshine Stream Server & Offline LLM + Decision-Model Node"
 category = "workstation"
-desktop_environment = "Ryoku desktop (niri compositor) / Gamescope Session — high-end tier; the `server` specialisation is TTY-only (no greeter, compositor, Steam or Sunshine)"
+desktop_environment = "Dux desktop (DMS shell on niri) / Gamescope Session; the `server` specialisation is TTY-only (no greeter, compositor, Steam or Sunshine)"
 users = ["devji"]
-notes = ["Converted from a cage-based Steam kiosk into a full desktop (poseidon-style); since 2026-11-02 the Ryoku tier: globalModulesRyoku brings in the Ryoku shell on niri plus the sops/nix-index HM modules.", "Steam runs under the upstream gamescope-session, which is safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's Kepler card).", "History: the previous cage-kiosk specialisation and greetd dual-session experiments hung at graphical.target, so the DMS greeter path (as on poseidon) is used instead of greetd auto-login.", "Boot personas since 2026-11-03: the default generation is the gaming desktop; hosts/eisen/server.nix is `specialisation.server`, a TTY-only inference persona (no greeter, compositor, gamescope, Steam, Sunshine or gaming guard, and no forced HDMI-A-1 mode) that frees the desktop's idle VRAM and RAM for expert slots and page cache. Picked from the systemd-boot menu or `nixos-rebuild switch --specialisation server`; procedure in .agents/deploy/hosts/eisen.md."]
+notes = ["Converted from a cage-based Steam kiosk into a full desktop (poseidon-style); on the fleet Dux chain (globalModulesNixos: DMS shell on niri) since 2026-11-11, after the Ryoku tier was retired.", "Steam runs under the upstream gamescope-session, which is safe on the RX 5700's modern Vulkan ICD (unlike kellerbench's Kepler card).", "History: the cage-kiosk specialisation and greetd dual-session experiments hung at graphical.target; the desktop now logs in through the fleet-standard greetd autologin (base-desktop-environment), as every Dux host does.", "Boot personas since 2026-11-03: the default generation is the gaming desktop; hosts/eisen/server.nix is `specialisation.server`, a TTY-only inference persona (no greeter, compositor, gamescope, Steam, Sunshine or gaming guard, and no forced HDMI-A-1 mode) that frees the desktop's idle VRAM and RAM for expert slots and page cache. Picked from the systemd-boot menu or `nixos-rebuild switch --specialisation server`; procedure in .agents/deploy/hosts/eisen.md."]
 
 [hosts.eisen.hardware]
 model = "Custom Multi-Core Gaming Rig"
@@ -391,9 +391,9 @@ lan_ip = "192.168.3.91"
 mac = "00:e0:22:1c:bb:ed"
 
 [hosts.eisen.software]
-module_chain = "globalModulesRyoku"
+module_chain = "globalModulesNixos"
 impermanence = false
-key_services = ["Ryoku desktop shell (quickshell) on the niri compositor", "Ryoku SDDM greeter", "Steam (gamescope-session)", "Sunshine GameStream server (Moonlight LAN host)", "RX 5700 VCN 2.0 hardware video encode", "NAS client automount", "llama-swap model router on :8080 (OpenAI /v1 via nginx on eisen.lan:80 and tailscale serve; model 'qwen' = qwen3.6-35b-a3b)", "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM", "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit", "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture", "Laya decision model (421M, CPU-only) on 127.0.0.1:8090 behind nginx on laya.lan:80 and tailscale serve :8443, exposing the Jev-compatible POST /v1/systemone (choice/score/noul) — holds no VRAM, so it keeps answering while a game runs"]
+key_services = ["Dux desktop shell (DMS/quickshell) on the niri compositor", "greetd autologin (desktop persona)", "Steam (gamescope-session)", "Sunshine GameStream server (Moonlight LAN host)", "RX 5700 VCN 2.0 hardware video encode", "NAS client automount", "llama-swap model router on :8080 (OpenAI /v1 via nginx on eisen.lan:80 and tailscale serve; model 'qwen' = qwen3.6-35b-a3b)", "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM", "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit", "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture", "Laya decision model (421M, CPU-only) on 127.0.0.1:8090 behind nginx on laya.lan:80 and tailscale serve :8443, exposing the Jev-compatible POST /v1/systemone (choice/score/noul) — holds no VRAM, so it keeps answering while a game runs"]
 traits = ["12-core-24-thread", "64gb-ram", "amd-gpu", "sunshine-streaming", "steam-gaming", "llm-inference", "llm-model-router", "moe-expert-offload", "speculative-decoding", "game-aware-yield", "vulkan-compute", "decision-model", "jev-compatible", "cpu-inference", "ai-full", "dev-full"]
 
 [hosts.eisen.persona]

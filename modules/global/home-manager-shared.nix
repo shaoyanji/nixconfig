@@ -7,9 +7,9 @@
   ...
 }: {
   # A second Wayland shell cannot share a session with DMS: whichever starts
-  # last owns the bar, lock and notification surfaces. Ryoku hosts turn this
-  # off, which also drops `user/desktop/niri.nix` (see roles/home.nix) — the
-  # `imports` fork is an option here, never an mkForce.
+  # last owns the bar, lock and notification surfaces. A host that owns its own
+  # shell turns this off, which also drops `user/desktop/niri.nix` (see
+  # roles/home.nix) — the `imports` fork is an option here, never an mkForce.
   options.fleet.dankShell.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;

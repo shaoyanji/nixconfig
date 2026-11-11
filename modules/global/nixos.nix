@@ -47,7 +47,7 @@
         inherit inputs self;
         fleetHost = config.networking.hostName;
         # Lets a home module choose its imports by shell capability instead of
-        # mkForce-ing inside a role (see `roles/home.nix`, Ryoku pilot).
+        # mkForce-ing inside a role (see `roles/home.nix`).
         dankShell = config.fleet.dankShell.enable;
         # Same mechanism for the role's feature list: an import decision, taken
         # before `config` exists inside the HM module system.

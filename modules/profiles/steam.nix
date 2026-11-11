@@ -74,9 +74,9 @@
         fi
       fi
 
-      # 2. Trigger return to Gamescope through the display manager's autologin:
-      #    greetd on the Dux tier, sddm on the Ryoku tier (2026-11-02). A
-      #    greetd-only check made this a no-op on a host whose greeter is SDDM.
+      # 2. Trigger return to Gamescope through the display manager's autologin.
+      #    greetd is the Dux tier's greeter; the loop still covers sddm because a
+      #    greetd-only check silently no-opped on a host whose greeter was not.
       dm_restarted=0
       for dm in greetd sddm; do
         if systemctl is-active --quiet "$dm.service" 2>/dev/null; then

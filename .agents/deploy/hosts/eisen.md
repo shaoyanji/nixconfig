@@ -224,9 +224,9 @@ download.
 
 ## Boot personas: gaming desktop (default) and `server`
 
-The default generation is the Ryoku/gamescope desktop. `hosts/eisen/server.nix` is
+The default generation is the Dux/gamescope desktop. `hosts/eisen/server.nix` is
 `specialisation.server`: the same system with the whole display stack subtracted —
-no SDDM, no niri/Ryoku, no gamescope, no Steam, no Sunshine, no gaming guard, and
+no greeter, no niri/DMS, no gamescope, no Steam, no Sunshine, no gaming guard, and
 no `video=HDMI-A-1:1920x1080@60` (that mode exists only so gamescope has a known
 output; the persona writes to the console and does not care whether anything is
 plugged in). It exists because the desktop holds ~450–500 MiB of VRAM at idle

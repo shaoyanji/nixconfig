@@ -72,8 +72,8 @@
         # The route is a REPO-WIDE search on purpose. "Ryoku ships no cache" was
         # answered from one fetch of its flake.nix, where nixConfig would have
         # listed it — but the substituter is declared in a module and in the
-        # installer, so the answer was wrong and the host's actual value
-        # (`programs.ryoku.binaryCache.enable = true`) went unchecked. A search
+        # installer, so the answer was wrong and the host's real value (the
+        # retired Ryoku profile's `binaryCache.enable`) went unchecked. A search
         # across the repository costs one request and cannot miss a module.
         "repo-search" = {
           how = "gh api -X GET search/code -f q='<term> repo:<owner>/<repo>' — then read the file at the rev that matched";

@@ -142,8 +142,8 @@ in {
         pkgs.slurp
         pkgs.swayidle
         pkgs.waylock
-        # wl-copy + wtype are the pair a dead-key workaround needs: copy for
-        # paste-anywhere, wtype to synthesize the character into the focused window.
+        # wl-copy is what the screenshot chords pipe grim into; wtype is what a
+        # host's dead-key layer types a character with.
         pkgs.wl-clipboard
         pkgs.wmenu
         pkgs.wtype

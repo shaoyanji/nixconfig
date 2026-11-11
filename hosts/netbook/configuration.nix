@@ -15,9 +15,11 @@
   # The wallpaper: a hash-pinned store path, so the background is there before
   # the NAS mounts and survives a reorganised ~/Pictures. A newer plate is a
   # one-line URL + hash change; the bank's manifest is published/urls.tsv.
-  fernWallpaper = pkgs.fetchurl {
-    url = "https://res.cloudinary.com/de1eajx01/image/upload/assets/wall/2026-11-11/fern.png";
-    sha256 = "11m1bc8aw4cy9ap3lrswbqnlnv013jdxcbp6nlqfy6dim6r47xlp";
+  # A scene rather than a character portrait: `swaybg -m fill` crops to
+  # 1024x600, and a cropped face on a panel this small reads as a mistake.
+  fjordWallpaper = pkgs.fetchurl {
+    url = "https://res.cloudinary.com/de1eajx01/image/upload/assets/wall/2026-11-10/fjord.png";
+    sha256 = "1ypnr30mgx6fbs6xwy7hxifzw1x05sfiwxpf0zl6adqqfswq2qgv";
   };
 in {
   users.users.root.openssh.authorizedKeys.keys = [deployKey];
@@ -209,9 +211,9 @@ in {
     user = "alice";
     # A 1024x600 panel: the profile's default 11 is two rows of text short.
     font = "JetBrainsMono NFM:size=9";
-    # The store copy of `fernWallpaper` above: `swaybg -m fill` crops the 4k
-    # plate to this 1024x600 panel, with no dependency on $HOME or the NAS.
-    wallpaper = "${fernWallpaper}";
+    # The store copy of `fjordWallpaper` above, with no dependency on $HOME or
+    # on the NAS being mounted.
+    wallpaper = "${fjordWallpaper}";
     # Their keyboard's ribbon connector is broken, so this is the workaround
     # layer for the dead keys, spliced into the fleet keymap ahead of it (first
     # match wins). The file explains itself; `extraKeybinds` in the profile owns

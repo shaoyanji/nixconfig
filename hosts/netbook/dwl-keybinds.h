@@ -1,47 +1,73 @@
 /*
- * The netbook's accessibility layer: this keyboard lost P and most of the
- * punctuation cluster to a broken ribbon connector, so these entries borrow
- * keys that still work.
+ * The netbook's dead-key layer: this keyboard's ribbon connector is broken, so
+ * `p`, `0` and the right-hand punctuation never reach the compositor. Every
+ * entry below rents a key that still works.
  *
  * Not a header and not included — profiles.dwlDesktop splices this text in at
  * config.h's @EXTRA_KEYBINDS@ marker, which sits FIRST in keys[]. dwl takes the
  * first match, so an entry here shadows the fleet binding for the same chord.
- * Two fleet bindings are shadowed, both on purpose: Mod+S (the region
- * screenshot) and Mod+Space (the spotlight, which this session has no DMS for —
- * the symbol menu takes its place). The screenshot keeps a chord at the bottom
- * of this file rather than being lost.
+ * One fleet binding is shadowed, on purpose: Mod+S types `/`, so the region
+ * screenshot keeps Mod+Alt+S at the bottom of this file. Mod+Space is not bound
+ * here, so the fleet spotlight answers it again.
  *
- * Two rules, because the alternative is a pile of one-off bindings:
+ * One rule, so this is a thing to learn rather than twenty things:
  *
- *   1. One mechanism per meaning. TYPED() is the only place that knows how a
- *      dead character reaches a window: it copies first, so a client that
- *      refuses synthetic input still leaves the character pasteable.
- *   2. Chords live here; bodies live with alice. Every command below is a name
- *      on the session PATH — `environment.localBinInPath` puts ~/.local/bin
- *      there, and the dotfiles and ~/mako-suite installers fill it. The HUD
- *      cards are that same rule: they are her six scripts, and they speak
- *      fnott (the session's notifier) since the 2026-10-27 port.
+ *   Mod+<key>        types the dead key's plain character
+ *   Mod+Shift+<key>  types its shifted character
+ *
+ * The rented key sits as close to the lost one as the layout allows: z for 0,
+ * m for ;, n for -, u for =, c for [, o for ], b for \, s for /, x for ', v for
+ * the backquote, and g for the parenthesis pair. Vim's `:wq` is Mod+Shift+m,
+ * then w, then q.
+ *
+ * There is no menu. The layer this replaces opened wmenu, sent a fnott card,
+ * copied the character to the clipboard twice and slept before typing — so a
+ * `:` in a vim command was three keystrokes and a stall — and its list carried
+ * neither parenthesis. Here the body is one `wtype -- '<char>'`: the character
+ * lands at once, and the clipboard is left alone.
+ *
+ * Her own tools stay names on the session PATH (`environment.localBinInPath`):
+ * the six mako-suite HUD cards, dictation, the agent and the QR transfer. Their
+ * bodies live with alice; this file only names them.
  */
 
 /* Chord -> character. The macro writes the quoting once, so a character is
- * spelled once instead of three times, and adding one is a single table row. */
+ * spelled once per row instead of three times (`printf`, `wl-copy`, `wtype`),
+ * and adding one is a single row. */
 #define TYPED(key, mods, ch) \
-	{mods, XKB_KEY_##key, spawn, SHCMD("printf '" ch "' | wl-copy; wtype -- '" ch "'")}
+	{mods, XKB_KEY_##key, spawn, SHCMD("wtype -- '" ch "'")}
 
-/* The punctuation cluster, on letters that still send events. */
+/* The punctuation the connector lost: plain on Mod, shifted on Mod+Shift, the
+ * way the original key carried its pair. */
 TYPED(s, MODKEY, "/"),
 TYPED(s, MODKEY | WLR_MODIFIER_SHIFT, "?"),
 TYPED(n, MODKEY, "-"),
 TYPED(n, MODKEY | WLR_MODIFIER_SHIFT, "_"),
 TYPED(z, MODKEY, "0"),
+TYPED(z, MODKEY | WLR_MODIFIER_SHIFT, ")"),
 TYPED(m, MODKEY, ";"),
 TYPED(m, MODKEY | WLR_MODIFIER_SHIFT, ":"),
-TYPED(b, MODKEY, "\\\\"),
+TYPED(b, MODKEY, "\\"),
+TYPED(b, MODKEY | WLR_MODIFIER_SHIFT, "|"),
+TYPED(u, MODKEY, "="),
+TYPED(u, MODKEY | WLR_MODIFIER_SHIFT, "+"),
+TYPED(c, MODKEY, "["),
+TYPED(c, MODKEY | WLR_MODIFIER_SHIFT, "{"),
+TYPED(o, MODKEY, "]"),
+TYPED(o, MODKEY | WLR_MODIFIER_SHIFT, "}"),
+TYPED(g, MODKEY, "("),
+TYPED(g, MODKEY | WLR_MODIFIER_SHIFT, ")"),
+TYPED(v, MODKEY, "`"),
+TYPED(v, MODKEY | WLR_MODIFIER_SHIFT, "~"),
+TYPED(y, MODKEY, "p"),
+TYPED(y, MODKEY | WLR_MODIFIER_SHIFT, "P"),
+/* The apostrophe half of that pair cannot go through the macro: a single quote
+ * inside a single-quoted shell word has no escape, so this row is written out. */
+{MODKEY, XKB_KEY_x, spawn, SHCMD("wtype -- \"'\"")},
+TYPED(x, MODKEY | WLR_MODIFIER_SHIFT, "\""),
 
-/* Her own tools, by name: the symbol menu on Mod+Space, the QR transfer on
- * Mod+Shift+Space, dictation on Caps_Lock alone and on Mod+grave, the agent on
- * Mod+Caps_Lock. */
-{MODKEY, XKB_KEY_space, spawn, SHCMD("quick-keys.sh")},
+/* Her own tools, by name: the QR transfer on Mod+Shift+Space, dictation on
+ * Caps_Lock alone and on Mod+grave, the agent on Mod+Caps_Lock. */
 {MODKEY | WLR_MODIFIER_SHIFT, XKB_KEY_space, spawn, SHCMD("qr-sync")},
 {0, XKB_KEY_Caps_Lock, spawn, SHCMD("voice-dictate.sh")},
 {MODKEY, XKB_KEY_grave, spawn, SHCMD("voice-dictate")},

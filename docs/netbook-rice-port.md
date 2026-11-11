@@ -185,22 +185,27 @@ https://cache.nixos.org`, fleet nixpkgs):
 
 ## The host layer, after the 2026-11-11 rework
 
-The 21-entry keymap file and the duplicated session settings were the last bespoke
+The bespoke keymap and the duplicated session settings were the last hand-made
 surface on this host. What replaced them:
 
-- **One typing macro.** `hosts/netbook/dwl-keybinds.h` declares `TYPED(key, mods, ch)`
-  once and lists the dead punctuation characters as rows; each character is spelled
-  once per row instead of three times (`printf`, `wl-copy`, `wtype`). Adding one is a
-  new row, and the result is checkable in the running binary with
-  `grep -a "wl-copy; wtype" /proc/$(pgrep -x dwl)/exe`.
-- **Two fleet chords shadowed, both on purpose.** `Mod+S` types `/`, so the region
-  screenshot keeps `Mod+Alt+S`; full-screen stays `Mod+Print`. `Mod+Space` opens her
-  symbol menu instead of the spotlight, which has no DMS here to serve it.
-- **Bodies stay local.** Card, dictation and menu chords call names on the session
+- **One chord per dead character.** `hosts/netbook/dwl-keybinds.h` declares
+  `TYPED(key, mods, ch)` once and rents a living key for each character the broken
+  ribbon connector lost. `Mod+<key>` gives the plain character and `Mod+Shift+<key>`
+  its shifted pair: `Mod+m` is `;`, `Mod+Shift+m` is `:`, `Mod+g`/`Mod+Shift+g` are
+  `(`/`)`, `Mod+z`/`Mod+Shift+z` are `0`/`)`. Vim's `:wq` is two chords, not a menu.
+- **The menu is gone.** The layer this replaced opened `wmenu`, sent a fnott card,
+  copied the character with `wl-copy` twice and slept before typing, and its list
+  carried neither parenthesis. The body is one `wtype -- '<char>'` now, the clipboard
+  is untouched, and `Mod+Space` is the fleet spotlight again. What the binary carries
+  is checkable: `grep -ao "wtype -- '[^']*'" /proc/$(pgrep -x dwl)/exe | sort -u`.
+- **One fleet chord is still shadowed.** `Mod+S` types `/`, so the region screenshot
+  keeps `Mod+Alt+S`; full-screen stays `Mod+Print`.
+- **Bodies stay local.** Card, dictation and QR chords call names on the session
   PATH (`environment.localBinInPath`), never a copy of the script inside Nix.
 - **Wallpaper in the store.** `profiles.dwlDesktop.wallpaper` is a hash-pinned
-  Cloudinary plate (`assets/wall/2026-11-11/fern.png`), so the background depends on
-  neither `$HOME` nor a mounted NAS — this machine travels without both.
+  Cloudinary plate (`assets/wall/2026-11-10/fjord.png`) — a scene rather than a
+  character portrait, because `swaybg -m fill` crops hard to 1024x600 — so the
+  background depends on neither `$HOME` nor a mounted NAS.
 - **The host file lost what it duplicated**: pipewire, upower, the Nerd Font, `grim`,
   `imv`, `wl-clipboard` and the polkit/libinput/cleanOnBoot defaults all come from
   the profile or from NixOS. `configurationLimit` now matches its own comment (3).

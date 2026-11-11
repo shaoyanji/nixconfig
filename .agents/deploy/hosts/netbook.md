@@ -98,8 +98,9 @@ Two layers now, and the split is the point:
   `modules/config/dwl/config.h` plus this host's dead-key layer, spliced in from
   `hosts/netbook/dwl-keybinds.h` through the profile's `extraKeybinds` — inserted
   first, because dwl takes the first match, so a host entry shadows the fleet
-  binding for the same key; `Mod+S` types `/`, so that shot keeps `Mod+Alt+S`,
-  and the typing mechanism is one `TYPED()` macro. There is **no bar and no secret
+  binding for the same key; `Mod+S` types `/`, so that shot keeps `Mod+Alt+S`.
+  Dead keys are one `TYPED()` chord each, typed by a single `wtype`: no menu, no
+  clipboard write. There is **no bar and no secret
   service**, and that is measured rather than taste: waybar's closure is 1001 MiB
   (zenity alone is 902 MiB of it) against dwl's 345 MiB, and gnome-keyring is
   378 MiB — the table and the four verdicts are in

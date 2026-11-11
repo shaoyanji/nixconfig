@@ -30,13 +30,15 @@ output is unchanged.
 
 ## Why the budget allows it
 
-Measured with `cpg usage` (2026-11-06): 50 prompts per 10 minutes, 300 per hour,
-4 concurrent streams. One four-lane round is four prompts and zero image
-allowance, and the concurrency cap is exactly four — so a round is the largest
-fan-out the plan serves without queueing.
+Measured with `cpg usage` (2026-11-11): `dailyQueryCap` 350 prompts per day and
+`compareSlots` 4, so four concurrent streams. `unlimitedQueries: true` and the
+monthly `pro` counter are the plan's name, not the day: 350 is the cap. One
+four-lane round is four prompts and zero image allowance, and the concurrency cap
+is exactly four, so a round is the largest fan-out the plan serves without
+queueing.
 
-- 300/h ÷ 4 = **75 rounds an hour**, one every 48 seconds sustained.
-- 50/10m caps a burst at **12 rounds** in any ten minutes.
+- 350/day ÷ 4 = **87 rounds a day**. No hourly counter is in the payload, so a
+  429 is a burst refused: space the round out rather than retry into it.
 - Jev grading is not a prompt: it is a Typesafe call, ~1 s, and its input is the
   candidates (2,000 characters each).
 

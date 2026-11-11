@@ -55,14 +55,18 @@ Sizes: `1024x1024` (default), `1536x1024` wide, `1024x1536` tall, and `auto`.
 cpg usage --json | jq '{images: .usage.images, prompts: .usage.dailyQueries}'
 ```
 
-Measured 2026-11-08 on the lifetime pool: **100 images per day**, resetting at
-00:00 UTC, and 350 prompts per day. The hourly bucket is not in the payload but
-it exists: on 2026-11-10 a batch of 26 plates in 30 minutes was answered
-`RATE_LIMITED` with 74 images still unspent.
+Measured 2026-11-11 on the lifetime pool: **100 images per day**, resetting at
+00:00 UTC, and 350 prompts per day (`usage.dailyQueries`). `usage.images.remaining`
+answers `"unlimited"` — that is the plan talking, not the day: the ceiling is
+`entitlement.limits.imagesPerDay`, so count `imagesPerDay - usage.images.used`.
 
-- Read `usage.images.remaining` before a batch and between batches. A 429 with
-  images left is the hourly bucket: back off 60 s, then 120 s, then 240 s, and
-  a fourth failure is a spent window, not a reason to keep retrying.
+The burst bucket is not in the payload but it exists: on 2026-11-10 a batch of 26
+plates in 30 minutes was answered `RATE_LIMITED` with 74 images still unspent.
+Plan a batch as **20 plates, then a pause**, not one sweep.
+
+- Read the count before a batch and between batches. A 429 with images left is
+  the burst bucket: back off 60 s, then 120 s, then 240 s, and a fourth failure
+  is a spent window, not a reason to keep retrying.
 - Spend generations on what only a model can do. Cropping, resizing, colour
   grading, text overlays and repetition are local work for an image tool.
 - One composed prompt beats three variations. Re-roll on a named defect ("the

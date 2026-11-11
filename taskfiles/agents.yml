@@ -808,3 +808,178 @@ tasks:
       - |
         bash scripts/task/docs-budget.sh
         bash scripts/task/taskfile-graph.sh >/dev/null && echo "task graph clean"
+
+  agents:review:schema:
+    desc: "Second model on a document: a YAML schema, parsed and shape-checked before it is trusted"
+    summary: >
+      One prompt for what a cheap model is genuinely good at: postulating a schema
+      from a sample. The answer is asked for as YAML in a fixed shape and then
+      held to it — through `llm-yaml.sh` (fence, backtick and prose removal) and a
+      `yq` check that `fields[]` is non-empty and `open_questions[]` exists — so a
+      chatty or invented answer fails the call instead of becoming a file. An
+      empty `fields[]` is refused, which is the model saying nothing in a shape
+      that looks like an answer. Pass `FILE=`, then `OUT=` to keep it.
+    vars:
+      FILE: '{{.FILE | default ""}}'
+      OUT: '{{.OUT | default ""}}'
+      DRY: '{{.DRY | default "0"}}'
+      MODEL: '{{.MODEL | default "claude-haiku-5-5"}}'
+      FALLBACK: '{{.FALLBACK | default "gpt-6-luna"}}'
+    cmds:
+      - |
+        args=(schema)
+        [ -n "{{.FILE}}" ] && args+=(--prompt-file "{{.FILE}}")
+        [ -n "{{.OUT}}" ] && args+=(--out "{{.OUT}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        MODEL="{{.MODEL}}" FALLBACK="{{.FALLBACK}}" bash scripts/task/cpg-review.sh "${args[@]}"
+
+  agents:review:adversary:
+    desc: "Second model on a failure or checkpoint: the other readings, what was taken on trust, the one probe"
+    summary: >
+      For the moment when the person reading a failure is tired: one prompt on
+      logic only, asking what else the evidence could mean, what the answer is
+      taking on trust, and which single command or reading would settle it. The
+      answer is YAML in a fixed shape (verdict, because, could_mean, trusted,
+      next_probe, weak_spots) and is parsed and shape-checked, so it files as
+      data rather than prose. `FAIL=` (or `PROMPT_FILE=`) is the failing output;
+      `CODE=` is the script that asserts it; `DIFF=` is optional. `DRY=1` costs
+      nothing.
+    vars:
+      FAIL: '{{.FAIL | default ""}}'
+      PROMPT_FILE: '{{.PROMPT_FILE | default ""}}'
+      CODE: '{{.CODE | default ""}}'
+      DIFF: '{{.DIFF | default ""}}'
+      OUT: '{{.OUT | default ""}}'
+      DRY: '{{.DRY | default "0"}}'
+      MODEL: '{{.MODEL | default "claude-haiku-5-5"}}'
+      FALLBACK: '{{.FALLBACK | default "gpt-6-luna"}}'
+    cmds:
+      - |
+        args=(adversary)
+        if [ -n "{{.FAIL}}" ]; then args+=(--prompt "{{.FAIL}}"); fi
+        [ -n "{{.PROMPT_FILE}}" ] && args+=(--prompt-file "{{.PROMPT_FILE}}")
+        [ -n "{{.CODE}}" ] && args+=(--file "{{.CODE}}")
+        [ -n "{{.DIFF}}" ] && args+=(--diff "{{.DIFF}}")
+        [ -n "{{.OUT}}" ] && args+=(--out "{{.OUT}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        MODEL="{{.MODEL}}" FALLBACK="{{.FALLBACK}}" bash scripts/task/cpg-review.sh "${args[@]}"
+
+  agents:loop:run:
+    desc: "Sequential cpg loop: one validated YAML command per turn, executed in a scratch directory"
+    summary: >
+      The model has no tools, so the loop is the tool: one command per turn in a
+      fixed YAML shape, refused against a deny list, run under a timeout in the
+      work directory, fed back with its exit status and output tail. `GOAL=`
+      names the outcome, `STEPS=` the ceiling, and `VERIFY=` must exit 0 before
+      the goal counts as done — `stop: true` is a request, not a result. A call
+      costs about 7 queries, so the loop exits 6 rather than start one the
+      budget cannot pay for.
+    vars:
+      GOAL: '{{.GOAL | default ""}}'
+      STEPS: '{{.STEPS | default "6"}}'
+      WORKDIR: '{{.WORKDIR | default ""}}'
+      VERIFY: '{{.VERIFY | default ""}}'
+      SANDBOX: '{{.SANDBOX | default "auto"}}'
+      DRY: '{{.DRY | default "0"}}'
+      MODEL: '{{.MODEL | default "claude-haiku-5-5"}}'
+      FALLBACK: '{{.FALLBACK | default "gpt-6-luna"}}'
+    cmds:
+      - |
+        args=(--goal "{{.GOAL}}" --steps "{{.STEPS}}" --sandbox "{{.SANDBOX}}")
+        [ -n "{{.WORKDIR}}" ] && args+=(--workdir "{{.WORKDIR}}")
+        [ -n "{{.VERIFY}}" ] && args+=(--verify "{{.VERIFY}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        MODEL="{{.MODEL}}" FALLBACK="{{.FALLBACK}}" bash scripts/task/cpg-loop.sh "${args[@]}"
+
+  agents:review:draft:
+    desc: "Second model fills a caller's YAML skeleton: the drafting half of a tool-calling harness"
+    summary: >
+      The direction a tool-calling agent needs. A harness (hermes) owns the tools
+      and the loop; this lane owns the drafting, because a cheap model here writes
+      better prose and structure than a base model that can call tools. `SHAPE=`
+      is a skeleton document whose keys are the contract, `FILE=` the material.
+      The answer is parsed and its top-level key set must match the skeleton
+      exactly — missing and extra keys are both refused — so the harness reads the
+      result with `yq` instead of parsing prose. `OUT=` keeps it; `DRY=1` spends
+      nothing.
+    vars:
+      SHAPE: '{{.SHAPE | default ""}}'
+      FILE: '{{.FILE | default ""}}'
+      OUT: '{{.OUT | default ""}}'
+      DRY: '{{.DRY | default "0"}}'
+      MODEL: '{{.MODEL | default "claude-haiku-5-5"}}'
+      FALLBACK: '{{.FALLBACK | default "gpt-6-luna"}}'
+    cmds:
+      - |
+        args=(draft --shape "{{.SHAPE}}")
+        [ -n "{{.FILE}}" ] && args+=(--prompt-file "{{.FILE}}")
+        [ -n "{{.OUT}}" ] && args+=(--out "{{.OUT}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        MODEL="{{.MODEL}}" FALLBACK="{{.FALLBACK}}" bash scripts/task/cpg-review.sh "${args[@]}"
+
+  agents:review:gate:
+    desc: "Second model on a check: what makes this gate pass while the thing it guards is broken"
+    summary: >
+      One prompt, no tools on the other side, so pass `FILE=` with the check: a
+      hunk with no surroundings gets an answer about the wrong file. Defaults to
+      `git diff HEAD`. Answers in bullets: the inputs that make the check pass
+      vacuously, the single most likely one with its line, and an input that would
+      fail for the wrong reason. `DRY=1` prints the packet and spends nothing;
+      `MODEL=` names a different vendor from the one that wrote the check.
+    vars:
+      FILE: '{{.FILE | default ""}}'
+      DIFF: '{{.DIFF | default ""}}'
+      DRY: '{{.DRY | default "0"}}'
+      MODEL: '{{.MODEL | default "claude-haiku-5-5"}}'
+      FALLBACK: '{{.FALLBACK | default "gpt-6-luna"}}'
+    cmds:
+      - |
+        args=(gate)
+        [ -n "{{.FILE}}" ] && args+=(--file "{{.FILE}}")
+        [ -n "{{.DIFF}}" ] && args+=(--diff "{{.DIFF}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        MODEL="{{.MODEL}}" FALLBACK="{{.FALLBACK}}" bash scripts/task/cpg-review.sh "${args[@]}"
+
+  agents:review:plate:
+    desc: "Second model on a generation prompt: the defects to look for before an image is spent"
+    summary: >
+      One prompt against the request, not against the plate: the model cannot see
+      the image, so this is a pre-flight that costs no image allowance. Answers in
+      five bullets, most likely defect first, then the one edit that removes the
+      top one. Supply the prompt with `PROMPT_FILE=` or `PROMPT=`; `SIZE=` and
+      `INTENT=` say what the plate has to be. `DRY=1` prints the packet.
+    vars:
+      PROMPT: '{{.PROMPT | default ""}}'
+      PROMPT_FILE: '{{.PROMPT_FILE | default ""}}'
+      SIZE: '{{.SIZE | default "1536x1024"}}'
+      INTENT: '{{.INTENT | default "a desktop wallpaper"}}'
+      DRY: '{{.DRY | default "0"}}'
+      MODEL: '{{.MODEL | default "claude-haiku-5-5"}}'
+      FALLBACK: '{{.FALLBACK | default "gpt-6-luna"}}'
+    cmds:
+      - |
+        args=(plate --size "{{.SIZE}}" --intent "{{.INTENT}}")
+        [ -n "{{.PROMPT}}" ] && args+=(--prompt "{{.PROMPT}}")
+        [ -n "{{.PROMPT_FILE}}" ] && args+=(--prompt-file "{{.PROMPT_FILE}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        MODEL="{{.MODEL}}" FALLBACK="{{.FALLBACK}}" bash scripts/task/cpg-review.sh "${args[@]}"
+
+  agents:review:plan:
+    desc: "Second model on a plan or design doc: the objections, ordered by what being wrong costs"
+    summary: >
+      One prompt for a document about to become work. It cannot check facts, so it
+      judges structure: what the plan assumes, what it leaves out, what breaks
+      first. Answers in bullets ordered by cost, then the cheapest test that would
+      settle the top objection. `PROMPT_FILE=` or stdin supplies the document;
+      `DRY=1` prints the packet.
+    vars:
+      PROMPT_FILE: '{{.PROMPT_FILE | default ""}}'
+      DRY: '{{.DRY | default "0"}}'
+      MODEL: '{{.MODEL | default "claude-haiku-5-5"}}'
+      FALLBACK: '{{.FALLBACK | default "gpt-6-luna"}}'
+    cmds:
+      - |
+        args=(plan)
+        [ -n "{{.PROMPT_FILE}}" ] && args+=(--prompt-file "{{.PROMPT_FILE}}")
+        [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
+        MODEL="{{.MODEL}}" FALLBACK="{{.FALLBACK}}" bash scripts/task/cpg-review.sh "${args[@]}"

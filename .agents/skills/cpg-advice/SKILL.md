@@ -67,17 +67,18 @@ running on, and stay with an id whose answer you have already judged. Ids exerci
 
 ## Budget: prompts are rate-limited, not metered
 
-Measured 2026-11-06 on the lifetime pool (`cpg usage`): `basicQueries` and
-`advancedQueries` are 0, meaning no quota counter to exhaust, but the rate limits
-are real — **50 prompts per 10 minutes and 300 per hour**, 4 concurrent streams.
-That is the pacing constraint for a long session:
+Measured 2026-11-11 on the lifetime pool (`cpg usage`): `dailyQueryCap` is
+**350 prompts per day**, `compareSlots` 4 concurrent streams, and
+`unlimitedQueries: true` means the monthly `pro` counter is not the ceiling. The
+350 is the budget to plan against:
 
-- One question, one call. A three-model `compare` costs three prompts, and a
-  fan-out over every free id spends a tenth of the hour for one answer.
-- 300/hour is 5 a minute sustained; a review loop that fires 50 calls in a burst
-  hits the window before it hits any quota.
-- On a 429, wait for the window (10 minutes for the burst limit) rather than
-  retrying; the CLI has no queue.
+- One question, one call. A three-model `compare` costs three prompts, so a
+  fan-out over every free id is 29 prompts for one answer.
+- 350/day is about 15 an hour across a working day; a review loop that fires
+  every diff still fits, and there is no hourly counter in the payload to pace
+  against, so the day count is what `cpg usage` answers.
+- On a 429, back off 60 s, then 120 s, then 240 s rather than retrying; the CLI
+  has no queue.
 
 ## Machine surfaces
 
@@ -86,7 +87,7 @@ That is the pacing constraint for a long session:
 ```bash
 cpg models --json | jq -r '.[] | select(.premium_only | not) | .id'
 cpg status --json | jq -e '.authenticated'
-cpg usage --json | jq '.entitlement.rateLimits.prompt'
+cpg usage --json | jq '.usage.dailyQueries'
 ```
 
 A one-shot `cpg chat` writes bare text when stdout is not a TTY — no prompt
@@ -130,6 +131,112 @@ long-chain reasoning. The lane is the fix, but only if the split is honest:
 - **Record what won.** `speculate.sh` appends a ledger row per round; over a
   week that table says which model writes which kind of thing on this account
   far better than any benchmark does.
+
+## Six one-prompt lanes
+
+`scripts/task/cpg-review.sh` (behind `task agents:review:*`) is the advice lane
+for the places one prompt buys more than it costs. Each is a single call, so 350
+a day is not a budget to ration:
+
+```bash
+task agents:review:gate FILE=scripts/task/site-check.sh   # or: git diff HEAD
+task agents:review:plate PROMPT_FILE=/tmp/plate.txt SIZE=1536x1024
+task agents:review:plan  PROMPT_FILE=docs/proposal.md
+task agents:review:schema FILE=.sops.yaml OUT=/tmp/schema.yaml
+task agents:review:adversary FAIL=/tmp/fail.txt CODE=scripts/task/site-check.sh
+task agents:review:draft   SHAPE=/tmp/step.yaml FILE=/tmp/material.md OUT=/tmp/step-out.yaml
+```
+
+- **gate** — a change to a check, before it ships. The question is not whether
+the code is right but what input makes the check pass while the guarded thing is
+broken. Ask it of a guard that has never been seen to fail; that is where the
+vacuous pass hides.
+- **plate** — a generation prompt, before the image is spent. The model cannot
+see the plate, so it reads the request and names the defects to expect; one
+prompt against a batch of twenty is the cheapest protection the image allowance
+has.
+- **plan** — a design doc or a proposal, before it becomes work. Ordered
+objections with their cost, and the cheapest test that settles the first one.
+- **schema** — a config, a manifest, a payload you are about to write a parser
+for. It postulates the schema in YAML instead of prose, and the answer is only
+accepted if it parses into the fixed shape with a non-empty `fields[]`: every
+field cites its `evidence` from the sample, and anything the sample cannot settle
+comes back under `open_questions` instead of hardening into a requirement.
+- **adversary** — an assertion failure or a checkpoint, with the code that
+asserts it. The call that turns a bad night into a good decision: what else the
+evidence could mean, what the reading takes on trust, and the one probe that
+settles it. YAML, so `could_mean[]` is worked through instead of skimmed.
+- **draft** — a caller's skeleton plus the material. See the bridge below; this
+is the lane a harness calls, not a person.
+
+## Bridging a tool-calling harness and a drafting model
+
+hermes is the harness: it holds the tool loop, a file, a shell, the cron. Its base
+models (Nemotron 3.5 / 3) are weak drafters and cannot be swapped per task. The
+models here are the opposite — they draft and structure better, and cannot call a
+tool at all. So the split is not "one agent or the other":
+
+- **hermes decides and executes.** It owns state, permissions, retries and the
+  schedule. It never asks this lane to run anything.
+- **this lane fills shapes.** `agents:review:draft` takes a skeleton the harness
+  wrote and returns the same keys with real content, parsed and key-checked. The
+  harness then reads fields by name with `yq` instead of re-parsing prose.
+- **the artifact is the handoff.** A validated YAML file in the work directory is
+  what crosses between them; neither side needs the other's conversation.
+
+That is why the shape check matters more than the prose quality: a draft whose
+keys do not match is refused, so the harness fails loudly instead of silently
+consuming a plausible-looking wrong field.
+
+Measured 2026-11-11: `claude-sonnet-5-5` and `gpt-6.1-sol` still answer `403
+premium_only` on this pool, so the lanes default to `claude-haiku-5-5` with
+`gpt-6-luna` as the one fallback; both answered a 5,000-character packet in
+15-30 s. A premium id is a refusal in one second, not a slow call — check it
+before naming it in a plan.
+
+`DRY=1` prints the packet and sends nothing. `MODEL=` names the vendor; pick one
+that is not the model whose work is under review. The packet is capped at 15,000
+characters and the script refuses rather than truncating, so cut the material
+rather than letting it be silently dropped.
+
+## YAML in, YAML out
+
+Ask these models for structured answers as YAML in a shape you name, never for
+"a schema" in prose. The reply is cleaned by `scripts/task/llm-yaml.sh` — fence
+lines, a leading "here it is" sentence, CRLF, a stray wrapping backtick — then
+parsed, with `--map` rejecting the reply that is technically YAML because a bare
+scalar is YAML. A `schema` or `adversary` answer that does not parse, or parses
+into the wrong shape, exits 1: the shape is the contract, so "it looked right" is
+not a result. Clean it in one script, never by eye at each call site.
+
+## The loop: a validated command per turn
+
+`scripts/task/cpg-loop.sh` (`task agents:loop:run`) is what makes these models
+into an executor rather than an adviser. It asks for one command per turn in the
+same YAML contract, refuses it against a deny list (delete, push, service
+restart, decrypt, sudo, a pipe into a shell), runs it under `timeout` in a
+scratch work directory — inside `bwrap` when that is installed, which on the
+netbook it is not — and returns the exit status and the output tail to the next
+turn.
+
+```bash
+task agents:loop:run GOAL=/tmp/goal.md STEPS=6 VERIFY='test -s out.txt'
+task agents:loop:run GOAL=/tmp/goal.md DRY=1                       # first packet, no cost
+bash scripts/task/cpg-loop.sh --check-command 'rm -rf /'          # deny list, no cost
+```
+
+A turn's answer is `thought`, `run`, `expect`, `stop`, and `stop: true` is a
+request, not a result: the run exits 0 only when `VERIFY=` exits 0, and exits 4
+with the goal unverified otherwise. The budget is the wall, not the step count —
+one answered call costs about 7 of the 350 queries, so about 50 turns a day, and
+the loop exits 6 rather than begin a turn the counter cannot pay for. Ledger and
+per-turn actions land in `~/.cache/cpg-loop/<goal-slug>/` beside a lock file that
+makes a second run refuse instead of interleaving.
+
+There is no `crontab` on the netbook, and a scheduled goal is not an ad-hoc one:
+the fleet's declarative path is `services.agentScheduler.jobs` on frieren
+(`frieren-offload` skill), which is a deploy. Until a goal earns a job, run it in
+a `tmux` session (`tmux` skill) so it outlives the shell.
 
 ## Use it for
 

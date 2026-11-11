@@ -64,6 +64,15 @@ for path in "$@"; do
 done
 
 robots=$(get /robots.txt)
+# An empty body is a failed fetch, not a permissive robots.txt: without this the
+# `Disallow: /` branch below records a pass for a site that answered nothing.
+# CRLF is stripped first because `^Disallow: /$` cannot match a line ending in \r.
+if [ -n "$robots" ]; then
+  verdict 0 "$host/robots.txt answered a body"
+else
+  verdict 1 "$host/robots.txt answered a body"
+fi
+robots=${robots//$'\r'/}
 printf '%s' "$robots" | grep -q 'Sitemap:'
 verdict $? "$host/robots.txt names a sitemap"
 # `[ $? -ne 0 ]` reads the exit status of the test it is inside, not the grep's,

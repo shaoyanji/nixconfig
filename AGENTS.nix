@@ -2,6 +2,51 @@
 {
   schemaVersion = 1;
   notes = {
+    config-registry-schema = {
+      title = "The config registries have no schema, and four conventions nothing checks";
+      kind = "open";
+      status = "OPEN";
+      priority = "P4";
+      date = "2026-11-11";
+      summary = "A cpg schema pass over modules.toml, taskfiles/checks.toml and inventory.toml found rules no gate enforces: knob path location, option casing, a group with no root row, and ports that live only in description prose. checks:knobs covers paths, hosts and the count, and stops there.";
+      refs = {
+        modules = [
+          "modules.toml"
+          "taskfiles/checks.toml"
+          "inventory.toml"
+          ".sops.yaml"
+        ];
+        tasks = ["checks:knobs" "check:verify" "agents:review:schema"];
+        docs = [".agents/skills/cpg-advice/SKILL.md"];
+      };
+      body = ''
+        Swept 2026-11-11 with `task agents:review:schema` over modules.toml, the
+        first six rows of taskfiles/checks.toml and two inventory hosts.
+        `checks:knobs` already proves every knob path exists, every host resolves
+        and `metadata.total_knobs` matches. These are the rules nothing proves.
+
+        - `knobs.ai.path` is `modules/global/noDE.nix`, the only one of 17 outside
+          `modules/profiles/` or `modules/services/`. The gate allows it, so the
+          convention is real only in the other 16 entries.
+        - Three options are camelCase (`profiles.dwlDesktop.enable`,
+          `services.zettelGraph.enable`, `services.mataroaConsole.enable`); 14 are
+          kebab. All resolve as Nix paths, so nothing decides which style holds.
+        - Six services name their port only inside `description` (:5000, :8123,
+          :8088, :6801, :8453, :8454). `checks:ports` audits firewall against live
+          listeners, so two knobs could claim one port unseen.
+        - `taskfiles/checks.toml` has a root row for `checks:appflow` and none for
+          `checks:audit`, which exists only as `:handoff` and `:system`.
+          `check:verify` pairs rows with tasks; it says nothing about roots.
+        - `inventory.toml` omits `managed` on 27 of 38 hosts. That one is settled —
+          `lib/inventory.nix` defaults it to false — and is recorded so the next
+          sweep does not re-open it.
+        - `.sops.yaml` defines the `garnix` anchor and references it in no group,
+          and `acersops`/`acersopshost` carry one recipient value.
+
+        Exit: one schema plus one check that validates these registries, or this
+        note REJECTED with the reason a schema would not pay for itself.
+      '';
+    };
     model-provider-epistemics = {
       title = "Model availability is provider-scoped, not inferred across vendors";
       kind = "decision";

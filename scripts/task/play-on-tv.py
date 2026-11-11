@@ -199,6 +199,7 @@ def main():
     ap.add_argument("--tv-port", default="49152")
     ap.add_argument("--jellyfin", default="http://192.168.3.25:8096")
     ap.add_argument("--wait", type=int, default=30, help="seconds to wait for PLAYING")
+    ap.add_argument("--force", action="store_true", help="play over whatever is running now")
     ap.add_argument(
         "--transcode",
         action="store_true",
@@ -217,6 +218,17 @@ def main():
 
     if not (args.search or args.list):
         ap.error("give --search <title substring> or --list")
+
+    if not args.list:
+        state, _, _ = transport(ctrl)
+        if state == "TRANSITIONING":
+            sys.exit(
+                "play-on-tv: the transport is stuck in TRANSITIONING and another set-uri makes it "
+                "worse — run task media:stop first (Stop released it on 2026-11-11); power-cycle "
+                "the set only if it stays stuck after that"
+            )
+        if state == "PLAYING" and not args.force:
+            sys.exit("play-on-tv: something is already playing — task media:stop first, or pass --force")
 
     base = args.jellyfin.rstrip("/")
     uuid = discover_dlna_uuid(base) or jellyfin_dlna_uuid(base)
@@ -240,13 +252,9 @@ def main():
     attempts = [(url, "direct play")]
     if args.transcode and "Static=true" in url:
         attempts.append((url.replace("Static=true", "Static=false"), "transcode, same container"))
-        if ".mkv" in url:
-            attempts.append(
-                (
-                    url.replace("Static=true", "Static=false").replace(".mkv", ".mp4"),
-                    "transcode to mp4",
-                )
-            )
+        mp4 = re.sub(r"\.(mkv|mov|avi|webm|ts)(\?)", r".mp4\2", url)
+        if mp4 != url:
+            attempts.append((mp4.replace("Static=true", "Static=false"), "transcode to mp4"))
 
     for candidate, label in attempts:
         print(f"  attempt: {label}")

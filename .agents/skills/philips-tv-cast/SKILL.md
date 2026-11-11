@@ -77,10 +77,15 @@ Exit 0 means the set really is playing: `PLAYING  rel=0:00:04 dur=1:38:40`.
   previous channel's audio behind it, and every later `SetAVTransportURI` — including one
   for a file that had played fine an hour before — stayed `TRANSITIONING`. `Stop` and an
   empty `CurrentURI` report `STOPPED`/`NO_MEDIA_PRESENT` but do not clear the overlay, and
-  there is no key API to clear it. Back or Home clears the overlay only: after it, a new
-  URI still hung with **zero** GETs from the set in the Jellyfin log while the same URL
-  returned `206` to `curl` on frieren. Recovery is a power cycle of the set, then one
-  clean attempt — not another send.
+  there is no key API to clear it. `task media:stop` (`Stop`) did return the transport to
+  `STOPPED`, and the next single attempt played, so Stop first and only power-cycle a
+  transport that stays stuck; the on-screen overlay clears with Back on the remote. The
+  script refuses to send while `TRANSITIONING` for exactly this reason.
+- **Container decides direct play.** `/arr/In the Mood for Love` resolves to `stream.mkv`
+  (h264/aac) and plays; `/arr/Gravity` resolves to `stream.mov` and never starts. Read the
+  `res` extension before sending anything — `--transcode` rewrites any container to `.mp4`
+  with `Static=false`. Do not read Jellyfin's journal for fetch evidence: it logs no
+  access, so a count of 0 says nothing about whether the set pulled the file.
 - **The `YouTube` container is not a film library.** `/YouTube/Nix in 100 Seconds` was
   accepted and sat in `TRANSITIONING` until the wait expired, on direct play and on the
   transcode retry; `/arr` is what this set plays. A stuck `TRANSITIONING` means the item's

@@ -893,6 +893,24 @@ cmd_gc() {
 # in neither list is unjudged rather than bad, so nothing lands on a screen on the
 # strength of its date alone. With no approval list yet, the newest unrejected
 # plate is used, which is what a lane nobody has looked at gets.
+# A wallpaper is landscape. A square plate under `swaybg -m fill` is cropped to a
+# stripe of itself, which reads on a screen as a broken wallpaper rather than as a
+# wrong request — so the shape is measured where the plate is chosen. The size a
+# generator returns is not the size it was asked for until someone reads it.
+dimensions() {
+  ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "$1" 2>/dev/null |
+    awk -F, 'NF == 2 {print $1 "x" $2}'
+}
+
+landscape() {
+  local d w h
+  d=$(dimensions "$1")
+  [ -n "$d" ] || return 1
+  w=${d%x*}
+  h=${d#*x}
+  [ "$h" -gt 0 ] && [$((w * 10 / h)) -ge 12]
+}
+
 resolve_plate() {
   local taste_root=$1 want=$2 candidate
   case $want in
@@ -919,6 +937,7 @@ cmd_wallpaper() {
   local id reason pick=""
   local -a approved ids
   mapfile -t approved < <(jq -r '.wall.in[]?' "$rotation" 2>/dev/null || true)
+  command -v ffprobe >/dev/null || die "ffprobe is required to check a plate's shape (pkgs.ffmpeg)"
 
   if [ "${#approved[@]}" -gt 0 ]; then
     # List order is priority: the first id that resolves is the wallpaper, so
@@ -926,8 +945,13 @@ cmd_wallpaper() {
     for id in "${approved[@]}"; do
       reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
       if [ -n "$reason" ]; then say "skipping $id: $reason"; continue; fi
-      pick=$(resolve_plate "$taste_root" "$id") && break
-      say "skipping $id: no such plate"
+      pick=$(resolve_plate "$taste_root" "$id") || { say "skipping $id: no such plate"; continue; }
+      if ! landscape "$pick"; then
+        say "skipping $id: $(dimensions "$pick" || echo unknown) is not landscape"
+        pick=""
+        continue
+      fi
+      break
     done
   else
     # Nothing approved: newest unjudged plate, which is what a fresh generation
@@ -940,7 +964,13 @@ cmd_wallpaper() {
     for id in "${ids[@]}"; do
       reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
       [ -n "$reason" ] && continue
-      pick=$(resolve_plate "$taste_root" "$id") && break
+      pick=$(resolve_plate "$taste_root" "$id") || continue
+      if ! landscape "$pick"; then
+        say "skipping $id: $(dimensions "$pick" || echo unknown) is not landscape"
+        pick=""
+        continue
+      fi
+      break
     done
   fi
   [ -n "$pick" ] || die "nothing in rotation resolves; approve a plate in lib/image-daily/rotation.json"

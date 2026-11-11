@@ -193,6 +193,9 @@ surface on this host. What replaced them:
   ribbon connector lost. `Mod+<key>` gives the plain character and `Mod+Shift+<key>`
   its shifted pair: `Mod+m` is `;`, `Mod+Shift+m` is `:`, `Mod+g`/`Mod+Shift+g` are
   `(`/`)`, `Mod+z`/`Mod+Shift+z` are `0`/`)`. Vim's `:wq` is two chords, not a menu.
+  The rows are generated from one `deadKeys` list in the host file, and
+  `Mod+Shift+grave` shows that same list as a fnott card (`netbook-keys --text`
+  prints it in a shell) — the lookup the deleted menu failed to be.
 - **The menu is gone.** The layer this replaced opened `wmenu`, sent a fnott card,
   copied the character with `wl-copy` twice and slept before typing, and its list
   carried neither parenthesis. The body is one `wtype -- '<char>'` now, the clipboard

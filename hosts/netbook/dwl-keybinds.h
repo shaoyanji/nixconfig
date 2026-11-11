@@ -18,12 +18,18 @@
  * The rented key sits as close to the lost one as the layout allows: z for 0,
  * m for ;, n for -, u for =, c for [, o for ], b for \, s for /, x for ', v for
  * the backquote, and g for the parenthesis pair. Vim's `:wq` is Mod+Shift+m,
- * then w, then q.
+ * then w, then q. Mod+Shift+grave puts the whole table on screen, because a
+ * mapping nobody can look up is just the menu this replaced.
  *
- * There is no menu. The layer this replaces opened wmenu, sent a fnott card,
+ * The rows are not written out here. `deadKeys` in
+ * hosts/netbook/configuration.nix is one list, and the build projects it twice:
+ * into the rows at @DEAD_KEYS@ below, and into the text of that card. A new
+ * character is one entry there, and it becomes typable and documented together.
+ *
+ * There is no menu. The layer this replaced opened wmenu, sent a fnott card,
  * copied the character to the clipboard twice and slept before typing — so a
  * `:` in a vim command was three keystrokes and a stall — and its list carried
- * neither parenthesis. Here the body is one `wtype -- '<char>'`: the character
+ * neither parenthesis. Here the body is one `wtype -- <char>`: the character
  * lands at once, and the clipboard is left alone.
  *
  * Her own tools stay names on the session PATH (`environment.localBinInPath`):
@@ -31,40 +37,13 @@
  * bodies live with alice; this file only names them.
  */
 
-/* Chord -> character. The macro writes the quoting once, so a character is
- * spelled once per row instead of three times (`printf`, `wl-copy`, `wtype`),
- * and adding one is a single row. */
-#define TYPED(key, mods, ch) \
-	{mods, XKB_KEY_##key, spawn, SHCMD("wtype -- '" ch "'")}
+/* Chord -> character. The argument is a shell-quoted word, so the quoting lives
+ * once in the list that generates these rows instead of in every row. */
+#define TYPED(key, mods, lit) \
+	{mods, XKB_KEY_##key, spawn, SHCMD("wtype -- " lit)}
 
-/* The punctuation the connector lost: plain on Mod, shifted on Mod+Shift, the
- * way the original key carried its pair. */
-TYPED(s, MODKEY, "/"),
-TYPED(s, MODKEY | WLR_MODIFIER_SHIFT, "?"),
-TYPED(n, MODKEY, "-"),
-TYPED(n, MODKEY | WLR_MODIFIER_SHIFT, "_"),
-TYPED(z, MODKEY, "0"),
-TYPED(z, MODKEY | WLR_MODIFIER_SHIFT, ")"),
-TYPED(m, MODKEY, ";"),
-TYPED(m, MODKEY | WLR_MODIFIER_SHIFT, ":"),
-TYPED(b, MODKEY, "\\"),
-TYPED(b, MODKEY | WLR_MODIFIER_SHIFT, "|"),
-TYPED(u, MODKEY, "="),
-TYPED(u, MODKEY | WLR_MODIFIER_SHIFT, "+"),
-TYPED(c, MODKEY, "["),
-TYPED(c, MODKEY | WLR_MODIFIER_SHIFT, "{"),
-TYPED(o, MODKEY, "]"),
-TYPED(o, MODKEY | WLR_MODIFIER_SHIFT, "}"),
-TYPED(g, MODKEY, "("),
-TYPED(g, MODKEY | WLR_MODIFIER_SHIFT, ")"),
-TYPED(v, MODKEY, "`"),
-TYPED(v, MODKEY | WLR_MODIFIER_SHIFT, "~"),
-TYPED(y, MODKEY, "p"),
-TYPED(y, MODKEY | WLR_MODIFIER_SHIFT, "P"),
-/* The apostrophe half of that pair cannot go through the macro: a single quote
- * inside a single-quoted shell word has no escape, so this row is written out. */
-{MODKEY, XKB_KEY_x, spawn, SHCMD("wtype -- \"'\"")},
-TYPED(x, MODKEY | WLR_MODIFIER_SHIFT, "\""),
+/* The characters the connector lost, generated from `deadKeys`. */
+/* @DEAD_KEYS@ */
 
 /* Her own tools, by name: the QR transfer on Mod+Shift+Space, dictation on
  * Caps_Lock alone and on Mod+grave, the agent on Mod+Caps_Lock. */
@@ -72,6 +51,9 @@ TYPED(x, MODKEY | WLR_MODIFIER_SHIFT, "\""),
 {0, XKB_KEY_Caps_Lock, spawn, SHCMD("voice-dictate.sh")},
 {MODKEY, XKB_KEY_grave, spawn, SHCMD("voice-dictate")},
 {MODKEY, XKB_KEY_Caps_Lock, spawn, SHCMD("voice-agent.sh")},
+
+/* The same table as a fnott card, and `netbook-keys --text` in a shell. */
+{MODKEY | WLR_MODIFIER_SHIFT, XKB_KEY_grave, spawn, SHCMD("netbook-keys")},
 
 /* The HUD cards, one per BackSpace modifier — the same five chords niri had. */
 {MODKEY, XKB_KEY_BackSpace, spawn, SHCMD("makotop")},

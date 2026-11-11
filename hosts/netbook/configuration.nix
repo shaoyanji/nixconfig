@@ -21,6 +21,115 @@
     url = "https://res.cloudinary.com/de1eajx01/image/upload/assets/wall/2026-11-10/fjord.png";
     sha256 = "1ypnr30mgx6fbs6xwy7hxifzw1x05sfiwxpf0zl6adqqfswq2qgv";
   };
+
+  # The characters this keyboard's broken ribbon connector lost, and the living
+  # key each one is rented from. One list, two projections: the dwl chords
+  # spliced into the keymap, and the card `Mod+Shift+grave` shows. `p` is a lost
+  # letter rather than punctuation and is a row like the rest.
+  deadKeys = [
+    {
+      key = "s";
+      plain = "/";
+      shifted = "?";
+    }
+    {
+      key = "n";
+      plain = "-";
+      shifted = "_";
+    }
+    {
+      key = "z";
+      plain = "0";
+      shifted = ")";
+    }
+    {
+      key = "m";
+      plain = ";";
+      shifted = ":";
+    }
+    {
+      key = "b";
+      plain = "\\";
+      shifted = "|";
+    }
+    {
+      key = "u";
+      plain = "=";
+      shifted = "+";
+    }
+    {
+      key = "c";
+      plain = "[";
+      shifted = "{";
+    }
+    {
+      key = "o";
+      plain = "]";
+      shifted = "}";
+    }
+    {
+      key = "g";
+      plain = "(";
+      shifted = ")";
+    }
+    {
+      key = "v";
+      plain = "`";
+      shifted = "~";
+    }
+    {
+      key = "y";
+      plain = "p";
+      shifted = "P";
+    }
+    {
+      key = "x";
+      plain = "'";
+      shifted = "\"";
+    }
+  ];
+
+  # A shell-quoted word for one character, then the C literal that carries it
+  # into the keymap. The apostrophe cannot sit inside single quotes, and a
+  # backslash or a double quote has to survive C as well as sh.
+  shellWord = c:
+    if c == "'"
+    then ''"'"''
+    else "'${c}'";
+  cString = c: let
+    escaped = builtins.replaceStrings ["\\" "\""] ["\\\\" "\\\""] (shellWord c);
+  in ''"${escaped}"'';
+
+  deadKeyRows =
+    lib.concatMapStrings (d: ''
+      TYPED(${d.key}, MODKEY, ${cString d.plain}),
+      TYPED(${d.key}, MODKEY | WLR_MODIFIER_SHIFT, ${cString d.shifted}),
+    '')
+    deadKeys;
+
+  # The same list as a cheat sheet. Three keys per line keeps the card inside
+  # fnott's 240 px body instead of truncating the rows that matter.
+  deadKeyCells = map (d: "${d.key} ${d.plain}${d.shifted}") deadKeys;
+  keyTable = lib.concatStringsSep "\n" (
+    ["Dead keys: the key, then plain (Mod) and shifted (Mod+Shift)"]
+    ++ builtins.genList
+    (i: lib.concatStringsSep "   " (lib.take 3 (lib.drop (i * 3) deadKeyCells)))
+    (builtins.div (builtins.length deadKeyCells + 2) 3)
+    ++ ["Vim :wq = Mod+Shift+m, w, q"]
+  );
+
+  keysCard = pkgs.writeShellScriptBin "netbook-keys" ''
+    table=${lib.escapeShellArg keyTable}
+    if [ "''${1:-}" = --text ]; then
+      printf '%s\n' "$table"
+      exit 0
+    fi
+    # fnott owns org.freedesktop.Notifications here; a timeout of 0 means "do not
+    # expire", so the card stays until it is dismissed.
+    busctl --user call org.freedesktop.Notifications /org/freedesktop/Notifications \
+      org.freedesktop.Notifications Notify susssasa{sv}i \
+      netbook-keys 0 "" "Dead keys" "$table" 0 0 0
+  '';
 in {
   users.users.root.openssh.authorizedKeys.keys = [deployKey];
   imports = [
@@ -218,7 +327,11 @@ in {
     # layer for the dead keys, spliced into the fleet keymap ahead of it (first
     # match wins). The file explains itself; `extraKeybinds` in the profile owns
     # the mechanism.
-    extraKeybinds = builtins.readFile ./dwl-keybinds.h;
+    extraKeybinds =
+      builtins.replaceStrings
+      ["/* @DEAD_KEYS@ */"]
+      [deadKeyRows]
+      (builtins.readFile ./dwl-keybinds.h);
     # The two `spawn-at-startup` lines from niri worth keeping: the battery
     # sentinel (the bar is gone, so its alerts come from here) and the taildrop
     # receiver. waybar's line is deliberately absent, and swayidle/swaybg are the
@@ -237,6 +350,8 @@ in {
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
     #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    # The dead-key table as a fnott card; `netbook-keys --text` prints it instead.
+    keysCard
     age-plugin-tpm # unseals the TPM-sealed sops identity
     tpm2-tools
     sops # the other half: `SOPS_AGE_KEY_FILE=~/… sops -d`

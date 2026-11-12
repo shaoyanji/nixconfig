@@ -55,12 +55,45 @@ fi
 # the first diff instead of building the file. Measured on delphi 2026-11-06.
 keys_of() { { grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' "$1" 2>/dev/null || true; } | tr -d '=' | sort -u; }
 
+# --- aliases: derive the name a provider reads --------------------------------
+# The rendered blob stays the single source. A provider that spells the same
+# credential differently gets the alias derived here, at env level — not a
+# second copy in sops, and not a declaration inside the tool. Format
+# TARGET=SOURCE; TARGET is emitted only when SOURCE is defined and TARGET is
+# not, so a blob that later carries TARGET makes this line go quiet.
+# FAL_KEY: hermes' image_gen plugin reads FAL_KEY alone
+# (plugins/image_gen/fal/plugin.yaml `requires_env`, and
+# tool_backend_helpers.fal_key_is_configured), while the blob carries
+# FAL_API_KEY. Without the alias `hermes doctor` reports image_gen unavailable.
+ALIASES='FAL_KEY=FAL_API_KEY'
+derived_keys=""
+alias_lines=""
+while IFS='=' read -r target source; do
+  [ -n "$target" ] || continue
+  # A derived name belongs to this script, not to the host: it must never be
+  # seeded into .env.local, or --check would report it as drift forever.
+  derived_keys="${derived_keys}${target}
+"
+  grep -qE "^${target}=" "$RENDERED" 2>/dev/null && continue
+  if [ -s "$LOCAL" ]; then
+    grep -qE "^${target}=" "$LOCAL" 2>/dev/null && continue
+  fi
+  value="$(grep -m1 "^${source}=" "$RENDERED" 2>/dev/null | cut -d= -f2- || true)"
+  [ -n "$value" ] || continue
+  alias_lines="${alias_lines}${target}=${value}
+"
+done <<<"$ALIASES"
+
 # --- seed .env.local once, from the keys the rendered file does not define ----
 if [ ! -e "$LOCAL" ] && [ -f "$TARGET" ]; then
   keyfile="$(mktemp)"
   localfile="$(mktemp)"
   keys_of "$RENDERED" >"$keyfile"
-  keys_of "$TARGET" | comm -13 "$keyfile" - >"$keyfile.extras"
+  # A derived key is not the host's to keep: drop it before deciding whether
+  # anything actually needs .env.local.
+  keys_of "$TARGET" | comm -13 "$keyfile" - | while IFS= read -r k; do
+    grep -qxF "$k" <<<"$derived_keys" || printf '%s\n' "$k"
+  done >"$keyfile.extras"
   if [ -s "$keyfile.extras" ]; then
     if [ "$MODE" = "check" ]; then
       # --check never writes: report what the next activation would seed.
@@ -87,6 +120,11 @@ cat "$RENDERED" >"$desired"
 if [ -s "$LOCAL" ]; then
   printf '\n# --- kept by hermes-env-sync: keys the rendered file does not define (%s) ---\n' "$LOCAL" >>"$desired"
   cat "$LOCAL" >>"$desired"
+fi
+
+if [ -n "$alias_lines" ]; then
+  printf '\n# --- derived by hermes-env-sync: one credential, the name the provider reads ---\n' >>"$desired"
+  printf '%s' "$alias_lines" >>"$desired"
 fi
 
 if [ -f "$TARGET" ] && cmp -s "$desired" "$TARGET"; then

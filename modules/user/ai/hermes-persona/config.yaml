@@ -20,6 +20,14 @@ model:
 agent:
   max_turns: 150
   reasoning_effort: medium
+# Search is pinned to Tavily, extraction is not pinned. Both keys arrive from the
+# one shared sops blob (`ai-services-shared-env`), and per-capability keys never
+# reroute the other capability (tools/web_tools.py `_get_backend`), so extract
+# stays on Firecrawl's keyed path. Left unpinned, `hermes doctor` resolved both
+# capabilities to firecrawl (measured 2026-11-12), which left the Tavily key
+# loaded but unused.
+web:
+  search_backend: tavily
 display:
   interface: cli
   tool_progress: all

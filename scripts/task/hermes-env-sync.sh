@@ -61,6 +61,10 @@ keys_of() { { grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' "$1" 2>/dev/null || true; } | 
 # second copy in sops, and not a declaration inside the tool. Format
 # TARGET=SOURCE; TARGET is emitted only when SOURCE is defined and TARGET is
 # not, so a blob that later carries TARGET makes this line go quiet.
+# The blob decides this, never .env.local: a local TARGET would be a stale copy
+# of a credential the blob rotates, and it would win silently with --check
+# green (measured 2026-11-12). Derived names are filtered out of the local
+# block below so the file never carries two lines for one key.
 # FAL_KEY: hermes' image_gen plugin reads FAL_KEY alone
 # (plugins/image_gen/fal/plugin.yaml `requires_env`, and
 # tool_backend_helpers.fal_key_is_configured), while the blob carries
@@ -75,9 +79,6 @@ while IFS='=' read -r target source; do
   derived_keys="${derived_keys}${target}
 "
   grep -qE "^${target}=" "$RENDERED" 2>/dev/null && continue
-  if [ -s "$LOCAL" ]; then
-    grep -qE "^${target}=" "$LOCAL" 2>/dev/null && continue
-  fi
   value="$(grep -m1 "^${source}=" "$RENDERED" 2>/dev/null | cut -d= -f2- || true)"
   [ -n "$value" ] || continue
   alias_lines="${alias_lines}${target}=${value}
@@ -119,7 +120,12 @@ trap 'rm -f "$desired"' EXIT
 cat "$RENDERED" >"$desired"
 if [ -s "$LOCAL" ]; then
   printf '\n# --- kept by hermes-env-sync: keys the rendered file does not define (%s) ---\n' "$LOCAL" >>"$desired"
-  cat "$LOCAL" >>"$desired"
+  # A derived name is this script's to write: drop a stale copy from .env.local
+  # rather than leave two lines for one key and let the parser pick.
+  awk -v derived="$derived_keys" '
+    BEGIN { n = split(derived, a, "\n"); for (i = 1; i <= n; i++) if (a[i] != "") d[a[i]] = 1 }
+    { split($0, f, "="); if (!(f[1] in d)) print }
+  ' "$LOCAL" >>"$desired"
 fi
 
 if [ -n "$alias_lines" ]; then

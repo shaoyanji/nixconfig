@@ -201,11 +201,11 @@ Do not hand-run `laya-serve`: the declarative unit owns `:8090` (the same rule a
 
 ## Gaming coexistence (auto-yield)
 
-eisen is a gaming desktop first, so `llama-swap-gaming-guard.service` **stops `llama-swap` while a Steam game is running** and restarts it when the game exits. That returns the model's RAM (21 GiB Qwen / 44 GiB Kolibri) and, measured with Qwen loaded, **5,367 MiB of the 8 GiB VRAM** to the game — a model left resident would hold roughly two-thirds of the GPU while the game fights it for the rest. While yielded, the API answers connection-refused rather than that half-starved state.
+eisen is a gaming host first, so `llama-swap-gaming-guard.service` **stops `strata` (and `llama-swap`, if it is ever revived) while a Steam game is running** and starts it again when the game exits. That returns the model's RAM (58 GiB of mapped pack for the served tier) and **6,367 MiB of the 8 GiB VRAM** to the game — a model left resident would hold most of the GPU while the game fights it for the rest. While yielded, the API answers connection-refused rather than that half-starved state. The stop is re-applied on every poll, so a `systemctl start strata` during a game is undone within 5 s.
 
 A game is detected as **any process whose executable lives under a Steam library's `steamapps/common/`** (covers native, Proton and SteamLinuxRuntime-container games alike). Gamescope and `gamescopereaper` are deliberately **not** used as signals — both run permanently here (the Steam tenfoot kiosk session), so they would suspend the LLM forever.
 
-Verified on 2026-10-09: no false positive with Steam idle and the full game library installed, and a simulated game (a binary run from `steamapps/common/`) made the guard log `game detected - yielding, stopping llama-swap` and stop the unit within ~15 s, then resume it on exit.
+Verified on 2026-10-09: no false positive with Steam idle and the full game library installed, and a simulated game (a binary run from `steamapps/common/`) made the guard log `game detected - yielding, stopping llama-swap` and stop the unit within ~15 s, then resume it on exit. The poll is 5 s since 2026-11-12.
 
 ---
 

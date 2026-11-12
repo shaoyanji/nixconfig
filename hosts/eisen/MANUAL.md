@@ -137,7 +137,7 @@ sudo systemctl restart strata.service
 ```
 
 ### Automatic gaming yield
-The `llama-swap-gaming-guard` unit polls `/proc/[0-9]*/exe` every 15 seconds. If any process executes under `*/steamapps/common/*`, the guard automatically suspends `strata.service` to release 100% of GPU VRAM to Steam/Gamescope/Proton, and resumes Strata once the game exits.
+The `llama-swap-gaming-guard` unit polls `/proc/[0-9]*/exe` every 5 seconds. If any process executes under `*/steamapps/common/*`, the guard stops `strata.service` to release 100% of GPU VRAM to Steam/Gamescope/Proton, and starts it again once the game exits. The stop is re-applied on every poll while the game runs, so anything that brings Strata back mid-game (a hand `systemctl start`, a switch activating a changed unit) is stopped again; the marker lives in `/run`, so a guard restart mid-game still resumes the engine afterwards.
 
 ---
 

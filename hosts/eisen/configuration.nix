@@ -10,10 +10,13 @@ in {
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
-    self.modules."profiles.steam"
-    # The fleet desktop baseline: Dux shell on niri, greetd. The Ryoku tier that
-    # replaced it from 2026-11-02 to 2026-11-11 is retired.
-    self.modules."profiles.base-desktop-environment"
+    # Gamescope-only kiosk: greetd auto-logs devji into `steam-gamescope`, so
+    # Steam Big Picture is the entire UI — the same shape as ares and
+    # deckstation. profiles.steamos brings profiles.steam with it. The desktop
+    # shell (Dux on niri, and the Ryoku tier before it) is gone: it spent
+    # ~450–500 MiB of VRAM and several GiB of RAM the model wants, and this host
+    # is a console.
+    self.modules."profiles.steamos"
     self.modules."profiles.base-node"
     self.modules."profiles.nas-client"
     self.modules."profiles.sunshine"
@@ -26,33 +29,35 @@ in {
     ./strata.nix
   ];
 
-  # --- Desktop: Dux (DMS on niri) + gamescope ---
-  # The greeter is the DMS one the rest of the fleet runs: greetd's initial
-  # session is the gamescope kiosk, and a logout lands on the DMS login screen.
+  # --- Session: gamescope kiosk, no desktop ---
+  # Boot lands straight in Steam Big Picture under gamescope-session, so Steam
+  # Link / Moonlight work with zero interaction after power-on; a logout returns
+  # to greetd, which relaunches the same session. There is no desktop shell and
+  # no login screen: profile.steamos sets greetd's `default_session` to
+  # `steam-gamescope`.
+  #
+  # sddm stays explicitly off. A desktop-chain module defaults it on in other
+  # tiers, and two display managers fighting for the one seat is exactly the
+  # failure mode the kiosk must not have.
   services.displayManager.sddm = {
     enable = false;
     wayland.enable = true;
   };
-  # Autologin: boot straight into Steam Big Picture under gamescope-session so
-  # Steam Link / Moonlight work with zero interaction after power-on.
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = user.name;
-  };
+  # Kept because it is a validated value (nixpkgs asserts the name is a session
+  # Steam provides at the priority it is set); greetd ignores it and autologins
+  # from `default_session` instead.
   services.displayManager.defaultSession = "steam";
 
-  programs.dms-greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with the user's DankMaterialShell config
-  };
+  # X server for XWayland: Steam spawns legacy X11-only windows inside
+  # gamescope's Wayland surface.
+  services.xserver.enable = true;
 
   # --- Steam under gamescope ---
   # The RX 5700's modern Vulkan ICD fully supports gamescope's compositor
   # (unlike kellerbench's Kepler + legacy_580 card, where gamescope's
   # wlserver crashes with "Creating headless backend").  steam.nix enables
-  # programs.steam.gamescopeSession, so greetd/DMS can launch the upstream
-  # gamescope-session script directly.
+  # programs.steam.gamescopeSession, and profile.steamos points greetd at the
+  # `steam-gamescope` wrapper so the whole session is one unit.
   programs.gamescope.enable = true;
   programs.steam.gamescopeSession.args = [
     "-W"
@@ -70,7 +75,7 @@ in {
   ];
 
   # --- Boot persona: gaming desktop by default, inference server on demand ---
-  # This file is the boot default (Dux + gamescope). `specialisation.server`
+  # This file is the boot default (gamescope kiosk). `specialisation.server`
   # (server.nix) is the TTY-only persona: no greeter, no compositor, no Steam,
   # nothing competing with the model for the card. It ships in the same generation, so
   # the systemd-boot menu has it and `nixos-rebuild switch --specialisation

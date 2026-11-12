@@ -45,6 +45,10 @@
   # and gamescopereaper cannot be used as "is a game running" signals here.
   gamingGuard = pkgs.writeShellScript "llama-swap-gaming-guard" ''
     set -eu
+    # /run, so the marker dies at boot: services start from their own units then,
+    # and there is nothing to resume.
+    state=/run/llama-swap-gaming-guard.yielded
+
     gaming() {
       local p t
       for p in /proc/[0-9]*/exe; do
@@ -56,20 +60,33 @@
       return 1
     }
 
-    suspended=0
+    busy() {
+      systemctl is-active --quiet strata.service \
+        || systemctl is-active --quiet llama-swap.service
+    }
+
     while true; do
       if gaming; then
-        if [ "$suspended" = 0 ]; then
+        touch "$state"
+        # Raises the marker on every pass, not just when the game is first seen:
+        # anything that brings the engine back mid-game (a hand `systemctl start`,
+        # a switch activating a changed unit) is stopped again here, so the card
+        # stays the game's for as long as it runs.
+        if busy; then
           echo "game detected - yielding, stopping llama-swap and strata"
           systemctl stop llama-swap.service strata.service || true
-          suspended=1
         fi
-      elif [ "$suspended" = 1 ]; then
+      elif [ -e "$state" ]; then
         echo "game exited - resuming llama-swap and strata"
-        systemctl start llama-swap.service strata.service || true
-        suspended=0
+        # Separate starts: llama-swap is dormant and its unit does not exist, and
+        # one failing start must not skip strata.
+        systemctl start strata.service || true
+        systemctl start llama-swap.service || true
+        rm -f "$state"
       fi
-      sleep 15
+      # 5 s, not 15: a game that starts while the engine holds 6.1 GiB of 8.18 GiB
+      # VRAM has the allocator's full attention for the first seconds.
+      sleep 5
     done
   '';
 
@@ -359,7 +376,7 @@ in {
   # only Steam itself is idle in the background.
   #
   # On detection both services are stopped outright rather than left holding a
-  # half-starved model: Strata frees its resident expert arena plus the 6.1 GiB
+  # half-starved model (and re-stopped if they come back while the game runs): Strata frees its resident expert arena plus the 6.1 GiB
   # of 8.18 GiB VRAM it holds (hosts/eisen/MANUAL.md §7), and the API answers
   # connection-refused until the game exits — an honest "yielded to gaming"
   # instead of a model quietly competing for VRAM. `llama-swap.service` is

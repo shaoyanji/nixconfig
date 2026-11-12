@@ -9,10 +9,10 @@
   services.displayManager.enable = lib.mkForce false;
   services.displayManager.sddm.enable = lib.mkForce false;
   services.displayManager.autoLogin.enable = lib.mkForce false;
-  # The DMS greeter is a greetd front-end: both have to go, or the persona still
-  # ships a login screen it can never show.
+  # greetd is the kiosk launcher on the default persona (it starts
+  # `steam-gamescope`): it goes with the session, or the persona still ships a
+  # launcher for a Steam that is not enabled here.
   services.greetd.enable = lib.mkForce false;
-  programs.dms-greeter.enable = lib.mkForce false;
   services.xserver.enable = lib.mkForce false;
   systemd.defaultUnit = lib.mkForce "multi-user.target";
 
@@ -38,7 +38,7 @@
   systemd.services."llama-swap-gaming-guard".enable = lib.mkForce false;
 
   # --- The dummy plug stops mattering ----------------------------------
-  # The desktop persona forces 1920x1080@60 on HDMI-A-1 so gamescope has a known
+  # The kiosk persona forces 1920x1080@60 on HDMI-A-1 so gamescope has a known
   # output. This persona only ever writes to the console, so the TTY comes up on
   # whatever the plug (or an empty port) advertises. Keep the two params that are
   # hardware, not display: PCIe cold-reboot recovery and ASPM off.

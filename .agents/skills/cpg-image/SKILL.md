@@ -101,6 +101,42 @@ Plan a batch as **20 plates, then a pause**, not one sweep.
   bucket — back off and retry; `remaining` at zero is the day, and
   `cpg usage --json | jq .usage.images` says when it resets. There is no queue.
 
+## Where a generated asset must land
+
+A plate is not finished when the PNG exists. The standing rule on this fleet — a
+directive, not a preference — is that every asset built with `cpg image` for a
+site walks all three steps, in this order, and none of them is optional:
+
+```bash
+# 1. Cloudinary is the asset plane, never the repo
+url=$(bash scripts/task/cloudinary.sh upload /tmp/plate.png \
+        --public-id assets/site/<day>/<name>)
+
+# 2. The manifest is what makes it findable
+IMAGES_ROOT=… task images:publish          # urls.tsv -> manifest.json
+
+# 3. The frontend is the search surface (publish deploys it itself)
+#    project bountystash-assets -> https://bountystash-assets.pages.dev
+```
+
+- **Cloudinary, not the repo.** A PNG in `modules/`, a console checkout or an
+  `assets/` folder is bytes nobody can resize and every clone pays for. The
+  delivery URL carries its own crop (`/upload/f_auto,q_auto,w_600/`), so one
+  upload serves the thumbnail, the card and the retina hero.
+- **The manifest, not a hand-written list.** `images:publish` writes
+  `published/urls.tsv` and rebuilds `manifest.json` from it; lane, day and tags
+  are derived from the public id, so the name is the only search input anyone
+  controls. Editing the manifest by hand is a claim the next publish overwrites.
+- **Pages, not a local file.** The deploy is `scripts/task/pages-deploy.sh`
+  through `scripts/task/wrangler.sh`, which reads the Cloudflare token from
+  sops. An asset that lives only on disk is not published.
+- **Publishing from a host that does not hold the bank** keeps the rows it did
+  not restage. Before 2026-11-12 it truncated `urls.tsv` to the staged set, so a
+  publish from a second machine rewrote the frontend down to one batch.
+- The queue layer (`images:run`, the ledger, the `agy` judge, `ONLY=`/`CAP=`) is
+  how the allowance gets spent; a hand-written prompt that skips the queue still
+  lands through the three steps above.
+
 ## What it is not
 
 - **Not editing.** The chat `-i` flag is for vision input, not for image-to-image.

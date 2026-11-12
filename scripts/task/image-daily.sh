@@ -36,8 +36,15 @@ repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 BRIEFS=${BRIEFS:-$repo/lib/image-daily/briefs.json}
 # The pool's media tree is root:root 0770 (/Volumes/data/media), so a generated
 # asset cannot live there without sudo. pics/generated is the writable, devji-owned
-# neighbour.
-IMAGES_ROOT=${IMAGES_ROOT:-/Volumes/data/pics/generated}
+# neighbour. A Linux host has no /Volumes at all, and the shard still has to run
+# there: delphi publishes the same bank from a home directory.
+if [ -z "${IMAGES_ROOT:-}" ]; then
+  if [ -d /Volumes/data/pics ]; then
+    IMAGES_ROOT=/Volumes/data/pics/generated
+  else
+    IMAGES_ROOT=$HOME/Pictures/generated
+  fi
+fi
 LANES_ORDER=(site wall blog fleet badge)
 # Words a slug carries for grammar rather than meaning. Tags are derived from the
 # public id, so this list is the only editorial judgement in the manifest.
@@ -668,8 +675,13 @@ cmd_publish() {
   # carries its own resize (`f_auto,q_auto,w_1200`), so a consumer picks the
   # size it needs from one upload and this tree never becomes a website. The
   # urls.tsv beside the assets is the manifest a consumer reads.
-  local rel url id
-  : >"$IMAGES_ROOT/published/urls.tsv"
+  local rel url id rows=$IMAGES_ROOT/published/urls.tsv restaged=$IMAGES_ROOT/published/.restaged.$$
+  local fresh=$IMAGES_ROOT/published/.urls.$$
+  # A publish replaces only the rows it restaged. Truncating the manifest deletes
+  # every asset whose file is not on this host, so a publish from a machine that
+  # does not hold the bank rewrites the frontend down to that one batch.
+  find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | sort >"$restaged"
+  : >"$fresh"
   while IFS= read -r file; do
     rel=${file#"$IMAGES_ROOT/published/"}
     # A badge is addressed by host, not by day: the site map names
@@ -679,11 +691,20 @@ cmd_publish() {
     case $rel in badge/*) id="assets/fleet/$(basename "${rel%.*}")" ;; esac
     url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$file" --public-id "$id") || {
       say "publish: upload failed for $rel"
+      rm -f "$fresh" "$restaged"
       return 1
     }
-    printf '%s\t%s\t%s\n' "$rel" "$url" "$(stat -c%s "$file")" >>"$IMAGES_ROOT/published/urls.tsv"
+    printf '%s\t%s\t%s\n' "$rel" "$url" "$(stat -c%s "$file")" >>"$fresh"
     say "uploaded $rel"
-  done < <(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | sort)
+  done <"$restaged"
+  if [ -s "$rows" ]; then
+    awk -F'\t' -v list="$restaged" '
+      BEGIN { while ((getline l < list) > 0) { sub(/^.*\/published\//, "", l); seen[l] = 1 } }
+      !($1 in seen)
+    ' "$rows" >>"$fresh"
+  fi
+  mv -f "$fresh" "$rows"
+  rm -f "$restaged"
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
   build_index
   deploy_frontend

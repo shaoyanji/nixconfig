@@ -624,6 +624,42 @@
       "prompt": "Beastie, the FreeBSD daemon — a small red cartoon devil with short horns, a wide grin, sneakers and a pitchfork held upright, seen from the chest up. Square profile picture badge, realistic 4k wallpaper quality, neumorphic art deco relief plate: stepped arch and chevron frame, matte warm-white surface, muted gold and graphite, deep inset shadows, soft extruded highlights, subject centred and cropped at the shoulders, one clear focal point, no text, no lettering, no numbers, no logos.",
       "expect": "the red BSD daemon holding a pitchfork, never a corporate logo, a terminal window or a UI panel",
       "rev": 1
+    },
+    {
+      "id": "site-bs-hud-grid",
+      "lane": "site",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "bs/hud-grid.png",
+      "prompt": "A dark technical background plate for a brutalist systems console: an extremely fine grid of hairlines on near-black charcoal, the lines fading to nothing at the edges, one soft electric-blue glow behind the centre, flat vector, uniform weight, no text, no objects, no figures, wide aspect.",
+      "expect": "a fine grid of hairlines on near-black with one blue bloom, never a photograph or a UI window"
+    },
+    {
+      "id": "site-bs-scanlines",
+      "lane": "site",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "bs/scanlines.png",
+      "prompt": "A CRT texture plate: near-black background with evenly spaced faint horizontal scanlines in cold grey-blue, a slight vertical vignette, one thin brighter rule across the lower third, flat and uniform, no text, no objects, no figures, wide aspect.",
+      "expect": "evenly spaced scanlines on near-black, never a television or a monitor as an object"
+    },
+    {
+      "id": "site-bs-telemetry",
+      "lane": "site",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "bs/telemetry.png",
+      "prompt": "An abstract telemetry figure on near-black charcoal: one clean polyline waveform rising and falling across the frame, a secondary fainter trace behind it, a thin baseline and five small tick marks, vivid electric blue on dark, uniform stroke weight, flat vector, no text, no numbers, no UI panels, wide aspect.",
+      "expect": "one polyline waveform on dark with tick marks, never a screen, a chart with labels or a person"
+    },
+    {
+      "id": "site-bs-mark",
+      "lane": "site",
+      "every": 60,
+      "size": "1024x1024",
+      "name": "bs/mark.png",
+      "prompt": "A single geometric emblem on near-black charcoal, perfectly centred: three identical isometric slabs stacked with even gaps, the top slab's front edge one vivid electric-blue line, everything else mid-grey, hard 90-degree geometry, flat vector, high contrast, legible when shrunk to small size, no letters, no text, no gradients.",
+      "expect": "three stacked isometric slabs as one emblem, never a letter, a logo with text or a photograph"
     }
   ]
 }

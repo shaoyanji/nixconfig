@@ -37,10 +37,12 @@ die() {
 }
 
 [ -d "$(dirname "$TARGET")" ] || die "target directory $(dirname "$TARGET") does not exist"
-if [ ! -r "$RENDERED" ]; then
+if [ ! -s "$RENDERED" ]; then
   # A host with no rendered secrets (no sops, or a container) keeps whatever it
-  # has; inventing an empty .env there would wipe credentials.
-  printf 'hermes-env-sync: %s is not readable — leaving %s alone\n' "$RENDERED" "$TARGET"
+  # has; inventing an empty .env there would wipe credentials. `-s`, not `-r`: a
+  # zero-byte render is a broken template, and comparing against it would either
+  # empty .env or report a green check over no keys (measured 2026-11-12).
+  printf 'hermes-env-sync: %s is empty or unreadable — leaving %s alone\n' "$RENDERED" "$TARGET"
   exit 0
 fi
 if [ -L "$TARGET" ]; then
@@ -158,6 +160,11 @@ changed="$(awk -F= 'FILENAME == ARGV[1] { v[$1] = substr($0, length($1) + 2); ne
 if [ "$MODE" = "check" ]; then
   printf 'hermes-env-sync: DRIFT in %s (would add: %s; would drop: %s; would change: %s)\n' \
     "$TARGET" "${added:-none}" "${removed:-none}" "${changed:-none}"
+  # Byte-different with no key difference: an `export ` prefix, CRLF endings, a
+  # comment or an ordering change. Name it, or three "none"s read as a false alarm.
+  if [ -z "$added$removed$changed" ]; then
+    printf 'hermes-env-sync: the difference is formatting only (export prefix, line endings, comments or order), not a key\n' >&2
+  fi
   exit 1
 fi
 

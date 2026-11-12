@@ -33,6 +33,28 @@ if [ -z "${VOX_BATTERY:-}" ]; then
   export VOX_BATTERY="$root/scripts/task/vox-battery.json"
 fi
 
+# The `doc_pages` tool shells out to `qmd`, and this host carries the agents but
+# not the indexer, so the tool failed with `qmd: executable file not found` while
+# the caller's pick was right. Resolve it from `.#cli.search.qmd` — llm-agents'
+# qmd, substituted from cache.numtide.com — into the cache link
+# qmd-docs-index.sh already shares, and prepend its bin to PATH for the call. A
+# miss stays non-fatal: vox reports the failed tool and the turn still answers.
+if ! command -v qmd >/dev/null 2>&1; then
+  qmd_root="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-qmd"
+  qmd_bin="$qmd_root/qmd/bin/qmd"
+  if [ ! -x "$qmd_bin" ]; then
+    qmd_out=$(nix build --no-link --print-out-paths --builders "" "git+file://$root?submodules=1#cli.search.qmd" 2>/dev/null | tail -1 || true)
+    if [ -n "$qmd_out" ]; then
+      mkdir -p "$qmd_root"
+      ln -sfn "$qmd_out" "$qmd_root/qmd"
+    fi
+  fi
+  if [ -x "$qmd_bin" ]; then
+    PATH="$(dirname "$qmd_bin"):$PATH"
+    export PATH
+  fi
+fi
+
 bin=${VOX_BIN:-}
 if [ -z "$bin" ]; then
   bin=$(command -v vox || true)
@@ -49,14 +71,71 @@ if [ -z "$bin" ]; then
   fi
   bin="$out/bin/vox"
 fi
+# TOON is the projection an agent reads; JSON is the wire form the CLI emits
+# ([[flake/policies.nix#agent-boundary-is-toon]]: a program gets JSON, a reader
+# gets TOON). `FORMAT=json` asks for the wire form back. Only `ask` and
+# `battery` have a JSON mode — every other subcommand already prints prose.
+#
+# `toon` is resolved from PATH because that is where llm-agents puts it
+# (modules/profiles/operator-tools.nix, substituted from cache.numtide.com); a
+# missing one is reported and the JSON printed rather than failing the turn.
+format=${VOX_FORMAT:-toon}
+case "$format" in
+  toon | json) ;;
+  *)
+    echo "vox: unknown FORMAT '$format' (toon or json)" >&2
+    exit 1
+    ;;
+esac
+# Only these two subcommands speak JSON, so only they can be projected; every
+# other one already prints prose a person reads and has nothing to convert.
+speaks_json=no
+case "${1:-}" in
+  ask | battery) speaks_json=yes ;;
+esac
+project=no
+if [ "$speaks_json" = yes ]; then
+  # `-json` may already be among the arguments; appending it twice is harmless
+  # but a second copy in a log is noise.
+  already=no
+  for a in "$@"; do
+    if [ "$a" = "-json" ]; then already=yes; fi
+  done
+  if [ "$already" = no ]; then
+    # Before the positional argument, never after: Go's flag parser stops at the
+    # first non-flag argument, so `ask <prompt> -json` would silently drop it.
+    sub=$1
+    shift
+    set -- "$sub" -json "$@"
+  fi
+  if [ "$format" = toon ]; then
+    project=yes
+  fi
+fi
+
 # The contract is the exit code: 0 answered or acted, 2 a proposal that needs a
 # person, 3 refused, 4 escalated to a reasoning model. Spelled out rather than
 # passed through with `exec`, so an unexpected code cannot leak out as one of
 # those four — and so the gate that compares a summary's promise to what the
 # script emits has the literals to compare.
 set +e
-"$bin" "$@"
-rc=$?
+if [ "$project" = yes ]; then
+  raw=$(mktemp)
+  "$bin" "$@" >"$raw"
+  rc=$?
+  if [ -s "$raw" ]; then
+    if command -v toon >/dev/null 2>&1; then
+      toon -e <"$raw" || cat "$raw"
+    else
+      echo "vox: toon is not on PATH (llm-agents toon, see modules/profiles/operator-tools.nix); printing JSON" >&2
+      cat "$raw"
+    fi
+  fi
+  rm -f "$raw"
+else
+  "$bin" "$@"
+  rc=$?
+fi
 set -e
 case "$rc" in
   0) exit 0 ;;

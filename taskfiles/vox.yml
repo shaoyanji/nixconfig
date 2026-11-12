@@ -8,6 +8,12 @@ version: "3"
 # missing engine makes the caller a replay fixture, a missing decision model
 # leaves the caller's own pick, a missing chat lane returns the raw answer.
 # `vox:doctor` is the task that says which one is missing on this host.
+# An agent reads the result, so the default projection is TOON and `FORMAT=json`
+# asks for the wire form the CLI emits; `scripts/task/vox.sh` does the converting
+# and keeps the exit code, which is the actual verdict.
+vars:
+  FORMAT: '{{.FORMAT | default "toon"}}'
+
 tasks:
   vox:doctor:
     desc: Which of the caller, the router and the voice exist on this host
@@ -37,17 +43,18 @@ tasks:
       means the score is below `-threshold`. The engine is arm64, so this is a
       delphi task; on x86_64 there is no caller to measure.
     cmds:
-      - bash scripts/task/vox.sh battery -cases scripts/task/vox-battery.json {{.CLI_ARGS}}
+      - VOX_FORMAT={{.FORMAT}} bash scripts/task/vox.sh battery -cases scripts/task/vox-battery.json {{.CLI_ARGS}}
 
   vox:ask:
     desc: Explain one question end to end (caller -> router -> tool -> voice)
     summary: >
       `task vox:ask -- "what is fern"`. One caller pass picks a tool, the lane is
-      routed, a read-only tool runs, and the answer is explained in prose. Exit
-      2 means the gate held it as a proposal, 3 a refusal, 4 an escalation to a
-      reasoning model — the exit code carries the verdict, so no prose is parsed.
+      routed, a read-only tool runs, and the answer is explained in prose. The
+      result is TOON; `FORMAT=json` prints the wire form. Exit 2 means the gate
+      held it as a proposal, 3 a refusal, 4 an escalation to a reasoning model —
+      the exit code carries the verdict, so nothing parses the prose.
     cmds:
-      - bash scripts/task/vox.sh ask {{.CLI_ARGS}}
+      - VOX_FORMAT={{.FORMAT}} bash scripts/task/vox.sh ask {{.CLI_ARGS}}
 
   vox:decide:
     desc: Ask a decision model for a label and a probability

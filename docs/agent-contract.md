@@ -1,11 +1,10 @@
-# Agent contract — what "done" means, per kind of change
+# Agent contract: what done means for each kind of change
 
 Routing lives in `AGENTS.md` (entry contract, task ladder) and the `task-plane`
-skill. This page owns the part neither states: the **exit predicate** for each
-kind of work, the **evidence object** a turn must carry, and the **playbook**
-declared before the first tool call. A rule here that is not a `holds` in
-`flake/policies.nix` is decoration, and this page is written to be as small as
-that rule allows.
+skill. This page owns the part neither states: the exit predicate for each kind
+of work, the evidence object a turn must carry, and the playbook declared before
+the first tool call. A rule here that is not a `holds` in `flake/policies.nix` is
+decoration, and this page is written to be as small as that rule allows.
 
 ## The door
 
@@ -25,9 +24,9 @@ checks:tasks` fails any `task <name>` citation here that the graph does not have
 (wildcards resolve by their static prefix), so this table cannot drift into a
 wish list.
 
-### Where a lookup goes — name the pattern, or ask for one
+### Where a lookup goes: name the pattern, or ask for one
 
-**A typed lookup is the default, and the edge caller is not it.** Measured
+A typed lookup is the default, and the edge caller is not it. Measured
 2026-11-02: `task ops:kg:host HOST=fern` costs 145 ms, emits 40 bytes and is
 exact; `task agents:call Q="what touches fern"` costs 1073 ms, emits 54 bytes and
 reads 605 against 217, and gets the typed call right 3 times in 6 — the rest are
@@ -59,7 +58,7 @@ you actually need: `nix eval --raw .#nixosConfigurations.<host>.config.<option>`
 
 ## Reading rule, scoped to structure
 
-Learn **structure** from the graph and from evaluation, never from prose. Do not
+Learn structure from the graph and from evaluation, never from prose. Do not
 read `AGENTS.nix` in full (query `task ops:notes`), do not re-derive the process
 by reading `.agents/**`, and do not read a `.nix` comment to infer a default,
 an ordering or a dependency — a comment can lie, `nix eval` cannot.

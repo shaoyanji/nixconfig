@@ -1,6 +1,6 @@
 # Agent context — start here
 
-This directory is the **agent context plane**: a router, a schema, and skills.
+This directory is the agent context plane: a router, a schema and skills.
 It is not a second manual and it is not executable truth.
 
 | You need | Go to |
@@ -36,9 +36,9 @@ nix build .#artifacts.agent-skills-bundle                     # skills + index.j
 `SCHEMA.md`, and emits the index. A new skill is discovered by adding a
 directory — there is no table to update, so there is no table to forget.
 
-## The skills that matter most (pinnacles)
+## The skills that matter most
 
-| Skill | Why it is a pinnacle |
+| Skill | Why it matters |
 | :--- | :--- |
 | [`task-plane`](skills/task-plane/SKILL.md) | The control plane is hundreds of tasks (`task --list-all \| wc -l`); this is the intent→task router, cost tiers, and the authoring contract. Read it before adding a task. |
 | [`nix-eval`](skills/nix-eval/SKILL.md) | The cheapest instrument ladder. Most "I need a script" questions are a 1-second eval. |

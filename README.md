@@ -328,9 +328,9 @@ The fleet roster — 31 devices across NixOS, nix-darwin, standalone Home Manage
 external non-Nix nodes, preserved and WIP machines — is defined once in
 [`inventory.toml`](inventory.toml), the machine-readable source of truth, and
 rendered for humans by `nix build .#artifacts.docs` (pointer: [`docs/fleet-inventory.md`](docs/fleet-inventory.md))
-(built by `lib/docs.nix`; refresh with `task docs:sync`, verify with
-`task checks:docs:sync`). Neither copy is hand-maintained, so the roster is
-deliberately **not** duplicated here.
+(built by `lib/docs.nix`; `task docs:build` renders it and nothing is committed,
+so there is no drift check to run). Neither copy is hand-maintained, so the
+roster is deliberately not duplicated here.
 
 `deckstation` is a pure Steam install — no desktop environment, just greetd + tuigreet dropping into gamescope-session (Steam Big Picture). Uses `globalModulesContainers` so no dms/niri leaks in. Runs Sunshine GameStream/Moonlight host so any LAN client (phone, laptop, TV box) can launch the big screen remotely. Closure is minimalistic: ROCm/OpenCL compute packages are dropped from the AMD profile since Steam + gamescope only need Mesa + amdgpu.
 

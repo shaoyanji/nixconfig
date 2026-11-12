@@ -117,8 +117,8 @@
         src = pkgs.fetchFromGitHub {
           owner = "shaoyanji";
           repo = "pancakes-harness";
-          rev = "a7fd668a233c4e627ca48080a0dc50885fb7bc79";
-          hash = "sha256-wzVnazxP9hxVP/iVCXf/fL47WmHuC3Wq7PY9fKeVKPE=";
+          rev = "ad225137c65f0afa3e3826faae7b469ca59d7c9c";
+          hash = "sha256-nPjlvfWfj157Eb6pQIayJQQkTDJAejgHVi1Eh07/R7M=";
         };
         subPackages = ["cmd/vox"];
         vendorHash = null;

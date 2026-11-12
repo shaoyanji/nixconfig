@@ -13,6 +13,8 @@
 #                             Chirpy front matter per banner, and the JPEGs copied
 #   image-daily.sh gc         destroy Cloudinary public ids nothing references
 #   image-daily.sh wallpaper  set the first in-rotation wallpaper with swaybg
+#   image-daily.sh plates     a requested round of photoreal character plates from
+#                             the standing roster lib/image-daily/plates.txt
 #
 # WHY THIS EXISTS: the allowance is 100 images per day and it does not carry
 # over, so a day nobody spends is a day thrown away — and a queue kept in a
@@ -191,6 +193,25 @@ briefs_guard() {
     fi
   done < <(jq -r '.briefs[] | select(.id | startswith("badge-"))
     | [.id, .prompt, (.expect // ""), ((.prompt | split(" ") | length) | tostring)] | @tsv' "$BRIEFS")
+  # The wall lane's intent is illustrated art with one clear subject, and the
+  # judge holds every plate to that intent, not to the brief. A wall prompt that
+  # names no style is therefore rendered as a photograph and refused at judging
+  # time. Measured 2026-11-12: a 42-plate burst sent photographic sentences and
+  # nine came back "photorealistic rather than illustrative" or "no focal point",
+  # each refusal spending a second image. Style and focal point are stated in the
+  # brief, so the drift never reaches the judge.
+  while IFS=$'\t' read -r id prompt expect; do
+    [ -n "$expect" ] || { say "briefs: $id has no expect line"; bad=1; }
+    case "$prompt" in
+      *illustration* | *illustrated* | *"cel-shaded"*) ;;
+      *) say "briefs: $id names no illustrative style — the judge refuses a photographic plate"; bad=1 ;;
+    esac
+    case "$prompt" in
+      *"one clear focal point"*) ;;
+      *) say "briefs: $id names no focal point"; bad=1 ;;
+    esac
+  done < <(jq -r '.briefs[] | select(.id | startswith("wall-"))
+    | [.id, .prompt, (.expect // "")] | @tsv' "$BRIEFS")
   return $bad
 }
 
@@ -323,6 +344,10 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
   # call because a plate spent without a way to measure it is spent blind.
   command -v ffprobe >/dev/null || die "ffprobe is required to verify a plate's size (pkgs.ffmpeg)"
   local out rc=0 tries=0 wait got
+  # The burst window is the real ceiling on this plan, so how long to wait for it
+  # is a caller's decision: a nightly brief gives up after three tries and moves
+  # on, a requested plate round waits the window out.
+  local tries_max=${RATE_TRIES:-3} base=${RATE_WAIT:-60} ceiling=${RATE_WAIT_MAX:-900}
   while :; do
     out=$(cpg image --json -s "$size" -o "$file" "$prompt" 2>&1); rc=$?
     if [ "$rc" -eq 0 ] && [ -s "$file" ]; then
@@ -336,12 +361,13 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
     fi
     if printf '%s' "$out" | grep -q '429\|RATE_LIMITED'; then
       tries=$((tries + 1))
-      if [ "$tries" -gt 3 ]; then
+      if [ "$tries" -gt "$tries_max" ]; then
         record "$day" "$lane" "$id" "$file" "failed" "rate limited after $tries attempts" "$prompt" "$n" "$rev"
         say "$id: still rate limited after $tries attempts"
         return 2
       fi
-      wait=$((60 * (1 << (tries - 1))))
+      wait=$((base * (1 << (tries - 1))))
+      [ "$wait" -gt "$ceiling" ] && wait=$ceiling
       say "$id: rate limited, waiting ${wait}s"
       sleep "$wait"
       continue
@@ -501,7 +527,7 @@ build_index() {
 # --- subcommands ------------------------------------------------------------
 cmd_plan() {
   need jq cpg
-  briefs_guard || die "briefs: a character brief is not bank-ready (see above)"
+  briefs_guard || die "briefs: a brief is not bank-ready (see above)"
   local rem lane rows n total=0
   rem=$(remaining)
   [ -n "$rem" ] || die "cpg usage answered nothing — is the session alive? (cpg status --json)"
@@ -524,7 +550,7 @@ cmd_plan() {
 
 cmd_run() {
   need jq cpg agy git
-  briefs_guard || die "briefs: a character brief is not bank-ready (see above)"
+  briefs_guard || die "briefs: a brief is not bank-ready (see above)"
   mkdir -p "$IMAGES_ROOT" "$STAGE"
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }
@@ -1016,6 +1042,97 @@ cmd_wallpaper() {
   say "$(basename "$pick")"
 }
 
+# A requested character plate is not a brief and cannot be one: a brief is a
+# freshness promise (`every`), and nobody wants the same person redrawn on a
+# schedule. It also cannot ride the wall lane, whose intent is illustrated art —
+# a photographic plate is refused by that intent at judging time, which is how the
+# 2026-11-12 burst lost plates it had already paid for. So the round has its own
+# intent (`.intents.photoreal`), its own roster, and one property that makes it the
+# go-to spend: a row whose plate the judge kept is skipped, so re-running the
+# round renders nothing twice and a half-finished round resumes for free.
+#
+# Roster lines are `<slug>|<prompt>|<expect>`; `|` is not otherwise used in a
+# prompt, and `expect` is what lets the judge call a literal reading of a name a
+# reroll. The tail `4k, photorealistic, realistic, neumorphism.` is the family the
+# 2026-11-10 palette test settled on, so it lives in each line rather than here.
+kept_plate() { # brief
+  [ -f "$LEDGER" ] || return 0
+  jq -r --arg b "$1" 'select(.brief == $b and .verdict == "keep") | .path' "$LEDGER" |
+    tac | while IFS= read -r p; do
+      [ -f "$p" ] && { printf '%s\n' "$p"; break; }
+    done
+}
+
+cmd_plates() {
+  need jq cpg agy git ffprobe
+  local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} size=${SIZE:-1536x1024}
+  [ -f "$roster" ] || die "no roster at $roster"
+  local intent
+  intent=$(jq -r '.intents.photoreal // empty' "$BRIEFS")
+  [ -n "$intent" ] || die "briefs.json carries no .intents.photoreal"
+  # A requested round is allowed to wait the burst window out: the alternative is
+  # spending a plate, judging it, and then abandoning the round at 25 images.
+  export RATE_TRIES=${RATE_TRIES:-8} RATE_WAIT=${RATE_WAIT:-300} RATE_WAIT_MAX=${RATE_WAIT_MAX:-900}
+  mkdir -p "$IMAGES_ROOT" "$STAGE"
+  exec 9>"$IMAGES_ROOT/.run.lock"
+  flock -n 9 || { say "another run holds the lock"; exit 0; }
+
+  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect have file v verdict defect sent
+  day=$(today)
+  left=$(remaining || echo 0)
+  say "plates: $(grep -vc '^#' "$roster") row(s) in the roster, $left image(s) left${cap:+, cap $cap}"
+
+  while IFS='|' read -r slug prompt expect; do
+    [ -n "$slug" ] || continue
+    case $slug in \#*) continue ;; esac
+    # An empty ONLY is not a filter that matches nothing: it is no filter at all.
+    if [ -n "${ONLY:-}" ]; then
+      case ",$ONLY," in *",$slug,"*) ;; *) continue ;; esac
+    fi
+    if [ "${FORCE:-0}" != "1" ]; then
+      have=$(kept_plate "photoreal-$slug")
+      [ -n "$have" ] && { say "$slug: kept already ($have)"; continue; }
+    fi
+    [ "$left" -gt 0 ] || { say "allowance spent"; break; }
+    if [ "$cap" -gt 0 ] && [ "$spent" -ge "$cap" ]; then
+      say "cap $cap reached; the rest of the roster waits for the next round"
+      break
+    fi
+    if [ "${DRY:-0}" = "1" ]; then
+      say "would generate $slug ($size) -> wall/$day/$slug.png"
+      spent=$((spent + 1))
+      continue
+    fi
+
+    file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$prompt" "$day" 1 1) || continue
+    left=$((left - 1))
+    v=$(judge_image "$file" wall "$intent" "$expect")
+    verdict=$(printf '%s' "$v" | jq -r '.verdict')
+    defect=$(printf '%s' "$v" | jq -r '.defect // ""')
+    spent=$((spent + 1))
+    record "$day" wall "photoreal-$slug" "$file" "$verdict" "$(reason_of "$v")" "$prompt" 1 1
+
+    if [ "$verdict" = "reroll" ] && [ -n "$defect" ] && [ "$left" -gt 0 ] &&
+      { [ "$cap" -eq 0 ] || [ "$spent" -lt "$cap" ]; }; then
+      say "$slug: reroll — $defect"
+      rm -f "$file"
+      sent="$prompt (Change only this: $defect.)"
+      file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$sent" "$day" 2 1) || continue
+      left=$((left - 1))
+      v=$(judge_image "$file" wall "$intent" "$expect")
+      verdict=$(printf '%s' "$v" | jq -r '.verdict')
+      spent=$((spent + 1))
+      record "$day" wall "photoreal-$slug" "$file" "$verdict" "$(reason_of "$v")" "$sent" 2 1
+    fi
+    say "$slug: $verdict"
+  done <"$roster"
+
+  say "$day: $spent image(s) spent this round"
+  if [ "${PUBLISH:-1}" = "1" ] && [ "${DRY:-0}" != "1" ] && [ "$spent" -gt 0 ]; then
+    cmd_publish || say "publish failed; the plates are on disk and the next publish picks them up"
+  fi
+}
+
 case "${1:-plan}" in
   plan) cmd_plan ;;
   run) cmd_run ;;
@@ -1026,5 +1143,6 @@ case "${1:-plan}" in
   gc) cmd_gc ;;
   blog) shift && cmd_blog "$@" ;;
   wallpaper) cmd_wallpaper ;;
-  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|wallpaper" ;;
+  plates) cmd_plates ;;
+  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|wallpaper|plates" ;;
 esac

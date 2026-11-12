@@ -37,6 +37,18 @@ tasks:
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} STORYBOOK_DIR={{.STORYBOOK_DIR}} bash scripts/task/image-daily.sh run
 
+  images:plates:
+    desc: A requested round of photoreal character plates from the standing roster
+    summary: >
+      The go-to spend for "more wallpapers": `lib/image-daily/plates.txt` lists
+      `<slug>|<prompt>|<expect>` character plates in the palette-test family,
+      judged against `.intents.photoreal` rather than the wall lane's illustrated
+      intent, so a portrait is what the judge holds the name to. A row the ledger
+      already kept is skipped, so a resumed round costs nothing. Env: `ONLY=`,
+      `MAX_GEN=`, `FORCE=1`, `DRY=1`, `PUBLISH=0`.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" bash scripts/task/image-daily.sh plates
+
   images:status:
     desc: "[gate] per-lane freshness from the ledger — exit 1 when a lane is stale"
     summary: >

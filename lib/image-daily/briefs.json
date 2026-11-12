@@ -32,6 +32,9 @@
       "intent": "a square profile-picture badge for one host on the fleet site, shown at 96px beside the host's name: one recognisable subject with a clear focal point, never a UI panel, an icon sheet or an abstract emblem"
     }
   },
+  "intents": {
+    "photoreal": "a photorealistic 4k portrait plate of one fictional anime character as a real person: the character is recognisable at a glance from hair, eyes and outfit, with one clear focal point and no garbled lettering, and never a plant, a chemical element, a symbol, a UI panel or a landscape standing in for the person"
+  },
   "briefs": [
     {
       "id": "site-og-console",
@@ -103,9 +106,9 @@
       "every": 45,
       "size": "1536x1024",
       "name": "frieren-cyberpunk.png",
-      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End — long silver-white hair in twin tails, pointed ears, green eyes, white and gold-trimmed robe over a black dress, standing on a rain-slick street in a neon-lit city at night, seen from the waist up, cel-shaded anime illustration, cyan and magenta light on her face, no text.",
+      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End — long silver-white hair in twin tails, pointed ears, green eyes, white and gold-trimmed robe over a black dress, standing on a rain-slick street in a neon-lit city at night, seen from the waist up, cel-shaded anime illustration, one clear focal point, cyan and magenta light on her face, no text.",
       "expect": "an anime character portrait of Frieren in a neon city, never a city with nobody in it",
-      "rev": 2
+      "rev": 3
     },
     {
       "id": "wall-char-fern",
@@ -193,9 +196,9 @@
       "every": 9,
       "size": "1536x1024",
       "name": "crt-sand.png",
-      "prompt": "A beige CRT monitor half-buried in pale dune sand, its screen dark and dust-filmed, rippled sand in the foreground, illustrated scene, warm late-afternoon light, no text.",
+      "prompt": "A beige CRT monitor half-buried in pale dune sand, its screen dark and dust-filmed, rippled sand in the foreground, illustrated scene, one clear focal point, warm late-afternoon light, no text.",
       "expect": "a CRT monitor half-buried in sand, never a flat abstract shape",
-      "rev": 2
+      "rev": 3
     },
     {
       "id": "wall-neumorph-diver",
@@ -203,9 +206,9 @@
       "every": 9,
       "size": "1536x1024",
       "name": "diver-cathedral.png",
-      "prompt": "A deep-sea diver in a brass helmet walking down the nave of a flooded gothic cathedral, shafts of green light through the water, illustrated scene, no text.",
+      "prompt": "A deep-sea diver in a brass helmet walking down the nave of a flooded gothic cathedral, shafts of green light through the water, illustrated scene, one clear focal point, no text.",
       "expect": "a diver inside a cathedral nave underwater, never a diving emblem or icon",
-      "rev": 2
+      "rev": 3
     },
     {
       "id": "wall-neumorph-vending",
@@ -213,9 +216,9 @@
       "every": 9,
       "size": "1536x1024",
       "name": "vending-snow.png",
-      "prompt": "A lit vending machine standing alone in a snowfield at night, its glow the only light, falling snow, illustrated scene, no text.",
+      "prompt": "A lit vending machine standing alone in a snowfield at night, its glow the only light, falling snow, illustrated scene, one clear focal point, no text.",
       "expect": "a vending machine standing in snow, never a vending icon or a UI card",
-      "rev": 2
+      "rev": 3
     },
     {
       "id": "wall-neumorph-kitchen",
@@ -223,9 +226,9 @@
       "every": 12,
       "size": "1536x1024",
       "name": "keeper-kitchen.png",
-      "prompt": "A lighthouse keeper's small kitchen at dusk, a kettle on a stove and a rain-streaked window looking out to sea, illustrated scene, warm lamp light, no text.",
+      "prompt": "A lighthouse keeper's small kitchen at dusk, a kettle on a stove and a rain-streaked window looking out to sea, illustrated scene, one clear focal point, warm lamp light, no text.",
       "expect": "a kitchen interior with a window to the sea, never a kitchen appliance icon",
-      "rev": 2
+      "rev": 3
     },
     {
       "id": "wall-neumorph-sleep",
@@ -233,9 +236,9 @@
       "every": 4,
       "size": "1536x1024",
       "name": "frieren-sleep.png",
-      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End, asleep in a field of white flowers with her staff beside her, seen from a low angle, cel-shaded anime illustration, soft morning light, no text.",
+      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End, asleep in a field of white flowers with her staff beside her, seen from a low angle, cel-shaded anime illustration, one clear focal point, soft morning light, no text.",
       "expect": "Frieren asleep in a flower field, never an abstract emblem or a UI panel",
-      "rev": 2
+      "rev": 3
     },
     {
       "id": "fleet-docs-hero",

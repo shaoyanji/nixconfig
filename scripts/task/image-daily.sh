@@ -241,6 +241,17 @@ remaining() {
     if (.entitlement.limits.imagesPerDay | type) == "number"
     then (.entitlement.limits.imagesPerDay - (.usage.images.used // 0))
     else (.usage.images.remaining // empty) end' 2>/dev/null)
+  # An unreadable pool is not an empty one. The session token lives 60 s and is
+  # minted from the stored cookie, so a 401 here is usually a stale token:
+  # refresh once and ask again. Still empty means the session is gone, and the
+  # caller has to say so instead of spending nothing and calling it a full day.
+  if [ -z "$n" ] || [ "$n" = null ]; then
+    cpg refresh >/dev/null 2>&1 || true
+    n=$(cpg usage --json 2>/dev/null | jq -r '
+      if (.entitlement.limits.imagesPerDay | type) == "number"
+      then (.entitlement.limits.imagesPerDay - (.usage.images.used // 0))
+      else (.usage.images.remaining // empty) end' 2>/dev/null)
+  fi
   case "$n" in
     '' | null) return 0 ;;
     -*) echo 0 ;;
@@ -1079,7 +1090,8 @@ cmd_plates() {
 
   local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect have file v verdict defect sent
   day=$(today)
-  left=$(remaining || echo 0)
+  left=$(remaining)
+  [ -n "$left" ] || die "usage unreadable (401 from cpg) — run cpg refresh, or chatplayground-go login when the session itself is gone"
   say "plates: $(grep -vc '^#' "$roster") row(s) in the roster, $left image(s) left${cap:+, cap $cap}"
 
   while IFS='|' read -r slug prompt expect; do

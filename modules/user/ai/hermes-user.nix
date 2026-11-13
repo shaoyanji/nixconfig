@@ -402,6 +402,11 @@ in {
         Type = "oneshot";
         # --json plus a non-zero exit on a dead session: that is the signal.
         ExecStart = "${chatplaygroundCli}/bin/cpg refresh --json";
+        # The mint shells out to `node`. Inheriting the user manager's PATH made
+        # this an hourly `node: executable file not found` the moment a profile
+        # stopped carrying nodejs, which reads as a dead session and blocks
+        # every `cpg` call. Pin the interpreter instead of hoping for PATH.
+        path = [pkgs.nodejs];
         Environment = [
           "HOME=${config.home.homeDirectory}"
           "USER=${config.home.username}"

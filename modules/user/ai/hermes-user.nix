@@ -405,9 +405,10 @@ in {
         # The mint shells out to `node`. Inheriting the user manager's PATH made
         # this an hourly `node: executable file not found` the moment a profile
         # stopped carrying nodejs, which reads as a dead session and blocks
-        # every `cpg` call. Pin the interpreter instead of hoping for PATH.
-        path = [pkgs.nodejs];
+        # every `cpg` call. Say PATH out loud: `path =` inside `Service` is not a
+        # unit directive, and systemd drops an unknown key without a word.
         Environment = [
+          "PATH=${pkgs.nodejs}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
           "HOME=${config.home.homeDirectory}"
           "USER=${config.home.username}"
         ];

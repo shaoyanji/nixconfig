@@ -9,6 +9,22 @@
   # ~/.hermes/ for the gateway daemon.
   ...
 }: let
+  # The session keepalive's first step. Minting a token does not count as
+  # activity, so a session with no real request ages out on the provider's
+  # schedule while every mint succeeds — measured 2026-11-14: seven idle days,
+  # `status: expired`, every `cpg` call 401, and nothing failed until an image
+  # round needed one. This call is the activity, and it fails loudly before the
+  # deadline instead of after it.
+  cpgSessionTouch = pkgs.writeShellApplication {
+    name = "cpg-session-touch";
+    runtimeInputs = with pkgs; [
+      coreutils
+      curl
+      jq
+    ];
+    text = builtins.readFile ../../../scripts/task/cpg-session-touch.sh;
+  };
+
   # ~/.hermes/.env is DERIVED: the rendered credential file plus the keys only
   # this host defines (see scripts/task/hermes-env-sync.sh for why a plain file
   # shadowing a symlink was worse than either option alone).
@@ -386,9 +402,13 @@ in {
 
     # The session lives in a browser cookie. When it dies, chat, image
     # generation and the advice lane die together, and nothing says so until a
-    # request fails. One mint an hour keeps the 60-second token fresh and makes
-    # a dead session a failed unit within the hour. It cannot resurrect one:
-    # that needs `chatplayground-go login` in a real browser.
+    # request fails. The hourly job now does two things: touch the session (the
+    # only call that counts as activity, so the idle clock keeps moving) and mint
+    # the 60-second token from the cookie. Neither can resurrect a session that
+    # has already expired — that needs `chatplayground-go login` in a real
+    # browser — so the touch also fails the unit when the provider's fixed
+    # expiry is inside ${EXPIRE_WARN_HOURS} hours, which turns a surprise outage
+    # into a day's notice.
     systemd.user.services.chatplayground-refresh = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
       Unit = {
         Description = "chatplayground session keepalive — mint a Clerk token from the stored client cookie";
@@ -400,6 +420,10 @@ in {
       };
       Service = {
         Type = "oneshot";
+        # Touch first: a mint alone leaves the idle clock where it was. Exit 2
+        # (alive but inside the warning window) still mints, so the token keeps
+        # working up to the deadline; the unit's exit status carries the warning.
+        ExecStartPre = "-${cpgSessionTouch}/bin/cpg-session-touch";
         # --json plus a non-zero exit on a dead session: that is the signal.
         ExecStart = "${chatplaygroundCli}/bin/cpg refresh --json";
         # The mint shells out to `node`. Inheriting the user manager's PATH made

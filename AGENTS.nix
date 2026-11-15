@@ -5320,9 +5320,9 @@
         **For the next re-consent.** `--headless=new` is refused ("This browser or app may not be
         secure"); the same binary under `xvfb-run` is not, driven by CDP over node's `WebSocket`.
         This account answers with a passkey, so one phone approval is required, and the TOTP comes
-        from `cloak view google`. Keep the `--user-data-dir` profile at `/tmp/cdp-prof-headed`:
-        the next consent should skip the login step entirely. Method recorded in the `calendar`
-        skill.
+        from `cloak view google`. Keep the `--user-data-dir` profile at
+        `~/.local/state/cdp-prof-headed` — a Google session is a cookie jar, so the profile is the
+        credential and `/tmp` was the wrong home for it. Method recorded in the `calendar` skill.
 
         Exit: `task checks:gcal` still reports a permanent grant on 2026-11-22, one week after this
         consent, with no `invalid_grant` in the journal. If it has reverted, the cap is real and

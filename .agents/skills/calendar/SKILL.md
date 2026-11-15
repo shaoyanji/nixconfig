@@ -208,8 +208,10 @@ write`; nothing in this skill sends on its own.
   one **phone approval** is needed) → `google authenticator` code from
   `cloak view google` → a "update your password" speedbump → consent → the
   redirect lands on `127.0.0.1:<port>` **on this host**, so the code is exchanged
-  locally and the token written. Keep the `--user-data-dir` profile: the next
-  consent skips the login. A consent driven this way produced a **permanent**
+  locally and the token written. Keep the `--user-data-dir` profile -
+  `~/.local/state/cdp-prof-headed` (it was /tmp until 2026-11-15, which a reboot
+  empties): the cookies are the Google session, so the next consent skips the
+  login and the phone tap. A consent driven this way produced a **permanent**
   grant where the paste-based exchange produced 604799 s.
 
 Truth: `modules/calendar.nix` — the option surface; this page is the procedure.

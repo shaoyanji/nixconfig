@@ -184,6 +184,14 @@ agent reads; `FORMAT=text` gives a person a table and `FORMAT=json` a machine.
 new application does not wait for someone to type the task. `sync.enable = false`
 turns the drainer off and leaves the verbs above.
 
+A mail that asks something and states no lifecycle event — *"Wäre es für Sie
+möglich, in Vollzeit zu arbeiten?"* — is not noise: the sync parks it in the
+person's queue (`review`, owner `human`, left unresolved) and writes `answer the
+question in this mail` as the record's next action. Resolving it instead is how
+the Eat Happy question of 23 October 2026 disappeared with nothing written and
+nobody told; the phrase list is `QUESTION_SIGNALS` in `sync.py`, and the ATS
+footer "Haben Sie Fragen?" deliberately does not match.
+
 Each sync then starts `appflow-resolve.service`: the two local engines answer
 attribute/ignore/unsure, and the unsures go through one hermes turn. An entry it
 judges irrelevant moves to the reversible `ignore` tier, and `task

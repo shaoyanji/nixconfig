@@ -101,6 +101,34 @@ if employer.lower() != "avenit group":
 else:
     print("ok    Personio employer")
 
+# A question is not a status and must not be closed as noise: the Eat Happy mail
+# asked "Wäre es für Sie möglich, in Vollzeit zu arbeiten?" and the sync resolved
+# it, so nobody was ever asked to answer. The ATS footer asks nothing.
+questions = [
+    (
+        "question: full-time possible",
+        "Wäre es für Sie möglich, in Vollzeit zu arbeiten?",
+        True,
+    ),
+    (
+        "question: availability in English",
+        "Are you available to start on 1 December?",
+        True,
+    ),
+    (
+        "footer asks nothing",
+        "Haben Sie Fragen? Kontaktieren Sie uns jederzeit gerne.",
+        False,
+    ),
+]
+for name, text, want in questions:
+    got = sync.asks_question(text)
+    if got != want:
+        print(f"FAIL  {name}: asks_question={got!r}, want {want!r}")
+        failed += 1
+    else:
+        print(f"ok    {name}")
+
 # A conditional invite is an acknowledgement, not an interview.
 conditional = sync.detect_event(
     "Wir haben deine Unterlagen erhalten. Wenn wir dich zu einem "
@@ -112,7 +140,7 @@ if not conditional or conditional[0] != "received":
 else:
     print("ok    conditional invite is not an interview")
 
-total = len(cases) + 3
+total = len(cases) + 3 + len(questions)
 print(f"{total - failed}/{total} passed")
 sys.exit(1 if failed else 0)
 PY

@@ -336,6 +336,32 @@ def detect_event(text: str) -> tuple[str, str] | None:
     return None
 
 
+# A question needs an answer, not a status. This is the Eat Happy case: a real
+# recruiter asked "Wäre es für Sie möglich, in Vollzeit zu arbeiten?" and the sync
+# read it, found no lifecycle event, and resolved it — so the mail left the queue
+# with no status, no next action, and nobody told. The phrases are the ones that
+# ask the applicant about availability or interest; the ATS footer "Haben Sie
+# Fragen? Kontaktieren Sie uns" asks nothing and stays noise, which is why this is
+# a phrase list and not a search for a question mark.
+QUESTION_SIGNALS = (
+    r"w(?:ä|ae)re es (?:f(?:ü|ue)r sie )?m(?:ö|oe)glich|ist es m(?:ö|oe)glich"
+    r"|h(?:ä|ae)tten sie (?:interesse|zeit)|haben sie (?:interesse|zeit)"
+    r"|sind sie bereit|w(?:ä|ae)ren sie bereit|passt es ihnen|passt ihnen"
+    r"|k(?:ö|oe)nnten sie|w(?:ü|ue)rden sie|ab wann|wann k(?:ö|oe)nnten sie"
+    r"|would you be able|are you available|would you be available|are you interested"
+    r"|can you start|could you start|when could you start"
+)
+
+
+def asks_question(text: str) -> bool:
+    """Does this mail ask the applicant something a status cannot answer?
+
+    Narrow on purpose: the cost of a false positive is a message parked in a
+    person's queue, so only the phrases that expect a reply from us match.
+    """
+    return re.search(QUESTION_SIGNALS, (text or "").lower()) is not None
+
+
 # How far along a message puts an application. The sync walks a mailbox's worth
 # of mail per applicant in order, so without this an acknowledgement from
 # September overwrote an interview from October: the queue is newest-first and
@@ -366,6 +392,8 @@ def sync(api: str, apply: bool, limit: int, ledger_path: str, only: str = "") ->
     if not queue:
         print("pipeline sync: nothing in the queue")
         return 0
+
+    questions = 0
 
     # Oldest first: the newest message is the one that decides the current status.
     queue.sort(key=lambda row: row.get("sentAt") or "")
@@ -520,6 +548,49 @@ def sync(api: str, apply: bool, limit: int, ledger_path: str, only: str = "") ->
         body = get(f"{api}/api/message-body?messageId={urllib.parse.quote(message_id)}") or [{}]
         text = f"{subject}\n{(body[0] or {}).get('bodyPlain') or ''}"
         event = detect_event(text)
+        if event is None and asks_question(text):
+            # No status is provable, but the mail asks something only a person can
+            # answer. Resolving it is how the Eat Happy question disappeared: the
+            # row left the queue with nothing written and no one told. It moves to
+            # the person's queue (`review`, owner `human`) instead — left
+            # unresolved, so `/api/attention` keeps offering it — and the record
+            # carries a next action so `task apps:list` shows it too.
+            questions += 1
+            ledger.write(
+                json.dumps(
+                    {
+                        "action": "question-to-human" if apply else "would-question-to-human",
+                        "message_id": message_id,
+                        "application": target["id"],
+                        "subject": subject,
+                    }
+                )
+                + "\n"
+            )
+            if apply:
+                post(
+                    f"{api}/api/triage-upsert",
+                    {
+                        "messageId": message_id,
+                        "classifier": "appflow-question",
+                        "tier": "review",
+                        "owner": "human",
+                        "reason": f"question for a person: {subject[:80]}",
+                        "confidence": 0.6,
+                    },
+                )
+                post(
+                    f"{api}/api/application-update",
+                    {
+                        "id": target["id"],
+                        "status": target["status"],
+                        "stage": target.get("stage") or "other",
+                        "nextAction": "answer the question in this mail",
+                    },
+                )
+            print(f"{'parked' if apply else 'would park'}  {target['company'][:30]:<30} question for a person")
+            continue
+
         if event is None:
             # ATS boilerplate ("please accept the privacy policy", "continue your
             # application") carries no status, and leaving it open fills the
@@ -600,7 +671,8 @@ def sync(api: str, apply: bool, limit: int, ledger_path: str, only: str = "") ->
     print(
             f"pipeline sync: {written} {'updated' if apply else 'to update'}, {discovered} discovered,"
             f" {alerts} job alert(s) closed, {closed} already reflected in the stage,"
-            f" {ambiguous} ambiguous or unnamed, {unprovable} with no provable event (ledger: {ledger_path})"
+            f" {ambiguous} ambiguous or unnamed, {unprovable} with no provable event,"
+            f" {questions} question(s) parked for a person (ledger: {ledger_path})"
         )
     return 0
 

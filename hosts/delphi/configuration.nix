@@ -1137,13 +1137,50 @@ in {
       "$(cat ${config.sops.secrets."radicale/password".path})" > /run/radicale/users
   '';
 
-  # --- ntfy: the fleet's alerts, on a phone ----------------------------------
-  # Gatus and fleet-sentinel could only toast on a desktop. Topics are guessed
-  # easily, so the mount stays on the tailnet and `base-url` is the tailnet
-  # origin: the phone subscribes there, not to ntfy.sh.
-  # There is no `services.ntfy-sh` in this nixpkgs pin, so the unit is declared
-  # here. Flags rather than a config file: the whole configuration is four
-  # values, and a YAML file generated into the store would say nothing more.
+  # --- ntfy: push notifications to a phone -----------------------------------
+  # One push server, one channel on it: topic `fleet`. This is the only surface
+  # whose purpose is a message leaving the host and arriving where a person is
+  # not looking at a terminal.
+  #
+  # The server alone was never a channel. Measured 2026-11-06 to 15: the unit ran
+  # for nine days and its message cache was empty, because nothing published and
+  # no topic was named — and `MANUAL.md` still described it as gatus and
+  # sentinel's push. A push server with no publisher is a health check. The
+  # publisher is the appflow sync (a question parked for a person), and
+  # `task checks:ntfy` proves delivery by reading a probe back out of the cache.
+  #
+  # Access is closed by default: one user `fleet`, password in sops, rights on
+  # topic `fleet` only, anonymous denied. The phone subscribes at the tailnet
+  # origin with that user; there is no public origin because topics are guessable.
+  #
+  # A static user rather than `DynamicUser`: sops can only hand a secret to an
+  # account that exists at activation, and a dynamic user does not exist until
+  # the unit starts.
+  users.groups.ntfy = {};
+  users.users.ntfy = {
+    isSystemUser = true;
+    group = "ntfy";
+    description = "ntfy push notification server";
+  };
+  sops.secrets."ntfy/fleet-password" = {
+    sopsFile = ../../modules/secrets.yaml;
+    key = "ntfy/fleet-password";
+    owner = "ntfy";
+    group = "ntfy";
+    mode = "0400";
+  };
+  # The CLI needs the same file the server reads, and its own default path is
+  # `/etc/ntfy/server.yml`, so `ntfy user add` and `ntfy access` need no flags.
+  environment.etc."ntfy/server.yml".text = ''
+    listen-http: 127.0.0.1:8096
+    base-url: https://${tailnetHost}:8458
+    behind-proxy: true
+    cache-file: /var/lib/ntfy/cache.db
+    cache-duration: 12h
+    attachment-cache-dir: /var/lib/ntfy/attachments
+    auth-file: /var/lib/ntfy/user.db
+    auth-default-access: deny-all
+  '';
   systemd.services.ntfy = {
     description = "ntfy push notification server";
     wantedBy = ["multi-user.target"];
@@ -1151,17 +1188,15 @@ in {
     # A push server has to come back on its own; it is not a job that retires.
     unitConfig."X-Fleet-Role" = "daemon";
     serviceConfig = {
-      ExecStart = lib.concatStringsSep " " [
-        "${lib.getExe pkgs.ntfy-sh} serve"
-        "--listen-http 127.0.0.1:8096"
-        "--base-url https://${tailnetHost}:8458"
-        # TLS ends at tailscaled, so the forwarded headers are the only truth
-        # about scheme and client address.
-        "--behind-proxy"
-        "--cache-file /var/lib/ntfy/cache.db"
-        "--attachment-cache-dir /var/lib/ntfy/attachments"
-      ];
-      DynamicUser = true;
+      ExecStart = "${lib.getExe pkgs.ntfy-sh} serve --config /etc/ntfy/server.yml";
+      ExecStartPost = pkgs.writeShellScript "ntfy-provision" ''
+        set -euo pipefail
+        NTFY_PASSWORD="$(cat ${config.sops.secrets."ntfy/fleet-password".path})" \
+          ${lib.getExe pkgs.ntfy-sh} user add --ignore-exists --role=user fleet
+        ${lib.getExe pkgs.ntfy-sh} access fleet fleet read-write
+      '';
+      User = "ntfy";
+      Group = "ntfy";
       StateDirectory = "ntfy";
       StateDirectoryMode = "0700";
       Restart = "always";
@@ -1412,7 +1447,7 @@ in {
         port = 8458;
         upstream = "http://127.0.0.1:8096";
         title = "ntfy";
-        description = "Push notifications for gatus and fleet-sentinel, straight to the phone.";
+        description = "Push to the phone, topic fleet, one sops user and anonymous denied. The appflow sync publishes a parked question here; gatus pages through the SimpleX bridge.";
         requires = ["ntfy.service"];
       };
       vikunja = {

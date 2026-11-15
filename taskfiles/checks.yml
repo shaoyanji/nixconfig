@@ -579,6 +579,19 @@ tasks:
     cmds:
       - bash tests/appflow-triage/run.sh
 
+  checks:ntfy:
+    desc: Prove the push channel end to end — publish a probe and read it back out of the cache
+    summary: >
+      A push channel that is only configured is how ntfy sat on delphi for nine
+      days with an empty cache: the unit was active, the manual claimed gatus and
+      the sentinel pushed to it, and nothing ever published. This gate publishes
+      a probe as the `fleet` user, reads the topic back out of the cache, and
+      asserts anonymous publish is refused — so the failure it catches is
+      delivery, not liveness. Password comes from modules/secrets.yaml, so it
+      needs sops on this host; ~2 s, no nix, no build.
+    cmds:
+      - bash scripts/task/ntfy-check.sh
+
   checks:appflow:resolve:
     desc: Fixture for the queue resolver — rules, closed vocabulary, and every refusal path
     summary: >

@@ -192,6 +192,13 @@ the Eat Happy question of 23 October 2026 disappeared with nothing written and
 nobody told; the phrase list is `QUESTION_SIGNALS` in `sync.py`, and the ATS
 footer "Haben Sie Fragen?" deliberately does not match.
 
+`notify.url` names a push server (ntfy) and a parked question is published to
+its topic, so the mail reaches a phone instead of waiting for someone to open the
+queue. Credentials are `user` plus `passwordFile`, never a value in the store; an
+empty `url` sends nothing, which is the default. The push is best-effort on
+purpose: the queue is the durable half, and a failed POST must not mark a sync
+that did its work as failed.
+
 Each sync then starts `appflow-resolve.service`: the two local engines answer
 attribute/ignore/unsure, and the unsures go through one hermes turn. An entry it
 judges irrelevant moves to the reversible `ignore` tier, and `task

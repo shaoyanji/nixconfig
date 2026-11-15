@@ -103,6 +103,33 @@ in {
         description = "OnCalendar expression for the sync timer.";
       };
     };
+
+    # A parked question is the one thing this plugin produces that a person has to
+    # act on outside the mail client. The queue is the durable half; this is the
+    # half that arrives. Empty `url` sends nothing, so a host with no push server
+    # needs no configuration at all.
+    notify = {
+      url = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "Push server base URL (ntfy). Empty disables the push.";
+      };
+      topic = lib.mkOption {
+        type = lib.types.str;
+        default = "fleet";
+        description = "Topic the parked question is published to.";
+      };
+      user = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "User for HTTP basic auth; empty sends no credentials.";
+      };
+      passwordFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = "File holding the password for `user`, so it never reaches argv.";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -187,6 +214,14 @@ in {
         ExecStartPost = [
           "${config.systemd.package}/bin/systemctl --no-block start appflow-resolve.service"
         ];
+        Environment =
+          lib.optionals (cfg.notify.url != "") [
+            "NTFY_URL=${cfg.notify.url}"
+            "NTFY_TOPIC=${cfg.notify.topic}"
+            "NTFY_USER=${cfg.notify.user}"
+          ]
+          ++ lib.optional (cfg.notify.passwordFile != null)
+          "NTFY_PASSWORD_FILE=${toString cfg.notify.passwordFile}";
         StateDirectory = "appflow-sync";
         User = "root";
         NoNewPrivileges = true;

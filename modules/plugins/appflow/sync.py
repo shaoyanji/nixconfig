@@ -28,6 +28,7 @@ never edits the workflow's JSON: docs/email-archive.md.
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
 import re
@@ -362,6 +363,47 @@ def asks_question(text: str) -> bool:
     return re.search(QUESTION_SIGNALS, (text or "").lower()) is not None
 
 
+def notify_question(company: str, subject: str) -> None:
+    """Push a parked question to a phone, when a channel is configured.
+
+    ntfy is the fleet's push server: one POST per topic, and the message waits in
+    its cache until a client collects it. Configuration is environment, not a
+    store path (`NTFY_URL`, `NTFY_TOPIC`, `NTFY_USER`, `NTFY_PASSWORD_FILE`), so
+    a host with no push server sends nothing and the queue stays the only record.
+
+    A push that fails must not fail the sync. The mail is already parked in a
+    person's queue — the durable half — and a red unit would report a
+    notification twice, which is not something a person can act on.
+    """
+    url = (os.environ.get("NTFY_URL") or "").rstrip("/")
+    topic = os.environ.get("NTFY_TOPIC") or ""
+    if not url or not topic:
+        return
+    request = urllib.request.Request(
+        f"{url}/{topic}",
+        data=f"{company}: {subject}".encode(),
+        method="POST",
+    )
+    request.add_header("Title", f"Question from {company}"[:120])
+    request.add_header("Tags", "email,question")
+    user = os.environ.get("NTFY_USER") or ""
+    path = os.environ.get("NTFY_PASSWORD_FILE") or ""
+    if user and path:
+        try:
+            with open(path, encoding="utf-8") as handle:
+                password = handle.read().strip()
+        except OSError as exc:
+            print(f"  push: cannot read the password file: {exc}")
+            return
+        token = base64.b64encode(f"{user}:{password}".encode()).decode()
+        request.add_header("Authorization", f"Basic {token}")
+    try:
+        with urllib.request.urlopen(request, timeout=10) as response:
+            print(f"  push: {company[:30]} -> {topic} ({response.status})")
+    except (urllib.error.URLError, OSError) as exc:
+        print(f"  push: {topic} refused: {exc}")
+
+
 # How far along a message puts an application. The sync walks a mailbox's worth
 # of mail per applicant in order, so without this an acknowledgement from
 # September overwrote an interview from October: the queue is newest-first and
@@ -588,6 +630,8 @@ def sync(api: str, apply: bool, limit: int, ledger_path: str, only: str = "") ->
                         "nextAction": "answer the question in this mail",
                     },
                 )
+            if apply:
+                notify_question(target["company"], subject)
             print(f"{'parked' if apply else 'would park'}  {target['company'][:30]:<30} question for a person")
             continue
 

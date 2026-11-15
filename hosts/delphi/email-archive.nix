@@ -1,6 +1,10 @@
 # The email archive on delphi: NpgsqlRest on loopback, tailnet-only through the
 # `tailscale serve` mount in the portal registry. docs/email-archive.md.
-{self, ...}: {
+{
+  self,
+  config,
+  ...
+}: {
   imports = [
     self.modules."services.email-archive"
     # The reading surface: fuzzy search and a relation graph over the same
@@ -45,4 +49,15 @@
   # JSON is still where new applications appear. Once the database is the source,
   # this stays empty and the timer never exists.
   services.appflowPlugin.enable = true;
+
+  # A question parked for a person is worth a phone: the queue is the durable
+  # half, this is the half that arrives. The credentials are the ntfy server's
+  # own user (`hosts/delphi/configuration.nix`), decrypted at activation and
+  # handed to the unit as a file path.
+  services.appflowPlugin.notify = {
+    url = "http://127.0.0.1:8096";
+    topic = "fleet";
+    user = "fleet";
+    passwordFile = config.sops.secrets."ntfy/fleet-password".path;
+  };
 }

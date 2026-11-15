@@ -186,8 +186,16 @@ const actionExpr = () => `(() => {
   // finish. A passkey installed via CAL_PASSKEY_FILE makes Google skip this
   // entirely, which is why the alternative is tried before it.
   if (/\\/challenge\\//.test(location.href)) {
-    const alt = els.find((e) => /try another way|use another|other way/i.test(text(e)));
+    // A challenge page that already offers a password field IS the password page:
+    // clicking "try another way" there walks back to the chooser and returns, in
+    // a circle that looks like a hang. Submit instead.
+    const alt = pwField ? undefined : els.find((e) => /try another way|use another|other way/i.test(text(e)));
     if (alt) { alt.click(); return "clicked: " + text(alt); }
+    if (pwField) {
+      const next = els.find((e) => /^(next|continue)$/i.test(text(e)));
+      if (next) { next.click(); return "submitted: " + text(next); }
+      return "waiting";
+    }
     // The method list is role=radio rows, not buttons: a button query reports
     // "waiting" forever on a page that is offering the choice, which reads like
     // a hang instead of a wrong selector.

@@ -14,7 +14,7 @@
 
   collect = pkgs.writeShellApplication {
     name = "fleet-sentinel-collect";
-    runtimeInputs = with pkgs; [coreutils gnugrep gawk jq systemd findutils];
+    runtimeInputs = with pkgs; [coreutils gnugrep gawk jq systemd findutils curl];
     text = ''
       set -uo pipefail
 
@@ -61,6 +61,30 @@
         esac
         FAILED_UNITS+=("$unit")
       done < <(systemctl list-units --state=failed --no-legend --plain --no-pager 2>/dev/null || true)
+
+      ${lib.optionalString cfg.collectUserUnits ''
+        # --- failed user units -----------------------------------------------
+        # The loop above runs in the SYSTEM manager, so it cannot see
+        # `~/.config/systemd/user`. That gap is why a vdirsyncer unit could fail
+        # every 15 minutes for three days, and a keepalive fail 104 times, while
+        # this collector reported `ok`. Query each logged-in user's manager; a
+        # user whose manager is not running is skipped, not a fault.
+        while IFS= read -r who; do
+          [ -n "$who" ] || continue
+          while IFS= read -r uline; do
+            [ -n "$uline" ] || continue
+            uunit="$(printf '%s' "$uline" | awk '{print $1}')"
+            [ -n "$uunit" ] || continue
+            # Either the bare name or the qualified one can retire a unit that
+            # fails by design, so an ignore list does not have to know the host.
+            case " $IGNORE_UNITS " in
+              *" $uunit "*) continue ;;
+              *" user@$who:$uunit "*) continue ;;
+            esac
+            FAILED_UNITS+=("user@$who:$uunit")
+          done < <(systemctl --user -M "$who@.host" list-units --state=failed --no-legend --plain --no-pager 2>/dev/null || true)
+        done < <(loginctl list-users --no-legend 2>/dev/null | awk '{print $2}' || true)
+      ''}
 
       if [ "''${#FAILED_UNITS[@]}" -gt 0 ]; then
         REASONS+=("failed-units:''${#FAILED_UNITS[@]}")
@@ -235,6 +259,47 @@
       printf '%s\n' "$EVENT" | jq . > "$STATUS"
       printf '%s\n' "$HEALTH_TEXT" > "$HEALTH"
 
+      ${lib.optionalString (cfg.notify.url != "") ''
+        # --- notify on a change ---------------------------------------------
+        # The publisher is the one the appflow triage already proves: same URL,
+        # topic, user and password file, so a second ntfy configuration never
+        # exists on this fleet. A push every 15 minutes teaches a person to
+        # ignore the topic, so the state plus reasons are hashed and only a
+        # change is sent - a recovery is a change too. A failed push must not
+        # fail collection: the ledger and the health endpoint are the durable
+        # record, and the next run retries because the signature only advances
+        # on a 200.
+        SIG="$(printf '%s\n' "$STATE" "$REASONS_JSON" | sha256sum | cut -c1-16)"
+        LAST=""
+        if [ -r "$ROOT/notify.sig" ]; then
+          LAST="$(cat "$ROOT/notify.sig")"
+        fi
+        if [ "$SIG" != "$LAST" ]; then
+          if [ -z "$LAST" ] && [ "$STATE" = "ok" ]; then
+            printf '%s' "$SIG" > "$ROOT/notify.sig"
+          else
+            if [ "$STATE" = "ok" ]; then
+              TITLE="fleet-sentinel: $HOST recovered"
+              TAGS="white_check_mark"
+            else
+              TITLE="fleet-sentinel: $HOST degraded"
+              TAGS="warning"
+            fi
+            BODY="$(printf '%s' "$REASONS_JSON" | jq -r 'if length == 0 then "ok" else join(", ") end')"
+            AUTH=()
+            if [ -n "''${NOTIFY_USER:-}" ] && [ -n "''${NOTIFY_PASSWORD_FILE:-}" ] && [ -r "''${NOTIFY_PASSWORD_FILE:-/nonexistent}" ]; then
+              AUTH=(-u "$NOTIFY_USER:$(cat "$NOTIFY_PASSWORD_FILE")")
+            fi
+            CODE="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "''${AUTH[@]}" -H "Title: $TITLE" -H "Tags: $TAGS" --data "$BODY" "$NOTIFY_URL/$NOTIFY_TOPIC" || true)"
+            if [ "$CODE" = "200" ]; then
+              printf '%s' "$SIG" > "$ROOT/notify.sig"
+            else
+              echo "notify: $NOTIFY_TOPIC answered $CODE"
+            fi
+          fi
+        fi
+      ''}
+
       # --- dashboard (static; reads status.json client-side) -----------------
       # The markup is a file (modules/services/fleet-sentinel-dashboard.html):
       # HTML/CSS/JS is content, not configuration, and in a Nix string every JS
@@ -356,6 +421,50 @@ in {
         those units records `absent` and stays neutral.
       '';
     };
+
+    collectUserUnits = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Also count failed units from each logged-in user's systemd manager.
+        Off by default because it changes what a host's verdict means: a user
+        unit that fails by design would degrade the host, and that is a decision
+        for the host that owns it, not a side effect of enabling the sentinel.
+        The names are qualified `user@<account>:<unit>`, and an entry in
+        {option}`ignoreFailedUnits` matches either the bare unit or that form.
+      '';
+    };
+
+    notify = {
+      url = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = ''
+          Push server base URL. Empty sends nothing, so a host without a push
+          server needs no configuration. Point this at the same server and
+          credential the appflow triage uses rather than adding a second one.
+        '';
+      };
+      topic = lib.mkOption {
+        type = lib.types.str;
+        default = "fleet";
+        description = "Topic a state change is published to.";
+      };
+      user = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = "User for HTTP basic auth; empty sends no credentials.";
+      };
+      passwordFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = ''
+          File holding that user's password. A path, never an inline secret, so
+          the collector can read a sops-managed file without it landing in the
+          Nix store.
+        '';
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -371,6 +480,14 @@ in {
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${collect}/bin/fleet-sentinel-collect";
+        Environment =
+          lib.optionals (cfg.notify.url != "") [
+            "NOTIFY_URL=${cfg.notify.url}"
+            "NOTIFY_TOPIC=${cfg.notify.topic}"
+            "NOTIFY_USER=${cfg.notify.user}"
+          ]
+          ++ lib.optional (cfg.notify.passwordFile != null)
+          "NOTIFY_PASSWORD_FILE=${toString cfg.notify.passwordFile}";
         TimeoutStartSec = 120;
         Nice = 10;
         IOSchedulingClass = "idle";

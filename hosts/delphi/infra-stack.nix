@@ -301,6 +301,18 @@ in {
       {unit = "nginx.service";}
       {unit = "tailscaled.service";}
     ];
+    # User units are where the 2026-11-15 outages lived: a vdirsyncer timer that
+    # failed every 15 minutes for three days and a keepalive that failed 104
+    # times, both invisible to a collector that only asks the system manager.
+    collectUserUnits = true;
+    # The same publisher the appflow triage uses (hosts/delphi/email-archive.nix),
+    # so the push channel has one configuration and one credential on this fleet.
+    notify = {
+      url = "http://127.0.0.1:8096";
+      topic = "fleet";
+      user = "fleet";
+      passwordFile = config.sops.secrets."ntfy/fleet-password".path;
+    };
   };
 
   # --- Declarative Autonomous Agent Scheduler (EXP-016) -----------------------

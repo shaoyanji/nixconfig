@@ -187,7 +187,15 @@ in {
     };
     Service = {
       Type = "oneshot";
-      ExecStart = "${config.programs.vdirsyncer.package}/bin/vdirsyncer sync personal";
+      # Two facts decide this line. The pair is `calendar_<account>` —
+      # home-manager's naming, not the account's — and a pair is empty until
+      # `discover` has run, which declaring the collection does not skip: it
+      # answers "Please run `vdirsyncer discover` before synchronization". A unit
+      # has no tty, so discover's "create the local collection?" prompt gets EOF
+      # and aborts, hence `yes`. No `pipefail` on purpose: once discover stops
+      # reading, `yes` dies of SIGPIPE, and that must not be the unit's verdict —
+      # sync's status is.
+      ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/yes | ${config.programs.vdirsyncer.package}/bin/vdirsyncer discover calendar_personal; exec ${config.programs.vdirsyncer.package}/bin/vdirsyncer sync calendar_personal'";
     };
   };
 

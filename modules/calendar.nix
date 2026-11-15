@@ -107,7 +107,13 @@ in {
   # seeded by that unit's preStart, so this account finds a calendar rather than
   # an empty principal. Phone clients (DAVx5) use the same URL and user; calendar
   # skill § Radicale.
-  accounts.calendar.accounts."personal" = {
+  # The account is named for the server, not for its one collection. khal names a
+  # section after the account and a discovered sub-calendar after its directory,
+  # so an account `personal` holding a collection `personal` collides and khal
+  # renames the calendar `personal1` — after which `khal -a personal` cannot find
+  # it. The Google account shows the shape: section `google`, calendars `Primary`,
+  # `Family`, none of them named after the account.
+  accounts.calendar.accounts."radicale" = {
     khal = {
       enable = true;
       type = "discover";
@@ -195,7 +201,7 @@ in {
       # and aborts, hence `yes`. No `pipefail` on purpose: once discover stops
       # reading, `yes` dies of SIGPIPE, and that must not be the unit's verdict —
       # sync's status is.
-      ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/yes | ${config.programs.vdirsyncer.package}/bin/vdirsyncer discover calendar_personal; exec ${config.programs.vdirsyncer.package}/bin/vdirsyncer sync calendar_personal'";
+      ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/yes | ${config.programs.vdirsyncer.package}/bin/vdirsyncer discover calendar_radicale; exec ${config.programs.vdirsyncer.package}/bin/vdirsyncer sync calendar_radicale'";
     };
   };
 

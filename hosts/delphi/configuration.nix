@@ -1100,7 +1100,7 @@ in {
   # principal inside its own collections; the htpasswd file is rendered at start
   # from a sops value, so no password hash lives in the store either.
   #
-  # The client end is `accounts.calendar.accounts.personal` in
+  # The client end is `accounts.calendar.accounts.radicale` in
   # `modules/calendar.nix`, and the phone is DAVx5 at the tailnet origin. A
   # server nobody subscribes to is the failure this pair is written against.
   sops.secrets."radicale/password" = {

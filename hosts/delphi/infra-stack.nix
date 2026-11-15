@@ -1,5 +1,6 @@
 # Delphi Infrastructure Stack — Health Sentinel, Autonomous Agent Schedulers, and Resource Regulation
 {
+  config,
   self,
   pkgs,
   lib,

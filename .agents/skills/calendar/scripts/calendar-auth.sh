@@ -4,6 +4,9 @@
 #   calendar-auth.sh                     first sync: discover, wait for consent, sync, read back
 #   calendar-auth.sh verify              sync now and show what khal can see
 #   calendar-auth.sh auth [--force]      the same as the default, spelled out
+#   calendar-auth.sh auth --force --browser   drive the consent in Chromium: no paste,
+#                                        and no phone prompt when CAL_PASSKEY_FILE
+#                                        holds a vault passkey (scripts/task/gcal-consent.sh)
 #
 # The OAuth *token* is runtime state, not config: `modules/calendar.nix` only
 # gates `vdirsyncer.service` on the token file, so nothing here needs a rebuild.
@@ -52,10 +55,11 @@ verify() {
 
 auth() {
   need vdirsyncer
-  local force=0
+  local force=0 browser=${CAL_BROWSER:-0}
   while [ $# -gt 0 ]; do
     case "$1" in
     --force) force=1 && shift ;;
+    --browser) browser=1 && shift ;;
     *) die "unknown flag $1" ;;
     esac
   done
@@ -93,6 +97,7 @@ auth() {
   PORT=$(printf '%s\n' "$url" | sed -n 's/.*redirect_uri=http%3A%2F%2F127\.0\.0\.1%3A\([0-9]*\).*/\1/p')
   [ -n "$PORT" ] || PORT="$PAIR_PORT"
 
+  if [ "$browser" = 0 ]; then
   cat >&2 <<EOF
 Open this URL in a browser and approve calendar access:
 
@@ -113,6 +118,12 @@ Option B (SSH tunnel):
 Waiting up to ${WAIT}s for $TOKEN...
 Paste redirect URL here (or press Enter if using Option B):
 EOF
+  else
+    echo "calendar-auth: driving the consent in Chromium — no paste, no display" >&2
+    repo="$(cd "$(dirname "$0")/../../../.." && pwd)"
+    bash "$repo/scripts/task/gcal-consent.sh" "$url" "$PORT" "${CAL_PASSKEY_FILE:-}" ||
+      die "the browser consent driver failed — the token file is untouched only if it never answered; rerun without --browser to finish by hand"
+  fi
 
   waited=0
   while [ "$waited" -lt "$WAIT" ]; do
@@ -170,6 +181,6 @@ cmd=${1:-auth}
 case "$cmd" in
 auth) shift && auth "$@" ;;
 verify) shift && verify ;;
--h | --help) sed -n '2,9p' "$0" ;;
+-h | --help) sed -n '2,12p' "$0" ;;
 *) die "unknown command '$cmd' — (no argument) | verify" ;;
 esac

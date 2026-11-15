@@ -65,6 +65,19 @@ code="$(curl -s --max-time 20 -o "$work" -w '%{http_code}' \
 case "$code" in
 200)
   echo "gcal-check: ok — refresh token accepted ($kind grant), access token for $(jq -r '.expires_in // "?"' "$work")s"
+  if [ "$kind" = "time-based" ]; then
+    # Counted from the moment of consent, not from now: the file is written at
+    # consent, so the issue time is expires_at minus expires_in.
+    dies="$(python3 - "$token" <<'PY'
+import datetime, json, sys
+d = json.load(open(sys.argv[1]))
+issue = d.get("expires_at", 0) - d.get("expires_in", 0)
+dies = issue + d.get("refresh_token_expires_in", 0)
+print(datetime.datetime.fromtimestamp(dies).strftime("%Y-%m-%d %H:%M"))
+PY
+)"
+    echo "  warning: the grant is time-based and stops syncing at ${dies} — re-approve choosing permanent access" >&2
+  fi
   ;;
 400)
   err="$(jq -r '.error // "unknown"' "$work")"

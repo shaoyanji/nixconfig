@@ -185,6 +185,13 @@ const actionExpr = () => `(() => {
   // on a challenge page: walk to the password path, which is the one a TOTP can
   // finish. A passkey installed via CAL_PASSKEY_FILE makes Google skip this
   // entirely, which is why the alternative is tried before it.
+  // Google answers repeated automated logins with an image challenge. Nothing a
+  // password or a passkey can supply clears it, and retrying is what earns it,
+  // so stop and say so instead of looping against an account.
+  const bodyText = (document.body.innerText || "").replace(/\\s+/g, " ");
+  if (/enter the characters you see|type the text you hear|not a robot|unusual traffic/i.test(bodyText)) {
+    return "captcha: Google is asking for an image challenge";
+  }
   if (/\\/challenge\\//.test(location.href)) {
     // A challenge page that already offers a password field IS the password page:
     // clicking "try another way" there walks back to the chooser and returns, in
@@ -225,6 +232,7 @@ const actionExpr = () => `(() => {
 const started = Date.now();
 let last = "";
 let clicks = 0;
+let steps = 0;
 const limit = Number(deadline || 240) * 1000;
 while (Date.now() - started < limit) {
   await sleep(1200);
@@ -242,10 +250,17 @@ while (Date.now() - started < limit) {
     console.log(`  ${r.value}  <- ${here.slice(0, 70)}`);
     last = r.value;
   }
-  if (String(r.value).startsWith("stuck")) {
+  if (String(r.value).startsWith("stuck") || String(r.value).startsWith("captcha")) {
     console.error(`gcal-consent: ${r.value}`);
     ws.close();
     process.exit(4);
+  }
+  // A flow that keeps interacting without moving is cycling, and every extra
+  // round trip is one more automated login to the account's risk engine.
+  if (++steps > 30) {
+    console.error(`gcal-consent: giving up after 30 interactions (the flow is cycling)`);
+    ws.close();
+    process.exit(6);
   }
 }
 // Say what the page says, not just that nothing happened: "wrong password"

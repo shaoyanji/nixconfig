@@ -200,6 +200,18 @@ write`; nothing in this skill sends on its own.
     time now.
   - an OAuth app whose publishing status is **Testing** caps every refresh token
     at 7 days, so re-consent buys a week. Publish the consent screen.
+- **Google escalates to an image CAPTCHA, and that is the real ceiling.** Tried
+  2026-11-15 with `scripts/task/gcal-consent.sh` and the account password plus a
+  live TOTP: identifier filled, `Next`, passkey challenge, `Try another way`,
+  `Enter your password`, password filled, submitted — and the password page came
+  back carrying *"Type the text you hear or see" / "enter the characters you see
+  in the image above"*. After roughly six automated attempts Google adds that
+  challenge to `/challenge/pwd`, and neither a password nor a passkey clears it;
+  retrying is what earns it, so the driver now stops on the first sight of it
+  (exit 4) and gives up on a cycling flow after 30 interactions (exit 6). Either
+  run it with a human present who can solve one image, or make the passkey path
+  win so the password page is never reached (`CAL_PASSKEY_FILE`; the primitive is
+  `scripts/task/passkey-probe.sh`, the vault read is still unwired).
 - **A passkey cannot be typed, but it can be imported.** `scripts/task/passkey-probe.sh`
   proves the primitive without touching Google: a CDP virtual authenticator registers a
   credential on a local page, exports its PKCS8 private key, installs that key into a

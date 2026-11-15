@@ -248,6 +248,11 @@ while (Date.now() - started < limit) {
     process.exit(4);
   }
 }
+// Say what the page says, not just that nothing happened: "wrong password"
+// and "this value was not accepted by the field" need different fixes, and from
+// the outside both look like a page that never moves.
+const said = await evaluate("document.body.innerText.replace(/\\s+/g,' ').slice(0,300)");
+if (said.value) console.error(`gcal-consent: page says: ${said.value}`);
 console.error(`gcal-consent: no redirect within ${deadline}s (last page ${last || "unknown"})`);
 ws.close();
 process.exit(5);

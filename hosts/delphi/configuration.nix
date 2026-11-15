@@ -1099,6 +1099,10 @@ in {
   # OAuth round trip rather than competing with it. `owner_only` keeps every
   # principal inside its own collections; the htpasswd file is rendered at start
   # from a sops value, so no password hash lives in the store either.
+  #
+  # The client end is `accounts.calendar.accounts.personal` in
+  # `modules/calendar.nix`, and the phone is DAVx5 at the tailnet origin. A
+  # server nobody subscribes to is the failure this pair is written against.
   sops.secrets."radicale/password" = {
     sopsFile = ../../modules/secrets.yaml;
     mode = "0400";
@@ -1135,6 +1139,15 @@ in {
     umask 077
     ${lib.getExe' pkgs.apacheHttpd "htpasswd"} -nbB ${user.name} \
       "$(cat ${config.sops.secrets."radicale/password".path})" > /run/radicale/users
+    # A CalDAV server with no collection is a server with nothing on it: this one
+    # served a 302 and held zero calendars for nine days, because nothing had
+    # ever asked for one. The default collection is seeded here so the first
+    # client (vdirsyncer, DAVx5) finds a calendar rather than an empty principal,
+    # and so `checks:caldav` has something to write into and read back.
+    collections=/var/lib/radicale/collections/collection-root/${user.name}
+    mkdir -p "$collections/personal"
+    [ -f "$collections/personal/.Radicale.props" ] || printf '%s' \
+      '{"tag": "VCALENDAR", "D:displayname": "Personal"}' > "$collections/personal/.Radicale.props"
   '';
 
   # --- ntfy: push notifications to a phone -----------------------------------

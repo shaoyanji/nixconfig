@@ -592,6 +592,19 @@ tasks:
     cmds:
       - bash scripts/task/ntfy-check.sh
 
+  checks:caldav:
+    desc: Prove the self-hosted calendar works — PROPFIND the collection, then write, read back and delete a probe event
+    summary: >
+      Radicale held zero collections for nine days while `systemctl is-active
+      radicale` was true: a listener, not a calendar. This gate asks the server
+      the question a client asks — PROPFIND a seeded collection with the sops
+      password — then PUTs a throwaway event, reads it back, deletes it, and
+      asserts anonymous read is refused. Catches an unseeded collection, a stale
+      htpasswd render and a broken tailnet mount in one pass. Needs sops on this
+      host; ~3 s, no nix, no build.
+    cmds:
+      - bash scripts/task/caldav-check.sh
+
   checks:appflow:resolve:
     desc: Fixture for the queue resolver — rules, closed vocabulary, and every refusal path
     summary: >

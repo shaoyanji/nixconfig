@@ -26,6 +26,10 @@ name = "checks:ntfy"
 kind = "leaf"
 
 [[check]]
+name = "checks:caldav"
+kind = "leaf"
+
+[[check]]
 name = "checks:typeset"
 kind = "leaf"
 

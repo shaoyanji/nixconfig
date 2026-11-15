@@ -83,6 +83,10 @@ in {
       # slash-free. This replaced vdirsyncer scraping a hand-made rclone.conf.
       "gdrive_client_id".key = "googleDrive/clientId";
       "gdrive_client_secret".key = "googleDrive/clientSecret";
+      # Radicale's one user on delphi. The same sops value the host renders into
+      # its htpasswd, so the client and the server cannot drift; named without a
+      # slash because the secret's file name is the last path component.
+      "radicale_password".key = "radicale/password";
       # The fleet's one shell history. Rendered to atuin's default path, because
       # a bare `atuin` run mints a fresh key there when the file is missing and
       # that host then syncs a history nobody can decrypt. The key file wants

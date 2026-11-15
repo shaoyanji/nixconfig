@@ -101,6 +101,37 @@ in {
     };
   };
 
+  # The self-hosted calendar on delphi (Radicale, module `services.radicale`).
+  # Plain CalDAV with the fleet user and a sops password: no OAuth, no consent
+  # flow, no token file — which is the whole reason it exists. The collection is
+  # seeded by that unit's preStart, so this account finds a calendar rather than
+  # an empty principal. Phone clients (DAVx5) use the same URL and user; calendar
+  # skill § Radicale.
+  accounts.calendar.accounts."personal" = {
+    khal = {
+      enable = true;
+      type = "discover";
+    };
+    vdirsyncer = {
+      enable = true;
+      collections = ["from a"];
+      metadata = ["displayname"];
+    };
+    remote = {
+      type = "caldav";
+      url = "https://delphi.cloudforest-kardashev.ts.net:8457/";
+      userName = config.home.username;
+      passwordCommand = [
+        "${pkgs.coreutils}/bin/cat"
+        config.sops.secrets.radicale_password.path
+      ];
+    };
+    local = {
+      type = "filesystem";
+      fileExt = ".ics";
+    };
+  };
+
   programs.khal = {
     enable = true;
     settings = {
@@ -142,6 +173,32 @@ in {
   # the token is absent (no red unit), and a host that finishes the flow starts
   # syncing with no config change.
   systemd.user.services.vdirsyncer.Unit.ConditionPathExists = tokenFile;
+
+  # Radicale has no consent step, so its sync is its own unit instead of sharing
+  # the token gate above: gating both on the Google token would mean a host set up
+  # for the self-hosted calendar never syncs until it consents to Google, and
+  # dropping the gate would turn "has not consented yet" into a red unit every 15
+  # minutes. One unit per credential kind, each conditioned on what it actually
+  # needs.
+  systemd.user.services.vdirsyncer-personal = {
+    Unit = {
+      Description = "Sync the self-hosted calendar from Radicale";
+      ConditionPathExists = config.sops.secrets.radicale_password.path;
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${config.programs.vdirsyncer.package}/bin/vdirsyncer sync personal";
+    };
+  };
+
+  systemd.user.timers.vdirsyncer-personal = {
+    Unit.Description = "Check the self-hosted calendar every 15 minutes";
+    Timer = {
+      OnCalendar = "*:0/15";
+      Persistent = true;
+    };
+    Install.WantedBy = ["timers.target"];
+  };
 
   # The notifier only exists on a generation that declares a session, and only
   # runs where the sync that fills khal can work.

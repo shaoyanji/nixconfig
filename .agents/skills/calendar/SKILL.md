@@ -15,7 +15,8 @@ Declared in `modules/calendar.nix`, imported by `modules/env.nix`. Google CalDAV
 (`caldav.googleapis.com`) → `vdirsyncer` writes `.ics` into
 `~/.local/share/calendars/google/` → `khal` reads them → `calendar-notify` polls
 `khal list now 15m` and raises a libnotify toast, which DMS shows in its
-notification center.
+notification center. A second account, `personal`, has the same shape against
+the self-hosted Radicale on delphi — see § Radicale below.
 
 | | |
 | :--- | :--- |
@@ -24,6 +25,32 @@ notification center.
 | Default calendar | `Primary` |
 | Sync timer | `vdirsyncer.timer`, `frequency = "*:0/15"` |
 | Notify timer | `calendar-notify.timer`, `OnCalendar = "*:0/5"`, oneshot — exists only on a generation that declares a compositor |
+
+## The self-hosted calendar (Radicale on delphi)
+
+Built 2026-11-06 with ntfy and Vikunja, and unused until the collection was
+seeded: the server answered 302, held zero calendars, and no client pointed at
+it. `accounts.calendar.accounts.personal` is the client half.
+
+| | |
+| :--- | :--- |
+| URL | `https://delphi.cloudforest-kardashev.ts.net:8457/` (tailnet only; loopback 5232) |
+| User / password | the fleet user; password `radicale/password` in sops, the same value the host renders into its htpasswd |
+| Collection | `personal`, seeded by the Radicale unit's preStart, so the principal is never empty |
+| Local copy | `~/.local/share/calendars/personal/` via `vdirsyncer-personal.timer` every 15 min |
+| Phone | DAVx5: the URL above, same user and password; no public origin, so the phone must be on the tailnet |
+| Gate | `task checks:caldav` — PROPFIND, then write, read back and delete a probe event |
+
+Two sync units, not one, because the credentials are different kinds: `vdirsyncer`
+carries the Google account behind `ConditionPathExists=…/google_token` (a host that
+has not consented is skipped, not red), and `vdirsyncer-personal` carries Radicale
+behind the sops password file. Gating both on the Google token would mean a host
+set up for the self-hosted calendar never syncs; dropping the gate would make an
+un-consented host red every 15 minutes.
+
+khal keeps `default_calendar = "Primary"` (Google), so ask for the self-hosted one
+explicitly: `khal list -a personal today 7d`. khal only sees what vdirsyncer last
+wrote — `vdirsyncer sync personal` is the immediate form.
 
 ## The two commands
 

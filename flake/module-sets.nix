@@ -67,7 +67,6 @@
   hmSharedModulesHome =
     inventoryModules
     ++ [
-      inputs.kickstart-nixvim.homeManagerModules.default
       inputs.sops-nix.homeManagerModules.sops
       inputs.nix-index-database.homeModules.nix-index
       # ~/AGENTS.md from `.#homeAgents.<host>`; standalone HM configs get

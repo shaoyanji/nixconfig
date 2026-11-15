@@ -14,9 +14,6 @@
     (import ../overlays/simplex-chat.nix)
     (import ../overlays/nvidia-persistenced-fix.nix)
     (import ../overlays/nushell-plugins-compat.nix)
-    # kickstart.nixvim treesitter.nix still references the tmux grammar
-    # that nvim-treesitter dropped upstream
-    (import ../overlays/nvim-treesitter-tmux.nix)
     # molly-brown is newer than nixpkgs' 2023 snapshot (upstream has no tags)
     (import ../overlays/molly-brown.nix)
   ];

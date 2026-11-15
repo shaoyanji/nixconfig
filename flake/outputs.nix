@@ -204,12 +204,9 @@ in {
           inherit self;
           fleetHost = name;
         };
-      # Standalone HM hosts build their own pkgs; apply the repo overlays so
-      # kickstart-nixvim's treesitter config resolves the tmux grammar that
-      # nvim-treesitter dropped upstream.
-      pkgs = nixpkgs.legacyPackages.${host.system}.extend (
-        import ../overlays/nvim-treesitter-tmux.nix
-      );
+      # Standalone HM hosts build their own pkgs; none needs an overlay, so the
+      # package set is the one `legacyPackages` already is.
+      pkgs = nixpkgs.legacyPackages.${host.system};
       inherit (host) modules;
     });
 

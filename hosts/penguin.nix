@@ -1,5 +1,6 @@
 {
   self,
+  inputs,
   config,
   pkgs,
   ...
@@ -12,14 +13,17 @@ in {
     self.modules."lf"
     self.modules."sops"
     self.modules."scripts"
+    # Imported here, not into every standalone HM config: this is the only host
+    # that enables the editor, and option surface is what a gate pays for.
+    inputs.kickstart-nixvim.homeManagerModules.default
   ];
   # Was roles/portable-home.nix, a file with one import plus this line and a
   # single consumer. One host is not a shared property.
   programs.nixvim = {
     enable = true;
-    # Use the host's pkgs (with the nvim-treesitter-tmux overlay) inside nixvim
-    # instead of nixvim's own pinned nixpkgs, which dropped the `tmux` grammar
-    # that kickstart-nixvim's treesitter config still references.
+    # Use the host's pkgs inside nixvim instead of nixvim's own nixpkgs: one
+    # nixpkgs evaluation per host, and the plugins share store paths the rest of
+    # this config already pulls in.
     nixpkgs.useGlobalPackages = true;
   };
 

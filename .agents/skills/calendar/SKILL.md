@@ -200,6 +200,19 @@ write`; nothing in this skill sends on its own.
     time now.
   - an OAuth app whose publishing status is **Testing** caps every refresh token
     at 7 days, so re-consent buys a week. Publish the consent screen.
+- **A passkey cannot be typed, but it can be imported.** `scripts/task/passkey-probe.sh`
+  proves the primitive without touching Google: a CDP virtual authenticator registers a
+  credential on a local page, exports its PKCS8 private key, installs that key into a
+  *second, empty* authenticator, and signs an assertion there — exit 0 means the
+  vault → browser half of a headless passkey login is wired. `--from-vault FILE` takes
+  the shape a Bitwarden item's `fido2Credentials` hold (`rpId`, base64url
+  `credentialId`, base64 `privateKey`). Three facts bound the plan: `cloak` 0.3.0 is
+  TOTP-only, so reading a passkey needs a vault client that is not installed
+  (`bw`/`rbw`); a passkey for the account must actually exist in Vaultwarden; and the
+  Bitwarden *extension* is not the route on Linux because it breaks WebAuthn in
+  Chromium outright (bitwarden/clients#17837). The RP ID must be a domain — a probe
+  served on `127.0.0.1` is refused with "This is an invalid domain", so use
+  `localhost`.
 - **Headless re-consent works, but only with a display.** Tried 2026-11-15 on aarch64:
   `agent-browser` and `chromium --headless=new` are both refused at the password
   step ("Couldn't sign you in — This browser or app may not be secure"). The *same*

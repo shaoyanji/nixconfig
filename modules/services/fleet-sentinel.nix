@@ -286,6 +286,12 @@
               TAGS="warning"
             fi
             BODY="$(printf '%s' "$REASONS_JSON" | jq -r 'if length == 0 then "ok" else join(", ") end')"
+            if [ "$STATE" != "ok" ]; then
+              UNITS="$(jq -r '(.failed_units // []) | join(", ")' "$ROOT/www/status.json" 2>/dev/null || true)"
+              if [ -n "$UNITS" ]; then
+                BODY="$BODY - $UNITS"
+              fi
+            fi
             AUTH=()
             if [ -n "''${NOTIFY_USER:-}" ] && [ -n "''${NOTIFY_PASSWORD_FILE:-}" ] && [ -r "''${NOTIFY_PASSWORD_FILE:-/nonexistent}" ]; then
               AUTH=(-u "$NOTIFY_USER:$(cat "$NOTIFY_PASSWORD_FILE")")

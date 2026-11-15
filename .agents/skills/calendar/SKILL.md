@@ -30,14 +30,16 @@ the self-hosted Radicale on delphi — see § Radicale below.
 
 Built 2026-11-06 with ntfy and Vikunja, and unused until the collection was
 seeded: the server answered 302, held zero calendars, and no client pointed at
-it. `accounts.calendar.accounts.personal` is the client half.
+it. `accounts.calendar.accounts.radicale` is the client half — named for the
+server, because an account and its only collection both called `personal`
+collide in khal and the calendar surfaces as `personal1`.
 
 | | |
 | :--- | :--- |
 | URL | `https://delphi.cloudforest-kardashev.ts.net:8457/` (tailnet only; loopback 5232) |
 | User / password | the fleet user; password `radicale/password` in sops, the same value the host renders into its htpasswd |
 | Collection | `personal`, seeded by the Radicale unit's preStart, so the principal is never empty |
-| Local copy | `~/.local/share/calendars/personal/` via `vdirsyncer-personal.timer` every 15 min |
+| Local copy | `~/.local/share/calendars/radicale/personal/` via `vdirsyncer-personal.timer` every 15 min |
 | Phone | DAVx5: the URL above, same user and password; no public origin, so the phone must be on the tailnet |
 | Gate | `task checks:caldav` — PROPFIND, then write, read back and delete a probe event |
 
@@ -50,13 +52,15 @@ un-consented host red every 15 minutes.
 
 khal keeps `default_calendar = "Primary"` (Google), so ask for the self-hosted one
 explicitly: `khal list -a personal today 7d`. khal only sees what vdirsyncer last
-wrote — `vdirsyncer sync personal` is the immediate form.
+wrote — `vdirsyncer sync calendar_radicale` is the immediate form (the pair is
+`calendar_<account>`: home-manager's naming, not the account's).
 
 ## The two commands
 
 ```bash
 scripts/calendar-auth.sh            # first sync: discover, wait for consent, sync, read back
 scripts/calendar-auth.sh verify     # sync now, then show what khal can see
+task checks:gcal                    # is the credential alive? one token exchange, no calendar traffic
 ```
 
 The consent step is the reason this is a script: `vdirsyncer discover` keeps its
@@ -188,6 +192,13 @@ write`; nothing in this skill sends on its own.
 - **Nothing appears after a sync** — check `khal list` sees the collection before
   blaming the timer: `vdirsyncer` writes files whether or not khal indexed them.
 - **Expired token** — `scripts/calendar-auth.sh auth --force`; nothing else needs
-  editing, because the client pair comes from the sops plane.
+  editing, because the client pair comes from the sops plane. Two kinds look
+  identical from the journal and have different cures:
+  - `refresh_token_expires_in` present in the token file means the consent
+    granted *time-based* access and the token was born dead (52 seconds, once);
+    re-approve choosing permanent access. The script refuses this at consent
+    time now.
+  - an OAuth app whose publishing status is **Testing** caps every refresh token
+    at 7 days, so re-consent buys a week. Publish the consent screen.
 
 Truth: `modules/calendar.nix` — the option surface; this page is the procedure.

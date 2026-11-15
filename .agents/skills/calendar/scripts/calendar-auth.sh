@@ -136,6 +136,21 @@ EOF
   done
   [ -s "$TOKEN" ] || die "no token after ${WAIT}s — the redirect never reached localhost:$PORT"
 
+  # Google sets `refresh_token_expires_in` only when the consent granted
+  # *time-based* access, and the token then dies at that timestamp: sync starts
+  # answering invalid_grant on the next run. Approving with a checkbox that said
+  # "this session" is a one-click mistake, so name it here instead of leaving it
+  # to the journal. (delphi, 2026-11-15: refresh_token_expires_in=52.)
+  time_based=$(python3 - "$TOKEN" <<'PY'
+import json, sys
+try:
+    print(json.load(open(sys.argv[1])).get("refresh_token_expires_in") or "")
+except Exception:
+    print("")
+PY
+)
+  [ -z "$time_based" ] || die "the consent granted time-based access (${time_based}s), so this token is already spent — approve again and choose permanent access; if the OAuth app is still in Testing, publish it, because Testing caps every refresh token at 7 days"
+
   # A token is not a working pair. `discover` creates each local collection only
   # by asking, and its prompt had no TTY (or was answered no), so the local side
   # stayed empty and `sync` paired nothing — the failure read "no collection

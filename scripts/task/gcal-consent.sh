@@ -187,6 +187,17 @@ ws.close();
 process.exit(5);
 JS
 
+# A killed browser leaves SingletonLock behind and the next launch dies in the
+# zygote before CDP ever exists ("Failed sending zygote boot message"). Clear it
+# only when the process that owned it is gone.
+if [ -L "$profile/SingletonLock" ]; then
+  owner="$(readlink "$profile/SingletonLock" | sed 's/.*-//')"
+  if [ -n "$owner" ] && ! kill -0 "$owner" 2>/dev/null; then
+    rm -f "$profile/SingletonLock" "$profile/SingletonSocket" "$profile/SingletonCookie"
+    echo "gcal-consent: cleared a stale profile lock (pid $owner is gone)" >&2
+  fi
+fi
+
 if command -v xvfb-run >/dev/null 2>&1; then
   launch=(xvfb-run -a "$chromium")
 else

@@ -608,15 +608,11 @@ tasks:
   checks:gcal:
     desc: Prove the Google Calendar credential still works — one token exchange, and name which kind of death it had
     summary: >
-      vdirsyncer.service failed every 15 minutes for three days, one "Server
-      disconnected" per collection, while the line that mattered was
-      `(invalid_grant) Token has been expired or revoked`: sixteen hundred log
-      lines built around one fact a single request states outright. This
-      exchanges the refresh_token for an access token and names the cause — a
-      dead grant (re-consent), a time-based grant (approve permanent access),
-      or an OAuth app still in Testing, whose refresh tokens die at seven days.
-      No token at all is a pass: the sync unit is gated on that file by design.
-      Needs sops on this host; ~1 s, no nix, no build.
+      Three days of "Server disconnected" per collection, one per 15 minutes,
+      around the line that mattered: `invalid_grant`. This exchanges the refresh
+      token and names the cause — a dead grant, a time-based grant, or an app
+      still in Testing. No token is a pass: the sync unit is gated on that file.
+      Needs sops; ~1 s, no build.
     cmds:
       - bash scripts/task/gcal-check.sh
 

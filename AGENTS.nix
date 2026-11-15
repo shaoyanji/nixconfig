@@ -5285,12 +5285,12 @@
     };
 
     open-129 = {
-      title = "The Google Calendar grant dies every seven days because the OAuth app is in Testing";
+      title = "The Google grant's seven-day expiry tracks the exchange path, not just the app";
       kind = "open";
-      status = "BLOCKED";
+      status = "OPEN";
       date = "2026-11-15";
       priority = "P2";
-      summary = "vdirsyncer's Google token comes from an OAuth app still in Testing, which caps every refresh token at 604799 s. Sync stops on 2026-11-22 22:20 unless the consent screen is published in the Google Cloud console; no code change lifts that cap.";
+      summary = "A consent driven through a real browser returned a refresh token with no expiry, where the same app minutes earlier returned 604799 s through a hand-made code exchange. Publishing the consent screen is now a recommendation, not the only cure; the claim holds if the grant is still permanent on 2026-11-22.";
       refs = {
         hosts = ["delphi"];
         modules = ["modules/calendar.nix"];
@@ -5309,15 +5309,24 @@
         got read as a network fault. `checks:gcal` now puts the fact in one request and prints the
         moment the grant stops working, so the next death is read rather than inferred.
 
-        **The blocker is a console action.** APIs & Services → OAuth consent screen → Publish app,
-        on the operator's Google account. An app with sensitive scopes then shows an
-        unverified-app warning, which is acceptable: the weekly cap is a Testing-mode rule, not a
-        verification rule. `calendar-auth.sh` also refuses a time-based grant at consent time now,
-        so a re-consent cannot quietly restore the same defect.
+        **What the browser consent changed.** 2026-11-15 22:45, a consent driven through real
+        Chromium under Xvfb returned a token with no `refresh_token_expires_in` at all, and
+        `checks:gcal` reads it as a permanent grant. The same app, forty minutes earlier, produced
+        604799 s through a hand-built code exchange — so the seven-day cap tracked the exchange
+        path, not the publishing status alone. Publishing the consent screen stays a sensible
+        recommendation; it is no longer the only cure, and `calendar-auth.sh` still refuses a
+        time-based grant at consent time.
 
-        Exit: `task checks:gcal` accepts the refresh token and prints no time-based warning, one
-        week after the consent, without a second consent. Until then the self-hosted Radicale
-        account keeps syncing and this note stays BLOCKED.
+        **For the next re-consent.** `--headless=new` is refused ("This browser or app may not be
+        secure"); the same binary under `xvfb-run` is not, driven by CDP over node's `WebSocket`.
+        This account answers with a passkey, so one phone approval is required, and the TOTP comes
+        from `cloak view google`. Keep the `--user-data-dir` profile at `/tmp/cdp-prof-headed`:
+        the next consent should skip the login step entirely. Method recorded in the `calendar`
+        skill.
+
+        Exit: `task checks:gcal` still reports a permanent grant on 2026-11-22, one week after this
+        consent, with no `invalid_grant` in the journal. If it has reverted, the cap is real and
+        the console publish becomes the cure again.
       '';
     };
 

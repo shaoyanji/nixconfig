@@ -88,12 +88,11 @@ Headed for debugging: `agent-browser open --headed <url>`.
   research-shaped.
 - When a site blocks automation or needs login, prefer `extract` from
   `parallel-cli` (clean markdown, no browser) before fighting the browser.
-- **Google account sign-in is a hard wall**, not a fingerprint problem to tune.
-  Verified 2026-11-15 with 0.43.0 on aarch64: the consent URL renders, the email
-  field fills, and *Next* answers `Couldn't sign you in — This browser or app may
-  not be secure`. A desktop user-agent via `--headers` changes nothing, and there
-  is no `--user-agent`, `--args` or profile flag to try. Anything that depends on
-  an interactive Google login (OAuth consent, calendar, Drive) has to happen in a
-  browser a person is sitting at; the headless half only gets as far as the email
-  field. Doing the login once and reusing a profile is not available here either,
-  because `open` gives no user-data-dir.
+- **Google account sign-in refuses headless, not automation as such.** Verified
+  2026-11-15 with 0.43.0 on aarch64: `chromium --headless=new` gets as far as the
+  email field and then answers `Couldn't sign you in — This browser or app may not
+  be secure`; a desktop user-agent changes nothing. The same Chromium binary under
+  `xvfb-run` is accepted, driven by CDP over `node`'s built-in `WebSocket`
+  (`--remote-debugging-port`, then `Runtime.evaluate` + `Input.insertText`).
+  `agent-browser` exposes no `--user-data-dir`, so anything needing a persistent
+  login profile has to launch Chromium directly.

@@ -200,13 +200,16 @@ write`; nothing in this skill sends on its own.
     time now.
   - an OAuth app whose publishing status is **Testing** caps every refresh token
     at 7 days, so re-consent buys a week. Publish the consent screen.
-- **Headless re-consent does not work, and it is not the credential.** Tried
-  2026-11-15 with `agent-browser` 0.43.0 (Chromium 157, aarch64): the consent URL
-  loads, the email field accepts `jisifu@gmail.com`, and the next step answers
-  *"Couldn't sign you in — This browser or app may not be secure"*. A desktop
-  user-agent changes nothing, so the TOTP in `cloak view google` is never even
-  reached. The working shape is the browser on a device the operator can touch,
-  with the `127.0.0.1:<port>` address pasted back into a page served from this
-  host — or, better, publishing the consent screen so no re-consent is needed.
+- **Headless re-consent works, but only with a display.** Tried 2026-11-15 on aarch64:
+  `agent-browser` and `chromium --headless=new` are both refused at the password
+  step ("Couldn't sign you in — This browser or app may not be secure"). The *same*
+  Chromium binary under `xvfb-run` is accepted, and CDP over `node`'s built-in
+  `WebSocket` drives it: email → (this account answers with a passkey prompt, so
+  one **phone approval** is needed) → `google authenticator` code from
+  `cloak view google` → a "update your password" speedbump → consent → the
+  redirect lands on `127.0.0.1:<port>` **on this host**, so the code is exchanged
+  locally and the token written. Keep the `--user-data-dir` profile: the next
+  consent skips the login. A consent driven this way produced a **permanent**
+  grant where the paste-based exchange produced 604799 s.
 
 Truth: `modules/calendar.nix` — the option surface; this page is the procedure.

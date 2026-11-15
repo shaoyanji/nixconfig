@@ -5284,6 +5284,43 @@
       '';
     };
 
+    open-129 = {
+      title = "The Google Calendar grant dies every seven days because the OAuth app is in Testing";
+      kind = "open";
+      status = "BLOCKED";
+      date = "2026-11-15";
+      priority = "P2";
+      summary = "vdirsyncer's Google token comes from an OAuth app still in Testing, which caps every refresh token at 604799 s. Sync stops on 2026-11-22 22:20 unless the consent screen is published in the Google Cloud console; no code change lifts that cap.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/calendar.nix"];
+        tasks = ["checks:gcal"];
+        docs = [".agents/skills/calendar/SKILL.md"];
+      };
+      body = ''
+        **What the number means.** The grant re-consented on 2026-11-15 22:20 carries
+        `refresh_token_expires_in` = 604799, seven days minus a second. The grant that broke on
+        13 Nov carried the same field as 52 s: the same seven-day window, consented inside its
+        last minute. So the token was never merely stale — it had a birth defect with a known
+        date. vdirsyncer is not at fault; `google.py` already asks for `access_type=offline`.
+
+        **Why it cost three days.** When the window closes, every collection logs "Server
+        disconnected" and the reason appears once per run as `(invalid_grant)`. 1616 error lines
+        got read as a network fault. `checks:gcal` now puts the fact in one request and prints the
+        moment the grant stops working, so the next death is read rather than inferred.
+
+        **The blocker is a console action.** APIs & Services → OAuth consent screen → Publish app,
+        on the operator's Google account. An app with sensitive scopes then shows an
+        unverified-app warning, which is acceptable: the weekly cap is a Testing-mode rule, not a
+        verification rule. `calendar-auth.sh` also refuses a time-based grant at consent time now,
+        so a re-consent cannot quietly restore the same defect.
+
+        Exit: `task checks:gcal` accepts the refresh token and prints no time-based warning, one
+        week after the consent, without a second consent. Until then the self-hosted Radicale
+        account keeps syncing and this note stays BLOCKED.
+      '';
+    };
+
     exp-128 = {
       title = "EXP-128 — A mail manager on a 121M-param router, gated by trust rather than confidence";
       kind = "experiment";

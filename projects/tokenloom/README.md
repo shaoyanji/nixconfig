@@ -20,10 +20,11 @@ cargo run --release -p loom-cli -- replay session
 node web/smoke.mjs                       # wire-level end-to-end against a running server
 node web/uitest.mjs http://127.0.0.1:8787/   # headless chromium over CDP (needs `ws` beside it)
 node web/retune.mjs http://127.0.0.1:8787/   # retune round trip, and whether the span keeps its identity
+node web/window.mjs http://127.0.0.1:8787/   # what the coalescing window costs an edit, and what it buys a burst
 ```
 
 Environment: `LOOM_PORT`, `LOOM_BIND`, `LOOM_DATA` (default `./session`, `off`
-disables persistence), `LOOM_COALESCE_MS` (default 8).
+disables persistence), `LOOM_COALESCE_MS` (default 2).
 
 ## Measured numbers
 
@@ -58,6 +59,11 @@ Acceptance tests (`cargo test --all --locked`, 19 tests):
   to the rope, carrying the token its anchor resolves to; the same list is what a
   connecting page is handed, a retune keeps the span's id and length while the
   rule changes, and a removal empties the list on both paths.
+- `a_retune_keeps_every_span_where_it_was` — twenty retunes of one span with a
+  neighbouring span planted beside it: the ids, the anchors, the lengths and the
+  resolved tokens all hold, the neighbour keeps its own rule, every retune bumps
+  the revision, and the next plant takes a fresh id rather than one a retune
+  handed out.
 - `legacy_snapshot_still_loads` — a snapshot written before constraints were
   stored still opens, with an empty index rather than a refusal; so does the
   shape before the reactor bank was written down, with every reactor on.
@@ -108,11 +114,31 @@ stamp rather than by a polling loop. Identity is asserted where it could break:
 the row element has to be the same node afterwards (a property set on it must
 survive), the id it shows must not change, the anchor and the length must not
 move, and the next plant has to take the next id — 60/60 on all four. The
-timings are op on the wire 0.1 ms, ack 9.4 ms (8 ms of which is the coalescer
-window), and the list frame ~50 ms on an idle client. The last gap is not the
-retune: the server queues both frames within 30 µs, and dropping one client
-write 15 ms into the round trip brings both to 15.4 ms, so the second small
-write was waiting for the client to acknowledge the first.
+timings are op on the wire 0.1 ms, ack 3.3 ms (2 ms of which is the coalescer
+window) and the list frame 3.3 ms. The first measurement of this was 9.4 ms and
+51.8 ms, and the gap was not the retune: the server queued both frames within
+30 µs, and dropping one client write 15 ms into the round trip brought both to
+15.4 ms. That is Nagle — an ack and a list frame are two small writes in a row,
+and the second waited about 41 ms for the client to acknowledge the first. axum
+leaves `TCP_NODELAY` unset on its accepted sockets, so setting it removed the
+wait, and the two frames now arrive 0.1 ms apart.
+
+`node web/window.mjs` measures the coalescing window from the client: one edit to
+its diff, ten ops sent in one turn, ten ops spread over 4 ms, and twenty edits at
+a typing cadence, against whatever `LOOM_COALESCE_MS` the server was started with.
+
+| window | edit → diff p99 | 10 ops in one turn | 10 ops over 4 ms |
+| :--- | :--- | :--- | :--- |
+| 1 ms | 2.58 ms | 1 batch | 2.86 batches |
+| 2 ms | 3.29 ms | 1 batch | 2.00 batches |
+| 4 ms | 5.57 ms | 1 batch | 1 batch |
+| 8 ms | 9.45 ms | 1 batch | 1 batch |
+
+The default is 2 ms: the widest window that keeps end-to-end p99 under the 5 ms
+target. A keystroke cadence merges nothing at any width, so a burst is the only
+traffic the window is for, and a burst sent in one turn already merges at 1 ms.
+The 8 ms default it shipped with added 6 ms to every edit and merged nothing
+more than 2 ms does except a burst spread over several milliseconds.
 
 ## How it works
 
@@ -134,9 +160,12 @@ correct and the overrun is counted instead of hidden. The old and new token runs
 are trimmed by common prefix and suffix, and only the middle is spliced, which is
 what makes the emitted `DIFF` minimal.
 
-**Batches.** Ops inside one 8 ms window are applied verbatim and retokenized
+**Batches.** Ops inside one 2 ms window are applied verbatim and retokenized
 once afterwards. Retokenizing between ops would shift the indices the client's
 next op refers to, so the op would land somewhere the user did not click. The
+width is measured rather than inherited: 2 ms is the widest that keeps the
+end-to-end edit-to-diff p99 under the 5 ms target, and a burst of ten ops sent
+in one turn still becomes one revision at that width. The
 frame's span comes from the affine pre/post mapping; the retokenization seed
 comes from the per-op splices shifted by later deltas, which stays exact even if
 an op's offset had to be clamped. If a sender's offsets do not line up with the
@@ -214,15 +243,19 @@ log whose base document is gone.
 ## Deliberate choices and limits
 
 - **The bench measures the core pipeline, not the coalescer.** Edit-to-diff with
-  an 8 ms batcher cannot be under 5 ms on average: the batch window is a floor.
-  The bench therefore times apply → ripple → diff encode, which is the part the
-  pipeline can improve.
+  a batcher cannot be under the window: 2 ms is a floor no pipeline can go below,
+  so the bench times apply → ripple → diff encode, which is the part it can
+  improve. The end-to-end figure is measured separately by `web/window.mjs`
+  (3.29 ms p99, window included).
 - **Frames go out as separate socket messages.** A batch that produces an ack and
-  a list frame is two small writes, and the second waits for the client to
-  acknowledge the first: 49.9 ms to the list frame against an idle client, 15.4 ms
-  when the client has a write in flight, with both frames queued server-side
-  within 30 µs. TCP_NODELAY or one message carrying several frames would remove
-  the wait; neither is built, so the idle-client figure is what a client sees.
+  a list frame is two small writes. This used to cost a round trip — 49.9 ms to
+  the list frame against an idle client, 15.4 ms when the client had a write in
+  flight, with both frames queued server-side within 30 µs — because axum leaves
+  `TCP_NODELAY` unset and the second small write waited for the client's
+  acknowledgement of the first. `tcp_nodelay(true)` on the listener removed that:
+  9.3 ms against 9.3 ms at an 8 ms window, 3.3 against 3.3 at the shipped 2 ms.
+  Concatenating several frames into one message would still save a syscall per
+  frame; it is not built.
 - **The constraint index is bucketed by anchor byte (128-byte blocks), not an
   interval tree.** Same query result for far less code; the cost is a scan per
   touched bucket, and the query errs wide where a token-width guess is needed.
@@ -252,7 +285,7 @@ crates/loom-wire   binary protocol (client frames are the ops themselves)
 crates/loom-srv    session, coalescer, persistence, axum server
 crates/loom-cli    bench, fuzz, replay
 index.html         the landing page GitHub Pages serves: what this is, and its numbers
-web/               index.html, loom.js (vanilla, virtualized rope view), smoke.mjs, uitest.mjs, redraw.mjs, retune.mjs
+web/               index.html, loom.js (vanilla, virtualized rope view), smoke.mjs, uitest.mjs, redraw.mjs, retune.mjs, window.mjs
 vocabs/            bpe_a.json, bpe_b.json, wordpiece.json, delims.json
 LICENSE            MIT
 ```

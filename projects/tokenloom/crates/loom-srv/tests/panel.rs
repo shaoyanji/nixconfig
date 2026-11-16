@@ -128,3 +128,118 @@ async fn a_plant_with_no_edit_reaches_the_sidebar() {
         other => panic!("the emptied list came back as {other:?}"),
     }
 }
+
+/// Identity through a run of retunes, with a neighbour planted beside the span.
+///
+/// The page keeps one row per id and repaints it in place, which is only sound
+/// if the protocol holds four things: the retuned span keeps its id, its anchor
+/// and its length; the span that was not retuned does not move; the list still
+/// holds one entry per span; and the next plant takes a fresh id rather than one
+/// the retune handed out. Those are checked here because a browser is not needed
+/// to check them, and a browser test that fails on them says less about where.
+#[tokio::test]
+async fn a_retune_keeps_every_span_where_it_was() {
+    let (state, mut rx) = running().await;
+    let text = tokens(&state);
+
+    // Two plants in two batches, so a page would have handed out #0 and #1.
+    state
+        .ops_tx
+        .send(vec![Op::ConstraintAdd {
+            seq: 1,
+            start: 1,
+            len: 2,
+            kind: 1,
+            param: 4,
+        }])
+        .expect("the first plant reaches the coalescer");
+    let (first, _) = next_list(&mut rx).await;
+    assert_eq!(first.len(), 1, "one plant, one entry");
+    state
+        .ops_tx
+        .send(vec![Op::ConstraintAdd {
+            seq: 2,
+            start: 3,
+            len: 1,
+            kind: 2,
+            param: b' ' as u32,
+        }])
+        .expect("the second plant reaches the coalescer");
+    let (two, _) = next_list(&mut rx).await;
+    assert_eq!(two.len(), 2, "a second span is a second entry");
+    let (a, b) = (two[0], two[1]);
+    assert_eq!(a.id, first[0].id, "the first span kept the id it was handed");
+    assert_ne!(a.id, b.id, "two spans are two ids");
+
+    // 20 retunes of `a`, each to a rule it does not already have, while `b` sits
+    // beside it untouched.
+    let mut rev = state.revision();
+    for i in 0..20u32 {
+        state
+            .ops_tx
+            .send(vec![Op::ConstraintUpdate {
+                seq: 10 + i as u64,
+                id: a.id,
+                kind: 1,
+                param: 100 + i,
+            }])
+            .expect("the retune reaches the coalescer");
+        let (items, seen) = next_list(&mut rx).await;
+        assert_eq!(
+            items.len(),
+            2,
+            "a retune moves no count; frames before the list: {seen:?}"
+        );
+        assert_eq!(
+            items.iter().map(|c| c.id).collect::<Vec<_>>(),
+            vec![a.id, b.id],
+            "round {i}: the ids, in plant order, are the ids the page holds"
+        );
+        for (got, was) in items.iter().zip([a, b]) {
+            assert_eq!(got.anchor, was.anchor, "round {i}: an anchor does not move");
+            assert_eq!(got.len, was.len, "round {i}: nor does a span length");
+            assert_eq!(
+                got.token, was.token,
+                "round {i}: so the anchor still covers the same token"
+            );
+        }
+        assert_eq!(
+            items[0].kind, 1,
+            "round {i}: the retuned span wears the rule it was given"
+        );
+        assert_eq!(items[0].param, 100 + i, "round {i}: and that rule's number");
+        assert_eq!(
+            (items[1].kind, items[1].param),
+            (b.kind, b.param),
+            "round {i}: the neighbour keeps its own rule"
+        );
+        let now = state.revision();
+        assert!(
+            now > rev,
+            "round {i}: a retune bumps the revision ({rev} -> {now}), or its log record is trimmed as covered"
+        );
+        rev = now;
+    }
+
+    // The next plant must take an id no retune used: a page keyed by id would
+    // otherwise repaint a row that is already on screen.
+    state
+        .ops_tx
+        .send(vec![Op::ConstraintAdd {
+            seq: 40,
+            start: 0,
+            len: 1,
+            kind: 1,
+            param: 2,
+        }])
+        .expect("the third plant reaches the coalescer");
+    let (three, seen) = next_list(&mut rx).await;
+    assert_eq!(three.len(), 3, "three spans, three entries: {seen:?}");
+    let ids: Vec<u32> = three.iter().map(|c| c.id).collect();
+    assert_eq!(ids[..2], [a.id, b.id], "the planted spans keep their ids");
+    assert!(
+        ids[2] > b.id,
+        "a new span takes a fresh id, not one a retune handed out: {ids:?}"
+    );
+    assert_eq!(tokens(&state), text, "and no retune moved any text");
+}

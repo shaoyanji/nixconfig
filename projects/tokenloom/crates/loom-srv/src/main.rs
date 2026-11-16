@@ -14,10 +14,15 @@ async fn main() -> std::io::Result<()> {
         .and_then(|v| v.parse().ok())
         .unwrap_or(8787);
     let bind = std::env::var("LOOM_BIND").unwrap_or_else(|_| "127.0.0.1".to_string());
+    // 2 ms is the widest window whose end-to-end edit-to-diff p99 stays under
+    // the 5 ms target: measured 3.29 ms, against 5.57 ms at 4 ms and 9.45 ms at
+    // the 8 ms this shipped with. A burst still merges at this width (ten ops in
+    // one turn arrive as one batch), so the old floor bought nothing a keystroke
+    // could feel.
     let coalesce_ms: u64 = std::env::var("LOOM_COALESCE_MS")
         .ok()
         .and_then(|v| v.parse().ok())
-        .unwrap_or(8);
+        .unwrap_or(2);
     let data: Option<PathBuf> = match std::env::var("LOOM_DATA") {
         Ok(v) if v == "off" || v.is_empty() => None,
         Ok(v) => Some(PathBuf::from(v)),
@@ -78,5 +83,12 @@ async fn main() -> std::io::Result<()> {
     println!(
         "token loom listening on http://{addr}/ (ws /ws) · {tokens} tokens, {bytes} bytes · {constraints} constraints · replayed {replayed} batches · data {data:?} · coalesce {coalesce_ms}ms"
     );
-    axum::serve(listener, ws::app(state)).await
+    // Nagle off. Every batch writes an ack and a diff as separate small frames,
+    // and with Nagle on the second waits for the client to acknowledge the
+    // first: measured at 49.9 ms to the frame against an idle client, 15.4 ms
+    // once a client write was in flight. axum defaults this to None, so the
+    // option has to be set or the socket keeps the extra round trip.
+    axum::serve(listener, ws::app(state))
+        .tcp_nodelay(true)
+        .await
 }

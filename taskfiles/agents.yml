@@ -482,7 +482,7 @@ tasks:
         # commit and is what you have before a switch.
         drain=(email-archive-ci-drain)
         command -v "${drain[0]}" >/dev/null 2>&1 || drain=(python3 modules/services/email-ci-drain.py)
-        args=(--days "{{.DAYS}}")
+        args=(--days "{{.DAYS}}" --api "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}")
         [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
         [ "{{.FULL}}" = "1" ] && args+=(--full)
         if [ "{{.FORMAT}}" = "text" ]; then

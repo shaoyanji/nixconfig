@@ -1092,8 +1092,9 @@ cmd_wallpaper() {
 # 2026-11-10 palette test settled on, so it lives in each line rather than here.
 kept_plate() { # brief
   [ -f "$LEDGER" ] || return 0
-  # `type == "object"` first: the ledger is append-only and one malformed line used
-  # to fail the whole query, which read as "no kept plate" for every row.
+  # `type == "object"` first: the ledger is append-only and read while a round is
+  # still writing it, so a half-written line fails the whole query and reads as
+  # "no kept plate" for every row. One torn read did exactly that on 2026-11-16.
   jq -r --arg b "$1" 'select(type == "object") | select(.brief == $b and .verdict == "keep") | .path' "$LEDGER" |
     tac | while IFS= read -r p; do
       [ -f "$p" ] && { printf '%s\n' "$p"; break; }

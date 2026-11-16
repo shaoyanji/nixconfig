@@ -343,6 +343,31 @@ image itself is well made, because it is the wrong subject."
   printf '%s' "$verdict"
 }
 
+# A re-render overwrites the plate it replaces, and the earlier plate is the one
+# an operator may want back: on 2026-11-16 the second Mortred read worse than the
+# bust it replaced, and the better render survived only as a Cloudinary version.
+# Copy the file away before the generator is pointed at its path. Stamped, so a
+# slug can accumulate renders and `variants` lists them oldest first.
+archive_prior() { # file
+  local f=$1 rel stamp dest
+  [ -f "$f" ] || return 0
+  rel=${f#"$IMAGES_ROOT/src/"}
+  rel=${rel#"$IMAGES_ROOT/published/"}
+  stamp=$(date -u +%Y%m%dT%H%M%SZ)
+  dest="$IMAGES_ROOT/variants/${rel%.*}.$stamp.${rel##*.}"
+  # Two plates can be archived inside the same second, and a stamp that collides
+  # overwrites the copy the operator just asked to keep — measured 2026-11-16,
+  # when a restore overwrote its own source and put the replaced plate straight
+  # back. A counter keeps both; the name stays sortable by when it was archived.
+  local n=1
+  while [ -e "$dest" ]; do
+    n=$((n + 1))
+    dest="$IMAGES_ROOT/variants/${rel%.*}.$stamp-$n.${rel##*.}"
+  done
+  mkdir -p "$(dirname "$dest")"
+  cp -f "$f" "$dest" && say "archived prior render: variants/${dest#"$IMAGES_ROOT/variants/"}"
+}
+
 # --- generation -------------------------------------------------------------
 # One call, one plate. A named defect is re-rolled once; a verdict of "keep" is
 # final, and the re-roll budget is one per brief per day so a bad prompt cannot
@@ -353,6 +378,7 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
   mkdir -p "$dir"
   local file="$dir/$name"
   mkdir -p "$(dirname "$file")"
+  archive_prior "$file"
 
   # 429 is a burst limit, not a spent day: `cpg usage` still reports the
   # allowance, so waiting is the right answer and recording a failure is not.
@@ -782,6 +808,49 @@ cmd_publish() {
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
   build_index
   deploy_frontend
+}
+
+# The other half of `archive_prior`: with no argument it lists the superseded
+# renders, and with `VARIANT=<path>` it puts one back. A restore also drops the
+# path from the manifest, because publish copies a row it already carries rather
+# than uploading again — the row is what says "this URL is already served", and
+# after a restore that sentence is wrong.
+cmd_variants() {
+  local root=$IMAGES_ROOT/variants want=${VARIANT:-} rel file rows=$IMAGES_ROOT/published/urls.tsv
+  if [ -z "$want" ]; then
+    [ -d "$root" ] || { say "no superseded renders yet ($root)"; return 0; }
+    find "$root" -type f \( -name '*.png' -o -name '*.jpg' \) | sort |
+      while IFS= read -r f; do say "${f#"$root"/}"; done
+    return 0
+  fi
+  case $want in
+  /*) file=$want ;;
+  *)
+    want=${want#"$IMAGES_ROOT/"}
+    want=${want#variants/}
+    file=$root/$want
+    ;;
+  esac
+  [ -f "$file" ] || die "no archived render at $file"
+  # variants/wall/2026-11-16/dota-phantom-assassin.<stamp>[-n].png -> wall/<day>/<slug>.png
+  rel=${file#"$root"/}
+  rel=$(printf '%s' "$rel" | sed -E 's/\.[0-9]{8}T[0-9]{6}Z(-[0-9]+)?(\.[a-z]+)$/\2/')
+  # The plate being replaced is archived too, so flipping the choice back is the
+  # same command run against the other file instead of a one-way door. Copy the
+  # chosen render aside first: archiving writes into the same folder it came from.
+  local hold=$file.hold.$$
+  cp -f "$file" "$hold" || die "could not read $file"
+  archive_prior "$IMAGES_ROOT/published/$rel"
+  mkdir -p "$(dirname "$IMAGES_ROOT/published/$rel")" "$(dirname "$IMAGES_ROOT/src/$rel")"
+  mv -f "$hold" "$IMAGES_ROOT/published/$rel"
+  cp -f "$IMAGES_ROOT/published/$rel" "$IMAGES_ROOT/src/$rel"
+  if [ -s "$rows" ]; then
+    awk -F'\t' -v r="$rel" '$1 != r' "$rows" >"$rows.restore.$$" && mv -f "$rows.restore.$$" "$rows"
+  fi
+  say "restored $rel from $(basename "$file")"
+  [ "${PUBLISH:-1}" = "1" ] || { say "PUBLISH=0: the gallery still serves the replaced plate"; return 0; }
+  [ -s "$rows" ] || { say "manifest is empty — nothing to publish until a plate lands again"; return 0; }
+  cmd_publish
 }
 
 # The consumer of the blog lane is a Chirpy checkout, not this gallery: hand over
@@ -1316,10 +1385,11 @@ case "${1:-plan}" in
   status) cmd_status ;;
   judge) shift && cmd_judge "$@" ;;
   publish) cmd_publish ;;
+  variants) cmd_variants ;;
   post) cmd_post ;;
   gc) cmd_gc ;;
   blog) shift && cmd_blog "$@" ;;
   wallpaper) cmd_wallpaper ;;
   plates) cmd_plates ;;
-  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|wallpaper|plates" ;;
+  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates" ;;
 esac

@@ -1,0 +1,28 @@
+# The archetype library for `task images:plates`.
+#
+# A roster row may write `arch:<name>` where it would otherwise re-derive a face
+# from hair, a gown and an expression. Adjectives were reached for on 2026-11-16
+# and returned a heavy jaw in a slim gown, so the face is now named as a type and
+# described once, in one place.
+#
+# `image-daily.sh` substitutes the traits into the prompt before the row is sent
+# and *before* the form guard runs, so a plate's prompt — the sentence the ledger
+# records — is still the whole instruction, and a row naming an archetype cannot
+# skip the clause. An unknown name refuses the row instead of falling back.
+#
+# `<name>|<traits>`; traits are a comma-separated clause with no leading or
+# trailing comma, so the row supplies the punctuation around it.
+#
+# Where these come from: the plates the operator named as good — Ganyu
+# (`ganyu-genshin`), Eula (`eula-genshin`), Lisa Yadomaru (`lisa-yadomaru`),
+# Narmaya (`narmaya-gbf`) and 2B's design — and what the bad reads shared: Luna,
+# the Lady of DMC and Vanessa Enoteca all read harsh and angular, a gaunt hollow
+# face with a cold stare, which is the mask the traits below are written against.
+
+gentle-adeptus|a soft rounded face with full cheeks, large gentle eyes and a tender closed-lip smile, a small chin, fine rounded bone structure, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+proud-duelist|a fine-boned aristocratic face with an elegant narrow jaw that stays soft at the corner, long level eyes, a poised half-smile with warmth behind it, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+sultry-siren|a mature voluptuous figure with a narrow waist and gently curved hips, warm full lips, a knowing heavy-lidded half-smile, soft rounded cheeks, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+graceful-dancer|a dancer's light bearing, long-limbed and slim, a soft round face, warm upturned eyes and a bright gentle smile, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+porcelain-android|a porcelain-doll face with a soft rounded jaw, a small nose and full lips, clear fair skin, a calm dreaming expression, unmistakably a soft human woman's face and not a metal mask, a mannequin or a featureless head, a fine-boned build with narrow shoulders and a small waist, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+warm-warrior|a warm open grin with softly rounded cheeks and bright alert eyes, a slim strong build with narrow shoulders and no bulk, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+slim-valkyrie|a slender figure inside light fitted armour that follows the body instead of widening the torso, a soft smiling face above the collar, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure

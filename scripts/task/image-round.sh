@@ -95,14 +95,16 @@ add_custom() {
     return 2
   fi
   prompt=$(gum write --width 90 --height 12 \
-    --header "Prompt — who, from where, what they wear, how framed" \
-    --placeholder "Name, an adult woman from the game … — hair, eyes, gown and neckline, expression, portrait from the waist up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.") || return 2
+    --header "Prompt — who, from where, what they wear, how framed; a face can be `arch:<name>`" \
+    --placeholder "Name, an adult woman from the game … — hair, eyes, gown and neckline, expression, portrait from the waist up, glamorous and alluring, arch:sultry-siren, 4k, photorealistic, realistic, neumorphism.") || return 2
   prompt=$(printf '%s' "$prompt" | tr '\n' ' ' | sed 's/  */ /g; s/^ //; s/ $//')
   [ -n "$prompt" ] || return 2
   # The row is refused without this clause, so a custom character gets it here
-  # rather than being typed in by hand every time.
+  # rather than being typed in by hand every time. An `arch:<name>` brings the
+  # clause with it when the engine expands the row, so typing an archetype is
+  # enough — and appending both would repeat the face twice in one sentence.
   case $prompt in
-  *"soft feminine facial features"*) ;;
+  *"soft feminine facial features"* | *"arch:"*) ;;
   *)
     if printf '%s' "$prompt" | grep -q ', 4k,'; then
       prompt=$(printf '%s' "$prompt" | sed "s/, 4k,/, $form, 4k,/")

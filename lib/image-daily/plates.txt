@@ -13,6 +13,15 @@
 # refuses to spend on a row without it (`PLATE_FORM`), so the clause is a
 # requirement and the sentence that produced a plate is still on its line.
 #
+# A row may also carry `arch:<name>` where a face belongs, and the engine
+# substitutes the traits from `archetypes.tsv` before sending: the adjective list
+# was reached for and returned a heavy jaw, so the face is named as a type instead
+# — `gentle-adeptus`, `sultry-siren`, `porcelain-android`, and four others. The
+# substitution happens before the form guard, so an archetype row cannot skip the
+# clause, and the expanded sentence is what the ledger records. The reference
+# plates the library was distilled from are `ganyu-genshin`, `eula-genshin`,
+# `lisa-yadomaru` and `narmaya-gbf`.
+#
 # Allure is the target, not bulk: gowns, bare shoulders, deep necklines. Nothing
 # explicit and nothing nude — the plate has to be something you would put on a
 # desktop.
@@ -47,7 +56,7 @@ rukia-kuchiki|Rukia Kuchiki from the anime Bleach — short black hair, violet e
 bulma|Bulma Briefs, an adult woman from the anime Dragon Ball — a confident inventor in her twenties, short turquoise hair, blue eyes, a white and red motorcycle jacket, portrait from the shoulders up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.|Bulma as a recognisable lifelike portrait of an adult inventor with turquoise hair, never a capsule, a car or an abstract plate
 nami|Nami, an adult woman from the anime One Piece — a navigator in her twenties, long orange hair, brown eyes, a blue and white striped shirt, portrait from the shoulders up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.|Nami as a recognisable lifelike portrait of an adult navigator with orange hair, never a compass or a map alone
 nico-robin|Nico Robin, an adult woman from the anime One Piece — an archaeologist in her twenties, long black hair, dark eyes, a purple jacket, portrait from the shoulders up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.|Nico Robin as a recognisable lifelike portrait of an adult with long black hair, never a generic figure
-2b|2B, an adult android woman from the anime NieR:Automata — short white hair in a bob, a black visor across her eyes, a black dress with a white collar, portrait from the shoulders up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.|2B as a recognisable lifelike android portrait wearing a black visor, never a sword alone or an emblem
+2b|2B, an adult android woman from the anime NieR:Automata — short white hair in a bob, a slim black visor covering only her eyes so her nose, lips and soft smile stay visible below it, a fitted black sleeveless dress with a white collar and a thin silver belt at the waist, narrow shoulders and slender arms, arch:porcelain-android, 4k, photorealistic, realistic, neumorphism.|2B as a recognisable lifelike android portrait wearing a narrow black eye visor with her soft smiling lower face clearly visible, a slim waist and no bulky sleeves or shoulder pads, never a mask over the whole face, never a sword alone
 lucy|Lucy, Lucyna Kushinada, an adult woman from the anime Cyberpunk: Edgerunners — short pastel-white hair with pink tips, dark eyes, a black and yellow jacket with a high collar, portrait from the shoulders up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.|Lucy as a recognisable lifelike portrait of an adult netrunner with short white hair, never a neon city with nobody in it or a UI panel
 # --- round 2: twenty more iconic female characters, all adults ---
 erza-scarlet|Erza Scarlet, an adult woman from the anime Fairy Tail — long scarlet hair, steady brown eyes, a polished silver breastplate over a blue skirt, portrait from the shoulders up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.|Erza as a recognisable lifelike portrait of an adult knight with long scarlet hair, never armour alone, a sword on the floor or an emblem

@@ -288,7 +288,10 @@ generic, so do not mark an image down for carrying few words.
 A portrait of a woman must read as a woman: a heavy square jaw, a thick neck, a
 flat broad brow, a masculine or androgynous face, or a torso widened and
 flattened by bulky armour is a defect — name it and reroll, however well the
-image is made.
+image is made. The same reroll applies to a harsh cold read: sunken gaunt
+cheeks, an angular hollowed jaw, a hard unblinking stare, or a smooth featureless
+mannequin face — a visor that has swallowed the whole face counts — because that
+is an unpleasant mask rather than a woman.
 Otherwise answer "reroll" and put in "defect" one concrete, actionable defect
 (the thing to change, e.g. "the horizon is not level"). Use "reject" only when
 the image is unusable and the prompt is wrong, not the render.
@@ -1114,6 +1117,30 @@ roster_pending() { # roster
 # This is the engine refusing to spend on a row that forgot it.
 PLATE_FORM="soft feminine facial features"
 
+# Some faces only come out of an archetype: the adjective list was reached for on
+# 2026-11-16 and returned a heavy jaw in a slim gown, so a row may name a type
+# instead — `arch:sultry-siren` rather than re-deriving a face from hair and a
+# gown. The traits live in one file, are substituted in before the row is sent and
+# before the guard below runs, so the expanded sentence is what the ledger records
+# and a row naming an archetype still cannot skip the clause. An unknown name
+# refuses the row; it never falls back to a bare word.
+PLATE_ARCH_FILE=${PLATE_ARCH_FILE:-$repo/lib/image-daily/archetypes.tsv}
+
+plate_expand() { # prompt -> prompt with every arch:<name> resolved
+  local p=$1 name traits
+  case $p in *arch:*) ;; *) printf '%s' "$p"; return 0 ;; esac
+  [ -f "$PLATE_ARCH_FILE" ] || { say "no archetype file at $PLATE_ARCH_FILE"; return 1; }
+  for name in $(printf '%s' "$p" | grep -o 'arch:[a-z0-9-]*' | sed 's/^arch://' | sort -u); do
+    traits=$(awk -F'|' -v n="$name" '!/^#/ && $1 == n {print $2; exit}' "$PLATE_ARCH_FILE")
+    if [ -z "$traits" ]; then
+      say "arch:$name is not in $PLATE_ARCH_FILE — known: $(awk -F'|' '!/^#/ && NF > 1 {printf "%s ", $1}' "$PLATE_ARCH_FILE")"
+      return 1
+    fi
+    p=${p//arch:$name/$traits}
+  done
+  printf '%s' "$p"
+}
+
 cmd_plates() {
   need jq cpg agy git ffprobe
   local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} size=${SIZE:-1536x1024}
@@ -1147,9 +1174,10 @@ cmd_plates() {
       have=$(kept_plate "photoreal-$slug")
       [ -n "$have" ] && { say "$slug: kept already ($have)"; continue; }
     fi
+    prompt=$(plate_expand "$prompt") || continue
     case $prompt in
     *"$PLATE_FORM"*) ;;
-    *) say "$slug: no form clause — add '$PLATE_FORM, a delicate jawline, a slender neck, a graceful feminine figure' to the row"
+    *) say "$slug: no form clause — add '$PLATE_FORM, a delicate jawline, a slender neck, a graceful feminine figure' or an arch:<name> from $PLATE_ARCH_FILE to the row"
        continue ;;
     esac
     [ "$left" -gt 0 ] || { say "allowance spent"; break; }

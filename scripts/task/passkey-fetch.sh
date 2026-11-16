@@ -2,9 +2,13 @@
 # Pull one passkey out of the vault in the shape a browser driver can import.
 #
 # A passkey cannot be copied out of the vault UI and does not survive an export:
-# the private key lives in `fido2Credentials`, a field only an unlocked CLI
-# returns. That is the whole reason this exists — `cloak` is TOTP only, and
-# `bw export` omits credentials.
+# the private key lives in `fido2Credentials`, which `bw export` omits.
+#
+# This is the one job that still needs bitwarden-cli. `rbw` is the fleet's vault
+# client — it is a Rust binary, it fetches by name, and it is what `dev:passkey`
+# would use if it could: `rbw get --raw` prints {id, folder, name, data, fields,
+# notes, history} — the decrypted entry, with no `fido2Credentials` in it — so the
+# credential is out of its reach. Every other read goes through rbw.
 #
 #   scripts/task/passkey-fetch.sh                 # rpId google.com
 #   RP=github.com OUT=/tmp/gh.json scripts/task/passkey-fetch.sh

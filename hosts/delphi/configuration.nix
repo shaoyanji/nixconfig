@@ -736,7 +736,9 @@ in {
   # presents. crab-hole answers for the LAN, not for `*.frieren.lan`, and
   # MagicDNS is not consulted here (nameservers above), so the name needs a
   # static answer: frieren's Tailscale address, the same one the alert bridge
-  # above uses. The record has to exist before `bw login` can prelogin.
+  # above uses. The record has to exist before either client can prelogin: `rbw
+  # login` is the fleet's vault client, and `bw` survives only for passkeys, which
+  # no other client exposes.
   networking.hosts."100.97.61.65" = ["vault.frieren.lan"];
 
   # --- The gokrazy appliance's build artifacts ---------------------------------

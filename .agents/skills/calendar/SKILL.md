@@ -211,7 +211,7 @@ write`; nothing in this skill sends on its own.
   (exit 4) and gives up on a cycling flow after 30 interactions (exit 6). Either
   run it with a human present who can solve one image, or make the passkey path
   win so the password page is never reached (`CAL_PASSKEY_FILE`; the primitive is
-  `scripts/task/passkey-probe.sh`, the vault read is still unwired).
+  `scripts/task/passkey-probe.sh`; the vault read is `task dev:passkey:fetch`).
 - **A passkey cannot be typed, but it can be imported.** `scripts/task/passkey-probe.sh`
   proves the primitive without touching Google: a CDP virtual authenticator registers a
   credential on a local page, exports its PKCS8 private key, installs that key into a
@@ -219,8 +219,11 @@ write`; nothing in this skill sends on its own.
   vault → browser half of a headless passkey login is wired. `--from-vault FILE` takes
   the shape a Bitwarden item's `fido2Credentials` hold (`rpId`, base64url
   `credentialId`, base64 `privateKey`). Three facts bound the plan: `cloak` 0.3.0 is
-  TOTP-only, so reading a passkey needs a vault client that is not installed
-  (`bw`/`rbw`); a passkey for the account must actually exist in Vaultwarden; and the
+  TOTP-only, and rbw — installed on every host and the fleet's vault client — prints
+  `{id, folder, name, data, fields, notes, history}` from its `--raw`, which holds no
+  `fido2Credentials`: bitwarden-cli is the only client that does, which is why
+  `scripts/task/passkey-fetch.sh` exists. A passkey for the account must actually
+  exist in Vaultwarden; and the
   Bitwarden *extension* is not the route on Linux because it breaks WebAuthn in
   Chromium outright (bitwarden/clients#17837). The RP ID must be a domain — a probe
   served on `127.0.0.1` is refused with "This is an invalid domain", so use

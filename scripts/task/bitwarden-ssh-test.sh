@@ -22,6 +22,10 @@
 # Interactive by design: unlocking the vault needs the master password, which is why the
 # task wrapping this is a human-run check rather than a gate.
 #
+# rbw cannot take over this read: its `--raw` entry JSON is
+# {id, folder, name, data, fields, notes, history}, and neither that nor `--field`
+# exposes `sshKey`, so the private half is out of its reach.
+#
 # env: HOST         target host (default frieren)
 #      ITEM         vault item name or id; required when the vault holds >1 SSH key
 #      PUBKEY/CERT  key + certificate (default ~/.ssh/bitwarden{,-cert.pub})

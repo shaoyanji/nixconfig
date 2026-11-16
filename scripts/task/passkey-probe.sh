@@ -55,6 +55,17 @@ if ! node -e 'process.exit(typeof WebSocket === "function" ? 0 : 1)'; then
   exit 3
 fi
 
+# WebAuthn checks an rpId against the *page's* origin, so a credential stored for a
+# real site cannot assert on localhost — which is the whole point of the vault
+# path. Serve the probe under the credential's own host instead: a throwaway
+# cert, --ignore-certificate-errors for the trust, and a resolver rule pointing
+# the name at loopback. https, because WebAuthn also demands a secure context
+# and http://google.com is not one.
+page_host="localhost"
+if [ -n "$vault_file" ]; then
+  page_host="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["rpId"])' "$vault_file")"
+fi
+
 work="$(mktemp -d)"
 pick_port() {
   python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()'
@@ -218,8 +229,39 @@ ws.close();
 process.exit(0);
 JS
 
-echo "passkey-probe: chromium $(basename "$chromium"), node $(node -v), page :$srv_port, cdp :$cdp_port"
-python3 -m http.server "$srv_port" --bind 127.0.0.1 --directory "$work" >/dev/null 2>&1 &
+scheme="http"
+map_flags=()
+if [ "$page_host" != "localhost" ] && [ "$page_host" != "127.0.0.1" ]; then
+  if command -v openssl >/dev/null 2>&1; then
+    ossl=(openssl)
+  else
+    ossl=(nix shell --option builders "" nixpkgs#openssl -c openssl)
+  fi
+  scheme="https"
+  "${ossl[@]}" req -x509 -newkey rsa:2048 -nodes -days 1 -subj "/CN=$page_host" \
+    -keyout "$work/key.pem" -out "$work/cert.pem" >/dev/null 2>&1
+  cat >"$work/tls.py" <<'PY'
+import http.server, os, ssl, sys
+port, root, cert, key = int(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4]
+os.chdir(root)
+httpd = http.server.HTTPServer(("127.0.0.1", port), http.server.SimpleHTTPRequestHandler)
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+ctx.load_cert_chain(cert, key)
+httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
+httpd.serve_forever()
+PY
+  map_flags=(
+    --host-resolver-rules="MAP $page_host 127.0.0.1:$srv_port"
+    --ignore-certificate-errors
+  )
+fi
+
+echo "passkey-probe: chromium $(basename "$chromium"), node $(node -v), page $scheme://$page_host:$srv_port, cdp :$cdp_port"
+if [ "$scheme" = "https" ]; then
+  python3 "$work/tls.py" "$srv_port" "$work" "$work/cert.pem" "$work/key.pem" >/dev/null 2>&1 &
+else
+  python3 -m http.server "$srv_port" --bind 127.0.0.1 --directory "$work" >/dev/null 2>&1 &
+fi
 srv=$!
 sleep 1
 
@@ -235,8 +277,9 @@ fi
 "${launch[@]}" \
   --user-data-dir="$work/profile" \
   --no-first-run --no-default-browser-check --disable-gpu \
+  ${map_flags[@]:+"${map_flags[@]}"} \
   --remote-debugging-address=127.0.0.1 --remote-debugging-port="$cdp_port" \
-  "http://localhost:$srv_port/index.html" >"$work/chrome.log" 2>&1 &
+  "$scheme://$page_host:$srv_port/index.html" >"$work/chrome.log" 2>&1 &
 browser=$!
 
 args=("$cdp_port")
@@ -249,5 +292,5 @@ if [ "$rc" -ne 0 ]; then
   exit 1
 fi
 echo "passkey-probe: ok — a credential was imported into a blank authenticator and signed with"
-echo "  what a headless login still needs: a vault client that reads fido2Credentials (bw/rbw;"
-echo "  cloak is TOTP only) and a passkey for the site stored in Vaultwarden."
+echo "  vault -> browser is wired end to end: bw login hands over fido2Credentials, and"
+echo "  serving the probe under the credential's own rpId is what makes the assertion real."

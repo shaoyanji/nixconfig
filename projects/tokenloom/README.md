@@ -19,6 +19,7 @@ cargo run --release -p loom-cli -- fuzz 300
 cargo run --release -p loom-cli -- replay session
 node web/smoke.mjs                       # wire-level end-to-end against a running server
 node web/uitest.mjs http://127.0.0.1:8787/   # headless chromium over CDP (needs `ws` beside it)
+node web/retune.mjs http://127.0.0.1:8787/   # retune round trip, and whether the span keeps its identity
 ```
 
 Environment: `LOOM_PORT`, `LOOM_BIND`, `LOOM_DATA` (default `./session`, `off`
@@ -100,6 +101,19 @@ tokens inserted in one op, then the body of the rope redraw two hundred times
 unmarked and marked, at the top of the rope and in the middle, plus what a diff
 costs a full constraint index.
 
+`node web/retune.mjs` measures the retune path and checks the identity claim at
+the same time. It plants a span, marks it, then retunes it sixty times through
+the rule buttons, timing each step from the click by the frame's own arrival
+stamp rather than by a polling loop. Identity is asserted where it could break:
+the row element has to be the same node afterwards (a property set on it must
+survive), the id it shows must not change, the anchor and the length must not
+move, and the next plant has to take the next id — 60/60 on all four. The
+timings are op on the wire 0.1 ms, ack 9.4 ms (8 ms of which is the coalescer
+window), and the list frame ~50 ms on an idle client. The last gap is not the
+retune: the server queues both frames within 30 µs, and dropping one client
+write 15 ms into the round trip brings both to 15.4 ms, so the second small
+write was waiting for the client to acknowledge the first.
+
 ## How it works
 
 **Rope.** `loom-core::Rope` is a piece table whose pieces are token runs of at
@@ -167,7 +181,9 @@ a `CONSTRAINT_REMOVE` op naming the id the server handed out; ids are never
 renumbered, or a warning that names one would point at a span it never described.
 A marked entry is retuned in place by the rule buttons — a `CONSTRAINT_UPDATE`
 that keeps the anchor, the length and the id, so the warning the old rule raised
-keeps its identity instead of reading as a new problem. A removal and a retune
+keeps its identity instead of reading as a new problem. The panel keeps one row
+per id and updates it where it stands, so a retune repaints text inside the same
+element rather than rebuilding the list. A removal and a retune
 move no text either, and both bump the revision so their log records outlive the
 snapshot they follow.
 
@@ -201,6 +217,12 @@ log whose base document is gone.
   an 8 ms batcher cannot be under 5 ms on average: the batch window is a floor.
   The bench therefore times apply → ripple → diff encode, which is the part the
   pipeline can improve.
+- **Frames go out as separate socket messages.** A batch that produces an ack and
+  a list frame is two small writes, and the second waits for the client to
+  acknowledge the first: 49.9 ms to the list frame against an idle client, 15.4 ms
+  when the client has a write in flight, with both frames queued server-side
+  within 30 µs. TCP_NODELAY or one message carrying several frames would remove
+  the wait; neither is built, so the idle-client figure is what a client sees.
 - **The constraint index is bucketed by anchor byte (128-byte blocks), not an
   interval tree.** Same query result for far less code; the cost is a scan per
   touched bucket, and the query errs wide where a token-width guess is needed.
@@ -230,7 +252,7 @@ crates/loom-wire   binary protocol (client frames are the ops themselves)
 crates/loom-srv    session, coalescer, persistence, axum server
 crates/loom-cli    bench, fuzz, replay
 index.html         the landing page GitHub Pages serves: what this is, and its numbers
-web/               index.html, loom.js (vanilla, virtualized rope view), smoke.mjs, uitest.mjs, redraw.mjs
+web/               index.html, loom.js (vanilla, virtualized rope view), smoke.mjs, uitest.mjs, redraw.mjs, retune.mjs
 vocabs/            bpe_a.json, bpe_b.json, wordpiece.json, delims.json
 LICENSE            MIT
 ```

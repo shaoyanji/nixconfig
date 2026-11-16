@@ -374,6 +374,43 @@ function consSpanOf(id) {
   return { start, end: Math.min(state.tokens.length, start + Math.max(1, c.len)) };
 }
 
+// One row per span, kept by id. A list frame carries the whole list, but an id
+// names a span across a retune, so the row for that id is updated where it
+// stands instead of being rebuilt: focus inside it and the marked outline stay
+// put through the update.
+const consRows = new Map();
+
+function consRow(id) {
+  const li = document.createElement('li');
+  li.dataset.id = String(id);
+  const kind = document.createElement('span');
+  kind.className = 'k';
+  const msg = document.createElement('span');
+  msg.className = 'msg';
+  const rm = document.createElement('button');
+  rm.className = 'rm';
+  rm.textContent = '×';
+  rm.title = `remove constraint #${id}`;
+  rm.onclick = (e) => {
+    e.stopPropagation();
+    opConstraintRemove(id);
+  };
+  li.append(kind, msg, rm);
+  li.onclick = () => {
+    // The span stays marked after the click, so the rule that is being watched
+    // and the chips it covers are visible while the rope is edited.
+    state.consSel = state.consSel === id ? null : id;
+    const span = consSpanOf(id);
+    if (span) {
+      state.sel = { a: span.start, b: Math.max(span.start, span.end - 1) };
+      scroller.scrollTop = Math.floor(span.start / ROW_TOKENS) * ROW_H;
+    }
+    renderConstraints();
+    drawRope();
+  };
+  return { li, kind, msg };
+}
+
 function renderConstraints() {
   const list = $('#constraints');
   $('#consCount').textContent = String(state.constraints.length);
@@ -383,43 +420,29 @@ function renderConstraints() {
     state.consSel = null;
   }
   if (!state.constraints.length) {
+    consRows.clear();
     list.innerHTML = '<li class="empty">none planted</li>';
     return;
   }
-  list.replaceChildren(
-    ...state.constraints.map((c) => {
-      const li = document.createElement('li');
-      if (c.id === state.consSel) li.className = 'on';
-      const kind = document.createElement('span');
-      kind.className = 'k';
-      kind.textContent = `#${c.id} ${CONS_KIND[c.kind] || `kind ${c.kind}`}`;
-      const msg = document.createElement('span');
-      msg.className = 'msg';
-      msg.textContent = `${describeConstraint(c)} · ${c.len}t @ ${c.anchor}b`;
-      const rm = document.createElement('button');
-      rm.className = 'rm';
-      rm.textContent = '×';
-      rm.title = `remove constraint #${c.id}`;
-      rm.onclick = (e) => {
-        e.stopPropagation();
-        opConstraintRemove(c.id);
-      };
-      li.append(kind, msg, rm);
-      li.onclick = () => {
-        // The span stays marked after the click, so the rule that is being
-        // watched and the chips it covers are visible while the rope is edited.
-        state.consSel = state.consSel === c.id ? null : c.id;
-        const span = consSpanOf(c.id);
-        if (span) {
-          state.sel = { a: span.start, b: Math.max(span.start, span.end - 1) };
-          scroller.scrollTop = Math.floor(span.start / ROW_TOKENS) * ROW_H;
-        }
-        renderConstraints();
-        drawRope();
-      };
-      return li;
-    }),
-  );
+  for (const id of [...consRows.keys()]) {
+    if (!state.constraints.some((c) => c.id === id)) consRows.delete(id);
+  }
+  const nodes = state.constraints.map((c) => {
+    let row = consRows.get(c.id);
+    if (!row) {
+      row = consRow(c.id);
+      consRows.set(c.id, row);
+    }
+    row.kind.textContent = `#${c.id} ${CONS_KIND[c.kind] || `kind ${c.kind}`}`;
+    row.msg.textContent = `${describeConstraint(c)} · ${c.len}t @ ${c.anchor}b`;
+    row.li.className = c.id === state.consSel ? 'on' : '';
+    return row.li;
+  });
+  // Touch the DOM only when the set or its order moved. A retune moves neither,
+  // so its frame repaints text in place and drops nothing.
+  const settled =
+    list.children.length === nodes.length && nodes.every((n, i) => list.children[i] === n);
+  if (!settled) list.replaceChildren(...nodes);
 }
 
 function renderMetrics() {

@@ -291,7 +291,9 @@ flattened by bulky armour is a defect — name it and reroll, however well the
 image is made. The same reroll applies to a harsh cold read: sunken gaunt
 cheeks, an angular hollowed jaw, a hard unblinking stare, or a smooth featureless
 mannequin face — a visor that has swallowed the whole face counts — because that
-is an unpleasant mask rather than a woman.
+is an unpleasant mask rather than a woman. A plate that reads as a man at all — a
+male face, a flat chest, a male build — is a reject rather than a reroll: the row
+itself is wrong, so do not spend a second image on it.
 Otherwise answer "reroll" and put in "defect" one concrete, actionable defect
 (the thing to change, e.g. "the horizon is not level"). Use "reject" only when
 the image is unusable and the prompt is wrong, not the render.
@@ -1139,6 +1141,12 @@ PLATE_ARCH_FILE=${PLATE_ARCH_FILE:-$repo/lib/image-daily/archetypes.tsv}
 # cannot re-describe the face that failed. A kept plate never reaches this check.
 PLATE_ARCH_REQUIRED='armour|armored|armoured|pauldron|breastplate|knight|knightess|valkyrie|villain|villainess|witch|sorceress|empress|huntress|assassin|swordswoman|nemesis'
 
+# Every row on this roster is an adult woman. A male character has no place on it:
+# `duncan-idaho` was on the roster until 2026-11-16 and spent an image drawing a
+# man as a woman, which is wrong however well the plate is made. The judge cannot
+# know canon, so the row itself is refused before any allowance is touched.
+PLATE_MALE='(^|[^a-z])(an adult man|adult male|a man|male character|the man|he is|his face|his hair|his eyes|his jaw)([^a-z]|$)'
+
 plate_expand() { # prompt -> prompt with every arch:<name> resolved
   local p=$1 name traits
   case $p in *arch:*) ;; *) printf '%s' "$p"; return 0 ;; esac
@@ -1186,6 +1194,10 @@ cmd_plates() {
     if [ "${FORCE:-0}" != "1" ]; then
       have=$(kept_plate "photoreal-$slug")
       [ -n "$have" ] && { say "$slug: kept already ($have)"; continue; }
+    fi
+    if printf '%s' "$prompt" | grep -qiE "$PLATE_MALE"; then
+      say "$slug: row describes a man — this roster is adult women only (duncan-idaho was removed after it rendered a man as a woman)"
+      continue
     fi
     if ! printf '%s' "$prompt" | grep -qi 'arch:' &&
       printf '%s' "$prompt" | grep -qiE "$PLATE_ARCH_REQUIRED"; then

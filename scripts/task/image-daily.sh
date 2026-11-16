@@ -368,6 +368,12 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
   # is a caller's decision: a nightly brief gives up after three tries and moves
   # on, a requested plate round waits the window out.
   local tries_max=${RATE_TRIES:-3} base=${RATE_WAIT:-60} ceiling=${RATE_WAIT_MAX:-900}
+  # Waiting the burst window out is a budget per row, not per attempt: with
+  # RATE_TRIES=8 and a 900 s ceiling one stuck row held the lock for two hours
+  # while twenty other rows waited their turn (2026-11-16). A row that spends the
+  # budget closes the window for the whole round — the next row would be probing
+  # the same closed bucket, one ladder at a time.
+  local waited=0 max_wait=${RATE_WAIT_TOTAL:-420}
   while :; do
     out=$(cpg image --json -s "$size" -o "$file" "$prompt" 2>&1); rc=$?
     if [ "$rc" -eq 0 ] && [ -s "$file" ]; then
@@ -381,15 +387,20 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
     fi
     if printf '%s' "$out" | grep -q '429\|RATE_LIMITED'; then
       tries=$((tries + 1))
-      if [ "$tries" -gt "$tries_max" ]; then
-        record "$day" "$lane" "$id" "$file" "failed" "rate limited after $tries attempts" "$prompt" "$n" "$rev"
-        say "$id: still rate limited after $tries attempts"
+      if [ "$tries" -gt "$tries_max" ] || [ "$waited" -ge "$max_wait" ]; then
+        record "$day" "$lane" "$id" "$file" "failed" \
+          "burst window closed after ${waited}s (${tries} attempt(s))" "$prompt" "$n" "$rev"
+        say "$id: burst window still closed after ${waited}s — the round stops here"
         return 2
       fi
       wait=$((base * (1 << (tries - 1))))
       [ "$wait" -gt "$ceiling" ] && wait=$ceiling
+      # Never sleep past what this row has left to spend.
+      [ $((waited + wait)) -gt "$max_wait" ] && wait=$((max_wait - waited))
+      [ "$wait" -gt 0 ] || wait=1
       say "$id: rate limited, waiting ${wait}s"
       sleep "$wait"
+      waited=$((waited + wait))
       continue
     fi
     record "$day" "$lane" "$id" "$file" "failed" \
@@ -932,7 +943,13 @@ cmd_post() {
   local paths=("${post#"$blog"/}")
   if [ -n "$draft" ] && [ "$draft" != "$post" ]; then
     rm -f "$draft"
-    paths+=("${draft#"$blog"/}")
+    # A draft that was never tracked leaves nothing for git to stage, and
+    # `git add --` on a path that does not exist is fatal, which aborted the
+    # commit and the push after the banner had already been paid for
+    # (2026-11-16). Only a tracked draft is worth naming.
+    if git -C "$blog" ls-files --error-unmatch "${draft#"$blog"/}" >/dev/null 2>&1; then
+      paths+=("${draft#"$blog"/}")
+    fi
   fi
   git -C "$blog" add -A -- "${paths[@]}"
   if ! git -C "$blog" diff --cached --quiet -- "${paths[@]}" 2>/dev/null; then
@@ -1113,7 +1130,7 @@ kept_plate() { # brief
 roster_pending() { # roster
   local all kept
   all=$(mktemp) && kept=$(mktemp) || return 0
-  awk -F'|' '!/^#/ && NF > 1 {print "photoreal-" $1}' "$1" | sort -u >"$all"
+  awk -F'|' '!/^#/ && NF > 1 && $2 !~ /^hold:/ {print "photoreal-" $1}' "$1" | sort -u >"$all"
   { [ -f "$LEDGER" ] && jq -r 'select(type == "object") | select(.verdict == "keep") | .brief' "$LEDGER"; } 2>/dev/null | sort -u >"$kept"
   comm -23 "$all" "$kept" | wc -l | tr -d ' '
   rm -f "$all" "$kept"
@@ -1176,7 +1193,7 @@ cmd_plates() {
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }
 
-  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect have file v verdict defect sent
+  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect have file v verdict defect sent rc=0 hold_reason
   local ledger_before=0
   [ -f "$LEDGER" ] && ledger_before=$(wc -l <"$LEDGER" | tr -d ' ')
   day=$(today)
@@ -1187,6 +1204,20 @@ cmd_plates() {
   while IFS='|' read -r slug prompt expect; do
     [ -n "$slug" ] || continue
     case $slug in \#*) continue ;; esac
+    # A row the provider refuses is held, not deleted: the reason travels on the
+    # row so a round says why it skipped it instead of recording the same refusal
+    # again. Measured 2026-11-16: seven live-action and comic characters answered
+    # VALIDATION_FAILED about their identity, and softening the sentence and
+    # changing the archetype changed nothing. Re-casting means rewriting the row
+    # and dropping the prefix; the engine never releases a hold on its own.
+    case $prompt in
+    hold:*)
+      hold_reason=${prompt#hold: }
+      hold_reason=${hold_reason%% ::*}
+      say "$slug: held — $hold_reason"
+      continue
+      ;;
+    esac
     # An empty ONLY is not a filter that matches nothing: it is no filter at all.
     if [ -n "${ONLY:-}" ]; then
       case ",$ONLY," in *",$slug,"*) ;; *) continue ;; esac
@@ -1221,7 +1252,11 @@ cmd_plates() {
       continue
     fi
 
-    file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$prompt" "$day" 1 1) || continue
+    file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$prompt" "$day" 1 1) || {
+      rc=$?
+      [ "$rc" -eq 2 ] && { say "burst window closed; the rest of the roster waits for the next round"; break; }
+      continue
+    }
     left=$((left - 1))
     v=$(judge_image "$file" wall "$intent" "$expect")
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
@@ -1234,7 +1269,11 @@ cmd_plates() {
       say "$slug: reroll — $defect"
       rm -f "$file"
       sent="$prompt (Change only this: $defect.)"
-      file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$sent" "$day" 2 1) || continue
+      file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$sent" "$day" 2 1) || {
+        rc=$?
+        [ "$rc" -eq 2 ] && { say "burst window closed; the rest of the roster waits for the next round"; break; }
+        continue
+      }
       left=$((left - 1))
       v=$(judge_image "$file" wall "$intent" "$expect")
       verdict=$(printf '%s' "$v" | jq -r '.verdict')

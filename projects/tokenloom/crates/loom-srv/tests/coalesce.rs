@@ -156,6 +156,133 @@ async fn the_same_burst_across_two_windows_is_two_revisions() {
 }
 
 #[tokio::test]
+async fn a_delete_burst_and_a_retune_in_one_window_are_one_revision_and_one_diff() {
+    let (state, mut rx) = running(20).await;
+
+    // The plant gets its own window: the burst under test is the deletes plus
+    // the retune, so the plant's revision must not be inside the count.
+    state
+        .ops_tx
+        .send(vec![Op::ConstraintAdd {
+            seq: 1,
+            start: 0,
+            len: 2,
+            kind: 1,
+            param: 4,
+        }])
+        .expect("the plant reaches the coalescer");
+    let planted = drain(&mut rx).await;
+    assert_eq!(
+        counts(&planted),
+        (1, 0),
+        "a plant moves no text, so it costs a list and no diff: {planted:?}"
+    );
+    let id = planted
+        .iter()
+        .find_map(|f| match f {
+            ServerFrame::Constraints { items, .. } => items.first().map(|c| c.id),
+            _ => None,
+        })
+        .expect("the list a plant sends");
+
+    let (len0, was) = rope(&state);
+    let rev0 = state.revision();
+    // Where the trailing two tokens begin. The burst removes both from the end,
+    // so the document has to end exactly here afterwards.
+    let tail_start = {
+        let s = state.session.lock().expect("the session lock");
+        let abs = s.rope.abs_tokens();
+        abs[abs.len() - 2].start
+    };
+
+    // Separate sends, so the window is what makes this one batch. Each delete
+    // names the token that is last at the time it lands; the retune names the id
+    // the plant handed out.
+    for (seq, offset) in [(2u64, len0 - 1), (3, len0 - 2)] {
+        state
+            .ops_tx
+            .send(vec![Op::Delete {
+                seq,
+                offset: offset as u32,
+                count: 1,
+            }])
+            .expect("the delete reaches the coalescer");
+    }
+    state
+        .ops_tx
+        .send(vec![Op::ConstraintUpdate {
+            seq: 4,
+            id,
+            kind: 2,
+            param: 0,
+        }])
+        .expect("the retune reaches the coalescer");
+
+    let frames = drain(&mut rx).await;
+    let (acks, diffs) = counts(&frames);
+    assert_eq!(acks, 3, "every op is acknowledged: {frames:?}");
+    assert_eq!(
+        diffs, 1,
+        "two deletes and a retune inside one window are one diff: {frames:?}"
+    );
+
+    let (revision, start, deleted, inserted) = frames
+        .iter()
+        .find_map(|f| match f {
+            ServerFrame::Diff {
+                revision,
+                start,
+                deleted,
+                inserted,
+            } => Some((*revision, *start, *deleted, inserted.len())),
+            _ => None,
+        })
+        .expect("the diff");
+    assert_eq!(deleted, 2, "the one diff carries both deletes");
+    assert_eq!(
+        inserted, 0,
+        "and puts nothing back: the diff is the removed tokens, not a rewrite"
+    );
+    assert_eq!(
+        start as usize, len0 - 2,
+        "the diff starts where the deleted run did, not at the head of the document"
+    );
+    assert_eq!(revision, rev0 + 1, "the whole burst is one revision");
+    assert_eq!(state.revision(), rev0 + 1, "and the session agrees");
+    let (_, doc) = rope(&state);
+    assert_eq!(
+        doc.as_bytes(),
+        &was.as_bytes()[..tail_start],
+        "the rope lost exactly those two tokens; it reads {doc:?}"
+    );
+
+    let lists: Vec<&ServerFrame> = frames
+        .iter()
+        .filter(|f| matches!(f, ServerFrame::Constraints { .. }))
+        .collect();
+    assert_eq!(
+        lists.len(),
+        1,
+        "one list for the batch, not one per op: {frames:?}"
+    );
+    match lists[0] {
+        ServerFrame::Constraints { items, .. } => {
+            assert_eq!(items.len(), 1, "the span survives the deletes");
+            let span = &items[0];
+            assert_eq!(span.id, id, "a retune keeps the id the plant handed out");
+            assert_eq!(
+                (span.kind, span.param),
+                (2, 0),
+                "and carries the rule it was retuned to"
+            );
+            assert_eq!(span.len, 2, "the span's length did not move");
+            assert_eq!(span.anchor, 0, "the deletes landed behind it, so it stayed put");
+        }
+        _ => unreachable!(),
+    }
+}
+
+#[tokio::test]
 async fn an_idle_socket_is_not_a_frame() {
     let (_state, mut rx) = running(20).await;
     let frames = drain(&mut rx).await;

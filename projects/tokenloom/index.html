@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Token Loom — a token-editing workbench</title>
-<meta name="description" content="Token Loom is a workbench for editing token streams: a byte-anchored constraint index, six reactors over the diff, and a minimal diff stream that does not flicker. Measured p99 latency in the hundreds of microseconds." />
+<meta name="description" content="Token Loom is a workbench for editing token streams: a byte-anchored constraint index, six reactors over the diff, and a minimal diff stream that does not flicker. Measured end-to-end diff latency under 4 ms on a 10k-token document." />
 <meta name="color-scheme" content="dark" />
 <style>
   :root {
@@ -162,8 +162,9 @@
       <tr><th>What</th><th>Target</th><th>Measured</th></tr>
     </thead>
     <tbody>
-      <tr><td>edit to diff latency, p99</td><td class="n">&lt; 5 ms</td><td>124–182 µs over two runs (p50 45, p90 76, max 340)</td></tr>
-      <tr><td>edit to diff at the client, p99</td><td class="n">&lt; 5 ms</td><td>3.45 ms, the 2 ms batch window included</td></tr>
+      <tr><td>edit to diff over the socket, p99</td><td class="n">&lt; 5 ms</td><td>3.70 ms, the 2 ms batch window included (p50 3.18)</td></tr>
+      <tr><td>core pipeline, p99 (no window)</td><td class="n">—</td><td>60 µs — the floor under that number</td></tr>
+      <tr><td>40 000-token document, p99</td><td class="n">&lt; 5 ms</td><td>3.96 ms, and 5.14 ms on an earlier run</td></tr>
       <tr><td>bytes re-tokenized per edit</td><td class="n">&lt; 2 % median, 10 % p99</td><td>0.07 % median, 0.20 % p99</td></tr>
       <tr><td>ripple hits past the window</td><td class="n">&lt; 0.1 %</td><td>0 of 1000 edits</td></tr>
       <tr><td>batches per second, six reactors</td><td class="n">1000/s, no queue</td><td>1000/s, 0 starved shards</td></tr>
@@ -183,8 +184,11 @@
 <pre><code><span class="c"># server, page and socket</span>
 cargo run --release -p loom-srv        <span class="c"># http://127.0.0.1:8787/  (ws /ws)</span>
 
-<span class="c"># the numbers above</span>
+<span class="c"># the gate: edit → diff over a real socket, window included</span>
 cargo run --release -p loom-cli -- bench
+
+<span class="c"># the pipeline alone, no window: the floor under that number</span>
+cargo run --release -p loom-cli -- bench --core
 
 <span class="c"># end to end: HTTP, snapshot, diff, warning, clear, resync, unplant</span>
 LOOM_PORT=8787 node web/smoke.mjs

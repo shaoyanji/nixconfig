@@ -68,26 +68,47 @@ pub fn apply_with_anchors(
     out
 }
 
-/// The batch's changed token range in post-batch coordinates, shifted per op by
-/// the deltas of the ops that came after it. Exact even when an op's offset had
-/// to be clamped, which is when the affine pre/post mapping is not.
-fn seed_union(
-    splices: &[(usize, usize, i64)],
-    total_delta: i64,
-    total: usize,
-) -> std::ops::Range<usize> {
-    let mut lo = usize::MAX;
-    let mut hi = 0usize;
-    for (start, new_count, cum_after) in splices {
-        let shifted = (*start as i64 + (total_delta - *cum_after)).max(0) as usize;
-        lo = lo.min(shifted.min(total));
-        hi = hi.max((shifted + *new_count).min(total));
+/// Map an offset in the space one op was written in back to the batch's starting
+/// space.
+///
+/// Ops inside a batch are written against the document as the client has already
+/// applied its own edits, so the second delete in a burst names the token *after*
+/// the first one shifted the rope. `deltas` holds each splice's position in
+/// starting coordinates and its token delta, sorted: within the segment between
+/// two splices the shift is the sum of the deltas before it, so the inverse is a
+/// walk over those segments rather than an arithmetic guess.
+fn to_pre(at: usize, deltas: &[(usize, i64)]) -> usize {
+    let mut shift = 0i64;
+    for &(p, d) in deltas {
+        let x = at as i64 - shift;
+        if x < p as i64 {
+            return x.max(0) as usize;
+        }
+        shift += d;
     }
-    if lo == usize::MAX {
-        0..0
-    } else {
-        lo..hi.max(lo)
-    }
+    (at as i64 - shift).max(0) as usize
+}
+
+/// A starting-space position carried forward past the splices that end before it:
+/// the first token of the region a splice inserted, not the token after it.
+fn to_post_before(pre: usize, deltas: &[(usize, i64)]) -> usize {
+    let shift: i64 = deltas
+        .iter()
+        .take_while(|&&(p, _)| p < pre)
+        .map(|&(_, d)| d)
+        .sum();
+    (pre as i64 + shift).max(0) as usize
+}
+
+/// The same for an exclusive end: every splice at or before it counts, so a run
+/// of appends at one position ends after all of them.
+fn to_post_through(pre: usize, deltas: &[(usize, i64)]) -> usize {
+    let shift: i64 = deltas
+        .iter()
+        .take_while(|&&(p, _)| p <= pre)
+        .map(|&(_, d)| d)
+        .sum();
+    (pre as i64 + shift).max(0) as usize
 }
 
 #[derive(Clone, Debug)]
@@ -187,9 +208,6 @@ impl Session {
     pub fn apply_batch(&mut self, ops: &[Op]) -> BatchOutcome {
         let started = Instant::now();
         let pre_len = self.rope.len_tokens();
-        let mut cum: i64 = 0;
-        let mut base: i64 = i64::MAX;
-        let mut end: i64 = i64::MIN;
         let mut text_changed = false;
         let mut planted = false;
         let mut removed = false;
@@ -197,9 +215,11 @@ impl Session {
         let mut toggled = false;
         let mut resync = false;
         let mut diverged = false;
-        // (tok_start, new_count, cumulative delta after this op), which is what
-        // the seed window is derived from once every op has landed.
-        let mut splices: Vec<(usize, usize, i64)> = Vec::new();
+        // Each splice as (start in the batch's starting coordinates, tokens it
+        // replaced), plus the delta map that puts a later op's offset back into
+        // that space. Both are what make the frame span the whole batch.
+        let mut pre_spans: Vec<(usize, usize)> = Vec::new();
+        let mut deltas: Vec<(usize, i64)> = Vec::new();
         let mut seqs = Vec::with_capacity(ops.len());
 
         for op in ops {
@@ -251,11 +271,13 @@ impl Session {
                     if let Some(eo) =
                         apply_with_anchors(op, &mut self.rope, &mut self.constraints)
                     {
-                        let pre_start = eo.tok_start as i64 - cum;
-                        base = base.min(pre_start);
-                        end = end.max(pre_start + eo.old_count as i64);
-                        cum += eo.new_count as i64 - eo.old_count as i64;
-                        splices.push((eo.tok_start, eo.new_count, cum));
+                        let pre_start = to_pre(eo.tok_start, &deltas);
+                        pre_spans.push((pre_start, eo.old_count));
+                        let delta = eo.new_count as i64 - eo.old_count as i64;
+                        let slot = deltas
+                            .binary_search_by_key(&pre_start, |&(p, _)| p)
+                            .unwrap_or_else(|i| i);
+                        deltas.insert(slot, (pre_start, delta));
                         text_changed = true;
                     } else if matches!(op, Op::Merge { .. } | Op::Split { .. }) {
                         diverged = true;
@@ -265,7 +287,7 @@ impl Session {
             }
         }
 
-        if base == i64::MAX {
+        if pre_spans.is_empty() {
             // A batch that only planted a constraint or threw a switch changed
             // the session though it moved no text. Bump so its log record is
             // newer than any snapshot the log is trimmed against: otherwise a
@@ -283,12 +305,21 @@ impl Session {
         }
         resync = resync || diverged;
 
-        let base = base.max(0) as usize;
-        let end = (end.max(base as i64)) as usize;
+        // The union in starting coordinates, widened where an op that landed
+        // after an earlier splice was shifted by it: the window can be a token
+        // too wide (the trim recovers the minimal diff) but never one too
+        // narrow, which is a token the client would keep.
+        let base = pre_spans.iter().map(|(s, _)| *s).min().unwrap_or(0);
+        let end = pre_spans
+            .iter()
+            .map(|(s, c)| s + c)
+            .max()
+            .unwrap_or(base)
+            .max(base);
 
         let mut retok = RetokReport::default();
         if text_changed {
-            let seed = seed_union(&splices, cum, self.rope.len_tokens());
+            let seed = to_post_before(base, &deltas)..to_post_through(end, &deltas);
             retok = retokenize_window(&mut self.rope, seed, &*self.tok, &self.cfg);
             if retok.truncated {
                 self.ripple_truncations += 1;

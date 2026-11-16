@@ -14,7 +14,8 @@ travels as a tar and every `cargo` invocation happens on that box.
 
 ```bash
 cargo run --release -p loom-srv          # http://127.0.0.1:8787/  (ws /ws)
-cargo run --release -p loom-cli -- bench # 10k tokens, 1000 edits, histogram
+cargo run --release -p loom-cli -- bench # edit → diff over a socket: the 5 ms gate
+cargo run --release -p loom-cli -- bench --core # apply → ripple → encode alone: the floor
 cargo run --release -p loom-cli -- fuzz 300
 cargo run --release -p loom-cli -- replay session
 node web/smoke.mjs                       # wire-level end-to-end against a running server
@@ -25,6 +26,8 @@ node web/window.mjs http://127.0.0.1:8787/   # the edit-to-diff target, gated; w
 
 Environment: `LOOM_PORT`, `LOOM_BIND`, `LOOM_DATA` (default `./session`, `off`
 disables persistence), `LOOM_COALESCE_MS` (default 2).
+`loom-cli bench` takes `--doc N`, `--window N` and `--relax`; `web/window.mjs`
+reads `TARGET_MS` (the 5 ms it gates on) and reports what the window buys.
 
 ## Measured numbers
 
@@ -32,14 +35,15 @@ disables persistence), `LOOM_COALESCE_MS` (default 2).
 
 | Metric | Target | Measured |
 | :--- | :--- | :--- |
-| edit → diff latency, p99 | < 5 ms | **124–182 µs** over two runs (latest: p50 45, p90 76, max 340) |
+| edit → diff over the socket, p99 | < 5 ms | **3.70 ms** (p50 3.18, max 3.93; 10 029 tokens, 2 ms window included) |
+| core pipeline, p99 (no window) | — | **60 µs** (p50 39, max 66) — the floor under that number, not a target |
 | tokens re-tokenized per edit, median | < 2 % of doc | **0.07 %** |
 | tokens re-tokenized per edit, p99 | < 10 % of doc | **0.20 %** |
 | ripple bound hits | < 0.1 % of edits | **0 / 1000** |
 | diff frame encode | no allocation | 6.0–7.4 µs/frame, reused buffer, 4096 → 4096 bytes |
 | 6 reactors at 1000 batches/s, document growing | no queue depth, no drift | 1000 batches, 4000 shard events over 4 shards, 2000 reactions, **0 starved**, **0 span-creep** |
 
-Acceptance tests (`cargo test --all --locked`, 24 tests):
+Acceptance tests (`cargo test --all --locked`, 25 tests):
 
 - `incremental_eq_rebuild` — proptest, random documents and op sequences; the
   incremental token array equals a full rebuild byte for byte.
@@ -85,15 +89,27 @@ Acceptance tests (`cargo test --all --locked`, 24 tests):
   and an idle socket is written nothing. The contrast is the point: counting one
   batch alone would still pass if the window coalesced nothing and the client
   merged the diffs itself.
+- `a_delete_burst_and_a_retune_in_one_window_are_one_revision_and_one_diff` —
+  two deletes and a retune sent as three separate messages inside one window cost
+  one revision, one diff that carries *both* deleted tokens and reinserts
+  nothing, and one list frame holding the retune's rule on the id the plant handed
+  out, with the span's anchor and length unmoved. It found a real bug on the first
+  run: the frame's span came from subtracting every later op's delta, so a delete
+  that landed *behind* an earlier one was reported as one token instead of two.
+  The client would have kept a token the server had dropped, and every later edit
+  would have landed one token off. Positions now come from a walk of the batch's
+  own splices (`to_pre`), which can err a token wide — the trim recovers the
+  minimal diff — but never narrow.
 - `concatenated_frames_walk_from_their_own_lengths` — seven frame types written
   back to back into one message: each is found from the length of the one before
   it, and the lengths cover the message exactly, with every frame equal to what
   was written.
 - `protocol_roundtrip` — every frame type encodes and decodes losslessly, fuzzed,
   and a truncated prefix is refused.
-- `latency_p99` — lives in the bench rather than `cargo test`, because CI noise
-  is exactly what makes a wall-clock assertion useless; the bench exits non-zero
-  when a target is missed (`--relax` reports without failing).
+- `latency_p99` — gated in the bench rather than `cargo test`, because CI noise
+  is exactly what makes a wall-clock assertion useless: `loom-cli bench` exits
+  non-zero when the socket p99 misses (`--relax` reports without failing), and
+  `web/window.mjs` applies the same target to the same segment from the browser.
 
 `node web/smoke.mjs` drives the release binary: HTTP routes, snapshot, insert →
 diff, plant a constraint → `warning raise`, disable the reactor → `warning
@@ -125,8 +141,7 @@ the row element has to be the same node afterwards (a property set on it must
 survive), the id it shows must not change, the anchor and the length must not
 move, and the next plant has to take the next id — no run has broken any of the
 four. The timings are op on the wire 0.1 ms, ack 3.3 ms (2 ms of which is the
-coalescer window), the list frame the same 3.3 ms in the same message, and the
-row repainted at 3.4 ms. Identity held 20/20 in the last run on the row element,
+coalescer window), the list frame the same 3.3 ms in the same message, andthe row repainted at 3.4 ms. Identity held 60/60 in the last run on the row element,
 the id and the focus, with the span at `3t @ 0b` and the next plant taking 0, 1.
 The first measurement of this was 9.4 ms and 51.8 ms, and the gap was not the
 retune: the server queued both frames within
@@ -136,19 +151,26 @@ and the second waited about 41 ms for the client to acknowledge the first. axum
 leaves `TCP_NODELAY` unset on its accepted sockets, so setting it removed the
 wait, and the two frames now arrive 0.1 ms apart.
 
-`node web/window.mjs` measures the coalescing window from the client and **is the
-gate for the end-to-end target**: one edit to its diff, ten ops sent in one turn,
-ten ops spread over 4 ms, and twenty edits at a typing cadence, against whatever
-`LOOM_COALESCE_MS` the server was started with. It exits non-zero when a single
-edit's p99 misses the 5 ms target, so the number in this file is checked rather
-than remembered. Same build, same box, one run each:
+The gate is one segment and one target: a socket write to the diff frame's
+arrival, window included, under 5 ms. `loom-cli bench` measures it from Rust — it
+starts the real server on a loopback port and speaks the real protocol, so the
+number includes the coalescer instead of reporting under it — and
+`node web/window.mjs` measures the same segment from the browser, where it also
+reports what the window buys a burst. Same build, same box, `bench` at its
+default 200 edits, one run each:
 
-| window | edit → diff p99 | 10 ops in one turn | 10 ops over 4 ms |
-| :--- | :--- | :--- | :--- |
-| 1 ms | 2.31 ms · pass | 1 batch | 2.61 batches |
-| 2 ms | 3.45 ms · pass | 1 batch | 2.00 batches |
-| 4 ms | 5.36 ms · **fail** | 1 batch | 1 batch |
-| 8 ms | 9.41 ms · **fail** | 1 batch | 1 batch |
+| window | edit → diff p99 | verdict |
+| :--- | :--- | :--- |
+| 1 ms | 2.45 ms | pass |
+| **2 ms** | **4.16 ms** | **pass — the default** |
+| 4 ms | 5.36 ms | fail |
+| 8 ms | 9.84 ms | fail |
+
+From the browser at 2 ms the same segment measured 3.47 ms over 60 edits, with
+the diff sharing the ack's message in 60/60. The bench runs longer, so its p99
+covers more of a tail that is real: 3.70 ms on the default run, 4.16 ms in this
+sweep, and 4.76 ms over 1000 edits, by which point the document has grown by
+1000 tokens.
 
 The default is 2 ms: the widest window that keeps end-to-end p99 under the 5 ms
 target, and the gate says so rather than the prose — 4 ms and 8 ms are the same
@@ -262,12 +284,26 @@ log whose base document is gone.
 
 ## Deliberate choices and limits
 
-- **The bench measures the core pipeline, not the coalescer.** Edit-to-diff with
-  a batcher cannot be under the window: 2 ms is a floor no pipeline can go below,
-  so the bench times apply → ripple → diff encode, which is the part it can
-  improve. The end-to-end figure is measured separately by `web/window.mjs`
-  (3.45 ms p99, window included), which fails rather than reports when it
-  misses.
+- **One latency gate, and it is the socket one.** The bench used to time
+  apply → ripple → encode and quote that as edit-to-diff (124–182 µs) while
+  checking a target measured elsewhere: two instruments disagreeing about what the
+  words meant. `loom-cli bench` now starts the server on a loopback port and times
+  send → diff frame — the same segment `web/window.mjs` times from the browser,
+  against the same 5 ms — so a regression in either shows up as the same failing
+  number. The pipeline alone is `bench --core`: the floor under that number, and
+  no gate of its own, because a target the core meets while the socket misses says
+  nothing about an editor.
+- **The target holds at the document size it was measured at, and is marginal
+  beyond it.** 10 029 tokens: 3.70 ms p99. 40 125 tokens: 3.96 ms, and 5.14 ms on
+  an earlier run — one 5.39 ms edit moves the p99 of 200 samples. 100 154 tokens:
+  5.79 ms, a miss. None of that was measured before; the bench now says it instead
+  of a table saying nothing.
+- **A snapshot is never packed, so packing cannot hurt one.** It is written before
+  the packing loop, as its own message: measured as one transport frame carrying
+  one loom frame at 10 029 tokens (42 665 bytes, 0.77 ms from connect), 40 125
+  tokens (170 657 bytes, 2.46 ms) and 100 154 tokens (425 944 bytes, 6.41 ms). No
+  cap and no chunking, because a client cannot draw a rope before its last token
+  arrives: splitting would add reassembly to a cost that is the bytes.
 - **Several frames ride one socket message.** A batch that produces an ack, a
   diff and a list frame is three small writes, and the client used to handle them
   as three events. Both sides now treat a message as a sequence: the server drains
@@ -277,7 +313,7 @@ log whose base document is gone.
   frame ends (`decode_server_at` on the server side, `decodeAll` in each web
   script). Measured effect: the retune ack and its list frame went from 0.1 ms
   apart to 0.0, one write and one client wake-up per batch saved, and the
-  single-edit p99 unchanged at 3.45 ms — the latency win was `TCP_NODELAY`, not
+  single-edit p99 unchanged at 3.70 ms — the latency win was `TCP_NODELAY`, not
   this. It is built because the atomicity is real: a client can no longer see an
   ack without the list it made true. The bug it introduced first was mine — the
   page's new reader passed a `Uint8Array` to `DataView`, which Chromium refuses,

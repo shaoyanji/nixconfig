@@ -1,8 +1,12 @@
 //! `loom-cli bench`, `fuzz`, `replay`.
 //!
-//! The bench measures the core pipeline (apply → ripple → diff encode), not the
-//! coalescing wait: an edit that waits 8ms for its batch is by design not a
-//! latency the core can improve.
+//! `bench` is the gate: it runs the server on a loopback port and times send →
+//! diff over the real protocol, coalescer window included — the same segment
+//! `web/window.mjs` times from the browser, against the same 5 ms target.
+//! `bench --core` times apply → ripple → encode alone: that is the floor under
+//! the number, not a gate of its own.
+
+mod e2e;
 
 use loom_core::{NewToken, Op, Rope, Tokenizer, FLAG_WORD};
 use loom_srv::session::Session;
@@ -13,7 +17,11 @@ use std::time::Instant;
 const USAGE: &str = "\
 usage: loom-cli <command>
 
-  bench [--relax] [edits]  10k-token document, random single-token edits, histogram
+  bench [--relax] [edits]  edit → diff over a socket, window included: the 5ms gate
+                           (default 200 edits: at 1000 the doc grows by 1000 tokens)
+  bench --core [edits]     apply → ripple → encode alone, no window, no gate
+        --doc N            document size in tokens (default 10000)
+        --window N         coalescer window in ms (default 2, or LOOM_COALESCE_MS)
   fuzz [batches]           random batches, assert incremental == full rebuild
   replay [dir]             load snapshot + log, replay, report
 ";
@@ -75,13 +83,60 @@ fn pct(sorted: &[u32], q: f64) -> u32 {
     sorted[(((sorted.len() - 1) as f64) * q).round() as usize]
 }
 
+/// The gate, and the diagnostic that explains it.
+///
+/// One number is quoted for edit → diff: the socket one. The core pipeline is
+/// reported beside it as the floor, because a target the core meets but the
+/// socket misses is a number that says nothing about the editor.
 fn bench(args: &[String]) -> i32 {
     let relax = args.iter().any(|a| a == "--relax");
-    let edits: usize = args
-        .iter()
-        .find_map(|a| a.parse().ok())
-        .unwrap_or(1000);
+    let core = args.iter().any(|a| a == "--core");
+    let mut edits = 200usize;
+    let mut doc_tokens = 10_000usize;
+    let mut window = std::env::var("LOOM_COALESCE_MS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(2u64);
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--doc" => {
+                if let Some(n) = args.get(i + 1).and_then(|v| v.parse().ok()) {
+                    doc_tokens = n;
+                }
+                i += 2;
+            }
+            "--window" => {
+                if let Some(n) = args.get(i + 1).and_then(|v| v.parse().ok()) {
+                    window = n;
+                }
+                i += 2;
+            }
+            flag if flag.starts_with("--") => i += 1,
+            n => {
+                if let Ok(v) = n.parse() {
+                    edits = v;
+                }
+                i += 1;
+            }
+        }
+    }
 
+    if !core {
+        let doc = build_doc(doc_tokens);
+        let rt = match tokio::runtime::Builder::new_multi_thread().enable_all().build() {
+            Ok(rt) => rt,
+            Err(e) => {
+                eprintln!("loom-cli: no runtime for the socket bench: {e}");
+                return 1;
+            }
+        };
+        return rt.block_on(e2e::measure(&doc, edits, window, relax));
+    }
+    core_bench(edits, relax)
+}
+
+fn core_bench(edits: usize, relax: bool) -> i32 {
     let doc = build_doc(10_000);
     let mut sess = Session::with_doc(&doc);
     let tokens = sess.rope.len_tokens();
@@ -180,21 +235,22 @@ fn bench(args: &[String]) -> i32 {
         scratch.capacity()
     );
 
-    let p99 = pct(&sorted, 0.99);
     let med = pct(&ratios, 0.50);
     let p99r = pct(&ratios, 0.99);
     let reactors_ok = reactor_phase(&sess);
-    let ok = p99 < 5_000
-        && med < 200
+    let ok = med < 200
         && p99r < 1_000
         && (truncations as f64) < edits as f64 * 0.001
         && reactors_ok;
     println!(
-        "\ntargets: p99 < 5ms [{}] · median < 2% [{}] · p99 < 10% [{}] · truncations < 0.1% [{}]",
-        if p99 < 5_000 { "ok" } else { "MISS" },
+        "\ntargets (core): median < 2% [{}] · p99 < 10% [{}] · truncations < 0.1% [{}] · reactors [{}]",
         if med < 200 { "ok" } else { "MISS" },
         if p99r < 1_000 { "ok" } else { "MISS" },
-        if (truncations as f64) < edits as f64 * 0.001 { "ok" } else { "MISS" }
+        if (truncations as f64) < edits as f64 * 0.001 { "ok" } else { "MISS" },
+        if reactors_ok { "ok" } else { "MISS" }
+    );
+    println!(
+        "  the 5 ms edit → diff target is gated over the socket: `loom-cli bench` without --core"
     );
     if ok || relax {
         0

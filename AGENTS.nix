@@ -6387,5 +6387,44 @@
         tail; the note gates and `checks:prose` stay green.
       '';
     };
+    wall-plate-rounds = {
+      title = "A plate round holds refused rows, caps one row's wait and keeps the render it replaces";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-16";
+      from = ["image-daily-queue"];
+      summary = "An `images:plates` round spends the standing roster: a row the provider refuses is held with its reason, one row's burst wait caps the round instead of holding the lock, and a re-render archives the plate it replaces so `images:variants` can put it back.";
+      refs = {
+        hosts = ["frieren"];
+        modules = [
+          "scripts/task/image-daily.sh"
+          "lib/image-daily/plates.txt"
+          "lib/image-daily/archetypes.tsv"
+        ];
+        tasks = ["images:plates" "images:variants"];
+      };
+      body = ''
+        **A refusal is held, not deleted.** Seven live-action and comic rows answered
+        `VALIDATION_FAILED` about the character's identity on 2026-11-16; softening the
+        sentence and changing the archetype changed nothing. The row becomes
+        `hold: <reason> :: <the row as it was>`, `plates` prints it and skips it, and
+        `roster_pending` stops counting it. Re-casting means rewriting the row and
+        dropping the prefix; the engine never releases a hold on its own.
+
+        **One stuck row must not spend the round.** `RATE_TRIES` with a 900 s ceiling
+        held the run lock for two hours while twenty rows waited. A row now has
+        `RATE_WAIT_TOTAL` (420 s default); spending it closes the burst window for the
+        whole round, because the next row would probe the same closed bucket.
+
+        **A re-render keeps what it replaces.** `attempt` copies the existing plate to
+        `variants/<lane>/<day>/<slug>.<stamp>[-n].png` before the generator writes the
+        path, with a counter because two archives can land in the same second.
+        `images:variants` lists them and `VARIANT=<path>` puts one back, drops its
+        `urls.tsv` row so publish uploads it again, and archives the plate it took out.
+
+        **The record.** A refused row reads `hold:` in `plates.txt` and never reaches
+        the generator; the superseded render is a file on disk, not a delivery URL.
+      '';
+    };
   };
 }

@@ -926,6 +926,20 @@ tasks:
         target="${1:-/Volumes/data/security/accounts.age}"
         ./scripts/bw-cloak-sync.sh --export-age "$target"
 
+  dev:passkey:fetch:
+    desc: Extract a WebAuthn passkey from the Vaultwarden vault into the file a browser driver imports
+    summary: >
+      A passkey cannot be copied out of the vault UI or an export: the key lives
+      in `fido2Credentials`, which only an unlocked CLI returns. Needs
+      BW_SESSION (`bw login`, then `bw unlock --raw`); the master password is not
+      in sops. RP= is the rpId (default google.com), OUT= the destination
+      (default $XDG_RUNTIME_DIR/passkey-<rp>.json, 0600), SEARCH= narrows the
+      listing, SYNC=0 skips the sync. Prints the rpId, key size and path, never
+      the key. Exit 3 = no bw or no session. Retrieved is not accepted:
+      passkey-probe.sh --from-vault is the assertion.
+    cmds:
+      - bash scripts/task/passkey-fetch.sh
+
   # ── CI Control Plane ──────────────────────────────────────────
 
   dev:ci:plan:

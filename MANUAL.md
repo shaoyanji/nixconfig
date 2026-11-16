@@ -17,7 +17,7 @@
 | DNS | Pi-hole + unbound on frieren; wildcard `*.frieren.lan` → `192.168.3.25` |
 | SSH | `ssh frieren` (CA-signed user certs; `ssh.ca.enableClient`) |
 | Storage | `/srv/data` ↔ `/Volumes/data` (bind mount + NFS export) |
-| Watchdog | hardware battery acts as a UPS; UPower clean poweroff at 5 % |
+| Watchdog | the battery is the UPS; UPower clean poweroff at 5 % |
 
 **Never assume the LAN.** The tailnet address is the only dual-homed identity.
 `*` below marks a service reached through nginx on port 80/443.

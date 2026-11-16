@@ -148,8 +148,9 @@ rsync -a --info=progress2 --no-inc-recursive \
 ssh eisen 'chmod +x /mnt/storage/models/deepseek-v4-flash/llama-*-modchip-linux-x86_64'
 ```
 
-The two binaries arrive `0644` and the unit's `ExecStart` is the binary itself, so the `chmod` is
-load-bearing. Verify on the destination, where a corrupt copy would actually live:
+The two binaries arrive `0644` and the unit's `ExecStart` runs the binary itself, so without
+the `chmod` the unit exits before it loads a model. Verify on the destination, where a
+corrupt copy would actually live:
 
 ```bash
 ssh eisen 'cd /mnt/storage/models/deepseek-v4-flash && sha256sum -c SHA256SUMS'

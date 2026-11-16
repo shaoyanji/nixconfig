@@ -54,7 +54,7 @@
     '';
 
     meta = {
-      description = "Automatic REST API for PostgreSQL";
+      description = "REST API for PostgreSQL tables and functions";
       homepage = "https://npgsqlrest.github.io";
       license = lib.licenses.mit;
       platforms = ["aarch64-linux"];

@@ -18,8 +18,8 @@ app, so the public vhost carries the landing page and `/healthz` and nothing els
   http://127.0.0.1:3080`. tailscaled issues and renews the certificate (no ACME,
   no cert file to own); 8443 because nginx owns `0.0.0.0:443`.
 - `Host` survives the front (measured: `Host: delphi.cloudforest-kardashev.ts.net:8443`
-  reached the upstream verbatim), which is load-bearing twice — dsh fences `/api`
-  on the authority and keys the session cookie to it.
+  reached the upstream verbatim). Two things depend on it: dsh fences `/api` on the
+  authority, and the session cookie is keyed to it.
 
 Verify from a *client*, not from the host:
 

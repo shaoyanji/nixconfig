@@ -111,11 +111,11 @@ LAN address, because the probe sends the bare IP as `Host:` and the **atuin**
 vhost claims `192.168.3.25` in `server_name`, so that request lands on atuin and
 404s. The bytes still flow through this front, so the fill is correct; the
 conflicting vhost is separate open work (`nginx -t` does not flag it — the first
-block simply wins).
+block wins).
 
 The split is deliberate. The cache lives on the **removable** USB flash tier
 (`nofail`), so its unit is gated on `ConditionPathIsMountPoint` and nothing else
-depends on it: when the stick is out the backend is simply not running, the
+depends on it: when the stick is out the backend is not running, the
 front answers 502, and its `error_page 502 504 = @valve` re-fetches the object
 from Valve. A pulled drive costs the cache, never the LAN's downloads.
 

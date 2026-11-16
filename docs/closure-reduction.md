@@ -124,7 +124,7 @@ quoted throughout is the unwrapped build alone; the complete four-path removal i
 
 The duplicate report corroborates it independently: `reclaimable` falls
 `5.1 GiB → 4.4 GiB` on the rebuilt closure while the group count stays 675 — the
-`chromium-unwrapped` group (4 copies) simply shrinks to 2. Two different
+`chromium-unwrapped` group (4 copies) shrinks to 2. Two different
 measures, the same ~703 MiB.
 
 Reproduce (the build is store-only — it does not switch the running system):
@@ -218,7 +218,7 @@ task dev:closure:menu -- members electron-unwrapped
 66.8% of the closure (2688 packages) lands in `other` because
 `subsystemOf`'s ordered pattern list has no rule for it. That is fine for a
 bucket-of-last-resort, but it means the largest slice of the graph is opaque —
-the top of `other` is simply the top of the closure. Splitting `other` (nixpkgs
+the top of `other` is the top of the closure. Splitting `other` (nixpkgs
 ecosystems already present: `qt`/`gtk` are classified, but `dotnet`, `haskell`,
 `mono`, `texlive`, `wasm` are not) would make the breakdown self-explaining.
 Note this is a *readability* lever, not a size lever.
@@ -359,7 +359,7 @@ Every row prints its *basis* (`pin`, `base+1.0%`, …) next to the numbers, so a
 auditable without opening the TOML: a pin and a baseline-plus-headroom ceiling are different
 promises, and the table says which one it measured against. `dev:closure:budget` shares the
 implementation with the gate, so it also exits non-zero when a host is over — the verdict is
-the same, it is simply reachable by name from `task --list`'s closure group.
+the same, and it is reachable by name from `task --list`'s closure group.
 
 Exit `0` = within budget, `1` = over budget, `2` = budgets file or `yq` missing. The file
 is TOML and guarded by `task checks:toml:lint` like every other tracked `.toml`.

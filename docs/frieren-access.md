@@ -116,7 +116,7 @@ base64 secret AriaNg's `getCurrentRpcSecret` expects; `ariang-site.service`
 replaces the placeholder from sops.
 
 AriaNg stores this object at localStorage `AriaNg.Options`, with the fields
-directly on it and no `rpcList` key. `language` is load-bearing: the language
+directly on it and no `rpcList` key. `language` decides whether the app boots: the
 guard runs before the per-key default backfill, so an object without it throws in
 `getCurrentRpcUrl` and the app dies before the first RPC call. The symptom is a
 blank pane in a fresh browser while an already-open tab keeps working.

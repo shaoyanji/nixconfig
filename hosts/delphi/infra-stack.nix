@@ -334,7 +334,7 @@ in {
       };
       agy-nightly-system = {
         name = "agy-nightly-system";
-        description = "Trigger-gated system health audit (Mon-Sat quiet reflex, Sunday comprehensive scorecard)";
+        description = "Trigger-gated system health audit (Mon-Sat brief check, Sunday full scorecard)";
         schedule = "*-*-* 05:30:00";
         command = agySystemRunner;
         workingDirectory = "${user.home}";

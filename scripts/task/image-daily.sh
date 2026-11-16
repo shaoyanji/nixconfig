@@ -1092,7 +1092,9 @@ cmd_wallpaper() {
 # 2026-11-10 palette test settled on, so it lives in each line rather than here.
 kept_plate() { # brief
   [ -f "$LEDGER" ] || return 0
-  jq -r --arg b "$1" 'select(.brief == $b and .verdict == "keep") | .path' "$LEDGER" |
+  # `type == "object"` first: the ledger is append-only and one malformed line used
+  # to fail the whole query, which read as "no kept plate" for every row.
+  jq -r --arg b "$1" 'select(type == "object") | select(.brief == $b and .verdict == "keep") | .path' "$LEDGER" |
     tac | while IFS= read -r p; do
       [ -f "$p" ] && { printf '%s\n' "$p"; break; }
     done
@@ -1109,7 +1111,7 @@ roster_pending() { # roster
   local all kept
   all=$(mktemp) && kept=$(mktemp) || return 0
   awk -F'|' '!/^#/ && NF > 1 {print "photoreal-" $1}' "$1" | sort -u >"$all"
-  { [ -f "$LEDGER" ] && jq -r 'select(.verdict == "keep") | .brief' "$LEDGER"; } 2>/dev/null | sort -u >"$kept"
+  { [ -f "$LEDGER" ] && jq -r 'select(type == "object") | select(.verdict == "keep") | .brief' "$LEDGER"; } 2>/dev/null | sort -u >"$kept"
   comm -23 "$all" "$kept" | wc -l | tr -d ' '
   rm -f "$all" "$kept"
 }
@@ -1242,7 +1244,7 @@ cmd_plates() {
   if [ "${DRY:-0}" != "1" ] && [ "${XS_SUMMARY:-1}" = "1" ]; then
     local round_keeps pending assets outcome line
     round_keeps=$(tail -n +"$((ledger_before + 1))" "$LEDGER" 2>/dev/null |
-      jq -r 'select((.brief // "") | startswith("photoreal-")) | select(.verdict == "keep") | .brief' 2>/dev/null |
+      jq -r 'select(type == "object") | select((.brief // "") | startswith("photoreal-")) | select(.verdict == "keep") | .brief' 2>/dev/null |
       wc -l | tr -d ' ')
     pending=$(roster_pending "$roster")
     assets=$(wc -l <"$IMAGES_ROOT/published/urls.tsv" 2>/dev/null | tr -d ' ')

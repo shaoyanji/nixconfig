@@ -174,3 +174,44 @@ CREATE TABLE IF NOT EXISTS portfolio_project (
 
 CREATE INDEX IF NOT EXISTS portfolio_project_order_idx
   ON portfolio_project (language, sort);
+
+-- Read-only SQL for a tailnet client, so `task apps:query` needs neither a psql
+-- role on the host nor an ssh session on delphi — that ssh path was the one verb
+-- with no API route, and it cost four minutes on a Tailscale auth check before
+-- it failed. `/api/pipeline-sql` is the endpoint that calls this.
+--
+-- The guard is textual because PostgreSQL has no way to re-enter a transaction as
+-- read-only from inside a function; the boundary it backs is the tailnet, not the
+-- open internet. A plain `select` cannot write, with three exceptions the check
+-- below closes: `select … into` creates a table, a data-modifying CTE hides an
+-- INSERT behind a `with`, and a sequence or a side-effecting builtin mutates from
+-- the select list.
+CREATE OR REPLACE FUNCTION appflow_pipeline_sql(q text)
+RETURNS SETOF json
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  bare text;
+  hit  text;
+BEGIN
+  IF q IS NULL OR btrim(q) = '' THEN
+    RAISE EXCEPTION 'pipeline-sql: no statement';
+  END IF;
+  -- Comments and string literals carry words that are not statements: a note
+  -- saying "delete this later" must not read as a DELETE.
+  bare := regexp_replace(q, '''([^'']|'''')*''', '''''', 'g');
+  bare := regexp_replace(bare, '/\*.*?\*/', ' ', 'gs');
+  bare := regexp_replace(bare, '--[^\n]*', ' ', 'g');
+  IF bare ~ ';' THEN
+    RAISE EXCEPTION 'pipeline-sql: one statement per call';
+  END IF;
+  IF btrim(bare) !~* '^(select|with)\y' THEN
+    RAISE EXCEPTION 'pipeline-sql: read-only — the statement must start with select or with';
+  END IF;
+  hit := substring(bare FROM '\y(insert|update|delete|merge|truncate|drop|alter|create|grant|revoke|copy|call|do|lock|vacuum|analyze|refresh|reindex|cluster|comment|into|nextval|setval|pg_terminate_backend|pg_cancel_backend)\y');
+  IF hit IS NOT NULL THEN
+    RAISE EXCEPTION 'pipeline-sql: read-only — % is not a read', upper(hit);
+  END IF;
+  RETURN QUERY EXECUTE format('select to_json(t) from (%s) t', q);
+END;
+$$;

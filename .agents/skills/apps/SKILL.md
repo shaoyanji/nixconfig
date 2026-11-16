@@ -1,7 +1,7 @@
 ---
 name: apps
 description: "Job application pipeline: status, mail triage, Typst documents."
-version: 0.2.0
+version: 0.3.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
 platforms: [linux]
@@ -13,27 +13,37 @@ metadata:
 
 # apps — the job-application pipeline
 
-The pipeline lives in the archive database on delphi. Since `86bdb73b`
-(2026-11-03) that database is the only writer: `appflow-sync.timer` advances
-statuses from ATS mail hourly, and `applications.json` in the workflow checkout
-is an export, not a source. Nothing imports it on a schedule.
+The pipeline is the archive database on delphi, and a tailnet client needs one
+thing to use it: `https://delphi.cloudforest-kardashev.ts.net:8450`. Since
+`86bdb73b` (2026-11-03) that database is the only writer; `appflow-sync.timer`
+advances statuses from ATS mail hourly, and `applications.json` in the workflow
+checkout is an export, not a source.
 
-Each sync is followed by `appflow-resolve.service`: the two local engines answer
-attribute/ignore/unsure, the unsures go through one hermes turn, and an ignore is
-a reversible queue tier (`task apps:queue:resolve -- --restore <id>`).
+## What runs where
 
-| Where | Role |
-| :--- | :--- |
-| `applications` (Postgres, `email_archive`) | Source of truth |
-| `application_mail` | The messages behind a record, with the rule that linked them |
-| `application_document` | The job description and notes, keyed by application and kind |
-| `/srv/data/projects/antigravity-application-workflow` | Typst documents only; retired as a source |
-| `data/applications.json` there | Historical copy; `task apps:export` regenerates it |
+`task apps:doctor` probes every transport below in one call, each probe bounded,
+so a missing piece answers no instead of stalling the shell. Run it on an
+unfamiliar client before anything else.
+
+| Transport | Needs | Gives |
+| :--- | :--- | :--- |
+| archive API | tailnet reach to 8450 | list, search, get, update, upsert, overview, queue, status, export |
+| SQL | nothing extra — `/api/pipeline-sql` is on the API | `apps:query` |
+| Typst checkout | `/srv/data` mounted (`APPS_DIR`) | build, audit, followups |
+| sops identity | this host's age key | `apps:pii:sync` |
+
+`query` used to be the exception: no route, so it needed a psql role or an ssh
+session on delphi, and on a client with neither it waited four minutes on a
+Tailscale auth check before failing. The route is `POST /api/pipeline-sql`, one
+read-only statement, refused unless it starts with `select` or `with` and carries
+no write verb. psql and a bounded ssh (`BatchMode`, 5 s connect timeout) remain as
+the fallback for an archive older than the route. `APPFLOW_API` moves the mount
+and `DELPHI_HOST` the ssh target.
 
 ## The flows
 
-`task apps:list|search|get|update|overview|status` speak the archive API from any
-tailnet host — they do not read the checkout. A status change is one command:
+`task apps:list|search|get|update|overview|status` speak the API from any host,
+and a status change is one command:
 
 ```bash
 task apps:update -- <id> --status "Rejected (email 2026-10-23)"
@@ -44,14 +54,13 @@ task apps:update -- <id> --status "Rejected (email 2026-10-23)"
 There is no push step and no JSON to reconcile.
 
 `task apps:emails` shows what the hourly sync will drain. A message the rules
-cannot prove stays in the queue and shows up there; a rejection the vocabulary
-does not recognise is exactly the defect `checks:appflow:triage` now covers.
-`apps:followups`, `apps:build` and `apps:audit` are the Typst half and need the
-workflow checkout; they do not touch the pipeline rows.
+cannot prove stays in the queue, and a rejection the vocabulary does not
+recognise is the case `checks:appflow:triage` covers.
 
-Never hand-edit a JSON copy and never import it over the database: a stale file
-reverts rows the mail hub discovered. If a snapshot is needed, `task apps:export`
-writes one.
+The Typst half (`apps:followups`, `apps:build`, `apps:audit`) reads the checkout,
+so it runs where `/srv/data` is mounted. It does not touch pipeline rows.
 
-Truth: `taskfiles/apps.yml` and `docs/email-archive.md` — the executable contract
-and the API; this page is the procedure.
+Never hand-edit a JSON copy or import one over the database: a stale file reverts
+rows the mail hub discovered. `task apps:export` writes a snapshot on demand.
+
+Truth: `taskfiles/apps.yml` and `docs/email-archive.md`.

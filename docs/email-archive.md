@@ -240,6 +240,7 @@ agent reads. `FORMAT=text` gives a person the table it printed yesterday.
 | an agent's own inbox | `GET /api/agent-queue?owner=agent&lim=N` |
 | the newsletter batch | `GET /api/triage-digest?days=7&lim=N` |
 | judge / resolve a message | `POST /api/triage-upsert`, `POST /api/triage-resolve` |
+| read-only SQL | `POST /api/pipeline-sql` — one statement, refused unless it is a read |
 | **send mail** | **no.** There is no SMTP in this module; `mail-agent` sends through himalaya |
 | **upload an attachment** | **no.** The upload handlers are configured, but no routine is annotated `@upload`, so `attachment_path` is written only by the importer, from mail that already arrived |
 | HTML-only mail | converted to text with `html2markdown` at ingest (and by `--refill`), so 100 % of archived rows carry a body |

@@ -11,10 +11,13 @@
 # endpoint takes the bucket rather than deriving it. Changing one without the
 # other is the drift this comment exists to make visible.
 #
-# Usage: apps-db.sh <list|search|get|update|overview|queue|export|status|query> …
+# Usage: apps-db.sh <list|search|get|update|upsert|overview|queue|export|status|query|doctor> …
 set -euo pipefail
 
 api=${APPFLOW_API:-https://delphi.cloudforest-kardashev.ts.net:8450}
+# The bare name resolves only where MagicDNS and an ssh alias both carry it;
+# the tailnet FQDN answers from every client.
+delphi_host=${DELPHI_HOST:-delphi.cloudforest-kardashev.ts.net}
 verb=${1:-help}
 if [ "$#" -gt 0 ]; then shift; fi
 
@@ -27,6 +30,20 @@ stage='def stage:
     elif (($s | test("screening")) or ($s | test("follow-up required"))) then "screening"
     elif ($s | test("draft|packet|\\bjd\\b")) then "prep"
     else "other" end;'
+
+
+# Every transport probe is bounded: a client that lacks a piece answers no in a
+# few seconds, instead of sitting on Tailscale's interactive check until the
+# shell gives up (measured 2026-11-16: 240 s on a single apps:query).
+pg_local() { PGCONNECT_TIMEOUT=3 psql -w -d email_archive -Atc 'select 1' >/dev/null 2>&1; }
+ssh_ok() {
+  if command -v timeout >/dev/null 2>&1; then
+    timeout 8 ssh "${ssh_opts[@]}" "$delphi_host" true >/dev/null 2>&1
+  else
+    ssh "${ssh_opts[@]}" "$delphi_host" true >/dev/null 2>&1
+  fi
+}
+ssh_opts=(-o BatchMode=yes -o NumberOfPasswordPrompts=0 -o ConnectTimeout=5)
 
 rows() {
   # A terminal table, but a pipe still works: `column` only formats when present.
@@ -50,9 +67,11 @@ usage: apps-db.sh <verb> [args]
   queue                    messages waiting for agent:apps (the sync drains them hourly)
   export [file|-]          applications.json from the database (snake_case)
   status                   totals, newest change, queue depth
-  query <sql>              read-only SQL against email_archive on delphi
+  query <sql>              read-only SQL over the archive API; psql or ssh only as a fallback
+  doctor                   which transports this client has, each probe bounded
 
 The API is $APPFLOW_API (default: delphi's tailnet mount, port 8450).
+SQL reaches delphi at $DELPHI_HOST (default: the tailnet FQDN).
 EOF
 }
 
@@ -233,12 +252,75 @@ case "$verb" in
   query)
     sql=${*:-}
     if [ -z "$sql" ]; then usage; exit 2; fi
-    if psql -d email_archive -Atc 'select 1' >/dev/null 2>&1; then
+    # The read-only route is the transport every tailnet client has: it replaced
+    # the ssh hop that stalled on a Tailscale auth check. A 404 means the archive
+    # predates the route and 000 means it is unreachable, and only those two fall
+    # through to SQL proper; a refusal from the route is the answer, not a retry.
+    out=$(mktemp)
+    trap 'rm -f "$out"' EXIT
+    code=$(curl -sS -m 20 -o "$out" -w '%{http_code}' -X POST \
+      -H 'content-type: application/json' \
+      -d "$(jq -cn --arg q "$sql" '{q: $q}')" \
+      "$api/api/pipeline-sql" 2>/dev/null || echo 000)
+    case "$code" in
+      2*)
+        jq -r 'if length == 0 then empty
+               else (.[0] | keys_unsorted | @tsv), (.[] | [.[]] | @tsv) end' "$out"
+        exit 0
+        ;;
+      404 | 000) : ;;
+      *)
+        echo "apps-db: the archive refused the statement" >&2
+        cat "$out" >&2
+        exit 1
+        ;;
+    esac
+    if pg_local; then
       exec psql -d email_archive -Atc "$sql"
     fi
-    # The archive's role is not on every host, so the fallback is a one-shot
-    # read on delphi. The pipe keeps the SQL out of the remote shell's quoting.
-    printf '%s\n' "$sql" | ssh delphi "sudo -u postgres psql -d email_archive -At"
+    # SQL is the one verb the API does not expose, so it is the only one that may
+    # need delphi itself. Probe before spending the caller's time: a client
+    # without the role used to wait four minutes on an auth prompt.
+    if ! ssh_ok; then
+      echo "apps-db: no SQL transport on this host" >&2
+      echo "apps-db: the archive role lives on delphi and ssh to $delphi_host is not answering" >&2
+      echo "apps-db: pipeline verbs still work over the API — task apps:doctor says which" >&2
+      exit 3
+    fi
+    # The pipe keeps the SQL out of the remote shell's quoting.
+    printf '%s\n' "$sql" | ssh "${ssh_opts[@]}" "$delphi_host" \
+      "sudo -u postgres psql -d email_archive -At"
+    ;;
+
+  doctor)
+    # One call answers what this client can do, so nobody discovers a missing
+    # transport by waiting for a timeout.
+    if body=$(curl -fsS -m 6 "$api/api/application-pipeline" 2>&1); then
+      printf 'api       reachable (%s stage(s)) — list, search, get, update, upsert, export\n' \
+        "$(printf '%s' "$body" | jq 'length' 2>/dev/null || echo '?')"
+    else
+      printf 'api       UNREACHABLE — %s\n' "$(printf '%s' "$body" | head -1)"
+    fi
+    if curl -fsS -m 6 -X POST -H 'content-type: application/json' \
+      -d '{"q":"select 1"}' "$api/api/pipeline-sql" >/dev/null 2>&1; then
+      printf 'sql       over the API (/api/pipeline-sql) — apps:query runs anywhere\n'
+    elif pg_local; then
+      printf 'sql       local role answers — apps:query runs here\n'
+    elif ssh_ok; then
+      printf 'sql       over ssh to %s — apps:query runs here\n' "$delphi_host"
+    else
+      printf 'sql       absent — role is on delphi, ssh not answering; apps:query exits 3\n'
+    fi
+    if [ -d "${APPS_DIR:-/srv/data/projects/antigravity-application-workflow}" ]; then
+      printf 'typst     checkout mounted — build, audit, followups\n'
+    else
+      printf 'typst     no checkout here — those tasks run where /srv/data is mounted\n'
+    fi
+    if [ -f "${PII_FILE:-$HOME/.config/appflow/pii.json}" ]; then
+      printf 'pii       %s\n' "${PII_FILE:-$HOME/.config/appflow/pii.json}"
+    else
+      printf 'pii       absent — run task apps:pii:sync on this host\n'
+    fi
     ;;
 
   help | -h | --help)

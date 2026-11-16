@@ -53,6 +53,16 @@ tasks:
     cmds:
       - "{{.APPS_DB}} status"
 
+  apps:doctor:
+    desc: Which appflow transports this client has (API, SQL, Typst checkout, PII)
+    summary: >
+      Bounded probes, one per transport, so a missing piece answers no instead of
+      hanging the shell. Every pipeline verb needs only the archive API over the
+      tailnet; `query` needs SQL, which is the one verb with no API route; build,
+      audit and followups need the Typst checkout; pii is per host.
+    cmds:
+      - "{{.APPS_DB}} doctor"
+
   # The sync itself is a unit on delphi (appflow-sync.timer, hourly), and each
   # run starts appflow-resolve.service for what the rules could not decide. This
   # shows what is waiting for them instead of running a second scanner by hand.

@@ -8,6 +8,14 @@
     self.modules."scripts.pb"
   ];
   home.packages = with pkgs; [
+    # The vault clients. rbw is the only client that tolerates a plain-http
+    # base URL, and it execs `rbw-agent` as a *separate binary off PATH*, so an
+    # absolute store path with no `bin` on PATH fails with "failed to run
+    # rbw-agent". It prompts through pinentry, and `pkgs.pinentry` no longer
+    # exists in nixpkgs, so the curses variant is named for the `pinentry`
+    # executable it ships.
+    rbw
+    pinentry-curses
     # NOTE: `nvidia-offload` used to live here, which shipped it to EVERY host
     # (``modules/user/base.nix`` pulls in this directory). It is a PRIME render-offload
     # wrapper, so it belongs only on the NVIDIA GPU hosts. Those hosts get the

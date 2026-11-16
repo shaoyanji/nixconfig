@@ -17,7 +17,7 @@
 #   appflow-packet.sh --id <application> [--resume P] [--letter P] [--jd P] [--out <link>]
 set -euo pipefail
 
-API="${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}"
+API="${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}"
 CONFIG="${APPFLOW_CONFIG:-$HOME/.config/appflow}"
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/email-archive/packets"
 REPO="$(git rev-parse --show-toplevel)"

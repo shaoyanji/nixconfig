@@ -45,6 +45,7 @@ usage: apps-db.sh <verb> [args]
   search <words…>          substring over id, company, role, status, next action
   get <id>                 one record and the mail linked to it
   update <id> --status S [--next-action N]
+  upsert [file|-]          upsert an application record (JSON on stdin or in a file)
   overview                 stage counts
   queue                    messages waiting for agent:apps (the sync drains them hourly)
   export [file|-]          applications.json from the database (snake_case)
@@ -175,6 +176,57 @@ case "$verb" in
     curl -fsS "$api/api/application-pipeline" \
       | jq -r '["stage","applications","with next action"],
           (.[] | [.stage, .applications, .withNextAction]) | @tsv' \
+      | rows
+    ;;
+
+  upsert)
+    src=${1:-}
+    if [ -n "$src" ] && [ "$src" != "-" ]; then
+      [ -r "$src" ] || { echo "apps-db: cannot read $src" >&2; exit 2; }
+      body=$(cat "$src")
+    else
+      body=$(cat)
+    fi
+    if [ -z "$body" ]; then
+      echo "apps-db: upsert needs a JSON record on stdin or a file" >&2
+      exit 2
+    fi
+    # The route answers 404 for a missing key, so every key is sent and a field
+    # the caller omitted becomes null. Both spellings are accepted because the
+    # export is snake_case and the API is camelCase, and the caller should not
+    # have to remember which side of that line it is on.
+    payload=$(printf '%s' "$body" | jq -c '
+      def f($camel; $snake): (.[$camel] // .[$snake]);
+      {
+        id: .id,
+        company: (.company // "unknown"),
+        role: (.role // "unknown"),
+        category: (.category // "other"),
+        language: (.language // "en"),
+        fit: (.fit // null),
+        status: (.status // ""),
+        stage: (.stage // ""),
+        nextAction: f("nextAction"; "next_action"),
+        applyUrl: f("applyUrl"; "apply_url"),
+        coverLetterUrl: f("coverLetterUrl"; "cover_letter_url"),
+        resumeUrl: f("resumeUrl"; "resume_url"),
+        gmail: (.gmail // null),
+        reviewFlag: f("reviewFlag"; "review_flag"),
+        notes: (.notes // null),
+        folderPath: f("folderPath"; "folder_path"),
+        messageId: f("messageId"; "message_id"),
+        recruiterEmail: f("recruiterEmail"; "recruiter_email"),
+        createdAt: f("createdAt"; "created_at"),
+        updatedAt: f("updatedAt"; "updated_at"),
+        origin: (.origin // "manual")
+      }') || { echo "apps-db: record is not valid JSON" >&2; exit 2; }
+    if [ "$(printf '%s' "$payload" | jq -r '.id // ""')" = "" ]; then
+      echo "apps-db: upsert needs an id" >&2
+      exit 2
+    fi
+    curl -fsS -X POST -H 'content-type: application/json' -d "$payload" \
+      "$api/api/application-upsert" \
+      | jq -r '.[0] | "\(.id)\t\(.company)\t\(.stage)"' \
       | rows
     ;;
 

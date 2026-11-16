@@ -31,6 +31,18 @@ tasks:
     cmds:
       - "{{.APPS_DB}} update {{.CLI_ARGS}}"
 
+  apps:upsert:
+    desc: Add or refresh one application record from JSON (CLI_ARGS is a file, or pipe stdin)
+    summary: >
+      The write path for a record the hourly sync did not create. Send the whole
+      object, camelCase or snake_case, with `id`, `company`, `role`, `status`,
+      `stage` and the next action; the route 404s on a missing key, so the script
+      fills every key it was not given with null instead of omitting it. Prints
+      the stored id, company and stage. A re-run with the same id updates in
+      place, so this is also the way to correct a row the mail got wrong.
+    cmds:
+      - "{{.APPS_DB}} upsert {{.CLI_ARGS}}"
+
   apps:overview:
     desc: Pipeline summary - stage counts and how many carry a next action
     cmds:

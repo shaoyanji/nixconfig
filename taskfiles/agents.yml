@@ -424,7 +424,7 @@ tasks:
         [ -n "{{.ID}}" ] || { echo "agents:mail:resolve: ID is required (take it from agents:mail:attention)" >&2; exit 2; }
         changed="$(curl -fsS --max-time 20 -X POST -H 'content-type: application/json' \
           -d "$(jq -nc --arg m "{{.ID}}" '{messageId: $m}')" \
-          "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-resolve")"
+          "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/triage-resolve")"
         n="$(jq 'length' <<<"$changed")"
         [ "$n" -gt 0 ] || { echo "agents:mail:resolve: nothing open for {{.ID}}" >&2; exit 1; }
         echo "resolved {{.ID}} ($n verdict(s))"
@@ -482,7 +482,7 @@ tasks:
         # commit and is what you have before a switch.
         drain=(email-archive-ci-drain)
         command -v "${drain[0]}" >/dev/null 2>&1 || drain=(python3 modules/services/email-ci-drain.py)
-        args=(--days "{{.DAYS}}" --api "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}")
+        args=(--days "{{.DAYS}}" --api "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}")
         [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
         [ "{{.FULL}}" = "1" ] && args+=(--full)
         if [ "{{.FORMAT}}" = "text" ]; then
@@ -510,7 +510,7 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/attention?lim={{.LIM}}")"
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/attention?lim={{.LIM}}")"
         case "{{.FORMAT}}" in
           text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:16])  \(.tier)  \(.subject[0:70])"' ;;
           json) printf '%s' "$rows" ;;
@@ -525,7 +525,7 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/triage-digest?days={{.DAYS}}&lim={{.LIM}}")"
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/triage-digest?days={{.DAYS}}&lim={{.LIM}}")"
         case "{{.FORMAT}}" in
           text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:10])  \(.sender[0:40])  \(.subject[0:70])"' ;;
           json) printf '%s' "$rows" ;;
@@ -543,7 +543,7 @@ tasks:
         # `letters` is what archive/delete/hermes rows are, `commands` is the
         # mailbox-wide instruction with no message behind it. One document, so
         # an agent reads the whole handoff in one call.
-        base="${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}"
+        base="${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}"
         letters="$(curl -fsS --max-time 20 "$base/api/atlas-actions?status={{.STATUS}}&lim={{.LIM}}")"
         commands="$(curl -fsS --max-time 20 "$base/api/atlas-commands?status={{.STATUS}}&lim={{.LIM}}")"
         rows="$(jq -nc --argjson l "$letters" --argjson c "$commands" '{letters: $l, commands: $c}')"
@@ -598,7 +598,7 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent&lim={{.LIM}}")"
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/agent-queue?owner=agent&lim={{.LIM}}")"
         case "{{.FORMAT}}" in
           text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:16])  \(.owner)  \(.subject[0:60])  \(.messageId)"' ;;
           json) printf '%s' "$rows" ;;
@@ -670,7 +670,7 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/plugins")"
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/plugins")"
         case "{{.FORMAT}}" in
           text) printf '%s' "$rows" | jq -r '.[]? | "\(.owner)  \(.kind)\topen \(.open)\tresolved \(.resolved)\tlast \(.lastDecision[0:16] // "-")"' | column -t -s$'\t' ;;
           json) printf '%s' "$rows" ;;
@@ -684,7 +684,7 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/applications-discovered?lim={{.LIM}}")"
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/applications-discovered?lim={{.LIM}}")"
         case "{{.FORMAT}}" in
           text) printf '%s' "$rows" | jq -r '.[]? | "\(.createdAt[0:10])  \(.company[0:32])  \(.status[0:40])"' ;;
           json) printf '%s' "$rows" ;;
@@ -795,7 +795,7 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}/api/agent-queue?owner=agent:apps&lim={{.LIM}}")"
+        rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/agent-queue?owner=agent:apps&lim={{.LIM}}")"
         case "{{.FORMAT}}" in
           text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"' ;;
           json) printf '%s' "$rows" ;;

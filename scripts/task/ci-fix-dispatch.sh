@@ -14,7 +14,7 @@
 #   ci-fix-dispatch.sh resolve  --mail <message_id>
 set -euo pipefail
 
-API="${EMAIL_ARCHIVE_API:-http://127.0.0.1:8080}"
+API="${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}"
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/ci-fix"
 LOG_CHARS="${CI_FIX_LOG_CHARS:-12000}"
 SESSION_PREFIX="ci-fix"

@@ -44,8 +44,14 @@ tasks:
       `<slug>|<prompt>|<expect>` character plates in the palette-test family,
       judged against `.intents.photoreal` rather than the wall lane's illustrated
       intent, so a portrait is what the judge holds the name to. A row the ledger
-      already kept is skipped, so a resumed round costs nothing. Env: `ONLY=`,
-      `MAX_GEN=`, `FORCE=1`, `DRY=1`, `PUBLISH=0`.
+      already kept is skipped, so a resumed round costs nothing.
+
+      Nobody has to start or watch a round: the four `image-daily-slot-*` timers
+      run this after the lane queue with whatever the slot has left, so a roster
+      row is spent by the schedule. A round publishes once and posts one xs turn
+      of its own counts, which `services.xs-notify` toasts on the desktop — the
+      roster edit is the request, the toast is the report. Env: `ONLY=`, `MAX_GEN=`,
+      `FORCE=1`, `DRY=1`, `PUBLISH=0`, `XS_SUMMARY=0`.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" bash scripts/task/image-daily.sh plates
 
@@ -88,10 +94,14 @@ tasks:
       `manifest.json` for the search frontend that Pages serves. Every row carries its
       lane, day and tags derived from the public id, so the frontend filters as well
       as searches. The resize is in the URL, so one upload serves the card, the
-      thumbnail and the retina hero, and the deploy carries no images at all.
-      Re-running re-uploads; a versioned URL is immutable.
+      thumbnail and the retina hero, and      the deploy carries no images at all.
+
+      A path the manifest already carries is not uploaded again — its public id is
+      derived from the path and a kept plate is never re-rendered — so a round's
+      publish moves only its new plates, and `REUPLOAD=1` forces every staged file
+      back over the wire after a forced re-render.
     cmds:
-      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh publish
+      - IMAGES_ROOT={{.IMAGES_ROOT}} REUPLOAD="{{if .REUPLOAD}}{{.REUPLOAD}}{{end}}" bash scripts/task/image-daily.sh publish
 
   images:post:
     desc: One motion from a title to a post with its banner already on Cloudinary

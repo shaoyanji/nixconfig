@@ -714,6 +714,16 @@ cmd_publish() {
   # urls.tsv beside the assets is the manifest a consumer reads.
   local rel url id rows=$IMAGES_ROOT/published/urls.tsv restaged=$IMAGES_ROOT/published/.restaged.$$
   local fresh=$IMAGES_ROOT/published/.urls.$$
+  # A public id is derived from the path and a kept plate is never re-rendered, so
+  # a path the manifest already carries is already served. Uploading it again is
+  # the difference between a thirty-second round publish and a ten-minute one, and
+  # nobody is watching either way. REUPLOAD=1 puts every staged file back over the
+  # wire, which is what a forced re-render of an existing slug needs.
+  local known=$IMAGES_ROOT/published/.known.$$
+  : >"$known"
+  if [ "${REUPLOAD:-0}" != "1" ] && [ -s "$rows" ]; then
+    cut -f1 "$rows" >"$known"
+  fi
   # A publish replaces only the rows it restaged. Truncating the manifest deletes
   # every asset whose file is not on this host, so a publish from a machine that
   # does not hold the bank rewrites the frontend down to that one batch.
@@ -726,9 +736,16 @@ cmd_publish() {
     # `lib/site/host-badges.json` never has to learn a new date.
     id="assets/${rel%.*}"
     case $rel in badge/*) id="assets/fleet/$(basename "${rel%.*}")" ;; esac
+    # Copy the existing row forward instead of skipping the file silently: the
+    # merge below would otherwise read the file as restaged-but-unwritten and
+    # delete an asset that is still being served.
+    if [ -s "$known" ] && grep -qxF -- "$rel" "$known"; then
+      awk -F'\t' -v r="$rel" '$1 == r' "$rows" >>"$fresh"
+      continue
+    fi
     url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$file" --public-id "$id") || {
       say "publish: upload failed for $rel"
-      rm -f "$fresh" "$restaged"
+      rm -f "$fresh" "$restaged" "$known"
       return 1
     }
     printf '%s\t%s\t%s\n' "$rel" "$url" "$(stat -c%s "$file")" >>"$fresh"
@@ -741,7 +758,7 @@ cmd_publish() {
     ' "$rows" >>"$fresh"
   fi
   mv -f "$fresh" "$rows"
-  rm -f "$restaged"
+  rm -f "$restaged" "$known"
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
   build_index
   deploy_frontend
@@ -1074,6 +1091,18 @@ kept_plate() { # brief
     done
 }
 
+# Rows with no kept plate: what a round is still waiting for. kept_plate answers
+# per row and re-reads the ledger every time, so a whole-roster answer is one pass
+# over both files instead.
+roster_pending() { # roster
+  local all kept
+  all=$(mktemp) && kept=$(mktemp) || return 0
+  awk -F'|' '!/^#/ && NF > 1 {print "photoreal-" $1}' "$1" | sort -u >"$all"
+  { [ -f "$LEDGER" ] && jq -r 'select(.verdict == "keep") | .brief' "$LEDGER"; } 2>/dev/null | sort -u >"$kept"
+  comm -23 "$all" "$kept" | wc -l | tr -d ' '
+  rm -f "$all" "$kept"
+}
+
 cmd_plates() {
   need jq cpg agy git ffprobe
   local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} size=${SIZE:-1536x1024}
@@ -1089,6 +1118,8 @@ cmd_plates() {
   flock -n 9 || { say "another run holds the lock"; exit 0; }
 
   local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect have file v verdict defect sent
+  local ledger_before=0
+  [ -f "$LEDGER" ] && ledger_before=$(wc -l <"$LEDGER" | tr -d ' ')
   day=$(today)
   left=$(remaining)
   [ -n "$left" ] || die "usage unreadable (401 from cpg) — run cpg refresh, or chatplayground-go login when the session itself is gone"
@@ -1142,6 +1173,27 @@ cmd_plates() {
   say "$day: $spent image(s) spent this round"
   if [ "${PUBLISH:-1}" = "1" ] && [ "${DRY:-0}" != "1" ] && [ "$spent" -gt 0 ]; then
     cmd_publish || say "publish failed; the plates are on disk and the next publish picks them up"
+  fi
+
+  # The round reports itself. It runs from a timer with nobody reading the log, and
+  # xs-notify toasts a turn on the machine the person is actually at, so the result
+  # travels instead of the person watching for it. Never fatal: the plates are on
+  # disk and the ledger already holds the verdicts, so a failed post costs a toast,
+  # not a round.
+  if [ "${DRY:-0}" != "1" ] && [ "${XS_SUMMARY:-1}" = "1" ]; then
+    local round_keeps pending assets outcome line
+    round_keeps=$(tail -n +"$((ledger_before + 1))" "$LEDGER" 2>/dev/null |
+      jq -r 'select((.brief // "") | startswith("photoreal-")) | select(.verdict == "keep") | .brief' 2>/dev/null |
+      wc -l | tr -d ' ')
+    pending=$(roster_pending "$roster")
+    assets=$(wc -l <"$IMAGES_ROOT/published/urls.tsv" 2>/dev/null | tr -d ' ')
+    outcome=in_progress
+    [ "${round_keeps:-0}" -gt 0 ] && outcome=done
+    line="$day: ${round_keeps:-0} plate(s) kept of $spent spent, ${pending:-?} roster row(s) waiting, ${assets:-0} asset(s) published"
+    say "summary: $line"
+    SUBJECT=nixconfig:wall-plates ACTION="$line" OUTCOME=$outcome SOURCE=image-daily \
+      bash "$repo/scripts/task/xs-turn-post.sh" >/dev/null 2>&1 ||
+      say "xs turn not posted; the next post replays the queue"
   fi
 }
 

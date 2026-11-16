@@ -472,7 +472,9 @@
   # hour, so one nightly pass spends the day in minutes and then answers 429 for
   # the rest of the hour. Four slots 6h20 apart, each capped at 25, is the same 100
   # without the burst — and every slot republishes the Cloudinary manifest, so the
-  # asset frontend follows the queue through the day. Tools are prepended to PATH
+  # asset frontend follows the queue through the day. Each slot also takes the
+  # roster's next unkept row with its leftover, which is what makes "more
+  # wallpapers" a roster edit rather than a supervised run. Tools are prepended to PATH
   # because cpg and agy live in the user profile, not in this script's closure.
   imageDailySlot = slot: cap: reserve:
     pkgs.writeShellScript "image-daily-slot-${slot}" ''
@@ -494,9 +496,24 @@
       export IMAGES_ROOT=/Volumes/data/pics/generated
       export STORYBOOK_DIR=${user.home}/Documents/storybook/lantern
       export SLOT=${slot}
-      export CAP=${toString cap}
       export RESERVE=${toString reserve}
-      exec ${pkgs.bash}/bin/bash ${../../scripts/task/image-daily.sh} run
+      # A slot spends the queue first, then the standing character roster with what
+      # the slot's cap has left, and publishes once. The roster skips a row the
+      # judge already kept, so a round cut short by the hourly burst resumes on the
+      # next slot for free instead of waiting for someone to start it again. Neither
+      # phase publishes alone: one publish at the end is one manifest rewrite, and
+      # paths the manifest already serves are not uploaded twice.
+      daily=${../../scripts/task/image-daily.sh}
+      ledger=$IMAGES_ROOT/ledger.jsonl
+      rc=0
+      before=$(wc -l <"$ledger" 2>/dev/null || printf 0)
+      CAP=${toString cap} PUBLISH=0 ${pkgs.bash}/bin/bash "$daily" run || rc=$?
+      after=$(wc -l <"$ledger" 2>/dev/null || printf 0)
+      room=$(( ${toString cap} - (after - before) ))
+      [ "$room" -lt 1 ] && room=1
+      MAX_GEN=$room PUBLISH=0 ${pkgs.bash}/bin/bash "$daily" plates || rc=$?
+      ${pkgs.bash}/bin/bash "$daily" publish || rc=$?
+      exit $rc
     '';
 in {
   imports = [

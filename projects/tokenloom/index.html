@@ -163,7 +163,7 @@
     </thead>
     <tbody>
       <tr><td>edit to diff latency, p99</td><td class="n">&lt; 5 ms</td><td>124–182 µs over two runs (p50 45, p90 76, max 340)</td></tr>
-      <tr><td>edit to diff at the client, p99</td><td class="n">&lt; 5 ms</td><td>3.29 ms, the 2 ms batch window included</td></tr>
+      <tr><td>edit to diff at the client, p99</td><td class="n">&lt; 5 ms</td><td>3.45 ms, the 2 ms batch window included</td></tr>
       <tr><td>bytes re-tokenized per edit</td><td class="n">&lt; 2 % median, 10 % p99</td><td>0.07 % median, 0.20 % p99</td></tr>
       <tr><td>ripple hits past the window</td><td class="n">&lt; 0.1 %</td><td>0 of 1000 edits</td></tr>
       <tr><td>batches per second, six reactors</td><td class="n">1000/s, no queue</td><td>1000/s, 0 starved shards</td></tr>
@@ -192,7 +192,7 @@ LOOM_PORT=8787 node web/smoke.mjs
 <span class="c"># the page itself, driven in headless chromium over the DevTools protocol</span>
 node web/uitest.mjs --shot loom.png
 
-<span class="c"># what the batch window costs an edit, and what it buys a burst</span>
+<span class="c"># the edit-to-diff target, gated; what the window costs and buys</span>
 node web/window.mjs http://127.0.0.1:8787/</code></pre>
   <p>
     The page shows the rope, the diff lane, the warning feed, the reactor bank and the constraint

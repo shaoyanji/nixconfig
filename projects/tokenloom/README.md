@@ -20,7 +20,7 @@ cargo run --release -p loom-cli -- replay session
 node web/smoke.mjs                       # wire-level end-to-end against a running server
 node web/uitest.mjs http://127.0.0.1:8787/   # headless chromium over CDP (needs `ws` beside it)
 node web/retune.mjs http://127.0.0.1:8787/   # retune round trip, and whether the span keeps its identity
-node web/window.mjs http://127.0.0.1:8787/   # what the coalescing window costs an edit, and what it buys a burst
+node web/window.mjs http://127.0.0.1:8787/   # the edit-to-diff target, gated; what the window costs and buys
 ```
 
 Environment: `LOOM_PORT`, `LOOM_BIND`, `LOOM_DATA` (default `./session`, `off`
@@ -39,7 +39,7 @@ disables persistence), `LOOM_COALESCE_MS` (default 2).
 | diff frame encode | no allocation | 6.0–7.4 µs/frame, reused buffer, 4096 → 4096 bytes |
 | 6 reactors at 1000 batches/s, document growing | no queue depth, no drift | 1000 batches, 4000 shard events over 4 shards, 2000 reactions, **0 starved**, **0 span-creep** |
 
-Acceptance tests (`cargo test --all --locked`, 19 tests):
+Acceptance tests (`cargo test --all --locked`, 24 tests):
 
 - `incremental_eq_rebuild` — proptest, random documents and op sequences; the
   incremental token array equals a full rebuild byte for byte.
@@ -79,6 +79,16 @@ Acceptance tests (`cargo test --all --locked`, 19 tests):
 - `constraint_follows_its_text_across_edits` — a span planted on a word stays on
   that word when text is inserted before it, inserted after it, and deleted
   before it.
+- `a_burst_inside_one_window_is_one_revision_and_one_diff` — ten ops inside one
+  window cost one diff and one revision, with an ack for each of them and the
+  whole burst inside that diff; the same ten sent across two windows cost two,
+  and an idle socket is written nothing. The contrast is the point: counting one
+  batch alone would still pass if the window coalesced nothing and the client
+  merged the diffs itself.
+- `concatenated_frames_walk_from_their_own_lengths` — seven frame types written
+  back to back into one message: each is found from the length of the one before
+  it, and the lengths cover the message exactly, with every frame equal to what
+  was written.
 - `protocol_roundtrip` — every frame type encodes and decodes losslessly, fuzzed,
   and a truncated prefix is refused.
 - `latency_p99` — lives in the bench rather than `cargo test`, because CI noise
@@ -113,32 +123,42 @@ the rule buttons, timing each step from the click by the frame's own arrival
 stamp rather than by a polling loop. Identity is asserted where it could break:
 the row element has to be the same node afterwards (a property set on it must
 survive), the id it shows must not change, the anchor and the length must not
-move, and the next plant has to take the next id — 60/60 on all four. The
-timings are op on the wire 0.1 ms, ack 3.3 ms (2 ms of which is the coalescer
-window) and the list frame 3.3 ms. The first measurement of this was 9.4 ms and
-51.8 ms, and the gap was not the retune: the server queued both frames within
+move, and the next plant has to take the next id — no run has broken any of the
+four. The timings are op on the wire 0.1 ms, ack 3.3 ms (2 ms of which is the
+coalescer window), the list frame the same 3.3 ms in the same message, and the
+row repainted at 3.4 ms. Identity held 20/20 in the last run on the row element,
+the id and the focus, with the span at `3t @ 0b` and the next plant taking 0, 1.
+The first measurement of this was 9.4 ms and 51.8 ms, and the gap was not the
+retune: the server queued both frames within
 30 µs, and dropping one client write 15 ms into the round trip brought both to
 15.4 ms. That is Nagle — an ack and a list frame are two small writes in a row,
 and the second waited about 41 ms for the client to acknowledge the first. axum
 leaves `TCP_NODELAY` unset on its accepted sockets, so setting it removed the
 wait, and the two frames now arrive 0.1 ms apart.
 
-`node web/window.mjs` measures the coalescing window from the client: one edit to
-its diff, ten ops sent in one turn, ten ops spread over 4 ms, and twenty edits at
-a typing cadence, against whatever `LOOM_COALESCE_MS` the server was started with.
+`node web/window.mjs` measures the coalescing window from the client and **is the
+gate for the end-to-end target**: one edit to its diff, ten ops sent in one turn,
+ten ops spread over 4 ms, and twenty edits at a typing cadence, against whatever
+`LOOM_COALESCE_MS` the server was started with. It exits non-zero when a single
+edit's p99 misses the 5 ms target, so the number in this file is checked rather
+than remembered. Same build, same box, one run each:
 
 | window | edit → diff p99 | 10 ops in one turn | 10 ops over 4 ms |
 | :--- | :--- | :--- | :--- |
-| 1 ms | 2.58 ms | 1 batch | 2.86 batches |
-| 2 ms | 3.29 ms | 1 batch | 2.00 batches |
-| 4 ms | 5.57 ms | 1 batch | 1 batch |
-| 8 ms | 9.45 ms | 1 batch | 1 batch |
+| 1 ms | 2.31 ms · pass | 1 batch | 2.61 batches |
+| 2 ms | 3.45 ms · pass | 1 batch | 2.00 batches |
+| 4 ms | 5.36 ms · **fail** | 1 batch | 1 batch |
+| 8 ms | 9.41 ms · **fail** | 1 batch | 1 batch |
 
 The default is 2 ms: the widest window that keeps end-to-end p99 under the 5 ms
-target. A keystroke cadence merges nothing at any width, so a burst is the only
-traffic the window is for, and a burst sent in one turn already merges at 1 ms.
-The 8 ms default it shipped with added 6 ms to every edit and merged nothing
-more than 2 ms does except a burst spread over several milliseconds.
+target, and the gate says so rather than the prose — 4 ms and 8 ms are the same
+measurement failing. A keystroke cadence merges nothing at any width, so a burst
+is the only traffic the window is for, and a burst sent in one turn already
+merges at 1 ms. The 8 ms default it shipped with added 6 ms to every edit and
+merged nothing more than 2 ms does except a burst spread over several
+milliseconds, which 2 ms splits into two batches. The edit's ack and its diff now
+arrive in one message, so the script also reports that the ack already carries
+the window: `the diff shared the ack's message in 60/60 edits`.
 
 ## How it works
 
@@ -246,16 +266,23 @@ log whose base document is gone.
   a batcher cannot be under the window: 2 ms is a floor no pipeline can go below,
   so the bench times apply → ripple → diff encode, which is the part it can
   improve. The end-to-end figure is measured separately by `web/window.mjs`
-  (3.29 ms p99, window included).
-- **Frames go out as separate socket messages.** A batch that produces an ack and
-  a list frame is two small writes. This used to cost a round trip — 49.9 ms to
-  the list frame against an idle client, 15.4 ms when the client had a write in
-  flight, with both frames queued server-side within 30 µs — because axum leaves
-  `TCP_NODELAY` unset and the second small write waited for the client's
-  acknowledgement of the first. `tcp_nodelay(true)` on the listener removed that:
-  9.3 ms against 9.3 ms at an 8 ms window, 3.3 against 3.3 at the shipped 2 ms.
-  Concatenating several frames into one message would still save a syscall per
-  frame; it is not built.
+  (3.45 ms p99, window included), which fails rather than reports when it
+  misses.
+- **Several frames ride one socket message.** A batch that produces an ack, a
+  diff and a list frame is three small writes, and the client used to handle them
+  as three events. Both sides now treat a message as a sequence: the server drains
+  what is already queued for that client into one write (capped at 64 KiB, and a
+  burst of ten ops measured 12–13 frames in one message), and a frame is
+  self-delimiting, so clients walk the buffer instead of being told where each
+  frame ends (`decode_server_at` on the server side, `decodeAll` in each web
+  script). Measured effect: the retune ack and its list frame went from 0.1 ms
+  apart to 0.0, one write and one client wake-up per batch saved, and the
+  single-edit p99 unchanged at 3.45 ms — the latency win was `TCP_NODELAY`, not
+  this. It is built because the atomicity is real: a client can no longer see an
+  ack without the list it made true. The bug it introduced first was mine — the
+  page's new reader passed a `Uint8Array` to `DataView`, which Chromium refuses,
+  so every frame was dropped while the socket still read `live`; `uitest.mjs`'s
+  "no page exceptions" check and the empty rope caught it.
 - **The constraint index is bucketed by anchor byte (128-byte blocks), not an
   interval tree.** Same query result for far less code; the cost is a scan per
   touched bucket, and the query errs wide where a token-width guess is needed.

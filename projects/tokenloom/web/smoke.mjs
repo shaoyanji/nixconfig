@@ -37,7 +37,10 @@ class W {
   done() { return this.buf.slice(0, this.p); }
 }
 
-function decode(bytes) {
+// One frame at the head of a message, with the bytes it used: the server packs
+// the frames it wrote in the same instant, so a message can hold several and a
+// reader that stops at the first would wait forever for the rest.
+function decodeAt(bytes) {
   const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const state = { p: 0 };
   const u8 = () => { const x = v.getUint8(state.p); state.p += 1; return x; };
@@ -50,7 +53,8 @@ function decode(bytes) {
     return s;
   };
   const op = u8();
-  if (op === 0x80) return { op, seq: u64(), revision: u64() };
+  const at = (frame) => [frame, state.p];
+  if (op === 0x80) return at({ op, seq: u64(), revision: u64() });
   if (op === 0x81) {
     const revision = u64(), start = u32(), deleted = u16(), count = u16();
     const inserted = [];
@@ -58,7 +62,7 @@ function decode(bytes) {
       const len = u16(), flags = u8();
       inserted.push({ text: text(len), flags });
     }
-    return { op, revision, start, deleted, inserted };
+    return at({ op, revision, start, deleted, inserted });
   }
   if (op === 0x82) {
     const w = {
@@ -66,9 +70,9 @@ function decode(bytes) {
       start: u32(), len: u16(), revision: u64(),
     };
     w.message = text(u16());
-    return w;
+    return at(w);
   }
-  if (op === 0x83) return { op, id: u32(), revision: u64() };
+  if (op === 0x83) return at({ op, id: u32(), revision: u64() });
   if (op === 0x84) {
     const revision = u64(), reactors = u8(), n = u32();
     const tokens = [];
@@ -76,13 +80,13 @@ function decode(bytes) {
       const len = u16(), flags = u8();
       tokens.push({ text: text(len), flags });
     }
-    return { op, revision, reactors, tokens };
+    return at({ op, revision, reactors, tokens });
   }
   if (op === 0x85) {
-    return {
+    return at({
       op, p50: u32(), p99: u32(), retok: u32(), trunc: u32(), starved: u32(), win: u32(),
       reactors: u8(), constraints: u32(),
-    };
+    });
   }
   if (op === 0x86) {
     const revision = u64(), n = u32();
@@ -90,9 +94,20 @@ function decode(bytes) {
     for (let i = 0; i < n; i++) {
       items.push({ id: u32(), anchor: u32(), token: u32(), len: u16(), kind: u8(), param: u32() });
     }
-    return { op, revision, items };
+    return at({ op, revision, items });
   }
-  return { op };
+  return at({ op });
+}
+
+function decodeAll(bytes) {
+  const frames = [];
+  let at = 0;
+  while (at < bytes.length) {
+    const [frame, used] = decodeAt(bytes.subarray(at));
+    frames.push(frame);
+    at += used;
+  }
+  return frames;
 }
 
 const queue = [];
@@ -185,7 +200,9 @@ async function main() {
     ws.onopen = resolve;
     ws.onerror = () => reject(new Error('websocket failed to open'));
   });
-  ws.onmessage = (ev) => push(decode(new Uint8Array(ev.data)));
+  ws.onmessage = (ev) => {
+    for (const frame of decodeAll(new Uint8Array(ev.data))) push(frame);
+  };
   await opened;
 
   let seq = 1;

@@ -64,8 +64,12 @@ class Writer {
 }
 
 class Reader {
+  // `buf` is a whole message that may hold several frames, so it arrives as a
+  // view onto the message rather than a copy of it.
   constructor(buf) {
-    this.v = new DataView(buf);
+    this.v = buf instanceof ArrayBuffer
+      ? new DataView(buf)
+      : new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
     this.p = 0;
   }
   u8() { const x = this.v.getUint8(this.p); this.p += 1; return x; }
@@ -145,14 +149,28 @@ function selected() {
 
 /* ── incoming frames ─────────────────────────────────────────────── */
 
-function onBinary(buf) {
-  const r = new Reader(buf);
+// A message may carry several frames. The server packs what it wrote in the
+// same instant into one write, so one event can be an ack plus the diff or the
+// list that ack made true. Each frame is self-delimiting, so walk the message.
+function onBinary(data) {
+  const bytes = data instanceof ArrayBuffer
+    ? new Uint8Array(data)
+    : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  let at = 0;
+  while (at < bytes.length) {
+    const used = onFrame(new Reader(bytes.subarray(at)));
+    if (used <= 0) return;
+    at += used;
+  }
+}
+
+function onFrame(r) {
   switch (r.u8()) {
     case FRAME.ACK: {
       r.u64();
       state.revision = r.u64();
       $('#rev').textContent = `rev ${state.revision}`;
-      return;
+      return r.p;
     }
     case FRAME.DIFF: {
       const revision = r.u64();
@@ -169,7 +187,7 @@ function onBinary(buf) {
       $('#rev').textContent = `rev ${state.revision}`;
       renderDiffs();
       drawRope();
-      return;
+      return r.p;
     }
     case FRAME.RAISE: {
       const w = {
@@ -184,14 +202,14 @@ function onBinary(buf) {
       };
       state.warnings.set(w.id, w);
       renderWarnings();
-      return;
+      return r.p;
     }
     case FRAME.CLEAR: {
       const id = r.u32();
       r.u64();
       state.warnings.delete(id);
       renderWarnings();
-      return;
+      return r.p;
     }
     case FRAME.SNAPSHOT: {
       const revision = r.u64();
@@ -208,7 +226,7 @@ function onBinary(buf) {
       drawRope();
       renderDiffs();
       renderWarnings();
-      return;
+      return r.p;
     }
     case FRAME.METRICS: {
       state.metrics = {
@@ -216,7 +234,7 @@ function onBinary(buf) {
         reactors: r.u8(), constraints: r.u32(),
       };
       renderMetrics();
-      return;
+      return r.p;
     }
     case FRAME.CONSTRAINTS: {
       r.u64();
@@ -227,8 +245,10 @@ function onBinary(buf) {
       }
       state.constraints = items;
       renderConstraints();
-      return;
+      return r.p;
     }
+    default:
+      return 0;
   }
 }
 

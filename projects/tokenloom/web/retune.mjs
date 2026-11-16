@@ -150,10 +150,39 @@ const result = await evaluate(`(async (rounds) => {
   // events themselves. A polling loop here would measure its own interval, and
   // would say a 1 ms path took as long as the timer it was watching with.
   const arrivals = [];
+  // A message can hold several frames: the server packs what it wrote in one
+  // instant, so the ack and the list it caused share an arrival. Walk the
+  // message and stamp every frame it holds, or the list would read as missing.
+  const ops = (bytes) => {
+    const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const seen = [];
+    let at = 0;
+    while (at < bytes.length) {
+      const op = v.getUint8(at);
+      at += 1;
+      if (op === 0x80) at += 16;
+      else if (op === 0x81) {
+        at += 8 + 4 + 2;
+        const count = v.getUint16(at, true); at += 2;
+        for (let i = 0; i < count; i++) { const len = v.getUint16(at, true); at += 2 + 1 + len; }
+      } else if (op === 0x84) {
+        at += 9;
+        const count = v.getUint32(at, true); at += 4;
+        for (let i = 0; i < count; i++) { const len = v.getUint16(at, true); at += 2 + 1 + len; }
+      } else if (op === 0x85) at += 29;
+      else if (op === 0x86) { at += 8; const n = v.getUint32(at, true); at += 4 + n * 19; }
+      else if (op === 0x82) { at += 21; const len = v.getUint16(at, true); at += 2 + len; }
+      else if (op === 0x83) at += 12;
+      else break;
+      seen.push(op);
+    }
+    return seen;
+  };
   const prevMessage = state.ws.onmessage;
   state.ws.onmessage = (ev) => {
     if (ev.data instanceof ArrayBuffer) {
-      arrivals.push({ t: performance.now(), op: new DataView(ev.data).getUint8(0) });
+      const t = performance.now();
+      for (const op of ops(new Uint8Array(ev.data))) arrivals.push({ t, op });
     }
     prevMessage(ev);
   };

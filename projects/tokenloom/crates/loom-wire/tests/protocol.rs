@@ -1,7 +1,10 @@
 //! Every frame type encodes and decodes losslessly, fuzzed.
 
 use loom_core::{NewToken, Op};
-use loom_wire::{decode_op, decode_server, encode, encode_op_frame, ConstraintView, ServerFrame};
+use loom_wire::{
+    decode_op, decode_server, decode_server_at, encode, encode_op_frame, ConstraintView,
+    ServerFrame,
+};
 use proptest::prelude::*;
 
 fn text() -> impl Strategy<Value = Vec<u8>> {
@@ -122,6 +125,85 @@ fn server_frame() -> impl Strategy<Value = ServerFrame> {
         (any::<u64>(), prop::collection::vec(constraint_view(), 0..5))
             .prop_map(|(revision, items)| ServerFrame::Constraints { revision, items }),
     ]
+}
+
+/// A message may carry several frames. The server packs what it wrote in the
+/// same instant into one write, so a client finds the next frame from the
+/// length of the one before it — and the lengths have to cover the message
+/// exactly, or a packed write would hand the client a half-read frame.
+#[test]
+fn concatenated_frames_walk_from_their_own_lengths() {
+    let frames = vec![
+        ServerFrame::Ack {
+            seq: 7,
+            revision: 3,
+        },
+        ServerFrame::Diff {
+            revision: 3,
+            start: 1,
+            deleted: 0,
+            inserted: vec![NewToken {
+                flags: 1,
+                tag: 0,
+                text: b"z".to_vec(),
+            }],
+        },
+        ServerFrame::WarningRaise {
+            id: 2,
+            kind: 1,
+            reactor: 3,
+            severity: 2,
+            start: 0,
+            len: 1,
+            revision: 3,
+            message: "max tokens".to_string(),
+        },
+        ServerFrame::Constraints {
+            revision: 3,
+            items: vec![ConstraintView {
+                id: 0,
+                anchor: 0,
+                token: 1,
+                len: 2,
+                kind: 1,
+                param: 4,
+            }],
+        },
+        ServerFrame::Metrics {
+            p50_us: 120,
+            p99_us: 900,
+            retok_per_edit: 15,
+            ripple_truncations: 0,
+            starved: 0,
+            window: 4,
+            reactors: 0xff,
+            constraints: 1,
+        },
+        ServerFrame::Snapshot {
+            revision: 3,
+            reactors: 0x3f,
+            tokens: vec![NewToken {
+                flags: 1,
+                tag: 0,
+                text: b"alpha".to_vec(),
+            }],
+        },
+        ServerFrame::WarningClear { id: 2, revision: 3 },
+    ];
+    let mut message = Vec::new();
+    for frame in &frames {
+        message.extend_from_slice(&encode(frame).expect("an encodable frame"));
+    }
+
+    let mut at = 0;
+    let mut back = Vec::new();
+    while at < message.len() {
+        let (frame, used) = decode_server_at(&message[at..]).expect("a frame at this offset");
+        back.push(frame);
+        at += used;
+    }
+    assert_eq!(at, message.len(), "the frames cover the message exactly");
+    assert_eq!(back, frames, "and every frame came back as it was written");
 }
 
 proptest! {

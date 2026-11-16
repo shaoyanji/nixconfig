@@ -319,6 +319,12 @@ impl<'a> Reader<'a> {
         Reader { buf, pos: 0 }
     }
 
+    /// Bytes consumed so far. A socket message may carry several frames back to
+    /// back, so the client needs to know where one ended.
+    pub fn pos(&self) -> usize {
+        self.pos
+    }
+
     fn take(&mut self, n: usize) -> Result<&'a [u8], WireError> {
         let end = self.pos.checked_add(n).ok_or(WireError::Short)?;
         if end > self.buf.len() {
@@ -418,8 +424,22 @@ pub fn encode_op_frame(op: &Op) -> Result<Vec<u8>, WireError> {
     Ok(out)
 }
 
-pub fn decode_server(buf: &[u8]) -> Result<ServerFrame, WireError> {
+/// Decode the frame at the head of `buf`, with the bytes it used.
+///
+/// Frames are self-delimiting: every field is fixed width or length-prefixed,
+/// so a message carrying several of them can be walked without a container.
+/// That is what lets the server put an ack and the list it caused in one write.
+pub fn decode_server_at(buf: &[u8]) -> Result<(ServerFrame, usize), WireError> {
     let mut r = Reader::new(buf);
+    let frame = decode_server_frame(&mut r)?;
+    Ok((frame, r.pos()))
+}
+
+pub fn decode_server(buf: &[u8]) -> Result<ServerFrame, WireError> {
+    Ok(decode_server_at(buf)?.0)
+}
+
+fn decode_server_frame(r: &mut Reader<'_>) -> Result<ServerFrame, WireError> {
     let opcode = r.u8()?;
     Ok(match opcode {
         OP_ACK => ServerFrame::Ack { seq: r.u64()?, revision: r.u64()? },

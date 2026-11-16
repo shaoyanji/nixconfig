@@ -10,7 +10,12 @@ use axum::routing::get;
 use axum::Router;
 use loom_wire::{decode_op, encode_into, ServerFrame};
 use std::sync::Arc;
+use tokio::sync::broadcast;
 use tokio::sync::broadcast::error::RecvError;
+
+/// Ceiling on a packed message. A frame burst is a few hundred bytes; a client
+/// this far behind is owed a snapshot on the next lag, not a megabyte of diffs.
+const PACK_LIMIT: usize = 64 * 1024;
 
 pub const INDEX_HTML: &str = include_str!("../../../web/index.html");
 pub const LOOM_JS: &str = include_str!("../../../web/loom.js");
@@ -60,6 +65,26 @@ fn snapshot_frame(state: &AppState) -> Vec<u8> {
     buf
 }
 
+/// Add every frame already queued for this client to `buf`.
+///
+/// The ack and the list a retune causes are two frames written microseconds
+/// apart. As two messages they cost two writes and two wake-ups, and the second
+/// arrives a round trip of scheduling later; packed, the client handles them in
+/// one event. Frames are self-delimiting, so the client walks the buffer.
+fn pack_queued(rx: &mut broadcast::Receiver<Arc<Vec<u8>>>, buf: &mut Vec<u8>) -> usize {
+    let mut packed = 0;
+    while buf.len() < PACK_LIMIT {
+        match rx.try_recv() {
+            Ok(more) => {
+                buf.extend_from_slice(&more);
+                packed += 1;
+            }
+            Err(_) => break,
+        }
+    }
+    packed
+}
+
 async fn client(mut socket: WebSocket, state: Arc<AppState>) {
     // Send the snapshot and subscribe inside one session lock: a batch applied
     // between those two steps would be a diff the client never receives.
@@ -95,7 +120,10 @@ async fn client(mut socket: WebSocket, state: Arc<AppState>) {
             ev = rx.recv() => {
                 match ev {
                     Ok(bytes) => {
-                        if socket.send(Message::Binary(bytes.as_ref().clone())).await.is_err() {
+                        let mut message = Vec::with_capacity(bytes.len() + 64);
+                        message.extend_from_slice(&bytes);
+                        pack_queued(&mut rx, &mut message);
+                        if socket.send(Message::Binary(message)).await.is_err() {
                             break;
                         }
                     }

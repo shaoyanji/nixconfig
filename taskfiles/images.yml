@@ -41,19 +41,30 @@ tasks:
     desc: A requested round of photoreal character plates from the standing roster
     summary: >
       The go-to spend for "more wallpapers": `lib/image-daily/plates.txt` lists
-      `<slug>|<prompt>|<expect>` character plates in the palette-test family,
-      judged against `.intents.photoreal` rather than the wall lane's illustrated
-      intent, so a portrait is what the judge holds the name to. A row the ledger
-      already kept is skipped, so a resumed round costs nothing.
-
-      Nobody has to start or watch a round: the four `image-daily-slot-*` timers
-      run this after the lane queue with whatever the slot has left, so a roster
-      row is spent by the schedule. A round publishes once and posts one xs turn
-      of its own counts, which `services.xs-notify` toasts on the desktop — the
-      roster edit is the request, the toast is the report. Env: `ONLY=`, `MAX_GEN=`,
-      `FORCE=1`, `DRY=1`, `PUBLISH=0`, `XS_SUMMARY=0`.
+      `<slug>|<prompt>|<expect>` rows, judged against `.intents.photoreal`. A kept
+      row is skipped, so a resumed round costs nothing, and the four
+      `image-daily-slot-*` timers spend the roster after the lane queue, so nobody
+      starts or watches one. Env: `ONLY=`, `MAX_GEN=`, `FORCE=1`, `DRY=1`,
+      `PUBLISH=0`, `XS_SUMMARY=0`.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" bash scripts/task/image-daily.sh plates
+
+  images:round:
+    desc: "[menu] Round picker (gum) — take the next rows, pick characters, add a custom one"
+    summary: >
+      The roster's front door: it reads the allowance and the rows the judge has
+      not kept, then spends them through the same `image-daily.sh plates` the
+      nightly slots run. Nothing to remember — no roster path, no ledger, no
+      publish step — and the round publishes once and posts its own xs turn when
+      it ends.
+
+      Three ways in: the next N rows in roster order, a hand-picked set (space to
+      select), or a custom character, whose row is appended to
+      `lib/image-daily/plates.txt` and left for you to commit. `ONLY=a,b` with no
+      menu is the scripted form.
+    interactive: true
+    cmds:
+      - ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" bash scripts/task/image-round.sh
 
   images:status:
     desc: "[gate] per-lane freshness from the ledger — exit 1 when a lane is stale"
@@ -91,15 +102,12 @@ tasks:
       Copies every accepted `site`, `wall` and `blog` plate out of the ledger into
       `{{.IMAGES_ROOT}}/published/`, uploads each to Cloudinary and writes
       `published/urls.tsv`, the manifest of path to delivery URL, and rebuilds
-      `manifest.json` for the search frontend that Pages serves. Every row carries its
-      lane, day and tags derived from the public id, so the frontend filters as well
-      as searches. The resize is in the URL, so one upload serves the card, the
-      thumbnail and the retina hero, and      the deploy carries no images at all.
+      `manifest.json` for the search frontend that Pages serves. The resize is in
+      the URL, so one upload serves the card, the thumbnail and the retina hero.
 
-      A path the manifest already carries is not uploaded again — its public id is
-      derived from the path and a kept plate is never re-rendered — so a round's
-      publish moves only its new plates, and `REUPLOAD=1` forces every staged file
-      back over the wire after a forced re-render.
+      A path the manifest already carries is not uploaded again, so a round moves
+      only its new plates; `REUPLOAD=1` forces every staged file back over the wire
+      after a forced re-render.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} REUPLOAD="{{if .REUPLOAD}}{{.REUPLOAD}}{{end}}" bash scripts/task/image-daily.sh publish
 

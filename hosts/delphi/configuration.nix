@@ -729,6 +729,16 @@ in {
     "::1"
   ];
 
+  # The vault runs on this host, but no client that matters can reach it under
+  # its own port: `domain` advertises https, and bitwarden-cli 2026.9.1 refuses
+  # a plain-http base URL outright (InsecureUrlNotAllowedError at /api/config),
+  # while the TLS cert is the `*.frieren.lan` wildcard that only frieren's nginx
+  # presents. crab-hole answers for the LAN, not for `*.frieren.lan`, and
+  # MagicDNS is not consulted here (nameservers above), so the name needs a
+  # static answer: frieren's Tailscale address, the same one the alert bridge
+  # above uses. The record has to exist before `bw login` can prelogin.
+  networking.hosts."100.97.61.65" = ["vault.frieren.lan"];
+
   # --- The gokrazy appliance's build artifacts ---------------------------------
   # .github/workflows/gok.yml sends them here over Taildrop and
   # `task infra:gok:deploy` pushes from here; hosts/delphi/gok-artifacts.nix

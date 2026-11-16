@@ -120,6 +120,19 @@ impl ConstraintIndex {
         id
     }
 
+    /// Drop the span with `id`. Ids are not renumbered: a warning that names
+    /// one, or a page still holding the list it was sent, would otherwise point
+    /// at a span it never described.
+    pub fn remove(&mut self, id: u32) -> bool {
+        let before = self.items.len();
+        self.items.retain(|c| c.id != id);
+        if self.items.len() == before {
+            return false;
+        }
+        self.reindex();
+        true
+    }
+
     /// Text at `at` changed: `old_bytes` removed and `new_bytes` inserted.
     ///
     /// Every anchor after the edit follows it. An anchor inside the replaced

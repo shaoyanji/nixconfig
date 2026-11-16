@@ -276,6 +276,13 @@ pub fn replay(
                 Op::ConstraintAdd { start, len, kind, param, .. } => {
                     plant_constraint(&rope, &mut constraints, *start, *len, *kind, *param);
                 }
+                // A span taken back out has to stay out after a restart, or the
+                // sidebar comes back listing something the session no longer
+                // holds — and the reactor that had stopped complaining about it
+                // starts complaining again.
+                Op::ConstraintRemove { id, .. } => {
+                    constraints.remove(*id);
+                }
                 // A toggle moves no text but is session state all the same: it
                 // decides which reactors get to speak. Replay it, or a restart
                 // comes back with every reactor on and warnings the operator had

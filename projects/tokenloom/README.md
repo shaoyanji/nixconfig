@@ -37,7 +37,7 @@ disables persistence), `LOOM_COALESCE_MS` (default 8).
 | diff frame encode | no allocation | 6.0–7.4 µs/frame, reused buffer, 4096 → 4096 bytes |
 | 6 reactors at 1000 batches/s, document growing | no queue depth, no drift | 1000 batches, 4000 shard events over 4 shards, 2000 reactions, **0 starved**, **0 span-creep** |
 
-Acceptance tests (`cargo test --all --locked`, 17 tests):
+Acceptance tests (`cargo test --all --locked`, 19 tests):
 
 - `incremental_eq_rebuild` — proptest, random documents and op sequences; the
   incremental token array equals a full rebuild byte for byte.
@@ -48,6 +48,13 @@ Acceptance tests (`cargo test --all --locked`, 17 tests):
 - `constraints_survive_a_restart` — a span planted before the snapshot and one
   planted after it both come back on the right bytes, having moved with an
   insert that landed ahead of them.
+- `constraint_removal_survives_a_restart` — a span taken out after the snapshot
+  stays out across a restart while the document keeps every byte, and the ids of
+  the spans that remain do not move.
+- `a_plant_with_no_edit_reaches_the_sidebar` — a plant sent through the
+  coalescer arrives as a `CONSTRAINTS` frame with no diff beside it and no change
+  to the rope; the same list is what a connecting page is handed, and a removal
+  empties it on both paths.
 - `legacy_snapshot_still_loads` — a snapshot written before constraints were
   stored still opens, with an empty index rather than a refusal; so does the
   shape before the reactor bank was written down, with every reactor on.
@@ -78,10 +85,11 @@ DevTools protocol: click and shift-click selection, an insert arriving in the
 rope view, a planted constraint raising a severity-3 warning, a warning click
 selecting its span, the reactor switch clearing its warning and surviving a page
 reload, the header pill reporting the reactor bank and the constraint count with
-no edit to carry the frame, the constraint sidebar listing the planted span and
-selecting it when clicked, split/merge/delete, and a scrolled window that stays
-virtualization-sized — with no page exception during the run, and a screenshot
-when asked for one.
+no edit to carry the frame, the constraint sidebar listing the planted span,
+selecting it when clicked and marking its chips in the rope, taking it back out
+and watching the count follow, the reactor switch surviving a page reload,
+split/merge/delete, and a scrolled window that stays virtualization-sized — with
+no page exception during the run, and a screenshot when asked for one.
 
 ## How it works
 
@@ -133,11 +141,19 @@ waiting on it has nothing to nudge.
 **Constraints.** A span is planted by token index, converted once to a byte
 anchor, and shifted on every edit that lands before it, so it keeps pointing at
 the text it was planted on. The session's index rides a `CONSTRAINTS` frame — on
-connect, after a batch that planted one, and after a resync — and the sidebar
-lists each span with its rule, its token count and its byte anchor. Clicking one
-maps that anchor back to a token by walking the rope's own texts, so the
-selection lands on what the span covers now, not on what it covered at plant
-time.
+connect, after a batch that planted or removed one, and after a resync — and the
+sidebar lists each span with its rule, its token count and its byte anchor. A
+plant moves no text, so the list cannot ride a diff: it is its own frame, which
+is why a plant that raised no warning is still something the page can show.
+Clicking an entry marks the chips the span covers now and selects them, and the
+mark stays on while the rope is edited — a span that has outgrown its rule is
+then visible as text rather than only as a count. The anchor resolves through a
+byte-offset index the page keeps per token, so it is a binary search on each
+redraw rather than a walk of ten thousand token texts. The `×` on an entry sends
+a `CONSTRAINT_REMOVE` op naming the id the server handed out; ids are never
+renumbered, or a warning that names one would point at a span it never described.
+A removal moves no text either, and it bumps the revision so its log record outlives
+the snapshot it follows.
 
 **Warnings.** Identity is `(kind, reactor, span bucket)`, so a violation that
 moves by a few tokens keeps its id. A re-raise inside 250 ms bumps `flap_count`

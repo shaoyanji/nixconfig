@@ -11,6 +11,8 @@ pub enum Op {
     Split { seq: u64, offset: u32, byte_off: u16 },
     Annotate { seq: u64, offset: u32, count: u16, tag: u16, bytes: Vec<u8> },
     ConstraintAdd { seq: u64, start: u32, len: u16, kind: u8, param: u32 },
+    /// Take a span back out of the index, by the id the server handed out.
+    ConstraintRemove { seq: u64, id: u32 },
     ReactorToggle { seq: u64, reactor: u8, enabled: bool },
     Resync { seq: u64 },
 }
@@ -24,6 +26,7 @@ impl Op {
             | Op::Split { seq, .. }
             | Op::Annotate { seq, .. }
             | Op::ConstraintAdd { seq, .. }
+            | Op::ConstraintRemove { seq, .. }
             | Op::ReactorToggle { seq, .. }
             | Op::Resync { seq } => *seq,
         }

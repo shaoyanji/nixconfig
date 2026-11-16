@@ -248,6 +248,20 @@ const consSel = await evaluate("document.querySelector('#sel').textContent");
 if (!/tokens \d+\.\.\d+ \(\d+\)/.test(consSel)) fail(`clicking a constraint should select its span, showed '${consSel}'`);
 step(`constraint click selects its span: ${consSel}`);
 
+// The span stays marked after the click, so the rule being watched and the
+// chips it covers are on screen together.
+const marked = await evaluate(`(() => {
+  const chips = [...document.querySelectorAll('.chip.cons')];
+  return {
+    n: chips.length,
+    first: chips.length ? Number(chips[0].dataset.i) : -1,
+    on: !!document.querySelector('#constraints li.on'),
+  };
+})()`);
+if (marked.n < 2) fail(`the clicked constraint's span should be marked in the rope, ${marked.n} chips carry .cons`);
+if (!marked.on) fail('the clicked constraint should stay marked in the panel');
+step(`constraint span marked in the rope: ${marked.n} chips from #${marked.first}`);
+
 await evaluate("document.querySelectorAll('#reactors input')[4].click()");
 
 // The server keeps the reactor bank and the snapshot frame hands it back, so a
@@ -280,6 +294,20 @@ await waitFor(
   "document.querySelectorAll('#reactors input')[4].checked === true",
   4000,
 );
+
+// The panel can take a span back out again, and the removal reaches the pill on
+// the same clock a plant does — no edit of ours to carry it.
+await evaluate("document.querySelector('#constraints li .rm').click()");
+const removedPill = await waitFor(
+  'the constraint panel to empty and the pill to count zero',
+  `(() => {
+     const empty = document.querySelector('#constraints li')?.classList.contains('empty');
+     const t = document.querySelector('#metrics').textContent;
+     return empty && t.includes('cons 0') ? t : '';
+   })()`,
+  4000,
+);
+step(`constraint removed: panel empty, ${removedPill}`);
 
 // Split, merge and delete through the buttons. Split needs a token wider than
 // one byte, so pick one instead of assuming chip 2.

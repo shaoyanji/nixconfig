@@ -38,6 +38,8 @@ fn op() -> impl Strategy<Value = Op> {
         (any::<u64>(), any::<u32>(), any::<u16>(), any::<u8>(), any::<u32>()).prop_map(
             |(seq, start, len, kind, param)| Op::ConstraintAdd { seq, start, len, kind, param }
         ),
+        (any::<u64>(), any::<u32>())
+            .prop_map(|(seq, id)| Op::ConstraintRemove { seq, id }),
         (any::<u64>(), any::<u8>(), any::<bool>())
             .prop_map(|(seq, reactor, enabled)| Op::ReactorToggle { seq, reactor, enabled }),
         any::<u64>().prop_map(|seq| Op::Resync { seq }),

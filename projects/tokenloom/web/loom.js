@@ -1,6 +1,6 @@
 'use strict';
 
-const WIRE = { INSERT: 1, DELETE: 2, MERGE: 3, SPLIT: 4, ANNOTATE: 5, CONSTRAINT: 6, TOGGLE: 7, RESYNC: 8 };
+const WIRE = { INSERT: 1, DELETE: 2, MERGE: 3, SPLIT: 4, ANNOTATE: 5, CONSTRAINT: 6, TOGGLE: 7, RESYNC: 8, CONSTRAINT_REMOVE: 9 };
 const FRAME = {
   ACK: 0x80, DIFF: 0x81, RAISE: 0x82, CLEAR: 0x83, SNAPSHOT: 0x84, METRICS: 0x85, CONSTRAINTS: 0x86,
 };
@@ -24,6 +24,8 @@ const state = {
   warnings: new Map(),
   diffs: [],
   constraints: [],
+  consSel: null,
+  offsets: new Uint32Array(0),
   metrics: null,
   sel: { a: 0, b: 0 },
   ws: null,
@@ -34,6 +36,7 @@ const scroller = $('#scroller');
 const spacer = $('#spacer');
 const layer = $('#layer');
 const decoder = new TextDecoder('utf-8');
+const encoder = new TextEncoder();
 
 class Writer {
   constructor(cap = 256) {
@@ -115,6 +118,10 @@ function opConstraint(start, len, kind, param) {
   send(new Writer().u8(WIRE.CONSTRAINT).u64(state.seq++).u32(start).u16(len).u8(kind).u32(param).done());
 }
 
+function opConstraintRemove(id) {
+  send(new Writer().u8(WIRE.CONSTRAINT_REMOVE).u64(state.seq++).u32(id).done());
+}
+
 function opToggle(id, on) {
   send(new Writer().u8(WIRE.TOGGLE).u64(state.seq++).u8(id).u8(on ? 1 : 0).done());
 }
@@ -149,6 +156,7 @@ function onBinary(buf) {
       const inserted = [];
       for (let i = 0; i < count; i++) inserted.push(r.oneToken());
       state.tokens.splice(start, deleted, ...inserted);
+      reindex();
       state.revision = revision;
       state.diffs.unshift({ revision, start, deleted, inserted });
       if (state.diffs.length > 30) state.diffs.pop();
@@ -186,6 +194,7 @@ function onBinary(buf) {
       const tokens = [];
       for (let i = 0; i < n; i++) tokens.push(r.oneToken());
       state.tokens = tokens;
+      reindex();
       state.revision = revision;
       state.diffs = [];
       state.warnings.clear();
@@ -242,6 +251,7 @@ function drawRope() {
   renderQueued = true;
   requestAnimationFrame(() => {
     renderQueued = false;
+    const hl = state.consSel == null ? null : consSpanOf(state.consSel);
     const total = state.tokens.length;
     const rows = Math.ceil(total / ROW_TOKENS);
     spacer.style.height = `${rows * ROW_H}px`;
@@ -259,7 +269,9 @@ function drawRope() {
       for (let i = from; i < to; i++) {
         const t = state.tokens[i];
         const chip = document.createElement('span');
-        chip.className = `chip ${classOf(t.flags)}${inSel(i) ? ' sel' : ''}`;
+        chip.className = `chip ${classOf(t.flags)}${inSel(i) ? ' sel' : ''}${
+          hl && i >= hl.start && i < hl.end ? ' cons' : ''
+        }`;
         chip.textContent = display(t.text);
         chip.dataset.i = String(i);
         chip.title = `#${i} · ${t.text.length} bytes`;
@@ -334,22 +346,52 @@ function describeConstraint(c) {
   return `kind ${c.kind}`;
 }
 
-// The panel speaks bytes because that is what the index keeps; the rope speaks
-// tokens. Walk the token texts once to find the one that covers the anchor.
-function tokenAtByte(byte) {
-  const enc = new TextEncoder();
+// Where every token starts in bytes, rebuilt whenever the rope changes: the
+// panel resolves a byte anchor on every redraw, and walking ten thousand token
+// texts per frame to find one is a cost this view does not have to pay.
+function reindex() {
+  const offs = new Uint32Array(state.tokens.length + 1);
   let at = 0;
   for (let i = 0; i < state.tokens.length; i++) {
-    const len = enc.encode(state.tokens[i].text).length;
-    if (at + len > byte) return i;
-    at += len;
+    offs[i] = at;
+    at += encoder.encode(state.tokens[i].text).length;
   }
-  return 0;
+  offs[state.tokens.length] = at;
+  state.offsets = offs;
+}
+
+// The panel speaks bytes because that is what the index keeps; the rope speaks
+// tokens. The offsets are ascending, so the covering token is a binary search.
+function tokenAtByte(byte) {
+  const offs = state.offsets;
+  if (offs.length < 2) return 0;
+  let lo = 0;
+  let hi = offs.length - 2;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (offs[mid] <= byte) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
+
+// The tokens a constraint covers now. `len` is the span it was planted with, so
+// a span that outgrew its rule still marks what it was planted on.
+function consSpanOf(id) {
+  const c = state.constraints.find((k) => k.id === id);
+  if (!c) return null;
+  const start = tokenAtByte(c.anchor);
+  return { start, end: Math.min(state.tokens.length, start + Math.max(1, c.len)) };
 }
 
 function renderConstraints() {
   const list = $('#constraints');
   $('#consCount').textContent = String(state.constraints.length);
+  // A list frame follows a removal, so the mark has to let go of an id that is
+  // no longer on it.
+  if (state.consSel != null && !state.constraints.some((c) => c.id === state.consSel)) {
+    state.consSel = null;
+  }
   if (!state.constraints.length) {
     list.innerHTML = '<li class="empty">none planted</li>';
     return;
@@ -357,18 +399,33 @@ function renderConstraints() {
   list.replaceChildren(
     ...state.constraints.map((c) => {
       const li = document.createElement('li');
+      if (c.id === state.consSel) li.className = 'on';
       const kind = document.createElement('span');
       kind.className = 'k';
       kind.textContent = `#${c.id} ${CONS_KIND[c.kind] || `kind ${c.kind}`}`;
       const msg = document.createElement('span');
       msg.className = 'msg';
       msg.textContent = `${describeConstraint(c)} · ${c.len}t @ ${c.anchor}b`;
-      li.append(kind, msg);
+      const rm = document.createElement('button');
+      rm.className = 'rm';
+      rm.textContent = '×';
+      rm.title = `remove constraint #${c.id}`;
+      rm.onclick = (e) => {
+        e.stopPropagation();
+        opConstraintRemove(c.id);
+      };
+      li.append(kind, msg, rm);
       li.onclick = () => {
-        const start = tokenAtByte(c.anchor);
-        state.sel = { a: start, b: start + Math.max(0, c.len - 1) };
+        // The span stays marked after the click, so the rule that is being
+        // watched and the chips it covers are visible while the rope is edited.
+        state.consSel = state.consSel === c.id ? null : c.id;
+        const span = consSpanOf(c.id);
+        if (span) {
+          state.sel = { a: span.start, b: Math.max(span.start, span.end - 1) };
+          scroller.scrollTop = Math.floor(span.start / ROW_TOKENS) * ROW_H;
+        }
+        renderConstraints();
         drawRope();
-        scroller.scrollTop = Math.floor(start / ROW_TOKENS) * ROW_H;
       };
       return li;
     }),

@@ -421,3 +421,43 @@ fn constraints_survive_a_restart() {
     assert!(anchor > beta, "the insert ahead of it must have moved the anchor");
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// A span taken back out before the snapshot, and one taken out after it: the
+/// second rides the log, and a restart must not resurrect it from the snapshot.
+#[test]
+fn constraint_removal_survives_a_restart() {
+    let dir = temp_dir("replay-remove");
+    let mut sess = Session::with_doc("alpha beta gamma delta");
+    let (mut persist, _, _) = Persist::open(&dir).unwrap();
+
+    sess.apply_batch(&[Op::ConstraintAdd { seq: 1, start: 0, len: 1, kind: 1, param: 4 }]);
+    sess.apply_batch(&[Op::ConstraintAdd { seq: 2, start: 1, len: 1, kind: 1, param: 4 }]);
+    assert_eq!(sess.constraints.len(), 2);
+    persist.snapshot(&sess).unwrap();
+    let snapshot_id = sess.constraints.iter().next().expect("the first span").id;
+
+    // The one the snapshot carries, removed across the log.
+    let ops = vec![Op::ConstraintRemove { seq: 3, id: snapshot_id }];
+    sess.apply_batch(&ops);
+    assert_eq!(sess.constraints.len(), 1, "the session dropped the span");
+    assert_eq!(sess.rope.revision(), 3, "a removal is a revision the log keeps");
+    persist
+        .append(&loom_srv::persist::BatchRecord {
+            revision: sess.rope.revision(),
+            ops,
+        })
+        .unwrap();
+    let live: Vec<u32> = sess.constraints.iter().map(|c| c.id).collect();
+    drop(persist);
+
+    let (snap, recs) = load(&dir).unwrap();
+    let snap = snap.expect("the pinned snapshot");
+    assert_eq!(snap.constraints.len(), 2, "the snapshot still carried both");
+    assert_eq!(recs.len(), 1, "the removal must outlive the snapshot it follows");
+    let back = restore(&snap, &recs, &loom_tok::bpe_a());
+    let again: Vec<u32> = back.constraints.iter().map(|c| c.id).collect();
+    assert_eq!(again, live, "a restart must not resurrect a removed span");
+    assert!(!again.contains(&snapshot_id));
+    assert_eq!(back.rope.doc(), sess.rope.doc(), "and it must move no text");
+    let _ = fs::remove_dir_all(&dir);
+}

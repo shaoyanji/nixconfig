@@ -189,6 +189,7 @@ impl Session {
         let mut end: i64 = i64::MIN;
         let mut text_changed = false;
         let mut planted = false;
+        let mut removed = false;
         let mut toggled = false;
         let mut resync = false;
         let mut diverged = false;
@@ -209,6 +210,9 @@ impl Session {
                         *kind,
                         *param,
                     );
+                }
+                Op::ConstraintRemove { id, .. } => {
+                    removed |= self.constraints.remove(*id);
                 }
                 Op::ReactorToggle { reactor, enabled, .. } => {
                     let i = (*reactor as usize) % self.reactors.len();
@@ -258,7 +262,7 @@ impl Session {
             // newer than any snapshot the log is trimmed against: otherwise a
             // constraint planted, or a reactor switched off, after the last
             // snapshot would be dropped on the next load.
-            if planted || toggled {
+            if planted || removed || toggled {
                 self.rope.bump_revision();
             }
             return BatchOutcome { seqs, applied: None, resync };

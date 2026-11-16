@@ -16,6 +16,7 @@ pub const OP_ANNOTATE: u8 = 0x05;
 pub const OP_CONSTRAINT_ADD: u8 = 0x06;
 pub const OP_REACTOR_TOGGLE: u8 = 0x07;
 pub const OP_RESYNC: u8 = 0x08;
+pub const OP_CONSTRAINT_REMOVE: u8 = 0x09;
 
 pub const OP_ACK: u8 = 0x80;
 pub const OP_DIFF: u8 = 0x81;
@@ -276,6 +277,11 @@ pub fn encode_op(op: &Op, out: &mut Vec<u8>) -> Result<(), WireError> {
             out.push(*kind);
             out.extend_from_slice(&param.to_le_bytes());
         }
+        Op::ConstraintRemove { seq, id } => {
+            out.push(OP_CONSTRAINT_REMOVE);
+            out.extend_from_slice(&seq.to_le_bytes());
+            out.extend_from_slice(&id.to_le_bytes());
+        }
         Op::ReactorToggle { seq, reactor, enabled } => {
             out.push(OP_REACTOR_TOGGLE);
             out.extend_from_slice(&seq.to_le_bytes());
@@ -376,6 +382,7 @@ pub fn decode_op(buf: &[u8]) -> Result<Op, WireError> {
             kind: r.u8()?,
             param: r.u32()?,
         },
+        OP_CONSTRAINT_REMOVE => Op::ConstraintRemove { seq: r.u64()?, id: r.u32()? },
         OP_REACTOR_TOGGLE => Op::ReactorToggle {
             seq: r.u64()?,
             reactor: r.u8()?,

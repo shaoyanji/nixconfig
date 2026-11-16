@@ -124,6 +124,17 @@
   #constraints li { cursor: pointer; }
   #constraints li:hover { background: #182029; }
   #constraints .k { color: #9fe8c0; }
+  #constraints li.on { background: #1b2634; }
+  #constraints .rm {
+    margin-left: auto;
+    padding: 0 6px;
+    line-height: 1.2;
+    color: var(--dim);
+    background: none;
+    border-color: transparent;
+  }
+  #constraints .rm:hover { color: var(--sev3); border-color: #5b2a2a; }
+  .chip.cons { outline: 1px dashed #9fe8c0; outline-offset: 1px; }
   .sev-1 .kind { color: var(--sev1); }
   .sev-2 .kind { color: var(--sev2); }
   .sev-3 .kind { color: var(--sev3); }

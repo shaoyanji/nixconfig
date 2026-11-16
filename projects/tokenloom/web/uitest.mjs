@@ -295,6 +295,24 @@ await waitFor(
   4000,
 );
 
+// A marked entry is retuned where it sits: same id, new rule, same count. The
+// panel is the proof that the retune reached the server.
+await evaluate("document.querySelector('#constraints li').click()");
+await frame();
+await evaluate("document.querySelector('[data-constraint=delim]').click()");
+const retuned = await waitFor(
+  'the marked entry to report its new rule',
+  `(() => {
+     const li = document.querySelector('#constraints li');
+     const k = li?.querySelector('.k')?.textContent || '';
+     const m = li?.querySelector('.msg')?.textContent || '';
+     return k.startsWith('#0 ') && k.includes('no-crossing') ? { k, m } : null;
+   })()`,
+  4000,
+);
+if (!retuned.m.includes("no token crosses ' '")) fail(`retuned entry has the wrong rule: '${retuned.m}'`);
+step(`constraint retuned in place: ${retuned.k} ${retuned.m}`);
+
 // The panel can take a span back out again, and the removal reaches the pill on
 // the same clock a plant does — no edit of ours to carry it.
 await evaluate("document.querySelector('#constraints li .rm').click()");

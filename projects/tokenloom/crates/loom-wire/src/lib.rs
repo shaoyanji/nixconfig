@@ -17,6 +17,7 @@ pub const OP_CONSTRAINT_ADD: u8 = 0x06;
 pub const OP_REACTOR_TOGGLE: u8 = 0x07;
 pub const OP_RESYNC: u8 = 0x08;
 pub const OP_CONSTRAINT_REMOVE: u8 = 0x09;
+pub const OP_CONSTRAINT_UPDATE: u8 = 0x0a;
 
 pub const OP_ACK: u8 = 0x80;
 pub const OP_DIFF: u8 = 0x81;
@@ -33,6 +34,10 @@ pub const OP_CONSTRAINTS: u8 = 0x86;
 pub struct ConstraintView {
     pub id: u32,
     pub anchor: u32,
+    /// The token the anchor covers when the frame is written. The page keeps no
+    /// byte index of its own, so the server does the mapping once here and the
+    /// page shifts the result with the diffs it already receives.
+    pub token: u32,
     pub len: u16,
     pub kind: u8,
     pub param: u32,
@@ -201,6 +206,7 @@ pub fn encode_into(frame: &ServerFrame, out: &mut Vec<u8>) -> Result<(), WireErr
             for c in items {
                 out.extend_from_slice(&c.id.to_le_bytes());
                 out.extend_from_slice(&c.anchor.to_le_bytes());
+                out.extend_from_slice(&c.token.to_le_bytes());
                 out.extend_from_slice(&c.len.to_le_bytes());
                 out.push(c.kind);
                 out.extend_from_slice(&c.param.to_le_bytes());
@@ -281,6 +287,13 @@ pub fn encode_op(op: &Op, out: &mut Vec<u8>) -> Result<(), WireError> {
             out.push(OP_CONSTRAINT_REMOVE);
             out.extend_from_slice(&seq.to_le_bytes());
             out.extend_from_slice(&id.to_le_bytes());
+        }
+        Op::ConstraintUpdate { seq, id, kind, param } => {
+            out.push(OP_CONSTRAINT_UPDATE);
+            out.extend_from_slice(&seq.to_le_bytes());
+            out.extend_from_slice(&id.to_le_bytes());
+            out.push(*kind);
+            out.extend_from_slice(&param.to_le_bytes());
         }
         Op::ReactorToggle { seq, reactor, enabled } => {
             out.push(OP_REACTOR_TOGGLE);
@@ -383,6 +396,12 @@ pub fn decode_op(buf: &[u8]) -> Result<Op, WireError> {
             param: r.u32()?,
         },
         OP_CONSTRAINT_REMOVE => Op::ConstraintRemove { seq: r.u64()?, id: r.u32()? },
+        OP_CONSTRAINT_UPDATE => Op::ConstraintUpdate {
+            seq: r.u64()?,
+            id: r.u32()?,
+            kind: r.u8()?,
+            param: r.u32()?,
+        },
         OP_REACTOR_TOGGLE => Op::ReactorToggle {
             seq: r.u64()?,
             reactor: r.u8()?,
@@ -453,6 +472,7 @@ pub fn decode_server(buf: &[u8]) -> Result<ServerFrame, WireError> {
                 items.push(ConstraintView {
                     id: r.u32()?,
                     anchor: r.u32()?,
+                    token: r.u32()?,
                     len: r.u16()?,
                     kind: r.u8()?,
                     param: r.u32()?,

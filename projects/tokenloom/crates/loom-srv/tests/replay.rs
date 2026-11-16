@@ -442,22 +442,44 @@ fn constraint_removal_survives_a_restart() {
     assert_eq!(sess.constraints.len(), 1, "the session dropped the span");
     assert_eq!(sess.rope.revision(), 3, "a removal is a revision the log keeps");
     persist
-        .append(&loom_srv::persist::BatchRecord {
-            revision: sess.rope.revision(),
-            ops,
-        })
+        .append(&loom_srv::persist::BatchRecord { revision: 3, ops })
         .unwrap();
-    let live: Vec<u32> = sess.constraints.iter().map(|c| c.id).collect();
+
+    // A retune rides the log too, and it has to come back as the new rule on the
+    // span that kept its id.
+    let survivor = sess.constraints.iter().next().expect("one span left").id;
+    let retune = vec![Op::ConstraintUpdate {
+        seq: 4,
+        id: survivor,
+        kind: 2,
+        param: 32,
+    }];
+    sess.apply_batch(&retune);
+    assert_eq!(sess.rope.revision(), 4, "a retune is a revision the log keeps");
+    persist
+        .append(&loom_srv::persist::BatchRecord { revision: 4, ops: retune })
+        .unwrap();
+    let live: Vec<(u32, u8, u32)> = sess
+        .constraints
+        .iter()
+        .map(|c| (c.id, c.kind as u8, c.param))
+        .collect();
     drop(persist);
 
     let (snap, recs) = load(&dir).unwrap();
     let snap = snap.expect("the pinned snapshot");
     assert_eq!(snap.constraints.len(), 2, "the snapshot still carried both");
-    assert_eq!(recs.len(), 1, "the removal must outlive the snapshot it follows");
+    assert_eq!(recs.len(), 2, "the removal and the retune outlive the snapshot");
     let back = restore(&snap, &recs, &loom_tok::bpe_a());
-    let again: Vec<u32> = back.constraints.iter().map(|c| c.id).collect();
+    let again: Vec<(u32, u8, u32)> = back
+        .constraints
+        .iter()
+        .map(|c| (c.id, c.kind as u8, c.param))
+        .collect();
     assert_eq!(again, live, "a restart must not resurrect a removed span");
-    assert!(!again.contains(&snapshot_id));
+    assert!(!again.iter().any(|(id, _, _)| *id == snapshot_id));
+    assert_eq!(again[0].1, 2, "the restored span carries the rule it was retuned to");
+    assert_eq!(again[0].2, 32);
     assert_eq!(back.rope.doc(), sess.rope.doc(), "and it must move no text");
     let _ = fs::remove_dir_all(&dir);
 }

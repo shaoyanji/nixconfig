@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Token Loom — a token-editing workbench</title>
+<meta name="description" content="Token Loom is a workbench for editing token streams: a byte-anchored constraint index, six reactors over the diff, and a minimal diff stream that does not flicker. Measured p99 latency in the hundreds of microseconds." />
+<meta name="color-scheme" content="dark" />
+<style>
+  :root {
+    --bg: #0d1014;
+    --panel: #131820;
+    --line: #232b36;
+    --ink: #d6dde8;
+    --dim: #8b97a8;
+    --word: #7ad1a0;
+    --punct: #e0b872;
+    --accent: #9fe8c0;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.62 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid #2c6b4c; }
+  a:hover { border-bottom-color: var(--accent); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 22px; }
+  header { border-bottom: 1px solid var(--line); background: var(--panel); }
+  header .wrap { display: flex; gap: 14px; align-items: baseline; padding: 14px 22px; flex-wrap: wrap; }
+  .brand { font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+  header nav { margin-left: auto; display: flex; gap: 16px; font-size: 13px; }
+  header nav a { border-bottom: none; color: var(--dim); }
+  header nav a:hover { color: var(--ink); }
+  main { padding: 52px 0 40px; }
+  h1 { font-size: 30px; line-height: 1.24; margin: 0 0 14px; letter-spacing: -0.01em; }
+  h1 .sub { display: block; color: var(--dim); font-size: 16px; margin-top: 10px; font-weight: 400; letter-spacing: 0; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.13em; color: var(--dim); margin: 46px 0 14px; font-weight: 600; }
+  p { margin: 0 0 14px; }
+  .lede { font-size: 17px; color: #c3ccd9; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 0; }
+  .chip { border-radius: 4px; padding: 2px 7px; font-size: 13px; }
+  .chip.w { color: var(--word); background: #14301f; }
+  .chip.p { color: var(--punct); background: #2c2312; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; background: var(--panel); }
+  .card h3 { margin: 0 0 6px; font-size: 14px; color: var(--accent); letter-spacing: 0.04em; }
+  .card p { margin: 0; color: var(--dim); font-size: 13.5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--dim); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+  td.n { color: var(--accent); white-space: nowrap; }
+  pre { background: #0b0e12; border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 13px; margin: 0 0 14px; }
+  pre .c { color: var(--dim); }
+  code { font: inherit; }
+  ul { margin: 0 0 14px; padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; }
+  footer .wrap { padding: 18px 22px 30px; display: flex; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <span class="brand">token loom</span>
+    <nav>
+      <a href="#why">why</a>
+      <a href="#how">how</a>
+      <a href="#numbers">numbers</a>
+      <a href="#run">run it</a>
+      <a href="https://github.com/shaoyanji/tokenloom">source</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>
+    A workbench for editing token streams.
+    <span class="sub">Byte-anchored constraints, six reactors over the diff, and a wire that sends
+    the tokens an edit changed — never the whole document.</span>
+  </h1>
+
+  <p class="lede">
+    Token Loom is a client and a server that edit text as tokens. A page sends
+    token-level operations over a binary WebSocket; the server keeps the stream in a chunked
+    piece table, re-tokenizes only the window an edit disturbed, runs six reactors over what
+    changed, and streams back a minimal token diff plus warnings whose lifecycle does not flicker.
+  </p>
+  <div class="chips">
+    <span class="chip w">tokens</span>
+    <span class="chip p">·</span>
+    <span class="chip w">byte anchors</span>
+    <span class="chip p">·</span>
+    <span class="chip w">firehose</span>
+  </div>
+
+  <h2 id="why">Why it exists</h2>
+  <p>
+    Every editing surface that shows tokens as chips eventually lies about them. Three failures
+    show up over and over, and all three come from re-tokenizing the document on every keystroke:
+  </p>
+  <ul>
+    <li><strong>The page disagrees with the server.</strong> A merge inside a word ripples past the
+      visible window, so a full re-tokenization moves tokens the client thought were stable.</li>
+    <li><strong>A constraint drifts off its text.</strong> "Token 40" means a different piece of text
+      the moment anything before it is inserted, so a rule planted on a span starts describing a
+      neighbour.</li>
+    <li><strong>Warnings flicker.</strong> A rule broken, restored and broken inside a second
+      produces three identities for one condition, and a feed nobody can read.</li>
+  </ul>
+  <p>
+    Token Loom is the smallest thing that avoids all three and stays fast enough to type into:
+    bounded ripple instead of full re-tokenization, byte anchors instead of token indices, one
+    stable identity per warning, and a diff small enough to send on every edit.
+  </p>
+
+  <h2 id="how">How it works</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Rope</h3>
+      <p>A chunked piece table of token runs, at most 256 tokens each. An edit splits the chunks it
+      straddles, applies the change in one working buffer, and re-splits. Text and offsets have no
+      second copy to drift.</p>
+    </div>
+    <div class="card">
+      <h3>Bounded ripple</h3>
+      <p>The dirty range widens at each edge until the tokenizer calls the boundary stable. A word run
+      is the limit, and the window is capped, so one edit never re-tokenizes the document.</p>
+    </div>
+    <div class="card">
+      <h3>Six reactors</h3>
+      <p>BPE-A, BPE-B, WordPiece, a regex lexer, a constraint check and a stability check run over
+      the same diff on sharded workers. No queue between them: a shard that cannot keep up re-lexes
+      on its next idle moment and says so.</p>
+    </div>
+    <div class="card">
+      <h3>Anchored constraints</h3>
+      <p>A span is planted by token, stored as a byte anchor, and shifted by every edit that lands
+      before it. Rules can be retuned in place, keeping the span's identity and its warnings.</p>
+    </div>
+    <div class="card">
+      <h3>Stable warnings</h3>
+      <p>Identity is kind, reactor and span bucket. A re-raise inside 250 ms bumps a flap count and
+      sends nothing; absence starts a quiet clock; the feed settles instead of strobing.</p>
+    </div>
+    <div class="card">
+      <h3>A log, not a guess</h3>
+      <p>Every batch is appended to an edit log and the rope is snapshotted on a revision and idle
+      clock. A restart replays and re-tokenizes, so it can only land where the live path landed.</p>
+    </div>
+  </div>
+
+  <h2 id="numbers">Measured numbers</h2>
+  <p>
+    Release build, thin LTO, one InstaBox box (4 vCPU EPYC, 8 GiB). The bench exits non-zero when a
+    target is missed, so these are gates rather than decoration.
+  </p>
+  <table>
+    <thead>
+      <tr><th>What</th><th>Target</th><th>Measured</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>edit to diff latency, p99</td><td class="n">&lt; 5 ms</td><td>124–182 µs over two runs (p50 45, p90 76, max 340)</td></tr>
+      <tr><td>bytes re-tokenized per edit</td><td class="n">&lt; 2 % median, 10 % p99</td><td>0.07 % median, 0.20 % p99</td></tr>
+      <tr><td>ripple hits past the window</td><td class="n">&lt; 0.1 %</td><td>0 of 1000 edits</td></tr>
+      <tr><td>batches per second, six reactors</td><td class="n">1000/s, no queue</td><td>1000/s, 0 starved shards</td></tr>
+      <tr><td>diff frame encode</td><td class="n">no allocation</td><td>6.0–7.4 µs/frame, reused buffer, 4096 → 4096 bytes</td></tr>
+      <tr><td>page redraw with a span marked</td><td class="n">—</td><td>1.1 ms p50 on a 40 323-token rope, 512 visible chips</td></tr>
+      <tr><td>shifting the span list per diff</td><td class="n">—</td><td>1.8 µs for a full index of 256 spans</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:14px; color:var(--dim); font-size:13.5px;">
+    The page row is there because the first version of it was wrong: the page kept a byte-offset
+    table per token and rebuilt it on every diff, which measured 29.5 ms p50 on that rope. The list
+    frame now carries the token its anchor covers and the page shifts it with the diff, so marking
+    a span costs a comparison per visible chip.
+  </p>
+
+  <h2 id="run">Run it</h2>
+<pre><code><span class="c"># server, page and socket</span>
+cargo run --release -p loom-srv        <span class="c"># http://127.0.0.1:8787/  (ws /ws)</span>
+
+<span class="c"># the numbers above</span>
+cargo run --release -p loom-cli -- bench
+
+<span class="c"># end to end: HTTP, snapshot, diff, warning, clear, resync, unplant</span>
+LOOM_PORT=8787 node web/smoke.mjs
+
+<span class="c"># the page itself, driven in headless chromium over the DevTools protocol</span>
+node web/uitest.mjs --shot loom.png</code></pre>
+  <p>
+    The page shows the rope, the diff lane, the warning feed, the reactor bank and the constraint
+    sidebar. Clicking a constraint marks the chips its anchor covers; the rule buttons retune a
+    marked span in place, and the <code>×</code> takes it back out.
+  </p>
+
+  <h2>What it is not</h2>
+  <ul>
+    <li>No model inference. The reactors are tokenizers and checks, not a network call.</li>
+    <li>No authentication, no accounts, no multi-tenant story.</li>
+    <li>No rich text: one document per server process, one byte stream.</li>
+    <li>No full-document re-tokenization per edit, and no JSON on the hot path.</li>
+  </ul>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>MIT licensed.</span>
+    <span><a href="https://github.com/shaoyanji/tokenloom">github.com/shaoyanji/tokenloom</a></span>
+    <span>Built and measured on clanker.</span>
+  </div>
+</footer>
+</body>
+</html>

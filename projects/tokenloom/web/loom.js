@@ -1,6 +1,9 @@
 'use strict';
 
-const WIRE = { INSERT: 1, DELETE: 2, MERGE: 3, SPLIT: 4, ANNOTATE: 5, CONSTRAINT: 6, TOGGLE: 7, RESYNC: 8, CONSTRAINT_REMOVE: 9 };
+const WIRE = {
+  INSERT: 1, DELETE: 2, MERGE: 3, SPLIT: 4, ANNOTATE: 5, CONSTRAINT: 6, TOGGLE: 7, RESYNC: 8,
+  CONSTRAINT_REMOVE: 9, CONSTRAINT_UPDATE: 10,
+};
 const FRAME = {
   ACK: 0x80, DIFF: 0x81, RAISE: 0x82, CLEAR: 0x83, SNAPSHOT: 0x84, METRICS: 0x85, CONSTRAINTS: 0x86,
 };
@@ -25,7 +28,6 @@ const state = {
   diffs: [],
   constraints: [],
   consSel: null,
-  offsets: new Uint32Array(0),
   metrics: null,
   sel: { a: 0, b: 0 },
   ws: null,
@@ -122,6 +124,10 @@ function opConstraintRemove(id) {
   send(new Writer().u8(WIRE.CONSTRAINT_REMOVE).u64(state.seq++).u32(id).done());
 }
 
+function opConstraintUpdate(id, kind, param) {
+  send(new Writer().u8(WIRE.CONSTRAINT_UPDATE).u64(state.seq++).u32(id).u8(kind).u32(param).done());
+}
+
 function opToggle(id, on) {
   send(new Writer().u8(WIRE.TOGGLE).u64(state.seq++).u8(id).u8(on ? 1 : 0).done());
 }
@@ -156,7 +162,7 @@ function onBinary(buf) {
       const inserted = [];
       for (let i = 0; i < count; i++) inserted.push(r.oneToken());
       state.tokens.splice(start, deleted, ...inserted);
-      reindex();
+      shiftConstraints(start, deleted, inserted.length);
       state.revision = revision;
       state.diffs.unshift({ revision, start, deleted, inserted });
       if (state.diffs.length > 30) state.diffs.pop();
@@ -194,7 +200,6 @@ function onBinary(buf) {
       const tokens = [];
       for (let i = 0; i < n; i++) tokens.push(r.oneToken());
       state.tokens = tokens;
-      reindex();
       state.revision = revision;
       state.diffs = [];
       state.warnings.clear();
@@ -218,7 +223,7 @@ function onBinary(buf) {
       const n = r.u32();
       const items = [];
       for (let i = 0; i < n; i++) {
-        items.push({ id: r.u32(), anchor: r.u32(), len: r.u16(), kind: r.u8(), param: r.u32() });
+        items.push({ id: r.u32(), anchor: r.u32(), token: r.u32(), len: r.u16(), kind: r.u8(), param: r.u32() });
       }
       state.constraints = items;
       renderConstraints();
@@ -346,33 +351,18 @@ function describeConstraint(c) {
   return `kind ${c.kind}`;
 }
 
-// Where every token starts in bytes, rebuilt whenever the rope changes: the
-// panel resolves a byte anchor on every redraw, and walking ten thousand token
-// texts per frame to find one is a cost this view does not have to pay.
-function reindex() {
-  const offs = new Uint32Array(state.tokens.length + 1);
-  let at = 0;
-  for (let i = 0; i < state.tokens.length; i++) {
-    offs[i] = at;
-    at += encoder.encode(state.tokens[i].text).length;
+// The panel speaks bytes because that is what the index keeps, and the server
+// resolves the anchor to a token when it writes the list. A diff moves those
+// tokens with the text: without this the mark would drift until the next list
+// frame, which a plant or a retune sends and an edit does not.
+function shiftConstraints(start, deleted, inserted) {
+  if (!state.constraints.length) return;
+  const delta = inserted - deleted;
+  const after = start + deleted;
+  for (const c of state.constraints) {
+    if (c.token >= after) c.token += delta;
+    else if (c.token > start) c.token = start;
   }
-  offs[state.tokens.length] = at;
-  state.offsets = offs;
-}
-
-// The panel speaks bytes because that is what the index keeps; the rope speaks
-// tokens. The offsets are ascending, so the covering token is a binary search.
-function tokenAtByte(byte) {
-  const offs = state.offsets;
-  if (offs.length < 2) return 0;
-  let lo = 0;
-  let hi = offs.length - 2;
-  while (lo < hi) {
-    const mid = (lo + hi + 1) >> 1;
-    if (offs[mid] <= byte) lo = mid;
-    else hi = mid - 1;
-  }
-  return lo;
 }
 
 // The tokens a constraint covers now. `len` is the span it was planted with, so
@@ -380,7 +370,7 @@ function tokenAtByte(byte) {
 function consSpanOf(id) {
   const c = state.constraints.find((k) => k.id === id);
   if (!c) return null;
-  const start = tokenAtByte(c.anchor);
+  const start = Math.min(c.token, Math.max(0, state.tokens.length - 1));
   return { start, end: Math.min(state.tokens.length, start + Math.max(1, c.len)) };
 }
 
@@ -475,6 +465,14 @@ document.querySelectorAll('[data-act]').forEach((b) => {
 document.querySelectorAll('[data-constraint]').forEach((b) => {
   b.addEventListener('click', () => {
     const r = selected();
+    // A marked entry is retuned where it sits: the anchor and the length stay,
+    // so the span keeps its id and the warning it raised keeps its identity.
+    if (state.consSel != null) {
+      if (b.dataset.constraint === 'max') opConstraintUpdate(state.consSel, 1, 4);
+      if (b.dataset.constraint === 'delim') opConstraintUpdate(state.consSel, 2, 32);
+      if (b.dataset.constraint === 'stable') opConstraintUpdate(state.consSel, 3, 0);
+      return;
+    }
     if (b.dataset.constraint === 'max') opConstraint(r.start, r.count, 1, 4);
     if (b.dataset.constraint === 'delim') opConstraint(r.start, r.count, 2, 32);
     if (b.dataset.constraint === 'stable') opConstraint(r.start, 1, 3, r.start);

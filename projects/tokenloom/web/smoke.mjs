@@ -88,7 +88,7 @@ function decode(bytes) {
     const revision = u64(), n = u32();
     const items = [];
     for (let i = 0; i < n; i++) {
-      items.push({ id: u32(), anchor: u32(), len: u16(), kind: u8(), param: u32() });
+      items.push({ id: u32(), anchor: u32(), token: u32(), len: u16(), kind: u8(), param: u32() });
     }
     return { op, revision, items };
   }
@@ -150,6 +150,10 @@ function insert(seq, offset, words) {
 
 function constraint(seq, start, len, kind, param) {
   return new W().u8(0x06).u64(seq).u32(start).u16(len).u8(kind).u32(param).done();
+}
+
+function remove(seq, id) {
+  return new W().u8(0x09).u64(seq).u32(id).done();
 }
 
 function toggle(seq, reactor, on) {
@@ -233,8 +237,23 @@ async function main() {
   const span = listed.items.find((c) => c.kind === 1 && c.len === 3);
   assert(span, `resync carried no max-tokens span (${JSON.stringify(listed.items)})`);
   console.log(
-    `constraints: ${listed.items.length} listed, #${span.id} kind ${span.kind} len ${span.len} param ${span.param} @ ${span.anchor}b`,
+    `constraints: ${listed.items.length} listed, #${span.id} kind ${span.kind} len ${span.len} param ${span.param} @ ${span.anchor}b token ${span.token}`,
   );
+
+  // Taking a span back out is a list change of its own, and one that moves no
+  // text: the page has to hear about it with no diff to carry it, and a resync
+  // after it has to report the empty list rather than the one it was told to
+  // forget.
+  send(remove(seq++, span.id));
+  const gone = await scan(0x86);
+  assert(gone.items.length === 0, `removal left ${gone.items.length} spans listed`);
+  console.log(`constraints: #${span.id} removed, list now ${gone.items.length}`);
+
+  send(resync(seq++));
+  await scan(0x84);
+  const empty = await scan(0x86);
+  assert(empty.items.length === 0, `resync carried ${empty.items.length} spans after the removal`);
+  console.log(`constraints: resync lists ${empty.items.length} after the removal`);
 
   ws.close();
   console.log('PASS');

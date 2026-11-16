@@ -13,6 +13,9 @@ pub enum Op {
     ConstraintAdd { seq: u64, start: u32, len: u16, kind: u8, param: u32 },
     /// Take a span back out of the index, by the id the server handed out.
     ConstraintRemove { seq: u64, id: u32 },
+    /// Retune a span where it sits: the anchor and the length stay, the rule
+    /// changes, and the id survives so the warning it raised keeps its identity.
+    ConstraintUpdate { seq: u64, id: u32, kind: u8, param: u32 },
     ReactorToggle { seq: u64, reactor: u8, enabled: bool },
     Resync { seq: u64 },
 }
@@ -27,6 +30,7 @@ impl Op {
             | Op::Annotate { seq, .. }
             | Op::ConstraintAdd { seq, .. }
             | Op::ConstraintRemove { seq, .. }
+            | Op::ConstraintUpdate { seq, .. }
             | Op::ReactorToggle { seq, .. }
             | Op::Resync { seq } => *seq,
         }

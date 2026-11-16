@@ -49,12 +49,14 @@ Acceptance tests (`cargo test --all --locked`, 19 tests):
   planted after it both come back on the right bytes, having moved with an
   insert that landed ahead of them.
 - `constraint_removal_survives_a_restart` — a span taken out after the snapshot
-  stays out across a restart while the document keeps every byte, and the ids of
-  the spans that remain do not move.
+  stays out across a restart while the document keeps every byte, a retune after
+  it comes back as the rule it was last given, and the ids of the spans that
+  remain do not move.
 - `a_plant_with_no_edit_reaches_the_sidebar` — a plant sent through the
   coalescer arrives as a `CONSTRAINTS` frame with no diff beside it and no change
-  to the rope; the same list is what a connecting page is handed, and a removal
-  empties it on both paths.
+  to the rope, carrying the token its anchor resolves to; the same list is what a
+  connecting page is handed, a retune keeps the span's id and length while the
+  rule changes, and a removal empties the list on both paths.
 - `legacy_snapshot_still_loads` — a snapshot written before constraints were
   stored still opens, with an empty index rather than a refusal; so does the
   shape before the reactor bank was written down, with every reactor on.
@@ -78,18 +80,25 @@ Acceptance tests (`cargo test --all --locked`, 19 tests):
 
 `node web/smoke.mjs` drives the release binary: HTTP routes, snapshot, insert →
 diff, plant a constraint → `warning raise`, disable the reactor → `warning
-clear`, `RESYNC` → fresh snapshot and the constraint list that has to ride it.
+clear`, `RESYNC` → fresh snapshot and the constraint list that has to ride it,
+then unplant it → the list empties, and a second `RESYNC` reports the empty
+list rather than the span it was told to forget.
 
 `node web/uitest.mjs` drives the page itself in headless chromium over the
 DevTools protocol: click and shift-click selection, an insert arriving in the
 rope view, a planted constraint raising a severity-3 warning, a warning click
-selecting its span, the reactor switch clearing its warning and surviving a page
-reload, the header pill reporting the reactor bank and the constraint count with
-no edit to carry the frame, the constraint sidebar listing the planted span,
-selecting it when clicked and marking its chips in the rope, taking it back out
-and watching the count follow, the reactor switch surviving a page reload,
-split/merge/delete, and a scrolled window that stays virtualization-sized — with
-no page exception during the run, and a screenshot when asked for one.
+selecting its span, the reactor switch clearing its warning, the header pill
+reporting the reactor bank and the constraint count with no edit to carry the
+frame, the constraint sidebar listing the planted span, selecting it when
+clicked and marking its chips in the rope, retuning it in place and taking it
+back out, the reactor switch surviving a page reload, split/merge/delete, and a
+scrolled window that stays virtualization-sized — with no page exception during
+the run, and a screenshot when asked for one.
+
+`node web/redraw.mjs` measures the page rather than asserting it: ten thousand
+tokens inserted in one op, then the body of the rope redraw two hundred times
+unmarked and marked, at the top of the rope and in the middle, plus what a diff
+costs a full constraint index.
 
 ## How it works
 
@@ -145,15 +154,22 @@ connect, after a batch that planted or removed one, and after a resync — and t
 sidebar lists each span with its rule, its token count and its byte anchor. A
 plant moves no text, so the list cannot ride a diff: it is its own frame, which
 is why a plant that raised no warning is still something the page can show.
-Clicking an entry marks the chips the span covers now and selects them, and the
-mark stays on while the rope is edited — a span that has outgrown its rule is
-then visible as text rather than only as a count. The anchor resolves through a
-byte-offset index the page keeps per token, so it is a binary search on each
-redraw rather than a walk of ten thousand token texts. The `×` on an entry sends
+Clicking an entry marks the chips the span covers now and selects them, andthe mark stays on while the rope is edited — a span that has outgrown its rule is
+then visible as text rather than only as a count. The frame carries the token
+each anchor covered when it was written, so the page keeps no byte index of its
+own; a diff shifts that token with the text, which costs 1.8 µs for a full index
+of 256 spans. The first version had the page keep a byte-offset table per token
+and rebuild it on every diff, and measuring it settled the question: 29.5 ms p50
+on a 40 323-token rope, once per edit, so a marked page stalled a frame whenever
+it typed. With the mapping on the server the same marked redraw measures 1.1 ms
+p50 against 1.0 ms unmarked, with 512 chips on screen. The `×` on an entry sends
 a `CONSTRAINT_REMOVE` op naming the id the server handed out; ids are never
 renumbered, or a warning that names one would point at a span it never described.
-A removal moves no text either, and it bumps the revision so its log record outlives
-the snapshot it follows.
+A marked entry is retuned in place by the rule buttons — a `CONSTRAINT_UPDATE`
+that keeps the anchor, the length and the id, so the warning the old rule raised
+keeps its identity instead of reading as a new problem. A removal and a retune
+move no text either, and both bump the revision so their log records outlive the
+snapshot they follow.
 
 **Warnings.** Identity is `(kind, reactor, span bucket)`, so a violation that
 moves by a few tokens keeps its id. A re-raise inside 250 ms bumps `flap_count`
@@ -213,6 +229,12 @@ crates/loom-react  reactor trait, shard pool, warning engine, constraints
 crates/loom-wire   binary protocol (client frames are the ops themselves)
 crates/loom-srv    session, coalescer, persistence, axum server
 crates/loom-cli    bench, fuzz, replay
-web/               index.html, loom.js (vanilla, virtualized rope view), smoke.mjs, uitest.mjs
+index.html         the landing page GitHub Pages serves: what this is, and its numbers
+web/               index.html, loom.js (vanilla, virtualized rope view), smoke.mjs, uitest.mjs, redraw.mjs
 vocabs/            bpe_a.json, bpe_b.json, wordpiece.json, delims.json
+LICENSE            MIT
 ```
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).

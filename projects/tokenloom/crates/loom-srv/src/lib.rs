@@ -217,16 +217,12 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
         broadcast_event(&state.shared, e);
     }
 
-    let (outcome, revision, snap_tokens, view, constraints_changed) = {
+    let (outcome, revision, snap_tokens, view) = {
         let mut s = match state.session.lock() {
             Ok(s) => s,
             Err(_) => return,
         };
-        let before_constraints = s.constraints.len();
         let outcome = s.apply_batch(&batch);
-        // A plant and a removal both change the list, and both are rare enough
-        // to answer with the whole index.
-        let constraints_changed = s.constraints.len() != before_constraints;
         // The session is where a toggle is written down; the pool's copy is a
         // mirror so its sink reads a flag without waiting on this lock.
         for (i, flag) in state.shared.reactors_on.iter().enumerate() {
@@ -254,7 +250,7 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
             .shared
             .starved
             .store(state.pool.starved_total() as u32, Ordering::Relaxed);
-        (outcome, revision, snap, view, constraints_changed)
+        (outcome, revision, snap, view)
     };
 
     if let Ok(mut buf) = state.scratch.lock() {
@@ -294,10 +290,12 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
         }
     }
 
-    // The sidebar's list changes on a plant, a removal and a resync, and all
+    // The sidebar's list changes on a plant, a removal and a retune, and all
     // three are rare: answer with the whole index rather than a delta a client
-    // would have to apply to a list it only half knows.
-    if constraints_changed || outcome.resync {
+    // would have to apply to a list it only half knows. The session reports the
+    // change instead of this function comparing lengths, because a retune moves
+    // the length not at all.
+    if outcome.constraints || outcome.resync {
         broadcast_constraints(state);
     }
 

@@ -18,8 +18,15 @@ fn tokens() -> impl Strategy<Value = Vec<NewToken>> {
 }
 
 fn constraint_view() -> impl Strategy<Value = ConstraintView> {
-    (any::<u32>(), any::<u32>(), any::<u16>(), any::<u8>(), any::<u32>())
-        .prop_map(|(id, anchor, len, kind, param)| ConstraintView { id, anchor, len, kind, param })
+    (any::<u32>(), any::<u32>(), any::<u32>(), any::<u16>(), any::<u8>(), any::<u32>())
+        .prop_map(|(id, anchor, token, len, kind, param)| ConstraintView {
+            id,
+            anchor,
+            token,
+            len,
+            kind,
+            param,
+        })
 }
 
 fn op() -> impl Strategy<Value = Op> {
@@ -40,6 +47,8 @@ fn op() -> impl Strategy<Value = Op> {
         ),
         (any::<u64>(), any::<u32>())
             .prop_map(|(seq, id)| Op::ConstraintRemove { seq, id }),
+        (any::<u64>(), any::<u32>(), any::<u8>(), any::<u32>())
+            .prop_map(|(seq, id, kind, param)| Op::ConstraintUpdate { seq, id, kind, param }),
         (any::<u64>(), any::<u8>(), any::<bool>())
             .prop_map(|(seq, reactor, enabled)| Op::ReactorToggle { seq, reactor, enabled }),
         any::<u64>().prop_map(|seq| Op::Resync { seq }),

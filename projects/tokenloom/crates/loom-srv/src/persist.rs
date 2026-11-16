@@ -283,6 +283,11 @@ pub fn replay(
                 Op::ConstraintRemove { id, .. } => {
                     constraints.remove(*id);
                 }
+                Op::ConstraintUpdate { id, kind, param, .. } => {
+                    if let Some(kind) = ConstraintKind::from_u8(*kind) {
+                        constraints.update(*id, kind, *param);
+                    }
+                }
                 // A toggle moves no text but is session state all the same: it
                 // decides which reactors get to speak. Replay it, or a restart
                 // comes back with every reactor on and warnings the operator had

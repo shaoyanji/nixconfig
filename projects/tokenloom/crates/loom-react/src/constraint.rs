@@ -133,6 +133,29 @@ impl ConstraintIndex {
         true
     }
 
+    /// Retune the span with `id` where it sits: the anchor and the length stay,
+    /// so the id survives and the warning the old rule raised keeps its
+    /// identity. A retune that changes nothing reports `false`.
+    ///
+    /// The blocks are keyed on the anchor and the span length, neither of which
+    /// a retune touches, so nothing is reindexed.
+    pub fn update(&mut self, id: u32, kind: ConstraintKind, param: u32) -> bool {
+        let Some(c) = self.items.iter_mut().find(|c| c.id == id) else {
+            return false;
+        };
+        let param = if matches!(kind, ConstraintKind::BoundaryStableAt) {
+            c.anchor
+        } else {
+            param
+        };
+        if c.kind == kind && c.param == param {
+            return false;
+        }
+        c.kind = kind;
+        c.param = param;
+        true
+    }
+
     /// Text at `at` changed: `old_bytes` removed and `new_bytes` inserted.
     ///
     /// Every anchor after the edit follows it. An anchor inside the replaced

@@ -67,6 +67,7 @@ async fn a_plant_with_no_edit_reaches_the_sidebar() {
     assert_eq!(planted.kind, 1, "max-tokens, as it was planted");
     assert_eq!(planted.len, 2, "the span it was planted on");
     assert_eq!(planted.param, 4, "the rule, not the anchor");
+    assert_eq!(planted.token, 1, "the server resolves the anchor to a token");
     assert!(
         seen.iter().any(|f| f.starts_with("Ack")),
         "the session has to take the op before the page can list it: {seen:?}"
@@ -85,11 +86,30 @@ async fn a_plant_with_no_edit_reaches_the_sidebar() {
         other => panic!("connect sent {other:?}"),
     }
 
+    // A retune keeps the id and the count: the span is the same span and only
+    // the rule on it changed, so the page is told rather than asked to replant.
+    state
+        .ops_tx
+        .send(vec![Op::ConstraintUpdate {
+            seq: 2,
+            id: planted.id,
+            kind: 2,
+            param: 32,
+        }])
+        .expect("the retune reaches the coalescer");
+    let (items, seen) = next_list(&mut rx).await;
+    assert_eq!(items.len(), 1, "a retune moves no count; frames: {seen:?}");
+    assert_eq!(items[0].id, planted.id, "the span keeps its id through a retune");
+    assert_eq!(items[0].kind, 2, "and takes the new rule");
+    assert_eq!(items[0].param, 32);
+    assert_eq!(items[0].anchor, planted.anchor, "the anchor does not move");
+    assert_eq!(items[0].len, planted.len, "and neither does the span length");
+
     // And the panel takes it back out again.
     state
         .ops_tx
         .send(vec![Op::ConstraintRemove {
-            seq: 2,
+            seq: 3,
             id: planted.id,
         }])
         .expect("the removal reaches the coalescer");

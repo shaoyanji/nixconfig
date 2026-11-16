@@ -1096,6 +1096,10 @@ kept_plate() { # brief
     tac | while IFS= read -r p; do
       [ -f "$p" ] && { printf '%s\n' "$p"; break; }
     done
+  # An empty pipeline exits 1, and under `set -e` that killed the whole round the
+  # first time a kept plate's file was not on disk (2026-11-16, five parked plates).
+  # "no kept plate" is an answer, not an error.
+  return 0
 }
 
 # Rows with no kept plate: what a round is still waiting for. kept_plate answers
@@ -1125,6 +1129,12 @@ PLATE_FORM="soft feminine facial features"
 # and a row naming an archetype still cannot skip the clause. An unknown name
 # refuses the row; it never falls back to a bare word.
 PLATE_ARCH_FILE=${PLATE_ARCH_FILE:-$repo/lib/image-daily/archetypes.tsv}
+
+# Two families of row were the ones that kept failing: a villain came back a gaunt
+# mask, a knight came back a bulky torso. Naming the face by archetype is now a
+# requirement in those families rather than advice, so a new villain or armour row
+# cannot re-describe the face that failed. A kept plate never reaches this check.
+PLATE_ARCH_REQUIRED='armour|armored|armoured|pauldron|breastplate|knight|knightess|valkyrie|villain|villainess|witch|sorceress|empress|huntress|assassin|swordswoman|nemesis'
 
 plate_expand() { # prompt -> prompt with every arch:<name> resolved
   local p=$1 name traits
@@ -1173,6 +1183,11 @@ cmd_plates() {
     if [ "${FORCE:-0}" != "1" ]; then
       have=$(kept_plate "photoreal-$slug")
       [ -n "$have" ] && { say "$slug: kept already ($have)"; continue; }
+    fi
+    if ! printf '%s' "$prompt" | grep -qi 'arch:' &&
+      printf '%s' "$prompt" | grep -qiE "$PLATE_ARCH_REQUIRED"; then
+      say "$slug: villain or armour row without an archetype — name one of: $(awk -F'|' '!/^#/ && NF > 1 {printf "%s ", $1}' "$PLATE_ARCH_FILE")"
+      continue
     fi
     prompt=$(plate_expand "$prompt") || continue
     case $prompt in

@@ -26,3 +26,21 @@ graceful-dancer|a dancer's light bearing, long-limbed and slim, a soft round fac
 porcelain-android|a porcelain-doll face with a soft rounded jaw, a small nose and full lips, clear fair skin, a calm dreaming expression, unmistakably a soft human woman's face and not a metal mask, a mannequin or a featureless head, a fine-boned build with narrow shoulders and a small waist, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
 warm-warrior|a warm open grin with softly rounded cheeks and bright alert eyes, a slim strong build with narrow shoulders and no bulk, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
 slim-valkyrie|a slender figure inside light fitted armour that follows the body instead of widening the torso, a soft smiling face above the collar, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+
+# The two families the roster kept getting wrong, one entry per bad read.
+#
+# Villains came back as a gaunt mask — hollow cheeks, an angular jaw, a stare with
+# no warmth (the Luna and Vanessa Enoteca reads) — or as a gothic mannequin (the
+# Lady of DMC read). A villainess is allowed to be cold and powerful; she is not
+# allowed to be unpleasant to look at. The traits below keep the menace in the
+# brows and the smile and the skin soft, so "wicked" comes from the expression
+# instead of from a skull-like face.
+imperious-villainess|a soft full face with rounded cheeks and a small chin, arched brows over heavy-lidded eyes, a slow knowing smile with warmth behind it, a fitted black velvet gown with a high jewelled collar, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+lace-villainess|a tall elegant woman with soft rounded cheeks and full red lips in a confident smirk, long dark hair, warm eyes rather than a dead stare, a black lace gown with a low square neckline and long gloves, a slim graceful figure, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+wicked-witch|a playful sultry witch with a soft round face, bright teasing eyes and a wide mischievous grin, an hourglass figure with a narrow waist, a fitted violet dress under a wide-brimmed hat, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+#
+# Knights came back as a torso widened and flattened by armour — puffed sleeves,
+# a breastplate that erased the waist (the seraph round, Erza's plate). Fitted
+# armour on a slim body reads as a knightess; bulk reads as a man in a barrel.
+slim-knightess|a slim knightess in fitted light plate that follows her waist and hips instead of widening her torso, pauldrons no wider than her own shoulder line, a soft smiling face above a raised visor, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure
+blade-dancer|a sleek swordswoman in a fitted bodice and a soft sash, light on her feet, a confident half-smile and warm eyes, a supple slender figure with no bulk, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure

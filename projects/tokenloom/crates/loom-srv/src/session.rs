@@ -12,6 +12,7 @@ use loom_core::{
 };
 use loom_react::{ConstraintIndex, ConstraintKind};
 use loom_tok::bpe_a;
+use loom_wire::ConstraintView;
 use std::collections::VecDeque;
 use std::ops::Range;
 use std::sync::Arc;
@@ -358,6 +359,21 @@ impl Session {
     /// Tokens the reactors saw in the last batch window.
     pub fn last_window(&self) -> u32 {
         self.last_window
+    }
+
+    /// The constraint index as a page lists it, in plant order. The page holds
+    /// no index of its own, so this is the whole list rather than a delta.
+    pub fn constraint_views(&self) -> Vec<ConstraintView> {
+        self.constraints
+            .iter()
+            .map(|c| ConstraintView {
+                id: c.id,
+                anchor: c.anchor,
+                len: c.len,
+                kind: c.kind as u8,
+                param: c.param,
+            })
+            .collect()
     }
 
     /// Bit per reactor id, bit `i` = reactor `i`: ids are 1-based, so bit 0 is

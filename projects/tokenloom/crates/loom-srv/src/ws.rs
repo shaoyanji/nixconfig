@@ -70,6 +70,13 @@ async fn client(mut socket: WebSocket, state: Arc<AppState>) {
     if socket.send(Message::Binary(initial)).await.is_err() {
         return;
     }
+    // The snapshot carries tokens, not spans: the constraint list comes beside
+    // it, because a page that connects has no index of its own.
+    if let Some(cons) = crate::constraints_frame(&state) {
+        if socket.send(Message::Binary(cons)).await.is_err() {
+            return;
+        }
+    }
 
     loop {
         tokio::select! {
@@ -96,6 +103,15 @@ async fn client(mut socket: WebSocket, state: Arc<AppState>) {
                         // Diffs are useless once one is missed: resynchronize.
                         if socket.send(Message::Binary(snapshot_frame(&state))).await.is_err() {
                             break;
+                        }
+                        match crate::constraints_frame(&state) {
+                            Some(cons) => {
+                                if socket.send(Message::Binary(cons)).await.is_err() {
+                                    break;
+                                }
+                            }
+                            None => {}
+
                         }
                     }
                     Err(RecvError::Closed) => break,

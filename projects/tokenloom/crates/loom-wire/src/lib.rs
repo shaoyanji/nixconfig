@@ -23,6 +23,19 @@ pub const OP_WARNING_RAISE: u8 = 0x82;
 pub const OP_WARNING_CLEAR: u8 = 0x83;
 pub const OP_SNAPSHOT: u8 = 0x84;
 pub const OP_METRICS: u8 = 0x85;
+pub const OP_CONSTRAINTS: u8 = 0x86;
+
+/// A constraint as a client lists it: the byte anchor the index keeps, the span
+/// length in tokens it was planted with, and what it forbids. No token index,
+/// because the anchor is what stays true as text moves.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ConstraintView {
+    pub id: u32,
+    pub anchor: u32,
+    pub len: u16,
+    pub kind: u8,
+    pub param: u32,
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ServerFrame {
@@ -56,7 +69,17 @@ pub enum ServerFrame {
         starved: u32,
         /// Tokens the reactors saw in the last batch window.
         window: u32,
+        /// The session's reactor bank, bit `i` = reactor `i`, as `SNAPSHOT`
+        /// carries it. Sent with the metrics so a toggle is visible without a
+        /// reload.
+        reactors: u8,
+        /// Constraints the session holds, so a plant that landed without
+        /// raising is still something the page can see.
+        constraints: u32,
     },
+    /// Every constraint the session holds, so a page can list the spans rather
+    /// than only count them.
+    Constraints { revision: u64, items: Vec<ConstraintView> },
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -157,6 +180,8 @@ pub fn encode_into(frame: &ServerFrame, out: &mut Vec<u8>) -> Result<(), WireErr
             ripple_truncations,
             starved,
             window,
+            reactors,
+            constraints,
         } => {
             out.push(OP_METRICS);
             out.extend_from_slice(&p50_us.to_le_bytes());
@@ -165,6 +190,20 @@ pub fn encode_into(frame: &ServerFrame, out: &mut Vec<u8>) -> Result<(), WireErr
             out.extend_from_slice(&ripple_truncations.to_le_bytes());
             out.extend_from_slice(&starved.to_le_bytes());
             out.extend_from_slice(&window.to_le_bytes());
+            out.push(*reactors);
+            out.extend_from_slice(&constraints.to_le_bytes());
+        }
+        ServerFrame::Constraints { revision, items } => {
+            out.push(OP_CONSTRAINTS);
+            out.extend_from_slice(&revision.to_le_bytes());
+            out.extend_from_slice(&u32::try_from(items.len()).unwrap_or(u32::MAX).to_le_bytes());
+            for c in items {
+                out.extend_from_slice(&c.id.to_le_bytes());
+                out.extend_from_slice(&c.anchor.to_le_bytes());
+                out.extend_from_slice(&c.len.to_le_bytes());
+                out.push(c.kind);
+                out.extend_from_slice(&c.param.to_le_bytes());
+            }
         }
     }
     Ok(())
@@ -396,7 +435,24 @@ pub fn decode_server(buf: &[u8]) -> Result<ServerFrame, WireError> {
             ripple_truncations: r.u32()?,
             starved: r.u32()?,
             window: r.u32()?,
+            reactors: r.u8()?,
+            constraints: r.u32()?,
         },
+        OP_CONSTRAINTS => {
+            let revision = r.u64()?;
+            let count = r.u32()? as usize;
+            let mut items = Vec::with_capacity(count.min(256));
+            for _ in 0..count {
+                items.push(ConstraintView {
+                    id: r.u32()?,
+                    anchor: r.u32()?,
+                    len: r.u16()?,
+                    kind: r.u8()?,
+                    param: r.u32()?,
+                });
+            }
+            ServerFrame::Constraints { revision, items }
+        }
         other => return Err(WireError::Opcode(other)),
     })
 }

@@ -108,7 +108,7 @@
   input { width: 110px; }
   aside { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
   ol, ul { list-style: none; margin: 0; padding: 0; }
-  #diffs li, #warnings li {
+  #diffs li, #warnings li, #constraints li {
     padding: 5px 12px;
     border-bottom: 1px solid #1a212b;
     display: flex;
@@ -119,8 +119,11 @@
   #diffs .n { color: var(--punct); }
   #warnings li { cursor: pointer; }
   #warnings li:hover { background: #182029; }
-  #warnings .kind { font-size: 11px; letter-spacing: 0.06em; }
-  #warnings .msg { color: var(--dim); font-size: 11px; }
+  #warnings .kind, #constraints .k { font-size: 11px; letter-spacing: 0.06em; }
+  #warnings .msg, #constraints .msg { color: var(--dim); font-size: 11px; }
+  #constraints li { cursor: pointer; }
+  #constraints li:hover { background: #182029; }
+  #constraints .k { color: #9fe8c0; }
   .sev-1 .kind { color: var(--sev1); }
   .sev-2 .kind { color: var(--sev2); }
   .sev-3 .kind { color: var(--sev3); }
@@ -157,6 +160,8 @@
     <ul id="warnings"><li class="empty">quiet</li></ul>
     <div class="paneHead"><span>reactors</span><span class="hint">off means its warnings clear</span></div>
     <div id="reactors"></div>
+    <div class="paneHead"><span>constraints</span><span id="consCount" class="hint">0</span></div>
+    <ol id="constraints"><li class="empty">none planted</li></ol>
     <div class="paneHead"><span>plant a constraint</span></div>
     <div class="toolbar">
       <button data-constraint="max">≤ 4 tokens in span</button>

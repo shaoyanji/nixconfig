@@ -1,7 +1,7 @@
 //! Every frame type encodes and decodes losslessly, fuzzed.
 
 use loom_core::{NewToken, Op};
-use loom_wire::{decode_op, decode_server, encode, encode_op_frame, ServerFrame};
+use loom_wire::{decode_op, decode_server, encode, encode_op_frame, ConstraintView, ServerFrame};
 use proptest::prelude::*;
 
 fn text() -> impl Strategy<Value = Vec<u8>> {
@@ -15,6 +15,11 @@ fn token() -> impl Strategy<Value = NewToken> {
 
 fn tokens() -> impl Strategy<Value = Vec<NewToken>> {
     prop::collection::vec(token(), 0..6)
+}
+
+fn constraint_view() -> impl Strategy<Value = ConstraintView> {
+    (any::<u32>(), any::<u32>(), any::<u16>(), any::<u8>(), any::<u32>())
+        .prop_map(|(id, anchor, len, kind, param)| ConstraintView { id, anchor, len, kind, param })
 }
 
 fn op() -> impl Strategy<Value = Op> {
@@ -76,18 +81,35 @@ fn server_frame() -> impl Strategy<Value = ServerFrame> {
             any::<u32>(),
             any::<u32>(),
             any::<u32>(),
+            any::<u32>(),
+            any::<u8>(),
             any::<u32>()
         )
-            .prop_map(|(p50_us, p99_us, retok_per_edit, ripple_truncations, starved, window)| {
-                ServerFrame::Metrics {
+            .prop_map(
+                |(
                     p50_us,
                     p99_us,
                     retok_per_edit,
                     ripple_truncations,
                     starved,
                     window,
-                }
-            }),
+                    reactors,
+                    constraints,
+                )| {
+                    ServerFrame::Metrics {
+                        p50_us,
+                        p99_us,
+                        retok_per_edit,
+                        ripple_truncations,
+                        starved,
+                        window,
+                        reactors,
+                        constraints,
+                    }
+                },
+            ),
+        (any::<u64>(), prop::collection::vec(constraint_view(), 0..5))
+            .prop_map(|(revision, items)| ServerFrame::Constraints { revision, items }),
     ]
 }
 

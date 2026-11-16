@@ -30,14 +30,14 @@ disables persistence), `LOOM_COALESCE_MS` (default 8).
 
 | Metric | Target | Measured |
 | :--- | :--- | :--- |
-| edit → diff latency, p99 | < 5 ms | **110 µs** (p50 46, p90 74, max 145) |
+| edit → diff latency, p99 | < 5 ms | **124–182 µs** over two runs (latest: p50 45, p90 76, max 340) |
 | tokens re-tokenized per edit, median | < 2 % of doc | **0.07 %** |
 | tokens re-tokenized per edit, p99 | < 10 % of doc | **0.20 %** |
 | ripple bound hits | < 0.1 % of edits | **0 / 1000** |
-| diff frame encode | no allocation | reused buffer, 4096 → 4096 bytes |
-| 6 reactors at 1000 batches/s, document growing | no queue depth, no drift | 1000 batches, 4000 shard events over 4 shards, **0 starved**, **0 span-creep** |
+| diff frame encode | no allocation | 6.0–7.4 µs/frame, reused buffer, 4096 → 4096 bytes |
+| 6 reactors at 1000 batches/s, document growing | no queue depth, no drift | 1000 batches, 4000 shard events over 4 shards, 2000 reactions, **0 starved**, **0 span-creep** |
 
-Acceptance tests (`cargo test --all --locked`, 16 tests):
+Acceptance tests (`cargo test --all --locked`, 17 tests):
 
 - `incremental_eq_rebuild` — proptest, random documents and op sequences; the
   incremental token array equals a full rebuild byte for byte.
@@ -51,6 +51,10 @@ Acceptance tests (`cargo test --all --locked`, 16 tests):
 - `legacy_snapshot_still_loads` — a snapshot written before constraints were
   stored still opens, with an empty index rather than a refusal; so does the
   shape before the reactor bank was written down, with every reactor on.
+- `corrupt_snapshot_is_refused` — a snapshot whose magic is followed by
+  nothing readable stops the load instead of reading as an empty session, while
+  the same bytes whole still open; the server refuses to start and names the
+  file to move aside.
 - `reactor_toggles_survive_a_restart` — a reactor switched off before the
   snapshot and one switched off after it both come back off, from a batch that
   moved no text.
@@ -67,13 +71,15 @@ Acceptance tests (`cargo test --all --locked`, 16 tests):
 
 `node web/smoke.mjs` drives the release binary: HTTP routes, snapshot, insert →
 diff, plant a constraint → `warning raise`, disable the reactor → `warning
-clear`, `RESYNC` → fresh snapshot.
+clear`, `RESYNC` → fresh snapshot and the constraint list that has to ride it.
 
 `node web/uitest.mjs` drives the page itself in headless chromium over the
 DevTools protocol: click and shift-click selection, an insert arriving in the
 rope view, a planted constraint raising a severity-3 warning, a warning click
 selecting its span, the reactor switch clearing its warning and surviving a page
-reload, split/merge/delete, and a scrolled window that stays
+reload, the header pill reporting the reactor bank and the constraint count with
+no edit to carry the frame, the constraint sidebar listing the planted span and
+selecting it when clicked, split/merge/delete, and a scrolled window that stays
 virtualization-sized — with no page exception during the run, and a screenshot
 when asked for one.
 
@@ -116,7 +122,22 @@ per reactor. The pool runs `min(4, cpus)` shards; a shard whose queue (bound 32)
 is full raises its starve flag and re-lexes the whole document on its next idle
 moment, counting `starved` rather than dropping diffs. The header pill carries
 that count next to the last batch window, so a shard that fell back to a
-keyframe is visible from the page instead of only in the server's log.
+keyframe is visible from the page instead of only in the server's log. The same
+frame carries the reactor bank and the session's constraint count, so a switch
+thrown in another tab, and a span planted without raising, both show on the page
+without waiting for a reload (`bank 5/6 · cons 1`). That frame rides a 250 ms
+clock as well as the batches, so the pill is a readout of the session rather than
+of the last edit: an idle page still sees a switch thrown elsewhere, and a test
+waiting on it has nothing to nudge.
+
+**Constraints.** A span is planted by token index, converted once to a byte
+anchor, and shifted on every edit that lands before it, so it keeps pointing at
+the text it was planted on. The session's index rides a `CONSTRAINTS` frame — on
+connect, after a batch that planted one, and after a resync — and the sidebar
+lists each span with its rule, its token count and its byte anchor. Clicking one
+maps that anchor back to a token by walking the rope's own texts, so the
+selection lands on what the span covers now, not on what it covered at plant
+time.
 
 **Warnings.** Identity is `(kind, reactor, span bucket)`, so a violation that
 moves by a few tokens keeps its id. A re-raise inside 250 ms bumps `flap_count`
@@ -137,7 +158,10 @@ on. Reactor toggles are session state too, so they ride both: the snapshot holds
 the bank and the tail replays the switches thrown after it, and a batch that only
 threw one bumps the revision so its record is not trimmed as already covered.
 The `SNAPSHOT` frame carries the same bits, so a page that reloads draws the
-server's bank instead of defaulting every switch to on. 
+server's bank instead of defaulting every switch to on. A snapshot that is
+present but will not decode is not treated as a missing one: the loader refuses
+it and the server exits naming the file, because starting over would append to a
+log whose base document is gone.
 
 ## Deliberate choices and limits
 

@@ -20,6 +20,7 @@ use tokio::sync::{broadcast, mpsc};
 
 pub const REACTORS: usize = 6;
 const BROADCAST_CAPACITY: usize = 256;
+const METRICS_EVERY: Duration = Duration::from_millis(250);
 
 pub fn now_ms() -> u64 {
     static T0: OnceLock<Instant> = OnceLock::new();
@@ -216,12 +217,14 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
         broadcast_event(&state.shared, e);
     }
 
-    let (outcome, revision, snap_tokens, view) = {
+    let (outcome, revision, snap_tokens, view, planted) = {
         let mut s = match state.session.lock() {
             Ok(s) => s,
             Err(_) => return,
         };
+        let before_constraints = s.constraints.len();
         let outcome = s.apply_batch(&batch);
+        let planted = s.constraints.len() != before_constraints;
         // The session is where a toggle is written down; the pool's copy is a
         // mirror so its sink reads a flag without waiting on this lock.
         for (i, flag) in state.shared.reactors_on.iter().enumerate() {
@@ -249,7 +252,7 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
             .shared
             .starved
             .store(state.pool.starved_total() as u32, Ordering::Relaxed);
-        (outcome, revision, snap, view)
+        (outcome, revision, snap, view, planted)
     };
 
     if let Ok(mut buf) = state.scratch.lock() {
@@ -289,6 +292,12 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
         }
     }
 
+    // The sidebar's list changes on a plant and on a resync, and both are rare:
+    // answer with the whole index rather than a delta a client has to apply.
+    if planted || outcome.resync {
+        broadcast_constraints(state);
+    }
+
     if let Some(view) = view {
         state.pool.submit(view);
     }
@@ -305,33 +314,82 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
         }
     }
 
-    let due = state
-        .last_metrics
-        .lock()
-        .map(|mut last| {
-            if last.elapsed() >= Duration::from_millis(250) {
-                *last = Instant::now();
-                true
-            } else {
-                false
-            }
-        })
-        .unwrap_or(false);
-    if due {
-        if let Ok(s) = state.session.lock() {
-            let (p50_us, p99_us) = s.percentiles();
-            let frame = ServerFrame::Metrics {
-                p50_us,
-                p99_us,
-                retok_per_edit: s.retok_per_edit_bp(),
-                ripple_truncations: s.ripple_truncations.min(u32::MAX as u64) as u32,
-                starved: state.shared.starved.load(Ordering::Relaxed),
-                window: s.last_window(),
-            };
-            if let Ok(bytes) = loom_wire::encode(&frame) {
-                let _ = state.shared.out.send(Arc::new(bytes));
-            }
+    emit_metrics(state, false);
+}
+
+fn metrics_frame(state: &AppState) -> Option<Vec<u8>> {
+    let s = state.session.lock().ok()?;
+    let (p50_us, p99_us) = s.percentiles();
+    let frame = ServerFrame::Metrics {
+        p50_us,
+        p99_us,
+        retok_per_edit: s.retok_per_edit_bp(),
+        ripple_truncations: s.ripple_truncations.min(u32::MAX as u64) as u32,
+        starved: state.shared.starved.load(Ordering::Relaxed),
+        window: s.last_window(),
+        reactors: s.reactor_bits(),
+        constraints: s.constraints.len().min(u32::MAX as usize) as u32,
+    };
+    loom_wire::encode(&frame).ok()
+}
+
+/// Broadcast the pill's numbers, at most once per [`METRICS_EVERY`] unless the
+/// caller is the clock.
+///
+/// A batch and the clock share one deadline, so a burst of edits still yields a
+/// single frame per window and an idle session still yields frames.
+fn emit_metrics(state: &AppState, force: bool) {
+    if !force {
+        let due = state
+            .last_metrics
+            .lock()
+            .map(|mut last| {
+                if last.elapsed() >= METRICS_EVERY {
+                    *last = Instant::now();
+                    true
+                } else {
+                    false
+                }
+            })
+            .unwrap_or(false);
+        if !due {
+            return;
         }
+    }
+    if let Some(bytes) = metrics_frame(state) {
+        let _ = state.shared.out.send(Arc::new(bytes));
+    }
+}
+
+/// The whole constraint index, for the sidebar panel. Sent when a client
+/// connects (the snapshot carries tokens, not spans), after a batch that
+/// planted one, and after a resync.
+pub fn constraints_frame(state: &AppState) -> Option<Vec<u8>> {
+    let s = state.session.lock().ok()?;
+    let frame = ServerFrame::Constraints {
+        revision: s.rope.revision(),
+        items: s.constraint_views(),
+    };
+    loom_wire::encode(&frame).ok()
+}
+
+fn broadcast_constraints(state: &AppState) {
+    if let Some(bytes) = constraints_frame(state) {
+        let _ = state.shared.out.send(Arc::new(bytes));
+    }
+}
+
+/// Push the metrics on a clock, not only on a batch.
+///
+/// The pill reports the session, so a page with no edit of its own still has to
+/// see a reactor switched off in another tab or a constraint planted there.
+/// Without this the readout is the last edit's, which is what made a switch look
+/// unapplied until the page happened to type.
+pub async fn metrics_ticker(state: Arc<AppState>) {
+    let mut interval = tokio::time::interval(METRICS_EVERY);
+    loop {
+        interval.tick().await;
+        emit_metrics(&state, true);
     }
 }
 

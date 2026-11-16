@@ -240,6 +240,48 @@ fn legacy_snapshot_still_loads() {
     let _ = fs::remove_dir_all(&dir);
 }
 
+/// A snapshot that says it is a snapshot and then does not decode is refused.
+/// Reading it as an empty session would append to a log whose base document is
+/// gone, and the document the operator still has on disk would disappear with
+/// the error nobody saw.
+#[test]
+fn corrupt_snapshot_is_refused() {
+    let dir = temp_dir("replay-corrupt");
+    fs::create_dir_all(&dir).unwrap();
+    let sess = Session::with_doc("the outstanding reconsideration");
+    let mut good = b"LMS3".to_vec();
+    good.extend(
+        bincode::serialize(&SnapshotFile {
+            revision: 3,
+            tokens: sess.snapshot_tokens(),
+            constraints: Vec::new(),
+            reactors: [true; 8],
+        })
+        .unwrap(),
+    );
+
+    // The magic is there; the bytes behind it are not.
+    fs::write(dir.join(SNAP_FILE), &good[..good.len() / 2]).unwrap();
+    let err = load(&dir).expect_err("a truncated snapshot must not load");
+    assert_eq!(err.kind(), std::io::ErrorKind::InvalidData);
+    assert!(
+        err.to_string().contains(SNAP_FILE),
+        "the refusal should name the file it refused: {err}"
+    );
+
+    // A file that never was a snapshot, with no magic either.
+    fs::write(dir.join(SNAP_FILE), b"not a snapshot, just bytes").unwrap();
+    let err = load(&dir).expect_err("a foreign file must not read as an empty session");
+    assert_eq!(err.kind(), std::io::ErrorKind::InvalidData);
+
+    // The same bytes, whole, still load: the refusal is about corruption, not
+    // about the shape.
+    fs::write(dir.join(SNAP_FILE), &good).unwrap();
+    let (snap, _) = load(&dir).unwrap();
+    assert_eq!(snap.expect("the whole snapshot").revision, 3);
+    let _ = fs::remove_dir_all(&dir);
+}
+
 /// A switch thrown before the snapshot rides the snapshot; one thrown after it
 /// rides the log. Both have to come back, or the panel shows every reactor on
 /// while the server quietly skips the ones that were turned off.

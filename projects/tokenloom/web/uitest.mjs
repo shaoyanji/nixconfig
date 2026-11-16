@@ -162,14 +162,17 @@ step(`insert → ${diffHead.rev} ${diffHead.body} (chips ${before} → ${await e
 // The header pill reports the batch window and the starve count, so a shard
 // that fell back to a keyframe is visible without reading the server's log.
 const pill = await waitFor(
-  'the metrics pill to report a window and starvations',
+  'the metrics pill to report a window, starvations, the bank and the constraints',
   `(() => {
      const t = document.querySelector('#metrics').textContent;
-     return /win \\d+t/.test(t) && /starved \\d+/.test(t) ? t : '';
+     return /win \\d+t/.test(t) && /starved \\d+/.test(t) && t.includes('bank 6/6') && /cons \\d+/.test(t)
+       ? t
+       : '';
    })()`,
   4000,
 );
 if (!/p50 /.test(pill)) fail(`metrics pill has no latency: '${pill}'`);
+if (!/cons 0/.test(pill)) fail(`no constraint is planted yet, pill shows '${pill}'`);
 step(`metrics pill: ${pill}`);
 
 // Plant a "≤ 4 tokens" constraint on the six selected tokens and then grow it.
@@ -209,6 +212,42 @@ await waitFor(
   4000,
 );
 step('reactor switch off → its constraint warning cleared');
+
+// The pill is pushed on a clock as well as on a batch, so the switch thrown
+// above has to reach it with no edit of ours to carry it — and the count has to
+// show the span planted above even though the warning it raised has cleared.
+const banked = await waitFor(
+  'the clock-driven pill to show the bank minus the switched-off reactor and one constraint',
+  `(() => {
+     const t = document.querySelector('#metrics').textContent;
+     return t.includes('bank 5/6') && t.includes('cons 1') ? t : '';
+   })()`,
+  4000,
+);
+step(`pill after the switch, no edit of ours: ${banked}`);
+
+// The sidebar lists the spans themselves, not just their number.
+const listed = await evaluate(`(() => {
+  const items = [...document.querySelectorAll('#constraints li')];
+  return items.map((li) => ({
+    k: li.querySelector('.k')?.textContent || '',
+    msg: li.querySelector('.msg')?.textContent || '',
+    empty: li.classList.contains('empty'),
+  }));
+})()`);
+if (listed.length !== 1 || listed[0].empty) fail(`constraints panel should list one span, has ${JSON.stringify(listed)}`);
+if (!listed[0].k.includes('max-tokens')) fail(`constraints panel entry has the wrong kind: '${listed[0].k}'`);
+if (!listed[0].msg.includes('≤ 4 tokens')) fail(`constraints panel entry has the wrong rule: '${listed[0].msg}'`);
+if (!/@ \d+b/.test(listed[0].msg)) fail(`constraints panel entry has no byte anchor: '${listed[0].msg}'`);
+step(`constraints panel: ${listed[0].k} ${listed[0].msg}`);
+
+// Clicking an entry selects the tokens its anchor now covers.
+await evaluate("document.querySelector('#constraints li').click()");
+await frame();
+const consSel = await evaluate("document.querySelector('#sel').textContent");
+if (!/tokens \d+\.\.\d+ \(\d+\)/.test(consSel)) fail(`clicking a constraint should select its span, showed '${consSel}'`);
+step(`constraint click selects its span: ${consSel}`);
+
 await evaluate("document.querySelectorAll('#reactors input')[4].click()");
 
 // The server keeps the reactor bank and the snapshot frame hands it back, so a
@@ -224,13 +263,17 @@ await waitFor(
 );
 await send('Page.reload');
 await waitFor(
-  'a fresh document with the rope drawn',
-  "document.querySelector('#diffs li')?.classList.contains('empty') && document.querySelectorAll('.chip').length > 16",
+  'a fresh document with the rope drawn and the constraint list back',
+  `document.querySelector('#diffs li')?.classList.contains('empty')
+   && document.querySelectorAll('.chip').length > 16
+   && document.querySelector('#constraints li .k')`,
 );
 await frame();
 const restoredOff = await evaluate("document.querySelectorAll('#reactors input')[4].checked");
 if (restoredOff !== false) fail('a reload should restore reactor 5 as off from the snapshot');
-step('reload → reactor 5 still off, restored from the snapshot');
+const relisted = await evaluate("document.querySelector('#constraints li .k').textContent");
+if (!relisted.includes('max-tokens')) fail(`a reload should replay the constraint list, shows '${relisted}'`);
+step(`reload → reactor 5 still off, constraint list back: ${relisted}`);
 await evaluate("document.querySelectorAll('#reactors input')[4].click()");
 await waitFor(
   'reactor 5 back on after the reload',

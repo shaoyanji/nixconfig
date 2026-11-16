@@ -78,7 +78,20 @@ function decode(bytes) {
     }
     return { op, revision, reactors, tokens };
   }
-  if (op === 0x85) return { op, p50: u32(), p99: u32(), retok: u32(), trunc: u32() };
+  if (op === 0x85) {
+    return {
+      op, p50: u32(), p99: u32(), retok: u32(), trunc: u32(), starved: u32(), win: u32(),
+      reactors: u8(), constraints: u32(),
+    };
+  }
+  if (op === 0x86) {
+    const revision = u64(), n = u32();
+    const items = [];
+    for (let i = 0; i < n; i++) {
+      items.push({ id: u32(), anchor: u32(), len: u16(), kind: u8(), param: u32() });
+    }
+    return { op, revision, items };
+  }
   return { op };
 }
 
@@ -212,6 +225,15 @@ async function main() {
   );
   console.log(
     `resync: rev ${again.revision}, ${again.tokens.length} tokens, reactors 0b${again.reactors.toString(2)}`,
+  );
+
+  // The sidebar lists the spans, and the page keeps no index of its own, so the
+  // list has to ride the resync beside the tokens.
+  const listed = await scan(0x86);
+  const span = listed.items.find((c) => c.kind === 1 && c.len === 3);
+  assert(span, `resync carried no max-tokens span (${JSON.stringify(listed.items)})`);
+  console.log(
+    `constraints: ${listed.items.length} listed, #${span.id} kind ${span.kind} len ${span.len} param ${span.param} @ ${span.anchor}b`,
   );
 
   ws.close();

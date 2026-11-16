@@ -1,7 +1,9 @@
 'use strict';
 
 const WIRE = { INSERT: 1, DELETE: 2, MERGE: 3, SPLIT: 4, ANNOTATE: 5, CONSTRAINT: 6, TOGGLE: 7, RESYNC: 8 };
-const FRAME = { ACK: 0x80, DIFF: 0x81, RAISE: 0x82, CLEAR: 0x83, SNAPSHOT: 0x84, METRICS: 0x85 };
+const FRAME = {
+  ACK: 0x80, DIFF: 0x81, RAISE: 0x82, CLEAR: 0x83, SNAPSHOT: 0x84, METRICS: 0x85, CONSTRAINTS: 0x86,
+};
 const ROW_TOKENS = 16;
 const ROW_H = 26;
 const KIND = {
@@ -13,6 +15,7 @@ const KIND = {
   6: 'ripple-truncated',
 };
 const REACTORS = { 1: 'bpe-a', 2: 'bpe-b', 3: 'wordpiece', 4: 'regex-lexer', 5: 'constraint-check', 6: 'stability' };
+const CONS_KIND = { 1: 'max-tokens', 2: 'no-crossing', 3: 'stable-boundary' };
 
 const state = {
   tokens: [],
@@ -20,6 +23,7 @@ const state = {
   seq: 1,
   warnings: new Map(),
   diffs: [],
+  constraints: [],
   metrics: null,
   sel: { a: 0, b: 0 },
   ws: null,
@@ -195,8 +199,20 @@ function onBinary(buf) {
     case FRAME.METRICS: {
       state.metrics = {
         p50: r.u32(), p99: r.u32(), retok: r.u32(), trunc: r.u32(), starved: r.u32(), win: r.u32(),
+        reactors: r.u8(), constraints: r.u32(),
       };
       renderMetrics();
+      return;
+    }
+    case FRAME.CONSTRAINTS: {
+      r.u64();
+      const n = r.u32();
+      const items = [];
+      for (let i = 0; i < n; i++) {
+        items.push({ id: r.u32(), anchor: r.u32(), len: r.u16(), kind: r.u8(), param: r.u32() });
+      }
+      state.constraints = items;
+      renderConstraints();
       return;
     }
   }
@@ -311,12 +327,65 @@ function renderWarnings() {
   );
 }
 
+function describeConstraint(c) {
+  if (c.kind === 1) return `≤ ${c.param} tokens`;
+  if (c.kind === 2) return `no token crosses '${String.fromCharCode(c.param)}'`;
+  if (c.kind === 3) return 'stable boundary';
+  return `kind ${c.kind}`;
+}
+
+// The panel speaks bytes because that is what the index keeps; the rope speaks
+// tokens. Walk the token texts once to find the one that covers the anchor.
+function tokenAtByte(byte) {
+  const enc = new TextEncoder();
+  let at = 0;
+  for (let i = 0; i < state.tokens.length; i++) {
+    const len = enc.encode(state.tokens[i].text).length;
+    if (at + len > byte) return i;
+    at += len;
+  }
+  return 0;
+}
+
+function renderConstraints() {
+  const list = $('#constraints');
+  $('#consCount').textContent = String(state.constraints.length);
+  if (!state.constraints.length) {
+    list.innerHTML = '<li class="empty">none planted</li>';
+    return;
+  }
+  list.replaceChildren(
+    ...state.constraints.map((c) => {
+      const li = document.createElement('li');
+      const kind = document.createElement('span');
+      kind.className = 'k';
+      kind.textContent = `#${c.id} ${CONS_KIND[c.kind] || `kind ${c.kind}`}`;
+      const msg = document.createElement('span');
+      msg.className = 'msg';
+      msg.textContent = `${describeConstraint(c)} · ${c.len}t @ ${c.anchor}b`;
+      li.append(kind, msg);
+      li.onclick = () => {
+        const start = tokenAtByte(c.anchor);
+        state.sel = { a: start, b: start + Math.max(0, c.len - 1) };
+        drawRope();
+        scroller.scrollTop = Math.floor(start / ROW_TOKENS) * ROW_H;
+      };
+      return li;
+    }),
+  );
+}
+
 function renderMetrics() {
   const m = state.metrics;
   if (!m) return;
   const pill = $('#metrics');
+  let on = 0;
+  for (const id of Object.keys(REACTORS)) if (m.reactors & (1 << Number(id))) on++;
+  // The bank and the constraint count come from the server with every metrics
+  // frame: a switch thrown in another tab, and a plant that raised nothing,
+  // both show up here rather than only in the snapshot on reload.
   pill.textContent =
-    `p50 ${(m.p50 / 1000).toFixed(2)}ms · p99 ${(m.p99 / 1000).toFixed(2)}ms · retok ${(m.retok / 100).toFixed(2)}% · trunc ${m.trunc} · win ${m.win}t · starved ${m.starved}`;
+    `p50 ${(m.p50 / 1000).toFixed(2)}ms · p99 ${(m.p99 / 1000).toFixed(2)}ms · retok ${(m.retok / 100).toFixed(2)}% · trunc ${m.trunc} · win ${m.win}t · starved ${m.starved} · bank ${on}/6 · cons ${m.constraints}`;
   // A starved shard means a reactor missed a diff and fell back to a keyframe:
   // the feed is still right, it just took the expensive path. That should be
   // visible here rather than only in the server's log.

@@ -1,4 +1,4 @@
-use loom_srv::{build_state, coalesce, persist, session::Session, ticker, ws};
+use loom_srv::{build_state, coalesce, metrics_ticker, persist, session::Session, ticker, ws};
 use std::net::SocketAddr;
 use std::path::PathBuf;
 
@@ -32,7 +32,19 @@ async fn main() -> std::io::Result<()> {
             }
             // A log with no snapshot has no known base document, so replaying it
             // would invent one. Seed the demo and pin it below.
-            _ => (Session::with_doc(DEMO), 0, false),
+            Ok((None, _)) => (Session::with_doc(DEMO), 0, false),
+            // A snapshot that exists but does not decode is not a fresh start:
+            // starting the demo and appending would drop the document the
+            // operator still has on disk, silently. Refuse and say how to get
+            // past it.
+            Err(e) => {
+                eprintln!("loom: refusing to start: {e}");
+                eprintln!(
+                    "loom: move {} aside to start a new session",
+                    dir.join(persist::SNAP_FILE).display()
+                );
+                std::process::exit(1);
+            }
         },
         None => (Session::with_doc(DEMO), 0, false),
     };
@@ -42,6 +54,7 @@ async fn main() -> std::io::Result<()> {
     let (state, ops_rx) = build_state(sess, data.clone(), coalesce_ms);
     tokio::spawn(coalesce(ops_rx, state.clone()));
     tokio::spawn(ticker(state.clone()));
+    tokio::spawn(metrics_ticker(state.clone()));
 
     // Pin the starting document. Without this a first run leaves a log whose
     // ops have no base to replay onto, and a restart comes back as an empty

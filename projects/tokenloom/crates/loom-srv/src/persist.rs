@@ -66,29 +66,41 @@ struct SnapshotV1 {
     tokens: Vec<NewToken>,
 }
 
+/// A file that says it is a snapshot and then does not decode is refused, not
+/// read as an empty session: carrying on would append to a log whose base
+/// document no longer exists, and the document the operator had on disk would
+/// be gone with nothing said. An unknown magic fails the same way, through the
+/// pre-magic shape.
+fn corrupt(shape: &str, why: &str) -> io::Error {
+    io::Error::new(
+        io::ErrorKind::InvalidData,
+        format!("{SNAP_FILE} is not a readable snapshot ({shape}): {why}"),
+    )
+}
+
 impl SnapshotFile {
-    fn decode(bytes: &[u8]) -> Option<SnapshotFile> {
+    fn decode(bytes: &[u8]) -> io::Result<SnapshotFile> {
         if let Some(rest) = bytes.strip_prefix(SNAP_MAGIC) {
-            return bincode::deserialize(rest).ok();
+            return bincode::deserialize(rest).map_err(|e| corrupt("LMS3", &e.to_string()));
         }
         if let Some(rest) = bytes.strip_prefix(SNAP_MAGIC_V2) {
-            return bincode::deserialize::<SnapshotV2>(rest)
-                .ok()
-                .map(|s| SnapshotFile {
-                    revision: s.revision,
-                    tokens: s.tokens,
-                    constraints: s.constraints,
-                    reactors: [true; 8],
-                });
+            let s = bincode::deserialize::<SnapshotV2>(rest)
+                .map_err(|e| corrupt("LMS2", &e.to_string()))?;
+            return Ok(SnapshotFile {
+                revision: s.revision,
+                tokens: s.tokens,
+                constraints: s.constraints,
+                reactors: [true; 8],
+            });
         }
         bincode::deserialize::<SnapshotV1>(bytes)
-            .ok()
             .map(|s| SnapshotFile {
                 revision: s.revision,
                 tokens: s.tokens,
                 constraints: Vec::new(),
                 reactors: [true; 8],
             })
+            .map_err(|e| corrupt("no magic", &e.to_string()))
     }
 }
 
@@ -112,14 +124,20 @@ fn read_blob(r: &mut impl Read) -> io::Result<Option<Vec<u8>>> {
     Ok(Some(buf))
 }
 
+/// The snapshot, if there is one, and the log records newer than it.
+///
+/// A missing snapshot is not an error; one that exists and does not decode is,
+/// and callers are expected to stop rather than start over on a session whose
+/// document they cannot read.
 pub fn load(dir: &Path) -> io::Result<(Option<SnapshotFile>, Vec<BatchRecord>)> {
     let snap = match File::open(dir.join(SNAP_FILE)) {
         Ok(mut f) => {
             let mut buf = Vec::new();
             f.read_to_end(&mut buf)?;
-            SnapshotFile::decode(&buf)
+            Some(SnapshotFile::decode(&buf)?)
         }
-        Err(_) => None,
+        Err(e) if e.kind() == io::ErrorKind::NotFound => None,
+        Err(e) => return Err(e),
     };
     let mut records = Vec::new();
     if let Ok(mut f) = File::open(dir.join(LOG_FILE)) {

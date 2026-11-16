@@ -77,6 +77,12 @@
     security = {
       age.pkg = pkgs.age;
       cloak.pkg = pkgs.cloak;
+      # The vault clients. rbw is the one that tolerates a plain-http base URL,
+      # but it prompts through pinentry, so the binary has to be reachable and
+      # cannot be guessed: `pkgs.pinentry` no longer exists, and pinentry-curses
+      # ships its executable as `pinentry`.
+      rbw.pkg = pkgs.rbw;
+      pinentry.pkg = pkgs.pinentry-curses;
       pass = {
         pkg = pkgs.pass;
         linux = true;

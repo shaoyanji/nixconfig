@@ -87,7 +87,7 @@ run_round() { # only cap
 }
 
 add_custom() {
-  local slug prompt expect
+  local slug prompt expect form="soft feminine facial features, a delicate jawline, a slender neck, a graceful feminine figure"
   slug=$(gum input --header "slug — short, dashes, unique" --placeholder "dota-windranger-alt") || return 2
   [ -n "$slug" ] || return 2
   if grep -qE "^${slug}\|" "$roster"; then
@@ -96,9 +96,21 @@ add_custom() {
   fi
   prompt=$(gum write --width 90 --height 12 \
     --header "Prompt — who, from where, what they wear, how framed" \
-    --placeholder "Name, an adult woman from the game … — hair, eyes, garment, expression, portrait from the waist up, tastefully dressed, fully clothed, 4k, photorealistic, realistic, neumorphism.") || return 2
+    --placeholder "Name, an adult woman from the game … — hair, eyes, gown and neckline, expression, portrait from the waist up, glamorous and alluring, soft feminine facial features, a delicate jawline, high cheekbones, a slender neck, a graceful feminine figure, 4k, photorealistic, realistic, neumorphism.") || return 2
   prompt=$(printf '%s' "$prompt" | tr '\n' ' ' | sed 's/  */ /g; s/^ //; s/ $//')
   [ -n "$prompt" ] || return 2
+  # The row is refused without this clause, so a custom character gets it here
+  # rather than being typed in by hand every time.
+  case $prompt in
+  *"soft feminine facial features"*) ;;
+  *)
+    if printf '%s' "$prompt" | grep -q ', 4k,'; then
+      prompt=$(printf '%s' "$prompt" | sed "s/, 4k,/, $form, 4k,/")
+    else
+      prompt="$prompt, $form"
+    fi
+    ;;
+  esac
   expect=$(gum input --header "Judge expectation — what a literal reading would be" \
     --placeholder "Name as a glamorous lifelike portrait of an adult … , never <icon> alone") || return 2
   printf '%s|%s|%s\n' "$slug" "$prompt" "$expect" >>"$roster"

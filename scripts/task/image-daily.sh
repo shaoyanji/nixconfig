@@ -285,6 +285,10 @@ Keep only when: the subject is recognisable at a glance and there is a clear
 focal point, with no garbled lettering and no malformed faces or hands. A short
 prompt that lands a deliberate image is a keep: spare is not the same as
 generic, so do not mark an image down for carrying few words.
+A portrait of a woman must read as a woman: a heavy square jaw, a thick neck, a
+flat broad brow, a masculine or androgynous face, or a torso widened and
+flattened by bulky armour is a defect — name it and reroll, however well the
+image is made.
 Otherwise answer "reroll" and put in "defect" one concrete, actionable defect
 (the thing to change, e.g. "the horizon is not level"). Use "reject" only when
 the image is unusable and the prompt is wrong, not the render.
@@ -1103,6 +1107,13 @@ roster_pending() { # roster
   rm -f "$all" "$kept"
 }
 
+# A row that names only garments and coverage is drawn as a broad, heavy-jawed
+# figure: the 2026-11-16 seraph round came back looking like men in armour. The
+# fix is a face clause on the row, not a stronger adjective in the judge, and the
+# clause stays in `plates.txt` because a plate's prompt is the whole instruction.
+# This is the engine refusing to spend on a row that forgot it.
+PLATE_FORM="soft feminine facial features"
+
 cmd_plates() {
   need jq cpg agy git ffprobe
   local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} size=${SIZE:-1536x1024}
@@ -1136,6 +1147,11 @@ cmd_plates() {
       have=$(kept_plate "photoreal-$slug")
       [ -n "$have" ] && { say "$slug: kept already ($have)"; continue; }
     fi
+    case $prompt in
+    *"$PLATE_FORM"*) ;;
+    *) say "$slug: no form clause — add '$PLATE_FORM, a delicate jawline, a slender neck, a graceful feminine figure' to the row"
+       continue ;;
+    esac
     [ "$left" -gt 0 ] || { say "allowance spent"; break; }
     if [ "$cap" -gt 0 ] && [ "$spent" -ge "$cap" ]; then
       say "cap $cap reached; the rest of the roster waits for the next round"

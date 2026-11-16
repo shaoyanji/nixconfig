@@ -6303,9 +6303,9 @@
     image-daily-queue = {
       title = "The 100-image day runs itself: a queue with a freshness promise, agy as judge";
       kind = "experiment";
-      status = "OPEN";
+      status = "DELIVERED";
       date = "2026-11-10";
-      summary = "A brief bank with an `every` per entry, a ledger row per generation attempt, and an agy judge turn the daily allowance into assets: nothing publishes that a judge has not passed. Re-armed 2026-11-10 in four capped slots, because the generator's burst limit is 25 an hour; publishing is Cloudinary plus a tagged manifest frontend.";
+      summary = "A brief bank with an `every` per entry, a ledger row per generation attempt, and an agy judge turning the daily allowance into assets: nothing publishes that a judge has not passed. Four capped slots against the 25/hour burst limit; Cloudinary plus a tagged manifest frontend. Delivered 2026-11-16.";
       refs = {
         hosts = ["frieren"];
         modules = [

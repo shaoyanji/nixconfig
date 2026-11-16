@@ -3,7 +3,7 @@
 Alice's travel netbook (N3060, 1.8 GiB, eMMC). It carries no global module
 chain: its own configuration is the whole system, plus `inventoryModules`. It is
 the only host whose closure is **pushed** rather than pulled — see
-[Build ladder](#build-ladder-this-is-the-whole-topology).
+[Build ladder](../../../docs/netbook-deploy.md#build-ladder-this-is-the-whole-topology).
 
 ## What is pinned, and what is not
 
@@ -41,31 +41,6 @@ Nothing here proves `linuxPackages_latest`; the comment that blamed "newer kerne
 predates the measurement. If nixpkgs drops the LTS line, boot-test that with the same
 staged procedure, not by deploying straight across.
 
-## Diagnosing a boot that never reaches stage 2
-
-A failed boot leaves **no journal entry**: stage 1 died before journald started.
-Instruments, all runnable from frieren:
-
-```bash
-# authoritative: what does the flake say this host's initrd should be?
-nix eval .#nixosConfigurations.netbook.config.boot.initrd.systemd.enable
-# an installed system: systemd-initrd is the variant that passes root=fstab
-grep -h '^options' /boot/loader/entries/*.conf
-# did the machine ever reach stage 2? absent boot id = it did not
-ssh root@192.168.3.36 journalctl --list-boots
-```
-
-Reading the archive itself needs one fact about its layout: an initrd is
-`[microcode cpio][TRAILER][padding to 512][zstd cpio]`, so `cpio -it` on the raw
-file stops after the microcode entry and a plain `grep` sees nothing. Find the
-zstd magic (`28 b5 2f fd`) after the first `TRAILER!!!` and start there — that
-is how the 604-entry scripted initrd and the 2078-entry systemd one were
-compared.
-
-`boot.consoleLogLevel = 7` is set on purpose. This machine has no serial port,
-and at the previous level 3 a hang was indistinguishable from a frozen screen —
-generation 50 died with nothing on the console to read.
-
 ## Deploy
 
 ```bash
@@ -78,6 +53,10 @@ TARGET=root@100.72.110.107 task infra:apply:host:netbook    # travelling (tailne
 activates the **built** system with `nix-env -p /nix/var/nix/profiles/system
 --set` + `switch-to-configuration`. No flake evaluation and no compiler on the
 netbook — the Celeron never evaluates and never builds.
+
+The boot-chain staging path, the build ladder, both guards, activation over ssh,
+the boot-menu repair and rollback are
+[`docs/netbook-deploy.md`](../../../docs/netbook-deploy.md).
 
 ### Where the desktop config lives
 
@@ -175,155 +154,6 @@ Everything declined on this host was declined with a number: the closure table a
 the four verdicts (bar, browser, secret service, display manager) are in
 [`docs/netbook-rice-port.md`](../../../docs/netbook-rice-port.md).
 
-### Staging a boot-chain change (the practiced path)
-
-A deploy that changes the kernel or initrd store paths is refused by the guard
-on purpose. The way across is deliberate and staged, never one shot:
-
-```bash
-# 1. write entries + profile, activate nothing (guarded by ALLOW_KERNEL_CHANGE)
-ON_BUILDER=1 REMOTE="$PWD" TARGET=root@192.168.3.36 STAGE=boot \
-  ALLOW_KERNEL_CHANGE=1 bash scripts/task/deploy-netbook.sh
-# 2. keep the proven generation default until the new entry has booted:
-#    read the entries, then point `default` at the proven one
-ssh root@192.168.3.36 'grep -H "^version" /boot/loader/entries/*.conf'
-ssh root@192.168.3.36 "sed -i 's|^default .*|default <proven-entry>.conf|' /boot/loader/loader.conf"
-# 3. boot the new entry; once it reaches stage 2 it IS the running generation —
-#    confirm with ACTION=verify (deployed == running) and leave the default there
-ON_BUILDER=1 REMOTE="$PWD" TARGET=root@192.168.3.36 ACTION=verify \
-  bash scripts/task/deploy-netbook.sh
-```
-
-Staging with `STAGE=boot` makes the new generation the loader default, because
-`switch-to-configuration boot` installs entries for the *current profile*. That
-is why step 2 exists: until the entry is proven, the default must stay on the
-generation that boots. Give the test entry a distinguishable `title` while it is
-under test, and delete the copy afterwards.
-
-### Build ladder (this is the whole topology)
-
-Frieren evaluates and holds the result; nixbuild.net supplies anything missing;
-the netbook only receives. `BUILD` picks how the closure is obtained:
-
-| `BUILD` | Flags on frieren | When |
-| --- | --- | --- |
-| `auto` (default) | `--max-jobs 0 --builders ""`, then `--max-jobs 0` on failure | the fleet nixpkgs closure is normally already in the caches, unknown gaps still get built |
-| `local` | `--builders ""` | fall back to compiling on frieren |
-| `remote` (`REMOTE_ONLY=1`) | `--max-jobs 0` | every gap on nixbuild.net, nothing local |
-
-`auto` is the default because the first attempt costs nothing: a substituted
-closure completes in seconds without touching the 25 h/month nixbuild budget, and
-a deploy that does need work escalates instead of failing.
-
-**Nothing on the netbook pulls, and that is not a bug to fix.** Its paths predate any
-LAN cache (6.6 GB fetched from `cache.nixos.org` years ago): harmonia serves the
-current system because frieren built it, but not the long tail — which is why the
-deploy pushes. `ACTION=preflight` prints that answer instead of assuming it.
-Measured 2026-10-22: `BUILD=remote` 2m28s, `BUILD=auto` on an unchanged tree seconds,
-and only the paths the host lacks travel.
-
-## The two guards (both before anything is copied)
-
-| Guard | Refuses | Override |
-| --- | --- | --- |
-| boot chain — new kernel/initrd store path ≠ running | exit 3 | `ALLOW_KERNEL_CHANGE=1` |
-| `/etc/nixos` drift — `configuration.nix` edited since the last deploy | exit 4 | `ALLOW_CONFIG_DRIFT=1` |
-| bus dead after activation — units never restarted | exit 5 | none; fix the bus and re-run |
-| `switch-to-configuration` non-zero with a live bus | exit 6 | none; read its output |
-
-Both guards compare `/nix/store/<name>` — the kernel and initrd *output* paths —
-not the image files. The built system exposes `kernel`/`initrd` as symlinks into
-`…-linux-6.18.56/bzImage`, while the target reports the same symlink resolved, so
-the first version compared an output path against a file and refused two deploys
-on an identical boot chain before either side was normalized.
-
-The boot-chain guard is the anti-brick check, and it is what catches an
-accidental kernel move: with the fleet nixpkgs the default kernel changes without
-anyone editing `hosts/netbook/`. The drift guard covers the other direction:
-`/etc/nixos` stays on the machine as a fallback, so a local `nixos-rebuild` from
-an edited copy would deploy something the flake cannot see. After activating, the
-deploy records `system=` and `config-sha256=` in `/etc/nixos/.flake-managed`
-(plus a `FLAKE-IS-TRUTH` note), and `ACTION=verify` reports when the running
-system or that file no longer matches.
-
-`ACTION=preflight` (or `verify`) is read-only: reachability, what the host is
-running, drift against the recorded manifest, failed units, disk, and whether
-harmonia actually serves the running system. Run it first when the host comes
-online.
-
-## Activation needs a working system bus
-
-`switch-to-configuration` links `/etc` and `/run/current-system` **before** it
-asks systemd to restart units. When the system bus cannot reach pid1 the deploy
-prints `Failed to subscribe to systemd dbus messages` and stops halfway: the new
-system is *current* and the units that changed kept running the old one. Measured
-here 2026-10-22 — the switch looked successful (`/run/current-system` moved)
-while `dbus-daemon` rejected every message from uid 0 to
-`org.freedesktop.systemd1` and `org.freedesktop.login1`, so logind could not
-create sessions and nothing restarted. The policy sets in `/etc/dbus-1` were byte-identical before and after,
-so this is not a config difference: `systemctl restart dbus.service` restored
-`Subscribe`/`ListUnits`, and the reboot into the new generation came up clean.
-
-So the deploy verifies instead of assuming (exit 5 = bus dead after the switch,
-exit 6 = switch exited non-zero with a live bus). If exit 5 happens: restart the
-bus, re-run the switch — and expect a live desktop session to be gone, because
-restarting the bus kills it; a reboot is the clean recovery.
-
-## Launching an activation over ssh
-
-The push uses LAN ssh as root (`root@192.168.3.36`), the same key alice has
-(`deployKey`). Measured 2026-10-22: right after a reboot the LAN address can time
-out for a minute or two while the interface and `sshd` come up — `ping` succeeds
-with ~90–230 ms RTT at the same moment, so the neighbour table is not the test.
-Retry `ACTION=preflight` rather than switching `TARGET` to the tailnet.
-
-Who reaches the netbook's tailnet address depends on the source, which is why
-"use the tailnet" is not a blanket answer: from **frieren** (tagged) it is
-intercepted by Tailscale SSH and hangs on a browser check, while from **delphi**
-(an untagged member) the same `root@100.72.110.107` reaches the real sshd and the
-deploy key works. The script runs on frieren, so its unattended target stays the
-LAN address.
-
-## Before a structural change: measure the closure first
-
-A change that adds a module chain, a user profile or a desktop stack is measured
-**before** anything is copied to the host. This box has ~6 GiB free on a 24 GiB
-eMMC at 75 %, and its entire system store is smaller than one DMS desktop: the
-fleet's home-manager component set builds 4.3 GiB, of which ~3 GiB is Qt, and
-that is what a "just manage the dotfiles" idea costs here.
-
-```bash
-# 1. what would land — build it on frieren, never here
-P=$(nix build --no-link --print-out-paths --builders "" \
-  .#nixosConfigurations.netbook.config.home-manager.users.alice.home.activationPackage)
-nix path-info -Sh "$P"                              # total
-nix path-info -rS "$P" | sort -n -k2 | tail -10      # what dominates, in bytes
-
-# 2. what is free, right now
-ssh alice@192.168.3.36 'df -h / | tail -1'
-```
-
-The rule: the closure must fit with **at least 1 GiB left over**. This host has
-been full before (84 %), and a full eMMC breaks GC — which is how generations
-pile up until something else fails. If it does not fit, the answer is a smaller
-component set, not a slower copy.
-
-An aborted attempt leaves its bytes in the store until GC. Reclaim them:
-
-```bash
-sudo nix-env -p /nix/var/nix/profiles/system --list-generations
-sudo nix-env -p /nix/var/nix/profiles/system --delete-generations <n> …
-sudo nix-collect-garbage   # measured 1.5 GiB freed after one aborted HM attempt
-```
-
-**A collect that frees nothing means roots, and this host had three:** a 5.9 GiB
-`/etc/nixos/result` from a Sep 30 build, plus both users' home-manager
-`gcroots/current-home` (3.8 GiB and 380 MiB). Removing them freed 7.2 GiB. The
-check and the removal procedure are fleet-wide, in
-[`docs/nix-patterns.md`](../../../docs/nix-patterns.md) — *Reclaiming store space*.
-Do not repeat the generation-pruning step here expecting space; on a 24 GiB eMMC
-the first question after any collect is `sudo nix-store --gc --print-roots`.
-
 ## Preconditions
 
 - **Root ssh by key from frieren.** `nix copy` writes to the store, so it needs
@@ -336,65 +166,3 @@ the first question after any collect is `sudo nix-store --gc --print-roots`.
   (`root@192.168.3.36`) hits the real sshd and needs no check — which is why the
   deploy targets the LAN and why nothing unattended may use the tailnet name.
 - **`/etc/nixos` is a fallback, not the source.** Nothing updates it any more.
-
-## Boot menu
-
-Entries for generations whose kernel and initrd were pruned from
-`/boot/EFI/nixos` survive a switch and hang when selected. On 2026-10-22 **15 of
-22 entries pointed at files that no longer existed** (generations 13–26 and 29);
-they were deleted, and generation 50 — the systemd-initrd failure — was deleted
-once generation 51 replaced it. Live entries are 45–49 plus 51, and `default` is
-the running generation.
-
-Re-check whenever the menu is suspected:
-
-```bash
-cd /boot/loader/entries
-for f in *.conf; do
-  k=$(sed -n 's/^linux //p' "$f"); i=$(sed -n 's/^initrd //p' "$f")
-  [ -e "/boot$k" ] && [ -e "/boot$i" ] || echo "dead: $f"
-done
-```
-
-Deleting a dead `.conf` is safe and needs no rebuild — it points at nothing.
-`bootctl set-default`/`set-timeout` do not write `/boot/loader/loader.conf` on
-this box (verified 2026-10-22); edit that file directly.
-
-### `pti=off` black-panels this machine (gens 60 and 62), 2026-10-22
-
-Two generations carrying `pti=off` came back with the **panel dark while the
-machine ran**; 59 and 61 booted normally. Gen 62 is the clean evidence: its journal
-is complete — i915 bound cherryview as `fb0`, the renderer initialised on
-`renderD128`, the session's clients started — and the only difference from 61 was
-that flag plus a masked unit. So the fault is the display, not stage 1, and
-`pti=off` is out for good. Gen 60 wrote no journal at all, so that boot died before
-journald for another reason; the trimmed initrd (0.3 s of loader time saved) and
-`nodiscard` were dropped on value too.
-
-**A switch rewrites `loader.conf` to point at the generation that just failed.**
-Both times the machine came back only after a manual pick, and the next reboot would
-have black-panelled again. After any failed generation, rewrite `default` in
-`/boot/loader/loader.conf` and `nix-env -p … --switch-generation` before anything
-else. Reading an initrd: `cpio -id < initrd` extracts only the uncompressed
-microcode prepend, so read the zstd frame after it (`tail -c +<offset> initrd | zstd
--dc`) or the raw bytes.
-
-## Rollback
-
-`task infra:rollback:host:netbook` — `nix-env --rollback` on the system profile,
-then that generation's `switch-to-configuration switch`. No rebuild, no eval. The
-guard asks whether the **profile** moved, so a rollback that lands on the system
-already running is a success (fixed 2026-10-22; it used to exit 1 after doing the
-work whenever the profile was ahead of the running system — the exact state
-`STAGE=boot` leaves behind).
-
-Two things the command does not do for you:
-
-- **The loader default still names the newer generation.** The switcher links
-  `/run/current-system` but installs no boot entries, so a reboot undoes the
-  rollback. Run `<generation>/bin/switch-to-configuration boot` — the task now
-  prints the command — to make it stick.
-- **A blind rollback from 51 lands on generation 50**, the systemd-initrd system
-  that cannot boot. Read `nix-env -p /nix/var/nix/profiles/system
-  --list-generations` first, and use `--switch-generation` when the target
-  matters.

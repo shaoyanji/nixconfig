@@ -1,0 +1,19 @@
+[package]
+name = "loom-srv"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "loom-srv"
+path = "src/main.rs"
+
+[dependencies]
+loom-core.workspace = true
+loom-tok.workspace = true
+loom-react.workspace = true
+loom-wire.workspace = true
+serde.workspace = true
+bincode.workspace = true
+tokio.workspace = true
+axum.workspace = true

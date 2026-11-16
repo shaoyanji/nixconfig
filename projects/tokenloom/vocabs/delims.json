@@ -1,0 +1,4 @@
+{
+  "name": "regex-lexer",
+  "delimiters": " \t\n\r.,;:!?()[]{}<>\"'-"
+}

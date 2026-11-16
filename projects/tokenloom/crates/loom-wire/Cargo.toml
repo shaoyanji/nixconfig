@@ -1,0 +1,11 @@
+[package]
+name = "loom-wire"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+loom-core.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true

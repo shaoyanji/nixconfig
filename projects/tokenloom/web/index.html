@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Token Loom</title>
+<style>
+  :root {
+    --bg: #0d1014;
+    --panel: #131820;
+    --line: #232b36;
+    --ink: #d6dde8;
+    --dim: #7b8798;
+    --word: #7ad1a0;
+    --word-bg: #14301f;
+    --punct: #e0b872;
+    --punct-bg: #2c2312;
+    --ws: #5b6675;
+    --ws-bg: #171d25;
+    --sel: #2a4a7a;
+    --sev1: #6aa9ff;
+    --sev2: #e0b872;
+    --sev3: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .brand { font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #9fe8c0; }
+  .pill {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px 9px;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  .pill.ok { color: #7ad1a0; border-color: #23543a; }
+  .pill.warn { color: var(--sev3); border-color: #5b2a2a; }
+  main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+  #ropePane { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); }
+  .paneHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+  }
+  .hint { color: var(--dim); font-size: 11px; text-transform: none; letter-spacing: 0; }
+  #scroller { position: relative; flex: 1; min-height: 0; overflow-y: auto; }
+  #spacer { width: 1px; }
+  #layer { position: absolute; top: 0; left: 0; right: 0; will-change: transform; }
+  .row { display: flex; align-items: center; gap: 3px; padding: 0 10px; overflow: hidden; }
+  .chip {
+    border-radius: 4px;
+    padding: 2px 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid transparent;
+    user-select: none;
+  }
+  .chip.word { color: var(--word); background: var(--word-bg); }
+  .chip.punct { color: var(--punct); background: var(--punct-bg); }
+  .chip.ws { color: var(--ws); background: var(--ws-bg); }
+  .chip.sel { border-color: var(--sel); background: #1c2f4d; color: #cfe3ff; }
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: 8px 10px;
+    border-top: 1px solid var(--line);
+  }
+  button, input {
+    font: inherit;
+    color: var(--ink);
+    background: #1a212b;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 4px 8px;
+  }
+  button:hover { border-color: #3a4a60; }
+  input { width: 110px; }
+  aside { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+  ol, ul { list-style: none; margin: 0; padding: 0; }
+  #diffs li, #warnings li {
+    padding: 5px 12px;
+    border-bottom: 1px solid #1a212b;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+  #diffs li { color: var(--dim); font-size: 12px; }
+  #diffs .n { color: var(--punct); }
+  #warnings li { cursor: pointer; }
+  #warnings li:hover { background: #182029; }
+  #warnings .kind { font-size: 11px; letter-spacing: 0.06em; }
+  #warnings .msg { color: var(--dim); font-size: 11px; }
+  .sev-1 .kind { color: var(--sev1); }
+  .sev-2 .kind { color: var(--sev2); }
+  .sev-3 .kind { color: var(--sev3); }
+  #reactors { display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 8px 12px; }
+  #reactors label { display: flex; gap: 6px; align-items: center; color: var(--dim); }
+  .empty { padding: 10px 12px; color: var(--dim); font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">token loom</span>
+  <span id="rev" class="pill">rev 0</span>
+  <span id="conn" class="pill warn">connecting</span>
+  <span id="metrics" class="pill">·</span>
+</header>
+<main>
+  <section id="ropePane">
+    <div class="paneHead"><span>rope</span><span class="hint">click a chip · shift-click or drag for a range</span></div>
+    <div id="scroller"><div id="spacer"></div><div id="layer"></div></div>
+    <div class="toolbar">
+      <input id="word" placeholder="a word" value="ripple" />
+      <button data-act="insert">insert</button>
+      <button data-act="split">split ⏎</button>
+      <button data-act="merge">merge M</button>
+      <button data-act="delete">delete ⌫</button>
+      <button data-act="annotate">annotate ✳</button>
+      <span id="sel" class="hint">no selection</span>
+    </div>
+  </section>
+  <aside>
+    <div class="paneHead"><span>diff lane</span><span id="diffCount" class="hint">0</span></div>
+    <ol id="diffs"><li class="empty">no diffs yet</li></ol>
+    <div class="paneHead"><span>warnings</span><span id="warnCount" class="hint">0</span></div>
+    <ul id="warnings"><li class="empty">quiet</li></ul>
+    <div class="paneHead"><span>reactors</span><span class="hint">off means its warnings clear</span></div>
+    <div id="reactors"></div>
+    <div class="paneHead"><span>plant a constraint</span></div>
+    <div class="toolbar">
+      <button data-constraint="max">≤ 4 tokens in span</button>
+      <button data-constraint="delim">no space crossing</button>
+      <button data-constraint="stable">stable boundary here</button>
+    </div>
+  </aside>
+</main>
+<script src="/loom.js"></script>
+</body>
+</html>

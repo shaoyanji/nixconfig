@@ -1,0 +1,30 @@
+{
+  "name": "wordpiece",
+  "pieces": [
+    "the",
+    "in",
+    "ing",
+    "##ing",
+    "##ed",
+    "##er",
+    "##s",
+    "##n",
+    "##t",
+    "an",
+    "and",
+    "tion",
+    "##tion",
+    "st",
+    "##st",
+    "re",
+    "##re",
+    "on",
+    "##on",
+    "al",
+    "##al",
+    "con",
+    "##con",
+    "out",
+    "##out"
+  ]
+}

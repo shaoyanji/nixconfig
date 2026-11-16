@@ -1,0 +1,9 @@
+[package]
+name = "loom-react"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+loom-core.workspace = true
+loom-tok.workspace = true

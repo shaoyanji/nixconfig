@@ -13,6 +13,11 @@
 # input), a host gate (one host) or a cache gate (asks a substituter) — which is
 # what makes three verbs enough.
 #
+# The table is TOML, which Nix imports natively, so the rows come from
+# `nix eval --raw .#checkInventory.tsv` (builtins.fromTOML in flake/outputs.nix)
+# instead of from a TOML parser in this script. Zero dependencies: the only
+# binary in that path is the `nix` a `task` already needs.
+#
 # Exit: 0 clean · 1 the table and the tree disagree · 2 usage.
 set -euo pipefail
 
@@ -26,9 +31,9 @@ die() {
 
 [ -f "$table" ] || die "no $table"
 
-# One yq call, rows as `kind<TAB>name`.
+# Rows as `kind<TAB>name`, rendered where the TOML is parsed: Nix.
 rows() {
-  yq -p toml -o tsv '.["check"][] | [.kind, .name] | @tsv' "$table"
+  (cd "$root" && nix eval --raw .#checkInventory.tsv)
 }
 
 # `<name>\t<desc>` from go-task, which is the only thing that knows a task's desc.
@@ -93,8 +98,8 @@ case "${1:-}" in
     if [ "$kind" = cache ] && [ -z "$name" ]; then name=checks:build:route; fi
     [ -n "$name" ] || die "NAME=<task> is required (see: task check:list $kind)"
     # No `exit` in the awk: under `pipefail` an early reader closes the pipe and
-    # yq dies with SIGPIPE (141), which made a correct dispatch look like a
-    # failure. The table is 94 rows, so scanning it whole costs nothing.
+    # the writer dies with SIGPIPE (141), which made a correct dispatch look like
+    # a failure. The table is 110 rows, so scanning it whole costs nothing.
     row=$(rows | awk -F'\t' -v n="$name" '$2 == n {print $1}')
     [ -n "$row" ] || die "$name is not in the check inventory (task check:list)"
     [ "$row" = "$kind" ] || die "$name is a $row check, not $kind"

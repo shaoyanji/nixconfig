@@ -31,7 +31,7 @@
   # behind `#nix-comments-are-pointers` and `checks:nix:comments`.
   nixCommentsCtl = import ./nix-comments.nix {
     inherit lib;
-    paths = nixFilesCtl.paths;
+    inherit (nixFilesCtl) paths;
   };
   moduleSets = import ./module-sets.nix {
     inherit inputs self lib inventory;
@@ -64,7 +64,10 @@
   # AGENTS.nix -> validated note index + rendered pages (lib/agents-notes.nix).
   # One source for the decisions, queue and design studies that used to be four
   # root markdown files; consumed by checks, docs and the query task.
-  agentsNotesCtl = import ../lib/agents-notes.nix {inherit lib inventory;};
+  agentsNotesCtl = import ../lib/agents-notes.nix {
+    inherit lib inventory;
+    claimOf = epistemicsCtl.noteClaims;
+  };
   homeAgentsGen = import ../lib/home-agents.nix {inherit lib inventory;};
   taskListPkgs = pkgsFor (builtins.head systems.work);
   taskList = builtins.listToAttrs (map (p: {
@@ -88,6 +91,13 @@
                   + [($v.aliases // [])[] | [., $d, $s, $k]])
           | add // []' > $out
       ''))));
+  checkInventory = let
+    rows = (builtins.fromTOML (builtins.readFile ../taskfiles/checks.toml)).check;
+  in {
+    inherit rows;
+    names = map (r: r.name) rows;
+    tsv = lib.concatMapStrings (r: "${r.kind}\t${r.name}\n") rows;
+  };
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
     inherit lib inventory;
     skills = skillsCtl;
@@ -290,6 +300,8 @@ in {
   # Comment census, gated by #nix-comments-are-pointers; the task pointers are
   # resolved by `checks:nix:comments`.
   nixComments = nixCommentsCtl;
+
+  inherit checkInventory;
 
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
   # Consumed by the home activation script as a store symlink.

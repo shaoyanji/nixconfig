@@ -80,11 +80,14 @@ kg_graph_path() {
     mkdir -p "$cache"
     # temp file + rename: a reader that races the eval would otherwise see a
     # half-written JSON, and jq would report a parse error rather than a miss.
-    if ! (cd "$REPO" && kg_eval_graph) >"$path.tmp" 2>/dev/null; then
+    if ! (cd "$REPO" && kg_eval_graph) >"$path.tmp" 2>"$path.err"; then
       rm -f "$path.tmp"
       echo "kg-graph: evaluating .#knowledgeGraph.graph failed" >&2
+      sed 's/^/  /' "$path.err" >&2 || true
+      rm -f "$path.err"
       return 1
     fi
+    rm -f "$path.err"
     mv "$path.tmp" "$path"
     # One file per distinct working-tree content: bounded by a week, so an
     # afternoon of editing cannot leave a directory of graphs nobody will read.

@@ -18,10 +18,12 @@ tasks:
   check:list:
     desc: List the check inventory by kind, with each task's live description (KIND=leaf|host|cache)
     summary: >
-      Reads taskfiles/checks.toml (the table: one row per gate, name and kind) and
-      joins it with `task --list-all --json` for the description, so the listing is
-      never a second copy of a `desc`. KIND= narrows to leaf (no input), host (one
-      host) or cache (asks a substituter). ~2 s, no eval.
+      Reads taskfiles/checks.toml (the table: one row per gate, name and kind) through
+      `nix eval --raw .#checkInventory.tsv` — the TOML is parsed by
+      `builtins.fromTOML` in the flake, not by yq in the script — and joins it with
+      `task --list-all --json` for the description, so the listing is never a second
+      copy of a `desc`. KIND= narrows to leaf (no input), host (one host) or cache
+      (asks a substituter). ~1.7 s, most of it go-task's own listing.
     cmds:
       - bash scripts/task/check.sh list {{.KIND}}
 
@@ -31,7 +33,8 @@ tasks:
       The gate that keeps taskfiles/checks.toml honest in both directions: a row
       naming no task (a rename or a deletion left it behind) and a checks:* task
       with no row (a gate nobody classified) are both exit 1, as is a kind that is
-      not leaf|host|cache. Duplicate rows fail too. ~2 s, no eval.
+      not leaf|host|cache. Duplicate rows fail too. The table is read by the same
+      native import the listing uses, so one parser covers all three verbs. ~1.7 s.
     cmds:
       - bash scripts/task/check.sh verify
 

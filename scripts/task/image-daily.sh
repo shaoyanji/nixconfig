@@ -1296,23 +1296,26 @@ cmd_today() {
   # The slots are read from the units that exist, not from a number in this file:
   # the schedule lives in Nix, and a second copy would drift from it.
   units=$(systemctl --user list-unit-files --no-legend 'image-daily-slot-*.service' 2>/dev/null |
-    sed -n 's/^image-daily-slot-\([0-9][0-9]*\)\.service.*/\1/p' | sort -n)
-  total=$(printf '%s\n' "$units" | grep -c . || true)
+    sed -n 's/^image-daily-slot-\([0-9][0-9]*\)\.service.*/\1/p' | sort -n || true)
+  total=$(printf '%s\n' "$units" | grep -c . 2>/dev/null || true)
   if [ "${total:-0}" -eq 0 ]; then
     printf '  next slot   no image-daily-slot timer on this host\n'
   else
-    n=$(systemctl --user list-timers --no-pager --json=short 'image-daily-slot-*.timer' 2>/dev/null |
-      jq -r 'if type == "array" then .[] | select((.next // 0) > 0) | [.next, (.activates // "")] | @tsv else empty end' 2>/dev/null |
-      sort -n | head -1 | cut -f2 | sed -n 's/^image-daily-slot-\([0-9][0-9]*\)\.service$/\1/p')
+    # `list-timers` is sorted by next elapse, so its first row is the next slot,
+    # and the last column is the unit that row activates. Its JSON form is not on
+    # every systemd this fleet runs (`--json` is unrecognized here), and the table
+    # is the one shape both answer.
+    n=$(systemctl --user list-timers --no-pager --no-legend 'image-daily-slot-*.timer' 2>/dev/null |
+      awk 'NR == 1 {print $NF}' | sed -n 's/^image-daily-slot-\([0-9][0-9]*\)\.service$/\1/p' || true)
     if [ -z "$n" ]; then
       printf '  next slot   %s slot(s) registered, none scheduled\n' "$total"
     else
-      next_at=$(systemctl --user show -p NextElapseUSecRealtime --value "image-daily-slot-$n.timer" 2>/dev/null)
+      next_at=$(systemctl --user show -p NextElapseUSecRealtime --value "image-daily-slot-$n.timer" 2>/dev/null || true)
       reserve=$(systemctl --user show -p ExecStart --value "image-daily-slot-$n.service" 2>/dev/null |
-        grep -o 'export RESERVE=[0-9][0-9]*' | cut -d= -f2)
+        grep -o 'export RESERVE=[0-9][0-9]*' | cut -d= -f2 || true)
       cap=$(slot_share "$left" "$((total - n + 1))")
       printf '  next slot   %s of %s at %s -> cap %s' "$n" "$total" "${next_at:-unknown}" "$cap"
-      [ -n "$reserve" ] && [ "$reserve" -gt 0 ] && printf ', %s held back' "$reserve"
+      if [ -n "$reserve" ] && [ "$reserve" -gt 0 ]; then printf ', %s held back' "$reserve"; fi
       printf '\n'
     fi
   fi

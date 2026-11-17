@@ -164,7 +164,10 @@
     parts = lib.splitString "[[flake/policies.nix#" text;
   in
     lib.unique (
-      lib.filter (id: builtins.match "[a-z0-9][a-z0-9-]*" id != null)
+      # Only a DECLARED policy becomes a node: a template like `#id` in a doc is
+      # prose about the convention, and a citation to an unknown id is a
+      # `checks.policies` failure, not a node the graph should invent.
+      lib.filter (id: builtins.hasAttr id policies && builtins.match "[a-z0-9][a-z0-9-]*" id != null)
       (map (chunk: builtins.head (lib.splitString "]]" chunk)) (builtins.tail parts))
     );
 

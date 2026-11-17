@@ -276,6 +276,9 @@ tasks:
       FIX: "{{.FIX}}"
       SUBJECT: "{{.SUBJECT | default \"\"}}"
       OUTCOME: "{{.OUTCOME | default \"done\"}}"
+      # A task variable is not an environment variable: without this line the
+      # script fell back to `whoami` and filed an agent's issue under devji.
+      SOURCE: "{{.SOURCE | default \"\"}}"
     cmds:
       - bash scripts/task/issue-ledger.sh record
 

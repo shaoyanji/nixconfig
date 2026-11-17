@@ -4007,7 +4007,7 @@
       body = ''
         **Mode:** a rule plus a gate — heavy closures are built by CI or the remote builder, never on a 2-core laptop.
 
-        **Status:** the rule is documented in `AGENTS.md` §5; `task checks:build:route` reports
+        **Status:** the rule is documented in `AGENTS.md` § Gates and operating; `task checks:build:route` reports
         whether the cache already serves the closure. It does not yet fail a build started on a
         non-builder tier.
 
@@ -5000,7 +5000,7 @@
         3. **Infrastructure was in the profile being dropped.** `tailscaled` and the NAS automount came
            from `desktop-client.nix`, so forking took the host off the tailnet and left the canonical
            `~/Documents/nixconfig` symlink dangling at its NAS target (the mapping is stated once, in
-           AGENTS.md § Home Initialization). A fork must list what it keeps: reachability and the
+           `.agents/SCHEMA.md` §7). A fork must list what it keeps: reachability and the
            canonical path are not rice.
 
         Documentation rule that came with this: rationale goes here or in a policy, not into comment

@@ -26,8 +26,8 @@ The chains themselves (`globalModulesNixos`, `globalModulesImpermanence`,
 `globalModulesContainers`, `globalModulesMacos`,
 `globalModulesHome`, `globalModulesDemo`) are defined in
 [`flake/module-sets.nix`](flake/module-sets.nix) and tabulated — with the hosts
-that use each — in [`AGENTS.md`](AGENTS.md) §Module Chains. That table is
-canonical, so it is not duplicated here; which host runs which chain is
+that use each — in `docs/generated/fleet-module-chains.md` (`task docs:build`). That
+table is canonical, so it is not duplicated here; which host runs which chain is
 `nix eval --json .#inventory.hosts` (`software.module_chain`), not a list in a
 second place.
 
@@ -346,14 +346,14 @@ Per-host quirks and exceptions: `.agents/deploy/hosts/*.md`
 `checks` and `devShells`, assembled from [`flake/outputs.nix`](flake/outputs.nix)
 via [`lib/mk-nixos-host.nix`](lib/mk-nixos-host.nix). The full assembly diagram and
 how inventory entries project into each output live in
-[`AGENTS.md`](AGENTS.md) §Flake Output Assembly.
+[`flake/outputs.nix`](flake/outputs.nix) and `AGENTS.md` § Architecture.
 
 ## Secrets & SSH CA
 
 Secrets use `sops-nix`. The two encrypted files (`modules/secrets.yaml`,
-`modules/ssh-ca-key.yaml`) and their recipient sets are tabulated in
-[`AGENTS.md`](AGENTS.md) §Secrets Architecture — that table is canonical, so it
-is not duplicated here.
+`modules/ssh-ca-key.yaml`), their recipient sets and the rekey procedure are
+[`docs/sops-rekey.md`](docs/sops-rekey.md) — canonical, so they are not
+duplicated here.
 
 ### SSH CA workflow
 

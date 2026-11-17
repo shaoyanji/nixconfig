@@ -21,7 +21,7 @@ Read the evidence, not the vibes: `git log --oneline -50`, `git log --grep=rever
 
 Group them into classes. A class counts once it has happened twice.
 
-The repo already keeps one such record: the "Agent Verification Protocol" in `AGENTS.md`. It is a table of corrections whose enforcement you can audit.
+The repo already keeps one such record: contracts in `AGENTS.md`, gates in `flake/policies.nix`. Each is a correction whose enforcement you can audit.
 
 ## 2. Fix each class at the highest level that works
 

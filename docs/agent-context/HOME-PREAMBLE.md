@@ -20,7 +20,7 @@
 ## Read order
 
 1. This host card (below) — hardware, role, directive.
-2. `AGENTS.md` § "Agent entry contract" — invariants and verification phases.
+2. `AGENTS.md` § "Entry contract" — invariants, truth order, verification phases.
 3. `.agents/SCHEMA.md` — where each kind of fact belongs.
 4. `MANUAL.md` — services, access paths, the closed loop.
 5. The `router` skill — the shape of the work, and the gate that ends it.
@@ -55,7 +55,7 @@ curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?repo=<repo>
 Read those turns first; if another agent claimed the same area or is
 `in_progress` on the same subject, stop and report it instead of editing in
 parallel. After the turn, `POST $X/v1/events` with the schema in `AGENTS.md`
-§ "Agent turns" — summaries only, never secrets or transcripts. If the endpoint
+§ "Agent turns (xs)" — summaries only, never secrets or transcripts. If the endpoint
 is down, retry once, queue the entry in `~/.local/state/agent-turns/queue.jsonl`,
 and replay it by UUID later.
 

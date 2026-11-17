@@ -9,7 +9,7 @@ unless a task says so.
 
 Code: `modules/services/agent-turns.nix`, `modules/services/agent-turns/shim/` (Go).
 Exposure: `hosts/delphi/configuration.nix` (`services.servicePortal.mounts`).
-Protocol: `AGENTS.md` § "Agent turns", `docs/agent-context/HOME-PREAMBLE.md`.
+Protocol: `AGENTS.md` § "Agent turns (xs)", `docs/agent-context/HOME-PREAMBLE.md`.
 
 ## Shape
 

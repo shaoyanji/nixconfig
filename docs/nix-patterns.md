@@ -98,7 +98,7 @@ bash scripts/task/warm-host.sh --check <host>        # the cache already serves 
 A real build — on CI, never on the NAS — is for a change that **adds
 derivations**: a Python package, model weights, a Rust or Go binary. Anything else
 is a fix, and a fix that needs a closure rebuild was built on the wrong tree.
-Long form: [`../AGENTS.md`](../AGENTS.md) §5.
+Long form: [`../AGENTS.md`](../AGENTS.md) § "Entry contract" item 3.
 
 ### A config-only delta does not need the CI round trip
 

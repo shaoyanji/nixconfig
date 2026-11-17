@@ -230,3 +230,29 @@ Authoring contract, field rules, templates and the verification commands:
 - Does it name a command that does not exist? Run it before writing it.
 - Is it longer than the budget? Move it, don't grow the file — and a root
   narrative file is now a 10-line pointer, not a home.
+
+---
+
+## 7. Host initialization and the editing loop
+
+1. **Repository root** is `~/Documents/nixconfig` (on `frieren` a symlink into `/Volumes/data`):
+   `readlink -f` first, since a Home Manager-owned path is a read-only store copy that reports the
+   active generation.
+2. **`~/Taskfile.yml` is decrypted, not authored** (`modules/secrets/DE-Taskfile.yaml`; every
+   `infra:rebuild:*` decrypts it). Keep it a pure forwarder: a duplicate task name makes task reject the
+   file (203), a `NIX_CONFIG` line breaks every `nix` call. Declarative ownership is open work
+   (`AGENTS.nix` note `taskfile-plane-handmade`).
+3. **Guidance is materialized:** `~/.agents/` holds the skills and deploy notes; the host card is
+   `.#homeAgents.<host>` (`lib/home-agents.nix`), linked to `~/AGENTS.md` by activation.
+4. **Docs are compiled:** one pure projection per artifact, nothing generated committed
+   [[flake/policies.nix#generated-not-tracked]], and a rendered surface compiled from one registry rather
+   than re-derived per vhost [[flake/policies.nix#surfaces-are-compiled]]. Eval-time `readFile` is
+   flake-scoped, so `git add` an untracked `.md` before evaluating it.
+5. **Nix:** `alejandra` is canonical and `statix` advisory [[flake/policies.nix#statix-advisory]];
+   `scripts/task/nix-fmt.sh` is the one implementation behind `dev:fmt` and `checks:nix:*`. Four watch
+   traps — a killed launcher leaves a grandchild, task's shell has no `kill`, `--dry` still starts one,
+   `watch: true` is CLI-only — so always `task checks:nix:watch:stop`.
+6. **Fetches** are registered in `modules/config/fetches.json`, resolved by `lib/fetches-extra.nix`, and
+   their hashes rewritten by `task dev:config:hash-update`.
+7. **Hooks:** `.githooks/pre-commit` runs the hard gates and `pre-push` what CI's docs job runs; enable
+   once with `bash .git-hooks-setup.sh`.

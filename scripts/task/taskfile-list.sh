@@ -4,7 +4,7 @@
 # This is the control plane's most expensive read: go-task parses all 24
 # shards and every task to answer it, measured **2.3-2.5 s** on delphi
 # (2026-11-07) for 616 tasks. `task help` and `task find:<word>` are the
-# documented way in (AGENTS.md §2), and each was paying that once plus the
+# documented way in (AGENTS.md § Entry contract), and each was paying that once plus the
 # outer parse — 2.6 s to answer "which task". The same JSON is a pure function
 # of the Taskfile tree and the go-task binary, so it is cached against exactly
 # those: 9 ms to key, ~120 ms to read.

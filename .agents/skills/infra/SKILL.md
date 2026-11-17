@@ -16,7 +16,7 @@ metadata:
 `task find:<word>` finds these by name and `task --list-all --json` gives the
 whole set with descriptions, so this page lists only what the description does
 not say. Cost tiers, what each gate proves and the build-budget rules live in
-`task-plane` and `AGENTS.md`; do not re-derive them here.
+`task-plane`, the `checks` skill and `AGENTS.md`; do not re-derive them here.
 
 ## Remote hosts
 
@@ -31,8 +31,8 @@ not say. Cost tiers, what each gate proves and the build-budget rules live in
 
 Never build *on* the target host: `infra:warm:host:<h>` on the builder (or
 `dev:ci:trigger:<h>`), then `checks:build:route` to confirm the cache serves it.
-The reasoning and the measurements are in `AGENTS.md` (*Agent Verification
-Protocol*).
+The reasoning and the measurements are in `AGENTS.md` (*Gates and
+operating*) and the `checks` skill.
 
 ## Local rebuilds
 

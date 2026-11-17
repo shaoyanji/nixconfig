@@ -136,7 +136,7 @@ done
 
 # Mirror-vs-submodule content drift: modules/secrets.yaml is a local mirror of
 # the canonical private submodule file modules/secrets/secrets.yaml (see
-# AGENTS.md "Secrets Architecture"). The two are edited by different entry
+# docs/sops-rekey.md). The two are edited by different entry
 # points, and a key added to only one (2026-10-15: TLS keys landed in the
 # mirror, the submodule went unpushed) decrypts on the dev machine but breaks
 # on every host once the mirror is regenerated from the submodule. Recipient

@@ -25,11 +25,11 @@ Unverified work has unknown correctness. Derived state is cheaper to read than t
 - A secret: decrypt it once, not "sops drift reported clean last month".
 - A gate: run it and keep its exit status, including when you pipe it through `head` or `grep`.
 
-When verification fails, suspect the observation method first: a negative narinfo cache makes a warm cache look empty, a non-login ssh shell loses `PATH`, a stale `ControlMaster` socket hangs. `AGENTS.md` keeps the field notes for each.
+When verification fails, suspect the observation method first: a negative narinfo cache makes a warm cache look empty, a non-login ssh shell loses `PATH`, a stale `ControlMaster` socket hangs. `docs/nix-patterns.md` and the `checks` skill keep the field notes for each.
 
 ## Label the claim
 
-Each claim in the report is `measured`, `inferred`, or `guess`. This repo already asks for that in the Agent Verification Protocol; use its phase split so the label is honest:
+Each claim in the report is `measured`, `inferred`, or `guess`. `AGENTS.md` item 3 asks for that phase split; use it so the label is honest:
 
 - evaluation catches a config error,
 - a build proves a closure,

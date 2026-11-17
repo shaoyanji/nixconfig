@@ -101,9 +101,9 @@ task ops:ask Q="what should I read before touching minyx"   # sugar: rules, then
 task ops:kg:blast TARGET=<id>              # reverse closure; jq has no one-liner
 ```
 
-The sidecar, its measured timings and the `--native` parity experiment live in
-`AGENTS.md` (*Structural queries are the graph, not grep*); `task ops:kg:speed`
-re-measures both paths rather than quoting a ratio that moves with tree state.
+The sidecar and its measured timings are `task ops:kg:speed`, which re-measures
+both paths rather than quoting a ratio that moves with tree state; the
+`--native` parity experiment is `checks:kg:native`.
 
 Use the six patterns for *"what touches X"*, a question BM25 is bad at. Use `qmd`
 for *"where is this explained"*, which a graph is bad at. Before **applying** a

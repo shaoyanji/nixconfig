@@ -47,7 +47,7 @@
     ".agents/skills/nixos-deploy/SKILL.md" = 55;
     ".agents/skills/no-comments/SKILL.md" = 39;
     ".agents/skills/officecli/SKILL.md" = 41;
-    ".agents/skills/ontology/SKILL.md" = 131;
+    ".agents/skills/ontology/SKILL.md" = 143;
     ".agents/skills/parallel-cli/SKILL.md" = 36;
     ".agents/skills/paste/SKILL.md" = 119;
     ".agents/skills/pdfvision/SKILL.md" = 37;
@@ -66,7 +66,7 @@
     ".agents/skills/voice-loop/SKILL.md" = 71;
     ".agents/skills/wikisearch/SKILL.md" = 148;
     ".agents/skills/xs-turns/SKILL.md" = 192;
-    "AGENTS.md" = 228;
+    "AGENTS.md" = 117;
     "modules/user/ai/skills/jev-ultrafast/SKILL.md" = 108;
     "modules/user/ai/skills/nix-preflight-editor/SKILL.md" = 50;
     "modules/user/ai/skills/simplex-admin/SKILL.md" = 190;
@@ -78,7 +78,6 @@
     ".agents/skills/agents-notes/SKILL.md" = "the note contract, the status table, and the promotion ladder that keeps a note code-shaped";
     ".agents/skills/calendar/SKILL.md" = "two calendars and a consent flow with three documented dead ends";
     ".agents/skills/cpg/SKILL.md" = "four lanes over one client, one auth story, two budgets, one shared failure table";
-    "AGENTS.md" = "the operator manual: the routing table, the gates, and the contracts a turn must honour";
   };
 in {
   inherit argueAbove pages notes;

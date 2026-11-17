@@ -121,7 +121,7 @@ systemctl list-timers --all | grep -E 'restic|nixos-upgrade|sentinel'
 
 1. **A successful unit is not a successful outcome.** `nixos-upgrade.service`
    can exit 0 with "no new generation" when the flake input did not advance
-   (the origin-vs-local trap in `AGENTS.md`). `generation-stale` is the check
+   (the origin-vs-local trap in `.agents/deploy/hosts/frieren.md`). `generation-stale` is the check
    that catches that.
 2. **A restic job that has never run is `absent`, not failed.** Do not "fix" a
    fresh install by inventing a timer.

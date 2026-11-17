@@ -40,8 +40,8 @@
   };
 
   # chatplayground: the `cpg` client. Three consumers, one binary — the advice
-  # lane (`cpg chat`, `.agents/skills/cpg-advice`), image generation
-  # (`cpg image`, `.agents/skills/cpg-image`), and the `serve` shim aichat
+  # lane (`cpg chat`, `.agents/skills/cpg`), image generation
+  # (`cpg image`, `.agents/skills/cpg`), and the `serve` shim aichat
   # points at. No unit is needed for the first two: the thread lives server
   # side and only the new prompt is ever sent.
   #

@@ -17,7 +17,7 @@
           ".sops.yaml"
         ];
         tasks = ["checks:knobs" "check:verify" "agents:review:schema"];
-        docs = [".agents/skills/cpg-advice/SKILL.md"];
+        docs = [".agents/skills/cpg/SKILL.md"];
       };
       body = ''
         Swept 2026-11-11 with `task agents:review:schema` over modules.toml, the

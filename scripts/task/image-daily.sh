@@ -669,9 +669,9 @@ cmd_run() {
     [ "$left" -lt 0 ] && left=0
   fi
   if [ "${STORYBOOK:-0}" = "1" ] && [ "$left" -gt 0 ] && [ -n "${STORYBOOK_DIR:-}" ] &&
-    [ -f "$repo/.agents/skills/cpg-storybook/scripts/storybook.py" ]; then
+    [ -f "$repo/.agents/skills/cpg/scripts/storybook.py" ]; then
     say "storybook: $left images left, printing $((left / 3)) spread(s)"
-    [ "${DRY:-0}" = "1" ] || python3 "$repo/.agents/skills/cpg-storybook/scripts/storybook.py" \
+    [ "${DRY:-0}" = "1" ] || python3 "$repo/.agents/skills/cpg/scripts/storybook.py" \
       run --limit "$((left / 3))" || say "storybook stopped early (see its ledger)"
   elif [ "$left" -gt 0 ]; then
     say "leftover: $left images unused (STORYBOOK=1 with STORYBOOK_DIR to spend them)"

@@ -127,7 +127,7 @@ Caveats an agent must respect:
 - **The local CLI is a lexical scorer** (hash embeddings + softmax), not the 421M
   checkpoint. Its confidence is low signal — offline fallback only.
 - **Never let a decision gate a destructive action alone.** See
-  `.agents/skills/decision-picker/SKILL.md` and `confirm-before-destructive`.
+  `.agents/skills/jevdecide/SKILL.md` and `confirm-before-destructive`.
 - `decide local` needs `systemone-decision` (installed on `frieren` and `eisen` only).
 - A silent fallback is not allowed: the provider error goes to stderr first.
 

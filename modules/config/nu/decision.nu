@@ -30,7 +30,7 @@
 # low signal — it is an offline fallback and a smoke test, not a Jev stand-in.
 #
 # A decision is a signal, not an authorisation: never let one gate a
-# destructive action on its own. See `.agents/skills/decision-picker/SKILL.md`.
+# destructive action on its own. See `.agents/skills/jevdecide/SKILL.md`.
 # =============================================================================
 
 const DECISION_ENDPOINT = "https://api.typesafe.ai/v1/systemone"

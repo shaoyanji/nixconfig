@@ -27,9 +27,8 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-# The round runner lives in the sibling skill, not here: `speculate.sh` is
-# cpg-speculate's contract and adapting must not fork it.
-SPECULATE = HERE.parents[1] / "cpg-speculate" / "scripts" / "speculate.sh"
+# The round runner sits beside this file, so adapting cannot fork it.
+SPECULATE = HERE / "speculate.sh"
 
 # The words the pictures and the count already fixed. A translator that
 # re-decides "Mole" or "wish-lantern" produces a book that disagrees with its own

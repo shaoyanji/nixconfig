@@ -80,4 +80,4 @@ tasks:
       plus a Jev grade, using `speculate.sh --all` so the candidates are not
       discarded — a round below the gate is evidence, not a winner.
     cmds:
-      - bash .agents/skills/cpg-speculate/scripts/speculate.sh --all {{.CLI_ARGS}}
+      - bash .agents/skills/cpg/scripts/speculate.sh --all {{.CLI_ARGS}}

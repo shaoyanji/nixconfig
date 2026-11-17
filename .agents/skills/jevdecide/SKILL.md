@@ -1,8 +1,8 @@
 ---
 name: jevdecide
-description: Jev decisions for hermes — classify or choose with jev-decide, route a lane on calibrated probabilities, never let a model authorise an action.
-version: 2.0.0
-tags: [jev, decision, routing, gating, triage]
+description: Jev decisions for hermes — classify or choose with jev-decide, route a lane on calibrated probabilities, pick between Jev, Laya and Kev-4B, never let a model authorise an action.
+version: 3.0.0
+tags: [jev, decision, routing, gating, triage, eisen]
 platforms: [linux, macos]
 ---
 
@@ -51,6 +51,8 @@ cpg chat -m gpt-6-luna -s advice-review "…" \
   Gate on both: a 0.82 with a 0.03 margin is nearly a tie.
 - A `false` on a `noul` question means "no", not "missing".
 - `usage.output_tokens` is 0. There is no prose to read, so do not ask for any.
+- An answer comes back on exit 2 with `status: needs_review` — that is a draft
+  signal to read, not a failure to retry.
 
 ## Thresholds, and what they are not
 
@@ -61,6 +63,50 @@ cpg chat -m gpt-6-luna -s advice-review "…" \
   own data before gating anything that matters.
 - A decision is a signal, never an authorisation. Delete, deploy, push and send
   still go through `confirm-before-destructive`.
+
+## Which model answers a decision
+
+Three models can, and the router on Eisen (:8000) already picks between them:
+
+| Model | Where | Input limit | When |
+| :--- | :--- | :--- | :--- |
+| **TypeSafe Jev** (cloud) | api.typesafe.ai, via the router | large | default; most accurate (0.966 macro on the public benchmark) |
+| **Laya** (local) | `127.0.0.1:8090`, on demand | **512 tokens**, hard | Jev unreachable and the input is ≤500 tokens |
+| **Kev-4B** (local) | its own llama-server, no endpoint | long (validated context unpublished) | Jev unreachable and the input is longer than Laya can hold |
+
+1. **Jev first**, 25 s timeout; the router forwards the client's auth.
+2. **On failure, local by input length** — ≤500 tokens to Laya, more to Kev-4B.
+3. **A first-request 502 is working behaviour.** After idle, Laya's cold start
+   can exceed the 25 s timeout, so the first decision 502s and the second
+   succeeds. Retry; do not lengthen the timeout.
+
+**Laya's `confidence` is `1 − normalized entropy`**, so a Jev cutoff does not
+transfer, and it is not a drop-in: on large option sets it falls to ~0.43 where
+Jev holds 0.87. **Kev-4B accepts long inputs but its long-context accuracy is
+unvalidated** — test on your own inputs before trusting it, and never expose it;
+it is a local fallback, not a service.
+
+From a nushell shell (`modules/config/nu/decision.nu`) the same lane, with the
+provider failure printed to stderr so a silent switch to the weaker local model
+is visible:
+
+```bash
+decide models                                        # providers + readiness
+decide "pick the backup tier" --options [ssd hdd tape]   # auto: Jev, then local
+decide yes "the upstream is degraded" --state {msg: "502"}
+decide score "rate severity" --criteria [ok degraded down]
+decide jev …   ·   decide local …                    # force one side
+```
+
+The `local` CLI in this repo scores by lexical overlap (hash embeddings +
+softmax), not the 421M checkpoint — its confidence is low signal, so treat it as
+an offline fallback.
+
+**For graph-intent routing ("what touches frieren") no model is used at all.**
+When no keyword rule matches, `ops:ask` returns the context bundle of the node the
+question names instead of guessing a relation. The bench that produced that
+decision, and the reasons the table it printed has to be read carefully, are in
+`references/eisen-routing.md`.
 
 ## Routing: the lane, not the model
 
@@ -76,9 +122,7 @@ jev-decide classify --provider typesafe \
 
 What it cannot do is choose the model or provider that answers an agent turn:
 that is `fallback_providers` in the hermes config, resolved by the agent, and
-there is no hook for it. For graph-intent routing ("what touches frieren") the
-measured answer is keyword rules plus a context bundle, no model at all — the
-numbers are in `decision-picker`.
+there is no hook for it.
 
 ## Fail closed
 
@@ -97,5 +141,6 @@ numbers are in `decision-picker`.
   confident `DELETE`: `references/inbox-cleanup.md` and `assets/jev_inbox.py`.
 - The fleet engine contract and the categoriser's error gate:
   `scripts/task/categorize.sh`, `flake/policies.nix#decision-engine-routing`.
-- Choosing among Jev, Laya and Kev-4B: `decision-picker`.
-- The text lane to pipe in: `cpg-advice`.
+- Eisen's router, the `/v1/systemone` request shape and the routing bench:
+  `references/eisen-routing.md`.
+- The text lane to pipe in: `cpg` (lane 1).

@@ -246,7 +246,7 @@ run_http() {
                   else {} end))}')" || return 1
 
   # Retry once: a 502/000 on the first call is documented cold-start behaviour
-  # (decision-picker skill), and the bench must not score a cold start as wrong.
+  # (jevdecide skill), and the bench must not score a cold start as wrong.
   local attempt=0
   while :; do
     attempt=$((attempt + 1))

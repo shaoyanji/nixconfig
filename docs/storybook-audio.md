@@ -1,6 +1,6 @@
 # Storybook audio — narration, cues and the music bed
 
-Moved out of the `.agents/skills/cpg-storybook` body when it passed its 400-line
+Moved out of the `.agents/skills/cpg` body when it passed its 400-line
 budget. The skill is the run; this is the audio half: what the voices are, how
 the cues are placed, and the measurement that picked the bed level.
 

@@ -4,7 +4,7 @@
 set -euo pipefail
 
 project=${STORYBOOK_DIR:-$HOME/Documents/storybook/lantern}
-printer=$HOME/Documents/nixconfig/.agents/skills/cpg-storybook/scripts/storybook.py
+printer=$HOME/Documents/nixconfig/.agents/skills/cpg/scripts/storybook.py
 cd "$project"
 
 unjudged=$(python3 - "$project" <<'PY'

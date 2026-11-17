@@ -119,49 +119,21 @@ and a human reading the served page. Run `wiki-ask` from frieren, or ssh first.
 
 `wikisearch` is a universal CLI client that queries any ZIM archive in the library or directory.
 
-### A. Full-Text Search
-Searches the primary archive — with no `-w`, `find_zim` resolves against the declarative library first, so the default is the full English Wikipedia (19.2M articles):
+### The flags, all over one index
+
+With no `-w`, the query resolves against the declarative library first, so the
+default is the full English Wikipedia (19.2M articles). `-w` is a
+case-insensitive substring of the archive path: declarative store paths first,
+then local files in `/var/lib/kiwix`, then an error.
+
 ```bash
-wikisearch "quantum computing"
-wikisearch "James Webb Space Telescope"
-```
-
-### B. Targeting a Specific Wiki Archive (`-w`, `--wiki`)
-Resolution order: declarative library paths (store ZIMs) → local files in
-`/var/lib/kiwix` → error. Match is a case-insensitive substring of the path:
-```bash
-# Full Wikipedia (library store path)
-wikisearch -w wikipedia "Alan Turing"
-
-# ArchWiki (library store path)
-wikisearch -w arch "systemd-boot"
-
-# Local-only archive in /var/lib/kiwix
-wikisearch -w top "Alan Turing"
-```
-
-### C. List Available Archives (`-l`, `--list`)
-Inspect all registered wikis, article counts, filenames, and IDs:
-```bash
-wikisearch --list
-```
-
-### D. Autocomplete / Title Prefix Search (`-s`, `--suggest`)
-Find exact article title matches:
-```bash
-wikisearch -s "Antigrav"
-```
-
-### E. Resolve Direct Article URLs (`-u`, `--url`)
-Outputs full HTTP URLs to the web reader:
-```bash
-wikisearch -u "relativity"
-```
-
-### F. Status & Diagnostics (`--status`)
-Inspect the running `kiwix-serve` daemon, archive paths, and background services:
-```bash
-wikisearch --status
+wikisearch "quantum computing"          # full text, default archive
+wikisearch -w arch "systemd-boot"       # one archive, by path substring
+wikisearch -w top "Alan Turing"         # a local-only archive in /var/lib/kiwix
+wikisearch -l                           # archives, counts, filenames, ids
+wikisearch -s "Antigrav"                # title-prefix suggest
+wikisearch -u "relativity"              # reader URLs
+wikisearch --status                     # serve unit, archive paths
 ```
 
 ---

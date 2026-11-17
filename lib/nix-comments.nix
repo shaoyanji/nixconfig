@@ -85,8 +85,11 @@
         (builtins.tail parts)
       );
 
-  # A line inside a multi-line string is content, not a comment: the toggle is an
-  # odd count of the quote pair on lines that are not themselves comments.
+  occurrences = pat: text: builtins.length (builtins.filter builtins.isString (builtins.split pat text)) - 1;
+
+  # A line inside a multi-line string is content, not a comment: the toggle is the
+  # delimiter count on lines that are not themselves comments. `''$` is an escape
+  # for a literal `$` inside the string, so `''${VAR}` never opens one.
   scanFile = p: let
     lines = lib.splitString "\n" (builtins.readFile (root + "/${p}"));
     indexed =
@@ -97,7 +100,7 @@
       lines;
     step = acc: cur: let
       trimmed = lib.trim cur.text;
-      quotes = builtins.length (builtins.filter builtins.isString (builtins.split "''" cur.text)) - 1;
+      quotes = occurrences "''" cur.text - occurrences "''\\$" cur.text;
       isComment = !acc.inside && lib.hasPrefix "#" trimmed;
       quotesHere =
         if isComment

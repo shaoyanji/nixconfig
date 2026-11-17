@@ -1,55 +1,110 @@
 ---
 name: antigravity
-description: "Delegate coding to agy CLI (Google agent, installed version). Uses --dangerously-skip-permissions, --json-schema <path>, --print='<prompt>', --mode plan, --output-format json. Binary NOT migrated; only invocation reference persisted."
-version: 0.1.0
+description: "Delegate coding to agy, Google's Antigravity CLI (1.5.9): --settings '{\"modelProvider\":\"gemini\"}' --model gemini-4-hydrogen-high --output-format json -p '<prompt>'. The settings flag is what makes the Gemini 4 models exist at all."
+version: 0.2.0
 author: Hermes Agent
 license: MIT
-platforms: [linux, macos, windows]
+platforms: [linux, macos]
 metadata:
   hermes:
     tags: [Coding-Agent, Antigravity, Google, AI-Agent, Delegation]
-    related_skills: [claude-code, hermes-agent, nix-toolchain]
+    related_skills: [frieren-offload, agents, prove-it-works]
 ---
 
-# Antigravity CLI
+# Antigravity CLI (agy)
 
-Delegate coding tasks to [Antigravity](https://antigravity.google/) via the Hermes terminal. Antigravity is Google's autonomous coding agent CLI.
+Delegate a bounded coding task and read one JSON object back. The model list is
+provider-scoped: without `--settings`, `agy models` offers Gemini 3.8 Flash,
+Claude Sonnet/Opus and GPT-OSS; the Gemini 4 family (carbon, hydrogen, argon)
+exists only under `--settings '{"modelProvider":"gemini"}'`.
 
-## When to use
+## The invocation
 
-- Building features
-- Refactoring
-- PR reviews
-- Batch issue fixing
-- Ultra-fast web automation with browser integration
+```bash
+agy --settings '{"modelProvider":"gemini"}' \
+    --model gemini-4-hydrogen-high \
+    --output-format json \
+    -p "Hello from Hydrogen!"
+```
 
-Requires the antigravity CLI.
+Measured 2026-11-17 on 1.5.9: 97 s and 18 661 tokens for a one-line answer, against
+2.7 s on the default model for the same prompt. The pair travels together — drop
+the settings and the call exits 1 with
+`{"status":"ERROR","error":"… model gemini-4-hydrogen-high is not recognized as a known model or custom model in settings"}`.
 
-## Prerequisites
+Ask agy itself which models the provider has, with the same settings you intend
+to use — the bare list is a different one:
 
-- `agy` available: declared by `modules/user/ai/antigravity-cli.nix` as
-  `pkgs.llm-agents.antigravity-cli` (on a nixconfig host: `/etc/profiles/per-user/devji/bin/agy`,
-  measured 1.5.1). Anywhere else: `nix run github:numtide/llm-agents.nix#antigravity-cli -- <args>`.
-- Never `npm install -g antigravity-cli` — different binary name, and it writes
-  outside the store (see the `nix-toolchain` skill).
-- Default model on this fleet is set by the module (`$GEMINI_MODEL`), currently
-  `gemini-3.8-flash`; read the module rather than assuming a model id. `agy` has no
-  model env var of its own — pass `--model "$GEMINI_MODEL"` explicitly.
-- Auth is the per-user OAuth token already in `$HOME`
-  (`~/.gemini/antigravity-cli/antigravity-oauth-token`), so a local-user hermes
-  reuses it instead of re-authenticating. A second host reuses that token
-  (`install -m600` or a symlink) instead of signing in again.
-- `GEMINI_API_KEY` alone is inert. `agy` reads it only when the session's settings
-  say `modelProvider=gemini`; with the key exported and no provider it signs in
-  with the account instead. Measured 2026-11-17 on 1.5.9: `agy models` with the
-  key exported listed only the account models, and the same call with
-  `--settings '{"modelProvider":"gemini"}'` listed
-  `gemini-4-hydrogen-{low,medium,high,xhigh}`, Carbon and Argon. That route needs
-  no OAuth session and bills the key's project rather than the plan.
+```bash
+agy --settings '{"modelProvider":"gemini"}' models
+# gemini-4-carbon-{high,medium,low} · gemini-4-hydrogen-{xhigh,high,medium,low}
+# gemini-4-argon-{high,medium,low} · gemini-3.8-flash-{…} · gemini-3.1-pro-{high,low}
+```
 
-## The Gemini API key route (Hydrogen)
+`--effort low|medium|high|xhigh|max` is a second axis; a Gemini 4 id already
+carries an effort, and `--settings` validates its values (an unknown provider is
+an error, not a fallback).
 
-Use `agy-gemini` instead of hand-writing the flag pair:
+## Install and defaults
+
+- `agy` is `pkgs.llm-agents.antigravity-cli` from
+  `modules/user/ai/antigravity-cli.nix`; on a nixconfig host that is
+  `/etc/profiles/per-user/devji/bin/agy`. Elsewhere:
+  `nix run github:numtide/llm-agents.nix#antigravity-cli -- <args>`.
+- Never `npm install -g antigravity-cli`: different binary name, and it writes
+  outside the store.
+- The fleet default model is the module's `$GEMINI_MODEL` (`gemini-3.8-flash`).
+  `agy` has no model env var of its own — pass `--model` explicitly, and read the
+  module rather than assuming a version.
+- Under the hermes gateway the unit exports `AGY_CLI_DISABLE_AUTO_UPDATE` and
+  `GEMINI_MODEL`; a login shell gets them from Home Manager.
+
+## Flags that matter
+
+| flag | meaning |
+| :--- | :--- |
+| `-p`, `--print`, `--prompt` | run one prompt non-interactively and print the answer. **Not** skip-permissions |
+| `--settings '<json>'` | `settings.json` keys for this session only, never saved; `modelProvider` is the one that changes the model list |
+| `--model <id>` | model for the session; must be one the selected provider lists |
+| `--output-format text\|json\|stream-json` | `json` gives `{conversation_id,status,response,duration_seconds,num_turns,usage}` |
+| `--dangerously-skip-permissions` | auto-approve every tool call. Long form only, no short alias |
+| `--mode plan\|auto\|accept-edits` | `plan` answers with a plan and a question, which is never what a headless caller wants |
+| `--json-schema <inline-json-or-path>` | enforce a shape on the final answer |
+| `--print-timeout <duration>` | limit on print mode (`180s`); `0` waits for the turn |
+| `--input-format stream-json` | one NDJSON message per line on stdin, requires `--output-format stream-json` |
+| `--effort`, `--agent`, `--project`, `--add-dir`, `--sandbox` | effort, agent, project, extra workspace dirs, sandboxed tools |
+
+Re-read `agy --help` after an upgrade; this table is what 1.5.9 prints.
+
+## The wrapper subagents call
+
+`agy-subagent`, declared by `modules/user/ai/antigravity-cli.nix`, pins the model
+and provider pair and the JSON form, so a parent parses a result instead of
+scraping a TUI:
+
+```bash
+agy-subagent 'Add a dark mode toggle to settings' --mode plan --dir ~/project
+agy-subagent 'Summarise the failing tests' --schema /tmp/schema.json --dir ~/repo --toon
+```
+
+It exits 2 outside a git work tree, on a missing argument, and on the default route
+with `GEMINI_API_KEY` unset. `AGY_SETTINGS` (default the Gemini provider) and
+`AGY_SUBAGENT_MODEL` (default `gemini-4-hydrogen-high`) set the pair,
+`AGY_SUBAGENT_TIMEOUT` the 900 s cap; stdout is agy's JSON.
+
+Hydrogen is the default for delegated work and it is an API-key model: the
+consumer OAuth account lists no Gemini 4 id at all, so a run without the key
+cannot fall back quietly. Pass `AGY_SETTINGS='{}'` (and an account model) when a
+call really does belong on the OAuth route. Interactive `agy` stays on the
+account route with `$GEMINI_MODEL`, because the provider setting is session-only
+by design. `--toon` projects it through `toon -e` — for a record
+array, not for the single nested object a conversational answer returns.
+
+## The Gemini API key route
+
+`agy-gemini` is the shared implementation: the provider setting, the hydrogen
+default and the `GEMINI_API_KEY` preflight live there, and `agy-subagent`, the
+host cascades and a hand-written call all go through it. For one delegated task:
 
 ```bash
 agy-gemini -p 'hello'                       # gemini-4-hydrogen-high, print mode
@@ -57,115 +112,71 @@ agy-gemini models                           # what the key unlocks
 agy-gemini --model gemini-4-carbon-high -p 'review this diff'
 ```
 
-The wrapper requires `GEMINI_API_KEY` (a login shell already exports it from the
-sops cache), adds `--settings '{"modelProvider":"gemini"}'` for that session
-only, and defaults `--model` to `gemini-4-hydrogen-high` unless you pass one.
-`--settings` is never saved, so the Pro account route stays the default and the
+It requires `GEMINI_API_KEY` and adds `--settings '{"modelProvider":"gemini"}'`
+for that session only, so the Pro account route stays the default and the
 HM-owned `settings.json` is untouched. Do not put `modelProvider` in
-`settings.json` to get this: it would replace the account route for every run on
-the host, not just the one that wants Hydrogen.
+`settings.json` to get this: it replaces the account route for every run on the
+host, not just the one that wants Hydrogen.
 
-Prefixed model ids matter. `gemini-4-hydrogen` (unsuffixed) answered
+Prefixed ids matter. `gemini-4-hydrogen` (unsuffixed) answered
 `503 UNAVAILABLE — high demand` after 84 s on the same key and minute that
-`gemini-4-hydrogen-high` answered normally, so pin a suffixed id. `--effort`
-exists too (`AGY_GEMINI_EFFORT`), but the suffix already picks the level; set one
-or the other.
+`gemini-4-hydrogen-high` answered normally, so pin a suffixed id.
 
 Budget is the real constraint, not latency. The free API tier allows a handful of
-requests per minute and about 20 per day per project (check the live numbers in
-AI Studio — Google stopped publishing the table), and one agent turn is one
-request plus retries: a trivial print run measured 17 226 input tokens in one
-turn. A 429 carrying `quota_exceeded` ends the day, while `rate_limit_exceeded`
-clears in seconds. So Hydrogen is for a single delegated task, and a long sweep
-belongs on the account route or a billed project.
-- Under the hermes gateway the unit exports `AGY_CLI_DISABLE_AUTO_UPDATE` and
-  `GEMINI_MODEL` itself; a login shell gets them from Home Manager.
-- Must run inside a git repository (`/tmp/antigravity_task` used as scratch workspace).
-- Use `pty=true` in terminal calls — `agy` hangs without PTY.
+requests per minute and about 20 a day per project (the live numbers are in AI
+Studio), and one agent turn is one request plus retries: a trivial print run
+measured 17 226 input tokens. A 429 carrying `quota_exceeded` ends the day, while
+`rate_limit_exceeded` clears in seconds. A long sweep belongs on the account
+route or a billed project.
 
-## Key flags
-
-| Flag | Description |
-|------|-------------|
-|| `--dangerously-skip-permissions` (`-p`) | Skip permission checks |
-|| `--json-schema <path>` | JSON schema file path (NOT bare `--jsonschema`) |
-|| `--print='<prompt>'` | Non-interactive prompt |
-|| `--mode plan` | Planning mode |
-|| `--output-format json` | Structured JSON output |
-|| `--sandbox` | Sandbox mode (syntax may differ from old `--sandbox danger-full-access`) |
-
-## One-shot tasks
-
-Prefer the wrapper — it is the delegated-subagent entry point Hermes is told to use, and
-the only place the flags are pinned:
+## Direct call
 
 ```bash
-agy-subagent 'Add a dark mode toggle to settings' --mode plan --dir ~/project
-agy-subagent 'Summarise the failing tests' --schema /tmp/schema.json --dir ~/repo
+cd ~/project
+agy --settings '{"modelProvider":"gemini"}' --model gemini-4-hydrogen-high \
+  --dangerously-skip-permissions --output-format json --json-schema schema.json \
+  --mode accept-edits --print-timeout 180s -p 'Add dark mode toggle to settings'
 ```
 
-It exits 2 with a message outside a git work tree, defaults to `$GEMINI_MODEL`
-(`gemini-3.8-flash`), caps the run at `$AGY_SUBAGENT_TIMEOUT` (900 s) and writes agy's JSON
-(`status`, `response`, `usage`) to stdout. That result is one small object, so read it as
-JSON; when a schema makes `response` a long array of records, add `--toon` —
-`agy-subagent … --schema s.json --toon` — and the wrapper projects the document through
-`toon -e`, printing the size stat on stderr. Measured on a one-line reply: TOON is 15 %
-*more* tokens for this single nested object, and 14 % fewer on the flat `task --list-all`
-table, so the flag is for record arrays, not for every call. Raw form for anything the wrapper does not cover:
+Scratch work still needs a git work tree:
 
 ```bash
-# Verified syntax for agy installed version (NOT antigravity binary)
-terminal(command="agy --model \"$GEMINI_MODEL\" --dangerously-skip-permissions --json-schema /tmp/antigravity_task/schema.json --print='Add dark mode toggle to settings' --mode plan --output-format json", workdir="~/project", pty=true)
+d=$(mktemp -d) && cd "$d" && git init -q .
 ```
 
-For scratch work (requires `.git` directory):
-```bash
-terminal(command="cd $(mktemp -d) && git init && agy --dangerously-skip-permissions --print='Build a test script' --mode plan --output-format json", workdir="/tmp/project", pty=true)
-```
+## Long tasks
 
-## Background mode (long tasks)
+Print mode returns when the turn ends, so anything past the wrapper's timeout
+belongs in a detached session (`tmux` skill) with the JSON written to a log. A
+detached session has no TTY to approve a tool call, so there
+`--dangerously-skip-permissions` is mandatory, and `--mode plan` is the one mode
+that will stop and wait for an answer that nobody will type.
 
-```bash
-# Background mode (verified syntax for agy installed version; binary NOT migrated)
-terminal(command="agy --dangerously-skip-permissions --json-schema /tmp/antigravity_task/schema.json --print='Process email judgments' --mode plan --output-format json", workdir="~/project", background=true, pty=true)
-# Note: previous session proc_60c8a2ea9699 completed exit=0 but produced truncated/no artifact (syntax fixed after .hm-backup patch).
-# Monitor progress (process_manage may not be available in all Hermes sessions; verify with ps/log if needed):
-# process(action="poll", session_id="<id>")
-# process(action="log", session_id="<id>")
+## Auth and hosts
 
-# Monitor progress
-process(action="poll", session_id="<id>")
-process(action="log", session_id="<id>")
-
-# Send input if Antigravity asks a question
-process(action="submit", session_id="<id>", data="yes")
-
-# Kill if needed
-process(action="kill", session_id="<id>")
-```
-
-## Verification protocol (required before mailbox mutation)
-
-Before deploying any archive/deletion action:
-1. Read `HANDOFF.md` at `/home/devji/.hermes/cache/scratch/email-cleansing/HANDOFF.md`.
-2. Confirm `jev-decide` criteria include `archive` and `delete` choices (not just `archive`/`keep`).
-3. Confirm `mailbox_mutation_performed` is `false` before execution; set to `true` only after verified `himalaya` command success.
-4. Confirm user authorization is recorded (this session: user authorized via Telegram DM, message IDs 1445, 1448, 1458).
-5. `git status` clean (this skill directory only; binary not migrated).
-6. No untracked secrets in workspace (`~/.config/hermes/hermes.env` carries `JISIFU_APP_PASSWORD` via sops, not committed).
-7. Verify with `himalaya -a jisifu envelope list` before and after mutation to confirm change.
-8. Report execution result honestly: include exit codes, applied counts, and any syntax errors (e.g., `--mailbox Archive` unavailable in Gmail IMAP).
+Two routes, two credentials. The account route uses the per-user OAuth token at
+`~/.gemini/antigravity-cli/antigravity-oauth-token`; a second host reuses it
+(`install -m600` or a symlink) instead of signing in again. The API-key route
+reads `GEMINI_API_KEY` only when the session says `modelProvider=gemini` — with
+the key exported and no provider, agy signs in with the account and ignores it
+(measured 2026-11-17: `agy models` with the key listed only account models, and
+the same call under the provider listed the Gemini 4 family). That route needs no
+OAuth session and bills the key's project rather than the plan. A CPU without
+RDRAND cannot run agy at all: `hosts/fern/configuration.nix` disables the module
+and the host uses `agy-remote` against frieren. `AGY_CLI_DISABLE_AUTO_UPDATE` is
+set by the module, because the self-updater writes to `~/.local/bin` where a
+store path owns the binary.
 
 ## Rules
 
-1. **Always verify `agy --help` before invoking** — `--dangerously-skip-permissions` and `--json-schema <path>` are confirmed; `--jsonschema` (bare) does NOT work on `agy` installed version.
-2. **Always include `--json-schema <path>`** for structured output; never use bare `--jsonschema`.
-3. **Always use `--print='<prompt>'`** for non-interactive delegation; never pass unquoted prompts that can be interpreted as flags.
-4. **Always run inside `git` directory** — `agy` fails outside `.git` (`/tmp/antigravity_task` scratch workspace verified).
-5. **Always check `HANDOFF.md`** before mailbox mutation; confirm authorization recorded.
-6. **Always confirm `mailbox_mutation_performed`** explicitly (`false` before, `true` only after verified `himalaya` success).
-7. **Always report execution honestly** (exit codes, applied counts, syntax errors, timeout results — e.g., previous `proc_60c8a2ea9699` completed exit=0 with truncated/no artifact).
-8. **Always clean up** — kill `proc_*` background sessions (verify with `ps` or `notify_on_complete`); remove temp directories.
-9. **Never migrate binary** — `agy` (`/etc/profiles/per-user/devji/bin/agy`, installed version) stays in profile; this skill only defines invocation patterns.
+1. `--model` and `--settings` travel together for anything newer than the default list;
+   only the pair resolves.
+2. `-p` is `--print`. Skip-permissions is spelled out in full.
+3. A rejected model exits 1 with `{"status":"ERROR"}`, and a produced JSON carries
+   `status`: read it, do not infer success from a silent stderr.
+4. Run inside a git work tree — agy refuses to start outside one.
+5. `--mode plan` is for human review; a headless caller wants `accept-edits` or a schema.
+6. Report the exit code, `status`, `duration_seconds` and `usage` — a turn that ran
+   is not the same claim as a turn that produced the artifact.
 
-Truth: `modules/user/ai/antigravity-cli.nix` — the CLI module; this page is the procedure.
+Truth: `modules/user/ai/antigravity-cli.nix` — the module and the wrapper; this page is the procedure.

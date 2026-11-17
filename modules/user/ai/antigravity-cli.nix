@@ -71,19 +71,22 @@
       AGY_CLI_DISABLE_AUTO_UPDATE = "true";
     };
 
-    # Hermes' main subagent runner. One headless agy call, JSON on stdout, so a
-    # parent turn parses a result instead of scraping a TUI. Every flag here is
-    # one the skill proves by hand; the point of the wrapper is that the model
-    # comes from GEMINI_MODEL (the same knob the gateway unit exports) and that
-    # the git-work-tree precondition fails with a message rather than a hang.
+    # Hermes' main subagent runner: one headless call, JSON on stdout. The provider
+    # setting, model default and key preflight come from agy-gemini (flake/cli.nix);
+    # this adds the prompt/schema/mode surface, the git-work-tree precondition and
+    # the timeout.
     home.packages = lib.mkIf config.programs.antigravity-cli.enable [
       (pkgs.writeShellApplication {
         name = "agy-subagent";
-        runtimeInputs = [config.programs.antigravity-cli.package pkgs.git pkgs.llm-agents.toon];
+        runtimeInputs = [
+          self.packages.${pkgs.stdenv.hostPlatform.system}.cli.ai.agy-gemini
+          pkgs.git
+          pkgs.llm-agents.toon
+        ];
         text = ''
           usage() {
             cat <<'EOF'
-          agy-subagent — run agy headless as a Hermes subagent; JSON on stdout
+          agy-subagent — run agy-gemini headless as a Hermes subagent; JSON on stdout
 
             agy-subagent '<prompt>' [--schema FILE] [--mode plan|auto|accept-edits] [--dir DIR] [--toon]
 
@@ -93,8 +96,11 @@
             --toon          project the result to TOON (stdout); the size stat goes to stderr
 
           Env:
-            GEMINI_MODEL          model for the run (default: gemini-3.8-flash)
+            AGY_SUBAGENT_MODEL    model for the run (default: gemini-4-hydrogen-high)
             AGY_SUBAGENT_TIMEOUT  print-mode time limit in seconds (default: 900)
+            GEMINI_API_KEY        required: the Gemini 4 models exist only on the API-key
+                                  route (modelProvider=gemini), which agy-gemini enforces
+                                  before the call. The OAuth account lists none of them.
           EOF
           }
 
@@ -130,14 +136,14 @@
             exit 2
           fi
 
-          args=(--model "''${GEMINI_MODEL:-gemini-3.8-flash}" --dangerously-skip-permissions --print "$prompt" --output-format json --print-timeout "''${AGY_SUBAGENT_TIMEOUT:-900}s")
+          args=(--model "''${AGY_SUBAGENT_MODEL:-gemini-4-hydrogen-high}" --dangerously-skip-permissions --print "$prompt" --output-format json --print-timeout "''${AGY_SUBAGENT_TIMEOUT:-900}s")
           if [ -n "$schema" ]; then args+=(--json-schema "$schema"); fi
           if [ -n "$mode" ]; then args+=(--mode "$mode"); fi
 
           if [ "$toon" = 1 ]; then
-            agy "''${args[@]}" | toon -e --stats
+            agy-gemini "''${args[@]}" | toon -e --stats
           else
-            agy "''${args[@]}"
+            agy-gemini "''${args[@]}"
           fi
         '';
       })

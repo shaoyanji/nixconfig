@@ -72,7 +72,7 @@ scp HANDOFF.md frieren:~/HANDOFF.md
 
 # b) run it immediately, in a session that outlives the tool call (see `tmux`)
 ssh frieren "tmux new-session -d -s agent-job -c /var/lib/job -- \
-  nix shell nixpkgs#... -c agy --dangerously-skip-permissions -p 'Read HANDOFF.md and execute it.'"
+  nix shell nixpkgs#... -c agy --settings '{"modelProvider":"gemini"}' --model gemini-4-hydrogen-high --output-format json --dangerously-skip-permissions -p 'Read HANDOFF.md and execute it.'"
 ```
 
 Use `/var/lib/<job>` for the working directory, not `$HOME`: hardened units with

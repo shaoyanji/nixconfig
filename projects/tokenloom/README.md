@@ -31,8 +31,8 @@ publish and outbound).
 `loom-cli bench` takes `--doc N` (for the socket run and `--core` alike),
 `--window N` and `--relax`; `web/window.mjs`
 reads `TARGET_MS` (the 5 ms it gates on) and reports what the window buys.
-`scripts/bench-sweep.sh` runs the four-width sweep and fails when a verdict
-differs from the table above.
+`scripts/bench-sweep.sh` runs the gate at three window widths and on a 40 k
+document, and fails when a verdict differs from the table below.
 
 ## Measured numbers
 
@@ -40,7 +40,7 @@ differs from the table above.
 
 | Metric | Target | Measured |
 | :--- | :--- | :--- |
-| edit → diff over the socket, p99 | < 5 ms | **3.52 ms** (p50 3.19, max 4.28; 10 029 tokens, 2 ms window included) |
+| edit → diff over the socket, p99 | < 5 ms | **2.28 ms** (p50 2.20; the worst single edit over five runs was 4.78 ms; 10 029 tokens, 2 ms window included) |
 | core pipeline, p99 (no window) | — | **43 µs** on 10 k tokens, **105 µs** on 40 k (p50 28 / 90) — the floor under that number, not a target |
 | tokens re-tokenized per edit, median | < 2 % of doc | **0.07 %** |
 | tokens re-tokenized per edit, p99 | < 10 % of doc | **0.20 %** |
@@ -162,8 +162,8 @@ stamp rather than by a polling loop. Identity is asserted where it could break:
 the row element has to be the same node afterwards (a property set on it must
 survive), the id it shows must not change, the anchor and the length must not
 move, and the next plant has to take the next id — no run has broken any of the
-four. The timings are op on the wire 0.1 ms, ack 3.3 ms (2 ms of which is the
-coalescer window), the list frame the same 3.3 ms in the same message, andthe row repainted at 3.4 ms. Identity held 60/60 in the last run on the row element,
+four. The timings are op on the wire 0.1 ms, ack 2.3 ms (2 ms of which is the
+coalescer window), the list frame the same 2.3 ms in the same message, and the row repainted at 2.4 ms. Identity held 60/60 in the last run on the row element,
 the id and the focus, with the span at `3t @ 0b` and the next plant taking 0, 1.
 The first measurement of this was 9.4 ms and 51.8 ms, and the gap was not the
 retune: the server queued both frames within
@@ -183,24 +183,24 @@ default 200 edits, one run each:
 
 | window | edit → diff p99 | verdict |
 | :--- | :--- | :--- |
-| 1 ms | 2.28 ms | pass |
-| **2 ms** | **3.24 ms** | **pass — the default** |
-| 4 ms | 5.31 ms | fail |
-| 8 ms | 9.42 ms | fail |
+| 1 ms | 1.19 ms | pass |
+| **2 ms** | **2.19 ms** | **pass — the default** |
+| 4 ms | 4.18 ms | on the line — 9.18 ms in another run |
+| 8 ms | 8.26 ms | fail |
 
-From the browser at 2 ms the same segment measured 3.47 ms over 60 edits, with
+From the browser at 2 ms the same segment measured 2.31 ms over 60 edits, with
 the diff sharing the ack's message in 60/60. The bench runs longer, so its p99
-covers more of a tail that is real: 3.52 ms on the default run, 3.24 ms in this
-sweep, and 3.98 and 3.96 ms over two runs of 1000 edits, by which point the
-document has grown by 1000 tokens. The slowest single edit in those runs was
-5.18 ms, and the p99 did not follow it there. A larger document is no longer the
-worse case: 4.16 and 4.29 ms over 600 edits at 40 k, 4.59 and 4.81 over 1000, and
-4.21–4.32 ms at 100 k. The pipeline under all of them is 105 µs at 40 k; what the
-rest is made of, and what was moved to get here, is in the limits below.
+covers more of a tail that is real: 2.28 and 2.30 ms on the default run, 2.19 ms in
+this sweep, and 2.94 ms over 1000 edits, by which point the document has grown by
+1000 tokens. The slowest single edit in those runs was 7.34 ms, and the p99 did
+not follow it there. A larger document is no longer the worse case: 3.08 and 3.17
+ms over 600 edits at 40 k, and 3.58 ms at 100 k. The pipeline under all of them is
+105 µs at 40 k; what the rest is made of, and what was moved to get here, is in
+the limits below.
 
-The default is 2 ms: the widest window that keeps end-to-end p99 under the 5 ms
-target, and the gate says so rather than the prose — 4 ms and 8 ms are the same
-measurement failing. A keystroke cadence merges nothing at any width, so a burst
+The default is 2 ms: the widest window with margin under the 5 ms target, and the
+gate says so rather than the prose — 4 ms measures 4.18 ms with a 9.18 ms run
+beside it, and 8 ms fails outright. A keystroke cadence merges nothing at any width, so a burst
 is the only traffic the window is for, and a burst sent in one turn already
 merges at 1 ms. The 8 ms default it shipped with added 6 ms to every edit and
 merged nothing more than 2 ms does except a burst spread over several
@@ -232,8 +232,9 @@ what makes the emitted `DIFF` minimal.
 once afterwards. Retokenizing between ops would shift the indices the client's
 next op refers to, so the op would land somewhere the user did not click. The
 width is measured rather than inherited: 2 ms is the widest that keeps the
-end-to-end edit-to-diff p99 under the 5 ms target, and a burst of ten ops sent
-in one turn still becomes one revision at that width. The
+end-to-end edit-to-diff p99 under the 5 ms target with room to spare — 4 ms sits
+on the line — and a burst of ten ops sent in one turn still becomes one revision
+at that width. The
 frame's span comes from the affine pre/post mapping; the retokenization seed
 comes from the per-op splices shifted by later deltas, which stays exact even if
 an op's offset had to be clamped. If a sender's offsets do not line up with the
@@ -335,27 +336,36 @@ log whose base document is gone.
   scratch build the same 600 edits measured 3.35 ms with 66 µs outbound, so the
   cost was four shard threads on four cores delaying both socket wakeups — the
   allocator was ruled out the same way, since forcing the mmap thresholds left the
-  p99 at 6.10 ms. The wait has a floor of its own: it is `window + 1.06 ms` at 1,
-  2 and 4 ms widths, which is tokio's 1 ms timer granularity, not a phase this
-  code can tune without polling for it. The shard count is now one per two cores,
+  p99 at 6.10 ms. The wait had a floor of its own: `window + 1.06 ms` at 1, 2 and
+  4 ms widths, which is tokio's timer wheel rounding a deadline up to its next
+  1 ms tick. A blocking sleep is a `clock_nanosleep` and lands on the microsecond,
+  so the window is closed by one now, and the millisecond came back: 3.31 → 2.28 ms
+  at 10 k tokens, 4.16 → 2.57 ms at 40 k. Draining the last millisecond with
+  `yield_now` instead measured the same 3.04 ms at 40 k while holding a core for
+  that millisecond, so the blocking sleep is the one that ships. The shard count
+  is now one per two cores,
   and the difference is the gate: 5.70 ms at four shards, 4.21 at two, on the same
   run; 1000 batches/s still lands 2000 shard events with 0 starved. One shard
   measures 3.78 ms and is rejected, because six reactors on one thread means each
   waits for the slowest.
-- **What is left is the window.** A 40 k edit's p50 is 3.4 ms, of which 3.06 is
-  the window; its p99 is 4.2–4.8 ms over 600–1000 edits, and 10 k holds 3.5–4.0.
+- **What is left is the window.** A 40 k edit's p50 is 2.54 ms, of which 2.0 is
+  the window; its p99 is 3.1–3.4 ms over 600 edits, and 10 k holds 2.2–2.3.
   The structural work under that was fixed earlier and is still in the numbers:
   every position lookup summed a chunk's tokens, so `byte_of_token` was
   O(tokens), and the token array a batch materializes was grown from zero. Both
   were measured interleaved against a build with the old rope, three rounds each,
   server time per edit at 100 154 tokens (median): ops 85 → 56 µs, ripple
   473 → 177 µs, materialize 321 → 269 µs, end-to-end p50 3.93 → 3.52 ms. The
-  remaining margin is the gate's own arithmetic: 2 ms of window, 1 ms of timer
-  granularity, ~0.3–1.0 ms of apply.
+  remaining margin is the gate's own arithmetic: 2 ms of window, ~0.5 ms of
+  apply and transport at p50, and ~1.2 ms of the same at the p99 end.
 - **The gate's verdict is checked on a schedule, not re-read.**
   `.github/workflows/bench.yml` runs `scripts/bench-sweep.sh` every Monday: the
-  four window widths above, each compared with this README's table, two attempts
-  per width so one noisy run is a footnote. A verdict that changed fails the job
+  three window widths above, each compared with this README's table, two attempts
+  per width so one noisy run is a footnote, and a 40 000-token document over 600
+  edits at the 2 ms default, compared with the 5 ms target itself because that
+  target is what the document has to meet. The 4 ms width is published and not
+  gated: it is 4.18 ms in one run and 9.18 ms in another, so a row there would
+  flip on noise. A verdict that changed fails the job
   and prints the p99 beside it, because a gate whose answer moved is a fact to
   look at rather than a paragraph to trust. The script prints the runner's core
   count and CPU, puts them in every row, and writes `bench-sweep.json`; below the

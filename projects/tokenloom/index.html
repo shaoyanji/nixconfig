@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Token Loom — a token-editing workbench</title>
-<meta name="description" content="Token Loom is a workbench for editing token streams: a byte-anchored constraint index, six reactors over the diff, and a minimal diff stream that does not flicker. Measured end-to-end diff latency around 4 ms on a 10k-token document." />
+<meta name="description" content="Token Loom is a workbench for editing token streams: a byte-anchored constraint index, six reactors over the diff, and a minimal diff stream that does not flicker. Measured end-to-end diff latency around 2 ms on a 10k-token document." />
 <meta name="color-scheme" content="dark" />
 <style>
   :root {
@@ -162,16 +162,16 @@
       <tr><th>What</th><th>Target</th><th>Measured</th></tr>
     </thead>
     <tbody>
-      <tr><td>edit to diff over the socket, p99</td><td class="n">&lt; 5 ms</td><td>3.52 ms, the 2 ms batch window included (p50 3.19)</td></tr>
+      <tr><td>edit to diff over the socket, p99</td><td class="n">&lt; 5 ms</td><td>2.28 ms, the 2 ms batch window included (p50 2.20)</td></tr>
       <tr><td>core pipeline, p99 (no window)</td><td class="n">—</td><td>43 µs on 10k tokens, 105 µs on 40k — the floor under that number</td></tr>
-      <tr><td>40 000-token document, p99</td><td class="n">&lt; 5 ms</td><td>4.2–4.8 ms over 600–1000 edits, 4.3 ms at 100k</td></tr>
+      <tr><td>40 000-token document, p99</td><td class="n">&lt; 5 ms</td><td>3.1–3.2 ms over 600 edits, 3.6 ms at 100k</td></tr>
       <tr><td>bytes re-tokenized per edit</td><td class="n">&lt; 2 % median, 10 % p99</td><td>0.07 % median, 0.20 % p99</td></tr>
       <tr><td>ripple hits past the window</td><td class="n">&lt; 0.1 %</td><td>0 of 1000 edits</td></tr>
       <tr><td>batches per second, six reactors</td><td class="n">1000/s, no queue</td><td>1000/s on 2 shards, 0 starved</td></tr>
       <tr><td>diff frame encode</td><td class="n">no allocation</td><td>6.0–7.4 µs/frame, reused buffer, 4096 → 4096 bytes</td></tr>
       <tr><td>page redraw with a span marked</td><td class="n">—</td><td>1.1 ms p50 on a 40 323-token rope, 512 visible chips</td></tr>
       <tr><td>shifting the span list per diff</td><td class="n">—</td><td>1.8 µs for a full index of 256 spans</td></tr>
-      <tr><td>the gate's verdict, re-checked weekly</td><td class="n">a changed answer fails CI</td><td>1 ms and 2 ms pass, 4 ms and 8 ms fail — as documented</td></tr>
+      <tr><td>the gate's verdict, re-checked weekly</td><td class="n">a changed answer fails CI</td><td>1 ms and 2 ms pass, 8 ms fails — as documented</td></tr>
     </tbody>
   </table>
   <p style="margin-top:14px; color:var(--dim); font-size:13.5px;">

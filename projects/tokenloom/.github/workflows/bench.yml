@@ -1,10 +1,10 @@
 # The gate's verdict, on a schedule.
 #
-# `bench-sweep.sh` runs the socket bench at four window widths and compares each
-# verdict with the table README.md publishes. A shared runner moves the
-# milliseconds; it should not move the verdict. When it does, this job fails with
-# the p99 beside it, because a gate whose answer changed is a fact to look at
-# rather than one to re-read in prose.
+# `bench-sweep.sh` runs the socket bench at three window widths and on a 40 k
+# document, and compares each verdict with the table README.md publishes. A shared
+# runner moves the milliseconds; it should not move the verdict. When it does,
+# this job fails with the p99 beside it, because a gate whose answer changed is a
+# fact to look at rather than one to re-read in prose.
 #
 # The table came from a four-core box, so the core count is printed, carried in
 # every row and written into `bench-sweep.json`. Below four cores the script

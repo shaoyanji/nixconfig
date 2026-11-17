@@ -74,4 +74,5 @@ incident (`correct`).
 - Labels: `assets/labels.json`, flat, no nesting.
 - Which task answers an intent: `task-plane`; `task help`, `task find:<word>`.
 - The decision lane: `jevdecide`. The evidence rule: `prove-it-works`.
+- The rule behind the gate: [[flake/policies.nix#router-labels-are-routed]].
 - This page's own budget: `flake/prose-budget.nix`. [[flake/policies.nix#agent-prose-budget]]

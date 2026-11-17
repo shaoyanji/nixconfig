@@ -80,7 +80,6 @@
       to = ["doc" "host" "skill"];
       evidence = "the `about` list of the draft frontmatter, filtered to ids that exist";
       tier = "asserted";
-      multiplicity = "many-to-many";
       cannot = "that the draft is agreed or delivered: status is the note's, not the edge's";
     };
     cites = {
@@ -89,7 +88,6 @@
       to = ["policy"];
       evidence = "`[[flake/policies.nix#<id>]]`, resolved against the ids flake/policies.nix declares";
       tier = "resolved";
-      multiplicity = "many-to-many";
       cannot = "that the citing page obeys the rule; the gate proves the citation, not the conduct";
     };
     derives = {
@@ -98,7 +96,6 @@
       to = ["note"];
       evidence = "the `from` list of the note, filtered to note ids that exist";
       tier = "resolved";
-      multiplicity = "many-to-many";
       cannot = "causation or agreement: the author asserted the link, and the arrow only says which note came first";
     };
     imports = {
@@ -107,7 +104,6 @@
       to = ["module"];
       evidence = "an import path in the source, resolved against the file walk in lib/nix-files.nix";
       tier = "extracted";
-      multiplicity = "many-to-many";
       cannot = "that the import is on an enabled host's path: the chain decides that, one host at a time";
     };
     mentions = {
@@ -116,7 +112,6 @@
       to = ["host" "skill"];
       evidence = "a token match on the entity name, split on non-name characters so devji is not dev";
       tier = "extracted";
-      multiplicity = "many-to-many";
       cannot = "an intent, a version, or that the page is about the entity; it is a place to look";
     };
     references = {
@@ -125,7 +120,6 @@
       to = ["doc"];
       evidence = "an inline markdown link whose target resolves to a page in the doc set";
       tier = "resolved";
-      multiplicity = "many-to-many";
       cannot = "that the target was read, or that the sentence around the link is still true";
     };
     supersedes = {
@@ -134,7 +128,6 @@
       to = ["note"];
       evidence = "the `supersedes` list of the replacement, gated to name a note marked SUPERSEDED";
       tier = "resolved";
-      multiplicity = "many-to-many";
       cannot = "that every other page already cites the replacement; retired prose may still link the old note";
     };
     tagged = {
@@ -143,15 +136,27 @@
       to = ["tag"];
       evidence = "the tags list of SKILL.md, parsed by lib/skills.nix";
       tier = "asserted";
-      multiplicity = "many-to-many";
       cannot = "that a skill sharing the tag is related, or that the tag names a topic anyone maintains";
     };
   };
 
   sinks = {
-    "current-release" = "none: a moving answer carries its date, not a corpus entry";
-    "personal-method" = "every `## Claim` in ~/vaults/personal";
-    "project-fact" = "every `## Claim` in ~/vaults/personal";
+    "current-release" = {
+      kind = "none";
+      where = "nothing durable: a moving answer carries its date, not a corpus entry";
+    };
+    "personal-method" = {
+      kind = "external";
+      where = "every `## Claim` in ~/vaults/personal";
+    };
+    "project-fact" = {
+      kind = "external";
+      where = "every `## Claim` in ~/vaults/personal";
+    };
+    "model-label" = {
+      kind = "external";
+      where = "the turn log (xs), with the label and its margin — never a fact";
+    };
   };
 
   entityIds = builtins.attrNames entities;
@@ -197,7 +202,8 @@
 
   stableKinds = builtins.filter (k: epistemics.kinds.${k}.volatility == "stable") epistemics.kindIds;
   unhomed = builtins.filter (k: !(builtins.hasAttr k homes) && !(builtins.hasAttr k sinks)) stableKinds;
-  straySinks = builtins.filter (k: !(builtins.elem k epistemics.kindIds)) (builtins.attrNames sinks);
+  sinkIds = builtins.attrNames sinks;
+  straySinks = builtins.filter (k: !(builtins.elem k epistemics.kindIds)) sinkIds;
 
   touches = t:
     builtins.filter (r: builtins.elem t relations.${r}.from || builtins.elem t relations.${r}.to) relationIds;
@@ -222,7 +228,7 @@
     }
   ];
 in {
-  inherit entities relations tiers tierNotes sinks entityIds relationIds homes stableKinds unhomed straySinks samples idType admit touches weak;
+  inherit entities relations tiers tierNotes sinks sinkIds entityIds relationIds homes stableKinds unhomed straySinks samples idType admit touches weak;
   all = map admit samples;
   count = {
     entities = builtins.length entityIds;

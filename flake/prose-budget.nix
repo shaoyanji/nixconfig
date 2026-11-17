@@ -55,7 +55,7 @@
     ".agents/skills/prove-it-works/SKILL.md" = 35;
     ".agents/skills/qmd/SKILL.md" = 153;
     ".agents/skills/reasonix/SKILL.md" = 68;
-    ".agents/skills/router/SKILL.md" = 65;
+    ".agents/skills/router/SKILL.md" = 66;
     ".agents/skills/serv00/SKILL.md" = 50;
     ".agents/skills/services/SKILL.md" = 22;
     ".agents/skills/simplex-admin/SKILL.md" = 11;
@@ -66,7 +66,7 @@
     ".agents/skills/voice-loop/SKILL.md" = 71;
     ".agents/skills/wikisearch/SKILL.md" = 148;
     ".agents/skills/xs-turns/SKILL.md" = 192;
-    "AGENTS.md" = 227;
+    "AGENTS.md" = 228;
     "modules/user/ai/skills/jev-ultrafast/SKILL.md" = 108;
     "modules/user/ai/skills/nix-preflight-editor/SKILL.md" = 50;
     "modules/user/ai/skills/simplex-admin/SKILL.md" = 190;

@@ -11,7 +11,8 @@ fact lives and what gate proves it. A fact with a compiler is queried, never cop
 
 1. **Start from intent.** The `router` skill names the shape of work and its ending gate; `task help`
    → `task find:<word>` → the owning shard is where its steps run. Never invent a task name; a new
-   one walks the ladder in the `task-plane` skill (eval → jq → Nix lib → check → task → script → Go).
+   one walks the ladder in the `task-plane` skill (eval → jq → Nix lib → check → task → script → Go)
+   [[flake/policies.nix#router-labels-are-routed]].
 2. **Truth order:** compiled data (`inventory.toml`, `modules.toml`) → host and module Nix →
    taskfiles → docs.
 3. **Ask the compiler, not a pasted table.** `nix eval --json .#inventory.hosts | toon -e`

@@ -39,7 +39,7 @@ its date.
 
 ## 2. The relation contract
 
-Every relation declares domain, range, multiplicity, and **what its evidence
+Every relation declares domain, range, and **what its evidence
 is**. The evidence tier is the part that keeps an answer honest:
 
 | Tier | Means | Example here |

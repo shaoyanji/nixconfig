@@ -84,6 +84,22 @@
         };
       };
     };
+    "jev-decide" = {
+      what = "a decision model's label for one request (TypeSafe Jev), with its probability and margin";
+      standing = "unvetted";
+      volatility = "live";
+      vintage = "2026-11-17";
+      settles = ["model-label"];
+      routes = {
+        classify = {
+          how = "jev-decide classify --provider typesafe --text <request> --criteria <labels>";
+          cost = 400;
+          offline = false;
+          metered = "quota";
+          fanout = false;
+        };
+      };
+    };
     "web" = {
       what = "the live internet — unversioned, unattributed, and somebody's quota";
       standing = "unvetted";
@@ -131,7 +147,7 @@
       };
     };
   };
-  sourceIds = ["repo-docs" "vault-claims" "zim-shelf" "upstream-repo" "web"];
+  sourceIds = ["repo-docs" "vault-claims" "zim-shelf" "upstream-repo" "web" "jev-decide"];
 
   # --- precedence ------------------------------------------------------------
   # Epistemics outranks policy: a policy is a JUDGMENT ("this protects
@@ -193,12 +209,17 @@
     "procedure" = {
       volatility = "stable";
       what = "the steps to accomplish something here";
-      persist = "docs/ or a skill — a procedure an agent cannot follow is a paragraph";
+      persist = "docs/, a skill body, or a playbook row — a procedure an agent cannot follow is a paragraph";
     };
     "fleet-fact" = {
       volatility = "stable";
       what = "a compiled fact about these hosts";
       persist = "the compiled source (inventory.toml or the module), never a prose copy";
+    };
+    "model-label" = {
+      volatility = "moving";
+      what = "which playbook a request belongs to, as a probability";
+      persist = "the turn log, with the label and its margin — never a fact";
     };
     "upstream-declaration" = {
       volatility = "moving";
@@ -206,7 +227,7 @@
       persist = "an AGENTS.nix note only when it changes what this fleet does; cite the rev, because the project's own file is the record and it moves";
     };
   };
-  kindIds = ["software-behaviour" "config-syntax" "definition" "historical-fact" "current-release" "personal-method" "decision" "project-fact" "procedure" "fleet-fact" "upstream-declaration"];
+  kindIds = ["software-behaviour" "config-syntax" "definition" "historical-fact" "current-release" "personal-method" "decision" "project-fact" "procedure" "fleet-fact" "upstream-declaration" "model-label"];
 
   standingTier = {
     authored = 0;

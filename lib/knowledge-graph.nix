@@ -49,8 +49,22 @@
   # retired Python site (`docs-site/`) — the split that made the page list a
   # second source of truth. One projection now: if a file is a document, it is a
   # node here, and the site renders it.
+  skillRefDocs =
+    if builtins.pathExists (root + "/.agents/skills")
+    then
+      lib.concatMap (
+        n: let
+          refs = root + "/.agents/skills/${n}/references";
+        in
+          if builtins.pathExists refs
+          then mdIn refs
+          else []
+      ) (builtins.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir (root + "/.agents/skills"))))
+    else [];
+
   docFiles =
     mdIn (root + "/docs")
+    ++ skillRefDocs
     ++ mdIn (root + "/.agents")
     ++ mdIn (root + "/.agents/deploy")
     ++ mdInSubdirs (root + "/.agents/deploy")

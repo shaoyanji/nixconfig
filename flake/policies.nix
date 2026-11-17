@@ -674,6 +674,13 @@
       detail = "corpus ${toString (skillLines + agentsLines)} lines over ${toString (builtins.length budgetedPages)} pages, recorded ${toString proseBudget.total}\n    unrecorded: ${lib.concatStringsSep ", " budgetMissing}\n    stale: ${lib.concatStringsSep ", " budgetStale}\n    drift: ${lib.concatStringsSep ", " budgetDrift}\n    over ${toString proseBudget.argueAbove} without a reason: ${lib.concatStringsSep ", " budgetUnargued}";
     };
 
+    router-labels-are-routed = {
+      rule = "A router label is a route, not a procedure: its row in `.agents/skills/router/references/playbooks.md` names the read to run and the gate that ends the turn, and the row never restates what the taskfile already does. The label set (`assets/labels.json`) and the rows are the same fact in two files, so they are gated against each other — a label with no row is a request the router accepts and cannot dispatch. Neither file may grow into a playbook library: the procedure is the task.";
+      proof = "flake/checks.nix `router-labels` (label set against playbook rows, both directions) · task checks:router";
+      holds = has "flake/checks.nix" "router-labels" && has ".agents/skills/router/assets/labels.json" "publish";
+      detail = "the router gate or its label set moved; rebuild #checks.<system>.router-labels";
+    };
+
     rules-are-cited-not-restated = {
       rule = "A document names a rule by citing its id — `flake/policies.nix#<id>` — and never by explaining the rule in its own words. The rule has one home; a second rendering is the copy that drifts, and the citation is what lets the graph answer which pages carry it. Skills are covered by `skills-cite-truth`; this is the prose half.";
       proof = "every root *.md and docs/*.md that mentions `flake/policies.nix` also carries `[[flake/policies.nix#`";

@@ -393,7 +393,13 @@ lib.genAttrs systems.work (
         declaredEntities;
         kindIssues =
           map (k: "claim kind '${k}' is stable but has no entity home and no declared sink") ontologyCtl.unhomed
-          ++ map (k: "sink '${k}' names no claim kind") ontologyCtl.straySinks;
+          ++ map (k: "sink '${k}' names no claim kind") ontologyCtl.straySinks
+          ++ map (s: "sink '${s}' declares kind '${ontologyCtl.sinks.${s}.kind}', not one of none|external") (
+            builtins.filter (s: !(builtins.elem ontologyCtl.sinks.${s}.kind ["none" "external"])) ontologyCtl.sinkIds
+          )
+          ++ map (s: "sink '${s}' has an empty where — a home nobody can find") (
+            builtins.filter (s: ontologyCtl.sinks.${s}.where == "") ontologyCtl.sinkIds
+          );
         tierIssues = map (r: "relation '${r}' has tier '${ontologyCtl.relations.${r}.tier}' that is not declared") (
           builtins.filter (r: !(builtins.hasAttr ontologyCtl.relations.${r}.tier ontologyCtl.tiers)) declaredRelations
         );

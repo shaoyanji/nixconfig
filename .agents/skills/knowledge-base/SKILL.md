@@ -162,6 +162,17 @@ saying `nix-eval-jobs` does not reach `nix-eval`. For a fleet-visible roster,
 `from` is only ever a doc (`doc:<path>`) or a skill (`skill:<name>`); hosts and
 tags are only `to` ends, so filtering on `from=="frieren"` matches nothing.
 
+Every doc and skill node also carries **`cites`**: the `[[flake/policies.nix#id]]`
+rule ids its body names. That is the reverse of a link — "which pages still
+restate this rule" — and it is why a page can cite a rule instead of explaining
+it. Read it with jq; there is no pattern for it because the answer is a property,
+not an edge:
+
+```bash
+nix eval --json .#knowledgeGraph.graph \
+  | jq -r '.nodes[] | select((.cites // []) | index("agent-prose-budget")) | .id'
+```
+
 `ops:ask` is deterministic and offline: rules answer the rule-shaped set, and a
 question that names a node gets that node's whole context (`route: bundle`). It
 is a convenience for a human phrasing a question, not the supported way for an

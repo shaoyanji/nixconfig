@@ -62,7 +62,7 @@
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
     inherit lib inventory;
     skills = skillsCtl;
-    policies = policiesCtl.policies;
+    inherit (policiesCtl) policies;
   };
   # The rules the docs state, as predicates (flake/policies.nix). Compiled once
   # and asserted by `checks.policies`; docs cite an id instead of explaining it.

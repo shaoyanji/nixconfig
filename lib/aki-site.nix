@@ -22,8 +22,11 @@
     else rawInventory;
 
   skills = import ./skills.nix {inherit lib;};
+  # The rules, as data, for the graph's `policy` nodes: one import, named, so the
+  # wire does not hide a second evaluation behind an attribute select.
+  rulebook = import ../flake/policies.nix {inherit lib;};
   kg = import ./knowledge-graph.nix {
-    policies = (import ../flake/policies.nix {inherit lib;}).policies;
+    inherit (rulebook) policies;
     inherit lib skills;
     inventory = inv;
   };

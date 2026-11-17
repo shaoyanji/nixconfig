@@ -76,14 +76,20 @@ Repo: $repo
 Fix the cause, not the gate. A check that fails on main is a real defect: do not
 disable it, weaken an assertion, or push with --no-verify.
 
-The two jobs that fail most often here, and what each one means:
+Classify the failure before you touch it (\`docs/issue-classes.md\`): \`trust\` (a
+source declared without its proof — a substituter with no key), \`lint\` (an
+artefact past its threshold), \`assert\` (an environment precondition nobody
+stated) or \`capacity\` (the work exceeded a measured limit). A remedy from the
+wrong class goes green and returns in another shape.
 
-- \`docs-budget\` / "Living documents within budget" — \`bash scripts/task/docs-budget.sh\`
+The two steps that fail most often here, and the class each belongs to:
+
+- \`docs-budget\` / "Living documents within budget" — \`lint\`. \`bash scripts/task/docs-budget.sh\`
   from the repo root prints which document is over. Shorten the document, do not
   raise the budget.
-- \`docs-budget\` / "Task graph gate" — a shard violates a bucket (duplicate key,
-  dangling reference, include cycle, orphan shard, MATCH arity, exit-code drift)
-  or the name set disagrees with \`task --list-all --json\`. \`task checks:tasks\`
+- \`docs-budget\` / "Task graph gate" — \`lint\`. A shard violates a bucket (duplicate
+  key, dangling reference, include cycle, orphan shard, MATCH arity, exit-code
+  drift) or the name set disagrees with \`task --list-all --json\`. \`task checks:tasks\`
   names the bucket; fix the shard, not the gate.
 
 Verification is phased and bounded: \`bash scripts/task/docs-budget.sh\` for a doc

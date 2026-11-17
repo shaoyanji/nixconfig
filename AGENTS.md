@@ -114,6 +114,7 @@ packages: `.#artifacts`, `.#sites`, `.#servers`, `.#cli` only.
 | what happened | `task agents:xs:list` |
 | a procedure | `docs/*.md` or a skill |
 | a superseded narrative | `docs/history/` |
+| an issue, before you fix it | its class → [`docs/issue-classes.md`](docs/issue-classes.md) |
 
 Procedures, not facts: [`docs/task-control-plane.md`](docs/task-control-plane.md),
 [`docs/nix-patterns.md`](docs/nix-patterns.md), [`docs/agent-contract.md`](docs/agent-contract.md),

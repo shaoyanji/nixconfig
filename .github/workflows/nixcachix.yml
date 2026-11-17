@@ -45,6 +45,20 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
             substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            # A substituter without its key is a source build. This line was
+            # absent while cache.numtide.com was listed, so every numtide path
+            # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
+            # and nix store 2.34.9 itself, on a 16 GiB runner, ending in
+            # `Killed` (run 43835442088) and "the runner has received a shutdown
+            # signal". Keys are copied from flake.nix nixConfig, which CI
+            # deliberately does not accept; numtide's key is niks3's, verified
+            # with `nix store verify --store https://cache.numtide.com`. One line,
+            # because a second trusted-public-keys entry replaces the first.
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            # Four parallel derivations at four cores each is 16 compiler
+            # processes on 16 GiB; cap the fan-out so a cache miss degrades into
+            # a slower build instead of an OOM kill.
+            max-jobs = 2
             connect-timeout = 5
       - name: Sync repository
         uses: actions/checkout@v4
@@ -76,6 +90,20 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
             substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            # A substituter without its key is a source build. This line was
+            # absent while cache.numtide.com was listed, so every numtide path
+            # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
+            # and nix store 2.34.9 itself, on a 16 GiB runner, ending in
+            # `Killed` (run 43835442088) and "the runner has received a shutdown
+            # signal". Keys are copied from flake.nix nixConfig, which CI
+            # deliberately does not accept; numtide's key is niks3's, verified
+            # with `nix store verify --store https://cache.numtide.com`. One line,
+            # because a second trusted-public-keys entry replaces the first.
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            # Four parallel derivations at four cores each is 16 compiler
+            # processes on 16 GiB; cap the fan-out so a cache miss degrades into
+            # a slower build instead of an OOM kill.
+            max-jobs = 2
             connect-timeout = 5
       - name: Sync repository
         uses: actions/checkout@v4
@@ -210,6 +238,13 @@ jobs:
     # is a stall (measured 2026-10-30: a job sat on one derivation for 5.5 h and
     # was only stopped by GitHub's hard cap), so fail fast and keep the runner
     # for a run that can finish.
+    #
+    # The one job that reached this cap was delphi on arm, and the cap was not
+    # the fault: run 43906282808 logged 2423 "not signed by any of the keys"
+    # refusals on that runner and was still compiling boost and duckdb when it
+    # was cancelled at 65 minutes. That is the trust class, not the capacity
+    # class, so the missing trusted-public-keys line is the fix and this budget
+    # stays at the value it was measured for (`docs/issue-classes.md`).
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -229,7 +264,7 @@ jobs:
         uses: easimon/maximize-build-space@v10
         with:
           overprovision-lvm: true
-          swap-size-mb: 1024
+          swap-size-mb: 4096
           remove-dotnet: "true"
           remove-android: "true"
           remove-haskell: "true"
@@ -248,6 +283,20 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
             substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            # A substituter without its key is a source build. This line was
+            # absent while cache.numtide.com was listed, so every numtide path
+            # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
+            # and nix store 2.34.9 itself, on a 16 GiB runner, ending in
+            # `Killed` (run 43835442088) and "the runner has received a shutdown
+            # signal". Keys are copied from flake.nix nixConfig, which CI
+            # deliberately does not accept; numtide's key is niks3's, verified
+            # with `nix store verify --store https://cache.numtide.com`. One line,
+            # because a second trusted-public-keys entry replaces the first.
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            # Four parallel derivations at four cores each is 16 compiler
+            # processes on 16 GiB; cap the fan-out so a cache miss degrades into
+            # a slower build instead of an OOM kill.
+            max-jobs = 2
             connect-timeout = 5
 
       - name: Sync repository
@@ -290,9 +339,14 @@ jobs:
       # modules/secrets) — those keep `?submodules=1`.
       - run: |
           set -euo pipefail
+          # The same key set as extra_nix_config, repeated on the command that
+          # matters: cachix/cachix-action@v14 writes nix.conf after this file, and
+          # whichever trusted-public-keys line Nix reads last is the only one it
+          # keeps.
+          keys="cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           for attr in ${{ join(matrix.attrs, ' ') }}; do
             echo "::group::nix build $attr"
-            nix build -L ".#${attr}"
+            nix build -L --option trusted-public-keys "$keys" ".#${attr}"
             echo "::endgroup::"
           done
 
@@ -357,7 +411,7 @@ jobs:
         uses: easimon/maximize-build-space@v10
         with:
           overprovision-lvm: true
-          swap-size-mb: 1024
+          swap-size-mb: 4096
           remove-dotnet: "true"
           remove-android: "true"
           remove-haskell: "true"
@@ -390,6 +444,20 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
             substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            # A substituter without its key is a source build. This line was
+            # absent while cache.numtide.com was listed, so every numtide path
+            # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
+            # and nix store 2.34.9 itself, on a 16 GiB runner, ending in
+            # `Killed` (run 43835442088) and "the runner has received a shutdown
+            # signal". Keys are copied from flake.nix nixConfig, which CI
+            # deliberately does not accept; numtide's key is niks3's, verified
+            # with `nix store verify --store https://cache.numtide.com`. One line,
+            # because a second trusted-public-keys entry replaces the first.
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            # Four parallel derivations at four cores each is 16 compiler
+            # processes on 16 GiB; cap the fan-out so a cache miss degrades into
+            # a slower build instead of an OOM kill.
+            max-jobs = 2
             connect-timeout = 5
 
       - name: Sync repository

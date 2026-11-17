@@ -183,6 +183,7 @@ in {
       # Nightly classification drift: a failed run degrades this sentinel, so
       # config that would fail its own gate is reported before the 04:00 deploy.
       {unit = "fleet-classification-gate.service";}
+      {unit = "kg-ontology-check.service";}
       {unit = "restic-backups-frieren-local.service";}
       {unit = "restic-backups-frieren-burgernas.service";}
       {unit = "restic-drill.service";}

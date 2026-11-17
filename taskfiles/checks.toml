@@ -246,6 +246,10 @@ name = "checks:nix:watch:stop"
 kind = "leaf"
 
 [[check]]
+name = "checks:ontology"
+kind = "leaf"
+
+[[check]]
 name = "checks:paperless:watchdog"
 kind = "leaf"
 

@@ -264,6 +264,23 @@ tasks:
     cmds:
       - bash scripts/task/kg-iets-check.sh
 
+  checks:ontology:
+    desc: "[gate] The graph's types are declared, and every declared type is populated"
+    summary: >
+      flake/ontology.nix declares what may exist in .#knowledgeGraph — seven entity
+      types with identity, membership source, fields and claim homes, six relations
+      with domain, range and evidence tier. The gate proves declaration and graph
+      agree both ways: an undeclared node or edge type fails, a declared type the
+      graph stops emitting fails, every edge must be admitted by its relation, and no
+      node may carry an undeclared field. Stable claim kinds must have a home.
+
+      Cost: one graph eval (~10 s cold), no build. Exit 0 = clean, 1 = drift.
+    vars:
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
+    cmds:
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.ontology
+
   checks:entry:
     desc: "[gate] Entry reads stay on their cache layer (min-of-3 timing budgets)"
     summary: >

@@ -68,6 +68,7 @@
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
     inherit lib inventory;
     skills = skillsCtl;
+    notes = agentsNotesCtl;
     inherit (policiesCtl) policies;
   };
   # The rules the docs state, as predicates (flake/policies.nix). Compiled once
@@ -80,6 +81,10 @@
   # no pkgs, no host eval, no filesystem — the whole table is 120 lines of
   # declared attributes, so `nix eval .#epistemics.review` is a leaf read.
   epistemicsCtl = import ./epistemics.nix {inherit lib;};
+  ontologyCtl = import ./ontology.nix {
+    inherit lib;
+    epistemics = epistemicsCtl;
+  };
   # nixFilesCtl / nixRegistry are bound above the chains: `flake/nix-registry.nix`
   # is the walk's naming layer, shared with the knowledge graph.
   # The CLI table is compiled once and projected into `packages.<system>.cli`
@@ -117,7 +122,7 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl;
+    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl ontologyCtl knowledgeGraphCtl;
   };
 
   # Resident helpers and their Kelly arithmetic: `nix eval --json .#daemons`. The
@@ -129,6 +134,9 @@ in {
   # `nix eval --json .#epistemics.all | toon -e`. This is the answer to "is it
   # worth reading the wiki article" that a match score cannot give.
   epistemics = epistemicsCtl;
+
+  # flake/ontology.nix
+  ontology = ontologyCtl;
 
   # The rules as data, looked up by id — the output IS the attrset, so an id with
   # a dash needs quotes: `nix eval .#policies."<id>".holds`, and the id list is

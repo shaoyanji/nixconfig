@@ -3,6 +3,7 @@
   lib,
   inventory,
   skills,
+  notes ? {},
   # The rules, as data: `flake/policies.nix` is the one home and this projects it
   # into the graph, so a policy is a node whose `rule` is readable without prose.
   policies ? {},
@@ -340,10 +341,41 @@
     })
     policyIds;
 
+  noteEntries = notes.notes or {};
+  noteIdsForEdges = builtins.attrNames noteEntries;
+  noteNodes =
+    map (id: let
+      n = noteEntries.${id};
+    in {
+      id = "note:${id}";
+      type = "note";
+      label = n.title or id;
+      path = "AGENTS.nix";
+      kind = n.kind or "reference";
+      status = n.status or "PROPOSED";
+    })
+    noteIdsForEdges;
+  noteEdges = lib.concatMap (id: let
+    n = noteEntries.${id};
+    targets = k: builtins.filter (p: builtins.elem p noteIdsForEdges) (n.${k} or []);
+  in
+    map (p: {
+      from = "note:${id}";
+      to = "note:${p}";
+      type = "derives";
+    }) (targets "from")
+    ++ map (p: {
+      from = "note:${id}";
+      to = "note:${p}";
+      type = "supersedes";
+    }) (targets "supersedes"))
+  noteIdsForEdges;
+
   nodes =
     hostNodes
     ++ skillNodes
     ++ policyNodes
+    ++ noteNodes
     ++ map (d: {
       inherit (d) id type label path cites;
     })
@@ -424,7 +456,8 @@
         type = "cites";
       })
       (citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body)))
-    (builtins.attrNames skills.skills);
+    (builtins.attrNames skills.skills)
+    ++ noteEdges;
 
   tagNodes = lib.unique (lib.concatMap (n: skills.skills.${n}.tags) (builtins.attrNames skills.skills));
 
@@ -445,6 +478,7 @@
       skills = builtins.length (builtins.attrNames skills.skills);
       docs = builtins.length docs;
       ideas = builtins.length ideas;
+      notes = builtins.length noteIdsForEdges;
       modules = builtins.length modules;
       policies = builtins.length policyIds;
       edges = builtins.length edges;
@@ -467,6 +501,8 @@
         then "Module"
         else if n.type == "policy"
         then "Policy"
+        else if n.type == "note"
+        then "Note"
         else "Tag";
     in ''
       MERGE (${"n_${builtins.hashString "md5" n.id}"}:${label} {id: ${q n.id}})
@@ -484,6 +520,10 @@
         then "ABOUT"
         else if e.type == "imports"
         then "IMPORTS"
+        else if e.type == "derives"
+        then "DERIVES"
+        else if e.type == "supersedes"
+        then "SUPERSEDES"
         else "MENTIONS";
     in ''
       MATCH (${a}), (${b}) MERGE (${a})-[:${rel}]->(${b});

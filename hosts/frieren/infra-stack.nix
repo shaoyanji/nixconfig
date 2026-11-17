@@ -991,6 +991,27 @@ in {
     wantedBy = ["default.target"];
   };
 
+  systemd.services.kg-ontology-check = {
+    description = "Knowledge graph against flake/ontology.nix";
+    serviceConfig = {
+      Type = "oneshot";
+      WorkingDirectory = "${user.home}/Documents/nixconfig";
+      ExecStart = "${config.nix.package}/bin/nix build --no-link --builders \"\" .?submodules=1#checks.${pkgs.system}.ontology";
+      Nice = 10;
+      IOSchedulingClass = "idle";
+    };
+  };
+
+  systemd.timers.kg-ontology-check = {
+    description = "Nightly knowledge-graph ontology gate";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "*-*-* 02:35:00";
+      Persistent = true;
+      RandomizedDelaySec = "120s";
+    };
+  };
+
   # Declarative Agent Scheduler (EXP-016)
   services.agentScheduler = {
     enable = true;

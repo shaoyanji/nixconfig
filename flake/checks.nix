@@ -8,6 +8,8 @@
   agentsNotesCtl,
   policiesCtl,
   epistemicsCtl,
+  ontologyCtl,
+  knowledgeGraphCtl,
 }:
 # Cheap checks only: nothing in this set may force a host configuration. The
 # split, the measurements and the gate are AGENTS.md §Gates and
@@ -361,6 +363,67 @@ lib.genAttrs systems.work (
         else
           pkgs.runCommand "epistemics" {} ''
             echo "epistemics: ${toString (builtins.length declaredSources)} sources x ${toString (builtins.length knownKinds)} claim kinds, every kind settled and persistable, every route labelled, Kelly sign correct"
+            touch $out
+          '';
+
+      # flake/ontology.nix
+      ontology = let
+        g = knowledgeGraphCtl.graph;
+        nodeTypes = lib.unique (map (n: n.type) g.nodes);
+        edgeTypes = lib.unique (map (e: e.type) g.edges);
+        declaredEntities = ontologyCtl.entityIds;
+        declaredRelations = ontologyCtl.relationIds;
+        nodeTypeIssues =
+          map (t: "the graph emits node type '${t}' that no entity declares") (lib.subtractLists declaredEntities nodeTypes)
+          ++ map (t: "entity '${t}' is declared but the graph emits no node of that type") (lib.subtractLists nodeTypes declaredEntities);
+        edgeTypeIssues =
+          map (t: "the graph emits edge type '${t}' that no relation declares") (lib.subtractLists declaredRelations edgeTypes)
+          ++ map (t: "relation '${t}' is declared but the graph emits no edge of that type") (lib.subtractLists edgeTypes declaredRelations);
+        fieldIssues = lib.concatMap (n: let
+          carried = builtins.attrNames (builtins.removeAttrs n ["id" "type"]);
+          extra = lib.subtractLists ontologyCtl.entities.${n.type}.fields carried;
+        in
+          map (f: "node ${n.id} carries field '${f}' that ${n.type}.fields does not declare") extra)
+        g.nodes;
+        badEdges = builtins.filter (e: !(ontologyCtl.admit e).ok) g.edges;
+        edgeIssues = map (e: "edge ${e.from} -${e.type}-> ${e.to}: ${(ontologyCtl.admit e).why}") badEdges;
+        claimIssues = lib.concatMap (t:
+          map (k: "${t}.claims names claim kind '${k}' that flake/epistemics.nix does not declare")
+          (builtins.filter (k: !(builtins.elem k epistemicsCtl.kindIds)) ontologyCtl.entities.${t}.claims))
+        declaredEntities;
+        kindIssues =
+          map (k: "claim kind '${k}' is stable but has no entity home and no declared sink") ontologyCtl.unhomed
+          ++ map (k: "sink '${k}' names no claim kind") ontologyCtl.straySinks;
+        tierIssues = map (r: "relation '${r}' has tier '${ontologyCtl.relations.${r}.tier}' that is not declared") (
+          builtins.filter (r: !(builtins.hasAttr ontologyCtl.relations.${r}.tier ontologyCtl.tiers)) declaredRelations
+        );
+        sparseIssues =
+          lib.concatMap (t: let
+            e = ontologyCtl.entities.${t};
+          in
+            lib.optional (e.what == "") "${t}.what is empty"
+            ++ lib.optional (e.identity == "") "${t}.identity is empty — say what makes two of these the same thing"
+            ++ lib.optional (e.member == "") "${t}.member is empty — name the compiled source that enumerates membership"
+            ++ lib.optional (e.fields == []) "${t}.fields is empty")
+          declaredEntities
+          ++ lib.concatMap (r: let
+            x = ontologyCtl.relations.${r};
+          in
+            lib.optional (x.evidence == "") "${r}.evidence is empty — a relation with no evidence is a guess"
+            ++ lib.optional (x.cannot == "") "${r}.cannot is empty — say what the edge does not prove"
+            ++ lib.optional (x.from == [] || x.to == []) "${r} declares no domain or range")
+          declaredRelations;
+        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ claimIssues ++ kindIssues ++ tierIssues ++ sparseIssues;
+        nodeCount = builtins.length g.nodes;
+        edgeCount = builtins.length g.edges;
+        entityCount = builtins.length declaredEntities;
+        relationCount = builtins.length declaredRelations;
+      in
+        if issues != []
+        then builtins.throw "the graph is not an instance of its ontology (flake/ontology.nix):\n  ${lib.concatStringsSep "\n  " issues}"
+        else
+          pkgs.runCommand "ontology" {} ''
+            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges, every edge admitted, every field declared, every stable claim kind homed"
             touch $out
           '';
 

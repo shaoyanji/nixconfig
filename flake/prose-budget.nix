@@ -47,6 +47,7 @@
     ".agents/skills/nixos-deploy/SKILL.md" = 55;
     ".agents/skills/no-comments/SKILL.md" = 39;
     ".agents/skills/officecli/SKILL.md" = 41;
+    ".agents/skills/ontology/SKILL.md" = 131;
     ".agents/skills/parallel-cli/SKILL.md" = 36;
     ".agents/skills/paste/SKILL.md" = 119;
     ".agents/skills/pdfvision/SKILL.md" = 37;

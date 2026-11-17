@@ -75,8 +75,8 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged|references|about|imports|cites" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites")'
+check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes")'
 
 # A citation is the one edge quoting `flake/policies.nix#id`: prose points at the
 # rule, never the reverse. If a doc or skill could SOURCE a policy, the graph
@@ -141,6 +141,21 @@ check "imports: module -> module" \
 # is what makes a silent parser collapse fail.
 check "imports layer is populated (>=100 edges)" \
   '([.edges[] | select(.type == "imports")] | length) >= 100'
+
+# A lineage edge is a claim two notes make about each other, and it is the only
+# edge whose both ends are the same type. `derives` is SCHEMA's `from`; the name
+# differs because `from` reads as a field in every query that prints an edge.
+check "derives|supersedes: note -> note" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if (.type != "derives" and .type != "supersedes") then true
+         else (.from as $f | .to as $to | $t[$f] == "note" and $t[$to] == "note")
+         end)'
+
+# The lineage layer is populated by construction — AGENTS.nix ships notes with
+# `from` and `supersedes` — so zero edges means the emitter stopped reading them.
+check "lineage layer is populated (>=1 edge)" \
+  '([.edges[] | select(.type == "derives" or .type == "supersedes")] | length) >= 1'
 
 check "about: idea -> (doc|host|skill)" \
   '(.nodes | map({(.id): .type}) | add) as $t

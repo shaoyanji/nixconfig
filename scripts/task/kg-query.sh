@@ -210,6 +210,7 @@ case "$PATTERN" in
     JQ='[{
           nodes: (.nodes | length),
           hosts: (.nodes | map(select(.type == "host")) | length),
+          notes: (.nodes | map(select(.type == "note")) | length),
           skills: (.nodes | map(select(.type == "skill")) | length),
           docs: (.nodes | map(select(.type == "doc")) | length),
           tags: (.nodes | map(select(.type == "tag")) | length),

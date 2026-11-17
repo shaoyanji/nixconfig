@@ -59,6 +59,22 @@ affects_graph() {
   return 1
 }
 
+# The ontology gate (flake/ontology.nix -> task checks:ontology) is the only thing
+# that proves the compiled graph is an instance of its declared types: an undeclared
+# node or edge type, a declaration the graph stopped populating, an edge outside its
+# relation's domain, or a stable claim kind with no home. It costs one graph eval and
+# builds nothing, and it can only be wrong when the contract or the emitter moved —
+# so it is scoped to those files instead of every commit.
+affects_ontology() {
+  local f
+  while IFS= read -r f; do
+    case "$f" in
+      flake/ontology.nix | flake/epistemics.nix | lib/knowledge-graph.nix | lib/agents-notes.nix) return 0 ;;
+    esac
+  done <<<"${1:-}"
+  return 1
+}
+
 BLOB_GATE="$REPO_ROOT/scripts/task/repo-blobs.sh"
 
 # A blob is permanent: deleting the file later leaves the object and costs a
@@ -120,6 +136,18 @@ if affects_graph "$STAGED"; then
   fi
 
   echo "Graph checks passed."
+fi
+
+if affects_ontology "$STAGED"; then
+  echo "Checking the graph against its ontology (staged changes touch the type contract)..."
+  SYS="$(nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || true)"
+  if [ -z "$SYS" ] || ! nix build --no-link --builders "" ".?submodules=1#checks.$SYS.ontology" >/tmp/pre-commit-ontology.log 2>&1; then
+    echo "pre-commit: the ontology gate failed or could not run; refusing to skip it." >&2
+    sed 's/^/  /' /tmp/pre-commit-ontology.log 2>/dev/null | tail -20
+    echo "  Run it alone: task check:leaf NAME=checks:ontology"
+    exit 1
+  fi
+  echo "Ontology checks passed."
 fi
 
 # Pre-flight blast radius: INFORMATION, never a gate. A commit that touches a

@@ -204,10 +204,24 @@
 
   agentCascadeScript = ''
     run_agent_cascade() {
-      local prompt="$1"
+      local prompt="$1" hermes_env
 
-      echo "=== [$(date)] Agent Cascade: Attempting Tier 1 (agy-gemini / Hydrogen) ==="
-      if ${self.packages.${pkgs.stdenv.hostPlatform.system}.cli.ai.agy-gemini}/bin/agy-gemini --output-format json --dangerously-skip-permissions -p "$prompt"; then
+      # The Gemini API key is the difference between Tier 1 running and Tier 1
+      # falling through: agy-gemini refuses to start without GEMINI_API_KEY, and
+      # the key lives only in the rendered sops env. Load both files here, not
+      # inside Tier 3 — by then the cascade has already given up on Hydrogen.
+      # Rendered LAST, so the sops-owned file wins over a stale ~/.hermes/.env.
+      for hermes_env in "${user.home}/.hermes/.env" "${user.home}/.config/hermes/hermes.env"; do
+        if [ -f "$hermes_env" ]; then
+          set -a
+          # shellcheck disable=SC1090
+          source "$hermes_env" 2>/dev/null || true
+          set +a
+        fi
+      done
+
+      echo "=== [$(date)] Agent Cascade: Attempting Tier 1 (agy-gemini / gemini-4-hydrogen-high) ==="
+      if AGY_GEMINI_MODEL="gemini-4-hydrogen-high" ${self.packages.${pkgs.stdenv.hostPlatform.system}.cli.ai.agy-gemini}/bin/agy-gemini --output-format json --dangerously-skip-permissions -p "$prompt"; then
         echo "=== [$(date)] Agent Cascade: Tier 1 (agy-gemini) succeeded. ==="
         return 0
       fi
@@ -231,18 +245,6 @@
         echo "=== [$(date)] Agent Cascade: Attempting Tier 3 (hermes) ==="
         local hermes_bin
         hermes_bin="$(command -v hermes 2>/dev/null || echo "/run/current-system/sw/bin/hermes")"
-
-        # Source both env files, rendered LAST so the sops-owned one wins:
-        # ~/.hermes/.env is a plain file a stale auth flow leaves behind, and
-        # sourcing it last would shadow a rotated secret.
-        for hermes_env in "${user.home}/.hermes/.env" "${user.home}/.config/hermes/hermes.env"; do
-          if [ -f "$hermes_env" ]; then
-            set -a
-            # shellcheck disable=SC1090
-            source "$hermes_env" 2>/dev/null || true
-            set +a
-          fi
-        done
 
         if "$hermes_bin" chat -q "$prompt" --oneshot -Q --run-budget 600; then
           echo "=== [$(date)] Agent Cascade: Tier 3 (hermes) succeeded. ==="

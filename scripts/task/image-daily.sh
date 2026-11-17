@@ -1259,7 +1259,7 @@ plate_expand() { # prompt -> prompt with every arch:<name> resolved
 
 cmd_plates() {
   need jq cpg agy git ffprobe
-  local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} size=${SIZE:-1536x1024}
+  local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} def_size=${SIZE:-1536x1024}
   [ -f "$roster" ] || die "no roster at $roster"
   local intent
   intent=$(jq -r '.intents.photoreal // empty' "$BRIEFS")
@@ -1271,7 +1271,7 @@ cmd_plates() {
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }
 
-  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect have file v verdict defect sent rc=0 hold_reason
+  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect row_size size have file v verdict defect sent rc=0 hold_reason
   local ledger_before=0
   [ -f "$LEDGER" ] && ledger_before=$(wc -l <"$LEDGER" | tr -d ' ')
   day=$(today)
@@ -1279,9 +1279,18 @@ cmd_plates() {
   [ -n "$left" ] || die "usage unreadable (401 from cpg) — run cpg refresh, or chatplayground-go login when the session itself is gone"
   say "plates: $(grep -vc '^#' "$roster") row(s) in the roster, $left image(s) left${cap:+, cap $cap}"
 
-  while IFS='|' read -r slug prompt expect; do
+  # A fourth field is that row's own size. The default is a landscape plate, and
+  # a phone wallpaper is 1024x1536: asking for the default crops it silently, and
+  # `attempt` then discards the answer for being the size it was not asked for.
+  # An empty field means the roster default, so every existing row is unchanged.
+  while IFS='|' read -r slug prompt expect row_size; do
     [ -n "$slug" ] || continue
     case $slug in \#*) continue ;; esac
+    if [ -n "$row_size" ] && ! printf '%s' "$row_size" | grep -qE '^[0-9]+x[0-9]+$'; then
+      say "$slug: size '$row_size' is not WxH — row skipped"
+      continue
+    fi
+    size=${row_size:-$def_size}
     # A row the provider refuses is held, not deleted: the reason travels on the
     # row so a round says why it skipped it instead of recording the same refusal
     # again. Measured 2026-11-16: seven live-action and comic characters answered

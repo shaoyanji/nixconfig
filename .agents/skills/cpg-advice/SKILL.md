@@ -52,13 +52,10 @@ budget, summarise it yourself first, or split it into two questions; do not trun
 
 ## Choosing a model
 
-`cpg models` lists 34 ids (2026-11-06). `premium_only` is a **global** flag, not an
-answer about this account: this one holds a lifetime pool, and 10 of the 11 premium
-ids still answered `403 only available to active subscribers` — `gpt-6.1-sol`,
-`claude-sonnet-5-5`, `claude-opus-5-5`, `kimi-k3`, `qwen3.8-max`, `glm-5.3` and the
-two perplexity ids among them. `gemini-3.8-flash` was the single exception that
-worked. So treat `premium_only` as unavailable and re-test when the plan changes.
-`cpg usage` is the authority on the plan; the catalog is not.
+`cpg models` lists the ids. `premium_only` is a **global** flag, not an answer about
+this account: 10 of 11 premium ids answered `403 only available to active
+subscribers` on the lifetime pool (2026-11-06), `gemini-3.8-flash` the exception.
+Treat them as unavailable; `cpg usage` is the authority on the plan, not the catalog.
 
 The value here is independence, not a ranking. Pick a different vendor from the model you are
 running on, and stay with an id whose answer you have already judged. Ids exercised on
@@ -145,29 +142,18 @@ task agents:review:plan  PROMPT_FILE=docs/proposal.md
 task agents:review:schema FILE=.sops.yaml OUT=/tmp/schema.yaml
 task agents:review:adversary FAIL=/tmp/fail.txt CODE=scripts/task/site-check.sh
 task agents:review:draft   SHAPE=/tmp/step.yaml FILE=/tmp/material.md OUT=/tmp/step-out.yaml
-```
-
-- **gate** — a change to a check, before it ships. The question is not whether
-the code is right but what input makes the check pass while the guarded thing is
-broken. Ask it of a guard that has never been seen to fail; that is where the
-vacuous pass hides.
-- **plate** — a generation prompt, before the image is spent. The model cannot
-see the plate, so it reads the request and names the defects to expect; one
-prompt against a batch of twenty is the cheapest protection the image allowance
-has.
-- **plan** — a design doc or a proposal, before it becomes work. Ordered
-objections with their cost, and the cheapest test that settles the first one.
-- **schema** — a config, a manifest, a payload you are about to write a parser
-for. It postulates the schema in YAML instead of prose, and the answer is only
-accepted if it parses into the fixed shape with a non-empty `fields[]`: every
-field cites its `evidence` from the sample, and anything the sample cannot settle
-comes back under `open_questions` instead of hardening into a requirement.
-- **adversary** — an assertion failure or a checkpoint, with the code that
-asserts it. The call that turns a bad night into a good decision: what else the
-evidence could mean, what the reading takes on trust, and the one probe that
-settles it. YAML, so `could_mean[]` is worked through instead of skimmed.
-- **draft** — a caller's skeleton plus the material. See the bridge below; this
-is the lane a harness calls, not a person.
+```- **gate** — a check before it ships: ask what input makes it pass while the
+  guarded thing is broken. Ask it of a guard never seen to fail.
+- **plate** — a generation prompt before the image is spent: name the defects to
+  expect, since the model cannot see the plate.
+- **plan** — a design doc before it becomes work: ordered objections with their
+  cost, and the cheapest test that settles the first.
+- **schema** — a payload you are about to write a parser for: YAML, accepted only
+  if it parses into the shape with a non-empty `fields[]`, each citing `evidence`;
+  what the sample cannot settle goes under `open_questions`.
+- **adversary** — an assertion failure with the code that asserts it: what else
+  the evidence could mean, and the one probe that settles it.
+- **draft** — a caller's skeleton plus the material; the harness lane below.
 
 ## Bridging a tool-calling harness and a drafting model
 
@@ -265,36 +251,12 @@ a `tmux` session (`tmux` skill) so it outlives the shell.
 The `chatplayground-serve` unit on 127.0.0.1:8799 is for aichat's OpenAI-compatible client; this
 skill never needs it.
 
-## Routing the advice call with Jev
+## Routing the lane with Jev
 
-Jev is installed as a classifier: `jev-decide` (uv tool at `~/.local/bin/jev-decide`), with
-`TYPESAFE_API_KEY` and `OPENROUTER_API_KEY` in `~/.hermes/.env`. It returns a label with
-probabilities and never generates text, so it can route the call but cannot write the advice.
-
-```bash
-cat > /tmp/advice.json <<'EOF'
-{
-  "ask_another_model": "A second, independent model's opinion would change the answer or catch an error.",
-  "do_it_locally": "The agent can settle this itself with tools and its own reasoning.",
-  "review_my_work": "A claim, diff or plan that needs adversarial review before it ships."
-}
-EOF
-jev-decide classify --provider typesafe \
-  --text "Should I ask another model to review this 40-line Nix module before I switch?" \
-  --criteria /tmp/advice.json
-```
-
-```json
-{"decisions": {"category": {"status": "selected", "value": "ask_another_model",
-                            "probability": 0.91, "margin": 0.86}}}
-```
-
-- `status: "selected"` with probability ≥ 0.8 is a routing hint; `"review"`, a null or a low
-  margin means decide it yourself and move on.
-- Route the **lane** (ask / review / skip), not the model. Jev cannot choose which provider
-  answers a hermes turn — that is `fallback_providers` in `config.yaml`, resolved by the agent.
-- `--dry-run` validates the request offline; it is not a judgment.
-- One call is ~1 s and ~400 input tokens (measured 2026-11-06, `typesafe`).
-- Never let a decision model approve a destructive action.
+`jev-decide` returns a label with probabilities and never generates text, so it can
+route the call but cannot write the advice. Route the **lane** (ask, review, skip),
+never the model: which provider answers a hermes turn is `fallback_providers` in
+`config.yaml`. Criteria, providers, `--dry-run` and the rule that a decision model
+never approves a destructive action are the `jevdecide` skill.
 
 Related: `cpg-image` (same client, image generation).

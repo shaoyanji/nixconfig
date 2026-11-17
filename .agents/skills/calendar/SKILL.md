@@ -72,14 +72,9 @@ process exit code.
 binds to an ephemeral port (note: `8080` is occupied by `pihole-FTL` on frieren).
 `scripts/calendar-auth.sh` parses the allocated port directly from the OAuth URL.
 
-To complete the flow from another machine:
-- **Option A (No SSH tunnel):** Approve the consent URL in your browser. When Google
-  redirects to `http://127.0.0.1:<port>/?state=...&code=...` (which fails on your
-  client), copy the full URL from the browser address bar and paste it into the script.
-- **Option B (SSH tunnel):** Hold open the dynamically assigned port from your client:
-  ```bash
-  ssh -N -L <port>:127.0.0.1:<port> <host>
-  ```
+From another machine: approve the URL, then either paste the failed
+`http://127.0.0.1:<port>/?state=…&code=…` redirect back into the script, or hold the
+port open first with `ssh -N -L <port>:127.0.0.1:<port> <host>`.
 
 `verify` separates two failures that share an exit code: an auth rejection
 (`invalid_grant`, `403 accessNotConfigured`) is fatal and named, while a
@@ -141,11 +136,9 @@ notify-send --app-name="Calendar" --urgency=normal \
 
 ## The Cal.com booking surface (`task cal:*`)
 
-Two authorities, and they answer different questions. **khal** is the calendar:
-what is on it, when, from Google through vdirsyncer. **Cal.com** is the booking
-surface in front of it: the event types someone can pick, the slots that are
-free, and the booking record — who asked, with which address, under which uid.
-khal never had that half, so a question about a booking is not a khal question.
+**khal** is the calendar: what is on it, from Google through vdirsyncer. **Cal.com**
+is the booking surface in front of it — event types, free slots, and who booked
+under which uid — so a question about a booking is not a khal question.
 
 ```bash
 task cal:events                          # slugs and ids of the page's event types
@@ -175,15 +168,10 @@ its `.md` document on the public page names the event id.
 
 ## When the calendar is out of reach
 
-khal only knows what vdirsyncer last wrote, and a host without the token has no
-local copy at all. Reach for `task cal:slots` and `task cal:list` first: they
-answer synchronously and structurally. If the host cannot run them either, ask
-the Cal.ai assistant at `mattji@my.cal.ai` — the constant is `user.calEmail` in
-`modules/global/user.nix`. It reads the Cal.com calendar and answers a
-scheduling question as mail, so a reply is the authority where a stale `.ics`
-file is not. State the question and the window in the subject, for example
-"Free 45 minutes next Tuesday afternoon?". Draft it with `himalaya message
-write`; nothing in this skill sends on its own.
+khal only knows what vdirsyncer last wrote. Reach for `task cal:slots` and
+`task cal:list` first; if the host cannot run them, ask the Cal.ai assistant at
+`mattji@my.cal.ai` (`user.calEmail` in `modules/global/user.nix`), naming the
+window in the subject. Draft with `himalaya message write`; nothing here sends.
 
 ## Troubleshooting
 
@@ -201,45 +189,27 @@ write`; nothing in this skill sends on its own.
   - an OAuth app whose publishing status is **Testing** caps every refresh token
     at 7 days, so re-consent buys a week. Publish the consent screen.
 - **Google escalates to an image CAPTCHA, and that is the real ceiling.** Tried
-  2026-11-15 with `scripts/task/gcal-consent.sh` and the account password plus a
-  live TOTP: identifier filled, `Next`, passkey challenge, `Try another way`,
-  `Enter your password`, password filled, submitted — and the password page came
-  back carrying *"Type the text you hear or see" / "enter the characters you see
-  in the image above"*. After roughly six automated attempts Google adds that
-  challenge to `/challenge/pwd`, and neither a password nor a passkey clears it;
-  retrying is what earns it, so the driver now stops on the first sight of it
-  (exit 4) and gives up on a cycling flow after 30 interactions (exit 6). Either
-  run it with a human present who can solve one image, or make the passkey path
-  win so the password page is never reached (`CAL_PASSKEY_FILE`; the primitive is
-  `scripts/task/passkey-probe.sh`; the vault read is `task dev:passkey:fetch`).
+  2026-11-15 with `scripts/task/gcal-consent.sh`: after about six automated
+  attempts the password page carries *"enter the characters you see in the image"*,
+  which neither a password nor a passkey clears, and retrying is what earns it. The
+  driver stops on first sight (exit 4) and gives up on a cycling flow (exit 6).
+  Either run it with a human present, or make the passkey path win so the password
+  page is never reached (`CAL_PASSKEY_FILE`).
 - **A passkey cannot be typed, but it can be imported.** `scripts/task/passkey-probe.sh`
-  proves the primitive without touching Google: a CDP virtual authenticator registers a
-  credential on a local page, exports its PKCS8 private key, installs that key into a
-  *second, empty* authenticator, and signs an assertion there — exit 0 means the
-  vault → browser half of a headless passkey login is wired. `--from-vault FILE` takes
-  the shape a Bitwarden item's `fido2Credentials` hold (`rpId`, base64url
-  `credentialId`, base64 `privateKey`). Three facts bound the plan: `cloak` 0.3.0 is
-  TOTP-only, and rbw — installed on every host and the fleet's vault client — prints
-  `{id, folder, name, data, fields, notes, history}` from its `--raw`, which holds no
-  `fido2Credentials`: bitwarden-cli is the only client that does, which is why
-  `scripts/task/passkey-fetch.sh` exists. A passkey for the account must actually
-  exist in Vaultwarden; and the
-  Bitwarden *extension* is not the route on Linux because it breaks WebAuthn in
-  Chromium outright (bitwarden/clients#17837). The RP ID must be a domain — a probe
-  served on `127.0.0.1` is refused with "This is an invalid domain", so use
-  `localhost`.
-- **Headless re-consent works, but only with a display.** Tried 2026-11-15 on aarch64:
-  `agent-browser` and `chromium --headless=new` are both refused at the password
-  step ("Couldn't sign you in — This browser or app may not be secure"). The *same*
-  Chromium binary under `xvfb-run` is accepted, and CDP over `node`'s built-in
-  `WebSocket` drives it: email → (this account answers with a passkey prompt, so
-  one **phone approval** is needed) → `google authenticator` code from
-  `cloak view google` → a "update your password" speedbump → consent → the
-  redirect lands on `127.0.0.1:<port>` **on this host**, so the code is exchanged
-  locally and the token written. Keep the `--user-data-dir` profile -
-  `~/.local/state/cdp-prof-headed` (it was /tmp until 2026-11-15, which a reboot
-  empties): the cookies are the Google session, so the next consent skips the
-  login and the phone tap. A consent driven this way produced a **permanent**
-  grant where the paste-based exchange produced 604799 s.
+  registers a credential on a CDP virtual authenticator, exports its PKCS8 key,
+  installs it into a second empty authenticator and signs there — exit 0 means the
+  vault → browser half is wired; `--from-vault FILE` takes the Bitwarden
+  `fido2Credentials` shape. `cloak` 0.3.0 is TOTP-only, and rbw's `--raw` carries no
+  `fido2Credentials`, which is why `scripts/task/passkey-fetch.sh` (bitwarden-cli)
+  exists. The RP ID must be a domain — `127.0.0.1` is refused as "This is an invalid
+  domain", so use `localhost` — and the Bitwarden extension is not the Linux route
+  (bitwarden/clients#17837).
+- **Headless re-consent works, but only with a display.** `agent-browser` and
+  `chromium --headless=new` are refused at the password step ("This browser or app
+  may not be secure"); the same binary under `xvfb-run` is accepted, driven by CDP
+  over `node`. Keep the profile at `~/.local/state/cdp-prof-headed` — the cookies
+  are the Google session, so the next consent skips the login and the phone tap. A
+  consent driven this way produced a **permanent** grant where the paste-based
+  exchange produced 604799 s.
 
 Truth: `modules/calendar.nix` — the option surface; this page is the procedure.

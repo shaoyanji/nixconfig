@@ -125,6 +125,15 @@ jobs:
         run: nix shell nixpkgs#yq-go nixpkgs#go-task -c bash scripts/task/taskfile-graph.sh
       - name: Module edges are named, not pathed
         run: bash scripts/task/modules-edges.sh
+      - name: Policies hold and classify
+        # The one gate that reads the docs, the taskfiles and flake/policies.nix
+        # together: every citation must resolve in both directions, and the run
+        # prints which class each failure belongs to. It sat outside CI until
+        # 2026-11-17, where two policies were red for days — one matched a
+        # workflow line too literally, one named three checks that spelled a
+        # secrets path. Cheap: policies evaluate from tracked text alone, and the
+        # artifact is three lines.
+        run: nix build -L .?submodules=1#checks.x86_64-linux.policies
 
   plan:
     runs-on: ubuntu-latest

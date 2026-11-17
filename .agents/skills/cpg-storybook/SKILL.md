@@ -46,45 +46,15 @@ reads the counter every call, so it is correct on both sides of midnight.
 
 ### When `cpg usage` cannot answer
 
-The allowance has a second place to read it: the dashboard at
-`www.chatplayground.ai`, on the subscription page. Read by hand on 2026-11-07 at
-14:00 UTC, on this account:
+The dashboard at `www.chatplayground.ai` (subscription page) prints the same
+counters: chat turns draw from a credit pool priced per model by `creditWeight`,
+images from the daily 100. A chunk of `adapt.py` is four chat turns — noise —
+while a book is the whole day's images, so the image counter is the constraint.
 
-| Row | Value | Pays for |
-| :--- | :--- | :--- |
-| Plan | Lifetime · RedemptionActive · never expires | nothing is metered by the plan itself |
-| Credits | 257 / 99,999 · resets 2026-11-15 | **chat turns**, charged at the model's `creditWeight` — live weights are in `cpg models --json`, and the client's fixture prices a basic model at 1 and an advanced one at 5 |
-| Images today | 100 / 100 · resets 00:00 UTC — 01:00 local, this host is UTC+1 | **image generations only**, one per call whatever the model; this is the counter that stops a book |
-
-That middle label is an inference, and it is the only one the account supports:
-the catalog hangs a `creditWeight` on every model and nothing else on the account
-is priced per model, while no page on the site documents a credit at all. The
-dashboard prints the pool without a unit, so read it as the request budget and
-treat a model's weight as what one message draws from it.
-
-The practical reading for this skill: an `adapt.py` chunk is four chat turns, a
-round of four chunks is sixteen — noise against 99,999 — while one book of three
-candidates per spread is 84 image calls and the whole day's 100. Credited turns
-are never the constraint here; the image counter is.
-
-Two questions that page answers when the client cannot:
-
-- **A dead host is not an empty allowance.** That day `app.chatplayground.ai`
-  answered NXDOMAIN while the dashboard showed an active lifetime plan, a live
-  session (`cpg status` → `authenticated: true`, credential age under an hour)
-  and images that were simply spent. The two failures do not look alike before
-  anything leaves the machine: a spent allowance is an HTTP `429 … reached your
-  daily limit`, an unreachable host is `lookup … no such host`. Reading the
-  dashboard first is what keeps a DNS outage from being planned as if it were
-  tomorrow's budget.
-- **The reset is 00:00 UTC, not local midnight.** At UTC+1 the new allowance
-  starts at 01:00, so a run planned for "tonight" has an hour more than the
-  clock on the wall suggests — or an hour less, depending on which side of it
-  you are sitting.
-
-The dashboard is the fallback, not a second source of truth: it is a page read
-by hand, the client is the JSON the scripts consume, and while both answered
-they agreed with each other.
+The two failures are distinguishable before anything leaves the machine: a spent
+allowance answers `429 … reached your daily limit`, an unreachable host answers
+`lookup … no such host`. Read the dashboard before planning a DNS outage as
+tomorrow's budget.
 
 ## Manifest
 
@@ -166,14 +136,11 @@ no `0.0.0.0`, no firewall rule to forget. The address is a port, and it is easy
 to mistype: 8899 and 8898 get typed as 8099 and 8098, and a wrong port reads as
 a dead server rather than a typo.
 
-Do not fix that by mounting the books on `tailscale serve`.
-`frieren.<tailnet>.ts.net:443` belongs to nginx — it is the fleet portal,
-declared in `hosts/frieren/reverse-proxy.nix` and proxying to loopback — and a
-serve mount on 443 takes the whole listener away from it, so the portal and
-every vhost behind that name answer with the book instead. `frieren.lan` is not
-a way round it either: the name resolves to a link-local IPv6 address, which
-these servers do not bind. A book that is served at all gets its own port, and
-the port is the whole address.
+Do not mount the books on `tailscale serve`: `frieren.<tailnet>.ts.net:443`
+belongs to nginx (`hosts/frieren/reverse-proxy.nix`), and a serve mount takes the
+whole listener, so the portal and every vhost behind that name answer with the
+book. `frieren.lan` is not a way round it — it resolves to a link-local address
+these servers do not bind. A served book gets its own port.
 
 Books live on the pool, `/Volumes/data/projects/storybook/<book>` (the
 `projects/` tree in [`docs/storage-taxonomy.md`](../../../docs/storage-taxonomy.md)),
@@ -219,39 +186,18 @@ next prompt to keep the voice from restarting every seven pages, and the
 chunk→winner map in `state/adapt-<lang>.json` makes a rerun resume rather than
 re-spend.
 
-The round needs `cpg`. On 2026-11-07 `app.chatplayground.ai` answered
-**NXDOMAIN** from two independent networks (`www.chatplayground.ai` still served
-200, so this is the API host being withdrawn, not a resolver fault) and the
-lantern adaptation was written in the agent instead. Everything except the model
-call was proved with stand-ins on `PATH` — a fake `cpg` printing one chunk's JSON
-and a fake `jev-decide` choosing `c1` — which exercised the prompt, the four
-lanes, the parse, the merge and the resume in `state/adapt-<lang>.json`.
+The round needs `cpg`. `CHATPLAYGROUND_BASE_URL` is read by `chat.go` and is worth
+setting only if the host answers `/api/chat/azure`; the catalog, image and
+entitlement paths hardcode `app.`.
 
-`CHATPLAYGROUND_BASE_URL` is read by `chat.go`, but the catalog, the image path
-and the entitlement call hardcode `app.`; a base-URL switch only helps if the
-host answers `/api/chat/azure`. On 2026-11-07 `web.chatplayground.ai` answered
-`/api/models` 200 and `/api/chat/azure` 404, so the chat route had moved too and
-the switch bought nothing. Check that host before
-planning a round.
-
-Traps, all measured:
-
-- **Openverse answers 403 without a `User-Agent`** and rate-limits anonymous
-  callers, so requests are spaced and the UA says who is asking.
-- What it returns for a Freesound hit is the **preview mp3**, not the original
-  upload. Fine for a CC0 sound, and it is what makes the fetch keyless.
-- **The title filter needs an avoid list.** The top CC0 result for "river
-  ambience" is `City river ambience 2 (chatter)` — people, not water.
-- **One-shots carry lead-in room tone.** A page turn placed at 0.12 s measured
-  −27.9 dB at the head of the page: the sound arrived late. Download-time
-  `silenceremove` plus a cue position that matches where the recording actually
-  peaks is the fix.
-- **A page turn peaks at its plop, not its rustle.** The cue carries a negative
-  `at` (−1.6 s) and lands on the cut, which is where a page actually turns.
-- **Stacking cues needs a limiter.** Beds at 0.06–0.12 and one-shots at 0.20–0.40
-  against narration normalised to −16 LUFS put the first mix at −0.9 dB peak;
-  `alimiter=limit=0.85` keeps the ceiling while the mean stays −16.7.
-- `--synth-bed` still mixes the generated noise bed, for a book with no sfx files.
+Traps, all measured: Openverse answers 403 without a `User-Agent` and rate-limits
+anonymous callers; a Freesound hit returns the preview mp3, not the original
+upload, which is what keeps the fetch keyless; the title filter needs an avoid
+list (`City river ambience 2 (chatter)` is people, not water); one-shots carry
+lead-in room tone, so cues are trimmed at download and anchored where the
+recording peaks — a page turn lands on its plop, about 1.6 s before the cut;
+stacking cues needs `alimiter=limit=0.85`; `--synth-bed` mixes a generated noise
+bed for a book with no sfx files.
 
 A second language is open work: the harness takes `--lang` and a voice per
 language, and only German has a script.
@@ -274,11 +220,9 @@ mean a rate window binds first; a failure only after the counter hits
 `usage.images.limit` means the daily allowance does. Record either in an xs turn:
 a limit that was never hit is a limit you cannot plan against.
 
-Measured 2026-11-07 on the old endpoint, `gpt-image-2.5-sunburst`, unpaced: 25
-attempts, 21 plates, 615 s, counter 78 → 100, the last three answering
-`429 … "You've reached your daily limit of 100 image generations"` within 1 s
-each. Measured again on 2026-11-08, four unpaced generations ran at 13–15 s with
-no refusal at all: the daily counter is the only one this account enforces.
+Measured 2026-11-07: 25 unpaced attempts, 21 plates, counter 78 → 100, then
+`429 … daily limit of 100` within 1 s each — the daily counter is the only limit
+this account enforces.
 
 ## Comparing an adaptation with a hand-written edition
 

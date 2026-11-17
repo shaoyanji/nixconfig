@@ -10,7 +10,7 @@
 # agent must not be a plain background child.
 #
 # Usage:
-#   ci-fix-dispatch.sh dispatch --run <id> [--mail <message_id>] [--dry-run]
+#   ci-fix-dispatch.sh dispatch --run <id> [--mail <mid>] [--class <c>] [--dry-run]
 #   ci-fix-dispatch.sh resolve  --mail <message_id>
 set -euo pipefail
 
@@ -26,11 +26,15 @@ usage() {
 }
 
 dispatch() {
-  local run="" mail="" dry=0
+  local run="" mail="" class="" dry=0
   while [ $# -gt 0 ]; do
     case "$1" in
       --run) run="${2:-}"; shift 2 ;;
       --mail) mail="${2:-}"; shift 2 ;;
+      # trust | lint | assert | capacity (docs/issue-classes.md). Optional: the
+      # caller often knows it from the failing job, and the agent records the
+      # same line with what it found if the guess was wrong.
+      --class) class="${2:-}"; shift 2 ;;
       --dry-run) dry=1; shift ;;
       *) echo "ci-fix: unknown argument $1" >&2; exit 2 ;;
     esac
@@ -60,6 +64,15 @@ dispatch() {
   title="$(jq -r '.displayTitle // ""' <<<"$meta")"
   workflow="$(jq -r '.workflowName // .name // "workflow"' <<<"$meta")"
 
+  # The class is the part a dispatcher usually knows and the agent has to
+  # re-derive. Recorded before the launch, so the ledger answers what breaks CI
+  # even when the fix does not land.
+  if [ -n "$class" ] && [ "$dry" = 0 ]; then
+    CLASS="$class" SOURCE=ci-fix SUBJECT="ci:run-$run" OUTCOME=in_progress \
+      EVIDENCE="$failing" FIX="pending: agent dispatched on run $run" \
+      bash "$repo/scripts/task/issue-ledger.sh" record
+  fi
+
   mkdir -p "$STATE"
   local prompt="$STATE/run-$run.md"
   cat >"$prompt" <<PROMPT
@@ -81,6 +94,14 @@ source declared without its proof — a substituter with no key), \`lint\` (an
 artefact past its threshold), \`assert\` (an environment precondition nobody
 stated) or \`capacity\` (the work exceeded a measured limit). A remedy from the
 wrong class goes green and returns in another shape.
+
+Write the class down before you start, so the record survives a fix that does
+not land:
+
+    task agents:ledger:record CLASS=<class> SUBJECT=ci:run-$run \
+      EVIDENCE="<the line in the log that showed it>" FIX="<what you changed>"
+
+Use the class the evidence supports, not the one this dispatch was opened with.
 
 The two steps that fail most often here, and the class each belongs to:
 

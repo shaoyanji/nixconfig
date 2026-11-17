@@ -14,8 +14,9 @@
 
 use loom_core::{NewToken, Op, FLAG_WORD};
 use loom_srv::session::Session;
-use loom_srv::{build_state, coalesce, ws};
+use loom_srv::{build_state, coalesce, ws, AppState, StageTimes};
 use loom_wire::{decode_server_at, encode_op_frame, ServerFrame};
+use std::collections::HashMap;
 use std::io;
 use std::time::{Duration, Instant};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -234,6 +235,88 @@ fn show(name: &str, samples: &[u128]) -> String {
     )
 }
 
+/// Split the gate into the segments it is made of, at the slow end.
+///
+/// The client's send and receive stamps and the server's own are on one
+/// monotonic clock because the bench runs both in one process. That is the only
+/// reason the decomposition is possible, and also why it is a diagnostic and
+/// not a second gate: a browser is not in the server's process, so its inbound
+/// and outbound segments are not these.
+fn split_tail(state: &AppState, stamps: &[(u64, Instant, Instant)], window_ms: u64) {
+    let by_seq: HashMap<u64, StageTimes> = state
+        .trace
+        .entries()
+        .into_iter()
+        .map(|t| (t.seq, t))
+        .collect();
+    // total, in, window wait, apply, publish, out
+    let mut rows: Vec<[u128; 6]> = Vec::with_capacity(stamps.len());
+    for (seq, sent, recv) in stamps {
+        let Some(t) = by_seq.get(seq) else {
+            continue;
+        };
+        rows.push([
+            recv.duration_since(*sent).as_nanos(),
+            t.queued.duration_since(*sent).as_nanos(),
+            t.apply_at.duration_since(t.queued).as_nanos(),
+            t.applied_at.duration_since(t.apply_at).as_nanos(),
+            t.sent_at.duration_since(t.applied_at).as_nanos(),
+            recv.duration_since(t.sent_at).as_nanos(),
+        ]);
+    }
+    if rows.is_empty() {
+        return;
+    }
+    let at = |rows: &[[u128; 6]], i: usize, q: f64| -> f64 {
+        let mut v: Vec<u128> = rows.iter().map(|r| r[i]).collect();
+        v.sort_unstable();
+        v[(((v.len() - 1) as f64) * q).round() as usize] as f64 / 1000.0
+    };
+    let line = |q: f64| {
+        format!(
+            "in {:.2} · window {:.2} · apply {:.2} · publish {:.2} · out {:.2}",
+            at(&rows, 1, q),
+            at(&rows, 2, q),
+            at(&rows, 3, q),
+            at(&rows, 4, q),
+            at(&rows, 5, q)
+        )
+    };
+    // The slowest 5% by the gate's own number: the target is about this end, so
+    // the mean of each segment here is what a miss is made of.
+    let mut slow: Vec<[u128; 6]> = rows.clone();
+    slow.sort_unstable_by_key(|r| std::cmp::Reverse(r[0]));
+    slow.truncate((rows.len() / 20).max(1));
+    let mean = |i: usize| -> f64 {
+        slow.iter().map(|r| r[i]).sum::<u128>() as f64 / (slow.len() as f64 * 1000.0)
+    };
+    println!(
+        "  trace, n={} (one process, one clock, µs): p50 {} · total p50 {:.0}",
+        rows.len(),
+        line(0.50),
+        at(&rows, 0, 0.50)
+    );
+    println!(
+        "  trace: p99 {} · total p99 {:.0}",
+        line(0.99),
+        at(&rows, 0, 0.99)
+    );
+    println!(
+        "  trace, slowest 5% (n={}): in {:.0} · window {:.0} · apply {:.0} · publish {:.0} \
+         · out {:.0} · total {:.0}",
+        slow.len(),
+        mean(1),
+        mean(2),
+        mean(3),
+        mean(4),
+        mean(5),
+        mean(0)
+    );
+    println!(
+        "  window configured {window_ms} ms; the wait above is window + timer slack + scheduling"
+    );
+}
+
 pub async fn measure(doc: &str, edits: usize, window_ms: u64, relax: bool) -> i32 {
     let (state, ops_rx) = build_state(Session::with_doc(doc), None, window_ms);
     tokio::spawn(coalesce(ops_rx, state.clone()));
@@ -294,6 +377,7 @@ pub async fn measure(doc: &str, edits: usize, window_ms: u64, relax: bool) -> i3
     let mut seq = 1u64;
     let mut latencies: Vec<u128> = Vec::with_capacity(edits);
     let mut acks: Vec<u128> = Vec::with_capacity(edits);
+    let mut stamps: Vec<(u64, Instant, Instant)> = Vec::with_capacity(edits);
     let mut shared = 0usize;
     // The snapshot's message is one frame, whatever the document's size: it is
     // written before the packing loop, so packing cannot carry or split it.
@@ -352,6 +436,7 @@ pub async fn measure(doc: &str, edits: usize, window_ms: u64, relax: bool) -> i3
                 if acked == Some(t) {
                     shared += 1;
                 }
+                stamps.push((op.seq(), t0, diff));
                 break;
             }
         }
@@ -386,6 +471,9 @@ pub async fn measure(doc: &str, edits: usize, window_ms: u64, relax: bool) -> i3
             ph.retok_us as f64 / n,
             ph.materialize_us as f64 / n
         );
+    }
+    if state.trace.on {
+        split_tail(&state, &stamps, window_ms);
     }
 
     let p99 = pct(&latencies, 0.99);

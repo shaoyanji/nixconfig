@@ -5,6 +5,12 @@
 # milliseconds; it should not move the verdict. When it does, this job fails with
 # the p99 beside it, because a gate whose answer changed is a fact to look at
 # rather than one to re-read in prose.
+#
+# The table came from a four-core box, so the core count is printed, carried in
+# every row and written into `bench-sweep.json`. Below four cores the script
+# reports the verdicts as advisory and does not fail: that run measured the
+# runner. Public-repository runners have four vCPUs, which is why they are the
+# comparison and not a stand-in for it.
 name: bench
 
 on:
@@ -27,7 +33,23 @@ jobs:
       # green, because the build here is one crate graph and a minute.
       - name: toolchain
         run: rustup default stable && cargo --version
+      - name: machine
+        run: |
+          nproc
+          grep -m1 'model name' /proc/cpuinfo || true
+          uname -sr
       - name: build
         run: cargo build --release --locked
       - name: sweep
+        env:
+          SWEEP_JSON: bench-sweep.json
         run: bash scripts/bench-sweep.sh
+      - name: record
+        if: always()
+        run: cat bench-sweep.json 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bench-sweep
+          path: bench-sweep.json
+          if-no-files-found: warn

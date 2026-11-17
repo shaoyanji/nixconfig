@@ -25,7 +25,9 @@ node web/window.mjs http://127.0.0.1:8787/   # the edit-to-diff target, gated; w
 ```
 
 Environment: `LOOM_PORT`, `LOOM_BIND`, `LOOM_DATA` (default `./session`, `off`
-disables persistence), `LOOM_COALESCE_MS` (default 2).
+disables persistence), `LOOM_COALESCE_MS` (default 2) and `LOOM_TRACE` (off; set
+it with `loom-cli bench` to split every edit into inbound, window, apply,
+publish and outbound).
 `loom-cli bench` takes `--doc N` (for the socket run and `--core` alike),
 `--window N` and `--relax`; `web/window.mjs`
 reads `TARGET_MS` (the 5 ms it gates on) and reports what the window buys.
@@ -38,15 +40,15 @@ differs from the table above.
 
 | Metric | Target | Measured |
 | :--- | :--- | :--- |
-| edit → diff over the socket, p99 | < 5 ms | **4.01 ms** (p50 3.14, max 4.22; 10 029 tokens, 2 ms window included) |
-| core pipeline, p99 (no window) | — | **42 µs** on 10 k tokens, **99 µs** on 40 k (p50 28 / 84) — the floor under that number, not a target |
+| edit → diff over the socket, p99 | < 5 ms | **3.52 ms** (p50 3.19, max 4.28; 10 029 tokens, 2 ms window included) |
+| core pipeline, p99 (no window) | — | **43 µs** on 10 k tokens, **105 µs** on 40 k (p50 28 / 90) — the floor under that number, not a target |
 | tokens re-tokenized per edit, median | < 2 % of doc | **0.07 %** |
 | tokens re-tokenized per edit, p99 | < 10 % of doc | **0.20 %** |
 | ripple bound hits | < 0.1 % of edits | **0 / 1000** |
 | diff frame encode | no allocation | 6.0–7.4 µs/frame, reused buffer, 4096 → 4096 bytes |
-| 6 reactors at 1000 batches/s, document growing | no queue depth, no drift | 1000 batches, 4000 shard events over 4 shards, 2000 reactions, **0 starved**, **0 span-creep** |
+| 6 reactors at 1000 batches/s, document growing | no queue depth, no drift | 1000 batches, 2000 shard events over 2 shards, 2000 reactions, **0 starved**, **0 span-creep** |
 
-Acceptance tests (`cargo test --all --locked`, 26 tests):
+Acceptance tests (`cargo test --all --locked`, 27 tests):
 
 - `incremental_eq_rebuild` — proptest, random documents and op sequences; the
   incremental token array equals a full rebuild byte for byte.
@@ -114,6 +116,12 @@ Acceptance tests (`cargo test --all --locked`, 26 tests):
   every later edit would have landed one token off. The frame now spans the union
   of what the batch named and what the ripple touched, mapped back into starting
   coordinates.
+- `two_clients_converge_on_one_document` — two pages on one session, alternating
+  batches: each edit is one revision and one diff, both pages are sent the same
+  frame, and both lists are the rope after every batch. The page that types
+  names its offsets against the document as it last saw it, so this is what
+  would fail if the other page's diffs stopped arriving whole. It passed on the
+  first run, which is the point of writing it down.
 - `concatenated_frames_walk_from_their_own_lengths` — seven frame types written
   back to back into one message: each is found from the length of the one before
   it, and the lengths cover the message exactly, with every frame equal to what
@@ -175,19 +183,20 @@ default 200 edits, one run each:
 
 | window | edit → diff p99 | verdict |
 | :--- | :--- | :--- |
-| 1 ms | 3.01 ms | pass |
-| **2 ms** | **4.09 ms** | **pass — the default** |
-| 4 ms | 5.98 ms | fail |
-| 8 ms | 9.33 ms | fail |
+| 1 ms | 2.28 ms | pass |
+| **2 ms** | **3.24 ms** | **pass — the default** |
+| 4 ms | 5.31 ms | fail |
+| 8 ms | 9.42 ms | fail |
 
 From the browser at 2 ms the same segment measured 3.47 ms over 60 edits, with
 the diff sharing the ack's message in 60/60. The bench runs longer, so its p99
-covers more of a tail that is real: 4.01 ms on the default run, 4.09 ms in this
-sweep, and 4.38 and 5.49 ms on two runs over 1000 edits, by which point the
-document has grown by 1000 tokens. Those two runs are the honest picture of the
-margin: at 10 k tokens the tail sometimes crosses 5 ms, and the pipeline is not
-what crosses it — the server's own apply → encode p99 on those runs was 0.28 ms
-against a 2 ms window.
+covers more of a tail that is real: 3.52 ms on the default run, 3.24 ms in this
+sweep, and 3.98 and 3.96 ms over two runs of 1000 edits, by which point the
+document has grown by 1000 tokens. The slowest single edit in those runs was
+5.18 ms, and the p99 did not follow it there. A larger document is no longer the
+worse case: 4.16 and 4.29 ms over 600 edits at 40 k, 4.59 and 4.81 over 1000, and
+4.21–4.32 ms at 100 k. The pipeline under all of them is 105 µs at 40 k; what the
+rest is made of, and what was moved to get here, is in the limits below.
 
 The default is 2 ms: the widest window that keeps end-to-end p99 under the 5 ms
 target, and the gate says so rather than the prose — 4 ms and 8 ms are the same
@@ -237,9 +246,17 @@ only the batch window. Positions are stored per block of 256 spans, and a block'
 start byte is the sum of the lengths of the blocks before it: an edit rewrites
 the block it lands in and every later position moves for free, because it was
 never stored. That is what keeps a batch at 1000/s from walking a 7k-span tail
-per reactor. The pool runs `min(4, cpus)` shards; a shard whose queue (bound 32)
-is full raises its starve flag and re-lexes the whole document on its next idle
-moment, counting `starved` rather than dropping diffs. The header pill carries
+per reactor.The pool runs one shard per two cores,
+capped at four; a shard whose queue (bound 32) is full raises its starve flag and
+re-lexes the whole document on its next idle moment, counting `starved` rather
+than dropping diffs. A shard per core was the first rule and it was wrong in a way
+only the socket measures: six reactors on four threads on a four-core box take the
+core the runtime's own workers need, and the edit's delivery pays for it — at
+40 125 tokens over 600 edits the p99 was 5.70 ms at four shards with 1.96 ms of it
+outbound, and 4.21 ms at two with 56 µs outbound. A single shard measures 3.78 ms,
+best of the three, and is rejected because every reactor would wait for the
+slowest one; 1000 batches/s with two shards still lands 2000 shard events, 0
+starved, 0 span-creep. The header pill carries
 that count next to the last batch window, so a shard that fell back to a
 keyframe is visible from the page instead of only in the server's log. The same
 frame carries the reactor bank and the session's constraint count, so a switch
@@ -310,30 +327,41 @@ log whose base document is gone.
   number. The pipeline alone is `bench --core`: the floor under that number, and
   no gate of its own, because a target the core meets while the socket misses says
   nothing about an editor.
-- **The target is measured, and beyond 10 k tokens it is marginal.** The first
-  measurements said 10 029 tokens held at 3.70 ms while 40 k and 100 k did not,
-  and part of that was structural: every position lookup summed a chunk's tokens
-  instead of reading its text length, so `byte_of_token` was O(tokens) and an edit
-  went through it several times; and the token array a batch materializes for the
-  send path and the reactors was grown from zero. Both are fixed, and the fix is
-  measured interleaved against a build with the old rope, three rounds each,
+- **The tail was the reactor bank's threads, and it moved by measurement.** A
+  `LOOM_TRACE=1` bench splits every edit into inbound, window, apply, publish and
+  outbound on one clock. At 40 125 tokens it said the pipeline was never the tail:
+  a 5.7–6.4 ms p99 was a 3.6–3.9 ms wait for a 2 ms window, 1.8–2.0 ms inbound,
+  0.7–1.2 ms apply and 1.9–2.0 ms outbound. With the pool's `submit` removed in a
+  scratch build the same 600 edits measured 3.35 ms with 66 µs outbound, so the
+  cost was four shard threads on four cores delaying both socket wakeups — the
+  allocator was ruled out the same way, since forcing the mmap thresholds left the
+  p99 at 6.10 ms. The wait has a floor of its own: it is `window + 1.06 ms` at 1,
+  2 and 4 ms widths, which is tokio's 1 ms timer granularity, not a phase this
+  code can tune without polling for it. The shard count is now one per two cores,
+  and the difference is the gate: 5.70 ms at four shards, 4.21 at two, on the same
+  run; 1000 batches/s still lands 2000 shard events with 0 starved. One shard
+  measures 3.78 ms and is rejected, because six reactors on one thread means each
+  waits for the slowest.
+- **What is left is the window.** A 40 k edit's p50 is 3.4 ms, of which 3.06 is
+  the window; its p99 is 4.2–4.8 ms over 600–1000 edits, and 10 k holds 3.5–4.0.
+  The structural work under that was fixed earlier and is still in the numbers:
+  every position lookup summed a chunk's tokens, so `byte_of_token` was
+  O(tokens), and the token array a batch materializes was grown from zero. Both
+  were measured interleaved against a build with the old rope, three rounds each,
   server time per edit at 100 154 tokens (median): ops 85 → 56 µs, ripple
-  473 → 177 µs, materialize 321 → 269 µs, end-to-end p50 3.93 → 3.52 ms. The p99
-  did not follow it down, and the reason is not the pipeline: apply → encode p99
-  is 0.5–1.7 ms against a 2 ms window, and cutting the reactor pool from four
-  shards to three halved that server p99 (668–806 → 361–456 µs) while the
-  end-to-end number went from 4.6–5.0 to 5.0–5.5 ms. At 200 edits the socket p99
-  is 4.01 ms at 10 k, 4.1–5.2 at 40 k and 4.1–4.3 at 100 k; at 600–1000 edits the
-  tail widens to 5.3–7.0 ms at 40 k while 10 k stays at 4.4–5.5. A 40 k document
-  measuring worse than a 100 k one is the tell: what is left is the round trip and
-  the timer on a four-core box, not the diff. The gate passes at the size it was
-  measured at, and is reported rather than hidden everywhere else.
+  473 → 177 µs, materialize 321 → 269 µs, end-to-end p50 3.93 → 3.52 ms. The
+  remaining margin is the gate's own arithmetic: 2 ms of window, 1 ms of timer
+  granularity, ~0.3–1.0 ms of apply.
 - **The gate's verdict is checked on a schedule, not re-read.**
   `.github/workflows/bench.yml` runs `scripts/bench-sweep.sh` every Monday: the
   four window widths above, each compared with this README's table, two attempts
   per width so one noisy run is a footnote. A verdict that changed fails the job
   and prints the p99 beside it, because a gate whose answer moved is a fact to
-  look at rather than a paragraph to trust.
+  look at rather than a paragraph to trust. The script prints the runner's core
+  count and CPU, puts them in every row, and writes `bench-sweep.json`; below the
+  four cores this table came from it reports the verdicts as advisory instead of
+  failing, because that run measured the runner rather than the gate. A
+  public-repository runner has four vCPUs, which is why it is the comparison.
 - **A snapshot is never packed, so packing cannot hurt one.** It is written before
   the packing loop, as its own message: measured as one transport frame carrying
   one loom frame at 10 029 tokens (42 665 bytes, 0.77 ms from connect), 40 125

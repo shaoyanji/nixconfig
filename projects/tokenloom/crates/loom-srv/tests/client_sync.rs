@@ -7,7 +7,9 @@
 //! and check spans; this one keeps the client's list and asserts that after every
 //! batch it equals the server's rope, token for token, across random multi-op
 //! batches — inserts, deletes, merges, splits and annotations in one window,
-//! which is where the pre/post mapping has to hold.
+//! which is where the pre/post mapping has to hold. A second test puts two such
+//! pages on one session: each edit is one diff, both pages receive it, and both
+//! end on the rope.
 //!
 //! Tags are left out of the comparison on purpose: the wire carries a token's
 //! text and flags, and a client never learns a tag, so asserting on one would be
@@ -28,6 +30,8 @@ type Frames = broadcast::Receiver<Arc<Vec<u8>>>;
 /// wait is generous: the coalescer window under test is 20 ms.
 const WAIT: Duration = Duration::from_secs(2);
 const BATCHES: usize = 48;
+/// Two pages take one window each per batch, so this bounds the test's time.
+const TWO_PAGES_BATCHES: usize = 32;
 
 /// What a page keeps per token.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -277,6 +281,36 @@ fn window(toks: &[Tok], at: usize) -> Vec<String> {
         .collect()
 }
 
+/// The one diff a batch owes, and the coordinates a page applies it at.
+fn diff_of(frames: &[ServerFrame]) -> Option<(u64, usize, usize, Vec<NewToken>)> {
+    frames.iter().find_map(|f| match f {
+        ServerFrame::Diff {
+            revision,
+            start,
+            deleted,
+            inserted,
+        } => Some((*revision, *start as usize, *deleted as usize, inserted.clone())),
+        _ => None,
+    })
+}
+
+/// What a page does with a frame, and nothing else.
+fn apply_diff(client: &mut Vec<Tok>, start: usize, deleted: usize, inserted: &[NewToken]) {
+    assert!(
+        start + deleted <= client.len(),
+        "diff replaces {deleted} at {start}, client holds {}",
+        client.len()
+    );
+    let fresh: Vec<Tok> = inserted
+        .iter()
+        .map(|t| Tok {
+            flags: t.flags,
+            text: t.text.clone(),
+        })
+        .collect();
+    client.splice(start..start + deleted, fresh);
+}
+
 /// Every frame of one batch, up to and including its diff.
 async fn batch_frames(rx: &mut Frames) -> Vec<ServerFrame> {
     let mut frames = Vec::new();
@@ -341,15 +375,7 @@ async fn every_diff_lands_on_the_server_rope() {
             acks, expected_acks,
             "batch {batch} acknowledges each of {expected_acks} ops: {frames:?}"
         );
-        let (rev, start, deleted, insert) = match found[0] {
-            ServerFrame::Diff {
-                revision,
-                start,
-                deleted,
-                inserted,
-            } => (*revision, *start as usize, *deleted as usize, inserted.clone()),
-            _ => unreachable!(),
-        };
+        let (rev, start, deleted, insert) = diff_of(&frames).expect("the diff the batch owes");
         assert_eq!(
             rev,
             revision + 1,
@@ -370,19 +396,7 @@ async fn every_diff_lands_on_the_server_rope() {
 
         // What the page does with the frame, and nothing else.
         let mut applied = client.clone();
-        assert!(
-            start + deleted <= applied.len(),
-            "batch {batch}: diff replaces {deleted} at {start}, client holds {}",
-            applied.len()
-        );
-        let fresh: Vec<Tok> = insert
-            .iter()
-            .map(|t| Tok {
-                flags: t.flags,
-                text: t.text.clone(),
-            })
-            .collect();
-        applied.splice(start..start + deleted, fresh);
+        apply_diff(&mut applied, start, deleted, &insert);
 
         let server = tokens_of(&state);
         if applied != server {
@@ -412,4 +426,112 @@ async fn every_diff_lands_on_the_server_rope() {
         tokens_of(&state),
         "the list built only from the snapshot and the diff stream is the rope"
     );
+}
+
+/// Two pages, one session.
+///
+/// The server keeps one rope and broadcasts one diff, so a page that types
+/// computes its offset against the document as it last saw it — which is only
+/// valid if the other page's edits reached it. This alternates batches between
+/// two pages and asserts, after every one, that each list is the rope and that
+/// they agree: the second page is not a separate protocol path today, and this
+/// is what would notice if it became one.
+#[tokio::test]
+async fn two_clients_converge_on_one_document() {
+    let (state, ops_rx) = build_state(Session::with_doc(&doc()), None, 20);
+    let mut rx_a = state.shared.out.subscribe();
+    let mut rx_b = state.shared.out.subscribe();
+    tokio::spawn(coalesce(ops_rx, state.clone()));
+
+    let mut a = snapshot(&state);
+    let mut b = snapshot(&state);
+    assert_eq!(
+        a, b,
+        "two pages connecting to one session start from one document"
+    );
+    assert_eq!(a, tokens_of(&state), "and that document is the rope");
+
+    let mut rng = Lcg(0x2c1e_47e5_f3a9_d812);
+    let mut seq = 0u64;
+    let mut revision = state.revision();
+    let mut diffs = 0usize;
+
+    for batch in 0..TWO_PAGES_BATCHES {
+        let from_a = batch % 2 == 0;
+        let who = if from_a { "A" } else { "B" };
+        // The page that types names its offsets against its own list; both lists
+        // are the document because every diff so far reached both of them.
+        let mut shadow = if from_a { a.clone() } else { b.clone() };
+        let ops = make_batch(&mut rng, &mut shadow, &mut seq);
+        let seqs: Vec<u64> = ops.iter().map(|o| o.seq()).collect();
+        for op in &ops {
+            state
+                .ops_tx
+                .send(vec![op.clone()])
+                .expect("the op reaches the coalescer");
+        }
+
+        let frames_a = batch_frames(&mut rx_a).await;
+        let frames_b = batch_frames(&mut rx_b).await;
+        for (frames, page) in [(&frames_a, "A"), (&frames_b, "B")] {
+            let acks: Vec<u64> = frames
+                .iter()
+                .filter_map(|f| match f {
+                    ServerFrame::Ack { seq, .. } => Some(*seq),
+                    _ => None,
+                })
+                .collect();
+            assert_eq!(
+                acks.len(),
+                seqs.len(),
+                "batch {batch} from {who}: page {page} hears every op acked: {frames:?}"
+            );
+            assert!(
+                acks.iter().all(|s| seqs.contains(s)),
+                "batch {batch} from {who}: page {page} acked something it did not send"
+            );
+        }
+
+        let (rev, start, deleted, insert) = diff_of(&frames_a).unwrap_or_else(|| {
+            panic!("batch {batch} from {who}: page A got no diff: {frames_a:?}")
+        });
+        assert_eq!(
+            diff_of(&frames_b),
+            Some((rev, start, deleted, insert.clone())),
+            "batch {batch} from {who}: both pages are sent the same diff"
+        );
+        assert_eq!(rev, revision + 1, "batch {batch} from {who}: one revision");
+        revision = rev;
+
+        apply_diff(&mut a, start, deleted, &insert);
+        apply_diff(&mut b, start, deleted, &insert);
+        let server = tokens_of(&state);
+        for (client, page) in [(&a, "A"), (&b, "B")] {
+            if *client != server {
+                let at = client
+                    .iter()
+                    .zip(server.iter())
+                    .position(|(x, y)| x != y)
+                    .unwrap_or(client.len().min(server.len()));
+                panic!(
+                    "batch {batch} from {who}: page {page} is off the rope at token {at} \
+                     (page {} tokens, server {}; diff {start} −{deleted} +{})\n\
+                     ops {ops:#?}\n  page {:#?}\n  rope {:#?}",
+                    client.len(),
+                    server.len(),
+                    insert.len(),
+                    window(client, at),
+                    window(&server, at),
+                );
+            }
+        }
+        assert_eq!(a, b, "batch {batch} from {who}: the two pages agree");
+        diffs += 1;
+    }
+
+    assert_eq!(
+        diffs, TWO_PAGES_BATCHES,
+        "one diff per batch, and neither page missed one"
+    );
+    assert_eq!(a, tokens_of(&state));
 }

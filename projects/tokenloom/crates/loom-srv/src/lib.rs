@@ -34,9 +34,49 @@ pub struct Shared {
     pub starved: AtomicU32,
 }
 
+/// One batch's stamps on the monotonic clock, for the bench's tail split.
+///
+/// The bench runs the client and the server in one process, so these stamps and
+/// the client's are the same clock and the segments add up to the number the
+/// gate quotes. Collected only when `LOOM_TRACE` is set: one field read per
+/// batch otherwise.
+#[derive(Clone, Copy, Debug)]
+pub struct StageTimes {
+    /// First op of the batch.
+    pub seq: u64,
+    /// The coalescer took that op: the window starts here.
+    pub queued: Instant,
+    /// The session lock was taken and apply began.
+    pub apply_at: Instant,
+    /// `apply_batch` returned.
+    pub applied_at: Instant,
+    /// Every frame of the batch was in the broadcast.
+    pub sent_at: Instant,
+}
+
+#[derive(Default)]
+pub struct Trace {
+    pub on: bool,
+    entries: Mutex<Vec<StageTimes>>,
+}
+
+impl Trace {
+    fn push(&self, at: StageTimes) {
+        if let Ok(mut v) = self.entries.lock() {
+            v.push(at);
+        }
+    }
+
+    /// Every batch stamped so far, oldest first.
+    pub fn entries(&self) -> Vec<StageTimes> {
+        self.entries.lock().map(|v| v.clone()).unwrap_or_default()
+    }
+}
+
 pub struct AppState {
     pub session: Mutex<Session>,
     pub shared: Arc<Shared>,
+    pub trace: Arc<Trace>,
     pub pool: Pool,
     pub ops_tx: mpsc::UnboundedSender<Vec<Op>>,
     pub persist: Mutex<Option<persist::Persist>>,
@@ -93,6 +133,10 @@ pub fn build_state(
         scratch: Mutex::new(Vec::with_capacity(4096)),
         last_metrics: Mutex::new(Instant::now()),
         coalesce_ms,
+        trace: Arc::new(Trace {
+            on: std::env::var_os("LOOM_TRACE").is_some(),
+            ..Trace::default()
+        }),
     });
     (state, ops_rx)
 }
@@ -181,6 +225,9 @@ pub async fn ticker(state: Arc<AppState>) {
 pub async fn coalesce(mut rx: mpsc::UnboundedReceiver<Vec<Op>>, state: Arc<AppState>) {
     let window = Duration::from_millis(state.coalesce_ms.max(1));
     while let Some(first) = rx.recv().await {
+        // The window starts when this task takes the op, not when it was typed:
+        // that is the segment the trace calls the wait.
+        let queued = Instant::now();
         let mut batch = first;
         let deadline = tokio::time::Instant::now() + window;
         loop {
@@ -189,11 +236,11 @@ pub async fn coalesce(mut rx: mpsc::UnboundedReceiver<Vec<Op>>, state: Arc<AppSt
                 _ => break,
             }
         }
-        handle_batch(&state, batch);
+        handle_batch(&state, batch, queued);
     }
 }
 
-fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
+fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>, queued: Instant) {
     let toggled_off = now_ms();
     let mut toggle_events: Vec<EngineEvent> = Vec::new();
     for op in &batch {
@@ -217,12 +264,14 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
         broadcast_event(&state.shared, e);
     }
 
-    let (outcome, revision, snap_tokens, view) = {
+    let apply_at = Instant::now();
+    let (outcome, revision, snap_tokens, view, applied_at) = {
         let mut s = match state.session.lock() {
             Ok(s) => s,
             Err(_) => return,
         };
         let outcome = s.apply_batch(&batch);
+        let applied_at = Instant::now();
         // The session is where a toggle is written down; the pool's copy is a
         // mirror so its sink reads a flag without waiting on this lock.
         for (i, flag) in state.shared.reactors_on.iter().enumerate() {
@@ -250,7 +299,7 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
             .shared
             .starved
             .store(state.pool.starved_total() as u32, Ordering::Relaxed);
-        (outcome, revision, snap, view)
+        (outcome, revision, snap, view, applied_at)
     };
 
     if let Ok(mut buf) = state.scratch.lock() {
@@ -288,6 +337,18 @@ fn handle_batch(state: &Arc<AppState>, batch: Vec<Op>) {
                 let _ = state.shared.out.send(Arc::new(buf.clone()));
             }
         }
+    }
+
+    // Stamped for the bench: the gate quotes one number, and this is the split
+    // that says which of its parts a miss belongs to. Off unless `LOOM_TRACE`.
+    if state.trace.on {
+        state.trace.push(StageTimes {
+            seq: batch.first().map(|o| o.seq()).unwrap_or(0),
+            queued,
+            apply_at,
+            applied_at,
+            sent_at: Instant::now(),
+        });
     }
 
     // The sidebar's list changes on a plant, a removal and a retune, and all

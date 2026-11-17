@@ -3,8 +3,8 @@
 Measured on **frieren** against `/run/current-system` on **2026-10-10**
 (`nixos-system-frieren-26.11.20261005.aa48d34`).
 
-This is the *why* behind the closure tooling. Every number below is reproduced by
-a command in this document; nothing here is estimated. Anything marked
+Every number below is reproduced by a command in this document; nothing here is
+estimated. Anything marked
 **candidate** was measured but not yet actioned, and carries the command that
 confirms or refutes it.
 
@@ -50,9 +50,9 @@ Subsystem table (top 6 of 18):
 
 ## 3. The structural finding: `home-manager-path`
 
-The single most useful result of the traversal is *where* things attach. Almost
-every oversized interactive tool in this closure reaches the system through one
-node:
+The useful result of the traversal is where things attach rather than what they
+weigh: almost every oversized interactive tool in this closure reaches the system
+through one node.
 
 ```
 nixos-system-… └── etc └── user-environment └── home-manager-path └── <tool>
@@ -143,7 +143,7 @@ comm -23 /tmp/old /tmp/new    # the removed set
 
 The nine packages in §3 total ≈ 2.5 GiB and are all interactive tooling. None of
 them is a systemd unit or a driver, so none of them *needs* to be in the boot
-closure of a headless NAS. They are the natural first cohort for tier B/C below.
+closure of a headless NAS. They are the first candidates for tier B/C below.
 
 ### L3 — `mbrola-voices` · **644.7 MiB, candidate**
 
@@ -188,7 +188,7 @@ task dev:closure:menu -- why libreoffice
 
 ### L6 — duplicate versions across subsystems · **5.1 GiB optimistic / 675 groups**
 
-Two copies of one package in one closure buys nothing. The report ranks groups by
+Two copies of one package in one closure serve no purpose. The report ranks groups by
 the size of the redundant copy (total minus the largest member), so the figure is
 an upper bound: it assumes each group can collapse to exactly one build.
 
@@ -203,7 +203,7 @@ Top groups:
 | 187.6 MiB | 2 | `uptime-kuma` |
 | 138.6 MiB | 2 | `openvino` |
 
-A group is a *candidate*, never a fact: the version-stripping key is a heuristic,
+A group is a candidate, not a fact: the version-stripping key is a heuristic,
 and two versions can be genuinely required (a client and a daemon, say). That is
 why `reduce` prints every concrete store path — the decision is made by looking at
 the copies, not the total.
@@ -221,7 +221,7 @@ bucket-of-last-resort, but it means the largest slice of the graph is opaque —
 the top of `other` is the top of the closure. Splitting `other` (nixpkgs
 ecosystems already present: `qt`/`gtk` are classified, but `dotnet`, `haskell`,
 `mono`, `texlive`, `wasm` are not) would make the breakdown self-explaining.
-Note this is a *readability* lever, not a size lever.
+This is a readability lever, not a size lever.
 
 ## 5. The direction: three tiers instead of one
 
@@ -241,7 +241,7 @@ Tier B already half-exists: `modules/config/shells/*` defines `flaskpy`,
 tool added to a shell and to `home.packages` is in the closure anyway, and
 nothing surfaces the overlap.
 
-**Tier C is the actual gap.** Both flake outputs are empty:
+Tier C is the gap. Both flake outputs are empty:
 
 ```nix
 # flake/packages.nix
@@ -266,8 +266,8 @@ family by family: drop what a host does not run continuously from `home.packages
 
 Trade-off, stated plainly: `nix run` is a store lookup on every invocation and a
 fetch if the path is not yet local. That is the price of not carrying the closure.
-For tools used constantly it is the wrong trade; for tools used occasionally it is
-the whole point. The three-tier table is how the decision gets made explicitly
+For tools used constantly that is the wrong trade; for tools used occasionally it
+is the point. The three-tier table is how the decision gets made explicitly
 instead of by default.
 
 ## 6. Verification protocol

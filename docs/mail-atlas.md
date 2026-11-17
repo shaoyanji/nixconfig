@@ -34,8 +34,8 @@ through the hub's plugin contract (`services.emailArchive.plugins.mail-atlas`).
 | `mail_box` | where a letter sits in the working inbox: `inbox`, `queued`, `archived`, `trashed`, `gone` |
 | `mail_command` | a command about the mailbox rather than a letter, in the person's own words |
 
-`tags are stored, not computed at query time` — a taxonomy that is recomputed per
-request cannot be corrected by hand, and the graph needs the counts cheaply.
+Tags are stored, not computed at query time: a taxonomy recomputed per request
+cannot be corrected by hand, and the graph needs the counts cheaply.
 
 `mail_atlas_autotag()` is the rules pass. It judges messages that carry no rule
 verdict yet, newest first, bounded by `services.mailAtlas.tagLimit` (4000), and
@@ -173,13 +173,12 @@ Posting any decision also resolves the message's open `email_triage` verdicts:
 the person has just dealt with it, so it should leave `/api/attention` in the
 same act rather than needing a second click.
 
-## The mailbox is the truth
+## Reconciling with the mailbox
 
 `mail_box` only ever knew what this page asked for. Mail is also archived from a
 phone, a web client or a filter, and none of that reaches the atlas — so a letter
 archived in Gmail kept counting as inbox, and the working set filled with mail
-the person had already handled. That is a wrong number at the top of the page,
-which is worse than a slow one.
+the person had already handled. That is a wrong number at the top of the page.
 
 `mail-atlas-reconcile` closes it. One run reads the Message-IDs of every
 envelope in the Inbox through `himalaya` (500 per page, until a short page says
@@ -238,7 +237,7 @@ a sea, over the character for a chart.
   search box on submit, a light ripple per keystroke, a heartbeat at the graph's
   centre when results land. The simulation never learns the query; it only feels
   how much the sea is moving.
-- **The graph is the answer, not a decoration.** Nodes are the query, all ten
+- **The graph carries the answer.** Nodes are the query, all ten
   gates, its hottest tags and the first 30 letters; edges are letter→tag and
   tag→category, bowed and carrying a travelling spark whose rate is the link's
   heat. Every node has a heat derived from the result set: gate gauges are the

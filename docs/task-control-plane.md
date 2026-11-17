@@ -1,6 +1,7 @@
 # Task control plane
 
-This repository uses a simplified task namespace for predictable operator workflows.
+Tasks are grouped by what they act on. Each shard owns one kind of action, and the
+namespace is the entry surface for operators and agents alike.
 
 ## Current namespace structure
 
@@ -82,9 +83,8 @@ rename.
 The 94 named `checks:*` tasks are still the **implementation**, deliberately.
 `check.sh` runs `task "$name"`, so a name is what holds the command: deleting
 the names would move every command into a TOML string, which is the second home
-the split was meant to avoid (no `deps`, no `{{.VAR}}`, nothing lintable). Three
-verbs are the *entry* surface, the names are the payload — shrinking
-`task --list` means deleting gates, not renaming them.
+the split was meant to avoid (no `deps`, no `{{.VAR}}`, nothing lintable). Three verbs are the entry surface; the names are the implementation. Shrinking
+`task --list` therefore means deleting gates, not renaming them.
 
 ### Operator helpers
 ```bash
@@ -135,9 +135,9 @@ move the text to `summary` — never `internal: true`.
 bind — this applies to agents invoking wildcards too). Use the concrete name
 (`task infra:plan:host:poseidon`); the menu prompts for the value and splices it.
 
-### Watch mode: stopping it is its own task
+### Stopping watch mode
 
-Watch mode leaves children running: the watcher is a *grandchild* of whatever
+Watch mode leaves children running: the watcher is a grandchild of whatever
 launched it. Killing the launching shell left a live `task checks:nix:watch`
 formatting the repo for ~8 minutes, and it looked stopped because the parent PID
 was gone. `task checks:nix:watch:stop` matches the watcher cmdline exactly (so it
@@ -170,7 +170,7 @@ parses.
 So the graph is compiled instead. `scripts/task/lib/taskfile_graph.py` walks
 `Taskfile.yml` plus the nested include graph and emits one projection — task
 names, `desc`/`summary`, `aliases`, `cmds`, `requires.vars`, wildcard arity,
-cross-task references, include edges. **yq parses; the rules are the script.** No
+cross-task references, include edges. yq parses; the script holds the rules. No
 IFD, no committed derivative, and no second source of truth: the shards are the
 input and nothing is generated beside them.
 
@@ -235,8 +235,7 @@ summaries were over 600 characters (`checks:host` alone was 3400, and `ops:ask`
 2629), which is a page an agent pays for on every `task --list-all --json` read.
 They were rewritten to the contract — purpose, `VAR=` names, exit codes, and what
 the gate does **not** prove — with the narrative dropped or left to `#` comments,
-and the buckets moved into `gateBuckets`. A budget that is only reported is a
-budget that drifts; `desc` is the one-line list label, `summary` is the contract,
+and the buckets moved into `gateBuckets`. A budget that is only reported drifts; `desc` is the one-line list label, `summary` is the contract,
 `#` comments are for whoever reads the YAML next.
 
 Two precision rules matter, both learned from a noisy first version that reported
@@ -253,7 +252,7 @@ Two precision rules matter, both learned from a noisy first version that reporte
 ### Exit codes: the one clause prose can silently lose
 
 A `summary` that promises an exit code is the sharpest part of the contract, and
-it is the part that decays without a sound: when 28 over-budget summaries were
+it is the part that decays silently: when 28 over-budget summaries were
 rewritten to fit, `checks:ports` lost `1 = STRICT drift` while the script kept
 exiting 1. Nothing compared the sentence to the shell. Five rules make that
 comparison a gate (`exitDrift`, fatal) without drowning it in false positives:

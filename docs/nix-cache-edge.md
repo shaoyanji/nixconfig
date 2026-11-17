@@ -16,7 +16,7 @@ serves are uploaded, so the 10 GiB holds fleet build output rather than a second
 copy of nixpkgs. `dev:nixcache:push` refuses the upload if it would cross the
 budget — the gate is the refusal, not a warning.
 
-**It does not hold a system closure, and it is not supposed to.** See
+It does not hold a system closure, and is not supposed to. See
 [Why a system closure fits](#why-a-system-closure-fits) for the measurement: an
 18 GiB NixOS closure contributes well under 1 GiB here, because a cache that
 stores the delta and leaves the rest to nixpkgs is the only kind that fits in a
@@ -164,8 +164,7 @@ sync of delphi's system put **342 paths / 693 MiB of nar** in the bucket as
 **0.44 GiB / 694 objects** — a ~35 % margin in the refusal's favour, so a bucket
 that reports under budget is under budget.
 
-So the answer to "a NixOS closure is 18 GiB, how does this fit" is that a
-closure is never stored; a *delta* is. A client substitutes the toplevel from the
+A closure is never stored here; a delta is. A client substitutes the toplevel from the
 edge and its references from whichever cache has them, which is what every
 substituter list in `lib/cache-registry.nix` exists for. The consequence to
 respect: **the edge is not self-contained.** A host that lists only the edge
@@ -209,9 +208,9 @@ journalctl --user -u nixcache-sync --since -1month
 
 ## A microfix that rebuilds the fleet
 
-The complaint this answers: an agent edits one module, every host's toplevel
-becomes a different derivation, and the next switch stops being a substitution.
-The edit was small; the bill was a closure.
+A one-line module edit makes every host's toplevel a different derivation, so the
+next switch stops being a substitution and becomes a rebuild. The edit was small;
+the rebuild is a whole closure.
 
 ```bash
 task checks:invalidation                        # against origin/main
@@ -227,8 +226,8 @@ nix build --dry-run --json --builders "" .#nixosConfigurations.<host>.config.sys
 ```
 
 `--dry-run` builds nothing and `--builders ""` means the question cannot reach
-nixbuild.net and spend the month's budget. The count is the chore: 1–3 is a
-microfix, hundreds is a new stdenv or an overlay change. Over `MAX_BUILDS` (5)
+nixbuild.net and spend the month's budget.The count is the verdict: 1–3 is a microfix, hundreds is a new stdenv or an overlay
+change. Over `MAX_BUILDS` (5)
 the check fails and **names the derivations**, which is what tells an agent which
 layer the edit reached.
 
@@ -273,8 +272,8 @@ One difference from cachix is deliberate and worth stating: cachix sorts by
 **last access** because it sees every request. This Worker cannot — narinfo is
 served `Cache-Control: immutable`, so Cloudflare answers the repeats and the
 origin only ever observes misses, which would make a recorded "last access" a
-measurement of cache misses rather than of use. **Upload age is the honest stand-in**,
-and it self-corrects: a path a build still needs gets re-pushed, which refreshes
+measurement of cache misses rather than of use. Upload age is the stand-in, and it
+self-corrects: a path a build still needs gets re-pushed, which refreshes
 it. The two mechanisms also compose with the push gate — when `push` refuses
 because the bucket is at 10 GiB, `gc -- --delete` is what makes room.
 
@@ -355,7 +354,7 @@ valid path" afterwards, because nix caches the miss in
 <path>` bypasses it (measured 2026-11-02), as does deleting that file. The cache is
 fine; the client's memory is stale.
 
-That last command is the honest end-to-end check: `nix` fetched the narinfo from
+That last command is the end-to-end check: `nix` fetched the narinfo from
 the Worker, followed its `URL:` to `/nar/…`, verified the signature against a
 trusted key and wrote the path into another cache (2026-11-02, one reference-free
 `.patch`). A narinfo that is served but rejected by a client (`ignoring

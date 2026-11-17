@@ -104,7 +104,7 @@ autoUpgrade took the LAN's DNS down. Each mistake is a check now, not a note:
   opens `vrrp` from the firewall's start path (`extraInputRules` under nftables, else
   `extraCommands`), which is rebuilt each start and cannot half-delete itself.
 
-A VIP buys one address, configured once on the router, that survives losing a node.
+A VIP is one address, configured once on the router, that survives losing a node.
 
 ### Choosing the VIP
 
@@ -148,8 +148,8 @@ FAIL  9.9.9.9 answered '<no answer>' for hc3-check.frieren.lan (expected 192.168
 ERROR: resolvers did not answer the zone: 9.9.9.9        # exit 1
 ```
 
-That is a trade, not an oversight — partial degradation beats no internet — with a
-symptom worth recognising: a client that rotates entries (`options rotate`, some
+That is a trade rather than an oversight — partial degradation beats no internet —
+and it has one symptom: a client that rotates entries (`options rotate`, some
 Android stacks) fails `.lan` names intermittently while frieren is healthy.
 
 A zone-aware second entry would be the `gok` appliance at `192.168.3.4`: blocky, the

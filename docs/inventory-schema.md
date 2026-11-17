@@ -49,6 +49,7 @@ reads `hosts.<h>.network.mac` from the compiled artifact.
 | `[hosts.<name>.network]` | `lan_ip`, `mac`, `tailscale_ip`, `tailscale_hostname`, `tailnet_domain`, `ssh_alias`, `domain`, `gemini_url`, `gopher_url`, `tailscale`, `links` |
 | `[[hosts.<name>.network.links]]` | `label`, `port`, `scheme` (`http`/`https`, default `https`), `path`, `note` — a clickable tailnet endpoint |
 | `[hosts.<name>.software]` | `module_chain`, `impermanence`, `key_services`, `traits` |
+| `[hosts.<name>.persona]` | `title`, `system_prompt_hint`, `compute_tier`, `allowed_tasks`, `constraints` |
 
 A `network.links` row is what the docs site and the service portal render as a
 clickable card; the URL is compiled from `tailscale_hostname` + `tailnet_domain` +
@@ -71,7 +72,6 @@ promotion to a fuller toolchain or a different GPU tier is therefore an edit to
 one host's inventory entry, not to the module that consumes it. `nas-server` is
 the negative capability: the two NAS client profiles skip the mount on the host
 that declares it, instead of comparing the hostname against the server's name.
-| `[hosts.<name>.persona]` | `title`, `system_prompt_hint`, `compute_tier`, `allowed_tasks`, `constraints` |
 
 Everything except `kind`, `arch` and `status` is optional with an empty default,
 so the compiled record is uniform even when the source omits a section.
@@ -132,7 +132,7 @@ The behavioural half — a host's module system *really* resolving the registry 
 lives here, because it is the only place it can be checked without paying for every
 host at once.
 
-**Coverage, honestly:** tier 1 covers every registered host of every kind (nixos,
+Coverage: tier 1 covers every registered host of every kind (nixos,
 containers, standalone home, darwin, microvms) because it reads their module lists.
 Tier 2 *as a build* covers the 23 NixOS hosts — those are the ones a local
 `hostChecks` attribute can both evaluate and build on x86_64, since a check derivation

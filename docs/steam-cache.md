@@ -31,8 +31,8 @@ says what that zone held:
 | 1 | `cache9-fra1.steamcontent.com` | Valve's own cache host |
 
 `cm-01-fra1` is a **sibling** of the download names, not their child, so no
-exclusion inside the zone can spare it while the zone is steered — "narrow the
-zone" was the wrong shape. An allowlist is the shape that works:
+exclusion inside the zone can spare it while the zone is steered. An allowlist
+is the shape that works:
 
 | `dnsSteer` | writes | verdict |
 | :--- | :--- | :--- |
@@ -106,14 +106,13 @@ The service-level gates still apply if the unit is ever enabled:
 `/__health`, and `TimeoutStartSec` (not `RuntimeMaxSec`, which a oneshot ignores)
 as the bound.
 
-One cosmetic wrinkle: detection reports `localhost [127.0.0.1]` rather than the
-LAN address, because the probe sends the bare IP as `Host:` and the **atuin**
+Detection reports `localhost [127.0.0.1]` rather than the LAN address, because the probe sends the bare IP as `Host:` and the **atuin**
 vhost claims `192.168.3.25` in `server_name`, so that request lands on atuin and
 404s. The bytes still flow through this front, so the fill is correct; the
 conflicting vhost is separate open work (`nginx -t` does not flag it — the first
 block wins).
 
-The split is deliberate. The cache lives on the **removable** USB flash tier
+The cache lives on the **removable** USB flash tier
 (`nofail`), so its unit is gated on `ConditionPathIsMountPoint` and nothing else
 depends on it: when the stick is out the backend is not running, the
 front answers 502, and its `error_page 502 504 = @valve` re-fetches the object
@@ -276,15 +275,13 @@ takes the whole line:
 | `ping 1.1.1.1` | 33 % loss, 49 ms | 0 % loss, 12 ms |
 | a house device resolving a cold name | reads as "the DNS is down" | fine |
 
-The failure mode is worth naming because it does not look like bandwidth: the
-fill eats the upstream, un-cached lookups time out **upstream**, and a TV
+The failure mode does not look like bandwidth: the fill eats the upstream, un-cached lookups time out **upstream**, and a TV
 upstairs reports no internet while `dig @192.168.3.25 crunchyroll.com` answers
 normally on the box. Stopping the run gives the line back in two seconds and
 costs nothing — `SIGINT` to the SteamPrefill pid, then start it again; it skips
 what is cached. Do **not** use `SIGSTOP` as a throttle: measured 2026-10-28, a
 SIGSTOP/SIGCONT duty cycle left throughput unchanged at 3.3 MB/s and the process
-never showed `T`, while `SIGINT` dropped the line to 8 KiB/s in 2 s. A signal
-that cannot stop it cannot pace it.
+never showed `T`, while `SIGINT` dropped the line to 8 KiB/s in 2 s.
 
 State 2026-10-28 22:20: **complete.** Dota 2 linux depots, `Prefilled 1 apps
 totaling 33.42 GiB in 35:27.37`, cache `40 → 45 GB` on a 100 GB cap with 74 GB

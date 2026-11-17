@@ -29,7 +29,7 @@ dsh-remote --status                                 # service + ingress + real p
 curl -s -o /dev/null -w 'public=%{http_code}\n' https://delphi.bountystash.com/deepseek/   # 404
 ```
 
-**An unsigned worker is not a dead end, but it has exactly two doors.** Upstream
+**An unsigned worker has exactly two ways in.** Upstream
 accepts the DeepSeek OAuth callback only on a loopback origin with an explicit
 port (`dsh-deepseek-account-platform` `loginOrigin()`, whose own comment reads
 "remote domains and path-based proxies are unsupported"; the UI passes

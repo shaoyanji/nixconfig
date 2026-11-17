@@ -14,7 +14,7 @@ The host key cannot serve the Home Manager plane: activation runs as the user an
 
 `sops updatekeys` only re-wraps the **data key** for the new recipient set — values
 are never re-encrypted and no secret is printed. It is cheap and safe; what it
-needs is *any identity that is currently a recipient*.
+needs is any identity that is currently a recipient.
 
 ## Files
 
@@ -113,9 +113,9 @@ task infra:secrets:sync     # the mirror is a copy, never a second edit
 task checks:sops:drift
 ```
 
-The fingerprint is the one *My profile → API keys* shows for the key, not one you compute.
+The fingerprint is the one shown under *My profile → API keys*, not one you compute.
 
-## Reading & testing secrets safely (Agent recipes)
+## Reading and testing secrets safely
 
 An agent reading or verifying credentials must never print plaintext into transcripts or write unencrypted files to tracked paths:
 [[flake/policies.nix#credentials-never-land-in-a-tracked-file]]

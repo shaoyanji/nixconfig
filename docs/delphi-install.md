@@ -67,7 +67,7 @@ closure substitutes from cache.nixos.org / cache.numtide.com; only what is missi
 compiles, on two cores. The LAN cache (`192.168.3.25`) is unreachable from OCI and only
 costs a 5 s probe per miss.
 
-**Recovery, and it matters:** if the flake fails *after* disko has wiped the disk (the
+**Recovery:** if the flake fails *after* disko has wiped the disk (the
 2026-10-20 run failed twice this way), the installer keeps SSH — nixos-anywhere copies
 the target's `~/.ssh/authorized_keys` to `/root/.ssh` before kexec, so the OCI key still
 opens `root@`. The disk stays formatted and mounted at `/mnt`, so skip the destructive
@@ -234,7 +234,7 @@ with `dig` against `10.99.0.53`.
 IPv4 only: OCI free-tier instances have no IPv6 uplink, and a resolver that
 prefers IPv6 root servers SERVFAILs every lookup, the same failure class as the
 2026-10-14 frieren outage. The third upstream is envs.net (157.180.15.214,
-Hetzner DE), the only one here that publishes it keeps no query log and a host
+Hetzner DE), the only one here that publishes that it keeps no query log, and it is a host
 this fleet already trusts with mail. Measured from this box: 21 ms RTT, DNSSEC
 validating (`dnssec-failed.org` SERVFAILs), no filtering (`doubleclick.net`
 resolves to its real addresses). It is ordered last because the anycast

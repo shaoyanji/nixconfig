@@ -28,7 +28,7 @@ High-core gaming desktop, Sunshine GameStream server, and high-RAM local AI infe
 
 ## Serving design: `llama-swap` in front of native `llama-server`
 
-**Why `llama-swap` instead of plain `services.llama-cpp`?** The two models cannot co-reside in 62 GiB (21 GiB + 44 GiB > 62 GiB). `llama-swap` exposes **one** OpenAI-compatible endpoint (`:8080`) and starts/unloads a `llama-server` child per requested model, so the fleet never has to know which model is currently resident.
+`llama-swap` sits in front of plain `services.llama-cpp` because the two models cannot co-reside in 62 GiB (21 GiB + 44 GiB > 62 GiB). `llama-swap` exposes **one** OpenAI-compatible endpoint (`:8080`) and starts/unloads a `llama-server` child per requested model, so the fleet never has to know which model is currently resident.
 
 ```
 client ──> nginx :80 (eisen.lan)          ─┐
@@ -124,7 +124,7 @@ from the override.
 
 | Model | Total / Active | Quant | Aliases | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **Qwen3.6-35B-A3B** | 35B / **~3B** | `Q4_K_M` (22.5 GB) | `qwen3.6-35b-a3b`, `qwen` | Primary champion: 2026 agentic coding/thinking-preservation MoE. Whole expert pool fits with ~40 GiB RAM to spare. |
+| **Qwen3.6-35B-A3B** | 35B / **~3B** | `Q4_K_M` (22.5 GB) | `qwen3.6-35b-a3b`, `qwen` | The default agent coder: a 2026 MoE tuned for agentic coding and long thinking. Whole expert pool fits with ~40 GiB RAM to spare. |
 | **Aleph-Alpha Kolibri-1** | 78B / **3.46B** | `Q4_K_M` (44.2 GB) | `kolibri-1`, `kolibri`, `aleph` | German + English MoE (Apache 2.0, ctx up to 262144). Loads via the patched llama.cpp build — see Serving Design above. |
 
 Larger Kolibri quants exist (`Q3_K_M` ≈ 37.5 GB, `Q5_K_M` split in two parts) but `Q4_K_M` is the best fit for 62 GiB alongside the OS and Steam.

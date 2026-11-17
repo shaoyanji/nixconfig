@@ -34,7 +34,11 @@
 #      a prompt the judge keeps refusing costs a few plates, not every slot.
 set -euo pipefail
 
-repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+# A checkout resolves its own root. A store-baked copy of this one file has no
+# `../..`, so a caller that ships it into a store path must pass REPO; without it
+# this resolved to `/` and every `$repo/lib/...` became `//lib/...`. Measured
+# 2026-11-15..17: four slots, twenty passes, every one dead in four seconds.
+repo=${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}
 BRIEFS=${BRIEFS:-$repo/lib/image-daily/briefs.json}
 # The pool's media tree is root:root 0770 (/Volumes/data/media), so a generated
 # asset cannot live there without sudo. pics/generated is the writable, devji-owned
@@ -63,6 +67,11 @@ die() {
 # capture recorded "image-daily: wall-char-stark: rate limited, waiting 120s\n/path"
 # as the plate, and the next publish tried to copy that string.
 say() { echo "image-daily: $*" >&2; }
+
+# Refuse a root that cannot be one. The alternative is what happened: nothing to
+# read, a four-second exit 1, and a green timer that looks like a spent allowance.
+[ -f "$BRIEFS" ] ||
+  die "no briefs at $BRIEFS — this script resolved its root to '$repo'; set REPO to the checkout root"
 
 need() {
   local c

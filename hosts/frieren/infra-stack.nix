@@ -493,6 +493,12 @@
         ]
       }:"$PATH"
       export IMAGES_ROOT=/Volumes/data/pics/generated
+      # The Cloudinary and xs helpers read secrets through lib/paths.sh, which takes
+      # this as its repo root. The store copy of the source cannot carry it: the
+      # apikeys plane has no committed mirror, so `modules/secrets/` only exists in
+      # the checkout (and only with the submodule fetched). Pointing here is what
+      # lets `publish` sign an upload from a store-baked script.
+      export NIXCONFIG_ROOT=${user.home}/Documents/nixconfig
       export STORYBOOK_DIR=${user.home}/Documents/storybook/lantern
       export SLOT=${slot}
       export RESERVE=${toString reserve}
@@ -502,7 +508,10 @@
       # next slot for free instead of waiting for someone to start it again. Neither
       # phase publishes alone: one publish at the end is one manifest rewrite, and
       # paths the manifest already serves are not uploaded twice.
-      daily=${../../scripts/task/image-daily.sh}
+      # The whole source root, not the one file: the script resolves its own
+      # `../..` for the briefs, the roster, the Cloudinary and Pages helpers and
+      # the asset frontend, and a lone store-baked script resolves to `/`.
+      daily=${../../.}/scripts/task/image-daily.sh
       ledger=$IMAGES_ROOT/ledger.jsonl
       rc=0
       before=$(wc -l <"$ledger" 2>/dev/null || printf 0)

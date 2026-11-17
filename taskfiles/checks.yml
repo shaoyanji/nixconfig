@@ -281,6 +281,21 @@ tasks:
     cmds:
       - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.ontology
 
+  checks:router:
+    desc: "[gate] Every router label has one playbook section, and no section lacks a label"
+    summary: >
+      flake/checks.nix reads assets/labels.json and references/playbooks.md and
+      requires them to name the same set: each label has exactly one `## <label>`
+      section, no section appears twice, and no section is unmatched. The label set
+      is what jev-decide classifies against, so a label with no playbook is a
+      request the router accepts and cannot dispatch. Pure readFile: no graph eval,
+      no build. Exit 0 = the two agree, 1 = drift.
+    vars:
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
+    cmds:
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.router-labels
+
   checks:entry:
     desc: "[gate] Entry reads stay on their cache layer (min-of-3 timing budgets)"
     summary: >

@@ -427,6 +427,30 @@ lib.genAttrs systems.work (
             touch $out
           '';
 
+      router-labels = let
+        dir = ../.agents/skills/router;
+        labels = builtins.attrNames (builtins.fromJSON (builtins.readFile (dir + "/assets/labels.json")));
+        sections = map builtins.head (
+          builtins.filter (m: m != null) (
+            map (builtins.match "## ([a-z]+(-[a-z]+)*)") (lib.splitString "\n" (builtins.readFile (dir + "/references/playbooks.md")))
+          )
+        );
+        missing = lib.subtractLists sections labels;
+        orphans = lib.subtractLists labels sections;
+        repeated = lib.subtractLists (lib.unique sections) sections;
+        issues =
+          map (l: "label '${l}' has no '## ${l}' section in references/playbooks.md") missing
+          ++ map (s: "section '## ${s}' has no label in assets/labels.json") orphans
+          ++ map (s: "'## ${s}' appears more than once") (lib.unique repeated);
+      in
+        if issues != []
+        then builtins.throw "the router's labels and playbooks disagree:\n  ${lib.concatStringsSep "\n  " issues}"
+        else
+          pkgs.runCommand "router-labels" {} ''
+            echo "router: ${toString (builtins.length labels)} labels, each with exactly one playbook section"
+            touch $out
+          '';
+
       # --- registry and flake outputs agree, both directions ----------------
       inventory-hosts = assert (coverage.missing == []) || throw "inventory.toml declares flake hosts the flake does not build: ${builtins.toString coverage.missing}";
       assert (coverage.unregistered == []) || throw "the flake builds hosts missing from inventory.toml: ${builtins.toString coverage.unregistered}";

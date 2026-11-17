@@ -55,6 +55,7 @@
     ".agents/skills/prove-it-works/SKILL.md" = 35;
     ".agents/skills/qmd/SKILL.md" = 153;
     ".agents/skills/reasonix/SKILL.md" = 68;
+    ".agents/skills/router/SKILL.md" = 125;
     ".agents/skills/serv00/SKILL.md" = 50;
     ".agents/skills/services/SKILL.md" = 22;
     ".agents/skills/simplex-admin/SKILL.md" = 11;

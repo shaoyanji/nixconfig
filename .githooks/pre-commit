@@ -150,6 +150,18 @@ if affects_ontology "$STAGED"; then
   echo "Ontology checks passed."
 fi
 
+if grep -Eq '^\.agents/skills/router/' <<<"$STAGED"; then
+  echo "Checking the router's labels against its playbooks..."
+  SYS="$(nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || true)"
+  if [ -z "$SYS" ] || ! nix build --no-link --builders "" ".?submodules=1#checks.$SYS.router-labels" >/tmp/pre-commit-router.log 2>&1; then
+    echo "pre-commit: the router label gate failed or could not run; refusing to skip it." >&2
+    sed 's/^/  /' /tmp/pre-commit-router.log 2>/dev/null | tail -20
+    echo "  Run it alone: task check:leaf NAME=checks:router"
+    exit 1
+  fi
+  echo "Router labels passed."
+fi
+
 # Pre-flight blast radius: INFORMATION, never a gate. A commit that touches a
 # host directory, a living document or a skill changes what some other node
 # claims; printing the dependents here costs ~0.5 s (or ~1 ms per anchor when the

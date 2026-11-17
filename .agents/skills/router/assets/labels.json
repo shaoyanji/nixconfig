@@ -1,0 +1,18 @@
+{
+  "host-change": "editing one host's configuration, profile or service module, where a single host must pass its module-system check",
+  "chain-change": "editing a shared module that several hosts import through a feature chain, where the blast radius must be found before the edit",
+  "flake-change": "editing flake wiring, outputs, the host inventory or the module registry, where the projection assembles every configuration",
+  "gate-change": "adding or changing a check, lint or assertion, where the new gate must fail on a real past mistake before it may pass",
+  "task-change": "adding or changing a task, its summary, or its place in a taskfile shard",
+  "prose-change": "editing documentation, a skill page or a code comment, where the prose budget and the comment census apply",
+  "note-change": "writing or promoting an AGENTS.nix note: a decision, an experiment, an open todo or a handoff",
+  "bug-fix": "a symptom whose cause is unknown, where the space must be bisected and one proven fix applied",
+  "perf": "a request to make something faster or smaller, where a measurement has to come before the claim",
+  "incident": "a live host misbehaving now, where health, unit state and the sentinel ledger are read before any config edit",
+  "secret": "anything touching sops, age keys, hashed passwords or a secret value",
+  "deploy": "moving a built configuration onto a host, with plan, apply, validate and a rollback path",
+  "research": "a question about a fact, a host or a design, answered rather than changed",
+  "decision": "choosing which model, provider or lane should answer a decision, scored on calibrated probability",
+  "novel": "a request that matches no other label, which must be checked against the design record first",
+  "publish": "publishing a site, blog post or static surface from the repo rather than editing it on a host"
+}

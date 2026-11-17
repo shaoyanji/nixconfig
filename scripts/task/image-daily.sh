@@ -1409,5 +1409,9 @@ case "${1:-plan}" in
   blog) shift && cmd_blog "$@" ;;
   wallpaper) cmd_wallpaper ;;
   plates) cmd_plates ;;
-  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates" ;;
+  # The day's allowance as a number, for a caller that has to divide it: a slot
+  # script splits what is left across the slots still to run. Empty stdout when the
+  # pool is unreadable is the one answer here that is not a count.
+  remaining) remaining ;;
+  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates|remaining" ;;
 esac

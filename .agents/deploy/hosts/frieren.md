@@ -279,9 +279,10 @@ calls `hermes chat -q <prompt> --oneshot -Q --run-budget N`; the top-level
 `hermes -q` form exits 2 before any model call. `-Q` keeps the banner out of the
 job log and `--run-budget` is the same ceiling Tier 2 gets from `-t 600`.
 
-The image queue asks for four daytime slots, clear of the 03:00-05:30 window,
-each at most 20 images against the 25-per-hour burst limit. Every slot keeps
-RESERVE images back, the last one 10, so an evening hand-run batch does not find
-the day already swept. `persistent =
+The image queue asks for four daytime slots, clear of the 03:00-05:30 window.
+Each takes an even share of the day's remaining allowance across the slots left,
+clamped to the 25-per-hour burst limit, so a hand-run batch lowers the later
+slots instead of being spent twice. The last slot keeps RESERVE=10 back, so an
+evening batch does not find the day already swept. `persistent =
 false`, because catching up three missed slots at boot would burst into the
 limit the spacing avoids.

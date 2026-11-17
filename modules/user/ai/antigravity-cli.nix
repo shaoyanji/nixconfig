@@ -140,6 +140,74 @@
           fi
         '';
       })
+      # The Gemini API-key route, as a per-session profile. agy reads GEMINI_API_KEY
+      # only when settings.json says modelProvider=gemini; the key alone is inert
+      # (measured: `agy models` with the key exported lists only the account
+      # models, and the same call with --settings '{"modelProvider":"gemini"}'
+      # lists gemini-4-hydrogen-{low,medium,high,xhigh} and Carbon). --settings is
+      # session-only and never saved, so the Pro OAuth session and the HM-owned
+      # settings.json keep their account route as the default.
+      (pkgs.writeShellApplication {
+        name = "agy-gemini";
+        runtimeInputs = [config.programs.antigravity-cli.package];
+        text = ''
+          usage() {
+            cat <<'EOF'
+          agy-gemini — agy on the Gemini API key route (Hydrogen), for this session only
+
+            agy-gemini [agy args...]     e.g. agy-gemini -p 'hello'
+            agy-gemini models            what the key unlocks
+
+            Sets modelProvider=gemini via --settings, which agy never saves: the
+            account route and ~/.gemini/antigravity-cli/settings.json are untouched,
+            and requests bill the API key's project rather than the Pro plan. Pass
+            your own --model to override the default.
+
+          Env:
+            GEMINI_API_KEY     required; a login shell exports it from the sops cache
+            AGY_GEMINI_MODEL   default gemini-4-hydrogen-high
+                               (low | medium | high | xhigh, as suffixed model ids)
+            AGY_GEMINI_EFFORT  optional, passed as --effort (low|medium|high|xhigh|max)
+
+          Budget: the free API tier allows a handful of requests per minute and about
+          20 per day per project, and one agent turn is one request plus retries. A
+          429 with quota_exceeded ends the day, so use this for a Hydrogen task and
+          the account route for a long sweep. Unsuffixed ids (gemini-4-hydrogen) are
+          the ones that answer 503 under load.
+          EOF
+          }
+
+          case "''${1:-}" in
+            -h | --help) usage; exit 0 ;;
+          esac
+
+          if [ -z "''${GEMINI_API_KEY:-}" ]; then
+            echo "agy-gemini: GEMINI_API_KEY is unset — agy reads it only with modelProvider=gemini, which this sets." >&2
+            exit 2
+          fi
+
+          args=(--settings '{"modelProvider":"gemini"}')
+
+          # Subcommands (models, mcp, ...) take no model flag; everything else gets
+          # the default unless the caller already picked one.
+          model=0
+          subcommand=0
+          for a in "$@"; do
+            case "$a" in
+              --model) model=1 ;;
+              models | agents | agent | mcp | plugin | plugins | acp | changelog | help | install | mic-serve | remote-control | update) subcommand=1 ;;
+            esac
+          done
+          if [ "$subcommand" = 0 ] && [ "$model" = 0 ]; then
+            args+=(--model "''${AGY_GEMINI_MODEL:-gemini-4-hydrogen-high}")
+          fi
+          if [ -n "''${AGY_GEMINI_EFFORT:-}" ]; then
+            args+=(--effort "$AGY_GEMINI_EFFORT")
+          fi
+
+          exec agy "''${args[@]}" "$@"
+        '';
+      })
     ];
 
     # Antigravity standalone project fallback to avoid project store read failures

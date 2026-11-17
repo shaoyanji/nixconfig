@@ -37,10 +37,47 @@ Requires the antigravity CLI.
   model env var of its own — pass `--model "$GEMINI_MODEL"` explicitly.
 - Auth is the per-user OAuth token already in `$HOME`
   (`~/.gemini/antigravity-cli/antigravity-oauth-token`), so a local-user hermes
-  reuses it instead of re-authenticating. Measured 2026-11-06: with only
-  `GEMINI_API_KEY` and a clean `$HOME`, `agy` ignores the key and blocks on the
-  browser OAuth flow — do not treat the API key as agy auth. A second host
-  reuses that token (`install -m600` or a symlink) instead of signing in again.
+  reuses it instead of re-authenticating. A second host reuses that token
+  (`install -m600` or a symlink) instead of signing in again.
+- `GEMINI_API_KEY` alone is inert. `agy` reads it only when the session's settings
+  say `modelProvider=gemini`; with the key exported and no provider it signs in
+  with the account instead. Measured 2026-11-17 on 1.5.9: `agy models` with the
+  key exported listed only the account models, and the same call with
+  `--settings '{"modelProvider":"gemini"}'` listed
+  `gemini-4-hydrogen-{low,medium,high,xhigh}`, Carbon and Argon. That route needs
+  no OAuth session and bills the key's project rather than the plan.
+
+## The Gemini API key route (Hydrogen)
+
+Use `agy-gemini` instead of hand-writing the flag pair:
+
+```bash
+agy-gemini -p 'hello'                       # gemini-4-hydrogen-high, print mode
+agy-gemini models                           # what the key unlocks
+agy-gemini --model gemini-4-carbon-high -p 'review this diff'
+```
+
+The wrapper requires `GEMINI_API_KEY` (a login shell already exports it from the
+sops cache), adds `--settings '{"modelProvider":"gemini"}'` for that session
+only, and defaults `--model` to `gemini-4-hydrogen-high` unless you pass one.
+`--settings` is never saved, so the Pro account route stays the default and the
+HM-owned `settings.json` is untouched. Do not put `modelProvider` in
+`settings.json` to get this: it would replace the account route for every run on
+the host, not just the one that wants Hydrogen.
+
+Prefixed model ids matter. `gemini-4-hydrogen` (unsuffixed) answered
+`503 UNAVAILABLE — high demand` after 84 s on the same key and minute that
+`gemini-4-hydrogen-high` answered normally, so pin a suffixed id. `--effort`
+exists too (`AGY_GEMINI_EFFORT`), but the suffix already picks the level; set one
+or the other.
+
+Budget is the real constraint, not latency. The free API tier allows a handful of
+requests per minute and about 20 per day per project (check the live numbers in
+AI Studio — Google stopped publishing the table), and one agent turn is one
+request plus retries: a trivial print run measured 17 226 input tokens in one
+turn. A 429 carrying `quota_exceeded` ends the day, while `rate_limit_exceeded`
+clears in seconds. So Hydrogen is for a single delegated task, and a long sweep
+belongs on the account route or a billed project.
 - Under the hermes gateway the unit exports `AGY_CLI_DISABLE_AUTO_UPDATE` and
   `GEMINI_MODEL` itself; a login shell gets them from Home Manager.
 - Must run inside a git repository (`/tmp/antigravity_task` used as scratch workspace).

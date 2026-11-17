@@ -188,17 +188,35 @@ is_quiet() {
   ((age >= QUIET_SECONDS))
 }
 
+# A download job's own companion files: the checksums a payload is verified
+# against and the log the job writes. They are never the payload, and a model
+# asked to place one answers "documents" or "software" at random. The same list
+# decides what `payload_of` may pick inside a directory — `fetch.log` was a
+# 189 KiB job log judged as the item of `minimax-h3-image/`, which kept the
+# timer failing for a directory whose payload had already moved.
+is_sidecar() {
+  case "$1" in
+    *SUMS | *.sha256 | *.sha512 | *.md5 | *.log) return 0 ;;
+  esac
+  return 1
+}
+
 # The largest regular file inside a torrent payload directory is the item. A
 # directory is never moved wholesale — its siblings (README, flash script) are
-# part of the download, not part of the taxonomy.
+# part of the download, not part of the taxonomy. A directory with nothing but
+# companion files has no payload left and is reported as a shell, not judged.
 payload_of() {
-  local item=$1
+  local item=$1 f
   if [ -d "$item" ]; then
-    find "$item" -maxdepth 2 -type f ! -name '*.aria2' -printf '%s %p\n' 2>/dev/null |
-      sort -rn | head -1 | cut -d' ' -f2- || true
-  else
-    printf '%s\n' "$item"
+    while IFS= read -r f; do
+      is_sidecar "$(basename "$f")" && continue
+      printf '%s\n' "$f"
+      return 0
+    done < <(find "$item" -maxdepth 2 -type f ! -name '*.aria2' -printf '%s %p\n' 2>/dev/null |
+      sort -rn | cut -d' ' -f2-)
+    return 0
   fi
+  printf '%s\n' "$item"
 }
 
 title_tag() {
@@ -493,8 +511,13 @@ classify() {
   fi
   file=$(payload_of "$item")
   if [ -z "$file" ]; then
-    say "UNKNOWN  $item — empty or unreadable directory"
-    unknown=$((unknown + 1))
+    if [ -d "$item" ]; then
+      say "SHELL    $(basename "$item")/ — only a download job's companion files remain; clean with task data:clean:downloads"
+      sidecars=$((sidecars + 1))
+    else
+      say "UNKNOWN  $item — empty or unreadable directory"
+      unknown=$((unknown + 1))
+    fi
     return 0
   fi
   lname=$(basename "$file" | tr '[:upper:]' '[:lower:]')
@@ -591,7 +614,9 @@ classify() {
         pending=$((pending + 1))
       fi
       ;;
-    zip | 7z | deb | rpm | exe | msi | dmg | pkg | apk | xz | zst | bz2)
+    # A workflow or app config is a tool, not a document: paperless would index
+    # it and a media server would never see it.
+    zip | 7z | deb | rpm | exe | msi | dmg | pkg | apk | xz | zst | bz2 | json)
       place "$file" "$SOFTWARE_DIR/$(basename "$file")" 0644 other
       ;;
     *)
@@ -642,16 +667,12 @@ for item in "$DOWNLOADS"/*; do
   name=$(basename "$item")
   case "$name" in
     *.aria2 | *.sh | .*) continue ;;
-    # A download job's own companion files: the checksums a payload is verified
-    # against and the log the job writes. They are never the payload, and a
-    # model asked to place one answers "documents" or "software" at random, so
-    # they are named and left where the job put them.
-    *SUMS | *.sha256 | *.sha512 | *.md5 | *.log)
-      say "SIDECAR  $name — a download job's companion file, not payload"
-      sidecars=$((sidecars + 1))
-      continue
-      ;;
   esac
+  if is_sidecar "$name"; then
+    say "SIDECAR  $name — a download job's companion file, not payload"
+    sidecars=$((sidecars + 1))
+    continue
+  fi
   payload=$(payload_of "$item")
   held=0
   [ -n "$payload" ] && [ -n "${ACTIVE["$payload"]:-}" ] && held=1

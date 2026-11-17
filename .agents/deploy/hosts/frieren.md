@@ -280,7 +280,8 @@ calls `hermes chat -q <prompt> --oneshot -Q --run-budget N`; the top-level
 job log and `--run-budget` is the same ceiling Tier 2 gets from `-t 600`.
 
 The image queue asks for four daytime slots, clear of the 03:00-05:30 window,
-each at most 20 images against the 25-per-hour burst limit. Every daytime slot
-keeps RESERVE images back, and the last runs with RESERVE=0. `persistent =
+each at most 20 images against the 25-per-hour burst limit. Every slot keeps
+RESERVE images back, the last one 10, so an evening hand-run batch does not find
+the day already swept. `persistent =
 false`, because catching up three missed slots at boot would burst into the
 limit the spacing avoids.

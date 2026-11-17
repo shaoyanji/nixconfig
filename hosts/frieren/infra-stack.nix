@@ -475,7 +475,9 @@
   # without the burst — and every slot republishes the Cloudinary manifest, so the
   # asset frontend follows the queue through the day. Each slot also takes the
   # roster's next unkept row with its leftover, which is what makes "more
-  # wallpapers" a roster edit rather than a supervised run. Tools are prepended to PATH
+  # wallpapers" a roster edit rather than a supervised run. Every slot holds a slice
+  # back, the last one included, so a hand-run batch in the evening does not start by
+  # finding the day already spent. Tools are prepended to PATH
   # because cpg and agy live in the user profile, not in this script's closure.
   imageDailySlot = slot: cap: reserve:
     pkgs.writeShellScript "image-daily-slot-${slot}" ''
@@ -1069,9 +1071,9 @@ in {
       };
       image-daily-slot-4 = {
         name = "image-daily-slot-4";
-        description = "Image queue 4/4 (21:20, end of the day): sweep, special requests, Cloudinary, manifest";
+        description = "Image queue 4/4 (21:20, end of the day): queue and roster, reserve 10, Cloudinary, manifest";
         schedule = "*-*-* 21:20:00";
-        command = imageDailySlot "4" 40 0;
+        command = imageDailySlot "4" 20 10;
         workingDirectory = "${user.home}";
         lockFile = "/tmp/image-daily.lock";
         persistent = false;

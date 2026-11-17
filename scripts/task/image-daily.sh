@@ -636,10 +636,10 @@ cmd_run() {
   local rem lane budget
   rem=$(remaining)
   [ -n "$rem" ] || die "cpg usage answered nothing — run cpg status --json"
-  # Daytime slots hold a slice back. A plate someone asked for during the day is
-  # worth more than the queue's next due entry, and a slot that spends the day at
-  # 13:20 leaves nothing for that. The last slot runs with RESERVE=0 and sweeps
-  # whatever demand and budget the day left.
+  # Every slot holds a slice back. A plate someone asked for during the day is worth
+  # more than the queue's next due entry, and a slot that spends the day at 13:20
+  # leaves nothing for that. The last slot reserves too, because a hand-run batch in
+  # the evening would otherwise find the day already swept.
   local reserve=${RESERVE:-0}
   if [ "$reserve" -le 0 ]; then
     say "$day: $rem images available"

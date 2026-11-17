@@ -134,6 +134,80 @@
           mainProgram = "vox";
         };
       };
+
+      # agy reads GEMINI_API_KEY only when the session says modelProvider=gemini,
+      # and `--settings` is the flag that says it without saving anything. So the
+      # key route is a wrapper rather than a settings.json key: the Pro account
+      # route stays the default, and one command opts a single run into Hydrogen.
+      agy-gemini.pkg =
+        (pkgs.writeShellApplication {
+          name = "agy-gemini";
+          runtimeInputs = [inputs.llm-agents.packages.${system}.antigravity-cli];
+          text = ''
+            usage() {
+              cat <<'EOF'
+            agy-gemini — agy on the Gemini API key route (Hydrogen), for this session only
+
+              agy-gemini [agy args...]     e.g. agy-gemini -p 'hello'
+              agy-gemini models            what the key unlocks
+
+              Sets modelProvider=gemini via --settings, which agy never saves: the
+              account route and ~/.gemini/antigravity-cli/settings.json are untouched,
+              and requests bill the API key's project rather than the Pro plan. Pass
+              your own --model to override the default.
+
+            Env:
+              GEMINI_API_KEY     required; a login shell exports it from the sops cache
+              AGY_GEMINI_MODEL   default gemini-4-hydrogen-high
+                                 (low | medium | high | xhigh, as suffixed model ids)
+              AGY_GEMINI_EFFORT  optional, passed as --effort (low|medium|high|xhigh|max)
+
+            Budget: the free API tier allows a handful of requests per minute and about
+            20 per day per project, and one agent turn is one request plus retries. A
+            429 with quota_exceeded ends the day, so use this for a Hydrogen task and
+            the account route for a long sweep. Unsuffixed ids (gemini-4-hydrogen) are
+            the ones that answer 503 under load.
+            EOF
+            }
+
+            case "''${1:-}" in
+              -h | --help) usage; exit 0 ;;
+            esac
+
+            if [ -z "''${GEMINI_API_KEY:-}" ]; then
+              echo "agy-gemini: GEMINI_API_KEY is unset — agy reads it only with modelProvider=gemini, which this sets." >&2
+              exit 2
+            fi
+
+            args=(--settings '{"modelProvider":"gemini"}')
+
+            # Subcommands (models, mcp, ...) take no model flag; everything else gets
+            # the default unless the caller already picked one.
+            model=0
+            subcommand=0
+            for a in "$@"; do
+              case "$a" in
+                --model) model=1 ;;
+                models | agents | agent | mcp | plugin | plugins | acp | changelog | help | install | mic-serve | remote-control | update) subcommand=1 ;;
+              esac
+            done
+            if [ "$subcommand" = 0 ] && [ "$model" = 0 ]; then
+              args+=(--model "''${AGY_GEMINI_MODEL:-gemini-4-hydrogen-high}")
+            fi
+            if [ -n "''${AGY_GEMINI_EFFORT:-}" ]; then
+              args+=(--effort "$AGY_GEMINI_EFFORT")
+            fi
+
+            exec agy "''${args[@]}" "$@"
+          '';
+        })
+        .overrideAttrs (old: {
+          meta =
+            (old.meta or {})
+            // {
+              description = "Run agy on the Gemini API key route (Hydrogen) for one session";
+            };
+        });
     };
     learn = {
       deutsch-srs.pkg = pkgs.callPackage ./deutsch-srs.nix {};

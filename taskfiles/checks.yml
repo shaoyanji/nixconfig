@@ -285,11 +285,11 @@ tasks:
     desc: "[gate] Every router label has one playbook section, and no section lacks a label"
     summary: >
       flake/checks.nix reads assets/labels.json and references/playbooks.md and
-      requires them to name the same set: each label has exactly one `## <label>`
-      section, no section appears twice, and no section is unmatched. The label set
-      is what jev-decide classifies against, so a label with no playbook is a
-      request the router accepts and cannot dispatch. Pure readFile: no graph eval,
-      no build. Exit 0 = the two agree, 1 = drift.
+      requires them to name the same set: each label has exactly one table row, no
+      label repeats, and no row is unmatched. The label set is what jev-decide
+      classifies against, so a label with no playbook is a request the router
+      accepts and cannot dispatch. Pure readFile: no graph eval, no build.
+      Exit 0 = the two agree, 1 = drift.
     vars:
       SYSTEM:
         sh: nix eval --impure --raw --expr builtins.currentSystem

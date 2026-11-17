@@ -430,24 +430,24 @@ lib.genAttrs systems.work (
       router-labels = let
         dir = ../.agents/skills/router;
         labels = builtins.attrNames (builtins.fromJSON (builtins.readFile (dir + "/assets/labels.json")));
-        sections = map builtins.head (
+        rows = map builtins.head (
           builtins.filter (m: m != null) (
-            map (builtins.match "## ([a-z]+(-[a-z]+)*)") (lib.splitString "\n" (builtins.readFile (dir + "/references/playbooks.md")))
+            map (builtins.match "\\|[[:space:]]*`([a-z]+(-[a-z]+)*)`.*") (lib.splitString "\n" (builtins.readFile (dir + "/references/playbooks.md")))
           )
         );
-        missing = lib.subtractLists sections labels;
-        orphans = lib.subtractLists labels sections;
-        repeated = lib.subtractLists (lib.unique sections) sections;
+        missing = lib.subtractLists rows labels;
+        orphans = lib.subtractLists labels rows;
+        repeated = lib.subtractLists (lib.unique rows) rows;
         issues =
-          map (l: "label '${l}' has no '## ${l}' section in references/playbooks.md") missing
-          ++ map (s: "section '## ${s}' has no label in assets/labels.json") orphans
-          ++ map (s: "'## ${s}' appears more than once") (lib.unique repeated);
+          map (l: "label '${l}' has no row in references/playbooks.md") missing
+          ++ map (s: "row '${s}' has no label in assets/labels.json") orphans
+          ++ map (s: "'${s}' appears in more than one row") (lib.unique repeated);
       in
         if issues != []
         then builtins.throw "the router's labels and playbooks disagree:\n  ${lib.concatStringsSep "\n  " issues}"
         else
           pkgs.runCommand "router-labels" {} ''
-            echo "router: ${toString (builtins.length labels)} labels, each with exactly one playbook section"
+            echo "router: ${toString (builtins.length labels)} labels, each with exactly one playbook row"
             touch $out
           '';
 

@@ -74,13 +74,9 @@ generation; `generation-stale` in the ledger is the signal that catches it.
 
 ## Memory, in order
 
-- **Design record** — `task ops:notes:near Q="<intent>"`, then `:lineage`:
-decisions, experiments and their ancestry. Schema-gated, and a graph node.
-- **Episodic** — `task agents:xs:list Q="…"`: what happened, one turn each.
-- **Prose and structure** — `qmd` for text, `task ops:kg:*` for "what touches X".
-- **`ai-memory`** is cross-agent scratch: no schema gate, no place in
-`.#knowledgeGraph`, and no unit for its server (`:49374`) on any host. Never the
-authority for a repo fact; treat it as absent until one exists.
+- **Design record** — `task ops:notes:near Q="<intent>"`, then `:lineage`. Schema-gated, a graph node.
+- **Episodic** — `task agents:xs:list Q="…"`. **Prose and structure** — `qmd`, `task ops:kg:*`.
+- **`ai-memory`** is ungated scratch: no schema, not in `.#knowledgeGraph`, and no unit for its `:49374` server. Never authority for a repo fact.
 
 ## Where to write
 

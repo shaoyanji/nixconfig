@@ -3,6 +3,9 @@
   lib,
   inventory,
   skills,
+  # The rules, as data: `flake/policies.nix` is the one home and this projects it
+  # into the graph, so a policy is a node whose `rule` is readable without prose.
+  policies ? {},
 }: let
   root = ../.;
 
@@ -322,9 +325,27 @@
     })
     (builtins.attrNames skills.skills);
 
+  # A policy node exists because prose cites it: `checks.policies` proves every
+  # citation resolves and every id is cited, so the set cannot be invented here.
+  policyIds = lib.unique (
+    lib.concatMap (d: d.cites) docs
+    ++ lib.concatMap (n: citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body)) (builtins.attrNames skills.skills)
+  );
+  policyNodes =
+    map (id: {
+      id = "policy:${id}";
+      type = "policy";
+      label = id;
+      path = "flake/policies.nix";
+      rule = policies.${id}.rule or "";
+      proof = policies.${id}.proof or "";
+    })
+    policyIds;
+
   nodes =
     hostNodes
     ++ skillNodes
+    ++ policyNodes
     ++ map (d: {
       inherit (d) id type label path cites;
     })
@@ -387,7 +408,25 @@
         type = "imports";
       })
       (builtins.filter (r: builtins.elem r nixPaths) m.imports))
-    modules;
+    modules
+    # A citation: prose names the rule, so the rule can name its prose. This is
+    # the edge that answers "which pages restate this" without a grep.
+    ++ lib.concatMap (d:
+      map (id: {
+        from = d.id;
+        to = "policy:${id}";
+        type = "cites";
+      })
+      d.cites)
+    docs
+    ++ lib.concatMap (n:
+      map (id: {
+        from = "skill:${n}";
+        to = "policy:${id}";
+        type = "cites";
+      })
+      (citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body)))
+    (builtins.attrNames skills.skills);
 
   tagNodes = lib.unique (lib.concatMap (n: skills.skills.${n}.tags) (builtins.attrNames skills.skills));
 
@@ -409,6 +448,7 @@
       docs = builtins.length docs;
       ideas = builtins.length ideas;
       modules = builtins.length modules;
+      policies = builtins.length policyIds;
       edges = builtins.length edges;
     };
   };
@@ -427,6 +467,8 @@
         then "Idea"
         else if n.type == "module"
         then "Module"
+        else if n.type == "policy"
+        then "Policy"
         else "Tag";
     in ''
       MERGE (${"n_${builtins.hashString "md5" n.id}"}:${label} {id: ${q n.id}})

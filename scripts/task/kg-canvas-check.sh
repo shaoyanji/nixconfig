@@ -260,7 +260,7 @@ grep -q 'kg-search' "$SITE/data/kg.json" && ok "slice carries the label search b
 # The slice is JSON, so the markup is escaped; strip the backslashes before
 # counting the distinct chips, otherwise the regex stops at the first `\"`.
 chips="$(tr -d '\\' < "$SITE/data/kg.json" | grep -o 'data-kg-type="[a-z]*"' | sort -u | wc -l)"
-[ "$chips" = 4 ] && ok "slice carries a chip for all four node types" || bad "kg slice has $chips of 4 type chips"
+[ "$chips" = 5 ] && ok "slice carries a chip for all five node types" || bad "kg slice has $chips of 5 type chips"
 grep -q "aki:applied" "$SITE/aki.min.js" && ok "aki dispatches after a transition" || bad "aki does not dispatch aki:applied"
 
 say "click a node in a real browser"
@@ -417,10 +417,10 @@ else
   h_visible="$(jq -r '.visible' <<<"$shared" 2>/dev/null || echo -1)"
   h_q="$(jq -r '.q' <<<"$shared" 2>/dev/null || echo "")"
   h_chips="$(jq -r '.chips' <<<"$shared" 2>/dev/null || echo "")"
-  if [[ "$h_crumbs" == *"knowledge-graph"* ]] && [ "$h_visible" = "$expect_hash" ] && [ "$h_q" = "frieren" ] && [ "$h_chips" = "host=on,skill=off,doc=on,tag=off" ]; then
+  if [[ "$h_crumbs" == *"knowledge-graph"* ]] && [ "$h_visible" = "$expect_hash" ] && [ "$h_q" = "frieren" ] && [ "$h_chips" = "host=on,skill=off,doc=on,tag=off,policy=off" ]; then
     ok "#kg?q=frieren&types=host,doc opens the graph with $h_visible matching nodes"
   else
-    bad "shareable hash did not restore the view: $shared (expected visible=$expect_hash, chips host=on,skill=off,doc=on,tag=off)"
+    bad "shareable hash did not restore the view: $shared (expected visible=$expect_hash, chips host=on,skill=off,doc=on,tag=off,policy=off)"
   fi
 
   # Writing the other direction: an edit must update the hash an operator would

@@ -509,6 +509,33 @@
     else builtins.length (takeWhile (l: lib.trim l != "---") (builtins.tail lines)) + 2;
   skillLines = builtins.foldl' (acc: p: acc + lineCount p - frontmatterLines p) 0 skillFiles;
 
+  # The prose budget as data (flake/prose-budget.nix): one measured body count per
+  # page, and a written reason above `argueAbove`. Comparing the record to the tree
+  # is what makes growth an edit someone reviews instead of a slide.
+  proseBudget = import ./prose-budget.nix {inherit lib;};
+  budgetedPages = ["AGENTS.md"] ++ map rel skillFiles;
+  budgetMeasured = page:
+    if lib.hasSuffix "/SKILL.md" page
+    then lineCount (root + "/${page}") - frontmatterLines (root + "/${page}")
+    else lineCount (root + "/${page}");
+  budgetMissing = builtins.filter (pg: !(lib.hasAttr pg proseBudget.pages)) budgetedPages;
+  budgetStale = builtins.filter (pg: !(builtins.elem pg budgetedPages)) (builtins.attrNames proseBudget.pages);
+  budgetDrift = builtins.filter (pg: (proseBudget.pages.${pg} or (-1)) != budgetMeasured pg) budgetedPages;
+  budgetUnargued =
+    builtins.filter (pg: budgetMeasured pg > proseBudget.argueAbove && !(lib.hasAttr pg proseBudget.notes)) budgetedPages;
+
+  # The documents, not the skills: `skills-cite-truth` already requires a skill to
+  # point at machine truth, and this is the prose half of the same rule.
+  # The documents, not the skills: `skills-cite-truth` already requires a skill to
+  # point at machine truth, and this is the prose half of the same rule. The list
+  # comes from `filesWithSuffix` and the root documents rather than the whole tree
+  # walk: this rule needs the documents, and forcing every tracked file into it was
+  # the recursion.
+  ruleDocs = ["AGENTS.md" "MANUAL.md" "README.md"] ++ filesWithSuffix "docs" ".md";
+  namesPolicyFile = p: lib.hasInfix "flake/policies.nix" (read p);
+  citesPolicyId = p: lib.hasInfix "[[flake/policies.nix#" (read p);
+  uncitedRuleMentions = builtins.filter (p: namesPolicyFile p && !(citesPolicyId p)) ruleDocs;
+
   # Truth, as a skill may cite it: a backticked repo path that RESOLVES, or a
   # policy citation. Prose that describes a mechanism without naming the file
   # that implements it is a second source of truth nobody can diff.
@@ -613,35 +640,22 @@
     };
 
     agent-prose-budget = {
-      rule = "AGENTS.md (482 lines) and the body of every tracked SKILL.md (5270 lines today) are shrink-only — they are the prose an agent carries or loads, so a cleanup lowers the number here in the same commit. A skill's frontmatter is NOT counted: `lib/skills.nix` compiles it into the one-line index, so it is metadata, not context. The only extension is an audited one: the audit lives in this rule text, the added prose must be a `Truth:` pointer counted by `skills-cite-truth`, and that policy must already hold. A budget that grows without either is how a corpus becomes a liability. SOFT gate: the overrun is reported with its number on every `checks.policies` run and never fails one — a cost to bring down, not a contradiction to refuse.";
-      proof = "line counts of AGENTS.md and of every tracked SKILL.md minus its frontmatter block";
-      # Audited 2026-10-21: 215 lines removed by collapsing the shadowed
-      # `.agents/skills/simplex-admin` copy (the module is canonical and the
-      # installer prefers it), 60 lines added as one `Truth:` pointer per skill
-      # that had none. Net −155, cap lowered 5546 → 5526 in the same change.
-      # Audited 2026-11-04: the skills figure counted YAML frontmatter (647 of
-      # 5927 lines across 63 files), which the index compiles away, so the cap was
-      # measuring the wrong thing — bodies are 5280, and the cap is that number.
-      # AGENTS.md 941 → 927 by deleting the namespace table, a third copy of
-      # docs/task-control-plane.md, .agents/README.md and `task --list-all`.
-      # Audited 2026-11-06: the corpus had drifted to 5371 — `mail-alias` and
-      # `envs` landed whole after the 2026-11-04 freeze and nobody paid for the
-      # lines. Paid now, out of prose that duplicated a compiled surface: the
-      # retired `crush` page shrank to its tombstone, knowledge-base dropped the
-      # jq cookbook entries `ops:kg:host`/`:doc` already answer, and wikisearch,
-      # envs, mail-alias and agents-notes lost their repeated measurements and
-      # restated rules. 5371 → 5270, cap lowered with it.
-      # Audited 2026-11-05: AGENTS.md 927 → 482. The manual had grown a second copy
-      # of every surface that now compiles one: the xs endpoint (docs/agent-turns.md),
-      # the verification protocol (docs/nix-patterns.md, the checks skill), the module
-      # tree and the documentation map (.#knowledgeGraph, .#artifacts.docs), the
-      # formatter table (scripts/task/nix-fmt.sh) and a packages section that claimed
-      # the output was {}. What remains routes. The map is gone, so `no-orphan-docs`
-      # went with it: reachability is the site index compiled from the graph.
-      holds = agentsLines <= 482 && skillLines <= 5270;
-      # Soft: a budget, not a contradiction — the overrun is reported with its number and never reds the gate.
-      soft = true;
-      detail = "AGENTS.md ${toString agentsLines}/482 lines, skill bodies ${toString skillLines}/5270 — over budget means delete or an audited `Truth:` extension, not a renumber";
+      rule = "Every page an agent loads carries a recorded body budget in `flake/prose-budget.nix`: the measured line count, and for a page over 200 lines the reason it earns them. The record is the gate, not a corpus ceiling — a page may only grow by editing its own number in the same commit, so growth is a decision with a diff, and a number that no longer matches the file fails. Frontmatter is not counted: `lib/skills.nix` compiles it into the one-line index. The corpus total is reported on every run; it is a cost to read, never a number to renumber.";
+      proof = "flake/prose-budget.nix (`pages`, `notes`) against body line counts of every tracked SKILL.md plus AGENTS.md";
+      holds =
+        budgetMissing
+        == []
+        && budgetStale == []
+        && budgetDrift == []
+        && budgetUnargued == [];
+      detail = "corpus ${toString (skillLines + agentsLines)} lines over ${toString (builtins.length budgetedPages)} pages, recorded ${toString proseBudget.total}\n    unrecorded: ${lib.concatStringsSep ", " budgetMissing}\n    stale: ${lib.concatStringsSep ", " budgetStale}\n    drift: ${lib.concatStringsSep ", " budgetDrift}\n    over ${toString proseBudget.argueAbove} without a reason: ${lib.concatStringsSep ", " budgetUnargued}";
+    };
+
+    rules-are-cited-not-restated = {
+      rule = "A document names a rule by citing its id — `flake/policies.nix#<id>` — and never by explaining the rule in its own words. The rule has one home; a second rendering is the copy that drifts, and the citation is what lets the graph answer which pages carry it. Skills are covered by `skills-cite-truth`; this is the prose half.";
+      proof = "every root *.md and docs/*.md that mentions `flake/policies.nix` also carries `[[flake/policies.nix#`";
+      holds = uncitedRuleMentions == [];
+      detail = "documents naming the policy file without an id citation: ${lib.concatStringsSep ", " uncitedRuleMentions}";
     };
 
     rebuild-flags-are-finite = {

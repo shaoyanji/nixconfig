@@ -110,6 +110,7 @@ packages: `.#artifacts`, `.#sites`, `.#servers`, `.#cli` only.
 | module chains | same artifact → `fleet-module-chains.md` |
 | notes, decisions, open work | `task ops:notes` (source `AGENTS.nix`) |
 | what touches what | `task ops:kg` (source `.#knowledgeGraph`) |
+| a page's line budget, and its reason | `nix eval --json .#proseBudget` then `toon -e` (source `flake/prose-budget.nix`) |
 | the task contract | `task --list-all --json` (source `taskfiles/*.yml`) |
 | what happened | `task agents:xs:list` |
 | a procedure | `docs/*.md` or a skill |

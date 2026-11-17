@@ -62,6 +62,7 @@
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
     inherit lib inventory;
     skills = skillsCtl;
+    policies = policiesCtl.policies;
   };
   # The rules the docs state, as predicates (flake/policies.nix). Compiled once
   # and asserted by `checks.policies`; docs cite an id instead of explaining it.
@@ -241,6 +242,11 @@ in {
   # string is needed (the bundle below); as a root output it was a second path
   # to one fact with no reader.
   agentSkills = skillsCtl.index;
+
+  # The prose budget as data: one recorded body count per page, plus the reason a
+  # long page earns its lines. `checks.policies` compares it to the tree, and the
+  # agent form is `nix eval --json .#proseBudget | toon -e`.
+  proseBudget = import ./prose-budget.nix {inherit lib;};
 
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
   # Consumed by the home activation script as a store symlink.

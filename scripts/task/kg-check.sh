@@ -12,7 +12,7 @@
 # Three layers, cheapest first:
 #   1. schema   — required fields, unique ids, endpoints resolve, edge shapes
 #                 (mentions: doc|skill -> host|skill; tagged: skill -> tag;
-#                 references: doc -> doc).
+#                 references: doc -> doc; cites: doc|skill -> policy).
 #   2. patterns — each of the six returns rows for an anchor DERIVED from the
 #                 graph, result ids are the expected node types, and the answer is
 #                 cross-checked: everything `doc X` returns must list `doc:X`
@@ -75,8 +75,25 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged|references|about|imports" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports")'
+check "edge types are mentions|tagged|references|about|imports|cites" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites")'
+
+# A citation is the one edge quoting `flake/policies.nix#id`: prose points at the
+# rule, never the reverse. If a doc or skill could SOURCE a policy, the graph
+# would be claiming a rule lives in prose, which is the thing this layer denies.
+check "cites: (doc|skill) -> policy" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if .type != "cites" then true
+         else (.from as $f | .to as $to
+               | ($t[$f] == "doc" or $t[$f] == "skill") and $t[$to] == "policy")
+         end)'
+
+# The layer can collapse to zero without anything else looking wrong: the marker
+# is a literal string, so a reworded citation leaves every page in place and the
+# edges gone. The floor makes that a failure.
+check "cites layer is populated (>=20 edges)" \
+  '([.edges[] | select(.type == "cites")] | length) >= 20'
 
 # The doc-to-doc layer is the one relation that needs a parser rather than a token
 # scan, so it is the one that can silently return zero: a wrong regex, a changed
@@ -219,9 +236,10 @@ expect_types "host" "$HOST_JSON" 'doc|skill'
 
 rows "doc AGENTS.md (living-doc anchor)" doc AGENTS.md
 DOC_JSON="$LAST"
-# A doc now answers with three kinds of neighbour: the hosts and skills it
-# mentions, and the documents it links to (the `references` layer).
-expect_types "doc" "$DOC_JSON" 'host|skill|doc'
+# A doc answers with four kinds of neighbour: the hosts and skills it mentions,
+# the documents it links to (the `references` layer), and the rules it cites — the
+# `cites` layer, which is what makes "who restates this rule" a query.
+expect_types "doc" "$DOC_JSON" 'host|skill|doc|policy'
 
 if [ -n "$seed_skill" ]; then
   rows "skill $seed_skill (derived anchor)" skill "$seed_skill"

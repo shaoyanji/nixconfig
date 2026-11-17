@@ -23,6 +23,7 @@
 
   skills = import ./skills.nix {inherit lib;};
   kg = import ./knowledge-graph.nix {
+    policies = (import ../flake/policies.nix {inherit lib;}).policies;
     inherit lib skills;
     inventory = inv;
   };
@@ -760,7 +761,7 @@
           <div class="card">
             <h4>Entities (Nodes)</h4>
             <p><strong>${toString (builtins.length kg.graph.nodes)}</strong> total nodes</p>
-            <p><small style="color: var(--text-muted);">${toString kg.graph.stats.hosts} hosts &bull; ${toString kg.graph.stats.skills} skills &bull; ${toString kg.graph.stats.docs} docs</small></p>
+            <p><small style="color: var(--text-muted);">${toString kg.graph.stats.hosts} hosts &bull; ${toString kg.graph.stats.skills} skills &bull; ${toString kg.graph.stats.docs} docs &bull; ${toString kg.graph.stats.policies} policies</small></p>
           </div>
           <div class="card">
             <h4>Mentions (Edges)</h4>
@@ -797,6 +798,7 @@
           <button class="tab-btn nav-active" data-kg-type="skill">skill <span class="badge badge-green">${toString kg.graph.stats.skills}</span></button>
           <button class="tab-btn nav-active" data-kg-type="doc">doc <span class="badge badge-yellow">${toString kg.graph.stats.docs}</span></button>
           <button class="tab-btn nav-active" data-kg-type="tag">tag <span class="badge" style="background: rgba(187, 154, 247, 0.2); color: var(--accent); border: 1px solid var(--accent);">${toString tagCount}</span></button>
+          <button class="tab-btn nav-active" data-kg-type="policy">policy <span class="badge" style="background: rgba(247, 118, 142, 0.2); color: #f7768e; border: 1px solid #f7768e;">${toString kg.graph.stats.policies}</span></button>
         </p>
 
         <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--heading);">Graph Projection Layers</h3>
@@ -1017,7 +1019,9 @@
       ++ lib.optional (n ? status) ["status" (escH n.status)]
       ++ lib.optional (n ? kind) ["kind" (escH n.kind)]
       ++ lib.optional (n ? description) ["description" (escH n.description)]
-      ++ lib.optional (n ? tags) ["tags" (escH (lib.concatStringsSep ", " n.tags))];
+      ++ lib.optional (n ? tags) ["tags" (escH (lib.concatStringsSep ", " n.tags))]
+      ++ lib.optional (n ? rule) ["rule" (escH n.rule)]
+      ++ lib.optional (n ? proof) ["proof" (escH n.proof)];
   in
     builtins.toJSON {
       "#breadcrumbs" = {textContent = "fleet / knowledge-graph / ${n.id}";};

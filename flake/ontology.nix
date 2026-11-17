@@ -125,7 +125,7 @@
       what = "a playbook row names the task that carries it out";
       from = ["doc" "skill"];
       to = ["task"];
-      evidence = "a backticked command in references/playbooks.md whose first word names a declared task";
+      evidence = "a backticked command in a labelled references/playbooks.md row, whose first word names a declared task; the edge carries the row's label";
       tier = "resolved";
       cannot = "that the task still does what the row claims, or that the row's gate is the one that runs";
     };

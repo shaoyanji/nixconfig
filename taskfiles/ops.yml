@@ -399,6 +399,24 @@ tasks:
           bash scripts/task/kg-query.sh tag "{{.TAG}}"
         fi
 
+  ops:kg:task:
+    desc: Playbook labels that route a task
+    summary: >
+      Inbound `routes` edges for task:<NAME>: the router labels whose row names
+      this task. NAME is the bare task name (`checks:host`), and a wildcard row
+      (`find:closure`) answers for the wildcard task it resolves to. The reverse
+      of references/playbooks.md — if you rename this task, these are the rows
+      that go stale. FORMAT=json emits {pattern, arg, count, results:[label TAB page]}.
+    requires:
+      vars: [NAME]
+    cmds:
+      - |
+        if [ "{{.FORMAT}}" = "json" ]; then
+          bash scripts/task/kg-query.sh task "{{.NAME}}" --json
+        else
+          bash scripts/task/kg-query.sh task "{{.NAME}}"
+        fi
+
   ops:kg:comention:
     desc: 'Hosts that share documents with a host'
     summary: >

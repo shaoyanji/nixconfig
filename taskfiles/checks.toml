@@ -314,6 +314,10 @@ name = "checks:router"
 kind = "leaf"
 
 [[check]]
+name = "checks:task-descs"
+kind = "leaf"
+
+[[check]]
 name = "checks:selector"
 kind = "leaf"
 

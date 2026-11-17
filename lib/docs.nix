@@ -10,6 +10,7 @@
   # flake/module-sets.nix. The chain table beside it in AGENTS.md was a second
   # copy of the same facts; this renders it instead.
   moduleSets ? null,
+  tasks ? {},
 }: let
   knobs = modules.knobs or {};
   modulesMeta = modules.metadata or {};
@@ -388,12 +389,26 @@
     ''
     + "\n";
 
-  # --- page set (paths inside the derivation) --------------------------------
+  taskSurface = let
+    names = lib.sort (a: b: a < b) (builtins.attrNames tasks);
+    rows = map (n: ["`${n}`" (tasks.${n}.shard or "root") (tasks.${n}.desc or "")]) names;
+  in ''
+    # Task surface
+
+    Generated from `taskfiles/*.yml` — a task that exists is a task this page
+    lists, with the description `task help` prints. The same ${toString (builtins.length names)}
+    names are `task` nodes in `.#knowledgeGraph`, and each playbook row that runs
+    one is a `routes` edge carrying the row's label.
+
+    ${table ["task" "shard" "description"] rows}
+  '';
+
   generatedPages =
     {
       "docs/generated/fleet-inventory.md" = fleetInventory;
       "docs/generated/fleet-matrix.md" = fleetMatrix;
       "docs/generated/modules-registry.md" = modulesRegistry;
+      "docs/generated/task-surface.md" = taskSurface;
     }
     // lib.optionalAttrs (moduleSets != null) {
       "docs/generated/fleet-module-chains.md" = moduleChains;

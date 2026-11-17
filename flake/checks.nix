@@ -10,6 +10,7 @@
   epistemicsCtl,
   ontologyCtl,
   knowledgeGraphCtl,
+  taskList,
 }:
 # Cheap checks only: nothing in this set may force a host configuration. The
 # split, the measurements and the gate are AGENTS.md §Gates and
@@ -456,6 +457,18 @@ lib.genAttrs systems.work (
         else
           pkgs.runCommand "router-labels" {} ''
             echo "router: ${toString (builtins.length labels)} labels, each with exactly one playbook row"
+            touch $out
+          '';
+
+      task-descs = let
+        undescribed = builtins.filter (n: taskList.${n}.desc == "" && !taskList.${n}.hasSummary) (builtins.attrNames taskList);
+        issues = map (n: "task '${n}' has no desc and no summary — invisible in both `task --list` and --list-all --json") undescribed;
+      in
+        if issues != []
+        then builtins.throw "the task surface hides tasks:\n  ${lib.concatStringsSep "\n  " issues}"
+        else
+          pkgs.runCommand "task-descs" {} ''
+            echo "task-descs: ${toString (builtins.length (builtins.attrNames taskList))} tasks, each visible to a person or to an agent"
             touch $out
           '';
 

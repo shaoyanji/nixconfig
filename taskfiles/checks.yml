@@ -296,6 +296,20 @@ tasks:
     cmds:
       - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.router-labels
 
+  checks:task-descs:
+    desc: "[gate] Every task is visible to a person or to an agent, never neither"
+    summary: >
+      flake/checks.nix reads the task list projection (yq over taskfiles/*.yml at
+      eval) and fails a task with neither a `desc` — the `task --list` menu — nor a
+      `summary`, the JSON surface an agent or client sees. One of the two is a
+      deliberate choice (`exit` has only a summary); neither leaves the task
+      invisible twice. The count also proves the projection read every shard.
+    vars:
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
+    cmds:
+      - nix build --no-link --builders "" ".?submodules=1#checks.{{.SYSTEM}}.task-descs"
+
   checks:entry:
     desc: "[gate] Entry reads stay on their cache layer (min-of-3 timing budgets)"
     summary: >

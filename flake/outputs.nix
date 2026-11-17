@@ -56,6 +56,7 @@
     inherit lib inventory;
     notes = agentsNotesCtl.pages;
     inherit moduleSets;
+    tasks = taskList;
   };
   # Skills are compiled the same way the inventory is: parsed once, validated
   # once, consumed by checks/tasks/bundles. No host config is evaluated.
@@ -68,7 +69,10 @@
   taskListPkgs = pkgsFor (builtins.head systems.work);
   taskList = builtins.listToAttrs (map (p: {
       name = builtins.elemAt p 0;
-      value.desc = builtins.elemAt p 1;
+      value = {
+        desc = builtins.elemAt p 1;
+        hasSummary = builtins.elemAt p 2;
+      };
     }) (builtins.fromJSON (builtins.readFile (taskListPkgs.runCommandLocal "task-list.json" {
         nativeBuildInputs = [taskListPkgs.yq-go taskListPkgs.jq];
       } ''
@@ -76,8 +80,8 @@
           yq -o=json -I=0 '.tasks // {}' "$f"
         done | jq -s 'add // {} | to_entries
           | map(.key as $k | .value as $v
-                | [[$k, ($v.desc // "")]]
-                  + [($v.aliases // [])[] | [., ($v.desc // "")]])
+                | [[$k, ($v.desc // ""), (($v.summary // "") | length > 0)]]
+                  + [($v.aliases // [])[] | [., ($v.desc // ""), (($v.summary // "") | length > 0)]])
           | add // []' > $out
       ''))));
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
@@ -138,7 +142,7 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl ontologyCtl knowledgeGraphCtl;
+    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl ontologyCtl knowledgeGraphCtl taskList;
   };
 
   # Resident helpers and their Kelly arithmetic: `nix eval --json .#daemons`. The

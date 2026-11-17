@@ -408,28 +408,43 @@
     if builtins.pathExists p
     then builtins.readFile p
     else "";
-  playbookParts = lib.splitString "`" playbookDoc;
-  spans = map (i: builtins.elemAt playbookParts (i * 2 + 1)) (
-    builtins.filter (i: i * 2 + 1 < builtins.length playbookParts) (lib.range 0 (builtins.length playbookParts))
-  );
-  spanWords = map (s: builtins.head (lib.splitString " " (lib.removePrefix "task " s))) spans;
+  playbookLines = lib.splitString "\n" playbookDoc;
+  lineSpans = line: let
+    parts = lib.splitString "`" line;
+  in
+    map (i: builtins.elemAt parts (i * 2 + 1)) (
+      builtins.filter (i: i * 2 + 1 < builtins.length parts) (lib.range 0 (builtins.length parts))
+    );
+  rowWords = line: map (s: builtins.head (lib.splitString " " (lib.removePrefix "task " s))) (lineSpans line);
+  rowLabel = line: let
+    m = builtins.match "\\|[[:space:]]*`([a-z]+(-[a-z]+)*)`.*" line;
+  in
+    if m == null
+    then null
+    else builtins.head m;
   taskShaped = t: builtins.match "[a-z][a-z0-9-]*(:[a-z0-9*][a-z0-9*_-]*)+" t != null;
-  # `find:closure` runs `find:*`: resolve to the task that exists, report the rest.
   wildcardFor = t: builtins.filter (n: lib.hasInfix "*" n && lib.hasPrefix (builtins.head (lib.splitString "*" n)) t) taskIds;
   resolves = t: builtins.hasAttr t tasks || wildcardFor t != [];
   resolvedTask = t:
     if builtins.hasAttr t tasks
     then t
     else builtins.head (wildcardFor t);
-  routedNames = lib.unique (map resolvedTask (builtins.filter (t: taskShaped t && resolves t) spanWords));
-  routerUnknown = lib.unique (builtins.filter (t: taskShaped t && !(resolves t)) spanWords);
-  routeEdges =
-    map (n: {
-      from = "doc:.agents/skills/router/references/playbooks.md";
-      to = "task:${n}";
-      type = "routes";
-    })
-    routedNames;
+  rowTasks = line: let
+    l = rowLabel line;
+  in
+    if l == null
+    then []
+    else
+      map (n: {
+        from = "doc:.agents/skills/router/references/playbooks.md";
+        to = "task:${n}";
+        type = "routes";
+        label = l;
+      }) (lib.unique (map resolvedTask (builtins.filter (t: taskShaped t && resolves t) (rowWords line))));
+  routeEdges = lib.concatMap rowTasks playbookLines;
+  routerUnknown = lib.unique (
+    lib.concatMap (line: builtins.filter (t: taskShaped t && !(resolves t)) (rowWords line)) playbookLines
+  );
 
   nodes =
     hostNodes

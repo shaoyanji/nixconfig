@@ -12,6 +12,7 @@
 #   tag <t>         (Skill)-[:TAGGED]->(Tag)             "skills tagged nix"
 #   comention <h>   (Doc)->(Host) and the same (Doc)->(Host')
 #                                                        "who shares docs with X"
+#   task <n>        (Doc)-[:ROUTES]->(Task)              "which router rows run this"
 #   stats           counts, plus top out-degree with --top N
 #   blast <id>      (Module|Doc|Skill|Host)-[:*]->(...)*        "who breaks with it"
 #                   reverse closure, prefixed id (host:, skill:, doc:, tag:,
@@ -92,6 +93,7 @@ node_id() {
     skill:*) printf 'skill:%s' "$n" ;;
     doc:*) printf 'doc:%s' "$n" ;;
     tag:*) printf 'tag:%s' "$n" ;;
+    task:*) printf 'task:%s' "$n" ;;
     module:*) printf 'module:%s' "$n" ;;
     modules/* | hosts/* | flake/* | lib/*) printf 'module:%s' "$n" ;;
   esac
@@ -167,6 +169,11 @@ case "$PATTERN" in
     ID="$(node_id tag "$NAME")"
     JQ='[.edges[] | select(.to == $a) | .from] | unique | sort'
     ;;
+  task)
+    require_name task
+    ID="$(node_id task "$NAME")"
+    JQ='[.edges[] | select(.type == "routes" and .to == $a) | [(.label // "?"), .from] | @tsv] | unique | sort'
+    ;;
   module)
     require_name module
     ID="$(node_id module "$NAME")"
@@ -223,7 +230,7 @@ case "$PATTERN" in
     exit 0
     ;;
   *)
-    echo "kg-query: unknown pattern '$PATTERN' (host|skill|doc|tag|module|comention|stats)" >&2
+    echo "kg-query: unknown pattern '$PATTERN' (host|skill|doc|tag|module|comention|task|stats)" >&2
     exit 2
     ;;
 esac
@@ -277,4 +284,4 @@ fi
 
 jq -r '.[] | if type == "object" then [.id, (.shared | tostring)] | @tsv else . end' \
   <<<"$RESULT" |
-  if [ "$PATTERN" = "comention" ]; then column -t -s$'\t'; else cat; fi
+  if [ "$PATTERN" = "comention" ] || [ "$PATTERN" = "task" ]; then column -t -s$'\t'; else cat; fi

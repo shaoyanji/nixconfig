@@ -1,0 +1,41 @@
+# The page suites, on a schedule.
+#
+# `bench-sweep.sh` proves the socket. These prove the page: the rope the user
+# sees, the constraint sidebar, the identity a retune keeps across sixty rounds,
+# and the same 5 ms target measured from a browser instead of from inside the
+# server's process. They need chromium and `ws`, which is why they are their own
+# job rather than a step of the bench: one job, one reason to be red.
+#
+# `scripts/page-suite.sh` is what a person runs at a terminal, so a scheduled
+# failure is reproducible with one command and no guessing about which server
+# the browser was talking to.
+name: page
+
+on:
+  schedule:
+    # Mondays, 05:47 UTC — after the bench sweep at :23, so two heavy runs do not
+    # share the same minute on the same runner.
+    - cron: "47 5 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: page
+  cancel-in-progress: false
+
+jobs:
+  suites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      # The runner's rustup is the toolchain, and the browser is already in the
+      # image as google-chrome; the only install is the one node module the CDP
+      # suites import.
+      - name: toolchain
+        run: rustup default stable && cargo --version
+      - name: node deps
+        run: npm install --no-save --no-package-lock ws
+      - name: build
+        run: cargo build --release --locked
+      - name: suites
+        run: bash scripts/page-suite.sh

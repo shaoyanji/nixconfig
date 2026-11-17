@@ -22,6 +22,7 @@ node web/smoke.mjs                       # wire-level end-to-end against a runni
 node web/uitest.mjs http://127.0.0.1:8787/   # headless chromium over CDP (needs `ws` beside it)
 node web/retune.mjs http://127.0.0.1:8787/   # retune round trip, and whether the span keeps its identity
 node web/window.mjs http://127.0.0.1:8787/   # the edit-to-diff target, gated; what the window costs and buys
+bash scripts/page-suite.sh                 # all four page suites, fresh server each, browser included
 ```
 
 Environment: `LOOM_PORT`, `LOOM_BIND`, `LOOM_DATA` (default `./session`, `off`
@@ -33,6 +34,10 @@ publish and outbound).
 reads `TARGET_MS` (the 5 ms it gates on) and reports what the window buys.
 `scripts/bench-sweep.sh` runs the gate at three window widths and on a 40 k
 document, and fails when a verdict differs from the table below.
+`scripts/page-suite.sh` runs the four page suites in order — smoke, window,
+retune, uitest — each against a fresh server, and starts the browser the two
+CDP suites need; below `MIN_CORES` its latency suite is advisory, the same rule
+the sweep uses.
 
 ## Measured numbers
 
@@ -185,6 +190,7 @@ default 200 edits, one run each:
 | :--- | :--- | :--- |
 | 1 ms | 1.19 ms | pass |
 | **2 ms** | **2.19 ms** | **pass — the default** |
+| 3 ms | 3.28 ms | pass at 10 k; 4.13 at 40 k, 5.09 at 100 k |
 | 4 ms | 4.18 ms | on the line — 9.18 ms in another run |
 | 8 ms | 8.26 ms | fail |
 
@@ -200,7 +206,10 @@ the limits below.
 
 The default is 2 ms: the widest window with margin under the 5 ms target, and the
 gate says so rather than the prose — 4 ms measures 4.18 ms with a 9.18 ms run
-beside it, and 8 ms fails outright. A keystroke cadence merges nothing at any width, so a burst
+beside it, and 8 ms fails outright. 3 ms was measured again once the timer tax
+was gone, because the reclaimed millisecond might have bought it: it merges 5.0
+ops of a 4 ms-spread burst against 4.8 at 2 ms, and puts 100 k at 5.09 ms, so it
+is not worth a millisecond on every edit. A keystroke cadence merges nothing at any width, so a burst
 is the only traffic the window is for, and a burst sent in one turn already
 merges at 1 ms. The 8 ms default it shipped with added 6 ms to every edit and
 merged nothing more than 2 ms does except a burst spread over several
@@ -347,7 +356,17 @@ log whose base document is gone.
   and the difference is the gate: 5.70 ms at four shards, 4.21 at two, on the same
   run; 1000 batches/s still lands 2000 shard events with 0 starved. One shard
   measures 3.78 ms and is rejected, because six reactors on one thread means each
-  waits for the slowest.
+  waits for the slowest. With the window closing on time, the trace says what the
+  rest is: at 40 125 tokens the p99 is 2.10 ms of window, 0.81–0.99 ms of apply,
+  0.02 in, 0.05 out and 0.004 publish. That apply segment is the session's own
+  work — per edit at 40 k, ops 55 µs, ripple 128 and materialize 103 — plus what
+  the reactor threads cost it: a scratch build with the pool's `submit` removed
+  puts the same segment at p50 125–194 µs and p99 183–411, against 298–330 and
+  809–994 with the bank running, on the same 600 edits. So the millisecond above
+  the window is the six reactors sharing four cores with the work they read from,
+  not one hot function: materialize is 103 µs of a ~1 ms tail, and the shard rule
+  already cut the rest once. The only cheaper lever is not running them, and one
+  shard measures worse.
 - **What is left is the window.** A 40 k edit's p50 is 2.54 ms, of which 2.0 is
   the window; its p99 is 3.1–3.4 ms over 600 edits, and 10 k holds 2.2–2.3.
   The structural work under that was fixed earlier and is still in the numbers:
@@ -371,7 +390,10 @@ log whose base document is gone.
   count and CPU, puts them in every row, and writes `bench-sweep.json`; below the
   four cores this table came from it reports the verdicts as advisory instead of
   failing, because that run measured the runner rather than the gate. A
-  public-repository runner has four vCPUs, which is why it is the comparison.
+  public-repository runner has four vCPUs, which is why it is the comparison. The
+  page half of the schedule is `scripts/page-suite.sh` in the `page` workflow,
+  which runs the same four suites a Monday evening later, so a page that stops
+  drawing is a red build rather than a thing somebody notices.
 - **A snapshot is never packed, so packing cannot hurt one.** It is written before
   the packing loop, as its own message: measured as one transport frame carrying
   one loom frame at 10 029 tokens (42 665 bytes, 0.77 ms from connect), 40 125

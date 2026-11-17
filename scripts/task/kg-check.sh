@@ -75,8 +75,19 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes")'
+check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes|routes" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes" or .type == "routes")'
+
+# A route is a table row naming the task it runs: prose points at the command,
+# never the reverse. The task must be a compiled node, not a string the row got
+# away with.
+check "routes: (doc|skill) -> task" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if .type != "routes" then true
+         else (.from as $f | .to as $to
+               | ($t[$f] == "doc" or $t[$f] == "skill") and $t[$to] == "task")
+         end)'
 
 # A citation is the one edge quoting `flake/policies.nix#id`: prose points at the
 # rule, never the reverse. If a doc or skill could SOURCE a policy, the graph

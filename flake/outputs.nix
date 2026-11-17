@@ -65,11 +65,27 @@
   # root markdown files; consumed by checks, docs and the query task.
   agentsNotesCtl = import ../lib/agents-notes.nix {inherit lib inventory;};
   homeAgentsGen = import ../lib/home-agents.nix {inherit lib inventory;};
+  taskListPkgs = pkgsFor (builtins.head systems.work);
+  taskList = builtins.listToAttrs (map (p: {
+      name = builtins.elemAt p 0;
+      value.desc = builtins.elemAt p 1;
+    }) (builtins.fromJSON (builtins.readFile (taskListPkgs.runCommandLocal "task-list.json" {
+        nativeBuildInputs = [taskListPkgs.yq-go taskListPkgs.jq];
+      } ''
+        for f in ${../Taskfile.yml} ${../taskfiles}/*.yml; do
+          yq -o=json -I=0 '.tasks // {}' "$f"
+        done | jq -s 'add // {} | to_entries
+          | map(.key as $k | .value as $v
+                | [[$k, ($v.desc // "")]]
+                  + [($v.aliases // [])[] | [., ($v.desc // "")]])
+          | add // []' > $out
+      ''))));
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {
     inherit lib inventory;
     skills = skillsCtl;
     notes = agentsNotesCtl;
     inherit (policiesCtl) policies;
+    tasks = taskList;
   };
   # The rules the docs state, as predicates (flake/policies.nix). Compiled once
   # and asserted by `checks.policies`; docs cite an id instead of explaining it.

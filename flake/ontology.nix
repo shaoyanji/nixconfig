@@ -64,6 +64,13 @@
       fields = ["label" "description" "path" "tags" "cites"];
       claims = ["definition" "procedure" "software-behaviour"];
     };
+    task = {
+      what = "a thing a person runs: a name in taskfiles/*.yml that go-task exposes, with the description it prints";
+      identity = "the full name you type after `task`, namespace included — `help`, `checks:host`";
+      member = "flake/outputs.nix taskList: yq projects taskfiles/*.yml to JSON at eval, Nix reads the JSON";
+      fields = ["label" "desc" "shard"];
+      claims = ["procedure"];
+    };
     tag = {
       what = "a free label a skill declares";
       identity = "the label text itself";
@@ -113,6 +120,14 @@
       evidence = "a token match on the entity name, split on non-name characters so devji is not dev";
       tier = "extracted";
       cannot = "an intent, a version, or that the page is about the entity; it is a place to look";
+    };
+    routes = {
+      what = "a playbook row names the task that carries it out";
+      from = ["doc" "skill"];
+      to = ["task"];
+      evidence = "a backticked command in references/playbooks.md whose first word names a declared task";
+      tier = "resolved";
+      cannot = "that the task still does what the row claims, or that the row's gate is the one that runs";
     };
     references = {
       what = "one page links to another";

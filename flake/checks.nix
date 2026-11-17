@@ -444,10 +444,12 @@ lib.genAttrs systems.work (
         missing = lib.subtractLists rows labels;
         orphans = lib.subtractLists labels rows;
         repeated = lib.subtractLists (lib.unique rows) rows;
+        unknownTasks = map (t: "playbook row runs 'task ${t}', which no taskfile declares") knowledgeGraphCtl.routerUnknown;
         issues =
           map (l: "label '${l}' has no row in references/playbooks.md") missing
           ++ map (s: "row '${s}' has no label in assets/labels.json") orphans
-          ++ map (s: "'${s}' appears in more than one row") (lib.unique repeated);
+          ++ map (s: "'${s}' appears in more than one row") (lib.unique repeated)
+          ++ unknownTasks;
       in
         if issues != []
         then builtins.throw "the router's labels and playbooks disagree:\n  ${lib.concatStringsSep "\n  " issues}"

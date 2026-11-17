@@ -421,6 +421,15 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
       return 1
     fi
     if printf '%s' "$out" | grep -q '429\|RATE_LIMITED'; then
+      # A 429 at zero allowance is the day, not the bucket: the ladder below would
+      # sleep out its whole budget against a limit that resets hours later, and the
+      # round's kept plates stay unpublished until the loop reaches its end
+      # (measured 2026-11-17: 1800 s slept at 100/100). Nothing is recorded, so the
+      # row is still pending for the next slot.
+      if [ "$(remaining || echo 1)" -le 0 ]; then
+        say "$id: allowance spent — waiting cannot reopen the bucket"
+        return 3
+      fi
       tries=$((tries + 1))
       if [ "$tries" -gt "$tries_max" ] || [ "$waited" -ge "$max_wait" ]; then
         record "$day" "$lane" "$id" "$file" "failed" \
@@ -486,6 +495,10 @@ run_lane() { # lane budget
     file=$(attempt "$id" "$lane" "$size" "$name" "$sent" "$day" "$n" "$rev") || rc=$?
     if [ "$rc" -eq 2 ]; then
       say "lane $lane: rate limited, stopping early"
+      break
+    fi
+    if [ "$rc" -eq 3 ]; then
+      say "lane $lane: allowance spent, stopping early"
       break
     fi
     [ "$rc" -eq 0 ] || continue
@@ -1417,6 +1430,7 @@ cmd_plates() {
     file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$prompt" "$day" 1 1) || {
       rc=$?
       [ "$rc" -eq 2 ] && { say "burst window closed; the rest of the roster waits for the next round"; break; }
+      [ "$rc" -eq 3 ] && { say "allowance spent; the rest of the roster waits for the next slot"; break; }
       continue
     }
     left=$((left - 1))
@@ -1434,6 +1448,7 @@ cmd_plates() {
       file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$sent" "$day" 2 1) || {
         rc=$?
         [ "$rc" -eq 2 ] && { say "burst window closed; the rest of the roster waits for the next round"; break; }
+        [ "$rc" -eq 3 ] && { say "allowance spent; the rest of the roster waits for the next slot"; break; }
         continue
       }
       left=$((left - 1))

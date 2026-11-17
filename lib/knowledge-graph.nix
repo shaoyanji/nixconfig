@@ -152,6 +152,19 @@
     && !(lib.hasPrefix "http" t)
     && !(lib.hasPrefix "mailto:" t);
 
+  # Which rules a page CITES (`[[flake/policies.nix#id]]`) rather than restates.
+  # A property, not a fifth node type: the canvas, its slice set and its gate key
+  # on the four types, and a type nobody renders is a node nobody can click. The
+  # id is safe to trust because `checks.policies` already proves every citation
+  # resolves and every id is cited.
+  citedPolicies = text: let
+    parts = lib.splitString "[[flake/policies.nix#" text;
+  in
+    lib.unique (
+      lib.filter (id: builtins.match "[a-z0-9][a-z0-9-]*" id != null)
+      (map (chunk: builtins.head (lib.splitString "]]" chunk)) (builtins.tail parts))
+    );
+
   # Every path that will become a doc node, so a link resolves before nodes exist.
   docPaths = map rel files;
 
@@ -180,6 +193,7 @@
     mentionsHosts = builtins.filter (h: builtins.elem h toks) hostNames;
     mentionsSkills = builtins.filter (s: builtins.elem s toks) skillNames;
     references = referencesIn id content;
+    cites = citedPolicies content;
   };
 
   docs = map mkDoc files;
@@ -303,6 +317,8 @@
       description = skills.skills.${n}.description;
       path = skills.skills.${n}.path;
       tags = skills.skills.${n}.tags;
+      # The body is already parsed in `lib/skills.nix`, so this costs no read.
+      cites = citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body);
     })
     (builtins.attrNames skills.skills);
 
@@ -310,7 +326,7 @@
     hostNodes
     ++ skillNodes
     ++ map (d: {
-      inherit (d) id type label path;
+      inherit (d) id type label path cites;
     })
     docs
     ++ map (i: {

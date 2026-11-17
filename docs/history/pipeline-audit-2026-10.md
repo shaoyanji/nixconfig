@@ -1,6 +1,9 @@
 # Nix idiom audit — docs pipeline & hardcoded config
 
-Status: **IN FLIGHT** — audit + policy only (2026-10-19). Nothing here is a rewrite.
+Record of the 2026-10-19 audit, kept for its measurements and the before/after
+comparisons. Everything it proposed landed the same day; the rules that survived
+live in `flake/policies.nix` and the `nix-patterns` skill. This page is not
+current truth.
 
 - **Part A (§1–5)** — documentation/site pipeline: producers, committed
   derivatives, content-as-code, double instantiation.

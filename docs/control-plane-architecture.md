@@ -1,23 +1,23 @@
 # Control plane — site & dashboard architecture (redesign)
 
-> **Status:** partly implemented (2026-10-17); the Go/Datastar runtime below is
-> still a proposal.
->
-> **What already landed:** the compiled-data half. `lib/docs.nix` generates the
-> fleet inventory, modules registry and per-host pages from the compiled
-> `.#inventory` and `modules.toml`, and emits the site **nav as a Nix value** —
-> so there is no hand-written `nav.json` any more, and `docs/site.toml` is no
-> longer needed for that job. `nix build .#artifacts.docs` is the source of truth and the
-> only copy — the checked-in `docs/generated/` mirror and its drift gate were
-> removed on 2026-10-19 (see [`docs-pipeline-audit.md`](./docs-pipeline-audit.md)).
-> The Python generator remains only as the markdown→HTML step (section 4's
-> "Retire generate.py" is still open).
-> **Companion vision:** [`control-plane-vision.md`](./control-plane-vision.md)
-> (why the end state is shaped this way — Nix-as-generator, federated
-> manifests, and the evaluation-speed wall).
-> **End state:** a web dashboard that gives the same control surface as the
-> Taskfile *and* serves wiki-like content about the flake and fleet — rendered
-> live from the same primitives, including closure graphs.
+Status: partly implemented (2026-10-17). The Go/Datastar runtime below is still a
+proposal; the compiled-data half landed.
+
+`lib/docs.nix` generates the fleet inventory, modules registry and per-host pages
+from the compiled `.#inventory` and `modules.toml`, and emits the site nav as a
+Nix value, so there is no hand-written `nav.json` and `docs/site.toml` is not
+needed for that job. `nix build .#artifacts.docs` is the only copy: the checked-in
+`docs/generated/` mirror and its drift gate were removed on 2026-10-19
+([history/pipeline-audit-2026-10.md](./history/pipeline-audit-2026-10.md)). The
+Python renderer went the same day; `lib/aki-site.nix` renders the site.
+
+Companion: [`control-plane-vision.md`](./control-plane-vision.md) records why the
+end state has this shape (Nix as generator, federated manifests, the
+evaluation-speed wall).
+
+End state: a web dashboard that gives the same control surface as the Taskfile and
+serves wiki content about the flake and fleet, rendered from the same primitives,
+including closure graphs.
 
 ---
 
@@ -26,7 +26,7 @@
 **DELIVERED 2026-10-19:** `docs-site/` (`python3 + python3Packages.markdown` +
 `generate.py` + `nav.json`) is deleted, and with it the `.#docs-site` output, its
 flake check and the Python derivation. The Nix-native renderer (`lib/aki-site.nix`)
-is the site. The paragraph below is kept as the record of what was wrong:
+is the site. The record of what was wrong:
 
 - The nav is no longer hand-maintained, but markdown→HTML still happens in
   Python at build time instead of the Go builder described below.
@@ -34,9 +34,9 @@ is the site. The paragraph below is kept as the record of what was wrong:
 - Python is the wrong rendering dependency for something meant to grow into a
   runtime control plane.
 
-The redesign keeps docs as a **first-class artefact** but makes the whole thing
-one system: **primitives (Nix + data) → compiled bundle (+ one small Go binary)
-→ served as static wiki *and* live control plane.**
+The redesign keeps docs as a first-class artefact and makes the whole thing one
+system: primitives (Nix + data) → compiled bundle plus one small Go binary →
+served as a static wiki and a live control plane.
 
 ## 2. Constraints & principles
 
@@ -64,7 +64,8 @@ Everything the site shows is derived from these. No secondary copies.
 | `lib/docs.nix` | Nix | nav/sections manifest + generated pages — **this replaced `nav.json`; `site.toml` is no longer required** |
 
 Nix is the compiler: a single function `mkSite` in `lib/` takes these and returns
-a store path. `docs/site.toml` declares the nav so the manifest is data, not code.
+a store path. The nav is a compiled value in `lib/docs.nix`; whether a
+`docs/site.toml` manifest replaces it is still open (§10).
 
 ## 4. The pipeline (compile-time)
 
@@ -124,9 +125,9 @@ for sc.Scan() {
 }
 ```
 
-This is the property that matters: **the Taskfile *is* the API.** The dashboard
-never re-implements task logic — it lists tasks and runs them, so the CLI, the
-TUI (`task menu`), and the web UI all stay one control plane.
+The Taskfile is the API. The dashboard never re-implements task logic; it lists
+tasks and runs them, so the CLI, the TUI (`task menu`) and the web UI stay one
+control plane.
 
 ### Closure graphs
 
@@ -162,11 +163,12 @@ only**, never in `allowedTCPPorts`.
 
 A web-triggered task can change a host, so it is fenced:
 
-- Trust boundary is the **tailnet** (no public Funnel), same as the LLM/TTS
-  endpoints. Optional bearer token (`apiKeyFile`) mirroring the TTS module.
-- A **task allowlist** in `docs/site.toml` (data) decides what is runnable from
-  the UI; destructive tasks require an explicit confirmation patch.
-- No arbitrary command execution endpoint — only `task <allowlisted-name> [args]`.
+- The trust boundary is the tailnet, with no public Funnel, the same as the
+  LLM/TTS endpoints. An optional bearer token (`apiKeyFile`) mirrors the TTS
+  module.
+- A task allowlist in `docs/site.toml` (data) decides what is runnable from the
+  UI; destructive tasks require an explicit confirmation patch.
+- No arbitrary command execution endpoint, only `task <allowlisted-name> [args]`.
 
 ## 9. Migration path (incremental, verifiable at each step)
 

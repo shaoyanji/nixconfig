@@ -7,13 +7,6 @@
   ...
 }: let
   cfg = config.services.udsStaticBridge;
-  # Same site, same evaluated inputs as the HTTP vhost: the compiled registry and
-  # this host's own name, so the served bytes cannot disagree with nginx's copy.
-  akiDocs = import self.nixFiles.lib."aki-site.nix" {
-    inherit pkgs;
-    inventory = config.fleet.inventory;
-    host = config.networking.hostName;
-  };
 
   # Same cache policy the HTTP vhost uses (modules/config/nginx-static-cache.nix):
   # one store path, one set of cache directives.
@@ -34,9 +27,10 @@ in {
       description = "Filesystem path for the UNIX domain socket listener.";
     };
 
+    # Supplied by the enabling host, so this module carries neither the site
+    # compiler (lib/aki-site.nix) nor the knowledge graph it reads.
     root = lib.mkOption {
       type = lib.types.path;
-      default = akiDocs;
       description = "Static site directory to serve over the UNIX domain socket.";
     };
   };

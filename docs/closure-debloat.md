@@ -4,8 +4,8 @@ Measured on **frieren** at generation 81 (`/run/current-system`,
 `nixos-system-frieren-26.11.20261005.aa48d34`), after the duplicate-Chromium
 removal in `docs/closure-reduction.md`.
 
-This document is the *plan*. `docs/closure-reduction.md` is the *tooling and
-evidence*; read it first if a number here looks unmotivated.
+This page is the plan. `docs/closure-reduction.md` holds the tooling and
+evidence; read that first if a number here needs support.
 
 ## 1. Reproduce
 
@@ -40,10 +40,9 @@ file. Two mechanics matter:
   both `system-path` and `home-manager-path`; the store dedupes them. That is
   listed in the tool's output only to stop anyone "fixing" it as waste.
 
-The practical consequence: **you cannot remove ~16 GiB of shared store paths one
-service at a time.** Glibc, Python, LLVM, GTK and Mesa are shared
-precisely because many owners need them. Per-owner savings are capped by that
-owner's exclusive bytes.
+You cannot remove the ~16 GiB of shared store paths one service at a time. Glibc,
+Python, LLVM, GTK and Mesa are shared because many owners need them, and
+per-owner savings are capped by that owner's exclusive bytes.
 
 ## 3. Owner table (measured)
 
@@ -133,10 +132,10 @@ with the free wins.
 `modules/profiles/desktop-client.nix` (`printing = {`), a shared desktop profile,
 so this needs a per-host override rather than an edit to that file.
 
-**T1-7 · Duplicate versions — up to 4.4 GiB (optimistic).** 675 groups still hold
-a redundant copy. The real yield is lower: the number assumes every group
-collapses to one build, and some pairs are legitimately two artefacts (a client
-and a daemon). Start with the ranked report, not the total.
+**T1-7 · Duplicate versions — up to 4.4 GiB at most.** 675 groups still hold a
+redundant copy. The real yield is lower: the number assumes every group collapses
+to one build, and some pairs are legitimately two artefacts (a client and a
+daemon). Start with the ranked report, not the total.
 
 ```bash
 task dev:closure:menu -- reduce 20
@@ -213,8 +212,8 @@ Also in this tier: `home-manager-files` carries
 
 ## 7. Realistic projection
 
-Arithmetic, not optimism: exclusive bytes are the ceiling per owner, and the 16.2
-GiB of shared store paths does not move piecemeal.
+Exclusive bytes are the ceiling per owner, and the 16.2 GiB of shared store paths
+does not move piecemeal.
 
 | Step | Projected total |
 | --- | --- |
@@ -230,8 +229,8 @@ So "down to essentials" is roughly a **16–17 GiB floor** for this host, and ab
 requirement. Twenty gigabytes is reachable, but only with most of Tier 2 and
 Tier 3 done — the ~1 GiB one-shot fixes alone land near 31 GiB, not 20.
 
-The fastest honest path to 20 GiB, in order: T1-1 (done) → T1-2 fonts → the top 15
-of Tier 3 → the three JVM services → the `*arr` stack.
+The fastest path to 20 GiB: T1-1 (done), T1-2 fonts, the top 15 of Tier 3, the
+three JVM services, then the `*arr` stack.
 
 ## 8. Method notes / cautions
 

@@ -716,7 +716,7 @@ tasks:
   # modules.toml, so they cannot drift from the hosts/knobs they describe.
   # `.?submodules=1#artifacts.docs` is the ONLY copy: the tree is a store path, and no part of it is
   # checked in (docs/generated/ used to be, which is why a drift gate had to
-  # exist — see docs/docs-pipeline-audit.md §4).
+  # exist — see docs/history/pipeline-audit-2026-10.md §4).
   docs:build:
     desc: Build the generated docs tree from compiled metadata (nix build .?submodules=1#artifacts.docs)
     summary: >

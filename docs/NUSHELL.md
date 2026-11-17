@@ -19,9 +19,9 @@ and the `nu_scripts` extras the config sources. This page is the single home for
 
 ---
 
-## 2. RULE: `nu -c` and `nu script.nu` do **not** load your config
+## 2. `nu -c` and `nu script.nu` do not load your config
 
-Measured on 0.115.1 (this is the trap that made the shell look broken):
+Measured on 0.115.1:
 
 ```bash
 nu -c 'print $env.config.show_banner'                          # true   (built-in default)
@@ -35,13 +35,13 @@ nu --config ~/.config/nushell/config.nu -c 'help commands | where name == nugroq
 scripted `nu` has: no secrets, no `llm`/`decide`, no aliases, `edit_mode=emacs`,
 `show_banner=true`. Plugins still load (they come from `plugin.msgpackz`).
 
-**Every agent invocation must be explicit:**
+Every agent invocation must be explicit:
 
 ```bash
 nu --config ~/.config/nushell/config.nu --env-config ~/.config/nushell/env.nu -c '…'
 ```
 
-For a single-need probe, sourcing just what you need is cheaper:
+For a one-off probe, source only what you need:
 
 ```bash
 nu --no-config-file -n -c 'source ~/Documents/nixconfig/modules/config/nu/decision.nu; decide models'
@@ -204,8 +204,9 @@ nu --no-config-file -n -c 'source <secrets.nu>; source <decision.nu>; decide mod
 task checks:host HOST=frieren MODE=eval        # 2241 assertions, rc=0, ~8 s warm
 ```
 
-`nu --ide-check` prints `{"type":"diagnostic","severity":"Error",…}` lines — a grep
-for `"type":"error"` matches nothing and silently "passes". Use the control above.
+`nu --ide-check` prints `{"type":"diagnostic","severity":"Error",…}` lines. A grep
+for `"type":"error"` matches nothing and passes silently, so use the control
+above.
 
 ---
 

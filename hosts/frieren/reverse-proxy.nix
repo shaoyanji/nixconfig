@@ -55,6 +55,14 @@
 in {
   imports = [self.modules."services.service-portal"];
 
+  # EXP-024: serve the same compiled site the vhost serves, over a UNIX socket.
+  # The bridge takes the site as a value, so one eval instantiates it once.
+  services.udsStaticBridge = {
+    enable = true;
+    socketPath = "/run/uds-docs/docs.sock";
+    root = fleetSite;
+  };
+
   # --- Service portal: the page, from the registry ----------------------------
   # One entry per card. Keys under `exposed` services (immich, paperless, …) are
   # the `profiles.serviceExposure` keys, so the address and badge come from the

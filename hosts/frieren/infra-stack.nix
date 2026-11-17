@@ -1077,13 +1077,6 @@ in {
   # Declarative Btrfs silent corruption & device error watchdog (Consolidated into fleetGovernor)
   services.btrfsWatchdog.enable = false;
 
-  # Zero-TCP static documentation bridge via UNIX domain sockets (EXP-024)
-  # Serves immutable Aki fleet docs natively over unix:/run/uds-docs/docs.sock
-  services.udsStaticBridge = {
-    enable = true;
-    socketPath = "/run/uds-docs/docs.sock";
-  };
-
   # Hardware UPS simulation drill and battery telemetry (EXP-029)
   # Inspects Lenovo battery health, runtime modeling, and UPower clean poweroff thresholds.
   services.upsSimulationDrill = {

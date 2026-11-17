@@ -61,7 +61,7 @@
     ++ mdInSubdirs (root + "/hosts");
 
   # `docs/generated/` is a build artifact and not committed (see
-  # docs/docs-pipeline-audit.md §4); it is not a knowledge source and would only
+  # docs/history/pipeline-audit-2026-10.md §4); it is not a knowledge source and would only
   # add duplicate edges. The filter below is what keeps it out even if a local
   # build output is checked out by hand.
   files = builtins.filter builtins.pathExists (rootDocs ++ docFiles);

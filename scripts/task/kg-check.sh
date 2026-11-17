@@ -68,6 +68,15 @@ check "node ids are unique" \
 check "every edge has from/to/type" \
   'all(.edges[]; has("from") and has("to") and has("type"))'
 
+# The edge property set is closed. `routes` is the one edge that carries data
+# beyond its endpoints (the playbook row's label); any other property is a field
+# no pattern reads, i.e. data that looks queryable and is not.
+check "edges carry only type/from/to/label" \
+  'all(.edges[]; ((keys - ["type", "from", "to", "label"]) | length) == 0)'
+
+check "routes edges carry a label" \
+  'all(.edges[]; if .type == "routes" then ((.label // "") | length) > 0 else true end)'
+
 # NB: inside `all(GEN; COND)` the input of COND is the element, and an `as`
 # binding belongs in COND, not in GEN — `all(.edges[] as $e; …)` is a syntax
 # error and silently failed this check the first time round.
@@ -77,6 +86,19 @@ check "edge endpoints resolve to nodes" \
 
 check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes|routes" \
   'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes" or .type == "routes")'
+
+check "routes layer is populated (>=17 edges)" \
+  '([.edges[] | select(.type == "routes")] | length) >= 17'
+
+# An alias is a second name for a task that exists, so it must point at a node
+# carrying the same description. An alias whose canonical vanished still answers
+# `task <alias>` on the command line while the graph answers nothing.
+check "alias task nodes point at a real task with the same desc" \
+  '(.nodes | map({(.id): .}) | add) as $n
+   | all(.nodes[];
+         if .type == "task" and ((.aliasOf // "") != "") then
+           ($n["task:" + .aliasOf] != null and $n["task:" + .aliasOf].desc == .desc)
+         else true end)'
 
 # A route is a table row naming the task it runs: prose points at the command,
 # never the reverse. The task must be a compiled node, not a string the row got
@@ -358,13 +380,37 @@ echo "== surface =="
 # Taskfile and the surface check fails for a reason that has nothing to do with
 # the graph (caught by running the drift tests from /tmp).
 if task --dir "$REPO" --list-all --json >"$work/tasks.json" 2>/dev/null; then
-  for t in host skill doc tag module comention stats blast; do
+  for t in host skill doc tag module comention stats blast task; do
     if jq -e --arg n "ops:kg:$t" '.tasks | map(.name) | index($n)' "$work/tasks.json" >/dev/null 2>&1; then
       ok "task ops:kg:$t exists"
     else
       bad "task ops:kg:$t is missing from the Taskfile"
     fi
   done
+  # The graph's task nodes are the Taskfile's names and aliases, and nothing
+  # else. yq and go-task parse the same YAML; a shard yq dropped, or an alias
+  # list it read as a string, shows up as a set difference instead of a graph
+  # that answers for a surface nobody can run.
+  jq -r '.tasks[] | .name, (.aliases // [])[]' "$work/tasks.json" | sort -u >"$work/names.txt"
+  jq -r '.nodes[] | select(.type == "task") | .id | sub("^task:"; "")' "$G" | sort -u >"$work/nodes.txt"
+  if diff_out="$(diff -u "$work/names.txt" "$work/nodes.txt")"; then
+    ok "task nodes are the Taskfile surface ($(wc -l <"$work/nodes.txt" | tr -d ' ') names and aliases)"
+  else
+    bad "task nodes disagree with go-task:"
+    printf '%s\n' "$diff_out" | sed -n '3,12p' | sed 's/^/      /'
+  fi
+
+  # The alias map is the same claim in both directions: go-task reports which
+  # name is an alias of which task, and each alias node must carry that aliasOf.
+  jq -r '.tasks[] | select((.aliases // []) | length > 0) | .name as $c | .aliases[] | "\(.)\t\($c)"' \
+    "$work/tasks.json" | sort >"$work/alias-want.txt"
+  jq -r '.nodes[] | select(.type == "task" and ((.aliasOf // "") != "")) | "\(.id | sub("^task:"; ""))\t\(.aliasOf)"' \
+    "$G" | sort >"$work/alias-got.txt"
+  if diff -q "$work/alias-want.txt" "$work/alias-got.txt" >/dev/null; then
+    ok "alias nodes carry their canonical task ($(wc -l <"$work/alias-got.txt" | tr -d ' '))"
+  else
+    bad "alias map disagrees with go-task: $(diff "$work/alias-want.txt" "$work/alias-got.txt" 2>&1 | head -4 | tr '\n' ' ')"
+  fi
 else
   bad "could not read \`task --list-all --json\`"
 fi

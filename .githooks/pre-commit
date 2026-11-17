@@ -23,7 +23,9 @@
 #                       fires on this repo's house style
 #   blobs     HARD      a staged blob over 512 KiB is refused
 #                       (scripts/task/repo-blobs.sh --index)
-#   checks:kg HARD      graph schema + all six patterns, when they are affected
+#   checks:kg HARD      graph schema + all patterns, when they are affected
+#   census    HARD      `.nix` prose lines may not exceed the recorded ceiling
+#   task-descs HARD     a task added to a taskfile must be visible somewhere
 #
 # Fail-closed: if the formatter cannot be resolved, nix-fmt.sh exits non-zero and
 # the commit is refused, rather than silently skipping the format check. The same
@@ -53,7 +55,7 @@ affects_graph() {
       .agents/skills/*) return 0 ;;
       lib/knowledge-graph.nix | lib/skills.nix | lib/inventory.nix) return 0 ;;
       scripts/task/kg-*.sh | scripts/task/lib/kg-graph.sh) return 0 ;;
-      taskfiles/ops.yml) return 0 ;;
+      flake/outputs.nix | taskfiles/*.yml) return 0 ;;
     esac
   done <<<"${1:-}"
   return 1
@@ -119,6 +121,43 @@ if [ -n "$STAGED_NIX" ]; then
   echo "Nix checks passed."
 fi
 
+# The comment census is a shrink-only ratchet: a `.nix` file may not carry one
+# more prose line than `flake/nix-comments.nix` records. It is one eval and no
+# build, so it runs on every commit that stages a `.nix` — the failure mode is a
+# ceiling raised by accident in a commit whose diff looked like a one-line edit
+# and whose author never ran `checks:policies`.
+if [ -n "$STAGED_NIX" ]; then
+  HEADER="$(nix eval .#nixComments.header 2>/dev/null || true)"
+  CEILING="$(nix eval .#nixComments.ceiling 2>/dev/null || true)"
+  if ! [[ "$HEADER" =~ ^[0-9]+$ && "$CEILING" =~ ^[0-9]+$ ]]; then
+    echo "pre-commit: the comment census could not be read; refusing to skip it." >&2
+    exit 1
+  fi
+  if [ "$HEADER" -gt "$CEILING" ]; then
+    echo "Commit refused: Nix comment lines ${HEADER} > ceiling ${CEILING}." >&2
+    echo "  A comment must be a pointer: a path, a task name, a policy id, an attr." >&2
+    echo "  Where the prose is: nix eval --json .#nixComments.headerPerFile | jq 'to_entries|sort_by(-.value)|.[:5]'" >&2
+    echo "  Rule: flake/policies.nix#nix-comments-are-pointers" >&2
+    exit 1
+  fi
+  echo "Comment census ${HEADER}/${CEILING}."
+fi
+
+# A task that arrives without a desc and without a summary is invisible in both
+# `task --list` and `task --list-all --json`. The gate is cheap (one trivial
+# derivation), and a taskfile change is exactly when it can go wrong.
+if grep -Eq '^(taskfiles/.*\.yml|flake/outputs\.nix)$' <<<"$STAGED"; then
+  echo "Checking that every task is visible to a person or an agent..."
+  SYS="$(nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || true)"
+  if [ -z "$SYS" ] || ! nix build --no-link --builders "" ".?submodules=1#checks.$SYS.task-descs" >/tmp/pre-commit-task-descs.log 2>&1; then
+    echo "pre-commit: the task visibility gate failed or could not run; refusing to skip it." >&2
+    sed 's/^/  /' /tmp/pre-commit-task-descs.log 2>/dev/null | tail -20
+    echo "  Run it alone: task check:leaf NAME=checks:task-descs"
+    exit 1
+  fi
+  echo "Task visibility passed."
+fi
+
 if affects_graph "$STAGED"; then
   if [ ! -f "$KG_CHECK" ]; then
     echo "pre-commit: $KG_CHECK is missing; refusing to skip the graph gate." >&2
@@ -150,7 +189,7 @@ if affects_ontology "$STAGED"; then
   echo "Ontology checks passed."
 fi
 
-if grep -Eq '^\.agents/skills/router/' <<<"$STAGED"; then
+if grep -Eq '^(\.agents/skills/router/|lib/knowledge-graph\.nix)' <<<"$STAGED"; then
   echo "Checking the router's labels against its playbooks..."
   SYS="$(nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || true)"
   if [ -z "$SYS" ] || ! nix build --no-link --builders "" ".?submodules=1#checks.$SYS.router-labels" >/tmp/pre-commit-router.log 2>&1; then

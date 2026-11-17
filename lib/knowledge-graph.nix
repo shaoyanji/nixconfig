@@ -399,6 +399,7 @@
         if builtins.length parts > 1
         then builtins.head parts
         else "root";
+      aliasOf = tasks.${n}.aliasOf or "";
     })
     taskIds;
 

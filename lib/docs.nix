@@ -36,7 +36,6 @@
     row = cells: "| " + lib.concatStringsSep " | " (map esc cells) + " |";
     rule = "| " + lib.concatStringsSep " | " (map (_: "---") headers) + " |";
   in
-    # header row, alignment rule, then the body — markdown needs all three.
     lib.concatStringsSep "\n" ([(row headers) rule] ++ map row rows);
 
   rowList = label: values:
@@ -391,16 +390,38 @@
 
   taskSurface = let
     names = lib.sort (a: b: a < b) (builtins.attrNames tasks);
-    rows = map (n: ["`${n}`" (tasks.${n}.shard or "root") (tasks.${n}.desc or "")]) names;
+    aliasOf = n: tasks.${n}.aliasOf or "";
+    aliasCount = builtins.length (builtins.filter (n: aliasOf n != "") names);
+    description = n: let
+      d = tasks.${n}.desc or "";
+    in
+      if d == ""
+      then tasks.${n}.summary or ""
+      else d;
+    rows =
+      map (n: [
+        "`${n}`"
+        (tasks.${n}.shard or "root")
+        (let
+          a = aliasOf n;
+        in
+          if a == ""
+          then ""
+          else "alias of `${a}`")
+        (description n)
+      ])
+      names;
   in ''
     # Task surface
 
     Generated from `taskfiles/*.yml` — a task that exists is a task this page
-    lists, with the description `task help` prints. The same ${toString (builtins.length names)}
-    names are `task` nodes in `.#knowledgeGraph`, and each playbook row that runs
-    one is a `routes` edge carrying the row's label.
+    lists, with the description `task help` prints (a summary where a desc is
+    deliberately absent). The same ${toString (builtins.length names)}
+    names are `task` nodes in `.#knowledgeGraph`, ${toString aliasCount} of them
+    aliases carrying the canonical name; each playbook row that runs one is a
+    `routes` edge carrying the row's label.
 
-    ${table ["task" "shard" "description"] rows}
+    ${table ["task" "shard" "via" "description"] rows}
   '';
 
   generatedPages =

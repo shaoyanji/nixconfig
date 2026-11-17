@@ -239,6 +239,17 @@ esac
 . "${BASH_SOURCE[0]%/*}/lib/kg-graph.sh"
 GRAPH="$(kg_graph_path)" || exit 1
 
+# An alias is a second name for the same task, not a node with its own rows: the
+# projection records `aliasOf`, and the query follows it one hop. Without this,
+# `ops:kg:task NAME=<alias>` answered nothing while `task <alias>` ran fine.
+if [ "$PATTERN" = "task" ] && [ -n "${ID:-}" ]; then
+  alias_of="$(jq -r --arg a "$ID" 'first(.nodes[] | select(.id == $a) | (.aliasOf // "")) // ""' "$GRAPH")"
+  if [ -n "$alias_of" ]; then
+    printf 'kg-query: %s is an alias of task:%s\n' "${ID#task:}" "$alias_of" >&2
+    ID="task:$alias_of"
+  fi
+fi
+
 if [ -n "${ID:-}" ]; then check_exists "$ID" "$NAME"; fi
 
 if [ "${BLAST:-0}" = 1 ]; then

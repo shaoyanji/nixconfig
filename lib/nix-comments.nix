@@ -200,7 +200,7 @@ in {
     path = builtins.length pathCites;
   };
   unresolvedPaths = lib.unique (builtins.filter (c: !(builtins.pathExists (root + "/${c.path}"))) pathCites);
-  inherit policyCites taskCites worst;
+  inherit policyCites taskCites worst headerPerFile;
   ruleLines = map (e: {
     inherit (e) file line body;
   }) (builtins.filter (e: e.kind == "rule") entries);

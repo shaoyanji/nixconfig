@@ -68,7 +68,7 @@
       what = "a thing a person runs: a name in taskfiles/*.yml that go-task exposes, with the description it prints";
       identity = "the full name you type after `task`, namespace included — `help`, `checks:host`";
       member = "flake/outputs.nix taskList: yq projects taskfiles/*.yml to JSON at eval, Nix reads the JSON";
-      fields = ["label" "desc" "shard"];
+      fields = ["label" "desc" "shard" "aliasOf"];
       claims = ["procedure"];
     };
     tag = {

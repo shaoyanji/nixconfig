@@ -71,7 +71,9 @@
       name = builtins.elemAt p 0;
       value = {
         desc = builtins.elemAt p 1;
-        hasSummary = builtins.elemAt p 2;
+        summary = builtins.elemAt p 2;
+        hasSummary = builtins.elemAt p 2 != "";
+        aliasOf = builtins.elemAt p 3;
       };
     }) (builtins.fromJSON (builtins.readFile (taskListPkgs.runCommandLocal "task-list.json" {
         nativeBuildInputs = [taskListPkgs.yq-go taskListPkgs.jq];
@@ -80,8 +82,10 @@
           yq -o=json -I=0 '.tasks // {}' "$f"
         done | jq -s 'add // {} | to_entries
           | map(.key as $k | .value as $v
-                | [[$k, ($v.desc // ""), (($v.summary // "") | length > 0)]]
-                  + [($v.aliases // [])[] | [., ($v.desc // ""), (($v.summary // "") | length > 0)]])
+                | ($v.desc // "") as $d
+                | ($v.summary // "") as $s
+                | [[$k, $d, $s, ""]]
+                  + [($v.aliases // [])[] | [., $d, $s, $k]])
           | add // []' > $out
       ''))));
   knowledgeGraphCtl = import ../lib/knowledge-graph.nix {

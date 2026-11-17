@@ -1,0 +1,13 @@
+[package]
+name = "loom-img"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Tokenizer bytes to Hilbert-ordered image bytes, and typed range variations over them"
+
+[dependencies]
+loom-hilbert.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]

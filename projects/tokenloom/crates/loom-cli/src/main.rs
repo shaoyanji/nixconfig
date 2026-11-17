@@ -1,4 +1,4 @@
-//! `loom-cli bench`, `fuzz`, `replay`.
+//! `loom-cli bench`, `fuzz`, `replay`, `image`, `hilbert`.
 //!
 //! `bench` is the gate: it runs the server on a loopback port and times send →
 //! diff over the real protocol, coalescer window included — the same segment
@@ -7,6 +7,7 @@
 //! the number, not a gate of its own.
 
 mod e2e;
+mod image;
 
 use loom_core::{NewToken, Op, Rope, Tokenizer, FLAG_WORD};
 use loom_srv::session::Session;
@@ -24,6 +25,11 @@ usage: loom-cli <command>
         --window N         coalescer window in ms (default 2, or LOOM_COALESCE_MS)
   fuzz [batches]           random batches, assert incremental == full rebuild
   replay [dir]             load snapshot + log, replay, report
+  image --plan <f>         tokenizer bytes → Hilbert canvases, .himg/.ppm/.hex + report
+        --out <dir>        where the canvases go (default .)
+        --tok <name>       bpe_a (default), bpe_b, wordpiece, regex_lexer
+  hilbert --table <n>      the d2xy table, for parity with shaoyanji/hilbert
+  hilbert --span <n> <a> <l>  exact bounds of a byte span
 ";
 
 const WORDS: &[&str] = &[
@@ -474,6 +480,8 @@ fn main() {
         Some("bench") => bench(&args[1..]),
         Some("fuzz") => fuzz(&args[1..]),
         Some("replay") => replay(&args[1..]),
+        Some("image") => image::image(&args[1..]),
+        Some("hilbert") => image::hilbert(&args[1..]),
         _ => {
             print!("{USAGE}");
             0

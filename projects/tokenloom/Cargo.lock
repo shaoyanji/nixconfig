@@ -467,10 +467,13 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "loom-core",
+ "loom-hilbert",
+ "loom-img",
  "loom-react",
  "loom-srv",
  "loom-tok",
  "loom-wire",
+ "serde_json",
  "tokio",
 ]
 
@@ -480,6 +483,19 @@ version = "0.1.0"
 dependencies = [
  "proptest",
  "serde",
+]
+
+[[package]]
+name = "loom-hilbert"
+version = "0.1.0"
+
+[[package]]
+name = "loom-img"
+version = "0.1.0"
+dependencies = [
+ "loom-hilbert",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

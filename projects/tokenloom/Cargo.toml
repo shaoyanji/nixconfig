@@ -6,6 +6,8 @@ members = [
   "crates/loom-react",
   "crates/loom-wire",
   "crates/loom-srv",
+  "crates/loom-hilbert",
+  "crates/loom-img",
   "crates/loom-cli",
 ]
 
@@ -20,6 +22,8 @@ loom-tok = { path = "crates/loom-tok" }
 loom-react = { path = "crates/loom-react" }
 loom-wire = { path = "crates/loom-wire" }
 loom-srv = { path = "crates/loom-srv" }
+loom-hilbert = { path = "crates/loom-hilbert" }
+loom-img = { path = "crates/loom-img" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 bincode = "1.3"

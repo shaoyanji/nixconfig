@@ -205,6 +205,19 @@ node web/window.mjs http://127.0.0.1:8787/</code></pre>
     marked span in place, and the <code>×</code> takes it back out.
   </p>
 
+  <h2 id="image">Tokens to an image</h2>
+  <p>A tokenizer emits a one-dimensional stream, and so does a file of image bytes. <code>loom-cli image</code> reads one as the other: the token bytes go down in Hilbert order, so byte <em>d</em> is the pixel <code>d2xy(128, d)</code> — the text's own bytes at the positions the curve gives them. No model, no codec, nothing trained.</p>
+  <p>Every variation declares the byte spans it may touch, and the run fails if a changed byte falls outside them. The bounds are computed from the curve rather than scanned: a span tiles into aligned squares, so its hull is exact in <code>O(order)</code>.</p>
+  <table>
+    <tr><td>roll 8 KiB by 37</td><td class="n">7 628 B</td><td>x0–63 y0–63 · 22.9 dB</td></tr>
+    <tr><td>splice from 16 384</td><td class="n">3 843 B</td><td>x0–63 y0–31 · 25.7 dB</td></tr>
+    <tr><td>reverse 8 KiB</td><td class="n">7 546 B</td><td>x0–63 y64–127 · 23.0 dB</td></tr>
+    <tr><td>gain 1.6</td><td class="n">8 192 B</td><td>x0–63 y0–63 · 20.6 dB</td></tr>
+    <tr><td>mask 4 KiB</td><td class="n">4 096 B</td><td>x32–63 y64–127 · 19.2 dB</td></tr>
+    <tr><td>roll + reverse</td><td class="n">5 756 B</td><td>x0–95 y0–127 · 24.1 dB</td></tr>
+  </table>
+  <p>The curve is the one <a href="https://github.com/shaoyanji/hilbert">hilbert</a> ships, and that repo's parity test compares both implementations cell for cell across orders 1–7: 21 844 cells, no disagreements. The canvas is raw bytes, not a codec.</p>
+
   <h2>What it is not</h2>
   <ul>
     <li>No model inference. The reactors are tokenizers and checks, not a network call.</li>

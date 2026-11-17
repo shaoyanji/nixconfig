@@ -326,6 +326,54 @@ present but will not decode is not treated as a missing one: the loader refuses
 it and the server exits naming the file, because starting over would append to a
 log whose base document is gone.
 
+## Tokens to an image
+
+A tokenizer emits a one-dimensional stream, and so does a file of image bytes.
+`loom-cli image` reads one as the other: the token bytes go down in Hilbert
+order, so byte `d` is the pixel `d2xy(128, d)`, and the picture is the text's own
+bytes at the positions the curve gives them. No model, no codec, nothing trained.
+
+```bash
+cargo run --release --bin loom-cli -- image --plan examples/image-plan.json --out /tmp/loom-image
+node tools/loom-himg.js /tmp/loom-image/roll.himg /tmp/loom-image   # in shaoyanji/hilbert
+```
+
+Each canvas is written three ways — `.himg` (a header line, then raw pixels in
+curve order), `.ppm`, and `.hex` (the same bytes as text, which is the form a
+tokenizer can emit) — beside a `report.json`. On the example plan, 1545 tokens of
+1953 bytes fill a 128×128 `rgb8` canvas 25.2 times over.
+
+**Ranges are what makes it legible.** A plan declares token ranges to locate and,
+for each variation, the byte spans it may touch. A span tiles into curve-aligned
+squares — `4^k` indices starting at a multiple of `4^k` fill one square of side
+`2^k` — so its bounding box is exact in `O(order)`, and the report carries both
+that answer and an enumeration of the same span agreeing with it. Then a variation
+has to prove itself:
+
+| variant | bytes changed | changed pixels | dB | contained |
+| :--- | ---: | :--- | ---: | :--- |
+| roll 8 KiB by 37 | 7 628 | x0–63 y0–63 | 22.86 | yes |
+| splice from 16 384 | 3 843 | x0–63 y0–31 | 25.69 | yes |
+| reverse 8 KiB | 7 546 | x0–63 y64–127 | 22.97 | yes |
+| gain 1.6 | 8 192 | x0–63 y0–63 | 20.64 | yes |
+| mask 4 KiB | 4 096 | x32–63 y64–127 | 19.21 | yes |
+| roll + reverse | 5 756 | x0–95 y0–127 | 24.08 | yes |
+
+`contained` is checked rather than asserted: every changed byte index is looked
+up in the union of the spans that variant declared, and one index outside fails the
+run. The token regions get the same treatment — tokens 0–16 tile bytes 0–21, which
+occupy `x0–3 y0–7`.
+
+The curve is the one `shaoyanji/hilbert` ships. That repo's `test/loom-parity.js`
+compares this implementation against `lib/hilbert.js` for every cell of orders 1–7
+in both directions — 21 844 cells, no disagreements — and its `tools/loom-himg.js`
+renders a `.himg` through its own PNG encoder, so the handoff is a checked
+contract rather than a shared assumption.
+
+What this is not: a better codec. The canvas is raw (49 152 bytes for 128×128), the
+dB figures say how far a variation moved the bytes and nothing about quality, and
+nothing about an image's meaning is modelled or learned.
+
 ## Deliberate choices and limits
 
 - **One latency gate, and it is the socket one.** The bench used to time
@@ -442,7 +490,9 @@ crates/loom-tok    BPE, WordPiece, delimiter lexer, vocab loader
 crates/loom-react  reactor trait, shard pool, warning engine, constraints
 crates/loom-wire   binary protocol (client frames are the ops themselves)
 crates/loom-srv    session, coalescer, persistence, axum server
-crates/loom-cli    bench, fuzz, replay
+crates/loom-hilbert  curve, exact span bounds, region algebra (no dependencies)
+crates/loom-img     canvas, .himg and text containers, declarative variation plan
+crates/loom-cli    bench, fuzz, replay, image, hilbert
 index.html         the landing page GitHub Pages serves: what this is, and its numbers
 web/               index.html, loom.js (vanilla, virtualized rope view), smoke.mjs, uitest.mjs, redraw.mjs, retune.mjs, window.mjs
 vocabs/            bpe_a.json, bpe_b.json, wordpiece.json, delims.json

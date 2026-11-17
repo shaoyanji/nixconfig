@@ -1,0 +1,39 @@
+{
+  "order": 7,
+  "layout": "rgb8",
+  "fill": "repeat",
+  "source": { "file": "stream.txt" },
+  "regions": [
+    { "name": "opening", "tokens": { "start": 0, "len": 16 } },
+    { "name": "middle", "tokens": { "start": 16, "len": 32 } }
+  ],
+  "variants": [
+    {
+      "name": "roll",
+      "ops": [{ "roll": { "span": { "start": 0, "len": 8192 }, "by": 37 } }]
+    },
+    {
+      "name": "splice",
+      "ops": [{ "splice": { "span": { "start": 0, "len": 4096 }, "from": 16384 } }]
+    },
+    {
+      "name": "reverse",
+      "ops": [{ "reverse": { "span": { "start": 12288, "len": 8192 } } }]
+    },
+    {
+      "name": "gain",
+      "ops": [{ "gain": { "span": { "start": 0, "len": 8192 }, "factor": 1.6 } }]
+    },
+    {
+      "name": "mask",
+      "ops": [{ "mask": { "span": { "start": 20480, "len": 4096 } } }]
+    },
+    {
+      "name": "two-ranges",
+      "ops": [
+        { "roll": { "span": { "start": 0, "len": 2048 }, "by": 91 } },
+        { "reverse": { "span": { "start": 24576, "len": 4096 } } }
+      ]
+    }
+  ]
+}

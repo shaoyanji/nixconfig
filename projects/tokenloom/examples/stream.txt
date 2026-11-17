@@ -1,0 +1,32 @@
+A token stream is a one-dimensional thing, and so is a file of image bytes. The
+only question the gap asks is what order to read them in.
+
+Raster order answers by rows: byte one is the top left pixel, byte two the one to
+its right, and a line of text becomes a line of the picture. Then a byte and its
+neighbour in the stream are neighbours on the canvas only until the row ends, and
+the last byte of a row sits an edge away from a byte it contributes nothing to.
+
+A Hilbert curve answers differently. It visits every cell of the square exactly
+once, and consecutive cells are always touching, so consecutive bytes are always
+touching pixels. The picture keeps the stream's locality: a repeated word becomes
+a patch, a change early in the text moves a region near the start of the curve,
+and a range of bytes occupies a region of the picture with a bounding box that can
+be computed rather than guessed.
+
+That last sentence is the whole claim. A span of bytes on the curve is a set of
+pixels whose bounds are arithmetic: split the span into the aligned blocks the
+curve already knows about, take each block's square, and the hull of those squares
+is exact. No approximation, no scan, no model. The same arithmetic answers where
+the tokens a person edited landed in the image, and it answers whether a variation
+stayed inside the range it declared.
+
+Nothing here is a diffusion model, and nothing here is trained. The bytes are the
+tokenizer's own output, read in an order that preserves what the text was doing.
+Variations are typed range operations over those bytes: roll a span, splice one
+span into another, reverse it, gain it, mask it. Each one declares the range it is
+allowed to touch, and the report either shows that every changed byte lies inside
+a declared range or fails.
+
+So the image is not a rendering of a prompt's meaning. It is the prompt's bytes,
+at the positions the curve gives them, and a set of declared changes you can point
+at.

@@ -1,0 +1,10 @@
+[package]
+name = "loom-hilbert"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Hilbert index arithmetic and the typed span/region algebra the image bridge reasons with"
+
+[dependencies]
+
+[dev-dependencies]

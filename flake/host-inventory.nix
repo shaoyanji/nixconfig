@@ -61,8 +61,6 @@ in {
     modules = globalModulesContainers ++ [../hosts/deckstation/configuration.nix];
   };
 
-  # Role/hardware/history are COMPILED, not commented: inventory.toml
-  # `[hosts.delphi] notes`, surfaced by `task dev:inventory:feed`.
   delphi = {
     kind = "nixos";
     system = "aarch64-linux";
@@ -105,8 +103,6 @@ in {
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Role/hardware/history are COMPILED, not commented: inventory.toml
-    # `[hosts.eisen] notes`, surfaced by `task dev:inventory:feed`.
     modules = globalModulesNixos ++ [../hosts/eisen/configuration.nix];
   };
 
@@ -137,8 +133,6 @@ in {
   ares = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Role/hardware/history are COMPILED, not commented: inventory.toml
-    # `[hosts.ares] notes`, surfaced by `task dev:inventory:feed`.
     modules =
       globalModulesContainers
       ++ [
@@ -153,8 +147,6 @@ in {
   stark = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Role/hardware/history are COMPILED, not commented: inventory.toml
-    # `[hosts.stark] notes`, surfaced by `task dev:inventory:feed`.
     modules =
       globalModulesNixos
       ++ [
@@ -170,8 +162,6 @@ in {
   fern = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Role/hardware/history are COMPILED, not commented: inventory.toml
-    # `[hosts.fern] notes`, surfaced by `task dev:inventory:feed`.
     # Back on dwl (2026-11-09). The Ryoku pilot ran 2026-10-31 → 2026-11-09 and is
     # over: on this 15 W Picasso APU the Ryoku session with the DisplayLink manager
     # daemon was intolerable in daily use. The desktop is a fork, not a disable
@@ -201,8 +191,6 @@ in {
   scratch = {
     kind = "nixos";
     system = "x86_64-linux";
-    # Role/hardware/history are COMPILED, not commented: inventory.toml
-    # `[hosts.scratch] notes`, surfaced by `task dev:inventory:feed`.
     modules = globalModulesNixos ++ [../hosts/scratch/configuration.nix];
   };
 

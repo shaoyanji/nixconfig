@@ -51,6 +51,7 @@ tasks:
       - task: checks:toon
       - task: checks:toon:surfaces
       - task: checks:tasks
+      - task: checks:nix:comments
       - task: checks:skills:mirror
       - task: checks:kg
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
@@ -837,6 +838,19 @@ tasks:
       warning fires on the house style).
     cmds:
       - bash scripts/task/nix-fmt.sh --check --all --tools deadnix,statix
+
+  checks:nix:comments:
+    desc: "[gate] Every Nix comment is a pointer that resolves, and prose only falls"
+    summary: >
+      Nix is evaluated, never read line by line, so a comment earns its place as
+      an address: a path that exists, a `task` the recipe book has, a policy id,
+      a flake attribute. `nix eval .#nixComments` classifies every comment line
+      and `flake/policies.nix#nix-comments-are-pointers` holds the ceiling; this
+      task adds what Nix cannot answer — it resolves each cited `task` name
+      against go-task's live set, so a pointer at a recipe nobody can run fails
+      here. ~1.5 s, no host eval.
+    cmds:
+      - bash scripts/task/nix-comments.sh
 
   checks:nix:shell:
     desc: "[gate] Shell inside Nix strings: no expansion read as interpolation, shellcheck clean"

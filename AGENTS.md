@@ -111,6 +111,7 @@ packages: `.#artifacts`, `.#sites`, `.#servers`, `.#cli` only.
 | notes, decisions, open work | `task ops:notes` (source `AGENTS.nix`) |
 | what touches what | `task ops:kg` (source `.#knowledgeGraph`) |
 | a page's line budget, and its reason | `nix eval --json .#proseBudget` then `toon -e` (source `flake/prose-budget.nix`) |
+| comment debt in Nix | `nix eval --json .#nixComments \| toon -e` |
 | the task contract | `task --list-all --json` (source `taskfiles/*.yml`) |
 | what happened | `task agents:xs:list` |
 | a procedure | `docs/*.md` or a skill |
@@ -135,6 +136,7 @@ task checks:host HOST=<h>      # [gate] module system + assertions, one host
 task checks:hosts HOSTS="a b"  # a named set, one process each
 task checks:flake              # only where the machine can hold it
 task checks:prose              # docs and skills carry no unslop vocabulary
+task checks:nix:comments       # every Nix comment is a pointer; task names resolve
 task checks:nix:lint           # deadnix (fail) + statix (advisory)
 ```
 

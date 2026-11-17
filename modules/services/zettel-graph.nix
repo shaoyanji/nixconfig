@@ -17,8 +17,8 @@
   vaultDir = "${stateDir}/vault";
   wwwDir = "${stateDir}/www";
 
-  # pyyaml is the exporter's one import (scripts/check_links.py) and the
-  # publisher's config reader. typst is what publish_md.py shells out to.
+  # pyyaml is the vault exporter's one import and the publisher's config reader;
+  # typst is what the vault's publish_md.py shells out to.
   python = pkgs.python3.withPackages (ps: [ps.pyyaml]);
 
   # The reader is a Go service and the vault's scripts stay the vault's: one

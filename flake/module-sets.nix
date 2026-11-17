@@ -165,8 +165,7 @@ in rec {
 
   # The seven chain names as DATA: a chain is exactly its features, in order, and
   # the docs table is a projection of this rather than a second copy of it
-  # (`docs/generated/fleet-module-chains.md`,
-  # [[flake/policies.nix#generated-not-tracked]]).
+  # (`task docs:build`, [[flake/policies.nix#generated-not-tracked]]).
   chainFeatures = {
     globalModulesNixos = ["base" "nixos" "dms"];
     globalModulesImpermanence = ["base" "nixos" "dms" "impermanence"];

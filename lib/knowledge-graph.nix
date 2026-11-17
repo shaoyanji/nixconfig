@@ -277,15 +277,10 @@
   ideas = map mkIdea ideaFiles;
 
   # --- Nix module graph ------------------------------------------------------
-  # The one structural question the doc graph could not answer: "who imports
-  # `modules/services/x.nix`" was a grep across relative paths, and a grep is the
-  # token cost a graph exists to remove. The walk and the edge extraction live in
-  # `lib/nix-files.nix` because the flake registry (`flake/nix-registry.nix`)
-  # names the same files; this is the graph's view of that one list. `ops:kg:module`
-  # reads the importers, `ops:kg:blast` the transitive closure.
-  #
-  # The walk is the whole tree, so `flake.nix` — the file every blast radius ends
-  # at — and the overlays are nodes instead of the old four fixed roots.
+  # "Who imports this module" was a grep; the walk and the extraction are
+  # `lib/nix-files.nix` (which `flake/nix-registry.nix` also names from), and
+  # `ops:kg:module` / `ops:kg:blast` read them. The walk is the whole tree, so
+  # `flake.nix` and the overlays are nodes.
   nixFilesCtl = import ./nix-files.nix {inherit lib root;};
   nixPaths = nixFilesCtl.paths;
   modules =

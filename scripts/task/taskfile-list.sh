@@ -53,13 +53,16 @@ if [ "$refresh" = 0 ] && [ -s "$path" ]; then
 fi
 
 mkdir -p "$CACHE"
-# temp file + rename: a reader racing the parse would otherwise see half a
-# document and jq would report a syntax error instead of a miss.
-if ! (cd "$REPO" && task --list-all --json) >"$path.tmp" 2>/dev/null; then
-  rm -f "$path.tmp"
+# One temp file PER WRITER, then an atomic rename: a reader racing the parse
+# must never see half a document. A single shared `.tmp` also let two refreshes
+# clobber each other, which surfaced as `mv: cannot stat … .tmp` and a caller
+# reading a truncated name set (measured: two `--refresh` runs at once).
+tmp="$(mktemp "$path.XXXXXX")"
+if ! (cd "$REPO" && task --list-all --json) >"$tmp" 2>/dev/null; then
+  rm -f "$tmp"
   echo "taskfile-list: task --list-all --json failed" >&2
   exit 1
 fi
-mv "$path.tmp" "$path"
+mv "$tmp" "$path"
 find "$CACHE" -maxdepth 1 -name 'tasks-*.json' -type f -mtime +7 -delete 2>/dev/null || true
 cat "$path"

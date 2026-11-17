@@ -428,3 +428,7 @@ kind = "cache"
 [[check]]
 name = "checks:nixcache:probe"
 kind = "cache"
+
+[[check]]
+name = "checks:nix:comments"
+kind = "leaf"

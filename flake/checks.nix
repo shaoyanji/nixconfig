@@ -9,28 +9,10 @@
   policiesCtl,
   epistemicsCtl,
 }:
-# CHEAP CHECKS ONLY — `checks.<system>` MUST NOT force a host configuration.
-#
-# This is a hard budget rule, not a style preference. Every check in this set is
-# evaluated in ONE nix process, and a NixOS host config costs ~200 MiB of
-# evaluator heap (measured: 1.98 s / 197.6 MiB for `nixosConfigurations.frieren`).
-# The previous revision forced every host here — `host-eval-<host>`,
-# `inventory-host-<host>` and a `host-architecture` check that read
-# `config.systemd.services` for all 23 — so `nix flake check` (and
-# `task checks:quick`, which built `host-architecture`) evaluated 23 full
-# toplevels in a single process: ~4.5 GiB, which on this 11 GiB host with 5 GiB
-# already swapped was SIGKILLed (exit 137) leaving the box in a 62 %-IO-stall
-# state for minutes.
-#
-# The split:
-#   * checks.<system>          — this file. Reads the compiled registry and flake
-#                                attr NAMES. ~50 MiB, no host evaluation. Runs in
-#                                `nix flake check` and CI unconditionally.
-#   * hostChecks.<system>.<h>  — flake/host-checks.nix. Exactly ONE host per
-#                                attribute, so one bounded evaluation (~200 MiB).
-#                                CI runs it for affected hosts; `task
-#                                checks:host:HOST=` runs one; `task checks:hosts`
-#                                sweeps sequentially, never in one process.
+# Cheap checks only: nothing in this set may force a host configuration. The
+# split, the measurements and the gate are AGENTS.md §Gates and
+# `flake/policies.nix#flake-check-memory-gated`; the per-host half is
+# `flake/host-checks.nix`.
 lib.genAttrs systems.work (
   system: let
     pkgs = pkgsFor system;

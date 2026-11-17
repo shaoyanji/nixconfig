@@ -1,11 +1,26 @@
 # flake/policies.nix — the rules the docs state, as predicates over the tree.
 # Cite one as [[flake/policies.nix#id]] instead of restating it; `checks.policies`
 # proves every `holds` and that every citation and id exists, in both directions.
-{lib}: let
+{
+  lib,
+  nixComments ? null,
+}: let
   root = ../.;
   read = p: builtins.readFile (root + "/${p}");
   has = p: needle: lib.hasInfix needle (read p);
   anyLine = p: pred: lib.any pred (lib.splitString "\n" (read p));
+
+  # The comment census (lib/nix-comments.nix). `flake/outputs.nix` passes it in so
+  # the 316-file walk happens once; a standalone importer (the site render) gets
+  # its own copy rather than a second definition.
+  nixCommentsCtl =
+    if nixComments != null
+    then nixComments
+    else
+      import ./nix-comments.nix {
+        inherit lib;
+        paths = (import ../lib/nix-files.nix {inherit lib;}).paths;
+      };
 
   # Top-level files of one directory with a suffix. No tree walk: walking the
   # root would copy the repository into the store just to list markdown.
@@ -172,16 +187,24 @@
   # anchored group is the only capture, which `builtins.split` requires.
   citationRe = "[[][[]flake.policies.nix#([A-Za-z0-9_-]+)]]";
 
-  citations = lib.concatMap (doc: let
-    text = read doc;
-    groups = builtins.filter builtins.isList (builtins.split citationRe text);
-  in
-    map (g: {
-      inherit doc;
-      id = builtins.head g;
+  citations =
+    lib.concatMap (doc: let
+      text = read doc;
+      groups = builtins.filter builtins.isList (builtins.split citationRe text);
+    in
+      map (g: {
+        inherit doc;
+        id = builtins.head g;
+      })
+      groups)
+    normativeDocs
+    # A `.nix` comment cites a rule the same way a page does, without the brackets:
+    # one citation set, so a comment cannot name a policy that was renamed.
+    ++ map (r: {
+      doc = "${r.file}:${toString r.line}";
+      id = r.id;
     })
-    groups)
-  normativeDocs;
+    nixCommentsCtl.policyCites;
 
   # A root markdown file is either one of the living documents or a pointer
   # stub. Anything else is a new document that belongs in `docs/`.
@@ -656,6 +679,20 @@
       proof = "every root *.md and docs/*.md that mentions `flake/policies.nix` also carries `[[flake/policies.nix#`";
       holds = uncitedRuleMentions == [];
       detail = "documents naming the policy file without an id citation: ${lib.concatStringsSep ", " uncitedRuleMentions}";
+    };
+
+    nix-comments-are-pointers = {
+      rule = "A comment in a `.nix` file is a pointer, never a second home: a repo path that resolves, a `task` name the recipe book has, a policy id (`flake/policies.nix#<id>`), or a flake attribute. The file is evaluated, not read line by line, so a comment that explains the code is a document nobody greps and nobody updates — a measured fact belongs in `flake/epistemics.nix`, a recipe in `taskfiles/`, a rule in this file, and the rest belongs nowhere. What remains is a ratchet: prose lines may not exceed the recorded ceiling, dated commentary may not grow (history is a turn), and a decorative rule line is deleted on sight. Task pointers resolve against `taskfiles/*.yml` in `checks:nix:comments`; paths and policy ids resolve here, so a moved file leaves no stale address behind.";
+      proof = "lib/nix-comments.nix over every tracked .nix · flake/nix-comments.nix (ceiling, datedCeiling) · scripts/task/nix-comments.sh against `task --list-all --json`";
+      holds =
+        nixCommentsCtl.rules
+        == 0
+        && nixCommentsCtl.header <= nixCommentsCtl.ceiling
+        && nixCommentsCtl.dated <= nixCommentsCtl.datedCeiling
+        && nixCommentsCtl.unresolvedPaths == [];
+      detail = let
+        hotspots = builtins.filter (w: w.lines > 0) (lib.take 5 nixCommentsCtl.worst);
+      in "${toString nixCommentsCtl.comments} comment lines in ${toString nixCommentsCtl.files} files: ${toString nixCommentsCtl.pointers} pointers (${toString nixCommentsCtl.kinds.task} task, ${toString nixCommentsCtl.kinds.policy} policy, ${toString nixCommentsCtl.kinds.path} path), header ${toString nixCommentsCtl.header}/${toString nixCommentsCtl.ceiling}, dated ${toString nixCommentsCtl.dated}/${toString nixCommentsCtl.datedCeiling}, rule lines ${toString nixCommentsCtl.rules}\n    unresolved paths: ${lib.concatStringsSep ", " (map (c: "${c.file}:${toString c.line} -> ${c.path}") nixCommentsCtl.unresolvedPaths)}\n    heaviest prose: ${lib.concatStringsSep ", " (map (w: "${w.path} (${toString w.lines})") hotspots)}";
     };
 
     rebuild-flags-are-finite = {
@@ -1287,7 +1324,7 @@ in {
   errorClasses = let
     gates = {
       "trust" = ["ci-substituter-keys"];
-      "lint" = ["ci-doc-budget" "ci-task-graph"];
+      "lint" = ["ci-doc-budget" "ci-task-graph" "nix-comments-are-pointers"];
       # Quoted because `assert` is a Nix keyword: the class name belongs to
       # docs/issue-classes.md, so the parser is the thing that gets worked around.
       "assert" = ["boot-gate-needs-kvm" "flake-check-memory-gated"];

@@ -1,14 +1,6 @@
-# The prose budget as data — what each page's body costs, and why.
-#
-# Two readers: `checks.policies` (#agent-prose-budget) compares `pages` to the
-# tree, so a page that grows must be re-recorded in the same commit — a decision
-# with a diff instead of a slide — and the agent form is
-# `nix eval --json .#proseBudget | toon -e` (TOON is the token-cheap shape).
-#
-# `pages` counts the body only: frontmatter is compiled metadata (`lib/skills.nix`
-# turns it into the one-line index), not context a turn carries. `notes` is
-# required above `argueAbove` lines: a long page has to say what it earns them
-# with, because length without an argument is the thing this file exists to stop.
+# The prose budget as data: body lines per page, plus the reason a long page
+# earns them. Gate `#agent-prose-budget`, reader
+# `nix eval --json .#proseBudget | toon -e`; frontmatter is not counted.
 {lib}: let
   argueAbove = 200;
   pages = {
@@ -53,7 +45,7 @@
     ".agents/skills/neocities/SKILL.md" = 53;
     ".agents/skills/nix-eval/SKILL.md" = 109;
     ".agents/skills/nixos-deploy/SKILL.md" = 55;
-    ".agents/skills/no-comments/SKILL.md" = 37;
+    ".agents/skills/no-comments/SKILL.md" = 39;
     ".agents/skills/officecli/SKILL.md" = 41;
     ".agents/skills/parallel-cli/SKILL.md" = 36;
     ".agents/skills/paste/SKILL.md" = 119;
@@ -72,7 +64,7 @@
     ".agents/skills/voice-loop/SKILL.md" = 71;
     ".agents/skills/wikisearch/SKILL.md" = 148;
     ".agents/skills/xs-turns/SKILL.md" = 192;
-    "AGENTS.md" = 225;
+    "AGENTS.md" = 227;
     "modules/user/ai/skills/jev-ultrafast/SKILL.md" = 108;
     "modules/user/ai/skills/nix-preflight-editor/SKILL.md" = 50;
     "modules/user/ai/skills/simplex-admin/SKILL.md" = 190;

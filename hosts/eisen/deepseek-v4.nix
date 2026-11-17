@@ -1,9 +1,6 @@
-# eisen — DeepSeek-V4-Flash 284B on CPU: a mock, imported by nothing because the benchmark
-# settled against it. Measured 2026-11-10: the bundled binary below never starts on this Xeon
-# (`invalid opcode`; it is an AVX-512 native build), and the source build that does start
-# (`scripts/build_zen5_llama.sh`, AVX2 path) decodes at 2.9 tok/s against Strata's 19.4.
-# `AGENTS.nix` note `deepseek-v4-flash-eisen` and docs/deepseek-v4-flash.md carry the numbers;
-# this module stays unimported, so `deepseek-v4-flash.service` does not exist on the host.
+# eisen — DeepSeek-V4-Flash 284B on CPU: an unimported mock. The benchmark and
+# the verdict live in `AGENTS.nix` note `deepseek-v4-flash-eisen` and
+# `docs/deepseek-v4-flash.md`; this file is the config they settled against.
 {
   lib,
   pkgs,

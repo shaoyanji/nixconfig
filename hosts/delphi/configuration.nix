@@ -1583,10 +1583,10 @@ in {
   # for the browser surface, while a turn resolves to the `deepseek-official`
   # route and dies with MISSING_CREDENTIAL without this key. Rendered 0400 for
   # the unit's user; never in the store, never on a command line.
-  # The key lives in the TRACKED fleet file, not `modules/secrets/apikeys.yaml`:
+  # The key lives in the TRACKED fleet file, not in the untracked `apikeys.yaml`:
   # that directory is outside the flake (delphi builds from `github:…` with no
   # submodules), so a `sopsFile` pointing there is a path that does not exist in
-  # the store. The value was copied in from apikeys.yaml.
+  # the store.
   sops.secrets."deepseek/api/key" = {
     sopsFile = ../../modules/secrets.yaml;
     key = "deepseek/api/key";

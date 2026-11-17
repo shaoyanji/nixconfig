@@ -812,9 +812,7 @@ in {
   networking.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  # ============================================================================
-  # Closure Debloat Overrides (Tier 1 safe wins: T1-2, T1-6)
-  # ============================================================================
+  # Closure debloat overrides (Tier 1 safe wins: T1-2, T1-6)
 
   # T1-6: Disable printing / HPLIP drivers (~70 MiB).
   # frieren is a NAS / media center host and does not manage physical HP printers.

@@ -40,10 +40,12 @@ git diff main... -- . | head -400     # or: git diff --staged, git diff <files>
 
 6. **Report** the deletion count, what you kept and the proof it is about something you cannot change, the encodings, and the constraints left open.
 
-## Evidence this repo has, as of 2026-10-20
+## Read the census, do not remember it
 
-- 5,220 comment lines in 236 `.nix` files, 17% of non-blank Nix.
-- 66 banner rules across 19 files.
-- 86 dated incident narratives in `.nix`/`.sh` while the record is the turn log.
+The totals are compiled: `nix eval --json .#nixComments | toon -e` gives
+`header` (prose lines), `dated`, `rules`, `pointers` and the heaviest files. The
+ceiling is `flake/nix-comments.nix`; the gate is
+[[flake/policies.nix#nix-comments-are-pointers]], so a deletion lowers the number
+in the same commit and the diff agrees with the record.
 
 Start with the diff in front of you. Do not sweep the tree in one pass.

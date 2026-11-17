@@ -123,6 +123,11 @@ jobs:
         # Python jq wrapper, which rejects that flag and reported it as "yq cannot
         # parse Taskfile.yml" — a wrong binary wearing a parse error's clothes.
         run: nix shell nixpkgs#yq-go nixpkgs#go-task -c bash scripts/task/taskfile-graph.sh
+      - name: Nix comments are pointers, and every cited recipe resolves
+        # The half of #nix-comments-are-pointers that Nix cannot answer: the
+        # ceiling is in `checks.policies`, but a `task <name>` in a comment is a
+        # pointer into `taskfiles/*.yml`, and go-task is the oracle for that set.
+        run: nix shell nixpkgs#yq-go -c bash scripts/task/nix-comments.sh
       - name: Module edges are named, not pathed
         run: bash scripts/task/modules-edges.sh
       - name: Policies hold and classify

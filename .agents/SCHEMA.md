@@ -46,7 +46,7 @@ it. This table is the place to look before touching data in place.
 | :--- | :--- | :--- | :--- |
 | TOML | `inventory.toml`, `modules.toml` | `yq -p toml -o toml -i`; keep the `.toml` extension, or pass `-p`/`-o` explicitly. `tomlkit` when comments must survive | `task checks:toml:lint` |
 | YAML | `taskfiles/*.yml`, `.github/workflows/*.yml` | `yq -p yaml -o yaml -i`; a task graph edit is verified by running it | `task checks:yaml:lint`, `checks:tasks` |
-| Nix | `*.nix`, `flake.nix` | editor plus `alejandra`; read a value with `nix eval` instead of re-parsing it | `task checks:nix:format`, `checks:nix:lint` |
+| Nix | `*.nix`, `flake.nix` | editor plus `alejandra`; read a value with `nix eval` instead of re-parsing it. A comment is a pointer (path, task, policy id, attr), never a restatement [[flake/policies.nix#nix-comments-are-pointers]] | `task checks:nix:format`, `checks:nix:lint`, `checks:nix:comments` |
 | JSON | flake outputs, API bodies, anything feeding `jq` | `jq` | none: a program consumes it |
 | JSONL | `/var/lib/fleet-sentinel/ledger.jsonl` | append-only; filter with `jq` | `fleet-sentinel` |
 | TOON | the agent boundary: an answer an agent reads, a table an agent authors (`scripts/task/selector-battery.toon`) | `toon -e` / `toon -d` only, never a hand-built string; recount `[n]` with `task dev:toon:fix` | `task checks:toon`, `checks:toon:surfaces`, `checks:selector` |

@@ -27,6 +27,12 @@
   # this file's outputs, so the chains can be named without a cycle.
   nixFilesCtl = import ../lib/nix-files.nix {inherit lib;};
   nixRegistry = import ./nix-registry.nix {inherit lib nixFilesCtl;};
+  # Every comment line in the tree, classified (lib/nix-comments.nix): the census
+  # behind `#nix-comments-are-pointers` and `checks:nix:comments`.
+  nixCommentsCtl = import ./nix-comments.nix {
+    inherit lib;
+    paths = nixFilesCtl.paths;
+  };
   moduleSets = import ./module-sets.nix {
     inherit inputs self lib inventory;
     moduleFiles = nixRegistry.modules;
@@ -66,7 +72,10 @@
   };
   # The rules the docs state, as predicates (flake/policies.nix). Compiled once
   # and asserted by `checks.policies`; docs cite an id instead of explaining it.
-  policiesCtl = import ./policies.nix {inherit lib;};
+  policiesCtl = import ./policies.nix {
+    inherit lib;
+    nixComments = nixCommentsCtl;
+  };
   # Which source may settle which claim, as data (flake/epistemics.nix). Pure:
   # no pkgs, no host eval, no filesystem — the whole table is 120 lines of
   # declared attributes, so `nix eval .#epistemics.review` is a leaf read.
@@ -243,10 +252,12 @@ in {
   # to one fact with no reader.
   agentSkills = skillsCtl.index;
 
-  # The prose budget as data: one recorded body count per page, plus the reason a
-  # long page earns its lines. `checks.policies` compares it to the tree, and the
-  # agent form is `nix eval --json .#proseBudget | toon -e`.
+  # Prose budgets as data (flake/prose-budget.nix), gated by #agent-prose-budget.
   proseBudget = import ./prose-budget.nix {inherit lib;};
+
+  # Comment census, gated by #nix-comments-are-pointers; the task pointers are
+  # resolved by `checks:nix:comments`.
+  nixComments = nixCommentsCtl;
 
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
   # Consumed by the home activation script as a store symlink.

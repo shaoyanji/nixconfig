@@ -368,6 +368,7 @@
       path = "AGENTS.nix";
       kind = n.kind or "reference";
       status = n.status or "PROPOSED";
+      claim = ((notes.claims or {}).${id} or {}).claim or null;
     })
     noteIdsForEdges;
   noteEdges = lib.concatMap (id: let

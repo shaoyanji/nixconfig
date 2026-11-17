@@ -2,17 +2,8 @@
   lib,
   epistemics ? import ./epistemics.nix {inherit lib;},
 }: let
-  tiers = {
-    asserted = 0;
-    resolved = 1;
-    extracted = 2;
-  };
-
-  tierNotes = {
-    asserted = "a person wrote it down; the relation holds because it was declared, not because a tool confirmed it";
-    resolved = "the far end was looked up in a registry and exists; the relation is a proof, the meaning is not";
-    extracted = "a token or an import path matched in the text; a candidate for a relation, never a proof of intent";
-  };
+  tiers = lib.mapAttrs (_: e: e.rank) epistemics.evidence;
+  tierNotes = lib.mapAttrs (_: e: e.what) epistemics.evidence;
 
   entities = {
     doc = {
@@ -47,8 +38,8 @@
       what = "a decision, proposal, experiment, open item, handoff or reference in AGENTS.nix";
       identity = "the attrset key under notes, which the id grammar already constrains";
       member = "AGENTS.nix through lib/agents-notes.nix";
-      fields = ["label" "path" "kind" "status"];
-      claims = ["decision" "upstream-declaration"];
+      fields = ["label" "path" "kind" "status" "claim"];
+      claims = lib.unique (builtins.attrValues epistemics.noteClaims);
     };
     policy = {
       what = "a rule a machine can check, declared in flake/policies.nix";
@@ -197,6 +188,18 @@
         if rel == null
         then null
         else rel.tier;
+      producedBy =
+        if rel == null
+        then null
+        else epistemics.evidence.${rel.tier}.producedBy;
+      canSettle =
+        if rel == null
+        then []
+        else epistemics.canCarry rel.tier;
+      promote =
+        if rel == null
+        then null
+        else epistemics.evidence.${rel.tier}.promote;
       inherit ok why;
     };
   in
@@ -244,6 +247,7 @@
   ];
 in {
   inherit entities relations tiers tierNotes sinks sinkIds entityIds relationIds homes stableKinds unhomed straySinks samples idType admit touches weak;
+  inherit (epistemics) evidence;
   all = map admit samples;
   count = {
     entities = builtins.length entityIds;

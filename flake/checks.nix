@@ -349,6 +349,41 @@ lib.genAttrs systems.work (
           lib.optional (kelly.ev == null || kellyEv >= 0.0) "the measured 0.7% shelf hit rate must produce a NEGATIVE Kelly ev; got ${lib.strings.floatToString kellyEv}"
           ++ lib.optional (kellyGood.ev == null || kellyGoodEv <= 0.0) "the 50% software-behaviour rate must produce a POSITIVE Kelly ev; got ${lib.strings.floatToString kellyGoodEv}";
         persistIssues = map (k: "${k}.persist is empty — an answer with nowhere to live is researched forever") epistemicsCtl.persistable;
+        evIssues =
+          lib.concatMap (
+            t: let
+              e = epistemicsCtl.evidence.${t};
+            in
+              lib.optional (!(e ? rank) || !(builtins.isInt e.rank) || e.rank < 0) "evidence.${t}.rank must be a non-negative integer"
+              ++ lib.optional (e.what or "" == "") "evidence.${t}.what is empty"
+              ++ lib.optional (e.cannot or "" == "") "evidence.${t}.cannot is empty — say what the tier does not prove"
+              ++ lib.optional (e.promote or "" == "") "evidence.${t}.promote is empty — say what would raise it"
+              ++ lib.optional (!(builtins.elem (e.producedBy or "") ["person" "compiler" "machine"])) "evidence.${t}.producedBy must be person/compiler/machine"
+          )
+          epistemicsCtl.evidenceIds
+          ++ map (t: "evidence.${t} is not in evidenceIds — the ladder has no order") (
+            lib.subtractLists epistemicsCtl.evidenceIds (builtins.attrNames epistemicsCtl.evidence)
+          )
+          ++ map (t: "evidenceIds names '${t}', which is not a declared tier") (
+            lib.subtractLists (builtins.attrNames epistemicsCtl.evidence) epistemicsCtl.evidenceIds
+          )
+          ++ (
+            let
+              ranks = map (t: epistemicsCtl.evidence.${t}.rank) epistemicsCtl.evidenceIds;
+            in
+              lib.optional (builtins.length (lib.unique ranks) != builtins.length ranks) "two evidence tiers share a rank — a ladder with a rung missing"
+          );
+        floorIssues = map (k: "kinds.${k}.evidenceFloor '${toString epistemicsCtl.kinds.${k}.evidenceFloor}' is not a declared evidence tier") (
+          builtins.filter (k: !(builtins.hasAttr epistemicsCtl.kinds.${k}.evidenceFloor epistemicsCtl.evidence)) knownKinds
+        );
+        noteClaimIssues = map (k: "noteClaims maps a note kind to '${k}', which flake/epistemics.nix does not declare") (
+          lib.subtractLists knownKinds (lib.unique (builtins.attrValues epistemicsCtl.noteClaims))
+        );
+        carryIssues =
+          lib.optional (epistemicsCtl.carries "decision" "extracted") "an extracted match must not carry a decision"
+          ++ lib.optional (!(epistemicsCtl.carries "decision" "asserted")) "an authored decision must be allowed — the ladder is inverted"
+          ++ lib.optional (epistemicsCtl.carries "fleet-fact" "extracted") "a token match must not carry a compiled fleet fact"
+          ++ lib.optional (!(epistemicsCtl.carries "fleet-fact" "resolved")) "a resolved lookup must carry a fleet fact";
         issues =
           badSettles
           ++ map (n: "${n}.standing is not authored/snapshot/unvetted") badStanding
@@ -357,13 +392,17 @@ lib.genAttrs systems.work (
           ++ routeIssues
           ++ spendIssues
           ++ kellyIssues
-          ++ persistIssues;
+          ++ persistIssues
+          ++ evIssues
+          ++ floorIssues
+          ++ noteClaimIssues
+          ++ carryIssues;
       in
         if issues != []
         then builtins.throw "epistemics table is inconsistent (flake/epistemics.nix):\n  ${lib.concatStringsSep "\n  " issues}"
         else
           pkgs.runCommand "epistemics" {} ''
-            echo "epistemics: ${toString (builtins.length declaredSources)} sources x ${toString (builtins.length knownKinds)} claim kinds, every kind settled and persistable, every route labelled, Kelly sign correct"
+            echo "epistemics: ${toString (builtins.length declaredSources)} sources x ${toString (builtins.length knownKinds)} claim kinds, every kind settled and persistable, every route labelled, the evidence ladder ordered, Kelly sign correct"
             touch $out
           '';
 
@@ -388,6 +427,29 @@ lib.genAttrs systems.work (
         g.nodes;
         badEdges = builtins.filter (e: !(ontologyCtl.admit e).ok) g.edges;
         edgeIssues = map (e: "edge ${e.from} -${e.type}-> ${e.to}: ${(ontologyCtl.admit e).why}") badEdges;
+        noteNodes = builtins.filter (n: n.type == "note") g.nodes;
+        noteClaimIssues =
+          map (n: "note ${n.id} carries no claim kind — every note is a claim (flake/epistemics.nix noteClaims)") (
+            builtins.filter (n: (n.claim or null) == null) noteNodes
+          )
+          ++ map (n: "note ${n.id} carries claim '${n.claim}', which flake/epistemics.nix does not declare") (
+            builtins.filter (
+              n: let
+                c = n.claim or null;
+              in
+                c != null && !(builtins.elem c epistemicsCtl.kindIds)
+            )
+            noteNodes
+          )
+          ++ map (n: "note ${n.id} is classified '${n.claim}' and a note is an assertion — that tier cannot carry the kind") (
+            builtins.filter (
+              n: let
+                c = n.claim or null;
+              in
+                c != null && builtins.elem c epistemicsCtl.kindIds && !(epistemicsCtl.carries c "asserted")
+            )
+            noteNodes
+          );
         claimIssues = lib.concatMap (t:
           map (k: "${t}.claims names claim kind '${k}' that flake/epistemics.nix does not declare")
           (builtins.filter (k: !(builtins.elem k epistemicsCtl.kindIds)) ontologyCtl.entities.${t}.claims))
@@ -420,7 +482,7 @@ lib.genAttrs systems.work (
             ++ lib.optional (x.cannot == "") "${r}.cannot is empty — say what the edge does not prove"
             ++ lib.optional (x.from == [] || x.to == []) "${r} declares no domain or range")
           declaredRelations;
-        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ claimIssues ++ kindIssues ++ tierIssues ++ sparseIssues;
+        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ kindIssues ++ tierIssues ++ sparseIssues;
         nodeCount = builtins.length g.nodes;
         edgeCount = builtins.length g.edges;
         entityCount = builtins.length declaredEntities;
@@ -430,7 +492,7 @@ lib.genAttrs systems.work (
         then builtins.throw "the graph is not an instance of its ontology (flake/ontology.nix):\n  ${lib.concatStringsSep "\n  " issues}"
         else
           pkgs.runCommand "ontology" {} ''
-            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges, every edge admitted, every field declared, every stable claim kind homed"
+            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges, every edge admitted, every field declared, every stable claim kind homed, every note classified"
             touch $out
           '';
 

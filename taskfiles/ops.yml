@@ -118,7 +118,7 @@ tasks:
           | toon -e --stats
 
   ops:claim:check:
-    desc: Whether a claim is worth reading for, per source (KIND=; TEXT=, BUDGET=)
+    desc: Whether a claim is worth reading for, per source (KIND=; TEXT=, BUDGET=, EVIDENCE=)
     summary: >
       The compiled go/no-go: `nix eval .#epistemics.table` (flake/epistemics.nix)
       says which source may SETTLE a claim kind, which cannot, and what to do
@@ -126,13 +126,18 @@ tasks:
       `.#epistemics.kindIds`; BUDGET (default 400) only filters `order`, so a
       price refusal is not an authority refusal. `never` carries the reason, since
       "no" without one is a score with manners. Exit 2 on an unknown kind, listing
-      the valid ones. Emits TOON; FORMAT=json for a program. A permitted source
-      that returns nothing does not falsify the claim — permission is not coverage.
+      the valid ones. EVIDENCE=asserted|resolved|extracted checks whether the
+      evidence you already hold can carry that kind (a decision needs a person, a
+      fleet fact needs a lookup, a token match carries neither); `evidence.promote`
+      names what would raise it, and a refusal exits 3. Emits TOON;
+      FORMAT=json for a program. A permitted source that returns nothing does not
+      falsify the claim — permission is not coverage.
     requires:
       vars: [KIND]
     vars:
       BUDGET: '{{.BUDGET | default 400}}'
       FORMAT: '{{.FORMAT | default "toon"}}'
+      EVIDENCE: '{{.EVIDENCE | default ""}}'
       # Optional vars take the rename trick (as Q_KIND below): an undeclared
       # `{{.TEXT}}` renders as a literal and the claim comes back as "<no value>".
       CLAIM_TEXT: '{{.TEXT | default ""}}'
@@ -146,21 +151,44 @@ tasks:
             | { if [ "{{.FORMAT}}" = json ]; then cat; else toon -e; fi; } >&2
           exit 2
         fi
-        printf '%s' "$table" | jq -c --arg k "{{.KIND}}" --arg t "{{.CLAIM_TEXT}}" \
-          --argjson b "{{.BUDGET}}" '
-            .[$k]
-            | (.order | map(select(.cost <= $b))) as $aff
-            | (.order | map(select(.cost > $b))) as $over
+        # The ladder is read only when a tier was supplied: `evidence.rank` is
+        # weakness order, so a tier carries a kind when its rank is at or below
+        # the kind's floor. Existence of the tier is checked by the same jq.
+        ev='{}'
+        if [ -n "{{.EVIDENCE}}" ]; then
+          ev="$(nix eval --json .#epistemics.evidence)"
+        fi
+        out="$(printf '%s' "$table" | jq -c --arg k "{{.KIND}}" --arg t "{{.CLAIM_TEXT}}" \
+          --arg tier "{{.EVIDENCE}}" --argjson ev "$ev" --argjson b "{{.BUDGET}}" '
+            .[$k] as $row
+            | ($row.order | map(select(.cost <= $b))) as $aff
+            | ($row.order | map(select(.cost > $b))) as $over
+            | (if $tier == "" then null
+               else ($ev[$tier] // null) as $e
+                 | if $e == null
+                   then {tier: $tier, ok: false, floor: $row.floor,
+                         why: ("no such evidence tier; declared: " + ($ev | keys | join(", ")))}
+                   else {tier: $tier, ok: ($e.rank <= $row.evidenceRank),
+                         floor: $row.floor, promote: $e.promote}
+                   end
+               end) as $evidence
             | {claim: {text: $t, kind: $k},
                read: (if ($aff|length) > 0 then $aff[0].name else null end),
                price: (if ($aff|length) > 0 then $aff[0].cost else null end),
-               next: (if ($aff|length) > 0 then .next
+               next: (if ($aff|length) > 0 then $row.next
                       else "nothing permitted fits BUDGET=\($b); \($over[0].name) would serve it for \($over[0].cost)" end),
-               persist: .persist,
+               persist: $row.persist,
+               evidence: $evidence,
                order: $aff,
                over_budget: $over,
-               never: .never}' \
-          | { if [ "{{.FORMAT}}" = json ]; then cat; else toon -e; fi; }
+               never: $row.never}')"
+        printf '%s' "$out" | { if [ "{{.FORMAT}}" = json ]; then cat; else toon -e; fi; }
+        if [ -n "{{.EVIDENCE}}" ] && ! printf '%s' "$out" | jq -e '.evidence.ok' >/dev/null; then
+          printf 'epistemics: %s evidence cannot carry a %s claim; %s\n' \
+            "{{.EVIDENCE}}" "{{.KIND}}" \
+            "$(printf '%s' "$out" | jq -r '.evidence.promote // .evidence.why')" >&2
+          exit 3
+        fi
 
   ops:wiki:ask:
     desc: Ask the local ZIM archives a question (Q=; gated fan-out, budgeted)

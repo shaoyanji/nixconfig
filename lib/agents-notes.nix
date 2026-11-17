@@ -3,6 +3,7 @@
   lib,
   inventory ? null,
   notes ? import ../AGENTS.nix,
+  claimOf ? {},
 }: let
   root = ../.;
   raw = notes.notes or {};
@@ -63,6 +64,7 @@
   summaryOf = n: n.summary or "";
 
   noteIds = builtins.attrNames raw;
+  claimKindOf = n: claimOf.${n.kind or ""} or null;
 
   # --- validation ------------------------------------------------------------
   # Each note contributes zero or more issues. The gate
@@ -82,6 +84,8 @@
         p != null && !(builtins.elem p priorities)
     ) "${id}: priority must be one of ${lib.concatStringsSep ", " priorities} or null"
     ++ lib.optional (summaryOf n == "") "${id}: missing summary"
+    ++ lib.optional (claimOf != {} && claimKindOf n == null)
+    "${id}: kind '${n.kind or ""}' has no claim kind in flake/epistemics.nix noteClaims"
     ++ lib.optional (builtins.stringLength (summaryOf n) > 400)
     "${id}: summary is longer than 400 chars (move detail to body)"
     ++ map (h: "${id}: refs.hosts names unknown host '${h}'") (unknownHosts n)
@@ -165,6 +169,8 @@
     inherit id;
     title = n.title or id;
     kind = n.kind or "reference";
+    claim = claimKindOf n;
+    evidence = "asserted";
     status = n.status or "PROPOSED";
     priority = n.priority or null;
     date = n.date or null;
@@ -217,6 +223,7 @@
 
   counts = {
     total = builtins.length entryList;
+    byClaim = lib.genAttrs (lib.unique (builtins.attrValues claimOf)) (k: builtins.length (builtins.filter (e: e.claim == k) entryList));
     byStatus = lib.genAttrs statuses (s: builtins.length (byStatus s));
     byKind = lib.genAttrs kinds (k: builtins.length (byKind k));
     open = builtins.length (builtins.filter (e: builtins.elem e.status openStatuses) entryList);
@@ -253,6 +260,7 @@
   notePageWith = linkify: relatedLink: e:
     "# ${e.title}\n\n"
     + "**Status:** ${statusBadge e} · **Kind:** `${e.kind}`"
+    + lib.optionalString (e.claim != null) " · **Claim:** `${e.claim}` (${e.evidence})"
     + lib.optionalString (e.date != null) " · **Updated:** ${e.date}"
     + "\n\n${e.summary}\n\n"
     + lib.concatStringsSep "\n" (
@@ -325,6 +333,7 @@
     byTask = indexOf "tasks";
     byDoc = indexOf "docs";
     byStatus = byStatusIds;
+    claims = lib.mapAttrs (_: e: {inherit (e) claim evidence;}) entries;
     # One record per note, both directions, all derived. This is what
     # `task ops:notes:lineage` reads — no traversal at query time.
     lineage =
@@ -342,7 +351,7 @@
   };
 in {
   inherit api;
-  inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
+  inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus claims lineage origins frontier open;
   inherit pages sitePages;
   # `api` is the typed document; `artifacts.agents-notes` serializes it.
 }

@@ -168,66 +168,90 @@
   kinds = {
     "software-behaviour" = {
       volatility = "stable";
+      evidenceFloor = "resolved";
       what = "how a program behaves, its flags and formats";
       persist = "a vault claim citing the passage, or a skill line if it changes what an agent does";
     };
     "config-syntax" = {
       volatility = "stable";
+      evidenceFloor = "resolved";
       what = "the shape of a config file or directive";
       persist = "a vault claim citing the passage — the syntax is the claim";
     };
     "definition" = {
       volatility = "stable";
+      evidenceFloor = "asserted";
       what = "what a term means";
       persist = "a vault claim, so the next question is a lookup";
     };
     "historical-fact" = {
       volatility = "stable";
+      evidenceFloor = "resolved";
       what = "what happened, and when";
       persist = "a vault claim with the date and the source";
     };
     "current-release" = {
       volatility = "moving";
+      evidenceFloor = "resolved";
       what = "the version, default or state of something today";
       persist = "nothing durable — record the date and version in the answer, not the corpus";
     };
     "personal-method" = {
       volatility = "stable";
+      evidenceFloor = "asserted";
       what = "how I work, and why";
       persist = "a new `## Claim` in the vault, with its status";
     };
     "decision" = {
       volatility = "stable";
+      evidenceFloor = "asserted";
       what = "what this fleet chose to do";
       persist = "an AGENTS.nix note (kind=decision) plus the doc the decision governs";
     };
     "project-fact" = {
       volatility = "stable";
+      evidenceFloor = "asserted";
       what = "a fact about my own projects";
       persist = "a `## Claim` in the vault";
     };
     "procedure" = {
       volatility = "stable";
+      evidenceFloor = "asserted";
       what = "the steps to accomplish something here";
       persist = "docs/, a skill body, or a playbook row — a procedure an agent cannot follow is a paragraph";
     };
     "fleet-fact" = {
       volatility = "stable";
+      evidenceFloor = "resolved";
       what = "a compiled fact about these hosts";
       persist = "the compiled source (inventory.toml or the module), never a prose copy";
     };
     "model-label" = {
       volatility = "moving";
+      evidenceFloor = "extracted";
       what = "which playbook a request belongs to, as a probability";
       persist = "the turn log, with the label and its margin — never a fact";
     };
     "upstream-declaration" = {
       volatility = "moving";
+      evidenceFloor = "resolved";
       what = "what a third-party project declares or omits — a substituter, a default, a pin — and what our host therefore inherits by using it. An ABSENCE is the claim that needs the most care: one file answering 'no' is not evidence, because the declaration is usually in a module the flake does not mention";
       persist = "an AGENTS.nix note only when it changes what this fleet does; cite the rev, because the project's own file is the record and it moves";
     };
   };
   kindIds = ["software-behaviour" "config-syntax" "definition" "historical-fact" "current-release" "personal-method" "decision" "project-fact" "procedure" "fleet-fact" "upstream-declaration" "model-label"];
+
+  rankOf = tier:
+    if builtins.hasAttr tier evidence
+    then evidence.${tier}.rank
+    else 99;
+
+  carries = kind: tier:
+    builtins.hasAttr kind kinds
+    && builtins.hasAttr tier evidence
+    && rankOf tier <= rankOf kinds.${kind}.evidenceFloor;
+
+  canCarry = tier: builtins.filter (k: carries k tier) kindIds;
 
   standingTier = {
     authored = 0;
@@ -241,6 +265,40 @@
     upstream = 1;
     quota = 2;
     paid = 3;
+  };
+
+  evidence = {
+    asserted = {
+      rank = 0;
+      producedBy = "person";
+      what = "a person wrote it down; it holds because it was declared, not because a tool confirmed it";
+      cannot = "that the world agrees: an assertion is accountable, not verified — read the artifact it predicts";
+      promote = "the artifact it names exists and is referenced from the compiled source: a task, a module, a gate";
+    };
+    resolved = {
+      rank = 1;
+      producedBy = "compiler";
+      what = "the far end was looked up in a registry and exists; the link is proven, the meaning is not";
+      cannot = "intent or agreement: a resolved id proves the target exists, never that the sentence about it is true";
+      promote = "a person adopts the resolved target in a declaration — asserted is stronger for intent, resolved for existence, and neither is both";
+    };
+    extracted = {
+      rank = 2;
+      producedBy = "machine";
+      what = "a token or an import path matched the text; a candidate for a relation, never a proof";
+      cannot = "a relation: the same word can name two things, and an import can sit on a branch no host enables";
+      promote = "resolve the match — parse the frontmatter, look the id up in its registry, or read the file — and it becomes the resolved tier";
+    };
+  };
+  evidenceIds = ["asserted" "resolved" "extracted"];
+
+  noteClaims = {
+    decision = "decision";
+    proposal = "decision";
+    open = "project-fact";
+    experiment = "project-fact";
+    handoff = "procedure";
+    reference = "definition";
   };
 
   # --- measured settling rates ----------------------------------------------
@@ -297,7 +355,7 @@
     base = {
       inherit name;
       inherit (route) cost offline metered fanout how;
-      ev = ev;
+      inherit ev;
     };
   in
     if !(builtins.elem kind src.settles)
@@ -354,6 +412,8 @@
     # Where the answer goes once it is known — the step that makes the next
     # lookup an offline one.
     inherit (kinds.${kind}) persist;
+    floor = kinds.${kind}.evidenceFloor;
+    evidenceRank = rankOf kinds.${kind}.evidenceFloor;
     order = map strip permitted;
     never = map strip (builtins.filter (v: !v.go) verdicts);
   };
@@ -364,7 +424,33 @@
     })
     kindIds);
 
-  review = claim: (table.${claim.kind} or (throw "epistemics: unknown claim kind '${claim.kind}', known: ${lib.concatStringsSep ", " kindIds}")) // {inherit (claim) text;};
+  review = claim: let
+    t =
+      table.${claim.kind}
+      or (throw "epistemics: unknown claim kind '${claim.kind}', known: ${lib.concatStringsSep ", " kindIds}");
+  in
+    t
+    // {inherit (claim) text;}
+    // (
+      if !(claim ? evidence)
+      then {}
+      else if !(builtins.hasAttr claim.evidence evidence)
+      then {
+        evidence = {
+          inherit (claim) evidence;
+          ok = false;
+          why = "unknown evidence tier; declared: ${lib.concatStringsSep ", " evidenceIds}";
+        };
+      }
+      else {
+        evidence = {
+          inherit (claim) evidence;
+          inherit (kinds.${claim.kind}) evidenceFloor;
+          ok = carries claim.kind claim.evidence;
+          promote = evidence.${claim.evidence}.promote;
+        };
+      }
+    );
 
   samples = [
     {
@@ -394,6 +480,7 @@
   ];
 in {
   inherit sources kinds judge table review samples sourceIds kindIds asOf spend;
+  inherit evidence evidenceIds noteClaims carries canCarry;
   inherit overrides;
   # The precedence as a function, so the gate applies it rather than re-deriving
   # "is this overridden" in a second place.

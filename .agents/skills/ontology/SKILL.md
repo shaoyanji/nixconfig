@@ -13,10 +13,11 @@ metadata:
 
 # ontology — what may exist in the graph, and what an edge proves
 
-`flake/ontology.nix` is the schema `.#knowledgeGraph` is an instance of: eight
-entity types and eight relations. It answers what `flake/epistemics.nix` cannot.
+`flake/ontology.nix` is the schema `.#knowledgeGraph` is an instance of: nine
+entity types and nine relations. It answers what `flake/epistemics.nix` cannot.
 Epistemics says which **source** may settle a claim; ontology says which
 **thing** a claim can be filed on, and how strong an edge between two things is.
+The two meet at the evidence ladder, which epistemics owns.
 
 Truth: `flake/ontology.nix`, read as `.#ontology`, proven against the graph by
 `checks:ontology`.
@@ -48,6 +49,14 @@ is**. The evidence tier is the part that keeps an answer honest:
 | `resolved` | the target was looked up and exists | `references`, `cites` |
 | `extracted` | a token or import path matched the text | `mentions`, `imports` |
 
+The ladder itself is declared in `flake/epistemics.nix` (`.#epistemics.evidence`)
+and `.#ontology.tiers` is a projection of it, so the graph's tier and the claim
+kinds a tier may carry cannot drift. `carries` is the join: a decision needs a
+person, a fleet fact needs a lookup, and an extracted match carries neither.
+Every `note` node carries the claim kind its authored `kind` maps to
+(`.#epistemics.noteClaims`), with `asserted` evidence because a note is one
+person's record — `DELIVERED` is a status, not a proof.
+
 `mentions` and `imports` are candidates. A page can name a host without depending
 on it, and an import can sit on a branch no host enables. Treat a tier-2 edge as
 "look here", never as "this is why".
@@ -67,6 +76,7 @@ nix eval --json .#ontology.entities | toon -e     # declared types, identity, fi
 nix eval --json .#ontology.relations | toon -e    # domain, range, evidence, tier
 nix eval --json .#ontology.all | toon -e          # three sample edges; the third is refused
 nix eval --json .#ontology.unhomed | toon -e      # stable kinds with nowhere to land
+nix eval --json .#epistemics.evidence | toon -e   # the ladder every edge tier projects
 ```
 
 1. **Read the declaration before the code.** `.#ontology` is the contract; the
@@ -96,7 +106,9 @@ task check:leaf NAME=checks:ontology
 - a node carries a field its entity type does not declare, or a relation's
   endpoint is outside its domain and range;
 - an entity or relation has empty `identity`, `member`, `evidence` or `cannot`;
-- a stable claim kind has no home, or a `sinks` key names no kind.
+- a stable claim kind has no home, or a `sinks` key names no kind;
+- a note carries no claim kind, an undeclared one, or one an assertion cannot
+  support (a note kind mapped above the `asserted` tier fails here).
 
 It does **not** prove that an edge is true. `references` proves a link resolves,
 not that the linked page is right; `cites` proves a policy id exists, not that

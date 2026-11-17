@@ -1276,7 +1276,7 @@ slot_share() { # left slots_left
 # and the user timer table, and spends nothing.
 cmd_today() {
   need jq
-  local day left limit roster pending units total n next_at reserve cap
+  local day left limit roster pending units total n next_at wrapper reserve cap
   roster=${ROSTER:-$repo/lib/image-daily/plates.txt}
   day=$(today)
   left=$(remaining)
@@ -1311,8 +1311,11 @@ cmd_today() {
       printf '  next slot   %s slot(s) registered, none scheduled\n' "$total"
     else
       next_at=$(systemctl --user show -p NextElapseUSecRealtime --value "image-daily-slot-$n.timer" 2>/dev/null || true)
-      reserve=$(systemctl --user show -p ExecStart --value "image-daily-slot-$n.service" 2>/dev/null |
-        grep -o 'export RESERVE=[0-9][0-9]*' | cut -d= -f2 || true)
+      # The reserve is baked into the wrapper, not the unit: ExecStart names the
+      # store path, and the `export RESERVE=` line lives inside that file.
+      wrapper=$(systemctl --user show -p ExecStart --value "image-daily-slot-$n.service" 2>/dev/null |
+        grep -o '/nix/store/[^ "]*image-daily-slot-[0-9][0-9]*' | head -1 || true)
+      reserve=$(grep -o 'export RESERVE=[0-9][0-9]*' "$wrapper" 2>/dev/null | head -1 | cut -d= -f2 || true)
       cap=$(slot_share "$left" "$((total - n + 1))")
       printf '  next slot   %s of %s at %s -> cap %s' "$n" "$total" "${next_at:-unknown}" "$cap"
       if [ -n "$reserve" ] && [ "$reserve" -gt 0 ]; then printf ', %s held back' "$reserve"; fi

@@ -120,18 +120,14 @@ tasks:
   ops:claim:check:
     desc: Whether a claim is worth reading for, per source (KIND=; TEXT=, BUDGET=, EVIDENCE=)
     summary: >
-      The compiled go/no-go: `nix eval .#epistemics.table` (flake/epistemics.nix)
-      says which source may SETTLE a claim kind, which cannot, and what to do
-      instead — one leaf read, no search, no model. KIND is one of
-      `.#epistemics.kindIds`; BUDGET (default 400) only filters `order`, so a
-      price refusal is not an authority refusal. `never` carries the reason, since
-      "no" without one is a score with manners. Exit 2 on an unknown kind, listing
-      the valid ones. EVIDENCE=asserted|resolved|extracted checks whether the
-      evidence you already hold can carry that kind (a decision needs a person, a
-      fleet fact needs a lookup, a token match carries neither); `evidence.promote`
-      names what would raise it, and a refusal exits 3. Emits TOON;
-      FORMAT=json for a program. A permitted source that returns nothing does not
-      falsify the claim — permission is not coverage.
+      The compiled go/no-go from `.#epistemics.table`: which source may SETTLE a
+      claim kind, which cannot, what to do instead. KIND is one of
+      `.#epistemics.kindIds`. BUDGET (400) filters `order` only — a price refusal
+      is not an authority refusal; `never` says why. Exit 2 on an unknown kind.
+      EVIDENCE=asserted|resolved|extracted asks whether your evidence can carry
+      the kind (a decision needs a person, a fleet fact a lookup); a refusal exits
+      3 with `evidence.promote`. Emits TOON; FORMAT=json. Permission is not
+      coverage: a permitted source that returns nothing does not falsify the claim.
     requires:
       vars: [KIND]
     vars:

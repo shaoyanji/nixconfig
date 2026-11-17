@@ -161,6 +161,7 @@
     ".agents/README.md"
     "docs/agent-contract.md"
     "docs/ci-pipeline.md"
+    "docs/issue-classes.md"
     "docs/nix-patterns.md"
     "docs/sops-rekey.md"
     "docs/storage-taxonomy.md"
@@ -928,8 +929,12 @@
       # tree, and a host's `github:` ref cannot even take the parameter
       # ("contains unknown parameter 'submodules'"). Measured 2026-11-02: frieren
       # rebuilt 34 derivations on a commit CI had already built.
+      # The quoted attribute is what carries the tree choice; the flags in front
+      # of it are not part of the rule. Matching the whole command turned a
+      # `--option trusted-public-keys "$keys"` prefix into a policy violation
+      # (2026-11-17) while the build still used the bare tree.
       holds =
-        has ".github/workflows/nixcachix.yml" "nix build -L \".#\${attr}\""
+        has ".github/workflows/nixcachix.yml" "\".#\${attr}\""
         && has ".github/workflows/nixcachix.yml" "?submodules=1#hostChecks."
         && has ".github/workflows/nixcachix.yml" "pipe-operators";
       detail = "the workflow stopped building host closures from the host's tree (.#attr), lost the submodule hostChecks gate, or dropped pipe-operators";
@@ -1205,6 +1210,46 @@
       holds = has "modules/global/global.nix" "\"pipe-operators\"";
       detail = "modules/global/global.nix dropped pipe-operators";
     };
+
+    # --- error classification (docs/issue-classes.md) -----------------------
+    # The trust class is the one that cost the most: a substituter was listed and
+    # the key that proves its signatures was not, so CI fetched 2722 paths, threw
+    # them away as unsigned and rebuilt glibc, gcc and the agent stack until the
+    # runner was killed. The rule is about the pairing, not about one cache.
+    ci-substituter-keys = {
+      rule = "A substituter CI lists is a substituter CI trusts: every `substituters =` line in the workflow has a matching `trusted-public-keys =` line, the numtide signature is among those keys, and the build command repeats the same set because cachix-action rewrites nix.conf after the install step.";
+      proof = ".github/workflows/nixcachix.yml";
+      holds = let
+        lines = lib.splitString "\n" (read ".github/workflows/nixcachix.yml");
+        count = needle: builtins.length (builtins.filter (l: lib.hasInfix needle l) lines);
+      in
+        count "substituters ="
+        == count "trusted-public-keys ="
+        && count "trusted-public-keys =" >= 1
+        && has ".github/workflows/nixcachix.yml" "niks3.numtide.com-1:"
+        && has ".github/workflows/nixcachix.yml" "--option trusted-public-keys";
+      detail = "a substituter is listed without its key again: nix will fetch the path, reject it as unsigned, and rebuild it from source on the runner";
+    };
+
+    issue-classes-have-one-home = {
+      rule = "Every failure is classified before it is fixed, and the class comes from `docs/issue-classes.md`: the ledger reads the vocabulary from that page rather than keeping a second list, and the agent a CI failure is handed to is told the four classes.";
+      proof = "docs/issue-classes.md · scripts/task/issue-ledger.sh · scripts/task/ci-fix-dispatch.sh";
+      holds =
+        has "scripts/task/issue-ledger.sh" "docs/issue-classes.md"
+        && has "scripts/task/ci-fix-dispatch.sh" "docs/issue-classes.md"
+        && lib.all (c: has "docs/issue-classes.md" "| `${c}` |") ["trust" "lint" "assert" "capacity"];
+      detail = "a class list was copied into a script, or the page a dispatched agent is pointed at stopped naming the classes";
+    };
+
+    issue-ledger-accompanies-turns = {
+      rule = "A turn that closed an issue leaves its classification behind: `xs-turn-post.sh` writes the same subject, source and outcome into the issue ledger with the class, so the record and the coordination log cannot disagree.";
+      proof = "scripts/task/xs-turn-post.sh · scripts/task/issue-ledger.sh · taskfiles/agents.yml";
+      holds =
+        has "scripts/task/xs-turn-post.sh" "issue-ledger.sh"
+        && has "scripts/task/issue-ledger.sh" "issue-ledger.jsonl"
+        && has "taskfiles/agents.yml" "agents:ledger:check";
+      detail = "a turn can land with no classified line beside it, so the ledger counts turns that were never diagnosed";
+    };
   };
 
   ids = builtins.attrNames policies;
@@ -1217,6 +1262,49 @@ in {
     ids
     citedIds
     ;
+
+  # --- the four classes, and the policies that hold each one --------------
+  # `checks.policies` prints this table, so "which gate proves a trust failure"
+  # is an output rather than a recollection. A class with no gate fails the
+  # build: that is the prose-only case `correct` calls the last resort.
+  # One binding, not four: a plain attrset is not recursive, so a sibling cannot
+  # refer to another (`undefined variable` at eval), and `policyIds` is derived
+  # here from `policies` rather than borrowed from the set this lives in.
+  errorClasses = let
+    gates = {
+      "trust" = ["ci-substituter-keys"];
+      "lint" = ["ci-doc-budget" "ci-task-graph"];
+      # Quoted because `assert` is a Nix keyword: the class name belongs to
+      # docs/issue-classes.md, so the parser is the thing that gets worked around.
+      "assert" = ["boot-gate-needs-kvm" "flake-check-memory-gated"];
+      "capacity" = ["no-fleet-default"];
+    };
+    policyIds = builtins.attrNames policies;
+    lineMatch = l: builtins.match "\\| `([a-z]+)` \\|.*" l;
+    declared = map builtins.head (
+      builtins.filter (m: m != null) (map lineMatch (lib.splitString "\n" (read "docs/issue-classes.md")))
+    );
+    required = ["trust" "lint" "assert" "capacity"];
+  in {
+    inherit gates declared;
+    problems =
+      lib.optional (declared != required)
+      "docs/issue-classes.md declares [${lib.concatStringsSep ", " declared}]; the table here gates [trust, lint, assert, capacity]"
+      ++ map
+      (c: "gates.${c} is not a class docs/issue-classes.md declares")
+      (builtins.filter (c: !(builtins.elem c declared)) (builtins.attrNames gates))
+      ++ lib.concatMap
+      (c:
+        map (id: "gates.${c} names ${id}, which is not a policy id")
+        (builtins.filter (id: !(builtins.elem id policyIds)) gates.${c}))
+      (builtins.attrNames gates)
+      ++ map (c: "class ${c} has no gate — a class with no policy is prose")
+      (builtins.filter (c: gates.${c} == []) required);
+    report =
+      map
+      (c: "class ${c}: ${toString (builtins.length gates.${c})} gate(s) — ${lib.concatStringsSep ", " gates.${c}}")
+      (builtins.attrNames gates);
+  };
 
   # Both directions. A citation to an id that does not exist is a broken link
   # (Obsidian shows it greyed out); an id nobody cites is an invisible gate.

@@ -148,6 +148,7 @@ lib.genAttrs systems.work (
         policyOverturned;
       dangling = map (c: "${c.doc} -> ${c.id}") policiesCtl.danglingCitations;
       unenforced = policiesCtl.unenforcedHardRules;
+      classIssues = policiesCtl.errorClasses.problems;
     in {
       # flake/nix-registry.nix: one name per file, and no module name claimed
       # twice — `listToAttrs` silently keeps the last of a collision (stripping
@@ -219,10 +220,16 @@ lib.genAttrs systems.work (
         then builtins.throw "a policy is enforced but no document cites it (invisible gate):\n  ${lib.concatStringsSep "\n  " policiesCtl.uncitedPolicies}"
         else if unenforced != []
         then builtins.throw "HARD RULE without a [[flake/policies.nix#id]] citation — state the rule in the registry and cite it, or delete it:\n  ${lib.concatStringsSep "\n  " unenforced}"
+        # The classification table is the policy layer's error output: a class
+        # the page declares but no policy holds is a class that will be patched
+        # ad hoc next time.
+        else if classIssues != []
+        then builtins.throw "the error-classification table and docs/issue-classes.md disagree:\n  ${lib.concatStringsSep "\n  " classIssues}"
         else
           pkgs.runCommand "policies" {}
           (''
               echo "${toString (builtins.length policiesCtl.ids)} policies hold; every citation resolves; every id is cited"
+              printf '%s\n' ${lib.escapeShellArg (lib.concatStringsSep "\n" policiesCtl.errorClasses.report)}
             ''
             + lib.optionalString (policyOverturned != []) ''
               printf '%s\n' ${lib.escapeShellArg overturnReport}

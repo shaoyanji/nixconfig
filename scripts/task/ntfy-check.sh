@@ -11,6 +11,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
+. "$repo_root/scripts/task/lib/paths.sh"
 
 url="${NTFY_CHECK_URL:-http://127.0.0.1:8096}"
 topic="${NTFY_CHECK_TOPIC:-fleet}"
@@ -20,9 +21,9 @@ if ! command -v sops >/dev/null 2>&1; then
   echo "ntfy-check: sops is not on PATH; run this from the dev shell" >&2
   exit 3
 fi
-password="$(sops -d --extract '["ntfy"]["fleet-password"]' modules/secrets.yaml 2>/dev/null || true)"
+password="$(secret_get '["ntfy"]["fleet-password"]' || true)"
 if [ -z "$password" ]; then
-  echo "ntfy-check: cannot read ntfy/fleet-password from modules/secrets.yaml with this identity" >&2
+  echo "ntfy-check: cannot read ntfy/fleet-password with this identity" >&2
   exit 3
 fi
 if ! command -v curl >/dev/null 2>&1; then

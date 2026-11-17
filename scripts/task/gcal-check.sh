@@ -11,6 +11,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
+. "$repo_root/scripts/task/lib/paths.sh"
 
 token="${GCAL_CHECK_TOKEN:-${XDG_CONFIG_HOME:-$HOME/.config}/vdirsyncer/google_token}"
 
@@ -39,10 +40,10 @@ else:
 PY
 )
 
-client_id="$(sops -d --extract '["googleDrive"]["clientId"]' modules/secrets.yaml 2>/dev/null || true)"
-client_secret="$(sops -d --extract '["googleDrive"]["clientSecret"]' modules/secrets.yaml 2>/dev/null || true)"
+client_id="$(secret_get '["googleDrive"]["clientId"]' || true)"
+client_secret="$(secret_get '["googleDrive"]["clientSecret"]' || true)"
 if [ -z "$client_id" ] || [ -z "$client_secret" ]; then
-  echo "gcal-check: cannot read googleDrive credentials from modules/secrets.yaml with this identity" >&2
+  echo "gcal-check: cannot read googleDrive credentials with this identity" >&2
   exit 3
 fi
 

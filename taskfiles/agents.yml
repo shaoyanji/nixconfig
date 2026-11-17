@@ -258,17 +258,63 @@ tasks:
     cmds:
       - 'bash scripts/task/edge-sidecar.sh "{{.CMD | default "status"}}"'
 
+  agents:ledger:record:
+    desc: "Record one classified issue in the running ledger (CLASS, EVIDENCE, FIX)"
+    summary: >
+      One JSONL line in ~/.local/state/nixconfig/issue-ledger.jsonl, the machine
+      half of docs/issue-classes.md: trust, lint, assert or capacity, plus what
+      proved the class and what made it stop. The class names are read from that
+      page, so a second list cannot drift and an undeclared CLASS is refused
+      rather than filed. agents:xs:post writes the same line for a turn that
+      carries CLASS=. Exit 0 = recorded, 2 = bad input (undeclared class, or a
+      missing evidence or fix).
+    requires:
+      vars: [CLASS, EVIDENCE, FIX]
+    env:
+      CLASS: "{{.CLASS}}"
+      EVIDENCE: "{{.EVIDENCE}}"
+      FIX: "{{.FIX}}"
+      SUBJECT: "{{.SUBJECT | default \"\"}}"
+      OUTCOME: "{{.OUTCOME | default \"done\"}}"
+    cmds:
+      - bash scripts/task/issue-ledger.sh record
+
+  agents:ledger:list:
+    desc: "Read the issue ledger: rows then a count per class (CLASS=, LIMIT=)"
+    summary: >
+      The read side: ts, class, source, subject, outcome and fix per line, then a
+      count per class, so "how many of these were trust failures" is a number
+      rather than a memory. CLASS= filters to one declared class; LIMIT= bounds
+      the rows (default 20). Exit 0 with an empty ledger is an answer; exit 2 =
+      bad LIMIT.
+    env:
+      CLASS: "{{.CLASS | default \"\"}}"
+      LIMIT: "{{.LIMIT | default \"20\"}}"
+    cmds:
+      - bash scripts/task/issue-ledger.sh list
+
+  agents:ledger:check:
+    desc: "Assert every ledger entry carries a declared class, evidence and a fix"
+    summary: >
+      The lint for the record itself. Each line must parse as JSON, name a class
+      declared in docs/issue-classes.md, and carry evidence and a fix — an entry
+      with neither records a symptom, not a class. Exit 0 = clean, or no ledger
+      yet; 1 = an entry fails one of those three; 2 = the class table could not
+      be read from docs/issue-classes.md.
+    cmds:
+      - bash scripts/task/issue-ledger.sh check
+
   agents:xs:post:
     desc: "Post one xs turn from a template (SUBJECT, ACTION, RATIONALE - no JSON)"
     summary: >
       Renders scripts/task/xs-turn.jq - the schema - and posts it, filling id, ts,
-      source, base_commit and branch; values cross as environment variables, so
-      prose with quotes stays literal and no caller builds JSON. Needs
-      SUBJECT=<repo>:<task-id> and ACTION; optional RATIONALE, OUTCOME, SOURCE,
-      FILES/COMMITS/CLAIMS (comma-separated), ID (retry), BASE_COMMIT/BRANCH. An
-      unreachable endpoint queues the body; the next successful post replays it.
-      Exit 2 = bad input (nothing sent), exit 3 = no token, exit 4 = transport (now
-      queued), exit 5 = rejected.
+      source, base_commit, branch; values cross as env vars, so quotes stay
+      literal and no caller builds JSON. Needs SUBJECT=<repo>:<task-id> and
+      ACTION; optional RATIONALE, OUTCOME, SOURCE, CLASS (also writes the ledger
+      line), FILES/COMMITS/CLAIMS (comma-separated), ID (retry),
+      BASE_COMMIT/BRANCH. An unreachable endpoint queues the body; the next post
+      replays it. Exit 2 = bad input (nothing sent), exit 3 = no token, exit 4 =
+      transport (now queued), exit 5 = rejected.
     requires:
       vars: [SUBJECT, ACTION]
     env:
@@ -277,6 +323,7 @@ tasks:
       RATIONALE: "{{.RATIONALE | default \"\"}}"
       OUTCOME: "{{.OUTCOME | default \"done\"}}"
       SOURCE: "{{.SOURCE | default \"\"}}"
+      CLASS: "{{.CLASS | default \"\"}}"
       FILES: "{{.FILES | default \"\"}}"
       COMMITS: "{{.COMMITS | default \"\"}}"
       CLAIMS: "{{.CLAIMS | default \"\"}}"

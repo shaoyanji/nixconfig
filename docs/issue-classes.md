@@ -54,9 +54,29 @@ more familiar.
 ## Keep the class in the gate
 
 A class fixed only in prose comes back. `correct` climbs architecture → type or
-lint → test or gate → prose, and this page is the last of those four. The gates
-that already hold each class are the ones named above; a class that arrives with
-no gate is not fixed yet.
+lint → test or gate → prose, and this page is the last of those four.
+`checks.policies` prints the classes and the policies holding each one, and it
+fails when this page and that table disagree:
+[[flake/policies.nix#ci-substituter-keys]] for `trust`,
+[[flake/policies.nix#ci-doc-budget]] and [[flake/policies.nix#ci-task-graph]] for
+`lint`, [[flake/policies.nix#boot-gate-needs-kvm]] and
+[[flake/policies.nix#flake-check-memory-gated]] for `assert`, and
+[[flake/policies.nix#no-fleet-default]] for `capacity`.
+
+## The running ledger
+
+A one-off classification is a story. `scripts/task/issue-ledger.sh` keeps the
+running record, one JSONL line per issue — `ts`, `class`, `source`, `subject`,
+`outcome`, `evidence`, `fix` — in `~/.local/state/nixconfig/issue-ledger.jsonl`.
+The class names are read from this page, so there is no second list to drift
+[[flake/policies.nix#issue-classes-have-one-home]].
+
+It travels with the turn log rather than beside it: `agents:xs:post` takes
+`CLASS=`, and `xs-turn-post.sh` appends the ledger line once the shim accepts the
+turn, with the same subject, source and outcome
+[[flake/policies.nix#issue-ledger-accompanies-turns]].
+`task agents:ledger:check` asserts every line carries a declared class, evidence
+and a fix; `task agents:ledger:list CLASS=trust` reads one class back.
 
 A failure routed to an agent starts at `scripts/task/ci-fix-dispatch.sh`, whose
 prompt names these four classes so the agent begins from a diagnosis rather than

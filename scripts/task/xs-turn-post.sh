@@ -223,6 +223,17 @@ esac
 printf 'http      %s%s\n' "$code" "$([ "$code" = 200 ] && printf ' (already stored)' || true)"
 jq -r '"frame     \(.id)", "client    \(.client_uuid)"' "$resp" 2>/dev/null || true
 printf 'subject   %s\noutcome   %s\n' "$subject" "$outcome"
+# The classification travels with the turn: one append-only line, same subject
+# and outcome, so `agents:ledger:check` counts a class instead of a story. Not
+# fatal — the turn is already stored, and a ledger write that fails is a warning
+# here, never a reason to report the post as failed.
+if [ -n "${CLASS:-}" ]; then
+  if ! CLASS="$CLASS" EVIDENCE="${EVIDENCE:-$action}" FIX="${FIX:-$action}" \
+    SUBJECT="$subject" SOURCE="$source_name" OUTCOME="$outcome" ID="$id" TS="$ts" \
+    bash "$ROOT/scripts/task/issue-ledger.sh" record >/dev/null; then
+    printf 'xs-turn: the ledger refused this turn (CLASS=%s); the turn is stored\n' "$CLASS" >&2
+  fi
+fi
 if [ "$replayed" -gt 0 ]; then printf 'replayed  %s queued turn(s)\n' "$replayed"; fi
 if [ -s "$REJECTED" ]; then
   printf 'rejected  %s poisoned line(s) in %s\n' "$(grep -c . "$REJECTED")" "$REJECTED"

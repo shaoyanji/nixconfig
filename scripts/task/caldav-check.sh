@@ -10,6 +10,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
+. "$repo_root/scripts/task/lib/paths.sh"
 
 url="${CALDAV_CHECK_URL:-https://delphi.cloudforest-kardashev.ts.net:8457}"
 collection="${CALDAV_CHECK_COLLECTION:-personal}"
@@ -21,9 +22,9 @@ for tool in sops curl; do
     exit 3
   fi
 done
-password="$(sops -d --extract '["radicale"]["password"]' modules/secrets.yaml 2>/dev/null || true)"
+password="$(secret_get '["radicale"]["password"]' || true)"
 if [ -z "${password}" ]; then
-  echo "caldav-check: cannot read radicale/password from modules/secrets.yaml with this identity" >&2
+  echo "caldav-check: cannot read radicale/password with this identity" >&2
   exit 3
 fi
 

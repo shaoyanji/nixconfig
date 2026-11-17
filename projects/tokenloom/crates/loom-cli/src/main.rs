@@ -133,11 +133,11 @@ fn bench(args: &[String]) -> i32 {
         };
         return rt.block_on(e2e::measure(&doc, edits, window, relax));
     }
-    core_bench(edits, relax)
+    core_bench(doc_tokens, edits, relax)
 }
 
-fn core_bench(edits: usize, relax: bool) -> i32 {
-    let doc = build_doc(10_000);
+fn core_bench(doc_tokens: usize, edits: usize, relax: bool) -> i32 {
+    let doc = build_doc(doc_tokens);
     let mut sess = Session::with_doc(&doc);
     let tokens = sess.rope.len_tokens();
     let bytes = sess.rope.len_bytes();

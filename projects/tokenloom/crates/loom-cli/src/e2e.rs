@@ -252,8 +252,11 @@ pub async fn measure(doc: &str, edits: usize, window_ms: u64, relax: bool) -> i3
         }
     };
     trace(&format!("bound 127.0.0.1:{port}"));
+    // The server keeps a handle of its own: the client-side clock is the gate,
+    // and the session's own numbers are what says where the gate's time went.
+    let served = state.clone();
     tokio::spawn(async move {
-        let _ = axum::serve(listener, ws::app(state)).tcp_nodelay(true).await;
+        let _ = axum::serve(listener, ws::app(served)).tcp_nodelay(true).await;
     });
 
     let started = Instant::now();
@@ -368,6 +371,22 @@ pub async fn measure(doc: &str, edits: usize, window_ms: u64, relax: bool) -> i3
     println!("{}\n  (n={edits}, window included)", show("single edit → diff", &latencies));
     println!("  frames per message: max {max_packed}");
     println!("  the diff shared the ack's message in {shared}/{edits} edits");
+    // The same segment measured on the other side of the socket. The gap between
+    // this and the gate is the window, the transport and scheduling; the split
+    // of this one is what a miss on a large document is actually made of.
+    {
+        let s = state.session.lock().expect("the session lock");
+        let (p50, p99) = s.percentiles();
+        let n = s.retok_edits().max(1) as f64;
+        let ph = s.phases();
+        println!(
+            "  server apply → encode: p50 {p50}µs · p99 {p99}µs, per edit ops {:.1} · \
+             ripple {:.1} · materialize {:.1} µs",
+            ph.ops_us as f64 / n,
+            ph.retok_us as f64 / n,
+            ph.materialize_us as f64 / n
+        );
+    }
 
     let p99 = pct(&latencies, 0.99);
     let ok = p99 <= TARGET_MS;

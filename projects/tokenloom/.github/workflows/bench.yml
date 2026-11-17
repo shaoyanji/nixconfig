@@ -1,0 +1,33 @@
+# The gate's verdict, on a schedule.
+#
+# `bench-sweep.sh` runs the socket bench at four window widths and compares each
+# verdict with the table README.md publishes. A shared runner moves the
+# milliseconds; it should not move the verdict. When it does, this job fails with
+# the p99 beside it, because a gate whose answer changed is a fact to look at
+# rather than one to re-read in prose.
+name: bench
+
+on:
+  schedule:
+    # Mondays, 05:23 UTC — off the hour, so not in every other cron's thundering herd.
+    - cron: "23 5 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: bench
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      # The runner's rustup is the toolchain; no action and no cache to keep
+      # green, because the build here is one crate graph and a minute.
+      - name: toolchain
+        run: rustup default stable && cargo --version
+      - name: build
+        run: cargo build --release --locked
+      - name: sweep
+        run: bash scripts/bench-sweep.sh

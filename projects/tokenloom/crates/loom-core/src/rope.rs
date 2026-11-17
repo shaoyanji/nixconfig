@@ -80,8 +80,11 @@ impl Chunk {
         }
     }
 
+    /// The chunk's byte length. The text is the one copy, so this is its length
+    /// rather than a sum over tokens: that sum is O(tokens) and every position
+    /// lookup went through it, which is a cost that grows with the document.
     fn byte_len(&self) -> usize {
-        self.tokens.iter().map(|t| t.byte_len as usize).sum()
+        self.text.len()
     }
 
     /// The chunk's tokens with their text, in order.
@@ -255,7 +258,10 @@ impl Rope {
     }
 
     pub fn abs_range(&self, range: std::ops::Range<usize>) -> Vec<AbsToken> {
-        let mut out = Vec::new();
+        // The length is known before the walk: a batch materializes the whole
+        // array, and growing it from zero reallocs and copies the tail each
+        // time the document doubles.
+        let mut out = Vec::with_capacity(range.end.saturating_sub(range.start));
         let mut tok = 0usize;
         let mut byte = 0usize;
         for c in &self.chunks {

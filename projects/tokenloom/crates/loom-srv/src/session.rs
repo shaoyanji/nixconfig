@@ -21,6 +21,23 @@ use std::time::Instant;
 pub const MAX_CONSTRAINTS: usize = 256;
 const METRIC_SAMPLES: usize = 1024;
 
+/// Microseconds a batch spent in each phase, summed over the batches measured.
+///
+/// The gate reports one number for the segment an editor feels, and that number
+/// is the one that has to hold. This is the diagnostic beside it: when the gate
+/// misses on a large document, the phase that grew with the document is the one
+/// to open, and saying which one it is beats guessing from the total.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PhaseTotals {
+    /// Applying the ops to the rope, anchors and constraint index included.
+    pub ops_us: u64,
+    /// Widening, re-lexing and splicing the dirty window.
+    pub retok_us: u64,
+    /// Copying out the document and the token array the send path and the
+    /// reactors read.
+    pub materialize_us: u64,
+}
+
 /// Plant a constraint named by tokens, anchored on the byte its span starts at.
 ///
 /// The wire speaks tokens because that is what a client has, but the index
@@ -145,6 +162,7 @@ pub struct Session {
     /// for its sink; this one is what a snapshot writes down.
     pub reactors: [bool; 8],
     latencies: VecDeque<u32>,
+    phases: PhaseTotals,
     last_window: u32,
     pub ripple_truncations: u64,
     sum_retok: u64,
@@ -161,6 +179,7 @@ impl Session {
             constraints: ConstraintIndex::new(),
             reactors: [true; 8],
             latencies: VecDeque::new(),
+            phases: PhaseTotals::default(),
             last_window: 0,
             ripple_truncations: 0,
             sum_retok: 0,
@@ -287,6 +306,8 @@ impl Session {
             }
         }
 
+        let ops_us = started.elapsed().as_micros() as u64;
+
         if pre_spans.is_empty() {
             // A batch that only planted a constraint or threw a switch changed
             // the session though it moved no text. Bump so its log record is
@@ -309,8 +330,8 @@ impl Session {
         // after an earlier splice was shifted by it: the window can be a token
         // too wide (the trim recovers the minimal diff) but never one too
         // narrow, which is a token the client would keep.
-        let base = pre_spans.iter().map(|(s, _)| *s).min().unwrap_or(0);
-        let end = pre_spans
+        let mut base = pre_spans.iter().map(|(s, _)| *s).min().unwrap_or(0);
+        let mut end = pre_spans
             .iter()
             .map(|(s, c)| s + c)
             .max()
@@ -318,9 +339,27 @@ impl Session {
             .max(base);
 
         let mut retok = RetokReport::default();
+        let mut retok_us = 0u64;
         if text_changed {
             let seed = to_post_before(base, &deltas)..to_post_through(end, &deltas);
-            retok = retokenize_window(&mut self.rope, seed, &*self.tok, &self.cfg);
+            let t = Instant::now();
+            retok = retokenize_window(&mut self.rope, seed.clone(), &*self.tok, &self.cfg);
+            retok_us = t.elapsed().as_micros() as u64;
+            // The ripple widens to a stable boundary, so it can rewrite a token
+            // the batch's own spans never named — the word the edit landed
+            // beside, or the one that ends the window. A frame that stopped at
+            // the spans would leave the client holding its old copy of that
+            // token, and from there on every token is one off: the document
+            // looks right for a keystroke and then edits land in the wrong
+            // place. So the frame spans the union of what the batch named and
+            // what the ripple touched, mapped back into starting coordinates.
+            let touched = retok.tok_start + retok.old_count;
+            if retok.tok_start < seed.start || touched > seed.end {
+                let lo = seed.start.min(retok.tok_start);
+                let hi = seed.end.max(touched);
+                base = base.min(to_pre(lo, &deltas));
+                end = end.max(to_pre(hi, &deltas));
+            }
             if retok.truncated {
                 self.ripple_truncations += 1;
             }
@@ -332,7 +371,12 @@ impl Session {
         let post_len = self.rope.len_tokens();
         let (deleted, inserted) = batch_frame(base, end, pre_len, post_len);
         let inserted_end = (base + inserted).min(post_len);
+        debug_assert!(
+            base + inserted <= post_len,
+            "the widened frame runs past the document: {base}+{inserted} > {post_len}"
+        );
 
+        let t_mat = Instant::now();
         let doc = Arc::new(self.rope.doc());
         let abs = Arc::new(self.rope.abs_range(0..post_len));
         let tokens: Vec<NewToken> = abs[base.min(abs.len())..inserted_end]
@@ -351,6 +395,10 @@ impl Session {
             byte_start
         };
         let byte_window = byte_start..byte_end.max(byte_start);
+        let materialize_us = t_mat.elapsed().as_micros() as u64;
+        self.phases.ops_us += ops_us;
+        self.phases.retok_us += retok_us;
+        self.phases.materialize_us += materialize_us;
         let tok_end = (base + 1).min(post_len).max(inserted_end);
         let tok_window = base.min(post_len)..tok_end;
         self.last_window = tok_window.len() as u32;
@@ -404,6 +452,11 @@ impl Session {
 
     pub fn retok_edits(&self) -> u64 {
         self.retok_edits
+    }
+
+    /// Where the edits that [`Session::percentiles`] timed actually went.
+    pub fn phases(&self) -> PhaseTotals {
+        self.phases
     }
 
     /// Tokens the reactors saw in the last batch window.

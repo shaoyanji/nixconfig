@@ -1257,6 +1257,70 @@ plate_expand() { # prompt -> prompt with every arch:<name> resolved
   printf '%s' "$p"
 }
 
+# A slot's share of what the day has left: ceil(left / slots_left), clamped to the
+# hourly burst ceiling and to at least one. One implementation, two callers — the
+# slot wrapper in hosts/frieren/infra-stack.nix asks for `share`, and `today` prints
+# what the next slot will take, so the readout cannot drift from the spend.
+slot_share() { # left slots_left
+  local left=$1 slots=${2:-1} cap
+  case $left in "" | *[!0-9]*) left=0 ;; esac
+  case $slots in "" | *[!0-9]* | 0) slots=1 ;; esac
+  cap=$(((left + slots - 1) / slots))
+  [ "$cap" -gt 25 ] && cap=25
+  [ "$cap" -lt 1 ] && cap=1
+  printf '%s\n' "$cap"
+}
+
+# What the day still holds, in one readout: the allowance, the share the next slot
+# takes, and how many roster rows are waiting for it. Read-only — it asks the pool
+# and the user timer table, and spends nothing.
+cmd_today() {
+  need jq
+  local day left limit roster pending units total n next_at reserve cap
+  roster=${ROSTER:-$repo/lib/image-daily/plates.txt}
+  day=$(today)
+  left=$(remaining)
+  [ -n "$left" ] || die "usage unreadable (401 from cpg) — run cpg refresh, or chatplayground-go login when the session itself is gone"
+
+  printf '%s\n' "$day"
+  if [ "$left" -ge 1000 ]; then
+    printf '  allowance   unlimited on this plan; the hourly burst (25) is the ceiling\n'
+  else
+    limit=$(cpg usage --json 2>/dev/null | jq -r '.entitlement.limits.imagesPerDay // empty' 2>/dev/null)
+    case $limit in
+    "" | *[!0-9]*) printf '  allowance   %s left\n' "$left" ;;
+    *) printf '  allowance   %s of %s used, %s left\n' "$((limit - left))" "$limit" "$left" ;;
+    esac
+  fi
+
+  # The slots are read from the units that exist, not from a number in this file:
+  # the schedule lives in Nix, and a second copy would drift from it.
+  units=$(systemctl --user list-unit-files --no-legend 'image-daily-slot-*.service' 2>/dev/null |
+    sed -n 's/^image-daily-slot-\([0-9][0-9]*\)\.service.*/\1/p' | sort -n)
+  total=$(printf '%s\n' "$units" | grep -c . || true)
+  if [ "${total:-0}" -eq 0 ]; then
+    printf '  next slot   no image-daily-slot timer on this host\n'
+  else
+    n=$(systemctl --user list-timers --no-pager --json=short 'image-daily-slot-*.timer' 2>/dev/null |
+      jq -r 'if type == "array" then .[] | select((.next // 0) > 0) | [.next, (.activates // "")] | @tsv else empty end' 2>/dev/null |
+      sort -n | head -1 | cut -f2 | sed -n 's/^image-daily-slot-\([0-9][0-9]*\)\.service$/\1/p')
+    if [ -z "$n" ]; then
+      printf '  next slot   %s slot(s) registered, none scheduled\n' "$total"
+    else
+      next_at=$(systemctl --user show -p NextElapseUSecRealtime --value "image-daily-slot-$n.timer" 2>/dev/null)
+      reserve=$(systemctl --user show -p ExecStart --value "image-daily-slot-$n.service" 2>/dev/null |
+        grep -o 'export RESERVE=[0-9][0-9]*' | cut -d= -f2)
+      cap=$(slot_share "$left" "$((total - n + 1))")
+      printf '  next slot   %s of %s at %s -> cap %s' "$n" "$total" "${next_at:-unknown}" "$cap"
+      [ -n "$reserve" ] && [ "$reserve" -gt 0 ] && printf ', %s held back' "$reserve"
+      printf '\n'
+    fi
+  fi
+
+  pending=$(roster_pending "$roster" 2>/dev/null || printf '?')
+  printf '  roster      %s row(s) waiting in %s\n' "${pending:-?}" "${roster#"$repo"/}"
+}
+
 cmd_plates() {
   need jq cpg agy git ffprobe
   local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} def_size=${SIZE:-1536x1024}
@@ -1265,8 +1329,13 @@ cmd_plates() {
   intent=$(jq -r '.intents.photoreal // empty' "$BRIEFS")
   [ -n "$intent" ] || die "briefs.json carries no .intents.photoreal"
   # A requested round is allowed to wait the burst window out: the alternative is
-  # spending a plate, judging it, and then abandoning the round at 25 images.
+  # spending five plates, then abandoning the round when the hourly bucket closes
+  # (measured 2026-11-17: 5 spent, 18 rows left waiting). The budget is one window,
+  # not the nightly lane's 420 s, because the bucket refills over an hour; the round
+  # still ends on the first row that spends it, since every later row would be
+  # probing the same closed bucket.
   export RATE_TRIES=${RATE_TRIES:-8} RATE_WAIT=${RATE_WAIT:-300} RATE_WAIT_MAX=${RATE_WAIT_MAX:-900}
+  export RATE_WAIT_TOTAL=${RATE_WAIT_TOTAL:-3600}
   mkdir -p "$IMAGES_ROOT" "$STAGE"
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }
@@ -1401,6 +1470,9 @@ case "${1:-plan}" in
   plan) cmd_plan ;;
   run) cmd_run ;;
   status) cmd_status ;;
+  today) cmd_today ;;
+  # The cap one slot takes, from the same arithmetic `today` prints.
+  share) slot_share "$(remaining)" "${2:-1}" ;;
   judge) shift && cmd_judge "$@" ;;
   publish) cmd_publish ;;
   variants) cmd_variants ;;
@@ -1413,5 +1485,5 @@ case "${1:-plan}" in
   # script splits what is left across the slots still to run. Empty stdout when the
   # pool is unreadable is the one answer here that is not a count.
   remaining) remaining ;;
-  *) die "usage: image-daily.sh plan|run|status|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates|remaining" ;;
+  *) die "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates|remaining" ;;
 esac

@@ -76,6 +76,17 @@ tasks:
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh status
 
+  images:today:
+    desc: Today's allowance, what share the next slot takes, and how many roster rows wait
+    summary: >
+      The readout before asking for "more wallpapers": how much of the day is
+      left, what share the next `image-daily-slot-*` timer will take (the same
+      `share` arithmetic the slot wrapper runs, so the two cannot disagree), and
+      how many roster rows the judge has not kept yet. Read-only — it asks the
+      pool and the user timer table, and spends nothing.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh today
+
   images:judge:
     desc: Judge one image file with agy and print the verdict JSON
     summary: >

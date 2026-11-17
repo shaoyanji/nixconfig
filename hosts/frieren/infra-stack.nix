@@ -521,15 +521,13 @@
       rc=0
       # One pool, shared: a slot takes its even share of what the day has left
       # across the slots still to run, so an early hand-run batch lowers the later
-      # slots instead of being spent twice. `remaining` is the script's own
-      # arithmetic, which is where the "unlimited" plan answer is translated into a
-      # day count and a stale session token is refreshed once.
+      # slots instead of being spent twice. The share arithmetic is the script's
+      # own (`share`): it translates the "unlimited" plan answer into a day count,
+      # refreshes a stale session token once, and deals the same cap that
+      # `task images:today` prints for the next slot.
       slots_left=$(( ${toString total} - ${toString slot} + 1 ))
-      cap=$(${pkgs.bash}/bin/bash "$daily" remaining 2>/dev/null || printf 0)
-      case $cap in "" | *[!0-9]*) cap=0 ;; esac
-      cap=$(( (cap + slots_left - 1) / slots_left ))
-      [ "$cap" -gt 25 ] && cap=25
-      [ "$cap" -lt 1 ] && cap=1
+      cap=$(${pkgs.bash}/bin/bash "$daily" share "$slots_left" 2>/dev/null || printf 1)
+      case $cap in "" | *[!0-9]*) cap=1 ;; esac
       before=$(wc -l <"$ledger" 2>/dev/null || printf 0)
       CAP=$cap PUBLISH=0 ${pkgs.bash}/bin/bash "$daily" run || rc=$?
       after=$(wc -l <"$ledger" 2>/dev/null || printf 0)

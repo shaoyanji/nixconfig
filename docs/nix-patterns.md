@@ -1,7 +1,7 @@
 # Nix patterns & gotchas
 
-The things that bit this tree once and would bite it again: what fails, why, and
-the fix that is actually in the repo.
+Failures this tree hit once and would hit again: what breaks, why, and the fix
+that is in the repo.
 
 ## Formats go through tools, not text edits
 
@@ -81,10 +81,10 @@ unreferenced the moment its evaluation ends) and 04:00 `autoUpgrade` spent 8.5 o
 those minutes re-copying ~20 of them. `services.flakeGcRoot` now roots the
 deployed flake and its inputs at 05:00, so the GC cannot take them.
 
-**The trap worth remembering** is the other fix: a submodule tree is a *different
-source path* from the same commit's GitHub tarball, so a warm from one is worth
-nothing to an evaluation of the other — which is why frieren rebuilt 34
-derivations on a commit CI had already built. `?submodules=1` is not legal on a
+The submodule trap is the same class: a submodule tree is a *different source
+path* from the same commit's GitHub tarball, so a warm from one buys nothing for
+an evaluation of the other, which is why frieren rebuilt 34 derivations on a
+commit CI had already built. `?submodules=1` is not legal on a
 `github:` ref; a plain git tree and the tarball at one commit *do* resolve to one
 `/nix/store/…-source`, so `.#` is the ref to warm.
 
@@ -317,13 +317,14 @@ lists empty, 2026-10-29), so "the newest release" can only be the tip of master.
 `vendorHash` — the go module set has not moved since nixpkgs' 2023-02-10 pin —
 verified by building the override locally. Only `src` and `version` differ.
 
-Operational half: [`../AGENTS.md`](../AGENTS.md) routing, `infra` skill (deploy, rebuild, rollback).
+Routing is [`../AGENTS.md`](../AGENTS.md); deploy, rebuild and rollback procedures
+are the `infra` skill.
 
 ## A daemon must clear the Kelly gate
 
-A resident helper is a bet, and the stake is a unit, memory, a surface someone has
-to reason about, and a failure mode that appears after a logout — so it must beat
-what the counterfactual costs an agent, not a cold start. Tokens generate at
+A resident helper costs a unit, memory, a surface to reason about, and a failure
+mode that appears after a logout. It has to beat what the alternative costs an
+agent, not a cold start. Tokens generate at
 ~50/s, so a sub-second local round trip is free: a correct answer saves only the
 tokens of *naming the argument*, a handful. So:
 
@@ -334,8 +335,8 @@ save   what one correct answer saves the agent
 cost   what one wrong answer costs: the wasted round trip plus the retry
 ```
 
-Enable only if `save > 0` **and** `ev > 0`. `ev == 0` is off: a coin flip that
-pays rent is not enabled, it is tolerated. `save <= 0` cannot be rescued by
+Enable only if `save > 0` and `ev > 0`. `ev == 0` is off: an even bet is tolerated
+at best, never enabled. `save <= 0` cannot be rescued by
 accuracy at any `p < 1`.
 
 `flake/daemons.nix` is the registry, `nix eval --json .#daemons.daemons` prints the
@@ -346,9 +347,9 @@ numbers to agree both ways — including that a justified daemon is not silently
 | :--- | ---: | ---: | ---: | ---: | :--- |
 | `edge-caller` | 0.5 | **−1.0 s** | 1.2 | **−1.1** | disable: the *win case* is a loss |
 
-That row is the lesson: the dispatcher's call is 54 bytes against 40, its answer
-605 against 217, its round trip 1073 ms against 145 — it loses even when it is
-right. A latency claim means nothing against the alternative.
+The dispatcher's call is 54 bytes against 40, its answer 605 against 217, its
+round trip 1073 ms against 145: it loses even when it is right. A latency claim
+means nothing against the alternative.
 
 `kg-sidecar` cleared the same gate on 2026-11-02 (441 ms → 28 ms, `p = 1`) and was
 removed on 2026-11-07 because the counterfactual moved: 25 ms saved does not pay

@@ -207,7 +207,7 @@ session; when the run is green, `task agents:ci:resolve MESSAGE_ID=<id>` sets
 stays searchable and the resolution is the record. The triage unit's
 `ExecStartPost` then runs `task agents:ci:drain`: a notice older than 14 days is
 stale and only the newest per repo+workflow survives, which closed 234 of 237 on
-the first run. A queue nobody drains is a mailbox with a nicer name.
+the first run. An undrained queue is still an unread mailbox.
 
 ## Verify
 
@@ -229,8 +229,8 @@ task agents:mail:triage CLI_ARGS=--dry-run  # verdicts without writing them
 task agents:ci:queue                    # unresolved CI an agent owns
 ```
 
-Every one of these prints TOON: `toon -e` of the API's own JSON, which is what an
-agent reads. `FORMAT=text` gives a person the table it printed yesterday.
+Every one of these prints TOON, `toon -e` of the API's own JSON, which is what an
+agent reads. `FORMAT=text` prints the table instead.
 
 ## What it can and cannot do
 

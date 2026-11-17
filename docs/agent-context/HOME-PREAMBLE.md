@@ -23,7 +23,8 @@
 2. `AGENTS.md` § "Agent entry contract" — invariants and verification phases.
 3. `.agents/SCHEMA.md` — where each kind of fact belongs.
 4. `MANUAL.md` — services, access paths, the closed loop.
-5. The owning skill for the subsystem (`task ops:skills`).
+5. The `router` skill — the shape of the work, and the gate that ends it.
+6. The owning skill for the subsystem (`task ops:skills`).
 
 ## Live-host rules (all hosts, non-negotiable)
 
@@ -70,6 +71,16 @@ task ops:kg                # structure: hosts x skills x docs ("what touches X")
 
 A green socket is not a successful job. `nixos-upgrade` can exit 0 with no new
 generation; `generation-stale` in the ledger is the signal that catches it.
+
+## Memory, in order
+
+- **Design record** — `task ops:notes:near Q="<intent>"`, then `:lineage`:
+decisions, experiments and their ancestry. Schema-gated, and a graph node.
+- **Episodic** — `task agents:xs:list Q="…"`: what happened, one turn each.
+- **Prose and structure** — `qmd` for text, `task ops:kg:*` for "what touches X".
+- **`ai-memory`** is cross-agent scratch: no schema gate, no place in
+`.#knowledgeGraph`, and no unit for its server (`:49374`) on any host. Never the
+authority for a repo fact; treat it as absent until one exists.
 
 ## Where to write
 

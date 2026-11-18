@@ -484,6 +484,8 @@ tasks:
       - |
         if [ "{{.FORMAT}}" = "json" ]; then
           bash scripts/task/kg-query.sh stats --json
+        elif [ "{{.FORMAT}}" = "line" ]; then
+          bash scripts/task/kg-query.sh stats --line
         else
           bash scripts/task/kg-query.sh stats
         fi
@@ -785,13 +787,14 @@ tasks:
     desc: List AGENTS.nix notes or find the ones near an intent (STATUS=, KIND=, CLAIM=, EVIDENCE=)
     summary: >
       The human surface over `.?submodules=1#agentsNotes.json` (lib/agents-notes.nix). No args
-      lists every note; STATUS=, KIND=, CLAIM= and EVIDENCE= filter; FORMAT=json emits records.
+      lists every note; STATUS=, KIND=, CLAIM= and EVIDENCE= filter; FORMAT=json
+      emits records, FORMAT=line one `k=v` line.
       A note with refs is distilled, a leaf carries its intent in prose. Starting something
       not in the repo yet? `ops:notes:near Q=<intent>` ranks notes against it with each one's
       lineage. Author or promote with the `agents-notes` skill: a note graduates by gaining
       `refs.modules` and its gate task, never by becoming a markdown file.
     cmds:
-      - bash scripts/task/notes.sh list "{{.STATUS | default ""}}" "{{.KIND | default ""}}" "{{.CLAIM | default ""}}" "{{.EVIDENCE | default ""}}"
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh list "{{.STATUS | default ""}}" "{{.KIND | default ""}}" "{{.CLAIM | default ""}}" "{{.EVIDENCE | default ""}}"
 
   ops:notes:claims:
     desc: How the notes distribute over claim kinds and their evidence tier
@@ -811,7 +814,7 @@ tasks:
       hosts/modules/tasks/docs it affects, related notes and the body.
       FORMAT=json emits the note object.
     cmds:
-      - bash scripts/task/notes.sh show "{{.ID | default ""}}"
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh show "{{.ID | default ""}}"
 
   ops:notes:host:
     desc: Print the notes that affect HOST (HOST= required)
@@ -819,7 +822,7 @@ tasks:
       Reads the compiled byHost index. An empty answer is a valid answer: no
       note claims that host. HOST is required.
     cmds:
-      - bash scripts/task/notes.sh host "{{.HOST | default ""}}"
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh host "{{.HOST | default ""}}"
 
   ops:notes:module:
     desc: Print the notes that reference a repository path (PATH= required)
@@ -828,7 +831,7 @@ tasks:
       the reverse of the module -> notes edge, so "why does this file look like
       this" becomes one query. An unknown path prints an empty list.
     cmds:
-      - bash scripts/task/notes.sh module "{{.PATH | default ""}}"
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh module "{{.PATH | default ""}}"
 
   ops:notes:task:
     desc: Print the notes that reference TASK (TASK= required)
@@ -836,7 +839,7 @@ tasks:
       TASK is a taskfile task name (e.g. ops:health). Useful before changing or
       deleting a task: the notes explain why it exists.
     cmds:
-      - bash scripts/task/notes.sh task "{{.TASK | default ""}}"
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh task "{{.TASK | default ""}}"
 
   ops:notes:near:
     desc: Rank the notes near an intent (Q= required) — the novel-task entry
@@ -879,7 +882,7 @@ tasks:
     requires:
       vars: [DOC]
     cmds:
-      - bash scripts/task/notes.sh doc "{{.DOC}}"
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh doc "{{.DOC}}"
 
   ops:notes:search:
     desc: Full-text search over AGENTS.nix notes (Q= required)
@@ -887,7 +890,7 @@ tasks:
       Case-insensitive substring match over id, title, summary and body. Use it
       for "why did we decide X"; use `ops:notes:host` / `:module` for structure.
     cmds:
-      - bash scripts/task/notes.sh search "{{.Q | default ""}}"
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh search "{{.Q | default ""}}"
 
   ops:qmd:sync:eisen:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN

@@ -8,7 +8,7 @@
 #
 # Usage: notes.sh list [STATUS] [KIND] [CLAIM] [EVIDENCE] | claims | show ID | near Q [LIMIT]
 #        | lineage ID | host HOST | module PATH | task TASK | doc DOC | search Q
-# Env: FORMAT=json emits the selected notes as JSON instead of a table.
+# Env: FORMAT=json emits records; FORMAT=line prints one k=v line, not a table.
 #
 # `near` is the novel-task entry: it ranks notes against an intent so an agent
 # that has never seen this repo can ask "has something like this been tried?"
@@ -42,6 +42,7 @@ fi
 # dominates, so this tie-break rarely decides anything — it exists so two equally
 # relevant notes do not sort by id.
 srank='{"IN FLIGHT":0,"OPEN":1,"ACCEPTED":2,"PROPOSED":3,"BLOCKED":4,"DELIVERED":5,"REJECTED":6,"SUPERSEDED":7}'
+open_ids='["PROPOSED","ACCEPTED","IN FLIGHT","BLOCKED","OPEN"]'
 
 print_ids() {
   local list="$1"
@@ -53,6 +54,10 @@ print_ids() {
   fi
   if [ "${FORMAT:-}" = "json" ]; then
     jq --argjson ids "$list" '.notes | with_entries(select(.key as $k | $ids | index($k)))' <<<"$data"
+    return 0
+  fi
+  if [ "${FORMAT:-}" = "line" ]; then
+    printf 'mode=%s matches=%s open=%s\n' "$MODE" "$n" "$(jq --argjson ids "$list" --argjson open "$open_ids" '[.notes | to_entries[] | select(.key as $k | $ids | index($k)) | select(.value.status as $s | $open | index($s) != null)] | length' <<<"$data")"
     return 0
   fi
   printf '%-28s %-11s %-10s %-19s %s\n' "ID" "STATUS" "KIND" "CLAIM" "TITLE"
@@ -97,6 +102,10 @@ case "$MODE" in
     fi
     if [ "${FORMAT:-}" = "json" ]; then
       jq --arg id "$id" '.notes[$id]' <<<"$data"
+      exit 0
+    fi
+    if [ "${FORMAT:-}" = "line" ]; then
+      jq -r --arg id "$id" '.notes[$id] | "mode=show id=\($id) status=\(.status) kind=\(.kind) claim=\(.claim // "-") evidence=\(.evidence // "-")"' <<<"$data"
       exit 0
     fi
     jq -r --arg id "$id" '
@@ -231,6 +240,10 @@ case "$MODE" in
       printf '%s\n' "$hits"
       exit 0
     fi
+    if [ "${FORMAT:-}" = "line" ]; then
+      printf 'mode=near hits=%s\n' "$(jq 'length' <<<"$hits")"
+      exit 0
+    fi
     if [ "$(jq 'length' <<<"$hits")" -eq 0 ]; then
       echo "no note matches that intent — try fewer words, or 'ops:notes:search' for a phrase"
       exit 0
@@ -265,6 +278,10 @@ case "$MODE" in
       jq --arg id "$id" '.lineage[$id]' <<<"$data"
       exit 0
     fi
+    if [ "${FORMAT:-}" = "line" ]; then
+      jq -r --arg id "$id" '.lineage[$id] | "mode=lineage id=\($id) from=\(.from | length) supersedes=\(.supersedes | length) replacedBy=\(.replacedBy | length) descendants=\(.descendants | length)"' <<<"$data"
+      exit 0
+    fi
     jq -r --arg id "$id" '
       . as $d | .notes[$id] as $n | .lineage[$id] as $l
       | "\($n.title)",
@@ -290,9 +307,13 @@ case "$MODE" in
     ' <<<"$data"
     ;;
   claims)
-    open='["PROPOSED","ACCEPTED","IN FLIGHT","BLOCKED","OPEN"]'
+    open="$open_ids"
     if [ "${FORMAT:-}" = "json" ]; then
       jq --argjson open "$open" '{total: .counts.total, open: .counts.open, byClaim: .counts.byClaim, openByClaim: ([.notes[] | select(.status as $s | $open | index($s) != null)] | group_by(.claim) | map({key: (.[0].claim // "-"), value: length}) | from_entries), status: .counts.byStatus, evidence: ([.notes[] | .evidence] | group_by(.) | map({tier: .[0], notes: length}))}' <<<"$data"
+      exit 0
+    fi
+    if [ "${FORMAT:-}" = "line" ]; then
+      jq -r '"mode=claims notes=\(.counts.total) open=\(.counts.open) kinds=\(.counts.byClaim | length)"' <<<"$data"
       exit 0
     fi
     printf '%-19s %6s %6s  %s\n' "CLAIM" "NOTES" "OPEN" "EVIDENCE"

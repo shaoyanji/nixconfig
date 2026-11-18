@@ -273,6 +273,26 @@
       "- **${label}:** " + lib.concatStringsSep ", " (map relatedLink xs)
     );
 
+  lineageRows = e:
+    builtins.filter (r: r.ids != []) [
+      {
+        label = "from";
+        ids = e.from;
+      }
+      {
+        label = "supersedes";
+        ids = e.supersedes;
+      }
+      {
+        label = "replaced by";
+        ids = e.replacedBy;
+      }
+      {
+        label = "led to";
+        ids = lib.subtractLists e.replacedBy e.descendants;
+      }
+    ];
+
   notePageWith = linkify: relatedLink: e:
     "# ${e.title}\n\n"
     + "**Status:** ${statusBadge e} · **Kind:** `${e.kind}`"
@@ -280,20 +300,17 @@
     + lib.optionalString (e.date != null) " · **Updated:** ${e.date}"
     + "\n\n${e.summary}\n\n"
     + lib.concatStringsSep "\n" (
-      builtins.filter (s: s != "") [
-        (refLine linkify "hosts" e.refs.hosts)
-        (refLine linkify "modules" e.refs.modules)
-        (refLine linkify "tasks" e.refs.tasks)
-        (refLine linkify "docs" e.refs.docs)
-        (lib.optionalString (e.links != [])
-          ("- **Related notes:** " + lib.concatStringsSep ", " (map relatedLink e.links)))
-        (lineageLine relatedLink "From" e.from)
-        (lineageLine relatedLink "Supersedes" e.supersedes)
-        (lineageLine relatedLink "Replaced by" e.replacedBy)
-        # A superseding note IS a descendant (it knew what it replaced), so it is
-        # already on its own line; listing it twice reads like two successors.
-        (lineageLine relatedLink "Led to" (lib.subtractLists e.replacedBy e.descendants))
-      ]
+      builtins.filter (s: s != "") (
+        [
+          (refLine linkify "hosts" e.refs.hosts)
+          (refLine linkify "modules" e.refs.modules)
+          (refLine linkify "tasks" e.refs.tasks)
+          (refLine linkify "docs" e.refs.docs)
+          (lib.optionalString (e.links != [])
+            ("- **Related notes:** " + lib.concatStringsSep ", " (map relatedLink e.links)))
+        ]
+        ++ map (r: lineageLine relatedLink (capitalize r.label) r.ids) (lineageRows e)
+      )
     )
     + "\n"
     + lib.optionalString (e.body != "") "\n${e.body}\n";
@@ -378,6 +395,6 @@
 in {
   inherit api;
   inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus claims lineage origins frontier open;
-  inherit pages sitePages claimStats claimRows;
+  inherit pages sitePages claimStats claimRows lineageRows;
   # `api` is the typed document; `artifacts.agents-notes` serializes it.
 }

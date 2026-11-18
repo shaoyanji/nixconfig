@@ -713,58 +713,65 @@
     };
   };
 
-  agentNoteSlices =
-    lib.mapAttrsToList (id: e: let
-      metaRows =
-        [["status" e.status] ["kind" e.kind]]
-        ++ lib.optional (e.claim != null) ["claim" "${e.claim} (${e.evidence})"]
-        ++ lib.optional (e.priority != null) ["priority" e.priority]
-        ++ lib.optional (e.date != null) ["updated" e.date]
-        ++ lib.optional e.leaf ["trace" "leaf (no code refs; verbose intent)"];
-      refRows =
-        lib.optional (e.refs.hosts != []) ["hosts" (lib.concatStringsSep ", " e.refs.hosts)]
-        ++ lib.optional (e.refs.modules != []) ["modules" (lib.concatStringsSep ", " e.refs.modules)]
-        ++ lib.optional (e.refs.tasks != []) ["tasks" (lib.concatStringsSep ", " e.refs.tasks)]
-        ++ lib.optional (e.refs.docs != []) ["docs" (lib.concatStringsSep ", " e.refs.docs)]
-        ++ lib.optional (e.links != []) ["related" (lib.concatStringsSep ", " e.links)]
-        # Same four lineage rows as the markdown page (lib/agents-notes.nix), and
-        # the same subtraction: a superseding note is also a descendant, so it
-        # prints once, on `replaced by`.
-        ++ lib.optional (e.from != []) (noteRow "from" e.from)
-        ++ lib.optional (e.supersedes != []) (noteRow "supersedes" e.supersedes)
-        ++ lib.optional (e.replacedBy != []) (noteRow "replaced by" e.replacedBy)
-        ++ lib.optional (e.descendants != [] && lib.subtractLists e.replacedBy e.descendants != [])
-        (noteRow "led to" (lib.subtractLists e.replacedBy e.descendants));
-      row = r: ''<tr><th>${escH (builtins.head r)}</th><td><code>${escH (builtins.elemAt r 1)}</code></td></tr>'';
-      noteRow = label: ids:
-        "<tr><th>${label}</th><td>"
-        + lib.concatMapStringsSep ", " (id: "<button class=\"side-btn\" style=\"padding:0;border:none;color:var(--heading);cursor:pointer;\" url=\"data/agents-notes/${id}.json\">${escH id}</button>") ids
-        + "</td></tr>";
-    in {
-      name = "data/agents-notes/${id}.json";
-      file = pkgs.writeText "agent-note-${nodeSlug id}.json" (builtins.toJSON {
-        "#breadcrumbs" = {textContent = "fleet / notes / ${id}";};
-        "#sidebar-pane" = {innerHTML = sidebarButtons;};
-        "#detail-pane" = {
-          innerHTML = ''
-            <h2>${escH e.title}</h2>
-            <p style="margin: 0.75rem 0; color: var(--text-muted);">${escH e.summary}</p>
-            <table><tbody>
-              ${lib.concatMapStringsSep "\n" (r:
-              if builtins.isString r
-              then r
-              else row r) (metaRows ++ refRows)}
-            </tbody></table>
-            <div class="note"><!--KG_NOTE--></div>
-            <p style="margin-top: 1.5rem;">
-              <button class="tab-btn" url="data/agents-notes.json">&larr; All agent notes</button>
-              <button class="tab-btn" url="data/notes.json">Docs &amp; skills</button>
-            </p>
-          '';
-        };
-      });
-    })
-    agentsNotes.notes;
+  agentNoteSlices = let
+    slices =
+      lib.mapAttrsToList (id: e: let
+        metaRows =
+          [["status" e.status] ["kind" e.kind]]
+          ++ lib.optional (e.claim != null) ["claim" "${e.claim} (${e.evidence})"]
+          ++ lib.optional (e.priority != null) ["priority" e.priority]
+          ++ lib.optional (e.date != null) ["updated" e.date]
+          ++ lib.optional e.leaf ["trace" "leaf (no code refs; verbose intent)"];
+        refRows =
+          lib.optional (e.refs.hosts != []) ["hosts" (lib.concatStringsSep ", " e.refs.hosts)]
+          ++ lib.optional (e.refs.modules != []) ["modules" (lib.concatStringsSep ", " e.refs.modules)]
+          ++ lib.optional (e.refs.tasks != []) ["tasks" (lib.concatStringsSep ", " e.refs.tasks)]
+          ++ lib.optional (e.refs.docs != []) ["docs" (lib.concatStringsSep ", " e.refs.docs)]
+          ++ lib.optional (e.links != []) ["related" (lib.concatStringsSep ", " e.links)]
+          # Same four lineage rows as the markdown page (lib/agents-notes.nix), and
+          # the same subtraction: a superseding note is also a descendant, so it
+          # prints once, on `replaced by`.
+          ++ map (r: noteRow r.label r.ids) (agentsNotes.lineageRows e);
+        row = r: ''<tr><th>${escH (builtins.head r)}</th><td><code>${escH (builtins.elemAt r 1)}</code></td></tr>'';
+        noteRow = label: ids:
+          "<tr><th>${label}</th><td>"
+          + lib.concatMapStringsSep ", " (id: "<button class=\"side-btn\" style=\"padding:0;border:none;color:var(--heading);cursor:pointer;\" url=\"data/agents-notes/${id}.json\">${escH id}</button>") ids
+          + "</td></tr>";
+      in {
+        name = "data/agents-notes/${id}.json";
+        file = pkgs.writeText "agent-note-${nodeSlug id}.json" (builtins.toJSON {
+          "#breadcrumbs" = {textContent = "fleet / notes / ${id}";};
+          "#sidebar-pane" = {innerHTML = sidebarButtons;};
+          "#detail-pane" = {
+            innerHTML = ''
+              <h2>${escH e.title}</h2>
+              <p style="margin: 0.75rem 0; color: var(--text-muted);">${escH e.summary}</p>
+              <table><tbody>
+                ${lib.concatMapStringsSep "\n" (r:
+                if builtins.isString r
+                then r
+                else row r) (metaRows ++ refRows)}
+              </tbody></table>
+              <div class="note"><!--KG_NOTE--></div>
+              <p style="margin-top: 1.5rem;">
+                <button class="tab-btn" url="data/agents-notes.json">&larr; All agent notes</button>
+                <button class="tab-btn" url="data/notes.json">Docs &amp; skills</button>
+              </p>
+            '';
+          };
+        });
+      })
+      agentsNotes.notes;
+    expected = map (id: "data/agents-notes/${id}.json") (builtins.attrNames agentsNotes.notes);
+    produced = map (s: s.name) slices;
+    drift = lib.subtractLists expected produced ++ lib.subtractLists produced expected;
+    shared = lib.subtractLists (lib.unique produced) produced;
+  in
+    if drift != []
+    then throw "the site's note slices do not match the note set: ${lib.concatStringsSep ", " drift}"
+    else if shared != []
+    then throw "two notes share a slice path: ${lib.concatStringsSep ", " shared}"
+    else slices;
 
   # Knowledge Graph slice (Gap D)
   kgJson = builtins.toJSON {

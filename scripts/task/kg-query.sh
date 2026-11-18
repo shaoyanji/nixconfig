@@ -53,6 +53,7 @@ MIN=1
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --json) JSON=1; shift ;;
+    --line) LINE=1; shift ;;
     --top) TOP="${2:-0}"; shift 2 ;;
     --min) MIN="${2:-1}"; shift 2 ;;
     -h | --help) sed -n '2,34p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
@@ -277,6 +278,12 @@ RESULT="$(jq -c --arg a "${ID:-}" --argjson min "$MIN" "$JQ" "$GRAPH")"
 if [ "$JSON" = 1 ]; then
   jq -c --arg p "$PATTERN" --arg a "${ID:-}" --argjson r "$RESULT" \
     '{pattern: $p, arg: $a, count: ($r | length), results: $r}' <<<"{}"
+  exit 0
+fi
+
+if [ "$PATTERN" = "stats" ] && [ "${LINE:-0}" = 1 ]; then
+  jq -r '.[0] | "nodes=\(.nodes) hosts=\(.hosts) skills=\(.skills) docs=\(.docs) tags=\(.tags) modules=\(.modules) notes=\(.notes) edges=\(.edges)"' \
+    <<<"$RESULT"
   exit 0
 fi
 

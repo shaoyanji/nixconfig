@@ -15,6 +15,8 @@
 #   image-daily.sh wallpaper  set the first in-rotation wallpaper with swaybg
 #   image-daily.sh plates     a requested round of photoreal character plates from
 #                             the standing roster lib/image-daily/plates.txt
+#   image-daily.sh approve    put a day's kept plates into the wallpaper rotation,
+#                             newest first (idempotent; a rejection still wins)
 #
 # WHY THIS EXISTS: the allowance is 100 images per day and it does not carry
 # over, so a day nobody spends is a day thrown away — and a queue kept in a
@@ -713,6 +715,12 @@ cmd_run() {
     cmd_publish || say "publish failed; assets are on disk and the lane reads stale until it succeeds"
   fi
 
+  # The wall lane's keeps are wallpaper candidates too, so the approval a roster
+  # round does runs here as well; APPROVE=0 leaves the rotation to a person.
+  if [ "${APPROVE:-1}" = "1" ] && [ "${DRY:-0}" != "1" ]; then
+    cmd_approve || say "approve failed; the kept plates are on disk and `images:approve` retries it"
+  fi
+
   # A dry run has spent nothing, so it must not claim the day: the marker is what
   # makes the 06:10 run a no-op, and marking a DRY pass would silence the night.
   if [ "${DRY:-0}" != "1" ]; then
@@ -1197,6 +1205,44 @@ cmd_wallpaper() {
   say "$(basename "$pick")"
 }
 
+# The judgement is the keep; approval is what makes a kept plate a wallpaper, and
+# the first id in `wall.in` is the one `wallpaper` installs. A round approves its
+# own keeps, newest first, so the rotation follows the roster without a second
+# command. Idempotent: an id already listed is skipped, an id rejected in
+# `wall.out` stays rejected (a rejection wins over an approval), and an id whose
+# file is not on disk is skipped rather than added to fail later at install time.
+cmd_approve() {
+  local rotation=$repo/lib/image-daily/rotation.json day=${DAY:-$(today)} tmp id added
+  local -a ids=() new=()
+  [ -f "$rotation" ] || die "no rotation at $rotation"
+  [ -f "$LEDGER" ] || { say "approve: no ledger yet"; return 0; }
+  # The ledger stores the absolute path; a rotation id is the part under the lane
+  # root, and published/ wins over src/ when both exist (`resolve_plate`'s rule).
+  mapfile -t ids < <(
+    jq -r --arg d "$day" 'select(type == "object") | select(.day == $d and .verdict == "keep") | .path' "$LEDGER" |
+      while IFS= read -r p; do
+        id=${p#*/published/wall/}
+        [ "$id" = "$p" ] && id=${p#*/src/wall/}
+        printf '%s\n' "$id"
+      done | tac | awk '!seen[$0]++'
+  )
+  for id in "${ids[@]}"; do
+    [ -n "$id" ] || continue
+    case $id in /* | *"$IMAGES_ROOT"*) continue ;; esac
+    jq -e --arg id "$id" 'any((.wall.in // [])[]; . == $id)' "$rotation" >/dev/null 2>&1 && continue
+    jq -e --arg id "$id" '(.wall.out // {}) | has($id)' "$rotation" >/dev/null 2>&1 && continue
+    [ -f "$IMAGES_ROOT/published/wall/$id" ] || [ -f "$IMAGES_ROOT/src/wall/$id" ] || continue
+    new+=("$id")
+  done
+  [ "${#new[@]}" -gt 0 ] || { say "approve: nothing new for $day"; return 0; }
+  if [ "${DRY:-0}" = "1" ]; then printf '%s\n' "${new[@]}"; return 0; fi
+  added=$(printf '%s\n' "${new[@]}" | jq -R . | jq -sc .) || die "approve: could not encode the list"
+  tmp=$(mktemp) || die "approve: no temp file"
+  jq --argjson add "$added" '.wall.in = ($add + (.wall.in // []))' "$rotation" >"$tmp" &&
+    mv "$tmp" "$rotation" || { rm -f "$tmp"; die "approve: could not write $rotation"; }
+  say "approved ${#new[@]} plate(s) for $day, newest first"
+}
+
 # A requested character plate is not a brief and cannot be one: a brief is a
 # freshness promise (`every`), and nobody wants the same person redrawn on a
 # schedule. It also cannot ride the wall lane, whose intent is illustrated art —
@@ -1474,6 +1520,12 @@ cmd_plates() {
   if [ "${PUBLISH:-1}" = "1" ] && [ "${DRY:-0}" != "1" ] && [ "$spent" -gt 0 ]; then
     cmd_publish || say "publish failed; the plates are on disk and the next publish picks them up"
   fi
+  # The judgement is already made, so approval is the only step between a keep and
+  # a wallpaper; a round does it for its own plates. APPROVE=0 leaves the rotation
+  # to the operator.
+  if [ "${APPROVE:-1}" = "1" ] && [ "${DRY:-0}" != "1" ] && [ "$spent" -gt 0 ]; then
+    cmd_approve || say "approve failed; the plates are on disk and `images:approve` retries it"
+  fi
 
   # The round reports itself. It runs from a timer with nobody reading the log, and
   # xs-notify toasts a turn on the machine the person is actually at, so the result
@@ -1512,9 +1564,10 @@ case "${1:-plan}" in
   blog) shift && cmd_blog "$@" ;;
   wallpaper) cmd_wallpaper ;;
   plates) cmd_plates ;;
+  approve) cmd_approve ;;
   # The day's allowance as a number, for a caller that has to divide it: a slot
   # script splits what is left across the slots still to run. Empty stdout when the
   # pool is unreadable is the one answer here that is not a count.
   remaining) remaining ;;
-  *) die "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates|remaining" ;;
+  *) die "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates|approve|remaining" ;;
 esac

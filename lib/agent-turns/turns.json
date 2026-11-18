@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-18T20:47:09Z",
+  "generated": "2026-11-18T22:03:12Z",
   "count": 200,
-  "pin": "fa5ce0cb950d98d294a504d95e98c51c72657184a42b800089c8b62cc4c23eb7",
+  "pin": "7a6362a3b1f33f34cefe49dc03522fc5edb7f524e8725e419d96c551e850ea43",
   "turns": [
+    {
+      "id": "30cb08fc-386a-4235-a88b-1bc268367380",
+      "ts": "2026-11-18T22:00:47Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 1 plate(s) kept of 2 spent, 6 roster row(s) waiting, 511 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
+      "branch": "main",
+      "frame": "03h9f9ot25tnw16ysuwpansfl"
+    },
+    {
+      "id": "2ab10abf-1952-42be-a310-ffe13c51b5ff",
+      "ts": "2026-11-18T21:33:07Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 0 plate(s) kept of 2 spent, 7 roster row(s) waiting, 510 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
+      "branch": "main",
+      "frame": "03h9f4a8ltbiku94b58a7tmmh"
+    },
+    {
+      "id": "10586fff-849d-4cd3-9363-bb4359d0751d",
+      "ts": "2026-11-18T21:02:43Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 1 plate(s) kept of 3 spent, 7 roster row(s) waiting, 510 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
+      "branch": "main",
+      "frame": "03h9eych9z62fdu5d3gcqgrqv"
+    },
+    {
+      "id": "38ebb55c-85c2-4f5d-8887-fab3ca4907fa",
+      "ts": "2026-11-18T20:47:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:freeapi-complete",
+      "action": "apisfreellm re-checked live: chat, /ask, /health, /models, /v1/completions, SSE stream, freeserp web+sites and keyless trustburn all answer; freenews still needs its free key. Added freeapi.sh complete + task freeapi:complete for the documented completions shape (choices[0].text), one skill line, budget 144->145. check:verify 111/111, taskfile graph clean, checks:prose and checks:quick green.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
+      "branch": "main",
+      "frame": "03h9evc1q9f5xi3rl3hr26bwu"
+    },
     {
       "id": "a1d365b3-7e52-428b-aa3c-f646ab2aaedb",
       "ts": "2026-11-18T20:45:03Z",
@@ -2696,58 +2748,6 @@
       "base_commit": "51178ea7c84b423e2fcfd55aff376e56a91459f2",
       "branch": "main",
       "frame": "03h7oir4iz5ptug6hu0xdlqta"
-    },
-    {
-      "id": "1a20ee6b-e801-4254-a6fe-1e0eebd1993a",
-      "ts": "2026-11-10T18:26:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:image-briefs-and-qwen38",
-      "action": "Qwen3.8-35B-A3B benched on eisen: 15.7 tok/s decode over three 128-token runs, 93 tok/s prefill, 15.9 on an agent turn. Fails the 50 tok/s bar and sits under strata's 19.4, so strata keeps :8085; 1.7 GB experts/token against 25.6 GB/s DDR3 is a ~15 tok/s wall. Note REJECTED + docs pushed 51178ea7. Eight wall-char briefs now describe face and kit; briefs_guard refuses name-only briefs, af372289. Eisen off, ping and ssh dead.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "51178ea7c84b423e2fcfd55aff376e56a91459f2",
-      "branch": "main",
-      "frame": "03h7nlg288jli8okgf6vifhep"
-    },
-    {
-      "id": "6442ce1a-6038-445d-b599-0c204cc5fb55",
-      "ts": "2026-11-10T17:55:50Z",
-      "source": "devji",
-      "subject": "nixconfig:qwen38-35b-a3b-eisen",
-      "action": "Qwen3.8-35B-A3B Q4_K_M copied to eisen (21.7GB, sha256 196103..cfa5 matches both ends) and benched on Vulkan with experts in RAM: tg 15.7/15.6/15.9 tok/s, pp 93 over 601. Fails the 50 tok/s bar and is under strata's 19.4, so strata stays. Bandwidth wall ~15. Note REJECTED + docs table pushed (51178ea7); eisen powered off. Character briefs now describe each Frieren character's face and kit; briefs_guard refuses a name-only brief.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "51178ea7c84b423e2fcfd55aff376e56a91459f2",
-      "branch": "main",
-      "frame": "03h7nfghxrzomnxnmdita8jct"
-    },
-    {
-      "id": "324f0df7-371f-48c9-b51d-fc2a023406c0",
-      "ts": "2026-11-10T17:29:29Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily-prompts",
-      "action": "Rewrote 29 image-brief prompts to name the scene, dropped the 4k/neumorphism tail, set rev 2 on the 14 wall briefs, added per-attempt ledger rows and a 3-strike park, cut fleet-site badges to frieren; pushed a30f9595, no deploy",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a30f9595609306908c2228584329f74636900be5",
-      "branch": "main",
-      "frame": "03h7nab9r8t7cjou0xzrybqmp"
-    },
-    {
-      "id": "e2504bbd-1c26-42fa-b855-58df8d8c85f1",
-      "ts": "2026-11-10T17:23:05Z",
-      "source": "devji",
-      "subject": "nixconfig:deepseek-v4-flash-eisen",
-      "action": "Pack copied to eisen (56.57 GiB, all hashes OK). Bundled binary SIGILLs (AVX-512 build, Haswell here); source build of synchopate/llama-modchip runs: load 4 min, pp 6-7, tg 2.9 tok/s vs Strata 19.4. Note REJECTED, module unimported, strata restored, eisen powered off.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7256245e0fa846166c1be7891ab31a798084f75d",
-      "branch": "main",
-      "frame": "03h7n9276i6fe4eu4y7e1x67c"
     }
   ]
 }

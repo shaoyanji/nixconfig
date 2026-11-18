@@ -45,7 +45,7 @@ tasks:
       row is skipped, so a resumed round costs nothing, and the four
       `image-daily-slot-*` timers spend the roster after the lane queue, so nobody
       starts or watches one. Env: `ONLY=`, `MAX_GEN=`, `FORCE=1`, `DRY=1`,
-      `PUBLISH=0`, `XS_SUMMARY=0`.
+      `PUBLISH=0`, `APPROVE=0`, `XS_SUMMARY=0`.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" bash scripts/task/image-daily.sh plates
 
@@ -159,6 +159,18 @@ tasks:
       destroyed, and `DRY=1` prints the list instead.
     cmds:
       - GC_PREFIX="{{if .GC_PREFIX}}{{.GC_PREFIX}}{{end}}" IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh gc
+
+  images:approve:
+    desc: Put a day's kept plates into the wallpaper rotation, newest first
+    summary: >
+      The judgement is the keep, so approval is the one step between a plate and
+      a wallpaper. Idempotent: an id already listed is skipped, an id rejected in
+      `wall.out` stays rejected, and a plate whose file is gone is skipped rather
+      than added to break `images:wallpaper` later. `DAY=2026-11-18` picks another
+      day, `DRY=1` prints what would be added. A round approves its own keeps, so
+      the nightly slots keep the rotation current unless `APPROVE=0`.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} DAY="{{if .DAY}}{{.DAY}}{{end}}" bash scripts/task/image-daily.sh approve
 
   images:wallpaper:
     desc: Set the first in-rotation wallpaper with swaybg (a dwl session's rotation)

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T09:42:10Z",
+  "generated": "2026-11-18T10:06:46Z",
   "count": 200,
-  "pin": "1abae6079e185104d8f049e6b9722a4e65848752a98dab305962783ff82d0a7c",
+  "pin": "57cedc29d923b29cbb4fdb591649144a9a99f92a94def626b56e5d1ea9d4bdbe",
   "turns": [
+    {
+      "id": "170ce3a7-a74a-48d1-9007-bd07e026719c",
+      "ts": "2026-11-18T09:59:17Z",
+      "source": "devji",
+      "subject": "nixconfig:slice-links-line-form-pin-idempotence",
+      "action": "lineage targets must have a slice; ops:kg:evidence FORMAT=line; turns snapshot no longer rewrites when unchanged",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "be98090a9872cee5e9424af5088db7db87abdc34",
+      "branch": "main",
+      "frame": "03h9bcqwudmny3w1dppm30qcl"
+    },
     {
       "id": "c12ef758-52de-4a51-90a1-31ce6f48161a",
       "ts": "2026-11-18T09:41:39Z",
@@ -2779,19 +2792,6 @@
       "base_commit": "3c6d1502c478050ed746dd95f03cb3975f55345b",
       "branch": "main",
       "frame": "03h7gmnb0gu9d3hnvf5bifc5i"
-    },
-    {
-      "id": "d4975b3e-6c1a-4ebe-b936-2f2bd048dd99",
-      "ts": "2026-11-09T20:51:12Z",
-      "source": "devji",
-      "subject": "nixconfig:bountystash-corpus-capsule",
-      "action": "Pushed a93b7df1: the Gemini capsule's section headings and Gemini-only labels moved into the corpus's capsule block in lib/bountystash/portfolio*.json (build byte-identical, same store path), shared.nix keeps only slug, and BOUNTY_DIR is now resolved by scripts/task/bountystash-dir.sh with a bountystash:dir task instead of naming frieren's data volume.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "55e99a3a7becd40c8641d8ef7fcc2b9d6cbf3118",
-      "branch": "main",
-      "frame": "03h7gkf301dv3pm8n95dmy7tm"
     }
   ]
 }

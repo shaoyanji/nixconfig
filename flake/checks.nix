@@ -472,6 +472,16 @@ lib.genAttrs systems.work (
           ++ map (s: "sink '${s}' names route '${sinkRoute s}', which flake/epistemics.nix does not declare") (
             builtins.filter (s: !(builtins.elem (sinkRoute s) epistemicsCtl.sourceIds)) ontologyCtl.sinkIds
           );
+        bareNotes = import ../lib/agents-notes.nix {inherit lib;};
+        claimParity = let
+          bare = bareNotes.counts.byClaim;
+          compiled = agentsNotesCtl.counts.byClaim;
+          keys = lib.unique (builtins.attrNames bare ++ builtins.attrNames compiled);
+          unclassified = builtins.filter (id: (bareNotes.index.${id}.claim or null) == null) (builtins.attrNames bareNotes.index);
+        in
+          lib.optional (!(builtins.all (k: (bare.${k} or 0) == (compiled.${k} or 0)) keys))
+          "a bare lib/agents-notes.nix import reports claim counts ${builtins.toJSON bare} where the compiled projection reports ${builtins.toJSON compiled} — the site renders the bare one"
+          ++ map (id: "note ${id} has no claim kind without an explicit claimOf — a surface importing the module bare would show it unclassified") unclassified;
         recordedCount = builtins.length (builtins.filter (e: e ? evidence) g.edges);
         recordIssues = lib.optional (recordedCount == 0) "no edge records its own evidence — the per-edge tier is declared but nothing uses it";
         citationIssues = map (c: "citation ${c} names a policy id flake/policies.nix does not declare — the graph drops the edge, so name the rule or drop the citation") knowledgeGraphCtl.unresolvedCitations;
@@ -494,7 +504,7 @@ lib.genAttrs systems.work (
             ++ lib.optional (x.cannot == "") "${r}.cannot is empty — say what the edge does not prove"
             ++ lib.optional (x.from == [] || x.to == []) "${r} declares no domain or range")
           declaredRelations;
-        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ kindIssues ++ recordIssues ++ citationIssues ++ tierIssues ++ sparseIssues;
+        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ claimParity ++ kindIssues ++ recordIssues ++ citationIssues ++ tierIssues ++ sparseIssues;
         nodeCount = builtins.length g.nodes;
         edgeCount = builtins.length g.edges;
         entityCount = builtins.length declaredEntities;
@@ -504,7 +514,7 @@ lib.genAttrs systems.work (
         then builtins.throw "the graph is not an instance of its ontology (flake/ontology.nix):\n  ${lib.concatStringsSep "\n  " issues}"
         else
           pkgs.runCommand "ontology" {} ''
-            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges (${toString recordedCount} record their own tier), every edge admitted, every citation resolves, every field declared, every stable claim kind homed, every sink routed, every note classified"
+            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges (${toString recordedCount} record their own tier), every edge admitted, every citation resolves, every field declared, every stable claim kind homed, every sink routed, every note classified — on a bare import too"
             touch $out
           '';
 

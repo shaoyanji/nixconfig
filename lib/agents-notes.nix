@@ -3,7 +3,7 @@
   lib,
   inventory ? null,
   notes ? import ../AGENTS.nix,
-  claimOf ? {},
+  claimOf ? (import ../flake/epistemics.nix {inherit lib;}).noteClaims,
 }: let
   root = ../.;
   raw = notes.notes or {};

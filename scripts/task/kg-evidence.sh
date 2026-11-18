@@ -7,8 +7,9 @@
 # unresolved citations are the policy ids prose names that flake/policies.nix
 # does not declare — the edges the graph drops, which `checks:ontology` fails on.
 #
-# Usage: kg-evidence.sh
-# Env: FORMAT=json emits the object instead of the table.
+# Usage: kg-evidence.sh [RELATION]
+# Env: FORMAT=json emits the object instead of the table. RELATION narrows every
+# count to one relation; an unknown one exits 2 and names the declared relations.
 set -euo pipefail
 
 REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
@@ -25,6 +26,14 @@ if ! data="$(iets_eval_json .?submodules=1#knowledgeGraph.evidence 2>"$err")"; t
   exit 1
 fi
 
+relation="${1:-}"
+if [ -n "$relation" ]; then
+  if ! jq -e --arg r "$relation" '.relations | has($r)' <<<"$data" >/dev/null; then
+    echo "kg-evidence: no relation '$relation'; declared: $(jq -r '.relations | keys | join(", ")' <<<"$data")" >&2
+    exit 2
+  fi
+  data="$(jq --arg r "$relation" '.relations = {($r): .relations[$r]} | .recordedEdges = [.recordedEdges[] | select(.type == $r)] | .total = .relations[$r].edges | .recorded = .relations[$r].recorded' <<<"$data")"
+fi
 unresolved="$(jq '.unresolvedCitations | length' <<<"$data")"
 if [ "${FORMAT:-}" = "json" ]; then
   jq . <<<"$data"

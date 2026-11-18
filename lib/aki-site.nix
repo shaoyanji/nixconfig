@@ -719,6 +719,7 @@
     lib.mapAttrsToList (id: e: let
       metaRows =
         [["status" e.status] ["kind" e.kind]]
+        ++ lib.optional (e.claim != null) ["claim" "${e.claim} (${e.evidence})"]
         ++ lib.optional (e.priority != null) ["priority" e.priority]
         ++ lib.optional (e.date != null) ["updated" e.date]
         ++ lib.optional e.leaf ["trace" "leaf (no code refs; verbose intent)"];
@@ -881,10 +882,7 @@
   # repository file to index): decisions, queue items and design studies,
   # compiled and validated by lib/agents-notes.nix. They use the same
   # build-time markdown renderer and the same static-slice navigation as a doc.
-  agentsNotes = import ./agents-notes.nix {
-    inherit lib;
-    claimOf = (import ../flake/epistemics.nix {inherit lib;}).noteClaims;
-  };
+  agentsNotes = import ./agents-notes.nix {inherit lib;};
 
   # Doc and skill nodes carry their own text into their slice. The note is read
   # from the repository at evaluation time, shipped as data next to the slice,

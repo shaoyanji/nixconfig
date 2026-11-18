@@ -17,6 +17,12 @@
 # STRICT=1 turns absence into a failure for the run that wants to prove the fleet
 # is actually up.
 #
+# A bare hostname resolves only where MagicDNS is the resolver, and a tailnet host
+# with Tailscale SSH answers `ssh` with "requires an additional check" instead of a
+# key handshake. So each host is tried three times — ssh alias, tailnet FQDN, LAN
+# address from inventory.toml — and one resolver or auth gap is not thirteen
+# unreachable machines.
+#
 # Usage: atuin-audit.sh [--strict]
 # Env:   HOSTS="a b"  audit only these · ATUIN_TIMEOUT=20 per host · STRICT=1
 # Exit:  0 every reachable host is logged in · 1 a reachable host is not
@@ -46,15 +52,26 @@ command -v yq >/dev/null || { echo "atuin-audit: yq is not on PATH" >&2; exit 2;
 
 hosts=$(yq -r '.hosts | to_entries | .[]
   | select(.value.status == "active" and (.value.kind == "nixos" or .value.kind == "home"))
-  | [.key, (.value.network.ssh_alias // .key)] | @tsv' "$INVENTORY") || {
+  | [.key, (.value.network.ssh_alias // .key), (.value.network.lan_ip // "")] | @tsv' "$INVENTORY") || {
   echo "atuin-audit: could not read hosts from $INVENTORY" >&2
   exit 2
 }
 
+# host -> tailnet FQDN, from the local tailscale daemon. Empty when tailscale is
+# absent or logged out, which leaves the single-alias behaviour below unchanged.
+declare -A fqdn=()
+if command -v tailscale >/dev/null 2>&1 && ts=$(timeout 10 tailscale status --json 2>/dev/null); then
+  while IFS=$'\t' read -r name dns; do
+    [ -n "$name" ] && [ -n "$dns" ] || continue
+    fqdn[$name]=${dns%.}
+  done < <(jq -r '((.Peer // {}) | to_entries[] | [.value.HostName, .value.DNSName]),
+    (if .Self then [.Self.HostName, .Self.DNSName] else empty end) | @tsv' <<<"$ts" 2>/dev/null)
+fi
+
 if [ -n "${HOSTS:-}" ]; then
   keep=$(printf '%s\n' $HOSTS)
-  hosts=$(while IFS=$'\t' read -r key target; do
-    grep -qxF -- "$key" <<<"$keep" && printf '%s\t%s\n' "$key" "$target"
+  hosts=$(while IFS=$'\t' read -r key target lan; do
+    grep -qxF -- "$key" <<<"$keep" && printf '%s\t%s\t%s\n' "$key" "$target" "$lan"
   done <<<"$hosts")
 fi
 
@@ -64,10 +81,10 @@ wrapper=$(command -v timeout || command -v gtimeout || true)
 
 probe() { # target
   if [ -n "$wrapper" ]; then
-    "$wrapper" "$TIMEOUT" ssh -o BatchMode=yes -o ConnectTimeout=5 \
+    "$wrapper" "$TIMEOUT" ssh -o BatchMode=yes -o ConnectTimeout=3 \
       -o StrictHostKeyChecking=accept-new "$1" bash -s 2>/dev/null
   else
-    ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new "$1" bash -s 2>/dev/null
+    ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "$1" bash -s 2>/dev/null
   fi <<'REMOTE'
 set +e
 d=$(command -v atuin 2>/dev/null)
@@ -92,9 +109,16 @@ fleet_addr=$(grep -o 'sync_address = "[^"]*"' "$ROOT/modules/shell/atuin.nix" 2>
 fail=0 ok=0 skip=0 warn=0
 
 printf '%-14s %-8s %-26s %-7s %s\n' HOST STATE SYNC_ADDRESS ITEMS UNIT
-while IFS=$'\t' read -r key target; do
+while IFS=$'\t' read -r key target lan; do
   [ -n "$key" ] || continue
-  line=$(probe "$target")
+  line="" tried=""
+  for t in "$target" "${fqdn[$key]:-}" "$lan"; do
+    [ -n "$t" ] || continue
+    [ "$t" = "$tried" ] && continue
+    tried=$t
+    line=$(probe "$t")
+    [ -n "$line" ] && break
+  done
   if [ -z "$line" ]; then
     printf '%-14s %-8s %s\n' "$key" SKIP "unreachable"
     skip=$((skip + 1))

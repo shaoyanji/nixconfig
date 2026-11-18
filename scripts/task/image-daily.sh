@@ -543,13 +543,27 @@ run_lane() { # lane budget
 # The published tree accumulates; a deploy replaces the whole site, so it must
 # carry every earlier day or the history disappears on the second run.
 stage_publish() {
-  local day file rel out
+  local day file rel out base
   while IFS= read -r file; do
-    # The ledger is append-only and a path in it can be stale: a plate deleted for
-    # being the wrong subject leaves a keep behind. Skip what is not on disk rather
-    # than failing the whole manifest on one old row.
-    [ -f "$file" ] || { say "publish: ledger path is gone ($file)"; continue; }
+    # A legacy row can carry a log line before its path: `say` wrote to stdout
+    # until 2026-11-10 and `attempt` is read as a capture, so nine rows hold
+    # "…rate limited…\n/path". The path is the last line either way.
+    case $file in *$'\n'*) file=${file##*$'\n'} ;; esac
     rel=${file#"$IMAGES_ROOT/src/"}
+    # The ledger is append-only and a path in it can be stale: a plate deleted for
+    # being the wrong subject leaves a keep behind, and a slug re-rendered on a
+    # later day leaves the earlier row pointing at the file the new render
+    # replaced. Skipping is right — one old row must not fail the manifest — but
+    # six lines per publish saying so is not: count them, say it once.
+    if [ ! -f "$file" ]; then
+      base=$(basename "$rel")
+      if compgen -G "$IMAGES_ROOT/published/${rel%%/*}/*/$base" >/dev/null; then
+        PUBLISH_SHIFTED=$((PUBLISH_SHIFTED + 1))
+      else
+        PUBLISH_GONE=$((PUBLISH_GONE + 1))
+      fi
+      continue
+    fi
     if [ "$lane" = "blog" ]; then
       # 3:2 out of the generator, 1200x630 in the page. The crop is local work,
       # so it costs no image and keeps og:image at a few hundred KB instead of
@@ -782,12 +796,15 @@ deploy_frontend() {
 
 cmd_publish() {
   need jq
-  local lane
+  local lane PUBLISH_SHIFTED=0 PUBLISH_GONE=0
   [ -d "$IMAGES_ROOT/src" ] || die "nothing generated yet under $IMAGES_ROOT/src"
   for lane in site wall blog badge; do
     [ "$(lane_setting "$lane" publish)" = "true" ] || continue
     stage_publish
   done
+  if [ "$PUBLISH_SHIFTED" -gt 0 ] || [ "$PUBLISH_GONE" -gt 0 ]; then
+    say "publish: $PUBLISH_SHIFTED keep row(s) already served under another day, $PUBLISH_GONE with no file left"
+  fi
   build_index
   say "$(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | wc -l) asset(s) staged"
   if [ "${DRY:-0}" = "1" ]; then

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T15:51:20Z",
+  "generated": "2026-11-18T16:00:14Z",
   "count": 200,
-  "pin": "c31a9e28c36ab394c381b375796273ecfb4b63c343bdfe5c08e5b9e68cd49284",
+  "pin": "591fbc7a18239dd1fe77969a29a53068f555046b9d7f6a2de7b7e04d144fa0cb",
   "turns": [
+    {
+      "id": "c1f8ce7e-f8a2-4a9d-a93c-3b31c3192efc",
+      "ts": "2026-11-18T15:51:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:minuet-chat-fim",
+      "action": "minuet now has openai_compatible for llm.onerouter.pro/v1/chat/completions on deepseek/deepseek-v4-flash-0731:free, chosen at setup when INFRON_API_KEY is present, local eisen FIM otherwise; kickstart.nixvim 45c063b, nixconfig pin bumped with nixvim b67578f, checks:host penguin rc=0. Infill confirmed unavailable: /completions 404 for deepseek free, qwen free rejects suffix (400), /beta/completions 405.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ee7802a36baaf6d82abe3c7dea9bbdf18c6cf84f",
+      "branch": "main",
+      "frame": "03h9d9jr4sugfy1kj8vkn3saa"
+    },
     {
       "id": "47d885f1-6c4f-4c4c-9707-4e7da6a97b4b",
       "ts": "2026-11-18T15:44:49Z",
@@ -2743,19 +2756,6 @@
       "base_commit": "4a2f7fe8b1e79bf8d9c26948f7111ca65b821889",
       "branch": "main",
       "frame": "03h7i0bw1f99abimi0uabuuzb"
-    },
-    {
-      "id": "99f51add-de4b-411b-81c4-f8ada2d52989",
-      "ts": "2026-11-10T01:14:36Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-queue-ternary",
-      "action": "Appflow triage: local engines answer attribute/ignore/unsure, unsures go to one hermes batch, ignore is a reversible queue tier with --restore",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4a2f7fe8b1e79bf8d9c26948f7111ca65b821889",
-      "branch": "main",
-      "frame": "03h7hzvezevvc3i0kp4k6wtiu"
     }
   ]
 }

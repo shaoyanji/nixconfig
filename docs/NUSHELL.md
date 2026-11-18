@@ -64,7 +64,7 @@ Fixed 2026-10-19:
   Now `install -m 600` creates it first, `save -f` truncates in place.
 
 Verified: 34 keys load; `GROQ`, `TODOIST`, `COHERE`, `OPENROUTER`, `TYPESAFE`,
-`NVIDIA`, `GEMINI` all present; pre-setting `GEMINI_API_KEY` no longer blocks the rest.
+`NVIDIA`, `GEMINI`, `INFRON` all present; pre-setting `GEMINI_API_KEY` no longer blocks the rest.
 `sops`/age keys are not needed for **eval** — only for this loader.
 
 Pitfall: the loader is `export-env` + `def --env`, so it takes effect when the file

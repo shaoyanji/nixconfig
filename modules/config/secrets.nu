@@ -101,6 +101,7 @@ def --env _load_all_secrets [force_refresh: bool = false] {
       GROQ_API_KEY:                  "GROQ.API.KEY"
       OPENROUTER_API_KEY:            "OPENROUTER.API.KEY"
       GEMINI_API_KEY:                "GEMINI.API.KEY"
+      INFRON_API_KEY:                "INFRON.API.KEY"
       COHERE_API_KEY:                "COHERE.API.KEY"
       OPENCODE_API_KEY:              "OPENCODE.API.KEY"
       AIHUBMIX_API_KEY:              "AIHUBMIX.API.KEY"

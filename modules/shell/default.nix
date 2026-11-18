@@ -52,11 +52,11 @@ in {
           export PATH="/run/wrappers/bin:$PATH"
         fi
 
-        # Load in-memory decrypted secrets if available (shared with Nushell)
-        if [ -z "''${GEMINI_API_KEY:-}" ]; then
+        # Load in-memory secrets (shared with Nushell) unless the loader already ran here
+        if [ "''${NU_SECRETS_LOADED:-}" != "1" ]; then
           _sec_cache="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/nushell-secrets.json"
           if [ -f "$_sec_cache" ] && command -v jq >/dev/null 2>&1; then
-            eval "$(jq -r 'to_entries | .[] | "export " + .key + "=" + (.value | @sh)' "$_sec_cache" 2>/dev/null)"
+            eval "$(jq -r 'to_entries | .[] | "export " + .key + "=" + (.value | @sh)' "$_sec_cache" 2>/dev/null)" && export NU_SECRETS_LOADED=1
           fi
         fi
 

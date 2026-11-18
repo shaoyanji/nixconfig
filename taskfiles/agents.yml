@@ -310,13 +310,14 @@ tasks:
   agents:pins:refresh:
     desc: Refresh the small pinned datasets in lib/pins.toml, and nothing large
     summary: >
-      scripts/task/pins-refresh.sh — `lib/pins.toml`: a file, its refresh command,
-      and the `max_bytes` that keeps a corpus out. An unavailable source is SKIPPED
-      and named; an oversized one is refused. `--check` exits 1 on a stale pin, or
-      on a gist fetch with no `[[hash]]` row or a bare hash, and needs no network;
+      scripts/task/pins-refresh.sh — `lib/pins.toml`: a file, its refresh cmd, and
+      the `max_bytes` that keeps a corpus out. A missing source is SKIPPED and
+      named; an oversized one is refused. `--check` exits 1 on a stale pin, or on a
+      gist fetch with no `[[hash]]` row or a bare hash, and needs no network;
       `--commit` commits. `hash_key` names the fetch a pin feeds; a `[[hash]]`
-      entry is a gist fetch with no file here (shell configs, SSH keys). Either
-      way that sha256 moves in the same commit, archives excluded.
+      entry is a gist with no file here (shell configs, SSH keys). That sha256 moves
+      in the same commit; archives excluded. Each hash line names its value and the
+      commit that pinned it.
       Vars: CLI_ARGS=, PINS=, PIN_TIMEOUT=.
     cmds:
       - bash scripts/task/pins-refresh.sh {{.CLI_ARGS}}

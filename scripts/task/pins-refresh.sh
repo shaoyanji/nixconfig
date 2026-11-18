@@ -16,6 +16,10 @@
 # A `[[hash]]` is a fetch with no file here — a gist a shell reads, the SSH key
 # list — where the hash is the whole pin, so every run re-reads it.
 #
+# A `[[hash]]` line carries the value that is pinned and the commit that pinned
+# it, so the report answers "what does the build read, and since when" without a
+# second lookup.
+#
 # Usage
 #   pins-refresh.sh            refresh, print what changed
 #   pins-refresh.sh --check    exit 1 when a pin is stale, without writing
@@ -50,6 +54,20 @@ hash_rows=$(yq -p toml -o json '.hash // []' "$PINS" | jq -r '.[] | [.key, (.fil
 changed=()
 skipped=()
 
+# The pin's current sha256 as Nix reads it, or empty.
+hash_value() { # key file
+  jq -r --arg k "$1" '.. | objects | select(.key == $k) | .sha256 // empty' "$ROOT/$2" 2>/dev/null | head -1
+}
+
+# When this exact hash entered the tree. `-S` matches the value itself, not the
+# row, so reformatting the entry does not read as a change; a hash still in the
+# working tree has no commit to name yet.
+hash_age() { # file value
+  local line
+  line=$(git -C "$ROOT" log -1 --format='%h %cs' -S"$2" -- "$1" 2>/dev/null)
+  printf '%.20s %s' "${2:-none}" "${line:-uncommitted}"
+}
+
 # A gist Nix fetches is bytes with no file here: its sha256 is the only thing
 # telling the build which revision it reads, so a gist that was added without a
 # `[[hash]]` row, or whose hash was written bare, is drift nothing would report
@@ -76,7 +94,7 @@ check_hashes() {
 
   while IFS=$'\t' read -r key file; do
     [ -n "$key" ] || continue
-    value=$(jq -r --arg k "$key" '.. | objects | select(.key == $k) | .sha256 // empty' "$ROOT/$file" 2>/dev/null | head -1)
+    value=$(hash_value "$key" "$file")
     # Nix's base32: digits and lowercase minus e, o, t and u — 52 of them.
     if ! [[ "$value" =~ ^sha256:[0-9abcdfghijklmnpqrsvwxyz]{52}$ ]]; then
       printf 'BADHASH  %-18s %s (%s)\n' "$key" "$file" "${value:-none}" >&2
@@ -97,10 +115,10 @@ refresh_hash() { # name key file
   if log=$(bash "$ROOT/scripts/task/nix-hash-update.sh" "$ROOT/$file" "$key" 2>&1); then
     after=$(sha256sum "$ROOT/$file" | cut -d' ' -f1)
     if [ "$before" = "$after" ]; then
-      printf 'HASH   %-12s %-20s unchanged\n' "$name" "$key"
+      printf 'HASH   %-12s %-20s unchanged  %s\n' "$name" "$key" "$(hash_age "$file" "$(hash_value "$key" "$file")")"
     else
       git -C "$ROOT" add -- "$file"
-      printf 'HASH   %-12s %-20s rewritten\n' "$name" "$key"
+      printf 'HASH   %-12s %-20s rewritten  %s\n' "$name" "$key" "$(hash_age "$file" "$(hash_value "$key" "$file")")"
       changed+=("$key")
     fi
   else
@@ -167,6 +185,12 @@ fi
 if [ "$mode" = --check ]; then
   check_hashes || exit 1
   [ ${#changed[@]} -eq 0 ] || { printf 'pins: %d stale — task pins:refresh\n' "${#changed[@]}" >&2; exit 1; }
+  # The same line the refresh prints, minus the network: what the tree pins and
+  # when each hash got there, read from git rather than a snapshot file.
+  while IFS=$'\t' read -r key file; do
+    [ -n "$key" ] || continue
+    printf 'HASH   %-12s %-20s pinned     %s\n' "fetch" "$key" "$(hash_age "$file" "$(hash_value "$key" "$file")")"
+  done <<<"$hash_rows"
   printf 'pins: all fresh (%d hashes)\n' "$(printf '%s\n' "$hash_rows" | cut -f1 | wc -l)"
   exit 0
 fi

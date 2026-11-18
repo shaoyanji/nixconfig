@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T15:01:41Z",
+  "generated": "2026-11-18T15:10:02Z",
   "count": 200,
-  "pin": "9855756cfbee821d7b8c1bec313e0cc9fa00dab8442828578acb09ef40417b56",
+  "pin": "0e0addfbbd80ae6209ea2a2576facaa45616b61eec948e33a84361ee223b00eb",
   "turns": [
+    {
+      "id": "76eb8731-18a0-459a-aa6d-470efd25d53f",
+      "ts": "2026-11-18T15:02:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:pins-gist-hash-gate",
+      "action": "pins --check now fails on a gist URL with no [[hash]] row and on a bare sha256, offline so pre-push runs it; tested both directions. diogenes atuin logged in, nu+bash history seeded once, fleet at 30707 items on frieren and diogenes",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "563fec4b4c3d840318756cf6e29c131240ea5e4e",
+      "branch": "main",
+      "frame": "03h9czwgyn1ccw8mdy2bcfezl"
+    },
     {
       "id": "3d2b09ad-9867-4910-bd90-1a02883e2574",
       "ts": "2026-11-18T14:35:40Z",
@@ -2743,19 +2756,6 @@
       "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
       "branch": "main",
       "frame": "03h7hju28j4xge19nas98ss96"
-    },
-    {
-      "id": "a099326a-29df-42d2-8f80-378d77027564",
-      "ts": "2026-11-09T23:44:26Z",
-      "source": "devji",
-      "subject": "nixconfig:git-pull",
-      "action": "pulled origin/main 591e5bb5..b4509a6e (fast-forward, secrets submodule to 8756c60)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
-      "branch": "main",
-      "frame": "03h7hi9k0z2pjmnxdcceufcv8"
     }
   ]
 }

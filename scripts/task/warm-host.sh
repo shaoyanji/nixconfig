@@ -264,7 +264,17 @@ for h in "${hosts[@]}"; do
     mapfile -t gaps < <(pending_list "$attr")
     n="${#gaps[@]}"
     if [ "${n:-0}" -eq 0 ]; then
-      report "warm [$h] READY — this host substitutes everything"
+      # The toplevel is excluded from the count above on purpose, and saying
+      # READY without naming it is what made this gate and activate-host.sh
+      # disagree: measured 2026-11-18, `--check` said READY while the deploy
+      # refused the same host, because the toplevel is in no cache and never
+      # will be. Name it, so READY means what the deploy will then do.
+      if [ -n "$top" ] && served_by_cache "$top" "${stores[@]}"; then
+        report "warm [$h] READY — this host substitutes everything; toplevel served by $answer_cache"
+      else
+        report "warm [$h] READY — this host substitutes everything"
+        report "         toplevel $top is in no store (normal); activate builds that tree on the target"
+      fi
     else
       report "warm [$h] GAP — this host would COMPILE $n derivations:"
       printf '%s\n' "${gaps[@]:0:5}" | sed 's/^/           /' | while IFS= read -r line; do report "$line"; done

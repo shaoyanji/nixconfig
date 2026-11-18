@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T10:51:51Z",
+  "generated": "2026-11-18T11:02:00Z",
   "count": 200,
-  "pin": "6454ca70e66da78a0f149252aec9b0feccf4a9d70d13a59892ddadc05a6d9fa0",
+  "pin": "639ce7d48edb129660fc8db7ffd041f70d3912cf57227800c7598f9a3a22fb26",
   "turns": [
+    {
+      "id": "30a0696d-e646-4662-b2c6-41910f209282",
+      "ts": "2026-11-18T10:51:56Z",
+      "source": "devji",
+      "subject": "nixconfig:resume-gist-fetch",
+      "action": "resume.json: mint the gist as a fetchurl pin (matt-resume, mutable /raw/resume.json + sha256) and have lib/matt-site.nix read that fetch; canonical() now asks the gist before the cache. Root cause of the 7 lost projects was a Nov 9 cache, not the gist: the gist held all 10 throughout. Site build rebuilt from the gist (10 projects), drift/format/checks:quick rc=0. No rollout.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2c71ebd0e74f654ef5bc4e42ea2df7d59aba79c3",
+      "branch": "main",
+      "frame": "03h9bn1801n7ea3uzhaltkpck"
+    },
     {
       "id": "1a9f3d7e-d6c6-4ce1-a289-49a555f483f6",
       "ts": "2026-11-18T10:37:35Z",
@@ -2761,25 +2774,6 @@
       "base_commit": "355d6e1f31ee68a5d950b0e4e7d8945d22160249",
       "branch": "main",
       "frame": "03h7h473db5l4mlt5xx1fed16"
-    },
-    {
-      "id": "ba7d5b87-eb8e-4380-9160-1209e4f982da",
-      "ts": "2026-11-09T22:06:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-board",
-      "action": "Built appflow-board (45a1c859): a read-only page on delphi :8463 over four proxied archive routes — 157 rows, stage chips, search, record detail. Writes 404 through it by allowlist. None of the cutover files touched. The retirement calls and the pure-DB target are in rationale for the single-writer plan.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "modules/services/appflow-board.nix",
-        "lib/appflow-board/index.html",
-        "docs/appflow-board.md",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml"
-      ],
-      "base_commit": "45a1c859c9e1fbf073325f64c257c73a55e323d9",
-      "branch": "main",
-      "frame": "03h7gz7gxjmwsjr7azqebehmz"
     }
   ]
 }

@@ -149,18 +149,60 @@ done
 # answers that request with 404 while serving the path perfectly well over the
 # store API (measured 2026-10-15 on both a warm and a cold path — the curl test
 # gave false failures). `nix path-info --store` is the authoritative answer.
+# The toplevel is the ONE path no cache holds durably. It is a generated script
+# tree whose store path changes with every commit, and a cache prunes what nothing
+# references: measured 2026-11-18, delphi's RUNNING toplevel was absent from all
+# seven of its stores, so `warm-host.sh --check` (which excludes exactly this
+# path) called the host READY while this gate refused it — two instruments,
+# opposite answers, one host. The closure is the deployable object; the toplevel
+# is what the switch produces, and it produces it in milliseconds once every
+# input substitutes.
+#
+# So: when the toplevel alone is missing, carry its derivation to the target and
+# let it realise it there. Proven, not assumed — a dry run with builders off must
+# leave exactly one pending derivation and it must be this toplevel's, so nothing
+# but the generated script tree can be built on the target.
+toplevel_drv=""
 if [ -z "$serving" ]; then
+  drv="$(nix eval --raw "$attr.drvPath" 2>/dev/null || true)"
+  pending="$(nix build "$attr" --dry-run --builders "" --json 2>/dev/null | jq -r '.[].drvPath' 2>/dev/null || true)"
+  if [ -n "$drv" ] && [ "$pending" = "$drv" ]; then
+    toplevel_drv="$drv"
+    echo "activate [$host] toplevel is in no store (normal); the closure substitutes, so the target builds just that tree from $drv"
+  fi
+fi
+
+if [ -z "$serving" ] && [ -z "$toplevel_drv" ]; then
   echo "activate [$host] GATE FAILED — none of this host's substituters serve $top:" >&2
   echo "  $caches" >&2
+  echo "  and it is not the toplevel alone: a dry run still has other derivations pending." >&2
   echo "  warm it on the builder first: task infra:warm:host:$host" >&2
   exit 1
 fi
-cache="$serving"
-echo "activate [$host] closure is served by $cache"
+if [ -n "$serving" ]; then
+  cache="$serving"
+  echo "activate [$host] closure is served by $cache"
+fi
 
 if [ "$mode" = "check" ]; then
   echo "activate [$host] READY — target $target, path $top"
   exit 0
+fi
+
+# The derivation has to be IN the target's store for it to realise anything. Its
+# inputs are all substitutable (that is what the dry run proved), so this is the
+# generated tree only — a few seconds, no compiler.
+if [ -n "$toplevel_drv" ]; then
+  # `nix copy`, not a bare `nix-store --export`: a drv names its input drvs, and
+  # `nix-store --import` refuses the set unless every one of them is present —
+  # measured 2026-11-18 on frieren, "store path …-activate.drv does not exist",
+  # after the same hand-off happened to work on delphi where CI had left them.
+  # copy walks the drv closure itself, so the target gets what the realise needs.
+  echo "activate [$host] carrying the toplevel derivation to $target"
+  NIX_SSHOPTS="-o BatchMode=yes -o ConnectTimeout=10" nix copy --to "ssh://$target" "$toplevel_drv" || {
+    echo "activate [$host] GATE FAILED — could not hand the toplevel derivation to $target" >&2
+    exit 1
+  }
 fi
 
 action="${ACTION:-switch}"
@@ -175,6 +217,7 @@ NIX=/run/current-system/sw/bin/nix
 NIXENV=/run/current-system/sw/bin/nix-env
 CACHES='$caches'
 TOP='$top'
+TOP_DRV='$toplevel_drv'
 ACTION='$action'
 if [ "\$(readlink -f /run/current-system)" = "\$TOP" ]; then
   echo "already on \$TOP — nothing to do"
@@ -190,9 +233,22 @@ for c in "\$@"; do
   "\$NIX" copy --from "\$c" --no-check-sigs --option narinfo-cache-negative-ttl 0 --option trusted-substituters "\$c" "\$TOP" && break || echo "   \$c did not serve it; trying the next substituter"
 done
 if ! "\$NIX" path-info "\$TOP" >/dev/null 2>&1; then
-  echo "activate FAILED — \$TOP is not in the local store and no substituter served it." >&2
-  echo "  refusing to fall through to a local build on this host. Warm it: task infra:warm:host:<host>" >&2
-  exit 1
+  # Only the toplevel can be missing here: the caller proved every other
+  # derivation substitutes, so realising this drv builds the generated script
+  # tree and nothing else. Then the check below is the same verdict as always.
+  if [ -n "\$TOP_DRV" ]; then
+    echo "== building the toplevel tree from \$TOP_DRV (its inputs all substitute) =="
+    # nix-store, not `nix store`: there is no `nix store realise` subcommand, and
+    # the first version of this line printed its usage error into a `|| true`
+    # and left the deploy looking like a cache miss (measured 2026-11-18).
+    /run/current-system/sw/bin/nix-store --realise "\$TOP_DRV" ||
+      echo "   realise of the toplevel tree FAILED — the verdict below still decides"
+  fi
+  if ! "\$NIX" path-info "\$TOP" >/dev/null 2>&1; then
+    echo "activate FAILED — \$TOP is not in the local store and no substituter served it." >&2
+    echo "  refusing to fall through to compiling the closure on this host. Warm it: task infra:warm:host:<host>" >&2
+    exit 1
+  fi
 fi
 echo "== registering generation =="
 "\$NIXENV" -p /nix/var/nix/profiles/system --set "\$TOP"

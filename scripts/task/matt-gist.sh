@@ -55,11 +55,22 @@ pull() {
 canonical() {
   if [ -s "$base" ]; then
     printf '%s\n' "$base"
-  elif [ -s "$cache/resume.json" ]; then
-    printf '%s\n' "$cache/resume.json"
-  else
-    return 1
+    return 0
   fi
+  # The cache is a copy of the gist from the last pull, and the gist moves from
+  # other machines: a cache-only answer republishes whatever this host last saw
+  # and silently drops projects added since. Ask the gist, keep the cache as the
+  # offline fallback.
+  mkdir -p "$cache"
+  if gh gist view "$resume_gist" --raw >"$cache/resume.json.tmp" 2>/dev/null &&
+    [ -s "$cache/resume.json.tmp" ]; then
+    mv "$cache/resume.json.tmp" "$cache/resume.json"
+  else
+    rm -f "$cache/resume.json.tmp"
+    [ -s "$cache/resume.json" ] &&
+      echo "canonical: gist unreachable, using $cache/resume.json" >&2
+  fi
+  [ -s "$cache/resume.json" ] && printf '%s\n' "$cache/resume.json"
 }
 
 canonical_de() {

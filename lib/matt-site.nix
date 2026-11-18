@@ -5,7 +5,8 @@
 {
   pkgs,
   lib ? pkgs.lib,
-  resume ? builtins.fromJSON (builtins.readFile ./matt/resume.json),
+  fetches ? import ./fetches-extra.nix {inherit pkgs;},
+  resume ? builtins.fromJSON (builtins.readFile (fetches.fetch "matt-resume")),
   data ? builtins.fromJSON (builtins.readFile ./matt/profile.json),
   dataDe ? builtins.fromJSON (builtins.readFile ./matt/profile.de.json),
   cases ? builtins.fromJSON (builtins.readFile ./matt/cases.json),

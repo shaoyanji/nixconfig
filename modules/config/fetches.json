@@ -31,5 +31,11 @@
     "url": "https://gist.githubusercontent.com/shaoyanji/656406074a590a09e33755b88ac29d53/raw/rc.elv",
     "sha256": "0b0078sp6fyqygxz9hap7inhpnwz17s0vcpb4fgklzxa2h8kp194",
     "fetchType": "fetchurl"
+  },
+  {
+    "key": "matt-resume",
+    "url": "https://gist.githubusercontent.com/shaoyanji/b7b844737e6469c9160bf41aa8970068/raw/resume.json",
+    "sha256": "sha256:0pf2dv4zsfm8l8inzbvn0vzaf8j8cqhl5g7d36xgaa94hpdi95c4",
+    "fetchType": "fetchurl"
   }
 ]

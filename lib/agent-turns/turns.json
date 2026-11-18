@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T10:36:36Z",
+  "generated": "2026-11-18T10:51:51Z",
   "count": 200,
-  "pin": "ae7e69c04e5ceb09fbffdca15f212ea80783be2ef29a6e9a8888290114be7771",
+  "pin": "6454ca70e66da78a0f149252aec9b0feccf4a9d70d13a59892ddadc05a6d9fa0",
   "turns": [
+    {
+      "id": "1a9f3d7e-d6c6-4ce1-a289-49a555f483f6",
+      "ts": "2026-11-18T10:37:35Z",
+      "source": "devji",
+      "subject": "nixconfig:agy-cascade-oauth",
+      "action": "Reverted both nightly agy cascades (frieren 03:00/05:00, delphi) from Tier 1 agy-gemini/Hydrogen to plain agy on the OAuth account route with gemini-3.8-flash: the API key free tier (~20 req/day) ends an agentic sweep with quota_exceeded. checks:host frieren + delphi rc=0, checks:quick rc=0, prose-budget record moved with the skill edit; pushed c0598adb.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c0598adbf7f7821771b3c6593848b606a3541ecf",
+      "branch": "main",
+      "frame": "03h9bk87fcjfic7xmgn0hvx4b"
+    },
     {
       "id": "d48d7949-1247-4a9b-92cd-559094c299f3",
       "ts": "2026-11-18T10:27:18Z",
@@ -2767,27 +2780,6 @@
       "base_commit": "45a1c859c9e1fbf073325f64c257c73a55e323d9",
       "branch": "main",
       "frame": "03h7gz7gxjmwsjr7azqebehmz"
-    },
-    {
-      "id": "16409f85-5be8-49c9-b017-b4737b0b0a5d",
-      "ts": "2026-11-09T21:47:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:media-library-browse",
-      "action": "Newest-first ordering (folders by newest fetch, files by mtime), a copy button per row for the absolute URL, posters now use YouTube own thumbnail (1278x720, 69 KB) with the frame grab as fallback, and the format chain no longer ends in best: a fetch with no avc1/mp4a under the ceiling fails with a reason. checks:media-relay added; switched delphi (4ed544da, ka0f7wdk).",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "lib/media-relay/index.html",
-        "modules/services/media-relay.nix",
-        "docs/media-relay.md",
-        "tests/media-relay/run.sh",
-        "tests/media-relay/page.js",
-        "taskfiles/checks.yml",
-        "taskfiles/checks.toml"
-      ],
-      "base_commit": "4ed544da61523a41a20a33d85a7b5194649315ee",
-      "branch": "main",
-      "frame": "03h7gvdmbgf2hwyu7noz43jj2"
     }
   ]
 }

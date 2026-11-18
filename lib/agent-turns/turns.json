@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T15:10:02Z",
+  "generated": "2026-11-18T15:18:17Z",
   "count": 200,
-  "pin": "0e0addfbbd80ae6209ea2a2576facaa45616b61eec948e33a84361ee223b00eb",
+  "pin": "11b8e34eed319ff96a8c921829f3ad62cd0481ac7a9d04f439f0b2a2a754d378",
   "turns": [
+    {
+      "id": "9b88946d-f04a-4d00-b500-21325b4103f9",
+      "ts": "2026-11-18T15:12:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:pins-hash-age",
+      "action": "pins refresh and --check now print each hash with its value plus the commit and date that pinned it (git -S, so a reformatted row is not a change); a working-tree-only hash reads uncommitted. aa66984e pushed. Follows the offline gist-hash coverage gate in 563fec4b",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa66984e3d3f8a9e7a307aafbff237b79947db41",
+      "branch": "main",
+      "frame": "03h9d1xl00h22sfjwbc3uwkxd"
+    },
     {
       "id": "76eb8731-18a0-459a-aa6d-470efd25d53f",
       "ts": "2026-11-18T15:02:06Z",
@@ -2743,19 +2756,6 @@
       "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
       "branch": "main",
       "frame": "03h7hlcwyg2are92er8irxrgv"
-    },
-    {
-      "id": "ba7e8fcf-17cc-4546-825c-616ce23b3e81",
-      "ts": "2026-11-09T23:52:30Z",
-      "source": "devji",
-      "subject": "nixconfig:secrets-submodule",
-      "action": "B: recurse off, branch=master, pull re-attaches, sync refuses newer mirror, form writes canonical",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
-      "branch": "main",
-      "frame": "03h7hju28j4xge19nas98ss96"
     }
   ]
 }

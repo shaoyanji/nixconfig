@@ -43,3 +43,13 @@ key = "lf-icons"
 [[hash]]
 key = "authorized-keys"
 file = "modules/config/authorized-keys.json"
+
+# A release pin whose version builds the URL, so version and hash are one fact in
+# one file (modules/services/agent-turns.nix). The refresh follows upstream and
+# rewrites both hashes only after every tarball prefetches; `--check` keeps
+# comparing the file to HEAD, so a bump travels in the commit that caused it.
+[[pin]]
+name = "xs-release"
+path = "modules/services/agent-turns.nix"
+cmd = "bash scripts/task/xs-pin.sh"
+max_bytes = 40000

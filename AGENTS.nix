@@ -2,6 +2,64 @@
 {
   schemaVersion = 1;
   notes = {
+    agent-vault-rbw-only = {
+      title = "Agent credentials go through rbw; agent-access is not installed";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-19";
+      summary = "aac's field-scoped tunnel costs one unpackaged binary, a permanent bw shim (its Bitwarden provider shells out to bw anyway), a pty-only listener and a third-party default relay. The fleet keeps rbw from nixpkgs and bounds reads with a dedicated user, a short unlock window and an item allowlist.";
+      refs = {
+        modules = ["flake/cli.nix"];
+        tasks = ["checks:ssh:bitwarden"];
+        docs = ["docs/rbw-agent-secrets.md"];
+      };
+      body = ''
+        Verified 2026-11-19 against agent-access v0.11.0 and rbw 1.15.0:
+        - The release tarball is dynamically linked and fails on NixOS; a patched
+          build runs, but that is a second unpackaged Rust binary to carry.
+        - aac's Bitwarden provider shells out to `bw` for status, unlock and get,
+          so rbw still needs a shim and the `bw` name stays in the tree.
+        - `aac listen` is a ratatui TUI that panics without a pty.
+        - The default relay is a third party; rbw keeps the vault client local.
+        - `rbw get --raw` carries every field aac reads, and `--field` selects one.
+
+        The boundary is the procedure in docs/rbw-agent-secrets.md: a dedicated
+        user, `rbw lock` in a trap, `lock_timeout`, and item namespacing with an
+        allowlist glob. The residual risk is stated there — an unlocked agent
+        reads the whole account, which is the property aac would have narrowed.
+
+        Exit: agents follow the doc; revisit aac only when a grant must be
+        narrower than the account, and that decision needs no bw shim.
+      '';
+    };
+    firecrawl-local-no-prebuilt = {
+      title = "firecrawl-local runs on paper only: no binary is published anywhere";
+      kind = "open";
+      status = "BLOCKED";
+      priority = "P3";
+      date = "2026-11-19";
+      summary = "Firecrawl's new single-binary local engine is announced at 37x the old self-host speed and 11 MB idle, but crates.io ships source only, the repo's releases carry zero assets, and there is no image or nixpkgs attr, so running it needs one local compile.";
+      refs = {
+        modules = ["hosts/frieren/tools.nix"];
+      };
+      body = ''
+        Checked 2026-11-19: crates.io `firecrawl-local` 0.1.0 (published
+        2026-11-11) has no binary target distributed; `firecrawl/firecrawl`
+        releases expose zero assets; ghcr has `firecrawl/firecrawl` but no
+        `firecrawl-local`; nixpkgs-unstable and llm-agents.nix have no attr, so
+        there is no cache entry to `nix run` and the vendor's 37x claim is
+        unmeasured here.
+
+        Blocker: one compile to fill `cargoHash` in a `buildRustPackage`, which
+        the operator declined for this pass. The crate is axum + rustls +
+        chromiumoxide with no openssl, so the derivation itself is small.
+
+        Exit: build it, then time `firecrawl-local scrape example.com --markdown`
+        against the current hermes web-extract path. If it is not faster, set
+        REJECTED with that number instead of keeping a wish open.
+      '';
+    };
     config-registry-schema = {
       title = "The config registries have no schema, and four conventions nothing checks";
       kind = "open";

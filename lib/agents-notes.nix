@@ -369,6 +369,6 @@
 in {
   inherit api;
   inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus claims lineage origins frontier open;
-  inherit pages sitePages;
+  inherit pages sitePages claimStats;
   # `api` is the typed document; `artifacts.agents-notes` serializes it.
 }

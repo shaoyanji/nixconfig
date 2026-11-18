@@ -333,6 +333,12 @@ in {
     in {
       total = builtins.length edges;
       recorded = count (e: e ? evidence);
+      recordedEdges =
+        map (e: {
+          inherit (e) from to type evidence;
+          because = e.because or "";
+        })
+        (builtins.filter (e: e ? evidence) edges);
       relations =
         lib.mapAttrs (r: rel: {
           defaultTier = rel.tier;

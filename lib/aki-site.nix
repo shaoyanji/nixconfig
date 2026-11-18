@@ -679,6 +679,24 @@
         </p>
         <table style="margin-top: 1.5rem;">
           <thead>
+            <tr><th>Claim</th><th>Notes</th><th>Open</th><th>Evidence</th></tr>
+          </thead>
+          <tbody>
+            ${lib.concatMapStringsSep "\n" (c: let
+            s = agentsNotes.claimStats.${c};
+          in ''
+            <tr>
+              <td><code>${escH c}</code></td>
+              <td>${toString s.notes}</td>
+              <td>${toString s.open}</td>
+              <td><code>${escH (lib.concatStringsSep "," s.evidence)}</code></td>
+            </tr>
+          '')
+          (builtins.attrNames agentsNotes.claimStats)}
+          </tbody>
+        </table>
+        <table style="margin-top: 1.5rem;">
+          <thead>
             <tr><th>Note</th><th>Status</th><th>Kind</th><th>Refs</th></tr>
           </thead>
           <tbody>
@@ -863,7 +881,10 @@
   # repository file to index): decisions, queue items and design studies,
   # compiled and validated by lib/agents-notes.nix. They use the same
   # build-time markdown renderer and the same static-slice navigation as a doc.
-  agentsNotes = import ./agents-notes.nix {inherit lib;};
+  agentsNotes = import ./agents-notes.nix {
+    inherit lib;
+    claimOf = (import ../flake/epistemics.nix {inherit lib;}).noteClaims;
+  };
 
   # Doc and skill nodes carry their own text into their slice. The note is read
   # from the repository at evaluation time, shipped as data next to the slice,

@@ -25,8 +25,13 @@ if ! data="$(iets_eval_json .?submodules=1#knowledgeGraph.evidence 2>"$err")"; t
   exit 1
 fi
 
+unresolved="$(jq '.unresolvedCitations | length' <<<"$data")"
 if [ "${FORMAT:-}" = "json" ]; then
   jq . <<<"$data"
+  [ "$unresolved" -eq 0 ] || {
+    echo "kg-evidence: ${unresolved} citation(s) resolve to nothing — checks:ontology fails on these" >&2
+    exit 3
+  }
   exit 0
 fi
 
@@ -44,8 +49,19 @@ done
 
 jq -r '"", "\(.total) edges, \(.recorded) record their own tier"' <<<"$data"
 jq -r '
+  if (.recordedEdges | length) == 0
+  then "no edge records its own tier"
+  else "RECORDED (over the relation default):",
+       (.recordedEdges[] | "  \(.type) \(.from) -> \(.to) as \(.evidence)")
+  end
+' <<<"$data"
+jq -r '
   if (.unresolvedCitations | length) == 0
   then "no unresolved policy citations"
   else "UNRESOLVED CITATIONS:", (.unresolvedCitations[] | "  " + .)
   end
 ' <<<"$data"
+if [ "$unresolved" -gt 0 ]; then
+  echo "kg-evidence: ${unresolved} citation(s) resolve to nothing — checks:ontology fails on these" >&2
+  exit 3
+fi

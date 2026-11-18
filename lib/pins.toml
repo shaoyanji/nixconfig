@@ -1,0 +1,20 @@
+# Small transient data the tree pins, and how to refresh it.
+#
+# The rule that keeps this honest: a pin is a FILE in the repository, never a
+# fetch at eval time. Nix cannot reach the tailnet shim (it wants a bearer
+# header, and the sandbox has no network), and a build must be reproducible from
+# the commit alone. So the refresh runs outside Nix, the result is committed, and
+# `max_bytes` is what stops a large corpus from being dragged in — the kiwix
+# archive and the media trees are not pins.
+
+[[pin]]
+name = "agent-turns"
+path = "lib/agent-turns/turns.json"
+cmd = "task agents:turns:snapshot"
+max_bytes = 300000
+
+[[pin]]
+name = "resume"
+path = "lib/matt/resume.json"
+cmd = "task matt:gist:sync"
+max_bytes = 120000

@@ -307,6 +307,46 @@ tasks:
     cmds:
       - bash scripts/task/issue-ledger.sh check
 
+  agents:pins:refresh:
+    desc: Refresh the small pinned datasets in lib/pins.toml, and nothing large
+    summary: >
+      scripts/task/pins-refresh.sh — `lib/pins.toml` is the registry: one file,
+      the command that refreshes it, and the `max_bytes` that keeps a corpus out.
+      The refresh runs outside Nix and the result is committed, so the tree stays
+      pure while the data is fresh at push time. An unavailable source is SKIPPED
+      and named; an oversized one is refused instead of vendored. `--check` exits
+      1 on a stale pin, `--commit` commits. Vars: CLI_ARGS=, PINS=, PIN_TIMEOUT=.
+    cmds:
+      - bash scripts/task/pins-refresh.sh {{.CLI_ARGS}}
+
+  agents:turns:snapshot:
+    desc: Refresh the committed agent-turn snapshot the flake appends as turn-* entries
+    summary: >
+      scripts/task/turns-snapshot.sh — reads the newest frames from the tailnet
+      shim and writes `lib/agent-turns/turns.json` with a `pin` (sha256 of the
+      sorted frame ids, recomputed at eval by `lib/agent-turns.nix`) and the
+      `generated` time. A refresh that would drop a frame the committed file
+      already holds is refused, because the ledger is append-only and a
+      shrinking view of it is a different claim. The file, not a fetch, is the
+      mechanism: the shim wants a bearer header that `builtins.fetchurl` cannot
+      send and the public mount answers 404 for the JSON. Vars: OUT=, LIMIT=
+      (1-200), XS_TURNS_URL=.
+    cmds:
+      - bash scripts/task/turns-snapshot.sh
+
+  agents:turns:fuse:
+    desc: Emit the postgres projection of the turn snapshot and the note index
+    summary: >
+      scripts/task/turns-fuse.sh — the fusion from `turns-fusion-plane` as
+      `insert … on conflict do nothing` statements: `turn`, `turn_claim` and
+      `turn_file` from the snapshot, `note` when NOTES= names a
+      `nix eval --json .#agentsNotes.index` file. Idempotent by construction, so
+      a re-run cannot rewrite a turn, and the join key between a turn and a note
+      is the repo path (claim against `refs.modules`), not a title. `--check`
+      prints what a load would carry. CLI_ARGS=--sql (default) or --check.
+    cmds:
+      - bash scripts/task/turns-fuse.sh {{.CLI_ARGS}}
+
   agents:xs:post:
     desc: "Post one xs turn from a template (SUBJECT, ACTION, RATIONALE - no JSON)"
     summary: >

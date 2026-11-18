@@ -74,6 +74,37 @@ else
   echo "pre-push: yq or python3 not on PATH — the task graph gate was not run."
 fi
 
+# The small pinned datasets, refreshed at the last moment before they travel:
+# the turn snapshot and the resume are files Nix reads, and a stale file is a
+# build that describes yesterday. A refresh that commits is pushed here with
+# `--no-verify` (git read the refs before this hook ran, so the outer push would
+# upload the pre-refresh commit), and then this run is done — saying so is better
+# than a non-fast-forward the operator has to interpret.
+if [ -f scripts/task/pins-refresh.sh ]; then
+  if ! bash scripts/task/pins-refresh.sh --commit >/tmp/pre-push-pins.log 2>&1; then
+    echo "pre-push: the pin refresh failed:"
+    sed 's/^/  /' /tmp/pre-push-pins.log | tail -20
+    echo "  Run it alone: task agents:pins:refresh"
+    status=1
+  elif grep -q '^pins: committed' /tmp/pre-push-pins.log; then
+    sed 's/^/  /' /tmp/pre-push-pins.log | head -12
+    if [ -n "${NIXCONFIG_PIN_PUSH:-}" ]; then
+      status=1
+    else
+      echo "pre-push: pinned data refreshed and committed; uploading that commit"
+      branch=$(git rev-parse --abbrev-ref HEAD)
+      if NIXCONFIG_PIN_PUSH=1 git push --no-verify "$1" "$branch"; then
+        echo "pre-push: done — the push you ran is superseded by the one above"
+      else
+        status=1
+      fi
+      exit "$status"
+    fi
+  else
+    grep -E '^(PIN|FRESH|SKIP|LARGE)' /tmp/pre-push-pins.log | sed 's/^/  /' | head -8 || true
+  fi
+fi
+
 if [ "$status" -ne 0 ]; then
   echo
   echo "Push refused. This is the same gate CI runs as 'docs-budget'; fixing it here"

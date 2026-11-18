@@ -52,7 +52,16 @@ kg_usage() {
 kg_eval_graph() {
   # shellcheck source=lib/iets.sh
   . "${BASH_SOURCE[0]%/*}/iets.sh"
-  iets_eval_json .#knowledgeGraph.graph
+  # `task-list.json` is built at eval time by flake/outputs.nix, and that build
+  # takes its pkgs from `builtins.currentSystem` when the evaluator exposes one.
+  # A purely-evaluated flake cannot see it, so the fallback is an impure eval
+  # rather than a failure: without it the graph is unreadable on an aarch64 host
+  # whose x86_64 task-list derivation has no builder.
+  if out=$(iets_eval_json .#knowledgeGraph.graph 2>/dev/null) && [ -n "$out" ]; then
+    printf '%s' "$out"
+    return 0
+  fi
+  nix eval --impure --json .#knowledgeGraph.graph
 }
 
 kg_graph_path() {

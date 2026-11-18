@@ -149,7 +149,7 @@ fi
 if grep -Eq '^(taskfiles/.*\.yml|flake/outputs\.nix)$' <<<"$STAGED"; then
   echo "Checking that every task is visible to a person or an agent..."
   SYS="$(nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || true)"
-  if [ -z "$SYS" ] || ! nix build --no-link --builders "" ".?submodules=1#checks.$SYS.task-descs" >/tmp/pre-commit-task-descs.log 2>&1; then
+  if [ -z "$SYS" ] || ! nix build --impure --no-link --builders "" ".?submodules=1#checks.$SYS.task-descs" >/tmp/pre-commit-task-descs.log 2>&1; then
     echo "pre-commit: the task visibility gate failed or could not run; refusing to skip it." >&2
     sed 's/^/  /' /tmp/pre-commit-task-descs.log 2>/dev/null | tail -20
     echo "  Run it alone: task check:leaf NAME=checks:task-descs"
@@ -180,7 +180,7 @@ fi
 if affects_ontology "$STAGED"; then
   echo "Checking the graph against its ontology (staged changes touch the type contract)..."
   SYS="$(nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || true)"
-  if [ -z "$SYS" ] || ! nix build --no-link --builders "" ".?submodules=1#checks.$SYS.ontology" >/tmp/pre-commit-ontology.log 2>&1; then
+  if [ -z "$SYS" ] || ! nix build --impure --no-link --builders "" ".?submodules=1#checks.$SYS.ontology" >/tmp/pre-commit-ontology.log 2>&1; then
     echo "pre-commit: the ontology gate failed or could not run; refusing to skip it." >&2
     sed 's/^/  /' /tmp/pre-commit-ontology.log 2>/dev/null | tail -20
     echo "  Run it alone: task check:leaf NAME=checks:ontology"
@@ -192,7 +192,7 @@ fi
 if grep -Eq '^(\.agents/skills/router/|lib/knowledge-graph\.nix)' <<<"$STAGED"; then
   echo "Checking the router's labels against its playbooks..."
   SYS="$(nix eval --impure --raw --expr builtins.currentSystem 2>/dev/null || true)"
-  if [ -z "$SYS" ] || ! nix build --no-link --builders "" ".?submodules=1#checks.$SYS.router-labels" >/tmp/pre-commit-router.log 2>&1; then
+  if [ -z "$SYS" ] || ! nix build --impure --no-link --builders "" ".?submodules=1#checks.$SYS.router-labels" >/tmp/pre-commit-router.log 2>&1; then
     echo "pre-commit: the router label gate failed or could not run; refusing to skip it." >&2
     sed 's/^/  /' /tmp/pre-commit-router.log 2>/dev/null | tail -20
     echo "  Run it alone: task check:leaf NAME=checks:router"

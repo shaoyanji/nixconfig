@@ -4,6 +4,7 @@
   inventory ? null,
   notes ? import ../AGENTS.nix,
   claimOf ? (import ../flake/epistemics.nix {inherit lib;}).noteClaims,
+  turns ? {},
 }: let
   root = ../.;
   raw = notes.notes or {};
@@ -345,6 +346,8 @@
     ok = issues == [];
     index = lib.mapAttrs (_: e: removeAttrs e ["body"]) entries;
     notes = entries;
+    appended = entries // turns;
+    turnEntries = builtins.length (builtins.attrNames turns);
     byHost = indexOf "hosts";
     byModule = indexOf "modules";
     byTask = indexOf "tasks";

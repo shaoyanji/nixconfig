@@ -117,6 +117,29 @@ frame on the stream is what makes it refetch. Layout lives in the browser, where
 a zoom is a repaint. Code: `modules/services/turns-dashboard/web/graph.js`, route
 in `modules/services/turns-dashboard/main.go`.
 
+## The tree reads the log as a snapshot, not a fetch
+
+Nix cannot read this endpoint, and the two reasons are worth stating because the
+obvious fix (a pinned URL, `nurl`-style) does not work. `builtins.fetchurl` sends
+no headers, so the bearer token cannot be presented; and a build sandbox has no
+network, so an eval-time fetch is unavailable exactly where a build needs it. The
+public mount is read-only and answers `404` for `/api/turns.json`.
+
+What works is a file with a pin: `task agents:turns:snapshot` writes
+`lib/agent-turns/turns.json` from the newest frames, and `pin` is the sha256 of
+the sorted frame ids, which `lib/agent-turns.nix` recomputes at eval. A hand edit
+of an id fails `nix eval .#agentsNotes.agentTurns.pin.ok` instead of quietly
+changing the graph; a refresh that would drop a frame the committed file already holds is
+refused, since the ledger only grows. `lib/agent-turns.nix` then appends the
+frames to the note index with `//` as `turn-<id8>` entries whose `kind` is
+`turn` — visible as turns, never mistakable for an authored note, and outside the
+note schema that validates what a person wrote.
+
+The postgres projection is `task agents:turns:fuse`: `insert … on conflict do
+nothing` for `turn`, `turn_claim` and `turn_file`, and `note` when `NOTES=` names
+a saved `.#agentsNotes.index`. Re-running is a no-op, which is what makes the copy
+safe to schedule.
+
 The read side (`agents:xs:list`) adds the one rule the shim cannot know: an
 `in_progress` whose newest entry is older than `STALE_DAYS` (7) is **stale** —
 printed, and not a failed check, because an agent that died mid-turn must not red

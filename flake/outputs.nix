@@ -67,9 +67,15 @@
   agentsNotesCtl = import ../lib/agents-notes.nix {
     inherit lib inventory;
     claimOf = epistemicsCtl.noteClaims;
+    turns = turnsCtl.entries;
   };
   homeAgentsGen = import ../lib/home-agents.nix {inherit lib inventory;};
-  taskListPkgs = pkgsFor (builtins.head systems.work);
+  turnsCtl = import ../lib/agent-turns.nix {inherit lib;};
+  taskListPkgs = pkgsFor (
+    if builtins ? currentSystem
+    then builtins.currentSystem
+    else builtins.head systems.work
+  );
   taskList = builtins.listToAttrs (map (p: {
       name = builtins.elemAt p 0;
       value = {
@@ -320,6 +326,7 @@ in {
   # by `.#artifacts.agents-notes`, not carried here as a string.
   agentsNotes = {
     inherit (agentsNotesCtl) api schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus lineage origins frontier open;
+    agentTurns = turnsCtl.api;
   };
 
   # Structural projection: hosts × skills × docs × mentions. `jq`-queryable

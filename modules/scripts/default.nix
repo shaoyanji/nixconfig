@@ -9,10 +9,15 @@
   ];
   home.packages = with pkgs; [
     (pkgs.writers.writeBashBin "infron" {
-      runtimeInputs = [
-        coreutils
-        curl
-        jq
+      makeWrapperArgs = [
+        "--prefix"
+        "PATH"
+        ":"
+        (pkgs.lib.makeBinPath [
+          coreutils
+          curl
+          jq
+        ])
       ];
     } (builtins.readFile ../../scripts/infron-chat.sh))
     # The vault clients. rbw is the only client that tolerates a plain-http

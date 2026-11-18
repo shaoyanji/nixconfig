@@ -447,6 +447,16 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
       waited=$((waited + wait))
       continue
     fi
+    # A size the resolved model refuses is not a defect in the row: the free
+    # catalog is resolved per call, and on 2026-11-18 ~90 plates answered
+    # VALIDATION_FAILED on `size` at 1536x1024 while the same prompt and size
+    # succeeded minutes later. Retry once at a size both models take — the plate
+    # is smaller and every crop downstream is local.
+    if printf '%s' "$out" | grep -q 'VALIDATION_FAILED' && printf '%s' "$out" | grep -q 'size' && [ "$size" != 1024x1024 ]; then
+      say "$id: $size refused by the resolved model — retrying at 1024x1024"
+      size=1024x1024
+      continue
+    fi
     record "$day" "$lane" "$id" "$file" "failed" \
       "$(printf '%s' "$out" | tr '\n' ' ' | cut -c1-200)" "$prompt" "$n" "$rev"
     say "$id: generation failed (rc=$rc)"

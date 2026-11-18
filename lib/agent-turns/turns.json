@@ -1,8 +1,86 @@
 {
-  "generated": "2026-11-18T16:15:38Z",
+  "generated": "2026-11-18T20:27:42Z",
   "count": 200,
-  "pin": "72f85c15911283437b21a3cfba7257f49fd38fb054ac76cfdc36c65af18d2828",
+  "pin": "da2c5e3d4c16f24aa6f8c5e2d56b4b2d3f9f7c2ae56824efd6f8b548d39b5504",
   "turns": [
+    {
+      "id": "13209418-eb0d-4e2d-900a-2ffc7d02a05e",
+      "ts": "2026-11-18T16:30:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:session-2026-11-18",
+      "action": "checks:infron gate landed (27644194): runs the infron helper with a stub curl first on PATH, no network, and proves a paid primary or backup id is refused before any request, the defaults are the two :free ids, a 429 fails over, two failures exit 1. It now runs inside checks:quick, green after the atuin budget 154->155 (491cb554). Two image plate batches, SIZE=1024x1024 cap 3 each: 6 spent, 2 kept; publish -> 502 Cloudinary assets, bountystash-assets deployed.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
+      "branch": "main",
+      "frame": "03h9dh2u3791gkgo5hswo1x2z"
+    },
+    {
+      "id": "2c6b2365-75d1-47c9-a047-f697d15d48e3",
+      "ts": "2026-11-18T16:29:18Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 1 plate(s) kept of 3 spent, 15 roster row(s) waiting, 500 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
+      "branch": "main",
+      "frame": "03h9dgxnfwau12t0u5u8ijpph"
+    },
+    {
+      "id": "649d3cb2-1556-4667-8d2c-fcf26476ea4a",
+      "ts": "2026-11-18T16:23:49Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 1 plate(s) kept of 3 spent, 16 roster row(s) waiting, 500 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
+      "branch": "main",
+      "frame": "03h9dfv5l0ww72ypi1cekuxe4"
+    },
+    {
+      "id": "f3c88333-1b9a-4c16-9247-25f1f4e626d8",
+      "ts": "2026-11-18T16:17:08Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
+      "branch": "main",
+      "frame": "03h9dek3uloxl559jkltzfcug"
+    },
+    {
+      "id": "07e5ce35-ef3b-4623-9f9a-940baa5ad24f",
+      "ts": "2026-11-18T16:16:44Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
+      "branch": "main",
+      "frame": "03h9dehcl013ytiwmakjcso9e"
+    },
+    {
+      "id": "b131c3c6-869f-4a7d-bedd-717189be0475",
+      "ts": "2026-11-18T16:15:48Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
+      "branch": "main",
+      "frame": "03h9deaph4hpplprv0iewjyyq"
+    },
     {
       "id": "9f2a0942-6440-4b5c-b63d-a23efb5da1bf",
       "ts": "2026-11-18T16:13:53Z",
@@ -2670,92 +2748,6 @@
       "base_commit": "5ad3fecd914e0ff43c5fb220e267e1b1d75ad73d",
       "branch": "main",
       "frame": "03h7mxxhyq9o3vxq05xkpbepi"
-    },
-    {
-      "id": "6a82fdc5-0f03-4606-81d8-703c995ea192",
-      "ts": "2026-11-10T16:13:24Z",
-      "source": "devji",
-      "subject": "nixconfig:image-wall-characters",
-      "action": "queue reads imagesPerDay, RESERVE holds day tail, ONLY= picks briefs; 8 Frieren wallpapers scheduled 18:00",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "84ac5207a9d12189a560412a69f84dc1f3921b31",
-      "branch": "main",
-      "frame": "03h7mvg7672hg090tgwkhdw9y"
-    },
-    {
-      "id": "4841fd06-749c-48a7-b07d-622a0e97ab29",
-      "ts": "2026-11-10T15:00:51Z",
-      "source": "devji",
-      "subject": "nixconfig:images-drafts",
-      "action": "published the binary-caches draft with its banner; three drafts promoted, 38 assets live, checks:images green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c43ddef367e8e9a0879227cb7239b3117020f303",
-      "branch": "main",
-      "frame": "03h7mh9zdmzgife4936dp6mf4"
-    },
-    {
-      "id": "0555fc86-08c0-4d39-b30b-3bf03ce0bb4c",
-      "ts": "2026-11-10T14:50:13Z",
-      "source": "devji",
-      "subject": "nixconfig:images-check",
-      "action": "added checks:images (manifest vs urls.tsv as sets), promoted the RAG draft with its banner; 37 assets live",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c43ddef367e8e9a0879227cb7239b3117020f303",
-      "branch": "main",
-      "frame": "03h7mf77m1sscmhwebjetrw84"
-    },
-    {
-      "id": "c557ab61-2796-4c99-b16a-6fbfe43de98e",
-      "ts": "2026-11-10T14:44:25Z",
-      "source": "devji",
-      "subject": "nixconfig:images-post-motion",
-      "action": "promoted the old-laptop UPS draft: banner via images:post, live post, 36-asset tagged manifest, frieren switched with 4 image-daily timers armed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0ab8a47443d763384e30025a8116f44a7e7c0e46",
-      "branch": "main",
-      "frame": "03h7me2f3s7u6geot63swks2u"
-    },
-    {
-      "id": "5704954d-1980-440a-96fc-ab67d4c69735",
-      "ts": "2026-11-10T04:11:26Z",
-      "source": "agy",
-      "subject": "nixconfig:audit-frieren-2026-11-10",
-      "action": "Resolved 5 failed units: aligned resend declaration to tracked sops manifest for autoUpgrade, added openssh to checkout-ff, pruned download checksum staging, and reset transient automount/backup latches",
-      "outcome": "done",
-      "claims": [
-        "hosts/frieren/configuration.nix",
-        "modules/sops.nix"
-      ],
-      "files": [
-        "hosts/frieren/configuration.nix",
-        "modules/sops.nix",
-        "modules/secrets.yaml",
-        "modules/secrets/secrets.yaml"
-      ],
-      "base_commit": "6a38f66e2141866efcbd110b1ea2b06ee31d6af6",
-      "branch": "main",
-      "frame": "03h7iyf1kezpkbk3mrn7btn8b"
-    },
-    {
-      "id": "ca3e5092-8dc2-470a-8f7d-363532487ebb",
-      "ts": "2026-11-10T02:04:11Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily",
-      "action": "image queue landed: brief bank + runner + agy judge + 06:10 frieren job; judge measured 52-178s, publish needs images:publish:init",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8a9f4ad01882f4371728e598422fc6d77980e72e",
-      "branch": "main",
-      "frame": "03h7i9k3yvi4rfya9r9ese6h9"
     }
   ]
 }

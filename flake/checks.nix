@@ -487,6 +487,12 @@ lib.genAttrs systems.work (
           "the claim rows do not sum to the note total — a renderer reading them would show a partial table"
           ++ lib.optional ((builtins.foldl' (n: r: n + r.open) 0 agentsNotesCtl.claimRows) != agentsNotesCtl.counts.open)
           "the claim rows do not sum to the open note count";
+        noteIds = builtins.attrNames agentsNotesCtl.notes;
+        sliceLinkIssues = lib.concatMap (
+          n:
+            map (t: "note ${n.id} links '${t}', which has no slice — the lineage button on its page would 404")
+            (builtins.filter (t: !(builtins.elem t noteIds)) (n.from ++ n.supersedes ++ n.replacedBy ++ n.descendants))
+        ) (builtins.attrValues agentsNotesCtl.notes);
         recordedCount = builtins.length (builtins.filter (e: e ? evidence) g.edges);
         recordIssues = lib.optional (recordedCount == 0) "no edge records its own evidence — the per-edge tier is declared but nothing uses it";
         citationIssues = map (c: "citation ${c} names a policy id flake/policies.nix does not declare — the graph drops the edge, so name the rule or drop the citation") knowledgeGraphCtl.unresolvedCitations;
@@ -509,7 +515,7 @@ lib.genAttrs systems.work (
             ++ lib.optional (x.cannot == "") "${r}.cannot is empty — say what the edge does not prove"
             ++ lib.optional (x.from == [] || x.to == []) "${r} declares no domain or range")
           declaredRelations;
-        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ claimParity ++ claimRowIssues ++ kindIssues ++ recordIssues ++ citationIssues ++ tierIssues ++ sparseIssues;
+        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ claimParity ++ claimRowIssues ++ sliceLinkIssues ++ kindIssues ++ recordIssues ++ citationIssues ++ tierIssues ++ sparseIssues;
         nodeCount = builtins.length g.nodes;
         edgeCount = builtins.length g.edges;
         entityCount = builtins.length declaredEntities;

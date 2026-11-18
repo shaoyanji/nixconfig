@@ -44,6 +44,17 @@ if [ "${FORMAT:-}" = "json" ]; then
   exit 0
 fi
 
+if [ "${FORMAT:-}" = "line" ]; then
+  jq -r --arg rel "${relation:-all}" --argjson kinds "$(jq '.claimKinds | length' <<<"$data")" '
+    (if $rel == "all" then "mixed"
+     else (.relations[$rel].canCarry) as $c
+       | if ($c | length) == $kinds then "all(\($kinds))" else ($c | join(",")) end end) as $carry
+    | "relation=\($rel) edges=\(.total) recorded=\(.recorded) carries=\($carry) unresolved=\(.unresolvedCitations | length)"
+  ' <<<"$data"
+  [ "$unresolved" -eq 0 ] || exit 3
+  exit 0
+fi
+
 full=0
 if [ -n "$relation" ]; then full=1; fi
 printf '%-13s %-9s %6s %8s  %s\n' "RELATION" "DEFAULT" "EDGES" "OWN TIER" "CAN CARRY"

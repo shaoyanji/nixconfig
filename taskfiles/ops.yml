@@ -463,13 +463,12 @@ tasks:
   ops:kg:evidence:
     desc: Per-relation edge counts, recorded tiers, unresolved citations (RELATION= for one)
     summary: >
-      Reads `.#knowledgeGraph.evidence`: for every relation, the declared default
-      tier, how many edges the graph emits, how many record their own tier over that
-      default, and which claim kinds that tier can carry. RELATION=<name> narrows
-      every count to one relation. It names every edge that records its own tier, and
-      lists citations to policy ids flake/policies.nix does not declare — the edges
-      the graph drops, which `checks:ontology` fails on and this command exits 3 for.
-      One cached eval, then jq. FORMAT=json emits the object.
+      Reads `.#knowledgeGraph.evidence`: per relation, the default tier, the edge
+      count, how many record their own tier, and the claim kinds that tier carries.
+      RELATION=<name> narrows to one relation. It names every recorded edge and every
+      citation to a policy id flake/policies.nix does not declare (exit 3).
+      FORMAT=json emits the object; FORMAT=line emits `relation=… edges=…
+      recorded=… carries=… unresolved=…`.
     cmds:
       - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/kg-evidence.sh "{{.RELATION | default ""}}"
 

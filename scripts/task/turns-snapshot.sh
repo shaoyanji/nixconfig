@@ -81,8 +81,14 @@ count=$(printf '%s' "$turns" | jq 'length')
 pin=$(printf '%s\n' "$new_ids" | sha256sum | cut -d' ' -f1)
 
 mkdir -p "$(dirname "$OUT")"
-jq -n --argjson turns "$turns" --argjson count "$count" --arg pin "$pin" \
+doc=$(jq -n --argjson turns "$turns" --argjson count "$count" --arg pin "$pin" \
   --arg generated "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-  '{generated: $generated, count: $count, pin: $pin, turns: $turns}' >"$OUT.tmp"
+  '{generated: $generated, count: $count, pin: $pin, turns: $turns}')
+if [ -f "$OUT" ] &&
+  [ "$(jq -S 'del(.generated)' "$OUT")" = "$(printf '%s' "$doc" | jq -S 'del(.generated)')" ]; then
+  printf 'turns-snapshot: unchanged, %s turns, pin %s → %s\n' "$count" "${pin:0:12}" "${OUT#"$ROOT"/}"
+  exit 0
+fi
+printf '%s\n' "$doc" >"$OUT.tmp"
 mv "$OUT.tmp" "$OUT"
 printf 'turns-snapshot: %s turns, pin %s → %s\n' "$count" "${pin:0:12}" "${OUT#"$ROOT"/}"

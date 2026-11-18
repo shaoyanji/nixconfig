@@ -482,6 +482,11 @@ lib.genAttrs systems.work (
           lib.optional (!(builtins.all (k: (bare.${k} or 0) == (compiled.${k} or 0)) keys))
           "a bare lib/agents-notes.nix import reports claim counts ${builtins.toJSON bare} where the compiled projection reports ${builtins.toJSON compiled} — the site renders the bare one"
           ++ map (id: "note ${id} has no claim kind without an explicit claimOf — a surface importing the module bare would show it unclassified") unclassified;
+        claimRowIssues =
+          lib.optional ((builtins.foldl' (n: r: n + r.notes) 0 agentsNotesCtl.claimRows) != agentsNotesCtl.counts.total)
+          "the claim rows do not sum to the note total — a renderer reading them would show a partial table"
+          ++ lib.optional ((builtins.foldl' (n: r: n + r.open) 0 agentsNotesCtl.claimRows) != agentsNotesCtl.counts.open)
+          "the claim rows do not sum to the open note count";
         recordedCount = builtins.length (builtins.filter (e: e ? evidence) g.edges);
         recordIssues = lib.optional (recordedCount == 0) "no edge records its own evidence — the per-edge tier is declared but nothing uses it";
         citationIssues = map (c: "citation ${c} names a policy id flake/policies.nix does not declare — the graph drops the edge, so name the rule or drop the citation") knowledgeGraphCtl.unresolvedCitations;
@@ -504,7 +509,7 @@ lib.genAttrs systems.work (
             ++ lib.optional (x.cannot == "") "${r}.cannot is empty — say what the edge does not prove"
             ++ lib.optional (x.from == [] || x.to == []) "${r} declares no domain or range")
           declaredRelations;
-        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ claimParity ++ kindIssues ++ recordIssues ++ citationIssues ++ tierIssues ++ sparseIssues;
+        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ claimParity ++ claimRowIssues ++ kindIssues ++ recordIssues ++ citationIssues ++ tierIssues ++ sparseIssues;
         nodeCount = builtins.length g.nodes;
         edgeCount = builtins.length g.edges;
         entityCount = builtins.length declaredEntities;

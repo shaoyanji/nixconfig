@@ -221,6 +221,14 @@
     open = builtins.length (builtins.filter (e: builtins.elem e.status openStatuses) xs);
     evidence = lib.unique (map (e: e.evidence) xs);
   });
+  claimRows =
+    map (
+      c: {
+        claim = c;
+        inherit (claimStats.${c}) notes open evidence;
+      }
+    )
+    (builtins.attrNames claimStats);
 
   indexOf = key:
     lib.foldl' (
@@ -303,11 +311,9 @@
     + "with no such link is a leaf and carries the original intent in prose.\n\n"
     + "| claim | notes | open | evidence |\n| :--- | :--- | :--- | :--- |\n"
     + lib.concatMapStrings (
-      c: let
-        s = claimStats.${c};
-      in "| `${c}` | ${toString s.notes} | ${toString s.open} | ${lib.concatStringsSep "," (map (x: "`${x}`") s.evidence)} |\n"
+      r: "| `${r.claim}` | ${toString r.notes} | ${toString r.open} | ${lib.concatStringsSep "," (map (x: "`${x}`") r.evidence)} |\n"
     )
-    (builtins.attrNames claimStats)
+    claimRows
     + "\n"
     + lib.concatStringsSep "\n" (
       map (
@@ -372,6 +378,6 @@
 in {
   inherit api;
   inherit (api) schemaVersion counts issues ok index notes byHost byModule byTask byDoc byStatus claims lineage origins frontier open;
-  inherit pages sitePages claimStats;
+  inherit pages sitePages claimStats claimRows;
   # `api` is the typed document; `artifacts.agents-notes` serializes it.
 }

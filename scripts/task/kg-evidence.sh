@@ -44,13 +44,18 @@ if [ "${FORMAT:-}" = "json" ]; then
   exit 0
 fi
 
+full=0
+if [ -n "$relation" ]; then full=1; fi
 printf '%-13s %-9s %6s %8s  %s\n' "RELATION" "DEFAULT" "EDGES" "OWN TIER" "CAN CARRY"
-jq -r '
+jq -r --argjson kinds "$(jq '.claimKinds | length' <<<"$data")" --arg full "$full" '
   .relations
   | to_entries
   | sort_by(-.value.edges, .key)
   | .[]
-  | [.key, .value.defaultTier, .value.edges, .value.recorded, (.value.canCarry | join(","))]
+  | [.key, .value.defaultTier, .value.edges, .value.recorded,
+     (if $full == "1" then (.value.canCarry | join(","))
+      elif (.value.canCarry | length) == $kinds then "all \($kinds)"
+      else (.value.canCarry | join(",")) end)]
   | @tsv
 ' <<<"$data" | while IFS=$'\t' read -r rel def edges rec carry; do
   printf '%-13s %-9s %6s %8s  %s\n' "$rel" "$def" "$edges" "$rec" "$carry"

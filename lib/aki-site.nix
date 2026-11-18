@@ -682,17 +682,15 @@
             <tr><th>Claim</th><th>Notes</th><th>Open</th><th>Evidence</th></tr>
           </thead>
           <tbody>
-            ${lib.concatMapStringsSep "\n" (c: let
-            s = agentsNotes.claimStats.${c};
-          in ''
+            ${lib.concatMapStringsSep "\n" (r: ''
             <tr>
-              <td><code>${escH c}</code></td>
-              <td>${toString s.notes}</td>
-              <td>${toString s.open}</td>
-              <td><code>${escH (lib.concatStringsSep "," s.evidence)}</code></td>
+              <td><code>${escH r.claim}</code></td>
+              <td>${toString r.notes}</td>
+              <td>${toString r.open}</td>
+              <td><code>${escH (lib.concatStringsSep "," r.evidence)}</code></td>
             </tr>
           '')
-          (builtins.attrNames agentsNotes.claimStats)}
+          agentsNotes.claimRows}
           </tbody>
         </table>
         <table style="margin-top: 1.5rem;">
@@ -732,12 +730,16 @@
         # Same four lineage rows as the markdown page (lib/agents-notes.nix), and
         # the same subtraction: a superseding note is also a descendant, so it
         # prints once, on `replaced by`.
-        ++ lib.optional (e.from != []) ["from" (lib.concatStringsSep ", " e.from)]
-        ++ lib.optional (e.supersedes != []) ["supersedes" (lib.concatStringsSep ", " e.supersedes)]
-        ++ lib.optional (e.replacedBy != []) ["replaced by" (lib.concatStringsSep ", " e.replacedBy)]
+        ++ lib.optional (e.from != []) (noteRow "from" e.from)
+        ++ lib.optional (e.supersedes != []) (noteRow "supersedes" e.supersedes)
+        ++ lib.optional (e.replacedBy != []) (noteRow "replaced by" e.replacedBy)
         ++ lib.optional (e.descendants != [] && lib.subtractLists e.replacedBy e.descendants != [])
-        ["led to" (lib.concatStringsSep ", " (lib.subtractLists e.replacedBy e.descendants))];
+        (noteRow "led to" (lib.subtractLists e.replacedBy e.descendants));
       row = r: ''<tr><th>${escH (builtins.head r)}</th><td><code>${escH (builtins.elemAt r 1)}</code></td></tr>'';
+      noteRow = label: ids:
+        "<tr><th>${label}</th><td>"
+        + lib.concatMapStringsSep ", " (id: "<button class=\"side-btn\" style=\"padding:0;border:none;color:var(--heading);cursor:pointer;\" url=\"data/agents-notes/${id}.json\">${escH id}</button>") ids
+        + "</td></tr>";
     in {
       name = "data/agents-notes/${id}.json";
       file = pkgs.writeText "agent-note-${nodeSlug id}.json" (builtins.toJSON {
@@ -748,7 +750,10 @@
             <h2>${escH e.title}</h2>
             <p style="margin: 0.75rem 0; color: var(--text-muted);">${escH e.summary}</p>
             <table><tbody>
-              ${lib.concatMapStringsSep "\n" row (metaRows ++ refRows)}
+              ${lib.concatMapStringsSep "\n" (r:
+              if builtins.isString r
+              then r
+              else row r) (metaRows ++ refRows)}
             </tbody></table>
             <div class="note"><!--KG_NOTE--></div>
             <p style="margin-top: 1.5rem;">

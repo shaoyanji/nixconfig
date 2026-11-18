@@ -340,6 +340,7 @@ in {
     in {
       total = builtins.length edges;
       recorded = count (e: e ? evidence);
+      claimKinds = epistemicsCtl.kindIds;
       recordedEdges =
         map (e: {
           inherit (e) from to type evidence;

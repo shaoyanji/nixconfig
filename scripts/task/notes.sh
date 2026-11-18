@@ -127,7 +127,8 @@ case "$MODE" in
            (if (.from | length) > 0 then "from:        \(.from | join(", "))" else empty end),
            (if (.supersedes | length) > 0 then "supersedes:  \(.supersedes | join(", "))" else empty end),
            (if (.replacedBy | length) > 0 then "replaced by: \(.replacedBy | join(", "))" else empty end),
-           (if (.descendants | length) > 0 then "led to:      \(.descendants | join(", "))" else empty end)
+           (if ((.descendants - .replacedBy) | length) > 0 then "led to:      \((.descendants - .replacedBy) | join(", "))" else empty end),
+           (if (.ancestors | length) > 0 then "ancestry:    \(.ancestors | join(" <- "))" else empty end)
          else empty end),
         (if (.links | length) > 0 then "", "related: \(.links | join(", "))" else empty end),
         (if .body != "" then "", .body else empty end)
@@ -279,7 +280,7 @@ case "$MODE" in
       exit 0
     fi
     if [ "${FORMAT:-}" = "line" ]; then
-      jq -r --arg id "$id" '.lineage[$id] | "mode=lineage id=\($id) from=\(.from | length) supersedes=\(.supersedes | length) replacedBy=\(.replacedBy | length) descendants=\(.descendants | length)"' <<<"$data"
+      jq -r --arg id "$id" '.lineage[$id] | "mode=lineage id=\($id) from=\(.from | length) supersedes=\(.supersedes | length) replacedBy=\(.replacedBy | length) descendants=\(.descendants | length) ancestors=\(.ancestors | length)"' <<<"$data"
       exit 0
     fi
     jq -r --arg id "$id" '
@@ -313,7 +314,7 @@ case "$MODE" in
       exit 0
     fi
     if [ "${FORMAT:-}" = "line" ]; then
-      jq -r '"mode=claims notes=\(.counts.total) open=\(.counts.open) kinds=\(.counts.byClaim | length)"' <<<"$data"
+      jq -r '"mode=claims notes=\(.counts.total) open=\(.counts.open) kinds=\(.counts.byClaim | length) evidence=\([.notes[] | .evidence] | group_by(.) | map("\(.[0]):\(length)") | join(","))"' <<<"$data"
       exit 0
     fi
     printf '%-19s %6s %6s  %s\n' "CLAIM" "NOTES" "OPEN" "EVIDENCE"

@@ -214,4 +214,19 @@ if grep -Eq '^(hosts/|docs/|\.agents/skills/|AGENTS\.md|MANUAL\.md|ARCHITECTURE\
   fi
 fi
 
+# The small pinned datasets — the turn snapshot and the resume — are files Nix
+# reads, and a stale one is a build that describes yesterday. Refreshed here and
+# not at push time: a push hook that commits has to push again, because git read
+# the ref before the hook ran, and the push it was called for then fails as a
+# rejected ref. A commit is the last moment the refresh is free. It stages what it
+# changed, so the data travels with the commit that caused it, and it is advisory:
+# an unreachable source must warn, never block a commit.
+if [ -f "$REPO_ROOT/scripts/task/pins-refresh.sh" ]; then
+  if bash "$REPO_ROOT/scripts/task/pins-refresh.sh" >/tmp/pre-commit-pins.log 2>&1; then
+    grep -E '^(PIN|SKIP) ' /tmp/pre-commit-pins.log | sed 's/^/  /' | head -6 || true
+  else
+    echo "  pre-commit: the pin refresh could not run; the pinned files are unchanged."
+  fi
+fi
+
 exit 0

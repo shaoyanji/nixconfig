@@ -312,7 +312,8 @@ tasks:
     summary: >
       scripts/task/pins-refresh.sh — `lib/pins.toml`: a file, its refresh command,
       and the `max_bytes` that keeps a corpus out. An unavailable source is SKIPPED
-      and named; an oversized one is refused. `--check` exits 1 on a stale pin,
+      and named; an oversized one is refused. `--check` exits 1 on a stale pin, or
+      on a gist fetch with no `[[hash]]` row or a bare hash, and needs no network;
       `--commit` commits. `hash_key` names the fetch a pin feeds; a `[[hash]]`
       entry is a gist fetch with no file here (shell configs, SSH keys). Either
       way that sha256 moves in the same commit, archives excluded.

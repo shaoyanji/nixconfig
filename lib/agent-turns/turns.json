@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T14:32:35Z",
+  "generated": "2026-11-18T15:01:41Z",
   "count": 200,
-  "pin": "0ad6c966e489c5880088e5284af5a362867b2aa1ca0d9bf2b95ea4b88d8fc976",
+  "pin": "9855756cfbee821d7b8c1bec313e0cc9fa00dab8442828578acb09ef40417b56",
   "turns": [
+    {
+      "id": "3d2b09ad-9867-4910-bd90-1a02883e2574",
+      "ts": "2026-11-18T14:35:40Z",
+      "source": "buffy",
+      "subject": "nixconfig:pins-gist-hashes",
+      "action": "lib/pins.toml gained a [[hash]] table for gist fetches with no file in the tree: wezterm-config, wezterm-mappings, elvish-rc, lf-icons, authorized-keys (that json had no key, so the sweep skipped it silently). pins-refresh re-reads each per run and stages the registry in the same commit; resume keeps hash_key. base.nix's duplicate elvish hash now reads the one entry. Gates: refresh rewrote all 5 then unchanged; checks:tasks, checks:host frieren 2267 assertions, site build.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d45853590ae13ff4f1be656a06b2f7be276ab1fa",
+      "branch": "main",
+      "frame": "03h9cuqkizan4oxh0yq13orhl"
+    },
     {
       "id": "54252c99-637c-4b19-b1d3-a5fe9b82a85c",
       "ts": "2026-11-18T13:40:47Z",
@@ -2743,23 +2756,6 @@
       "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
       "branch": "main",
       "frame": "03h7hi9k0z2pjmnxdcceufcv8"
-    },
-    {
-      "id": "12d02bcd-f2dd-4ebd-977c-c5a344d7c80b",
-      "ts": "2026-11-09T23:43:56Z",
-      "source": "devji",
-      "subject": "nixconfig:model-epistemics-sops-recipes",
-      "action": "Added model provider epistemic note to AGENTS.nix and safe SOPS recipes to docs, pushed to main",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "AGENTS.nix",
-        "docs/sops-rekey.md",
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
-      "branch": "main",
-      "frame": "03h7hi5t9p83lr51ri7188ofq"
     }
   ]
 }

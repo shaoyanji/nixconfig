@@ -50,6 +50,43 @@ hash_rows=$(yq -p toml -o json '.hash // []' "$PINS" | jq -r '.[] | [.key, (.fil
 changed=()
 skipped=()
 
+# A gist Nix fetches is bytes with no file here: its sha256 is the only thing
+# telling the build which revision it reads, so a gist that was added without a
+# `[[hash]]` row, or whose hash was written bare, is drift nothing would report
+# until the build failed. This proves both from the tree alone, which is what
+# lets `--check` stay offline.
+check_hashes() {
+  local rc=0 key url file value known reg
+  known=$(printf '%s\n%s\n' "$(printf '%s\n' "$rows" | cut -f5)" "$(printf '%s\n' "$hash_rows" | cut -f1)")
+
+  for reg in modules/config/fetches.json modules/config/authorized-keys.json; do
+    [ -f "$ROOT/$reg" ] || continue
+    while IFS=$'\t' read -r key url; do
+      [ -n "$key" ] || continue
+      case "$url" in
+      *gist.githubusercontent.com*) : ;;
+      *) continue ;;
+      esac
+      if ! grep -qxF -- "$key" <<<"$known"; then
+        printf 'UNHASHED %-18s %s\n' "$key" "$reg" >&2
+        rc=1
+      fi
+    done < <(jq -r '.. | objects | select(has("url") and has("key")) | [.key, .url] | @tsv' "$ROOT/$reg" 2>/dev/null)
+  done
+
+  while IFS=$'\t' read -r key file; do
+    [ -n "$key" ] || continue
+    value=$(jq -r --arg k "$key" '.. | objects | select(.key == $k) | .sha256 // empty' "$ROOT/$file" 2>/dev/null | head -1)
+    # Nix's base32: digits and lowercase minus e, o, t and u — 52 of them.
+    if ! [[ "$value" =~ ^sha256:[0-9abcdfghijklmnpqrsvwxyz]{52}$ ]]; then
+      printf 'BADHASH  %-18s %s (%s)\n' "$key" "$file" "${value:-none}" >&2
+      rc=1
+    fi
+  done <<<"$hash_rows"
+
+  return "$rc"
+}
+
 # Rewrite one entry's sha256 in a fetch registry and stage the file when its
 # bytes changed. The comparison is the file against itself: a hash repaired back
 # to the committed value is a rewrite, and comparing with HEAD would call it
@@ -128,8 +165,9 @@ if [ "$mode" != --check ]; then
 fi
 
 if [ "$mode" = --check ]; then
+  check_hashes || exit 1
   [ ${#changed[@]} -eq 0 ] || { printf 'pins: %d stale — task pins:refresh\n' "${#changed[@]}" >&2; exit 1; }
-  printf 'pins: all fresh\n'
+  printf 'pins: all fresh (%d hashes)\n' "$(printf '%s\n' "$hash_rows" | cut -f1 | wc -l)"
   exit 0
 fi
 

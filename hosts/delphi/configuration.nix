@@ -325,6 +325,9 @@ in {
   # uplink was saturated): `docs/media-relay.md`.
   services.media-relay.enable = true;
 
+  # The bucket half: `→ R2` on the page, playback from the edge (docs/media-relay.md)
+  services.media-relay.r2.enable = true;
+
   # --- the job pipeline as a page ---
   # Read-only over the mail hub's tables; consumer of the appflow-single-writer
   # cutover, and a writer of nothing.

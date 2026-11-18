@@ -46,6 +46,21 @@ SEARCH_PAYLOAD = [
     }
 ]
 
+# One `rclone lsjson` answer: the video, its poster (metadata, never a row) and a
+# `.txt` the extension set leaves out. ModTime carries rclone's nanoseconds.
+REMOTE_OBJECTS = [
+    {
+        "Path": "vidA/Big Buck Bunny [vidA].mp4",
+        "Name": "Big Buck Bunny [vidA].mp4",
+        "Size": 5000,
+        "ModTime": "2026-11-19T00:00:00.123456789Z",
+        "IsDir": False,
+    },
+    {"Path": "vidA/poster.jpg", "Size": 1200, "ModTime": "2026-11-19T00:00:00Z", "IsDir": False},
+    {"Path": "vidA/notes.txt", "Size": 10, "ModTime": "2026-11-19T00:00:00Z", "IsDir": False},
+]
+STORE_URL = "https://edge.example/media/vidA/Big%20Buck%20Bunny%20%5BvidA%5D.mp4"
+
 
 class Urls(unittest.TestCase):
     def test_accepts_the_shapes_youtube_hands_out(self):
@@ -80,6 +95,43 @@ class Urls(unittest.TestCase):
         self.assertEqual(api.clean_title("  x\x00y  "), "xy")
         self.assertEqual(api.clean_title(None), "")
         self.assertEqual(len(api.clean_title("z" * 500)), 200)
+
+
+class Remote(unittest.TestCase):
+    """The bucket listing, mapped to the rows the cloud section draws."""
+
+    def setUp(self):
+        self.saved = api.R2_PUBLIC
+        api.R2_PUBLIC = "https://edge.example/media"
+
+    def tearDown(self):
+        api.R2_PUBLIC = self.saved
+
+    def test_the_indexs_three_rules_hold_for_a_bucket(self):
+        items = api.remote_items(REMOTE_OBJECTS)
+        self.assertEqual([item["name"] for item in items], ["Big Buck Bunny [vidA].mp4"])
+        item = items[0]
+        self.assertEqual(item["kind"], "video")
+        self.assertEqual(item["size"], 5000)
+        self.assertEqual(item["poster"], "https://edge.example/media/vidA/poster.jpg")
+        # The poster is not a row and is not counted: the same rule as the local
+        # manifest, so a stored video and a fetched one look alike.
+        self.assertEqual(sum(i["size"] for i in items), 5000)
+
+    def test_the_link_is_the_edge_and_it_is_quoted(self):
+        self.assertEqual(api.remote_items(REMOTE_OBJECTS)[0]["url"], STORE_URL)
+
+    def test_a_folder_without_a_poster_has_no_poster_field(self):
+        items = api.remote_items([REMOTE_OBJECTS[0]])
+        self.assertIsNone(items[0]["poster"])
+
+    def test_nanosecond_modtimes_parse(self):
+        self.assertEqual(api.epoch("2026-11-19T00:00:00.123456789Z"), api.epoch("2026-11-19T00:00:00Z"))
+        self.assertEqual(api.epoch("nonsense"), 0)
+        self.assertEqual(api.epoch(None), 0)
+
+    def test_junk_entries_are_dropped_rather_than_crashing(self):
+        self.assertEqual(api.remote_items([None, {}, {"Path": ""}, {"Path": ".hidden/"}]), [])
 
 
 class Limits(unittest.TestCase):
@@ -132,7 +184,11 @@ class Live(unittest.TestCase):
         search.write_text("#!/bin/sh\ncat <<'JSON'\n" + json.dumps(SEARCH_PAYLOAD) + "\nJSON\n")
         fetch = root / "yt-get"
         fetch.write_text("#!/bin/sh\necho \"http://delphi:8461/vidA/Big Buck Bunny.mp4\"\n")
-        for script in (search, fetch):
+        store = root / "yt-store"
+        store.write_text(f"#!/bin/sh\necho {STORE_URL!r}\n".replace("'", '"'))
+        listing = root / "r2-list"
+        listing.write_text("#!/bin/sh\ncat <<'JSON'\n" + json.dumps(REMOTE_OBJECTS) + "\nJSON\n")
+        for script in (search, fetch, store, listing):
             script.chmod(0o755)
 
         cls.port = free_port()
@@ -143,6 +199,9 @@ class Live(unittest.TestCase):
                 "BIND_ADDR": "127.0.0.1",
                 "YT_SEARCH": str(search),
                 "YT_GET": str(fetch),
+                "YT_STORE": str(store),
+                "R2_LIST": str(listing),
+                "R2_PUBLIC": "https://edge.example/media",
                 "COOKIE_FILE": "",
             }
         )
@@ -212,6 +271,44 @@ class Live(unittest.TestCase):
         self.assertEqual(done["state"], "done")
         self.assertEqual(done["title"], "a test")
         self.assertTrue(done["out"].endswith("Big Buck Bunny.mp4"))
+
+    def test_health_says_the_bucket_is_configured(self):
+        status, body = call(self.port, "/api/health")
+        self.assertEqual(status, 200)
+        self.assertTrue(body["r2"])
+
+    def test_store_queues_a_job_that_reaches_done(self):
+        status, job = call(self.port, "/api/store", {"url": "https://youtu.be/dQw4w9WgXcQ", "title": "remote"})
+        self.assertEqual(status, 202)
+        self.assertEqual(job["mode"], "r2")
+
+        deadline = time.time() + 15
+        done = None
+        while time.time() < deadline:
+            _, listing = call(self.port, "/api/jobs")
+            done = next(
+                (r for r in listing["jobs"] if r["id"] == job["id"] and r["state"] not in ("queued", "running")),
+                None,
+            )
+            if done:
+                break
+            time.sleep(0.1)
+        self.assertIsNotNone(done, "the queued store never finished")
+        self.assertEqual(done["state"], "done")
+        # A store's output is a URL at the edge, not a path on this host.
+        self.assertEqual(done["out"], STORE_URL)
+
+    def test_a_plain_fetch_is_not_a_store(self):
+        status, job = call(self.port, "/api/fetch", {"url": "https://youtu.be/dQw4w9WgXcQ"})
+        self.assertEqual(status, 202)
+        self.assertEqual(job["mode"], "local")
+
+    def test_cloud_listing_carries_absolute_links(self):
+        status, body = call(self.port, "/api/r2?refresh=1")
+        self.assertEqual(status, 200)
+        self.assertEqual(body["count"], 1)
+        self.assertEqual(body["bytes"], 5000)
+        self.assertEqual(body["items"][0]["url"], STORE_URL)
 
     def test_unknown_route_is_404(self):
         self.assertEqual(call(self.port, "/api/nope")[0], 404)

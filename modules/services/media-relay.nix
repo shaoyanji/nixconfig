@@ -5,9 +5,20 @@
   config,
   lib,
   pkgs,
+  self,
   ...
 }: let
   cfg = config.services.media-relay;
+
+  # `.#cacheRegistry` is the one home for the edge URL.
+  edgeUrl = self.cacheRegistry.caches.edge.url;
+
+  # scripts/media-relay/r2-env.sh — the credential, read at run time.
+  r2Env = pkgs.writeTextFile {
+    name = "media-relay-r2-env.sh";
+    text = builtins.readFile ../../scripts/media-relay/r2-env.sh;
+    executable = true;
+  };
 
   # The cookie jar is a credential a human provisioned, and both scripts read it
   # through this one fragment: a search that forgot it meets the consent page
@@ -22,17 +33,26 @@
   ytGet = pkgs.writeShellScriptBin "yt-get" ''
     set -eu
 
+    usage='usage: yt-get [--height N] [--fps N] [--allow-live] [--dest DIR] <url>'
     max_height=${toString cfg.maxHeight}
     max_fps=${toString cfg.maxFps}
     allow_live=0
+    dest=${lib.escapeShellArg cfg.mediaDir}
+    print_path=0
     url=""
     while [ "$#" -gt 0 ]; do
       case "$1" in
         --height) max_height="$2"; shift 2 ;;
         --fps) max_fps="$2"; shift 2 ;;
         --allow-live) allow_live=1; shift ;;
+        # `yt-store` spools here; docs/media-relay.md has the destinations.
+        --dest)
+          dest="$2"
+          print_path=1
+          shift 2
+          ;;
         -h | --help)
-          echo "usage: yt-get [--height N] [--fps N] [--allow-live] <url>"
+          echo "$usage"
           exit 0
           ;;
         -*)
@@ -46,7 +66,7 @@
       esac
     done
     if [ -z "$url" ]; then
-      echo "usage: yt-get [--height N] [--fps N] [--allow-live] <url>" >&2
+      echo "$usage" >&2
       exit 2
     fi
 
@@ -89,7 +109,7 @@
 
     # The id is the directory, so a re-fetch reuses it and a listing groups by
     # video rather than by whichever title YouTube was A/B-testing that hour.
-    out="${cfg.mediaDir}/$id"
+    out="$dest/$id"
     mkdir -p "$out"
 
     # H.264/AAC or nothing. A `best` fallback here would store VP9 or AV1 in an
@@ -150,7 +170,12 @@
       [ -s "$poster" ] || echo "yt-get: no poster frame; the page shows the filename only" >&2
     fi
 
-    rel="''${file#${cfg.mediaDir}/}"
+    if [ "$print_path" = "1" ]; then
+      echo "$file"
+      exit 0
+    fi
+
+    rel="''${file#$dest/}"
 
     # The library page reads this manifest, so a file that appeared only after
     # the next timer tick would look like a failed download.
@@ -159,6 +184,102 @@
     fi
 
     echo "${cfg.publicBase}/$rel"
+  '';
+
+  # The upload half of the same fetch; docs/media-relay.md has the destinations.
+  # Its credential is scripts/media-relay/r2-env.sh, never this file.
+  ytStore = pkgs.writeShellScriptBin "yt-store" ''
+    set -eu
+
+    usage='usage: yt-store [--height N] [--fps N] <url>'
+    max_height=${toString cfg.maxHeight}
+    max_fps=${toString cfg.maxFps}
+    url=""
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+        --height) max_height="$2"; shift 2 ;;
+        --fps) max_fps="$2"; shift 2 ;;
+        -h | --help)
+          echo "$usage"
+          exit 0
+          ;;
+        -*)
+          echo "yt-store: unknown option: $1" >&2
+          exit 2
+          ;;
+        *)
+          url="$1"
+          shift
+          ;;
+      esac
+    done
+    if [ -z "$url" ]; then
+      echo "$usage" >&2
+      exit 2
+    fi
+
+    export PATH="${ytGet}/bin:${pkgs.yt-dlp}/bin:${pkgs.ffmpeg}/bin:${pkgs.rclone}/bin:${pkgs.sops}/bin:${pkgs.jq}/bin:${pkgs.curl}/bin:${pkgs.python3}/bin:$PATH"
+
+    MEDIA_SOPS_FILE=${lib.escapeShellArg cfg.r2.sopsFile}
+    . ${r2Env}
+
+    bucket=${lib.escapeShellArg cfg.r2.bucket}
+    prefix=${lib.escapeShellArg cfg.r2.prefix}
+    budget_bytes=${toString (cfg.r2.budgetGiB * 1024 * 1024 * 1024)}
+
+    ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg cfg.spoolDir}
+    spool="$(${pkgs.coreutils}/bin/mktemp -d ${lib.escapeShellArg cfg.spoolDir}/store.XXXXXX)"
+    trap '${pkgs.coreutils}/bin/rm -rf "$spool"' EXIT
+
+    held="$(rclone size "r2:$bucket/$prefix" --json 2>/dev/null | ${pkgs.jq}/bin/jq -r '.bytes // 0' || true)"
+    held="''${held:-0}"
+    if [ "$held" -ge "$budget_bytes" ]; then
+      echo "yt-store: $prefix holds $(( held / 1024 / 1024 )) MiB, at the ${toString cfg.r2.budgetGiB} GiB media budget" >&2
+      echo "          the rest of the bucket is the nix cache's; prune a video or raise" >&2
+      echo "          services.media-relay.r2.budgetGiB" >&2
+      exit 1
+    fi
+
+    file="$(yt-get --dest "$spool" --height "$max_height" --fps "$max_fps" "$url")"
+    if [ -z "$file" ] || [ ! -f "$file" ]; then
+      echo "yt-store: yt-get produced no file; the library was not touched" >&2
+      exit 1
+    fi
+    dir="$(${pkgs.coreutils}/bin/dirname "$file")"
+    name="$(${pkgs.coreutils}/bin/basename "$file")"
+    id="$(${pkgs.coreutils}/bin/basename "$dir")"
+    key="$prefix/$id/$name"
+
+    rclone copyto "$file" "r2:$bucket/$key" --transfers 1 --checkers 1
+    if [ -s "$dir/poster.jpg" ]; then
+      rclone copyto "$dir/poster.jpg" "r2:$bucket/$prefix/$id/poster.jpg" || true
+    fi
+
+    rclone lsf "r2:$bucket/$prefix/$id" --files-only 2>/dev/null |
+      while IFS= read -r stale; do
+        case "$stale" in
+          "$name" | poster.jpg) ;;
+          *) rclone deletefile "r2:$bucket/$prefix/$id/$stale" || true ;;
+        esac
+      done || true
+
+    rel="''${key#"$prefix/"}"
+    public_url="${cfg.r2.publicBase}/$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1]))' "$rel")"
+    if ! curl -sfI --max-time 15 "$public_url" >/dev/null; then
+      echo "yt-store: uploaded, but $public_url is not served yet" >&2
+      echo "          deploy the Worker that owns /media/: task dev:nixcache:deploy" >&2
+    fi
+
+    echo "$public_url"
+  '';
+
+  # The cloud listing, read by scripts/media-relay/r2-env.sh for the page.
+  r2List = pkgs.writeShellScript "media-relay-r2-list" ''
+    set -eu
+    export PATH="${pkgs.rclone}/bin:${pkgs.sops}/bin:${pkgs.jq}/bin:$PATH"
+    MEDIA_SOPS_FILE=${lib.escapeShellArg cfg.r2.sopsFile}
+    . ${r2Env}
+    exec rclone lsjson "r2:${cfg.r2.bucket}/${cfg.r2.prefix}" --files-only --recursive
   '';
 
   # Search, for the page's search field. `--flat-playlist` is the whole trick:
@@ -303,6 +424,11 @@
     export YT_GET=${ytGet}/bin/yt-get
     export YT_SEARCH=${ytSearch}/bin/yt-search
     export COOKIE_FILE=${cfg.cookieFile}
+    ${lib.optionalString cfg.r2.enable ''
+      export YT_STORE=${ytStore}/bin/yt-store
+      export R2_LIST=${r2List}
+      export R2_PUBLIC=${cfg.r2.publicBase}
+    ''}
     export REQUIRE_COOKIES=${
       if cfg.requireCookies
       then "1"
@@ -400,6 +526,77 @@ in {
       default = "http://delphi:${nginxPort}";
       description = "URL prefix printed by `yt-get`, i.e. what a client bookmarks.";
     };
+
+    spoolDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/var/lib/media-relay/spool";
+      description = ''
+        Scratch space for `yt-store`: `yt-get --dest` writes here, the upload
+        reads it, and the directory is deleted on exit whatever happened. It is on
+        the same volume as the library, so a spool is counted by `df` while it
+        lasts — one file at a time, because the API queues stores.
+      '';
+    };
+
+    # The bucket docs/nix-cache-edge.md owns, double-dipped per docs/media-relay.md.
+    r2.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Offer `→ R2` on the page and `yt-store` on the host: fetch into the
+        bucket instead of the boot volume, and play it back from the edge. Off by
+        default, because it depends on a credential and a deployed Worker.
+      '';
+    };
+
+    r2.bucket = lib.mkOption {
+      type = lib.types.str;
+      default = "nix-cache";
+      description = "R2 bucket. The cache's name, not a second bucket: one free-tier budget, one lifecycle rule, one Worker.";
+    };
+
+    r2.prefix = lib.mkOption {
+      type = lib.types.str;
+      default = "media";
+      description = ''
+        Object prefix, and the Worker's URL prefix (`/media/…`). It must stay a
+        first path segment that no narinfo or nar grammar claims, or a stored
+        video would shadow a store path.
+      '';
+    };
+
+    r2.publicBase = lib.mkOption {
+      type = lib.types.str;
+      default = "${edgeUrl}/${cfg.r2.prefix}";
+      description = ''
+        Where a stored object is played from: the edge Worker, not this host. The
+        default is `lib/cache-registry.nix`'s edge URL, so the cache and the
+        library cannot disagree about which Worker serves the bucket.
+      '';
+    };
+
+    r2.budgetGiB = lib.mkOption {
+      type = lib.types.int;
+      default = 6;
+      description = ''
+        Ceiling for the prefix, in GiB, measured by `rclone size` before every
+        store. A refusal, not a warning: the bucket's 10 GiB free tier is shared
+        with the nix cache, and overflow is billed. 6 leaves the cache its
+        documented 4.
+      '';
+    };
+
+    r2.sopsFile = lib.mkOption {
+      type = lib.types.str;
+      default = "${config.users.users.${cfg.user}.home}/Documents/nixconfig/modules/secrets/apikeys.yaml";
+      description = ''
+        The sops apikeys plane `yt-store` and the lister read at run time with the
+        library owner's age key (`CLOUDFLARE.{ACCESS.KEY.ID,
+        SECRET.ACCESS.KEY,S3.API.ENDPOINT}`). A path rather than a store copy: the
+        directory is a git submodule and the keys are not declared in Nix, the
+        same rule scripts/task/nixcache.sh follows.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -410,18 +607,22 @@ in {
       }
     ];
 
-    environment.systemPackages = [ytGet ytSearch pkgs.yt-dlp pkgs.ffmpeg];
+    environment.systemPackages =
+      [ytGet ytSearch pkgs.yt-dlp pkgs.ffmpeg]
+      ++ lib.optional cfg.r2.enable ytStore;
 
     # Group left as `-` on purpose: delphi's devji has no group of its own
     # (primary gid 100 = users), and naming it made the rule fail with
     # "invalid group", which then left the nginx root missing.
-    systemd.tmpfiles.rules = [
-      "d ${cfg.mediaDir} 0755 ${cfg.user} - -"
-      # Traversable, not 0750: nginx workers are not devji and cannot enter a
-      # group-restricted parent, which turns every request into 403 while the
-      # jar itself stays 0600.
-      "d ${builtins.dirOf cfg.cookieFile} 0755 ${cfg.user} - -"
-    ];
+    systemd.tmpfiles.rules =
+      [
+        "d ${cfg.mediaDir} 0755 ${cfg.user} - -"
+        # Traversable, not 0750: nginx workers are not devji and cannot enter a
+        # group-restricted parent, which turns every request into 403 while the
+        # jar itself stays 0600.
+        "d ${builtins.dirOf cfg.cookieFile} 0755 ${cfg.user} - -"
+      ]
+      ++ lib.optional cfg.r2.enable "d ${cfg.spoolDir} 0700 ${cfg.user} - -";
 
     # Range support is native to nginx; what is added is the listing a client
     # can actually browse on an iPad (plain HTML, no JS) and a cache header that
@@ -570,7 +771,8 @@ in {
         # (measured 2026-11-10, first deploy of this API).
         ReadWritePaths =
           [cfg.mediaDir]
-          ++ lib.optional (cfg.cookieFile != "") (builtins.dirOf cfg.cookieFile);
+          ++ lib.optional (cfg.cookieFile != "") (builtins.dirOf cfg.cookieFile)
+          ++ lib.optional cfg.r2.enable cfg.spoolDir;
         RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
         # The interpreter plus one yt-dlp child; the cap is the runaway guard,
         # not the expectation.

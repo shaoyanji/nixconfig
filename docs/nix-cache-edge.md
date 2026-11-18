@@ -26,7 +26,7 @@ that is a cost decision, not a technical one, and it is the wrong one.
 | Layer | Home |
 | :--- | :--- |
 | the Worker (GET/HEAD only) | `modules/services/nix-cache-edge/src/worker.ts` |
-| path grammar, range and cache-info rules | `modules/services/nix-cache-edge/src/routes.ts` |
+| path grammar, range and cache-info rules, the `/media/` route | `modules/services/nix-cache-edge/src/routes.ts` |
 | bucket, binding, priority, route | `modules/services/nix-cache-edge/wrangler.toml` |
 | deploy / probe / size / keygen / push | `scripts/task/nixcache.sh` |
 | the deploy toolchain on the host that deploys | `hosts/delphi/nix-cache-edge.nix` |
@@ -63,6 +63,19 @@ already report. Nothing reads those counters, so they are not written.
 **`nix-cache-info` carries `Priority: 30`.** Lower wins in nix. harmonia advertises
 10 and is LAN-only, so a LAN build never leaves the house; the ordering across
 WAN tiers is `lib/cache-registry.nix`'s `evalOrder`, not this file's.
+
+## The media prefix shares the bucket
+
+`/media/…` is a second read route on this Worker and this bucket, for delphi's
+video library: `yt-store` writes `media/<video id>/` over the S3 API and the page
+plays it from the edge (`docs/media-relay.md`). It is here rather than in a
+bucket of its own because a player needs Range, `HEAD` and an `immutable` ETag —
+what a nix client needs — and because the free tier is one budget.
+
+Two consequences. The lifecycle rule is bucket-wide, so a stored video expires
+365 days after upload like a nar, and `/media/` is public-read with no listing
+route, so a URL is the whole authorisation. Nix never asks for a path outside
+the narinfo and nar grammars, so `media/…` cannot shadow a store path.
 
 ## First deploy
 

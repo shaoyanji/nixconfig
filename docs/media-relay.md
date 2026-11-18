@@ -91,8 +91,10 @@ process never touches a media byte.
 | :--- | :--- |
 | `GET /api/search?q=…&limit=N` | one `yt-search`, i.e. `yt-dlp --flat-playlist -J "ytsearchN:q"`, trimmed to `id, title, channel, duration, live, url, thumb`. Answers are cached for 10 minutes, 64 queries deep, and at most two searches run at once. |
 | `POST /api/fetch` | takes `{"url": …}`, queues a `yt-get` run and answers `202` with the job record; `429` when four already are. |
-| `GET /api/jobs` | the queue's recent records: `queued`, `running`, `done`, `failed`, `out`, `error`. |
-| `GET /api/health` | liveness, plus whether the cookie jar is readable, so the page warns before a paste fails inside yt-dlp. |
+| `POST /api/store` | the same body, queued as a `yt-store` run: fetch into the R2 bucket, keep nothing. `503` when the bucket is not configured. |
+| `GET /api/r2` | the bucket's rows (`key`, `name`, `dir`, `ext`, `kind`, `size`, `mtime`, `poster`, `url`), read through `rclone lsjson` and held for a minute; `?refresh=1` skips the cache. |
+| `GET /api/jobs` | the queue's recent records: `mode` (`local` or `r2`), `queued`, `running`, `done`, `failed`, `out`, `error`. |
+| `GET /api/health` | liveness, whether the cookie jar is readable, and whether the bucket is configured — so the page warns before a paste fails inside yt-dlp. |
 
 `POST /api/fetch` accepts only the YouTube hosts on an allow-list, with no
 userinfo and no explicit port. `yt-get` itself takes any URL, so the allow-list
@@ -108,10 +110,62 @@ shape, and the fetch already existed as `yt-get`. An Invidious instance would
 add a database, a second scrape path and another thing that breaks when YouTube
 changes, to replace a wrapper that was already here.
 
+## The bucket: fetch on delphi, play from the edge
+
+`→ R2` on a search card is the same fetch with a different destination.
+`yt-store` spools into `spoolDir`, uploads the MP4 and its poster to
+`nix-cache/media/<video id>/`, deletes the spool, and prints the URL it will be
+played from. Nothing is left on the boot volume: that volume is 200 GB shared
+with five services, and the bucket is a 10 GiB free tier that the nix cache
+occupies 447 MiB of (2026-11-19). `docs/nix-cache-edge.md` owns the bucket; this
+is the second prefix on it.
+
+The same Worker serves both, so `/media/…` is a read route beside the narinfo
+and nar grammars: the content type comes from the extension and Range, `HEAD`,
+`ETag` and `immutable` are the four things a `<video>` element wants and the
+four the binary cache already had. A stored video seeks without delphi in the
+path at all — the bytes come from Cloudflare, not from this host's uplink.
+
+Three rules keep the prefix from becoming a second library:
+
+- **The id is the folder.** A re-store overwrites `media/<id>/`, and a store
+  under a corrected title deletes the object it replaced, so one video is one
+  entry — the local library's rule, spelled in object keys.
+- **The media budget is a refusal.** `r2.budgetGiB` (6) is measured with
+  `rclone size` before every store; over it, `yt-store` refuses and says what to
+  prune. The cache keeps the rest of the free tier, which is why the number
+  lives in the module and not in a shell script.
+- **A store nobody can play is not a store.** The upload is followed by a `HEAD`
+  on the public URL. That is a warning, not a failure: the object is already in
+  the bucket, and the fix is `task dev:nixcache:deploy`, not a delete.
+
+The Cloud section of the page is `/api/r2`: one `rclone lsjson`, mapped with the
+index's own rules (`poster.jpg` is metadata, an unknown extension is not listed,
+the folder is the fetch) and held for a minute. The API process holds no
+credential — `yt-store` and the lister decrypt the sops apikeys plane with the
+library owner's age key at run time, the rule `scripts/task/nixcache.sh`
+already follows.
+
+**A stored object is public.** Anyone with the URL can read it and there is no
+listing route, exactly like the cache it shares; a YouTube id is guessable, so
+treat the prefix as public content. That is the trade for a playback path with
+no token on the edge, and the reason the store is for public videos rather than
+a private library.
+
+**Retention is the bucket's.** The one lifecycle rule expires objects 365 days
+after upload, bucket-wide, so a stored video ages like a nar. There is no media
+gc yet: pruning is `rclone deletefile`, or a timer in the shape of
+`media-relay-prune` once it matters.
+
 ## Operations
 
-- `yt-get [--height N] [--fps N] <url>` fetches; `yt-search [--limit N] <query>`
-  prints the search JSON `api.py` serves. Neither has a task.
+- `yt-get [--height N] [--fps N] [--dest DIR] <url>` fetches; `yt-search
+  [--limit N] <query>` prints the search JSON `api.py` serves; `yt-store
+  [--height N] [--fps N] <url>` fetches into the bucket and prints the edge URL.
+  None of the three has a task.
+- `yt-get --dest DIR` is the same fetch into a directory that is not served and
+  prints the file path instead of a URL: that is what keeps the three format
+  rules in one place when one destination is a bucket.
 - `media-relay-api.service` is the loopback API and `/api/` on the vhost is its
   only ingress. It runs as the library's owner and writes under `mediaDir` plus
   the cookie jar's directory: yt-dlp opens `--cookies` read-write to save the

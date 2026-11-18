@@ -52,8 +52,9 @@ function notFound(head: boolean): Response {
 function readOnly(head: boolean): Response {
   const body =
     "this cache is read-only\n\n" +
-    "uploads go to the R2 bucket through its S3 API, where nix signs the narinfo\n" +
-    "it writes; see docs/nix-cache-edge.md\n";
+    "uploads go to the R2 bucket through its S3 API: nix signs the narinfo it\n" +
+    "writes, and the media relay's `yt-store` PUTs under /media/; see\n" +
+    "docs/nix-cache-edge.md and docs/media-relay.md\n";
   return new Response(head ? null : body, {
     status: 405,
     headers: {
@@ -92,7 +93,12 @@ export default {
       });
     }
 
-    const contentType = route.kind === "narinfo" ? "text/x-nix-narinfo" : "application/x-nix-nar";
+    const contentType =
+      route.kind === "media"
+        ? route.contentType
+        : route.kind === "narinfo"
+          ? "text/x-nix-narinfo"
+          : "application/x-nix-nar";
     const rangeHeader = request.headers.get("range");
 
     // A ranged request costs one metadata read before the body: the object size

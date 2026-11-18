@@ -151,6 +151,29 @@ test("a miss is a 404 and a write is a 405 that names the real upload path", asy
   assert.match(await put.text(), /S3 API/);
 });
 
+test("a media object is served with its own type and ranges like a video", async () => {
+  const key = "media/vidA/Big Buck Bunny [vidA].mp4";
+  const encoded = key.split("/").map(encodeURIComponent).join("/");
+  const body = "0123456789";
+  const whole = await call(stubBucket({[key]: body}), `/${encoded}`);
+  assert.equal(whole.status, 200);
+  assert.equal(whole.headers.get("content-type"), "video/mp4");
+  assert.equal(whole.headers.get("accept-ranges"), "bytes");
+  assert.match(whole.headers.get("cache-control") ?? "", /immutable/);
+
+  const partial = await call(stubBucket({[key]: body}), `/${encoded}`, {
+    headers: {range: "bytes=0-3"},
+  });
+  assert.equal(partial.status, 206);
+  assert.equal(partial.headers.get("content-range"), "bytes 0-3/10");
+  assert.equal(await partial.text(), "0123");
+});
+
+test("a media write is refused like any other", async () => {
+  const res = await call(stubBucket({}), "/media/vidA/x.mp4", {method: "PUT"});
+  assert.equal(res.status, 405);
+});
+
 test("unknown paths never reach the bucket", async () => {
   const bucket = stubBucket({});
   for (const path of ["/", "/nix/store/abc", "/nar/../etc/passwd", "/nix-cache-info.json"]) {

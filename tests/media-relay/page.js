@@ -45,8 +45,8 @@ globalThis.location = { origin: 'https://delphi.example:8461' };
 
 const body = slice("'use strict';", 'function selected');
 const rows = slice('function selected', 'function markup');
-const { selected, groupByDir, ytCard, fmtDur, shortcutFor } = new Function(
-  `${body}\n${rows}\nreturn { selected, groupByDir, ytCard, fmtDur, shortcutFor };`,
+const { selected, r2Row, groupByDir, ytCard, fmtDur, shortcutFor } = new Function(
+  `${body}\n${rows}\nreturn { selected, r2Row, groupByDir, ytCard, fmtDur, shortcutFor };`,
 )();
 
 let pass = 0;
@@ -106,10 +106,14 @@ ok('a card carries the thumbnail', card.includes('src="https://i.ytimg.com/vi/vi
 ok('the thumbnail is a wide lazy box', card.includes('class="thumb wide"') && card.includes('loading="lazy"'));
 ok('the card links the video', card.includes('href="https://www.youtube.com/watch?v=vidA"'));
 ok('the card names the channel and the length', card.includes('Blender \u00b7 9:56'));
-ok('the fetch button is outside the link', card.includes('</a><button'));
+ok('the fetch button is outside the link', card.includes('</a><div class="acts"><button'));
 ok('the fetch button carries the url and the title',
   card.includes('data-url="https://www.youtube.com/watch?v=vidA"')
   && card.includes('data-title="Big Buck Bunny"'));
+// The store button is the same fetch with the bucket as its destination.
+ok('a card offers the bucket', card.includes('class="go st"') && card.includes('→ R2'));
+ok('the store button carries the url too',
+  (card.match(/data-url="https:\/\/www\.youtube\.com\/watch\?v=vidA"/g) || []).length === 2);
 ok('a title with markup is escaped', ytCard({ ...hit, title: '<b>x</b>' }).includes('&lt;b&gt;x&lt;/b&gt;'));
 ok('a missing thumbnail falls back to the still',
   ytCard({ ...hit, thumb: '' }).includes('src="https://i.ytimg.com/vi/vidA/mqdefault.jpg"'));
@@ -118,9 +122,26 @@ ok('a live entry says live', ytCard({ ...hit, duration: null, live: 'is_live' })
 ok('a live result offers no fetch',
   !ytCard({ ...hit, live: 'is_live' }).includes('<button') && ytCard({ ...hit, live: 'is_live' }).includes('class="go off"'));
 ok('an upcoming stream offers no fetch', !ytCard({ ...hit, live: 'is_upcoming' }).includes('<button'));
+ok('a live result offers no store either', !ytCard({ ...hit, live: 'is_live' }).includes('class="go st"'));
 ok('a finished stream still fetches', ytCard({ ...hit, live: 'was_live' }).includes('<button class="go fet"'));
 ok('durations are clock-shaped', fmtDur(59) === '0:59' && fmtDur(60) === '1:00' && fmtDur(3661) === '1:01:01');
 ok('no duration prints nothing', fmtDur(null) === '' && fmtDur(undefined) === '');
+
+// The cloud rows: the same shape as a library row, but the link is the edge, so
+// playback never comes back through delphi.
+const object = {
+  key: 'vidA/Big Buck Bunny [vidA].mp4', name: 'Big Buck Bunny [vidA].mp4', dir: 'vidA',
+  ext: 'mp4', kind: 'video', size: 5000, mtime: 1000,
+  poster: 'https://edge.example/media/vidA/poster.jpg',
+  url: 'https://edge.example/media/vidA/Big%20Buck%20Bunny%20%5BvidA%5D.mp4',
+};
+const cloud = r2Row(object);
+ok('a cloud row points at the edge',
+  cloud.includes('href="https://edge.example/media/vidA/Big%20Buck%20Bunny%20%5BvidA%5D.mp4"'));
+ok('a cloud row says it is in R2', cloud.includes('R2 · mp4'));
+ok('a cloud poster is the absolute URL', cloud.includes('src="https://edge.example/media/vidA/poster.jpg"'));
+ok('a cloud row without a poster has no thumb', !r2Row({ ...object, poster: null }).includes('thumb'));
+ok('a cloud row carries no copy button', !cloud.includes('<button'));
 
 // Shortcuts: one letter per field, matched to the field's name.
 ok('l is the library filter', shortcutFor('l') === 'library');

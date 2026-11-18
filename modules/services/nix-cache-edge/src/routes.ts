@@ -7,6 +7,7 @@ export type Route =
   | {kind: "cache-info"}
   | {kind: "narinfo"; hash: string; key: string}
   | {kind: "nar"; key: string}
+  | {kind: "media"; key: string; contentType: string}
   | {kind: "not-found"};
 
 // A store path hash is 32 base32 characters (NOILU removed from the alphabet).
@@ -21,7 +22,70 @@ export function routeFor(pathname: string): Route {
   if (narinfo) return {kind: "narinfo", hash: narinfo[1], key: `${narinfo[1]}.narinfo`};
   const nar = NAR.exec(pathname);
   if (nar) return {kind: "nar", key: `nar/${nar[1]}`};
+  const media = mediaRoute(pathname);
+  if (media) return media;
   return {kind: "not-found"};
+}
+
+// The bucket is double-dipped: `media/` holds what the media relay fetched, and
+// the same read path serves it. A video player needs exactly what a nix client
+// needs here — a sized object, Range and a stable ETag — so the route only has
+// to name the object and its type. Why the relay stores there: docs/media-relay.md.
+const MEDIA_PREFIX = "/media/";
+
+// Extension to type, because R2 objects written by rclone carry no useful
+// Content-Type and a browser given application/octet-stream downloads the file
+// instead of playing it. The list is the relay's own extension set.
+const MEDIA_TYPES: Record<string, string> = {
+  mp4: "video/mp4",
+  m4v: "video/mp4",
+  webm: "video/webm",
+  mkv: "video/x-matroska",
+  mov: "video/quicktime",
+  avi: "video/x-msvideo",
+  mpg: "video/mpeg",
+  mpeg: "video/mpeg",
+  ts: "video/mp2t",
+  mp3: "audio/mpeg",
+  m4a: "audio/mp4",
+  aac: "audio/aac",
+  ogg: "audio/ogg",
+  opus: "audio/ogg",
+  flac: "audio/flac",
+  wav: "audio/wav",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+  avif: "image/avif",
+  srt: "text/plain; charset=utf-8",
+  vtt: "text/vtt; charset=utf-8",
+};
+
+export function mediaType(path: string): string {
+  const dot = path.lastIndexOf(".");
+  if (dot === -1 || dot < path.lastIndexOf("/")) return "application/octet-stream";
+  return MEDIA_TYPES[path.slice(dot + 1).toLowerCase()] ?? "application/octet-stream";
+}
+
+// A percent-encoded key from a page link, decoded once and then checked. The
+// decode happens before the checks so that `%2e%2e` cannot walk out of the
+// prefix; a dotfile is refused whole, which also keeps a stray key from being
+// listed by a future index route.
+function mediaRoute(pathname: string): Route | null {
+  if (!pathname.startsWith(MEDIA_PREFIX)) return null;
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(pathname.slice(MEDIA_PREFIX.length));
+  } catch {
+    return {kind: "not-found"};
+  }
+  if (!decoded || decoded.length > 512) return {kind: "not-found"};
+  if (/[\u0000-\u001f\\]/.test(decoded)) return {kind: "not-found"};
+  const segments = decoded.split("/");
+  if (segments.some((s) => s === "" || s.startsWith("."))) return {kind: "not-found"};
+  return {kind: "media", key: `media/${decoded}`, contentType: mediaType(decoded)};
 }
 
 // Nix orders substitutes by Priority (lower wins). harmonia advertises 10 and is

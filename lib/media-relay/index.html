@@ -57,7 +57,8 @@ li a:focus-visible{outline:1px solid var(--accent)}
 .ytmeta{display:flex;flex-direction:column;gap:.15rem;min-width:0}
 .ytmeta .t{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ytmeta .c{color:var(--dim);font-size:11px}
-.cards button.fet{margin:0 .5rem .5rem;align-self:flex-start}
+.cards .acts{display:flex;gap:.35rem;margin:0 .5rem .5rem;align-self:flex-start;flex-wrap:wrap}
+.empty{color:var(--dim);padding:2rem .5rem;text-align:center}
 @media(max-width:36rem){header{position:static}li a{grid-template-columns:1fr auto}li a.poster{grid-template-columns:auto 1fr auto}li a.poster .meta{display:none}li{grid-template-columns:1fr}button.cp{display:none}}
 </style>
 </head>
@@ -79,6 +80,7 @@ li a:focus-visible{outline:1px solid var(--accent)}
 <main>
   <section id="yt" aria-label="YouTube results"></section>
   <div id="list" aria-live="polite"></div>
+  <section id="cloud" aria-label="Stored in the R2 bucket"></section>
 </main>
 <script>
 'use strict';
@@ -95,6 +97,7 @@ const ytForm = document.getElementById('ytform');
 const urlEl = document.getElementById('url');
 const fetchForm = document.getElementById('fetchform');
 const jobline = document.getElementById('jobline');
+const cloudEl = document.getElementById('cloud');
 
 const KINDS = ['all', 'video', 'audio', 'image', 'subtitle'];
 let files = [];
@@ -104,6 +107,9 @@ let sel = -1;
 let ytItems = [];
 let ytState = '';
 let ytError = '';
+let r2Items = [];
+let r2State = '';
+let r2Error = '';
 let ytSeq = 0;
 let ytTimer = null;
 const seenDone = new Set();
@@ -212,6 +218,19 @@ function selected(item) {
     + `<button class="cp" type="button" data-href="${esc(href)}" aria-label="Copy the link to ${esc(item.name)}">copy</button></li>`;
 }
 
+// One object in the bucket. The link is the edge Worker, not this host: the read
+// is Range-served there, so a player seeks without delphi in the path at all, and
+// the poster is the absolute URL the manifest's own poster rule produces.
+function r2Row(item) {
+  const thumb = item.poster
+    ? `<span class="thumb"><img src="${esc(item.poster)}" alt="" width="96" height="54" loading="lazy" decoding="async"></span>`
+    : '';
+  return `<li><a href="${esc(item.url)}"${item.poster ? ' class="poster"' : ''}>${thumb}`
+    + `<span class="n">${esc(item.name)}</span>`
+    + `<span class="meta">${fmtSize(item.size)}</span>`
+    + `<span class="ext">R2 · ${esc(item.ext)}</span></a></li>`;
+}
+
 // 596 -> 9:56. A live stream has no duration and says so on its own line, so an
 // empty string here is a real answer rather than a missing one.
 function fmtDur(seconds) {
@@ -241,9 +260,13 @@ function ytCard(item) {
   // the broadcast ends and there is no size to check beforehand.
   const isLive = Boolean(item.live && item.live !== 'not_live' && item.live !== 'was_live');
   if (isLive || (item.live && item.live !== 'not_live')) bits.push('live');
+  // Two ways to keep it, because they answer different questions: `fetch` leaves
+  // it on delphi for the LAN, `→ R2` puts it in the bucket and leaves the boot
+  // volume alone. Both are the same yt-dlp fetch underneath.
   const act = isLive
     ? '<span class="go off" aria-disabled="true" title="a live stream records until it ends; yt-get refuses it">live</span>'
-    : `<button class="go fet" type="button" data-url="${esc(href)}" data-title="${esc(title)}">fetch</button>`;
+    : `<div class="acts"><button class="go fet" type="button" data-url="${esc(href)}" data-title="${esc(title)}">fetch</button>`
+      + `<button class="go st" type="button" data-url="${esc(href)}" data-title="${esc(title)}" title="download into the R2 bucket and play it from there">→ R2</button></div>`;
   return `<li class="card"><a href="${esc(href)}" target="_blank" rel="noreferrer">`
     + `<span class="thumb wide"><img src="${esc(thumb)}" alt="" loading="lazy" decoding="async"></span>`
     + `<span class="ytmeta"><span class="t">${esc(title)}</span>`
@@ -366,7 +389,7 @@ function renderYouTube() {
     ytEl.innerHTML = head('no results') + '<div id="state">Nothing on YouTube matched that.</div>';
     return;
   }
-  ytEl.innerHTML = head('click fetch to pull one onto this host')
+  ytEl.innerHTML = head('fetch keeps it here · → R2 plays it from the bucket')
     + `<ul class="cards">${ytItems.map(ytCard).join('')}</ul>`;
 }
 
@@ -397,6 +420,39 @@ function line(html) {
   jobline.innerHTML = html;
 }
 
+// What the bucket holds, which `find` cannot see. An empty (or unconfigured)
+// bucket earns no heading: the local list already says how to fill either one.
+function renderCloud() {
+  cloudEl.replaceChildren();
+  if (!r2State) return;
+  if (r2State === 'error') {
+    cloudEl.innerHTML = `<h2>Cloud <small>bucket unavailable</small></h2>`
+      + `<div class="empty">${esc(r2Error)}</div>`;
+    return;
+  }
+  if (!r2Items.length) return;
+  cloudEl.innerHTML = `<h2>Cloud <small>${r2Items.length} in R2 · played from the edge, not from delphi</small></h2>`
+    + `<ul>${r2Items.map(r2Row).join('')}</ul>`;
+}
+
+async function loadCloud(refresh) {
+  try {
+    const r = await fetch(`/api/r2${refresh ? '?refresh=1' : ''}`, { cache: 'no-store' });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+    r2Items = Array.isArray(data.items) ? data.items : [];
+    r2Error = '';
+    r2State = r2Items.length ? 'results' : 'empty';
+  } catch (err) {
+    r2Items = [];
+    r2Error = String(err.message || err);
+    // A bucket nobody configured is the feature being off, not a failure: the
+    // local half still works and shouting about it would bury the real one.
+    r2State = /not configured/.test(r2Error) ? '' : 'error';
+  }
+  renderCloud();
+}
+
 async function loadIndex() {
   try {
     const r = await fetch('/index.json', { cache: 'no-store' });
@@ -420,10 +476,10 @@ async function loadIndex() {
   }
 }
 
-async function postFetch(url, title) {
-  line(`<span class="live">queued</span> ${esc(title || url)} — starting`);
+async function postFetch(url, title, remote) {
+  line(`<span class="live">${remote ? 'storing in R2' : 'queued'}</span> ${esc(title || url)} — starting`);
   try {
-    const r = await fetch('/api/fetch', {
+    const r = await fetch(remote ? '/api/store' : '/api/fetch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, title }),
@@ -457,10 +513,14 @@ async function pollJobs() {
   const failed = jobs.find((j) => j.state === 'failed');
   const rows = active.slice(0, 3).map((j) => `<span class="live">${j.state === 'running' ? 'fetching' : 'queued'}</span> ${esc(j.title || j.url)}`);
   if (done) {
-    rows.push(`<span class="ok">saved</span> <a href="${esc(pathOf(done.out))}">${esc(nameOf(done.out) || done.title || done.url)}</a>`);
+    // A store's `out` is already an absolute edge URL; only a local fetch needs
+    // the host the reader used added at click time.
+    const href = done.mode === 'r2' ? done.out : pathOf(done.out);
+    const where = done.mode === 'r2' ? ' <span class="ext">R2</span>' : '';
+    rows.push(`<span class="ok">saved</span> <a href="${esc(href)}">${esc(nameOf(done.out) || done.title || done.url)}</a>${where}`);
     if (!seenDone.has(done.id)) {
       seenDone.add(done.id);
-      loadIndex();
+      if (done.mode === 'r2') loadCloud(true); else loadIndex();
     }
   }
   if (failed) {
@@ -534,12 +594,14 @@ fetchForm.addEventListener('submit', async (e) => {
 });
 
 ytEl.addEventListener('click', async (e) => {
-  const btn = e.target.closest('button.fet');
+  const btn = e.target.closest('button.fet, button.st');
   if (!btn) return;
   e.preventDefault();
+  const remote = btn.classList.contains('st');
   btn.disabled = true;
-  if (await postFetch(btn.dataset.url, btn.dataset.title || '')) btn.textContent = 'queued';
-  else btn.disabled = false;
+  if (await postFetch(btn.dataset.url, btn.dataset.title || '', remote)) {
+    btn.textContent = remote ? 'storing' : 'queued';
+  } else btn.disabled = false;
 });
 
 listEl.addEventListener('click', (e) => {
@@ -550,6 +612,7 @@ listEl.addEventListener('click', (e) => {
 });
 
 loadIndex();
+loadCloud(false);
 
 // The cookie jar is a hand-provisioned credential, so a page that cannot fetch
 // should say that before someone pastes a URL and reads a yt-dlp error.

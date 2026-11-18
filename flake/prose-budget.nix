@@ -9,7 +9,7 @@
     ".agents/skills/agents/SKILL.md" = 18;
     ".agents/skills/ai-memory/SKILL.md" = 68;
     ".agents/skills/antigravity/SKILL.md" = 172;
-    ".agents/skills/apisfreellm/SKILL.md" = 144;
+    ".agents/skills/apisfreellm/SKILL.md" = 145;
     ".agents/skills/apps/SKILL.md" = 54;
     ".agents/skills/atuin/SKILL.md" = 155;
     ".agents/skills/bountystash/SKILL.md" = 72;

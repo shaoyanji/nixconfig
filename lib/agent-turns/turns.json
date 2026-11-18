@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-18T20:27:42Z",
+  "generated": "2026-11-18T20:47:09Z",
   "count": 200,
-  "pin": "da2c5e3d4c16f24aa6f8c5e2d56b4b2d3f9f7c2ae56824efd6f8b548d39b5504",
+  "pin": "fa5ce0cb950d98d294a504d95e98c51c72657184a42b800089c8b62cc4c23eb7",
   "turns": [
+    {
+      "id": "a1d365b3-7e52-428b-aa3c-f646ab2aaedb",
+      "ts": "2026-11-18T20:45:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:ci-and-plates",
+      "action": "CI fix: writeBashBin forwarded an unsupported runtimeInputs; infron now takes PATH via makeWrapperArgs (4e99dda4), frieren toplevel evaluates locally, CI rerun success (first run died to a Nix daemon crash). image-daily retries a size the resolved model refuses at 1024x1024; the 3 refused plates landed, publish -> 509 Cloudinary assets, bountystash-assets deployed. 6 plates-3h timers queued for the next 3 h (21:57-00:27).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4e99dda41a0332a2d3286458be6f365f1f5187dd",
+      "branch": "main",
+      "frame": "03h9euw6ol2bjnggrgqggsr5f"
+    },
+    {
+      "id": "c60fdcaf-9c05-4292-bc17-69244f874337",
+      "ts": "2026-11-18T20:30:32Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 3 plate(s) kept of 3 spent, 8 roster row(s) waiting, 509 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4e99dda41a0332a2d3286458be6f365f1f5187dd",
+      "branch": "main",
+      "frame": "03h9es24hqm5okut4l18tr3hv"
+    },
+    {
+      "id": "21baa4ea-7aea-43ef-a4fd-4776c84ffb2b",
+      "ts": "2026-11-18T20:27:57Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 4 plate(s) kept of 7 spent, 11 roster row(s) waiting, 502 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03h9erjzzdxmh70wepshl28y7"
+    },
     {
       "id": "13209418-eb0d-4e2d-900a-2ffc7d02a05e",
       "ts": "2026-11-18T16:30:02Z",
@@ -2709,45 +2748,6 @@
       "base_commit": "7256245e0fa846166c1be7891ab31a798084f75d",
       "branch": "main",
       "frame": "03h7n9276i6fe4eu4y7e1x67c"
-    },
-    {
-      "id": "5172cd18-d5b8-45c9-b557-3b3bdd0a534f",
-      "ts": "2026-11-10T16:36:03Z",
-      "source": "devji",
-      "subject": "nixconfig:prose-triage",
-      "action": "uncited Nix comment backlog is zero: 31 blocks homed into runbooks and 5 new docs, gates clean, pushed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e3e91dfb5a09c343b0db73bda225897203c1725",
-      "branch": "main",
-      "frame": "03h7mzvijdkdr0v9cleqgym56"
-    },
-    {
-      "id": "f888adae-ca93-4bac-b703-0236179d598e",
-      "ts": "2026-11-10T16:33:12Z",
-      "source": "devji",
-      "subject": "nixconfig:image-wall-characters",
-      "action": "8 Frieren wall briefs rendered 1/8 right: bare names gave a fern leaf, an iron element tile and a sky widget, all judged keep. Briefs now name the anime, judge gets an expect line, FORCE re-renders, gallery re-published without the 7, rerender armed 02:15.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4975e6a657b9f0feade6e9444031ef6ec8439d3f",
-      "branch": "main",
-      "frame": "03h7mzbf50xarfnfnjc28egmf"
-    },
-    {
-      "id": "86d2d3ea-435f-41c4-890e-4c55e70ffc84",
-      "ts": "2026-11-10T16:26:06Z",
-      "source": "devji",
-      "subject": "nixconfig:prose-triage",
-      "action": "unslop word list is one TSV both readers use; 27 uncited Nix comment blocks homed or promoted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5ad3fecd914e0ff43c5fb220e267e1b1d75ad73d",
-      "branch": "main",
-      "frame": "03h7mxxhyq9o3vxq05xkpbepi"
     }
   ]
 }

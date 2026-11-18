@@ -48,6 +48,20 @@ tasks:
     cmds:
       - SYSTEM="{{.SYSTEM}}" MAX_TOKENS="{{.MAX_TOKENS}}" FORMAT="{{.FORMAT}}" bash scripts/task/freeapi.sh chat "{{.Q}}"
 
+  freeapi:complete:
+    desc: One plain completion from free-ai for a prompt, with no chat roles
+    summary: >
+      `/v1/completions`: the same model answers a bare prompt and the text comes
+      from choices[0].text instead of message.content. Use it when the input is a
+      continuation rather than a conversation — finishing a sentence, drafting a
+      line — and `freeapi:chat` when a system message or history matters. Same
+      keyless limits: 1 req/s, 2 in flight, and the daily 10k; MAX_TOKENS default
+      512 here, while the service allows 16000. Vars: Q=, MAX_TOKENS=.
+    requires:
+      vars: [Q]
+    cmds:
+      - MAX_TOKENS="{{.MAX_TOKENS}}" bash scripts/task/freeapi.sh complete "{{.Q}}"
+
   freeapi:search:
     desc: Free web or site search, or news with a free key — KIND=web|sites|news Q=...
     summary: >

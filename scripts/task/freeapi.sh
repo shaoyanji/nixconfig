@@ -5,6 +5,7 @@
 # Usage
 #   freeapi.sh ask QUESTION          /ask -> the answer as plain text
 #   freeapi.sh chat PROMPT           /v1/chat/completions -> the message text
+#   freeapi.sh complete PROMPT       /v1/completions -> choices[0].text
 #   freeapi.sh search KIND QUERY     KIND=web|sites|news
 #   freeapi.sh probe                 /health, then one chat call
 #
@@ -109,6 +110,15 @@ cmd_chat() {
   printf '%s\n' "$body" | jq -r '.choices[0].message.content // .error.message // empty'
 }
 
+cmd_complete() {
+  local prompt=$1 payload body
+  [ -n "$prompt" ] || die 'complete needs a prompt'
+  payload=$(jq -cn --arg p "$prompt" --argjson mt "${MAX_TOKENS:-512}" \
+    '{model: "free-ai", prompt: $p, max_tokens: $mt}')
+  body=$(fetch "$BASE/v1/completions" -H 'Content-Type: application/json' -d "$payload")
+  printf '%s\n' "$body" | jq -r '.choices[0].text // .error.message // empty'
+}
+
 cmd_search() {
   local kind=$1 q=$2 url body model key
   [ -n "$q" ] || die 'search needs a query'
@@ -165,7 +175,7 @@ cmd_probe() {
 }
 
 usage() {
-  sed -n '4,12p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2
+  sed -n '4,13p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2
 }
 
 cmd=${1:-}
@@ -173,6 +183,7 @@ if [ $# -gt 0 ]; then shift; fi
 case $cmd in
   ask) [ $# -ge 1 ] || die 'ask needs a question'; cmd_ask "$*" ;;
   chat) [ $# -ge 1 ] || die 'chat needs a prompt'; cmd_chat "$*" ;;
+  complete) [ $# -ge 1 ] || die 'complete needs a prompt'; cmd_complete "$*" ;;
   search) [ $# -ge 2 ] || die 'search needs KIND and a query'; cmd_search "$1" "${*:2}" ;;
   probe) cmd_probe ;;
   *) usage; exit 2 ;;

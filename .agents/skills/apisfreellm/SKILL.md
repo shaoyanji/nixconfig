@@ -22,6 +22,7 @@ back with `task agents:xs:list SUBJECT=apisfreellm:integration-prompt` through
 ```bash
 task freeapi:ask Q="summarise this changelog"        # /ask, plain text
 task freeapi:chat Q="..." SYSTEM="be terse"          # chat completions shape
+task freeapi:complete Q="finish: the flake pins"     # choices[0].text
 task freeapi:search KIND=web Q="nixos flake"         # freeserp global index
 task freeapi:search KIND=sites Q="nixos" FRESH=1     # home pages
 task freeapi:probe                                   # health + one chat reply

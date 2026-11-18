@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T15:39:03Z",
+  "generated": "2026-11-18T15:40:36Z",
   "count": 200,
-  "pin": "70c38f0b3f558e44c265c7d4d3e6d2d19668d80d46aa43de5ee78631e71cf676",
+  "pin": "43ce223dbeea5b079d6ae9f98f22e83a4e68f8aef109fb2b14a570eec792568d",
   "turns": [
+    {
+      "id": "feb14180-7977-4db9-b382-bea97fa0a41e",
+      "ts": "2026-11-18T15:39:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-infron-free",
+      "action": "hermes default is now Infron's deepseek/deepseek-v4-flash-0731:free via providers.infron (key_env INFRON_API_KEY from ai-services-shared-env), single fallback qwen/qwen3.8-27b:free; aux pins removed. Free-model call verified, usage 12 tokens. INFRON_API_KEY reaches hermes.env only at next switch's sops render; gateway restart then.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "40f95e82da5bc2d31efa4744818f0d0dc4b10d0d",
+      "branch": "main",
+      "frame": "03h9d75dy63qbc0lm74d11c13"
+    },
     {
       "id": "509b5e8a-42d0-4fdf-a1a7-8e80e1f9a75d",
       "ts": "2026-11-18T15:23:02Z",
@@ -2743,19 +2756,6 @@
       "base_commit": "ddb19d1cbef978e36c6e16bc4ba7b73ae2f3ead4",
       "branch": "main",
       "frame": "03h7hqtlt2x7moa2cu3f70ap9"
-    },
-    {
-      "id": "593dcef0-2b03-4552-9dc5-19bd6f11d2e1",
-      "ts": "2026-11-10T00:25:01Z",
-      "source": "buffy",
-      "subject": "nixconfig:media-relay-search",
-      "action": "Deployed search/fetch API + p/y/l shortcuts on delphi, ported agy commit 949b5920, pushed main",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "949b59200baf5a133860ddd85cc691a4b564c853",
-      "branch": "main",
-      "frame": "03h7hq6p469xy9bp62gxjqatq"
     }
   ]
 }

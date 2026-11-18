@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-18T16:11:34Z",
+  "generated": "2026-11-18T16:15:38Z",
   "count": 200,
-  "pin": "9c1981598d976ce73935dfd8b73c9ebcdde4e3331c5c01aba1ccc202b56aec95",
+  "pin": "72f85c15911283437b21a3cfba7257f49fd38fb054ac76cfdc36c65af18d2828",
   "turns": [
+    {
+      "id": "9f2a0942-6440-4b5c-b63d-a23efb5da1bf",
+      "ts": "2026-11-18T16:13:53Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "27644194e83bd62786d3743f3dfe45375fa5857c",
+      "branch": "main",
+      "frame": "03h9ddx7rryy9a2ys4str093p"
+    },
+    {
+      "id": "f8772175-75cc-4f41-8105-6735165b0ea8",
+      "ts": "2026-11-18T16:11:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:checks-infron",
+      "action": "new gate checks:infron (leaf, row added): runs scripts/infron-chat.sh with a stub curl first on PATH so no request leaves the host. Asserts paid primary/backup ids are rejected before any request, unset INFRON_API_KEY is named, defaults are deepseek-v4-flash-0731:free then qwen3.8-27b:free, a 429 fails over, two failures exit 1, and the hermes persona carries only :free ids. check:verify 111 rows, task-descs rc=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "27644194e83bd62786d3743f3dfe45375fa5857c",
+      "branch": "main",
+      "frame": "03h9ddhzv7ukb8l62v2n197x0"
+    },
     {
       "id": "23fe588b-0a9e-46fa-a3ef-efbb578b5e53",
       "ts": "2026-11-18T16:06:41Z",
@@ -2730,32 +2756,6 @@
       "base_commit": "8a9f4ad01882f4371728e598422fc6d77980e72e",
       "branch": "main",
       "frame": "03h7i9k3yvi4rfya9r9ese6h9"
-    },
-    {
-      "id": "7d82659f-de0b-4779-87cf-b048335717d8",
-      "ts": "2026-11-10T01:31:49Z",
-      "source": "devji",
-      "subject": "nixconfig:cpg-delphi",
-      "action": "Seeded ~/.chatplayground/auth.json on delphi from frieren's live Clerk session; cpg status authenticated, 32 models from the live catalog, hourly chatplayground-refresh now executes instead of skipping, both hosts survive independent refreshes; upstream chat answers 503 MAINTENANCE until 03:00Z",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8a9f4ad01882f4371728e598422fc6d77980e72e",
-      "branch": "main",
-      "frame": "03h7i38gw55q3kz3hsipq506u"
-    },
-    {
-      "id": "aa2262c2-0e1b-444c-b107-c0ddf4f49bae",
-      "ts": "2026-11-10T01:25:26Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-resolve-schedule",
-      "action": "Committed and pushed the resolver scheduler: appflow-sync starts appflow-resolve.service (User=devji, one hermes batch, state ledger)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d7a796408be3329e0c6db75edc4d7e39ce5c00c2",
-      "branch": "main",
-      "frame": "03h7i1zm0rw2lbdmhzeruyocn"
     }
   ]
 }

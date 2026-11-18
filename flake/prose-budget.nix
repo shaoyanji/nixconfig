@@ -11,7 +11,7 @@
     ".agents/skills/antigravity/SKILL.md" = 172;
     ".agents/skills/apisfreellm/SKILL.md" = 144;
     ".agents/skills/apps/SKILL.md" = 54;
-    ".agents/skills/atuin/SKILL.md" = 154;
+    ".agents/skills/atuin/SKILL.md" = 155;
     ".agents/skills/bountystash/SKILL.md" = 72;
     ".agents/skills/brainstorm/SKILL.md" = 81;
     ".agents/skills/burgernas/SKILL.md" = 114;

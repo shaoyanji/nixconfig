@@ -47,6 +47,7 @@ tasks:
       - task: checks:repo:paths
       - task: checks:docs:links
       - task: checks:prose
+      - task: checks:infron
       - task: checks:yaml:lint
       - task: checks:toon
       - task: checks:toon:surfaces

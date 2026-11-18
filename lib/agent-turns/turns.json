@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T09:33:48Z",
+  "generated": "2026-11-18T09:35:31Z",
   "count": 200,
-  "pin": "51d6151438b55ae08de2c0a2dcd5ff631bb9ce7f85c0e437f33b24755287f2a5",
+  "pin": "89c13cd83b5bf93e9026d7ee6306936696722c94cebf54b158a37d375b309124",
   "turns": [
+    {
+      "id": "d1562cb9-1f6f-4464-a24f-86e6542166ce",
+      "ts": "2026-11-18T09:34:02Z",
+      "source": "devji",
+      "subject": "nixconfig:claim-default-and-relation-filter",
+      "action": "claimOf defaults to noteClaims and the ontology gate checks a bare import; ops:kg:evidence RELATION= narrows one relation; note slices show the claim; pushed fceb847e",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fceb847e279cd581a72f92f266aa1838de0e2547",
+      "branch": "main",
+      "frame": "03h9b7tdtrctptp0lfl7mrhdm"
+    },
     {
       "id": "e07f9e8e-695e-4ed9-b462-53fda71658bf",
       "ts": "2026-11-18T09:26:15Z",
@@ -2779,19 +2792,6 @@
       "base_commit": "55e99a3a7becd40c8641d8ef7fcc2b9d6cbf3118",
       "branch": "main",
       "frame": "03h7gkf0bfgu7ru9c44wweiw9"
-    },
-    {
-      "id": "67bab258-06db-491f-beb0-221a09dd27fe",
-      "ts": "2026-11-09T20:51:05Z",
-      "source": "devji",
-      "subject": "nixconfig:media-library-browse",
-      "action": "Port 8461 now answers a static browse page at / with fuzzy search over every media file (name, folder, extension), kind filters and keyboard nav; /index.json is written by a find-based media-relay-index service on a 5-minute timer, at boot, and at the end of every yt-get. Pushed 55e99a3a; delphi evaluated but not yet rebuilt.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "55e99a3a7becd40c8641d8ef7fcc2b9d6cbf3118",
-      "branch": "main",
-      "frame": "03h7gkeb0netv6q6qvdg3w78t"
     }
   ]
 }

@@ -8,9 +8,10 @@
 # the sorted frame ids, recomputed at eval by `lib/agent-turns.nix`, so editing an
 # id by hand fails `.#agentTurns` instead of quietly changing the graph.
 #
-# Appending is the only allowed edit: a refresh that would drop a frame the
-# committed snapshot already holds is refused, because the ledger is append-only
-# and a shrinking view of it is a different claim.
+# Appending is the only allowed edit: a frame that is still inside the read
+# window and comes back missing is refused, because the ledger is append-only and
+# a view that loses history mid-window is a different claim. A frame older than
+# the window may fall out — the file is the newest `LIMIT` frames, not the log.
 #
 # Env
 #   OUT=      destination (default lib/agent-turns/turns.json)
@@ -60,10 +61,18 @@ turns=$(printf '%s\n' "$resp" | jq -c '
 
 export LC_ALL=C
 new_ids=$(printf '%s' "$turns" | jq -r '.[].id' | sort)
+# The window is finite, so the oldest frames fall out of it as new ones land. A
+# dropped frame is only innocent when it is older than the oldest frame the new
+# read returned: anything newer that disappeared is a read that lost history, and
+# that is the case worth refusing.
 if [ -f "$OUT" ]; then
-  gone=$(comm -23 <(jq -r '.turns[].id' "$OUT" | sort) <(printf '%s\n' "$new_ids") | head -3 | tr '\n' ' ')
+  oldest=$(printf '%s' "$turns" | jq -r '.[-1].ts // empty')
+  gone=$(comm -23 \
+    <(jq -r '.turns[] | "\(.ts)\t\(.id)"' "$OUT" | sort) \
+    <(printf '%s' "$turns" | jq -r '.[] | "\(.ts)\t\(.id)"' | sort) |
+    awk -F'\t' -v cut="${oldest:-9999}" '$1 > cut {print $2}' | head -3 | tr '\n' ' ')
   if [ -n "${gone// /}" ]; then
-    printf 'turns-snapshot: refusing to drop frames the snapshot already holds: %s\n' "$gone" >&2
+    printf 'turns-snapshot: refusing: these frames are inside the window but came back missing: %s\n' "$gone" >&2
     exit 1
   fi
 fi

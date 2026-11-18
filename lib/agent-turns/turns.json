@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T15:18:17Z",
+  "generated": "2026-11-18T15:39:03Z",
   "count": 200,
-  "pin": "11b8e34eed319ff96a8c921829f3ad62cd0481ac7a9d04f439f0b2a2a754d378",
+  "pin": "70c38f0b3f558e44c265c7d4d3e6d2d19668d80d46aa43de5ee78631e71cf676",
   "turns": [
+    {
+      "id": "509b5e8a-42d0-4fdf-a1a7-8e80e1f9a75d",
+      "ts": "2026-11-18T15:23:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:atuin-audit-xs-pin",
+      "action": "new task agents:atuin:audit probes active nixos/home hosts (alias, then tailnet FQDN, then LAN IP): frieren+diogenes 30707, diogenes still lacks atuin-auto-login. xs release is now a pins [[pin]]: xs-pin.sh bumps version+both arch hashes only after every prefetch; 0.16.0 pinned and --verify clean. 28004e45",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "28004e4589921cdfdf4665821a644146953cb5f8",
+      "branch": "main",
+      "frame": "03h9d3zp9lmg0igi8d82nn6s6"
+    },
     {
       "id": "9b88946d-f04a-4d00-b500-21325b4103f9",
       "ts": "2026-11-18T15:12:30Z",
@@ -2743,19 +2756,6 @@
       "base_commit": "949b59200baf5a133860ddd85cc691a4b564c853",
       "branch": "main",
       "frame": "03h7hq6p469xy9bp62gxjqatq"
-    },
-    {
-      "id": "285a1a90-1f2b-4841-8183-e086aa810884",
-      "ts": "2026-11-10T00:00:18Z",
-      "source": "devji",
-      "subject": "nixconfig:media-relay-search",
-      "action": "Added a loopback /api/ search+fetch (yt-search, yt-get) and page fields to media-relay; fixture and checks:host delphi pass",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
-      "branch": "main",
-      "frame": "03h7hlcwyg2are92er8irxrgv"
     }
   ]
 }

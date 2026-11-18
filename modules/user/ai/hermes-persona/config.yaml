@@ -13,10 +13,27 @@ terminal:
   timeout: 180
 telegram:
   reactions: false
+# Infron (llm.onerouter.pro) holds a prepaid $5 and nothing tops it up, so the
+# only models this file may name are the `:free` ids on that route. A paid id
+# here spends the balance that keeps the free ones working.
+#
+# The key is never written in this file: the provider entry names the env var and
+# INFRON_API_KEY comes from the shared sops blob (ai-services-shared-env), so a
+# rotation reaches hermes through hermes-env-sync instead of a second copy here.
+# Verified 2026-11-18: one `:free` completion returns `ok`, usage 12 tokens.
+providers:
+  infron:
+    api: https://llm.onerouter.pro/v1
+    key_env: INFRON_API_KEY
+    api_mode: openai
+    default_model: deepseek/deepseek-v4-flash-0731:free
+    models:
+      "deepseek/deepseek-v4-flash-0731:free": {}
+      "qwen/qwen3.8-27b:free": {}
 model:
-  provider: nous
-  default: stepfun/step-3.7-flash:free
-  base_url: https://inference-api.nousresearch.com/v1
+  provider: custom
+  default: deepseek/deepseek-v4-flash-0731:free
+  base_url: https://llm.onerouter.pro/v1
 agent:
   max_turns: 150
   reasoning_effort: medium
@@ -31,29 +48,14 @@ web:
 display:
   interface: cli
   tool_progress: all
-# Fallback chain: one capable model across three independent free quotas, then
-# the single paid endpoint. Nous stays primary even though the portal
-# rate-limits (its pool was in a 429 cooldown when this was written); a nous
-# fallback would share that limiter and add nothing. Matched models, not matched
-# vendors, on purpose: nemotron-3.5-super-vl is the strongest free tool-calling model
-# this fleet can reach, so a failover does not trade away capability. Each entry
-# ran a one-shot `hermes chat` turn on 2026-11-06.
-#
-# Why the chain is short, and what stays out of it: every extra entry is another
-# id that gets retired (gemini-2.5-flash-lite answered "no longer available to
-# new users" the same day). Deliberately absent — groq (hermes' provider registry
-# has no entry; `--provider groq` is "Unknown provider"), cerebras (402, paid
-# only), aihubmix (free models past the trial cap), opencode-zen (expired key),
-# gemini (its terms sit badly with agent work; it does aux tasks below instead).
+# Fallback chain: the second and last free id on the same route. The chain used
+# to span four vendors, which was the right shape while it read as free quota —
+# it is the wrong shape now, because every extra entry names a model outside the
+# two this account may run. One failover inside one route is the whole chain.
 fallback_providers:
-  - provider: nvidia
-    model: nvidia/nemotron-3.5-super-vl
-  - provider: openrouter
-    model: nvidia/nemotron-3.5-super-vl:free
-  - provider: ollama-cloud
-    model: nemotron-3-ultra
-  - provider: deepseek
-    model: deepseek-flash
+  - provider: custom
+    model: qwen/qwen3.8-27b:free
+    base_url: https://llm.onerouter.pro/v1
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes
 # exactly one message of at most 15,000 characters, while a hermes turn sends
 # ~29,000 characters of system prompt and tool schemas, so every
@@ -78,19 +80,14 @@ stt:
   provider: local
   local:
     model: base
-# Gemini is kept out of the agent chain (its terms sit badly with agent work) but
-# is a sane aux lane: titling and conversation compression are single-shot text
-# tasks. `free_only` keeps every other aux call off OpenRouter's paid default
-# lane, so the only billable route in this file is the deepseek fallback.
+# Titles and compression used to pin gemini, and the OpenRouter free lane held
+# everything else. Both are other models: with the account restricted to two
+# `:free` ids, an aux task routed anywhere else breaks that rule without buying
+# anything — `provider: auto` sends aux work to the main chat model instead.
+# `free_only` stays as a belt on the OpenRouter default lane for any aux call
+# that still has no explicit destination.
 auxiliary:
   free_only: true
-  openrouter_model: nvidia/nemotron-3.5-super-vl:free
-  title_generation:
-    provider: gemini
-    model: gemini-3.5-flash-lite
-  compression:
-    provider: gemini
-    model: gemini-3.5-flash-lite
 skills:
   trusted_project_dirs:
     - /Volumes/data/projects/nixconfig

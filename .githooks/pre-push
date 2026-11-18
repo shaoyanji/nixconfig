@@ -93,7 +93,7 @@ if [ -f scripts/task/pins-refresh.sh ]; then
     else
       echo "pre-push: pinned data refreshed and committed; uploading that commit"
       branch=$(git rev-parse --abbrev-ref HEAD)
-      if NIXCONFIG_PIN_PUSH=1 git push --no-verify "$1" "$branch"; then
+      if NIXCONFIG_PIN_PUSH=1 git push --no-verify "${1:-origin}" "$branch"; then
         echo "pre-push: done — the push you ran is superseded by the one above"
       else
         status=1

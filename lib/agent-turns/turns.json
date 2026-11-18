@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-18T22:38:33Z",
+  "generated": "2026-11-18T23:27:35Z",
   "count": 200,
-  "pin": "302b0e1b375edb903e80b2209ad627737bb23f8d2f5bac44e3e3216cdcab55e7",
+  "pin": "2505bff9247019445f1ad2afb682f299b04e2f49ec80eb84002c5ff8f3529e25",
   "turns": [
+    {
+      "id": "44150aaf-a4a8-428d-9c43-43df71724551",
+      "ts": "2026-11-18T23:09:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:agent-access-firecrawl-freellmapi",
+      "action": "aac prebuilt fails on NixOS (stub-ld, libssl3); autoPatchelfHook + openssl builds and runs 0.11.0 (hash sha256-oFs1vMLLnIe8MsL/r4Oh6PKawyWQ5gliH5LouU2G42g=). It shells out only to bw (status/unlock/get item), and rbw get --raw returns the same JSON, so a bw shim is the rbw route. llm-agents.nix has no firecrawl (pin 97b2c73, 205 attrs); nixpkgs has only cloud firecrawl-cli 1.26.3. firecrawl-local 0.1.0 is a packageable crates.io Rust binary. freellmapi: Node monorepo, skip.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
+      "branch": "main",
+      "frame": "03h9fn64y1165flhs8cpur8c5"
+    },
+    {
+      "id": "2fab0734-2397-44ef-b7e4-1a438ed902f2",
+      "ts": "2026-11-18T22:58:14Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 18 roster row(s) waiting, 522 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
+      "branch": "main",
+      "frame": "03h9fkwucb7usm0tsnmnooo1f"
+    },
+    {
+      "id": "bda460c7-a30c-4559-8006-8f3c4d0e1e28",
+      "ts": "2026-11-18T22:56:40Z",
+      "source": "buffy",
+      "subject": "nixconfig:wall-2026-11-18-verified",
+      "action": "Asked to prove 2026-11-18 was published: it is. 60 files generated (59 keep + 1 reroll), all 59 uploaded, each of the 59 Cloudinary delivery URLs returns 200, thumb and 1200x630 card transforms 200, served manifest has day_rows=59 of count=522, and the entry page (sha1 identical to site-dist) sorts by day so they are the first 59 cards. Nothing from 11-18 is pending.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
+      "branch": "main",
+      "frame": "03h9fklsem01w8ap5t5px42gs"
+    },
+    {
+      "id": "bf6f78ac-419d-4434-ae4f-d207471fe8b6",
+      "ts": "2026-11-18T22:54:36Z",
+      "source": "buffy",
+      "subject": "nixconfig:wall-backfill-reset-fill",
+      "action": "2026-11-18 has nothing unpublished: 60 files on disk = 59 keeps (all uploaded, 59/59 URLs 200, manifest day_rows=59) + 1 reroll. The real gap was 11 plates from 2026-11-11 that never got a ledger row, so publish skipped them forever: backfilled and published, site 511 -> 522. cpg images are 100/100 used until 00:00Z with a 25/hour burst, so a MAX_GEN=100 plates round is queued in tmux wallfill at 00:00:40Z, auto-publishing.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
+      "branch": "main",
+      "frame": "03h9fk7cfqsgblgp606d7jnaa"
+    },
+    {
+      "id": "5ba4c5be-395e-4822-abd6-b05b32a5fbc2",
+      "ts": "2026-11-18T22:38:42Z",
+      "source": "buffy",
+      "subject": "nixconfig:publish-accounting",
+      "action": "Today: 59 wall keeps (60 files, 59 published), 17 rerolls, 115 failed (100 the generator VALIDATION_FAILED bundle). All 59 are in urls.tsv, delivery URLs return 200, and the served manifest at bountystash-assets.pages.dev is count 511 generatedAt 22:00:34Z with 59 rows for 2026-11-18 (deploy e90252d0). Fixed publish's stale-path noise: multi-line legacy paths resolve to their last line, and the two skip counts print once.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
+      "branch": "main",
+      "frame": "03h9fh3ih69o6ags1v1c51gzn"
+    },
     {
       "id": "56a36240-1c1f-4b26-a15a-8ca45688fa45",
       "ts": "2026-11-18T22:28:15Z",
@@ -2678,71 +2743,6 @@
       "base_commit": "64fc285e07ea6e3b014a04393bab791368da0bec",
       "branch": "main",
       "frame": "03h7uaivrp1f4830y1csg5rjh"
-    },
-    {
-      "id": "333ed6c4-98a6-4f6d-9622-8028429adc5b",
-      "ts": "2026-11-11T14:42:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:netbook-host-layer",
-      "action": "netbook host layer reworked (one TYPED() macro, two documented chord shadows, host-file dedupe), Frieren wallpaper pinned into the store and live, deploy-netbook path flake ref fixed, deployed gen ix1glwih",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e9f1414de883c86185e110c99dddd030efee7d80",
-      "branch": "main",
-      "frame": "03h7u71rpotqe7egrjdhs9zzz"
-    },
-    {
-      "id": "4b73bdbe-dcc5-4f45-b78a-68946f8eadaf",
-      "ts": "2026-11-11T14:15:38Z",
-      "source": "buffy",
-      "subject": "nixconfig:retire-ryoku",
-      "action": "ryoku tier retired (feature, input, profile, policy); poseidon+eisen on the Dux chain with DMS greeter restored; eisen gaming guard verified statically and with a steamapps/common probe",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "42a93e3fbe7d6963789d1711458f8cda84c8d309",
-      "branch": "main",
-      "frame": "03h7u1qptt21o9bl7x171hhtp"
-    },
-    {
-      "id": "72708acc-6dbb-4883-bdee-b5c0a2293387",
-      "ts": "2026-11-11T13:58:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:atuin-auto-login",
-      "action": "atuin-auto-login: waits for sops secrets, exports ATUIN_SESSION, fails loudly; aristotle logged in 27010 items, 648 rows pushed, server 27019",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b00ad42763fdad620e892e802fc417cdc3f89d83",
-      "branch": "main",
-      "frame": "03h7tyfx4xlee2dgfd3ovjdub"
-    },
-    {
-      "id": "840ac093-bc5e-4a15-bfdf-f3cac210febb",
-      "ts": "2026-11-11T13:47:16Z",
-      "source": "devji",
-      "subject": "nixconfig:btop-tokyo-storm",
-      "action": "fleet default btop theme -> tokyo-storm (base.nix); aristotle deployed, HM re-activated past stale mpv backup",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d933377299898a260b4017ad7518fc10ec3db023",
-      "branch": "main",
-      "frame": "03h7tw79gaxvmrfxu712r3a5x"
-    },
-    {
-      "id": "a5aa1b96-472c-4b0c-a755-7bcfedf7912d",
-      "ts": "2026-11-11T08:36:01Z",
-      "source": "devji",
-      "subject": "nixconfig:bountystash-console-backend",
-      "action": "built cmd/console-api (stored contact intake, /api/status, /api/work with public-only filter, CORS allowlist) in bountystash; worker proxies BOUNTYSTASH_API with Resend fallback; applied on clanker :8081 against bs-pg, migrations 0001-0004 applied; 6+1 commits across both repos, unpushed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "51178ea7c84b423e2fcfd55aff376e56a91459f2",
-      "branch": "main",
-      "frame": "03h7s7edkf5gnotjonak303i9"
     }
   ]
 }

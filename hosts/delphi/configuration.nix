@@ -1661,16 +1661,9 @@ in {
   ];
 
   # --- Headless logging footprint --------------------------------------------
-  # profiles/server-hardening.nix is deliberately NOT imported: it bind-mounts
-  # /var/log and /var/cache to /srv/private (a NAS path) and ships an
-  # /etc/pihole tmpfiles entry owned by a `pihole` user that a crab-hole host
-  # has no reason to create — a failing tmpfiles unit on a fresh boot. The two
-  # settings worth keeping are declared directly.
-  services.journald.settings.Journal = {
-    SystemMaxUse = "300M";
-    RuntimeMaxUse = "200M";
-    MaxRetentionSec = "1week";
-  };
+  # The journal cap is a fleet default (modules/global/global.nix).
+  # profiles/server-hardening.nix stays unimported: it bind-mounts /var/log to a
+  # NAS path and ships /etc/pihole tmpfiles for a user this host never creates.
   boot.tmp.cleanOnBoot = true;
 
   # --- Headless Server Packages & Lightweight Base Closure ---

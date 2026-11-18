@@ -11,6 +11,8 @@
   # the LAN and must not assume LAN services. The two names that used to be OR'd in
   # both carry it, so the list was already redundant.
   isCloudHost = (hostMeta.category or "") == "cloud";
+  # A host with nobody at the keyboard lets oomd reclaim by pressure first.
+  oomdUserSlices = builtins.elem (hostMeta.category or "") ["cloud" "container-host" "server-and-workstation"];
 
   # ── Binary cache policy ──────────────────────────────────────────────────────
   # The list itself lives in lib/cache-policy.nix and is compiled per host into
@@ -137,6 +139,15 @@ in {
           "nixpkgs=flake:nixpkgs"
         ];
       };
+    };
+
+    # oomd ships enabled and managed by nobody; the journal cap was in five hosts.
+    systemd.oomd.enableUserSlices = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (lib.mkDefault oomdUserSlices);
+
+    services.journald.settings.Journal = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+      SystemMaxUse = lib.mkDefault "300M";
+      RuntimeMaxUse = lib.mkDefault "200M";
+      MaxRetentionSec = lib.mkDefault "1week";
     };
 
     # A cache listed twice is a second declaration, not redundancy: the module

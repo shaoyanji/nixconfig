@@ -13,30 +13,17 @@
   # which makes Tailscale treat them as one active/passive failover group: one
   # node answers, and the route moves when it disappears (~15 s).
   #
-  # Deliberately NOT a 100.64/10 tailnet member address: a /32 subnet route is
-  # the only way to give clients ONE resolver address backed by several hosts.
-  # Tailscale does not fail over between two global nameservers, so listing
-  # "frieren then delphi" would just break DNS when the first one dies.
+  # A /32 subnet route, not a 100.64/10 member address: Tailscale fails over
+  # subnet routes, never between two global nameservers.
   # Home: docs/delphi-install.md §"Phase 4d — the 10.99.0.53 failover pair"; docs/dns-failover.md.
   dnsServiceAddress = "10.99.0.53";
 
-  # Registry facts, not constants: `inventory.toml` carries the public name and
-  # the tailnet address, and the dossier below reads the same values. A host that
-  # moves one address cannot leave its own page pointing at the old one.
   hostMeta = config.fleet.inventory.hosts.delphi;
 
-  # Public HTTPS name. null = the box serves plain HTTP on :80 only.
-  #
-  # Setting this is the ONLY thing needed to bring up TLS, and it belongs here
-  # rather than in a manual step: `enableACME` issues and renews a Let's Encrypt
-  # cert over HTTP-01 (port 80, now reachable), `forceSSL` adds the :80→:443
-  # redirect, and nginx reloads on renewal. The one part nixconfig cannot own is
-  # the DNS A record — and a wrong or missing record turns every renewal into a
-  # failing unit, so do not set this before the name resolves to the instance's
-  # RESERVED public IP (an ephemeral IP changes on stop/start).
-  #
-  # `""` (the registry's "unknown") becomes null, or `lib.optionalAttrs` would
-  # generate a vhost with an empty `server_name`.
+  # Public HTTPS name; null serves plain HTTP on :80 only. `""` (the registry's
+  # "unknown") becomes null, or `lib.optionalAttrs` would make a vhost with an
+  # empty `server_name`. The A record must resolve to the RESERVED IP first, or
+  # every ACME renewal becomes a failing unit.
   # Home: docs/delphi-install.md §"Phase 4c — HTTPS (done 2026-10-20)".
   publicDomain = let
     d = hostMeta.network.domain;
@@ -45,26 +32,17 @@
     then null
     else d;
 
-  # DeepSeek Harness, tailnet only: tailscaled terminates TLS and forwards to the
-  # loopback app, so the harness is unreachable from the internet. 8443 because
-  # nginx owns 0.0.0.0:443. Runbook: .agents/deploy/hosts/delphi.md §"DeepSeek
-  # Harness (tailnet only)".
+  # DeepSeek Harness, tailnet only on 8443 (nginx owns 0.0.0.0:443); runbook:
+  # .agents/deploy/hosts/delphi.md §"DeepSeek Harness (tailnet only)".
   tailnetHost = "${hostMeta.network.tailscale_hostname}.${hostMeta.network.tailnet_domain}";
-  # Stable per node key, and the only address that works here: delphi runs
-  # `--accept-dns=false` (a resolver must not resolve through the address it
-  # serves), so a MagicDNS name does not resolve from inside this host.
+  # The key, not a MagicDNS name: `--accept-dns=false` (see below).
   tailnetIp = hostMeta.network.tailscale_ip;
   servePort = 8443;
   dshPort = 3080;
   dshPath = "/";
   dshUrl = "https://${tailnetHost}:${toString servePort}/";
 
-  # Both landing pages, from ONE compiled site (`lib/delphi-site.nix`): the
-  # public dossier and the tailnet console are two projections of a single
-  # evaluated structure, so a count on the dossier and the card list on the
-  # console cannot disagree. The dossier's facts come from the registry, the
-  # knowledge graph and `services.servicePortal.cards` — the same declaration
-  # that generates the `tailscale serve` units.
+  # Both landing pages from ONE compiled site: lib/delphi-site.nix.
   delphiSite = import ../../lib/delphi-site.nix {
     inherit pkgs;
     inventory = config.fleet.inventory;
@@ -77,15 +55,8 @@
   publicPage = "${delphiSite}/public";
   tailnetPage = "${delphiSite}/tailnet";
 
-  # Which store path a vhost is serving, said by the vhost itself. A deploy can
-  # finish and still leave the previous generation's tree in place (a boot-only
-  # activation, a rollback, a flake ref that did not move), and from outside both
-  # look identical — so a staleness gate asks the server instead of the journal.
-  # The value is the SITE, not the `public`/`tailnet` root under it, so the gate
-  # compares against `.#delphi-site.outPath` byte for byte and every vhost can be
-  # probed with the same expectation.
-  # It belongs in each `location`: a location that sets its own `add_header` (the
-  # cache policy does) does not inherit the server's.
+  # A staleness gate compares `X-Site-Path` against `.#delphi-site.outPath` byte
+  # for byte; the value is the SITE, and each `location` must set it itself.
   siteHeader = ''add_header X-Site-Path "${delphiSite}" always;'';
 
   # One cache policy for compiled static trees, shared with frieren's vhosts
@@ -100,9 +71,6 @@
   # A POSITIVE match on known clients, not "anything that is not Mozilla":
   # invert the test and a crawler, a link unfurler or a monitoring probe also
   # gets plain text, and those are most of the audience the HTML page exists for.
-  # A client not listed here gets the HTML, which is the safe default; curl and
-  # nushell are the two that made this worth doing, and the rest are the same
-  # kind of client met later.
   terminalClients = [
     "curl"
     "wget"
@@ -119,10 +87,8 @@
   ];
   terminalUa = "~*(${lib.concatStringsSep "|" terminalClients})";
 
-  # The utility-layer recon report (hosts/delphi/reports/), published from the
-  # store so a regeneration is a rebuild rather than a file dropped on the box.
-  # `no-store` on purpose: the URL is stable and the content moves with the
-  # generation, so a cached copy would be a stale report about fast-moving models.
+  # The utility-layer recon report, from the store, `no-store` because the URL is
+  # stable: hosts/delphi/reports/utility-layer-recon.html.
   reconReport = pkgs.writeTextDir "index.html" (builtins.readFile ./reports/utility-layer-recon.html);
   reconLocation = {
     alias = "${reconReport}/";
@@ -131,14 +97,12 @@
       add_header Cache-Control "no-store";
     '';
   };
-  # `/recon` without the slash matches no location prefix, so it fell through to
-  # the site root's `try_files` and answered 404. A named exact match redirects
-  # instead of relying on alias-implied 301 behaviour, which `alias` does not do.
+  # `/recon` without the slash matches no location prefix, so a named exact match
+  # redirects instead of relying on alias-implied 301 behaviour.
   reconRedirect = ''return 301 /recon/;'';
 
-  # The gate that makes this name inert on the public internet even though the
-  # tailnet vhost listens on the same 0.0.0.0:80: the client's 100.64/10
-  # address on tailscale0 is the allow-list.
+  # What makes a name inert on the internet though vhosts share 0.0.0.0:80:
+  # 100.64/10 on tailscale0 is the allow-list.
   tailnetOnly = ''
     allow 127.0.0.1;
     allow ::1;
@@ -146,13 +110,8 @@
     deny all;
   '';
 
-  # The location fragments more than one vhost repeats, defined once. Each takes
-  # the tailnet gate as a parameter because a `location` inherits nothing from
-  # its server block, and the same path answering on one name but not another is
-  # how the dossier and the console start disagreeing.
-  # The trailing newline keeps the gated fragment's shape when it is
-  # concatenated in front of an indented string, so the generated config is
-  # byte-identical to the hand-written form this replaced.
+  # A `location` inherits nothing, so each repeated fragment takes the gate as a
+  # parameter; the trailing newline keeps the generated config byte-identical.
   gate = withGate: lib.optionalString withGate (tailnetOnly + "\n");
   healthzLocation = withGate: {
     "= /healthz".extraConfig =
@@ -189,13 +148,8 @@
     };
   };
 
-  # The two machine surfaces, for a TUI, a probe or an agent that wants the
-  # structure instead of scraping HTML: the compiled dossier (`site` in
-  # lib/delphi-site.nix) and the portal's card list. TAILNET ONLY, and that is a
-  # rule rather than caution — the dossier JSON carries `identity.tailnetIp` and
-  # `identity.tailnetUrl`, which the public page is built never to print, so the
-  # machine surface sits behind the same gate as the console, not beside the
-  # dossier.
+  # Machine surfaces over the same data, tailnet only: the dossier JSON carries
+  # `identity.tailnetIp`, which the public page is built never to print.
   dataLocation = withGate: let
     common =
       gate withGate
@@ -218,10 +172,7 @@
     };
   };
 
-  # Stub services in the sandbox microVM, generated from the guest declaration
-  # (hosts/microvms/guests.nix) so the address and the port pair are not typed
-  # a second time here. `withGate` adds the tailnet allow-list, which locations
-  # do not inherit from the server block.
+  # Stub services from the guest declaration: hosts/microvms/guests.nix.
   microvmGuest = config.microvmGuests.sandbox;
   microvmProxyLocations = withGate: let
     proxies = lib.listToAttrs (map (svc: {
@@ -243,13 +194,10 @@
         + ''return 301 /microvm/${(lib.head microvmGuest.services).name}/;'';
     };
 
-  # Stirling holds whatever a document tool holds, so it is tailnet-only on both
-  # vhosts — unlike the stubs, which are public by design. The tailnet name
-  # proxies it behind the allow-list; the public name redirects there instead of
-  # answering 403 from a gate a public client can never satisfy.
-  #
-  # Stirling knows its own prefix (SERVER_SERVLET_CONTEXT_PATH), so the path is
-  # passed through unchanged instead of being stripped like a stub's.
+  # Stirling is tailnet-only on both vhosts; the public name redirects rather
+  # than answering 403 from a gate a public client can never satisfy. It knows
+  # its own prefix (SERVER_SERVLET_CONTEXT_PATH), so the path passes through
+  # unchanged.
   stirlingTailnetUrl = "http://${tailnetHost}${microvmGuest.stirlingPath}/";
   stirlingProxyLocations = lib.optionalAttrs (microvmGuest.stirling != null) {
     "${microvmGuest.stirlingPath}/" = {
@@ -272,11 +220,8 @@
     "= ${microvmGuest.stirlingPath}".extraConfig = ''return 302 ${stirlingTailnetUrl};'';
   };
 
-  # The deck (hosts/microvms/slideshow.md) is a terminal app — `slides` over ssh
-  # into the guest — so its web surface is an address card, not the show. This
-  # gives /slideshow a real page before anything renders, and names both ways in
-  # from the same declaration that created the account and the forward.
-  # `slideshow.bountystash.com` can point at this path later.
+  # The deck is a terminal app over ssh into the guest, so its web surface is an
+  # address card: hosts/microvms/slideshow.md.
   slidesEnabled = microvmGuest.sshPort != null && microvmGuest.sshUser != null;
   slideshowPage = pkgs.writeTextDir "index.html" ''
     <!doctype html>
@@ -301,12 +246,9 @@
     </html>
   '';
 
-  # The public ssh door to the deck. The edge carries 22 and nothing else new: a
-  # rule for 2222 is the tenancy's to add, and it is not ours to make from inside
-  # (instance principals are unauthorised in this compartment). So the public
-  # path reuses 22 — a host account whose whole login is a hop into the guest,
-  # where the deck's own forced command lives. The client holds a fleet key that
-  # the host already accepts; the guest credential never leaves this machine.
+  # The public ssh door: port 22 (2222 is the tenancy's to add, not ours), an
+  # account whose whole login is a hop into the guest, so the guest credential
+  # never leaves this machine.
   slidesHopEnabled = microvmGuest.sshHopTarget != null;
   slidesHopCommand = lib.concatStringsSep " " [
     "${pkgs.openssh}/bin/ssh"
@@ -330,8 +272,7 @@
     microvmGuest.sshHopTarget
   ];
 
-  # Same treatment as /microvm/: locations inherit nothing from the server
-  # block, so the tailnet gate is repeated in each one.
+  # Same treatment as /microvm/: locations inherit nothing.
   slideshowLocations = withGate: {
     "= /slideshow".extraConfig =
       (lib.optionalString withGate tailnetOnly)
@@ -385,25 +326,20 @@ in {
   services.media-relay.enable = true;
 
   # --- the job pipeline as a page ---
-  # Reads the mail hub's own tables through four read-only routes; it stores
-  # nothing and is not a writer. The single-writer cutover is the appflow turn
-  # (`appflow-single-writer`), and this page is its consumer.
+  # Read-only over the mail hub's tables; consumer of the appflow-single-writer
+  # cutover, and a writer of nothing.
   services.appflowBoard.enable = true;
 
-  # 10.99.0.53 on lo + the /32 advertised below form one half of the failover
-  # group; frieren runs the same module and advertises the same route.
-  # (Setting only `.address` does nothing — the bind is behind `enable`.)
-  # No `advertiseRoutes` here: delphi is a resolver and exit node, not a subnet
-  # router for a LAN it does not have.
+  # One half of the failover group; frieren runs the same module and the same /32
+  # (setting only `.address` does nothing — the bind is behind `enable`).
   profiles.tailnetDnsAddress = {
     enable = true;
     address = dnsServiceAddress;
     exitNode = true;
   };
 
-  # The two public surfaces are compiled from these registry fields, so an empty
-  # one would ship a vhost with no `server_name` and a console whose cards point
-  # at `.cloudforest-kardashev.ts.net`. Fail at eval instead.
+  # Both public surfaces compile from these registry fields; empty fails at eval
+  # rather than shipping a vhost with no `server_name`.
   assertions = [
     {
       assertion = hostMeta.network.domain != "";
@@ -424,26 +360,18 @@ in {
   ];
 
   # --- The gate toolchain -----------------------------------------------------
-  # This box runs `task checks:*` (it is where delphi's own gates are cheapest to
-  # run), so the tools those tasks call from PATH belong in the closure rather
-  # than in an ad-hoc `nix shell`: `toon` for `checks:toon`, `python3` for
-  # `ops:tailnet:policy` and the site preview helpers. Neither is an AI/dev stack
-  # — `globalModulesContainers` keeps that off here on purpose.
-  # `browser` stays off: `checks:kg:canvas` already skips its click step when
-  # `agent-browser` is absent, and ~700 MB for one optional half is a deliberate
-  # trade rather than a default.
+  # This box runs `task checks:*`, so `toon` and `python3` belong in the closure.
+  # No browser: `checks:kg:canvas` skips its click step without `agent-browser`,
+  # and ~700 MB for one optional half is a deliberate trade.
   profiles.operatorTools = {
     enable = true;
     browser = false;
   };
 
   # --- User-plane sops identity ----------------------------------------------
-  # base-node.nix gives the NixOS plane the host key (root can read it). Home
-  # Manager activation runs as devji and needs a user-readable identity file,
-  # and this host has no `~/.ssh/id_ed25519` — logins are CA certificates. The
-  # activation derives it from the host key, which yields exactly the `&delphi`
-  # recipient already in .sops.yaml: no extra key, no rekey, nothing to back up.
-  # Out of scope for frieren/fern, which use the TPM identity path.
+  # Home Manager activation runs as devji and needs a user-readable identity; this
+  # host has no `~/.ssh/id_ed25519` (CA logins), so the host key yields the
+  # `&delphi` recipient already in .sops.yaml. Frieren and fern use the TPM path.
   profiles.sopsUserIdentity.enable = true;
 
   # No `profiles.cachePush`: a post-build-hook on a 2-vCPU guest would upload
@@ -481,14 +409,9 @@ in {
   # frieren, which advertises the same /32 as the passive member).
 
   # --- Tailnet resolver: crab-hole -------------------------------------------
-  # Chosen over the pihole-ftl + unbound stack in net/dns/failover.nix:
-  # that module is built around a LAN interface and keepalived VRRP, neither of
-  # which exists on a cloud host. crab-hole is one Rust binary, keeps the same
-  # StevenBlack + Disconnect lists frieren blocks, and speaks plain DNS on 53.
-  #
-  # It listens on 0.0.0.0 rather than a hardcoded tailnet IP: the IP is assigned
-  # by Tailscale at login and would otherwise have to be baked in. The firewall
-  # (not the bind address) is what limits it to the tailnet.
+  # One Rust binary, the same two lists frieren blocks, plain DNS on 53; bound to
+  # 0.0.0.0 because the tailnet IP is assigned at login. The firewall, not the
+  # bind address, is what limits it to the tailnet.
   #
   # LIMIT, measured 2026-10-20: crab-hole is a forwarding ad-blocker, not an
   # authoritative server — its config has blocklist/downstream/upstream/api and
@@ -500,8 +423,6 @@ in {
   # cheap one; a dnsmasq zone front-end is the equivalent-resolver one).
   services.crab-hole = {
     enable = true;
-    # openFirewall would open 53 globally; the scoped interface rule below is
-    # the only intended path in.
     openFirewall = false;
     settings = {
       # UDP only, and that is a crab-hole limitation, not a choice: v0.1.12
@@ -538,8 +459,7 @@ in {
           trust_nx_responses = false;
         }
       ];
-      # Same two lists frieren's pihole-ftl uses, so a failover answer is the
-      # answer the client would have got from the primary.
+      # Same two lists frieren's pihole-ftl uses: a failover answer matches.
       blocklist = {
         include_subdomains = true;
         lists = [
@@ -547,7 +467,6 @@ in {
           "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt"
         ];
       };
-      # Loopback only; there is no crab-hole web UI to expose.
       api = {
         listen = "127.0.0.1";
         port = 8081;
@@ -557,12 +476,9 @@ in {
   };
 
   # --- The tailnet firewall surface, from ONE registry ----------------------
-  # Every port this host opens on the mesh, declared once and scoped to
-  # `tailscale0`, each value read from the option that owns it so a moved service
-  # cannot leave a stale row behind. Two rows were pruned 2026-11-09: 53/tcp
-  # (crab-hole has no TCP downstream) and 3012/tcp (vaultwarden 1.30 serves
-  # websockets on ROCKET_PORT; `./vaultwarden.nix` carries the measurement).
-  # Instrument: `task checks:ports HOST=delphi IFACE=tailscale0`.
+  # Every port on the mesh, scoped to `tailscale0`, each value read from the option
+  # that owns it so a moved service cannot leave a stale row; instrument:
+  # task checks:ports HOST=delphi IFACE=tailscale0.
   profiles.serviceExposure = {
     enable = true;
     interfaces = ["tailscale0"];
@@ -580,8 +496,7 @@ in {
         lan = false;
         tailnet = true;
       };
-      # The three services that moved off the NAS. frieren's nginx is their only
-      # client, over the tailnet — never the LAN, which this host does not have.
+      # Moved off the NAS; frieren's nginx is their only client, over the tailnet.
       paperless = {
         port = config.services.paperless.port;
         lan = false;
@@ -601,21 +516,13 @@ in {
   };
 
   # --- Fleet monitors, from OUTSIDE the LAN ---------------------------------
-  # frieren's own gatus cannot see a home-WAN outage: it probes loopback. This
-  # instance is the other vantage point — everything on delphi probes 127.0.0.1,
-  # and the frieren checks go over the tailnet, so "delphi can reach frieren" is
-  # a fact about the internet path and frieren's tailnet ingress, not about the
-  # LAN switch.
-  #
-  # `modules/services/fleet-monitors.nix` owns the mechanism (gatus plus the
-  # monitor definitions as Nix state); this block is only the endpoint list.
-  # Alerting stays off: the SimpleX bridge points at 127.0.0.1:5225, and this
-  # host runs no SimpleX daemon.
+  # The other vantage point: an internet-path fact, not a LAN one, because frieren's
+  # own gatus only probes loopback. Mechanism in modules/services/fleet-monitors.nix;
+  # alerting stays off, since no SimpleX daemon runs here.
   services.fleetMonitors = {
     enable = true;
-    # Bound to all interfaces because the tailnet address is assigned at login
-    # and must not be baked in; the tailscale0 firewall rule above is the only
-    # way in. Reached at http://100.123.145.53:8181/ from a tailnet client.
+    # Reached at http://100.123.145.53:8181/; the tailscale0 rule above is the only
+    # way in, because the address is assigned at login.
     address = "0.0.0.0";
     endpoints = [
       {

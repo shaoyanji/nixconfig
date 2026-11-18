@@ -22,3 +22,24 @@ max_bytes = 120000
 # Naming it here moves both together: a pin that changes without its hash leaves
 # the build describing the previous revision, which is the drift this pin caused.
 hash_key = "matt-resume"
+
+# Fetches whose upstream is a gist and whose bytes no file here pins: the shell
+# configs and the SSH key list. There is nothing to compare against, so the hash
+# IS the pin and every refresh re-reads it. `file` defaults to
+# modules/config/fetches.json. A release archive in that registry (ariang) is
+# deliberately absent — this table is for small strings and scripts.
+[[hash]]
+key = "wezterm-config"
+
+[[hash]]
+key = "wezterm-mappings"
+
+[[hash]]
+key = "elvish-rc"
+
+[[hash]]
+key = "lf-icons"
+
+[[hash]]
+key = "authorized-keys"
+file = "modules/config/authorized-keys.json"

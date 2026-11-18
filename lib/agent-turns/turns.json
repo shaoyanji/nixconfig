@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-18T11:03:00Z",
+  "generated": "2026-11-18T14:32:35Z",
   "count": 200,
-  "pin": "f54cf9d484bad64fde1141e083e766d1cadc61c993d13e538ae708ee2852e738",
+  "pin": "0ad6c966e489c5880088e5284af5a362867b2aa1ca0d9bf2b95ea4b88d8fc976",
   "turns": [
+    {
+      "id": "54252c99-637c-4b19-b1d3-a5fe9b82a85c",
+      "ts": "2026-11-18T13:40:47Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-18: 10 plate(s) kept of 13 spent, 17 roster row(s) waiting, 490 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03h9ck0jg29zuv5ikwn86t1es"
+    },
+    {
+      "id": "d1a5559a-2ba6-4711-84b4-ef1a910931a3",
+      "ts": "2026-11-18T11:35:43Z",
+      "source": "devji",
+      "subject": "nixconfig:needle-pin-and-fusion-queries",
+      "action": "Pinned needle's engine to the revision that still serves it (same sha256), added note.refs.modules plus four read-only fusion joins, and took the Nix comment ceiling 6628 -> 6540",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b94b28bca2b385b240e6c6f74f44519ffa84df06",
+      "branch": "main",
+      "frame": "03h9bvl0kpbrayd5zg03hgo28"
+    },
+    {
+      "id": "a074ed07-2548-45e7-96ad-8ef73510cc3e",
+      "ts": "2026-11-18T11:34:12Z",
+      "source": "devji",
+      "subject": "nixconfig:pins-autohash",
+      "action": "lib/pins.toml pins can name a hash_key; pre-commit's pins-refresh now rewrites that modules/config/fetches.json sha256 and stages both files together. nix-hash-update.sh takes key args (one fetch, unchanged when identical). Verified by corrupting the matt-resume hash: refresh repaired it and reported rewritten, second run unchanged; the no-key sweep still updates all 6 entries; checks:nix:format, checks:quick and the task graph gate rc=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ccd7d4dd2e6307507b90c72e05faf6024fdf1192",
+      "branch": "main",
+      "frame": "03h9bvagd8feyrvdgf756chl0"
+    },
     {
       "id": "0ed65441-1459-4ba1-84eb-1f66943f5230",
       "ts": "2026-11-18T11:02:08Z",
@@ -2721,59 +2760,6 @@
       "base_commit": "b4509a6e46b1adb1b63813662c84676ccc4958c1",
       "branch": "main",
       "frame": "03h7hi5t9p83lr51ri7188ofq"
-    },
-    {
-      "id": "9bf9153c-c099-4f0b-a740-01edc0a91474",
-      "ts": "2026-11-09T23:28:47Z",
-      "source": "devji",
-      "subject": "nixconfig:hermes-nemotron-35-upgrade",
-      "action": "Upgraded Hermes fallback and auxiliary models to Nemotron 3.5 Super VL and pushed all commits",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "base_commit": "55c89e15cdd4b9e5a9ee2755283825c9cae3d70c",
-      "branch": "main",
-      "frame": "03h7hf7845cu06yxuyh9l96su"
-    },
-    {
-      "id": "f6637c7e-492d-481e-8d4d-80128752a996",
-      "ts": "2026-11-09T23:22:25Z",
-      "source": "devji",
-      "subject": "nixconfig:dragoncourt-himalaya",
-      "action": "Wired dragoncourt Alwaysdata mailbox into himalaya and synced secrets submodule",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "modules/global/user.nix",
-        "modules/himalaya.nix",
-        "modules/secrets",
-        "modules/secrets.yaml",
-        "modules/sops.nix"
-      ],
-      "base_commit": "859c8b8d180a77c248d67d2686d705bfa2ff836a",
-      "branch": "main",
-      "frame": "03h7hdygcnbw7icry5sm63fzd"
-    },
-    {
-      "id": "729ae878-8f80-48fe-8018-18215f378705",
-      "ts": "2026-11-09T23:02:28Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-content",
-      "action": "Seeded the career and portfolio corpora into the delphi database (15 career entries, 5 projects per language) and re-exported all four artifacts unchanged: the export now keeps each document's own key order, so a re-seed is byte-identical in git.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "modules/plugins/appflow/career.py",
-        "modules/plugins/appflow/portfolio.py",
-        "modules/plugins/appflow/content_api.py",
-        "tests/career-cli/run.sh",
-        "tests/portfolio-cli/run.sh"
-      ],
-      "base_commit": "2c6cdf8e3c8336b2ed74f743732a20e36af90c66",
-      "branch": "main",
-      "frame": "03h7ha2854vaopvn9u3h3p3ep"
     }
   ]
 }

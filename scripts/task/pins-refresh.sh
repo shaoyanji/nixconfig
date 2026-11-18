@@ -12,6 +12,10 @@
 # and named on stderr: a push must not fail because one source was unavailable,
 # and a silent skip would be worse than a loud one.
 #
+# Two kinds of entry. A `[[pin]]` is a file in the tree, refreshed by its `cmd`.
+# A `[[hash]]` is a fetch with no file here — a gist a shell reads, the SSH key
+# list — where the hash is the whole pin, so every run re-reads it.
+#
 # Usage
 #   pins-refresh.sh            refresh, print what changed
 #   pins-refresh.sh --check    exit 1 when a pin is stale, without writing
@@ -38,8 +42,34 @@ rows=$(yq -p toml -o json '.pin' "$PINS" | jq -r '.[] | [.name, .path, .cmd, (.m
   exit 2
 }
 
+hash_rows=$(yq -p toml -o json '.hash // []' "$PINS" | jq -r '.[] | [.key, (.file // "modules/config/fetches.json")] | @tsv') || {
+  printf 'pins: could not read the [[hash]] table in %s\n' "$PINS" >&2
+  exit 2
+}
+
 changed=()
 skipped=()
+
+# Rewrite one entry's sha256 in a fetch registry and stage the file when its
+# bytes changed. The comparison is the file against itself: a hash repaired back
+# to the committed value is a rewrite, and comparing with HEAD would call it
+# unchanged.
+refresh_hash() { # name key file
+  local name="$1" key="$2" file="$3" before after log
+  before=$(sha256sum "$ROOT/$file" | cut -d' ' -f1)
+  if log=$(bash "$ROOT/scripts/task/nix-hash-update.sh" "$ROOT/$file" "$key" 2>&1); then
+    after=$(sha256sum "$ROOT/$file" | cut -d' ' -f1)
+    if [ "$before" = "$after" ]; then
+      printf 'HASH   %-12s %-20s unchanged\n' "$name" "$key"
+    else
+      git -C "$ROOT" add -- "$file"
+      printf 'HASH   %-12s %-20s rewritten\n' "$name" "$key"
+      changed+=("$key")
+    fi
+  else
+    printf 'HASH   %-12s %-20s could not be re-hashed: %s\n' "$name" "$key" "$(tail -1 <<<"$log")" >&2
+  fi
+}
 
 while IFS=$'\t' read -r name path cmd max hash_key; do
   [ -n "$name" ] || continue
@@ -83,22 +113,19 @@ while IFS=$'\t' read -r name path cmd max hash_key; do
   # Both files travel in one commit, so this runs whether or not the pin itself
   # moved — FRESH only means this file matches HEAD, not that the hash does.
   if [ -n "$hash_key" ]; then
-    # Compare the file with itself, not with HEAD: a hash repaired back to the
-    # committed value is a rewrite, and only the message would have said so.
-    before=$(sha256sum "$ROOT/modules/config/fetches.json" | cut -d' ' -f1)
-    if log=$(bash "$ROOT/scripts/task/nix-hash-update.sh" "$ROOT/modules/config/fetches.json" "$hash_key" 2>&1); then
-      after=$(sha256sum "$ROOT/modules/config/fetches.json" | cut -d' ' -f1)
-      if [ "$before" = "$after" ]; then
-        printf 'HASH   %-12s %s unchanged\n' "$name" "$hash_key"
-      else
-        git -C "$ROOT" add -- modules/config/fetches.json
-        printf 'HASH   %-12s %s rewritten\n' "$name" "$hash_key"
-      fi
-    else
-      printf 'HASH   %-12s %s could not be re-hashed: %s\n' "$name" "$hash_key" "$(tail -1 <<<"$log")" >&2
-    fi
+    refresh_hash "$name" "$hash_key" modules/config/fetches.json
   fi
 done <<<"$rows"
+
+# The fetches with no pinned file of their own: nothing to compare, so read the
+# upstream hash and stage the registry when it moved. Skipped in --check, which
+# stays offline and file-only because pre-push runs it.
+if [ "$mode" != --check ]; then
+  while IFS=$'\t' read -r key file; do
+    [ -n "$key" ] || continue
+    refresh_hash fetch "$key" "$file"
+  done <<<"$hash_rows"
+fi
 
 if [ "$mode" = --check ]; then
   [ ${#changed[@]} -eq 0 ] || { printf 'pins: %d stale — task pins:refresh\n' "${#changed[@]}" >&2; exit 1; }

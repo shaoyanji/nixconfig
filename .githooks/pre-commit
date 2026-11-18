@@ -223,7 +223,7 @@ fi
 # an unreachable source must warn, never block a commit.
 if [ -f "$REPO_ROOT/scripts/task/pins-refresh.sh" ]; then
   if bash "$REPO_ROOT/scripts/task/pins-refresh.sh" >/tmp/pre-commit-pins.log 2>&1; then
-    grep -E '^(PIN|HASH|SKIP) ' /tmp/pre-commit-pins.log | sed 's/^/  /' | head -8 || true
+    grep -E '^(PIN|HASH|SKIP) ' /tmp/pre-commit-pins.log | sed 's/^/  /' | head -12 || true
   else
     echo "  pre-commit: the pin refresh could not run; the pinned files are unchanged."
   fi

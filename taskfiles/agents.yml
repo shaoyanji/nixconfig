@@ -310,14 +310,13 @@ tasks:
   agents:pins:refresh:
     desc: Refresh the small pinned datasets in lib/pins.toml, and nothing large
     summary: >
-      scripts/task/pins-refresh.sh — `lib/pins.toml` is the registry: one file,
-      the command that refreshes it, and the `max_bytes` that keeps a corpus out.
-      The refresh runs outside Nix and the result is committed, so the tree stays
-      pure while the data is fresh at push time. An unavailable source is SKIPPED
-      and named; an oversized one is refused instead of vendored. `--check` exits
-      1 on a stale pin, `--commit` commits. A pin's `hash_key` names the fetch in
-      modules/config/fetches.json its source feeds; that sha256 moves in the same
-      commit. Vars: CLI_ARGS=, PINS=, PIN_TIMEOUT=.
+      scripts/task/pins-refresh.sh — `lib/pins.toml`: a file, its refresh command,
+      and the `max_bytes` that keeps a corpus out. An unavailable source is SKIPPED
+      and named; an oversized one is refused. `--check` exits 1 on a stale pin,
+      `--commit` commits. `hash_key` names the fetch a pin feeds; a `[[hash]]`
+      entry is a gist fetch with no file here (shell configs, SSH keys). Either
+      way that sha256 moves in the same commit, archives excluded.
+      Vars: CLI_ARGS=, PINS=, PIN_TIMEOUT=.
     cmds:
       - bash scripts/task/pins-refresh.sh {{.CLI_ARGS}}
 

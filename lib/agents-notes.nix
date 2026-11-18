@@ -213,6 +213,13 @@
 
   byStatus = status: builtins.filter (e: e.status == status) entryList;
   byKind = kind: builtins.filter (e: e.kind == kind) entryList;
+  claimStats = lib.genAttrs (lib.unique (builtins.attrValues claimOf)) (c: let
+    xs = builtins.filter (e: e.claim == c) entryList;
+  in {
+    notes = builtins.length xs;
+    open = builtins.length (builtins.filter (e: builtins.elem e.status openStatuses) xs);
+    evidence = lib.unique (map (e: e.evidence) xs);
+  });
 
   indexOf = key:
     lib.foldl' (
@@ -293,6 +300,14 @@
     + "${toString counts.total} notes (${toString counts.open} open, ${toString counts.leaves} leaves) — "
     + "each note links the hosts, modules, tasks and documents it affects; a note\n"
     + "with no such link is a leaf and carries the original intent in prose.\n\n"
+    + "| claim | notes | open | evidence |\n| :--- | :--- | :--- | :--- |\n"
+    + lib.concatMapStrings (
+      c: let
+        s = claimStats.${c};
+      in "| `${c}` | ${toString s.notes} | ${toString s.open} | ${lib.concatStringsSep "," (map (x: "`${x}`") s.evidence)} |\n"
+    )
+    (builtins.attrNames claimStats)
+    + "\n"
     + lib.concatStringsSep "\n" (
       map (
         k:

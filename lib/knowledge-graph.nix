@@ -436,7 +436,12 @@
     then null
     else builtins.head m;
   taskShaped = t: builtins.match "[a-z][a-z0-9-]*(:[a-z0-9*<][a-z0-9*_<>-]*)+" t != null;
-  wildcardFor = t: builtins.filter (n: lib.hasInfix "*" n && lib.hasPrefix (builtins.head (lib.splitString "*" n)) t) taskIds;
+  wildcardFor = t:
+    lib.sort (
+      a: b:
+        builtins.stringLength (builtins.head (lib.splitString "*" a))
+        > builtins.stringLength (builtins.head (lib.splitString "*" b))
+    ) (builtins.filter (n: lib.hasInfix "*" n && lib.hasPrefix (builtins.head (lib.splitString "*" n)) t) taskIds);
   resolves = t: builtins.hasAttr t tasks || wildcardFor t != [];
   resolvedTask = t:
     if builtins.hasAttr t tasks

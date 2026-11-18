@@ -327,5 +327,22 @@ in {
   # store artifact a non-evaluating consumer reads is `.#artifacts.knowledge-graph`.
   knowledgeGraph = {
     inherit (knowledgeGraphCtl) graph cypher;
+    evidence = let
+      edges = knowledgeGraphCtl.graph.edges;
+      count = p: builtins.length (builtins.filter p edges);
+    in {
+      total = builtins.length edges;
+      recorded = count (e: e ? evidence);
+      relations =
+        lib.mapAttrs (r: rel: {
+          defaultTier = rel.tier;
+          producedBy = epistemicsCtl.evidence.${rel.tier}.producedBy;
+          edges = count (e: e.type == r);
+          recorded = count (e: e.type == r && e ? evidence);
+          canCarry = epistemicsCtl.canCarry rel.tier;
+        })
+        ontologyCtl.relations;
+      inherit (knowledgeGraphCtl) unresolvedCitations;
+    };
   };
 }

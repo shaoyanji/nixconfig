@@ -328,7 +328,7 @@
         cutoff="$(( $(date +%s) - days * 86400 ))"
         # An unreadable ModTime keeps the object; a guessed date deletes a library: docs/media-relay.md
         stale="$(printf '%s' "$objects" | jq -r --argjson cut "$cutoff" --argjson now "$(date +%s)" '
-          .[] | ((.ModTime // "") | sub("\.[0-9]+$"; "")) as $t
+          .[] | ((.ModTime // "") | sub("\\.[0-9]+$"; "")) as $t
           | (($t | fromdateiso8601?) // $now) as $epoch
           | select($epoch < $cut) | .Path')"
         r2_removed="$(printf '%s\n' "$stale" | jq -R -s 'split("\n") | map(select(length > 0))')"

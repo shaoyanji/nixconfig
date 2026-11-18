@@ -171,7 +171,7 @@ Rules that keep this honest:
 
 ```bash
 curl -s localhost:8080/health                       # Healthy
-curl -s localhost:8080/openapi.json | jq '.paths|length'   # 23 (grows with a route)
+curl -s localhost:8080/openapi.json | jq '.paths|length'   # 52 (grows with a route)
 curl -s "$B/plugins" | jq '.[] | select(.open > 0)'  # nobody starved of work
 ```
 

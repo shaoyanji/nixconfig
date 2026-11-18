@@ -40,6 +40,22 @@
     echo "restic drill OK: restored a sample from snapshot $latest"
   '';
 
+  # Ledger projection; see scripts/task/turns-fuse.sh. Runs as the checkout owner
+  # (flake eval as root fails on libgit2 ownership), dropping to postgres for psql only.
+  turnsFuse = pkgs.writeShellScript "turns-fuse" ''
+    set -euo pipefail
+    cd ${lib.escapeShellArg "${user.home}/Documents/nixconfig"}
+    ${pkgs.git}/bin/git pull --ff-only --quiet || echo "turns-fuse: pull skipped, loading the checkout as it stands"
+    notes=$(${pkgs.coreutils}/bin/mktemp)
+    trap '${pkgs.coreutils}/bin/rm -f "$notes"' EXIT
+    ${config.nix.package}/bin/nix eval --json .#agentsNotes.index >"$notes"
+    NOTES="$notes" ${pkgs.bash}/bin/bash scripts/task/turns-fuse.sh --sql |
+      ${config.security.wrapperDir}/sudo -n -u postgres ${config.services.postgresql.package}/bin/psql -q -v ON_ERROR_STOP=1 -d fleet
+    for t in turn turn_claim turn_file note; do
+      printf '%s %s\n' "$t" "$(${config.security.wrapperDir}/sudo -n -u postgres ${config.services.postgresql.package}/bin/psql -d fleet -Atc "select count(*) from $t")"
+    done
+  '';
+
   burgernasSftp = pkgs.writeShellScript "burgernas-sftp" ''
     exec ${pkgs.openssh}/bin/ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new devji@192.168.3.92 /usr/local/bin/sftp-server "$@"
   '';
@@ -1032,6 +1048,31 @@ in {
       OnCalendar = "*-*-* 02:35:00";
       Persistent = true;
       RandomizedDelaySec = "120s";
+    };
+  };
+
+  # Daily, after the 04:00 autoUpgrade and clear of 03:00-05:30: task agents:turns:fuse.
+  systemd.services.turns-fuse = {
+    description = "Project agent turns and notes into frieren's fleet database";
+    path = [pkgs.jq pkgs.git pkgs.coreutils];
+    serviceConfig = {
+      Type = "oneshot";
+      User = user.name;
+      Group = "users";
+      WorkingDirectory = "${user.home}/Documents/nixconfig";
+      ExecStart = turnsFuse;
+      Nice = 10;
+      IOSchedulingClass = "idle";
+    };
+  };
+
+  systemd.timers.turns-fuse = {
+    description = "Daily turn fusion into the fleet database";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnCalendar = "*-*-* 06:20:00";
+      Persistent = true;
+      RandomizedDelaySec = "5min";
     };
   };
 

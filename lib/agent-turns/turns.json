@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T11:02:00Z",
+  "generated": "2026-11-18T11:03:00Z",
   "count": 200,
-  "pin": "639ce7d48edb129660fc8db7ffd041f70d3912cf57227800c7598f9a3a22fb26",
+  "pin": "f54cf9d484bad64fde1141e083e766d1cadc61c993d13e538ae708ee2852e738",
   "turns": [
+    {
+      "id": "0ed65441-1459-4ba1-84eb-1f66943f5230",
+      "ts": "2026-11-18T11:02:08Z",
+      "source": "devji",
+      "subject": "nixconfig:deploy-gate-and-fusion-timer",
+      "action": "delphi and frieren deployed; deploy gate asks the closure, toplevel built on target; turns-fuse timer daily 06:20 (200->207)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2c71ebd0e74f654ef5bc4e42ea2df7d59aba79c3",
+      "branch": "HEAD",
+      "frame": "03h9bp0y43tqezr2li04wqyib"
+    },
     {
       "id": "30a0696d-e646-4662-b2c6-41910f209282",
       "ts": "2026-11-18T10:51:56Z",
@@ -2761,19 +2774,6 @@
       "base_commit": "2c6cdf8e3c8336b2ed74f743732a20e36af90c66",
       "branch": "main",
       "frame": "03h7ha2854vaopvn9u3h3p3ep"
-    },
-    {
-      "id": "285a07d6-3ec0-44ce-b3f9-56aaa004203d",
-      "ts": "2026-11-09T22:32:27Z",
-      "source": "devji",
-      "subject": "nixconfig:career-db-authoring",
-      "action": "career_role/career_project + six endpoints + career.py (import/add/set/rm/export) + checks:career fixture; both corpora round-trip byte for byte",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "355d6e1f31ee68a5d950b0e4e7d8945d22160249",
-      "branch": "main",
-      "frame": "03h7h473db5l4mlt5xx1fed16"
     }
   ]
 }

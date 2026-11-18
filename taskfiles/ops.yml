@@ -790,7 +790,7 @@ tasks:
       `DELIVERED` is a status, not a proof. FORMAT=json emits the same data. Costs
       jq over the cached document, so it needs no eval beyond the one it already reads.
     cmds:
-      - bash scripts/task/notes.sh claims
+      - FORMAT="{{.FORMAT | default ""}}" bash scripts/task/notes.sh claims
 
   ops:notes:show:
     desc: Print one AGENTS.nix note (ID= required)

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T09:41:37Z",
+  "generated": "2026-11-18T09:42:10Z",
   "count": 200,
-  "pin": "89c13cd83b5bf93e9026d7ee6306936696722c94cebf54b158a37d375b309124",
+  "pin": "1abae6079e185104d8f049e6b9722a4e65848752a98dab305962783ff82d0a7c",
   "turns": [
+    {
+      "id": "c12ef758-52de-4a51-90a1-31ce6f48161a",
+      "ts": "2026-11-18T09:41:39Z",
+      "source": "devji",
+      "subject": "nixconfig:claim-rows-and-clickable-lineage",
+      "action": "claimRows is one list for markdown and site; note slices link lineage; evidence says all N; pre-push remote default fixed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0bd4bc730597cae20ccee810313166f05d1e46da",
+      "branch": "main",
+      "frame": "03h9b9ayr8qw3rcab55liawkc"
+    },
     {
       "id": "d1562cb9-1f6f-4464-a24f-86e6542166ce",
       "ts": "2026-11-18T09:34:02Z",
@@ -2779,19 +2792,6 @@
       "base_commit": "55e99a3a7becd40c8641d8ef7fcc2b9d6cbf3118",
       "branch": "main",
       "frame": "03h7gkf301dv3pm8n95dmy7tm"
-    },
-    {
-      "id": "1c52a57a-0fe8-44f9-9824-97f8caca2ad4",
-      "ts": "2026-11-09T20:51:11Z",
-      "source": "devji",
-      "subject": "nixconfig:contact-form",
-      "action": "Closed as deployed: GET bountystash.com/contact and /de/kontakt answer 200 with the no-JS form, and POST /api/contact with an unreadable body is answered 400 by the Pages worker, so the route reaches the worker rather than the asset handler. A real send is unproven (no submission made).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "55e99a3a7becd40c8641d8ef7fcc2b9d6cbf3118",
-      "branch": "main",
-      "frame": "03h7gkf0bfgu7ru9c44wweiw9"
     }
   ]
 }

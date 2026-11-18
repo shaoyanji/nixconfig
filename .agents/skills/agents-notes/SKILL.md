@@ -227,7 +227,7 @@ Then check the surfaces actually updated: `task docs:build` and `task docs:site`
 | :--- | :--- |
 | markdown | `.#artifacts.docs` → `docs/generated/agents-notes.md` + one page per note, refs as repo links |
 | site | `.#sites.fleet-docs-site` → Planner → **Agent notes (AGENTS.nix)**, one slice per note |
-| query | `task ops:notes[:near\|:lineage\|:show\|:host\|:module\|:task\|:doc\|:search]` |
+| query | `task ops:notes[:near\|:lineage\|:claims\|:show\|:host\|:module\|:task\|:doc\|:search]` |
 | code | `nix eval .#agentsNotes.{index,lineage,byHost,byModule,byTask,byDoc,byStatus,origins,frontier,open}` |
 
 ## Related

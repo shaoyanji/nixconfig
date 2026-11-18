@@ -781,6 +781,17 @@ tasks:
     cmds:
       - bash scripts/task/notes.sh list "{{.STATUS | default ""}}" "{{.KIND | default ""}}" "{{.CLAIM | default ""}}" "{{.EVIDENCE | default ""}}"
 
+  ops:notes:claims:
+    desc: How the notes distribute over claim kinds and their evidence tier
+    summary: >
+      Reads the compiled `counts.byClaim` and `claims` maps: how many notes carry
+      each claim kind (`.#epistemics.noteClaims`), and which evidence tier each one
+      carries. Every note is `asserted`, because a note is one person's record and
+      `DELIVERED` is a status, not a proof. FORMAT=json emits the same data. Costs
+      jq over the cached document, so it needs no eval beyond the one it already reads.
+    cmds:
+      - bash scripts/task/notes.sh claims
+
   ops:notes:show:
     desc: Print one AGENTS.nix note (ID= required)
     summary: >

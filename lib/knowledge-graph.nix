@@ -432,16 +432,26 @@
     else builtins.head (wildcardFor t);
   rowTasks = line: let
     l = rowLabel line;
+    hits = builtins.filter (t: taskShaped t && resolves t) (rowWords line);
   in
     if l == null
     then []
     else
-      map (n: {
-        from = "doc:.agents/skills/router/references/playbooks.md";
-        to = "task:${n}";
-        type = "routes";
-        label = l;
-      }) (lib.unique (map resolvedTask (builtins.filter (t: taskShaped t && resolves t) (rowWords line))));
+      map (h:
+        {
+          from = "doc:.agents/skills/router/references/playbooks.md";
+          to = "task:${h.name}";
+          type = "routes";
+          label = l;
+        }
+        // lib.optionalAttrs (!h.exact) {
+          evidence = "extracted";
+          because = "the row names a family member, not the node: a prefix selected ${h.name}, and no member of that family was run";
+        }) (lib.unique (map (t: {
+          name = resolvedTask t;
+          exact = builtins.hasAttr t tasks;
+        })
+        hits));
   routeEdges = lib.concatMap rowTasks playbookLines;
   routerUnknown = lib.unique (
     lib.concatMap (line: builtins.filter (t: taskShaped t && !(resolves t)) (rowWords line)) playbookLines

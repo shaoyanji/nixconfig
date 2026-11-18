@@ -6,7 +6,7 @@
 # script is the human surface over `.?submodules=1#agentsNotes.json`; the machine surface is
 # `nix eval .?submodules=1#agentsNotes.index` or `nix eval --json .?submodules=1#agentsNotes.json`.
 #
-# Usage: notes.sh list [STATUS] [KIND] [CLAIM] [EVIDENCE] | show ID | near Q [LIMIT]
+# Usage: notes.sh list [STATUS] [KIND] [CLAIM] [EVIDENCE] | claims | show ID | near Q [LIMIT]
 #        | lineage ID | host HOST | module PATH | task TASK | doc DOC | search Q
 # Env: FORMAT=json emits the selected notes as JSON instead of a table.
 #
@@ -289,6 +289,23 @@ case "$MODE" in
         "summary: \($n.summary)"
     ' <<<"$data"
     ;;
+  claims)
+    if [ "${FORMAT:-}" = "json" ]; then
+      jq '{total: .counts.total, byClaim: .counts.byClaim, evidence: ([.notes[] | .evidence] | group_by(.) | map({tier: .[0], notes: length}))}' <<<"$data"
+      exit 0
+    fi
+    printf '%-19s %6s  %s\n' "CLAIM" "NOTES" "EVIDENCE"
+    jq -r '
+      [.notes[] | {claim: (.claim // "-"), evidence: .evidence}]
+      | group_by(.claim)
+      | map({claim: .[0].claim, notes: length, evidence: ([.[].evidence] | unique | join(","))})
+      | sort_by(-.notes)
+      | .[] | [.claim, .notes, .evidence] | @tsv
+    ' <<<"$data" | while IFS=$'\t' read -r claim n ev; do
+      printf '%-19s %6s  %s\n' "$claim" "$n" "$ev"
+    done
+    jq -r '"", "\(.counts.total) notes, each classified by flake/epistemics.nix noteClaims"' <<<"$data"
+    ;;
   host)
     host="${1:-}"
     [ -n "$host" ] || { echo "usage: notes.sh host HOST=<host>" >&2; exit 2; }
@@ -321,7 +338,7 @@ case "$MODE" in
     print_ids "$list"
     ;;
   *)
-    echo "notes: unknown mode '$MODE' (list|show|near|lineage|host|module|task|doc|search)" >&2
+    echo "notes: unknown mode '$MODE' (list|claims|show|near|lineage|host|module|task|doc|search)" >&2
     exit 2
     ;;
 esac

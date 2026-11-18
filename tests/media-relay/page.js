@@ -62,7 +62,7 @@ const ok = (name, cond) => {
 };
 
 const video = {
-  path: 'vidA/Big Buck Bunny.mp4', name: 'Big Buck Bunny.mp4', ext: 'mp4',
+  path: 'vidA/Big Buck Bunny.mp4', name: 'Big Buck Bunny.mp4', ext: 'mp4', kind: 'video',
   size: 5000, mtime: 1000, poster: 'vidA/poster.jpg', html: 'Big Buck Bunny.mp4',
 };
 const plain = { path: 'vidB/clip.webm', name: 'clip.webm', ext: 'webm', size: 3000, mtime: 2000, html: 'clip.webm' };
@@ -139,9 +139,13 @@ const cloud = r2Row(object);
 ok('a cloud row points at the edge',
   cloud.includes('href="https://edge.example/media/vidA/Big%20Buck%20Bunny%20%5BvidA%5D.mp4"'));
 ok('a cloud row says it is in R2', cloud.includes('R2 · mp4'));
+ok('a cloud row wears the badge', cloud.includes('<span class="badge">R2</span>'));
 ok('a cloud poster is the absolute URL', cloud.includes('src="https://edge.example/media/vidA/poster.jpg"'));
 ok('a cloud row without a poster has no thumb', !r2Row({ ...object, poster: null }).includes('thumb'));
-ok('a cloud row carries no copy button', !cloud.includes('<button'));
+ok('a cloud row copies the edge URL',
+  cloud.includes('data-href="https://edge.example/media/vidA/Big%20Buck%20Bunny%20%5BvidA%5D.mp4"'));
+ok('a cloud row plays in place', cloud.includes('data-play="https://edge.example'));
+ok('a local video row plays in place', row.includes('data-play="/vidA/Big%20Buck%20Bunny.mp4"'));
 
 // Shortcuts: one letter per field, matched to the field's name.
 ok('l is the library filter', shortcutFor('l') === 'library');

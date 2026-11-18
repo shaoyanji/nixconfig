@@ -6,6 +6,8 @@
 }: {
   imports = [
     self.modules."scripts.pb"
+    self.modules."scripts.media-cli"
+    self.modules."scripts.mail-cli"
   ];
   home.packages = with pkgs; [
     (pkgs.writers.writeBashBin "infron" {

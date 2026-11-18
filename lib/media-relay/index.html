@@ -59,6 +59,10 @@ li a:focus-visible{outline:1px solid var(--accent)}
 .ytmeta .c{color:var(--dim);font-size:11px}
 .cards .acts{display:flex;gap:.35rem;margin:0 .5rem .5rem;align-self:flex-start;flex-wrap:wrap}
 .empty{color:var(--dim);padding:2rem .5rem;text-align:center}
+.badge{display:inline-block;border:1px solid var(--accent);color:var(--accent);font-size:10px;line-height:1;padding:.15rem .3rem;margin-right:.4rem;border-radius:.2rem;vertical-align:middle;letter-spacing:.06em}
+#player{margin:0 0 1rem}
+#player video{width:100%;max-height:62vh;background:#000;border:1px solid var(--line);border-radius:.3rem}
+#player .pmeta{display:flex;gap:.75rem;align-items:baseline;justify-content:space-between;color:var(--dim);font-size:12px;padding:.35rem .1rem}
 @media(max-width:36rem){header{position:static}li a{grid-template-columns:1fr auto}li a.poster{grid-template-columns:auto 1fr auto}li a.poster .meta{display:none}li{grid-template-columns:1fr}button.cp{display:none}}
 </style>
 </head>
@@ -79,8 +83,8 @@ li a:focus-visible{outline:1px solid var(--accent)}
 </header>
 <main>
   <section id="yt" aria-label="YouTube results"></section>
+  <div id="player" hidden></div>
   <div id="list" aria-live="polite"></div>
-  <section id="cloud" aria-label="Stored in the R2 bucket"></section>
 </main>
 <script>
 'use strict';
@@ -97,7 +101,7 @@ const ytForm = document.getElementById('ytform');
 const urlEl = document.getElementById('url');
 const fetchForm = document.getElementById('fetchform');
 const jobline = document.getElementById('jobline');
-const cloudEl = document.getElementById('cloud');
+const playerEl = document.getElementById('player');
 
 const KINDS = ['all', 'video', 'audio', 'image', 'subtitle'];
 let files = [];
@@ -190,7 +194,8 @@ function fuzzy(needle, hay) {
 function groupByDir(items) {
   const groups = new Map();
   for (const f of items) {
-    const d = dirOf(f.path);
+    // A cloud row already carries its folder; a local row's path is the folder.
+    const d = f.dir !== undefined ? f.dir : dirOf(f.path);
     if (!groups.has(d)) groups.set(d, []);
     groups.get(d).push(f);
   }
@@ -202,33 +207,31 @@ function groupByDir(items) {
 /* fuzzy:end */
 
 function selected(item) {
-  const href = '/' + item.path.split('/').map(encodeURIComponent).join('/');
-  // The poster is a plain static file beside the video (the index only names it
-  // for a video that has one), so a missing or failed frame degrades to the
+  const cloud = Boolean(item.cloud);
+  const href = cloud ? item.url : '/' + item.path.split('/').map(encodeURIComponent).join('/');
+  // The poster is a plain static file beside a local video and an absolute edge
+  // URL beside a stored one, so a missing or failed frame degrades to the
   // filename row rather than to a broken image.
   const thumb = item.poster
-    ? `<span class="thumb"><img src="/${item.poster.split('/').map(encodeURIComponent).join('/')}" alt="" width="96" height="54" loading="lazy" decoding="async"></span>`
+    ? `<span class="thumb"><img src="${esc(cloud ? item.poster : '/' + item.poster.split('/').map(encodeURIComponent).join('/'))}" alt="" width="96" height="54" loading="lazy" decoding="async"></span>`
     : '';
-  // The link is absolute only at click time: the page is served on loopback, on
-  // `delphi:8461` and on the tailnet name, and the useful bookmark is the host
-  // the reader actually used.
-  return `<li><a href="${href}" data-p="${esc(item.path)}"${item.poster ? ' class="poster"' : ''}>${thumb}<span class="n">${item.html}</span>`
+  // The link is absolute only at click time for a local file: the page is served
+  // on loopback, on `delphi:8461` and on the tailnet name, and the useful
+  // bookmark is the host the reader actually used. A stored object's address is
+  // the edge's, which is the same from everywhere.
+  const badge = cloud ? '<span class="badge">R2</span>' : '';
+  const ext = cloud ? `R2 · ${item.ext}` : item.ext;
+  const play = item.kind === 'video' ? ` data-play="${esc(href)}"` : '';
+  return `<li><a href="${esc(href)}" data-p="${esc(item.path)}"${play}${item.poster ? ' class="poster"' : ''}>${thumb}<span class="n">${badge}${item.html || esc(item.name)}</span>`
     + `<span class="meta">${fmtSize(item.size)}</span>`
-    + `<span class="ext">${esc(item.ext)}</span></a>`
+    + `<span class="ext">${esc(ext)}</span></a>`
     + `<button class="cp" type="button" data-href="${esc(href)}" aria-label="Copy the link to ${esc(item.name)}">copy</button></li>`;
 }
 
-// One object in the bucket. The link is the edge Worker, not this host: the read
-// is Range-served there, so a player seeks without delphi in the path at all, and
-// the poster is the absolute URL the manifest's own poster rule produces.
+// One object in the bucket, in the same row as a local file: the merge is the
+// listing, not a second section — docs/media-relay.md.
 function r2Row(item) {
-  const thumb = item.poster
-    ? `<span class="thumb"><img src="${esc(item.poster)}" alt="" width="96" height="54" loading="lazy" decoding="async"></span>`
-    : '';
-  return `<li><a href="${esc(item.url)}"${item.poster ? ' class="poster"' : ''}>${thumb}`
-    + `<span class="n">${esc(item.name)}</span>`
-    + `<span class="meta">${fmtSize(item.size)}</span>`
-    + `<span class="ext">R2 · ${esc(item.ext)}</span></a></li>`;
+  return selected({ ...item, path: item.key, cloud: true, html: esc(item.name) });
 }
 
 // 596 -> 9:56. A live stream has no duration and says so on its own line, so an
@@ -303,10 +306,11 @@ function markup(item) {
 function render() {
   sel = -1;
   const q = query.trim();
-  const pool = files.filter((f) => kind === 'all' || f.kind === kind);
+  const all = files.concat(r2Items);
+  const pool = all.filter((f) => kind === 'all' || f.kind === kind);
   listEl.replaceChildren();
 
-  if (!files.length) {
+  if (!all.length) {
     stateEl.innerHTML = 'The library is empty. Fetch something with the field above, '
       + 'or on delphi: <code>yt-get &lt;url&gt;</code>';
     listEl.append(stateEl);
@@ -345,14 +349,20 @@ function render() {
 }
 
 function stats() {
-  const bytes = files.reduce((n, f) => n + f.size, 0);
-  statsEl.textContent = files.length ? `· ${files.length} files · ${fmtSize(bytes)} · ${new Set(files.map((f) => f.kind)).size} kinds` : '';
+  const all = files.concat(r2Items);
+  const bytes = all.reduce((n, f) => n + f.size, 0);
+  statsEl.textContent = all.length
+    ? `· ${files.length} here · ${r2Items.length} in R2 · ${fmtSize(bytes)} · ${new Set(all.map((f) => f.kind)).size} kinds`
+    : '';
 }
+
+function renderAll() { stats(); chips(); render(); }
 
 function chips() {
   chipsEl.replaceChildren();
+  const all = files.concat(r2Items);
   for (const k of KINDS) {
-    const n = k === 'all' ? files.length : files.filter((f) => f.kind === k).length;
+    const n = k === 'all' ? all.length : all.filter((f) => f.kind === k).length;
     if (k !== 'all' && !n) continue;
     const b = document.createElement('button');
     b.className = 'chip';
@@ -420,19 +430,28 @@ function line(html) {
   jobline.innerHTML = html;
 }
 
-// What the bucket holds, which `find` cannot see. An empty (or unconfigured)
-// bucket earns no heading: the local list already says how to fill either one.
-function renderCloud() {
-  cloudEl.replaceChildren();
-  if (!r2State) return;
-  if (r2State === 'error') {
-    cloudEl.innerHTML = `<h2>Cloud <small>bucket unavailable</small></h2>`
-      + `<div class="empty">${esc(r2Error)}</div>`;
-    return;
-  }
-  if (!r2Items.length) return;
-  cloudEl.innerHTML = `<h2>Cloud <small>${r2Items.length} in R2 · played from the edge, not from delphi</small></h2>`
-    + `<ul>${r2Items.map(r2Row).join('')}</ul>`;
+// One player, reused: the row's link still opens the file in a tab (that is how
+// a reader saves it), while a plain click plays it here, from wherever the bytes
+// actually are.
+function playItem(href, name) {
+  playerEl.hidden = false;
+  playerEl.innerHTML = `<video controls autoplay playsinline src="${esc(href)}"></video>`
+    + `<div class="pmeta"><span>${esc(name)}</span>`
+    + `<button class="go" type="button" id="pclose">close</button></div>`;
+  document.getElementById('pclose').addEventListener('click', closePlayer);
+  playerEl.scrollIntoView({ block: 'nearest' });
+}
+
+function closePlayer() {
+  playerEl.hidden = true;
+  playerEl.replaceChildren();
+}
+
+// What the bucket holds, which `find` cannot see. It is merged into the one
+// listing rather than given a section of its own: a video a person stored and a
+// video still on this host answer the same question, and the badge says which.
+function rowsFromCloud(items) {
+  return items.map((o) => ({ ...o, cloud: true, path: o.key, html: esc(o.name) }));
 }
 
 async function loadCloud(refresh) {
@@ -440,7 +459,7 @@ async function loadCloud(refresh) {
     const r = await fetch(`/api/r2${refresh ? '?refresh=1' : ''}`, { cache: 'no-store' });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
-    r2Items = Array.isArray(data.items) ? data.items : [];
+    r2Items = rowsFromCloud(Array.isArray(data.items) ? data.items : []);
     r2Error = '';
     r2State = r2Items.length ? 'results' : 'empty';
   } catch (err) {
@@ -449,8 +468,9 @@ async function loadCloud(refresh) {
     // A bucket nobody configured is the feature being off, not a failure: the
     // local half still works and shouting about it would bury the real one.
     r2State = /not configured/.test(r2Error) ? '' : 'error';
+    if (r2State === 'error') line(`<span class="bad">bucket unavailable</span> ${esc(r2Error)}`);
   }
-  renderCloud();
+  renderAll();
 }
 
 async function loadIndex() {
@@ -461,13 +481,10 @@ async function loadIndex() {
     // A refresh keeps the rows on the screen when the fetch failed but the last
     // manifest is still true: only an empty library earns the message.
     files = (data.files || []).map((f) => ({ ...f, name: f.name || f.path.split('/').pop() }));
-    stats();
-    chips();
-    render();
+    renderAll();
   } catch (err) {
     if (files.length) return;
-    stats();
-    chips();
+    renderAll();
     listEl.replaceChildren();
     stateEl.innerHTML = `No index yet (${esc(String(err.message || err))}). `
       + 'The media-relay-index timer writes it within five minutes — '
@@ -548,6 +565,7 @@ document.addEventListener('keydown', (e) => {
     return;
   }
   if (e.key === 'Escape') {
+    if (!playerEl.hidden) { closePlayer(); return; }
     if (focused === ytqEl) {
       ytqEl.value = '';
       ytSeq += 1;
@@ -606,9 +624,17 @@ ytEl.addEventListener('click', async (e) => {
 
 listEl.addEventListener('click', (e) => {
   const btn = e.target.closest('button.cp');
-  if (!btn) return;
+  if (btn) {
+    e.preventDefault();
+    copyLink(btn);
+    return;
+  }
+  // A modified click is the reader asking for a tab or a download; only a plain
+  // click on a video row means "play it here".
+  const play = e.target.closest('a[data-play]');
+  if (!play || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
   e.preventDefault();
-  copyLink(btn);
+  playItem(play.dataset.play, play.dataset.p || play.dataset.play);
 });
 
 loadIndex();

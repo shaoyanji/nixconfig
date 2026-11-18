@@ -315,5 +315,93 @@ class Live(unittest.TestCase):
         self.assertEqual(call(self.port, "/api/jobs/../fetch")[0], 404)
 
 
+class Library(unittest.TestCase):
+    """The local half: the manifest read, the delete, and the pruner's window."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = pathlib.Path(self.tmp.name)
+        saved = (api.MEDIA_DIR, api.INDEX, api.MEDIA_GC, api.R2_DEL)
+        self.saved = saved
+        api.MEDIA_DIR = str(self.root)
+        api.INDEX = ""
+        api.MEDIA_GC = ""
+        api.R2_DEL = ""
+
+    def tearDown(self):
+        api.MEDIA_DIR, api.INDEX, api.MEDIA_GC, api.R2_DEL = self.saved
+        self.tmp.cleanup()
+
+    def test_paths_that_leave_the_library_are_refused(self):
+        for bad in (None, "", "  ", "../etc/passwd", "/etc/passwd", "/vidA/clip.mp4", "a/../../b", ".index.json", "a//b", "x\x00y"):
+            self.assertIsNone(api.safe_rel(bad), bad)
+        self.assertEqual(api.safe_rel("vidA/clip.mp4"), "vidA/clip.mp4")
+
+    def test_the_manifest_is_what_the_timer_wrote(self):
+        self.assertEqual(api.library_items()["count"], 0)
+        (self.root / ".index.json").write_text(
+            json.dumps(
+                {
+                    "generated": "2026-11-19T00:00:00Z",
+                    "files": [
+                        {"path": "vidA/clip.mp4", "name": "clip.mp4", "ext": "mp4", "kind": "video", "size": 10, "mtime": 1},
+                        {"path": "vidA/poster.jpg", "name": "poster.jpg", "ext": "jpg", "kind": "image", "size": 2, "mtime": 1},
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        body = api.library_items()
+        self.assertEqual(body["count"], 2)
+        self.assertEqual(body["bytes"], 12)
+        self.assertFalse(body["items"][0]["cloud"])
+
+    def test_delete_takes_the_poster_and_the_empty_folder(self):
+        folder = self.root / "vidA"
+        folder.mkdir()
+        (folder / "clip.mp4").write_bytes(b"x")
+        (folder / "poster.jpg").write_bytes(b"p")
+        result = api.delete_local("vidA/clip.mp4")
+        self.assertEqual(result["deleted"], ["vidA/clip.mp4", "vidA/poster.jpg"])
+        self.assertFalse(folder.exists())
+
+    def test_delete_keeps_a_poster_while_a_video_remains(self):
+        folder = self.root / "vidA"
+        folder.mkdir()
+        for name in ("a.mp4", "b.mp4", "poster.jpg"):
+            (folder / name).write_bytes(b"x")
+        api.delete_local("vidA/a.mp4")
+        self.assertTrue((folder / "poster.jpg").exists())
+        self.assertTrue(folder.exists())
+
+    def test_delete_refuses_a_missing_file_and_a_traversal(self):
+        with self.assertRaises(api.RequestError) as caught:
+            api.delete_local("vidA/nope.mp4")
+        self.assertEqual(caught.exception.status, 404)
+        with self.assertRaises(api.RequestError) as caught:
+            api.delete_local("../secrets.yaml")
+        self.assertEqual(caught.exception.status, 400)
+
+    def test_a_bucket_without_a_deleter_says_so(self):
+        with self.assertRaises(api.RequestError) as caught:
+            api.delete_remote("vidA/clip.mp4")
+        self.assertEqual(caught.exception.status, 503)
+
+    def test_the_pruner_window_is_clamped(self):
+        self.assertEqual(api.clamp_days("7"), 7)
+        self.assertEqual(api.clamp_days("0"), 0)
+        self.assertEqual(api.clamp_days("99999"), 3650)
+        self.assertEqual(api.clamp_days(None), api.RETENTION_DAYS)
+
+    def test_gc_answers_with_the_pruners_json(self):
+        script = self.root / "gc.sh"
+        script.write_text(
+            "#!/bin/sh\nprintf '%s' '{\"local\": [], \"r2\": [], \"applied\": false}'\n", encoding="utf-8"
+        )
+        script.chmod(0o755)
+        api.MEDIA_GC = str(script)
+        self.assertEqual(api.run_gc(14, True, "all"), {"local": [], "r2": [], "applied": False})
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

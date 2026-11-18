@@ -10,7 +10,11 @@ the tailnet mount stays the whole exposure:
     POST /api/store          queue a `yt-store` run: fetch into R2, keep nothing
     GET  /api/r2             what the bucket holds, read through rclone
     GET  /api/jobs           the queue's recent records
+    GET  /api/library        the local half, read from the manifest `find` wrote
     GET  /api/health         liveness, the cookie jar, and whether R2 is configured
+    DELETE /api/library?path=  one file on this host, plus the poster it leaves
+    DELETE /api/r2?key=        one object in the bucket
+    POST /api/gc             prune both halves, oldest first; dry unless told
 
 The two write routes are the same yt-dlp fetch; they differ in where the file
 ends up. A store job's `out` is the edge URL, not a path on this host.
@@ -39,6 +43,14 @@ YT_STORE = os.environ.get("YT_STORE", "")
 R2_LIST = os.environ.get("R2_LIST", "")
 R2_PUBLIC = os.environ.get("R2_PUBLIC", "").rstrip("/")
 R2_ENABLED = bool(YT_STORE and R2_LIST and R2_PUBLIC)
+R2_DEL = os.environ.get("R2_DEL", "")
+# The manifest and the pruner are the two things the local half already had as
+# units; the API calls the same scripts rather than growing a second opinion.
+MEDIA_DIR = os.environ.get("MEDIA_DIR", "")
+INDEX = os.environ.get("INDEX", "")
+MEDIA_GC = os.environ.get("MEDIA_GC", "")
+GC_TIMEOUT = 900
+RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "14") or 14)
 COOKIE_FILE = os.environ.get("COOKIE_FILE", "")
 REQUIRE_COOKIES = os.environ.get("REQUIRE_COOKIES", "0") == "1"
 
@@ -257,6 +269,139 @@ def remote_listing(force=False):
     return payload
 
 
+def safe_rel(value):
+    """A path inside the library, or None.
+
+    A request is not a filesystem handle: `..`, an absolute path, a NUL, or a
+    dotfile the manifest never lists is refused here rather than resolved
+    against whatever the caller meant.
+    """
+    if not isinstance(value, str):
+        return None
+    value = value.strip()
+    if not value or value.startswith("/") or "\x00" in value or len(value) > 512:
+        return None
+    parts = value.split("/")
+    if any(part in ("", ".", "..") for part in parts) or parts[0].startswith("."):
+        return None
+    return value
+
+
+def library_items():
+    """The manifest `media-relay-index` writes, as rows.
+
+    Read rather than walked: the timer and `yt-get` both refresh it, so this
+    answer and the page cannot disagree about what the library holds.
+    """
+    if not MEDIA_DIR:
+        raise RequestError(503, "MEDIA_DIR is not configured")
+    manifest = os.path.join(MEDIA_DIR, ".index.json")
+    try:
+        with open(manifest, encoding="utf-8") as handle:
+            data = json.load(handle)
+    except FileNotFoundError:
+        return {"generated": None, "count": 0, "bytes": 0, "items": []}
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RequestError(500, f"the library index is unreadable: {exc}")
+    rows = [
+        {**row, "cloud": False}
+        for row in (data.get("files") or [])
+        if isinstance(row, dict) and row.get("path")
+    ]
+    return {
+        "generated": data.get("generated"),
+        "count": len(rows),
+        "bytes": sum(int(row.get("size") or 0) for row in rows),
+        "items": rows,
+    }
+
+
+def delete_local(rel):
+    """Delete one file, the poster beside it, and the folder that empties."""
+    if not MEDIA_DIR:
+        raise RequestError(503, "MEDIA_DIR is not configured")
+    clean = safe_rel(rel)
+    if clean is None:
+        raise RequestError(400, "path must name a file inside the library")
+    target = os.path.join(MEDIA_DIR, clean)
+    if not os.path.isfile(target):
+        raise RequestError(404, f"no such file: {clean}")
+    folder = os.path.dirname(target)
+    removed = [clean]
+    os.unlink(target)
+    # `poster.jpg` is metadata about the video beside it, so it goes with the
+    # video — but only when nothing else is left in that folder.
+    try:
+        if os.path.isfile(os.path.join(folder, "poster.jpg")) and not any(
+            name != "poster.jpg" for name in os.listdir(folder)
+        ):
+            os.unlink(os.path.join(folder, "poster.jpg"))
+            removed.append(os.path.relpath(os.path.join(folder, "poster.jpg"), MEDIA_DIR))
+    except OSError:
+        pass
+    try:
+        if folder != MEDIA_DIR.rstrip("/") and not os.listdir(folder):
+            os.rmdir(folder)
+    except OSError:
+        pass
+    if INDEX:
+        try:
+            subprocess.run([INDEX], capture_output=True, text=True, timeout=LIST_TIMEOUT)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    return {"deleted": removed}
+
+
+def delete_remote(key):
+    """Delete one object below the media prefix, and its poster."""
+    if not R2_DEL:
+        raise RequestError(503, "R2 deletion is not configured (services.media-relay.r2.enable)")
+    clean = safe_rel(key)
+    if clean is None:
+        raise RequestError(400, "key must be an object path below the media prefix")
+    proc = subprocess.run([R2_DEL, clean], capture_output=True, text=True, timeout=LIST_TIMEOUT)
+    if proc.returncode != 0:
+        raise RequestError(502, tail(proc.stderr) or f"rclone exited {proc.returncode}")
+    removed = [clean]
+    folder = clean.rsplit("/", 1)[0] if "/" in clean else ""
+    if folder:
+        subprocess.run(
+            [R2_DEL, f"{folder}/poster.jpg"], capture_output=True, text=True, timeout=LIST_TIMEOUT
+        )
+        removed.append(f"{folder}/poster.jpg")
+    with _remote_lock:
+        _remote_cache["payload"] = None
+        _remote_cache["until"] = 0.0
+    return {"deleted": removed}
+
+
+def clamp_days(value):
+    try:
+        number = int(str(value).strip())
+    except (TypeError, ValueError):
+        return RETENTION_DAYS
+    return max(0, min(3650, number))
+
+
+def run_gc(days, dry, scope):
+    """One pruner, called with the caller's window; it answers in JSON."""
+    if not MEDIA_GC:
+        raise RequestError(503, "garbage collection is not configured")
+    args = [MEDIA_GC, "--days", str(days), "--scope", scope]
+    if dry:
+        args.append("--dry")
+    try:
+        proc = subprocess.run(args, capture_output=True, text=True, timeout=GC_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        raise RequestError(504, f"the pruner took longer than {GC_TIMEOUT} s")
+    if proc.returncode != 0:
+        raise RequestError(502, tail(proc.stderr) or f"media-gc exited {proc.returncode}")
+    try:
+        return json.loads(proc.stdout or "{}")
+    except json.JSONDecodeError:
+        raise RequestError(502, "media-gc printed something that is not JSON")
+
+
 def search(query, limit=15):
     """Run one `yt-search`, remembering the answer for a few minutes."""
     key = (query.strip().lower(), limit)
@@ -429,6 +574,9 @@ class Handler(BaseHTTPRequestHandler):
                 "cookies": bool(COOKIE_FILE) and os.access(COOKIE_FILE, os.R_OK),
                 "require_cookies": REQUIRE_COOKIES,
                 "r2": R2_ENABLED,
+                "library": bool(MEDIA_DIR),
+                "gc": bool(MEDIA_GC),
+                "retention_days": RETENTION_DAYS,
                 "active": JOBS.active(),
             },
         )
@@ -442,6 +590,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"jobs": JOBS.snapshot()})
         if parsed.path == "/api/r2":
             return self._send(200, remote_listing(force=bool((query.get("refresh") or [""])[0])))
+        if parsed.path == "/api/library":
+            return self._send(200, library_items())
         if parsed.path == "/api/search":
             text = (query.get("q") or [""])[0].strip()
             if len(text) < 2:
@@ -452,8 +602,37 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, search(text, limit))
         return self._send(404, {"error": "no such route"})
 
+    def _gc(self):
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            return self._send(400, {"error": "bad Content-Length"})
+        data = {}
+        if length:
+            if length < 0 or length > MAX_BODY:
+                return self._send(400, {"error": f"body must be 1..{MAX_BODY} bytes"})
+            try:
+                data = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+            except (ValueError, UnicodeDecodeError):
+                return self._send(400, {"error": "the body is not JSON"})
+            if not isinstance(data, dict):
+                return self._send(400, {"error": "the body is not an object"})
+        scope = data.get("scope") if data.get("scope") in ("all", "local", "r2") else "all"
+        return self._send(200, run_gc(clamp_days(data.get("days")), bool(data.get("dry")), scope))
+
+    def _delete(self):
+        parsed = urlparse(self.path)
+        query = parse_qs(parsed.query)
+        if parsed.path == "/api/library":
+            return self._send(200, delete_local((query.get("path") or [""])[0]))
+        if parsed.path == "/api/r2":
+            return self._send(200, delete_remote((query.get("key") or [""])[0]))
+        return self._send(404, {"error": "no such route"})
+
     def _post(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/api/gc":
+            return self._gc()
         if parsed.path not in ("/api/fetch", "/api/store"):
             return self._send(404, {"error": "no such route"})
         # The route names the destination, so a page cannot ask for a store it did
@@ -501,6 +680,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             self._post()
+        except RequestError as exc:
+            self._send(exc.status, {"error": str(exc)})
+        except Exception as exc:  # noqa: BLE001
+            self._send(500, {"error": f"{type(exc).__name__}: {exc}"})
+
+    def do_DELETE(self):
+        try:
+            self._delete()
         except RequestError as exc:
             self._send(exc.status, {"error": str(exc)})
         except Exception as exc:  # noqa: BLE001

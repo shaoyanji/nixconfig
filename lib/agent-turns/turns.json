@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-18T23:27:35Z",
+  "generated": "2026-11-18T23:47:45Z",
   "count": 200,
-  "pin": "2505bff9247019445f1ad2afb682f299b04e2f49ec80eb84002c5ff8f3529e25",
+  "pin": "d7e20a29ea7b64e9db32de03496a000ab9b7fe1a2b30aca05bb03dedf4d5895e",
   "turns": [
+    {
+      "id": "57067bfc-14d8-4883-8922-f7abd58572c5",
+      "ts": "2026-11-18T23:43:35Z",
+      "source": "devji",
+      "subject": "nixconfig:rbw-vault-firecrawl-local",
+      "action": "rbw-only vault workflow doc + 2 AGENTS.nix notes landed; aac skipped (needs unpackaged binary + bw shim), firecrawl-local BLOCKED (no prebuilt anywhere, 1 build needed); aria2 gid cc9f0dc4 GGUF Q4_K_M 5.78GB status=complete sha=ok",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "502c207d2a544442aeded0ee3b954d81ecd15633",
+      "branch": "HEAD",
+      "frame": "03h9ftrtbib7wkadmjy4o80lm"
+    },
+    {
+      "id": "2248d048-df9c-4575-9220-57c9d85b4e6d",
+      "ts": "2026-11-18T23:28:16Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-19: 0 plate(s) kept of 0 spent, 18 roster row(s) waiting, 522 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
+      "branch": "main",
+      "frame": "03h9fqs50t0ex49ok06h797nr"
+    },
+    {
+      "id": "b1345a72-14ee-49c7-ab8d-d7ade7c37028",
+      "ts": "2026-11-18T23:28:15Z",
+      "source": "devji",
+      "subject": "nixconfig:media-relay-r2",
+      "action": "yt-store uploads a fetch to R2 media/, the Worker serves it with Range, the page gained → R2 and a cloud section",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "502c207d2a544442aeded0ee3b954d81ecd15633",
+      "branch": "main",
+      "frame": "03h9fqrv887vk6wbymwjihufh"
+    },
     {
       "id": "44150aaf-a4a8-428d-9c43-43df71724551",
       "ts": "2026-11-18T23:09:48Z",
@@ -2704,45 +2743,6 @@
       "base_commit": "6c377ebb950596a8e5a26c073f1f680c160b6df1",
       "branch": "main",
       "frame": "03h7ul64ms0rd28hlr469haj1"
-    },
-    {
-      "id": "cfead007-3115-4940-9f03-58d78baf1017",
-      "ts": "2026-11-11T15:21:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:wall-rotation",
-      "action": "wall rotation lists land: lib/image-daily/rotation.json (in = approved, out = rejected with reason), images:wallpaper picks newest in-rotation and skips rejections, images:rotation prints both; netbook dead-key card respelled per line",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "154d69be4f99713f0f4170f91f2168aaea483757",
-      "branch": "main",
-      "frame": "03h7uemgpb56urpacnfu6j9w6"
-    },
-    {
-      "id": "01962d04-258b-4d93-9fe8-3ccd76a6e054",
-      "ts": "2026-11-11T15:08:31Z",
-      "source": "buffy",
-      "subject": "nixconfig:netbook-deadkeys-card",
-      "action": "netbook dead-key table now one list projected twice: dwl chords and a fnott card on Mod+Shift+grave (netbook-keys --text for a shell); tty1 session restarted, fresh dwl = deployed binary, card accepted by fnott; pushed d31aaacd",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d31aaacd51caf33417a7e6bce020bca1ca858adb",
-      "branch": "main",
-      "frame": "03h7uc2neixtjjmmmvojnt5ye"
-    },
-    {
-      "id": "6a9962bc-89ef-4af0-a3f2-298fa0673d8d",
-      "ts": "2026-11-11T15:00:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:netbook-deadkeys",
-      "action": "netbook dead-key layer rebuilt: one TYPED() chord per character (Mod plain, Mod+Shift shifted, both parens and quotes now reachable), menu/notify/clipboard/sleep path removed, wallpaper swapped to a 2026-11-10 fjord scene, deployed r4hi9shw and pushed 64fc285e",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "64fc285e07ea6e3b014a04393bab791368da0bec",
-      "branch": "main",
-      "frame": "03h7uaivrp1f4830y1csg5rjh"
     }
   ]
 }

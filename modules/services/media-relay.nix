@@ -282,6 +282,84 @@
     exec rclone lsjson "r2:${cfg.r2.bucket}/${cfg.r2.prefix}" --files-only --recursive
   '';
 
+  # The one pruner, called by the timer and by `/api/gc` — docs/media-relay.md
+  mediaGc = pkgs.writeShellScript "media-gc" ''
+    set -eu
+
+    media=${lib.escapeShellArg cfg.mediaDir}
+    bucket=${lib.escapeShellArg cfg.r2.bucket}
+    prefix=${lib.escapeShellArg cfg.r2.prefix}
+    days=${toString cfg.retentionDays}
+    scope=all
+    apply=0
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+        --days) days="$2"; shift 2 ;;
+        --scope) scope="$2"; shift 2 ;;
+        --apply) apply=1; shift ;;
+        --dry) apply=0; shift ;;
+        *) echo "media-gc: unknown option: $1" >&2; exit 2 ;;
+      esac
+    done
+    case "$days" in "" | *[!0-9]*) echo "media-gc: --days must be a number" >&2; exit 2 ;; esac
+    case "$scope" in all | local | r2) ;; *) echo "media-gc: --scope must be all, local or r2" >&2; exit 2 ;; esac
+
+    export PATH="${lib.makeBinPath [pkgs.findutils pkgs.coreutils pkgs.jq pkgs.rclone pkgs.sops]}"
+
+    local_removed='[]'
+    if [ "$scope" != "r2" ] && [ -d "$media" ]; then
+      list="$(find "$media" -type f ! -name '.index.json' -mtime +"$days" -printf '%P\n' || true)"
+      local_removed="$(printf '%s\n' "$list" | jq -R -s 'split("\n") | map(select(length > 0))')"
+      if [ "$apply" = 1 ] && [ -n "$list" ]; then
+        printf '%s\n' "$list" | while IFS= read -r rel; do
+          rm -f -- "$media/$rel"
+        done
+        find "$media" -type d -empty -delete 2>/dev/null || true
+        ${indexScript} || true
+      fi
+    fi
+
+    r2_removed='[]'
+    ${lib.optionalString cfg.r2.enable ''
+      if [ "$scope" != "local" ]; then
+        MEDIA_SOPS_FILE=${lib.escapeShellArg cfg.r2.sopsFile}
+        . ${r2Env}
+        objects="$(rclone lsjson "r2:$bucket/$prefix" --files-only --recursive 2>/dev/null || echo '[]')"
+        cutoff="$(( $(date +%s) - days * 86400 ))"
+        # An unreadable ModTime keeps the object; a guessed date deletes a library: docs/media-relay.md
+        stale="$(printf '%s' "$objects" | jq -r --argjson cut "$cutoff" --argjson now "$(date +%s)" '
+          .[] | ((.ModTime // "") | sub("\.[0-9]+$"; "")) as $t
+          | (($t | fromdateiso8601?) // $now) as $epoch
+          | select($epoch < $cut) | .Path')"
+        r2_removed="$(printf '%s\n' "$stale" | jq -R -s 'split("\n") | map(select(length > 0))')"
+        if [ "$apply" = 1 ] && [ -n "$stale" ]; then
+          printf '%s\n' "$stale" | while IFS= read -r key; do
+            rclone deletefile "r2:$bucket/$prefix/$key" || true
+            case "$key" in
+              poster.jpg | */poster.jpg) ;;
+              */*) rclone deletefile "r2:$bucket/$prefix/''${key%/*}/poster.jpg" 2>/dev/null || true ;;
+            esac
+          done
+        fi
+      fi
+    ''}
+
+    jq -n --argjson local "$local_removed" --argjson r2 "$r2_removed" \
+      --argjson days "$days" --arg scope "$scope" --argjson applied "$apply" \
+      '{days: $days, scope: $scope, applied: ($applied == 1),
+        local: $local, r2: $r2,
+        local_count: ($local | length), r2_count: ($r2 | length)}'
+  '';
+
+  # One object, gone; `/api/r2`'s delete route — docs/media-relay.md
+  r2Delete = pkgs.writeShellScript "media-relay-r2-delete" ''
+    set -eu
+    export PATH="${lib.makeBinPath [pkgs.rclone pkgs.sops pkgs.jq]}"
+    MEDIA_SOPS_FILE=${lib.escapeShellArg cfg.r2.sopsFile}
+    . ${r2Env}
+    exec rclone deletefile "r2:${cfg.r2.bucket}/${cfg.r2.prefix}/$1"
+  '';
+
   # Search, for the page's search field. `--flat-playlist` is the whole trick:
   # one search request, no per-video extraction, and the entry already carries
   # the title, channel, duration and thumbnail the page draws — the same shape
@@ -427,8 +505,13 @@
     ${lib.optionalString cfg.r2.enable ''
       export YT_STORE=${ytStore}/bin/yt-store
       export R2_LIST=${r2List}
+      export R2_DEL=${r2Delete}
       export R2_PUBLIC=${cfg.r2.publicBase}
+      export MEDIA_GC=${mediaGc}
     ''}
+    export MEDIA_DIR=${lib.escapeShellArg cfg.mediaDir}
+    export INDEX=${indexScript}
+    export RETENTION_DAYS=${toString cfg.retentionDays}
     export REQUIRE_COOKIES=${
       if cfg.requireCookies
       then "1"
@@ -692,11 +775,12 @@ in {
     systemd.services.media-relay-prune = {
       description = "Delete fetched videos untouched for ${toString cfg.retentionDays} days";
       path = [pkgs.findutils];
-      serviceConfig.Type = "oneshot";
-      script = ''
-        find ${cfg.mediaDir} -type f -mtime +${toString cfg.retentionDays} -print -delete || true
-        find ${cfg.mediaDir} -type d -empty -delete || true
-      '';
+      serviceConfig = {
+        Type = "oneshot";
+        # The bucket half reads sops as the library owner: docs/sops-rekey.md
+        User = cfg.user;
+      };
+      script = "${mediaGc} --days ${toString cfg.retentionDays} --scope all --apply";
     };
 
     systemd.timers.media-relay-prune = {

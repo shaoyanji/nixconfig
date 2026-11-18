@@ -157,6 +157,36 @@ after upload, bucket-wide, so a stored video ages like a nar. There is no media
 gc yet: pruning is `rclone deletefile`, or a timer in the shape of
 `media-relay-prune` once it matters.
 
+## Garbage collection
+
+Both halves age out, and one script does it: `media-gc` walks
+`find -mtime +retentionDays` for the library and `rclone lsjson` + `deletefile`
+for the bucket, and prints what it removed as JSON. The `media-relay-prune`
+timer runs it daily with `--apply`; `POST /api/gc` runs the same script with the
+caller's window and is **dry unless `{"dry": false}`**, so a page or a terminal
+cannot prune by accident. A stored video's `poster.jpg` goes with its mp4, and a
+local deletion takes a folder it emptied.
+
+The budget is not a gc: `yt-store` refuses at `r2.budgetGiB` instead of deleting
+the oldest video to make room, because "the bucket is full" is a decision a
+person makes, not a side effect of the next fetch.
+
+## The terminal
+
+`media` (`modules/scripts/media-cli.nix`) is the same API from a shell:
+`media ls|find|search|get|store|play|rm|gc|jobs|health`. It reads the merged
+listing (`/api/library` + `/api/r2`), ranks with `fzf --filter`, and prints the
+edge URL of a stored video rather than a path on this host. Delete is
+`DELETE /api/library?path=` or `DELETE /api/r2?key=`, and both ask before acting
+from a terminal; `gc` is dry unless `--apply`.
+
+The page merged the two halves for the same reason: a video on delphi's disk and
+a video in the bucket answer the same question, so they are one list with an
+`R2` badge, one fuzzy filter and one inline player — not a section per store.
+
+The routes, the negotiation, and where a TUI (and Go) starts:
+`docs/terminal-clients.md`.
+
 ## Operations
 
 - `yt-get [--height N] [--fps N] [--dest DIR] <url>` fetches; `yt-search

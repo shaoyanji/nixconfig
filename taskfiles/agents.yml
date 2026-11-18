@@ -307,6 +307,18 @@ tasks:
     cmds:
       - bash scripts/task/issue-ledger.sh check
 
+  agents:atuin:audit:
+    desc: Audit atuin login and sync state across every active Nix-managed host
+    summary: >
+      .agents/skills/atuin/scripts/atuin-audit.sh — one bounded ssh per active
+      nixos/home host in inventory.toml (external shards own their transports, so
+      they are excluded). Prints logged-in, the sync_address, the history count and
+      the atuin-auto-login unit, and exits 1 when a reachable host has no atuin, no
+      session, or an address outside the fleet. Unreachable is SKIP, not failure.
+      Vars: HOSTS=, STRICT=1, ATUIN_TIMEOUT=.
+    cmds:
+      - bash .agents/skills/atuin/scripts/atuin-audit.sh {{.CLI_ARGS}}
+
   agents:pins:refresh:
     desc: Refresh the small pinned datasets in lib/pins.toml, and nothing large
     summary: >

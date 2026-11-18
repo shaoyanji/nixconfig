@@ -154,11 +154,12 @@ nu --env-config ~/.config/nushell/env.nu --config ~/.config/nushell/config.nu \
 - **Never rotate the account key** with clients still holding the old one: run
   `atuin store rekey` on every host first, or the old-key records become
   permanently unreadable.
-- **Remaining hosts.** Derive them, do not trust a list:
-  `nix eval --json .#inventory.hosts | jq -r 'to_entries[] | select(.value.status=="active") | .key'`.
-  Done so far: `frieren`, `poseidon`, `delphi`, `fern`, `stark`. Each remaining host needs a
-  rebuild (for the key) and one run of the script. `guckloch` is only reachable
-  from its Windows box (no tailnet, and `guckloch.frieren.lan` resolves to
-  frieren), so its run is `ssh`-less and local.
+- **Remaining hosts are a table, not a memory.** `task agents:atuin:audit` probes every
+  active nixos/home host in one pass — login, `sync_address`, item count, auto-login
+  unit — exits 1 on a reachable host with no session, and names an unreachable one
+  SKIP rather than red. It is the instrument for deleting this skill: when it reports
+  the fleet's count everywhere, the migration is done. `guckloch` is only reachable
+  from its Windows box (no tailnet, and `guckloch.frieren.lan` resolves to frieren),
+  so it reads SKIP from anywhere else and its run is `ssh`-less and local.
 - Syncing is per-account, so the count is the fleet's: a host that shows fewer
   items has not finished its own import, not a sync problem.

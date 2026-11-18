@@ -32,16 +32,37 @@ def --env _load_all_secrets [force_refresh: bool = false] {
     }
   }
 
-  # 2. Skip only if THIS loader already ran in this process. Keying the check
-  # off one variable (GEMINI_API_KEY) was wrong: a session can export some keys
-  # without the rest, and the cache was then never read, so the missing keys
-  # stayed missing no matter how often the shell restarted.
-  if (not $force_refresh) and ($env.NU_SECRETS_LOADED? == "1") {
-    return
-  }
-
   let runtime_dir = ($env.XDG_RUNTIME_DIR? | default $"/run/user/(id -u)")
   let cache_file = $"($runtime_dir)/nushell-secrets.json"
+
+  # 2. Skip only when this process has already loaded THIS cache. Two earlier
+  # versions of this check were wrong in different ways. Keying it off one
+  # variable (GEMINI_API_KEY) meant a session that exported that key alone never
+  # read the cache, so every other key stayed missing. Keying it off the marker
+  # alone is the same defect one level up: the marker is exported, so a child
+  # shell inherits it and skips a load it never did — observed on 2026-11-18 with
+  # NU_SECRETS_LOADED=1 in the parent and no keys in the child.
+  # The stamp is the cache's identity (epoch seconds + size), so an inherited
+  # marker with no stamp, or a cache regenerated since the parent loaded it,
+  # falls through and loads. Bash computes the same stamp in
+  # modules/shell/default.nix, so both shells agree on what "already loaded" means.
+  # `stat` is the same command modules/shell/default.nix runs, so both shells
+  # compute an identical stamp: GNU `-c` first, BSD `-f` where that is what
+  # `stat` is (macOS). A formatting difference here would silently defeat the
+  # comparison and make every child shell reload.
+  let stat_stamp = {|file|
+    let gnu = (^stat -c "%Y-%s" $file | complete)
+    if $gnu.exit_code == 0 {
+      $gnu.stdout | str trim
+    } else {
+      let bsd = (^stat -f "%m-%z" $file | complete)
+      if $bsd.exit_code == 0 { $bsd.stdout | str trim } else { "" }
+    }
+  }
+  let stamp = (try { do $stat_stamp $cache_file } catch { "" })
+  if (not $force_refresh) and ($env.NU_SECRETS_LOADED? == "1") and ($stamp != "") and (($env.NU_SECRETS_STAMP? | default "") == $stamp) {
+    return
+  }
 
   # 3. Candidate repo locations for apikeys.yaml
   let candidate_paths = [
@@ -69,7 +90,7 @@ def --env _load_all_secrets [force_refresh: bool = false] {
       try {
         let secrets = (open $cache_file)
         load-env $secrets
-        load-env {NU_SECRETS_LOADED: "1"}
+        load-env {NU_SECRETS_LOADED: "1", NU_SECRETS_STAMP: $stamp}
         return
       } catch {
         # Corrupt cache, fall through to regenerate
@@ -184,8 +205,12 @@ def --env _load_all_secrets [force_refresh: bool = false] {
       ^install -m 600 /dev/null $cache_file
       $collected | to json | save -f $cache_file
     } catch {}
+    # Stamp what was actually written: the file is the record of what this
+    # process loaded, and a later rewrite must invalidate the marker for the
+    # next shell rather than let it inherit a stale "already loaded".
+    let written = (try { do $stat_stamp $cache_file } catch { "" })
     load-env $collected
-    load-env {NU_SECRETS_LOADED: "1"}
+    load-env {NU_SECRETS_LOADED: "1", NU_SECRETS_STAMP: $written}
   }
 }
 

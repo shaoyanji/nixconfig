@@ -8,6 +8,13 @@
     self.modules."scripts.pb"
   ];
   home.packages = with pkgs; [
+    (pkgs.writers.writeBashBin "infron" {
+      runtimeInputs = [
+        coreutils
+        curl
+        jq
+      ];
+    } (builtins.readFile ../../scripts/infron-chat.sh))
     # The vault clients. rbw is the only client that tolerates a plain-http
     # base URL, and it execs `rbw-agent` as a *separate binary off PATH*, so an
     # absolute store path with no `bin` on PATH fails with "failed to run

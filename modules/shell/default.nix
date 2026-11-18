@@ -52,12 +52,11 @@ in {
           export PATH="/run/wrappers/bin:$PATH"
         fi
 
-        # Load in-memory secrets (shared with Nushell) unless the loader already ran here
-        if [ "''${NU_SECRETS_LOADED:-}" != "1" ]; then
-          _sec_cache="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/nushell-secrets.json"
-          if [ -f "$_sec_cache" ] && command -v jq >/dev/null 2>&1; then
-            eval "$(jq -r 'to_entries | .[] | "export " + .key + "=" + (.value | @sh)' "$_sec_cache" 2>/dev/null)" && export NU_SECRETS_LOADED=1
-          fi
+        # Load in-memory secrets (shared with Nushell) unless this exact cache is already in the env
+        _sec_cache="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/nushell-secrets.json"
+        _sec_stamp="$(stat -c '%Y-%s' "$_sec_cache" 2>/dev/null || stat -f '%m-%z' "$_sec_cache" 2>/dev/null)"
+        if [ -n "$_sec_stamp" ] && [ "''${NU_SECRETS_STAMP:-}" != "$_sec_stamp" ] && command -v jq >/dev/null 2>&1; then
+          eval "$(jq -r 'to_entries | .[] | "export " + .key + "=" + (.value | @sh)' "$_sec_cache" 2>/dev/null)" && export NU_SECRETS_LOADED=1 NU_SECRETS_STAMP="$_sec_stamp"
         fi
 
         # starship: a repo on the NAS automount answers `git status` in seconds,

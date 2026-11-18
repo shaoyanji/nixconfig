@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T16:00:14Z",
+  "generated": "2026-11-18T16:06:32Z",
   "count": 200,
-  "pin": "591fbc7a18239dd1fe77969a29a53068f555046b9d7f6a2de7b7e04d144fa0cb",
+  "pin": "ea29bf63806826b8ee4b731559450a7692c5a628130aff9644782c86613e45ec",
   "turns": [
+    {
+      "id": "386fa205-35fb-4a43-bb1e-f96dacf62745",
+      "ts": "2026-11-18T16:00:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:infron-shell-env",
+      "action": "INFRON_API_KEY now in secrets.nu's map, so nushell and bash both export it with the rest (loaders share the JSON cache): verified infron_len=51 in nu and in a bash cache load, 34 keys cached. Bash's cache guard moved off GEMINI_API_KEY onto NU_SECRETS_LOADED. docs/NUSHELL.md count updated; checks:host frieren and checks:prose rc=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "465cdcaa55196a6e95b164522336555754dc3f30",
+      "branch": "main",
+      "frame": "03h9dbabao3dkf46jvddocgj1"
+    },
     {
       "id": "c1f8ce7e-f8a2-4a9d-a93c-3b31c3192efc",
       "ts": "2026-11-18T15:51:29Z",
@@ -2743,19 +2756,6 @@
       "base_commit": "4a2f7fe8b1e79bf8d9c26948f7111ca65b821889",
       "branch": "main",
       "frame": "03h7i1ctt5v21g8w4fhxjjl52"
-    },
-    {
-      "id": "9cd272f9-2341-4971-8a19-1e8684930240",
-      "ts": "2026-11-10T01:16:56Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-ignore-deploy",
-      "action": "delphi activated pikrid2fqp; tier ignore and its CHECK are live, reversible ignore/restore round trip proved 1->0->1 queue entries",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4a2f7fe8b1e79bf8d9c26948f7111ca65b821889",
-      "branch": "main",
-      "frame": "03h7i0bw1f99abimi0uabuuzb"
     }
   ]
 }

@@ -182,6 +182,10 @@ name = "checks:hermes"
 kind = "leaf"
 
 [[check]]
+name = "checks:infron"
+kind = "leaf"
+
+[[check]]
 name = "checks:inventory:compiled"
 kind = "leaf"
 

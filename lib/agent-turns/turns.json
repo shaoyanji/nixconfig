@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-18T16:06:32Z",
+  "generated": "2026-11-18T16:11:34Z",
   "count": 200,
-  "pin": "ea29bf63806826b8ee4b731559450a7692c5a628130aff9644782c86613e45ec",
+  "pin": "9c1981598d976ce73935dfd8b73c9ebcdde4e3331c5c01aba1ccc202b56aec95",
   "turns": [
+    {
+      "id": "23fe588b-0a9e-46fa-a3ef-efbb578b5e53",
+      "ts": "2026-11-18T16:06:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:secrets-stamp-infron-helper",
+      "action": "secrets.nu and bash now skip only when NU_SECRETS_STAMP matches the cache's stat stamp, so an inherited marker reloads (verified: matching->0, stale->51, no stamp->51 in both shells). New scripts/infron-chat.sh installed as infron: deepseek-v4-flash-0731:free primary, qwen3.8-27b:free on 429/5xx/timeout/empty, non-free ids refused rc=2; stub fallback, both-fail and a live call tested; checks:host frieren rc=0, census 6540.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8a3c3b5b13bd35567675868013fe8a45ccd1cb84",
+      "branch": "main",
+      "frame": "03h9dcio10h0c7o6wx32ltth2"
+    },
     {
       "id": "386fa205-35fb-4a43-bb1e-f96dacf62745",
       "ts": "2026-11-18T16:00:23Z",
@@ -2743,19 +2756,6 @@
       "base_commit": "d7a796408be3329e0c6db75edc4d7e39ce5c00c2",
       "branch": "main",
       "frame": "03h7i1zm0rw2lbdmhzeruyocn"
-    },
-    {
-      "id": "5563e423-e8cd-459b-bafd-2a714ef096d8",
-      "ts": "2026-11-10T01:22:12Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-resolve-schedule",
-      "action": "appflow-sync now starts appflow-resolve.service after each run (no-block, User=devji, one hermes batch); first live run ignored 11 and deferred 16, queue 27->16",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4a2f7fe8b1e79bf8d9c26948f7111ca65b821889",
-      "branch": "main",
-      "frame": "03h7i1ctt5v21g8w4fhxjjl52"
     }
   ]
 }

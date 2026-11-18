@@ -33,7 +33,7 @@ mode=${1:---refresh}
 
 command -v yq >/dev/null || { printf 'pins: yq is not on PATH\n' >&2; exit 2; }
 
-rows=$(yq -p toml -o json '.pin' "$PINS" | jq -r '.[] | [.name, .path, .cmd, (.max_bytes|tostring)] | @tsv') || {
+rows=$(yq -p toml -o json '.pin' "$PINS" | jq -r '.[] | [.name, .path, .cmd, (.max_bytes|tostring), (.hash_key // "")] | @tsv') || {
   printf 'pins: could not read %s\n' "$PINS" >&2
   exit 2
 }
@@ -41,7 +41,7 @@ rows=$(yq -p toml -o json '.pin' "$PINS" | jq -r '.[] | [.name, .path, .cmd, (.m
 changed=()
 skipped=()
 
-while IFS=$'\t' read -r name path cmd max; do
+while IFS=$'\t' read -r name path cmd max hash_key; do
   [ -n "$name" ] || continue
   file="$ROOT/$path"
 
@@ -72,11 +72,32 @@ while IFS=$'\t' read -r name path cmd max; do
   if git -C "$ROOT" diff --quiet -- "$path" 2>/dev/null &&
     git -C "$ROOT" diff --cached --quiet -- "$path" 2>/dev/null; then
     printf 'FRESH  %-12s %s\n' "$name" "$path"
-    continue
+  else
+    git -C "$ROOT" add -- "$path"
+    printf 'PIN    %-12s %s (%s bytes)\n' "$name" "$path" "$size"
+    changed+=("$name")
   fi
-  git -C "$ROOT" add -- "$path"
-  printf 'PIN    %-12s %s (%s bytes)\n' "$name" "$path" "$size"
-  changed+=("$name")
+
+  # The same source is often a Nix fetch as well, and Nix pins the bytes, not
+  # the URL: a refreshed pin with a stale hash fails the build that reads it.
+  # Both files travel in one commit, so this runs whether or not the pin itself
+  # moved — FRESH only means this file matches HEAD, not that the hash does.
+  if [ -n "$hash_key" ]; then
+    # Compare the file with itself, not with HEAD: a hash repaired back to the
+    # committed value is a rewrite, and only the message would have said so.
+    before=$(sha256sum "$ROOT/modules/config/fetches.json" | cut -d' ' -f1)
+    if log=$(bash "$ROOT/scripts/task/nix-hash-update.sh" "$ROOT/modules/config/fetches.json" "$hash_key" 2>&1); then
+      after=$(sha256sum "$ROOT/modules/config/fetches.json" | cut -d' ' -f1)
+      if [ "$before" = "$after" ]; then
+        printf 'HASH   %-12s %s unchanged\n' "$name" "$hash_key"
+      else
+        git -C "$ROOT" add -- modules/config/fetches.json
+        printf 'HASH   %-12s %s rewritten\n' "$name" "$hash_key"
+      fi
+    else
+      printf 'HASH   %-12s %s could not be re-hashed: %s\n' "$name" "$hash_key" "$(tail -1 <<<"$log")" >&2
+    fi
+  fi
 done <<<"$rows"
 
 if [ "$mode" = --check ]; then

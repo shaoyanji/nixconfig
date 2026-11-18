@@ -18,3 +18,7 @@ name = "resume"
 path = "lib/matt/resume.json"
 cmd = "task matt:gist:sync"
 max_bytes = 120000
+# The same gist is also a fetchurl entry Nix reads (modules/config/fetches.json).
+# Naming it here moves both together: a pin that changes without its hash leaves
+# the build describing the previous revision, which is the drift this pin caused.
+hash_key = "matt-resume"

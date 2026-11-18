@@ -315,7 +315,9 @@ tasks:
       The refresh runs outside Nix and the result is committed, so the tree stays
       pure while the data is fresh at push time. An unavailable source is SKIPPED
       and named; an oversized one is refused instead of vendored. `--check` exits
-      1 on a stale pin, `--commit` commits. Vars: CLI_ARGS=, PINS=, PIN_TIMEOUT=.
+      1 on a stale pin, `--commit` commits. A pin's `hash_key` names the fetch in
+      modules/config/fetches.json its source feeds; that sha256 moves in the same
+      commit. Vars: CLI_ARGS=, PINS=, PIN_TIMEOUT=.
     cmds:
       - bash scripts/task/pins-refresh.sh {{.CLI_ARGS}}
 

@@ -52,7 +52,15 @@ a second (`nix eval` of the compiled index, then jq; no host eval).
 task ops:notes:near Q="backups have never been restored"      # ranked, with lineage + refs
 task ops:notes:lineage ID=restic-drill-through-unit           # ancestors, descendants, replacement
 task ops:notes:task TASK=checks:build:route                   # why this task exists
+task ops:notes CLAIM=decision EVIDENCE=asserted               # the decisions, and only their assertions
 ```
+
+Every note carries the claim kind its authored `kind` maps to
+(`.#epistemics.noteClaims`) with `asserted` evidence, because a note is one
+person's record and `DELIVERED` is a status, not a proof. `CLAIM=` and
+`EVIDENCE=` filter on that classification; the header of each note page prints
+it, and an unmapped `kind` fails `agents-notes-schema` rather than vanishing
+from the claim table.
 
 `near` takes an intent, not keywords: stopwords are dropped and id/title/
 summary/refs weigh more than a body hit, so "builds are too slow on the laptop"

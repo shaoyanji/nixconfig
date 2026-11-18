@@ -454,15 +454,26 @@ lib.genAttrs systems.work (
           map (k: "${t}.claims names claim kind '${k}' that flake/epistemics.nix does not declare")
           (builtins.filter (k: !(builtins.elem k epistemicsCtl.kindIds)) ontologyCtl.entities.${t}.claims))
         declaredEntities;
+        sinkRoute = s: ontologyCtl.sinks.${s}.route or "";
+        sinkWhy = s: ontologyCtl.sinks.${s}.why or "";
         kindIssues =
           map (k: "claim kind '${k}' is stable but has no entity home and no declared sink") ontologyCtl.unhomed
+          ++ map (k: "claim kind '${k}' is stable and only a sink holds it — give it an entity home, or a sink can substitute for one forever") ontologyCtl.sinkOnly
           ++ map (k: "sink '${k}' names no claim kind") ontologyCtl.straySinks
           ++ map (s: "sink '${s}' declares kind '${ontologyCtl.sinks.${s}.kind}', not one of none|external") (
             builtins.filter (s: !(builtins.elem ontologyCtl.sinks.${s}.kind ["none" "external"])) ontologyCtl.sinkIds
           )
           ++ map (s: "sink '${s}' has an empty where — a home nobody can find") (
             builtins.filter (s: ontologyCtl.sinks.${s}.where == "") ontologyCtl.sinkIds
+          )
+          ++ map (s: "sink '${s}' has an empty why — say why this repository cannot hold the kind") (
+            builtins.filter (s: sinkWhy s == "") ontologyCtl.sinkIds
+          )
+          ++ map (s: "sink '${s}' names route '${sinkRoute s}', which flake/epistemics.nix does not declare") (
+            builtins.filter (s: !(builtins.elem (sinkRoute s) epistemicsCtl.sourceIds)) ontologyCtl.sinkIds
           );
+        recordedCount = builtins.length (builtins.filter (e: e ? evidence) g.edges);
+        recordIssues = lib.optional (recordedCount == 0) "no edge records its own evidence — the per-edge tier is declared but nothing uses it";
         tierIssues = map (r: "relation '${r}' has tier '${ontologyCtl.relations.${r}.tier}' that is not declared") (
           builtins.filter (r: !(builtins.hasAttr ontologyCtl.relations.${r}.tier ontologyCtl.tiers)) declaredRelations
         );
@@ -482,7 +493,7 @@ lib.genAttrs systems.work (
             ++ lib.optional (x.cannot == "") "${r}.cannot is empty — say what the edge does not prove"
             ++ lib.optional (x.from == [] || x.to == []) "${r} declares no domain or range")
           declaredRelations;
-        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ kindIssues ++ tierIssues ++ sparseIssues;
+        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ kindIssues ++ recordIssues ++ tierIssues ++ sparseIssues;
         nodeCount = builtins.length g.nodes;
         edgeCount = builtins.length g.edges;
         entityCount = builtins.length declaredEntities;
@@ -492,7 +503,7 @@ lib.genAttrs systems.work (
         then builtins.throw "the graph is not an instance of its ontology (flake/ontology.nix):\n  ${lib.concatStringsSep "\n  " issues}"
         else
           pkgs.runCommand "ontology" {} ''
-            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges, every edge admitted, every field declared, every stable claim kind homed, every note classified"
+            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges (${toString recordedCount} record their own tier), every edge admitted, every field declared, every stable claim kind homed, every sink routed, every note classified"
             touch $out
           '';
 

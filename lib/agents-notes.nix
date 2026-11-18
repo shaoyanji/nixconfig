@@ -298,10 +298,12 @@
         k:
           lib.optionalString (byKind k != []) (
             "## ${capitalize k}\n\n"
-            + "| id | title | status | refs |\n| :--- | :--- | :--- | :--- |\n"
+            + "| id | title | status | claim | refs |\n| :--- | :--- | :--- | :--- | :--- |\n"
             + lib.concatMapStringsSep "\n" (
               e:
                 "| [\`${e.id}\`](${base}agents-notes/${e.id}.md) | ${e.title} | ${statusBadge e} | "
+                + lib.optionalString (e.claim != null) "\`${e.claim}\`"
+                + " | "
                 + toString (builtins.length (e.refs.hosts ++ e.refs.modules ++ e.refs.tasks ++ e.refs.docs))
                 + " |"
             )

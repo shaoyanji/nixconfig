@@ -200,7 +200,7 @@
       volatility = "stable";
       evidenceFloor = "asserted";
       what = "how I work, and why";
-      persist = "a new `## Claim` in the vault, with its status";
+      persist = "the doc that governs how we work, or a new `## Claim` in the vault with its status";
     };
     "decision" = {
       volatility = "stable";

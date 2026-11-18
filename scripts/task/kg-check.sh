@@ -68,11 +68,13 @@ check "node ids are unique" \
 check "every edge has from/to/type" \
   'all(.edges[]; has("from") and has("to") and has("type"))'
 
-# The edge property set is closed. `routes` is the one edge that carries data
-# beyond its endpoints (the playbook row's label); any other property is a field
-# no pattern reads, i.e. data that looks queryable and is not.
-check "edges carry only type/from/to/label" \
-  'all(.edges[]; ((keys - ["type", "from", "to", "label"]) | length) == 0)'
+# The edge property set is closed. `routes` carries the playbook row's label and
+# a lineage edge carries the evidence tier it recorded plus the `because` that
+# justifies departing from its relation's default; both are read by `admit` and
+# written to the graph database. Any other property is a field no pattern reads,
+# i.e. data that looks queryable and is not.
+check "edges carry only type/from/to/label/evidence/because" \
+  'all(.edges[]; ((keys - ["type", "from", "to", "label", "evidence", "because"]) | length) == 0)'
 
 check "routes edges carry a label" \
   'all(.edges[]; if .type == "routes" then ((.label // "") | length) > 0 else true end)'

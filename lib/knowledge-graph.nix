@@ -374,17 +374,16 @@
   noteEdges = lib.concatMap (id: let
     n = noteEntries.${id};
     targets = k: builtins.filter (p: builtins.elem p noteIdsForEdges) (n.${k} or []);
+    lineage = type: p: {
+      from = "note:${id}";
+      to = "note:${p}";
+      inherit type;
+      evidence = "asserted";
+      because = "a person wrote the list; the schema only proves the id resolves";
+    };
   in
-    map (p: {
-      from = "note:${id}";
-      to = "note:${p}";
-      type = "derives";
-    }) (targets "from")
-    ++ map (p: {
-      from = "note:${id}";
-      to = "note:${p}";
-      type = "supersedes";
-    }) (targets "supersedes"))
+    map (lineage "derives") (targets "from")
+    ++ map (lineage "supersedes") (targets "supersedes"))
   noteIdsForEdges;
 
   taskIds = builtins.attrNames tasks;
@@ -562,6 +561,7 @@
       policies = builtins.length policyIds;
       tasks = builtins.length taskIds;
       edges = builtins.length edges;
+      recordedEdges = builtins.length (builtins.filter (e: e ? evidence) edges);
     };
   };
 
@@ -610,7 +610,7 @@
         then "ROUTES"
         else "MENTIONS";
     in ''
-      MATCH (${a}), (${b}) MERGE (${a})-[:${rel}]->(${b});
+      MATCH (${a}), (${b}) MERGE (${a})-[r:${rel}]->(${b})${lib.optionalString (e ? evidence) " SET r.evidence = ${q e.evidence}"};
     '')
     graph.edges;
 in {

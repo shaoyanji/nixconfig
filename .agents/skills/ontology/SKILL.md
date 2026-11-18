@@ -34,14 +34,20 @@ leave the type out.
 | Which claim kinds can be filed on one? | `claims` | a kind with no home, so it is researched forever |
 
 `claims` names ids from `.#epistemics.kindIds`, and a stable kind with no entity
-home must name a `sinks` entry instead (the vault, an `AGENTS.nix` note). A
+home must name a `sinks` entry instead (the vault, an `AGENTS.nix` note). A sink
+is a witness, not a home: it names the `route` that can consult the corpus and
+the `why` this repository cannot hold it, and `.#ontology.sinkOnly` is empty by
+construction — a stable kind whose only landing place is a sink fails the gate. A
 moving kind (`current-release`) has no durable home by design: the answer carries
 its date.
 
 ## 2. The relation contract
 
-Every relation declares domain, range, and **what its evidence
-is**. The evidence tier is the part that keeps an answer honest:
+Every relation declares domain, range, and **what its evidence is**. The tier is
+a default the extractor inherits; an individual edge may record its own in
+`evidence`, and when it differs from the default it must say why in `because`.
+Without that rule a relation is forced to claim one strength for edges that do
+not share it:
 
 | Tier | Means | Example here |
 | :--- | :--- | :--- |
@@ -62,9 +68,14 @@ on it, and an import can sit on a branch no host enables. Treat a tier-2 edge as
 "look here", never as "this is why".
 
 The design record is a type too. `note` is an `AGENTS.nix` entry, and `derives`
-and `supersedes` link note to note. Both are `resolved` because the note schema
-gates the target, and `supersedes` must land on a note marked `SUPERSEDED`. The
-arrow records what the author said; it does not prove the later note is right.
+and `supersedes` link note to note. Both default to `resolved` because the note
+schema gates the target, and `supersedes` must land on a note marked
+`SUPERSEDED`. Every lineage edge the graph emits then records `asserted` over
+that default: the author wrote the list, and the id lookup only proves it
+resolves. That is the mixed case the recording exists for — `resolved` is the
+right strength for existence and the wrong one for intent, and one relation
+cannot say both. The arrow records what the author said; it does not prove the
+later note is right.
 
 Every relation also carries `cannot`: the inference a reader must not make from
 it. If you cannot write that sentence, the relation is not yet understood.
@@ -74,7 +85,7 @@ it. If you cannot write that sentence, the relation is not yet understood.
 ```bash
 nix eval --json .#ontology.entities | toon -e     # declared types, identity, fields, claims
 nix eval --json .#ontology.relations | toon -e    # domain, range, evidence, tier
-nix eval --json .#ontology.all | toon -e          # three sample edges; the third is refused
+nix eval --json .#ontology.all | toon -e          # four sample edges; the third is refused, the fourth records a tier
 nix eval --json .#ontology.unhomed | toon -e      # stable kinds with nowhere to land
 nix eval --json .#epistemics.evidence | toon -e   # the ladder every edge tier projects
 ```
@@ -85,7 +96,9 @@ nix eval --json .#epistemics.evidence | toon -e   # the ladder every edge tier p
    field costs one line in `fields`; a type costs identity, membership,
    relations, a canvas colour and every query that enumerates types.
 3. **Ask `admit` for the edge you intend to emit.** If the pair is refused, the
-   domain or range is wrong, not the data.
+   domain or range is wrong, not the data. `admit` also returns `defaultTier`,
+   `recorded`, `producedBy`, `canSettle` and `promote`, so the caller sees the
+   strength it is about to claim before the edge exists.
 4. **Emit the edge only with evidence a reader can re-run**: a frontmatter list,
    a link, a citation, an import path. A name in a sentence is the weakest of the
    four, so it is the last tier.
@@ -105,8 +118,13 @@ task check:leaf NAME=checks:ontology
   about the shape of the repo);
 - a node carries a field its entity type does not declare, or a relation's
   endpoint is outside its domain and range;
+- an edge records an evidence tier the ladder does not declare, or records one
+  that differs from the relation's default without a `because`;
+- no edge records its own tier, so the per-edge mechanism has rotted into a
+  declaration nobody uses;
 - an entity or relation has empty `identity`, `member`, `evidence` or `cannot`;
-- a stable claim kind has no home, or a `sinks` key names no kind;
+- a stable claim kind has no home, or only a sink holds it, or a `sinks` key
+  names no kind, no `why`, or a `route` epistemics does not declare;
 - a note carries no claim kind, an undeclared one, or one an assertion cannot
   support (a note kind mapped above the `asserted` tier fails here).
 

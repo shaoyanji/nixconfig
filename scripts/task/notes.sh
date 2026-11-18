@@ -6,7 +6,7 @@
 # script is the human surface over `.?submodules=1#agentsNotes.json`; the machine surface is
 # `nix eval .?submodules=1#agentsNotes.index` or `nix eval --json .?submodules=1#agentsNotes.json`.
 #
-# Usage: notes.sh list [STATUS] [KIND] | show ID | near Q [LIMIT]
+# Usage: notes.sh list [STATUS] [KIND] [CLAIM] [EVIDENCE] | show ID | near Q [LIMIT]
 #        | lineage ID | host HOST | module PATH | task TASK | doc DOC | search Q
 # Env: FORMAT=json emits the selected notes as JSON instead of a table.
 #
@@ -55,16 +55,16 @@ print_ids() {
     jq --argjson ids "$list" '.notes | with_entries(select(.key as $k | $ids | index($k)))' <<<"$data"
     return 0
   fi
-  printf '%-28s %-11s %-10s %s\n' "ID" "STATUS" "KIND" "TITLE"
+  printf '%-28s %-11s %-10s %-19s %s\n' "ID" "STATUS" "KIND" "CLAIM" "TITLE"
   jq -r --argjson ids "$list" '
     .notes
     | with_entries(select(.key as $k | $ids | index($k)))
     | to_entries
     | sort_by(.value.status, .value.id)
     | .[]
-    | [.key, .value.status, .value.kind, .value.title] | @tsv
-  ' <<<"$data" | while IFS=$'\t' read -r id status kind title; do
-    printf '%-28s %-11s %-10s %s\n' "$id" "$status" "$kind" "$title"
+    | [.key, .value.status, .value.kind, (.value.claim // "-"), .value.title] | @tsv
+  ' <<<"$data" | while IFS=$'\t' read -r id status kind claim title; do
+    printf '%-28s %-11s %-10s %-19s %s\n' "$id" "$status" "$kind" "$claim" "$title"
   done
 }
 
@@ -72,10 +72,14 @@ case "$MODE" in
   list)
     status="${1:-}"
     kind="${2:-}"
-    list="$(jq -c --arg s "$status" --arg k "$kind" '
+    claim="${3:-}"
+    evidence="${4:-}"
+    list="$(jq -c --arg s "$status" --arg k "$kind" --arg c "$claim" --arg e "$evidence" '
       [.notes | to_entries[]
        | select($s == "" or .value.status == $s)
        | select($k == "" or .value.kind == $k)
+       | select($c == "" or .value.claim == $c)
+       | select($e == "" or .value.evidence == $e)
        | .key]
     ' <<<"$data")"
     print_ids "$list"
@@ -99,7 +103,7 @@ case "$MODE" in
       .notes[$id]
       | "\(.title)",
         "",
-        "\(.status)\(if .priority then " · \(.priority)" else "" end) · \(.kind)\(if .date then " · \(.date)" else "" end)",
+        "\(.status)\(if .priority then " · \(.priority)" else "" end) · \(.kind)\(if .claim then " · claim \(.claim)/\(.evidence)" else "" end)\(if .date then " · \(.date)" else "" end)",
         "",
         .summary,
         (if (.refs.hosts + .refs.modules + .refs.tasks + .refs.docs) | length > 0

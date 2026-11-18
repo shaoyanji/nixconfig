@@ -11,7 +11,7 @@
       identity = "the repo-relative path; two pages are the same page only at the same path";
       member = "lib/knowledge-graph.nix docFiles";
       fields = ["label" "path" "cites"];
-      claims = ["config-syntax" "decision" "definition" "fleet-fact" "historical-fact" "procedure" "software-behaviour"];
+      claims = ["config-syntax" "decision" "definition" "fleet-fact" "historical-fact" "personal-method" "procedure" "software-behaviour"];
     };
     idea = {
       what = "an unfinished draft in ideas/, carrying frontmatter and nothing a reader routes by";
@@ -150,18 +150,26 @@
     "current-release" = {
       kind = "none";
       where = "nothing durable: a moving answer carries its date, not a corpus entry";
+      why = "the answer is true for a day, so filing it would make a stale page authoritative";
+      route = "web";
     };
     "personal-method" = {
       kind = "external";
       where = "every `## Claim` in ~/vaults/personal";
+      why = "a method is a person's, and the vault that holds it is outside this repository";
+      route = "vault-claims";
     };
     "project-fact" = {
       kind = "external";
       where = "every `## Claim` in ~/vaults/personal";
+      why = "a fact about a project outside this tree has no node in this graph";
+      route = "vault-claims";
     };
     "model-label" = {
       kind = "external";
       where = "the turn log (xs), with the label and its margin — never a fact";
+      why = "a label is one model's opinion about one request, kept with its margin in the log";
+      route = "jev-decide";
     };
   };
 
@@ -182,26 +190,34 @@
     rel = relations.${edge.type} or null;
     src = idType (edge.from or "");
     dst = idType (edge.to or "");
+    recorded = edge.evidence or null;
+    defaultTier =
+      if rel == null
+      then null
+      else rel.tier;
+    tier =
+      if recorded == null
+      then defaultTier
+      else recorded;
+    known = tier != null && builtins.hasAttr tier epistemics.evidence;
     verdict = ok: why: {
       inherit (edge) from to type;
-      tier =
-        if rel == null
-        then null
-        else rel.tier;
+      inherit tier defaultTier recorded;
       producedBy =
-        if rel == null
-        then null
-        else epistemics.evidence.${rel.tier}.producedBy;
+        if known
+        then epistemics.evidence.${tier}.producedBy
+        else null;
       canSettle =
-        if rel == null
-        then []
-        else epistemics.canCarry rel.tier;
+        if known
+        then epistemics.canCarry tier
+        else [];
       promote =
-        if rel == null
-        then null
-        else epistemics.evidence.${rel.tier}.promote;
+        if known
+        then epistemics.evidence.${tier}.promote
+        else null;
       inherit ok why;
     };
+    suffix = lib.optionalString (recorded != null) " (recorded, over ${toString defaultTier})";
   in
     if rel == null
     then verdict false "no relation '${toString (edge.type or "")}' is declared"
@@ -209,7 +225,16 @@
     then verdict false "${toString src} is not a declared source of ${edge.type}"
     else if dst == null || !(builtins.elem dst rel.to)
     then verdict false "${toString dst} is not a declared target of ${edge.type}"
-    else verdict true "${src} --${rel.tier}--> ${dst}";
+    else if !known
+    then
+      verdict false (
+        if recorded == null
+        then "relation '${edge.type}' declares no tier"
+        else "the edge records evidence '${recorded}', which flake/epistemics.nix does not declare"
+      )
+    else if recorded != null && recorded != defaultTier && (edge.because or "") == ""
+    then verdict false "the edge records '${recorded}' where ${edge.type} defaults to '${defaultTier}' — add `because`, or the recording is an opinion"
+    else verdict true "${src} --${tier}--> ${dst}${suffix}";
 
   homes =
     lib.foldl' (
@@ -220,6 +245,7 @@
 
   stableKinds = builtins.filter (k: epistemics.kinds.${k}.volatility == "stable") epistemics.kindIds;
   unhomed = builtins.filter (k: !(builtins.hasAttr k homes) && !(builtins.hasAttr k sinks)) stableKinds;
+  sinkOnly = builtins.filter (k: !(builtins.hasAttr k homes)) (builtins.filter (k: builtins.hasAttr k sinks) stableKinds);
   sinkIds = builtins.attrNames sinks;
   straySinks = builtins.filter (k: !(builtins.elem k epistemics.kindIds)) sinkIds;
 
@@ -244,9 +270,16 @@
       from = "doc:AGENTS.md";
       to = "module:flake/nix-registry.nix";
     }
+    {
+      type = "derives";
+      from = "note:epistemics-declared";
+      to = "note:agent-prose-budget";
+      evidence = "asserted";
+      because = "a person wrote the lineage; the id lookup only proves it resolves";
+    }
   ];
 in {
-  inherit entities relations tiers tierNotes sinks sinkIds entityIds relationIds homes stableKinds unhomed straySinks samples idType admit touches weak;
+  inherit entities relations tiers tierNotes sinks sinkIds entityIds relationIds homes stableKinds unhomed sinkOnly straySinks samples idType admit touches weak;
   inherit (epistemics) evidence;
   all = map admit samples;
   count = {

@@ -770,17 +770,16 @@ tasks:
             "nix eval --json .#agentSkills.count"
 
   ops:notes:
-    desc: List AGENTS.nix notes or find the ones near an intent
+    desc: List AGENTS.nix notes or find the ones near an intent (STATUS=, KIND=, CLAIM=, EVIDENCE=)
     summary: >
       The human surface over `.?submodules=1#agentsNotes.json` (lib/agents-notes.nix). No args
-      lists every note; STATUS= and KIND= filter; FORMAT=json emits records. A note
-      with refs is distilled, a leaf carries the original intent in prose. Starting
-      something not in the repo yet? `ops:notes:near Q=<intent>` ranks notes against
-      it with each one's lineage — the entry point before any file is written.
-      Author or promote with the `agents-notes` skill: a note graduates by gaining
+      lists every note; STATUS=, KIND=, CLAIM= and EVIDENCE= filter; FORMAT=json emits records.
+      A note with refs is distilled, a leaf carries its intent in prose. Starting something
+      not in the repo yet? `ops:notes:near Q=<intent>` ranks notes against it with each one's
+      lineage. Author or promote with the `agents-notes` skill: a note graduates by gaining
       `refs.modules` and its gate task, never by becoming a markdown file.
     cmds:
-      - bash scripts/task/notes.sh list "{{.STATUS | default ""}}" "{{.KIND | default ""}}"
+      - bash scripts/task/notes.sh list "{{.STATUS | default ""}}" "{{.KIND | default ""}}" "{{.CLAIM | default ""}}" "{{.EVIDENCE | default ""}}"
 
   ops:notes:show:
     desc: Print one AGENTS.nix note (ID= required)

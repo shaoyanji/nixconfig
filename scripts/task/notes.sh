@@ -290,21 +290,22 @@ case "$MODE" in
     ' <<<"$data"
     ;;
   claims)
+    open='["PROPOSED","ACCEPTED","IN FLIGHT","BLOCKED","OPEN"]'
     if [ "${FORMAT:-}" = "json" ]; then
-      jq '{total: .counts.total, byClaim: .counts.byClaim, evidence: ([.notes[] | .evidence] | group_by(.) | map({tier: .[0], notes: length}))}' <<<"$data"
+      jq --argjson open "$open" '{total: .counts.total, open: .counts.open, byClaim: .counts.byClaim, openByClaim: ([.notes[] | select(.status as $s | $open | index($s) != null)] | group_by(.claim) | map({key: (.[0].claim // "-"), value: length}) | from_entries), status: .counts.byStatus, evidence: ([.notes[] | .evidence] | group_by(.) | map({tier: .[0], notes: length}))}' <<<"$data"
       exit 0
     fi
-    printf '%-19s %6s  %s\n' "CLAIM" "NOTES" "EVIDENCE"
-    jq -r '
-      [.notes[] | {claim: (.claim // "-"), evidence: .evidence}]
+    printf '%-19s %6s %6s  %s\n' "CLAIM" "NOTES" "OPEN" "EVIDENCE"
+    jq -r --argjson open "$open" '
+      [.notes[] | {claim: (.claim // "-"), evidence: .evidence, live: (.status as $s | $open | index($s) != null)}]
       | group_by(.claim)
-      | map({claim: .[0].claim, notes: length, evidence: ([.[].evidence] | unique | join(","))})
+      | map({claim: .[0].claim, notes: length, open: ([.[] | select(.live)] | length), evidence: ([.[].evidence] | unique | join(","))})
       | sort_by(-.notes)
-      | .[] | [.claim, .notes, .evidence] | @tsv
-    ' <<<"$data" | while IFS=$'\t' read -r claim n ev; do
-      printf '%-19s %6s  %s\n' "$claim" "$n" "$ev"
+      | .[] | [.claim, .notes, .open, .evidence] | @tsv
+    ' <<<"$data" | while IFS=$'\t' read -r claim n o ev; do
+      printf '%-19s %6s %6s  %s\n' "$claim" "$n" "$o" "$ev"
     done
-    jq -r '"", "\(.counts.total) notes, each classified by flake/epistemics.nix noteClaims"' <<<"$data"
+    jq -r '"", "\(.counts.total) notes (\(.counts.open) open), each classified by flake/epistemics.nix noteClaims"' <<<"$data"
     ;;
   host)
     host="${1:-}"

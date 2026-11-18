@@ -116,7 +116,7 @@
       what = "a playbook row names the task that carries it out";
       from = ["doc" "skill"];
       to = ["task"];
-      evidence = "a backticked command in a labelled references/playbooks.md row, whose first word names a declared task; the edge carries the row's label, and a row that names a family member reaches a wildcard task, so that edge records `extracted` with its `because`";
+      evidence = "a backticked command in a labelled references/playbooks.md row, whose first word names a declared task; the edge carries the row's label, and a row that writes a placeholder (`task infra:deploy:host:<h>`) names the wildcard task that serves it";
       tier = "resolved";
       cannot = "that the task still does what the row claims, or that the row's gate is the one that runs";
     };

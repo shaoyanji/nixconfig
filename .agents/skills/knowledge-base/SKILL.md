@@ -162,7 +162,7 @@ saying `nix-eval-jobs` does not reach `nix-eval`. For a fleet-visible roster,
 `from` is only ever a doc (`doc:<path>`) or a skill (`skill:<name>`); hosts and
 tags are only `to` ends, so filtering on `from=="frieren"` matches nothing.
 
-Every doc and skill node also carries **`cites`**: the `[[flake/policies.nix#id]]`
+Every doc and skill node also carries **`cites`**: the `[[flake/policies.nix#<id>]]`
 rule ids its body names. That is the reverse of a link — "which pages still
 restate this rule" — and it is why a page can cite a rule instead of explaining
 it. Read it with jq; there is no pattern for it because the answer is a property,

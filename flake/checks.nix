@@ -474,6 +474,7 @@ lib.genAttrs systems.work (
           );
         recordedCount = builtins.length (builtins.filter (e: e ? evidence) g.edges);
         recordIssues = lib.optional (recordedCount == 0) "no edge records its own evidence — the per-edge tier is declared but nothing uses it";
+        citationIssues = map (c: "citation ${c} names a policy id flake/policies.nix does not declare — the graph drops the edge, so name the rule or drop the citation") knowledgeGraphCtl.unresolvedCitations;
         tierIssues = map (r: "relation '${r}' has tier '${ontologyCtl.relations.${r}.tier}' that is not declared") (
           builtins.filter (r: !(builtins.hasAttr ontologyCtl.relations.${r}.tier ontologyCtl.tiers)) declaredRelations
         );
@@ -493,7 +494,7 @@ lib.genAttrs systems.work (
             ++ lib.optional (x.cannot == "") "${r}.cannot is empty — say what the edge does not prove"
             ++ lib.optional (x.from == [] || x.to == []) "${r} declares no domain or range")
           declaredRelations;
-        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ kindIssues ++ recordIssues ++ tierIssues ++ sparseIssues;
+        issues = nodeTypeIssues ++ edgeTypeIssues ++ fieldIssues ++ edgeIssues ++ noteClaimIssues ++ claimIssues ++ kindIssues ++ recordIssues ++ citationIssues ++ tierIssues ++ sparseIssues;
         nodeCount = builtins.length g.nodes;
         edgeCount = builtins.length g.edges;
         entityCount = builtins.length declaredEntities;
@@ -503,7 +504,7 @@ lib.genAttrs systems.work (
         then builtins.throw "the graph is not an instance of its ontology (flake/ontology.nix):\n  ${lib.concatStringsSep "\n  " issues}"
         else
           pkgs.runCommand "ontology" {} ''
-            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges (${toString recordedCount} record their own tier), every edge admitted, every field declared, every stable claim kind homed, every sink routed, every note classified"
+            echo "ontology: ${toString entityCount} entities x ${toString relationCount} relations, ${toString nodeCount} nodes / ${toString edgeCount} edges (${toString recordedCount} record their own tier), every edge admitted, every citation resolves, every field declared, every stable claim kind homed, every sink routed, every note classified"
             touch $out
           '';
 

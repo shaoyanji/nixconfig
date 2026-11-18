@@ -29,6 +29,8 @@
     cp ${./turns-dashboard/web/index.html} $out/index.html
     cp ${./turns-dashboard/web/style.css} $out/style.css
     cp ${./turns-dashboard/web/app.js} $out/app.js
+    cp ${./turns-dashboard/web/graph.html} $out/graph.html
+    cp ${./turns-dashboard/web/graph.js} $out/graph.js
   '';
 
   home = config.users.users.${cfg.user}.home;

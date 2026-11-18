@@ -5792,6 +5792,43 @@
         transcript out. Nothing about it changes merge authority.
       '';
     };
+    turns-fusion-plane = {
+      title = "Postgres, the turn ledger and AGENTS.nix fuse as a projection, each answering what it is compiled for";
+      kind = "proposal";
+      status = "PROPOSED";
+      priority = "P3";
+      date = "2026-11-18";
+      summary = "Frieren's postgres gains a turn and note projection built from the turn dump it already receives, keyed by repo path, so SQL joins what the ledger, the app databases and AGENTS.nix each answer best; dissemination follows .#epistemics.table and nothing writes back upstream.";
+      refs = {
+        hosts = ["delphi" "frieren"];
+        modules = ["modules/services/agent-turns.nix" "modules/services/turns-dashboard/web/graph.html" "modules/services/email-archive.nix"];
+        docs = ["docs/agent-turns.md"];
+        tasks = ["infra:xs:export"];
+      };
+      body = ''
+        **Three stores, three jobs.** Postgres on frieren holds rows that are
+        *updated* — the mail archive, the vector tables, the app databases — so it
+        is the only one that aggregates, joins and retains. The xs ledger on delphi
+        holds events that are never updated, so it answers "who touched this, and
+        what is open now". `AGENTS.nix` holds authored claims with validated refs,
+        so it answers "why is this the way it is, and what is the exit".
+
+        **Fusion is a projection, not a fourth store.** Frieren already receives
+        the 03:05 `frames.jsonl` dump, so a timer loads it into `turn` and
+        `turn_claim` and loads `.#agentsNotes.index` into `note`. The join key is
+        the repo path in `claims[]` against `refs.modules`, not a title — the same
+        edge `.#knowledgeGraph` draws, now queryable at scale.
+
+        **Dissemination follows the epistemics table.** `.#epistemics.table` names
+        which source settles which claim, so the loader copies and never merges: a
+        turn is not rewritten into a note, a note is not a transcript, and nothing
+        writes back upstream.
+
+        **Exit.** A `checks:fusion` gate that counts the three sides — frames, rows,
+        notes — and fails when the projection is behind, plus one routing line per
+        claim kind naming the store that answers it.
+      '';
+    };
     agent-turns-backup-cadence = {
       title = "agent.turns backup — the export hook exists, the cadence is Joiu's call";
       kind = "open";

@@ -144,6 +144,9 @@ func main() {
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "ok\n")
 	})
+	// The graph page reads the same snapshot as JSON: layout belongs in the
+	// browser, where a zoom is a repaint rather than a request.
+	mux.HandleFunc("GET /api/turns.json", s.turnsJSON)
 	// A reader keeps this page open for hours, so a stale app.js is a stale
 	// reader: a deploy would be invisible to it. The site is four small files on
 	// loopback — revalidate them, never serve them from heuristic freshness.
@@ -298,6 +301,24 @@ func (s *server) view(t turn) rowView {
 		v.Files = v.Files[:5]
 	}
 	return v
+}
+
+// turnsJSON is the cached log as JSON, newest first, for the graph page. It
+// costs no shim read — it is the snapshot the poller already holds — and a
+// frame on the stream is what tells the page to ask again.
+func (s *server) turnsJSON(w http.ResponseWriter, _ *http.Request) {
+	s.mu.Lock()
+	events := make([]turn, 0, len(s.rows))
+	for _, v := range s.rows {
+		events = append(events, v.turn)
+	}
+	s.mu.Unlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-store")
+	if err := json.NewEncoder(w).Encode(envelope{Count: len(events), Events: events}); err != nil {
+		log.Printf("turns-dashboard: turns.json: %v", err)
+	}
 }
 
 func outcomeClass(outcome string) string {

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>turn graph · delphi</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* The graph owns the viewport: one canvas, drawn from the same cached log the
+     reader shows, so the two views cannot disagree about what a turn is. */
+  #graph { position: fixed; inset: 0; display: block; width: 100%; height: 100%; cursor: crosshair; }
+  #tip {
+    position: fixed; z-index: 6; max-width: 32rem; padding: 0.7rem 0.85rem;
+    border: 1px solid var(--line-hi); background: rgba(3, 8, 10, 0.94);
+    font-size: 0.72rem; line-height: 1.5; color: var(--ink); pointer-events: none;
+  }
+  #tip[hidden] { display: none; }
+  #tip .t-sub { color: var(--emerald); }
+  #tip .t-meta { color: var(--dim); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.62rem; }
+  .legend { display: flex; align-items: baseline; gap: 0.9rem; margin-left: auto; }
+  .legend i { display: inline-block; width: 0.55rem; height: 0.55rem; margin-right: 0.4em; border-radius: 50%; }
+  .legend .done { background: var(--emerald); }
+  .legend .wait { background: var(--teal); }
+  .legend .bad { background: var(--bad); }
+  .legend .edge { background: none; border-top: 1px solid var(--line-hi); border-radius: 0; width: 1.1rem; }
+</style>
+</head>
+<body>
+<div class="grid" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<header class="topline">
+<span class="mark" aria-hidden="true">◤◢</span>
+<h1>turn <em>graph</em></h1>
+<a class="totop" href="index.html" title="back to the reading log">▤ log</a>
+<span class="hint"><kbd>wheel</kbd> zoom time · <kbd>drag</kbd> pan · <kbd>click</kbd> open a turn · <kbd>esc</kbd> reset</span>
+<span class="legend">
+  <span><i class="done"></i>done</span>
+  <span><i class="wait"></i>open</span>
+  <span><i class="bad"></i>failed</span>
+  <span><i class="edge"></i>same subject</span>
+  <span><i class="edge"></i>shared claim</span>
+</span>
+<span id="stat" class="pulse">loading</span>
+</header>
+<canvas id="graph" aria-label="agent turns over time, one lane per agent, edges between turns on the same subject or claim"></canvas>
+<div id="tip" role="tooltip" hidden></div>
+<script type="module" src="graph.js"></script>
+</body>
+</html>

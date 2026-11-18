@@ -101,6 +101,22 @@ A person without a shell reads the same log over Gemini:
 word search and the open claims ([`gemini-turns.md`](gemini-turns.md)). It is a
 reader over this shim, so it adds no second store.
 
+## Graph view
+
+`graph.html` is the same log as a picture instead of a list, beside the reader at
+`https://delphi.bountystash.com/turns/graph.html` and on the tailnet mount: time
+runs left to right because the ledger is append-only, each agent gets a lane, and
+an edge joins two turns that share a `subject` (solid) or a `claim` (faint). The
+claim edge is the one worth looking for — it is where two agents touch the same
+files without naming each other. Wheel zooms the time axis, drag pans, a click
+opens that turn in the log, `esc` resets.
+
+The page reads `GET /api/turns.json`: the dashboard's own cached snapshot, not a
+second shim read, so an open graph costs no extra request against the store and a
+frame on the stream is what makes it refetch. Layout lives in the browser, where
+a zoom is a repaint. Code: `modules/services/turns-dashboard/web/graph.js`, route
+in `modules/services/turns-dashboard/main.go`.
+
 The read side (`agents:xs:list`) adds the one rule the shim cannot know: an
 `in_progress` whose newest entry is older than `STALE_DAYS` (7) is **stale** —
 printed, and not a failed check, because an agent that died mid-turn must not red

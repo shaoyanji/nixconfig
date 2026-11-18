@@ -13,6 +13,7 @@
 # Usage
 #   turns-fuse.sh --sql      DDL and inserts, for `psql -f`
 #   turns-fuse.sh --check    what a load would carry, as counts
+#   turns-fuse.sh --queries  the read-only joins an agent asks the projection
 #
 # Env
 #   TURNS=   snapshot path (default lib/agent-turns/turns.json)
@@ -39,10 +40,13 @@ SQL='def sql: if . == null or . == "" then "\u0027\u0027"
 
 NOTE_SQL='def sql: if . == null or . == "" then "\u0027\u0027"
        else "\u0027" + (tostring | gsub("\u0027"; "\u0027\u0027")) + "\u0027" end;
+  def sqlarr: if . == null or length == 0 then "\u0027{}\u0027::text[]"
+       else "array[" + (map(sql) | join(", ")) + "]" end;
   to_entries[]
-  | "insert into note (id, kind, status, claim, title, date) values (\(.key | sql), "
+  | "insert into note (id, kind, status, claim, title, date, modules) values (\(.key | sql), "
     + ([.value.kind, .value.status, .value.claim, .value.title, .value.date] | map(sql) | join(", "))
-    + ") on conflict (id) do nothing;"'
+    + ", " + (.value.refs.modules | sqlarr)
+    + ") on conflict (id) do update set modules = excluded.modules;"'
 
 case ${1:---check} in
 --sql)
@@ -76,6 +80,7 @@ create table if not exists note (
   date date
 );
 create index if not exists turn_claim_area on turn_claim (area);
+alter table note add column if not exists modules text[];
 DDL
   jq -r "$SQL" "$TURNS"
   if [ -n "$NOTES" ] && [ -f "$NOTES" ]; then jq -r "$NOTE_SQL" "$NOTES"; fi
@@ -93,8 +98,41 @@ DDL
     printf 'notes      not loaded (NOTES= absent)\n'
   fi
   ;;
+--queries)
+  cat <<'SQL'
+\echo '== subjects: turns, claims, files, last seen =='
+select coalesce(t.subject, '(none)') as subject,
+       count(distinct t.id) as turns,
+       count(distinct c.area) as claims,
+       count(distinct f.path) as files,
+       max(t.ts)::date as last
+from turn t
+left join turn_claim c on c.turn_id = t.id
+left join turn_file  f on f.turn_id = t.id
+group by 1 order by turns desc, last desc;
+
+\echo '== files: turns that touched each, and their subjects =='
+select f.path, count(distinct f.turn_id) as turns,
+       (array_agg(distinct t.subject))[1:3] as subjects
+from turn_file f join turn t on t.id = f.turn_id
+group by 1 order by turns desc, path;
+
+\echo '== claims: areas by turns and outcome =='
+select c.area, count(distinct c.turn_id) as turns,
+       string_agg(distinct t.outcome, ', ') as outcomes
+from turn_claim c join turn t on t.id = c.turn_id
+group by 1 order by turns desc, area;
+
+\echo '== the documented join: a note path against what turns touched =='
+select n.kind, n.status, count(distinct n.id) as notes,
+       count(distinct f.turn_id) as turns
+from note n
+left join turn_file f on f.path = any(n.modules)
+group by 1, 2 order by notes desc;
+SQL
+  ;;
 *)
-  printf 'usage: turns-fuse.sh --sql|--check\n' >&2
+  printf 'usage: turns-fuse.sh --sql|--check|--queries\n' >&2
   exit 2
   ;;
 esac

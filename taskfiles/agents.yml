@@ -343,7 +343,8 @@ tasks:
       `nix eval --json .#agentsNotes.index` file. Idempotent by construction, so
       a re-run cannot rewrite a turn, and the join key between a turn and a note
       is the repo path (claim against `refs.modules`), not a title. `--check`
-      prints what a load would carry. CLI_ARGS=--sql (default) or --check.
+      prints what a load would carry, `--queries` the read-only joins. CLI_ARGS=--sql
+      (default), --check or --queries.
     cmds:
       - bash scripts/task/turns-fuse.sh {{.CLI_ARGS}}
 

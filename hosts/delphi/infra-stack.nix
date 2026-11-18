@@ -12,9 +12,11 @@
     run_agent_cascade() {
       local prompt="$1"
 
-      echo "=== [$(date)] Agent Cascade: Attempting Tier 1 (agy-gemini / Hydrogen) ==="
-      if ${self.packages.${pkgs.stdenv.hostPlatform.system}.cli.ai.agy-gemini}/bin/agy-gemini --output-format json --dangerously-skip-permissions -p "$prompt"; then
-        echo "=== [$(date)] Agent Cascade: Tier 1 (agy-gemini) succeeded. ==="
+      # The OAuth account route, not agy-gemini: an agentic sweep outruns the
+      # key's daily quota, and this cascade loads no key.
+      echo "=== [$(date)] Agent Cascade: Attempting Tier 1 (agy / gemini-3.8-flash) ==="
+      if ${pkgs.antigravity-cli}/bin/agy --model "''${GEMINI_MODEL:-gemini-3.8-flash}" --output-format json --dangerously-skip-permissions -p "$prompt"; then
+        echo "=== [$(date)] Agent Cascade: Tier 1 (agy) succeeded. ==="
         return 0
       fi
       echo "=== [$(date)] WARN: agy failed (credit exhaustion, quota, or execution error). Attempting fallback... ===" >&2

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-18T10:11:16Z",
+  "generated": "2026-11-18T10:36:36Z",
   "count": 200,
-  "pin": "ba3f1513189f4948821e5e1dd27fe72a4538612bba82cd1a1ce56c63840a0718",
+  "pin": "ae7e69c04e5ceb09fbffdca15f212ea80783be2ef29a6e9a8888290114be7771",
   "turns": [
+    {
+      "id": "d48d7949-1247-4a9b-92cd-559094c299f3",
+      "ts": "2026-11-18T10:27:18Z",
+      "source": "antigravity",
+      "subject": "frieren:daily-audit-2026-11-18",
+      "action": "Completed 2026-11-18 health audit: cleared failed restic-burgernas unit, verified sentinel ok, updated SYSTEM.md and HANDOFF.md",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f36d7a4126be015deadab353388bea96ef5f8ca4",
+      "branch": "main",
+      "frame": "03h9bi7ymvi8sx6dekjk3zjnz"
+    },
+    {
+      "id": "c62b485f-bfc4-4ad2-b0a0-b1bf52df8286",
+      "ts": "2026-11-18T10:22:30Z",
+      "source": "devji",
+      "subject": "nixconfig:turns-fusion-plane",
+      "action": "turn fusion loaded on frieren (200/33/118/229); pin refresh moved to pre-commit; delphi graph page awaits CI 44283420690",
+      "outcome": "blocked: delphi aarch64 closure not yet in cache",
+      "claims": [],
+      "files": [],
+      "base_commit": "f36d7a4126be015deadab353388bea96ef5f8ca4",
+      "branch": "main",
+      "frame": "03h9bha89dtvbps7armpjjudw"
+    },
     {
       "id": "bad83779-6f87-45a1-9c17-1912eb352dc1",
       "ts": "2026-11-18T10:11:08Z",
@@ -2762,36 +2788,6 @@
       "base_commit": "4ed544da61523a41a20a33d85a7b5194649315ee",
       "branch": "main",
       "frame": "03h7gvdmbgf2hwyu7noz43jj2"
-    },
-    {
-      "id": "aa9d14d1-c0e6-443b-b9b7-17d54d03b57d",
-      "ts": "2026-11-09T21:33:17Z",
-      "source": "buffy",
-      "subject": "nixconfig:media-library-browse",
-      "action": "Posters: yt-get writes poster.jpg (frame at 3 s, 0 s fallback, 480 px) beside each fetch, the index attaches a folder poster to its video and never lists or counts it, media-relay-posters backfills at boot, and page rows carry a lazy 96x54 thumbnail. Switched delphi (66773a61, gx1wll2dz) and verified live.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "modules/services/media-relay.nix",
-        "lib/media-relay/index.html",
-        "docs/media-relay.md"
-      ],
-      "base_commit": "66773a617cd9f2db6b18820276f5a08289a6f48e",
-      "branch": "main",
-      "frame": "03h7gsn2ylq4nc3kcx6p4dol2"
-    },
-    {
-      "id": "e4182ee7-7ea2-4e0d-b397-50f75c59a21c",
-      "ts": "2026-11-09T21:27:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-single-writer-handoff",
-      "action": "Handed the appflow single-writer cutover back to devji after reading frame 03h7f6cq: nothing of mine is in flight there and no files touched. One contradiction to settle before any code — the jobby-cli-consolidation note makes applications.json the truth, the plan makes Postgres the writer with apps:sync:push as export+commit. Five open questions in rationale.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3c6d1502c478050ed746dd95f03cb3975f55345b",
-      "branch": "main",
-      "frame": "03h7grfkkpu8i37jrgn5rhp7u"
     }
   ]
 }

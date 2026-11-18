@@ -103,8 +103,10 @@ array, not for the single nested object a conversational answer returns.
 ## The Gemini API key route
 
 `agy-gemini` is the shared implementation: the provider setting, the hydrogen
-default and the `GEMINI_API_KEY` preflight live there, and `agy-subagent`, the
-host cascades and a hand-written call all go through it. For one delegated task:
+default and the `GEMINI_API_KEY` preflight live there, and `agy-subagent` and a
+hand-written call go through it. The host cascades do not: a nightly sweep is many
+requests, the free tier is ~20 a day, so Tier 1 runs plain `agy` on the account
+route with `--model gemini-3.8-flash`. For one delegated task:
 
 ```bash
 agy-gemini -p 'hello'                       # gemini-4-hydrogen-high, print mode

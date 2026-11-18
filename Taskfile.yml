@@ -103,6 +103,10 @@ includes:
         taskfile: taskfiles/envs.yml
         dir: .
         flatten: true
+    freeapi:
+        taskfile: taskfiles/freeapi.yml
+        dir: .
+        flatten: true
     gravatar:
         taskfile: taskfiles/gravatar.yml
         dir: .

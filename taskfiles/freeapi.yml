@@ -1,0 +1,77 @@
+version: "3"
+
+# apisfreellm.com answers with no key: one model, 1 req/s, 10k requests or 10M
+# tokens a day. This shard is the repo's one call site for it, so the limits,
+# the retry and the row shape live in scripts/task/freeapi.sh instead of in every
+# agent's curl. The service is unpromised and the request stream is not private:
+# nothing carrying a secret or personal data goes through these tasks.
+tasks:
+  freeapi:ask:
+    desc: Ask the keyless free-ai model a question and print the answer
+    summary: >
+      `GET /ask`, so a bare shell needs nothing installed and the answer arrives
+      as text; FORMAT=json returns {answer, model}. This is the fallback when the
+      local model stack is unreachable — no key, no signup, no vhost. The service
+      allows 1 request/second and 2 in flight, and a 429 that reports the daily
+      allowance spent will not pass until 00:00 UTC. Vars: Q=, SYSTEM=,
+      MAX_TOKENS= (default 512), FORMAT=json.
+    requires:
+      vars: [Q]
+    cmds:
+      - SYSTEM="{{.SYSTEM}}" MAX_TOKENS="{{.MAX_TOKENS}}" FORMAT="{{.FORMAT}}" bash scripts/task/freeapi.sh ask "{{.Q}}"
+
+  freeapi:fallback:
+    desc: Ask the local stack first and free-ai only when it does not answer
+    summary: >
+      scripts/task/llm-ask.sh — the local-first order in one command: the eisen
+      router (`LLM_LOCAL_URL`, default `http://eisen:8000/v1/chat/completions`)
+      is tried with an 8s connect timeout, and free-ai answers only when the
+      router gives a connection error, a non-2xx status, or a body with no
+      message text. Stderr names which one answered, because the two differ in
+      privacy and in speed. LOCAL_ONLY=1 refuses the fallback; SYSTEM=,
+      MAX_TOKENS= and FORMAT= are passed through. Vars: Q=.
+    requires:
+      vars: [Q]
+    cmds:
+      - SYSTEM="{{.SYSTEM}}" MAX_TOKENS="{{.MAX_TOKENS}}" FORMAT="{{.FORMAT}}" bash scripts/task/llm-ask.sh "{{.Q}}"
+
+  freeapi:chat:
+    desc: One chat completion from free-ai, with an optional system message
+    summary: >
+      The `/v1/chat/completions` form, which is what an OpenAI client or a
+      streaming consumer wants; `ask` is the shell-shaped path to the same model.
+      Prints choices[0].message.content and nothing else, so it composes in a
+      pipeline. Same limits and no key. Vars: Q= (the prompt), SYSTEM=,
+      MAX_TOKENS=.
+    requires:
+      vars: [Q]
+    cmds:
+      - SYSTEM="{{.SYSTEM}}" MAX_TOKENS="{{.MAX_TOKENS}}" FORMAT="{{.FORMAT}}" bash scripts/task/freeapi.sh chat "{{.Q}}"
+
+  freeapi:search:
+    desc: Free web or site search, or news with a free key — KIND=web|sites|news Q=...
+    summary: >
+      `web` is freeserp's global index (~3.1B pages) and `sites` its home-page
+      index (~20M sites, with domain rating and filters); both answer keyless,
+      and FRESH=1 favors recent pages. `news` is freenewsapi, which now requires
+      a free key: taken from FNA_KEY, else from sops (`freenewsapi`), and without
+      either the service's own api_key_required body is printed and no empty list
+      is invented. Rows are url/host/title/snippet;
+      FORMAT=json returns the raw body. Vars: KIND= (default web), Q=, SIZE=
+      (at most 100), FRESH=1, FNA_KEY=.
+    requires:
+      vars: [Q]
+    vars:
+      KIND: '{{.KIND | default "web"}}'
+    cmds:
+      - SIZE="{{.SIZE}}" FRESH="{{.FRESH}}" FORMAT="{{.FORMAT}}" bash scripts/task/freeapi.sh search "{{.KIND}}" "{{.Q}}"
+
+  freeapi:probe:
+    desc: "[gate] free-ai is answering — /health plus one chat call"
+    summary: >
+      Two requests a second apart, so it costs two of the daily 10k and answers
+      whether the model is up right now: the /health status, then the text of a
+      one-word chat reply. Non-zero when either comes back empty — that means
+      switch tooling to another provider, not retry in a loop.
+    cmds:
+      - bash scripts/task/freeapi.sh probe

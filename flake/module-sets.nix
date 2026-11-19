@@ -94,6 +94,7 @@ in rec {
     # The NixOS kernel of a desktop or VM host.
     nixos = [
       moduleFiles."global.nixos"
+      moduleFiles."global.linux-systemd"
       # Determinate Nix: one Nix binary for every NixOS host (rollback = the
       # generation). See the module header for the priority and registry traps.
       moduleFiles."global.determinate-nix"
@@ -122,6 +123,7 @@ in rec {
     # modules/global/nixos.nix.
     containers = [
       moduleFiles."global.noDE"
+      moduleFiles."global.linux-systemd"
       moduleFiles."global.determinate-nix"
       inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.default
@@ -130,6 +132,7 @@ in rec {
 
     demo = [
       moduleFiles."global.demo"
+      moduleFiles."global.linux-systemd"
       moduleFiles."global.determinate-nix"
       inputs.home-manager.nixosModules.default
     ];

@@ -22,31 +22,33 @@
     description = "Named features of the desktop role (modules/roles/home.nix).";
   };
 
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "hm-backup"; #for rebuild
-    users.${user.name} = {
-      imports = [
-        self.modules."roles.home"
-      ];
-    }; # staging point for roles/home.nix commons
-    extraSpecialArgs = {
-      inherit inputs self;
-      # lib/home-agents.nix keys on the inventory name; this is that name.
-      fleetHost = config.networking.hostName;
-      hmUserFeatures = config.fleet.hmUserFeatures;
+  config = {
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      backupFileExtension = "hm-backup"; #for rebuild
+      users.${user.name} = {
+        imports = [
+          self.modules."roles.home"
+        ];
+      }; # staging point for roles/home.nix commons
+      extraSpecialArgs = {
+        inherit inputs self;
+        # lib/home-agents.nix keys on the inventory name; this is that name.
+        fleetHost = config.networking.hostName;
+        hmUserFeatures = config.fleet.hmUserFeatures;
+      };
+      # Optionally, use home-manager.extraSpecialArgs to pass
     };
-    # Optionally, use home-manager.extraSpecialArgs to pass
-  };
-  users.users.${user.name} = {
-    inherit (user) name;
-    home = "/Users/${user.name}";
-  };
-  # arguments to home.nix
-  nix-homebrew = {
-    enable = true;
-    enableRosetta = true;
-    user = user.name;
+    users.users.${user.name} = {
+      inherit (user) name;
+      home = "/Users/${user.name}";
+    };
+    # arguments to home.nix
+    nix-homebrew = {
+      enable = true;
+      enableRosetta = true;
+      user = user.name;
+    };
   };
 }

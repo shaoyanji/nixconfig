@@ -818,42 +818,42 @@
       status = "IN FLIGHT";
       priority = "P0";
       date = "2026-11-19";
-      summary = "Both hosts are `preserved` and undeployed. `minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`, 2026-10-19); `cassini`'s gate is measured now, and its two faults are a module-checker shape and a Linux block in the shared base chain — not `freebuff-remote`.";
+      summary = "`minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`). `cassini`'s darwin chain is being repaired: the module-shape and Linux-option faults are landed and a Linux host still gates, the third fault is an infinite recursion in the home role.";
       refs = {
         hosts = ["minyx" "cassini"];
-        modules = ["modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix" "hosts/minyx/configuration.nix" "hosts/cassini/configuration.nix" "modules/global/macos.nix" "modules/global/global.nix"];
+        modules = ["modules/global/macos.nix" "modules/global/linux-systemd.nix" "modules/global/global.nix" "flake/module-sets.nix" "modules/roles/home.nix" "modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix"];
         tasks = ["checks:host"];
       };
       body = ''
-        `cassini`'s stated blocker is already gone: `modules/user/ai/freebuff-remote.nix`
-        wraps `xdg.desktopEntries` in `lib.mkIf pkgs.stdenv.hostPlatform.isLinux`, so the
-        darwin evaluation no longer fails there.
+        `cassini`'s stated blocker was stale: `modules/user/ai/freebuff-remote.nix`
+        already gates `xdg` on `isLinux`.
 
-        Measured 2026-11-19 from frieren with
-        `ALLOW_PRESERVED=1 task checks:host HOST=cassini MODE=eval` (0.5-0.7 s to fail).
-        Two faults, in the order the evaluator reports them:
+        2026-11-19, `ALLOW_PRESERVED=1 task checks:host HOST=cassini MODE=eval`
+        (1.9 s to reach the head of the chain). Two faults are cleared and landed:
 
-        1. `modules/global/macos.nix` defines `home-manager`, `nix-homebrew` and `users`
-           at the top level of the module; nix-darwin's checker rejects that as an
-           unsupported attribute. Moving the three under an explicit `config = { ... }`
-           clears it and the eval then reaches fault 2 — so the shape is right, but that
-           edit cannot land alone.
+        1. `modules/global/macos.nix` moved `home-manager`, `nix-homebrew` and
+           `users` under an explicit `config`; nix-darwin's checker rejects them at
+           module top level.
+        2. `modules/global/linux-systemd.nix` carries `systemd.oomd`,
+           `systemd.timers` and `services.journald`, imported by the `nixos`,
+           `containers` and `demo` features only — never by `base` or `macos`.
+           `lib.mkIf` could not do this: `pushDownProperties` rewrites
+           `services = mkIf c { journald… }` into `services.journald = mkIf c`, so
+           the missing-option check runs with the condition false. Measured twice,
+           both gating attempts reverted.
 
-        2. `modules/global/global.nix` defines `services.journald.settings.Journal` and
-           `systemd.*`, which do not exist on nix-darwin. `lib.mkIf` does not hide an
-           option path: `pushDownProperties` rewrites
-           `services = mkIf c { journald.settings.Journal = ... }` into
-           `services.journald = mkIf c { settings.Journal = ... }`, so the "does not
-           exist" check runs with the condition false. Gating the value instead failed
-           identically — both attempts were reverted.
+        Third fault, now the head: infinite recursion while evaluating
+        `modules/roles/home.nix`, module argument `dankShell` — the darwin chain
+        provides no such argument, and the role's `fleet.hmUserFeatures` default
+        includes `desktop`. Hypothesis to test next: darwin's feature list must not
+        include `desktop`, or `dankShell` needs a darwin default.
 
-        The fix for (2) is structural: the Linux-shaped block has to leave the base
-        chain for a module only the Linux feature lists import. That is the next step,
-        and it is a chain edit plus one new registered module, not a `mkIf`.
+        Gates so far: `checks:host HOST=netbook` green in 10.2 s after the split, so
+        the move did not change a Linux host. cassini is still red at fault 3.
 
-        Exit: `task checks:host HOST=<one> MODE=eval` is green (or explicitly expected-red),
-        run by the owner when the hardware is powered on. Verification of a dormant host is
-        the owner's call, never an agent's drive-by eval.
+        Exit: a green (or explicitly expected-red) `checks:host HOST=<one>
+        MODE=eval`, run by the owner when the hardware is powered on. Verification
+        of a dormant host is the owner's call, never an agent's drive-by eval.
       '';
     };
     dns-second-resolver = {

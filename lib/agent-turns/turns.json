@@ -1,8 +1,172 @@
 {
-  "generated": "2026-11-19T14:47:39Z",
+  "generated": "2026-11-19T15:25:42Z",
   "count": 200,
-  "pin": "207a8c415b7e308cfe6120cc2beeb8ff46a4702bc4a175605b6d2c4f701fbb21",
+  "pin": "1ac4157d54a02c0dbaf51343e34565539e180672c45afa3f341ed3a76816d3d8",
   "turns": [
+    {
+      "id": "d1c247a2-0332-42b5-bf8e-b0c125267c38",
+      "ts": "2026-11-19T15:18:06Z",
+      "source": "devin",
+      "subject": "nixconfig:pipe-refactor",
+      "action": "landed: |> pipes through collection chains in 10 files (outputs/checks/epistemics/policies, email-archive, service-portal, skills, delphi, guests, reverse-proxy); left genAttrs/interpolations alone; gate fixes cherry-picked for worktree hooks | gate: pre-commit+pre-push PASS, nix eval inventory.hosts.frieren.role + knowledgeGraph.graph (1992n/1800e) + epistemics.table PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0f53dd945b357f4d686c27979cf9ac3688931d77",
+      "branch": "HEAD",
+      "frame": "03h9kwbpcz34tphjchsctgn3l"
+    },
+    {
+      "id": "9e3b771b-d633-4b7b-9a29-5937c2f26710",
+      "ts": "2026-11-19T15:04:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:loopcv-ui-refine",
+      "action": "freebuff to make changes IN LoopCV via browser: log into app.loopcv.pro (magic-link), turn OFF auto-apply on DE loops (Renewable Energy 8 apps/22 rejections, SWE Freiburg 2 apps) shifting to MONITOR, keep US loops (Consultant/BA 67, Solar PM 45) as-is, retarget roles where closures happened, report exactly what was toggled/retargeted in the UI",
+      "outcome": "in_progress",
+      "claims": [
+        "app.loopcv.pro",
+        "LoopCV browser UI"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9ktq8qi2ddosexc32wwyg5"
+    },
+    {
+      "id": "7ad16dbf-df5c-4329-9f7d-8bac0e3f0ec2",
+      "ts": "2026-11-19T14:54:06Z",
+      "source": "delphi",
+      "subject": "nixconfig:delphi-ssh-memory",
+      "action": "memory architecture decision landed: 24dd4613 on origin/main (vault→qmd→mem0/supermemory→web; ai-memory ungated scratch)",
+      "outcome": "done",
+      "claims": [
+        "memory-architecture"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9krmwyp8dnr0pkarahr7o3"
+    },
+    {
+      "id": "ae4c1e4b-a768-4627-9292-42d7bf7fde2a",
+      "ts": "2026-11-19T14:54:05Z",
+      "source": "devin",
+      "subject": "nixconfig:bagua-weather",
+      "action": "bagua-weather M1-M5 complete: published shaoyanji/bagua-weather public (MIT LICENSE + CI pytest+ruff, GitHub Actions run 44527506367 PASS, local pytest 38 PASS ruff clean), final commit 71febcc; M5 ablation fdebe4a (8 states justified)",
+      "outcome": "done",
+      "claims": [
+        "shaoyanji/bagua-weather"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9krmu1w0qme08gjo3eh2xj"
+    },
+    {
+      "id": "0f91e962-76f7-4091-9ecc-2783138c585c",
+      "ts": "2026-11-19T14:54:05Z",
+      "source": "agy",
+      "subject": "nixconfig:zeckendorf-pr-review",
+      "action": "PR #8 kg-zeck-cache reviewed: ExUnit 12/0 PASS + parity.exs PASS on frieren (worktree 97489aa0), verdict APPROVE no security blockers, no logic changes; PR not merged per instructions",
+      "outcome": "done",
+      "claims": [
+        "kg-zeck-cache",
+        "PR#8"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9krmqyoomuvde5zw1btv1j"
+    },
+    {
+      "id": "7f596391-c400-4c79-b7c2-2657841c8bf1",
+      "ts": "2026-11-19T14:54:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:loopcv-re-strategy",
+      "action": "LoopCV re-strategy complete: app.loopcv.pro mapped (loopcv.ai NXDOMAIN), 5 loops auto-applying (129 apps/558 emails/2718 pending/0 interviews/51 unanswered), magic-link sign-in used (passkey needed, sops gmail IMAP-only), auto-apply off US loops kept on DE loops",
+      "outcome": "done",
+      "claims": [
+        "loopcv.ai",
+        "app.loopcv.pro"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9krmnxrtoqsmdnd7cy5dhi"
+    },
+    {
+      "id": "5c19ab9d-279f-463f-a0f2-ec7d050327c4",
+      "ts": "2026-11-19T14:49:06Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:memory-architecture",
+      "action": "nudge: commit 24dd4613 landed, search order vault->qmd->mem0/supermemory->web established",
+      "outcome": "done",
+      "claims": [
+        "pane 5 (ssh*)"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9kqnowpph4n88kj3fpey6s"
+    },
+    {
+      "id": "b805de8c-fc1e-44db-9c97-2774234913d6",
+      "ts": "2026-11-19T14:49:05Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:zeckendorf-pr-review",
+      "action": "nudge: PR #8 Elixir kg-zeck awaiting idle agent",
+      "outcome": "in_progress",
+      "claims": [
+        "pane 2 (agy)"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9kqnm0nu5h47x17pdotcmq"
+    },
+    {
+      "id": "f0c7734a-8408-4808-8b0b-ab6122180330",
+      "ts": "2026-11-19T14:49:04Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:bagua-weather",
+      "action": "nudge: devin M1-M5 done, public repo push pending",
+      "outcome": "in_progress",
+      "claims": [
+        "pane 4 (devin-)"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9kqnj03jqie03029kmm8yd"
+    },
+    {
+      "id": "61877bf2-404a-48d7-afb2-eb1e5f8f1ead",
+      "ts": "2026-11-19T14:49:03Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:loopcv-re-strategy",
+      "action": "nudge: freebuff P1 sentinel + Google sign-in via xvfb-run+CDP pending",
+      "outcome": "in_progress",
+      "claims": [
+        "pane 1 (freebuff)"
+      ],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9kqng15s0ea736m9qaq8g9"
+    },
+    {
+      "id": "d3883da9-7e23-4772-9a52-63236904caee",
+      "ts": "2026-11-19T14:47:45Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-fallback",
+      "action": "final: 4-lane chain — infron :free x2 -> NIM nemotron-3.5-super-vl-120b-a12b -> openrouter nemotron:free (account verified is_free_tier, no balance exists to bill) -> ollama-cloud nemotron-3-ultra; api_max_retries 4 covers the hops; infron picker pinned to the 2 :free ids, billable vendors hidden from pickers | live: deepseek 429 -> qwen 429 -> NIM answered; openrouter :free proven earlier same session | gate: checks:infron PASS, checks:quick PASS, checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
+      "branch": "main",
+      "frame": "03h9kqe87o4cmbytxysphd7as"
+    },
     {
       "id": "7fb65641-2886-4ded-9ecc-a6a6ccbea1cf",
       "ts": "2026-11-19T14:47:03Z",
@@ -2635,192 +2799,6 @@
       "base_commit": "76b06d3dea30a154572f3d2868182ea82ead54f9",
       "branch": "main",
       "frame": "03h93yqr6tnac2rhks94fsscj"
-    },
-    {
-      "id": "8dc520b3-ac35-436a-945e-a9aaa3e37ab9",
-      "ts": "2026-11-17T10:56:33Z",
-      "source": "devji",
-      "subject": "nixconfig:cpg-anime-wallpapers",
-      "action": "Generated 12 anime-realistic character wallpapers with cpg image (1024x1536) into ~/Pictures/cpg/anime-2026-11-17",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8681ab95c674a3bde0f7d3aeaa452e92fa7d065",
-      "branch": "main",
-      "frame": "03h93umy5foukrdwg4y872sqv"
-    },
-    {
-      "id": "77e28def-d41f-4d4b-a1a8-ca59e0fef92a",
-      "ts": "2026-11-17T10:52:49Z",
-      "source": "buffy",
-      "subject": "nixconfig:docs-wringing",
-      "action": "Folder audit of docs/: completed pipeline audit moved to docs/history (+4 refs), prose pass on control-plane-vision/architecture/NUSHELL/closure-debloat/nix-patterns/email-archive, and the UDS bridge no longer imports lib/aki-site.nix (frieren passes its one fleetSite). Pushed 988d113e, 0337f3d0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0337f3d0e4bf724013d3a063cbaf7bfee7f118e0",
-      "branch": "main",
-      "frame": "03h93twob2qfk8c5x42s589ti"
-    },
-    {
-      "id": "4b517d2a-54fd-4e71-a5f3-fa7e756c5037",
-      "ts": "2026-11-17T10:42:19Z",
-      "source": "antigravity",
-      "subject": "nixconfig:model-fetch-qwen-image-uncensored",
-      "action": "Queued Qwen-Image-2.1 Uncensored Omni Q8_0/Q4_K_M GGUF and FP8 safetensors on aria2.frieren.lan",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8951a2e7bcc2e358a214e9adb8b8627a038f274c",
-      "branch": "main",
-      "frame": "03h93ruv03nyhvliiltwpy36k"
-    },
-    {
-      "id": "285363e6-2c98-4261-9b72-cbc73b576073",
-      "ts": "2026-11-17T10:39:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:antigravity-hydrogen",
-      "action": "Rebased onto e8681ab9. One Hydrogen route: agy-gemini owns provider setting, model default and GEMINI_API_KEY preflight; agy-subagent and both cascades delegate to it; skill merged with upstream agy-gemini section; census ceiling 6621->6628 (upstream growth)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8951a2e7bcc2e358a214e9adb8b8627a038f274c",
-      "branch": "main",
-      "frame": "03h93r87bqt4shmz9bcknxsx8"
-    },
-    {
-      "id": "625a5451-5e06-4558-aeb1-99cb55c64a5f",
-      "ts": "2026-11-17T10:13:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:rules-as-data",
-      "action": "Rules and their budgets are data: flake/prose-budget.nix records every page body count, #rules-are-cited-not-restated makes prose cite an id, policies became graph nodes with cites edges and a canvas type, and a dangling citation cannot invent a node",
-      "outcome": "done",
-      "claims": [
-        "flake/prose-budget.nix",
-        "flake/policies.nix",
-        "lib/knowledge-graph.nix"
-      ],
-      "files": [
-        "flake/prose-budget.nix",
-        "flake/policies.nix",
-        "flake/outputs.nix",
-        "lib/knowledge-graph.nix",
-        "lib/aki-site.nix",
-        "lib/site/kg.js",
-        "scripts/task/kg-check.sh",
-        "scripts/task/kg-canvas-check.sh",
-        "AGENTS.md",
-        ".agents/SCHEMA.md"
-      ],
-      "base_commit": "9ef11f18a0f25ab90ac0b34400898a9e005aa567",
-      "branch": "main",
-      "frame": "03h93mb003epnz4hbdq4hsgiw"
-    },
-    {
-      "id": "170139c9-1e02-466d-a367-affd5b4cfd8a",
-      "ts": "2026-11-17T10:13:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:comments-as-pointers",
-      "action": "Nix comments classify pointer|rule|dated|header behind a shrink-only ceiling; checks:nix:comments resolves 41 task pointers against the compiled task graph, and the sweep found 5 stale paths, a phantom #id citation, and a temp-file race in taskfile-list.sh",
-      "outcome": "done",
-      "claims": [
-        "lib/nix-comments.nix",
-        "flake/nix-comments.nix",
-        "scripts/task/nix-comments.sh",
-        "scripts/task/taskfile-list.sh",
-        "taskfiles/checks.yml"
-      ],
-      "files": [
-        "lib/nix-comments.nix",
-        "flake/nix-comments.nix",
-        "flake/outputs.nix",
-        "flake/policies.nix",
-        "flake/prose-budget.nix",
-        "flake/checks.nix",
-        "flake/host-inventory.nix",
-        "flake/module-sets.nix",
-        "scripts/task/nix-comments.sh",
-        "scripts/task/taskfile-list.sh",
-        "taskfiles/checks.yml",
-        "taskfiles/checks.toml",
-        ".github/workflows/nixcachix.yml",
-        "AGENTS.md",
-        ".agents/SCHEMA.md",
-        ".agents/skills/no-comments/SKILL.md",
-        "hosts/delphi/configuration.nix",
-        "hosts/eisen/deepseek-v4.nix",
-        "hosts/frieren/configuration.nix",
-        "lib/knowledge-graph.nix",
-        "modules/services/zettel-graph.nix"
-      ],
-      "base_commit": "9ef11f18a0f25ab90ac0b34400898a9e005aa567",
-      "branch": "main",
-      "frame": "03h93m8s0cuge2sn69l6h7khr"
-    },
-    {
-      "id": "1c6e0f08-9962-4da3-b70e-0b05a5518500",
-      "ts": "2026-11-17T09:49:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-image-bridge",
-      "action": "token stream read as Hilbert canvas: loom-hilbert + loom-img + loom-cli image, six typed variations all contained, 21844 cells parity with shaoyanji/hilbert and a PNG renderer there",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "458cbb85bd917df362518eb82c1ebb0d9610444d",
-      "branch": "main",
-      "frame": "03h93hm7zk2ecuq2ntbejy3en"
-    },
-    {
-      "id": "4fd57d30-2f4d-492a-ab16-74e5e42160bb",
-      "ts": "2026-11-17T09:42:43Z",
-      "source": "devji",
-      "subject": "nixconfig:comments-as-pointers",
-      "action": "Nix comments classify as pointer|rule|dated|header; ceiling 6383/139 recorded, checks:nix:comments resolves 41 task pointers, taskfile-list cache write atomic per writer",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9ef11f18a0f25ab90ac0b34400898a9e005aa567",
-      "branch": "main",
-      "frame": "03h93g7qnj5pswsguoir12tr4"
-    },
-    {
-      "id": "7e822611-d1f9-4819-b08a-799c01ae9acb",
-      "ts": "2026-11-17T09:35:18Z",
-      "source": "antigravity",
-      "subject": "nixconfig:model-fetch-gemma4-lightonocr",
-      "action": "Queued Gemma 4 26B A4B uncensored Q4_K_M + mmproj and LightOnOCR-3-4B Q8_0/Q4_K_M + mmproj on aria2.frieren.lan",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c862c3e77c183be66bb78f013085390b720dd7da",
-      "branch": "main",
-      "frame": "03h93erisk7betqf5v7wlmz19"
-    },
-    {
-      "id": "a0265583-bd01-4e43-aa1c-fb987dc4b671",
-      "ts": "2026-11-17T09:17:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-window-tail",
-      "action": "rejected a 3 ms window by measurement (100k 5.09 ms), charged the ms above the window to the reactor threads (nopool apply 125-194 vs 298-330 p50), and scheduled the four page suites via scripts/page-suite.sh + page.yml",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8a42d2b0f8e9c7a8d37091dc08e95d22534139ef",
-      "branch": "main",
-      "frame": "03h93b91z5q0owyd1152er5p4"
-    },
-    {
-      "id": "a30be308-82c8-4d36-b5c2-0734e788d437",
-      "ts": "2026-11-17T08:53:31Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-timer",
-      "action": "removed tokio's 1 ms timer tax with an exact blocking sleep (40k/600 4.16 -> 2.57 ms), swept 1/2/8 ms plus a 40k row, re-ran the four browser suites",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "55f0bdd3cea6805ea2151917ff76d823bff377a5",
-      "branch": "main",
-      "frame": "03h936lpyb3sueo6yjr2zesc7"
     }
   ]
 }

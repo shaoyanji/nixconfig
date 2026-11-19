@@ -51,6 +51,8 @@ One JSON object per run:
     "restic-drill.service": "absent"
   },
   "generation_age_h": 5.2,
+  "queue": {"open_person": 3, "open_action": 12, "unmatched_fresh": 0,
+            "newest_mail_age_h": 1.5, "prior_week_mails": 147},
   "disk_pct": {"root": 42, "nix": 61, "data": 80},
   "psi": {"io": 1.2, "memory": 0.0},
   "prefill": {"ts": "2026-10-28T23:59:37Z", "recorded": true, "measure": "statvfs",
@@ -73,6 +75,13 @@ timestamp, outcome, reason. That job exits 0 even when every agent tier failed,
 so the timer keeps firing — which is why its unit `Result` cannot be watched and
 `fallback` in this field is the signal instead.
 
+`queue` is the mail loop's own measurement, read from the archive's
+`/api/queue-health` and present only where `queueProbe.url` is set (delphi).
+`agents:hub` is pull-only, so without it a stalled queue was found by a person
+looking: the backlog, the fresh unowned mail, an unreachable API and a newest
+message age that contradicts the prior week all degrade the host. `null` means
+this host holds no archive.
+
 **A job's own progress output is not a measurement.** The Steam prefill counted
 chunks across the whole selection and served the uncached ones first: it read
 18 % for 46 minutes, then finished all 33.72 GiB in 8:29 off the cache. Its
@@ -94,6 +103,11 @@ is the signal that something other than the cache moved.
 | `disk-high:<path>:<pct>%` | filesystem ≥ 90 % | `task dev:closure:size`; GC/snapshot prune; never delete `/srv/data` content ad hoc |
 | `audit-failed:<outcome>` | the newest audit outcome is in `auditFailOutcomes` (`fallback`): the run finished without doing its work | `journalctl --user -u agy-nightly-system -n 100`; `cat /var/lib/agy-system/last-run`; rerun with `FORCE_RUN=1` |
 | `audit-stale:<h>h` | newest audit record older than `auditMaxAgeHours` (192) — the audit stopped running, and silence is not a verdict | `systemctl --user list-timers agy-nightly-system.timer`; read `audit.ts` in `status.json` |
+| `queue-person:<n>` | more unresolved person-tier messages than `queueProbe.maxOpenPerson` (25) | `task agents:hub`, then `/api/attention`; a backlog that stays is the queue not draining, not a broken timer |
+| `queue-action:<n>` | more unresolved action-tier messages than `maxOpenAction` (40) | same, oldest first |
+| `queue-unmatched:<n>` | more person/action/review mail younger than 48 h with owner `none` than `maxUnmatchedFresh` (20) — the router stopped claiming new mail | `GET /api/plugins` and its `none` row; a triage rule or a plugin's sender list is what puts an owner on a message |
+| `mail-stalled:<h>h` | newest archived message older than `maxMailAgeHours` (26) while the prior week had mail | `systemctl status email-archive-import`; the timer can fire into a failing IMAP login |
+| `queue-unreachable` | the probe URL did not answer | the archive API is down — a green gatus socket is not a drained queue |
 
 `null` disk values mean the path does not exist on that host (neutral, not bad).
 `absent` job results mean the unit is not installed on that host (neutral).

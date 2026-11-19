@@ -1,8 +1,123 @@
 {
-  "generated": "2026-11-19T11:52:40Z",
+  "generated": "2026-11-19T12:30:56Z",
   "count": 200,
-  "pin": "5805c9c27be2f8e7dc5c395986ec2b2c71f57e67e365ab5ce2d17e5d580b2380",
+  "pin": "f706895e354cec56fe3e7eacb5f12f3f902ea6cd5c10a4f9c84fc2ea7670c861",
   "turns": [
+    {
+      "id": "18e3677e-3e9b-4e93-bdd7-5debdddcf12f",
+      "ts": "2026-11-19T12:25:34Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 23: freebuff on LoopCV (Google sign-in via sops gmail value under xvfb+CDP, mapping auto-apply loops). devin completed bagua-weather M1-M4 (honest results, GBM tuned wins narrowly), now on M5 state-count ablation. agy updating DB from extended job report. delphi verifying email archive + triage second-pass.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
+      "branch": "main",
+      "frame": "03h9jymenfiolh2hgyschlu4j"
+    },
+    {
+      "id": "3f426335-061a-467e-b0ce-6e374f533b0f",
+      "ts": "2026-11-19T12:24:46Z",
+      "source": "agy",
+      "subject": "apps:triage-update",
+      "action": "landed: updated 30 pipeline rows across Apply/Monitor/Pass/Expired | gate: verify 30/30 in delphi api",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
+      "branch": "main",
+      "frame": "03h9jygp0103qgli4ed60plik"
+    },
+    {
+      "id": "318e2d74-5752-4241-9bed-a89122e64b5f",
+      "ts": "2026-11-19T12:24:02Z",
+      "source": "agy",
+      "subject": "apps:triage-update",
+      "action": "start: update 30 triaged roles in delphi apps db",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
+      "branch": "main",
+      "frame": "03h9jybjb5x2xf3dysnnzjrp0"
+    },
+    {
+      "id": "b0246743-16ed-4a08-9beb-9f10ab2afb6e",
+      "ts": "2026-11-19T12:18:23Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 22: freebuff landed P1 sentinel egress (push.url + sops bearer, UNIX-socket ingest, delphi pushes to frieren centre). Routed LoopCV task to freebuff (login loopcv.ai via Google under xvfb+CDP, map auto-apply loops, re-strategize). agy produced extended Action-First Triage Matrix (30+ leads). devin on bagua-weather (scikit-learn install). delphi on sentinel wiring.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
+      "branch": "main",
+      "frame": "03h9jx7tdcr6e7pd170ez8100"
+    },
+    {
+      "id": "e1bc0bf0-4ff3-453d-83c0-0741b668e3fa",
+      "ts": "2026-11-19T12:10:51Z",
+      "source": "devin",
+      "subject": "scratch:bagua-weather",
+      "action": "landed: bagua-weather v0.1.0 M1-M4 | gate: pytest 32 PASS, ruff clean | DWD conventions verified (all-UTC from 2003-09-01); markov_contextual LL 0.769 beats climatology 1.388/persistence 1.048, tuned GBM edges it at 0.758 | dwell right-censored by daylight mask (stated)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
+      "branch": "main",
+      "frame": "03h9jvqto39enaqsdy00iaak2"
+    },
+    {
+      "id": "a27c223c-990d-40ba-99a1-3eee319da04f",
+      "ts": "2026-11-19T12:09:37Z",
+      "source": "devji",
+      "subject": "nixconfig:sentinel-push",
+      "action": "landed f01990c1: optional sentinel egress (push.url + sops bearer) and a UNIX-socket ingest behind frieren's default vhost; bearer-checked Go receiver, event validation, atomic per-host files; receiving collector degrades on peer-stale/peer-degraded by mtime; delphi pushes, frieren is the centre; checks:host frieren+delphi and checks:quick green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
+      "branch": "main",
+      "frame": "03h9jvi5o12zxh60dbce2tvgk"
+    },
+    {
+      "id": "c3279933-efe3-485d-aa4e-95c05bbe3476",
+      "ts": "2026-11-19T12:04:21Z",
+      "source": "frieren",
+      "subject": "nixconfig:delphi-cloud-service-node",
+      "action": "delphi freebuff (cloud service node) landed email-triage second-pass via remote model (19aa4ad4, triage.secondBackend asks infron about the envelope) + vhost registry gating (f2ef4587). Recommended: route review-class mail to agent:apps, allow capped body snippet for review rows, import Sent, cache verdicts per envelope, report queue depth to sentinel.",
+      "outcome": "done",
+      "claims": [
+        "modules/services/email-triage.nix"
+      ],
+      "files": [],
+      "base_commit": "5771d2da4feb5a091d951997aefcfe104f9c5b0b",
+      "branch": "main",
+      "frame": "03h9juh6jktl015q6qwtpeqcv"
+    },
+    {
+      "id": "e363b345-db24-46dc-b782-553407ce97db",
+      "ts": "2026-11-19T11:58:12Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 21: freebuff landed xs:list commits projection (5771d2da, commits now visible in ledger rows). Now on P1 sentinel loop (IN FLIGHT, pushUrl egress). agy produced Action-First Triage Matrix, now applying it to remaining untriaged leads. devin building bagua-weather (scipy compiling on remote builder). delphi on cloud service node (email-archive-triage investigation).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "5771d2da4feb5a091d951997aefcfe104f9c5b0b",
+      "branch": "main",
+      "frame": "03h9jt9xw5e8x75jftle4ygi9"
+    },
     {
       "id": "5b34574c-f057-4717-b544-5eede0f275ba",
       "ts": "2026-11-19T11:51:26Z",
@@ -2674,110 +2789,6 @@
       "base_commit": "e327f0f745097af9760d18e65d9cbb15a964efa1",
       "branch": "main",
       "frame": "03h8wiwstlpkhlr71yi1f3aow"
-    },
-    {
-      "id": "98c0b772-7b76-40fa-9846-1ab4f7a00c8e",
-      "ts": "2026-11-16T12:26:14Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 0 plate(s) kept of 0 spent, 24 roster row(s) waiting, 350 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "594616527363b58d64cb57fb81b9e1de7d98064f",
-      "branch": "main",
-      "frame": "03h8wiuylt9x51ysfqr0edtjk"
-    },
-    {
-      "id": "0c292bc2-2d60-4db2-a830-3b64c8ae41a0",
-      "ts": "2026-11-16T12:24:57Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 2 plate(s) kept of 2 spent, 24 roster row(s) waiting, 350 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "594616527363b58d64cb57fb81b9e1de7d98064f",
-      "branch": "main",
-      "frame": "03h8wilunjq91kp97n0p9rdbz"
-    },
-    {
-      "id": "a9dfefda-97e3-4389-b16b-7d901b0eb77b",
-      "ts": "2026-11-16T11:30:10Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 0 plate(s) kept of 0 spent, 24 roster row(s) waiting, 336 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "594616527363b58d64cb57fb81b9e1de7d98064f",
-      "branch": "main",
-      "frame": "03h8w7wo6odeemas7k5ev4eyi"
-    },
-    {
-      "id": "4c28d63f-95bc-4507-859a-c0b53b2d07eb",
-      "ts": "2026-11-16T10:43:14Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 3 plate(s) kept of 4 spent, 36 roster row(s) waiting, 338 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "594616527363b58d64cb57fb81b9e1de7d98064f",
-      "branch": "main",
-      "frame": "03h8vyql1c4bjnn1badg3wcb9"
-    },
-    {
-      "id": "12296a17-4734-437e-b460-0328e9df0cb5",
-      "ts": "2026-11-16T10:00:57Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-male-row",
-      "action": "duncan-idaho removed from the women-only roster (it rendered a man as a woman); plate parked, manifest republished, engine now refuses a male row via PLATE_MALE and the judge rejects a male-reading plate instead of rerolling it",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "594616527363b58d64cb57fb81b9e1de7d98064f",
-      "branch": "main",
-      "frame": "03h8vqh8m8jjd88jgdykmemk0"
-    },
-    {
-      "id": "65a2de31-4187-4c9b-bede-7b5b10d96f76",
-      "ts": "2026-11-16T09:59:21Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-archetype-sweep",
-      "action": "Corrected the ledger-guard rationale: torn read of a live append, not stored corruption",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "63beabe188ef8aef5ce5b8d67e5b33ae21aaf195",
-      "branch": "main",
-      "frame": "03h8vq5znffbjjmyce6ccnncq"
-    },
-    {
-      "id": "0c4d34e7-17f4-44e5-8e42-049539f888f4",
-      "ts": "2026-11-16T09:58:38Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-archetype-sweep",
-      "action": "Archetypes now mandatory for villain/armour rows (12 in library, 50 rows assigned, guards proven); 8 of the 44 waiting rows rendered before the hourly burst bucket ran out (mikasa rebuilt on warm-warrior and kept); 346 assets published; engine made tolerant of malformed ledger lines",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "986f2b39153d370ac8798aef0c290b9911186480",
-      "branch": "main",
-      "frame": "03h8vq0xarnddsdn7na4y5vns"
-    },
-    {
-      "id": "8fa3ea55-ad7a-4e52-9126-0e8132cfe623",
-      "ts": "2026-11-16T08:57:08Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-archetypes",
-      "action": "plates engine expands arch:<name> from lib/image-daily/archetypes.tsv before the form guard (7 archetypes distilled from Ganyu/Eula/Lisa/Narmaya/2B reads, written against the gaunt-cold bad reads); 2B rebuilt on porcelain-android and re-rendered keep, gallery 335, pushed 55fa0ad5",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "55fa0ad58e9a59dc4eca118862c738c1496eff05",
-      "branch": "main",
-      "frame": "03h8ve0f0e31rcmn8ohbstjml"
     }
   ]
 }

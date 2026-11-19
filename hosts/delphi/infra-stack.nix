@@ -319,6 +319,7 @@ in {
       user = "fleet";
       passwordFile = config.sops.secrets."ntfy/fleet-password".path;
     };
+    queueProbe.url = "http://127.0.0.1:${toString config.services.emailArchive.port}/api/queue-health";
   };
 
   # --- Declarative Autonomous Agent Scheduler (EXP-016) -----------------------

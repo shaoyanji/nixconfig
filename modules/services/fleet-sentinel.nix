@@ -254,6 +254,37 @@
         done
       ''}
 
+      QUEUE_JSON="null"
+      ${lib.optionalString (cfg.queueProbe.url != "") ''
+        QROW=""
+        if QROW="$(curl -fsS --max-time ${toString cfg.queueProbe.timeoutSeconds} "${cfg.queueProbe.url}" 2>/dev/null \
+          | jq -c '(if type == "array" then .[0] else . end) // empty' 2>/dev/null)" \
+          && [ -n "$QROW" ]; then
+          QUEUE_JSON="$QROW"
+          qnum() { printf '%s' "$QUEUE_JSON" | jq -r --arg k "$1" '.[$k] // 0'; }
+          Q_PERSON="$(qnum open_person)"
+          Q_ACTION="$(qnum open_action)"
+          Q_UNMATCHED="$(qnum unmatched_fresh)"
+          Q_LAG="$(qnum newest_mail_age_h)"
+          Q_PRIOR="$(qnum prior_week_mails)"
+          if [ "$Q_PERSON" -gt ${toString cfg.queueProbe.maxOpenPerson} ]; then
+            REASONS+=("queue-person:$Q_PERSON")
+          fi
+          if [ "$Q_ACTION" -gt ${toString cfg.queueProbe.maxOpenAction} ]; then
+            REASONS+=("queue-action:$Q_ACTION")
+          fi
+          if [ "$Q_UNMATCHED" -gt ${toString cfg.queueProbe.maxUnmatchedFresh} ]; then
+            REASONS+=("queue-unmatched:$Q_UNMATCHED")
+          fi
+          if awk -v age="$Q_LAG" -v max="${toString cfg.queueProbe.maxMailAgeHours}" -v base="$Q_PRIOR" \
+            'BEGIN { exit !(age > max && base > 0) }'; then
+            REASONS+=("mail-stalled:''${Q_LAG}h")
+          fi
+        else
+          REASONS+=("queue-unreachable")
+        fi
+      ''}
+
       # --- assemble ----------------------------------------------------------
       if [ "''${#REASONS[@]}" -eq 0 ]; then
         STATE="ok"
@@ -280,10 +311,11 @@
         --argjson prefill "$PREFILL_JSON" \
         --argjson audit "$AUDIT_JSON" \
         --argjson peers "$PEERS_JSON" \
+        --argjson queue "$QUEUE_JSON" \
         '{schema: 1, ts: $ts, host: $host, state: $state, reasons: $reasons,
           failed_units: $failed_units, jobs: $jobs, generation_age_h: $gen_age_h,
           disk_pct: $disk, psi: {io: $io_psi, memory: $mem_psi},
-          prefill: $prefill, audit: $audit, peers: $peers}')"
+          prefill: $prefill, audit: $audit, peers: $peers, queue: $queue}')"
 
       printf '%s\n' "$EVENT" >> "$LEDGER"
       # Bounded history: ~100 days at the 15-minute default, enough to correlate
@@ -454,6 +486,66 @@ in {
         weekly cadence plus a missed week, so one skipped run is reported rather
         than waited out.
       '';
+    };
+
+    queueProbe = {
+      url = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = ''
+          HTTP endpoint answering one JSON object of mail-queue counts in the
+          shape `open_person`, `open_action`, `unmatched_fresh`,
+          `newest_mail_age_h`, `prior_week_mails` — the archive's own
+          `/api/queue-health`. Empty records `queue: null` and never degrades,
+          so a host without a mail queue needs no configuration. A watched unit
+          that exited 0 says the timer fired; these counts are what says the
+          queue moved, so "the queue stopped draining" arrives as a page rather
+          than as silence.
+        '';
+      };
+
+      timeoutSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 5;
+        description = "Seconds the probe may take before it counts as unreachable.";
+      };
+
+      maxOpenPerson = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 25;
+        description = ''
+          Degrade above this many unresolved person-tier messages. A backlog
+          threshold, not a rate: a queue nobody works is the fault this catches,
+          and it clears only when somebody works it.
+        '';
+      };
+
+      maxOpenAction = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 40;
+        description = "Degrade above this many unresolved action-tier messages.";
+      };
+
+      maxUnmatchedFresh = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 20;
+        description = ''
+          Degrade above this many person/action/review messages younger than
+          48 h with no owner at all — the router stopped claiming new mail.
+          Digest and robot traffic is excluded: a mailbox of receipts is not a
+          broken router.
+        '';
+      };
+
+      maxMailAgeHours = lib.mkOption {
+        type = lib.types.float;
+        default = 26.0;
+        description = ''
+          Degrade when the newest archived message is older than this and the
+          mailbox had mail in the previous week. The age alone cannot tell a
+          quiet mailbox from a stalled importer; the prior week's volume can.
+        '';
+      };
     };
 
     watchUnits = lib.mkOption {

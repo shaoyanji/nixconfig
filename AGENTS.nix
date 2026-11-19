@@ -363,6 +363,21 @@
         Exit: three hosts push for a week; a powered-off host shows `stale:>2h` rather than a missing row; ingest stays behind the existing vhost.
       '';
     };
+    sentinel-queue-probe = {
+      title = "Sentinel observes the mail queue, not just its sockets";
+      kind = "decision";
+      status = "DELIVERED";
+      date = "2026-11-19";
+      summary = "`agents:hub` is pull-only, so a queue that stopped draining was silent until a person looked. The collector now reads `/api/queue-health` from the archive and degrades on person/action backlog, fresh unowned attention mail, an unreachable probe and importer lag.";
+      refs = {
+        modules = ["modules/services/fleet-sentinel.nix" "modules/services/email-archive-endpoints/queue-health.sql"];
+        hosts = ["delphi"];
+        tasks = ["ops:health" "agents:hub"];
+      };
+      body = ''
+        Thresholds are options rather than constants so a host opts in and owns what `degraded` means there: `maxOpenPerson` 25, `maxOpenAction` 40, `maxUnmatchedFresh` 20, `maxMailAgeHours` 26 with a prior-week baseline. Only a host holding the archive sets `queueProbe.url`; an absent probe is neutral, an unreachable one degrades.
+      '';
+    };
     p2-vault-write-path = {
       title = "P2 — a real write path to the vault";
       kind = "proposal";

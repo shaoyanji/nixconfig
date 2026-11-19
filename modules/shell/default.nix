@@ -2,6 +2,7 @@
 {
   self,
   pkgs,
+  lib,
   ...
 }: let
   myAliases = {
@@ -181,6 +182,14 @@ in {
         "--group-directories-first"
       ];
     };
+  };
+
+  home.file.".bash_profile" = lib.mkForce {
+    text = ''
+      [[ -f ~/.profile ]] && . ~/.profile || true
+      [[ -f ~/.bashrc ]] && . ~/.bashrc || true
+      :
+    '';
   };
 
   home.file.".bash_aliases".text = ''

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-18T23:47:45Z",
+  "generated": "2026-11-19T07:21:07Z",
   "count": 200,
-  "pin": "d7e20a29ea7b64e9db32de03496a000ab9b7fe1a2b30aca05bb03dedf4d5895e",
+  "pin": "94fe082189f6d5838ad1aa6523826171ec36a3322bd008c54b75c708c2e21862",
   "turns": [
+    {
+      "id": "8c4b4adb-a251-4e45-bd5d-c2d8182aac9c",
+      "ts": "2026-11-19T00:20:58Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-19: 13 plate(s) kept of 15 spent, 5 roster row(s) waiting, 535 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c106ebf085ec1cd5ec670c53fc9438160a7dba94",
+      "branch": "main",
+      "frame": "03h9g12p3718qryy2npfr7gca"
+    },
+    {
+      "id": "db2b967d-db04-44ef-ae5a-385c4fa7ac0b",
+      "ts": "2026-11-18T23:53:19Z",
+      "source": "devji",
+      "subject": "nixconfig:media-mail-cli",
+      "action": "media: delete/gc/merged listing+inline player; media and mail CLIs over the tailnet APIs; delphi switched",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "288a74196288fb030bbf4b9186803954b2a57f47",
+      "branch": "main",
+      "frame": "03h9fvo91ea7r6xpxyk33k7ue"
+    },
     {
       "id": "57067bfc-14d8-4883-8922-f7abd58572c5",
       "ts": "2026-11-18T23:43:35Z",
@@ -2707,42 +2733,6 @@
       "base_commit": "6b3a958c94396446d625c2cf713b665cc90b14bc",
       "branch": "main",
       "frame": "03h7vc1i34lsmr15y0kjscqfp"
-    },
-    {
-      "id": "df31c080-d160-46b4-ad24-ad4671ec0207",
-      "ts": "2026-11-11T17:54:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:xs-notify",
-      "action": "services.xsNotify: a 2-minute user timer toasts new xs turns through libnotify; on for aristotle, diogenes, poseidon, stark (host files) and fern, netbook, scratch (dwl profile); eisen, frieren and delphi left out; nothing deployed yet",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/xs-notify.nix"
-      ],
-      "files": [
-        "modules/services/xs-notify.nix",
-        "modules/profiles/base-desktop-environment.nix",
-        "modules/profiles/dwl-desktop.nix",
-        "hosts/aristotle/configuration.nix",
-        "hosts/diogenes/configuration.nix",
-        "hosts/poseidon/configuration.nix",
-        "hosts/stark/configuration.nix"
-      ],
-      "base_commit": "8732d8cd",
-      "branch": "main",
-      "frame": "03h7v8gt3s38soxfka1jtil7r"
-    },
-    {
-      "id": "b5f9cf1b-711b-4d8a-89ff-6b77692928e2",
-      "ts": "2026-11-11T15:55:05Z",
-      "source": "devji",
-      "subject": "nixconfig:netbook-keymap-rotation",
-      "action": "Mod+Return=terminal, one launcher chord, rotation is a priority list headed by Frieren plates (10 new), inventory says dwl/Dux 2.0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6c377ebb950596a8e5a26c073f1f680c160b6df1",
-      "branch": "main",
-      "frame": "03h7ul64ms0rd28hlr469haj1"
     }
   ]
 }

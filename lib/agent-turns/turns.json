@@ -1,8 +1,67 @@
 {
-  "generated": "2026-11-19T09:27:05Z",
+  "generated": "2026-11-19T09:49:14Z",
   "count": 200,
-  "pin": "833bcf694f161680e0912cdd5b270cd22ae1b8b35f488caac0b19e24b3322836",
+  "pin": "4b500441ce3b8993737aed2570dd6a08d776db78cfc85a30e983a31b0f055007",
   "turns": [
+    {
+      "id": "dca8efb4-5358-4403-9f9d-e0987d31a405",
+      "ts": "2026-11-19T09:45:39Z",
+      "source": "devin",
+      "subject": "nixconfig:fibtransponder-zeckendorf",
+      "action": "mapped kg-zeck epoch cache (devin/1795077799-kg-zeck-cache) onto fibtransponder: epoch->marker-cut sketch payload, dirty log->MemOpLog, Zeckendorf blocks->CA replay segments, quotient->frontier state id; proposed measurement-first replay probe",
+      "outcome": "done",
+      "claims": [
+        "/Volumes/data/projects/fibtransponder"
+      ],
+      "files": [],
+      "base_commit": "c5119370",
+      "branch": "main",
+      "frame": "03h9j3dqswa2ji960uptx1v9s"
+    },
+    {
+      "id": "f3bbf97f-e88f-4da6-976a-e60ec390a81d",
+      "ts": "2026-11-19T09:35:41Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 13: freebuff landed infron backup subagent (c5119370, scripts/infron-subagent.sh wires reasonix to llm.onerouter.pro via OpenAI-compatible [[providers]] block, deepseek-v4-flash-0731:free primary + qwen3.8-27b:free backup, checks:infron gate). Verified live: reasonix -p --model infron/... answers. devin on postgres fetcher. agy on job research.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "c511937012a13ee9f9f3dea42f9adbeb29b1b4f1",
+      "branch": "main",
+      "frame": "03h9j1fmz0j703f4leifbk5y0"
+    },
+    {
+      "id": "bd80f91b-6242-4465-9feb-3ee1b72545d1",
+      "ts": "2026-11-19T09:34:07Z",
+      "source": "devin",
+      "subject": "nixconfig:apps-pipeline-triage",
+      "action": "apps doer turn: marked 33 duplicate rows (status 'Duplicate of <keep-id>' -> stage other; kept the 09-2x originals over 10-04 re-imports, mail/folder evidence) and corrected 5 dead JDs (nerdware, clera-backend, glassflow, vultr, qwist -> '; JD 404' + repost-check next action)",
+      "outcome": "done",
+      "claims": [
+        "email_archive.applications (delphi)"
+      ],
+      "files": [],
+      "base_commit": "c5119370",
+      "branch": "main",
+      "frame": "03h9j14lfuf7stqp8rcscqg03"
+    },
+    {
+      "id": "bf3c0b82-c8c2-441e-8c86-816ac1281679",
+      "ts": "2026-11-19T09:27:16Z",
+      "source": "devji",
+      "subject": "nixconfig:infron-subagent",
+      "action": "landed c5119370: scripts/infron-subagent.sh runs reasonix -p on the infron provider (deepseek-v4-flash:free, qwen backup), resolves key from sops, refuses paid ids; live both answered; gate+quick+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c511937012a13ee9f9f3dea42f9adbeb29b1b4f1",
+      "branch": "main",
+      "frame": "03h9izsfgp14itgws7b3dvpaz"
+    },
     {
       "id": "4a282c7e-9322-46c9-9690-15a9c542fb47",
       "ts": "2026-11-19T09:16:30Z",
@@ -2706,58 +2765,6 @@
       "base_commit": "2d836e203e38f5bced0b65828145b06e8c850cf5",
       "branch": "main",
       "frame": "03h8rm7i5ot24os9osd5arzr2"
-    },
-    {
-      "id": "4bdd5c5f-818f-4ae4-8a95-8d2b397d31f6",
-      "ts": "2026-11-15T19:21:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:gcal-dead-grant",
-      "action": "google sync: that consent granted time-based access (52 seconds), so the grant was dead on arrival; the 1616 Server disconnected lines were noise around one invalid-grant. Added checks:gcal (one exchange, names the failure kind) and calendar-auth.sh refuses a time-based grant at consent time, eace6645. The fix needs one click: gcal-auth is live on port 58501",
-      "outcome": "blocked: awaiting a Google consent click",
-      "claims": [],
-      "files": [],
-      "base_commit": "eace66455829fd3c42e82e8a3912ef4b3ed9765b",
-      "branch": "main",
-      "frame": "03h8qyo62g8kxnzio0dge4qjq"
-    },
-    {
-      "id": "37491b31-6f35-4324-a6cc-54486cee2a10",
-      "ts": "2026-11-15T19:16:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:calendar-client-sync",
-      "action": "vdirsyncer-personal was enabled and dead: the pair is calendar_<account>, not the account name, and a from-a pair needs discover first, whose create-the-collection prompt a tty-less unit cannot answer (yes now supplies it). Renamed the account to radicale so khal exposes the collection as 'personal' rather than 'personal1'. ba0ec7d8, e30a832c; delphi switched; khal new -> server .ics -> DELETE round trip proven, timer fires at :15",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e30a832c68ecf61b7b121524ab1ae93895715859",
-      "branch": "main",
-      "frame": "03h8qxlwekodmljdlfuobxbpi"
-    },
-    {
-      "id": "a8a6a4a6-0430-406e-b7f2-d8ffd3977c76",
-      "ts": "2026-11-15T18:53:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:ntfy-caldav-channels",
-      "action": "ntfy and Radicale now wired at both ends on delphi (d0b7682d, 6342a937): ntfy has one sops user 'fleet' on topic 'fleet', anonymous denied, published by the appflow sync, gated by checks:ntfy (probe read back from cache); Radicale seeds a 'personal' collection with accounts.calendar.accounts.personal plus its own vdirsyncer-personal unit, gated by checks:caldav. Traps: DynamicUser leaves /var/lib/ntfy a dangling symlink a static user rejects",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6342a937a15b8ef0fc183d2d91ca7280e1540c18",
-      "branch": "main",
-      "frame": "03h8qt6l85duquo3qo7nz61fo"
-    },
-    {
-      "id": "4682a656-2683-4204-bd34-578102ac7cd3",
-      "ts": "2026-11-15T18:18:08Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-question-guard",
-      "action": "wired a hosted FIM option (MINUET_API_KEY_NAME, n_completions 1) upstream c3b5a6f, CI green; appflow sync now parks question-shaped mail in review/human with a next action instead of resolving it (af32fc0b, fixture 15/15); sweep found no other unanswered question in that class",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "af32fc0b85a735c3223acbe789717df96edb6806",
-      "branch": "main",
-      "frame": "03h8qmax577t9ok727evrp3vp"
     }
   ]
 }

@@ -33,13 +33,15 @@ case $model in
 esac
 
 key="${INFRON_API_KEY:-}"
-if [ -z "$key" ] && command -v sops >/dev/null 2>&1 && [ -f "$repo/modules/secrets.yaml" ]; then
-  key="$(sops -d "$repo/modules/secrets.yaml" 2>/dev/null |
-    yq -p yaml -o json '.["ai-services-shared-env"]' -r 2>/dev/null |
+if [ -z "$key" ] && command -v sops >/dev/null 2>&1; then
+  # The path is resolved in one place; this script only names the blob.
+  # shellcheck source=scripts/task/lib/paths.sh
+  . "$repo/scripts/task/lib/paths.sh"
+  key="$(secret_get '["ai-services-shared-env"]' 2>/dev/null |
     sed -n 's/^INFRON_API_KEY=//p' | head -1)" || true
 fi
 if [ -z "$key" ]; then
-  echo "infron-subagent: no INFRON_API_KEY (export it, or decrypt modules/secrets.yaml here)" >&2
+  echo "infron-subagent: no INFRON_API_KEY (export it, or decrypt the shared sops blob here)" >&2
   exit 2
 fi
 export INFRON_API_KEY="$key"

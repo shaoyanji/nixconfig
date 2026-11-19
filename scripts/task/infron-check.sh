@@ -138,6 +138,60 @@ else
   bad "$persona is missing"
 fi
 
+echo "== dsh provider"
+# The dsh overlay is repo-owned, so every field that makes it the Infron route is
+# checkable, and a model id that lost its `:free` suffix is the same balance risk
+# here as in the reasonix provider block.
+dsh_patch="$repo/modules/user/ai/dsh-infron.patch.yml"
+dsh_wrapper="$repo/scripts/dsh-infron.sh"
+if [ -f "$dsh_patch" ]; then
+  ok "the dsh overlay exists"
+  if grep -q 'id: llm-pi-ai' "$dsh_patch"; then
+    ok "the overlay targets the llm-pi-ai provider plugin"
+  else
+    bad "the dsh overlay does not target llm-pi-ai"
+  fi
+  if grep -q 'api: openai-completions' "$dsh_patch"; then
+    ok "the route speaks OpenAI Chat Completions"
+  else
+    bad "the dsh route does not name its API protocol"
+  fi
+  if grep -q 'baseURL: https://llm.onerouter.pro/v1' "$dsh_patch"; then
+    ok "the dsh route points at llm.onerouter.pro/v1"
+  else
+    bad "the dsh route does not point at Infron"
+  fi
+  if grep -q 'apiKeyEnv: INFRON_API_KEY' "$dsh_patch"; then
+    ok "the dsh route reads INFRON_API_KEY"
+  else
+    bad "the dsh route does not name INFRON_API_KEY"
+  fi
+  dsh_ids="$(grep -oE '(deepseek|qwen)/[A-Za-z0-9._:-]+' "$dsh_patch" | sort -u)"
+  while IFS= read -r id; do
+    [ -n "$id" ] || continue
+    case "$id" in
+      *:free) ok "dsh model $id is :free" ;;
+      *) bad "dsh model $id is not :free — the route bills that id" ;;
+    esac
+  done <<<"$dsh_ids"
+else
+  bad "$dsh_patch is missing"
+fi
+if [ -f "$dsh_wrapper" ]; then
+  if grep -q 'INFRON_MODEL:-\$primary' "$dsh_wrapper"; then
+    ok "the dsh wrapper defaults to the :free primary"
+  else
+    bad "the dsh wrapper does not default to the :free primary"
+  fi
+  if grep -q '\*:free)' "$dsh_wrapper"; then
+    ok "the dsh wrapper refuses a non-:free id"
+  else
+    bad "the dsh wrapper has no :free guard"
+  fi
+else
+  bad "$dsh_wrapper is missing"
+fi
+
 echo "== reasonix provider"
 # The provider block is user state (`~/.reasonix/config.toml`), so it is checked
 # where it exists and skipped where it does not — but a block that names a paid id

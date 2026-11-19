@@ -1,0 +1,22 @@
+# dsh profile patch: point the headless agent at Infron's OpenAI-compatible route.
+# `scripts/dsh-infron.sh` passes this as a `--patch` overlay, so the profile's own
+# cordis.patch.yml stays untouched and this file is the one copy of the route.
+#
+# `llm-pi-ai` is the provider plugin (@deepseek-ai/dsh-llm-pi-ai). In the headless
+# tree it mounts with no `providers`, which is why replacing its config drops
+# nothing; a route the shipped catalog does not describe must name `api`, and
+# llm.onerouter.pro speaks OpenAI Chat Completions.
+- id: llm-pi-ai
+  config:
+    providers:
+      infron:
+        apiKeyEnv: INFRON_API_KEY
+        api: openai-completions
+        baseURL: https://llm.onerouter.pro/v1
+        models:
+          - id: "deepseek/deepseek-v4-flash-0731:free"
+          - id: "qwen/qwen3.8-27b:free"
+- id: agent-default-model
+  config:
+    provider: infron
+    model: "deepseek/deepseek-v4-flash-0731:free"

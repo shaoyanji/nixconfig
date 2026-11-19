@@ -307,6 +307,10 @@ in {
     # failed every 15 minutes for three days and a keepalive that failed 104
     # times, both invisible to a collector that only asks the system manager.
     collectUserUnits = true;
+    push = {
+      url = "http://100.97.61.65/sentinel/ingest";
+      tokenFile = config.sops.secrets."agent-turns-token".path;
+    };
     # The same publisher the appflow triage uses (hosts/delphi/email-archive.nix),
     # so the push channel has one configuration and one credential on this fleet.
     notify = {
@@ -315,6 +319,7 @@ in {
       user = "fleet";
       passwordFile = config.sops.secrets."ntfy/fleet-password".path;
     };
+    queueProbe.url = "http://127.0.0.1:${toString config.services.emailArchive.port}/api/queue-health";
   };
 
   # --- Declarative Autonomous Agent Scheduler (EXP-016) -----------------------

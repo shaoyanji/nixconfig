@@ -464,3 +464,11 @@ kind = "leaf"
 [[check]]
 name = "checks:docs:links:test"
 kind = "leaf"
+
+[[check]]
+name = "checks:services:ports"
+kind = "leaf"
+
+[[check]]
+name = "checks:services:ports:test"
+kind = "leaf"

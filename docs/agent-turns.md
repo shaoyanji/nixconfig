@@ -161,9 +161,9 @@ ways and never prints a raw event to an agent.
 | `CLAIM='a,b'` | exit 1 when a live claim overlaps an area you are about to touch |
 | `FORMAT=toon` (default) · `text` · `json` | compact rows for an agent · a person · the whole model for a program |
 
-A row is `ts, src, subj, out, act, claims, files, id` plus `hit` (the fields that
-matched) and `snip` (a word-aligned window around the first match), and the
-payload always ends with `live`, `stale` and `verdict`:
+A row is `ts, src, subj, out, act, claims, files, commits, id` plus `hit` (the
+fields that matched) and `snip` (a word-aligned window around the first match),
+and the payload always ends with `live`, `stale` and `verdict`:
 
 ```bash
 $ task agents:xs:list Q="tika heap" LIMIT=3
@@ -173,8 +173,8 @@ truncated: false
 matched: 2
 stored: 168
 stale_days: 7
-turns[2]{ts,src,subj,out,act,claims,files,id,hit,snip}:
-  "2026-11-05T15:19",buffy,"nixconfig:delphi-microvm-cleanup",done,"Deployed the tika heap-flag fix on delphi…",hosts/delphi,0,03h6jighuo0twatcedwx3d1vt,action,"…"
+turns[2]{ts,src,subj,out,act,claims,files,commits,id,hit,snip}:
+  "2026-11-05T15:19",buffy,"nixconfig:delphi-microvm-cleanup",done,"Deployed the tika heap-flag fix on delphi…",hosts/delphi,0,,03h6jighuo0twatcedwx3d1vt,action,"…"
   "2026-11-05T15:13",buffy,"nixconfig:checks-units",done,"Added checks:units (systemd-analyze verify…","taskfiles/checks.yml,scripts/task/unit-gate.sh",7,03h6jhajs277mthu4nlc3ld0g,action,"…"
 live[3]{ts,subj,src,kind,text}:
   …
@@ -188,9 +188,12 @@ matched field in brackets, then the claims and the verdict. `snip` is suppressed
 there when the match is only in `action`/`subject`, which the row already prints.
 
 The row is deliberately not the event: `rationale` (up to 1000 characters), the
-full file list and the commit hashes stay in `FORMAT=json` and in the store. An
-agent reading twelve rows should be able to answer "did someone already do this,
-and where is it written" without spending twelve kilobytes.
+full file list and the untruncated commit list stay in `FORMAT=json` and in the
+store. `commits` carries the hashes a `done` turn landed, comma-joined and clipped
+like `claims`, so a reader can go from a row straight to `git show` without
+fetching the event. An agent reading twelve rows should be able to answer "did
+someone already do this, and where is it written" without spending twelve
+kilobytes.
 
 Rejections: `401` missing or wrong bearer; `400` unknown field, missing field,
 bad UUID or timestamp, bad `outcome`, a blocked/failed outcome without its note,

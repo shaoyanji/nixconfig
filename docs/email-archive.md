@@ -135,28 +135,25 @@ and so re-classifying never rewrites the archive.
 | `resolved_at` | set by whatever dealt with it; an unresolved row is the queue |
 
 The classifier (`modules/services/email-triage.py`) runs rules first, in an
-order that decides the queue: VIP, declared pointers, CI, plugin claims (sender
-**or** subject), deadline signals → `action`, records → `digest`, one-shot codes
-and alerts → `robot`, machine senders → `digest`. The residue reaches `julia-1`
-(3 ms per question); a verdict that does not lead the runner-up by
-`triage.margin` becomes **`review`**. The second architecture (`laya`) then
-overrides it in **either direction** — a definite verdict replaces the other
-model's, and only a tie keeps `julia`'s tier — so the queue pays for a
-classification, not for a tie. A sender that writes repeatedly with no deadline
-is a feed and becomes `digest`; a declared **pointer** (`triage.pointers`, one a
-day from an assistant) is exempt and stays in front of a person for a week.
-`triage.expireDays` resolves `review` rows nobody touched in 30 days; `person`,
-`action` and pointers are never expired.
+order that decides the queue: VIP, pointers, CI, plugin claims (sender **or**
+subject), deadlines → `action`, records → `digest`, one-shot codes → `robot`,
+machine senders → `digest`. The residue reaches `julia-1`; a verdict that does
+not lead the runner-up by `triage.margin` becomes **`review`**, and `laya`
+overrides either model in **either direction** — only a tie keeps `julia`'s tier.
+A sender writing repeatedly with no deadline is a feed (`digest`); a declared
+**pointer** stays in front of a person for a week.
+
+**A stronger second opinion.** `triage.secondBackend = "openai"` posts the
+envelope — sender, subject, labels, never a body — to a `:free` route and reads
+one JSON verdict in the same five tiers. Delphi sets it because julia-1 calls
+marketing `person` and laya parks it in `review`; on 2026-11-19 it closed 12
+digest/robot rows and left every `action` row in front of a person.
 
 **One decision per sender, not per message.** `task agents:mail:sweep
-SENDER=<substring> DRY=1` counts what a selector matches (by tier and sender)
-and `DRY=0` resolves the block through `/api/triage-resolve`. At least one
-selector is required, so a typo cannot empty the queue. Measured 2026-11-03: the
-human queue went 511 → 50 in one pass. 203 rows were a machine sender filed as a
-person's action item and 104 were one-shot codes or records; the 30-day expiry
-took the old review tail, and the two consumers took their own (235 CI notices,
-43 application mails to the pipeline). What is left is 21 action rows, 2 people
-and 27 reviews.
+SENDER=<substring> DRY=1` counts what a selector matches and `DRY=0` resolves it
+through `/api/triage-resolve`; one selector is required, so a typo cannot empty
+the queue. On 2026-11-03 that plus the 30-day expiry took it from 511 to 50 (the
+`mail-archive` skill keeps the breakdown).
 
 **The VIP list is encrypted config, not state.** `modules/secrets.yaml` carries
 `email-archive.vip-senders`; sops-nix lands it as a 0400 file at `triage.vipFile`,

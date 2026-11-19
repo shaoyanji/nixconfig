@@ -185,6 +185,8 @@
     lib.concatStringsSep "\n" cfg.triage.pointers + "\n"
   );
 
+  secondKeyArg = lib.optionalString (cfg.triage.secondBackend == "openai") "--second-key-file ${lib.escapeShellArg config.sops.secrets."ai-services-shared-env".path}";
+
   classifier = pkgs.writeShellApplication {
     name = "email-archive-triage";
     runtimeInputs = [pkgs.python3];
@@ -199,6 +201,11 @@
         --engine-url ${lib.escapeShellArg cfg.triage.engineUrl} \
         --second-engine-url ${lib.escapeShellArg cfg.triage.secondEngineUrl} \
         --second-classifier ${lib.escapeShellArg cfg.triage.secondClassifier} \
+        --second-backend ${lib.escapeShellArg cfg.triage.secondBackend} \
+        --second-base-url ${lib.escapeShellArg cfg.triage.secondBaseUrl} \
+        --second-model ${lib.escapeShellArg cfg.triage.secondModel} \
+        --second-fallback-model ${lib.escapeShellArg cfg.triage.secondFallbackModel} \
+        ${secondKeyArg} \
         --margin ${toString cfg.triage.margin} \
         --expire-days ${toString cfg.triage.expireDays} \
         "$@"
@@ -491,6 +498,42 @@ in {
         '';
       };
 
+      secondBackend = lib.mkOption {
+        type = lib.types.enum ["systemone" "openai"];
+        default = "systemone";
+        description = ''
+          Who answers the second pass. `systemone` is the local second
+          architecture on this host (laya, 421M parameters). `openai` posts the
+          envelope to an OpenAI-compatible route — the model ids must end in
+          `:free`, because a paid id spends the balance that keeps the free ones
+          answering. A host picks the remote backend only where the local models'
+          verdicts are the problem: a 144M model calls a marketing send `person`
+          and a 421M one parks it in `review`, and both land in front of a human.
+        '';
+      };
+
+      secondBaseUrl = lib.mkOption {
+        type = lib.types.str;
+        default = "https://llm.onerouter.pro/v1";
+        description = ''
+          Base URL for `secondBackend = "openai"`. The default is the fleet's
+          Infron route; scripts/infron-chat.sh is the caller that knows its
+          model list and its fallback rule.
+        '';
+      };
+
+      secondModel = lib.mkOption {
+        type = lib.types.str;
+        default = "deepseek/deepseek-v4-flash-0731:free";
+        description = "Model id for the remote second opinion; must end in `:free`.";
+      };
+
+      secondFallbackModel = lib.mkOption {
+        type = lib.types.str;
+        default = "qwen/qwen3.8-27b:free";
+        description = "Model tried when the first remote model cannot answer.";
+      };
+
       margin = lib.mkOption {
         type = lib.types.float;
         default = 0.10;
@@ -542,6 +585,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    sops.secrets."ai-services-shared-env" =
+      lib.mkIf (cfg.triage.enable && cfg.triage.secondBackend == "openai") {};
+
     # On PATH so `task checks:email:bodies` resolves the same converter the
     # importer runs, with no second pin.
     environment.systemPackages =

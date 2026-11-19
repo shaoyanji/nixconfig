@@ -13,8 +13,8 @@ metadata:
 
 # ontology — what may exist in the graph, and what an edge proves
 
-`flake/ontology.nix` is the schema `.#knowledgeGraph` is an instance of: nine
-entity types and nine relations. It answers what `flake/epistemics.nix` cannot.
+`flake/ontology.nix` is the schema `.#knowledgeGraph` is an instance of: ten
+entity types and ten relations. It answers what `flake/epistemics.nix` cannot.
 Epistemics says which **source** may settle a claim; ontology says which
 **thing** a claim can be filed on, and how strong an edge between two things is.
 The two meet at the evidence ladder, which epistemics owns.

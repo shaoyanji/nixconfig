@@ -138,6 +138,166 @@ else
   bad "$persona is missing"
 fi
 
+echo "== dsh provider"
+# The dsh overlay is repo-owned, so every field that makes it the Infron route is
+# checkable, and a model id that lost its `:free` suffix is the same balance risk
+# here as in the reasonix provider block.
+dsh_patch="$repo/modules/user/ai/dsh-infron.patch.yml"
+dsh_wrapper="$repo/scripts/dsh-infron.sh"
+if [ -f "$dsh_patch" ]; then
+  ok "the dsh overlay exists"
+  if grep -q 'id: llm-pi-ai' "$dsh_patch"; then
+    ok "the overlay targets the llm-pi-ai provider plugin"
+  else
+    bad "the dsh overlay does not target llm-pi-ai"
+  fi
+  if grep -q 'api: openai-completions' "$dsh_patch"; then
+    ok "the route speaks OpenAI Chat Completions"
+  else
+    bad "the dsh route does not name its API protocol"
+  fi
+  if grep -q 'baseURL: https://llm.onerouter.pro/v1' "$dsh_patch"; then
+    ok "the dsh route points at llm.onerouter.pro/v1"
+  else
+    bad "the dsh route does not point at Infron"
+  fi
+  if grep -q 'apiKeyEnv: INFRON_API_KEY' "$dsh_patch"; then
+    ok "the dsh route reads INFRON_API_KEY"
+  else
+    bad "the dsh route does not name INFRON_API_KEY"
+  fi
+  dsh_ids="$(grep -oE '(deepseek|qwen)/[A-Za-z0-9._:-]+' "$dsh_patch" | sort -u)"
+  while IFS= read -r id; do
+    [ -n "$id" ] || continue
+    case "$id" in
+      *:free) ok "dsh model $id is :free" ;;
+      *) bad "dsh model $id is not :free — the route bills that id" ;;
+    esac
+  done <<<"$dsh_ids"
+else
+  bad "$dsh_patch is missing"
+fi
+if [ -f "$dsh_wrapper" ]; then
+  if grep -q 'INFRON_MODEL:-\$primary' "$dsh_wrapper"; then
+    ok "the dsh wrapper defaults to the :free primary"
+  else
+    bad "the dsh wrapper does not default to the :free primary"
+  fi
+  if grep -q '\*:free)' "$dsh_wrapper"; then
+    ok "the dsh wrapper refuses a non-:free id"
+  else
+    bad "the dsh wrapper has no :free guard"
+  fi
+else
+  bad "$dsh_wrapper is missing"
+fi
+
+echo "== reasonix provider"
+# The provider block is user state (`~/.reasonix/config.toml`), so it is checked
+# where it exists and skipped where it does not — but a block that names a paid id
+# or the wrong route is the same balance risk as a bad default in the helper.
+rx="$HOME/.reasonix/config.toml"
+wrapper="$repo/scripts/infron-subagent.sh"
+if [ -f "$wrapper" ]; then
+  if grep -q 'INFRON_MODEL:-deepseek/deepseek-v4-flash-0731:free' "$wrapper"; then
+    ok "the wrapper defaults to the :free primary"
+  else
+    bad "the wrapper does not default to the :free primary"
+  fi
+  if grep -q '\*:free)' "$wrapper"; then
+    ok "the wrapper refuses a non-:free id"
+  else
+    bad "the wrapper has no :free guard"
+  fi
+else
+  bad "$wrapper is missing"
+fi
+if [ -f "$rx" ]; then
+  if grep -Eq 'name[[:space:]]*=[[:space:]]*"infron"' "$rx"; then
+    ok "~/.reasonix/config.toml declares the infron provider"
+  else
+    bad "~/.reasonix/config.toml has no infron provider — infron-subagent cannot answer"
+  fi
+  if grep -Eq 'base_url[[:space:]]*=[[:space:]]*"https://llm\.onerouter\.pro/v1"' "$rx"; then
+    ok "the provider points at llm.onerouter.pro/v1"
+  else
+    bad "the provider base_url is not the Infron route"
+  fi
+  if grep -Eq 'api_key_env[[:space:]]*=[[:space:]]*"INFRON_API_KEY"' "$rx"; then
+    ok "the provider reads INFRON_API_KEY"
+  else
+    bad "the provider does not name INFRON_API_KEY"
+  fi
+  rx_ids="$(grep -oE '(deepseek|qwen)/[A-Za-z0-9._:-]+' "$rx" | sort -u)"
+  while IFS= read -r id; do
+    [ -n "$id" ] || continue
+    case "$id" in
+      *:free) ok "reasonix model $id is :free" ;;
+      *) bad "reasonix model $id is not :free — the route bills that id" ;;
+    esac
+  done <<<"$rx_ids"
+else
+  ok "no ~/.reasonix/config.toml (provider block is user state; skipped)"
+fi
+
+echo "== dispatch"
+# The dispatcher is the operator's one command, so its plan is checkable without a
+# request: which agent a task kind picks, that a plan never names a paid id, and that
+# the JSON shape a program parses is the one the dry run prints.
+dispatcher="$repo/scripts/dispatch.sh"
+if [ -f "$dispatcher" ]; then
+  ok "the dispatcher exists"
+  plan_code="$(bash "$dispatcher" --dry-run --kind code "fix the failing assertion in scripts/x.sh" 2>/dev/null)"
+  plan_quick="$(bash "$dispatcher" --dry-run --kind quick "name one risk" 2>/dev/null)"
+  first_code="$(printf '%s\n' "$plan_code" | head -1)"
+  first_quick="$(printf '%s\n' "$plan_quick" | head -1)"
+  case "$first_code" in
+    reasonix:*) ok "a code task walks reasonix first" ;;
+    *) bad "the code plan starts with '$first_code'" ;;
+  esac
+  case "$first_quick" in
+    dsh:*) ok "a quick task walks dsh first" ;;
+    *) bad "the quick plan starts with '$first_quick'" ;;
+  esac
+  paid=""
+  while IFS= read -r entry; do
+    [ -n "$entry" ] || continue
+    case "${entry#*:}" in
+      *:free) ;;
+      *) paid="${entry#*:}" ;;
+    esac
+  done <<<"$(printf '%s\n%s\n' "$plan_code" "$plan_quick")"
+  [ -n "$paid" ] && bad "a dispatch plan names the paid id '$paid'" || ok "every planned model id is :free"
+  if bash "$dispatcher" --dry-run --json "hi" 2>/dev/null | jq -e '.dry_run and (.plan | length > 0)' >/dev/null 2>&1; then
+    ok "the dry-run plan parses as the documented JSON"
+  else
+    bad "the dry-run plan is not the documented JSON shape"
+  fi
+  forced="$(bash "$dispatcher" --dry-run --kind quick --agent reasonix "hi" 2>/dev/null | head -1)"
+  case "$forced" in
+    reasonix:*) ok "--agent restricts the plan to one agent" ;;
+    *) bad "--agent did not restrict the plan: '$forced'" ;;
+  esac
+  auto_code="$(bash "$dispatcher" --dry-run "please refactor scripts/dispatch.sh" 2>/dev/null | head -1)"
+  case "$auto_code" in
+    reasonix:*) ok "kind=auto reads a path and a verb as a code task" ;;
+    *) bad "kind=auto misread a code task: '$auto_code'" ;;
+  esac
+  bash "$dispatcher" --dry-run --kind nonsense "hi" >/dev/null 2>&1
+  [ $? -eq 2 ] && ok "an unknown kind is refused" || bad "an unknown kind was not refused"
+  bash "$dispatcher" --dry-run --agent nope "hi" >/dev/null 2>&1
+  [ $? -eq 2 ] && ok "an unknown agent is refused" || bad "an unknown agent was not refused"
+  bash "$dispatcher" --dry-run -- "" </dev/null >/dev/null 2>&1
+  [ $? -eq 2 ] && ok "an empty prompt is refused" || bad "an empty prompt was not refused"
+  if grep -Eq 'modules/secrets|secrets\.yaml' "$dispatcher"; then
+    bad "the dispatcher spells the secrets path instead of leaving it to the wrappers"
+  else
+    ok "the dispatcher takes the secrets path from paths.sh"
+  fi
+else
+  bad "$dispatcher is missing"
+fi
+
 echo "== both down"
 : >"$log"
 PATH="$work/bin:$PATH" STUB_LOG="$log" STUB_MODE=down bash "$helper" "hi" >"$work/out" 2>"$work/err"

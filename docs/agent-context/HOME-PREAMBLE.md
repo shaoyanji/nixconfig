@@ -42,22 +42,29 @@
 
 ## Agent turns (before and after every turn, mandatory)
 
-A fleet turn log lives on delphi so agents can see who is working on what, from
-which base commit, before starting — and so a merge or test is checked against
-real turns, not a stale chat report. It does not authorize a merge.
+The xs turn log on delphi (`https://delphi.cloudforest-kardashev.ts.net:8449`) is the fleet's single
+coordination signal: stewards consolidate polling to this API instead of polling git or chat.
+Every turn must be logged before starting and after landing. It authorizes no merge.
 
 ```bash
-X=https://delphi.cloudforest-kardashev.ts.net:8449   # tailnet only
-export AGENT_TURNS_TOKEN="$(sops -d ~/Documents/nixconfig/modules/secrets.yaml | yq -r '.["agent-turns-token"]')"
-curl -sS -H "Authorization: Bearer $AGENT_TURNS_TOKEN" "$X/v1/events?repo=<repo>&limit=20" | jq '.events'
+# 1. Before work: check collisions (TOON output) and claim subject + files
+task agents:xs:list SUBJECT=<repo>:<task-id> CLAIM="path/to/dir"
+task agents:xs:post SUBJECT=<repo>:<task-id> ACTION="start: ..." OUTCOME=in_progress CLAIMS="path/to/dir" SOURCE=<agent>
+
+# 2. After landing: record completion (done turn MUST name commit and proving gate)
+task agents:xs:post SUBJECT=<repo>:<task-id> ACTION="landed: ... | gate: checks:<name> PASS" OUTCOME=done COMMITS="<hash>" SOURCE=<agent>
 ```
 
-Read those turns first; if another agent claimed the same area or is
-`in_progress` on the same subject, stop and report it instead of editing in
-parallel. After the turn, `POST $X/v1/events` with the schema in `AGENTS.md`
-§ "Agent turns (xs)" — summaries only, never secrets or transcripts. If the endpoint
-is down, retry once, queue the entry in `~/.local/state/agent-turns/queue.jsonl`,
-and replay it by UUID later.
+- **When to post:**
+  - **Before starting:** Query with `agents:xs:list`. If another agent claimed the area or is `in_progress` on the subject, abort and report. Post `OUTCOME=in_progress` with `CLAIMS=`.
+  - **After landing:** Post final status immediately upon verification.
+- **Exact `OUTCOME` values:**
+  - `done` — landed and verified. **Must name the commit hash and the passing gate** (`COMMITS=` / `ACTION=`).
+  - `in_progress` — active turn claiming subject and paths.
+  - `blocked: <why>` — hard capability stop only (missing credentials, operator action). If work proceeds past an open question, stay `in_progress` with rationale.
+  - `failed: <why>` — gate failed; needs retry.
+- **Consumption:** `task agents:xs:list` emits TOON by default (`FORMAT=toon`), keeping context cheap.
+- **Transport:** Summaries only (no secrets or transcripts). If unreachable, the task automatically queues locally (`~/.local/state/agent-turns/queue.jsonl`) and replays oldest-first by UUID.
 
 ## Closed loop (run this before blaming the config)
 

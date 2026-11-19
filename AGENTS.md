@@ -45,17 +45,17 @@ a procedure is a skill or a page in `docs/`, and the docs site's navigation come
 
 ## Agent turns (xs)
 
-Read the fleet turn log before a turn, post one summary after — coordination state, not chat, and it
-changes no merge authority. `https://delphi.cloudforest-kardashev.ts.net:8449` (tailnet only).
+The xs turn log on delphi (`https://delphi.cloudforest-kardashev.ts.net:8449`) is the fleet's single coordination signal:
+stewards consolidate polling here rather than polling git or chat. Turn logging is mandatory before and after work; it changes no merge authority.
 
 ```bash
-task agents:xs:list Q="<words>"
-task agents:xs:post SUBJECT=nixconfig:<task-id> ACTION="one line" OUTCOME=done
+# Before: check collisions (emits TOON), claim paths | After: done must name commit + passing gate
+task agents:xs:list SUBJECT=nixconfig:<task-id> CLAIM="path/to/dir"
+task agents:xs:post SUBJECT=nixconfig:<task-id> ACTION="claim: ..." OUTCOME=in_progress CLAIMS="path/to/dir" SOURCE=<agent>
+task agents:xs:post SUBJECT=nixconfig:<task-id> ACTION="landed: ... | gate: checks:<name> PASS" OUTCOME=done COMMITS="<hash>" SOURCE=<agent>
 ```
 
-`OUTCOME` is `done` | `in_progress` | `blocked: …` | `failed: …`. Summaries and identifiers only: the shim
-refuses credential-shaped bodies, there is no update or delete route, and an unreachable endpoint queues
-the body and replays it oldest-first. Schema and restore: [`docs/agent-turns.md`](docs/agent-turns.md).
+`OUTCOME` is `done` (landed; names commit + gate) | `in_progress` (claim) | `blocked: <why>` (hard capability/credential stop only) | `failed: <why>` (gate failed; needs retry). `task agents:xs:list` emits compact TOON by default. Summaries only; offline queues to `~/.local/state/agent-turns/queue.jsonl`. Host `~/AGENTS.md` fans out from [`docs/agent-context/HOME-PREAMBLE.md`](docs/agent-context/HOME-PREAMBLE.md) (`task dev:inventory:home-agents`). Schema: [`docs/agent-turns.md`](docs/agent-turns.md).
 
 ## Where a fact lives
 

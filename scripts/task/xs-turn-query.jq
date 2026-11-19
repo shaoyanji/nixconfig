@@ -116,6 +116,7 @@ def matches($tokens; $id):
        act: ((.action // "") | clips(150)),
        claims: ((.claims // []) | join(",") | clips(80)),
        files: ((files | length)),
+       commits: ((.commits // []) | join(",") | clips(80)),
        id: ((._frame // .id // "") | tostring),
        hit: (if $tokens == [] then "" else hitfields($tokens) end),
        snip: (if $tokens == [] then "" else snippet($tokens) end)

@@ -12,6 +12,17 @@
   # Space-delimited for the shell loop below; empty is harmless (`case " " in`).
   IGNORE = lib.concatStringsSep " " cfg.ignoreFailedUnits;
 
+  ingestPackage = pkgs.buildGoModule {
+    pname = "fleet-sentinel-ingest";
+    version = "0.1.0";
+    src = ./fleet-sentinel-ingest;
+    vendorHash = null;
+    meta = {
+      description = "Bearer-checked UNIX-socket receiver for pushed sentinel status";
+      mainProgram = "fleet-sentinel-ingest";
+    };
+  };
+
   collect = pkgs.writeShellApplication {
     name = "fleet-sentinel-collect";
     runtimeInputs = with pkgs; [coreutils gnugrep gawk jq systemd findutils curl];
@@ -39,6 +50,20 @@
       # Assigned rather than used inline: a `case` on a literal word trips
       # SC2194, and writeShellApplication fails the build on any finding.
       IGNORE_UNITS="${IGNORE}"
+
+      # --- can this host answer systemd at all? -----------------------------
+      # `absent` means "not installed on this host" and is neutral by design, so
+      # a host with no systemd manager would answer `absent` for every watched
+      # unit and its verdict would read `ok` — a blind host claiming clean jobs.
+      # The test is the directory, not `command -v systemctl`: systemd's binaries
+      # arrive through this script's own runtimeInputs, so a nix-darwin or
+      # container host has them on PATH and only /run/systemd/system proves a
+      # manager is there to answer.
+      UNIT_OBSERVER="systemd"
+      if [ ! -d /run/systemd/system ]; then
+        UNIT_OBSERVER="none"
+        REASONS+=("unit-status-unobservable")
+      fi
 
       # --- failed units ------------------------------------------------------
       while IFS= read -r line; do
@@ -91,8 +116,15 @@
       fi
 
       # --- oneshot job results ----------------------------------------------
+      # `absent` stays reserved for "installed nowhere on this host". A host that
+      # cannot see systemd gets `unobservable`, a value no consumer can read as
+      # success; the single unit-status-unobservable reason already names why.
       unit_result() {
         local u="$1"
+        if [ "$UNIT_OBSERVER" != "systemd" ]; then
+          printf 'unobservable'
+          return
+        fi
         if ! systemctl cat "$u" >/dev/null 2>&1; then
           printf 'absent'
           return
@@ -109,7 +141,9 @@
         [ "$u" = "-" ] && continue
         r="$(unit_result "$u")"
         case "$r" in
-          success|absent|unknown) ;;
+          # `absent` is neutral and `unobservable` is reported once above, so
+          # neither repeats per unit.
+          success|absent|unknown|unobservable) ;;
           *) REASONS+=("unit-failed:$u:$r") ;;
         esac
         WATCH_JSON="$(printf '%s' "$WATCH_JSON" | jq -c --arg k "$u" --arg v "$r" '. + {($k): $v}')"
@@ -221,6 +255,65 @@
         fi
       ''}
 
+      PEERS_JSON="{}"
+      ${lib.optionalString cfg.ingest.enable ''
+        INCOMING="$ROOT/incoming"
+        mkdir -p "$INCOMING"
+        for f in "$INCOMING"/*.json; do
+          [ -e "$f" ] || continue
+          peer="$(basename "$f" .json)"
+          peer_state="$(jq -r '.state // "unknown"' "$f" 2>/dev/null || true)"
+          [ -n "$peer_state" ] || peer_state="unknown"
+          PEER_AGE_H="$(awk -v now="$(date +%s)" -v mtime="$(stat -c %Y "$f" 2>/dev/null || echo 0)" \
+            'BEGIN { if (mtime > 0) printf "%.1f", (now - mtime) / 3600; else print "0.0" }')"
+          PEERS_JSON="$(printf '%s' "$PEERS_JSON" | jq -c --arg k "$peer" --arg s "$peer_state" \
+            --argjson a "$PEER_AGE_H" '. + {($k): {state: $s, age_h: $a}}')"
+          if [ "$peer_state" != "ok" ]; then
+            REASONS+=("peer-degraded:$peer:$peer_state")
+          fi
+          if awk -v age="$PEER_AGE_H" -v max="${toString cfg.ingest.peerMaxAgeHours}" 'BEGIN { exit !(age > max) }'; then
+            REASONS+=("peer-stale:$peer:''${PEER_AGE_H}h")
+          fi
+        done
+      ''}
+
+      QUEUE_JSON="null"
+      ${lib.optionalString (cfg.queueProbe.url != "") ''
+        QROW=""
+        if QROW="$(curl -fsS --max-time ${toString cfg.queueProbe.timeoutSeconds} "${cfg.queueProbe.url}" 2>/dev/null \
+          | jq -c '(if type == "array" then .[0] else . end) // empty' 2>/dev/null)" \
+          && [ -n "$QROW" ]; then
+          QUEUE_JSON="$(printf '%s' "$QROW" | jq -c '{
+            open_person: (.openPerson // .open_person // 0),
+            open_action: (.openAction // .open_action // 0),
+            unmatched_fresh: (.unmatchedFresh // .unmatched_fresh // 0),
+            newest_mail_age_h: (.newestMailAgeH // .newest_mail_age_h // 0),
+            prior_week_mails: (.priorWeekMails // .prior_week_mails // 0)
+          }')"
+          qnum() { printf '%s' "$QUEUE_JSON" | jq -r --arg k "$1" '.[$k] // 0'; }
+          Q_PERSON="$(qnum open_person)"
+          Q_ACTION="$(qnum open_action)"
+          Q_UNMATCHED="$(qnum unmatched_fresh)"
+          Q_LAG="$(qnum newest_mail_age_h)"
+          Q_PRIOR="$(qnum prior_week_mails)"
+          if [ "$Q_PERSON" -gt ${toString cfg.queueProbe.maxOpenPerson} ]; then
+            REASONS+=("queue-person:$Q_PERSON")
+          fi
+          if [ "$Q_ACTION" -gt ${toString cfg.queueProbe.maxOpenAction} ]; then
+            REASONS+=("queue-action:$Q_ACTION")
+          fi
+          if [ "$Q_UNMATCHED" -gt ${toString cfg.queueProbe.maxUnmatchedFresh} ]; then
+            REASONS+=("queue-unmatched:$Q_UNMATCHED")
+          fi
+          if awk -v age="$Q_LAG" -v max="${toString cfg.queueProbe.maxMailAgeHours}" -v base="$Q_PRIOR" \
+            'BEGIN { exit !(age > max && base > 0) }'; then
+            REASONS+=("mail-stalled:''${Q_LAG}h")
+          fi
+        else
+          REASONS+=("queue-unreachable")
+        fi
+      ''}
+
       # --- assemble ----------------------------------------------------------
       if [ "''${#REASONS[@]}" -eq 0 ]; then
         STATE="ok"
@@ -231,7 +324,16 @@
       fi
 
       REASONS_JSON="$(printf '%s\n' "''${REASONS[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')"
-      FAILED_JSON="$(printf '%s\n' "''${FAILED_UNITS[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')"
+      # `[]` is a claim that a scan ran and found nothing. On a host with no
+      # manager the loop above reads an empty list because systemctl cannot
+      # answer at all, so publish `null` instead: unknown, not zero. Consumers
+      # already treat a missing list as "no names to show" (`// []`), and no
+      # reader can mistake `null` for a clean count.
+      if [ "$UNIT_OBSERVER" = "systemd" ]; then
+        FAILED_JSON="$(printf '%s\n' "''${FAILED_UNITS[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')"
+      else
+        FAILED_JSON="null"
+      fi
 
       EVENT="$(jq -cn \
         --arg ts "$NOW" \
@@ -246,10 +348,14 @@
         --argjson mem_psi "$MEM_PSI" \
         --argjson prefill "$PREFILL_JSON" \
         --argjson audit "$AUDIT_JSON" \
+        --argjson peers "$PEERS_JSON" \
+        --argjson queue "$QUEUE_JSON" \
+        --arg unit_observer "$UNIT_OBSERVER" \
         '{schema: 1, ts: $ts, host: $host, state: $state, reasons: $reasons,
+          unit_observer: $unit_observer,
           failed_units: $failed_units, jobs: $jobs, generation_age_h: $gen_age_h,
           disk_pct: $disk, psi: {io: $io_psi, memory: $mem_psi},
-          prefill: $prefill, audit: $audit}')"
+          prefill: $prefill, audit: $audit, peers: $peers, queue: $queue}')"
 
       printf '%s\n' "$EVENT" >> "$LEDGER"
       # Bounded history: ~100 days at the 15-minute default, enough to correlate
@@ -258,6 +364,22 @@
 
       printf '%s\n' "$EVENT" | jq . > "$STATUS"
       printf '%s\n' "$HEALTH_TEXT" > "$HEALTH"
+
+      ${lib.optionalString (cfg.push.url != "") ''
+        if [ ! -r "$PUSH_TOKEN_FILE" ]; then
+          echo "push: no readable token file; nothing sent"
+        else
+          PUSH_TOKEN="$(cat "$PUSH_TOKEN_FILE")"
+          PUSH_CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 \
+            -H "Authorization: Bearer $PUSH_TOKEN" \
+            -H 'Content-Type: application/json' \
+            --data "$EVENT" "$PUSH_URL" || true)"
+          case "$PUSH_CODE" in
+            2??) ;;
+            *) echo "push: $PUSH_URL answered ''${PUSH_CODE:-nothing}" ;;
+          esac
+        fi
+      ''}
 
       ${lib.optionalString (cfg.notify.url != "") ''
         # --- notify on a change ---------------------------------------------
@@ -406,6 +528,68 @@ in {
       '';
     };
 
+    queueProbe = {
+      url = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = ''
+          HTTP endpoint answering one JSON object of mail-queue counts:
+          `open_person`, `open_action`, `unmatched_fresh`,
+          `newest_mail_age_h`, `prior_week_mails` — the archive's own
+          `/api/queue-health`. Keys are read in the API's camelCase as well as
+          snake_case, because NpgsqlRest camelCases every column it projects.
+          Empty records `queue: null` and never degrades,
+          so a host without a mail queue needs no configuration. A watched unit
+          that exited 0 says the timer fired; these counts are what says the
+          queue moved, so "the queue stopped draining" arrives as a page rather
+          than as silence.
+        '';
+      };
+
+      timeoutSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 5;
+        description = "Seconds the probe may take before it counts as unreachable.";
+      };
+
+      maxOpenPerson = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 25;
+        description = ''
+          Degrade above this many unresolved person-tier messages. A backlog
+          threshold, not a rate: a queue nobody works is the fault this catches,
+          and it clears only when somebody works it.
+        '';
+      };
+
+      maxOpenAction = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 40;
+        description = "Degrade above this many unresolved action-tier messages.";
+      };
+
+      maxUnmatchedFresh = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 20;
+        description = ''
+          Degrade above this many person/action/review messages younger than
+          48 h with no owner at all — the router stopped claiming new mail.
+          Digest and robot traffic is excluded: a mailbox of receipts is not a
+          broken router.
+        '';
+      };
+
+      maxMailAgeHours = lib.mkOption {
+        type = lib.types.float;
+        default = 26.0;
+        description = ''
+          Degrade when the newest archived message is older than this and the
+          mailbox had mail in the previous week. The age alone cannot tell a
+          quiet mailbox from a stalled importer; the prior week's volume can.
+        '';
+      };
+    };
+
     watchUnits = lib.mkOption {
       type = lib.types.listOf (lib.types.submodule {
         options = {
@@ -424,7 +608,10 @@ in {
       description = ''
         Jobs whose last result should degrade the sentinel when not `success`.
         The default set on frieren is the backup/upgrade chain; a host without
-        those units records `absent` and stays neutral.
+        those units records `absent` and stays neutral. A host with no systemd
+        manager at all records `unobservable` and degrades with
+        `unit-status-unobservable` — it must never report a unit it cannot see
+        as healthy.
       '';
     };
 
@@ -471,13 +658,88 @@ in {
         '';
       };
     };
+
+    push = {
+      url = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = ''
+          Central collector URL this host POSTs its status event to. Empty
+          means the host is observed only by its own ledger. The receiver is a
+          UNIX-socket service behind the collector's existing vhost, so no port
+          is opened for it — point this at that vhost's `/sentinel/ingest`.
+        '';
+      };
+      tokenFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = ''
+          File holding the bearer the receiver checks. A path, never an inline
+          secret, so a sops-rendered file is used and nothing lands in the Nix
+          store. Required whenever {option}`push.url` is set.
+        '';
+      };
+    };
+
+    ingest = {
+      enable = lib.mkEnableOption "the UNIX-socket endpoint peers push their status to";
+
+      socket = lib.mkOption {
+        type = lib.types.path;
+        default = "/run/fleet-sentinel/ingest.sock";
+        description = ''
+          Socket the receiver listens on. The vhost proxies to it, which is how
+          this adds no listening port to the host.
+        '';
+      };
+
+      tokenFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = ''
+          File holding the bearer a push must present. Required when
+          {option}`ingest.enable` is set: a receiver without one refuses every
+          push, which is the only safe default for a write endpoint.
+        '';
+      };
+
+      socketGroup = lib.mkOption {
+        type = lib.types.str;
+        default = "nginx";
+        description = "Group allowed to connect to {option}`ingest.socket`.";
+      };
+
+      peerMaxAgeHours = lib.mkOption {
+        type = lib.types.float;
+        default = 1.0;
+        description = ''
+          Degrade when a peer's newest push is older than this. One hour is
+          four missed collections at the 15-minute default: long enough not to
+          fire on a slow run, short enough to report a dead collector the same
+          morning rather than never.
+        '';
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules = [
-      "d ${cfg.stateDir} 0755 root root -"
-      "d ${cfg.stateDir}/www 0755 root root -"
+    assertions = [
+      {
+        assertion = cfg.push.url == "" || cfg.push.tokenFile != null;
+        message = "services.fleetSentinel.push.url is set without push.tokenFile; the receiver would refuse every unauthenticated push.";
+      }
+      {
+        assertion = !cfg.ingest.enable || cfg.ingest.tokenFile != null;
+        message = "services.fleetSentinel.ingest.enable is set without ingest.tokenFile; a write endpoint must refuse rather than accept everything.";
+      }
     ];
+
+    systemd.tmpfiles.rules =
+      [
+        "d ${cfg.stateDir} 0755 root root -"
+        "d ${cfg.stateDir}/www 0755 root root -"
+      ]
+      ++ lib.optionals cfg.ingest.enable ["d ${cfg.stateDir}/incoming 0755 root root -"];
 
     systemd.services.fleet-sentinel = {
       description = "Fleet sentinel: collect observation ledger + health";
@@ -493,7 +755,10 @@ in {
             "NOTIFY_USER=${cfg.notify.user}"
           ]
           ++ lib.optional (cfg.notify.passwordFile != null)
-          "NOTIFY_PASSWORD_FILE=${toString cfg.notify.passwordFile}";
+          "NOTIFY_PASSWORD_FILE=${toString cfg.notify.passwordFile}"
+          ++ lib.optionals (cfg.push.url != "") ["PUSH_URL=${cfg.push.url}"]
+          ++ lib.optional (cfg.push.tokenFile != null)
+          "PUSH_TOKEN_FILE=${toString cfg.push.tokenFile}";
         TimeoutStartSec = 120;
         Nice = 10;
         IOSchedulingClass = "idle";
@@ -514,6 +779,26 @@ in {
         OnUnitActiveSec = cfg.interval;
         Persistent = true;
         RandomizedDelaySec = "45s";
+      };
+    };
+
+    systemd.services.fleet-sentinel-ingest = lib.mkIf cfg.ingest.enable {
+      description = "Fleet sentinel ingest: peers push their status here";
+      wantedBy = ["multi-user.target"];
+      after = ["network.target"];
+      unitConfig.X-Fleet-Role = "daemon";
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${ingestPackage}/bin/fleet-sentinel-ingest -socket ${cfg.ingest.socket} -incoming ${cfg.stateDir}/incoming -token-file ${toString cfg.ingest.tokenFile} -socket-group ${cfg.ingest.socketGroup}";
+        Restart = "on-failure";
+        RestartSec = 3;
+        RuntimeDirectory = "fleet-sentinel";
+        RuntimeDirectoryMode = "0755";
+        ReadWritePaths = [cfg.stateDir];
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        PrivateTmp = true;
+        NoNewPrivileges = true;
       };
     };
   };

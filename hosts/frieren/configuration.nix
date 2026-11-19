@@ -189,7 +189,13 @@ in {
       {unit = "restic-drill.service";}
       {unit = "postgresqlBackup-immich.service";}
     ];
+    ingest = {
+      enable = true;
+      tokenFile = config.sops.secrets."agent-turns-token".path;
+    };
   };
+
+  sops.secrets."agent-turns-token" = {};
 
   # Nightly drift gate: evaluates the pushed flake's host configs (the same ref
   # autoUpgrade installs) one host per process, so a broken assertion or a

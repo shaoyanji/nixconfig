@@ -69,9 +69,24 @@
       fields = ["label"];
       claims = [];
     };
+    service = {
+      what = "a service a host declares in software.services: a name, the port it claims, and a note";
+      identity = "host and name together — two hosts may run a service with the same name";
+      member = "inventory.toml through lib/inventory.nix";
+      fields = ["label" "host" "port" "note"];
+      claims = ["fleet-fact"];
+    };
   };
 
   relations = {
+    runs-on = {
+      what = "a declared service runs on a host";
+      from = ["service"];
+      to = ["host"];
+      evidence = "the host's software.services record in inventory.toml";
+      tier = "asserted";
+      cannot = "that the service is running or listening: checks:services:ports ties the port to prose, checks:ports proves a local listener";
+    };
     about = {
       what = "a draft names the entity it is about";
       from = ["idea"];

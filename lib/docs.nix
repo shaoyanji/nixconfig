@@ -424,12 +424,82 @@
     ${table ["task" "shard" "via" "description"] rows}
   '';
 
+  portRows =
+    map
+    (key: let
+      k = knobs.${key};
+    in [
+      k.name
+      (toString k.port)
+      (lib.concatStringsSep ", " (k.hosts or []))
+      "`${k.path}`"
+    ])
+    (lib.filter (key: (knobs.${key}.port or null) != null) (lib.attrNames knobs));
+
+  endpointRows = lib.concatMap (
+    name: let
+      h = allHosts.${name};
+    in
+      map (l: [
+        name
+        (l.label or "—")
+        (toString l.port)
+        (l.note or "")
+      ]) (h.network.links or [])
+  ) (lib.attrNames allHosts);
+
+  serviceRows = lib.concatMap (
+    name:
+      map (s: [
+        name
+        s.name
+        (
+          if s.port == null
+          then ""
+          else toString s.port
+        )
+        s.note
+      ])
+      allHosts.${name}.software.services
+  ) (lib.attrNames allHosts);
+
+  fleetServices =
+    header "Fleet service map" "`modules.toml` and `inventory.toml`"
+    + ''
+      Two compiled halves. A **registry service** is a knob that declares a `port`,
+      switched on for the hosts listed; a **host endpoint** is an entry that host
+      declares in `network.links`, which carries the label and the note. A host
+      absent from a registry row does not run the service, so the same number can
+      appear twice without a collision.
+
+      Neither half is a liveness claim: `task checks:ports` proves whether a listener
+      answers on this host, and the unit and reach prose in `MANUAL.md` remains the map
+      of what each one is for.
+
+      ## Registry services (${toString (builtins.length portRows)})
+
+      ${table ["service" "port" "hosts" "module"] portRows}
+
+      ## Host-declared endpoints (${toString (builtins.length endpointRows)})
+
+      ${table ["host" "service" "port" "note"] endpointRows}
+
+      ## Host services (${toString (builtins.length serviceRows)})
+
+      Declared per host in `software.services`: the record half of `key_services`.
+      Unlike an endpoint, a service need not listen — `port` is empty where none is
+      claimed.
+
+      ${table ["host" "service" "port" "note"] serviceRows}
+    '';
+
   generatedPages =
     {
       "docs/generated/fleet-inventory.md" = fleetInventory;
       "docs/generated/fleet-matrix.md" = fleetMatrix;
       "docs/generated/modules-registry.md" = modulesRegistry;
       "docs/generated/task-surface.md" = taskSurface;
+      "docs/generated/fleet-services.md" = fleetServices;
     }
     // lib.optionalAttrs (moduleSets != null) {
       "docs/generated/fleet-module-chains.md" = moduleChains;

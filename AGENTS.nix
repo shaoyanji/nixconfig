@@ -338,6 +338,26 @@
         tasks = ["ops:kg"];
       };
     };
+    memory-architecture = {
+      title = "Memory architecture — vault → qmd → mem0/supermemory → web; ai-memory ungated scratch";
+      kind = "decision";
+      status = "ACCEPTED";
+      date = "2026-11-19";
+      summary = "Five-layer memory hierarchy with nix/AGENTS.nix as policy authority; ai-memory stays ungated scratch because nix eval (.#knowledgeGraph) already discovers truth in local files and nix AST.";
+      refs = {
+        hosts = ["frieren" "delphi"];
+        modules = ["lib/knowledge-graph.nix" "modules/user/ai/agents.nix" "modules/services/agent-turns.nix"];
+        docs = ["docs/agent-turns.md" "AGENTS.md" ".agents/SCHEMA.md"];
+        tasks = ["ops:health"];
+      };
+      body = ''
+        **Layers, in search order.** MEMORY.md (boot, always loaded) → vault (fast working memory) → qmd wiki (docs, runbooks, codebase) → mem0/supermemory (deep consult, decided by jev) → web. The supermemory key writes durable directives for context transfer between the Telegram instance and the tab 3 controller; mem0 stores structured TOON.
+
+        **ai-memory is not authority.** It has no server unit on this fleet and is "never authority for a repo fact." Its handoffs/message/workstreams are rich but the server is not run here; the knowledge graph (.#knowledgeGraph, 1991 nodes compiled from the nix tree) already discovers truth in local files and nix AST, so there is no information digest that needs staging through ai-memory before reaching nix data structures.
+
+        **nix determines policy.** AGENTS.nix notes and .#knowledgeGraph are the compiled source of truth for what exists; xs turn log on delphi is live coordination. Nothing here changes merge authority.
+      '';
+    };
     d5-one-skill-tree = {
       title = "D5 — one fleet-wide skill tree, materialized by Home Manager";
       kind = "decision";
@@ -391,6 +411,21 @@
         Exit: three hosts push for a week; a powered-off host shows `stale:>2h` rather than a missing row; ingest stays behind the existing vhost.
       '';
     };
+    sentinel-queue-probe = {
+      title = "Sentinel observes the mail queue, not just its sockets";
+      kind = "decision";
+      status = "DELIVERED";
+      date = "2026-11-19";
+      summary = "`agents:hub` is pull-only, so a queue that stopped draining was silent until a person looked. The collector now reads `/api/queue-health` from the archive and degrades on person/action backlog, fresh unowned attention mail, an unreachable probe and importer lag.";
+      refs = {
+        modules = ["modules/services/fleet-sentinel.nix" "modules/services/email-archive-endpoints/queue-health.sql"];
+        hosts = ["delphi"];
+        tasks = ["ops:health" "agents:hub"];
+      };
+      body = ''
+        Thresholds are options rather than constants so a host opts in and owns what `degraded` means there: `maxOpenPerson` 25, `maxOpenAction` 40, `maxUnmatchedFresh` 20, `maxMailAgeHours` 26 with a prior-week baseline. Only a host holding the archive sets `queueProbe.url`; an absent probe is neutral, an unreachable one degrades.
+      '';
+    };
     p2-vault-write-path = {
       title = "P2 — a real write path to the vault";
       kind = "proposal";
@@ -434,7 +469,7 @@
         docs = ["docs/task-control-plane.md"];
       };
       body = ''
-        Delivered: home card in Nix. Remaining: `--sync-docs`/`--compile-fleet` paths once `lib/docs.nix` owns the last tables.
+        Delivered: home card in Nix; MANUAL §1's identity table replaced by the generated host card; §2's service map compiled to `docs/generated/fleet-services.md`; `software.services` is a typed record (name, port, note) with duplicate-name/port issues, so every host's "what runs here" is data. Remaining: retire the `modules-menu.sh sync` wrapper once no hand table is left — §2's unit and reach columns are operational, so they stay prose.
       '';
     };
     p5-dms-widget = {
@@ -978,7 +1013,7 @@
     sentinel-external-hosts = {
       title = "Sentinel `unit-failed` for external hosts";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P1";
       date = "2026-10-19";
       summary = "On non-NixOS hosts the field is `absent`, which can read as success. It must never claim a unit it cannot see.";
@@ -986,6 +1021,23 @@
         modules = ["modules/services/fleet-sentinel.nix"];
         tasks = ["ops:health"];
       };
+      body = ''
+        Landed 2026-11-19. The collector probes `/run/systemd/system` once per run,
+        records `unit_observer` (`systemd` | `none`) in every event, and on a host
+        with no manager answers `unobservable` for each watched unit while adding
+        one `unit-status-unobservable` reason — `degraded`, never `ok`. `absent`
+        now means only "not installed on this host" and stays neutral, which is
+        what a never-run restic drill relies on. `failed_units` follows the same
+        rule: `null` on a blind host rather than `[]`, because an empty list
+        claims a scan that never ran.
+
+        The probe is the directory, not `command -v systemctl`: systemd's binaries
+        come from the collector's own runtimeInputs closure, so a nix-darwin or
+        container host has them on PATH and only the directory proves a manager is
+        there to answer.
+
+        Gate: `task checks:host HOST=frieren` and `task checks:quick`.
+      '';
     };
     semantic-search = {
       title = "Semantic search only if it earns its keep";
@@ -5482,6 +5534,82 @@
         left the inbox, one restored from All Mail on demand. The audit stores `message-id`, not the
         uid, because Gmail reassigns uids per mailbox (310172 in INBOX, 621165 in All Mail).
         Operations: docs/mail-agent.md. Open: neverest stays deferred, revisit past ~1k envelopes.
+      '';
+    };
+
+    exp-129 = {
+      title = "EXP-129 — Quotient closures: a per-feature fanout probe and a CA cutoff demo";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-11-19";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["lib/cache-policy.nix"];
+        tasks = ["dev:closure:native"];
+        docs = ["docs/nix-patterns.md"];
+      };
+      summary = "Measured on delphi: 19,034 drvs per toplevel, 28-29 s and 3.0 GiB to instantiate. Feature files are nested imports of configuration.nix, and disabledModules is a no-op even with the key read from the module graph, so per-feature fanout needs an import rewrite. Both delphi registries now guard on option presence, and CA early cutoff is demonstrated by drv hashes.";
+      body = ''
+        **Question.** Split a host closure into an invariant core and per-feature deltas?
+        The numeration system is a red herring: a cryptographic hash avalanches
+        regardless, so the split has to be structural (which key is hashed) and the
+        invariant half must be a *content* address.
+
+        **Cost, measured (delphi, 2026-11-19).** Toplevel: 19,034 drvs, 28-29 s
+        and 3.0 GiB peak, so ~30 s per feature — not a gate. Rebuilding the host
+        from its own assembly reproduces the real drv exactly, which is the
+        baseline an import rewrite can stand on.
+
+        **Removal is not a list operation.** Delphi's module list has 15 entries;
+        its feature files are `imports` *inside* configuration.nix. And
+        `disabledModules` is no better: with the exact key from the module graph
+        `extendModules` returns a byte-identical drv, as do relative, absolute and
+        path-value keys — a clean 0%, so no probe was registered.
+
+        **Removability, paid for.** Both delphi registries read each port from the
+        option that owns it, so a removed module failed the host eval; a row now
+        exists only while the option does (`lib.optionalAttrs (lib.hasAttr …`).
+        `checks:host delphi` passes and every mount is still listed.
+
+        **Early cutoff, measured.** ca-derivations is off daemon-side; a rooted
+        store with it on builds the demo. Two derivations, identical output,
+        different env: distinct drv hashes (54j0…, 85i2…), one output (wsapf…);
+        the dependent resolves to the same output (kzp6…) and is not rebuilt.
+
+        **Exit.** A fanout instrument that rewrites the host file's own imports,
+        proves the unfiltered rebuild equals `.#nixosConfigurations`, and collects
+        from one source copy. Then one row per feature says whether any feature
+        owns more than a rounding error of the graph.
+      '';
+    };
+
+    triage-remote-second-opinion = {
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-19";
+      title = "Mail triage asks a remote model about the envelope, never the body";
+      summary = "The mail second pass can ask deepseek-v4-flash-0731:free through llm.onerouter.pro, on the envelope only, because julia-1 (144M) files marketing as a person and laya (421M) parks it in review. Bodies never leave the host; the module default stays local and a host opts in.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/services/email-triage.py"];
+        tasks = ["agents:mail:triage"];
+        docs = ["docs/email-archive.md"];
+      };
+      body = ''
+        Measured 2026-11-19 on delphi's 26-row human queue:
+        - julia-1 called a 30%-off marketing send `person` (0.39) and laya left
+          the Freebuff, OpenRouter and Craft sends in `review`; both tiers sit in
+          front of a person, which is the one queue a model may not pad.
+        - The remote pass over the same envelopes produced 12 digest/robot
+          verdicts that closed, one human reply kept as `person`, and every
+          `action` row untouched. It overrides the local pair in both
+          directions under the same protected-signal gate.
+        - It posts sender, subject and labels, never a body. The route is a third
+          party, so the content of a mailbox is not the classifier's to send.
+        - The key is read by name from `ai-services-shared-env`, so the unit's
+          environment carries no other key. `secondBackend = "systemone"` stays
+          the default and delphi sets `openai`.
       '';
     };
 

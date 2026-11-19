@@ -59,6 +59,11 @@ tailscale = true
 tailscale_hostname = "frieren"
 ssh_alias = "frieren"
 
+[[hosts.frieren.network.links]]
+label = "Task control"
+port = 8451
+note = "The whole Taskfile as a page: fuzzy-find a recipe, run it, stream the output; also at /task-weather on the tailnet vhost"
+
 [hosts.frieren.software]
 module_chain = "globalModulesNixos"
 impermanence = false

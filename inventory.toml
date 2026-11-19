@@ -63,6 +63,7 @@ ssh_alias = "frieren"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Harmonia (LAN binary cache on :5000)", "Shelter host for delphi's offloaded services: docs/vault/anki vhosts and /srv/backup/offload (paperless + vaultwarden moved to delphi 2026-11-02)", "Hermes Agent & Gateway (user systemd service)", "Home Assistant (:8123); Mosquitto module off since 2026-11-09 (zero clients in 7 days)", "Kiwix Serve (declarative ZIMs :8088 -> wiki.frieren.lan)", "Immich Photo Server & ML backend", "Jellyfin Media Server (:8096)", "Plex Media Server", "Aria2 RPC daemon (:6801 + AriaNg web)", "Paste (pb server at paste.frieren.lan)", "iVentoy PXE server", "Samba & NFS export (/srv/data)"]
+services = [{ name = "harmonia", port = 5000 }, { name = "home-assistant", port = 8123 }, { name = "kiwix", port = 8088 }, { name = "aria2", port = 6801 }, { name = "jellyfin", port = 8096 }, { name = "immich" }, { name = "plex" }, { name = "hermes" }, { name = "paste" }, { name = "iventoy" }, { name = "samba-nfs" }]
 traits = ["lan-binary-cache", "nightly-backup-window", "btrfs-heavy-io", "sops-secrets", "ssh-ca-client", "kitchen-workstation", "niri-wayland", "dms-greeter", "dell-dock", "ai-full", "tpm-identity", "nas-server", "agent-backend"]
 
 [hosts.frieren.persona]
@@ -105,6 +106,7 @@ ssh_alias = "mtfuji"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["Ollama", "Docker", "NAS client automount"]
+services = [{ name = "ollama" }, { name = "docker" }, { name = "nas-automount" }]
 traits = ["headless", "no-de", "ollama-host", "nas-client"]
 
 [hosts.mtfuji.persona]
@@ -142,6 +144,7 @@ ssh_alias = "applevalley"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["Docker", "btrfs-progs", "Laptop power management"]
+services = [{ name = "docker" }, { name = "btrfs-progs" }, { name = "power-management" }]
 traits = ["vintage-hardware", "container-host", "thinkpad-t420", "headless"]
 
 [hosts.applevalley.persona]
@@ -275,6 +278,7 @@ note = "Gatus, watching frieren from outside its LAN"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["nginx :443 — Let's Encrypt TLS for the public dossier, /healthz, :80 redirect", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry NXDOMAIN, failover pair with frieren)", "Tailscale exit node, advertising the shared 10.99.0.53/32 route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness, tailnet-only (:8443, dsh-web on loopback :3080)", "System One decision engine, tailnet-only (:8444, loopback :8091)", "Stirling PDF, tailnet-only (:8445, loopback :7351)", "Service console, tailnet-only (:8446, loopback :8082)", "Gemini capsule on :1965 (portfolio as gemtext, resume.json/lebenslauf.json) and :1966 on the tailnet", "Gatus fleet monitors — an out-of-LAN vantage", "Paperless-ngx, tailnet-only (:28981), served as docs.frieren.lan through frieren's vhost (moved off frieren 2026-11-02)", "Vaultwarden, tailnet-only (:8222, notifications websocket on the same port since 1.30), served as vault.frieren.lan (moved 2026-11-02)", "Anki sync server, tailnet-only (:27701), served as anki.frieren.lan (moved 2026-11-02)", "Shelter bridge: paperless, vaultwarden and anki state mirrored nightly to frieren:/srv/backup/offload", "Radicale CalDAV/CardDAV (:8457), ntfy push (:8458), Vikunja tasks with CalDAV (:8459), agent-turn dashboard with per-turn Hermes prompts (:8460), media relay for range-served video with YouTube search and fetch (:8461) — tailnet-only, added 2026-11-06", "OCI serial console logging"]
+services = [{ name = "nginx", port = 443 }, { name = "crab-hole" }, { name = "tailscale-exit" }, { name = "hermes" }, { name = "deepseek-harness", port = 8443 }, { name = "system-one", port = 8444 }, { name = "stirling-pdf", port = 8445 }, { name = "service-console", port = 8446 }, { name = "gemini", port = 1965 }, { name = "gatus" }, { name = "paperless", port = 28981 }, { name = "vaultwarden", port = 8222 }, { name = "anki-sync", port = 27701 }, { name = "radicale", port = 8457 }, { name = "ntfy", port = 8458 }, { name = "vikunja", port = 8459 }, { name = "agent-turns", port = 8460 }, { name = "media-relay", port = 8461 }, { name = "zettel-graph", port = 8453 }, { name = "mataroa-console", port = 8454 }]
 traits = ["cloud-server", "aarch64-arm", "11gb-ram", "tailscale-exit-node", "oci-always-free", "agent-backend"]
 
 [hosts.delphi.persona]
@@ -316,6 +320,7 @@ ssh_alias = "poseidon"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Dux desktop shell (DMS/quickshell) on the niri compositor", "greetd autologin into the niri session", "Steam (full gaming suite)", "Ollama (CUDA acceleration with lfm2.5)", "NVIDIA proprietary drivers (open kernel module)", "NAS client automount"]
+services = [{ name = "dux-shell" }, { name = "greetd" }, { name = "steam" }, { name = "ollama" }, { name = "nvidia" }, { name = "nas-automount" }]
 traits = ["flagship-workstation", "cuda-compute", "laptop-profile", "optimus-prime", "dual-gpu", "niri-desktop", "steam-gaming", "ai-full", "dev-full", "tpm-identity"]
 
 [hosts.poseidon.persona]
@@ -353,6 +358,7 @@ ssh_alias = "cassini"
 module_chain = "globalModulesMacos"
 impermanence = false
 key_services = ["nix-darwin system management", "nix-homebrew declarative package integration", "role:home user environment", "SOPS secrets loaded from age key"]
+services = [{ name = "nix-darwin" }, { name = "homebrew" }, { name = "home-role" }, { name = "sops" }]
 traits = ["macos", "apple-silicon", "aarch64-darwin", "homebrew", "aqua-gui"]
 
 [hosts.cassini.persona]
@@ -394,6 +400,7 @@ mac = "00:e0:22:1c:bb:ed"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Gamescope Session (steam-gamescope kiosk under greetd autologin, no desktop shell)", "Steam (gamescope-session)", "Sunshine GameStream server (Moonlight LAN host)", "RX 5700 VCN 2.0 hardware video encode", "NAS client automount", "llama-swap model router on :8080 (OpenAI /v1 via nginx on eisen.lan:80 and tailscale serve; model 'qwen' = qwen3.6-35b-a3b)", "Qwen3.6-35B-A3B on Vulkan/radv llama.cpp with DFlash2 speculative decoding (+40% decode, measured) and expert tensors kept in CPU RAM", "llama-swap-gaming-guard: suspends the LLM while a Steam game runs, freeing ~21 GiB RAM + 5.4 GiB VRAM, and resumes on exit", "Kolibri-1 (78B A3B, German/English) weights staged at /mnt/storage/models but not loadable: stock llama.cpp lacks the kolibri1 architecture", "Laya decision model (421M, CPU-only) on 127.0.0.1:8090 behind nginx on laya.lan:80 and tailscale serve :8443, exposing the Jev-compatible POST /v1/systemone (choice/score/noul) — holds no VRAM, so it keeps answering while a game runs"]
+services = [{ name = "gamescope-session" }, { name = "steam" }, { name = "sunshine" }, { name = "vcn-encode" }, { name = "nas-automount" }, { name = "llama-swap", port = 8080 }]
 traits = ["12-core-24-thread", "64gb-ram", "amd-gpu", "sunshine-streaming", "steam-gaming", "llm-inference", "llm-model-router", "moe-expert-offload", "speculative-decoding", "game-aware-yield", "vulkan-compute", "decision-model", "jev-compatible", "cpu-inference", "ai-full", "dev-full"]
 
 [hosts.eisen.persona]
@@ -443,6 +450,7 @@ ssh_alias = "aristotle"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NFS client automount (/Volumes/data from frieren)", "SSH CA Client"]
+services = [{ name = "niri" }, { name = "dms-greeter" }, { name = "auto-cpufreq" }, { name = "libinput" }, { name = "nfs-automount" }, { name = "ssh-ca" }]
 traits = ["thinkpad-t440", "laptop-profile", "niri-desktop", "nfs-client", "battery-optimized", "btrfs"]
 
 [hosts.aristotle.persona]
@@ -491,6 +499,7 @@ ssh_alias = "diogenes"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Niri Wayland Compositor (autologin devji)", "DMS Greeter (DankMaterialShell)", "auto-cpufreq", "NFS client automount (/Volumes/data from frieren)", "SSH CA Client"]
+services = [{ name = "niri" }, { name = "dms-greeter" }, { name = "auto-cpufreq" }, { name = "nfs-automount" }, { name = "ssh-ca" }]
 traits = ["thinkpad-l440", "laptop-profile", "niri-desktop", "nfs-client", "battery-optimized", "btrfs", "docked-workstation"]
 
 [hosts.diogenes.persona]
@@ -527,6 +536,7 @@ ssh_alias = "aceofspades"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["SDDM Wayland", "Mesa OpenCL compute runtime", "Ozone Wayland env"]
+services = [{ name = "sddm" }, { name = "mesa-opencl" }, { name = "ozone-wayland" }]
 traits = ["amd-gpu", "opencl", "sddm-wayland", "legacy-grub"]
 
 [hosts.aceofspades.persona]
@@ -563,6 +573,7 @@ ssh_alias = "ancientace"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Ollama (listening on 0.0.0.0:11434 with CORS open)", "MicroVM Host (runs testvm sandbox over NAT bridge)", "Base desktop environment"]
+services = [{ name = "ollama", port = 11434 }, { name = "microvm-host" }, { name = "base-desktop" }]
 traits = ["microvm-hypervisor", "ollama-server", "networked-ai-host"]
 
 [hosts.ancientace.persona]
@@ -605,6 +616,7 @@ ssh_alias = "stark"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["Gamescope Session (steam -gamepadui autologin)", "DMS Greeter (fallback Niri session)", "NVIDIA PRIME render offload (nvidia-offload)", "Steam library on /mnt/steam"]
+services = [{ name = "gamescope-session" }, { name = "dms-greeter" }, { name = "prime-offload" }, { name = "steam-library" }]
 traits = ["aio-form-factor", "optimus-prime", "dual-gpu", "steam-gamepadui", "dual-disk"]
 
 [hosts.stark.persona]
@@ -642,6 +654,7 @@ ssh_alias = "ares"
 module_chain = "containers + impermanence"
 impermanence = true
 key_services = ["greetd autologin to gamescope-session (steam -gamepadui)", "Impermanence (/persist subvolume)", "NVIDIA legacy_580 driver with DRM KMS"]
+services = [{ name = "greetd-gamescope" }, { name = "impermanence" }, { name = "nvidia-legacy" }]
 traits = ["kiosk-only", "no-de", "impermanence", "ephemeral-root", "kepler-gpu", "dev-full", "gpu-high"]
 
 [hosts.ares.persona]
@@ -679,6 +692,7 @@ ssh_alias = "kellerbench"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["Sunshine GameStream server", "Steam", "Base node"]
+services = [{ name = "sunshine" }, { name = "steam" }, { name = "base-node" }]
 traits = ["headless-gaming", "sunshine-streaming", "kepler-gpu", "benchmark-rig"]
 
 [hosts.kellerbench.persona]
@@ -715,6 +729,7 @@ ssh_alias = "deckstation"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["greetd + tuigreet + gamescope-session", "Sunshine GameStream server", "AMD RX 5700 XT driver stack"]
+services = [{ name = "greetd-tuigreet" }, { name = "sunshine" }, { name = "amd-driver" }]
 traits = ["amd-rx-5700xt", "sunshine-host", "gamescope-kiosk"]
 
 [hosts.deckstation.persona]
@@ -765,6 +780,7 @@ ssh_alias = "fern"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["dwl session (profiles.dwlDesktop: fleet keybinds, foot, fnott, wmenu, waylock, swayidle)", "KDE Connect phone integration", "Dell D6000 Dock (DisplayLink / EVDI)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
+services = [{ name = "dwl" }, { name = "kdeconnect" }, { name = "dell-dock" }, { name = "auto-cpufreq" }, { name = "libinput" }, { name = "nfs-automount" }]
 traits = ["battery-optimized", "lightweight-desktop", "no-steam", "laptop-profile", "btrfs", "dell-dock", "tpm-identity"]
 
 [hosts.fern.persona]
@@ -803,6 +819,7 @@ ssh_alias = "scratch"
 module_chain = "globalModulesNixos"
 impermanence = false
 key_services = ["dwl Wayland desktop from `profiles.dwlDesktop` (getty autologin on tty1, fleet-menu launcher, no display manager)", "zram 100% swap (zero disk swap)", "tmpfs mounts for /var/log, /tmp, /var/tmp, /var/cache, ~/.cache", "volatile journald (RAM only, core dumps disabled)", "weekly fstrim + noatime"]
+services = [{ name = "dwl" }, { name = "zram" }, { name = "tmpfs" }, { name = "volatile-journald" }, { name = "fstrim" }]
 traits = ["strict-io-diet", "f2fs", "legacy-bios", "zram-100", "tmpfs-caches", "suckless-dwl", "small-screen", "tpm-identity"]
 
 [hosts.scratch.persona]
@@ -839,6 +856,7 @@ ssh_alias = "schneeeule"
 module_chain = "globalModulesImpermanence"
 impermanence = true
 key_services = ["Impermanence (root wiped each boot)", "Niri + DMS greeter", "Steam gaming", "thermald laptop power/thermal daemon"]
+services = [{ name = "impermanence" }, { name = "niri-dms" }, { name = "steam" }, { name = "thermald" }]
 traits = ["impermanence", "ephemeral-root", "nvidia-legacy-470", "laptop-profile"]
 
 [hosts.schneeeule.persona]
@@ -878,6 +896,7 @@ ssh_alias = "netbook"
 module_chain = "Own configuration only (no global chain), fleet nixpkgs"
 impermanence = false
 key_services = ["dwl Wayland desktop from `profiles.dwlDesktop` (foot, fleet-menu, waylock)", "getty autologin on tty1 (no display manager)", "Pipewire", "NFS client automount"]
+services = [{ name = "dwl" }, { name = "getty-autologin" }, { name = "pipewire" }, { name = "nfs-automount" }]
 traits = ["alice-user", "celeron-n3060", "fleet-nixpkgs", "scripted-initrd", "f2fs", "ultra-low-spec", "gpu-low", "suckless-dwl"]
 
 [hosts.netbook.persona]
@@ -914,6 +933,7 @@ ssh_alias = "penguin"
 module_chain = "globalModulesHome"
 impermanence = false
 key_services = ["Standalone Home Manager", "nixGL wrapped MPV", "Btop", "Atuin", "Nixvim"]
+services = [{ name = "home-manager" }, { name = "nixgl-mpv" }, { name = "btop" }, { name = "atuin" }, { name = "nixvim" }]
 traits = ["chromebook", "crostini", "standalone-home-manager", "nixgl"]
 
 [hosts.penguin.persona]
@@ -955,6 +975,7 @@ ssh_alias = "clanker"
 module_chain = "globalModulesHome"
 impermanence = false
 key_services = ["Nix (single-user)", "Go build jobs", "Nix builds in the background"]
+services = [{ name = "nix" }, { name = "go-build" }, { name = "background-builds" }]
 traits = ["vm", "instabox", "offload", "background-builds", "standalone-home-manager", "lean-profile"]
 
 [hosts.clanker.persona]
@@ -1036,6 +1057,7 @@ ssh_alias = "minyx"
 module_chain = "globalModules + determinate-nix + sops + raspberry-pi-3 (no home-manager)"
 impermanence = false
 key_services = ["key-only sshd", "Tailscale", "persistent ssh forwards (systemd units)", "gh codespaces wrapper"]
+services = [{ name = "sshd" }, { name = "tailscale" }, { name = "ssh-forwards" }, { name = "gh-codespaces" }]
 traits = ["raspberry-pi-3", "1gb-ram-limit", "usb-boot", "no-home-manager", "tunnel-box"]
 
 [hosts.minyx.persona]
@@ -1073,6 +1095,7 @@ ssh_alias = "kali"
 module_chain = "globalModulesHome"
 impermanence = false
 key_services = ["Nushell + Starship", "Recon: nmap, rustscan, arp-scan", "Web Testing: gobuster, ffuf, sqlmap, nikto", "Wireless: aircrack-ng, wifite2, bettercap"]
+services = [{ name = "nushell" }, { name = "recon" }, { name = "web-testing" }, { name = "wireless" }]
 traits = ["offensive-security", "pen-testing", "mobile-arm64", "nethunter-pro"]
 
 [hosts.kali.persona]
@@ -1108,6 +1131,7 @@ ssh_alias = "alarm"
 module_chain = "globalModulesHome"
 impermanence = false
 key_services = ["roles/minimal user environment"]
+services = [{ name = "minimal-user" }]
 traits = ["arch-linux-arm", "minimal", "standalone-home"]
 
 [hosts.alarm.persona]
@@ -1147,6 +1171,7 @@ ssh_alias = "moto"
 module_chain = "Termux on Android"
 impermanence = false
 key_services = ["OpenSSH daemon on port 8022", "Obsidian mobile notes sync", "Charmbracelet Gum / Wish menu", "Android storage shortcuts (~/storage/)"]
+services = [{ name = "sshd", port = 8022 }, { name = "obsidian-sync" }, { name = "gum-menu" }, { name = "storage-shortcuts" }]
 traits = ["smartphone", "termux", "battery-powered", "mobile-sensors", "tailscale"]
 
 [hosts.moto.persona]
@@ -1187,6 +1212,7 @@ domain = "https://jisifu.serv00.net"
 module_chain = "FreeBSD Native"
 impermanence = false
 key_services = ["Go 1.24 webserver on port 49613 (proxied to jisifu.serv00.net)", "Devil CLI resource and port management", "Keep-alive supervisor cron job"]
+services = [{ name = "go-webserver", port = 49613 }, { name = "devil-cli" }, { name = "keepalive-cron" }]
 traits = ["non-nix", "freebsd", "devil-cli", "512mb-limit", "go-backend", "web-proxy"]
 
 [hosts.serv00.persona]
@@ -1224,6 +1250,7 @@ domain = "https://dragoncourt.alwaysdata.net"
 module_chain = "Alwaysdata Managed Debian"
 impermanence = false
 key_services = ["Apache + alproxy webserver", "PHP / Wasm engine", "SSH deployment"]
+services = [{ name = "apache" }, { name = "php-wasm" }, { name = "ssh-deploy" }]
 traits = ["non-nix", "alwaysdata", "debian", "web-hosting", "apache-alproxy"]
 
 [hosts.dragoncourt.persona]
@@ -1263,6 +1290,7 @@ gopher_url = "gopher://jisifu.envs.net"
 module_chain = "Debian 13 Trixie Pubnix"
 impermanence = false
 key_services = ["Nginx Web Hosting (/home/jisifu/public_html)", "Gemini Capsule (/home/jisifu/public_gemini)", "Gopher Hole (/home/jisifu/public_gopher)"]
+services = [{ name = "nginx" }, { name = "gemini" }, { name = "gopher" }]
 traits = ["non-nix", "pubnix", "debian-trixie", "gemini-protocol", "gopher-protocol", "small-web"]
 
 [hosts.envs.persona]
@@ -1299,6 +1327,7 @@ domain = "https://jisifu.pythonanywhere.com"
 module_chain = "PythonAnywhere Managed Python 3.10 + MySQL"
 impermanence = false
 key_services = ["Flask CMS web app (WSGI, system site-packages, no virtualenv)", "MySQL default database", "REST API v0: files, webapps, cpu, schedule"]
+services = [{ name = "flask-cms" }, { name = "mysql" }, { name = "rest-api" }]
 traits = ["non-nix", "pythonanywhere", "flask", "mysql", "api-managed", "web-hosting"]
 
 [hosts.pythonanywhere.persona]
@@ -1336,6 +1365,7 @@ ssh_alias = "garnix"
 module_chain = "garnix.server"
 impermanence = false
 key_services = ["Garnix CI runner engine", "Bountystash web application (:3000 with Nginx proxy)", "SOPS secrets from /var/garnix/keys/repo-key"]
+services = [{ name = "garnix-runner" }, { name = "bountystash", port = 3000 }, { name = "sops" }]
 traits = ["ci-runner", "bountystash-host", "cloud-nixos"]
 
 [hosts.garnixMachine.persona]
@@ -1370,6 +1400,7 @@ ssh_alias = "sledgehammer"
 module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["Disko automated disk partitioning", "SOPS, Age, and SSH-to-age secret tooling", "nixos-install toolchain"]
+services = [{ name = "disko" }, { name = "secret-tooling" }, { name = "nixos-install" }]
 traits = ["live-usb", "disaster-recovery", "fleet-provisioner", "removable-media"]
 
 [hosts.sledgehammer.persona]
@@ -1406,6 +1437,7 @@ ssh_alias = "guckloch"
 module_chain = "globalModulesContainers + nixos-wsl"
 impermanence = false
 key_services = ["Docker Desktop WSL2 integration", "SSHFS NAS client mount", "Nix-LD dynamic library loader for unpatched binaries"]
+services = [{ name = "docker-desktop" }, { name = "sshfs" }, { name = "nix-ld" }]
 traits = ["wsl2", "windows-interop", "docker-desktop", "nix-ld"]
 
 [hosts.guckloch.persona]
@@ -1440,6 +1472,7 @@ tailscale = false
 module_chain = "globalModulesDemo"
 impermanence = false
 key_services = ["Niri autologin", "NetworkManager", "No SOPS secrets"]
+services = [{ name = "niri" }, { name = "networkmanager" }, { name = "no-sops" }]
 traits = ["demo-vm", "no-secrets", "simple-auth"]
 
 [hosts.demo.persona]
@@ -1474,6 +1507,7 @@ tailscale = false
 module_chain = "microvm.nixosModules"
 impermanence = true
 key_services = ["cloud-hypervisor", "vsock communications"]
+services = [{ name = "cloud-hypervisor" }, { name = "vsock" }]
 traits = ["microvm", "cloud-hypervisor", "isolation-sandbox"]
 
 [hosts.testvm.persona]
@@ -1520,6 +1554,7 @@ domain = "bitlockerpremium.cloudforest-kardashev.ts.net"
 module_chain = "Windows 11 Pro 25H2 Native (Build 10.0.26200)"
 impermanence = false
 key_services = ["Windows OpenSSH sshd (TCP/22, firewall rule scoped to the Tailscale interface)", "Tailscale tailnet membership & MagicDNS (100.81.170.87)", "Scoop package manager (shims repointed to physical version dirs to clear RedirectionGuard)", "Nushell 0.116.1 and PowerShell 7.6.6 (Scoop-managed)"]
+services = [{ name = "sshd", port = 22 }, { name = "tailscale" }, { name = "scoop" }, { name = "nushell" }]
 traits = ["non-nix", "windows-11", "tailscale", "openssh", "scoop", "nushell", "bitlocker", "mobile-workstation"]
 
 [hosts.bitlockerpremium.persona]
@@ -1564,6 +1599,7 @@ domain = "https://192.168.3.92:5001"
 module_chain = "Synology DSM 7.4.1 (native, non-Nix)"
 impermanence = false
 key_services = ["SFTP receiver for frieren's restic repo (/volume1/backup/frieren/restic)", "Transmission 4.1.3 (SynoCommunity, leech-only torrent client on :9091)", "aria2 1.37.0 + AriaNg 1.3.7 (SynoCommunity; aria2 RPC :6800, AriaNg UI at http://192.168.3.92/ariang/)", "restic 0.19.1 (SynoCommunity) for local/air-gapped restores", "Wake-on-LAN on eth0 (MAC 90:09:D0:06:C1:EE) + daily 22:45 power-off"]
+services = [{ name = "sftp" }, { name = "transmission", port = 9091 }, { name = "aria2", port = 6800 }, { name = "restic" }, { name = "wol" }]
 traits = ["non-nix", "synology-dsm", "cold-vault", "wol", "sftp-backup-target", "low-power", "arm64", "512mb"]
 
 [hosts.burgernas.persona]
@@ -1597,6 +1633,7 @@ lan_ip = "192.168.83.10"
 module_chain = "microvm"
 impermanence = false
 key_services = ["openssh only: no fleet service module is imported, so the guest is base plumbing plus a tool set"]
+services = [{ name = "sshd" }]
 traits = ["microvm", "canary", "ephemeral", "sandbox", "on-demand"]
 
 # ------------------------------------------------------------------------------

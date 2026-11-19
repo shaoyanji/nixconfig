@@ -448,6 +448,21 @@
       ]) (h.network.links or [])
   ) (lib.attrNames allHosts);
 
+  serviceRows = lib.concatMap (
+    name:
+      map (s: [
+        name
+        s.name
+        (
+          if s.port == null
+          then ""
+          else toString s.port
+        )
+        s.note
+      ])
+      allHosts.${name}.software.services
+  ) (lib.attrNames allHosts);
+
   fleetServices =
     header "Fleet service map" "`modules.toml` and `inventory.toml`"
     + ''
@@ -468,6 +483,14 @@
       ## Host-declared endpoints (${toString (builtins.length endpointRows)})
 
       ${table ["host" "service" "port" "note"] endpointRows}
+
+      ## Host services (${toString (builtins.length serviceRows)})
+
+      Declared per host in `software.services`: the record half of `key_services`.
+      Unlike an endpoint, a service need not listen — `port` is empty where none is
+      claimed.
+
+      ${table ["host" "service" "port" "note"] serviceRows}
     '';
 
   generatedPages =

@@ -24,6 +24,17 @@
     default = [];
   };
 
+  serviceModule = {
+    options = {
+      name = str "";
+      port = mkOption {
+        type = types.nullOr types.port;
+        default = null;
+      };
+      note = str "";
+    };
+  };
+
   hardwareModule = {
     options = {
       model = str "";
@@ -85,6 +96,10 @@
       module_chain = str "";
       impermanence = bool false;
       key_services = strs;
+      services = mkOption {
+        type = types.listOf (types.submodule serviceModule);
+        default = [];
+      };
       traits = strs;
     };
   };
@@ -320,6 +335,19 @@
         lib.optional
         (host.status == "active" && host.kind == "external" && host.managed)
         "hosts.${name}: a non-Nix device cannot be `managed` (managed = fleet deploy/warm rotation)")
+      hosts)
+    (lib.mapAttrsToList
+      (name: host: let
+        svcs = host.software.services;
+        names = map (s: s.name) svcs;
+        ports = map (s: s.port) (builtins.filter (s: s.port != null) svcs);
+      in
+        lib.optional (builtins.any (s: s.name == "") svcs)
+        "hosts.${name}: a software.services entry has an empty name"
+        ++ lib.optional (names != lib.unique names)
+        "hosts.${name}: duplicate service name in software.services"
+        ++ lib.optional (ports != lib.unique ports)
+        "hosts.${name}: duplicate service port in software.services")
       hosts)
   ];
 

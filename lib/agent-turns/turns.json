@@ -1,8 +1,24 @@
 {
-  "generated": "2026-11-19T08:56:07Z",
+  "generated": "2026-11-19T08:58:41Z",
   "count": 200,
-  "pin": "6580831c043ab0dfab5fb12908ffe5873ab18959b4b9a2673d74c02282757900",
+  "pin": "46cd6df6e9c5fe7ca0cdfa5d27ba83fd628b05cec465a3358784c02f88596b48",
   "turns": [
+    {
+      "id": "ab5a64ff-20a4-45f3-a5b1-183e657c3aaf",
+      "ts": "2026-11-19T08:56:35Z",
+      "source": "agy",
+      "subject": "nixconfig:agents-md-turns",
+      "action": "docs: concrete xs turn logging guidance in AGENTS.md and HOME-PREAMBLE | gate: checks:toon:surfaces + checks.policies PASS",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.md",
+        "docs/agent-context/HOME-PREAMBLE.md"
+      ],
+      "files": [],
+      "base_commit": "0a4bfefb33192cc8f4ecbb1a97dca6ca199e557d",
+      "branch": "main",
+      "frame": "03h9itsqecgb5epiiwulxhk8b"
+    },
     {
       "id": "c4e71daa-f6bc-4de0-b115-a9e2a1c916bd",
       "ts": "2026-11-19T08:54:28Z",
@@ -2730,19 +2746,6 @@
       "base_commit": "2ec1c26db214f8c2d7a57e03ef02e71e2469d6f0",
       "branch": "main",
       "frame": "03h8m0rp87htpxcjcpv4kg8jk"
-    },
-    {
-      "id": "52c2789a-e016-4191-831b-49453e8c1233",
-      "ts": "2026-11-14T22:20:05Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round7",
-      "action": "keepalive now touches the session and fails 48h early (gate rc=0, d014bf50); 37 plates kept and published, 246 rows verified; jinx/zarya/yshtola still refused",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ec1c26db214f8c2d7a57e03ef02e71e2469d6f0",
-      "branch": "main",
-      "frame": "03h8k49rkwy0wdsv4j1ovtn2v"
     }
   ]
 }

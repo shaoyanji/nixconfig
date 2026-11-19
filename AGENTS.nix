@@ -406,7 +406,7 @@
         docs = ["docs/task-control-plane.md"];
       };
       body = ''
-        Delivered: home card in Nix; MANUAL §1's identity table replaced by the generated host card; §2's service map compiled to `docs/generated/fleet-services.md`. Remaining: retire the `modules-menu.sh sync` wrapper once no hand table is left — §2's unit and reach columns are operational, so they stay prose.
+        Delivered: home card in Nix; MANUAL §1's identity table replaced by the generated host card; §2's service map compiled to `docs/generated/fleet-services.md`; `software.services` is a typed record (name, port, note) with duplicate-name/port issues, so every host's "what runs here" is data. Remaining: retire the `modules-menu.sh sync` wrapper once no hand table is left — §2's unit and reach columns are operational, so they stay prose.
       '';
     };
     p5-dms-widget = {

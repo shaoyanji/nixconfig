@@ -84,6 +84,39 @@ defmodule KGZeckTest do
     assert Enum.any?(restored["edges"], &(&1["type"] == "cites" and &1["to"] == "policy:real"))
   end
 
+  test "a doc edit during full evaluation cannot persist an old graph under new hashes" do
+    {repo, cache} = repo_fixture()
+
+    File.write!(
+      Path.join(repo, ".edit-on-eval"),
+      JSON.encode!(["docs/a.md", "# concurrent\n[[flake/policies.nix#real]]\n"])
+    )
+
+    assert_raise RuntimeError, ~r/inputs changed during full graph evaluation/, fn ->
+      KGZeck.graph(repo, cache)
+    end
+
+    refute File.exists?(Path.join(cache, "manifest.json"))
+    graph = KGZeck.graph(repo, cache) |> KGZeck.read()
+    assert Enum.find(graph["nodes"], &(&1["id"] == "doc:docs/a.md"))["label"] == "concurrent"
+  end
+
+  test "a core edit during evaluation leaves the previous epoch untouched" do
+    {repo, cache} = repo_fixture()
+    KGZeck.graph(repo, cache)
+    manifest = File.read!(Path.join(cache, "manifest.json"))
+    File.write!(Path.join(repo, ".edit-on-eval"), JSON.encode!(["core.nix", "concurrent"]))
+
+    assert_raise RuntimeError, ~r/inputs changed during full graph evaluation/, fn ->
+      KGZeck.graph(repo, cache, true)
+    end
+
+    assert File.read!(Path.join(cache, "manifest.json")) == manifest
+    assert KGZeck.status(repo, cache)["next_leaps"]
+    KGZeck.graph(repo, cache)
+    refute KGZeck.status(repo, cache)["next_leaps"]
+  end
+
   test "greedy terms have non-adjacent Fibonacci indexes and sum to n" do
     fibs = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 

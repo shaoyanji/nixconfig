@@ -177,6 +177,8 @@ defmodule KGZeck do
   def read(path), do: path |> File.read!() |> JSON.decode!()
 
   def leap(repo, cache) do
+    before = core_key(repo, %{})
+
     {out, code} =
       System.cmd(
         "bash",
@@ -208,6 +210,10 @@ defmodule KGZeck do
       "doc_shas" => doc_shas,
       "log" => []
     }
+
+    if core_key(repo, %{}) != before do
+      raise "inputs changed during full graph evaluation; retry"
+    end
 
     atomic(Path.join(cache, "cores/#{epoch}.json"), graph)
     atomic(Path.join(cache, "manifest.json"), state)

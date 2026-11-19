@@ -33,31 +33,47 @@
         narrower than the account, and that decision needs no bw shim.
       '';
     };
-    firecrawl-local-no-prebuilt = {
-      title = "firecrawl-local runs on paper only: no binary is published anywhere";
-      kind = "open";
-      status = "BLOCKED";
-      priority = "P3";
+    firecrawl-local-loopback = {
+      title = "firecrawl-local is built on clanker and serves hermes extract on loopback";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
       date = "2026-11-19";
-      summary = "Firecrawl's new single-binary local engine is announced at 37x the old self-host speed and 11 MB idle, but crates.io ships source only, the repo's releases carry zero assets, and there is no image or nixpkgs attr, so running it needs one local compile.";
+      summary = "No prebuilt exists, so the crate is compiled once on clanker and patched to frieren's loader; measured the same day it answers a scrape 5-25x faster than the cloud path at 23 MiB idle, and hermes reaches it through FIRECRAWL_API_URL instead of the keyed cloud API.";
       refs = {
-        modules = ["hosts/frieren/tools.nix"];
+        modules = [
+          "hosts/frieren/tools.nix"
+          "modules/user/ai/hermes-user.nix"
+        ];
       };
       body = ''
-        Checked 2026-11-19: crates.io `firecrawl-local` 0.1.0 (published
-        2026-11-11) has no binary target distributed; `firecrawl/firecrawl`
-        releases expose zero assets; ghcr has `firecrawl/firecrawl` but no
-        `firecrawl-local`; nixpkgs-unstable and llm-agents.nix have no attr, so
-        there is no cache entry to `nix run` and the vendor's 37x claim is
-        unmeasured here.
+        Built 2026-11-19 from crates.io `firecrawl-local` 0.1.0 on clanker
+        (`nix shell nixpkgs#rustc nixpkgs#cargo nixpkgs#gcc`, 5m42s on 4 vCPU):
+        23,843,336 bytes, sha256 2c7fbf19…cc8b. It links against clanker's store
+        glibc, so it is patched to frieren's loader and gcc-16.2.0-lib rpath
+        (`--set-interpreter`, `--set-rpath`) before first use.
 
-        Blocker: one compile to fill `cargoHash` in a `buildRustPackage`, which
-        the operator declined for this pass. The crate is axum + rustls +
-        chromiumoxide with no openssl, so the derivation itself is small.
+        Runtime, not a derivation: ~/.local/bin/firecrawl-local, unit
+        ~/.config/systemd/user/firecrawl-local.service (`serve --port 3002`,
+        FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=never — no browser here, so
+        JavaScript pages are read statically).
 
-        Exit: build it, then time `firecrawl-local scrape example.com --markdown`
-        against the current hermes web-extract path. If it is not faster, set
-        REJECTED with that number instead of keeping a wish open.
+        Measured 3 runs per page, same payload, warm server: example.com 0.02 s
+        vs 0.42 s cloud; NixOS manual 0.33 s vs 1.59 s; Python asyncio docs
+        0.02 s vs 0.43 s. Idle RSS 23.1 MiB, not the vendor's 11.
+
+        Wiring is two pins. `hermes doctor` named extract firecrawl while the
+        tool resolved to tavily (measured 2026-11-19), so the persona config
+        pins `web.extract_backend: firecrawl`, and FIRECRAWL_API_URL in
+        ~/.hermes/.env.local (folded in by hermes-env-sync) points that
+        provider's self-hosted branch at 127.0.0.1:3002.
+
+        Verified by calling `web_extract_tool` with the unit stopped: it named
+        port 3002 and refused. It also rescued that failure through keyless
+        cloud, so a dead loopback degrades quietly rather than erroring.
+
+        Exit: replace the user-local binary and unit with something a host
+        rebuild owns, then REJECT this note.
       '';
     };
     config-registry-schema = {

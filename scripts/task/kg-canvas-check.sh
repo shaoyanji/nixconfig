@@ -75,6 +75,7 @@ fi
 say "data matches the compiled projection"
 want_nodes="$(cd "$REPO" && nix eval --json .?submodules=1#knowledgeGraph.graph --apply 'g: builtins.length g.nodes')"
 want_edges="$(cd "$REPO" && nix eval --json .?submodules=1#knowledgeGraph.graph --apply 'g: builtins.length g.edges')"
+want_graph="$(cd "$REPO" && nix eval --json .?submodules=1#knowledgeGraph.graph)"
 got_nodes="$(jq -r '.nodes | length' "$SITE/data/kg-graph.json")"
 got_edges="$(jq -r '.edges | length' "$SITE/data/kg-graph.json")"
 want_docs="$(jq '[.nodes[] | select(.type == "doc")] | length' "$SITE/data/kg-graph.json")"
@@ -84,6 +85,15 @@ want_docs="$(jq '[.nodes[] | select(.type == "doc")] | length' "$SITE/data/kg-gr
 want_doc_id="$(jq -r '[.nodes[] | select(.type == "doc")][0].id' "$SITE/data/kg-graph.json")"
 [ "$got_nodes" = "$want_nodes" ] && ok "node count ($got_nodes)" || bad "node count: site $got_nodes vs compiled $want_nodes"
 [ "$got_edges" = "$want_edges" ] && ok "edge count ($got_edges)" || bad "edge count: site $got_edges vs compiled $want_edges"
+if jq -e --slurpfile compiled <(printf '%s' "$want_graph") '
+  $compiled[0] as $want |
+  ([.nodes[] | del(.slice, .degree)] | sort_by(.id)) == ($want.nodes | sort_by(.id))
+  and (.edges | sort_by(.from, .to, .type)) == ($want.edges | sort_by(.from, .to, .type))
+' "$SITE/data/kg-graph.json" >/dev/null; then
+  ok "site graph matches the compiled nodes and edges"
+else
+  bad "site graph differs from the compiled nodes or edges"
+fi
 
 missing_slice="$(jq -r --arg root "$SITE/" '.nodes[] | select((.slice // "") == "") | .id' "$SITE/data/kg-graph.json" | head -5)"
 [ -z "$missing_slice" ] && ok "every node names a slice" || bad "nodes without a slice: $(printf '%s' "$missing_slice" | tr '\n' ' ')"

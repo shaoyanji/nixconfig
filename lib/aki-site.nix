@@ -7,6 +7,7 @@
   # about a host's kind/status/role; the TOML fallback exists only for a
   # standalone `nix-build lib/aki-site.nix` and is NOT defaults-normalised.
   inventory ? null,
+  knowledgeGraph ? null,
   # Host that serves the site, for the status badge. `null` makes no claim.
   host ? null,
 }: let
@@ -25,11 +26,15 @@
   # The rules, as data, for the graph's `policy` nodes: one import, named, so the
   # wire does not hide a second evaluation behind an attribute select.
   rulebook = import ../flake/policies.nix {inherit lib;};
-  kg = import ./knowledge-graph.nix {
-    inherit (rulebook) policies;
-    inherit lib skills;
-    inventory = inv;
-  };
+  kg =
+    if knowledgeGraph != null
+    then knowledgeGraph
+    else
+      import ./knowledge-graph.nix {
+        inherit (rulebook) policies;
+        inherit lib skills;
+        inventory = inv;
+      };
 
   # --- the evaluated model ---------------------------------------------------
   hosts = inv.hosts or {};
@@ -982,11 +987,7 @@
     {}
     kg.graph.edges; # Tag nodes have no stat of their own; derive the count so the chip can
   # never disagree with the data it filters.
-  tagCount =
-    builtins.length kg.graph.nodes
-    - kg.graph.stats.hosts
-    - kg.graph.stats.skills
-    - kg.graph.stats.docs;
+  tagCount = builtins.length (builtins.filter (n: n.type == "tag") kg.graph.nodes);
 
   siteNodes =
     map

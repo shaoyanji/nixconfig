@@ -792,6 +792,22 @@
       detail = "the edge-caller path lost its derived tool set, its read-only prefetch allowlist, its confidence bands, its graph-side type repair, its telemetry opt-out, its battery gate, or the task that exposes it";
     };
 
+    taskfiles-include-is-ownership = {
+      rule = "A taskfiles shard declares tasks and is included once, directly, by `Taskfile.yml`. An include-only shard is an aggregator — a second routing layer nobody reads — and a shard no include names is dead YAML, so the include graph is the ownership map or it is nothing.";
+      proof = "Taskfile.yml includes · taskfiles/README.md";
+      holds = let
+        tf = read "Taskfile.yml";
+        missing = builtins.filter (p: !(lib.hasInfix "taskfile: ${p}" tf)) taskfiles;
+        taskless = builtins.filter (p: !(has p "\ntasks:")) taskfiles;
+      in
+        missing == [] && taskless == [];
+      detail = let
+        tf = read "Taskfile.yml";
+        missing = builtins.filter (p: !(lib.hasInfix "taskfile: ${p}" tf)) taskfiles;
+        taskless = builtins.filter (p: !(has p "\ntasks:")) taskfiles;
+      in "shards Taskfile.yml does not include: ${lib.concatStringsSep ", " missing} — shards declaring no tasks: ${lib.concatStringsSep ", " taskless}";
+    };
+
     channels-have-a-task = {
       rule = "Every discovery channel keeps an entry point: a fleet fact is read with `task dev:inventory:feed`, a note with `ops:notes:show`, a durable doc with `docs:build`, and a rule with the policy check. A category with no entry point is a fact nobody can reach, which is how prose becomes the only home.";
       proof = "taskfiles/dev.yml (inventory:feed, docs:build), taskfiles/ops.yml (ops:notes:show), flake/checks.nix (policyFailures)";

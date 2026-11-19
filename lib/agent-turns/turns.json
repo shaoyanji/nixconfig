@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T16:55:00Z",
+  "generated": "2026-11-19T16:56:38Z",
   "count": 200,
-  "pin": "f176693ff928b5ea3d3c18c2cb8bda2694ea06a4222c625eb0ec65d6cb1edb2e",
+  "pin": "2cbefcb4c205d8e3ab87dbaba7b342d0a879ff811bedc511fabdebb01487689a",
   "turns": [
+    {
+      "id": "f2b1fe10-02c0-42cd-82d1-492b034ea305",
+      "ts": "2026-11-19T16:55:09Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-closures",
+      "action": "shadow convention landed: modules/roles/minimal.shadow.nix — empty module holding the kg-elixir cleanup, addressable as .#modules.\"roles.minimal.shadow\"; pointer-style comments kept census at 6537/6539 | gate: checks:nix:comments PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aee2c6c0e89bd55c39dbc683f46b05e5dea382f5",
+      "branch": "HEAD",
+      "frame": "03h9lfa7f39cpr0moq65uidde"
+    },
     {
       "id": "0bc71034-06b3-4439-9aae-8412a81b2f5a",
       "ts": "2026-11-19T16:52:31Z",
@@ -2804,19 +2817,6 @@
       "base_commit": "93a4475921085a6dcf8d9b0cda5979cbf55060f4",
       "branch": "main",
       "frame": "03h9524jdzoa51p4o3m7row3e"
-    },
-    {
-      "id": "da32b63e-605d-4976-8dff-f450691f5bb8",
-      "ts": "2026-11-17T14:19:21Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily-round17",
-      "action": "round-17 batch spent 5 (burst limit), resumed as batch20c cap 18; slots now share the day's remaining allowance evenly and reserve gates the roster; frieren rebuilt at 583c31ba",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "583c31baf5e34860c15b19e6b1158d52a050a10e",
-      "branch": "main",
-      "frame": "03h94y91zxbcn33hm92cwwe3q"
     }
   ]
 }

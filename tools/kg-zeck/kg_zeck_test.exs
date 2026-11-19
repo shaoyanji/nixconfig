@@ -132,7 +132,7 @@ defmodule KGZeckTest do
     script = "KGZeck.locked(#{inspect(cache)}, fn -> System.halt(0) end)"
 
     {_, 0} =
-      System.cmd(System.find_executable("elixir"), [
+      System.cmd(System.get_env("KG_ELIXIR") || System.find_executable("elixir"), [
         "-r",
         Path.join(__DIR__, "kg_zeck.exs"),
         "-e",

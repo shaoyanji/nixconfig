@@ -128,3 +128,7 @@
 # todo-txt-cli           # Todo.txt command line interface
 # ytcast                 # Cast YouTube videos to TV/device
 # zbar                   # Barcode and QR code reader
+
+# ── Agent Tooling (llm-agents.nix) ──
+# llm-agents.pdfvision   # reason: zero repo callers — slashed from user.ai agentTools 2026-11 (deep-slash)
+# llm-agents.parallel-cli # reason: zero repo callers — slashed from user.ai agentTools 2026-11 (deep-slash)

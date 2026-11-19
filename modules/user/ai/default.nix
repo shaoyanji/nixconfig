@@ -34,8 +34,6 @@
   ];
 
   agentTools = [
-    pkgs.llm-agents.pdfvision # PDF understanding/conversion
-    pkgs.llm-agents.parallel-cli # parallel task runner for batched agent work
     pkgs.llm-agents.agent-browser # headless Chrome automation CLI (bundles Chromium ~700MB)
   ];
 in {
@@ -58,9 +56,10 @@ in {
         - "light": lightweight client tools (antigravity-cli, geminicommit, tgpt, aichat).
                    Excludes heavy agent-browser (700MB Chromium), qmd embeddings, and batched runner daemons.
         - "full": complete fleet agent suite (qmd, agent-browser, ai-memory, toon,
-                  pdfvision, parallel-cli, reasonix). Default for frieren, eisen, poseidon.
-                  `crush` is retired (free credits exhausted, 2026-11-06) and is not
-                  part of any tier.
+                  reasonix). Default for frieren, eisen, poseidon.
+                  `crush` is retired (free credits exhausted, 2026-11-06) and
+                  pdfvision/parallel-cli are slashed (zero callers, pkgs.txt) —
+                  none are part of any tier.
       '';
     };
   };

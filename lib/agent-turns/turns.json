@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-19T17:07:02Z",
+  "generated": "2026-11-19T17:14:09Z",
   "count": 200,
-  "pin": "bf404b00b3138b0285c1e85cae21fd47c632ed8cc034a81e1a9c3d4fc28b0d85",
+  "pin": "e91d4f3775a88d1ec497270a587dd6f412877e13d67b30dfc4923bd2b98b8bed",
   "turns": [
+    {
+      "id": "86bb4ba9-e020-418e-aec7-9a22afe61568",
+      "ts": "2026-11-19T17:12:40Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-clanker-migration",
+      "action": "survey: llm-agents installs 11 pkgs (qmd/ai-memory/toon/pdfvision/parallel-cli/agent-browser/antigravity-cli/reasonix/hermes-agent/dsh/freebuff); zero-caller: pdfvision, parallel-cli; dsh dead-vs-shadowed-service; nixpkgs#antigravity-cli exists on unstable",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "33ee153bef2c51c5ee743181da7004a474a380eb",
+      "branch": "HEAD",
+      "frame": "03h9lipf6vmc0jaz8x1zjw6ir"
+    },
+    {
+      "id": "82c7b426-bf05-4089-bba8-196ff28d53ec",
+      "ts": "2026-11-19T17:11:47Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-clanker-migration",
+      "action": "claim: survey llm-agents closure usage, clanker migration surface",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai",
+        "flake",
+        "hosts"
+      ],
+      "files": [],
+      "base_commit": "33ee153bef2c51c5ee743181da7004a474a380eb",
+      "branch": "HEAD",
+      "frame": "03h9lij5eluivuumyqjwxju4z"
+    },
+    {
+      "id": "16b30a4e-28fe-4ca7-aa39-c8ce60e90f06",
+      "ts": "2026-11-19T17:07:13Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-dsh-agy",
+      "action": "landed: 3 shadow files (delphi dsh-web stack, agy daemon-web on delphi+frieren), new 'shadow' comment kind (header census 6537->6532); KEEP all 4 agy flights — agy-nightly-system writes the sentinel auditRecord, killing it pages; handoff is zero-cost when quiet | gate: checks:nix:comments PASS, frieren+delphi role evals",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "33ee153bef2c51c5ee743181da7004a474a380eb",
+      "branch": "HEAD",
+      "frame": "03h9lhmzqjlo0b4ssnvcwsmnf"
+    },
     {
       "id": "c0d258ae-c8b2-4337-af72-d88738e63210",
       "ts": "2026-11-19T17:03:28Z",
@@ -2781,45 +2824,6 @@
       "base_commit": "7c08e7fc06c3788c28e17e8cec823ce90c2183ab",
       "branch": "main",
       "frame": "03h95x3m7w1ts5ltc7rtqujex"
-    },
-    {
-      "id": "95ccab86-6af9-4caa-b775-bd29e1fe527e",
-      "ts": "2026-11-17T17:15:39Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily-round18",
-      "action": "round 18: 16 kept of 16 spent, 16 approved (rotation 96), round 19 queued, allowance 100/100; a 429 at zero now ends the round instead of sleeping",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4c3d798a256d3d236649cb419adadcc14a24b84e",
-      "branch": "main",
-      "frame": "03h95wovq2a8ruz2iivfzablo"
-    },
-    {
-      "id": "dbb137e3-9186-44b4-a5d9-4994b837bef2",
-      "ts": "2026-11-17T16:25:24Z",
-      "source": "devji",
-      "subject": "nixconfig:check-inventory-native",
-      "action": "taskfiles/checks.toml is read by builtins.fromTOML as .#checkInventory (rows/names/tsv); check.sh rows() calls nix eval --raw .#checkInventory.tsv instead of yq, byte-identical 110 rows, 219 ms, check:list +457 ms",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "93a4475921085a6dcf8d9b0cda5979cbf55060f4",
-      "branch": "main",
-      "frame": "03h95mvm2wgdbqdfsqqlgb6he"
-    },
-    {
-      "id": "6a8e4c88-40a6-42a0-8c48-8b6fed0a9307",
-      "ts": "2026-11-17T14:56:13Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily-round17",
-      "action": "round 17 closed: 16 kept of 17 spent, 436 assets, 16 plates approved (rotation 80); rounds wait the burst window, images:today is the readout; yennefer/triss held on VALIDATION_FAILED",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1e8d9f57dde3642e8cc6a83076a40330f98e4d65",
-      "branch": "main",
-      "frame": "03h955gdaxblf84k10xt2d1nn"
     }
   ]
 }

@@ -175,7 +175,9 @@
   # Stub services from the guest declaration: hosts/microvms/guests.nix.
   microvmGuest = config.microvmGuests.sandbox;
   microvmProxyLocations = withGate: let
-    proxies = lib.listToAttrs (map (svc: {
+    proxies =
+      microvmGuest.services
+      |> map (svc: {
         name = "/microvm/${svc.name}/";
         value =
           {
@@ -184,7 +186,7 @@
           }
           // lib.optionalAttrs withGate {extraConfig = tailnetOnly;};
       })
-      microvmGuest.services);
+      |> lib.listToAttrs;
   in
     proxies
     // lib.optionalAttrs (microvmGuest.services != []) {

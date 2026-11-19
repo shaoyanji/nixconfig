@@ -6,10 +6,10 @@
   runtimeSkills = ./.;
 
   dirsOf = p:
-    builtins.attrNames (
-      lib.filterAttrs (name: type: type == "directory" && !(lib.hasPrefix "." name))
-      (builtins.readDir p)
-    );
+    p
+    |> builtins.readDir
+    |> lib.filterAttrs (name: type: type == "directory" && !(lib.hasPrefix "." name))
+    |> builtins.attrNames;
 
   # Runtime wins on a name collision: it is the tree that carries scripts.
   names = lib.unique (dirsOf repoSkills ++ dirsOf runtimeSkills);

@@ -228,7 +228,7 @@ in {
         ports = map (l: l.port or 80) (v.listen or [{port = 80;}]);
       in
         lib.concatMap (port: map (name: {inherit name port vname;}) names) ports
-    ) (builtins.attrNames config.services.nginx.virtualHosts);
+    ) (config.services.nginx.virtualHosts |> builtins.attrNames);
     byName = lib.groupBy (c: "${toString c.port}:${c.name}") claims;
     contested =
       lib.filterAttrs (

@@ -32,14 +32,17 @@ lib.genAttrs systems.work (
           darwin = builtins.attrNames self.darwinConfigurations;
           home = builtins.attrNames self.homeConfigurations;
         };
-        declared = kind: builtins.attrNames (lib.filterAttrs (_: h: h.kind == kind) self.inventory.flakeHosts);
+        declared = kind:
+          self.inventory.flakeHosts
+          |> lib.filterAttrs (_: h: h.kind == kind)
+          |> builtins.attrNames;
         tagged = kind: names: map (n: "${kind}:${n}") names;
         kinds = ["nixos" "darwin" "home"];
       in {
         # inventory.toml calls it a flake host, but the flake has no output.
-        missing = lib.concatMap (kind: tagged kind (lib.subtractLists kindNames.${kind} (declared kind))) kinds;
+        missing = kinds |> lib.concatMap (kind: tagged kind (lib.subtractLists kindNames.${kind} (declared kind)));
         # the flake builds it, but inventory.toml never registered it.
-        unregistered = lib.concatMap (kind: tagged kind (lib.subtractLists (declared kind) kindNames.${kind})) kinds;
+        unregistered = kinds |> lib.concatMap (kind: tagged kind (lib.subtractLists (declared kind) kindNames.${kind}));
       };
 
       # The module that injects the compiled registry (flake/module-sets.nix) is

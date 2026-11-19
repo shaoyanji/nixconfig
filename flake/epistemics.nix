@@ -391,7 +391,10 @@
 
   forKind = kind: let
     verdicts = map (judge kind) sourceIds;
-    permitted = lib.sort (a: b: a.key < b.key) (builtins.filter (v: v.go) verdicts);
+    permitted =
+      verdicts
+      |> builtins.filter (v: v.go)
+      |> lib.sort (a: b: a.key < b.key);
     strip = v: {
       inherit (v) name cost why offline metered fanout ev;
     };
@@ -415,14 +418,19 @@
     floor = kinds.${kind}.evidenceFloor;
     evidenceRank = rankOf kinds.${kind}.evidenceFloor;
     order = map strip permitted;
-    never = map strip (builtins.filter (v: !v.go) verdicts);
+    never =
+      verdicts
+      |> builtins.filter (v: !v.go)
+      |> map strip;
   };
 
-  table = builtins.listToAttrs (map (k: {
+  table =
+    kindIds
+    |> map (k: {
       name = k;
       value = forKind k;
     })
-    kindIds);
+    |> builtins.listToAttrs;
 
   review = claim: let
     t =

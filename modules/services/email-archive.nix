@@ -172,12 +172,13 @@
   endpointsDir = pkgs.runCommand "email-archive-endpoints" {} ''
     mkdir -p $out
     cp ${./email-archive-endpoints}/*.sql $out/
-    ${lib.concatMapStringsSep "\n" (dir: "cp ${dir}/*.sql $out/") (
-      lib.concatMap (plugin: plugin.sql) (lib.attrValues cfg.plugins)
-    )}
+    ${cfg.plugins
+      |> lib.attrValues
+      |> lib.concatMap (plugin: plugin.sql)
+      |> lib.concatMapStringsSep "\n" (dir: "cp ${dir}/*.sql $out/")}
   '';
 
-  pluginSchemas = lib.concatMap (plugin: plugin.schema) (lib.attrValues cfg.plugins);
+  pluginSchemas = cfg.plugins |> lib.attrValues |> lib.concatMap (plugin: plugin.schema);
 
   # Declared pointers: an agent's regular "look here", one file the classifier
   # reads. Empty by default, so a host that wants none carries no state.
@@ -594,7 +595,7 @@ in {
       lib.optional cfg.importer.enable html2markdown
       ++ lib.optional cfg.triage.enable classifier
       ++ lib.optional cfg.triage.enable ciDrain
-      ++ lib.concatMap (plugin: plugin.packages) (lib.attrValues cfg.plugins);
+      ++ (cfg.plugins |> lib.attrValues |> lib.concatMap (plugin: plugin.packages));
 
     services.postgresql = {
       enable = true;

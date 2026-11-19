@@ -211,7 +211,7 @@
       else "${cfg.tailnetHost}:${toString m.port}";
     inherit (m) requires;
     vhost = null;
-  }) (builtins.attrNames (lib.filterAttrs (_: m: !m.hideCard) cfg.mounts));
+  }) (cfg.mounts |> lib.filterAttrs (_: m: !m.hideCard) |> builtins.attrNames);
 
   # 3. Standalone cards: renames (`entries.paste` → `frieren.lan`) and things a
   # non-nginx daemon serves. A key that is neither an exposure row nor a mount,
@@ -555,7 +555,11 @@ in {
                   then []
                   else (h.network.links or [])
                 );
-              shown = map (m: m.port) (builtins.attrValues (lib.filterAttrs (_: m: !m.hideCard) cfg.mounts));
+              shown =
+                cfg.mounts
+                |> lib.filterAttrs (_: m: !m.hideCard)
+                |> builtins.attrValues
+                |> map (m: m.port);
             in
               builtins.all (p: builtins.elem p linked) shown
           );

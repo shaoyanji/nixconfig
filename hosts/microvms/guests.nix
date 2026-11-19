@@ -402,7 +402,8 @@ in {
         # attribute set because one attrset cannot define `systemd.services`
         # twice; the `optionalAttrs` is what keeps it off by default.
         systemd.services =
-          lib.listToAttrs (map (svc: {
+          (stubServices
+            |> map (svc: {
               name = "microvm-stub-${svc.name}";
               value = lib.mkIf services {
                 description = "Stub HTTP service '${svc.name}' inside the sandbox microVM";
@@ -416,7 +417,7 @@ in {
                 };
               };
             })
-            stubServices)
+            |> lib.listToAttrs)
           // lib.optionalAttrs stirling {
             # A release jar, a JRE and the CLI tools the app shells out to. The
             # jar is architecture-independent; every tool here is in nixpkgs for

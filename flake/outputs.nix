@@ -47,7 +47,10 @@
 
   # Inventory -> per-kind attrset. The kind is the only thing that decides which
   # assembler a host gets, so it is the only filter the flake needs.
-  project = kind: fn: lib.mapAttrs fn (lib.filterAttrs (_: host: host.kind == kind) hostInventory);
+  project = kind: fn:
+    hostInventory
+    |> lib.filterAttrs (_: host: host.kind == kind)
+    |> lib.mapAttrs fn;
 
   # Documentation + site nav generated from the SAME compiled registry the hosts
   # use (lib/docs.nix). Built for one system: it is markdown only, so the
@@ -76,7 +79,23 @@
     then builtins.currentSystem
     else builtins.head systems.work
   );
-  taskList = builtins.listToAttrs (map (p: {
+  taskList =
+    taskListPkgs.runCommandLocal "task-list.json" {
+      nativeBuildInputs = [taskListPkgs.yq-go taskListPkgs.jq];
+    } ''
+      for f in ${../Taskfile.yml} ${../taskfiles}/*.yml; do
+        yq -o=json -I=0 '.tasks // {}' "$f"
+      done | jq -s 'add // {} | to_entries
+        | map(.key as $k | .value as $v
+              | ($v.desc // "") as $d
+              | ($v.summary // "") as $s
+              | [[$k, $d, $s, ""]]
+                + [($v.aliases // [])[] | [., $d, $s, $k]])
+        | add // []' > $out
+    ''
+    |> builtins.readFile
+    |> builtins.fromJSON
+    |> map (p: {
       name = builtins.elemAt p 0;
       value = {
         desc = builtins.elemAt p 1;
@@ -84,19 +103,8 @@
         hasSummary = builtins.elemAt p 2 != "";
         aliasOf = builtins.elemAt p 3;
       };
-    }) (builtins.fromJSON (builtins.readFile (taskListPkgs.runCommandLocal "task-list.json" {
-        nativeBuildInputs = [taskListPkgs.yq-go taskListPkgs.jq];
-      } ''
-        for f in ${../Taskfile.yml} ${../taskfiles}/*.yml; do
-          yq -o=json -I=0 '.tasks // {}' "$f"
-        done | jq -s 'add // {} | to_entries
-          | map(.key as $k | .value as $v
-                | ($v.desc // "") as $d
-                | ($v.summary // "") as $s
-                | [[$k, $d, $s, ""]]
-                  + [($v.aliases // [])[] | [., $d, $s, $k]])
-          | add // []' > $out
-      ''))));
+    })
+    |> builtins.listToAttrs;
   checkInventory = let
     rows = (builtins.fromTOML (builtins.readFile ../taskfiles/checks.toml)).check;
   in {
@@ -200,9 +208,10 @@ in {
   # prints the store path, and `nix eval --raw` gives it without building anything
   # else. Membership is the inventory (`category = "microvm"`), so a new guest is
   # reachable the moment it is registered — nothing here names it.
-  microvmRunners = lib.mapAttrs (
-    name: _: self.nixosConfigurations.${name}.config.microvm.declaredRunner
-  ) (lib.filterAttrs (_: host: host.category == "microvm") inventory.hosts);
+  microvmRunners =
+    inventory.hosts
+    |> lib.filterAttrs (_: host: host.category == "microvm")
+    |> lib.mapAttrs (name: _: self.nixosConfigurations.${name}.config.microvm.declaredRunner);
 
   # The fleet gate, in two shapes (see flake/fleet-checks.nix):
   #   fleetHostChecks.<system>.<host> — one host per attribute, membership from the

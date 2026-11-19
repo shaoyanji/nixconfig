@@ -29,9 +29,11 @@
       if dir == "."
       then n
       else "${dir}/${n}") (
-      builtins.attrNames (
-        lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix suffix n) (builtins.readDir (root + "/${dir}"))
-      )
+      root
+      + "/${dir}"
+      |> builtins.readDir
+      |> lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix suffix n)
+      |> builtins.attrNames
     );
 
   taskfiles = filesWithSuffix "taskfiles" ".yml";
@@ -606,9 +608,11 @@
   # desktop underneath. A host that disables a compositor has to fork the profile.
   hostConfigs = builtins.filter (p: builtins.pathExists (root + "/${p}")) (
     map (h: "hosts/${h}/configuration.nix") (
-      builtins.attrNames (
-        lib.filterAttrs (_: t: t == "directory") (builtins.readDir (root + "/hosts"))
-      )
+      root
+      + "/hosts"
+      |> builtins.readDir
+      |> lib.filterAttrs (_: t: t == "directory")
+      |> builtins.attrNames
     )
   );
   halfForked =

@@ -50,10 +50,9 @@ agent:
   # length, not a retry preference: every failover hop consumes one
   # restart-count credit and the turn dies at `rebuilt_restart_limit_exceeded`
   # when they run out, so `1` (the value that sat dead under `fallback:`)
-  # would have capped a three-lane chain at its first hop — measured
-  # 2026-11-19, when the qwen failover worked and the turn died activating
-  # openrouter.
-  api_max_retries: 3
+  # would have capped the chain at its first hop — measured 2026-11-19, when
+  # the qwen failover worked and the turn died activating the next lane.
+  api_max_retries: 4
 # Every provider holding a credential in ~/.hermes/.env or the shell env is a
 # selectable row in `hermes model` / `/model`, and the expensive-model guard
 # only warns on KNOWN pricing — silent on a custom route, and a billed pick is
@@ -125,18 +124,19 @@ web:
 display:
   interface: cli
   tool_progress: all
-# Fallback chain: three independent free quotas, one failover each. Infron's
+# Fallback chain: four independent free quotas, one failover each. Infron's
 # daily allowance is account-scoped, so when the route dies the second `:free`
 # id on it dies too — one failover inside one route is no chain at all, which
 # is how a quota outage ended a turn instead of degrading it (2026-11-19).
 # Each entry's free contract is structural, not a remembered price: `:free` is
 # the suffix the Infron route bills at zero, `nvidia` is NIM's free dev tier
 # on integrate.api.nvidia.com (a build.nvidia.com key, no wallet exists to
-# bill), and ollama-cloud's catalog is a closed free list. Nemotron therefore
-# belongs on the NIM lane, never the custom endpoint — the billed pick that
-# cost the Infron balance (2026-11-19) was this model resolved through a
-# metered route, and openrouter stays out of the chain for the same reason:
-# its account CAN hold a wallet even when a `:free` id is correct.
+# bill), the openrouter account is verified `is_free_tier` (2026-11-19) so it
+# holds no balance — a `:free` id there is free quota, still suffixed in case
+# the account is ever credited — and ollama-cloud's catalog is a closed free
+# list. Nemotron's first failover is the NIM lane, not the custom endpoint:
+# the billed pick that cost the Infron balance (2026-11-19) was this model
+# resolved through a metered route.
 fallback_providers:
   - provider: custom
     model: qwen/qwen3.8-27b:free
@@ -144,6 +144,8 @@ fallback_providers:
     key_env: INFRON_API_KEY
   - provider: nvidia
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
+  - provider: openrouter
+    model: nvidia/nemotron-3.5-super-vl:free
   - provider: ollama-cloud
     model: nemotron-3-ultra
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes

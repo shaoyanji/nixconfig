@@ -1,8 +1,24 @@
 {
-  "generated": "2026-11-19T08:13:56Z",
+  "generated": "2026-11-19T08:22:11Z",
   "count": 200,
-  "pin": "ed3eb113bc4c85a268b49a05d305dc15bc0236bb5263d5c0c28c1ff50b29818b",
+  "pin": "7d8f672b353ad635f7a815408c10f81c71cc70d88f8b0cd81e071b90e77b8a7a",
   "turns": [
+    {
+      "id": "5a0fae45-ed39-466b-b7cd-f6889ab03004",
+      "ts": "2026-11-19T08:17:38Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 3: freebuff landed config-registry-schema (70dc7f13, lib/registry-schema.nix + checks.registry-schema, knob path roots + option casing + ports, 5 real failures fixed). Fed it \"wire ports to the gate\" followup. agy delivered email triage: Appwrite dragon-court deletion (needs decision), 3 PRs awaiting review, Oracle trial expiry Dec 18, security logins to confirm, nixcachix CI already resolved.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "70dc7f13d537b6527a05e4cac2f2ea0dfd46e0f3",
+      "branch": "main",
+      "frame": "03h9im6ttvrbq4gymeeyik6wj"
+    },
     {
       "id": "7cb39ce6-31e6-4c95-9b70-a72b2fc97605",
       "ts": "2026-11-19T08:13:24Z",
@@ -2709,19 +2725,6 @@
       "base_commit": "a003cc7a969afecfbf25f792d34f09d562922d56",
       "branch": "main",
       "frame": "03h82bka18q2kvcd4zgmtonmw"
-    },
-    {
-      "id": "41c31904-2868-4d76-83c4-d41c596ce146",
-      "ts": "2026-11-12T15:21:17Z",
-      "source": "devji",
-      "subject": "pancakes-harness:vox-ungrounded-fallback",
-      "action": "measured the vox battery on delphi (12/14); an ungrounded argument now answers from the chat lane instead of declining, tested and crossed-built on clanker",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a003cc7a969afecfbf25f792d34f09d562922d56",
-      "branch": "main",
-      "frame": "03h827v293v8nnhvkrt1rpthy"
     }
   ]
 }

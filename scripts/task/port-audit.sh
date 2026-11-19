@@ -187,6 +187,41 @@ fmt() {
   if [ -n "${1:-}" ]; then printf '%s ' $1; else printf 'none'; fi
 }
 
+# --- registry ports: the knob table's `port` fields against this host's reality -------
+# A port in a description is a claim; a `port` field is data. This section is why the
+# data earns its keep: a knob port that is listening publicly and gated nowhere is a
+# firewall hole nobody declared, and two knobs naming one port is a collision that the
+# prose could never show. Scoped by `hosts` so delphi's ports stay out of frieren's run.
+registry_json="${FIXTURE_REGISTRY:-}"
+if [ -z "$registry_json" ] && command -v yq >/dev/null 2>&1; then
+  registry_json="$(yq -p toml -o json modules.toml 2>/dev/null || true)"
+fi
+registry_rows=""; registry_hole=""; registry_collision=""; registry_idle=""
+if [ -n "$registry_json" ]; then
+  registry_collision="$(jq -r '[.knobs | to_entries[] | select(.value.port != null)]
+    | group_by(.value.port) | .[] | select(length > 1)
+    | "\(.[0].value.port):\(map(.key) | join("+"))"' <<<"$registry_json" 2>/dev/null || true)"
+  while read -r knob port; do
+    [ -n "$knob" ] || continue
+    if in_set "$port" "$public_tcp"; then
+      if in_set "$port" "$declared_tcp" || in_set "$port" "$global_tcp" || in_set "$port" "$serve_ports"; then
+        registry_rows="${registry_rows}${knob}=${port}:SERVED "
+      else
+        registry_rows="${registry_rows}${knob}=${port}:HOLE "
+        registry_hole="${registry_hole}${knob}(${port}) "
+      fi
+    elif in_set "$port" "$loopback_tcp"; then
+      registry_rows="${registry_rows}${knob}=${port}:LOOPBACK "
+    else
+      registry_rows="${registry_rows}${knob}=${port}:NO-LISTENER "
+      registry_idle="${registry_idle}${knob}(${port}) "
+    fi
+  done < <(jq -r --arg h "$HOST" '.knobs | to_entries[]
+      | select(.value.port != null)
+      | select(((.value.hosts // []) | index($h)) != null)
+      | "\(.key) \(.value.port)"' <<<"$registry_json" 2>/dev/null)
+fi
+
 echo "=== port audit: ${HOST} / ${IFACE} ==="
 echo "declared: $(printf '%s ' $declared_tcp)(tcp) / $(printf '%s ' $declared_udp)(udp)"
 echo "global:   $(fmt "$global_tcp")(tcp, open on every interface)"
@@ -230,6 +265,9 @@ echo "FIREWALL-ONLY (public, undeclared):   ${firewall_only:-none}"
 echo "ACCEPTED (public, documented):        ${accepted:-none}"
 echo "DYNAMIC (drawn port, undeclarable):   ${dynamic:-none}"
 echo "LOOPBACK-ONLY (not exposed):          $(printf '%s ' $loopback_tcp)"
+echo "REGISTRY (knob port, this host):      $(fmt "$registry_rows")"
+echo "REGISTRY-COLLISION (port, two knobs): $(fmt "$registry_collision")"
+echo "REGISTRY-HOLE (exposed, undeclared):  $(fmt "$registry_hole")"
 echo
 
 if [ -n "$dead" ]; then
@@ -272,6 +310,22 @@ if [ -n "$dynamic" ]; then
   echo "      start-up and there is no stable number to declare. Pin the port where the owner"
   echo "      allows it (services.nfs.server.statdPort/lockdPort) or isolate the service; the"
   echo "      firewall scope is their only control until then."
+fi
+
+if [ -n "$registry_collision" ]; then
+  echo >&2
+  echo "ERROR: two knobs claim one port: $(fmt "$registry_collision")" >&2
+  echo "       Merge them or give one a distinct port in modules.toml; a shared number" >&2
+  echo "       means one of the two services cannot start where the registry says it does." >&2
+fi
+if [ -n "$registry_hole" ]; then
+  echo >&2
+  echo "ERROR: knob ports listening publicly and gated nowhere: $(fmt "$registry_hole")" >&2
+  echo "       Declare the port on the host's interface (or serve it), or bind the service" >&2
+  echo "       to loopback — the registry says it is exposed, the firewall says nothing." >&2
+fi
+if [ -n "$registry_collision" ] || [ -n "$registry_hole" ]; then
+  exit 1
 fi
 
 if [ -n "$redundant" ]; then

@@ -32,6 +32,9 @@ command -v jq >/dev/null 2>&1 || {
 # One exposure declaration, reused: 22 is declared on the interface, 8181 is not.
 # Cases that need a different declaration replace it.
 SCOPED='{"allowedTCPPorts":[],"allowedUDPPorts":[],"interfaces":{"tailscale0":{"allowedTCPPorts":[22],"allowedUDPPorts":[53]}}}'
+# The registry half reads modules.toml through yq on a real host; the fixture hands
+# it JSON instead so a case can state the knob table it means.
+REGISTRY='{}'
 
 # Every case this fixture is supposed to run. Coverage is asserted, not counted:
 # deleting a case with its `run` call would otherwise just print a smaller number
@@ -47,6 +50,9 @@ EXPECTED=(
   "dead hole is only reported without STRICT"
   "foreign host is refused"
   "unscoped interface is refused"
+  "two knobs one port exits 1"
+  "knob port is audited against the firewall"
+  "knob port exposed but undeclared exits 1"
 )
 
 fail=0
@@ -65,6 +71,7 @@ run() { # name want_rc needle...
   out="$(
     PATH="$bin:$PATH" HOST="$RUN_HOST" IFACE="$RUN_IFACE" STRICT="${STRICT:-0}" \
       FIXTURE_SS="$SS" FIXTURE_FIREWALL="$FIREWALL" FIXTURE_SERVE="$SERVE" \
+      FIXTURE_REGISTRY="$REGISTRY" \
       bash "$audit" 2>&1
   )"
   rc=$?
@@ -74,7 +81,18 @@ run() { # name want_rc needle...
     fail=1
     return
   fi
+  # A needle prefixed with `!` asserts absence: "this host's ports only" is a claim
+  # about what must NOT be printed, and a presence-only harness cannot make it fail.
   for needle in "$@"; do
+    if [ "${needle#!}" != "$needle" ]; then
+      if grep -qF -- "${needle#!}" <<<"$out"; then
+        echo "FAIL $name: output contains forbidden '${needle#!}'"
+        printf '%s\n' "$out" | sed 's/^/     /'
+        fail=1
+        return
+      fi
+      continue
+    fi
     if ! grep -qF -- "$needle" <<<"$out"; then
       echo "FAIL $name: output lacks '${needle}'"
       printf '%s\n' "$out" | sed 's/^/     /'
@@ -154,6 +172,31 @@ SS=$'tcp LISTEN 0 4096 0.0.0.0:22 0.0.0.0:*'
 STRICT=1 run "unscoped interface is refused" 2 \
   "tailscale0 declares no ports on fixture" \
   "IFACE=tailscale0"
+
+# 10. Two knobs naming one port is the collision the prose could never show: the
+#     registry is data, so the audit can see it without either service running.
+REGISTRY='{"knobs":{"alpha":{"port":9001,"hosts":["fixture"]},"beta":{"port":9001,"hosts":["fixture"]}}}'
+FIREWALL="$SCOPED"
+SS=$'tcp LISTEN 0 4096 0.0.0.0:22 0.0.0.0:*'
+STRICT=0 run "two knobs one port exits 1" 1 \
+  "REGISTRY-COLLISION" "9001:alpha+beta"
+
+# 11. A knob port that is listening publicly AND gated is the intended state — and
+#     only knobs claiming this HOST may appear, which is what keeps delphi's ports
+#     out of frieren's run.
+REGISTRY='{"knobs":{"svc":{"port":9400,"hosts":["fixture"]},"other":{"port":9500,"hosts":["elsewhere"]}}}'
+FIREWALL='{"allowedTCPPorts":[],"allowedUDPPorts":[],"interfaces":{"tailscale0":{"allowedTCPPorts":[22,9400],"allowedUDPPorts":[]}}}'
+SS=$'tcp LISTEN 0 4096 0.0.0.0:22 0.0.0.0:*\ntcp LISTEN 0 4096 0.0.0.0:9400 0.0.0.0:*'
+STRICT=0 run "knob port is audited against the firewall" 0 \
+  "svc=9400:SERVED" "!other="
+
+# 12. The drift the section exists for: a knob says the port is exposed, it listens
+#     publicly, and no firewall list gates it.
+REGISTRY='{"knobs":{"svc":{"port":9401,"hosts":["fixture"]}}}'
+FIREWALL="$SCOPED"
+SS=$'tcp LISTEN 0 4096 0.0.0.0:22 0.0.0.0:*\ntcp LISTEN 0 4096 0.0.0.0:9401 0.0.0.0:*'
+STRICT=0 run "knob port exposed but undeclared exits 1" 1 \
+  "REGISTRY-HOLE" "svc(9401)"
 
 # Coverage, in both directions: a case in EXPECTED must have run, and a case that
 # ran must be listed. The first catches a deleted `run` call, the second a case

@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-19T08:52:41Z",
+  "generated": "2026-11-19T08:56:07Z",
   "count": 200,
-  "pin": "db2b572ce323140357a4634885617cccb4829388dea8a3525bc3dad5739a9f27",
+  "pin": "6580831c043ab0dfab5fb12908ffe5873ab18959b4b9a2673d74c02282757900",
   "turns": [
+    {
+      "id": "c4e71daa-f6bc-4de0-b115-a9e2a1c916bd",
+      "ts": "2026-11-19T08:54:28Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 9: freebuff landed fleet service map (d1394fd2, compiled which service owns which port per host from registry). Fed it key_services structuring (registry-schema change to complete the map for all hosts).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d1394fd28b9f6f2300b1674aff9a849102cab658",
+      "branch": "main",
+      "frame": "03h9itdt32gzzd3csoszgs2n7"
+    },
+    {
+      "id": "c91be503-aaa9-4225-9cb5-7c62ad912473",
+      "ts": "2026-11-19T08:54:05Z",
+      "source": "agy",
+      "subject": "nixconfig:agents-md-turns",
+      "action": "Concrete xs turn logging guidance in AGENTS.md and HOME-PREAMBLE.md | gate: checks:toon:surfaces + checks.policies PASS",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.md",
+        "docs/agent-context/HOME-PREAMBLE.md"
+      ],
+      "files": [],
+      "base_commit": "d1394fd28b9f6f2300b1674aff9a849102cab658",
+      "branch": "main",
+      "frame": "03h9itb370vn13fgmxw2e7gwm"
+    },
+    {
+      "id": "dce6b294-e9a0-4f3d-91ec-aca5810d9156",
+      "ts": "2026-11-19T08:52:50Z",
+      "source": "devji",
+      "subject": "nixconfig:fleet-service-map",
+      "action": "lib/docs.nix renders docs/generated/fleet-services.md from registry ports + inventory network.links (18 delphi endpoints); MANUAL §2 defers to it; commit 3afebbc1 follow-on green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d1394fd28b9f6f2300b1674aff9a849102cab658",
+      "branch": "main",
+      "frame": "03h9it2c633fs5ktl3x1303tm"
+    },
     {
       "id": "603177d0-37f8-48e5-b12c-706f962514cf",
       "ts": "2026-11-19T08:50:02Z",
@@ -2698,45 +2743,6 @@
       "base_commit": "2ec1c26db214f8c2d7a57e03ef02e71e2469d6f0",
       "branch": "main",
       "frame": "03h8k49rkwy0wdsv4j1ovtn2v"
-    },
-    {
-      "id": "5cbf67a5-1be0-4a24-9ba5-b160ed87f892",
-      "ts": "2026-11-14T19:42:47Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round7",
-      "action": "cpg reauth recovered (Clerk reset-code via IMAP + cookie-jar sign-in); round 6 published 228 rows/assets; round 7 roster committed 0960a514, rendering under image rate limit",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0960a514adc36a4ea45ab8cc80429cd3d3802111",
-      "branch": "main",
-      "frame": "03h8j9jjmg6kk8f5jo1emtsyq"
-    },
-    {
-      "id": "9baefc4a-a537-4c9f-9f08-323487e23bb9",
-      "ts": "2026-11-14T04:07:25Z",
-      "source": "devji",
-      "subject": "nixconfig:frieren-daily-audit-2026-11-14",
-      "action": "Daily audit complete: reset restic-burgernas unit, verified Gen 277 & sentinel ok, updated SYSTEM.md & HANDOFF.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "45c444790e49af1a8fc0ced53932baa9b3684c6e",
-      "branch": "main",
-      "frame": "03h8e6tk9es0aqy563gtomdti"
-    },
-    {
-      "id": "9272aaac-b6f7-4d43-9f0d-a3f6abebe05a",
-      "ts": "2026-11-13T19:48:26Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round6",
-      "action": "round 6 roster committed (20 rows, 121 total) but zero generated: cpg session dead, 401 on every call; keepalive unit failing hourly on missing node — pinned pkgs.nodejs and made the runner refuse an unreadable pool instead of reporting allowance spent (45c44479); needs cpg login",
-      "outcome": "blocked: cpg session 401, refresh cannot mint, needs a browser/token login",
-      "claims": [],
-      "files": [],
-      "base_commit": "45c444790e49af1a8fc0ced53932baa9b3684c6e",
-      "branch": "main",
-      "frame": "03h8bhcla868r1ynepkdpinxo"
     }
   ]
 }

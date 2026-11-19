@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T14:38:17Z",
+  "generated": "2026-11-19T14:40:44Z",
   "count": 200,
-  "pin": "9c190c6a735af7b9887581e72f93014c1a255ef4c389f416bf5f8e93da40af26",
+  "pin": "98a831e80db45c70306f1724d0e669f8d16e8936f18c80cca6c4ad4787f8550a",
   "turns": [
+    {
+      "id": "e1f558fb-d7a8-4742-8441-527ad1cbda81",
+      "ts": "2026-11-19T14:38:26Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-fallback",
+      "action": "landed: infron picker pinned to the 2 :free ids, 3-lane cross-vendor free chain (infron->openrouter->ollama-cloud), billable vendors hidden via model_catalog.excluded_providers, api_max_retries under agent: gated to cover chain length (failover hops spend restart credits), checks:infron gains yq spend-guard | live: deepseek 429 -> qwen 429 -> openrouter :free answered | gate: checks:quick PASS, checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e19f10ffb516da0d0043d905d1f026a0c4f933b7",
+      "branch": "main",
+      "frame": "03h9koksfhuj5lu3o8zux1jkr"
+    },
     {
       "id": "bb0edec8-a276-4474-9ba3-ac9a7d2dd644",
       "ts": "2026-11-19T14:36:53Z",
@@ -2808,19 +2821,6 @@
       "base_commit": "4831b449309568cd2d7dd2df3079ad42266d0d49",
       "branch": "main",
       "frame": "03h92wenvobvfkeolthajnoei"
-    },
-    {
-      "id": "69eb83b4-2b5f-4245-ac35-c13d3a302c9d",
-      "ts": "2026-11-17T08:01:13Z",
-      "source": "devji",
-      "subject": "nixconfig:issue-classes",
-      "action": "nixcachix kills classed as trust not capacity: numtide key on all four blocks, docs/issue-classes.md is the standard, pushed 4831b449",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4831b449309568cd2d7dd2df3079ad42266d0d49",
-      "branch": "main",
-      "frame": "03h92wduyilsiul03xdahqulo"
     }
   ]
 }

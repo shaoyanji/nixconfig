@@ -815,17 +815,33 @@
     dormant-host-gates = {
       title = "Dormant host gates — minyx and cassini";
       kind = "open";
-      status = "OPEN";
+      status = "IN FLIGHT";
       priority = "P0";
-      date = "2026-10-19";
-      summary = "Both hosts are `preserved` and undeployed. `minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`, 2026-10-19); `cassini` still needs the Linux-only `freebuff-remote` import gated.";
+      date = "2026-11-19";
+      summary = "Both hosts are `preserved` and undeployed. `minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`, 2026-10-19); `cassini`'s gate is now measured and fails on two chain faults, not on `freebuff-remote`.";
       refs = {
         hosts = ["minyx" "cassini"];
-        modules = ["modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix" "hosts/minyx/configuration.nix" "hosts/cassini/configuration.nix"];
+        modules = ["modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix" "hosts/minyx/configuration.nix" "hosts/cassini/configuration.nix" "modules/global/macos.nix"];
         tasks = ["checks:host"];
       };
       body = ''
-        Exit: `task checks:host HOST=<one> MODE=eval` is green (or explicitly expected-red), run by the owner when the hardware is powered on. Verification of a dormant host is the owner's call, never an agent's drive-by eval.
+        `cassini`'s stated blocker is already gone: `modules/user/ai/freebuff-remote.nix`
+        wraps `xdg.desktopEntries` in `lib.mkIf pkgs.stdenv.hostPlatform.isLinux`, so the
+        darwin evaluation no longer fails there.
+
+        Measured 2026-11-19 from frieren: `ALLOW_PRESERVED=1 task checks:host HOST=cassini
+        MODE=eval` fails in 0.48 s on `modules/global/macos.nix` — "unsupported attribute
+        `home-manager' (namely: home-manager nix-homebrew users)", the darwin module checker
+        refusing top-level definitions. Moving those three under `config = { ... }` cleared
+        that error and exposed the next one:
+        error: The option `services.journald' does not exist. Definition values:
+        so a Linux-shaped module also reaches the macOS chain. Both faults are chain-level, not AI-module, and each fix uncovers the
+        next — which is why this is IN FLIGHT rather than closed. The halfway change was
+        reverted: it did not format and did not make the gate pass.
+
+        Exit: `task checks:host HOST=<one> MODE=eval` is green (or explicitly expected-red),
+        run by the owner when the hardware is powered on. Verification of a dormant host is
+        the owner's call, never an agent's drive-by eval.
       '';
     };
     dns-second-resolver = {

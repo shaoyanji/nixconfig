@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T08:22:11Z",
+  "generated": "2026-11-19T08:29:27Z",
   "count": 200,
-  "pin": "7d8f672b353ad635f7a815408c10f81c71cc70d88f8b0cd81e071b90e77b8a7a",
+  "pin": "ca9bf290ea9fe8346a2e84c514fa3ec2ce92d6c3a1a90355d13f0f270db6439f",
   "turns": [
+    {
+      "id": "745780a5-2a9d-406b-b3b3-3c9ec55e2f69",
+      "ts": "2026-11-19T08:25:14Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 4: freebuff landed port audit (033938f6, scripts/task/port-audit.sh classifies SERVED/HOLE/LOOPBACK/NO-LISTENER, fails on hole or two-knobs-one-port, fixture + negative needle). Fed it Sloppiness-audit continuation (hand-typed count gate + doc-link gate).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "033938f6fb731065ca2dca5ddff73f8e8f9742d8",
+      "branch": "main",
+      "frame": "03h9inoad6s0mxqv24f8djokg"
+    },
+    {
+      "id": "43ff1d34-8c02-4e94-9c11-e706f28a8558",
+      "ts": "2026-11-19T08:22:20Z",
+      "source": "devji",
+      "subject": "nixconfig:ports-audit-registry",
+      "action": "port-audit.sh classifies modules.toml port fields per host (SERVED/HOLE/LOOPBACK/NO-LISTENER) and fails on an ungated public port or two knobs on one; 12-case fixture with negative needles; frieren audit clean (4 knobs SERVED)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "033938f6fb731065ca2dca5ddff73f8e8f9742d8",
+      "branch": "main",
+      "frame": "03h9in3uwc0zc5mapsre6l70t"
+    },
     {
       "id": "5a0fae45-ed39-466b-b7cd-f6889ab03004",
       "ts": "2026-11-19T08:17:38Z",
@@ -2699,32 +2728,6 @@
       "base_commit": "f5f500e78b700e0fccda04e14d537b5c53a6b83f",
       "branch": "main",
       "frame": "03h82n1c7l6yyvh5sjalno2rq"
-    },
-    {
-      "id": "e583706e-d582-4168-892c-a980eb534335",
-      "ts": "2026-11-12T16:34:14Z",
-      "source": "devji",
-      "subject": "nixconfig:vox-merge-repin-qmd",
-      "action": "merged pancakes-harness PR #2, repinned cli.ai.vox to ad225137, vox.sh resolves qmd from cli.search.qmd, deploy-netbook flakeref fix; policies+checks:quick green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a003cc7a969afecfbf25f792d34f09d562922d56",
-      "branch": "main",
-      "frame": "03h82m43yzjbybe0ogi668mg7"
-    },
-    {
-      "id": "bb93fa3a-e5fa-4580-a5ce-c63fb93d65df",
-      "ts": "2026-11-12T15:40:13Z",
-      "source": "devji",
-      "subject": "pancakes-harness:vox-pin-and-toon",
-      "action": "pushed fa638e8 and pinned it; battery repeat 3 is 0.857 with the original tool text (a rewrite measured 0.714, so it was reverted); vox ask and battery now emit TOON by default",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a003cc7a969afecfbf25f792d34f09d562922d56",
-      "branch": "main",
-      "frame": "03h82bka18q2kvcd4zgmtonmw"
     }
   ]
 }

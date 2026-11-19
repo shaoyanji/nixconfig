@@ -1,0 +1,12 @@
+# count-claims.tsv — a hand-typed count and the compiled value it must equal.
+#
+# file<TAB>regex<TAB>source<TAB>label
+# The regex must carry exactly one capture group around the number. `source` is a
+# key in the compiled counts map (`hosts`, `knobs` today). A row that stops
+# matching is a failure, not a skip: a deleted statement leaves a stale claim.
+#
+# Seeded with the two registries, because those are the hand-written files whose
+# numbers a reader trusts. Prose claims join as canonical statements appear —
+# AGENTS.md deliberately routes to `nix eval` instead of pasting counts.
+modules.toml	^total_knobs = ([0-9]+)$	knobs	knob registry total
+inventory.toml	^total_devices = ([0-9]+)$	hosts	device registry total

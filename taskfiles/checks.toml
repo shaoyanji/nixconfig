@@ -448,3 +448,11 @@ kind = "cache"
 [[check]]
 name = "checks:nix:comments"
 kind = "leaf"
+
+[[check]]
+name = "checks:counts"
+kind = "leaf"
+
+[[check]]
+name = "checks:counts:test"
+kind = "leaf"

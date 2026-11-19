@@ -4761,7 +4761,7 @@
     sloppiness-audit-2026-10 = {
       title = "Sloppiness audit: knowledge with two homes and no enforcement";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       date = "2026-10-20";
       summary = "Slop here is not ugly code but uncounted truth: hand-typed numbers, checks that cannot fail, and checkout paths on a 34-host fleet.";
       refs = {
@@ -4799,11 +4799,11 @@
         paths. Tasks probe the flag before using the installed binary, so a stale closure
         falls back to the repo source.
 
-        **Open, in `correct` order.** Add a gate so a hand-typed count cannot land; add a
-        doc-link gate; then the `no-comments` and `unslop` passes.
+        **Delivered.** `checks:docs:links` (in `checks:quick`) gates absolute and broken
+        links; `checks:counts` holds registry counts to the compiled source, fixture proven.
 
-        **Exit.** Each gate above exists and has failed on the instance that motivated
-        it; this note then reads DELIVERED with `refs.tasks` naming them.
+        **Exit.** Met for the count and link gates; `refs.tasks` names both. The
+        `no-comments` and `unslop` passes stay open work on their own notes.
       '';
     };
     experiments-policy = {

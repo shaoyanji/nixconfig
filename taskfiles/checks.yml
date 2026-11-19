@@ -58,6 +58,8 @@ tasks:
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
       # (~3 s) for a parity experiment, and its own summary says so.
       - task: checks:ports:test
+      - task: checks:counts
+      - task: checks:counts:test
       - task: checks:nix:lint
       - task: checks:nix:shell
       - task: checks:modules:edges
@@ -588,6 +590,25 @@ tasks:
         sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
       - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules
+
+  checks:counts:
+    desc: "[gate] Every hand-typed count matches its compiled source"
+    summary: >
+      `modules/config/count-claims.tsv` names a file, a regex with one capture
+      group, and a count source. The script evaluates the sources once and fails on
+      a differing number, on a claim that no longer matches (the statement moved),
+      and on an unknown source — a count cannot land by hand and then drift.
+    cmds:
+      - bash scripts/task/count-claims.sh
+
+  checks:counts:test:
+    desc: Regression fixture for checks:counts (match, wrong, vanished, unknown)
+    summary: >
+      Proves the gate can fail: a matching claim exits 0, a wrong number exits 1, a
+      claim whose regex stops matching exits 1, and an unknown source exits 1.
+      In-memory counts and a temp manifest, so no host and no eval.
+    cmds:
+      - bash tests/count-claims/run.sh
 
   checks:ports:
     desc: Diff THIS machine's declared firewall surface against its live listeners

@@ -1300,6 +1300,19 @@ roster_pending() { # roster
   rm -f "$all" "$kept"
 }
 
+# A row the judge refuses outright, or refuses again after its one correction,
+# is parked — `hold: <reason> :: ` on the prompt field is the skip the round
+# reads at the top of the loop, and the reason is sanitized to stay one field.
+# Re-casting rewrites the row and drops the prefix by hand; the engine never
+# releases a hold on its own.
+hold_roster_row() { # roster slug reason
+  local roster=$1 slug=$2 reason
+  reason=$(printf '%s' "$3" | tr '|\t' '  ' | tr '\n' ' ' | tr -s ' ' | cut -c1-140)
+  [ -n "$reason" ] || reason="judge refused it"
+  awk -v s="$slug" -v r="$reason" -F'|' 'BEGIN{OFS="|"} $1==s && $2 !~ /^hold:/ {$2 = "hold: " r " :: " $2} {print}' \
+    "$roster" >"$roster.hold.$$" && mv "$roster.hold.$$" "$roster"
+}
+
 # A row that names only garments and coverage is drawn as a broad, heavy-jawed
 # figure: the 2026-11-16 seraph round came back looking like men in armour. The
 # fix is a face clause on the row, not a stronger adjective in the judge, and the
@@ -1432,7 +1445,9 @@ cmd_plates() {
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }
 
-  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect row_size size have file v verdict defect sent rc=0 hold_reason
+  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect row_size size have file v verdict defect sent rc=0 hold_reason retried
+  local holds_file
+  holds_file=$(mktemp)
   local ledger_before=0
   [ -f "$LEDGER" ] && ledger_before=$(wc -l <"$LEDGER" | tr -d ' ')
   day=$(today)
@@ -1500,6 +1515,7 @@ cmd_plates() {
       continue
     fi
 
+    retried=0
     file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$prompt" "$day" 1 1) || {
       rc=$?
       [ "$rc" -eq 2 ] && { say "burst window closed; the rest of the roster waits for the next round"; break; }
@@ -1527,11 +1543,28 @@ cmd_plates() {
       left=$((left - 1))
       v=$(judge_image "$file" wall "$intent" "$expect")
       verdict=$(printf '%s' "$v" | jq -r '.verdict')
+      defect=$(printf '%s' "$v" | jq -r '.defect // ""')
       spent=$((spent + 1))
+      retried=1
       record "$day" wall "photoreal-$slug" "$file" "$verdict" "$(reason_of "$v")" "$sent" 2 1
     fi
     say "$slug: $verdict"
+    # A refused row is parked, not re-rolled forever: `fail` is terminal on the
+    # first look, `reroll` after its correction (or with no defect to correct)
+    # is spent too. `unjudged` is NOT held — it is agy being down or out of
+    # quota, and parking the whole roster for a judge outage is the worse bug.
+    case $verdict in
+    fail) printf '%s\t%s\n' "$slug" "$(reason_of "$v")" >>"$holds_file" ;;
+    reroll) { [ "$retried" -eq 1 ] || [ -z "$defect" ]; } &&
+      printf '%s\t%s\n' "$slug" "$(reason_of "$v")" >>"$holds_file" ;;
+    esac
   done <"$roster"
+  if [ -s "$holds_file" ]; then
+    while IFS=$'\t' read -r slug hold_reason; do
+      hold_roster_row "$roster" "$slug" "$hold_reason" && say "$slug: held — $hold_reason"
+    done <"$holds_file"
+  fi
+  rm -f "$holds_file"
 
   say "$day: $spent image(s) spent this round"
   if [ "${PUBLISH:-1}" = "1" ] && [ "${DRY:-0}" != "1" ] && [ "$spent" -gt 0 ]; then

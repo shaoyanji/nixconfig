@@ -1,8 +1,63 @@
 {
-  "generated": "2026-11-19T21:45:27Z",
+  "generated": "2026-11-19T22:07:07Z",
   "count": 200,
-  "pin": "2ab080c14c0f7735c1efc234b89d8fd4368d79c5bab4c3b8a458d6dde675859d",
+  "pin": "745ce2699cc543774ca42ed93b7646a38907f0e56742298d73c72a01224b0d71",
   "turns": [
+    {
+      "id": "81397c6f-b398-4a74-9fef-3bcfe1060745",
+      "ts": "2026-11-19T22:05:13Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-reroll-fix",
+      "action": "claim: hold-prefix retirement for rejected plates rows",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/image-daily.sh",
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
+      "branch": "main",
+      "frame": "03h9n3upk7c9n9aphp2oo3trx"
+    },
+    {
+      "id": "f63066f6-39a3-4728-809a-92204b4f7f3e",
+      "ts": "2026-11-19T22:00:43Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-19: 0 plate(s) kept of 2 spent, 5 roster row(s) waiting, 535 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
+      "branch": "main",
+      "frame": "03h9n2z479emni1h7awpzjsz3"
+    },
+    {
+      "id": "65c48069-4962-4725-85c1-c54ae7bdb9bc",
+      "ts": "2026-11-19T21:57:05Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-19: 0 plate(s) kept of 2 spent, 5 roster row(s) waiting, 535 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
+      "branch": "main",
+      "frame": "03h9n29j3h47xry6len6mwkdr"
+    },
+    {
+      "id": "a3cfeb5a-253e-482d-a53f-24e7a2ea6a19",
+      "ts": "2026-11-19T21:45:36Z",
+      "source": "buffy",
+      "subject": "freebuff:cpg-wallpapers",
+      "action": "No wallpaper was missing: all 13 plates for 2026-11-19 existed on disk, on Cloudinary and in the served manifest. The gap was approval - wall.in held none of them - so nothing from that day could rotate. Approved all 13 (now head of rotation), republished (535 assets, deploy d3f22433), ran one 5-row plate round (2 spent, 0 kept, 23 of 100 used today), and fixed images:approve dropping DRY. All 13 verified 200 on bountystash-assets.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c8913ed010e147117d140bf26d794e7222952f56",
+      "branch": "main",
+      "frame": "03h9n00rmv6189vsgtm5z5tqq"
+    },
     {
       "id": "93c7a566-177e-4f5a-9824-f44a27367670",
       "ts": "2026-11-19T21:44:02Z",
@@ -2782,58 +2837,6 @@
       "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
       "branch": "main",
       "frame": "03h9dek3uloxl559jkltzfcug"
-    },
-    {
-      "id": "07e5ce35-ef3b-4623-9f9a-940baa5ad24f",
-      "ts": "2026-11-18T16:16:44Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
-      "branch": "main",
-      "frame": "03h9dehcl013ytiwmakjcso9e"
-    },
-    {
-      "id": "b131c3c6-869f-4a7d-bedd-717189be0475",
-      "ts": "2026-11-18T16:15:48Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
-      "branch": "main",
-      "frame": "03h9deaph4hpplprv0iewjyyq"
-    },
-    {
-      "id": "9f2a0942-6440-4b5c-b63d-a23efb5da1bf",
-      "ts": "2026-11-18T16:13:53Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "27644194e83bd62786d3743f3dfe45375fa5857c",
-      "branch": "main",
-      "frame": "03h9ddx7rryy9a2ys4str093p"
-    },
-    {
-      "id": "f8772175-75cc-4f41-8105-6735165b0ea8",
-      "ts": "2026-11-18T16:11:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:checks-infron",
-      "action": "new gate checks:infron (leaf, row added): runs scripts/infron-chat.sh with a stub curl first on PATH so no request leaves the host. Asserts paid primary/backup ids are rejected before any request, unset INFRON_API_KEY is named, defaults are deepseek-v4-flash-0731:free then qwen3.8-27b:free, a 429 fails over, two failures exit 1, and the hermes persona carries only :free ids. check:verify 111 rows, task-descs rc=0.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27644194e83bd62786d3743f3dfe45375fa5857c",
-      "branch": "main",
-      "frame": "03h9ddhzv7ukb8l62v2n197x0"
     }
   ]
 }

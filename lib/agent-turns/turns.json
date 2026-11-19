@@ -1,8 +1,258 @@
 {
-  "generated": "2026-11-19T10:05:04Z",
+  "generated": "2026-11-19T11:51:17Z",
   "count": 200,
-  "pin": "94fffdbdaa85d2b2aaea1ef1a30677164bc52a72d5c77437d51a340886f566c2",
+  "pin": "c659de2c262a43e780485437ee824bdeae12c4b4bf06a48b86233838255b8be3",
   "turns": [
+    {
+      "id": "e8044a69-1307-437b-9bdb-6cf9dad3da31",
+      "ts": "2026-11-19T11:50:14Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 20: freebuff corrected lebenslauf.md (removed fabricated Blazor template, real Matt Ji German CV, grep-verified no template claims survive). agy produced Action-First Triage Matrix job report (grouped Apply/Monitor/Pass, single-hurdle column). devin landed deltaqueue replay cache (bbb3dd7, 168µs vs 375µs -55%). freebuff now fixing xs:list commits projection. devin delegated bagua-weather build. delphi on cloud service node.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jrq49mp8ic063fwgv5asw"
+    },
+    {
+      "id": "eb7695c9-4df2-4664-ab1b-bcff84575ac4",
+      "ts": "2026-11-19T11:35:34Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 19: freebuff on lebenslauf.md proofread (comparing vs resume.json/lebenslauf.json gists, fixing fabricated Blazor template). devin on deltaqueue replay accelerator (productizing probe). agy on improved job report format. delphi freebuff as cloud service node (db/email triaging via infron).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9joupo1c8wp2i0gujyti36"
+    },
+    {
+      "id": "df0047e6-b1bd-4f74-bf34-669427d571e1",
+      "ts": "2026-11-19T11:31:55Z",
+      "source": "devin",
+      "subject": "nixconfig:fibtransponder-zeckendorf",
+      "action": "probe productionized: replay.go (ReplayLog, provisional kernel) + epoch_cache.go (EpochCache, word-mixed keys, BlockDelta, quotient snapshots) + equivalence tests; HANDOFF updated. Warm EpochCache.Replay 168µs vs full 375µs (-55%); gate: go test ./internal/deltaqueue PASS",
+      "outcome": "done",
+      "claims": [
+        "/Volumes/data/projects/fibtransponder"
+      ],
+      "files": [
+        "internal/deltaqueue/{replay",
+        "epoch_cache",
+        "replay_test",
+        "epoch_cache_test",
+        "epoch_probe_test}.go",
+        "HANDOFF.md"
+      ],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jo51gerb8buxjwi4m0lig"
+    },
+    {
+      "id": "7601e1fc-d024-4809-93d0-d36edab977c1",
+      "ts": "2026-11-19T11:08:23Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 18: freebuff landed dispatch wrapper (9e10d672, scripts/dispatch.sh routes one task to best Infron backup agent, checks:infron dispatch section 44 checks). Verified: dispatch-ok via dsh in 10s. devin committed zeckendorf handoff (0bc8701, HANDOFF.md Epoch-Replay Probe section + probe file). agy updated Black Forest Labs row.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jjjk3j67tg8uyzouk1tvz"
+    },
+    {
+      "id": "3a7b535b-795a-47d1-adfd-b302c37c3324",
+      "ts": "2026-11-19T11:06:30Z",
+      "source": "devin",
+      "subject": "nixconfig:fibtransponder-zeckendorf",
+      "action": "correction: probe + handoff now committed and pushed as 0bc8701 on master (epoch_probe_test.go + HANDOFF.md; gate: go test ./internal/deltaqueue PASS)",
+      "outcome": "done",
+      "claims": [
+        "/Volumes/data/projects/fibtransponder"
+      ],
+      "files": [
+        "internal/deltaqueue/epoch_probe_test.go",
+        "HANDOFF.md"
+      ],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jj6az1gb6zmww9bp4etyz"
+    },
+    {
+      "id": "a9fd7726-a803-4913-aa64-c4ce2f29c65e",
+      "ts": "2026-11-19T11:00:15Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 17: devin quizzed on appflow skill — confirmed all writes via task apps:update/upsert (delphi:8450 API), no JSON hand-edits; found its Focused Energy update was overwritten by agy rezi-leads race (no shared lock), reconciled to \"English packet ready\"/prep. devin now doing zeckendorf HANDOFF.md update. agy updated Black Forest Labs row (Expired). freebuff on dispatch wrapper.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jhyc6jyzabs3xaxisa81f"
+    },
+    {
+      "id": "99ceabad-364f-4983-be25-8f1eb7402001",
+      "ts": "2026-11-19T10:59:08Z",
+      "source": "devin",
+      "subject": "nixconfig:fibtransponder-zeckendorf",
+      "action": "HANDOFF.md updated: new 'Epoch-Replay Probe' section (approach, 10k-op benchmark table, gate PASS incl p=25%/R=1 +118µs, caveats, open decisions); gap 4 entry annotated; files table + footer addendum",
+      "outcome": "done",
+      "claims": [
+        "/Volumes/data/projects/fibtransponder"
+      ],
+      "files": [
+        "HANDOFF.md"
+      ],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jhqjvtbf1xhymrkd7jts0"
+    },
+    {
+      "id": "158153b4-3bcc-4558-a8a1-269ebbe1d7ef",
+      "ts": "2026-11-19T10:48:30Z",
+      "source": "agy",
+      "subject": "apps:bfl-lead-update",
+      "action": "landed: updated BFL product engineer row to Expired | gate: verify curl delphi api",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jfnrgetu67zxtze6k9cp6"
+    },
+    {
+      "id": "134e2e20-d418-4601-849f-32abd700704a",
+      "ts": "2026-11-19T10:48:16Z",
+      "source": "agy",
+      "subject": "apps:bfl-lead-update",
+      "action": "start: update BFL product engineer row status in delphi apps db",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9jfm3bpfe5070gtg0zczl3"
+    },
+    {
+      "id": "197ea516-9df8-466e-aebe-d7ab8f43fd4d",
+      "ts": "2026-11-19T10:18:11Z",
+      "source": "devin",
+      "subject": "nixconfig:fibtransponder-zeckendorf",
+      "action": "deltaqueue epoch-replay probe landed (internal/deltaqueue/epoch_probe_test.go, test-only): zeckendorf block-carving + FNV block keys + quotient addressing; gate PASSES — 10k ops: full 380µs vs segmented-p100 124µs (-67%), quotient hit 64ns, snapshot 59µs; save>0 at every p,R incl p=25%/R=1",
+      "outcome": "done",
+      "claims": [
+        "/Volumes/data/projects/fibtransponder"
+      ],
+      "files": [
+        "internal/deltaqueue/epoch_probe_test.go"
+      ],
+      "base_commit": "c5119370",
+      "branch": "main",
+      "frame": "03h9j9qjq3ozs3glp35uys0qk"
+    },
+    {
+      "id": "7e526c41-eade-4f52-9bf3-3df0c2513189",
+      "ts": "2026-11-19T10:18:01Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 16: agy updated 4 job rows (apps:rezi-leads-update done, Focused Energy=ready, Phantasma=passed, Good Hood+ecoplanet=expired). devin built Focused Energy application packet (lead→prep, English packet ready, PDFs verified) and started deltaqueue replay probe. freebuff on dispatch wrapper. agy now researching Black Forest Labs.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9j9pbuov7onyrud83ux72l"
+    },
+    {
+      "id": "16616029-9bd7-444d-8f84-df4ca2ea282a",
+      "ts": "2026-11-19T10:12:02Z",
+      "source": "agy",
+      "subject": "apps:rezi-leads-update",
+      "action": "landed: updated 4 job rows via task apps:update | gate: verify curl delphi api",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9j8j921feqz5dzlm6j0570"
+    },
+    {
+      "id": "40c3871d-b326-4f58-99de-5cf253faefdc",
+      "ts": "2026-11-19T10:11:22Z",
+      "source": "agy",
+      "subject": "apps:rezi-leads-update",
+      "action": "start: update pipeline status for 4 researched roles in delphi apps db",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9j8elkxn5y9lhmw4nmyf4x"
+    },
+    {
+      "id": "fabbc547-577a-43e0-a1a0-40bc6b8d1d9e",
+      "ts": "2026-11-19T10:11:20Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 15: freebuff on dispatch wrapper (agents:dispatch, routing by kind across reasonix/dsh/plain, fixing longSummary). agy finished job research (Focused Energy=apply, Phantasma=pass, Good Hood+ecoplanet=expired), now updating DB. devin preparing Focused Energy application packet. delphi freebuff idle (detached nudge blocked).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9j8ebltcim60ogpjx73b12"
+    },
+    {
+      "id": "73a93036-4ecc-4388-a18d-b15f5b9c1a97",
+      "ts": "2026-11-19T10:09:10Z",
+      "source": "devin",
+      "subject": "nixconfig:apps-focused-energy",
+      "action": "built Focused Energy ML Engineer packet (Darmstadt, Ashby 576081bf): Cover_Letter.typ + Resume_Matt_Ji_Focused.typ under src/applications/tech/Focused_Energy_ML_Engineer/, compiled to dist/ — QA 0 violations (letter 1p/45 lines, resume 2p/39+32); row lead->prep 'English packet ready', folderPath corrected off the accompio template",
+      "outcome": "done",
+      "claims": [
+        "/srv/data/projects/antigravity-application-workflow/src/applications/tech/Focused_Energy_ML_Engineer"
+      ],
+      "files": [],
+      "base_commit": "c5119370",
+      "branch": "main",
+      "frame": "03h9j7z3uk4qzlwta06v40uu6"
+    },
+    {
+      "id": "3a716b69-c886-46e7-b412-5b994981a7dd",
+      "ts": "2026-11-19T10:05:13Z",
+      "source": "devji",
+      "subject": "nixconfig:dispatch",
+      "action": "landed 9e10d672: scripts/dispatch.sh + task agents:dispatch route a task by kind across reasonix, dsh and the plain caller, primary then qwen backup, skipping absent binaries; model ids from the dsh overlay; verified live on all four routes incl. both agents off PATH; infron gate reads plans with --dry-run; quick+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
+      "branch": "main",
+      "frame": "03h9j77boq7mclqwoxhkoe69n"
+    },
     {
       "id": "8c3acf57-6097-44d1-b5e5-83fae890135e",
       "ts": "2026-11-19T09:54:41Z",
@@ -2528,246 +2778,6 @@
       "base_commit": "361356b4d756d5993b0e81e9eb15a2303a0a3c03",
       "branch": "main",
       "frame": "03h8vdz3jgcah0ahcownc5ess"
-    },
-    {
-      "id": "fb27bcbe-1b62-4632-bbb3-b348a849af7c",
-      "ts": "2026-11-16T08:54:15Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 0 plate(s) kept of 0 spent, 44 roster row(s) waiting, 333 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "361356b4d756d5993b0e81e9eb15a2303a0a3c03",
-      "branch": "main",
-      "frame": "03h8vdg7l2mva5c9bxoyq6ns8"
-    },
-    {
-      "id": "aff1d5f3-e08e-4ad6-90ed-e504922de2e0",
-      "ts": "2026-11-16T08:45:04Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-boudoir-blocked",
-      "action": "Boudoir/slip prompts refused twice by the provider safety system (VALIDATION_FAILED); row dropped with a note, gallery unchanged at 334, commit pushed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "361356b4d756d5993b0e81e9eb15a2303a0a3c03",
-      "branch": "main",
-      "frame": "03h8vbnlop3rynokjuo2figfp"
-    },
-    {
-      "id": "3ff48a8e-6f57-490e-9de2-00445ac4c49a",
-      "ts": "2026-11-16T08:37:12Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 0 plate(s) kept of 0 spent, 45 roster row(s) waiting, 334 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2c571da5b7619d606156ab07b4c1bc26b4d3859e",
-      "branch": "main",
-      "frame": "03h8va48ch8nraan3cmhril5x"
-    },
-    {
-      "id": "fe504f31-0244-4b91-8c33-15da7908d1b7",
-      "ts": "2026-11-16T08:34:16Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-form-clause",
-      "action": "Plate engine now refuses a row with no feminine-form clause and the judge names a masculine read; ten seraphs re-rendered 10/10 at 334 assets, commit 2c571da5",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2c571da5b7619d606156ab07b4c1bc26b4d3859e",
-      "branch": "main",
-      "frame": "03h8v9jmydmccm4q3pr9fbgvs"
-    },
-    {
-      "id": "d6308b99-ffb8-4f27-af71-47caea5094da",
-      "ts": "2026-11-16T08:33:42Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 1 plate(s) kept of 1 spent, 44 roster row(s) waiting, 334 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2c571da5b7619d606156ab07b4c1bc26b4d3859e",
-      "branch": "main",
-      "frame": "03h8v9fncj33qqgfv0fxi45o3"
-    },
-    {
-      "id": "d7cf792e-2912-4e8d-b3af-5b77ff57e6a2",
-      "ts": "2026-11-16T08:30:41Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 9 plate(s) kept of 9 spent, 44 roster row(s) waiting, 334 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "67480554dc26db9813736ce205e89edc89666468",
-      "branch": "main",
-      "frame": "03h8v8uhntq7jiypai4y07vav"
-    },
-    {
-      "id": "cf08a23a-dcf4-48e5-aaf9-6116498beff5",
-      "ts": "2026-11-16T08:05:15Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round14",
-      "action": "Ten ten-winged seraph plates kept 10/10 after one auriel reroll and one michaela retry; gallery 324 to 334, roster row committed and pushed 67480554",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "67480554dc26db9813736ce205e89edc89666468",
-      "branch": "main",
-      "frame": "03h8v3vluvfu5q9syzd8psltt"
-    },
-    {
-      "id": "76d103c6-9679-4052-9427-598d12ac05cc",
-      "ts": "2026-11-16T08:04:27Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 2 plate(s) kept of 2 spent, 44 roster row(s) waiting, 334 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5e28f51a7e9ca62dcf4f522b2b3bae3ca67b1f69",
-      "branch": "main",
-      "frame": "03h8v3pzqrr385o4t6hjtu4mv"
-    },
-    {
-      "id": "46d36b57-36d5-4fe6-906a-c4cdb3592c3e",
-      "ts": "2026-11-16T08:01:51Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 8 plate(s) kept of 10 spent, 46 roster row(s) waiting, 332 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5e28f51a7e9ca62dcf4f522b2b3bae3ca67b1f69",
-      "branch": "main",
-      "frame": "03h8v37nlnc9k4i6jx2wddtae"
-    },
-    {
-      "id": "343a9fda-af97-4ca1-b9fa-7a37a3e09571",
-      "ts": "2026-11-16T07:51:47Z",
-      "source": "buffy",
-      "subject": "nixconfig:gcal-passkey-consent",
-      "action": "Passkey import now asserts at the credential own rpId; task dev:passkey:fetch reads the Google passkey from the vault and the probe signs a 72-byte assertion at google.com. Google consent still ends at an image CAPTCHA.",
-      "outcome": "blocked: Google serves an image CAPTCHA on /challenge/pwd after repeated automated logins; only a person can solve it",
-      "claims": [
-        "scripts/task/gcal-consent.sh",
-        "scripts/task/passkey-probe.sh"
-      ],
-      "files": [
-        "scripts/task/gcal-consent.sh",
-        "scripts/task/passkey-probe.sh",
-        "scripts/task/passkey-fetch.sh"
-      ],
-      "base_commit": "ffbbd96f1185042769d9667ac508e8d2e9fb9bd2",
-      "branch": "main",
-      "frame": "03h8v18uhvse7i8dog7le1p09"
-    },
-    {
-      "id": "ab8ecade-d306-442d-8bd6-56e0a10ddd3e",
-      "ts": "2026-11-16T07:51:26Z",
-      "source": "buffy",
-      "subject": "nixconfig:vault-rbw-default",
-      "action": "rbw 1.15 is the installed default vault client (Rust, no node in the closure) and vault.frieren.lan resolves again on delphi; bitwarden-cli is now on demand for passkey reads only.",
-      "outcome": "done",
-      "claims": [
-        "modules/scripts/default.nix",
-        "flake/cli.nix",
-        "scripts/task/passkey-fetch.sh"
-      ],
-      "files": [
-        "flake/cli.nix",
-        "modules/scripts/default.nix",
-        "hosts/delphi/configuration.nix",
-        "taskfiles/dev.yml",
-        "scripts/task/passkey-fetch.sh",
-        "scripts/task/passkey-probe.sh",
-        ".agents/skills/calendar/SKILL.md"
-      ],
-      "base_commit": "ffbbd96f1185042769d9667ac508e8d2e9fb9bd2",
-      "branch": "main",
-      "frame": "03h8v16ei8xg16tkq578zmgkf"
-    },
-    {
-      "id": "9e11bab2-29c5-4d7b-a85c-dd38e9ced082",
-      "ts": "2026-11-16T07:51:11Z",
-      "source": "buffy",
-      "subject": "nixconfig:gcal-passkey-consent",
-      "action": "Pas key import now asserts at the credential own rpId; task dev:passkey:fetch reads the Google passkey out of the vault and the probe signs a 72-byte assertion at google.com. Google consent still ends at an image CAPTCHA.",
-      "outcome": "blocked: Google serves an image CAPTCHA on /challenge/pwd after repeated automated logins; only a person can solve it",
-      "claims": [
-        "scripts/task/gcal-consent.sh",
-        "scripts/task/passkey-probe.sh"
-      ],
-      "files": [
-        "scripts/task/gcal-consent.sh",
-        "scripts/task/passkey-probe.sh",
-        "scripts/task/passkey-fetch.sh"
-      ],
-      "base_commit": "ffbbd96f1185042769d9667ac508e8d2e9fb9bd2",
-      "branch": "main",
-      "frame": "03h8v14ol9sujf0k5k4a3i04j"
-    },
-    {
-      "id": "e7dca691-9714-4eb6-8720-7bf93f030d56",
-      "ts": "2026-11-16T07:45:22Z",
-      "source": "devji",
-      "subject": "nixconfig:images-round-tui",
-      "action": "Plates roster got a gum picker (task images:round) over the same plates entry the slots run; both task summaries trimmed under the 700-char contract ceiling",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "scripts/task/image-round.sh",
-        "taskfiles/images.yml"
-      ],
-      "base_commit": "373db16d0d01b0f51abe8dad4e0b487c4768756f",
-      "branch": "main",
-      "frame": "03h8uzzr9rwwkpgz0sr7puqyo"
-    },
-    {
-      "id": "2309cc1b-1574-45f7-bce8-22c7f3a756a9",
-      "ts": "2026-11-16T04:11:35Z",
-      "source": "antigravity",
-      "subject": "nixconfig:frieren-daily-audit-2026-11-16",
-      "action": "Daily audit complete: reset failed backup & sort units, reconciled sops drift, verified Gen 281 & sentinel ok, updated SYSTEM.md & HANDOFF.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "/home/devji/SYSTEM.md",
-        "/home/devji/HANDOFF.md"
-      ],
-      "base_commit": "1eb849dcd184158d37ed50a2a7c8db9c8590a01c",
-      "branch": "main",
-      "frame": "03h8tu8aops9134aqxmi6mmlk"
-    },
-    {
-      "id": "b5425e0a-3124-468b-b799-2d254abdaa39",
-      "ts": "2026-11-15T21:59:49Z",
-      "source": "devji",
-      "subject": "nixconfig:fleet-sentinel-ntfy",
-      "action": "fleet-sentinel now collects failed user units and pages ntfy on a state change, reusing the appflow triage publisher",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "916b1135645835f6e1e81192ff6b76d540eb2a3d",
-      "branch": "main",
-      "frame": "03h8rtluzemji52ygigd48c8s"
-    },
-    {
-      "id": "48fe2672-e171-47a2-ac79-a838ae6f575a",
-      "ts": "2026-11-15T21:47:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:gcal-headless-consent",
-      "action": "google calendar re-consented with no human paste: --headless=new is refused by google, the same chromium under xvfb-run is accepted, and CDP over node drove passkey (one phone tap), cloak TOTP, speedbump and consent; the loopback redirect landed on delphi so the code was exchanged locally. Result is a permanent grant where the hand-built exchange gave 604799 s. open-129 OPEN, proof due 2026-11-22. 17eb0966",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17eb0966b610c1d57e136c8be6ac1cae8bd4d39f",
-      "branch": "main",
-      "frame": "03h8rr3rhbez651n0n4akmz4s"
     }
   ]
 }

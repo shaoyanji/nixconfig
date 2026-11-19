@@ -472,8 +472,8 @@ tasks:
     desc: "Find xs turns (Q= free text like grep, ID, REPO, SUBJECT, SOURCE) and flag live claims — compact TOON, FORMAT=text for a person"
     summary: >
       The read side of the turn log, shaped for an agent: one compact row per turn
-      (ts, source, subject, outcome, action, claims, files), the field that matched
-      and a window around it. Q="tika heap" is the grep — every word must appear,
+      (ts, source, subject, outcome, action, claims, files, commits), the field that
+      matched and a window around it. Q="tika heap" is the grep — every word must appear,
       subject hits rank first; ID= takes a frame id or UUID prefix. REPO=, SUBJECT=
       and SOURCE= filter at the endpoint (2000-frame scan); LIMIT= 1-200; CLAIM=
       'a,b' fails when a live claim overlaps yours; LIVE=1 is the open queue;

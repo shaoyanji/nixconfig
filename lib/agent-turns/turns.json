@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T08:40:32Z",
+  "generated": "2026-11-19T08:47:22Z",
   "count": 200,
-  "pin": "cd16ad5da5f808f4d0dceb7a4d2c72db618c4cbd0bda6dac63bc73beacbaf254",
+  "pin": "d655ad6a1cb1e7d5d21352bbda531aa0eca9ca6c31d902ee125e288518810577",
   "turns": [
+    {
+      "id": "1ae996a5-2b80-4ed7-acd0-ab47bb077e2e",
+      "ts": "2026-11-19T08:42:36Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 7: freebuff landed doc-link refinements (56a812d1, code-fence skip + anchor validation, 176 md files every link+anchor resolves). Sloppiness audit complete. Fed it P4 continuation (taskfiles to evals, last Python: --sync-docs/--compile-fleet via lib/docs.nix).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "56a812d1976add1c091eb119ef728656ecd76629",
+      "branch": "main",
+      "frame": "03h9ir2cqme5ecshlkhveyyu0"
+    },
+    {
+      "id": "c7af2774-b6c8-414d-9b61-10ddbd5f0e8d",
+      "ts": "2026-11-19T08:40:40Z",
+      "source": "devji",
+      "subject": "nixconfig:docs-link-anchors",
+      "action": "link gate skips fenced blocks and validates same/cross-file anchors against headings; fixture 13 cases, quick+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "56a812d1976add1c091eb119ef728656ecd76629",
+      "branch": "main",
+      "frame": "03h9iqorq8qnxcz7f5b77cxx3"
+    },
     {
       "id": "8e10aa1e-a34f-440c-bbb0-4787d7ba5e14",
       "ts": "2026-11-19T08:38:02Z",
@@ -2705,35 +2734,6 @@
       "base_commit": "65c4aea1171e1006060132e1e2e8b5ddfd468501",
       "branch": "main",
       "frame": "03h8772hoalde8q874o30uacm"
-    },
-    {
-      "id": "a7506729-0da9-40e3-8887-fcd943af04aa",
-      "ts": "2026-11-13T04:07:09Z",
-      "source": "antigravity",
-      "subject": "nixconfig:frieren-daily-audit-2026-11-13",
-      "action": "Daily audit complete: reset restic-burgernas unit, verified Gen 276 & sentinel ok, updated SYSTEM.md & HANDOFF.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "/home/devji/SYSTEM.md",
-        "/home/devji/HANDOFF.md"
-      ],
-      "base_commit": "0e2767ea4e6044c93ec9080ab914b4568d0dd986",
-      "branch": "main",
-      "frame": "03h86dgxz46o3vh50e8lwelin"
-    },
-    {
-      "id": "a101a281-88ff-44eb-ae6c-df8d45403027",
-      "ts": "2026-11-12T21:46:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-fal-tavily",
-      "action": "tomorrow: confirm frieren's 02:45 checkout-ff pulled 269d2e1f and the 04:00 autoUpgrade shipped the new hermes-env-sync (FAL_KEY derived from FAL_API_KEY, web.search_backend tavily), then hermes doctor there reads image_gen ok, web search tavily, web extract firecrawl",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "269d2e1fd53172812541a2e52ba42a31891c8979",
-      "branch": "main",
-      "frame": "03h84b5stcrjlaz4dfixk2kzf"
     }
   ]
 }

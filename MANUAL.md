@@ -8,19 +8,20 @@
 
 ## 1. Identity and access
 
-| Property | Value |
-| :--- | :--- |
-| Role | Central NAS, media/service host, fleet cache and build coordinator |
-| LAN | `192.168.3.25` (`frieren.lan`, `nas.frieren.lan`, `frieren`) |
-| Tailnet | `frieren` / `100.97.61.65` |
-| DNS | Pi-hole + unbound on frieren; wildcard `*.frieren.lan` → `192.168.3.25` |
-| SSH | `ssh frieren` (CA-signed user certs; `ssh.ca.enableClient`) |
-| Storage | `/srv/data` ↔ `/Volumes/data` (bind mount + NFS export; `docs/storage-taxonomy.md`) |
-| Watchdog | the battery is the UPS; UPower clean poweroff at 5 % |
+Role, status, kind, LAN and tailnet addresses and every hardware field are compiled and
+belong to no markdown file: read the generated host card (`docs/generated/hosts/frieren.md`,
+built by `lib/docs.nix` and served by the docs site) or ask
+`nix eval --json .#inventory.hosts.frieren | toon -e`.
 
-Hardware, status and capabilities are compiled, not recorded here:
-`nix eval --json .#inventory.hosts.frieren | toon -e`. The tailnet address is the only
-dual-homed identity. `*` below marks a service reached through nginx on port 80/443.
+What the registry does not hold, and this page therefore keeps:
+
+- DNS: Pi-hole + unbound here; wildcard `*.frieren.lan` → `192.168.3.25`.
+- SSH: `ssh frieren`, CA-signed user certs (`ssh.ca.enableClient`).
+- Storage: `/srv/data` ↔ `/Volumes/data` (bind mount + NFS export; `docs/storage-taxonomy.md`).
+- Watchdog: the battery is the UPS; UPower clean poweroff at 5 %.
+
+The tailnet address is the only dual-homed identity. `*` below marks a service reached
+through nginx on port 80/443.
 
 ## 2. Service inventory (live, 2026-10-19)
 
@@ -96,7 +97,9 @@ dual-homed identity. `*` below marks a service reached through nginx on port 80/
 
 > Orientation only. `ss -tlnp` and `systemctl status <unit>` are the live truth, and
 > `SCHEMA.md` §1 forbids a second fleet table — this is the service map, not a copy of
-> `inventory.toml`.
+> `inventory.toml`. The listening ports are compiled: `docs/generated/fleet-ports.md`
+> lists every knob that declares one and the hosts it is enabled on. Unit names and
+> reach URLs stay prose because no compiled source owns them.
 
 ## 3. The closed loop, and the agent context
 

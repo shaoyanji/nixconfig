@@ -424,12 +424,35 @@
     ${table ["task" "shard" "via" "description"] rows}
   '';
 
+  portRows =
+    map
+    (key: let
+      k = knobs.${key};
+    in [
+      k.name
+      (toString k.port)
+      (lib.concatStringsSep ", " (k.hosts or []))
+      "`${k.path}`"
+    ])
+    (lib.filter (key: (knobs.${key}.port or null) != null) (lib.attrNames knobs));
+
+  fleetPorts =
+    header "Fleet listening ports" "`modules.toml`"
+    + ''
+      Every knob that declares a `port`, the hosts whose chain includes it, and the
+      module that serves it. A host absent here does not run the service, which is
+      why the same number can appear twice without a collision.
+
+      ${table ["service" "port" "hosts" "module"] portRows}
+    '';
+
   generatedPages =
     {
       "docs/generated/fleet-inventory.md" = fleetInventory;
       "docs/generated/fleet-matrix.md" = fleetMatrix;
       "docs/generated/modules-registry.md" = modulesRegistry;
       "docs/generated/task-surface.md" = taskSurface;
+      "docs/generated/fleet-ports.md" = fleetPorts;
     }
     // lib.optionalAttrs (moduleSets != null) {
       "docs/generated/fleet-module-chains.md" = moduleChains;

@@ -406,7 +406,7 @@
         docs = ["docs/task-control-plane.md"];
       };
       body = ''
-        Delivered: home card in Nix. Remaining: `--sync-docs`/`--compile-fleet` paths once `lib/docs.nix` owns the last tables.
+        Delivered: home card in Nix; MANUAL §1's identity table replaced by the generated host card; §2's ports compiled to `docs/generated/fleet-ports.md`. Remaining: retire the `modules-menu.sh sync` wrapper once no hand table is left — §2's unit and reach columns are operational, so they stay prose.
       '';
     };
     p5-dms-widget = {

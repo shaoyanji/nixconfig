@@ -297,7 +297,6 @@ in {
       {unit = "stirling-pdf.service";}
       {unit = "searx.service";}
       {unit = "uptime-kuma.service";}
-      {unit = "dsh-web.service";}
       {unit = "crab-hole.service";}
       {unit = "systemone-decision-serve.service";}
       {unit = "nginx.service";}
@@ -328,6 +327,8 @@ in {
   services.agentScheduler = {
     enable = true;
     jobs = {
+      # KEEP (deep-slash review): exits before any LLM call when no promotion
+      # candidates exist — see agyHandoffRunner in hosts/delphi/infra-stack.nix.
       agy-nightly-handoff = {
         name = "agy-nightly-handoff";
         description = "Action-gated handoff runner (runs only on autonomous promotion candidates or manual trigger)";
@@ -338,6 +339,8 @@ in {
         cpuWeight = 300;
         ioWeight = 300;
       };
+      # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
+      # hosts/delphi/infra-stack.nix reads its verdict file; stale pages, task ops:health.
       agy-nightly-system = {
         name = "agy-nightly-system";
         description = "Trigger-gated system health audit (Mon-Sat brief check, Sunday full scorecard)";
@@ -353,13 +356,7 @@ in {
 
   # The sandbox microVM's resource controls. Why:
   # .agents/deploy/hosts/delphi.md §"Guest layer — the `sandbox` microVM".
-
-  systemd.services.dsh-web.serviceConfig = {
-    CPUWeight = 200;
-    IOWeight = 200;
-    MemoryHigh = "1200M";
-    MemoryMax = "1500M";
-  };
+  # The dsh-web cgroup guards retired with the unit — hosts/delphi/dsh-web.shadow.nix.
 
   systemd.services.crab-hole = {
     unitConfig = {

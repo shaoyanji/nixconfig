@@ -1002,33 +1002,8 @@ in {
     };
   };
 
-  # 24/7 Remote Operator Gateway: Antigravity remote-control daemon
-  systemd.user.services.antigravity-cli-daemon = {
-    description = "antigravity remote-control daemon";
-    after = ["network.target"];
-    unitConfig = {
-      StartLimitIntervalSec = 0;
-    };
-    serviceConfig = {
-      Type = "simple";
-      Environment = [
-        ''"SSH_CLIENT=127.0.0.1 1 1"''
-        ''"SSH_CONNECTION=127.0.0.1 1 127.0.0.1 22"''
-        "HOME=${user.home}"
-        "USER=devji"
-        "PATH=${user.home}/.nix-profile/bin:/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin"
-        "SHELL=/run/current-system/sw/bin/bash"
-      ];
-      ExecStart = "${pkgs.antigravity-cli}/bin/agy remote-control serve";
-      Restart = "on-failure";
-      RestartSec = "10s";
-      RestartPreventExitStatus = 3;
-      TimeoutStopSec = "30s";
-      StandardOutput = "journal";
-      StandardError = "journal";
-    };
-    wantedBy = ["default.target"];
-  };
+  # The interactive remote-control gateway is retired — the cascade drives
+  # `agy -p` headless. Unit preserved at hosts/frieren/agy-daemon-web.shadow.nix.
 
   systemd.services.kg-ontology-check = {
     description = "Knowledge graph against flake/ontology.nix";
@@ -1080,6 +1055,8 @@ in {
   services.agentScheduler = {
     enable = true;
     jobs = {
+      # KEEP (deep-slash review): exits before any LLM call when no promotion
+      # candidates exist — see agyHandoffRunner in hosts/frieren/infra-stack.nix.
       agy-nightly-handoff = {
         name = "agy-nightly-handoff";
         description = "Action-gated handoff runner (runs only on autonomous promotion candidates or manual trigger)";
@@ -1087,6 +1064,8 @@ in {
         command = agyHandoffRunner;
         workingDirectory = "${user.home}";
       };
+      # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
+      # hosts/frieren/configuration.nix reads its verdict file; stale pages, task ops:health.
       agy-nightly-system = {
         name = "agy-nightly-system";
         description = "Trigger-gated system health audit (Mon-Sat brief check, Sunday full scorecard)";

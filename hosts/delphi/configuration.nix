@@ -32,14 +32,9 @@
     then null
     else d;
 
-  # DeepSeek Harness, tailnet only on 8443 (nginx owns 0.0.0.0:443); runbook:
-  # .agents/deploy/hosts/delphi.md §"DeepSeek Harness (tailnet only)".
   tailnetHost = "${hostMeta.network.tailscale_hostname}.${hostMeta.network.tailnet_domain}";
   # The key, not a MagicDNS name: `--accept-dns=false` (see below).
   tailnetIp = hostMeta.network.tailscale_ip;
-  servePort = 8443;
-  dshPort = 3080;
-  dshUrl = "https://${tailnetHost}:${toString servePort}/";
 
   # Both landing pages from ONE compiled site: lib/delphi-site.nix.
   delphiSite = import ../../lib/delphi-site.nix {
@@ -865,36 +860,18 @@ in {
             // microvmProxyLocations false
             // stirlingPublicRedirect
             // lib.optionalAttrs slidesEnabled (slideshowLocations false);
-          # Deliberately no harness location. The worker is tailnet-only (see
-          # `tailscale-serve-dsh` below); publishing it here would put a
-          # token-only gate in front of a user that holds the fleet SSH CA key.
+          # Deliberately no harness location — the worker is retired to
+          # hosts/delphi/dsh-web.shadow.nix; even live it was tailnet-only, and
+          # publishing here would put a token-only gate in front of a user that
+          # holds the fleet SSH CA key.
         };
       };
   };
 
-  # --- DeepSeek Harness, hosted HERE (NATIVE LANE), TAILNET ONLY --------------
-  # Architectural Decision: Pinned to the NATIVE host lane. Delphi runs on an
-  # OCI A1 ARM64 instance without KVM virtualization (EL2 unavailable), meaning
-  # the sandbox microVM runs under interpreted QEMU TCG. Running an active agent
-  # coding harness (bash executions, model orchestration, git workspaces) inside
-  # TCG incurs severe interpreted CPU penalties and stalls the 2 OCPU budget.
-  # Native host execution runs at bare-metal Ampere Altra speed with systemd
-  # cgroup guards (CPUWeight=200, MemoryHigh=1200M) and direct SOPS key access.
-  # The phantom guest volume reservation in hosts/microvms was retired.
-  #
-  # A client needs only a browser at `dshUrl`. The unit binds loopback and
-  # `tailscale-serve-dsh` below is the only way in. `tailscale serve` preserves
-  # the client's Host header (measured: `Host: delphi.<tailnet>.ts.net:8443`
-  # reached the upstream verbatim), so that authority is both the /api fence
-  # entry (`trustedHosts`) and the key the session cookie is minted for.
-  services.dshWeb = {
-    enable = true;
-    user = user.name;
-    port = dshPort;
-    publicUrl = dshUrl;
-    trustedHosts = ["${tailnetHost}:${toString servePort}"];
-    environmentFile = config.sops.templates."dsh-web.env".path;
-  };
+  # DeepSeek Harness retired to hosts/delphi/dsh-web.shadow.nix — the module
+  # stays imported, so revival is uncommenting that file's blocks back here.
+  # `services.dsh-web` module import stays: the options existing is what makes
+  # the shadow a one-uncomment revive rather than a reconstruction.
 
   # --- System One decision engine (Julia-1 / Laya) ----------------------------
   # The engine is stdlib Python (no torch, no model weights at runtime): its
@@ -1321,13 +1298,7 @@ in {
     includeExposure = false;
     mounts =
       {
-        dsh = {
-          port = servePort;
-          upstream = "http://127.0.0.1:${toString dshPort}";
-          title = "DeepSeek Harness";
-          description = "Agent loop, bash, model calls and workspaces, in the browser.";
-          requires = ["dsh-web.service"];
-        };
+        # dsh card retired with the harness — hosts/delphi/dsh-web.shadow.nix.
         systemone = {
           port = 8444;
           upstream = "http://127.0.0.1:8091";
@@ -1834,33 +1805,8 @@ in {
       '')
   ];
 
-  # 24/7 Remote Operator Gateway: Antigravity remote-control daemon (antigravity.google.com)
-  systemd.user.services.antigravity-cli-daemon = {
-    description = "antigravity remote-control daemon";
-    after = ["network.target"];
-    unitConfig = {
-      StartLimitIntervalSec = 0;
-    };
-    serviceConfig = {
-      Type = "simple";
-      Environment = [
-        ''"SSH_CLIENT=127.0.0.1 1 1"''
-        ''"SSH_CONNECTION=127.0.0.1 1 127.0.0.1 22"''
-        "HOME=${user.home}"
-        "USER=${user.name}"
-        "PATH=${user.home}/.nix-profile/bin:/etc/profiles/per-user/${user.name}/bin:/run/current-system/sw/bin"
-        "SHELL=/run/current-system/sw/bin/bash"
-      ];
-      ExecStart = "${pkgs.antigravity-cli}/bin/agy remote-control serve";
-      Restart = "on-failure";
-      RestartSec = "10s";
-      RestartPreventExitStatus = 3;
-      TimeoutStopSec = "30s";
-      StandardOutput = "journal";
-      StandardError = "journal";
-    };
-    wantedBy = ["default.target"];
-  };
+  # The interactive remote-control gateway is retired — the cascade drives
+  # `agy -p` headless. Unit preserved at hosts/delphi/agy-daemon-web.shadow.nix.
 
   # Modal editor defaults (Catppuccin Mocha theme, relative line numbers).
   # This nixpkgs revision has no NixOS programs.helix module, so helix comes

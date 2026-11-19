@@ -86,6 +86,7 @@ done <"$work/cites"
 
 comment_total=$(jq -r '.comments' "$work/census.json")
 pointer_total=$(jq -r '.pointers' "$work/census.json")
+shadow_total=$(jq -r '.shadow' "$work/census.json")
 header_total=$(jq -r '.header' "$work/census.json")
 rule_total=$(jq -r '.rules' "$work/census.json")
 dated_total=$(jq -r '.dated' "$work/census.json")
@@ -125,7 +126,7 @@ if [ "$json" = 1 ]; then
   [ "$unresolved_total" -eq 0 ] && exit 0 || exit 1
 fi
 
-echo "nix comments: ${comment_total} lines in ${files} files — ${pointer_total} pointers, ${header_total}/${ceiling} header, ${dated_total}/${dated_ceiling} dated, ${rule_total} rules"
+echo "nix comments: ${comment_total} lines in ${files} files — ${pointer_total} pointers, ${shadow_total} shadow, ${header_total}/${ceiling} header, ${dated_total}/${dated_ceiling} dated, ${rule_total} rules"
 echo "task pointers: ${task_total} citations of ${names_total} recipes"
 
 if [ "$unresolved_total" -ne 0 ]; then

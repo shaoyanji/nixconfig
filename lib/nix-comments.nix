@@ -90,7 +90,11 @@
   # A line inside a multi-line string is content, not a comment: the toggle is the
   # delimiter count on lines that are not themselves comments. `''$` is an escape
   # for a literal `$` inside the string, so `''${VAR}` never opens one.
+  # A *.shadow.nix is a retired-code store: comments are the payload, not prose
+  # debt, so they classify as `shadow` — counted, pointer-resolved, but outside
+  # the header/dated ceilings a live file is held to.
   scanFile = p: let
+    shadow = lib.hasSuffix ".shadow.nix" p;
     lines = lib.splitString "\n" (builtins.readFile (root + "/${p}"));
     indexed =
       lib.imap0 (i: l: {
@@ -118,7 +122,9 @@
       attr = attrRefs body;
       path = pathRefs body;
       kind =
-        if rule
+        if shadow
+        then "shadow"
+        else if rule
         then "rule"
         else if dated
         then "dated"
@@ -191,6 +197,7 @@ in {
   comments = builtins.length entries;
   rules = countOf "rule";
   dated = countOf "dated";
+  shadow = countOf "shadow";
   pointers = countOf "pointer";
   header = countOf "header";
   kinds = {

@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T16:56:38Z",
+  "generated": "2026-11-19T17:07:02Z",
   "count": 200,
-  "pin": "2cbefcb4c205d8e3ab87dbaba7b342d0a879ff811bedc511fabdebb01487689a",
+  "pin": "bf404b00b3138b0285c1e85cae21fd47c632ed8cc034a81e1a9c3d4fc28b0d85",
   "turns": [
+    {
+      "id": "c0d258ae-c8b2-4337-af72-d88738e63210",
+      "ts": "2026-11-19T17:03:28Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-dsh-agy",
+      "action": "claim: shadow dsh-web + agy daemon-web units, decide 3am/5am agy flights",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi",
+        "hosts/frieren"
+      ],
+      "files": [],
+      "base_commit": "f27da646731704fc646b66bb0da9a4a964225994",
+      "branch": "HEAD",
+      "frame": "03h9lgwmfe18j49d3qmkcjmte"
+    },
+    {
+      "id": "7eb83d82-844b-4e71-8b9f-d471ba9c00e0",
+      "ts": "2026-11-19T16:56:46Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-closures",
+      "action": "doc->policy trace landed: taskfiles/README.md include-graph claim is now .#policies.taskfiles-include-is-ownership — phantom-shard negative test verified holds flips false | gate: .#policies eval + hooks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f27da646731704fc646b66bb0da9a4a964225994",
+      "branch": "HEAD",
+      "frame": "03h9lfll74m9ywq2ono6t8f1r"
+    },
     {
       "id": "f2b1fe10-02c0-42cd-82d1-492b034ea305",
       "ts": "2026-11-19T16:55:09Z",
@@ -2791,32 +2820,6 @@
       "base_commit": "1e8d9f57dde3642e8cc6a83076a40330f98e4d65",
       "branch": "main",
       "frame": "03h955gdaxblf84k10xt2d1nn"
-    },
-    {
-      "id": "70f9b55f-760a-4b08-95ae-d1b16d345e75",
-      "ts": "2026-11-17T14:52:48Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-17: 16 plate(s) kept of 17 spent, 2 roster row(s) waiting, 436 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h954s9tgac2k2vm497pva27"
-    },
-    {
-      "id": "c06f57c1-3838-4fc6-874f-5b01b651d1db",
-      "ts": "2026-11-17T14:39:10Z",
-      "source": "devji",
-      "subject": "nixconfig:task-surface-gates",
-      "action": "Aliases are identity (aliasOf, ops:kg:task follows one hop, page names the canonical); kg-check proves task set == go-task names+aliases and closed edge props; pre-commit gates the comment census (HEAD was 6629/6628) and task-descs; header now 6628/6628",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "93a4475921085a6dcf8d9b0cda5979cbf55060f4",
-      "branch": "main",
-      "frame": "03h9524jdzoa51p4o3m7row3e"
     }
   ]
 }

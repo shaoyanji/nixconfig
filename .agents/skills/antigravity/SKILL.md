@@ -18,6 +18,19 @@ provider-scoped: without `--settings`, `agy models` offers Gemini 3.8 Flash,
 Claude Sonnet/Opus and GPT-OSS; the Gemini 4 family (carbon, hydrogen, argon)
 exists only under `--settings '{"modelProvider":"gemini"}'`.
 
+## Getting a binary
+
+`agy` is on-demand — no host profile installs it (HM manages only the settings
+at `~/.gemini/antigravity-cli/`). Run it fresh:
+
+```bash
+nix run github:numtide/llm-agents.nix#antigravity-cli -- -p "Hello!"
+```
+
+The exceptions that carry their own pinned copy: the agentScheduler cascade
+(`agy -p` by store path), `agy-gemini` and `agy-subagent` — the headless lanes
+below. This convention is for an interactive or ad-hoc shell.
+
 ## The invocation
 
 ```bash

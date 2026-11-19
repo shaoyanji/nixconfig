@@ -11,7 +11,10 @@
   config = lib.mkIf (config.profiles.ai.enable or true) {
     programs.antigravity-cli = {
       enable = lib.mkDefault true;
-      package = pkgs.llm-agents.antigravity-cli;
+      # Binary is on-demand, not in the profile — the `nix run` convention is
+      # .agents/skills/antigravity/SKILL.md. null keeps HM managing settings,
+      # commands and GEMINI.md; the subagent wrappers below carry their own copy.
+      package = null;
       # Fast Gemini model, set via $GEMINI_MODEL (HM module behavior).
       defaultModel = "gemini-3.8-flash";
 

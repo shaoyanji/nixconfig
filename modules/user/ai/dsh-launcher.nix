@@ -1,6 +1,5 @@
 # `dsh` desktop launchers: open the agent deck in the best terminal available.
 {
-  self,
   pkgs,
   lib,
   config,
@@ -19,11 +18,9 @@
     magick ${iconIco} -resize 256x256 $out
   '';
 
-  # The harness runs on the worker (`services.dshWeb`), which publishes it on
-  # the tailnet at the worker's MagicDNS name via `tailscale serve`; this is the
-  # client half. Shared with the hosts that install it directly (frieren), so
-  # there is one definition of what `dsh-remote` means and one place to change it.
-  dshRemote = import self.modules."scripts.dsh-remote" {inherit pkgs;};
+  # The remote client half retired with the worker's harness —
+  # modules/user/ai/dsh-launcher.shadow.nix; it revives when the service does.
+  # The `dsh` CLI itself stays: scripts/dispatch.sh routes to it.
 
   # Local entry, only where the harness is actually installed (tier "full").
   # `dsh web` prints a tokenised URL and opens it; the bare port answers 401 by
@@ -65,12 +62,11 @@
   '';
 in
   lib.mkIf (config.profiles.ai.enable && isLinux) {
-    home.packages = [dshRemote] ++ lib.optional (config.profiles.ai.tier == "full") dshLocal;
+    home.packages = lib.optional (config.profiles.ai.tier == "full") dshLocal;
 
     home.file =
       {
         ".local/share/icons/hicolor/256x256/apps/deepseek.png".source = iconFile;
-        ".local/share/applications/dsh-remote.desktop".text = desktop "DeepSeek Harness (Remote)" "Open the harness running on the worker" "dsh-remote" "ai;agent;dsh;deepseek;remote;browser";
       }
       // lib.optionalAttrs (config.profiles.ai.tier == "full") {
         ".local/share/applications/dsh.desktop".text = desktop "DeepSeek Harness" "Start the local harness and open its web UI" "dsh-local" "ai;agent;dsh;deepseek;local";

@@ -97,9 +97,10 @@ through nginx on port 80/443.
 
 > Orientation only. `ss -tlnp` and `systemctl status <unit>` are the live truth, and
 > `SCHEMA.md` §1 forbids a second fleet table — this is the service map, not a copy of
-> `inventory.toml`. The listening ports are compiled: `docs/generated/fleet-ports.md`
-> lists every knob that declares one and the hosts it is enabled on. Unit names and
-> reach URLs stay prose because no compiled source owns them.
+> `inventory.toml`. The service map is compiled: `docs/generated/fleet-services.md` lists
+> every registry port with the hosts that enable it, and every endpoint a host declares in
+> `inventory.toml`. Unit names and reach URLs stay prose because no compiled source owns
+> them.
 
 ## 3. The closed loop, and the agent context
 

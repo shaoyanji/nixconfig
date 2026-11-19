@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T08:47:22Z",
+  "generated": "2026-11-19T08:52:41Z",
   "count": 200,
-  "pin": "d655ad6a1cb1e7d5d21352bbda531aa0eca9ca6c31d902ee125e288518810577",
+  "pin": "db2b572ce323140357a4634885617cccb4829388dea8a3525bc3dad5739a9f27",
   "turns": [
+    {
+      "id": "603177d0-37f8-48e5-b12c-706f962514cf",
+      "ts": "2026-11-19T08:50:02Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 8: freebuff landed P4 continuation (3afebbc1, compiled fleet port table via lib/docs.nix, stopped pasting host card; comment census caught redundant comment). Fed it service-map compilation. agy working on AGENTS.md agent-turns adherence.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "3afebbc16b9216be981899ed417118bec82c7306",
+      "branch": "main",
+      "frame": "03h9isil2bpjhg9vuzrrxtxf1"
+    },
+    {
+      "id": "a502ff3a-4871-478e-90e1-c0e14a8791f3",
+      "ts": "2026-11-19T08:47:31Z",
+      "source": "devji",
+      "subject": "nixconfig:p4-docs-tables",
+      "action": "lib/docs.nix renders docs/generated/fleet-ports.md from modules.toml port+hosts; MANUAL §1 hand identity table replaced by the compiled host card; quick+frieren+docs green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3afebbc16b9216be981899ed417118bec82c7306",
+      "branch": "main",
+      "frame": "03h9is0z2ynwlccivh2tv9pm4"
+    },
     {
       "id": "1ae996a5-2b80-4ed7-acd0-ab47bb077e2e",
       "ts": "2026-11-19T08:42:36Z",
@@ -2708,32 +2737,6 @@
       "base_commit": "45c444790e49af1a8fc0ced53932baa9b3684c6e",
       "branch": "main",
       "frame": "03h8bhcla868r1ynepkdpinxo"
-    },
-    {
-      "id": "ef5a4210-7e9f-4056-a0bd-b7984406fc09",
-      "ts": "2026-11-13T13:08:14Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round5",
-      "action": "images:plates round 5: 20 rows (Genshin/HSR/NieR/Hellsing/Berserk/Persona), 18 kept, 2 provider failures retried to keep, roster 101 rows, publish https://50c3a0ec.bountystash-assets.pages.dev",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aec5d6d1e820e464166e0833412aee54225f8b51",
-      "branch": "main",
-      "frame": "03h89b66t0jatv5l6dp2v0hcz"
-    },
-    {
-      "id": "6f282d1a-608c-413f-8b86-0b0d1965a42a",
-      "ts": "2026-11-13T06:38:40Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-rounds",
-      "action": "images:plates standing round: 60 photoreal plates over rounds 2-4, roster 81 rows, publish live at https://50576e03.bountystash-assets.pages.dev",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "65c4aea1171e1006060132e1e2e8b5ddfd468501",
-      "branch": "main",
-      "frame": "03h8772hoalde8q874o30uacm"
     }
   ]
 }

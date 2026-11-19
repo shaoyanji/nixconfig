@@ -436,14 +436,38 @@
     ])
     (lib.filter (key: (knobs.${key}.port or null) != null) (lib.attrNames knobs));
 
-  fleetPorts =
-    header "Fleet listening ports" "`modules.toml`"
+  endpointRows = lib.concatMap (
+    name: let
+      h = allHosts.${name};
+    in
+      map (l: [
+        name
+        (l.label or "—")
+        (toString l.port)
+        (l.note or "")
+      ]) (h.network.links or [])
+  ) (lib.attrNames allHosts);
+
+  fleetServices =
+    header "Fleet service map" "`modules.toml` and `inventory.toml`"
     + ''
-      Every knob that declares a `port`, the hosts whose chain includes it, and the
-      module that serves it. A host absent here does not run the service, which is
-      why the same number can appear twice without a collision.
+      Two compiled halves. A **registry service** is a knob that declares a `port`,
+      switched on for the hosts listed; a **host endpoint** is an entry that host
+      declares in `network.links`, which carries the label and the note. A host
+      absent from a registry row does not run the service, so the same number can
+      appear twice without a collision.
+
+      Neither half is a liveness claim: `task checks:ports` proves whether a listener
+      answers on this host, and the unit and reach prose in `MANUAL.md` remains the map
+      of what each one is for.
+
+      ## Registry services (${toString (builtins.length portRows)})
 
       ${table ["service" "port" "hosts" "module"] portRows}
+
+      ## Host-declared endpoints (${toString (builtins.length endpointRows)})
+
+      ${table ["host" "service" "port" "note"] endpointRows}
     '';
 
   generatedPages =
@@ -452,7 +476,7 @@
       "docs/generated/fleet-matrix.md" = fleetMatrix;
       "docs/generated/modules-registry.md" = modulesRegistry;
       "docs/generated/task-surface.md" = taskSurface;
-      "docs/generated/fleet-ports.md" = fleetPorts;
+      "docs/generated/fleet-services.md" = fleetServices;
     }
     // lib.optionalAttrs (moduleSets != null) {
       "docs/generated/fleet-module-chains.md" = moduleChains;

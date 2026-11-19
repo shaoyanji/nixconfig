@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T08:29:27Z",
+  "generated": "2026-11-19T08:36:28Z",
   "count": 200,
-  "pin": "ca9bf290ea9fe8346a2e84c514fa3ec2ce92d6c3a1a90355d13f0f270db6439f",
+  "pin": "9bb4f530b9ff6b1f308ae5752e6ef03e8463cfa8bfd84e7c9bffc6c7f1afef25",
   "turns": [
+    {
+      "id": "d27b7dd9-4ef1-4960-8220-f144017d9485",
+      "ts": "2026-11-19T08:34:13Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 5: freebuff landed count gate (67164d07, checks:counts gates hand-typed registry counts vs compiled source; decision: prose has few canonical counts so manifest starts with registries). Fed it doc-link gate (2nd Sloppiness-audit item). delphi freebuff finished quotient-hashing CA probe, now on its own followups.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "67164d07dea6e347e966a97aeda68b9ab3f3b1e2",
+      "branch": "main",
+      "frame": "03h9ipfefakg0lupfpqd2j7pm"
+    },
+    {
+      "id": "e77ea05f-7998-47ab-b398-4fa5abfb3ae6",
+      "ts": "2026-11-19T08:29:36Z",
+      "source": "devji",
+      "subject": "nixconfig:count-gate",
+      "action": "checks:counts gates hand-typed registry counts against the compiled source with a 4-case fixture (match/wrong/vanished/unknown); doc-link gate was already live in checks:quick, so the sloppiness note is now DELIVERED",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "67164d07dea6e347e966a97aeda68b9ab3f3b1e2",
+      "branch": "main",
+      "frame": "03h9ioiybx0bnobccve80h5j6"
+    },
     {
       "id": "745780a5-2a9d-406b-b3b3-3c9ec55e2f69",
       "ts": "2026-11-19T08:25:14Z",
@@ -2702,32 +2731,6 @@
       "base_commit": "c8c8ab3f7c326bcd29d825b2c26c7e4445b89280",
       "branch": "main",
       "frame": "03h83ztcmpzfra66a3vuzvy3u"
-    },
-    {
-      "id": "3a4b6531-cb22-4115-88a0-ec6255e0b25b",
-      "ts": "2026-11-12T17:32:39Z",
-      "source": "devji",
-      "subject": "nixconfig:vox-commit-repin",
-      "action": "committed and pushed the vox TOON projection, the qmd resolver for doc_pages, the deploy-netbook flakeref, and the harness repin at ad225137; policies 0, checks:quick 0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3393ade4ffedf004460460d0ecc2b1aa04d7a9dd",
-      "branch": "main",
-      "frame": "03h82xixrfz24o1ed77je07n1"
-    },
-    {
-      "id": "37a08ba4-c83c-4f38-813d-91d75679ff90",
-      "ts": "2026-11-12T16:38:57Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-21",
-      "action": "21 photorealistic anime-character wall plates generated and judged keep, published to Cloudinary and indexed on bountystash-assets (129 assets, 63 wall today); 3 prompts blocked by the generator safety filter were rephrased as adult portrait briefs",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f5f500e78b700e0fccda04e14d537b5c53a6b83f",
-      "branch": "main",
-      "frame": "03h82n1c7l6yyvh5sjalno2rq"
     }
   ]
 }

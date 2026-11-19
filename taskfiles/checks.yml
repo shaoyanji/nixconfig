@@ -46,6 +46,7 @@ tasks:
     deps:
       - task: checks:repo:paths
       - task: checks:docs:links
+      - task: checks:docs:links:test
       - task: checks:prose
       - task: checks:infron
       - task: checks:yaml:lint
@@ -88,6 +89,16 @@ tasks:
       carries `link-ok: <reason>` on its line. ~0.1 s, no network, no eval.
     cmds:
       - bash scripts/task/docs-links.sh
+
+  checks:docs:links:test:
+    desc: Regression fixture for checks:docs:links (all five classes)
+    summary: >
+      Proves the link gate can fail: a dangling relative link, a `file:///`
+      absolute, and a stale reference-style definition each exit 1, while a real
+      relative target, a `link-ok:` line and web/anchor links exit 0. Temp tree,
+      no network, no eval.
+    cmds:
+      - bash tests/docs-links/run.sh
 
   checks:prose:
     desc: "[gate] Docs and skills carry none of the unslop vocabulary"

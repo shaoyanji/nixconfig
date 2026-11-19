@@ -456,3 +456,7 @@ kind = "leaf"
 [[check]]
 name = "checks:counts:test"
 kind = "leaf"
+
+[[check]]
+name = "checks:docs:links:test"
+kind = "leaf"

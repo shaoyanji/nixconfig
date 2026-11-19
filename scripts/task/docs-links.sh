@@ -78,6 +78,19 @@ done < <(
         print FILENAME "\t" FNR "\t" target
         rest = substr(rest, RSTART + RLENGTH)
       }
+      # Reference-style definitions `[id]: path` are links too, and one pointing
+      # at a moved file is exactly the breakage an inline-only scan misses.
+      # `[^id]:` is a footnote, not a link, so the caret is excluded.
+      if (match($0, /^[ \t]*\[[^]]*\]:[ \t]+[^ \t\r]+/)) {
+        def = substr($0, RSTART, RLENGTH)
+        # A footnote definition is not a link. `[^^]` was tried first and does not
+        # behave as a negated class here (mawk): the rule silently never fired, so
+        # the caret is excluded by testing the matched id instead.
+        if (def !~ /^[ \t]*\[\^/) {
+          sub(/^[ \t]*\[[^]]*\]:[ \t]+/, "", def)
+          print FILENAME "\t" FNR "\t" def
+        }
+      }
     }
   ' "${paths[@]}"
 )

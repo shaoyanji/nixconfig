@@ -138,6 +138,54 @@ else
   bad "$persona is missing"
 fi
 
+echo "== reasonix provider"
+# The provider block is user state (`~/.reasonix/config.toml`), so it is checked
+# where it exists and skipped where it does not — but a block that names a paid id
+# or the wrong route is the same balance risk as a bad default in the helper.
+rx="$HOME/.reasonix/config.toml"
+wrapper="$repo/scripts/infron-subagent.sh"
+if [ -f "$wrapper" ]; then
+  if grep -q 'INFRON_MODEL:-deepseek/deepseek-v4-flash-0731:free' "$wrapper"; then
+    ok "the wrapper defaults to the :free primary"
+  else
+    bad "the wrapper does not default to the :free primary"
+  fi
+  if grep -q '\*:free)' "$wrapper"; then
+    ok "the wrapper refuses a non-:free id"
+  else
+    bad "the wrapper has no :free guard"
+  fi
+else
+  bad "$wrapper is missing"
+fi
+if [ -f "$rx" ]; then
+  if grep -Eq 'name[[:space:]]*=[[:space:]]*"infron"' "$rx"; then
+    ok "~/.reasonix/config.toml declares the infron provider"
+  else
+    bad "~/.reasonix/config.toml has no infron provider — infron-subagent cannot answer"
+  fi
+  if grep -Eq 'base_url[[:space:]]*=[[:space:]]*"https://llm\.onerouter\.pro/v1"' "$rx"; then
+    ok "the provider points at llm.onerouter.pro/v1"
+  else
+    bad "the provider base_url is not the Infron route"
+  fi
+  if grep -Eq 'api_key_env[[:space:]]*=[[:space:]]*"INFRON_API_KEY"' "$rx"; then
+    ok "the provider reads INFRON_API_KEY"
+  else
+    bad "the provider does not name INFRON_API_KEY"
+  fi
+  rx_ids="$(grep -oE '(deepseek|qwen)/[A-Za-z0-9._:-]+' "$rx" | sort -u)"
+  while IFS= read -r id; do
+    [ -n "$id" ] || continue
+    case "$id" in
+      *:free) ok "reasonix model $id is :free" ;;
+      *) bad "reasonix model $id is not :free — the route bills that id" ;;
+    esac
+  done <<<"$rx_ids"
+else
+  ok "no ~/.reasonix/config.toml (provider block is user state; skipped)"
+fi
+
 echo "== both down"
 : >"$log"
 PATH="$work/bin:$PATH" STUB_LOG="$log" STUB_MODE=down bash "$helper" "hi" >"$work/out" 2>"$work/err"

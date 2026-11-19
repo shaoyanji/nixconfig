@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T09:13:00Z",
+  "generated": "2026-11-19T09:27:05Z",
   "count": 200,
-  "pin": "04313cfde91075ba1116ffcc2f132c0c87a4517ebc5f6f302cc98af4efa35fe6",
+  "pin": "833bcf694f161680e0912cdd5b270cd22ae1b8b35f488caac0b19e24b3322836",
   "turns": [
+    {
+      "id": "4a282c7e-9322-46c9-9690-15a9c542fb47",
+      "ts": "2026-11-19T09:16:30Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 12: freebuff landed graph-the-services (745f5577, service map wired into knowledge graph). Fed it infron/dsh backup-subagent hookup (wire dsh or reasonix to llm.onerouter.pro deepseek-v4-flash-0731:free). agy on job research. delphi freebuff idle after followups.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "745f557763e691d4d3c047591200c4fea2decbf2",
+      "branch": "main",
+      "frame": "03h9ixorl2sswupmlkgeronas"
+    },
+    {
+      "id": "84509512-7382-431f-a2e6-826a645228a8",
+      "ts": "2026-11-19T09:13:10Z",
+      "source": "devji",
+      "subject": "nixconfig:kg-services",
+      "action": "landed 745f5577: 159 service nodes + runs-on edges declared in flake/ontology.nix; kg-check/host pattern extended; quick+ontology+kg+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "745f557763e691d4d3c047591200c4fea2decbf2",
+      "branch": "main",
+      "frame": "03h9ix1a584x8vocwdhheov67"
+    },
     {
       "id": "665050c2-075d-46fd-b657-cf112915c741",
       "ts": "2026-11-19T09:12:18Z",
@@ -2729,32 +2758,6 @@
       "base_commit": "af32fc0b85a735c3223acbe789717df96edb6806",
       "branch": "main",
       "frame": "03h8qmax577t9ok727evrp3vp"
-    },
-    {
-      "id": "caf71c5a-a19e-47b7-b9b5-dfe714a9fb41",
-      "ts": "2026-11-15T18:08:08Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-notify-gap",
-      "action": "diagnosed the unanswered 23 Oct Eat Happy mail: triaged action/agent:apps correctly, then resolved by the pre-ledger sync with no event; attention excludes agent owners and no mail notifier exists. Record moved to applied/follow-up; appflow profile already carried +49 1733281570; DeepSeek beta FIM proven live with the sops key.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "50d5568c0c63ac928986648cfeebd66d602cddac",
-      "branch": "main",
-      "frame": "03h8qkcjnyce4fzwd62i5115x"
-    },
-    {
-      "id": "06aede71-b991-4cfd-9de3-722d35f8350f",
-      "ts": "2026-11-15T17:27:47Z",
-      "source": "devji",
-      "subject": "nixconfig:kickstart-nixvim-minimal",
-      "action": "local FIM completion seam (minuet, env-overridable endpoint) pushed as 29c489b; nixconfig pin moved to it and the overlay removal committed as 50d5568c",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "50d5568c0c63ac928986648cfeebd66d602cddac",
-      "branch": "main",
-      "frame": "03h8qcgtm1aa0v89h4n44vcik"
     }
   ]
 }

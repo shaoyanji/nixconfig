@@ -84,6 +84,9 @@ kg_graph_path() {
       env REPO="$REPO" "$elixir" "$REPO/tools/kg-zeck/cli.exs" "$action"
       return $?
     fi
+    # zeck was asked for explicitly: warn so a benchmark never silently
+    # measures the fallback backend and calls it zeck.
+    echo "kg-graph: KG_BACKEND=zeck but no Elixir resolved; using HEAD+diff path instead" >&2
   fi
 
   cache="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig"

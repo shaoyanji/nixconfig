@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T19:01:55Z",
+  "generated": "2026-11-19T19:15:50Z",
   "count": 200,
-  "pin": "9508301be0aee0e06ba00fc9a60f7c8d9f5f028827a2bcfc22cbe71ab4c30039",
+  "pin": "d5c94c8f46346c4d4bc35733ea6e0706040036077237ab3dc636720661e10d85",
   "turns": [
+    {
+      "id": "f08a9637-7ddf-4a3a-b63e-4667b39ee8e0",
+      "ts": "2026-11-19T19:12:50Z",
+      "source": "devin",
+      "subject": "nixconfig:cpg-fix",
+      "action": "claim: fix cpg login binary name, refresh Windows-helper fallthrough, serve statelessness; repin hash",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai/hermes-user.nix",
+        "/tmp/chatplayground-go"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9m66fxgbykxwcauh8on3xj"
+    },
+    {
+      "id": "8eac0081-94f2-442b-b620-4d876649ee89",
+      "ts": "2026-11-19T19:02:08Z",
+      "source": "devin",
+      "subject": "nixconfig:fleet-hygiene",
+      "action": "done: six invariants swept — nixpkgs input refreshed 2026-10-16->2026-11-16 (frieren module eval passes on new lock), 4 skills gained version: frontmatter; audits clean: 86 live notes all resolve refs, 0 stale xs turns, 63 skills pass, 766 tasks 0 dangling refs, 121 check gates cover executable subsystems | gates: .#agentsNotes.issues=[], .#inventory.hosts.frieren.role + nixosConfigurations.frieren module eval PASS, kg-check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9m436rg29exwyl3jwuc3ji"
+    },
     {
       "id": "486d2281-ccb2-4b99-9708-040cb36b6118",
       "ts": "2026-11-19T18:56:40Z",
@@ -2789,32 +2818,6 @@
       "base_commit": "f36d7a4126be015deadab353388bea96ef5f8ca4",
       "branch": "main",
       "frame": "03h9bha89dtvbps7armpjjudw"
-    },
-    {
-      "id": "bad83779-6f87-45a1-9c17-1912eb352dc1",
-      "ts": "2026-11-18T10:11:08Z",
-      "source": "devji",
-      "subject": "nixconfig:show-lineage-and-line-parity",
-      "action": "ops:notes:show subtracts replacedBy from led to and prints ancestry; claims line carries the evidence mix; lineage line carries ancestors",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6ee51b769f3e12d2ada9139e9ac2349e0260a817",
-      "branch": "main",
-      "frame": "03h9bf2g75ny9s8124kotww45"
-    },
-    {
-      "id": "0ddf1915-da02-4b79-b98c-e438178abd74",
-      "ts": "2026-11-18T10:06:53Z",
-      "source": "devji",
-      "subject": "nixconfig:slice-guard-line-forms-shared-lineage",
-      "action": "site slice set gated at eval; ops:notes and ops:kg:stats have FORMAT=line; lineageRows shared by both surfaces",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8e594745afc4b3476304db1fa3e0f4c201aded8b",
-      "branch": "main",
-      "frame": "03h9be8erswzmjux83yjuw3ti"
     }
   ]
 }

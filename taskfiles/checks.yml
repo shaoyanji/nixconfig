@@ -72,7 +72,7 @@ tasks:
     # TIMING gate with a min-of-3 budget, so it must never share a core: it goes
     # last, after the deps have finished and every other task has exited.
     cmds:
-      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.knobs .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.knobs .?submodules=1#checks.{{.SYSTEM}}.registry-schema .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies
       - task: checks:sops:drift
       - task: checks:entry
 

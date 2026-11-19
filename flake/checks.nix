@@ -683,6 +683,104 @@ lib.genAttrs systems.work (
             echo "knobs: ${toString (builtins.length ids)} entries, every path exists, every host resolves; ${toString (builtins.length (lib.subtractLists noToggle readable))} of them point at a file that declares the toggle${lib.optionalString (noToggle != []) ", ${toString (builtins.length noToggle)} are wired to an option declared elsewhere: ${lib.concatStringsSep ", " noToggle}"}" > $out
           '';
 
+      registry-schema = let
+        schema = import ../lib/registry-schema.nix;
+        knobs = (builtins.fromTOML (builtins.readFile ../modules.toml)).knobs;
+        ids = builtins.attrNames knobs;
+        checks = (builtins.fromTOML (builtins.readFile ../taskfiles/checks.toml)).check;
+        checkNames = map (r: r.name) checks;
+        hosts = (builtins.fromTOML (builtins.readFile ../inventory.toml)).hosts;
+        hostNames = builtins.attrNames hosts;
+
+        kebab = "[a-z0-9]+(-[a-z0-9]+)*";
+        parts = option: lib.splitString "." option;
+        leafOf = option: let
+          ps = parts option;
+        in
+          if lib.last ps == "enable"
+          then lib.elemAt ps (builtins.length ps - 2)
+          else lib.last ps;
+
+        pathProblems = builtins.filter (p: p != null) (map (
+            id: let
+              entry = knobs.${id};
+            in
+              if builtins.hasAttr id schema.knobPathExceptions
+              then
+                if entry.path == schema.knobPathExceptions.${id}
+                then null
+                else "${id}: recorded exception is ${schema.knobPathExceptions.${id}}, registry says ${entry.path}"
+              else if lib.any (root: lib.hasPrefix root entry.path) schema.knobPathRoots
+              then null
+              else "${id}: ${entry.path} is outside ${lib.concatStringsSep " or " schema.knobPathRoots} and is not recorded in lib/registry-schema.nix"
+          )
+          ids);
+
+        optionOf = id: knobs.${id}.option;
+        casingProblems =
+          builtins.filter (p: p != null) (map (
+              id: let
+                option = optionOf id;
+                leaf = leafOf option;
+              in
+                if builtins.elem option schema.optionCasingExceptions
+                then null
+                else if builtins.match kebab leaf != null
+                then null
+                else "${id}: option ${option} has a non-kebab leaf '${leaf}'"
+            )
+            ids)
+          ++ builtins.filter (p: p != null) (map (
+              option:
+                if builtins.any (id: optionOf id == option) ids
+                then null
+                else "${option} is recorded as a casing exception but no knob uses it"
+            )
+            schema.optionCasingExceptions);
+
+        prosePort = id: let
+          m = builtins.match ".*:([0-9]{4,5}).*" (knobs.${id}.description or "");
+        in
+          if m == null
+          then null
+          else builtins.head m;
+        declaredPort = id: knobs.${id}.port or null;
+        prosePorts = builtins.filter (id: prosePort id != null) ids;
+        allPorts = builtins.filter (p: p != null) (map declaredPort ids);
+        duplicated = builtins.filter (p: builtins.length (builtins.filter (q: q == p) allPorts) > 1) allPorts;
+        portProblems =
+          map (id: "${id}: description names :${prosePort id} but port = ${builtins.toString (declaredPort id)}")
+          (builtins.filter (id: declaredPort id != null && builtins.toString (declaredPort id) != prosePort id) prosePorts)
+          ++ map (id: "${id}: description names :${prosePort id} but the entry has no port field")
+          (builtins.filter (id: declaredPort id == null) prosePorts)
+          ++ lib.optional (duplicated != []) "ports claimed twice: ${lib.concatStringsSep ", " (map builtins.toString (lib.unique duplicated))}";
+
+        seg = n: lib.splitString ":" n;
+        families = lib.unique (map (n: lib.elemAt (seg n) 1) (builtins.filter (n: builtins.length (seg n) > 2) checkNames));
+        duplicateRows = lib.unique (builtins.filter (n: builtins.length (builtins.filter (m: m == n) checkNames) > 1) checkNames);
+        familyProblems =
+          map (f: "${f} is recorded as an umbrella in lib/registry-schema.nix but has no member rows")
+          (builtins.filter (f: !(builtins.elem (lib.removePrefix "checks:" f) families)) schema.umbrellaFamilies)
+          ++ lib.optional (duplicateRows != []) "rows listed twice: ${lib.concatStringsSep ", " duplicateRows}";
+
+        inventoryProblems =
+          map (h: "${h}: managed must be a boolean when present, got ${builtins.typeOf hosts.${h}.managed}")
+          (builtins.filter (h: hosts.${h} ? managed && builtins.typeOf hosts.${h}.managed != "bool") hostNames);
+        managedAbsent = builtins.length (builtins.filter (h: !(hosts.${h} ? managed)) hostNames);
+
+        problems = pathProblems ++ casingProblems ++ portProblems ++ familyProblems ++ inventoryProblems;
+      in
+        if problems != []
+        then
+          builtins.throw ''
+            a registry broke its schema (lib/registry-schema.nix):
+              ${lib.concatStringsSep "\n  " problems}
+            Fix the registry, or record the departure in the schema with a reason.''
+        else
+          pkgs.runCommand "registry-schema" {} ''
+            echo "registry schema: ${toString (builtins.length ids)} knobs (${toString (builtins.length prosePorts)} ports as data), ${toString (builtins.length checkNames)} check rows, ${toString (builtins.length hostNames)} hosts (${toString managedAbsent} leave managed at its default)" > $out
+          '';
+
       # --- living documents have budgets (SCHEMA.md §2) ---------------------
       # One implementation: scripts/task/docs-budget.sh, the same script
       # `task ops:docs:budget` runs and the same gate the CI `docs-budget` job

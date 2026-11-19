@@ -1,8 +1,50 @@
 {
-  "generated": "2026-11-19T08:03:42Z",
+  "generated": "2026-11-19T08:13:56Z",
   "count": 200,
-  "pin": "cab0038ff9efa51e10d5fe09a70d4821ea35dae021d0a32fca1da7e858d89797",
+  "pin": "ed3eb113bc4c85a268b49a05d305dc15bc0236bb5263d5c0c28c1ff50b29818b",
   "turns": [
+    {
+      "id": "7cb39ce6-31e6-4c95-9b70-a72b2fc97605",
+      "ts": "2026-11-19T08:13:24Z",
+      "source": "devji",
+      "subject": "nixconfig:registry-schema",
+      "action": "delivered lib/registry-schema.nix + checks.registry-schema (rides in checks:quick): knob path roots, option casing with recorded exceptions, ports as data (6 prose ports now fields), umbrella census; checks:host frieren, quick, notes and prose green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0194f7cae8ca333f915af3bef693ecf1013c015c",
+      "branch": "main",
+      "frame": "03h9ild1r00sj23hwr8g4d8fj"
+    },
+    {
+      "id": "ea24e938-cf86-4c55-8e1a-d0217a322241",
+      "ts": "2026-11-19T08:07:01Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 2: freebuff landed ZIM shelf measurement (0194f7ca, ops:wiki:stats + wiki-ask --stats, answers semantic-search kill criterion). Fed it config-registry-schema (P4) next. Routed email triage to agy (Gemini 3.8 Flash). Inbox: nixcachix CI failures on nixconfig, Oracle trial expiry, iOS login + amazon sign-in + Google security alerts, Host&Stay app.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "0194f7cae8ca333f915af3bef693ecf1013c015c",
+      "branch": "main",
+      "frame": "03h9ik45zk4snj51jipx5dzl8"
+    },
+    {
+      "id": "5c14aabd-4852-4eb0-9de3-58ae40ba86ce",
+      "ts": "2026-11-19T08:03:50Z",
+      "source": "devji",
+      "subject": "nixconfig:wiki-ask-stats",
+      "action": "semantic-search kill criterion measured from the verdict log: 456 verdicts all on the 2026-11-04 build day, 0 in 14 days; added --stats and ops:wiki:stats (exit 1 on an empty window), deletion left as the operator call",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0194f7cae8ca333f915af3bef693ecf1013c015c",
+      "branch": "main",
+      "frame": "03h9ijhrc3wjpabi8m284ykj0"
+    },
     {
       "id": "36cdcf25-e627-4ecb-ab73-c8b0050cabad",
       "ts": "2026-11-19T08:03:09Z",
@@ -2680,48 +2722,6 @@
       "base_commit": "a003cc7a969afecfbf25f792d34f09d562922d56",
       "branch": "main",
       "frame": "03h827v293v8nnhvkrt1rpthy"
-    },
-    {
-      "id": "664639f8-57ef-4e78-9a1e-55038f78d47a",
-      "ts": "2026-11-12T10:06:20Z",
-      "source": "devji",
-      "subject": "nixconfig:wall42-burst",
-      "action": "42 landscape wallpapers generated and judged keep, 38 Cloudinary assets indexed on bountystash-assets (108 total); duplicate urls.tsv rows from two concurrent publishes corrected by one clean publish",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f5f500e78b700e0fccda04e14d537b5c53a6b83f",
-      "branch": "main",
-      "frame": "03h80ic7svn65hodrjd28iikl"
-    },
-    {
-      "id": "22a420e5-43b5-4510-a9cf-85f1bba37526",
-      "ts": "2026-11-12T09:38:59Z",
-      "source": "devji",
-      "subject": "nixconfig:bountystash-assets",
-      "action": "pushed bountystash feat/surface-wiring + console main; published 4 dark-console plates through cpg->cloudinary->manifest->bountystash-assets (106 assets)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b36e34a832a33c5dabd5ca14967cd75f3622081c",
-      "branch": "main",
-      "frame": "03h80czxch6wbotjnpsi5hf96"
-    },
-    {
-      "id": "1f8a0952-5739-48f1-85ec-669d12beb84d",
-      "ts": "2026-11-11T23:35:05Z",
-      "source": "buffy",
-      "subject": "nixconfig:deutsch-srs-pages",
-      "action": "Pages enabled and made to resolve for shaoyanji/deutsch-srs: the repo is a Go TUI with no web build, so a workflow renders README.md into one page; run 43120848712 deployed and https://shaoyanji.github.io/deutsch-srs/ answers 200.",
-      "outcome": "done",
-      "claims": [
-        "deutsch-srs:.github/workflows/pages.yml",
-        "deutsch-srs:scripts/render-readme.py"
-      ],
-      "files": [],
-      "base_commit": "f5f500e78b700e0fccda04e14d537b5c53a6b83f",
-      "branch": "main",
-      "frame": "03h7x311pfuldlox2skhkqnd7"
     }
   ]
 }

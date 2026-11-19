@@ -134,6 +134,7 @@ category = "infrastructure"
 option = "services.harmonia.enable"
 path = "modules/services/harmonia.nix"
 description = "Serves local nix store closures over HTTP (:5000) for zero-latency LAN caching"
+port = 5000
 default = false
 hosts = ["frieren"]
 
@@ -144,6 +145,7 @@ category = "iot"
 option = "services.home-assistant.enable"
 path = "modules/services/home-assistant.nix"
 description = "Home Assistant Core IoT dashboard (:8123) with Mosquitto MQTT message broker"
+port = 8123
 default = false
 hosts = ["frieren"]
 
@@ -154,6 +156,7 @@ category = "knowledge"
 option = "services.kiwix-serve.enable"
 path = "modules/services/kiwix.nix"
 description = "Declarative Kiwix offline Wikipedia / ArchWiki server (:8088)"
+port = 8088
 default = false
 hosts = ["frieren"]
 
@@ -164,6 +167,7 @@ category = "downloads"
 option = "services.aria2-daemon.enable"
 path = "modules/services/aria2-daemon.nix"
 description = "Headless aria2 RPC daemon (:6801) with AriaNg web UI frontend"
+port = 6801
 default = false
 hosts = ["frieren"]
 
@@ -174,6 +178,7 @@ category = "knowledge"
 option = "services.zettelGraph.enable"
 path = "modules/services/zettel-graph.nix"
 description = "The private vault as a tailnet reader (:8453) with write-back and PDF publishing"
+port = 8453
 default = false
 hosts = ["delphi"]
 
@@ -184,5 +189,6 @@ category = "writing"
 option = "services.mataroaConsole.enable"
 path = "modules/services/mataroa-console.nix"
 description = "A mataroa.blog blog as markdown files (:8454): ledger, editor, publish and unpublish"
+port = 8454
 default = false
 hosts = ["delphi"]

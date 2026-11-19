@@ -82,10 +82,10 @@
     config-registry-schema = {
       title = "The config registries have no schema, and four conventions nothing checks";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P4";
       date = "2026-11-11";
-      summary = "A cpg schema pass over modules.toml, taskfiles/checks.toml and inventory.toml found rules no gate enforces: knob path location, option casing, a group with no root row, and ports that live only in description prose. checks:knobs covers paths, hosts and the count, and stops there.";
+      summary = "A cpg schema pass over modules.toml, taskfiles/checks.toml and inventory.toml found rules no gate enforced: knob path location, option casing, a group with no root row, and ports that live only in description prose. Delivered 2026-11-19 as lib/registry-schema.nix plus checks.<system>.registry-schema.";
       refs = {
         modules = [
           "modules.toml"
@@ -120,8 +120,12 @@
         - `.sops.yaml` defines the `garnix` anchor and references it in no group,
           and `acersops`/`acersopshost` carry one recipient value.
 
-        Exit: one schema plus one check that validates these registries, or this
-        note REJECTED with the reason a schema would not pay for itself.
+        Delivered 2026-11-19: `lib/registry-schema.nix` records the conventions
+        and each departure WITH the excepted value, and
+        `checks.<system>.registry-schema` (built by `checks:quick`) fails on any
+        other departure; the six prose ports are `port` fields now. Root rows are
+        recorded as a census (30 flat families, `appflow` the only umbrella) since
+        `check:verify` pairs rows with tasks; `.sops.yaml` is another registry.
       '';
     };
     model-provider-epistemics = {

@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T08:36:28Z",
+  "generated": "2026-11-19T08:40:32Z",
   "count": 200,
-  "pin": "9bb4f530b9ff6b1f308ae5752e6ef03e8463cfa8bfd84e7c9bffc6c7f1afef25",
+  "pin": "cd16ad5da5f808f4d0dceb7a4d2c72db618c4cbd0bda6dac63bc73beacbaf254",
   "turns": [
+    {
+      "id": "8e10aa1e-a34f-440c-bbb0-4787d7ba5e14",
+      "ts": "2026-11-19T08:38:02Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 6: freebuff landed doc-link gate (79f0ab46, checks:docs:links:test, 176 markdown files every link resolves, wired into checks:quick). Fed it refinements (skip code fences + validate anchors).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "79f0ab46c5e0869fe4927ddd4a7881a4fba0847e",
+      "branch": "main",
+      "frame": "03h9iq69fdcysptjsd6tab3s8"
+    },
+    {
+      "id": "5ac055ec-808c-4378-ac88-4c01b314fb73",
+      "ts": "2026-11-19T08:36:37Z",
+      "source": "devji",
+      "subject": "nixconfig:docs-link-gate",
+      "action": "checks:docs:links now has an 8-case negative-control fixture and scans reference-style [id]: definitions; mawk [^^] bug caught by the fixture itself; frieren, quick, verify green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "79f0ab46c5e0869fe4927ddd4a7881a4fba0847e",
+      "branch": "main",
+      "frame": "03h9ipwbwj8bmm2vf1s8ey10s"
+    },
     {
       "id": "d27b7dd9-4ef1-4960-8220-f144017d9485",
       "ts": "2026-11-19T08:34:13Z",
@@ -2705,32 +2734,6 @@
       "base_commit": "269d2e1fd53172812541a2e52ba42a31891c8979",
       "branch": "main",
       "frame": "03h84b5stcrjlaz4dfixk2kzf"
-    },
-    {
-      "id": "2773abd3-1433-4854-b311-fcbed17b0fd2",
-      "ts": "2026-11-12T21:42:47Z",
-      "source": "devji",
-      "subject": "nixconfig:hermes-fal-tavily",
-      "action": "hermes env: FAL_KEY now derived from the shared blob's FAL_API_KEY, web.search_backend pinned to tavily; doctor reads image_gen ok, search tavily, extract firecrawl",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "269d2e1fd53172812541a2e52ba42a31891c8979",
-      "branch": "main",
-      "frame": "03h84ae08ipnuowmsscj24l52"
-    },
-    {
-      "id": "db088d37-6243-498f-a69a-90a7c5c74290",
-      "ts": "2026-11-12T20:48:38Z",
-      "source": "devji",
-      "subject": "nixconfig:eisen-gamescope-kiosk",
-      "action": "eisen switched to gamescope-only kiosk (Dux/niri desktop + live Ryoku leftovers removed); gaming guard re-stops strata every 5s; deployed and pushed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c8c8ab3f7c326bcd29d825b2c26c7e4445b89280",
-      "branch": "main",
-      "frame": "03h83ztcmpzfra66a3vuzvy3u"
     }
   ]
 }

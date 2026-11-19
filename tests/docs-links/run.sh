@@ -5,7 +5,8 @@
 # every class is exercised against a temp tree: a relative link to a real file
 # passes, a relative link to nothing fails, a `file:///` absolute fails, a
 # reference-style definition is judged the same way, `link-ok:` exempts its line,
-# and web/anchor links are skipped rather than fetched or resolved.
+# web links are skipped, a fenced example is not a link, and an anchor must name a
+# heading — same file, another file, or not at all.
 #
 # Exit: 0 every case behaves, 2 the fixture cannot run.
 set -uo pipefail
@@ -19,6 +20,7 @@ gate="$repo/scripts/task/docs-links.sh"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 : >"$tmp/exists.md"
+printf '## Heading Two\n' >"$tmp/anchored.md"
 
 fail=0
 cases=0
@@ -46,12 +48,17 @@ run() { # name want_rc needle file-content
 
 run "relative link that resolves passes" 0 "PASS:" "[ok]($tmp/exists.md)"
 run "relative link to nothing fails" 1 "links that resolve to nothing" "[dead](nowhere.md)"
-run "absolute file link fails" 1 "machine-absolute links" "[local](file:///Volumes/data/projects/nixconfig/AGENTS.md)"
+run "absolute file link fails" 1 "machine-absolute links" "[local](file:///srv/checkout/AGENTS.md)"
 run "another user home fails" 1 "machine-absolute links" "[home](file:///home/someone/x.md)"
 run "link-ok exempts the line" 0 "PASS:" "[moved](gone.md) link-ok: fixture proves the escape hatch"
-run "web and anchor links are skipped" 0 "PASS:" $'[web](https://example.com/x)\n[anchor](#section)'
+run "web and anchor links are skipped" 0 "PASS:" $'[web](https://example.com/x)'
 run "reference definition to a real file passes" 0 "PASS:" "$(printf '[ref]: %s' "$tmp/exists.md")"
 run "reference definition to nothing fails" 1 "links that resolve to nothing" "[ref]: ../missing/elsewhere.md"
+run "fenced example is not a link" 0 "PASS:" $'```\n[dead](nowhere.md)\n```'
+run "same-file anchor that resolves passes" 0 "PASS:" $'## Heading Two\n\n[top](#heading-two)'
+run "same-file anchor to no heading fails" 1 "anchors that name no heading" $'## Heading Two\n\n[gone](#heading-three)'
+run "cross-file anchor that resolves passes" 0 "PASS:" "[ref]($tmp/anchored.md#heading-two)"
+run "cross-file anchor to no heading fails" 1 "anchors that name no heading" "[ref]($tmp/anchored.md#nope)"
 
 echo "docs-links fixture: ${cases} cases"
 [ "$fail" = 0 ] || exit 1

@@ -1,8 +1,39 @@
 {
-  "generated": "2026-11-19T18:51:41Z",
+  "generated": "2026-11-19T19:01:55Z",
   "count": 200,
-  "pin": "67e1a64db3d31e0f31f318f086dd9f6d7b4250eee80daac2c8b49e00cfb1ae7c",
+  "pin": "9508301be0aee0e06ba00fc9a60f7c8d9f5f028827a2bcfc22cbe71ab4c30039",
   "turns": [
+    {
+      "id": "486d2281-ccb2-4b99-9708-040cb36b6118",
+      "ts": "2026-11-19T18:56:40Z",
+      "source": "devin",
+      "subject": "nixconfig:fleet-hygiene",
+      "action": "claim: six-invariant hygiene sweep (notes/xs/frontmatter/tasknames/gates/inputs)",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix",
+        ".agents/skills/",
+        "taskfiles/",
+        "flake.lock"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9m30qu5xf23l7sissr6txs"
+    },
+    {
+      "id": "5713e79d-9a0c-4b3c-b429-d979ca70997c",
+      "ts": "2026-11-19T18:51:53Z",
+      "source": "devin",
+      "subject": "nixconfig:tailnet-web-port80",
+      "action": "landed: task-web on :443 tailnetName vhost at /task-weather (301 + prefix-strip proxy, proxy_buffering off/1h for SSE); :8451 mount kept; SPA switched to relative URLs so one build serves both prefixes | gate: parse, nix:comments 6538/6539 + 57 pointers, frieren role eval",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "134a0d2bab672b2be384bdb29f4320ad60386b93",
+      "branch": "HEAD",
+      "frame": "03h9m234mh5y18y2ny7xnjpx5"
+    },
     {
       "id": "3b738c9b-d87f-402e-b6e1-67e68eedd536",
       "ts": "2026-11-19T18:50:47Z",
@@ -2784,32 +2815,6 @@
       "base_commit": "8e594745afc4b3476304db1fa3e0f4c201aded8b",
       "branch": "main",
       "frame": "03h9be8erswzmjux83yjuw3ti"
-    },
-    {
-      "id": "170ce3a7-a74a-48d1-9007-bd07e026719c",
-      "ts": "2026-11-18T09:59:17Z",
-      "source": "devji",
-      "subject": "nixconfig:slice-links-line-form-pin-idempotence",
-      "action": "lineage targets must have a slice; ops:kg:evidence FORMAT=line; turns snapshot no longer rewrites when unchanged",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "be98090a9872cee5e9424af5088db7db87abdc34",
-      "branch": "main",
-      "frame": "03h9bcqwudmny3w1dppm30qcl"
-    },
-    {
-      "id": "c12ef758-52de-4a51-90a1-31ce6f48161a",
-      "ts": "2026-11-18T09:41:39Z",
-      "source": "devji",
-      "subject": "nixconfig:claim-rows-and-clickable-lineage",
-      "action": "claimRows is one list for markdown and site; note slices link lineage; evidence says all N; pre-push remote default fixed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0bd4bc730597cae20ccee810313166f05d1e46da",
-      "branch": "main",
-      "frame": "03h9b9ayr8qw3rcab55liawkc"
     }
   ]
 }

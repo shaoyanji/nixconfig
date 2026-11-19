@@ -26,7 +26,10 @@
 # 1 = drift.
 set -euo pipefail
 
-REPO="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
+# GIT_DIR is exported by commit hooks but GIT_WORK_TREE is not; under that
+# env `rev-parse --show-toplevel` answers the -C dir itself, so clear both
+# for the resolution (later `git -C $REPO` calls keep the inherited env).
+REPO="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 Q="$REPO/scripts/task/kg-query.sh"
 
 fail=0

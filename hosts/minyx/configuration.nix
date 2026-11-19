@@ -32,15 +32,15 @@ in {
   boot.kernelParams = ["cma=16M"];
   boot.tmp.cleanOnBoot = true;
 
-  # aarch64 closures are built elsewhere when they can be. This is NOT
-  # `max-jobs = 0`: the host has no cached closure of its own and no push path, so
-  # substitute-or-fail left it unable to even build its way back to a working
-  # system. It is a WIP host pending a clean reinstall — until then the honest
-  # setting is "may build, slowly", not "may never build".
+  # `max-jobs = 0`: a cache miss fails fast instead of compiling on 1 GiB and an
+  # SD card — delphi pushes closures via hosts/delphi/minyx-keeper.nix, so
+  # recovery arrives prebuilt; a one-off build is `nix build --max-jobs 1`.
+  # auto-optimise-store off: optimisation rewrites store links on a no-TRIM SD —
+  # flash churn for near-zero savings.
   nix.settings = {
-    max-jobs = 1;
+    max-jobs = 0;
     cores = 1;
-    auto-optimise-store = true;
+    auto-optimise-store = false;
   };
 
   # No swap file on the stick: compressed RAM only.

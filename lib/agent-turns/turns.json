@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T20:13:07Z",
+  "generated": "2026-11-19T20:26:17Z",
   "count": 200,
-  "pin": "726c974f44fdb5a706bc28197b86428161700c2ced27d935cdfb202d4960d6ad",
+  "pin": "6475374d88caab26b60cb217f58282bec63001dad3859155e9abbc95556484b7",
   "turns": [
+    {
+      "id": "e3b7a0e5-2a68-4b10-8eb7-6f077089bab2",
+      "ts": "2026-11-19T20:25:24Z",
+      "source": "devin",
+      "subject": "nixconfig:minyx-nobuild-fix",
+      "action": "claim: minyx never-build fix (max-jobs=0, stop flash churn) + harmonia/substituter check",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/minyx/"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9mkcsigf1ioskfff5n6qkp"
+    },
+    {
+      "id": "5e0144a9-692f-46f9-9e4e-0c1e40c04424",
+      "ts": "2026-11-19T20:13:19Z",
+      "source": "devin",
+      "subject": "nixconfig:ha-ambilight-on",
+      "action": "done: ambilightTV.enable=true host=192.168.3.26 on frieren (config.nix:404-408); hue stays off (no bridge). Huawei audit: huawei_lte only core integration (HiLink routers, not phones); no huawei package needed — fritzbox component already ships and covers phone device_tracker via router | gates: parse, role+module eval, issues=[], census 6538/6539, hooks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9mhzr8gyxzrnpovv2se71e"
+    },
     {
       "id": "c3d1fc60-06f2-440e-9f05-cae450d5c840",
       "ts": "2026-11-19T20:12:14Z",
@@ -2802,32 +2830,6 @@
       "base_commit": "aa66984e3d3f8a9e7a307aafbff237b79947db41",
       "branch": "main",
       "frame": "03h9d1xl00h22sfjwbc3uwkxd"
-    },
-    {
-      "id": "76eb8731-18a0-459a-aa6d-470efd25d53f",
-      "ts": "2026-11-18T15:02:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:pins-gist-hash-gate",
-      "action": "pins --check now fails on a gist URL with no [[hash]] row and on a bare sha256, offline so pre-push runs it; tested both directions. diogenes atuin logged in, nu+bash history seeded once, fleet at 30707 items on frieren and diogenes",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "563fec4b4c3d840318756cf6e29c131240ea5e4e",
-      "branch": "main",
-      "frame": "03h9czwgyn1ccw8mdy2bcfezl"
-    },
-    {
-      "id": "3d2b09ad-9867-4910-bd90-1a02883e2574",
-      "ts": "2026-11-18T14:35:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:pins-gist-hashes",
-      "action": "lib/pins.toml gained a [[hash]] table for gist fetches with no file in the tree: wezterm-config, wezterm-mappings, elvish-rc, lf-icons, authorized-keys (that json had no key, so the sweep skipped it silently). pins-refresh re-reads each per run and stages the registry in the same commit; resume keeps hash_key. base.nix's duplicate elvish hash now reads the one entry. Gates: refresh rewrote all 5 then unchanged; checks:tasks, checks:host frieren 2267 assertions, site build.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d45853590ae13ff4f1be656a06b2f7be276ab1fa",
-      "branch": "main",
-      "frame": "03h9cuqkizan4oxh0yq13orhl"
     }
   ]
 }

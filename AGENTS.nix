@@ -5457,6 +5457,82 @@
       '';
     };
 
+    exp-129 = {
+      title = "EXP-129 — Quotient closures: a per-feature fanout probe and a CA cutoff demo";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-11-19";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["lib/cache-policy.nix"];
+        tasks = ["dev:closure:native"];
+        docs = ["docs/nix-patterns.md"];
+      };
+      summary = "Measured on delphi: 19,034 drvs per toplevel, 28-29 s and 3.0 GiB to instantiate. Feature files are nested imports of configuration.nix, and disabledModules is a no-op even with the key read from the module graph, so per-feature fanout needs an import rewrite. Both delphi registries now guard on option presence, and CA early cutoff is demonstrated by drv hashes.";
+      body = ''
+        **Question.** Split a host closure into an invariant core and per-feature deltas?
+        The numeration system is a red herring: a cryptographic hash avalanches
+        regardless, so the split has to be structural (which key is hashed) and the
+        invariant half must be a *content* address.
+
+        **Cost, measured (delphi, 2026-11-19).** Toplevel: 19,034 drvs, 28-29 s
+        and 3.0 GiB peak, so ~30 s per feature — not a gate. Rebuilding the host
+        from its own assembly reproduces the real drv exactly, which is the
+        baseline an import rewrite can stand on.
+
+        **Removal is not a list operation.** Delphi's module list has 15 entries;
+        its feature files are `imports` *inside* configuration.nix. And
+        `disabledModules` is no better: with the exact key from the module graph
+        `extendModules` returns a byte-identical drv, as do relative, absolute and
+        path-value keys — a clean 0%, so no probe was registered.
+
+        **Removability, paid for.** Both delphi registries read each port from the
+        option that owns it, so a removed module failed the host eval; a row now
+        exists only while the option does (`lib.optionalAttrs (lib.hasAttr …`).
+        `checks:host delphi` passes and every mount is still listed.
+
+        **Early cutoff, measured.** ca-derivations is off daemon-side; a rooted
+        store with it on builds the demo. Two derivations, identical output,
+        different env: distinct drv hashes (54j0…, 85i2…), one output (wsapf…);
+        the dependent resolves to the same output (kzp6…) and is not rebuilt.
+
+        **Exit.** A fanout instrument that rewrites the host file's own imports,
+        proves the unfiltered rebuild equals `.#nixosConfigurations`, and collects
+        from one source copy. Then one row per feature says whether any feature
+        owns more than a rounding error of the graph.
+      '';
+    };
+
+    triage-remote-second-opinion = {
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-19";
+      title = "Mail triage asks a remote model about the envelope, never the body";
+      summary = "The mail second pass can ask deepseek-v4-flash-0731:free through llm.onerouter.pro, on the envelope only, because julia-1 (144M) files marketing as a person and laya (421M) parks it in review. Bodies never leave the host; the module default stays local and a host opts in.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/services/email-triage.py"];
+        tasks = ["agents:mail:triage"];
+        docs = ["docs/email-archive.md"];
+      };
+      body = ''
+        Measured 2026-11-19 on delphi's 26-row human queue:
+        - julia-1 called a 30%-off marketing send `person` (0.39) and laya left
+          the Freebuff, OpenRouter and Craft sends in `review`; both tiers sit in
+          front of a person, which is the one queue a model may not pad.
+        - The remote pass over the same envelopes produced 12 digest/robot
+          verdicts that closed, one human reply kept as `person`, and every
+          `action` row untouched. It overrides the local pair in both
+          directions under the same protected-signal gate.
+        - It posts sender, subject and labels, never a body. The route is a third
+          party, so the content of a mailbox is not the classifier's to send.
+        - The key is read by name from `ai-services-shared-env`, so the unit's
+          environment carries no other key. `secondBackend = "systemone"` stays
+          the default and delphi sets `openai`.
+      '';
+    };
+
     nix-cache-edge = {
       title = "NIX-CACHE-EDGE — a third cache tier that reads, and never signs";
       kind = "decision";

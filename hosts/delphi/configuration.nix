@@ -485,37 +485,44 @@ in {
   profiles.serviceExposure = {
     enable = true;
     interfaces = ["tailscale0"];
-    services = {
-      # The fleet resolver. UDP is crab-hole's only plain DNS downstream.
-      crabhole-dns = {
-        port = 53;
-        tcp = false;
-        udp = true;
-        lan = false;
-        tailnet = true;
+    services =
+      {
+        # The fleet resolver. UDP is crab-hole's only plain DNS downstream.
+        crabhole-dns = {
+          port = 53;
+          tcp = false;
+          udp = true;
+          lan = false;
+          tailnet = true;
+        };
+        fleet-monitors = {
+          port = config.services.fleetMonitors.port;
+          lan = false;
+          tailnet = true;
+        };
+      }
+      // lib.optionalAttrs (lib.hasAttr "paperless" config.services) {
+        # Moved off the NAS; frieren's nginx is their only client, over the tailnet.
+        paperless = {
+          port = config.services.paperless.port;
+          lan = false;
+          tailnet = true;
+        };
+      }
+      // lib.optionalAttrs (lib.hasAttr "vaultwarden" config.services) {
+        vaultwarden = {
+          port = config.services.vaultwarden.config.ROCKET_PORT;
+          lan = false;
+          tailnet = true;
+        };
+      }
+      // lib.optionalAttrs (lib.hasAttr "anki-sync-server" config.services) {
+        anki-sync = {
+          port = config.services.anki-sync-server.port;
+          lan = false;
+          tailnet = true;
+        };
       };
-      fleet-monitors = {
-        port = config.services.fleetMonitors.port;
-        lan = false;
-        tailnet = true;
-      };
-      # Moved off the NAS; frieren's nginx is their only client, over the tailnet.
-      paperless = {
-        port = config.services.paperless.port;
-        lan = false;
-        tailnet = true;
-      };
-      vaultwarden = {
-        port = config.services.vaultwarden.config.ROCKET_PORT;
-        lan = false;
-        tailnet = true;
-      };
-      anki-sync = {
-        port = config.services.anki-sync-server.port;
-        lan = false;
-        tailnet = true;
-      };
-    };
   };
 
   # --- Fleet monitors, from OUTSIDE the LAN ---------------------------------
@@ -1312,172 +1319,177 @@ in {
     # names, while the cards here are the `tailscale serve` mounts. Different
     # audiences, so no card is derived from the registry.
     includeExposure = false;
-    mounts = {
-      dsh = {
-        port = servePort;
-        upstream = "http://127.0.0.1:${toString dshPort}";
-        title = "DeepSeek Harness";
-        description = "Agent loop, bash, model calls and workspaces, in the browser.";
-        requires = ["dsh-web.service"];
+    mounts =
+      {
+        dsh = {
+          port = servePort;
+          upstream = "http://127.0.0.1:${toString dshPort}";
+          title = "DeepSeek Harness";
+          description = "Agent loop, bash, model calls and workspaces, in the browser.";
+          requires = ["dsh-web.service"];
+        };
+        systemone = {
+          port = 8444;
+          upstream = "http://127.0.0.1:8091";
+          title = "System One decisions";
+          description = "POST /v1/systemone — the state+questions → answers envelope.";
+          requires = ["systemone-decision-serve.service"];
+        };
+        pdf = {
+          port = 8445;
+          upstream = "http://127.0.0.1:7351";
+          title = "Stirling PDF";
+          description = "PDF merge, split, OCR and conversion (native ARM64).";
+          requires = ["stirling-pdf.service"];
+        };
+        portal = {
+          port = 8446;
+          upstream = "http://127.0.0.1:8082";
+          title = "Service portal";
+          description = "This page, served only on the tailnet.";
+          requires = ["nginx.service"];
+          # The page lists the mounts; listing its own mount is noise.
+          hideCard = true;
+        };
+        search = {
+          port = 8447;
+          upstream = "http://127.0.0.1:8888";
+          title = "SearXNG";
+          description = "Private, ad-free meta-search engine on the tailnet.";
+          requires = ["searx.service"];
+        };
+        kuma = {
+          port = 8448;
+          upstream = "http://127.0.0.1:3001";
+          title = "Uptime Kuma";
+          description = "External fleet and home WAN status monitor.";
+          requires = ["uptime-kuma.service"];
+        };
+        miniflux = {
+          port = 8455;
+          upstream = "http://127.0.0.1:8098";
+          title = "Miniflux";
+          description = "Feed reader: the newsletters that do not need to be mail.";
+          requires = ["miniflux.service"];
+        };
+        umami = {
+          port = 8456;
+          upstream = "http://127.0.0.1:8061";
+          title = "Umami";
+          description = "First-party analytics for pages we own; no third-party script.";
+          requires = ["umami.service"];
+        };
+        radicale = {
+          port = 8457;
+          upstream = "http://127.0.0.1:5232";
+          title = "Radicale";
+          description = "CalDAV and CardDAV: calendars and contacts without a third-party token.";
+          requires = ["radicale.service"];
+        };
+        ntfy = {
+          port = 8458;
+          upstream = "http://127.0.0.1:8096";
+          title = "ntfy";
+          description = "Push to the phone, topic fleet, one sops user and anonymous denied. The appflow sync publishes a parked question here; gatus pages through the SimpleX bridge.";
+          requires = ["ntfy.service"];
+        };
+        vikunja = {
+          port = 8459;
+          upstream = "http://127.0.0.1:8097";
+          title = "Vikunja";
+          description = "Tasks with CalDAV and a REST API, in place of a paid service.";
+          requires = ["vikunja.service"];
+        };
+        email-archive = {
+          port = 8450;
+          upstream = "http://127.0.0.1:8080";
+          title = "Email archive";
+          description = "NpgsqlRest over the mail archive: full-text search, uploads, file-system handlers.";
+          requires = ["npgsqlrest.service"];
+          # NpgsqlRest has no page at `/` (404), so it is not a card: the archive is
+          # browsed through `mail-atlas`, and the endpoint is machine-facing.
+          hideCard = true;
+        };
+        # 8451 stays reserved for the rival archive benchmark; this is the reading
+        # surface over the same database, with its own loopback vhost so `/api` is
+        # same-origin for the browser.
+        mail-atlas = {
+          port = 8452;
+          upstream = "http://127.0.0.1:${toString config.services.mailAtlas.port}";
+          title = "Mail atlas";
+          description = "The archive as a field: fuzzy finding, a tag taxonomy and a relation graph.";
+          requires = ["nginx.service"];
+        };
+        # A reading surface with a prompt box per turn, so it is a card: this is
+        # the page a person opens, and the inventory link points at the same port.
+        turns = {
+          port = 8460;
+          upstream = "http://127.0.0.1:${toString config.services.turnsDashboard.port}";
+          title = "Agent turns";
+          description = "The turn log as a field: one panel per turn, live, with a Hermes prompt on each.";
+          requires = ["turns-dashboard.service"];
+        };
+        # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
+        # browsing surface, so no card on the tailnet page.
+        agent-turns = {
+          port = 8449;
+          upstream = "http://127.0.0.1:${toString config.services.agentTurns.port}";
+          title = "Agent turns (xs)";
+          description = "Append-only agent-turn coordination store; bearer token required.";
+          requires = ["agent-turns-shim.service"];
+          hideCard = true;
+        };
+        # The blog as files: the ledger, the editor, and a publish that is a
+        # deployment rather than the only copy. Same shape as the zettel mount —
+        # the port is the module's, because the origin a write is checked against
+        # is `https://<tailnetHost>:<port>`.
+        mataroa = {
+          port = config.services.mataroaConsole.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.mataroaConsole.port}";
+          title = "Mataroa console";
+          description = "Posts as markdown files; publish and unpublish against mataroa.blog.";
+          requires = ["mataroa-console.service"];
+        };
+        # The pipeline, read from the archive: stage counts, a search over company,
+        # role and next action, and the record behind a click. Read-only by
+        # construction — the vhost proxies four GET routes and nothing else, so the
+        # plugin's write endpoints are not reachable through this mount.
+        appflow = {
+          # The tailnet port is not the vhost's: `tailscale serve` and nginx both
+          # bind, and sharing a number puts them on the same socket.
+          port = 8463;
+          upstream = "http://127.0.0.1:${toString config.services.appflowBoard.port}";
+          title = "Job pipeline";
+          description = "Applications and their mail, read from the archive database.";
+          requires = ["nginx.service"];
+        };
+      }
+      // lib.optionalAttrs (lib.hasAttr "zettelGraph" config.services) {
+        # Read, write and publish. The service is loopback; this mount, behind the
+        # tailnet, is the whole exposure. The port is the module's, because the
+        # origin a write is checked against is `https://<tailnetHost>:<port>` and a
+        # second literal here is how that check starts rejecting the open page.
+        zettel = {
+          port = config.services.zettelGraph.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.zettelGraph.port}";
+          title = "Zettel graph";
+          description = "The vault as a reader: notes, their web, edits and PDF publishing.";
+          requires = ["zettel-graph.service"];
+        };
+      }
+      // lib.optionalAttrs (lib.hasAttr "media-relay" config.services) {
+        # The library, not a player: a browse page with fuzzy search over the files,
+        # plus Range support a player can stream from. The vhost binds loopback and
+        # the library lives on this host's disk, so this mount is the whole exposure
+        # — there is no firewall row and no public counterpart.
+        media = {
+          port = 8461;
+          upstream = "http://127.0.0.1:${toString config.services.media-relay.port}";
+          title = "Media relay";
+          description = "Fetched media, range-served: fuzzy search over the library, YouTube search with thumbnails, and a field that queues a fetch.";
+          requires = ["nginx.service"];
+        };
       };
-      systemone = {
-        port = 8444;
-        upstream = "http://127.0.0.1:8091";
-        title = "System One decisions";
-        description = "POST /v1/systemone — the state+questions → answers envelope.";
-        requires = ["systemone-decision-serve.service"];
-      };
-      pdf = {
-        port = 8445;
-        upstream = "http://127.0.0.1:7351";
-        title = "Stirling PDF";
-        description = "PDF merge, split, OCR and conversion (native ARM64).";
-        requires = ["stirling-pdf.service"];
-      };
-      portal = {
-        port = 8446;
-        upstream = "http://127.0.0.1:8082";
-        title = "Service portal";
-        description = "This page, served only on the tailnet.";
-        requires = ["nginx.service"];
-        # The page lists the mounts; listing its own mount is noise.
-        hideCard = true;
-      };
-      search = {
-        port = 8447;
-        upstream = "http://127.0.0.1:8888";
-        title = "SearXNG";
-        description = "Private, ad-free meta-search engine on the tailnet.";
-        requires = ["searx.service"];
-      };
-      kuma = {
-        port = 8448;
-        upstream = "http://127.0.0.1:3001";
-        title = "Uptime Kuma";
-        description = "External fleet and home WAN status monitor.";
-        requires = ["uptime-kuma.service"];
-      };
-      miniflux = {
-        port = 8455;
-        upstream = "http://127.0.0.1:8098";
-        title = "Miniflux";
-        description = "Feed reader: the newsletters that do not need to be mail.";
-        requires = ["miniflux.service"];
-      };
-      umami = {
-        port = 8456;
-        upstream = "http://127.0.0.1:8061";
-        title = "Umami";
-        description = "First-party analytics for pages we own; no third-party script.";
-        requires = ["umami.service"];
-      };
-      radicale = {
-        port = 8457;
-        upstream = "http://127.0.0.1:5232";
-        title = "Radicale";
-        description = "CalDAV and CardDAV: calendars and contacts without a third-party token.";
-        requires = ["radicale.service"];
-      };
-      ntfy = {
-        port = 8458;
-        upstream = "http://127.0.0.1:8096";
-        title = "ntfy";
-        description = "Push to the phone, topic fleet, one sops user and anonymous denied. The appflow sync publishes a parked question here; gatus pages through the SimpleX bridge.";
-        requires = ["ntfy.service"];
-      };
-      vikunja = {
-        port = 8459;
-        upstream = "http://127.0.0.1:8097";
-        title = "Vikunja";
-        description = "Tasks with CalDAV and a REST API, in place of a paid service.";
-        requires = ["vikunja.service"];
-      };
-      email-archive = {
-        port = 8450;
-        upstream = "http://127.0.0.1:8080";
-        title = "Email archive";
-        description = "NpgsqlRest over the mail archive: full-text search, uploads, file-system handlers.";
-        requires = ["npgsqlrest.service"];
-        # NpgsqlRest has no page at `/` (404), so it is not a card: the archive is
-        # browsed through `mail-atlas`, and the endpoint is machine-facing.
-        hideCard = true;
-      };
-      # 8451 stays reserved for the rival archive benchmark; this is the reading
-      # surface over the same database, with its own loopback vhost so `/api` is
-      # same-origin for the browser.
-      mail-atlas = {
-        port = 8452;
-        upstream = "http://127.0.0.1:${toString config.services.mailAtlas.port}";
-        title = "Mail atlas";
-        description = "The archive as a field: fuzzy finding, a tag taxonomy and a relation graph.";
-        requires = ["nginx.service"];
-      };
-      # A reading surface with a prompt box per turn, so it is a card: this is
-      # the page a person opens, and the inventory link points at the same port.
-      turns = {
-        port = 8460;
-        upstream = "http://127.0.0.1:${toString config.services.turnsDashboard.port}";
-        title = "Agent turns";
-        description = "The turn log as a field: one panel per turn, live, with a Hermes prompt on each.";
-        requires = ["turns-dashboard.service"];
-      };
-      # Machine-facing: POST /v1/events and GET /v1/events, bearer token, no
-      # browsing surface, so no card on the tailnet page.
-      agent-turns = {
-        port = 8449;
-        upstream = "http://127.0.0.1:${toString config.services.agentTurns.port}";
-        title = "Agent turns (xs)";
-        description = "Append-only agent-turn coordination store; bearer token required.";
-        requires = ["agent-turns-shim.service"];
-        hideCard = true;
-      };
-      # Read, write and publish. The service is loopback; this mount, behind the
-      # tailnet, is the whole exposure. The port is the module's, because the
-      # origin a write is checked against is `https://<tailnetHost>:<port>` and a
-      # second literal here is how that check starts rejecting the open page.
-      zettel = {
-        port = config.services.zettelGraph.tailnetPort;
-        upstream = "http://127.0.0.1:${toString config.services.zettelGraph.port}";
-        title = "Zettel graph";
-        description = "The vault as a reader: notes, their web, edits and PDF publishing.";
-        requires = ["zettel-graph.service"];
-      };
-      # The blog as files: the ledger, the editor, and a publish that is a
-      # deployment rather than the only copy. Same shape as the zettel mount —
-      # the port is the module's, because the origin a write is checked against
-      # is `https://<tailnetHost>:<port>`.
-      mataroa = {
-        port = config.services.mataroaConsole.tailnetPort;
-        upstream = "http://127.0.0.1:${toString config.services.mataroaConsole.port}";
-        title = "Mataroa console";
-        description = "Posts as markdown files; publish and unpublish against mataroa.blog.";
-        requires = ["mataroa-console.service"];
-      };
-      # The library, not a player: a browse page with fuzzy search over the files,
-      # plus Range support a player can stream from. The vhost binds loopback and
-      # the library lives on this host's disk, so this mount is the whole exposure
-      # — there is no firewall row and no public counterpart.
-      media = {
-        port = 8461;
-        upstream = "http://127.0.0.1:${toString config.services.media-relay.port}";
-        title = "Media relay";
-        description = "Fetched media, range-served: fuzzy search over the library, YouTube search with thumbnails, and a field that queues a fetch.";
-        requires = ["nginx.service"];
-      };
-      # The pipeline, read from the archive: stage counts, a search over company,
-      # role and next action, and the record behind a click. Read-only by
-      # construction — the vhost proxies four GET routes and nothing else, so the
-      # plugin's write endpoints are not reachable through this mount.
-      appflow = {
-        # The tailnet port is not the vhost's: `tailscale serve` and nginx both
-        # bind, and sharing a number puts them on the same socket.
-        port = 8463;
-        upstream = "http://127.0.0.1:${toString config.services.appflowBoard.port}";
-        title = "Job pipeline";
-        description = "Applications and their mail, read from the archive database.";
-        requires = ["nginx.service"];
-      };
-    };
     entries.gatus = {
       title = "Fleet monitors (external vantage)";
       description = "Gatus checks that watch frieren from outside its LAN, on the tailnet IP.";

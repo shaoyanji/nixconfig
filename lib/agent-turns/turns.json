@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T11:51:17Z",
+  "generated": "2026-11-19T11:52:28Z",
   "count": 200,
-  "pin": "c659de2c262a43e780485437ee824bdeae12c4b4bf06a48b86233838255b8be3",
+  "pin": "5805c9c27be2f8e7dc5c395986ec2b2c71f57e67e365ab5ce2d17e5d580b2380",
   "turns": [
+    {
+      "id": "5b34574c-f057-4717-b544-5eede0f275ba",
+      "ts": "2026-11-19T11:51:26Z",
+      "source": "devji",
+      "subject": "nixconfig:xs-list-commits",
+      "action": "landed 5771d2da: xs-turn-query.jq row projection now carries commits (comma-joined, clipped 80) alongside claims/files, so .turns[0].commits is the stored hash instead of null; docs/agent-turns.md row contract and task summary updated; verified against the live dispatch turn",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5771d2da4feb5a091d951997aefcfe104f9c5b0b",
+      "branch": "main",
+      "frame": "03h9jrybqex5ssysci2vwba71"
+    },
     {
       "id": "e8044a69-1307-437b-9bdb-6cf9dad3da31",
       "ts": "2026-11-19T11:50:14Z",
@@ -2765,19 +2778,6 @@
       "base_commit": "55fa0ad58e9a59dc4eca118862c738c1496eff05",
       "branch": "main",
       "frame": "03h8ve0f0e31rcmn8ohbstjml"
-    },
-    {
-      "id": "db850f3c-dcf6-431d-9265-de793733c392",
-      "ts": "2026-11-16T08:56:57Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-16: 1 plate(s) kept of 1 spent, 44 roster row(s) waiting, 335 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "361356b4d756d5993b0e81e9eb15a2303a0a3c03",
-      "branch": "main",
-      "frame": "03h8vdz3jgcah0ahcownc5ess"
     }
   ]
 }

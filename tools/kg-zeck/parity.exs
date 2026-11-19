@@ -171,12 +171,38 @@ defmodule KGZeckParity do
       System.put_env("KG_ZECK_EPOCH", "2")
       path = Path.join(repo, first["path"])
       File.write!(path, File.read!(path) <> "\nthreshold\n")
-      {_, threshold, _} = compare(repo, cache, "threshold leaps")
+      {current, threshold, _} = compare(repo, cache, "threshold leaps")
 
       assert!(
         threshold["epoch"] != cited["epoch"] and threshold["n"] == 0,
         "threshold did not leap"
       )
+
+      System.delete_env("KG_ZECK_EPOCH")
+      eligible_ids = MapSet.new(KGZeck.eligible(current), & &1["id"])
+
+      {policy, [citation]} =
+        current["edges"]
+        |> Enum.filter(&(&1["type"] == "cites"))
+        |> Enum.group_by(& &1["to"])
+        |> Enum.find(fn {_, edges} ->
+          length(edges) == 1 and MapSet.member?(eligible_ids, hd(edges)["from"])
+        end)
+
+      path = Path.join(repo, String.replace_prefix(citation["from"], "doc:", ""))
+      original = File.read!(path)
+      marker = "[[flake/policies.nix#" <> String.replace_prefix(policy, "policy:", "") <> "]]"
+      File.write!(path, String.replace(original, marker, ""))
+      {removed, _, _} = compare(repo, cache, "last policy citation removed")
+
+      assert!(
+        not Enum.any?(removed["nodes"], &(&1["id"] == policy)),
+        "policy survived its last citation"
+      )
+
+      File.write!(path, original)
+      {restored, _, _} = compare(repo, cache, "last policy citation restored")
+      assert!(Enum.any?(restored["nodes"], &(&1["id"] == policy)), "restored policy is missing")
 
       IO.puts(
         "timing (in-process): cold leap #{Float.round(cold, 1)} ms; incremental #{Float.round(incremental, 1)} ms; warm #{Float.round(warm_us / 1000, 1)} ms"

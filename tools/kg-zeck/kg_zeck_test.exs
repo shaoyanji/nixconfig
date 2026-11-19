@@ -25,6 +25,65 @@ defmodule KGZeckTest do
     }
   end
 
+  def repo_fixture do
+    root = Path.join(System.tmp_dir!(), "kg-zeck-repo-#{System.unique_integer([:positive])}")
+    repo = Path.join(root, "repo")
+    cache = Path.join(root, "cache")
+    File.mkdir_p!(Path.join(repo, "scripts/task/lib"))
+    File.mkdir_p!(Path.join(repo, "docs"))
+    on_exit(fn -> File.rm_rf!(root) end)
+    File.write!(Path.join(repo, "docs/a.md"), "# old\n[[flake/policies.nix#real]]\n")
+    File.write!(Path.join(repo, "b.md"), "# B\n")
+    File.write!(Path.join(repo, "core.nix"), "before")
+    elixir = System.get_env("KG_ELIXIR") || System.find_executable("elixir")
+
+    File.write!(
+      Path.join(repo, "scripts/task/lib/kg-graph.sh"),
+      "kg_eval_graph() { '#{elixir}' eval.exs; }\n"
+    )
+
+    File.write!(Path.join(repo, "eval.exs"), """
+    graph = JSON.decode!(#{inspect(JSON.encode!(fixture()))})
+    {tracked, 0} = System.cmd("git", ["ls-files", "docs/a.md"])
+    content = File.read!("docs/a.md")
+    cites = if tracked != "" and String.contains?(content, "[[flake/policies.nix#real]]"), do: ["real"], else: []
+    nodes = Enum.flat_map(graph["nodes"], fn node ->
+      cond do
+        node["id"] == "doc:docs/a.md" and tracked == "" -> []
+        node["id"] == "doc:docs/a.md" -> [Map.merge(node, %{"cites" => cites, "label" => content |> String.split("\\n") |> hd() |> String.replace_prefix("# ", "")})]
+        node["type"] == "policy" and cites == [] -> []
+        true -> [node]
+      end
+    end)
+    edges = Enum.map(cites, &%{"from" => "doc:docs/a.md", "to" => "policy:" <> &1, "type" => "cites"})
+    graph = %{graph | "nodes" => nodes, "edges" => edges, "stats" => %{"edges" => length(edges), "recordedEdges" => 0}}
+    if File.exists?(".edit-on-eval") do
+      [target, value] = ".edit-on-eval" |> File.read!() |> JSON.decode!()
+      File.write!(target, value)
+      File.rm!(".edit-on-eval")
+    end
+    IO.puts(JSON.encode!(graph))
+    """)
+
+    KGZeck.git(repo, ["init", "-q"])
+    KGZeck.git(repo, ["add", "."])
+    {repo, cache}
+  end
+
+  test "restoring a policy's last citation restores its node and edge" do
+    {repo, cache} = repo_fixture()
+    KGZeck.graph(repo, cache)
+    path = Path.join(repo, "docs/a.md")
+    original = File.read!(path)
+    File.write!(path, "# old\n")
+    removed = KGZeck.graph(repo, cache) |> KGZeck.read()
+    refute Enum.any?(removed["nodes"], &(&1["id"] == "policy:real"))
+    File.write!(path, original)
+    restored = KGZeck.graph(repo, cache) |> KGZeck.read()
+    assert Enum.any?(restored["nodes"], &(&1["id"] == "policy:real"))
+    assert Enum.any?(restored["edges"], &(&1["type"] == "cites" and &1["to"] == "policy:real"))
+  end
+
   test "greedy terms have non-adjacent Fibonacci indexes and sum to n" do
     fibs = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 

@@ -262,17 +262,8 @@ defmodule KGZeck do
                   |> Enum.drop(1)
                   |> Enum.map(&(String.split(&1, "]]", parts: 2) |> hd()))
 
-              policy_ids =
-                  graph["nodes"]
-                  |> Enum.filter(&(&1["type"] == "policy"))
-                  |> MapSet.new(&String.replace_prefix(&1["id"], "policy:", ""))
-
               fresh =
-                  Enum.filter(
-                    raw,
-                    &(Regex.match?(~r/\A[a-z0-9][a-z0-9-]*\z/, &1) and
-                          MapSet.member?(policy_ids, &1))
-                  )
+                  Enum.filter(raw, &Regex.match?(~r/\A[a-z0-9][a-z0-9-]*\z/, &1))
 
               MapSet.new(fresh) != MapSet.new(node["cites"])
             end

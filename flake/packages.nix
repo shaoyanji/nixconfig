@@ -59,7 +59,10 @@ in
       {
         # Aki explorer site: fed the COMPILED registry, so its host matrix cannot
         # disagree with the hosts or with the markdown docs built from the same value.
-        fleet-docs-site = import ../lib/aki-site.nix {inherit pkgs lib inventory;};
+        fleet-docs-site = import ../lib/aki-site.nix {
+          inherit pkgs lib inventory;
+          knowledgeGraph = knowledgeGraphCtl;
+        };
 
         # bountystash.com is the console in `shaoyanji/bountystash-console`, not a
         # Nix output: it is deployed from its own build, and its data

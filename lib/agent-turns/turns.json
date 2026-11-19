@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T20:07:21Z",
+  "generated": "2026-11-19T20:13:07Z",
   "count": 200,
-  "pin": "a105708fa1cff159600ebb77be7faf37d85e065703e0352c4e19ad25481acefa",
+  "pin": "726c974f44fdb5a706bc28197b86428161700c2ced27d935cdfb202d4960d6ad",
   "turns": [
+    {
+      "id": "c3d1fc60-06f2-440e-9f05-cae450d5c840",
+      "ts": "2026-11-19T20:12:14Z",
+      "source": "devin",
+      "subject": "nixconfig:ha-ambilight-on",
+      "action": "claim: flip ambilightTV on frieren + Huawei HA extension audit",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9mhs79rl7ab608n8dk3tzd"
+    },
+    {
+      "id": "c03abc36-c27d-41a2-b3e6-6a2a9d0fa69e",
+      "ts": "2026-11-19T20:07:31Z",
+      "source": "devin",
+      "subject": "nixconfig:ha-hue-first",
+      "action": "done: LAN probe found Philips 65OLED759/12 at 192.168.3.26:1925 (JointSPACE v6.1) + Chromecast at .64, no Hue bridge; ha-stack reworked: devices.hue/ambilightTV options (config-flow, IP declarative record), extraComponents defaults += hue/philips_js/cast, extraPythonPackages default [aiohue ha-philipsjs]; frieren example with measured TV IP, all disabled | gates: parse, frieren role+module eval, issues=[], census 6539, hooks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9mgv1k2osc3lvyyjxgkzue"
+    },
     {
       "id": "7eeaae8c-82ec-42f8-84bc-9f10b0152508",
       "ts": "2026-11-19T20:03:37Z",
@@ -2800,32 +2828,6 @@
       "base_commit": "d45853590ae13ff4f1be656a06b2f7be276ab1fa",
       "branch": "main",
       "frame": "03h9cuqkizan4oxh0yq13orhl"
-    },
-    {
-      "id": "54252c99-637c-4b19-b1d3-a5fe9b82a85c",
-      "ts": "2026-11-18T13:40:47Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 10 plate(s) kept of 13 spent, 17 roster row(s) waiting, 490 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h9ck0jg29zuv5ikwn86t1es"
-    },
-    {
-      "id": "d1a5559a-2ba6-4711-84b4-ef1a910931a3",
-      "ts": "2026-11-18T11:35:43Z",
-      "source": "devji",
-      "subject": "nixconfig:needle-pin-and-fusion-queries",
-      "action": "Pinned needle's engine to the revision that still serves it (same sha256), added note.refs.modules plus four read-only fusion joins, and took the Nix comment ceiling 6628 -> 6540",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b94b28bca2b385b240e6c6f74f44519ffa84df06",
-      "branch": "main",
-      "frame": "03h9bvl0kpbrayd5zg03hgo28"
     }
   ]
 }

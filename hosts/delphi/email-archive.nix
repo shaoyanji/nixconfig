@@ -42,6 +42,9 @@
       # what it thinks matters — regular, not bulk — so it stays in front of a
       # person and the feed rule may not close it.
       pointers = ["gumball@gumloop.ai"];
+      secondBackend = "openai";
+      secondModel = "deepseek/deepseek-v4-flash-0731:free";
+      secondFallbackModel = "qwen/qwen3.8-27b:free";
     };
   };
 

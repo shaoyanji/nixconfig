@@ -397,6 +397,140 @@ def classify_engine(message: dict, engine_url: str, margin: float) -> tuple[str,
     return tier, owner, f"engine: {choice} ({top:.2f})", top
 
 
+FREE_SUFFIX = ":free"
+
+
+def load_key(path: str, name: str) -> str:
+    """One key, from the environment or from a dotenv file.
+
+    The fleet keeps its AI keys in a single sops blob
+    (`ai-services-shared-env`), which sops-nix lands as a 0400 file. Reading that
+    file and taking one name is what keeps a unit's environment from carrying
+    the other thirty.
+    """
+    value = os.environ.get(name, "").strip()
+    if value:
+        return value
+    if not path or not os.path.exists(path):
+        return ""
+    with open(path, encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if line.startswith(f"{name}="):
+                return line.split("=", 1)[1].strip().strip("\"'")
+    return ""
+
+
+# A remote model sees the same three fields the local engine gets: the sender,
+# the envelope, the labels. The body is the mailbox's content, and this route is
+# somebody else's inference box.
+SECOND_SYSTEM = """You sort one personal mailbox into exactly one tier.
+
+Answer with a single JSON object and nothing else:
+{"tier": "<tier>", "confidence": <0..1>, "reason": "<eight words at most>"}
+
+Tiers:
+- person: a real human wrote to me, or a human reply in a thread
+- action: a transactional notice with a decision or a deadline behind it
+- digest: a newsletter, a marketing send, a receipt or a status update to keep
+- robot: an automated notice with no human content and no decision (CI, alerts)
+- review: you cannot tell from the envelope
+
+Rules:
+- A personalised display name on a marketing sender is still digest.
+- "robot" needs a machine sender or an automated subject; when unsure, digest.
+- A deadline that expires ("action required", "expires", "insufficient") is
+  action, even from a machine.
+- A verification code, sign-in alert or password reset is robot: it is spent
+  the moment it is read."""
+
+
+def chat(base_url: str, model: str, api_key: str, system: str, user: str, timeout: float = 60.0) -> str:
+    """One OpenAI-compatible completion, or "" when the route cannot answer."""
+    payload = {
+        "model": model,
+        "max_tokens": 200,
+        "temperature": 0.0,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+    }
+    request = urllib.request.Request(
+        f"{base_url.rstrip('/')}/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={
+            "content-type": "application/json",
+            "authorization": f"Bearer {api_key}",
+            # A naming user agent is not cosmetic: the route sits behind a proxy
+            # that answers urllib's default with 403, which reads like a bad key.
+            "user-agent": "email-triage/1 (+nixconfig)",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            body = json.loads(response.read().decode() or "{}")
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode()[:200] if error.fp else ""
+        print(f"triage: {model}: HTTP {error.code} {detail}", file=sys.stderr)
+        return ""
+    except (urllib.error.URLError, TimeoutError, ValueError) as error:
+        print(f"triage: {model}: no answer ({error})", file=sys.stderr)
+        return ""
+    return ((body.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+
+
+def classify_remote(
+    message: dict,
+    base_url: str,
+    model: str,
+    api_key: str,
+    fallback_model: str = "",
+) -> tuple[str, str, str, float] | None:
+    """A remote model's verdict, or None when neither model answered.
+
+    The same vocabulary and the same evidence rule as the local engine, so a
+    stronger model cannot widen a queue by inventing a tier. A paid model id is
+    refused before any request: the free ids are what keep the route usable.
+    """
+    state = (
+        f"Sender: {message.get('sender') or ''}\n"
+        f"Subject: {message.get('subject') or ''}\n"
+        f"Labels: {', '.join(message.get('labels') or [])}"
+    )
+    for candidate in (model, fallback_model):
+        if not candidate:
+            continue
+        if not candidate.endswith(FREE_SUFFIX):
+            print(f"triage: {candidate} is not a :free id; refusing", file=sys.stderr)
+            return None
+        content = chat(base_url, candidate, api_key, SECOND_SYSTEM, state)
+        if not content:
+            continue
+        text = content.strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[-1].rsplit("```", 1)[0]
+        try:
+            answer = json.loads(text)
+        except ValueError:
+            print(f"triage: {candidate}: answer was not JSON", file=sys.stderr)
+            continue
+        tier = str(answer.get("tier") or "").strip().lower()
+        if tier not in TIERS:
+            print(f"triage: {candidate}: tier {tier!r} is not in the vocabulary", file=sys.stderr)
+            continue
+        if tier == "robot":
+            addr = address(message.get("sender"))
+            if not any(marker in addr for marker in ("github", "jenkins", "buildkite", "circleci")):
+                tier = "digest"
+        confidence = float(answer.get("confidence") or 0.0)
+        reason = str(answer.get("reason") or "").strip()[:120]
+        owner = "human" if tier in ("person", "action") else "none"
+        return tier, owner, f"{candidate.split('/')[-1]}: {reason}", confidence
+    return None
+
+
 # What a second model's verdict may replace: anything. The two architectures
 # override each other in both directions, because a disagreement is information
 # and the queue is what pays for a tie. The only bar is a declared pointer.
@@ -413,6 +547,11 @@ def second_pass(
     margin: float,
     dry_run: bool,
     pointers: set[str] | None = None,
+    backend: str = "systemone",
+    base_url: str = "",
+    model: str = "",
+    fallback_model: str = "",
+    api_key: str = "",
 ) -> tuple[int, int, int, int]:
     """Ask the second model about unresolved human mail.
 
@@ -422,14 +561,19 @@ def second_pass(
     `review` is for a message neither model can place, not a parking spot.
     """
     pointers = pointers or set()
-    try:
-        get(f"{engine_url.rstrip('/')}/health", timeout=5.0)
-    except (urllib.error.URLError, TimeoutError, ValueError) as error:
-        print(
-            f"triage: second engine unreachable at {engine_url} ({error}); pass skipped",
-            file=sys.stderr,
-        )
-        return 0, 0, 0, 0
+    if backend == "openai":
+        if not api_key:
+            print("triage: no key for the remote second opinion; pass skipped", file=sys.stderr)
+            return 0, 0, 0, 0
+    else:
+        try:
+            get(f"{engine_url.rstrip('/')}/health", timeout=5.0)
+        except (urllib.error.URLError, TimeoutError, ValueError) as error:
+            print(
+                f"triage: second engine unreachable at {engine_url} ({error}); pass skipped",
+                file=sys.stderr,
+            )
+            return 0, 0, 0, 0
 
     attention = [normalize(row) for row in (get(f"{api}/api/attention?lim=100000") or [])]
     if not attention:
@@ -456,7 +600,10 @@ def second_pass(
 
     closed = reopened = kept = skipped = 0
     for message in targets:
-        verdict = classify_engine(message, engine_url, margin)
+        if backend == "openai":
+            verdict = classify_remote(message, base_url, model, api_key, fallback_model)
+        else:
+            verdict = classify_engine(message, engine_url, margin)
         if verdict is None:
             skipped += 1
             continue
@@ -587,6 +734,32 @@ def main() -> int:
         action="store_true",
         help="skip the second pass over human mail (default: run it)",
     )
+    parser.add_argument(
+        "--second-backend",
+        choices=("systemone", "openai"),
+        default="systemone",
+        help="who answers the second pass: the local second architecture, or an OpenAI-compatible route",
+    )
+    parser.add_argument(
+        "--second-base-url",
+        default=os.environ.get("INFRON_BASE_URL", "https://llm.onerouter.pro/v1"),
+        help="OpenAI-compatible base URL for --second-backend openai",
+    )
+    parser.add_argument(
+        "--second-model",
+        default=os.environ.get("INFRON_MODEL", "deepseek/deepseek-v4-flash-0731:free"),
+        help="model id for the remote second opinion; must end in :free",
+    )
+    parser.add_argument(
+        "--second-fallback-model",
+        default=os.environ.get("INFRON_BACKUP_MODEL", "qwen/qwen3.8-27b:free"),
+        help="second model id tried when the first cannot answer",
+    )
+    parser.add_argument(
+        "--second-key-file",
+        default="",
+        help="dotenv file to read INFRON_API_KEY from when the variable is unset",
+    )
     parser.add_argument("--dry-run", action="store_true", help="print verdicts, write nothing")
     parser.add_argument("--report", action="store_true", help="print tier counts from the API and exit")
     args = parser.parse_args()
@@ -605,6 +778,7 @@ def main() -> int:
     vip = load_vip(args.vip_file)
     plugins = load_plugins(args.plugins)
     pointers = load_pointers(args.pointers)
+    api_key = load_key(args.second_key_file, "INFRON_API_KEY") if args.second_backend == "openai" else ""
     pending = [
         normalize(row)
         for row in get(
@@ -663,6 +837,11 @@ def main() -> int:
             args.margin,
             args.dry_run,
             pointers,
+            backend=args.second_backend,
+            base_url=args.second_base_url,
+            model=args.second_model,
+            fallback_model=args.second_fallback_model,
+            api_key=api_key,
         )
         print(
             f"second pass: {closed} closed, {reopened} moved to a person, "

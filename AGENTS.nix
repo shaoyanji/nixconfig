@@ -992,9 +992,9 @@
         DIRECTION: structural facts calcify into `.#knowledgeGraph`; a pass that can
         only produce prose stays a tool with a kill date, never a rung to consult.
 
-        KILL CRITERION: no claim-shaped call in the verdict log after two weeks →
-        delete `modules/scripts/wiki-ask.*` and close this REJECTED with the count.
-        A tool nobody calls is not a decision to keep; `qmd embed` stays optional.
+        KILL CRITERION FIRED 2026-11-19: 456 verdicts, all written on the build
+        day, none in 14 days. `ops:wiki:stats` now reads that from the log (exit 1
+        on an empty window); the delete itself is the operator's call.
       '';
     };
     epistemics-declared = {

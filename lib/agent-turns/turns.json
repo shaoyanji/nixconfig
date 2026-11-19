@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T07:49:43Z",
+  "generated": "2026-11-19T08:03:42Z",
   "count": 200,
-  "pin": "84ba27d3c0fb25387c958e593afbc0c541e946f53a93978a01d7b5422d06f84a",
+  "pin": "cab0038ff9efa51e10d5fe09a70d4821ea35dae021d0a32fca1da7e858d89797",
   "turns": [
+    {
+      "id": "36cdcf25-e627-4ecb-ab73-c8b0050cabad",
+      "ts": "2026-11-19T08:03:09Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Stewarding freebuff (tab1, DeepSeek) + agy (tab2, Gemini 3.8 Flash) as personal subagents: freebuff = high-technical nixconfig optimizer (innovation on agent recall/knowledge fetches, gated per change); agy = lighter/email tasks. Polling both, feeding next AGENTS.nix experiment on completion.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "73becf6bca061bbf3418292df3d9b9a7998f2cf3",
+      "branch": "main",
+      "frame": "03h9ijczk2x3v6qlv7ua98jhe"
+    },
+    {
+      "id": "dc705cab-37d4-41f0-a399-911b474a9d8b",
+      "ts": "2026-11-19T07:49:51Z",
+      "source": "devji",
+      "subject": "nixconfig:firecrawl-local-browser",
+      "action": "firecrawl-local renders JS through a gc-rooted wrapper over agent-browser's pinned chromium (157, already on cache.nixos.org so no R2 push needed); CI nixcachix substituters gained the R2 edge cache + delphi.edge key that hosts already had; hermes extract of a JS-only page 2.32s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "73becf6bca061bbf3418292df3d9b9a7998f2cf3",
+      "branch": "main",
+      "frame": "03h9igrewhgvot9fzysayua6t"
+    },
     {
       "id": "32823f51-a6a8-48d3-b6b7-da88bb22f41d",
       "ts": "2026-11-19T07:33:17Z",
@@ -2693,46 +2722,6 @@
       "base_commit": "f5f500e78b700e0fccda04e14d537b5c53a6b83f",
       "branch": "main",
       "frame": "03h7x311pfuldlox2skhkqnd7"
-    },
-    {
-      "id": "72bfbedc-41f7-4c6b-9e62-c995cf0e22bb",
-      "ts": "2026-11-11T23:30:36Z",
-      "source": "buffy",
-      "subject": "nixconfig:fibtransponder-clanker-benchmarks",
-      "action": "fibtransponder benchmarks re-measured on clanker (4 vCPU EPYC, Go 1.27.1, every internal/ package ok), published in docs/BENCHMARKS.md as d0d8402, and its portfolio site is now live on GitHub Pages.",
-      "outcome": "done",
-      "claims": [
-        "fibtransponder:docs/BENCHMARKS.md",
-        "fibtransponder:.github/workflows/pages.yml"
-      ],
-      "files": [],
-      "base_commit": "f5f500e78b700e0fccda04e14d537b5c53a6b83f",
-      "branch": "main",
-      "frame": "03h7x25hu2g9ut25l0sjshhk8"
-    },
-    {
-      "id": "836e351d-3bac-4ca1-9d24-929d83a2c031",
-      "ts": "2026-11-11T23:21:16Z",
-      "source": "buffy",
-      "subject": "nixconfig:philips-tv-dlna-cast",
-      "action": "Living-room Philips 65OLED759 plays /arr films over UPnP DLNA: skill, media taskfile, play script and blog post landed and pushed to main.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/play-on-tv.py",
-        "taskfiles/media.yml",
-        ".agents/skills/philips-tv-cast"
-      ],
-      "files": [
-        "AGENTS.nix",
-        "Taskfile.yml",
-        "taskfiles/media.yml",
-        "scripts/task/play-on-tv.py",
-        "scripts/task/plex-play.py",
-        ".agents/skills/philips-tv-cast/SKILL.md"
-      ],
-      "base_commit": "54d28527",
-      "branch": "main",
-      "frame": "03h7x0bvbtbccer0su1rsgdbi"
     }
   ]
 }

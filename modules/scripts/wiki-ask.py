@@ -19,6 +19,7 @@ the gate can be calibrated and BM25's misses are measured, not argued about.
 """
 
 import argparse
+import calendar
 import json
 import math
 import os
@@ -442,10 +443,50 @@ def to_toon(obj):
     return r.returncode
 
 
+def stats(path, days):
+    """What the shelf earned, from its own log: the note's kill criterion is a
+    count, so it is measured rather than remembered."""
+    since = time.time() - days * 86400
+    total = in_window = 0
+    verdicts, declined = {}, {}
+    try:
+        with open(path) as fh:
+            for line in fh:
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                total += 1
+                verdict = row.get("verdict", "?")
+                verdicts[verdict] = verdicts.get(verdict, 0) + 1
+                if verdict != "answer":
+                    query = row.get("query", "")
+                    declined[query] = declined.get(query, 0) + 1
+                try:
+                    when = calendar.timegm(time.strptime(row.get("ts", ""), "%Y-%m-%dT%H:%M:%SZ"))
+                except ValueError:
+                    when = 0
+                if when and when >= since:
+                    in_window += 1
+    except FileNotFoundError:
+        pass
+    return {
+        "log": path,
+        "days": days,
+        "total": total,
+        "in_window": in_window,
+        "verdicts": verdicts,
+        "top_declined": sorted(declined.items(), key=lambda kv: -kv[1])[:8],
+        "kill_criterion": "fired: nothing called this in the window" if not in_window else "not met: still in use",
+    }
+
+
 def main():
     ap = argparse.ArgumentParser(prog="wiki-ask", description="fan-out ZIM retrieval with a token gate")
     ap.add_argument("query", nargs="*")
     ap.add_argument("--list", action="store_true", help="print the archive catalog (JSON) and exit")
+    ap.add_argument("--stats", action="store_true", help="summarise the verdict log and exit")
+    ap.add_argument("--days", type=int, default=14, help="window for --stats")
     ap.add_argument("--budget", type=int, default=1200, help="token cap for quoted text (chars/4)")
     ap.add_argument("--candidates", type=int, default=8)
     ap.add_argument("--archive", action="append", default=[], help="only archives whose name contains this")
@@ -456,6 +497,15 @@ def main():
     ap.add_argument("--no-log", action="store_true")
     ap.add_argument("--log", default=os.environ.get("WIKI_ASK_LOG") or default_log())
     args = ap.parse_args()
+
+    if args.stats:
+        payload = stats(args.log, args.days)
+        if args.toon:
+            return to_toon(payload)
+        print(json.dumps(payload, indent=2))
+        # An empty window is the note's kill criterion, so it fails the call: a
+        # tool nobody calls should break a pipeline, not print a tidy zero.
+        return 0 if payload["in_window"] else 1
 
     query = " ".join(args.query)
     started = time.time()

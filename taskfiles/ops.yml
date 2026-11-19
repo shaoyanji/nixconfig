@@ -186,6 +186,27 @@ tasks:
           exit 3
         fi
 
+  ops:wiki:stats:
+    desc: "Report what the ZIM shelf earned — verdict mix and whether anyone asks"
+    summary: >
+      Reads ~/.local/state/wiki-ask/verdicts.jsonl and answers the semantic-search
+      note's kill criterion from the log instead of from memory: total verdicts,
+      the answer/expand/silent mix, and how many arrived in the last DAYS window.
+      `--stats` on frieren, where the log lives. Exits 1 when the window is empty,
+      so a quiet tool fails a pipeline rather than printing zero.
+    vars:
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    silent: true
+    cmds:
+      - |
+        out=$(python3 modules/scripts/wiki-ask.py --stats --days {{.DAYS | default "14"}})
+        rc=$?
+        case "$FORMAT" in
+          json) printf '%s' "$out" ;;
+          *) printf '%s' "$out" | toon -e ;;
+        esac
+        exit "$rc"
+
   ops:wiki:ask:
     desc: Ask the local ZIM archives a question (Q=; gated fan-out, budgeted)
     summary: >

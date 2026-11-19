@@ -1,8 +1,95 @@
 {
-  "generated": "2026-11-19T13:24:13Z",
+  "generated": "2026-11-19T13:57:18Z",
   "count": 200,
-  "pin": "9364d161e52d83b2a444fd17a49ea4d59fbcfbd82664c8dae93b2c456840a856",
+  "pin": "0f944cf961428a463f53d16c749e4fd5004f01cf94a464aa6cf0afded62f8e18",
   "turns": [
+    {
+      "id": "22ba2230-b8a1-4d30-afc6-b28cc7169b07",
+      "ts": "2026-11-19T13:46:25Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 32: freebuff verifying CI doc-budget gate on doc-only pushes. agy idle after prep-lead DB update (24/24) and submission-path research (DeepL/Parloa/LiveKit/Maze paths noted). devin following PR #8 nits: poisoned manifest/core fails closed, pruned cores re-leap added, containment validation in progress (03h9kcy4ykuhi0mweg4ouy7yz turn logged). delphi sending LiveKit outreach + retargeting Parloa as broker (6m 51s).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
+      "branch": "main",
+      "frame": "03h9keeyw1395rxiduzd7ftro"
+    },
+    {
+      "id": "62c68302-d297-4420-8554-9d8086895b2b",
+      "ts": "2026-11-19T13:43:51Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 31: freebuff on doc-budget-ci (IN FLIGHT P0, verifying CI gate fires on doc-only pushes). agy researching submission paths for APPLY-group leads (DeepL, Parloa, LiveKit, Maze — posting URLs and ATS methods noted). devin following PR #8 nits: poisoned manifest/core now fails closed, pruned cores re-leap added, containment validation in progress. delphi sending LiveKit outreach + retargeting Parloa as broker (6m 42s).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
+      "branch": "main",
+      "frame": "03h9kdwvfqghzrw8kodda3tad"
+    },
+    {
+      "id": "757292d0-7ee6-4eb5-b6e6-2b1bb6a529dd",
+      "ts": "2026-11-19T13:43:27Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 30: freebuff delivered sentinel-external-hosts (P1, unit-failed→absent for hosts that cannot report, gate verified). agy finished prep/teilzeit DB update (24 leads) and submission-path research (DeepL, Parloa, LiveKit paths noted). devin approved PR #8 (opt-in zeck, kg_zeck 12/0 parity PASS, 3 nits flagged). delphi sending LiveKit outreach + Parloa retarget as broker.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
+      "branch": "main",
+      "frame": "03h9kdu2eybb5phyxrvu93t9k"
+    },
+    {
+      "id": "a57de9c3-97b6-4f22-9a34-f98b55a5db95",
+      "ts": "2026-11-19T13:43:18Z",
+      "source": "devji",
+      "subject": "nixconfig:hermes-fallback-429",
+      "action": "hermes fallback chain rebuilt across nvidia/openrouter/ollama-cloud; config.yaml entry 1 gained its missing key_env; min_switch_reset_seconds 120->0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
+      "branch": "main",
+      "frame": "03h9kdsyanbrocjd2jwtyqwrn"
+    },
+    {
+      "id": "cddf3696-6ef7-40e1-839f-421b5bc5e718",
+      "ts": "2026-11-19T13:38:54Z",
+      "source": "devin",
+      "subject": "nixconfig:kg-zeck-cache",
+      "action": "followup: zeck-fallback warns on missing Elixir (00a4413c); pruned cores/<epoch>.json re-leaps via 'core cache pruned' reason (b77f28a0); cached manifest/core paths containment-checked, fail-closed (daa1de5a); two hook-env worktree fixes needed to land (b7a511a8, 9399d46f) | gate: kg-zeck-check ExUnit 14/0 + parity PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "daa1de5a7e20949a46f5bd5c314b1a88e41e67e8",
+      "branch": "devin/1795077799-kg-zeck-cache",
+      "frame": "03h9kcy4ykuhi0mweg4ouy7yz"
+    },
+    {
+      "id": "4239f04c-c0da-40ce-b080-3f09344c52ef",
+      "ts": "2026-11-19T13:24:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:sentinel-external-hosts",
+      "action": "sentinel: a host with no systemd manager read an empty failed-units list and published [], asserting a scan it never ran. It now publishes null (count unknown) while unit-status-unobservable carries the reason; list consumers already used // []. With the earlier unit fix (jobs read unobservable, absent stays 'not installed here'), no field claims a unit the host cannot see. Pushed 2c0288b4 on top of 95065d96 and 2a121964; checks:host frieren rc=0 in 14.8 s, checks:quick rc=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
+      "branch": "main",
+      "frame": "03h9ka56203b3qovhekk91kvw"
+    },
     {
       "id": "c0f7dc1f-a602-415a-9392-a59cbc6c0d44",
       "ts": "2026-11-19T13:20:41Z",
@@ -2728,84 +2815,6 @@
       "base_commit": "c67044beecebb5035c9c63cd98a418738f41ea49",
       "branch": "main",
       "frame": "03h8xt0c1nt7eu104xyd0l87m"
-    },
-    {
-      "id": "d1bf786c-f158-4c3a-9ac6-c67e2621be05",
-      "ts": "2026-11-16T16:19:52Z",
-      "source": "devji",
-      "subject": "nixconfig:prose-deslop",
-      "action": "living docs + service descriptions de-slopped (load-bearing x3, simply x5, acts as, two vague descriptions); prose/docs-budget/links green; pushed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9b3da67c0cc10585ca1ef2f4206d86ff5f3409bd",
-      "branch": "main",
-      "frame": "03h8xshyqf8h02mpcgy6598lv"
-    },
-    {
-      "id": "07c334e8-2e25-4bac-9776-e8862c84bd18",
-      "ts": "2026-11-16T16:17:14Z",
-      "source": "devji",
-      "subject": "nixconfig:archive-api-default",
-      "action": "archive API now defaults to delphi tailnet in taskfiles/agents.yml, email-sweep, ci-fix-dispatch, appflow-packet; apps-db.sh gains upsert + apps:upsert; verified no-env writes from frieren; pushed 27bc236d",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27bc236df150bac56bcf2dd0d0bccd59f9eba9a4",
-      "branch": "main",
-      "frame": "03h8xrzenqbe8vf4o0nn4va5k"
-    },
-    {
-      "id": "39d2704e-4e96-4389-8e3d-b9efe7c7c8a2",
-      "ts": "2026-11-16T16:13:09Z",
-      "source": "devji",
-      "subject": "nixconfig:mail-queue-handover",
-      "action": "CI queue drained 101->5 (taskfile --api fix, 8f1dab59); kleinanzeigen and appwrite notices resolved; pipeline += XALT, Scranton, Signature Performance, Smartsheet; XALT CV sent",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8f1dab5915800a48d6cb6a7c3110706c09de6d47",
-      "branch": "main",
-      "frame": "03h8xr6n66x7lwei02sjdbvop"
-    },
-    {
-      "id": "83d384b6-6c02-4fb9-ab66-c518aa3bad73",
-      "ts": "2026-11-16T15:54:37Z",
-      "source": "devji",
-      "subject": "nixconfig:delphi-netbook-runbook-split",
-      "action": "both 400/400 host cards flattened: runtime layer to docs/delphi-runtime.md, staged deploy to docs/netbook-deploy.md; image-daily-queue closed DELIVERED; pushed 40cec452",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "40cec452da6c5c819bec11c152f4f323f67387e6",
-      "branch": "main",
-      "frame": "03h8xnkd90174ewclfon3z20e"
-    },
-    {
-      "id": "87dc7197-3ad3-4b78-8989-58ba7525e917",
-      "ts": "2026-11-16T15:52:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-repo",
-      "action": "tokenloom: retune-in-place op, anchor resolved server-side (page byte index measured 29.5ms/diff and was removed), smoke unplant, redraw bench; standalone repo shaoyanji/tokenloom public with MIT LICENSE and Pages built at shaoyanji.github.io/tokenloom",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "88eee8324d28fd5357e640b992cffe50bebc8270",
-      "branch": "main",
-      "frame": "03h8xn3g625vc1z82rw52debx"
-    },
-    {
-      "id": "b9712a50-bec1-4657-9d7b-e45439b24700",
-      "ts": "2026-11-16T15:41:49Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-rounds",
-      "action": "pushed 8 commits (59461652..540c879f); plate-round rules noted in AGENTS.nix; images:publish and images:variants trimmed to the 600-char surface; docs-budget green (AGENTS.md 223/1200)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "540c879ffc85deb0ee3c445c8b9b1c90148e35fc",
-      "branch": "main",
-      "frame": "03h8xl2af2o175tm9l3tax8i6"
     }
   ]
 }

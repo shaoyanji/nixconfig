@@ -310,6 +310,26 @@
         tasks = ["ops:kg"];
       };
     };
+    memory-architecture = {
+      title = "Memory architecture — vault → qmd → mem0/supermemory → web; ai-memory ungated scratch";
+      kind = "decision";
+      status = "ACCEPTED";
+      date = "2026-11-19";
+      summary = "Five-layer memory hierarchy with nix/AGENTS.nix as policy authority; ai-memory stays ungated scratch because nix eval (.#knowledgeGraph) already discovers truth in local files and nix AST.";
+      refs = {
+        hosts = ["frieren" "delphi"];
+        modules = ["lib/knowledge-graph.nix" "modules/user/ai/agents.nix" "modules/services/agent-turns.nix"];
+        docs = ["docs/agent-turns.md" "AGENTS.md" ".agents/SCHEMA.md"];
+        tasks = ["ops:health"];
+      };
+      body = ''
+        **Layers, in search order.** MEMORY.md (boot, always loaded) → vault (fast working memory) → qmd wiki (docs, runbooks, codebase) → mem0/supermemory (deep consult, decided by jev) → web. The supermemory key writes durable directives for context transfer between the Telegram instance and the tab 3 controller; mem0 stores structured TOON.
+
+        **ai-memory is not authority.** It has no server unit on this fleet and is "never authority for a repo fact." Its handoffs/message/workstreams are rich but the server is not run here; the knowledge graph (.#knowledgeGraph, 1991 nodes compiled from the nix tree) already discovers truth in local files and nix AST, so there is no information digest that needs staging through ai-memory before reaching nix data structures.
+
+        **nix determines policy.** AGENTS.nix notes and .#knowledgeGraph are the compiled source of truth for what exists; xs turn log on delphi is live coordination. Nothing here changes merge authority.
+      '';
+    };
     d5-one-skill-tree = {
       title = "D5 — one fleet-wide skill tree, materialized by Home Manager";
       kind = "decision";

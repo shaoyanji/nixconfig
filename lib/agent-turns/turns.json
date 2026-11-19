@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T09:49:14Z",
+  "generated": "2026-11-19T10:05:04Z",
   "count": 200,
-  "pin": "4b500441ce3b8993737aed2570dd6a08d776db78cfc85a30e983a31b0f055007",
+  "pin": "94fffdbdaa85d2b2aaea1ef1a30677164bc52a72d5c77437d51a340886f566c2",
   "turns": [
+    {
+      "id": "8c3acf57-6097-44d1-b5e5-83fae890135e",
+      "ts": "2026-11-19T09:54:41Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 14: freebuff landed dsh-infron (8bd18575, dsh headless routed through infron via patch overlay; both reasonix + dsh now backup subagents on infron endpoint). devin did postgres fetcher (5 dead JDs corrected) + zeckendorf/fibtransponder investigation (kg-zeck failed Kelly gate; next step = deltaqueue replay probe; 2 decisions needed). agy on job research. Authored workflow-pane-performance zettel.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "8bd18575320ab7ece524b6e2e572a24cb0f7bcd9",
+      "branch": "main",
+      "frame": "03h9j55c3d47byjv2icjuysq2"
+    },
+    {
+      "id": "b02c27d0-54f6-4683-917f-a5ff4d3ed2c2",
+      "ts": "2026-11-19T09:49:23Z",
+      "source": "devji",
+      "subject": "nixconfig:dsh-infron",
+      "action": "landed 8bd18575: scripts/dsh-infron.sh applies modules/user/ai/dsh-infron.patch.yml (llm-pi-ai provider, openai-completions, llm.onerouter.pro/v1), :free guard, reasonix fallback; dsh headless answered on both free models without an exported key; gate+quick+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8bd18575320ab7ece524b6e2e572a24cb0f7bcd9",
+      "branch": "main",
+      "frame": "03h9j442a0axtayxtsxn3slye"
+    },
     {
       "id": "dca8efb4-5358-4403-9f9d-e0987d31a405",
       "ts": "2026-11-19T09:45:39Z",
@@ -2739,32 +2768,6 @@
       "base_commit": "17eb0966b610c1d57e136c8be6ac1cae8bd4d39f",
       "branch": "main",
       "frame": "03h8rr3rhbez651n0n4akmz4s"
-    },
-    {
-      "id": "39e1214b-85d2-46ed-8f1d-d1cfa9e2676f",
-      "ts": "2026-11-15T21:31:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:cpg-session-repair",
-      "action": "chatplayground keepalive on delphi was not broken, it was locked out: cpg-session-touch answered HTTP 401 since 13 Nov, so the hourly refresh could never re-arm. Copied frieren's live auth.json (session renews there hourly), refreshed and ran the unit: Result=success, timer back at 23:03. No chromium on delphi (no agent-browser/chromium/playwright), so the headless Google login route was not attempted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9c6c389f82057c55bc1221d1bd2e9f7739a5a7d0",
-      "branch": "main",
-      "frame": "03h8ro4dzv3s04c6dngq77514"
-    },
-    {
-      "id": "1f908dad-69d4-424c-be14-2b7a41440775",
-      "ts": "2026-11-15T21:21:56Z",
-      "source": "buffy",
-      "subject": "nixconfig:gcal-dead-grant",
-      "action": "google sync is fixed and syncing: the code was in the browser and could not be carried to delphi, so a delphi page (tailscale serve, HTTPS with tailnet cert) took the pasted loopback address and did the code exchange server-side. Checks:gcal now exchanges and names a dead vs time-based grant and dates its death. Commits eace6645, 2d836e20. Open: the OAuth app is in Testing, so the grant dies 2026-11-22 22:20; publishing the consent screen is the durable cure",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2d836e203e38f5bced0b65828145b06e8c850cf5",
-      "branch": "main",
-      "frame": "03h8rm7i5ot24os9osd5arzr2"
     }
   ]
 }

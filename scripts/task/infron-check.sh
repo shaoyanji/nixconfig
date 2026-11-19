@@ -240,6 +240,64 @@ else
   ok "no ~/.reasonix/config.toml (provider block is user state; skipped)"
 fi
 
+echo "== dispatch"
+# The dispatcher is the operator's one command, so its plan is checkable without a
+# request: which agent a task kind picks, that a plan never names a paid id, and that
+# the JSON shape a program parses is the one the dry run prints.
+dispatcher="$repo/scripts/dispatch.sh"
+if [ -f "$dispatcher" ]; then
+  ok "the dispatcher exists"
+  plan_code="$(bash "$dispatcher" --dry-run --kind code "fix the failing assertion in scripts/x.sh" 2>/dev/null)"
+  plan_quick="$(bash "$dispatcher" --dry-run --kind quick "name one risk" 2>/dev/null)"
+  first_code="$(printf '%s\n' "$plan_code" | head -1)"
+  first_quick="$(printf '%s\n' "$plan_quick" | head -1)"
+  case "$first_code" in
+    reasonix:*) ok "a code task walks reasonix first" ;;
+    *) bad "the code plan starts with '$first_code'" ;;
+  esac
+  case "$first_quick" in
+    dsh:*) ok "a quick task walks dsh first" ;;
+    *) bad "the quick plan starts with '$first_quick'" ;;
+  esac
+  paid=""
+  while IFS= read -r entry; do
+    [ -n "$entry" ] || continue
+    case "${entry#*:}" in
+      *:free) ;;
+      *) paid="${entry#*:}" ;;
+    esac
+  done <<<"$(printf '%s\n%s\n' "$plan_code" "$plan_quick")"
+  [ -n "$paid" ] && bad "a dispatch plan names the paid id '$paid'" || ok "every planned model id is :free"
+  if bash "$dispatcher" --dry-run --json "hi" 2>/dev/null | jq -e '.dry_run and (.plan | length > 0)' >/dev/null 2>&1; then
+    ok "the dry-run plan parses as the documented JSON"
+  else
+    bad "the dry-run plan is not the documented JSON shape"
+  fi
+  forced="$(bash "$dispatcher" --dry-run --kind quick --agent reasonix "hi" 2>/dev/null | head -1)"
+  case "$forced" in
+    reasonix:*) ok "--agent restricts the plan to one agent" ;;
+    *) bad "--agent did not restrict the plan: '$forced'" ;;
+  esac
+  auto_code="$(bash "$dispatcher" --dry-run "please refactor scripts/dispatch.sh" 2>/dev/null | head -1)"
+  case "$auto_code" in
+    reasonix:*) ok "kind=auto reads a path and a verb as a code task" ;;
+    *) bad "kind=auto misread a code task: '$auto_code'" ;;
+  esac
+  bash "$dispatcher" --dry-run --kind nonsense "hi" >/dev/null 2>&1
+  [ $? -eq 2 ] && ok "an unknown kind is refused" || bad "an unknown kind was not refused"
+  bash "$dispatcher" --dry-run --agent nope "hi" >/dev/null 2>&1
+  [ $? -eq 2 ] && ok "an unknown agent is refused" || bad "an unknown agent was not refused"
+  bash "$dispatcher" --dry-run -- "" </dev/null >/dev/null 2>&1
+  [ $? -eq 2 ] && ok "an empty prompt is refused" || bad "an empty prompt was not refused"
+  if grep -Eq 'modules/secrets|secrets\.yaml' "$dispatcher"; then
+    bad "the dispatcher spells the secrets path instead of leaving it to the wrappers"
+  else
+    ok "the dispatcher takes the secrets path from paths.sh"
+  fi
+else
+  bad "$dispatcher is missing"
+fi
+
 echo "== both down"
 : >"$log"
 PATH="$work/bin:$PATH" STUB_LOG="$log" STUB_MODE=down bash "$helper" "hi" >"$work/out" 2>"$work/err"

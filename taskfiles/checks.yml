@@ -540,16 +540,17 @@ tasks:
       - bash scripts/task/hermes-check.sh
 
   checks:infron:
-    desc: "[gate] infron caller: non-free model ids refused, fallback order, no request spent"
+    desc: "[gate] infron routes: non-free ids refused, fallback order, dsh and dispatch plans, no request spent"
     summary: >
-      Local and token-free: the shared `infron` caller runs against a stub `curl`
-      first on PATH, so nothing leaves the host. Gates the refusals that protect a
-      prepaid balance — a primary or backup model id without `:free` is rejected
-      before any request is made, and an unset `INFRON_API_KEY` names the missing
-      variable — then that the default pair is deepseek free followed by qwen free,
-      that a 429 fails over to the backup, and that two failures exit 1. Reads the
-      model ids out of the hermes persona too, so a paid id written there fails the
-      gate instead of the balance. Exit 0 = clean, 1 = defect.
+      Local and token-free: the caller runs against a stub `curl` first on PATH, so
+      nothing leaves the host. Gates the refusals that protect a prepaid balance — an
+      id without `:free` is rejected before any request, and an unset
+      `INFRON_API_KEY` names the missing variable — then that the default pair is
+      deepseek free then qwen free, a 429 fails over, two failures exit 1. Reads the
+      hermes persona's ids too, so a paid id there fails here. The dispatcher's plan
+      is read with `--dry-run`:
+      a code task walks reasonix first, a quick one dsh first, no plan names a paid
+      id. Exit 0 = clean, 1 = defect.
     cmds:
       - bash scripts/task/infron-check.sh
 

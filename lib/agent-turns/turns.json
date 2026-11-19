@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-19T08:58:41Z",
+  "generated": "2026-11-19T09:04:03Z",
   "count": 200,
-  "pin": "46cd6df6e9c5fe7ca0cdfa5d27ba83fd628b05cec465a3358784c02f88596b48",
+  "pin": "3f011a2b984e4e335f8dee5a1aeb38b2edeffa14fb6cca8d18ed07a90b82743e",
   "turns": [
+    {
+      "id": "6a4d7002-3329-437c-809a-93594775f9de",
+      "ts": "2026-11-19T09:01:51Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 10: freebuff landed key_services structuring (bf825049, registry records for service name/port/host). Fed it record-port gate (cross-check records vs live listeners). agy completed AGENTS.md turns guidance (0a4bfefb).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "bf8250495c37d3c90bc66b08e1385c0ebffa7137",
+      "branch": "main",
+      "frame": "03h9iutqqyu6u9yr39a2toume"
+    },
+    {
+      "id": "0d76689d-1e27-454e-8e3b-0b78337bc1e5",
+      "ts": "2026-11-19T09:00:19Z",
+      "source": "agy",
+      "subject": "nixconfig:agents-md-turns",
+      "action": "docs: concrete xs turn logging guidance in AGENTS.md and HOME-PREAMBLE | commit: 0a4bfefb | gate: checks:toon:surfaces + checks.policies PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "AGENTS.md",
+        "docs/agent-context/HOME-PREAMBLE.md"
+      ],
+      "base_commit": "bf8250495c37d3c90bc66b08e1385c0ebffa7137",
+      "branch": "main",
+      "frame": "03h9iuiypgjbgm5z66qrvz3fc"
+    },
+    {
+      "id": "37bd4b28-d3a3-4b9b-9166-273eb84653fb",
+      "ts": "2026-11-19T08:58:50Z",
+      "source": "devji",
+      "subject": "nixconfig:host-services",
+      "action": "software.services typed per host (37 hosts, 159 records), inventory-schema rejects dup name/port, fleet-services renders all three halves; quick+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bf8250495c37d3c90bc66b08e1385c0ebffa7137",
+      "branch": "main",
+      "frame": "03h9iu8k07d4dubtkjmp9tjwm"
+    },
     {
       "id": "ab5a64ff-20a4-45f3-a5b1-183e657c3aaf",
       "ts": "2026-11-19T08:56:35Z",
@@ -2707,45 +2752,6 @@
       "base_commit": "e4c7a172f873ee5db4acba6e849f98257c09d4a8",
       "branch": "main",
       "frame": "03h8oeiqbo3qjveta88ss46ya"
-    },
-    {
-      "id": "13e7bcc3-e395-4ddd-9f84-0322a57d04a7",
-      "ts": "2026-11-15T10:14:48Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round9",
-      "action": "round 9: 21 of 22 kept and published (285 assets, images-check ok, f50f3b98); Rurouni Kenshin 8, Legend of Korra 6, Dune 5, Dota 3; Duncan Idaho blocked twice by the safety system",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d0d495537959945e6d398dfe10c9d7e7e8e62af8",
-      "branch": "main",
-      "frame": "03h8nzvyd3sjvjdnz0hef69bw"
-    },
-    {
-      "id": "3a30e53a-f541-4cb7-a51f-a801372139f0",
-      "ts": "2026-11-15T08:39:28Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round8",
-      "action": "round 8: 18 of 20 plates kept and published (264 assets, images-check ok, 0ae644e3); MiniMax-H3-Image Q2_K 6.88 GB fetched to /Volumes/data/downloads/minimax-h3-image, sha256 matches HF LFS; daki and suzuha still download-401",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e58daf0ebeeed029fc4bd528b574c0d9b4952ac1",
-      "branch": "main",
-      "frame": "03h8nh9fzsgbjdrz1qvgctxqg"
-    },
-    {
-      "id": "3e53956d-3ee8-46d4-bf32-471b54bb1125",
-      "ts": "2026-11-15T04:10:45Z",
-      "source": "antigravity",
-      "subject": "nixconfig:frieren-weekly-audit-2026-11-15",
-      "action": "Weekly audit complete: reset restic-burgernas unit, verified Gen 280 & sentinel ok, updated SYSTEM.md & HANDOFF.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ec1c26db214f8c2d7a57e03ef02e71e2469d6f0",
-      "branch": "main",
-      "frame": "03h8m0rp87htpxcjcpv4kg8jk"
     }
   ]
 }

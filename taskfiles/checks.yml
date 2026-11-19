@@ -47,6 +47,7 @@ tasks:
       - task: checks:repo:paths
       - task: checks:docs:links
       - task: checks:docs:links:test
+      - task: checks:services:ports
       - task: checks:prose
       - task: checks:infron
       - task: checks:yaml:lint
@@ -99,6 +100,16 @@ tasks:
       no network, no eval.
     cmds:
       - bash tests/docs-links/run.sh
+
+  checks:services:ports:
+    desc: A service record's port must be the port its host's prose states
+    cmds:
+      - bash scripts/task/service-port-claims.sh
+
+  checks:services:ports:test:
+    desc: Regression fixture for checks:services:ports
+    cmds:
+      - bash tests/service-ports/run.sh
 
   checks:prose:
     desc: "[gate] Docs and skills carry none of the unslop vocabulary"

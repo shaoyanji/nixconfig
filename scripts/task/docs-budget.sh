@@ -14,7 +14,9 @@ set -euo pipefail
 # The flake check runs this from a store copy (no .git), so fall back to the
 # script's own location; both resolve to the repository root.
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if root="$(git -C "$here" rev-parse --show-toplevel 2>/dev/null)"; then
+# GIT_DIR without GIT_WORK_TREE (as exported inside git hooks) makes
+# `rev-parse --show-toplevel` answer the -C dir itself; clear both here.
+if root="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "$here" rev-parse --show-toplevel 2>/dev/null)"; then
   cd "$root"
 else
   cd "$here/../.."

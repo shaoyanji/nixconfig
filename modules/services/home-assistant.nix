@@ -2,9 +2,31 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
   cfg = config.services.ha-stack;
+  dev = cfg.devices;
+  extraPy = ps:
+    map (
+      n:
+        if builtins.hasAttr n ps
+        then builtins.getAttr n ps
+        else throw "services.ha-stack.extraPythonPackages: '${n}' is not in pkgs.python3Packages"
+    )
+    cfg.extraPythonPackages;
+  haComponents = lib.unique (
+    cfg.extraComponents
+    ++ lib.optional dev.zha.enable "zha"
+    ++ lib.optional dev.esphome.enable "esphome"
+    ++ lib.optional dev.zigbee2mqtt.enable "mqtt"
+  );
+  declaredPorts =
+    [cfg.port cfg.mqtt.port]
+    ++ lib.optional cfg.uptime-kuma.enable cfg.uptime-kuma.port
+    ++ lib.optional dev.zigbee2mqtt.enable dev.zigbee2mqtt.port
+    ++ lib.optional dev.esphome.enable dev.esphome.port;
+  dupPorts = lib.subtractLists (lib.unique declaredPorts) declaredPorts;
 in {
   options.services.ha-stack = {
     enable = lib.mkEnableOption "Home Assistant IoT & device stack";
@@ -114,12 +136,135 @@ in {
       default = ps: [ps.androidtvremote2];
       description = "Extra Python packages for Home Assistant";
     };
+
+    extraPythonPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      example = ["androidtvremote2" "hue-ble"];
+      description = ''
+        The one-line way to add a Home Assistant Python dependency: attribute
+        names resolved against `pkgs.python3Packages`, appended onto whatever
+        `extraPackages` returns. A name that is not a real attribute fails the
+        eval with the option name in the error, so a typo cannot reach a
+        rebuild. Prefer this over writing `extraPackages` yourself; keep
+        `extraPackages` only for a package outside python3Packages.
+      '';
+    };
+
+    devices = {
+      zigbee2mqtt = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Run upstream services.zigbee2mqtt; requires mqtt.enable";
+        };
+        dataDir = lib.mkOption {
+          type = lib.types.str;
+          default = "/srv/private/zigbee2mqtt";
+          description = "Zigbee2MQTT state dir; backed up with /srv/private";
+        };
+        port = lib.mkOption {
+          type = lib.types.port;
+          default = 8080;
+          description = "Zigbee2MQTT frontend port (loopback; proxy for LAN)";
+        };
+        serialPort = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          example = "/dev/ttyUSB0";
+          description = "Coordinator device path; null leaves autodetect";
+        };
+        mqttBaseTopic = lib.mkOption {
+          type = lib.types.str;
+          default = "zigbee2mqtt";
+          description = "MQTT base topic zigbee2mqtt publishes under";
+        };
+        permitJoin = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Permit pairing new Zigbee devices; keep off after pairing";
+        };
+      };
+
+      esphome = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Run upstream services.esphome dashboard (firmware builder)";
+        };
+        port = lib.mkOption {
+          type = lib.types.port;
+          default = 6052;
+          description = "ESPHome dashboard HTTP port; 6053 is the device native API, not this";
+        };
+      };
+
+      zha = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Enable HA's built-in ZHA integration (needs the zha Python deps and a radio path)";
+        };
+        radioPath = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          example = "/dev/ttyUSB0";
+          description = "Radio device for zigpy_config; null configures via UI flow only";
+        };
+      };
+
+      mqttDevices = lib.mkOption {
+        type = lib.types.listOf (lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Package name; becomes mqtt-devices/<name>.yaml and the packages key";
+            };
+            topic = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+              description = "Base MQTT topic for reference/documentation";
+            };
+            yaml = lib.mkOption {
+              type = lib.types.lines;
+              description = "HA YAML snippet (sensor/binary_sensor/etc.) written verbatim into the file";
+            };
+          };
+        });
+        default = [];
+        example = [
+          {
+            name = "esp32-kitchen";
+            topic = "home/kitchen";
+            yaml = "sensor:\n  - name: Kitchen Temperature\n    state_topic: home/kitchen/temp";
+          }
+        ];
+        description = ''
+          MQTT device YAML snippets. Each entry lands in
+          `configDir/mqtt-devices/<name>.yaml` (via a Nix store symlink) and is
+          loaded through `homeassistant.packages.<name> = !include` — the YAML
+          must be a complete HA package document.
+        '';
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = !dev.zigbee2mqtt.enable || cfg.mqtt.enable;
+        message = "services.ha-stack: devices.zigbee2mqtt.enable requires mqtt.enable — zigbee2mqtt publishes through the broker";
+      }
+    ];
+    warnings =
+      lib.optional (dupPorts != [])
+      "services.ha-stack: duplicate device port(s) ${lib.concatMapStringsSep ", " toString dupPorts} — check services binding the same port";
+
     services.home-assistant = {
       enable = true;
-      inherit (cfg) configDir extraComponents extraPackages;
+      inherit (cfg) configDir;
+      extraComponents = haComponents;
+      extraPackages = ps: cfg.extraPackages ps ++ extraPy ps;
       config = {
         default_config = {};
         # Reverse-proxied via nginx (ha.frieren.lan vhost from the service
@@ -156,8 +301,25 @@ in {
             };
           }
         ];
+
+        homeassistant = lib.mkIf (dev.mqttDevices != []) {
+          packages = lib.listToAttrs (map (
+              d: lib.nameValuePair d.name "!include mqtt-devices/${d.name}.yaml"
+            )
+            dev.mqttDevices);
+        };
+        zha = lib.mkIf dev.zha.enable (lib.optionalAttrs (dev.zha.radioPath != null) {
+          zigpy_config.device.path = dev.zha.radioPath;
+        });
       };
     };
+
+    systemd.tmpfiles.rules =
+      ["d ${cfg.configDir}/mqtt-devices 0755 - - - -"]
+      ++ map (d: "L+ ${cfg.configDir}/mqtt-devices/${d.name}.yaml - - - - ${
+        pkgs.writeText "ha-mqtt-${d.name}.yaml" d.yaml
+      }")
+      dev.mqttDevices;
 
     # Mosquitto MQTT broker (loopback-only, anonymous)
     services.mosquitto = lib.mkIf cfg.mqtt.enable {
@@ -169,6 +331,30 @@ in {
           settings.allow_anonymous = true;
         }
       ];
+    };
+
+    services.zigbee2mqtt = lib.mkIf dev.zigbee2mqtt.enable {
+      enable = true;
+      inherit (dev.zigbee2mqtt) dataDir;
+      settings = {
+        mqtt = {
+          base_topic = dev.zigbee2mqtt.mqttBaseTopic;
+          server = "mqtt://${cfg.mqtt.address}:${toString cfg.mqtt.port}";
+        };
+        serial = lib.mkIf (dev.zigbee2mqtt.serialPort != null) {
+          port = dev.zigbee2mqtt.serialPort;
+        };
+        frontend = {
+          host = "127.0.0.1";
+          port = dev.zigbee2mqtt.port;
+        };
+        permit_join = dev.zigbee2mqtt.permitJoin;
+      };
+    };
+
+    services.esphome = lib.mkIf dev.esphome.enable {
+      enable = true;
+      inherit (dev.esphome) port;
     };
 
     # Uptime-Kuma status dashboards

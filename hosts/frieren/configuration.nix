@@ -400,6 +400,8 @@ in {
     # telemetry is `command_line` sensors, so nothing lost the feed. The module
     # stays for the ESP32/Zigbee layer in [[exp-009]].
     mqtt.enable = false;
+    # devices.* opts in (zigbee2mqtt needs mqtt.enable on); docs: modules/services/home-assistant.nix.
+    extraPythonPackages = [];
   };
 
   # Shell-history sync (modules/services/atuin-server.nix). The one account is

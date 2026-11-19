@@ -1,8 +1,65 @@
 {
-  "generated": "2026-11-19T19:15:50Z",
+  "generated": "2026-11-19T19:57:19Z",
   "count": 200,
-  "pin": "d5c94c8f46346c4d4bc35733ea6e0706040036077237ab3dc636720661e10d85",
+  "pin": "619a1818415834b65961d8628b54a0e62839fa2ddcff29e39f99a7d0f121cc5c",
   "turns": [
+    {
+      "id": "de270991-a569-4569-9f53-73dcf62e347d",
+      "ts": "2026-11-19T19:53:01Z",
+      "source": "devin",
+      "subject": "nixconfig:ha-device-integration",
+      "action": "claim: ha-stack devices surface (zigbee2mqtt/esphome/zha/mqttDevices), extraPythonPackages ergonomics, validation",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/home-assistant.nix",
+        "hosts/frieren/"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9me104ymzyiz3gbouf0i3s"
+    },
+    {
+      "id": "f92e882b-8b1a-496f-a436-0b4df924b278",
+      "ts": "2026-11-19T19:28:53Z",
+      "source": "devin",
+      "subject": "deutsch-srs:quality-check",
+      "action": "done: full source audit — gates clean (CGO_ENABLED=0 build/vet/test, gofmt); AGENTS.md compliant (anksync read-only, no .anki2 writes); 1 real bug fixed (cli --limit silent atoi -> fatal); coverage already honest (srs 9 tests, backend queue 6, store 5 files); decks YAML verified via live import | commit 3d4fb55 pushed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9m9bc3f5eetyezup4nv9vo"
+    },
+    {
+      "id": "d1cfafe8-e4b4-4f2b-b1a8-eaee0e62754b",
+      "ts": "2026-11-19T19:26:00Z",
+      "source": "devin",
+      "subject": "deutsch-srs:quality-check",
+      "action": "claim: quality+bug sweep (build/vet/test/fmt, AGENTS compliance, scheduler/store/UI bugs)",
+      "outcome": "in_progress",
+      "claims": [
+        "/Volumes/data/projects/deutsch-srs"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9m8r2a2nkpp0fhf9e99yka"
+    },
+    {
+      "id": "6d3c9e9a-6d28-443a-afa6-a2a2aa5e9c7d",
+      "ts": "2026-11-19T19:16:01Z",
+      "source": "devin",
+      "subject": "nixconfig:cpg-fix",
+      "action": "done: chatplayground-go 8a3efd0 pushed (login LookPath guard, refresh REST-retry + Windows-helper GOOS gate, serve conversation-keyed clients); nixconfig repin 1.2.4 hash sha256-RCUKJFsN... vendorHash unchanged | gates: go build+vet+pkg/server tests PASS, frieren role eval PASS, agentsNotes.issues=[], taskfiles cpg endpoints intact",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9m6stryiz7im65y4xndq6d"
+    },
     {
       "id": "f08a9637-7ddf-4a3a-b63e-4667b39ee8e0",
       "ts": "2026-11-19T19:12:50Z",
@@ -2766,58 +2823,6 @@
       "base_commit": "2c71ebd0e74f654ef5bc4e42ea2df7d59aba79c3",
       "branch": "HEAD",
       "frame": "03h9bp0y43tqezr2li04wqyib"
-    },
-    {
-      "id": "30a0696d-e646-4662-b2c6-41910f209282",
-      "ts": "2026-11-18T10:51:56Z",
-      "source": "devji",
-      "subject": "nixconfig:resume-gist-fetch",
-      "action": "resume.json: mint the gist as a fetchurl pin (matt-resume, mutable /raw/resume.json + sha256) and have lib/matt-site.nix read that fetch; canonical() now asks the gist before the cache. Root cause of the 7 lost projects was a Nov 9 cache, not the gist: the gist held all 10 throughout. Site build rebuilt from the gist (10 projects), drift/format/checks:quick rc=0. No rollout.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2c71ebd0e74f654ef5bc4e42ea2df7d59aba79c3",
-      "branch": "main",
-      "frame": "03h9bn1801n7ea3uzhaltkpck"
-    },
-    {
-      "id": "1a9f3d7e-d6c6-4ce1-a289-49a555f483f6",
-      "ts": "2026-11-18T10:37:35Z",
-      "source": "devji",
-      "subject": "nixconfig:agy-cascade-oauth",
-      "action": "Reverted both nightly agy cascades (frieren 03:00/05:00, delphi) from Tier 1 agy-gemini/Hydrogen to plain agy on the OAuth account route with gemini-3.8-flash: the API key free tier (~20 req/day) ends an agentic sweep with quota_exceeded. checks:host frieren + delphi rc=0, checks:quick rc=0, prose-budget record moved with the skill edit; pushed c0598adb.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c0598adbf7f7821771b3c6593848b606a3541ecf",
-      "branch": "main",
-      "frame": "03h9bk87fcjfic7xmgn0hvx4b"
-    },
-    {
-      "id": "d48d7949-1247-4a9b-92cd-559094c299f3",
-      "ts": "2026-11-18T10:27:18Z",
-      "source": "antigravity",
-      "subject": "frieren:daily-audit-2026-11-18",
-      "action": "Completed 2026-11-18 health audit: cleared failed restic-burgernas unit, verified sentinel ok, updated SYSTEM.md and HANDOFF.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f36d7a4126be015deadab353388bea96ef5f8ca4",
-      "branch": "main",
-      "frame": "03h9bi7ymvi8sx6dekjk3zjnz"
-    },
-    {
-      "id": "c62b485f-bfc4-4ad2-b0a0-b1bf52df8286",
-      "ts": "2026-11-18T10:22:30Z",
-      "source": "devji",
-      "subject": "nixconfig:turns-fusion-plane",
-      "action": "turn fusion loaded on frieren (200/33/118/229); pin refresh moved to pre-commit; delphi graph page awaits CI 44283420690",
-      "outcome": "blocked: delphi aarch64 closure not yet in cache",
-      "claims": [],
-      "files": [],
-      "base_commit": "f36d7a4126be015deadab353388bea96ef5f8ca4",
-      "branch": "main",
-      "frame": "03h9bha89dtvbps7armpjjudw"
     }
   ]
 }

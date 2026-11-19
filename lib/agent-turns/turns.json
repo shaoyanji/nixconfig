@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T15:55:37Z",
+  "generated": "2026-11-19T16:00:19Z",
   "count": 200,
-  "pin": "1845f011911ecfcbfda07633ea534adb4346be2fe9b6cfcef2f23994ead67e4f",
+  "pin": "e8920e9e0bd117b15b7d07008499076ed989ea380f8d321e7527dbab178c4801",
   "turns": [
+    {
+      "id": "582fa8d7-eed3-4163-9f9d-bb9f73bf4a53",
+      "ts": "2026-11-19T15:59:08Z",
+      "source": "devin",
+      "subject": "nixconfig:kg-elixir-decision",
+      "action": "claim: keep-or-kill kgElixirRootCleanup + Elixir remnant sweep",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/roles/minimal.nix"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9l4c8snouliazfo7zap1hz"
+    },
+    {
+      "id": "0f24d16b-afcd-40c4-b42a-a881ed1a99f8",
+      "ts": "2026-11-19T15:55:51Z",
+      "source": "devin",
+      "subject": "nixconfig:modules-dendritic",
+      "action": "landed: zen->aria2 sideways import moved to browser feature; sops verified single-sourced (paths.sh canonical->mirror, 63 keys identical); dead sops.nix comment removed; AGENTS.md direction rule written | gate: nixFileRegistry 0 dup/dangling + frieren.role + hooks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9l3p5813fnkrtmf3v8tm2n"
+    },
     {
       "id": "5fad2d04-c534-441a-96e4-e86cfad8d506",
       "ts": "2026-11-19T15:50:34Z",
@@ -2781,32 +2809,6 @@
       "base_commit": "9c71c419fcb421b9414cd75d75fbb520b063d12a",
       "branch": "main",
       "frame": "03h94nekfymdm9xu7uvxot9ll"
-    },
-    {
-      "id": "72beace7-5658-4f32-ad69-4296f43af3ee",
-      "ts": "2026-11-17T13:21:37Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-17: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 398 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h94mz1wi8jspnaeydws1wek"
-    },
-    {
-      "id": "e32009eb-60b7-4d9d-b36a-9440f27f83ca",
-      "ts": "2026-11-17T13:18:44Z",
-      "source": "devji",
-      "subject": "nixconfig:router",
-      "action": "Preamble read order names router + memory ordered by authority (pushed 1f2e630e); router skill materialization on frieren blocked: local build refused (DNS resolver), REMOTE_BUILD=1 needs a warm cache",
-      "outcome": "blocked: needs infra:warm:host:frieren or the 04:00 autoUpgrade",
-      "claims": [],
-      "files": [],
-      "base_commit": "1f2e630eb9ccd6fb5555d6d2aa8be27ca8eb72dc",
-      "branch": "main",
-      "frame": "03h94mew8x6idbqvcdaiqkmq4"
     }
   ]
 }

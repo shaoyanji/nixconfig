@@ -830,14 +830,13 @@
         darwin evaluation no longer fails there.
 
         Measured 2026-11-19 from frieren: `ALLOW_PRESERVED=1 task checks:host HOST=cassini
-        MODE=eval` fails in 0.48 s on `modules/global/macos.nix` — "unsupported attribute
-        `home-manager' (namely: home-manager nix-homebrew users)", the darwin module checker
-        refusing top-level definitions. Moving those three under `config = { ... }` cleared
-        that error and exposed the next one:
-        error: The option `services.journald' does not exist. Definition values:
-        so a Linux-shaped module also reaches the macOS chain. Both faults are chain-level, not AI-module, and each fix uncovers the
-        next — which is why this is IN FLIGHT rather than closed. The halfway change was
-        reverted: it did not format and did not make the gate pass.
+        MODE=eval` fails in 0.48 s before reaching the AI module — "unsupported attribute
+        `home-manager' (namely: home-manager nix-homebrew users)" in
+        `modules/global/macos.nix`, the darwin checker refusing top-level definitions.
+        Moving those three under `config = { ... }` cleared that error and exposed the
+        next: the option `services.journald` does not exist on darwin, so a Linux-shaped
+        module reaches the macOS chain too. Both faults are chain-level, and the halfway
+        change was reverted because it neither formatted nor made the gate pass.
 
         Exit: `task checks:host HOST=<one> MODE=eval` is green (or explicitly expected-red),
         run by the owner when the hardware is powered on. Verification of a dormant host is

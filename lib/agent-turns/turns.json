@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T14:40:44Z",
+  "generated": "2026-11-19T14:41:40Z",
   "count": 200,
-  "pin": "98a831e80db45c70306f1724d0e669f8d16e8936f18c80cca6c4ad4787f8550a",
+  "pin": "4dd2dbb6d3ac3c7798e3648822d99546b84c01a8f626408b4bb50934befbf277",
   "turns": [
+    {
+      "id": "4ea31381-92bc-4062-aaab-534cacc57129",
+      "ts": "2026-11-19T14:40:51Z",
+      "source": "buffy",
+      "subject": "nixconfig:dormant-host-gates",
+      "action": "Audited open notes: no kind=open IN FLIGHT remained, so I advanced dormant-host-gates P0 instead. Its cassini claim was stale (freebuff-remote already gated on isLinux); ALLOW_PRESERVED=1 checks:host cassini fails in 0.48 s on services.journald from modules/global/global.nix. A config wrap only moved the error and broke formatting, so it was reverted. Note OPEN -> IN FLIGHT with both faults quoted; format, checks:quick and agentsNotes.ok green.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ce8131aa2c336a88606b6861d8498d692cf0b8aa",
+      "branch": "main",
+      "frame": "03h9kp1qdb9jl6dnyfug6k6hw"
+    },
     {
       "id": "e1f558fb-d7a8-4742-8441-527ad1cbda81",
       "ts": "2026-11-19T14:38:26Z",
@@ -2808,19 +2821,6 @@
       "base_commit": "2dd44961660cac0ac742e64f12e43aebc597939e",
       "branch": "main",
       "frame": "03h92y8kvpsxy65h68bcaqrm8"
-    },
-    {
-      "id": "26bc3616-34b9-4a74-afb6-0acc0ab60fe5",
-      "ts": "2026-11-17T08:01:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:issue-classes",
-      "action": "nixcachix kills classed as trust not capacity: numtide key on all four blocks, docs/issue-classes.md is the standard, pushed 4831b449 (earlier identical turn went out with source=devji)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4831b449309568cd2d7dd2df3079ad42266d0d49",
-      "branch": "main",
-      "frame": "03h92wenvobvfkeolthajnoei"
     }
   ]
 }

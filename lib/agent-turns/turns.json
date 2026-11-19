@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T16:52:20Z",
+  "generated": "2026-11-19T16:55:00Z",
   "count": 200,
-  "pin": "465a3f6d479ab33ddd458bf7e491301d70da7ff803cb24e388370537a88e167b",
+  "pin": "f176693ff928b5ea3d3c18c2cb8bda2694ea06a4222c625eb0ec65d6cb1edb2e",
   "turns": [
+    {
+      "id": "0bc71034-06b3-4439-9aae-8412a81b2f5a",
+      "ts": "2026-11-19T16:52:31Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-closures",
+      "action": "first slash landed: tomlq out of user/base -> pkgs.txt (zero callers, yq-go is the documented TOML tool) | gate: parse + frieren.role + hooks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c2d6806ba82c5106b9db6ffbba4a0e2cbb9723e7",
+      "branch": "HEAD",
+      "frame": "03h9lerp8dzlq5ccb1xjqiph1"
+    },
     {
       "id": "a5721ad3-bb8a-4b20-8e00-c085a95665de",
       "ts": "2026-11-19T16:49:18Z",
@@ -2804,19 +2817,6 @@
       "base_commit": "583c31baf5e34860c15b19e6b1158d52a050a10e",
       "branch": "main",
       "frame": "03h94y91zxbcn33hm92cwwe3q"
-    },
-    {
-      "id": "27fa1a99-2740-4e73-949d-f1e3418c53c3",
-      "ts": "2026-11-17T14:16:37Z",
-      "source": "devji",
-      "subject": "nixconfig:ontology-tasks",
-      "action": "Followups: routes edges carry row label (ops:kg:task reverse query), checks:task-descs gate (desc or summary, 761 tasks), docs/generated/task-surface.md from the same nodes; checks quick/kg/task-descs/router/ontology/policies green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "65be408341d5636b3f89029929d0a025112612c8",
-      "branch": "main",
-      "frame": "03h94xq1osvwwjaxsk533h294"
     }
   ]
 }

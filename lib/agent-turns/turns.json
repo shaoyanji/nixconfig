@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-19T21:27:42Z",
+  "generated": "2026-11-19T21:45:27Z",
   "count": 200,
-  "pin": "039111b35adb4fb3303076e26d910927d31116125cba084bd987bde0fc9148f7",
+  "pin": "2ab080c14c0f7735c1efc234b89d8fd4368d79c5bab4c3b8a458d6dde675859d",
   "turns": [
+    {
+      "id": "93c7a566-177e-4f5a-9824-f44a27367670",
+      "ts": "2026-11-19T21:44:02Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-19: 0 plate(s) kept of 2 spent, 5 roster row(s) waiting, 535 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "637f93f5d3a1476a283e89d268d899347d771a56",
+      "branch": "main",
+      "frame": "03h9mzps9w9bt3luwbitufdlc"
+    },
+    {
+      "id": "8c420594-ab59-4f5c-83cd-516a95df9ba2",
+      "ts": "2026-11-19T21:38:11Z",
+      "source": "buffy",
+      "subject": "freebuff:cpg-wallpapers",
+      "action": "Claiming the wallpaper generation pass: checking the daily image allowance, then generating the 13 missing 2026-11-19 wall plates and publishing them.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "637f93f5d3a1476a283e89d268d899347d771a56",
+      "branch": "main",
+      "frame": "03h9myklgfphn3nq771gt423h"
+    },
+    {
+      "id": "cd32624c-fdc8-438f-a93d-efa438f1a2a9",
+      "ts": "2026-11-19T21:27:53Z",
+      "source": "devin",
+      "subject": "nixconfig:wiki-cleanup",
+      "action": "landed: wiki-ask wrapper for stats + one-jq epistemics gate in ask | gate: live ask run (abstain verdict), jq gate 3-case test, kg-check, census 6537/6539 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "637f93f5d3a1476a283e89d268d899347d771a56",
+      "branch": "main",
+      "frame": "03h9mwk68zgukxrt6xnakv33e"
+    },
     {
       "id": "e2732e06-0b89-4f2e-90e3-173b40ce54bb",
       "ts": "2026-11-19T21:26:08Z",
@@ -2795,45 +2834,6 @@
       "base_commit": "27644194e83bd62786d3743f3dfe45375fa5857c",
       "branch": "main",
       "frame": "03h9ddhzv7ukb8l62v2n197x0"
-    },
-    {
-      "id": "23fe588b-0a9e-46fa-a3ef-efbb578b5e53",
-      "ts": "2026-11-18T16:06:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:secrets-stamp-infron-helper",
-      "action": "secrets.nu and bash now skip only when NU_SECRETS_STAMP matches the cache's stat stamp, so an inherited marker reloads (verified: matching->0, stale->51, no stamp->51 in both shells). New scripts/infron-chat.sh installed as infron: deepseek-v4-flash-0731:free primary, qwen3.8-27b:free on 429/5xx/timeout/empty, non-free ids refused rc=2; stub fallback, both-fail and a live call tested; checks:host frieren rc=0, census 6540.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8a3c3b5b13bd35567675868013fe8a45ccd1cb84",
-      "branch": "main",
-      "frame": "03h9dcio10h0c7o6wx32ltth2"
-    },
-    {
-      "id": "386fa205-35fb-4a43-bb1e-f96dacf62745",
-      "ts": "2026-11-18T16:00:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:infron-shell-env",
-      "action": "INFRON_API_KEY now in secrets.nu's map, so nushell and bash both export it with the rest (loaders share the JSON cache): verified infron_len=51 in nu and in a bash cache load, 34 keys cached. Bash's cache guard moved off GEMINI_API_KEY onto NU_SECRETS_LOADED. docs/NUSHELL.md count updated; checks:host frieren and checks:prose rc=0.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "465cdcaa55196a6e95b164522336555754dc3f30",
-      "branch": "main",
-      "frame": "03h9dbabao3dkf46jvddocgj1"
-    },
-    {
-      "id": "c1f8ce7e-f8a2-4a9d-a93c-3b31c3192efc",
-      "ts": "2026-11-18T15:51:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:minuet-chat-fim",
-      "action": "minuet now has openai_compatible for llm.onerouter.pro/v1/chat/completions on deepseek/deepseek-v4-flash-0731:free, chosen at setup when INFRON_API_KEY is present, local eisen FIM otherwise; kickstart.nixvim 45c063b, nixconfig pin bumped with nixvim b67578f, checks:host penguin rc=0. Infill confirmed unavailable: /completions 404 for deepseek free, qwen free rejects suffix (400), /beta/completions 405.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ee7802a36baaf6d82abe3c7dea9bbdf18c6cf84f",
-      "branch": "main",
-      "frame": "03h9d9jr4sugfy1kj8vkn3saa"
     }
   ]
 }

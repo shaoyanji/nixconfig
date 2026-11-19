@@ -170,7 +170,7 @@ tasks:
       day, `DRY=1` prints what would be added. A round approves its own keeps, so
       the nightly slots keep the rotation current unless `APPROVE=0`.
     cmds:
-      - IMAGES_ROOT={{.IMAGES_ROOT}} DAY="{{if .DAY}}{{.DAY}}{{end}}" bash scripts/task/image-daily.sh approve
+      - IMAGES_ROOT={{.IMAGES_ROOT}} DAY="{{if .DAY}}{{.DAY}}{{end}}" DRY="{{if .DRY}}{{.DRY}}{{end}}" bash scripts/task/image-daily.sh approve
 
   images:wallpaper:
     desc: Set the first in-rotation wallpaper with swaybg (a dwl session's rotation)

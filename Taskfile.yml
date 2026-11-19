@@ -47,8 +47,9 @@ includes:
     # home-manager symlink chain, which made task load a include cycle
     # ("include cycle detected … Taskfile.yml <--> Taskfile.yml", exit 110)
     # and broke every root-level `task` run.
-    # services.yml flatten-includes services-core/legacy themselves — do not
-    # include those two here or every services:* task would be defined twice.
+    # The services:* compat surface is two shards included directly below —
+    # core holds the canonical wrappers, legacy the wildcard aliases that a
+    # Task `aliases:` entry cannot express.
     # dir: . keeps tasks in the repo root even when invoked via the
     # ~/Taskfile.yml forwarder from $HOME.
     agents:
@@ -155,8 +156,12 @@ includes:
         taskfile: taskfiles/serv00.yml
         dir: .
         flatten: true
-    services:
-        taskfile: taskfiles/services.yml
+    services-core:
+        taskfile: taskfiles/services-core.yml
+        dir: .
+        flatten: true
+    services-legacy:
+        taskfile: taskfiles/services-legacy.yml
         dir: .
         flatten: true
     vox:

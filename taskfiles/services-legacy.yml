@@ -1,6 +1,6 @@
 version: "3"
 
-# Deprecated / compatibility names for the services:* layer.
+# Deprecated wildcard aliases for the services:* layer.
 #
 # The rebuild aliases (nixos-rebuild, darwin-rebuild, home-manager-switch,
 # wsl-rebuild, orb-rebuild) are NOT declared here any more — they are `aliases:`
@@ -9,12 +9,12 @@ version: "3"
 # agent-facing contract.
 #
 # The wildcard wrappers below cannot become aliases: a Task alias is a plain
-# name and cannot carry a `*`, so these stay as tasks.
+# name and cannot carry a `*`, so these stay as tasks. Named compat entries
+# (services:deploy:<host>, push-*-rebuild, the thinsandy tombstones, the menu
+# shims) had zero callers in scripts, docs or other taskfiles and were removed —
+# `switch:*`/`boot:*` cover the compat surface generically.
 
 tasks:
-  # Removed: pre-hook-rebuild (broken - services:rebuild:pre-hook doesn't exist)
-  # Use infra:rebuild:* directly instead
-
   switch:*:
     desc: "[deprecated] Alias for infra:switch:*"
     vars:
@@ -28,65 +28,3 @@ tasks:
       OS: '{{index .MATCH 0}}'
     cmds:
       - task infra:boot:{{.OS}}
-
-  # Removed: prb:* (redundant - creates circular routing through services layer)
-  # Use infra:deploy:host:* directly instead
-
-  services:deploy:rpi:
-    desc: Deploy configured Raspberry Pi host
-    cmds:
-      - task infra:deploy:host:{{.PI}}
-
-  push-rpi-rebuild:
-    desc: "[deprecated] Alias for infra:deploy:host:{{.PI}}"
-    cmds:
-      - task infra:deploy:host:{{.PI}}
-
-  services:deploy:thinsandy:
-    desc: "[removed] thinsandy host was decommissioned (NAS role moved to frieren)"
-    cmds:
-      - echo "thinsandy was decommissioned; use task infra:deploy:host:frieren" && exit 1
-
-  push-thin-rebuild:
-    desc: "[removed] Alias for the decommissioned thinsandy host"
-    cmds:
-      - echo "thinsandy was decommissioned; use task infra:deploy:host:frieren" && exit 1
-
-  services:deploy:mtfuji:
-    desc: Deploy mtfuji host
-    cmds:
-      - task infra:deploy:host:mtfuji
-
-  # Cannot be an alias: infra:deploy:host:mtfuji is matched by the
-  # infra:deploy:host:* wildcard, and a Task alias cannot carry a wildcard.
-  push-fuji-rebuild:
-    desc: "[deprecated] Alias for infra:deploy:host:mtfuji"
-    cmds:
-      - task infra:deploy:host:mtfuji
-
-  services:deploy:menu:
-    desc: Compatibility alias for infra:deploy:menu
-    cmds:
-      - task infra:deploy:menu
-
-  rebuild:
-    desc: "[deprecated] Legacy rebuild menu - use infra:rebuild:* or infra:deploy:* directly"
-    cmds:
-      - |
-        choice=$(
-          {
-            printf '%s\n' infra:rebuild:nixos infra:rebuild:darwin infra:rebuild:home-manager infra:rebuild:wsl infra:rebuild:orb
-            printf '%s\n' "infra:deploy:host:{{.PI}}"
-            printf '%s\n' infra:deploy:host:garnixMachine infra:deploy:host:mtfuji infra:deploy:host:frieren infra:deploy:host:kellerbench infra:deploy:host:deckstation
-            printf '%s\n' exit
-          } | awk '!seen[$0]++' | gum choose
-        )
-        case "$choice" in
-          infra:rebuild:*) NOM=1 task "$choice" ;;
-          *) task "$choice" ;;
-        esac
-
-  services:logs:menu:
-    desc: Compatibility alias for infra:logs:menu
-    cmds:
-      - task infra:logs:menu

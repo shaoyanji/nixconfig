@@ -14,15 +14,15 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/codespace.yml` owns GitHub Codespaces as a mode (`codespace:*`) for work that runs in someone else's remote devcontainer: the file transport `gh codespace cp` cannot do, a push that happens on the host holding the git auth, a reset for the post-rewrite clone, and a stop that waits for `Shutdown`.
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/instabox.yml` owns InstaBox machines (`instabox:*`) as a dependency-free surface: the HTTP API with the sops key, an SSH token minted through it for a plain `ssh`, and `exec` when no shell is needed. Skill: `.agents/skills/instabox`.
-- `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` provide legacy compatibility wrappers routing to canonical `infra:*` tasks.
+- `taskfiles/services-core.yml` holds the canonical `services:*` wrappers (`services:validate:*`, `services:record:*`, `services:rollback:*`, `services:evidence:*`) that route to `infra:*`; `taskfiles/services-legacy.yml` is the deprecated wildcard-alias layer (`switch:*`, `boot:*` — a Task `aliases:` entry cannot carry `*`).
 - Rebuild flags have exactly one home: `scripts/task/rebuild-flags.sh` renders
   builders / substitutes / flakes and nothing else, so a switch task states the host and
   the flake ref, never a flag. [[flake/policies.nix#rebuild-flags-are-finite]]
 - `taskfiles/data.yml` is the canonical NAS surface (`data:*`) for the `/Volumes/data` taxonomy, hygiene, permissions and the portable tool library.
 - `taskfiles/lifecycle.yml` owns host commissioning and decommissioning (`lifecycle:*`), which is provisioning a host, not operating one.
 - `taskfiles/mail.yml` owns forwarding aliases on the ImprovMX domain (`mail:*`): a disposable address per service, its declared expiry in `modules/config/mail-aliases.toml`, and the drift check between the two. It needs the network and a sops key, so it is operator surface, never a build gate.
-- `taskfiles/services.yml` is an include-only aggregator: it flattens `services-core.yml` and `services-legacy.yml` and declares no tasks of its own.
-  [[flake/policies.nix#taskfiles-aggregators-declare-nothing]]
+- **Format convention:** taskfiles are YAML (`task` reads nothing else), inventories are TOML (`checks.toml`, `modules.toml`, `inventory.toml`, `closure-budgets.toml` — parsed by `builtins.fromTOML`), and machine manifests are JSON (`site-manifest.json`, read by `scripts/task/site-target.sh`). One format per role; there is no second parser to keep honest.
+- **When a new shard is warranted:** a taskfile owns one `namespace:*` over one domain (a host family, a service, a plane). Add a file when the namespace is new *and* has a script or skill behind it; add a task to an existing shard when the namespace already exists. An include-only aggregator is never a file — `Taskfile.yml` lists every shard directly, so the include graph is the ownership map.
 - The task surface is also the **edge caller's tool set**: `agents:call` derives its tools
   from `scripts/task/lib/taskfile_graph.py by-name`, so a callable verb is a task, not a second registry. Read-only
   verbs prefetch on any validated call (TOON out), the graph repairs the argument's type,
@@ -54,10 +54,9 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/data.yml` – NAS storage taxonomy and hygiene, permissions, media unindexing, portable tool library (`data:*`)
 - `taskfiles/lifecycle.yml` – commissioning a new host, decommission audit and cleanup (`lifecycle:*`)
 - `taskfiles/mail.yml` – ImprovMX forwarding aliases: temporary per-service addresses, expiry pruning, registry drift (`mail:*`), implemented by `scripts/task/mail-alias.sh`
-- `taskfiles/services.yml` – include-only aggregator for `services-core.yml` + `services-legacy.yml` (no tasks declared here)
 - `taskfiles/ops.yml` – sentinel/ledger, compiled skill index, knowledge graph, document budgets, eval benchmarks
-- `taskfiles/services-core.yml` – minimal compatibility wrappers
-- `taskfiles/services-legacy.yml` – deprecated aliases (marked `[deprecated]`)
+- `taskfiles/services-core.yml` – canonical `services:*` wrappers routed to `infra:*`
+- `taskfiles/services-legacy.yml` – deprecated wildcard aliases (`switch:*`, `boot:*`)
 
 ## Truth boundaries
 - `taskfiles/site-manifest.json` is the site/static deployment metadata source; query it through `scripts/task/site-target.sh` or `dev:site:*` wrappers.

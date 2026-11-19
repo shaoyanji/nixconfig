@@ -792,13 +792,6 @@
       detail = "the edge-caller path lost its derived tool set, its read-only prefetch allowlist, its confidence bands, its graph-side type repair, its telemetry opt-out, its battery gate, or the task that exposes it";
     };
 
-    taskfiles-aggregators-declare-nothing = {
-      rule = "An include-only shard is `version:` plus `includes:` and nothing else: `taskfiles/services.yml` flattens `services-core.yml` and `services-legacy.yml` so `services:*` resolves through one file. A task declared in the aggregator is invisible to the ownership map and vanishes the moment the file is read as a flatten of its children, which is why the rule is a predicate instead of a sentence stated twice.";
-      proof = "taskfiles/services.yml · taskfiles/README.md";
-      holds = !(lib.hasInfix "tasks:" (read "taskfiles/services.yml"));
-      detail = "taskfiles/services.yml grew a `tasks:` section — declare it in services-core.yml or services-legacy.yml";
-    };
-
     channels-have-a-task = {
       rule = "Every discovery channel keeps an entry point: a fleet fact is read with `task dev:inventory:feed`, a note with `ops:notes:show`, a durable doc with `docs:build`, and a rule with the policy check. A category with no entry point is a fact nobody can reach, which is how prose becomes the only home.";
       proof = "taskfiles/dev.yml (inventory:feed, docs:build), taskfiles/ops.yml (ops:notes:show), flake/checks.nix (policyFailures)";

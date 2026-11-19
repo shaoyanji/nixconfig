@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T16:08:13Z",
+  "generated": "2026-11-19T16:15:40Z",
   "count": 200,
-  "pin": "3e2e1981ccc8798349a7db0d044b104de1193f9251025bc5d0da2e1fa885fabd",
+  "pin": "1b30e8dd78a71d50acba0ecb70cdb605193d9347902fd27e4ca8cf48688aa255",
   "turns": [
+    {
+      "id": "b52fd316-53b1-4a49-a609-cee64d890820",
+      "ts": "2026-11-19T16:11:20Z",
+      "source": "devin",
+      "subject": "nixconfig:taskfile-dendritic",
+      "action": "claim: taskfile survey + desloppify (check/checks triangle, services aggregator, format unification)",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ Taskfile.yml"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9l6q1os1439s0qplmlo2z7"
+    },
+    {
+      "id": "5f08c641-320f-4218-af7b-edf738558789",
+      "ts": "2026-11-19T16:08:27Z",
+      "source": "devin",
+      "subject": "nixconfig:agents-nix-audit",
+      "action": "landed: notes audit 235->183 | KILL 52 bulk exp-* PROPOSED design studies | CLOSED 18 (verified prototypes + concluded analyses) | KEEP 165 | gate: agentsNotes.issues=[], frieren.role eval, pre-commit+pre-push PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b2974abce2c72476a13d10de917bd59631029b5",
+      "branch": "HEAD",
+      "frame": "03h9l65sj8c90177wtwyhuimt"
+    },
     {
       "id": "8461a25c-f765-408f-aee4-b95e59864e44",
       "ts": "2026-11-19T16:03:24Z",
@@ -2785,32 +2813,6 @@
       "base_commit": "14212527d5bbe4a4bf673604ee54a40016e9fbcb",
       "branch": "main",
       "frame": "03h94tippi1fbai5og5xut6xv"
-    },
-    {
-      "id": "db413a0e-38a4-42a8-ab98-7b8ec77f0a47",
-      "ts": "2026-11-17T13:52:09Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-17: 17 plate(s) kept of 20 spent, 3 roster row(s) waiting, 415 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h94sxrx5brfbj871qkxxiho"
-    },
-    {
-      "id": "4e8a16de-74b9-477d-8888-7ae942c95291",
-      "ts": "2026-11-17T13:45:55Z",
-      "source": "devji",
-      "subject": "nixconfig:router",
-      "action": "Router runthrough: playbooks 372->24 lines, SKILL body 125->65, gate now reads table rows (proved failing), preamble memory block halved; pushed 52d8c550",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "52d8c55001f435144e53d312d1b9e65ee5c3e71a",
-      "branch": "main",
-      "frame": "03h94rpyvg063yw784s9epz5i"
     }
   ]
 }

@@ -260,7 +260,13 @@
         if QROW="$(curl -fsS --max-time ${toString cfg.queueProbe.timeoutSeconds} "${cfg.queueProbe.url}" 2>/dev/null \
           | jq -c '(if type == "array" then .[0] else . end) // empty' 2>/dev/null)" \
           && [ -n "$QROW" ]; then
-          QUEUE_JSON="$QROW"
+          QUEUE_JSON="$(printf '%s' "$QROW" | jq -c '{
+            open_person: (.openPerson // .open_person // 0),
+            open_action: (.openAction // .open_action // 0),
+            unmatched_fresh: (.unmatchedFresh // .unmatched_fresh // 0),
+            newest_mail_age_h: (.newestMailAgeH // .newest_mail_age_h // 0),
+            prior_week_mails: (.priorWeekMails // .prior_week_mails // 0)
+          }')"
           qnum() { printf '%s' "$QUEUE_JSON" | jq -r --arg k "$1" '.[$k] // 0'; }
           Q_PERSON="$(qnum open_person)"
           Q_ACTION="$(qnum open_action)"
@@ -493,10 +499,12 @@ in {
         type = lib.types.str;
         default = "";
         description = ''
-          HTTP endpoint answering one JSON object of mail-queue counts in the
-          shape `open_person`, `open_action`, `unmatched_fresh`,
+          HTTP endpoint answering one JSON object of mail-queue counts:
+          `open_person`, `open_action`, `unmatched_fresh`,
           `newest_mail_age_h`, `prior_week_mails` — the archive's own
-          `/api/queue-health`. Empty records `queue: null` and never degrades,
+          `/api/queue-health`. Keys are read in the API's camelCase as well as
+          snake_case, because NpgsqlRest camelCases every column it projects.
+          Empty records `queue: null` and never degrades,
           so a host without a mail queue needs no configuration. A watched unit
           that exited 0 says the timer fired; these counts are what says the
           queue moved, so "the queue stopped draining" arrives as a page rather

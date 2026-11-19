@@ -1,8 +1,24 @@
 {
-  "generated": "2026-11-19T12:30:56Z",
+  "generated": "2026-11-19T12:33:09Z",
   "count": 200,
-  "pin": "f706895e354cec56fe3e7eacb5f12f3f902ea6cd5c10a4f9c84fc2ea7670c861",
+  "pin": "f6bf2cf586fe589bafa4dda5dcea0bb332b9ddf0eb69ec9b86489c0bed654aa7",
   "turns": [
+    {
+      "id": "06cb4d62-b04c-491b-aa0c-d3b993af6b14",
+      "ts": "2026-11-19T12:32:25Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 24: agy updated 30 pipeline rows (apps:triage-update done, Apply/Monitor/Pass/Expired, verified 30/30). Now researching Monitor-group leads (Parloa, evoila, Workato, Octopus, Castle Tech). freebuff on LoopCV (extracting auto-apply loop cards via CDP). devin on M5 ablation. delphi on email archive verification.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
+      "branch": "main",
+      "frame": "03h9jzyj1oy893rhl3ttnlcge"
+    },
     {
       "id": "18e3677e-3e9b-4e93-bdd7-5debdddcf12f",
       "ts": "2026-11-19T12:25:34Z",
@@ -2776,19 +2792,6 @@
       "base_commit": "e327f0f745097af9760d18e65d9cbb15a964efa1",
       "branch": "main",
       "frame": "03h8wjci74yrztrxnmy7xh4q2"
-    },
-    {
-      "id": "20412f0b-b14d-45b2-a9b6-779f380fdba3",
-      "ts": "2026-11-16T12:26:30Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-archetype",
-      "action": "audited all 269 plate rows as adult women, rendered on archetypes, removed 4 male rows, gated arch+form at the row, 350 assets published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e327f0f745097af9760d18e65d9cbb15a964efa1",
-      "branch": "main",
-      "frame": "03h8wiwstlpkhlr71yi1f3aow"
     }
   ]
 }

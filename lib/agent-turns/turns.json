@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T14:41:40Z",
+  "generated": "2026-11-19T14:46:44Z",
   "count": 200,
-  "pin": "4dd2dbb6d3ac3c7798e3648822d99546b84c01a8f626408b4bb50934befbf277",
+  "pin": "13a10104b8d0e10c7caed6ccf2195480b7ccdc570f42c6d9534c1775970afd18",
   "turns": [
+    {
+      "id": "764ba459-6316-4836-8121-42b2e8f8bdab",
+      "ts": "2026-11-19T14:44:17Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-fallback",
+      "action": "corrected: nemotron failover moved off openrouter (wallet-capable route) onto nvidia NIM integrate.api.nvidia.com dev tier — no wallet exists to bill; chain is now infron :free x2 -> NIM nemotron-3.5-super-vl-120b-a12b -> ollama-cloud nemotron-3-ultra, zero wallet routes; openrouter verified is_free_tier, billed $0 | live: deepseek 429 -> qwen 429 -> NIM answered | gate: checks:infron PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "340a2a5526b9fee31108d717c98c0f14fee6f3bd",
+      "branch": "main",
+      "frame": "03h9kppvrj3lfkb83pdnbt5by"
+    },
     {
       "id": "4ea31381-92bc-4062-aaab-534cacc57129",
       "ts": "2026-11-19T14:40:51Z",
@@ -2808,19 +2821,6 @@
       "base_commit": "2dd44961660cac0ac742e64f12e43aebc597939e",
       "branch": "main",
       "frame": "03h9317ep8mi5drpp6maoi0b7"
-    },
-    {
-      "id": "6a8d53f9-2c4e-48af-aa17-3c452fea9d31",
-      "ts": "2026-11-17T08:10:42Z",
-      "source": "buffy",
-      "subject": "nixconfig:issue-ledger",
-      "action": "policy gate prints the four classes with their proofs and agents:xs:post CLASS= writes the ledger; 2722 paths were refused as unsigned on x86 and 2423 on arm before the numtide key line",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2dd44961660cac0ac742e64f12e43aebc597939e",
-      "branch": "main",
-      "frame": "03h92y8kvpsxy65h68bcaqrm8"
     }
   ]
 }

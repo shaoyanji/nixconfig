@@ -818,10 +818,10 @@
       status = "IN FLIGHT";
       priority = "P0";
       date = "2026-11-19";
-      summary = "Both hosts are `preserved` and undeployed. `minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`, 2026-10-19); `cassini`'s gate is now measured and fails on two chain faults, not on `freebuff-remote`.";
+      summary = "Both hosts are `preserved` and undeployed. `minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`, 2026-10-19); `cassini`'s gate is measured now, and its two faults are a module-checker shape and a Linux block in the shared base chain — not `freebuff-remote`.";
       refs = {
         hosts = ["minyx" "cassini"];
-        modules = ["modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix" "hosts/minyx/configuration.nix" "hosts/cassini/configuration.nix" "modules/global/macos.nix"];
+        modules = ["modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix" "hosts/minyx/configuration.nix" "hosts/cassini/configuration.nix" "modules/global/macos.nix" "modules/global/global.nix"];
         tasks = ["checks:host"];
       };
       body = ''
@@ -829,14 +829,27 @@
         wraps `xdg.desktopEntries` in `lib.mkIf pkgs.stdenv.hostPlatform.isLinux`, so the
         darwin evaluation no longer fails there.
 
-        Measured 2026-11-19 from frieren: `ALLOW_PRESERVED=1 task checks:host HOST=cassini
-        MODE=eval` fails in 0.48 s before reaching the AI module — "unsupported attribute
-        `home-manager' (namely: home-manager nix-homebrew users)" in
-        `modules/global/macos.nix`, the darwin checker refusing top-level definitions.
-        Moving those three under `config = { ... }` cleared that error and exposed the
-        next: the option `services.journald` does not exist on darwin, so a Linux-shaped
-        module reaches the macOS chain too. Both faults are chain-level, and the halfway
-        change was reverted because it neither formatted nor made the gate pass.
+        Measured 2026-11-19 from frieren with
+        `ALLOW_PRESERVED=1 task checks:host HOST=cassini MODE=eval` (0.5-0.7 s to fail).
+        Two faults, in the order the evaluator reports them:
+
+        1. `modules/global/macos.nix` defines `home-manager`, `nix-homebrew` and `users`
+           at the top level of the module; nix-darwin's checker rejects that as an
+           unsupported attribute. Moving the three under an explicit `config = { ... }`
+           clears it and the eval then reaches fault 2 — so the shape is right, but that
+           edit cannot land alone.
+
+        2. `modules/global/global.nix` defines `services.journald.settings.Journal` and
+           `systemd.*`, which do not exist on nix-darwin. `lib.mkIf` does not hide an
+           option path: `pushDownProperties` rewrites
+           `services = mkIf c { journald.settings.Journal = ... }` into
+           `services.journald = mkIf c { settings.Journal = ... }`, so the "does not
+           exist" check runs with the condition false. Gating the value instead failed
+           identically — both attempts were reverted.
+
+        The fix for (2) is structural: the Linux-shaped block has to leave the base
+        chain for a module only the Linux feature lists import. That is the next step,
+        and it is a chain edit plus one new registered module, not a `mkIf`.
 
         Exit: `task checks:host HOST=<one> MODE=eval` is green (or explicitly expected-red),
         run by the owner when the hardware is powered on. Verification of a dormant host is

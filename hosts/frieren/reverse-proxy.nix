@@ -350,6 +350,13 @@ in {
             add_header Cache-Control "no-store";
           '';
         };
+        locations."= /sentinel/ingest" = {
+          proxyPass = "http://unix:/run/fleet-sentinel/ingest.sock:/";
+          extraConfig = ''
+            client_max_body_size 64k;
+            proxy_set_header Host $host;
+          '';
+        };
         locations."/paste/" = {
           alias = "/var/lib/paste/";
           extraConfig = ''

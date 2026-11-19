@@ -12,6 +12,17 @@
   # Space-delimited for the shell loop below; empty is harmless (`case " " in`).
   IGNORE = lib.concatStringsSep " " cfg.ignoreFailedUnits;
 
+  ingestPackage = pkgs.buildGoModule {
+    pname = "fleet-sentinel-ingest";
+    version = "0.1.0";
+    src = ./fleet-sentinel-ingest;
+    vendorHash = null;
+    meta = {
+      description = "Bearer-checked UNIX-socket receiver for pushed sentinel status";
+      mainProgram = "fleet-sentinel-ingest";
+    };
+  };
+
   collect = pkgs.writeShellApplication {
     name = "fleet-sentinel-collect";
     runtimeInputs = with pkgs; [coreutils gnugrep gawk jq systemd findutils curl];
@@ -221,6 +232,28 @@
         fi
       ''}
 
+      PEERS_JSON="{}"
+      ${lib.optionalString cfg.ingest.enable ''
+        INCOMING="$ROOT/incoming"
+        mkdir -p "$INCOMING"
+        for f in "$INCOMING"/*.json; do
+          [ -e "$f" ] || continue
+          peer="$(basename "$f" .json)"
+          peer_state="$(jq -r '.state // "unknown"' "$f" 2>/dev/null || true)"
+          [ -n "$peer_state" ] || peer_state="unknown"
+          PEER_AGE_H="$(awk -v now="$(date +%s)" -v mtime="$(stat -c %Y "$f" 2>/dev/null || echo 0)" \
+            'BEGIN { if (mtime > 0) printf "%.1f", (now - mtime) / 3600; else print "0.0" }')"
+          PEERS_JSON="$(printf '%s' "$PEERS_JSON" | jq -c --arg k "$peer" --arg s "$peer_state" \
+            --argjson a "$PEER_AGE_H" '. + {($k): {state: $s, age_h: $a}}')"
+          if [ "$peer_state" != "ok" ]; then
+            REASONS+=("peer-degraded:$peer:$peer_state")
+          fi
+          if awk -v age="$PEER_AGE_H" -v max="${toString cfg.ingest.peerMaxAgeHours}" 'BEGIN { exit !(age > max) }'; then
+            REASONS+=("peer-stale:$peer:''${PEER_AGE_H}h")
+          fi
+        done
+      ''}
+
       # --- assemble ----------------------------------------------------------
       if [ "''${#REASONS[@]}" -eq 0 ]; then
         STATE="ok"
@@ -246,10 +279,11 @@
         --argjson mem_psi "$MEM_PSI" \
         --argjson prefill "$PREFILL_JSON" \
         --argjson audit "$AUDIT_JSON" \
+        --argjson peers "$PEERS_JSON" \
         '{schema: 1, ts: $ts, host: $host, state: $state, reasons: $reasons,
           failed_units: $failed_units, jobs: $jobs, generation_age_h: $gen_age_h,
           disk_pct: $disk, psi: {io: $io_psi, memory: $mem_psi},
-          prefill: $prefill, audit: $audit}')"
+          prefill: $prefill, audit: $audit, peers: $peers}')"
 
       printf '%s\n' "$EVENT" >> "$LEDGER"
       # Bounded history: ~100 days at the 15-minute default, enough to correlate
@@ -258,6 +292,22 @@
 
       printf '%s\n' "$EVENT" | jq . > "$STATUS"
       printf '%s\n' "$HEALTH_TEXT" > "$HEALTH"
+
+      ${lib.optionalString (cfg.push.url != "") ''
+        if [ ! -r "$PUSH_TOKEN_FILE" ]; then
+          echo "push: no readable token file; nothing sent"
+        else
+          PUSH_TOKEN="$(cat "$PUSH_TOKEN_FILE")"
+          PUSH_CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 \
+            -H "Authorization: Bearer $PUSH_TOKEN" \
+            -H 'Content-Type: application/json' \
+            --data "$EVENT" "$PUSH_URL" || true)"
+          case "$PUSH_CODE" in
+            2??) ;;
+            *) echo "push: $PUSH_URL answered ''${PUSH_CODE:-nothing}" ;;
+          esac
+        fi
+      ''}
 
       ${lib.optionalString (cfg.notify.url != "") ''
         # --- notify on a change ---------------------------------------------
@@ -471,13 +521,88 @@ in {
         '';
       };
     };
+
+    push = {
+      url = lib.mkOption {
+        type = lib.types.str;
+        default = "";
+        description = ''
+          Central collector URL this host POSTs its status event to. Empty
+          means the host is observed only by its own ledger. The receiver is a
+          UNIX-socket service behind the collector's existing vhost, so no port
+          is opened for it — point this at that vhost's `/sentinel/ingest`.
+        '';
+      };
+      tokenFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = ''
+          File holding the bearer the receiver checks. A path, never an inline
+          secret, so a sops-rendered file is used and nothing lands in the Nix
+          store. Required whenever {option}`push.url` is set.
+        '';
+      };
+    };
+
+    ingest = {
+      enable = lib.mkEnableOption "the UNIX-socket endpoint peers push their status to";
+
+      socket = lib.mkOption {
+        type = lib.types.path;
+        default = "/run/fleet-sentinel/ingest.sock";
+        description = ''
+          Socket the receiver listens on. The vhost proxies to it, which is how
+          this adds no listening port to the host.
+        '';
+      };
+
+      tokenFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = ''
+          File holding the bearer a push must present. Required when
+          {option}`ingest.enable` is set: a receiver without one refuses every
+          push, which is the only safe default for a write endpoint.
+        '';
+      };
+
+      socketGroup = lib.mkOption {
+        type = lib.types.str;
+        default = "nginx";
+        description = "Group allowed to connect to {option}`ingest.socket`.";
+      };
+
+      peerMaxAgeHours = lib.mkOption {
+        type = lib.types.float;
+        default = 1.0;
+        description = ''
+          Degrade when a peer's newest push is older than this. One hour is
+          four missed collections at the 15-minute default: long enough not to
+          fire on a slow run, short enough to report a dead collector the same
+          morning rather than never.
+        '';
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules = [
-      "d ${cfg.stateDir} 0755 root root -"
-      "d ${cfg.stateDir}/www 0755 root root -"
+    assertions = [
+      {
+        assertion = cfg.push.url == "" || cfg.push.tokenFile != null;
+        message = "services.fleetSentinel.push.url is set without push.tokenFile; the receiver would refuse every unauthenticated push.";
+      }
+      {
+        assertion = !cfg.ingest.enable || cfg.ingest.tokenFile != null;
+        message = "services.fleetSentinel.ingest.enable is set without ingest.tokenFile; a write endpoint must refuse rather than accept everything.";
+      }
     ];
+
+    systemd.tmpfiles.rules =
+      [
+        "d ${cfg.stateDir} 0755 root root -"
+        "d ${cfg.stateDir}/www 0755 root root -"
+      ]
+      ++ lib.optionals cfg.ingest.enable ["d ${cfg.stateDir}/incoming 0755 root root -"];
 
     systemd.services.fleet-sentinel = {
       description = "Fleet sentinel: collect observation ledger + health";
@@ -493,7 +618,10 @@ in {
             "NOTIFY_USER=${cfg.notify.user}"
           ]
           ++ lib.optional (cfg.notify.passwordFile != null)
-          "NOTIFY_PASSWORD_FILE=${toString cfg.notify.passwordFile}";
+          "NOTIFY_PASSWORD_FILE=${toString cfg.notify.passwordFile}"
+          ++ lib.optionals (cfg.push.url != "") ["PUSH_URL=${cfg.push.url}"]
+          ++ lib.optional (cfg.push.tokenFile != null)
+          "PUSH_TOKEN_FILE=${toString cfg.push.tokenFile}";
         TimeoutStartSec = 120;
         Nice = 10;
         IOSchedulingClass = "idle";
@@ -514,6 +642,26 @@ in {
         OnUnitActiveSec = cfg.interval;
         Persistent = true;
         RandomizedDelaySec = "45s";
+      };
+    };
+
+    systemd.services.fleet-sentinel-ingest = lib.mkIf cfg.ingest.enable {
+      description = "Fleet sentinel ingest: peers push their status here";
+      wantedBy = ["multi-user.target"];
+      after = ["network.target"];
+      unitConfig.X-Fleet-Role = "daemon";
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${ingestPackage}/bin/fleet-sentinel-ingest -socket ${cfg.ingest.socket} -incoming ${cfg.stateDir}/incoming -token-file ${toString cfg.ingest.tokenFile} -socket-group ${cfg.ingest.socketGroup}";
+        Restart = "on-failure";
+        RestartSec = 3;
+        RuntimeDirectory = "fleet-sentinel";
+        RuntimeDirectoryMode = "0755";
+        ReadWritePaths = [cfg.stateDir];
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        PrivateTmp = true;
+        NoNewPrivileges = true;
       };
     };
   };

@@ -307,6 +307,10 @@ in {
     # failed every 15 minutes for three days and a keepalive that failed 104
     # times, both invisible to a collector that only asks the system manager.
     collectUserUnits = true;
+    push = {
+      url = "http://100.97.61.65/sentinel/ingest";
+      tokenFile = config.sops.secrets."agent-turns-token".path;
+    };
     # The same publisher the appflow triage uses (hosts/delphi/email-archive.nix),
     # so the push channel has one configuration and one credential on this fleet.
     notify = {

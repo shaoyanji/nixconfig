@@ -4,6 +4,10 @@
 # only `source`s it plus the interpolated pkgs paths it cannot know about. A
 # nushell change is therefore a `.nu` diff that a shell can parse, not a Nix
 # string that only the Nix parser sees.
+#
+# The task surface for the workflow modules lives in dispatch.nu: `nu-run` is
+# the entrypoint — bare it lists tasks, `nu-run jobby:coverletter:render` runs
+# the space-subcommand form `jobby coverletter render`.
 
 let carapace_completer = {|spans|
   carapace $spans.0 nushell $spans | from json

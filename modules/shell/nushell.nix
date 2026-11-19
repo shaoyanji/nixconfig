@@ -8,10 +8,28 @@
     name = "nu-run";
     runtimeInputs = [pkgs.nushell];
     text = ''
-      exec nu \
-        --config "''${XDG_CONFIG_HOME:-$HOME/.config}/nushell/config.nu" \
-        --env-config "''${XDG_CONFIG_HOME:-$HOME/.config}/nushell/env.nu" \
-        "$@"
+      cfg="''${XDG_CONFIG_HOME:-$HOME/.config}/nushell/config.nu"
+      envc="''${XDG_CONFIG_HOME:-$HOME/.config}/nushell/env.nu"
+      case "''${1:-}" in
+        # Bare nu-run is the task list; modules/config/nu/dispatch.nu: nutasks.
+        "") set -- -c nutasks ;;
+        # Flags and script files keep plain nu semantics; only a bare word is
+        # a task name (modules/config/nu/dispatch.nu: nu-task maps : to space).
+        -* | *.*) ;;
+        # Every arg becomes one quoted word for nu-task; `\`, `"` and `$` are
+        # escaped so an argument can never re-parse as nushell syntax.
+        *)
+          line="nu-task"
+          for a in "$@"; do
+            a=''${a//\\/\\\\}
+            a=''${a//\"/\\\"}
+            a=''${a//\$/\\\$}
+            line="$line \"$a\""
+          done
+          set -- -c "$line"
+          ;;
+      esac
+      exec nu --config "$cfg" --env-config "$envc" "$@"
     '';
   };
 
@@ -63,6 +81,10 @@ in {
         source ${../config/nu/de.nu}
         source ${../config/nu/jobby.nu}
         source ${../config/nu/todoist.nu}
+
+        # Task surface last: dispatch.nu's nutasks lists what scope commands
+        # sees, so it sources after every workflow module.
+        source ${../config/nu/dispatch.nu}
 
         # System & extraction modules
         source ${pkgs.nu_scripts}/share/nu_scripts/modules/data_extraction/ultimate_extractor.nu

@@ -1,4 +1,4 @@
-def "todoist get" [] {
+export def "todoist get" [] {
   let url = "https://api.todoist.com/api/v1/tasks"
   let blob = http get -H ["Authorization" $"Bearer ($env.TODOIST_API_TOKEN)"] ($url)
   let tasks = ($blob | get results)
@@ -6,7 +6,7 @@ def "todoist get" [] {
   $choice
 }
 
-def "todoist post" [] {
+export def "todoist post" [] {
   let url = "https://api.todoist.com/api/v1/tasks"
   let content = input "content> "
   let description = input "description> "
@@ -25,7 +25,7 @@ def "todoist post" [] {
   | http post -H ["Authorization" $"Bearer ($env.TODOIST_API_TOKEN)"] -H ["Content-Type: application/json"] ($url)
 }
 
-def "todoist complete" [] {
+export def "todoist complete" [] {
   let url = "https://api.todoist.com/api/v1/tasks"
   let sync_url = "https://api.todoist.com/api/v1/sync"
   let blob = http get -H ["Authorization" $"Bearer ($env.TODOIST_API_TOKEN)"] ($url)
@@ -47,7 +47,7 @@ def "todoist complete" [] {
   print $"Task ($task_id) completed."
 }
 
-def "todoist edit" [] {
+export def "todoist edit" [] {
   let url = "https://api.todoist.com/api/v1/tasks"
   let sync_url = "https://api.todoist.com/api/v1/sync"
   let blob = http get -H ["Authorization" $"Bearer ($env.TODOIST_API_TOKEN)"] ($url)
@@ -83,7 +83,7 @@ def "todoist edit" [] {
   print $"Task ($task_id) updated."
 }
 
-def "todoist delete" [] {
+export def "todoist delete" [] {
   let url = "https://api.todoist.com/api/v1/tasks"
   let blob = http get -H ["Authorization" $"Bearer ($env.TODOIST_API_TOKEN)"] ($url)
   let tasks = ($blob | get results)

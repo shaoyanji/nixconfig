@@ -79,7 +79,10 @@ The `docs-budget` job runs on every push and builds
 `nix flake check`, not a second implementation. It counts lines at eval time
 (manual 1200, ledger 150, root stubs 10 and pointing at `AGENTS.nix`) and fails
 the job on a violation, so documentation cannot grow past its `SCHEMA.md` §2
-budget just because the change touched no host.
+budget just because the change touched no host. The job carries no `if:` and no
+path filter, which is why a `*.md`-only push has a gate at all; `concurrency` is
+per ref with `cancel-in-progress`, so a run superseded within seconds is
+cancelled and the newest commit on the branch is the one that must be green.
 
 ## The boot canary (`modules/services/**`)
 

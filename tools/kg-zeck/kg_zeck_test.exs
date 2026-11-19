@@ -139,6 +139,25 @@ defmodule KGZeckTest do
     refute KGZeck.status(repo, cache)["next_leaps"]
   end
 
+  test "a manifest path escaping the repository fails closed" do
+    {repo, cache} = repo_fixture()
+    KGZeck.graph(repo, cache)
+    manifest = KGZeck.read(Path.join(cache, "manifest.json"))
+
+    for poison <- [
+          put_in(manifest["docs"]["../escape"], manifest["docs"]["docs/a.md"]),
+          put_in(manifest["docs"]["/etc/hostname"], manifest["docs"]["docs/a.md"]),
+          put_in(manifest["log"], [%{"path" => "../../outside.md", "sha" => "0"}]),
+          put_in(manifest["epoch"], "../../escape")
+        ] do
+      KGZeck.atomic(Path.join(cache, "manifest.json"), poison)
+      assert_raise RuntimeError, ~r/outside the repository/, fn -> KGZeck.status(repo, cache) end
+    end
+
+    KGZeck.atomic(Path.join(cache, "manifest.json"), manifest)
+    refute KGZeck.status(repo, cache)["next_leaps"]
+  end
+
   test "a terminated VM does not leave the cache locked" do
     {_repo, cache} = repo_fixture()
     script = "KGZeck.locked(#{inspect(cache)}, fn -> System.halt(0) end)"

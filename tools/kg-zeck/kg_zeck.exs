@@ -215,9 +215,32 @@ defmodule KGZeck do
       raise "inputs changed during full graph evaluation; retry"
     end
 
+    contained!(state, graph)
     atomic(Path.join(cache, "cores/#{epoch}.json"), graph)
     atomic(Path.join(cache, "manifest.json"), state)
     {state, graph}
+  end
+
+  # A relative path that stays inside the root it is joined to: not absolute,
+  # and no `..` component (normalise/1 clamps `..` instead of rejecting it, so
+  # it cannot serve as the check). Applied to every path the cache hands back
+  # before it is joined to the repo — a hand-edited manifest or core file must
+  # not steer File reads outside the repository.
+  defp safe_relative?(path) do
+    is_binary(path) and path != "" and Path.type(path) == :relative and
+      not Enum.member?(Path.split(path), "..")
+  end
+
+  defp contained!(state, graph) do
+    paths =
+      Map.keys(state["docs"]) ++
+        Map.keys(state["doc_shas"]) ++
+        Enum.map(state["log"], & &1["path"]) ++
+        Enum.map(eligible(graph), & &1["path"])
+
+    unless Enum.all?(paths, &safe_relative?/1) do
+      raise "manifest or core cache names a path outside the repository"
+    end
   end
 
   def inspect_state(repo, cache) do
@@ -225,10 +248,17 @@ defmodule KGZeck do
 
     if File.exists?(manifest) do
       state = read(manifest)
+
+      unless safe_relative?(state["epoch"]) do
+        raise "manifest or core cache names a path outside the repository"
+      end
+
       core_path = Path.join(cache, "cores/#{state["epoch"]}.json")
 
       if File.exists?(core_path) do
-        inspect_epoch(repo, state, read(core_path))
+        core = read(core_path)
+        contained!(state, core)
+        inspect_epoch(repo, state, core)
       else
         {state, nil, "core cache pruned"}
       end

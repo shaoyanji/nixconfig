@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T16:15:40Z",
+  "generated": "2026-11-19T16:32:22Z",
   "count": 200,
-  "pin": "1b30e8dd78a71d50acba0ecb70cdb605193d9347902fd27e4ca8cf48688aa255",
+  "pin": "c896f2b045a0a0d72338a07b2594d93c9425286af6cceff7ae3123d74a3adce9",
   "turns": [
+    {
+      "id": "6d3c9e94-904a-4fa6-bd07-188efc3407c0",
+      "ts": "2026-11-19T16:30:01Z",
+      "source": "devin",
+      "subject": "nixconfig:infra-deploy-paradigm",
+      "action": "claim: route switch+deploy build decisions through rebuild-flags.sh closed envelope",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/infra.yml scripts/task/rebuild-flags.sh scripts/task/deploy-netbook.sh scripts/task/warm-host.sh scripts/task/activate-host.sh"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9ladgs3ttd1e2o4500ti4o"
+    },
+    {
+      "id": "fafd9382-a5d5-4fce-9288-ffb378f63200",
+      "ts": "2026-11-19T16:15:53Z",
+      "source": "devin",
+      "subject": "nixconfig:taskfile-dendritic",
+      "action": "landed: services.yml aggregator deleted (direct includes), services-legacy pruned to wildcard aliases, policy node removed, selector battery gold rows repaired | gate: check:verify 116/116 + kg-check + frieren.role + checks:toon PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "628a179622cecc10794738d863b243bca80c3d86",
+      "branch": "HEAD",
+      "frame": "03h9l7m30zgj5pcn99h1zip2a"
+    },
     {
       "id": "b52fd316-53b1-4a49-a609-cee64d890820",
       "ts": "2026-11-19T16:11:20Z",
@@ -2787,32 +2815,6 @@
       "base_commit": "0facfdb45883c6524ef76f0db231f1d073a3fb85",
       "branch": "main",
       "frame": "03h94w5vs5ev468oz7ehrt29e"
-    },
-    {
-      "id": "c3e18ea1-fa2c-4726-9008-5483b5912ac6",
-      "ts": "2026-11-17T14:08:08Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily-round17",
-      "action": "approved 17 round-16 landscape plates in rotation; slot 4 now cap 20 reserve 10 (rebuilt frieren); round-17 20-image batch running",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5f25b0c67af97e17313b4ec153d11e86a7e00b7e",
-      "branch": "main",
-      "frame": "03h94w2772sk8zr9ipqfmytuh"
-    },
-    {
-      "id": "c1ecb497-1673-4a1d-ae73-bfb4e22f61ae",
-      "ts": "2026-11-17T13:55:07Z",
-      "source": "devji",
-      "subject": "nixconfig:ontology-epistemics",
-      "action": "Typed sinks (none|external), multiplicity dropped (was constant), model-label claim kind settled only by jev-decide, skill references indexed as doc nodes (docs 72->76), router policy cited; checks green, pushed 14212527",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "14212527d5bbe4a4bf673604ee54a40016e9fbcb",
-      "branch": "main",
-      "frame": "03h94tippi1fbai5og5xut6xv"
     }
   ]
 }

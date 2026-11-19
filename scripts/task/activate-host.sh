@@ -165,7 +165,10 @@ done
 toplevel_drv=""
 if [ -z "$serving" ]; then
   drv="$(nix eval --raw "$attr.drvPath" 2>/dev/null || true)"
-  pending="$(nix build "$attr" --dry-run --builders "" --json 2>/dev/null | jq -r '.[].drvPath' 2>/dev/null || true)"
+  # The no-dispatch dry run is the envelope's `none` render, not an inline
+  # `--builders ""` — one spelling of the builders decision fleet-wide.
+  # shellcheck disable=SC2086 # the renderer prints flags; word splitting is the point
+  pending="$(nix build "$attr" --dry-run --json $(bash "$REPO/scripts/task/rebuild-flags.sh" --builders none) 2>/dev/null | jq -r '.[].drvPath' 2>/dev/null || true)"
   if [ -n "$drv" ] && [ "$pending" = "$drv" ]; then
     toplevel_drv="$drv"
     echo "activate [$host] toplevel is in no store (normal); the closure substitutes, so the target builds just that tree from $drv"

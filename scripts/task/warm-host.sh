@@ -212,9 +212,12 @@ served_by_cache() {
 # every host, every time. Counting it reported "GAP 1" for a perfectly
 # substitutable host, which is how a gate gets ignored.
 # ONE dry run per host: it instantiates the whole graph, so asking twice (once
-# for a count, once for names) doubled a 90 s eval into a timeout.
+# for a count, once for names) doubled a 90 s eval into a timeout. The no-build
+# posture is the envelope's `none` render (max-jobs 0 + empty machine list),
+# not an inline spelling.
 pending_list() {
-  nix build "$1" --dry-run --builders "" --json 2>/dev/null |
+  # shellcheck disable=SC2086 # the renderer prints flags; word splitting is the point
+  nix build "$1" --dry-run --json $(bash "$REPO/scripts/task/rebuild-flags.sh" --builders none) 2>/dev/null |
     jq -r '.[].drvPath' 2>/dev/null |
     grep -vE -- '-nixos-system-[^/]+\.drv$' |
     sed 's|.*/||; s|\.drv$||' || true

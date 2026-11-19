@@ -186,23 +186,28 @@ ROLLBACK
     # (free), then nixbuild.net (25 h/month budget), then compile locally. `auto`
     # is the useful default because it spends nothing when the pinned 25.11
     # release is already in the caches, and still completes when it is not.
+    # The flags come from the one envelope (scripts/task/rebuild-flags.sh):
+    # `none` is substitute-or-fail, `self` is compile-here-only, `remote` is
+    # dispatch — the same spellings the switch and deploy paths render.
     mode=${BUILD:-auto}
     [ "${REMOTE_ONLY:-0}" = "1" ] && mode=remote
+    flags_for() { bash "$REMOTE/scripts/task/rebuild-flags.sh" --builders "$1"; }
+    # shellcheck disable=SC2086 # the renderer prints flags; word splitting is the point
     case "$mode" in
       auto)
         say "substituting the ${ATTR} closure on the builder (no compile)"
-        if ! system=$(nix build --no-link --print-out-paths --max-jobs 0 --builders "" "$toplevel" 2>/dev/null); then
+        if ! system=$(nix build --no-link --print-out-paths $(flags_for none) "$toplevel" 2>/dev/null); then
           say "not fully substitutable — filling the gaps on nixbuild.net"
-          system=$(nix build --no-link --print-out-paths --max-jobs 0 "$toplevel")
+          system=$(nix build --no-link --print-out-paths $(flags_for remote) "$toplevel")
         fi
         ;;
       local)
         say "building the ${ATTR} closure on the builder (local compile allowed)"
-        system=$(nix build --no-link --print-out-paths --builders "" "$toplevel")
+        system=$(nix build --no-link --print-out-paths $(flags_for self) "$toplevel")
         ;;
       remote)
         say "building the ${ATTR} closure on nixbuild.net only"
-        system=$(nix build --no-link --print-out-paths --max-jobs 0 "$toplevel")
+        system=$(nix build --no-link --print-out-paths $(flags_for remote) "$toplevel")
         ;;
       *) die "unknown BUILD=${mode} (auto|local|remote)" ;;
     esac

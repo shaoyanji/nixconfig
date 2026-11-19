@@ -1533,8 +1533,8 @@ tasks:
     desc: "[gate] Rebuild flags come from the 3-axis envelope, every combination"
     summary: >
       scripts/task/rebuild-flags.sh --self-test — the finite envelope behind every
-      rebuild, proven without building: builders (local|none|remote) x substitutes
-      (on|off) x flakes (accept|impure), all 12 rendered against a table, plus a closed
+      rebuild, proven without building: builders (local|self|none|remote) x substitutes
+      (on|off) x flakes (accept|impure), all 16 rendered against a table, plus a closed
       set (a typo like `--builders everywhere` is a usage error, not a silent local
       build). Defaults render NOTHING because local/on/accept is what Nix does anyway.
       Exit 0 = every combination renders what it says, 1 = drift.

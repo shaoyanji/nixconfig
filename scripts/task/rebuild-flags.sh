@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # rebuild-flags.sh — the finite envelope behind every rebuild. Three axes, no more:
 #
-#   --builders     local | none | remote     who compiles
-#   --substitutes  on | off                  may Nix fetch a path instead
-#   --flakes       accept | impure           the flake acceptance posture
+#   --builders     local | self | none | remote    who compiles
+#   --substitutes  on | off                        may Nix fetch a path instead
+#   --flakes       accept | impure                 the flake acceptance posture
 #
 # Everything else a rebuild needs is the host, the flake ref and the action, and
 # those are arguments — not flags. Before this file the same three decisions were
@@ -24,6 +24,12 @@
 #
 #   rebuild.sh --builders | --substitutes | --flakes  # print one axis' value
 #
+# Env spellings are the same axes: REBUILD_BUILDERS / REBUILD_SUBSTITUTES /
+# REBUILD_FLAKES / REBUILD_FLAVOUR. `REMOTE_BUILD=1` is the historical spelling
+# of `--builders none` ("substitute or fail, never compile here") and lives here
+# so callers map it in one place, not one line per caller; REBUILD_BUILDERS wins
+# when both are set.
+#
 # Flavour is the command being dressed: `nix` (build/eval/path-info),
 # `nixos-rebuild`, `darwin-rebuild`, `home-manager`. It only changes spelling.
 #
@@ -31,7 +37,14 @@
 # must not quietly become "local builders"), 1 the self-test failed.
 set -euo pipefail
 
-BUILDERS="${REBUILD_BUILDERS:-local}"
+# REMOTE_BUILD=1 is the caller-facing alias of builders=none; REBUILD_BUILDERS
+# wins when both are spelled. REMOTE_BUILD=0 is a real value (callers export it
+# to mean "local is fine"), so the test is =1, not setness.
+BUILDERS="${REBUILD_BUILDERS:-}"
+if [ -z "$BUILDERS" ] && [ "${REMOTE_BUILD:-0}" = "1" ]; then
+  BUILDERS=none
+fi
+BUILDERS="${BUILDERS:-local}"
 SUBSTITUTES="${REBUILD_SUBSTITUTES:-on}"
 FLAKES="${REBUILD_FLAKES:-accept}"
 FLAVOUR="${REBUILD_FLAVOUR:-nix}"
@@ -65,8 +78,8 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-case "$BUILDERS" in local | none | remote) ;; *)
-  echo "rebuild-flags: --builders must be local|none|remote (got '$BUILDERS')" >&2
+case "$BUILDERS" in local | self | none | remote) ;; *)
+  echo "rebuild-flags: --builders must be local|self|none|remote (got '$BUILDERS')" >&2
   exit 2
   ;;
 esac
@@ -91,6 +104,14 @@ render() { # builders substitutes flakes flavour
 
   case "$b" in
   local) ;; # the Nix config decides; saying nothing is the honest spelling
+  self)
+    # Compile here only: an empty machine list forbids remote dispatch without
+    # touching local jobs. This is the spelling `--builders ""` made inside the
+    # scripts that could not use it — word splitting cannot produce an empty
+    # argv element, so `;` (a lone spec separator = no machines) is the argv-safe
+    # form of the same decision.
+    out="$out --option builders ;"
+    ;;
   none)
     # Substitute or fail. `max-jobs 0` alone still lets Nix dispatch to a
     # configured remote builder, which uploads the whole closure before it starts
@@ -159,6 +180,10 @@ if [ "$SELF_TEST" = 1 ]; then
   check "--impure" local on impure
   check "--option substitute false" local off accept
   check "--option substitute false --impure" local off impure
+  check "--option builders ;" self on accept
+  check "--option builders ; --impure" self on impure
+  check "--option builders ; --option substitute false" self off accept
+  check "--option builders ; --option substitute false --impure" self off impure
   check "--option max-jobs 0 --option builders ;" none on accept
   check "--option max-jobs 0 --option builders ; --impure" none on impure
   check "--option max-jobs 0 --option builders ; --option substitute false" none off accept
@@ -181,7 +206,7 @@ if [ "$SELF_TEST" = 1 ]; then
 
   echo
   if [ "$fail" = 0 ]; then
-    echo "rebuild-flags: ok — 12 combinations, closed set"
+    echo "rebuild-flags: ok — 16 combinations, closed set"
   else
     echo "rebuild-flags: DRIFT — the envelope does not render what it says"
   fi

@@ -1,8 +1,50 @@
 {
-  "generated": "2026-11-19T13:14:49Z",
+  "generated": "2026-11-19T13:24:13Z",
   "count": 200,
-  "pin": "c0f785b8b9edfb23092b286cb216167528739eb5c324f4aa1dd302552242c779",
+  "pin": "9364d161e52d83b2a444fd17a49ea4d59fbcfbd82664c8dae93b2c456840a856",
   "turns": [
+    {
+      "id": "c0f7dc1f-a602-415a-9392-a59cbc6c0d44",
+      "ts": "2026-11-19T13:20:41Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 29: freebuff landed sentinel-external-hosts (95065d96, never report a unit the host cannot see, DELIVERED). devin reviewed PR #8 (APPROVE: opt-in zeck cache, kg_zeck_test 12/0, parity PASS, 3 non-blocking nits). agy updated 24 prep/teilzeit leads (apps:prep-leads-update done). delphi sending LiveKit outreach as broker.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "2a1219645ad30cb96d4a13336bd7e3ea4addf7d2",
+      "branch": "main",
+      "frame": "03h9k9dz1hcs3k0iverk87hr4"
+    },
+    {
+      "id": "f7f75bd2-44a2-4476-acdb-3b42f5ab0198",
+      "ts": "2026-11-19T13:20:12Z",
+      "source": "devji",
+      "subject": "nixconfig:apps-livekit-send-parloa-retarget",
+      "action": "Sent LiveKit Software Engineer Agents application to recruiting@livekit.io as matt@bountystash.com, Resend delivered; retargeted Parloa row to Staff Product Engineer and rebuilt its packet",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
+      "branch": "main",
+      "frame": "03h9k9aldzuhsx8x84mz48cfk"
+    },
+    {
+      "id": "475d6d8f-abd2-4536-b799-2b7c79d7683b",
+      "ts": "2026-11-19T13:15:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:sentinel-external-hosts",
+      "action": "sentinel: a host with no systemd answered absent per watched unit, which is neutral, so its verdict stayed ok while blind. It now probes /run/systemd/system, records unit_observer (systemd|none), answers unobservable plus one unit-status-unobservable reason, so a blind host degrades. absent keeps meaning 'not installed here'. Dashboard marks it red; skill and prose budget updated; P1 note DELIVERED. Pushed 2a121964; checks:host frieren and checks:quick green.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2a1219645ad30cb96d4a13336bd7e3ea4addf7d2",
+      "branch": "main",
+      "frame": "03h9k8bsye7yqdtycj4a9mb5y"
+    },
     {
       "id": "c40263ab-59a5-4623-a5d3-647cd1c847bd",
       "ts": "2026-11-19T13:14:26Z",
@@ -2764,45 +2806,6 @@
       "base_commit": "540c879ffc85deb0ee3c445c8b9b1c90148e35fc",
       "branch": "main",
       "frame": "03h8xl2af2o175tm9l3tax8i6"
-    },
-    {
-      "id": "5e2bff55-e789-4c7d-8c95-db7be52c6b46",
-      "ts": "2026-11-16T15:39:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-constraints",
-      "action": "tokenloom: constraint removal op + panel x button, span chips marked in the rope via a per-token byte-offset index, panel server test; 19 tests, bench, smoke and 17-step UI pass on clanker",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "debdc3ae89b4e1635a05bfd0ffd23e3fbb63689c",
-      "branch": "main",
-      "frame": "03h8xkk6gxoyez8dm0yiqoqse"
-    },
-    {
-      "id": "d83c69d8-ca05-446d-8a7d-f5c9d3be4716",
-      "ts": "2026-11-16T15:25:26Z",
-      "source": "devji",
-      "subject": "nixconfig:netbook-boot-26.11",
-      "action": "No nixpkgs 27.05 upstream (unstable and master both report 26.11, no release-27.05 branch); pushed netbook STAGE=boot on the current pin as a boot generation",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fe0b3b4caf81f4bf97d4ef02a7415ed50c5ced79",
-      "branch": "main",
-      "frame": "03h8xhv4oqa0n8snnjvxqzp6m"
-    },
-    {
-      "id": "825d0665-b24c-47ca-a133-6585d186a633",
-      "ts": "2026-11-16T15:15:02Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-plates-variants",
-      "action": "Replaced plates archive to variants/ with a stamp; images:variants lists and restores one, republishing the gallery and archiving the plate it swaps out",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fe0b3b4caf81f4bf97d4ef02a7415ed50c5ced79",
-      "branch": "main",
-      "frame": "03h8xftydqjcfjf7vfwf8tfsr"
     }
   ]
 }

@@ -324,7 +324,16 @@
       fi
 
       REASONS_JSON="$(printf '%s\n' "''${REASONS[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')"
-      FAILED_JSON="$(printf '%s\n' "''${FAILED_UNITS[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')"
+      # `[]` is a claim that a scan ran and found nothing. On a host with no
+      # manager the loop above reads an empty list because systemctl cannot
+      # answer at all, so publish `null` instead: unknown, not zero. Consumers
+      # already treat a missing list as "no names to show" (`// []`), and no
+      # reader can mistake `null` for a clean count.
+      if [ "$UNIT_OBSERVER" = "systemd" ]; then
+        FAILED_JSON="$(printf '%s\n' "''${FAILED_UNITS[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')"
+      else
+        FAILED_JSON="null"
+      fi
 
       EVENT="$(jq -cn \
         --arg ts "$NOW" \

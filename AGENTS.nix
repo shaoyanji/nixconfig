@@ -979,7 +979,9 @@
         with no manager answers `unobservable` for each watched unit while adding
         one `unit-status-unobservable` reason — `degraded`, never `ok`. `absent`
         now means only "not installed on this host" and stays neutral, which is
-        what a never-run restic drill relies on.
+        what a never-run restic drill relies on. `failed_units` follows the same
+        rule: `null` on a blind host rather than `[]`, because an empty list
+        claims a scan that never ran.
 
         The probe is the directory, not `command -v systemctl`: systemd's binaries
         come from the collector's own runtimeInputs closure, so a nix-darwin or

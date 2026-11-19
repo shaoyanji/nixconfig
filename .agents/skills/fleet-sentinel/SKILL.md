@@ -99,7 +99,7 @@ is the signal that something other than the cache moved.
 | :--- | :--- | :--- |
 | `failed-units:N` | N units in `failed` state | `systemctl --failed`; inspect the named units in `failed_units` |
 | `unit-failed:<unit>:<result>` | a watched oneshot's last `Result` is not `success` | `journalctl -u <unit> -n 80`; check its inputs (disk, network, secrets) |
-| `unit-status-unobservable` | the host has no systemd manager (`/run/systemd/system` missing), so every unit's state is unknowable and `jobs` reads `unobservable` | run this collector only where systemd can answer; a container or nix-darwin host needs its own check rather than a green sentinel |
+| `unit-status-unobservable` | the host has no systemd manager (`/run/systemd/system` missing), so every unit's state is unknowable: `jobs` reads `unobservable` and `failed_units` is `null` | run this collector only where systemd can answer; a container or nix-darwin host needs its own check rather than a green sentinel |
 | `failed-units` naming `loaded` (fixed 2026-10-29) | the collector read column 2 of `list-units --plain --no-legend` (the literal word `loaded`), so `ignoreFailedUnits` never matched | upgrade; verify with `systemctl --failed --no-legend --plain \| head` and that `status.json` names the unit |
 | `generation-stale:<h>h` | running system older than `generationAgeHours` (72) | check `nixos-upgrade` journal; confirm the flake input/autoUpgrade path |
 | `disk-high:<path>:<pct>%` | filesystem ≥ 90 % | `task dev:closure:size`; GC/snapshot prune; never delete `/srv/data` content ad hoc |
@@ -115,7 +115,7 @@ is the signal that something other than the cache moved.
 `absent` job results mean the unit is not installed on that host (neutral).
 `unobservable` means the host has no systemd manager to ask, so it must never be
 read as success: `unit_observer` records `systemd` or `none`, `none` adds
-`unit-status-unobservable`, and the host is `degraded` rather than green.
+`unit-status-unobservable`, and the host is `degraded` rather than green. `failed_units` is `null` there, not `[]`: an empty list would claim a scan the host could not run, while `null` says the count is unknown.
 
 ## 3. Operator loop
 

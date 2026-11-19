@@ -27,7 +27,7 @@
     ".agents/skills/dragoncourt/SKILL.md" = 53;
     ".agents/skills/eisen-status/SKILL.md" = 67;
     ".agents/skills/envs/SKILL.md" = 92;
-    ".agents/skills/fleet-sentinel/SKILL.md" = 144;
+    ".agents/skills/fleet-sentinel/SKILL.md" = 150;
     ".agents/skills/frieren-offload/SKILL.md" = 88;
     ".agents/skills/google-drive/SKILL.md" = 55;
     ".agents/skills/home-assistant/SKILL.md" = 91;

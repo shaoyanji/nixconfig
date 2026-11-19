@@ -42,6 +42,7 @@ One JSON object per run:
   "schema": 1,
   "ts": "2026-10-19T11:00:00Z",
   "host": "frieren",
+  "unit_observer": "systemd",
   "state": "ok",
   "reasons": ["generation-stale:75.2h"],
   "failed_units": ["foo.service"],
@@ -98,6 +99,7 @@ is the signal that something other than the cache moved.
 | :--- | :--- | :--- |
 | `failed-units:N` | N units in `failed` state | `systemctl --failed`; inspect the named units in `failed_units` |
 | `unit-failed:<unit>:<result>` | a watched oneshot's last `Result` is not `success` | `journalctl -u <unit> -n 80`; check its inputs (disk, network, secrets) |
+| `unit-status-unobservable` | the host has no systemd manager (`/run/systemd/system` missing), so every unit's state is unknowable and `jobs` reads `unobservable` | run this collector only where systemd can answer; a container or nix-darwin host needs its own check rather than a green sentinel |
 | `failed-units` naming `loaded` (fixed 2026-10-29) | the collector read column 2 of `list-units --plain --no-legend` (the literal word `loaded`), so `ignoreFailedUnits` never matched | upgrade; verify with `systemctl --failed --no-legend --plain \| head` and that `status.json` names the unit |
 | `generation-stale:<h>h` | running system older than `generationAgeHours` (72) | check `nixos-upgrade` journal; confirm the flake input/autoUpgrade path |
 | `disk-high:<path>:<pct>%` | filesystem ≥ 90 % | `task dev:closure:size`; GC/snapshot prune; never delete `/srv/data` content ad hoc |
@@ -111,6 +113,9 @@ is the signal that something other than the cache moved.
 
 `null` disk values mean the path does not exist on that host (neutral, not bad).
 `absent` job results mean the unit is not installed on that host (neutral).
+`unobservable` means the host has no systemd manager to ask, so it must never be
+read as success: `unit_observer` records `systemd` or `none`, `none` adds
+`unit-status-unobservable`, and the host is `degraded` rather than green.
 
 ## 3. Operator loop
 
@@ -161,8 +166,9 @@ systemctl list-timers --all | grep -E 'restic|nixos-upgrade|sentinel'
 
 ## 6. What is deliberately not here
 
-- No push from other hosts yet (see the `p1-sentinel-push` note in `AGENTS.nix`). Today the sentinel is
-  frieren-local; the fleet report is `task checks:*` + CI + the xs turn log.
+- Push exists (delphi → frieren's `/sentinel/ingest`), but a host that has never
+  pushed is still invisible — a declared `peers` list would be a second option.
+  The rest of the fleet report is `task checks:*` + CI + the xs turn log.
 - No alerting of its own: gatus owns the transition, and its custom webhook
   bridges to SimpleX (3 consecutive failures, with a resolved notice).
 - No metrics database: 10 000 JSONL lines are queryable with `jq`/TOON and cost

@@ -965,7 +965,7 @@
     sentinel-external-hosts = {
       title = "Sentinel `unit-failed` for external hosts";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P1";
       date = "2026-10-19";
       summary = "On non-NixOS hosts the field is `absent`, which can read as success. It must never claim a unit it cannot see.";
@@ -973,6 +973,21 @@
         modules = ["modules/services/fleet-sentinel.nix"];
         tasks = ["ops:health"];
       };
+      body = ''
+        Landed 2026-11-19. The collector probes `/run/systemd/system` once per run,
+        records `unit_observer` (`systemd` | `none`) in every event, and on a host
+        with no manager answers `unobservable` for each watched unit while adding
+        one `unit-status-unobservable` reason — `degraded`, never `ok`. `absent`
+        now means only "not installed on this host" and stays neutral, which is
+        what a never-run restic drill relies on.
+
+        The probe is the directory, not `command -v systemctl`: systemd's binaries
+        come from the collector's own runtimeInputs closure, so a nix-darwin or
+        container host has them on PATH and only the directory proves a manager is
+        there to answer.
+
+        Gate: `task checks:host HOST=frieren` and `task checks:quick`.
+      '';
     };
     semantic-search = {
       title = "Semantic search only if it earns its keep";

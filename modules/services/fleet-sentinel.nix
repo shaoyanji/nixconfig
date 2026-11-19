@@ -51,6 +51,20 @@
       # SC2194, and writeShellApplication fails the build on any finding.
       IGNORE_UNITS="${IGNORE}"
 
+      # --- can this host answer systemd at all? -----------------------------
+      # `absent` means "not installed on this host" and is neutral by design, so
+      # a host with no systemd manager would answer `absent` for every watched
+      # unit and its verdict would read `ok` — a blind host claiming clean jobs.
+      # The test is the directory, not `command -v systemctl`: systemd's binaries
+      # arrive through this script's own runtimeInputs, so a nix-darwin or
+      # container host has them on PATH and only /run/systemd/system proves a
+      # manager is there to answer.
+      UNIT_OBSERVER="systemd"
+      if [ ! -d /run/systemd/system ]; then
+        UNIT_OBSERVER="none"
+        REASONS+=("unit-status-unobservable")
+      fi
+
       # --- failed units ------------------------------------------------------
       while IFS= read -r line; do
         [ -n "$line" ] || continue
@@ -102,8 +116,15 @@
       fi
 
       # --- oneshot job results ----------------------------------------------
+      # `absent` stays reserved for "installed nowhere on this host". A host that
+      # cannot see systemd gets `unobservable`, a value no consumer can read as
+      # success; the single unit-status-unobservable reason already names why.
       unit_result() {
         local u="$1"
+        if [ "$UNIT_OBSERVER" != "systemd" ]; then
+          printf 'unobservable'
+          return
+        fi
         if ! systemctl cat "$u" >/dev/null 2>&1; then
           printf 'absent'
           return
@@ -120,7 +141,9 @@
         [ "$u" = "-" ] && continue
         r="$(unit_result "$u")"
         case "$r" in
-          success|absent|unknown) ;;
+          # `absent` is neutral and `unobservable` is reported once above, so
+          # neither repeats per unit.
+          success|absent|unknown|unobservable) ;;
           *) REASONS+=("unit-failed:$u:$r") ;;
         esac
         WATCH_JSON="$(printf '%s' "$WATCH_JSON" | jq -c --arg k "$u" --arg v "$r" '. + {($k): $v}')"
@@ -318,7 +341,9 @@
         --argjson audit "$AUDIT_JSON" \
         --argjson peers "$PEERS_JSON" \
         --argjson queue "$QUEUE_JSON" \
+        --arg unit_observer "$UNIT_OBSERVER" \
         '{schema: 1, ts: $ts, host: $host, state: $state, reasons: $reasons,
+          unit_observer: $unit_observer,
           failed_units: $failed_units, jobs: $jobs, generation_age_h: $gen_age_h,
           disk_pct: $disk, psi: {io: $io_psi, memory: $mem_psi},
           prefill: $prefill, audit: $audit, peers: $peers, queue: $queue}')"
@@ -574,7 +599,10 @@ in {
       description = ''
         Jobs whose last result should degrade the sentinel when not `success`.
         The default set on frieren is the backup/upgrade chain; a host without
-        those units records `absent` and stays neutral.
+        those units records `absent` and stays neutral. A host with no systemd
+        manager at all records `unobservable` and degrades with
+        `unit-status-unobservable` — it must never report a unit it cannot see
+        as healthy.
       '';
     };
 

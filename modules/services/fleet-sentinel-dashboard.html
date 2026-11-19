@@ -35,7 +35,7 @@ fetch('status.json', {cache:'no-store'}).then(r => r.json()).then(s => {
   const disk = Object.entries(s.disk_pct || {})
     .filter(([,v]) => v !== null).map(([k,v]) => `<div class="v">${k}: ${v}%</div>`).join("");
   const jobs = Object.entries(s.jobs || {})
-    .map(([k,v]) => `<div class="v">${v}</div><div class="k">${k}</div>`).join("");
+    .map(([k,v]) => `<div class="v ${v === 'unobservable' ? 'bad' : ''}">${v}</div><div class="k">${k}</div>`).join("");
   const reasons = (s.reasons || []).map(r => `<li>${r}</li>`).join("") || '<li class="ok">none</li>';
   const audit = s.audit
     ? `<div class="v ${s.audit.outcome === 'fallback' ? 'bad' : 'ok'}">${s.audit.outcome}</div>

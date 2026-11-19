@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T16:00:19Z",
+  "generated": "2026-11-19T16:08:13Z",
   "count": 200,
-  "pin": "e8920e9e0bd117b15b7d07008499076ed989ea380f8d321e7527dbab178c4801",
+  "pin": "3e2e1981ccc8798349a7db0d044b104de1193f9251025bc5d0da2e1fa885fabd",
   "turns": [
+    {
+      "id": "8461a25c-f765-408f-aee4-b95e59864e44",
+      "ts": "2026-11-19T16:03:24Z",
+      "source": "devin",
+      "subject": "nixconfig:agents-nix-audit",
+      "action": "claim: kill/keep/archive audit of all AGENTS.nix notes",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9l56b8gqzm922cztdinihx"
+    },
+    {
+      "id": "33caaf2f-d19f-45a0-96b2-f3ef665b1492",
+      "ts": "2026-11-19T16:00:33Z",
+      "source": "devin",
+      "subject": "nixconfig:kg-elixir-decision",
+      "action": "landed: KILL kgElixirRootCleanup — expired migration removed from minimal.nix; historical BEAM comments + turns-runtime bench lane untouched | gate: pre-commit nix checks + frieren.role eval PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "887f4364ded70bd9cd722f61c96847153e00e1e6",
+      "branch": "HEAD",
+      "frame": "03h9l4m6x1yjubr0ohldv8hsn"
+    },
     {
       "id": "582fa8d7-eed3-4163-9f9d-bb9f73bf4a53",
       "ts": "2026-11-19T15:59:08Z",
@@ -2783,32 +2811,6 @@
       "base_commit": "52d8c55001f435144e53d312d1b9e65ee5c3e71a",
       "branch": "main",
       "frame": "03h94rpyvg063yw784s9epz5i"
-    },
-    {
-      "id": "fc77d63a-1b0e-418d-be02-c9f734fdfcc5",
-      "ts": "2026-11-17T13:40:03Z",
-      "source": "devji",
-      "subject": "nixconfig:agy-hydrogen",
-      "action": "Rebuilt frieren: router materialized, sorter is_sidecar live (unit success), 03:00/05:00 cascade sources sops env before Tier 1 and pins gemini-4-hydrogen-high; pushed d487f129",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d487f129871486c91a1d7d4dd24922870b1afb7a",
-      "branch": "main",
-      "frame": "03h94qkp43e9p0f8v10z7cpdl"
-    },
-    {
-      "id": "a4f66073-ae20-4cd1-9052-8eecee05d01a",
-      "ts": "2026-11-17T13:23:49Z",
-      "source": "devji",
-      "subject": "nixconfig:downloads-sort",
-      "action": "Fixed downloads-sort red loop: payload_of picked a job log inside minimax-h3-image/; sidecars excluded, shell reported, .json workflows -> software/. Staging cleared, unit exits 0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9c71c419fcb421b9414cd75d75fbb520b063d12a",
-      "branch": "main",
-      "frame": "03h94nekfymdm9xu7uvxot9ll"
     }
   ]
 }

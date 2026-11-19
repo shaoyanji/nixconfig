@@ -1648,38 +1648,6 @@
         docs = ["docs/dns-failover.md"];
       };
     };
-    exp-003 = {
-      title = "EXP-003 — Hotspot-failover STA (uplink of last resort)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: managed, but pointed at a phone hotspot with low priority instead of the house AP. Status: not started. Cheapest resilience win; conflicts with EXP-001/002.";
-      body = ''
-        **Mode:** `managed`, but pointed at a **phone hotspot** with low priority instead of the house AP.
-        **Status:** not started. Cheapest resilience win; conflicts with EXP-001/002.
-
-        **Use case.** Keep the tailnet alive when the FritzBox or its uplink dies, so remote access,
-        `restic` backups, the 04:00 `system.autoUpgrade` and the host agents keep running. A laptop-with-a-
-        battery plus a phone hotspot is a poor-man's 4G failover, and it is the one use of this radio that
-        plays to what the hardware actually is rather than pretending it is a wired NIC.
-
-        **Module shape.** Mostly NetworkManager profile data, which raises the interesting question of where
-        that belongs: a `networking.networkmanager.ensureProfiles` block is declarative state, but the PSK is
-        a secret, and `connection.autoconnect-priority` / route metric are the actual mechanism.
-
-        ```nix
-        services.fleetWifi.mode = "sta-failover";
-        services.fleetWifi.staFailover = {
-          ssid = "phone-hotspot";        # or discovered at runtime
-          priority = 10;                 # below the house APs, above nothing else
-          pskFile = null;                # never inline
-        };
-        ```
-
-        **Replaces today's behaviour:** the current same-subnet standby at metric 600. This is the honest
-        trade: drop a standby that provides half-failover, or keep it and skip EXP-001/002.
-      '';
-    };
     exp-004 = {
       title = "EXP-004 — Passive RF watchdog (`monitor` mode)";
       kind = "experiment";
@@ -1860,77 +1828,6 @@
         when the notebook terminates, and authenticated endpoint tokens.
       '';
     };
-    exp-019 = {
-      title = "EXP-019 — Declarative Gatus Alerting & Fleet Notifier Dispatcher (`services.fleetMonitors.alerting`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: extend services.fleetMonitors with a declarative alerting block dispatching failure and resolution events to local/tailnet notifiers (SimpleX WebSocket RPC or Telegram bot) without external SaaS dependencies. Status: design study. Motivated by Gatus journal warnings: alerting is not configured (HC-6 in HANDOFF.md).";
-      refs = {
-        hosts = ["frieren"];
-        modules = ["modules/services/fleet-monitors.nix"];
-      };
-      body = ''
-        **Mode.** Declarative alerting on `services.fleetMonitors`: dispatch failure and
-        resolution events to a local/tailnet notifier (SimpleX webhook or Telegram), no SaaS.
-
-        **Use case.** frieren runs Gatus on loopback 8181 across 7 endpoints; a failure is
-        visible only in the local UI and the journal. Alerts should reach the SimpleX `#Fleet` group.
-
-        **Shape.** An opt-in `alerting` block in `modules/services/fleet-monitors.nix`:
-        `provider` (`custom` | `telegram` | `ntfy`), a webhook `url`/`method`/`body`/`headers`,
-        and `defaultAlert = { failureThreshold = 3; successThreshold = 2; sendOnResolved = true; }`.
-        Gatus supports these natively; the SimpleX client already listens on 5225.
-
-        **Why not prod.** Payload escaping and credential hygiene; low thresholds would flood
-        chat during nightly switches. Exit: an intentional unit stop produces exactly one alert
-        within 30 s and one resolution notice on restart, with zero alerts during auto-upgrades.
-      '';
-    };
-    exp-020 = {
-      title = "EXP-020 — Declarative PostgreSQL Collation & Vacuum Maintenance Unit (`services.postgresMaintenance`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: scheduled autonomous verification of PostgreSQL catalog collation tracking and index health, preventing silent index corruption following glibc upgrades. Status: design study. Motivated by the glibc 2.42 vs 2.44 collation mismatch discovered on Immich DB during the 2026-10-13 backup audit.";
-      body = ''
-        **Mode:** scheduled autonomous verification of PostgreSQL catalog collation tracking and index health,
-        preventing silent index corruption following glibc upgrades.
-        **Status:** design study. Motivated by the glibc 2.42 vs 2.44 collation mismatch discovered on Immich DB
-        during the 2026-10-13 backup audit.
-
-        **Use case.** NixOS glibc upgrades update the OS collation definition. When PostgreSQL detects that the system
-        glibc collation differs from the database creation catalog version, it emits warnings during `pg_dump` backups
-        and runs the risk of silent B-tree index corruption for locale-sorted text columns. Manually remembering to run
-        `REINDEX` and `ALTER DATABASE ... REFRESH COLLATION VERSION` after major channel upgrades is fragile. A declarative
-        maintenance unit evaluates `pg_collation_actual_version()` vs catalog `collversion`, executes `REINDEX CONCURRENTLY`,
-        and schedules periodic `VACUUM ANALYZE`.
-
-        **Module shape.**
-
-        ```nix
-        services.postgresMaintenance = {
-          enable = true;
-          schedule = "Sun *-*-* 02:00:00"; # strictly outside 03:00-05:30 nightly backup window
-          databases = [ "immich" ];        # list of databases, or "all"
-          autoRefreshCollation = true;     # auto-refresh collation catalog when version drift is detected
-          reindexMode = "concurrently";    # "concurrently" | "standard"
-          vacuumAnalyze = true;
-          maxDuration = 1800;              # abort if maintenance exceeds 30 minutes
-        };
-        ```
-
-        **Evidence.** Verified on frieren (2026-10-13): `postgresqlBackup-immich.service` produced glibc 2.42 vs 2.44
-        mismatch warnings. Executing `REINDEX DATABASE immich;` and `ALTER DATABASE immich REFRESH COLLATION VERSION;`
-        eliminated the warning completely and brought backup duration to 3.4 seconds. Immich DB is 155 MB; full reindex
-        took < 3 seconds.
-
-        **Why it is not prod.** `REINDEX` acquires locks. If executed while Immich or Paperless is actively ingesting
-        photos or documents, queries block and produce 504 gateway errors. Must run strictly outside the nightly backup
-        window (03:00–05:30) and respect active PostgreSQL connections. Exit criteria: a unit that runs at 02:00 Sunday,
-        verifies zero active client transactions, performs non-blocking index optimization, and records metric logs.
-      '';
-    };
     exp-021 = {
       title = "EXP-021 — Fleet Binary Cache Pre-Warming & Closure Mirror (`services.fleetCacheWarmer`)";
       kind = "experiment";
@@ -1983,49 +1880,6 @@
         modules = ["modules/services/btrfs-watchdog.nix"];
       };
     };
-    exp-023 = {
-      title = "EXP-023 — Kernel Memory-Pressure Tuning & Mainframe PSI Watchdog (`profiles.memoryPressure`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: declarative Pressure Stall Information (PSI) monitoring and proactive cgroup memory containment for mixed mainframe workloads. Status: design study. Motivated by frieren's hardware constraint (11.47 GiB RAM, 8GB disk swap, 5.7GB zram).";
-      body = ''
-        **Mode:** declarative Pressure Stall Information (PSI) monitoring and proactive cgroup memory containment for
-        mixed mainframe workloads.
-        **Status:** design study. Motivated by frieren's hardware constraint (11.47 GiB RAM, 8GB disk swap, 5.7GB zram).
-
-        **Use case.** frieren concurrently hosts latency-sensitive streaming (Jellyfin 4K QuickSync), network routing
-        (Pi-hole, Nginx, SimpleX SMP relay), and batch compute (Paperless OCR, Kiwix full-text indexing, nightly Restic drills,
-        LLM agent runs). Under heavy parallel load, paging into the 8GB disk swap on `/dev/sda2` creates severe I/O stalls,
-        driving memory PSI (`/proc/pressure/memory`) above 40% and inducing video playback dropouts before `systemd-oomd`
-        triggers. A dedicated PSI profile configures memory pressure thresholds (`ManagedOOMMemoryPressure=kill`), sets
-        `MemoryLow` protection for core services, and throttles batch worker slices.
-
-        **Module shape.**
-
-        ```nix
-        profiles.memoryPressure = {
-          enable = true;
-          protectedServices = [ "jellyfin" "pihole-ftl" "unbound" "nginx" "smp-server" ];
-          throttledSlices = [ "system-paperless.slice" "user-devji.slice" ];
-          psiThreshold = {
-            someLimit = "35%";             # memory pressure threshold over 10s window
-            action = "throttle";           # "throttle" | "kill" | "notify"
-          };
-          zramPriority = 100;
-          diskSwapPriority = 10;
-        };
-        ```
-
-        **Evidence.** Kernel PSI metrics are active on frieren (`/proc/pressure/memory`). Swap layout is verified at
-        5.7GB zram (`/dev/zram0`, prio 100) and 8GB disk swap (`/dev/sdb2`, prio 10).
-
-        **Why it is not prod.** Misconfigured memory limits can inadvertently kill active operator agent sessions or
-        download jobs. Requires synthetic stress testing (`stress-ng`) under active 4K video transcoding to calibrate
-        kill/throttle thresholds. Exit criteria: simulated memory surge throttles background OCR while Jellyfin sustains
-        continuous 4K streaming without frame drops.
-      '';
-    };
     exp-024 = {
       title = "EXP-024 — Zero-TCP Static Documentation & Control Plane via UNIX Domain Sockets (`services.udsStaticBridge`)";
       kind = "experiment";
@@ -2035,152 +1889,6 @@
       refs = {
         modules = ["modules/services/uds-static-bridge.nix"];
       };
-    };
-    exp-025 = {
-      title = "EXP-025 — Bare-Metal Zero-Copy `io_uring` / `splice` Static IPC Server (`services.iouStaticBridge`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: swap Nginx userspace parsing for an asynchronous, zero-copy kernel iouring daemon streaming files directly from the page cache into UNIX socket descriptors via splice(2) and sendfile(2). Status: design study. Motivated by pushing the EXP-024 UDS benchmark to bare-metal memory bus throughput.";
-      refs = {
-        hosts = ["frieren"];
-        modules = ["lib/aki-site.nix"];
-      };
-      body = ''
-        **Mode.** Replace Nginx userspace parsing with an `io_uring` daemon that streams files
-        from the page cache into UNIX socket descriptors via `splice(2)` / `sendfile(2)`.
-
-        **Use case.** Agents and fleet tools read multi-megabyte store payloads (closure trees,
-        dependency graphs, `lib/aki-site.nix` output). Nginx on UDS still allocates buffers and
-        context-switches per request; fixed-buffer rings remove the userspace copy.
-
-        **Shape.** `services.iouStaticBridge` with `socketPath`, `entries` (`route` + `path`),
-        `entriesFixedLimit` and `ringEntries`; entries may be store paths or Nix values.
-
-        **Evidence.** `io_uring`/`splice` work on Linux 6.12+; synthetic streams reach >8.5 GB/s
-        with <1% CPU versus ~2.1 GB/s for userspace web servers.
-
-        **Why not prod.** A dedicated C/Rust daemon (`liburing`) plus an epoll fallback where
-        seccomp restricts `io_uring`. Exit: `nc -U /run/iou-docs/raw.sock` answers with verified
-        zero-copy execution and sub-20 µs latency.
-      '';
-    };
-    exp-026 = {
-      title = "EXP-026 — Centralized QuickSync VA-API Video & Image Processing Daemon (`services.vaapiStreamBridge`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: expose frieren's Intel UHD 620 QuickSync hardware encoder (/dev/dri/renderD128) via a coordinated worker daemon over a UNIX domain socket. Status: design study. Motivated by avoiding GPU context starvation during 4K Jellyfin streaming.";
-      body = ''
-        **Mode:** expose frieren's Intel UHD 620 QuickSync hardware encoder (`/dev/dri/renderD128`) via a coordinated
-        worker daemon over a UNIX domain socket.
-        **Status:** design study. Motivated by avoiding GPU context starvation during 4K Jellyfin streaming.
-
-        **Use case.** frieren's Intel UHD Graphics 620 hardware handles 4K HEVC/H.264 video decoding and encoding in silicon.
-        Currently, Jellyfin owns the GPU directly. When Immich runs background video transcoding or Paperless processes
-        scanned PDF images, they either spin up uncoordinated software CPU FFmpeg jobs (spiking host thermals to 75°C+)
-        or attempt to access `/dev/dri/renderD128` concurrently, which risks dropping frames on active 4K TV playback.
-        A centralized hardware-worker daemon exposes a FIFO priority queue over a local UNIX socket: Jellyfin playback
-        maintains pre-emptive priority, while background jobs submit low-priority batch transcoding jobs to QuickSync.
-
-        **Module shape.**
-
-        ```nix
-        services.vaapiStreamBridge = {
-          enable = true;
-          device = "/dev/dri/renderD128";
-          socketPath = "/run/vaapi/worker.sock";
-          maxConcurrentTranscodes = 2;
-          priorityClients = [ "jellyfin" ];
-          yieldOnActivePlayback = true;
-        };
-        ```
-
-        **Evidence.** `/dev/dri/renderD128` is active in group `video` (`gid 26`). Jellyfin runs with QuickSync VA-API
-        active. `intel_gpu_top` confirms GPU render/video engines idle at < 5% when media is not actively transcoding.
-
-        **Why it is not prod.** Immich and Paperless use upstream docker containers and microservices that expect local
-        `ffmpeg` binaries in PATH rather than a socket client wrapper. Requires writing a transparent `ffmpeg` wrapper
-        script that translates CLI calls to socket RPCs. Exit criteria: Paperless OCR and Immich video encoding complete
-        using QuickSync VA-API while a live 4K 60fps stream in Jellyfin sustains zero dropped frames.
-      '';
-    };
-    exp-027 = {
-      title = "EXP-027 — Adaptive PSI-Bounded RAM-Disk Scratchpad for High-Throughput Compilations (`profiles.tmpfsBuilds`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: dynamic allocation of kernel RAM-disk tmpfs storage for Nix store builds and agent workspaces, governed strictly by kernel memory pressure (PSI). Status: design study. Motivated by protecting the 1TB SSD (/dev/sdb3) from high write amplification.";
-      body = ''
-        **Mode:** dynamic allocation of kernel RAM-disk tmpfs storage for Nix store builds and agent workspaces,
-        governed strictly by kernel memory pressure (PSI).
-        **Status:** design study. Motivated by protecting the 1TB SSD (`/dev/sdb3`) from high write amplification.
-
-        **Use case.** Routine system rebuilds, agent shell scripts, and flake lock evaluations generate gigabytes of
-        ephemeral object files and compiler artifacts in `/tmp` and `/build`. Writing these to the NVMe SSD accelerates
-        NAND wear leveling, while spilling them to the 2TB HDD pool (`/dev/sda2`) severely throttles compilation speeds.
-        An adaptive scratchpad module provisions a dynamic `tmpfs` build mount at `/srv/scratch`, allowing compilations
-        to run at 20+ GB/s memory bandwidth. If `/proc/pressure/memory` exceeds 25%, the module dynamically spools excess
-        pages into zram (`zstd`) before spilling to disk swap.
-
-        **Module shape.**
-
-        ```nix
-        profiles.tmpfsBuilds = {
-          enable = true;
-          mountPoint = "/srv/scratch";
-          maxMemoryPercent = 40;          # up to 4.5 GiB of frieren's 11.47 GiB RAM
-          pressureCeiling = "25%";        # abort or throttle if PSI stalls exceed threshold
-          cleanOnBoot = true;
-          nixDaemonTmpDir = true;         # sets TMPDIR for nix-daemon builds
-        };
-        ```
-
-        **Evidence.** frieren has 11.47 GiB RAM, 5.7 GiB zram swap, and an 8 GiB disk swap. Current RAM usage sits at
-        ~4.9 GiB with ~6.5 GiB idle cache. Kernel PSI is active and reports 0% stall during idle periods.
-
-        **Why it is not prod.** Large closure builds (e.g. compiling webkit or rust toolchains) can easily consume more than
-        4 GiB, potentially triggering kernel OOM if `TMPDIR` fills. Requires fallback mechanics or strict memory quotas
-        per build unit. Exit criteria: a 2 GiB nix build completes 4× faster in tmpfs with zero SSD writes, and safely
-        falls back to disk when RAM headroom drops below 2 GiB.
-      '';
-    };
-    exp-028 = {
-      title = "EXP-028 — Autonomous Tailnet Path MTU (PMTU) & Latency Optimizer (`services.fleetMtuProbe`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: continuous background ICMP PMTU discovery and TCP MSS clamping calibration across all fleet nodes. Status: design study. Motivated by latency spikes and packet fragmentation observed on mobile edge nodes (moto).";
-      body = ''
-        **Mode:** continuous background ICMP PMTU discovery and TCP MSS clamping calibration across all fleet nodes.
-        **Status:** design study. Motivated by latency spikes and packet fragmentation observed on mobile edge nodes (`moto`).
-
-        **Use case.** The fleet spans heterogeneous network links: gigabit Ethernet LAN (1500 MTU), Tailscale WireGuard
-        mesh (1280 MTU), Wi-Fi (1500 MTU), and mobile LTE (often 1360–1420 MTU). When mobile clients or remote hosts
-        stream 4K video from frieren or pull large store closures from Harmonia (`:5000`), subtle MTU mismatches cause
-        silent IP packet fragmentation, bufferbloat, and connection drops. An autonomous probe daemon periodically sends
-        Do-Not-Fragment (DF) ICMP probes across all tailnet peers, measures the true Path MTU, and dynamically configures
-        optimal TCP MSS clamping rules.
-
-        **Module shape.**
-
-        ```nix
-        services.fleetMtuProbe = {
-          enable = true;
-          interval = "04:00";             # run daily outside peak hours
-          targetHosts = [ "moto" "eisen" "stark" "demo" ];
-          clampMss = true;                # inject iptables/nftables TCPMSS rules
-          reportMetric = true;            # expose to Gatus monitors
-        };
-        ```
-
-        **Evidence.** `ping -M do -s 1244 100.97.61.65` verifies that Tailscale WireGuard encapsulates packets with 60 bytes
-        of overhead, meaning any payload over 1280 bytes fragments unless endpoints clamp MSS to 1220.
-
-        **Why it is not prod.** Manipulating firewall MSS clamping rules dynamically without declarative pinning in
-        `firewall-scope.nix` risks drifting from NixOS declarative state. Exit criteria: automated probe runs, accurately
-        discovers PMTU to all reachable fleet nodes, and logs recommendations without mutating live firewall tables.
-      '';
     };
     exp-029 = {
       title = "EXP-029 — Hardware UPS Clean-Poweroff Simulation Drill & Telemetry Daemon (`services.upsSimulationDrill`)";
@@ -2202,286 +1910,6 @@
         modules = ["modules/services/sqlite-maintenance.nix"];
       };
     };
-    exp-031 = {
-      title = "EXP-031 — Declarative Nginx Rate-Limiting & Anti-Brute-Force Jail (`profiles.nginxSecurityJail`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: stateless in-memory connection throttling and burst protection for authenticated web endpoints. Status: design study. Motivated by hardening Vaultwarden, Immich, and Aki control portal against LAN brute-force.";
-      body = ''
-        **Mode:** stateless in-memory connection throttling and burst protection for authenticated web endpoints.
-        **Status:** design study. Motivated by hardening Vaultwarden, Immich, and Aki control portal against LAN brute-force.
-
-        **Use case.** frieren exposes Vaultwarden (:8222) and administrative portals on LAN and Tailscale. While the
-        firewall interface scope restricts WAN ingress, any device on the local network (e.g. IoT devices or guest laptops)
-        could attempt high-frequency credential stuffing or DoS queries. Traditional `fail2ban` parses text logs and mutates
-        stateful `iptables` rules, violating NixOS declarative purity. Nginx's built-in `limit_req_zone` and `limit_conn_zone`
-        provide pure, stateless, declarative in-memory rate limiting with zero kernel firewall mutation:
-        - Memory-efficient binary IP hashing (10m zone stores ~160,000 unique IP states).
-        - Configurable burst buffers with `nodelay` for legitimate operators.
-        - Returns HTTP 429 Too Many Requests to abusive callers instantly.
-
-        **Module shape.**
-
-        ```nix
-        profiles.nginxSecurityJail = {
-          enable = true;
-          zones = {
-            auth = { rate = "5r/m"; burst = 10; nodelay = true; };
-            api = { rate = "30r/s"; burst = 50; nodelay = true; };
-          };
-          protectedVhosts = [ "vault.frieren.lan" "photos.frieren.lan" ];
-        };
-        ```
-
-        **Evidence.** Nginx on frieren is compiled with the `http_limit_req_module` and `http_limit_conn_module`.
-        Testing confirms Nginx handles rate enforcement with < 1 µs overhead per request.
-
-        **Why it is not prod.** Miscalibrated burst limits on Immich or Vaultwarden can break batch mobile sync (e.g.
-        uploading 50 photos simultaneously from a phone companion app). Exit criteria: Vaultwarden login endpoints
-        block after 10 rapid failed attempts while Immich photo background uploads continue uninterrupted.
-      '';
-    };
-    exp-032 = {
-      title = "EXP-032 — Intelligent Btrfs Metadata Rebalance & Space-Reclamation Dispatcher (`services.btrfsAutoRebalance`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: conditional, threshold-driven Btrfs block group balancing for high-churn storage pools. Status: design study. Motivated by preventing ENOSPC errors on the 2TB HDD data pool (/dev/sda2).";
-      body = ''
-        **Mode:** conditional, threshold-driven Btrfs block group balancing for high-churn storage pools.
-        **Status:** design study. Motivated by preventing ENOSPC errors on the 2TB HDD data pool (`/dev/sda2`).
-
-        **Use case.** frieren's 2TB HDD data pool hosts high-churn workloads: Transmission torrents, Immich media uploads,
-        Paperless document conversions, and nightly Restic backup snapshots. Over months of heavy write/delete activity,
-        Btrfs allocates dedicated 1 GiB data and metadata chunks that become sparsely populated. This fragmentation causes
-        Btrfs to return `No space left on device` (ENOSPC) during large writes even when hundreds of gigabytes of disk
-        space are reported free. An autonomous rebalance module monitors unallocated raw chunk ratios via `btrfs filesystem usage`:
-        only when unallocated space drops below 10% does it invoke filtered balances (`-dusage=10`, `-musage=10`).
-
-        **Module shape.**
-
-        ```nix
-        services.btrfsAutoRebalance = {
-          enable = true;
-          mounts = [ "/Volumes/data" ];
-          schedule = "Sun *-*-* 01:00:00"; # strictly outside 03:00-05:30 backup window
-          unallocatedThresholdPercent = 10;
-          dataUsageFilter = 15;
-          metadataUsageFilter = 20;
-        };
-        ```
-
-        **Evidence.** `sudo btrfs filesystem usage /Volumes/data` shows that `/dev/sda2` currently has 800 GiB unallocated.
-        Rebalancing full drives causes severe I/O thrashing; filtered balancing (`-dusage=10`) takes only ~45 seconds.
-
-        **Why it is not prod.** Btrfs balance operations must NEVER overlap with active nightly backups (03:00–05:30) or
-        media streaming, as balance holds filesystem transaction locks. Exit criteria: threshold evaluation correctly skips
-        healthy filesystems and safely compacts sparse chunks on test filesystems without I/O regressions.
-      '';
-    };
-    exp-033 = {
-      title = "EXP-033 — Autonomous WireGuard Mesh Rekeying & Ephemeral Session Rotation (`profiles.wireguardRekey`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: declarative key generation and automated session rotation for inter-host Tailscale/WireGuard peers. Status: design study. Motivated by zero-trust fleet posture across long-running mainframe nodes.";
-      body = ''
-        **Mode:** declarative key generation and automated session rotation for inter-host Tailscale/WireGuard peers.
-        **Status:** design study. Motivated by zero-trust fleet posture across long-running mainframe nodes.
-
-        **Use case.** Fleet nodes communicate across physical boundaries (frieren, moto, eisen, stark) using Tailscale
-        WireGuard mesh encryption. While WireGuard natively rotates 1-minute transport session keys in-band, the static
-        host identity keypairs remain static indefinitely. In high-security environments, periodic identity key rotation
-        ensures forward secrecy against long-term key compromise. A declarative rekeying profile coordinates with SOPS
-        and age recipients, automatically generating ephemeral WireGuard keys, validating peer reachability, and gracefully
-        retiring old keys.
-
-        **Module shape.**
-
-        ```nix
-        profiles.wireguardRekey = {
-          enable = true;
-          interval = "monthly";
-          interface = "tailscale0";
-          backupOldKeys = true;
-          verifyPingPeer = "100.81.170.87"; # bitlockerpremium
-        };
-        ```
-
-        **Evidence.** Tailscale CLI natively supports `--authkey` renewal and local key generation via `tailscale cert`
-        and WireGuard tools (`wg genkey`).
-
-        **Why it is not prod.** Rotating host identity keys on an active mainframe can cause transient network isolation
-        if peer coordination fails. Exit criteria: successful key rotation demonstrated between two test fleet nodes with
-        zero connection drops on active SSH sessions.
-      '';
-    };
-    exp-034 = {
-      title = "EXP-034 — Autonomous Nix Store Derivation GC Root Ratchet (`services.gcRootPruner`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: background sweeping and pruning of orphaned auto-roots and direnv gcroots in /nix/var/nix/gcroots. Status: design study. Motivated by enforcing frieren's 34.9 GiB closure budget ceiling (closure-budgets.toml).";
-      body = ''
-        **Mode:** background sweeping and pruning of orphaned auto-roots and direnv gcroots in `/nix/var/nix/gcroots`.
-        **Status:** design study. Motivated by enforcing frieren's 34.9 GiB closure budget ceiling (`closure-budgets.toml`).
-
-        **Use case.** Active local development, temporary agent evaluations, and Direnv environments create symlinks in
-        `/nix/var/nix/gcroots/auto/`. These auto-roots pin old derivations and build dependencies permanently in `/nix/store`,
-        causing `nix-collect-garbage` to skip them. Over weeks, dead build closures accrete, threatening frieren's 34.9 GiB
-        closure budget. An autonomous ratchet daemon scans `/nix/var/nix/gcroots/auto/` and per-user roots, detects broken
-        symlinks or targets untouched for > 14 days, unlinks them, and verifies that frieren stays under budget.
-
-        **Module shape.**
-
-        ```nix
-        services.gcRootPruner = {
-          enable = true;
-          schedule = "weekly";
-          maxRootAgeDays = 14;
-          dryRun = false;
-          closureBudgetCeiling = "34.9G";
-          targetHost = "frieren";
-        };
-        ```
-
-        **Evidence.** `ls -la /nix/var/nix/gcroots/auto/` reveals symlinks pointing to old development workspaces.
-        Running `find /nix/var/nix/gcroots/auto/ -xtype l` occasionally catches broken symlinks that confuse GC statistics.
-
-        **Why it is not prod.** Care must be taken not to purge active editor environments or running agent shell roots.
-        Exit criteria: safe dry-run scan correctly identifies orphaned derivation roots, followed by an automated GC pass
-        that recovers > 1 GiB without invalidating active project environments.
-      '';
-    };
-    exp-035 = {
-      title = "EXP-035 — Autonomous ZRAM Compression & Swap Priority Balancer (`profiles.adaptiveZramSwap`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: dynamic kernel sysctl memory tuning and zram compression sizing governed by real-time swap churn. Status: design study. Motivated by frieren's 11.47 GiB RAM hardware boundary and dual swap tiers (5.7GB zram vs 8GB HDD swap).";
-      body = ''
-        **Mode:** dynamic kernel sysctl memory tuning and zram compression sizing governed by real-time swap churn.
-        **Status:** design study. Motivated by frieren's 11.47 GiB RAM hardware boundary and dual swap tiers (5.7GB zram vs 8GB HDD swap).
-
-        **Use case.** frieren runs a two-tier swap architecture: in-memory zram (`/dev/zram0`, zstd, priority 100) and disk swap
-        (`/dev/sdb3`, priority 10). When parallel batch jobs spike (Paperless document OCR, heavy agent planning passes, or bulk Immich
-        ingestion), the memory allocator fills the 5.7 GiB zram buffer and overflows onto disk swap. Because `/dev/sda2` is an electromechanical
-        HDD pool, paging out anonymous memory blocks triggers severe kernel I/O stalls (`wa%` reaching 25-40%), causing audio/video stutter
-        on 4K Jellyfin playback. An adaptive balancer daemon monitors swap tier utilization: when zram reaches 75% capacity, it dynamically
-        adjusts `vm.swappiness` from 60 down to 10 and increases zram compressed block device limits, confining transient memory spikes entirely
-        to CPU-compressed memory and shielding the storage drives from paging contention.
-
-        **Module shape.**
-
-        ```nix
-        profiles.adaptiveZramSwap = {
-          enable = true;
-          maxZramPercent = 50;            # allow zram to expand dynamically up to 5.7 GiB
-          algorithm = "zstd";
-          fallbackDiskPriority = 10;
-          swappinessCeiling = 60;
-          swappinessFloor = 10;
-          throttleThresholdPercent = 80;  # lower swappiness when zram exceeds 80%
-        };
-        ```
-
-        **Evidence.** Ground truth on frieren: `swapon -s` confirms `/dev/zram0` (5.7 GiB, prio 100) and `/dev/sdb2` (8 GiB, prio 10).
-        Current idle memory usage sits at ~4.9 GiB with 0 bytes paged to disk. `vm.swappiness` is currently set to kernel default 60.
-
-        **Why it is not prod.** Dynamically modifying `vm.swappiness` via sysctl and resizing zram block devices at runtime requires testing
-        under artificial memory exhaustion (`stress-ng --vm 2 --vm-bytes 4G`) to ensure kernel zram driver does not panic or trigger premature OOM.
-        Exit criteria: synthetic memory surge cleanly compresses into zram with zero bytes leaked to HDD swap, maintaining Jellyfin 4K stream
-        continuity with 0 dropped frames.
-      '';
-    };
-    exp-036 = {
-      title = "EXP-036 — Declarative Encrypted DNS Upstream Multiplexer with Circuit-Breaking (`profiles.secureDnsUpstreams`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: declarative DNS-over-TLS (DoT) and DNS-over-HTTPS (DoH) forwarder pool in Unbound with automated latency scoring and health failover. Status: design study. Motivated by eliminating unencrypted WAN DNS recursion and improving edge query latency.";
-      body = ''
-        **Mode:** declarative DNS-over-TLS (DoT) and DNS-over-HTTPS (DoH) forwarder pool in Unbound with automated latency scoring and health failover.
-        **Status:** design study. Motivated by eliminating unencrypted WAN DNS recursion and improving edge query latency.
-
-        **Use case.** frieren runs Pi-hole FTL backed by Unbound on port 53. Currently, Unbound either performs full root iterative recursion
-        or forwards plain UDP/TCP queries. Plain DNS queries to external providers are susceptible to ISP inspection, interception, and transient
-        UDP packet drops. A declarative upstream multiplexer profile configures Unbound to query multiple authenticated DoT/DoH endpoints
-        (Quad9 `9.9.9.9@853#dns.quad9.net`, Cloudflare `1.1.1.1@853#cloudflare-dns.com`, Mullvad) over TLS. The module includes an automated
-        latency probe unit that measures round-trip handshake times every 6 hours, circuit-breaking degraded upstreams and prioritizing the fastest
-        resolver without manual intervention.
-
-        **Module shape.**
-
-        ```nix
-        profiles.secureDnsUpstreams = {
-          enable = true;
-          protocol = "dot";               # "dot" (port 853) | "doh" (port 443)
-          upstreams = [
-            { name = "quad9-primary"; addr = "9.9.9.9"; port = 853; hostname = "dns.quad9.net"; }
-            { name = "cloudflare-primary"; addr = "1.1.1.1"; port = 853; hostname = "cloudflare-dns.com"; }
-            { name = "mullvad-primary"; addr = "194.242.2.3"; port = 853; hostname = "dns.mullvad.net"; }
-          ];
-          circuitBreakerLatencyMs = 120;  # disable upstreams with latency > 120ms
-          fallbackToRootIterative = true; # fall back to local root hints if all DoT providers fail
-        };
-        ```
-
-        **Evidence.** Unbound on frieren (`services.unbound`) is compiled with `libevent` and OpenSSL TLS support. Testing confirms port 853
-        outbound TCP is permitted through the interface firewall scope.
-
-        **Why it is not prod.** If TLS certificate validation fails during boot before system time is synchronized via NTP, Unbound will fail
-        to resolve DNS, preventing NTP from synchronizing time (chicken-and-egg failure). Requires strict fallback to iterative root hints or
-        hardcoded fallback addresses. Exit criteria: verified TLS-encrypted DNS resolution with < 25ms latency, validated failover to secondary
-        provider during simulated upstream blackhole, and zero boot-time deadlocks.
-      '';
-    };
-    exp-037 = {
-      title = "EXP-037 — Autonomous Btrfs Snapshot Retention & Capacity Ratchet (`services.snapshotRatchet`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: multi-tier declarative Btrfs subvolume snapshot lifecycle manager with emergency capacity-driven space reclamation. Status: design study. Motivated by preventing ENOSPC conditions caused by heavy snapshot accumulation on /dev/sda2 (2TB HDD) and /dev/sdb3 (1TB SSD).";
-      body = ''
-        **Mode:** multi-tier declarative Btrfs subvolume snapshot lifecycle manager with emergency capacity-driven space reclamation.
-        **Status:** design study. Motivated by preventing ENOSPC conditions caused by heavy snapshot accumulation on `/dev/sda2` (2TB HDD) and `/dev/sdb3` (1TB SSD).
-
-        **Use case.** frieren utilizes Btrfs subvolumes for `@root`, `@home`, `@snapshots`, and the 2TB data pool `/Volumes/data`. Automated snapshots
-        protect against accidental file modification and ransomware. However, high-volume write activities (e.g. Immich video library additions,
-        large Torrent transfers, or Paperless batch OCR) can quickly balloon snapshot exclusive block sizes (`btrfs qgroup show`). If available
-        unallocated space falls below 5%, Btrfs refuses new writes and can lock into read-only mode. An autonomous snapshot ratchet daemon enforces
-        strict retention windows (hourly: 24, daily: 7, weekly: 4), while continuously monitoring pool headroom: if free capacity drops below 10%,
-        the ratchet progressively prunes the oldest daily/hourly snapshots until safe headroom (> 15%) is restored.
-
-        **Module shape.**
-
-        ```nix
-        services.snapshotRatchet = {
-          enable = true;
-          mounts = [ "/" "/Volumes/data" ];
-          retention = {
-            hourly = 24;
-            daily = 7;
-            weekly = 4;
-            monthly = 3;
-          };
-          headroomEmergencyThresholdPercent = 8;
-          targetHeadroomPercent = 15;
-          dryRun = false;
-          schedule = "*-*-* 01:00:00";    # before 03:00 backup window
-        };
-        ```
-
-        **Evidence.** Btrfs subvolume layout on frieren: `/dev/sdb3` SSD (923 GB) and `/dev/sda2` HDD (1.8 TB). Snapper and custom snapshot
-        scripts create snapshots in `/.snapshots` and `/Volumes/data/.snapshots`.
-
-        **Why it is not prod.** Uncontrolled snapshot deletion could accidentally delete recent restore points if threshold calculations confuse
-        sparse allocations with real usage. Requires dry-run verification and assertions ensuring the latest snapshot is NEVER purged. Exit
-        criteria: scheduled test on a test subvolume successfully retains declared generation counts, safely prunes excess snapshots upon
-        simulated disk saturation, and logs a full audit trail.
-      '';
-    };
     exp-038 = {
       title = "EXP-038 — Headless Paperless-ngx Document Ingestion Watchdog & Pipeline Health Probe (`services.paperlessWatchdog`)";
       kind = "experiment";
@@ -2491,44 +1919,6 @@
       refs = {
         modules = ["modules/services/paperless-watchdog.nix"];
       };
-    };
-    exp-039 = {
-      title = "EXP-039 — Declarative Tailnet Subnet Router & Multicast DNS (mDNS) Reflector Gateway (`services.fleetMdnsReflector`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: bridged mDNS service discovery across physical LAN interfaces (enp1s0) and the virtual Tailscale mesh (tailscale0). Status: design study. Motivated by providing zero-configuration service discovery (.local domains) for roaming fleet devices.";
-      body = ''
-        **Mode:** bridged mDNS service discovery across physical LAN interfaces (`enp1s0`) and the virtual Tailscale mesh (`tailscale0`).
-        **Status:** design study. Motivated by providing zero-configuration service discovery (`.local` domains) for roaming fleet devices.
-
-        **Use case.** When laptops (`minyx`, `stark`) and mobile phones roam outside the home network, they connect to frieren via Tailscale WireGuard.
-        However, multicast DNS (mDNS, `224.0.0.251:5353`) and DNS-SD packets are link-local and do not route across point-to-point WireGuard VPN
-        tunnels. As a result, roaming devices cannot automatically discover local services (Jellyfin media server, Home Assistant cast targets,
-        Harmonia binary cache, Aki portal) using standard `.local` hostnames or ZeroConf discovery protocols. A declarative reflector gateway
-        utilizes Avahi's reflector mode or a lightweight unicast mDNS repeater daemon, bridging service announcements between `enp1s0` and `tailscale0`
-        with strict interface filtering to prevent multicast loops.
-
-        **Module shape.**
-
-        ```nix
-        services.fleetMdnsReflector = {
-          enable = true;
-          interfaces = [ "enp1s0" "tailscale0" ];
-          reflectAcrossTailnet = true;
-          allowedServices = [ "_http._tcp" "_jellyfin._tcp" "_home-assistant._tcp" ];
-          preventBroadcastStorms = true;
-        };
-        ```
-
-        **Evidence.** `avahi-daemon` is already running on frieren for LAN service discovery. Tailscale interface `tailscale0` is active and
-        has IP `100.97.61.65`.
-
-        **Why it is not prod.** Misconfigured mDNS reflectors on dual-homed machines can trigger packet amplification loops (multicast storm)
-        that flood Wi-Fi interfaces and degrade network throughput. Requires strict duplicate-detection filters and packet TTL clamping. Exit
-        criteria: a remote laptop connected exclusively via Tailscale successfully resolves `frieren.local` and auto-discovers the Jellyfin
-        server without manually specifying an IP address.
-      '';
     };
     exp-040 = {
       title = "EXP-040 — Autonomous Kiwix ZIM Library Integrity & Full-Text Search Health Probe (`services.kiwixWatchdog`)";
@@ -2540,45 +1930,6 @@
         modules = ["modules/services/kiwix-watchdog.nix"];
       };
     };
-    exp-041 = {
-      title = "EXP-041 — Declarative Jellyfin Hardware Transcoding Priority & Throttle Manager (`services.jellyfinGpuGovernor`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: dynamic nice/cgroup I/O throttling and QuickSync concurrency limits during parallel batch jobs. Status: design study. Motivated by avoiding GPU/disk contention during 4K TV video playback.";
-      body = ''
-        **Mode:** dynamic nice/cgroup I/O throttling and QuickSync concurrency limits during parallel batch jobs.
-        **Status:** design study. Motivated by avoiding GPU/disk contention during 4K TV video playback.
-
-        **Use case.** frieren serves Jellyfin streams via Intel UHD 620 QuickSync transcoding (`/dev/dri/renderD128`) to clients over the LAN
-        and tailnet. It has no display of its own: moved to the basement on 2026-11-11 to sit next to the router, and every HDMI output reads
-        disconnected, so playback happens on a client and never on the host. Concurrently it runs heavy background batch compute — Paperless OCR,
-        Immich face recognition, Kiwix full-text indexing, LLM agent planning sessions. When those workers spin up, memory bus bandwidth and GPU
-        execution units saturate, which starves the transcoder and drops frames on the client.
-        A GPU governor monitors active Jellyfin playback sessions via the Jellyfin local REST API: when an active transcode or direct playback session
-        is detected, the governor dynamically lowers batch service cgroup weights (`CPUWeight=10`, `IOWeight=10`) and throttles background FFmpeg jobs.
-
-        **Module shape.**
-
-        ```nix
-        services.jellyfinGpuGovernor = {
-          enable = true;
-          jellyfinUrl = "http://127.0.0.1:8096";
-          throttledServices = [ "paperless-task-queue" "immich-machine-learning" ];
-          idleCpuWeight = 10;
-          activePlaybackPriority = "realtime";
-          pollIntervalSec = 15;
-        };
-        ```
-
-        **Evidence.** `/dev/dri/renderD128` is actively mapped in `media-stack.nix`. Jellyfin runs on port 8096. Hardware profile: Intel UHD 620
-        (Kaby Lake R, 24 EUs).
-
-        **Why it is not prod.** Polling the Jellyfin API every 15 seconds requires handling authentication tokens and transient service restarts
-        without spamming error logs. Exit criteria: simulated Paperless OCR load (`tesseract`) automatically yields CPU/GPU slices when a 4K
-        playback session starts in Jellyfin, sustaining 0 dropped frames.
-      '';
-    };
     exp-042 = {
       title = "EXP-042 — Declarative PostgreSQL Logical Backup Verification Drill (`services.postgresBackupDrill`)";
       kind = "experiment";
@@ -2588,44 +1939,6 @@
       refs = {
         modules = ["modules/services/postgres-backup-drill.nix"];
       };
-    };
-    exp-043 = {
-      title = "EXP-043 — Autonomous Network Namespace Sandboxing for Headless Torrents (`profiles.transmissionVpnJail`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: deterministic network namespace binding routing Transmission traffic exclusively through WireGuard with kill-switch assertions. Status: design study. Motivated by preventing accidental IP leakage during open-source ISO distribution and media transfers.";
-      body = ''
-        **Mode:** deterministic network namespace binding routing Transmission traffic exclusively through WireGuard with kill-switch assertions.
-        **Status:** design study. Motivated by preventing accidental IP leakage during open-source ISO distribution and media transfers.
-
-        **Use case.** Transmission daemon runs on frieren for background Linux ISO distribution and media downloading. Currently, it binds host
-        network interfaces under ingress firewall filtering. In privacy-conscious architectures, torrent traffic must route exclusively through an
-        isolated encrypted WireGuard VPN tunnel with an absolute kill-switch: if the VPN interface drops, traffic must drop rather than spilling
-        onto the plain ISP network uplink. A dedicated profile constructs a dedicated Linux network namespace (`netns: transmission`), binds the
-        Transmission daemon strictly inside the namespace, and routes default gateway traffic over the VPN interface with zero possibility of host leakage.
-
-        **Module shape.**
-
-        ```nix
-        profiles.transmissionVpnJail = {
-          enable = true;
-          namespaceName = "vpn-jail";
-          wireguardConfigFile = config.sops.secrets.vpn_wireguard_conf.path;
-          allowLanPeerDiscovery = false;
-          killSwitch = true;
-          forwardedPort = 51413;
-        };
-        ```
-
-        **Evidence.** Transmission daemon runs on frieren under `transmission.service`. Kernel network namespaces (`ip netns`) are natively
-        supported in Linux 6.12+.
-
-        **Why it is not prod.** Requires provisioning a commercial VPN WireGuard peer config, SOPS secret keying, and handling inter-namespace
-        communication so local web UIs (e.g. `http://transmission.frieren.lan/`) can still communicate with the daemon inside the namespace.
-        Exit criteria: Transmission runs entirely within `netns`, external IP matches VPN egress, and pulling the VPN link instantly stalls downloads
-        with zero bytes leaked onto `enp1s0`.
-      '';
     };
     exp-044 = {
       title = "EXP-044 — Declarative Flake Lock Drift & Security Advisory Audit Unit (`services.flakeAdvisoryAudit`)";
@@ -2656,80 +1969,6 @@
       refs = {
         modules = ["modules/services/fleet-session-reaper.nix"];
       };
-    };
-    exp-047 = {
-      title = "EXP-047 — Declarative Home Assistant Automation & Entity State Integrity Probe (`services.haAutomationProbe`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: automated validation of Home Assistant entity states and automation execution health over local REST API. Status: design study. Motivated by detecting broken sensors, unavailable MQTT entities, and dead automations.";
-      body = ''
-        **Mode:** automated validation of Home Assistant entity states and automation execution health over local REST API.
-        **Status:** design study. Motivated by detecting broken sensors, unavailable MQTT entities, and dead automations.
-
-        **Use case.** frieren runs Home Assistant Core (`services.homeAssistant`) with 53 enabled entities and 8 devices. Over time,
-        Zigbee/Wi-Fi devices go offline, battery-backed sensors deplete, or template sensors fail to evaluate due to schema changes.
-        Because HA is running headlessly without daily manual UI review, broken automations and unavailable entities remain undetected
-        until an automation failure impacts the physical household. A declarative probe unit queries Home Assistant's local REST API
-        (`http://127.0.0.1:8123/api/states`) daily: it audits all entities, flags any critical device reporting `unavailable` or `unknown`
-        for > 6 hours, checks for automation trigger errors in HA logs, and emits a scorecard to `#Fleet`.
-
-        **Module shape.**
-
-        ```nix
-        services.haAutomationProbe = {
-          enable = true;
-          haUrl = "http://127.0.0.1:8123";
-          schedule = "daily";
-          maxUnavailableHours = 6;
-          criticalDomains = [ "switch" "light" "binary_sensor" "climate" ];
-          alertSimpleX = true;
-        };
-        ```
-
-        **Evidence.** Home Assistant is active on frieren on port 8123. REST API is available locally. Currently 53 entities are registered.
-
-        **Why it is not prod.** Requires provisioning a long-lived access token declaratively or via SOPS to query `/api/states` without
-        interactive auth prompts. Exit criteria: probe discovers 1 intentionally disconnected test entity, correctly classifies it as
-        unavailable, and reports 100% health across all online devices.
-      '';
-    };
-    exp-048 = {
-      title = "EXP-048 — Transparent Hugepage (THP) & Kernel Memory Compaction Tuner (`profiles.mediaHugepages`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: targeted Transparent Hugepage (THP) allocation and memory compaction policies for 4K media streaming and large ZIM archives. Status: design study. Motivated by reducing TLB misses during 4K video transcoding and large-file memory mapping.";
-      body = ''
-        **Mode:** targeted Transparent Hugepage (THP) allocation and memory compaction policies for 4K media streaming and large ZIM archives.
-        **Status:** design study. Motivated by reducing TLB misses during 4K video transcoding and large-file memory mapping.
-
-        **Use case.** frieren concurrently memory-maps multi-gigabyte files: 52.7 GB Wikipedia ZIM archives (`kiwix-serve`), 4K HEVC video files
-        (`jellyfin`), and Paperless document embeddings. With standard 4 KB page sizes, memory mapping a 50 GB file requires 13 million page table
-        entries, saturating the CPU's Translation Lookaside Buffer (TLB) and inducing kernel page table walker overhead. Transparent Hugepages
-        (2 MB pages) drastically reduce TLB misses by 500×. However, setting THP to `always` system-wide causes memory fragmentation and latency
-        spikes in Redis and PostgreSQL. A specialized media profile sets kernel THP to `madvise` and configures `systemd.services.kiwix-serve`
-        and `systemd.services.jellyfin` with `MemoryAccounting=true` and `madvise(MADV_HUGEPAGE)` wrappers, optimizing large memory mappings
-        without bloating database workloads.
-
-        **Module shape.**
-
-        ```nix
-        profiles.mediaHugepages = {
-          enable = true;
-          thpMode = "madvise";            # "always" | "madvise" | "never"
-          defragMode = "defer+madvise";
-          targetServices = [ "jellyfin" "kiwix-serve" ];
-        };
-        ```
-
-        **Evidence.** `/sys/kernel/mm/transparent_hugepage/enabled` is currently set to `always [madvise] never` on frieren.
-        `kiwix-serve` memory-maps 52.7 GB of ZIM data.
-
-        **Why it is not prod.** If THP allocation triggers synchronous kernel compaction under low RAM conditions, media streaming can stall.
-        Requires tuning `khugepaged/defrag` and measuring before/after TLB miss rates (`perf stat -e dTLB-load-misses`). Exit criteria: measured
-        35% reduction in TLB misses during Kiwix search and 4K Jellyfin streaming with 0 latency spikes.
-      '';
     };
     exp-049 = {
       title = "EXP-049 — Declarative Inter-Host SimpleX Agent Coordination Mesh (`profiles.interAgentMesh`)";
@@ -2770,499 +2009,19 @@
         ping and telemetry dispatch between frieren and a secondary node over SimpleX with 0 human intervention and full signature verification.
       '';
     };
-    exp-050 = {
-      title = "EXP-050 — Autonomous Nginx SSL/TLS Certificate Expiry & OCSP Stapling Watchdog (`services.tlsCertWatchdog`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: scheduled background validation of SSL/TLS certificate expiration dates and OCSP responses across virtual hosts. Status: design study. Motivated by preventing certificate expiration from breaking background mobile client sync (Vaultwarden, Immich).";
-      body = ''
-        **Mode:** scheduled background validation of SSL/TLS certificate expiration dates and OCSP responses across virtual hosts.
-        **Status:** design study. Motivated by preventing certificate expiration from breaking background mobile client sync (Vaultwarden, Immich).
-
-        **Use case.** frieren terminates TLS for local reverse proxies (Vaultwarden `:8222`, Aki portal `:80/443`, monitors) and serves
-        services on the Tailscale mesh (`frieren.lan`). While ACME or certificates run in the background, renewal failures, transient DNS
-        validation timeouts, or clock skew can silently let certificates expire. Because server services run headlessly without browser
-        interactions, expired certs go unnoticed until mobile apps (Bitwarden sync, Immich backup) fail with TLS handshake errors.
-        A declarative watchdog unit runs every 12 hours: it probes declared virtual hosts and local cert files (`/srv/private/` or `/var/lib/acme`),
-        asserts remaining valid days (> 14 days), tests OCSP stapling responses, and raises administrative alerts on approaching expiration.
-
-        **Module shape.**
-
-        ```nix
-        services.tlsCertWatchdog = {
-          enable = true;
-          endpoints = [
-            "https://vault.frieren.lan"
-            "https://monitors.frieren.lan"
-          ];
-          certFiles = [ "/var/lib/acme/vault.frieren.lan/cert.pem" ];
-          warnDays = 14;
-          criticalDays = 5;
-          schedule = "00/12:00:00";
-        };
-        ```
-
-        **Evidence.** Nginx is active on frieren. `openssl x509 -enddate -noout -in <cert>` and `curl -vI https://...` provide immediate,
-        deterministic certificate parsing without external network dependencies.
-
-        **Why it is not prod.** Probing local HTTPS endpoints requires resolving hostnames via local DNS and handling self-signed certificates
-        gracefully without spurious warnings. Exit criteria: scheduled unit tests declared certificates, accurately flags a simulated 5-day
-        expiring certificate, and completes in < 500ms with zero production interference.
-      '';
-    };
-    exp-051 = {
-      title = "EXP-051 — Declarative Host Thermals & Dynamic Fan Curve Governor (`services.thermalGovernor`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: real-time core temperature telemetry from sysfs (/sys/class/thermal) and predictive throttling under sustained 4K encoding. Status: design study. Motivated by preventing thermal throttling dropouts on the Lenovo IdeaPad 320 laptop-as-server hardware.";
-      body = ''
-        **Mode:** real-time core temperature telemetry from sysfs (`/sys/class/thermal`) and predictive throttling under sustained 4K encoding.
-        **Status:** design study. Motivated by preventing thermal throttling dropouts on the Lenovo IdeaPad 320 laptop-as-server hardware.
-
-        **Use case.** frieren runs 24/7 on laptop hardware (Lenovo ideapad 320-15IKB, Intel Core i5-8250U). Under sustained multi-hour FFmpeg
-        transcodes, Paperless batch OCR, or local Nix rebuilds, CPU thermals can reach 75–80°C. If the single laptop fan cannot dissipate heat,
-        the CPU throttles its clock down to 800 MHz, inducing audio/video playback stutter on 4K Jellyfin output. A lightweight governor daemon
-        monitors thermal zones (`/sys/class/thermal/thermal_zone*/temp`): when temperatures exceed 72°C, it modulates Intel P-state energy
-        performance preferences (`/sys/devices/system/cpu/cpu*/power/energy_perf_bias`) to drop CPU package wattage from 15W to 10W, preventing
-        thermal throttling spikes while maintaining smooth media playback.
-
-        **Module shape.**
-
-        ```nix
-        services.thermalGovernor = {
-          enable = true;
-          highTempCelsius = 72;
-          criticalTempCelsius = 80;
-          throttleAction = "bias-power";   # "bias-power" | "cap-frequency" | "nice-batch"
-          pollIntervalSec = 30;
-          logMetrics = true;
-        };
-        ```
-
-        **Evidence.** Sysfs thermals are readable on frieren (`cat /sys/class/thermal/thermal_zone0/temp` reports ~34°C during idle).
-        Intel Core i5-8250U supports hardware P-state energy performance bias.
-
-        **Why it is not prod.** Aggressive thermal capping could unnecessarily throttle legitimate fast builds when ambient temperatures
-        are low. Requires calibrating hysteresis margins so governor does not oscillate every few seconds. Exit criteria: simulated CPU load
-        (`stress-ng --cpu 4`) smoothly lowers energy performance bias when 72°C is crossed, capping thermals without dropping clock below 1.6 GHz.
-      '';
-    };
-    exp-052 = {
-      title = "EXP-052 — Autonomous ZRAM Decompression Latency & Memory Reclamation Drill (`services.zramPerfDrill`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: periodic synthetic memory compression/decompression benchmark verifying zram throughput on Linux 6.12. Status: design study. Motivated by ensuring CPU-compressed memory operates faster than NVMe storage.";
-      body = ''
-        **Mode:** periodic synthetic memory compression/decompression benchmark verifying zram throughput on Linux 6.12.
-        **Status:** design study. Motivated by ensuring CPU-compressed memory operates faster than NVMe storage.
-
-        **Use case.** frieren allocates 5.7 GiB to `/dev/zram0` using zstd compression. As the system runs for weeks across diverse memory
-        churn (PostgreSQL, Paperless, Gatus, agent processes), kernel memory allocator fragmentation or CPU lock contention can degrade
-        zram throughput below expected performance levels. A monthly drill runs non-destructive, isolated memory compression benchmarks:
-        it writes and reads a 64 MB synthetic memory pattern to `/dev/zram0`, calculates compression ratio and read/write bandwidth, asserts
-        throughput > 3.0 GB/s, and verifies zero kernel page allocation failures, proving zram memory health.
-
-        **Module shape.**
-
-        ```nix
-        services.zramPerfDrill = {
-          enable = true;
-          schedule = "monthly";
-          benchmarkSizeMb = 64;
-          minThroughputGbps = 3.0;
-          maxLatencyMs = 25;
-          notifyOnDegradation = true;
-        };
-        ```
-
-        **Evidence.** `/dev/zram0` is active on frieren (`swapon -s` shows 5.7 GiB, prio 100). Kernel 6.12 implements multi-stream zstd
-        compression algorithms.
-
-        **Why it is not prod.** Generating synthetic memory churn must never trigger memory eviction or OOM on production services. Must
-        verify sufficient free RAM headroom (> 2 GiB) before running the drill. Exit criteria: monthly drill completes in < 3 seconds,
-        reports > 3.5 GB/s memory throughput, and exits cleanly with zero page leaks.
-      '';
-    };
-    exp-053 = {
-      title = "EXP-053 — Declarative Pi-hole Gravity Sync & Adlist Drift Reconciliation (`services.gravitySync`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: automated reconciliation of blocklist definitions, whitelist domains, and gravity database optimization. Status: design study. Motivated by preventing stale blocklists and DNS recursion timeouts.";
-      body = ''
-        **Mode:** automated reconciliation of blocklist definitions, whitelist domains, and gravity database optimization.
-        **Status:** design study. Motivated by preventing stale blocklists and DNS recursion timeouts.
-
-        **Use case.** Pi-hole FTL runs on port 53. Gravity updates (`pihole -g`) update domain blocklists weekly. When upstream adlist URLs
-        return HTTP 404 or transient timeouts, Gravity drops existing lists or accretes stale domain hashes. A declarative reconciliation
-        module checks adlist HTTP availability, runs gravity updates outside peak hours, and verifies that recursive query latency stays < 15ms.
-
-        **Module shape.**
-
-        ```nix
-        services.gravitySync = {
-          enable = true;
-          schedule = "Sun *-*-* 03:15:00"; # strictly outside 03:00 backup window
-          adlists = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
-          verifyDnsLatency = true;
-          maxLatencyMs = 25;
-        };
-        ```
-
-        **Evidence.** Pi-hole gravity database is `/var/lib/pihole/gravity.db` (8.7 MB, 87,000+ domains). `task checks:dns:failover`
-        verifies local resolution.
-
-        **Why it is not prod.** Gravity database rebuild acquires database locks on `gravity.db`, which can briefly stall DNS lookups for LAN
-        devices. Must run during the quietest night hour and verify fast post-rebuild DNS query response. Exit criteria: scheduled unit
-        reconciles adlists, runs Gravity rebuild, and confirms sub-10ms DNS resolution on `127.0.0.1:53`.
-      '';
-    };
-    exp-054 = {
-      title = "EXP-054 — Declarative Automated Flake Input Dependency Graph & Security Vulnerability Matrix (`services.flakeMatrixRepor";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: autonomous derivation tree graphing and CVE impact matrix visualization for the Aki fleet portal. Status: design study. Motivated by creating an offline visual control plane for fleet package closures.";
-      refs = {
-        hosts = ["frieren"];
-        modules = ["lib/aki-site.nix"];
-      };
-      body = ''
-        **Mode:** autonomous derivation tree graphing and CVE impact matrix visualization for the Aki fleet portal.
-        **Status:** design study. Motivated by creating an offline visual control plane for fleet package closures.
-
-        **Use case.** frieren compiles the Aki fleet documentation hypermedia tree (`lib/aki-site.nix`) over UDS socket. Incorporating an
-        automated dependency graph generator that visualizes all fleet host closures and evaluates CVE vulnerabilities creates an offline,
-        interactive visual control plane for fleet health.
-
-        **Module shape.**
-
-        ```nix
-        services.flakeMatrixReport = {
-          enable = true;
-          schedule = "weekly";
-          outputDir = "docs/matrix";  # repo-relative
-          targetHosts = [ "frieren" "minyx" "eisen" "stark" ];
-          generateGraph = true;
-        };
-        ```
-
-        **Evidence.** `lib/aki-site.nix` is already compiled into `/nix/store` and served over `unix:/run/uds-docs/docs.sock`.
-        Flake evaluation across all hosts is supported natively.
-
-        **Why it is not prod.** Generating full derivation graphs for 4 hosts can produce multi-megabyte SVG/DOT files that take compute
-        to render. Requires caching and delta generation. Exit criteria: weekly unit builds dependency matrix and embeds interactive graph
-        into Aki portal with zero build regressions.
-      '';
-    };
-    exp-055 = {
-      title = "EXP-055 — Declarative InfluxDB Retention & Metrics Aggregation Compaction Drill (`services.metricsRetentionDrill`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: scheduled retention validation and TSM shard compaction for time-series telemetry storage. Status: design study. Motivated by preventing time-series disk bloat and slow historical dashboard queries.";
-      body = ''
-        **Mode:** scheduled retention validation and TSM shard compaction for time-series telemetry storage.
-        **Status:** design study. Motivated by preventing time-series disk bloat and slow historical dashboard queries.
-
-        **Use case.** frieren runs InfluxDB (`:8086`) storing system performance counters, disk I/O metrics, and Home Assistant sensor
-        histories. Over months of 24/7 logging, high-resolution metric data accretes rapidly across Btrfs storage pools, causing multi-gigabyte
-        TSM shard directories and slow query responses for historical dashboard graphs. A declarative retention policy reconciles measurement
-        retention rules (raw 1-second metrics retained 7 days, 1-minute downsampled rollups retained 90 days), compacts cold TSM shards, and
-        validates continuous query execution outside peak hours, maintaining tight storage footprints.
-
-        **Module shape.**
-
-        ```nix
-        services.metricsRetentionDrill = {
-          enable = true;
-          schedule = "Sun *-*-* 03:45:00"; # strictly outside backup window
-          influxEndpoint = "http://127.0.0.1:8086";
-          retentionPolicies = {
-            "autogen" = "168h"; # 7 days for high-resolution counters
-            "downsampled" = "2160h"; # 90 days for rollups
-          };
-          compactColdShards = true;
-        };
-        ```
-
-        **Evidence.** InfluxDB is active on frieren (`systemctl is-active influxdb`). Data directory `/var/lib/influxdb` contains WAL and TSM shards.
-
-        **Why it is not prod.** TSM shard compaction generates intensive disk writes. Must run with low I/O priority (`ionice -c 3`) and assert
-        zero concurrent backup tasks. Exit criteria: scheduled unit validates retention policies, compacts shards in < 15 seconds, and frees
-        at least 15% TSM storage with 0 query errors.
-      '';
-    };
-    exp-056 = {
-      title = "EXP-056 — Declarative Paperless OCR Language Pack & Model Drift Reconciler (`services.paperlessOcrAudit`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: scheduled validation of Tesseract language traineddata models and OCR accuracy across document ingestion queues. Status: design study. Motivated by preventing silent OCR fallback to lossy ASCII recognition on foreign-language documents.";
-      body = ''
-        **Mode:** scheduled validation of Tesseract language traineddata models and OCR accuracy across document ingestion queues.
-        **Status:** design study. Motivated by preventing silent OCR fallback to lossy ASCII recognition on foreign-language documents.
-
-        **Use case.** frieren processes scanned physical documents and PDFs using Paperless-ngx and Tesseract OCR (`tesseract`).
-        Over months of system upgrades or manual document imports, documents scanned in German, Japanese, Chinese, or French can
-        silently fail OCR or fall back to English ASCII approximations if required language pack packages (`tessdata/deu`, `tessdata/jpn`)
-        are unlinked in NixOS wrappers or missing from `$TESSDATA_PREFIX`. A declarative OCR reconciler audits declared language packs
-        in the Paperless runtime environment, runs synthetic OCR verification tests against multi-language sample test pages, asserts text
-        extraction fidelity, and validates that OCR page processing latency stays < 8.0 seconds per page without stalling Celery workers.
-
-        **Module shape.**
-
-        ```nix
-        services.paperlessOcrAudit = {
-          enable = true;
-          schedule = "weekly";
-          languages = [ "eng" "deu" "jpn" "fra" ];
-          maxPageLatencySec = 8.0;
-          testSampleDir = "tests/ocr-samples";  # repo-relative
-          alertOnMissingModel = true;
-        };
-        ```
-
-        **Evidence.** Paperless-ngx is active on frieren (`paperless-consumer`, `paperless-web`). Tesseract is mapped in Paperless's environment.
-
-        **Why it is not prod.** Generating test OCR recognition runs consumes CPU cycles. Must run during off-peak hours and test compact
-        synthetic snippets. Exit criteria: scheduled unit asserts all declared language traineddata files exist, validates 100% character
-        accuracy on test snippets in < 2 seconds, and alerts if a language model is missing.
-      '';
-    };
-    exp-057 = {
-      title = "EXP-057 — Declarative Linux Kernel TCP BBRv3 & Bufferbloat Mitigation Tuner (`profiles.networkBufferbloatTuner`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: kernel socket buffer optimization, Fair Queuing (fq) packet scheduling, and BBR congestion control on 1 GbE wired interface. Status: design study. Motivated by eliminating jitter and bufferbloat during concurrent media streaming and multi-gigabyte backups.";
-      body = ''
-        **Mode:** kernel socket buffer optimization, Fair Queuing (`fq`) packet scheduling, and BBR congestion control on 1 GbE wired interface.
-        **Status:** design study. Motivated by eliminating jitter and bufferbloat during concurrent media streaming and multi-gigabyte backups.
-
-        **Use case.** frieren serves as the fleet NAS and streaming server, concurrently running high-bandwidth Restic backup uploads,
-        NFS file transfers, and 4K Jellyfin streaming over its single 1 GbE wired interface (`enp1s0`). Under standard Linux Cubic congestion
-        control and default FIFO queuing, saturating throughput creates severe bufferbloat: latency spikes from 0.4ms to 120ms+, inducing
-        dropped audio frames on TV playback and stalling real-time SimpleX WebSocket responses. A declarative network profile enables
-        Linux kernel TCP BBR congestion control (`net.ipv4.tcp_congestion_control = "bbr"`), applies Fair Queuing (`net.core.default_qdisc = "fq"`),
-        and tunes receive/transmit buffer memory limits (`tcp_rmem`, `tcp_wmem`), maintaining sub-2ms network latency even under saturated line rate.
-
-        **Module shape.**
-
-        ```nix
-        profiles.networkBufferbloatTuner = {
-          enable = true;
-          congestionControl = "bbr"; # "bbr" | "bbr3" | "cubic"
-          defaultQdisc = "fq"; # "fq" | "fq_codel" | "cake"
-          targetInterface = "enp1s0";
-          maxBufferBloatLatencyMs = 5.0;
-          benchmarkOnActivation = true;
-        };
-        ```
-
-        **Evidence.** Kernel 6.12 is running on frieren. `sysctl net.ipv4.tcp_congestion_control` is currently `cubic`.
-        `sysctl net.core.default_qdisc` is currently `fq_codel`.
-
-        **Why it is not prod.** Changing global TCP congestion control affects all WAN and Tailscale traffic. Must verify compatibility
-        with Tailscale WireGuard encapsulation and ensure zero packet drops on local 1 GbE switch. Exit criteria: sustained 940 Mbps iperf3
-        stream sustains < 3.0ms ping latency to the local router, eliminating media playback stutter.
-      '';
-    };
     exp-058 = {
       title = "EXP-058 — Decision-Model Augmented Kiwix Search & Auto-Recommender (`services.decisionWikiRecommend`)";
       kind = "experiment";
-      status = "PROPOSED";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Mode: non-autoregressive decision classification (Julia-1 144M & Laya 421M) for domain routing and offline knowledge recommendation with calibrated threshold gating. Status: design study & implemented prototype. Motivated by eliminating operator guesswork and providing offline technical manuals during automated system triage.";
       body = ''
-        **Mode:** non-autoregressive decision classification (Julia-1 144M & Laya 421M) for domain routing and offline knowledge recommendation with calibrated threshold gating.
-        **Status:** design study & implemented prototype. Motivated by eliminating operator guesswork and providing offline technical manuals during automated system triage.
-
-        **Use case.** When system triage units detect errors (e.g. Btrfs silent corruption, PostgreSQL vacuum page bloat, systemd unit crashes), standard keyword search against Kiwix HTTP (`:8088`) either drowns in generic Wikipedia pages or requires manual archive specification (`-w archwiki`). System One decision models (`julia-1` on mmBERT-small, `laya` on ModernBERT-large) evaluate the error state in a single fast forward pass (< 0.5 ms on frieren CPU), classify the technical domain (`filesystem_storage`, `database_systems`, `network_dns_tls`, `nixos_declarative`), compute calibrated confidence, and gate recommendation on a threshold (default 0.65). If threshold is satisfied, the pipeline synthesizes technical keywords, targets the optimal local ZIM archive (`archlinux_en_all`, `wikipedia_en_all`, or `stackoverflow`), and surfaces authoritative offline manual links (`http://wiki.frieren.lan/...`) in sub-second response time.
-
-        **Module shape.**
-
-        ```nix
-        services.decisionWikiRecommend = {
-          enable = true;
-          model = "julia-1"; # "julia-1" (144M, 8k context) | "laya" (421M, 512 context)
-          confidenceThreshold = 0.65;
-          kiwixEndpoint = "http://127.0.0.1:8088";
-          defaultArchives = [ "archlinux_en_all" "wikipedia_en_all" ];
-          maxRecommendations = 5;
-        };
-        ```
-
-        **Evidence.** Kiwix daemon is active on port 8088 and reverse-proxied at `http://wiki.frieren.lan/`. Decision engine prototype `modules/services/systemone/wiki_recommend.py` successfully classified Btrfs scrub alerts and PostgreSQL vacuum queries in < 25ms, returning accurate ArchWiki and Wikipedia articles.
-
-        **Why it is not prod.** Requires calibrated confidence tuning across diverse log formats to prevent false-positive article flooding on trivial warnings. Exit criteria: scheduled unit and operator CLI (`wiki-recommend.sh`) consistently recommend exact authoritative ArchWiki/NixOS sections for simulated fault injections with 0 internet access.
-      '';
-    };
-    exp-059 = {
-      title = "EXP-059 — Additional Offline ZIM Knowledge Base Catalog & Storage Provisioning (`services.offlineKnowledgeCatalog`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: declarative curation, store packaging, and storage capacity provisioning for developer and sysadmin .zim archives. Status: queued & sent to host HANDOFF.md (Item 3, OPEN). Motivated by achieving complete network-isolated technical recall for autonomous agents.";
-      refs = {
-        hosts = ["frieren"];
-        modules = ["modules/services/kiwix.nix"];
-        docs = [".agents/deploy/hosts/frieren.md"];
-      };
-      body = ''
-        **Mode.** Declarative curation and provisioning of additional offline ZIM archives
-        (`services.offlineKnowledgeCatalog`) so agents keep technical recall when the WAN drops.
-
-        **Use case.** frieren serves 51 GB of Wikipedia plus ArchWiki. Missing: Stack Overflow top
-        questions (~5.5 GB), Server Fault (~2 GB), MDN (~1.8 GB), DevDocs (~1.5 GB) and the NixOS
-        manual/wiki (~0.15 GB) — about 11 GB, under 3% of the 800 GiB free on `/Volumes/data`.
-
-        **Shape.** `services.offlineKnowledgeCatalog = { storagePath = "/Volumes/data/kiwix";
-        recommendedZims = { … flavour, approxSizeGb, priority }; }`, reconciled into
-        `modules/services/kiwix.nix`: `kiwixLibrary` entries are `fetchurl` + hash, and the
-        `kiwix-library` activation script force-syncs `library.xml`.
-
-        **Evidence.** `kiwix-serve -M` hot-reloads the library without a restart; `wikisearch`
-        indexes the store paths.
-
-        **Why not prod.** Fetching during peak hours saturates the WAN link. Exit: the
-        high-priority archives are store paths, present in `library.xml`, and `wikisearch`
-        returns hits with zero storage warnings.
-      '';
-    };
-    exp-060 = {
-      title = "EXP-060 — Autonomous Alert Escalation & Metric Noise Suppression Engine (`services.alertDecisionEscalator`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: non-autoregressive decision classification (Julia-1 144M) over Gatus probe time-series, ping latencies, and service error states to differentiate transient blips from genuine outages. Status: design study & architectural specification. Motivated by resolving HC-6 (Alerting is not configured in Gatus) while eliminating flappy alarm fatigue.";
-      body = ''
-        **Mode:** non-autoregressive decision classification (Julia-1 144M) over Gatus probe time-series, ping latencies, and service error states to differentiate transient blips from genuine outages.
-        **Status:** design study & architectural specification. Motivated by resolving HC-6 (`Alerting is not configured` in Gatus) while eliminating flappy alarm fatigue.
-
-        **Use case.** `services.fleetMonitors` (Gatus on `:8181`) probes 7 internal and reverse-proxied endpoints every 30 seconds. On standard rule-based monitors, a single 150ms WiFi latency fluctuation or temporary DNS recursion stall triggers false-positive paging notifications. `services.alertDecisionEscalator` hooks into Gatus's event bus and webhook endpoint, ingesting a rolling 5-minute sliding window of probe results (status codes, response latency vectors, local system load, and Btrfs I/O contention). Julia-1 evaluates the multivariate window in < 0.3 ms on CPU, computing calibrated outage probability distributions:
-        * `TRANSIENT_NETWORK_JITTER` (confidence > 0.80): suppressed silently; logged for trend telemetry.
-        * `DEPENDENCY_CHAIN_FAILURE` (e.g. Unbound down causing Pi-hole and Nginx failures): root-cause collapsed into a single parent alert.
-        * `CONFIRMED_SERVICE_OUTAGE` (confidence > 0.85): formats an actionable Markdown diagnostic report and delivers it immediately to the SimpleX `#Fleet` chat group via `simplex-admin`.
-
-        **Module shape.**
-
-        ```nix
-        services.alertDecisionEscalator = {
-          enable = true;
-          model = "julia-1"; # 144M mmBERT non-autoregressive decision classifier
-          confidenceThreshold = 0.85;
-          gatusWebhookPort = 8182;
-          slidingWindowSeconds = 300;
-          destinationSimpleXGroup = "#Fleet";
-          suppressTransientJitter = true;
-        };
-        ```
-
-        **Evidence.** Gatus is active on port 8181 and reverse-proxied at `http://monitors.frieren.lan/`. Current log reports `Alerting is not configured`. Julia-1 decision latency on frieren is benchmarked at 0.235 ms, enabling sub-millisecond evaluation of incoming Gatus webhooks without consuming background CPU cycles.
-
-        **Why it is not prod.** Requires tuning probability calibration against intentional chaos injection (e.g. killing Unbound or simulating packet drops on `enp1s0`). Exit criteria: 10 simulated transient network drops result in 0 operator alerts, while a killed Nginx process triggers an actionable SimpleX alert in < 5 seconds.
-      '';
-    };
-    exp-061 = {
-      title = "EXP-061 — Predictive Spinning HDD I/O & Media Streaming Quality-of-Service Governor (`services.diskQosGovernor`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 classification of disk queue depth, Btrfs commit latencies, and Jellyfin playback states to dynamically throttle background torrent and download I/O. Status: design study & architectural specification. Motivated by frieren's storage architecture: 1TB fast SSD root vs 2TB spinning HDD data pool where 4K media streaming and Transmission…";
-      body = ''
-        **Mode:** Julia-1 classification of disk queue depth, Btrfs commit latencies, and Jellyfin playback states to dynamically throttle background torrent and download I/O.
-        **Status:** design study & architectural specification. Motivated by frieren's storage architecture: 1TB fast SSD root vs 2TB spinning HDD data pool where 4K media streaming and Transmission downloads collide.
-
-        **Use case.** Frieren drives a Philips 65" 4K TV via Jellyfin / niri compositor. The 2TB HDD (`/dev/sda2`, mounted at `/Volumes/data`) hosts both the 4K media library (`/Volumes/data/media`) and the Transmission/Aria2 download trees (`/Volumes/data/transmission`). When active torrents perform random-write chunk flushing at 30 MB/s, HDD actuator head thrashing introduces read latency spikes exceeding 450 ms, causing audio sync loss and video stutter during high-bitrate 4K HEVC playback. `services.diskQosGovernor` samples `/sys/block/sda/stat`, Btrfs transaction commit latency, and Jellyfin active play session counts every 10 seconds. Julia-1 evaluates the tuple into calibrated operational states:
-        1. `IDLE_HOST_BURST`: 0 active media streams, disk read queue nominal → Transmission/Aria2 uncapped.
-        2. `STREAMING_PRIORITY`: 1+ active media sessions detected → transmission upload/download capped to 2.5 MB/s, Btrfs commit interval relaxed to 60s, IO nice priority set to `idle` (`ionice -c 3`).
-        3. `CRITICAL_IO_CONTENTION`: HDD seek latency > 250 ms during video playback → download daemon writes paused completely in-memory until media buffer drains.
-
-        **Module shape.**
-
-        ```nix
-        services.diskQosGovernor = {
-          enable = true;
-          monitoredDisk = "/dev/sda";
-          mediaService = "jellyfin";
-          throttleUnits = [ "transmission.service" "aria2.service" ];
-          evaluationInterval = 10; # seconds
-          maxSeekLatencyMs = 150;
-        };
-        ```
-
-        **Evidence.** `btrfs filesystem usage /Volumes/data` shows single 1.05 TiB allocated data pool. Transmission and Aria2 currently operate with uncoordinated write buffers. Julia-1's 144M model evaluates the 10-second metric vector in 0.2 ms on CPU, generating zero thermal overhead.
-
-        **Why it is not prod.** Requires verifying that Transmission peer connections are not dropped during temporary pause intervals. Exit criteria: concurrent 40 MB/s download torrent and 65 Mbps 4K Jellyfin playback stream exhibits zero dropped frames and < 50ms read latency over a 30-minute playback test.
-      '';
-    };
-    exp-062 = {
-      title = "EXP-062 — Autonomous Paperless Ingestion Pipeline Healer & Quarantine Dispatcher (`services.paperlessSmartTriage`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 classification of document parsing errors, OCR tracebacks, and MIME signatures in /var/lib/paperless/consume to triage and unstick document ingestion pipelines. Status: design study & architectural specification. Motivated by EXP-038 finding a 0-byte ghost PDF stalled since 2016 without operator visibility.";
-      body = ''
-        **Mode:** Julia-1 classification of document parsing errors, OCR tracebacks, and MIME signatures in `/var/lib/paperless/consume` to triage and unstick document ingestion pipelines.
-        **Status:** design study & architectural specification. Motivated by EXP-038 finding a 0-byte ghost PDF stalled since 2016 without operator visibility.
-
-        **Use case.** Paperless-ngx ingests scanned invoices, receipts, and multi-page technical documents. When an incoming file is corrupted (e.g. truncated upload, 0-byte scanner artifact), password-encrypted, or contains malformed PostScript font tables, the `paperless-consumer` and Apache Tika daemons can enter retry loops or stall the queue worker. `services.paperlessSmartTriage` watches `/var/lib/paperless/consume` and worker journal logs. Upon detection of a failure or timeout (> 60s), Julia-1 evaluates the file header, MIME magic, byte entropy, and Python worker exception traceback across its 8k token context window, classifying the document:
-        * `CORRUPTED_ZERO_BYTE_ARTIFACT`: moved to `/Volumes/data/paperless/quarantine/corrupted/` with descriptive tombstone metadata.
-        * `ENCRYPTED_PASSWORD_REQUIRED`: moved to quarantine; dispatches a SimpleX notification prompting the operator to provide an unlock secret.
-        * `UNSUPPORTED_LANGUAGE_SCAN`: queues document for off-peak OCR with auxiliary language packs (e.g. `tesseract-ocr-jpn`).
-        * `MALFORMED_POSTSCRIPT_REPAIRABLE`: invokes `pdftoppm` / `gs` rasterization pass to synthesize a clean PDF and returns it to the ingestion queue.
-
-        **Module shape.**
-
-        ```nix
-        services.paperlessSmartTriage = {
-          enable = true;
-          consumeDir = "/var/lib/paperless/consume";
-          quarantineDir = "/Volumes/data/paperless/quarantine";
-          autoRepairMalformed = true;
-          notificationEndpoint = "simplex";
-        };
-        ```
-
-        **Evidence.** `task checks:paperless:watchdog` successfully isolated `sandra_0228_japanese pigs.pdf` lingering in consume staging. The Paperless stack consists of 4 distinct units (`consumer`, `web`, `task-queue`, `tika`). Julia-1's mmBERT classifier easily absorbs full Tika stack traces (< 3,000 tokens) in a single pass.
-
-        **Why it is not prod.** Document sanitization via Ghostscript must be audited to guarantee no sensitive invoice numbers or metadata are altered during rasterization. Exit criteria: pipeline automatically unblocks 5 intentionally malformed/corrupted PDFs injected into `/var/lib/paperless/consume` within 15 seconds with 0 service crashes.
-      '';
-    };
-    exp-063 = {
-      title = "EXP-063 — Anomaly-Gated PostgreSQL Vacuum & Vector Index Maintenance Dispatcher (`services.postgresSmartVacuum`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 non-autoregressive decision classification of pgstatusertables, pgvector index bloat, and system I/O load to trigger dynamic vacuuming and reindexing. Status: design study & architectural specification. Motivated by EXP-020 (Immich collation reindex) and EXP-045 (pgvector/vchord index health) where rigid cron schedules either run unnecessarily…";
-      body = ''
-        **Mode:** Julia-1 non-autoregressive decision classification of `pg_stat_user_tables`, pgvector index bloat, and system I/O load to trigger dynamic vacuuming and reindexing.
-        **Status:** design study & architectural specification. Motivated by EXP-020 (Immich collation reindex) and EXP-045 (pgvector/vchord index health) where rigid cron schedules either run unnecessarily or miss high-churn bloat.
-
-        **Use case.** Immich DB hosts facial recognition vectors (`vector` v0.8.7) and deep image embeddings (`vchord` v1.1.1) alongside Paperless metadata. Standard PostgreSQL autovacuum is conservative and causes background I/O spikes during busy periods, while static nightly cron vacuums run even when zero dead tuples exist. `services.postgresSmartVacuum` queries `pg_stat_user_tables`, index dead-leaf page ratios, and active query latency distributions every 30 minutes. Julia-1 evaluates the tabular database scorecard:
-        * `NOMINAL_HEALTH` (dead tuple ratio < 5%, vector search latency < 12ms): no action, zero disk I/O.
-        * `TRANSACTION_CONCURRENT_MAINTENANCE`: dead tuples between 10–25% → runs non-blocking `VACUUM ANALYZE` on affected tables only.
-        * `VECTOR_INDEX_DEGRADATION`: vector distance query latency degraded by > 2.5× → schedules concurrent `REINDEX INDEX CONCURRENTLY` strictly during the 01:00–02:30 off-peak pre-backup window.
-
-        **Module shape.**
-
-        ```nix
-        services.postgresSmartVacuum = {
-          enable = true;
-          databases = [ "immich" "paperless" ];
-          deadTupleThreshold = 0.15;
-          respectBackupWindow = true; # strictly avoid 03:00-05:30
-          checkInterval = "30m";
-        };
-        ```
-
-        **Evidence.** PostgreSQL vector audit drill (`postgres-pgvector-audit.service`) proved that page compaction reclaimed 15 allocated vector pages on Immich DB. Database collation catalog is currently clean (glibc 2.44).
-
-        **Why it is not prod.** Concurrent reindexing requires sufficient temporary disk space on `/dev/sda2`. Exit criteria: simulated dead-tuple injection on 10,000 vector rows triggers a surgical `VACUUM ANALYZE` within 30 minutes, restoring query latency without interfering with Immich mobile client sync.
+        Implemented prototype — non-autoregressive decision classification with Julia-1
+        (144M) and Laya (421M) for domain routing and offline knowledge recommendation.
+        The realized path is the live jevdecide/Julia-1 routing line that later
+        experiments (EXP-065 onward) built their classifier + synthesizer shape on.
+        Closed: the experiment concluded and its descendants are recorded separately;
+        nothing here remains actionable.
       '';
     };
     exp-064 = {
@@ -3304,7 +2063,7 @@
     exp-065 = {
       title = "EXP-065 — Declarative System 1 & System 2 Pre-Harness Diagnostic Ensemble (`services.systemEnsemblePreHarness`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Closed-loop reflex + deliberation ensemble: Julia-1 (144M) sub-millisecond anomaly detection triggering Ollama's nemotron-3-ultra:cloud to synthesize verified remediation runbooks before human escalation. Status:…";
       refs = {
@@ -3314,7 +2073,7 @@
     exp-066 = {
       title = "EXP-066 — Autonomous NixOS Flake Regression Self-Healing & Rollback Ensemble (`services.nixAutoReconcileEnsemble`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 preflight compiler error triage triggering Nemotron-3-Ultra precision Nix AST patch synthesis with nix-preflight-editor validation. Status: PROTOTYPED & VERIFIED LIVE ON FRIEREN (Generation 102,…";
       refs = {
@@ -3324,7 +2083,7 @@
     exp-067 = {
       title = "EXP-067 — Predictive Storage Failure Prognosis & Automated Btrfs Rebalance Synthesis (`services.storagePrognosisEnsemble";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 SMART attribute and NCQ timeout classification triggering Nemotron-3-Ultra to generate workload-aware Btrfs balance filters and scrub schedules. Status: PROTOTYPED & VERIFIED LIVE ON FRIEREN (Generation…";
       refs = {
@@ -3334,7 +2093,7 @@
     exp-068 = {
       title = "EXP-068 — Multi-Modal Audio/Visual Media Indexing & Semantic Metadata Enricher (`services.mediaSemanticEnricher`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 local codec & audio layout classification triggering Nemotron-3-Ultra to synthesize rich NFO metadata, chapter markers, and subtitles for unindexed recordings. Status: PROTOTYPED & VERIFIED LIVE ON FRIEREN…";
       refs = {
@@ -3344,7 +2103,7 @@
     exp-069 = {
       title = "EXP-069 — Zero-Trust Fleet Telemetry Anomaly & Lateral Movement Classifier (`services.fleetSecurityEnsemble`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 network packet & authentication log triage paired with Nemotron-3-Ultra incident forensics and interface-scoped iptables drop-rule synthesis. Status: PROTOTYPED & VERIFIED LIVE ON FRIEREN (Generation 102,…";
       refs = {
@@ -3354,7 +2113,7 @@
     exp-070 = {
       title = "EXP-070 — Autonomous Tailscale Mesh Latency & DERP Relay Bypasser (`services.tailscalePathGovernor`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 peer latency & path status triage triggering Nemotron-3-Ultra to diagnose firewall state and generate UPnP / STUN hole-punch rules. Status: prototyped & verified live on frieren (Generation 104). Wired to…";
       refs = {
@@ -3364,7 +2123,7 @@
     exp-071 = {
       title = "EXP-071 — Predictive Memory Pressure & Early Zram Compaction Synthesizer (`services.memoryPressureGovernor`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 PSI (/proc/pressure/memory) anomaly classification triggering Nemotron-3-Ultra to synthesize dynamic watermark tuning and zram compression. Status: prototyped & verified live on frieren (Generation 104).…";
       refs = {
@@ -3374,105 +2133,26 @@
     exp-072 = {
       title = "EXP-072 — Zero-Leak Secret Rotator & SOPS Rekey Verifier (`services.sopsAutoRekeyEnsemble`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 .sops.yaml key drift detection triggering Nemotron-3-Ultra to synthesize preflight decrypt drills and automated sops updatekeys. Status: prototyped & verified live on frieren (Generation 104). Wired to…";
       refs = {
         modules = ["modules/services/systemone-decision.nix"];
       };
     };
-    exp-073 = {
-      title = "EXP-073 — Immich AI ML Inference Offloader & Model Sharding Governor (`services.immichOffloadGovernor`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 Immich ML queue depth triage triggering Nemotron-3-Ultra to coordinate job offloading to remote GPU endpoints over Tailscale. Status: proposed design study. Motivated by frieren's 4c/8t CPU taking 2–4 seconds per image for facial recognition and CLIP embeddings during large photo library imports.";
-      body = ''
-        **Mode:** Julia-1 Immich ML queue depth triage triggering Nemotron-3-Ultra to coordinate job offloading to remote GPU endpoints over Tailscale.
-        **Status:** proposed design study. Motivated by frieren's 4c/8t CPU taking 2–4 seconds per image for facial recognition and CLIP embeddings during large photo library imports.
-
-        **Use case.** Immich machine learning workers run facial recognition, CLIP image search, and OCR. On frieren, importing 500 photos from a mobile phone consumes 100% CPU on all 8 threads for 30 minutes, increasing chassis temperatures and causing media playback stutter. `services.immichOffloadGovernor` monitors Immich's Redis queue depth and CPU thermals:
-        * Julia-1 triages queue backlog and host thermal status in 0.2 ms.
-        * When backlog exceeds 50 items and thermals rise (> 70°C), Nemotron-3-Ultra negotiates an ephemeral REST proxy tunnel to an idle fleet machine (e.g. `poseidon` or external GPU runner) over Tailscale, shifting vector inference while keeping raw photo storage local.
-
-        **Module shape.**
-
-        ```nix
-        services.immichOffloadGovernor = {
-          enable = true;
-          queueDepthThreshold = 50;
-          maxCpuThermalC = 72;
-          remoteInferencePeers = [ "poseidon" ];
-        };
-        ```
-
-        **Evidence.** Immich is active with PostgreSQL pgvector (`immich-server`, `immich-machine-learning`). Intel UHD 620 lacks dedicated tensor cores.
-
-        **Why it is not prod.** Requires testing remote inference fallback during Tailscale network disconnects. Exit criteria: 100 photo batch processed with 0 local CPU thermal spikes above 65°C.
-      '';
-    };
     exp-074 = {
       title = "EXP-074 — Continuous Declarative Kiwix ZIM Library Sync & Search Re-indexer (`services.kiwixSearchEnricher`)";
       kind = "experiment";
-      status = "PROPOSED";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Mode: Julia-1 ZIM library catalog audit triggering Nemotron-3-Ultra to synthesize semantic query expansions and cross-index technical manuals with a Strict Zero-Network-Download Guarantee. Status: prototyped & verified live on frieren (Generation 104). Wired to systemone-ensemble kiwix-search and task checks:decision:kiwix. Motivated by Kiwix being strictly…";
       body = ''
-        **Mode:** Julia-1 ZIM library catalog audit triggering Nemotron-3-Ultra to synthesize semantic query expansions and cross-index technical manuals with a **Strict Zero-Network-Download Guarantee**.
-        **Status:** prototyped & verified live on frieren (Generation 104). Wired to `systemone-ensemble kiwix-search` and `task checks:decision:kiwix`. Motivated by Kiwix being strictly declarative on frieren (`/var/lib/kiwix` never edited by hand) and the operator's requirement that offline search tools produce **zero surprise downloads** each month.
-
-        **Use case.** Frieren hosts offline Kiwix ZIM archives (Wikipedia, StackExchange, ArchWiki, NixOS documentation) pinned directly in the Nix store. Keyword search in Kiwix is exact and fails on colloquial queries or incident log errors. `services.kiwixSearchEnricher`:
-        * Hardcoded Guarantee: strictly offline execution (`network_allowed = False`, 0 MB downloaded).
-        * Directly inspects `/var/lib/kiwix/library.xml` to discover declared local `/nix/store/*.zim` paths.
-        * Invokes `kiwix-search` on existing ZIM stores (e.g. `wikipedia_en_all_nopic_2026-06.zim` [51.4 GB] and `archlinux_en_all_maxi_2026-07.zim` [34.7 MB]).
-        * Julia-1 evaluates relevance in < 0.2 ms; Nemotron-3-Ultra optionally synthesizes targeted technical manual extracts without touching the internet.
-
-        **Module shape.**
-
-        ```nix
-        services.kiwixSearchEnricher = {
-          enable = true;
-          zimStoragePath = "/var/lib/kiwix/library.xml";
-          preIndexTechnicalWikis = [ "archlinux" "wikipedia" ];
-          confidenceGate = 0.75;
-          enforceZeroDownload = true;
-        };
-        ```
-
-        **Evidence.** Verified live on frieren via `task checks:decision:kiwix` (138 ms evaluation). Retrieved 5 local matches from Wikipedia and ArchWiki with `downloaded_bytes_this_month = 0` and zero network sockets opened.
-
-        **Why it is not prod.** Requires full semantic cross-reference mapping across all library books. Exit criteria: technical incident query resolves to the exact offline manual section in < 500 ms with 0 bytes downloaded.
-      '';
-    };
-    exp-075 = {
-      title = "EXP-075 — Btrfs Snapshot Lifecycle & Deduplication Synthesizer (`services.btrfsDuperEnsemble`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 extent collision and snapshot count classification triggering Nemotron-3-Ultra to synthesize batched duperemove and retention schedules. Status: proposed design study. Motivated by 2TB HDD pool (/dev/sda2) accumulating duplicate data across Paperless, Transmission, and Immich.";
-      body = ''
-        **Mode:** Julia-1 extent collision and snapshot count classification triggering Nemotron-3-Ultra to synthesize batched `duperemove` and retention schedules.
-        **Status:** proposed design study. Motivated by 2TB HDD pool (`/dev/sda2`) accumulating duplicate data across Paperless, Transmission, and Immich.
-
-        **Use case.** File storage on `/dev/sda2` contains duplicated document scans, repeated media clips, and immutable snapshots. Standard background deduplication tools thrash spinning disks with random extent reads. `services.btrfsDuperEnsemble`:
-        * Julia-1 monitors extent fragmentation and daily write churn.
-        * When disk is idle (0 streams, 0 active torrents), Nemotron-3-Ultra calculates the optimal chunk hash batch size and synthesizes an extent deduplication run (`duperemove -drh --hashfile=... /Volumes/data`) capped to 5GB extents, avoiding high-churn torrent directories.
-
-        **Module shape.**
-
-        ```nix
-        services.btrfsDuperEnsemble = {
-          enable = true;
-          mountPoint = "/Volumes/data";
-          excludedPaths = [ "/Volumes/data/transmission/incomplete" ];
-          maxExtentBatchMb = 5120;
-          idleWindowOnly = true;
-        };
-        ```
-
-        **Evidence.** Btrfs metadata DUP is 5.00 GiB on `/dev/sda2` with 1.04 TiB allocated data pool.
-
-        **Why it is not prod.** Deduplication memory consumption must be strictly bounded below 250 MB on the 11.47 GiB host. Exit criteria: 20 GB of duplicated test files deduplicated with zero impact on concurrent 4K playback.
+        Julia-1 ZIM library catalog audit triggering Nemotron-3-Ultra to synthesize
+        semantic query expansions and cross-index technical manuals under a strict
+        zero-network-download guarantee. Prototyped and verified live on frieren
+        (generation 104); wired to systemone-ensemble kiwix-search and
+        `task checks:decision:kiwix`. Never promoted to a reusable option surface.
+        Closed as a completed experiment record.
       '';
     };
     exp-076 = {
@@ -3505,173 +2185,20 @@
         **Why it is not prod.** Requires testing under simulated Ethernet cable disconnections and WiFi roaming. Exit criteria: simulated dual-master VRRP conflict resolved to a single authoritative resolver in < 2 seconds.
       '';
     };
-    exp-077 = {
-      title = "EXP-077 — Transmission Torrent Seeding QoS & Actuator Wear Minimizer (`services.torrentIoShaper`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 HDD IOPS and peer connection rate triage triggering Nemotron-3-Ultra to synthesize dynamic RAM cache sizing and peer connection limits. Status: proposed design study. Motivated by spinning HDD actuator wear caused by 50+ concurrent torrent seeding peers performing random 16KB disk reads.";
-      body = ''
-        **Mode:** Julia-1 HDD IOPS and peer connection rate triage triggering Nemotron-3-Ultra to synthesize dynamic RAM cache sizing and peer connection limits.
-        **Status:** proposed design study. Motivated by spinning HDD actuator wear caused by 50+ concurrent torrent seeding peers performing random 16KB disk reads.
-
-        **Use case.** The 2TB HDD pool (`/dev/sda2`) hosts long-term torrent seeds. When multiple external peers request random chunks simultaneously, disk actuators thrash continuously, producing audible chassis chatter and driving up drive temperatures. `services.torrentIoShaper`:
-        * Julia-1 monitors disk IOPS, actuator seek counts, and active seeding torrents every 15 seconds.
-        * Nemotron-3-Ultra dynamically synthesizes transmission RPC commands (`transmission-remote --cache-size-mb ...`) adjusting in-memory read cache between 64 MB and 512 MB, grouping random reads into contiguous cache hits and reducing physical head movement by > 65%.
-
-        **Module shape.**
-
-        ```nix
-        services.torrentIoShaper = {
-          enable = true;
-          maxIopsThreshold = 120;
-          dynamicRamCacheMb = { min = 64; max = 512; };
-          coalesceSeedingPeers = true;
-        };
-        ```
-
-        **Evidence.** Transmission daemon runs natively on frieren with storage in `/Volumes/data/transmission`.
-
-        **Why it is not prod.** Must ensure dynamic cache expansion does not compete with Paperless or Immich during peak daytime hours. Exit criteria: measured 50% reduction in HDD head seeks during 30 concurrent seeding streams.
-      '';
-    };
-    exp-078 = {
-      title = "EXP-078 — Automated Restic Repository De-corruption & Verification Drill (`services.resticIntegrityDrill`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 nightly backup delta and pack hash triage triggering Nemotron-3-Ultra to formulate read-subset verification drills and prune windows. Status: proposed design study. Motivated by nightly 03:00–05:30 backup window where corrupted pack files can go unnoticed until a disaster recovery restore is attempted.";
-      body = ''
-        **Mode:** Julia-1 nightly backup delta and pack hash triage triggering Nemotron-3-Ultra to formulate read-subset verification drills and prune windows.
-        **Status:** proposed design study. Motivated by nightly 03:00–05:30 backup window where corrupted pack files can go unnoticed until a disaster recovery restore is attempted.
-
-        **Use case.** Frieren backs up vital datasets (Paperless, Immich, Postgres, dotfiles) to local and remote Restic repositories. Full repository checks (`restic check --read-data`) take several hours and cannot fit in the nightly backup window. `services.resticIntegrityDrill`:
-        * Julia-1 tracks daily snapshot byte churn and pack index updates.
-        * Once per week, Nemotron-3-Ultra computes a statistically representative 2% pseudorandom subset of pack files and schedules a non-blocking `restic check --read-data-subset=2%` strictly during daytime idle windows, alerting `#Fleet` if silent bitrot is detected.
-
-        **Module shape.**
-
-        ```nix
-        services.resticIntegrityDrill = {
-          enable = true;
-          repository = "/Volumes/data/backups";
-          subsetPercent = 2;
-          schedule = "weekly";
-          alertDestination = "simplex:#Fleet";
-        };
-        ```
-
-        **Evidence.** Restic backups run nightly via declarative modules. Restic binary is present in system store.
-
-        **Why it is not prod.** Requires testing repository lock contention when backup drills coincide with manual snapshot runs. Exit criteria: 2% data subset verified in < 8 minutes with 0 lock collisions.
-      '';
-    };
-    exp-079 = {
-      title = "EXP-079 — Multi-Host Autonomous Agent Handshake & Workload Broker (`services.fleetAgentBroker`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 SimpleX task intent classification triggering Nemotron-3-Ultra to draft distributed execution manifests across heterogeneous fleet nodes. Status: proposed design study. Motivated by frieren (storage-heavy, compute-limited i5-8250U) collaborating with compute-heavy fleet members (poseidon, eisen).";
-      body = ''
-        **Mode:** Julia-1 SimpleX task intent classification triggering Nemotron-3-Ultra to draft distributed execution manifests across heterogeneous fleet nodes.
-        **Status:** proposed design study. Motivated by frieren (storage-heavy, compute-limited i5-8250U) collaborating with compute-heavy fleet members (`poseidon`, `eisen`).
-
-        **Use case.** Autonomous host agents run on each fleet machine. When frieren needs heavy computations (e.g. compiling large Nix packages from source or running multi-hour ML training), running locally pins its CPU and degrades media streaming. `services.fleetAgentBroker`:
-        * Julia-1 classifies agent requests arriving via SimpleX into `LOCAL_STORAGE_TASK`, `LIGHTWEIGHT_DECISION`, or `HEAVY_COMPUTE_DELEGATION`.
-        * If classified as `HEAVY_COMPUTE_DELEGATION`, Nemotron-3-Ultra constructs a signed JSON-RPC delegation manifest, sends it to `poseidon` over SimpleX `#Fleet`, and sets up an ephemeral binary cache push tunnel over Tailscale.
-
-        **Module shape.**
-
-        ```nix
-        services.fleetAgentBroker = {
-          enable = true;
-          localCapabilities = [ "nas-storage" "media-streaming" "fast-decision" ];
-          remoteComputePeers = [ "poseidon" "eisen" ];
-          simplexGroup = "#Fleet";
-        };
-        ```
-
-        **Evidence.** Fleet SSH aliases (`frieren`, `poseidon`, `eisen`) and SimpleX agent groups are fully operational. Fleet binary cache warming is proven.
-
-        **Why it is not prod.** Requires verifying mutual cryptographic agent authentication to prevent unauthenticated remote execution. Exit criteria: simulated heavy build task automatically offloaded from frieren to poseidon and returned as a pre-built store path in < 3 minutes.
-      '';
-    };
-    exp-080 = {
-      title = "EXP-080 — Autonomous Btrfs Metadata Allocation Balancing & ENOSPC Preemptor (`services.btrfsMetaBalancer`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 Btrfs unallocated chunk ratio triage triggering Nemotron-3-Ultra to calculate compact balance filters and synthesize targeted btrfs balance start -musage=... runs. Status: proposed design study. Motivated by Btrfs filesystems failing with fatal ENOSPC errors even with 100+ GB free space when metadata chunk allocation becomes fragmented into…";
-      body = ''
-        **Mode:** Julia-1 Btrfs unallocated chunk ratio triage triggering Nemotron-3-Ultra to calculate compact balance filters and synthesize targeted `btrfs balance start -musage=...` runs.
-        **Status:** proposed design study. Motivated by Btrfs filesystems failing with fatal `ENOSPC` errors even with 100+ GB free space when metadata chunk allocation becomes fragmented into 1GB blocks.
-
-        **Use case.** On frieren's 1TB SSD root pool (`/dev/sdb3`), heavy Nix builds and SQLite write churn frequently allocate 1GB metadata chunks that remain mostly empty, exhausting unallocated raw drive space. Standard blanket balance commands (`btrfs balance start /`) thrash SSD write cycles and lock up I/O for 20 minutes. `services.btrfsMetaBalancer`:
-        * Julia-1 samples `btrfs filesystem df --raw /` and `/sys/fs/btrfs/*/allocation` every 6 hours.
-        * If metadata allocated ratio diverges from used ratio (> 40% empty allocation), Nemotron-3-Ultra calculates the minimal balance filter (`-musage=10`, `-musage=20`) and synthesizes a rate-limited maintenance window during low I/O periods (e.g. 02:00, strictly before the 03:00 backup window).
-
-        **Module shape.**
-
-        ```nix
-        services.btrfsMetaBalancer = {
-          enable = true;
-          mounts = [ "/" "/Volumes/data" ];
-          emptyChunkThresholdPercent = 40;
-          maxUsageFilter = 20;
-          schedule = "02:00:00";
-        };
-        ```
-
-        **Evidence.** Frieren runs root, home, and nix on Btrfs (`/dev/sdb3`). `task checks:btrfs:stats` already tracks device errors; metadata allocation monitoring is the missing prevention layer.
-
-        **Why it is not prod.** Requires stress-testing balance execution while compiling large derivations in `/nix/store` to assert zero filesystem lockup. Exit criteria: simulated metadata fragmentation recovered with 0 dropped disk I/O requests.
-      '';
-    };
     exp-081 = {
       title = "EXP-081 — Intel QuickSync VA-API Thermal Throttling & Transcode Governor (`services.vaapiThermalGovernor`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 thermal package temperature and render load triage triggering Nemotron-3-Ultra to adjust Jellyfin transcode concurrency and video downscale profiles. Status: prototyped & verified live on frieren…";
       refs = {
         modules = ["modules/services/systemone-decision.nix"];
       };
     };
-    exp-082 = {
-      title = "EXP-082 — Zero-Trust SimpleX Agent Command Sanitizer & JSON-RPC Access Control Gateway (`services.simplexRpcGuard`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 intent classification and semantic boundary verification over incoming SimpleX WebSocket messages before routing to fleet execution handlers. Status: proposed design study. Motivated by fleet-wide autonomous agents coordinating over SimpleX chat where unstructured messages must not execute unchecked shell commands.";
-      body = ''
-        **Mode:** Julia-1 intent classification and semantic boundary verification over incoming SimpleX WebSocket messages before routing to fleet execution handlers.
-        **Status:** proposed design study. Motivated by fleet-wide autonomous agents coordinating over SimpleX chat where unstructured messages must not execute unchecked shell commands.
-
-        **Use case.** SimpleX Chat is frieren's declarative communication fabric (`simplex-admin` skill). Remote agents on `poseidon` or `eisen` can submit maintenance requests to `#Fleet`. Directly executing command strings exposed to agent chat creates an arbitrary code execution vulnerability. `services.simplexRpcGuard`:
-        * Julia-1 classifies message payload intent in < 0.2 ms into `SAFE_READ_QUERY`, `DECLARATIVE_MAINTENANCE_RPC`, or `UNTRUSTED_ARBITRARY_SHELL`.
-        * Safe queries route to predetermined Taskfile commands (`task checks:...`); dangerous or ambiguous commands require cryptographic HMAC confirmation from the operator's personal SimpleX identity.
-
-        **Module shape.**
-
-        ```nix
-        services.simplexRpcGuard = {
-          enable = true;
-          group = "#Fleet";
-          allowedRpcTasks = [ "checks:quick" "checks:ports" "checks:decision:triage" ];
-          operatorFingerprint = "age1njrjwpkuhxctx5nzfjjsg7dggazwsw9se6gpzta8wh52n343ngysepqt2k";
-          confidenceGate = 0.90;
-        };
-        ```
-
-        **Evidence.** SimpleX SMP server and local CLI are running on frieren. `simplex-admin` skill is active.
-
-        **Why it is not prod.** Requires adversarial prompt injection testing across diverse chat payloads. Exit criteria: 100 fuzz tests and simulated prompt injections blocked with 0 unauthorized command executions.
-      '';
-    };
     exp-083 = {
       title = "EXP-083 — Smartd & Scrutiny Predictive HDD Drive Failure & Snapshot Arbiter (`services.diskSmartPredictor`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 SMART telemetry vector triage triggering Nemotron-3-Ultra to synthesize emergency read-only subvolume pinning and remote replication manifests. Status: prototyped & verified live on frieren (Generation…";
       refs = {
@@ -3681,78 +2208,17 @@
     exp-084 = {
       title = "EXP-084 — Ephemeral SQLite In-Memory Buffer Tuning & WAL Compactor (`services.sqliteMemoryBuffer`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 query frequency and WAL growth trajectory classification dynamically tuning PRAGMA mmapsize, PRAGMA cachesize, and checkpoint cadence across fleet SQLite instances. Status: prototyped & verified live on…";
       refs = {
         modules = ["modules/services/systemone-decision.nix"];
       };
     };
-    exp-085 = {
-      title = "EXP-085 — Declarative Transmission VPN Kill-Switch & Leak Auditing Ensemble (`services.torrentVpnAuditor`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 routing table and namespace isolation auditing asserting that BitTorrent traffic strictly egresses through VPN tunnels with zero plaintext leakage onto enp1s0. Status: proposed design study. Motivated by privacy guarantees on residential FritzBox network (192.168.3.25).";
-      body = ''
-        **Mode:** Julia-1 routing table and namespace isolation auditing asserting that BitTorrent traffic strictly egresses through VPN tunnels with zero plaintext leakage onto `enp1s0`.
-        **Status:** proposed design study. Motivated by privacy guarantees on residential FritzBox network (`192.168.3.25`).
-
-        **Use case.** Transmission daemon operates on frieren for ISO and media downloads. When a VPN tunnel resets or reconnects, misconfigured network stacks can fall back to the default gateway (`192.168.3.1`), exposing the public WAN IP. `services.torrentVpnAuditor`:
-        * Julia-1 samples `ip route show` and active socket endpoints for `transmission-daemon` every 60 seconds.
-        * If any torrent socket binds outside the designated VPN network namespace or interface, Nemotron-3-Ultra synthesizes an immediate nftables drop rule and suspends the systemd unit until VPN health is verified.
-
-        **Module shape.**
-
-        ```nix
-        services.torrentVpnAuditor = {
-          enable = true;
-          vpnInterface = "wg-vpn0";
-          monitoredServices = [ "transmission.service" ];
-          enforceKillSwitch = true;
-        };
-        ```
-
-        **Evidence.** `transmission-daemon` is active on frieren. Network routing is managed via NetworkManager and static systemd routes.
-
-        **Why it is not prod.** Requires testing against intentional VPN interface tear-downs. Exit criteria: killed VPN interface results in 0 packets emitted out `enp1s0` within 100 ms.
-      '';
-    };
-    exp-086 = {
-      title = "EXP-086 — Automated Uptime-Kuma to Declarative Gatus Monitor Synchronization Bridge (`services.kumaToGatusSync`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 schema translation reading Uptime-Kuma SQLite database and synthesizing declarative services.fleetMonitors.endpoints NixOS attribute sets. Status: proposed design study. Motivated by resolving EXP-008 (Uptime-Kuma is imperative/undeclared) while preserving operator UI flexibility.";
-      body = ''
-        **Mode:** Julia-1 schema translation reading Uptime-Kuma SQLite database and synthesizing declarative `services.fleetMonitors.endpoints` NixOS attribute sets.
-        **Status:** proposed design study. Motivated by resolving EXP-008 (Uptime-Kuma is imperative/undeclared) while preserving operator UI flexibility.
-
-        **Use case.** Human operators frequently add ad-hoc monitors in Uptime-Kuma's web UI (`:3001`), but these monitors are stored exclusively in SQLite and lost upon state resets or absent from declarative git manifests. `services.kumaToGatusSync`:
-        * Periodically reads `/var/lib/private/uptime-kuma/kuma.db` via read-only SQLite URI.
-        * Julia-1 validates monitor URL formats, interval constraints, and expected HTTP status codes.
-        * Synthesizes a clean Nix file (`hosts/frieren/generated-monitors.nix`) that feeds into `services.fleetMonitors`, bringing imperatively created monitors into version-controlled git declarations.
-
-        **Module shape.**
-
-        ```nix
-        services.kumaToGatusSync = {
-          enable = true;
-          kumaDbPath = "/var/lib/private/uptime-kuma/kuma.db";
-          outputNixPath = "hosts/frieren/generated-monitors.nix";  # repo-relative
-          syncInterval = "daily";
-        };
-        ```
-
-        **Evidence.** Uptime-Kuma is running on port 3001 and Gatus is active on port 8181.
-
-        **Why it is not prod.** Requires diff verification against existing Gatus endpoints to avoid duplicating probe traffic. Exit criteria: UI-created monitor in Uptime-Kuma rendered to valid Nix syntax verified by `nix-instantiate --parse`.
-      '';
-    };
     exp-087 = {
       title = "EXP-087 — Local Nix Binary Cache Warming & Garbage Collection Pre-Filter (`services.nixCacheWarmer`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 derivation tree analysis predicting fleet closure requirements and caching critical paths in Harmonia before running nightly garbage collection. Status: prototyped & verified live on frieren (Generation…";
       refs = {
@@ -3762,42 +2228,12 @@
     exp-088 = {
       title = "EXP-088 — Paperless Document Deduplication & OCR Confidence Scoring Pipeline (`services.paperlessOcrAuditor`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 document text density and OCR confidence triage on newly ingested PDFs triggering Nemotron-3-Ultra to synthesize metadata tags and flag illegible scans. Status: prototyped & verified live on frieren…";
       refs = {
         modules = ["modules/services/systemone-decision.nix"];
       };
-    };
-    exp-089 = {
-      title = "EXP-089 — Fleet-Wide Tailscale Subnet Router & Multicast DNS (mDNS) Gateway (`services.fleetMdnsReflector`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 interface traffic and broadcast domain classification gating selective avahi mDNS reflection across Tailscale tunnels. Status: proposed design study. Motivated by cross-device discovery between residential LAN devices and roaming Tailscale nodes.";
-      body = ''
-        **Mode:** Julia-1 interface traffic and broadcast domain classification gating selective avahi mDNS reflection across Tailscale tunnels.
-        **Status:** proposed design study. Motivated by cross-device discovery between residential LAN devices and roaming Tailscale nodes.
-
-        **Use case.** Frieren is connected to both physical LAN (`enp1s0`, `192.168.3.25`) and the fleet mesh (`tailscale0`). When devices are away from home on 5G/WAN, standard mDNS (Avahi/Bonjour) does not cross the Layer 3 Tailscale boundary, making local media casts (AirPlay/Chromecast) and `.frieren.lan` service discovery fail. `services.fleetMdnsReflector`:
-        * Julia-1 monitors local Avahi service announcements and Tailscale peer states.
-        * Selectively reflects designated service records (HTTP, AirPlay, SSH) onto the Tailscale interface as unicast DNS pointers, so LAN-style service discovery works across the tailnet.
-
-        **Module shape.**
-
-        ```nix
-        services.fleetMdnsReflector = {
-          enable = true;
-          lanInterface = "enp1s0";
-          tailscaleInterface = "tailscale0";
-          reflectedServices = [ "_http._tcp" "_ssh._tcp" "_airplay._tcp" ];
-        };
-        ```
-
-        **Evidence.** Avahi daemon and Tailscale are active on frieren. Dual-homed network configuration is documented in `AGENTS.md`.
-
-        **Why it is not prod.** Requires testing reflection performance over high-latency cellular connections to prevent multicast traffic storms. Exit criteria: mobile phone on cellular Tailscale discovers `frieren.lan` services in < 2 seconds.
-      '';
     };
     exp-090 = {
       title = "EXP-090 — Multi-Path Incremental Btrfs/ZFS Snapshot Replicator over Tailscale (`services.tailscaleBackupReplicator`)";
@@ -3832,132 +2268,6 @@
         **Why it is not prod.** Requires testing incremental snapshot re-anchoring when a middle snapshot is pruned. Exit criteria: 50 GB differential snapshot successfully transmitted and mounted on remote peer with 0 stream checksum errors.
       '';
     };
-    exp-091 = {
-      title = "EXP-091 — Automated Nginx ACME Wildcard Certificate Rekey & Zero-Downtime Reload Drill (`services.tlsRekeyDrill`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 certificate expiration trajectory and OCSP stapling validity triage triggering Nemotron-3-Ultra to synthesize preflight ACME renewals and atomic Nginx configuration reloads. Status: proposed design study. Motivated by frieren hosting 10+ HTTPS internal virtual hosts (wiki, monitors, fleet, auth, immich, paperless).";
-      body = ''
-        **Mode:** Julia-1 certificate expiration trajectory and OCSP stapling validity triage triggering Nemotron-3-Ultra to synthesize preflight ACME renewals and atomic Nginx configuration reloads.
-        **Status:** proposed design study. Motivated by frieren hosting 10+ HTTPS internal virtual hosts (`wiki`, `monitors`, `fleet`, `auth`, `immich`, `paperless`).
-
-        **Use case.** Expired TLS certificates cause catastrophic fleet breakages across agents and browser web readers. While `services.tlsCertWatchdog` alerts on expiration, manual certificate renewals can introduce syntax errors in Nginx vhost configs that reject reload. `services.tlsRekeyDrill`:
-        * Julia-1 samples TLS handshake certificates on `:443` every 12 hours.
-        * If a certificate enters the 14-day renewal window, Nemotron-3-Ultra initiates a sandbox renewal drill, verifies X.509 SAN extensions against host DNS aliases, and executes a validated atomic reload (`nginx -t && systemctl reload nginx`).
-
-        **Module shape.**
-
-        ```nix
-        services.tlsRekeyDrill = {
-          enable = true;
-          warnWindowDays = 14;
-          criticalWindowDays = 3;
-          acmeDomains = [ "*.frieren.lan" "frieren.lan" ];
-          autoReloadNginx = true;
-        };
-        ```
-
-        **Evidence.** Nginx reverse proxy runs on frieren. TLS certificates are managed under `/var/lib/acme`.
-
-        **Why it is not prod.** Requires DNS-01 challenge automation with the local Pi-hole/Unbound resolver. Exit criteria: simulated expiring certificate renewed and hot-reloaded with 0 dropped active HTTP/2 connections.
-      '';
-    };
-    exp-092 = {
-      title = "EXP-092 — Immich Photo Vector Embedding Cluster Sharding & Offload Governor (`services.immichVectorSharder`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 Immich pgvector index size and query latency triage triggering Nemotron-3-Ultra to partition high-dimensional vector search between local CPU and remote GPU workers. Status: proposed design study. Motivated by facial recognition and CLIP semantic image search growing to tens of thousands of 512-dim vectors in PostgreSQL.";
-      body = ''
-        **Mode:** Julia-1 Immich pgvector index size and query latency triage triggering Nemotron-3-Ultra to partition high-dimensional vector search between local CPU and remote GPU workers.
-        **Status:** proposed design study. Motivated by facial recognition and CLIP semantic image search growing to tens of thousands of 512-dim vectors in PostgreSQL.
-
-        **Use case.** On frieren's i5-8250U, querying high-dimensional vectors in PostgreSQL (`face_search`, `smart_search`) consumes significant RAM and CPU during concurrent photo browsing. When the vector table exceeds 50,000 embeddings, HNSW index scans take > 400 ms. `services.immichVectorSharder`:
-        * Julia-1 monitors pgvector query duration and index fragmentation during browse requests.
-        * When query latency exceeds 150 ms, Nemotron-3-Ultra provisions a sharded replica query to a remote GPU node over Tailscale, falling back to local IVF-flat indexing if the remote node is unreachable.
-
-        **Module shape.**
-
-        ```nix
-        services.immichVectorSharder = {
-          enable = true;
-          database = "immich";
-          vectorTables = [ "face_search" "smart_search" ];
-          maxLocalLatencyMs = 150;
-          remoteGpuWorker = "poseidon";
-        };
-        ```
-
-        **Evidence.** PostgreSQL with `pgvector` extension is active in `immich` database.
-
-        **Why it is not prod.** Requires PostgreSQL foreign data wrapper (FDW) or Immich microservice offloading support. Exit criteria: 100 concurrent semantic photo queries resolve in < 50 ms.
-      '';
-    };
-    exp-093 = {
-      title = "EXP-093 — Autonomous Unbound DNSSEC Cache Poisoning & Split-Horizon Watchdog (`services.dnssecPoisonWatchdog`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 DNS root key anchor and response RRSIG validation triage triggering Nemotron-3-Ultra to flush suspect domain caches and fail over to root hints. Status: proposed design study. Motivated by frieren acting as the authoritative DNS recursive resolver for the entire household.";
-      refs = {
-        hosts = ["frieren"];
-        modules = ["hosts/frieren/dns.nix"];
-      };
-      body = ''
-        **Mode:** Julia-1 DNS root key anchor and response RRSIG validation triage triggering Nemotron-3-Ultra to flush suspect domain caches and fail over to root hints.
-        **Status:** proposed design study. Motivated by frieren acting as the authoritative DNS recursive resolver for the entire household.
-
-        **Use case.** Unbound recursive resolver (`127.0.0.1:5335`) validates DNSSEC for upstream records. When ISP or router MITM attempts intercept DNS queries, or when an upstream recursive resolver provides forged signatures, Unbound can experience cache corruption or bogus validation errors (`SERVFAIL`). `services.dnssecPoisonWatchdog`:
-        * Julia-1 audits Unbound logs and probes DNSSEC validation test domains (`sigok.verteiltesysteme.net` vs `sigfail.verteiltesysteme.net`) every 15 minutes.
-        * If signature validation anomalies or spoofing are detected, Nemotron-3-Ultra synthesizes an immediate cache purge (`unbound-control flush_zone ...`) and locks queries to hardcoded root hints over DNS-over-TLS (DoT).
-
-        **Module shape.**
-
-        ```nix
-        services.dnssecPoisonWatchdog = {
-          enable = true;
-          unboundControlPath = "/run/current-system/sw/bin/unbound-control";
-          canaryTestDomains = [ "sigfail.verteiltesysteme.net" "dnssec-failed.org" ];
-          failoverToDot = true;
-        };
-        ```
-
-        **Evidence.** Unbound and Pi-hole are active and configured in `hosts/frieren/dns.nix`.
-
-        **Why it is not prod.** Requires testing against artificial DNSSEC failure injection without disrupting live home LAN DNS traffic. Exit criteria: simulated bogus DNSSEC injection correctly produces SERVFAIL and alerts SimpleX in < 3 seconds.
-      '';
-    };
-    exp-094 = {
-      title = "EXP-094 — Declarative WireGuard MTU Clamping & Path MTU Discovery Governor (`services.wireguardMtuGovernor`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 ICMP fragmentation-needed packet drop triage triggering Nemotron-3-Ultra to dynamically clamp interface MTU and synthesize TCP MSS clamping rules. Status: proposed design study. Motivated by roaming laptops and mobile phones experiencing stalled SSH sessions or slow transfers when connecting to frieren over asymmetric 4G/5G networks.";
-      body = ''
-        **Mode:** Julia-1 ICMP fragmentation-needed packet drop triage triggering Nemotron-3-Ultra to dynamically clamp interface MTU and synthesize TCP MSS clamping rules.
-        **Status:** proposed design study. Motivated by roaming laptops and mobile phones experiencing stalled SSH sessions or slow transfers when connecting to frieren over asymmetric 4G/5G networks.
-
-        **Use case.** Tailscale and WireGuard tunnel packets through outer UDP envelopes, adding 60–80 bytes of overhead. On WAN connections with PPPoE (MTU 1492) or mobile cellular networks (MTU 1420), standard 1500-byte packets exceed tunnel MTU. If ICMP "Fragmentation Needed" packets are filtered by residential firewalls (Path MTU Black Hole), TCP handshakes complete but large data transfers (e.g. `git push`, media streaming) freeze indefinitely. `services.wireguardMtuGovernor`:
-        * Julia-1 evaluates TCP retransmission rates and tunnel ping telemetry with DF (Don't Fragment) bits set.
-        * Nemotron-3-Ultra calculates optimal MTU (e.g. 1280 bytes) and synthesizes nftables TCP MSS clamping rules (`tcp flags syn tcp option maxseg size set ...`).
-
-        **Module shape.**
-
-        ```nix
-        services.wireguardMtuGovernor = {
-          enable = true;
-          interfaces = [ "tailscale0" "enp1s0" ];
-          autoClampTcpMss = true;
-          minMtuBytes = 1280;
-        };
-        ```
-
-        **Evidence.** Tailscale WireGuard interface is active on frieren.
-
-        **Why it is not prod.** Requires packet capture testing across multiple cellular uplinks. Exit criteria: 100 MB file transfer completes over PPPoE link with 0 frozen TCP sessions.
-      '';
-    };
     exp-095 = {
       title = "EXP-095 — Btrfs Asynchronous Scrub Scheduling & Cgroup IO Rate Limiter (`services.btrfsScrubThrottle`)";
       kind = "experiment";
@@ -3989,108 +2299,15 @@
         **Why it is not prod.** Requires benchmarking scrub completion time when throttled versus unthrottled. Exit criteria: full 2TB disk scrub completes within 48 hours without causing video stutter during 4K streaming.
       '';
     };
-    exp-096 = {
-      title = "EXP-096 — Zero-Downtime PostgreSQL Logical Replication & Hot Standby Failover Drill (`services.postgresHotStandbyDrill`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 WAL sender lag and replay latency triage triggering Nemotron-3-Ultra to synthesize hot-standby failover manifests and VIP migration commands. Status: proposed design study. Motivated by PostgreSQL housing core state for Immich (photos) and Paperless (documents).";
-      body = ''
-        **Mode:** Julia-1 WAL sender lag and replay latency triage triggering Nemotron-3-Ultra to synthesize hot-standby failover manifests and VIP migration commands.
-        **Status:** proposed design study. Motivated by PostgreSQL housing core state for Immich (photos) and Paperless (documents).
-
-        **Use case.** While nightly `pg_dump` backups protect against disaster, a hardware failure on frieren requires hours of manual host provisioning to restore database state. Setting up logical replication or streaming replication to a secondary fleet node (`poseidon`) provides instant failover. `services.postgresHotStandbyDrill`:
-        * Julia-1 evaluates `pg_stat_replication` replication lag (bytes and milliseconds) every 5 minutes.
-        * If primary node hardware warning or power loss is detected, Nemotron-3-Ultra drafts a promotion manifest (`pg_ctl promote`) and switches local DNS records to point clients to the standby node.
-
-        **Module shape.**
-
-        ```nix
-        services.postgresHotStandbyDrill = {
-          enable = true;
-          primaryHost = "frieren";
-          standbyPeer = "poseidon";
-          databases = [ "immich" "paperless" ];
-          maxAllowedLagMb = 64;
-        };
-        ```
-
-        **Evidence.** PostgreSQL is active on frieren with Immich and Paperless databases.
-
-        **Why it is not prod.** Requires standby PostgreSQL cluster running on `poseidon` with SOPS replication credentials. Exit criteria: simulated primary database shutdown fails over to standby in < 30 seconds with 0 committed transaction loss.
-      '';
-    };
     exp-097 = {
       title = "EXP-097 — Automated Flake Input Transitive Vulnerability Scanner & Patch Proposer (`services.vulnPatchProposer`)";
       kind = "experiment";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Prototype wired to systemone-ensemble and `checks:decision:*`; no reusable option surface yet. Mode: Julia-1 lockfile input hash audit triggering Nemotron-3-Ultra to cross-reference known CVE advisories and draft pinned input overrides. Status: approved & prototyped live on frieren (Generation 107). Wired to…";
       refs = {
         modules = ["modules/services/systemone-decision.nix"];
       };
-    };
-    exp-098 = {
-      title = "EXP-098 — Jellyfin Ephemeral RAM-Disk Transcode Cache & SSD Wear Minimizer (`services.jellyfinRamTranscode`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 memory buffer headroom triage dynamically mounting a 3GB tmpfs RAM disk for video transcode segments when RAM is available. Status: proposed design study. Motivated by Jellyfin transcoding writing tens of gigabytes of temporary .ts video chunks to disk daily.";
-      body = ''
-        **Mode:** Julia-1 memory buffer headroom triage dynamically mounting a 3GB `tmpfs` RAM disk for video transcode segments when RAM is available.
-        **Status:** proposed design study. Motivated by Jellyfin transcoding writing tens of gigabytes of temporary `.ts` video chunks to disk daily.
-
-        **Use case.** When remote clients or mobile phones stream video requiring transcoding, Jellyfin slices the media into hundreds of 3-second HLS chunk files written to `/var/lib/jellyfin/transcodes`. Writing these temporary segments to the SSD `/dev/sdb3` wears flash cells and causes unnecessary I/O. `services.jellyfinRamTranscode`:
-        * Julia-1 monitors available RAM (frieren has 11.47 GiB with ~7 GiB free).
-        * When available RAM > 5.5 GiB, it mounts a 3.0 GiB `tmpfs` at `/run/jellyfin-transcodes`, pointing Jellyfin's transcode path to RAM.
-        * If system memory pressure rises (PSI > 15%), it dynamically migrates transcode buffers to disk swap or shrinks the tmpfs.
-
-        **Module shape.**
-
-        ```nix
-        services.jellyfinRamTranscode = {
-          enable = true;
-          ramDiskSizeGb = 3.0;
-          minFreeRamHeadroomGb = 4.5;
-          transcodeMount = "/run/jellyfin-transcodes";
-        };
-        ```
-
-        **Evidence.** Jellyfin is active on frieren. Host currently has ~7 GiB of available RAM buffer.
-
-        **Why it is not prod.** Requires testing behavior when multiple simultaneous streams fill the 3GB tmpfs. Exit criteria: 3-hour 4K transcoding session completes with 0 bytes written to SSD transcode directory.
-      '';
-    };
-    exp-099 = {
-      title = "EXP-099 — Autonomous Systemd Cgroup Memory Pressure Early Warning Daemon (`services.oomEarlyWarning`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: Julia-1 kernel event polling over /proc/pressure/memory file descriptors triggering Nemotron-3-Ultra to shed transient workloads before the kernel OOM killer fires. Status: proposed design study. Motivated by preventing kernel OOM killer from abruptly terminating critical stateful services (PostgreSQL, Pi-hole).";
-      body = ''
-        **Mode:** Julia-1 kernel event polling over `/proc/pressure/memory` file descriptors triggering Nemotron-3-Ultra to shed transient workloads before the kernel OOM killer fires.
-        **Status:** proposed design study. Motivated by preventing kernel OOM killer from abruptly terminating critical stateful services (PostgreSQL, Pi-hole).
-
-        **Use case.** Linux kernel memory pressure spikes can escalate from 10% stall to fatal OOM within 500 milliseconds when multiple memory-intensive tasks (Ollama model loading, Paperless OCR, Nix building) coincide. The Linux kernel OOM killer selects targets via badness heuristics, sometimes killing innocent PostgreSQL backends instead of the runaway worker. `services.oomEarlyWarning`:
-        * Uses an `epoll()` loop on `/proc/pressure/memory` configured for `some 200000 1000000` (200ms stall in 1s window).
-        * When triggered, Julia-1 evaluates candidate cgroup processes in < 0.1 ms and sends a SIGSTOP or graceful cancellation to disposable batch jobs (e.g. background image indexing or Nix builds), saving PostgreSQL and Nginx.
-
-        **Module shape.**
-
-        ```nix
-        services.oomEarlyWarning = {
-          enable = true;
-          pressureThresholdMs = 200;
-          windowMs = 1000;
-          sacrificialCgroups = [ "system-nix\\x2ddaemon.slice" "user-devji.slice" ];
-          protectedServices = [ "postgresql.service" "nginx.service" "sshd.service" ];
-        };
-        ```
-
-        **Evidence.** Kernel 6.12 PSI is active and tested on frieren.
-
-        **Why it is not prod.** Requires kernel epoll C-daemon wrapper or lightweight Python event listener. Exit criteria: simulated memory burst (`stress-ng --vm 4 --vm-bytes 3G`) gracefully throttled without a single kernel OOM killer invocation.
-      '';
     };
     exp-100 = {
       title = "EXP-100 — Declarative Consolidated Fleet Governor & 3-Tier Escalation Router (`services.fleetGovernor`)";
@@ -4168,7 +2385,7 @@
     exp-107 = {
       title = "EXP-107 — Build-routing guard";
       kind = "experiment";
-      status = "PROPOSED";
+      status = "CLOSED";
       date = "2026-10-19";
       summary = "Mode: a rule plus a gate — heavy closures are built by CI or the remote builder, never on a 2-core laptop.";
       refs = {
@@ -4176,63 +2393,7 @@
         modules = ["scripts/task/warm-host.sh" "flake/checks.nix"];
         tasks = ["checks:build:route" "dev:nixbuild:warm"];
       };
-      body = ''
-        **Mode:** a rule plus a gate — heavy closures are built by CI or the remote builder, never on a 2-core laptop.
-
-        **Status:** the rule is documented in `AGENTS.md` § Gates and operating; `task checks:build:route` reports
-        whether the cache already serves the closure. It does not yet fail a build started on a
-        non-builder tier.
-
-        **Use case.** `nixos-rebuild build --flake .#fern` was started on fern and pushed its load average to ~9.4 on a 2-core/4-thread machine before it was killed; the same closure was built on a GitHub runner and pushed to cachix in **6m53s** (`gh workflow run nixcachix.yml -f host=fern`, run `38634182649`, `build-machines (fern, nixos, x86_64-linux, ubuntu-latest …) success`). After the warm run, a local rebuild on fern is substitution-only.
-
-        **Deliverable.** A documented rule ("if the host is not a builder, warm it through CI/`dev:nixbuild:warm` first") in `AGENTS.md` and the `dev` skill, plus a `checks:*` gate that reads `inventory.toml`'s `compute_tier`/`allowed_tasks` and fails when a build is attempted on a tier whose `allowed_tasks` excludes heavy compilation.
-
-        **Evidence.** fern's `inventory.toml` entry restricts it to "Lightweight local builds and documentation" with the constraint "15W dual-core processor and 8GB RAM; avoid heavy compilation loops" — the constraint existed, the tooling did not enforce it. The CI workflow already maps host → runner arch from `inventory.toml` and already pushes to cachix.
-
-        **Why it is not prod.** The gate needs a reliable way to detect "this is a heavy build" without evaluating the whole closure (the flake attribute plus a change-since-last-warm signal is the cheap heuristic). Exit criteria: `task checks:build:route HOST=fern` exits non-zero when fern would build an unwarmed closure, and passes after the CI warm.
-      '';
-    };
-    exp-108 = {
-      title = "EXP-108 — One command that answers \"can this host build?\" (`checks:host:prebuild`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: a preflight that checks the inputs of a build instead of running it: resolver, default route, each substituter's nix-cache-info, disk headroom, and whether the repo path itself lives on a network share.";
-      body = ''
-        **Mode:** a preflight that checks the *inputs* of a build instead of running it: resolver, default route, each substituter's `nix-cache-info`, disk headroom, and whether the repo path itself lives on a network share.
-
-        **Status:** not started; written from the 2026-10-14 debugging session, where every one of those inputs had to be tested by hand.
-
-        **Use case.** "I can't nixos build" had four distinct causes on one machine in one evening: a resolver outage (frieren), a boot-race mount failure (NFS), a store path that is only reachable through that mount (fern's checkout lives on the NAS mount), and a failed `nix-gc` that shared the same root cause. A single command that names the broken leg would have replaced the entire investigation.
-
-        **Deliverable.**
-
-        ```nix
-        # nixos-rebuild's problem is never "nix"; it is the preconditions.
-        ```
-
-        **Evidence.** `curl https://cache.nixos.org/nix-cache-info` (200), `curl http://192.168.3.25:5000/nix-cache-info` (200), `nix build nixpkgs#hello` (ok), `findmnt -T /Volumes/data`, `resolvectl status`, and `df` are all cheap and were all needed.
-
-        **Why it is not prod.** Needs to be honest about *which* failure matters (a dead substituter is survivable, a dead resolver is not) and must not itself trigger the NAS automount as a side effect of probing. Exit criteria: it exits non-zero naming exactly one leg on a host with that leg broken, and exits 0 within a second on a healthy host.
-      '';
-    };
-    exp-109 = {
-      title = "EXP-109 — GC-root hygiene and store-growth reporting (`services.gcRootAudit`)";
-      kind = "experiment";
-      status = "PROPOSED";
-      date = "2026-10-19";
-      summary = "Mode: scheduled audit of /nix/var/nix/gcroots, /nix/var/nix/profiles, and per-host store growth, with network-path roots called out as first-class citizens.";
-      body = ''
-        **Mode:** scheduled audit of `/nix/var/nix/gcroots`, `/nix/var/nix/profiles`, and per-host store growth, with network-path roots called out as first-class citizens.
-
-        **Status:** partially mitigated (EXP-103's `ExecStartPre` guard stops `nix-gc` from dying), the audit itself not started. fern's `nix-gc.service` is in `failed` state on the current generation.
-
-        **Use case.** fern's GC failed at every boot for a reason that has nothing to do with garbage: a root on an NFS path. Roots on network paths are a *structural* fragility of this fleet's design (the canonical repo lives on the NAS and builds are run from it), and nothing reports them until the GC unit turns red.
-
-        **Evidence.** `find /nix/var/nix/gcroots/auto -lname '*Volumes*'` on fern found `…/zsaq3lrb6m1hgx6gwrzmr1w9g36q0bb7 -> /Volumes/data/projects/nixconfig/result`; `journalctl -u nix-gc.service` shows `error: getting status of "/Volumes/data/projects/nixconfig/result": Host is down` → `0 store paths deleted`. (repo-path-ok: verbatim journalctl output) EXP-034 (`gcRootPruner`) and HC-4's budget table are the natural homes for the reporting half.
-
-        **Why it is not prod.** Deleting a root is only safe when its filesystem is genuinely absent, and "absent" must be proven from the mount table rather than by touching the path (touching it triggers the automount — the trap in EXP-103). Exit criteria: a report that lists network-path roots, superseded generations, and reclaimable bytes per host, with a non-zero exit only on unbounded growth.
-      '';
+      body = "The rule shipped — heavy closures build via CI or the remote builder, never on a 2-core host (task checks:build:route). Closed via exp-113.";
     };
     exp-110 = {
       title = "EXP-110 — Close HC-4";
@@ -6215,7 +4376,7 @@
     daemon-earns-it-by-compression = {
       title = "A winning daemon replaces an 18 KB read, not a 145 ms question";
       kind = "proposal";
-      status = "IN FLIGHT";
+      status = "CLOSED";
       priority = "P2";
       date = "2026-11-02";
       summary = "The Kelly break-even is p* = cost/(save+cost), so a daemon wins by making `save` big: naming an argument saves ~3 tokens and needs p > 0.88, while not reading an 18 KB blast listing needs p > 0.29. Design: NL to a schema-checked query object over compiled registries, answered in <=80 tokens with pointers, refusing on invalid or empty.";
@@ -6224,38 +4385,7 @@
         tasks = ["ops:ask" "ops:q" "ops:q:sidecar" "checks:toolcall" "checks:selector" "checks:selector:sidecar"];
         docs = ["docs/nix-patterns.md" "docs/selector-daemon-predesign.md"];
       };
-      body = ''
-        Handoff packet: docs/selector-daemon-predesign.md.
-
-        Measured 2026-11-03, criteria met: executor p 1.0, S 942.94 s, refusal 71 ms;
-        stage 1 p 1.0 on all 21 scored questions it answered (coverage 21/28), 6/6
-        abstain declined, held-out 0.978 at 0.92. `selector.service` is the resident
-        unit behind `wanted = true`, and `checks:selector:sidecar` proves it answers
-        the same bytes: 180 ms vs 250 ms answered, 37 ms vs 105 ms refused. One
-        battery question refuses — a task named only by its description.
-
-        Measured 2026-11-02: the deterministic keyword router resolves 6/6 graph
-        lookups in 265 ms with no model, so the whole class the edge caller aimed at
-        has no niche left. The wide reads are where an agent actually pays:
-        `ops:kg:blast` 18,025 B, `ops:ledger` 22,538 B, `docs/inventory-schema.md`
-        13,230 B, `task --list-all --json` 274,574 B.
-
-        **Shape.** Choose a task class where GROUND TRUTH IS COMPILED, so p can be
-        scored offline by executing the intended query. The model emits a query
-        object from a closed vocabulary (registry + filter + fields), never prose; the
-        daemon validates it against the compiled schema, executes it, and returns <=80
-        tokens with pointers an agent can verify in one cheap call.
-
-        **Refusal is the accuracy mechanic.** Invalid query or empty result is a
-        refusal, not an answer, so p is measured over ANSWERED cases. That only works
-        if refusal is cheap: two stages, a lexical shortlist at ~5 ms and the 29M
-        model only on a hit, because a refusal costing 800 ms against a 145 ms direct
-        call is itself a loss.
-
-        **Exit.** Build the deterministic grammar first (p=1) and let the model only
-        front it. Ship only if answered-case p >= 0.3 at S >= 3 s AND refusal <= 100 ms
-        AND the Kelly entry in flake/daemons.nix clears with `wanted = true`. If the grammar is learnable in one session, S amortises to zero and the answer is no.
-      '';
+      body = "The Kelly analysis delivered its verdict through the needle3 rejections (flake/daemons.nix scores resident helpers, ev gate). Closed — conclusion reached.";
     };
 
     jobby-cli-consolidation = {

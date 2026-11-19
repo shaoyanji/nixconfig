@@ -86,8 +86,8 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes|routes" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes" or .type == "routes")'
+check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes|routes|runs-on" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes" or .type == "routes" or .type == "runs-on")'
 
 check "routes layer is populated (>=17 edges)" \
   '([.edges[] | select(.type == "routes")] | length) >= 17'
@@ -152,6 +152,22 @@ check "mentions: (doc|skill) -> (host|skill)" \
                | ($t[$f] == "doc" or $t[$f] == "skill")
                  and ($t[$to] == "host" or $t[$to] == "skill"))
          end)'
+
+check "runs-on: service -> host" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if .type != "runs-on" then true
+         else (.from as $f | .to as $to | $t[$f] == "service" and $t[$to] == "host")
+         end)'
+
+check "runs-on layer is populated (>=100 edges)" \
+  '([.edges[] | select(.type == "runs-on")] | length) >= 100'
+
+check "service nodes carry a host and a port field" \
+  'all(.nodes[];
+       if .type == "service" then
+         (.host | type == "string" and length > 0) and has("port")
+       else true end)'
 
 check "tagged: skill -> tag" \
   '(.nodes | map({(.id): .type}) | add) as $t
@@ -229,6 +245,7 @@ check "stats agree with a recount of nodes and edges" \
    | (.nodes | map(select(.type == "module")) | length) as $m
    | .stats.hosts == $h and .stats.skills == $s and .stats.docs == $d
      and .stats.modules == $m
+     and .stats.services == (.nodes | map(select(.type == "service")) | length)
      and .stats.edges == (.edges | length)'
 
 echo "== patterns =="
@@ -282,7 +299,9 @@ seed_module="$(jq -r '[.edges[] | select(.type == "imports") | .to]
 
 rows "host frieren (inventory anchor)" host frieren
 HOST_JSON="$LAST"
-expect_types "host" "$HOST_JSON" 'doc|skill'
+# A host answers with the documents and skills that mention it and the services
+# that run on it: the `runs-on` layer is what makes "what runs here" one query.
+expect_types "host" "$HOST_JSON" 'doc|skill|service'
 
 rows "doc AGENTS.md (living-doc anchor)" doc AGENTS.md
 DOC_JSON="$LAST"

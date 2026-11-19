@@ -1,8 +1,76 @@
 {
-  "generated": "2026-11-19T09:04:03Z",
+  "generated": "2026-11-19T09:13:00Z",
   "count": 200,
-  "pin": "3f011a2b984e4e335f8dee5a1aeb38b2edeffa14fb6cca8d18ed07a90b82743e",
+  "pin": "04313cfde91075ba1116ffcc2f132c0c87a4517ebc5f6f302cc98af4efa35fe6",
   "turns": [
+    {
+      "id": "665050c2-075d-46fd-b657-cf112915c741",
+      "ts": "2026-11-19T09:12:18Z",
+      "source": "devji",
+      "subject": "nixconfig:kg-services",
+      "action": "landed b3d4b399: 159 service nodes + runs-on edges declared in flake/ontology.nix; kg-check and host pattern extended; quick+ontology+kg+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
+      "branch": "main",
+      "frame": "03h9iwv8ewsorc8er373p8e8i"
+    },
+    {
+      "id": "49531a46-309e-434b-b3d3-cb7c41ab9dc1",
+      "ts": "2026-11-19T09:10:29Z",
+      "source": "devji",
+      "subject": "nixconfig:kg-services",
+      "action": "correction: earlier post preceded the commit. Landed b3d4b399: 159 service nodes + runs-on edges, kg-check extended, ops:kg:host lists services; quick+kg-check+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
+      "branch": "main",
+      "frame": "03h9iwie3fgd5vghf7cxf4r6s"
+    },
+    {
+      "id": "9980d3bd-d54a-420e-948c-cbeafb73b1b2",
+      "ts": "2026-11-19T09:09:24Z",
+      "source": "devji",
+      "subject": "nixconfig:kg-services",
+      "action": "159 service nodes + runs-on edges in .#knowledgeGraph, kg-check schema/shape/floor extended, ops:kg:host lists services; quick+frieren+kg green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
+      "branch": "main",
+      "frame": "03h9iwav3ele089zfuqzhli9b"
+    },
+    {
+      "id": "8cc0b51f-ffd9-47c5-9909-d11814c97fb1",
+      "ts": "2026-11-19T09:07:11Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 11: freebuff landed record-port gate (b3d4b399, cross-checks service port records vs listeners, one-directional by design). Fed it graph-the-services (connect service map to knowledge graph).",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
+      "branch": "main",
+      "frame": "03h9ivva4lzjsfkx5gl9e1h5q"
+    },
+    {
+      "id": "3366dd27-9098-4563-9566-8480b6d666b3",
+      "ts": "2026-11-19T09:04:12Z",
+      "source": "devji",
+      "subject": "nixconfig:service-port-gate",
+      "action": "checks:services:ports ties 29 record ports to host prose with boundaries; 7-case fixture; caught delphi 8453/8454 missing from prose; quick+frieren green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
+      "branch": "main",
+      "frame": "03h9iva9oywxx3do5pcobh3y6"
+    },
     {
       "id": "6a4d7002-3329-437c-809a-93594775f9de",
       "ts": "2026-11-19T09:01:51Z",
@@ -2687,71 +2755,6 @@
       "base_commit": "50d5568c0c63ac928986648cfeebd66d602cddac",
       "branch": "main",
       "frame": "03h8qcgtm1aa0v89h4n44vcik"
-    },
-    {
-      "id": "13f0a886-e6b6-46a7-bb80-74fffcb2fa37",
-      "ts": "2026-11-15T16:57:17Z",
-      "source": "devji",
-      "subject": "nixconfig:kickstart-nixvim-minimal",
-      "action": "stripped kickstart.nixvim to 6 plugin modules (2170 lines out), deleted the nvim-treesitter tmux overlay, scoped the editor module to penguin, pushed 5dc39de",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d979d3393c08bf6e97937c24bd22bfa1451c4861",
-      "branch": "main",
-      "frame": "03h8q6id3y79uy3jbpnwo8fhv"
-    },
-    {
-      "id": "53a5739a-e527-403d-8c73-cacc2190fd39",
-      "ts": "2026-11-15T13:46:12Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round13",
-      "action": "round 13 Dota 2 glamour: 9 of 14 rendered, published, images-check green; phantom assassin rerolled twice on UI-in-background artifacts and legion commander rc=1, both queued",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d979d3393c08bf6e97937c24bd22bfa1451c4861",
-      "branch": "main",
-      "frame": "03h8p56lu8bolvdrc4jfdgk6y"
-    },
-    {
-      "id": "7c448e73-4fcc-4c58-a8a9-9e421615a425",
-      "ts": "2026-11-15T13:02:55Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round12",
-      "action": "round 12 glamour: 3 of 20 landed before the image endpoint's burst window closed, published with images-check green; 17 rows queued",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f739ba90a148b2231e58988e732498b4498e7514",
-      "branch": "main",
-      "frame": "03h8owq5pynaijn8duziuywgb"
-    },
-    {
-      "id": "a7a6b282-da31-4bb7-ad14-5341797dcc8f",
-      "ts": "2026-11-15T12:25:44Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round11",
-      "action": "round 11 glamour: 16 of 20 kept, four download-401 (no blocks, no rate limit), published with images-check green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "836d694146ae779b0f98a2cd7e99b2dedbcfed3c",
-      "branch": "main",
-      "frame": "03h8opgql69lxfe3gk9p4w3v4"
-    },
-    {
-      "id": "1d3ebff2-aa8d-4f27-997a-ecbae11daec5",
-      "ts": "2026-11-15T11:29:43Z",
-      "source": "devji",
-      "subject": "nixconfig:wall-photoreal-round10",
-      "action": "round 10 glamour: 11 kept of 26 attempted, published (296 assets, images-check ok); six Western-IP prompts blocked twice, provider rate-limited the last four",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4c7a172f873ee5db4acba6e849f98257c09d4a8",
-      "branch": "main",
-      "frame": "03h8oeiqbo3qjveta88ss46ya"
     }
   ]
 }

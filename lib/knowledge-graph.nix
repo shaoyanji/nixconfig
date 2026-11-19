@@ -327,6 +327,33 @@
     })
     hostNames;
 
+  serviceNodes =
+    lib.concatMap (
+      h:
+        map (s: {
+          id = "service:${h}:${s.name}";
+          type = "service";
+          label = s.name;
+          host = h;
+          port = s.port;
+          note = s.note;
+        })
+        inventory.hosts.${h}.software.services
+    )
+    hostNames;
+
+  serviceEdges =
+    lib.concatMap (
+      h:
+        map (s: {
+          from = "service:${h}:${s.name}";
+          to = "host:${h}";
+          type = "runs-on";
+        })
+        inventory.hosts.${h}.software.services
+    )
+    hostNames;
+
   skillNodes =
     map (n: {
       id = "skill:${n}";
@@ -467,6 +494,7 @@
   nodes =
     hostNodes
     ++ skillNodes
+    ++ serviceNodes
     ++ policyNodes
     ++ noteNodes
     ++ map (d: {
@@ -552,6 +580,7 @@
       (citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body)))
     (builtins.attrNames skills.skills)
     ++ routeEdges
+    ++ serviceEdges
     ++ noteEdges;
 
   tagNodes = lib.unique (lib.concatMap (n: skills.skills.${n}.tags) (builtins.attrNames skills.skills));
@@ -575,6 +604,7 @@
       ideas = builtins.length ideas;
       notes = builtins.length noteIdsForEdges;
       modules = builtins.length modules;
+      services = builtins.length serviceNodes;
       policies = builtins.length policyIds;
       tasks = builtins.length taskIds;
       edges = builtins.length edges;
@@ -602,6 +632,8 @@
         then "Note"
         else if n.type == "task"
         then "Task"
+        else if n.type == "service"
+        then "Service"
         else "Tag";
     in ''
       MERGE (${"n_${builtins.hashString "md5" n.id}"}:${label} {id: ${q n.id}})
@@ -625,6 +657,8 @@
         then "SUPERSEDES"
         else if e.type == "routes"
         then "ROUTES"
+        else if e.type == "runs-on"
+        then "RUNS_ON"
         else "MENTIONS";
     in ''
       MATCH (${a}), (${b}) MERGE (${a})-[r:${rel}]->(${b})${lib.optionalString (e ? evidence) " SET r.evidence = ${q e.evidence}"};

@@ -138,6 +138,122 @@ else
   bad "$persona is missing"
 fi
 
+echo "== hermes spend guard"
+# The persona is read structurally here, not grepped: a paid id can hide in
+# fields a `(deepseek|qwen)` pattern never sees — model.default, a fallback
+# entry, another providers.<name> block, or the catalog a live /models probe
+# serves the picker. The spend rule the file must keep (measured 2026-11-19,
+# when a picker-selected nemotron-3.5-super billed the prepaid balance):
+#
+#   1. on a metered route (custom endpoint, openrouter) an id may only be
+#      named with its `:free` suffix — that suffix is the zero-billing contract
+#   2. ollama-cloud/ollama/lmstudio/nous are closed free lanes — any id there
+#      is unbilled
+#   3. every providers.<name> row must be pinned: discover_models: false plus a
+#      list-shaped models: allowlist, or the picker probes the endpoint and
+#      offers its paid ids
+#   4. model_catalog.excluded_providers hides the keyed billable vendors from
+#      every picker (CLI, TUI, gateway slash); hermes' cost guard warns only on
+#      known pricing and stays silent on a custom route
+#   5. the chain must cross vendors: Infron's daily quota is account-scoped, so
+#      a same-route second id is not a failover, it is the same failure
+if ! command -v yq >/dev/null 2>&1; then
+  bad "yq is required to read the persona's spend fields"
+elif [ ! -f "$persona" ]; then
+  bad "cannot read the persona's spend fields: $persona is missing"
+else
+  persona_default="$(yq -r '.model.default // ""' "$persona")"
+  case "$persona_default" in
+    *:free) ok "model.default $persona_default is :free" ;;
+    *) bad "model.default '$persona_default' is not :free — the primary bills on every turn" ;;
+  esac
+  case "$(yq -r '.model.provider // ""' "$persona")" in
+    custom | infron) ok "model.provider stays on the declared route" ;;
+    *) bad "model.provider moved off the declared route — gate its ids before merging" ;;
+  esac
+
+  # Every providers.<name> entry: pinned catalog, every declared id :free. An
+  # empty map fails too — without a named entry shadowing the endpoint's URL,
+  # the picker falls back to a bare "custom" row that probes it live.
+  prov_count="$(yq '.providers | length' "$persona" 2>/dev/null || echo 0)"
+  [ "$prov_count" -ge 1 ] || bad "providers: is empty — the bare custom row probes the route's paid catalog"
+  for pname in $(yq -r '.providers | keys | .[]' "$persona"); do
+    if [ "$(yq -r ".providers.$pname.discover_models" "$persona")" = "false" ]; then
+      ok "providers.$pname discover_models: false pins the picker row"
+    else
+      bad "providers.$pname probes its catalog live — the picker offers the route's paid ids"
+    fi
+    if [ "$(yq ".providers.$pname.models | type" "$persona")" = "!!seq" ]; then
+      ok "providers.$pname models: is a list-shaped allowlist"
+      id_src=".providers.$pname.models[]"
+    else
+      bad "providers.$pname models: is not a list — a dict is metadata, not an allowlist"
+      id_src=".providers.$pname.models | keys | .[]"
+    fi
+    while IFS= read -r id; do
+      [ -n "$id" ] || continue
+      case "$id" in
+        *:free) ;;
+        *) bad "providers.$pname names paid id '$id'" ;;
+      esac
+    done < <(yq -r "$id_src, .providers.$pname.default_model? // \"\"" "$persona")
+  done
+
+  # The chain: at least two independent free quotas. Metered-route entries need
+  # :free; closed-lane providers (ollama-cloud, ollama, lmstudio, nous) carry
+  # their free contract in the provider, not the id.
+  fb_count="$(yq '.fallback_providers | length' "$persona" 2>/dev/null || echo 0)"
+  [ "$fb_count" -ge 2 ] && ok "fallback chain has $fb_count lanes" \
+    || bad "fallback chain has $fb_count lane(s) — Infron's daily quota is account-scoped, so a same-route second id is the same failure"
+  while IFS=$'\t' read -r fb_provider fb_model; do
+    [ -n "$fb_provider" ] || continue
+    case "$fb_provider" in
+      custom | openrouter)
+        case "$fb_model" in
+          *:free) ok "fallback $fb_provider/$fb_model is :free" ;;
+          *) bad "fallback $fb_provider/$fb_model — a metered-route id without :free spends the balance" ;;
+        esac
+        ;;
+      ollama-cloud | ollama | lmstudio | nous)
+        ok "fallback $fb_provider/$fb_model is on a closed free lane"
+        ;;
+      *)
+        bad "fallback provider '$fb_provider' can bill — only :free ids on metered routes or the closed free lanes are allowed"
+        ;;
+    esac
+  done < <(yq -r '.fallback_providers[]? | (.provider // "") + "\t" + (.model // "")' "$persona")
+
+  # Picker denylist: the keyed billable vendors must all be hidden. Slugs match
+  # case-insensitively upstream; the list here is asserted verbatim.
+  required_excl="nvidia openai-api openrouter deepseek gemini groq cerebras aihubmix cohere tinker opencode-zen opencode-go nous"
+  excl_list="$(yq -r '.model_catalog.excluded_providers[]?' "$persona")"
+  missing_excl=""
+  for p in $required_excl; do
+    grep -qxF "$p" <<<"$excl_list" || missing_excl="$missing_excl $p"
+  done
+  [ -z "$missing_excl" ] && ok "model_catalog.excluded_providers hides the keyed billable vendors" \
+    || bad "model_catalog.excluded_providers is missing:$missing_excl"
+
+  [ "$(yq -r '.auxiliary.free_only // false' "$persona")" = "true" ] \
+    && ok "auxiliary.free_only stays on" \
+    || bad "auxiliary.free_only is off — aux calls can reach paid openrouter ids"
+
+  # Dead-key regression + restart budget: api_max_retries is read from agent.,
+  # not fallback, and every failover hop consumes one restart-count credit —
+  # the turn dies at rebuilt_restart_limit_exceeded below the chain length.
+  if yq -e '.fallback.api_max_retries' "$persona" >/dev/null 2>&1; then
+    bad "fallback.api_max_retries is dead config — the key is read from agent.api_max_retries"
+  else
+    ok "no dead fallback.api_max_retries"
+  fi
+  retries="$(yq -r '.agent.api_max_retries // 0' "$persona")"
+  if [ "$retries" -ge "$fb_count" ] 2>/dev/null; then
+    ok "agent.api_max_retries ($retries) covers the $fb_count-lane chain"
+  else
+    bad "agent.api_max_retries ($retries) < fallback lanes ($fb_count) — a failover hop needs one restart credit each"
+  fi
+fi
+
 echo "== dsh provider"
 # The dsh overlay is repo-owned, so every field that makes it the Infron route is
 # checkable, and a model id that lost its `:free` suffix is the same balance risk

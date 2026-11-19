@@ -14,8 +14,10 @@ terminal:
 telegram:
   reactions: false
 # Infron (llm.onerouter.pro) holds a prepaid $5 and nothing tops it up, so the
-# only models this file may name are the `:free` ids on that route. A paid id
-# here spends the balance that keeps the free ones working.
+# only models this file may name on a metered route are the `:free` ids — the
+# suffix is what the route bills at zero. The sole exception is ollama-cloud
+# below: its catalog is a closed free list, never a paid SKU. A paid id
+# anywhere else spends the balance that keeps the free ones working.
 #
 # The key is never written in this file: the provider entry names the env var and
 # INFRON_API_KEY comes from the shared sops blob (ai-services-shared-env), so a
@@ -27,9 +29,15 @@ providers:
     key_env: INFRON_API_KEY
     api_mode: openai
     default_model: deepseek/deepseek-v4-flash-0731:free
+    # Picker pin, both halves needed: `models:` as a LIST is an allowlist (a
+    # dict is per-model metadata, not a catalog narrow — hermes_cli's
+    # `_models_config_is_allowlist`), and `discover_models: false` stops the
+    # /models probe that otherwise offers every paid id on the route. The
+    # probe is how a billed `nemotron-3.5-super` was one pick away (2026-11-19).
+    discover_models: false
     models:
-      "deepseek/deepseek-v4-flash-0731:free": {}
-      "qwen/qwen3.8-27b:free": {}
+      - deepseek/deepseek-v4-flash-0731:free
+      - qwen/qwen3.8-27b:free
 model:
   provider: custom
   default: deepseek/deepseek-v4-flash-0731:free
@@ -37,6 +45,74 @@ model:
 agent:
   max_turns: 150
   reasoning_effort: medium
+  # Read from `agent.` — under `fallback:` this key is dead config: `fallback.`
+  # surfaces only `min_switch_reset_seconds`. The floor is the fallback chain
+  # length, not a retry preference: every failover hop consumes one
+  # restart-count credit and the turn dies at `rebuilt_restart_limit_exceeded`
+  # when they run out, so `1` (the value that sat dead under `fallback:`)
+  # would have capped a three-lane chain at its first hop — measured
+  # 2026-11-19, when the qwen failover worked and the turn died activating
+  # openrouter.
+  api_max_retries: 3
+# Every provider holding a credential in ~/.hermes/.env or the shell env is a
+# selectable row in `hermes model` / `/model`, and the expensive-model guard
+# only warns on KNOWN pricing — silent on a custom route, and a billed pick is
+# one keypress past a quiet row. The metered vendors are hidden here (slug or
+# alias, case-insensitive; the CLI picker, the TUI and the gateway slash
+# commands all read it). What stays visible cannot bill: ollama-cloud (closed
+# free catalog), lmstudio (local) and the pinned infron row — nous is excluded
+# too, because a paid plan's portal models bill the same way a paid SKU does.
+# The limit of the guard: this narrows pickers only — a typed
+# `/model x --provider nvidia` still resolves — so billed provider keys stay
+# out of every file hermes authors and this list stays the whole set.
+model_catalog:
+  excluded_providers:
+    - nous
+    - anthropic
+    - openai-api
+    - openai-codex
+    - openai
+    - fireworks
+    - openrouter
+    - moa
+    - novita
+    - alibaba
+    - alibaba-coding-plan
+    - xai
+    - xai-oauth
+    - xiaomi
+    - tencent-tokenhub
+    - tencent-tokenplan
+    - nvidia
+    - huggingface
+    - gemini
+    - vertex
+    - deepseek
+    - zai
+    - kimi-coding
+    - kimi-coding-cn
+    - stepfun
+    - minimax
+    - minimax-oauth
+    - minimax-cn
+    - arcee
+    - gmi
+    - kilocode
+    - opencode-zen
+    - opencode-go
+    - bedrock
+    - azure-foundry
+    - ai-gateway
+    - qwen-oauth
+    - groq
+    - cerebras
+    - aihubmix
+    - cohere
+    - tinker
+    - mistral
+    - together
+    - perplexity
+    - deepinfra
 # Both capabilities are pinned. Unpinned, `hermes doctor` named firecrawl while
 # the tool actually resolved to tavily (measured 2026-11-19), so the pin is the
 # only thing that decides. Extraction goes to the firecrawl provider, and that
@@ -49,14 +125,25 @@ web:
 display:
   interface: cli
   tool_progress: all
-# Fallback chain: the second and last free id on the same route. The chain used
-# to span four vendors, which was the right shape while it read as free quota —
-# it is the wrong shape now, because every extra entry names a model outside the
-# two this account may run. One failover inside one route is the whole chain.
+# Fallback chain: three independent free quotas, one failover each. Infron's
+# daily allowance is account-scoped, so when the route dies the second `:free`
+# id on it dies too — one failover inside one route is no chain at all, which
+# is how a quota outage ended a turn instead of degrading it (2026-11-19).
+# Each entry's free contract is structural, not a remembered price: `:free` is
+# the suffix the metered routes bill at zero, and ollama-cloud's catalog is a
+# closed free list keyed by OLLAMA_API_KEY. The billed entries from the old
+# four-vendor chain stay out — `nvidia/nemotron-3.5-super-vl` on NIM and
+# `deepseek-flash` both spend, and the NIM id is the one that already billed
+# this wallet once.
 fallback_providers:
   - provider: custom
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
+    key_env: INFRON_API_KEY
+  - provider: openrouter
+    model: nvidia/nemotron-3.5-super-vl:free
+  - provider: ollama-cloud
+    model: nemotron-3-ultra
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes
 # exactly one message of at most 15,000 characters, while a hermes turn sends
 # ~29,000 characters of system prompt and tool schemas, so every
@@ -102,7 +189,6 @@ platforms:
       user_id: '8679391100'
 fallback:
   min_switch_reset_seconds: 120
-  api_max_retries: 1
 onboarding:
   seen:
     busy_input_prompt: true

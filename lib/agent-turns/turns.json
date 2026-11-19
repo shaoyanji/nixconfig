@@ -1,8 +1,50 @@
 {
-  "generated": "2026-11-19T14:28:48Z",
+  "generated": "2026-11-19T14:38:17Z",
   "count": 200,
-  "pin": "1acf660720afd229f2ce81de99879b8d79b1c4225edf784592b0e29018aeb324",
+  "pin": "9c190c6a735af7b9887581e72f93014c1a255ef4c389f416bf5f8e93da40af26",
   "turns": [
+    {
+      "id": "bb0edec8-a276-4474-9ba3-ac9a7d2dd644",
+      "ts": "2026-11-19T14:36:53Z",
+      "source": "devji",
+      "subject": "nixconfig:appflow-parloa-closed",
+      "action": "broker turn closed with no send: Parloa Staff Product Engineer email already delivered 14:14 UTC (Resend 01a1f428, single message to parloa.com, no bounce, archive shows no reply); operator declined a duplicate; next contact is the follow-up drafted for 2026-11-26",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
+      "branch": "main",
+      "frame": "03h9ko9uqv1gzmmigto6gtbn9"
+    },
+    {
+      "id": "8be9464f-2f5b-4fd5-841b-75aaf292504c",
+      "ts": "2026-11-19T14:34:15Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 35: freebuff auditing AGENTS.nix open notes (CI queued — AGENTS.nix change triggered build-machines rebuild). agy compiling submission-path report table (LiveKit, Maze Senior confirmed ATS/Yes/packet). devin running fleet health validation (checks:health, ops:health, ops:ledger:toon). delphi sending Parloa Staff Product Engineer outreach as broker.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d11da18fc4ec6ce89861e8e57100ee3b06cc3f67",
+      "branch": "main",
+      "frame": "03h9knrbcwvgpzj7dq7or7hap"
+    },
+    {
+      "id": "cbf8c881-0c1b-47ca-b2e7-5722c15cd1ee",
+      "ts": "2026-11-19T14:28:49Z",
+      "source": "devji",
+      "subject": "nixconfig:appflow-parloa-noresend",
+      "action": "repeat retarget request for Parloa Staff Product Engineer: verified the 14:14 UTC send is delivered (Resend 01a1f428, one and only message to parloa.com), posting 8adc761e still isListed; no second send made to avoid duplicating an irreversible email",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
+      "branch": "main",
+      "frame": "03h9kmp5h2pbfmza2296myjj5"
+    },
     {
       "id": "841cadb0-b526-45f3-9bb9-afed5d564356",
       "ts": "2026-11-19T14:26:54Z",
@@ -2779,45 +2821,6 @@
       "base_commit": "4831b449309568cd2d7dd2df3079ad42266d0d49",
       "branch": "main",
       "frame": "03h92wduyilsiul03xdahqulo"
-    },
-    {
-      "id": "7d10b564-8fa3-4f91-9ed2-2a4bdb1f7212",
-      "ts": "2026-11-17T07:08:36Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-client-sync",
-      "action": "tokenloom: a client-sync test applies every diff to a page's token list; it caught a frame ending one token short of where the ripple widened, so the frame now spans the union (would have drifted every later edit). position lookups stopped summing a chunk's tokens, measured interleaved: server work -40% at 100k, gate 4.09ms/26 tests/all 4 web suites green. weekly bench sweep in CI fails when a window verdict changes. pushed 9c3b546b",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "81d071dd4597911dcb4d6bfca34bdb878c856b87",
-      "branch": "main",
-      "frame": "03h92m3wus99y7p42neblwb67"
-    },
-    {
-      "id": "6f9b63c5-3ce9-43e6-903d-e3c9fbe7de7f",
-      "ts": "2026-11-17T06:50:05Z",
-      "source": "devji",
-      "subject": "nixconfig:apps-chases",
-      "action": "sent the two chases that were genuinely waiting (OBI 5 weeks, Lease a Bike 3 weeks); drafts removed, pipeline rows already corrected",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6fcb35fc8e091bacbe5e66826b09fa7758639da",
-      "branch": "main",
-      "frame": "03h92ihqapoxp9njps2dj2y0f"
-    },
-    {
-      "id": "eb155c4e-54a9-4aab-8adc-b83eaa0fa12e",
-      "ts": "2026-11-17T06:47:29Z",
-      "source": "devji",
-      "subject": "nixconfig:apps-relabel",
-      "action": "four stale 'send the documents' rows corrected against the real mail (one was a rejection); OBI and Lease a Bike chases filed as drafts, nothing sent",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6fcb35fc8e091bacbe5e66826b09fa7758639da",
-      "branch": "main",
-      "frame": "03h92hze7r23jzy7rzufisklc"
     }
   ]
 }

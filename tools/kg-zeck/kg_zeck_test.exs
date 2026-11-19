@@ -127,6 +127,37 @@ defmodule KGZeckTest do
     refute Enum.any?(graph["edges"], &(&1["from"] == "doc:docs/a.md"))
   end
 
+  test "a terminated VM does not leave the cache locked" do
+    {_repo, cache} = repo_fixture()
+    script = "KGZeck.locked(#{inspect(cache)}, fn -> System.halt(0) end)"
+
+    {_, 0} =
+      System.cmd(System.find_executable("elixir"), [
+        "-r",
+        Path.join(__DIR__, "kg_zeck.exs"),
+        "-e",
+        script
+      ])
+
+    assert KGZeck.locked(cache, fn -> :recovered end, 10) == :recovered
+  end
+
+  test "a live lock cannot be stolen and exceptions release it" do
+    {_repo, cache} = repo_fixture()
+
+    assert_raise RuntimeError, "callback failed", fn ->
+      KGZeck.locked(cache, fn ->
+        assert_raise RuntimeError, ~r/cache lock unavailable/, fn ->
+          KGZeck.locked(cache, fn -> flunk("stole a live lock") end, 0)
+        end
+
+        raise "callback failed"
+      end)
+    end
+
+    assert KGZeck.locked(cache, fn -> :released end) == :released
+  end
+
   test "greedy terms have non-adjacent Fibonacci indexes and sum to n" do
     fibs = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 

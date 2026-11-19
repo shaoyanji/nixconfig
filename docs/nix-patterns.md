@@ -375,7 +375,7 @@ The last row is why the daemon went: it could not answer for the tree you are
 editing, which is what the file cache exists for. The middle row is why that file
 cache stays: one eval serves every caller.
 
-Zeck is a one-shot Elixir CLI, not a daemon. Ubuntu VM, 2026-11-19: cold leap
+Zeck is a one-shot Elixir CLI, not a daemon; writer locking requires `flock` on PATH. Ubuntu VM, 2026-11-19: cold leap
 2618 ms; incremental doc edit 589 ms; warm hit 761 ms (including BEAM startup).
 HEAD+diff took 562 ms on that edit and 35 ms warm. `task checks:kg:zeck` repeats
 parity and timings in a disposable worktree. `task ops:kg:zeck` reports the epoch;

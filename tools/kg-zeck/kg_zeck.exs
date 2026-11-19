@@ -379,22 +379,31 @@ defmodule KGZeck do
 
   def locked(cache, fun, attempts \\ 600) do
     File.mkdir_p!(cache)
-    lock = Path.join(cache, "lock")
+    flock = System.find_executable("flock") || raise "cache locking requires flock on PATH"
 
-    case File.mkdir(lock) do
-      :ok ->
-        try do
-          fun.()
-        after
-          File.rmdir!(lock)
-        end
+    port =
+      Port.open({:spawn_executable, flock}, [
+        :binary,
+        :exit_status,
+        args: [
+          "-w",
+          to_string(attempts / 10),
+          Path.join(cache, "writer.lock"),
+          "sh",
+          "-c",
+          "printf 'locked\\n'; read -r release"
+        ]
+      ])
 
-      {:error, :eexist} when attempts > 0 ->
-        Process.sleep(100)
-        locked(cache, fun, attempts - 1)
-
-      other ->
-        raise "cache lock unavailable: #{inspect(other)} (remove #{lock} if its writer died)"
+    try do
+      receive do
+        {^port, {:data, "locked\n"}} -> fun.()
+        {^port, {:exit_status, status}} -> raise "cache lock unavailable: flock exited #{status}"
+      after
+        attempts * 100 + 5_000 -> raise "cache lock unavailable: flock timed out"
+      end
+    after
+      if Port.info(port) != nil, do: Port.close(port)
     end
   end
 end

@@ -166,6 +166,21 @@ in {
         href = "https://pihole.frieren.lan/";
       };
     };
+
+    # Mount-card links derive the URL in modules/services/service-portal.nix.
+    tailnetHost = tailnetName;
+
+    mounts = {
+      # Task control plane (modules/services/task-web.nix) — RCE by design, mount = fence.
+      task-web = {
+        port = 8451;
+        upstream = "http://127.0.0.1:${toString config.services.taskWeb.port}";
+        title = "Task control";
+        description = "The whole Taskfile as a page: fuzzy-find a recipe, run it on frieren, stream the output.";
+        group = "Operations & Fleet Infrastructure";
+        requires = ["task-web.service"];
+      };
+    };
   };
 
   systemd.services.tailscale-cert-frieren = {

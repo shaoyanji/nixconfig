@@ -141,6 +141,7 @@ in {
     self.modules."services.atuin-server"
     self.modules."services.iventoy"
     self.modules."services.simplex-smp-server"
+    self.modules."services.task-web"
     self.modules."profiles.nixbuild-client"
   ];
 
@@ -201,6 +202,10 @@ in {
   # autoUpgrade installs) one host per process, so a broken assertion or a
   # misclassified unit is in the sentinel before it is deployed.
   services.fleetClassificationGate.enable = true;
+
+  # Tailnet task control plane (modules/services/task-web.nix): loopback on
+  # 8490, published via the mount in hosts/frieren/reverse-proxy.nix.
+  services.taskWeb.enable = true;
 
   # Offload the weekly fleet cache-warm builds (and any local builds) to
   # nixbuild.net. Key: sops `nixbuild_ssh_key` → /root/.ssh/nixbuild

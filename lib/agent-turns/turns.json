@@ -1,8 +1,54 @@
 {
-  "generated": "2026-11-19T18:20:10Z",
+  "generated": "2026-11-19T18:43:27Z",
   "count": 200,
-  "pin": "e515ef792117635457b260efdf22b8491f71b456a8e1dd1fe53e9123cae6bcf6",
+  "pin": "3319323c67d3e82d4ad4a9c8277fabbb036e5904fd2118e3a33569af91b06019",
   "turns": [
+    {
+      "id": "fc24f129-3835-4f85-b923-0d9b7a0130e7",
+      "ts": "2026-11-19T18:31:53Z",
+      "source": "devin",
+      "subject": "nixconfig:tailnet-task-website",
+      "action": "survey: 766 tasks via task --list-all --json (name/desc/aliases, no YAML parsing); stack=Go buildGoModule matching turns-dashboard precedent; publish=servicePortal.mounts tailscale serve --https=8451 on frieren.cloudforest-kardashev.ts.net (delphi pattern: 8443/8448/8449-xs/8450-mail taken there, frieren ports free); cwd=/home/devji/Documents/nixconfig live checkout; exec=task subprocess + SSE stream",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/task-web.nix",
+        "hosts/frieren/"
+      ],
+      "files": [],
+      "base_commit": "eb4d036966d1d92e399568a411ef9edee492e70e",
+      "branch": "HEAD",
+      "frame": "03h9ly6ewdhzhbz74y1q6cpcw"
+    },
+    {
+      "id": "e72bcda2-c8cb-43b7-9bf1-76159523805c",
+      "ts": "2026-11-19T18:30:33Z",
+      "source": "devin",
+      "subject": "nixconfig:tailnet-task-website",
+      "action": "claim: tailnet task website — fuzzy-finder task UI + execution on frieren",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/",
+        "hosts/frieren/",
+        "taskfiles/"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9lxx13jspmdbajqxi06gqq"
+    },
+    {
+      "id": "127fc456-1465-45b9-9dbb-1e76b2b7e9c8",
+      "ts": "2026-11-19T18:20:24Z",
+      "source": "devin",
+      "subject": "nixconfig:tmux-skills-audit",
+      "action": "landed: minimal.shadow.nix records garnix/service-oauth retirements + clanker/instabox as the stopgap-install convention (npx/cargo/go off-host, task clanker:job); 63-skill audit table already in docs/history/skills-audit-2026-11.md | gate: checks:nix:comments 176 shadow/56 pointers resolve/header 6534 + module no-op eval + frieren role",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "eb4d036966d1d92e399568a411ef9edee492e70e",
+      "branch": "HEAD",
+      "frame": "03h9lvxp8jrvbjh162rwlgy35"
+    },
     {
       "id": "c6732e19-40eb-4377-9dfa-44de4d9e077f",
       "ts": "2026-11-19T18:14:36Z",
@@ -2761,58 +2807,6 @@
       "base_commit": "04c7f9348eb39b16a0881706b13b7ebeb49caa51",
       "branch": "main",
       "frame": "03h9b6akwkv1s6ohdjncs7jpt"
-    },
-    {
-      "id": "0113c613-ddfe-479b-86d9-55be896d2919",
-      "ts": "2026-11-18T09:24:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:turns-graph-fusion",
-      "action": "freeapi shard, wrapper and skill landed and pushed; the turns dashboard gained a graph view (/graph.html + /api/turns.json); the postgres/ledger/AGENTS.nix fusion is written up as the turns-fusion-plane note",
-      "outcome": "done",
-      "claims": [
-        "modules/services/turns-dashboard",
-        "AGENTS.nix:fusion"
-      ],
-      "files": [
-        ".agents/skills/apisfreellm/SKILL.md",
-        "scripts/task/freeapi.sh",
-        "scripts/task/llm-ask.sh",
-        "taskfiles/freeapi.yml",
-        "modules/services/turns-dashboard/web/graph.html",
-        "modules/services/turns-dashboard/web/graph.js",
-        "modules/services/turns-dashboard/main.go",
-        "AGENTS.nix",
-        "docs/agent-turns.md"
-      ],
-      "base_commit": "e08e4b84c875dbdccfc250f58dce7bfbb928805f",
-      "branch": "main",
-      "frame": "03h9b5xae2quxkdycferkf28f"
-    },
-    {
-      "id": "fa43bd8b-1754-4b58-a65d-b61704925318",
-      "ts": "2026-11-18T09:21:24Z",
-      "source": "devji",
-      "subject": "nixconfig:kg-evidence-and-claim-split",
-      "action": "ops:kg:evidence reads graph+ontology in one eval; note index shows claim open split; wildcard match now most-specific; pushed 8e6a925e",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8e6a925ebd6050d5b28b7315ec85d8c5875e9d26",
-      "branch": "main",
-      "frame": "03h9b5chwfuv2j03ubg5zcvr9"
-    },
-    {
-      "id": "1ab54564-a0e1-4f9c-9c9d-889b81e313a4",
-      "ts": "2026-11-18T09:17:56Z",
-      "source": "devji",
-      "subject": "nixconfig:citation-gate-and-claims-open",
-      "action": "ontology gate fails on unresolved citations; placeholder playbook rows route; ops:notes:claims shows OPEN; pushed a3fdc57a",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a3fdc57a399bfa93bfec60de3160e1b63515f48d",
-      "branch": "main",
-      "frame": "03h9b4o56lyaomyvpohpmyang"
     }
   ]
 }

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>frieren · task control</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <h1>frieren <span class="dim">· task control</span></h1>
+  <div id="health" class="badges"></div>
+</header>
+
+<div id="runbar">
+  <input id="q" type="text" placeholder="fuzzy find — checks:quick · ops:health · agents:tmux …" autocomplete="off" autofocus>
+  <div id="sel">
+    <code id="selname">— pick a task —</code>
+    <input id="vars" type="text" placeholder="VAR=value …" autocomplete="off">
+    <button id="go" disabled>run</button>
+    <button id="shellbtn" title="open shell lane">$</button>
+  </div>
+</div>
+
+<div id="shellbox" class="hidden">
+  <input id="shellcmd" type="text" placeholder="bash -lc — tailnet is the auth model: anything typed here runs as devji" autocomplete="off">
+  <button id="shellgo">exec</button>
+</div>
+
+<div id="grid">
+  <section id="tasks"></section>
+  <section id="right">
+    <div id="lanes" class="card"><h2>agent lanes</h2><pre id="lanesbody">—</pre></div>
+    <div id="runsbox" class="card"><h2>runs</h2><ul id="runs"></ul></div>
+    <div id="outbox" class="card"><h2 id="outtitle">output</h2><pre id="out">select a task — output streams here.</pre></div>
+  </section>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

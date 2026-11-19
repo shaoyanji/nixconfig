@@ -368,11 +368,19 @@ being an eval: `taskfile_graph.py report` is 0.6 s cold, reading only the shards
 | :--- | :--- | ---: | :--- |
 | `kg-graph.sh` file | `HEAD` + `sha1(git diff HEAD)` | ~53 ms with jq | same tree content |
 | `iets` tracing cache | the files an eval read | ~16 ms warm | none of them changed |
+| `KG_BACKEND=zeck` (opt-in) | epoch + Fibonacci doc segments | 589 ms edit / 761 ms hit | only eligible docs changed |
 | a resident daemon | the committed graph | ~28 ms | never, on a dirty tree |
 
 The last row is why the daemon went: it could not answer for the tree you are
 editing, which is what the file cache exists for. The middle row is why that file
 cache stays: one eval serves every caller.
+
+Zeck is a one-shot Elixir CLI, not a daemon. Ubuntu VM, 2026-11-19: cold leap
+2618 ms; incremental doc edit 589 ms; warm hit 761 ms (including BEAM startup).
+HEAD+diff took 562 ms on that edit and 35 ms warm. `task checks:kg:zeck` repeats
+parity and timings in a disposable worktree. `task ops:kg:zeck` reports the epoch;
+`KG_ZECK_EPOCH=10` sets its Fibonacci threshold (55 docs). Core changes, doc
+membership or citation-set changes leap; skills, ideas and the playbook stay core.
 
 Two reads sat outside both layers and are the two an agent makes first.
 `task help` / `find:` ran go-task's 2.3 s parse twice through a *nested* `task

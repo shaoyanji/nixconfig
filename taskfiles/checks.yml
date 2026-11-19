@@ -263,6 +263,15 @@ tasks:
     cmds:
       - bash scripts/task/kg-check.sh
 
+  checks:kg:zeck:
+    desc: "[gate] Incremental doc fragments match fresh Nix graphs across Fibonacci carries"
+    summary: >
+      Runs ExUnit and isolated temporary-worktree edits against full Nix evals.
+      Proves graph parity, segment reuse and epoch invalidation, not host configs.
+      Exit 0 = parity, 1 = drift or unavailable evaluator. No host is targeted.
+    cmds:
+      - bash scripts/task/kg-zeck-check.sh
+
   checks:kg:iets:
     desc: "[gate] The graph's fast evaluator renders what nix renders, byte for byte"
     summary: >

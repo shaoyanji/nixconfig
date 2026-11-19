@@ -127,6 +127,18 @@ defmodule KGZeckTest do
     refute Enum.any?(graph["edges"], &(&1["from"] == "doc:docs/a.md"))
   end
 
+  test "a pruned core cache file re-leaps instead of raising" do
+    {repo, cache} = repo_fixture()
+    KGZeck.graph(repo, cache)
+    manifest = KGZeck.read(Path.join(cache, "manifest.json"))
+    File.rm!(Path.join(cache, "cores/#{manifest["epoch"]}.json"))
+    assert KGZeck.status(repo, cache)["reason"] == "core cache pruned"
+    assert KGZeck.status(repo, cache)["next_leaps"]
+    graph = KGZeck.graph(repo, cache) |> KGZeck.read()
+    assert Enum.any?(graph["nodes"], &(&1["id"] == "doc:docs/a.md"))
+    refute KGZeck.status(repo, cache)["next_leaps"]
+  end
+
   test "a terminated VM does not leave the cache locked" do
     {_repo, cache} = repo_fixture()
     script = "KGZeck.locked(#{inspect(cache)}, fn -> System.halt(0) end)"

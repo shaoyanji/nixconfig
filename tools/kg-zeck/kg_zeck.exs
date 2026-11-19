@@ -225,69 +225,78 @@ defmodule KGZeck do
 
     if File.exists?(manifest) do
       state = read(manifest)
-      graph = read(Path.join(cache, "cores/#{state["epoch"]}.json"))
-      tracked = git(repo, ["ls-files", "-z"]) |> String.split(<<0>>, trim: true) |> MapSet.new()
+      core_path = Path.join(cache, "cores/#{state["epoch"]}.json")
 
-      current =
-        Map.new(state["docs"], fn {path, _} ->
-          full = Path.join(repo, path)
-          {path, if(File.regular?(full), do: sha(full), else: nil)}
-        end)
-
-      dirty = Enum.filter(eligible(graph), &(current[&1["path"]] != state["docs"][&1["path"]]))
-      log = Enum.map(state["log"], &%{"path" => &1["path"], "sha" => current[&1["path"]]})
-      seen = MapSet.new(log, & &1["path"])
-
-      log =
-        log ++
-          (dirty
-           |> Enum.reject(&MapSet.member?(seen, &1["path"]))
-           |> Enum.map(&%{"path" => &1["path"], "sha" => current[&1["path"]]}))
-
-      reason =
-        cond do
-          Enum.any?(state["docs"], fn {path, _} -> not MapSet.member?(tracked, path) end) ->
-            "doc no longer tracked"
-
-          core_key(repo, state["docs"]) != state["core_key"] ->
-            "core key changed"
-
-          Enum.any?(current, fn {_, v} -> is_nil(v) end) ->
-            "doc deleted"
-
-          length(log) >= threshold() ->
-            "epoch threshold"
-
-          Enum.any?(dirty, fn node ->
-            previous = Enum.find(state["log"], &(&1["path"] == node["path"]))
-
-            if previous && previous["sha"] == current[node["path"]] do
-              false
-            else
-              content = File.read!(Path.join(repo, node["path"]))
-
-              raw =
-                  content
-                  |> String.split("[[flake/policies.nix#")
-                  |> Enum.drop(1)
-                  |> Enum.map(&(String.split(&1, "]]", parts: 2) |> hd()))
-
-              fresh =
-                  Enum.filter(raw, &Regex.match?(~r/\A[a-z0-9][a-z0-9-]*\z/, &1))
-
-              MapSet.new(fresh) != MapSet.new(node["cites"])
-            end
-          end) ->
-            "doc citations changed"
-
-          true ->
-            nil
-        end
-
-      {%{state | "log" => log}, graph, reason}
+      if File.exists?(core_path) do
+        inspect_epoch(repo, state, read(core_path))
+      else
+        {state, nil, "core cache pruned"}
+      end
     else
       {nil, nil, "no epoch"}
     end
+  end
+
+  defp inspect_epoch(repo, state, graph) do
+    tracked = git(repo, ["ls-files", "-z"]) |> String.split(<<0>>, trim: true) |> MapSet.new()
+
+    current =
+      Map.new(state["docs"], fn {path, _} ->
+        full = Path.join(repo, path)
+        {path, if(File.regular?(full), do: sha(full), else: nil)}
+      end)
+
+    dirty = Enum.filter(eligible(graph), &(current[&1["path"]] != state["docs"][&1["path"]]))
+    log = Enum.map(state["log"], &%{"path" => &1["path"], "sha" => current[&1["path"]]})
+    seen = MapSet.new(log, & &1["path"])
+
+    log =
+      log ++
+        (dirty
+         |> Enum.reject(&MapSet.member?(seen, &1["path"]))
+         |> Enum.map(&%{"path" => &1["path"], "sha" => current[&1["path"]]}))
+
+    reason =
+      cond do
+        Enum.any?(state["docs"], fn {path, _} -> not MapSet.member?(tracked, path) end) ->
+          "doc no longer tracked"
+
+        core_key(repo, state["docs"]) != state["core_key"] ->
+          "core key changed"
+
+        Enum.any?(current, fn {_, v} -> is_nil(v) end) ->
+          "doc deleted"
+
+        length(log) >= threshold() ->
+          "epoch threshold"
+
+        Enum.any?(dirty, fn node ->
+          previous = Enum.find(state["log"], &(&1["path"] == node["path"]))
+
+          if previous && previous["sha"] == current[node["path"]] do
+            false
+          else
+            content = File.read!(Path.join(repo, node["path"]))
+
+            raw =
+                content
+                |> String.split("[[flake/policies.nix#")
+                |> Enum.drop(1)
+                |> Enum.map(&(String.split(&1, "]]", parts: 2) |> hd()))
+
+            fresh =
+                Enum.filter(raw, &Regex.match?(~r/\A[a-z0-9][a-z0-9-]*\z/, &1))
+
+            MapSet.new(fresh) != MapSet.new(node["cites"])
+          end
+        end) ->
+          "doc citations changed"
+
+        true ->
+          nil
+      end
+
+    {%{state | "log" => log}, graph, reason}
   end
 
   def segments(state) do

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-19T07:21:07Z",
+  "generated": "2026-11-19T07:49:43Z",
   "count": 200,
-  "pin": "94fe082189f6d5838ad1aa6523826171ec36a3322bd008c54b75c708c2e21862",
+  "pin": "84ba27d3c0fb25387c958e593afbc0c541e946f53a93978a01d7b5422d06f84a",
   "turns": [
+    {
+      "id": "32823f51-a6a8-48d3-b6b7-da88bb22f41d",
+      "ts": "2026-11-19T07:33:17Z",
+      "source": "devji",
+      "subject": "nixconfig:firecrawl-local-loopback",
+      "action": "firecrawl-local 0.1.0 built on clanker 5m42s, serves 127.0.0.1:3002, measured 5-25x faster than cloud; hermes extract pinned to firecrawl + FIRECRAWL_API_URL and verified by a refused connect to 3002 when the unit was stopped",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "be8f256e817bcc7f04ffd8648af10d01a4a6e821",
+      "branch": "main",
+      "frame": "03h9idiwjiehdnla14nlgyb5a"
+    },
+    {
+      "id": "743e95d9-50c1-4b90-ad4a-dfacec76e713",
+      "ts": "2026-11-19T07:23:49Z",
+      "source": "devji",
+      "subject": "nixconfig:delphi-hm-login-shell",
+      "action": "home-manager-devji failed since 00:52 because HM's .bashrc interactive guard returns 1 and its .bash_profile ends on the matching && chain; owned .bash_profile with errexit-safe sourcing, unit active, switch rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c6ab06f1015a7a7896d54eebc26004465d0191e9",
+      "branch": "main",
+      "frame": "03h9ibo9nt9s3cbtxhoeakbex"
+    },
     {
       "id": "8c4b4adb-a251-4e45-bd5d-c2d8182aac9c",
       "ts": "2026-11-19T00:20:58Z",
@@ -2707,32 +2733,6 @@
       "base_commit": "54d28527",
       "branch": "main",
       "frame": "03h7x0bvbtbccer0su1rsgdbi"
-    },
-    {
-      "id": "e0eaecbc-2f95-4543-a566-eded1dfd0796",
-      "ts": "2026-11-11T18:19:52Z",
-      "source": "devji",
-      "subject": "nixconfig:repo-banners",
-      "action": "Superseded the tracked blob: banners now live on Cloudinary under assets/repos/<repo> and the READMEs point at f_auto,q_auto,w_1200 delivery URLs; banner.png removed from all four repos (nixconfig d0e33a05, bountystash efdcf3a, pancakes-harness 07a03a6, fibtransponder 3a0e899).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d0e33a055c40597c8b00866f261df0f32c4bc2af",
-      "branch": "main",
-      "frame": "03h7vdg8wlpl2gzuse8rkspgg"
-    },
-    {
-      "id": "135b9ab1-c97c-4833-9882-96783b0a466b",
-      "ts": "2026-11-11T18:12:39Z",
-      "source": "devji",
-      "subject": "nixconfig:repo-banners",
-      "action": "Published cpg banners to the READMEs of nixconfig (6b3a958c), bountystash (e7a66fc), pancakes-harness (ced0010) and fibtransponder (7f7d9b8); nixconfig fitted to 900px to clear the 512 KiB blob gate, the other three pushed from fresh clones because their checkouts were behind.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6b3a958c94396446d625c2cf713b665cc90b14bc",
-      "branch": "main",
-      "frame": "03h7vc1i34lsmr15y0kjscqfp"
     }
   ]
 }

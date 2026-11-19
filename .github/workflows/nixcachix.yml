@@ -44,7 +44,7 @@ jobs:
           # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
-            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            substituters = https://shaoyanji.cachix.org https://nix-cache-edge.jisifu.workers.dev https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
             # A substituter without its key is a source build. This line was
             # absent while cache.numtide.com was listed, so every numtide path
             # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
@@ -54,7 +54,7 @@ jobs:
             # deliberately does not accept; numtide's key is niks3's, verified
             # with `nix store verify --store https://cache.numtide.com`. One line,
             # because a second trusted-public-keys entry replaces the first.
-            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
             # Four parallel derivations at four cores each is 16 compiler
             # processes on 16 GiB; cap the fan-out so a cache miss degrades into
             # a slower build instead of an OOM kill.
@@ -89,7 +89,7 @@ jobs:
           # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
-            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            substituters = https://shaoyanji.cachix.org https://nix-cache-edge.jisifu.workers.dev https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
             # A substituter without its key is a source build. This line was
             # absent while cache.numtide.com was listed, so every numtide path
             # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
@@ -99,7 +99,7 @@ jobs:
             # deliberately does not accept; numtide's key is niks3's, verified
             # with `nix store verify --store https://cache.numtide.com`. One line,
             # because a second trusted-public-keys entry replaces the first.
-            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
             # Four parallel derivations at four cores each is 16 compiler
             # processes on 16 GiB; cap the fan-out so a cache miss degrades into
             # a slower build instead of an OOM kill.
@@ -296,7 +296,7 @@ jobs:
           # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
-            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            substituters = https://shaoyanji.cachix.org https://nix-cache-edge.jisifu.workers.dev https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
             # A substituter without its key is a source build. This line was
             # absent while cache.numtide.com was listed, so every numtide path
             # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
@@ -306,7 +306,7 @@ jobs:
             # deliberately does not accept; numtide's key is niks3's, verified
             # with `nix store verify --store https://cache.numtide.com`. One line,
             # because a second trusted-public-keys entry replaces the first.
-            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
             # Four parallel derivations at four cores each is 16 compiler
             # processes on 16 GiB; cap the fan-out so a cache miss degrades into
             # a slower build instead of an OOM kill.
@@ -357,7 +357,7 @@ jobs:
           # matters: cachix/cachix-action@v14 writes nix.conf after this file, and
           # whichever trusted-public-keys line Nix reads last is the only one it
           # keeps.
-          keys="cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+          keys="cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk="
           for attr in ${{ join(matrix.attrs, ' ') }}; do
             echo "::group::nix build $attr"
             nix build -L --option trusted-public-keys "$keys" ".#${attr}"
@@ -457,7 +457,7 @@ jobs:
           # NAS consumes cachix; it is not CI's build or warm path.
           extra_nix_config: |
             experimental-features = nix-command flakes pipe-operators
-            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            substituters = https://shaoyanji.cachix.org https://nix-cache-edge.jisifu.workers.dev https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
             # A substituter without its key is a source build. This line was
             # absent while cache.numtide.com was listed, so every numtide path
             # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
@@ -467,7 +467,7 @@ jobs:
             # deliberately does not accept; numtide's key is niks3's, verified
             # with `nix store verify --store https://cache.numtide.com`. One line,
             # because a second trusted-public-keys entry replaces the first.
-            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
             # Four parallel derivations at four cores each is 16 compiler
             # processes on 16 GiB; cap the fan-out so a cache miss degrades into
             # a slower build instead of an OOM kill.

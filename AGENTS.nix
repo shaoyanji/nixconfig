@@ -55,12 +55,15 @@
 
         Runtime, not a derivation: ~/.local/bin/firecrawl-local, unit
         ~/.config/systemd/user/firecrawl-local.service (`serve --port 3002`,
-        FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=never — no browser here, so
-        JavaScript pages are read statically).
+        FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=auto). Chrome comes from
+        the store, not the repo: ~/.local/bin/firecrawl-chrome execs the
+        chromium agent-browser already pins (157, on cache.nixos.org, so
+        nothing is pushed to the fleet edge) and gc-roots it under
+        ~/.local/state. JS-only pages were header-only under `never` and render
+        under `auto` (quotes.toscrape.com/js: 0 → 3 quotes, status 200).
 
-        Measured 3 runs per page, same payload, warm server: example.com 0.02 s
-        vs 0.42 s cloud; NixOS manual 0.33 s vs 1.59 s; Python asyncio docs
-        0.02 s vs 0.43 s. Idle RSS 23.1 MiB, not the vendor's 11.
+        Measured 3 runs per page, warm: example.com 0.02 s vs 0.42 s cloud,
+        NixOS manual 0.33 s vs 1.59 s; idle RSS 23.1 MiB, not the vendor's 11.
 
         Wiring is two pins. `hermes doctor` named extract firecrawl while the
         tool resolved to tavily (measured 2026-11-19), so the persona config

@@ -81,9 +81,20 @@ generation; `generation-stale` in the ledger is the signal that catches it.
 
 ## Memory, in order
 
-- **Design record** — `task ops:notes:near Q="<intent>"`, then `:lineage`. Schema-gated, a graph node.
-- **Episodic** — `task agents:xs:list Q="…"`. **Prose and structure** — `qmd`, `task ops:kg:*`.
-- **`ai-memory`** is ungated scratch: no schema, not in `.#knowledgeGraph`, and no unit for its `:49374` server. Never authority for a repo fact.
+Two canonical layers, then the consults: the xs turn log is the single
+coordination signal, and the compiled chain (`AGENTS.nix` notes +
+`.#knowledgeGraph`) is the durable record. The compiled layer table is
+`.#memoryLayers` (`nix eval --json .#memoryLayers.layers | toon -e`).
+
+1. **Coordination** — `task agents:xs:list Q="…"`. Append-only; authority for who is doing what.
+2. **Design record** — `task ops:notes:near Q="<intent>"`, then `:lineage`. Schema-gated, a graph node.
+3. **Structure** — `task ops:kg:*` ("what touches X"); prose search via `qmd`.
+4. **Personal prose** — the Obsidian vault (`/Volumes/data/Obsidian-Git-Sync`). Zettels, never repo facts.
+5. **Deep consult** — mem0 + supermemory (keys in hermes.env), Jev-selected. Advisory, never authority.
+6. **Scratch** — `ai-memory`: no schema, not in `.#knowledgeGraph`, no unit for its `:49374` server. Never authority for a repo fact.
+
+Boot context (`~/.hermes` USER.md/MEMORY.md/SOUL.md) is session priming, not a
+memory layer.
 
 ## Where to write
 

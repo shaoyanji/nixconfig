@@ -312,6 +312,10 @@ in {
   # Prose budgets as data (flake/prose-budget.nix), gated by #agent-prose-budget.
   proseBudget = import ./prose-budget.nix {inherit lib;};
 
+  # The memory/recall layer map (flake/memory.nix): the table HOME-PREAMBLE.md
+  # restates in prose. `nix eval .#memoryLayers` is the compile/consistency gate.
+  memoryLayers = import ./memory.nix {inherit lib;};
+
   # Comment census, gated by #nix-comments-are-pointers; the task pointers are
   # resolved by `checks:nix:comments`.
   nixComments = nixCommentsCtl;

@@ -37,7 +37,6 @@
     pkgs.llm-agents.pdfvision # PDF understanding/conversion
     pkgs.llm-agents.parallel-cli # parallel task runner for batched agent work
     pkgs.llm-agents.agent-browser # headless Chrome automation CLI (bundles Chromium ~700MB)
-    pkgs.llm-agents.reasonix
   ];
 in {
   # Fleet-wide gate and tiering for AI CLI tooling.
@@ -75,6 +74,7 @@ in {
     self.modules."user.ai.freebuff-remote"
     self.modules."user.ai.dsh-launcher"
     self.modules."user.ai.mainframe-remotes"
+    self.modules."user.ai.reasonix"
     self.modules."user.ai.zed-mcp"
     # ./opencode.nix
   ];

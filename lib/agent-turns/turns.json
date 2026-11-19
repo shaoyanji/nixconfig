@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T15:30:54Z",
+  "generated": "2026-11-19T15:47:19Z",
   "count": 200,
-  "pin": "044641bf55ddeb89a192a1418f8b5015a9d54332afd9f145af3247e558ed5cb8",
+  "pin": "66ab7221e16dde9df311d4982a1b947c825c34c5607763e60cd2daefa31ffa35",
   "turns": [
+    {
+      "id": "2a2c1b35-5260-481e-87cc-32ad83fef851",
+      "ts": "2026-11-19T15:38:15Z",
+      "source": "devin",
+      "subject": "nixconfig:memory-consolidation",
+      "action": "claim: memory/recall consolidation — dsh + reasonix desloppify, AGENTS.md memory section",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/scripts/dsh-remote.nix modules/services/dsh-web.nix modules/user/ai/ AGENTS.md"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9l09elczn86n8sj8nus9ha"
+    },
+    {
+      "id": "c07aed13-3e07-4a25-ba7d-2ad9ddd9f0b2",
+      "ts": "2026-11-19T15:32:49Z",
+      "source": "devin",
+      "subject": "nixconfig:memory-consolidation",
+      "action": "landed: hermes persona set resolved at eval (uname/if-elif chain -> personaFiles table + pathExists); memoryTools/agentTools named in profiles.ai | gate: comment-census + alejandra + frieren.role eval PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9kz74pu3d9jkphpkhla91j"
+    },
     {
       "id": "1a79b8a2-37aa-4bc1-8fc5-c051aad1ea26",
       "ts": "2026-11-19T15:29:11Z",
@@ -2777,32 +2805,6 @@
       "base_commit": "5a3a3acd54f2ff2dbca2bdc6c4c7ceaf7cf204b6",
       "branch": "main",
       "frame": "03h94kmwh08a713d4y37be0z8"
-    },
-    {
-      "id": "5e4fc04c-2e1c-4c32-8961-00d81de92a00",
-      "ts": "2026-11-17T12:24:31Z",
-      "source": "buffy",
-      "subject": "nixconfig:image-daily-size-field",
-      "action": "roster rows may carry a 4th size field (portrait 1024x1536 for cammy + 5 frieren poses, dry-verified); today's 12 in rotation (installer still landscape-only); slot 3 triggered by hand: success, 20 spent, 14 keeps, 388->398 assets live",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8fb78b4410e8bcd9dd5c6f9884d674fb1911ce3b",
-      "branch": "main",
-      "frame": "03h94btiyg9ynn2bjn5dsey4z"
-    },
-    {
-      "id": "abbd4473-ae78-48f8-b0ba-88d99895a802",
-      "ts": "2026-11-17T12:22:46Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-17: 1 plate(s) kept of 1 spent, 0 roster row(s) waiting, 388 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h94bh9fwv631d4sqthlsoly"
     }
   ]
 }

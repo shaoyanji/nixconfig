@@ -65,6 +65,7 @@ task agents:xs:post SUBJECT=nixconfig:<task-id> ACTION="landed: ... | gate: chec
 | decisions, open work | `task ops:notes` (source `AGENTS.nix`) |
 | what touches what | `task ops:kg` (source `.#knowledgeGraph`) |
 | what happened | `task agents:xs:list` |
+| memory/recall layers, authority per layer | `nix eval --json .#memoryLayers` |
 | a procedure | `.agents/skills/*/SKILL.md`, then `docs/*.md` |
 | an issue, before fixing it | its class → [`docs/issue-classes.md`](docs/issue-classes.md) |
 | home init, docs pipeline, formatting, hooks | [`.agents/SCHEMA.md`](.agents/SCHEMA.md) §7 |

@@ -39,7 +39,6 @@
   tailnetIp = hostMeta.network.tailscale_ip;
   servePort = 8443;
   dshPort = 3080;
-  dshPath = "/";
   dshUrl = "https://${tailnetHost}:${toString servePort}/";
 
   # Both landing pages from ONE compiled site: lib/delphi-site.nix.
@@ -892,7 +891,6 @@ in {
     enable = true;
     user = user.name;
     port = dshPort;
-    path = dshPath;
     publicUrl = dshUrl;
     trustedHosts = ["${tailnetHost}:${toString servePort}"];
     environmentFile = config.sops.templates."dsh-web.env".path;

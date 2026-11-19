@@ -19,18 +19,27 @@
     magick ${iconIco} -resize 256x256 $out
   '';
 
-  # The harness runs on the worker (`services.dshWeb`), which publishes it under
-  # its own TLS ingress at /deepseek/; this is the client half. Shared with the
-  # hosts that install it directly (frieren), so there is one definition of what
-  # `dsh-remote` means and one place to change it.
+  # The harness runs on the worker (`services.dshWeb`), which publishes it on
+  # the tailnet at the worker's MagicDNS name via `tailscale serve`; this is the
+  # client half. Shared with the hosts that install it directly (frieren), so
+  # there is one definition of what `dsh-remote` means and one place to change it.
   dshRemote = import self.modules."scripts.dsh-remote" {inherit pkgs;};
 
   # Local entry, only where the harness is actually installed (tier "full").
+  # `dsh web` prints a tokenised URL and opens it; the bare port answers 401 by
+  # design and two instances fight over it, so a live listener means "already
+  # running" rather than "start another".
   dshLocal = pkgs.writeShellApplication {
     name = "dsh-local";
-    runtimeInputs = [pkgs.llm-agents.dsh];
+    runtimeInputs = [pkgs.llm-agents.dsh pkgs.iproute2 pkgs.gawk pkgs.gnugrep];
     text = ''
       set -euo pipefail
+      port="''${DSH_PORT:-3080}"
+      if ss -ltnH 2>/dev/null | awk '{print $4}' | grep -qE "[:.]''${port}$"; then
+        echo "dsh web is already serving on port $port." >&2
+        echo "Its tokenised URL is in the terminal that started it." >&2
+        exit 0
+      fi
       TITLE="DeepSeek Harness (local)"
       if command -v kitty >/dev/null 2>&1; then
         exec kitty --title "$TITLE" -e dsh web

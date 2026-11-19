@@ -24,12 +24,6 @@ in {
       description = "Loopback port the harness binds; the reverse proxy points at it.";
     };
 
-    path = lib.mkOption {
-      type = lib.types.str;
-      default = "/deepseek/";
-      description = "Public mount prefix, with leading and trailing slash. The proxy strips it.";
-    };
-
     publicUrl = lib.mkOption {
       type = lib.types.str;
       description = ''
@@ -66,10 +60,6 @@ in {
 
   config = lib.mkIf cfg.enable {
     assertions = [
-      {
-        assertion = lib.hasPrefix "/" cfg.path && lib.hasSuffix "/" cfg.path;
-        message = "services.dshWeb.path must start and end with '/': it is a proxy mount prefix, not a URL path.";
-      }
       {
         assertion = lib.hasPrefix "http" cfg.publicUrl && lib.hasSuffix "/" cfg.publicUrl;
         message = "services.dshWeb.publicUrl must be an absolute http(s) root ending in '/'.";
@@ -120,8 +110,7 @@ in {
               "--public-url"
               cfg.publicUrl
             ]
-            ++ lib.optional (cfg.trustedHosts != []) "--trusted-host"
-            ++ cfg.trustedHosts);
+            ++ lib.concatMap (h: ["--trusted-host" h]) cfg.trustedHosts);
           Restart = "always";
           RestartSec = 3;
         }

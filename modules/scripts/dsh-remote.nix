@@ -1,6 +1,7 @@
 # dsh-remote — open the DeepSeek Harness that runs on a remote worker.
 #
-# The harness is a service on the worker (`services.dshWeb`) published under a
+# The harness is a service on the worker (`services.dshWeb`) published on the
+# tailnet by `tailscale serve` at the worker's MagicDNS name.
 {pkgs, ...}:
 pkgs.writeShellApplication {
   name = "dsh-remote";

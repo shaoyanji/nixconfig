@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T18:14:06Z",
+  "generated": "2026-11-19T18:20:10Z",
   "count": 200,
-  "pin": "09c7647fed49c0c8f3002fed7d7b275fca00c79d1dfd3a88bd75344ea0956ae7",
+  "pin": "e515ef792117635457b260efdf22b8491f71b456a8e1dd1fe53e9123cae6bcf6",
   "turns": [
+    {
+      "id": "c6732e19-40eb-4377-9dfa-44de4d9e077f",
+      "ts": "2026-11-19T18:14:36Z",
+      "source": "devin",
+      "subject": "nixconfig:tmux-skills-audit",
+      "action": "landed: agents-tmux.sh name-addressed capture (agents:tmux + agents:tmux:show tasks, pane_title->window_name->window_id); full 63-skill audit docs/history/skills-audit-2026-11.md — 63 KEEP, fixed service-oauth/garnix/base.nix stale refs, removed dead dev:flake:update-garnix, not-installed notes on pdfvision/parallel-cli | gate: agent-prose-budget 6601/6601 + checks:nix:comments 6534/6539 + kg-check + task tasks live-verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e0de6be2b85d2ae71b9f73e382bccd83d7f72f8",
+      "branch": "HEAD",
+      "frame": "03h9lusyaodeqsked3wc9dr7y"
+    },
     {
       "id": "e103a079-2404-4e39-a29f-c94e90ac35b6",
       "ts": "2026-11-19T18:00:00Z",
@@ -2800,19 +2813,6 @@
       "base_commit": "a3fdc57a399bfa93bfec60de3160e1b63515f48d",
       "branch": "main",
       "frame": "03h9b4o56lyaomyvpohpmyang"
-    },
-    {
-      "id": "5ceebc18-a215-488f-8d38-772ca1826faf",
-      "ts": "2026-11-18T09:10:39Z",
-      "source": "devji",
-      "subject": "nixconfig:notes-claims-and-family-routes",
-      "action": "ops:notes:claims added; one family row now records extracted; pushed 0670c642",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0670c6420b59bbf50b68d90b53705515e3c86d92",
-      "branch": "main",
-      "frame": "03h9b38xnehkz0afnlltt4abp"
     }
   ]
 }

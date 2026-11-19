@@ -71,8 +71,9 @@
 # fdupes                 # Duplicate file detector
 # hyperfine              # Command-line benchmarking tool
 
-# ── Redundant Shell & Diff Tools (subsumed by delta / lf / git / gh) ──
+# ── Redundant Shell & Diff Tools (subsumed by delta / lf / git / gh / yq) ──
 # aha                    # ANSI to HTML converter
+# tomlq                  # reason: TOML parsing is yq-go's job (yq -p toml, the documented convention); zero repo callers
 # diff-so-fancy          # Legacy diff highlighter (delta is declarative standard)
 # dust                   # Disk usage tree (duf and btop are standard)
 # gitmoji-cli            # Interactive git commit emoji tool

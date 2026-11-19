@@ -63,7 +63,6 @@ in {
         just # Modern command runner
         nix-output-monitor # Enhanced nix-build progress output (nom)
         sd # Intuitive regex search & replace
-        tomlq # TOML stream parser
         yq-go # YAML/JSON processor
 
         # ── Core Unix Administration Utilities ──

@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T16:32:22Z",
+  "generated": "2026-11-19T16:52:20Z",
   "count": 200,
-  "pin": "c896f2b045a0a0d72338a07b2594d93c9425286af6cceff7ae3123d74a3adce9",
+  "pin": "465a3f6d479ab33ddd458bf7e491301d70da7ff803cb24e388370537a88e167b",
   "turns": [
+    {
+      "id": "a5721ad3-bb8a-4b20-8e00-c085a95665de",
+      "ts": "2026-11-19T16:49:18Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-closures",
+      "action": "claim: closure audit → pkgs.txt slash, shadow.nix convention, comments-as-context, doc→note/policy merge",
+      "outcome": "in_progress",
+      "claims": [
+        "pkgs.txt hosts/ modules/user AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9le53xku0f54n7w2l13jou"
+    },
+    {
+      "id": "d1ddf631-071c-4c3b-9db0-f0b69de4098b",
+      "ts": "2026-11-19T16:32:36Z",
+      "source": "devin",
+      "subject": "nixconfig:infra-deploy-paradigm",
+      "action": "landed: builders envelope unified — self axis added, REMOTE_BUILD is env input, netbook BUILD + deploy dry-runs render via rebuild-flags.sh | gate: checks:rebuild 16 combos + check:verify 116/116 + frieren.role + kg-check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4ab3bc05fa9f9ce0a5546d021d81ecc1e4f5d5d3",
+      "branch": "HEAD",
+      "frame": "03h9lavkaa0qlq8i5s7ri1ubu"
+    },
     {
       "id": "6d3c9e94-904a-4fa6-bd07-188efc3407c0",
       "ts": "2026-11-19T16:30:01Z",
@@ -2789,32 +2817,6 @@
       "base_commit": "65be408341d5636b3f89029929d0a025112612c8",
       "branch": "main",
       "frame": "03h94xq1osvwwjaxsk533h294"
-    },
-    {
-      "id": "f62aa817-6ed2-4913-880b-bfc9dcbdc24f",
-      "ts": "2026-11-17T14:14:58Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-17: 5 plate(s) kept of 5 spent, 18 roster row(s) waiting, 420 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h94xe987xa33nd8oncsxp8n"
-    },
-    {
-      "id": "3a5c9ed4-6586-4ae6-a7f7-ea5e17336a9f",
-      "ts": "2026-11-17T14:08:39Z",
-      "source": "devji",
-      "subject": "nixconfig:ontology-tasks",
-      "action": "Task entity + routes edge: yq->JSON task list at eval (runCommandLocal), 759 task nodes with desc/shard, playbook rows route to real tasks incl. wildcard find:*, unknown task fails checks:router; 1620 edges; checks:quick+kg green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0facfdb45883c6524ef76f0db231f1d073a3fb85",
-      "branch": "main",
-      "frame": "03h94w5vs5ev468oz7ehrt29e"
     }
   ]
 }

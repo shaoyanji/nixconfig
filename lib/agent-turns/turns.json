@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T17:19:22Z",
+  "generated": "2026-11-19T17:29:11Z",
   "count": 200,
-  "pin": "8041003a4ac26c0149caed98be23d1c5824d3d6c5fe1b896c6711cb345b61155",
+  "pin": "06e5bdc83bacf4debb6961ddaee9ed3ec0dae5e512aa322ebc1679e1e1ff55da",
   "turns": [
+    {
+      "id": "f5e200e6-0158-4543-9a8f-f48b3efa970c",
+      "ts": "2026-11-19T17:19:38Z",
+      "source": "devin",
+      "subject": "nixconfig:deep-slash-clanker-migration",
+      "action": "agy binary on-demand: programs.antigravity-cli.package=null (HM keeps settings/commands/context); convention documented in antigravity SKILL.md (prose budget renumbered same commit); dsh remote launcher -> modules/user/ai/dsh-launcher.shadow.nix, local lane + dispatch binary kept | gate: prose-budget holds, parses, role evals",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6eda6e1dcd50629cbe89354d6f370162d2416737",
+      "branch": "HEAD",
+      "frame": "03h9lk2b70lczngf93e77prz2"
+    },
     {
       "id": "0b030045-1887-418c-aa51-6817cbdc7abf",
       "ts": "2026-11-19T17:14:19Z",
@@ -2811,19 +2824,6 @@
       "base_commit": "7fa84ecfb1be9d5e920485c7d64fd4b35625acac",
       "branch": "main",
       "frame": "03h97k5wancinup3c9rp1q7wb"
-    },
-    {
-      "id": "d680b7b7-5802-47fb-88a7-3df8a10f3f58",
-      "ts": "2026-11-17T22:07:03Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily-round20",
-      "action": "round 20 queued (20 rows, 12 characters + 8 wardrobe originals); allowance 0/100 until 00:00Z, image-daily-round20.service armed to spend 20 at 01:02 CET",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "7aa40e78d9e0021ed913d5777e6ec286a322f0c1",
-      "branch": "main",
-      "frame": "03h97hm6zikhto78c1ls4aiaz"
     }
   ]
 }

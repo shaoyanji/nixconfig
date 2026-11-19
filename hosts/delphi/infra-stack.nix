@@ -65,209 +65,281 @@
     }
   '';
 
+  # The LLM hop prefers clanker — scripts/task/clanker.sh job, the same line
+  # task clanker:job runs, drops a detached job that `nix run`s agy per
+  # .agents/skills/antigravity/SKILL.md. GEMINI_API_KEY rides inside the job
+  # file (self-deletes at EXIT); failures fall back to run_agent_cascade.
+  clankerAgentDispatch = ''
+        run_via_clanker() {
+          local prompt="$1" dest="''${2:-}"
+          local repo="''${NIXCONFIG_REPO:-${user.home}/Documents/nixconfig}"
+          local clanker="$repo/scripts/task/clanker.sh"
+          local instabox="$repo/scripts/task/instabox.sh"
+          [ -f "$clanker" ] && [ -f "$instabox" ] || return 1
+
+          local key="" hermes_env
+          for hermes_env in "${user.home}/.hermes/.env" "${user.home}/.config/hermes/hermes.env"; do
+            [ -f "$hermes_env" ] || continue
+            key="$(grep -E '^(export[[:space:]]+)?GEMINI_API_KEY=' "$hermes_env" | tail -1 | cut -d= -f2- | tr -d "\"'" || true)"
+            [ -n "$key" ] && break
+          done
+          if [ -z "$key" ]; then
+            echo "=== [$(date)] clanker lane: no GEMINI_API_KEY to lend the box; staying local ===" >&2
+            return 1
+          fi
+
+          echo "=== [$(date)] Agent lane: offloading prompt to clanker (nix run agy, key route) ==="
+          bash "$instabox" wake clanker >/dev/null 2>&1 || true
+
+          # scripts/task/clanker.sh writes jobcmd as cmd.sh; the trap deletes it.
+          local jobcmd
+          jobcmd="$(cat <<JOB_EOF
+    export PATH="\$HOME/.nix-profile/bin:\$PATH"
+    export AGY_CLI_DISABLE_AUTO_UPDATE=true
+    export GEMINI_API_KEY=$(printf '%q' "$key")
+    trap 'rm -f "\$0"' EXIT
+    mkdir -p out
+    timeout 1500 nix run github:numtide/llm-agents.nix#antigravity-cli -- --settings '{"modelProvider":"gemini"}' --model "gemini-3.8-flash" --output-format json --dangerously-skip-permissions -p $(printf '%q' "$prompt") > out/report.json 2> out/agy.log
+    JOB_EOF
+    )"
+
+          local id
+          id="$(bash "$clanker" job -- "$jobcmd" | tail -1)" || {
+            echo "=== clanker lane: job submit failed ===" >&2
+            return 1
+          }
+          case "$id" in
+            ""|*[!0-9A-Za-z-]*) echo "=== clanker lane: no job id (got '$id') ===" >&2; return 1 ;;
+          esac
+          echo "=== [$(date)] clanker job $id started; waiting up to 1800s ==="
+
+          if bash "$clanker" wait "$id" 1800; then
+            if [ -n "$dest" ]; then
+              bash "$clanker" result "$id" >/dev/null 2>&1 &&
+                cp "$repo/.clanker-out/$id/out/report.json" "$dest/clanker-$id-report.json" 2>/dev/null || true
+            fi
+            echo "=== [$(date)] clanker job $id finished ==="
+            return 0
+          fi
+
+          echo "=== [$(date)] clanker job $id failed; log tail below, local cascade next ===" >&2
+          bash "$clanker" logs "$id" 40 >&2 || true
+          return 1
+        }
+  '';
+
   agyHandoffRunner = pkgs.writeShellScript "agy-handoff-runner" ''
-    set -euo pipefail
+        set -euo pipefail
 
-    HANDOFF_FILE="${user.home}/HANDOFF.md"
+        HANDOFF_FILE="${user.home}/HANDOFF.md"
 
-    if [ ! -f "$HANDOFF_FILE" ]; then
-      echo "No HANDOFF.md found in ${user.home}. Skipping execution."
-      exit 0
-    fi
+        if [ ! -f "$HANDOFF_FILE" ]; then
+          echo "No HANDOFF.md found in ${user.home}. Skipping execution."
+          exit 0
+        fi
 
-    echo "=== [$(date)] Found $HANDOFF_FILE. Preparing execution... ==="
-    ARCHIVE_DIR="${user.home}/.agents/handoffs"
-    mkdir -p "$ARCHIVE_DIR"
-    ARCHIVE_COPY="$ARCHIVE_DIR/HANDOFF-$(date +%Y%m%d_%H%M%S).md"
-    cp "$HANDOFF_FILE" "$ARCHIVE_COPY"
+        echo "=== [$(date)] Found $HANDOFF_FILE. Preparing execution... ==="
+        ARCHIVE_DIR="${user.home}/.agents/handoffs"
+        mkdir -p "$ARCHIVE_DIR"
+        ARCHIVE_COPY="$ARCHIVE_DIR/HANDOFF-$(date +%Y%m%d_%H%M%S).md"
+        cp "$HANDOFF_FILE" "$ARCHIVE_COPY"
 
-    cd "${user.home}"
+        cd "${user.home}"
 
-    # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
-    TRIAGE_REPORT="/tmp/systemone-handoff-triage.json"
-    OPEN_ITEMS=0
-    ACTIONABLE_COUNT=0
-    if command -v systemone-decision >/dev/null 2>&1; then
-      echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
-      systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
-      OPEN_ITEMS=$( (grep -o '"status": "OPEN"' "$TRIAGE_REPORT" || true) | wc -l)
-      ACTIONABLE_COUNT=$( (grep -o '"category": "AUTONOMOUS_PROMOTION_CANDIDATE"' "$TRIAGE_REPORT" || true) | wc -l)
-      echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found, $ACTIONABLE_COUNT actionable autonomous candidates)."
-    fi
+        # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
+        TRIAGE_REPORT="/tmp/systemone-handoff-triage.json"
+        OPEN_ITEMS=0
+        ACTIONABLE_COUNT=0
+        if command -v systemone-decision >/dev/null 2>&1; then
+          echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
+          systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
+          OPEN_ITEMS=$( (grep -o '"status": "OPEN"' "$TRIAGE_REPORT" || true) | wc -l)
+          ACTIONABLE_COUNT=$( (grep -o '"category": "AUTONOMOUS_PROMOTION_CANDIDATE"' "$TRIAGE_REPORT" || true) | wc -l)
+          echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found, $ACTIONABLE_COUNT actionable autonomous candidates)."
+        fi
 
-    # --- Trigger Gate: Only invoke heavy LLM cascade if on-demand or actionable tasks exist ---
-    if [ "''${FORCE_RUN:-0}" != "1" ] && [ "''${1:-}" != "--force" ] && [ "$ACTIONABLE_COUNT" -eq 0 ]; then
-      echo "=== [$(date)] Handoff Gate: No actionable autonomous promotion candidates ($OPEN_ITEMS items remain blocked or documented). Skipping LLM agent cascade. ==="
-      exit 0
-    fi
+        # --- Trigger Gate: Only invoke heavy LLM cascade if on-demand or actionable tasks exist ---
+        if [ "''${FORCE_RUN:-0}" != "1" ] && [ "''${1:-}" != "--force" ] && [ "$ACTIONABLE_COUNT" -eq 0 ]; then
+          echo "=== [$(date)] Handoff Gate: No actionable autonomous promotion candidates ($OPEN_ITEMS items remain blocked or documented). Skipping LLM agent cascade. ==="
+          exit 0
+        fi
 
-    ${agentCascadeScript}
+        ${agentCascadeScript}
+        ${clankerAgentDispatch}
 
-    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available at /tmp/systemone-handoff-triage.json ($OPEN_ITEMS open items, $ACTIONABLE_COUNT actionable). The intent is to provide live execution guidance without replacing or deleting the markdown files."
+        # One prompt for both lanes: HANDOFF.md is embedded — scripts/task/clanker.sh
+        # jobs can't see ~; file edits stay a local-cascade behavior.
+        prompt="Here is the current HANDOFF.md, verbatim:
 
-    if run_agent_cascade "$prompt"; then
-      echo "=== [$(date)] Handoff execution finished successfully. Preserved $HANDOFF_FILE in-place. ==="
-    else
-      echo "=== [$(date)] CRITICAL: Handoff execution encountered errors across agent tiers. Preserved $HANDOFF_FILE for inspection. ===" >&2
-      exit 1
-    fi
+    $(cat "$HANDOFF_FILE")
+
+    Execute the plan. System One decision triage pre-analysis ran on this host ($OPEN_ITEMS open items, $ACTIONABLE_COUNT actionable). The intent is to provide live execution guidance without replacing or deleting the markdown files — you cannot modify files here, so return the guidance in your answer."
+
+        if run_via_clanker "$prompt" "$ARCHIVE_DIR" || run_agent_cascade "$prompt"; then
+          echo "=== [$(date)] Handoff execution finished successfully. Preserved $HANDOFF_FILE in-place. ==="
+        else
+          echo "=== [$(date)] CRITICAL: Handoff execution encountered errors across agent tiers. Preserved $HANDOFF_FILE for inspection. ===" >&2
+          exit 1
+        fi
   '';
 
   agySystemRunner = pkgs.writeShellScript "agy-system-runner" ''
-    set -euo pipefail
+        set -euo pipefail
 
-    SYSTEM_FILE="${user.home}/SYSTEM.md"
+        SYSTEM_FILE="${user.home}/SYSTEM.md"
 
-    if [ ! -f "$SYSTEM_FILE" ]; then
-      echo "No SYSTEM.md found in ${user.home}. Skipping execution."
-      exit 0
-    fi
+        if [ ! -f "$SYSTEM_FILE" ]; then
+          echo "No SYSTEM.md found in ${user.home}. Skipping execution."
+          exit 0
+        fi
 
-    # The outcome of an audit is state, not prose — same contract as frieren's
-    # runner: one TSV line per run, in a directory tmpfiles owns for this user so
-    # the root sentinel collector can read it (its unit runs with ProtectHome, so
-    # a path under $HOME would be invisible).
-    STATE_DIR="''${AGY_STATE_DIR:-/var/lib/agy-system}"
-    if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
-      echo "=== [$(date)] WARN: cannot create $STATE_DIR; recording to the journal only ===" >&2
-      STATE_DIR=""
-    fi
-    record_outcome() {
-      local outcome="$1" reason="$2"
-      echo "=== [$(date)] Audit outcome: $outcome ($reason) ==="
-      if [ -n "$STATE_DIR" ]; then
-        printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$outcome" "$reason" > "$STATE_DIR/last-run"
-      fi
-    }
+        # The outcome of an audit is state, not prose — same contract as frieren's
+        # runner: one TSV line per run, in a directory tmpfiles owns for this user so
+        # the root sentinel collector can read it (its unit runs with ProtectHome, so
+        # a path under $HOME would be invisible).
+        STATE_DIR="''${AGY_STATE_DIR:-/var/lib/agy-system}"
+        if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
+          echo "=== [$(date)] WARN: cannot create $STATE_DIR; recording to the journal only ===" >&2
+          STATE_DIR=""
+        fi
+        record_outcome() {
+          local outcome="$1" reason="$2"
+          echo "=== [$(date)] Audit outcome: $outcome ($reason) ==="
+          if [ -n "$STATE_DIR" ]; then
+            printf '%s\t%s\t%s\n' "$(date -Iseconds)" "$outcome" "$reason" > "$STATE_DIR/last-run"
+          fi
+        }
 
-    echo "=== [$(date)] Found $SYSTEM_FILE. Preparing execution... ==="
-    ARCHIVE_DIR="${user.home}/.agents/system"
-    mkdir -p "$ARCHIVE_DIR"
-    ARCHIVE_COPY="$ARCHIVE_DIR/SYSTEM-$(date +%Y%m%d_%H%M%S).md"
-    cp "$SYSTEM_FILE" "$ARCHIVE_COPY"
+        echo "=== [$(date)] Found $SYSTEM_FILE. Preparing execution... ==="
+        ARCHIVE_DIR="${user.home}/.agents/system"
+        mkdir -p "$ARCHIVE_DIR"
+        ARCHIVE_COPY="$ARCHIVE_DIR/SYSTEM-$(date +%Y%m%d_%H%M%S).md"
+        cp "$SYSTEM_FILE" "$ARCHIVE_COPY"
 
-    cd "${user.home}"
+        cd "${user.home}"
 
-    # --- STEP 1: Deterministic Health & Self-Repair (0 API tokens consumed) ---
-    echo "=== [$(date)] Step 1: Performing deterministic service checks ==="
-    FAILED_SYS=$( (systemctl --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
-    FAILED_USER=$( (systemctl --user --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
+        # --- STEP 1: Deterministic Health & Self-Repair (0 API tokens consumed) ---
+        echo "=== [$(date)] Step 1: Performing deterministic service checks ==="
+        FAILED_SYS=$( (systemctl --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
+        FAILED_USER=$( (systemctl --user --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
 
-    if [ "$FAILED_SYS" -gt 0 ]; then
-      echo "Detected failed system units. Attempting reset-failed..."
-      systemctl reset-failed || true
-    fi
-    if [ "$FAILED_USER" -gt 0 ]; then
-      echo "Detected failed user units. Attempting reset-failed..."
-      systemctl --user reset-failed || true
-    fi
+        if [ "$FAILED_SYS" -gt 0 ]; then
+          echo "Detected failed system units. Attempting reset-failed..."
+          systemctl reset-failed || true
+        fi
+        if [ "$FAILED_USER" -gt 0 ]; then
+          echo "Detected failed user units. Attempting reset-failed..."
+          systemctl --user reset-failed || true
+        fi
 
-    # Check sentinel closed loop
-    SENTINEL_HEALTH="/var/lib/fleet-sentinel/www/health.txt"
-    SENTINEL_DEGRADED=0
-    if [ -f "$SENTINEL_HEALTH" ]; then
-      if [ "$(cat "$SENTINEL_HEALTH")" != "ok" ]; then
-        SENTINEL_DEGRADED=1
-      fi
-    fi
+        # Check sentinel closed loop
+        SENTINEL_HEALTH="/var/lib/fleet-sentinel/www/health.txt"
+        SENTINEL_DEGRADED=0
+        if [ -f "$SENTINEL_HEALTH" ]; then
+          if [ "$(cat "$SENTINEL_HEALTH")" != "ok" ]; then
+            SENTINEL_DEGRADED=1
+          fi
+        fi
 
-    # Core delphi service probes
-    DNS_FAILED=0
-    if ! ${pkgs.dnsutils}/bin/dig @10.99.0.53 +short +time=2 example.com >/dev/null 2>&1; then
-      DNS_FAILED=1
-    fi
+        # Core delphi service probes
+        DNS_FAILED=0
+        if ! ${pkgs.dnsutils}/bin/dig @10.99.0.53 +short +time=2 example.com >/dev/null 2>&1; then
+          DNS_FAILED=1
+        fi
 
-    NGINX_FAILED=0
-    if ! ${pkgs.curl}/bin/curl -s -m 3 http://127.0.0.1/healthz >/dev/null 2>&1; then
-      NGINX_FAILED=1
-    fi
+        NGINX_FAILED=0
+        if ! ${pkgs.curl}/bin/curl -s -m 3 http://127.0.0.1/healthz >/dev/null 2>&1; then
+          NGINX_FAILED=1
+        fi
 
-    DSH_FAILED=0
-    if ! ${pkgs.curl}/bin/curl -sI -m 3 http://127.0.0.1:3080/ >/dev/null 2>&1; then
-      DSH_FAILED=1
-    fi
+        SYSTEMONE_FAILED=0
+        if ! ${pkgs.curl}/bin/curl -sI -m 3 http://127.0.0.1:8091/ >/dev/null 2>&1; then
+          SYSTEMONE_FAILED=1
+        fi
 
-    SYSTEMONE_FAILED=0
-    if ! ${pkgs.curl}/bin/curl -sI -m 3 http://127.0.0.1:8091/ >/dev/null 2>&1; then
-      SYSTEMONE_FAILED=1
-    fi
+        STIRLING_FAILED=0
+        if ! systemctl is-active stirling-pdf.service >/dev/null 2>&1; then
+          STIRLING_FAILED=1
+        fi
 
-    STIRLING_FAILED=0
-    if ! systemctl is-active stirling-pdf.service >/dev/null 2>&1; then
-      STIRLING_FAILED=1
-    fi
+        UPGRADE_FAILED=0
+        if systemctl is-failed nixos-upgrade.service >/dev/null 2>&1; then
+          UPGRADE_FAILED=1
+        fi
 
-    UPGRADE_FAILED=0
-    if systemctl is-failed nixos-upgrade.service >/dev/null 2>&1; then
-      UPGRADE_FAILED=1
-    fi
+        # --- STEP 2: System One Decision Triage (Julia-1 & Laya) ---
+        echo "=== [$(date)] Step 2: Running System One Decision Triage (Julia-1) ==="
+        TRIAGE_REPORT="/tmp/systemone-system-triage.json"
+        TIER1_COUNT=0
+        if command -v systemone-decision >/dev/null 2>&1; then
+          systemone-decision --model julia-1 triage-system "$SYSTEM_FILE" > "$TRIAGE_REPORT" || true
+          TIER1_COUNT=$( (grep -o '"protocol": "TIER_1_IMMEDIATE_REPAIR"' "$TRIAGE_REPORT" || true) | wc -l)
+          echo "System One System Triage: Evaluated scorecard with $TIER1_COUNT potential TIER 1 immediate repair item(s)."
+        fi
 
-    # --- STEP 2: System One Decision Triage (Julia-1 & Laya) ---
-    echo "=== [$(date)] Step 2: Running System One Decision Triage (Julia-1) ==="
-    TRIAGE_REPORT="/tmp/systemone-system-triage.json"
-    TIER1_COUNT=0
-    if command -v systemone-decision >/dev/null 2>&1; then
-      systemone-decision --model julia-1 triage-system "$SYSTEM_FILE" > "$TRIAGE_REPORT" || true
-      TIER1_COUNT=$( (grep -o '"protocol": "TIER_1_IMMEDIATE_REPAIR"' "$TRIAGE_REPORT" || true) | wc -l)
-      echo "System One System Triage: Evaluated scorecard with $TIER1_COUNT potential TIER 1 immediate repair item(s)."
-    fi
+        # --- STEP 3: Trigger Decision Gate ---
+        DAY_OF_WEEK=$(date +%u) # 1=Mon, ..., 7=Sun
+        SHOULD_RUN_CASCADE=0
+        RUN_REASON=""
 
-    # --- STEP 3: Trigger Decision Gate ---
-    DAY_OF_WEEK=$(date +%u) # 1=Mon, ..., 7=Sun
-    SHOULD_RUN_CASCADE=0
-    RUN_REASON=""
+        if [ "''${FORCE_RUN:-0}" = "1" ] || [ "''${1:-}" = "--force" ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="Manual on-demand trigger (--force / FORCE_RUN=1)"
+        elif [ "$DAY_OF_WEEK" -eq 7 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="Scheduled weekly comprehensive audit (Sunday)"
+        elif [ "$FAILED_SYS" -gt 0 ] || [ "$FAILED_USER" -gt 0 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="Active failed systemd units detected (sys: $FAILED_SYS, user: $FAILED_USER)"
+        elif [ "$SENTINEL_DEGRADED" -gt 0 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="Fleet sentinel observation state is degraded"
+        elif [ "$DNS_FAILED" -gt 0 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="Crab-hole DNS resolver probe failure on 10.99.0.53:53"
+        elif [ "$NGINX_FAILED" -gt 0 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="Nginx local healthz probe failure on port 80"
+        elif [ "$SYSTEMONE_FAILED" -gt 0 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="System One decision serve probe failure on 127.0.0.1:8091"
+        elif [ "$STIRLING_FAILED" -gt 0 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="Stirling PDF service is not active"
+        elif [ "$UPGRADE_FAILED" -gt 0 ]; then
+          SHOULD_RUN_CASCADE=1
+          RUN_REASON="NixOS autoUpgrade failure detected"
+        fi
 
-    if [ "''${FORCE_RUN:-0}" = "1" ] || [ "''${1:-}" = "--force" ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="Manual on-demand trigger (--force / FORCE_RUN=1)"
-    elif [ "$DAY_OF_WEEK" -eq 7 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="Scheduled weekly comprehensive audit (Sunday)"
-    elif [ "$FAILED_SYS" -gt 0 ] || [ "$FAILED_USER" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="Active failed systemd units detected (sys: $FAILED_SYS, user: $FAILED_USER)"
-    elif [ "$SENTINEL_DEGRADED" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="Fleet sentinel observation state is degraded"
-    elif [ "$DNS_FAILED" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="Crab-hole DNS resolver probe failure on 10.99.0.53:53"
-    elif [ "$NGINX_FAILED" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="Nginx local healthz probe failure on port 80"
-    elif [ "$DSH_FAILED" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="DeepSeek Harness probe failure on 127.0.0.1:3080"
-    elif [ "$SYSTEMONE_FAILED" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="System One decision serve probe failure on 127.0.0.1:8091"
-    elif [ "$STIRLING_FAILED" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="Stirling PDF service is not active"
-    elif [ "$UPGRADE_FAILED" -gt 0 ]; then
-      SHOULD_RUN_CASCADE=1
-      RUN_REASON="NixOS autoUpgrade failure detected"
-    fi
+        if [ "$SHOULD_RUN_CASCADE" -eq 0 ]; then
+          echo "=== [$(date)] Quiet Reflex Gate: System is 100% nominal (0 failed units, all services healthy). Preserving AI tokens. ==="
+          record_outcome quiet "0 failed units, all service probes healthy"
+          exit 0
+        fi
 
-    if [ "$SHOULD_RUN_CASCADE" -eq 0 ]; then
-      echo "=== [$(date)] Quiet Reflex Gate: System is 100% nominal (0 failed units, all services healthy). Preserving AI tokens. ==="
-      record_outcome quiet "0 failed units, all service probes healthy"
-      exit 0
-    fi
+        # --- STEP 4: Agent execution — clanker first, local cascade as fallback ---
+        echo "=== [$(date)] Step 4: Trigger active ($RUN_REASON). Invoking agent lane ==="
+        ${agentCascadeScript}
+        ${clankerAgentDispatch}
 
-    # --- STEP 4: Agent Cascade Execution ---
-    echo "=== [$(date)] Step 4: Trigger active ($RUN_REASON). Invoking Agent Cascade ==="
-    ${agentCascadeScript}
+        # One prompt for both lanes: SYSTEM.md is embedded — scripts/task/clanker.sh
+        # jobs can't see ~; in-place updates stay a local-cascade behavior.
+        prompt="Here is the current SYSTEM.md, verbatim:
 
-    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status. System One decision pre-triage is available at /tmp/systemone-system-triage.json ($TIER1_COUNT immediate items flagged). Audit trigger reason: $RUN_REASON."
+    $(cat "$SYSTEM_FILE")
 
-    if run_agent_cascade "$prompt"; then
-      echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
-      record_outcome ok "$RUN_REASON"
-    else
-      echo "=== [$(date)] WARN: All AI agent tiers failed. Applying deterministic timestamp update to $SYSTEM_FILE ===" >&2
-      record_outcome fallback "all agent tiers failed ($RUN_REASON)"
-    fi
+    Execute the health and maintenance audits it describes and draft a HANDOFF.md for any missing items or recommendations. If you can write files, update SYSTEM.md in-place with current findings; otherwise return the complete updated SYSTEM.md as your final section. System One decision pre-triage ran on this host ($TIER1_COUNT immediate items flagged). Audit trigger reason: $RUN_REASON."
+
+        if run_via_clanker "$prompt" "$ARCHIVE_DIR"; then
+          echo "=== [$(date)] System audit answered by clanker; report archived beside $ARCHIVE_COPY ==="
+          record_outcome ok "clanker:$RUN_REASON"
+        elif run_agent_cascade "$prompt"; then
+          echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
+          record_outcome ok "$RUN_REASON"
+        else
+          echo "=== [$(date)] WARN: All AI agent tiers failed. Applying deterministic timestamp update to $SYSTEM_FILE ===" >&2
+          record_outcome fallback "all agent tiers failed ($RUN_REASON)"
+        fi
   '';
 in {
   imports = [
@@ -331,7 +403,7 @@ in {
       # candidates exist — see agyHandoffRunner in hosts/delphi/infra-stack.nix.
       agy-nightly-handoff = {
         name = "agy-nightly-handoff";
-        description = "Action-gated handoff runner (runs only on autonomous promotion candidates or manual trigger)";
+        description = "Action-gated handoff runner (LLM hop prefers a clanker job; local cascade is the fallback)";
         schedule = "*-*-* 03:30:00";
         command = agyHandoffRunner;
         workingDirectory = "${user.home}";
@@ -343,7 +415,7 @@ in {
       # hosts/delphi/infra-stack.nix reads its verdict file; stale pages, task ops:health.
       agy-nightly-system = {
         name = "agy-nightly-system";
-        description = "Trigger-gated system health audit (Mon-Sat brief check, Sunday full scorecard)";
+        description = "Trigger-gated system health audit (probes stay local; LLM hop prefers a clanker job, local cascade fallback)";
         schedule = "*-*-* 05:30:00";
         command = agySystemRunner;
         workingDirectory = "${user.home}";

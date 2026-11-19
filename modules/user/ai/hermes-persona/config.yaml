@@ -130,18 +130,20 @@ display:
 # id on it dies too — one failover inside one route is no chain at all, which
 # is how a quota outage ended a turn instead of degrading it (2026-11-19).
 # Each entry's free contract is structural, not a remembered price: `:free` is
-# the suffix the metered routes bill at zero, and ollama-cloud's catalog is a
-# closed free list keyed by OLLAMA_API_KEY. The billed entries from the old
-# four-vendor chain stay out — `nvidia/nemotron-3.5-super-vl` on NIM and
-# `deepseek-flash` both spend, and the NIM id is the one that already billed
-# this wallet once.
+# the suffix the Infron route bills at zero, `nvidia` is NIM's free dev tier
+# on integrate.api.nvidia.com (a build.nvidia.com key, no wallet exists to
+# bill), and ollama-cloud's catalog is a closed free list. Nemotron therefore
+# belongs on the NIM lane, never the custom endpoint — the billed pick that
+# cost the Infron balance (2026-11-19) was this model resolved through a
+# metered route, and openrouter stays out of the chain for the same reason:
+# its account CAN hold a wallet even when a `:free` id is correct.
 fallback_providers:
   - provider: custom
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
     key_env: INFRON_API_KEY
-  - provider: openrouter
-    model: nvidia/nemotron-3.5-super-vl:free
+  - provider: nvidia
+    model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: ollama-cloud
     model: nemotron-3-ultra
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes

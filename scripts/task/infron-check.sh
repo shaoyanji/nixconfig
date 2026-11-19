@@ -147,8 +147,9 @@ echo "== hermes spend guard"
 #
 #   1. on a metered route (custom endpoint, openrouter) an id may only be
 #      named with its `:free` suffix — that suffix is the zero-billing contract
-#   2. ollama-cloud/ollama/lmstudio/nous are closed free lanes — any id there
-#      is unbilled
+#   2. nvidia/ollama-cloud/ollama/lmstudio/nous are closed free lanes — NIM's
+#      integrate.api.nvidia.com key has no wallet to bill, and the rest are
+#      free catalogs; any id there is unbilled
 #   3. every providers.<name> row must be pinned: discover_models: false plus a
 #      list-shaped models: allowlist, or the picker probes the endpoint and
 #      offers its paid ids
@@ -200,8 +201,10 @@ else
   done
 
   # The chain: at least two independent free quotas. Metered-route entries need
-  # :free; closed-lane providers (ollama-cloud, ollama, lmstudio, nous) carry
-  # their free contract in the provider, not the id.
+  # :free; closed-lane providers (nvidia's no-wallet NIM tier, ollama-cloud,
+  # ollama, lmstudio, nous) carry their free contract in the provider, not the
+  # id. Openrouter stays metered even for :free ids — the account can hold a
+  # wallet, so nemotron belongs on the NIM lane instead (2026-11-19).
   fb_count="$(yq '.fallback_providers | length' "$persona" 2>/dev/null || echo 0)"
   [ "$fb_count" -ge 2 ] && ok "fallback chain has $fb_count lanes" \
     || bad "fallback chain has $fb_count lane(s) — Infron's daily quota is account-scoped, so a same-route second id is the same failure"
@@ -214,7 +217,7 @@ else
           *) bad "fallback $fb_provider/$fb_model — a metered-route id without :free spends the balance" ;;
         esac
         ;;
-      ollama-cloud | ollama | lmstudio | nous)
+      nvidia | ollama-cloud | ollama | lmstudio | nous)
         ok "fallback $fb_provider/$fb_model is on a closed free lane"
         ;;
       *)

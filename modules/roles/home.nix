@@ -27,7 +27,7 @@ in {
       self.modules."user.ai.antigravity-cli"
       self.modules."user.selector-daemon"
     ]
-    ++ when "browser" [self.modules."zen"]
+    ++ when "browser" [self.modules."zen" self.modules."aria2"]
     ++ when "media" [
       self.modules."user.desktop.multimedia"
       self.modules."user.desktop.appimage-menu"

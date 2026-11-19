@@ -111,7 +111,8 @@ never `internal: true` [[flake/policies.nix#task-surface-visible]].
 the user role is a second list (`fleet.hmUserFeatures`), because option surface is what a gate pays for.
 `.#modules` is keyed `profiles.base-node` and `nix-registry` proves one name per file; directories are
 `modules/{global,profiles,services,roles,user,shell,config}`, and constants live in `modules/global/user.nix` —
-import, never hardcode. Chains and knobs are `task docs:build` output; no custom packages, only `.#artifacts`, `.#sites`, `.#servers`, `.#cli`.
+import, never hardcode; `imports` go downward only (chains → leaves; `modules/{scripts,config}` are `import`
+value libraries). Chains and knobs are `task docs:build` output; no custom packages, only `.#artifacts`, `.#sites`, `.#servers`, `.#cli`.
 
 A new host is a module at `hosts/<name>/`, registered there with its features, its age key from
 `ssh_host_ed25519_key` in `.sops.yaml` before `hashedPassword` decrypts, proved by

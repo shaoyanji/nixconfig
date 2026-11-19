@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T15:47:19Z",
+  "generated": "2026-11-19T15:55:37Z",
   "count": 200,
-  "pin": "66ab7221e16dde9df311d4982a1b947c825c34c5607763e60cd2daefa31ffa35",
+  "pin": "1845f011911ecfcbfda07633ea534adb4346be2fe9b6cfcef2f23994ead67e4f",
   "turns": [
+    {
+      "id": "5fad2d04-c534-441a-96e4-e86cfad8d506",
+      "ts": "2026-11-19T15:50:34Z",
+      "source": "devin",
+      "subject": "nixconfig:modules-dendritic",
+      "action": "claim: dendritic modules/, sops submodule single-source, de-couple cross-module imports",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/ hosts/ lib/"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9l2o133c1r4go4cvr8zblp"
+    },
+    {
+      "id": "5ee79aaa-d6d2-4c8e-b443-b2e5bbdbf8ca",
+      "ts": "2026-11-19T15:47:33Z",
+      "source": "devin",
+      "subject": "nixconfig:memory-consolidation",
+      "action": "landed: .#memoryLayers compiled layer table; dsh dead path option removed + trustedHosts flag-per-host + frieren/tools.nix duplicate launchers deleted (HM dsh-launcher canonical, port-guard merged); reasonix own module; HOME-PREAMBLE memory section rewritten | gate: .#memoryLayers + frieren.role eval + pre-commit/pre-push PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9l22slybop2ou0ybtzdevk"
+    },
     {
       "id": "2a2c1b35-5260-481e-87cc-32ad83fef851",
       "ts": "2026-11-19T15:38:15Z",
@@ -2779,32 +2807,6 @@
       "base_commit": "1f2e630eb9ccd6fb5555d6d2aa8be27ca8eb72dc",
       "branch": "main",
       "frame": "03h94mew8x6idbqvcdaiqkmq4"
-    },
-    {
-      "id": "6a11a969-926d-4f64-ab9a-9a1ce3c4e238",
-      "ts": "2026-11-17T13:12:13Z",
-      "source": "devji",
-      "subject": "nixconfig:router",
-      "action": "Landed router skill: 16 jev labels -> 16 playbooks; AGENTS.md step 1 wired; checks:router parity gate (proved failing) in pre-commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6f493a05cbacf70e4fa147920d491dffddc8950f",
-      "branch": "main",
-      "frame": "03h94l50s1hgchn6vpnojw9sy"
-    },
-    {
-      "id": "ac5214d4-3752-4e53-82b8-76dbeff0aab0",
-      "ts": "2026-11-17T13:09:39Z",
-      "source": "devji",
-      "subject": "nixconfig:router",
-      "action": "Added .agents/skills/router (16 playbooks, jev labels); skills-schema/prose/budget/kg green, 3 jev classifications selected; uncommitted",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5a3a3acd54f2ff2dbca2bdc6c4c7ceaf7cf204b6",
-      "branch": "main",
-      "frame": "03h94kmwh08a713d4y37be0z8"
     }
   ]
 }

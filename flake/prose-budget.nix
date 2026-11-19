@@ -67,7 +67,7 @@
     ".agents/skills/voice-loop/SKILL.md" = 71;
     ".agents/skills/wikisearch/SKILL.md" = 148;
     ".agents/skills/xs-turns/SKILL.md" = 192;
-    "AGENTS.md" = 117;
+    "AGENTS.md" = 119;
     "modules/user/ai/skills/jev-ultrafast/SKILL.md" = 108;
     "modules/user/ai/skills/nix-preflight-editor/SKILL.md" = 50;
     "modules/user/ai/skills/simplex-admin/SKILL.md" = 190;

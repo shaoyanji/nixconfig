@@ -39,7 +39,8 @@ in {
       plugins = lib.optional useTpm pkgs.age-plugin-tpm;
       #sshKeyPaths = [ "${ssh_key_path}" ];
     };
-    # defaultSopsFile = "${inputs.secrets."secrets.yaml"}";
+    # The committed mirror is the closure-safe file — scripts/task/lib/paths.sh
+    # spells the canonical-vs-mirror resolution order for everything else.
     defaultSopsFile = ./secrets.yaml;
     validateSopsFiles = false;
     secrets = {

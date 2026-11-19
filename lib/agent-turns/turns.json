@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-19T21:11:05Z",
+  "generated": "2026-11-19T21:27:42Z",
   "count": 200,
-  "pin": "a37593c35422e5096490fd10d47680805c27399586d57c04685e20b6efd084ef",
+  "pin": "039111b35adb4fb3303076e26d910927d31116125cba084bd987bde0fc9148f7",
   "turns": [
+    {
+      "id": "e2732e06-0b89-4f2e-90e3-173b40ce54bb",
+      "ts": "2026-11-19T21:26:08Z",
+      "source": "devin",
+      "subject": "nixconfig:wiki-cleanup",
+      "action": "claim: ops:wiki:* taskfile cleanup (wiki-ask wrapper, TOON default, epistemics gate simplify)",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml"
+      ],
+      "files": [],
+      "base_commit": "637f93f5d3a1476a283e89d268d899347d771a56",
+      "branch": "main",
+      "frame": "03h9mw7u33kf81uln4usmqqc2"
+    },
     {
       "id": "58674851-7706-42e3-b1bb-33a3e3bfc887",
       "ts": "2026-11-19T20:41:39Z",
@@ -2819,19 +2834,6 @@
       "base_commit": "ee7802a36baaf6d82abe3c7dea9bbdf18c6cf84f",
       "branch": "main",
       "frame": "03h9d9jr4sugfy1kj8vkn3saa"
-    },
-    {
-      "id": "47d885f1-6c4f-4c4c-9707-4e7da6a97b4b",
-      "ts": "2026-11-18T15:44:49Z",
-      "source": "buffy",
-      "subject": "nixconfig:infron-fim-unavailable",
-      "action": "Tested llm.onerouter.pro for minuet FIM: deepseek-v4-flash-0731:free /v1/completions is 404 upstream; qwen3.8-27b:free completes a plain prompt (200) but rejects any suffix (400 'suffix is not currently supported') and /beta/completions is 405. minuet's openai_fim_compatible sends prompt+suffix, so this route cannot serve it. kickstart.nixvim untouched at c3b5a6f; hermes chat on the same key is 200.",
-      "outcome": "blocked: Infron route has no FIM endpoint",
-      "claims": [],
-      "files": [],
-      "base_commit": "d09781587ffeb6fba801f6b690bc9c19d3d27f3b",
-      "branch": "main",
-      "frame": "03h9d88trzesxphearlohn0fa"
     }
   ]
 }

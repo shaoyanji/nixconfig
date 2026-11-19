@@ -199,7 +199,7 @@ tasks:
     silent: true
     cmds:
       - |
-        out=$(python3 modules/scripts/wiki-ask.py --stats --days {{.DAYS | default "14"}})
+        out=$(wiki-ask --stats --days {{.DAYS | default "14"}})
         rc=$?
         case "$FORMAT" in
           json) printf '%s' "$out" ;;
@@ -229,20 +229,17 @@ tasks:
     cmds:
       - |
         # Empty WIKI_KIND means "exploring, not settling a claim" — the gate is
-        # opt-in so an ad-hoc search still works.
+        # opt-in so an ad-hoc search still works. One jq program does both
+        # checks; halt_error writes the refusal to stderr and exits 2.
         if [ -n "{{.WIKI_KIND}}" ]; then
-          judge="$(nix eval --json .#epistemics.table)"
-          if ! printf '%s' "$judge" | jq -e --arg k "{{.WIKI_KIND}}" 'has($k)' >/dev/null; then
-            printf 'epistemics: no claim kind %s; valid: %s\n' "{{.WIKI_KIND}}" \
-              "$(printf '%s' "$judge" | jq -r 'keys | join(", ")')" >&2
-            exit 2
-          fi
-          if ! printf '%s' "$judge" | jq -e --arg k "{{.WIKI_KIND}}" \
-              '.[$k].order | map(.name) | index("zim-shelf") != null' >/dev/null; then
-            printf '%s' "$judge" | jq -r --arg k "{{.WIKI_KIND}}" \
-              '"epistemics: the shelf cannot settle a \($k) claim (\(.[$k].never[] | select(.name=="zim-shelf") | .why)); read \(.[$k].read) — \(.[$k].next)"' >&2
-            exit 2
-          fi
+          nix eval --json .#epistemics.table | jq -r --arg k "{{.WIKI_KIND}}" '
+            if has($k) | not then
+              "epistemics: no claim kind \($k); valid: \(keys | join(", "))" | halt_error(2)
+            elif (.[$k].order | map(.name) | index("zim-shelf")) == null then
+              "epistemics: the shelf cannot settle a \($k) claim (\(.[$k].never[] | select(.name == "zim-shelf") | .why)); read \(.[$k].read) — \(.[$k].next)" | halt_error(2)
+            else empty end'
+          rc=$?
+          [ "$rc" -eq 0 ] || exit "$rc"
         fi
         case "{{.FORMAT}}" in
           json) wiki-ask "{{.Q}}" ;;

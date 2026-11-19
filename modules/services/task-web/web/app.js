@@ -62,7 +62,7 @@ function attach(id, label) {
   if (es) es.close();
   $('out').textContent = '';
   $('outtitle').textContent = label || 'output';
-  es = new EventSource('/api/runs/' + id + '/events');
+  es = new EventSource('api/runs/' + id + '/events');
   es.onmessage = (e) => {
     $('out').textContent += JSON.parse(e.data);
     $('out').scrollTop = $('out').scrollHeight;
@@ -90,12 +90,12 @@ async function launch(path, body) {
 $('go').onclick = () => {
   if (!sel) return;
   const args = $('vars').value.trim().split(/\s+/).filter(Boolean);
-  launch('/api/run', { task: sel, args });
+  launch('api/run', { task: sel, args });
 };
 $('shellbtn').onclick = () => $('shellbox').classList.toggle('hidden');
 $('shellgo').onclick = () => {
   const c = $('shellcmd').value.trim();
-  if (c) launch('/api/shell', { cmd: c });
+  if (c) launch('api/shell', { cmd: c });
 };
 $('shellcmd').addEventListener('keydown', e => { if (e.key === 'Enter') $('shellgo').click(); });
 $('q').addEventListener('keydown', e => { if (e.key === 'Enter' && sel) $('go').click(); });
@@ -103,7 +103,7 @@ $('q').oninput = render;
 
 async function pollRuns() {
   try {
-    const j = await (await fetch('/api/runs')).json();
+    const j = await (await fetch('api/runs')).json();
     $('runs').innerHTML = (j.runs || []).map(r => {
       const cls = r.done ? (r.exit === 0 ? 'ok' : 'bad') : 'run';
       const st = r.done ? 'exit ' + r.exit : 'running';
@@ -117,7 +117,7 @@ async function pollRuns() {
 
 async function pollDash() {
   try {
-    const d = await (await fetch('/api/dash')).json();
+    const d = await (await fetch('api/dash')).json();
     const st = d.state || '?';
     const cls = st === 'running' ? 'ok' : st === 'degraded' ? 'bad' : 'warn';
     const memPct = d.memTotal ? Math.round(100 * (1 - d.memAvail / d.memTotal)) : 0;
@@ -142,7 +142,7 @@ function rel(iso) {
   return Math.round(s / 86400) + 'd';
 }
 
-fetch('/api/tasks')
+fetch('api/tasks')
   .then(r => r.json())
   .then(j => { tasks = (j.tasks || []).map(t => ({ name: t.name, desc: t.desc || '' })); render(); })
   .catch(() => { $('tasks').innerHTML = '<div class="ns">task catalog failed</div>'; });

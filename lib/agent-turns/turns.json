@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T18:43:27Z",
+  "generated": "2026-11-19T18:51:41Z",
   "count": 200,
-  "pin": "3319323c67d3e82d4ad4a9c8277fabbb036e5904fd2118e3a33569af91b06019",
+  "pin": "67e1a64db3d31e0f31f318f086dd9f6d7b4250eee80daac2c8b49e00cfb1ae7c",
   "turns": [
+    {
+      "id": "3b738c9b-d87f-402e-b6e1-67e68eedd536",
+      "ts": "2026-11-19T18:50:47Z",
+      "source": "devin",
+      "subject": "nixconfig:tailnet-web-port80",
+      "action": "claim: task-web on frieren 443 vhost at /task-weather, keep :8451 mount",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren/reverse-proxy.nix",
+        "modules/services/task-web/"
+      ],
+      "files": [],
+      "base_commit": "f21442a30641824b396d453e53bb50bcbe6fb1ac",
+      "branch": "HEAD",
+      "frame": "03h9m1vfd6nntf8mzq52ps73b"
+    },
+    {
+      "id": "532b23a8-312e-496f-a2bf-dc045939c666",
+      "ts": "2026-11-19T18:43:42Z",
+      "source": "devin",
+      "subject": "nixconfig:tailnet-task-website",
+      "action": "landed: task-web Go service (stdlib, turns-dashboard shape) + modules/services/task-web.nix; frieren services.taskWeb @127.0.0.1:8490 + servicePortal.mounts.task-web https=8451 (first tailnet mount on frieren); SPA fuzzy-finds 766 tasks, runs via POST /api/run, SSE streams, /api/shell is the documented RCE lane, /api/kill process-groups; verified live: catalog+exec+stream+kill+rejections | gate: go vet+build, parse x3, nix:comments 6537/6539, frieren role eval",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f21442a30641824b396d453e53bb50bcbe6fb1ac",
+      "branch": "HEAD",
+      "frame": "03h9m0hilamqx4j30fc84virl"
+    },
     {
       "id": "fc24f129-3835-4f85-b923-0d9b7a0130e7",
       "ts": "2026-11-19T18:31:53Z",
@@ -2781,32 +2810,6 @@
       "base_commit": "0bd4bc730597cae20ccee810313166f05d1e46da",
       "branch": "main",
       "frame": "03h9b9ayr8qw3rcab55liawkc"
-    },
-    {
-      "id": "d1562cb9-1f6f-4464-a24f-86e6542166ce",
-      "ts": "2026-11-18T09:34:02Z",
-      "source": "devji",
-      "subject": "nixconfig:claim-default-and-relation-filter",
-      "action": "claimOf defaults to noteClaims and the ontology gate checks a bare import; ops:kg:evidence RELATION= narrows one relation; note slices show the claim; pushed fceb847e",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fceb847e279cd581a72f92f266aa1838de0e2547",
-      "branch": "main",
-      "frame": "03h9b7tdtrctptp0lfl7mrhdm"
-    },
-    {
-      "id": "e07f9e8e-695e-4ed9-b462-53fda71658bf",
-      "ts": "2026-11-18T09:26:15Z",
-      "source": "devji",
-      "subject": "nixconfig:evidence-names-and-site-split",
-      "action": "ops:kg:evidence names recorded edges and exits on dangling citations; site note page renders the claim split; rebased and pushed 04c7f934",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "04c7f9348eb39b16a0881706b13b7ebeb49caa51",
-      "branch": "main",
-      "frame": "03h9b6akwkv1s6ohdjncs7jpt"
     }
   ]
 }

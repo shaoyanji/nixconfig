@@ -640,6 +640,19 @@ in {
         addSSL = true;
         sslCertificate = tailnetCertificate;
         sslCertificateKey = tailnetCertificateKey;
+        # Task control plane on :443 too (modules/services/task-web.nix); :8451 stays.
+        locations."= /task-weather" = {
+          return = "301 /task-weather/";
+        };
+        locations."/task-weather/" = {
+          proxyPass = "http://127.0.0.1:${toString config.services.taskWeb.port}/";
+          proxyWebsockets = true;
+          extraConfig = ''
+            # Run output is SSE — no buffer, no 60s chop.
+            proxy_buffering off;
+            proxy_read_timeout 1h;
+          '';
+        };
         locations."/" = {
           proxyPass = "http://127.0.0.1:80";
           proxyWebsockets = true;

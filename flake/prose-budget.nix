@@ -6,7 +6,7 @@
   pages = {
     ".agents/skills/agent-browser/SKILL.md" = 86;
     ".agents/skills/agents-notes/SKILL.md" = 227;
-    ".agents/skills/agents/SKILL.md" = 18;
+    ".agents/skills/agents/SKILL.md" = 19;
     ".agents/skills/ai-memory/SKILL.md" = 68;
     ".agents/skills/antigravity/SKILL.md" = 185;
     ".agents/skills/apisfreellm/SKILL.md" = 145;
@@ -49,9 +49,9 @@
     ".agents/skills/no-comments/SKILL.md" = 39;
     ".agents/skills/officecli/SKILL.md" = 41;
     ".agents/skills/ontology/SKILL.md" = 161;
-    ".agents/skills/parallel-cli/SKILL.md" = 36;
+    ".agents/skills/parallel-cli/SKILL.md" = 37;
     ".agents/skills/paste/SKILL.md" = 119;
-    ".agents/skills/pdfvision/SKILL.md" = 37;
+    ".agents/skills/pdfvision/SKILL.md" = 39;
     ".agents/skills/philips-tv-cast/SKILL.md" = 133;
     ".agents/skills/prove-it-works/SKILL.md" = 35;
     ".agents/skills/qmd/SKILL.md" = 153;
@@ -62,7 +62,7 @@
     ".agents/skills/simplex-admin/SKILL.md" = 11;
     ".agents/skills/stt/SKILL.md" = 74;
     ".agents/skills/task-plane/SKILL.md" = 155;
-    ".agents/skills/tmux/SKILL.md" = 108;
+    ".agents/skills/tmux/SKILL.md" = 125;
     ".agents/skills/unslop/SKILL.md" = 69;
     ".agents/skills/voice-loop/SKILL.md" = 71;
     ".agents/skills/wikisearch/SKILL.md" = 148;

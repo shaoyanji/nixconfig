@@ -24,7 +24,8 @@ convenience and not an API — quote the task name, not the menu path. The
 `browse`, `edit-config` and `update` entries are deprecated menus kept alive for
 muscle memory; new work uses `edit-global`, `edit-sops`, `dev:flake:*` directly.
 
-All OAuth work goes through `scripts/task/service-oauth.sh`, so a token problem is
-a bug in that script, not in the task that wrapped it.
+OAuth scripts live in the service's own skill (`calendar` → `scripts/calendar-auth.sh`,
+`google-drive` → `scripts/drive-auth.sh`), so a token problem is a bug in that
+skill's script, not in the task that wrapped it.
 
 Truth: `taskfiles/agents.yml` — the executable contract; this page is the procedure.

@@ -493,6 +493,25 @@ tasks:
     cmds:
       - bash scripts/task/xs-turn-list.sh
 
+  agents:tmux:
+    desc: "Agent lane pane map — sessions and windows by name (scripts/task/agents-tmux.sh list)"
+    summary: >
+      Live view of the agent lanes: every tmux session and window with its
+      name, pane title, and current command. Read this instead of guessing an
+      index — the names are what `agents:tmux:show NAME=` resolves. xs stays
+      the verified record (agents:xs:list); a quiet pane proves nothing.
+    cmds:
+      - bash scripts/task/agents-tmux.sh list
+
+  agents:tmux:show:
+    desc: "Tail one agent lane by name — NAME=freebuff|agy|hermes|devin|…, LINES= (default 40)"
+    summary: >
+      `tmux capture-pane -t 0:3.1` breaks when a lane opens or closes; this
+      resolves the window's pane_title (`~> hermes`) or window_name to an id
+      that survives index drift, then captures the tail. scripts/task/agents-tmux.sh.
+    cmds:
+      - bash scripts/task/agents-tmux.sh show "{{.NAME}}" "{{.LINES}}"
+
   browse:
     desc: "[deprecated] Legacy browse menu - use direct commands"
     cmds:

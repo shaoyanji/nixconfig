@@ -216,9 +216,8 @@ tasks:
       - git branch -D update || true
       - git switch -c update
       - nix flake update
-      - task dev:flake:update-garnix
-      - git add flake.lock garnix.yaml
-      - gmc -c "flake update and garnix sync" --yes
+      - git add flake.lock
+      - gmc -c "flake update" --yes
       - git push -f origin update
       - git switch main
 
@@ -273,9 +272,8 @@ tasks:
       - git branch -D update || true
       - git switch -c update
       - nix flake update
-      - task dev:flake:update-garnix
-      - git add flake.lock garnix.yaml
-      - gmc -c "flake update and garnix sync" --yes
+      - git add flake.lock
+      - gmc -c "flake update" --yes
       - git push -f origin update
       - git switch main
       - git pull --rebase origin main
@@ -698,18 +696,6 @@ tasks:
       `dev:inventory:host` (compiled registry, also no host eval).
     cmds:
       - "nix eval --raw .?submodules=1#nixosConfigurations --apply 'hosts: builtins.concatStringsSep \"\\n\" (builtins.attrNames hosts)'"
-
-  # Update garnix.yaml with current nixosConfigurations
-  dev:flake:update-garnix:
-    desc: Rewrite garnix.yaml builds.include from the current nixosConfigurations host set
-    cmds:
-      - |
-        # Start with empty builds.include array
-        yq -i '.builds.include = []' garnix.yaml
-        # Add each host from flake
-        for host in $(task dev:flake:get-hosts); do
-          yq -i ".builds.include += [\"nixosConfigurations.$host\"]" garnix.yaml
-        done
 
   # --- docs: generated from the compiled metadata (lib/docs.nix) ------------
   # The pages and the site nav are Nix values built from `.?submodules=1#inventory` and

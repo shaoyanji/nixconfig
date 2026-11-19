@@ -16,6 +16,7 @@ metadata:
 Managed web-intelligence CLI: AI search, open-ended deep research, clean
 markdown extraction from URLs, entity discovery, and change monitoring.
 Cloud-backed — check auth/balance before assuming failure is a bug.
+Not in the fleet closure since the llm-agents slash — fetch ad-hoc via `nix shell github:numtide/llm-agents.nix#parallel-cli`.
 
 ## 1. Auth first
 

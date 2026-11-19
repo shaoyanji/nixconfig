@@ -74,6 +74,23 @@ Capture past the visible pane when the output matters more than the screen:
 tmux pipe-pane -o -t agent-build 'cat >> /tmp/agent-build.log'
 ```
 
+## Status by name, not index
+
+`tmux capture-pane -t 0:3.1` breaks the moment a lane opens or closes, and the
+lanes here already carry names — `pane_title` (`~> hermes`) on the titled panes,
+`window_name` otherwise. The named surface is `task agents:tmux`:
+
+```bash
+task agents:tmux                       # session:window map — names, titles, commands
+task agents:tmux:show NAME=hermes      # tail the pane whose title or name matches
+task agents:tmux:show NAME=devin LINES=60
+```
+
+`scripts/task/agents-tmux.sh` resolves the name to a `session:window_id` once
+and captures that — no index arithmetic, no drift. It is the *live* view only:
+xs (`task agents:xs:list`) stays the verified record, and a quiet pane proves
+nothing either way.
+
 Long batch job, no keystrokes, wants journald:
 
 ```bash
@@ -92,7 +109,7 @@ nix shell nixpkgs#reptyr -c sudo reptyr <pid>   # run it inside the target tmux 
 
 No tmux on a fresh host or container: `nix shell nixpkgs#tmux -c tmux new-session
 -d -s agent-x -- <cmd>` works, but the store path is only GC-rooted while the
-`nix shell` runs. On a host you keep, enable tmux from `modules/shell/base.nix`.
+`nix shell` runs. On a host you keep, enable tmux from `modules/shell/default.nix`.
 
 ## Rules
 

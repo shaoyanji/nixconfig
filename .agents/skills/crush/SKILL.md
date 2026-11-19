@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [Deprecated, Crush, Charm, Coding-Agent]
-    related_skills: [antigravity, hermes-agent, frieren-offload, reasonix]
+    related_skills: [antigravity, frieren-offload, reasonix]
 ---
 
 # Crush — retired

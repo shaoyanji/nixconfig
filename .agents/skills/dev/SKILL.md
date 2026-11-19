@@ -35,7 +35,7 @@ This page keeps only the traps a description cannot warn about.
 `update-complete` is the whole workflow (branch, update, merge). Use
 `update-branch` + `merge-update` when you want to read the lock diff first, and
 `update-transitive` for pins a root update misses. After adding a host,
-`dev:flake:update-garnix` syncs `garnix.yaml` or CI never builds it.
+garnix was dropped (d5b7baa2): `dev:flake:update*` stages `flake.lock` only — no `garnix.yaml` sync.
 
 ## Site — two different sites
 

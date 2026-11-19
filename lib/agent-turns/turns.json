@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-19T17:48:33Z",
+  "generated": "2026-11-19T18:14:06Z",
   "count": 200,
-  "pin": "e0c76991fab03945119f1c60b4abedcc354ca2c4da98b232d61811099e5d8783",
+  "pin": "09c7647fed49c0c8f3002fed7d7b275fca00c79d1dfd3a88bd75344ea0956ae7",
   "turns": [
+    {
+      "id": "e103a079-2404-4e39-a29f-c94e90ac35b6",
+      "ts": "2026-11-19T18:00:00Z",
+      "source": "devin",
+      "subject": "nixconfig:tmux-skills-audit",
+      "action": "survey: 63 skills all well-formed (frontmatter+desc); tmux poll uses window-index 0:X.1 while names already carry lanes (freebuff/agy/hermes/devin); -t accepts window names; pdfvision/parallel-cli skills stale post-slash",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c989962f396dee42ecd588f2cc2b8be8cea6039f",
+      "branch": "HEAD",
+      "frame": "03h9lry7nmjuucgjnqwhy9mih"
+    },
+    {
+      "id": "571a722d-5fe1-4346-a7f0-b1aa8379157b",
+      "ts": "2026-11-19T17:59:15Z",
+      "source": "devin",
+      "subject": "nixconfig:tmux-skills-audit",
+      "action": "claim: tmux skills audit — tmux status mechanism + .agents/skills census",
+      "outcome": "in_progress",
+      "claims": [
+        ".agents/skills/"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9lrt0yjygkrffkaggq3yyg"
+    },
+    {
+      "id": "4f9b8238-f540-46e5-b269-653957354ae3",
+      "ts": "2026-11-19T17:50:35Z",
+      "source": "vesper",
+      "subject": "rebuild-kit:wishlist-for-vesper",
+      "action": "Follow-up answered: exact Qwen HF URL posted in full; devil repo serv00-webserver now filled at HEAD d3ab1be (was empty because the first push went to the wrong bare-repo path).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": "master",
+      "frame": "03h9lq4ross1nfuc72g1eoksh"
+    },
+    {
+      "id": "35b902e9-2839-4c55-bd19-4bcdd3d5cf41",
+      "ts": "2026-11-19T17:48:48Z",
+      "source": "devin",
+      "subject": "nixconfig:nushell-rework",
+      "action": "landed: dispatch.nu colon-task surface (nu-task/nutasks), nu-run is the entrypoint, todoist defs exported | gate: live nu -c tests PASS + role evals + nix-comments",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c989962f396dee42ecd588f2cc2b8be8cea6039f",
+      "branch": "HEAD",
+      "frame": "03h9lpriduu6f8to5dd0mhhy6"
+    },
     {
       "id": "4d4e1415-ca18-4f34-a18a-37c8248c6ab8",
       "ts": "2026-11-19T17:47:06Z",
@@ -2759,78 +2813,6 @@
       "base_commit": "0670c6420b59bbf50b68d90b53705515e3c86d92",
       "branch": "main",
       "frame": "03h9b38xnehkz0afnlltt4abp"
-    },
-    {
-      "id": "c516e9e4-8d92-4681-8feb-7749319e151d",
-      "ts": "2026-11-18T09:07:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:apisfreellm-skill",
-      "action": "apisfreellm skill rewritten from the real integration prompt, plus task freeapi:ask|chat|search|probe over one wrapper script",
-      "outcome": "done",
-      "claims": [
-        ".agents/skills/apisfreellm",
-        "taskfiles/freeapi.yml",
-        "scripts/task/freeapi.sh"
-      ],
-      "files": [
-        ".agents/skills/apisfreellm/SKILL.md",
-        "scripts/task/freeapi.sh",
-        "taskfiles/freeapi.yml",
-        "Taskfile.yml",
-        "flake/prose-budget.nix"
-      ],
-      "base_commit": "57d5a463fc05e990d4660b20b20879c457a75bfa",
-      "branch": "main",
-      "frame": "03h9b2j80y1hkmceh6bq38op3"
-    },
-    {
-      "id": "057cf4f2-067a-4bad-b0ff-97c3264da948",
-      "ts": "2026-11-18T09:03:06Z",
-      "source": "devji",
-      "subject": "nixconfig:ontology-per-edge-evidence",
-      "action": "edges record their own tier with because; sinks routed; notes filter by CLAIM/EVIDENCE; committed 24a51ec5",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "24a51ec53e974bb79ecdea22b4492baf13cc865a",
-      "branch": "main",
-      "frame": "03h9b1rs5bb8pbj7edse9v1x4"
-    },
-    {
-      "id": "523c705f-c779-44a5-b8a3-c3c96ebc634f",
-      "ts": "2026-11-18T09:01:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:apisfreellm-skill",
-      "action": "Added .agents/skills/apisfreellm from vesper's apisfreellm:integration-prompt turn, with a 75-line prose budget entry",
-      "outcome": "done",
-      "claims": [
-        ".agents/skills/apisfreellm"
-      ],
-      "files": [
-        ".agents/skills/apisfreellm/SKILL.md",
-        "flake/prose-budget.nix"
-      ],
-      "base_commit": "57d5a463fc05e990d4660b20b20879c457a75bfa",
-      "branch": "main",
-      "frame": "03h9b1j0j4o551b3ph8czp0c0"
-    },
-    {
-      "id": "472b9ed2-1ed6-4b1a-9df4-353d28a7bb2f",
-      "ts": "2026-11-18T08:36:35Z",
-      "source": "vesper",
-      "subject": "apisfreellm:integration-prompt",
-      "action": "Saved the free keyless APIsFreeLLM integration prompt to memory and verified the API live",
-      "outcome": "done",
-      "claims": [
-        "apisfreellm"
-      ],
-      "files": [
-        "~/MEMORY.md",
-        "~/memory/2026-11-18.md"
-      ],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h9awlnnb06xn92kqignv4ov"
     }
   ]
 }

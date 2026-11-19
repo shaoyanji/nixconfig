@@ -18,6 +18,8 @@ per-page quality and names the next flag to use when the default pass is not
 enough (e.g. scanned pages need `--ocr`). Pairs with `officecli` for Office
 formats; pdfvision is the PDF-side tool.
 
+Not in the fleet closure since the llm-agents slash — fetch ad-hoc via `nix shell github:numtide/llm-agents.nix#pdfvision`.
+
 ## 1. Common flows
 
 ```bash

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T20:41:29Z",
+  "generated": "2026-11-19T21:11:05Z",
   "count": 200,
-  "pin": "62d691d4ec13a026c99ff0556de3649ef1d270936f9898adbe3789f16388839f",
+  "pin": "a37593c35422e5096490fd10d47680805c27399586d57c04685e20b6efd084ef",
   "turns": [
+    {
+      "id": "58674851-7706-42e3-b1bb-33a3e3bfc887",
+      "ts": "2026-11-19T20:41:39Z",
+      "source": "devin",
+      "subject": "nixconfig:ci-fix-qa",
+      "action": "landed: inventory link row fixes portal-mount assertion (CI red since f21442a3); QA of cpg repin/HA/minyx/task-web commits clean | gate: frieren assertions all-true eval, parse, census, issues[] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9mnj2j1egpk5csghbgtx1m"
+    },
     {
       "id": "35efd034-26af-4441-83d7-a7eafe87cfb2",
       "ts": "2026-11-19T20:37:15Z",
@@ -2819,19 +2832,6 @@
       "base_commit": "d09781587ffeb6fba801f6b690bc9c19d3d27f3b",
       "branch": "main",
       "frame": "03h9d88trzesxphearlohn0fa"
-    },
-    {
-      "id": "feb14180-7977-4db9-b382-bea97fa0a41e",
-      "ts": "2026-11-18T15:39:12Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-infron-free",
-      "action": "hermes default is now Infron's deepseek/deepseek-v4-flash-0731:free via providers.infron (key_env INFRON_API_KEY from ai-services-shared-env), single fallback qwen/qwen3.8-27b:free; aux pins removed. Free-model call verified, usage 12 tokens. INFRON_API_KEY reaches hermes.env only at next switch's sops render; gateway restart then.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "40f95e82da5bc2d31efa4744818f0d0dc4b10d0d",
-      "branch": "main",
-      "frame": "03h9d75dy63qbc0lm74d11c13"
     }
   ]
 }

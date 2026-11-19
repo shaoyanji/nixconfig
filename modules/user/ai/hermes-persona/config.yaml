@@ -180,6 +180,14 @@ stt:
 # that still has no explicit destination.
 auxiliary:
   free_only: true
+
+# Titles and summaries use their own model lane, pinned to hydrogen so aux
+# work never burns the `:free` ids on the main chat route.
+title_generation:
+  model: gemini-4-hydrogen
+
+summary:
+  model: gemini-4-hydrogen
 skills:
   trusted_project_dirs:
     - /Volumes/data/projects/nixconfig
@@ -196,6 +204,7 @@ fallback:
 onboarding:
   seen:
     busy_input_prompt: true
+    tool_progress_prompt: true
 telemetry:
   shared_metrics:
     enabled: false

@@ -125,7 +125,7 @@ in {
         [api]
         baseurl = ""
         key = '${config.sops.placeholder."gemini/api/key"}'
-        model = "gemini-2.5-flash"
+        model = "gemini-4-hydrogen"
 
         [behavior]
         auto_select = false

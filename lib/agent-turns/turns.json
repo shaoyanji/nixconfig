@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-19T15:25:42Z",
+  "generated": "2026-11-19T15:30:54Z",
   "count": 200,
-  "pin": "1ac4157d54a02c0dbaf51343e34565539e180672c45afa3f341ed3a76816d3d8",
+  "pin": "044641bf55ddeb89a192a1418f8b5015a9d54332afd9f145af3247e558ed5cb8",
   "turns": [
+    {
+      "id": "1a79b8a2-37aa-4bc1-8fc5-c051aad1ea26",
+      "ts": "2026-11-19T15:29:11Z",
+      "source": "delphi",
+      "subject": "nixconfig:delphi-email-update",
+      "action": "Email update sent via delphi (tab 5): checked mail attention queue (16 items, 5 action-tier with deadlines incl. Appwrite 'dragon court' deletion in 1 day, Oracle Cloud trial expiry in 30 days), apps pipeline (171 tracked, 39 applied/33 rejected, 9 Monitor, 0 prep/screening/interview), inbox highlights today (Solar Asset Manager reply, Cloudflare observability alert, Novu security disclosure). Sent summary to jisifu@gmail.com.",
+      "outcome": "done",
+      "claims": [
+        "delphi",
+        "mail-archive",
+        "apps-pipeline"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9kyhld5js370ojfim7iyop"
+    },
+    {
+      "id": "b2037c1f-1cf8-4440-9864-976e5cea2055",
+      "ts": "2026-11-19T15:26:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:loopcv-ui-refine",
+      "action": "LoopCV UI done: auto-apply disabled on all 5 loops. DE Renewable Energy and SWE Freiburg had their automatic emails and form auto-fill switched off (AI answers left on), matching the US loops. Titles retargeted: Renewable now Solar Asset Manager + Renewable Energy Manager; Freiburg now Software Engineer + Backend Engineer. Verified on the loop cards: 5/5 Auto apply disabled.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0f53dd945b357f4d686c27979cf9ac3688931d77",
+      "branch": "HEAD",
+      "frame": "03h9kxwwk3rp0mo8l249o4yz3"
+    },
+    {
+      "id": "719290b2-78cc-4ae4-9f06-f9611f8a6fa2",
+      "ts": "2026-11-19T15:25:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:dormant-host-gates",
+      "action": "Landed the darwin chain repair: global.nix's systemd/journald block moved to modules/global/linux-systemd.nix (nixos/containers/demo only) and macos.nix now puts its darwin definitions under config. mkIf could not gate this - pushDownProperties rewrites it. netbook gate green 10.2 s; cassini fails one fault later, infinite recursion on roles/home.nix arg dankShell. Note updated, still IN FLIGHT.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0ca845adec418488cc5a2b3ef6095334d28423cd",
+      "branch": "main",
+      "frame": "03h9kxu3cxybo9ro3vwfr88rt"
+    },
     {
       "id": "d1c247a2-0332-42b5-bf8e-b0c125267c38",
       "ts": "2026-11-19T15:18:06Z",
@@ -2760,45 +2803,6 @@
       "base_commit": null,
       "branch": null,
       "frame": "03h94bh9fwv631d4sqthlsoly"
-    },
-    {
-      "id": "dfd0feab-726c-4ba7-9193-788597c04d84",
-      "ts": "2026-11-17T12:22:42Z",
-      "source": "devji",
-      "subject": "nixconfig:ontology",
-      "action": "Landed flake/ontology.nix (8 entities, 8 relations, note lineage); gate now in pre-commit + nightly kg-ontology-check on frieren; pushed 5a3a3acd",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5a3a3acd54f2ff2dbca2bdc6c4c7ceaf7cf204b6",
-      "branch": "main",
-      "frame": "03h94bgrpss4s70k5k5m649en"
-    },
-    {
-      "id": "49a528ea-1f0c-4ea9-a8ec-00727ccbacb3",
-      "ts": "2026-11-17T11:33:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:image-daily-slot-fix",
-      "action": "image-daily slots fixed on frieren (source root + REPO guard + NIXCONFIG_ROOT), deployed c8b4ab40, 12 plates of 2026-11-17 in the bank and live on bountystash-assets (manifest 388), roster +6 rows (cammy, 5 frieren poses)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c8b4ab40b80dbcab79d08df66d8e3f3b1940af83",
-      "branch": "main",
-      "frame": "03h941wjw3wv2a81jis8ox8nw"
-    },
-    {
-      "id": "9d046852-29a8-4d7d-ac84-fc9c5625095c",
-      "ts": "2026-11-17T11:17:33Z",
-      "source": "buffy",
-      "subject": "nixconfig:docs-wringing",
-      "action": "Third wringing pass over the 11 remaining audit targets, pushed as 76b06d3d (43 edits across 11 docs). Also repaired a detached schema-table row in inventory-schema.md and a broken sentence in delphi-install.md. checks:prose, ops:docs:budget, docs:build, checks:quick all rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "76b06d3dea30a154572f3d2868182ea82ead54f9",
-      "branch": "main",
-      "frame": "03h93yqr6tnac2rhks94fsscj"
     }
   ]
 }

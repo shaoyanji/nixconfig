@@ -25,6 +25,20 @@
     if builtins.elem "ai-full" traits
     then "full"
     else "light";
+
+  # Memory layer — the accepted note: task ops:notes:show ID=memory-architecture.
+  memoryTools = [
+    pkgs.llm-agents.qmd # local hybrid markdown/code search — the wiki layer
+    pkgs.llm-agents.ai-memory # persistent cross-agent memory — scratch, never authority
+    pkgs.llm-agents.toon # TOON format tooling
+  ];
+
+  agentTools = [
+    pkgs.llm-agents.pdfvision # PDF understanding/conversion
+    pkgs.llm-agents.parallel-cli # parallel task runner for batched agent work
+    pkgs.llm-agents.agent-browser # headless Chrome automation CLI (bundles Chromium ~700MB)
+    pkgs.llm-agents.reasonix
+  ];
 in {
   # Fleet-wide gate and tiering for AI CLI tooling.
   # "light" keeps closures small on mobile laptops by excluding heavy Chromium-bundled
@@ -88,16 +102,10 @@ in {
       ]
       # Heavy agent suite — ONLY installed when tier == "full"
       # Keeps ~2+ GB and bundled Chromium off light mobile clients like aristotle
-      ++ lib.optionals (config.profiles.ai.tier == "full") [
+      ++ lib.optionals (config.profiles.ai.tier == "full") (
         # pkgs.llm-agents.crush — retired 2026-11-06 (free credits exhausted); do
         # not re-add without a paid quota. See `.agents/skills/crush`.
-        pkgs.llm-agents.qmd # local hybrid markdown/code search
-        pkgs.llm-agents.ai-memory # persistent cross-agent memory
-        pkgs.llm-agents.toon # TOON format tooling
-        pkgs.llm-agents.pdfvision # PDF understanding/conversion
-        pkgs.llm-agents.parallel-cli # parallel task runner for batched agent work
-        pkgs.llm-agents.agent-browser # headless Chrome automation CLI (bundles Chromium ~700MB)
-        pkgs.llm-agents.reasonix
-      ];
+        memoryTools ++ agentTools
+      );
   };
 }

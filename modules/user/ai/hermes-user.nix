@@ -3,6 +3,7 @@
   lib,
   config,
   pkgs,
+  osConfig ? {},
   # ~/AGENTS.md itself comes from modules/user/ai/home-agents.nix (the flake's
   # `.#homeAgents.<host>`, injected via extraSpecialArgs in
   # modules/global/nixos.nix). This module only mirrors that link into
@@ -76,6 +77,22 @@
       mainProgram = "cpg";
       license = pkgs.lib.licenses.mit;
     };
+  };
+
+  hostName = osConfig.networking.hostName or "";
+
+  soulRel =
+    if hostName != "" && builtins.pathExists ./personas/${hostName}/SOUL.md
+    then "personas/${hostName}/SOUL.md"
+    else if builtins.pathExists ./personas/default/SOUL.md
+    then "personas/default/SOUL.md"
+    else "hermes-persona/SOUL.md";
+
+  personaFiles = {
+    "config.yaml" = "hermes-persona/config.yaml";
+    "USER.md" = "hermes-persona/USER.md";
+    "MEMORY.md" = "hermes-persona/MEMORY.md";
+    "SOUL.md" = soulRel;
   };
 in {
   options.programs.hermes-user = {
@@ -191,11 +208,6 @@ in {
       # for a host that needs the persona, not the repo.
       PERSONA_STORE="${./hermes-persona}"
 
-      # Personas are per-host. The activation script runs under `set -u`, so the
-      # name has to come from somewhere: `uname -n` always exists, while nothing
-      # exports HOST_NAME into an activation sandbox.
-      HOST_NAME="$(uname -n | cut -d. -f1)"
-
       # Clean up misplaced files in $HOME from earlier experiments
       for f in SOUL.md USER.md MEMORY.md config.yaml; do
         if [ -L "$HOME/$f" ]; then
@@ -203,27 +215,15 @@ in {
         fi
       done
 
-      # 1. Base Hermes runtime config & memories in ~/.hermes/
-      for f in config.yaml USER.md MEMORY.md; do
-        run rm -f "$HOME/.hermes/$f"
-        if [ -f "$REPO_DIR/modules/user/ai/hermes-persona/$f" ]; then
-          run ln -s "$REPO_DIR/modules/user/ai/hermes-persona/$f" "$HOME/.hermes/$f"
-        elif [ -f "$PERSONA_STORE/$f" ]; then
-          run ln -s "$PERSONA_STORE/$f" "$HOME/.hermes/$f"
-        fi
-      done
-
-      # 2. Host-specific persona (SOUL.md) in ~/.hermes/
-      run rm -f "$HOME/.hermes/SOUL.md"
-      if [ -f "$REPO_DIR/modules/user/ai/personas/$HOST_NAME/SOUL.md" ]; then
-        run ln -s "$REPO_DIR/modules/user/ai/personas/$HOST_NAME/SOUL.md" "$HOME/.hermes/SOUL.md"
-      elif [ -f "$REPO_DIR/modules/user/ai/personas/default/SOUL.md" ]; then
-        run ln -s "$REPO_DIR/modules/user/ai/personas/default/SOUL.md" "$HOME/.hermes/SOUL.md"
-      elif [ -f "$REPO_DIR/modules/user/ai/hermes-persona/SOUL.md" ]; then
-        run ln -s "$REPO_DIR/modules/user/ai/hermes-persona/SOUL.md" "$HOME/.hermes/SOUL.md"
-      elif [ -f "$PERSONA_STORE/SOUL.md" ]; then
-        run ln -s "$PERSONA_STORE/SOUL.md" "$HOME/.hermes/SOUL.md"
-      fi
+      ${lib.concatStringsSep "" (lib.mapAttrsToList (f: rel: ''
+          run rm -f "$HOME/.hermes/${f}"
+          if [ -f "$REPO_DIR/modules/user/ai/${rel}" ]; then
+            run ln -s "$REPO_DIR/modules/user/ai/${rel}" "$HOME/.hermes/${f}"
+          elif [ -f "$PERSONA_STORE/${builtins.baseNameOf rel}" ]; then
+            run ln -s "$PERSONA_STORE/${builtins.baseNameOf rel}" "$HOME/.hermes/${f}"
+          fi
+        '')
+        personaFiles)}
 
       # 3. ~/AGENTS.md is Home Manager's (modules/user/ai/home-agents.nix →
       # `.#homeAgents.<host>`: fleet preamble + compiled inventory card +

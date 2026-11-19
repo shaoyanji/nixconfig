@@ -784,21 +784,32 @@
     doc-budget-ci = {
       title = "Doc budget gate in CI";
       kind = "open";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       priority = "P0";
       date = "2026-10-21";
-      summary = "A doc-only push allocated zero runners and gated nothing; the workflow now has a `docs-budget` job that builds the same check as `task ops:docs:budget`, through one script.";
+      summary = "A doc-only push allocated zero runners and gated nothing; the workflow now has a `docs-budget` job that builds the same check as `task ops:docs:budget`, through one script, and it is proven green on a `*.md`-only push.";
       refs = {
         modules = [".github/workflows/nixcachix.yml" "scripts/task/docs-budget.sh"];
         tasks = ["ops:docs:budget"];
         docs = [".agents/SCHEMA.md" "docs/ci-pipeline.md"];
       };
       body = ''
-        Missing: the green run. The red half is proven locally — on a copy with
-        AGENTS.md padded to 1300 lines, `nix build .#checks.x86_64-linux.docs-budget`
-        exits 1 and names the file — but only a push proves the job executes.
+        Closed 2026-11-19. A `*.md`-only push (`fede3c1b`, `docs/ci-pipeline.md`)
+        ran `docs-budget` green in 51 s while `build-machines` and `boot-canary`
+        were skipped — run 44540530585 — so the gate now fires on exactly the
+        push that allocates no runner.
 
-        Exit: the `docs-budget` job is green on a `*.md`-only commit.
+        The job's later steps cover what the script cannot. `docs-budget.sh`
+        skips `.agents/skills/*` on purpose (their bodies are `lib/skills.nix`'s
+        to compile and `flake/prose-budget.nix`'s to bound), and `checks.policies`
+        compares that record through `agent-prose-budget` — it joined the job on
+        2026-11-17, so a skills-only edit is gated without a host build. Beside
+        it: `prose-tells` for vocabulary, `taskfile-graph` and `nix-comments` for
+        pointers, module edges for imports.
+
+        Why a gate exists here at all: no `if:`, no path filter, and
+        `concurrency` per ref — a run superseded within seconds is cancelled, so
+        the newest commit on the branch is the one that must be green.
       '';
     };
     dormant-host-gates = {

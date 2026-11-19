@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-19T13:57:18Z",
+  "generated": "2026-11-19T14:13:03Z",
   "count": 200,
-  "pin": "0f944cf961428a463f53d16c749e4fd5004f01cf94a464aa6cf0afded62f8e18",
+  "pin": "7f9b024c6e46ce5b7391b1baed5a1a6b72474cabffe2c5534fa2e684f570fe8a",
   "turns": [
+    {
+      "id": "6d8e82d6-09f7-4f32-b7c9-b45c0979e9fd",
+      "ts": "2026-11-19T14:11:13Z",
+      "source": "devji",
+      "subject": "nixconfig:appflow-liveness",
+      "action": "verified 5 prep postings live (parloa/focused/routine/evoila/octopus via canonical Lever); parlive/livekit Ashby submissions blocked on 3 answers + no browser; sheet written",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
+      "branch": "main",
+      "frame": "03h9kj9by01dfq18vnd42u5i1"
+    },
     {
       "id": "22ba2230-b8a1-4d30-afc6-b28cc7169b07",
       "ts": "2026-11-19T13:46:25Z",
@@ -2802,19 +2815,6 @@
       "base_commit": "bafe6c1b6230f31aba93e429524e2175c423f496",
       "branch": "main",
       "frame": "03h8zdbqzspdnqgtp212hcsps"
-    },
-    {
-      "id": "0d2ab7f0-d9b5-44ed-99a5-87df70a28af6",
-      "ts": "2026-11-16T16:22:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-retune",
-      "action": "tokenloom: panel rows keyed by id so a retune updates in place; web/retune.mjs measures the round trip (op 0.1ms, ack 9.4ms of which 8ms is the coalesce window, list frame 50ms because a second small socket write waits ~41ms for the client's ack, 15.4ms when the client has data in flight) and asserts identity 60/60; published to shaoyanji/tokenloom",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c67044beecebb5035c9c63cd98a418738f41ea49",
-      "branch": "main",
-      "frame": "03h8xt0c1nt7eu104xyd0l87m"
     }
   ]
 }

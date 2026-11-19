@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-19T22:07:07Z",
+  "generated": "2026-11-19T22:38:16Z",
   "count": 200,
-  "pin": "745ce2699cc543774ca42ed93b7646a38907f0e56742298d73c72a01224b0d71",
+  "pin": "5897002d719730ce5d08d23e11ad71fdf571ee8aa9e3593c22eb00a03f8d6e17",
   "turns": [
+    {
+      "id": "14c6cefd-117b-4834-8ddb-ba511097e6da",
+      "ts": "2026-11-19T22:32:17Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-android",
+      "action": "claim: enable hermes-android plugin, route around uv.lock-in-store blocker",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai/"
+      ],
+      "files": [],
+      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
+      "branch": "main",
+      "frame": "03h9n953rc4h3un20p9ndfkxc"
+    },
+    {
+      "id": "dac354a1-27e6-4e41-9682-5e3c25398603",
+      "ts": "2026-11-19T22:07:19Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-reroll-fix",
+      "action": "landed: refused plates rows get hold: prefix after fail/exhausted-reroll; unjudged left for judge recovery | gate: bash -n, DRY roster walk, isolated hold_roster_row test, census PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
+      "branch": "main",
+      "frame": "03h9n49hga1ewbaok2wrhlz04"
+    },
     {
       "id": "81397c6f-b398-4a74-9fef-3bcfe1060745",
       "ts": "2026-11-19T22:05:13Z",
@@ -2811,32 +2839,6 @@
       "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
       "branch": "main",
       "frame": "03h9dgxnfwau12t0u5u8ijpph"
-    },
-    {
-      "id": "649d3cb2-1556-4667-8d2c-fcf26476ea4a",
-      "ts": "2026-11-18T16:23:49Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 1 plate(s) kept of 3 spent, 16 roster row(s) waiting, 500 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
-      "branch": "main",
-      "frame": "03h9dfv5l0ww72ypi1cekuxe4"
-    },
-    {
-      "id": "f3c88333-1b9a-4c16-9247-25f1f4e626d8",
-      "ts": "2026-11-18T16:17:08Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 17 roster row(s) waiting, 500 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "491cb554a8a0de7ec5e9072830ec228fdbce4104",
-      "branch": "main",
-      "frame": "03h9dek3uloxl559jkltzfcug"
     }
   ]
 }

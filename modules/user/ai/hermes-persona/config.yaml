@@ -191,6 +191,9 @@ summary:
 skills:
   trusted_project_dirs:
     - /Volumes/data/projects/nixconfig
+plugins:
+  enabled:
+    - hermes-android
 platforms:
   telegram:
     enabled: true

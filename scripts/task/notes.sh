@@ -41,7 +41,7 @@ fi
 # Status order for RANKING only: live work first, a solved area last. Relevance
 # dominates, so this tie-break rarely decides anything — it exists so two equally
 # relevant notes do not sort by id.
-srank='{"IN FLIGHT":0,"OPEN":1,"ACCEPTED":2,"PROPOSED":3,"BLOCKED":4,"DELIVERED":5,"REJECTED":6,"SUPERSEDED":7}'
+srank='{"IN FLIGHT":0,"OPEN":1,"ACCEPTED":2,"PROPOSED":3,"BLOCKED":4,"DELIVERED":5,"CLOSED":5,"REJECTED":6,"SUPERSEDED":7}'
 open_ids='["PROPOSED","ACCEPTED","IN FLIGHT","BLOCKED","OPEN"]'
 
 print_ids() {

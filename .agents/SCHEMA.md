@@ -104,13 +104,15 @@ bounded at 10 lines each by `checks.<system>.docs-budget` and
 | `ACCEPTED` | agreed; work not started |
 | `IN FLIGHT` | partially delivered; say exactly what is missing |
 | `DELIVERED` | landed in the tree; link the commit or path |
+| `CLOSED` | landed and its gate ran green; link the run and the commit |
 | `SUPERSEDED` | replaced; link the replacement, do not delete the record |
 | `REJECTED` | considered and declined; keep the reason |
 | `BLOCKED` | waiting on hardware / another item; name the blocker |
 | `OPEN` | queue item, actionable now |
 
-A completed item is not "done" — it is `DELIVERED` with a path. A deleted item
-with no record is indistinguishable from an oversight.
+A completed item is not "done" — it is `DELIVERED` with a path, or `CLOSED` when
+the note also names the run that gated it. A deleted item with no record is
+indistinguishable from an oversight.
 
 ## 4. Skill contract
 

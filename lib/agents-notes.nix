@@ -15,6 +15,7 @@
     "ACCEPTED"
     "IN FLIGHT"
     "DELIVERED"
+    "CLOSED"
     "SUPERSEDED"
     "REJECTED"
     "BLOCKED"

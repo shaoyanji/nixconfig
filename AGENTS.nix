@@ -784,10 +784,10 @@
     doc-budget-ci = {
       title = "Doc budget gate in CI";
       kind = "open";
-      status = "DELIVERED";
+      status = "CLOSED";
       priority = "P0";
-      date = "2026-10-21";
-      summary = "A doc-only push allocated zero runners and gated nothing; the workflow now has a `docs-budget` job that builds the same check as `task ops:docs:budget`, through one script, and it is proven green on a `*.md`-only push.";
+      date = "2026-11-19";
+      summary = "A doc-only push allocated zero runners and gated nothing; the `docs-budget` CI job now runs the same check as `task ops:docs:budget`, proven on a `*.md`-only push (run 44540530585 at `fede3c1b`).";
       refs = {
         modules = [".github/workflows/nixcachix.yml" "scripts/task/docs-budget.sh"];
         tasks = ["ops:docs:budget"];

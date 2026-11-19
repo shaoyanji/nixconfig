@@ -1,8 +1,79 @@
 {
-  "generated": "2026-11-19T14:13:03Z",
+  "generated": "2026-11-19T14:28:48Z",
   "count": 200,
-  "pin": "7f9b024c6e46ce5b7391b1baed5a1a6b72474cabffe2c5534fa2e684f570fe8a",
+  "pin": "1acf660720afd229f2ce81de99879b8d79b1c4225edf784592b0e29018aeb324",
   "turns": [
+    {
+      "id": "841cadb0-b526-45f3-9bb9-afed5d564356",
+      "ts": "2026-11-19T14:26:54Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 34: freebuff closing doc-budget-ci note CLOSED. agy compiling submission-path report in /home/devji/.hermes/cache/scratch/submission-report.txt. devin verifying PR #8 changes landed + tests pass. delphi retargeting Parloa Staff Product Engineer outreach as broker.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "cf422658c497737a1f60b8f6212327774e578bd5",
+      "branch": "main",
+      "frame": "03h9kmbnp8ljwxpntr4zrnrnf"
+    },
+    {
+      "id": "52966c8d-6d5e-4203-af8a-034d23c63c4c",
+      "ts": "2026-11-19T14:26:29Z",
+      "source": "frieren",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 33: freebuff delivered doc-budget-ci gate verified on doc-only pushes (fede3c1b + cf422658 pushed, xs 03h9kl5xa5jiqgd9wq058u205 posted). devin landed PR #8 nits + tests passed. agy compiled submission-path report. delphi sent LiveKit outreach + Parloa retarget pending.",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/ops.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "cf422658c497737a1f60b8f6212327774e578bd5",
+      "branch": "main",
+      "frame": "03h9km8npj9fpm0a6hnqywuf4"
+    },
+    {
+      "id": "d0109eff-bbde-47bc-bae5-4958bfb784fc",
+      "ts": "2026-11-19T14:20:58Z",
+      "source": "buffy",
+      "subject": "nixconfig:doc-budget-ci",
+      "action": "doc-budget-ci closed: a docs-only push (fede3c1b) ran the docs-budget job green in 51 s while both build jobs were skipped (run 44540530585). The note records that run and the job's coverage: docs-budget.sh skips skill bodies on purpose, and checks.policies, already in the job, bounds them. A duplicate policies step I added was caught from the job's own step list and reverted. DELIVERED at cf422658; checks:quick rc=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cf422658c497737a1f60b8f6212327774e578bd5",
+      "branch": "main",
+      "frame": "03h9kl5xa5jiqgd9wq058u205"
+    },
+    {
+      "id": "2b7a3dd8-03bf-405c-8861-dc2dba21cb8b",
+      "ts": "2026-11-19T14:20:14Z",
+      "source": "devji",
+      "subject": "nixconfig:appflow-octopus-parloa-prep",
+      "action": "drafted Parloa follow-up for 2026-11-26; drafted Octopus form answers (visa radio left blank, all five options are UK statuses); fixed Octopus apply_url from dead Indeed redirect to canonical Lever link",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
+      "branch": "main",
+      "frame": "03h9kl0rt5ztbs2wvkcbxinyn"
+    },
+    {
+      "id": "938c892a-0718-49c9-bfc4-79cb64481def",
+      "ts": "2026-11-19T14:15:21Z",
+      "source": "devji",
+      "subject": "nixconfig:appflow-parloa-send",
+      "action": "retargeted Parloa to Staff Product Engineer; sent outreach to contact@parloa.com (imprint address, no talent desk exists) with parloa packet, Resend 01a1f428, delivered; Ashby form still unsubmitted",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
+      "branch": "main",
+      "frame": "03h9kk2clssf25wgw14s91vsn"
+    },
     {
       "id": "6d8e82d6-09f7-4f32-b7c9-b45c0979e9fd",
       "ts": "2026-11-19T14:11:13Z",
@@ -2747,74 +2818,6 @@
       "base_commit": "b6fcb35fc8e091bacbe5e66826b09fa7758639da",
       "branch": "main",
       "frame": "03h92hze7r23jzy7rzufisklc"
-    },
-    {
-      "id": "d008f14c-7fae-4317-b5a3-76fb7e47e40a",
-      "ts": "2026-11-17T04:07:03Z",
-      "source": "antigravity",
-      "subject": "nixconfig:frieren-daily-audit-2026-11-17",
-      "action": "Daily audit complete: reset failed backup & sort units, verified Gen 282 & sentinel ok, updated SYSTEM.md & HANDOFF.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "/home/devji/SYSTEM.md",
-        "/home/devji/HANDOFF.md"
-      ],
-      "base_commit": "b6fcb35fc8e091bacbe5e66826b09fa7758639da",
-      "branch": "main",
-      "frame": "03h91mn3ydpk2n4px2r8xzl5k"
-    },
-    {
-      "id": "d18ab009-af6c-405f-a5ea-d72ee537e02f",
-      "ts": "2026-11-16T23:25:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:tokenloom-gate",
-      "action": "tokenloom: loom-cli bench now measures send->diff over a real socket (same segment window.mjs gates); new mixed-burst coalesce test found and fixed a diff-span bug (delete behind an earlier splice under-reported); snapshot measured 42k/170k/425k bytes, never packed. 25 tests, uitest 18/18, retune 60/60, smoke+window pass on clanker. pushed 0e3e4258",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "928d4cb49734020289a020371bff44d654a9488f",
-      "branch": "main",
-      "frame": "03h903m5cahig56mvuo3vtn87"
-    },
-    {
-      "id": "04c8dfd1-684a-4270-8aca-eabf9da7ebfb",
-      "ts": "2026-11-16T23:02:57Z",
-      "source": "devji",
-      "subject": "nixconfig:apps-transports",
-      "action": "apps:doctor + bounded probes; POST /api/pipeline-sql replaces the 240 s ssh wait for apps:query; skill now leads with transports",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6fcb35fc8e091bacbe5e66826b09fa7758639da",
-      "branch": "main",
-      "frame": "03h8zz8ltqf6atcq4hz1dp8lc"
-    },
-    {
-      "id": "b021c590-82d5-46e1-9dff-ce7b9156f097",
-      "ts": "2026-11-16T22:08:21Z",
-      "source": "devji",
-      "subject": "nixconfig:tokenloom-frames",
-      "action": "tokenloom: frames of one batch packed into one message (drain+decode_server_at, 12-13 frames/message measured); window.mjs now gates edit->diff p99 (3.45 pass @2ms, 5.36/9.41 fail @4/8ms); coalesce test: 10 ops in one window = 1 revision, 1 diff. 24 tests, uitest/retune/smoke pass on clanker, pushed d7fa03aa",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6c0d6bfeed272b785db46145c59ab851b607e65",
-      "branch": "main",
-      "frame": "03h8zokmlynk6g5qxy624psq6"
-    },
-    {
-      "id": "b3dc7516-15c0-4ee3-84c5-98fce68fd1c5",
-      "ts": "2026-11-16T21:10:47Z",
-      "source": "devji",
-      "subject": "nixconfig:tokenloom-window",
-      "action": "tokenloom: TCP_NODELAY on the listener removes the 41 ms Nagle stall between ack and list frame; batch window 8->2 ms picked by measurement (p99 9.45->3.29 ms end to end); retune identity now asserted in the Rust suite; retune identity 60/60, uitest 18/18, smoke and 20 tests pass on clanker",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafe6c1b6230f31aba93e429524e2175c423f496",
-      "branch": "main",
-      "frame": "03h8zdbqzspdnqgtp212hcsps"
     }
   ]
 }

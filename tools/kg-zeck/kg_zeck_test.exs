@@ -117,6 +117,16 @@ defmodule KGZeckTest do
     refute KGZeck.status(repo, cache)["next_leaps"]
   end
 
+  test "removing a doc from the index removes its cached node even when the file remains" do
+    {repo, cache} = repo_fixture()
+    KGZeck.graph(repo, cache)
+    KGZeck.git(repo, ["rm", "--cached", "docs/a.md"])
+    assert File.regular?(Path.join(repo, "docs/a.md"))
+    graph = KGZeck.graph(repo, cache) |> KGZeck.read()
+    refute Enum.any?(graph["nodes"], &(&1["id"] == "doc:docs/a.md"))
+    refute Enum.any?(graph["edges"], &(&1["from"] == "doc:docs/a.md"))
+  end
+
   test "greedy terms have non-adjacent Fibonacci indexes and sum to n" do
     fibs = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 

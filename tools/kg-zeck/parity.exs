@@ -160,6 +160,24 @@ defmodule KGZeckParity do
       cmd!("git", ["-C", repo, "add", "docs/zeck-synthetic.md"])
       {_, added, _} = compare(repo, cache, "added doc leaps")
       assert!(added["epoch"] != inventory_leap["epoch"], "added doc did not leap")
+      cmd!("git", ["-C", repo, "rm", "--cached", "docs/zeck-synthetic.md"])
+
+      {untracked, untracked_state, _} =
+        compare(repo, cache, "untracked doc removed despite local file")
+
+      assert!(
+        File.regular?(Path.join(repo, "docs/zeck-synthetic.md")),
+        "untracked file did not remain"
+      )
+
+      assert!(
+        not Enum.any?(untracked["nodes"], &(&1["id"] == "doc:docs/zeck-synthetic.md")),
+        "untracked doc remained in graph"
+      )
+
+      assert!(untracked_state["epoch"] != added["epoch"], "untracked doc did not leap")
+      cmd!("git", ["-C", repo, "add", "docs/zeck-synthetic.md"])
+      compare(repo, cache, "doc tracked again")
       File.rm!(Path.join(repo, "docs/zeck-synthetic.md"))
       {_, deleted, _} = compare(repo, cache, "deleted doc leaps")
       assert!(deleted["epoch"] != added["epoch"], "deleted doc did not leap")

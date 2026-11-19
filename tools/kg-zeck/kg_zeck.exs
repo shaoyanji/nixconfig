@@ -226,6 +226,7 @@ defmodule KGZeck do
     if File.exists?(manifest) do
       state = read(manifest)
       graph = read(Path.join(cache, "cores/#{state["epoch"]}.json"))
+      tracked = git(repo, ["ls-files", "-z"]) |> String.split(<<0>>, trim: true) |> MapSet.new()
 
       current =
         Map.new(state["docs"], fn {path, _} ->
@@ -245,6 +246,9 @@ defmodule KGZeck do
 
       reason =
         cond do
+          Enum.any?(state["docs"], fn {path, _} -> not MapSet.member?(tracked, path) end) ->
+            "doc no longer tracked"
+
           core_key(repo, state["docs"]) != state["core_key"] ->
             "core key changed"
 

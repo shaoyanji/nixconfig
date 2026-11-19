@@ -400,8 +400,8 @@ in {
     # telemetry is `command_line` sensors, so nothing lost the feed. The module
     # stays for the ESP32/Zigbee layer in [[exp-009]].
     mqtt.enable = false;
-    # devices.* opts in (zigbee2mqtt needs mqtt.enable on); docs: modules/services/home-assistant.nix.
-    extraPythonPackages = [];
+    # devices.* opts in — 2026-11-19 LAN sweep: 65OLED759 TV at 192.168.3.26:1925, no Hue bridge.
+    # devices.ambilightTV = { enable = true; host = "192.168.3.26"; }; devices.hue.bridgeIP = "192.168.3.xx";
   };
 
   # Shell-history sync (modules/services/atuin-server.nix). The one account is

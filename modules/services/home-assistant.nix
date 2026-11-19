@@ -1,4 +1,4 @@
-# Home Assistant device-layer stack: Home Assistant + Mosquitto MQTT broker
+# Home Assistant device-layer stack: HA + Mosquitto; Hue/Ambilight lead, zigbee stays opt-in
 {
   config,
   lib,
@@ -116,6 +116,9 @@ in {
         "met"
         "ipp"
         "mqtt"
+        "hue"
+        "philips_js"
+        "cast"
       ];
       description = ''
         Extra Home Assistant **Python dependencies** — not "enabled components".
@@ -123,11 +126,12 @@ in {
         configure the matching integration. An integration from this list is only
         live once it has a config entry (or YAML support). Measured against
         `configDir/.storage/core.config_entries` and the rendered
-        `configuration.yaml`, 4 of the 11 defaults are actually active
-        (`command_line` via the rendered block, `github`, `met`, `ipp`) and 7 are
-        dependency-only (`rest`, `todoist`, `jellyfin`, `plex`, `fritzbox`,
-        `immich`, `mqtt`). Adding a name here makes an integration *available*;
-        it does not turn it on.
+        `configuration.yaml`, 4 of the 14 defaults are actually active
+        (`command_line` via the rendered block, `github`, `met`, `ipp`) and the
+        rest are dependency-only (`rest`, `todoist`, `jellyfin`, `plex`,
+        `fritzbox`, `immich`, `mqtt`; `hue`, `philips_js` and `cast` wait for
+        SSDP discovery to offer a config flow). Adding a name here makes an
+        integration *available*; it does not turn it on.
       '';
     };
 
@@ -139,7 +143,7 @@ in {
 
     extraPythonPackages = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = ["aiohue" "ha-philipsjs"];
       example = ["androidtvremote2" "hue-ble"];
       description = ''
         The one-line way to add a Home Assistant Python dependency: attribute
@@ -152,6 +156,48 @@ in {
     };
 
     devices = {
+      hue = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Declare a Philips Hue bridge on this LAN (deps already ship via extraComponents)";
+        };
+        bridgeIP = lib.mkOption {
+          type = lib.types.str;
+          default = "";
+          example = "192.168.3.40";
+          description = ''
+            The bridge's LAN address. Hue is a config-flow integration: the
+            `hue` component and aiohue are already installed, SSDP discovery
+            (part of `default_config`) finds the bridge on the LAN, and the
+            pairing (link button → application key) completes in the HA UI.
+            This value is a declarative record of where it lives — HA's own
+            discovery is what actually wires it.
+          '';
+        };
+      };
+
+      ambilightTV = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Declare a Philips Ambilight TV on this LAN (philips_js, JointSPACE :1925/:1926)";
+        };
+        host = lib.mkOption {
+          type = lib.types.str;
+          default = "";
+          example = "192.168.3.26";
+          description = ''
+            The TV's LAN address. Philips TVs answer the JointSPACE API on
+            1925/1926 (probe `GET http://<host>:1925/1/system` for the model).
+            Like hue this is a config-flow integration — discovery offers it
+            in the HA UI and digest-auth pairing completes there. Measured on
+            frieren's LAN 2026-11-19: a 65OLED759/12 answers 192.168.3.26:1925
+            with api_version 6.1.
+          '';
+        };
+      };
+
       zigbee2mqtt = {
         enable = lib.mkOption {
           type = lib.types.bool;

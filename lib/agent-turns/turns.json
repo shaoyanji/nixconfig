@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-19T19:57:19Z",
+  "generated": "2026-11-19T20:07:21Z",
   "count": 200,
-  "pin": "619a1818415834b65961d8628b54a0e62839fa2ddcff29e39f99a7d0f121cc5c",
+  "pin": "a105708fa1cff159600ebb77be7faf37d85e065703e0352c4e19ad25481acefa",
   "turns": [
+    {
+      "id": "7eeaae8c-82ec-42f8-84bc-9f10b0152508",
+      "ts": "2026-11-19T20:03:37Z",
+      "source": "devin",
+      "subject": "nixconfig:ha-hue-first",
+      "action": "claim: LAN probe + ha-stack rework to Hue/Ambilight-first",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/home-assistant.nix",
+        "hosts/frieren/"
+      ],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9mg3mc453hr7hitop8r0hh"
+    },
+    {
+      "id": "6efb62fb-bf4b-4bc5-90ef-097e3de0a827",
+      "ts": "2026-11-19T19:57:35Z",
+      "source": "devin",
+      "subject": "nixconfig:ha-device-integration",
+      "action": "done: ha-stack devices surface (zigbee2mqtt/esphome/zha/mqttDevices via upstream modules + homeassistant.packages !include), extraPythonPackages attr-name resolution, mqtt assertion + port-dup warning; verified with all-enabled synthetic nixos eval (z2m settings/comps/tmpfiles/zha path all correct); defaults off, frieren unchanged | gates: parse, frieren role eval, issues=[], census 6539/6539, alejandra+statix, full hooks",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
+      "branch": "main",
+      "frame": "03h9mex5dcdomulz1yz62xqz5"
+    },
     {
       "id": "de270991-a569-4569-9f53-73dcf62e347d",
       "ts": "2026-11-19T19:53:01Z",
@@ -2797,32 +2826,6 @@
       "base_commit": "b94b28bca2b385b240e6c6f74f44519ffa84df06",
       "branch": "main",
       "frame": "03h9bvl0kpbrayd5zg03hgo28"
-    },
-    {
-      "id": "a074ed07-2548-45e7-96ad-8ef73510cc3e",
-      "ts": "2026-11-18T11:34:12Z",
-      "source": "devji",
-      "subject": "nixconfig:pins-autohash",
-      "action": "lib/pins.toml pins can name a hash_key; pre-commit's pins-refresh now rewrites that modules/config/fetches.json sha256 and stages both files together. nix-hash-update.sh takes key args (one fetch, unchanged when identical). Verified by corrupting the matt-resume hash: refresh repaired it and reported rewritten, second run unchanged; the no-key sweep still updates all 6 entries; checks:nix:format, checks:quick and the task graph gate rc=0.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ccd7d4dd2e6307507b90c72e05faf6024fdf1192",
-      "branch": "main",
-      "frame": "03h9bvagd8feyrvdgf756chl0"
-    },
-    {
-      "id": "0ed65441-1459-4ba1-84eb-1f66943f5230",
-      "ts": "2026-11-18T11:02:08Z",
-      "source": "devji",
-      "subject": "nixconfig:deploy-gate-and-fusion-timer",
-      "action": "delphi and frieren deployed; deploy gate asks the closure, toplevel built on target; turns-fuse timer daily 06:20 (200->207)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2c71ebd0e74f654ef5bc4e42ea2df7d59aba79c3",
-      "branch": "HEAD",
-      "frame": "03h9bp0y43tqezr2li04wqyib"
     }
   ]
 }

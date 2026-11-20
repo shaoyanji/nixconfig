@@ -25,6 +25,7 @@
   # modules, which is the one edge the registry could not name. A module takes
   # `user` as an argument, so the file has one name (`.#modules."global.user"`)
   # and a rename fails `checks.nix-registry` instead of an eval.
+  appendModules = extra: mods: mods ++ extra;
   inventoryModules = [
     {
       _module.args = {
@@ -44,7 +45,7 @@
 
   globalModules =
     inventoryModules
-    ++ [
+    |> appendModules [
       {
         system.configurationRevision = self.rev or self.dirtyRev or null;
       }
@@ -66,7 +67,7 @@
   # Minimal sharedModules for home-manager-only (standalone) configs.
   hmSharedModulesHome =
     inventoryModules
-    ++ [
+    |> appendModules [
       inputs.sops-nix.homeManagerModules.sops
       inputs.nix-index-database.homeModules.nix-index
       # ~/AGENTS.md from `.#homeAgents.<host>`; standalone HM configs get
@@ -74,7 +75,7 @@
       moduleFiles."user.ai.home-agents"
     ];
 in rec {
-  inherit globalModules hmSharedModulesHome inventoryModules;
+  inherit globalModules hmSharedModulesHome inventoryModules appendModules;
 
   # A host is a list of named features, not one of seven chains.
   #
@@ -151,7 +152,7 @@ in rec {
     # (pulled in via roles/minimal → user/ai) fails eval on alarm/kali.
     home =
       hmSharedModulesHome
-      ++ [
+      |> appendModules [
         {
           nixpkgs.config.allowUnfree = true;
           nixpkgs.overlays = [inputs.llm-agents.overlays.shared-nixpkgs];
@@ -164,7 +165,9 @@ in rec {
     features,
     modules ? [],
   }:
-    lib.concatMap (f: featureModules.${f}) features ++ modules;
+    features
+    |> lib.concatMap (f: featureModules.${f})
+    |> appendModules modules;
 
   # The seven chain names as DATA: a chain is exactly its features, in order, and
   # the docs table is a projection of this rather than a second copy of it

@@ -1,8 +1,86 @@
 {
-  "generated": "2026-11-20T13:11:57Z",
+  "generated": "2026-11-20T13:28:20Z",
   "count": 200,
-  "pin": "ec901a835b18b441db72aa1b1e1a306e3ea70bd95a8ba4627189f0b445263c38",
+  "pin": "3294e485d8b44b2907908efd51967b3e7dad17d36c28fcf4dc6ecfab958a6e62",
   "turns": [
+    {
+      "id": "7eb704bf-9db3-447a-abdb-ecdf7a3b09c0",
+      "ts": "2026-11-20T13:17:40Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: agy backed off (rate-limited), job search workload moved to delphi freebuff. frieren freebuff→site deploy, devin→nixconfig refactoring (pipe-operator branch), delphi freebuff→pipeline report. Commits: 4522c0d7 EN CV review, e159f195 DE Lebenslauf fix, a2a982cf CV links sitewide, e01885b5 sops anchor check. | gate: pane-watch BUSY x2 (frieren) + delphi freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9s23j1stkt6wpvkcvijmgd"
+    },
+    {
+      "id": "60f654e4-5669-40a6-a12f-629851b4e4b1",
+      "ts": "2026-11-20T13:14:53Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf vs resume.json — period() collapses equal years (2012 – 2012 gone), degree line comma-separated, contact falls back to basics.url since lebenslauf.json has no profiles | gate: typst compile EN 2 pages + DE 3 pages, zero equal-year ranges, pushed | parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups, identical dates | supersedes 03h9s1gzkg04vam0pscfz9qqs (posted before push)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9s1jw3kys0fwoszjeo0nsu"
+    },
+    {
+      "id": "349159e2-2ebe-402b-8dc4-fee073b4ef0e",
+      "ts": "2026-11-20T13:14:28Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf vs resume.json — period() collapses equal years (2012 – 2012 gone), degree line comma-separated, contact falls back to basics.url since lebenslauf.json has no profiles | gate: typst compile EN 2 pages + DE 3 pages, zero equal-year ranges, rebased on origin/main and pushed | corpus parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups, identical dates",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f6bc810465b0d7ff10554927a196d4a93b58aae",
+      "branch": "main",
+      "frame": "03h9s1gzkg04vam0pscfz9qqs"
+    },
+    {
+      "id": "fa79dc4f-73e0-4767-8b25-dd77336063fb",
+      "ts": "2026-11-20T13:14:01Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf vs resume.json — period() collapses equal years (2012 – 2012 gone), degree line comma-separated, contact falls back to basics.url since lebenslauf.json has no profiles | gate: typst compile EN+DE PASS, no equal-year ranges in either, DE 3 pages | corpus parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups, identical dates | supersedes 03h9s19gexigf236pthlnn172 (push rejected, rebased)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f6bc810465b0d7ff10554927a196d4a93b58aae",
+      "branch": "main",
+      "frame": "03h9s1dtx26k0fgie9o1vpv8m"
+    },
+    {
+      "id": "35c8ed03-1318-4977-975e-28dda5628299",
+      "ts": "2026-11-20T13:13:24Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf accuracy pass vs resume.json — period() collapses equal years (2012 – 2012 / 2026 – 2026 gone), education line comma-separated, contact falls back to basics.url because lebenslauf.json has no profiles | gate: typst compile EN+DE fixtures PASS, DE 3 pages full corpus, EN selection 2 pages | supersedes nothing; DE corpus parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups match dates and counts",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e86439530676785dc64eaf5b8454bf90d1921719",
+      "branch": "main",
+      "frame": "03h9s19gexigf236pthlnn172"
+    },
+    {
+      "id": "d6e40f3b-65ed-4259-91ef-1b1ae720c0e6",
+      "ts": "2026-11-20T13:12:39Z",
+      "source": "devin",
+      "subject": "nixconfig:config-registry-schema",
+      "action": "landed: registry-schema audits .sops.yaml — every keys: anchor must be claimed by a group age list, every *alias must resolve, stale exceptions refused; sopsAnchorExceptions records garnix (garnixMachine repo-key). Bite-tested unrecorded (throws naming &garnix) | gate: checks:quick PASS (registry-schema: 42 sops anchors)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e01885b559ae3cdd9523b76154bb58c2d7d206d1",
+      "branch": "devin/sops-anchor-check",
+      "frame": "03h9s147c3qdf3glulrpebxlw"
+    },
     {
       "id": "fa41aac8-a276-483f-b1b3-44a93f74c96b",
       "ts": "2026-11-20T13:08:38Z",
@@ -2767,91 +2845,6 @@
       "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
       "branch": "main",
       "frame": "03h9jhqjvtbf1xhymrkd7jts0"
-    },
-    {
-      "id": "158153b4-3bcc-4558-a8a1-269ebbe1d7ef",
-      "ts": "2026-11-19T10:48:30Z",
-      "source": "agy",
-      "subject": "apps:bfl-lead-update",
-      "action": "landed: updated BFL product engineer row to Expired | gate: verify curl delphi api",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jfnrgetu67zxtze6k9cp6"
-    },
-    {
-      "id": "134e2e20-d418-4601-849f-32abd700704a",
-      "ts": "2026-11-19T10:48:16Z",
-      "source": "agy",
-      "subject": "apps:bfl-lead-update",
-      "action": "start: update BFL product engineer row status in delphi apps db",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jfm3bpfe5070gtg0zczl3"
-    },
-    {
-      "id": "197ea516-9df8-466e-aebe-d7ab8f43fd4d",
-      "ts": "2026-11-19T10:18:11Z",
-      "source": "devin",
-      "subject": "nixconfig:fibtransponder-zeckendorf",
-      "action": "deltaqueue epoch-replay probe landed (internal/deltaqueue/epoch_probe_test.go, test-only): zeckendorf block-carving + FNV block keys + quotient addressing; gate PASSES — 10k ops: full 380µs vs segmented-p100 124µs (-67%), quotient hit 64ns, snapshot 59µs; save>0 at every p,R incl p=25%/R=1",
-      "outcome": "done",
-      "claims": [
-        "/Volumes/data/projects/fibtransponder"
-      ],
-      "files": [
-        "internal/deltaqueue/epoch_probe_test.go"
-      ],
-      "base_commit": "c5119370",
-      "branch": "main",
-      "frame": "03h9j9qjq3ozs3glp35uys0qk"
-    },
-    {
-      "id": "7e526c41-eade-4f52-9bf3-3df0c2513189",
-      "ts": "2026-11-19T10:18:01Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 16: agy updated 4 job rows (apps:rezi-leads-update done, Focused Energy=ready, Phantasma=passed, Good Hood+ecoplanet=expired). devin built Focused Energy application packet (lead→prep, English packet ready, PDFs verified) and started deltaqueue replay probe. freebuff on dispatch wrapper. agy now researching Black Forest Labs.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9j9pbuov7onyrud83ux72l"
-    },
-    {
-      "id": "16616029-9bd7-444d-8f84-df4ca2ea282a",
-      "ts": "2026-11-19T10:12:02Z",
-      "source": "agy",
-      "subject": "apps:rezi-leads-update",
-      "action": "landed: updated 4 job rows via task apps:update | gate: verify curl delphi api",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9j8j921feqz5dzlm6j0570"
-    },
-    {
-      "id": "40c3871d-b326-4f58-99de-5cf253faefdc",
-      "ts": "2026-11-19T10:11:22Z",
-      "source": "agy",
-      "subject": "apps:rezi-leads-update",
-      "action": "start: update pipeline status for 4 researched roles in delphi apps db",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9j8elkxn5y9lhmw4nmyf4x"
     }
   ]
 }

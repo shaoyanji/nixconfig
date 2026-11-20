@@ -9,6 +9,7 @@
 }: let
   inherit
     (moduleSets)
+    appendModules
     globalModules
     globalModulesContainers
     globalModulesDemo
@@ -29,7 +30,7 @@ in {
     system = "x86_64-linux";
     modules =
       inventoryModules
-      ++ [
+      |> appendModules [
         inputs.garnix-lib.nixosModules.garnix
         ../hosts/garnixMachine.nix
       ];
@@ -40,25 +41,25 @@ in {
     system = "x86_64-linux";
     # The fleet desktop chain. The host imports base-desktop-environment itself;
     # the Ryoku tier it ran from 2026-11-02 to 2026-11-11 is retired.
-    modules = globalModulesNixos ++ [../hosts/poseidon/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/poseidon/configuration.nix];
   };
 
   mtfuji = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [../hosts/mtfuji/configuration.nix];
+    modules = globalModulesContainers |> appendModules [../hosts/mtfuji/configuration.nix];
   };
 
   kellerbench = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [../hosts/kellerbench/configuration.nix];
+    modules = globalModulesContainers |> appendModules [../hosts/kellerbench/configuration.nix];
   };
 
   deckstation = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesContainers ++ [../hosts/deckstation/configuration.nix];
+    modules = globalModulesContainers |> appendModules [../hosts/deckstation/configuration.nix];
   };
 
   delphi = {
@@ -66,7 +67,7 @@ in {
     system = "aarch64-linux";
     modules =
       globalModulesContainers
-      ++ [
+      |> appendModules [
         inputs.disko.nixosModules.default
         ../hosts/delphi/configuration.nix
         # microvm retired on delphi (OCI A1 lacks KVM hardware acceleration;
@@ -83,7 +84,7 @@ in {
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/eisen/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/eisen/configuration.nix];
   };
 
   applevalley = {
@@ -91,7 +92,7 @@ in {
     system = "x86_64-linux";
     modules =
       globalModulesContainers
-      ++ [
+      |> appendModules [
         inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
         ../hosts/applevalley/configuration.nix
       ];
@@ -107,7 +108,7 @@ in {
     # sandbox` ssh alias and a `/var/lib/microvms/sandbox` state dir on the NAS that
     # nothing started. The bridge and NAT the canary needs come from
     # modules/profiles/microvm-host.nix, which infra-stack.nix imports directly.
-    modules = globalModulesNixos ++ [../hosts/frieren/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/frieren/configuration.nix];
   };
 
   ares = {
@@ -115,7 +116,7 @@ in {
     system = "x86_64-linux";
     modules =
       globalModulesContainers
-      ++ [
+      |> appendModules [
         inputs.impermanence.nixosModules.impermanence
         inputs.disko.nixosModules.default
         moduleFiles."global.impermanence"
@@ -129,7 +130,7 @@ in {
     system = "x86_64-linux";
     modules =
       globalModulesNixos
-      ++ [
+      |> appendModules [
         inputs.disko.nixosModules.default
         ../hosts/stark/configuration.nix
         (import ../hosts/stark/disko.nix {
@@ -150,7 +151,7 @@ in {
     # netbook and scratch adopt.
     modules =
       globalModulesNixos
-      ++ [
+      |> appendModules [
         inputs.disko.nixosModules.default
         ../hosts/fern/configuration.nix
         (import ../hosts/fern/disko.nix {device = "/dev/nvme0n1";})
@@ -162,7 +163,7 @@ in {
     system = "x86_64-linux";
     modules =
       globalModulesImpermanence
-      ++ [
+      |> appendModules [
         ../hosts/schneeeule/configuration.nix
         (import ../hosts/common/disko.nix {device = "/dev/sda";})
       ];
@@ -171,19 +172,19 @@ in {
   scratch = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/scratch/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/scratch/configuration.nix];
   };
 
   aristotle = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/aristotle/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/aristotle/configuration.nix];
   };
 
   diogenes = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/diogenes/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/diogenes/configuration.nix];
   };
 
   # netbook carries no global module chain — its own configuration is the whole
@@ -199,19 +200,19 @@ in {
     # injection explicitly — the same reason the microVM hosts above do. Without it
     # the host has no `config.fleet.inventory`, which `checks.<system>.inventory-modules`
     # rejects structurally and `hostChecks` rejects when it reads the registry.
-    modules = inventoryModules ++ [../hosts/netbook/configuration.nix];
+    modules = inventoryModules |> appendModules [../hosts/netbook/configuration.nix];
   };
 
   aceofspades = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/aceofspades/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/aceofspades/configuration.nix];
   };
 
   ancientace = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesNixos ++ [../hosts/ancientace/configuration.nix];
+    modules = globalModulesNixos |> appendModules [../hosts/ancientace/configuration.nix];
   };
 
   guckloch = {
@@ -219,7 +220,7 @@ in {
     system = "x86_64-linux";
     modules =
       globalModulesContainers
-      ++ [
+      |> appendModules [
         ../hosts/guckloch/configuration.nix
         inputs.nixos-wsl.nixosModules.default
       ];
@@ -234,7 +235,7 @@ in {
     # makes meaningless. The tunnel role needs native NixOS options only.
     modules =
       globalModules
-      ++ [
+      |> appendModules [
         moduleFiles."global.determinate-nix"
         inputs.sops-nix.nixosModules.sops
         ../hosts/minyx/configuration.nix
@@ -247,7 +248,7 @@ in {
     system = "x86_64-linux";
     modules =
       globalModulesContainers
-      ++ [
+      |> appendModules [
         ../hosts/sledgehammer/configuration.nix
         inputs.disko.nixosModules.default
       ];
@@ -256,7 +257,7 @@ in {
   demo = {
     kind = "nixos";
     system = "x86_64-linux";
-    modules = globalModulesDemo ++ [../hosts/demo/configuration.nix];
+    modules = globalModulesDemo |> appendModules [../hosts/demo/configuration.nix];
   };
 
   testvm = {
@@ -264,7 +265,7 @@ in {
     system = "x86_64-linux";
     modules =
       inventoryModules
-      ++ [
+      |> appendModules [
         inputs.microvm.nixosModules.microvm
         (import ../hosts/microvms/testvm.nix {})
         ({pkgs, ...}: {
@@ -281,7 +282,7 @@ in {
     system = "x86_64-linux";
     modules =
       inventoryModules
-      ++ [
+      |> appendModules [
         inputs.microvm.nixosModules.microvm
         ../hosts/microvms/frieren-canary.nix
       ];
@@ -291,21 +292,21 @@ in {
     kind = "home";
     system = "x86_64-linux";
     extraSpecialArgs = {inherit inputs self;};
-    modules = globalModulesHome ++ [../hosts/penguin.nix];
+    modules = globalModulesHome |> appendModules [../hosts/penguin.nix];
   };
 
   alarm = {
     kind = "home";
     system = "aarch64-linux";
     extraSpecialArgs = {inherit inputs self;};
-    modules = globalModulesHome ++ [../hosts/alarm.nix];
+    modules = globalModulesHome |> appendModules [../hosts/alarm.nix];
   };
 
   kali = {
     kind = "home";
     system = "aarch64-linux";
     extraSpecialArgs = {inherit inputs self;};
-    modules = globalModulesHome ++ [../hosts/kali.nix];
+    modules = globalModulesHome |> appendModules [../hosts/kali.nix];
   };
 
   # The Instabox VM. `kind = "home"` is the honest projection: we own only the
@@ -316,12 +317,12 @@ in {
     kind = "home";
     system = "x86_64-linux";
     extraSpecialArgs = {inherit inputs self;};
-    modules = globalModulesHome ++ [../hosts/clanker.nix];
+    modules = globalModulesHome |> appendModules [../hosts/clanker.nix];
   };
 
   cassini = {
     kind = "darwin";
     system = "aarch64-darwin";
-    modules = globalModulesMacos ++ [../hosts/cassini/configuration.nix];
+    modules = globalModulesMacos |> appendModules [../hosts/cassini/configuration.nix];
   };
 }

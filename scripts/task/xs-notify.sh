@@ -4,7 +4,7 @@
 set -euo pipefail
 
 TOKEN_FILE="/run/secrets/agent-turns-token"
-NTFY_PASS_FILE="/run/secrets/ntfy-fleet-password"
+NTFY_PASS_FILE="/run/secrets/ntfy/fleet-password"
 STATE_DIR="/var/lib/xs-notify"
 STATE_FILE="$STATE_DIR/last.sha1"
 XS_URL="https://delphi.cloudforest-kardashev.ts.net:8449/v1/events"

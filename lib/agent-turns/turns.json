@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-20T11:07:30Z",
+  "generated": "2026-11-20T11:33:23Z",
   "count": 200,
-  "pin": "13fc4c79e3060f3c2cf0a5784152c0d3ca38cfb95a1fc4ac1e9cb0683671459a",
+  "pin": "fa31185076d16d52ddd2eba60986e3390a74ae3a5d7802164be0516a64257f28",
   "turns": [
+    {
+      "id": "f828740b-4f6e-4c97-970a-d6764550f695",
+      "ts": "2026-11-20T11:07:48Z",
+      "source": "antigravity",
+      "subject": "nixconfig:open-129",
+      "action": "verified: open-129 permanent grant holds on delphi (day 5/7) | gate: task checks:gcal PASS, 0 invalid_grant in journal",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6cb73ec9fce873682b545d1ed4862cf1e39f27da",
+      "branch": "main",
+      "frame": "03h9rcq7lwgwb37idjl9yv91l"
+    },
     {
       "id": "d7c05ddf-730f-425c-89b4-5c4eedf79d3b",
       "ts": "2026-11-20T11:02:55Z",
@@ -2870,19 +2883,6 @@
       "base_commit": "c6ab06f1015a7a7896d54eebc26004465d0191e9",
       "branch": "main",
       "frame": "03h9ibo9nt9s3cbtxhoeakbex"
-    },
-    {
-      "id": "8c4b4adb-a251-4e45-bd5d-c2d8182aac9c",
-      "ts": "2026-11-19T00:20:58Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-19: 13 plate(s) kept of 15 spent, 5 roster row(s) waiting, 535 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c106ebf085ec1cd5ec670c53fc9438160a7dba94",
-      "branch": "main",
-      "frame": "03h9g12p3718qryy2npfr7gca"
     }
   ]
 }

@@ -138,16 +138,31 @@ task site:links                                                         # both N
 bash scripts/task/site-links.sh /tmp/matt-site cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf
 ```
 
-A passing build prints `site-links: no gaps` from the pre-flight and then
-`site-links: every internal link resolves and all 4 PDFs are linked`. An
-orphaned CV fails the build naming it:
+A passing build prints `site-links: no gaps — every target resolves and all 4
+built PDFs have a site link` from the pre-flight and then
+`site-links: every internal link resolves, all 4 PDFs are linked, and all 16 PDF
+anchors download`. An orphaned CV fails the build naming it:
 
 ```text
-site-links: 67 internal links over 15 pages, 4 PDFs (4 required)
-FAIL no page links cv-energy-de.pdf
-FAIL no page links cv-energy.pdf
-site-links: 2 unlinked PDF(s) of 4
+site-links: 81 internal links over 15 pages, 5 PDFs (4 required)
+FAIL no page links stray.pdf
+site-links: 1 unlinked PDF(s) of 5
 ```
+
+Each failure below is one mutation of a passing artifact, run through the same
+script, so the gate is known to fail for the reason it claims:
+
+| Perturbation | Exit | It prints |
+| :--- | ---: | :--- |
+| a required name the artifact does not ship (`cv-ghost.pdf`) | 1 | `FAIL required PDF not shipped cv-ghost.pdf` |
+| an extra PDF no page links (`stray.pdf`) | 1 | `FAIL no page links stray.pdf` — in the full pass and in `--gap` |
+| ` download` deleted from the anchor in `index.html` | 1 | `FAIL index.html: cv.pdf has no download attribute` |
+| `href="cv-energy.pdf"` pointed at a file that is not there | 1 | `FAIL index.html: cv-energy-gone.pdf -> /cv-energy-gone.pdf`, in both modes |
+| `cv-de.pdf` deleted from the artifact | 1 | `FAIL de/index.html: ../cv-de.pdf -> /cv-de.pdf`, and the count drops to `3 PDFs (4 required)` |
+
+The deployed artifact agrees with the gate rather than merely with the store:
+all four URLs on `matt.bountystash.com` answer `200 application/pdf` with the
+byte count and sha256 of the file this build produced.
 
 `--check` is not a flag on this Nix (`2.35.3`): it errors before building, and
 `--rebuild` only re-runs a derivation whose output is already in the store. To

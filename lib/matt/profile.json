@@ -234,7 +234,8 @@
         "SOPS and age",
         "Tailscale",
         "ZFS and btrfs",
-        "systemd"
+        "systemd",
+        "CI gates"
       ]
     },
     {
@@ -245,6 +246,7 @@
         "risk models",
         "bank audit reporting",
         "KEV and CVSS",
+        "vulnerability programme design",
         "Typst"
       ]
     }

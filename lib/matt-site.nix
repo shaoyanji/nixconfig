@@ -695,6 +695,14 @@
       if lang == "de"
       then builtins.filter (e: !(builtins.hasAttr (e.resumeName or e.name) deProjects)) joinProjects
       else [];
+    projectRank = e:
+      (
+        if e.end == ""
+        then "9999"
+        else e.end
+      )
+      + "/"
+      + e.start;
   in
     d
     // {
@@ -735,7 +743,7 @@
                 period = yearPeriod nowLabel e.start e.end;
               }
           )
-          joinProjects;
+          (lib.sort (a: b: projectRank a > projectRank b) joinProjects);
     };
 
   # A tailored CV is a projection of the corpus for its language: the variant

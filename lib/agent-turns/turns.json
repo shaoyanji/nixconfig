@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T22:31:23Z",
+  "generated": "2026-11-20T22:32:53Z",
   "count": 200,
-  "pin": "aff8cfff8f0c46958f178542bff4a76498aa6e8326ff8c789c22e2a198c1da97",
+  "pin": "b0b1857dc0940ba40385f2b8cbd0f4fed922752bec81017ec040e7bfa32f1176",
   "turns": [
+    {
+      "id": "41f5c2a0-5d84-4a65-ac2c-e03981c4b0cd",
+      "ts": "2026-11-20T22:32:16Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-refresh",
+      "action": "landed CV refresh (supersedes 301e3b5f, rewritten by rebase): CV lists the six newest projects, both stacks name CI gates + vulnerability programme design; matt-site build gate passed, cv.pdf deployed to shaoyanji (a34c3eb, run 44829435569 success)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ed1b695587fbc78e4b188a723b4cb7fb36276028",
+      "branch": "HEAD",
+      "frame": "03h9v2flxd8lovfif1zz2uit9"
+    },
+    {
+      "id": "ab80496e-067f-4957-b160-d3de013978c6",
+      "ts": "2026-11-20T22:31:35Z",
+      "source": "devin",
+      "subject": "nixconfig:dns-client-fallback",
+      "action": "landed: profiles.dnsClient (aristotle/diogenes/eisen consolidated, VIP+tailnet+public fallback, mkDefault) + checks:dns:resolver-health probe + delphi gatus dns:// endpoint; notes exp-104/exp-105 DELIVERED, resolver-independence half-met | gate: checks:quick PASS, drv-equality 17 identical, probe live PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ed1b695587fbc78e4b188a723b4cb7fb36276028",
+      "branch": "HEAD",
+      "frame": "03h9v2asxsehmw6n8deb1ixik"
+    },
+    {
+      "id": "0bae9c65-9419-40e2-91f0-6acd3e384a8f",
+      "ts": "2026-11-20T22:31:30Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-refresh",
+      "action": "CV now lists the six newest projects (joinProjects was oldest-first, so all 2026 work was cut) and both stacks name CI gates + vulnerability programme design; matt-site build passed typeset/ATS/site-links, cv.pdf copied to shaoyanji and deployed (run 44829435569)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "301e3b5fbb84d94b24fffc50b3c72ffced79c0b2",
+      "branch": "main",
+      "frame": "03h9v2abcqubfgbec9w4iy87j"
+    },
     {
       "id": "0f871a6b-a401-4c55-b791-17d60fc4daa3",
       "ts": "2026-11-20T22:26:21Z",
@@ -2722,49 +2761,6 @@
       "base_commit": "430d3f68ea1f0e1dee5825fd6eaf1dc2dba5c676",
       "branch": "HEAD",
       "frame": "03h9lj0zztxc6ax4q7rseowqg"
-    },
-    {
-      "id": "86bb4ba9-e020-418e-aec7-9a22afe61568",
-      "ts": "2026-11-19T17:12:40Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-clanker-migration",
-      "action": "survey: llm-agents installs 11 pkgs (qmd/ai-memory/toon/pdfvision/parallel-cli/agent-browser/antigravity-cli/reasonix/hermes-agent/dsh/freebuff); zero-caller: pdfvision, parallel-cli; dsh dead-vs-shadowed-service; nixpkgs#antigravity-cli exists on unstable",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "33ee153bef2c51c5ee743181da7004a474a380eb",
-      "branch": "HEAD",
-      "frame": "03h9lipf6vmc0jaz8x1zjw6ir"
-    },
-    {
-      "id": "82c7b426-bf05-4089-bba8-196ff28d53ec",
-      "ts": "2026-11-19T17:11:47Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-clanker-migration",
-      "action": "claim: survey llm-agents closure usage, clanker migration surface",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai",
-        "flake",
-        "hosts"
-      ],
-      "files": [],
-      "base_commit": "33ee153bef2c51c5ee743181da7004a474a380eb",
-      "branch": "HEAD",
-      "frame": "03h9lij5eluivuumyqjwxju4z"
-    },
-    {
-      "id": "16b30a4e-28fe-4ca7-aa39-c8ce60e90f06",
-      "ts": "2026-11-19T17:07:13Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-dsh-agy",
-      "action": "landed: 3 shadow files (delphi dsh-web stack, agy daemon-web on delphi+frieren), new 'shadow' comment kind (header census 6537->6532); KEEP all 4 agy flights — agy-nightly-system writes the sentinel auditRecord, killing it pages; handoff is zero-cost when quiet | gate: checks:nix:comments PASS, frieren+delphi role evals",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "33ee153bef2c51c5ee743181da7004a474a380eb",
-      "branch": "HEAD",
-      "frame": "03h9lhmzqjlo0b4ssnvcwsmnf"
     }
   ]
 }

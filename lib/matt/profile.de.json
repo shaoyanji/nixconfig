@@ -234,7 +234,8 @@
         "SOPS und age",
         "Tailscale",
         "ZFS und btrfs",
-        "systemd"
+        "systemd",
+        "CI-Gates"
       ]
     },
     {
@@ -245,6 +246,7 @@
         "Risikomodelle",
         "Berichte für Bankprüfungen",
         "KEV und CVSS",
+        "Aufbau von Schwachstellenprogrammen",
         "Typst"
       ]
     }

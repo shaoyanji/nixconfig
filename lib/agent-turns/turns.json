@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T15:36:52Z",
+  "generated": "2026-11-20T15:45:59Z",
   "count": 200,
-  "pin": "79b08986bef1c856c989fd7ad23f199f1232468b9d49ac43992060752cfb0080",
+  "pin": "edd5ee5b9db086ff032368d5cfe8d0374b6d59f8442ba8bd0ebbb6f94e97828d",
   "turns": [
+    {
+      "id": "3a509f64-bd0a-4c32-87f5-1b5f7577b7a9",
+      "ts": "2026-11-20T15:43:34Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "claim: identify leads > 1 week stale, prepare/draft recommended followups",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "ddd77ae426c6ec181a5aba9d2208070afdafe05c",
+      "branch": "main",
+      "frame": "03h9sulh6jwiykh4wn86r2rv7"
+    },
+    {
+      "id": "8964d84d-bfdc-449d-b73b-cd0450261346",
+      "ts": "2026-11-20T15:42:01Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "steward directive written to handoff: keep all panes moving, jev for all decisions, no self-coding, suggestions to jev then queue to panes, query panes not full logs, protect context",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ddd77ae426c6ec181a5aba9d2208070afdafe05c",
+      "branch": "main",
+      "frame": "03h9suamayllqskn4xbt3z162"
+    },
+    {
+      "id": "71db54e2-eb24-4b14-8a74-0707516a60dd",
+      "ts": "2026-11-20T15:41:29Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "landed: Seoul 99 marked rejected (44 total rejected, 0 active interviews); verified Legence TA followup was sent via himalaya 8627; compiled 55 Typst application packages (110 documents) to dist/ with 0 audit violations for the 13 active actionable prep targets | gate: apps:status PASS, apps:audit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ddd77ae426c6ec181a5aba9d2208070afdafe05c",
+      "branch": "main",
+      "frame": "03h9su6swqhjmi3v6kyeblf7t"
+    },
     {
       "id": "7864c310-86be-4c88-a575-1dbfcf20acbb",
       "ts": "2026-11-20T15:34:57Z",
@@ -2773,51 +2812,6 @@
       "base_commit": "5771d2da4feb5a091d951997aefcfe104f9c5b0b",
       "branch": "main",
       "frame": "03h9juh6jktl015q6qwtpeqcv"
-    },
-    {
-      "id": "e363b345-db24-46dc-b782-553407ce97db",
-      "ts": "2026-11-19T11:58:12Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 21: freebuff landed xs:list commits projection (5771d2da, commits now visible in ledger rows). Now on P1 sentinel loop (IN FLIGHT, pushUrl egress). agy produced Action-First Triage Matrix, now applying it to remaining untriaged leads. devin building bagua-weather (scipy compiling on remote builder). delphi on cloud service node (email-archive-triage investigation).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "5771d2da4feb5a091d951997aefcfe104f9c5b0b",
-      "branch": "main",
-      "frame": "03h9jt9xw5e8x75jftle4ygi9"
-    },
-    {
-      "id": "5b34574c-f057-4717-b544-5eede0f275ba",
-      "ts": "2026-11-19T11:51:26Z",
-      "source": "devji",
-      "subject": "nixconfig:xs-list-commits",
-      "action": "landed 5771d2da: xs-turn-query.jq row projection now carries commits (comma-joined, clipped 80) alongside claims/files, so .turns[0].commits is the stored hash instead of null; docs/agent-turns.md row contract and task summary updated; verified against the live dispatch turn",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5771d2da4feb5a091d951997aefcfe104f9c5b0b",
-      "branch": "main",
-      "frame": "03h9jrybqex5ssysci2vwba71"
-    },
-    {
-      "id": "e8044a69-1307-437b-9bdb-6cf9dad3da31",
-      "ts": "2026-11-19T11:50:14Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 20: freebuff corrected lebenslauf.md (removed fabricated Blazor template, real Matt Ji German CV, grep-verified no template claims survive). agy produced Action-First Triage Matrix job report (grouped Apply/Monitor/Pass, single-hurdle column). devin landed deltaqueue replay cache (bbb3dd7, 168µs vs 375µs -55%). freebuff now fixing xs:list commits projection. devin delegated bagua-weather build. delphi on cloud service node.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jrq49mp8ic063fwgv5asw"
     }
   ]
 }

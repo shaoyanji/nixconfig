@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T18:35:30Z",
+  "generated": "2026-11-20T18:46:09Z",
   "count": 200,
-  "pin": "8c2db604eab76260fd65fa4a7e6f9cd3bd427a9d652a170a594b3e4e3d04b338",
+  "pin": "a67533276d9b2ebc95935217dadf784a5352f60eeef7f93d153b4fcf9369f6e5",
   "turns": [
+    {
+      "id": "ae9d718d-73b9-4010-a0e6-05df045e4670",
+      "ts": "2026-11-20T18:42:48Z",
+      "source": "pane-idle-watch",
+      "subject": "pane-steward:full-run",
+      "action": "Drove all idle panes (1.1/2.1/delphi twice) via jevdecide; all working; agy left idle at live-email confirm",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fb394ab3714fffd09eadafefaa106f14f1297a3e",
+      "branch": "main",
+      "frame": "03h9ttlwipzgwvnaql8pc6kzd"
+    },
+    {
+      "id": "21c5c5c8-0e46-48ae-9972-532a6cc5d7da",
+      "ts": "2026-11-20T18:37:45Z",
+      "source": "pane-idle-watch",
+      "subject": "pane-steward:delphi-mail-sweep",
+      "action": "Delphi triage done; re-drove with mail backlog sweep (dry-run)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fb394ab3714fffd09eadafefaa106f14f1297a3e",
+      "branch": "main",
+      "frame": "03h9tsmfd5uuz4qnsgjmzmwyz"
+    },
+    {
+      "id": "d86ade89-e54d-4286-8eb8-64a351f05cd1",
+      "ts": "2026-11-20T18:35:54Z",
+      "source": "devin",
+      "subject": "nixconfig:dead-modules",
+      "action": "landed: removed 2 never-wired registry modules (dockerbuilder-flake, cache-auth), registry 170->168 | gate: checks:drv-equality PASS (17 identical, 13 unchanged errors) + checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8b963fad51c71e28031c115900e7cf7499a6f229",
+      "branch": "HEAD",
+      "frame": "03h9ts9e4o270gugof2lltcyy"
+    },
     {
       "id": "6aa2270f-4d87-4470-881c-3219fbdae7fa",
       "ts": "2026-11-20T18:33:07Z",
@@ -2754,51 +2793,6 @@
       "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
       "branch": "main",
       "frame": "03h9k5zirop1lqy17rgwtxp7a"
-    },
-    {
-      "id": "34efc8d2-b952-4c92-a887-799cd52426de",
-      "ts": "2026-11-19T13:03:12Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 27: devin reviewing zeckendorf PR #8 (kg: opt-in Elixir cache with Zeckendorf segments, 1052 additions, fail-closed security/logic review + Elixir tests). delphi building app packets as broker (INDEX.md, no-send without verified recipients). freebuff session released (restarting). agy idle.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9k5z2k6e3xn52n75rie95t"
-    },
-    {
-      "id": "3d78c6f0-de9d-4948-a848-bed4dae2e23f",
-      "ts": "2026-11-19T12:59:39Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 26: devin published bagua-weather public (shaoyanji/bagua-weather, MIT LICENSE + CI pytest+ruff, gate GitHub Actions PASS, final commit 71febcc). delphi as data broker/runner building app packets from agy job report (7 drafts, decided no-send without verified recipients, fixing a Monitor->prep re-bucket). freebuff+agy idle.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9k5a3hy9h4vskuoqr8oajg"
-    },
-    {
-      "id": "3251d67b-2fd0-42ca-9159-f43d9929423e",
-      "ts": "2026-11-19T12:50:16Z",
-      "source": "devin",
-      "subject": "scratch:bagua-weather",
-      "action": "published: shaoyanji/bagua-weather public; finishing touches: MIT LICENSE + CI (pytest+ruff) | gate: GitHub Actions run 44527506367 PASS + local pytest 38 PASS, ruff clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9k3g3orll8hl430i129452"
     }
   ]
 }

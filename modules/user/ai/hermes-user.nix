@@ -499,9 +499,6 @@ in {
           # setuid and makes child agents fail escalation with "sudo binary
           # lacks setuid" (seen 2026-10-08).
           "PATH=/run/wrappers/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
-          # plugin deps ride PYTHONPATH — PM's frozen export wants a uv.lock the
-          # package does not ship; selection: plugins.enabled, hermes-persona/config.yaml.
-          "PYTHONPATH=${pkgs.python3.withPackages (ps: [ps.requests ps.aiohttp])}/${pkgs.python3.sitePackages}"
         ];
         Restart = "always";
         RestartSec = 5;

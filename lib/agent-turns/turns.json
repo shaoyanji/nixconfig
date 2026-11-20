@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-20T12:28:15Z",
+  "generated": "2026-11-20T12:30:36Z",
   "count": 200,
-  "pin": "bd1859ea1c410e695c23bc38d5092920a2f85278762044b85e20548e8b4f7441",
+  "pin": "9cbb855dc045bd660058c2830d3d7f230f50c8ef5e9af7d3796462a701723ffd",
   "turns": [
+    {
+      "id": "9b4ea9bd-7cbc-4d17-8ad2-10b715fc5dd2",
+      "ts": "2026-11-20T12:28:53Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: lib/matt-site.nix cvFiles list drives the four CV installs and a link gate that runs last inside the matt-site derivation, with those CVs as required targets; site-links.sh takes required PDFs and still fails unlinked PDFs and dead hrefs, so a deploy cannot ship an orphaned CV | gate: nix build .#sites.matt-site PASS (4/4 CVs linked; negative build fails) + task site:links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "49e3c484a5cf14745a45d39ca0f2bd06958b99be",
+      "branch": "main",
+      "frame": "03h9rskgcgtkqhmm1xnheal08"
+    },
     {
       "id": "fc1ecbf2-4fbf-4ed1-a1e2-4b284761ea8b",
       "ts": "2026-11-20T12:27:08Z",
@@ -2837,22 +2850,6 @@
       "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
       "branch": "main",
       "frame": "03h9iva9oywxx3do5pcobh3y6"
-    },
-    {
-      "id": "6a4d7002-3329-437c-809a-93594775f9de",
-      "ts": "2026-11-19T09:01:51Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 10: freebuff landed key_services structuring (bf825049, registry records for service name/port/host). Fed it record-port gate (cross-check records vs live listeners). agy completed AGENTS.md turns guidance (0a4bfefb).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "bf8250495c37d3c90bc66b08e1385c0ebffa7137",
-      "branch": "main",
-      "frame": "03h9iutqqyu6u9yr39a2toume"
     }
   ]
 }

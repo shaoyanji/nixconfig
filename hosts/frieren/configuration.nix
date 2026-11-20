@@ -796,7 +796,6 @@ in {
       445
       139
       2049
-      8766 # FlipsiBridge relay (hermes-android)
 
       8123 # HomeAssistant
       6801 # AriaNg web UI

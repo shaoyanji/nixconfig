@@ -71,9 +71,9 @@
   contractJson = builtins.toJSON (
     map
     (d: {
-      key = d.key;
-      plain = d.plain;
-      shifted = d.shifted;
+      inherit (d) key;
+      inherit (d) plain;
+      inherit (d) shifted;
       plain_chord = "Mod+${d.key}";
       shifted_chord = "Mod+Shift+${d.key}";
       command = "wtype -- ${lib.escapeShellArg d.plain}";

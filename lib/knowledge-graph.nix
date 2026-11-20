@@ -335,8 +335,8 @@
           type = "service";
           label = s.name;
           host = h;
-          port = s.port;
-          note = s.note;
+          inherit (s) port;
+          inherit (s) note;
         })
         inventory.hosts.${h}.software.services
     )

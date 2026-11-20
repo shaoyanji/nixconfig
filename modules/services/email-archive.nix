@@ -152,7 +152,7 @@
   # routes to its owner, and this file is the only place a new one is added.
   pluginRules = (pkgs.formats.json {}).generate "email-archive-plugins.json" (
     lib.mapAttrs (name: plugin: {
-      label = plugin.label;
+      inherit (plugin) label;
       rules =
         map (rule: {
           owner =

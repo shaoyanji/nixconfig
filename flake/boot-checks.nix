@@ -127,7 +127,7 @@ let
       # share the machine (TCG is one thread per vCPU, so this is the difference
       # between half the box and all of it). A host whose own units take minutes to
       # converge needs the second core or the gate measures boot speed, not boot.
-      cores = size.cores;
+      inherit (size) cores;
       diskSize = 4096;
     };
   };

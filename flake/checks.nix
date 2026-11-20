@@ -688,11 +688,11 @@ lib.genAttrs systems.work (
 
       registry-schema = let
         schema = import ../lib/registry-schema.nix;
-        knobs = (builtins.fromTOML (builtins.readFile ../modules.toml)).knobs;
+        inherit ((builtins.fromTOML (builtins.readFile ../modules.toml))) knobs;
         ids = builtins.attrNames knobs;
         checks = (builtins.fromTOML (builtins.readFile ../taskfiles/checks.toml)).check;
         checkNames = map (r: r.name) checks;
-        hosts = (builtins.fromTOML (builtins.readFile ../inventory.toml)).hosts;
+        inherit ((builtins.fromTOML (builtins.readFile ../inventory.toml))) hosts;
         hostNames = builtins.attrNames hosts;
 
         kebab = "[a-z0-9]+(-[a-z0-9]+)*";

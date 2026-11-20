@@ -29,7 +29,7 @@
   inventoryModules = [
     {
       _module.args = {
-        inventory = inventory;
+        inherit inventory;
         user = import moduleFiles."global.user";
       };
     }

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-20T18:15:19Z",
+  "generated": "2026-11-20T18:19:55Z",
   "count": 200,
-  "pin": "fcfe69b21b2e3d76c6af719b12d980ed44f8b53b456a8cf6dc2aa942baff1cdc",
+  "pin": "86e9be0ffe7f8786a94e1570e54cd679ea2f2548504f2de01d159a5c11037df3",
   "turns": [
+    {
+      "id": "13c29c9b-a788-46b6-a1e8-24e372f93042",
+      "ts": "2026-11-20T18:17:55Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "drove freebuff pane: Jev (typesafe) chose verify_cv_site (p=0.7, margin 0.42, needs_review but decisive margin) — freebuff now verifying the CV link gate on the built site",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3c19b980dc2e5a7c2aa50d19af0f85c13306401",
+      "branch": "main",
+      "frame": "03h9toqw7uudkbypeilq3f3d8"
+    },
+    {
+      "id": "367df9ff-2414-4376-b23e-20f249446e35",
+      "ts": "2026-11-20T18:16:29Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:job-search-loop",
+      "action": "steward: Jev decided drafts (p=1.0) for the 8 staged follow-up emails; pane at confirmation gate, emails remain unsent in Gmail Drafts awaiting human review",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3c19b980dc2e5a7c2aa50d19af0f85c13306401",
+      "branch": "main",
+      "frame": "03h9togx9syhqz0bnnnw5nqek"
+    },
     {
       "id": "4074a832-7bc7-4a94-92a3-a5856f196b88",
       "ts": "2026-11-20T18:12:15Z",
@@ -2775,35 +2801,6 @@
       "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
       "branch": "main",
       "frame": "03h9k0p6phmkl1cv32ggopwz6"
-    },
-    {
-      "id": "f91b2f14-3bee-402a-974f-523e142f1cb1",
-      "ts": "2026-11-19T12:35:57Z",
-      "source": "buffy",
-      "subject": "nixconfig:loopcv-restategy",
-      "action": "LoopCV mapped: loopcv.ai is NXDOMAIN, real app app.loopcv.pro. 5 loops all auto-applying: Consultant/BA US 67 apps, Solar PM US 45, AI Engineer DE 7, Renewable Energy DE 8, SWE Freiburg 2; 129 apps, 558 emails, 2718 pending, 0 interviews, 51 unanswered questions. Google sign-in needs a passkey (sops gmail value is IMAP-only) so used magic-link reset. Auto-apply off on Consultant/BA, Solar PM, AI Engineer; kept on for DE energy + Freiburg SWE.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9k0ndv3wktmxfrsk3freju"
-    },
-    {
-      "id": "06cb4d62-b04c-491b-aa0c-d3b993af6b14",
-      "ts": "2026-11-19T12:32:25Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 24: agy updated 30 pipeline rows (apps:triage-update done, Apply/Monitor/Pass/Expired, verified 30/30). Now researching Monitor-group leads (Parloa, evoila, Workato, Octopus, Castle Tech). freebuff on LoopCV (extracting auto-apply loop cards via CDP). devin on M5 ablation. delphi on email archive verification.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9jzyj1oy893rhl3ttnlcge"
     }
   ]
 }

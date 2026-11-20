@@ -144,7 +144,7 @@
       }
       else {
         inherit inside;
-        entries = acc.entries;
+        inherit (acc) entries;
       };
     out =
       builtins.foldl' step {

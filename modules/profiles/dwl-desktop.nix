@@ -208,7 +208,7 @@ in {
       theme = "catppuccin-mocha";
       settings = {
         main = {
-          font = cfg.font;
+          inherit (cfg) font;
           pad = "12x12 center";
           dpi-aware = "yes";
         };

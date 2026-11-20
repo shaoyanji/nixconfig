@@ -16,7 +16,7 @@ in {
   # a broken import, so it is reported, not gated. A `self.modules."x"` that names
   # nothing is a different failure — it breaks the import, not the walk — and is.
   registry = {
-    count = nixFilesCtl.count;
+    inherit (nixFilesCtl) count;
     modules = builtins.length moduleFiles;
     # `listToAttrs` keeps the last of a collision silently; the check asserts
     # this is empty instead.

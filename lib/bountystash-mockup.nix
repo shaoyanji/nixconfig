@@ -169,7 +169,7 @@
       "@context" = "https://schema.org";
       "@type" = "WebPage";
       name = title;
-      description = description;
+      inherit description;
       url = canonical;
       inLanguage = lang;
       isPartOf = {
@@ -193,7 +193,7 @@
         then "Konzept-Mockup: die Liste der ausgenutzten Schwachstellen als abarbeitbare Warteschlange, mit Aufwands-Clustern"
         else "Concept mockup: the exploited list as a work queue, grouped into effort clusters";
       htmlLang = lang;
-      alternates = alternates;
+      inherit alternates;
       ogLocale =
         if lang == "de"
         then "de_DE"
@@ -217,7 +217,7 @@
     d = dataDe;
     lang = "de";
     cssHref = "../style.css";
-    langs = langs;
+    inherit langs;
   };
 
   # Share cards. Rendered at build time so the unfurl is a real 1200x630 PNG —

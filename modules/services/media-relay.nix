@@ -719,7 +719,7 @@ in {
             # row, not something the bind address should pre-empt on a host whose
             # public interface is the fleet's only one.
             addr = "127.0.0.1";
-            port = cfg.port;
+            inherit (cfg) port;
           }
         ];
         root = cfg.mediaDir;

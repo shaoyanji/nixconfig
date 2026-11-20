@@ -217,15 +217,15 @@ in {
   # nixpkgs' own default when an LTS leaves the tree, so a version bump is a
   # deliberate edit rather than an eval error inside the nightly autoUpgrade
   # window — pinned to a missing attribute, the whole host stops rebuilding.
-  boot.kernelPackages = lib.mkForce (
+  boot.kernelPackages =
+    lib.mkForce
     pkgs.${
       lib.findFirst (name: builtins.hasAttr name pkgs) "linuxPackages" [
         "linuxPackages_6_12"
         "linuxPackages_6_6"
         "linuxPackages_5_15"
       ]
-    }
-  );
+    };
 
   # Frieren is a server-heavy-io-sensitive node with spinning media (/dev/sda).
   # 1. Disable full-store batch traversal to prevent mechanical head thrashing.

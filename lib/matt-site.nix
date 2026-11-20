@@ -234,7 +234,7 @@
       then dataDe
       else data;
     p = d.profile;
-    ui = d.ui;
+    inherit (d) ui;
     root =
       if lang == "de"
       then "../"
@@ -369,13 +369,13 @@
       (builtins.toJSON {
         "@context" = "https://schema.org";
         "@type" = "Person";
-        name = p.name;
+        inherit (p) name;
         jobTitle = p.title;
         description = p.bio;
         url = pageUrl;
         email = contactHref "email";
         inLanguage = lang;
-        sameAs = sameAs;
+        inherit sameAs;
         address = {
           "@type" = "PostalAddress";
           addressLocality = "Gutach im Breisgau";
@@ -514,7 +514,7 @@
       then dataDe
       else data;
     p = d.profile;
-    ui = d.ui;
+    inherit (d) ui;
     dir =
       if kind == "case"
       then "work"
@@ -595,7 +595,7 @@
         then ui.caseKicker
         else c.kicker;
       headline = c.title;
-      standfirst = c.standfirst;
+      inherit (c) standfirst;
       byline =
         if kind == "case"
         then "${c.period} · ${c.role}"
@@ -810,8 +810,8 @@
       profile =
         prose.profile
         // {
-          title = json.title;
-          bio = json.bio;
+          inherit (json) title;
+          inherit (json) bio;
           languages = languageLine prose.ui;
         };
       education =
@@ -852,7 +852,7 @@
             }
         )
         json.projects;
-      stack = json.stack;
+      inherit (json) stack;
     };
 
   cvPdf = name: cvJson:

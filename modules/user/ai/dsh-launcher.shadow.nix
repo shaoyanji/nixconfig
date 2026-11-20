@@ -10,7 +10,7 @@
 #
 # Deliberately kept live: the `dsh` CLI (scripts/dispatch.sh routes to it)
 # and dshLocal — a local harness on a full-tier host owes nothing to delphi.
-{...}: {
+_: {
   # --- was the dshRemote let binding ----------------------------------------
   # dshRemote = import self.modules."scripts.dsh-remote" {inherit pkgs;};
   # (the script module itself stays — a value library, not a service)

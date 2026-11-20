@@ -160,9 +160,9 @@ def probe(name, kind, system):
         payload["seconds"] = elapsed
         return payload
     lines = [l.strip() for l in (r.stderr or r.stdout).splitlines() if l.strip()]
-    # The `error:` line is the stable one; the line after it is often a
-    # "did you mean" suggestion and the lines before it are trace frames.
-    idx = next((i for i, l in enumerate(lines) if l.startswith("error:")), None)
+    # The last `error:` line carries the message; earlier ones are a banner plus
+    # trace frames whose order shifts with eval-forcing order.
+    idx = next((i for i in range(len(lines) - 1, -1, -1) if lines[i].startswith("error:")), None)
     if idx is None:
         err = lines[-1] if lines else f"exit {r.returncode}"
     elif lines[idx] == "error:" and idx + 1 < len(lines):

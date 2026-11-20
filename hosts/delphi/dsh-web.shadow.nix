@@ -13,7 +13,7 @@
 # each block back into its home file is the whole move. The sops template
 # `sops.templates."dsh-web.env"` was never removed — DEEPSEEK_API_KEY still
 # renders to the same path, waiting for a reader.
-{...}: {
+_: {
   # --- was hosts/delphi/configuration.nix, services.dshWeb ------------------
   # services.dshWeb = {
   #   enable = true;

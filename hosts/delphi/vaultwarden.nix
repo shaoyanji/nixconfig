@@ -1,7 +1,7 @@
 # Vaultwarden on delphi, offloaded from frieren 2026-11-02. The host in DOMAIN
 # is the one passkeys were enrolled against and must not move; 8222 is
 # tailnet-only. docs/service-offload.md.
-{...}: {
+_: {
   services.vaultwarden = {
     enable = true;
     # Local, sqlite-consistent dumps; the offload bridge ships them to

@@ -259,9 +259,9 @@ in {
       }
       // lib.listToAttrs (map (t:
         lib.nameValuePair t.name {
-          owner = t.owner;
-          group = t.group;
-          mode = t.mode;
+          inherit (t) owner;
+          inherit (t) group;
+          inherit (t) mode;
           sopsFile = ../../modules/secrets.yaml;
           restartUnits = ["agent-turns-shim.service"];
         }) (map normToken cfg.additionalTokens));

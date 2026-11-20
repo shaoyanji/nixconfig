@@ -4,7 +4,7 @@
 # hosts/delphi/agy-daemon-web.shadow.nix: the cascade drives `agy -p`
 # headless, so the interactive remote-operator lane was an idle 24/7 unit.
 # Revive by uncommenting the unit back into hosts/frieren/infra-stack.nix.
-{...}: {
+_: {
   # systemd.user.services.antigravity-cli-daemon = {
   #   description = "antigravity remote-control daemon";
   #   after = ["network.target"];

@@ -234,7 +234,7 @@
   # prose typed into it, and kept claiming a host was WIP after it went live.
   allHosts = inventory.hosts;
   isNixHost = h: h.kind != "external";
-  namesWhere = pred: lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: h: pred h) allHosts));
+  namesWhere = pred: lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: pred) allHosts));
   ticks = names: lib.concatMapStringsSep ", " (n: "`${n}`") names;
 
   statusLines = let

@@ -3,7 +3,7 @@
 # `jd` projects the resume corpus onto that description first; without it the file
 # compiles as it always did. docs: modules/plugins/appflow/README.md
 {pkgs}: let
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
   # The rules the site's CVs answer to as well: page budget, no barely-filled last
   # page (lib/typeset.nix).
   typeset = import ../../../lib/typeset.nix {inherit pkgs;};

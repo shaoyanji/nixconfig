@@ -75,9 +75,7 @@
   homeAgentsGen = import ../lib/home-agents.nix {inherit lib inventory;};
   turnsCtl = import ../lib/agent-turns.nix {inherit lib;};
   taskListPkgs = pkgsFor (
-    if builtins ? currentSystem
-    then builtins.currentSystem
-    else builtins.head systems.work
+    builtins.currentSystem or (builtins.head systems.work)
   );
   taskList =
     taskListPkgs.runCommandLocal "task-list.json" {

@@ -19,7 +19,7 @@
     else
       import ./nix-comments.nix {
         inherit lib;
-        paths = (import ../lib/nix-files.nix {inherit lib;}).paths;
+        inherit ((import ../lib/nix-files.nix {inherit lib;})) paths;
       };
 
   # Top-level files of one directory with a suffix. No tree walk: walking the
@@ -204,7 +204,7 @@
     # one citation set, so a comment cannot name a policy that was renamed.
     ++ map (r: {
       doc = "${r.file}:${toString r.line}";
-      id = r.id;
+      inherit (r) id;
     })
     nixCommentsCtl.policyCites;
 

@@ -8,7 +8,7 @@
 # on this host. A 24/7 remote-operator door on a cloud box is the surface the
 # slash exists to remove; reviving it is uncommenting the unit back into
 # hosts/delphi/configuration.nix.
-{...}: {
+_: {
   # systemd.user.services.antigravity-cli-daemon = {
   #   description = "antigravity remote-control daemon";
   #   after = ["network.target"];

@@ -44,7 +44,7 @@
     readOnly ? false,
     extraArgs ? [],
   }: {
-    description = description;
+    inherit description;
     wantedBy = ["multi-user.target"];
     unitConfig.X-Fleet-Role = "daemon";
     after = ["agent-turns-shim.service" "network.target"];
@@ -165,7 +165,7 @@ in {
     ];
 
     systemd.services.turns-dashboard = unit {
-      port = cfg.port;
+      inherit (cfg) port;
       description = "Live agent-turn dashboard with per-turn Hermes prompts";
       extraArgs =
         ["-hermes-home" home]

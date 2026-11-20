@@ -15,7 +15,7 @@ in {
     enable = true;
     address = "0.0.0.0";
     port = 28981;
-    dataDir = dataDir;
+    inherit dataDir;
     # The fork is what makes this list usable: upstream's own module applies a
     # tesseract narrowing to `package` on every definition, which on aarch64
     # means compiling tesseract and re-wrapping paperless. The override below is

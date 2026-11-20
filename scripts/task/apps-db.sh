@@ -313,8 +313,10 @@ case "$verb" in
     fi
     if [ -d "${APPS_DIR:-/srv/data/projects/antigravity-application-workflow}" ]; then
       printf 'typst     checkout mounted — build, audit, followups\n'
+    elif ssh -n -o BatchMode=yes -o ConnectTimeout=5 "${APPS_HOST:-frieren}" true 2>/dev/null; then
+      printf 'typst     no checkout here — build, audit, followups delegate to %s over ssh\n' "${APPS_HOST:-frieren}"
     else
-      printf 'typst     no checkout here — those tasks run where /srv/data is mounted\n'
+      printf 'typst     absent — no checkout and %s not answering; build, audit, followups exit 127\n' "${APPS_HOST:-frieren}"
     fi
     if [ -f "${PII_FILE:-$HOME/.config/appflow/pii.json}" ]; then
       printf 'pii       %s\n' "${PII_FILE:-$HOME/.config/appflow/pii.json}"

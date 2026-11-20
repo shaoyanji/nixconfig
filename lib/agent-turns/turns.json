@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-20T11:54:28Z",
+  "generated": "2026-11-20T11:54:57Z",
   "count": 200,
-  "pin": "327739259a0db897eb3dd5a834374517b28b6da084c795bfd57061a7d4eb4dda",
+  "pin": "6dd8ea6d5cf259507e7ac4d0a78e6dc22c39a43c290dfe374f8741122beb9575",
   "turns": [
+    {
+      "id": "1bbf8672-6a16-45c2-a5f3-ae8c4cd37831",
+      "ts": "2026-11-20T11:54:40Z",
+      "source": "antigravity",
+      "subject": "nixconfig:monitor-leads-nudge",
+      "action": "landed: research & nudge 5 Monitor leads (Parloa applied/gated, evoila prep direct portal, Workato pivoted to Berlin Golang Engine GH 8929803002, Octopus prep Lever, Castle Tech closed) | gate: application-pipeline PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ac5874beb12b9b1942ddb879e6cb17495eccb710",
+      "branch": "main",
+      "frame": "03h9rlvqiv512snh8dt2tw6qh"
+    },
     {
       "id": "34761a8e-bd4c-433d-9e6c-1ce582edeff8",
       "ts": "2026-11-20T11:52:43Z",
@@ -2854,22 +2867,6 @@
       "base_commit": "56a812d1976add1c091eb119ef728656ecd76629",
       "branch": "main",
       "frame": "03h9iqorq8qnxcz7f5b77cxx3"
-    },
-    {
-      "id": "8e10aa1e-a34f-440c-bbb0-4787d7ba5e14",
-      "ts": "2026-11-19T08:38:02Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 6: freebuff landed doc-link gate (79f0ab46, checks:docs:links:test, 176 markdown files every link resolves, wired into checks:quick). Fed it refinements (skip code fences + validate anchors).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "79f0ab46c5e0869fe4927ddd4a7881a4fba0847e",
-      "branch": "main",
-      "frame": "03h9iq69fdcysptjsd6tab3s8"
     }
   ]
 }

@@ -193,11 +193,6 @@ ssh_alias = "delphi"
 # service portal asserts each port is a mount on this host. Descriptions stay in
 # `key_services` below; this list is only what a reader clicks.
 [[hosts.delphi.network.links]]
-label = "DeepSeek Harness"
-port = 8443
-note = "agent loop, bash, model calls, workspaces"
-
-[[hosts.delphi.network.links]]
 label = "System One decisions"
 port = 8444
 note = "POST /v1/systemone"

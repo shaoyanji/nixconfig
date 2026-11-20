@@ -57,7 +57,7 @@
 #v(3pt)
 #text(size: 8.4pt, fill: muted)[
   #p.handle · #p.location \
-  matt.bountystash.com · github.com/shaoyanji · linkedin.com/in/mattji
+  #d.site · #d.links.join(" · ")
 ]
 
 #v(4pt)

@@ -40,6 +40,10 @@
   resumeEducation = resume.education or [];
   resumeLanguages = resume.languages or [];
 
+  # CV contact row from the resume's profile URLs; a hardcoded row had lost XING.
+  stripScheme = url: builtins.replaceStrings ["https://" "http://"] ["" ""] url;
+  cvLinks = map (p: stripScheme p.url) (resume.basics.profiles or []);
+
   # The German corpus: the same resume, translated bullet for bullet. A German
   # variant projects from it, so its bullets are checked against German strings
   # rather than against their English originals.
@@ -699,6 +703,8 @@
       # leaving the second page to be noticed by whoever opens the file.
       pages = 2;
       labels = cvLabels.${lang};
+      site = stripScheme d.profile.url;
+      links = cvLinks;
       profile =
         d.profile
         // {
@@ -708,7 +714,8 @@
         if lang == "de"
         then deEducation
         else education;
-      work = joinWork d nowLabel;
+      # Experience is the resume's work; the site's project-as-work entries are not.
+      work = builtins.filter (w: (w.org or "") != "") (joinWork d nowLabel);
       projects =
         if untranslated != []
         then throw "matt-site: no German project title for: ${lib.concatStringsSep ", " (map (e: e.name) untranslated)}"
@@ -798,6 +805,8 @@
       # A tailored CV earns its one page the hard way: the build fails if it spills.
       pages = json.pages or 1;
       labels = cvLabels.${lang} // (json.labels or {});
+      site = stripScheme prose.profile.url;
+      links = cvLinks;
       profile =
         prose.profile
         // {

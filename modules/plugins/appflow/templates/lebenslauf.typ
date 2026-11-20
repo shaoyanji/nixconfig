@@ -56,6 +56,13 @@
 #v(6pt)
 #line(length: 100%, stroke: 0.5pt + rgb("#d1d5db"))
 
+// The summary is the one part of `basics` a reader scans before the roles: it was
+// the only field of the source document the packet never printed.
+#if basics.at("summary", default: "") != "" [
+  #v(6pt)
+  #text(size: 9pt)[#basics.summary]
+]
+
 // ---- helpers --------------------------------------------------------------
 #let year(value) = {
   if value == none or value == "" { none } else { value.split("-").at(0) }

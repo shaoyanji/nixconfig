@@ -65,8 +65,6 @@ in {
   };
 
   imports = [
-    # ./codex.nix
-    # ./mods.nix
     self.modules."user.ai.aichat"
     self.modules."user.ai.antigravity-cli"
     self.modules."user.ai.skills"
@@ -75,7 +73,6 @@ in {
     self.modules."user.ai.mainframe-remotes"
     self.modules."user.ai.reasonix"
     self.modules."user.ai.zed-mcp"
-    # ./opencode.nix
   ];
 
   config = lib.mkIf (config.profiles.ai.enable && config.profiles.ai.tier != "none") {

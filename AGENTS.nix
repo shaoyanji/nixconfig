@@ -322,7 +322,7 @@
       summary = "Five-layer memory hierarchy with nix/AGENTS.nix as policy authority; ai-memory stays ungated scratch because nix eval (.#knowledgeGraph) already discovers truth in local files and nix AST.";
       refs = {
         hosts = ["frieren" "delphi"];
-        modules = ["lib/knowledge-graph.nix" "modules/user/ai/agents.nix" "modules/services/agent-turns.nix"];
+        modules = ["lib/knowledge-graph.nix" "modules/user/ai/personas" "modules/services/agent-turns.nix"];
         docs = ["docs/agent-turns.md" "AGENTS.md" ".agents/SCHEMA.md"];
         tasks = ["ops:health"];
       };

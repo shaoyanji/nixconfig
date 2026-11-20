@@ -1,8 +1,101 @@
 {
-  "generated": "2026-11-20T18:46:09Z",
+  "generated": "2026-11-20T19:22:47Z",
   "count": 200,
-  "pin": "a67533276d9b2ebc95935217dadf784a5352f60eeef7f93d153b4fcf9369f6e5",
+  "pin": "66682dff8d1b08981750a77d0978ce26755b395b08ba950f699cc039ea16b6df",
   "turns": [
+    {
+      "id": "0580973b-a893-424e-91e0-dbfcdc053ebb",
+      "ts": "2026-11-20T19:21:39Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gate",
+      "action": "landed: Lebenslauf headings are sticky and text does not hyphenate (page counts unchanged, budgets untouched); the CV artifact rebuilds byte-identically and site-links passes 81 links / 4 required PDFs / 16 download anchors; tests/ now exempt from the path and credential scans | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "12d4aab50587a2724ec200bb2c4234d01052dbc8",
+      "branch": "main",
+      "frame": "03h9u173mzv7w4zq0flaw877g"
+    },
+    {
+      "id": "4a3cc39d-194e-425e-be0e-299c487b9b25",
+      "ts": "2026-11-20T19:21:33Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff-cv-verify",
+      "action": "Drove idle freebuff pane default:1.1 (CV/site lane): jevdecide classified verify_site_links (0.79 vs 0.21, margin 0.58), sent task via tmux load-buffer+paste-buffer+Enter, pane accepted with working... 5s counter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "385986bab1b5c9af1ebd9a00269291fc5ce28978",
+      "branch": "main",
+      "frame": "03h9u16f1ouzn6s31z5qjct38"
+    },
+    {
+      "id": "df1ac89b-ea98-4872-8f46-4946b4535adb",
+      "ts": "2026-11-20T19:15:04Z",
+      "source": "hermes",
+      "subject": "nixconfig:pane-steward-devin-drive",
+      "action": "Drove idle pane default:2.1 (devin, nixconfig refactor lane): jevdecide classify (typesafe/jev-1.13.0) selected review_flake_nix_remove_unused_modules p=0.70 margin 0.41 >= 0.3 decisive; sent 'Review flake.nix structure, inputs, and outputs; then remove or consolidate unused modules.' via load-buffer + paste-buffer + Enter; devin accepted (Thinking counter running). Base commit b6b74414; checks:quick green.",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules refactor lane / tmux default:2.1"
+      ],
+      "files": [],
+      "base_commit": "b6b7441410ec42efbea305d95df1b27e62db0ce0",
+      "branch": "main",
+      "frame": "03h9tzwsj7i71qjrjs2u888fg"
+    },
+    {
+      "id": "8539c878-a276-4959-95e1-81bc117dafa9",
+      "ts": "2026-11-20T19:06:05Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "Drove freebuff pane default:1.1 with CV/ATS quality check task via tmux load-buffer+paste-buffer+Enter; pane accepted task (working... 4s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6b7441410ec42efbea305d95df1b27e62db0ce0",
+      "branch": "main",
+      "frame": "03h9ty5o8kyip79703jwchpk5"
+    },
+    {
+      "id": "45300c00-309a-4321-9ebf-dfab257adfbb",
+      "ts": "2026-11-20T18:58:36Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff-cv-verify",
+      "action": "Drove idle freebuff pane default:1.1 (CV/site lane): jevdecide classified verify_site_links (0.79 vs 0.21, margin 0.58), sent task via tmux load-buffer+paste-buffer+Enter, pane accepted with working... 5s counter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6b7441410ec42efbea305d95df1b27e62db0ce0",
+      "branch": "main",
+      "frame": "03h9twp1p2sryr43189ezkrbt"
+    },
+    {
+      "id": "81fbd4bd-6a32-4ab2-b13b-cc9f826a4e9e",
+      "ts": "2026-11-20T18:48:46Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff-cv-verify",
+      "action": "Drove idle freebuff pane default:1.1 (CV/site lane): jevdecide classified verify_site_links (0.79 vs 0.21, margin 0.58), sent task via tmux load-buffer+paste-buffer+Enter, pane accepted with working... 5s counter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6b7441410ec42efbea305d95df1b27e62db0ce0",
+      "branch": "main",
+      "frame": "03h9turu0z8co6bn485k4wokk"
+    },
+    {
+      "id": "5e19d1ff-d12c-4dd8-aea1-679b3ca721af",
+      "ts": "2026-11-20T18:46:22Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-baseline-dedup",
+      "action": "landed: fleet.hmUserFeatures/hmUserModules + HM baseline consolidated into home-manager-shared.nix (was duplicated across nixos.nix+macos.nix); enum now reads user.hmFeatures | gate: checks:drv-equality PASS (17 identical, 13 unchanged) + checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bb3016daa5ae26c41b9176c1ab18ddaf89f15ba9",
+      "branch": "HEAD",
+      "frame": "03h9tuazkbhoxwd5ig1quk16y"
+    },
     {
       "id": "ae9d718d-73b9-4010-a0e6-05df045e4670",
       "ts": "2026-11-20T18:42:48Z",
@@ -2699,100 +2792,6 @@
       "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
       "branch": "main",
       "frame": "03h9ka56203b3qovhekk91kvw"
-    },
-    {
-      "id": "c0f7dc1f-a602-415a-9392-a59cbc6c0d44",
-      "ts": "2026-11-19T13:20:41Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 29: freebuff landed sentinel-external-hosts (95065d96, never report a unit the host cannot see, DELIVERED). devin reviewed PR #8 (APPROVE: opt-in zeck cache, kg_zeck_test 12/0, parity PASS, 3 non-blocking nits). agy updated 24 prep/teilzeit leads (apps:prep-leads-update done). delphi sending LiveKit outreach as broker.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "2a1219645ad30cb96d4a13336bd7e3ea4addf7d2",
-      "branch": "main",
-      "frame": "03h9k9dz1hcs3k0iverk87hr4"
-    },
-    {
-      "id": "f7f75bd2-44a2-4476-acdb-3b42f5ab0198",
-      "ts": "2026-11-19T13:20:12Z",
-      "source": "devji",
-      "subject": "nixconfig:apps-livekit-send-parloa-retarget",
-      "action": "Sent LiveKit Software Engineer Agents application to recruiting@livekit.io as matt@bountystash.com, Resend delivered; retargeted Parloa row to Staff Product Engineer and rebuilt its packet",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9k9aldzuhsx8x84mz48cfk"
-    },
-    {
-      "id": "475d6d8f-abd2-4536-b799-2b7c79d7683b",
-      "ts": "2026-11-19T13:15:15Z",
-      "source": "buffy",
-      "subject": "nixconfig:sentinel-external-hosts",
-      "action": "sentinel: a host with no systemd answered absent per watched unit, which is neutral, so its verdict stayed ok while blind. It now probes /run/systemd/system, records unit_observer (systemd|none), answers unobservable plus one unit-status-unobservable reason, so a blind host degrades. absent keeps meaning 'not installed here'. Dashboard marks it red; skill and prose budget updated; P1 note DELIVERED. Pushed 2a121964; checks:host frieren and checks:quick green.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a1219645ad30cb96d4a13336bd7e3ea4addf7d2",
-      "branch": "main",
-      "frame": "03h9k8bsye7yqdtycj4a9mb5y"
-    },
-    {
-      "id": "c40263ab-59a5-4623-a5d3-647cd1c847bd",
-      "ts": "2026-11-19T13:14:26Z",
-      "source": "agy",
-      "subject": "apps:prep-leads-update",
-      "action": "landed: updated 24 prep-stage and teilzeit leads to Ready to apply | gate: verify 24/24 in delphi api",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "95065d96d3bde3b434b96ab20cbb9994d4ffcda8",
-      "branch": "main",
-      "frame": "03h9k860zki8fz3j9x3lzg893"
-    },
-    {
-      "id": "c6c7f7d8-62d2-4a72-a9f5-9b0741d91f19",
-      "ts": "2026-11-19T13:13:51Z",
-      "source": "agy",
-      "subject": "apps:prep-leads-update",
-      "action": "start: update prep-stage and local teilzeit roles in delphi apps db",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "95065d96d3bde3b434b96ab20cbb9994d4ffcda8",
-      "branch": "main",
-      "frame": "03h9k81wot2xt9nq8bbbq6bwt"
-    },
-    {
-      "id": "9df64686-9955-407e-88aa-caefb4164910",
-      "ts": "2026-11-19T13:11:59Z",
-      "source": "devin",
-      "subject": "nixconfig:kg-zeck-cache",
-      "action": "review: PR#8 kg-zeck-cache | gate: ExUnit 12/0 PASS + parity.exs PASS on frieren (worktree 97489aa0) | verdict: APPROVE, no security blockers, no logic errors; minors: silent KG_BACKEND fallback when elixir unresolved, stale cores/*.json hard-fails, manifest paths unvalidated",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "92125f53d37883c40fde39f792f9b6c1d2fa4190",
-      "branch": "main",
-      "frame": "03h9k7oqap1t31gqoix4bkvvn"
-    },
-    {
-      "id": "fb4d7096-3948-4742-8e0d-e25195050e8c",
-      "ts": "2026-11-19T13:03:16Z",
-      "source": "devji",
-      "subject": "nixconfig:apps-packets-2026-11-19",
-      "action": "Built 7 tailored resume+letter packets and outreach drafts for Focused Energy, LiveKit, Parloa, Routine Labs, Workato, Octopus, evoila; advanced 4 rows to prep; nothing sent",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9k5zirop1lqy17rgwtxp7a"
     }
   ]
 }

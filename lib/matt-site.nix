@@ -855,6 +855,29 @@
   cvEnergy = cvPdf "energy" (cvVariantData cvEnergyJson "en");
   cvEnergyDe = cvPdf "energy-de" (cvVariantData cvEnergyDeJson "de");
 
+  # Every CV this build ships. The installs and the link gate both read this
+  # list, so a CV added here without a page linking it fails the build, and the
+  # four filenames are spelled once instead of in the installs and again in a
+  # gate that could drift from them.
+  cvFiles = [
+    {
+      name = "cv.pdf";
+      src = cv;
+    }
+    {
+      name = "cv-de.pdf";
+      src = cvDe;
+    }
+    {
+      name = "cv-energy.pdf";
+      src = cvEnergy;
+    }
+    {
+      name = "cv-energy-de.pdf";
+      src = cvEnergyDe;
+    }
+  ];
+
   # Share cards, rendered at build time: Slack and LinkedIn ignore an SVG
   # og:image, and the persona page needs its own card rather than the mockup's.
   fontMono = "${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono.ttf";
@@ -915,15 +938,12 @@
     '')
     sitemapUrls;
 in
-  pkgs.runCommand "matt-site" {} ''
+  pkgs.runCommand "matt-site" {nativeBuildInputs = [pkgs.python3];} ''
     mkdir -p $out/de $out/work $out/de/work $out/brief $out/de/brief
     install -m 0644 ${cssFile} $out/style.css
     install -m 0644 ${card}/og.png $out/og.png
     install -m 0644 ${card}/og-de.png $out/og-de.png
-    install -m 0644 ${cv}/cv.pdf $out/cv.pdf
-    install -m 0644 ${cvDe}/cv.pdf $out/cv-de.pdf
-    install -m 0644 ${cvEnergy}/cv.pdf $out/cv-energy.pdf
-    install -m 0644 ${cvEnergyDe}/cv.pdf $out/cv-energy-de.pdf
+    ${lib.concatMapStringsSep "\n    " (c: "install -m 0644 ${c.src}/cv.pdf $out/${c.name}") cvFiles}
     install -m 0644 ${page "index.html" en} $out/index.html
     install -m 0644 ${page "de-index.html" de} $out/de/index.html
     ${lib.concatMapStringsSep "\n" (s: ''
@@ -969,5 +989,13 @@ in
     <body style="font:16px ui-monospace,monospace;padding:4rem;max-width:40rem">
     <h1>404</h1><p>No such page.</p><p><a href="/">matt.bountystash.com</a></p>
     EOF
+    # Gate: every CV the build ships is reachable from a page by a link that
+    # resolves, and every internal href on every emitted page — 404 and sitemap
+    # included, so this runs last — lands on a file. It runs inside the build,
+    # not only in `task site:links`, because `matt:deploy:prod` builds and
+    # publishes without that task: an orphaned CV must not leave the store.
+    bash ${../scripts/task/site-links.sh} $out ${
+      lib.concatStringsSep " " (map (c: c.name) cvFiles)
+    }
     echo "matt-site: $(find $out -type f | wc -l) files, $(du -sb $out | cut -f1) bytes"
   ''

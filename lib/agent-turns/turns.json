@@ -1,8 +1,77 @@
 {
-  "generated": "2026-11-20T12:05:36Z",
+  "generated": "2026-11-20T12:28:15Z",
   "count": 200,
-  "pin": "9262237e020d3a8f980ea1323634ac0f29d2f9816c7fd98de89cad28ece55ae8",
+  "pin": "bd1859ea1c410e695c23bc38d5092920a2f85278762044b85e20548e8b4f7441",
   "turns": [
+    {
+      "id": "fc1ecbf2-4fbf-4ed1-a1e2-4b284761ea8b",
+      "ts": "2026-11-20T12:27:08Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-android",
+      "action": "claim: strip hermes-android/flipsibridge shared config early (was phase 5 of fleet-remote PR #3): plugins.enabled, gateway PYTHONPATH, :8766, live relay+drop-in remnants",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren/configuration.nix",
+        "modules/user/ai/hermes-user.nix",
+        "modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "files": [],
+      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
+      "branch": "main",
+      "frame": "03h9rs83n3gas3qs5mhxjwluh"
+    },
+    {
+      "id": "fa72699a-0188-4795-8972-1d2d3377f1c3",
+      "ts": "2026-11-20T12:22:38Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: gateway shutdown killed tmux server + all 3 agent panes. Rebuilt session default (socket /run/user/1000/tmux-1000/default) and relaunched freebuff/devin/agy. Re-drove all 3: freebuff→gate link targets, devin→review PR cleanup (set bypass mode, was prompting per-command), agy→job search loop. pane-idle-watch cron now reports BUSY for all 3 (UNKNOWN was dead server, not script). | gate: pane-watch.sh reports BUSY x3",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
+      "branch": "main",
+      "frame": "03h9rrcg6bz35gkbnjnfwerg2"
+    },
+    {
+      "id": "0d96e764-d661-4988-90be-c5a315d330d1",
+      "ts": "2026-11-20T12:09:41Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "claim: scan attention queue, follow up monitor leads, ingest untracked employers into delphi tracker",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
+      "branch": "main",
+      "frame": "03h9rotd3uos6qbbu31buj96e"
+    },
+    {
+      "id": "96cee4b5-e4bb-419a-9251-d233a85489e7",
+      "ts": "2026-11-20T12:05:52Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "landed: 10 new apps added, 4 nudged (Materna to screening, Eat Happy to rejected, Smartsheet to prep, Sig Perf linked), 0 monitor replies | gate: application-pipeline PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
+      "branch": "main",
+      "frame": "03h9ro2j1wohihzjom315mg4b"
+    },
+    {
+      "id": "f1c68667-98df-489d-9391-0dfbec1f3c98",
+      "ts": "2026-11-20T12:05:45Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "fixed: CV anchors gained download attr (shell.html) — a plain link to inline application/pdf emitted a navigation, so browser download waits never fired (a text/plain link failed the same way); with the attribute all 4 CV links download: 4/4 OK, valid PDFs, 2/1/2/1 pages | gate: nix build .#sites.matt-site rc=0 + agent-browser download 4/4 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
+      "branch": "main",
+      "frame": "03h9ro1q74hlcfu3rzb549ora"
+    },
     {
       "id": "cf426bf5-353c-46ad-b20f-ea01a595f4dc",
       "ts": "2026-11-20T12:03:59Z",
@@ -2784,83 +2853,6 @@
       "base_commit": "bf8250495c37d3c90bc66b08e1385c0ebffa7137",
       "branch": "main",
       "frame": "03h9iutqqyu6u9yr39a2toume"
-    },
-    {
-      "id": "0d76689d-1e27-454e-8e3b-0b78337bc1e5",
-      "ts": "2026-11-19T09:00:19Z",
-      "source": "agy",
-      "subject": "nixconfig:agents-md-turns",
-      "action": "docs: concrete xs turn logging guidance in AGENTS.md and HOME-PREAMBLE | commit: 0a4bfefb | gate: checks:toon:surfaces + checks.policies PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "AGENTS.md",
-        "docs/agent-context/HOME-PREAMBLE.md"
-      ],
-      "base_commit": "bf8250495c37d3c90bc66b08e1385c0ebffa7137",
-      "branch": "main",
-      "frame": "03h9iuiypgjbgm5z66qrvz3fc"
-    },
-    {
-      "id": "37bd4b28-d3a3-4b9b-9166-273eb84653fb",
-      "ts": "2026-11-19T08:58:50Z",
-      "source": "devji",
-      "subject": "nixconfig:host-services",
-      "action": "software.services typed per host (37 hosts, 159 records), inventory-schema rejects dup name/port, fleet-services renders all three halves; quick+frieren green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bf8250495c37d3c90bc66b08e1385c0ebffa7137",
-      "branch": "main",
-      "frame": "03h9iu8k07d4dubtkjmp9tjwm"
-    },
-    {
-      "id": "ab5a64ff-20a4-45f3-a5b1-183e657c3aaf",
-      "ts": "2026-11-19T08:56:35Z",
-      "source": "agy",
-      "subject": "nixconfig:agents-md-turns",
-      "action": "docs: concrete xs turn logging guidance in AGENTS.md and HOME-PREAMBLE | gate: checks:toon:surfaces + checks.policies PASS",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.md",
-        "docs/agent-context/HOME-PREAMBLE.md"
-      ],
-      "files": [],
-      "base_commit": "0a4bfefb33192cc8f4ecbb1a97dca6ca199e557d",
-      "branch": "main",
-      "frame": "03h9itsqecgb5epiiwulxhk8b"
-    },
-    {
-      "id": "c4e71daa-f6bc-4de0-b115-a9e2a1c916bd",
-      "ts": "2026-11-19T08:54:28Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 9: freebuff landed fleet service map (d1394fd2, compiled which service owns which port per host from registry). Fed it key_services structuring (registry-schema change to complete the map for all hosts).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "d1394fd28b9f6f2300b1674aff9a849102cab658",
-      "branch": "main",
-      "frame": "03h9itdt32gzzd3csoszgs2n7"
-    },
-    {
-      "id": "c91be503-aaa9-4225-9cb5-7c62ad912473",
-      "ts": "2026-11-19T08:54:05Z",
-      "source": "agy",
-      "subject": "nixconfig:agents-md-turns",
-      "action": "Concrete xs turn logging guidance in AGENTS.md and HOME-PREAMBLE.md | gate: checks:toon:surfaces + checks.policies PASS",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.md",
-        "docs/agent-context/HOME-PREAMBLE.md"
-      ],
-      "files": [],
-      "base_commit": "d1394fd28b9f6f2300b1674aff9a849102cab658",
-      "branch": "main",
-      "frame": "03h9itb370vn13fgmxw2e7gwm"
     }
   ]
 }

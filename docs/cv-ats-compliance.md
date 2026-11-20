@@ -40,7 +40,7 @@ and the fonts (New Computer Modern, Libertinus Serif) ship with Typst.
 | File | Change |
 | :--- | :--- |
 | `lib/matt/cv.typ` | header stacked into one column, contact URLs as plain text; headings in normal case at 9.7pt with no tracking, and `sticky` so a heading cannot end a page alone; each role, degree and project on one line with its period; footer reduced to the page number (`1/2`), and omitted on a one-page document; `show link` rule removed because no link remains |
-| `modules/plugins/appflow/templates/lebenslauf.typ` | `entry()` uses one column instead of a two-column grid; `section()` sets the heading in its own case, not uppercased |
+| `modules/plugins/appflow/templates/lebenslauf.typ` | `entry()` uses one column instead of a two-column grid; `section()` sets the heading in its own case, not uppercased, is `sticky`, and the text does not hyphenate |
 | `lib/matt-site.nix` | `cvLabels` now carries the standard words: `Projects`, `Skills`, `Languages` / `Projekte`, `Kenntnisse`, `Sprachen`; the key `tools` became `skills` |
 | `lib/matt/cv-energy.json`, `cv-energy.de.json` | the tailored CV overrides `projects` with `Projects` / `Projekte` instead of `Relevant projects` / `Relevante Projekte` |
 
@@ -71,6 +71,31 @@ one page of material, not by the template.
 The same numbers are what `lib/typeset.nix` reads back from each build's
 `<typeset>` report, so a budget that stops fitting is a build error rather than a
 page someone has to notice.
+
+## A heading cannot end a page, and nothing hyphenates
+
+Compiled from the whole corpus, page 2 of the Lebenslauf ended on `Kenntnisse`
+with all six skill lines on page 3: `section()` kept a heading with its own rule,
+but not with the block that followed it. `cv.typ` had carried `sticky: true` for
+this since its heading fix; `section()` now does too, so a heading moves to the
+page its content is on instead of sitting alone at the foot of the previous one.
+
+`#set text(… hyphenate: false)` alongside it states what the justified paragraphs
+had been relying on: no extracted line of either corpus ends in a hyphen, and a
+German compound that reaches a line end is the one a parser stops matching
+(`Schwachstellen-` / `programme`). The guard costs nothing — measured below.
+
+A/B against the previous template, same inputs, same harness:
+
+| Input | Before | After |
+| :--- | :--- | :--- |
+| Full corpus | 3 pages, 68 mm | 3 pages, 81 mm |
+| Selection over a description, 5 highlights / 1 project | 2 pages, 60 mm | 2 pages, 60 mm |
+| Selection over a description, 9 highlights / 4 projects | 2 pages, 152 mm | 2 pages, 152 mm |
+
+The full-corpus row grows because the heading moved onto the page its content
+already filled. No page count changes anywhere, so no budget in `lib/typeset.nix`
+nor `packet.nix` moved.
 
 ## Checked after the change
 
@@ -147,6 +172,8 @@ repository; nothing here reaches it.
 ## Limits of this check
 
 No commercial ATS was run; the evidence is the extracted text, the annotation scan
-and the layout rules above. The packet target was compiled from the corpus and from
-a selection over a synthetic description, because the production selection depends
-on the job ad it is built for.
+and the layout rules above. `anschreiben.typ` sits in the same directory and is not
+covered: it justifies without the no-hyphenation guard, which matters less for a
+letter no parser hunts keywords in. The packet target was compiled from the corpus
+and from a selection over a synthetic description, because the production selection
+depends on the job ad it is built for.

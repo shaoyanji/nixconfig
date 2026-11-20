@@ -19,7 +19,10 @@
 #set page(paper: "a4", margin: (top: 1.4cm, bottom: 1.4cm, left: 1.7cm, right: 1.7cm))
 // Libertinus ships with Typst: no font package, no network, identical output on
 // every host that has this flake.
-#set text(font: ("Libertinus Serif", "New Computer Modern"), size: 9.5pt, fill: rgb("#111827"), lang: lang)
+// `hyphenate: false`: German compounds hyphenate under justification, and a
+// keyword broken as `Schwachstellen-` / `programme` is a keyword an ATS does not
+// match. Ragged-but-whole words are worth the loose right edge.
+#set text(font: ("Libertinus Serif", "New Computer Modern"), size: 9.5pt, fill: rgb("#111827"), lang: lang, hyphenate: false)
 #set par(leading: 0.5em, justify: true)
 
 // ---- header, from `basics` ------------------------------------------------
@@ -82,7 +85,10 @@
 // A heading is derived from the section in the application's language; the data
 // never carries translated headings. It is set in its own case, not uppercased:
 // `Berufserfahrung` is the string a parser matches.
-#let section(kind) = block(breakable: false, width: 100%)[
+// `sticky`: without it the compiled lebenslauf ended page 2 on `Kenntnisse` with
+// every skill on page 3 — a heading alone at the foot of a page. cv.typ keeps its
+// headings with `sticky` for the same reason.
+#let section(kind) = block(breakable: false, sticky: true, width: 100%)[
   #v(5pt)
   #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#strings.at(kind, default: kind)]
   #v(1pt)

@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-20T11:54:57Z",
+  "generated": "2026-11-20T12:05:36Z",
   "count": 200,
-  "pin": "6dd8ea6d5cf259507e7ac4d0a78e6dc22c39a43c290dfe374f8741122beb9575",
+  "pin": "9262237e020d3a8f980ea1323634ac0f29d2f9816c7fd98de89cad28ece55ae8",
   "turns": [
+    {
+      "id": "cf426bf5-353c-46ad-b20f-ea01a595f4dc",
+      "ts": "2026-11-20T12:03:59Z",
+      "source": "devin",
+      "subject": "fleet-remote:device-agent",
+      "action": "landed: draft PR #3 to shaoyanji/fleet-remote — docs/device-agent.md (pull-based device lane on task-web replacing FlipsiBridge; consent tiers, phasing, open questions) + docs/device-protocol.md (wire format); docs only, no APK work | gate: review pending — CI trivially green (docs)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
+      "branch": "main",
+      "frame": "03h9rnpbhehy6t9kztkdgqz93"
+    },
+    {
+      "id": "73d53027-03d6-451b-8aba-b24378d74ab8",
+      "ts": "2026-11-20T12:01:44Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: drove all 3 idle panes — freebuff→site CV verify, devin→fleet-remote PR approach, agy→job search continue (jevdecide routed each). Pushed 8d45c020+ac5874be to origin/main. Fixed pane-idle-watch cron (was UNKNOWN for all panes: missing TMUX_TMPDIR=/run/user/1000 in cron env; added export + broadened BUSY/IDLE patterns). Verified: cron now reports BUSY for all 3 | gate: pane-watch.sh manual run PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
+      "branch": "main",
+      "frame": "03h9rn9fo2asxsnckqqh4i7ou"
+    },
+    {
+      "id": "9fafa0c7-cd33-4e07-99cf-662aaf1f001a",
+      "ts": "2026-11-20T12:01:21Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "verified: headless Chrome (agent-browser 0.43.0) on the built site — nav.links carries 2 CV anchors per language resolving to /cv.pdf + /cv-energy.pdf and /cv-de.pdf + /cv-energy-de.pdf; clicking each tailored link navigated to application/pdf and the Chrome viewer rendered 1/1 pages titled 'Matt Ji — CV' / 'Matt Ji — Lebenslauf'. No code change needed. | gate: nix build .#sites.matt-site rc=0 + browser render PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
+      "branch": "main",
+      "frame": "03h9rn6s6mkquzrwr5xqvi2lk"
+    },
+    {
+      "id": "4d7d326e-721d-4e88-a026-56dfccdd532d",
+      "ts": "2026-11-20T12:00:30Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "claim: scan attention queue, follow up monitor leads, ingest discovered employers into delphi tracker",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
+      "branch": "main",
+      "frame": "03h9rn0u3h630fu7h6mkls3je"
+    },
+    {
+      "id": "f68f806d-92e7-481a-b23d-be0361811cd9",
+      "ts": "2026-11-20T11:55:53Z",
+      "source": "devin",
+      "subject": "nixconfig:apps-followups",
+      "action": "landed: apps-typst.sh runs bin/appflow locally when /srv/data is mounted and delegates to frieren over bounded ssh when not (stdin-safe -n; apps:doctor reports the transport); apps:followups/build/audit/git:status rewired; verified on delphi end-to-end — followups prints the cadence table, audit 110 docs 0 violations, unreachable host exits 127 with a hint; delphi checkout ff'd to ac5874be | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
+      "branch": "main",
+      "frame": "03h9rm4dgw6rp75qt8l1pgn0e"
+    },
     {
       "id": "1bbf8672-6a16-45c2-a5f3-ae8c4cd37831",
       "ts": "2026-11-20T11:54:40Z",
@@ -2796,77 +2861,6 @@
       "base_commit": "d1394fd28b9f6f2300b1674aff9a849102cab658",
       "branch": "main",
       "frame": "03h9itb370vn13fgmxw2e7gwm"
-    },
-    {
-      "id": "dce6b294-e9a0-4f3d-91ec-aca5810d9156",
-      "ts": "2026-11-19T08:52:50Z",
-      "source": "devji",
-      "subject": "nixconfig:fleet-service-map",
-      "action": "lib/docs.nix renders docs/generated/fleet-services.md from registry ports + inventory network.links (18 delphi endpoints); MANUAL §2 defers to it; commit 3afebbc1 follow-on green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d1394fd28b9f6f2300b1674aff9a849102cab658",
-      "branch": "main",
-      "frame": "03h9it2c633fs5ktl3x1303tm"
-    },
-    {
-      "id": "603177d0-37f8-48e5-b12c-706f962514cf",
-      "ts": "2026-11-19T08:50:02Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 8: freebuff landed P4 continuation (3afebbc1, compiled fleet port table via lib/docs.nix, stopped pasting host card; comment census caught redundant comment). Fed it service-map compilation. agy working on AGENTS.md agent-turns adherence.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "3afebbc16b9216be981899ed417118bec82c7306",
-      "branch": "main",
-      "frame": "03h9isil2bpjhg9vuzrrxtxf1"
-    },
-    {
-      "id": "a502ff3a-4871-478e-90e1-c0e14a8791f3",
-      "ts": "2026-11-19T08:47:31Z",
-      "source": "devji",
-      "subject": "nixconfig:p4-docs-tables",
-      "action": "lib/docs.nix renders docs/generated/fleet-ports.md from modules.toml port+hosts; MANUAL §1 hand identity table replaced by the compiled host card; quick+frieren+docs green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3afebbc16b9216be981899ed417118bec82c7306",
-      "branch": "main",
-      "frame": "03h9is0z2ynwlccivh2tv9pm4"
-    },
-    {
-      "id": "1ae996a5-2b80-4ed7-acd0-ab47bb077e2e",
-      "ts": "2026-11-19T08:42:36Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 7: freebuff landed doc-link refinements (56a812d1, code-fence skip + anchor validation, 176 md files every link+anchor resolves). Sloppiness audit complete. Fed it P4 continuation (taskfiles to evals, last Python: --sync-docs/--compile-fleet via lib/docs.nix).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "56a812d1976add1c091eb119ef728656ecd76629",
-      "branch": "main",
-      "frame": "03h9ir2cqme5ecshlkhveyyu0"
-    },
-    {
-      "id": "c7af2774-b6c8-414d-9b61-10ddbd5f0e8d",
-      "ts": "2026-11-19T08:40:40Z",
-      "source": "devji",
-      "subject": "nixconfig:docs-link-anchors",
-      "action": "link gate skips fenced blocks and validates same/cross-file anchors against headings; fixture 13 cases, quick+frieren green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "56a812d1976add1c091eb119ef728656ecd76629",
-      "branch": "main",
-      "frame": "03h9iqorq8qnxcz7f5b77cxx3"
     }
   ]
 }

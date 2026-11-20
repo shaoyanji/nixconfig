@@ -17,29 +17,30 @@
 }: let
   has = f: lib.elem f hmUserFeatures;
   when = f: mods: lib.optionals (has f) mods;
+  appendModules = extra: mods: mods ++ extra;
 in {
   imports =
     [self.modules."roles.minimal"]
-    ++ when "systemd-policy" [self.modules."systemd-policy"]
-    ++ when "shell" [self.modules."shell"]
-    ++ when "dev" [self.modules."dev"]
-    ++ when "ai" [
+    |> appendModules (when "systemd-policy" [self.modules."systemd-policy"])
+    |> appendModules (when "shell" [self.modules."shell"])
+    |> appendModules (when "dev" [self.modules."dev"])
+    |> appendModules (when "ai" [
       self.modules."user.ai.antigravity-cli"
       self.modules."user.selector-daemon"
-    ]
-    ++ when "browser" [self.modules."zen" self.modules."aria2"]
-    ++ when "media" [
+    ])
+    |> appendModules (when "browser" [self.modules."zen" self.modules."aria2"])
+    |> appendModules (when "media" [
       self.modules."user.desktop.multimedia"
       self.modules."user.desktop.appimage-menu"
       self.modules."kitty"
-    ]
+    ])
     # Imported unconditionally in the old file (`a pkgs`-dependent import reads
     # `config` and recurses); niri.nix gates its own body with mkIf on Linux,
     # because a Wayland compositor has no aarch64-darwin counterpart and its
     # swayidle dependency is not packaged for darwin — which failed EVALUATION,
     # not just the build, on cassini. A host that owns its own compositor drops
     # the feature rather than redefining the same options twice.
-    ++ when "desktop" ([self.modules."user.desktop.suite"] ++ lib.optionals dankShell [self.modules."user.desktop.niri"]);
+    |> appendModules (when "desktop" ([self.modules."user.desktop.suite"] ++ lib.optionals dankShell [self.modules."user.desktop.niri"]));
 
   # `optionalAttrs`, not `mkIf`: `selectorDaemon` is declared by a module the
   # `ai` feature imports, and a `programs.selectorDaemon.enable = lib.mkIf …` is

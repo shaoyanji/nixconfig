@@ -5,6 +5,7 @@
   pkgsFor,
   self,
   hostInventory,
+  moduleSets,
 }:
 # HOST BOOT CHECKS — boot ONE host's REAL module graph in a VM and fail unless
 # stage-1 hands off to stage-2.
@@ -157,7 +158,7 @@ in
               # pkgs turns those into assertion failures before a single unit runs.
               node.pkgsReadOnly = false;
               nodes.machine = {
-                imports = hostCfg.modules ++ [(bootVm host)];
+                imports = hostCfg.modules |> moduleSets.appendModules [(bootVm host)];
               };
               # The assertion is the SERIAL CONSOLE, not the driver's backdoor shell.
               # Two measured reasons:

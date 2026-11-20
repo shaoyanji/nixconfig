@@ -230,7 +230,7 @@ in {
   # `checks` in a single process. See flake/boot-checks.nix for what it does and
   # does not prove.
   hostBootChecks = import ./boot-checks.nix {
-    inherit lib inputs systems pkgsFor self hostInventory;
+    inherit lib inputs systems pkgsFor self hostInventory moduleSets;
   };
 
   # `nix fmt` = the repo's canonical formatter, so the tool is reachable through

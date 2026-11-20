@@ -519,7 +519,7 @@
       summary = "`microvm.vms.<name>` on frieren (brlan, KVM, cloud-hypervisor) and on delphi (aarch64, qemu/TCG: OCI A1 exposes no EL2, and cloud-hypervisor has no TCG backend). A guest reads the host's /nix/store over virtiofs, so starting one is seconds on KVM and minutes under TCG; no image is built either way, only the shares persist.";
       refs = {
         hosts = ["frieren" "delphi"];
-        modules = ["hosts/microvms/base.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix" "hosts/delphi/configuration.nix"];
+        modules = ["hosts/microvms/base.nix" "hosts/microvms/frieren-canary.nix" "modules/profiles/microvm-host.nix" "hosts/delphi/configuration.nix"];
         tasks = ["microvm:list" "microvm:start" "microvm:stop" "microvm:ssh" "vm:canary:run" "vm:canary:test"];
         docs = ["hosts/microvms/README.md"];
       };
@@ -3537,7 +3537,7 @@
       summary = "Stirling was six edits in six places — nginx location, tailnet gate, socket-proxyd, sshd Match, principals file, docs page — and the second tenant already retyped the gate. One `fleet.exposure` row should compile all six, and `edge:verify` should prove the row from both vantage points.";
       refs = {
         hosts = ["delphi"];
-        modules = ["hosts/delphi/configuration.nix" "hosts/microvms/guests.nix" "modules/profiles/microvm-host.nix"];
+        modules = ["hosts/delphi/configuration.nix" "hosts/microvms/frieren-canary.nix" "modules/profiles/microvm-host.nix"];
         tasks = ["microvm:start" "checks:host"];
         docs = ["hosts/microvms/README.md" ".agents/deploy/hosts/delphi.md"];
       };
@@ -3580,7 +3580,7 @@
       summary = "Stirling costs minutes of emulated boot and holds 1.2 GiB of heap all day for a tool used twice a week. A snapshot of the booted guest turns start into a restore that keeps the volume, the store share and the identity, and gives the RAM back between uses.";
       refs = {
         hosts = ["delphi" "frieren"];
-        modules = ["hosts/microvms/guests.nix" "hosts/microvms/base.nix" "modules/profiles/microvm-host.nix"];
+        modules = ["hosts/microvms/frieren-canary.nix" "hosts/microvms/base.nix" "modules/profiles/microvm-host.nix"];
         tasks = ["microvm:start" "microvm:stop"];
         docs = ["hosts/microvms/README.md"];
       };
@@ -3619,7 +3619,7 @@
       summary = "`checks:flake` refuses below 16 GiB because a fleet eval once reached 6078 MiB and died at 137, and `oom-guard.sh` watches pressure around that absence of isolation. A microVM with a declared cap is the same gate with the blast radius removed — and it is the `sandbox:run` primitive underneath.";
       refs = {
         hosts = ["frieren" "delphi"];
-        modules = ["flake/checks.nix" "hosts/microvms/base.nix" "hosts/microvms/guests.nix"];
+        modules = ["flake/checks.nix" "hosts/microvms/base.nix" "hosts/microvms/frieren-canary.nix"];
         tasks = ["checks:host" "checks:flake"];
         docs = ["docs/ci-pipeline.md" "docs/nix-patterns.md"];
       };

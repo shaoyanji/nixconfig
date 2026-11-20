@@ -1137,7 +1137,8 @@ tasks:
     # Read from the evaluated config, never a hand-kept list.
     summary: >
       The guests are `microvm.vms.<name>` in the host's NixOS config
-      (`hosts/microvms/guests.nix`), so the config is the list — nothing is
+      (delphi's `sandbox` module was removed at e8e87ea2; none declared today),
+      so the config is the list — nothing is
       enumerated by hand. Nothing autostarts: a guest runs because it was started.
       Run it on the host that declares the guests (frieren: brlan + KVM; delphi:
       aarch64 under TCG, slow). See `checks:boot` for why the fast path needs KVM.
@@ -1184,7 +1185,7 @@ tasks:
     desc: "SSH into a declarative microVM guest (NAME=sandbox|slides)"
     summary: >
       Resolves `sandbox` / `slides` from `/etc/ssh/ssh_config` on the host that
-      declares them (hosts/microvms/guests.nix), so the address is declared once.
+      declares them (delphi; the guest itself was removed at e8e87ea2), so the address is declared once.
     requires:
       vars: [NAME]
     cmds:

@@ -41,10 +41,10 @@ nix eval --json '.?submodules=1#nixosConfigurations.frieren-canary.config.system
 
 ## Not always on
 
-Frieren declares no `microvm.vms.frieren-canary` (that is delphi's `sandbox`,
-`hosts/microvms/guests.nix`), so no `microvm@` unit is enabled, nothing starts the
-canary at boot, and no timer boots it. It exists only while the transient unit
-holds it:
+Frieren declares no `microvm.vms.frieren-canary` (delphi's `sandbox` was the only
+one, removed at e8e87ea2 with its module file), so no `microvm@` unit is enabled,
+nothing starts the canary at boot, and no timer boots it. It exists only while
+the transient unit holds it:
 
 - `task vm:canary:run` runs `scripts/task/run-canary.sh` under
   `frieren-canary-runner`, with `RuntimeMaxSec` (`LIFETIME`, default `2h`) so an

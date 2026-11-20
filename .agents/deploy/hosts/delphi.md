@@ -46,8 +46,9 @@ paperless rebuild is ~41 minutes, a config-only change is ~18 small derivations.
 
 ## Guest layer — the `sandbox` microVM
 
-Declared in `hosts/microvms/guests.nix`; rationale and the traps that shaped it are
-in the `AGENTS.nix` note `microvm-guests` (`task ops:notes:show ID=microvm-guests`).
+Removed at e8e87ea2 (OCI A1 exposes no KVM); the host keeps the proxy surface inline.
+Rationale and the traps that shaped the guest are in the `AGENTS.nix` note
+`microvm-guests` (`task ops:notes:show ID=microvm-guests`).
 
 | What | From a workstation | From delphi |
 | :--- | :--- | :--- |
@@ -59,8 +60,8 @@ from delphi because `192.168.83.0/24` is host-local.
 The terminal deck (`slides`) is **off**: it is a development facility, not a service,
 and it leaked a TUI per abandoned login — under TCG three of them were 0.65 of the box's
 two cores. `slidesUser = "slides"` plus `exposeSsh = 2222` in
-`flake/host-inventory.nix` brings it back; the module side is still in
-`hosts/microvms/guests.nix`.
+`flake/host-inventory.nix` brings it back; the module side was
+the deleted guests.nix — revival is git history.
 
 HTTP lives in the guest too: `/microvm/one/` and `/microvm/two/` (busybox stubs) on
 both hostnames, `/microvm/stirling/` on the tailnet only (public answers 302).

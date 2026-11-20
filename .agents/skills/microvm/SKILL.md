@@ -1,6 +1,6 @@
 ---
 name: microvm
-description: "Guests on delphi (declarative sandbox) and frieren (a capped, on-demand runbook sandbox): the task that boots each, how to get a shell in one, and the traps that make a healthy guest look unreachable."
+description: "The frieren canary (a capped, on-demand runbook sandbox) and the declarative-guest shape: the task that boots each, how to get a shell in one, and the traps that make a healthy guest look unreachable."
 version: 0.1.0
 platforms: [linux]
 metadata:
@@ -15,7 +15,7 @@ taskfile: the tasks are the API, this page is the route to them.
 
 | Kind | Where | Lifecycle |
 | :--- | :--- | :--- |
-| Declarative guest (`microvm.vms.<name>`) | delphi only: `sandbox` — `hosts/microvms/guests.nix`. Frieren declares none: `testvm` and `frieren-canary` are their own host configs, not `microvm.vms` entries | a `microvm@<name>` systemd unit, `autostart` where declared |
+| Declarative guest (`microvm.vms.<name>`) | none today: delphi's `sandbox` lost KVM and was removed (e8e87ea2). `testvm` and `frieren-canary` are their own host configs, not `microvm.vms` entries | a `microvm@<name>` systemd unit, `autostart` where declared |
 | Canary runner (`microvmRunners.frieren-canary`) | `hosts/microvms/frieren-canary.nix`, started by `scripts/task/run-canary.sh` | a transient unit, `frieren-canary-runner`, capped by `RuntimeMaxSec` |
 
 The canary is a **runbook sandbox**: a login, a tool set (gcc, git, jq, sqlite,
@@ -49,7 +49,7 @@ static address on `brlan`). Rationale, tiers and state volumes: `AGENTS.nix` not
   `hosts/frieren/infra-stack.nix`), `task vm:canary:ssh` from anywhere with the repo.
   The guest stops itself at the unit's `RuntimeMaxSec` — that is the cap that keeps
   a forgotten sandbox off frieren's 8 GiB, not a failure: boot it again.
-- **The sandbox shell**, from delphi: `task microvm:ssh NAME=sandbox` (root in the guest).
+- **The delphi sandbox is gone** (no KVM on OCI A1): `microvm:ssh` applies to the next declarative guest.
 
 ## Traps that look like a broken guest
 

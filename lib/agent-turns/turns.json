@@ -1,8 +1,84 @@
 {
-  "generated": "2026-11-20T12:30:36Z",
+  "generated": "2026-11-20T12:46:57Z",
   "count": 200,
-  "pin": "9cbb855dc045bd660058c2830d3d7f230f50c8ef5e9af7d3796462a701723ffd",
+  "pin": "957e80bf6f0e4c937f469a87612649bd108eff722979315a9e44d72330fbb2a4",
   "turns": [
+    {
+      "id": "a7cff9c3-6591-478f-90e5-03531c4c6cec",
+      "ts": "2026-11-20T12:46:38Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: all 4 panes active. frieren freebuff→gate docs, devin→review fleet-remote PRs #3/#4, agy→job search (RESTARTED on account route, was 429 on free Gemini tier), delphi freebuff→clean noise. Email triage: 19 attention rows, 4 drafts ready. devin landed fleet-remote PR #4 (repo setup). | gate: pane-watch BUSY x3 + delphi freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
+      "branch": "main",
+      "frame": "03h9rw17cy5m9ebnspy2gz97q"
+    },
+    {
+      "id": "5504fd7a-c1ba-435f-9e88-61d8a8e458db",
+      "ts": "2026-11-20T12:45:06Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "claim: continue job search loop, attention queue scan, upsert, follow-ups",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
+      "branch": "main",
+      "frame": "03h9rvqgb5lve70q23pf1hm6y"
+    },
+    {
+      "id": "e226c438-1ab6-404d-b35b-662fc8dbb743",
+      "ts": "2026-11-20T12:44:51Z",
+      "source": "devin",
+      "subject": "fleet-remote:repo-setup",
+      "action": "landed: PR #4 shaoyanji/fleet-remote — device-lane package scaffold (data/device, device, ui/device; comment-only markers), README repository-layout map, PR template, CI contents:read | gate: GH Actions debug x2 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "README.md",
+        ".github/workflows/android.yml",
+        ".github/pull_request_template.md",
+        "app/src/main/java/dev/shaoyanji/fleetremote/{device",
+        "data/device",
+        "ui/device}"
+      ],
+      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
+      "branch": "main",
+      "frame": "03h9rvoo8zb3e7xnzy9lkmyfg"
+    },
+    {
+      "id": "c36ab387-0882-4d3e-819a-f20bc08094c3",
+      "ts": "2026-11-20T12:38:37Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: corrected email triage on delphi freebuff pane to use LOCAL Postgres email_archive via NpgsqlRest (http://127.0.0.1:8080/api), not himalaya (jevdecide local_postgres 0.99). All 4 panes active: frieren freebuff→verify CV-link gate, devin→fleet-remote repo setup, agy→job search loop, delphi freebuff→email triage. freebuff landed 49e3c484, devin landed 96b84e2e, both pushed. | gate: pane-watch BUSY x3 + delphi freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
+      "branch": "main",
+      "frame": "03h9ruguuojxfafy9vh9e5243"
+    },
+    {
+      "id": "5b4a38c2-cbcc-432c-bfa1-41a66f57622a",
+      "ts": "2026-11-20T12:30:53Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-android",
+      "action": "landed: stripped hermes-android/FlipsiBridge shared config early (fleet-remote PR#3 phase 5 pulled forward) — plugins.enabled selection, gateway PYTHONPATH env, :8766 rule; live relay tree + empty drop-in dir + scratch/lock files removed on frieren | gate: checks:host HOST=frieren PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "hosts/frieren/configuration.nix",
+        "modules/user/ai/hermes-user.nix",
+        "modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
+      "branch": "main",
+      "frame": "03h9rsyiujtdspltb3s44dozh"
+    },
     {
       "id": "9b4ea9bd-7cbc-4d17-8ad2-10b715fc5dd2",
       "ts": "2026-11-20T12:28:53Z",
@@ -2782,74 +2858,6 @@
       "base_commit": "745f557763e691d4d3c047591200c4fea2decbf2",
       "branch": "main",
       "frame": "03h9ix1a584x8vocwdhheov67"
-    },
-    {
-      "id": "665050c2-075d-46fd-b657-cf112915c741",
-      "ts": "2026-11-19T09:12:18Z",
-      "source": "devji",
-      "subject": "nixconfig:kg-services",
-      "action": "landed b3d4b399: 159 service nodes + runs-on edges declared in flake/ontology.nix; kg-check and host pattern extended; quick+ontology+kg+frieren green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
-      "branch": "main",
-      "frame": "03h9iwv8ewsorc8er373p8e8i"
-    },
-    {
-      "id": "49531a46-309e-434b-b3d3-cb7c41ab9dc1",
-      "ts": "2026-11-19T09:10:29Z",
-      "source": "devji",
-      "subject": "nixconfig:kg-services",
-      "action": "correction: earlier post preceded the commit. Landed b3d4b399: 159 service nodes + runs-on edges, kg-check extended, ops:kg:host lists services; quick+kg-check+frieren green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
-      "branch": "main",
-      "frame": "03h9iwie3fgd5vghf7cxf4r6s"
-    },
-    {
-      "id": "9980d3bd-d54a-420e-948c-cbeafb73b1b2",
-      "ts": "2026-11-19T09:09:24Z",
-      "source": "devji",
-      "subject": "nixconfig:kg-services",
-      "action": "159 service nodes + runs-on edges in .#knowledgeGraph, kg-check schema/shape/floor extended, ops:kg:host lists services; quick+frieren+kg green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
-      "branch": "main",
-      "frame": "03h9iwav3ele089zfuqzhli9b"
-    },
-    {
-      "id": "8cc0b51f-ffd9-47c5-9909-d11814c97fb1",
-      "ts": "2026-11-19T09:07:11Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 11: freebuff landed record-port gate (b3d4b399, cross-checks service port records vs listeners, one-directional by design). Fed it graph-the-services (connect service map to knowledge graph).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
-      "branch": "main",
-      "frame": "03h9ivva4lzjsfkx5gl9e1h5q"
-    },
-    {
-      "id": "3366dd27-9098-4563-9566-8480b6d666b3",
-      "ts": "2026-11-19T09:04:12Z",
-      "source": "devji",
-      "subject": "nixconfig:service-port-gate",
-      "action": "checks:services:ports ties 29 record ports to host prose with boundaries; 7-case fixture; caught delphi 8453/8454 missing from prose; quick+frieren green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b3d4b399fad5016e2f956329f28e305ce8e2c7f5",
-      "branch": "main",
-      "frame": "03h9iva9oywxx3do5pcobh3y6"
     }
   ]
 }

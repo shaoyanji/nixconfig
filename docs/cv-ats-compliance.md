@@ -87,6 +87,44 @@ page someone has to notice.
 - The footer no longer carries `page 1 of`: on a one-page document it carries
   nothing, and on the full CV it carries only the page number, `1/2` and `2/2`.
 
+## The link gate: a CV the site ships is a CV the site links
+
+The rules above shape the four PDFs; this gate keeps them reachable.
+`lib/matt-site.nix` compiles `cv`, `cvDe`, `cvEnergy` and `cvEnergyDe` and lists
+them once in `cvFiles`. The installs read that list and so does the gate, so a CV
+added there without a page linking it fails the build instead of shipping as a
+file nobody can find, and the four filenames are spelled in one place.
+
+The gate is the last step of the `matt-site` derivation:
+`bash scripts/task/site-links.sh $out cv.pdf cv-de.pdf cv-energy.pdf
+cv-energy-de.pdf`. `scripts/task/site-links.sh` walks the finished artifact,
+resolves every root-relative and relative `href`/`src` the way Cloudflare Pages
+serves it (a file, or `x` as `x.html`), and fails on three things: a link that
+lands nowhere, a `*.pdf` no page links, and a named PDF the artifact does not
+ship. A failure leaves `$out` uncreated, so no task and no deploy can publish
+that site — the check is in the build rather than in a gate a deploy might skip.
+
+```bash
+nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site -L   # the gate runs here
+task site:links                                                         # both Nix sites, same script
+bash scripts/task/site-links.sh /tmp/matt-site cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf
+```
+
+A passing build prints `site-links: every internal link resolves and all 4 PDFs
+are linked` after the page count. An orphaned CV fails the build naming it:
+
+```text
+site-links: 67 internal links over 15 pages, 4 PDFs (4 required)
+FAIL no page links cv-energy-de.pdf
+FAIL no page links cv-energy.pdf
+site-links: 2 unlinked PDF(s) of 4
+```
+
+`--check` is not a flag on this Nix (`2.35.3`): it errors before building, and
+`--rebuild` only re-runs a derivation whose output is already in the store. To
+verify a change to the gate, perturb the input and build plainly — the failing
+derivation has no old output to re-check.
+
 ## Downstream: `task apps:build` compiles another template
 
 `task apps:build` drives the workflow checkout, and that checkout keeps its own

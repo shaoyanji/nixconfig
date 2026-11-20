@@ -20,6 +20,12 @@
 # exactly that way. Every *.pdf under the artifact must be the target of a link,
 # which also keeps a renamed or dropped CV from leaving a build-only file behind.
 #
+# It runs inside the `matt-site` derivation (lib/matt-site.nix), last, with that
+# build's `cvFiles` as the required list: `matt:build`, `matt:deploy:preview`
+# and `matt:deploy:prod` inherit the gate because they build the derivation, and
+# `task site:links` runs it over the same artifacts. The procedure and why it
+# lives in the build: docs/cv-ats-compliance.md, "The link gate".
+#
 # Exit: 0 every link resolves, every PDF is linked and every required PDF is
 # shipped, 1 any of those fails, 2 the input is not a directory.
 set -uo pipefail

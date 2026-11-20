@@ -24,6 +24,10 @@ in {
       smtp.port = 465;
       smtp.authentication = "plain";
       passwordCommand = "cat ${config.sops.secrets.gmail.path}";
+      # `Sent` is a stale Gmail label, not the Sent mailbox.
+      # himalaya 2.2.1 reads `mailbox.alias`; it ignores `folder.aliases`.
+      folders.sent = "[Gmail]/Sent Mail";
+      himalaya.settings.mailbox.alias.sent = "[Gmail]/Sent Mail";
       signature.text = gravatar.signature;
       himalaya.enable = true;
     };
@@ -51,6 +55,9 @@ in {
         username = "resend";
         password.command = "cat ${config.sops.secrets.resend-api-key.path}";
       };
+      # As `jisifu`: same Sent folder, same v1 alias key.
+      folders.sent = "[Gmail]/Sent Mail";
+      himalaya.settings.mailbox.alias.sent = "[Gmail]/Sent Mail";
       signature.text = gravatar.signature;
       himalaya.enable = true;
     };

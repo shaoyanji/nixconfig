@@ -176,7 +176,7 @@
     sshPort = 22;
     sshUser = "deck";
     sshHopTarget = "deck@localhost";
-    sshHopGroup = null;
+    sshHopGroup = "deck";
   };
   microvmProxyLocations = withGate: let
     proxies =

@@ -123,8 +123,8 @@
       "type": "site",
       "start": "2026-11",
       "end": "",
-      "summary": "This page: two languages from one template, a CV rendered from the same JSON, and no third-party scripts.",
-      "summaryDe": "Diese Seite: zwei Sprachen aus einer Vorlage, ein Lebenslauf aus denselben Daten, keine Skripte von Dritten.",
+      "summary": "Personal site: two languages from one template, a CV rendered from the same JSON, and no third-party scripts.",
+      "summaryDe": "Persönliche Website: zwei Sprachen aus einer Vorlage, ein Lebenslauf aus denselben Daten, keine Skripte von Dritten.",
       "keywords": [
         "Nix",
         "HTML",

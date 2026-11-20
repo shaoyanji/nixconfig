@@ -102,10 +102,17 @@
 ]
 
 // skills -------------------------------------------------------------------
-#head(labels.at("skills", default: "Skills"))
-#for s in d.stack [
-  #par(leading: 0.5em)[
-    #strong[#s.category]: #s.items.join(", ")
+// The section moves to the next page whole. Breaking inside it put the heading
+// and one group at the foot of page 1 and left the other two groups at the top
+// of page 2 under no heading, and breaking inside a group cut "ZFS and btrfs,"
+// from "systemd, CI gates" — a truncated list, not a new one. A one-page CV has
+// no break to make here, so its layout is unchanged.
+#block(breakable: false)[
+  #head(labels.at("skills", default: "Skills"))
+  #for s in d.stack [
+    #par(leading: 0.5em)[
+      #strong[#s.category]: #s.items.join(", ")
+    ]
   ]
 ]
 

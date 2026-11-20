@@ -255,7 +255,8 @@
     "title": "Was ich suche",
     "body": "Eine Senior- oder Lead-Rolle, in der Infrastruktur und Sicherheit aufeinandertreffen: Plattform-Engineering, Site Reliability oder Schwachstellenbetrieb. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
     "briefsNote": "Zwei Notizen dazu, was ich in den ersten neunzig Tagen tun würde:",
-    "wants": [        "Go, Python, PostgreSQL, NixOS — und gewohnt, einen Dienst von Anfang bis Ende zu verantworten",
+    "wants": [
+      "Go, Python, PostgreSQL, NixOS — und gewohnt, einen Dienst von Anfang bis Ende zu verantworten",
       "Kurzfristig verfügbar"
     ],
     "cta": {

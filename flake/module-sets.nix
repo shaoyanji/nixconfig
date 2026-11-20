@@ -73,6 +73,7 @@
       # ~/AGENTS.md from `.#homeAgents.<host>`; standalone HM configs get
       # `fleetHost` from the home assembler in flake/outputs.nix.
       moduleFiles."user.ai.home-agents"
+      moduleFiles."user.task-shim"
     ];
 in rec {
   inherit globalModules hmSharedModulesHome inventoryModules appendModules;

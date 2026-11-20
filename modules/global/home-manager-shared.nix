@@ -28,6 +28,7 @@
       # Shared by every embedded NixOS/darwin HM config; needs self + fleetHost
       # in that host's extraSpecialArgs (modules/global/{nixos,macos}.nix).
       self.modules."user.ai.home-agents"
+      self.modules."user.task-shim"
     ]
     ++ lib.optionals config.fleet.dankShell.enable [
       inputs.niri.homeModules.niri

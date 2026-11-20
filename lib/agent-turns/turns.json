@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T15:45:59Z",
+  "generated": "2026-11-20T15:55:25Z",
   "count": 200,
-  "pin": "edd5ee5b9db086ff032368d5cfe8d0374b6d59f8442ba8bd0ebbb6f94e97828d",
+  "pin": "d1808adee141513c67c91e536b9e21283aa72bb0fb39361d874cd71fa97afc26",
   "turns": [
+    {
+      "id": "61a1ea31-7216-43f1-a590-f2b036fb3ca4",
+      "ts": "2026-11-20T15:52:20Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "all 4 panes busy: win1 freebuff CV-link gate; win2 devin next nixconfig refactor (jev needs_review 0.75, top=next_refactor, proceeded per keep-moving directive); win3 agy generating followup emails (draft 6/6 Kent); delphi freebuff resolving himalaya config-format (himalaya 2.2.1 at pin, evaluating HM module config format)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4e8f80ab8257ed66745bd774fdb8adf21b5692a",
+      "branch": "main",
+      "frame": "03h9swb5b1pis6d6xz4raaufo"
+    },
+    {
+      "id": "67901fae-5615-442a-ae16-920b6adfd3fd",
+      "ts": "2026-11-20T15:51:27Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "drove panes: win2 devin pulled main + pushed to origin (e4e8f80a, local==origin so 04:00 autoUpgrade safe); delphi freebuff completed sent_alias_fix (107bef21, config fixed not activated due to 294-commit gap + open himalaya config-format question), now on himalaya_format resolution (jev 0.92); win3 agy busy on job search followup drafts; win1 freebuff on CV-link gate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4e8f80ab8257ed66745bd774fdb8adf21b5692a",
+      "branch": "main",
+      "frame": "03h9sw4ygkdfzba141jdnqeij"
+    },
+    {
+      "id": "18e9130a-8707-4f26-8428-906afcee817a",
+      "ts": "2026-11-20T15:51:14Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "staged: 8 tailored follow-up drafts in [Gmail]/Drafts (32794-32801) for stale leads >1 week; awaiting confirmation before live send",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4e8f80ab8257ed66745bd774fdb8adf21b5692a",
+      "branch": "main",
+      "frame": "03h9sw3cz6cg7ovpqzrbpmztd"
+    },
     {
       "id": "3a509f64-bd0a-4c32-87f5-1b5f7577b7a9",
       "ts": "2026-11-20T15:43:34Z",
@@ -2771,47 +2810,6 @@
       "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
       "branch": "main",
       "frame": "03h9jx7tdcr6e7pd170ez8100"
-    },
-    {
-      "id": "e1bc0bf0-4ff3-453d-83c0-0741b668e3fa",
-      "ts": "2026-11-19T12:10:51Z",
-      "source": "devin",
-      "subject": "scratch:bagua-weather",
-      "action": "landed: bagua-weather v0.1.0 M1-M4 | gate: pytest 32 PASS, ruff clean | DWD conventions verified (all-UTC from 2003-09-01); markov_contextual LL 0.769 beats climatology 1.388/persistence 1.048, tuned GBM edges it at 0.758 | dwell right-censored by daylight mask (stated)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9jvqto39enaqsdy00iaak2"
-    },
-    {
-      "id": "a27c223c-990d-40ba-99a1-3eee319da04f",
-      "ts": "2026-11-19T12:09:37Z",
-      "source": "devji",
-      "subject": "nixconfig:sentinel-push",
-      "action": "landed f01990c1: optional sentinel egress (push.url + sops bearer) and a UNIX-socket ingest behind frieren's default vhost; bearer-checked Go receiver, event validation, atomic per-host files; receiving collector degrades on peer-stale/peer-degraded by mtime; delphi pushes, frieren is the centre; checks:host frieren+delphi and checks:quick green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9jvi5o12zxh60dbce2tvgk"
-    },
-    {
-      "id": "c3279933-efe3-485d-aa4e-95c05bbe3476",
-      "ts": "2026-11-19T12:04:21Z",
-      "source": "frieren",
-      "subject": "nixconfig:delphi-cloud-service-node",
-      "action": "delphi freebuff (cloud service node) landed email-triage second-pass via remote model (19aa4ad4, triage.secondBackend asks infron about the envelope) + vhost registry gating (f2ef4587). Recommended: route review-class mail to agent:apps, allow capped body snippet for review rows, import Sent, cache verdicts per envelope, report queue depth to sentinel.",
-      "outcome": "done",
-      "claims": [
-        "modules/services/email-triage.nix"
-      ],
-      "files": [],
-      "base_commit": "5771d2da4feb5a091d951997aefcfe104f9c5b0b",
-      "branch": "main",
-      "frame": "03h9juh6jktl015q6qwtpeqcv"
     }
   ]
 }

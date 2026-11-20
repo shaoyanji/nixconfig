@@ -1343,7 +1343,7 @@
     open-parakeet-hardening = {
       title = "Harden the Parakeet STT service";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P2";
       date = "2026-10-19";
       summary = "The STT server decodes untrusted audio as root with no sandbox, no idle stop and no start limit.";
@@ -1363,6 +1363,20 @@
         Exit: a bounded unit (user, sandbox, memory cap, start limit) that still answers `POST /transcribe`
         with 200 and returns 413 above the 25 MB cap. The keep-alive body-drain fix already landed in
         `parakeet-server.py`.
+
+        Delivered 2026-11-20 (commits 6cb73ec9 + 422ad47d; eisen woken by `infra:wol:eisen`):
+        - DynamicUser + ProtectSystem=strict/PrivateTmp/MemoryMax=2G had already landed (28fe7729);
+          the unit is unchanged there except `Restart=always` → `on-failure` (a clean idle exit must
+          not resurrect the service) and `wantedBy` dropped — the service is socket-activated now.
+        - `parakeet-stt.socket` holds 127.0.0.1:8091 (Accept=no); the server takes the inherited fd
+          via LISTEN_FDS/LISTEN_PID, so a connection cold-starts the service (~50 s first hit).
+        - `--idle-timeout 900` exits the service cleanly; watchdog measured by hand at 20 s.
+        - Upload reads are bounded by a total 120 s deadline (a per-recv timeout alone does not
+          stop a drip). `--threads 8` untouched.
+        Verified live: socket-listener + dead service = 0 B resident vs 1.05 GiB before; POST
+        /transcribe → 200 through the cold start; 26 MB body → 413; 200 B/s drip → 400 "timed out"
+        at 120 s. Gate: `checks:host HOST=eisen` 2067 assertions; switch landed on eisen and is the
+        boot default (/run/current-system = b8mn7c9…-eisen-26.11.20261116.e21fec3).
       '';
     };
     open-eisen-gpu-off-bus = {

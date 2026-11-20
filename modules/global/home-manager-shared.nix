@@ -1,9 +1,10 @@
-# Canonical home-manager sharedModules baseline for embedded (NixOS) configs.
+# Canonical home-manager baseline for embedded (NixOS/darwin) configs.
 {
   self,
   inputs,
   lib,
   config,
+  user,
   ...
 }: {
   # A second Wayland shell cannot share a session with DMS: whichever starts
@@ -16,23 +17,45 @@
     description = "Import the DMS shell and niri home modules into embedded HM.";
   };
 
-  config.home-manager.sharedModules =
-    [
-      # The constants module takes `user` as an argument; HM is a nested eval, so
-      # the value is injected there too (the file says why).
-      self.modules."global.hm-user"
-      inputs.sops-nix.homeManagerModules.sops
-      inputs.kickstart-nixvim.homeManagerModules.default
-      inputs.nix-index-database.homeModules.nix-index
-      # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (lib/home-agents.nix).
-      # Shared by every embedded NixOS/darwin HM config; needs self + fleetHost
-      # in that host's extraSpecialArgs (modules/global/{nixos,macos}.nix).
-      self.modules."user.ai.home-agents"
-      self.modules."user.task-shim"
-    ]
-    ++ lib.optionals config.fleet.dankShell.enable [
-      inputs.niri.homeModules.niri
-      inputs.dms.homeModules.dank-material-shell
-      inputs.dms.homeModules.niri
-    ];
+  # `imports` is a module argument, so a fork has to be an option, not mkForce.
+  options.fleet.hmUserModules = lib.mkOption {
+    type = lib.types.listOf lib.types.path;
+    default = [self.modules."roles.home"];
+    description = "Home-manager modules for the embedded `devji` user.";
+  };
+
+  # Which parts of `roles.home` this host builds. A name the role does not know
+  # is a typo, and an enum makes that an eval error instead of a silently
+  # ignored string. Default is the full set in `modules/global/user.nix`.
+  options.fleet.hmUserFeatures = lib.mkOption {
+    type = lib.types.listOf (lib.types.enum user.hmFeatures);
+    default = user.hmFeatures;
+    description = "Named features of the desktop role (modules/roles/home.nix).";
+  };
+
+  config.home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    backupFileExtension = "hm-backup";
+    users.${user.name}.imports = config.fleet.hmUserModules;
+    sharedModules =
+      [
+        # The constants module takes `user` as an argument; HM is a nested eval, so
+        # the value is injected there too (the file says why).
+        self.modules."global.hm-user"
+        inputs.sops-nix.homeManagerModules.sops
+        inputs.kickstart-nixvim.homeManagerModules.default
+        inputs.nix-index-database.homeModules.nix-index
+        # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (lib/home-agents.nix).
+        # Shared by every embedded NixOS/darwin HM config; needs self + fleetHost
+        # in that host's extraSpecialArgs (modules/global/{nixos,macos}.nix).
+        self.modules."user.ai.home-agents"
+        self.modules."user.task-shim"
+      ]
+      ++ lib.optionals config.fleet.dankShell.enable [
+        inputs.niri.homeModules.niri
+        inputs.dms.homeModules.dank-material-shell
+        inputs.dms.homeModules.niri
+      ];
+  };
 }

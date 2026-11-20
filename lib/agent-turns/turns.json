@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T11:43:25Z",
+  "generated": "2026-11-20T11:44:24Z",
   "count": 200,
-  "pin": "c2936ea1ef68828ad6bf1a1292e843744206454721448a5a1704f87b88eb1af0",
+  "pin": "ca621fbe2e91d4cb442e9c6e7cd950b9aa094147efb80dfc7dac0ce84b7a96ef",
   "turns": [
+    {
+      "id": "891995eb-4565-42f6-af48-114c0b10cefd",
+      "ts": "2026-11-20T11:43:49Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 37: freebuff landed ats-resume 27e26469 (ATS-parsable CV+Lebenslauf), now building site CVs. agy landed triage-actions (Legence packet, gate apps:gate:packet PASS), now on job-search continue. devin on parakeet-hardening. jevdecide routed agy→job_search_continue (0.54 needs_review).",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a9bae7c263382764fc62975d30c6f053402f4e35",
+      "branch": "main",
+      "frame": "03h9rjrggqyweo5nkz7kscn08"
+    },
+    {
+      "id": "f2b11514-9209-4c90-8a84-a9275b1275e3",
+      "ts": "2026-11-20T11:43:46Z",
+      "source": "antigravity",
+      "subject": "nixconfig:agy-job-search",
+      "action": "claim: scan attention queue, tap & nudge, upsert applications on delphi PostgreSQL",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a9bae7c263382764fc62975d30c6f053402f4e35",
+      "branch": "main",
+      "frame": "03h9rjr4xcrinhf3buiy8hcom"
+    },
+    {
+      "id": "080eb9b7-9f81-43b3-9be3-6517cf1136db",
+      "ts": "2026-11-20T11:43:33Z",
+      "source": "devin",
+      "subject": "nixconfig:parakeet-hardening",
+      "action": "landed: parakeet-stt socket-activated (socket unit on 127.0.0.1:8091 + inherited-fd server), --idle-timeout 900 idle stop, 120s total body-read deadline, Restart=on-failure; sandbox/MemoryMax/StartLimit verified live; POST /transcribe 200, 26MB 413, drip 400@120s; eisen switched + boot default; gate: checks:host eisen 2067 assertions PASS; note closed in a9bae7c2",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a9bae7c263382764fc62975d30c6f053402f4e35",
+      "branch": "main",
+      "frame": "03h9rjpjxywum4x41a0j6o1ij"
+    },
     {
       "id": "b03d95be-b284-4634-abb0-af9965e28174",
       "ts": "2026-11-20T11:42:59Z",
@@ -2838,48 +2877,6 @@
       "base_commit": "70dc7f13d537b6527a05e4cac2f2ea0dfd46e0f3",
       "branch": "main",
       "frame": "03h9im6ttvrbq4gymeeyik6wj"
-    },
-    {
-      "id": "7cb39ce6-31e6-4c95-9b70-a72b2fc97605",
-      "ts": "2026-11-19T08:13:24Z",
-      "source": "devji",
-      "subject": "nixconfig:registry-schema",
-      "action": "delivered lib/registry-schema.nix + checks.registry-schema (rides in checks:quick): knob path roots, option casing with recorded exceptions, ports as data (6 prose ports now fields), umbrella census; checks:host frieren, quick, notes and prose green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0194f7cae8ca333f915af3bef693ecf1013c015c",
-      "branch": "main",
-      "frame": "03h9ild1r00sj23hwr8g4d8fj"
-    },
-    {
-      "id": "ea24e938-cf86-4c55-8e1a-d0217a322241",
-      "ts": "2026-11-19T08:07:01Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 2: freebuff landed ZIM shelf measurement (0194f7ca, ops:wiki:stats + wiki-ask --stats, answers semantic-search kill criterion). Fed it config-registry-schema (P4) next. Routed email triage to agy (Gemini 3.8 Flash). Inbox: nixcachix CI failures on nixconfig, Oracle trial expiry, iOS login + amazon sign-in + Google security alerts, Host&Stay app.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "0194f7cae8ca333f915af3bef693ecf1013c015c",
-      "branch": "main",
-      "frame": "03h9ik45zk4snj51jipx5dzl8"
-    },
-    {
-      "id": "5c14aabd-4852-4eb0-9de3-58ae40ba86ce",
-      "ts": "2026-11-19T08:03:50Z",
-      "source": "devji",
-      "subject": "nixconfig:wiki-ask-stats",
-      "action": "semantic-search kill criterion measured from the verdict log: 456 verdicts all on the 2026-11-04 build day, 0 in 14 days; added --stats and ops:wiki:stats (exit 1 on an empty window), deletion left as the operator call",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0194f7cae8ca333f915af3bef693ecf1013c015c",
-      "branch": "main",
-      "frame": "03h9ijhrc3wjpabi8m284ykj0"
     }
   ]
 }

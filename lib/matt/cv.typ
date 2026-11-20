@@ -38,7 +38,10 @@
 // A heading is bold text in the document's own language, not an uppercased,
 // tracking-spaced label: `Experience` is the string a parser matches, and 0.14em
 // of letter-spacing is what some extracts turn into `E X P E R I E N C E`.
-#let head(title) = block(above: 9.5pt, below: 3pt)[
+// `sticky` keeps a heading with the block that follows it. Without it the built
+// cv.pdf ended page 1 on `Education` with both degrees on page 2: a heading alone
+// at the foot of a page is the layout defect this template is meant to avoid.
+#let head(title) = block(above: 9.5pt, below: 3pt, sticky: true)[
   #text(size: 9.7pt, weight: "bold", fill: accent)[#title]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#bbbbbb"))

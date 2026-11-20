@@ -39,7 +39,7 @@ and the fonts (New Computer Modern, Libertinus Serif) ship with Typst.
 
 | File | Change |
 | :--- | :--- |
-| `lib/matt/cv.typ` | header stacked into one column, contact URLs as plain text; headings in normal case at 9.7pt with no tracking; each role, degree and project on one line with its period; footer reduced to the page number (`1/2`), and omitted on a one-page document; `show link` rule removed because no link remains |
+| `lib/matt/cv.typ` | header stacked into one column, contact URLs as plain text; headings in normal case at 9.7pt with no tracking, and `sticky` so a heading cannot end a page alone; each role, degree and project on one line with its period; footer reduced to the page number (`1/2`), and omitted on a one-page document; `show link` rule removed because no link remains |
 | `modules/plugins/appflow/templates/lebenslauf.typ` | `entry()` uses one column instead of a two-column grid; `section()` sets the heading in its own case, not uppercased |
 | `lib/matt-site.nix` | `cvLabels` now carries the standard words: `Projects`, `Skills`, `Languages` / `Projekte`, `Kenntnisse`, `Sprachen`; the key `tools` became `skills` |
 | `lib/matt/cv-energy.json`, `cv-energy.de.json` | the tailored CV overrides `projects` with `Projects` / `Projekte` instead of `Relevant projects` / `Relevante Projekte` |
@@ -55,7 +55,7 @@ its last page the content reached, in millimetres.
 
 | Document | Budget | Before | After |
 | :--- | ---: | :--- | :--- |
-| `cv.pdf` (full, English) | 2 | 2 pages, 53 mm | 2 pages, 72 mm |
+| `cv.pdf` (full, English) | 2 | 2 pages, 53 mm | 2 pages, 80 mm |
 | `cv-de.pdf` (full, German) | 2 | 2 pages, 72 mm | 2 pages, 88 mm |
 | `cv-energy.pdf` (tailored) | 1 | 1 page, 270 mm | 1 page, 269 mm |
 | `cv-energy-de.pdf` (tailored) | 1 | 1 page, 273 mm | 1 page, 273 mm |
@@ -79,7 +79,10 @@ page someone has to notice.
   `<typeset>` report.
 - `pdftotext` order: name, role, contact, summary, `Experience`, roles, `Projects`,
   `Education`, `Skills`, `Languages` — the name at line 1 of the extracted text and
-  the headings at lines 12, 42, 66, 73 and 79.
+  the headings at lines 12, 42, 69, 73 and 79.
+- Built through `nix build .#sites.matt-site`, the four CVs the site ships extract
+  their headings as standard words, carry no link annotation, and no heading ends a
+  page: page 1 of the full CV closes on an entry, and page 2 opens on `Education`.
 - No link annotation is left: a scan of the PDF bytes finds no `/URI`.
 - The footer no longer carries `page 1 of`: on a one-page document it carries
   nothing, and on the full CV it carries only the page number, `1/2` and `2/2`.

@@ -31,8 +31,10 @@ from pathlib import Path
 from parakeet_stt.transcribe import OnnxParakeet, read_audio
 
 MAX_BODY_BYTES = 25 * 1024 * 1024
-# An upload that stalls holds a request thread forever; two minutes is generous
-# for 25 MB on the LAN and still bounds the stall.
+# An upload that stalls holds a request thread forever; two minutes is a
+# generous *total* deadline for 25 MB (~218 KB/s floor) and still bounds it.
+# A per-recv socket timeout alone is not enough: a drip that keeps bytes
+# coming never blocks a syscall long enough to trip it.
 READ_TIMEOUT_SECONDS = 120
 # sd_listen_fds(3): fd 0,1,2 are stdio; the first passed socket is fd 3.
 SD_LISTEN_FDS_START = 3
@@ -66,6 +68,22 @@ def make_handler(server: Server):
 
         def log_message(self, *args):  # keep stdout clean; errors go via send_error_json
             pass
+
+        def _read_body(self, length: int) -> bytes:
+            deadline = time.monotonic() + READ_TIMEOUT_SECONDS
+            parts = []
+            remaining = length
+            while remaining > 0:
+                budget = deadline - time.monotonic()
+                if budget <= 0:
+                    raise TimeoutError(f"body not complete within {READ_TIMEOUT_SECONDS}s")
+                self.request.settimeout(budget)
+                chunk = self.rfile.read1(min(remaining, 1 << 16))
+                if not chunk:
+                    raise OSError("connection closed mid-body")
+                parts.append(chunk)
+                remaining -= len(chunk)
+            return b"".join(parts)
 
         def _json(self, status: int, payload: dict, close: bool = False) -> None:
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -101,7 +119,7 @@ def make_handler(server: Server):
                 self._json(413, {"error": "body exceeds 25 MB cap"}, close=True)
                 return
             try:
-                data = self.rfile.read(length)
+                data = self._read_body(length)
             except OSError as exc:
                 self._json(400, {"error": f"failed to read body: {exc}"})
                 return

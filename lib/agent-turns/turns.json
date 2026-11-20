@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-20T11:33:23Z",
+  "generated": "2026-11-20T11:37:46Z",
   "count": 200,
-  "pin": "fa31185076d16d52ddd2eba60986e3390a74ae3a5d7802164be0516a64257f28",
+  "pin": "c01db2399f8cd67bedf753b69d765496e3276f59d542c35500afc2954dc7afbe",
   "turns": [
+    {
+      "id": "82095ecb-9764-40b4-835b-10e9900fea75",
+      "ts": "2026-11-20T11:35:52Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 36: committed+pushe ea0e6766 (xs-notify ntfy→Telegram rewrite). Nudged freebuff→Typst resume QC, agy→triage apply-now actions. devin on parakeet-hardening. | gate: git push origin/main OK",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "ea0e6766d0bb7a981a1cf7679f729d1d9793dd05",
+      "branch": "main",
+      "frame": "03h9ri7i6iagijha4iu4u3brq"
+    },
+    {
+      "id": "172a7900-b08b-4572-a6db-59a43b7eccc6",
+      "ts": "2026-11-20T11:33:39Z",
+      "source": "hermes",
+      "subject": "nixconfig:xs-notify-deploy",
+      "action": "landed: committed+pushe ea0e6766 (rewrite ntfy→Telegram bot push, delphi→@Frierenixbot) | gate: git push origin/main OK",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ea0e6766d0bb7a981a1cf7679f729d1d9793dd05",
+      "branch": "main",
+      "frame": "03h9rhryz9fomb5r3x5pd0s9s"
+    },
     {
       "id": "f828740b-4f6e-4c97-970a-d6764550f695",
       "ts": "2026-11-20T11:07:48Z",
@@ -2857,32 +2883,6 @@
       "base_commit": "73becf6bca061bbf3418292df3d9b9a7998f2cf3",
       "branch": "main",
       "frame": "03h9igrewhgvot9fzysayua6t"
-    },
-    {
-      "id": "32823f51-a6a8-48d3-b6b7-da88bb22f41d",
-      "ts": "2026-11-19T07:33:17Z",
-      "source": "devji",
-      "subject": "nixconfig:firecrawl-local-loopback",
-      "action": "firecrawl-local 0.1.0 built on clanker 5m42s, serves 127.0.0.1:3002, measured 5-25x faster than cloud; hermes extract pinned to firecrawl + FIRECRAWL_API_URL and verified by a refused connect to 3002 when the unit was stopped",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "be8f256e817bcc7f04ffd8648af10d01a4a6e821",
-      "branch": "main",
-      "frame": "03h9idiwjiehdnla14nlgyb5a"
-    },
-    {
-      "id": "743e95d9-50c1-4b90-ad4a-dfacec76e713",
-      "ts": "2026-11-19T07:23:49Z",
-      "source": "devji",
-      "subject": "nixconfig:delphi-hm-login-shell",
-      "action": "home-manager-devji failed since 00:52 because HM's .bashrc interactive guard returns 1 and its .bash_profile ends on the matching && chain; owned .bash_profile with errexit-safe sourcing, unit active, switch rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6ab06f1015a7a7896d54eebc26004465d0191e9",
-      "branch": "main",
-      "frame": "03h9ibo9nt9s3cbtxhoeakbex"
     }
   ]
 }

@@ -172,6 +172,7 @@
   microvmGuest = {
     services = [];
     stirlingPath = "/microvm/stirling/";
+    stirling = null;
     sshPort = 22;
     sshUser = "deck";
     sshHopTarget = "deck@localhost";

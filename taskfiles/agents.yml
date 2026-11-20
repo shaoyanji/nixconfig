@@ -850,7 +850,7 @@ tasks:
         esac
 
   agents:apps:packet:
-    desc: "Build a packet through nix: a store path with the CV and letter PDFs (ID=, or EXAMPLE=1 for the fictional fixture; RESUME=, LETTER=, JD=, OUT=link)"
+    desc: "Build a packet through nix: a store path with the CV and letter PDFs (ID=, or EXAMPLE=1 for the fictional fixture; RESUME=, LETTER=, JD=, PAGES=, OUT=link)"
     vars:
       ID: '{{.ID | default ""}}'
       EXAMPLE: '{{.EXAMPLE | default "0"}}'
@@ -858,6 +858,7 @@ tasks:
       RESUME: '{{.RESUME | default ""}}'
       LETTER: '{{.LETTER | default ""}}'
       JD: '{{.JD | default ""}}'
+      PAGES: '{{.PAGES | default ""}}'
     cmds:
       - |
         args=()
@@ -867,6 +868,7 @@ tasks:
         [ -n "{{.RESUME}}" ] && args+=(--resume "{{.RESUME}}")
         [ -n "{{.LETTER}}" ] && args+=(--letter "{{.LETTER}}")
         [ -n "{{.JD}}" ] && args+=(--jd "{{.JD}}")
+        [ -n "{{.PAGES}}" ] && args+=(--pages "{{.PAGES}}")
         [ -n "{{.ID}}" ] || [ "{{.EXAMPLE}}" = "1" ] || {
           echo "agents:apps:packet: ID is required (or EXAMPLE=1)" >&2; exit 2; }
         bash scripts/task/appflow-packet.sh "${args[@]}"

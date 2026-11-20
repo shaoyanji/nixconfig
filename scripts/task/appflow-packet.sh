@@ -26,6 +26,7 @@ id=""
 out=""
 resume=""
 letter=""
+pages=""
 example=0
 
 usage() { sed -n '4,12p' "$0" | sed 's/^# \{0,1\}//'; }
@@ -37,6 +38,7 @@ while [ $# -gt 0 ]; do
     --resume) resume="${2:-}"; shift 2 ;;
     --letter) letter="${2:-}"; shift 2 ;;
     --jd) jd="${2:-}"; shift 2 ;;
+    --pages) pages="${2:-}"; shift 2 ;;
     --out) out="${2:-}"; shift 2 ;;
     --example) example=1; shift ;;
     -h | --help) usage; exit 0 ;;
@@ -64,7 +66,8 @@ if [ -n "$id" ]; then
             role,
             apply_url: (.applyUrl // ""),
             language: (if (.language // "") == "en" or (.language // "") == "english_us"
-                       then "en" else "de" end)
+                       then "en" else "de" end),
+            pages: (.pages // (if (.category // "") == "minijob" or (.category // "") == "hospitality" then 1 else 2 end))
           }' | jq --arg d "$today" '. + {date: $d}' >"$work/application.json"
   name="$id"
 else
@@ -150,6 +153,12 @@ else
   echo "appflow-packet: no letter.json — building the CV only" >&2
 fi
 
+pages_clause=""
+pages="${pages:-$(jq -r '.pages // empty' "$work/application.json" 2>/dev/null || true)}"
+if [ -n "$pages" ]; then
+  pages_clause="pages = $pages;"
+fi
+
 expr="let
   repo = $REPO;
   flake = builtins.getFlake (\"path:\" + toString repo);
@@ -160,6 +169,7 @@ in
     resume = $work/resume.json;
     $letter_clause
     $jd_clause
+    $pages_clause
     name = \"$name\";
   }"
 

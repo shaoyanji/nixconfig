@@ -39,6 +39,8 @@
   if basics.at("email", default: "") != "" { parts.push(basics.email) }
   if basics.at("phone", default: "") != "" { parts.push(basics.phone) }
   for profile in profiles { parts.push(profile.at("url", default: profile.at("username", default: ""))) }
+  // The German corpus carries no `profiles`: keep one link rather than none.
+  if profiles.len() == 0 and basics.at("url", default: "") != "" { parts.push(basics.url) }
   if place != "" { parts.push(place) }
   parts.join(" • ")
 }
@@ -72,7 +74,8 @@
   let first = year(start)
   if first == none { "" } else {
     let last = if year(end) == none { strings.at("present") } else { year(end) }
-    first + " – " + last
+    // A six-month role printed "2012 – 2012".
+    if last == first { first } else { first + " – " + last }
   }
 }
 
@@ -138,7 +141,11 @@
   #for study in resume.at("education", default: ()) [
     #entry(
       study.at("institution", default: ""),
-      (study.at("studyType", default: "") + " " + study.at("area", default: "")),
+      {
+        let kind = study.at("studyType", default: "")
+        let area = study.at("area", default: "")
+        if kind != "" and area != "" { kind + ", " + area } else { kind + area }
+      },
       period(study.at("startDate", default: ""), study.at("endDate", default: "")),
       study.at("courses", default: ()),
     )

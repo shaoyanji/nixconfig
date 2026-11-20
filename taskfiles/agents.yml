@@ -588,19 +588,20 @@ tasks:
         echo "resolved {{.ID}} ($n verdict(s))"
 
   agents:mail:sweep:
-    desc: "Resolve a block of the human queue by selector (SENDER= DOMAIN= SUBJECT= TIER= OLDER= NEWER=; dry run unless DRY=0)"
+    desc: "Resolve a block of the open queue by selector (SENDER= DOMAIN= SUBJECT= TIER= OWNER= OLDER= NEWER=; dry run unless DRY=0)"
     summary: >
-      One decision per sender, not 511 per message. Selectors combine with AND
-      and at least one is required, so a mistyped command cannot empty the queue.
-      Prints what matched, by tier and by sender, before anything is written;
-      DRY=0 resolves every match through /api/triage-resolve, which only sets
-      `resolved_at` — the mail stays archived and searchable. FORMAT=json and
-      FORMAT=text exist; TOON is the default because an agent is the reader.
+      One decision per sender, not 511 per message. Rows come from
+      /api/agent-queue for the unowned and human queues, every tier included;
+      `attention` is the person's queue and answers a digest selector with
+      nothing. Selectors AND together and at least one is required. Prints
+      matches by tier and sender first; DRY=0 resolves via /api/triage-resolve,
+      which sets `resolved_at` only, so the mail stays archived and searchable.
     vars:
       SENDER: '{{.SENDER | default ""}}'
       DOMAIN: '{{.DOMAIN | default ""}}'
       SUBJECT: '{{.SUBJECT | default ""}}'
       TIER: '{{.TIER | default ""}}'
+      OWNER: '{{.OWNER | default ""}}'
       OLDER: '{{.OLDER | default ""}}'
       NEWER: '{{.NEWER | default ""}}'
       LIMIT: '{{.LIMIT | default "0"}}'
@@ -612,7 +613,7 @@ tasks:
           echo "agents:mail:sweep: a selector is required (SENDER= DOMAIN= SUBJECT= TIER= OLDER= NEWER=)" >&2
           exit 2; }
         args=(--sender "{{.SENDER}}" --domain "{{.DOMAIN}}" --subject "{{.SUBJECT}}"
-              --tier "{{.TIER}}" --limit "{{.LIMIT}}")
+              --tier "{{.TIER}}" --owner "{{.OWNER}}" --limit "{{.LIMIT}}")
         [ -n "{{.OLDER}}" ] && args+=(--older "{{.OLDER}}")
         [ -n "{{.NEWER}}" ] && args+=(--newer "{{.NEWER}}")
         [ "{{.DRY}}" != "1" ] && args+=(--apply)

@@ -47,6 +47,7 @@ tasks:
       - task: checks:repo:paths
       - task: checks:docs:links
       - task: checks:docs:links:test
+      - task: checks:task-shim:test
       - task: checks:services:ports
       - task: checks:prose
       - task: checks:infron
@@ -100,6 +101,16 @@ tasks:
       no network, no eval.
     cmds:
       - bash tests/docs-links/run.sh
+
+  checks:task-shim:test:
+    desc: Regression fixture for the ~/Taskfile.yml shim (modules/user/task-shim.nix)
+    summary: >
+      Rebuilds a temp $HOME with the shipped shim and a Documents/nixconfig
+      symlink at this checkout: `task --list` must exit 0 and name a repo task,
+      and a duplicate flattened include must exit 203 with "multiple tasks" —
+      the collision class the note measured.
+    cmds:
+      - bash tests/task-shim/run.sh
 
   checks:services:ports:
     desc: A service record's port must be the port its host's prose states

@@ -3307,7 +3307,7 @@
     taskfile-plane-handmade = {
       title = "The $HOME task plane is a hand-made shim, and it fails where it exists";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P2";
       date = "2026-10-22";
       summary = "`~/Taskfile.yml` is hand-made and untracked, and `task` from $HOME fails on both hosts checked: 203 on frieren (duplicate `load-env` under a flattened include) and 100 on scratch (no file). Working forms are `task -t <repo>/Taskfile.yml` or running inside the clone.";
@@ -3333,6 +3333,13 @@
         read-only), it must not redefine a flattened name such as `load-env` (use a prefixed/namespace
         include instead of `flatten: true`), and it needs a gate that runs `task --list` in `$HOME` so a
         collision cannot ship. Exit criteria: that gate passes on every active host the module serves.
+
+        Delivered 2026-11-20: `modules/user/task-shim.nix` emits `~/Taskfile.yml`
+        through `home.file` (fleetHost-gated like AGENTS.md) from the single
+        source `modules/user/task-shim.yml`, and `checks:task-shim:test` proves
+        `task --list` exits 0 in a temp $HOME and that a duplicate flattened
+        include exits 203. `flatten: true` stays — the contract is unprefixed
+        task names — and the root file defines no tasks, so it cannot shadow.
       '';
     };
 

@@ -1,0 +1,6 @@
+version: "3"
+includes:
+    nixconfig:
+        taskfile: ~/Documents/nixconfig/Taskfile.yml
+        dir: ~/Documents/nixconfig
+        flatten: true

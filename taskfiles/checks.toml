@@ -462,6 +462,10 @@ name = "checks:docs:links:test"
 kind = "leaf"
 
 [[check]]
+name = "checks:task-shim:test"
+kind = "leaf"
+
+[[check]]
 name = "checks:services:ports"
 kind = "leaf"
 

@@ -1,8 +1,41 @@
 {
-  "generated": "2026-11-20T10:52:15Z",
+  "generated": "2026-11-20T11:02:19Z",
   "count": 200,
-  "pin": "634f34ab3b45457129ffd1de38ed9cf71d58812cc5d78ec563b951d9801af408",
+  "pin": "e98013941177208d3b287cb720e0ba8c1e5b830ddee88997e8af359714441164",
   "turns": [
+    {
+      "id": "e2153656-7bde-4931-8ab8-60746cce0ad1",
+      "ts": "2026-11-20T11:02:17Z",
+      "source": "devin",
+      "subject": "nixconfig:parakeet-hardening",
+      "action": "claim: harden parakeet STT unit on eisen (sandbox, MemoryMax, StartLimit, idle stop, read timeout)",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/eisen"
+      ],
+      "files": [],
+      "base_commit": "768bdabcf544623c685aaf312d729b6d4e5e1f73",
+      "branch": "main",
+      "frame": "03h9rbndz7dp4po0mz4a9p6up"
+    },
+    {
+      "id": "37eebcdc-2da0-4880-aa69-ab460f83e662",
+      "ts": "2026-11-20T10:52:23Z",
+      "source": "devin",
+      "subject": "nixconfig:frieren-offload",
+      "action": "landed: verified all offload exit criteria live on frieren+delphi; open-frieren-offload marked DELIVERED with measurements | gate: ops:notes:show reads DELIVERED, nix parse OK",
+      "outcome": "done",
+      "claims": [
+        "hosts/frieren",
+        "hosts/delphi"
+      ],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "768bdabcf544623c685aaf312d729b6d4e5e1f73",
+      "branch": "main",
+      "frame": "03h9r9pppsy3byk3le3awsa3c"
+    },
     {
       "id": "9cd32113-3fb0-4b21-8070-4953ccd81888",
       "ts": "2026-11-20T10:50:57Z",
@@ -2850,32 +2883,6 @@
       "base_commit": "288a74196288fb030bbf4b9186803954b2a57f47",
       "branch": "main",
       "frame": "03h9fvo91ea7r6xpxyk33k7ue"
-    },
-    {
-      "id": "57067bfc-14d8-4883-8922-f7abd58572c5",
-      "ts": "2026-11-18T23:43:35Z",
-      "source": "devji",
-      "subject": "nixconfig:rbw-vault-firecrawl-local",
-      "action": "rbw-only vault workflow doc + 2 AGENTS.nix notes landed; aac skipped (needs unpackaged binary + bw shim), firecrawl-local BLOCKED (no prebuilt anywhere, 1 build needed); aria2 gid cc9f0dc4 GGUF Q4_K_M 5.78GB status=complete sha=ok",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "502c207d2a544442aeded0ee3b954d81ecd15633",
-      "branch": "HEAD",
-      "frame": "03h9ftrtbib7wkadmjy4o80lm"
-    },
-    {
-      "id": "2248d048-df9c-4575-9220-57c9d85b4e6d",
-      "ts": "2026-11-18T23:28:16Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-19: 0 plate(s) kept of 0 spent, 18 roster row(s) waiting, 522 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
-      "branch": "main",
-      "frame": "03h9fqs50t0ex49ok06h797nr"
     }
   ]
 }

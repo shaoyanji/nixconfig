@@ -5,6 +5,13 @@
 // One template renders both languages. The data carries translated prose and a
 // closed set of labels; a second template would let a heading or a page number
 // drift between an English and a German CV that claim to be the same document.
+//
+// The layout is one column on purpose: an applicant tracking system reads the
+// text stream, so the name, the contact block, every heading and every entry sit
+// in document order. No `grid` in the body (a right-aligned date is a column
+// jump), no letter-spacing, no link anchors, and no name in the footer — a parser
+// that drops footers or link text must still find the whole document. Why:
+// docs/cv-ats-compliance.md.
 #let d = json("cv.json")
 #let p = d.profile
 #let labels = d.at("labels", default: (:))
@@ -14,40 +21,43 @@
 #set page(
   paper: "a4",
   margin: (x: 17mm, top: 14mm, bottom: 15mm),
+  // Page numbers only, and only once there is a second page: a footer repeating
+  // the name is content a parser may skip, a page number is not content.
   footer: context align(center, text(size: 7.6pt, fill: rgb("#666666"))[
-    #p.name · #p.handle · #labels.at("page", default: "page") #counter(page).display() #labels.at("of", default: "of") #counter(page).final().first()
+    #if counter(page).final().first() > 1 [
+      #counter(page).display() / #counter(page).final().first()
+    ]
   ]),
 )
 #set text(font: "New Computer Modern", size: 9.4pt, lang: lang)
 #set par(leading: 0.58em, justify: false)
-#show link: it => text(fill: rgb("#1c5f4d"))[#it]
 
 #let muted = rgb("#555555")
 #let accent = rgb("#1c5f4d")
 
-#let head(title) = block(above: 11pt, below: 4pt)[
-  #text(size: 7.9pt, weight: "bold", tracking: 0.14em, fill: accent, upper(title))
-  #v(-3pt)
+// A heading is bold text in the document's own language, not an uppercased,
+// tracking-spaced label: `Experience` is the string a parser matches, and 0.14em
+// of letter-spacing is what some extracts turn into `E X P E R I E N C E`.
+#let head(title) = block(above: 9.5pt, below: 3pt)[
+  #text(size: 9.7pt, weight: "bold", fill: accent)[#title]
+  #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#bbbbbb"))
 ]
 
 // header -------------------------------------------------------------------
-#grid(columns: (1fr, auto), column-gutter: 12pt)[
-  #text(size: 21pt, weight: "bold")[#p.name]
-  #v(1pt)
-  #text(size: 10.5pt)[#p.title]
-][
-  #align(right)[
-    #text(size: 8.3pt, fill: muted)[
-      #p.handle \
-      #p.location \
-      #link("https://matt.bountystash.com")[matt.bountystash.com] \
-      #link("https://github.com/shaoyanji")[github.com/shaoyanji] · #link("https://linkedin.com/in/mattji")[linkedin.com/in/mattji]
-    ]
-  ]
+// Top to bottom, one column: name, role, contact, rule, summary. The contact
+// URLs are plain text, because a parser that strips a link anchor leaves the
+// anchor's text or nothing at all, depending on who built it.
+#text(size: 20pt, weight: "bold")[#p.name]
+#v(1.5pt)
+#text(size: 10.5pt)[#p.title]
+#v(3pt)
+#text(size: 8.4pt, fill: muted)[
+  #p.handle · #p.location \
+  matt.bountystash.com · github.com/shaoyanji · linkedin.com/in/mattji
 ]
 
-#v(5pt)
+#v(4pt)
 #line(length: 100%, stroke: 0.9pt + black)
 #v(4pt)
 #text(size: 9.2pt)[#p.bio]
@@ -56,13 +66,11 @@
 #head(labels.at("experience", default: "Experience"))
 #for w in d.work {
   block(above: 5pt, below: 1pt)[
-    #grid(columns: (1fr, auto), column-gutter: 8pt)[
-      #strong[#w.title] #h(3pt) #text(fill: muted)[#w.role]
-    ][
-      #text(size: 8.1pt, fill: muted)[#w.period]
-    ]
+    // Title, role and period on one line: the date follows the entry it belongs
+    // to in reading order instead of being parked in a second column.
+    #par[#strong[#w.title] — #text(fill: muted)[#w.role] #text(size: 8.1pt, fill: muted)[· #w.period]]
     #if w.at("description", default: "") != "" [
-      #text(size: 8.9pt)[#w.description]
+      #par[#text(size: 8.9pt)[#w.description]]
     ]
     // Only a tailored CV carries bullets: the full one names the role and the
     // prose behind it, and an empty list renders nothing rather than a gap.
@@ -76,7 +84,7 @@
 }
 
 // projects -----------------------------------------------------------------
-#head(labels.at("projects", default: "Selected projects"))
+#head(labels.at("projects", default: "Projects"))
 #for e in d.projects.slice(0, calc.min(6, d.projects.len())) [
   #par(leading: 0.5em)[
     #strong[#e.name] #text(size: 8pt, fill: muted)[— #e.period] \
@@ -87,15 +95,11 @@
 // education ----------------------------------------------------------------
 #head(labels.at("education", default: "Education"))
 #for e in d.education [
-  #grid(columns: (1fr, auto), column-gutter: 8pt)[
-    #strong[#e.degree], #e.school
-  ][
-    #text(size: 8.1pt, fill: muted)[#e.period]
-  ]
+  #par[#strong[#e.degree], #e.school #text(size: 8.1pt, fill: muted)[· #e.period]]
 ]
 
-// tools --------------------------------------------------------------------
-#head(labels.at("tools", default: "Tools"))
+// skills -------------------------------------------------------------------
+#head(labels.at("skills", default: "Skills"))
 #for s in d.stack [
   #par(leading: 0.5em)[
     #strong[#s.category]: #s.items.join(", ")
@@ -103,7 +107,7 @@
 ]
 
 // languages and authorisation ---------------------------------------------
-#head(labels.at("languages", default: "Languages and authorisation"))
+#head(labels.at("languages", default: "Languages"))
 #par[#p.languages]
 #par[#p.workAuth]
 

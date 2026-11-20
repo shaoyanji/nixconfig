@@ -70,22 +70,23 @@
 }
 
 // A heading is derived from the section in the application's language; the data
-// never carries translated headings.
+// never carries translated headings. It is set in its own case, not uppercased:
+// `Berufserfahrung` is the string a parser matches.
 #let section(kind) = block(breakable: false, width: 100%)[
   #v(5pt)
-  #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#upper(strings.at(kind, default: kind))]
+  #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#strings.at(kind, default: kind)]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
   #v(2pt)
 ]
 
+// One column: the date follows the entry it dates, instead of sitting in a
+// right-hand column an ATS may read out of order. docs/cv-ats-compliance.md.
 #let entry(title, subtitle, when, bullets) = block(breakable: false, width: 100%)[
-  #grid(
-    columns: (1fr, auto),
-    column-gutter: 8pt,
-    [#text(weight: "bold")[#title]],
-    [#text(size: 8.5pt, fill: rgb("#4b5563"))[#when]],
-  )
+  #par[
+    #text(weight: "bold")[#title]
+    #if when != "" [#text(size: 8.5pt, fill: rgb("#4b5563"))[ — #when]]
+  ]
   #if subtitle != "" [#text(size: 8.5pt, fill: rgb("#4b5563"))[#subtitle]]
   #if bullets != () [
     #v(1pt)

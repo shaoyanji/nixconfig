@@ -619,25 +619,28 @@
 
   # The closed label set the CV template reads. A heading is part of the
   # document's language, so it lives with the other localized strings rather than
-  # in a second template.
+  # in a second template. The words are the standard headings an applicant
+  # tracking system matches (`Experience`, `Education`, `Skills`, `Languages`,
+  # `Projects`), not a house style: a heading a parser cannot classify turns that
+  # section into unsorted text. Why: docs/cv-ats-compliance.md.
   cvLabels = {
     en = {
       cv = "CV";
       experience = "Experience";
-      projects = "Selected projects";
+      projects = "Projects";
       education = "Education";
-      tools = "Tools";
-      languages = "Languages and authorisation";
+      skills = "Skills";
+      languages = "Languages";
       page = "page";
       of = "of";
     };
     de = {
       cv = "Lebenslauf";
       experience = "Berufserfahrung";
-      projects = "Ausgewählte Projekte";
+      projects = "Projekte";
       education = "Ausbildung";
-      tools = "Werkzeuge";
-      languages = "Sprachen und Arbeitserlaubnis";
+      skills = "Kenntnisse";
+      languages = "Sprachen";
       page = "Seite";
       of = "von";
     };

@@ -1,8 +1,63 @@
 {
-  "generated": "2026-11-20T10:45:03Z",
+  "generated": "2026-11-20T10:52:15Z",
   "count": 200,
-  "pin": "591b40fe6397dec7429f152740c99d11db07e92a02f2115e61d8385d01cca198",
+  "pin": "634f34ab3b45457129ffd1de38ed9cf71d58812cc5d78ec563b951d9801af408",
   "turns": [
+    {
+      "id": "9cd32113-3fb0-4b21-8070-4953ccd81888",
+      "ts": "2026-11-20T10:50:57Z",
+      "source": "devin",
+      "subject": "nixconfig:frieren-offload",
+      "action": "claim: verify offload exit criteria on frieren+delphi, close open-frieren-offload if met",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren",
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "937d185863015e2c8c15b4f9eaa4549eca5d7240",
+      "branch": "main",
+      "frame": "03h9r9fqcqa4hszev5mah6oek"
+    },
+    {
+      "id": "687af4ea-8901-4d50-acc2-ca975a7f84ab",
+      "ts": "2026-11-20T10:50:46Z",
+      "source": "agy",
+      "subject": "nixconfig:xs-notify-deploy",
+      "action": "landed: deploy xs-notify on delphi with 60s timer pushing agent-turn changes to Telegram @Frierenixbot (chat_id 8679391100)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task",
+        "modules/services",
+        "hosts/delphi"
+      ],
+      "files": [
+        "scripts/task/xs-notify.sh",
+        "modules/services/xs-notify.nix",
+        "hosts/delphi/configuration.nix"
+      ],
+      "base_commit": "937d185863015e2c8c15b4f9eaa4549eca5d7240",
+      "branch": "main",
+      "frame": "03h9r9ec8d30z9qfj6b8qcmy5"
+    },
+    {
+      "id": "1e9c6633-b986-4c51-b185-70892e2019d2",
+      "ts": "2026-11-20T10:45:15Z",
+      "source": "devin",
+      "subject": "nixconfig:triage-pipeline",
+      "action": "landed: triage.py ingest->analyze->match->rank->action; live run scored Legence 80 apply-now, Vivid BESS 65 hold, 19 skip; --create 3 upserted rows+docs, re-run kept 174 rows | gate: checks:quick FAIL on unrelated uncommitted lib/matt-site.nix ATS edits (+3 header lines vs 6539 ceiling); clean tree passes 6538/6539",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow"
+      ],
+      "files": [
+        "modules/plugins/appflow/triage.py",
+        "modules/plugins/appflow/README.md"
+      ],
+      "base_commit": "937d185863015e2c8c15b4f9eaa4549eca5d7240",
+      "branch": "main",
+      "frame": "03h9r8bl4uex80fjwnlceko1r"
+    },
     {
       "id": "8d003de6-5670-4342-9d4b-4e099bb01309",
       "ts": "2026-11-20T10:37:43Z",
@@ -2821,45 +2876,6 @@
       "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
       "branch": "main",
       "frame": "03h9fqs50t0ex49ok06h797nr"
-    },
-    {
-      "id": "b1345a72-14ee-49c7-ab8d-d7ade7c37028",
-      "ts": "2026-11-18T23:28:15Z",
-      "source": "devji",
-      "subject": "nixconfig:media-relay-r2",
-      "action": "yt-store uploads a fetch to R2 media/, the Worker serves it with Range, the page gained → R2 and a cloud section",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "502c207d2a544442aeded0ee3b954d81ecd15633",
-      "branch": "main",
-      "frame": "03h9fqrv887vk6wbymwjihufh"
-    },
-    {
-      "id": "44150aaf-a4a8-428d-9c43-43df71724551",
-      "ts": "2026-11-18T23:09:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:agent-access-firecrawl-freellmapi",
-      "action": "aac prebuilt fails on NixOS (stub-ld, libssl3); autoPatchelfHook + openssl builds and runs 0.11.0 (hash sha256-oFs1vMLLnIe8MsL/r4Oh6PKawyWQ5gliH5LouU2G42g=). It shells out only to bw (status/unlock/get item), and rbw get --raw returns the same JSON, so a bw shim is the rbw route. llm-agents.nix has no firecrawl (pin 97b2c73, 205 attrs); nixpkgs has only cloud firecrawl-cli 1.26.3. firecrawl-local 0.1.0 is a packageable crates.io Rust binary. freellmapi: Node monorepo, skip.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
-      "branch": "main",
-      "frame": "03h9fn64y1165flhs8cpur8c5"
-    },
-    {
-      "id": "2fab0734-2397-44ef-b7e4-1a438ed902f2",
-      "ts": "2026-11-18T22:58:14Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 18 roster row(s) waiting, 522 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
-      "branch": "main",
-      "frame": "03h9fkwucb7usm0tsnmnooo1f"
     }
   ]
 }

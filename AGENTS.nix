@@ -2925,9 +2925,9 @@
     open-frieren-offload = {
       title = "Move the movable services off frieren";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P3";
-      date = "2026-10-21";
+      date = "2026-11-20";
       summary = "Compute leaves the NAS and the NAS keeps the name and the copy: stirling (2026-10-21) then paperless, vaultwarden and anki (2026-11-02) run on delphi behind frieren's vhosts, with a nightly state mirror into its restic window; the monitor pair followed on 2026-11-04, hermes stays resident on both hosts by decision, and immich stays because its 1.4 TB is the NAS.";
       refs = {
         hosts = ["frieren" "delphi"];
@@ -2962,6 +2962,18 @@
         delphi over the tailnet, and `systemctl show -p MemoryCurrent` on frieren
         shows the release; the shelter copy is under `/srv/backup/offload` and
         inside a restic snapshot; the tunnel file is deleted — all met.
+
+        **Verified 2026-11-20 (devin).** No stirling/paperless/vaultwarden/anki/
+        gatus/uptime-kuma units exist in frieren's system.slice; delphi answers on
+        the tailnet (stirling :8445 → 200, uptime-kuma :8448 → 302, gatus :8181 →
+        200) while `docs.`, `vault.` and `anki.frieren.lan` stay frieren vhosts.
+        The 03:10 mirror refreshed `/srv/backup/offload/{anki,paperless,
+        vaultwarden,vaultwarden-backup}` the same day and snapshot d2228859
+        (03:30, `restic-frieren-local`) carries the tree. Memory shed measured on
+        delphi's units: ~1.4 GiB (stirling 633, paperless ~480, uptime-kuma 137,
+        vaultwarden 58, gatus 42, anki 6 MiB). Nothing movable remains: the rest
+        is library (immich, jellyfin, plex, *arr, audiobookshelf), the SimpleX
+        identity, or hermes by decision.
       '';
     };
     exp-114 = {

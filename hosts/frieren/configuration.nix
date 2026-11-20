@@ -152,7 +152,7 @@ in {
   ssh.ca.enableClient = true;
 
   # pihole-ftl unused variable issue was resolved upstream in nixpkgs (env.NIX_CFLAGS_COMPILE);
-  # overlay retired as planned in overlays/pihole-ftl-werror.nix.
+  # the scoped -werror overlay was retired and deleted.
   nixpkgs.overlays = [];
 
   # Serve the fleet's LAN binary cache (see modules/services/harmonia.nix).

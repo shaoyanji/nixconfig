@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-20T10:03:01Z",
+  "generated": "2026-11-20T10:45:03Z",
   "count": 200,
-  "pin": "3549573a29764881971d0e838b644099717a6223d84209ef4c6540a488ecaf04",
+  "pin": "591b40fe6397dec7429f152740c99d11db07e92a02f2115e61d8385d01cca198",
   "turns": [
+    {
+      "id": "8d003de6-5670-4342-9d4b-4e099bb01309",
+      "ts": "2026-11-20T10:37:43Z",
+      "source": "devin",
+      "subject": "nixconfig:triage-pipeline",
+      "action": "claim: build triage.py in appflow (hermes start was dispatch marker; claims disjoint)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
+      "branch": "main",
+      "frame": "03h9r6unyz7hsceprwnwaqesd"
+    },
+    {
+      "id": "9afc6d97-fc18-41a9-983c-5f4eda682622",
+      "ts": "2026-11-20T10:34:44Z",
+      "source": "devin",
+      "subject": "nixconfig:oracle-free-check",
+      "action": "verified via OCI API on delphi: 1x A1.Flex 2OCPU/12GB, 200GB boot vol only, ephemeral IP, egress ~49GiB/mo, usage report $0.001 total in 31d (one-time transition residue); no paid services",
+      "outcome": "done",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
+      "branch": "main",
+      "frame": "03h9r69l1nxz3vbhsxm1ca5vp"
+    },
+    {
+      "id": "b78efadc-7342-4151-91fe-4362e0a76941",
+      "ts": "2026-11-20T10:33:17Z",
+      "source": "agy",
+      "subject": "nixconfig:agy-job-search",
+      "action": "landed: add 3 applications (Coursedog, Legence, AutoLeap), 12 mail links, 14 nudged/updated, resolved attention items",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
+      "branch": "main",
+      "frame": "03h9r5zfq5vakb1mmzedxax8x"
+    },
+    {
+      "id": "41db71a3-5015-4742-b2c6-267c4be32d0a",
+      "ts": "2026-11-20T10:29:41Z",
+      "source": "devin",
+      "subject": "nixconfig:oracle-free-check",
+      "action": "claim: verify delphi within OCI Always Free limits (shape, disk, egress, paid services)",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
+      "branch": "main",
+      "frame": "03h9r5a33ockht5opym1wut17"
+    },
     {
       "id": "ed0199c6-d0b8-453b-bd63-1b3e9988893e",
       "ts": "2026-11-20T09:13:04Z",
@@ -2802,58 +2860,6 @@
       "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
       "branch": "main",
       "frame": "03h9fkwucb7usm0tsnmnooo1f"
-    },
-    {
-      "id": "bda460c7-a30c-4559-8006-8f3c4d0e1e28",
-      "ts": "2026-11-18T22:56:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:wall-2026-11-18-verified",
-      "action": "Asked to prove 2026-11-18 was published: it is. 60 files generated (59 keep + 1 reroll), all 59 uploaded, each of the 59 Cloudinary delivery URLs returns 200, thumb and 1200x630 card transforms 200, served manifest has day_rows=59 of count=522, and the entry page (sha1 identical to site-dist) sorts by day so they are the first 59 cards. Nothing from 11-18 is pending.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
-      "branch": "main",
-      "frame": "03h9fklsem01w8ap5t5px42gs"
-    },
-    {
-      "id": "bf6f78ac-419d-4434-ae4f-d207471fe8b6",
-      "ts": "2026-11-18T22:54:36Z",
-      "source": "buffy",
-      "subject": "nixconfig:wall-backfill-reset-fill",
-      "action": "2026-11-18 has nothing unpublished: 60 files on disk = 59 keeps (all uploaded, 59/59 URLs 200, manifest day_rows=59) + 1 reroll. The real gap was 11 plates from 2026-11-11 that never got a ledger row, so publish skipped them forever: backfilled and published, site 511 -> 522. cpg images are 100/100 used until 00:00Z with a 25/hour burst, so a MAX_GEN=100 plates round is queued in tmux wallfill at 00:00:40Z, auto-publishing.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
-      "branch": "main",
-      "frame": "03h9fk7cfqsgblgp606d7jnaa"
-    },
-    {
-      "id": "5ba4c5be-395e-4822-abd6-b05b32a5fbc2",
-      "ts": "2026-11-18T22:38:42Z",
-      "source": "buffy",
-      "subject": "nixconfig:publish-accounting",
-      "action": "Today: 59 wall keeps (60 files, 59 published), 17 rerolls, 115 failed (100 the generator VALIDATION_FAILED bundle). All 59 are in urls.tsv, delivery URLs return 200, and the served manifest at bountystash-assets.pages.dev is count 511 generatedAt 22:00:34Z with 59 rows for 2026-11-18 (deploy e90252d0). Fixed publish's stale-path noise: multi-line legacy paths resolve to their last line, and the two skip counts print once.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a2901b06011eed794ce5e372052fc22aa1f65b1",
-      "branch": "main",
-      "frame": "03h9fh3ih69o6ags1v1c51gzn"
-    },
-    {
-      "id": "56a36240-1c1f-4b26-a15a-8ca45688fa45",
-      "ts": "2026-11-18T22:28:15Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 0 plate(s) kept of 0 spent, 18 roster row(s) waiting, 511 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "99de0583f3d9f5efb15f0ad06a125953cec06371",
-      "branch": "main",
-      "frame": "03h9ff1xylx965hqkeylevl69"
     }
   ]
 }

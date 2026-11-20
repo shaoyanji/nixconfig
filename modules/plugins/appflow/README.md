@@ -31,6 +31,7 @@ no schedule writes it.
 | `content_api.py` | the wire both CLIs speak: one GET, one upsert and one delete per table |
 | `packet.nix` | the PDF build: typst in the sandbox, artifact is a store path |
 | `select.py` | the projection: one job description, one page of material out of the corpus |
+| `triage.py` | the other direction: every posting in the queue, one fit score each, ranked |
 | `glossary.json` | German job-ad words mapped onto the English ones the corpus uses |
 | `templates/` | two templates, localized through `strings.json`, no personal data |
 
@@ -72,6 +73,43 @@ The build checks the layout, not only the compile. Each template ends with a
 pages than its budget (`pages`, `letterPages`) or leaves under 40 mm on a final
 page. A CV that spills two lines onto page two is a build error now instead of a
 file someone has to notice; the site's CVs answer to the same file.
+
+## The queue and the score
+
+`triage.py` walks the other direction: every posting that is waiting, one fit
+score each, so the operator reads a ranked queue instead of an inbox.
+
+```bash
+python3 modules/plugins/appflow/triage.py            # rank the queue, dry run
+python3 modules/plugins/appflow/triage.py --create 3 # upsert rows for the top 3
+python3 modules/plugins/appflow/triage.py --json     # the analysis, not the table
+```
+
+Ingest reads three queues through the archive API (`--source`): `discovered`
+(applications the hub found), `attention` (applications with mail nobody dealt
+with) and `queue` (mail owned by `agent:apps`), deduplicated. A candidate's text
+is its `jd` document when one exists, else the newest linked mail body, else the
+row itself — a reply mail scores thin, and that is honest.
+
+The score is keyword coverage against the corpus, normalized to 0–100: +3 per
+resume keyword the description carries, +2 per rare corpus term it shares
+(capped), +1 per soft skill, +2 when experience meets the stated years and +2
+unless the work mode is strictly onsite, −2 per must-have the corpus lacks —
+the last only when the text has a requirements section to take must-haves from.
+80+ is `apply-now`, 60–79 `hold`, below `skip`.
+
+With `--create N` the top N rows are upserted (`fit` 1–5; new rows stage `prep`
+for apply-now, `other` otherwise), every scored candidate with an id gets a
+`triage-analysis` document, and each apply-now match also gets a `packet-brief`
+— the `select.py` projection the packet builds from. Rows and documents upsert
+on their ids, so a re-run is a no-op. Run it after `agents:apps:sync` lands new
+discovered rows; hourly cadence is the sync's, so once a day is enough for the
+queue as it stands.
+
+The packet itself stays a deliberate step — `task agents:apps:packet ID=<id>`
+renders the PDFs, and its page budget can and does refuse a projection that
+spills. A skip-tier score does not block a packet; it only declines to draft
+the brief.
 
 `nix build .#artifacts.appflow-packet-example` builds a packet from the fictional
 corpus in `templates/example/`, so the builder is reachable without the API.

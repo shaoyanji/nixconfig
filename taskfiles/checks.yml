@@ -96,14 +96,16 @@ tasks:
       - bash scripts/task/docs-links.sh
 
   checks:site:links:test:
-    desc: Regression fixture for the CV-PDF link gate (unlinked, unshipped, no download, dead href)
+    desc: Regression fixture for the CV-PDF link gate (linked, unlinked, unshipped, no download, dead target)
     summary: >
       The gate that proves every shipped CV is linked runs inside the `matt-site`
-      derivation, so a defect in it either ships or blocks every deploy. This
-      exercises its four assertions on a temp site: a linked CV with `download`
-      passes; an anchor without the attribute (including one carrying only
-      `downloads`) fails; an unlinked PDF fails; a required PDF that was not
-      shipped fails; a dead internal href fails. ~0.2 s, no eval, no network.
+      derivation, so a defect in it either ships or blocks every deploy. This is
+      its fail-fast copy on a temp site, in the shapes the site emits — two root
+      CVs, a `../cv-de.pdf` link from `/de/`, a fragment — and the shapes it must
+      reject: an anchor without `download` (including one carrying only
+      `downloads`), an unlinked PDF, a required PDF not shipped, a dead href, and
+      a PDF anchor at a missing file. Case coverage is asserted both ways, so a
+      vanished case fails. ~0.2 s, no eval, no network.
     cmds:
       - bash tests/site-links/run.sh
 

@@ -1,8 +1,107 @@
 {
-  "generated": "2026-11-20T20:18:45Z",
+  "generated": "2026-11-20T20:40:46Z",
   "count": 200,
-  "pin": "52bdc8bbde66a84fb1fd361c91374bca74bd138802aa3df3f6b68ad3b7ef7a27",
+  "pin": "52a3381a87d0b7f7a4dc4d80d7a041e58d4a17544803b5099f5a4c825dae356e",
   "turns": [
+    {
+      "id": "662bc681-3222-4394-bc0c-0731484c0a50",
+      "ts": "2026-11-20T20:39:28Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "Steward drove win1 freebuff → continue_leak_gate (jevdecide 0.99/0.98): CV-link/leak gate verified end-to-end — site-built CV PDFs are linked from site HTML and all targets resolve; zero defects flagged, no edits made, tree clean; fast-forwarded origin's 191b18f1 so local=origin=191b18f1, autoUpgrade-safe; nothing to commit or push",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9ugeccm8b409aqmq96frd4"
+    },
+    {
+      "id": "d4b6ec1b-ba26-42b6-9e31-de6f0cb9f686",
+      "ts": "2026-11-20T20:36:31Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "verified: hostpaths 1149 files PASS; site-links 81 links/4 PDFs/16 download anchors PASS; cv-links-check 12/12 live sha==artifact; site-check 35/35; nothing flagged, tree already == origin/main so nothing to commit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "191b18f17c04186b5a2b16984dca86ad233e64a4",
+      "branch": "main",
+      "frame": "03h9uftnagqid9z590fhgmkxu"
+    },
+    {
+      "id": "d7d5c589-73f5-4c2e-83fa-bcc2adbe2b22",
+      "ts": "2026-11-20T20:35:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "claim: verify every built CV PDF is linked from the site, run hostpaths/cv-links/site-check, push",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task",
+        "lib/matt-site.nix",
+        "taskfiles/bountystash.yml"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9ufn3sc1ep77ybgv08b7bb"
+    },
+    {
+      "id": "1465477b-10e8-4fe1-9dbb-559904f6f1b0",
+      "ts": "2026-11-20T20:30:02Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Drove idle panes via jevdecide (typesafe): win1 freebuff <- typst_autoats (p=0.99, margin 0.98) Typst CV autoATS quality check + template edits accepted - fresh working... 7s counter; win2 devin <- fleet_remote_pr (p=0.99, margin 0.98) fleet-remote PR task accepted - Thinking 8s, checkout command running; win3 agy left backed off (free Gemini 429; live SMTP confirmation prompt untouched); delphi freebuff not polled this run.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uek1tdlpo42z2vttbeirh"
+    },
+    {
+      "id": "ddad6ac7-c2b2-4c84-a4cc-8793376254a3",
+      "ts": "2026-11-20T20:29:25Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "drove idle panes via jevdecide: win1 freebuff -> leak-gate continuation (CV-link gate; CV-packet commit already landed and pushed); delphi freebuff -> mail backlog sweep dry-run print only (--older 1 --limit 300); win3 agy left backed off per directive",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9uefq3nkg8wz17ypi1vp70"
+    },
+    {
+      "id": "06ddbd8f-6109-4630-b55e-3cf7d3b7edf7",
+      "ts": "2026-11-20T20:27:15Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "drove idle panes via jevdecide: win1 freebuff -> leak-gate continuation (CV-link gate; CV-packet commit already landed and pushed); delphi freebuff -> mail backlog sweep dry-run print only (--older 1 --limit 300); win3 agy left backed off per directive",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9ue0eyhqmjseiwu85pplwx"
+    },
+    {
+      "id": "9d78a6be-2aa5-40e2-840c-aafc16285b23",
+      "ts": "2026-11-20T20:19:00Z",
+      "source": "devin",
+      "subject": "nixconfig:firecrawl-loopback",
+      "action": "landed: programs.hermes-user.firecrawl builds the crate via buildRustPackage (was ~/.local/bin drop) + declares the :3002 unit + store firecrawl-chrome; checkLinkTargets guard removes the 3 hand files; note firecrawl-local-loopback REJECTED | gate: drv-equality 17 identical + checks:quick PASS + build proven on nixbuild.net",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "191b18f17c04186b5a2b16984dca86ad233e64a4",
+      "branch": "HEAD",
+      "frame": "03h9ucef3npo4tkepb4zzlpl9"
+    },
     {
       "id": "4d463075-5437-4e41-bb12-24be56ffefd1",
       "ts": "2026-11-20T20:10:00Z",
@@ -2708,97 +2807,6 @@
       "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
       "branch": "main",
       "frame": "03h9kqng15s0ea736m9qaq8g9"
-    },
-    {
-      "id": "d3883da9-7e23-4772-9a52-63236904caee",
-      "ts": "2026-11-19T14:47:45Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-fallback",
-      "action": "final: 4-lane chain — infron :free x2 -> NIM nemotron-3.5-super-vl-120b-a12b -> openrouter nemotron:free (account verified is_free_tier, no balance exists to bill) -> ollama-cloud nemotron-3-ultra; api_max_retries 4 covers the hops; infron picker pinned to the 2 :free ids, billable vendors hidden from pickers | live: deepseek 429 -> qwen 429 -> NIM answered; openrouter :free proven earlier same session | gate: checks:infron PASS, checks:quick PASS, checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9kqe87o4cmbytxysphd7as"
-    },
-    {
-      "id": "7fb65641-2886-4ded-9ecc-a6a6ccbea1cf",
-      "ts": "2026-11-19T14:47:03Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-parloa-followup-gate",
-      "action": "follow-up step: apps:followups task is dead on delphi (APPS_DIR /srv/data/projects/antigravity-application-workflow missing, exit 127); Parloa follow-up stays in drafts/parloa-followup-2026-11-26.md, not sent because it is gated to 2026-11-26 and asserts a week has passed; posting 8adc761e still isListed, archive still has no parloa reply",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9kq9c6p8oeplyz5g98qb8t"
-    },
-    {
-      "id": "d20bc00b-eb90-4154-a57b-b685aa7a20cb",
-      "ts": "2026-11-19T14:46:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:dormant-host-gates",
-      "action": "Continued the P0: cassini fails in 0.7 s on modules/global/macos.nix (top-level home-manager/nix-homebrew/users). Wrapping them in config clears it, then services.journald is undefined on darwin. Parent mkIf cannot fix that: pushDownProperties rewrites it into a definition of the missing option, so both attempts were reverted. Next step is structural - move the Linux block out of the base chain. Note stays IN FLIGHT with the mechanism recorded.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "939d547b8087429c74fcfc9c8301973fcc0d6776",
-      "branch": "main",
-      "frame": "03h9kq7wwabu31p12bh9v1fr7"
-    },
-    {
-      "id": "764ba459-6316-4836-8121-42b2e8f8bdab",
-      "ts": "2026-11-19T14:44:17Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-fallback",
-      "action": "corrected: nemotron failover moved off openrouter (wallet-capable route) onto nvidia NIM integrate.api.nvidia.com dev tier — no wallet exists to bill; chain is now infron :free x2 -> NIM nemotron-3.5-super-vl-120b-a12b -> ollama-cloud nemotron-3-ultra, zero wallet routes; openrouter verified is_free_tier, billed $0 | live: deepseek 429 -> qwen 429 -> NIM answered | gate: checks:infron PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "340a2a5526b9fee31108d717c98c0f14fee6f3bd",
-      "branch": "main",
-      "frame": "03h9kppvrj3lfkb83pdnbt5by"
-    },
-    {
-      "id": "4ea31381-92bc-4062-aaab-534cacc57129",
-      "ts": "2026-11-19T14:40:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:dormant-host-gates",
-      "action": "Audited open notes: no kind=open IN FLIGHT remained, so I advanced dormant-host-gates P0 instead. Its cassini claim was stale (freebuff-remote already gated on isLinux); ALLOW_PRESERVED=1 checks:host cassini fails in 0.48 s on services.journald from modules/global/global.nix. A config wrap only moved the error and broke formatting, so it was reverted. Note OPEN -> IN FLIGHT with both faults quoted; format, checks:quick and agentsNotes.ok green.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce8131aa2c336a88606b6861d8498d692cf0b8aa",
-      "branch": "main",
-      "frame": "03h9kp1qdb9jl6dnyfug6k6hw"
-    },
-    {
-      "id": "e1f558fb-d7a8-4742-8441-527ad1cbda81",
-      "ts": "2026-11-19T14:38:26Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-fallback",
-      "action": "landed: infron picker pinned to the 2 :free ids, 3-lane cross-vendor free chain (infron->openrouter->ollama-cloud), billable vendors hidden via model_catalog.excluded_providers, api_max_retries under agent: gated to cover chain length (failover hops spend restart credits), checks:infron gains yq spend-guard | live: deepseek 429 -> qwen 429 -> openrouter :free answered | gate: checks:quick PASS, checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e19f10ffb516da0d0043d905d1f026a0c4f933b7",
-      "branch": "main",
-      "frame": "03h9koksfhuj5lu3o8zux1jkr"
-    },
-    {
-      "id": "bb0edec8-a276-4474-9ba3-ac9a7d2dd644",
-      "ts": "2026-11-19T14:36:53Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-parloa-closed",
-      "action": "broker turn closed with no send: Parloa Staff Product Engineer email already delivered 14:14 UTC (Resend 01a1f428, single message to parloa.com, no bounce, archive shows no reply); operator declined a duplicate; next contact is the follow-up drafted for 2026-11-26",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9ko9uqv1gzmmigto6gtbn9"
     }
   ]
 }

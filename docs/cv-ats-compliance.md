@@ -120,9 +120,12 @@ them once in `cvFiles`. The installs read that list and so does the gate, so a C
 added there without a page linking it fails the build instead of shipping as a
 file nobody can find, and the four filenames are spelled in one place.
 
-The gate is the last step of the `matt-site` derivation:
-`bash scripts/task/site-links.sh $out cv.pdf cv-de.pdf cv-energy.pdf
-cv-energy-de.pdf`. `scripts/task/site-links.sh` walks the finished artifact,
+The gate runs twice inside the `matt-site` derivation, both times with `cvFiles`
+as the required list: `bash scripts/task/site-links.sh --gap $out …` as a
+pre-flight, so a CV the build ships with no page linking it (or a target that
+resolves nowhere) names itself on one line and stops the build there, then the
+full pass again as the last step. `scripts/task/site-links.sh` walks the
+finished artifact,
 resolves every root-relative and relative `href`/`src` the way Cloudflare Pages
 serves it (a file, or `x` as `x.html`), and fails on three things: a link that
 lands nowhere, a `*.pdf` no page links, and a named PDF the artifact does not
@@ -135,8 +138,9 @@ task site:links                                                         # both N
 bash scripts/task/site-links.sh /tmp/matt-site cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf
 ```
 
-A passing build prints `site-links: every internal link resolves and all 4 PDFs
-are linked` after the page count. An orphaned CV fails the build naming it:
+A passing build prints `site-links: no gaps` from the pre-flight and then
+`site-links: every internal link resolves and all 4 PDFs are linked`. An
+orphaned CV fails the build naming it:
 
 ```text
 site-links: 67 internal links over 15 pages, 4 PDFs (4 required)

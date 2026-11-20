@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-20T20:45:31Z",
+  "generated": "2026-11-20T20:48:03Z",
   "count": 200,
-  "pin": "b2fc859a9792473ea18e69ba6287cee84d57a4b2ed30d316220bc6fe216be15e",
+  "pin": "9148dcb08b5301c9ce60d9e3ca3380d38d14023a900457f9324c0dd1fb709f48",
   "turns": [
+    {
+      "id": "8165bd99-6ca0-4a0c-98a6-3c1c45723c47",
+      "ts": "2026-11-20T20:46:19Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "Steward drove win1 freebuff → gap_flag_missing_fixture (jev duel 0.98/0.96): committed 632306dc feat(site-links): --gap pre-flight fails fast on an unlinked or dead CV target; pushed 67227fc9..632306dc → origin/main (site-links.sh, tests/site-links/run.sh, taskfiles/checks.yml); pre-commit gates passed; local=origin=632306dc, autoUpgrade-safe; nixconfig:site-cv-links closed (frame 03h9uhlqtdatmx8prvws0czx9)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uhqj0d9b0jnaf2wxwf8n8"
+    },
+    {
+      "id": "bba31158-3057-48e3-ba82-aa05fe06b150",
+      "ts": "2026-11-20T20:45:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: site-links.sh --gap pre-flight (orphan PDF, unresolvable target, stops at first) + 14-case fixture covering it both ways | gate: checks:site:links:test PASS 14/14, checks:tasks PASS, gap mode proved on the real artifact 0/1/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "632306dc709e9e19daa2e1cbe0f80c808aaa8353",
+      "branch": "main",
+      "frame": "03h9uhlqtdatmx8prvws0czx9"
+    },
     {
       "id": "67afdcbe-556b-4f64-9ff8-7578302f9b4b",
       "ts": "2026-11-20T20:43:02Z",
@@ -2773,36 +2799,6 @@
       "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
       "branch": "main",
       "frame": "03h9krmnxrtoqsmdnd7cy5dhi"
-    },
-    {
-      "id": "5c19ab9d-279f-463f-a0f2-ec7d050327c4",
-      "ts": "2026-11-19T14:49:06Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:memory-architecture",
-      "action": "nudge: commit 24dd4613 landed, search order vault->qmd->mem0/supermemory->web established",
-      "outcome": "done",
-      "claims": [
-        "pane 5 (ssh*)"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9kqnowpph4n88kj3fpey6s"
-    },
-    {
-      "id": "b805de8c-fc1e-44db-9c97-2774234913d6",
-      "ts": "2026-11-19T14:49:05Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:zeckendorf-pr-review",
-      "action": "nudge: PR #8 Elixir kg-zeck awaiting idle agent",
-      "outcome": "in_progress",
-      "claims": [
-        "pane 2 (agy)"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9kqnm0nu5h47x17pdotcmq"
     }
   ]
 }

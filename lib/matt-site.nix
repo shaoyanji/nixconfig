@@ -1012,6 +1012,15 @@ in
     # included, so this runs last — lands on a file. It runs inside the build,
     # not only in `task site:links`, because `matt:deploy:prod` builds and
     # publishes without that task: an orphaned CV must not leave the store.
+    #
+    # The `--gap` pre-flight runs first so a structural gap — a CV the build
+    # ships that no page links, or a target that resolves nowhere — names itself
+    # on one line and stops the build there, instead of after the anchor pass.
+    # It is not a replacement: the full gate below also proves the `download`
+    # attribute and the required list, which `--gap` cannot see.
+    bash ${../scripts/task/site-links.sh} --gap $out ${
+      lib.concatStringsSep " " (map (c: c.name) cvFiles)
+    }
     bash ${../scripts/task/site-links.sh} $out ${
       lib.concatStringsSep " " (map (c: c.name) cvFiles)
     }

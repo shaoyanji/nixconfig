@@ -28,10 +28,11 @@
 # page still returns 200, the href still resolves, the PDF is still linked — and
 # the click silently stops downloading. This walks the anchors themselves.
 #
-# It runs inside the `matt-site` derivation (lib/matt-site.nix), last, with that
-# build's `cvFiles` as the required list: `matt:build`, `matt:deploy:preview`
-# and `matt:deploy:prod` inherit the gate because they build the derivation, and
-# `task site:links` runs it over the same artifacts. The procedure and why it
+# It runs inside the `matt-site` derivation (lib/matt-site.nix) twice — `--gap`
+# as a pre-flight, then the full pass last — with that build's `cvFiles` as the
+# required list: `matt:build`, `matt:deploy:preview` and `matt:deploy:prod`
+# inherit the gate because they build the derivation, and `task site:links` runs
+# it over the same artifacts. The procedure and why it
 # lives in the build: docs/cv-ats-compliance.md, "The link gate".
 #
 # `--gap` is the pre-flight form: it asserts only the two structural gaps — a

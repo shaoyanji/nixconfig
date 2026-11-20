@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-20T15:55:25Z",
+  "generated": "2026-11-20T18:15:19Z",
   "count": 200,
-  "pin": "d1808adee141513c67c91e536b9e21283aa72bb0fb39361d874cd71fa97afc26",
+  "pin": "fcfe69b21b2e3d76c6af719b12d980ed44f8b53b456a8cf6dc2aa942baff1cdc",
   "turns": [
+    {
+      "id": "4074a832-7bc7-4a94-92a3-a5856f196b88",
+      "ts": "2026-11-20T18:12:15Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: converted pane-idle-watch cron from no_agent script to self-driving agent job (drives idle panes via jevdecide+tmux, delivers to local not user chat). frieren freebuff→add leak gate, devin→find next refactor, delphi freebuff→fix Trash alias. | gate: cron job updated + pane-watch BUSY x2 + delphi working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3c19b980dc2e5a7c2aa50d19af0f85c13306401",
+      "branch": "main",
+      "frame": "03h9tnn3uzlehsfyoj3uf14qv"
+    },
+    {
+      "id": "21ea62a2-da7e-4be1-a178-4bfe78baca3f",
+      "ts": "2026-11-20T18:06:07Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: re-drove all panes after session release. frieren freebuff→media host review, devin→find next nixconfig refactor, delphi freebuff→commit alias fix. Commits: a3c19b98 taskfile-plane, e4e8f80a pipe-operator merge, ddd77ae4 agent-browser trap fix. | gate: pane-watch BUSY x2 (frieren) + delphi freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3c19b980dc2e5a7c2aa50d19af0f85c13306401",
+      "branch": "main",
+      "frame": "03h9tmg07ycg6dguolw69sj9a"
+    },
+    {
+      "id": "3e1833dd-df47-45a4-8a6b-5578c3858a2b",
+      "ts": "2026-11-20T18:02:32Z",
+      "source": "devin",
+      "subject": "nixconfig:taskfile-plane-handmade",
+      "action": "landed: e2e verification of a3c19b98 — ~/Taskfile.yml shim resolves identical 768-task surface vs direct Taskfile; task ops:health + dev:inventory:host HOST=frieren run through the shim (dir: pins repo cwd); collision gate fires rc 203 'multiple tasks' on duplicate flattened include; check:verify 117 rows/117 live, checks:tasks graph parity exact | gate: checks:task-shim:test + check:verify + checks:tasks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3c19b980dc2e5a7c2aa50d19af0f85c13306401",
+      "branch": "main",
+      "frame": "03h9tlqrqcd5bzgfyjzmonqrc"
+    },
+    {
+      "id": "ffaf7450-7441-4aa8-b400-80c91c3feb19",
+      "ts": "2026-11-20T15:58:22Z",
+      "source": "devin",
+      "subject": "nixconfig:taskfile-plane-handmade",
+      "action": "landed: modules/user/task-shim.nix emits ~/Taskfile.yml via home.file (fleetHost-gated, single source task-shim.yml) into home-manager-shared + hmSharedModulesHome; checks:task-shim:test proves task --list rc0 in temp HOME and duplicate flattened include exits 203; note marked DELIVERED | gate: checks:host HOST=frieren PASS 68.8s, fixture 2/2, commit hook gates",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3c19b980dc2e5a7c2aa50d19af0f85c13306401",
+      "branch": "main",
+      "frame": "03h9sxhljtrbrrqbufev6hfhk"
+    },
     {
       "id": "61a1ea31-7216-43f1-a590-f2b036fb3ca4",
       "ts": "2026-11-20T15:52:20Z",
@@ -2752,64 +2804,6 @@
       "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
       "branch": "main",
       "frame": "03h9jzyj1oy893rhl3ttnlcge"
-    },
-    {
-      "id": "18e3677e-3e9b-4e93-bdd7-5debdddcf12f",
-      "ts": "2026-11-19T12:25:34Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 23: freebuff on LoopCV (Google sign-in via sops gmail value under xvfb+CDP, mapping auto-apply loops). devin completed bagua-weather M1-M4 (honest results, GBM tuned wins narrowly), now on M5 state-count ablation. agy updating DB from extended job report. delphi verifying email archive + triage second-pass.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9jymenfiolh2hgyschlu4j"
-    },
-    {
-      "id": "3f426335-061a-467e-b0ce-6e374f533b0f",
-      "ts": "2026-11-19T12:24:46Z",
-      "source": "agy",
-      "subject": "apps:triage-update",
-      "action": "landed: updated 30 pipeline rows across Apply/Monitor/Pass/Expired | gate: verify 30/30 in delphi api",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9jygp0103qgli4ed60plik"
-    },
-    {
-      "id": "318e2d74-5752-4241-9bed-a89122e64b5f",
-      "ts": "2026-11-19T12:24:02Z",
-      "source": "agy",
-      "subject": "apps:triage-update",
-      "action": "start: update 30 triaged roles in delphi apps db",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9jybjb5x2xf3dysnnzjrp0"
-    },
-    {
-      "id": "b0246743-16ed-4a08-9beb-9f10ab2afb6e",
-      "ts": "2026-11-19T12:18:23Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 22: freebuff landed P1 sentinel egress (push.url + sops bearer, UNIX-socket ingest, delphi pushes to frieren centre). Routed LoopCV task to freebuff (login loopcv.ai via Google under xvfb+CDP, map auto-apply loops, re-strategize). agy produced extended Action-First Triage Matrix (30+ leads). devin on bagua-weather (scikit-learn install). delphi on sentinel wiring.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9jx7tdcr6e7pd170ez8100"
     }
   ]
 }

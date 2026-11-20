@@ -24,12 +24,14 @@ in {
       smtp.port = 465;
       smtp.authentication = "plain";
       passwordCommand = "cat ${config.sops.secrets.gmail.path}";
-      # `Sent` and `Drafts` are stale Gmail labels, not the mailboxes.
+      # `Sent`, `Drafts` and `Trash` are stale Gmail labels, not the mailboxes.
       # himalaya 2.2.1 reads `mailbox.alias`; it ignores `folder.aliases`.
       folders.sent = "[Gmail]/Sent Mail";
       folders.drafts = "[Gmail]/Drafts";
+      folders.trash = "[Gmail]/Trash";
       himalaya.settings.mailbox.alias.sent = "[Gmail]/Sent Mail";
       himalaya.settings.mailbox.alias.drafts = "[Gmail]/Drafts";
+      himalaya.settings.mailbox.alias.trash = "[Gmail]/Trash";
       signature.text = gravatar.signature;
       himalaya.enable = true;
     };
@@ -38,13 +40,11 @@ in {
       primary = false;
       address = user.workEmail;
       inherit (user) realName;
-      # Reading stays on the Gmail mailbox that holds the mail; only sending
-      # moves. A personal Gmail account signs an alias with d=gmail.com, so mail
-      # from this address never aligned for DMARC. Resend holds the domain's
-      # DKIM key (resend._domainkey.bountystash.com), and its relay signs as
-      # bountystash.com, so the account's SMTP password is the Resend key and
-      # the login is the literal `resend`. The Home Manager module takes one
-      # passwordCommand per account, hence the per-account smtp sasl override.
+      # Reading stays on the Gmail box; only sending moves. A personal Gmail
+      # alias signs d=gmail.com and never aligns for DMARC, so SMTP goes through
+      # Resend, whose relay signs bountystash.com: login `resend`, password the
+      # Resend key. One passwordCommand per account is why sasl is overridden
+      # here.
       userName = "jisifu";
       imap.host = "imap.gmail.com";
       imap.port = 993;
@@ -57,17 +57,18 @@ in {
         username = "resend";
         password.command = "cat ${config.sops.secrets.resend-api-key.path}";
       };
-      # As `jisifu`: same Sent and Drafts folders, same alias keys.
+      # As `jisifu`: same Sent, Drafts and Trash folders, same alias keys.
       folders.sent = "[Gmail]/Sent Mail";
       folders.drafts = "[Gmail]/Drafts";
+      folders.trash = "[Gmail]/Trash";
       himalaya.settings.mailbox.alias.sent = "[Gmail]/Sent Mail";
       himalaya.settings.mailbox.alias.drafts = "[Gmail]/Drafts";
+      himalaya.settings.mailbox.alias.trash = "[Gmail]/Trash";
       signature.text = gravatar.signature;
       himalaya.enable = true;
     };
-    # envs.net pubnix mail. Implicit TLS on 993, submission on 587 needs STARTTLS
-    # spelled out; the login is the full address, which is what the server
-    # accepts (the unix name `jisifu` alone does not authenticate).
+    # envs.net pubnix mail: implicit TLS 993, submission 587 needs STARTTLS;
+    # the login is the full address (the unix name `jisifu` does not authenticate).
     "envs" = {
       name = "envs";
       primary = false;
@@ -85,8 +86,7 @@ in {
       signature.text = gravatar.signature;
       himalaya.enable = true;
     };
-    # Alwaysdata hosting mailbox for Dragon Court. Implicit TLS on 993,
-    # SMTPS on 465; the login is the full address.
+    # Alwaysdata Dragon Court mailbox: implicit TLS 993, SMTPS 465; login is the address.
     "dragoncourt" = {
       name = "dragoncourt";
       primary = false;

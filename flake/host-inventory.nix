@@ -69,30 +69,10 @@ in {
       ++ [
         inputs.disko.nixosModules.default
         ../hosts/delphi/configuration.nix
-        # microVM host: the same guest set as frieren, on the aarch64 side.
-        ({pkgs, ...}: {
-          imports = [
-            (import ../modules/profiles/microvm-host.nix {
-              natExternalInterface = "enp0s6";
-              inherit pkgs;
-            })
-          ];
-        })
-        # cloud-hypervisor is KVM-only, and OCI A1 does not expose EL2: dmesg says
-        # `kvm [1]: HYP mode not available`, /dev/kvm is absent, and the CH runner
-        # exits with `no supported hypervisor` in 33 ms. So this host names qemu
-        # with cpu = "max" (TCG): slow, but it boots. frieren keeps CH.
-        (import ../hosts/microvms/guests.nix {
-          inherit inputs self;
-          hypervisor = "qemu";
-          cpu = "max";
-          # Retired from autostart on 2026-10-25: OCI A1 lacks KVM hardware acceleration
-          # (TCG software emulation burned 44m CPU and 2.5G RAM). Stirling PDF now runs
-          # natively on Delphi (sub-second responses, ARM64 native execution).
-          autostart = false;
-          services = false;
-          stirling = false;
-        })
+        # microvm retired on delphi (OCI A1 lacks KVM hardware acceleration;
+        # Stirling PDF now runs natively on Delphi)
+        # microvm guest import removed; all services served directly via
+        # tailnet mounts above.
         # Install-time layout (disko also owns delphi's fileSystems). OCI
         # paravirtualized boot volumes enumerate as /dev/sda; verify with
         # `lsblk` on the instance BEFORE the first nixos-anywhere run — disko

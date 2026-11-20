@@ -166,8 +166,16 @@
     };
   };
 
-  # Stub services from the guest declaration: hosts/microvms/guests.nix.
-  microvmGuest = config.microvmGuests.sandbox;
+  # Microvm guest removed from delphi (OCI A1 lacks KVM hardware acceleration).
+  # All services served directly via tailnet mounts above. Dummy value keeps
+  # dependent code (nginx proxy links, slideshow page) evaluating without error.
+  microvmGuest = {
+    services = [];
+    stirlingPath = "/microvm/stirling/";
+    sshPort = 22;
+    sshUser = "deck";
+    sshHopTarget = "deck@localhost";
+  };
   microvmProxyLocations = withGate: let
     proxies =
       microvmGuest.services

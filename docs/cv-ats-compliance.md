@@ -84,6 +84,25 @@ page someone has to notice.
 - The footer no longer carries `page 1 of`: on a one-page document it carries
   nothing, and on the full CV it carries only the page number, `1/2` and `2/2`.
 
+## Downstream: `task apps:build` compiles another template
+
+`task apps:build` drives the workflow checkout, and that checkout keeps its own
+Typst sources — `/srv/data/projects/antigravity-application-workflow/src/templates/`,
+namely `rezi_template.typ` and `packet.typ`. It does not read either template this
+page describes. The run that compiled 55 folders and passed `task apps:audit` (110
+documents, 0 violations) still produced, from `dist/`:
+
+| Document | Extracted headings | Link annotations |
+| :--- | :--- | ---: |
+| `Focused_Energy_ML_Engineer/Resume_Matt_Ji_Focused.pdf`, 2 pages | `SUMMARY`, `CORE COMPETENCIES` | 3 |
+| `Aldi_Sued_Waldkirch/Lebenslauf.pdf`, 1 page | `PROFIL`, `STÄRKEN & KOMPETENZEN`, `BERUFLICHE ERFAHRUNG` | 2 |
+
+`apps:audit` passes them because it checks page count and orphan lines, not the
+properties above. So the site's four CVs and the nixconfig packet are clean, and a
+document built by the checkout that is retired as a source of truth but still builds
+PDFs is not. Porting this change into those two templates is an edit in that
+repository; nothing here reaches it.
+
 ## Limits of this check
 
 No commercial ATS was run; the evidence is the extracted text, the annotation scan

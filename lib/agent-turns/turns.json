@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T21:35:44Z",
+  "generated": "2026-11-20T21:42:04Z",
   "count": 200,
-  "pin": "56a5c36ecb6374ace97c5971eebd9c57c0dff11030f900b7d4ca8f6a84c4e566",
+  "pin": "b936110f21fe1276348ac43d8c951ded5af33e29d700383aa096aa6719b27aaa",
   "turns": [
+    {
+      "id": "045634a1-62ed-459f-b1b4-f87c221cf83c",
+      "ts": "2026-11-20T21:41:20Z",
+      "source": "freebuff",
+      "subject": "nixconfig:leak-gate",
+      "action": "landed: host-path gate widened to ~/code|src|dev|work|repos|git|source|Developer|Workspace checkouts plus Windows profile paths; fixture 15 cases; tree PASS with no false positives | gate: checks:repo:hostpaths PASS + checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "96ff71f635e295c58bffa5e29b0fe862c7b4c5dc",
+      "branch": "main",
+      "frame": "03h9ushezmanhhi6myzpcrewd"
+    },
+    {
+      "id": "d6d7b2fc-47c7-49e8-bcfa-94e918f9fa61",
+      "ts": "2026-11-20T21:40:20Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "landed: drove idle freebuff default:1.1 with commit_pages_work (jev-decide p=1.0, margin 1.0); fresh working... counter confirmed submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9usag34py3sddw8md3fp1d"
+    },
+    {
+      "id": "51a89c46-85eb-4194-bbc5-659819079ec9",
+      "ts": "2026-11-20T21:37:22Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-ats-gate",
+      "action": "landed: CV link gate documented after a fresh run — 81 links/15 pages/4 PDFs/16 anchors, 5 perturbations each fail, live PDFs sha-match the build; lebenslauf PDF metadata committed | gate: site:links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "25bf8077f20267351e4f41237d2cc63af9f46eff",
+      "branch": "main",
+      "frame": "03h9urplt6evbl8rzccjyix2m"
+    },
     {
       "id": "427bec30-2efc-4104-9228-d3c3b2baf9b1",
       "ts": "2026-11-20T21:35:43Z",
@@ -2737,47 +2776,6 @@
       "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
       "branch": "main",
       "frame": "03h9l56b8gqzm922cztdinihx"
-    },
-    {
-      "id": "33caaf2f-d19f-45a0-96b2-f3ef665b1492",
-      "ts": "2026-11-19T16:00:33Z",
-      "source": "devin",
-      "subject": "nixconfig:kg-elixir-decision",
-      "action": "landed: KILL kgElixirRootCleanup — expired migration removed from minimal.nix; historical BEAM comments + turns-runtime bench lane untouched | gate: pre-commit nix checks + frieren.role eval PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "887f4364ded70bd9cd722f61c96847153e00e1e6",
-      "branch": "HEAD",
-      "frame": "03h9l4m6x1yjubr0ohldv8hsn"
-    },
-    {
-      "id": "582fa8d7-eed3-4163-9f9d-bb9f73bf4a53",
-      "ts": "2026-11-19T15:59:08Z",
-      "source": "devin",
-      "subject": "nixconfig:kg-elixir-decision",
-      "action": "claim: keep-or-kill kgElixirRootCleanup + Elixir remnant sweep",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/roles/minimal.nix"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9l4c8snouliazfo7zap1hz"
-    },
-    {
-      "id": "0f24d16b-afcd-40c4-b42a-a881ed1a99f8",
-      "ts": "2026-11-19T15:55:51Z",
-      "source": "devin",
-      "subject": "nixconfig:modules-dendritic",
-      "action": "landed: zen->aria2 sideways import moved to browser feature; sops verified single-sourced (paths.sh canonical->mirror, 63 keys identical); dead sops.nix comment removed; AGENTS.md direction rule written | gate: nixFileRegistry 0 dup/dangling + frieren.role + hooks PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9l3p5813fnkrtmf3v8tm2n"
     }
   ]
 }

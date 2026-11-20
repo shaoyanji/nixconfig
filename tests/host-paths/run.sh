@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Regression fixture for `checks:repo:hostpaths` (scripts/task/host-paths-check.sh).
 #
-# A gate that has never failed is a claim, not a gate. Each rule is exercised
-# once on a temp file — a foreign mount, a checkout nested in a home, plaintext
-# key material — and so is each exception: the documented storage root passes, the
-# fleet's own repo path passes, and `host-path-ok:` exempts its line.
+# A gate that has never failed is a claim, not a gate. Each rule is exercised on a
+# temp file — a foreign mount, a checkout nested in a home under every word class
+# the gate knows, a Windows profile, plaintext key material — and so is each
+# exception: the documented storage root passes, the fleet's own repo path passes,
+# a home path used as configuration passes, and `host-path-ok:` exempts its line.
 #
 # Exit: 0 every case behaves, 2 the fixture cannot run.
 set -uo pipefail
@@ -49,6 +50,14 @@ run "a portable path passes" 0 "PASS:" 'BLOG="$HOME/Documents/blog"'
 run "a foreign mount fails" 1 "a mount that is not the documented storage root" 'MNT=/Volumes/scratch/x'
 run "the documented storage root passes" 0 "PASS:" 'MNT=/Volumes/data/media'
 run "a checkout nested in a home fails" 1 "a checkout under a home directory" 'BLOG=/Users/someone/projects/blog'
+run "a checkout under ~/code fails" 1 "a checkout under a home directory" 'SRC=/home/someone/code/blog'
+run "a checkout under ~/src fails" 1 "a checkout under a home directory" 'SRC=/home/someone/src/blog'
+run "a checkout under ~/work fails" 1 "a checkout under a home directory" 'SRC=/Users/someone/work/acme'
+run "a Windows profile path fails" 1 "a Windows user profile path" 'WIN=C:\Users\someone\projects\blog'
+run "a Windows profile path in forward-slash form fails" 1 "a Windows user profile path" 'WIN=C:/Users/someone/projects/blog'
+run "a file URL is not a profile path" 0 "PASS:" 'see file:///Users/someone/blog' # host-path-ok: fixture proves the URL does not read as a drive letter
+run "a home path used as configuration passes" 0 "PASS:" 'home = "/home/devji"'
+run "a checkout written against \$HOME passes" 0 "PASS:" 'SRC=$HOME/code/blog'
 run "the fleet repo path passes" 0 "PASS:" 'REPO=/home/someone/Documents/nixconfig' # repo-path-ok: fixture input for the host-paths gate
 run "plaintext private key fails" 1 "key material in the clear" '-----BEGIN OPENSSH '"PRIVATE KEY-----"
 run "an age secret key fails" 1 "key material in the clear" 'AGE-SECRET-KEY-1QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ'

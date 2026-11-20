@@ -191,19 +191,20 @@ tasks:
   checks:repo:hostpaths:test:
     desc: Regression fixture for checks:repo:hostpaths (every rule and exception)
     summary: >
-      Proves the gate can fail: a foreign mount, a checkout nested in a home and
-      plaintext key material each exit 1, while a portable `$HOME` path, the
-      documented storage root, the fleet repo path and a `host-path-ok:` line exit
-      0. Temp files, no network, no eval, ~0.1 s.
+      Proves the gate can fail: a foreign mount, a checkout nested in a home under
+      every word class the gate knows, a Windows profile path and plaintext key
+      material each exit 1, while a portable `$HOME` path, a home path used as
+      configuration, the documented storage root, the fleet repo path and a
+      `host-path-ok:` line exit 0. Temp files, no network, no eval, ~0.2 s.
     cmds:
       - bash tests/host-paths/run.sh
 
   checks:repo:hostpaths:
-    desc: "[gate] No tracked file names a machine's mounts, another home checkout, or a plaintext key"
+    desc: "[gate] No tracked file names a machine's mounts, another home checkout, a Windows profile, or a plaintext key"
     summary: >
-      A public tree must not name one machine's layout: a mount other than the
-      documented `/Volumes/data`, a checkout nested in a home directory, or key
-      material in the clear. `file://` is not judged (mostly `nix copy --to
+      A public tree must not name one machine's layout: a foreign mount, a
+      checkout below a home, a Windows profile path, or key material in the
+      clear. The word list and one failing case per rule live with the gate. `file://` is not judged (mostly `nix copy --to
       file://` caches and `git+file://` refs; markdown links are
       `checks:docs:links`), nor home paths as configuration or inventory
       addresses. ~0.2 s, tracked files only, no eval, no network. A line may carry

@@ -5,9 +5,18 @@
 #
 #   1. a mount that exists on one host only — `/Volumes/<name>` other than the
 #      documented storage root `/Volumes/data`;
-#   2. somebody's checkout under a home directory (a `Documents/` or `projects/`
-#      folder below a home) — dead on every other machine and in CI;
-#   3. key material in the clear, which must only ever reach the tree encrypted.
+#   2. somebody's checkout under a home directory — the `Documents/`, `projects/`,
+#      `code/`, `src/`, `dev/`, `work/`, `repos/`, `git/`, `source/`,
+#      `Developer/` or `Workspace/` folder a checkout sits in below a home, dead
+#      on every other machine and in CI;
+#   3. a Windows profile path (`C:\Users\<name>\…`, or its forward-slash form),
+#      the same leak on the one host in the fleet that runs Windows;
+#   4. key material in the clear, which must only ever reach the tree encrypted.
+#
+# The home vocabulary is a list of the words a checkout actually sits in, not a
+# proof: a checkout under a word nobody listed reads as portable. Widening it is
+# the repair, and `tests/host-paths/run.sh` keeps one failing case per word class
+# so the list cannot quietly lose one.
 #
 # Deliberately NOT judged: `file://` (most uses are `nix copy --to file://`
 # caches and `git+file://` flake refs, and markdown links are
@@ -69,8 +78,14 @@ judge \
 
 judge \
   'a checkout under a home directory' \
-  '/(home|Users)/[^/]+/(Documents|projects|Desktop|Downloads)/' \
+  '/(home|Users)/[^/]+/(Documents|projects|Desktop|Downloads|code|src|dev|work|repos|git|source|Developer|Workspace)/' \
   '/Documents/nixconfig'
+
+# The leading guard is what keeps `file:///Users/…` from reading as a drive
+# letter: a URL is not a profile path, and the docs gate itself greps for one.
+judge \
+  'a Windows user profile path' \
+  '(^|[^A-Za-z])[A-Za-z]:[\\/]+(Users|Documents and Settings)[\\/]+'
 
 judge \
   'key material in the clear' \

@@ -4,7 +4,7 @@
 {lib}: let
   argueAbove = 200;
   pages = {
-    ".agents/skills/agent-browser/SKILL.md" = 86;
+    ".agents/skills/agent-browser/SKILL.md" = 132;
     ".agents/skills/agents-notes/SKILL.md" = 227;
     ".agents/skills/agents/SKILL.md" = 19;
     ".agents/skills/ai-memory/SKILL.md" = 68;

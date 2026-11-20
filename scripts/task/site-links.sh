@@ -20,6 +20,14 @@
 # exactly that way. Every *.pdf under the artifact must be the target of a link,
 # which also keeps a renamed or dropped CV from leaving a build-only file behind.
 #
+# The third rule is the `download` attribute on a PDF anchor, and it exists
+# because every other check cannot see its absence. Cloudflare Pages serves a PDF
+# as `Content-Type: application/pdf` with no `Content-Disposition`, so the browser
+# decides from the attribute: with it the link saves a file, without it the link
+# navigates and looks identical to a link checker. Drop the attribute and the
+# page still returns 200, the href still resolves, the PDF is still linked — and
+# the click silently stops downloading. This walks the anchors themselves.
+#
 # It runs inside the `matt-site` derivation (lib/matt-site.nix), last, with that
 # build's `cvFiles` as the required list: `matt:build`, `matt:deploy:preview`
 # and `matt:deploy:prod` inherit the gate because they build the derivation, and
@@ -47,6 +55,9 @@ root = sys.argv[1]
 expected = sys.argv[2:]
 HTML = re.compile(r"\.html$", re.I)
 LINK = re.compile(r'(?:href|src)\s*=\s*"([^"]*)"', re.I)
+ANCHOR = re.compile(r"<a\b[^>]*>", re.I)
+ANCHOR_HREF = re.compile(r'\bhref\s*=\s*"([^"]*)"', re.I)
+HAS_DOWNLOAD = re.compile(r"(?<![-\w])download(?![\w-])", re.I)
 
 
 def resolvable(target):
@@ -60,9 +71,11 @@ def resolvable(target):
 
 
 bad = []
+bad_download = []
 linked = set()
 checked = 0
 pages = 0
+pdf_anchors = 0
 for base, _, files in os.walk(root):
     for name in sorted(files):
         if not HTML.search(name):
@@ -97,6 +110,18 @@ for base, _, files in os.walk(root):
             linked.add(posixpath.normpath(target.lstrip("/")))
             if not resolvable(target):
                 bad.append(f"{rel}: {href} -> {target}")
+        # A PDF anchor must carry `download`: without it Pages serves the file as
+        # a document and the click navigates instead of saving.
+        for tag in ANCHOR.findall(text):
+            match = ANCHOR_HREF.search(tag)
+            if match is None:
+                continue
+            href = match.group(1).split("#")[0].split("?")[0]
+            if not href.lower().endswith(".pdf"):
+                continue
+            pdf_anchors += 1
+            if HAS_DOWNLOAD.search(tag) is None:
+                bad_download.append(f"{rel}: {match.group(1)} has no download attribute")
 
 pdfs = []
 for base, _, files in os.walk(root):
@@ -115,6 +140,11 @@ if bad:
         print(f"FAIL {line}")
     print(f"site-links: {len(bad)} broken")
     sys.exit(1)
+if bad_download:
+    for line in bad_download:
+        print(f"FAIL {line}")
+    print(f"site-links: {len(bad_download)} PDF anchor(s) that would navigate instead of download")
+    sys.exit(1)
 if missing:
     for path in missing:
         print(f"FAIL required PDF not shipped {path}")
@@ -125,5 +155,8 @@ if orphans:
         print(f"FAIL no page links {path}")
     print(f"site-links: {len(orphans)} unlinked PDF(s) of {len(pdfs)}")
     sys.exit(1)
-print(f"site-links: every internal link resolves and all {len(pdfs)} PDFs are linked")
+print(
+    f"site-links: every internal link resolves, all {len(pdfs)} PDFs are linked"
+    + (f", and all {pdf_anchors} PDF anchors download" if pdf_anchors else "")
+)
 PY

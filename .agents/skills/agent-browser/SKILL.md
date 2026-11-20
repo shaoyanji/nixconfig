@@ -1,7 +1,7 @@
 ---
 name: agent-browser
 description: "Headless Chrome automation via agent-browser CLI."
-version: 0.2.0
+version: 0.2.1
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
 platforms: [linux]
@@ -58,10 +58,56 @@ the authenticated page, not a 401.
 
 Observed 2026-10-30: on some runs `open` spawns the wrapped chromium and then
 sits with no output for minutes. Bound every call (`timeout 60 agent-browser
-open …`), and clear the daemon between attempts — `pkill -f agent-browser` —
-because a stale one makes the next launch queue behind it. A plain
-`agent-browser open https://example.com` is the control that separates "the
-tool is wedged" from "that site is slow".
+open …`), and clear the daemon between attempts because a stale one makes the
+next launch queue behind it. A plain `agent-browser open https://example.com` is
+the control that separates "the tool is wedged" from "that site is slow".
+
+### Clearing the daemon: `-x`, never `-f`
+
+`pkill -f agent-browser` kills the calling script. `-f` matches the whole
+command line, and a wrapper script that names the tool — in an `ab() { …
+agent-browser "$@"; }` helper, a `pkill` line, even a comment-free variable
+assignment — carries that string in its own `/proc/<pid>/cmdline`, so `pkill`
+selects its own parent. The whole run then exits 0 with no output, which reads
+exactly like "the tool produced nothing". Two consecutive browser sweeps were
+lost this way on 2026-11-20 before the cause was obvious.
+
+```bash
+pkill -x agent-browser   # matches the process NAME only, so a shell is never a target
+```
+
+Verified 2026-11-20: run from a script whose body contains the literal string,
+`pkill -x` returned 1 (no daemon up) and the shell printed its next line. Note
+`-x` stops the Rust CLI but not its chromium children — `close` is the clean
+shutdown; `pkill -x chromium` is the blunt one.
+
+### Downloads: a PDF link is two traps, not one
+
+Verified 2026-11-20 against the CV links on `matt.bountystash.com` (headless
+Chrome 157):
+
+- The primitive is `agent-browser download <sel> <path>` — 34,886 B saved in
+  0 s. Set `--download-path <dir>` (or `AGENT_BROWSER_DOWNLOAD_PATH`) as well: a
+  bare `click` on a download link saves into `~/Downloads` under the server's
+  filename, which looks like a timeout to any checker watching its own path.
+- `open <pdf-url>` is the real hang. Headless Chrome has no PDF viewer, so the
+  tab is blank — empty `document.title`, `bodyLength 0`, zero embeds — and a
+  `snapshot` or `wait` after it has nothing to settle on. Never judge a PDF by
+  navigating to it.
+- The save happens only because the anchor carries `download=""`: Cloudflare
+  Pages serves `Content-Type: application/pdf` with no `Content-Disposition`, so
+the URL on its own displays rather than downloads. A link that loses its
+`download` attribute still answers 200 and still looks fine to a link checker.
+
+```bash
+agent-browser --download-path /tmp/dl open https://host/page
+agent-browser download 'a[download][href="cv.pdf"]' /tmp/dl/cv.pdf
+head -c 4 /tmp/dl/cv.pdf        # %PDF, not an HTML error page
+```
+
+`scripts/task/cv-links-check.sh [base-url]` is that loop over the live site:
+headers, a click per anchor, a `%PDF` magic byte test, `pdfinfo`, and a sha256
+comparison against a built artifact (`ARTIFACT=/tmp/matt-site`).
 
 ## 2. Core loop (snapshot → act by ref)
 

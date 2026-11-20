@@ -1,8 +1,164 @@
 {
-  "generated": "2026-11-20T13:11:57Z",
+  "generated": "2026-11-20T15:36:52Z",
   "count": 200,
-  "pin": "ec901a835b18b441db72aa1b1e1a306e3ea70bd95a8ba4627189f0b445263c38",
+  "pin": "79b08986bef1c856c989fd7ad23f199f1232468b9d49ac43992060752cfb0080",
   "turns": [
+    {
+      "id": "7864c310-86be-4c88-a575-1dbfcf20acbb",
+      "ts": "2026-11-20T15:34:57Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "claim: reject Seoul 99, send drafted followup, prepare active prep targets",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9sswu7ki6o6wnapzklrmaf"
+    },
+    {
+      "id": "54723cd7-4677-4270-bf56-0d33982fb99e",
+      "ts": "2026-11-20T15:31:59Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "landed: attention queue clear; 5 new apps upserted & linked to mail (Maximus, Antaros Medical, OneZero Solutions, Alan Turing Institute, ARZ Emmendingen); 3 mail linked (EDEKA Strecker rejection, Seoul 99 interview invite, Ensight Energy M7 followups); 0 monitor replies (Parloa applied/gated, evoila prep, Workato prep, Octopus prep, Castle Tech rejected); pipeline reached 200 tracked (49 applied, 16 prep, 4 screening, 1 interview) | gate: apps:status PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9ssc11mm8dj39jmkee29n4"
+    },
+    {
+      "id": "740c64c1-795b-43db-9026-1373efb3599a",
+      "ts": "2026-11-20T15:28:26Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "claim: continue job search loop (16:28), scan attention queue, follow up monitor leads, check discovered",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9srn276pioqgdjof590h6n"
+    },
+    {
+      "id": "eb14a33f-4e26-4eac-b359-994df8c6a651",
+      "ts": "2026-11-20T13:35:39Z",
+      "source": "devin",
+      "subject": "nixconfig:pipe-operator-refactor",
+      "action": "landed: merged picobot/pipe-operator-refactor into main as merge commit 2cc678e7 (main had moved to e159f195 — cv typst fix, no overlap) | gate: checks:drv-equality PASS post-merge (17 evaluable hosts identical to origin/main snapshot, 13 pre-existing failures unchanged by error text), frieren full eval 26.05",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2cc678e7b4d7a583e8a0081172d8fa41ef77671f",
+      "branch": "HEAD",
+      "frame": "03h9s5lycqai8uq3qyi14hxfc"
+    },
+    {
+      "id": "f7440349-f3ab-47f9-ad73-c9904c306aee",
+      "ts": "2026-11-20T13:33:03Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: user approved triage drafts, delphi freebuff sent them (incl Legence). Found Sent alias config trap, fixing. frieren freebuff→fix agent-browser trap, devin→merge pipe-operator refactor (9531476e), delphi freebuff→fix Sent alias. | gate: pane-watch BUSY x2 (frieren) + delphi freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9s53poi8pfsagwqonntec0"
+    },
+    {
+      "id": "7004628f-412f-4e9f-bd33-0c6b84a6eb53",
+      "ts": "2026-11-20T13:28:38Z",
+      "source": "devin",
+      "subject": "nixconfig:pipe-operator-refactor",
+      "action": "landed: module composition piped through |> appendModules (named stage; mkHost is now features|>resolve|>append). 30 sites in host-inventory, 4 in module-sets, boot-checks + roles/home.nix. Reimplemented on post-rewrite arch — c660074d predates featureModules | gate: checks:drv-equality PASS (17 evaluable hosts identical to origin/main snapshot, 13 pre-existing failures unchanged), inventory-modules green, frieren/penguin/clanker full evals",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9531476e599253542cb82fe9283b6287117a3259",
+      "branch": "picobot/pipe-operator-refactor",
+      "frame": "03h9s48lh8m02p3omod49czga"
+    },
+    {
+      "id": "7eb704bf-9db3-447a-abdb-ecdf7a3b09c0",
+      "ts": "2026-11-20T13:17:40Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "landed: agy backed off (rate-limited), job search workload moved to delphi freebuff. frieren freebuff→site deploy, devin→nixconfig refactoring (pipe-operator branch), delphi freebuff→pipeline report. Commits: 4522c0d7 EN CV review, e159f195 DE Lebenslauf fix, a2a982cf CV links sitewide, e01885b5 sops anchor check. | gate: pane-watch BUSY x2 (frieren) + delphi freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9s23j1stkt6wpvkcvijmgd"
+    },
+    {
+      "id": "60f654e4-5669-40a6-a12f-629851b4e4b1",
+      "ts": "2026-11-20T13:14:53Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf vs resume.json — period() collapses equal years (2012 – 2012 gone), degree line comma-separated, contact falls back to basics.url since lebenslauf.json has no profiles | gate: typst compile EN 2 pages + DE 3 pages, zero equal-year ranges, pushed | parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups, identical dates | supersedes 03h9s1gzkg04vam0pscfz9qqs (posted before push)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e159f195f7e7503948d7ec819232b3d571095193",
+      "branch": "main",
+      "frame": "03h9s1jw3kys0fwoszjeo0nsu"
+    },
+    {
+      "id": "349159e2-2ebe-402b-8dc4-fee073b4ef0e",
+      "ts": "2026-11-20T13:14:28Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf vs resume.json — period() collapses equal years (2012 – 2012 gone), degree line comma-separated, contact falls back to basics.url since lebenslauf.json has no profiles | gate: typst compile EN 2 pages + DE 3 pages, zero equal-year ranges, rebased on origin/main and pushed | corpus parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups, identical dates",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f6bc810465b0d7ff10554927a196d4a93b58aae",
+      "branch": "main",
+      "frame": "03h9s1gzkg04vam0pscfz9qqs"
+    },
+    {
+      "id": "fa79dc4f-73e0-4767-8b25-dd77336063fb",
+      "ts": "2026-11-20T13:14:01Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf vs resume.json — period() collapses equal years (2012 – 2012 gone), degree line comma-separated, contact falls back to basics.url since lebenslauf.json has no profiles | gate: typst compile EN+DE PASS, no equal-year ranges in either, DE 3 pages | corpus parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups, identical dates | supersedes 03h9s19gexigf236pthlnn172 (push rejected, rebased)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f6bc810465b0d7ff10554927a196d4a93b58aae",
+      "branch": "main",
+      "frame": "03h9s1dtx26k0fgie9o1vpv8m"
+    },
+    {
+      "id": "35c8ed03-1318-4977-975e-28dda5628299",
+      "ts": "2026-11-20T13:13:24Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: German Lebenslauf accuracy pass vs resume.json — period() collapses equal years (2012 – 2012 / 2026 – 2026 gone), education line comma-separated, contact falls back to basics.url because lebenslauf.json has no profiles | gate: typst compile EN+DE fixtures PASS, DE 3 pages full corpus, EN selection 2 pages | supersedes nothing; DE corpus parity: 5/5 roles, 2/2 degrees, 10/10 projects, 6/6 skill groups match dates and counts",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e86439530676785dc64eaf5b8454bf90d1921719",
+      "branch": "main",
+      "frame": "03h9s19gexigf236pthlnn172"
+    },
+    {
+      "id": "d6e40f3b-65ed-4259-91ef-1b1ae720c0e6",
+      "ts": "2026-11-20T13:12:39Z",
+      "source": "devin",
+      "subject": "nixconfig:config-registry-schema",
+      "action": "landed: registry-schema audits .sops.yaml — every keys: anchor must be claimed by a group age list, every *alias must resolve, stale exceptions refused; sopsAnchorExceptions records garnix (garnixMachine repo-key). Bite-tested unrecorded (throws naming &garnix) | gate: checks:quick PASS (registry-schema: 42 sops anchors)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e01885b559ae3cdd9523b76154bb58c2d7d206d1",
+      "branch": "devin/sops-anchor-check",
+      "frame": "03h9s147c3qdf3glulrpebxlw"
+    },
     {
       "id": "fa41aac8-a276-483f-b1b3-44a93f74c96b",
       "ts": "2026-11-20T13:08:38Z",
@@ -2662,196 +2818,6 @@
       "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
       "branch": "main",
       "frame": "03h9jrq49mp8ic063fwgv5asw"
-    },
-    {
-      "id": "eb7695c9-4df2-4664-ab1b-bcff84575ac4",
-      "ts": "2026-11-19T11:35:34Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 19: freebuff on lebenslauf.md proofread (comparing vs resume.json/lebenslauf.json gists, fixing fabricated Blazor template). devin on deltaqueue replay accelerator (productizing probe). agy on improved job report format. delphi freebuff as cloud service node (db/email triaging via infron).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9joupo1c8wp2i0gujyti36"
-    },
-    {
-      "id": "df0047e6-b1bd-4f74-bf34-669427d571e1",
-      "ts": "2026-11-19T11:31:55Z",
-      "source": "devin",
-      "subject": "nixconfig:fibtransponder-zeckendorf",
-      "action": "probe productionized: replay.go (ReplayLog, provisional kernel) + epoch_cache.go (EpochCache, word-mixed keys, BlockDelta, quotient snapshots) + equivalence tests; HANDOFF updated. Warm EpochCache.Replay 168µs vs full 375µs (-55%); gate: go test ./internal/deltaqueue PASS",
-      "outcome": "done",
-      "claims": [
-        "/Volumes/data/projects/fibtransponder"
-      ],
-      "files": [
-        "internal/deltaqueue/{replay",
-        "epoch_cache",
-        "replay_test",
-        "epoch_cache_test",
-        "epoch_probe_test}.go",
-        "HANDOFF.md"
-      ],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jo51gerb8buxjwi4m0lig"
-    },
-    {
-      "id": "7601e1fc-d024-4809-93d0-d36edab977c1",
-      "ts": "2026-11-19T11:08:23Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 18: freebuff landed dispatch wrapper (9e10d672, scripts/dispatch.sh routes one task to best Infron backup agent, checks:infron dispatch section 44 checks). Verified: dispatch-ok via dsh in 10s. devin committed zeckendorf handoff (0bc8701, HANDOFF.md Epoch-Replay Probe section + probe file). agy updated Black Forest Labs row.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jjjk3j67tg8uyzouk1tvz"
-    },
-    {
-      "id": "3a7b535b-795a-47d1-adfd-b302c37c3324",
-      "ts": "2026-11-19T11:06:30Z",
-      "source": "devin",
-      "subject": "nixconfig:fibtransponder-zeckendorf",
-      "action": "correction: probe + handoff now committed and pushed as 0bc8701 on master (epoch_probe_test.go + HANDOFF.md; gate: go test ./internal/deltaqueue PASS)",
-      "outcome": "done",
-      "claims": [
-        "/Volumes/data/projects/fibtransponder"
-      ],
-      "files": [
-        "internal/deltaqueue/epoch_probe_test.go",
-        "HANDOFF.md"
-      ],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jj6az1gb6zmww9bp4etyz"
-    },
-    {
-      "id": "a9fd7726-a803-4913-aa64-c4ce2f29c65e",
-      "ts": "2026-11-19T11:00:15Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 17: devin quizzed on appflow skill — confirmed all writes via task apps:update/upsert (delphi:8450 API), no JSON hand-edits; found its Focused Energy update was overwritten by agy rezi-leads race (no shared lock), reconciled to \"English packet ready\"/prep. devin now doing zeckendorf HANDOFF.md update. agy updated Black Forest Labs row (Expired). freebuff on dispatch wrapper.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jhyc6jyzabs3xaxisa81f"
-    },
-    {
-      "id": "99ceabad-364f-4983-be25-8f1eb7402001",
-      "ts": "2026-11-19T10:59:08Z",
-      "source": "devin",
-      "subject": "nixconfig:fibtransponder-zeckendorf",
-      "action": "HANDOFF.md updated: new 'Epoch-Replay Probe' section (approach, 10k-op benchmark table, gate PASS incl p=25%/R=1 +118µs, caveats, open decisions); gap 4 entry annotated; files table + footer addendum",
-      "outcome": "done",
-      "claims": [
-        "/Volumes/data/projects/fibtransponder"
-      ],
-      "files": [
-        "HANDOFF.md"
-      ],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jhqjvtbf1xhymrkd7jts0"
-    },
-    {
-      "id": "158153b4-3bcc-4558-a8a1-269ebbe1d7ef",
-      "ts": "2026-11-19T10:48:30Z",
-      "source": "agy",
-      "subject": "apps:bfl-lead-update",
-      "action": "landed: updated BFL product engineer row to Expired | gate: verify curl delphi api",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jfnrgetu67zxtze6k9cp6"
-    },
-    {
-      "id": "134e2e20-d418-4601-849f-32abd700704a",
-      "ts": "2026-11-19T10:48:16Z",
-      "source": "agy",
-      "subject": "apps:bfl-lead-update",
-      "action": "start: update BFL product engineer row status in delphi apps db",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9jfm3bpfe5070gtg0zczl3"
-    },
-    {
-      "id": "197ea516-9df8-466e-aebe-d7ab8f43fd4d",
-      "ts": "2026-11-19T10:18:11Z",
-      "source": "devin",
-      "subject": "nixconfig:fibtransponder-zeckendorf",
-      "action": "deltaqueue epoch-replay probe landed (internal/deltaqueue/epoch_probe_test.go, test-only): zeckendorf block-carving + FNV block keys + quotient addressing; gate PASSES — 10k ops: full 380µs vs segmented-p100 124µs (-67%), quotient hit 64ns, snapshot 59µs; save>0 at every p,R incl p=25%/R=1",
-      "outcome": "done",
-      "claims": [
-        "/Volumes/data/projects/fibtransponder"
-      ],
-      "files": [
-        "internal/deltaqueue/epoch_probe_test.go"
-      ],
-      "base_commit": "c5119370",
-      "branch": "main",
-      "frame": "03h9j9qjq3ozs3glp35uys0qk"
-    },
-    {
-      "id": "7e526c41-eade-4f52-9bf3-3df0c2513189",
-      "ts": "2026-11-19T10:18:01Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 16: agy updated 4 job rows (apps:rezi-leads-update done, Focused Energy=ready, Phantasma=passed, Good Hood+ecoplanet=expired). devin built Focused Energy application packet (lead→prep, English packet ready, PDFs verified) and started deltaqueue replay probe. freebuff on dispatch wrapper. agy now researching Black Forest Labs.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9j9pbuov7onyrud83ux72l"
-    },
-    {
-      "id": "16616029-9bd7-444d-8f84-df4ca2ea282a",
-      "ts": "2026-11-19T10:12:02Z",
-      "source": "agy",
-      "subject": "apps:rezi-leads-update",
-      "action": "landed: updated 4 job rows via task apps:update | gate: verify curl delphi api",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9j8j921feqz5dzlm6j0570"
-    },
-    {
-      "id": "40c3871d-b326-4f58-99de-5cf253faefdc",
-      "ts": "2026-11-19T10:11:22Z",
-      "source": "agy",
-      "subject": "apps:rezi-leads-update",
-      "action": "start: update pipeline status for 4 researched roles in delphi apps db",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9j8elkxn5y9lhmw4nmyf4x"
     }
   ]
 }

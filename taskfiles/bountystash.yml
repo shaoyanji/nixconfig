@@ -192,12 +192,33 @@ tasks:
   # locale's depth instead of the page's. The console's artifact is checked by
   # `bountystash:build`, on the machine that has its checkout.
   site:links:
-    desc: "[gate] build the Nix sites and resolve every internal href/src against the artifacts"
+    desc: "[gate] build the Nix sites, resolve every internal href/src, and prove every shipped PDF is linked"
     cmds:
       - nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site
       - nix build --builders "" --out-link /tmp/bountystash-mockup .#sites.bountystash-mockup
       - bash scripts/task/site-links.sh /tmp/matt-site
       - bash scripts/task/site-links.sh /tmp/bountystash-mockup
+
+  # The static gate (`site:links`) proves a PDF anchor still carries `download`;
+  # this proves the server turns that click into bytes, which no HTTP check can
+  # see — headless Chrome has no PDF viewer, so navigating to the URL renders a
+  # blank page that reads as a hang, and a bare click saves into ~/Downloads
+  # instead of the path a checker watches. Needs network and agent-browser, so it
+  # is a live proof, not part of a host gate.
+  matt:cv:check:
+    desc: "[gate] every CV link downloads a non-empty PDF in headless Chrome (live)"
+    summary: >
+      Clicks each real anchor on the home pages and articles, then judges the
+      saved file: %PDF magic bytes, a page count from pdfinfo, and — when
+      `/tmp/matt-site` exists from `matt:build` — a sha256 match against the
+      built artifact, so the live site is proven to be this tree's output rather
+      than merely a 200.
+
+      Exit 0 = 12 ok, 0 failed. The skill page
+      `.agents/skills/agent-browser/SKILL.md` records why the naive version of
+      this check times out; `docs/cv-ats-compliance.md` records the link gate.
+    cmds:
+      - bash scripts/task/cv-links-check.sh https://matt.bountystash.com
 
   matt:gist:pull:
     desc: Fetch resume.json and lebenslauf.json from the gists into the local cache

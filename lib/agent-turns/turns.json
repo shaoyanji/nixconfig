@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T11:44:24Z",
+  "generated": "2026-11-20T11:50:43Z",
   "count": 200,
-  "pin": "ca621fbe2e91d4cb442e9c6e7cd950b9aa094147efb80dfc7dac0ce84b7a96ef",
+  "pin": "263b36d1f3022f43206c421bf103dc7fd759e35a79cb246adbb6aa6348805de3",
   "turns": [
+    {
+      "id": "97c89ab7-be38-42b8-92b5-23da59141c38",
+      "ts": "2026-11-20T11:50:40Z",
+      "source": "antigravity",
+      "subject": "nixconfig:monitor-leads-nudge",
+      "action": "claim: research Monitor-group leads (Parloa, evoila, Workato, Octopus, Castle Tech) and nudge them on delphi PostgreSQL",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
+      "branch": "main",
+      "frame": "03h9rl3njpzfzel029qjzbwil"
+    },
+    {
+      "id": "5a355bba-497e-4098-8a66-f3656a6b6e8f",
+      "ts": "2026-11-20T11:47:02Z",
+      "source": "antigravity",
+      "subject": "nixconfig:agy-job-search",
+      "action": "landed: update 16 applications (resolve undiscovered roles, nudge leads, reconcile rejections) on delphi PostgreSQL | gate: application-pipeline 174 rows PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
+      "branch": "main",
+      "frame": "03h9rke4sozbj6veb1vsetfbf"
+    },
+    {
+      "id": "33b0fdb8-efc7-49fd-9b75-8ea693f5a577",
+      "ts": "2026-11-20T11:44:32Z",
+      "source": "freebuff",
+      "subject": "nixconfig:ats-resume",
+      "action": "landed: nix build .#sites.matt-site PASS on eu.nixbuild.net; shipped 4 CVs (2/2/1/1 pages), 15 pages, og cards; fixed a heading left alone at a page foot (cv.typ head() sticky), cv.pdf last page 80 mm | gate: nix build .#sites.matt-site rc=0 (typeset checks inside the derivations PASS)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
+      "branch": "main",
+      "frame": "03h9rjwingj7sc0lg3vu4k3ln"
+    },
     {
       "id": "891995eb-4565-42f6-af48-114c0b10cefd",
       "ts": "2026-11-20T11:43:49Z",
@@ -2832,51 +2871,6 @@
       "base_commit": "67164d07dea6e347e966a97aeda68b9ab3f3b1e2",
       "branch": "main",
       "frame": "03h9ioiybx0bnobccve80h5j6"
-    },
-    {
-      "id": "745780a5-2a9d-406b-b3b3-3c9ec55e2f69",
-      "ts": "2026-11-19T08:25:14Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 4: freebuff landed port audit (033938f6, scripts/task/port-audit.sh classifies SERVED/HOLE/LOOPBACK/NO-LISTENER, fails on hole or two-knobs-one-port, fixture + negative needle). Fed it Sloppiness-audit continuation (hand-typed count gate + doc-link gate).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "033938f6fb731065ca2dca5ddff73f8e8f9742d8",
-      "branch": "main",
-      "frame": "03h9inoad6s0mxqv24f8djokg"
-    },
-    {
-      "id": "43ff1d34-8c02-4e94-9c11-e706f28a8558",
-      "ts": "2026-11-19T08:22:20Z",
-      "source": "devji",
-      "subject": "nixconfig:ports-audit-registry",
-      "action": "port-audit.sh classifies modules.toml port fields per host (SERVED/HOLE/LOOPBACK/NO-LISTENER) and fails on an ungated public port or two knobs on one; 12-case fixture with negative needles; frieren audit clean (4 knobs SERVED)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "033938f6fb731065ca2dca5ddff73f8e8f9742d8",
-      "branch": "main",
-      "frame": "03h9in3uwc0zc5mapsre6l70t"
-    },
-    {
-      "id": "5a0fae45-ed39-466b-b7cd-f6889ab03004",
-      "ts": "2026-11-19T08:17:38Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 3: freebuff landed config-registry-schema (70dc7f13, lib/registry-schema.nix + checks.registry-schema, knob path roots + option casing + ports, 5 real failures fixed). Fed it \"wire ports to the gate\" followup. agy delivered email triage: Appwrite dragon-court deletion (needs decision), 3 PRs awaiting review, Oracle trial expiry Dec 18, security logins to confirm, nixcachix CI already resolved.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "70dc7f13d537b6527a05e4cac2f2ea0dfd46e0f3",
-      "branch": "main",
-      "frame": "03h9im6ttvrbq4gymeeyik6wj"
     }
   ]
 }

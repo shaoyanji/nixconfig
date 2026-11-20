@@ -471,10 +471,18 @@
       inherit (ui) themeAria;
       inherit (ui) langLabel;
       inherit (ui) cvLabel;
+      inherit (ui) cvTunedLabel;
       cvHref = "${root}${
         if lang == "de"
         then "cv-de.pdf"
         else "cv.pdf"
+      }";
+      # The tailored CV ships either way; without this link it was a store path
+      # nobody could open from the site.
+      cvTunedHref = "${root}${
+        if lang == "de"
+        then "cv-energy-de.pdf"
+        else "cv-energy.pdf"
       }";
       ogImage = "${siteUrl}/${
         if lang == "de"

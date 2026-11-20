@@ -70,6 +70,7 @@ p { margin: 0; max-width: var(--measure); }
 .links a { text-decoration: none; border-bottom: 1px solid var(--rule); }
 .links a:hover { color: var(--accent); border-color: var(--accent); }
 .links .cv { border-bottom-color: var(--accent); color: var(--accent); }
+.links .cv.tuned { border-bottom-style: dotted; }
 
 /* index rail -------------------------------------------------------------- */
 .index { display: flex; flex-wrap: wrap; gap: .35rem 1.5rem; margin: 1.05rem 0 0; font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; }

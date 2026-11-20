@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-20T20:48:03Z",
+  "generated": "2026-11-20T20:52:44Z",
   "count": 200,
-  "pin": "9148dcb08b5301c9ce60d9e3ca3380d38d14023a900457f9324c0dd1fb709f48",
+  "pin": "5deae35a930a119e8cf7fbce7a7d2604fd8dbdddcb41fdfe1a5fd3d739f3aa4e",
   "turns": [
+    {
+      "id": "882f7075-8b1c-4ee9-b694-86d5d95d522d",
+      "ts": "2026-11-20T20:52:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: cv-ats-check.sh runs in every matt-cv-* derivation (PDF vs the cv.json it was built from: heading vocabulary/order, name+contact placement, every record row present, no /URI, no hyphenated line end) + docs section | gate: nix build .#sites.matt-site PASS 4/4 matches, 2 negative builds fail (house-word heading, #link /URI), checks:prose/ops:docs:budget/checks:nix:comments PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f59a23aede9d86d9025c34a385f30f23dbc9d126",
+      "branch": "main",
+      "frame": "03h9uiwr88n8qyerkt3003rxf"
+    },
+    {
+      "id": "87de6a61-43c5-4dd6-9b0e-856fa432f9a3",
+      "ts": "2026-11-20T20:49:13Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "Steward drove win1 freebuff → run_gap_mode_in_build (jevdecide 0.93/0.87): committed f59a23ae feat(matt-site): run the CV link gate's --gap pre-flight inside the build; pushed 632306dc..f59a23ae → origin/main (lib/matt-site.nix, scripts/task/site-links.sh, docs/cv-ats-compliance.md); alejandra + pre-commit gates passed; local=origin=f59a23ae, autoUpgrade-safe; nixconfig:site-cv-links closed (frame 03h9ui3qtrmnqrdx8y7b0crtr).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uiavp8gjtemsqttkik777"
+    },
+    {
+      "id": "fd5e87f3-a317-47e6-b268-6d6d58539185",
+      "ts": "2026-11-20T20:48:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: matt-site derivation runs site-links --gap first (same cvFiles), then the full pass; build log shows both, an added unlinked CV fails the build at the pre-flight | gate: nix build .#sites.matt-site PASS, checks:prose/docs:links/nix:comments/ops:docs:budget PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f59a23aede9d86d9025c34a385f30f23dbc9d126",
+      "branch": "main",
+      "frame": "03h9ui3qtrmnqrdx8y7b0crtr"
+    },
     {
       "id": "8165bd99-6ca0-4a0c-98a6-3c1c45723c47",
       "ts": "2026-11-20T20:46:19Z",
@@ -2752,53 +2791,6 @@
       "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
       "branch": "main",
       "frame": "03h9krmwyp8dnr0pkarahr7o3"
-    },
-    {
-      "id": "ae4c1e4b-a768-4627-9292-42d7bf7fde2a",
-      "ts": "2026-11-19T14:54:05Z",
-      "source": "devin",
-      "subject": "nixconfig:bagua-weather",
-      "action": "bagua-weather M1-M5 complete: published shaoyanji/bagua-weather public (MIT LICENSE + CI pytest+ruff, GitHub Actions run 44527506367 PASS, local pytest 38 PASS ruff clean), final commit 71febcc; M5 ablation fdebe4a (8 states justified)",
-      "outcome": "done",
-      "claims": [
-        "shaoyanji/bagua-weather"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9krmu1w0qme08gjo3eh2xj"
-    },
-    {
-      "id": "0f91e962-76f7-4091-9ecc-2783138c585c",
-      "ts": "2026-11-19T14:54:05Z",
-      "source": "agy",
-      "subject": "nixconfig:zeckendorf-pr-review",
-      "action": "PR #8 kg-zeck-cache reviewed: ExUnit 12/0 PASS + parity.exs PASS on frieren (worktree 97489aa0), verdict APPROVE no security blockers, no logic changes; PR not merged per instructions",
-      "outcome": "done",
-      "claims": [
-        "kg-zeck-cache",
-        "PR#8"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9krmqyoomuvde5zw1btv1j"
-    },
-    {
-      "id": "7f596391-c400-4c79-b7c2-2657841c8bf1",
-      "ts": "2026-11-19T14:54:04Z",
-      "source": "freebuff",
-      "subject": "nixconfig:loopcv-re-strategy",
-      "action": "LoopCV re-strategy complete: app.loopcv.pro mapped (loopcv.ai NXDOMAIN), 5 loops auto-applying (129 apps/558 emails/2718 pending/0 interviews/51 unanswered), magic-link sign-in used (passkey needed, sops gmail IMAP-only), auto-apply off US loops kept on DE loops",
-      "outcome": "done",
-      "claims": [
-        "loopcv.ai",
-        "app.loopcv.pro"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9krmnxrtoqsmdnd7cy5dhi"
     }
   ]
 }

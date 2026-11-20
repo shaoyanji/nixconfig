@@ -855,8 +855,12 @@
       inherit (json) stack;
     };
 
+  # `typeset` reads the page count from the template's report; `cv-ats-check`
+  # re-reads the finished PDF against work/cv.json. Why: docs/cv-ats-compliance.md.
   cvPdf = name: cvJson:
-    pkgs.runCommand "matt-cv-${name}" {nativeBuildInputs = [pkgs.typst pkgs.jq];} ''
+    pkgs.runCommand "matt-cv-${name}" {
+      nativeBuildInputs = [pkgs.typst pkgs.jq pkgs.poppler-utils pkgs.python3];
+    } ''
       mkdir -p $out work
       cp ${./matt/cv.typ} work/cv.typ
       cp ${pkgs.writeText "cv.json" (builtins.toJSON cvJson)} work/cv.json
@@ -866,6 +870,7 @@
         budget = cvJson.pages;
         doc = "cv-${name}.pdf";
       }}
+      bash ${../scripts/task/cv-ats-check.sh} --record work/cv.json $out/cv.pdf
     '';
 
   cv = cvPdf "en" (cvData "en");

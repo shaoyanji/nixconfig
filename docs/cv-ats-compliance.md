@@ -154,6 +154,40 @@ site-links: 2 unlinked PDF(s) of 4
 verify a change to the gate, perturb the input and build plainly — the failing
 derivation has no old output to re-check.
 
+## The ATS parity gate: the PDF must still say what the record says
+
+The link gate keeps the four PDFs reachable; this one keeps them the document
+they claim to be. The template reads `cv.json`, and nothing proved the finished
+PDF still said what that record says: a heading that becomes a house word, a role
+the loop drops, a link annotation that comes back or a word hyphenated at a line
+end compiles cleanly, and the page-count check in `lib/typeset.nix` sees none of
+them.
+
+`bash scripts/task/cv-ats-check.sh --record work/cv.json $out/cv.pdf` runs inside
+every `matt-cv-*` derivation. It reads the PDF back with `pdftotext` in reading
+order — not `-layout`, which reintroduces the columns the template removed — and
+compares it with the same JSON the template read: the name in the first three
+lines, the contact in the body, the five headings as exact lines in one order
+(`Experience`, `Projects`, `Education`, `Skills`, `Languages`; German
+`Berufserfahrung`, `Projekte`, `Ausbildung`, `Kenntnisse`, `Sprachen`), every work
+title and role, every degree, school, project and skill group the record carries,
+and the record's own `labels` against that vocabulary. Then the bytes: no `/URI`
+annotation, and no line that ends in a hyphen and continues lowercase.
+
+A failure names the property rather than the file:
+
+```text
+cv-ats-check: cv.pdf <- cv.json (en)
+FAIL the record's 'projects' heading is 'Selected projects'; the ATS word is 'Projects'
+FAIL heading 'Selected projects' is not a line of the extracted text — an ATS matches the word, not an uppercased or house-style variant
+cv-ats-check: 2 defect(s)
+```
+
+The record is the payload this build generated, so the gate compares the PDF with
+the data the CV was built from, not with the applications table: a site build is
+a pure derivation and cannot read Postgres. `task career:export` is what carries
+a row change into the JSON.
+
 ## Downstream: `task apps:build` compiles another template
 
 `task apps:build` drives the workflow checkout, and that checkout keeps its own

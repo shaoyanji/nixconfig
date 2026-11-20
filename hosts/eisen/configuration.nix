@@ -22,6 +22,7 @@ in {
     self.modules."profiles.sunshine"
     self.modules."services.qwen-tts"
     self.modules."services.llm-decision-router"
+    self.modules."profiles.dns-client"
     ./llm-server.nix
     ./parakeet.nix
     ./decision-models.nix
@@ -111,19 +112,8 @@ in {
     ];
   };
 
-  # Pi-hole DNS via the tailnet: resolve through frieren's FTL (its
-  # 100.97.61.65 tailnet address) with the router as fallback so name
-  # resolution survives a frieren/tailnet outage.  Tradeoff: resolved
-  # queries all listed servers, so the router also answers when the pi-hole
-  # is up — ad-blocking is best-effort, not absolute.
-  services.resolved = {
-    enable = true;
-    settings.Resolve.DNS = [
-      "100.97.61.65"
-      "192.168.3.25"
-      "192.168.3.1"
-    ];
-  };
+  # profiles.dnsClient: resolved queries the whole list in parallel — ads best-effort.
+  profiles.dnsClient.enable = true;
 
   # --- Wake-on-LAN (WOL) ---
   # udevd arms linkConfig.WakeOnLan = "magic" on enp9s0 (Realtek GbE, MAC

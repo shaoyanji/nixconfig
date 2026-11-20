@@ -1000,6 +1000,14 @@
         client both resolvers (router DHCP, or `networking.nameservers`, which only
         aristotle sets today).
 
+        Half-met 2026-11-24: `profiles.dnsClient` (exp-104) consolidates the
+        client half — aristotle, diogenes and eisen now declare VIP + tailnet +
+        public fallback in one option set — and `checks:dns:resolver-health`
+        plus the gatus `dns://` endpoint on delphi (exp-105) probe the resolver
+        as a service. Still open: the zone's second home — the delphi
+        dnsmasq-front / split-DNS piece that answers `.lan` when frieren is
+        down; public names are the covered half.
+
         Exit: a client with frieren down still resolves public names; `checks:dns:resolver-health` reproduces it.
       '';
     };
@@ -2380,24 +2388,42 @@
     exp-104 = {
       title = "EXP-104 — Resolver independence for clients (`profiles.dnsClient`)";
       kind = "experiment";
-      status = "OPEN";
+      status = "DELIVERED";
       date = "2026-10-19";
       summary = "Mode: client-side resolver policy — a declared fallback upstream alongside the handed-out one, so a single resolver host is not also a single point of failure for clients.";
       refs = {
         tasks = ["checks:dns:failover"];
         docs = ["docs/dns-failover.md"];
       };
+      body = ''
+        Delivered 2026-11-24 as `modules/profiles/dns-client.nix`: VIP
+        (192.168.3.50) + tailnet resolver (100.97.61.65) in resolved `DNS`,
+        public upstreams in `FallbackDNS`, `~lan`/`~frieren.lan` pinned to the
+        fleet resolvers. aristotle and diogenes' identical hand-rolled stanzas
+        and eisen's bespoke list all collapse to `profiles.dnsClient.enable`.
+        Options are mkDefault, so a resolver host or a roaming override still
+        wins without mkForce.
+      '';
     };
     exp-105 = {
       title = "EXP-105 — Resolver health probe and gate (`checks:dns:resolver-health`)";
       kind = "experiment";
-      status = "OPEN";
+      status = "DELIVERED";
       date = "2026-10-19";
       summary = "Mode: monitor the resolver as a service, not as a config — a probe that fails when the resolver stops answering, wired into the existing Gatus deployment and the checks: gate family.";
       refs = {
         tasks = ["checks:dns:failover"];
         docs = ["docs/dns-failover.md"];
       };
+      body = ''
+        Delivered 2026-11-24 in two places. `checks:dns:resolver-health`
+        (scripts/task/dns-resolver-health.sh): live half digs the VIP for the
+        zone probe and the public fallback for itself; declared half evals
+        each enrolled client's `services.resolved` DNS/FallbackDNS as
+        non-empty. The gatus half is delphi's "frieren resolver (tailnet)"
+        `dns://` endpoint querying dns-probe.frieren.lan for 192.168.3.25 —
+        `fleetMonitors.endpoints` grew a `dns` option for it.
+      '';
     };
     exp-106 = {
       title = "EXP-106 — Make `network-online.target` honest on WiFi (`services.wifiBringupGuard`)";

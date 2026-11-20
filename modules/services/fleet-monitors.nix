@@ -55,7 +55,8 @@
         ];
     }
     // lib.optionalAttrs (e.group != null) {inherit (e) group;}
-    // lib.optionalAttrs (e.headers != null) {inherit (e) headers;};
+    // lib.optionalAttrs (e.headers != null) {inherit (e) headers;}
+    // lib.optionalAttrs (e.dns != null) {inherit (e) dns;};
 in {
   options.services.fleetMonitors = {
     enable = lib.mkEnableOption "config-declared fleet monitors (gatus backend)";
@@ -184,6 +185,23 @@ in {
             type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
             default = null;
             description = "Optional HTTP request headers for the probe.";
+          };
+          dns = lib.mkOption {
+            type = lib.types.nullOr (lib.types.submodule {
+              options = {
+                query-name = lib.mkOption {
+                  type = lib.types.str;
+                  description = "Name a `dns://` endpoint asks the resolver for.";
+                };
+                query-type = lib.mkOption {
+                  type = lib.types.str;
+                  default = "A";
+                  description = "Record type for the query.";
+                };
+              };
+            });
+            default = null;
+            description = "Required for `dns://` endpoints: the query the resolver must answer.";
           };
         };
       });

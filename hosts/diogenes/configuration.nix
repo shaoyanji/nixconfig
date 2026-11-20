@@ -11,6 +11,7 @@ in {
     self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"
     self.modules."profiles.sops-user-identity"
+    self.modules."profiles.dns-client"
   ];
 
   networking.hostName = "diogenes";
@@ -85,16 +86,7 @@ in {
     "--accept-routes=false"
   ];
 
-  # Declarative Fleet DNS: Pi-hole on frieren (192.168.3.25 LAN / 100.97.61.65 Tailscale)
-  networking.nameservers = ["192.168.3.25" "100.97.61.65"];
-  services.resolved = {
-    enable = true;
-    settings.Resolve = {
-      DNS = "192.168.3.25 100.97.61.65";
-      FallbackDNS = "1.1.1.1 8.8.8.8";
-      Domains = ["~lan" "~frieren.lan"];
-    };
-  };
+  profiles.dnsClient.enable = true;
 
   services.displayManager.sddm = {
     enable = false;

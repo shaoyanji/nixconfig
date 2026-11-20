@@ -142,6 +142,10 @@ name = "checks:dns:pool"
 kind = "leaf"
 
 [[check]]
+name = "checks:dns:resolver-health"
+kind = "leaf"
+
+[[check]]
 name = "checks:docs:links"
 kind = "leaf"
 

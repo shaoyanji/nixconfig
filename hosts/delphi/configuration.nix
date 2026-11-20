@@ -564,6 +564,18 @@ in {
         group = "frieren";
         conditions = ["[STATUS] < 400"];
       }
+      # exp-105: the resolver monitored as a service — pihole-ftl answers on the
+      # tailnet address, so a wrong zone or a dead daemon both go red here.
+      {
+        name = "frieren resolver (tailnet)";
+        url = "dns://100.97.61.65";
+        group = "frieren";
+        dns = {
+          query-name = "dns-probe.frieren.lan";
+          query-type = "A";
+        };
+        conditions = ["[DNS_RCODE] == NOERROR" "[BODY] == 192.168.3.25"];
+      }
       {
         name = "frieren sentinel";
         url = "http://100.97.61.65/sentinel/status.json";

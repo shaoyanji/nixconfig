@@ -1,8 +1,99 @@
 {
-  "generated": "2026-11-20T22:01:06Z",
+  "generated": "2026-11-20T22:31:23Z",
   "count": 200,
-  "pin": "8d329b435b96b4548bbdbf61c78038dc2d0d926352d42c173d1acadb4e40d553",
+  "pin": "aff8cfff8f0c46958f178542bff4a76498aa6e8326ff8c789c22e2a198c1da97",
   "turns": [
+    {
+      "id": "0f871a6b-a401-4c55-b791-17d60fc4daa3",
+      "ts": "2026-11-20T22:26:21Z",
+      "source": "freebuff-agent",
+      "subject": "nixconfig:freebuff-cv-update",
+      "action": "landed: update_cv — refresh CV with recent projects, skills, and contact links; link CV PDF from site and verify link targets resolve",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9v19zxlzwfsgvtv0ty6mt0"
+    },
+    {
+      "id": "68410c35-c4f5-44e9-bd66-067d4451aa7e",
+      "ts": "2026-11-20T22:22:59Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-links",
+      "action": "verified shaoyanji site build: jekyll 4.4.1 build from 4737d8f OK, CV tab active + /assets/files/cv.pdf download anchor present, htmlproofer rc=0 (67 files/145 links), all 65 live pages match fresh build modulo build timestamp, live not stale so no deploy",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c4d10be347c886a911fbd07ad5fb03b240c7a47d",
+      "branch": "main",
+      "frame": "03h9v0mday8c847fscoevbf8t"
+    },
+    {
+      "id": "7f1c4bd4-33c1-4eac-b3b9-190642e97049",
+      "ts": "2026-11-20T22:20:18Z",
+      "source": "devin-agent",
+      "subject": "nixconfig:pane-steward-devin-refactor",
+      "action": "drove devin win2 (nixconfig refactoring): jevdecide classify --provider typesafe picked resolver-independence over strata-engine-bump-retest (p=0.71, margin 0.42 >= 0.3, decisive); task pasted via load-buffer + Enter; pane accepted - devin querying DNS notes, Thinking 9s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9v03eyhau815i812ps0nyn"
+    },
+    {
+      "id": "1f678fc1-ab0d-475c-bdfd-03bf0faf0bca",
+      "ts": "2026-11-20T22:20:17Z",
+      "source": "freebuff-agent",
+      "subject": "nixconfig:pane-steward-freebuff-cv",
+      "action": "drove freebuff win1 (CV/site): jevdecide classify --provider typesafe picked site-build-deploy over cv-pdf-freshness/cv-print-styles (first pass 0.56/0.34/0.10, margin 0.22 -> needs_review; duel 0.55/0.45, margin 0.10, picked top per no-spin rule); task pasted via load-buffer + Enter; pane accepted - fresh working... counter 38s, Thinking",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9v03diu1c36kb16khdnyxa"
+    },
+    {
+      "id": "65a5f347-a0f0-4982-a1d4-3beb009563ef",
+      "ts": "2026-11-20T22:05:59Z",
+      "source": "freebuff-agent",
+      "subject": "nixconfig:cv-site-work",
+      "action": "landed: commit_pages_work — commit uncommitted --pages CV-packet work (lebenslauf.typ PDF metadata), push to origin/main, continue CV-link leak gate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uxaqmsln7vx9z8g67k1gj"
+    },
+    {
+      "id": "c8959043-9c3f-4beb-a418-9ce25c760ff8",
+      "ts": "2026-11-20T22:04:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-links",
+      "action": "verified: no uncommitted --pages work (lebenslauf.typ metadata already in 3ae66a2f); site build 67 pages / 3209 internal links / 0 broken, single built PDF assets/files/cv.pdf linked from cv/ | gate: shaoyanji _site link audit PASS, live sha256 == build",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c4d10be347c886a911fbd07ad5fb03b240c7a47d",
+      "branch": "main",
+      "frame": "03h9uwycoi6k8y45kw5uihkai"
+    },
+    {
+      "id": "b276db5a-6995-4112-8773-ad02ecf0d2a9",
+      "ts": "2026-11-20T22:01:18Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-user-tail",
+      "action": "landed: serviceTail+userInstall dedupe the 4 hermes user daemons; systemd.user.services evals byte-identical per unit | gate: drv-equality 17 identical + checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c4d10be347c886a911fbd07ad5fb03b240c7a47d",
+      "branch": "HEAD",
+      "frame": "03h9uwdttprcwc600bdeil45u"
+    },
     {
       "id": "cf56963e-b95d-4e4b-8b94-77e5608c944f",
       "ts": "2026-11-20T21:54:09Z",
@@ -2674,104 +2765,6 @@
       "base_commit": "33ee153bef2c51c5ee743181da7004a474a380eb",
       "branch": "HEAD",
       "frame": "03h9lhmzqjlo0b4ssnvcwsmnf"
-    },
-    {
-      "id": "c0d258ae-c8b2-4337-af72-d88738e63210",
-      "ts": "2026-11-19T17:03:28Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-dsh-agy",
-      "action": "claim: shadow dsh-web + agy daemon-web units, decide 3am/5am agy flights",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi",
-        "hosts/frieren"
-      ],
-      "files": [],
-      "base_commit": "f27da646731704fc646b66bb0da9a4a964225994",
-      "branch": "HEAD",
-      "frame": "03h9lgwmfe18j49d3qmkcjmte"
-    },
-    {
-      "id": "7eb83d82-844b-4e71-8b9f-d471ba9c00e0",
-      "ts": "2026-11-19T16:56:46Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-closures",
-      "action": "doc->policy trace landed: taskfiles/README.md include-graph claim is now .#policies.taskfiles-include-is-ownership — phantom-shard negative test verified holds flips false | gate: .#policies eval + hooks PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f27da646731704fc646b66bb0da9a4a964225994",
-      "branch": "HEAD",
-      "frame": "03h9lfll74m9ywq2ono6t8f1r"
-    },
-    {
-      "id": "f2b1fe10-02c0-42cd-82d1-492b034ea305",
-      "ts": "2026-11-19T16:55:09Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-closures",
-      "action": "shadow convention landed: modules/roles/minimal.shadow.nix — empty module holding the kg-elixir cleanup, addressable as .#modules.\"roles.minimal.shadow\"; pointer-style comments kept census at 6537/6539 | gate: checks:nix:comments PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aee2c6c0e89bd55c39dbc683f46b05e5dea382f5",
-      "branch": "HEAD",
-      "frame": "03h9lfa7f39cpr0moq65uidde"
-    },
-    {
-      "id": "0bc71034-06b3-4439-9aae-8412a81b2f5a",
-      "ts": "2026-11-19T16:52:31Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-closures",
-      "action": "first slash landed: tomlq out of user/base -> pkgs.txt (zero callers, yq-go is the documented TOML tool) | gate: parse + frieren.role + hooks PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c2d6806ba82c5106b9db6ffbba4a0e2cbb9723e7",
-      "branch": "HEAD",
-      "frame": "03h9lerp8dzlq5ccb1xjqiph1"
-    },
-    {
-      "id": "a5721ad3-bb8a-4b20-8e00-c085a95665de",
-      "ts": "2026-11-19T16:49:18Z",
-      "source": "devin",
-      "subject": "nixconfig:deep-slash-closures",
-      "action": "claim: closure audit → pkgs.txt slash, shadow.nix convention, comments-as-context, doc→note/policy merge",
-      "outcome": "in_progress",
-      "claims": [
-        "pkgs.txt hosts/ modules/user AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9le53xku0f54n7w2l13jou"
-    },
-    {
-      "id": "d1ddf631-071c-4c3b-9db0-f0b69de4098b",
-      "ts": "2026-11-19T16:32:36Z",
-      "source": "devin",
-      "subject": "nixconfig:infra-deploy-paradigm",
-      "action": "landed: builders envelope unified — self axis added, REMOTE_BUILD is env input, netbook BUILD + deploy dry-runs render via rebuild-flags.sh | gate: checks:rebuild 16 combos + check:verify 116/116 + frieren.role + kg-check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4ab3bc05fa9f9ce0a5546d021d81ecc1e4f5d5d3",
-      "branch": "HEAD",
-      "frame": "03h9lavkaa0qlq8i5s7ri1ubu"
-    },
-    {
-      "id": "6d3c9e94-904a-4fa6-bd07-188efc3407c0",
-      "ts": "2026-11-19T16:30:01Z",
-      "source": "devin",
-      "subject": "nixconfig:infra-deploy-paradigm",
-      "action": "claim: route switch+deploy build decisions through rebuild-flags.sh closed envelope",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/infra.yml scripts/task/rebuild-flags.sh scripts/task/deploy-netbook.sh scripts/task/warm-host.sh scripts/task/activate-host.sh"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9ladgs3ttd1e2o4500ti4o"
     }
   ]
 }

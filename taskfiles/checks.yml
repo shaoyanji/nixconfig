@@ -940,6 +940,20 @@ tasks:
     cmds:
       - HOST={{.HOST | default "frieren"}} RESOLVERS="{{.RESOLVERS | default ""}}" POOL="{{.POOL | default ""}}" POOL_START="{{.POOL_START | default ""}}" POOL_END="{{.POOL_END | default ""}}" bash scripts/task/dns-pool-check.sh
 
+  checks:dns:resolver-health:
+    desc: Probe the resolver as a service and prove every enrolled client declares a public fallback
+    summary: >
+      Two halves of "a client with frieren down still resolves public names".
+      Live: the resolver VIP (VIP=, default 192.168.3.50) answers NAME=
+      (default hc3-check.frieren.lan) with EXPECT= (default 192.168.3.25), and
+      the public fallback (PUBLIC=, default 1.1.1.1) answers — both ends of
+      the failover path respond. Declared: every host in CLIENTS= (default
+      "aristotle diogenes eisen") evaluates to a non-empty resolved
+      FallbackDNS. Exit 0 = healthy; 1 = a probe failed or a client declares
+      none; 2 = cannot evaluate.
+    cmds:
+      - VIP="{{.VIP | default ""}}" NAME="{{.NAME | default ""}}" EXPECT="{{.EXPECT | default ""}}" PUBLIC="{{.PUBLIC | default ""}}" CLIENTS="{{.CLIENTS | default ""}}" bash scripts/task/dns-resolver-health.sh
+
   checks:qmd:vault:
     desc: Check the Obsidian vault qmd collection exists and its index is fresh
     cmds:

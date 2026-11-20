@@ -456,6 +456,7 @@ in {
     # /v1 on loopback, so hermes' `custom:chatplayground` provider is one hop
     # from the same session a browser uses.
     chatplayground.enable = true;
+    firecrawl.enable = true;
   };
 
   # --- Boot parameters for GPU power saving ---

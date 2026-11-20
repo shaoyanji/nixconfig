@@ -79,6 +79,68 @@
     };
   };
 
+  # The crate publishes no prebuilt, so the binary was compiled once on clanker
+  # and dropped in ~/.local/bin with a hand-written unit. buildRustPackage makes
+  # a rebuild own it; see AGENTS.nix note firecrawl-local-loopback.
+  firecrawlLocal = pkgs.rustPlatform.buildRustPackage {
+    pname = "firecrawl-local";
+    version = "0.1.0";
+    src = pkgs.fetchCrate {
+      pname = "firecrawl-local";
+      version = "0.1.0";
+      hash = "sha256-ADHX1kPD5LQVQblu2+zgfM9VSunI3HslcwX7TQ1P3+I=";
+    };
+    cargoHash = "sha256-3ui7xplUVGDDNz4ZY2ZRPLJq1O2cwZrY9olco/qX5jI=";
+    # cargo-setup-hook pins AWS_LC_SYS_USE_SYSTEM=1; vendored aws-lc-sys 0.47
+    # therefore expects a pkg-config'd aws-lc, same as nixpkgs' own override.
+    nativeBuildInputs = [pkgs.pkg-config];
+    # cargo test builds a reqwest client, which the sandbox refuses.
+    doCheck = false;
+    buildInputs = [
+      pkgs.aws-lc
+      pkgs.zstd
+    ];
+    meta = {
+      description = "Loopback Firecrawl API serving hermes web extract";
+      mainProgram = "firecrawl-local";
+    };
+  };
+
+  # FIRECRAWL_CHROME_PATH resolves the store chromium agent-browser already
+  # pins (no extra closure) and gc-roots it; nixpkgs chromium is the fallback.
+  firecrawlChrome = pkgs.writeShellApplication {
+    name = "firecrawl-chrome";
+    runtimeInputs = with pkgs; [
+      binutils
+      coreutils
+      gnugrep
+      nix
+    ];
+    text = ''
+      state="''${XDG_STATE_HOME:-$HOME/.local/state}/firecrawl-local"
+      root="$state/chrome"
+      if [ -x "$root/bin/chromium" ]; then
+        exec "$root/bin/chromium" "$@"
+      fi
+      mkdir -p "$state"
+      chrome=""
+      if agent="$(command -v agent-browser)"; then
+        chrome="$(strings "$(readlink -f "$agent")" 2>/dev/null | grep -o '/nix/store/[a-z0-9]*-chromium-[^/]*/bin/chromium' | head -1 || true)"
+      fi
+      if [ -z "$chrome" ] || [ ! -x "$chrome" ]; then
+        out="$(nix build --no-link --print-out-paths --impure --expr \
+          "(builtins.getFlake \"$HOME/Documents/nixconfig\").inputs.nixpkgs.legacyPackages.x86_64-linux.chromium" 2>/dev/null || true)"
+        [ -n "$out" ] && chrome="$out/bin/chromium"
+      fi
+      [ -n "$chrome" ] && [ -x "$chrome" ] || {
+        echo "firecrawl-chrome: no chromium on this machine" >&2
+        exit 127
+      }
+      nix-store --add-root "$root" -r "$(dirname "$(dirname "$chrome")")" >/dev/null
+      exec "$chrome" "$@"
+    '';
+  };
+
   hostName = osConfig.networking.hostName or "";
 
   soulRel =
@@ -163,6 +225,18 @@ in {
           tools in the prompt, parses a fenced JSON block out of the reply and
           returns it as `tool_calls`. Off is the honest chat-only mode.
         '';
+      };
+    };
+
+    firecrawl = {
+      enable = lib.mkEnableOption ''
+        the loopback firecrawl-local server — the derivation and the unit are
+        owned by a rebuild, replacing the hand-placed ~/.local/bin copy
+      '';
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 3002;
+        description = "Loopback port; FIRECRAWL_API_URL in ~/.hermes/.env.local points here.";
       };
     };
 
@@ -286,6 +360,10 @@ in {
       # The client is installed whenever hermes-user is on, not only when the
       # shim is: `cpg chat` is the part that works with no service running.
       ++ lib.optional pkgs.stdenv.hostPlatform.isLinux chatplaygroundCli
+      ++ lib.optionals (config.programs.hermes-user.firecrawl.enable && pkgs.stdenv.hostPlatform.isLinux) [
+        firecrawlLocal
+        firecrawlChrome
+      ]
       ++ [
         (pkgs.writeShellApplication {
           name = "hermes-handoff";
@@ -348,6 +426,48 @@ in {
         fi
       done
     '';
+
+    # Same trap as hermesGatewayUnitCleanup: the hand-placed unit is a regular
+    # file where Home Manager wants to link its own, and the ~/.local/bin copies
+    # would shadow the store binaries on PATH. Runs only where firecrawl is on —
+    # that is the only host the old files ever lived on.
+    home.activation.firecrawlLocalCleanup = lib.mkIf (config.programs.hermes-user.firecrawl.enable && pkgs.stdenv.hostPlatform.isLinux) (lib.hm.dag.entryBefore ["checkLinkTargets"] ''
+      for f in \
+        "$HOME/.config/systemd/user/firecrawl-local.service" \
+        "$HOME/.config/systemd/user/default.target.wants/firecrawl-local.service" \
+        "$HOME/.local/bin/firecrawl-local" \
+        "$HOME/.local/bin/firecrawl-chrome"; do
+        if [ -e "$f" ]; then
+          target="$(readlink "$f" 2>/dev/null || true)"
+          case "$target" in
+            /nix/store/*) : ;;
+            *) run rm -f "$f" ;;
+          esac
+        fi
+      done
+    '');
+
+    systemd.user.services.firecrawl-local = lib.mkIf (config.programs.hermes-user.firecrawl.enable && pkgs.stdenv.hostPlatform.isLinux) {
+      Unit = {
+        Description = "firecrawl-local — loopback Firecrawl API for hermes web extract";
+        After = ["network-online.target"];
+        StartLimitIntervalSec = 0;
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${firecrawlLocal}/bin/firecrawl-local serve --port ${toString config.programs.hermes-user.firecrawl.port}";
+        Environment = [
+          "FIRECRAWL_CLOUD=off"
+          "FIRECRAWL_LOCAL_BROWSER=auto"
+          "FIRECRAWL_CHROME_PATH=${firecrawlChrome}/bin/firecrawl-chrome"
+        ];
+        Restart = "always";
+        RestartSec = 2;
+        StandardOutput = "journal";
+        StandardError = "journal";
+      };
+      Install.WantedBy = ["default.target"];
+    };
 
     systemd.user.services.simplex-chat = lib.mkIf (config.programs.hermes-user.simplex.daemon && pkgs.stdenv.hostPlatform.isLinux) {
       Unit = {

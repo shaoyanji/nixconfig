@@ -1,8 +1,202 @@
 {
-  "generated": "2026-11-20T19:24:02Z",
+  "generated": "2026-11-20T20:18:45Z",
   "count": 200,
-  "pin": "af22a96a6478d637563adce14224a2adb032b78f220154d225bbb9f80e5ec901",
+  "pin": "52bdc8bbde66a84fb1fd361c91374bca74bd138802aa3df3f6b68ad3b7ef7a27",
   "turns": [
+    {
+      "id": "4d463075-5437-4e41-bb12-24be56ffefd1",
+      "ts": "2026-11-20T20:10:00Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Drove idle freebuff win1 pane via jevdecide: cv_pdf_links (p=1.0, margin 1.0, decisive). Task: durable gate that every built CV PDF is linked from the site and all link targets resolve; verify and fix broken/missing links in nixconfig. Pane accepted — fresh working... counter. win2 devin BUSY (nixconfig refactoring), left alone. win3 agy IDLE but intentionally left backed off (free Gemini 429). delphi freebuff not polled this run.",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9ubk8u6363ze19zo5aoz5x"
+    },
+    {
+      "id": "c63d8710-1e98-43e3-9728-91575e0ce5b8",
+      "ts": "2026-11-20T20:09:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "site-links gate proven: fixture 6/6; derivation log 81 links/15 pages/4 CVs/16 anchors download; explicit 4-CV run PASS; real artifact minus one anchor FAIL rc=1; same gate in a nix build FAIL rc=1, clean control rc=0. Leak scan: nixconfig 1149 files PASS, repo:paths PASS, fixture 8/8; public Jekyll repo 64 files PASS (only /Volumes/data, the allowed root). Gate's own verdict on that repo found the CV anchor lacked download -> fixed + htmlproofer rc=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9uamw3v20hlur3sm3hhbt6"
+    },
+    {
+      "id": "f7df154c-3b40-4503-b88d-42845a98342e",
+      "ts": "2026-11-20T20:08:05Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "drove idle panes via jevdecide: win1 freebuff -> leak-gate continuation (CV-link gate; CV-packet commit already landed and pushed); delphi freebuff -> mail backlog sweep dry-run print only (--older 1 --limit 300); win3 agy left backed off per directive",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9ua9ri4srb6434z28yp6p1"
+    },
+    {
+      "id": "eae3d445-f405-4c9e-8f9e-2a22171516b5",
+      "ts": "2026-11-20T19:56:13Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:devin-refactor",
+      "action": "Drove default:2.1 devin (nixconfig refactoring lane): hermes_user_nix_review — jevdecide typesafe p=1.0 margin 1.0 decisive. Review modules/user/ai/hermes-user.nix (declarative hermes gateway unit) per open AGENTS.nix note; report the planned diff; verify via nix eval and checks:quick; commit if sound. fleet-remote PR not started (deferred per instruction). Pane accepted — Thinking · 10s, tool calls running.",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u7y6yd5tsur329ljncxtt"
+    },
+    {
+      "id": "dcb8d2c9-404e-40fd-b987-c1dfa069df4e",
+      "ts": "2026-11-20T19:56:09Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:freebuff-cv-page",
+      "action": "Drove default:1.1 freebuff (CV/site lane): cv_page_add — jevdecide typesafe p=0.86 margin 0.72 decisive, no review duel. Add a CV page/section to shaoyanji.is-a.dev linking the built CV PDF ~/Downloads/cv.pdf; verify the Jekyll build is clean and link targets resolve; commit when done. Pane accepted — agent working (working... 32s). Steward owns the drive; agent owns execution and its own commit gate.",
+      "outcome": "done",
+      "claims": [
+        "shaoyanji.is-a.dev"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u7xr48ywib8dw9ddb9mv3"
+    },
+    {
+      "id": "69bc6922-d541-4b2c-ba32-b4c7857333e1",
+      "ts": "2026-11-20T19:44:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-ats-audit",
+      "action": "audited cv.typ + lebenslauf.typ vs the ATS rules (grid header, tracking, footer name, link anchors, columns): all closed since 385986ba, no edit needed. Compiled from the build's own cv.json; output byte-identical to shipped cv.pdf 53c4e055 / cv-de.pdf d13d3a37. pdftotext: linear, 0 tabs, 0 spaced-caps, 0 ligatures; 0 URI annotations; footer page number only | gate: typst compile EN/DE 2p/2p + lebenslauf 3p + apps:audit 110 docs 0 violations PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u5kvr4kjbv3g9pmhv2vzp"
+    },
+    {
+      "id": "d562f156-ca65-4405-96e9-7877d4f63e9c",
+      "ts": "2026-11-20T19:42:06Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:devin-refactor",
+      "action": "Drove devin pane (default:2.1): nixconfig refactor lane — review modules/user/ai/hermes-user.nix (declarative gateway unit), verify via nix eval and checks:quick; Devin accepted and is running tool calls; fleet-remote PR (DEVIN_BRIEFING.md) deferred to next turn.",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u56w5qxc49oiomnrlavnx"
+    },
+    {
+      "id": "2c1edcdc-3c1a-4e6f-a013-d275016a2f0d",
+      "ts": "2026-11-20T19:42:05Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:cv-ats",
+      "action": "Drove freebuff tab 1 (default:1.1): CV ATS quality check + autoATS per DEVIN_FREEBUFF_TAB1_TASK.md; pane accepted the task and is working (typst compile + pdftotext verification pending).",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u56v0qg9d4y1o0jcpmnsy"
+    },
+    {
+      "id": "1e1447a8-e59b-4c45-862b-20ecfb11679f",
+      "ts": "2026-11-20T19:35:57Z",
+      "source": "steward",
+      "subject": "nixconfig:devin-refactoring",
+      "action": "closed devin refactoring turn as done: dead module cleanup verified, checks green, nothing to commit or push",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u3zpxhl9n56z37f7ej7av"
+    },
+    {
+      "id": "441e6be4-3341-48ed-8999-80196e42eb92",
+      "ts": "2026-11-20T19:35:40Z",
+      "source": "steward",
+      "subject": "nixconfig:freebuff-cv-gate",
+      "action": "drove freebuff pane win1 default:1.1 with durable CV site gate task: verify every built CV PDF (cv.pdf, cv-de.pdf) is linked from the site and every link target resolves",
+      "outcome": "done",
+      "claims": [
+        "lib/matt",
+        "site CV build"
+      ],
+      "files": [
+        "lib/matt/cv.typ",
+        "modules/plugins/appflow/templates/lebenslauf.typ",
+        "lib/matt-site.nix"
+      ],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u3xqf0cj9mci655s1p1t9"
+    },
+    {
+      "id": "364f5c3d-e4ee-458d-8290-03214ec2d77d",
+      "ts": "2026-11-20T19:29:04Z",
+      "source": "steward",
+      "subject": "nixconfig:devin-refactoring",
+      "action": "drove devin pane win2 default:2.1 with nixconfig refactoring task: verify dead module cleanup after removing 4 dead files, run checks:quick, scan modules/ and hosts/ for dead code",
+      "outcome": "in_progress",
+      "claims": [
+        "/home/devji/Documents/nixconfig"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u2n8uhh2qcdgv5yn35hq7"
+    },
+    {
+      "id": "3f42818f-2153-487c-96de-1247a8fe4803",
+      "ts": "2026-11-20T19:28:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff-cv-verify",
+      "action": "Drove idle freebuff pane default:1.1 (CV/site lane): jevdecide classified verify_site_links (0.79 vs 0.21, margin 0.58), sent task via tmux load-buffer+paste-buffer+Enter, pane accepted with working... 5s counter",
+      "outcome": "done",
+      "claims": [
+        "/home/devji/Documents/nixconfig"
+      ],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u2j4jphztzzkrpnf0kobk"
+    },
+    {
+      "id": "6e4567bc-4205-4e3e-92d3-9c5d6d8b96e1",
+      "ts": "2026-11-20T19:24:52Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gate",
+      "action": "landed: pushed to origin/main after integrating two concurrent landings; HEAD 98418659 carries 385986ba (Lebenslauf sticky headings + no hyphenation, docs) and 12d4aab5 (tests/ exempt from the path and credential scans); turns.json conflict resolved by regenerating the snapshot from the shim, pin recomputed; artifact rebuilds byte-identically, site-links 81 links / 4 required PDFs / 16 download anchors | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
+      "branch": "main",
+      "frame": "03h9u1trzkbual2tqrdlozoxw"
+    },
     {
       "id": "ab3fe832-6d31-4c9d-ad21-4e2922346c78",
       "ts": "2026-11-20T19:23:05Z",
@@ -2605,193 +2799,6 @@
       "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
       "branch": "main",
       "frame": "03h9ko9uqv1gzmmigto6gtbn9"
-    },
-    {
-      "id": "8be9464f-2f5b-4fd5-841b-75aaf292504c",
-      "ts": "2026-11-19T14:34:15Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 35: freebuff auditing AGENTS.nix open notes (CI queued — AGENTS.nix change triggered build-machines rebuild). agy compiling submission-path report table (LiveKit, Maze Senior confirmed ATS/Yes/packet). devin running fleet health validation (checks:health, ops:health, ops:ledger:toon). delphi sending Parloa Staff Product Engineer outreach as broker.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "d11da18fc4ec6ce89861e8e57100ee3b06cc3f67",
-      "branch": "main",
-      "frame": "03h9knrbcwvgpzj7dq7or7hap"
-    },
-    {
-      "id": "cbf8c881-0c1b-47ca-b2e7-5722c15cd1ee",
-      "ts": "2026-11-19T14:28:49Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-parloa-noresend",
-      "action": "repeat retarget request for Parloa Staff Product Engineer: verified the 14:14 UTC send is delivered (Resend 01a1f428, one and only message to parloa.com), posting 8adc761e still isListed; no second send made to avoid duplicating an irreversible email",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9kmp5h2pbfmza2296myjj5"
-    },
-    {
-      "id": "841cadb0-b526-45f3-9bb9-afed5d564356",
-      "ts": "2026-11-19T14:26:54Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 34: freebuff closing doc-budget-ci note CLOSED. agy compiling submission-path report in /home/devji/.hermes/cache/scratch/submission-report.txt. devin verifying PR #8 changes landed + tests pass. delphi retargeting Parloa Staff Product Engineer outreach as broker.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "cf422658c497737a1f60b8f6212327774e578bd5",
-      "branch": "main",
-      "frame": "03h9kmbnp8ljwxpntr4zrnrnf"
-    },
-    {
-      "id": "52966c8d-6d5e-4203-af8a-034d23c63c4c",
-      "ts": "2026-11-19T14:26:29Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 33: freebuff delivered doc-budget-ci gate verified on doc-only pushes (fede3c1b + cf422658 pushed, xs 03h9kl5xa5jiqgd9wq058u205 posted). devin landed PR #8 nits + tests passed. agy compiled submission-path report. delphi sent LiveKit outreach + Parloa retarget pending.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "cf422658c497737a1f60b8f6212327774e578bd5",
-      "branch": "main",
-      "frame": "03h9km8npj9fpm0a6hnqywuf4"
-    },
-    {
-      "id": "d0109eff-bbde-47bc-bae5-4958bfb784fc",
-      "ts": "2026-11-19T14:20:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:doc-budget-ci",
-      "action": "doc-budget-ci closed: a docs-only push (fede3c1b) ran the docs-budget job green in 51 s while both build jobs were skipped (run 44540530585). The note records that run and the job's coverage: docs-budget.sh skips skill bodies on purpose, and checks.policies, already in the job, bounds them. A duplicate policies step I added was caught from the job's own step list and reverted. DELIVERED at cf422658; checks:quick rc=0.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cf422658c497737a1f60b8f6212327774e578bd5",
-      "branch": "main",
-      "frame": "03h9kl5xa5jiqgd9wq058u205"
-    },
-    {
-      "id": "2b7a3dd8-03bf-405c-8861-dc2dba21cb8b",
-      "ts": "2026-11-19T14:20:14Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-octopus-parloa-prep",
-      "action": "drafted Parloa follow-up for 2026-11-26; drafted Octopus form answers (visa radio left blank, all five options are UK statuses); fixed Octopus apply_url from dead Indeed redirect to canonical Lever link",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9kl0rt5ztbs2wvkcbxinyn"
-    },
-    {
-      "id": "938c892a-0718-49c9-bfc4-79cb64481def",
-      "ts": "2026-11-19T14:15:21Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-parloa-send",
-      "action": "retargeted Parloa to Staff Product Engineer; sent outreach to contact@parloa.com (imprint address, no talent desk exists) with parloa packet, Resend 01a1f428, delivered; Ashby form still unsubmitted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9kk2clssf25wgw14s91vsn"
-    },
-    {
-      "id": "6d8e82d6-09f7-4f32-b7c9-b45c0979e9fd",
-      "ts": "2026-11-19T14:11:13Z",
-      "source": "devji",
-      "subject": "nixconfig:appflow-liveness",
-      "action": "verified 5 prep postings live (parloa/focused/routine/evoila/octopus via canonical Lever); parlive/livekit Ashby submissions blocked on 3 answers + no browser; sheet written",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9kj9by01dfq18vnd42u5i1"
-    },
-    {
-      "id": "22ba2230-b8a1-4d30-afc6-b28cc7169b07",
-      "ts": "2026-11-19T13:46:25Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 32: freebuff verifying CI doc-budget gate on doc-only pushes. agy idle after prep-lead DB update (24/24) and submission-path research (DeepL/Parloa/LiveKit/Maze paths noted). devin following PR #8 nits: poisoned manifest/core fails closed, pruned cores re-leap added, containment validation in progress (03h9kcy4ykuhi0mweg4ouy7yz turn logged). delphi sending LiveKit outreach + retargeting Parloa as broker (6m 51s).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
-      "branch": "main",
-      "frame": "03h9keeyw1395rxiduzd7ftro"
-    },
-    {
-      "id": "62c68302-d297-4420-8554-9d8086895b2b",
-      "ts": "2026-11-19T13:43:51Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 31: freebuff on doc-budget-ci (IN FLIGHT P0, verifying CI gate fires on doc-only pushes). agy researching submission paths for APPLY-group leads (DeepL, Parloa, LiveKit, Maze — posting URLs and ATS methods noted). devin following PR #8 nits: poisoned manifest/core now fails closed, pruned cores re-leap added, containment validation in progress. delphi sending LiveKit outreach + retargeting Parloa as broker (6m 42s).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
-      "branch": "main",
-      "frame": "03h9kdwvfqghzrw8kodda3tad"
-    },
-    {
-      "id": "757292d0-7ee6-4eb5-b6e6-2b1bb6a529dd",
-      "ts": "2026-11-19T13:43:27Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 30: freebuff delivered sentinel-external-hosts (P1, unit-failed→absent for hosts that cannot report, gate verified). agy finished prep/teilzeit DB update (24 leads) and submission-path research (DeepL, Parloa, LiveKit paths noted). devin approved PR #8 (opt-in zeck, kg_zeck 12/0 parity PASS, 3 nits flagged). delphi sending LiveKit outreach + Parloa retarget as broker.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "2c0288b4be1dd775348143de13e55448cb848f10",
-      "branch": "main",
-      "frame": "03h9kdu2eybb5phyxrvu93t9k"
-    },
-    {
-      "id": "a57de9c3-97b6-4f22-9a34-f98b55a5db95",
-      "ts": "2026-11-19T13:43:18Z",
-      "source": "devji",
-      "subject": "nixconfig:hermes-fallback-429",
-      "action": "hermes fallback chain rebuilt across nvidia/openrouter/ollama-cloud; config.yaml entry 1 gained its missing key_env; min_switch_reset_seconds 120->0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8f364b1baf76896251b25172ae042295867abae",
-      "branch": "main",
-      "frame": "03h9kdsyanbrocjd2jwtyqwrn"
-    },
-    {
-      "id": "cddf3696-6ef7-40e1-839f-421b5bc5e718",
-      "ts": "2026-11-19T13:38:54Z",
-      "source": "devin",
-      "subject": "nixconfig:kg-zeck-cache",
-      "action": "followup: zeck-fallback warns on missing Elixir (00a4413c); pruned cores/<epoch>.json re-leaps via 'core cache pruned' reason (b77f28a0); cached manifest/core paths containment-checked, fail-closed (daa1de5a); two hook-env worktree fixes needed to land (b7a511a8, 9399d46f) | gate: kg-zeck-check ExUnit 14/0 + parity PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "daa1de5a7e20949a46f5bd5c314b1a88e41e67e8",
-      "branch": "devin/1795077799-kg-zeck-cache",
-      "frame": "03h9kcy4ykuhi0mweg4ouy7yz"
     }
   ]
 }

@@ -36,7 +36,7 @@
     firecrawl-local-loopback = {
       title = "firecrawl-local is built on clanker and serves hermes extract on loopback";
       kind = "decision";
-      status = "ACCEPTED";
+      status = "REJECTED";
       priority = "P2";
       date = "2026-11-19";
       summary = "No prebuilt exists, so the crate is compiled once on clanker and patched to frieren's loader; measured the same day it answers a scrape 5-25x faster than the cloud path at 23 MiB idle, and hermes reaches it through FIRECRAWL_API_URL instead of the keyed cloud API.";
@@ -77,6 +77,15 @@
 
         Exit: replace the user-local binary and unit with something a host
         rebuild owns, then REJECT this note.
+
+        Met 2026-11-24: `programs.hermes-user.firecrawl` in hermes-user.nix
+        builds the crate as a `buildRustPackage` derivation (the cargoHash the
+        prebuilt note called the blocker: fetched crates.io 0.1.0 plus a
+        `cargoDeps` vendor run), declares the same unit (`serve --port 3002`,
+        FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=auto), ports the
+        firecrawl-chrome launcher to a store script, and removes all three
+        hand-placed files in a checkLinkTargets guard. frieren sets
+        `firecrawl.enable`; every other host keeps the defaults.
       '';
     };
     config-registry-schema = {

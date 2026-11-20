@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-20T13:08:30Z",
+  "generated": "2026-11-20T13:11:57Z",
   "count": 200,
-  "pin": "52cf103449b415d219d88f1683fe0636b550b134454222cd9b6515b97faacf33",
+  "pin": "ec901a835b18b441db72aa1b1e1a306e3ea70bd95a8ba4627189f0b445263c38",
   "turns": [
+    {
+      "id": "fa41aac8-a276-483f-b1b3-44a93f74c96b",
+      "ts": "2026-11-20T13:08:38Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: CV audit vs resume.json — full CV Experience is now the resume work list (fibtransponder/nixconfig had read as jobs, fibtransponder printed twice), contact row reads resume profile URLs (XING restored), packet template prints basics.summary, site project copy says no third-party scripts | gate: nix build .#sites.matt-site PASS (typeset 2/2/1/1 pages, site-links 81 links, 4/4 PDFs) | supersedes 03h9s088ykdpp1qd001k56eus, posted before a comment-ceiling refusal",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4522c0d77ca2ccff76763dfb4e6955da7709730d",
+      "branch": "main",
+      "frame": "03h9s0bznjixbv4qk8pniqg2p"
+    },
     {
       "id": "89389987-1e01-46ba-b220-0968d5a1c10e",
       "ts": "2026-11-20T13:08:07Z",
@@ -2839,22 +2852,6 @@
       "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
       "branch": "main",
       "frame": "03h9j8elkxn5y9lhmw4nmyf4x"
-    },
-    {
-      "id": "fabbc547-577a-43e0-a1a0-40bc6b8d1d9e",
-      "ts": "2026-11-19T10:11:20Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 15: freebuff on dispatch wrapper (agents:dispatch, routing by kind across reasonix/dsh/plain, fixing longSummary). agy finished job research (Focused Energy=apply, Phantasma=pass, Good Hood+ecoplanet=expired), now updating DB. devin preparing Focused Energy application packet. delphi freebuff idle (detached nudge blocked).",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9e10d67214a1470de180f1cfb4f651ec194a9cbd",
-      "branch": "main",
-      "frame": "03h9j8ebltcim60ogpjx73b12"
     }
   ]
 }

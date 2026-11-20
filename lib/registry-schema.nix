@@ -9,4 +9,5 @@
     "services.mataroaConsole.enable"
   ];
   umbrellaFamilies = ["checks:appflow"];
+  sopsAnchorExceptions = ["garnix"];
 }

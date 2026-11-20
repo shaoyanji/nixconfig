@@ -771,7 +771,24 @@ lib.genAttrs systems.work (
           (builtins.filter (h: hosts.${h} ? managed && builtins.typeOf hosts.${h}.managed != "bool") hostNames);
         managedAbsent = builtins.length (builtins.filter (h: !(hosts.${h} ? managed)) hostNames);
 
-        problems = pathProblems ++ casingProblems ++ portProblems ++ familyProblems ++ inventoryProblems;
+        # .sops.yaml — the fourth registry; exceptions: lib/registry-schema.nix
+        sopsYaml = builtins.readFile ../.sops.yaml;
+        tokens = pattern: map builtins.head (builtins.filter builtins.isList (builtins.split pattern sopsYaml));
+        anchorNames = lib.unique (tokens "&([A-Za-z0-9_-]+)");
+        refNames = lib.unique (tokens "\\*([A-Za-z0-9_-]+)");
+        sopsProblems =
+          map (a: ".sops.yaml anchor &${a} is referenced by no group — record it in lib/registry-schema.nix or delete the key")
+          (builtins.filter (a: !(builtins.elem a refNames) && !(builtins.elem a schema.sopsAnchorExceptions)) anchorNames)
+          ++ map (r: ".sops.yaml references *${r} but keys: defines no &${r} anchor")
+          (builtins.filter (r: !(builtins.elem r anchorNames)) refNames)
+          ++ map (a: "sopsAnchorExceptions records ${a} but the anchor is ${
+            if builtins.elem a refNames
+            then "referenced by a group"
+            else "not defined"
+          }")
+          (builtins.filter (a: !(builtins.elem a anchorNames) || builtins.elem a refNames) schema.sopsAnchorExceptions);
+
+        problems = pathProblems ++ casingProblems ++ portProblems ++ familyProblems ++ inventoryProblems ++ sopsProblems;
       in
         if problems != []
         then
@@ -781,7 +798,7 @@ lib.genAttrs systems.work (
             Fix the registry, or record the departure in the schema with a reason.''
         else
           pkgs.runCommand "registry-schema" {} ''
-            echo "registry schema: ${toString (builtins.length ids)} knobs (${toString (builtins.length prosePorts)} ports as data), ${toString (builtins.length checkNames)} check rows, ${toString (builtins.length hostNames)} hosts (${toString managedAbsent} leave managed at its default)" > $out
+            echo "registry schema: ${toString (builtins.length ids)} knobs (${toString (builtins.length prosePorts)} ports as data), ${toString (builtins.length checkNames)} check rows, ${toString (builtins.length hostNames)} hosts (${toString managedAbsent} leave managed at its default), ${toString (builtins.length anchorNames)} sops anchors" > $out
           '';
 
       # --- living documents have budgets (SCHEMA.md §2) ---------------------

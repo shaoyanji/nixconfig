@@ -126,6 +126,10 @@
         other departure; the six prose ports are `port` fields now. Root rows are
         recorded as a census (30 flat families, `appflow` the only umbrella) since
         `check:verify` pairs rows with tasks; `.sops.yaml` is another registry.
+        2026-11-20: the check now covers `.sops.yaml` too — every `keys:` anchor
+        must be claimed by a group's age list and every `*alias` must resolve;
+        `sopsAnchorExceptions` records `garnix` (garnixMachine's on-host
+        repo-key, not a group recipient).
       '';
     };
     model-provider-epistemics = {

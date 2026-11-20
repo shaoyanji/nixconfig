@@ -314,6 +314,7 @@ in {
     self.modules."services.service-portal"
     self.modules."services.systemone-decision"
     self.modules."services.turns-dashboard"
+    self.modules."services.xs-to-ntfy"
   ];
 
   # --- YouTube relay: fetch where the peering is good, serve over the tailnet ---

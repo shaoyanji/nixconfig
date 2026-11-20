@@ -1,8 +1,83 @@
 {
-  "generated": "2026-11-20T07:06:49Z",
+  "generated": "2026-11-20T08:47:59Z",
   "count": 200,
-  "pin": "6528a9b3f7e2ba03c3e71fb9c3ee837a03f7902e25653a85ba456a95fd93a347",
+  "pin": "13b32f218da711706ef27ec1fc5d4fc4bb34e255217f29c165083a4f4a5e514f",
   "turns": [
+    {
+      "id": "263b4750-5a52-4c1b-b8d6-79413d85b893",
+      "ts": "2026-11-20T08:28:53Z",
+      "source": "hermes",
+      "subject": "nixconfig:xs-notify-deploy",
+      "action": "start: Push agent-turn changes from delphi to Hermes via Telegram bot API",
+      "outcome": "in_progress",
+      "claims": [
+        "delphi"
+      ],
+      "files": [],
+      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
+      "branch": "main",
+      "frame": "03h9qhom3rkv87e5fzi5c7xal"
+    },
+    {
+      "id": "49098955-0d5c-4bad-a6d8-14a53272723b",
+      "ts": "2026-11-20T08:12:44Z",
+      "source": "hermes",
+      "subject": "nixconfig:xs-watch-deploy",
+      "action": "start: Deploy xs-watch systemd service+timer on delphi, pull latest nixconfig, configure ntfy+Telegram delivery",
+      "outcome": "in_progress",
+      "claims": [
+        "delphi"
+      ],
+      "files": [],
+      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
+      "branch": "main",
+      "frame": "03h9qeiyz3hjoryvbvpprzm4c"
+    },
+    {
+      "id": "4b3f74f3-0a7d-4405-811c-09f4faa70989",
+      "ts": "2026-11-20T07:51:52Z",
+      "source": "hermes",
+      "subject": "nixconfig:triage-pipeline",
+      "action": "start: Build triage workflow pipeline - resume vs job matching algorithm on delphi",
+      "outcome": "in_progress",
+      "claims": [
+        "delphi"
+      ],
+      "files": [],
+      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
+      "branch": "main",
+      "frame": "03h9qagb5z7yjp4167k7a05j7"
+    },
+    {
+      "id": "8eb1a9fe-113a-4668-b4d0-27237d302afd",
+      "ts": "2026-11-20T07:51:51Z",
+      "source": "hermes",
+      "subject": "nixconfig:agy-job-search",
+      "action": "start: Continue job search - tap & nudge, fill into job tracker DB on delphi PostgreSQL",
+      "outcome": "in_progress",
+      "claims": [
+        "delphi"
+      ],
+      "files": [],
+      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
+      "branch": "main",
+      "frame": "03h9qag852d0flw3m1pzq72cw"
+    },
+    {
+      "id": "e2a8d8fe-b1fe-4523-b429-851971efa84d",
+      "ts": "2026-11-20T07:14:22Z",
+      "source": "hermes",
+      "subject": "nixconfig:oracle-always-free-check",
+      "action": "start: Verify delphi Oracle Cloud instance is within Always Free limits - check OCPU count, RAM, boot volume size, network egress, no paid services",
+      "outcome": "in_progress",
+      "claims": [
+        "delphi"
+      ],
+      "files": [],
+      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
+      "branch": "main",
+      "frame": "03h9q34m8owtw0pw8lymjw8bi"
+    },
     {
       "id": "e5c3809f-ccac-4528-ab2b-a0c9775d0ab5",
       "ts": "2026-11-20T04:09:24Z",
@@ -2777,71 +2852,6 @@
       "base_commit": "99de0583f3d9f5efb15f0ad06a125953cec06371",
       "branch": "main",
       "frame": "03h9fa6ub8yhrllxrr0kj5nqa"
-    },
-    {
-      "id": "30cb08fc-386a-4235-a88b-1bc268367380",
-      "ts": "2026-11-18T22:00:47Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 1 plate(s) kept of 2 spent, 6 roster row(s) waiting, 511 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
-      "branch": "main",
-      "frame": "03h9f9ot25tnw16ysuwpansfl"
-    },
-    {
-      "id": "2ab10abf-1952-42be-a310-ffe13c51b5ff",
-      "ts": "2026-11-18T21:33:07Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 0 plate(s) kept of 2 spent, 7 roster row(s) waiting, 510 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
-      "branch": "main",
-      "frame": "03h9f4a8ltbiku94b58a7tmmh"
-    },
-    {
-      "id": "10586fff-849d-4cd3-9363-bb4359d0751d",
-      "ts": "2026-11-18T21:02:43Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-18: 1 plate(s) kept of 3 spent, 7 roster row(s) waiting, 510 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
-      "branch": "main",
-      "frame": "03h9eych9z62fdu5d3gcqgrqv"
-    },
-    {
-      "id": "38ebb55c-85c2-4f5d-8887-fab3ca4907fa",
-      "ts": "2026-11-18T20:47:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:freeapi-complete",
-      "action": "apisfreellm re-checked live: chat, /ask, /health, /models, /v1/completions, SSE stream, freeserp web+sites and keyless trustburn all answer; freenews still needs its free key. Added freeapi.sh complete + task freeapi:complete for the documented completions shape (choices[0].text), one skill line, budget 144->145. check:verify 111/111, taskfile graph clean, checks:prose and checks:quick green.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c1185044ea9e3259a174018fd6b002835ff99eca",
-      "branch": "main",
-      "frame": "03h9evc1q9f5xi3rl3hr26bwu"
-    },
-    {
-      "id": "a1d365b3-7e52-428b-aa3c-f646ab2aaedb",
-      "ts": "2026-11-18T20:45:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:ci-and-plates",
-      "action": "CI fix: writeBashBin forwarded an unsupported runtimeInputs; infron now takes PATH via makeWrapperArgs (4e99dda4), frieren toplevel evaluates locally, CI rerun success (first run died to a Nix daemon crash). image-daily retries a size the resolved model refuses at 1024x1024; the 3 refused plates landed, publish -> 509 Cloudinary assets, bountystash-assets deployed. 6 plates-3h timers queued for the next 3 h (21:57-00:27).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4e99dda41a0332a2d3286458be6f365f1f5187dd",
-      "branch": "main",
-      "frame": "03h9euw6ol2bjnggrgqggsr5f"
     }
   ]
 }

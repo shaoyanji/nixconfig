@@ -11,6 +11,10 @@
 # internal href, and a PDF anchor aimed at a file that does not exist, where the
 # attribute must not excuse the dead target.
 #
+# The `--gap` pre-flight is exercised on both sides too: it passes a site whose
+# anchors lost `download` (which is not its question), and fails on an unlinked
+# PDF, an unshipped required PDF and a dead target.
+#
 # Coverage is asserted both ways: a case listed below that stops running, or one
 # that runs without being listed, fails the fixture, so deleting an assertion
 # cannot silently shrink the set.
@@ -35,7 +39,12 @@ a word merely containing download fails
 an unlinked PDF fails
 a required PDF that was not shipped fails
 a dead internal link fails
-a PDF anchor to a missing file fails"
+a PDF anchor to a missing file fails
+a gap check passes on a linked site
+a gap check ignores a missing download attribute
+a gap check fails on an unlinked PDF
+a gap check fails on a required PDF not shipped
+a gap check fails on a dead target"
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
@@ -56,6 +65,7 @@ pdf() {
 fail=0
 cases=0
 ran=()
+mode=""
 check() { # name page html want_rc needle [required PDF...]
   local name="$1" page="$2" html="$3" want="$4" needle="$5"
   shift 5
@@ -64,7 +74,7 @@ check() { # name page html want_rc needle [required PDF...]
   ran+=("$name")
   mkdir -p "$site/$(dirname "$page")"
   printf '%s\n' "$html" >"$site/$page"
-  out="$(bash "$gate" "$site" "$@" 2>&1)"
+  out="$(bash "$gate" ${mode:+"$mode"} "$site" "$@" 2>&1)"
   rc=$?
   if [ "$rc" != "$want" ]; then
     echo "FAIL ${name}: exit ${rc}, want ${want}"
@@ -137,6 +147,48 @@ check "a PDF anchor to a missing file fails" index.html \
   '<a class="cv" href="cv.pdf" download>CV</a>
 <a href="work/nonexistent/">case study</a>' \
   1 "broken" cv.pdf
+
+reset
+pdf cv.pdf
+pdf cv-de.pdf
+mode=--gap
+check "a gap check passes on a linked site" index.html \
+  '<a class="cv" href="cv.pdf" download>CV</a>
+<a class="cv" href="cv-de.pdf" download>Lebenslauf</a>' \
+  0 "no gaps" cv.pdf cv-de.pdf
+mode=""
+
+reset
+pdf cv.pdf
+mode=--gap
+check "a gap check ignores a missing download attribute" index.html \
+  '<a class="cv" href="cv.pdf">CV</a>' \
+  0 "no gaps" cv.pdf
+mode=""
+
+reset
+pdf cv.pdf
+mode=--gap
+check "a gap check fails on an unlinked PDF" index.html \
+  '<p>nothing links the CV</p>' \
+  1 "no page links cv.pdf" cv.pdf
+mode=""
+
+reset
+pdf cv.pdf
+mode=--gap
+check "a gap check fails on a required PDF not shipped" index.html \
+  '<a class="cv" href="cv.pdf" download>CV</a>' \
+  1 "required PDF not shipped cv-de.pdf" cv.pdf cv-de.pdf
+mode=""
+
+reset
+pdf cv.pdf
+mode=--gap
+check "a gap check fails on a dead target" index.html \
+  '<a class="cv" href="cv-missing.pdf" download>CV</a>' \
+  1 "broken" cv.pdf
+mode=""
 
 for name in "${ran[@]}"; do
   grep -qxF -- "$name" <<<"$expected" || { echo "FAIL unlisted case: ${name}"; fail=1; }

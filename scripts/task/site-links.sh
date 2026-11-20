@@ -34,25 +34,36 @@
 # `task site:links` runs it over the same artifacts. The procedure and why it
 # lives in the build: docs/cv-ats-compliance.md, "The link gate".
 #
+# `--gap` is the pre-flight form: it asserts only the two structural gaps — a
+# built PDF no page links, and a href/src that resolves nowhere — and returns at
+# the first broken target instead of finishing the walk, so a build can ask "is
+# anything missing?" without paying for the anchor pass. It cannot replace the
+# full gate: a lost `download` attribute and a PDF the caller forgot to require
+# are both invisible to it.
+#
 # Exit: 0 every link resolves, every PDF is linked and every required PDF is
-# shipped, 1 any of those fails, 2 the input is not a directory.
+# shipped (or, with --gap, nothing is missing), 1 any of those fails, 2 the input
+# is not a directory.
 set -uo pipefail
 
-input=${1:?usage: site-links.sh DIR [PDF...]}
+gap=""
+if [ "${1:-}" = "--gap" ]; then gap="--gap"; shift; fi
+input=${1:?usage: site-links.sh [--gap] DIR [PDF...]}
 shift
 dir=$(cd "$input" 2>/dev/null && pwd) || {
   echo "site-links: no such directory: $input" >&2
   exit 2
 }
 
-python3 - "$dir" "$@" <<'PY'
+python3 - "$dir" "$gap" "$@" <<'PY'
 import os
 import posixpath
 import re
 import sys
 
 root = sys.argv[1]
-expected = sys.argv[2:]
+gap_only = sys.argv[2] == "--gap"
+expected = sys.argv[3:]
 HTML = re.compile(r"\.html$", re.I)
 LINK = re.compile(r'(?:href|src)\s*=\s*"([^"]*)"', re.I)
 ANCHOR = re.compile(r"<a\b[^>]*>", re.I)
@@ -109,7 +120,13 @@ for base, _, files in os.walk(root):
             checked += 1
             linked.add(posixpath.normpath(target.lstrip("/")))
             if not resolvable(target):
+                if gap_only:
+                    print(f"FAIL {rel}: {href} -> {target}")
+                    print("site-links: 1 broken (gap check stops at the first)")
+                    sys.exit(1)
                 bad.append(f"{rel}: {href} -> {target}")
+        if gap_only:
+            continue
         # A PDF anchor must carry `download`: without it Pages serves the file as
         # a document and the click navigates instead of saving.
         for tag in ANCHOR.findall(text):
@@ -131,10 +148,16 @@ for base, _, files in os.walk(root):
 orphans = [p for p in sorted(pdfs) if p not in linked]
 missing = [p for p in expected if p not in pdfs]
 
-print(
-    f"site-links: {checked} internal links over {pages} pages, {len(pdfs)} PDFs"
-    + (f" ({len(expected)} required)" if expected else "")
-)
+if gap_only:
+    print(
+        f"site-links: gap check, {pages} pages, {len(pdfs)} PDFs"
+        + (f" ({len(expected)} required)" if expected else "")
+    )
+else:
+    print(
+        f"site-links: {checked} internal links over {pages} pages, {len(pdfs)} PDFs"
+        + (f" ({len(expected)} required)" if expected else "")
+    )
 if bad:
     for line in bad:
         print(f"FAIL {line}")
@@ -155,6 +178,11 @@ if orphans:
         print(f"FAIL no page links {path}")
     print(f"site-links: {len(orphans)} unlinked PDF(s) of {len(pdfs)}")
     sys.exit(1)
+if gap_only:
+    print(
+        f"site-links: no gaps — every target resolves and all {len(pdfs)} built PDFs have a site link"
+    )
+    sys.exit(0)
 print(
     f"site-links: every internal link resolves, all {len(pdfs)} PDFs are linked"
     + (f", and all {pdf_anchors} PDF anchors download" if pdf_anchors else "")

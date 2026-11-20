@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-20T20:40:46Z",
+  "generated": "2026-11-20T20:45:31Z",
   "count": 200,
-  "pin": "52a3381a87d0b7f7a4dc4d80d7a041e58d4a17544803b5099f5a4c825dae356e",
+  "pin": "b2fc859a9792473ea18e69ba6287cee84d57a4b2ed30d316220bc6fe216be15e",
   "turns": [
+    {
+      "id": "67afdcbe-556b-4f64-9ff8-7578302f9b4b",
+      "ts": "2026-11-20T20:43:02Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "Steward drove win1 freebuff → gate_fixtures_in_quick (jevdecide 0.85/0.74): freebuff committed 67227fc9 test(checks): exercise the CV link gate in the shapes the site emits and pushed 191b18f1..67227fc9 → origin/main; hostpaths gate rc=0 PASS 1149 files; pre-commit hooks passed; local=origin=67227fc9, autoUpgrade-safe; lane nixconfig:site-cv-links closed (frame 03h9ugoyj1wzv5u86bnljgycg)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uh3elbrqppmcshe28mf3k"
+    },
+    {
+      "id": "cc5323e1-e77b-4b01-81ae-d30c3e8a90c9",
+      "ts": "2026-11-20T20:40:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: CV link-gate fixture now covers live shapes (two CVs, ../ from /de/, fragment), a missing-file PDF anchor, both-ways case coverage; mutation-proofed all four assertions | gate: checks:site:links:test PASS, checks:tasks PASS, checks:repo:hostpaths PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "67227fc97df4518488333cabf2f81e84bcf709e4",
+      "branch": "main",
+      "frame": "03h9ugoyj1wzv5u86bnljgycg"
+    },
     {
       "id": "662bc681-3222-4394-bc0c-0731484c0a50",
       "ts": "2026-11-20T20:39:28Z",
@@ -2777,36 +2803,6 @@
       "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
       "branch": "main",
       "frame": "03h9kqnm0nu5h47x17pdotcmq"
-    },
-    {
-      "id": "f0c7734a-8408-4808-8b0b-ab6122180330",
-      "ts": "2026-11-19T14:49:04Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:bagua-weather",
-      "action": "nudge: devin M1-M5 done, public repo push pending",
-      "outcome": "in_progress",
-      "claims": [
-        "pane 4 (devin-)"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9kqnj03jqie03029kmm8yd"
-    },
-    {
-      "id": "61877bf2-404a-48d7-afb2-eb1e5f8f1ead",
-      "ts": "2026-11-19T14:49:03Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:loopcv-re-strategy",
-      "action": "nudge: freebuff P1 sentinel + Google sign-in via xvfb-run+CDP pending",
-      "outcome": "in_progress",
-      "claims": [
-        "pane 1 (freebuff)"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9kqng15s0ea736m9qaq8g9"
     }
   ]
 }

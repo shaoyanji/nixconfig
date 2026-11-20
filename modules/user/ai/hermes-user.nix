@@ -143,6 +143,13 @@
 
   hostName = osConfig.networking.hostName or "";
 
+  serviceTail = {
+    Restart = "always";
+    StandardOutput = "journal";
+    StandardError = "journal";
+  };
+  userInstall = {WantedBy = ["default.target"];};
+
   soulRel =
     if hostName != "" && builtins.pathExists ./personas/${hostName}/SOUL.md
     then "personas/${hostName}/SOUL.md"
@@ -453,20 +460,19 @@ in {
         After = ["network-online.target"];
         StartLimitIntervalSec = 0;
       };
-      Service = {
-        Type = "simple";
-        ExecStart = "${firecrawlLocal}/bin/firecrawl-local serve --port ${toString config.programs.hermes-user.firecrawl.port}";
-        Environment = [
-          "FIRECRAWL_CLOUD=off"
-          "FIRECRAWL_LOCAL_BROWSER=auto"
-          "FIRECRAWL_CHROME_PATH=${firecrawlChrome}/bin/firecrawl-chrome"
-        ];
-        Restart = "always";
-        RestartSec = 2;
-        StandardOutput = "journal";
-        StandardError = "journal";
-      };
-      Install.WantedBy = ["default.target"];
+      Service =
+        {
+          Type = "simple";
+          ExecStart = "${firecrawlLocal}/bin/firecrawl-local serve --port ${toString config.programs.hermes-user.firecrawl.port}";
+          Environment = [
+            "FIRECRAWL_CLOUD=off"
+            "FIRECRAWL_LOCAL_BROWSER=auto"
+            "FIRECRAWL_CHROME_PATH=${firecrawlChrome}/bin/firecrawl-chrome"
+          ];
+          RestartSec = 2;
+        }
+        // serviceTail;
+      Install = userInstall;
     };
 
     systemd.user.services.simplex-chat = lib.mkIf (config.programs.hermes-user.simplex.daemon && pkgs.stdenv.hostPlatform.isLinux) {
@@ -475,16 +481,15 @@ in {
         After = ["network-online.target"];
         Wants = ["network-online.target"];
       };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.simplex-chat}/bin/simplex-chat -p ${toString config.programs.hermes-user.simplex.port}";
-        WorkingDirectory = "${config.home.homeDirectory}";
-        Restart = "always";
-        RestartSec = 5;
-        StandardOutput = "journal";
-        StandardError = "journal";
-      };
-      Install.WantedBy = ["default.target"];
+      Service =
+        {
+          Type = "simple";
+          ExecStart = "${pkgs.simplex-chat}/bin/simplex-chat -p ${toString config.programs.hermes-user.simplex.port}";
+          WorkingDirectory = "${config.home.homeDirectory}";
+          RestartSec = 5;
+        }
+        // serviceTail;
+      Install = userInstall;
     };
 
     # chatplayground-serve: loopback only. It holds a live web-chat session, so
@@ -497,27 +502,26 @@ in {
         Wants = ["network-online.target"];
         StartLimitIntervalSec = 0;
       };
-      Service = {
-        Type = "simple";
-        ExecStart = let
-          c = config.programs.hermes-user.chatplayground;
-        in
-          "${chatplaygroundCli}/bin/chatplayground-go serve --addr 127.0.0.1:${toString c.port}"
-          + lib.optionalString c.toolsEmulate " --tools-emulate";
-        WorkingDirectory = config.home.homeDirectory;
-        Environment = [
-          "HOME=${config.home.homeDirectory}"
-          "USER=${config.home.username}"
-        ];
-        # The auth file can be rewritten under it (a login, a rotation); the
-        # process reads it per request, so a restart is not needed. Only a dead
-        # port is: the unit is cheap, so let it restart rather than linger sick.
-        Restart = "always";
-        RestartSec = 5;
-        StandardOutput = "journal";
-        StandardError = "journal";
-      };
-      Install.WantedBy = ["default.target"];
+      Service =
+        {
+          Type = "simple";
+          ExecStart = let
+            c = config.programs.hermes-user.chatplayground;
+          in
+            "${chatplaygroundCli}/bin/chatplayground-go serve --addr 127.0.0.1:${toString c.port}"
+            + lib.optionalString c.toolsEmulate " --tools-emulate";
+          WorkingDirectory = config.home.homeDirectory;
+          Environment = [
+            "HOME=${config.home.homeDirectory}"
+            "USER=${config.home.username}"
+          ];
+          # The auth file can be rewritten under it (a login, a rotation); the
+          # process reads it per request, so a restart is not needed. Only a dead
+          # port is: the unit is cheap, so let it restart rather than linger sick.
+          RestartSec = 5;
+        }
+        // serviceTail;
+      Install = userInstall;
     };
 
     # The session lives in a browser cookie. When it dies, chat, image
@@ -538,27 +542,27 @@ in {
         Wants = ["network-online.target"];
         StartLimitIntervalSec = 0;
       };
-      Service = {
-        Type = "oneshot";
-        # Touch first: a mint alone leaves the idle clock where it was. Exit 2
-        # (alive but inside the warning window) still mints, so the token keeps
-        # working up to the deadline; the unit's exit status carries the warning.
-        ExecStartPre = "-${cpgSessionTouch}/bin/cpg-session-touch";
-        # --json plus a non-zero exit on a dead session: that is the signal.
-        ExecStart = "${chatplaygroundCli}/bin/cpg refresh --json";
-        # The mint shells out to `node`. Inheriting the user manager's PATH made
-        # this an hourly `node: executable file not found` the moment a profile
-        # stopped carrying nodejs, which reads as a dead session and blocks
-        # every `cpg` call. Say PATH out loud: `path =` inside `Service` is not a
-        # unit directive, and systemd drops an unknown key without a word.
-        Environment = [
-          "PATH=${pkgs.nodejs}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
-          "HOME=${config.home.homeDirectory}"
-          "USER=${config.home.username}"
-        ];
-        StandardOutput = "journal";
-        StandardError = "journal";
-      };
+      Service =
+        {
+          Type = "oneshot";
+          # Touch first: a mint alone leaves the idle clock where it was. Exit 2
+          # (alive but inside the warning window) still mints, so the token keeps
+          # working up to the deadline; the unit's exit status carries the warning.
+          ExecStartPre = "-${cpgSessionTouch}/bin/cpg-session-touch";
+          # --json plus a non-zero exit on a dead session: that is the signal.
+          ExecStart = "${chatplaygroundCli}/bin/cpg refresh --json";
+          # The mint shells out to `node`. Inheriting the user manager's PATH made
+          # this an hourly `node: executable file not found` the moment a profile
+          # stopped carrying nodejs, which reads as a dead session and blocks
+          # every `cpg` call. Say PATH out loud: `path =` inside `Service` is not a
+          # unit directive, and systemd drops an unknown key without a word.
+          Environment = [
+            "PATH=${pkgs.nodejs}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
+            "HOME=${config.home.homeDirectory}"
+            "USER=${config.home.username}"
+          ];
+        }
+        // lib.getAttrs ["StandardOutput" "StandardError"] serviceTail;
     };
 
     systemd.user.timers.chatplayground-refresh = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
@@ -581,57 +585,56 @@ in {
         # into a permanent stop.
         StartLimitIntervalSec = 0;
       };
-      Service = {
-        Type = "simple";
-        ExecStart = "${pkgs.llm-agents.hermes-agent}/bin/hermes gateway run";
-        WorkingDirectory = "${config.home.homeDirectory}/.hermes";
-        # Inject the sops-rendered credential file directly into the unit so
-        # the gateway never depends on the ~/.hermes/.env bridge symlink
-        # being present at start time. "-" tolerates a missing file.
-        EnvironmentFile =
-          lib.mkIf (config.programs.hermes-user.envFile != null)
-          "-${config.programs.hermes-user.envFile}";
-        Environment = [
-          "HERMES_HOME=${config.home.homeDirectory}/.hermes"
-          "HERMES_SUPERVISED_CHILD=1"
-          "HOME=${config.home.homeDirectory}"
-          "USER=${config.home.username}"
-          # agy is the subagent a hermes turn shells out to. Home Manager's
-          # sessionVariables never reach a systemd unit, so without these the
-          # daemon calls the local agy with no model and may attempt a
-          # self-update against the read-only store. The model comes from the
-          # antigravity module, not a second literal.
-          "AGY_CLI_DISABLE_AUTO_UPDATE=true"
-          "GEMINI_MODEL=${
-            # A null attr is not a missing one: attrByPath returns the value it
-            # finds, so an unset model coerced here and failed the whole switch
-            # (measured 2026-11-06 on delphi). Fall back rather than crash.
-            let
-              model = config.programs.antigravity-cli.defaultModel or null;
-            in
-              if model == null
-              then "gemini-3.8-flash"
-              else model
-          }"
-          # /run/wrappers/bin MUST come first: it holds the setuid sudo
-          # wrapper. A pkgs.sudo pulled into ~/.nix-profile (e.g. via the
-          # hermes-agent dependency tree) is a plain store binary without
-          # setuid and makes child agents fail escalation with "sudo binary
-          # lacks setuid" (seen 2026-10-08).
-          "PATH=/run/wrappers/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
-        ];
-        Restart = "always";
-        RestartSec = 5;
-        RestartForceExitStatus = 75;
-        SuccessExitStatus = 75;
-        RestartPreventExitStatus = 78;
-        KillMode = "mixed";
-        KillSignal = "SIGTERM";
-        TimeoutStopSec = 70;
-        StandardOutput = "journal";
-        StandardError = "journal";
-      };
-      Install.WantedBy = ["default.target"];
+      Service =
+        {
+          Type = "simple";
+          ExecStart = "${pkgs.llm-agents.hermes-agent}/bin/hermes gateway run";
+          WorkingDirectory = "${config.home.homeDirectory}/.hermes";
+          # Inject the sops-rendered credential file directly into the unit so
+          # the gateway never depends on the ~/.hermes/.env bridge symlink
+          # being present at start time. "-" tolerates a missing file.
+          EnvironmentFile =
+            lib.mkIf (config.programs.hermes-user.envFile != null)
+            "-${config.programs.hermes-user.envFile}";
+          Environment = [
+            "HERMES_HOME=${config.home.homeDirectory}/.hermes"
+            "HERMES_SUPERVISED_CHILD=1"
+            "HOME=${config.home.homeDirectory}"
+            "USER=${config.home.username}"
+            # agy is the subagent a hermes turn shells out to. Home Manager's
+            # sessionVariables never reach a systemd unit, so without these the
+            # daemon calls the local agy with no model and may attempt a
+            # self-update against the read-only store. The model comes from the
+            # antigravity module, not a second literal.
+            "AGY_CLI_DISABLE_AUTO_UPDATE=true"
+            "GEMINI_MODEL=${
+              # A null attr is not a missing one: attrByPath returns the value it
+              # finds, so an unset model coerced here and failed the whole switch
+              # (measured 2026-11-06 on delphi). Fall back rather than crash.
+              let
+                model = config.programs.antigravity-cli.defaultModel or null;
+              in
+                if model == null
+                then "gemini-3.8-flash"
+                else model
+            }"
+            # /run/wrappers/bin MUST come first: it holds the setuid sudo
+            # wrapper. A pkgs.sudo pulled into ~/.nix-profile (e.g. via the
+            # hermes-agent dependency tree) is a plain store binary without
+            # setuid and makes child agents fail escalation with "sudo binary
+            # lacks setuid" (seen 2026-10-08).
+            "PATH=/run/wrappers/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
+          ];
+          RestartSec = 5;
+          RestartForceExitStatus = 75;
+          SuccessExitStatus = 75;
+          RestartPreventExitStatus = 78;
+          KillMode = "mixed";
+          KillSignal = "SIGTERM";
+          TimeoutStopSec = 70;
+        }
+        // serviceTail;
+      Install = userInstall;
     };
   };
 }

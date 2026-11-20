@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-20T21:42:04Z",
+  "generated": "2026-11-20T22:01:06Z",
   "count": 200,
-  "pin": "b936110f21fe1276348ac43d8c951ded5af33e29d700383aa096aa6719b27aaa",
+  "pin": "8d329b435b96b4548bbdbf61c78038dc2d0d926352d42c173d1acadb4e40d553",
   "turns": [
+    {
+      "id": "cf56963e-b95d-4e4b-8b94-77e5608c944f",
+      "ts": "2026-11-20T21:54:09Z",
+      "source": "frieren-freebuff-lane-agent",
+      "subject": "shaoyanji.is-a.dev:cv-leak-gate",
+      "action": "landed: leak_gate_only — verify every built CV PDF is linked from the site and link targets resolve",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uuzjguo3stmln5idh17dq"
+    },
+    {
+      "id": "2fbb3f8e-0ccc-49c0-8ff7-3b4baaf7a739",
+      "ts": "2026-11-20T21:52:56Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Steward run: drove idle freebuff default:1.1 with typst_autoats CV autoATS quality-check (jev-decide p=0.97, margin 0.94); fresh working... counter confirmed submission. default:2.1 devin NOT driven — mid PR-scope question, not idle (left untouched). default:3.1 agy backed off (free Gemini 429 + live SMTP confirmation). No steward commits to push.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uur1lz8cu9n70mlxoy9hk"
+    },
+    {
+      "id": "2c331cac-c9f7-449d-b74f-78cbe7d3e51d",
+      "ts": "2026-11-20T21:46:56Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Steward run: drove idle freebuff default:1.1 with typst_autoats CV autoATS quality-check (jev-decide p=0.97, margin 0.94); fresh working... counter confirmed submission. default:2.1 devin NOT driven — mid PR-scope question, not idle (left untouched). default:3.1 agy backed off (free Gemini 429 + live SMTP confirmation). No steward commits to push.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9utku66i9rc57kfwagoeuk"
+    },
+    {
+      "id": "c9307214-10b9-4f19-a3b2-9f427e275d00",
+      "ts": "2026-11-20T21:43:59Z",
+      "source": "freebuff",
+      "subject": "nixconfig:leak-gate",
+      "action": "landed: host-path gate widened to ~/code|src|dev|work|repos checkouts and Windows profile paths; 16 fixture cases incl. file:// URL exception; tree PASS, no false positives | gate: checks:repo:hostpaths PASS, checks:tasks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dacec5a3f06a7cdc1340cc8a31f5edde08ae6476",
+      "branch": "main",
+      "frame": "03h9ut040s6yetahnai4w9b31"
+    },
     {
       "id": "045634a1-62ed-459f-b1b4-f87c221cf83c",
       "ts": "2026-11-20T21:41:20Z",
@@ -2720,62 +2772,6 @@
       "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
       "branch": "main",
       "frame": "03h9ladgs3ttd1e2o4500ti4o"
-    },
-    {
-      "id": "fafd9382-a5d5-4fce-9288-ffb378f63200",
-      "ts": "2026-11-19T16:15:53Z",
-      "source": "devin",
-      "subject": "nixconfig:taskfile-dendritic",
-      "action": "landed: services.yml aggregator deleted (direct includes), services-legacy pruned to wildcard aliases, policy node removed, selector battery gold rows repaired | gate: check:verify 116/116 + kg-check + frieren.role + checks:toon PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "628a179622cecc10794738d863b243bca80c3d86",
-      "branch": "HEAD",
-      "frame": "03h9l7m30zgj5pcn99h1zip2a"
-    },
-    {
-      "id": "b52fd316-53b1-4a49-a609-cee64d890820",
-      "ts": "2026-11-19T16:11:20Z",
-      "source": "devin",
-      "subject": "nixconfig:taskfile-dendritic",
-      "action": "claim: taskfile survey + desloppify (check/checks triangle, services aggregator, format unification)",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ Taskfile.yml"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9l6q1os1439s0qplmlo2z7"
-    },
-    {
-      "id": "5f08c641-320f-4218-af7b-edf738558789",
-      "ts": "2026-11-19T16:08:27Z",
-      "source": "devin",
-      "subject": "nixconfig:agents-nix-audit",
-      "action": "landed: notes audit 235->183 | KILL 52 bulk exp-* PROPOSED design studies | CLOSED 18 (verified prototypes + concluded analyses) | KEEP 165 | gate: agentsNotes.issues=[], frieren.role eval, pre-commit+pre-push PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b2974abce2c72476a13d10de917bd59631029b5",
-      "branch": "HEAD",
-      "frame": "03h9l65sj8c90177wtwyhuimt"
-    },
-    {
-      "id": "8461a25c-f765-408f-aee4-b95e59864e44",
-      "ts": "2026-11-19T16:03:24Z",
-      "source": "devin",
-      "subject": "nixconfig:agents-nix-audit",
-      "action": "claim: kill/keep/archive audit of all AGENTS.nix notes",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9l56b8gqzm922cztdinihx"
     }
   ]
 }

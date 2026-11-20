@@ -19,7 +19,7 @@ REPO="$(git rev-parse --show-toplevel)"
 VAULT_DIR="$HOME/vaults/personal"
 # The published blog is a collection of its own: an article that shipped is a
 # fact someone will search for later, and it lives outside this repo.
-BLOG_DIR="/home/devji/Documents/shaoyanji.is-a.dev"
+BLOG_DIR="/home/devji/Documents/shaoyanji.is-a.dev"  # host-path-ok: where the blog checkout lives on the NAS host; rewritten to $HOME below when absent
 [ -d "$BLOG_DIR" ] || BLOG_DIR="${BLOG_DIR/#\/home\/devji/$HOME}"
 # qmd is not on every host's PATH (delphi carries the agents but not qmd), and a
 # gate that cannot run is not a gate — so resolve it instead of refusing.

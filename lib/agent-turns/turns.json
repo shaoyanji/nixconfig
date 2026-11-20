@@ -1,8 +1,50 @@
 {
-  "generated": "2026-11-20T18:19:55Z",
+  "generated": "2026-11-20T18:35:07Z",
   "count": 200,
-  "pin": "86e9be0ffe7f8786a94e1570e54cd679ea2f2548504f2de01d159a5c11037df3",
+  "pin": "8c2db604eab76260fd65fa4a7e6f9cd3bd427a9d652a170a594b3e4e3d04b338",
   "turns": [
+    {
+      "id": "6aa2270f-4d87-4470-881c-3219fbdae7fa",
+      "ts": "2026-11-20T18:33:07Z",
+      "source": "pane-idle-watch",
+      "subject": "pane-steward:drive-idle",
+      "action": "Drove 3 idle panes via jevdecide routing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9c740adaa8caaae286ceef0c2f24f6c8b0d45b58",
+      "branch": "main",
+      "frame": "03h9trpyzrrr115qs7c4v8xbs"
+    },
+    {
+      "id": "a4ade622-9441-4ea3-ada5-822e720b75c2",
+      "ts": "2026-11-20T18:22:41Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "drove freebuff pane (default:1.1): Jev (typesafe) chose reprove_live_downloads (p=0.91, margin 0.82, selected) — pane now running matt:cv:check live gate",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/cv-links-check.sh",
+        "taskfiles/bountystash.yml"
+      ],
+      "files": [],
+      "base_commit": "a3c19b980dc2e5a7c2aa50d19af0f85c13306401",
+      "branch": "main",
+      "frame": "03h9tpohxf7de93igtmljlf65"
+    },
+    {
+      "id": "95b8bfd1-2f3a-47aa-b9c6-f1df56072e67",
+      "ts": "2026-11-20T18:21:01Z",
+      "source": "devin",
+      "subject": "nixconfig:statix-sweep",
+      "action": "landed: statix convergence, 28 files | gate: checks:drv-equality PASS (17 identical, 13 pre-existing errors unchanged); drv-equality error key now last error: line",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e95453e90844739b322f1c267e4231dda36cf3",
+      "branch": "HEAD",
+      "frame": "03h9tpcqegy4tf2apw6ojnk3z"
+    },
     {
       "id": "13c29c9b-a788-46b6-a1e8-24e372f93042",
       "ts": "2026-11-20T18:17:55Z",
@@ -2757,50 +2799,6 @@
       "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
       "branch": "main",
       "frame": "03h9k3g3orll8hl430i129452"
-    },
-    {
-      "id": "22da6142-3453-46f9-a645-ce3dd5737b00",
-      "ts": "2026-11-19T12:41:38Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 25: freebuff completed LoopCV re-strategy (loopcv-restategy done: 5 loops, 129 apps/558 emails/2718 pending/0 interviews/51 unanswered; US loops off, DE loops kept; magic-link sign-in). devin completed M5 ablation (fdebe4a, 8 states justified). agy completed Monitor research (Workato pivot, Octopus active, Castle closed). delphi verified email archive + sentinel mail-queue probe.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9k1rcqiwz9x0upi8ctvyhd"
-    },
-    {
-      "id": "e0a80f5b-ae5c-4f38-88c3-9c39456931da",
-      "ts": "2026-11-19T12:38:23Z",
-      "source": "frieren",
-      "subject": "nixconfig:delphi-email-archive-verify",
-      "action": "delphi freebuff verified email archive + job pipeline health end-to-end and wired the sentinel mail-queue probe (8a99c2c4, d8f364b1: sentinel probes the mail queue so a stalled drain pages, reads camelCase counts). Suggested followups: queue on dashboard, drop fixtures, split hub counts.",
-      "outcome": "done",
-      "claims": [
-        "modules/services/fleet-sentinel.nix"
-      ],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9k14imhy8xsyxqcxbvhocy"
-    },
-    {
-      "id": "0ac3999b-1b88-4683-a1fb-8db6166d8aae",
-      "ts": "2026-11-19T12:36:12Z",
-      "source": "devin",
-      "subject": "scratch:bagua-weather",
-      "action": "landed: M5 ablation fdebe4a | gate: pytest 38 PASS, ruff clean | all three 4-state drops + 8 + 16(+TT_TU temp bit); skill 0.524/0.604/1.083 nats; marginalized cross-check: 16->8 only -0.004 LL, verdict 8 states justified | NOTE: repo has no remote, push not possible",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f01990c12de1dcf1e5f8d9f3a74a0d7f6b87366e",
-      "branch": "main",
-      "frame": "03h9k0p6phmkl1cv32ggopwz6"
     }
   ]
 }

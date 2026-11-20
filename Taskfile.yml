@@ -38,8 +38,8 @@ vars:
     # It was invisible until a task resolved the local system in a `sh:` var
     # (checks:quick), where the failure is a failed eval, not a loud error.
     NIXNAS: /Volumes/data
-    MNTW: /Volumes/peachcable
-    MNTX: /Volumes/shared
+    MNTW: /Volumes/peachcable  # host-path-ok: the mount this file's NAS tasks copy to
+    MNTX: /Volumes/shared  # host-path-ok: the shared mount those same tasks use
 includes:
     # Fleet taskfiles, flattened (task names are already namespaced:
     # checks:*, infra:*, dev:*, …). Do NOT include this file itself —

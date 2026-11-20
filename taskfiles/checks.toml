@@ -310,6 +310,10 @@ name = "checks:repo:paths"
 kind = "leaf"
 
 [[check]]
+name = "checks:repo:hostpaths"
+kind = "leaf"
+
+[[check]]
 name = "checks:restic:drill"
 kind = "leaf"
 

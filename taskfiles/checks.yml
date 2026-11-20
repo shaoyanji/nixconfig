@@ -45,6 +45,7 @@ tasks:
     # cores; the floor is a shared eval, not more concurrency.
     deps:
       - task: checks:repo:paths
+      - task: checks:repo:hostpaths
       - task: checks:docs:links
       - task: checks:docs:links:test
       - task: checks:task-shim:test
@@ -170,6 +171,20 @@ tasks:
       then every tracked `.toon` document must strict-decode. ~0.2 s, no host.
     cmds:
       - bash scripts/task/toon-check.sh
+
+  checks:repo:hostpaths:
+    desc: "[gate] No tracked file names a machine's mounts, another home checkout, or a plaintext key"
+    summary: >
+      A public tree must not name one machine's layout: a mount other than the
+      documented `/Volumes/data`, a checkout nested in a home directory, or key
+      material in the clear. `file://` is not judged (mostly `nix copy --to
+      file://` caches and `git+file://` refs; markdown links are
+      `checks:docs:links`), nor home paths as configuration or inventory
+      addresses. ~0.2 s, tracked files only, no eval, no network. A line may carry
+      `host-path-ok:` with a reason; the turn ledger and fixtures are skipped by
+      path.
+    cmds:
+      - bash scripts/task/host-paths-check.sh
 
   checks:repo:paths:
     desc: "[gate] No tracked file hardcodes this machine's checkout path"

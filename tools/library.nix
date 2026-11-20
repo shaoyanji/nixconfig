@@ -177,15 +177,23 @@ let
   # since two matches make eget prompt and a prompt hangs a schedule.
   argsOf = dir: n: let
     t = tools.${n};
-    filters = t.filters ++ (if t ? pick then [t.pick.${dir}] else []);
+    filters =
+      t.filters
+      ++ (
+        if t ? pick
+        then [t.pick.${dir}]
+        else []
+      );
   in
     builtins.concatStringsSep " " (map (a: "--asset '${a}'") filters);
 
   line = dir: n: let
     t = tools.${n};
-    name = if t ? name then " --name '${t.name}'" else "";
-  in
-    "bash scripts/task/library-fetch.sh --repo ${t.repo} ${argsOf dir n} --dest ${dest.${dir}}${name} || failed=$((failed + 1))";
+    name =
+      if t ? name
+      then " --name '${t.name}'"
+      else "";
+  in "bash scripts/task/library-fetch.sh --repo ${t.repo} ${argsOf dir n} --dest ${dest.${dir}}${name} || failed=$((failed + 1))";
 
   plan = dir: ''
     set -u

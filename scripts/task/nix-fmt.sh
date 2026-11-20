@@ -61,7 +61,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-nixfmt"
-ALL_PATHS=(flake.nix flake hosts modules overlays lib)
+ALL_PATHS=(flake.nix flake hosts modules overlays lib AGENTS.nix templates tools)
 
 show_help() {
   # Print the header block between the two rule lines, so the help can never

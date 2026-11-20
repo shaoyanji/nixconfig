@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-20T12:51:43Z",
+  "generated": "2026-11-20T13:03:10Z",
   "count": 200,
-  "pin": "e5bae8eb2ab2d70a50a94d6089217f57a12e4bdd162def8229dde55b74503802",
+  "pin": "98097c3cdcc4810b517beb49f8e60911b9a0f17427397ffd991e926c3370a86b",
   "turns": [
+    {
+      "id": "97b0dcd4-54e6-4e2d-bc97-013e4704007a",
+      "ts": "2026-11-20T12:59:04Z",
+      "source": "devin",
+      "subject": "nixconfig:deadnix-cleanup",
+      "action": "claim: dead-code sweep on current main — chore/deadnix-cleanup is 4mo stale (missing inventory.toml/agent-turns); recreating branch on main tip, running deadnix gate",
+      "outcome": "in_progress",
+      "claims": [
+        "*.nix"
+      ],
+      "files": [],
+      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
+      "branch": "main",
+      "frame": "03h9rygoz41f15cfrro0jmafo"
+    },
+    {
+      "id": "c3637ea8-ded7-4d11-b02f-3175562016b0",
+      "ts": "2026-11-20T12:56:02Z",
+      "source": "devin",
+      "subject": "fleet-remote:pr-review",
+      "action": "landed: merged PR #3 (271542e, device-agent docs) and PR #4 (3d47ef3, repo setup) to master — order #3-then-#4, clean as verified; master CI debug runs all success | gate: gh run list master 3x success",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
+      "branch": "main",
+      "frame": "03h9rxvc9colcsvt60phc7zkn"
+    },
+    {
+      "id": "de832d98-0d3a-432b-93a5-b15a24838aa4",
+      "ts": "2026-11-20T12:54:23Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search-loop",
+      "action": "landed: 10 new applications upserted & linked to mail, 0 new monitor replies (Parloa applied/gated, evoila prep, Workato prep, Octopus prep, Castle Tech rejected), attention queue clean, pipeline now 195 tracked (49 applied, 14 prep, 4 screening, 1 interview) | gate: apps:status PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
+      "branch": "main",
+      "frame": "03h9rxjqt671add75t08ixgki"
+    },
+    {
+      "id": "20183696-ad5c-4c7f-9d63-285423635db4",
+      "ts": "2026-11-20T12:51:50Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: case studies and briefs carry the locale's tailored CV in the slim header — lib/matt/article.html gains a cv tuned anchor, mkArticle passes cvHref from pageRoot (cv-energy.pdf / cv-energy-de.pdf), style.css styles .utility .cv | gate: nix build .#sites.matt-site PASS (81 links/15 pages, 4/4 CVs linked; 12 article pages each with exactly one CV link)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
+      "branch": "main",
+      "frame": "03h9rx1qn4tl67k89kuk7sbi5"
+    },
     {
       "id": "d92b402b-2b0b-4b52-973f-5e19fd476ff9",
       "ts": "2026-11-20T12:49:38Z",
@@ -2798,65 +2852,6 @@
       "base_commit": "8bd18575320ab7ece524b6e2e572a24cb0f7bcd9",
       "branch": "main",
       "frame": "03h9j442a0axtayxtsxn3slye"
-    },
-    {
-      "id": "dca8efb4-5358-4403-9f9d-e0987d31a405",
-      "ts": "2026-11-19T09:45:39Z",
-      "source": "devin",
-      "subject": "nixconfig:fibtransponder-zeckendorf",
-      "action": "mapped kg-zeck epoch cache (devin/1795077799-kg-zeck-cache) onto fibtransponder: epoch->marker-cut sketch payload, dirty log->MemOpLog, Zeckendorf blocks->CA replay segments, quotient->frontier state id; proposed measurement-first replay probe",
-      "outcome": "done",
-      "claims": [
-        "/Volumes/data/projects/fibtransponder"
-      ],
-      "files": [],
-      "base_commit": "c5119370",
-      "branch": "main",
-      "frame": "03h9j3dqswa2ji960uptx1v9s"
-    },
-    {
-      "id": "f3bbf97f-e88f-4da6-976a-e60ec390a81d",
-      "ts": "2026-11-19T09:35:41Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 13: freebuff landed infron backup subagent (c5119370, scripts/infron-subagent.sh wires reasonix to llm.onerouter.pro via OpenAI-compatible [[providers]] block, deepseek-v4-flash-0731:free primary + qwen3.8-27b:free backup, checks:infron gate). Verified live: reasonix -p --model infron/... answers. devin on postgres fetcher. agy on job research.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "c511937012a13ee9f9f3dea42f9adbeb29b1b4f1",
-      "branch": "main",
-      "frame": "03h9j1fmz0j703f4leifbk5y0"
-    },
-    {
-      "id": "bd80f91b-6242-4465-9feb-3ee1b72545d1",
-      "ts": "2026-11-19T09:34:07Z",
-      "source": "devin",
-      "subject": "nixconfig:apps-pipeline-triage",
-      "action": "apps doer turn: marked 33 duplicate rows (status 'Duplicate of <keep-id>' -> stage other; kept the 09-2x originals over 10-04 re-imports, mail/folder evidence) and corrected 5 dead JDs (nerdware, clera-backend, glassflow, vultr, qwist -> '; JD 404' + repost-check next action)",
-      "outcome": "done",
-      "claims": [
-        "email_archive.applications (delphi)"
-      ],
-      "files": [],
-      "base_commit": "c5119370",
-      "branch": "main",
-      "frame": "03h9j14lfuf7stqp8rcscqg03"
-    },
-    {
-      "id": "bf3c0b82-c8c2-441e-8c86-816ac1281679",
-      "ts": "2026-11-19T09:27:16Z",
-      "source": "devji",
-      "subject": "nixconfig:infron-subagent",
-      "action": "landed c5119370: scripts/infron-subagent.sh runs reasonix -p on the infron provider (deepseek-v4-flash:free, qwen backup), resolves key from sops, refuses paid ids; live both answered; gate+quick+frieren green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c511937012a13ee9f9f3dea42f9adbeb29b1b4f1",
-      "branch": "main",
-      "frame": "03h9izsfgp14itgws7b3dvpaz"
     }
   ]
 }

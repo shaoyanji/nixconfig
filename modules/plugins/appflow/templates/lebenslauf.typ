@@ -16,6 +16,15 @@
 #let strings = all-strings.at(lang, default: all-strings.at("de"))
 #let basics = resume.at("basics", default: (:))
 
+// PDF properties, not layout: a parser that files a document by its metadata before
+// reading a line of text finds the candidate's name here. `cv.typ` sets the same two
+// fields; this template set none, so the extracted text held the name while the
+// document properties were empty.
+#set document(
+  title: basics.at("name", default: "") + " — " + (if lang == "de" { "Lebenslauf" } else { "Résumé" }),
+  author: basics.at("name", default: ""),
+)
+
 #set page(paper: "a4", margin: (top: 1.4cm, bottom: 1.4cm, left: 1.7cm, right: 1.7cm))
 // Libertinus ships with Typst: no font package, no network, identical output on
 // every host that has this flake.

@@ -1,8 +1,138 @@
 {
-  "generated": "2026-11-20T20:52:44Z",
+  "generated": "2026-11-20T21:35:44Z",
   "count": 200,
-  "pin": "5deae35a930a119e8cf7fbce7a7d2604fd8dbdddcb41fdfe1a5fd3d739f3aa4e",
+  "pin": "56a5c36ecb6374ace97c5971eebd9c57c0dff11030f900b7d4ca8f6a84c4e566",
   "turns": [
+    {
+      "id": "427bec30-2efc-4104-9228-d3c3b2baf9b1",
+      "ts": "2026-11-20T21:35:43Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "drove win1 freebuff: commit --pages CV-packet work + push to origin/main, continue CV-link leak gate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9urdwafjpszzku9nbw75l7"
+    },
+    {
+      "id": "846a2249-dcc3-4e57-a752-94549c1eb414",
+      "ts": "2026-11-20T21:30:09Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Steward run: drove idle freebuff default:1.1 with typst_autoats CV autoATS quality-check (jev-decide p=0.97, margin 0.94); fresh working... counter confirmed submission. default:2.1 devin NOT driven — mid PR-scope question, not idle (left untouched). default:3.1 agy backed off (free Gemini 429 + live SMTP confirmation). No steward commits to push.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uqatrb2dhh1dvq15r8mm2"
+    },
+    {
+      "id": "05d1f1cb-a4db-415d-8eed-e88ec30ad4fe",
+      "ts": "2026-11-20T21:28:49Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Drove idle panes via jevdecide (typesafe): win1 freebuff <- typst_autoats (p=0.99, margin 0.98) Typst CV autoATS quality check + template edits accepted - fresh working... 7s counter; win2 devin <- fleet_remote_pr (p=0.99, margin 0.98) fleet-remote PR task accepted - Thinking 8s, checkout command running; win3 agy left backed off (free Gemini 429; live SMTP confirmation prompt untouched); delphi freebuff not polled this run.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uq1fr2nsdpsch42maj5an"
+    },
+    {
+      "id": "a15944d4-ff98-4fd4-83c4-1f3f34cd28ee",
+      "ts": "2026-11-20T21:21:07Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "verified the CV link gate end-to-end: forced rebuild runs --gap then the full pass with 4 required PDFs, EN cv.pdf and DE cv-de.pdf plus both energy variants linked; negatives return 1 | gate: task site:links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "774087ea9d952835172f20c07f761ebe10ed61cd",
+      "branch": "main",
+      "frame": "03h9uojcntsd2gd57xn2ofkva"
+    },
+    {
+      "id": "d24d85a3-9203-4a2c-b439-9649bde3b0ba",
+      "ts": "2026-11-20T21:20:34Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Drove idle panes via jevdecide (typesafe): win1 freebuff <- typst_autoats (p=0.99, margin 0.98) Typst CV autoATS quality check + template edits accepted - fresh working... 7s counter; win2 devin <- fleet_remote_pr (p=0.99, margin 0.98) fleet-remote PR task accepted - Thinking 8s, checkout command running; win3 agy left backed off (free Gemini 429; live SMTP confirmation prompt untouched); delphi freebuff not polled this run.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uofck7st975klh6kpuswn"
+    },
+    {
+      "id": "c0e9f6b9-8f4e-402f-b76c-f38bf90f190a",
+      "ts": "2026-11-20T21:14:27Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site-link-gate",
+      "action": "Drove idle freebuff pane default:1.1: jev-decide classify (typesafe) selected cv_site_link_gate (p=0.98 margin=0.97, decisive) — verify CV PDF link targets resolve on shaoyanji.is-a.dev and Jekyll site builds clean; pasted via load-buffer + paste-buffer + Enter, pane shows working... and is executing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9un8etfvq2v3o3r59wpa06"
+    },
+    {
+      "id": "69f92ad3-463d-4ad9-8636-f98022533e3a",
+      "ts": "2026-11-20T21:12:12Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Drove idle panes via jevdecide (typesafe): win1 freebuff <- typst_autoats (p=0.99, margin 0.98) Typst CV autoATS quality check + template edits accepted - fresh working... 7s counter; win2 devin <- fleet_remote_pr (p=0.99, margin 0.98) fleet-remote PR task accepted - Thinking 8s, checkout command running; win3 agy left backed off (free Gemini 429; live SMTP confirmation prompt untouched); delphi freebuff not polled this run.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9umsjpn0ize3uyq17bsvt1"
+    },
+    {
+      "id": "b7794f2b-768f-40ad-a8db-fc3779c62309",
+      "ts": "2026-11-20T21:01:13Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:cv-ats-quality-check",
+      "action": "Drove freebuff pane 1.1 (CV/site work); jevdecide routed start_with_quality_check; PART 1 CV/ATS quality-check task accepted and running (working...), report pending",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uknd9uo8y78ba3l9vkbjl"
+    },
+    {
+      "id": "f8c8fecd-e0d6-4bcd-bbbb-8a19a8466f93",
+      "ts": "2026-11-20T20:53:48Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "Steward drove win1 freebuff → gate_ats_properties_in_build (jev duel 0.99/0.98): committed 774087ea feat(cv): gate the shipped PDF against the record it was built from; pushed f59a23ae..774087ea → origin/main (3 files); gates rc=0, alejandra clean, knowledge-graph passed; local=origin=774087ea, autoUpgrade-safe; nixconfig:site-cv-links closed.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9uj74md3igpb3ez2x9se6v"
+    },
+    {
+      "id": "dd9f9ece-02e4-4c5a-87ed-a7604fa758de",
+      "ts": "2026-11-20T20:52:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: cv-ats-check.sh gates every matt-cv-* PDF against the cv.json it was built from (heading vocabulary+order, name/contact placement, every record row, no /URI, no hyphenated line end) + docs | gate: nix build .#sites.matt-site PASS 4/4 matches, 2 negative builds fail, prose/budget/nix-comments PASS; corrects earlier close-out that named f59a23ae before the comment ceiling refused it",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "774087ea9d952835172f20c07f761ebe10ed61cd",
+      "branch": "main",
+      "frame": "03h9uj10io5yuq8iw2fx3lk7h"
+    },
     {
       "id": "882f7075-8b1c-4ee9-b694-86d5d95d522d",
       "ts": "2026-11-20T20:52:19Z",
@@ -2648,149 +2778,6 @@
       "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
       "branch": "main",
       "frame": "03h9l3p5813fnkrtmf3v8tm2n"
-    },
-    {
-      "id": "5fad2d04-c534-441a-96e4-e86cfad8d506",
-      "ts": "2026-11-19T15:50:34Z",
-      "source": "devin",
-      "subject": "nixconfig:modules-dendritic",
-      "action": "claim: dendritic modules/, sops submodule single-source, de-couple cross-module imports",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/ hosts/ lib/"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9l2o133c1r4go4cvr8zblp"
-    },
-    {
-      "id": "5ee79aaa-d6d2-4c8e-b443-b2e5bbdbf8ca",
-      "ts": "2026-11-19T15:47:33Z",
-      "source": "devin",
-      "subject": "nixconfig:memory-consolidation",
-      "action": "landed: .#memoryLayers compiled layer table; dsh dead path option removed + trustedHosts flag-per-host + frieren/tools.nix duplicate launchers deleted (HM dsh-launcher canonical, port-guard merged); reasonix own module; HOME-PREAMBLE memory section rewritten | gate: .#memoryLayers + frieren.role eval + pre-commit/pre-push PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9l22slybop2ou0ybtzdevk"
-    },
-    {
-      "id": "2a2c1b35-5260-481e-87cc-32ad83fef851",
-      "ts": "2026-11-19T15:38:15Z",
-      "source": "devin",
-      "subject": "nixconfig:memory-consolidation",
-      "action": "claim: memory/recall consolidation — dsh + reasonix desloppify, AGENTS.md memory section",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/scripts/dsh-remote.nix modules/services/dsh-web.nix modules/user/ai/ AGENTS.md"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9l09elczn86n8sj8nus9ha"
-    },
-    {
-      "id": "c07aed13-3e07-4a25-ba7d-2ad9ddd9f0b2",
-      "ts": "2026-11-19T15:32:49Z",
-      "source": "devin",
-      "subject": "nixconfig:memory-consolidation",
-      "action": "landed: hermes persona set resolved at eval (uname/if-elif chain -> personaFiles table + pathExists); memoryTools/agentTools named in profiles.ai | gate: comment-census + alejandra + frieren.role eval PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9kz74pu3d9jkphpkhla91j"
-    },
-    {
-      "id": "1a79b8a2-37aa-4bc1-8fc5-c051aad1ea26",
-      "ts": "2026-11-19T15:29:11Z",
-      "source": "delphi",
-      "subject": "nixconfig:delphi-email-update",
-      "action": "Email update sent via delphi (tab 5): checked mail attention queue (16 items, 5 action-tier with deadlines incl. Appwrite 'dragon court' deletion in 1 day, Oracle Cloud trial expiry in 30 days), apps pipeline (171 tracked, 39 applied/33 rejected, 9 Monitor, 0 prep/screening/interview), inbox highlights today (Solar Asset Manager reply, Cloudflare observability alert, Novu security disclosure). Sent summary to jisifu@gmail.com.",
-      "outcome": "done",
-      "claims": [
-        "delphi",
-        "mail-archive",
-        "apps-pipeline"
-      ],
-      "files": [],
-      "base_commit": "d69b0c5c6d67bb4899fa7e533306b44b18bf1224",
-      "branch": "main",
-      "frame": "03h9kyhld5js370ojfim7iyop"
-    },
-    {
-      "id": "b2037c1f-1cf8-4440-9864-976e5cea2055",
-      "ts": "2026-11-19T15:26:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:loopcv-ui-refine",
-      "action": "LoopCV UI done: auto-apply disabled on all 5 loops. DE Renewable Energy and SWE Freiburg had their automatic emails and form auto-fill switched off (AI answers left on), matching the US loops. Titles retargeted: Renewable now Solar Asset Manager + Renewable Energy Manager; Freiburg now Software Engineer + Backend Engineer. Verified on the loop cards: 5/5 Auto apply disabled.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0f53dd945b357f4d686c27979cf9ac3688931d77",
-      "branch": "HEAD",
-      "frame": "03h9kxwwk3rp0mo8l249o4yz3"
-    },
-    {
-      "id": "719290b2-78cc-4ae4-9f06-f9611f8a6fa2",
-      "ts": "2026-11-19T15:25:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:dormant-host-gates",
-      "action": "Landed the darwin chain repair: global.nix's systemd/journald block moved to modules/global/linux-systemd.nix (nixos/containers/demo only) and macos.nix now puts its darwin definitions under config. mkIf could not gate this - pushDownProperties rewrites it. netbook gate green 10.2 s; cassini fails one fault later, infinite recursion on roles/home.nix arg dankShell. Note updated, still IN FLIGHT.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0ca845adec418488cc5a2b3ef6095334d28423cd",
-      "branch": "main",
-      "frame": "03h9kxu3cxybo9ro3vwfr88rt"
-    },
-    {
-      "id": "d1c247a2-0332-42b5-bf8e-b0c125267c38",
-      "ts": "2026-11-19T15:18:06Z",
-      "source": "devin",
-      "subject": "nixconfig:pipe-refactor",
-      "action": "landed: |> pipes through collection chains in 10 files (outputs/checks/epistemics/policies, email-archive, service-portal, skills, delphi, guests, reverse-proxy); left genAttrs/interpolations alone; gate fixes cherry-picked for worktree hooks | gate: pre-commit+pre-push PASS, nix eval inventory.hosts.frieren.role + knowledgeGraph.graph (1992n/1800e) + epistemics.table PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0f53dd945b357f4d686c27979cf9ac3688931d77",
-      "branch": "HEAD",
-      "frame": "03h9kwbpcz34tphjchsctgn3l"
-    },
-    {
-      "id": "9e3b771b-d633-4b7b-9a29-5937c2f26710",
-      "ts": "2026-11-19T15:04:49Z",
-      "source": "freebuff",
-      "subject": "nixconfig:loopcv-ui-refine",
-      "action": "freebuff to make changes IN LoopCV via browser: log into app.loopcv.pro (magic-link), turn OFF auto-apply on DE loops (Renewable Energy 8 apps/22 rejections, SWE Freiburg 2 apps) shifting to MONITOR, keep US loops (Consultant/BA 67, Solar PM 45) as-is, retarget roles where closures happened, report exactly what was toggled/retargeted in the UI",
-      "outcome": "in_progress",
-      "claims": [
-        "app.loopcv.pro",
-        "LoopCV browser UI"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9ktq8qi2ddosexc32wwyg5"
-    },
-    {
-      "id": "7ad16dbf-df5c-4329-9f7d-8bac0e3f0ec2",
-      "ts": "2026-11-19T14:54:06Z",
-      "source": "delphi",
-      "subject": "nixconfig:delphi-ssh-memory",
-      "action": "memory architecture decision landed: 24dd4613 on origin/main (vault→qmd→mem0/supermemory→web; ai-memory ungated scratch)",
-      "outcome": "done",
-      "claims": [
-        "memory-architecture"
-      ],
-      "files": [],
-      "base_commit": "ebe378e35ee314eef6c949e39f8c86f7822df943",
-      "branch": "main",
-      "frame": "03h9krmwyp8dnr0pkarahr7o3"
     }
   ]
 }

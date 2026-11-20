@@ -90,9 +90,12 @@ in {
           ++ [
             "mnt-storage.mount"
             "network-online.target"
+            "parakeet-stt.socket"
           ];
         wants = fetchUnits ++ ["network-online.target"];
-        wantedBy = ["multi-user.target"];
+        # No wantedBy: parakeet-stt.socket starts this on the first connection,
+        # and --idle-timeout drops it again, so ~1 GB of ONNX sessions is
+        # resident only while someone is transcribing.
         # ffmpeg on PATH for decoding non-wav audio (read_audio in the pipeline).
         path = [pkgs.ffmpeg];
         # A missing or corrupt ONNX file must fail visibly instead of looping
@@ -103,8 +106,10 @@ in {
         };
         serviceConfig = {
           Type = "simple";
-          ExecStart = "${parakeetApp}/bin/parakeet-server --model-dir ${modelDir} --bind 127.0.0.1 --port ${toString port} --threads 8";
-          Restart = "always";
+          ExecStart = "${parakeetApp}/bin/parakeet-server --model-dir ${modelDir} --bind 127.0.0.1 --port ${toString port} --threads 8 --idle-timeout 900";
+          # on-failure, not always: the idle-timeout exit is exit 0 and must not
+          # resurrect the service, while a crash still earns a bounded retry.
+          Restart = "on-failure";
           RestartSec = 5;
           TimeoutStopSec = 15;
 
@@ -127,6 +132,18 @@ in {
         };
       };
     };
+
+  # The listener is systemd's, so the port answers even while the model is
+  # asleep: a connection cold-starts the service, the service exits cleanly on
+  # --idle-timeout, and the loop is the whole lifecycle.
+  systemd.sockets.parakeet-stt = {
+    description = "Parakeet STT listen socket (activates parakeet-stt.service)";
+    wantedBy = ["sockets.target"];
+    socketConfig = {
+      ListenStream = "127.0.0.1:${toString port}";
+      Accept = false;
+    };
+  };
 
   # --- LAN: http://eisen.lan/stt/* (nginx :80 -> 127.0.0.1:8091) -----------
   # Merges into the eisen.lan vhost declared in llm-server.nix; the /stt/

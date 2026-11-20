@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-20T11:02:19Z",
+  "generated": "2026-11-20T11:07:30Z",
   "count": 200,
-  "pin": "e98013941177208d3b287cb720e0ba8c1e5b830ddee88997e8af359714441164",
+  "pin": "13fc4c79e3060f3c2cf0a5784152c0d3ca38cfb95a1fc4ac1e9cb0683671459a",
   "turns": [
+    {
+      "id": "d7c05ddf-730f-425c-89b4-5c4eedf79d3b",
+      "ts": "2026-11-20T11:02:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:ats-resume",
+      "action": "landed: ATS-parsable lib/matt/cv.typ + appflow lebenslauf.typ, single column, standard headings via cvLabels (lib/matt-site.nix), plain-text URLs, page-number-only footer; budgets 2/2/1/1 pages, last page 72/88/269/273 mm | gate: checks:typeset PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "18e2c2d5644ffe07dfdaebf3863faad0b4f73d1c",
+      "branch": "main",
+      "frame": "03h9rbrsipdcmejkjxmlv3rpt"
+    },
     {
       "id": "e2153656-7bde-4931-8ab8-60746cce0ad1",
       "ts": "2026-11-20T11:02:17Z",
@@ -2870,19 +2883,6 @@
       "base_commit": "c106ebf085ec1cd5ec670c53fc9438160a7dba94",
       "branch": "main",
       "frame": "03h9g12p3718qryy2npfr7gca"
-    },
-    {
-      "id": "db2b967d-db04-44ef-ae5a-385c4fa7ac0b",
-      "ts": "2026-11-18T23:53:19Z",
-      "source": "devji",
-      "subject": "nixconfig:media-mail-cli",
-      "action": "media: delete/gc/merged listing+inline player; media and mail CLIs over the tailnet APIs; delphi switched",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "288a74196288fb030bbf4b9186803954b2a57f47",
-      "branch": "main",
-      "frame": "03h9fvo91ea7r6xpxyk33k7ue"
     }
   ]
 }

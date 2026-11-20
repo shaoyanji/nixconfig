@@ -19,21 +19,30 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import socket
 import sys
 import tempfile
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from parakeet_stt.transcribe import OnnxParakeet, read_audio
 
 MAX_BODY_BYTES = 25 * 1024 * 1024
+# An upload that stalls holds a request thread forever; two minutes is generous
+# for 25 MB on the LAN and still bounds the stall.
+READ_TIMEOUT_SECONDS = 120
+# sd_listen_fds(3): fd 0,1,2 are stdio; the first passed socket is fd 3.
+SD_LISTEN_FDS_START = 3
 
 
 class Server:
     def __init__(self, model_dir: Path, threads: int | None):
         self.model = OnnxParakeet(model_dir, threads=threads)
         self.lock = threading.Lock()
+        self.last_activity = time.monotonic()
 
     def transcribe_bytes(self, data: bytes) -> dict:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".audio") as tmp:
@@ -50,6 +59,10 @@ class Server:
 def make_handler(server: Server):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
+
+        def setup(self) -> None:
+            super().setup()
+            self.request.settimeout(READ_TIMEOUT_SECONDS)
 
         def log_message(self, *args):  # keep stdout clean; errors go via send_error_json
             pass
@@ -69,12 +82,14 @@ def make_handler(server: Server):
             self.wfile.write(body)
 
         def do_GET(self) -> None:
+            server.last_activity = time.monotonic()
             if self.path in ("/health", "/health/"):
                 self._json(200, {"status": "ok", "model": "parakeet-redux-onnx"})
             else:
                 self._json(404, {"error": "not found"})
 
         def do_POST(self) -> None:
+            server.last_activity = time.monotonic()
             if self.path not in ("/transcribe", "/transcribe/"):
                 self._json(404, {"error": "not found"}, close=True)
                 return
@@ -100,6 +115,37 @@ def make_handler(server: Server):
     return Handler
 
 
+def _idle_watchdog(httpd, server: Server, idle_seconds: int) -> None:
+    """Exit the process after idle_seconds without a request.
+
+    With the socket unit holding :8091, a clean exit drops the ~1 GB resident
+    model and the next connection cold-starts the service again. `shutdown`
+    must run off the serve thread, which is why this is a watchdog, not a
+    request hook.
+    """
+    while True:
+        time.sleep(min(30, max(1, idle_seconds // 4)))
+        if time.monotonic() - server.last_activity >= idle_seconds:
+            print(f"parakeet-stt idle for {idle_seconds}s; exiting", file=sys.stderr, flush=True)
+            httpd.shutdown()
+            return
+
+
+def _listen_socket(args):
+    """The listening socket systemd passed, if this start was socket-activated.
+
+    sd_listen_fds passes the accept() socket itself (Accept=no), so the service
+    binds nothing: `ThreadingHTTPServer` is constructed unbound and handed the
+    inherited fd. Without activation this returns None and the normal bind
+    happens.
+    """
+    listen_fds = int(os.environ.get("LISTEN_FDS") or 0)
+    listen_pid = int(os.environ.get("LISTEN_PID") or 0)
+    if listen_fds >= 1 and listen_pid == os.getpid():
+        return socket.fromfd(SD_LISTEN_FDS_START, socket.AF_INET, socket.SOCK_STREAM)
+    return None
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="parakeet-server")
     parser.add_argument("--model-dir", required=True, help="directory with the ONNX files")
@@ -107,6 +153,8 @@ def main(argv=None) -> int:
     parser.add_argument("--port", type=int, default=8091)
     parser.add_argument("--threads", type=int, default=8,
                         help="onnxruntime intra-op threads (default 8; leaves headroom beside the LLM)")
+    parser.add_argument("--idle-timeout", type=int, default=0,
+                        help="exit after this many seconds without a request (0 = never; the socket unit re-starts the service on the next connection)")
     args = parser.parse_args(argv)
 
     model_dir = Path(args.model_dir).expanduser().resolve()
@@ -115,12 +163,23 @@ def main(argv=None) -> int:
         return 1
     print(f"loading Parakeet Redux from {model_dir} ...", file=sys.stderr, flush=True)
     server = Server(model_dir, threads=args.threads)
-    httpd = ThreadingHTTPServer((args.bind, args.port), make_handler(server))
-    print(f"parakeet-stt listening on {args.bind}:{args.port}", file=sys.stderr, flush=True)
+    inherited = _listen_socket(args)
+    if inherited is not None:
+        httpd = ThreadingHTTPServer((args.bind, args.port), make_handler(server), bind_and_activate=False)
+        httpd.socket = inherited
+        httpd.server_address = inherited.getsockname()
+        httpd.server_activate()
+        print(f"parakeet-stt serving on inherited socket {inherited.getsockname()}", file=sys.stderr, flush=True)
+    else:
+        httpd = ThreadingHTTPServer((args.bind, args.port), make_handler(server))
+        print(f"parakeet-stt listening on {args.bind}:{args.port}", file=sys.stderr, flush=True)
+    if args.idle_timeout > 0:
+        threading.Thread(target=_idle_watchdog, args=(httpd, server, args.idle_timeout), daemon=True).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
+    httpd.server_close()
     return 0
 
 

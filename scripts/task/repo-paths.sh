@@ -20,6 +20,9 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 SELF="scripts/task/repo-paths.sh"
+# A fixture has to contain the literal it asserts on — `tests/host-paths/run.sh`
+# passes a checkout path to the sibling gate on purpose. Same exclusion there.
+FIXTURES=":!tests/*"
 
 PATTERNS=(
   '/Volumes/data/projects/nixconfig'
@@ -30,7 +33,7 @@ PATTERNS=(
 
 fail=0
 for pat in "${PATTERNS[@]}"; do
-  hits="$(git grep -nE "$pat" -- '*.sh' '*.py' '*.yml' '*.nix' ":!${SELF}" | grep -v 'repo-path-ok:' || true)"
+  hits="$(git grep -nE "$pat" -- '*.sh' '*.py' '*.yml' '*.nix' ":!${SELF}" "$FIXTURES" | grep -v 'repo-path-ok:' || true)"
   if [ -n "$hits" ]; then
     printf '%s\n' "$hits"
     fail=1

@@ -454,11 +454,14 @@
       lib.concatMap step (builtins.attrNames entries);
   in
     walk ".";
+  # `tests/` is exempt: a fixture has to contain the shape it asserts on — the
+  # same reason `scripts/task/host-paths-check.sh` skips it — and its material is
+  # fake by construction. Every other tracked text file is still read.
   credentialHits =
     lib.concatMap (
       p: hitsWhere p (l: lib.any (s: builtins.match ".*${s}.*" l != null) credentialShapes)
     )
-    textFiles;
+    (builtins.filter (p: !(lib.hasPrefix "tests/" p)) textFiles);
 
   # Decryption during evaluation writes the plaintext into /nix/store: world
   # readable, and it survives every rotation of the credential itself.

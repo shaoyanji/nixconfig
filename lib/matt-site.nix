@@ -614,6 +614,15 @@
       inherit (ui) themeAria;
       inherit (ui) langLabel;
       inherit langSwitch;
+      # The tailored CV the home header offers, reachable from a case study or a
+      # brief too: `pageRoot` is the locale root, so one row of links covers both
+      # locales instead of a path spelled per depth.
+      cvHref = "${pageRoot}${
+        if lang == "de"
+        then "cv-energy-de.pdf"
+        else "cv-energy.pdf"
+      }";
+      inherit (ui) cvTunedLabel;
       cssHref = "${pageRoot}style.css";
       footer = "${privacy ui d.analytics} ${ui.footer}";
       analytics = mkAnalytics d.analytics;

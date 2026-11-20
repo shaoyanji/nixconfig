@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-20T12:46:57Z",
+  "generated": "2026-11-20T12:51:43Z",
   "count": 200,
-  "pin": "957e80bf6f0e4c937f469a87612649bd108eff722979315a9e44d72330fbb2a4",
+  "pin": "e5bae8eb2ab2d70a50a94d6089217f57a12e4bdd162def8229dde55b74503802",
   "turns": [
+    {
+      "id": "d92b402b-2b0b-4b52-973f-5e19fd476ff9",
+      "ts": "2026-11-20T12:49:38Z",
+      "source": "devin",
+      "subject": "fleet-remote:pr-review",
+      "action": "landed: reviewed PRs #3+#4 together — found README tail conflict (both appended at EOF), fixed in #4 by moving Repository layout between Features and Build and test; re-verified clean merge in BOTH orders, CI debug x2 PASS on amended aaf9759; scaffold phases/paths match device-agent.md | gate: cross-merge 2x clean, CI PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "README.md"
+      ],
+      "base_commit": "8b6561dd216d4d6c29d5a1cfc1898303006481d8",
+      "branch": "main",
+      "frame": "03h9rwmam40m5yfcp79pu0c2f"
+    },
+    {
+      "id": "1856c0c4-908d-47cb-a2cd-e864133fd9af",
+      "ts": "2026-11-20T12:47:06Z",
+      "source": "hermes",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: documented the CV link gate — docs/cv-ats-compliance.md gains 'The link gate' (cvFiles as the one list behind installs and check, the in-build invocation, pass/fail output, --check absent and --rebuild caveat) and site-links.sh's header names its callers | gate: checks:prose PASS + ops:docs:budget PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8b6561dd216d4d6c29d5a1cfc1898303006481d8",
+      "branch": "main",
+      "frame": "03h9rw4glx98p0tk0obas5bb5"
+    },
     {
       "id": "a7cff9c3-6591-478f-90e5-03531c4c6cec",
       "ts": "2026-11-20T12:46:38Z",
@@ -2829,35 +2857,6 @@
       "base_commit": "c511937012a13ee9f9f3dea42f9adbeb29b1b4f1",
       "branch": "main",
       "frame": "03h9izsfgp14itgws7b3dvpaz"
-    },
-    {
-      "id": "4a282c7e-9322-46c9-9690-15a9c542fb47",
-      "ts": "2026-11-19T09:16:30Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 12: freebuff landed graph-the-services (745f5577, service map wired into knowledge graph). Fed it infron/dsh backup-subagent hookup (wire dsh or reasonix to llm.onerouter.pro deepseek-v4-flash-0731:free). agy on job research. delphi freebuff idle after followups.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "745f557763e691d4d3c047591200c4fea2decbf2",
-      "branch": "main",
-      "frame": "03h9ixorl2sswupmlkgeronas"
-    },
-    {
-      "id": "84509512-7382-431f-a2e6-826a645228a8",
-      "ts": "2026-11-19T09:13:10Z",
-      "source": "devji",
-      "subject": "nixconfig:kg-services",
-      "action": "landed 745f5577: 159 service nodes + runs-on edges declared in flake/ontology.nix; kg-check/host pattern extended; quick+ontology+kg+frieren green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "745f557763e691d4d3c047591200c4fea2decbf2",
-      "branch": "main",
-      "frame": "03h9ix1a584x8vocwdhheov67"
     }
   ]
 }

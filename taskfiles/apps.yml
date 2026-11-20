@@ -6,8 +6,6 @@ vars:
   # Typst documents. Everything that reads or writes the pipeline goes through
   # the archive API on delphi — scripts/task/apps-db.sh.
   APPS_DIR: "/srv/data/projects/antigravity-application-workflow"
-  APPS_BIN: "{{.APPS_DIR}}/bin/appflow"
-  APPS_RUN: "nix-shell -p python3 --run"
   APPS_DB: "bash scripts/task/apps-db.sh"
 
 tasks:
@@ -92,25 +90,27 @@ tasks:
     cmds:
       - "{{.APPS_DB}} query {{.CLI_ARGS}}"
 
+  # The Typst-checkout verbs delegate to frieren when /srv/data is not mounted
+  # here — apps-typst.sh runs the same bin/appflow call in both cases.
   apps:followups:
     desc: View drafted recruiter follow-up notes from the workflow checkout (--copy <id>)
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} followups {{.CLI_ARGS}}\""
+      - "APPS_DIR={{.APPS_DIR}} bash scripts/task/apps-typst.sh followups {{.CLI_ARGS}}"
 
   apps:build:
     desc: Compile Typst resumes/cover letters to dist/ (no args = --all)
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} build {{.CLI_ARGS}}\""
+      - "APPS_DIR={{.APPS_DIR}} bash scripts/task/apps-typst.sh build {{.CLI_ARGS}}"
 
   apps:audit:
     desc: QA layout, page budget, and orphan line audit on dist/
     cmds:
-      - "{{.APPS_RUN}} \"{{.APPS_BIN}} audit\""
+      - "APPS_DIR={{.APPS_DIR}} bash scripts/task/apps-typst.sh audit"
 
   apps:git:status:
     desc: Raw git status of the (retired as source) workflow checkout
     cmds:
-      - git -C "{{.APPS_DIR}}" status -sb
+      - "APPS_DIR={{.APPS_DIR}} bash scripts/task/apps-typst.sh git-status"
 
   # The text behind an application: the job description, a note that outgrew the
   # row. `import` reads $APPFLOW_JD_DIR (~/.config/appflow/jd) where those files

@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-20T11:50:43Z",
+  "generated": "2026-11-20T11:54:28Z",
   "count": 200,
-  "pin": "263b36d1f3022f43206c421bf103dc7fd759e35a79cb246adbb6aa6348805de3",
+  "pin": "327739259a0db897eb3dd5a834374517b28b6da084c795bfd57061a7d4eb4dda",
   "turns": [
+    {
+      "id": "34761a8e-bd4c-433d-9e6c-1ce582edeff8",
+      "ts": "2026-11-20T11:52:43Z",
+      "source": "devin",
+      "subject": "nixconfig:apps-followups",
+      "action": "claim: repair apps:followups on delphi — APPS_DIR missing; delegate checkout verbs to frieren over ssh when the mount is absent",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-typst.sh taskfiles/apps.yml"
+      ],
+      "files": [],
+      "base_commit": "986a59b4f61cc5d803c1c65f0d121110fdc3ebe3",
+      "branch": "main",
+      "frame": "03h9rli28y6my8py03kjajscv"
+    },
+    {
+      "id": "34731829-292b-49a8-88ea-b81aad216985",
+      "ts": "2026-11-20T11:50:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-cv-links",
+      "action": "landed: homepage header nav links cv-energy.pdf (EN) and cv-energy-de.pdf (DE) via cvTunedHref/cvTunedLabel in lib/matt-site.nix, shell.html, both profile files and style.css | gate: nix build .#sites.matt-site rc=0, both hrefs present, 15 pages unchanged",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "986a59b4f61cc5d803c1c65f0d121110fdc3ebe3",
+      "branch": "main",
+      "frame": "03h9rl4wo3ml15w71613jl8xi"
+    },
+    {
+      "id": "df64e522-2f6c-4faa-90a6-3364931aa511",
+      "ts": "2026-11-20T11:50:43Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Round 38: all 3 landed — devin parakeet-hardening 422ad47d, agy job-search (16 apps, gate 174 rows), freebuff site CVs 43f272e2. jevdecide routed: devin→parloa_followup (0.88), agy→job_search_deeper. All panes re-tasked, busy.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
+      "branch": "main",
+      "frame": "03h9rl414rscigweyjuqeyoan"
+    },
     {
       "id": "97c89ab7-be38-42b8-92b5-23da59141c38",
       "ts": "2026-11-20T11:50:40Z",
@@ -2829,48 +2870,6 @@
       "base_commit": "79f0ab46c5e0869fe4927ddd4a7881a4fba0847e",
       "branch": "main",
       "frame": "03h9iq69fdcysptjsd6tab3s8"
-    },
-    {
-      "id": "5ac055ec-808c-4378-ac88-4c01b314fb73",
-      "ts": "2026-11-19T08:36:37Z",
-      "source": "devji",
-      "subject": "nixconfig:docs-link-gate",
-      "action": "checks:docs:links now has an 8-case negative-control fixture and scans reference-style [id]: definitions; mawk [^^] bug caught by the fixture itself; frieren, quick, verify green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "79f0ab46c5e0869fe4927ddd4a7881a4fba0847e",
-      "branch": "main",
-      "frame": "03h9ipwbwj8bmm2vf1s8ey10s"
-    },
-    {
-      "id": "d27b7dd9-4ef1-4960-8220-f144017d9485",
-      "ts": "2026-11-19T08:34:13Z",
-      "source": "frieren",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 5: freebuff landed count gate (67164d07, checks:counts gates hand-typed registry counts vs compiled source; decision: prose has few canonical counts so manifest starts with registries). Fed it doc-link gate (2nd Sloppiness-audit item). delphi freebuff finished quotient-hashing CA probe, now on its own followups.",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/ops.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "67164d07dea6e347e966a97aeda68b9ab3f3b1e2",
-      "branch": "main",
-      "frame": "03h9ipfefakg0lupfpqd2j7pm"
-    },
-    {
-      "id": "e77ea05f-7998-47ab-b398-4fa5abfb3ae6",
-      "ts": "2026-11-19T08:29:36Z",
-      "source": "devji",
-      "subject": "nixconfig:count-gate",
-      "action": "checks:counts gates hand-typed registry counts against the compiled source with a 4-case fixture (match/wrong/vanished/unknown); doc-link gate was already live in checks:quick, so the sloppiness note is now DELIVERED",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "67164d07dea6e347e966a97aeda68b9ab3f3b1e2",
-      "branch": "main",
-      "frame": "03h9ioiybx0bnobccve80h5j6"
     }
   ]
 }

@@ -1,19 +1,31 @@
 #!/usr/bin/env python3
-"""Resolve a block of the human queue by selector, not one message at a time.
+"""Resolve a block of the open mail queue by selector, not one message at a time.
 
 `agents:mail:resolve` is right for a single message. A queue of 511 is not 511
 decisions, it is ~60 sender decisions: the same feed writes ten times, the same
 bank alerts monthly. This applies one decision to every row a selector names and
 prints what it matched before it writes anything.
 
+Reach comes from `/api/agent-queue`, one request per owner prefix, not from
+`/api/attention`. Attention is the person's queue by definition — person, action
+and review tiers, agent-owned rows excluded — so a digest or robot selector
+matched nothing against it and the unowned backlog was invisible to this task.
+`agent-queue` serves any tier for an owner prefix, which is the trunk the task
+is named after.
+
+Unread is not testable here: the importer stores a message's labels as
+`["inbox"]` and drops the IMAP flags, so no archived row carries a read state.
+
 Selectors combine with AND: `--sender gumball --older 30` is the rows from that
-sender older than 30 days. At least one selector is required, so a mistyped
-command cannot empty the queue.
+sender older than 30 days. At least one of sender/domain/subject/tier/age is
+required, so a mistyped command cannot empty the queue; `--owner` only narrows
+the scan and never widens it.
 
   --sender S    substring of the sender address
   --domain D    exact domain of the sender address
   --subject S   substring of the subject
-  --tier T      comma-separated tiers (person, action, review)
+  --tier T      comma-separated tiers (person, action, review, digest, robot)
+  --owner O     owner prefix to scan (default: none and human)
   --older N     rows older than N days
   --newer N     rows newer than N days
   --limit N     stop after N matches
@@ -32,11 +44,19 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from email.utils import parseaddr
+from urllib.parse import quote
 
 # Same default as the taskfile's other mail calls: the API is loopback on delphi,
 # so any other tailnet host has to name it. Without this the sweep silently
 # answered whatever else listens on 8080 (a 404, read as "no rows").
 DEFAULT_API = os.environ.get("EMAIL_ARCHIVE_API", "https://delphi.cloudforest-kardashev.ts.net:8450")
+
+# The person's and the router's queues. `owner=agent` is opt-in through --owner,
+# because a sweep of the agents' own queues is their drainer's decision, not this
+# task's default.
+DEFAULT_OWNERS = ("none", "human")
+
+QUEUE_LIM = 100000
 
 
 def get(url: str, timeout: float = 60.0) -> object:
@@ -75,6 +95,21 @@ def when(value: str | None) -> datetime | None:
         return None
 
 
+def open_rows(api: str, owners: tuple[str, ...]) -> list[dict]:
+    rows: list[dict] = []
+    seen: set[str] = set()
+    for owner in owners:
+        url = f"{api}/api/agent-queue?owner={quote(owner, safe='')}&lim={QUEUE_LIM}"
+        for row in get(url) or []:
+            data = normalize(row)
+            key = data.get("message_id") or ""
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(data)
+    return rows
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--api", default=DEFAULT_API)
@@ -82,6 +117,7 @@ def main() -> int:
     parser.add_argument("--domain", default="")
     parser.add_argument("--subject", default="")
     parser.add_argument("--tier", default="")
+    parser.add_argument("--owner", default="")
     parser.add_argument("--older", type=float, default=None, help="days")
     parser.add_argument("--newer", type=float, default=None, help="days")
     parser.add_argument("--limit", type=int, default=0)
@@ -100,7 +136,8 @@ def main() -> int:
         return 2
 
     api = args.api.rstrip("/")
-    rows = [normalize(row) for row in (get(f"{api}/api/attention?lim=100000") or [])]
+    owners = (args.owner,) if args.owner else DEFAULT_OWNERS
+    rows = open_rows(api, owners)
     tiers = {tier.strip().lower() for tier in args.tier.split(",") if tier.strip()}
     now = datetime.now(timezone.utc)
     sender = args.sender.lower()
@@ -154,6 +191,8 @@ def main() -> int:
         "resolved": resolved,
         "failed": failed,
         "applied": bool(args.apply),
+        "scanned": len(rows),
+        "owners": list(owners),
         "by_tier": by_tier,
         "by_sender": dict(sorted(by_sender.items(), key=lambda item: -item[1])[:15]),
         "rows": [
@@ -172,7 +211,11 @@ def main() -> int:
         print(json.dumps(payload, ensure_ascii=False))
     else:
         state = "resolved" if args.apply else "would resolve"
-        print(f"email-sweep: {len(matched)} matched, {state} {resolved if args.apply else len(matched)}")
+        print(
+            f"email-sweep: {len(matched)} matched, {state} "
+            f"{resolved if args.apply else len(matched)} of {len(rows)} open rows "
+            f"(owners: {','.join(owners)})"
+        )
         if failed:
             print(f"  failed {failed}", file=sys.stderr)
         print("  by tier:   " + " ".join(f"{tier}={n}" for tier, n in sorted(by_tier.items())))

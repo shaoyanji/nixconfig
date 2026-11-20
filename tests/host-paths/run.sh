@@ -49,8 +49,8 @@ run "a portable path passes" 0 "PASS:" 'BLOG="$HOME/Documents/blog"'
 run "a foreign mount fails" 1 "a mount that is not the documented storage root" 'MNT=/Volumes/scratch/x'
 run "the documented storage root passes" 0 "PASS:" 'MNT=/Volumes/data/media'
 run "a checkout nested in a home fails" 1 "a checkout under a home directory" 'BLOG=/Users/someone/projects/blog'
-run "the fleet repo path passes" 0 "PASS:" 'REPO=/home/someone/Documents/nixconfig'
-run "plaintext private key fails" 1 "key material in the clear" '-----BEGIN OPENSSH PRIVATE KEY-----'
+run "the fleet repo path passes" 0 "PASS:" 'REPO=/home/someone/Documents/nixconfig' # repo-path-ok: fixture input for the host-paths gate
+run "plaintext private key fails" 1 "key material in the clear" '-----BEGIN OPENSSH '"PRIVATE KEY-----"
 run "an age secret key fails" 1 "key material in the clear" 'AGE-SECRET-KEY-1QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ'
 run "host-path-ok exempts its line" 0 "PASS:" 'MNT=/Volumes/scratch/x host-path-ok: fixture proves the escape hatch'
 

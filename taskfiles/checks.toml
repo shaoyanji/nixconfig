@@ -314,6 +314,10 @@ name = "checks:repo:hostpaths"
 kind = "leaf"
 
 [[check]]
+name = "checks:repo:hostpaths:test"
+kind = "leaf"
+
+[[check]]
 name = "checks:restic:drill"
 kind = "leaf"
 
@@ -463,6 +467,10 @@ kind = "leaf"
 
 [[check]]
 name = "checks:docs:links:test"
+kind = "leaf"
+
+[[check]]
+name = "checks:site:links:test"
 kind = "leaf"
 
 [[check]]

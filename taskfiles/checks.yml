@@ -46,7 +46,9 @@ tasks:
     deps:
       - task: checks:repo:paths
       - task: checks:repo:hostpaths
+      - task: checks:repo:hostpaths:test
       - task: checks:docs:links
+      - task: checks:site:links:test
       - task: checks:docs:links:test
       - task: checks:task-shim:test
       - task: checks:services:ports
@@ -92,6 +94,18 @@ tasks:
       carries `link-ok: <reason>` on its line. ~0.1 s, no network, no eval.
     cmds:
       - bash scripts/task/docs-links.sh
+
+  checks:site:links:test:
+    desc: Regression fixture for the CV-PDF link gate (unlinked, unshipped, no download, dead href)
+    summary: >
+      The gate that proves every shipped CV is linked runs inside the `matt-site`
+      derivation, so a defect in it either ships or blocks every deploy. This
+      exercises its four assertions on a temp site: a linked CV with `download`
+      passes; an anchor without the attribute (including one carrying only
+      `downloads`) fails; an unlinked PDF fails; a required PDF that was not
+      shipped fails; a dead internal href fails. ~0.2 s, no eval, no network.
+    cmds:
+      - bash tests/site-links/run.sh
 
   checks:docs:links:test:
     desc: Regression fixture for checks:docs:links (all five classes)
@@ -171,6 +185,16 @@ tasks:
       then every tracked `.toon` document must strict-decode. ~0.2 s, no host.
     cmds:
       - bash scripts/task/toon-check.sh
+
+  checks:repo:hostpaths:test:
+    desc: Regression fixture for checks:repo:hostpaths (every rule and exception)
+    summary: >
+      Proves the gate can fail: a foreign mount, a checkout nested in a home and
+      plaintext key material each exit 1, while a portable `$HOME` path, the
+      documented storage root, the fleet repo path and a `host-path-ok:` line exit
+      0. Temp files, no network, no eval, ~0.1 s.
+    cmds:
+      - bash tests/host-paths/run.sh
 
   checks:repo:hostpaths:
     desc: "[gate] No tracked file names a machine's mounts, another home checkout, or a plaintext key"

@@ -5,26 +5,41 @@
 #
 #   1. a mount that exists on one host only — `/Volumes/<name>` other than the
 #      documented storage root `/Volumes/data`;
-#   2. somebody's checkout under a home directory (`/home/<u>/Documents/...`,
-#      `/Users/<u>/projects/...`) — dead on every other machine and in CI;
+#   2. somebody's checkout under a home directory (a `Documents/` or `projects/`
+#      folder below a home) — dead on every other machine and in CI;
 #   3. key material in the clear, which must only ever reach the tree encrypted.
 #
-# Deliberately NOT judged: `file://` (most uses here are `nix copy --to file://`
-# caches and `git+file://` flake refs, and markdown links are `checks:docs:links`'
-# job), `/home/<user>` as a fact (the fleet's own user home is configuration, not
-# a leak), and IP addresses (the inventory publishes the fleet's network on
+# Deliberately NOT judged: `file://` (most uses are `nix copy --to file://`
+# caches and `git+file://` flake refs, and markdown links are
+# `checks:docs:links`), `/home/<user>` as a fact (the fleet's own user home is
+# configuration), and IP addresses (the inventory publishes the network on
 # purpose). `checks:repo:paths` covers a checkout path in code; this covers the
 # layout around it.
 #
 # An exception is `host-path-ok:` with a reason on the same line. The turn ledger
-# and test fixtures are skipped by path: one is generated, the other asserts on
-# strings.
+# and test fixtures are skipped by path.
+#
+# Usage: host-paths-check.sh [FILE...]   no arguments = every tracked file.
 set -euo pipefail
 
-cd "$(git rev-parse --show-toplevel)"
+EXCLUDE=(
+  ":!scripts/task/host-paths-check.sh"
+  ":!lib/agent-turns/turns.json"
+  ":!*_test.go"
+  ":!tests/*"
+)
 
-SELF="scripts/task/host-paths-check.sh"
-EXCLUDE=(":!${SELF}" ":!lib/agent-turns/turns.json" ":!*_test.go" ":!tests/*")
+# Two doors: the gate itself walks tracked files, and the fixture hands it a temp
+# file per rule. The fixture needs the same rules, not a copy of them.
+if [ "$#" -gt 0 ]; then
+  files=("$@")
+  count=$#
+  scan() { grep -nIE -- "$1" "${files[@]}" 2>/dev/null || true; }
+else
+  cd "$(git rev-parse --show-toplevel)"
+  count=$(git ls-files | wc -l | tr -d ' ')
+  scan() { git grep -nIE -- "$1" -- . "${EXCLUDE[@]}" || true; }
+fi
 
 fail=0
 
@@ -36,7 +51,7 @@ judge() {
   # on a clean tree, and under `set -e` that would abort the gate instead of
   # letting it report PASS.
   hits="$(
-    { git grep -nIE -- "$pattern" -- . "${EXCLUDE[@]}" || true; } |
+    scan "$pattern" |
       { if [ -n "$ignore" ]; then grep -vE -- "$ignore" || true; else cat; fi; } |
       { grep -v 'host-path-ok:' || true; }
   )"
@@ -68,4 +83,4 @@ if [ "$fail" -ne 0 ]; then
   exit 1
 fi
 
-printf 'PASS: %s tracked files, no machine paths or plaintext keys.\n' "$(git ls-files | wc -l | tr -d ' ')"
+printf 'PASS: %s file(s) checked, no machine paths or plaintext keys.\n' "$count"

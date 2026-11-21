@@ -263,3 +263,141 @@ func TestSlotReleasedOnDisconnectWithStuckUpstream(t *testing.T) {
 	}
 	close(release) // let the stuck upstream return; handler 1 exits
 }
+
+// --- Decision handler: lane selection, error-classed fallback, observability ---
+
+// decisionTestRig spins up fake TypeSafe and Laya upstreams and returns a
+// handler plus counters recording how many requests each upstream saw.
+func decisionTestRig(t *testing.T, tsStatus int, tsBody string) (
+	handler http.HandlerFunc, tsHits, layaHits *atomic.Int32,
+) {
+	t.Helper()
+	tsHits = &atomic.Int32{}
+	layaHits = &atomic.Int32{}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tsHits.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(tsStatus)
+		_, _ = w.Write([]byte(tsBody))
+	}))
+	t.Cleanup(ts.Close)
+
+	laya := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		layaHits.Add(1)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"answers":{"q":{"choice":"laya"}}}`))
+	}))
+	t.Cleanup(laya.Close)
+
+	cfg := Config{
+		TypeSafeEndpoint:     ts.URL,
+		LayaEndpoint:         laya.URL,
+		DefaultDecisionModel: "jev-latest",
+		FallbackToLocal:      true,
+	}
+	return newDecisionHandler(cfg, ts.Client()), tsHits, layaHits
+}
+
+func postDecision(handler http.HandlerFunc, auth string) *httptest.ResponseRecorder {
+	req := httptest.NewRequest(http.MethodPost, "/v1/systemone",
+		strings.NewReader(`{"state":{"x":1},"questions":{"q":{"type":"choice"}}}`))
+	if auth != "" {
+		req.Header.Set("Authorization", auth)
+	}
+	rec := httptest.NewRecorder()
+	handler(rec, req)
+	return rec
+}
+
+func TestDecisionTypeSafeAnswers(t *testing.T) {
+	handler, _, layaHits := decisionTestRig(t, http.StatusOK, `{"answers":{}}`)
+	rec := postDecision(handler, "Bearer apikey_fleetkey123")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rec.Code)
+	}
+	if got := rec.Header().Get("X-Decision-Provider"); got != "typesafe" {
+		t.Fatalf("expected provider typesafe, got %q", got)
+	}
+	if layaHits.Load() != 0 {
+		t.Fatalf("local lane must not see a TypeSafe success")
+	}
+}
+
+func TestDecisionNoKeyGoesLocal(t *testing.T) {
+	handler, tsHits, _ := decisionTestRig(t, http.StatusOK, `{}`)
+	rec := postDecision(handler, "")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 from local lane, got %d", rec.Code)
+	}
+	if got := rec.Header().Get("X-Decision-Provider"); got != "laya" {
+		t.Fatalf("expected provider laya, got %q", got)
+	}
+	if tsHits.Load() != 0 {
+		t.Fatalf("TypeSafe must not be called without a TypeSafe-shaped key")
+	}
+}
+
+func TestDecisionForeignBearerNotForwarded(t *testing.T) {
+	handler, tsHits, _ := decisionTestRig(t, http.StatusOK, `{}`)
+	rec := postDecision(handler, "Bearer fleet-internal-token")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 from local lane, got %d", rec.Code)
+	}
+	if tsHits.Load() != 0 {
+		t.Fatalf("non-TypeSafe bearer must not be forwarded to the cloud API")
+	}
+}
+
+func TestDecisionServerErrorFallsBack(t *testing.T) {
+	handler, _, layaHits := decisionTestRig(t, http.StatusBadGateway, `{"error":"down"}`)
+	rec := postDecision(handler, "Bearer apikey_fleetkey123")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 from fallback, got %d", rec.Code)
+	}
+	if got := rec.Header().Get("X-Decision-Provider"); got != "laya" {
+		t.Fatalf("expected provider laya, got %q", got)
+	}
+	if layaHits.Load() != 1 {
+		t.Fatalf("expected exactly one local call, got %d", layaHits.Load())
+	}
+}
+
+func TestDecisionRequestErrorDoesNotFallBack(t *testing.T) {
+	handler, _, layaHits := decisionTestRig(t, http.StatusBadRequest, `{"error":"bad payload"}`)
+	rec := postDecision(handler, "Bearer apikey_fleetkey123")
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("request error must pass through verbatim, got %d", rec.Code)
+	}
+	if got := rec.Header().Get("X-Decision-Provider"); got != "typesafe" {
+		t.Fatalf("expected provider typesafe, got %q", got)
+	}
+	if layaHits.Load() != 0 {
+		t.Fatalf("a request-side error must not re-ask the weaker model")
+	}
+}
+
+func TestDecisionFallbackDisabledReturns502(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer ts.Close()
+	cfg := Config{TypeSafeEndpoint: ts.URL, LayaEndpoint: "http://127.0.0.1:1",
+		DefaultDecisionModel: "jev-latest", FallbackToLocal: false}
+	handler := newDecisionHandler(cfg, ts.Client())
+	rec := postDecision(handler, "Bearer apikey_fleetkey123")
+	if rec.Code != http.StatusBadGateway {
+		t.Fatalf("expected 502 with fallback disabled, got %d", rec.Code)
+	}
+}
+
+func TestDecisionMethodNotAllowed(t *testing.T) {
+	handler, _, _ := decisionTestRig(t, http.StatusOK, `{}`)
+	req := httptest.NewRequest(http.MethodGet, "/v1/systemone", nil)
+	rec := httptest.NewRecorder()
+	handler(rec, req)
+	if rec.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("expected 405, got %d", rec.Code)
+	}
+}

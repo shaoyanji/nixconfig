@@ -13,6 +13,7 @@
     src = ./llm-decision-router;
     vendorHash = null;
     env.CGO_ENABLED = 0;
+    doCheck = true;
   };
 in {
   options.services.llm-decision-router = {
@@ -38,8 +39,8 @@ in {
 
     llmUpstream = lib.mkOption {
       type = lib.types.str;
-      default = "http://127.0.0.1:8080";
-      description = "Upstream base URL for generative chat completions (llama-swap).";
+      default = "http://127.0.0.1:8085";
+      description = "Upstream base URL for generative chat completions. Strata serves :8085 on eisen; llama-swap :8080 has been dormant since 2026-10-21, so a default of :8080 pointed the chat lane at a dead port.";
     };
 
     typesafeEndpoint = lib.mkOption {

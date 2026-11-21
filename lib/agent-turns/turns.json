@@ -1,8 +1,28 @@
 {
-  "generated": "2026-11-21T09:49:30Z",
+  "generated": "2026-11-21T10:55:15Z",
   "count": 200,
-  "pin": "07897d52188c2c7d75be1ec9950b2ac1dfb728a571af3bd164ce6a2ab62d5cbe",
+  "pin": "daa6abf657b54726a84c75239046ae431537d15ddfee28eea2e0a0117a1c8f9e",
   "turns": [
+    {
+      "id": "eebb3d64-070c-4289-a7d0-acf06a19b71b",
+      "ts": "2026-11-21T10:46:49Z",
+      "source": "devin",
+      "subject": "nixconfig:decision-routers",
+      "action": "claim: fix decision-router layer end-to-end (jev wrapper done; audit nu lane, systemone, agent-lane, ultrafast scripts, gates, skill copies)",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/agent-lane.sh",
+        "modules/config/nu/decision.nu",
+        "modules/services/systemone",
+        "modules/user/ai/skills/jev-ultrafast",
+        ".agents/skills/jevdecide",
+        ".agents/skills/router"
+      ],
+      "files": [],
+      "base_commit": "cfb2fab4e1545bdd743e6bc7bf693bf71a962ae7",
+      "branch": "main",
+      "frame": "03h9z1xaxvdjgc2v8sypgs89x"
+    },
     {
       "id": "dffd503f-a3ea-402a-96ad-c218c2993e95",
       "ts": "2026-11-21T09:48:48Z",
@@ -2725,19 +2745,6 @@
       "base_commit": "8c7204aa223a1bcb561238544077da321331e8f7",
       "branch": "main",
       "frame": "03h9vlpnf637huec3c9619d3m"
-    },
-    {
-      "id": "9d384892-3c86-44cd-9e42-3323119ed5c4",
-      "ts": "2026-11-21T00:08:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-leak-gate",
-      "action": "re-verified at HEAD 8c7204aa via task site:links (fresh nix build both sites): matt-site 81 internal links / 15 pages / 4 PDFs (4 required), all linked, 16 anchors download; mockup 7/7, 0 PDFs; --gap pre-flight exit 0 on both; artifact ys2f4r55 cv.pdf cedbdc6 cv-de 5aa1183 cv-energy d6b5ed9 cv-energy-de 6cc9e36. No unlinked or dead CV target found — no fix needed, no files changed | gate: site:links exit 0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c7204aa223a1bcb561238544077da321331e8f7",
-      "branch": "main",
-      "frame": "03h9vl9repb6g8ekolj1gdktc"
     }
   ]
 }

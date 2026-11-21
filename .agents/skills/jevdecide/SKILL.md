@@ -1,6 +1,6 @@
 ---
 name: jevdecide
-description: Jev decisions for hermes — classify or choose with jev-decide, route a lane on calibrated probabilities, pick between Jev, Laya and Kev-4B, never let a model authorise an action.
+description: Jev decisions for hermes — classify or choose with jev-decide, route a lane on calibrated probabilities, pick between Jev and Laya, never let a model authorise an action.
 version: 3.0.0
 tags: [jev, decision, routing, gating, triage, eisen]
 platforms: [linux, macos]
@@ -68,25 +68,30 @@ cpg chat -m gpt-6-luna -s advice-review "…" \
 
 ## Which model answers a decision
 
-Three models can, and the router on Eisen (:8000) already picks between them:
+Two models can, and the router on Eisen (:8000) already picks between them:
 
 | Model | Where | Input limit | When |
 | :--- | :--- | :--- | :--- |
 | **TypeSafe Jev** (cloud) | api.typesafe.ai, via the router | large | default; most accurate (0.966 macro on the public benchmark) |
-| **Laya** (local) | `127.0.0.1:8090`, on demand | **512 tokens**, hard | Jev unreachable and the input is ≤500 tokens |
-| **Kev-4B** (local) | its own llama-server, no endpoint | long (validated context unpublished) | Jev unreachable and the input is longer than Laya can hold |
+| **Laya** (local) | `127.0.0.1:8090`, on demand | **512 tokens**, hard | Jev unreachable — the only local lane |
 
 1. **Jev first**, 25 s timeout; the router forwards the client's auth.
-2. **On failure, local by input length** — ≤500 tokens to Laya, more to Kev-4B.
+2. **On provider failure, Laya.** Provider failure means transport errors,
+   5xx, auth, payment and rate limits — the router stamps `X-Decision-Provider`
+   on every answer so a silent switch is visible. A request-side error
+   (4xx) returns TypeSafe's own response; it is not re-asked of a weaker model.
+   Inputs beyond Laya's 512-token limit have no local lane: Jev stays the only
+   answer, so retry or hand the residue to a reasoner instead of truncating.
 3. **A first-request 502 is working behaviour.** After idle, Laya's cold start
    can exceed the 25 s timeout, so the first decision 502s and the second
    succeeds. Retry; do not lengthen the timeout.
 
 **Laya's `confidence` is `1 − normalized entropy`**, so a Jev cutoff does not
 transfer, and it is not a drop-in: on large option sets it falls to ~0.43 where
-Jev holds 0.87. **Kev-4B accepts long inputs but its long-context accuracy is
-unvalidated** — test on your own inputs before trusting it, and never expose it;
-it is a local fallback, not a service.
+Jev holds 0.87. **Kev-4B is deliberately not a lane**: the merged GGUF works in
+stock llama.cpp (tested 2026-10-17 on :8092), but the operator's recorded
+decision is no endpoint and no router wiring — its long-context accuracy is
+unvalidated. It exists on disk for direct tests only.
 
 From a nushell shell (`modules/config/nu/decision.nu`) the same lane, with the
 provider failure printed to stderr so a silent switch to the weaker local model

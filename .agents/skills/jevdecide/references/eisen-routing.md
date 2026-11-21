@@ -1,7 +1,9 @@
 # Eisen's decision router — request shape and the bench that shaped it
 
 The router lives on Eisen: `:8000` → Jev, falling back to Laya (`127.0.0.1:8090`)
-or Kev-4B on its own llama-server. The routing rule and the caveats are in the
+only — provider-side failures, never request-side errors, and every answer
+stamped `X-Decision-Provider` so the lane is visible. Kev-4B is not a lane
+(operator decision). The routing rule and the caveats are in the
 `jevdecide` body; this file is the wire format and the measurement behind
 "no model is used for graph routing".
 

@@ -36,7 +36,7 @@
     ".agents/skills/infra/SKILL.md" = 61;
     ".agents/skills/instabox/SKILL.md" = 104;
     ".agents/skills/iventoy/SKILL.md" = 108;
-    ".agents/skills/jevdecide/SKILL.md" = 139;
+    ".agents/skills/jevdecide/SKILL.md" = 146;
     ".agents/skills/knowledge-base/SKILL.md" = 195;
     ".agents/skills/mail-alias/SKILL.md" = 81;
     ".agents/skills/mail-archive/SKILL.md" = 167;

@@ -185,6 +185,28 @@ func writeJSONError(w http.ResponseWriter, status int, code, message string) {
 	})
 }
 
+// fallbackStatus reports whether a TypeSafe failure is provider-side, so the
+// request may fall back to the local lane. Transport errors, 5xx, auth,
+// payment and rate-limit responses all mean the provider cannot serve this
+// client right now. A request-side error (400/404/405/413/422) is NOT a
+// provider problem — the same defect would fail on Laya too, so TypeSafe's
+// response is returned verbatim rather than masking a bad request behind a
+// silent switch to the weaker model.
+func fallbackStatus(status int) bool {
+	if status >= 500 {
+		return true
+	}
+	switch status {
+	case http.StatusUnauthorized,
+		http.StatusPaymentRequired,
+		http.StatusForbidden,
+		http.StatusRequestTimeout,
+		http.StatusTooManyRequests:
+		return true
+	}
+	return false
+}
+
 // llmErrorHandler replaces ReverseProxy's default (plain-text 502): a timed-out
 // upstream returns a parseable 504, and a client disconnect just logs.
 func llmErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
@@ -229,13 +251,137 @@ func (g *llmGateway) serveChat(w http.ResponseWriter, r *http.Request, wantedJSO
 	g.proxy.ServeHTTP(w, r)
 }
 
+// newDecisionHandler routes a System One decision request.
+//
+// Lane selection: a request carrying a TypeSafe-shaped credential goes to the
+// cloud Jev first; anything else goes straight to the local lane. Only a
+// TypeSafe key is forwarded upstream — any other Authorization value (a fleet
+// token, a stray bearer) is a credential this router must not leak to the
+// cloud API, so the request takes the local lane instead.
+//
+// Fallback is error-classed: provider-side failures (transport, 5xx, auth,
+// payment, rate limit) may drop to Laya; a request-side error returns
+// TypeSafe's response verbatim. Every answer carries X-Decision-Provider so
+// the caller can see which lane actually served it — a silent switch to the
+// weaker local model is exactly the failure mode this header exists to expose.
+func newDecisionHandler(cfg Config, client *http.Client) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		bodyBytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Failed to read request body", http.StatusBadRequest)
+			return
+		}
+
+		var payload map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &payload); err != nil {
+			http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+			return
+		}
+
+		// Ensure model is set for TypeSafe Jev if missing or unhardcoded policy placeholder
+		modelVal, hasModel := payload["model"].(string)
+		if !hasModel || modelVal == "" || strings.HasPrefix(modelVal, "policy:") {
+			payload["model"] = cfg.DefaultDecisionModel
+		}
+
+		forwardBytes, err := json.Marshal(payload)
+		if err != nil {
+			http.Error(w, "Failed to serialize payload", http.StatusInternalServerError)
+			return
+		}
+
+		authHeader := r.Header.Get("Authorization")
+		hasTypeSafeKey := strings.HasPrefix(authHeader, "Bearer apikey_")
+		typeSafeFailed := false
+
+		// 1. If a TypeSafe credential is present, attempt TypeSafe Jev first
+		if hasTypeSafeKey {
+			req, err := http.NewRequestWithContext(r.Context(), http.MethodPost, cfg.TypeSafeEndpoint, bytes.NewReader(forwardBytes))
+			if err == nil {
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", authHeader)
+
+				start := time.Now()
+				resp, err := client.Do(req)
+				if err == nil {
+					respBody, readErr := io.ReadAll(resp.Body)
+					resp.Body.Close()
+
+					if readErr == nil && resp.StatusCode == http.StatusOK {
+						log.Printf("[DECISION] TypeSafe Jev OK in %v (status %d)", time.Since(start), resp.StatusCode)
+						w.Header().Set("Content-Type", "application/json")
+						w.Header().Set("X-Decision-Provider", "typesafe")
+						w.WriteHeader(http.StatusOK)
+						w.Write(respBody)
+						return
+					}
+					if readErr == nil && !fallbackStatus(resp.StatusCode) {
+						log.Printf("[DECISION] TypeSafe rejected the request (status %d): %s", resp.StatusCode, string(respBody))
+						w.Header().Set("Content-Type", "application/json")
+						w.Header().Set("X-Decision-Provider", "typesafe")
+						w.WriteHeader(resp.StatusCode)
+						w.Write(respBody)
+						return
+					}
+					typeSafeFailed = true
+					log.Printf("[DECISION-WARN] TypeSafe provider failure (status %d): %s", resp.StatusCode, string(respBody))
+				} else {
+					typeSafeFailed = true
+					log.Printf("[DECISION-WARN] TypeSafe transport error: %v", err)
+				}
+			}
+		} else {
+			log.Printf("[DECISION] no TypeSafe credential — local lane")
+		}
+
+		// 2. Local lane: TypeSafe failed (when the flag allows) or no key was sent
+		if !typeSafeFailed || cfg.FallbackToLocal {
+			log.Printf("[DECISION] Routing to local Laya (%s)", cfg.LayaEndpoint)
+			req, err := http.NewRequestWithContext(r.Context(), http.MethodPost, cfg.LayaEndpoint, bytes.NewReader(forwardBytes))
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Failed to construct fallback request: %v", err), http.StatusInternalServerError)
+				return
+			}
+			req.Header.Set("Content-Type", "application/json")
+
+			start := time.Now()
+			resp, err := client.Do(req)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Fallback Laya unreachable: %v", err), http.StatusBadGateway)
+				return
+			}
+			defer resp.Body.Close()
+
+			respBody, err := io.ReadAll(resp.Body)
+			if err != nil {
+				http.Error(w, "Failed to read fallback response", http.StatusInternalServerError)
+				return
+			}
+
+			log.Printf("[DECISION] Local Laya responded in %v (status %d)", time.Since(start), resp.StatusCode)
+			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("X-Decision-Provider", "laya")
+			w.WriteHeader(resp.StatusCode)
+			w.Write(respBody)
+			return
+		}
+
+		http.Error(w, "Decision service unavailable (TypeSafe unreachable, local fallback disabled)", http.StatusBadGateway)
+	}
+}
+
 func main() {
 	port := getEnv("PORT", "8000")
 	bind := getEnv("BIND", "127.0.0.1")
 
 	cfg := Config{
 		BindAddr:             bind + ":" + port,
-		LLMUpstreamURL:       getEnv("LLM_UPSTREAM", "http://127.0.0.1:8080"),
+		LLMUpstreamURL:       getEnv("LLM_UPSTREAM", "http://127.0.0.1:8085"),
 		TypeSafeEndpoint:     getEnv("TYPESAFE_ENDPOINT", "https://api.typesafe.ai/v1/systemone"),
 		LayaEndpoint:         getEnv("LAYA_ENDPOINT", "http://127.0.0.1:8090/v1/systemone"),
 		DefaultDecisionModel: getEnv("DEFAULT_DECISION_MODEL", "jev-latest"),
@@ -378,103 +524,8 @@ func main() {
 	})
 
 	// Decisions endpoint for SubZeroClaw / Jev
-	handleDecisions := func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-
-		bodyBytes, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Failed to read request body", http.StatusBadRequest)
-			return
-		}
-
-		var payload map[string]interface{}
-		if err := json.Unmarshal(bodyBytes, &payload); err != nil {
-			http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
-			return
-		}
-
-		// Ensure model is set for TypeSafe Jev if missing or unhardcoded policy placeholder
-		modelVal, hasModel := payload["model"].(string)
-		if !hasModel || modelVal == "" || strings.HasPrefix(modelVal, "policy:") {
-			payload["model"] = cfg.DefaultDecisionModel
-		}
-
-		forwardBytes, err := json.Marshal(payload)
-		if err != nil {
-			http.Error(w, "Failed to serialize payload", http.StatusInternalServerError)
-			return
-		}
-
-		authHeader := r.Header.Get("Authorization")
-		triedTypeSafe := false
-
-		// 1. If an API key is present, attempt TypeSafe Jev first
-		if authHeader != "" && strings.Contains(authHeader, "apikey_") {
-			triedTypeSafe = true
-			req, err := http.NewRequestWithContext(r.Context(), http.MethodPost, cfg.TypeSafeEndpoint, bytes.NewReader(forwardBytes))
-			if err == nil {
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("Authorization", authHeader)
-
-				start := time.Now()
-				resp, err := httpClient.Do(req)
-				if err == nil {
-					respBody, readErr := io.ReadAll(resp.Body)
-					resp.Body.Close()
-
-					if readErr == nil && resp.StatusCode == http.StatusOK {
-						log.Printf("[DECISION] TypeSafe Jev OK in %v (status %d)", time.Since(start), resp.StatusCode)
-						w.Header().Set("Content-Type", "application/json")
-						w.WriteHeader(http.StatusOK)
-						w.Write(respBody)
-						return
-					}
-					log.Printf("[DECISION-WARN] TypeSafe returned status %d: %s", resp.StatusCode, string(respBody))
-				} else {
-					log.Printf("[DECISION-WARN] TypeSafe network error: %v", err)
-				}
-			}
-		}
-
-		// 2. Fallback to local Laya if TypeSafe failed or no key provided
-		if !triedTypeSafe || cfg.FallbackToLocal {
-			log.Printf("[DECISION] Routing to local Laya (%s)", cfg.LayaEndpoint)
-			req, err := http.NewRequestWithContext(r.Context(), http.MethodPost, cfg.LayaEndpoint, bytes.NewReader(forwardBytes))
-			if err != nil {
-				http.Error(w, fmt.Sprintf("Failed to construct fallback request: %v", err), http.StatusInternalServerError)
-				return
-			}
-			req.Header.Set("Content-Type", "application/json")
-
-			start := time.Now()
-			resp, err := httpClient.Do(req)
-			if err != nil {
-				http.Error(w, fmt.Sprintf("Fallback Laya unreachable: %v", err), http.StatusBadGateway)
-				return
-			}
-			defer resp.Body.Close()
-
-			respBody, err := io.ReadAll(resp.Body)
-			if err != nil {
-				http.Error(w, "Failed to read fallback response", http.StatusInternalServerError)
-				return
-			}
-
-			log.Printf("[DECISION] Local Laya responded in %v (status %d)", time.Since(start), resp.StatusCode)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(resp.StatusCode)
-			w.Write(respBody)
-			return
-		}
-
-		http.Error(w, "Decision service unavailable", http.StatusBadGateway)
-	}
-
-	mux.HandleFunc("/v1/decisions", handleDecisions)
-	mux.HandleFunc("/v1/systemone", handleDecisions)
+	mux.HandleFunc("/v1/decisions", newDecisionHandler(cfg, httpClient))
+	mux.HandleFunc("/v1/systemone", newDecisionHandler(cfg, httpClient))
 
 	server := &http.Server{
 		Addr:    cfg.BindAddr,

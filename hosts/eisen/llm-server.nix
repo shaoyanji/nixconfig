@@ -221,10 +221,8 @@
   dflashFile = "${modelDir}/${dflashName}";
   dflashUrl = "https://huggingface.co/aminya/Qwen3.6-35B-A3B-DFlash2-GGUF/resolve/main/${dflashName}";
 
-  # Kev-4B (decision model, /v1/systemone) — GGUF from ggml-org.
-  # Source is a LoRA adapter + pointer head (jaredpalmer/kev-4b); this is
-  # the merged/converted GGUF that llama.cpp serves natively (build 11669+).
-  # Q8_0 is the recommended quant for decision models. Apache-2.0.
+  # Kev-4B GGUF — kept on disk for direct tests; never served, never routed.
+  # hosts/eisen/HANDOFF.md "Kev-4B — tested, no endpoint (2026-10-17)".
   kevFile = "${modelDir}/Kev-4B-Q8_0.gguf";
   kevUrl = "https://huggingface.co/ggml-org/Kev-4B-GGUF/resolve/main/Kev-4B-Q8_0.gguf";
   /*

@@ -157,7 +157,7 @@ A completion smoke test is in the runbook: `Deploy & Validate` in
 
 ## Decision model: Laya (`laya.lan`, CPU-only)
 
-A 421M "System One" decision model that answers typed questions about one document and returns **no text** — just calibrated probabilities over options supplied at request time. It implements the same `POST /v1/systemone` contract as TypeSafe's hosted Jev, so a Jev client works by changing the base URL; this fleet has no hosted Jev, which is why it exists here.
+A 421M "System One" decision model that answers typed questions about one document and returns **no text** — just calibrated probabilities over options supplied at request time. It implements the same `POST /v1/systemone` contract as TypeSafe's hosted Jev, so a Jev client works by changing the base URL. TypeSafe Jev is the fleet's primary lane; Laya is the local fallback it drops to on provider failure.
 
 Questions come in three shapes: `choice` (n options, `criteria` a label→description map), `score` (ordinal, `criteria` a list of levels), and `noul` (a yes/no probability). Every question in a call is answered in **one** forward pass. `POST /v1/systemone/batch` takes `{states: [...], questions: {...}}` (up to 64 states) and shares forward passes; note it keys on `states`, not `requests` (a wrong key is a plain HTTP 400).
 
@@ -195,7 +195,7 @@ Do not hand-run `laya-serve`: the declarative unit owns `:8090` (the same rule a
 
 > **Accuracy is not Jev's.** On the public 49-task / 869-case benchmark, Jev scores **0.966** macro accuracy, Laya-base **0.583**, and on large option sets the base checkpoints fall to ~0.43 where Jev holds 0.87. Do not let this gate a destructive decision on its own, and threshold on `answer_confidence` **fit on your own held-out data** — Laya's `confidence` is `1 - normalized entropy`, not Jev's `(n·p_max - 1)/(n - 1)`, so a Jev cutoff does not transfer. Prefer `typed-decisions` for typed workflows.
 
-**Kev-4B was evaluated for this host and rejected** (do not re-litigate it): it serves only on CUDA, ROCm or Apple MLX, and the RX 5700 (Navi 10 / gfx1010) sits outside ROCm's support matrix with 8 GiB VRAM against Kev-4B's ~16 GiB floor. Its llama.cpp route is closed too, because Kev is a LoRA adapter plus pointer head on `Qwen/Qwen3.5-4B-Base` rather than a merged model, and llama.cpp cannot load those artifacts.
+**Kev-4B works but is deliberately not a lane.** The earlier "rejected" note (ROCm-only, LoRA-only) is obsolete: the merged GGUF at `ggml-org/Kev-4B-GGUF` serves `/v1/systemone` in stock llama.cpp and passed a live test on :8092 (2026-10-17). The operator's decision stands anyway — **no endpoint, no router wiring** — because its validated decision context is unpublished. `eisen-llm-kev` keeps the ~4.2 GB GGUF on disk for direct tests; Laya remains the router's only local fallback, and inputs beyond Laya's 512-token limit have no local lane.
 
 ---
 

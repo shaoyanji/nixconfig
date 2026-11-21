@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T11:40:49Z",
+  "generated": "2026-11-21T12:24:38Z",
   "count": 200,
-  "pin": "9abf6bb79b5b98a28d9dbfcaf83f4615d0d3d06dab895302d4659f5280c9a659",
+  "pin": "3c352dea3ced97ebf3b4996e9bb601a43d0332f6e22e7352432ef8c35db16a26",
   "turns": [
+    {
+      "id": "29ab3d81-73c9-4a03-bcac-57b6bb2e923e",
+      "ts": "2026-11-21T11:41:26Z",
+      "source": "devin-agent",
+      "subject": "nixconfig:steward-devin-2026-11-21",
+      "action": "devin committed 50eba9e1 and pushed to origin/main — host-change: removed dead openrouter rung from modules/user/ai/hermes-persona/config.yaml fallback_providers (chain now custom → nvidia → ollama-cloud, 3 lanes ≥ 2 per infron gate, YAML verified); gmc -a also swept the pre-existing matt-site/CV/ATS edits; working tree clean; pane idle",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "50eba9e1aea51c2ffa8f15ffc4fdfcaef15b321c",
+      "branch": "main",
+      "frame": "03h9zclfkvvu4lotyyt7hf138"
+    },
     {
       "id": "4e6caccf-35fe-4ae5-a2f8-df420cd30e21",
       "ts": "2026-11-21T11:39:35Z",
@@ -2741,19 +2754,6 @@
       "base_commit": "8c7204aa223a1bcb561238544077da321331e8f7",
       "branch": "main",
       "frame": "03h9vo6yszqusenijweduvjdl"
-    },
-    {
-      "id": "440b5b2a-968c-4d4e-a681-ab91746044a1",
-      "ts": "2026-11-21T00:17:27Z",
-      "source": "devin",
-      "subject": "nixconfig:dead-module-sweep",
-      "action": "steward re-drove devin pane: dead-module-sweep (Jev 0.86/0.77). Pane re-audited flake/module sets for nowhere-imported modules at HEAD 8c7204aa and returned to prompt.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vmz9jajynmzoyahfql69t"
     }
   ]
 }

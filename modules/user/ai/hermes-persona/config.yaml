@@ -146,6 +146,12 @@ fallback_providers:
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: ollama-cloud
     model: nemotron-3-ultra
+  # Keyless terminal lane: api.apisfreellm.com takes no key and can never
+  # bill, so it is the true last resort after every quota is spent.
+  - provider: custom
+    model: free-ai
+    base_url: https://api.apisfreellm.com/v1
+    api_key: free
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes
 # exactly one message of at most 15,000 characters, while a hermes turn sends
 # ~29,000 characters of system prompt and tool schemas, so every

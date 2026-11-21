@@ -395,7 +395,7 @@
                   "actions": [
                     {
                       "type": "open-uri",
-                      "uri": "http://thinsandy.fritz.box:2283"
+                      "uri": "https://photos.frieren.lan"
                     },
                     {
                       "type": "close-menu"

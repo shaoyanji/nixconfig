@@ -124,10 +124,12 @@ web:
 display:
   interface: cli
   tool_progress: all
-# Fallback chain: four independent free quotas, one failover each. Infron's
-# daily allowance is account-scoped, so when the route dies the second `:free`
-# id on it dies too — one failover inside one route is no chain at all, which
-# is how a quota outage ended a turn instead of degrading it (2026-11-19).
+# Fallback chain: the first lane shares the Infron route's account-scoped
+# daily quota with the main model, so it covers a per-model failure (limit,
+# delisting) but dies with the main model on a quota outage — the lanes
+# behind it are the quota-independent ones: nvidia, ollama-cloud and the
+# keyless apisfreellm terminal. Infron's daily allowance is account-scoped:
+# a quota outage ended a turn instead of degrading it (2026-11-19).
 # Each entry's free contract is structural, not a remembered price: `:free` is
 # the suffix the Infron route bills at zero, `nvidia` is NIM's free dev tier
 # on integrate.api.nvidia.com (a build.nvidia.com key, no wallet exists to

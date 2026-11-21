@@ -11,81 +11,112 @@
 }: let
   rootStr = toString root;
 
-  topDirs = builtins.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir root));
+  topDirs =
+    root
+    |> builtins.readDir
+    |> lib.filterAttrs (_: t: t == "directory")
+    |> builtins.attrNames;
   suffixes = [".nix" ".md" ".sh" ".toml" ".yml" ".yaml" ".json" ".jsonl" ".tsv" ".py" ".js" ".toon"];
   hasKnownSuffix = t: lib.any (s: lib.hasSuffix s t) suffixes;
 
   # Tokens, not substrings: `hosts/<name>/configuration.nix` is a template, not a
   # path, and a URL is not a repo file. Both fall out here instead of becoming an
   # unfixable "unresolved"
-  tokens = text: builtins.filter builtins.isString (builtins.split "[^A-Za-z0-9_./-]+" text);
+  tokens = text:
+    text
+    |> builtins.split "[^A-Za-z0-9_./-]+"
+    |> builtins.filter builtins.isString;
 
   pathRefs = body:
-    lib.unique (builtins.filter (
-        t:
-          builtins.length (lib.splitString "/" t)
-          > 1
-          && !(lib.hasPrefix "/" t)
-          && !(lib.hasPrefix "./" t)
-          && !(lib.hasPrefix "../" t)
-          && hasKnownSuffix t
-          && builtins.elem (builtins.head (lib.splitString "/" t)) topDirs
-      )
-      (tokens body));
+    body
+    |> tokens
+    |> builtins.filter (
+      t:
+        (lib.splitString "/" t |> builtins.length)
+        > 1
+        && !(lib.hasPrefix "/" t)
+        && !(lib.hasPrefix "./" t)
+        && !(lib.hasPrefix "../" t)
+        && hasKnownSuffix t
+        && (lib.splitString "/" t |> builtins.head |> (h: builtins.elem h topDirs))
+    )
+    |> lib.unique;
 
   # `flake/policies.nix#agent-prose-budget` in a comment is a citation, the same
   # relation a document writes in brackets; `flake/policies.nix` alone is a path.
   # `#<id>` and `#id` write the convention down; they are not citations of a rule.
   placeholderIds = ["id" "policy-id"];
   policyRefs = body: let
-    parts = builtins.filter builtins.isString (builtins.split "flake/policies\\.nix#" body);
+    parts =
+      body
+      |> builtins.split "flake/policies\\.nix#"
+      |> builtins.filter builtins.isString;
   in
     if builtins.length parts <= 1
     then []
     else
-      lib.unique (
-        builtins.filter (id: id != null && !(builtins.elem id placeholderIds)) (
-          map (chunk: let
-            m = builtins.match "([a-z0-9][a-z0-9-]*).*" chunk;
-          in
-            if m == null
-            then null
-            else builtins.head m)
-          (builtins.tail parts)
-        )
-      );
+      parts
+      |> builtins.tail
+      |> map (
+        chunk: let
+          m = builtins.match "([a-z0-9][a-z0-9-]*).*" chunk;
+        in
+          if m == null
+          then null
+          else builtins.head m
+      )
+      |> builtins.filter (id: id != null && !(builtins.elem id placeholderIds))
+      |> lib.unique;
 
   # `task <name>` is a pointer into the recipe book; the name set lives in
   # `taskfiles/*.yml`, so resolution is a script's job (`checks:nix:comments`).
   taskRefs = body: let
-    parts = builtins.filter builtins.isString (builtins.split "task " body);
-    pick = chunk: let
-      raw = builtins.head (builtins.split "[^A-Za-z0-9:_*/-]" chunk);
-    in
-      lib.removeSuffix "." (lib.removeSuffix "," (lib.removeSuffix ":" raw));
+    parts =
+      body
+      |> builtins.split "task "
+      |> builtins.filter builtins.isString;
+    pick = chunk:
+      chunk
+      |> builtins.split "[^A-Za-z0-9:_*/-]"
+      |> builtins.head
+      |> lib.removeSuffix ":"
+      |> lib.removeSuffix ","
+      |> lib.removeSuffix ".";
   in
-    builtins.filter (
+    parts
+    |> builtins.tail
+    |> map pick
+    |> builtins.filter (
       n: builtins.match "[a-z0-9][a-z0-9:_*/-]*:[A-Za-z0-9*][A-Za-z0-9:_*/-]*" n != null
-    )
-    (map pick (builtins.tail parts));
+    );
 
   attrRefs = body: let
-    parts = builtins.filter builtins.isString (builtins.split "\\.#" body);
+    parts =
+      body
+      |> builtins.split "\\.#"
+      |> builtins.filter builtins.isString;
   in
     if builtins.length parts <= 1
     then []
     else
-      builtins.filter (a: a != null) (
-        map (chunk: let
+      parts
+      |> builtins.tail
+      |> map (
+        chunk: let
           m = builtins.match "([A-Za-z0-9_-]+).*" chunk;
         in
           if m == null
           then null
-          else builtins.head m)
-        (builtins.tail parts)
-      );
+          else builtins.head m
+      )
+      |> builtins.filter (a: a != null);
 
-  occurrences = pat: text: builtins.length (builtins.filter builtins.isString (builtins.split pat text)) - 1;
+  occurrences = pat: text:
+    text
+    |> builtins.split pat
+    |> builtins.filter builtins.isString
+    |> builtins.length
+    |> (n: n - 1);
 
   # A line inside a multi-line string is content, not a comment: the toggle is the
   # delimiter count on lines that are not themselves comments. `''$` is an escape
@@ -95,13 +126,17 @@
   # the header/dated ceilings a live file is held to.
   scanFile = p: let
     shadow = lib.hasSuffix ".shadow.nix" p;
-    lines = lib.splitString "\n" (builtins.readFile (root + "/${p}"));
+    lines =
+      root
+      + "/${p}"
+      |> builtins.readFile
+      |> lib.splitString "\n";
     indexed =
-      lib.imap0 (i: l: {
+      lines
+      |> lib.imap0 (i: l: {
         line = i + 1;
         text = l;
-      })
-      lines;
+      });
     step = acc: cur: let
       trimmed = lib.trim cur.text;
       quotes = occurrences "''" cur.text - occurrences "''\\$" cur.text;
@@ -147,51 +182,64 @@
         inherit (acc) entries;
       };
     out =
-      builtins.foldl' step {
+      indexed
+      |> builtins.foldl' step {
         inside = false;
         entries = [];
-      }
-      indexed;
+      };
   in
     out.entries;
 
-  entries = lib.concatMap scanFile paths;
+  entries = paths |> lib.concatMap scanFile;
 
-  countOf = k: builtins.length (builtins.filter (e: e.kind == k) entries);
+  countOf = k: entries |> builtins.filter (e: e.kind == k) |> builtins.length;
 
   # Where the prose actually sits, so a cleanup has an address instead of a total.
-  headerPerFile = builtins.listToAttrs (map (p: let
-      n = builtins.length (builtins.filter (e: e.file == p && e.kind == "header") entries);
-    in {
-      name = p;
-      value = n;
-    })
-    paths);
-  worst = lib.take 12 (
-    lib.sort (a: b: a.lines > b.lines) (lib.mapAttrsToList (path: lines: {inherit path lines;}) headerPerFile)
-  );
+  headerPerFile =
+    paths
+    |> map (
+      p: {
+        name = p;
+        value = entries |> builtins.filter (e: e.file == p && e.kind == "header") |> builtins.length;
+      }
+    )
+    |> builtins.listToAttrs;
+  worst =
+    headerPerFile
+    |> lib.mapAttrsToList (path: lines: {inherit path lines;})
+    |> lib.sort (a: b: a.lines > b.lines)
+    |> lib.take 12;
 
-  policyCites = lib.concatMap (e:
-    map (id: {
-      inherit (e) file line;
-      inherit id;
-    })
-    e.policy)
-  entries;
-  taskCites = lib.concatMap (e:
-    map (name: {
-      inherit (e) file line;
-      inherit name;
-    })
-    e.task)
-  entries;
-  pathCites = lib.concatMap (e:
-    map (p: {
-      inherit (e) file line;
-      path = p;
-    })
-    e.path)
-  entries;
+  policyCites =
+    entries
+    |> lib.concatMap (
+      e:
+        e.policy
+        |> map (id: {
+          inherit (e) file line;
+          inherit id;
+        })
+    );
+  taskCites =
+    entries
+    |> lib.concatMap (
+      e:
+        e.task
+        |> map (name: {
+          inherit (e) file line;
+          inherit name;
+        })
+    );
+  pathCites =
+    entries
+    |> lib.concatMap (
+      e:
+        e.path
+        |> map (p: {
+          inherit (e) file line;
+          path = p;
+        })
+    );
 in {
   files = builtins.length paths;
   comments = builtins.length entries;
@@ -203,13 +251,19 @@ in {
   kinds = {
     policy = builtins.length policyCites;
     task = builtins.length taskCites;
-    attr = builtins.length (lib.concatMap (e: e.attr) entries);
+    attr = entries |> lib.concatMap (e: e.attr) |> builtins.length;
     path = builtins.length pathCites;
   };
-  unresolvedPaths = lib.unique (builtins.filter (c: !(builtins.pathExists (root + "/${c.path}"))) pathCites);
+  unresolvedPaths =
+    pathCites
+    |> builtins.filter (c: !(builtins.pathExists (root + "/${c.path}")))
+    |> lib.unique;
   inherit policyCites taskCites worst headerPerFile;
-  ruleLines = map (e: {
-    inherit (e) file line body;
-  }) (builtins.filter (e: e.kind == "rule") entries);
+  ruleLines =
+    entries
+    |> builtins.filter (e: e.kind == "rule")
+    |> map (e: {
+      inherit (e) file line body;
+    });
   root = rootStr;
 }

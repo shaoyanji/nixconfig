@@ -5,7 +5,7 @@
 }: let
   inherit (lib) mkOption types;
 
-  raw = builtins.fromTOML (builtins.readFile src);
+  raw = src |> builtins.readFile |> builtins.fromTOML;
 
   # Shorthands: every field is optional with an empty default, so a host only
   # states what it knows and the compiled record is uniform.
@@ -255,7 +255,8 @@
         net
         // {
           links =
-            map (
+            net.links
+            |> map (
               l:
                 l
                 // {
@@ -264,12 +265,11 @@
                     then "${l.scheme}://${net.tailscale_hostname}.${net.tailnet_domain}:${toString l.port}${l.path}"
                     else null;
                 }
-            )
-            net.links;
+            );
         };
     };
 
-  hosts = builtins.mapAttrs (_: withLinkUrls) evaluated.config.hosts;
+  hosts = evaluated.config.hosts |> builtins.mapAttrs (_: withLinkUrls);
   metadata = evaluated.config.metadata;
   repos = evaluated.config.repos;
 
@@ -278,14 +278,14 @@
   # ONE answer instead of each re-deriving it — the bug that gated a cloud host on
   # a LAN cache it cannot reach.
   cachePolicy = import ./cache-policy.nix {inherit lib;};
-  names = lib.attrNames hosts;
+  names = hosts |> lib.attrNames;
 
   isNixHost = host: host.kind != "external";
 
-  nixHosts = lib.filterAttrs (_: isNixHost) hosts;
-  externalHosts = lib.filterAttrs (_: host: !isNixHost host) hosts;
+  nixHosts = hosts |> lib.filterAttrs (_: isNixHost);
+  externalHosts = hosts |> lib.filterAttrs (_: host: !isNixHost host);
 
-  count = pred: lib.length (lib.filter pred (lib.attrValues hosts));
+  count = pred: hosts |> lib.attrValues |> lib.filter pred |> lib.length;
 
   # The single source of truth for fleet size and composition.
   derived = {
@@ -295,8 +295,8 @@
     activeExternal = count (h: h.status == "active" && !isNixHost h);
     wip = count (h: h.status == "wip");
     preserved = count (h: h.status == "preserved");
-    nix = lib.length (lib.attrNames nixHosts);
-    external = lib.length (lib.attrNames externalHosts);
+    nix = nixHosts |> lib.attrNames |> lib.length;
+    external = externalHosts |> lib.attrNames |> lib.length;
   };
 
   declaredCounts = {
@@ -339,8 +339,8 @@
     (lib.mapAttrsToList
       (name: host: let
         svcs = host.software.services;
-        names = map (s: s.name) svcs;
-        ports = map (s: s.port) (builtins.filter (s: s.port != null) svcs);
+        names = svcs |> map (s: s.name);
+        ports = svcs |> builtins.filter (s: s.port != null) |> map (s: s.port);
       in
         lib.optional (builtins.any (s: s.name == "") svcs)
         "hosts.${name}: a software.services entry has an empty name"
@@ -370,7 +370,7 @@ in
     ok = issues == [];
     # Every Nix-kind host the flake is expected to build. The coverage check
     # compares this against the flake's own output set.
-    flakeHosts = lib.filterAttrs (_: h: isNixHost h && h.flake) hosts;
+    flakeHosts = hosts |> lib.filterAttrs (_: h: isNixHost h && h.flake);
     # Per-host lookup that fails loudly rather than returning null.
     host = name: hosts.${name} or (throw "inventory: no such host '${name}' in ${toString src}");
     # `.#inventory.cache.<host>`: substituters, trusted keys, where it is warmed

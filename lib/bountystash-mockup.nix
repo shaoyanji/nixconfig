@@ -4,17 +4,17 @@
 {
   pkgs,
   lib ? pkgs.lib,
-  data ? builtins.fromJSON (builtins.readFile ./bountystash-mockup/data.json),
-  dataDe ? builtins.fromJSON (builtins.readFile ./bountystash-mockup/data.de.json),
+  data ? ./bountystash-mockup/data.json |> builtins.readFile |> builtins.fromJSON,
+  dataDe ? ./bountystash-mockup/data.de.json |> builtins.readFile |> builtins.fromJSON,
 }: let
   esc = lib.escapeXML;
   base = "https://concept.bountystash.com/";
 
   render = file: values: let
-    text = builtins.readFile file;
-    names = builtins.attrNames values;
-    out = lib.replaceStrings (map (n: "{{${n}}}") names) (map (n: toString values.${n}) names) text;
-    unbound = lib.head (lib.splitString "}}" (lib.last (lib.splitString "{{" out)));
+    text = file |> builtins.readFile;
+    names = values |> builtins.attrNames;
+    out = text |> lib.replaceStrings (names |> map (n: "{{${n}}}")) (names |> map (n: toString values.${n}));
+    unbound = out |> lib.splitString "{{" |> lib.last |> lib.splitString "}}" |> lib.head;
   in
     if lib.hasInfix "{{" out
     then throw "template ${toString file}: unbound placeholder {{${unbound}}}"

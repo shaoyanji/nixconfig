@@ -38,15 +38,15 @@
   # Callers therefore pass context-free text; see `readInfo` below.
   # Home: docs/task-control-plane.md §"Nix-native counterpart".
   parseRegistration = text: let
-    lines = lib.splitString "\n" (lib.removeSuffix "\n" text);
+    lines = text |> lib.removeSuffix "\n" |> lib.splitString "\n";
     n = length lines;
     go = i: acc:
       if i >= n
       then lib.reverseList acc
       else let
-        path = elemAt lines i;
-        narSize = fromJSON (elemAt lines (i + 2));
-        refCount = fromJSON (elemAt lines (i + 4));
+        path = lines |> (xs: elemAt xs i);
+        narSize = lines |> (xs: elemAt xs (i + 2)) |> fromJSON;
+        refCount = lines |> (xs: elemAt xs (i + 4)) |> fromJSON;
       in
         go (i + 5 + refCount) (
           [
@@ -65,7 +65,7 @@
 
   # Read a file out of the closure-info derivation without dragging the
   # derivation's store-path context into the values derived from it.
-  readInfo = path: builtins.unsafeDiscardStringContext (readFile path);
+  readInfo = path: path |> readFile |> builtins.unsafeDiscardStringContext;
 
   # Subsystem buckets. Order matters — first match wins, exactly as in the
   # shell's `case`, so the two rollups stay comparable.
@@ -128,7 +128,7 @@
     len = lib.stringLength s;
   in
     if width > len
-    then lib.concatStrings (lib.genList (_: " ") (width - len)) + s
+    then (width - len) |> lib.genList (_: " ") |> lib.concatStrings |> (pad: pad + s)
     else s;
 
   # --- human-readable sizes ---------------------------------------------------
@@ -162,32 +162,34 @@
       1125899906842624
     ];
     pick = i:
-      if i + 1 < length divisors && bytes >= elemAt divisors (i + 1)
+      if i + 1 < length divisors && bytes >= (divisors |> (xs: elemAt xs (i + 1)))
       then pick (i + 1)
       else i;
     idx = pick 0;
-    d = elemAt divisors idx;
+    d = divisors |> (xs: elemAt xs idx);
     scaled = div (bytes * 10 + d - 1) d; # ceil(bytes*10/d)
     whole = div scaled 10;
     frac = scaled - whole * 10;
-  in "${toString whole}.${toString frac}${elemAt units idx}";
+  in "${toString whole}.${toString frac}${units |> (xs: elemAt xs idx)}";
 
   rollupOf = entries: let
-    annotated = map (e: e // {sub = subsystemOf e.name;}) entries;
-    subs = lib.unique (map (e: e.sub) annotated);
+    annotated = entries |> map (e: e // {sub = e.name |> subsystemOf;});
+    subs = annotated |> map (e: e.sub) |> lib.unique;
     oneSub = sub: let
-      sel = builtins.filter (e: e.sub == sub) annotated;
+      sel = annotated |> builtins.filter (e: e.sub == sub);
     in {
       name = sub;
-      bytes = lib.foldl' (a: e: a + e.narSize) 0 sel;
+      bytes = sel |> lib.foldl' (a: e: a + e.narSize) 0;
       paths = length sel;
-      top = lib.sort bySizeDescName sel;
+      top = sel |> lib.sort bySizeDescName;
     };
   in
-    lib.sort (a: b:
+    subs
+    |> map oneSub
+    |> lib.sort (a: b:
       if a.bytes != b.bytes
       then a.bytes > b.bytes
-      else a.name < b.name) (map oneSub subs);
+      else a.name < b.name);
 in rec {
   inherit
     parseRegistration
@@ -213,15 +215,16 @@ in rec {
     topN ? 15,
     topPerSubsystem ? 8,
   }: let
-    declared = map (r:
-      if isString r
-      then storePath r
-      else r)
-    roots;
+    declared =
+      roots
+      |> map (r:
+        if isString r
+        then storePath r
+        else r);
     info = pkgs.closureInfo {rootPaths = declared;};
-    entries = parseRegistration (readInfo "${info}/registration");
-    totalBytes = fromJSON (readInfo "${info}/total-nar-size");
-    rollup = map (s: s // {top = lib.take topPerSubsystem s.top;}) (rollupOf entries);
+    entries = "${info}/registration" |> readInfo |> parseRegistration;
+    totalBytes = "${info}/total-nar-size" |> readInfo |> fromJSON;
+    rollup = entries |> rollupOf |> map (s: s // {top = s.top |> lib.take topPerSubsystem;});
   in {
     inherit host entries totalBytes rollup;
     rootPath = toString (head declared);
@@ -231,10 +234,10 @@ in rec {
       then rootLabel
       else toString (head declared);
     pathCount = length entries;
-    top = lib.take topN (lib.sort bySizeDesc entries);
+    top = entries |> lib.sort bySizeDesc |> lib.take topN;
     infoPath = toString info;
     # sum of the parsed narSizes — a self-check against total-nar-size
-    sumNarSize = lib.foldl' (a: e: a + e.narSize) 0 entries;
+    sumNarSize = entries |> lib.foldl' (a: e: a + e.narSize) 0;
   };
 
   # --- renderers --------------------------------------------------------------
@@ -246,17 +249,17 @@ in rec {
     + "  size:  ${human g.totalBytes} (${toString g.totalBytes} bytes)\n";
 
   renderSubsystems = g:
-    lib.concatMapStrings (
+    g.rollup
+    |> lib.concatMapStrings (
       s: let
         pct =
           if g.totalBytes != 0
           then fmt1 (100.0 * s.bytes / g.totalBytes)
           else "0.0";
       in "${padLeft 12 (human s.bytes)}  ${padLeft 5 pct}%  ${padLeft 4 (toString s.paths)} pkgs  ${s.name}\n"
-    )
-    g.rollup;
+    );
 
-  renderTop = g: lib.concatMapStrings (e: "${padLeft 12 (human e.narSize)}  ${e.base}\n") g.top;
+  renderTop = g: g.top |> lib.concatMapStrings (e: "${padLeft 12 (human e.narSize)}  ${e.base}\n");
 
   toTOML = g: let
     block = s: let
@@ -264,9 +267,10 @@ in rec {
       # newlines — so its last row ends up glued to the closing bracket
       # (`...,]`). Reproduced verbatim so the two TOMLs are byte-identical;
       # it is a quirk of the baseline, not a design choice.
-      rows = lib.concatStringsSep "\n" (
-        map (e: "  { name = \"${e.name}\", bytes = ${toString e.narSize} },") s.top
-      );
+      rows =
+        s.top
+        |> map (e: "  { name = \"${e.name}\", bytes = ${toString e.narSize} },")
+        |> lib.concatStringsSep "\n";
     in
       "[closure.subsystems.${s.name}]\n"
       + "bytes = ${toString s.bytes}\n"
@@ -286,7 +290,7 @@ in rec {
     + "system = \"${g.rootName}\"\n"
     + "total_bytes = ${toString g.totalBytes}\n"
     + "path_count = ${toString g.pathCount}\n\n"
-    + lib.concatStrings (map block g.rollup);
+    + (g.rollup |> map block |> lib.concatStrings);
 
   toDOT = g: let
     node = s:
@@ -297,6 +301,6 @@ in rec {
     + "  rankdir=LR;\n"
     + "  node [shape=box, fontname=\"monospace\"];\n"
     + "  root [label=\"${g.host}:${g.rootName}\\n${human g.totalBytes}\"];\n"
-    + lib.concatStringsSep "\n" (map node (lib.take 16 g.rollup))
+    + (g.rollup |> lib.take 16 |> map node |> lib.concatStringsSep "\n")
     + "\n}\n";
 }

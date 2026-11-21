@@ -169,14 +169,15 @@
 
       mkdir -p "$dir"
       bash ${../../scripts/task/xs-agent-turns-export.sh} "$out"
-      ${lib.optionalString (cfg.backup.pushTo != "") ''
-        # `--delete` is safe because this destination is the mirror of this one
-        # tree; `--delay-updates` installs each file at the end of the transfer,
-        # so a snapshot taken mid-run cannot catch a half-written dump.
-        rsync -a --delete --delay-updates \
-          -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${stateDir}/known_hosts -i ${cfg.backup.pushKeyFile}" \
-          "$dir/" "${cfg.backup.pushTo}"
-      ''}
+      ${''
+          # `--delete` is safe because this destination is the mirror of this one
+          # tree; `--delay-updates` installs each file at the end of the transfer,
+          # so a snapshot taken mid-run cannot catch a half-written dump.
+          rsync -a --delete --delay-updates \
+            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${stateDir}/known_hosts -i ${cfg.backup.pushKeyFile}" \
+            "$dir/" "${cfg.backup.pushTo}"
+        ''
+        |> lib.optionalString (cfg.backup.pushTo != "")}
       find "$dir" -mindepth 1 -maxdepth 1 -type d -name '20??-*' -mtime "+${toString cfg.backup.retain}" -exec rm -rf {} +
     '';
     onCalendar = cfg.backup.startAt;

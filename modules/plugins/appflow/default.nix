@@ -97,11 +97,14 @@
         "${config.systemd.package}/bin/systemctl --no-block start appflow-resolve.service"
       ];
       Environment =
-        lib.optionals (cfg.notify.url != "") [
-          "NTFY_URL=${cfg.notify.url}"
-          "NTFY_TOPIC=${cfg.notify.topic}"
-          "NTFY_USER=${cfg.notify.user}"
-        ]
+        (
+          [
+            "NTFY_URL=${cfg.notify.url}"
+            "NTFY_TOPIC=${cfg.notify.topic}"
+            "NTFY_USER=${cfg.notify.user}"
+          ]
+          |> lib.optionals (cfg.notify.url != "")
+        )
         ++ lib.optional (cfg.notify.passwordFile != null)
         "NTFY_PASSWORD_FILE=${toString cfg.notify.passwordFile}";
       StateDirectory = "appflow-sync";

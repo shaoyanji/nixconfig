@@ -951,15 +951,18 @@ in {
   # Scheduled jobs: `scheduledJobs` (let block) emits one Type=oneshot service
   # and its driving timer per entry — one skeleton for all six jobs.
   systemd.services =
-    lib.mapAttrs (_: job: job.service) scheduledJobs
-    // {
-      # The 30 G store sits on the data pool, outside the unit's StateDirectory, so
-      # systemd never chowns it; `ollama` is a dynamic user whose uid moved off the
-      # tree (976 -> 61547) and 0.40.4's `mkdir models/manifests-v2` started failing.
-      # `+` runs this as root, before the service user is switched to.
-      ollama.serviceConfig.ExecStartPre = "+${pkgs.coreutils}/bin/chown -R ollama:ollama /Volumes/data/ollama";
-    };
-  systemd.timers = lib.mapAttrs (_: job: job.timer) scheduledJobs;
+    [
+      (scheduledJobs |> lib.mapAttrs (_: job: job.service))
+      {
+        # The 30 G store sits on the data pool, outside the unit's StateDirectory, so
+        # systemd never chowns it; `ollama` is a dynamic user whose uid moved off the
+        # tree (976 -> 61547) and 0.40.4's `mkdir models/manifests-v2` started failing.
+        # `+` runs this as root, before the service user is switched to.
+        ollama.serviceConfig.ExecStartPre = "+${pkgs.coreutils}/bin/chown -R ollama:ollama /Volumes/data/ollama";
+      }
+    ]
+    |> lib.mergeAttrsList;
+  systemd.timers = scheduledJobs |> lib.mapAttrs (_: job: job.timer);
 
   # The interactive remote-control gateway is retired — the cascade drives
   # `agy -p` headless. Unit preserved at hosts/frieren/agy-daemon-web.shadow.nix.

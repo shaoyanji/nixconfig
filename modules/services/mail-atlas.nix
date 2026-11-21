@@ -166,7 +166,7 @@
     };
   };
 
-  enabledQueueJobs = lib.filterAttrs (_: job: job.enable) queueJobs;
+  enabledQueueJobs = queueJobs |> lib.filterAttrs (_: job: job.enable);
 in {
   options.services.mailAtlas = {
     enable = lib.mkEnableOption "the mail atlas (fuzzy search, taxonomy and relation graph)";
@@ -295,8 +295,8 @@ in {
       schema = [./mail-atlas/schema.sql];
     };
 
-    systemd.services = lib.mapAttrs (_: job: job.service) enabledQueueJobs;
-    systemd.timers = lib.mapAttrs (_: job: job.timer) enabledQueueJobs;
+    systemd.services = enabledQueueJobs |> lib.mapAttrs (_: job: job.service);
+    systemd.timers = enabledQueueJobs |> lib.mapAttrs (_: job: job.timer);
 
     services.nginx.virtualHosts.mail-atlas = {
       listen = [

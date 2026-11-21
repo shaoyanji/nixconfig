@@ -14,15 +14,20 @@
   self,
 }: let
   feedHost = name: h: let
-    bullets = label: values: lib.optionalString (values != []) "\n- ${label}: ${lib.concatStringsSep ", " values}";
+    bullets = label: values:
+      values
+      |> lib.concatStringsSep ", "
+      |> (joined: "\n- ${label}: ${joined}")
+      |> lib.optionalString (values != []);
     # Prose fields are whole sentences, not labels. Comma-joining them produced
     # "...plus the sops/nix-index HM modules., Steam runs under ..." — a broken
     # sentence where the reader cannot tell where one note ends. One sub-bullet per
     # entry instead. Short label fields (traits, key services) stay `bullets`.
     prose = label: values:
-      lib.optionalString (values != []) (
-        "\n- ${label}:\n" + lib.concatMapStringsSep "\n" (v: "  - ${v}") values
-      );
+      values
+      |> lib.concatMapStringsSep "\n" (v: "  - ${v}")
+      |> (joined: "\n- ${label}:\n" + joined)
+      |> lib.optionalString (values != []);
     lines =
       [
         "## ${name}"
@@ -106,6 +111,14 @@ in
         let
           m = inventory.metadata;
           d = inventory.derived;
+          hostCards =
+            inventory.nixHosts
+            |> lib.mapAttrsToList feedHost
+            |> lib.concatStringsSep "\n";
+          externalRows =
+            inventory.externalHosts
+            |> lib.mapAttrsToList (name: h: "- ${name}: ${h.role} (${h.status})")
+            |> lib.concatStringsSep "\n";
         in
           ''
             # ${m.title}
@@ -119,11 +132,11 @@ in
             - wip: ${toString d.wip}, preserved: ${toString d.preserved}
 
           ''
-          + lib.concatStringsSep "\n" (lib.mapAttrsToList feedHost inventory.nixHosts)
+          + hostCards
           + ''
             ## Non-Nix devices
 
-            ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: h: "- ${name}: ${h.role} (${h.status})") inventory.externalHosts)}
+            ${externalRows}
           ''
       );
 

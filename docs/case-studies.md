@@ -1,4 +1,4 @@
-# Showcase — three incidents the architecture caught
+# Case studies — three incidents the architecture caught
 
 Each story is one commit away in `git log`. The point is not the bug; it is
 which plane of the repo caught it, and what that plane cost to build.

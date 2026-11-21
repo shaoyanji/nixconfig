@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T13:07:58Z",
+  "generated": "2026-11-21T13:09:46Z",
   "count": 200,
-  "pin": "97fb213515577916d7acf1516297cd4ae9cd1f61d297b98319dd87a8ad4a7922",
+  "pin": "2fe72d847e1accf094e5c542fe1b64bb5b8b623d32c0355344156c57ea27cc41",
   "turns": [
+    {
+      "id": "80df2eee-fa73-4bb7-92ad-40f44a6ef9d9",
+      "ts": "2026-11-21T13:09:18Z",
+      "source": "devin",
+      "subject": "nixconfig:task-summaries",
+      "action": "landed: checks/dev summary refresh + turns pin | gate: pre-push pins+images PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bcf9d21cd05dae9856758fc60bcb5856b901933d",
+      "branch": "main",
+      "frame": "03h9ztrb07k1ikxvpz50v6nx0"
+    },
     {
       "id": "829badb3-9590-4186-a370-5c808f1e8f96",
       "ts": "2026-11-21T12:56:04Z",
@@ -2741,19 +2754,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9votjrl9eu9aogn8xf7fws"
-    },
-    {
-      "id": "6c5b44f7-e1a9-4fa6-9dc8-f13c36656f0b",
-      "ts": "2026-11-21T00:26:52Z",
-      "source": "freebuff",
-      "subject": "cv:reprove-live-downloads",
-      "action": "landed: re-prove live CV downloads via matt:cv:check (headless Chrome) — verify live server serves CV PDF bytes",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9votimksc34as33ifytxab"
     }
   ]
 }

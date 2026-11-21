@@ -39,7 +39,7 @@ flake/policies ──► 123 checks             # gates that prove, not prose th
 Live render: **[shaoyanji.github.io/nixconfig](https://shaoyanji.github.io/nixconfig)** —
 the compiled documentation site, rebuilt on every push.
 
-Case studies: [`docs/showcase.md`](docs/showcase.md) — three incidents the
+Case studies: [`docs/case-studies.md`](docs/case-studies.md) — three incidents the
 architecture caught, told at commit resolution.
 
 ## Layout

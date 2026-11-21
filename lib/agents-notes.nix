@@ -25,7 +25,7 @@
   openStatuses = ["PROPOSED" "ACCEPTED" "IN FLIGHT" "BLOCKED" "OPEN"];
 
   rel = p: root + "/${p}";
-  exists = p: builtins.pathExists (rel p);
+  exists = p: p |> rel |> builtins.pathExists;
   idOk = id: builtins.match "[a-z0-9][a-z0-9-]*" id != null;
 
   refsOf = n: let
@@ -52,9 +52,9 @@
   hostNames =
     if inventory == null
     then []
-    else builtins.attrNames inventory.hosts;
-  unknownHosts = n: builtins.filter (h: !(builtins.elem h hostNames)) (hostsOf n);
-  missing = xs: builtins.filter (p: !(exists p)) xs;
+    else inventory.hosts |> builtins.attrNames;
+  unknownHosts = n: n |> hostsOf |> builtins.filter (h: !(hostNames |> builtins.elem h));
+  missing = xs: xs |> builtins.filter (p: !(p |> exists));
 
   bodyOf = n: n.body or "";
   bodyLines = n: let
@@ -62,10 +62,10 @@
   in
     if b == ""
     then 0
-    else builtins.length (lib.splitString "\n" (lib.removeSuffix "\n" b));
+    else b |> lib.removeSuffix "\n" |> lib.splitString "\n" |> builtins.length;
   summaryOf = n: n.summary or "";
 
-  noteIds = builtins.attrNames raw;
+  noteIds = raw |> builtins.attrNames;
   claimKindOf = n: claimOf.${n.kind or ""} or null;
 
   # --- validation ------------------------------------------------------------
@@ -90,27 +90,23 @@
     "${id}: kind '${n.kind or ""}' has no claim kind in flake/epistemics.nix noteClaims"
     ++ lib.optional (builtins.stringLength (summaryOf n) > 400)
     "${id}: summary is longer than 400 chars (move detail to body)"
-    ++ map (h: "${id}: refs.hosts names unknown host '${h}'") (unknownHosts n)
-    ++ map (p: "${id}: refs.modules path does not exist: ${p}") (missing (modulesOf n))
-    ++ map (p: "${id}: refs.docs path does not exist: ${p}") (missing (docsOf n))
-    ++ map (_: "${id}: refs.tasks entry is empty") (builtins.filter (t: t == "") (tasksOf n))
-    ++ map (l: "${id}: links names unknown note '${l}'") (
-      builtins.filter (l: !(builtins.elem l noteIds)) (n.links or [])
-    )
-    ++ map (l: "${id}: from names unknown note '${l}'") (
-      builtins.filter (l: !(builtins.elem l noteIds)) (fromOf n)
-    )
-    ++ map (l: "${id}: supersedes names unknown note '${l}'") (
-      builtins.filter (l: !(builtins.elem l noteIds)) (supersedesOf n)
-    )
+    ++ (n |> unknownHosts |> map (h: "${id}: refs.hosts names unknown host '${h}'"))
+    ++ (n |> modulesOf |> missing |> map (p: "${id}: refs.modules path does not exist: ${p}"))
+    ++ (n |> docsOf |> missing |> map (p: "${id}: refs.docs path does not exist: ${p}"))
+    ++ (n |> tasksOf |> builtins.filter (t: t == "") |> map (_: "${id}: refs.tasks entry is empty"))
+    ++ ((n.links or []) |> builtins.filter (l: !(noteIds |> builtins.elem l)) |> map (l: "${id}: links names unknown note '${l}'"))
+    ++ (n |> fromOf |> builtins.filter (l: !(noteIds |> builtins.elem l)) |> map (l: "${id}: from names unknown note '${l}'"))
+    ++ (n |> supersedesOf |> builtins.filter (l: !(noteIds |> builtins.elem l)) |> map (l: "${id}: supersedes names unknown note '${l}'"))
     # Superseding is a two-sided edit, or it is an unrecorded deletion: the new
     # note claims the edge, the old one keeps its body and changes status.
     ++ map (
       l: "${id}: supersedes '${l}', but '${l}' is ${raw.${l}.status or "unknown"} — mark it SUPERSEDED (the record stays) or use `from` if it is not being replaced"
     ) (
-      builtins.filter (
-        l: builtins.elem l noteIds && (raw.${l}.status or "") != "SUPERSEDED"
-      ) (supersedesOf n)
+      n
+      |> supersedesOf
+      |> builtins.filter (
+        l: (noteIds |> builtins.elem l) && (raw.${l}.status or "") != "SUPERSEDED"
+      )
     )
     ++ (
       ((n.links or []) ++ fromOf n ++ supersedesOf n)
@@ -147,7 +143,7 @@
       if depth == 0
       then acc
       else let
-        next = lib.unique (acc ++ lib.concatMap stepOf acc);
+        next = (acc ++ (acc |> lib.concatMap stepOf)) |> lib.unique;
       in
         if builtins.length next == builtins.length acc
         then acc
@@ -162,10 +158,10 @@
 
   # Computed once per note, not once per query: 157 notes is already more than
   # the graph will ever hold, and a closure per call would make `near` quadratic.
-  ancestors = lib.genAttrs noteIds (id: lib.unique (reach id));
-  cyclic = id: builtins.elem id ancestors.${id};
-  descendantsOf = id: builtins.filter (x: builtins.elem id ancestors.${x}) noteIds;
-  replacedByOf = id: builtins.filter (x: builtins.elem id (supersedesOf raw.${x})) noteIds;
+  ancestors = lib.genAttrs noteIds (id: id |> reach |> lib.unique);
+  cyclic = id: ancestors.${id} |> builtins.elem id;
+  descendantsOf = id: noteIds |> builtins.filter (x: ancestors.${x} |> builtins.elem id);
+  replacedByOf = id: noteIds |> builtins.filter (x: raw.${x} |> supersedesOf |> builtins.elem id);
 
   entry = id: n: {
     inherit id;
@@ -195,75 +191,80 @@
   };
 
   entries = lib.genAttrs noteIds (id: entry id raw.${id});
-  entryList = map (id: entries.${id}) noteIds;
-  ordered = lib.sort (a: b: a.id < b.id) entryList;
+  entryList = noteIds |> map (id: entries.${id});
+  ordered = entryList |> lib.sort (a: b: a.id < b.id);
 
   # Two whole-corpus rules, not per-note ones: a cycle in `from` has no single
   # guilty note, and SCHEMA §3's "SUPERSEDED links the replacement" is only
   # true if the replacement actually claims it.
   graphIssues =
-    lib.concatMap (
+    noteIds
+    |> lib.concatMap (
       id:
         lib.optional (cyclic id) "${id}: lineage cycle (from/supersedes returns to this note)"
         ++ lib.optional (
           (raw.${id}.status or "") == "SUPERSEDED" && replacedByOf id == []
         ) "${id}: SUPERSEDED but no note supersedes it — add `supersedes = [\"${id}\"]` to the replacement so the record is not a dead end"
-    )
-    noteIds;
+    );
 
-  issues = lib.concatMap (id: issuesFor id raw.${id}) noteIds ++ graphIssues;
+  issues = (noteIds |> lib.concatMap (id: issuesFor id raw.${id})) ++ graphIssues;
 
-  byStatus = status: builtins.filter (e: e.status == status) entryList;
-  byKind = kind: builtins.filter (e: e.kind == kind) entryList;
-  claimStats = lib.genAttrs (lib.unique (builtins.attrValues claimOf)) (c: let
-    xs = builtins.filter (e: e.claim == c) entryList;
-  in {
-    notes = builtins.length xs;
-    open = builtins.length (builtins.filter (e: builtins.elem e.status openStatuses) xs);
-    evidence = lib.unique (map (e: e.evidence) xs);
-  });
+  byStatus = status: entryList |> builtins.filter (e: e.status == status);
+  byKind = kind: entryList |> builtins.filter (e: e.kind == kind);
+  claimStats =
+    claimOf
+    |> builtins.attrValues
+    |> lib.unique
+    |> (names:
+      lib.genAttrs names (c: let
+        xs = entryList |> builtins.filter (e: e.claim == c);
+      in {
+        notes = builtins.length xs;
+        open = xs |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> builtins.length;
+        evidence = xs |> map (e: e.evidence) |> lib.unique;
+      }));
   claimRows =
-    map (
+    (claimStats |> builtins.attrNames)
+    |> map (
       c: {
         claim = c;
         inherit (claimStats.${c}) notes open evidence;
       }
-    )
-    (builtins.attrNames claimStats);
+    );
 
   indexOf = key:
-    lib.foldl' (
+    entryList
+    |> lib.foldl' (
       acc: e:
-        lib.foldl' (a: v: a // {"${v}" = (a.${v} or []) ++ [e.id];}) acc e.refs.${key}
-    ) {}
-    entryList;
+        e.refs.${key}
+        |> lib.foldl' (a: v: a // {"${v}" = (a.${v} or []) ++ [e.id];}) acc
+    ) {};
 
   counts = {
-    total = builtins.length entryList;
-    byClaim = lib.genAttrs (lib.unique (builtins.attrValues claimOf)) (k: builtins.length (builtins.filter (e: e.claim == k) entryList));
-    byStatus = lib.genAttrs statuses (s: builtins.length (byStatus s));
-    byKind = lib.genAttrs kinds (k: builtins.length (byKind k));
-    open = builtins.length (builtins.filter (e: builtins.elem e.status openStatuses) entryList);
-    leaves = builtins.length (builtins.filter (e: e.leaf) entryList);
-    lineageEdges = builtins.length (lib.concatMap (id: parentsOf raw.${id}) noteIds);
-    withLineage = builtins.length (builtins.filter (e: e.ancestors != []) entryList);
+    total = entryList |> builtins.length;
+    byClaim = claimOf |> builtins.attrValues |> lib.unique |> (names: lib.genAttrs names (k: entryList |> builtins.filter (e: e.claim == k) |> builtins.length));
+    byStatus = statuses |> (names: lib.genAttrs names (s: s |> byStatus |> builtins.length));
+    byKind = kinds |> (names: lib.genAttrs names (k: k |> byKind |> builtins.length));
+    open = entryList |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> builtins.length;
+    leaves = entryList |> builtins.filter (e: e.leaf) |> builtins.length;
+    lineageEdges = noteIds |> lib.concatMap (id: parentsOf raw.${id}) |> builtins.length;
+    withLineage = entryList |> builtins.filter (e: e.ancestors != []) |> builtins.length;
   };
-  byStatusIds = lib.genAttrs statuses (s: map (e: e.id) (byStatus s));
+  byStatusIds = statuses |> (names: lib.genAttrs names (s: s |> byStatus |> map (e: e.id)));
 
   # --- markdown rendering ----------------------------------------------------
-  capitalize = s: lib.toUpper (builtins.substring 0 1 s) + builtins.substring 1 (builtins.stringLength s) s;
+  capitalize = s: (s |> builtins.substring 0 1 |> lib.toUpper) + (s |> builtins.stringLength |> (n: builtins.substring 1 n s));
   statusBadge = e: "`${e.status}`" + lib.optionalString (e.priority != null) " · `${e.priority}`"; # `linkify` is how a ref is rendered: a repository-relative link in the docs
   # tree, or plain code in the site (where the file lives at a different depth).
   refLine = linkify: label: xs:
     lib.optionalString (xs != []) (
       "- **${label}:** "
-      + lib.concatStringsSep ", " (
-        map (x:
+      + (xs
+        |> map (x:
           if label == "hosts" || label == "tasks"
           then "`${x}`"
           else linkify x)
-        xs
-      )
+        |> lib.concatStringsSep ", ")
     );
 
   # Lineage renders like a ref line but every entry is a note, so it goes through
@@ -271,11 +272,11 @@
   # in the site).
   lineageLine = relatedLink: label: xs:
     lib.optionalString (xs != []) (
-      "- **${label}:** " + lib.concatStringsSep ", " (map relatedLink xs)
+      "- **${label}:** " + (xs |> map relatedLink |> lib.concatStringsSep ", ")
     );
 
   lineageRows = e:
-    builtins.filter (r: r.ids != []) [
+    [
       {
         label = "from";
         ids = e.from;
@@ -292,7 +293,8 @@
         label = "led to";
         ids = lib.subtractLists e.replacedBy e.descendants;
       }
-    ];
+    ]
+    |> builtins.filter (r: r.ids != []);
 
   notePageWith = linkify: relatedLink: e:
     "# ${e.title}\n\n"
@@ -300,18 +302,18 @@
     + lib.optionalString (e.claim != null) " · **Claim:** `${e.claim}` (${e.evidence})"
     + lib.optionalString (e.date != null) " · **Updated:** ${e.date}"
     + "\n\n${e.summary}\n\n"
-    + lib.concatStringsSep "\n" (
-      builtins.filter (s: s != "") (
-        [
+    + (
+      ([
           (refLine linkify "hosts" e.refs.hosts)
           (refLine linkify "modules" e.refs.modules)
           (refLine linkify "tasks" e.refs.tasks)
           (refLine linkify "docs" e.refs.docs)
           (lib.optionalString (e.links != [])
-            ("- **Related notes:** " + lib.concatStringsSep ", " (map relatedLink e.links)))
+            ("- **Related notes:** " + (e.links |> map relatedLink |> lib.concatStringsSep ", ")))
         ]
-        ++ map (r: lineageLine relatedLink (capitalize r.label) r.ids) (lineageRows e)
-      )
+        ++ (e |> lineageRows |> map (r: lineageLine relatedLink (capitalize r.label) r.ids)))
+      |> builtins.filter (s: s != "")
+      |> lib.concatStringsSep "\n"
     )
     + "\n"
     + lib.optionalString (e.body != "") "\n${e.body}\n";
@@ -328,70 +330,70 @@
     + "each note links the hosts, modules, tasks and documents it affects; a note\n"
     + "with no such link is a leaf and carries the original intent in prose.\n\n"
     + "| claim | notes | open | evidence |\n| :--- | :--- | :--- | :--- |\n"
-    + lib.concatMapStrings (
-      r: "| `${r.claim}` | ${toString r.notes} | ${toString r.open} | ${lib.concatStringsSep "," (map (x: "`${x}`") r.evidence)} |\n"
-    )
-    claimRows
+    + (claimRows
+      |> lib.concatMapStrings (
+        r: "| `${r.claim}` | ${toString r.notes} | ${toString r.open} | ${r.evidence |> map (x: "`${x}`") |> lib.concatStringsSep ","} |\n"
+      ))
     + "\n"
-    + lib.concatStringsSep "\n" (
-      map (
+    + (kinds
+      |> map (
         k:
           lib.optionalString (byKind k != []) (
             "## ${capitalize k}\n\n"
             + "| id | title | status | claim | refs |\n| :--- | :--- | :--- | :--- | :--- |\n"
-            + lib.concatMapStringsSep "\n" (
-              e:
-                "| [\`${e.id}\`](${base}agents-notes/${e.id}.md) | ${e.title} | ${statusBadge e} | "
-                + lib.optionalString (e.claim != null) "\`${e.claim}\`"
-                + " | "
-                + toString (builtins.length (e.refs.hosts ++ e.refs.modules ++ e.refs.tasks ++ e.refs.docs))
-                + " |"
-            )
-            (lib.filter (e: e.kind == k) ordered)
+            + (ordered
+              |> lib.filter (e: e.kind == k)
+              |> lib.concatMapStringsSep "\n" (
+                e:
+                  "| [\`${e.id}\`](${base}agents-notes/${e.id}.md) | ${e.title} | ${statusBadge e} | "
+                  + lib.optionalString (e.claim != null) "\`${e.claim}\`"
+                  + " | "
+                  + toString (builtins.length (e.refs.hosts ++ e.refs.modules ++ e.refs.tasks ++ e.refs.docs))
+                  + " |"
+              ))
             + "\n"
           )
       )
-      kinds
-    );
+      |> lib.concatStringsSep "\n");
 
   # Paths inside the `.#artifacts.docs` derivation. `base` is the relative prefix back to
   # the repository root, so a ref renders as a working link in the markdown tree.
   pages =
     {"docs/generated/agents-notes.md" = indexPage "";}
-    // lib.mapAttrs' (id: _: lib.nameValuePair "docs/generated/agents-notes/${id}.md" (notePage "../../../" entries.${id})) raw;
+    // (raw |> lib.mapAttrs' (id: _: lib.nameValuePair "docs/generated/agents-notes/${id}.md" (notePage "../../../" entries.${id})));
 
   # Same pages, but refs render as code instead of repo-relative links: the site
   # serves notes from a different depth and has no repository route.
-  sitePages = lib.mapAttrs (_: e: notePageWith (x: "`${x}`") (l: "`${l}`") e) entries;
+  sitePages = entries |> lib.mapAttrs (_: e: notePageWith (x: "`${x}`") (l: "`${l}`") e);
 
   api = {
     schemaVersion = 2;
     inherit counts issues;
     ok = issues == [];
-    index = lib.mapAttrs (_: e: removeAttrs e ["body"]) entries;
+    index = entries |> lib.mapAttrs (_: e: removeAttrs e ["body"]);
     notes = entries;
     appended = entries // turns;
-    turnEntries = builtins.length (builtins.attrNames turns);
+    turnEntries = turns |> builtins.attrNames |> builtins.length;
     byHost = indexOf "hosts";
     byModule = indexOf "modules";
     byTask = indexOf "tasks";
     byDoc = indexOf "docs";
     byStatus = byStatusIds;
-    claims = lib.mapAttrs (_: e: {inherit (e) claim evidence;}) entries;
+    claims = entries |> lib.mapAttrs (_: e: {inherit (e) claim evidence;});
     # One record per note, both directions, all derived. This is what
     # `task ops:notes:lineage` reads — no traversal at query time.
     lineage =
-      lib.mapAttrs (_: e: {
+      entries
+      |> lib.mapAttrs (_: e: {
         inherit (e) from;
         inherit (e) supersedes;
         inherit (e) ancestors;
         inherit (e) descendants;
         inherit (e) replacedBy;
-      })
-      entries;
-    origins = builtins.filter (id: entries.${id}.ancestors == []) noteIds;
-    frontier = builtins.filter (id: entries.${id}.descendants == []) noteIds;
-    open = map (e: e.id) (builtins.filter (e: builtins.elem e.status openStatuses) ordered);
+      });
+    origins = noteIds |> builtins.filter (id: entries.${id}.ancestors == []);
+    frontier = noteIds |> builtins.filter (id: entries.${id}.descendants == []);
+    open = ordered |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> map (e: e.id);
   };
 in {
   inherit api;

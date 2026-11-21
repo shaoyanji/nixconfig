@@ -203,6 +203,20 @@
       }
     }
   '';
+
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
+  # The two measurement halves share a sandbox: strict fs except the paths
+  # each needs to write, keyed by the same mount condition as the fill.
+  mkMeasure = systemdJobs.mkDaemon {
+    unitBase.unitConfig.ConditionPathIsMountPoint = cfg.requireMount;
+    serviceBase = {
+      Type = "oneshot";
+      ProtectSystem = "strict";
+      ProtectHome = true;
+      PrivateTmp = true;
+      NoNewPrivileges = true;
+    };
+  };
 in {
   options.services.steamCache = {
     enable = lib.mkEnableOption "the LAN Steam content cache";
@@ -608,39 +622,27 @@ in {
     # Root, unlike the fill itself: the cache tree is `0700 nginx`, so the
     # account SteamPrefill runs as cannot size it. Same mount condition as the
     # fill — with the stick out there is nothing to measure.
-    systemd.services.steam-prefill-baseline = lib.mkIf cfg.enable {
+    systemd.services.steam-prefill-baseline = lib.mkIf cfg.enable (mkMeasure {
       description = "Steam cache: size the cache before a prefill";
-      unitConfig.ConditionPathIsMountPoint = cfg.requireMount;
       serviceConfig = {
-        Type = "oneshot";
         ExecStart = "${recorder}/bin/steam-prefill-record baseline";
-        ProtectSystem = "strict";
         ReadWritePaths = [cfg.prefill.stateDir];
-        ProtectHome = true;
-        PrivateTmp = true;
-        NoNewPrivileges = true;
       };
-    };
+    });
 
-    systemd.services.steam-prefill-record = lib.mkIf cfg.enable {
+    systemd.services.steam-prefill-record = lib.mkIf cfg.enable (mkMeasure {
       description = "Steam cache: record what the prefill moved";
       # `After` only: the record must run whether the fill succeeded, failed or
       # was skipped by its Conditions. A silent skip is a fact worth recording.
       after = ["steam-prefill.service"];
-      unitConfig.ConditionPathIsMountPoint = cfg.requireMount;
       serviceConfig = {
-        Type = "oneshot";
         ExecStart = "${recorder}/bin/steam-prefill-record record";
-        ProtectSystem = "strict";
         ReadWritePaths = [
           cfg.prefill.stateDir
           (builtins.dirOf cfg.prefill.ledger)
         ];
-        ProtectHome = true;
-        PrivateTmp = true;
-        NoNewPrivileges = true;
       };
-    };
+    });
 
     systemd.timers.steam-prefill = lib.mkIf cfg.prefill.enable {
       description = "Nightly SteamPrefill window";

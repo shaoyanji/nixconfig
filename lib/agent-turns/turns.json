@@ -1,8 +1,140 @@
 {
-  "generated": "2026-11-21T02:47:08Z",
+  "generated": "2026-11-21T02:56:02Z",
   "count": 200,
-  "pin": "ab38f949a8d93f780325e2c48281358694346fb6d6713cdd1a97278d9d0dfc11",
+  "pin": "61e11eb0ecba28db742317c7081230aedaf5bacb96e9a69b61c581b19742b5ed",
   "turns": [
+    {
+      "id": "35fafbb9-3c1c-47a5-9e4f-f0f70f418a79",
+      "ts": "2026-11-21T02:55:10Z",
+      "source": "delphi-freebuff",
+      "subject": "nixconfig:email-triage",
+      "action": "landed: routed email triage to delphi freebuff pane 0:1.1 (jev email_triage margin 0.38)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9whsgxdkeowczejunzzc1k"
+    },
+    {
+      "id": "c240f09b-d794-407a-ae87-bc553d6c841b",
+      "ts": "2026-11-21T02:55:09Z",
+      "source": "devin",
+      "subject": "nixconfig:refactor",
+      "action": "landed: routed nixconfig refactor to devin pane 2.1 (jev nixconfig_refactor margin 0.34)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9whse00pipg5ghurqlcd86"
+    },
+    {
+      "id": "f95fafce-fa75-4c24-ab8c-6346fe6e29f0",
+      "ts": "2026-11-21T02:55:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-ats",
+      "action": "landed: routed ATS quality check to freebuff pane 1.1 (jev cv_quality_ats p=0.82)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9whsb2wk5ijryx1vw43n5n"
+    },
+    {
+      "id": "7e1d847c-663d-444b-ae34-2fcc32005566",
+      "ts": "2026-11-21T02:55:01Z",
+      "source": "delphi-freebuff",
+      "subject": "nixconfig:email-triage",
+      "action": "landed: routed email triage to delphi freebuff pane 0:1.1 (jev email_triage margin 0.38)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9whrgy3l1cghw1i4h03x9e"
+    },
+    {
+      "id": "2b4a2df9-643e-4506-b37d-988780c11e7a",
+      "ts": "2026-11-21T02:55:01Z",
+      "source": "devin",
+      "subject": "nixconfig:refactor",
+      "action": "landed: routed nixconfig refactor to devin pane 2.1 (jev nixconfig_refactor margin 0.34)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9whre2qqteeabi949huw90"
+    },
+    {
+      "id": "dd693839-43b5-499e-b462-6b204297db70",
+      "ts": "2026-11-21T02:55:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-ats",
+      "action": "landed: routed ATS quality check to freebuff pane 1.1 (jev cv_quality_ats p=0.82)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9whrb9fb14odpwxugg2orf"
+    },
+    {
+      "id": "1999322e-a17f-471c-84ed-288d68cc9b4f",
+      "ts": "2026-11-21T02:54:48Z",
+      "source": "devin",
+      "subject": "nixconfig:steam-prefill",
+      "action": "claim: steam-prefill baseline+record measurement pair onto shared tail",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/steam-cache.nix"
+      ],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9whpv696qvauco3mpdio7k"
+    },
+    {
+      "id": "a6cfb830-4809-46af-b1c4-7e46e4c174e3",
+      "ts": "2026-11-21T02:48:37Z",
+      "source": "devin",
+      "subject": "frieren:nixconfig-refactor",
+      "action": "landed: drove devin win2 on nixconfig refactor (strip Shared Config from Draft PR #3); pane confirmed working (Thinking, running git/rg)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9wgier1qer5ej2nzff55km"
+    },
+    {
+      "id": "dfba6e03-9102-4c7a-b722-585f0296ecf8",
+      "ts": "2026-11-21T02:48:36Z",
+      "source": "freebuff",
+      "subject": "frieren:cv-site-gate",
+      "action": "landed: drove freebuff win1 on CV/site gate work (durable gate that every built CV PDF is linked from the site and link targets resolve); pane completed the run and returned to prompt",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9wgicoroa601n6y6xmowec"
+    },
+    {
+      "id": "e657455c-91bd-40a2-a82e-1126ab002899",
+      "ts": "2026-11-21T02:47:20Z",
+      "source": "devin",
+      "subject": "nixconfig:watchdog-timers",
+      "action": "landed: ups-drill + pg-backup-drill + paperless-watchdog onto shared mkTimerJob; 6 units byte-identical frieren+delphi; zettel-graph skipped (divergent), fleetGovernor-parked watchdogs untouched | gate: checks:quick PASS census 6484",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
+      "branch": "main",
+      "frame": "03h9wg9fwsv14ud1abo0z9ydd"
+    },
     {
       "id": "9c5fe5c7-1767-43c2-8152-2c090ede0fca",
       "ts": "2026-11-21T02:46:50Z",
@@ -2559,146 +2691,6 @@
       "base_commit": "e86439530676785dc64eaf5b8454bf90d1921719",
       "branch": "main",
       "frame": "03h9s19gexigf236pthlnn172"
-    },
-    {
-      "id": "d6e40f3b-65ed-4259-91ef-1b1ae720c0e6",
-      "ts": "2026-11-20T13:12:39Z",
-      "source": "devin",
-      "subject": "nixconfig:config-registry-schema",
-      "action": "landed: registry-schema audits .sops.yaml — every keys: anchor must be claimed by a group age list, every *alias must resolve, stale exceptions refused; sopsAnchorExceptions records garnix (garnixMachine repo-key). Bite-tested unrecorded (throws naming &garnix) | gate: checks:quick PASS (registry-schema: 42 sops anchors)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e01885b559ae3cdd9523b76154bb58c2d7d206d1",
-      "branch": "devin/sops-anchor-check",
-      "frame": "03h9s147c3qdf3glulrpebxlw"
-    },
-    {
-      "id": "fa41aac8-a276-483f-b1b3-44a93f74c96b",
-      "ts": "2026-11-20T13:08:38Z",
-      "source": "hermes",
-      "subject": "nixconfig:site-cv-links",
-      "action": "landed: CV audit vs resume.json — full CV Experience is now the resume work list (fibtransponder/nixconfig had read as jobs, fibtransponder printed twice), contact row reads resume profile URLs (XING restored), packet template prints basics.summary, site project copy says no third-party scripts | gate: nix build .#sites.matt-site PASS (typeset 2/2/1/1 pages, site-links 81 links, 4/4 PDFs) | supersedes 03h9s088ykdpp1qd001k56eus, posted before a comment-ceiling refusal",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4522c0d77ca2ccff76763dfb4e6955da7709730d",
-      "branch": "main",
-      "frame": "03h9s0bznjixbv4qk8pniqg2p"
-    },
-    {
-      "id": "89389987-1e01-46ba-b220-0968d5a1c10e",
-      "ts": "2026-11-20T13:08:07Z",
-      "source": "hermes",
-      "subject": "nixconfig:site-cv-links",
-      "action": "landed: CV audit vs resume.json — full CV Experience is now the resume work list (fibtransponder/nixconfig were jobs too, fibtransponder printed twice), contact row reads resume profiles (XING restored, was hardcoded), packet template prints basics.summary, site project copy says no third-party scripts | gate: nix build .#sites.matt-site PASS (typeset 2/2/1/1 pages, site-links 81 links, 4/4 PDFs)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
-      "branch": "main",
-      "frame": "03h9s088ykdpp1qd001k56eus"
-    },
-    {
-      "id": "979acc71-dd9a-490a-879a-b5b4caa37180",
-      "ts": "2026-11-20T13:06:50Z",
-      "source": "devin",
-      "subject": "nixconfig:config-registry-schema",
-      "action": "verified: already delivered — 70dc7f13 on origin/main carries lib/registry-schema.nix (knobPathRoots+exceptions, casing exceptions, umbrellaFamilies census) and checks.<system>.registry-schema wired into checks:quick; rebuilt on current main: 17 knobs/6 ports-as-data/116 check rows/38 hosts, zero departures | gate: nix build checks.registry-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "lib/registry-schema.nix",
-        "flake/checks.nix"
-      ],
-      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
-      "branch": "main",
-      "frame": "03h9rzz8dq0n1czb7k6lyktb0"
-    },
-    {
-      "id": "fba9a4dc-fdcb-4fb9-940e-d281b21f4355",
-      "ts": "2026-11-20T13:05:16Z",
-      "source": "devji",
-      "subject": "nixconfig:apps-loop",
-      "action": "mail-driven tracker pass: attention 16 rows/0 job mail, archive 2000 msgs to 2026-07-28 shows no untracked job mail, 0 replies from parl oa/evoila/workato/octopus/castle, goldbelt+legence rows intact, 9 rows at 12:50 came from a concurrent writer",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
-      "branch": "main",
-      "frame": "03h9rzo9ddeb8s7el38lwhzrp"
-    },
-    {
-      "id": "b3148b22-3fc5-4bfc-a14a-cad60661da19",
-      "ts": "2026-11-20T13:03:24Z",
-      "source": "devin",
-      "subject": "nixconfig:deadnix-cleanup",
-      "action": "landed: chore/deadnix-cleanup recreated on main (old branch was 4mo stale, missing inventory/agent-turns) — zero deadnix drift on 327 gated files; closed real hole: AGENTS.nix+templates+tools were outside ALL_PATHS, widened gate to 332 files + alejandra'd tools/library.nix | gate: deadnix+statix 332 clean, alejandra 332 clean, checks:quick all-content-PASS (iets perf sub-gate misses only in cold worktree, 29ms on main)",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/nix-fmt.sh"
-      ],
-      "files": [
-        "scripts/task/nix-fmt.sh",
-        "tools/library.nix"
-      ],
-      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
-      "branch": "main",
-      "frame": "03h9rzb32omeawca0d3mztwdr"
-    },
-    {
-      "id": "97b0dcd4-54e6-4e2d-bc97-013e4704007a",
-      "ts": "2026-11-20T12:59:04Z",
-      "source": "devin",
-      "subject": "nixconfig:deadnix-cleanup",
-      "action": "claim: dead-code sweep on current main — chore/deadnix-cleanup is 4mo stale (missing inventory.toml/agent-turns); recreating branch on main tip, running deadnix gate",
-      "outcome": "in_progress",
-      "claims": [
-        "*.nix"
-      ],
-      "files": [],
-      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
-      "branch": "main",
-      "frame": "03h9rygoz41f15cfrro0jmafo"
-    },
-    {
-      "id": "c3637ea8-ded7-4d11-b02f-3175562016b0",
-      "ts": "2026-11-20T12:56:02Z",
-      "source": "devin",
-      "subject": "fleet-remote:pr-review",
-      "action": "landed: merged PR #3 (271542e, device-agent docs) and PR #4 (3d47ef3, repo setup) to master — order #3-then-#4, clean as verified; master CI debug runs all success | gate: gh run list master 3x success",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
-      "branch": "main",
-      "frame": "03h9rxvc9colcsvt60phc7zkn"
-    },
-    {
-      "id": "de832d98-0d3a-432b-93a5-b15a24838aa4",
-      "ts": "2026-11-20T12:54:23Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search-loop",
-      "action": "landed: 10 new applications upserted & linked to mail, 0 new monitor replies (Parloa applied/gated, evoila prep, Workato prep, Octopus prep, Castle Tech rejected), attention queue clean, pipeline now 195 tracked (49 applied, 14 prep, 4 screening, 1 interview) | gate: apps:status PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
-      "branch": "main",
-      "frame": "03h9rxjqt671add75t08ixgki"
-    },
-    {
-      "id": "20183696-ad5c-4c7f-9d63-285423635db4",
-      "ts": "2026-11-20T12:51:50Z",
-      "source": "hermes",
-      "subject": "nixconfig:site-cv-links",
-      "action": "landed: case studies and briefs carry the locale's tailored CV in the slim header — lib/matt/article.html gains a cv tuned anchor, mkArticle passes cvHref from pageRoot (cv-energy.pdf / cv-energy-de.pdf), style.css styles .utility .cv | gate: nix build .#sites.matt-site PASS (81 links/15 pages, 4/4 CVs linked; 12 article pages each with exactly one CV link)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
-      "branch": "main",
-      "frame": "03h9rx1qn4tl67k89kuk7sbi5"
     }
   ]
 }

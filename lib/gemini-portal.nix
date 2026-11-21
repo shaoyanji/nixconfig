@@ -4,8 +4,8 @@
 {
   pkgs,
   lib ? pkgs.lib,
-  data ? builtins.fromJSON (builtins.readFile ./bountystash/portfolio.json),
-  dataDe ? builtins.fromJSON (builtins.readFile ./bountystash/portfolio.de.json),
+  data ? ./bountystash/portfolio.json |> builtins.readFile |> builtins.fromJSON,
+  dataDe ? ./bountystash/portfolio.de.json |> builtins.readFile |> builtins.fromJSON,
   # Extra gemtext placed after the index's last section, before its footer: a
   # capsule that is more than the portfolio (the tailnet mail reader) reaches
   # its other pages from the index instead of from a URL you had to know.
@@ -28,14 +28,14 @@
     then "/de/"
     else "/";
 
-  slugs = map (p: slug p.title) data.projects;
+  slugs = data.projects |> map (p: p.title |> slug);
 
-  heading = level: text: "${lib.concatStringsSep "" (lib.genList (_: "#") level)} ${text}";
+  heading = level: text: "${level |> lib.genList (_: "#") |> lib.concatStringsSep ""} ${text}";
   # A gemtext link is a line of its own, and needs a label: clients do not
   # auto-link a bare URL.
   link = url: label: "=> ${url} ${label}";
-  bullets = xs: map (x: "* ${x}") xs;
-  join = lines: lib.concatStringsSep "\n" lines + "\n";
+  bullets = xs: xs |> map (x: "* ${x}");
+  join = lines: (lines |> lib.concatStringsSep "\n") + "\n";
 
   # The three contacts the HTML page publishes; the phone number in the same
   # JSON is not a capsule decision.
@@ -50,13 +50,11 @@
     p = x.profile;
     v = t lang;
     work =
-      lib.imap0 (
-        i: pr: link "${root lang}work/${builtins.elemAt slugs i}.gmi" "${pr.title} — ${pr.period}"
-      )
-      x.projects;
-    stack = lib.concatMap (cat: ["" (heading 3 cat.category) "" (lib.concatStringsSep " · " cat.items)]) x.skills;
-    principles = lib.concatMap (q: ["" (heading 3 q.title) "" q.body]) x.philosophy;
-    education = bullets (map (e: "${e.degree} — ${e.school} (${e.period})") p.education);
+      x.projects
+      |> lib.imap0 (i: pr: link "${root lang}work/${slugs |> (xs: builtins.elemAt xs i)}.gmi" "${pr.title} — ${pr.period}");
+    stack = x.skills |> lib.concatMap (cat: ["" (heading 3 cat.category) "" (cat.items |> lib.concatStringsSep " · ")]);
+    principles = x.philosophy |> lib.concatMap (q: ["" (heading 3 q.title) "" q.body]);
+    education = p.education |> map (e: "${e.degree} — ${e.school} (${e.period})") |> bullets;
   in
     join (
       [
@@ -73,7 +71,7 @@
       ++ contacts p
       ++ ["" (heading 2 v.profile) "" p.bio]
       ++ ["" (heading 2 v.metrics) ""]
-      ++ bullets (map (m: "${m.label} — ${m.value}") x.metrics)
+      ++ (x.metrics |> map (m: "${m.label} — ${m.value}") |> bullets)
       ++ ["" (heading 2 v.work) ""]
       ++ work
       ++ ["" (heading 2 v.stack)]
@@ -105,7 +103,7 @@
   projectDoc = lang: i: let
     x = d lang;
     v = t lang;
-    pr = builtins.elemAt x.projects i;
+    pr = x.projects |> (xs: builtins.elemAt xs i);
   in
     join (
       ["# ${pr.title}" "" "${pr.role} · ${pr.period}" "" pr.description]
@@ -145,13 +143,14 @@ in
     install -m 0644 ${page "index.gmi" (indexDoc "en")} $out/index.gmi
     install -m 0644 ${page "de-index.gmi" (indexDoc "de")} $out/de/index.gmi
 
-    ${lib.concatStringsSep "\n" (lib.imap0 (i: _: ''
-        install -m 0644 ${page "work-${builtins.elemAt slugs i}.gmi" (projectDoc "en" i)} $out/work/${builtins.elemAt slugs i}.gmi
-        install -m 0644 ${page "de-work-${builtins.elemAt slugs i}.gmi" (projectDoc "de" i)} $out/de/work/${builtins.elemAt slugs i}.gmi
+    ${data.projects
+      |> lib.imap0 (i: _: ''
+        install -m 0644 ${page "work-${slugs |> (xs: builtins.elemAt xs i)}.gmi" (projectDoc "en" i)} $out/work/${slugs |> (xs: builtins.elemAt xs i)}.gmi
+        install -m 0644 ${page "de-work-${slugs |> (xs: builtins.elemAt xs i)}.gmi" (projectDoc "de" i)} $out/de/work/${slugs |> (xs: builtins.elemAt xs i)}.gmi
       '')
-      data.projects)}
+      |> lib.concatStringsSep "\n"}
 
     # Pretty-printed: people read these on a gemini client as often as programs do.
-    ${pkgs.jq}/bin/jq . ${page "resume.json" (builtins.toJSON (resume "en"))} > $out/resume.json
-    ${pkgs.jq}/bin/jq . ${page "lebenslauf.json" (builtins.toJSON (resume "de"))} > $out/lebenslauf.json
+    ${pkgs.jq}/bin/jq . ${page "resume.json" ("en" |> resume |> builtins.toJSON)} > $out/resume.json
+    ${pkgs.jq}/bin/jq . ${page "lebenslauf.json" ("de" |> resume |> builtins.toJSON)} > $out/lebenslauf.json
   ''

@@ -18,13 +18,13 @@
     then v * 1000
     else if lib.isString v
     then let
-      m = builtins.match "([0-9]+)(ms|s|min)?" v;
+      m = v |> builtins.match "([0-9]+)(ms|s|min)?";
     in
       if m == null
       then defaultDelayMs
       else let
-        n = lib.toInt (builtins.elemAt m 0);
-        unit = builtins.elemAt m 1;
+        n = m |> (xs: builtins.elemAt xs 0) |> lib.toInt;
+        unit = m |> (xs: builtins.elemAt xs 1);
       in
         if unit == "ms"
         then n
@@ -65,10 +65,14 @@
   # The unit expects a running compositor. Existence is a different question: a
   # unit can be gated correctly by `mkIf` and never appear at all.
   sessionBound = u:
-    (lib.any (t: builtins.elem t (listOf (installSection u) "WantedBy" ++ listOf (installSection u) "RequiredBy"))
-      ["graphical-session.target" "graphical-session-pre.target"])
-    || (lib.any (t: builtins.elem t (listOf (unitSection u) "PartOf" ++ listOf (unitSection u) "Wants" ++ listOf (unitSection u) "Requires"))
-      ["graphical-session.target" "graphical-session-pre.target"]);
+    (
+      ["graphical-session.target" "graphical-session-pre.target"]
+      |> lib.any (t: (listOf (installSection u) "WantedBy" ++ listOf (installSection u) "RequiredBy") |> builtins.elem t)
+    )
+    || (
+      ["graphical-session.target" "graphical-session-pre.target"]
+      |> lib.any (t: (listOf (unitSection u) "PartOf" ++ listOf (unitSection u) "Wants" ++ listOf (unitSection u) "Requires") |> builtins.elem t)
+    );
 
   # Something starts the unit: a target via Install, another unit via
   # PartOf/Wants/Requires, or a timer. A oneshot nobody triggers is dead config.
@@ -76,7 +80,7 @@
     install = installSection u;
     unit = unitSection u;
     named = i: timers.${i}.Timer.Unit or null == "${name}.service";
-    timerActivates = builtins.hasAttr name timers || lib.any named (builtins.attrNames timers);
+    timerActivates = (timers |> builtins.hasAttr name) || (timers |> builtins.attrNames |> lib.any named);
   in
     listOf install "WantedBy"
     != []
@@ -96,14 +100,16 @@
     timers,
     sessionDeclared,
   }: let
-    names = builtins.attrNames services;
-    retirableNames = builtins.filter (n: retirable services.${n}) names;
-    sessionNames = builtins.filter (n: sessionBound services.${n}) names;
-    orphanNames = builtins.filter (n: !(reachable timers n services.${n})) names;
+    names = services |> builtins.attrNames;
+    retirableNames = names |> builtins.filter (n: services.${n} |> retirable);
+    sessionNames = names |> builtins.filter (n: services.${n} |> sessionBound);
+    orphanNames = names |> builtins.filter (n: !(services.${n} |> reachable timers n));
   in
-    lib.optionals (!sessionDeclared) (map (n: "user unit '${n}' is bound to graphical-session.target but this generation declares no compositor — gate its existence on the session capability (programs.niri.enable) instead of enabling it everywhere") sessionNames)
-    ++ map (n: "user unit '${n}' can be retired by systemd's start limit (Restart=${toString (restartOf services.${n})}, RestartSec=${toString (restartDelayOf services.${n})}ms, StartLimitIntervalSec unset) — set StartLimitIntervalSec=0 with RestartSteps/RestartMaxDelaySec, or a RestartSec that cannot fit ${toString burst} starts in ${toString windowMs}ms") retirableNames
-    ++ map (n: "user service '${n}' is started by nothing: no Install.WantedBy/RequiredBy, no PartOf/Wants/Requires, no timer — delete it or give it an entry point") orphanNames;
+    lib.optionals (!sessionDeclared) (
+      sessionNames |> map (n: "user unit '${n}' is bound to graphical-session.target but this generation declares no compositor — gate its existence on the session capability (programs.niri.enable) instead of enabling it everywhere")
+    )
+    ++ (retirableNames |> map (n: "user unit '${n}' can be retired by systemd's start limit (Restart=${services.${n} |> restartOf |> toString}, RestartSec=${services.${n} |> restartDelayOf |> toString}ms, StartLimitIntervalSec unset) — set StartLimitIntervalSec=0 with RestartSteps/RestartMaxDelaySec, or a RestartSec that cannot fit ${burst |> toString} starts in ${windowMs |> toString}ms"))
+    ++ (orphanNames |> map (n: "user service '${n}' is started by nothing: no Install.WantedBy/RequiredBy, no PartOf/Wants/Requires, no timer — delete it or give it an entry point"));
 
   # A system unit this repo declares states its own class at the point of
   # declaration, so there is no registry to drift:
@@ -113,17 +119,18 @@
   fleetRole = u: (unitSection u).X-Fleet-Role or null;
 
   markedSystemViolations = {services}: let
-    names = builtins.attrNames services;
-    role = n: fleetRole services.${n};
-    marked = builtins.filter (n: role n != null) names;
-    unknown = builtins.filter (n: !(builtins.elem (role n) ["daemon" "bounded"])) marked;
-    daemons = builtins.filter (n: role n == "daemon") marked;
-    bounded = builtins.filter (n: role n == "bounded") marked;
+    names = services |> builtins.attrNames;
+    role = n: services.${n} |> fleetRole;
+    marked = names |> builtins.filter (n: role n != null);
+    unknown = marked |> builtins.filter (n: !(["daemon" "bounded"] |> builtins.elem (role n)));
+    daemons = marked |> builtins.filter (n: role n == "daemon");
+    bounded = marked |> builtins.filter (n: role n == "bounded");
   in
-    map (n: "system unit '${n}' has X-Fleet-Role=${toString (role n)}, which is not \"daemon\" or \"bounded\"") unknown
-    ++ map (n: "system unit '${n}' is classified a daemon but sets no Restart= — nothing brings it back after a crash") (builtins.filter (n: restartOf services.${n} == null || restartOf services.${n} == "no") daemons)
-    ++ map (n: "system unit '${n}' is classified a daemon and can be retired by systemd's start limit (Restart=${toString (restartOf services.${n})}, RestartSec=${toString (restartDelayOf services.${n})}ms, StartLimitIntervalSec unset) — set StartLimitIntervalSec=0 with RestartSteps/RestartMaxDelaySec, or reclassify it \"bounded\" with an explicit StartLimitBurst") (builtins.filter (n: retirable services.${n}) daemons)
-    ++ map (n: "system unit '${n}' is classified \"bounded\" without an explicit StartLimitBurst — inheriting the default is not a decision") (builtins.filter (n: !(builtins.hasAttr "StartLimitBurst" (unitSection services.${n}))) bounded);
+    unknown
+    |> map (n: "system unit '${n}' has X-Fleet-Role=${role n |> toString}, which is not \"daemon\" or \"bounded\"")
+    ++ (daemons |> builtins.filter (n: (services.${n} |> restartOf) == null || (services.${n} |> restartOf) == "no") |> map (n: "system unit '${n}' is classified a daemon but sets no Restart= — nothing brings it back after a crash"))
+    ++ (daemons |> builtins.filter (n: services.${n} |> retirable) |> map (n: "system unit '${n}' is classified a daemon and can be retired by systemd's start limit (Restart=${services.${n} |> restartOf |> toString}, RestartSec=${services.${n} |> restartDelayOf |> toString}ms, StartLimitIntervalSec unset) — set StartLimitIntervalSec=0 with RestartSteps/RestartMaxDelaySec, or reclassify it \"bounded\" with an explicit StartLimitBurst"))
+    ++ (bounded |> builtins.filter (n: !(services.${n} |> unitSection |> builtins.hasAttr "StartLimitBurst")) |> map (n: "system unit '${n}' is classified \"bounded\" without an explicit StartLimitBurst — inheriting the default is not a decision"));
 in {
   inherit
     retirable

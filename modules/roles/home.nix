@@ -16,10 +16,11 @@
   ...
 }: let
   has = f: lib.elem f hmUserFeatures;
-  when = f: lib.optionals (has f);
 
-  # Feature → module set. The bulk lives here so `in` is one line per feature.
-  mods = {
+  # Feature → module set. imports is one concatMap over hmUserFeatures, so the
+  # fleet's declared feature order is the import order and a name the table
+  # lacks contributes nothing (or []).
+  features = {
     systemd-policy = [self.modules."systemd-policy"];
     shell = [self.modules."shell"];
     dev = [self.modules."dev"];
@@ -57,13 +58,7 @@
 in {
   imports =
     [self.modules."roles.minimal"]
-    ++ when "systemd-policy" mods.systemd-policy
-    ++ when "shell" mods.shell
-    ++ when "dev" mods.dev
-    ++ when "ai" mods.ai
-    ++ when "browser" mods.browser
-    ++ when "media" mods.media
-    ++ when "desktop" mods.desktop;
+    ++ lib.concatMap (f: features.${f} or []) hmUserFeatures;
 
   # No resident knowledge-graph sidecar: it answered 25 ms faster than the
   # content-keyed graph file and cost 27 MB of BEAM to do it, so it is gone

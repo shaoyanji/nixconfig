@@ -252,7 +252,6 @@ in {
   # Configure network connections interactively with nmcli or nmtui.
   networking.networkmanager.enable = true;
 
-  # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -404,7 +403,6 @@ in {
   # Keep ~/.local/bin on PATH for the session and login shells.
   environment.localBinInPath = true;
 
-  # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
     settings = {

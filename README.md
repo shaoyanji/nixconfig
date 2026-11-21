@@ -2,6 +2,10 @@
 
 ![nixconfig: an elven mage contemplating a constellation of machines built from one flake](https://res.cloudinary.com/de1eajx01/image/upload/f_auto,q_auto,w_1200/assets/repos/nixconfig-v2)
 
+[![nixcachix](https://github.com/shaoyanji/nixconfig/actions/workflows/nixcachix.yml/badge.svg?branch=main)](https://github.com/shaoyanji/nixconfig/actions/workflows/nixcachix.yml)
+[![pages](https://github.com/shaoyanji/nixconfig/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/shaoyanji/nixconfig/actions/workflows/pages.yml)
+[![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **A personal knowledge civilization, compiled.** One flake describes 38 machines
 — a NAS, a netbook, a phone, an Oracle free-tier outpost — and every fact about
 them lives as data a machine can answer, because an operator's memory is the
@@ -476,24 +480,6 @@ Once all hosts have been rebuilt with `ssh.ca.enable = true`, the `authorized-ke
 - The NAS client recovery profile now lives in `modules/profiles/nas-client.nix`, which automounts `/Volumes/data` from the NAS host (`frieren`, previously `thinsandy`) for non-NAS hosts so the compatibility path stays available without relying on `hosts/common/localmounts.nix`.
 - The agent-era tooling (nullclaw, zeroclaw, hermes, xs, pancakes-harness, qwen-code and their modules/scripts/docs) was removed in 2026-09; the git history retains it if anything is ever needed again.
 - The experimental devcontainer configuration was reverted; there is no current repo-provided devcontainer image, so use the Taskfiles, flake outputs, and hosted workflows directly.
-
-## Recent changes
-
-**Last updated: 2026-09-29**
-
-**2026-09-29 — stark + fern hosts added; dank-greeter migration; transitive-input sweep.** Two new hosts joined the fleet: **stark** (Dell Inspiron 24 3477 AIO, i5-7200U + MX110 Pascal dGPU on `legacy_580` with PRIME render offload, eisen-style Steam Big Picture autologin, dual-disk disko with a 1 TB HDD Steam library) and **fern** (HP 15 laptop, Ryzen 3 3250U Vega 3, scratch-style niri desktop autologin, no Steam, single-disk disko). The greeter moved upstream from the dms flake to its own `dank-greeter` repo: all desktop hosts now use `inputs.dank-greeter.nixosModules.default` → `programs.dms-greeter` and `dms` is unpinned again. `globalModulesHome` gained `nixpkgs.config.allowUnfree` so standalone HM hosts (alarm/kali) eval like NixOS hosts do. A new task (`checks:flake:transitive` / `dev:flake:update-transitive`, backed by `scripts/task/flake-transitive-sweep.sh`) sweeps flake.lock transitive pins against upstream heads — a root `nix flake update` leaves those stale. `authorized-keys.nix` now appends two repo-side keys (bitlockerpremium Windows box + a Bitwarden key) to the fetched gist list.
-
-**2026-09-17 — scratch: Steam Remote Play kiosk converted to an eisen-style niri desktop.** The Fujitsu ESPRIMO D556 now runs the `globalModulesNixos` chain (niri + DankMaterialShell greeter, autoLogin, role:heim userland) via `base-desktop-environment.nix`; Steam, the cage kiosk wrapper and the greetd autologin are gone, while the tmpfs/zram IO diet (zram 100%, journald volatile, ~/.cache on tmpfs, fstrim, gentle writeback sysctls) is kept verbatim for the shaky f2fs SSD. Legacy BIOS boot with GRUB on /dev/sda is unchanged. See `.agents/deploy/hosts/scratch.md`.
-
-**2026-09-17 — verntil/orb-cassini host files removed; thinsandy references purged.** Orphaned `hosts/verntil.nix` and `hosts/orb-cassini/` (never registered in the host inventory) were deleted, and remaining live references to the long-decommissioned `thinsandy` were replaced with `frieren` (the current NAS): deploy/logs menus, nas-client skip-list, heim's anki sync URL, nixoshmsymlinks skip-list, pi-hole DNS comments, the stale `checks:nullclaw:smoke:thinsandy` task, and the thinsandy age keys in `.sops.yaml`. Historical migration notes in `docs/history/` intentionally keep their thinsandy mentions.
-
-**2026-08-03 — Poseidon microVM disabled; frieren daily self-upgrade; scratch real disk UUIDs + GRUB; GC consolidation.** The `testvm` microVM on `poseidon` no longer runs — the microvm imports and the `microvm.vms` block in `hosts/poseidon/configuration.nix` are commented out for easy re-enable (microbr bridge/NAT profile included). `frieren` (the NAS) now self-upgrades every morning at 04:00 via the canonical `system.autoUpgrade` module (no hand-rolled timer): it stages `nixos-rebuild boot` from `github:shaoyanji/nixconfig#frieren` first, then reboots into the new generation only if kernel/initrd/kernel-modules changed (`allowReboot`, reached only after a successful boot), otherwise applies a live `switch`. Persistent timer catches up if the NAS was off. `scratch` got its real disk UUIDs from the original machine gist (f2fs root + ext4 /boot) and now boots with GRUB (legacy BIOS) instead of systemd-boot; its redundant 14-day GC was dropped in favour of the global 10-day GC. See `.agents/deploy/hosts/frieren.md` and `.agents/deploy/hosts/scratch.md`.
-
-**2026-09-17 — Agent-era tooling removed.** All agent-era modules (`ai-host`, `hermes-defaults`, `ollama-cloud-defaults`, `nullclaw`/`zeroclaw` + deployment wrappers, `pancakes-harness`, `hermes-ai-mounts`, `ai-services-*`), packages (`nullclaw`, `pancakes-harness`, `qwen-code`, `xs`, `xs-helper`, `xs-materializer`), their scripts/taskfiles/smoke-checks, and the fleet-pattern docs were deleted. `hosts/mtfuji/ai.nix` now only mounts the ollama data subvols and enables ollama; poseidon/garnixMachine/kellerbench agent blocks are gone; the `nullclawFleetContract` check and the `xs-helper` app output were dropped. The tailscale DNS target moved from the decommissioned thinsandy pi-hole IP to frieren's `100.97.61.65`.
-
-**2026-04-30 — Task system consolidation.** Deprecated legacy task aliases and menus, directing users to new `infra:` and `dev:` prefixed tasks. Simplified `checks:nullclaw:smoke` tasks and extended `dev:git` tasks with AI commit integration.
-
-**2026-04-23 — Manifest and dead-code cleanup.** The AI-host manifest system (`taskfiles/ai-host-manifest.json`, `scripts/task/ai-host-*.sh`, and `taskfiles/services-ai-hosts.yml`) was removed. Host menus and validation tasks now use static host lists and direct smoke checks. The `modules/user/ai/` directory and `modules/goodies.nix` were also removed; nothing in active host configs imported them. See the git log for the full decision.
 
 ## Documentation
 

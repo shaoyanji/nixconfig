@@ -1203,7 +1203,7 @@ in {
   # endpoint is coordination state, not a chat relay and not a merge authority.
   services.agentTurns.enable = true;
   # The outcome lane out of the log: a minutely watcher pushes changed turn
-  # outcomes to @Frierenixbot on Telegram (token is the `hermes` sops key,
+  # outcomes to the operator on Telegram (token is the `hermes` sops key,
   # aliased for this service — delphi's own bot keeps its `delphi-telegram`).
   # The shim is loopback on this host, so the poll needs no TLS or tailnet hop.
   services.xsNotify = {

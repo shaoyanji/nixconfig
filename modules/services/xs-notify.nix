@@ -13,10 +13,10 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.xsNotify;
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   xsNotifyScript = pkgs.writeShellApplication {
     name = "xs-notify";

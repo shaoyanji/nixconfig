@@ -4,10 +4,9 @@
 {
   lib,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
-
   # gh takes its token from a file, never from the session environment: an
   # exported GH_TOKEN is world-readable in /proc and in every child process.
   ghcs = pkgs.writeShellScriptBin "ghcs" ''

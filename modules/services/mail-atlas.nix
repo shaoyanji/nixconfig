@@ -4,11 +4,11 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.mailAtlas;
   archive = config.services.emailArchive;
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   # The particle simulation is a real .wat compiled at build time: the artifact
   # is a store path, wabt is a build input, and nothing is generated on the host.

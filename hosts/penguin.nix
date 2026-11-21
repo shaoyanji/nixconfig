@@ -3,9 +3,9 @@
   inputs,
   config,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../modules/global/user.nix;
 in {
   imports = [
     self.modules."shell"

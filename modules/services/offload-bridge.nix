@@ -6,6 +6,7 @@
   lib,
   pkgs,
   user,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.offloadBridge;
@@ -41,8 +42,6 @@
     pkgs.bash
     pkgs.curl
   ];
-
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
   mkJob = systemdJobs.mkTimerJob {Type = "oneshot";};
 
   # The two timer jobs share the skeleton; the table names only what differs.

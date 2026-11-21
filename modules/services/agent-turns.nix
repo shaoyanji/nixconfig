@@ -6,10 +6,10 @@
   lib,
   pkgs,
   user,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.agentTurns;
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   # Upstream publishes a prebuilt arm64 binary per release. Building the crate
   # here would mean compiling Nushell 0.116 on a 2-vCPU guest; the release asset

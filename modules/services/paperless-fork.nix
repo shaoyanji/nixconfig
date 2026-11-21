@@ -4,11 +4,11 @@
   options,
   pkgs,
   lib,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.paperless;
   opt = options.services.paperless;
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   defaultUser = "paperless";
   defaultFont = "${pkgs.liberation_ttf}/share/fonts/truetype/LiberationSerif-Regular.ttf";

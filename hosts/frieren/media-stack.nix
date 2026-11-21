@@ -1,10 +1,9 @@
 {
   pkgs,
   lib,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
-
   # DLNA is a first-party Jellyfin plugin (moved out of core in 10.9). nixpkgs
   # offers neither a `services.jellyfin.plugins` option nor a plugin package, so
   # the ABI-matched release is fetched and dropped into the persistent plugins

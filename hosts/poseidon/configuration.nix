@@ -2,9 +2,9 @@
   self,
   pkgs,
   lib,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
   obsConfig = {
     enable = false;
     plugins = with pkgs.obs-studio-plugins; [

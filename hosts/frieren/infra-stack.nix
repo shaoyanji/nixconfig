@@ -4,14 +4,11 @@
   pkgs,
   config,
   lib,
+  systemdJobs,
+  user,
   ...
 }: let
-  # Primary user constants (modules/global/user.nix is the single source).
-  user = import ../../modules/global/user.nix;
-
   qmdEisenEmbedSync = import ../../modules/scripts/qmd-eisen-embed-sync.nix {inherit pkgs;};
-
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   # The backup whose repository the restore drill below verifies.
   resticBackup = config.services.restic.backups.frieren-local;

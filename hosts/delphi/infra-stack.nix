@@ -4,10 +4,9 @@
   self,
   pkgs,
   lib,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
-
   agentCascadeScript = ''
     run_agent_cascade() {
       local prompt="$1"

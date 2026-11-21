@@ -4,9 +4,9 @@
 {
   self,
   lib,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
 in {
   imports = [self.modules."profiles.base-desktop-environment"];
 

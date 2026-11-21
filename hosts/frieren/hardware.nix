@@ -2,9 +2,9 @@
 {
   config,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
   netbookIp = config.fleet.inventory.hosts.netbook.network.tailscale_ip;
 in {
   # --- Intel QuickSync VA-API ---

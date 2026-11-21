@@ -6,9 +6,9 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
 in {
   imports = [
     ./dns.nix

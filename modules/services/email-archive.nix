@@ -7,9 +7,9 @@
   lib,
   pkgs,
   user,
+  systemdJobs,
   ...
 }: let
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
   cfg = config.services.emailArchive;
 
   # The rclone remote is state, not config, for the same reason the calendar's

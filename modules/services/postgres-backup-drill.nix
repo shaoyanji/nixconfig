@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.postgresBackupDrill;
@@ -141,8 +142,6 @@
     echo "PASS: All PostgreSQL backups successfully verified and restored in ephemeral cluster."
     exit 0
   '';
-
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
   job = systemdJobs.mkTimerJob {Type = "oneshot";} {
     description = "PostgreSQL logical backup verification drill";
     timerDescription = "Scheduled PostgreSQL backup verification drill timer";

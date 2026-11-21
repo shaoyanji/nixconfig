@@ -3,9 +3,9 @@
   config,
   pkgs,
   lib,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
   # Belt-and-suspenders rfkill unblock: the Ideapad EC can boot with BT
   # soft-blocked (Fn+F8 state persisted across reboots). The standalone
   # `rfkill` binary no longer exists in this nixpkgs revision, so clear the

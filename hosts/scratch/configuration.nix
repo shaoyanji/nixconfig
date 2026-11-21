@@ -3,9 +3,9 @@
   self,
   lib,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
 in {
   # Fork, not inheritance: see [[flake/policies.nix#desktop-fork-not-disable]].
   imports = [

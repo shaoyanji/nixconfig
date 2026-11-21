@@ -3,10 +3,9 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
-
   port = 8090;
   root = "/mnt/storage/decision";
   venv = "${root}/laya";

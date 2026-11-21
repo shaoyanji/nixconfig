@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.paperlessWatchdog;
@@ -83,8 +84,6 @@
     echo "PASS: Paperless ingestion pipeline verified."
     exit 0
   '';
-
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
   job = systemdJobs.mkTimerJob {Type = "oneshot";} {
     description = "Paperless document ingestion watchdog and pipeline health probe";
     timerDescription = "Scheduled Paperless ingestion watchdog timer";

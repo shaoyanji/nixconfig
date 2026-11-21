@@ -6,6 +6,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.steamCache;
@@ -203,8 +204,6 @@
       }
     }
   '';
-
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
   # The two measurement halves share a sandbox: strict fs except the paths
   # each needs to write, keyed by the same mount condition as the fill.
   mkMeasure = systemdJobs.mkDaemon {

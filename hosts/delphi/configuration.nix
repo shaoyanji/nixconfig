@@ -4,10 +4,9 @@
   pkgs,
   config,
   lib,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
-
   # The address the whole tailnet points its DNS at (see the route group below).
   # Both this host and frieren bind it on lo and advertise it as the SAME /32,
   # which makes Tailscale treat them as one active/passive failover group: one

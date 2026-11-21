@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.upsSimulationDrill;
@@ -110,8 +111,6 @@
       exit 1
     fi
   '';
-
-  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
   job = systemdJobs.mkTimerJob {Type = "oneshot";} {
     description = "Hardware UPS simulation drill and battery telemetry";
     timerDescription = "Scheduled hardware UPS simulation drill timer";

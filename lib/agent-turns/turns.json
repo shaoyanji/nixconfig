@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-21T05:07:00Z",
+  "generated": "2026-11-21T05:13:20Z",
   "count": 200,
-  "pin": "606ba276dca025b6dc003d9857ac37cb99de8831238f370b9071cf0db84910ad",
+  "pin": "4ad42b5e37c08b3c7720e036a254c841af0b7641f988e5614ccf2800973ffb6d",
   "turns": [
+    {
+      "id": "342a4de6-86d6-43e2-a866-758902803c27",
+      "ts": "2026-11-21T05:08:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-tailnet-serve",
+      "action": "Swept delphi after the 04:33 boot race (7 failed: gemini-tailnet-cert + 6 tailscale-serve-*); retried cert and 8460 front, serve config now has 8460 and answers 200. Gate: systemctl --failed empty, task ops:health ok at 05:08:29Z.",
+      "outcome": "done",
+      "claims": [
+        "modules/services"
+      ],
+      "files": [],
+      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
+      "branch": "main",
+      "frame": "03h9x7unndpmaybtoi95btrer"
+    },
+    {
+      "id": "15cedb18-5655-45ce-a104-ada956de85db",
+      "ts": "2026-11-21T05:07:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:xs-service",
+      "action": "landed: tailscale serve writes serialized after the 04:32 boot race killed 8449; endpoint back, 18 fronts active | gate: checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/service-portal.nix"
+      ],
+      "files": [],
+      "base_commit": "7bb85c4c10bd4d25b4b6b25c784b969abae01246",
+      "branch": "main",
+      "frame": "03h9x7m22esvg934y6e326762"
+    },
     {
       "id": "9666a9ec-d3a0-43c4-b4d7-9ab6d5e3a674",
       "ts": "2026-11-21T05:05:44Z",
@@ -2687,32 +2717,6 @@
       "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
       "branch": "main",
       "frame": "03h9u2j4jphztzzkrpnf0kobk"
-    },
-    {
-      "id": "6e4567bc-4205-4e3e-92d3-9c5d6d8b96e1",
-      "ts": "2026-11-20T19:24:52Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-gate",
-      "action": "landed: pushed to origin/main after integrating two concurrent landings; HEAD 98418659 carries 385986ba (Lebenslauf sticky headings + no hyphenation, docs) and 12d4aab5 (tests/ exempt from the path and credential scans); turns.json conflict resolved by regenerating the snapshot from the shim, pin recomputed; artifact rebuilds byte-identically, site-links 81 links / 4 required PDFs / 16 download anchors | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659afb44457e9f9800af5e3f0a0e55e1a5f",
-      "branch": "main",
-      "frame": "03h9u1trzkbual2tqrdlozoxw"
-    },
-    {
-      "id": "ab3fe832-6d31-4c9d-ad21-4e2922346c78",
-      "ts": "2026-11-20T19:23:05Z",
-      "source": "devin",
-      "subject": "nixconfig:dead-ai-modules",
-      "action": "landed: dropped codex/mods/opencode/agents pre-tier AI modules (registry 168->164), note ref -> personas/; also fixed b6b74414's host-paths fixture tripping repo:paths + policies credential gate (repo-path-ok + quote-split) | gate: drv-equality PASS (17 identical, 13 unchanged) + checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ac35b524073667b748d48444d96e5800179af5d3",
-      "branch": "HEAD",
-      "frame": "03h9u1h995xgji3dxtkjx9t2w"
     }
   ]
 }

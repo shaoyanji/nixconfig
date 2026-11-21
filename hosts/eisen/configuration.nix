@@ -3,9 +3,9 @@
   self,
   pkgs,
   lib,
+  user,
   ...
 }: let
-  user = import ../../modules/global/user.nix;
 in {
   imports = [
     ./hardware-configuration.nix

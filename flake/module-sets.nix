@@ -25,12 +25,17 @@
   # modules, which is the one edge the registry could not name. A module takes
   # `user` as an argument, so the file has one name (`.#modules."global.user"`)
   # and a rename fails `checks.nix-registry` instead of an eval.
+  #
+  # `systemdJobs` joins it for the identical reason: the timer/daemon skeleton
+  # was restated as `import ../../lib/systemd-jobs.nix` in ten service modules
+  # and one host file — the same unnamed edge.
   appendModules = extra: mods: mods ++ extra;
   inventoryModules = [
     {
       _module.args = {
         inherit inventory;
         user = import moduleFiles."global.user";
+        systemdJobs = import self.nixFiles.lib."systemd-jobs.nix" {inherit lib;};
       };
     }
     {

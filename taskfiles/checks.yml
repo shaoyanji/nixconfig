@@ -1672,15 +1672,6 @@ tasks:
     cmds:
       - bash scripts/task/appflow-gate.sh roundtrip
 
-  checks:audit:handoff:
-    desc: Trigger strategic handoff execution on HANDOFF.md on-demand (FORCE_RUN=1)
-    summary: >
-      Forces an immediate full agent cascade execution on /home/devji/HANDOFF.md,
-      evaluating open queue items and executing autonomous promotion candidates.
-    cmds:
-      - systemctl --user set-environment FORCE_RUN=1
-      - systemctl --user start agy-nightly-handoff.service
-      - systemctl --user unset-environment FORCE_RUN
-      - journalctl --user -u agy-nightly-handoff.service -n 30 --no-pager
+
 
 

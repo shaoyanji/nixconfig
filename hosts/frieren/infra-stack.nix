@@ -276,66 +276,6 @@
     }
   '';
 
-  agyHandoffRunner = pkgs.writeShellScript "agy-handoff-runner" ''
-    set -euo pipefail
-
-    HANDOFF_FILE="${user.home}/HANDOFF.md"
-
-    if [ ! -f "$HANDOFF_FILE" ]; then
-      echo "No HANDOFF.md found in ${user.home}. Skipping execution."
-      exit 0
-    fi
-
-    echo "=== [$(date)] Found $HANDOFF_FILE. Preparing execution... ==="
-    ARCHIVE_DIR="${user.home}/.agents/handoffs"
-    mkdir -p "$ARCHIVE_DIR"
-    ARCHIVE_COPY="$ARCHIVE_DIR/HANDOFF-$(date +%Y%m%d_%H%M%S).md"
-    cp "$HANDOFF_FILE" "$ARCHIVE_COPY"
-
-    cd ${user.home}
-
-    # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
-    # The triage document is stored as TOON and read back through the tool, so a
-    # count is structural (any nesting, key order or spacing) instead of a match
-    # on pretty-printed text: the old grep read "0 actionable" on a reformatted
-    # report and silently skipped the cascade below. TOON is the artifact an
-    # agent reads; jq is the program's reader after one decode.
-    TRIAGE_TOON="/tmp/systemone-handoff-triage.toon"
-    OPEN_ITEMS=0
-    ACTIONABLE_COUNT=0
-    if command -v systemone-decision >/dev/null 2>&1; then
-      echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
-      systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" 2>/dev/null \
-        | ${pkgs.llm-agents.toon}/bin/toon -e > "$TRIAGE_TOON" 2>/dev/null || true
-      if [ -s "$TRIAGE_TOON" ]; then
-        OPEN_ITEMS=$(${pkgs.llm-agents.toon}/bin/toon -d < "$TRIAGE_TOON" 2>/dev/null \
-          | ${pkgs.jq}/bin/jq '[.. | objects | select(.status? == "OPEN")] | length' 2>/dev/null || echo 0)
-        ACTIONABLE_COUNT=$(${pkgs.llm-agents.toon}/bin/toon -d < "$TRIAGE_TOON" 2>/dev/null \
-          | ${pkgs.jq}/bin/jq '[.. | objects | select(.category? == "AUTONOMOUS_PROMOTION_CANDIDATE")] | length' 2>/dev/null || echo 0)
-      else
-        echo "=== [$(date)] WARN: triage produced no decodable TOON; counts stay 0 and the gate below decides ===" >&2
-      fi
-      echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found, $ACTIONABLE_COUNT actionable autonomous candidates)."
-    fi
-
-    # --- Trigger Gate: Only invoke heavy LLM cascade if on-demand or actionable tasks exist ---
-    if [ "''${FORCE_RUN:-0}" != "1" ] && [ "''${1:-}" != "--force" ] && [ "$ACTIONABLE_COUNT" -eq 0 ]; then
-      echo "=== [$(date)] Handoff Gate: No actionable autonomous promotion candidates ($OPEN_ITEMS items remain blocked on hardware or documented gaps). Skipping LLM agent cascade. ==="
-      exit 0
-    fi
-
-    ${agentCascadeScript}
-
-    prompt="Please read HANDOFF.md in the current working directory and execute the plan. System One decision triage pre-analysis is available as TOON at /tmp/systemone-handoff-triage.toon ($OPEN_ITEMS open items, $ACTIONABLE_COUNT actionable); decode it with toon -d if you need JSON. The intent is to provide live execution guidance without replacing or deleting the markdown files."
-
-    if run_agent_cascade "$prompt"; then
-      echo "=== [$(date)] Handoff execution finished successfully. Preserved $HANDOFF_FILE in-place. ==="
-    else
-      echo "=== [$(date)] CRITICAL: Handoff execution encountered errors across agent tiers. Preserved $HANDOFF_FILE for inspection. ===" >&2
-      exit 1
-    fi
-  '';
-
   agySystemRunner = pkgs.writeShellScript "agy-system-runner" ''
     set -euo pipefail
 
@@ -417,9 +357,8 @@
 
     # --- STEP 2: System One Decision Triage (Julia-1 & Laya) ---
     echo "=== [$(date)] Step 2: Running System One Decision Triage (Julia-1) ==="
-    # Same contract as the handoff runner: TOON on disk, one decode, structural
-    # count. A grep here reported 0 on any reformatting, which reads as "no TIER 1
-    # repairs" and decides nothing else.
+    # TOON on disk, one decode, structural count. A grep here reported 0 on any
+    # reformatting, which reads as "no TIER 1 repairs" and decides nothing else.
     TRIAGE_TOON="/tmp/systemone-system-triage.toon"
     TIER1_COUNT=0
     if command -v systemone-decision >/dev/null 2>&1; then
@@ -473,7 +412,7 @@
     echo "=== [$(date)] Step 4: Trigger active ($RUN_REASON). Invoking Agent Cascade ==="
     ${agentCascadeScript}
 
-    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, draft a HANDOFF.md for any missing items or recommendations, and update/refine SYSTEM.md in-place with current findings and status. System One decision pre-triage is available as TOON at /tmp/systemone-system-triage.toon ($TIER1_COUNT immediate items flagged); decode it with toon -d if you need JSON. Audit trigger reason: $RUN_REASON."
+    prompt="Please read SYSTEM.md in the current working directory, execute the health and maintenance audits, and update/refine SYSTEM.md in-place with current findings and status. Do not write HANDOFF.md or any handoff file — that channel is closed; open items belong in an xs turn or an AGENTS.nix note. System One decision pre-triage is available as TOON at /tmp/systemone-system-triage.toon ($TIER1_COUNT immediate items flagged); decode it with toon -d if you need JSON. Audit trigger reason: $RUN_REASON."
 
     if run_agent_cascade "$prompt"; then
       echo "=== [$(date)] System maintenance run finished. Pre-run snapshot preserved at $ARCHIVE_COPY ==="
@@ -493,8 +432,9 @@
   # the queue through the day, and each takes the roster's next unkept row with its
   # leftover, which is what makes "more wallpapers" a roster edit rather than a
   # supervised run. The last slot keeps 10 images back so an evening batch does not
-  # start by finding the day already swept. Tools are prepended to PATH because cpg
-  # and agy live in the user profile, not in this script's closure.
+  # start by finding the day already swept. Tools are prepended to PATH: cpg still
+  # lives in the user profile, agy no longer does — the judge needs it from the
+  # closure or every slot fails its verdict step.
   imageDailySlot = slot: total: reserve:
     pkgs.writeShellScript "image-daily-slot-${slot}" ''
       set -uo pipefail
@@ -510,6 +450,7 @@
           pkgs.gnused
           pkgs.ffmpeg
           pkgs.bash
+          pkgs.antigravity-cli
         ]
       }:"$PATH"
       export IMAGES_ROOT=/Volumes/data/pics/generated
@@ -1027,15 +968,6 @@ in {
   services.agentScheduler = {
     enable = true;
     jobs = {
-      # KEEP (deep-slash review): exits before any LLM call when no promotion
-      # candidates exist — see agyHandoffRunner in hosts/frieren/infra-stack.nix.
-      agy-nightly-handoff = {
-        name = "agy-nightly-handoff";
-        description = "Action-gated handoff runner (runs only on autonomous promotion candidates or manual trigger)";
-        schedule = "*-*-* 03:00:00";
-        command = agyHandoffRunner;
-        workingDirectory = "${user.home}";
-      };
       # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
       # hosts/frieren/configuration.nix reads its verdict file; stale pages, task ops:health.
       agy-nightly-system = {

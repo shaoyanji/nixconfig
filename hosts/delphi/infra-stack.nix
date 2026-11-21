@@ -127,61 +127,6 @@
         }
   '';
 
-  agyHandoffRunner = pkgs.writeShellScript "agy-handoff-runner" ''
-        set -euo pipefail
-
-        HANDOFF_FILE="${user.home}/HANDOFF.md"
-
-        if [ ! -f "$HANDOFF_FILE" ]; then
-          echo "No HANDOFF.md found in ${user.home}. Skipping execution."
-          exit 0
-        fi
-
-        echo "=== [$(date)] Found $HANDOFF_FILE. Preparing execution... ==="
-        ARCHIVE_DIR="${user.home}/.agents/handoffs"
-        mkdir -p "$ARCHIVE_DIR"
-        ARCHIVE_COPY="$ARCHIVE_DIR/HANDOFF-$(date +%Y%m%d_%H%M%S).md"
-        cp "$HANDOFF_FILE" "$ARCHIVE_COPY"
-
-        cd "${user.home}"
-
-        # --- System One Decision Triage Preflight (Julia-1 & Laya) ---
-        TRIAGE_REPORT="/tmp/systemone-handoff-triage.json"
-        OPEN_ITEMS=0
-        ACTIONABLE_COUNT=0
-        if command -v systemone-decision >/dev/null 2>&1; then
-          echo "=== [$(date)] Preflight: Running System One decision triage on $HANDOFF_FILE ==="
-          systemone-decision --model julia-1 triage-handoff "$HANDOFF_FILE" > "$TRIAGE_REPORT" || true
-          OPEN_ITEMS=$( (grep -o '"status": "OPEN"' "$TRIAGE_REPORT" || true) | wc -l)
-          ACTIONABLE_COUNT=$( (grep -o '"category": "AUTONOMOUS_PROMOTION_CANDIDATE"' "$TRIAGE_REPORT" || true) | wc -l)
-          echo "System One Handoff Triage: Evaluated $HANDOFF_FILE ($OPEN_ITEMS open items found, $ACTIONABLE_COUNT actionable autonomous candidates)."
-        fi
-
-        # --- Trigger Gate: Only invoke heavy LLM cascade if on-demand or actionable tasks exist ---
-        if [ "''${FORCE_RUN:-0}" != "1" ] && [ "''${1:-}" != "--force" ] && [ "$ACTIONABLE_COUNT" -eq 0 ]; then
-          echo "=== [$(date)] Handoff Gate: No actionable autonomous promotion candidates ($OPEN_ITEMS items remain blocked or documented). Skipping LLM agent cascade. ==="
-          exit 0
-        fi
-
-        ${agentCascadeScript}
-        ${clankerAgentDispatch}
-
-        # One prompt for both lanes: HANDOFF.md is embedded — scripts/task/clanker.sh
-        # jobs can't see ~; file edits stay a local-cascade behavior.
-        prompt="Here is the current HANDOFF.md, verbatim:
-
-    $(cat "$HANDOFF_FILE")
-
-    Execute the plan. System One decision triage pre-analysis ran on this host ($OPEN_ITEMS open items, $ACTIONABLE_COUNT actionable). The intent is to provide live execution guidance without replacing or deleting the markdown files — you cannot modify files here, so return the guidance in your answer."
-
-        if run_via_clanker "$prompt" "$ARCHIVE_DIR" || run_agent_cascade "$prompt"; then
-          echo "=== [$(date)] Handoff execution finished successfully. Preserved $HANDOFF_FILE in-place. ==="
-        else
-          echo "=== [$(date)] CRITICAL: Handoff execution encountered errors across agent tiers. Preserved $HANDOFF_FILE for inspection. ===" >&2
-          exit 1
-        fi
-  '';
-
   agySystemRunner = pkgs.writeShellScript "agy-system-runner" ''
         set -euo pipefail
 
@@ -327,7 +272,7 @@
 
     $(cat "$SYSTEM_FILE")
 
-    Execute the health and maintenance audits it describes and draft a HANDOFF.md for any missing items or recommendations. If you can write files, update SYSTEM.md in-place with current findings; otherwise return the complete updated SYSTEM.md as your final section. System One decision pre-triage ran on this host ($TIER1_COUNT immediate items flagged). Audit trigger reason: $RUN_REASON."
+    Execute the health and maintenance audits it describes. Do not write HANDOFF.md or any handoff file — that channel is closed; open items belong in an xs turn or an AGENTS.nix note. If you can write files, update SYSTEM.md in-place with current findings; otherwise return the complete updated SYSTEM.md as your final section. System One decision pre-triage ran on this host ($TIER1_COUNT immediate items flagged). Audit trigger reason: $RUN_REASON."
 
         if run_via_clanker "$prompt" "$ARCHIVE_DIR"; then
           echo "=== [$(date)] System audit answered by clanker; report archived beside $ARCHIVE_COPY ==="
@@ -393,23 +338,11 @@ in {
   };
 
   # --- Declarative Autonomous Agent Scheduler (EXP-016) -----------------------
-  # Coordinates system maintenance and strategic handoffs with CPU/IO regulation.
+  # Coordinates system maintenance with CPU/IO regulation.
   # Runs after autoUpgrade (04:30) and staggered from frieren's 03:00/05:00 runs.
   services.agentScheduler = {
     enable = true;
     jobs = {
-      # KEEP (deep-slash review): exits before any LLM call when no promotion
-      # candidates exist — see agyHandoffRunner in hosts/delphi/infra-stack.nix.
-      agy-nightly-handoff = {
-        name = "agy-nightly-handoff";
-        description = "Action-gated handoff runner (LLM hop prefers a clanker job; local cascade is the fallback)";
-        schedule = "*-*-* 03:30:00";
-        command = agyHandoffRunner;
-        workingDirectory = "${user.home}";
-        nice = 5;
-        cpuWeight = 300;
-        ioWeight = 300;
-      };
       # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
       # hosts/delphi/infra-stack.nix reads its verdict file; stale pages, task ops:health.
       agy-nightly-system = {

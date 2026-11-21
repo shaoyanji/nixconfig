@@ -42,10 +42,6 @@ name = "checks:typeset"
 kind = "leaf"
 
 [[check]]
-name = "checks:audit:handoff"
-kind = "leaf"
-
-[[check]]
 name = "checks:audit:system"
 kind = "leaf"
 

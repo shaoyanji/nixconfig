@@ -406,6 +406,10 @@ name = "checks:toon:tasks"
 kind = "leaf"
 
 [[check]]
+name = "checks:fusion"
+kind = "leaf"
+
+[[check]]
 name = "checks:uds:docs"
 kind = "leaf"
 

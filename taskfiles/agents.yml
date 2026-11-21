@@ -248,6 +248,38 @@ tasks:
     cmds:
       - bash scripts/task/toolcall.sh --batch
 
+  agents:lane:
+    desc: "Lane router: jev classifies Q= to its deterministic plane, answers, or exits 2 for a reasoner"
+    summary: >
+      scripts/task/agent-lane.sh — the agent-lane-plane primitive. jev-decide
+      classifies the question to the plane that answers it (kg-structure,
+      notes-design, qmd-prose, eval-compiled, ledger-episodic); a `selected`
+      decision dispatches without a model, `needs_review` and `residual` exit 2 —
+      the residue that earns one. Output is TOON ({q, lane, status, probability,
+      answer}); FORMAT=json for a program. The classifier picks a lane, never an
+      action — jev authorises nothing. Exit 0 answered, 2 = hand to a reasoner,
+      1 = jev unreachable.
+    requires:
+      vars: [Q]
+    vars:
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    cmds:
+      - FORMAT="{{.FORMAT}}" bash scripts/task/agent-lane.sh "{{.Q}}"
+
+  agents:lane:corpus:
+    desc: "Measure the lane's selected rate over N xs turn subjects (N=20)"
+    summary: >
+      agent-lane.sh --corpus — classifies the newest N subjects from the local
+      turn log and reports selected/needs_review/errors as TOON. Honest
+      expectation: xs subjects are terse coordination labels
+      (`nixconfig:foo-bar`), not natural-language intents, so they mostly land
+      `needs_review` — the lane's corpus is real questions, and this task is the
+      instrument that proves the difference rather than asserting it.
+    vars:
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    cmds:
+      - FORMAT="{{.FORMAT}}" bash scripts/task/agent-lane.sh --corpus "{{.N | default 20}}"
+
   agents:dispatch:
     desc: "One command for the Infron backup queue: KIND=auto|code|quick, MODEL=auto|primary|backup, AGENT=, DRY=1, JSON=1"
     summary: >

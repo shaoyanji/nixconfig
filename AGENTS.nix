@@ -4913,5 +4913,49 @@
         the generator; the superseded render is a file on disk, not a delivery URL.
       '';
     };
+    agent-lane-plane = {
+      title = "A lane primitive routes intent to a deterministic plane before any model";
+      kind = "experiment";
+      status = "DELIVERED";
+      date = "2026-11-21";
+      summary = "jev-decide classifies intent to the plane that answers it (kg pattern, notes, qmd, eval, ledger) — selected dispatches without a model, needs_review is the residue that earns one. scripts/task/agent-lane.sh behind `agents:lane`, 80% selected on natural questions.";
+      from = ["turns-fusion-plane"];
+      refs = {
+        hosts = ["eisen"];
+        modules = ["taskfiles/agents.yml" "scripts/task/toon-io.sh" "scripts/task/agent-lane.sh" "scripts/task/fusion-check.sh"];
+        tasks = ["agents:call" "agents:lane" "agents:lane:corpus" "checks:fusion"];
+        docs = ["docs/agent-turns.md"];
+      };
+      body = ''
+        The shape is already agreed: compiled Nix and the graph answer
+        deterministically, xs carries coordination, postgres joins retained
+        state (turns-fusion-plane), and a model generates only the residue.
+        Missing is the front door — the same kind of shared contract toon_emit
+        is for output, but for routing: one step that picks the answering lane.
+
+        Hypothesis: `jev-decide classify` over six lane labels routes ≥80% of
+        real agent intents `selected`. ~1 s + ~400 input tokens per call vs a
+        full turn; Laya (512 tokens) is the fallback when Jev is unreachable,
+        Kev-4B only past that. Jev picks a lane, never a provider — that hook
+        does not exist and does not need to.
+
+        Join measurement for the sibling plane, taken 2026-11-21 on
+        lib/agent-turns/turns.json (200 turns, 43 unique claim paths) against
+        .#agentsNotes.index refs (322): 6 exact + 6 prefix path joins — ~28% of
+        all claims, ~half of repo-local ones. jq, not memory — re-run it.
+        Under ~10% on a bigger corpus the path key, and the plane, fails.
+
+        Exit: a `lane`/`agents:call` answer to a corpus question with no model
+        call and the needs_review rate printed, or REJECTED with the rate.
+
+        Landed 2026-11-21: `agents:lane` answers a corpus question with no
+        model call; measured selected rate 8/10 (80%) on natural questions —
+        hypothesis met exactly. The honest caveat the instrument found: xs
+        subjects are coordination labels, not intents — 0/15 select on
+        `agents:lane:corpus`, which is the classifier correctly refusing to
+        guess. checks:fusion gates the sibling projection: fresh, lag ~1.7 h
+        inside the timer pad, 629 turns/236 notes projected on frieren.
+      '';
+    };
   };
 }

@@ -1,8 +1,39 @@
 {
-  "generated": "2026-11-21T08:11:35Z",
+  "generated": "2026-11-21T08:27:17Z",
   "count": 200,
-  "pin": "3aa011fb1f0a311c95e2a9499ee8f8643b746d593afd0d9a3cff3233b9671cbc",
+  "pin": "2ccd4e5111def674293e394276797a18172e517bc38e0bac9b920351fd09c750",
   "turns": [
+    {
+      "id": "b2e159c2-fb96-4c94-a63a-476771d98efb",
+      "ts": "2026-11-21T08:22:14Z",
+      "source": "devin",
+      "subject": "nixconfig:fusion-lane",
+      "action": "claim: building turns-fusion-plane projection (loader + turn/note tables on frieren) + agent-lane-plane primitive | paths: scripts/task/turns-load.sh scripts/task/agent-lane.sh taskfiles/ops.yml taskfiles/agents.yml modules/services/turns-fusion",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/turns-load.sh",
+        "scripts/task/agent-lane.sh",
+        "taskfiles/ops.yml",
+        "taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "f15e3769fa3c6d348b59f83b43c984b940d467ed",
+      "branch": "main",
+      "frame": "03h9y9oltbmm88wpxn03qkda3"
+    },
+    {
+      "id": "62e9d5e5-02f1-4817-be93-51b408c9a381",
+      "ts": "2026-11-21T08:11:40Z",
+      "source": "devin",
+      "subject": "nixconfig:toon-io",
+      "action": "landed: toon-io.sh is the shared emit/ingest contract — all taskfile emitters route through toon_emit, apps:* read verbs emit TOON by default, upsert+import accept TOON records, checks:toon:tasks lints it | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f15e3769fa3c6d348b59f83b43c984b940d467ed",
+      "branch": "main",
+      "frame": "03h9y7m95hqjlikvuyxo0thtb"
+    },
     {
       "id": "98a02cc9-dbc4-4d0a-9eb5-1a5e405e13f2",
       "ts": "2026-11-21T08:03:55Z",
@@ -2707,32 +2738,6 @@
       "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
       "branch": "main",
       "frame": "03h9vgftzkxlipbg82mqri8fr"
-    },
-    {
-      "id": "78635541-fd7a-413d-bdc2-e3c55f15107f",
-      "ts": "2026-11-20T23:35:38Z",
-      "source": "devin",
-      "subject": "fleet-remote:fleet-remote-pr-5",
-      "action": "landed: devin (win2) driven on fleet-remote lane — Jev selected create_fleet_remote_pr (p=0.99, margin=0.98); PR #5 'Device agent worker and tier-1 consent gate' open and verified on GitHub (mergeable, head devin/1795214210-device-agent-worker → master 3d47ef3); nothing new to create, push, or clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vetac3kqjwa3103fj5qfc"
-    },
-    {
-      "id": "5dfbfcda-979d-451a-acea-b39411cc4f2f",
-      "ts": "2026-11-20T23:35:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-ats-review",
-      "action": "landed: freebuff (win1) driven on CV/site lane — Jev selected review_cv_typ (p=0.84, margin=0.71); ATS compliance review of cv.typ + lebenslauf.typ delivered, read-only, no edits, nothing to push",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vet9cpfln4z9zb6u3gjp8"
     }
   ]
 }

@@ -201,6 +201,21 @@ tasks:
     cmds:
       - bash scripts/task/toon-tasks.sh
 
+  checks:fusion:
+    desc: "[gate] turns-fusion projection on frieren: tables non-empty, notes loaded, lag within one timer period"
+    summary: >
+      The turns-fusion-plane exit: scripts/task/fusion-check.sh counts the source
+      snapshot (turns/claims/files/generated), the projected rows on frieren's
+      postgres `fleet` (turn, turn_claim, turn_file, note), and the lag between the
+      snapshot's newest turn and max(turn.ts). The projection is cumulative, so the
+      gate is drift, not equality: fail on an empty table, zero notes, or lag
+      beyond one timer period (~26 h); exit 2 when frieren is unreachable so an
+      unchecked projection is never silently green. ~3 s over ssh, no eval.
+    vars:
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    cmds:
+      - FORMAT="{{.FORMAT}}" bash scripts/task/fusion-check.sh
+
   checks:repo:hostpaths:test:
     desc: Regression fixture for checks:repo:hostpaths (every rule and exception)
     summary: >

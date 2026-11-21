@@ -685,6 +685,16 @@ tasks:
     cmds:
       - bash tests/count-claims/run.sh
 
+  checks:quotient-hash:
+    desc: Property-test lib/quotient-hash.nix (Zeckendorf split, bucket fill)
+    summary: >
+      Every positive integer decomposes uniquely into non-adjacent Fibonacci
+      terms, so the Zeckendorf quotient is the top term's class and the remainder
+      is exact; the bit-split variant is checked for reconstruction and bucket
+      balance. 5000 numbers and 2000 keys in pure eval — no host, no build.
+    cmds:
+      - bash tests/quotient-hash/run.sh
+
   checks:ports:
     desc: Diff THIS machine's declared firewall surface against its live listeners
     summary: >

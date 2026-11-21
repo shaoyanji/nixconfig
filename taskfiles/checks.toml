@@ -6,6 +6,10 @@
 # nobody classifies.
 
 [[check]]
+name = "checks:quotient-hash"
+kind = "leaf"
+
+[[check]]
 name = "checks:appflow"
 kind = "leaf"
 

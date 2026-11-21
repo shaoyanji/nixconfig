@@ -1,8 +1,65 @@
 {
-  "generated": "2026-11-21T07:58:29Z",
+  "generated": "2026-11-21T08:11:35Z",
   "count": 200,
-  "pin": "001eaeb707783f0f1ab7978f0b5a5e23fe9a7b2133b4325a65156a82c56f489f",
+  "pin": "3aa011fb1f0a311c95e2a9499ee8f8643b746d593afd0d9a3cff3233b9671cbc",
   "turns": [
+    {
+      "id": "98a02cc9-dbc4-4d0a-9eb5-1a5e405e13f2",
+      "ts": "2026-11-21T08:03:55Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "landed: devin idle -> classified 'note-change' (p=0.99, margin=0.98); jobby-cli-consolidation AGENTS.nix note task sent; pane Thinking 1m 31s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
+      "branch": "main",
+      "frame": "03h9y63plwmiwmtbrg0tycv5m"
+    },
+    {
+      "id": "1f259f07-43fd-4876-a707-529bfea78018",
+      "ts": "2026-11-21T08:03:54Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff",
+      "action": "landed: freebuff idle -> classified 'publish' (p=0.88, margin=0.83); CV site publish task sent; pane at working... 4s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
+      "branch": "main",
+      "frame": "03h9y63nb9sx39twchkreslii"
+    },
+    {
+      "id": "0ba2bbc9-eebf-4d10-91e1-f5caad738e00",
+      "ts": "2026-11-21T07:58:37Z",
+      "source": "devin",
+      "subject": "nixconfig:appflow-workflow-fix",
+      "action": "landed: client-side appflow surface fixed end to end — apps:list tsv bug, queue:resolve wired, APPS_SYNC shim for delphi-only binary, select.py renamed (stdlib shadow killed drafts), apps:add + stage derivation, apps skill rewrote the workflow | gate: checks:quick PASS + checks:appflow{,:triage,:resolve,:gate} all green",
+      "outcome": "done",
+      "claims": [
+        "scripts/task",
+        "taskfiles/apps.yml",
+        "taskfiles/agents.yml",
+        ".agents/skills/apps"
+      ],
+      "files": [
+        ".agents/skills/apps/SKILL.md",
+        "modules/plugins/appflow/{jdselect.py",
+        "triage.py",
+        "packet.nix",
+        "README.md}",
+        "scripts/task/{appflow-sync.sh",
+        "apps-db.sh",
+        "apps-resolve.sh",
+        "appflow-select.sh}",
+        "taskfiles/{apps.yml",
+        "agents.yml}",
+        "tests/appflow-select/run.sh"
+      ],
+      "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
+      "branch": "main",
+      "frame": "03h9y52hlyirdbdy0jhv9iiku"
+    },
     {
       "id": "0636d130-2826-424e-8b77-ddd3bd8aed77",
       "ts": "2026-11-21T07:51:51Z",
@@ -2676,45 +2733,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9vet9cpfln4z9zb6u3gjp8"
-    },
-    {
-      "id": "3d6b5560-125a-47be-b7b4-cfe835a23f97",
-      "ts": "2026-11-20T23:27:37Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-fleet-remote-pr",
-      "action": "landed: devin fleet-remote PR task (create shaoyanji/fleet-remote repo + PR, then clean dev env; APK build paused per DEVIN_BRIEFING); pane Typing 6s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vd8uw4yj4xy4ofuhy5bmt"
-    },
-    {
-      "id": "ef3e1796-5935-405a-a522-6f95cb8fbd09",
-      "ts": "2026-11-20T23:27:36Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-ats-autoats",
-      "action": "landed: freebuff ATS quality check + autoATS edits on cv.typ/lebenslauf.typ (DEVIN_FREEBUFF_TAB1_TASK, PRIORITY high); pane working... 23s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vd8sy9hfs183zdi3aht2v"
-    },
-    {
-      "id": "811ad8ae-5440-4781-8b8b-1e39deaf27b4",
-      "ts": "2026-11-20T23:21:45Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-android",
-      "action": "residue cont: dropped stash@0 (parked copy of the :8766 hunk, byte-identical to 96b84e2e; archived /tmp/stash0-8766-archived.patch); other lanes' stashes kept | gate: checks:quick PASS (122 ok, 0 fail)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
-      "branch": "main",
-      "frame": "03h9vc3na703nxd96on1xnw99"
     }
   ]
 }

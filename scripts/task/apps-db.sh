@@ -14,6 +14,12 @@
 # Usage: apps-db.sh <list|search|get|update|upsert|overview|queue|export|status|query|doctor> …
 set -euo pipefail
 
+# TOON is the agent boundary: FORMAT=toon|json makes a read verb emit the
+# record itself instead of the terminal table, and `upsert` accepts a TOON
+# record where a JSON one was expected (toon-io.sh is the shared contract).
+# shellcheck source=toon-io.sh
+. "$(dirname "${BASH_SOURCE[0]}")/toon-io.sh"
+
 api=${APPFLOW_API:-https://delphi.cloudforest-kardashev.ts.net:8450}
 # The bare name resolves only where MagicDNS and an ssh alias both carry it;
 # the tailnet FQDN answers from every client.
@@ -64,7 +70,7 @@ usage: apps-db.sh <verb> [args]
   update <id> --status S [--next-action N]
   add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
                              [--notes N] [--category C] [--language L] [--origin O] [--fit N]
-  upsert [file|-]          upsert an application record (JSON on stdin or in a file)
+  upsert [file|-]          upsert an application record (JSON or TOON on stdin or in a file)
   overview                 stage counts
   queue                    messages waiting for agent:apps (the sync drains them hourly)
   export [file|-]          applications.json from the database (snake_case)
@@ -74,26 +80,33 @@ usage: apps-db.sh <verb> [args]
 
 The API is $APPFLOW_API (default: delphi's tailnet mount, port 8450).
 SQL reaches delphi at $DELPHI_HOST (default: the tailnet FQDN).
+Read verbs emit TOON — the record itself is what an agent reads. FORMAT=text
+prints a table for a person, FORMAT=json passes JSON through (toon-io.sh is
+the shared contract). `upsert` accepts TOON where a JSON record was expected.
 EOF
 }
 
 case "$verb" in
   list)
-    curl -fsS -G "$api/api/applications" --data-urlencode "lim=${LIM:-500}" \
-      | jq -r "$stage"'["stage","updated","company","role","status","next","mail"],
+    render() {
+      jq -r "$stage"'["stage","updated","company","role","status","next","mail"],
         (.[] | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status,
-                (.nextAction // ""), (.linkedMail // 0)]) | @tsv' \
-      | rows
+                (.nextAction // ""), (.linkedMail // 0)]) | @tsv' | rows
+    }
+    curl -fsS -G "$api/api/applications" --data-urlencode "lim=${LIM:-500}" \
+      | toon_emit render
     ;;
 
   search)
     q=${*:-}
     if [ -z "$q" ]; then usage; exit 2; fi
-    curl -fsS -G "$api/api/applications" --data-urlencode "lim=5000" \
-      | jq -r --arg q "$(printf '%s' "$q" | tr '[:upper:]' '[:lower:]')" "$stage"'
+    render() {
+      jq -r --arg q "$(printf '%s' "$q" | tr '[:upper:]' '[:lower:]')" "$stage"'
           .[] | select(([.id, .company, .role, .status, (.nextAction // "")] | join(" ") | ascii_downcase) | contains($q))
-          | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status, (.nextAction // "")] | @tsv' \
-      | rows
+          | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status, (.nextAction // "")] | @tsv' | rows
+    }
+    curl -fsS -G "$api/api/applications" --data-urlencode "lim=5000" \
+      | toon_emit render
     ;;
 
   get)
@@ -104,15 +117,18 @@ case "$verb" in
       echo "apps-db: no application $id" >&2
       exit 1
     fi
-    printf '%s' "$row" | jq -r '.[0] | to_entries[]
-      | select(.value != null and .value != "")
-      | "\(.key): \(.value)"'
-    echo
-    echo "mail:"
-    curl -fsS -G "$api/api/application-mail" \
-      --data-urlencode "applicationId=$id" --data-urlencode "lim=${LIM:-20}" \
-      | jq -r '(.[] | [((.sentAt // "")[0:10]), .tier, .matchedBy, .subject]) | @tsv' \
-      | rows
+    mail=$(curl -fsS -G "$api/api/application-mail" \
+      --data-urlencode "applicationId=$id" --data-urlencode "lim=${LIM:-20}")
+    render() {
+      printf '%s' "$row" | jq -r '.[0] | to_entries[]
+        | select(.value != null and .value != "")
+        | "\(.key): \(.value)"'
+      echo
+      echo "mail:"
+      printf '%s' "$mail" | jq -r '(.[] | [((.sentAt // "")[0:10]), .tier, .matchedBy, .subject]) | @tsv' | rows
+    }
+    jq -cn --argjson r "$row" --argjson m "$mail" '{record: $r[0], mail: $m}' \
+      | toon_emit render
     ;;
 
   update)
@@ -144,23 +160,26 @@ case "$verb" in
     fi
     payload=$(jq -cn --arg id "$id" --arg status "$status" --arg stage "$bucket" --arg next "$next" \
       '{id: $id, status: $status, stage: $stage, nextAction: $next}')
+    render() { jq -r '.[0] | "\(.id)\t\(.stage)\t\(.status)\t\(.nextAction)"' | rows; }
     curl -fsS -X POST -H 'content-type: application/json' -d "$payload" "$api/api/application-update" \
-      | jq -r '.[0] | "\(.id)\t\(.stage)\t\(.status)\t\(.nextAction)"' \
-      | rows
+      | toon_emit render
     ;;
 
   overview)
-    curl -fsS "$api/api/application-pipeline" \
-      | jq -r '["stage","applications","with next action"],
-          (.[] | [.stage, .applications, .withNextAction]) | @tsv' \
-      | rows
+    render() {
+      jq -r '["stage","applications","with next action"],
+          (.[] | [.stage, .applications, .withNextAction]) | @tsv' | rows
+    }
+    curl -fsS "$api/api/application-pipeline" | toon_emit render
     ;;
 
   queue)
+    render() {
+      jq -r '(.[] | [((.sentAt // "")[0:10]), .tier, .sender, .subject]) | @tsv' | rows
+    }
     curl -fsS -G "$api/api/agent-queue" \
       --data-urlencode "owner=agent:apps" --data-urlencode "lim=${LIM:-100}" \
-      | jq -r '(.[] | [((.sentAt // "")[0:10]), .tier, .sender, .subject]) | @tsv' \
-      | rows
+      | toon_emit render
     ;;
 
   export)
@@ -181,7 +200,7 @@ case "$verb" in
       updated_at: .updatedAt
     }]')
     if [ -z "$out" ] || [ "$out" = "-" ]; then
-      printf '%s\n' "$body"
+      printf '%s\n' "$body" | toon_emit
     else
       printf '%s\n' "$body" >"$out"
       echo "exported $(printf '%s' "$body" | jq 'length') applications to $out" >&2
@@ -190,14 +209,22 @@ case "$verb" in
 
   status)
     apps=$(curl -fsS -G "$api/api/applications" --data-urlencode "lim=5000")
-    printf 'tracked:        %s\n' "$(printf '%s' "$apps" | jq 'length')"
-    printf 'newest change:  %s\n' "$(printf '%s' "$apps" | jq -r 'max_by(.updatedAt).updatedAt // "—"')"
-    printf 'linked mail:    %s\n' "$(printf '%s' "$apps" | jq '[.[].linkedMail] | add // 0')"
-    printf 'open queue:     %s\n\n' "$(curl -fsS -G "$api/api/agent-queue" --data-urlencode "owner=agent:apps" --data-urlencode "lim=500" | jq 'length')"
-    curl -fsS "$api/api/application-pipeline" \
-      | jq -r '["stage","applications","with next action"],
-          (.[] | [.stage, .applications, .withNextAction]) | @tsv' \
-      | rows
+    queued=$(curl -fsS -G "$api/api/agent-queue" --data-urlencode "owner=agent:apps" --data-urlencode "lim=500")
+    pipeline=$(curl -fsS "$api/api/application-pipeline")
+    render() {
+      printf 'tracked:        %s\n' "$(printf '%s' "$apps" | jq 'length')"
+      printf 'newest change:  %s\n' "$(printf '%s' "$apps" | jq -r 'max_by(.updatedAt).updatedAt // "—"')"
+      printf 'linked mail:    %s\n' "$(printf '%s' "$apps" | jq '[.[].linkedMail] | add // 0')"
+      printf 'open queue:     %s\n\n' "$(printf '%s' "$queued" | jq 'length')"
+      printf '%s' "$pipeline" | jq -r '["stage","applications","with next action"],
+          (.[] | [.stage, .applications, .withNextAction]) | @tsv' | rows
+    }
+    jq -cn --argjson apps "$apps" --argjson q "$queued" --argjson p "$pipeline" \
+      '{tracked: ($apps | length),
+        newestChange: ($apps | max_by(.updatedAt).updatedAt),
+        linkedMail: ([$apps[].linkedMail] | add // 0),
+        openQueue: ($q | length),
+        pipeline: $p}' | toon_emit render
     ;;
 
   upsert | add)
@@ -205,12 +232,12 @@ case "$verb" in
       src=${1:-}
       if [ -n "$src" ] && [ "$src" != "-" ]; then
         [ -r "$src" ] || { echo "apps-db: cannot read $src" >&2; exit 2; }
-        body=$(cat "$src")
+        body=$(toon_ingest "$src")
       else
-        body=$(cat)
+        body=$(toon_ingest)
       fi
       if [ -z "$body" ]; then
-        echo "apps-db: upsert needs a JSON record on stdin or a file" >&2
+        echo "apps-db: upsert needs a JSON or TOON record on stdin or a file" >&2
         exit 2
       fi
     else
@@ -304,10 +331,9 @@ case "$verb" in
       printf '%s\n' "$payload" | jq .
       exit 0
     fi
+    render() { jq -r '.[0] | "\(.id)\t\(.company)\t\(.stage)"' | rows; }
     curl -fsS -X POST -H 'content-type: application/json' -d "$payload" \
-      "$api/api/application-upsert" \
-      | jq -r '.[0] | "\(.id)\t\(.company)\t\(.stage)"' \
-      | rows
+      "$api/api/application-upsert" | toon_emit render
     ;;
 
   query)

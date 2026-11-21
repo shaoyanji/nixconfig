@@ -10,7 +10,7 @@
     ".agents/skills/ai-memory/SKILL.md" = 68;
     ".agents/skills/antigravity/SKILL.md" = 185;
     ".agents/skills/apisfreellm/SKILL.md" = 145;
-    ".agents/skills/apps/SKILL.md" = 54;
+    ".agents/skills/apps/SKILL.md" = 57;
     ".agents/skills/atuin/SKILL.md" = 155;
     ".agents/skills/bountystash/SKILL.md" = 72;
     ".agents/skills/brainstorm/SKILL.md" = 81;
@@ -40,7 +40,7 @@
     ".agents/skills/knowledge-base/SKILL.md" = 195;
     ".agents/skills/mail-alias/SKILL.md" = 81;
     ".agents/skills/mail-archive/SKILL.md" = 167;
-    ".agents/skills/master-toon/SKILL.md" = 143;
+    ".agents/skills/master-toon/SKILL.md" = 153;
     ".agents/skills/microvm/SKILL.md" = 72;
     ".agents/skills/moto/SKILL.md" = 29;
     ".agents/skills/neocities/SKILL.md" = 53;

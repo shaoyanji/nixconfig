@@ -623,11 +623,12 @@ tasks:
         [ -n "{{.OLDER}}" ] && args+=(--older "{{.OLDER}}")
         [ -n "{{.NEWER}}" ] && args+=(--newer "{{.NEWER}}")
         [ "{{.DRY}}" != "1" ] && args+=(--apply)
-        case "{{.FORMAT}}" in
-          text) python3 scripts/task/email-sweep.py "${args[@]}" ;;
-          json) python3 scripts/task/email-sweep.py --json "${args[@]}" ;;
-          *) python3 scripts/task/email-sweep.py --json "${args[@]}" | toon -e ;;
-        esac
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
+          python3 scripts/task/email-sweep.py "${args[@]}"
+        else
+          python3 scripts/task/email-sweep.py --json "${args[@]}" | toon_emit
+        fi
 
   agents:ci:drain:
     desc: "Close CI notices that are stale or superseded by a newer one (TOON; FORMAT=text for a person, FULL=1 for every id, DRY=1, DAYS=14)"
@@ -650,11 +651,11 @@ tasks:
         args=(--days "{{.DAYS}}" --api "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}")
         [ "{{.DRY}}" = "1" ] && args+=(--dry-run)
         [ "{{.FULL}}" = "1" ] && args+=(--full)
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         if [ "{{.FORMAT}}" = "text" ]; then
           "${drain[@]}" "${args[@]}"
         else
-          "${drain[@]}" --json "${args[@]}" |
-            { if [ "{{.FORMAT}}" = "json" ]; then cat; else toon -e; fi; }
+          "${drain[@]}" --json "${args[@]}" | toon_emit
         fi
 
   agents:mail:triage:
@@ -675,12 +676,9 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/attention?lim={{.LIM}}")"
-        case "{{.FORMAT}}" in
-          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:16])  \(.tier)  \(.subject[0:70])"' ;;
-          json) printf '%s' "$rows" ;;
-          *) printf '%s' "$rows" | toon -e ;;
-        esac
+        printf '%s' "$rows" | toon_emit jq -r '.[]? | "\(.sentAt[0:16])  \(.tier)  \(.subject[0:70])"'
 
   agents:mail:digest:
     desc: "The newsletter batch: digest-tier mail from the last DAYS days (TOON; FORMAT=text for a table, LIM=200)"
@@ -690,12 +688,9 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/triage-digest?days={{.DAYS}}&lim={{.LIM}}")"
-        case "{{.FORMAT}}" in
-          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:10])  \(.sender[0:40])  \(.subject[0:70])"' ;;
-          json) printf '%s' "$rows" ;;
-          *) printf '%s' "$rows" | toon -e ;;
-        esac
+        printf '%s' "$rows" | toon_emit jq -r '.[]? | "\(.sentAt[0:10])  \(.sender[0:40])  \(.subject[0:70])"'
 
   agents:mail:atlas:
     desc: "The atlas queues: per-letter decisions and the general commands a person wrote in the reader (TOON; FORMAT=text, STATUS=pending, LIM=50)"
@@ -712,14 +707,12 @@ tasks:
         letters="$(curl -fsS --max-time 20 "$base/api/atlas-actions?status={{.STATUS}}&lim={{.LIM}}")"
         commands="$(curl -fsS --max-time 20 "$base/api/atlas-commands?status={{.STATUS}}&lim={{.LIM}}")"
         rows="$(jq -nc --argjson l "$letters" --argjson c "$commands" '{letters: $l, commands: $c}')"
-        case "{{.FORMAT}}" in
-          text)
-            printf '%s' "$rows" | jq -r '.letters[]? | "\(.requestedAt[0:16])  letter  \(.kind)  \(.subject[0:50])  \(.instruction // "")"'
-            printf '%s' "$rows" | jq -r '.commands[]? | "\(.requestedAt[0:16])  command  —  \(.instruction[0:80])"'
-            ;;
-          json) printf '%s' "$rows" ;;
-          *) printf '%s' "$rows" | toon -e ;;
-        esac
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        render() {
+          printf '%s' "$rows" | jq -r '.letters[]? | "\(.requestedAt[0:16])  letter  \(.kind)  \(.subject[0:50])  \(.instruction // "")"'
+          printf '%s' "$rows" | jq -r '.commands[]? | "\(.requestedAt[0:16])  command  —  \(.instruction[0:80])"'
+        }
+        printf '%s' "$rows" | toon_emit render
 
   agents:mail:atlas:drain:
     desc: "Execute the atlas decision queue now (APPLY=1 moves mail; default is a dry run that names the uid)"
@@ -763,12 +756,9 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/agent-queue?owner=agent&lim={{.LIM}}")"
-        case "{{.FORMAT}}" in
-          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:16])  \(.owner)  \(.subject[0:60])  \(.messageId)"' ;;
-          json) printf '%s' "$rows" ;;
-          *) printf '%s' "$rows" | toon -e ;;
-        esac
+        printf '%s' "$rows" | toon_emit jq -r '.[]? | "\(.sentAt[0:16])  \(.owner)  \(.subject[0:60])  \(.messageId)"'
 
   agents:ci:fix:
     desc: "Launch a subagent on one failing CI run (RUN=12345, MESSAGE_ID optional; DRY=1 writes the prompt only)"
@@ -802,7 +792,10 @@ tasks:
     cmds:
       - |
         [ -n "{{.FILE}}" ] || { echo "agents:apps:import: FILE is required (path, or - for stdin)" >&2; exit 2; }
-        args=(--file "{{.FILE}}")
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        tmp=$(mktemp); trap 'rm -f "$tmp"' EXIT
+        toon_ingest "{{.FILE}}" > "$tmp"
+        args=(--file "$tmp")
         [ "{{.LINK}}" = "1" ] && args+=(--link)
         {{.APPS_SYNC}} "${args[@]}"
 
@@ -812,11 +805,12 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        case "{{.FORMAT}}" in
-          text) {{.APPS_SYNC}} --report ;;
-          json) {{.APPS_SYNC}} --report --json ;;
-          *) {{.APPS_SYNC}} --report --json | toon -e ;;
-        esac
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
+          {{.APPS_SYNC}} --report
+        else
+          {{.APPS_SYNC}} --report --json | toon_emit
+        fi
 
   agents:apps:set:
     desc: "Record a pipeline change from mail (ID=, STATUS=, NEXT=; the stage is derived where the sync derives it)"
@@ -835,12 +829,9 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/plugins")"
-        case "{{.FORMAT}}" in
-          text) printf '%s' "$rows" | jq -r '.[]? | "\(.owner)  \(.kind)\topen \(.open)\tresolved \(.resolved)\tlast \(.lastDecision[0:16] // "-")"' | column -t -s$'\t' ;;
-          json) printf '%s' "$rows" ;;
-          *) printf '%s' "$rows" | toon -e ;;
-        esac
+        printf '%s' "$rows" | toon_emit jq -r '.[]? | "\(.owner)  \(.kind)\topen \(.open)\tresolved \(.resolved)\tlast \(.lastDecision[0:16] // "-")"' | column -t -s$'\t'
 
   agents:apps:discovered:
     desc: "Applications the mail hub found on its own — not in the workflow's JSON (TOON; FORMAT=text, LIM=20)"
@@ -849,12 +840,9 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/applications-discovered?lim={{.LIM}}")"
-        case "{{.FORMAT}}" in
-          text) printf '%s' "$rows" | jq -r '.[]? | "\(.createdAt[0:10])  \(.company[0:32])  \(.status[0:40])"' ;;
-          json) printf '%s' "$rows" ;;
-          *) printf '%s' "$rows" | toon -e ;;
-        esac
+        printf '%s' "$rows" | toon_emit jq -r '.[]? | "\(.createdAt[0:10])  \(.company[0:32])  \(.status[0:40])"'
 
   agents:apps:packet:
     desc: "Build a packet through nix: a store path with the CV and letter PDFs (ID=, or EXAMPLE=1 for the fictional fixture; RESUME=, LETTER=, JD=, PAGES=, OUT=link)"
@@ -931,11 +919,12 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
-        case "{{.FORMAT}}" in
-          text) {{.APPS_SYNC}} --drafts ;;
-          json) {{.APPS_SYNC}} --drafts --json ;;
-          *) {{.APPS_SYNC}} --drafts --json | toon -e ;;
-        esac
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
+          {{.APPS_SYNC}} --drafts
+        else
+          {{.APPS_SYNC}} --drafts --json | toon_emit
+        fi
 
   agents:apps:export:
     desc: "Regenerate applications.json from the database, in the workflow's own shape (OUT=path or - for stdout)"
@@ -962,12 +951,9 @@ tasks:
       FORMAT: '{{.FORMAT | default "toon"}}'
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         rows="$(curl -fsS --max-time 20 "${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}/api/agent-queue?owner=agent:apps&lim={{.LIM}}")"
-        case "{{.FORMAT}}" in
-          text) printf '%s' "$rows" | jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"' ;;
-          json) printf '%s' "$rows" ;;
-          *) printf '%s' "$rows" | toon -e ;;
-        esac
+        printf '%s' "$rows" | toon_emit jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"'
 
   agents:ci:preflight:
     desc: "Run the gates the CI docs-budget job runs, locally: no document over budget, task graph clean"

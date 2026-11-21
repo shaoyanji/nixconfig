@@ -60,6 +60,16 @@ JSON stays wherever a program is the consumer: `| jq`, `> file.json`, a flake
 output, an API body. `task checks:toon:surfaces` enforces that split in the 52
 agent-facing docs, so a command that emits JSON at a reader fails the gate.
 
+The taskfile half of that split is one function pair, `scripts/task/toon-io.sh`:
+a cmds block sources it, then `produce_json | toon_emit [text renderer]` serves
+FORMAT (`toon` — the agent's default; `json` — a program's opt-out; `text` — a
+person's table, run through the renderer args), and `toon_ingest FILE` hands a
+tool the JSON for a TOON or JSON record alike. `task checks:toon:tasks` refuses
+an open-coded `| toon -e`, a hand-cased FORMAT, or an unsourced `toon_emit`, so
+a new task gets the contract by sourcing the file — never by writing a third
+`case`. Where a task takes a record from an agent (`apps:upsert`,
+`agents:apps:import`), TOON input is the same contract in the other direction.
+
 ## 2. The `[n]` trap
 
 The `[n]` in `items[12]{id,name}:` is a row count. Counting rows by hand is the

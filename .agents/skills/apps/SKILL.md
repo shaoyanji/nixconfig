@@ -26,9 +26,10 @@ task apps:add -- --company Flox --role "MTS, Infrastructure" \
 
 `--company` and `--role` are required; the id defaults to a slug of the two, so
 a re-run updates rather than duplicates — `--id` reuses a scan's slug, `--dry`
-prints without writing, the other flags override `lead` defaults. A tool with a
-JSON record pipes it whole (`task apps:upsert -- < record.json`). The mail hub
-adds rows too (`origin` `agent-scan`/`discovered`): `agents:apps:discovered`.
+prints without writing, the other flags override `lead` defaults. A JSON or
+TOON record pipes in whole (`task apps:upsert -- < record.toon` — decode is the
+shared toon_ingest contract). The mail hub adds rows too (`origin`
+`agent-scan`/`discovered`): `agents:apps:discovered`.
 
 ## Track
 
@@ -39,6 +40,8 @@ task apps:search -- nix   # id, company, role, status, next action
 task apps:get -- <id>     # one record plus its linked mail
 task apps:status          # totals, newest change, queue depth
 ```
+
+Every read emits TOON; `FORMAT=text` prints a table for a person.
 
 `stage` derives from status text: `interview|trial` → interview, `rejected…` →
 rejected, `applied…`/`application received` → applied, `lead…`/`rezi…` → lead,

@@ -140,11 +140,12 @@ tasks:
     silent: true
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         table="$(nix eval --json .#epistemics.table)"
         if ! printf '%s' "$table" | jq -e --arg k "{{.KIND}}" 'has($k)' >/dev/null; then
           printf '%s' "$table" | jq -c --arg k "{{.KIND}}" \
             '{error: "no such claim kind", kind: $k, kinds: (keys)}' \
-            | { if [ "{{.FORMAT}}" = json ]; then cat; else toon -e; fi; } >&2
+            | toon_emit >&2
           exit 2
         fi
         # The ladder is read only when a tier was supplied: `evidence.rank` is
@@ -178,7 +179,7 @@ tasks:
                order: $aff,
                over_budget: $over,
                never: $row.never}')"
-        printf '%s' "$out" | { if [ "{{.FORMAT}}" = json ]; then cat; else toon -e; fi; }
+        printf '%s' "$out" | toon_emit
         if [ -n "{{.EVIDENCE}}" ] && ! printf '%s' "$out" | jq -e '.evidence.ok' >/dev/null; then
           printf 'epistemics: %s evidence cannot carry a %s claim; %s\n' \
             "{{.EVIDENCE}}" "{{.KIND}}" \
@@ -199,13 +200,13 @@ tasks:
     silent: true
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         out=$(wiki-ask --stats --days {{.DAYS | default "14"}})
         rc=$?
-        case "$FORMAT" in
-          json) printf '%s' "$out" ;;
-          *) printf '%s' "$out" | toon -e ;;
-        esac
-        exit "$rc"
+        printf '%s' "$out" | toon_emit
+        # wiki-ask --stats exits 0, or 1 on an empty window — literal so the
+        # exitDrift audit can see the claim the summary makes.
+        [ "$rc" -eq 0 ] || exit 1
 
   ops:wiki:ask:
     desc: Ask the local ZIM archives a question (Q=; gated fan-out, budgeted)
@@ -228,6 +229,7 @@ tasks:
     silent: true
     cmds:
       - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
         # Empty WIKI_KIND means "exploring, not settling a claim" — the gate is
         # opt-in so an ad-hoc search still works. One jq program does both
         # checks; halt_error writes the refusal to stderr and exits 2.
@@ -238,13 +240,11 @@ tasks:
             elif (.[$k].order | map(.name) | index("zim-shelf")) == null then
               "epistemics: the shelf cannot settle a \($k) claim (\(.[$k].never[] | select(.name == "zim-shelf") | .why)); read \(.[$k].read) — \(.[$k].next)" | halt_error(2)
             else empty end'
-          rc=$?
-          [ "$rc" -eq 0 ] || exit "$rc"
+          # halt_error(2) is the only refusal the jq program emits — a literal
+          # exit keeps the claim visible to the exitDrift audit.
+          [ "$?" -eq 0 ] || exit 2
         fi
-        case "{{.FORMAT}}" in
-          json) wiki-ask "{{.Q}}" ;;
-          *) wiki-ask "{{.Q}}" | toon -e ;;
-        esac
+        wiki-ask "{{.Q}}" | toon_emit
 
   ops:skills:
     desc: Print the compiled skill index (name, version, tags)
@@ -357,10 +357,11 @@ tasks:
       vars: [HOST]
     cmds:
       - |
-        if [ "{{.FORMAT}}" = "json" ]; then
-          bash scripts/task/kg-query.sh host "{{.HOST}}" --json
-        else
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
           bash scripts/task/kg-query.sh host "{{.HOST}}"
+        else
+          bash scripts/task/kg-query.sh host "{{.HOST}}" --json | toon_emit
         fi
 
   ops:kg:skill:
@@ -375,10 +376,11 @@ tasks:
       vars: [SKILL]
     cmds:
       - |
-        if [ "{{.FORMAT}}" = "json" ]; then
-          bash scripts/task/kg-query.sh skill "{{.SKILL}}" --json
-        else
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
           bash scripts/task/kg-query.sh skill "{{.SKILL}}"
+        else
+          bash scripts/task/kg-query.sh skill "{{.SKILL}}" --json | toon_emit
         fi
 
   ops:kg:doc:
@@ -397,10 +399,11 @@ tasks:
       vars: [DOC]
     cmds:
       - |
-        if [ "{{.FORMAT}}" = "json" ]; then
-          bash scripts/task/kg-query.sh doc "{{.DOC}}" --json
-        else
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
           bash scripts/task/kg-query.sh doc "{{.DOC}}"
+        else
+          bash scripts/task/kg-query.sh doc "{{.DOC}}" --json | toon_emit
         fi
 
   ops:kg:module:
@@ -417,10 +420,11 @@ tasks:
       vars: [PATH]
     cmds:
       - |
-        if [ "{{.FORMAT}}" = "json" ]; then
-          bash scripts/task/kg-query.sh module "{{.PATH}}" --json
-        else
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
           bash scripts/task/kg-query.sh module "{{.PATH}}"
+        else
+          bash scripts/task/kg-query.sh module "{{.PATH}}" --json | toon_emit
         fi
 
   ops:kg:tag:
@@ -435,10 +439,11 @@ tasks:
       vars: [TAG]
     cmds:
       - |
-        if [ "{{.FORMAT}}" = "json" ]; then
-          bash scripts/task/kg-query.sh tag "{{.TAG}}" --json
-        else
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
           bash scripts/task/kg-query.sh tag "{{.TAG}}"
+        else
+          bash scripts/task/kg-query.sh tag "{{.TAG}}" --json | toon_emit
         fi
 
   ops:kg:task:
@@ -453,10 +458,11 @@ tasks:
       vars: [NAME]
     cmds:
       - |
-        if [ "{{.FORMAT}}" = "json" ]; then
-          bash scripts/task/kg-query.sh task "{{.NAME}}" --json
-        else
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
           bash scripts/task/kg-query.sh task "{{.NAME}}"
+        else
+          bash scripts/task/kg-query.sh task "{{.NAME}}" --json | toon_emit
         fi
 
   ops:kg:comention:
@@ -472,10 +478,11 @@ tasks:
       vars: [HOST]
     cmds:
       - |
-        if [ "{{.FORMAT}}" = "json" ]; then
-          bash scripts/task/kg-query.sh comention "{{.HOST}}" --min {{.MIN | default 1}} --json
-        else
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        if [ "{{.FORMAT}}" = "text" ]; then
           bash scripts/task/kg-query.sh comention "{{.HOST}}" --min {{.MIN | default 1}}
+        else
+          bash scripts/task/kg-query.sh comention "{{.HOST}}" --min {{.MIN | default 1}} --json | toon_emit
         fi
 
   ops:kg:evidence:

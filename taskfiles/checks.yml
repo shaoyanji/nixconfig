@@ -57,6 +57,7 @@ tasks:
       - task: checks:yaml:lint
       - task: checks:toon
       - task: checks:toon:surfaces
+      - task: checks:toon:tasks
       - task: checks:tasks
       - task: checks:nix:comments
       - task: checks:skills:mirror
@@ -187,6 +188,18 @@ tasks:
       then every tracked `.toon` document must strict-decode. ~0.2 s, no host.
     cmds:
       - bash scripts/task/toon-check.sh
+
+  checks:toon:tasks:
+    desc: "[gate] Taskfile emitters route through toon_emit — no open-coded `toon -e` or `case FORMAT`"
+    summary: >
+      The taskfile half of the agent boundary. A cmds block that hands JSON to a
+      reader must pipe it through `toon_emit` (scripts/task/toon-io.sh, sourced
+      in the block); an ad-hoc `| toon -e` or a hand-written `case $FORMAT` is a
+      way back to copy-pasted contracts, and an unsourced `toon_emit` is a dead
+      call. `toon -e --stats` is the encoder's own demo and stays legal.
+      ~0.1 s, no host.
+    cmds:
+      - bash scripts/task/toon-tasks.sh
 
   checks:repo:hostpaths:test:
     desc: Regression fixture for checks:repo:hostpaths (every rule and exception)

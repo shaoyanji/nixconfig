@@ -12,22 +12,22 @@ tasks:
   apps:list:
     desc: List tracked applications from the archive database
     cmds:
-      - "{{.APPS_DB}} list {{.CLI_ARGS}}"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} list {{.CLI_ARGS}}
 
   apps:search:
     desc: Search applications (company, role, status, id, next action)
     cmds:
-      - "{{.APPS_DB}} search {{.CLI_ARGS}}"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} search {{.CLI_ARGS}}
 
   apps:get:
     desc: View one application and the mail linked to it
     cmds:
-      - "{{.APPS_DB}} get {{.CLI_ARGS}}"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} get {{.CLI_ARGS}}
 
   apps:update:
     desc: Update status in Postgres (task apps:update -- <id> --status Rejected [--next-action none])
     cmds:
-      - "{{.APPS_DB}} update {{.CLI_ARGS}}"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} update {{.CLI_ARGS}}
 
   apps:add:
     desc: Add one application — flags, no JSON (task apps:add -- --company C --role R [--apply-url U])
@@ -39,10 +39,10 @@ tasks:
       hourly sync applies. For a record a tool already produced as JSON,
       `apps:upsert` takes the object on stdin or from a file.
     cmds:
-      - "{{.APPS_DB}} add {{.CLI_ARGS}}"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} add {{.CLI_ARGS}}
 
   apps:upsert:
-    desc: Add or refresh one application record from JSON (CLI_ARGS is a file, or pipe stdin)
+    desc: Add or refresh one application record — JSON or TOON (CLI_ARGS is a file, or pipe stdin; FORMAT=toon for the row back)
     summary: >
       The write path for a record the hourly sync did not create. Send the whole
       object, camelCase or snake_case, with `id`, `company`, `role`, `status`,
@@ -51,17 +51,17 @@ tasks:
       the stored id, company and stage. A re-run with the same id updates in
       place, so this is also the way to correct a row the mail got wrong.
     cmds:
-      - "{{.APPS_DB}} upsert {{.CLI_ARGS}}"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} upsert {{.CLI_ARGS}}
 
   apps:overview:
     desc: Pipeline summary - stage counts and how many carry a next action
     cmds:
-      - "{{.APPS_DB}} overview"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} overview
 
   apps:status:
     desc: Totals, newest change and open queue depth from the archive
     cmds:
-      - "{{.APPS_DB}} status"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} status
 
   apps:doctor:
     desc: Which appflow transports this client has (API, SQL, Typst checkout, PII)
@@ -79,7 +79,7 @@ tasks:
   apps:emails:
     desc: Messages waiting for agent:apps (the hourly sync on delphi drains them)
     cmds:
-      - "{{.APPS_DB}} queue {{.CLI_ARGS}}"
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} queue {{.CLI_ARGS}}
 
   # Rules first: a form, an alert, an automatic reply, a retention request, or an
   # acknowledgement that names an employer the tracker does not have. What they

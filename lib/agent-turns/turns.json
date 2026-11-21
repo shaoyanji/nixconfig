@@ -1,8 +1,96 @@
 {
-  "generated": "2026-11-21T00:38:55Z",
+  "generated": "2026-11-21T00:49:02Z",
   "count": 200,
-  "pin": "9dd38eca15bd490520820cbba2155611784007905c0d33636852eb03cfea51a4",
+  "pin": "8def91cb78eeb73e5c8ab38f681cdb1f2a32ed648397e86602d68e7596d50ab3",
   "turns": [
+    {
+      "id": "0b232bf8-6f75-454b-ad7d-d30899c01026",
+      "ts": "2026-11-21T00:45:04Z",
+      "source": "devin",
+      "subject": "nixconfig:agent-turns-mkdaemon",
+      "action": "claim: consolidate xs-agent-turns + agent-turns-shim daemon tail in modules/services/agent-turns.nix",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/agent-turns.nix"
+      ],
+      "files": [],
+      "base_commit": "a3ed49305d9f2908463270a1ed88184eee87dedc",
+      "branch": "main",
+      "frame": "03h9vsdi6yn6ed04ljxq6jgma"
+    },
+    {
+      "id": "95723057-878d-48a7-ab0d-e2884b8947a1",
+      "ts": "2026-11-21T00:45:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-live-downloads",
+      "action": "landed: freebuff re-proved live CV downloads — server serves valid PDF bytes but one published revision behind; gate itself is sound (12 ok, 0 failed locally)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vsd4gsm0vzcf960mo1hmt"
+    },
+    {
+      "id": "25430619-a325-47d0-8cff-c0071106cdd2",
+      "ts": "2026-11-21T00:44:45Z",
+      "source": "devin",
+      "subject": "nixconfig:continue-refactor",
+      "action": "landed: drove devin pane 2.1 — continue nixconfig refactoring, next module area, checks:quick green",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vsb9ub6fnf89k1arpoo3x"
+    },
+    {
+      "id": "4e89323e-c32e-4e6d-ad7c-89b27b3a340c",
+      "ts": "2026-11-21T00:44:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-live-downloads",
+      "action": "landed: drove freebuff pane 1.1 — re-prove live CV downloads via matt:cv:check (headless Chrome)",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vsb8ub5uflrtj64ycavjz"
+    },
+    {
+      "id": "b3081641-7467-4e97-a314-f34d511f16f8",
+      "ts": "2026-11-21T00:39:52Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Drove idle freebuff win1 pane via jevdecide: reprove_live_downloads (p=0.71, margin 0.42, decisive over leave_idle 0.29; needs_review but margin>=0.3 so picked top). Task: run matt:cv:check (headless Chrome) to verify live server serves CV PDF bytes, not just that build links resolve. Pane accepted — fresh thinking... counter. win2 devin BUSY left alone. win3 agy IDLE but intentionally left backed off (job search).",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vrcx7ycpyll19adl04xld"
+    },
+    {
+      "id": "4be2a057-8b98-45cb-8a62-c9be9e4498b1",
+      "ts": "2026-11-21T00:39:08Z",
+      "source": "devin",
+      "subject": "nixconfig:frieren-timer-jobs",
+      "action": "landed: mkTimerJob skeleton + scheduledJobs table for six oneshot+timer pairs in infra-stack.nix; all 12 unit files byte-identical on frieren | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3ed49305d9f2908463270a1ed88184eee87dedc",
+      "branch": "main",
+      "frame": "03h9vr7tezvqqwd7qjpicxs0r"
+    },
     {
       "id": "336903a3-1957-4f91-85d1-86b1c29f7208",
       "ts": "2026-11-21T00:34:39Z",
@@ -2638,92 +2726,6 @@
       "base_commit": "cbdd5b96bc0751ce70aac8e64bcbf020e8a13499",
       "branch": "main",
       "frame": "03h9p2zuh6n82dyd0lk4i9wmt"
-    },
-    {
-      "id": "947f8f89-9ffd-4cac-bb16-3bb14f6af2c7",
-      "ts": "2026-11-20T04:02:18Z",
-      "source": "antigravity",
-      "subject": "frieren:audit-system",
-      "action": "start: system health & maintenance audit",
-      "outcome": "in_progress",
-      "claims": [
-        "/home/devji/SYSTEM.md",
-        "/home/devji/HANDOFF.md"
-      ],
-      "files": [],
-      "base_commit": "cbdd5b96bc0751ce70aac8e64bcbf020e8a13499",
-      "branch": "main",
-      "frame": "03h9p1lxge6wfgqjz5kqu0rvu"
-    },
-    {
-      "id": "87628668-1682-4c90-b149-c3f48b908369",
-      "ts": "2026-11-19T22:48:07Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-19: 0 plate(s) kept of 2 spent, 5 roster row(s) waiting, 535 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
-      "branch": "main",
-      "frame": "03h9nc8evuca8dga3d9jxraxb"
-    },
-    {
-      "id": "bc60e342-9201-4d39-9623-4d9e4ca3fb5a",
-      "ts": "2026-11-19T22:38:28Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-android",
-      "action": "landed: plugins.enabled config-path enable (uv.lock admission unrunnable under Nix) + gateway PYTHONPATH dep env; live drop-in applied, plugin enabled, 57 android schemas import | gate: parse+census+role eval+plugins list PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
-      "branch": "main",
-      "frame": "03h9nackbpg745pcglw114jdx"
-    },
-    {
-      "id": "14c6cefd-117b-4834-8ddb-ba511097e6da",
-      "ts": "2026-11-19T22:32:17Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-android",
-      "action": "claim: enable hermes-android plugin, route around uv.lock-in-store blocker",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai/"
-      ],
-      "files": [],
-      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
-      "branch": "main",
-      "frame": "03h9n953rc4h3un20p9ndfkxc"
-    },
-    {
-      "id": "dac354a1-27e6-4e41-9682-5e3c25398603",
-      "ts": "2026-11-19T22:07:19Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-reroll-fix",
-      "action": "landed: refused plates rows get hold: prefix after fail/exhausted-reroll; unjudged left for judge recovery | gate: bash -n, DRY roster walk, isolated hold_roster_row test, census PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
-      "branch": "main",
-      "frame": "03h9n49hga1ewbaok2wrhlz04"
-    },
-    {
-      "id": "81397c6f-b398-4a74-9fef-3bcfe1060745",
-      "ts": "2026-11-19T22:05:13Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-reroll-fix",
-      "action": "claim: hold-prefix retirement for rejected plates rows",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/image-daily.sh",
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
-      "branch": "main",
-      "frame": "03h9n3upk7c9n9aphp2oo3trx"
     }
   ]
 }

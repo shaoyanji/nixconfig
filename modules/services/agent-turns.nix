@@ -124,6 +124,34 @@
       exit 1
     '';
   };
+
+  # Both daemons below carry the same skeleton — the multi-user daemon class,
+  # an owner-only state directory under cfg.user, and the strict sandbox —
+  # and differ in the executable, the network surface and the memory cap.
+  daemonServiceConfig = {
+    Type = "simple";
+    User = cfg.user;
+    Group = cfg.user;
+    StateDirectory = cfg.stateDirectory;
+    # Owner-only, socket included: xs has no auth on that socket, so a
+    # world-readable one would let any local user DELETE a frame and undo
+    # the append-only promise the shim makes.
+    StateDirectoryMode = "0700";
+    Restart = "always";
+    RestartSec = 2;
+    ProtectSystem = "strict";
+    ProtectHome = true;
+    PrivateTmp = true;
+    NoNewPrivileges = true;
+  };
+
+  mkDaemon = extra:
+    {
+      wantedBy = ["multi-user.target"];
+      unitConfig.X-Fleet-Role = "daemon";
+      serviceConfig = daemonServiceConfig // (extra.serviceConfig or {});
+    }
+    // removeAttrs extra ["serviceConfig"];
 in {
   options.services.agentTurns = {
     enable = lib.mkEnableOption "the agent-turn coordination store (xs) and its authenticated shim";
@@ -266,53 +294,30 @@ in {
           restartUnits = ["agent-turns-shim.service"];
         }) (map normToken cfg.additionalTokens));
 
-    systemd.services.xs-agent-turns = {
+    systemd.services.xs-agent-turns = mkDaemon {
       description = "xs event stream store for agent turns (Unix socket only)";
-      wantedBy = ["multi-user.target"];
-      unitConfig.X-Fleet-Role = "daemon";
       # No ordering on sops: on this fleet the secrets are installed by the
       # activation script itself, not by a `sops-install-secrets` unit, so a
       # `requires` on that name leaves the unit unstartable.
       serviceConfig = {
-        Type = "simple";
-        User = cfg.user;
-        Group = cfg.user;
-        StateDirectory = cfg.stateDirectory;
-        # Owner-only, socket included: xs has no auth on that socket, so a
-        # world-readable one would let any local user DELETE a frame and undo
-        # the append-only promise the shim makes.
-        StateDirectoryMode = "0700";
         UMask = "0077";
         # `always`: an append that returned has reached the journal, so a turn
         # reported as stored cannot vanish in a power loss.
         ExecStart = "${cfg.package}/bin/xs serve ${storePath} --fsync always";
-        Restart = "always";
-        RestartSec = 2;
 
         # No network, ever. The store is a filesystem object; the only client is
         # the shim next door, over the socket in the state directory.
         PrivateNetwork = true;
         RestrictAddressFamilies = ["AF_UNIX"];
-        ProtectSystem = "strict";
-        ProtectHome = true;
-        PrivateTmp = true;
-        NoNewPrivileges = true;
         MemoryMax = "512M";
       };
     };
 
-    systemd.services.agent-turns-shim = {
+    systemd.services.agent-turns-shim = mkDaemon {
       description = "Authenticated append-only shim in front of the agent-turn store";
-      wantedBy = ["multi-user.target"];
-      unitConfig.X-Fleet-Role = "daemon";
       after = ["xs-agent-turns.service"];
       requires = ["xs-agent-turns.service"];
       serviceConfig = {
-        Type = "simple";
-        User = cfg.user;
-        Group = cfg.user;
-        StateDirectory = cfg.stateDirectory;
-        StateDirectoryMode = "0700";
         # `After=` is ordering, not readiness: xs prints its first frame before
         # the socket is connectable, and a shim that exits on the race makes the
         # whole switch fail (measured: status 4/NOPERMISSION).
@@ -331,14 +336,8 @@ in {
           "AGENT_TURNS_BIND=127.0.0.1"
           "AGENT_TURNS_PORT=${toString cfg.port}"
         ];
-        Restart = "always";
-        RestartSec = 2;
 
         RestrictAddressFamilies = ["AF_UNIX" "AF_INET"];
-        ProtectSystem = "strict";
-        ProtectHome = true;
-        PrivateTmp = true;
-        NoNewPrivileges = true;
         MemoryMax = "256M";
       };
     };

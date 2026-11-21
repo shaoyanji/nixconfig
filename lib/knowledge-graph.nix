@@ -11,37 +11,41 @@
 }: let
   root = ../.;
 
-  hostNames = builtins.attrNames inventory.hosts;
+  hostNames = inventory.hosts |> builtins.attrNames;
 
   # ARCHITECTURE.md, TODO.md, HANDOFF.md and EXPERIMENTS.md moved into
   # AGENTS.nix (2026-10-19) and are now <=10-line pointers; indexing a pointer
   # would add a doc node with no content. The notes are a separate projection
   # (`lib/agents-notes.nix`, `.#agentsNotes`, `task ops:notes`) so this graph
   # keeps its host/skill/doc semantics and its native-builder parity.
-  rootDocs = map (f: root + "/${f}") [
-    "AGENTS.md"
-    "MANUAL.md"
-    "README.md"
-  ];
+  rootDocs =
+    [
+      "AGENTS.md"
+      "MANUAL.md"
+      "README.md"
+    ]
+    |> map (f: root + "/${f}");
 
   # Markdown files directly inside a directory (empty when it does not exist).
   mdIn = dir:
     if builtins.pathExists dir
     then
-      map (n: dir + "/${n}") (
-        builtins.attrNames (
-          lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".md" n) (builtins.readDir dir)
-        )
-      )
+      dir
+      |> builtins.readDir
+      |> lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".md" n)
+      |> builtins.attrNames
+      |> map (n: dir + "/${n}")
     else [];
 
   # Markdown one level deeper — `.agents/deploy/hosts/*.md`.
   mdInSubdirs = dir:
     if builtins.pathExists dir
     then
-      lib.concatMap (sub: mdIn (dir + "/${sub}")) (
-        builtins.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir dir))
-      )
+      dir
+      |> builtins.readDir
+      |> lib.filterAttrs (_: t: t == "directory")
+      |> builtins.attrNames
+      |> lib.concatMap (sub: mdIn (dir + "/${sub}"))
     else [];
 
   # The doc set is every markdown file that is a document: the living documents,
@@ -53,14 +57,18 @@
   skillRefDocs =
     if builtins.pathExists (root + "/.agents/skills")
     then
-      lib.concatMap (
+      (root + "/.agents/skills")
+      |> builtins.readDir
+      |> lib.filterAttrs (_: t: t == "directory")
+      |> builtins.attrNames
+      |> lib.concatMap (
         n: let
           refs = root + "/.agents/skills/${n}/references";
         in
           if builtins.pathExists refs
           then mdIn refs
           else []
-      ) (builtins.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir (root + "/.agents/skills"))))
+      )
     else [];
 
   docFiles =
@@ -80,7 +88,7 @@
   # docs/history/pipeline-audit-2026-10.md §4); it is not a knowledge source and would only
   # add duplicate edges. The filter below is what keeps it out even if a local
   # build output is checked out by hand.
-  files = builtins.filter builtins.pathExists (rootDocs ++ docFiles);
+  files = (rootDocs ++ docFiles) |> builtins.filter builtins.pathExists;
 
   # Drafts are NOT documents and are deliberately not in `docFiles`: a draft is
   # not a page anyone routes by, so it must not answer for a finished one, and
@@ -90,11 +98,11 @@
   ideaFiles =
     if builtins.pathExists (root + "/ideas")
     then
-      map (n: root + "/ideas/${n}") (
-        builtins.attrNames (
-          lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".md" n) (builtins.readDir (root + "/ideas"))
-        )
-      )
+      (root + "/ideas")
+      |> builtins.readDir
+      |> lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".md" n)
+      |> builtins.attrNames
+      |> map (n: root + "/ideas/${n}")
     else [];
 
   rel = p: let
@@ -109,18 +117,19 @@
   # untrustworthy. Splitting on non-name characters keeps `master-toon` and
   # `nix-eval` intact while stopping `dev` from matching `devji`.
   tokensOf = text:
-    builtins.filter (t: builtins.isString t && t != "")
-    (builtins.split "[^A-Za-z0-9_-]+" text);
+    text
+    |> builtins.split "[^A-Za-z0-9_-]+"
+    |> builtins.filter (t: builtins.isString t && t != "");
 
   firstHeading = text: let
     lines = lib.splitString "\n" text;
-    hits = builtins.filter (l: lib.hasPrefix "# " l) lines;
+    hits = lines |> builtins.filter (l: lib.hasPrefix "# " l);
   in
     if hits == []
     then "(untitled)"
     else lib.removePrefix "# " (builtins.head hits);
 
-  skillNames = builtins.attrNames skills.skills;
+  skillNames = skills.skills |> builtins.attrNames;
 
   # Markdown inline links: the relation a token scan cannot see, and the source
   # of `references`. Only a target that IS a doc becomes an edge, so a stale path
@@ -131,10 +140,10 @@
   in
     if builtins.length parts <= 1
     then []
-    else map (chunk: builtins.head (lib.splitString ")" chunk)) (builtins.tail parts);
+    else parts |> builtins.tail |> map (chunk: chunk |> lib.splitString ")" |> builtins.head);
 
   cleanTarget = t: let
-    noFrag = builtins.head (lib.splitString "#" t);
+    noFrag = t |> lib.splitString "#" |> builtins.head;
   in
     lib.removeSuffix ">" (lib.removePrefix "<" noFrag);
 
@@ -143,7 +152,7 @@
   in
     if builtins.length parts <= 1
     then ""
-    else lib.concatStringsSep "/" (lib.init parts);
+    else parts |> lib.init |> lib.concatStringsSep "/";
 
   # `..` and `.` resolved segment-wise. Not a regex or a builtin: the target is a
   # repo-relative path, and the doc set is the only thing consulted after this.
@@ -161,7 +170,7 @@
         )
       else acc ++ [seg];
   in
-    lib.concatStringsSep "/" (builtins.foldl' step [] segs);
+    segs |> builtins.foldl' step [] |> lib.concatStringsSep "/";
 
   isDocLink = t:
     t
@@ -179,29 +188,32 @@
   citedIds = text: let
     parts = lib.splitString "[[flake/policies.nix#" text;
   in
-    lib.unique (map (chunk: builtins.head (lib.splitString "]]" chunk)) (builtins.tail parts));
+    parts |> builtins.tail |> map (chunk: chunk |> lib.splitString "]]" |> builtins.head) |> lib.unique;
 
   citedPolicies = text:
   # Only a DECLARED policy becomes a node: a template like `#<id>` in a doc is
   # prose about the convention, and a citation to an unknown id is a
   # `checks.ontology` failure, not a node the graph should invent.
-    lib.filter (id: builtins.hasAttr id policies && builtins.match "[a-z0-9][a-z0-9-]*" id != null) (citedIds text);
+    text |> citedIds |> lib.filter (id: (policies |> builtins.hasAttr id) && (id |> builtins.match "[a-z0-9][a-z0-9-]*") != null);
 
   # Every path that will become a doc node, so a link resolves before nodes exist.
-  docPaths = map rel files;
+  docPaths = files |> map rel;
 
   referencesIn = id: content: let
     dir = dirOf id;
-    targets = map (t:
-      normalisePath (
-        if dir == ""
-        then t
-        else "${dir}/${t}"
-      )) (
-      builtins.filter isDocLink (map cleanTarget (linkTargets content))
-    );
+    targets =
+      content
+      |> linkTargets
+      |> map cleanTarget
+      |> builtins.filter isDocLink
+      |> map (t:
+        normalisePath (
+          if dir == ""
+          then t
+          else "${dir}/${t}"
+        ));
   in
-    lib.unique (builtins.filter (t: t != id && builtins.elem t docPaths) targets);
+    targets |> builtins.filter (t: t != id && (docPaths |> builtins.elem t)) |> lib.unique;
 
   mkDoc = p: let
     content = builtins.readFile p;
@@ -212,14 +224,14 @@
     type = "doc";
     label = firstHeading content;
     path = id;
-    mentionsHosts = builtins.filter (h: builtins.elem h toks) hostNames;
-    mentionsSkills = builtins.filter (s: builtins.elem s toks) skillNames;
+    mentionsHosts = hostNames |> builtins.filter (h: toks |> builtins.elem h);
+    mentionsSkills = skillNames |> builtins.filter (s: toks |> builtins.elem s);
     references = referencesIn id content;
     cites = citedPolicies content;
     citations = citedIds content;
   };
 
-  docs = map mkDoc files;
+  docs = files |> map mkDoc;
 
   # Draft frontmatter, parsed line-wise: the contract, and why it is not YAML,
   # live in docs/blog-drafting.md.
@@ -229,11 +241,11 @@
       then acc // {done = true;}
       else acc // {items = acc.items ++ [x];};
   in
-    (builtins.foldl' step {
+    (list
+      |> builtins.foldl' step {
         done = false;
         items = [];
-      }
-      list)
+      })
     .items;
 
   frontmatter = content: let
@@ -250,30 +262,29 @@
 
   fmValue = content: key: let
     lines = frontmatter content;
-    hits = builtins.filter (l: lib.hasPrefix "${key}:" l) lines;
+    hits = lines |> builtins.filter (l: lib.hasPrefix "${key}:" l);
   in
     if hits == []
     then ""
-    else lib.trim (lib.removePrefix "${key}:" (builtins.head hits));
+    else hits |> builtins.head |> lib.removePrefix "${key}:" |> lib.trim;
 
   fmList = content: key: let
     lines = frontmatter content;
-    idx = builtins.filter (i: i != null) (
-      lib.imap0 (i: l:
+    idx =
+      lines
+      |> lib.imap0 (i: l:
         if l == "${key}:"
         then i
         else null)
-      lines
-    );
+      |> builtins.filter (i: i != null);
   in
     if idx == []
     then []
     else
-      map (l: lib.trim (lib.removePrefix "- " (lib.removePrefix "  - " l))) (
-        takeUntil (l: !(lib.hasPrefix "  - " l || lib.hasPrefix "- " l)) (
-          lib.drop ((builtins.head idx) + 1) lines
-        )
-      );
+      lines
+      |> lib.drop ((builtins.head idx) + 1)
+      |> takeUntil (l: !(lib.hasPrefix "  - " l || lib.hasPrefix "- " l))
+      |> map (l: l |> lib.removePrefix "  - " |> lib.removePrefix "- " |> lib.trim);
 
   mkIdea = p: let
     content = builtins.readFile p;
@@ -288,10 +299,10 @@
       then slug
       else title;
     inherit path;
-    about = builtins.filter (a: a != "") (fmList content "about");
+    about = fmList content "about" |> builtins.filter (a: a != "");
   };
 
-  ideas = map mkIdea ideaFiles;
+  ideas = ideaFiles |> map mkIdea;
 
   # --- Nix module graph ------------------------------------------------------
   # "Who imports this module" was a grep; the walk and the extraction are
@@ -301,36 +312,38 @@
   nixFilesCtl = import ./nix-files.nix {inherit lib root;};
   nixPaths = nixFilesCtl.paths;
   modules =
-    map (p: {
+    nixPaths
+    |> map (p: {
       id = "module:${p}";
       type = "module";
       label = p;
       path = p;
       imports = nixFilesCtl.importsOfPath p;
-    })
-    nixPaths;
+    });
 
   # Every node id that exists, so an `about` entry naming a typo is an edge that
   # does not resolve — which kg-check fails on — rather than an invented node.
   knowableIds =
-    map (h: "host:${h}") hostNames
-    ++ map (s: "skill:${s}") skillNames
-    ++ map (d: "doc:${d}") docPaths;
+    (hostNames |> map (h: "host:${h}"))
+    ++ (skillNames |> map (s: "skill:${s}"))
+    ++ (docPaths |> map (d: "doc:${d}"));
 
   hostNodes =
-    map (h: {
+    hostNames
+    |> map (h: {
       id = "host:${h}";
       type = "host";
       label = h;
       status = inventory.hosts.${h}.status or "unknown";
       kind = inventory.hosts.${h}.kind or "unknown";
-    })
-    hostNames;
+    });
 
   serviceNodes =
-    lib.concatMap (
+    hostNames
+    |> lib.concatMap (
       h:
-        map (s: {
+        inventory.hosts.${h}.software.services
+        |> map (s: {
           id = "service:${h}:${s.name}";
           type = "service";
           label = s.name;
@@ -338,24 +351,23 @@
           inherit (s) port;
           inherit (s) note;
         })
-        inventory.hosts.${h}.software.services
-    )
-    hostNames;
+    );
 
   serviceEdges =
-    lib.concatMap (
+    hostNames
+    |> lib.concatMap (
       h:
-        map (s: {
+        inventory.hosts.${h}.software.services
+        |> map (s: {
           from = "service:${h}:${s.name}";
           to = "host:${h}";
           type = "runs-on";
         })
-        inventory.hosts.${h}.software.services
-    )
-    hostNames;
+    );
 
   skillNodes =
-    map (n: {
+    (skills.skills |> builtins.attrNames)
+    |> map (n: {
       id = "skill:${n}";
       type = "skill";
       label = n;
@@ -363,42 +375,45 @@
       path = skills.skills.${n}.path;
       tags = skills.skills.${n}.tags;
       # The body is already parsed in `lib/skills.nix`, so this costs no read.
-      cites = citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body);
-    })
-    (builtins.attrNames skills.skills);
+      cites = skills.skills.${n}.body |> lib.concatStringsSep "\n" |> citedPolicies;
+    });
 
   # A policy node exists because prose cites it: `checks.policies` proves every
   # citation resolves and every id is cited, so the set cannot be invented here.
-  policyIds = lib.unique (
-    lib.concatMap (d: d.cites) docs
-    ++ lib.concatMap (n: citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body)) (builtins.attrNames skills.skills)
-  );
+  policyIds =
+    ((docs |> lib.concatMap (d: d.cites))
+      ++ ((skills.skills |> builtins.attrNames)
+        |> lib.concatMap (n: skills.skills.${n}.body |> lib.concatStringsSep "\n" |> citedPolicies)))
+    |> lib.unique;
   unresolvedCitations = let
     missed = id: !(builtins.hasAttr id policies) && builtins.match "[a-z0-9][a-z0-9-]*" id != null;
   in
-    lib.concatMap (d: map (id: "${d.id} -> policy:${id}") (builtins.filter missed d.citations)) docs
-    ++ lib.concatMap (
-      n:
-        map (id: "skill:${n} -> policy:${id}") (
-          builtins.filter missed (citedIds (lib.concatStringsSep "\n" skills.skills.${n}.body))
-        )
-    )
-    (builtins.attrNames skills.skills);
+    (docs |> lib.concatMap (d: d.citations |> builtins.filter missed |> map (id: "${d.id} -> policy:${id}")))
+    ++ ((skills.skills |> builtins.attrNames)
+      |> lib.concatMap (
+        n:
+          skills.skills.${n}.body
+          |> lib.concatStringsSep "\n"
+          |> citedIds
+          |> builtins.filter missed
+          |> map (id: "skill:${n} -> policy:${id}")
+      ));
   policyNodes =
-    map (id: {
+    policyIds
+    |> map (id: {
       id = "policy:${id}";
       type = "policy";
       label = id;
       path = "flake/policies.nix";
       rule = policies.${id}.rule or "";
       proof = policies.${id}.proof or "";
-    })
-    policyIds;
+    });
 
   noteEntries = notes.notes or {};
-  noteIdsForEdges = builtins.attrNames noteEntries;
+  noteIdsForEdges = noteEntries |> builtins.attrNames;
   noteNodes =
-    map (id: let
+    noteIdsForEdges
+    |> map (id: let
       n = noteEntries.${id};
     in {
       id = "note:${id}";
@@ -408,27 +423,28 @@
       kind = n.kind or "reference";
       status = n.status or "PROPOSED";
       claim = ((notes.claims or {}).${id} or {}).claim or null;
-    })
-    noteIdsForEdges;
-  noteEdges = lib.concatMap (id: let
-    n = noteEntries.${id};
-    targets = k: builtins.filter (p: builtins.elem p noteIdsForEdges) (n.${k} or []);
-    lineage = type: p: {
-      from = "note:${id}";
-      to = "note:${p}";
-      inherit type;
-      evidence = "asserted";
-      because = "a person wrote the list; the schema only proves the id resolves";
-    };
-  in
-    map (lineage "derives") (targets "from")
-    ++ map (lineage "supersedes") (targets "supersedes"))
-  noteIdsForEdges;
+    });
+  noteEdges =
+    noteIdsForEdges
+    |> lib.concatMap (id: let
+      n = noteEntries.${id};
+      targets = k: (n.${k} or []) |> builtins.filter (p: noteIdsForEdges |> builtins.elem p);
+      lineage = type: p: {
+        from = "note:${id}";
+        to = "note:${p}";
+        inherit type;
+        evidence = "asserted";
+        because = "a person wrote the list; the schema only proves the id resolves";
+      };
+    in
+      ("from" |> targets |> map (lineage "derives"))
+      ++ ("supersedes" |> targets |> map (lineage "supersedes")));
 
-  taskIds = builtins.attrNames tasks;
+  taskIds = tasks |> builtins.attrNames;
   taskNodes =
-    map (n: let
-      parts = lib.splitString ":" n;
+    taskIds
+    |> map (n: let
+      parts = n |> lib.splitString ":";
     in {
       id = "task:${n}";
       type = "task";
@@ -439,8 +455,7 @@
         then builtins.head parts
         else "root";
       aliasOf = tasks.${n}.aliasOf or "";
-    })
-    taskIds;
+    });
 
   playbookDoc = let
     p = root + "/.agents/skills/router/references/playbooks.md";
@@ -448,14 +463,16 @@
     if builtins.pathExists p
     then builtins.readFile p
     else "";
-  playbookLines = lib.splitString "\n" playbookDoc;
+  playbookLines = playbookDoc |> lib.splitString "\n";
   lineSpans = line: let
     parts = lib.splitString "`" line;
   in
-    map (i: builtins.elemAt parts (i * 2 + 1)) (
-      builtins.filter (i: i * 2 + 1 < builtins.length parts) (lib.range 0 (builtins.length parts))
-    );
-  rowWords = line: map (s: builtins.head (lib.splitString " " (lib.removePrefix "task " s))) (lineSpans line);
+    parts
+    |> builtins.length
+    |> lib.range 0
+    |> builtins.filter (i: i * 2 + 1 < builtins.length parts)
+    |> map (i: parts |> (xs: builtins.elemAt xs (i * 2 + 1)));
+  rowWords = line: line |> lineSpans |> map (s: s |> lib.removePrefix "task " |> lib.splitString " " |> builtins.head);
   rowLabel = line: let
     m = builtins.match "\\|[[:space:]]*`([a-z]+(-[a-z]+)*)`.*" line;
   in
@@ -464,32 +481,40 @@
     else builtins.head m;
   taskShaped = t: builtins.match "[a-z][a-z0-9-]*(:[a-z0-9*<][a-z0-9*_<>-]*)+" t != null;
   wildcardFor = t:
-    lib.sort (
+    taskIds
+    |> builtins.filter (n: (n |> lib.hasInfix "*") && (t |> lib.hasPrefix (n |> lib.splitString "*" |> builtins.head)))
+    |> lib.sort (
       a: b:
-        builtins.stringLength (builtins.head (lib.splitString "*" a))
-        > builtins.stringLength (builtins.head (lib.splitString "*" b))
-    ) (builtins.filter (n: lib.hasInfix "*" n && lib.hasPrefix (builtins.head (lib.splitString "*" n)) t) taskIds);
+        (a |> lib.splitString "*" |> builtins.head |> builtins.stringLength)
+        > (b |> lib.splitString "*" |> builtins.head |> builtins.stringLength)
+    );
   resolves = t: builtins.hasAttr t tasks || wildcardFor t != [];
   resolvedTask = t:
     if builtins.hasAttr t tasks
     then t
-    else builtins.head (wildcardFor t);
+    else t |> wildcardFor |> builtins.head;
   rowTasks = line: let
     l = rowLabel line;
   in
     if l == null
     then []
     else
-      map (n: {
+      line
+      |> rowWords
+      |> builtins.filter (t: (t |> taskShaped) && (t |> resolves))
+      |> map resolvedTask
+      |> lib.unique
+      |> map (n: {
         from = "doc:.agents/skills/router/references/playbooks.md";
         to = "task:${n}";
         type = "routes";
         label = l;
-      }) (lib.unique (map resolvedTask (builtins.filter (t: taskShaped t && resolves t) (rowWords line))));
-  routeEdges = lib.concatMap rowTasks playbookLines;
-  routerUnknown = lib.unique (
-    lib.concatMap (line: builtins.filter (t: taskShaped t && !(resolves t)) (rowWords line)) playbookLines
-  );
+      });
+  routeEdges = playbookLines |> lib.concatMap rowTasks;
+  routerUnknown =
+    playbookLines
+    |> lib.concatMap (line: line |> rowWords |> builtins.filter (t: (t |> taskShaped) && !(t |> resolves)))
+    |> lib.unique;
 
   nodes =
     hostNodes
@@ -497,124 +522,128 @@
     ++ serviceNodes
     ++ policyNodes
     ++ noteNodes
-    ++ map (d: {
-      inherit (d) id type label path cites;
-    })
-    docs
-    ++ map (i: {
-      inherit (i) id type label path;
-    })
-    ideas
-    ++ map (m: {
-      inherit (m) id type label path;
-    })
-    modules
+    ++ (docs
+      |> map (d: {
+        inherit (d) id type label path cites;
+      }))
+    ++ (ideas
+      |> map (i: {
+        inherit (i) id type label path;
+      }))
+    ++ (modules
+      |> map (m: {
+        inherit (m) id type label path;
+      }))
     ++ taskNodes;
 
   edges =
-    lib.concatMap (d:
-      map (h: {
-        from = d.id;
-        to = "host:${h}";
-        type = "mentions";
-      })
-      d.mentionsHosts
-      ++ map (s: {
-        from = d.id;
-        to = "skill:${s}";
-        type = "mentions";
-      })
-      d.mentionsSkills
-      ++ map (r: {
-        from = d.id;
-        to = "doc:${r}";
-        type = "references";
-      })
-      d.references)
-    docs
-    ++ lib.concatMap (n:
-      map (t: {
-        from = "skill:${n}";
-        to = "tag:${t}";
-        type = "tagged";
-      })
-      skills.skills.${n}.tags)
-    (builtins.attrNames skills.skills)
+    (docs
+      |> lib.concatMap (d:
+        (d.mentionsHosts
+          |> map (h: {
+            from = d.id;
+            to = "host:${h}";
+            type = "mentions";
+          }))
+        ++ (d.mentionsSkills
+          |> map (s: {
+            from = d.id;
+            to = "skill:${s}";
+            type = "mentions";
+          }))
+        ++ (d.references
+          |> map (r: {
+            from = d.id;
+            to = "doc:${r}";
+            type = "references";
+          }))))
+    ++ ((skills.skills |> builtins.attrNames)
+      |> lib.concatMap (n:
+        skills.skills.${n}.tags
+        |> map (t: {
+          from = "skill:${n}";
+          to = "tag:${t}";
+          type = "tagged";
+        })))
     # A draft names the entities it is about; the edge is only emitted for an id
     # that exists, so a typo in frontmatter surfaces as "edge endpoints resolve
     # to nodes" in kg-check instead of quietly shrinking the graph.
-    ++ lib.concatMap (i:
-      map (a: {
-        from = i.id;
-        to = a;
-        type = "about";
-      })
-      (lib.unique (builtins.filter (a: builtins.elem a knowableIds) i.about)))
-    ideas
+    ++ (ideas
+      |> lib.concatMap (i:
+        i.about
+        |> builtins.filter (a: knowableIds |> builtins.elem a)
+        |> lib.unique
+        |> map (a: {
+          from = i.id;
+          to = a;
+          type = "about";
+        })))
     # Only a path that IS a module node becomes an edge, so the importer list is
     # always answerable; the filter is what makes the extraction safe to be rough.
-    ++ lib.concatMap (m:
-      map (r: {
-        from = m.id;
-        to = "module:${r}";
-        type = "imports";
-      })
-      (builtins.filter (r: builtins.elem r nixPaths) m.imports))
-    modules
+    ++ (modules
+      |> lib.concatMap (m:
+        m.imports
+        |> builtins.filter (r: nixPaths |> builtins.elem r)
+        |> map (r: {
+          from = m.id;
+          to = "module:${r}";
+          type = "imports";
+        })))
     # A citation: prose names the rule, so the rule can name its prose. This is
     # the edge that answers "which pages restate this" without a grep.
-    ++ lib.concatMap (d:
-      map (id: {
-        from = d.id;
-        to = "policy:${id}";
-        type = "cites";
-      })
-      d.cites)
-    docs
-    ++ lib.concatMap (n:
-      map (id: {
-        from = "skill:${n}";
-        to = "policy:${id}";
-        type = "cites";
-      })
-      (citedPolicies (lib.concatStringsSep "\n" skills.skills.${n}.body)))
-    (builtins.attrNames skills.skills)
+    ++ (docs
+      |> lib.concatMap (d:
+        d.cites
+        |> map (id: {
+          from = d.id;
+          to = "policy:${id}";
+          type = "cites";
+        })))
+    ++ ((skills.skills |> builtins.attrNames)
+      |> lib.concatMap (n:
+        (skills.skills.${n}.body |> lib.concatStringsSep "\n" |> citedPolicies)
+        |> map (id: {
+          from = "skill:${n}";
+          to = "policy:${id}";
+          type = "cites";
+        })))
     ++ routeEdges
     ++ serviceEdges
     ++ noteEdges;
 
-  tagNodes = lib.unique (lib.concatMap (n: skills.skills.${n}.tags) (builtins.attrNames skills.skills));
+  tagNodes = (skills.skills |> builtins.attrNames) |> lib.concatMap (n: skills.skills.${n}.tags) |> lib.unique;
 
   graph = {
     schemaVersion = 1;
     generatedBy = "lib/knowledge-graph.nix";
     nodes =
       nodes
-      ++ map (t: {
-        id = "tag:${t}";
-        type = "tag";
-        label = t;
-      })
-      tagNodes;
+      ++ (tagNodes
+        |> map (t: {
+          id = "tag:${t}";
+          type = "tag";
+          label = t;
+        }));
     inherit edges;
     stats = {
-      hosts = builtins.length hostNames;
-      skills = builtins.length (builtins.attrNames skills.skills);
-      docs = builtins.length docs;
-      ideas = builtins.length ideas;
-      notes = builtins.length noteIdsForEdges;
-      modules = builtins.length modules;
-      services = builtins.length serviceNodes;
-      policies = builtins.length policyIds;
-      tasks = builtins.length taskIds;
-      edges = builtins.length edges;
-      recordedEdges = builtins.length (builtins.filter (e: e ? evidence) edges);
+      hosts = hostNames |> builtins.length;
+      skills = skills.skills |> builtins.attrNames |> builtins.length;
+      docs = docs |> builtins.length;
+      ideas = ideas |> builtins.length;
+      notes = noteIdsForEdges |> builtins.length;
+      modules = modules |> builtins.length;
+      services = serviceNodes |> builtins.length;
+      policies = policyIds |> builtins.length;
+      tasks = taskIds |> builtins.length;
+      edges = edges |> builtins.length;
+      recordedEdges = edges |> builtins.filter (e: e ? evidence) |> builtins.length;
     };
   };
 
   q = s: builtins.toJSON s;
   cypherNodes =
-    lib.concatMapStrings (n: let
+    graph.nodes
+    |> lib.concatMapStrings (n: let
       label =
         if n.type == "host"
         then "Host"
@@ -638,10 +667,10 @@
     in ''
       MERGE (${"n_${builtins.hashString "md5" n.id}"}:${label} {id: ${q n.id}})
       SET ${"n_${builtins.hashString "md5" n.id}"}.label = ${q n.label};
-    '')
-    graph.nodes;
+    '');
   cypherEdges =
-    lib.concatMapStrings (e: let
+    graph.edges
+    |> lib.concatMapStrings (e: let
       a = "n_${builtins.hashString "md5" e.from}";
       b = "n_${builtins.hashString "md5" e.to}";
       rel =
@@ -662,8 +691,7 @@
         else "MENTIONS";
     in ''
       MATCH (${a}), (${b}) MERGE (${a})-[r:${rel}]->(${b})${lib.optionalString (e ? evidence) " SET r.evidence = ${q e.evidence}"};
-    '')
-    graph.edges;
+    '');
 in {
   inherit graph routerUnknown unresolvedCitations;
   cypher = "// generated by lib/knowledge-graph.nix\n" + cypherNodes + cypherEdges;

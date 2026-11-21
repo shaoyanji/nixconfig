@@ -16,6 +16,7 @@
   ...
 }: let
   cfg = config.services.xsNotify;
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   xsNotifyScript = pkgs.writeShellApplication {
     name = "xs-notify";
@@ -27,6 +28,31 @@
       jq
     ];
     text = builtins.readFile ../../scripts/task/xs-notify.sh;
+  };
+
+  # Same skeleton as the rest of the fleet's timer jobs (lib/systemd-jobs.nix):
+  # a Type=oneshot service under a timers.target/Persistent timer.
+  job = systemdJobs.mkTimerJob {Type = "oneshot";} {
+    description = "Monitor xs agent-turn changes and push to Telegram @Frierenixbot";
+    timerDescription = "Run xs-notify every minute";
+    onCalendar = "*-*-* *:*:00";
+    after = [
+      "network-online.target"
+      "agent-turns-shim.service"
+    ];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      User = "root";
+      EnvironmentFile = [config.sops.secrets."xs-notify-telegram".path];
+      Environment = [
+        "XS_TURNS_URL=${cfg.url}"
+        "AGENT_TURNS_TOKEN_FILE=/run/secrets/agent-turns-token"
+        "TELEGRAM_CHAT_ID=${cfg.chatId}"
+        "STATE_DIR=/var/lib/xs-notify"
+      ];
+      StateDirectory = "xs-notify";
+      ExecStart = "${xsNotifyScript}/bin/xs-notify";
+    };
   };
 in {
   options.services.xsNotify = {
@@ -65,35 +91,7 @@ in {
       sopsFile = ../../modules/secrets.yaml;
     };
 
-    systemd.services.xs-notify = {
-      description = "Monitor xs agent-turn changes and push to Telegram @Frierenixbot";
-      after = [
-        "network-online.target"
-        "agent-turns-shim.service"
-      ];
-      wants = ["network-online.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        User = "root";
-        EnvironmentFile = [config.sops.secrets."xs-notify-telegram".path];
-        Environment = [
-          "XS_TURNS_URL=${cfg.url}"
-          "AGENT_TURNS_TOKEN_FILE=/run/secrets/agent-turns-token"
-          "TELEGRAM_CHAT_ID=${cfg.chatId}"
-          "STATE_DIR=/var/lib/xs-notify"
-        ];
-        StateDirectory = "xs-notify";
-        ExecStart = "${xsNotifyScript}/bin/xs-notify";
-      };
-    };
-
-    systemd.timers.xs-notify = {
-      description = "Run xs-notify every minute";
-      timerConfig = {
-        OnCalendar = "*-*-* *:*:00";
-        Persistent = true;
-      };
-      wantedBy = ["timers.target"];
-    };
+    systemd.services.xs-notify = job.service;
+    systemd.timers.xs-notify = job.timer;
   };
 }

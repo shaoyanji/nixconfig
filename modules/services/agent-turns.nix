@@ -9,6 +9,7 @@
   ...
 }: let
   cfg = config.services.agentTurns;
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   # Upstream publishes a prebuilt arm64 binary per release. Building the crate
   # here would mean compiling Nushell 0.116 on a 2-vCPU guest; the release asset
@@ -145,13 +146,13 @@
     NoNewPrivileges = true;
   };
 
-  mkDaemon = extra:
-    {
+  mkDaemon = systemdJobs.mkDaemon {
+    unitBase = {
       wantedBy = ["multi-user.target"];
       unitConfig.X-Fleet-Role = "daemon";
-      serviceConfig = daemonServiceConfig // (extra.serviceConfig or {});
-    }
-    // removeAttrs extra ["serviceConfig"];
+    };
+    serviceBase = daemonServiceConfig;
+  };
 in {
   options.services.agentTurns = {
     enable = lib.mkEnableOption "the agent-turn coordination store (xs) and its authenticated shim";

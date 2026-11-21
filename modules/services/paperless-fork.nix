@@ -8,6 +8,7 @@
 }: let
   cfg = config.services.paperless;
   opt = options.services.paperless;
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   defaultUser = "paperless";
   defaultFont = "${pkgs.liberation_ttf}/share/fonts/truetype/LiberationSerif-Regular.ttf";
@@ -133,26 +134,31 @@
   };
 
   pgTarget = lib.optional cfg.database.createLocally "postgresql.target";
+  # Paperless daemons need their site policy pre-computed — the postgres edge
+  # appends after any call-site `after`, and the shared `env` is the default
+  # rather than a hard value — so the call into the shared skeleton is thin.
   mkDaemon = extra:
-    {
-      requires = pgTarget;
-      after = (extra.after or []) ++ pgTarget;
-      unitConfig =
-        {
+    systemdJobs.mkDaemon {
+      unitBase = {
+        requires = pgTarget;
+        unitConfig = {
           X-Fleet-Role = "daemon";
           StartLimitIntervalSec = 0;
-        }
-        // (extra.unitConfig or {});
-      serviceConfig =
+        };
+      };
+      serviceBase =
         defaultServiceConfig
         // {
           User = cfg.user;
           Restart = "on-failure";
-        }
-        // (extra.serviceConfig or {});
-      environment = extra.environment or env;
-    }
-    // removeAttrs extra ["after" "unitConfig" "serviceConfig" "environment"];
+        };
+    } (
+      extra
+      // {
+        after = (extra.after or []) ++ pgTarget;
+        environment = extra.environment or env;
+      }
+    );
 in {
   disabledModules = ["services/misc/paperless.nix"];
 

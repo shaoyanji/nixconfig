@@ -8,6 +8,7 @@
 }: let
   cfg = config.services.mailAtlas;
   archive = config.services.emailArchive;
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
 
   # The particle simulation is a real .wat compiled at build time: the artifact
   # is a store path, wabt is a build input, and nothing is generated on the host.
@@ -106,45 +107,11 @@
   # The three queue jobs share one skeleton — a Type=oneshot service as root
   # with the minimal sandbox, driven by a timers.target/Persistent timer —
   # and differ in the script, the ordering edges, the timeout and the calendar.
-  mkTimerJob = {
-    description,
-    timerDescription,
-    onCalendar,
-    randomizedDelaySec,
-    enable ? true,
-    serviceConfig ? {},
-    ...
-  } @ spec: {
-    inherit enable;
-    service =
-      removeAttrs spec [
-        "description"
-        "timerDescription"
-        "onCalendar"
-        "randomizedDelaySec"
-        "enable"
-        "serviceConfig"
-      ]
-      // {
-        inherit description;
-        serviceConfig =
-          {
-            Type = "oneshot";
-            User = "root";
-            NoNewPrivileges = true;
-            PrivateTmp = true;
-          }
-          // serviceConfig;
-      };
-    timer = {
-      description = timerDescription;
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = onCalendar;
-        Persistent = true;
-        RandomizedDelaySec = randomizedDelaySec;
-      };
-    };
+  mkTimerJob = systemdJobs.mkTimerJob {
+    Type = "oneshot";
+    User = "root";
+    NoNewPrivileges = true;
+    PrivateTmp = true;
   };
 
   queueJobs = {

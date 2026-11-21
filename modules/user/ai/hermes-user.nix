@@ -150,6 +150,24 @@
   };
   userInstall = {WantedBy = ["default.target"];};
 
+  # The four Type=simple user daemons below share the network ordering edge,
+  # the crash-loop class (no start limit), serviceTail and the default.target
+  # install — a call site names its Unit/Service differences, and the gateway
+  # still overrides After/Wants in full for its SimpleX ordering edge.
+  mkUserDaemon = {
+    wantsNetwork ? true,
+    unlimitedStart ? true,
+    ...
+  } @ extra: {
+    Unit =
+      {After = ["network-online.target"];}
+      // lib.optionalAttrs wantsNetwork {Wants = ["network-online.target"];}
+      // lib.optionalAttrs unlimitedStart {StartLimitIntervalSec = 0;}
+      // (extra.Unit or {});
+    Service = {Type = "simple";} // (extra.Service or {}) // serviceTail;
+    Install = userInstall;
+  };
+
   soulRel =
     if hostName != "" && builtins.pathExists ./personas/${hostName}/SOUL.md
     then "personas/${hostName}/SOUL.md"
@@ -454,75 +472,52 @@ in {
       done
     '');
 
-    systemd.user.services.firecrawl-local = lib.mkIf (config.programs.hermes-user.firecrawl.enable && pkgs.stdenv.hostPlatform.isLinux) {
-      Unit = {
-        Description = "firecrawl-local — loopback Firecrawl API for hermes web extract";
-        After = ["network-online.target"];
-        StartLimitIntervalSec = 0;
+    systemd.user.services.firecrawl-local = lib.mkIf (config.programs.hermes-user.firecrawl.enable && pkgs.stdenv.hostPlatform.isLinux) (mkUserDaemon {
+      wantsNetwork = false;
+      Unit.Description = "firecrawl-local — loopback Firecrawl API for hermes web extract";
+      Service = {
+        ExecStart = "${firecrawlLocal}/bin/firecrawl-local serve --port ${toString config.programs.hermes-user.firecrawl.port}";
+        Environment = [
+          "FIRECRAWL_CLOUD=off"
+          "FIRECRAWL_LOCAL_BROWSER=auto"
+          "FIRECRAWL_CHROME_PATH=${firecrawlChrome}/bin/firecrawl-chrome"
+        ];
+        RestartSec = 2;
       };
-      Service =
-        {
-          Type = "simple";
-          ExecStart = "${firecrawlLocal}/bin/firecrawl-local serve --port ${toString config.programs.hermes-user.firecrawl.port}";
-          Environment = [
-            "FIRECRAWL_CLOUD=off"
-            "FIRECRAWL_LOCAL_BROWSER=auto"
-            "FIRECRAWL_CHROME_PATH=${firecrawlChrome}/bin/firecrawl-chrome"
-          ];
-          RestartSec = 2;
-        }
-        // serviceTail;
-      Install = userInstall;
-    };
+    });
 
-    systemd.user.services.simplex-chat = lib.mkIf (config.programs.hermes-user.simplex.daemon && pkgs.stdenv.hostPlatform.isLinux) {
-      Unit = {
-        Description = "SimpleX Chat WebSocket Daemon";
-        After = ["network-online.target"];
-        Wants = ["network-online.target"];
+    systemd.user.services.simplex-chat = lib.mkIf (config.programs.hermes-user.simplex.daemon && pkgs.stdenv.hostPlatform.isLinux) (mkUserDaemon {
+      unlimitedStart = false;
+      Unit.Description = "SimpleX Chat WebSocket Daemon";
+      Service = {
+        ExecStart = "${pkgs.simplex-chat}/bin/simplex-chat -p ${toString config.programs.hermes-user.simplex.port}";
+        WorkingDirectory = "${config.home.homeDirectory}";
+        RestartSec = 5;
       };
-      Service =
-        {
-          Type = "simple";
-          ExecStart = "${pkgs.simplex-chat}/bin/simplex-chat -p ${toString config.programs.hermes-user.simplex.port}";
-          WorkingDirectory = "${config.home.homeDirectory}";
-          RestartSec = 5;
-        }
-        // serviceTail;
-      Install = userInstall;
-    };
+    });
 
     # chatplayground-serve: loopback only. It holds a live web-chat session, so
     # it is never exposed beyond 127.0.0.1 — the hermes child agents on this host
     # are the only intended client.
-    systemd.user.services.chatplayground-serve = lib.mkIf (config.programs.hermes-user.chatplayground.enable && pkgs.stdenv.hostPlatform.isLinux) {
-      Unit = {
-        Description = "chatplayground-serve — OpenAI-compatible shim over chatplayground web chat";
-        After = ["network-online.target"];
-        Wants = ["network-online.target"];
-        StartLimitIntervalSec = 0;
+    systemd.user.services.chatplayground-serve = lib.mkIf (config.programs.hermes-user.chatplayground.enable && pkgs.stdenv.hostPlatform.isLinux) (mkUserDaemon {
+      Unit.Description = "chatplayground-serve — OpenAI-compatible shim over chatplayground web chat";
+      Service = {
+        ExecStart = let
+          c = config.programs.hermes-user.chatplayground;
+        in
+          "${chatplaygroundCli}/bin/chatplayground-go serve --addr 127.0.0.1:${toString c.port}"
+          + lib.optionalString c.toolsEmulate " --tools-emulate";
+        WorkingDirectory = config.home.homeDirectory;
+        Environment = [
+          "HOME=${config.home.homeDirectory}"
+          "USER=${config.home.username}"
+        ];
+        # The auth file can be rewritten under it (a login, a rotation); the
+        # process reads it per request, so a restart is not needed. Only a dead
+        # port is: the unit is cheap, so let it restart rather than linger sick.
+        RestartSec = 5;
       };
-      Service =
-        {
-          Type = "simple";
-          ExecStart = let
-            c = config.programs.hermes-user.chatplayground;
-          in
-            "${chatplaygroundCli}/bin/chatplayground-go serve --addr 127.0.0.1:${toString c.port}"
-            + lib.optionalString c.toolsEmulate " --tools-emulate";
-          WorkingDirectory = config.home.homeDirectory;
-          Environment = [
-            "HOME=${config.home.homeDirectory}"
-            "USER=${config.home.username}"
-          ];
-          # The auth file can be rewritten under it (a login, a rotation); the
-          # process reads it per request, so a restart is not needed. Only a dead
-          # port is: the unit is cheap, so let it restart rather than linger sick.
-          RestartSec = 5;
-        }
-        // serviceTail;
-      Install = userInstall;
-    };
+    });
 
     # The session lives in a browser cookie. When it dies, chat, image
     # generation and the advice lane die together, and nothing says so until a
@@ -576,7 +571,7 @@ in {
       Install.WantedBy = ["timers.target"];
     };
 
-    systemd.user.services.hermes-gateway = lib.mkIf (config.programs.hermes-user.gateway.enable && pkgs.stdenv.hostPlatform.isLinux) {
+    systemd.user.services.hermes-gateway = lib.mkIf (config.programs.hermes-user.gateway.enable && pkgs.stdenv.hostPlatform.isLinux) (mkUserDaemon {
       Unit = {
         Description = "Hermes Agent Gateway - Messaging Platform Integration";
         After = ["network-online.target"] ++ lib.optional config.programs.hermes-user.simplex.daemon "simplex-chat.service";
@@ -585,56 +580,52 @@ in {
         # into a permanent stop.
         StartLimitIntervalSec = 0;
       };
-      Service =
-        {
-          Type = "simple";
-          ExecStart = "${pkgs.llm-agents.hermes-agent}/bin/hermes gateway run";
-          WorkingDirectory = "${config.home.homeDirectory}/.hermes";
-          # Inject the sops-rendered credential file directly into the unit so
-          # the gateway never depends on the ~/.hermes/.env bridge symlink
-          # being present at start time. "-" tolerates a missing file.
-          EnvironmentFile =
-            lib.mkIf (config.programs.hermes-user.envFile != null)
-            "-${config.programs.hermes-user.envFile}";
-          Environment = [
-            "HERMES_HOME=${config.home.homeDirectory}/.hermes"
-            "HERMES_SUPERVISED_CHILD=1"
-            "HOME=${config.home.homeDirectory}"
-            "USER=${config.home.username}"
-            # agy is the subagent a hermes turn shells out to. Home Manager's
-            # sessionVariables never reach a systemd unit, so without these the
-            # daemon calls the local agy with no model and may attempt a
-            # self-update against the read-only store. The model comes from the
-            # antigravity module, not a second literal.
-            "AGY_CLI_DISABLE_AUTO_UPDATE=true"
-            "GEMINI_MODEL=${
-              # A null attr is not a missing one: attrByPath returns the value it
-              # finds, so an unset model coerced here and failed the whole switch
-              # (measured 2026-11-06 on delphi). Fall back rather than crash.
-              let
-                model = config.programs.antigravity-cli.defaultModel or null;
-              in
-                if model == null
-                then "gemini-3.8-flash"
-                else model
-            }"
-            # /run/wrappers/bin MUST come first: it holds the setuid sudo
-            # wrapper. A pkgs.sudo pulled into ~/.nix-profile (e.g. via the
-            # hermes-agent dependency tree) is a plain store binary without
-            # setuid and makes child agents fail escalation with "sudo binary
-            # lacks setuid" (seen 2026-10-08).
-            "PATH=/run/wrappers/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
-          ];
-          RestartSec = 5;
-          RestartForceExitStatus = 75;
-          SuccessExitStatus = 75;
-          RestartPreventExitStatus = 78;
-          KillMode = "mixed";
-          KillSignal = "SIGTERM";
-          TimeoutStopSec = 70;
-        }
-        // serviceTail;
-      Install = userInstall;
-    };
+      Service = {
+        ExecStart = "${pkgs.llm-agents.hermes-agent}/bin/hermes gateway run";
+        WorkingDirectory = "${config.home.homeDirectory}/.hermes";
+        # Inject the sops-rendered credential file directly into the unit so
+        # the gateway never depends on the ~/.hermes/.env bridge symlink
+        # being present at start time. "-" tolerates a missing file.
+        EnvironmentFile =
+          lib.mkIf (config.programs.hermes-user.envFile != null)
+          "-${config.programs.hermes-user.envFile}";
+        Environment = [
+          "HERMES_HOME=${config.home.homeDirectory}/.hermes"
+          "HERMES_SUPERVISED_CHILD=1"
+          "HOME=${config.home.homeDirectory}"
+          "USER=${config.home.username}"
+          # agy is the subagent a hermes turn shells out to. Home Manager's
+          # sessionVariables never reach a systemd unit, so without these the
+          # daemon calls the local agy with no model and may attempt a
+          # self-update against the read-only store. The model comes from the
+          # antigravity module, not a second literal.
+          "AGY_CLI_DISABLE_AUTO_UPDATE=true"
+          "GEMINI_MODEL=${
+            # A null attr is not a missing one: attrByPath returns the value it
+            # finds, so an unset model coerced here and failed the whole switch
+            # (measured 2026-11-06 on delphi). Fall back rather than crash.
+            let
+              model = config.programs.antigravity-cli.defaultModel or null;
+            in
+              if model == null
+              then "gemini-3.8-flash"
+              else model
+          }"
+          # /run/wrappers/bin MUST come first: it holds the setuid sudo
+          # wrapper. A pkgs.sudo pulled into ~/.nix-profile (e.g. via the
+          # hermes-agent dependency tree) is a plain store binary without
+          # setuid and makes child agents fail escalation with "sudo binary
+          # lacks setuid" (seen 2026-10-08).
+          "PATH=/run/wrappers/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
+        ];
+        RestartSec = 5;
+        RestartForceExitStatus = 75;
+        SuccessExitStatus = 75;
+        RestartPreventExitStatus = 78;
+        KillMode = "mixed";
+        KillSignal = "SIGTERM";
+        TimeoutStopSec = 70;
+      };
+    });
   };
 }

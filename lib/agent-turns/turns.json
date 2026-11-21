@@ -1,8 +1,77 @@
 {
-  "generated": "2026-11-21T01:18:04Z",
+  "generated": "2026-11-21T01:27:19Z",
   "count": 200,
-  "pin": "91d4b884244deb582427291567efcec00a4f0bbe8784c52ef5617aa5e677fd94",
+  "pin": "74812642135eeadc6d6ebb662cc5fbf8d8a83f81d2f084baf85cb13239194cf5",
   "turns": [
+    {
+      "id": "78c32b0b-e0bf-44e8-8578-e26d208cd2f8",
+      "ts": "2026-11-21T01:25:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-gate",
+      "action": "landed: drove idle freebuff pane (default:1.1) on verify_cv_gate — verify durable CV-PDF link gate end to end",
+      "outcome": "done",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w06thhq7we50mdx72j6l7"
+    },
+    {
+      "id": "de36b809-598d-4ffa-8d76-eb2443faac94",
+      "ts": "2026-11-21T01:21:11Z",
+      "source": "devin",
+      "subject": "nixconfig:ai-modules-review",
+      "action": "landed: nixconfig-refactor task driven to devin pane 2.1 (shared-helper home, eval-cost-ladder gate, hermes-user.nix review)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vzfjdq3cayajoz9yhnddi"
+    },
+    {
+      "id": "4a92b01a-2a68-4ae4-acc7-0b2697648c1b",
+      "ts": "2026-11-21T01:21:11Z",
+      "source": "freebuff",
+      "subject": "cv:cv-site-gate",
+      "action": "landed: cv-site-gate task driven to freebuff pane 1.1 (verify built CV PDFs linked from site, targets resolve)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vzfiadrre8yh6aw4xjui6"
+    },
+    {
+      "id": "17aaf694-fa01-45fd-ae60-fc35c7f63323",
+      "ts": "2026-11-21T01:20:37Z",
+      "source": "devin",
+      "subject": "nixconfig:ai-modules-review",
+      "action": "claim: review hermes-user.nix gateway unit + related AI modules for unused/duplicated config; assess shared-helper home",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai/"
+      ],
+      "files": [],
+      "base_commit": "1bf9935b70419d04bf5fdb1fa9dcab1d572ae4f6",
+      "branch": "main",
+      "frame": "03h9vzbl126hrt3ri0djlzsls"
+    },
+    {
+      "id": "2114f71d-82d8-46db-9170-cd0fc1c9efc9",
+      "ts": "2026-11-21T01:18:16Z",
+      "source": "devin",
+      "subject": "nixconfig:mail-atlas-mktimerjob",
+      "action": "landed: mkTimerJob + queueJobs table for mail-atlas tag/drain/reconcile; 6 unit files byte-identical on delphi | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1bf9935b70419d04bf5fdb1fa9dcab1d572ae4f6",
+      "branch": "main",
+      "frame": "03h9vyv1c8ggrjwsew5owgiev"
+    },
     {
       "id": "5d8bdad9-f073-454f-9365-babc5bf63907",
       "ts": "2026-11-21T01:17:36Z",
@@ -2622,73 +2691,6 @@
       "base_commit": "27e26469cecc25d3ee5073e53846f98e2b6f4b97",
       "branch": "main",
       "frame": "03h9riwhkodkfssjxg27w3q29"
-    },
-    {
-      "id": "82095ecb-9764-40b4-835b-10e9900fea75",
-      "ts": "2026-11-20T11:35:52Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 36: committed+pushe ea0e6766 (xs-notify ntfy→Telegram rewrite). Nudged freebuff→Typst resume QC, agy→triage apply-now actions. devin on parakeet-hardening. | gate: git push origin/main OK",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea0e6766d0bb7a981a1cf7679f729d1d9793dd05",
-      "branch": "main",
-      "frame": "03h9ri7i6iagijha4iu4u3brq"
-    },
-    {
-      "id": "172a7900-b08b-4572-a6db-59a43b7eccc6",
-      "ts": "2026-11-20T11:33:39Z",
-      "source": "hermes",
-      "subject": "nixconfig:xs-notify-deploy",
-      "action": "landed: committed+pushe ea0e6766 (rewrite ntfy→Telegram bot push, delphi→@Frierenixbot) | gate: git push origin/main OK",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea0e6766d0bb7a981a1cf7679f729d1d9793dd05",
-      "branch": "main",
-      "frame": "03h9rhryz9fomb5r3x5pd0s9s"
-    },
-    {
-      "id": "f828740b-4f6e-4c97-970a-d6764550f695",
-      "ts": "2026-11-20T11:07:48Z",
-      "source": "antigravity",
-      "subject": "nixconfig:open-129",
-      "action": "verified: open-129 permanent grant holds on delphi (day 5/7) | gate: task checks:gcal PASS, 0 invalid_grant in journal",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6cb73ec9fce873682b545d1ed4862cf1e39f27da",
-      "branch": "main",
-      "frame": "03h9rcq7lwgwb37idjl9yv91l"
-    },
-    {
-      "id": "d7c05ddf-730f-425c-89b4-5c4eedf79d3b",
-      "ts": "2026-11-20T11:02:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:ats-resume",
-      "action": "landed: ATS-parsable lib/matt/cv.typ + appflow lebenslauf.typ, single column, standard headings via cvLabels (lib/matt-site.nix), plain-text URLs, page-number-only footer; budgets 2/2/1/1 pages, last page 72/88/269/273 mm | gate: checks:typeset PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "18e2c2d5644ffe07dfdaebf3863faad0b4f73d1c",
-      "branch": "main",
-      "frame": "03h9rbrsipdcmejkjxmlv3rpt"
-    },
-    {
-      "id": "e2153656-7bde-4931-8ab8-60746cce0ad1",
-      "ts": "2026-11-20T11:02:17Z",
-      "source": "devin",
-      "subject": "nixconfig:parakeet-hardening",
-      "action": "claim: harden parakeet STT unit on eisen (sandbox, MemoryMax, StartLimit, idle stop, read timeout)",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/eisen"
-      ],
-      "files": [],
-      "base_commit": "768bdabcf544623c685aaf312d729b6d4e5e1f73",
-      "branch": "main",
-      "frame": "03h9rbndz7dp4po0mz4a9p6up"
     }
   ]
 }

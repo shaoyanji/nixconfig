@@ -11,6 +11,8 @@
 
   qmdEisenEmbedSync = import ../../modules/scripts/qmd-eisen-embed-sync.nix {inherit pkgs;};
 
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
+
   # The backup whose repository the restore drill below verifies.
   resticBackup = config.services.restic.backups.frieren-local;
 
@@ -628,39 +630,7 @@
   # driven by a timers.target timer with Persistent — and differ only in the
   # script, the ordering edges and the calendar. A timer-driven oneshot is
   # not a daemon: it has no crash-loop class to declare.
-  mkTimerJob = {
-    description,
-    timerDescription,
-    onCalendar,
-    randomizedDelaySec ? null,
-    serviceConfig ? {},
-    ...
-  } @ spec: {
-    service =
-      removeAttrs spec [
-        "description"
-        "timerDescription"
-        "onCalendar"
-        "randomizedDelaySec"
-        "serviceConfig"
-      ]
-      // {
-        inherit description;
-        serviceConfig = {Type = "oneshot";} // serviceConfig;
-      };
-    timer = {
-      description = timerDescription;
-      wantedBy = ["timers.target"];
-      timerConfig =
-        {
-          OnCalendar = onCalendar;
-          Persistent = true;
-        }
-        // lib.optionalAttrs (randomizedDelaySec != null) {
-          RandomizedDelaySec = randomizedDelaySec;
-        };
-    };
-  };
+  mkTimerJob = systemdJobs.mkTimerJob {Type = "oneshot";};
 
   scheduledJobs = {
     # --- BurgerNAS daily power-off safety net (22:45) ---

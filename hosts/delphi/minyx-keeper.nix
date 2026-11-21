@@ -4,14 +4,10 @@
 {
   lib,
   pkgs,
+  systemdJobs,
   ...
-}: {
-  # The service runs as devji (it needs that user's ssh key and the checkout) and
-  # writes only the deployed rev, so the state directory must exist and be
-  # writable before the first run.
-  systemd.tmpfiles.rules = ["d /var/lib/minyx-keeper 0755 devji users -"];
-
-  systemd.services.minyx-keeper = {
+}: let
+  minyxKeeperJob = systemdJobs.mkTimerJob {} {
     description = "Deploy main to minyx over the LAN (delphi is its declared builder)";
     wants = ["network-online.target"];
     after = ["network-online.target"];
@@ -39,17 +35,16 @@
       # this bounds the build that follows it.
       TimeoutStartSec = "45min";
     };
+    onCalendar = "*-*-* 06:15";
+    randomizedDelaySec = "10min";
   };
+in {
+  # The service runs as devji (it needs that user's ssh key and the checkout) and
+  # writes only the deployed rev, so the state directory must exist and be
+  # writable before the first run.
+  systemd.tmpfiles.rules = ["d /var/lib/minyx-keeper 0755 devji users -"];
 
-  systemd.timers.minyx-keeper = {
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      # After frieren's 04:00 autoUpgrade and outside the 03:00-05:30 window the
-      # fleet keeps clear, so the backup trails the primary by up to a day rather
-      # than racing it.
-      OnCalendar = "*-*-* 06:15";
-      Persistent = true;
-      RandomizedDelaySec = "10min";
-    };
-  };
+  systemd.services.minyx-keeper = minyxKeeperJob.service;
+
+  systemd.timers.minyx-keeper = minyxKeeperJob.timer;
 }

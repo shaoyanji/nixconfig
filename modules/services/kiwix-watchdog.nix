@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.kiwixWatchdog;
@@ -97,6 +98,18 @@
     echo "PASS: All Kiwix ZIM archives and search indices verified healthy."
     exit 0
   '';
+  kiwixWatchdogJob = systemdJobs.mkTimerJob {} {
+    description = "Kiwix offline knowledge library integrity and search health probe";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${watchdogScript}/bin/kiwix-watchdog";
+      ProtectSystem = "full";
+      PrivateTmp = true;
+    };
+    timerDescription = "Scheduled Kiwix library integrity watchdog timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "15m";
+  };
 in {
   options.services.kiwixWatchdog = {
     enable = lib.mkEnableOption "declarative Kiwix offline knowledge library integrity and search health probe";
@@ -139,25 +152,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.kiwix-watchdog = {
-      description = "Kiwix offline knowledge library integrity and search health probe";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${watchdogScript}/bin/kiwix-watchdog";
-        ProtectSystem = "full";
-        PrivateTmp = true;
-      };
-    };
+    systemd.services.kiwix-watchdog = kiwixWatchdogJob.service;
 
-    systemd.timers.kiwix-watchdog = {
-      description = "Scheduled Kiwix library integrity watchdog timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "15m";
-      };
-    };
+    systemd.timers.kiwix-watchdog = kiwixWatchdogJob.timer;
 
     environment.systemPackages = [watchdogScript];
   };

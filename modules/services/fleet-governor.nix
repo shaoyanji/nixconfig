@@ -4,6 +4,7 @@
   lib,
   pkgs,
   user,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.fleetGovernor;
@@ -84,6 +85,48 @@
       allow_s2 = cfg.allowSystem2;
     };
   });
+  fleetGovernorJob = systemdJobs.mkTimerJob {} {
+    description = "Consolidated Fleet Governor & 3-Tier Escalation Router (S0/S1/S2)";
+    path = [
+      pkgs.coreutils
+      pkgs.btrfs-progs
+      pkgs.sqlite
+      pkgs.systemd
+      pkgs.curl
+      pkgs.gnugrep
+      pkgs.gawk
+      pkgs.procps
+      pkgs.python3
+      config.services.systemoneDecision.ensemblePackage
+    ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      WorkingDirectory = "${user.home}";
+      ExecStart = ''
+        ${pkgs.writeShellScript "run-fleet-governor" ''
+          set -euo pipefail
+          FLAGS="--rules ${rulesConfig}"
+          if [ "${toString cfg.autoRepair}" = "1" ]; then
+            FLAGS="$FLAGS --auto-repair"
+          fi
+          if [ "${toString cfg.allowSystem2}" = "1" ]; then
+            FLAGS="$FLAGS --allow-s2"
+          fi
+
+          if command -v systemone-ensemble >/dev/null 2>&1; then
+            systemone-ensemble govern $FLAGS
+          else
+            python3 ${systemoneDir}/ensemble.py govern $FLAGS
+          fi
+        ''}
+      '';
+    };
+    timerDescription = "Scheduled Consolidated Fleet Governor Timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "60s";
+  };
 in {
   options.services.fleetGovernor = {
     enable = lib.mkEnableOption "Consolidated Fleet Governor with 3-Tier Escalation Router (S0/S1/S2)";
@@ -305,54 +348,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.fleet-governor = {
-      description = "Consolidated Fleet Governor & 3-Tier Escalation Router (S0/S1/S2)";
-      path = [
-        pkgs.coreutils
-        pkgs.btrfs-progs
-        pkgs.sqlite
-        pkgs.systemd
-        pkgs.curl
-        pkgs.gnugrep
-        pkgs.gawk
-        pkgs.procps
-        pkgs.python3
-        config.services.systemoneDecision.ensemblePackage
-      ];
+    systemd.services.fleet-governor = fleetGovernorJob.service;
 
-      serviceConfig = {
-        Type = "oneshot";
-        User = "root";
-        WorkingDirectory = "${user.home}";
-        ExecStart = ''
-          ${pkgs.writeShellScript "run-fleet-governor" ''
-            set -euo pipefail
-            FLAGS="--rules ${rulesConfig}"
-            if [ "${toString cfg.autoRepair}" = "1" ]; then
-              FLAGS="$FLAGS --auto-repair"
-            fi
-            if [ "${toString cfg.allowSystem2}" = "1" ]; then
-              FLAGS="$FLAGS --allow-s2"
-            fi
-
-            if command -v systemone-ensemble >/dev/null 2>&1; then
-              systemone-ensemble govern $FLAGS
-            else
-              python3 ${systemoneDir}/ensemble.py govern $FLAGS
-            fi
-          ''}
-        '';
-      };
-    };
-
-    systemd.timers.fleet-governor = {
-      description = "Scheduled Consolidated Fleet Governor Timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "60s";
-      };
-    };
+    systemd.timers.fleet-governor = fleetGovernorJob.timer;
   };
 }

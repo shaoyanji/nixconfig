@@ -4,6 +4,7 @@
   lib,
   pkgs,
   user,
+  systemdJobs,
   ...
 }:
 with lib; let
@@ -40,6 +41,27 @@ with lib; let
     ${pkgs.openssh}/bin/ssh-keygen "''${args[@]}"
     echo "Certificate renewed: $USER_KEY-cert.pub (valid 90 days)"
   '';
+  renewSshCertJob = systemdJobs.mkTimerJob {} {
+    description = "Renew the ${user.name} SSH user certificate (90-day validity)";
+    unitConfig = {
+      # A condition belongs in [Unit]; under [Service] systemd logs
+      # "Unknown key 'ConditionUser'" on every daemon-reload.
+      ConditionUser = user.name;
+    };
+    serviceConfig = {
+      Type = "oneshot";
+      Environment = [
+        "HOME=${user.home}"
+        "PATH=${pkgs.coreutils}/bin"
+      ];
+      ExecStart = "${renewSshCert}/bin/renew-ssh-cert";
+      StandardOutput = "journal";
+      StandardError = "journal";
+    };
+    timerDescription = "Renew the SSH user certificate weekly";
+    onCalendar = "Mon *-*-* 04:30:00";
+    randomizedDelaySec = "30m";
+  };
 in {
   options.ssh.ca = {
     enable = mkEnableOption "SSH CA trust — accept certificates signed by the user CA";
@@ -77,34 +99,9 @@ in {
       # Unattended renewal (weekly, catches up after downtime via
       # Persistent). Linger must be on for the timer to fire without a
       # login session — devji is lingered on frieren.
-      systemd.user.services.renew-ssh-cert = {
-        description = "Renew the ${user.name} SSH user certificate (90-day validity)";
-        unitConfig = {
-          # A condition belongs in [Unit]; under [Service] systemd logs
-          # "Unknown key 'ConditionUser'" on every daemon-reload.
-          ConditionUser = user.name;
-        };
-        serviceConfig = {
-          Type = "oneshot";
-          Environment = [
-            "HOME=${user.home}"
-            "PATH=${pkgs.coreutils}/bin"
-          ];
-          ExecStart = "${renewSshCert}/bin/renew-ssh-cert";
-          StandardOutput = "journal";
-          StandardError = "journal";
-        };
-      };
+      systemd.user.services.renew-ssh-cert = renewSshCertJob.service;
 
-      systemd.user.timers.renew-ssh-cert = {
-        description = "Renew the SSH user certificate weekly";
-        timerConfig = {
-          OnCalendar = "Mon *-*-* 04:30:00";
-          Persistent = true;
-          RandomizedDelaySec = "30m";
-        };
-        wantedBy = ["timers.target"];
-      };
+      systemd.user.timers.renew-ssh-cert = renewSshCertJob.timer;
     })
   ];
 }

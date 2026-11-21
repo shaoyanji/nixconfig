@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.sqliteMaintenance;
@@ -131,6 +132,18 @@
     echo "PASS: All inspected databases verified healthy."
     exit 0
   '';
+  sqliteMaintenanceJob = systemdJobs.mkTimerJob {} {
+    description = "SQLite WAL checkpoint, optimization, and integrity maintenance";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${maintenanceScript}/bin/sqlite-maintenance";
+      ProtectSystem = "full";
+      PrivateTmp = true;
+    };
+    timerDescription = "Scheduled SQLite maintenance timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "5m";
+  };
 in {
   options.services.sqliteMaintenance = {
     enable = lib.mkEnableOption "declarative SQLite WAL checkpoint, optimization, and integrity maintenance";
@@ -173,25 +186,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.sqlite-maintenance = {
-      description = "SQLite WAL checkpoint, optimization, and integrity maintenance";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${maintenanceScript}/bin/sqlite-maintenance";
-        ProtectSystem = "full";
-        PrivateTmp = true;
-      };
-    };
+    systemd.services.sqlite-maintenance = sqliteMaintenanceJob.service;
 
-    systemd.timers.sqlite-maintenance = {
-      description = "Scheduled SQLite maintenance timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.timers.sqlite-maintenance = sqliteMaintenanceJob.timer;
 
     environment.systemPackages = [maintenanceScript];
   };

@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.btrfsWatchdog;
@@ -56,6 +57,20 @@
       exit 0
     fi
   '';
+  btrfsWatchdogJob = systemdJobs.mkTimerJob {} {
+    description = "Btrfs silent corruption & device error watchdog";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${watchdogScript}/bin/btrfs-watchdog";
+      ProtectSystem = "strict";
+      ProtectHome = "read-only";
+      ReadOnlyPaths = cfg.mounts;
+      PrivateTmp = true;
+    };
+    timerDescription = "Hourly Btrfs device stats inspection timer";
+    onCalendar = cfg.interval;
+    randomizedDelaySec = "5m";
+  };
 in {
   options.services.btrfsWatchdog = {
     enable = lib.mkEnableOption "declarative Btrfs silent corruption and device error watchdog";
@@ -80,27 +95,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.btrfs-watchdog = {
-      description = "Btrfs silent corruption & device error watchdog";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${watchdogScript}/bin/btrfs-watchdog";
-        ProtectSystem = "strict";
-        ProtectHome = "read-only";
-        ReadOnlyPaths = cfg.mounts;
-        PrivateTmp = true;
-      };
-    };
+    systemd.services.btrfs-watchdog = btrfsWatchdogJob.service;
 
-    systemd.timers.btrfs-watchdog = {
-      description = "Hourly Btrfs device stats inspection timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.interval;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.timers.btrfs-watchdog = btrfsWatchdogJob.timer;
 
     environment.systemPackages = [watchdogScript];
   };

@@ -5,6 +5,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.flakeGcRoot;
@@ -45,6 +46,22 @@
       echo "rooted $(wc -w <<< "$keep") path(s) under $dir"
     '';
   };
+  flakeGcRootJob = systemdJobs.mkTimerJob {} {
+    description = "Root the deployed flake and its inputs against the nightly GC";
+    wants = ["network-online.target"];
+    after = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      # `nix flake archive` takes no attribute fragment: it archives the flake,
+      # which is the source plus its inputs, and that is what the GC eats.
+      ExecStart = "${rootScript}/bin/flake-gc-root ${lib.escapeShellArg (builtins.head (lib.splitString "#" cfg.flake))} /nix/var/nix/gcroots/flake/${config.networking.hostName}";
+      Nice = 15;
+      IOSchedulingClass = "idle";
+    };
+    timerDescription = "Nightly: keep the deployed flake's inputs out of the GC";
+    onCalendar = "*-*-* ${cfg.schedule}:00";
+    randomizedDelaySec = "10m";
+  };
 in {
   options.services.flakeGcRoot = {
     enable = lib.mkOption {
@@ -72,28 +89,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.flake-gc-root = {
-      description = "Root the deployed flake and its inputs against the nightly GC";
-      wants = ["network-online.target"];
-      after = ["network-online.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        # `nix flake archive` takes no attribute fragment: it archives the flake,
-        # which is the source plus its inputs, and that is what the GC eats.
-        ExecStart = "${rootScript}/bin/flake-gc-root ${lib.escapeShellArg (builtins.head (lib.splitString "#" cfg.flake))} /nix/var/nix/gcroots/flake/${config.networking.hostName}";
-        Nice = 15;
-        IOSchedulingClass = "idle";
-      };
-    };
+    systemd.services.flake-gc-root = flakeGcRootJob.service;
 
-    systemd.timers.flake-gc-root = {
-      description = "Nightly: keep the deployed flake's inputs out of the GC";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = "*-*-* ${cfg.schedule}:00";
-        Persistent = true;
-        RandomizedDelaySec = "10m";
-      };
-    };
+    systemd.timers.flake-gc-root = flakeGcRootJob.timer;
   };
 }

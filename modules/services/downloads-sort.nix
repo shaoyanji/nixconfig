@@ -5,6 +5,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.downloadsSort;
@@ -15,6 +16,31 @@
     export PATH="${lib.makeBinPath (with pkgs; [coreutils curl file jq ffmpeg findutils gnused gnugrep gawk])}:$PATH"
     ${builtins.readFile ../../scripts/task/sort-downloads.sh}
   '';
+  downloadsSortJob = systemdJobs.mkTimerJob {} {
+    description = "Sort finished downloads into the storage taxonomy"; # Only when classifying: the sorter's own PATH is set by the wrapper.
+    environment = lib.optionalAttrs (cfg.classifyPath != null) {
+      CLASSIFY_BIN = "${cfg.classifyPath}/jev-decide";
+    };
+    serviceConfig = {
+      Type = "oneshot";
+      # Root on purpose: the sorter reads the aria2 RPC secret to see seeding
+      # torrents and normalises ownership to devji:users on what it moves.
+      User = "root";
+      ExecStart = "${sorter}/bin/sort-downloads --apply${
+        lib.optionalString cfg.replace " --replace"
+      }${lib.optionalString cfg.classify " --classify"}";
+      EnvironmentFile =
+        lib.optional (cfg.classifyEnvironment != null) cfg.classifyEnvironment;
+      PrivateTmp = true;
+      # Exit 1 means "an item needs a human decision" (an unknown kind or a
+      # same-name conflict). It is left as a unit failure on purpose — that is
+      # the signal — and clears as soon as the item is handled or a rule is
+      # added to the sorter.
+    };
+    timerDescription = "Scheduled downloads staging sort";
+    onCalendar = cfg.interval;
+    randomizedDelaySec = "5m";
+  };
 in {
   options.services.downloadsSort = {
     enable = lib.mkEnableOption "periodic sorting of the downloads staging area into the storage taxonomy";
@@ -69,38 +95,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.downloads-sort = {
-      description = "Sort finished downloads into the storage taxonomy"; # Only when classifying: the sorter's own PATH is set by the wrapper.
-      environment = lib.optionalAttrs (cfg.classifyPath != null) {
-        CLASSIFY_BIN = "${cfg.classifyPath}/jev-decide";
-      };
-      serviceConfig = {
-        Type = "oneshot";
-        # Root on purpose: the sorter reads the aria2 RPC secret to see seeding
-        # torrents and normalises ownership to devji:users on what it moves.
-        User = "root";
-        ExecStart = "${sorter}/bin/sort-downloads --apply${
-          lib.optionalString cfg.replace " --replace"
-        }${lib.optionalString cfg.classify " --classify"}";
-        EnvironmentFile =
-          lib.optional (cfg.classifyEnvironment != null) cfg.classifyEnvironment;
-        PrivateTmp = true;
-        # Exit 1 means "an item needs a human decision" (an unknown kind or a
-        # same-name conflict). It is left as a unit failure on purpose — that is
-        # the signal — and clears as soon as the item is handled or a rule is
-        # added to the sorter.
-      };
-    };
+    systemd.services.downloads-sort = downloadsSortJob.service;
 
-    systemd.timers.downloads-sort = {
-      description = "Scheduled downloads staging sort";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.interval;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.timers.downloads-sort = downloadsSortJob.timer;
 
     # The sorter is useful by hand too, next to the other task scripts.
     environment.systemPackages = [sorter];

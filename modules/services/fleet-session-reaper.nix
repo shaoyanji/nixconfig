@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.fleetSessionReaper;
@@ -171,6 +172,17 @@
     sys.exit(0)
     EOF
   '';
+  reaperJob = systemdJobs.mkTimerJob {Type = "oneshot";} {
+    description = "Fleet SSH bastion and inactive session reaper";
+    timerDescription = "Scheduled fleet inactive session reaper timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "5m";
+    serviceConfig = {
+      ExecStart = "${reaperScript}/bin/fleet-session-reaper";
+      ProtectSystem = "full";
+      PrivateTmp = true;
+    };
+  };
 in {
   options.services.fleetSessionReaper = {
     enable = lib.mkEnableOption "declarative SSH bastion and inactive session reaper";
@@ -207,25 +219,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.fleet-session-reaper = {
-      description = "Fleet SSH bastion and inactive session reaper";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${reaperScript}/bin/fleet-session-reaper";
-        ProtectSystem = "full";
-        PrivateTmp = true;
-      };
-    };
-
-    systemd.timers.fleet-session-reaper = {
-      description = "Scheduled fleet inactive session reaper timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.services.fleet-session-reaper = reaperJob.service;
+    systemd.timers.fleet-session-reaper = reaperJob.timer;
 
     environment.systemPackages = [reaperScript];
   };

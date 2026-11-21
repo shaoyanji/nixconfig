@@ -6,6 +6,7 @@
   lib,
   pkgs,
   self,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.media-relay;
@@ -523,6 +524,17 @@
   '';
 
   nginxPort = toString cfg.port;
+  mediaRelayPruneJob = systemdJobs.mkTimerJob {} {
+    description = "Delete fetched videos untouched for ${toString cfg.retentionDays} days";
+    path = [pkgs.findutils];
+    serviceConfig = {
+      Type = "oneshot";
+      # The bucket half reads sops as the library owner: docs/sops-rekey.md
+      User = cfg.user;
+    };
+    script = "${mediaGc} --days ${toString cfg.retentionDays} --scope all --apply";
+    onCalendar = "daily";
+  };
 in {
   options.services.media-relay = {
     enable = lib.mkEnableOption "YouTube fetch and range-serving relay (delphi)";
@@ -772,24 +784,9 @@ in {
       };
     };
 
-    systemd.services.media-relay-prune = {
-      description = "Delete fetched videos untouched for ${toString cfg.retentionDays} days";
-      path = [pkgs.findutils];
-      serviceConfig = {
-        Type = "oneshot";
-        # The bucket half reads sops as the library owner: docs/sops-rekey.md
-        User = cfg.user;
-      };
-      script = "${mediaGc} --days ${toString cfg.retentionDays} --scope all --apply";
-    };
+    systemd.services.media-relay-prune = mediaRelayPruneJob.service;
 
-    systemd.timers.media-relay-prune = {
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = "daily";
-        Persistent = true;
-      };
-    };
+    systemd.timers.media-relay-prune = mediaRelayPruneJob.timer;
 
     # Written as the library's owner so the manifest is never a file nginx can
     # read but a fetch cannot replace.

@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.postgresPgvectorAudit;
@@ -112,6 +113,20 @@
     echo "PASS: PostgreSQL vector index health and maintenance verified."
     exit 0
   '';
+  postgresPgvectorAuditJob = systemdJobs.mkTimerJob {} {
+    description = "PostgreSQL vector (pgvector/vchord) index health and maintenance";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "postgres";
+      Group = "postgres";
+      ExecStart = "${auditScript}/bin/postgres-pgvector-audit";
+      ProtectSystem = "full";
+      PrivateTmp = true;
+    };
+    timerDescription = "Scheduled PostgreSQL vector index maintenance timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "5m";
+  };
 in {
   options.services.postgresPgvectorAudit = {
     enable = lib.mkEnableOption "declarative PostgreSQL vector (pgvector/vchord) indexing health and vacuum drill";
@@ -151,27 +166,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.postgres-pgvector-audit = {
-      description = "PostgreSQL vector (pgvector/vchord) index health and maintenance";
-      serviceConfig = {
-        Type = "oneshot";
-        User = "postgres";
-        Group = "postgres";
-        ExecStart = "${auditScript}/bin/postgres-pgvector-audit";
-        ProtectSystem = "full";
-        PrivateTmp = true;
-      };
-    };
+    systemd.services.postgres-pgvector-audit = postgresPgvectorAuditJob.service;
 
-    systemd.timers.postgres-pgvector-audit = {
-      description = "Scheduled PostgreSQL vector index maintenance timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.timers.postgres-pgvector-audit = postgresPgvectorAuditJob.timer;
 
     environment.systemPackages = [auditScript];
   };

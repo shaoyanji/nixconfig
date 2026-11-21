@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.flakeAdvisoryAudit;
@@ -93,6 +94,18 @@
     sys.exit(0)
     EOF
   '';
+  flakeAdvisoryAuditJob = systemdJobs.mkTimerJob {} {
+    description = "Flake lock drift and security advisory audit unit";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${auditScript}/bin/flake-advisory-audit";
+      ProtectSystem = "full";
+      PrivateTmp = true;
+    };
+    timerDescription = "Scheduled flake advisory audit timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "5m";
+  };
 in {
   options.services.flakeAdvisoryAudit = {
     enable = lib.mkEnableOption "declarative flake lock drift and security advisory audit unit";
@@ -133,25 +146,9 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.flake-advisory-audit = {
-      description = "Flake lock drift and security advisory audit unit";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${auditScript}/bin/flake-advisory-audit";
-        ProtectSystem = "full";
-        PrivateTmp = true;
-      };
-    };
+    systemd.services.flake-advisory-audit = flakeAdvisoryAuditJob.service;
 
-    systemd.timers.flake-advisory-audit = {
-      description = "Scheduled flake advisory audit timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.timers.flake-advisory-audit = flakeAdvisoryAuditJob.timer;
 
     environment.systemPackages = [auditScript];
   };

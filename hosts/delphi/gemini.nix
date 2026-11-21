@@ -5,6 +5,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   hostMeta = config.fleet.inventory.hosts.delphi;
@@ -55,6 +56,29 @@
       CGIPaths = ["cgi-bin"];
     }
     // geminiSettings);
+  geminiTailnetCertJob = systemdJobs.mkTimerJob {} {
+    description = "Issue/renew the tailnet TLS certificate for the Gemini capsule";
+    after = ["tailscaled.service" "network-online.target"];
+    wants = ["network-online.target"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = lib.escapeShellArgs [
+        "${config.services.tailscale.package}/bin/tailscale"
+        "cert"
+        "--cert-file=${tailnetCert}"
+        "--key-file=${tailnetKey}"
+        "--min-validity=720h"
+        tailnetHost
+      ];
+      ExecStartPost = [
+        "${pkgs.coreutils}/bin/chgrp gemini ${tailnetCert} ${tailnetKey}"
+        "${pkgs.coreutils}/bin/chmod 0640 ${tailnetCert} ${tailnetKey}"
+      ];
+    };
+    onCalendar = "daily";
+  };
 in {
   # Only the tailnet key needs a group of its own; the public instance joins
   # nginx's (see `SupplementaryGroups` below).
@@ -111,36 +135,9 @@ in {
     "d ${tailnetTlsDir} 0750 root gemini -"
   ];
 
-  systemd.services.gemini-tailnet-cert = {
-    description = "Issue/renew the tailnet TLS certificate for the Gemini capsule";
-    after = ["tailscaled.service" "network-online.target"];
-    wants = ["network-online.target"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = lib.escapeShellArgs [
-        "${config.services.tailscale.package}/bin/tailscale"
-        "cert"
-        "--cert-file=${tailnetCert}"
-        "--key-file=${tailnetKey}"
-        "--min-validity=720h"
-        tailnetHost
-      ];
-      ExecStartPost = [
-        "${pkgs.coreutils}/bin/chgrp gemini ${tailnetCert} ${tailnetKey}"
-        "${pkgs.coreutils}/bin/chmod 0640 ${tailnetCert} ${tailnetKey}"
-      ];
-    };
-  };
+  systemd.services.gemini-tailnet-cert = geminiTailnetCertJob.service;
 
-  systemd.timers.gemini-tailnet-cert = {
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-    };
-  };
+  systemd.timers.gemini-tailnet-cert = geminiTailnetCertJob.timer;
 
   systemd.services.molly-brown-tailnet = {
     description = "Molly Brown gemini server (tailnet: ${tailnetHost})";

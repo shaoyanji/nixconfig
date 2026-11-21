@@ -2,6 +2,7 @@
   pkgs,
   lib,
   user,
+  systemdJobs,
   ...
 }: let
   # DLNA is a first-party Jellyfin plugin (moved out of core in 10.9). nixpkgs
@@ -22,6 +23,35 @@
         }
       } -d $out/DLNA_14.0.0.0
     '';
+  libationSyncJob = systemdJobs.mkTimerJob {} {
+    description = "Libation Audible Audiobook Sync & Liberate";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = user.name;
+      Group = "users";
+      WorkingDirectory = "/srv/data/audiobooks";
+      ExecStart = pkgs.writeShellScript "libation-sync-run" ''
+        set -eu
+        if [ ! -s "/home/${user.name}/.local/share/Libation/Settings.json" ]; then
+          echo "Libation settings not found. Skipping sync."
+          exit 0
+        fi
+        if ${pkgs.libation}/bin/libationcli list-accounts 2>&1 | grep -q "No accounts configured"; then
+          echo "No Audible accounts configured in Libation. Skipping sync."
+          exit 0
+        fi
+        echo "Starting Libation scan..."
+        ${pkgs.libation}/bin/libationcli scan || true
+        echo "Starting Libation liberation..."
+        ${pkgs.libation}/bin/libationcli liberate || true
+      '';
+    };
+    timerDescription = "Daily Libation Audible Audiobook Sync";
+    onCalendar = "daily";
+    randomizedDelaySec = "1800";
+  };
 in {
   # --- Immich ---
   # Machine learning re-enabled (2026-09-29): smart search + facial
@@ -104,42 +134,9 @@ in {
   ];
 
   # --- Libation (Audible audiobook manager & scheduled sync) ---
-  systemd.services.libation-sync = {
-    description = "Libation Audible Audiobook Sync & Liberate";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      User = user.name;
-      Group = "users";
-      WorkingDirectory = "/srv/data/audiobooks";
-      ExecStart = pkgs.writeShellScript "libation-sync-run" ''
-        set -eu
-        if [ ! -s "/home/${user.name}/.local/share/Libation/Settings.json" ]; then
-          echo "Libation settings not found. Skipping sync."
-          exit 0
-        fi
-        if ${pkgs.libation}/bin/libationcli list-accounts 2>&1 | grep -q "No accounts configured"; then
-          echo "No Audible accounts configured in Libation. Skipping sync."
-          exit 0
-        fi
-        echo "Starting Libation scan..."
-        ${pkgs.libation}/bin/libationcli scan || true
-        echo "Starting Libation liberation..."
-        ${pkgs.libation}/bin/libationcli liberate || true
-      '';
-    };
-  };
+  systemd.services.libation-sync = libationSyncJob.service;
 
-  systemd.timers.libation-sync = {
-    description = "Daily Libation Audible Audiobook Sync";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-      RandomizedDelaySec = "1800";
-    };
-  };
+  systemd.timers.libation-sync = libationSyncJob.timer;
 
   system.activationScripts.jellyfin-dlna = {
     text = ''

@@ -4,6 +4,7 @@
   pkgs,
   lib,
   user,
+  systemdJobs,
   ...
 }: let
   # Belt-and-suspenders rfkill unblock: the Ideapad EC can boot with BT
@@ -105,6 +106,45 @@
     done
     exit $fail
   '';
+  fleetWarmCacheJob = systemdJobs.mkTimerJob {} {
+    description = "Build all fleet host closures to warm the harmonia LAN cache";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    # Never fight the 04:00 autoUpgrade for RAM/IO/store-locks: warming 18 host
+    # closures takes hours, so a 03:30 start used to run straight through 04:00.
+    # systemd stops this oneshot when nixos-upgrade starts — the upgrade wins,
+    # and the warmer picks up again on the next weekly trigger.
+    unitConfig.Conflicts = ["nixos-upgrade.service"];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${fleetWarmCache}";
+      # Weekly-ish job; give slow builds room.
+      TimeoutStartSec = "12h";
+      Nice = 10;
+      IOSchedulingClass = "idle";
+    };
+    onCalendar = "Sun, 01:30";
+    randomizedDelaySec = "30min";
+  };
+  checkoutFfJob = systemdJobs.mkTimerJob {} {
+    description = "Fast-forward the nixconfig and console checkouts on /Volumes/data";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    path = [pkgs.git pkgs.openssh];
+    serviceConfig = {
+      Type = "oneshot";
+      User = user.name;
+      Group = "users";
+      ExecStart = "${checkoutFf}";
+      # A fetch is seconds of work; anything near this means the network is wedged.
+      TimeoutStartSec = "10min";
+      Nice = 10;
+      IOSchedulingClass = "idle";
+    };
+    timerDescription = "Nightly fast-forward of the checkouts on /Volumes/data";
+    onCalendar = "*-*-* 02:45:00";
+    randomizedDelaySec = "5min";
+  };
 in {
   imports = [
     ./hardware-configuration.nix
@@ -241,35 +281,8 @@ in {
   # --- Fleet cache warmer ---
   # Weekly unattended build of all host closures (script defined above);
   # see modules/services/harmonia.nix for why this keeps the LAN fast.
-  systemd.services.fleet-warm-cache = {
-    description = "Build all fleet host closures to warm the harmonia LAN cache";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    # Never fight the 04:00 autoUpgrade for RAM/IO/store-locks: warming 18 host
-    # closures takes hours, so a 03:30 start used to run straight through 04:00.
-    # systemd stops this oneshot when nixos-upgrade starts — the upgrade wins,
-    # and the warmer picks up again on the next weekly trigger.
-    unitConfig.Conflicts = ["nixos-upgrade.service"];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${fleetWarmCache}";
-      # Weekly-ish job; give slow builds room.
-      TimeoutStartSec = "12h";
-      Nice = 10;
-      IOSchedulingClass = "idle";
-    };
-  };
-  systemd.timers.fleet-warm-cache = {
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      # 01:30 (was 03:30): start the multi-hour fleet warm well before the
-      # 03:00 agy runs and the 04:00 autoUpgrade so the Conflicts guard above
-      # rarely has to abort it mid-way.
-      OnCalendar = "Sun, 01:30";
-      Persistent = true;
-      RandomizedDelaySec = "30min";
-    };
-  };
+  systemd.services.fleet-warm-cache = fleetWarmCacheJob.service;
+  systemd.timers.fleet-warm-cache = fleetWarmCacheJob.timer;
 
   # --- Daily self-upgrade (04:00) ---
   # Canonical system.autoUpgrade module (no hand-rolled timer/script). Runs
@@ -302,32 +315,9 @@ in {
   };
 
   # --- Checkout fast-forward (02:45) --- .agents/deploy/hosts/frieren.md
-  systemd.services.checkout-ff = {
-    description = "Fast-forward the nixconfig and console checkouts on /Volumes/data";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    path = [pkgs.git pkgs.openssh];
-    serviceConfig = {
-      Type = "oneshot";
-      User = user.name;
-      Group = "users";
-      ExecStart = "${checkoutFf}";
-      # A fetch is seconds of work; anything near this means the network is wedged.
-      TimeoutStartSec = "10min";
-      Nice = 10;
-      IOSchedulingClass = "idle";
-    };
-  };
+  systemd.services.checkout-ff = checkoutFfJob.service;
 
-  systemd.timers.checkout-ff = {
-    description = "Nightly fast-forward of the checkouts on /Volumes/data";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "*-*-* 02:45:00";
-      Persistent = true;
-      RandomizedDelaySec = "5min";
-    };
-  };
+  systemd.timers.checkout-ff = checkoutFfJob.timer;
 
   sops.secrets."aria2-rpc-secret" = {
     owner = "aria2";

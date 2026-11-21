@@ -153,6 +153,35 @@
     };
     serviceBase = daemonServiceConfig;
   };
+  xsAgentTurnsBackupJob = systemdJobs.mkTimerJob {} {
+    description = "Export the agent-turn store and ship it to the backup host";
+    # No sandboxing beyond the default here: the unit reads the 0700 store as
+    # root, writes /var/backups and opens one outbound ssh. `ProtectHome` would
+    # hide the key it authenticates with.
+    path = [cfg.package pkgs.jq pkgs.rsync pkgs.openssh pkgs.findutils pkgs.coreutils pkgs.bash];
+    serviceConfig.Type = "oneshot";
+    # One run: dump, ship, prune — in that order, so a failed export cannot
+    # leave the far side holding a fresh timestamp over yesterday's frames.
+    script = ''
+      set -euo pipefail
+      dir="${cfg.backup.directory}"
+      out="$dir/$(date +%Y-%m-%dT%H%M)"
+
+      mkdir -p "$dir"
+      bash ${../../scripts/task/xs-agent-turns-export.sh} "$out"
+      ${lib.optionalString (cfg.backup.pushTo != "") ''
+        # `--delete` is safe because this destination is the mirror of this one
+        # tree; `--delay-updates` installs each file at the end of the transfer,
+        # so a snapshot taken mid-run cannot catch a half-written dump.
+        rsync -a --delete --delay-updates \
+          -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${stateDir}/known_hosts -i ${cfg.backup.pushKeyFile}" \
+          "$dir/" "${cfg.backup.pushTo}"
+      ''}
+      find "$dir" -mindepth 1 -maxdepth 1 -type d -name '20??-*' -mtime "+${toString cfg.backup.retain}" -exec rm -rf {} +
+    '';
+    onCalendar = cfg.backup.startAt;
+    randomizedDelaySec = "120s";
+  };
 in {
   options.services.agentTurns = {
     enable = lib.mkEnableOption "the agent-turn coordination store (xs) and its authenticated shim";
@@ -343,42 +372,8 @@ in {
       };
     };
 
-    systemd.services.xs-agent-turns-backup = lib.mkIf cfg.backup.enable {
-      description = "Export the agent-turn store and ship it to the backup host";
-      # No sandboxing beyond the default here: the unit reads the 0700 store as
-      # root, writes /var/backups and opens one outbound ssh. `ProtectHome` would
-      # hide the key it authenticates with.
-      path = [cfg.package pkgs.jq pkgs.rsync pkgs.openssh pkgs.findutils pkgs.coreutils pkgs.bash];
-      serviceConfig.Type = "oneshot";
-      # One run: dump, ship, prune — in that order, so a failed export cannot
-      # leave the far side holding a fresh timestamp over yesterday's frames.
-      script = ''
-        set -euo pipefail
-        dir="${cfg.backup.directory}"
-        out="$dir/$(date +%Y-%m-%dT%H%M)"
+    systemd.services.xs-agent-turns-backup = lib.mkIf cfg.backup.enable xsAgentTurnsBackupJob.service;
 
-        mkdir -p "$dir"
-        bash ${../../scripts/task/xs-agent-turns-export.sh} "$out"
-        ${lib.optionalString (cfg.backup.pushTo != "") ''
-          # `--delete` is safe because this destination is the mirror of this one
-          # tree; `--delay-updates` installs each file at the end of the transfer,
-          # so a snapshot taken mid-run cannot catch a half-written dump.
-          rsync -a --delete --delay-updates \
-            -e "ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${stateDir}/known_hosts -i ${cfg.backup.pushKeyFile}" \
-            "$dir/" "${cfg.backup.pushTo}"
-        ''}
-        find "$dir" -mindepth 1 -maxdepth 1 -type d -name '20??-*' -mtime "+${toString cfg.backup.retain}" -exec rm -rf {} +
-      '';
-    };
-
-    systemd.timers.xs-agent-turns-backup = lib.mkIf cfg.backup.enable {
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.backup.startAt;
-        # A host asleep at 03:05 owes itself the dump, not a skipped night.
-        Persistent = true;
-        RandomizedDelaySec = "120s";
-      };
-    };
+    systemd.timers.xs-agent-turns-backup = lib.mkIf cfg.backup.enable xsAgentTurnsBackupJob.timer;
   };
 }

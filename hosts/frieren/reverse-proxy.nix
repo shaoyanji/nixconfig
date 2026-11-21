@@ -3,6 +3,7 @@
   pkgs,
   lib,
   config,
+  systemdJobs,
   ...
 }: let
   # LAN wildcard TLS: private CA (modules/config/tls/frieren-lan-ca.pem,
@@ -52,6 +53,33 @@
   # `modules/services/service-portal.nix` fail the build when a card has no
   # owner.
   landingPage = config.services.servicePortal.pages.lan;
+  tailscaleCertFrierenJob = systemdJobs.mkTimerJob {} {
+    description = "Issue/renew the Tailscale TLS certificate for ${tailnetName}";
+    after = [
+      "tailscaled.service"
+      "network-online.target"
+    ];
+    wants = [
+      "tailscaled.service"
+      "network-online.target"
+    ];
+    before = ["nginx.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      set -eu
+      mkdir -p ${tailnetCertDir}
+      ${config.services.tailscale.package}/bin/tailscale cert \
+        --cert-file ${tailnetCertificate} \
+        --key-file ${tailnetCertificateKey} \
+        ${tailnetName}
+      chown root:nginx ${tailnetCertificateKey}
+      chmod 640 ${tailnetCertificateKey}
+      chmod 644 ${tailnetCertificate}
+    '';
+    onCalendar = "daily";
+    randomizedDelaySec = "1h";
+  };
 in {
   imports = [self.modules."services.service-portal"];
 
@@ -183,40 +211,9 @@ in {
     };
   };
 
-  systemd.services.tailscale-cert-frieren = {
-    description = "Issue/renew the Tailscale TLS certificate for ${tailnetName}";
-    after = [
-      "tailscaled.service"
-      "network-online.target"
-    ];
-    wants = [
-      "tailscaled.service"
-      "network-online.target"
-    ];
-    before = ["nginx.service"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      set -eu
-      mkdir -p ${tailnetCertDir}
-      ${config.services.tailscale.package}/bin/tailscale cert \
-        --cert-file ${tailnetCertificate} \
-        --key-file ${tailnetCertificateKey} \
-        ${tailnetName}
-      chown root:nginx ${tailnetCertificateKey}
-      chmod 640 ${tailnetCertificateKey}
-      chmod 644 ${tailnetCertificate}
-    '';
-  };
+  systemd.services.tailscale-cert-frieren = tailscaleCertFrierenJob.service;
 
-  systemd.timers.tailscale-cert-frieren = {
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-      RandomizedDelaySec = "1h";
-    };
-  };
+  systemd.timers.tailscale-cert-frieren = tailscaleCertFrierenJob.timer;
 
   # --- eval-time guards for the reverse proxy ---------------------------------
   # Each assertion here is a mistake that was actually made and cost an outage:

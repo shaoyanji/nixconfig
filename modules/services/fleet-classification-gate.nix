@@ -4,6 +4,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.fleetClassificationGate;
@@ -31,6 +32,26 @@
     i = lib.lists.findFirstIndex (h: h == host) 0 hosts;
   in
     lib.optional (i > 0) (unitOf (lib.lists.elemAt hosts (i - 1)));
+
+  gateJob = systemdJobs.mkTimerJob {} {
+    description = "Nightly systemd classification drift gate (verdict)";
+    wants = map unitOf hosts;
+    after = map unitOf hosts;
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "fleet-classification-verdict" ''
+        set -uo pipefail
+        if out=$(${pkgs.systemd}/bin/systemctl is-failed ${lib.concatMapStringsSep " " unitOf hosts}); then
+          echo "classification gate: at least one host failed — journalctl -u fleet-classification-check-*" >&2
+          printf '%s\n' "$out" >&2
+          exit 1
+        fi
+        echo "${toString (builtins.length hosts)} active host(s): module system + assertions pass"
+      ''}";
+    };
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "10min";
+  };
 in {
   options.services.fleetClassificationGate = {
     enable = lib.mkEnableOption "the nightly systemd classification drift sweep";
@@ -96,32 +117,9 @@ in {
         # exits 0 when AT LEAST ONE of the named units failed (verified on 2026-10-24:
         # two active units -> 1, one failed -> 0), so the verdict is its inverse. The
         # exit status is what the sentinel ledger records.
-        fleet-classification-gate = {
-          description = "Nightly systemd classification drift gate (verdict)";
-          wants = map unitOf hosts;
-          after = map unitOf hosts;
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.writeShellScript "fleet-classification-verdict" ''
-              set -uo pipefail
-              if out=$(${pkgs.systemd}/bin/systemctl is-failed ${lib.concatMapStringsSep " " unitOf hosts}); then
-                echo "classification gate: at least one host failed — journalctl -u fleet-classification-check-*" >&2
-                printf '%s\n' "$out" >&2
-                exit 1
-              fi
-              echo "${toString (builtins.length hosts)} active host(s): module system + assertions pass"
-            ''}";
-          };
-        };
+        fleet-classification-gate = gateJob.service;
       };
 
-    systemd.timers.fleet-classification-gate = {
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "10min";
-      };
-    };
+    systemd.timers.fleet-classification-gate = gateJob.timer;
   };
 }

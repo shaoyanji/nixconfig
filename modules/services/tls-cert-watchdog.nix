@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  systemdJobs,
   ...
 }: let
   cfg = config.services.tlsCertWatchdog;
@@ -24,6 +25,20 @@
         --cert-files ${lib.escapeShellArgs cfg.certFiles} \
         "$@"
     '';
+  };
+  tlsCertWatchdogJob = systemdJobs.mkTimerJob {} {
+    description = "Nginx SSL/TLS Certificate Expiry Watchdog (EXP-050)";
+    wantedBy = [];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${cfg.package}/bin/tls-cert-watchdog";
+      User = "root";
+      PrivateTmp = true;
+      ProtectSystem = "strict";
+      ProtectHome = "read-only";
+    };
+    timerDescription = "Scheduled Nginx SSL/TLS Certificate Expiry Watchdog (EXP-050)";
+    onCalendar = cfg.schedule;
   };
 in {
   options.services.tlsCertWatchdog = {
@@ -75,26 +90,8 @@ in {
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [cfg.package];
 
-    systemd.services.tls-cert-watchdog = {
-      description = "Nginx SSL/TLS Certificate Expiry Watchdog (EXP-050)";
-      wantedBy = [];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${cfg.package}/bin/tls-cert-watchdog";
-        User = "root";
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = "read-only";
-      };
-    };
+    systemd.services.tls-cert-watchdog = tlsCertWatchdogJob.service;
 
-    systemd.timers.tls-cert-watchdog = {
-      description = "Scheduled Nginx SSL/TLS Certificate Expiry Watchdog (EXP-050)";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-      };
-    };
+    systemd.timers.tls-cert-watchdog = tlsCertWatchdogJob.timer;
   };
 }

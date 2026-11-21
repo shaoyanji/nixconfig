@@ -4,7 +4,7 @@ An employer's applicant tracking system reads a resume's text layer and files it
 before a person opens the file. It reads in document order, matches section
 headings against a fixed vocabulary, and drops anything it cannot place into an
 unsorted pile. Both templates now answer that: one column top to bottom, standard
-heading words, contact details in the body, plain-text URLs, no letter-spacing and
+heading words, contact details in the body, visible URLs, no letter-spacing and
 no letterhead footer.
 
 The rules live in the templates themselves. This page is the reason they are
@@ -39,7 +39,7 @@ and the fonts (New Computer Modern, Libertinus Serif) ship with Typst.
 
 | File | Change |
 | :--- | :--- |
-| `lib/matt/cv.typ` | header stacked into one column, contact URLs as plain text; headings in normal case at 9.7pt with no tracking, and `sticky` so a heading cannot end a page alone; each role, degree and project on one line with its period; footer reduced to the page number (`1/2`), and omitted on a one-page document; `show link` rule removed because no link remains |
+| `lib/matt/cv.typ` | header stacked into one column, contact URLs as plain text; project URLs as links over their own visible address; headings in normal case with no tracking, and `sticky` so a heading cannot end a page alone; each entry's period at its right edge; footer reduced to the page number (`1/2`), and omitted on a one-page document |
 | `modules/plugins/appflow/templates/lebenslauf.typ` | `entry()` uses one column instead of a two-column grid; `section()` sets the heading in its own case, not uppercased, is `sticky`, and the text does not hyphenate; the closing `Generated from the application database` line is gone, so the document ends on its last section instead of on a provenance line no parser can file |
 | `lib/matt-site.nix` | `cvLabels` now carries the standard words: `Projects`, `Skills`, `Languages` / `Projekte`, `Kenntnisse`, `Sprachen`; the key `tools` became `skills` |
 | `lib/matt/cv-energy.json`, `cv-energy.de.json` | the tailored CV overrides `projects` with `Projects` / `Projekte` instead of `Relevant projects` / `Relevante Projekte` |
@@ -106,9 +106,10 @@ nor `packet.nix` moved.
   `Education`, `Skills`, `Languages` — the name at line 1 of the extracted text and
   the headings at lines 12, 42, 69, 73 and 79.
 - Built through `nix build .#sites.matt-site`, the four CVs the site ships extract
-  their headings as standard words, carry no link annotation, and no heading ends a
-  page: page 1 of the full CV closes on an entry, and page 2 opens on `Education`.
-- No link annotation is left: a scan of the PDF bytes finds no `/URI`.
+  their headings as standard words, and no heading ends a page: page 1 of the full
+  CV closes on an entry, and page 2 opens on `Education`.
+- A link annotation is allowed only over its own visible address: every project
+  URL is printed as text, so a parser that drops the annotation still reads it.
 - The footer no longer carries `page 1 of`: on a one-page document it carries
   nothing, and on the full CV it carries only the page number, `1/2` and `2/2`.
 
@@ -202,8 +203,8 @@ derivation has no old output to re-check.
 The link gate keeps the four PDFs reachable; this one keeps them the document
 they claim to be. The template reads `cv.json`, and nothing proved the finished
 PDF still said what that record says: a heading that becomes a house word, a role
-the loop drops, a link annotation that comes back or a word hyphenated at a line
-end compiles cleanly, and the page-count check in `lib/typeset.nix` sees none of
+the loop drops, a project URL that exists only as a link target or a word
+hyphenated at a line end compiles cleanly, and the page-count check in `lib/typeset.nix` sees none of
 them.
 
 `bash scripts/task/cv-ats-check.sh --record work/cv.json $out/cv.pdf` runs inside
@@ -214,8 +215,9 @@ lines, the contact in the body, the five headings as exact lines in one order
 (`Experience`, `Projects`, `Education`, `Skills`, `Languages`; German
 `Berufserfahrung`, `Projekte`, `Ausbildung`, `Kenntnisse`, `Sprachen`), every work
 title and role, every degree, school, project and skill group the record carries,
-and the record's own `labels` against that vocabulary. Then the bytes: no `/URI`
-annotation, and no line that ends in a hyphen and continues lowercase.
+and the record's own `labels` against that vocabulary. Then the lines: no line that
+ends in a hyphen and continues lowercase. Link annotations are permitted because
+the project address is also printed as text; a bare link label is not.
 
 A failure names the property rather than the file:
 
@@ -266,8 +268,8 @@ repository; nothing here reaches it.
 
 ## Limits of this check
 
-No commercial ATS was run; the evidence is the extracted text, the annotation scan
-and the layout rules above. `anschreiben.typ` sits in the same directory and is not
+No commercial ATS was run; the evidence is the extracted text and the layout rules
+above. `anschreiben.typ` sits in the same directory and is not
 covered: it justifies without the no-hyphenation guard, which matters less for a
 letter no parser hunts keywords in. The packet target was compiled from the corpus
 and from a selection over a synthetic description, because the production selection

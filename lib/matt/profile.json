@@ -7,7 +7,8 @@
     "subtitle": "Go · NixOS fleets · vulnerability data · energy infrastructure",
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
     "status": "Open to senior and lead roles",
-    "bio": "Most of my working life has gone into making operational data usable. I ran asset management for a solar portfolio above $100M for four years: yield models that passed bank audits, mobile field capture, and telemetry reconciliation when sensors went missing. Since 2023 I have run thirteen NixOS hosts from one flake, with an SSH certificate authority and encrypted secrets per host. The free hours go to CISA's KEV catalogue, building tools that turn the exploited list into a patch order a team can work through.",
+    "target": "Target: security operations or vulnerability management; remote from a CET base or on site in Freiburg.",
+    "bio": "Most of my working life has gone into making operational data usable: four years running asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture, and telemetry reconciliation when sensors went missing. Since 2023 I have run a thirteen-host personal NixOS fleet from one flake, with an SSH certificate authority and per-host encrypted secrets. The move into security follows the same question — can this number, host or patch be trusted — and since 2025 I have worked independently on that fleet and on KEV triage tooling.",
     "contacts": [
       {
         "label": "email",
@@ -113,9 +114,12 @@
       "sortStart": "2023-01-01"
     },
     {
-      "title": "bountystash: deterministic work engine",
-      "role": "Founder and engineer",
-      "description": "A request arrives as prose and has drifted by the time the work is done. I built a Go service that records it as an immutable document, so a job's state replays a month later and two people can agree on what was asked. One binary serves HTML, JSON and a terminal UI.",
+      "title": "bountystash: energy risk advisory",
+      "role": "Founder",
+      "description": "A five-year advisory practice for energy trading and risk management, with client work for a German energy trader and EWE Trading, including bug-bounty programme audits and cybersecurity advice.",
+      "highlights": [
+        "Built the bountystash work engine: a Go service that records a request as an immutable, content-addressed specification, so a job's state replays a month later and two people can agree on what was asked."
+      ],
       "link": "https://github.com/shaoyanji/bountystash",
       "caseStudy": "bountystash",
       "keywords": [
@@ -159,7 +163,7 @@
     {
       "title": "Smart Energy 360",
       "role": "Director of Sustainability",
-      "description": "Built and ran a project pipeline above $100M for commercial clients moving to cleaner electricity, with the sustainability strategy and the risk advice that went with it.",
+      "description": "Managed a USD 100M+ project pipeline for commercial clients moving to cleaner electricity, with the sustainability strategy and the risk advice that went with it.",
       "link": "",
       "keywords": [
         "sustainability",
@@ -214,19 +218,17 @@
   },
   "stack": [
     {
-      "category": "Systems and concurrency",
+      "category": "Languages and services",
       "items": [
         "Go",
-        "channels and state machines",
-        "PostgreSQL",
-        "Redis",
-        "gRPC and REST",
-        "Kafka",
-        "Python"
+        "Python",
+        "SQL",
+        "REST",
+        "state machines"
       ]
     },
     {
-      "category": "Declarative infrastructure",
+      "category": "Systems and infrastructure",
       "items": [
         "NixOS",
         "Nix flakes",
@@ -239,15 +241,22 @@
       ]
     },
     {
+      "category": "Security",
+      "items": [
+        "vulnerability management",
+        "CISA KEV",
+        "CVSS",
+        "bug-bounty programme audit",
+        "vulnerability programme design"
+      ]
+    },
+    {
       "category": "Domain",
       "items": [
         "asset valuation",
         "solar telemetry reconciliation",
         "risk models",
-        "bank audit reporting",
-        "KEV and CVSS",
-        "vulnerability programme design",
-        "Typst"
+        "bank audit reporting"
       ]
     }
   ],

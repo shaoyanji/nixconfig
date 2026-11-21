@@ -6,8 +6,8 @@
       "type": "open source",
       "start": "2023-01",
       "end": "",
-      "summary": "Thirteen NixOS hosts rebuilt from one repository: certificates, per-host secrets and the operator commands come from the same place, and the same check runs in CI and before a deploy.",
-      "summaryDe": "Dreizehn NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy.",
+      "summary": "Thirteen personal NixOS hosts rebuilt from one repository: certificates, per-host secrets and the operator commands come from the same place, and the same check runs in CI and before a deploy.",
+      "summaryDe": "Dreizehn persönliche NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy.",
       "keywords": [
         "Nix",
         "NixOS",

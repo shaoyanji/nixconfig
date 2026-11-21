@@ -151,13 +151,22 @@
 
 #if resume.at("projects", default: ()) != () [
   #section("projects")
+  // A project the corpus records only as a name and a period is not a CV entry.
+  // Where there are no bullets the resume's one-line `description` is the
+  // content; printing `entity` ("Personal", "Founder", a lab name) and nothing
+  // else is what left seven bare headings on the full CV. An entry with neither
+  // bullets nor a description is skipped rather than shipped empty.
   #for project in resume.at("projects", default: ()) [
-    #entry(
-      project.at("name", default: ""),
-      project.at("entity", default: project.at("description", default: "")),
-      period(project.at("startDate", default: ""), project.at("endDate", default: "")),
-      project.at("highlights", default: ()),
-    )
+    #let bullets = project.at("highlights", default: ())
+    #let blurb = project.at("description", default: "")
+    #if bullets.len() > 0 or blurb != "" [
+      #entry(
+        project.at("name", default: ""),
+        if bullets.len() == 0 { blurb } else { project.at("entity", default: blurb) },
+        period(project.at("startDate", default: ""), project.at("endDate", default: "")),
+        bullets,
+      )
+    ]
   ]
 ]
 

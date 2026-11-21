@@ -1,8 +1,43 @@
 {
-  "generated": "2026-11-21T10:55:15Z",
+  "generated": "2026-11-21T11:40:49Z",
   "count": 200,
-  "pin": "daa6abf657b54726a84c75239046ae431537d15ddfee28eea2e0a0117a1c8f9e",
+  "pin": "9abf6bb79b5b98a28d9dbfcaf83f4615d0d3d06dab895302d4659f5280c9a659",
   "turns": [
+    {
+      "id": "4e6caccf-35fe-4ae5-a2f8-df420cd30e21",
+      "ts": "2026-11-21T11:39:35Z",
+      "source": "devin-agent",
+      "subject": "nixconfig:steward-devin-2026-11-21",
+      "action": "drove idle devin pane: host-change task submitted — remove dead openrouter rung from modules/user/ai/hermes-persona/config.yaml fallback_providers (its key 402s on failover), verify YAML, commit with gmc, push to origin/main; fresh Thinking counter confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "26f3a06e7ea8f4e9225b140e9e3fbd3b9a8a66ba",
+      "branch": "main",
+      "frame": "03h9zc8dfhm1rlcle6eg7ec0h"
+    },
+    {
+      "id": "a7844854-ae21-445e-bb9a-7278145fbc72",
+      "ts": "2026-11-21T10:55:23Z",
+      "source": "devin",
+      "subject": "nixconfig:decision-routers",
+      "action": "landed: decision-router layer fixed — Go router error-classed fallback + X-Decision-Provider header + dead :8080 upstream -> Strata :8085, 8 new tests in nix build; docs reconciled (Kev not a lane per operator record); jev-decide wrapper default typesafe from prior commit | gate: go test + nix doCheck + checks:quick + checks:router PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "modules/services/llm-decision-router/main.go",
+        "modules/services/llm-decision-router/main_test.go",
+        "modules/services/llm-decision-router.nix",
+        ".agents/skills/jevdecide/SKILL.md",
+        ".agents/skills/jevdecide/references/eisen-routing.md",
+        "docs/eisen-llm-architecture.md",
+        "hosts/eisen/llm-server.nix",
+        "flake/prose-budget.nix"
+      ],
+      "base_commit": "26f3a06e7ea8f4e9225b140e9e3fbd3b9a8a66ba",
+      "branch": "main",
+      "frame": "03h9z3ll5trv5ezfzor9e85h6"
+    },
     {
       "id": "eebb3d64-070c-4289-a7d0-acf06a19b71b",
       "ts": "2026-11-21T10:46:49Z",
@@ -2719,32 +2754,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9vmz9jajynmzoyahfql69t"
-    },
-    {
-      "id": "f11643e8-5a8e-43e5-aa61-4b2a6211726d",
-      "ts": "2026-11-21T00:17:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-leak-gate",
-      "action": "steward re-drove freebuff pane: verify_cv_links (Jev 0.99/0.98). Pane re-verified the durable CV link gate at HEAD 8c7204aa: build-time gate holds, fixture checks:site:links:test 14/14, no file changes needed.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vmz7b8p15c1tnkxz81y2a"
-    },
-    {
-      "id": "57ed58db-c8a1-44d0-9e20-8666f9f743a1",
-      "ts": "2026-11-21T00:10:57Z",
-      "source": "devin",
-      "subject": "nixconfig:dead-module-sweep",
-      "action": "audit re-run post-d8217e59: zero-inbound set is all parks/roots (shadows, gok, deepseek mock, edge-caller, dsh-remote, templates) or string-path consumers (closure-graph via closure-graph.sh, systemd-policy via self.modules name, tools/library via policies.nix:282); nothing dead to remove | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c7204aa223a1bcb561238544077da321331e8f7",
-      "branch": "main",
-      "frame": "03h9vlpnf637huec3c9619d3m"
     }
   ]
 }

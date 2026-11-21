@@ -144,8 +144,6 @@ fallback_providers:
     key_env: INFRON_API_KEY
   - provider: nvidia
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
-  - provider: openrouter
-    model: nvidia/nemotron-3.5-super-vl:free
   - provider: ollama-cloud
     model: nemotron-3-ultra
 # chatplayground is deliberately NOT a provider here. Its chat endpoint takes
@@ -211,3 +209,6 @@ telemetry:
     send: false
     offer_version: 2
 _config_version: 52
+command_allowlist:
+  - execute_code
+  - script execution via -e/-c flag

@@ -468,7 +468,7 @@
         else "en_US";
       inherit (p) handle;
       inherit (p) status;
-      inherit (p) location;
+      location = lib.head (lib.splitString " · " (p.location or ""));
       inherit (p) name;
       role = p.title;
       inherit (p) subtitle;
@@ -747,7 +747,16 @@
                 period = yearPeriod nowLabel e.start e.end;
               }
           )
-          (lib.sort (a: b: projectRank a > projectRank b) joinProjects);
+          # The archive keeps every project; the two-page CV shows the three
+          # that argue for this role.
+          (joinProjects
+            |> lib.sort (a: b: projectRank a > projectRank b)
+            |> lib.filter (e:
+              builtins.elem (e.resumeName or e.name) [
+                "nixconfig"
+                "Vulnerability operations concept"
+                "kelly-svg"
+              ]));
     };
 
   # A tailored CV is a projection of the corpus for its language: the variant

@@ -7,7 +7,8 @@
     "subtitle": "Go · NixOS-Flotten · Schwachstellendaten · Energieinfrastruktur",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
     "status": "Offen für Senior- und Lead-Rollen",
-    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen. Vier Jahre lang habe ich das Asset Management für ein Solarportfolio über 100 Mio. USD verantwortet: Ertragsmodelle, die Bankprüfungen bestanden, mobile Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Seit 2023 betreibe ich dreizehn NixOS-Hosts aus einem Flake, mit eigener SSH-Zertifizierungsstelle und verschlüsselten Secrets pro Host. In den freien Stunden arbeite ich am KEV-Katalog von CISA: Werkzeuge, die aus der Liste der bekannten ausgenutzten Schwachstellen eine Patch-Reihenfolge machen, die ein Team abarbeiten kann.",
+    "target": "Ziel: Sicherheitsbetrieb oder Schwachstellenmanagement; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
+    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Seit 2023 betreibe ich eine persönliche NixOS-Flotte mit dreizehn Hosts aus einem Flake, mit eigener SSH-Zertifizierungsstelle und verschlüsselten Secrets pro Host. Der Wechsel in die Sicherheit folgt derselben Frage — ob dieser Wert, dieser Host oder dieser Patch vertrauenswürdig ist — und seit 2025 arbeite ich unabhängig an der Flotte und an KEV-Triage-Werkzeugen.",
     "contacts": [
       {
         "label": "email",
@@ -113,9 +114,12 @@
       "sortStart": "2023-01-01"
     },
     {
-      "title": "bountystash: deterministische Aufgaben-Engine",
-      "role": "Gründer und Entwickler",
-      "description": "Eine Anfrage kommt als Prosa an und ist bis zur Fertigstellung eine andere geworden. Ich habe einen Go-Dienst gebaut, der sie als unveränderliches Dokument festhält: einen Monat später lässt sich der Zustand eines Auftrags rekonstruieren, und zwei Personen können sich darauf einigen, was gefragt war. Ein Binary liefert HTML, JSON und eine Terminal-Oberfläche.",
+      "title": "bountystash: Energie-Risikoberatung",
+      "role": "Gründer",
+      "description": "Fünf Jahre Beratung für Energiehandel und Risikomanagement, mit Mandaten für einen deutschen Energiehändler und die EWE Trading, darunter Prüfungen von Bug-Bounty-Programmen und Cybersecurity-Beratung.",
+      "highlights": [
+        "Baute die bountystash-Aufgaben-Engine: ein Go-Dienst, der eine Anfrage als unveränderliche, inhaltsadressierte Spezifikation festhält, sodass sich der Zustand eines Auftrags einen Monat später rekonstruieren lässt und zwei Personen sich darauf einigen können, was gefragt war."
+      ],
       "link": "https://github.com/shaoyanji/bountystash",
       "caseStudy": "bountystash",
       "keywords": [
@@ -159,7 +163,7 @@
     {
       "title": "Smart Energy 360",
       "role": "Director of Sustainability",
-      "description": "Eine Projektpipeline über 100 Mio. USD für gewerbliche Kunden auf dem Weg zu saubererem Strom aufgebaut und geführt, dazu die Nachhaltigkeitsstrategie und die Risikoberatung, die dazugehörten.",
+      "description": "Betreute eine Projektpipeline über 100 Mio. USD für gewerbliche Kunden auf dem Weg zu saubererem Strom, dazu die Nachhaltigkeitsstrategie und die Risikoberatung, die dazugehörten.",
       "link": "",
       "keywords": [
         "Nachhaltigkeit",
@@ -214,19 +218,17 @@
   },
   "stack": [
     {
-      "category": "Systeme und Nebenläufigkeit",
+      "category": "Sprachen und Dienste",
       "items": [
         "Go",
-        "Channels und Zustandsautomaten",
-        "PostgreSQL",
-        "Redis",
-        "gRPC und REST",
-        "Kafka",
-        "Python"
+        "Python",
+        "SQL",
+        "REST",
+        "Zustandsautomaten"
       ]
     },
     {
-      "category": "Deklarative Infrastruktur",
+      "category": "Systeme und Infrastruktur",
       "items": [
         "NixOS",
         "Nix-Flakes",
@@ -239,15 +241,22 @@
       ]
     },
     {
+      "category": "Sicherheit",
+      "items": [
+        "Schwachstellenmanagement",
+        "CISA KEV",
+        "CVSS",
+        "Prüfung von Bug-Bounty-Programmen",
+        "Aufbau von Schwachstellenprogrammen"
+      ]
+    },
+    {
       "category": "Fachliches",
       "items": [
         "Anlagenbewertung",
         "Abgleich von Solar-Telemetrie",
         "Risikomodelle",
-        "Berichte für Bankprüfungen",
-        "KEV und CVSS",
-        "Aufbau von Schwachstellenprogrammen",
-        "Typst"
+        "Berichte für Bankprüfungen"
       ]
     }
   ],

@@ -16,9 +16,8 @@ in {
   ];
 
   # --- Desktop (eisen-style): niri compositor + DankMaterialShell greeter ---
-  # A toast when an agent turn lands in the fleet log. Delphi serves the log; the
-  # toast is a session-bus call, so it happens on the device with the session.
-  services.xsNotify.enable = true;
+  # The xs-notify toaster was rewritten to a Telegram lane on delphi
+  # (ea0e6766): this host's toast flag went with it.
 
   services.displayManager.sddm = {
     enable = false;

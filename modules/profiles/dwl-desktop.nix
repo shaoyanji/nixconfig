@@ -122,9 +122,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    # A toast when an agent turn lands in the fleet log; the module is skipped
-    # where this host holds no xs token.
-    services.xsNotify.enable = true;
+    # The xs-notify toaster was rewritten to a Telegram lane on delphi
+    # (ea0e6766): the profile's toast flag went with it.
     programs.dwl = {
       enable = true;
       package = dwl;

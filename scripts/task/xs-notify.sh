@@ -13,11 +13,16 @@ XS_URL="${XS_TURNS_URL:-https://delphi.cloudforest-kardashev.ts.net:8449/v1/even
 CHAT_ID="${TELEGRAM_CHAT_ID:-8679391100}"
 SCAN=200
 
-if [ ! -r "$BOT_TOKEN_FILE" ]; then
-  echo "xs-notify: bot token file not readable: $BOT_TOKEN_FILE" >&2
-  exit 1
+# The service unit injects TELEGRAM_BOT_TOKEN via EnvironmentFile (the sops
+# secret is KEY=value format); a bare token file is the fallback for hand runs.
+BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-}"
+if [ -z "$BOT_TOKEN" ]; then
+  if [ ! -r "$BOT_TOKEN_FILE" ]; then
+    echo "xs-notify: bot token file not readable: $BOT_TOKEN_FILE" >&2
+    exit 1
+  fi
+  BOT_TOKEN="$(tr -d '\r\n ' < "$BOT_TOKEN_FILE")"
 fi
-BOT_TOKEN="$(tr -d '\r\n ' < "$BOT_TOKEN_FILE")"
 
 if [ ! -r "$TOKEN_FILE" ]; then
   echo "xs-notify: xs token file not readable: $TOKEN_FILE" >&2

@@ -1,8 +1,86 @@
 {
-  "generated": "2026-11-21T01:35:27Z",
+  "generated": "2026-11-21T01:47:24Z",
   "count": 200,
-  "pin": "b29dce83f53c7dcdf9b81639b70bf7810acaf13b0d22a845888c2d10fc5eaee3",
+  "pin": "53cf0231d8f4f48f01a51dd5c9265bbb7515bd97d2f654ac45f08c324071ae17",
   "turns": [
+    {
+      "id": "f967e9b1-fafb-41ed-a0f7-2f15e26b0986",
+      "ts": "2026-11-21T01:43:36Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-link-gate",
+      "action": "Verified dev:blog:cv:check end to end: passes with 2 published CVs whose bytes equal the build and whose download anchors resolve in _site; negatives all fail (stale build, unlinked, no download, missing target, required-not-published rc1; no _site rc2). Live gap found and fixed: the blog checkout held cv-de.pdf uncommitted, so is-a.dev/cv/ linked only English. Pushed blog 7f551a3; Pages green, live cv-de.pdf 200 5aa1183bb1a3.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2e58ebf313edc9010e6b96d5380d88d54782fcda",
+      "branch": "main",
+      "frame": "03h9w3t68tjsjabe46ba5hf8m"
+    },
+    {
+      "id": "23ecebd8-e77d-4be2-86ab-0e0dce347788",
+      "ts": "2026-11-21T01:42:36Z",
+      "source": "devin",
+      "subject": "nixconfig:xs-notify-deploy",
+      "action": "landed: devin driving xs-notify deploy (delphi->Telegram agent-turn push)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w3m5ep4vxjecrt6jbyf6c"
+    },
+    {
+      "id": "e0313ae2-bf33-4b1a-acf4-1b95dc1e504e",
+      "ts": "2026-11-21T01:42:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-gate-verify",
+      "action": "landed: freebuff driving CV gate verification (dev:blog:cv:check end-to-end)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w3lreccojhldy0bh2th0r"
+    },
+    {
+      "id": "ea40b57e-4877-4be0-a15e-a3454fc17d8e",
+      "ts": "2026-11-21T01:36:57Z",
+      "source": "devin",
+      "subject": "nixconfig:strip-shared-config",
+      "action": "landed: drove devin pane on stripping Shared Config from Draft PR #3 (jev strip_shared_config 0.97)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w2idjtbsmgx6lpp3om0fp"
+    },
+    {
+      "id": "8cc0d60e-ccfc-421f-b813-9ba1b6ddc016",
+      "ts": "2026-11-21T01:36:57Z",
+      "source": "freebuff",
+      "subject": "cv:site-links-gate",
+      "action": "landed: drove freebuff pane on the durable CV-PDF-link gate (jev cv_site_gate 0.93)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w2icjys2hf1tktrplb9m1"
+    },
+    {
+      "id": "e3416abd-fa91-41dc-9f00-6dfcf2387f06",
+      "ts": "2026-11-21T01:35:37Z",
+      "source": "devin",
+      "subject": "nixconfig:email-archive-timers",
+      "action": "landed: email-archive gdrive/import/triage pairs onto lib/systemd-jobs.nix mkTimerJob via archiveJobs table; db-init/npgsqlrest stay literal; all 6 units byte-identical on delphi | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2e58ebf313edc9010e6b96d5380d88d54782fcda",
+      "branch": "main",
+      "frame": "03h9w2909afhlrrkr7syre4p1"
+    },
     {
       "id": "4510824f-9e21-477c-9bbd-39e1e4e3308b",
       "ts": "2026-11-21T01:33:30Z",
@@ -2616,86 +2694,6 @@
       "base_commit": "ac5874beb12b9b1942ddb879e6cb17495eccb710",
       "branch": "main",
       "frame": "03h9rlvqiv512snh8dt2tw6qh"
-    },
-    {
-      "id": "34761a8e-bd4c-433d-9e6c-1ce582edeff8",
-      "ts": "2026-11-20T11:52:43Z",
-      "source": "devin",
-      "subject": "nixconfig:apps-followups",
-      "action": "claim: repair apps:followups on delphi — APPS_DIR missing; delegate checkout verbs to frieren over ssh when the mount is absent",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-typst.sh taskfiles/apps.yml"
-      ],
-      "files": [],
-      "base_commit": "986a59b4f61cc5d803c1c65f0d121110fdc3ebe3",
-      "branch": "main",
-      "frame": "03h9rli28y6my8py03kjajscv"
-    },
-    {
-      "id": "34731829-292b-49a8-88ea-b81aad216985",
-      "ts": "2026-11-20T11:50:51Z",
-      "source": "freebuff",
-      "subject": "nixconfig:site-cv-links",
-      "action": "landed: homepage header nav links cv-energy.pdf (EN) and cv-energy-de.pdf (DE) via cvTunedHref/cvTunedLabel in lib/matt-site.nix, shell.html, both profile files and style.css | gate: nix build .#sites.matt-site rc=0, both hrefs present, 15 pages unchanged",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "986a59b4f61cc5d803c1c65f0d121110fdc3ebe3",
-      "branch": "main",
-      "frame": "03h9rl4wo3ml15w71613jl8xi"
-    },
-    {
-      "id": "df64e522-2f6c-4faa-90a6-3364931aa511",
-      "ts": "2026-11-20T11:50:43Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 38: all 3 landed — devin parakeet-hardening 422ad47d, agy job-search (16 apps, gate 174 rows), freebuff site CVs 43f272e2. jevdecide routed: devin→parloa_followup (0.88), agy→job_search_deeper. All panes re-tasked, busy.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
-      "branch": "main",
-      "frame": "03h9rl414rscigweyjuqeyoan"
-    },
-    {
-      "id": "97c89ab7-be38-42b8-92b5-23da59141c38",
-      "ts": "2026-11-20T11:50:40Z",
-      "source": "antigravity",
-      "subject": "nixconfig:monitor-leads-nudge",
-      "action": "claim: research Monitor-group leads (Parloa, evoila, Workato, Octopus, Castle Tech) and nudge them on delphi PostgreSQL",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
-      "branch": "main",
-      "frame": "03h9rl3njpzfzel029qjzbwil"
-    },
-    {
-      "id": "5a355bba-497e-4098-8a66-f3656a6b6e8f",
-      "ts": "2026-11-20T11:47:02Z",
-      "source": "antigravity",
-      "subject": "nixconfig:agy-job-search",
-      "action": "landed: update 16 applications (resolve undiscovered roles, nudge leads, reconcile rejections) on delphi PostgreSQL | gate: application-pipeline 174 rows PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
-      "branch": "main",
-      "frame": "03h9rke4sozbj6veb1vsetfbf"
-    },
-    {
-      "id": "33b0fdb8-efc7-49fd-9b75-8ea693f5a577",
-      "ts": "2026-11-20T11:44:32Z",
-      "source": "freebuff",
-      "subject": "nixconfig:ats-resume",
-      "action": "landed: nix build .#sites.matt-site PASS on eu.nixbuild.net; shipped 4 CVs (2/2/1/1 pages), 15 pages, og cards; fixed a heading left alone at a page foot (cv.typ head() sticky), cv.pdf last page 80 mm | gate: nix build .#sites.matt-site rc=0 (typeset checks inside the derivations PASS)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
-      "branch": "main",
-      "frame": "03h9rjwingj7sc0lg3vu4k3ln"
     }
   ]
 }

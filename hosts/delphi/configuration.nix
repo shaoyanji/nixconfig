@@ -1203,6 +1203,14 @@ in {
   # is the entire exposed surface, and the bearer token comes from sops. The
   # endpoint is coordination state, not a chat relay and not a merge authority.
   services.agentTurns.enable = true;
+  # The outcome lane out of the log: a minutely watcher pushes changed turn
+  # outcomes to @Frierenixbot on Telegram (token is the `hermes` sops key,
+  # aliased for this service — delphi's own bot keeps its `delphi-telegram`).
+  # The shim is loopback on this host, so the poll needs no TLS or tailnet hop.
+  services.xsNotify = {
+    enable = true;
+    url = "http://127.0.0.1:${toString config.services.agentTurns.port}/v1/events";
+  };
   # One revocable token per holder outside this repo's agents: the netbook, muse,
   # and vesper. Each authenticates to the same shim and is revoked on its own, so
   # no single machine carries the fleet credential.

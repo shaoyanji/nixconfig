@@ -5,8 +5,7 @@
   lib,
   user,
   ...
-}: let
-in {
+}: {
   imports = [
     self.modules."profiles.sshfs-nas-client"
     self.modules."config.authorized-keys"

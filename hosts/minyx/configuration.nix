@@ -8,8 +8,7 @@
   pkgs,
   user,
   ...
-}: let
-in {
+}: {
   imports = [
     ./dns.nix
     ./hardware-configuration.nix

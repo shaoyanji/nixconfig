@@ -3,8 +3,7 @@
   lib,
   user,
   ...
-}: let
-in {
+}: {
   imports = [
   ];
 

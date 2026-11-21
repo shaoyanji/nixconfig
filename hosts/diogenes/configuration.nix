@@ -4,8 +4,7 @@
   pkgs,
   user,
   ...
-}: let
-in {
+}: {
   imports = [
     ./hardware-configuration.nix
     self.modules."profiles.base-desktop-environment"

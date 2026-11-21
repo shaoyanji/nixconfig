@@ -6,8 +6,7 @@
   lib,
   user,
   ...
-}: let
-in {
+}: {
   imports = [self.modules."profiles.base-desktop-environment"];
 
   # nixpkgs' graphical-desktop module mkDefault-enables speechd for any desktop,

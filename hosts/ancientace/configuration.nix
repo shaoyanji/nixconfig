@@ -6,8 +6,7 @@
   lib,
   user,
   ...
-}: let
-in {
+}: {
   imports = [
     self.modules."config.authorized-keys"
     # Include the results of the hardware scan.

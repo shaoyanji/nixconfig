@@ -8,8 +8,7 @@
   pkgs,
   user,
   ...
-}: let
-in {
+}: {
   imports = [
     (import ./base.nix {
       inherit self;

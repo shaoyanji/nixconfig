@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T06:24:25Z",
+  "generated": "2026-11-21T06:24:39Z",
   "count": 200,
-  "pin": "f2e33d30bcb0596ed8c0652a7a036494f436db683e034dab081f7f1b83f8aa0e",
+  "pin": "95db907f9bd906c366b0b2394a345840d7c08ea549dc355efd330d8b0bbcf12f",
   "turns": [
+    {
+      "id": "d02d7050-03e0-4652-a3cc-f6e2c8126d7e",
+      "ts": "2026-11-21T06:24:37Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-apply-signature-performance",
+      "action": "done: application draft ready at docs/job-apps/sig-perf-application-draft.txt; To: careersupport@signatureperformance.com; Subject: Application: Senior Solar Asset Manager - RE-200128610 - Katie Laudon; application method: email (Wix careers page has no curl-accessible form); ready to send via himalaya/mail on delphi",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "34a34847a6207039ae316e6687c37fc6226dc1ac",
+      "branch": "main",
+      "frame": "03h9xmphh5y3pglbdpco5u7ly"
+    },
     {
       "id": "ec5b003f-7fcc-40cb-8f3f-c147431f8422",
       "ts": "2026-11-21T06:23:59Z",
@@ -2685,19 +2698,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9v3999hxw0pq2v26na3624"
-    },
-    {
-      "id": "52d7f42b-63aa-4b43-8436-6bcbe2bcb10d",
-      "ts": "2026-11-20T22:33:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-refresh",
-      "action": "landed CV refresh (corrects earlier turns naming 301e3b5f/ed1b6955, both superseded): CV lists the six newest projects, both stacks name CI gates + vulnerability programme design; matt-site build gate passed, cv.pdf deployed to shaoyanji (a34c3eb, run 44829435569 success)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e0f6aa42f535bb85c289cdfd637810b3bcfaa2d2",
-      "branch": "main",
-      "frame": "03h9v2kr8hziis9vq2wghpl5i"
     }
   ]
 }

@@ -5,8 +5,7 @@
   pkgs,
   user,
   ...
-}: let
-in {
+}: {
   # Fork, not inheritance: see [[flake/policies.nix#desktop-fork-not-disable]].
   imports = [
     ./hardware-configuration.nix

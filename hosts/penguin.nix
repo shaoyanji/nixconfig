@@ -5,8 +5,7 @@
   pkgs,
   user,
   ...
-}: let
-in {
+}: {
   imports = [
     self.modules."shell"
     self.modules."env"

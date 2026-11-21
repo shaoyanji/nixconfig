@@ -195,8 +195,10 @@
   ]
 ]
 
-#v(8pt)
-#align(center)[#text(size: 7.5pt, fill: rgb("#6b7280"))[#strings.at("generated", default: "")]]
+// No closing `Generated from the application database` line: it named where the
+// file came from, not the candidate, so it was the one line of the document an
+// ATS could not place in a section — the letterhead footer this template
+// otherwise avoided. Why: docs/cv-ats-compliance.md.
 
 // typeset report — read back by the build (lib/typeset.nix) -------------------
 // The page count and how far down its last page the content reached. A packet who

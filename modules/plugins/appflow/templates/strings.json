@@ -6,7 +6,6 @@
     "projects": "Projekte",
     "languages": "Sprachen",
     "present": "heute",
-    "generated": "Erzeugt aus der Bewerbungsdatenbank",
     "months": [
       "Januar",
       "Februar",
@@ -29,7 +28,6 @@
     "projects": "Projects",
     "languages": "Languages",
     "present": "present",
-    "generated": "Generated from the application database",
     "months": [
       "January",
       "February",

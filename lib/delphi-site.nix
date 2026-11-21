@@ -31,7 +31,7 @@
   inv =
     if inventory != null
     then inventory
-    else builtins.fromTOML (builtins.readFile ../inventory.toml);
+    else ../inventory.toml |> builtins.readFile |> builtins.fromTOML;
   skills = import ./skills.nix {inherit lib;};
   kg = import ./knowledge-graph.nix {
     inherit lib skills;
@@ -48,17 +48,17 @@
 
   # --- the evaluated model ---------------------------------------------------
   tally = f:
-    lib.foldl' (
+    hostValues
+    |> lib.foldl' (
       acc: h: let
         k = f h;
       in
         acc // {"${k}" = (acc.${k} or 0) + 1;}
-    ) {}
-    hostValues;
+    ) {};
 
   byKind = tally (h: h.kind or "unknown");
   byArch = tally (h: h.arch or "unknown");
-  countWhere = p: builtins.length (lib.filter p hostValues);
+  countWhere = p: hostValues |> lib.filter p |> builtins.length;
 
   devices = builtins.length hostValues;
   externalCount = countWhere (h: (h.kind or "") == "external");
@@ -88,10 +88,11 @@
     then throw "lib/delphi-site.nix: `cards` is empty — enable `services.servicePortal` on the host so the site renders the registry that also generates the `tailscale serve` units"
     else cards;
 
-  byAudience = a: lib.filter (c: c.audience == a) cardRegistry;
+  byAudience = a: cardRegistry |> lib.filter (c: c.audience == a);
   tailnetCards =
-    lib.sort (a: b: a.title < b.title)
-    (lib.filter (c: c.audience == "tailnet") cardRegistry);
+    cardRegistry
+    |> lib.filter (c: c.audience == "tailnet")
+    |> lib.sort (a: b: a.title < b.title);
   publicCards = byAudience "public";
   lanCards = byAudience "lan";
   withheld = builtins.length tailnetCards;
@@ -123,7 +124,7 @@
   inherit (builtins) toString;
   n = toString;
 
-  esc = s: lib.escapeXML (toString s);
+  esc = s: s |> toString |> lib.escapeXML;
 
   # A field the registry does not carry is OMITTED, never filled with invented
   # prose: an empty string is the compiled schema's "unknown", so it is also the
@@ -138,8 +139,8 @@
       <tr><th scope="row">${esc label}</th><td>${esc text}</td></tr>
     '';
 
-  mkBullets = xs: lib.concatMapStringsSep "\n" (x: "<li>${esc x}</li>") xs;
-  mkChips = xs: lib.concatMapStringsSep "\n" (x: ''<li class="chip">${esc x}</li>'') xs;
+  mkBullets = xs: xs |> lib.concatMapStringsSep "\n" (x: "<li>${esc x}</li>");
+  mkChips = xs: xs |> lib.concatMapStringsSep "\n" (x: ''<li class="chip">${esc x}</li>'');
 
   hardwareRows =
     mkRow "Model" (hw.model or "")
@@ -154,9 +155,9 @@
   # invents later still prints, at the end, instead of being dropped.
   preferred = ["nixos" "darwin" "home" "external"];
   orderedRow = attrs: let
-    present = builtins.attrNames attrs;
-    known = lib.filter (k: builtins.elem k present) preferred;
-    rest = lib.filter (k: !(builtins.elem k preferred)) present;
+    present = attrs |> builtins.attrNames;
+    known = preferred |> lib.filter (k: present |> builtins.elem k);
+    rest = present |> lib.filter (k: !(preferred |> builtins.elem k));
   in
     lib.concatMapStringsSep " · " (k: "${k} ${n attrs.${k}}") (known ++ rest);
 
@@ -189,7 +190,7 @@
       else "div";
     waits =
       lib.optionalString (c.requires != [])
-      ''<span class="svc-waits">waits on ${esc (lib.concatStringsSep ", " c.requires)}</span>'';
+      ''<span class="svc-waits">waits on ${c.requires |> lib.concatStringsSep ", " |> esc}</span>'';
     # A plain double-quoted string, not `''`: an indented string's shared leading
     # whitespace is stripped, which silently glued `data-title="…"href="…"`
     # together (measured in the built console).
@@ -203,12 +204,15 @@
   '';
 
   cardGrid = mode: cs:
-    lib.concatMapStringsSep "\n" (g: ''
+    cs
+    |> map (c: c.group)
+    |> lib.unique
+    |> lib.concatMapStringsSep "\n" (g: ''
       <h3 class="svc-group">${esc g}</h3>
       <div class="svc-grid">
-      ${lib.concatMapStringsSep "\n" (card mode) (lib.filter (c: c.group == g) cs)}
+      ${cs |> lib.filter (c: c.group == g) |> lib.concatMapStringsSep "\n" (card mode)}
       </div>
-    '') (lib.unique (map (c: c.group) cs));
+    '');
 
   # A canonical link only when there is a name to be canonical about; an empty
   # href is worse than no tag at all.
@@ -269,10 +273,10 @@
 
   # --- templates -------------------------------------------------------------
   render = file: values: let
-    text = builtins.readFile file;
-    names = builtins.attrNames values;
-    out = lib.replaceStrings (map (x: "{{${x}}}") names) (map (x: toString values.${x}) names) text;
-    unbound = lib.head (lib.splitString "}}" (lib.last (lib.splitString "{{" out)));
+    text = file |> builtins.readFile;
+    names = values |> builtins.attrNames;
+    out = text |> lib.replaceStrings (names |> map (x: "{{${x}}}")) (names |> map (x: toString values.${x}));
+    unbound = out |> lib.splitString "{{" |> lib.last |> lib.splitString "}}" |> lib.head;
   in
     if lib.hasInfix "{{" out
     then throw "template ${toString file}: unbound placeholder {{${unbound}}}"
@@ -320,9 +324,9 @@
     preserved = n preservedCount;
     wip = n wipCount;
     nixCount = n nixCount;
-    archs = n (builtins.length (builtins.attrNames byArch));
+    archs = byArch |> builtins.attrNames |> builtins.length |> n;
     kindRow = orderedRow byKind;
-    archRow = lib.concatMapStringsSep " · " (a: "${a} ${n byArch.${a}}") (builtins.attrNames byArch);
+    archRow = byArch |> builtins.attrNames |> lib.concatMapStringsSep " · " (a: "${a} ${n byArch.${a}}");
     graphNodes = n site.graph.nodes;
     graphEdges = n site.graph.edges;
     graphHosts = n site.graph.hosts;
@@ -446,12 +450,12 @@
   dim = sgr "2";
   reset = sgr "0";
   termWidth = 76;
-  rule = lib.concatStrings (lib.genList (_: "─") termWidth);
+  rule = termWidth |> lib.genList (_: "─") |> lib.concatStrings;
 
   # Fold words to `max` columns. A word longer than the line overflows rather
   # than being cut, because a model name or a URL broken mid-token is worse.
   fold = max: text: let
-    words = lib.filter (w: w != "") (lib.splitString " " (lib.replaceStrings ["\n"] [" "] text));
+    words = text |> lib.replaceStrings ["\n"] [" "] |> lib.splitString " " |> lib.filter (w: w != "");
     step = acc: w:
       if acc == []
       then [w]
@@ -459,10 +463,10 @@
       then lib.init acc ++ ["${lib.last acc} ${w}"]
       else acc ++ [w];
   in
-    builtins.foldl' step [] words;
+    words |> builtins.foldl' step [];
 
   # Prose the page quotes verbatim, folded and indented two columns.
-  termParagraph = text: lib.concatStringsSep "\n" (map (l: "  ${l}") (fold (termWidth - 2) text));
+  termParagraph = text: text |> fold (termWidth - 2) |> map (l: "  ${l}") |> lib.concatStringsSep "\n";
 
   # A gutter label and a value folded under it. Colour goes on the label only,
   # so the fold counts visible columns instead of escape bytes.
@@ -474,11 +478,11 @@
       lines = fold (termWidth - 13) value;
       cont =
         lib.optionalString (lib.length lines > 1)
-        ("\n" + lib.concatStringsSep "\n" (map (l: "             ${l}") (lib.tail lines)));
+        ("\n" + (lines |> lib.tail |> map (l: "             ${l}") |> lib.concatStringsSep "\n"));
     in "  ${dim}${pad}${reset} ${lib.head lines}${cont}";
 
-  padRight = width: s: s + lib.concatStrings (lib.genList (_: " ") (lib.max 0 (width - lib.stringLength s)));
-  termSection = title: rows: "\n${bold}${title}${reset}\n${lib.concatStringsSep "\n" (lib.filter (r: r != "") rows)}";
+  padRight = width: s: s + ((width - lib.stringLength s) |> lib.max 0 |> lib.genList (_: " ") |> lib.concatStrings);
+  termSection = title: rows: "\n${bold}${title}${reset}\n${rows |> lib.filter (r: r != "") |> lib.concatStringsSep "\n"}";
 
   statusDot =
     if (meta.status or "") == "active"
@@ -528,7 +532,7 @@
         ])
         (termSection "SERVICES" [
           (termRow "cards" "${n cardCount} compiled, ${n withheld} of them tailnet-only")
-          (termRow "names" (lib.concatStringsSep " · " (map (c: c.title) cardRegistry)))
+          (termRow "names" (cardRegistry |> map (c: c.title) |> lib.concatStringsSep " · "))
         ])
         (termSection "READ" [
           (termRow "public" publicUrl)

@@ -11,19 +11,19 @@
     preserved = "⚪ **Preserved (dormant)**";
   };
 
-  preamble = builtins.readFile (root + "/docs/agent-context/HOME-PREAMBLE.md");
+  preamble = root + "/docs/agent-context/HOME-PREAMBLE.md" |> builtins.readFile;
 
-  bullets = xs: lib.concatMapStringsSep "\n" (x: "- ${x}") xs;
+  bullets = xs: xs |> lib.concatMapStringsSep "\n" (x: "- ${x}");
   line = label: v: lib.optionalString (v != "" && v != null) "- **${label}**: ${v}\n";
 
   personaFor = host: let
     hostFile = root + "/modules/user/ai/personas/${host}/AGENTS.md";
     commonFile = root + "/modules/user/ai/hermes-persona/AGENTS.md";
   in
-    if builtins.pathExists hostFile
-    then builtins.readFile hostFile
-    else if builtins.pathExists commonFile
-    then builtins.readFile commonFile
+    if hostFile |> builtins.pathExists
+    then hostFile |> builtins.readFile
+    else if commonFile |> builtins.pathExists
+    then commonFile |> builtins.readFile
     else "";
 
   mkText = host: let
@@ -60,17 +60,17 @@
     tasks =
       if (p.allowed_tasks or []) == []
       then "- None defined"
-      else bullets p.allowed_tasks;
+      else p.allowed_tasks |> bullets;
 
     constraints =
       if (p.constraints or []) == []
       then ""
-      else "\n## Constraints\n\n" + bullets p.constraints + "\n";
+      else "\n## Constraints\n\n" + (p.constraints |> bullets) + "\n";
 
     notes =
       if (h.notes or []) == []
       then ""
-      else "\n## Notes\n\n" + bullets h.notes + "\n";
+      else "\n## Notes\n\n" + (h.notes |> bullets) + "\n";
   in ''
     ${preamble}
 

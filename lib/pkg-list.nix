@@ -2,66 +2,69 @@
 # `#` starts a comment, whole-line or trailing, so a list can carry the reason
 # next to the name. A name nixpkgs does not have throws: a typo cannot vanish.
 {lib}: let
-  trimR = s: let
-    m = builtins.match "^(.*[^[:space:]])[[:space:]]*$" s;
-  in
-    if m == null
-    then ""
-    else builtins.head m;
-
-  trim = s: let
-    m = builtins.match "^[[:space:]]*(.*)$" s;
-  in
-    trimR (
+  trimR = s:
+    s
+    |> builtins.match "^(.*[^[:space:]])[[:space:]]*$"
+    |> (m:
       if m == null
       then ""
-      else builtins.head m
-    );
+      else m |> builtins.head);
+
+  trim = s:
+    s
+    |> builtins.match "^[[:space:]]*(.*)$"
+    |> (m:
+      if m == null
+      then ""
+      else m |> builtins.head)
+    |> trimR;
 
   # Everything from the first `#` is a comment. A nixpkgs attribute path cannot
   # contain `#`, so this is safe, and it is why uncommenting a line that carries
   # its rationale still parses. Split, not match: a lazy `(.*?)#.*` group left
   # the leading `#` of a `## heading` in the entry.
-  stripComment = line: builtins.head (lib.splitString "#" line);
+  stripComment = line: line |> lib.splitString "#" |> builtins.head;
 
   # `- helix`, `* helix`, `+ helix`; an ordered `1. helix` too.
   stripMarker = line: let
-    bullet = builtins.match "[[:space:]]*[-*+][[:space:]]+(.*)$" line;
-    ordered = builtins.match "[[:space:]]*[0-9]+[.)][[:space:]]+(.*)$" line;
+    bullet = line |> builtins.match "[[:space:]]*[-*+][[:space:]]+(.*)$";
+    ordered = line |> builtins.match "[[:space:]]*[0-9]+[.)][[:space:]]+(.*)$";
   in
     if bullet != null
-    then builtins.head bullet
+    then bullet |> builtins.head
     else if ordered != null
-    then builtins.head ordered
+    then ordered |> builtins.head
     else line;
 
   # `- [x] helix` / `[ ]` — a checkbox is still just a marker.
-  stripCheck = line: let
-    m = builtins.match "[[]( |x|X)][[:space:]]+(.*)$" line;
-  in
-    if m == null
-    then line
-    else builtins.elemAt m 1;
+  stripCheck = line:
+    line
+    |> builtins.match "[[]( |x|X)][[:space:]]+(.*)$"
+    |> (m:
+      if m == null
+      then line
+      else m |> (xs: builtins.elemAt xs 1));
 
   # Marker and checkbox can nest (`- [x] fd`), so unwrap twice: marker, box,
   # marker again. A single pass left `[x] fd` as an entry name.
-  unmark = line: stripMarker (stripCheck (stripMarker line));
+  unmark = line: line |> stripMarker |> stripCheck |> stripMarker;
 
-  clean = line: trim (unmark (stripComment line));
+  clean = line: line |> stripComment |> unmark |> trim;
 
   # Ordered, de-duplicated entries. `lib.unique` keeps first occurrences.
   parse = text:
-    lib.unique (
-      builtins.filter (e: e != "")
-      (map clean (lib.splitString "\n" text))
-    );
+    text
+    |> lib.splitString "\n"
+    |> map clean
+    |> builtins.filter (e: e != "")
+    |> lib.unique;
 
-  read = path: parse (builtins.readFile path);
+  read = path: path |> builtins.readFile |> parse;
 
   # Dotted paths (`python3Packages.requests`) resolve through the package set,
   # so a list is not limited to top-level attributes.
   lookup = pkgs: name:
-    lib.attrByPath (lib.splitString "." name) null pkgs;
+    name |> lib.splitString "." |> (p: lib.attrByPath p null pkgs);
 
   # A list may name things nixpkgs lacks; the leftovers come back by name instead
   # of failing the first one. Why: docs/pkg-list.md.
@@ -85,15 +88,15 @@
       else "<text>";
     entries = parse src;
     resolved =
-      map (name: {
+      entries
+      |> map (name: {
         inherit name;
         value = lookup pkgs name;
-      })
-      entries;
+      });
   in {
     inherit label;
-    packages = builtins.map (r: r.value) (builtins.filter (r: r.value != null) resolved);
-    missing = builtins.map (r: r.name) (builtins.filter (r: r.value == null) resolved);
+    packages = resolved |> builtins.filter (r: r.value != null) |> builtins.map (r: r.value);
+    missing = resolved |> builtins.filter (r: r.value == null) |> builtins.map (r: r.name);
   };
 
   # Strict resolve: [ derivation ], throwing with the file and the entry, because
@@ -107,7 +110,7 @@
     else
       throw ''
         pkg-list: these entries in ${r.label} are not nixpkgs attributes:
-          ${lib.concatStringsSep "\n  " r.missing}
+          ${r.missing |> lib.concatStringsSep "\n  "}
         Fix the attribute path, drop the line, or read the list with `split` and
         handle the leftovers yourself.'';
 in {

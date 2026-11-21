@@ -10,7 +10,7 @@
   largestFib = n: let
     fs = fibs n;
   in
-    builtins.elemAt fs (builtins.length fs - 1);
+    fs |> (xs: builtins.elemAt xs (xs |> builtins.length |> (n: n - 1)));
 
   zeckendorf = n: let
     go = m: acc:
@@ -24,42 +24,46 @@
     go n [];
 
   fibIndex = fs: term:
-    builtins.head (builtins.filter (i: builtins.elemAt fs (i - 1) == term) (lib.range 1 (builtins.length fs)));
+    fs
+    |> builtins.length
+    |> lib.range 1
+    |> builtins.filter (i: builtins.elemAt fs (i - 1) == term)
+    |> builtins.head;
 
   indicesOf = n: let
     fs = fibs n;
   in
-    map (fibIndex fs) (zeckendorf n);
+    n |> zeckendorf |> map (fibIndex fs);
 
   pattern = n: let
-    fs = lib.reverseList (fibs n);
-    chosen = zeckendorf n;
+    fs = n |> fibs |> lib.reverseList;
+    chosen = n |> zeckendorf;
   in
-    lib.concatMapStrings (f:
-      if builtins.elem f chosen
+    fs
+    |> lib.concatMapStrings (f:
+      if chosen |> builtins.elem f
       then "1"
-      else "0")
-    fs;
+      else "0");
 
-  sum = xs: builtins.foldl' (a: b: a + b) 0 xs;
+  sum = xs: xs |> builtins.foldl' (a: b: a + b) 0;
 
-  hexInt = hex: (builtins.fromTOML "v = 0x${hex}").v;
+  hexInt = hex: "v = 0x${hex}" |> builtins.fromTOML |> (t: t.v);
 
   hashInt = {
     algorithm ? "sha256",
     digits ? 15,
-  }: key: hexInt (builtins.substring 0 digits (builtins.hashString algorithm key));
+  }: key: key |> builtins.hashString algorithm |> builtins.substring 0 digits |> hexInt;
 
   fingerprint = hashInt {};
 
-  pow2 = e: builtins.foldl' (acc: _: acc * 2) 1 (lib.range 1 e);
+  pow2 = e: e |> lib.range 1 |> builtins.foldl' (acc: _: acc * 2) 1;
 
   quotientHash = {
     key,
     digits ? 15,
     remainderBits ? 8,
   }: let
-    fp = hashInt {inherit digits;} key;
+    fp = key |> hashInt {inherit digits;};
     m = pow2 remainderBits;
     quotient = builtins.div fp m;
   in {
@@ -83,8 +87,8 @@
       idx = indicesOf fp;
     in {
       inherit fp terms;
-      quotient = builtins.head idx;
-      remainder = fp - builtins.head terms;
+      quotient = idx |> builtins.head;
+      remainder = fp - (terms |> builtins.head);
       indices = idx;
       pattern = pattern fp;
     };

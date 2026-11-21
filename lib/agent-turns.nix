@@ -2,14 +2,14 @@
   lib,
   path ? ./agent-turns/turns.json,
 }: let
-  data = builtins.fromJSON (builtins.readFile path);
+  data = path |> builtins.readFile |> builtins.fromJSON;
   turns = data.turns or [];
-  ids = lib.sort (a: b: a < b) (map (t: t.id or "") turns);
-  expected = builtins.hashString "sha256" (lib.concatStringsSep "\n" ids + "\n");
+  ids = turns |> map (t: t.id or "") |> lib.sort (a: b: a < b);
+  expected = ids |> lib.concatStringsSep "\n" |> (s: s + "\n") |> builtins.hashString "sha256";
   recorded = data.pin or "";
 
   entry = t: let
-    id = "turn-" + builtins.substring 0 8 (t.id or "");
+    id = "turn-" + ((t.id or "") |> builtins.substring 0 8);
   in {
     inherit id;
     origin = "turn";
@@ -18,7 +18,7 @@
     title = t.subject or "";
     claim = null;
     summary = t.action or "";
-    date = builtins.substring 0 10 (t.ts or "");
+    date = (t.ts or "") |> builtins.substring 0 10;
     refs = {
       hosts = [];
       modules = t.claims or [];
@@ -36,13 +36,13 @@
     body = "";
   };
 
-  entries = lib.listToAttrs (map (t: let e = entry t; in lib.nameValuePair e.id e) turns);
+  entries = turns |> map (t: let e = entry t; in lib.nameValuePair e.id e) |> lib.listToAttrs;
 in {
   inherit entries;
 
   api = {
     generated = data.generated or null;
-    count = builtins.length turns;
+    count = turns |> builtins.length;
     pin = {
       inherit recorded;
       computed = expected;

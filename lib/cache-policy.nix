@@ -25,11 +25,11 @@
   # They stay in the orders for VERIFICATION, which asks "could this path be
   # fetched" and must not care who declares the substituter.
   platformAppended = ["nixos" "determinate"];
-  ownOrder = order: builtins.filter (n: !(builtins.elem n platformAppended)) order;
+  ownOrder = order: order |> builtins.filter (n: !(platformAppended |> builtins.elem n));
 
   # A `key = null` entry mirrors another cache and reuses its key, so the key list
   # is deduplicated rather than repeating frieren.lan-1 for the tailnet mirror.
-  allKeys = lib.unique (builtins.filter (k: k != null) (keysOf (lib.attrNames registry)));
+  allKeys = registry |> lib.attrNames |> keysOf |> builtins.filter (k: k != null) |> lib.unique;
 
   # A host's policy. `category` is the only input, and it is the inventory's fact,
   # not a judgement made again in a script.
@@ -45,8 +45,8 @@
       if cloud
       then "wan"
       else "lan";
-    substituters = urlOf (ownOrder available);
-    trustedSubstituters = urlOf (lib.attrNames registry);
+    substituters = available |> ownOrder |> urlOf;
+    trustedSubstituters = registry |> lib.attrNames |> urlOf;
     trustedKeys = allKeys;
     # Where this host's closure is expected to be warmed, and by whom.
     warmOn =
@@ -57,18 +57,24 @@
     # from its own uplink.
     warmableLocally = !cloud;
     verifyStores =
-      if cloud
-      then urlOf wanOrder
-      else urlOf ["harmonia" "cachix"];
+      (
+        if cloud
+        then wanOrder
+        else ["harmonia" "cachix"]
+      )
+      |> urlOf;
     # The cache a deploy on this host may pull a closure from.
     deployStores =
-      if cloud
-      then urlOf wanOrder
-      else urlOf (["harmonia"] ++ wanOrder);
+      (
+        if cloud
+        then wanOrder
+        else ["harmonia"] ++ wanOrder
+      )
+      |> urlOf;
   };
 in {
   inherit registry forHost lanOrder wanOrder platformAppended;
 
   # Convenience for callers holding the whole inventory.
-  forHosts = hosts: lib.mapAttrs (_: forHost) hosts;
+  forHosts = hosts: hosts |> lib.mapAttrs (_: forHost);
 }

@@ -46,6 +46,30 @@
   # and this proxy cannot drift apart.
   piholeUi = "http://${lib.head (lib.splitString "," config.services.pihole-web.ports)}";
 
+  # TLS vhost boilerplate as a pipe: `spec |> mkTlsVhost` — the spec carries
+  # only what differs (locations, aliases, a custom listen); the wildcard cert
+  # pair and addSSL come from here. A spec's `listen` overrides the LAN pair
+  # (ha, whose :80 listener the service-exposure registry contributes).
+  lanTlsListen = [
+    {
+      addr = "0.0.0.0";
+      port = 80;
+    }
+    {
+      addr = "0.0.0.0";
+      port = 443;
+      ssl = true;
+    }
+  ];
+  mkTlsVhost = spec:
+    {
+      addSSL = true;
+      listen = lanTlsListen;
+      sslCertificate = tlsCertificate;
+      sslCertificateKey = tlsCertificateKey;
+    }
+    // spec;
+
   # The page is COMPILED from the service registry in `config`, not written
   # here: a hand-kept list outlives the services it names (this file still
   # advertised `pdf.frieren.lan` after Stirling moved to delphi). The
@@ -290,142 +314,127 @@ in {
 
     virtualHosts = {
       # Default portal / landing page
-      "frieren.lan" = {
-        default = true;
-        serverAliases = [
-          "nas.frieren.lan"
-          "nas.lan"
-          "frieren"
-          "192.168.3.25"
-          "frieren.local"
-        ];
-        # Both ports, both DEFAULT: an unknown Host otherwise lands on whichever vhost
-        # serialized first, and an IPv6 client gets refused. Why:
-        # .agents/deploy/hosts/frieren.md §"nginx default server".
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-            extraParameters = ["default_server"];
-          }
-          {
-            addr = "[::]";
-            port = 80;
-            extraParameters = ["default_server"];
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-            extraParameters = ["default_server"];
-          }
-          {
-            addr = "[::]";
-            port = 443;
-            ssl = true;
-            extraParameters = ["default_server"];
-          }
-        ];
-        # addSSL is what makes the module emit ssl_certificate; the explicit
-        # 443 listen above is what carries default_server.
-        addSSL = true;
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        # Lancache discovery probes `/lancache-heartbeat` with the bare LAN
-        # address as `Host:` (not a `*.steamcontent.com` name), so it lands on
-        # this default vhost instead of the cache front. SteamPrefill refuses
-        # to prefill without a 200 here (measured: LancacheNotFoundException).
-        locations."= /lancache-heartbeat" = {
-          return = "200 \"OK\"";
-          extraConfig = ''
-            add_header X-LanCache-Processed-By "frieren" always;
-          '';
-        };
-        locations."/" = {
-          root = landingPage;
-        };
-        # Regex expression enclosed in quotes so nginxfmt does not mistake '{8}' for an nginx block
-        locations."~ \"^/([a-z0-9]{8}(\\.[a-zA-Z0-9]+)?)$\"" = {
-          root = "/var/lib/paste";
-          extraConfig = ''
-            default_type text/plain;
-          '';
-        };
-        # fleet-sentinel (modules/services/fleet-sentinel.nix). Served from
-        # the default vhost so gatus can probe 127.0.0.1:80 without a
-        # Host-header trick or a second listener; the human vhost below maps
-        # the same directory at sentinel.frieren.lan.
-        locations."/sentinel/" = {
-          alias = "/var/lib/fleet-sentinel/www/";
-          extraConfig = ''
-            autoindex off;
-            add_header Cache-Control "no-store";
-          '';
-        };
-        locations."= /sentinel/ingest" = {
-          proxyPass = "http://unix:/run/fleet-sentinel/ingest.sock:/";
-          extraConfig = ''
-            client_max_body_size 64k;
-            proxy_set_header Host $host;
-          '';
-        };
-        locations."/paste/" = {
-          alias = "/var/lib/paste/";
-          extraConfig = ''
-            autoindex off;
-            default_type text/plain;
-          '';
-        };
-        locations."/p/" = {
-          alias = "/var/lib/paste/";
-          extraConfig = ''
-            autoindex off;
-            default_type text/plain;
-          '';
-        };
-        # Deliberately no route to `frieren-canary`: the guest is a runbook
-        # sandbox that exists only while `task vm:canary:run` holds it, and a
-        # vhost for a dormant guest is a per-host surface answering 504. A test
-        # that needs HTTP runs its own listener inside the guest and reaches it
-        # over the host-local bridge.
-      };
+      "frieren.lan" =
+        {
+          default = true;
+          serverAliases = [
+            "nas.frieren.lan"
+            "nas.lan"
+            "frieren"
+            "192.168.3.25"
+            "frieren.local"
+          ];
+          # Both ports, both DEFAULT: an unknown Host otherwise lands on whichever vhost
+          # serialized first, and an IPv6 client gets refused. Why:
+          # .agents/deploy/hosts/frieren.md §"nginx default server".
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = 80;
+              extraParameters = ["default_server"];
+            }
+            {
+              addr = "[::]";
+              port = 80;
+              extraParameters = ["default_server"];
+            }
+            {
+              addr = "0.0.0.0";
+              port = 443;
+              ssl = true;
+              extraParameters = ["default_server"];
+            }
+            {
+              addr = "[::]";
+              port = 443;
+              ssl = true;
+              extraParameters = ["default_server"];
+            }
+          ];
+          # addSSL is what makes the module emit ssl_certificate; the explicit
+          # 443 listen above is what carries default_server.
+          # Lancache discovery probes `/lancache-heartbeat` with the bare LAN
+          # address as `Host:` (not a `*.steamcontent.com` name), so it lands on
+          # this default vhost instead of the cache front. SteamPrefill refuses
+          # to prefill without a 200 here (measured: LancacheNotFoundException).
+          locations."= /lancache-heartbeat" = {
+            return = "200 \"OK\"";
+            extraConfig = ''
+              add_header X-LanCache-Processed-By "frieren" always;
+            '';
+          };
+          locations."/" = {
+            root = landingPage;
+          };
+          # Regex expression enclosed in quotes so nginxfmt does not mistake '{8}' for an nginx block
+          locations."~ \"^/([a-z0-9]{8}(\\.[a-zA-Z0-9]+)?)$\"" = {
+            root = "/var/lib/paste";
+            extraConfig = ''
+              default_type text/plain;
+            '';
+          };
+          # fleet-sentinel (modules/services/fleet-sentinel.nix). Served from
+          # the default vhost so gatus can probe 127.0.0.1:80 without a
+          # Host-header trick or a second listener; the human vhost below maps
+          # the same directory at sentinel.frieren.lan.
+          locations."/sentinel/" = {
+            alias = "/var/lib/fleet-sentinel/www/";
+            extraConfig = ''
+              autoindex off;
+              add_header Cache-Control "no-store";
+            '';
+          };
+          locations."= /sentinel/ingest" = {
+            proxyPass = "http://unix:/run/fleet-sentinel/ingest.sock:/";
+            extraConfig = ''
+              client_max_body_size 64k;
+              proxy_set_header Host $host;
+            '';
+          };
+          locations."/paste/" = {
+            alias = "/var/lib/paste/";
+            extraConfig = ''
+              autoindex off;
+              default_type text/plain;
+            '';
+          };
+          locations."/p/" = {
+            alias = "/var/lib/paste/";
+            extraConfig = ''
+              autoindex off;
+              default_type text/plain;
+            '';
+          };
+          # Deliberately no route to `frieren-canary`: the guest is a runbook
+          # sandbox that exists only while `task vm:canary:run` holds it, and a
+          # vhost for a dormant guest is a per-host surface answering 504. A test
+          # that needs HTTP runs its own listener inside the guest and reaches it
+          # over the host-local bridge.
+        }
+        |> mkTlsVhost;
 
-      "vault.frieren.lan" = {
-        # addSSL is what makes the module emit ssl_certificate/ssl_certificate_key
-        # for the ssl listen entry — a bare `listen … ssl` does not.
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        # Vaultwarden moved to delphi 2026-11-02. The name, the TLS cert and the
-        # DOMAIN the passkeys were enrolled against all stay here; only the
-        # upstream crosses the tailnet. Ports are literal because the service
-        # that owned them is no longer in this host's config.
-        locations."/" = {
-          proxyPass = "http://100.123.145.53:8222";
-          proxyWebsockets = true;
-        };
-        # 8222, not 3012: vaultwarden 1.30 removed the separate websocket
-        # listener, and this host runs 1.37.4 — the old port refused every
-        # /notifications/hub connection, which left live sync dead.
-        locations."/notifications/hub" = {
-          proxyPass = "http://100.123.145.53:8222";
-          proxyWebsockets = true;
-        };
-        locations."/notifications/hub/negotiate" = {
-          proxyPass = "http://100.123.145.53:8222";
-        };
-      };
+      # Vaultwarden moved to delphi 2026-11-02. The name, the TLS cert and the
+      # DOMAIN the passkeys were enrolled against all stay here; only the
+      # upstream crosses the tailnet. Ports are literal because the service
+      # that owned them is no longer in this host's config.
+      "vault.frieren.lan" =
+        {
+          locations."/" = {
+            proxyPass = "http://100.123.145.53:8222";
+            proxyWebsockets = true;
+          };
+          # 8222, not 3012: vaultwarden 1.30 removed the separate websocket
+          # listener, and this host runs 1.37.4 — the old port refused every
+          # /notifications/hub connection, which left live sync dead.
+          locations."/notifications/hub" = {
+            proxyPass = "http://100.123.145.53:8222";
+            proxyWebsockets = true;
+          };
+          locations."/notifications/hub/negotiate" = {
+            proxyPass = "http://100.123.145.53:8222";
+          };
+        }
+        |> mkTlsVhost;
 
       # Anki sync moved to delphi 2026-11-02. Until it moved, the client URL was
       # `anki.frieren.lan:27701` — a hostname and a hole, no vhost. A vhost is
@@ -439,182 +448,132 @@ in {
       # Home Assistant over TLS (web UI, companion apps and webhooks all want
       # a secure context). The backend binds 0.0.0.0:8123; this vhost is the
       # name-routed front end (raw :8123 stays open on the LAN as well).
-      "ha.frieren.lan" = {
-        # See the vault vhost: addSSL is required for the ssl_certificate
-        # directive; the service-exposure registry additionally contributes the
-        # plain-HTTP :80 listener for this same vhost.
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.ha-stack.port}";
-          proxyWebsockets = true;
-        };
-      };
+      "ha.frieren.lan" =
+        {
+          # The service-exposure registry contributes the plain-HTTP :80 listener,
+          # so the spec's listen overrides mkTlsVhost's pair with TLS-only.
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = 443;
+              ssl = true;
+            }
+          ];
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:${toString config.services.ha-stack.port}";
+            proxyWebsockets = true;
+          };
+        }
+        |> mkTlsVhost;
 
-      "fleet.frieren.lan" = {
-        serverAliases = [
-          "control.frieren.lan"
-          "explorer.frieren.lan"
-        ];
-        # `addSSL` is what makes the module EMIT ssl_certificate/_key. A manual
-        # `listen ... ssl = true` alone declared the listener without the pair,
-        # and nginx refused to start: `no "ssl_certificate" is defined for the
-        # "listen ... ssl" directive`. Same requirement as the vault and ha
-        # vhosts above.
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        locations."/" = {
-          # The compiled registry and this host's own name are passed in: the site
-          # renders the same evaluated data the host enforces, and its status
-          # badge is read from the registry instead of being typed into markup.
-          root = fleetSite;
-          extraConfig = staticCache.html;
-        };
-        # Eight hex digits spelled out: a `{8}` quantifier is split across lines by the
-        # generator and nginx rejects it. Why:
-        # .agents/deploy/hosts/frieren.md §"nginx location brace trap".
-        locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-          root = fleetSite;
-          extraConfig = staticCache.hashed;
-        };
-        # Live mainframe telemetry (Gap A)
-        locations."= /data/live.json" = {
-          alias = "/run/uds-docs/live.json";
-          extraConfig = ''
-            default_type application/json;
-            add_header Cache-Control "no-cache, no-store, must-revalidate" always;
-          '';
-        };
-      };
+      "fleet.frieren.lan" =
+        {
+          serverAliases = [
+            "control.frieren.lan"
+            "explorer.frieren.lan"
+          ];
+          # `addSSL` is what makes the module EMIT ssl_certificate/_key. A manual
+          # `listen ... ssl = true` alone declared the listener without the pair,
+          # and nginx refused to start: `no "ssl_certificate" is defined for the
+          # "listen ... ssl" directive`. Same requirement as the vault and ha
+          # vhosts above.
+          locations."/" = {
+            # The compiled registry and this host's own name are passed in: the site
+            # renders the same evaluated data the host enforces, and its status
+            # badge is read from the registry instead of being typed into markup.
+            root = fleetSite;
+            extraConfig = staticCache.html;
+          };
+          # Eight hex digits spelled out: a `{8}` quantifier is split across lines by the
+          # generator and nginx rejects it. Why:
+          # .agents/deploy/hosts/frieren.md §"nginx location brace trap".
+          locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
+            root = fleetSite;
+            extraConfig = staticCache.hashed;
+          };
+          # Live mainframe telemetry (Gap A)
+          locations."= /data/live.json" = {
+            alias = "/run/uds-docs/live.json";
+            extraConfig = ''
+              default_type application/json;
+              add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+            '';
+          };
+        }
+        |> mkTlsVhost;
 
       # `monitors.frieren.lan` was retired with this host's gatus on 2026-11-04;
       # the fleet's monitor UI is delphi's (http://100.123.145.53:8181/).
 
       # Fleet sentinel dashboard (static, reads status.json client-side).
-      "sentinel.frieren.lan" = {
-        serverAliases = ["sentinel"];
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        locations."/" = {
-          root = "/var/lib/fleet-sentinel/www";
-          extraConfig = ''
-            add_header Cache-Control "no-store";
-          '';
-        };
-      };
+      "sentinel.frieren.lan" =
+        {
+          serverAliases = ["sentinel"];
+          locations."/" = {
+            root = "/var/lib/fleet-sentinel/www";
+            extraConfig = ''
+              add_header Cache-Control "no-store";
+            '';
+          };
+        }
+        |> mkTlsVhost;
 
       # Transmission web UI (leech-only torrent client). RPC binds loopback
       # only (hosts/frieren/transmission.nix); this vhost is the sole path in,
       # so no raw :9091 LAN hole is opened. Same rationale as
       # vault.frieren.lan: not a profiles.serviceExposure entry.
-      "torrent.frieren.lan" = {
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.transmission.settings.rpc-port}";
-          proxyWebsockets = true;
-        };
-      };
+      "torrent.frieren.lan" =
+        {
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:${toString config.services.transmission.settings.rpc-port}";
+            proxyWebsockets = true;
+          };
+        }
+        |> mkTlsVhost;
 
       # Pi-hole admin UI (blocklists, query log, per-client stats). FTL binds
       # `127.0.0.1:8080` and the bind is not widened: this vhost is the LAN path
       # in, exactly like torrent.frieren.lan above. The UI stays enabled because
       # `services.pihole-ftl.lists` is loaded through its API — a build assertion
       # refuses the combination of lists with `webserver.port = ""`.
-      "pihole.frieren.lan" = {
-        serverAliases = ["pihole"];
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        # FTL 6 serves the UI at `/`: nixpkgs pins webhome to "/" in
-        # [webserver.paths] (web-apps/pihole-web.nix assigns it, no option), so
-        # `/admin/` is a 404 straight from FTL. `/admin` is still the address
-        # docs/frieren-access.md advertises and every Pi-hole bookmark assumes,
-        # so the prefix is rewritten away HERE rather than by moving webhome:
-        # FTL's own `/` -> `/admin/` redirect would emit an absolute URL and
-        # leak the loopback bind (127.0.0.1:8080) to the browser behind this
-        # proxy. FTL only ever sees `/` and `/api`, unchanged.
-        locations."/" = {
-          proxyPass = piholeUi;
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            # Query-log pages stream a long table; buffering them makes the
-            # first paint wait for the whole response.
-            proxy_buffering off;
-          '';
-        };
-        # A prefix location, so it also catches deep links: `/admin/queries`
-        # reaches `/queries` exactly as the UI would have linked it itself.
-        # A path FTL itself does not serve (`/settings` on 6.7.1) still 404s —
-        # the rewrite cannot invent a route. `break` keeps the rewritten URI for
-        # proxyPass, which carries no path.
-        locations."/admin" = {
-          proxyPass = piholeUi;
-          proxyWebsockets = true;
-          extraConfig = ''
-            rewrite ^/admin/?$ / break;
-            rewrite ^/admin/(.*)$ /$1 break;
-            proxy_set_header Host $host;
-            proxy_buffering off;
-          '';
-        };
-      };
+      "pihole.frieren.lan" =
+        {
+          serverAliases = ["pihole"];
+          # FTL 6 serves the UI at `/`: nixpkgs pins webhome to "/" in
+          # [webserver.paths] (web-apps/pihole-web.nix assigns it, no option), so
+          # `/admin/` is a 404 straight from FTL. `/admin` is still the address
+          # docs/frieren-access.md advertises and every Pi-hole bookmark assumes,
+          # so the prefix is rewritten away HERE rather than by moving webhome:
+          # FTL's own `/` -> `/admin/` redirect would emit an absolute URL and
+          # leak the loopback bind (127.0.0.1:8080) to the browser behind this
+          # proxy. FTL only ever sees `/` and `/api`, unchanged.
+          locations."/" = {
+            proxyPass = piholeUi;
+            proxyWebsockets = true;
+            extraConfig = ''
+              proxy_set_header Host $host;
+              # Query-log pages stream a long table; buffering them makes the
+              # first paint wait for the whole response.
+              proxy_buffering off;
+            '';
+          };
+          # A prefix location, so it also catches deep links: `/admin/queries`
+          # reaches `/queries` exactly as the UI would have linked it itself.
+          # A path FTL itself does not serve (`/settings` on 6.7.1) still 404s —
+          # the rewrite cannot invent a route. `break` keeps the rewritten URI for
+          # proxyPass, which carries no path.
+          locations."/admin" = {
+            proxyPass = piholeUi;
+            proxyWebsockets = true;
+            extraConfig = ''
+              rewrite ^/admin/?$ / break;
+              rewrite ^/admin/(.*)$ /$1 break;
+              proxy_set_header Host $host;
+              proxy_buffering off;
+            '';
+          };
+        }
+        |> mkTlsVhost;
 
       # The tailnet entry point. Same portal, but with the certificate that
       # actually covers this name; proxying to loopback keeps one copy of the
@@ -666,48 +625,35 @@ in {
       # `tailscale cert` will not issue a certificate for another node's name),
       # so browsers that insist on HTTPS cannot open it. This vhost gives it an
       # HTTPS address with the LAN wildcard cert, proxying to its tailnet IP.
-      "gok.frieren.lan" = {
-        addSSL = true;
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        locations."/" = {
-          proxyPass = "http://100.126.186.109:80";
-          proxyWebsockets = true;
-          extraConfig = ''
-            client_max_body_size 1024M;
-          '';
-        };
-      };
+      "gok.frieren.lan" =
+        {
+          locations."/" = {
+            proxyPass = "http://100.126.186.109:80";
+            proxyWebsockets = true;
+            extraConfig = ''
+              client_max_body_size 1024M;
+            '';
+          };
+        }
+        |> mkTlsVhost;
 
       # Audiobookshelf web UI & streaming API
-      "audiobooks.frieren.lan" = {
-        serverAliases = [
-          "audiobookshelf.frieren.lan"
-          "books.frieren.lan"
-          "audiobooks"
-        ];
-        addSSL = true;
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 80;
-          }
-          {
-            addr = "0.0.0.0";
-            port = 443;
-            ssl = true;
-          }
-        ];
-        sslCertificate = tlsCertificate;
-        sslCertificateKey = tlsCertificateKey;
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.audiobookshelf.port}";
-          proxyWebsockets = true;
-          extraConfig = ''
-            client_max_body_size 500M;
-          '';
-        };
-      };
+      "audiobooks.frieren.lan" =
+        {
+          serverAliases = [
+            "audiobookshelf.frieren.lan"
+            "books.frieren.lan"
+            "audiobooks"
+          ];
+          locations."/" = {
+            proxyPass = "http://127.0.0.1:${toString config.services.audiobookshelf.port}";
+            proxyWebsockets = true;
+            extraConfig = ''
+              client_max_body_size 500M;
+            '';
+          };
+        }
+        |> mkTlsVhost;
     };
   };
 

@@ -293,6 +293,16 @@ tasks:
     cmds:
       - bash scripts/task/nix-tool.sh run agy {{.CLI_ARGS}}
 
+  agents:agy:gemini:
+    desc: "agy-gemini (Hydrogen key route) through the nix-tool shim — wrapper resolved from this flake, agy itself fetched fresh"
+    summary: >
+      The Gemini API-key route of agents:agy: the wrapper is a .#cli output of
+      THIS flake (built once into the same GC-rooted cache), and inside it agy
+      resolves PATH-first, `nix run` fresh otherwise — no closure at any layer.
+      GEMINI_API_KEY required (login shells export it from the sops cache).
+    cmds:
+      - bash scripts/task/nix-tool.sh run agy-gemini {{.CLI_ARGS}}
+
   agents:dispatch:
     desc: "One command for the Infron backup queue: KIND=auto|code|quick, MODEL=auto|primary|backup, AGENT=, DRY=1, JSON=1"
     summary: >

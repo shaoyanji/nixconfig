@@ -13,31 +13,34 @@
 # this category of tool is meant to ride the fresh cache, not the lock.
 # `--builders ""` keeps a resolve off the remote builders.
 #
-# The registry maps the name you call to the flake attr (agy -> antigravity-cli)
-# and the binary inside (bin may differ from the attr). Add a row; don't
-# special-case callers.
+# The registry maps the name you call to a full installable — upstream
+# `github:numtide/llm-agents.nix#<attr>` for cache-served tools, this flake for
+# repo wrappers ({REPO} and {SYSTEM} are substituted) — plus the binary inside.
+# Add a row; don't special-case callers.
 set -euo pipefail
 
+REPO=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-tools"
-FLAKE="github:numtide/llm-agents.nix"   # fresh upstream — cache-served by design
+LLM="github:numtide/llm-agents.nix"     # fresh upstream — cache-served by design
 
-# name|attr|bin — bin defaults to attr when the package's binary is named for it
+# name|installable|bin
 registry() {
-  cat <<'EOF'
-agy|antigravity-cli|agy
-qmd|qmd|qmd
-toon|toon|toon
-ai-memory|ai-memory|ai-memory
-agent-browser|agent-browser|agent-browser
-dsh|dsh|dsh
-freebuff|freebuff|freebuff
-hermes-agent|hermes-agent|hermes-agent
-reasonix|reasonix|reasonix
-jev|jev|jev-decide
+  cat <<EOF
+agy|${LLM}#antigravity-cli|agy
+agy-gemini|git+file://{REPO}?submodules=1#packages.{SYSTEM}.cli.ai.agy-gemini|agy-gemini
+qmd|${LLM}#qmd|qmd
+toon|${LLM}#toon|toon
+ai-memory|${LLM}#ai-memory|ai-memory
+agent-browser|${LLM}#agent-browser|agent-browser
+dsh|${LLM}#dsh|dsh
+freebuff|${LLM}#freebuff|freebuff
+hermes-agent|${LLM}#hermes-agent|hermes-agent
+reasonix|${LLM}#reasonix|reasonix
+jev|${LLM}#jev|jev-decide
 EOF
 }
 
-row() {  # row <name> -> "attr bin"
+row() {  # row <name> -> raw "installable bin" ({REPO}/{SYSTEM} unexpanded)
   local name=$1 line
   line=$(grep -E "^${name}\|" <(registry) | head -1) || true
   [ -n "$line" ] || return 1
@@ -45,8 +48,8 @@ row() {  # row <name> -> "attr bin"
 }
 
 resolve() {  # resolve <name> -> path on stdout, noise on stderr
-  local name=$1 attr bin link
-  read -r attr bin < <(row "$name") || {
+  local name=$1 inst bin link sys
+  read -r inst bin < <(row "$name") || {
     echo "nix-tool: '$name' is not in the registry (nix-tool.sh registry lists it)" >&2
     return 2
   }
@@ -56,10 +59,15 @@ resolve() {  # resolve <name> -> path on stdout, noise on stderr
   command -v nix >/dev/null 2>&1 || return 1
   link="$CACHE_DIR/$name"
   if [ ! -x "$link/bin/$bin" ]; then
-    echo "==> $bin not on PATH; fetching ${FLAKE}#$attr (fresh cache)" >&2
+    # Placeholders only expand on the miss path — an installed tool costs a
+    # `command -v`, never a nix eval.
+    sys=$(nix eval --impure --expr builtins.currentSystem --raw)
+    inst=${inst//\{REPO\}/$REPO}
+    inst=${inst//\{SYSTEM\}/$sys}
+    echo "==> $bin not on PATH; fetching $inst" >&2
     mkdir -p "$CACHE_DIR"
-    nix build "${FLAKE}#${attr}" --out-link "$link" --builders "" >/dev/null 2>&1 \
-      || { echo "nix-tool: fetch of ${FLAKE}#$attr failed" >&2; return 1; }
+    nix build "$inst" --out-link "$link" --builders "" >/dev/null 2>&1 \
+      || { echo "nix-tool: fetch of $inst failed" >&2; return 1; }
   fi
   [ -x "$link/bin/$bin" ] || { echo "nix-tool: $link has no bin/$bin" >&2; return 1; }
   printf '%s\n' "$link/bin/$bin"

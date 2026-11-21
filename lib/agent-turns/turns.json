@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-21T08:44:00Z",
+  "generated": "2026-11-21T08:49:05Z",
   "count": 200,
-  "pin": "6a048dfe62b86ceb14dce1bf1a89a7130a84d5ed87feac2926caa535a26d4c33",
+  "pin": "2d5442ca471f6e1f19b381c87229b3d3876e9e3f0cc979804f3bbc121b2a819b",
   "turns": [
+    {
+      "id": "753947ca-e398-4707-8c57-4ac740ba6c2b",
+      "ts": "2026-11-21T08:45:45Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-21: 20 plate(s) kept of 20 spent, 0 roster row(s) waiting, 126 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
+      "branch": "main",
+      "frame": "03h9ye9y5598qjh0zbrux43eg"
+    },
+    {
+      "id": "c1cce964-9c68-4b7d-8fc6-eb7755e86569",
+      "ts": "2026-11-21T08:44:05Z",
+      "source": "devin",
+      "subject": "nixconfig:fusion-lane",
+      "action": "landed: nix-tool.sh — agent CLIs called through nix, never declared in a closure; fresh cache fetch not the lock pin (agy resolved 1.5.13 off HEAD); agents:agy alias, toon/qmd/lane rewired; agy-gemini drops runtimeInputs; services still bake | gate: checks:quick PASS, checks:fusion fresh, checks:qmd:docs fresh",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "593f24a2cc1e2d60f1bf4799d3a7e4d267cc50fb",
+      "branch": "main",
+      "frame": "03h9ydy8aprhwycbokdg5bpy7"
+    },
     {
       "id": "724795f4-615b-44e7-b1c9-a56f5d1f80ed",
       "ts": "2026-11-21T08:27:22Z",
@@ -2712,32 +2738,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9vhngmugpzgkevdvy8d9dk"
-    },
-    {
-      "id": "6b808a2f-2f66-41f8-a840-c914968b1e44",
-      "ts": "2026-11-20T23:44:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-win2-devin",
-      "action": "landed: fleet-remote PR #5 review routed to devin via Jev (fleet_remote_pr, p=0.95 margin 0.90); pane verified Thinking 13s, reviewing PR diff and CI",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vglei16x7374zymak6ah7"
-    },
-    {
-      "id": "b7775677-2c6e-4ed2-9efa-ec1731fa360c",
-      "ts": "2026-11-20T23:44:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-win1-freebuff",
-      "action": "landed: CV/site ATS task routed to freebuff tab 1 via Jev (make_autoats, p=0.70 margin 0.40); pane verified working 56s, compiling Typst cv.typ and lebenslauf.typ",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vgldin1sabiyfp0x5dxrk"
     }
   ]
 }

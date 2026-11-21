@@ -3,7 +3,6 @@
 # `jd` projects the resume corpus onto that description first; without it the file
 # compiles as it always did. docs: modules/plugins/appflow/README.md
 {pkgs}: let
-  inherit (pkgs) lib;
   # The rules the site's CVs answer to as well: page budget, no barely-filled last
   # page (lib/typeset.nix).
   typeset = import ../../../lib/typeset.nix {inherit pkgs;};
@@ -24,7 +23,7 @@ in {
     letterPages ? 1,
   }:
     pkgs.runCommand "appflow-packet-${name}" {
-      nativeBuildInputs = [pkgs.typst pkgs.jq] ++ lib.optional (jd != null) pkgs.python3;
+      nativeBuildInputs = [pkgs.typst pkgs.jq pkgs.poppler-utils pkgs.python3];
     } ''
       mkdir -p work "$out"
       cp ${./templates}/*.typ ${./templates}/strings.json work/
@@ -61,6 +60,13 @@ in {
         budget = pages;
         doc = "lebenslauf.pdf";
       }}
+      # The same read-back the site's four CVs get (lib/matt-site.nix `cvPdf`): the
+      # finished PDF against the record it was compiled from. After a job-ad
+      # selection `work/resume.json` is what the template was given, so a row the
+      # selector dropped is not a defect while a row the template dropped is. The
+      # language is the packet's own, which lives in application.json.
+      bash ${../../../scripts/task/cv-ats-check.sh} --record work/resume.json \
+        --application work/application.json "$out/lebenslauf.pdf"
       ${
         if letter == null
         then "printf 'no letter.json supplied; rendered the CV only\\n' > \"$out/README\""

@@ -231,6 +231,20 @@ the data the CV was built from, not with the applications table: a site build is
 a pure derivation and cannot read Postgres. `task career:export` is what carries
 a row change into the JSON.
 
+The same script runs in `modules/plugins/appflow/packet.nix`, against
+`work/resume.json` and `work/application.json`, so the packet's `lebenslauf.pdf` —
+the document a real application ships — is read back too. That record is a JSON
+Resume rather than the site payload, so the dialect decides only where a fact is
+spelled: `basics.name` instead of `profile.name`, `work[].name` / `position`
+instead of `title` / `role`, and the language in `application.json`, because a
+JSON Resume carries none. The properties are identical, with one consequence of
+the template's shape: a JSON Resume prints only the sections it has data for, so
+the headings are required only where the record has the section, while the site
+payload always carries all five and its `labels` must already be the standard
+words. After a job-ad selection `work/resume.json` is the selected record, so a
+project `select.py` dropped is not a defect while a row the template dropped is
+still one.
+
 ## Downstream: `task apps:build` compiles another template
 
 `task apps:build` drives the workflow checkout, and that checkout keeps its own

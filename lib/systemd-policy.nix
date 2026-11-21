@@ -126,8 +126,8 @@
     daemons = marked |> builtins.filter (n: role n == "daemon");
     bounded = marked |> builtins.filter (n: role n == "bounded");
   in
-    unknown
-    |> map (n: "system unit '${n}' has X-Fleet-Role=${role n |> toString}, which is not \"daemon\" or \"bounded\"")
+    (unknown
+      |> map (n: "system unit '${n}' has X-Fleet-Role=${role n |> toString}, which is not \"daemon\" or \"bounded\""))
     ++ (daemons |> builtins.filter (n: (services.${n} |> restartOf) == null || (services.${n} |> restartOf) == "no") |> map (n: "system unit '${n}' is classified a daemon but sets no Restart= — nothing brings it back after a crash"))
     ++ (daemons |> builtins.filter (n: services.${n} |> retirable) |> map (n: "system unit '${n}' is classified a daemon and can be retired by systemd's start limit (Restart=${services.${n} |> restartOf |> toString}, RestartSec=${services.${n} |> restartDelayOf |> toString}ms, StartLimitIntervalSec unset) — set StartLimitIntervalSec=0 with RestartSteps/RestartMaxDelaySec, or reclassify it \"bounded\" with an explicit StartLimitBurst"))
     ++ (bounded |> builtins.filter (n: !(services.${n} |> unitSection |> builtins.hasAttr "StartLimitBurst")) |> map (n: "system unit '${n}' is classified \"bounded\" without an explicit StartLimitBurst — inheriting the default is not a decision"));

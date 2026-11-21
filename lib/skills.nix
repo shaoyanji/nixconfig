@@ -3,44 +3,52 @@
   root = ../.agents/skills;
 
   isDir = t: t == "directory";
-  dirs = builtins.attrNames (lib.filterAttrs (_: isDir) (builtins.readDir root));
+  dirs =
+    root
+    |> builtins.readDir
+    |> lib.filterAttrs (_: isDir)
+    |> builtins.attrNames;
 
   # --- small, total text helpers -------------------------------------------
-  trimL = s: let
-    m = builtins.match "[[:space:]]*(.*)" s;
-  in
-    if m == null
-    then ""
-    else builtins.head m;
+  trimL = s:
+    s
+    |> builtins.match "[[:space:]]*(.*)"
+    |> (m:
+      if m == null
+      then ""
+      else m |> builtins.head);
 
-  trim = s: let
-    m = builtins.match "(.*[^[:space:]])[[:space:]]*" (trimL s);
-  in
-    if m == null
-    then ""
-    else builtins.head m;
+  trim = s:
+    s
+    |> trimL
+    |> builtins.match "(.*[^[:space:]])[[:space:]]*"
+    |> (m:
+      if m == null
+      then ""
+      else m |> builtins.head);
 
   unquote = s: let
-    dq = builtins.match "\"(.*)\"" s;
-    sq = builtins.match "'(.*)'" s;
+    dq = s |> builtins.match "\"(.*)\"";
+    sq = s |> builtins.match "'(.*)'";
   in
     if dq != null
-    then builtins.head dq
+    then dq |> builtins.head
     else if sq != null
-    then builtins.head sq
+    then sq |> builtins.head
     else s;
 
   # `[linux, macos]` -> ["linux" "macos"]; a bare scalar -> [scalar].
   parseList = v: let
-    s = trim v;
-    m = builtins.match "[[](.*)[]]" s;
+    s = v |> trim;
+    m = s |> builtins.match "[[](.*)[]]";
   in
     if s == ""
     then []
     else if m == null
-    then [(unquote s)]
+    then [(s |> unquote)]
     else
-      builtins.head m
+      m
+      |> builtins.head
       |> lib.splitString ","
       |> map (x: x |> trim |> unquote)
       |> lib.filter (x: x != "");
@@ -49,51 +57,53 @@
     go = acc: rest:
       if rest == []
       then acc
-      else if pred (builtins.head rest)
+      else if rest |> builtins.head |> pred
       then acc
-      else go (acc ++ [(builtins.head rest)]) (builtins.tail rest);
+      else go (acc ++ [(rest |> builtins.head)]) (rest |> builtins.tail);
   in
     go [] xs;
 
   dropN = n: xs:
     if n <= 0 || xs == []
     then xs
-    else dropN (n - 1) (builtins.tail xs);
+    else xs |> builtins.tail |> dropN (n - 1);
 
   # --- frontmatter ----------------------------------------------------------
   # The schema is deliberately a *subset* of YAML: `key: value` lines between
   # the first two `---` fences, optional indentation, no nested mappings.
   parse = text: let
-    lines = lib.splitString "\n" text;
-    fm = takeUntil (l: trim l == "---") (dropN 1 lines);
+    lines = text |> lib.splitString "\n";
+    fm = lines |> dropN 1 |> takeUntil (l: (l |> trim) == "---");
     fields =
-      lib.foldl' (
+      fm
+      |> lib.foldl' (
         acc: line: let
-          t = trim line;
-          m = builtins.match "([A-Za-z0-9_-]+):[[:space:]]*(.*)" t;
+          t = line |> trim;
+          m = t |> builtins.match "([A-Za-z0-9_-]+):[[:space:]]*(.*)";
         in
           if m == null
           then acc
-          else acc // {"${builtins.head m}" = builtins.elemAt m 1;}
-      ) {}
-      fm;
-    body = dropN (builtins.length fm + 2) lines;
-    bodyFirst = builtins.head (
-      lib.filter (l: trim l != "") (takeUntil (l: lib.hasPrefix "# " (trim l)) body)
-      ++ (lib.filter (l: trim l != "") body)
-      ++ [""]
-    );
+          else acc // {"${m |> builtins.head}" = m |> (xs: builtins.elemAt xs 1);}
+      ) {};
+    body = lines |> dropN (fm |> builtins.length |> (n: n + 2));
+    bodyFirst =
+      (
+        (body |> takeUntil (l: l |> trim |> lib.hasPrefix "# ") |> lib.filter (l: (l |> trim) != ""))
+        ++ (body |> lib.filter (l: (l |> trim) != ""))
+        ++ [""]
+      )
+      |> builtins.head;
   in {inherit fields body bodyFirst lines;};
 
   readSkill = name: let
-    text = builtins.readFile (root + "/${name}/SKILL.md");
-    p = parse text;
-    declared = unquote (trim (p.fields.name or ""));
-    description = unquote (trim (p.fields.description or ""));
-    version = unquote (trim (p.fields.version or "0.0.0"));
-    tags = parseList (p.fields.tags or "");
-    platforms = parseList (p.fields.platforms or "");
-    lineCount = builtins.length p.lines;
+    text = root + "/${name}/SKILL.md" |> builtins.readFile;
+    p = text |> parse;
+    declared = (p.fields.name or "") |> trim |> unquote;
+    description = (p.fields.description or "") |> trim |> unquote;
+    version = (p.fields.version or "0.0.0") |> trim |> unquote;
+    tags = (p.fields.tags or "") |> parseList;
+    platforms = (p.fields.platforms or "") |> parseList;
+    lineCount = p.lines |> builtins.length;
   in {
     inherit name description version tags platforms lineCount;
     # The parsed body lines (`p.body`), for a gate that has to read the markdown
@@ -101,7 +111,7 @@
     inherit (p) body;
     declaredName = declared;
     path = ".agents/skills/${name}";
-    bodyHeading = trim p.bodyFirst;
+    bodyHeading = p.bodyFirst |> trim;
     # Soft: the schema says these are optional with defaults.
     missing =
       lib.optional (version == "0.0.0") "version"
@@ -109,11 +119,13 @@
       ++ lib.optional (tags == []) "tags";
   };
 
-  skills = builtins.listToAttrs (map (n: {
+  skills =
+    dirs
+    |> map (n: {
       name = n;
-      value = readSkill n;
+      value = n |> readSkill;
     })
-    dirs);
+    |> builtins.listToAttrs;
 
   issueFor = s:
     lib.optional (s.declaredName != s.name)
@@ -122,36 +134,35 @@
     "name: missing"
     ++ lib.optional (s.description == "")
     "description: missing"
-    ++ lib.optional (builtins.stringLength s.description > 240)
-    "description: ${toString (builtins.stringLength s.description)} chars > 240 (it is a routing hint, not a summary)"
-    ++ lib.optional (builtins.stringLength s.description < 10 && s.description != "")
+    ++ lib.optional ((s.description |> builtins.stringLength) > 240)
+    "description: ${s.description |> builtins.stringLength |> toString} chars > 240 (it is a routing hint, not a summary)"
+    ++ lib.optional ((s.description |> builtins.stringLength) < 10 && s.description != "")
     "description: too short to route on"
     ++ lib.optional (s.lineCount > 400)
-    "body: ${toString s.lineCount} lines > 400 (move detail to docs/ and keep the skill a router)"
-    ++ lib.optional (!(lib.hasPrefix "# " s.bodyHeading))
+    "body: ${s.lineCount |> toString} lines > 400 (move detail to docs/ and keep the skill a router)"
+    ++ lib.optional (!(s.bodyHeading |> lib.hasPrefix "# "))
     "body: does not start with a level-1 heading";
 
-  issues = lib.concatMap (n: map (m: "${n}: ${m}") (issueFor skills.${n})) dirs;
-  warnings = lib.concatMap (n: map (f: "${n}: missing optional frontmatter '${f}' (defaults applied)") skills.${n}.missing) dirs;
+  issues = dirs |> lib.concatMap (n: skills.${n} |> issueFor |> map (m: "${n}: ${m}"));
+  warnings = dirs |> lib.concatMap (n: skills.${n}.missing |> map (f: "${n}: missing optional frontmatter '${f}' (defaults applied)"));
 
   byTag =
-    lib.foldl' (
+    dirs
+    |> lib.foldl' (
       acc: n:
-        lib.foldl' (a: t: a // {"${t}" = (a."${t}" or []) ++ [n];})
-        acc
         skills.${n}.tags
-    ) {}
-    dirs;
+        |> lib.foldl' (a: t: a // {"${t}" = (a."${t}" or []) ++ [n];}) acc
+    ) {};
 
   index = {
     schemaVersion = 1;
     generatedBy = "lib/skills.nix";
-    count = builtins.length dirs;
+    count = dirs |> builtins.length;
     skills =
-      lib.mapAttrs (_: s: {
+      skills
+      |> lib.mapAttrs (_: s: {
         inherit (s) description version tags platforms lineCount path;
-      })
-      skills;
+      });
     inherit byTag;
   };
 in {

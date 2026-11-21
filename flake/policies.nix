@@ -6,9 +6,9 @@
   nixComments ? null,
 }: let
   root = ../.;
-  read = p: builtins.readFile (root + "/${p}");
-  has = p: needle: lib.hasInfix needle (read p);
-  anyLine = p: pred: lib.any pred (lib.splitString "\n" (read p));
+  read = p: p |> (x: root + "/${x}") |> builtins.readFile;
+  has = p: needle: p |> read |> lib.hasInfix needle;
+  anyLine = p: pred: p |> read |> lib.splitString "\n" |> lib.any pred;
 
   # The comment census (lib/nix-comments.nix). `flake/outputs.nix` passes it in so
   # the 316-file walk happens once; a standalone importer (the site render) gets
@@ -25,16 +25,15 @@
   # Top-level files of one directory with a suffix. No tree walk: walking the
   # root would copy the repository into the store just to list markdown.
   filesWithSuffix = dir: suffix:
-    map (n:
+    root
+    + "/${dir}"
+    |> builtins.readDir
+    |> lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix suffix n)
+    |> builtins.attrNames
+    |> map (n:
       if dir == "."
       then n
-      else "${dir}/${n}") (
-      root
-      + "/${dir}"
-      |> builtins.readDir
-      |> lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix suffix n)
-      |> builtins.attrNames
-    );
+      else "${dir}/${n}");
 
   taskfiles = filesWithSuffix "taskfiles" ".yml";
   shellScripts = filesWithSuffix "scripts/task" ".sh";
@@ -43,9 +42,11 @@
   # modules that DECLARE units, which is a directory walk, not a top-level list.
   nixUnder = dir: let
     walk = d: let
-      entries = builtins.readDir (root + "/${d}");
+      entries = root + "/${d}" |> builtins.readDir;
     in
-      lib.concatMap (n: let
+      entries
+      |> builtins.attrNames
+      |> lib.concatMap (n: let
         rel =
           if d == "."
           then n
@@ -53,8 +54,7 @@
       in
         if entries.${n} == "directory"
         then walk rel
-        else lib.optional (lib.hasSuffix ".nix" n) rel)
-      (builtins.attrNames entries);
+        else lib.optional (lib.hasSuffix ".nix" n) rel);
   in
     walk dir;
 
@@ -74,103 +74,107 @@
   contentExtractors = ["unsquashfs" "readelf"];
   unitHosts = nixUnder "modules" ++ nixUnder "hosts";
   libraryExtractors =
-    builtins.filter
-    (p: let
+    shellScripts
+    ++ unitHosts
+    |> builtins.filter (p: let
       t = read p;
     in
-      lib.any (m: lib.hasInfix m t) netMounts
-      && lib.any (r: lib.hasInfix r t) contentExtractors)
-    (shellScripts ++ unitHosts);
-  extractorNames = map (p: lib.removeSuffix ".sh" (builtins.baseNameOf p)) libraryExtractors;
+      (netMounts |> lib.any (m: lib.hasInfix m t))
+      && (contentExtractors |> lib.any (r: lib.hasInfix r t)));
+  extractorNames = libraryExtractors |> map (p: p |> builtins.baseNameOf |> lib.removeSuffix ".sh");
   # The unit's own file never contains the extractor — it names the script — so
   # this is a name match against the scripts that do.
   scheduledLibraryExtractions =
-    builtins.filter
-    (p: let
+    unitHosts
+    |> builtins.filter (p: let
       t = read p;
     in
-      lib.hasInfix "systemd." t
-      && lib.any (n: lib.hasInfix n t) extractorNames)
-    unitHosts;
+      (t |> lib.hasInfix "systemd.")
+      && (extractorNames |> lib.any (n: lib.hasInfix n t)));
   # A library's bytes are pulled by a LAUNCH and by nothing else: no timer, no
   # login, no path unit watching for a fresh drop. A stale cache is flushed on
   # the next launch — that is cheap and user-initiated; warming ahead of it is a
   # LAN-wide congestion event nobody asked for.
   libraryPathWatchers =
-    builtins.filter
-    (p: let
+    unitHosts
+    |> builtins.filter (p: let
       t = read p;
     in
-      lib.any (m: lib.hasInfix m t) netMounts
-      && (lib.hasInfix "systemd.paths" t || lib.hasInfix "systemd.user.paths" t))
-    unitHosts;
+      (netMounts |> lib.any (m: lib.hasInfix m t))
+      && ((t |> lib.hasInfix "systemd.paths") || (t |> lib.hasInfix "systemd.user.paths")));
   # Named explicitly so a revert cannot pass by having no unit at all.
-  deletedLibraryIntegrators = builtins.filter (p: builtins.pathExists (root + "/${p}")) [
+  deletedLibraryIntegrators = builtins.filter (p: root + "/${p}" |> builtins.pathExists) [
     "scripts/task/appimage-integrate.sh"
     "modules/scripts/appimage-integrate.nix"
     "modules/user/desktop/appimage-launchers.nix"
   ];
 
-  indentOf = l: builtins.stringLength (builtins.head (builtins.match "([[:space:]]*).*" l));
+  indentOf = l: l |> builtins.match "([[:space:]]*).*" |> builtins.head |> builtins.stringLength;
   serviceBlocks = p: let
-    lines = lib.splitString "\n" (read p);
-    isStart = l: builtins.match "[[:space:]]*systemd\\.services\\.[A-Za-z0-9_.-]+ *=.*" l != null;
-    isComment = l: builtins.match "[[:space:]]*#.*" l != null;
-    isBlank = l: builtins.match "[[:space:]]*" l != null;
-    indices = lib.range 0 (builtins.length lines - 1);
-    starts = builtins.filter (i: isStart (builtins.elemAt lines i)) indices;
+    lines = p |> read |> lib.splitString "\n";
+    isStart = l: l |> builtins.match "[[:space:]]*systemd\\.services\\.[A-Za-z0-9_.-]+ *=.*" |> (m: m != null);
+    isComment = l: l |> builtins.match "[[:space:]]*#.*" |> (m: m != null);
+    isBlank = l: l |> builtins.match "[[:space:]]*" |> (m: m != null);
+    indices = lib.range 0 ((lines |> builtins.length) - 1);
+    starts = indices |> builtins.filter (i: isStart (builtins.elemAt lines i));
     endOf = i: let
       at = builtins.elemAt lines i;
       sibling =
-        builtins.filter (
+        indices
+        |> builtins.filter (
           j: j > i && !(isBlank (builtins.elemAt lines j)) && !(isComment (builtins.elemAt lines j)) && indentOf (builtins.elemAt lines j) <= indentOf at
-        )
-        indices;
+        );
     in
       if sibling == []
-      then builtins.length lines
-      else builtins.head sibling + 1;
+      then lines |> builtins.length
+      else (sibling |> builtins.head) + 1;
   in
     if lines == []
     then []
-    else map (i: lib.concatStringsSep "\n" (lib.sublist i (endOf i - i) lines)) starts;
+    else starts |> map (i: lines |> lib.sublist i (endOf i - i) |> lib.concatStringsSep "\n");
 
   # Modules that declare systemd units are exactly the ones a hostname list may
   # not gate: a host file naming itself is that host's config, a shared module
   # naming hosts is a capability nobody declared.
-  unitModules = builtins.filter (
-    p:
-      lib.hasInfix "systemd.services" (read p)
-      || lib.hasInfix "systemd.user.services" (read p)
-  ) (nixUnder "modules");
+  unitModules =
+    nixUnder "modules"
+    |> builtins.filter (
+      p:
+        (p |> read |> lib.hasInfix "systemd.services")
+        || (p |> read |> lib.hasInfix "systemd.user.services")
+    );
   # Every module, not only the ones that declare units: a package list or a tier
   # chosen by name is the same undeclared capability as a unit gated by name, and
   # it rots the moment a host is renamed, added or repurposed. Host files under
   # hosts/ are that host's own config and may say its name; a shared module may not.
   hostnameGatedModules =
-    builtins.filter (
+    nixUnder "modules"
+    |> builtins.filter (
       p:
-        anyLine p (l: builtins.match ".*builtins\\.elem hostName.*" l != null)
-        || anyLine p (l: builtins.match ".*lib\\.elem hostName.*" l != null)
-        || anyLine p (l: builtins.match ".*hostName ==.*" l != null)
+        anyLine p (l: l |> builtins.match ".*builtins\\.elem hostName.*" |> (m: m != null))
+        || anyLine p (l: l |> builtins.match ".*lib\\.elem hostName.*" |> (m: m != null))
+        || anyLine p (l: l |> builtins.match ".*hostName ==.*" |> (m: m != null))
         # `hostName != "frieren"` is the same list in the negative: a capability
         # nobody declared. The empty-string guard (`hostName != ""`, used to pick an
         # inventory entry) is not a hostname comparison and stays legal.
-        || anyLine p (l: builtins.match ".*hostName *[!=]= *\"[^\"]+\".*" l != null)
-    )
-    (nixUnder "modules");
-  hostnameGatedUnitModules = builtins.filter (p: builtins.elem p unitModules) hostnameGatedModules;
+        || anyLine p (l: l |> builtins.match ".*hostName *[!=]= *\"[^\"]+\".*" |> (m: m != null))
+    );
+  hostnameGatedUnitModules = hostnameGatedModules |> builtins.filter (p: unitModules |> builtins.elem p);
   unclassifiedDaemons =
-    lib.concatMap (
+    nixUnder "modules"
+    ++ nixUnder "hosts"
+    |> builtins.filter (p: root + "/${p}" |> builtins.pathExists)
+    |> lib.concatMap (
       p:
-        map (b: "${p}: ${lib.removeSuffix "\n" (builtins.head (lib.splitString "\n" b))}")
-        (builtins.filter (b: lib.hasInfix "Restart" b && !(lib.hasInfix "X-Fleet-Role" b)) (serviceBlocks p))
-    )
-    (builtins.filter (p: builtins.pathExists (root + "/${p}")) (nixUnder "modules" ++ nixUnder "hosts"));
+        p
+        |> serviceBlocks
+        |> builtins.filter (b: (b |> lib.hasInfix "Restart") && !(b |> lib.hasInfix "X-Fleet-Role"))
+        |> map (b: "${p}: ${b |> lib.splitString "\n" |> builtins.head |> lib.removeSuffix "\n"}")
+    );
 
   # The normative documents: the ones allowed to state a rule. Skills are
   # procedure, deliberately out of scope (`.agents/SCHEMA.md` §4).
-  normativeDocs = builtins.filter (d: builtins.pathExists (root + "/${d}")) [
+  normativeDocs = builtins.filter (d: root + "/${d}" |> builtins.pathExists) [
     "AGENTS.md"
     "README.md"
     "MANUAL.md"
@@ -190,23 +194,26 @@
   citationRe = "[[][[]flake.policies.nix#([A-Za-z0-9_-]+)]]";
 
   citations =
-    lib.concatMap (doc: let
-      text = read doc;
-      groups = builtins.filter builtins.isList (builtins.split citationRe text);
-    in
-      map (g: {
-        inherit doc;
-        id = builtins.head g;
-      })
-      groups)
-    normativeDocs
+    (
+      normativeDocs
+      |> lib.concatMap (doc: let
+        groups = doc |> read |> builtins.split citationRe |> builtins.filter builtins.isList;
+      in
+        groups
+        |> map (g: {
+          inherit doc;
+          id = g |> builtins.head;
+        }))
+    )
     # A `.nix` comment cites a rule the same way a page does, without the brackets:
     # one citation set, so a comment cannot name a policy that was renamed.
-    ++ map (r: {
-      doc = "${r.file}:${toString r.line}";
-      inherit (r) id;
-    })
-    nixCommentsCtl.policyCites;
+    ++ (
+      nixCommentsCtl.policyCites
+      |> map (r: {
+        doc = "${r.file}:${toString r.line}";
+        inherit (r) id;
+      })
+    );
 
   # A root markdown file is either one of the living documents or a pointer
   # stub. Anything else is a new document that belongs in `docs/`.
@@ -220,19 +227,19 @@
     "TODO.md"
   ];
   rootMd = filesWithSuffix "." ".md";
-  strayRootMd = builtins.filter (f: !(builtins.elem f knownRootMd)) rootMd;
+  strayRootMd = rootMd |> builtins.filter (f: !(knownRootMd |> builtins.elem f));
 
-  rel = p: lib.removePrefix "${toString root}/" (toString p);
+  rel = p: p |> toString |> lib.removePrefix "${toString root}/";
 
   # Position, not presence: a guard that runs after the expensive step is
   # decoration. An absent needle resolves to the whole file, so `before` is false
   # for a guard somebody deleted.
-  offsetOf = p: needle: builtins.stringLength (builtins.head (lib.splitString needle (read p)));
+  offsetOf = p: needle: p |> read |> lib.splitString needle |> builtins.head |> builtins.stringLength;
   before = p: a: b:
     offsetOf p a
     < offsetOf p b
-    && offsetOf p a < builtins.stringLength (read p);
-  anyMatchingLine = p: re: lib.any (l: builtins.match re l != null) (lib.splitString "\n" (builtins.readFile p));
+    && offsetOf p a < (p |> read |> builtins.stringLength);
+  anyMatchingLine = p: re: p |> builtins.readFile |> lib.splitString "\n" |> lib.any (l: l |> builtins.match re |> (m: m != null));
 
   # --- secrets: encrypted per VALUE, not per file ---------------------------
   # Counting one `ENC[` per file passes a file whose other keys were pasted in
@@ -241,55 +248,56 @@
   indexOf = pred: xs: let
     go = i: rest:
       if rest == []
-      then builtins.length xs
-      else if pred (builtins.head rest)
+      then xs |> builtins.length
+      else if rest |> builtins.head |> pred
       then i
       else go (i + 1) (builtins.tail rest);
   in
     go 0 xs;
 
   plaintextValues = file: let
-    lines = lib.splitString "\n" (read file);
-    cut = indexOf (l: lib.hasPrefix "sops:" l) lines;
-    body = lib.take cut lines;
-    meta = lib.drop cut lines;
-    suffixHits = builtins.filter (l: lib.hasPrefix "unencrypted_suffix:" (lib.trim l)) meta;
+    lines = file |> read |> lib.splitString "\n";
+    cut = lines |> indexOf (l: lib.hasPrefix "sops:" l);
+    body = lines |> lib.take cut;
+    meta = lines |> lib.drop cut;
+    suffixHits = meta |> builtins.filter (l: l |> lib.trim |> lib.hasPrefix "unencrypted_suffix:");
     suffix =
       if suffixHits == []
       then null
-      else lib.trim (lib.removePrefix "unencrypted_suffix:" (lib.trim (builtins.head suffixHits))); # Return the KEY, never the value: a gate error must not echo a secret.
+      else suffixHits |> builtins.head |> lib.trim |> lib.removePrefix "unencrypted_suffix:" |> lib.trim; # Return the KEY, never the value: a gate error must not echo a secret.
     plainKey = l: let
-      t = lib.trim l;
-      m = builtins.match "([A-Za-z0-9_.-]+):[[:space:]]+(.+)" t;
+      t = l |> lib.trim;
+      m = t |> builtins.match "([A-Za-z0-9_.-]+):[[:space:]]+(.+)";
     in
       if t == "" || lib.hasPrefix "#" t || m == null
       then null
       else
         (
           let
-            key = builtins.elemAt m 0;
-            value = lib.trim (builtins.elemAt m 1);
+            key = m |> (xs: builtins.elemAt xs 0);
+            value = m |> (xs: builtins.elemAt xs 1) |> lib.trim;
           in
-            if !(lib.hasPrefix "ENC[" value) && !(suffix != null && lib.hasSuffix suffix key)
+            if !(value |> lib.hasPrefix "ENC[") && !(suffix != null && lib.hasSuffix suffix key)
             then key
             else null
         );
   in
-    builtins.filter (k: k != null) (map plainKey body);
+    body |> map plainKey |> builtins.filter (k: k != null);
 
   # The library's release table, read as data: a row that lands in an arch dir
   # without a pin downloads whichever asset eget feels like.
   library = import (root + "/tools/library.nix");
   unpinnedRows =
-    lib.concatMap (
+    library.tools
+    |> builtins.attrNames
+    |> lib.concatMap (
       name: let
         t = library.tools.${name};
-        archDirs = builtins.filter (d: d != "appimages") t.dirs;
-        missing = builtins.filter (d: !(t ? pick) || !(builtins.hasAttr d t.pick)) archDirs;
+        archDirs = t.dirs |> builtins.filter (d: d != "appimages");
+        missing = archDirs |> builtins.filter (d: !(t ? pick) || !(t.pick |> builtins.hasAttr d));
       in
-        map (d: "${name}/${d}") missing
-    )
-    (builtins.attrNames library.tools);
+        missing |> map (d: "${name}/${d}")
+    );
 
   # --- exposure: the general gates that retire the rotation chore -------------
   # A secret rarely leaks by being pasted. It *moves*: into the second copy of a
@@ -312,26 +320,25 @@
   # The registry is only real if it is complete: an encrypted file nobody lists is
   # also a file `plaintextValues` never reads.
   encryptedInSecretsDir =
-    if builtins.pathExists (root + "/${secretsDir}")
+    if root + "/${secretsDir}" |> builtins.pathExists
     then
-      map (n: "${secretsDir}/${n}") (
-        builtins.attrNames (
-          lib.filterAttrs
-          (n: t: t == "regular" && !(lib.hasPrefix "." n) && lib.hasSuffix ".yaml" n)
-          (builtins.readDir (root + "/${secretsDir}"))
-        )
-      )
+      root
+      + "/${secretsDir}"
+      |> builtins.readDir
+      |> lib.filterAttrs (n: t: t == "regular" && !(lib.hasPrefix "." n) && lib.hasSuffix ".yaml" n)
+      |> builtins.attrNames
+      |> map (n: "${secretsDir}/${n}")
     else [];
-  unregisteredSops = builtins.filter (f: !(lib.elem f sopsFiles)) encryptedInSecretsDir;
+  unregisteredSops = encryptedInSecretsDir |> builtins.filter (f: !(sopsFiles |> lib.elem f));
   # A clone without the submodule checked out must still evaluate: the files that
   # are here are scanned, the ones that are not are reported by the registry gate
   # the moment they appear.
-  presentSopsFiles = builtins.filter (f: builtins.pathExists (root + "/${f}")) sopsFiles;
+  presentSopsFiles = sopsFiles |> builtins.filter (f: root + "/${f}" |> builtins.pathExists);
   # A bare tree (CI, nixbuild, a clone without `--recurse-submodules`) has no
   # secrets submodule at all, so a library read of it works on the machine that
   # has the checkout and nowhere else. Match the directory with its slash: the
   # tracked mirror `modules/secrets.yaml` is a different file.
-  secretsReads = builtins.filter (p: lib.hasInfix "modules/secrets/" (read p)) (nixUnder "lib");
+  secretsReads = nixUnder "lib" |> builtins.filter (p: p |> read |> lib.hasInfix "modules/secrets/");
 
   # --- one spelling for where a secrets file lives ---------------------------
   # 27 scripts each carried their own copy of the path, and with it their own
@@ -349,9 +356,11 @@
   ];
   scriptFiles = let
     walk = d: let
-      entries = builtins.readDir (root + "/${d}");
+      entries = root + "/${d}" |> builtins.readDir;
     in
-      lib.concatMap (n: let
+      entries
+      |> builtins.attrNames
+      |> lib.concatMap (n: let
         rel =
           if d == "."
           then n
@@ -359,10 +368,9 @@
       in
         if entries.${n} == "directory"
         then walk rel
-        else lib.optional (lib.hasSuffix ".sh" n || lib.hasSuffix ".py" n) rel)
-      (builtins.attrNames entries);
+        else lib.optional (lib.hasSuffix ".sh" n || lib.hasSuffix ".py" n) rel);
   in
-    if builtins.pathExists (root + "/scripts")
+    if root + "/scripts" |> builtins.pathExists
     then walk "scripts"
     else [];
   # A comment naming the path is documentation, so only the code before `#`
@@ -374,48 +382,50 @@
     if lib.hasSuffix ".py" p
     then
       anyLine p (l:
-        (lib.hasInfix "os.path.join" l && lib.hasInfix "modules/secrets" l)
-        || builtins.match ".*[\"']modules/secrets[/.].*" l != null)
+        ((l |> lib.hasInfix "os.path.join") && (l |> lib.hasInfix "modules/secrets"))
+        || (l |> builtins.match ".*[\"']modules/secrets[/.].*" |> (m: m != null)))
     else
       anyLine p (l: let
         code = codePart l;
       in
-        lib.hasInfix "modules/secrets.yaml" code
-        || builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" code != null);
+        (code |> lib.hasInfix "modules/secrets.yaml")
+        || (code |> builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" |> (m: m != null)));
   secretsPathOffenders =
-    builtins.filter (p: !(lib.elem p secretsPathExempt) && spellsSecretsPath p) scriptFiles;
+    scriptFiles |> builtins.filter (p: !(secretsPathExempt |> lib.elem p) && spellsSecretsPath p);
   # The task plane has its own spelling — `{{.SECRETS}}`, fed from the same helper —
   # so a task bypasses it when it runs sops on a secrets file named any other way.
   # A `desc:` or a comment that mentions the file is not a command: only the text
   # before `#` that also invokes sops counts, which is why the summaries here do not
   # trip it.
-  taskfilePlane = builtins.filter (p: builtins.pathExists (root + "/${p}")) (["Taskfile.yml"] ++ taskfiles);
+  taskfilePlane = ["Taskfile.yml"] ++ taskfiles |> builtins.filter (p: root + "/${p}" |> builtins.pathExists);
   spellsSecretsInTask = p:
     anyLine p (l: let
       code = codePart l;
     in
-      lib.hasInfix "sops" code
-      && !(lib.hasInfix "{{.SECRETS}}" code)
-      && (lib.hasInfix "modules/secrets.yaml" code
-        || builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" code != null));
-  taskfileOffenders = builtins.filter spellsSecretsInTask taskfilePlane;
-  plaintextSecrets = lib.concatMap (f: map (l: "${f}: ${l}") (plaintextValues f)) presentSopsFiles;
+      (code |> lib.hasInfix "sops")
+      && !(code |> lib.hasInfix "{{.SECRETS}}")
+      && (
+        (code |> lib.hasInfix "modules/secrets.yaml")
+        || (code |> builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" |> (m: m != null))
+      ));
+  taskfileOffenders = taskfilePlane |> builtins.filter spellsSecretsInTask;
+  plaintextSecrets = presentSopsFiles |> lib.concatMap (f: f |> plaintextValues |> map (l: "${f}: ${l}"));
   # The mirror is a `cp` of the submodule (`task infra:secrets:sync`), so identity
   # is the invariant. A value written to one copy only decrypts on the machine that
   # wrote it and is absent everywhere after the next sync.
   mirrorDrift =
-    builtins.pathExists (root + "/${secretsMirror}")
-    && builtins.pathExists (root + "/${secretsSubmodule}")
+    (root + "/${secretsMirror}" |> builtins.pathExists)
+    && (root + "/${secretsSubmodule}" |> builtins.pathExists)
     && read secretsMirror != read secretsSubmodule;
 
   # Positions of matching lines. Report the FILE AND LINE, never the line: a gate
   # failure is printed into a terminal, a CI log or a transcript, so quoting what
   # it found would re-publish the thing it is protecting.
   hitsWhere = p: pred: let
-    lines = lib.splitString "\n" (read p);
-    idx = builtins.filter (i: pred (builtins.elemAt lines i)) (lib.range 0 (builtins.length lines - 1));
+    lines = p |> read |> lib.splitString "\n";
+    idx = lib.range 0 ((lines |> builtins.length) - 1) |> builtins.filter (i: pred (builtins.elemAt lines i));
   in
-    map (i: "${p}:${toString (i + 1)}") idx;
+    idx |> map (i: "${p}:${toString (i + 1)}");
 
   # Shapes the issuers reserve. A value cannot be matched, so match the prefix:
   # the same test a scanner runs, over every tracked text file.
@@ -436,7 +446,7 @@
   # read a vendored tree.
   textFiles = let
     walk = d: let
-      entries = builtins.readDir (root + "/${d}");
+      entries = root + "/${d}" |> builtins.readDir;
       rel = n:
         if d == "."
         then n
@@ -449,50 +459,55 @@
           if n == ".git" || n == "node_modules"
           then []
           else walk r
-        else lib.optional (lib.any (s: lib.hasSuffix s n) textSuffixes) r;
+        else lib.optional (textSuffixes |> lib.any (s: lib.hasSuffix s n)) r;
     in
-      lib.concatMap step (builtins.attrNames entries);
+      entries |> builtins.attrNames |> lib.concatMap step;
   in
     walk ".";
   # `tests/` is exempt: a fixture has to contain the shape it asserts on — the
   # same reason `scripts/task/host-paths-check.sh` skips it — and its material is
   # fake by construction. Every other tracked text file is still read.
   credentialHits =
-    lib.concatMap (
-      p: hitsWhere p (l: lib.any (s: builtins.match ".*${s}.*" l != null) credentialShapes)
-    )
-    (builtins.filter (p: !(lib.hasPrefix "tests/" p)) textFiles);
+    textFiles
+    |> builtins.filter (p: !(p |> lib.hasPrefix "tests/"))
+    |> lib.concatMap (
+      p: hitsWhere p (l: credentialShapes |> lib.any (s: l |> builtins.match ".*${s}.*" |> (m: m != null)))
+    );
 
   # Decryption during evaluation writes the plaintext into /nix/store: world
   # readable, and it survives every rotation of the credential itself.
   # The registry itself is excepted: stating this rule means naming the idiom.
   nixSources =
-    builtins.filter (
+    nixUnder "modules"
+    ++ nixUnder "hosts"
+    ++ nixUnder "flake"
+    ++ nixUnder "lib"
+    |> builtins.filter (
       p: p != "flake/policies.nix"
-    )
-    (nixUnder "modules" ++ nixUnder "hosts" ++ nixUnder "flake" ++ nixUnder "lib");
+    );
   # A trailing comment that mentions the idiom is not the idiom; netbook's `sops #
   # \`sops -d\` …` line is prose about a root-only path, not an eval-time decrypt.
-  codePart = l: builtins.head (lib.splitString "#" l);
+  codePart = l: l |> lib.splitString "#" |> builtins.head;
   decryptAtEval =
-    lib.concatMap (
-      p: hitsWhere p (l: lib.hasInfix "sops -d" (codePart l))
-    )
-    nixSources;
+    nixSources
+    |> lib.concatMap (
+      p: hitsWhere p (l: l |> codePart |> lib.hasInfix "sops -d")
+    );
 
   # `diff` over two decrypted documents prints both copies the moment they
   # disagree — which is exactly when someone is reading. `cmp -s` answers the same
   # question and prints nothing.
   printedDiff =
-    lib.concatMap (
+    shellScripts
+    ++ taskfiles
+    |> lib.concatMap (
       p:
         hitsWhere p (
           l:
-            lib.hasInfix "sops -d" l
-            && (lib.hasInfix "| diff" l || lib.hasInfix "diff -" l || lib.hasInfix "diff <(" l)
+            (l |> lib.hasInfix "sops -d")
+            && ((l |> lib.hasInfix "| diff") || (l |> lib.hasInfix "diff -") || (l |> lib.hasInfix "diff <("))
         )
-    )
-    (shellScripts ++ taskfiles);
+    );
 
   # --- user access: one source of keys, no host-local key literals ----------
   # Not "no keys at all" — `config.ssh.authorizedKeys.keys` is the fleet's
@@ -509,48 +524,48 @@
     "hosts/microvms/"
   ];
   ownKeyLiterals =
-    builtins.filter (
+    nixFiles
+    |> builtins.filter (
       p: let
         r = rel p;
       in
-        !(builtins.elem r keySourceFiles)
-        && !(lib.any (h: lib.hasPrefix h r) outOfScopeHosts)
+        !(keySourceFiles |> builtins.elem r)
+        && !(outOfScopeHosts |> lib.any (h: lib.hasPrefix h r))
         && anyMatchingLine p ".*(ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256) AAAA.*"
-    )
-    nixFiles;
+    );
 
   # The agent-facing prose surfaces: the manual and every skill are read into
   # context on each turn, so their size is a cost, not an aesthetic. Shrink-only:
   # a cleanup lowers the number here in the same commit, and nothing may raise it.
-  lineCount = p: builtins.length (lib.splitString "\n" (builtins.readFile p)) - 1;
+  lineCount = p: (p |> builtins.readFile |> lib.splitString "\n" |> builtins.length) - 1;
   agentsLines = lineCount (root + "/AGENTS.md");
-  skillFiles = builtins.filter (p: lib.hasSuffix "/SKILL.md" (toString p)) treeFiles;
+  skillFiles = treeFiles |> builtins.filter (p: p |> toString |> lib.hasSuffix "/SKILL.md");
   # Frontmatter is compiled metadata, not prose: `lib/skills.nix` turns it into the
   # one-line index an agent carries (`name` + `description`), so 647 of the 5927
   # raw SKILL.md lines were budgeted as context they never occupy. What a skill
   # costs is the body loaded when it is opened, and that is what is counted.
   frontmatterLines = p: let
-    lines = lib.splitString "\n" (builtins.readFile p);
+    lines = p |> builtins.readFile |> lib.splitString "\n";
   in
-    if lines == [] || lib.trim (builtins.head lines) != "---"
+    if lines == [] || (lines |> builtins.head |> lib.trim) != "---"
     then 0
-    else builtins.length (takeWhile (l: lib.trim l != "---") (builtins.tail lines)) + 2;
-  skillLines = builtins.foldl' (acc: p: acc + lineCount p - frontmatterLines p) 0 skillFiles;
+    else (lines |> builtins.tail |> takeWhile (l: (l |> lib.trim) != "---") |> builtins.length) + 2;
+  skillLines = skillFiles |> builtins.foldl' (acc: p: acc + lineCount p - frontmatterLines p) 0;
 
   # The prose budget as data (flake/prose-budget.nix): one measured body count per
   # page, and a written reason above `argueAbove`. Comparing the record to the tree
   # is what makes growth an edit someone reviews instead of a slide.
   proseBudget = import ./prose-budget.nix {inherit lib;};
-  budgetedPages = ["AGENTS.md"] ++ map rel skillFiles;
+  budgetedPages = ["AGENTS.md"] ++ (skillFiles |> map rel);
   budgetMeasured = page:
     if lib.hasSuffix "/SKILL.md" page
     then lineCount (root + "/${page}") - frontmatterLines (root + "/${page}")
     else lineCount (root + "/${page}");
-  budgetMissing = builtins.filter (pg: !(lib.hasAttr pg proseBudget.pages)) budgetedPages;
-  budgetStale = builtins.filter (pg: !(builtins.elem pg budgetedPages)) (builtins.attrNames proseBudget.pages);
-  budgetDrift = builtins.filter (pg: (proseBudget.pages.${pg} or (-1)) != budgetMeasured pg) budgetedPages;
+  budgetMissing = budgetedPages |> builtins.filter (pg: !(proseBudget.pages |> lib.hasAttr pg));
+  budgetStale = proseBudget.pages |> builtins.attrNames |> builtins.filter (pg: !(budgetedPages |> builtins.elem pg));
+  budgetDrift = budgetedPages |> builtins.filter (pg: (proseBudget.pages.${pg} or (-1)) != budgetMeasured pg);
   budgetUnargued =
-    builtins.filter (pg: budgetMeasured pg > proseBudget.argueAbove && !(lib.hasAttr pg proseBudget.notes)) budgetedPages;
+    budgetedPages |> builtins.filter (pg: budgetMeasured pg > proseBudget.argueAbove && !(proseBudget.notes |> lib.hasAttr pg));
 
   # The documents, not the skills: `skills-cite-truth` already requires a skill to
   # point at machine truth, and this is the prose half of the same rule.
@@ -560,85 +575,87 @@
   # walk: this rule needs the documents, and forcing every tracked file into it was
   # the recursion.
   ruleDocs = ["AGENTS.md" "MANUAL.md" "README.md"] ++ filesWithSuffix "docs" ".md";
-  namesPolicyFile = p: lib.hasInfix "flake/policies.nix" (read p);
-  citesPolicyId = p: lib.hasInfix "[[flake/policies.nix#" (read p);
-  uncitedRuleMentions = builtins.filter (p: namesPolicyFile p && !(citesPolicyId p)) ruleDocs;
+  namesPolicyFile = p: p |> read |> lib.hasInfix "flake/policies.nix";
+  citesPolicyId = p: p |> read |> lib.hasInfix "[[flake/policies.nix#";
+  uncitedRuleMentions = ruleDocs |> builtins.filter (p: namesPolicyFile p && !(citesPolicyId p));
 
   # Truth, as a skill may cite it: a backticked repo path that RESOLVES, or a
   # policy citation. Prose that describes a mechanism without naming the file
   # that implements it is a second source of truth nobody can diff.
   repoRefPrefixes = ["modules/" "hosts/" "flake/" "lib/" "taskfiles/" "scripts/"];
   citedPaths = p:
-    lib.filter (s: builtins.isString s && lib.any (pre: lib.hasPrefix pre s) repoRefPrefixes) (
-      builtins.split "`" (builtins.readFile p)
-    );
+    p
+    |> builtins.readFile
+    |> builtins.split "`"
+    |> lib.filter (s: builtins.isString s && (repoRefPrefixes |> lib.any (pre: lib.hasPrefix pre s)));
   citesTruth = p:
-    lib.hasInfix "[[flake/policies.nix#" (builtins.readFile p)
-    || lib.any (q: builtins.pathExists (root + "/${q}")) (citedPaths p);
+    (p |> builtins.readFile |> lib.hasInfix "[[flake/policies.nix#")
+    || (citedPaths p |> lib.any (q: root + "/${q}" |> builtins.pathExists));
   skillName = p: baseNameOf (dirOf (toString p));
-  skillsWithoutTruth = map skillName (builtins.filter (p: !(citesTruth p)) skillFiles);
+  skillsWithoutTruth = skillFiles |> builtins.filter (p: !(citesTruth p)) |> map skillName;
 
   # A skill may name an option; it may not define one. A pasted `*.enable =`
   # block is the module's value typed a second time, with no type check and no
   # assertion behind it.
   definesService = p:
-    lib.any (l: builtins.match "[[:space:]]+[A-Za-z][A-Za-z0-9.-]*\\.enable = (true|false);" l != null)
-    (lib.splitString "\n" (builtins.readFile p));
-  skillsDefiningServices = map skillName (builtins.filter definesService skillFiles);
+    p
+    |> builtins.readFile
+    |> lib.splitString "\n"
+    |> lib.any (l: l |> builtins.match "[[:space:]]+[A-Za-z][A-Za-z0-9.-]*\\.enable = (true|false);" |> (m: m != null));
+  skillsDefiningServices = skillFiles |> builtins.filter definesService |> map skillName;
   # Supervision is a record, not a feeling: one JSON line per judged candidate,
   # and the automation label is gated on its verdicts (see `automation-is-earned`).
   ledger = ".agents/supervision.jsonl";
   ledgerLines =
-    if builtins.pathExists (root + "/${ledger}")
-    then lib.splitString "\n" (read ledger)
+    if root + "/${ledger}" |> builtins.pathExists
+    then ledger |> read |> lib.splitString "\n"
     else [];
-  agreeCount = builtins.length (builtins.filter (l: lib.hasInfix "\"agree\":true" (lib.replaceStrings [" "] [""] l)) ledgerLines);
-  totalJudged = builtins.length (builtins.filter (l: lib.hasInfix "\"target\"" l) ledgerLines);
+  agreeCount = ledgerLines |> builtins.filter (l: l |> lib.replaceStrings [" "] [""] |> lib.hasInfix "\"agree\":true") |> builtins.length;
+  totalJudged = ledgerLines |> builtins.filter (l: l |> lib.hasInfix "\"target\"") |> builtins.length;
   disagreeCount = totalJudged - agreeCount;
 
   # Every tracked .nix / .md file, walked once.
   treeFiles = lib.filesystem.listFilesRecursive root;
-  nixFiles = builtins.filter (p: lib.hasSuffix ".nix" (toString p)) treeFiles;
+  nixFiles = treeFiles |> builtins.filter (p: p |> toString |> lib.hasSuffix ".nix");
   takeWhile = pred: xs:
-    if xs == [] || !(pred (builtins.head xs))
+    if xs == [] || !(xs |> builtins.head |> pred)
     then []
-    else [(builtins.head xs)] ++ takeWhile pred (builtins.tail xs);
+    else [(xs |> builtins.head)] ++ (xs |> builtins.tail |> takeWhile pred);
 
   # A compositor swap inside `base-desktop-environment` is two configs fighting:
   # niri/DMS are force-disabled while the profile that installed them, and their
   # whole userland (zen, nautilus, portals, gnome-keyring), stays in the closure.
   # 2026-10-22: scratch ran exactly that shape for days — dwl on screen, fleet
   # desktop underneath. A host that disables a compositor has to fork the profile.
-  hostConfigs = builtins.filter (p: builtins.pathExists (root + "/${p}")) (
-    map (h: "hosts/${h}/configuration.nix") (
-      root
-      + "/hosts"
-      |> builtins.readDir
-      |> lib.filterAttrs (_: t: t == "directory")
-      |> builtins.attrNames
-    )
-  );
+  hostConfigs =
+    root
+    + "/hosts"
+    |> builtins.readDir
+    |> lib.filterAttrs (_: t: t == "directory")
+    |> builtins.attrNames
+    |> map (h: "hosts/${h}/configuration.nix")
+    |> builtins.filter (p: root + "/${p}" |> builtins.pathExists);
   halfForked =
-    builtins.filter (
+    hostConfigs
+    |> builtins.filter (
       p:
-        lib.hasInfix "base-desktop-environment" (read p)
-        && lib.hasInfix "programs.niri.enable = lib.mkForce false" (read p)
-    )
-    hostConfigs;
+        (p |> read |> lib.hasInfix "base-desktop-environment")
+        && (p |> read |> lib.hasInfix "programs.niri.enable = lib.mkForce false")
+    );
 
   policies = {
     desktop-fork-not-disable = {
       rule = "Swapping the compositor means forking the userland: a host may not import `base-desktop-environment` and force `programs.niri.enable = false` in the same module. That combination keeps niri, DMS, zen, nautilus and the portal/keyring stack installed behind a different WM, so the session changes and everything it opens does not. Drop the profile and declare the modules instead.";
       proof = "hosts/*/configuration.nix that both import base-desktop-environment and force niri off";
       holds = halfForked == [];
-      detail = "half-forked hosts: ${lib.concatStringsSep ", " halfForked}";
+      detail = "half-forked hosts: ${halfForked |> lib.concatStringsSep ", "}";
     };
 
     capabilities-are-traits-not-names = {
       rule = "A shared module asks a host what it declares, never what it is called. Capability belongs in `inventory.toml` (`category`, `persona.compute_tier`, `software.traits`), and the module reads it: `traits` for a package list or toolchain tier, `category` for what kind of machine it is. A hostname list compiles in a second registry whose only maintenance event is a breakage — frieren, eisen and poseidon were remembered in three separate modules, the GPU tier list had drifted from `hardware.gpu` (ares matched only by name, netbook's card matched by neither), and the NAS profiles excluded the server by comparing its name.";
       proof = "modules/**/*.nix scanned for `builtins.elem hostName`, `hostName ==` and a comparison against a quoted hostname; the traits they now read (including `nas-server`) live in inventory.toml";
       holds = hostnameGatedModules == [];
-      detail = "hostname-gated modules (the trait they need belongs in inventory.toml): ${lib.concatStringsSep ", " hostnameGatedModules}";
+      detail = "hostname-gated modules (the trait they need belongs in inventory.toml): ${hostnameGatedModules |> lib.concatStringsSep ", "}";
     };
 
     systemd-units-are-capability-gated = {
@@ -652,21 +669,21 @@
         && has "modules/calendar.nix" "ConditionPathExists"
         && !(has "modules/calendar.nix" "WAYLAND_DISPLAY")
         && has "modules/systemd-policy.nix" "userUnitViolations";
-      detail = "hostname-gated unit modules: ${lib.concatStringsSep ", " hostnameGatedUnitModules}; session wiring or the calendar gate is missing";
+      detail = "hostname-gated unit modules: ${hostnameGatedUnitModules |> lib.concatStringsSep ", "}; session wiring or the calendar gate is missing";
     };
 
     systemd-daemons-declare-their-class = {
       rule = "A system systemd service this tree declares states its crash-loop class where it is declared: `unitConfig.X-Fleet-Role = \"daemon\"` (must come back: Restart set and never retirable by systemd's start limit) or `\"bounded\"` (retiring is the point, so it carries an explicit StartLimitBurst). nixpkgs' own units are upstream's policy and carry no marker; a `Restart=` block without a role is a unit whose behaviour nobody decided, and the gate in modules/systemd-policy.nix enforces the class it names.";
       proof = "systemd.services blocks in modules/ and hosts/ that set Restart; lib/systemd-policy.nix markedSystemViolations";
       holds = unclassifiedDaemons == [];
-      detail = "system services with Restart and no X-Fleet-Role:\n    ${lib.concatStringsSep "\n    " unclassifiedDaemons}";
+      detail = "system services with Restart and no X-Fleet-Role:\n    ${unclassifiedDaemons |> lib.concatStringsSep "\n    "}";
     };
 
     root-markdown-closed = {
       rule = "No new root-level markdown: a document lives in docs/, in a skill, or as a note in AGENTS.nix.";
       proof = "root *.md listing";
       holds = strayRootMd == [];
-      detail = "stray root markdown: ${lib.concatStringsSep ", " strayRootMd}";
+      detail = "stray root markdown: ${strayRootMd |> lib.concatStringsSep ", "}";
     };
 
     agent-prose-budget = {
@@ -678,7 +695,7 @@
         && budgetStale == []
         && budgetDrift == []
         && budgetUnargued == [];
-      detail = "corpus ${toString (skillLines + agentsLines)} lines over ${toString (builtins.length budgetedPages)} pages, recorded ${toString proseBudget.total}\n    unrecorded: ${lib.concatStringsSep ", " budgetMissing}\n    stale: ${lib.concatStringsSep ", " budgetStale}\n    drift: ${lib.concatStringsSep ", " budgetDrift}\n    over ${toString proseBudget.argueAbove} without a reason: ${lib.concatStringsSep ", " budgetUnargued}";
+      detail = "corpus ${toString (skillLines + agentsLines)} lines over ${toString (builtins.length budgetedPages)} pages, recorded ${toString proseBudget.total}\n    unrecorded: ${budgetMissing |> lib.concatStringsSep ", "}\n    stale: ${budgetStale |> lib.concatStringsSep ", "}\n    drift: ${budgetDrift |> lib.concatStringsSep ", "}\n    over ${toString proseBudget.argueAbove} without a reason: ${budgetUnargued |> lib.concatStringsSep ", "}";
     };
 
     router-labels-are-routed = {
@@ -692,7 +709,7 @@
       rule = "A document names a rule by citing its id — `flake/policies.nix#<id>` — and never by explaining the rule in its own words. The rule has one home; a second rendering is the copy that drifts, and the citation is what lets the graph answer which pages carry it. Skills are covered by `skills-cite-truth`; this is the prose half.";
       proof = "every root *.md and docs/*.md that mentions `flake/policies.nix` also carries `[[flake/policies.nix#`";
       holds = uncitedRuleMentions == [];
-      detail = "documents naming the policy file without an id citation: ${lib.concatStringsSep ", " uncitedRuleMentions}";
+      detail = "documents naming the policy file without an id citation: ${uncitedRuleMentions |> lib.concatStringsSep ", "}";
     };
 
     nix-comments-are-pointers = {
@@ -705,8 +722,8 @@
         && nixCommentsCtl.dated <= nixCommentsCtl.datedCeiling
         && nixCommentsCtl.unresolvedPaths == [];
       detail = let
-        hotspots = builtins.filter (w: w.lines > 0) (lib.take 5 nixCommentsCtl.worst);
-      in "${toString nixCommentsCtl.comments} comment lines in ${toString nixCommentsCtl.files} files: ${toString nixCommentsCtl.pointers} pointers (${toString nixCommentsCtl.kinds.task} task, ${toString nixCommentsCtl.kinds.policy} policy, ${toString nixCommentsCtl.kinds.path} path), header ${toString nixCommentsCtl.header}/${toString nixCommentsCtl.ceiling}, dated ${toString nixCommentsCtl.dated}/${toString nixCommentsCtl.datedCeiling}, rule lines ${toString nixCommentsCtl.rules}\n    unresolved paths: ${lib.concatStringsSep ", " (map (c: "${c.file}:${toString c.line} -> ${c.path}") nixCommentsCtl.unresolvedPaths)}\n    heaviest prose: ${lib.concatStringsSep ", " (map (w: "${w.path} (${toString w.lines})") hotspots)}";
+        hotspots = nixCommentsCtl.worst |> lib.take 5 |> builtins.filter (w: w.lines > 0);
+      in "${toString nixCommentsCtl.comments} comment lines in ${toString nixCommentsCtl.files} files: ${toString nixCommentsCtl.pointers} pointers (${toString nixCommentsCtl.kinds.task} task, ${toString nixCommentsCtl.kinds.policy} policy, ${toString nixCommentsCtl.kinds.path} path), header ${toString nixCommentsCtl.header}/${toString nixCommentsCtl.ceiling}, dated ${toString nixCommentsCtl.dated}/${toString nixCommentsCtl.datedCeiling}, rule lines ${toString nixCommentsCtl.rules}\n    unresolved paths: ${nixCommentsCtl.unresolvedPaths |> map (c: "${c.file}:${toString c.line} -> ${c.path}") |> lib.concatStringsSep ", "}\n    heaviest prose: ${hotspots |> map (w: "${w.path} (${toString w.lines})") |> lib.concatStringsSep ", "}";
     };
 
     rebuild-flags-are-finite = {
@@ -719,17 +736,19 @@
         && has "scripts/task/rebuild-flags.sh" "REBUILD_SUBSTITUTES"
         && has "scripts/task/rebuild-flags.sh" "REBUILD_FLAKES"
         # Adopted, not merely available: every switch path must render its flags.
-        && builtins.length (lib.splitString "rebuild-flags.sh" (read "taskfiles/infra.yml")) > 3
+        && ("taskfiles/infra.yml" |> read |> lib.splitString "rebuild-flags.sh" |> builtins.length) > 3
         && has "taskfiles/checks.yml" "checks:rebuild";
       detail = "a rebuild path went back to spelling its own flags: the envelope lost its axes, its self-test, or one of the switch tasks stopped rendering from it";
     };
 
     daemon-clears-kelly = let
       d = import ./daemons.nix {inherit lib;};
-      report = lib.concatStringsSep "\n  " (lib.mapAttrsToList (
+      report =
+        d.daemons
+        |> lib.mapAttrsToList (
           n: v: "${n}: p=${toString v.p} save=${toString v.save}s cost=${toString v.cost}s ev=${toString v.ev}s clears=${lib.boolToString v.clears} wanted=${lib.boolToString v.wanted}"
         )
-        d.daemons);
+        |> lib.concatStringsSep "\n  ";
     in {
       rule = "Anything that runs RESIDENT must be strictly worth more than zero, measured against what the counterfactual costs an agent rather than against a cold start. The counterfactual is generation at ~50 tokens/s, where any sub-second local round trip is free: a daemon that answers correctly saves only the tokens of naming the argument, so the bar is `ev = p * save - (1 - p) * cost > 0` with `save > 0` as well. `save` may be negative — correct and still slower is the normal failure — and a daemon with `ev == 0` is off, because it pays rent in memory, surface and maintenance for a coin flip. Enabling is a measured claim, so every entry carries the command that measured it; a daemon whose best case is a loss cannot be rescued by accuracy.";
       proof = "flake/daemons.nix · docs/nix-patterns.md · modules/roles/home.nix (selectorDaemon) · hosts/delphi/configuration.nix (edgeCaller) · checks:edge:resident and checks:selector:sidecar for the p they use";
@@ -791,7 +810,7 @@
         && has "taskfiles/agents.yml" "agents:edge"
         && has "taskfiles/checks.yml" "checks:toolcall"
         && has "taskfiles/checks.yml" "checks:edge"
-        && builtins.pathExists (root + "/scripts/task/toolcall-battery.jsonl");
+        && (root + "/scripts/task/toolcall-battery.jsonl" |> builtins.pathExists);
       detail = "the edge-caller path lost its derived tool set, its read-only prefetch allowlist, its confidence bands, its graph-side type repair, its telemetry opt-out, its battery gate, or the task that exposes it";
     };
 
@@ -800,15 +819,15 @@
       proof = "Taskfile.yml includes · taskfiles/README.md";
       holds = let
         tf = read "Taskfile.yml";
-        missing = builtins.filter (p: !(lib.hasInfix "taskfile: ${p}" tf)) taskfiles;
-        taskless = builtins.filter (p: !(has p "\ntasks:")) taskfiles;
+        missing = taskfiles |> builtins.filter (p: !(tf |> lib.hasInfix "taskfile: ${p}"));
+        taskless = taskfiles |> builtins.filter (p: !(has p "\ntasks:"));
       in
         missing == [] && taskless == [];
       detail = let
         tf = read "Taskfile.yml";
-        missing = builtins.filter (p: !(lib.hasInfix "taskfile: ${p}" tf)) taskfiles;
-        taskless = builtins.filter (p: !(has p "\ntasks:")) taskfiles;
-      in "shards Taskfile.yml does not include: ${lib.concatStringsSep ", " missing} — shards declaring no tasks: ${lib.concatStringsSep ", " taskless}";
+        missing = taskfiles |> builtins.filter (p: !(tf |> lib.hasInfix "taskfile: ${p}"));
+        taskless = taskfiles |> builtins.filter (p: !(has p "\ntasks:"));
+      in "shards Taskfile.yml does not include: ${missing |> lib.concatStringsSep ", "} — shards declaring no tasks: ${taskless |> lib.concatStringsSep ", "}";
     };
 
     channels-have-a-task = {
@@ -838,7 +857,7 @@
       holds =
         # It classifies and never moves: a mutating categorizer is an automation
         # path whatever it calls itself, so the flag-name gate alone is not enough.
-        !(lib.any (t: has "scripts/task/categorize.sh" t) ["git mv" "sed -i" "mv \"$f\"" ">\"$f\""])
+        !(["git mv" "sed -i" "mv \"$f\"" ">\"$f\""] |> lib.any (t: has "scripts/task/categorize.sh" t))
         && (
           (!(has "scripts/task/categorize.sh" "--auto")
             && !(has "scripts/task/categorize.sh" "--apply"))
@@ -870,14 +889,14 @@
       rule = "A skill names a service option, it never defines one: no `*.enable = true|false;` assignment inside a SKILL.md. Service behaviour is an option in a module with its own assertions, so a skill that carries the value is a second home.";
       proof = "line scan of every tracked SKILL.md";
       holds = skillsDefiningServices == [];
-      detail = "skills defining a service: ${lib.concatStringsSep ", " skillsDefiningServices}";
+      detail = "skills defining a service: ${skillsDefiningServices |> lib.concatStringsSep ", "}";
     };
 
     skills-cite-truth = {
       rule = "A SKILL.md may describe procedure but must point at machine truth: a backticked repo path (`modules/`, `hosts/`, `flake/`, `lib/`, `taskfiles/`, `scripts/`) that exists on disk, or a [[flake/policies.nix#id]] citation. A skill that is the only home of a fact is the fact nobody can check.";
       proof = "inline code spans and policy citations in every tracked SKILL.md, resolved against the tree";
       holds = skillsWithoutTruth == [];
-      detail = "skills citing no resolvable repo path: ${lib.concatStringsSep ", " skillsWithoutTruth}";
+      detail = "skills citing no resolvable repo path: ${skillsWithoutTruth |> lib.concatStringsSep ", "}";
     };
 
     paperless-closure-traps = {
@@ -886,7 +905,7 @@
       holds =
         has "hosts/frieren/paperless.nix" "systemd.services.tika"
         && has "hosts/frieren/paperless.nix" ''runCommand "chromium"''
-        && !(anyLine "hosts/frieren/paperless.nix" (l: builtins.match "[[:space:]]*services.tika.enable = true;" l != null));
+        && !(anyLine "hosts/frieren/paperless.nix" (l: l |> builtins.match "[[:space:]]*services.tika.enable = true;" |> (m: m != null)));
       detail = "paperless went back to the module-level tika override or a real chromium";
     };
 
@@ -894,10 +913,10 @@
       rule = "Every sops file in the tree is encrypted (`ENC[AES256_GCM` values plus `sops:` metadata); a plaintext commit fails rather than being reviewed.";
       proof = "modules/secrets.yaml, modules/ssh-ca-key.yaml";
       holds =
-        lib.all (f: builtins.pathExists (root + "/${f}")) [secretsMirror "modules/ssh-ca-key.yaml"]
-        && lib.all (f: anyLine f (l: lib.hasPrefix "sops:" l)) presentSopsFiles
+        ([secretsMirror "modules/ssh-ca-key.yaml"] |> lib.all (f: root + "/${f}" |> builtins.pathExists))
+        && (presentSopsFiles |> lib.all (f: anyLine f (l: l |> lib.hasPrefix "sops:")))
         && plaintextSecrets == [];
-      detail = "plaintext value(s) in a sops file: ${lib.concatStringsSep "; " plaintextSecrets}";
+      detail = "plaintext value(s) in a sops file: ${plaintextSecrets |> lib.concatStringsSep "; "}";
     };
 
     secrets-submodule-declared = {
@@ -920,42 +939,42 @@
       rule = "A script never spells where a secrets file lives. It sources `scripts/task/lib/paths.sh`, which owns one resolution order: `$NIXCONFIG_SECRETS`, then the canonical submodule copy, then the committed mirror. 27 scripts each carried the path and, with it, their own answer to canonical-versus-mirror — so a writer and a reader in the same repository could disagree about which file was authoritative, and an edit could land in the copy builds never read. The two files that still name a path are the ones whose job that is: the drift gate compares the copies, and the openwrt wrapper resolves one where the submodule may be absent. A task takes the path from `{{.SECRETS}}`, which is derived from the same helper, so neither plane spells it.";
       proof = "scripts/task/lib/paths.sh · scripts/**/*.sh · scripts/**/*.py · taskfiles/*.yml · Taskfile.yml";
       holds = secretsPathOffenders == [] && taskfileOffenders == [];
-      detail = "bypasses the resolver: ${lib.concatStringsSep ", " (secretsPathOffenders ++ taskfileOffenders)}";
+      detail = "bypasses the resolver: ${secretsPathOffenders ++ taskfileOffenders |> lib.concatStringsSep ", "}";
     };
 
     secrets-files-are-registered = {
       rule = "Every encrypted file is named in the sops registry, because that registry is what the plaintext scan reads: an encrypted file outside it is a file whose plaintext nobody checks. New secret material therefore costs one line in `sopsFiles`, not a new scan.";
       proof = "flake/policies.nix (sopsFiles) · modules/secrets/*.yaml";
       holds = unregisteredSops == [];
-      detail = "encrypted file(s) the plaintext gate never reads: ${lib.concatStringsSep ", " unregisteredSops}";
+      detail = "encrypted file(s) the plaintext gate never reads: ${unregisteredSops |> lib.concatStringsSep ", "}";
     };
 
     private-data-is-not-a-build-input = {
       rule = "A static page publishes everything its build reads, so private data never enters eval: `lib/` reads no file from the secrets submodule, which keeps `.#sites.*` buildable from a bare tree (CI, nixbuild, a clone without `--recurse-submodules`). Private facts live sops-encrypted (`modules/secrets/pii.yaml`) and a script decrypts them when it builds an outbound document. A `pathExists` guard on a build input buys nothing either: the artifact then differs between a machine with the file and one without, and the difference never appears in the diff. That is what makes `lib/matt/*.json` published data rather than a leak — the deployed page carries every value in it.";
       proof = "lib/matt/*.json · lib/bountystash/*.json · modules/sops.nix · modules/secrets/pii.yaml";
       holds = secretsReads == [];
-      detail = "a library file reads the secrets submodule, so a bare-tree build fails there and only there: ${lib.concatStringsSep ", " secretsReads}";
+      detail = "a library file reads the secrets submodule, so a bare-tree build fails there and only there: ${secretsReads |> lib.concatStringsSep ", "}";
     };
 
     credentials-never-land-in-a-tracked-file = {
       rule = "No tracked text file carries a credential shape — a provider prefix or a private-key header. A secret that is committed is the one that has to be rotated everywhere it is used, and rotation is the chore this gate exists to stop repeating. Values cannot be matched, so the gate matches what the issuers reserve, over every tracked markdown, Nix, shell, YAML, TOML and JSON file; it reports the file and line and never quotes the match, because a gate failure is printed into a terminal or a transcript.";
       proof = "every tracked *.md, *.nix, *.sh, *.yml, *.yaml, *.toml, *.json (encrypted blobs contain no such shape)";
       holds = credentialHits == [];
-      detail = "credential-shaped text at: ${lib.concatStringsSep ", " credentialHits}";
+      detail = "credential-shaped text at: ${credentialHits |> lib.concatStringsSep ", "}";
     };
 
     secrets-are-not-decrypted-at-eval = {
       rule = "Nothing decrypts during evaluation: `sops -d` in a `.nix` file writes the plaintext into `/nix/store`, where it is world-readable and survives every rotation of the credential. Decryption belongs to activation (sops-nix) or to a runtime `passwordCommand`, both of which keep the value outside the store.";
       proof = "modules/**/*.nix · hosts/**/*.nix · flake/**/*.nix · lib/**/*.nix, non-comment lines";
       holds = decryptAtEval == [];
-      detail = "eval-time decryption at: ${lib.concatStringsSep ", " decryptAtEval}";
+      detail = "eval-time decryption at: ${decryptAtEval |> lib.concatStringsSep ", "}";
     };
 
     decrypted-documents-are-compared-not-printed = {
       rule = "A decrypted document is compared with `cmp -s`, never `diff`, because `diff` prints both copies the moment they disagree — precisely when someone is reading the output. The question is identical and the output is empty, so a drifting mirror cannot become a transcript of both secrets.";
       proof = "scripts/task/*.sh · taskfiles/*.yml";
       holds = printedDiff == [];
-      detail = "decrypt-then-diff at: ${lib.concatStringsSep ", " printedDiff}";
+      detail = "decrypt-then-diff at: ${printedDiff |> lib.concatStringsSep ", "}";
     };
 
     ssh-ca-declarative = {
@@ -974,7 +993,7 @@
         ownKeyLiterals
         == []
         && has "modules/config/authorized-keys.nix" "config.ssh.authorizedKeys.keys";
-      detail = "key literals outside the single source: ${lib.concatStringsSep ", " (map rel ownKeyLiterals)}";
+      detail = "key literals outside the single source: ${ownKeyLiterals |> map rel |> lib.concatStringsSep ", "}";
     };
 
     ci-matrix-is-inventory = {
@@ -982,8 +1001,8 @@
       proof = ".github/workflows/nixcachix.yml (calls the detector, has no `machine:` list), taskfiles/*.yml";
       holds =
         has ".github/workflows/nixcachix.yml" "detect-affected-hosts.py"
-        && !(anyLine ".github/workflows/nixcachix.yml" (l: builtins.match "[[:space:]]*machine:.*" l != null))
-        && lib.all (f: !(has f "lifecycle:ci:enable-host")) taskfiles;
+        && !(anyLine ".github/workflows/nixcachix.yml" (l: l |> builtins.match "[[:space:]]*machine:.*" |> (m: m != null)))
+        && (taskfiles |> lib.all (f: !(has f "lifecycle:ci:enable-host")));
       detail = "the workflow stopped being inventory-driven, or a task went back to editing a matrix";
     };
 
@@ -1026,14 +1045,17 @@
         && has "scripts/task/host-check-sweep.sh" "?submodules=1#hostChecks."
         && has "scripts/task/boot-check.sh" "?submodules=1#hostBootChecks."
         && has "taskfiles/infra.yml" "?submodules=1#nixosConfigurations."
-        && lib.all
-        (f:
-          !(anyLine f (l:
-            builtins.match ".*\\.#(nixosConfigurations|hostChecks|hostBootChecks)\\..*" l
-            != null
-            && builtins.match ".*submodules=1.*" l == null
-            && builtins.match ".*flakeref.*" l == null)))
-        (taskfiles ++ shellScripts);
+        && (
+          taskfiles
+          ++ shellScripts
+          |> lib.all (f:
+            !(anyLine f (l:
+              (l
+                |> builtins.match ".*\\.#(nixosConfigurations|hostChecks|hostBootChecks)\\..*"
+                |> (m: m != null))
+              && (l |> builtins.match ".*submodules=1.*") == null
+              && (l |> builtins.match ".*flakeref.*") == null)))
+        );
       detail = "a task or script grew a bare `.#host...` reference; use `.?submodules=1#` (or the `flakeref` helper in nixbuild-warm.sh for remote refs)";
     };
 
@@ -1057,8 +1079,8 @@
       rule = "The `/srv/data` layout has one home (`docs/storage-taxonomy.md`); the manual links to it instead of carrying a second table.";
       proof = "docs/storage-taxonomy.md exists, and AGENTS.md has no `/srv/data` layout table";
       holds =
-        builtins.pathExists (root + "/docs/storage-taxonomy.md")
-        && !(lib.hasInfix "| Path (`/srv/data/` /" (read "AGENTS.md"));
+        (root + "/docs/storage-taxonomy.md" |> builtins.pathExists)
+        && !("AGENTS.md" |> read |> lib.hasInfix "| Path (`/srv/data/` /");
       detail = "the storage table is back in AGENTS.md, or the taxonomy page is gone";
     };
 
@@ -1111,7 +1133,7 @@
         has "taskfiles/checks.yml" "HOSTS IS REQUIRED"
         # the sweep passes HOSTS through verbatim — a `| default` here is the footgun
         && has "taskfiles/checks.yml" ''--hosts "{{.HOSTS}}"''
-        && lib.all (f: !(has f "checks:hosts:all")) taskfiles;
+        && (taskfiles |> lib.all (f: !(has f "checks:hosts:all")));
       detail = "checks:hosts lost its required HOSTS, or a `checks:hosts:all` sweep came back";
     };
 
@@ -1122,7 +1144,7 @@
       # rule (`internal: true` is banned), and a substring match made the gate
       # fail on its own documentation. Matched at field indent so a `desc:` or a
       # `#` comment may talk about it freely.
-      holds = lib.all (f: !(anyLine f (l: builtins.match " +internal:[[:space:]]*true[[:space:]]*(#.*)?" l != null))) taskfiles;
+      holds = taskfiles |> lib.all (f: !(anyLine f (l: l |> builtins.match " +internal:[[:space:]]*true[[:space:]]*(#.*)?" |> (m: m != null))));
       detail = "a taskfile marks a task internal";
     };
 
@@ -1159,10 +1181,10 @@
       rule = "TOML is edited through a format-aware tool, never by text substitution.";
       proof = "scripts/task/*.sh";
       holds =
-        lib.all (
-          f: !(anyLine f (l: lib.hasInfix "sed -i" l && lib.hasInfix ".toml" l))
-        )
-        shellScripts;
+        shellScripts
+        |> lib.all (
+          f: !(anyLine f (l: (l |> lib.hasInfix "sed -i") && (l |> lib.hasInfix ".toml")))
+        );
       detail = "a script edits a .toml with sed -i";
     };
 
@@ -1188,7 +1210,7 @@
       proof = ".gitignore + docs-site absence";
       holds =
         has ".gitignore" "docs/generated/"
-        && !(builtins.pathExists (root + "/docs-site"));
+        && !(root + "/docs-site" |> builtins.pathExists);
       detail = "docs/generated is not gitignored, or the retired docs-site/ renderer is back";
     };
 
@@ -1244,7 +1266,7 @@
       rule = "Every library row names the substring that pins its asset per dir (`pick`), because eget does not filter by architecture: an aarch64 host fetched `starship-x86_64` once the arm token was missing, which is a binary the NAS can only fail to exec.";
       proof = "tools/library.nix rows that land in bin-aarch64/bin-x86";
       holds = unpinnedRows == [];
-      detail = "rows with no pin for an arch dir: ${lib.concatStringsSep ", " unpinnedRows}";
+      detail = "rows with no pin for an arch dir: ${unpinnedRows |> lib.concatStringsSep ", "}";
     };
 
     library-content-is-not-scheduled = {
@@ -1257,8 +1279,8 @@
         && deletedLibraryIntegrators == [];
       detail =
         if deletedLibraryIntegrators != []
-        then "the AppImage integrator is back: ${lib.concatStringsSep ", " deletedLibraryIntegrators} — it opened every image in /Volumes/data/appimages with unsquashfs/readelf on a timer. Measured 2026-10-28: 61 images, 50 CPU-seconds and a 673 MiB peak per hourly run on frieren; ~300 MB of NFS reads on the netbook inside four minutes of boot, on a Celeron over wifi."
-        else "a scheduled unit names a script that extracts library content across a network mount: ${lib.concatStringsSep ", " scheduledLibraryExtractions}";
+        then "the AppImage integrator is back: ${deletedLibraryIntegrators |> lib.concatStringsSep ", "} — it opened every image in /Volumes/data/appimages with unsquashfs/readelf on a timer. Measured 2026-10-28: 61 images, 50 CPU-seconds and a 673 MiB peak per hourly run on frieren; ~300 MB of NFS reads on the netbook inside four minutes of boot, on a Celeron over wifi."
+        else "a scheduled unit names a script that extracts library content across a network mount: ${scheduledLibraryExtractions |> lib.concatStringsSep ", "}";
     };
 
     history-sync-is-one-server = {
@@ -1294,8 +1316,8 @@
       rule = "A substituter CI lists is a substituter CI trusts: every `substituters =` line in the workflow has a matching `trusted-public-keys =` line, the numtide signature is among those keys, and the build command repeats the same set because cachix-action rewrites nix.conf after the install step.";
       proof = ".github/workflows/nixcachix.yml";
       holds = let
-        lines = lib.splitString "\n" (read ".github/workflows/nixcachix.yml");
-        count = needle: builtins.length (builtins.filter (l: lib.hasInfix needle l) lines);
+        lines = ".github/workflows/nixcachix.yml" |> read |> lib.splitString "\n";
+        count = needle: lines |> builtins.filter (l: l |> lib.hasInfix needle) |> builtins.length;
       in
         count "substituters ="
         == count "trusted-public-keys ="
@@ -1311,7 +1333,10 @@
       holds =
         has "scripts/task/issue-ledger.sh" "docs/issue-classes.md"
         && has "scripts/task/ci-fix-dispatch.sh" "docs/issue-classes.md"
-        && lib.all (c: has "docs/issue-classes.md" "| `${c}` |") ["trust" "lint" "assert" "capacity"];
+        && (
+          ["trust" "lint" "assert" "capacity"]
+          |> lib.all (c: has "docs/issue-classes.md" "| `${c}` |")
+        );
       detail = "a class list was copied into a script, or the page a dispatched agent is pointed at stopped naming the classes";
     };
 
@@ -1326,8 +1351,8 @@
     };
   };
 
-  ids = builtins.attrNames policies;
-  citedIds = lib.unique (map (c: c.id) citations);
+  ids = policies |> builtins.attrNames;
+  citedIds = citations |> map (c: c.id) |> lib.unique;
 in {
   inherit
     policies
@@ -1353,48 +1378,64 @@ in {
       "assert" = ["boot-gate-needs-kvm" "flake-check-memory-gated"];
       "capacity" = ["no-fleet-default"];
     };
-    policyIds = builtins.attrNames policies;
-    lineMatch = l: builtins.match "\\| `([a-z]+)` \\|.*" l;
-    declared = map builtins.head (
-      builtins.filter (m: m != null) (map lineMatch (lib.splitString "\n" (read "docs/issue-classes.md")))
-    );
+    policyIds = policies |> builtins.attrNames;
+    lineMatch = l: l |> builtins.match "\\| `([a-z]+)` \\|.*";
+    declared =
+      "docs/issue-classes.md"
+      |> read
+      |> lib.splitString "\n"
+      |> map lineMatch
+      |> builtins.filter (m: m != null)
+      |> map builtins.head;
     required = ["trust" "lint" "assert" "capacity"];
   in {
     inherit gates declared;
     problems =
       lib.optional (declared != required)
-      "docs/issue-classes.md declares [${lib.concatStringsSep ", " declared}]; the table here gates [trust, lint, assert, capacity]"
-      ++ map
-      (c: "gates.${c} is not a class docs/issue-classes.md declares")
-      (builtins.filter (c: !(builtins.elem c declared)) (builtins.attrNames gates))
-      ++ lib.concatMap
-      (c:
-        map (id: "gates.${c} names ${id}, which is not a policy id")
-        (builtins.filter (id: !(builtins.elem id policyIds)) gates.${c}))
-      (builtins.attrNames gates)
-      ++ map (c: "class ${c} has no gate — a class with no policy is prose")
-      (builtins.filter (c: gates.${c} == []) required);
+      "docs/issue-classes.md declares [${declared |> lib.concatStringsSep ", "}]; the table here gates [trust, lint, assert, capacity]"
+      ++ (
+        gates
+        |> builtins.attrNames
+        |> builtins.filter (c: !(builtins.elem c declared))
+        |> map (c: "gates.${c} is not a class docs/issue-classes.md declares")
+      )
+      ++ (
+        gates
+        |> builtins.attrNames
+        |> lib.concatMap (
+          c:
+            gates.${c}
+            |> builtins.filter (id: !(builtins.elem id policyIds))
+            |> map (id: "gates.${c} names ${id}, which is not a policy id")
+        )
+      )
+      ++ (
+        required
+        |> builtins.filter (c: gates.${c} == [])
+        |> map (c: "class ${c} has no gate — a class with no policy is prose")
+      );
     report =
-      map
-      (c: "class ${c}: ${toString (builtins.length gates.${c})} gate(s) — ${lib.concatStringsSep ", " gates.${c}}")
-      (builtins.attrNames gates);
+      gates
+      |> builtins.attrNames
+      |> map (c: "class ${c}: ${gates.${c} |> builtins.length |> toString} gate(s) — ${gates.${c} |> lib.concatStringsSep ", "}");
   };
 
   # Both directions. A citation to an id that does not exist is a broken link
   # (Obsidian shows it greyed out); an id nobody cites is an invisible gate.
   danglingCitations =
-    builtins.filter (c: !(builtins.elem c.id ids)) citations;
+    citations |> builtins.filter (c: !(ids |> builtins.elem c.id));
   uncitedPolicies =
-    builtins.filter (id: !(builtins.elem id citedIds)) ids;
+    ids |> builtins.filter (id: !(citedIds |> builtins.elem id));
 
   # `HARD RULE` is this repo's own token for "this one is enforced, not
   # advised", so the convention is checkable without guessing at English: a
   # hard rule that carries no citation is exactly the bloat we are deleting.
   unenforcedHardRules = let
     scan = doc:
-      builtins.filter
-      (l: lib.hasInfix "HARD RULE" l && !(lib.hasInfix "[[flake/policies.nix#" l))
-      (lib.splitString "\n" (read doc));
+      doc
+      |> read
+      |> lib.splitString "\n"
+      |> builtins.filter (l: (l |> lib.hasInfix "HARD RULE") && !(l |> lib.hasInfix "[[flake/policies.nix#"));
   in
-    lib.concatMap (d: map (l: "${d}: ${lib.removePrefix "#" (lib.trim l)}") (scan d)) normativeDocs;
+    normativeDocs |> lib.concatMap (d: d |> scan |> map (l: "${d}: ${l |> lib.trim |> lib.removePrefix "#"}"));
 }

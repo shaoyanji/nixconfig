@@ -1,7 +1,6 @@
 # The check inventory as a compiled attrset: name -> kind (leaf|host|cache).
-# Was taskfiles/checks.toml; the kind is the one fact a task cannot express,
-# and a Nix attrset is what .#checkInventory reads — the TOML was a second
-# format for no reason. A key that names no task, or a checks:* task with no
+# The kind is the one fact a task cannot express, and a Nix attrset is what
+# .#checkInventory reads. A key that names no task, or a checks:* task with no
 # key, fails `task check:verify` — adding a gate is a key, not a row.
 {
   # name -> kind

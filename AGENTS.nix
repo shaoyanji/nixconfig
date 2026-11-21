@@ -4957,5 +4957,42 @@
         inside the timer pad, 629 turns/236 notes projected on frieren.
       '';
     };
+    agent-tools-called-not-declared = {
+      title = "Agent CLIs are called through nix, never declared in a closure";
+      kind = "decision";
+      status = "ACCEPTED";
+      date = "2026-11-21";
+      summary = "llm-agents tools (agy, qmd, toon, ai-memory, agent-browser, dsh, …) resolve through scripts/task/nix-tool.sh — PATH first, then a FRESH fetch off cache.numtide.com. The category rides upstream HEAD; the flake.lock pin is deliberately not honored.";
+      refs = {
+        modules = ["scripts/task/nix-tool.sh" "scripts/task/toon-io.sh" "scripts/task/qmd-docs-index.sh" "flake/cli.nix"];
+        tasks = ["agents:agy" "agents:lane" "dev:qmd:refresh" "checks:qmd:docs"];
+        docs = ["docs/agent-turns.md"];
+      };
+      body = ''
+        The complaint that forced it: closures for llm-agents.nix were baked
+        into host packages while taskfiles only needed the binary callable.
+        cache.numtide.com serves the whole category prebuilt, so fetching is a
+        substituter hit and pinning is dead weight — these tools change faster
+        than the lock should chase them.
+
+        The contract (nix-tool.sh): `resolve <name>` prints the binary — PATH
+        wins, else `nix build github:numtide/llm-agents.nix#<attr>` once into
+        a GC-rooted link under ~/.cache/nixconfig-tools/. `run` execs it.
+        `registry` maps called-name to attr and binary (agy -> antigravity-cli
+        is the alias this whole thing was asked for). toon_emit, the qmd
+        indexer, and the lane all resolve through it — a taskfile never
+        requires the tool in a closure again.
+
+        The boundary: call sites resolve lazily; SERVICES still bake.
+        frieren's hermes-agent/freebuff/dsh and delphi's agent fleet are
+        daemons — a unit cannot resolve at exec time, so they keep their
+        closures. user.ai's light/full knob sheds the interactive half
+        per host whenever a rebuild wants it.
+
+        Side finding same day: no elixir in the devshell — tools/kg-engine
+        and kg-sidecar are gone, and the only Elixir left is the
+        turns-runtime benchmark's own nested flake. .envrc corrected.
+      '';
+    };
   };
 }

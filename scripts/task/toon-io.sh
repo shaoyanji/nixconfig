@@ -10,12 +10,22 @@
 #
 # FORMAT env: toon (default — the agent), json (a program consumes it), text
 # (a person at a terminal — runs the renderer args, e.g. `toon_emit jq -r '…'`).
+#
+# `toon` itself is not a closure requirement: PATH wins, and absent that the
+# flake.lock pin builds once into a GC-rooted link (nix-tool.sh resolve).
+
+_toon_bin() {
+  command -v toon 2>/dev/null && return 0
+  local root
+  root=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+  bash "$root/nix-tool.sh" resolve toon 2>/dev/null
+}
 
 toon_emit() {
   case "${FORMAT:-toon}" in
     json) cat ;;
-    text) if [ "$#" -gt 0 ]; then "$@"; else toon -e; fi ;;
-    *) toon -e ;;
+    text) if [ "$#" -gt 0 ]; then "$@"; else "$(_toon_bin)" -e; fi ;;
+    *) "$(_toon_bin)" -e ;;
   esac
 }
 
@@ -28,6 +38,6 @@ toon_ingest() {
   if printf '%s' "$body" | jq -e . >/dev/null 2>&1; then
     printf '%s' "$body"
   else
-    printf '%s' "$body" | toon -d
+    printf '%s' "$body" | "$(_toon_bin)" -d
   fi
 }

@@ -23,36 +23,15 @@ BLOG_DIR="/home/devji/Documents/shaoyanji.is-a.dev"  # host-path-ok: where the b
 [ -d "$BLOG_DIR" ] || BLOG_DIR="${BLOG_DIR/#\/home\/devji/$HOME}"
 # qmd is not on every host's PATH (delphi carries the agents but not qmd), and a
 # gate that cannot run is not a gate — so resolve it instead of refusing.
-# Order: an explicit QMD_BIN, then PATH, then the llm-agents revision pinned in
-# flake.lock, built once into a GC-rooted out-link. Same pattern as
-# scripts/task/nix-fmt.sh, and `--builders ""` so resolving a tool never spends
-# remote build budget.
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig-qmd"
-
+# Order: an explicit QMD_BIN, then the shared nix-tool contract (PATH, then the
+# flake.lock pin built once into a GC-rooted out-link).
 resolve_qmd() {
   if [ -n "${QMD_BIN:-}" ]; then
     command -v "$QMD_BIN" >/dev/null 2>&1 || return 1
     printf '%s\n' "$QMD_BIN"
     return 0
   fi
-  if command -v qmd >/dev/null 2>&1; then
-    command -v qmd
-    return 0
-  fi
-  command -v nix >/dev/null 2>&1 || return 1
-  local installable link
-  installable="$(jq -r '.nodes["llm-agents"].locked
-                     | select(.type == "github")
-                     | "github:\(.owner)/\(.repo)/\(.rev)"' "$REPO/flake.lock" 2>/dev/null)" || true
-  [ -n "$installable" ] || return 1
-  link="$CACHE_DIR/qmd"
-  if [ ! -x "$link/bin/qmd" ]; then
-    echo "==> qmd is not on PATH; resolving the llm-agents pin from flake.lock (once)" >&2
-    mkdir -p "$CACHE_DIR"
-    nix build "${installable}#qmd" --out-link "$link" --builders "" >/dev/null 2>&1 || return 1
-  fi
-  [ -x "$link/bin/qmd" ] || return 1
-  printf '%s\n' "$link/bin/qmd"
+  bash "$REPO/scripts/task/nix-tool.sh" resolve qmd
 }
 
 if ! QMD="$(resolve_qmd)"; then

@@ -63,8 +63,10 @@ dispatch() {  # dispatch <lane> <question> -> TOON answer on stdout
       (cd "$REPO" && bash scripts/task/notes.sh near "$q" 6) | head -40
       ;;
     qmd-prose)
-      command -v qmd >/dev/null 2>&1 || { echo '{"error":"qmd not on PATH"}'; return 1; }
-      qmd search "$q" -c nixconfig --format json 2>/dev/null | jq -c '.[:8] // .'
+      local qmd_bin
+      qmd_bin=$(bash "$REPO/scripts/task/nix-tool.sh" resolve qmd 2>/dev/null) \
+        || { echo '{"error":"qmd unresolvable"}'; return 1; }
+      "$qmd_bin" search "$q" -c nixconfig --format json 2>/dev/null | jq -c '.[:8] // .'
       ;;
     eval-compiled)
       jq -cn --arg q "$q" '{

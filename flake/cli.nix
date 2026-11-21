@@ -142,7 +142,10 @@
       agy-gemini.pkg =
         (pkgs.writeShellApplication {
           name = "agy-gemini";
-          runtimeInputs = [inputs.llm-agents.packages.${system}.antigravity-cli];
+          # No runtimeInputs: antigravity-cli is resolved at call time —
+          # PATH first, then `nix run` fresh off the numtide cache, so the
+          # wrapper's closure never bakes the agy package and never pins it.
+          runtimeInputs = [pkgs.nix];
           text = ''
             usage() {
               cat <<'EOF'
@@ -198,7 +201,10 @@
               args+=(--effort "$AGY_GEMINI_EFFORT")
             fi
 
-            exec agy "''${args[@]}" "$@"
+            if command -v agy >/dev/null 2>&1; then
+              exec agy "''${args[@]}" "$@"
+            fi
+            exec nix run "github:numtide/llm-agents.nix#antigravity-cli" -- "''${args[@]}" "$@"
           '';
         })
         .overrideAttrs (old: {

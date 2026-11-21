@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T08:27:17Z",
+  "generated": "2026-11-21T08:44:00Z",
   "count": 200,
-  "pin": "2ccd4e5111def674293e394276797a18172e517bc38e0bac9b920351fd09c750",
+  "pin": "6a048dfe62b86ceb14dce1bf1a89a7130a84d5ed87feac2926caa535a26d4c33",
   "turns": [
+    {
+      "id": "724795f4-615b-44e7-b1c9-a56f5d1f80ed",
+      "ts": "2026-11-21T08:27:22Z",
+      "source": "devin",
+      "subject": "nixconfig:fusion-lane",
+      "action": "landed: agents:lane (jev classifies intent -> kg/notes/qmd/eval/ledger, selected dispatches, needs_review exits 2) + checks:fusion gate (frieren projection fresh, 629 turns/236 notes, lag ~1.7h); agent-lane-plane DELIVERED, 8/10 selected on natural questions | gate: checks:quick PASS, checks:fusion fresh",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e206908cb202ebd67469e1e893163444031f5bf3",
+      "branch": "main",
+      "frame": "03h9yaon80rvxzsl21s0p399k"
+    },
     {
       "id": "b2e159c2-fb96-4c94-a63a-476771d98efb",
       "ts": "2026-11-21T08:22:14Z",
@@ -2725,19 +2738,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9vgldin1sabiyfp0x5dxrk"
-    },
-    {
-      "id": "a6e9bbb1-beff-4af6-b210-8c748913700a",
-      "ts": "2026-11-20T23:43:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-ats-audit",
-      "action": "verified, no edits needed: both templates already carry the ATS fix (grid/#link/footer-name 0, tracking only in comments); cv.typ compiled x4 from the build's own cv.json and lebenslauf.typ de+en, all rc=0; cv-ats-check PASS 4/4, 0 /URI, headings in reading order, name on line 1, page2 footer is '2/2' only | gate: typst compile + cv-ats-check + pdftotext PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
-      "branch": "main",
-      "frame": "03h9vgftzkxlipbg82mqri8fr"
     }
   ]
 }

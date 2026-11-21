@@ -280,6 +280,19 @@ tasks:
     cmds:
       - FORMAT="{{.FORMAT}}" bash scripts/task/agent-lane.sh --corpus "{{.N | default 20}}"
 
+  agents:agy:
+    desc: "agy through the nix-tool shim: PATH first, else the flake.lock pin built once — no closure needed"
+    summary: >
+      scripts/task/nix-tool.sh run agy — the alias for calling antigravity-cli
+      on a host that does not bake it. Resolution is PATH, then a fresh fetch
+      off the llm-agents flake (cache.numtide.com serves the category — the pin
+      is deliberately NOT honored: these tools ride upstream HEAD). The result
+      lands in a GC-rooted link under ~/.cache/nixconfig-tools/ so a resolved
+      tool costs a `command -v`, not a nix eval. `nix-tool.sh registry` lists
+      every mapped name (qmd, toon, ai-memory, agent-browser, dsh, …).
+    cmds:
+      - bash scripts/task/nix-tool.sh run agy {{.CLI_ARGS}}
+
   agents:dispatch:
     desc: "One command for the Infron backup queue: KIND=auto|code|quick, MODEL=auto|primary|backup, AGENT=, DRY=1, JSON=1"
     summary: >

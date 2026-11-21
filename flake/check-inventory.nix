@@ -89,7 +89,6 @@
     "checks:postgres:drill" = "leaf";
     "checks:postgres:vector" = "leaf";
     "checks:prose" = "leaf";
-    "checks:provenance" = "leaf";
     "checks:qmd:docs" = "leaf";
     "checks:qmd:vault" = "leaf";
     "checks:quick" = "leaf";

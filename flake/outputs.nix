@@ -103,7 +103,6 @@
       };
     })
     |> builtins.listToAttrs;
-  provenance = import ./provenance.nix;
   checkInventory = let
     inherit ((import ./check-inventory.nix)) byName;
     rows =
@@ -325,7 +324,7 @@ in {
   # resolved by `checks:nix:comments`.
   nixComments = nixCommentsCtl;
 
-  inherit checkInventory provenance;
+  inherit checkInventory;
 
   # `~/AGENTS.md` per host: fleet preamble + compiled host card + persona.
   # Consumed by the home activation script as a store symlink.

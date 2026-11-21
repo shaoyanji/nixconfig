@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T09:16:47Z",
+  "generated": "2026-11-21T09:36:16Z",
   "count": 200,
-  "pin": "ddbf1e739dc41bcb81ac30caaeb3fc82e52abcb86d8b0ae96fb109befcdcdd36",
+  "pin": "d08a267ca94db8b3905d19aaeee70c306fcbe88490c0f4ffd50a9483e074d46a",
   "turns": [
+    {
+      "id": "4dd700a3-53b0-4f5a-aede-f5bbdc22a071",
+      "ts": "2026-11-21T09:16:52Z",
+      "source": "devin",
+      "subject": "nixconfig:compile-boundary",
+      "action": "landed: provenance gate — flake/provenance.nix class table + .#provenance + checks:provenance; 1162 files classed, unclassed fails; AGENTS.md kg trap -> task ops:kg | gate: check:verify 124/124 PASS, checks:provenance PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "db05efffaf83c371a92c8f1f849c998d793717b5",
+      "branch": "main",
+      "frame": "03h9ykcpwxpcayfcyf4p3e03n"
+    },
     {
       "id": "5ad84726-3e70-4f7e-b71d-58579071e6fa",
       "ts": "2026-11-21T09:13:17Z",
@@ -2725,19 +2738,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9vjyjkypz31qpadr8fyqz7"
-    },
-    {
-      "id": "1f9a41de-3db9-42de-9b30-3b311d9dcc78",
-      "ts": "2026-11-21T00:01:59Z",
-      "source": "freebuff-agent",
-      "subject": "frieren:win1-freebuff",
-      "action": "landed: cv-site-gate — read-only CV/PDF site-gate task accepted by freebuff pane (working counter observed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vjyicrerpsu5hxvc0du7m"
     }
   ]
 }

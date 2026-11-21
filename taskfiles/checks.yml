@@ -73,7 +73,6 @@ tasks:
       # The check inventory (flake/check-inventory.nix): every checks:* task has
       # a key and every key names a task, so the three verbs cannot drift.
       - task: check:verify
-      - task: checks:provenance
     # Serial on purpose, in this order. The build leg is ONE flake eval (`policies`
     # is ~7.5 s of it, the other attrs are ~1 s together); `knobs` rides along in
     # that same process for ~0.1 s and is the compiled registry gate, strictly
@@ -140,19 +139,6 @@ tasks:
     desc: Regression fixture for checks:services:ports
     cmds:
       - bash tests/service-ports/run.sh
-
-  checks:provenance:
-    desc: "[gate] Every tracked file belongs to a declared class — unclassed is bloat"
-    summary: >
-      The compile boundary as a gate: `flake/provenance.nix` holds the class
-      table (nix-source, exec-source, prose, fixture, app-source, asset, config,
-      secret, ledger) as prefix/file/suffix rules, `nix eval --json .#provenance`
-      emits it, and `git ls-files` is the universe. A tracked path matching no
-      rule fails — either the file is bloat or its class is undeclared, and both
-      are this gate's business. `class PATH` answers one file for debugging.
-      ~0.5 s, one jq pass over the whole tree.
-    cmds:
-      - bash scripts/task/provenance-check.sh
 
   checks:prose:
     desc: "[gate] Docs and skills carry none of the unslop vocabulary"

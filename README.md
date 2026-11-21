@@ -30,7 +30,7 @@ flake/policies ──► 123 checks             # gates that prove, not prose th
 
 | Read | Why it's the interesting one |
 | :--- | :--- |
-| [`flake/policies.nix`](flake/policies.nix) | Every policy names its rule and its executable proof — including a comment census and a prose budget where growing docs is a decision with a diff |
+| [`flake/policies.nix`](flake/policies.nix) | Every policy names its rule and its executable proof — a comment census [[flake/policies.nix#nix-comments-are-pointers]] and a prose budget [[flake/policies.nix#agent-prose-budget]] where growth is a decision with a diff |
 | [`lib/knowledge-graph.nix`](lib/knowledge-graph.nix) | A graph database compiled in Nix; `checks:kg` has caught real regressions a typecheck couldn't |
 | [`modules/services/llm-decision-router/`](modules/services/llm-decision-router) | A Go router that classifies provider vs. request errors — a malformed request never silently falls through to a weaker model |
 | [`modules/services/fleet-sentinel.nix`](modules/services/fleet-sentinel.nix) | The closed loop: a ledger, a health gate, and a runbook, because a green socket is not a finished job |

@@ -10,12 +10,12 @@ metadata:
 
 # mail-alias — disposable forwarding addresses
 
-One domain forwards to one inbox: `@mail.shaoyanji.is-a.dev` → `jisifu@gmail.com`.
+One domain forwards to one inbox: `@mail.shaoyanji.is-a.dev` → the operator's gmail (`modules/global/user.nix`).
 An alias is per-service on purpose. When mail starts arriving from somewhere you
 never signed up for, the local part names the service that leaked or sold it, and
 revoking one address is a single command.
 
-`jisifu@gmail.com` cannot be un-given; a per-service alias can, and revoking it
+A gmail already handed out cannot be un-given; a per-service alias can, and revoking it
 is a record of what leaked. Any service that is not a primary identity gets an
 alias, not the inbox.
 

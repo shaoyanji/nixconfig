@@ -70,7 +70,7 @@ def clean_slug(name: str) -> str:
     # Strip protocol / www
     s = re.sub(r"^https?://", "", s, flags=re.I)
     s = re.sub(r"^www\.", "", s, flags=re.I)
-    # Strip trailing usernames / emails like :jisifu@gmail.com
+    # Strip trailing usernames / emails like :user@gmail.com
     if ":" in s:
         s = s.split(":", 1)[0].strip()
     if "@" in s:

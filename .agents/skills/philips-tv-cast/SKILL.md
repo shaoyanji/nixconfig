@@ -99,8 +99,8 @@ Exit 0 means the set really is playing: `PLAYING  rel=0:00:04 dur=1:38:40`.
 ## Plex: the better path, not wired yet
 
 frieren runs Plex Media Server 1.43.4 on 32400 with `Movies`/`Music`/`Photos`/`Other Videos`,
-and the set has a native Plex app. The server was **claimed on 2026-11-11** to
-`jisifu@gmail.com`: `/myplex/claim` returned 200 with `signInState="ok"`, `identity` reads
+and the set has a native Plex app. The server was **claimed on 2026-11-11** to the
+operator's gmail: `/myplex/claim` returned 200 with `signInState="ok"`, `identity` reads
 `claimed="1"`, and the token is `PlexOnlineToken` in
 `/srv/private/plex/Plex Media Server/Preferences.xml` (`PLEX_DATADIR=/srv/private/plex`).
 Read the token from that file rather than copying it into a secret — one credential, one

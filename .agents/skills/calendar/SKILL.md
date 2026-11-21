@@ -80,8 +80,8 @@ port open first with `ssh -N -L <port>:127.0.0.1:<port> <host>`.
 (`invalid_grant`, `403 accessNotConfigured`) is fatal and named, while a
 per-item error is warned about and the rest of the sync still counts.
 
-**Known skipped item:** `WEBEX-MEETING%2BCENTER-6.0418931-1376670602.ics` on
-`jisifu@gmail.com` — Google's multiget returns no properties for that href, so
+**Known skipped item:** `WEBEX-MEETING%2BCENTER-6.0418931-1376670602.ics`,
+on the `jisifu` gmail account — Google's multiget returns no properties for that href, so
 vdirsyncer logs *"properties are missing"* and raises `NotFound` every run. One
 event, not a sync failure; `verify` reports it under `skipped`.
 

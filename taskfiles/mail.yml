@@ -1,6 +1,6 @@
 version: "3"
 
-# Mail forwarding on ImprovMX (mail.shaoyanji.is-a-dev → jisifu@gmail.com).
+# Mail forwarding on ImprovMX (mail.shaoyanji.is-a-dev → the operator gmail).
 #
 # Why a shard: the alias set is a disposable-address policy, not a host config.
 # A per-service address is what makes a leak traceable and a signup revocable,
@@ -36,7 +36,7 @@ tasks:
   mail:alias:add:
     desc: Create a forwarding alias (NAME= required)
     summary: >
-      NAME is the local part only. FORWARD= defaults to jisifu@gmail.com.
+      NAME is the local part only. FORWARD= defaults to the operator gmail (`modules/global/user.nix`).
       KIND=permanent|temporary, EXPIRES=YYYY-MM-DD, NOTE= free text. Creates      on the API first and only then records the registry, so a failed create
       leaves no phantom declaration. Exit 2 when the alias is not live
       afterwards (a duplicate, a malformed local part, an unreachable API).

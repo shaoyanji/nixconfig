@@ -372,6 +372,20 @@ tasks:
     cmds:
       - bash scripts/task/blog-export.sh "{{.SLUG}}" {{.FLAGS}}
 
+  dev:blog:cv:check:
+    desc: "[gate] the is-a.dev site publishes this build's CVs and links every one"
+    summary: >
+      The CVs are built here and copied into the blog checkout's
+      `assets/files/`, so drift has two shapes: an anchor whose file is a
+      build behind, and a CV added here that no page links. Each published PDF
+      must hash equal to `.#sites.matt-site`, and in the built `_site` it must
+      be the target of an anchor carrying `download` that resolves to a file.
+      The generic link sweep stays the blog's own `htmlproofer _site`. Env:
+      BLOG_REPO, ARTIFACT, SITE, REQUIRED. Exit 2 with no checkout or `_site`;
+      an operator gate, never a `checks:quick` dep.
+    cmds:
+      - bash scripts/task/cv-blog-check.sh
+
   dev:blog:mataroa:
     desc: "The mataroa console's ledger: local markdown files against the blog (TOON; FORMAT=text, CONSOLE=url)"
     summary: >

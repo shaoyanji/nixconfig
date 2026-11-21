@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T01:27:19Z",
+  "generated": "2026-11-21T01:28:54Z",
   "count": 200,
-  "pin": "74812642135eeadc6d6ebb662cc5fbf8d8a83f81d2f084baf85cb13239194cf5",
+  "pin": "d3284d631e8c8f07043157ea1eeb5ccd0a4ee67ebc62d397dde9a5fca7e7091b",
   "turns": [
+    {
+      "id": "7c495d94-5979-4b7a-b311-4f08b935a397",
+      "ts": "2026-11-21T01:27:38Z",
+      "source": "devin",
+      "subject": "nixconfig:ai-modules-review",
+      "action": "landed: lib/systemd-jobs.nix shared home for mkDaemon/mkTimerJob (4 call sites) + hermes-user mkUserDaemon (4 user daemons); emitted units byte-identical frieren+delphi | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "df74925d1ffa3c0c5b287fc44adb6e20658beda2",
+      "branch": "main",
+      "frame": "03h9w0own3jk0u5boxks053pp"
+    },
     {
       "id": "78c32b0b-e0bf-44e8-8578-e26d208cd2f8",
       "ts": "2026-11-21T01:25:04Z",
@@ -2678,19 +2691,6 @@
       "base_commit": "27e26469cecc25d3ee5073e53846f98e2b6f4b97",
       "branch": "main",
       "frame": "03h9rjllwlnzt81asdfzcdv4k"
-    },
-    {
-      "id": "f2ac6e6c-2931-415a-9229-cf1ac275993a",
-      "ts": "2026-11-20T11:39:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:ats-resume",
-      "action": "landed: report records that task apps:build compiles the workflow checkout's own src/templates (dist PDFs still extract uppercase headings and carry 2-3 link annots; apps:audit passes them on page/orphan checks only) | gate: apps:audit PASS, 110 documents, 0 violations",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27e26469cecc25d3ee5073e53846f98e2b6f4b97",
-      "branch": "main",
-      "frame": "03h9riwhkodkfssjxg27w3q29"
     }
   ]
 }

@@ -83,6 +83,19 @@
     echo "PASS: Paperless ingestion pipeline verified."
     exit 0
   '';
+
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
+  job = systemdJobs.mkTimerJob {Type = "oneshot";} {
+    description = "Paperless document ingestion watchdog and pipeline health probe";
+    timerDescription = "Scheduled Paperless ingestion watchdog timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "10m";
+    serviceConfig = {
+      ExecStart = "${watchdogScript}/bin/paperless-watchdog";
+      ProtectSystem = "full";
+      PrivateTmp = true;
+    };
+  };
 in {
   options.services.paperlessWatchdog = {
     enable = lib.mkEnableOption "declarative Paperless-ngx document ingestion watchdog & pipeline health probe";
@@ -123,25 +136,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.paperless-watchdog = {
-      description = "Paperless document ingestion watchdog and pipeline health probe";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${watchdogScript}/bin/paperless-watchdog";
-        ProtectSystem = "full";
-        PrivateTmp = true;
-      };
-    };
-
-    systemd.timers.paperless-watchdog = {
-      description = "Scheduled Paperless ingestion watchdog timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "10m";
-      };
-    };
+    systemd.services.paperless-watchdog = job.service;
+    systemd.timers.paperless-watchdog = job.timer;
 
     environment.systemPackages = [watchdogScript];
   };

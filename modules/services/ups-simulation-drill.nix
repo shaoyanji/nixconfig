@@ -110,6 +110,20 @@
       exit 1
     fi
   '';
+
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
+  job = systemdJobs.mkTimerJob {Type = "oneshot";} {
+    description = "Hardware UPS simulation drill and battery telemetry";
+    timerDescription = "Scheduled hardware UPS simulation drill timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "10m";
+    serviceConfig = {
+      ExecStart = "${drillScript}/bin/ups-drill";
+      ProtectSystem = "strict";
+      ProtectHome = "read-only";
+      PrivateTmp = true;
+    };
+  };
 in {
   options.services.upsSimulationDrill = {
     enable = lib.mkEnableOption "declarative hardware UPS clean-poweroff simulation drill and telemetry";
@@ -146,26 +160,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.ups-simulation-drill = {
-      description = "Hardware UPS simulation drill and battery telemetry";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${drillScript}/bin/ups-drill";
-        ProtectSystem = "strict";
-        ProtectHome = "read-only";
-        PrivateTmp = true;
-      };
-    };
-
-    systemd.timers.ups-simulation-drill = {
-      description = "Scheduled hardware UPS simulation drill timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "10m";
-      };
-    };
+    systemd.services.ups-simulation-drill = job.service;
+    systemd.timers.ups-simulation-drill = job.timer;
 
     environment.systemPackages = [drillScript];
   };

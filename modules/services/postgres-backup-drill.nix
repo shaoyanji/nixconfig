@@ -141,6 +141,21 @@
     echo "PASS: All PostgreSQL backups successfully verified and restored in ephemeral cluster."
     exit 0
   '';
+
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
+  job = systemdJobs.mkTimerJob {Type = "oneshot";} {
+    description = "PostgreSQL logical backup verification drill";
+    timerDescription = "Scheduled PostgreSQL backup verification drill timer";
+    onCalendar = cfg.schedule;
+    randomizedDelaySec = "5m";
+    serviceConfig = {
+      User = "postgres";
+      Group = "postgres";
+      ExecStart = "${drillScript}/bin/postgres-backup-drill";
+      ProtectSystem = "full";
+      PrivateTmp = true;
+    };
+  };
 in {
   options.services.postgresBackupDrill = {
     enable = lib.mkEnableOption "declarative PostgreSQL logical backup verification drill";
@@ -171,27 +186,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.services.postgres-backup-drill = {
-      description = "PostgreSQL logical backup verification drill";
-      serviceConfig = {
-        Type = "oneshot";
-        User = "postgres";
-        Group = "postgres";
-        ExecStart = "${drillScript}/bin/postgres-backup-drill";
-        ProtectSystem = "full";
-        PrivateTmp = true;
-      };
-    };
-
-    systemd.timers.postgres-backup-drill = {
-      description = "Scheduled PostgreSQL backup verification drill timer";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.services.postgres-backup-drill = job.service;
+    systemd.timers.postgres-backup-drill = job.timer;
 
     environment.systemPackages = [drillScript];
   };

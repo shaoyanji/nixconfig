@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T02:46:38Z",
+  "generated": "2026-11-21T02:47:08Z",
   "count": 200,
-  "pin": "093b6aa6620d676d49c3e021a644675c78c868f165f4d11922cd32c3f0f8e635",
+  "pin": "ab38f949a8d93f780325e2c48281358694346fb6d6713cdd1a97278d9d0dfc11",
   "turns": [
+    {
+      "id": "9c5fe5c7-1767-43c2-8152-2c090ede0fca",
+      "ts": "2026-11-21T02:46:50Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-gate",
+      "action": "landed: CV + Lebenslauf PDFs are UA-1 tagged with real /H1 heading elements (was bold text only), cv-ats-check refuses an untagged PDF, cv.typ states hyphenate:false, and the heading element's 5.1pt paragraph gap is cancelled in cv.typ so budgets stay 2/2/1/1; durable link gate already in the build, proved by an injected unlinked PDF failing nix build rc=1 | gate: nix build .#sites.matt-site PASS, checks:site:links:test PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "388cd05dc57c73d14e7259529f2a59d5aa14a845",
+      "branch": "main",
+      "frame": "03h9wg65iast3q3j4irak8fxq"
+    },
     {
       "id": "e8503467-a0a1-45ac-b0d9-c6550f7f6256",
       "ts": "2026-11-21T02:44:50Z",
@@ -2686,21 +2699,6 @@
       "base_commit": "a2a982cf652ddb297f8995b3ac9e96a591361d42",
       "branch": "main",
       "frame": "03h9rx1qn4tl67k89kuk7sbi5"
-    },
-    {
-      "id": "d92b402b-2b0b-4b52-973f-5e19fd476ff9",
-      "ts": "2026-11-20T12:49:38Z",
-      "source": "devin",
-      "subject": "fleet-remote:pr-review",
-      "action": "landed: reviewed PRs #3+#4 together — found README tail conflict (both appended at EOF), fixed in #4 by moving Repository layout between Features and Build and test; re-verified clean merge in BOTH orders, CI debug x2 PASS on amended aaf9759; scaffold phases/paths match device-agent.md | gate: cross-merge 2x clean, CI PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "README.md"
-      ],
-      "base_commit": "8b6561dd216d4d6c29d5a1cfc1898303006481d8",
-      "branch": "main",
-      "frame": "03h9rwmam40m5yfcp79pu0c2f"
     }
   ]
 }

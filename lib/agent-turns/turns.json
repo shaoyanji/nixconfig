@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T09:06:01Z",
+  "generated": "2026-11-21T09:12:41Z",
   "count": 200,
-  "pin": "e26c601ad3bbfb42cdbad725434068a61fb008db58ab629f440bd5e6ad543410",
+  "pin": "cffcb3ff01f9cd540cf353f157e48c102d837565a6abb2fec06e4f0124c7b3b4",
   "turns": [
+    {
+      "id": "b65e4a9e-cb29-4c00-9aaa-ecc14076730b",
+      "ts": "2026-11-21T09:06:05Z",
+      "source": "devin",
+      "subject": "nixconfig:fusion-lane",
+      "action": "landed: docs purge — deleted docs/qmd-embedding-offload.md + hosts/eisen/laya-HANDOFF.md after full reference audit; frieren deployed (new agy-gemini wrapper serving fresh 1.5.13, systemd running) | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "29e5211b2f279b92d618bed6b9f43f6adb7e159c",
+      "branch": "main",
+      "frame": "03h9yi8wgwwz4lg43sfhaqfe6"
+    },
     {
       "id": "49812fca-de96-489c-ba63-d9736ab435a5",
       "ts": "2026-11-21T08:49:23Z",
@@ -2725,19 +2738,6 @@
       "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
       "branch": "main",
       "frame": "03h9vis5u9vcbhv49xdz3w223"
-    },
-    {
-      "id": "1b52426b-a6d4-4609-9036-4a15f09ed3e3",
-      "ts": "2026-11-20T23:51:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-leak-gate",
-      "action": "leak gate continued: --pages CV-packet work is already committed (9c740ada) and on origin/main, local==origin==d8217e59, nothing to commit or push; site-links full PASS (81 links/15 pages, 4/4 PDFs linked, 16 anchors download), --gap PASS, fixture 14/14, hostpaths 1151 files PASS. Finding: all 4 live CV PDFs on matt.bountystash.com hash-differ from the built artifact — deploy is stale, not a gate failure",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
-      "branch": "main",
-      "frame": "03h9vhwrb4yei1momw8fvrp4t"
     }
   ]
 }

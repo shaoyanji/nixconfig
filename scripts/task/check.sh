@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check.sh — the three verbs over the check inventory (taskfiles/checks.toml).
+# check.sh — the three verbs over the check inventory (flake/check-inventory.nix).
 #
 #   check.sh list [leaf|host|cache]     the table, with each task's live description
 #   check.sh verify                     every row names a task, every task has a row
@@ -13,16 +13,16 @@
 # input), a host gate (one host) or a cache gate (asks a substituter) — which is
 # what makes three verbs enough.
 #
-# The table is TOML, which Nix imports natively, so the rows come from
-# `nix eval --raw .#checkInventory.tsv` (builtins.fromTOML in flake/outputs.nix)
-# instead of from a TOML parser in this script. Zero dependencies: the only
-# binary in that path is the `nix` a `task` already needs.
+# The inventory is a Nix attrset, so the rows come from
+# `nix eval --raw .#checkInventory.tsv` (flake/check-inventory.nix, read by
+# flake/outputs.nix) instead of from a parser in this script. Zero
+# dependencies: the only binary in that path is the `nix` a `task` already needs.
 #
 # Exit: 0 clean · 1 the table and the tree disagree · 2 usage.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-table="$root/taskfiles/checks.toml"
+table="$root/flake/check-inventory.nix"
 
 die() {
   echo "check: $*" >&2

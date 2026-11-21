@@ -71,7 +71,7 @@ task checks:qmd:docs             # qmd docs collection exists + index fresh
 ```
 
 ### Three verbs over the check table
-`taskfiles/checks.toml` holds one row per `checks:*` gate and its kind — `leaf`
+`flake/check-inventory.nix` holds one key per `checks:*` gate and its kind — `leaf`
 (no input), `host` (one host), `cache` (asks a substituter). The command,
 description and summary stay in the taskfile; the table owns only the kind,
 which a taskfile cannot express. `check:leaf|host|cache` dispatch through it and

@@ -690,8 +690,7 @@ lib.genAttrs systems.work (
         schema = import ../lib/registry-schema.nix;
         inherit ((builtins.fromTOML (builtins.readFile ../modules.toml))) knobs;
         ids = builtins.attrNames knobs;
-        checks = (builtins.fromTOML (builtins.readFile ../taskfiles/checks.toml)).check;
-        checkNames = map (r: r.name) checks;
+        checkNames = builtins.attrNames (import ./check-inventory.nix).byName;
         inherit ((builtins.fromTOML (builtins.readFile ../inventory.toml))) hosts;
         hostNames = builtins.attrNames hosts;
 

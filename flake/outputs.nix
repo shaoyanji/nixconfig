@@ -104,7 +104,13 @@
     })
     |> builtins.listToAttrs;
   checkInventory = let
-    rows = (builtins.fromTOML (builtins.readFile ../taskfiles/checks.toml)).check;
+    byName = (import ./check-inventory.nix).byName;
+    rows =
+      map (name: {
+        inherit name;
+        kind = byName.${name};
+      })
+      (builtins.attrNames byName);
   in {
     inherit rows;
     names = map (r: r.name) rows;

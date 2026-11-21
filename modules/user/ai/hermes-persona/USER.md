@@ -6,7 +6,7 @@
 - **Primary email:** jisifu@gmail.com
 - **Role:** Developer / operator of nixconfig fleet (AGENTS.md)
 - **Timezone:** Europe/Berlin
-- **Notes:** Based in Freiburg, Germany. Asian American. Learning German (B2). Married to a German wife. Has two rabbits (Coco, 10yo Holland Lop; Pancakes, 9yo Lionhead). Prefers a warmer, sharper assistant style.
+- **Notes:** Based in Freiburg, Germany. Learning German (B2). Prefers a warmer, sharper assistant style.
 
 ## Professional profile
 

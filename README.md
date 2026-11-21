@@ -1,8 +1,46 @@
 # nixconfig
 
-![nixconfig: one snowflake blueprint unfolding into a row of identical machines](https://res.cloudinary.com/de1eajx01/image/upload/f_auto,q_auto,w_1200/assets/repos/nixconfig)
+![nixconfig: an elven mage contemplating a constellation of machines built from one flake](https://res.cloudinary.com/de1eajx01/image/upload/f_auto,q_auto,w_1200/assets/repos/nixconfig-v2)
+
+**A personal knowledge civilization, compiled.** One flake describes 38 machines
+— a NAS, a netbook, a phone, an Oracle free-tier outpost — and every fact about
+them lives as data a machine can answer, because an operator's memory is the
+least reliable database in the fleet.
 
 Multi-host Nix flake for NixOS, nix-darwin, Home Manager, and WSL-style container hosts.
+
+## The thesis
+
+Deterministic queries beat both recall and inference. The repo compiles its own
+description — inventory, module graph, decision log, knowledge graph — so a
+question like *"what touches this host"* is `task ops:kg:host HOST=eisen`, not a
+grep and not a guess. Agents that work in this tree consume the compiled
+surfaces first; a model is invoked only for the residue no deterministic plane
+can answer.
+
+```nix
+inventory.toml ──► .#inventory.hosts      # hardware, network, status — 38 hosts
+AGENTS.nix     ──► .#agentsNotes          # 185 decisions/proposals as data
+.agents/skills ──► .#agentSkills          # 63 procedures, one line each
+docs + modules ──► .#knowledgeGraph       # ~2,000 nodes: what touches what
+flake/policies ──► 123 checks             # gates that prove, not prose that asserts
+```
+
+## Start here
+
+| Read | Why it's the interesting one |
+| :--- | :--- |
+| [`flake/policies.nix`](flake/policies.nix) | Every policy names its rule and its executable proof — including a comment census and a prose budget where growing docs is a decision with a diff |
+| [`lib/knowledge-graph.nix`](lib/knowledge-graph.nix) | A graph database compiled in Nix; `checks:kg` has caught real regressions a typecheck couldn't |
+| [`modules/services/llm-decision-router/`](modules/services/llm-decision-router) | A Go router that classifies provider vs. request errors — a malformed request never silently falls through to a weaker model |
+| [`modules/services/fleet-sentinel.nix`](modules/services/fleet-sentinel.nix) | The closed loop: a ledger, a health gate, and a runbook, because a green socket is not a finished job |
+| [`inventory.toml`](inventory.toml) | The single source the whole fleet projects from |
+
+Live render: **[shaoyanji.github.io/nixconfig](https://shaoyanji.github.io/nixconfig)** —
+the compiled documentation site, rebuilt on every push.
+
+Case studies: [`docs/showcase.md`](docs/showcase.md) — three incidents the
+architecture caught, told at commit resolution.
 
 ## Layout
 

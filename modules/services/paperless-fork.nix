@@ -131,6 +131,28 @@
     ];
     UMask = "0066";
   };
+
+  pgTarget = lib.optional cfg.database.createLocally "postgresql.target";
+  mkDaemon = extra:
+    {
+      requires = pgTarget;
+      after = (extra.after or []) ++ pgTarget;
+      unitConfig =
+        {
+          X-Fleet-Role = "daemon";
+          StartLimitIntervalSec = 0;
+        }
+        // (extra.unitConfig or {});
+      serviceConfig =
+        defaultServiceConfig
+        // {
+          User = cfg.user;
+          Restart = "on-failure";
+        }
+        // (extra.serviceConfig or {});
+      environment = extra.environment or env;
+    }
+    // removeAttrs extra ["after" "unitConfig" "serviceConfig" "environment"];
 in {
   disabledModules = ["services/misc/paperless.nix"];
 
@@ -544,31 +566,25 @@ in {
           '';
         };
 
-        systemd.services.paperless-scheduler = {
-          unitConfig.X-Fleet-Role = "daemon";
-          unitConfig.StartLimitIntervalSec = 0;
+        systemd.services.paperless-scheduler = mkDaemon {
           description = "Paperless Celery Beat";
           wantedBy = ["multi-user.target"];
+          after = lib.optional enableRedis "redis-paperless.service";
           wants = [
             "paperless-consumer.service"
             "paperless-web.service"
             "paperless-task-queue.service"
           ];
-          serviceConfig =
-            defaultServiceConfig
-            // {
-              User = cfg.user;
-              ExecStart = "${cfg.package}/bin/celery --app paperless beat --loglevel INFO";
-              Restart = "on-failure";
-              TimeoutStartSec = "10m";
-              LoadCredential =
-                lib.optionalString
-                (
-                  cfg.passwordFile != null
-                ) "PAPERLESS_ADMIN_PASSWORD:${cfg.passwordFile}";
-              PrivateNetwork = cfg.database.createLocally; # defaultServiceConfig enables this by default, needs to be disabled for remote DBs
-            };
-          environment = env;
+          serviceConfig = {
+            ExecStart = "${cfg.package}/bin/celery --app paperless beat --loglevel INFO";
+            TimeoutStartSec = "10m";
+            LoadCredential =
+              lib.optionalString
+              (
+                cfg.passwordFile != null
+              ) "PAPERLESS_ADMIN_PASSWORD:${cfg.passwordFile}";
+            PrivateNetwork = cfg.database.createLocally; # defaultServiceConfig enables this by default, needs to be disabled for remote DBs
+          };
           unitConfig.RequiresMountsFor = defaultServiceConfig.ReadWritePaths;
 
           preStart = ''
@@ -604,89 +620,50 @@ in {
               fi
             fi
           '';
-          requires = lib.optional cfg.database.createLocally "postgresql.target";
-          after =
-            lib.optional enableRedis "redis-paperless.service"
-            ++ lib.optional cfg.database.createLocally "postgresql.target";
         };
 
-        systemd.services.paperless-task-queue = {
-          unitConfig.X-Fleet-Role = "daemon";
-          unitConfig.StartLimitIntervalSec = 0;
+        systemd.services.paperless-task-queue = mkDaemon {
           description = "Paperless Celery Workers";
-          requires = lib.optional cfg.database.createLocally "postgresql.target";
-          after =
-            [
-              "paperless-scheduler.service"
-            ]
-            ++ lib.optional cfg.database.createLocally "postgresql.target";
-          serviceConfig =
-            defaultServiceConfig
-            // {
-              User = cfg.user;
-              ExecStart = "${cfg.package}/bin/celery --app paperless worker --loglevel INFO";
-              Restart = "on-failure";
-              # The `mbind` syscall is needed for running the classifier.
-              SystemCallFilter = defaultServiceConfig.SystemCallFilter ++ ["mbind"];
-              # Needs to talk to mail server for automated import rules
-              PrivateNetwork = false;
-            };
-          environment = env;
+          after = ["paperless-scheduler.service"];
+          serviceConfig = {
+            ExecStart = "${cfg.package}/bin/celery --app paperless worker --loglevel INFO";
+            # The `mbind` syscall is needed for running the classifier.
+            SystemCallFilter = defaultServiceConfig.SystemCallFilter ++ ["mbind"];
+            # Needs to talk to mail server for automated import rules
+            PrivateNetwork = false;
+          };
         };
 
-        systemd.services.paperless-consumer = {
-          unitConfig.X-Fleet-Role = "daemon";
-          unitConfig.StartLimitIntervalSec = 0;
+        systemd.services.paperless-consumer = mkDaemon {
           description = "Paperless document consumer";
           # Bind to `paperless-scheduler` so that the consumer never runs
           # during migrations
           bindsTo = ["paperless-scheduler.service"];
-          requires = lib.optional cfg.database.createLocally "postgresql.target";
-          after =
-            [
-              "paperless-scheduler.service"
-            ]
-            ++ lib.optional cfg.database.createLocally "postgresql.target";
-          serviceConfig =
-            defaultServiceConfig
-            // {
-              User = cfg.user;
-              ExecStart = "${lib.getExe cfg.package} document_consumer";
-              Restart = "on-failure";
-              PrivateNetwork = cfg.database.createLocally; # defaultServiceConfig enables this by default, needs to be disabled for remote DBs
-            };
-          environment = env;
+          after = ["paperless-scheduler.service"];
+          serviceConfig = {
+            ExecStart = "${lib.getExe cfg.package} document_consumer";
+            PrivateNetwork = cfg.database.createLocally; # defaultServiceConfig enables this by default, needs to be disabled for remote DBs
+          };
           # Allow the consumer to access the private /tmp directory of the server.
           # This is required to support consuming files via a local folder.
           unitConfig.JoinsNamespaceOf = "paperless-task-queue.service";
         };
 
-        systemd.services.paperless-web = {
-          unitConfig.X-Fleet-Role = "daemon";
-          unitConfig.StartLimitIntervalSec = 0;
+        systemd.services.paperless-web = mkDaemon {
           description = "Paperless web server";
           # Bind to `paperless-scheduler` so that the web server never runs
           # during migrations
           bindsTo = ["paperless-scheduler.service"];
-          requires = lib.optional cfg.database.createLocally "postgresql.target";
-          after =
-            [
-              "paperless-scheduler.service"
-            ]
-            ++ lib.optional cfg.database.createLocally "postgresql.target";
-          serviceConfig =
-            defaultServiceConfig
-            // {
-              User = cfg.user;
-              ExecStart = "${lib.getExe cfg.package.python.pkgs.granian} --interface asginl --ws paperless.asgi:application";
-              Restart = "on-failure";
+          after = ["paperless-scheduler.service"];
+          serviceConfig = {
+            ExecStart = "${lib.getExe cfg.package.python.pkgs.granian} --interface asginl --ws paperless.asgi:application";
 
-              LimitNOFILE = 65536;
-              # liblapack needs mbind
-              SystemCallFilter = defaultServiceConfig.SystemCallFilter ++ ["mbind"];
-              # Needs to serve web page
-              PrivateNetwork = false;
-            };
+            LimitNOFILE = 65536;
+            # liblapack needs mbind
+            SystemCallFilter = defaultServiceConfig.SystemCallFilter ++ ["mbind"];
+            # Needs to serve web page
+            PrivateNetwork = false;
+          };
           environment =
             env
             // {

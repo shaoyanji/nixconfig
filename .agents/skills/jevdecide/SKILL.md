@@ -17,8 +17,10 @@ Do not use it to write, summarise, plan or explain: it returns a label.
 
 ## The call, in its three shapes
 
-Always name the provider. The CLI's default is OpenRouter, which answers HTTP 402
-without credit; a silent default turns a decision into a payment error.
+`~/.local/bin/jev-decide` wraps the upstream CLI: the default provider is
+**typesafe** (`JEV_PROVIDER` overrides), an explicit `--provider` wins, and a
+transport failure (HTTP/dns/tls/timeout/connection/missing key) retries once on
+the other provider. Request-side errors never retry.
 
 ```bash
 # 1. Classify one text against described labels

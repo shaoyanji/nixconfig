@@ -562,6 +562,200 @@
       ${pkgs.bash}/bin/bash "$daily" publish || rc=$?
       exit $rc
     '';
+
+  burgernasPoweroff = pkgs.writeShellScript "burgernas-poweroff" ''
+    set -u
+    NAS=devji@192.168.3.92
+    KEY=/root/.ssh/id_ed25519
+    SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
+    # Only act when the NAS is up — a nightly error when it is already off
+    # would be pure noise. NB: this unit's PATH has coreutils but NOT
+    # `bash`, so use the absolute bash (a bare `bash -c` fails silently and
+    # the check would always report the NAS offline).
+    if ! timeout 5 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
+      echo "BurgerNAS offline; nothing to power off."
+      exit 0
+    fi
+    echo "BurgerNAS online at $(date -Is); powering off cleanly."
+    $SSH "$NAS" "sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff" || true
+  '';
+
+  burgernasLibrarySync = pkgs.writeShellScript "burgernas-library-sync" ''
+    set -eu
+    SRC="/Volumes/data"
+    # The host and the path stay separate values. Concatenated into one
+    # string they were both pasted into the `mkdir` that runs on the NAS,
+    # which created a literal `./devji@192.168.3.92:/volume1/...` tree in its
+    # home while rsync then failed on the path that was never made.
+    DEST_HOST="devji@192.168.3.92"
+    # The one lane is the export, so the bytes must live here.
+    # Why: [[flake/policies.nix#library-crosses-the-wire]]
+    DEST_PATH="/volume1/peachcable"
+    KEY="${user.home}/.ssh/id_ed25519"
+    SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
+
+    if ! timeout 5 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
+      echo "BurgerNAS offline; skipping library sync."
+      exit 0
+    fi
+
+    dirs="bin-x86 bin-aarch64 bin-script appimages"
+    # rsync creates only the final component, so the tree root goes first.
+    # The share already exists; this is a no-op there and a creation on a
+    # fresh NAS.
+    $SSH "$DEST_HOST" "mkdir -p '$DEST_PATH' '$DEST_PATH/bin-x86' '$DEST_PATH/bin-aarch64' '$DEST_PATH/bin-script' '$DEST_PATH/appimages'"
+    for dir in $dirs; do
+      [ -d "$SRC/$dir" ] || continue
+      echo "=== [$(date -Is)] mirroring $dir ==="
+      # -s (--protect-args) is required, not cosmetic: the remote path
+      # contains a space, and without it the *remote* shell splits it.
+      # --no-perms because DSM's shared folders are ACL-managed and chmod
+      # on the directory itself fails with EPERM, turning a successful
+      # transfer into rsync exit 23.
+      ${pkgs.rsync}/bin/rsync -azs --delete --partial --no-perms \
+        --exclude '.rejected' \
+        --exclude '@eaDir' \
+        --exclude '.DS_Store' \
+        --rsync-path=/usr/bin/rsync \
+        -e "$SSH" \
+        "$SRC/$dir/" "$DEST_HOST:$DEST_PATH/$dir/"
+    done
+    ${pkgs.rsync}/bin/rsync -qs --no-perms -e "$SSH" "$SRC/.library.tsv" "$DEST_HOST:$DEST_PATH/.library.tsv" || true
+    echo "=== [$(date -Is)] Library mirror finished. ==="
+  '';
+
+  # The six scheduled jobs below share one skeleton — a Type=oneshot service
+  # driven by a timers.target timer with Persistent — and differ only in the
+  # script, the ordering edges and the calendar. A timer-driven oneshot is
+  # not a daemon: it has no crash-loop class to declare.
+  mkTimerJob = {
+    description,
+    timerDescription,
+    onCalendar,
+    randomizedDelaySec ? null,
+    serviceConfig ? {},
+    ...
+  } @ spec: {
+    service =
+      removeAttrs spec [
+        "description"
+        "timerDescription"
+        "onCalendar"
+        "randomizedDelaySec"
+        "serviceConfig"
+      ]
+      // {
+        inherit description;
+        serviceConfig = {Type = "oneshot";} // serviceConfig;
+      };
+    timer = {
+      description = timerDescription;
+      wantedBy = ["timers.target"];
+      timerConfig =
+        {
+          OnCalendar = onCalendar;
+          Persistent = true;
+        }
+        // lib.optionalAttrs (randomizedDelaySec != null) {
+          RandomizedDelaySec = randomizedDelaySec;
+        };
+    };
+  };
+
+  scheduledJobs = {
+    # --- BurgerNAS daily power-off safety net (22:45) ---
+    # BurgerNAS shuts down at 04:00 daily via DSM's internal power schedule.
+    # This timer serves as an auxiliary safety net at 22:45 to power off the NAS
+    # if a manual session was forgotten during the day.
+    burgernas-poweroff = mkTimerJob {
+      description = "Power off BurgerNAS if online (daily safety net)";
+      timerDescription = "Daily BurgerNAS power-off safety net (22:45)";
+      onCalendar = "*-*-* 22:45:00";
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
+      serviceConfig.ExecStart = burgernasPoweroff;
+    };
+
+    # --- BurgerNAS portable-library mirror (weekly Sunday 03:32) ---
+    # The whole tool library crosses the wire while the NAS is powered for its
+    # scheduled window, so a non-Nix machine can pull tools from the NAS without
+    # frieren being up. Rejected (dynamic) downloads are excluded: they are not
+    # library material.
+    burgernas-library-sync = mkTimerJob {
+      description = "Weekly mirror of the portable tool library to BurgerNAS";
+      timerDescription = "Weekly mirror of the portable tool library to BurgerNAS";
+      onCalendar = "Sun *-*-* 03:32:00";
+      after = ["network-online.target" "restic-backups-frieren-burgernas.service"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        User = "devji";
+        Group = "users";
+        ExecStart = burgernasLibrarySync;
+      };
+    };
+
+    # --- restic restore drill ---
+    # A backup that is never restored is a hypothesis; the script (defined in the
+    # let block) runs `restic check` + a sampled restore. Runs weekly, outside the
+    # nightly backup window, and fails loudly into the journal.
+    restic-drill = mkTimerJob {
+      description = "restic repository check + sampled restore drill";
+      timerDescription = "Weekly restic restore drill";
+      onCalendar = "Sun *-*-* 06:30:00";
+      randomizedDelaySec = "15min";
+      path = [pkgs.coreutils pkgs.findutils];
+      serviceConfig.ExecStart = resticDrill;
+    };
+
+    # --- QMD Remote Embedding Offload (Monthly, 1st of month at 02:00) ---
+    # Offloads batch vector embeddings from Frieren (15W quad-core NAS) to Eisen
+    # (12-core Xeon workstation) via Wake-on-LAN without LLM assistance.
+    # Runs at 02:00 on the 1st of the month, well clear of the 03:00-05:30 backup window.
+    # A timer-driven oneshot, not a daemon: it has no crash-loop class to declare.
+    qmd-eisen-embed-sync = mkTimerJob {
+      description = "Monthly QMD vector embedding synchronization to Eisen via WoL";
+      timerDescription = "Monthly QMD vector embedding sync to Eisen";
+      onCalendar = "*-*-01 02:00:00";
+      randomizedDelaySec = "10min";
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        User = user.name;
+        Group = "users";
+        ExecStart = "${qmdEisenEmbedSync}/bin/qmd-eisen-embed-sync";
+      };
+    };
+
+    kg-ontology-check = mkTimerJob {
+      description = "Knowledge graph against flake/ontology.nix";
+      timerDescription = "Nightly knowledge-graph ontology gate";
+      onCalendar = "*-*-* 02:35:00";
+      randomizedDelaySec = "120s";
+      serviceConfig = {
+        WorkingDirectory = "${user.home}/Documents/nixconfig";
+        ExecStart = "${config.nix.package}/bin/nix build --no-link --builders \"\" .?submodules=1#checks.${pkgs.system}.ontology";
+        Nice = 10;
+        IOSchedulingClass = "idle";
+      };
+    };
+
+    # Daily, after the 04:00 autoUpgrade and clear of 03:00-05:30: task agents:turns:fuse.
+    turns-fuse = mkTimerJob {
+      description = "Project agent turns and notes into frieren's fleet database";
+      timerDescription = "Daily turn fusion into the fleet database";
+      onCalendar = "*-*-* 06:20:00";
+      randomizedDelaySec = "5min";
+      path = [pkgs.jq pkgs.git pkgs.coreutils];
+      serviceConfig = {
+        User = user.name;
+        Group = "users";
+        WorkingDirectory = "${user.home}/Documents/nixconfig";
+        ExecStart = turnsFuse;
+        Nice = 10;
+        IOSchedulingClass = "idle";
+      };
+    };
+  };
 in {
   imports = [
     (import ../../modules/profiles/microvm-host.nix {
@@ -846,210 +1040,21 @@ in {
     '';
   };
 
-  # --- BurgerNAS daily power-off safety net (22:45) ---
-  # BurgerNAS shuts down at 04:00 daily via DSM's internal power schedule.
-  # This timer serves as an auxiliary safety net at 22:45 to power off the NAS
-  # if a manual session was forgotten during the day.
-  systemd.services.burgernas-poweroff = {
-    description = "Power off BurgerNAS if online (daily safety net)";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = pkgs.writeShellScript "burgernas-poweroff" ''
-        set -u
-        NAS=devji@192.168.3.92
-        KEY=/root/.ssh/id_ed25519
-        SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
-        # Only act when the NAS is up — a nightly error when it is already off
-        # would be pure noise. NB: this unit's PATH has coreutils but NOT
-        # `bash`, so use the absolute bash (a bare `bash -c` fails silently and
-        # the check would always report the NAS offline).
-        if ! timeout 5 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
-          echo "BurgerNAS offline; nothing to power off."
-          exit 0
-        fi
-        echo "BurgerNAS online at $(date -Is); powering off cleanly."
-        $SSH "$NAS" "sudo /usr/syno/sbin/synopoweroff || sudo /sbin/poweroff" || true
-      '';
+  # Scheduled jobs: `scheduledJobs` (let block) emits one Type=oneshot service
+  # and its driving timer per entry — one skeleton for all six jobs.
+  systemd.services =
+    lib.mapAttrs (_: job: job.service) scheduledJobs
+    // {
+      # The 30 G store sits on the data pool, outside the unit's StateDirectory, so
+      # systemd never chowns it; `ollama` is a dynamic user whose uid moved off the
+      # tree (976 -> 61547) and 0.40.4's `mkdir models/manifests-v2` started failing.
+      # `+` runs this as root, before the service user is switched to.
+      ollama.serviceConfig.ExecStartPre = "+${pkgs.coreutils}/bin/chown -R ollama:ollama /Volumes/data/ollama";
     };
-  };
-
-  systemd.timers.burgernas-poweroff = {
-    description = "Daily BurgerNAS power-off safety net (22:45)";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "*-*-* 22:45:00";
-      Persistent = true;
-    };
-  };
-
-  # --- BurgerNAS portable-library mirror (weekly Sunday 03:32) ---
-  # The whole tool library crosses the wire while the NAS is powered for its
-  # scheduled window, so a non-Nix machine can pull tools from the NAS without
-  # frieren being up. Rejected (dynamic) downloads are excluded: they are not
-  # library material.
-  systemd.services.burgernas-library-sync = {
-    description = "Weekly mirror of the portable tool library to BurgerNAS";
-    after = ["network-online.target" "restic-backups-frieren-burgernas.service"];
-    wants = ["network-online.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      User = "devji";
-      Group = "users";
-      ExecStart = pkgs.writeShellScript "burgernas-library-sync" ''
-        set -eu
-        SRC="/Volumes/data"
-        # The host and the path stay separate values. Concatenated into one
-        # string they were both pasted into the `mkdir` that runs on the NAS,
-        # which created a literal `./devji@192.168.3.92:/volume1/...` tree in its
-        # home while rsync then failed on the path that was never made.
-        DEST_HOST="devji@192.168.3.92"
-        # The one lane is the export, so the bytes must live here.
-        # Why: [[flake/policies.nix#library-crosses-the-wire]]
-        DEST_PATH="/volume1/peachcable"
-        KEY="${user.home}/.ssh/id_ed25519"
-        SSH="${pkgs.openssh}/bin/ssh -i $KEY -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=5"
-
-        if ! timeout 5 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
-          echo "BurgerNAS offline; skipping library sync."
-          exit 0
-        fi
-
-        dirs="bin-x86 bin-aarch64 bin-script appimages"
-        # rsync creates only the final component, so the tree root goes first.
-        # The share already exists; this is a no-op there and a creation on a
-        # fresh NAS.
-        $SSH "$DEST_HOST" "mkdir -p '$DEST_PATH' '$DEST_PATH/bin-x86' '$DEST_PATH/bin-aarch64' '$DEST_PATH/bin-script' '$DEST_PATH/appimages'"
-        for dir in $dirs; do
-          [ -d "$SRC/$dir" ] || continue
-          echo "=== [$(date -Is)] mirroring $dir ==="
-          # -s (--protect-args) is required, not cosmetic: the remote path
-          # contains a space, and without it the *remote* shell splits it.
-          # --no-perms because DSM's shared folders are ACL-managed and chmod
-          # on the directory itself fails with EPERM, turning a successful
-          # transfer into rsync exit 23.
-          ${pkgs.rsync}/bin/rsync -azs --delete --partial --no-perms \
-            --exclude '.rejected' \
-            --exclude '@eaDir' \
-            --exclude '.DS_Store' \
-            --rsync-path=/usr/bin/rsync \
-            -e "$SSH" \
-            "$SRC/$dir/" "$DEST_HOST:$DEST_PATH/$dir/"
-        done
-        ${pkgs.rsync}/bin/rsync -qs --no-perms -e "$SSH" "$SRC/.library.tsv" "$DEST_HOST:$DEST_PATH/.library.tsv" || true
-        echo "=== [$(date -Is)] Library mirror finished. ==="
-      '';
-    };
-  };
-
-  systemd.timers.burgernas-library-sync = {
-    description = "Weekly mirror of the portable tool library to BurgerNAS";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "Sun *-*-* 03:32:00";
-      Persistent = true;
-    };
-  };
-
-  # --- restic restore drill ---
-  # A backup that is never restored is a hypothesis; the script (defined in the
-  # let block) runs `restic check` + a sampled restore. Runs weekly, outside the
-  # nightly backup window, and fails loudly into the journal.
-  systemd.services.restic-drill = {
-    description = "restic repository check + sampled restore drill";
-    path = [pkgs.coreutils pkgs.findutils];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = resticDrill;
-    };
-  };
-
-  systemd.timers.restic-drill = {
-    description = "Weekly restic restore drill";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "Sun *-*-* 06:30:00";
-      Persistent = true;
-      RandomizedDelaySec = "15min";
-    };
-  };
-
-  # --- QMD Remote Embedding Offload (Monthly, 1st of month at 02:00) ---
-  # Offloads batch vector embeddings from Frieren (15W quad-core NAS) to Eisen
-  # (12-core Xeon workstation) via Wake-on-LAN without LLM assistance.
-  # Runs at 02:00 on the 1st of the month, well clear of the 03:00-05:30 backup window.
-  # A timer-driven oneshot, not a daemon: it has no crash-loop class to declare.
-  systemd.services.qmd-eisen-embed-sync = {
-    description = "Monthly QMD vector embedding synchronization to Eisen via WoL";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      User = user.name;
-      Group = "users";
-      ExecStart = "${qmdEisenEmbedSync}/bin/qmd-eisen-embed-sync";
-    };
-  };
-
-  systemd.timers.qmd-eisen-embed-sync = {
-    description = "Monthly QMD vector embedding sync to Eisen";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "*-*-01 02:00:00";
-      Persistent = true;
-      RandomizedDelaySec = "10min";
-    };
-  };
+  systemd.timers = lib.mapAttrs (_: job: job.timer) scheduledJobs;
 
   # The interactive remote-control gateway is retired — the cascade drives
   # `agy -p` headless. Unit preserved at hosts/frieren/agy-daemon-web.shadow.nix.
-
-  systemd.services.kg-ontology-check = {
-    description = "Knowledge graph against flake/ontology.nix";
-    serviceConfig = {
-      Type = "oneshot";
-      WorkingDirectory = "${user.home}/Documents/nixconfig";
-      ExecStart = "${config.nix.package}/bin/nix build --no-link --builders \"\" .?submodules=1#checks.${pkgs.system}.ontology";
-      Nice = 10;
-      IOSchedulingClass = "idle";
-    };
-  };
-
-  systemd.timers.kg-ontology-check = {
-    description = "Nightly knowledge-graph ontology gate";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "*-*-* 02:35:00";
-      Persistent = true;
-      RandomizedDelaySec = "120s";
-    };
-  };
-
-  # Daily, after the 04:00 autoUpgrade and clear of 03:00-05:30: task agents:turns:fuse.
-  systemd.services.turns-fuse = {
-    description = "Project agent turns and notes into frieren's fleet database";
-    path = [pkgs.jq pkgs.git pkgs.coreutils];
-    serviceConfig = {
-      Type = "oneshot";
-      User = user.name;
-      Group = "users";
-      WorkingDirectory = "${user.home}/Documents/nixconfig";
-      ExecStart = turnsFuse;
-      Nice = 10;
-      IOSchedulingClass = "idle";
-    };
-  };
-
-  systemd.timers.turns-fuse = {
-    description = "Daily turn fusion into the fleet database";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "*-*-* 06:20:00";
-      Persistent = true;
-      RandomizedDelaySec = "5min";
-    };
-  };
 
   # Declarative Agent Scheduler (EXP-016)
   services.agentScheduler = {
@@ -1213,12 +1218,6 @@ in {
     host = "127.0.0.1";
     openFirewall = false;
   };
-
-  # The 30 G store sits on the data pool, outside the unit's StateDirectory, so
-  # systemd never chowns it; `ollama` is a dynamic user whose uid moved off the
-  # tree (976 -> 61547) and 0.40.4's `mkdir models/manifests-v2` started failing.
-  # `+` runs this as root, before the service user is switched to.
-  systemd.services.ollama.serviceConfig.ExecStartPre = "+${pkgs.coreutils}/bin/chown -R ollama:ollama /Volumes/data/ollama";
 
   # Ephemeral MicroVM Sandbox SSH Client Configuration (EXP-102)
   # Eliminates known_hosts collisions and prompts for ephemeral test VMs

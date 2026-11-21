@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-21T00:30:38Z",
+  "generated": "2026-11-21T00:38:55Z",
   "count": 200,
-  "pin": "52f152368b175fa67ac74785ad97af99e7fa0280682325ef36deeaaadf06533a",
+  "pin": "9dd38eca15bd490520820cbba2155611784007905c0d33636852eb03cfea51a4",
   "turns": [
+    {
+      "id": "336903a3-1957-4f91-85d1-86b1c29f7208",
+      "ts": "2026-11-21T00:34:39Z",
+      "source": "devin",
+      "subject": "nixconfig:frieren-timer-jobs",
+      "action": "claim: consolidate six oneshot+timer pairs in hosts/frieren/infra-stack.nix behind one mkTimerJob skeleton",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren/infra-stack.nix"
+      ],
+      "files": [],
+      "base_commit": "cbfc7409c3f180183d3c88668db49cced4c1803e",
+      "branch": "main",
+      "frame": "03h9vqcbxxt6h4pk982279mam"
+    },
+    {
+      "id": "60159c74-800a-4224-8d5a-ae653c6520ae",
+      "ts": "2026-11-21T00:33:54Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:continue-refactor",
+      "action": "steward re-drove devin pane: continue nixconfig refactoring (Jev 0.72/0.55 decisive margin). Pane verified Thinking 12s, running xs collision check + ops:notes survey for next consolidation target.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vq6yv7wlgiu78fbg8qop8"
+    },
+    {
+      "id": "cf580323-aa0c-40f7-b0c9-49d274884d24",
+      "ts": "2026-11-21T00:30:50Z",
+      "source": "devin",
+      "subject": "nixconfig:paperless-mkdaemon",
+      "action": "landed: mkDaemon skeleton for paperless scheduler/task-queue/consumer/web (-83 lines); delphi unit files byte-identical | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cbfc7409c3f180183d3c88668db49cced4c1803e",
+      "branch": "main",
+      "frame": "03h9vplfaoa5vr2i0m1nwk1md"
+    },
     {
       "id": "87aea89f-c44f-4329-b38f-a362ba2d84cd",
       "ts": "2026-11-21T00:30:24Z",
@@ -2683,45 +2724,6 @@
       "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
       "branch": "main",
       "frame": "03h9n3upk7c9n9aphp2oo3trx"
-    },
-    {
-      "id": "f63066f6-39a3-4728-809a-92204b4f7f3e",
-      "ts": "2026-11-19T22:00:43Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-19: 0 plate(s) kept of 2 spent, 5 roster row(s) waiting, 535 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
-      "branch": "main",
-      "frame": "03h9n2z479emni1h7awpzjsz3"
-    },
-    {
-      "id": "65c48069-4962-4725-85c1-c54ae7bdb9bc",
-      "ts": "2026-11-19T21:57:05Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-19: 0 plate(s) kept of 2 spent, 5 roster row(s) waiting, 535 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "76718b7bd240755f8702367dad696e02dfa3dd14",
-      "branch": "main",
-      "frame": "03h9n29j3h47xry6len6mwkdr"
-    },
-    {
-      "id": "a3cfeb5a-253e-482d-a53f-24e7a2ea6a19",
-      "ts": "2026-11-19T21:45:36Z",
-      "source": "buffy",
-      "subject": "freebuff:cpg-wallpapers",
-      "action": "No wallpaper was missing: all 13 plates for 2026-11-19 existed on disk, on Cloudinary and in the served manifest. The gap was approval - wall.in held none of them - so nothing from that day could rotate. Approved all 13 (now head of rotation), republished (535 assets, deploy d3f22433), ran one 5-row plate round (2 spent, 0 kept, 23 of 100 used today), and fixed images:approve dropping DRY. All 13 verified 200 on bountystash-assets.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c8913ed010e147117d140bf26d794e7222952f56",
-      "branch": "main",
-      "frame": "03h9n00rmv6189vsgtm5z5tqq"
     }
   ]
 }

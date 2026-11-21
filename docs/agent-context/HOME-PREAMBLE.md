@@ -40,6 +40,39 @@
   verify with `task checks:build:route`.
 - **Secrets**: read via `task infra:sops:get:*`; never print a value.
 
+## Orchestration lane (hermes and every steward)
+
+An orchestrator's product is routed work, not code. Read `router` first, then
+`subagent-orchestration`, then the lane's own skill. Three rules are hard:
+
+- **Route, do not execute.** Builds, uploads, pushes, email and repo edits
+  belong to a worker pane. If every pane is busy, queue the task; do not do it
+  yourself while waiting. A steward that executes has failed the role.
+- **Never interrupt a pane.** `Escape` and `Ctrl+C` abort the worker's turn and
+  can drop its TUI session. Check state first (`task agents:tmux`,
+  `task agents:tmux:show NAME=<lane>`); send long text with `load-buffer` +
+  `paste-buffer` then one `Enter`; verify a fresh `working...` or tool line.
+  Leave a pane by letting it finish, detaching (`Ctrl-b d`), or its own quit.
+  Kill a session only when it is confirmed dead. Recovery:
+  `agent-pane-session-recovery`.
+- **No handoff files.** `~/.hermes/handoff*.md` and `~/.agents/handoffs/*` are
+  not a task queue; do not author one or read one as a directive. Durable state
+  is an xs turn, an `AGENTS.nix` note, or the kanban. A new session starts from
+  `task agents:xs:list LIVE=1` and the repo, never from a self-written brief.
+
+Routing is one `router` classification per turn:
+
+```bash
+jev-decide classify --provider typesafe --text-file - \
+  --criteria .agents/skills/router/assets/labels.json \
+  --min-probability 0.8 --min-margin 0.15
+```
+
+Exit `0` selected, `2` needs_review, `1` error. Read `margin`, then the
+playbook row. A label routes work; it never authorises a destructive step. On
+error use the rule table and write `jev_called: false` — never invent a label
+or a flag.
+
 ## Agent turns (before and after every turn, mandatory)
 
 The xs turn log on delphi (`https://delphi.cloudforest-kardashev.ts.net:8449`) is the fleet's single

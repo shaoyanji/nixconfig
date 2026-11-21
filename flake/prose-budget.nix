@@ -62,7 +62,7 @@
     ".agents/skills/simplex-admin/SKILL.md" = 11;
     ".agents/skills/stt/SKILL.md" = 74;
     ".agents/skills/task-plane/SKILL.md" = 155;
-    ".agents/skills/tmux/SKILL.md" = 125;
+    ".agents/skills/tmux/SKILL.md" = 147;
     ".agents/skills/unslop/SKILL.md" = 69;
     ".agents/skills/voice-loop/SKILL.md" = 71;
     ".agents/skills/wikisearch/SKILL.md" = 148;

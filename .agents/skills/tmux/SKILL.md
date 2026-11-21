@@ -111,6 +111,28 @@ No tmux on a fresh host or container: `nix shell nixpkgs#tmux -c tmux new-sessio
 -d -s agent-x -- <cmd>` works, but the store path is only GC-rooted while the
 `nix shell` runs. On a host you keep, enable tmux from `modules/shell/default.nix`.
 
+## Driving another agent's pane — and leaving it alive
+
+A worker pane is a TUI that owns a model session. Input arrives as keystrokes,
+so a stray `Escape` or `Ctrl+C` is not "cancelling a prompt": it aborts the
+worker's turn and can drop the session. Read the tail before typing: `working...`,
+a spinner, a modal, a file browser, or `[response interrupted]` is BUSY.
+
+```bash
+task agents:tmux                        # name map: session:window, command, title
+task agents:tmux:show NAME=devin        # tail that pane
+printf '%s' '<task>' | tmux load-buffer -b task -
+tmux paste-buffer -b task -t <target>
+tmux send-keys -t <target> Enter
+tmux capture-pane -p -t <target> | tail -15   # a fresh working line, not just text
+```
+
+Visible text in the input box is not proof of submission. Leaving a pane: let it
+finish, detach (`Ctrl-b d`), or use the TUI's own quit at a clean prompt. Kill a
+session only when it is confirmed dead, and say so in the turn log. The one
+`Escape` exception is the released-session/stuck-reconnect recovery in
+`agent-pane-session-recovery`.
+
 ## Rules
 
 - **Never a bare `&` for work that must finish.** It freezes silently, which is

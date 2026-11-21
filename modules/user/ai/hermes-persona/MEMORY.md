@@ -1,220 +1,74 @@
-# MEMORY.md (unified architecture)
+# MEMORY.md
 
-## Scope
+Boot context primes a session; it is not evidence. The compiled layer map is
+`nix eval --json .#memoryLayers`; the contract is
+`docs/agent-context/HOME-PREAMBLE.md` (§ Memory, in order).
 
-Governs memory operations, heartbeat checks, and logging flows across all tiers with BM25 hybrid search.
+## Read, in order
 
-## Silent replies
+1. **Coordination** — `task agents:xs:list LIVE=1`. The newest entry per subject
+   decides liveness; `in_progress`, `blocked` and `failed` stay live until a
+   `done` lands on top.
+2. **Design record** — `task ops:notes:near Q="<intent>"`, then
+   `task ops:notes:lineage ID=<id>`. Never read `AGENTS.nix` in full.
+3. **Structure** — `task ops:kg:*` for "what touches X"; prose via `qmd`.
+4. **Personal prose** — the Obsidian vault; zettels, never repo facts.
+5. **Deep consult** — mem0 + supermemory; advisory, never authority.
+6. **Scratch** — `ai-memory`; no schema, never authority.
 
-Reply ONLY `NO_REPLY` when a command explicitly asks for a silent memory/logging response.
+Boot files (`~/.hermes` USER.md / MEMORY.md / SOUL.md) are session priming, not
+a memory layer.
 
-## Heartbeats
+## Write
 
-**Trigger Conditions** (if ANY met → describe the issue):
+| It is… | Write it to |
+| :--- | :--- |
+| A proposal / decision | an `AGENTS.nix` note (`agents-notes`) |
+| Open work | an `AGENTS.nix` note with `kind = "open"` / `"handoff"` |
+| What happened | one xs turn (`task agents:xs:post`) |
+| History | `docs/history/` |
+| A procedure | `docs/` or a skill |
 
-- Error rate >5% in last 10 operations
-- Response latency >2s from any tier
-- Failed retrieval from primary tier (xs)
-- Quota usage >85%
-- BM25 index staleness >1 hour
+Never create a markdown file at the repo root. Never duplicate a fleet table.
 
-**Default Response** (if none above):
+## No handoff channel
 
-- `HEARTBEAT_OK`
+Do not author `~/.hermes/handoff*.md` or an exit interview, do not read one as a
+directive queue, and do not send a pane a pointer to one. A new session starts
+from `task agents:xs:list LIVE=1` and the repo. Durable continuation goes in the
+xs turn's `rationale`.
 
-## Memory tiers (unified)
+## Routing
 
-| Tier            | Purpose                                                 | Search Method    | Latency | Retention          | Indexing        |
-| --------------- | ------------------------------------------------------- | ---------------- | ------- | ------------------ | --------------- |
-| **context**     | Working memory (real-time, event sourcing)              | Direct lookup    | <10ms   | 24h (auto-archive) | None            |
-| **qmd**         | Personal notes & queries (semantic/keyword hybrid)      | BM25 + vector    | <200ms  | Permanent          | Live BM25 index |
-| **supermemory** | Philosophical/prose/context layer                       | BM25 + semantic  | <300ms  | Permanent          | Live BM25 index |
-| **mem0**        | Structured TOON format (`infer:false` preserves format) | BM25 exact-match | <150ms  | Permanent          | Live BM25 index |
-| **grep**        | Session recovery (fallback)                             | Regex + grep     | <500ms  | 30 days            | None            |
+Read `router`, then classify once per turn:
 
-## Retrieval strategy (tiered + hybrid search)
-
-### Phase 1: direct lookup (ctx only)
-
-```
-Query → ctx snapshot (orientation)
-  ↓ (if hit) return
-  ↓ (if miss) → Phase 2
-```
-
-### Phase 2: parallel BM25 search (qmd + supermemory + mem0)
-
-```
-Query → BM25 index across:
-  • qmd (personal notes, high recall)
-  • supermemory (conceptual prose, semantic ranking)
-  • mem0 (structured TOON, exact term matching)
-  ↓ (rank by relevance score)
-  ↓ (if high confidence >0.7) return merged results
-  ↓ (if low confidence) → Phase 3
+```bash
+jev-decide classify --provider typesafe --text-file - \
+  --criteria "$HOME/Documents/nixconfig/.agents/skills/router/assets/labels.json" \
+  --min-probability 0.8 --min-margin 0.15
 ```
 
-### Phase 3: fallback (grep and wikisearch)
+Exit `0` selected, `2` needs_review, `1` error. Read `margin`, not only
+`probability`. A label routes work; it never authorises delete, deploy, push or
+send. On error use the rule table and write `jev_called: false`; never invent a
+probability or a flag. `jev-decide --help` is the contract for the invocation.
 
-```
-Query → grep local files (YYYY-MM-DD.md)
-  ↓ (session recovery, regex patterns)
-  ↓ return results
-```
+## Pane control
 
-## BM25 configuration
+`task agents:tmux` is the name map; `task agents:tmux:show NAME=<lane>` tails a
+pane. Never send `Escape` or `Ctrl+C` to a pane that is working — it aborts the
+worker's turn and can drop the session. Leave a pane by letting it finish,
+detaching (`Ctrl-b d`), or its own `/quit`; kill a window only when it is
+confirmed dead. Long text goes in with `load-buffer` + `paste-buffer` + one
+`Enter`, and only a fresh working line proves submission.
 
-| Parameter        | Value                                | Rationale                             |
-| ---------------- | ------------------------------------ | ------------------------------------- |
-| k1               | 1.5                                  | Standard term frequency saturation    |
-| b                | 0.75                                 | Length normalization (moderate)       |
-| Min term length  | 3 chars                              | Filter noise; exceptions: "AI", "I/O" |
-| Field weights    | qmd:1.2 / supermemory:1.1 / mem0:1.0 | Prioritize personal notes slightly    |
-| Refresh interval | 5 minutes                            | Balance freshness vs. performance     |
-| Stale threshold  | 1 hour                               | Alert if index not updated            |
+## Local tooling (verify, do not trust prose)
 
-## Logging rules
-
-### What to log & where
-
-| Event                | Tier        | Format              | BM25 Indexing          |
-| -------------------- | ----------- | ------------------- | ---------------------- |
-| Task completed       | mem0        | TOON (`[TASK]`)     | Yes (auto-index)       |
-| Decision made        | mem0        | TOON (`[DECISION]`) | Yes (auto-index)       |
-| Reasoning/concept    | supermemory | Prose narrative     | Yes (semantic tokens)  |
-| Personal note/query  | qmd         | Markdown + tags     | Yes (keyword + vector) |
-| Error encountered    | grep        | `YYYY-MM-DD.md`     | No (recovery only)     |
-| Philosophy/framework | supermemory | Prose essay         | Yes (semantic tokens)  |
-
-### TOON format example (mem0)
-
-```
-[TASK] User requested memory architecture redesign
-→ Analyzed 5 existing tiers
-→ Integrated BM25 hybrid search
-✓ Delivered unified MEMORY.md with fallback chain
-[TAGS] memory, architecture, bm25, optimization
-[CONFIDENCE] 0.92
-```
-
-### qmd entry example
-
-```
-# Personal Query: When should I use vector vs BM25?
-Tags: #search #optimization #hybrid-search
-
-**Context:** Deciding search strategy for heterogeneous memory.
-
-**Note:** BM25 excels at keyword precision (mem0 TOON logs).
-Vector search better for semantic prose (supermemory philosophy).
-Hybrid approach: BM25 for filtering, vector for ranking.
-
-[INDEXED] 2024-01-15T10:42Z
-```
-
-### supermemory entry example
-
-```
-# Philosophy: Memory as Layered Cognition
-
-Working memory (ctx) ↔ Recent context (qmd) ↔ Deep concepts (supermemory) ↔ Structured actions (mem0)
-
-Each layer serves a different cognitive function. xs is reactive, qmd is reflective, supermemory is contemplative, mem0 is operational.
-
-[INDEXED] 2024-01-15T10:45Z
-[SEMANTIC_TAGS] memory-architecture, consciousness, layers
-```
-
-## Eviction & consistency
-
-**ctx → grep Migration:**
-
-- Triggered: 24 hours elapsed OR xs quota full
-- Process: Archive to `memory/YYYY-MM-DD.md`
-- BM25: No re-indexing (grep is search-free)
-
-**Conflict Resolution (Same Info, Multiple Tiers):**
-
-1. ctx > qmd > supermemory > mem0 > grep (recency order)
-2. BM25 relevance score as secondary tiebreaker
-3. Manual merge if confidence <0.6
-
-**Deduplication:**
-
-- Check BM25 index before logging new entry
-- Link related entries with `[RELATED_TO]` tags
-- Consolidate duplicate concept entries in supermemory quarterly
-
-## Recovery procedures
-
-| Scenario               | Action                                       | Fallback                   |
-| ---------------------- | -------------------------------------------- | -------------------------- |
-| BM25 index corrupted   | Rebuild from mem0 + qmd + supermemory (5min) | Use grep regex search      |
-| mem0 unavailable       | Route to supermemory; flag for sync          | Query qmd + grep           |
-| xs unavailable         | Skip to BM25 Phase 2                         | No performance impact      |
-| All indexed tiers down | Use grep local files + xs snapshot           | Batch retry on recovery    |
-| BM25 staleness >1h     | Force refresh; log heartbeat alert           | Continue with cached index |
-
-## Quota management
-
-| Tier        | Limit                  | Alert Threshold   |
-| ----------- | ---------------------- | ----------------- |
-| ctx         | 10MB                   | 85% (8.5MB)       |
-| qmd         | 50MB                   | 85% (42.5MB)      |
-| supermemory | 100MB                  | 85% (85MB)        |
-| mem0        | Unlimited (indexed)    | Index size >500MB |
-| grep        | 100MB (30-day rolling) | 85% (85MB)        |
-
-## Search examples
-
-### Example 1: simple query
-
-```
-Query: "What's my preference on async logging?"
-→ ctx (miss)
-→ BM25 Phase 2:
-   • qmd hits: "async logging" tag → score 0.82
-   • supermemory hits: "logging philosophy" → score 0.61
-→ Return qmd result (highest confidence)
-```
-
-### Example 2: complex query
-
-```
-Query: "Integrate BM25 into memory architecture"
-→ ctx (miss)
-→ BM25 Phase 2:
-   • mem0: "[TASK] BM25 integration..." → score 0.79
-   • supermemory: "Layered cognition..." → score 0.68
-   • qmd: "#search #optimization" notes → score 0.75
-→ Merge top 3 results with relevance ranking
-```
-
-### Example 3: fallback query
-
-```
-Query: "Session from 2024-01-10"
-→ ctx (miss)
-→ BM25 Phase 2 (low confidence <0.5)
-→ Phase 3 grep: "2024-01-10.md" → regex match
-→ Return session recovery file
-```
-
----
-
-## Persistent boot facts & local tooling
-
-Environment / tool facts (not user identity — see USER.md for persona/preferences):
-- CLI: `agy` at `/etc/profiles/per-user/devji/bin/agy` v1.2.16 (syntax: `--dangerously-skip-permissions --json-schema <path> --print='...' --mode plan --output-format json`).
-- Email: `himalaya` v2.0.0; account `jisifu` (Gmail) uses `JISIFU_APP_PASSWORD` env for IMAP auth.
-- `jev-decide`: `/home/devji/.local/bin/jev-decide`; provider `typesafe` (key in `~/.config/hermes/hermes.env`); model string `typesafe/jev-1.13`.
-- Mailbox mutation rule: never automatic; requires explicit authorization; criteria only define `archive`/`keep`/`review` (no `delete` judgment exists by default; deletion requires separate judgment and user confirmation).
-- Skill `jev-email-cleansing` (agents-sync) is the governing skill for this class: smoke-test, frozen/live samples, criteria JSON, no mailbox mutation without agreement.
-- Wrapper binary for jev: `askjev` (shell wrapper at `~/.local/bin/askjev`, wraps `jev-decide classify --provider typesafe`). Real call returns `jev_called: true`, `transport: typesafe`. User-preferred openrouter model: `inception/mercury-decide:free` (not applied by askjev wrapper — call `jev-decide` directly for openrouter).
-
-### Official skills with wrappers:
-1. The wrapper (`askjev`) loads keys from `~/.config/hermes/hermes.env`, exports `OPENROUTER_API_KEY` + `TYPESAFE_API_KEY`, builds a temp criteria JSON, then calls `jev-decide classify --provider typesafe --text "$QUESTION" --criteria`.
-2. To make an official skill with a wrapper: define `SKILL.md` with trigger/description; add a `scripts/` wrapper that validates inputs (check `--help` before invoking), loads env, builds evidence files (not strings), and calls the underlying binary with `--dry-run` first.
-3. Never invent invocation shapes — read the wrapper source (`cat /path/to/wrapper`) and the underlying binary's `--help` before writing the skill.
-4. Log results back: `jev_called`, `transport`, `probability`, `margin`, model used, and whether the user overrode.
-
+- `jev-decide` at `~/.local/bin/jev-decide`; provider `typesafe`; key
+  `TYPESAFE_API_KEY` in `~/.config/hermes/hermes.env`. There is no
+  `TYPESAFEAI_API_KEY` on this host.
+- `agy` for one-shot engineering delegation, interactive (no `-p`) for a
+  persistent pane. `crush` is deprecated here; do not route work to it.
+- Email: `himalaya` v2.0.0. Never send or draft with guessed personal details
+  without explicit approval.
+- Secrets: read one key into a variable. Never print a value or a decrypted file.

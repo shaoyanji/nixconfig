@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T07:06:57Z",
+  "generated": "2026-11-21T07:08:23Z",
   "count": 200,
-  "pin": "1af308304f282beeb2c0c859d4caa1ff46c11ae4b6557d4d18d04f50f9214f75",
+  "pin": "0b3e6de9a62413ea8942b49bbcba9001967f9e40da6a075c6392182bb9ba3af2",
   "turns": [
+    {
+      "id": "abe09057-4c14-42af-a15c-5a581fd8783b",
+      "ts": "2026-11-21T07:07:30Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-orchestration-fix",
+      "action": "landed: closed the self-perpetuating handoff loop fleet-wide (agy-nightly-handoff + runner removed frieren+delphi, audit prompts no longer draft HANDOFF.md, checks:audit:handoff task+row dropped); image-daily judge gets agy from closure (was missing from profile); systemd-jobs skeletons on |> pipelines | gate: checks:host frieren PASS (2309), delphi PASS (2110), checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03759b064e5589e1fba2b21db40eac2727cf03c9",
+      "branch": "main",
+      "frame": "03h9xv2y2bbayayrd6pzumrmn"
+    },
     {
       "id": "af248e10-dc0a-47e4-bd10-29d9fde800a7",
       "ts": "2026-11-21T07:02:04Z",
@@ -2697,19 +2710,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9vbxkdxq65bsakaus415gp"
-    },
-    {
-      "id": "c772f5dc-12f2-4a55-9c22-563afcb090a5",
-      "ts": "2026-11-20T23:16:07Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-android",
-      "action": "residue: dropped stash@1 (parked hermes-android plugins.enabled block, archived to /tmp/hermes-android-stash-archived.patch) + removed /tmp/install-relay.sh installer scratch; strip itself landed as 96b84e2e; no commit needed (non-repo artifacts) | gate: git grep flipsibridge/hermes-android/8766 = zero refs outside append-only ledger",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
-      "branch": "main",
-      "frame": "03h9vb02t121lm010n8k935m8"
     }
   ]
 }

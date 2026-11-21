@@ -6,7 +6,7 @@
   lib,
   paths,
 }: let
-  ceiling = 6482;
+  ceiling = 6484;
   datedCeiling = 140;
 in
   (import ../lib/nix-comments.nix {inherit lib paths;})

@@ -10,10 +10,11 @@
   # spec: description, timerDescription, onCalendar and the per-job extras;
   # `enable` carries a conditional (a filtered-out job and a `mkIf false`
   # definition produce the same option value), serviceConfig merges over the
-  # base, everything else passes through to the service.
+  # base, everything else passes through to the service. A null
+  # timerDescription emits no Description on the timer at all.
   mkTimerJob = serviceBase: {
     description,
-    timerDescription ? description,
+    timerDescription ? null,
     onCalendar,
     randomizedDelaySec ? null,
     enable ? true,
@@ -34,18 +35,19 @@
         inherit description;
         serviceConfig = serviceBase // serviceConfig;
       };
-    timer = {
-      description = timerDescription;
-      wantedBy = ["timers.target"];
-      timerConfig =
-        {
-          OnCalendar = onCalendar;
-          Persistent = true;
-        }
-        // lib.optionalAttrs (randomizedDelaySec != null) {
-          RandomizedDelaySec = randomizedDelaySec;
-        };
-    };
+    timer =
+      {
+        wantedBy = ["timers.target"];
+        timerConfig =
+          {
+            OnCalendar = onCalendar;
+            Persistent = true;
+          }
+          // lib.optionalAttrs (randomizedDelaySec != null) {
+            RandomizedDelaySec = randomizedDelaySec;
+          };
+      }
+      // lib.optionalAttrs (timerDescription != null) {description = timerDescription;};
   };
 
   # unitBase: the site's shared unit attrs (wantedBy, unitConfig class marker,

@@ -41,6 +41,37 @@
     pkgs.bash
     pkgs.curl
   ];
+
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
+  mkJob = systemdJobs.mkTimerJob {Type = "oneshot";};
+
+  # The two timer jobs share the skeleton; the table names only what differs.
+  bridgeJobs = lib.mapAttrs (_: mkJob) {
+    offload-bridge-push = {
+      # Root because the trees are 0700 to service users. No ProtectHome: the
+      # unit authenticates with a key in a home directory.
+      description = "Mirror this host's offloaded service state to the shelter";
+      onCalendar = cfg.startAt;
+      randomizedDelaySec = "120s";
+      path = unitPath;
+      serviceConfig = {
+        Environment = "BRIDGE_CONFIG=/etc/offload-bridge/config.json";
+        ExecStart = "${bridge} push";
+      };
+    };
+    offload-bridge-ingest = {
+      enable = cfg.ingest != {};
+      description = "Pull the ingest directory this host's service no longer hosts";
+      onCalendar = cfg.ingestEvery;
+      path = unitPath;
+      serviceConfig = {
+        Environment = "BRIDGE_CONFIG=/etc/offload-bridge/config.json";
+        ExecStart = "${bridge} ingest";
+      };
+    };
+  };
+
+  liveJobs = lib.filterAttrs (_: j: j.enable) bridgeJobs;
 in {
   options.services.offloadBridge = {
     enable = lib.mkEnableOption "the shelter bridge for services offloaded from the NAS";
@@ -175,43 +206,7 @@ in {
       "d /var/lib/offload-migrate 0700 root root -"
     ];
 
-    systemd.services.offload-bridge-push = {
-      description = "Mirror this host's offloaded service state to the shelter";
-      # Root because the trees are 0700 to service users. No ProtectHome: the
-      # unit authenticates with a key in a home directory.
-      path = unitPath;
-      serviceConfig = {
-        Type = "oneshot";
-        Environment = "BRIDGE_CONFIG=/etc/offload-bridge/config.json";
-        ExecStart = "${bridge} push";
-      };
-    };
-
-    systemd.timers.offload-bridge-push = {
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.startAt;
-        Persistent = true;
-        RandomizedDelaySec = "120s";
-      };
-    };
-
-    systemd.services.offload-bridge-ingest = lib.mkIf (cfg.ingest != {}) {
-      description = "Pull the ingest directory this host's service no longer hosts";
-      path = unitPath;
-      serviceConfig = {
-        Type = "oneshot";
-        Environment = "BRIDGE_CONFIG=/etc/offload-bridge/config.json";
-        ExecStart = "${bridge} ingest";
-      };
-    };
-
-    systemd.timers.offload-bridge-ingest = lib.mkIf (cfg.ingest != {}) {
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.ingestEvery;
-        Persistent = true;
-      };
-    };
+    systemd.services = lib.mapAttrs (_: j: j.service) liveJobs;
+    systemd.timers = lib.mapAttrs (_: j: j.timer) liveJobs;
   };
 }

@@ -1,8 +1,152 @@
 {
-  "generated": "2026-11-21T01:56:11Z",
+  "generated": "2026-11-21T02:19:48Z",
   "count": 200,
-  "pin": "b722306af45e6315551e78a63823268713400c8668991a84b93844708c35e307",
+  "pin": "ce8c2d5617e4443d336bbd4207edf0beeb6b349399c229d570b3363d04bfdc1a",
   "turns": [
+    {
+      "id": "c30038de-10af-4a9b-9d57-f64357c90f8e",
+      "ts": "2026-11-21T02:16:54Z",
+      "source": "devin",
+      "subject": "nixconfig:offload-bridge",
+      "action": "claim: offload-bridge two timer-job pairs onto shared mkTimerJob",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/offload-bridge.nix lib/systemd-jobs.nix"
+      ],
+      "files": [],
+      "base_commit": "3307d8f77153985862b7746b1fdd6c46214ed074",
+      "branch": "main",
+      "frame": "03h9wabdvpz1d91qdkohpqeot"
+    },
+    {
+      "id": "08b5f98e-fecf-4812-b2cf-740e98a79d3f",
+      "ts": "2026-11-21T02:12:08Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:pane-steward-devin-briefing",
+      "action": "Devin briefing closed: chose \"Stop — briefing done\", devin reported status and returned to clean prompt. Phases 2/4 parked with open design questions recorded in docs/device-agent.md.",
+      "outcome": "done",
+      "claims": [
+        "modules/services/task-web"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w9ds2ppx2mr95y42zpvpm"
+    },
+    {
+      "id": "ca43ec8c-a1fb-4ada-abb5-62882b3673a0",
+      "ts": "2026-11-21T02:11:59Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:pane-steward-freebuff-cv-gate",
+      "action": "CV-PDF link gate landed: freebuff implemented the gate (every built CV PDF linked from site, link targets resolve), wired into build/CI. CI run 44852626071 green with \"Check CV links\" step executing. Pane back at clean prompt.",
+      "outcome": "done",
+      "claims": [
+        "modules/services/task-web"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w9crc0ksez5i2x7mu3iom"
+    },
+    {
+      "id": "1354ff2c-62d5-499d-bd3b-8215587c1d05",
+      "ts": "2026-11-21T02:11:26Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:pane-steward-devin-briefing",
+      "action": "Resolved devin pane (default:2.1) decision menu: chose \"Stop — briefing done\" (5 PRs merged, env cleaned). Devin now reporting status; phases 2/4 parked.",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/task-web"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w98w2x3p8cacecure0jsk"
+    },
+    {
+      "id": "046d30d9-fd28-4c5b-b85c-f53cc1022d3e",
+      "ts": "2026-11-21T02:11:20Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:pane-steward-freebuff-cv-gate",
+      "action": "Drove freebuff pane (default:1.1): landed CV-PDF link gate task (every built CV PDF linked from site, link targets resolve, wired into build/CI). Pane now working.",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/task-web"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w987zmwb3dmzpfbkw0m0g"
+    },
+    {
+      "id": "eae0054f-2b04-41af-99fe-f8ab80d647af",
+      "ts": "2026-11-21T02:05:19Z",
+      "source": "devin",
+      "subject": "nixconfig:fleet-remote-pr",
+      "action": "landed: drove devin pane 2.1 to create the fleet-remote PR per DEVIN_BRIEFING",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w81x3hfq0ghi9mbu7nhu2"
+    },
+    {
+      "id": "a73b0466-9461-4118-b7a9-f5f817d8c652",
+      "ts": "2026-11-21T02:05:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-link-gate-verify",
+      "action": "landed: drove freebuff pane 1.1 to verify the CV-PDF link gate end-to-end",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w81v6day1e4kc7nfkofmg"
+    },
+    {
+      "id": "79698084-edc5-475e-847a-d916e8d2fbda",
+      "ts": "2026-11-21T02:00:31Z",
+      "source": "devin",
+      "subject": "nixconfig:xs-notify-delphi",
+      "action": "landed: runtimeInputs fix (gawk+diffutils) — unit was failing with awk not found; redeployed, timer clean, live Telegram alert sent on turn change | gate: checks:quick PASS + deploy switch + journal proof",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3307d8f77153985862b7746b1fdd6c46214ed074",
+      "branch": "main",
+      "frame": "03h9w748fv4hnrqwpacnmr4h3"
+    },
+    {
+      "id": "cc4f091f-9fa4-4148-9771-02c2c7ccf7f7",
+      "ts": "2026-11-21T01:59:35Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:cv-site-gate",
+      "action": "landed: freebuff win1 completed the durable CV-PDF-link gate",
+      "outcome": "done",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w6xibnit3xs5kpxtig7wf"
+    },
+    {
+      "id": "7bbfe7b1-e04c-435e-8f7e-e0310dc9fe69",
+      "ts": "2026-11-21T01:59:18Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:cv-site-gate",
+      "action": "landed: drove freebuff win1 (CV/site lane) to continue the durable CV-PDF-link gate",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w6vkfw9vpv9fzixdmewe1"
+    },
     {
       "id": "8c6066eb-f145-44ff-a972-21a004a5fa50",
       "ts": "2026-11-21T01:54:03Z",
@@ -2562,144 +2706,6 @@
       "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
       "branch": "main",
       "frame": "03h9rvoo8zb3e7xnzy9lkmyfg"
-    },
-    {
-      "id": "c36ab387-0882-4d3e-819a-f20bc08094c3",
-      "ts": "2026-11-20T12:38:37Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "landed: corrected email triage on delphi freebuff pane to use LOCAL Postgres email_archive via NpgsqlRest (http://127.0.0.1:8080/api), not himalaya (jevdecide local_postgres 0.99). All 4 panes active: frieren freebuff→verify CV-link gate, devin→fleet-remote repo setup, agy→job search loop, delphi freebuff→email triage. freebuff landed 49e3c484, devin landed 96b84e2e, both pushed. | gate: pane-watch BUSY x3 + delphi freebuff working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
-      "branch": "main",
-      "frame": "03h9ruguuojxfafy9vh9e5243"
-    },
-    {
-      "id": "5b4a38c2-cbcc-432c-bfa1-41a66f57622a",
-      "ts": "2026-11-20T12:30:53Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-android",
-      "action": "landed: stripped hermes-android/FlipsiBridge shared config early (fleet-remote PR#3 phase 5 pulled forward) — plugins.enabled selection, gateway PYTHONPATH env, :8766 rule; live relay tree + empty drop-in dir + scratch/lock files removed on frieren | gate: checks:host HOST=frieren PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "hosts/frieren/configuration.nix",
-        "modules/user/ai/hermes-user.nix",
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
-      "branch": "main",
-      "frame": "03h9rsyiujtdspltb3s44dozh"
-    },
-    {
-      "id": "9b4ea9bd-7cbc-4d17-8ad2-10b715fc5dd2",
-      "ts": "2026-11-20T12:28:53Z",
-      "source": "hermes",
-      "subject": "nixconfig:site-cv-links",
-      "action": "landed: lib/matt-site.nix cvFiles list drives the four CV installs and a link gate that runs last inside the matt-site derivation, with those CVs as required targets; site-links.sh takes required PDFs and still fails unlinked PDFs and dead hrefs, so a deploy cannot ship an orphaned CV | gate: nix build .#sites.matt-site PASS (4/4 CVs linked; negative build fails) + task site:links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "49e3c484a5cf14745a45d39ca0f2bd06958b99be",
-      "branch": "main",
-      "frame": "03h9rskgcgtkqhmm1xnheal08"
-    },
-    {
-      "id": "fc1ecbf2-4fbf-4ed1-a1e2-4b284761ea8b",
-      "ts": "2026-11-20T12:27:08Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-android",
-      "action": "claim: strip hermes-android/flipsibridge shared config early (was phase 5 of fleet-remote PR #3): plugins.enabled, gateway PYTHONPATH, :8766, live relay+drop-in remnants",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren/configuration.nix",
-        "modules/user/ai/hermes-user.nix",
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "files": [],
-      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
-      "branch": "main",
-      "frame": "03h9rs83n3gas3qs5mhxjwluh"
-    },
-    {
-      "id": "fa72699a-0188-4795-8972-1d2d3377f1c3",
-      "ts": "2026-11-20T12:22:38Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "landed: gateway shutdown killed tmux server + all 3 agent panes. Rebuilt session default (socket /run/user/1000/tmux-1000/default) and relaunched freebuff/devin/agy. Re-drove all 3: freebuff→gate link targets, devin→review PR cleanup (set bypass mode, was prompting per-command), agy→job search loop. pane-idle-watch cron now reports BUSY for all 3 (UNKNOWN was dead server, not script). | gate: pane-watch.sh reports BUSY x3",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
-      "branch": "main",
-      "frame": "03h9rrcg6bz35gkbnjnfwerg2"
-    },
-    {
-      "id": "0d96e764-d661-4988-90be-c5a315d330d1",
-      "ts": "2026-11-20T12:09:41Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search-loop",
-      "action": "claim: scan attention queue, follow up monitor leads, ingest untracked employers into delphi tracker",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
-      "branch": "main",
-      "frame": "03h9rotd3uos6qbbu31buj96e"
-    },
-    {
-      "id": "96cee4b5-e4bb-419a-9251-d233a85489e7",
-      "ts": "2026-11-20T12:05:52Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search-loop",
-      "action": "landed: 10 new apps added, 4 nudged (Materna to screening, Eat Happy to rejected, Smartsheet to prep, Sig Perf linked), 0 monitor replies | gate: application-pipeline PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
-      "branch": "main",
-      "frame": "03h9ro2j1wohihzjom315mg4b"
-    },
-    {
-      "id": "f1c68667-98df-489d-9391-0dfbec1f3c98",
-      "ts": "2026-11-20T12:05:45Z",
-      "source": "freebuff",
-      "subject": "nixconfig:site-cv-links",
-      "action": "fixed: CV anchors gained download attr (shell.html) — a plain link to inline application/pdf emitted a navigation, so browser download waits never fired (a text/plain link failed the same way); with the attribute all 4 CV links download: 4/4 OK, valid PDFs, 2/1/2/1 pages | gate: nix build .#sites.matt-site rc=0 + agent-browser download 4/4 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "65ade1252c365bd34e66ccec25f4d2ad013f8390",
-      "branch": "main",
-      "frame": "03h9ro1q74hlcfu3rzb549ora"
-    },
-    {
-      "id": "cf426bf5-353c-46ad-b20f-ea01a595f4dc",
-      "ts": "2026-11-20T12:03:59Z",
-      "source": "devin",
-      "subject": "fleet-remote:device-agent",
-      "action": "landed: draft PR #3 to shaoyanji/fleet-remote — docs/device-agent.md (pull-based device lane on task-web replacing FlipsiBridge; consent tiers, phasing, open questions) + docs/device-protocol.md (wire format); docs only, no APK work | gate: review pending — CI trivially green (docs)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
-      "branch": "main",
-      "frame": "03h9rnpbhehy6t9kztkdgqz93"
-    },
-    {
-      "id": "73d53027-03d6-451b-8aba-b24378d74ab8",
-      "ts": "2026-11-20T12:01:44Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "landed: drove all 3 idle panes — freebuff→site CV verify, devin→fleet-remote PR approach, agy→job search continue (jevdecide routed each). Pushed 8d45c020+ac5874be to origin/main. Fixed pane-idle-watch cron (was UNKNOWN for all panes: missing TMUX_TMPDIR=/run/user/1000 in cron env; added export + broadened BUSY/IDLE patterns). Verified: cron now reports BUSY for all 3 | gate: pane-watch.sh manual run PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
-      "branch": "main",
-      "frame": "03h9rn9fo2asxsnckqqh4i7ou"
     }
   ]
 }

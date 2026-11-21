@@ -13,40 +13,35 @@
   # argument, because reading `config.fleet…` inside `imports` is the recursion
   # the option exists to avoid.
   hmUserFeatures ? user.hmFeatures,
-  # The pipe combinators: defaulted args, not a let, so the body reads as
-  # `base |> op |> op` with no ceremony around it.
+  # Feature tests as defaulted args, not a let: `has` asks, `when` gates a list.
   has ? f: lib.elem f hmUserFeatures,
   when ? f: lib.optionals (has f),
-  appendModules ? extra: mods: mods ++ extra,
-  mergeWhen ? cond: extra: base: base // lib.optionalAttrs cond extra,
   ...
 }: {
   imports =
     [self.modules."roles.minimal"]
-    |> appendModules (when "systemd-policy" [self.modules."systemd-policy"])
-    |> appendModules (when "shell" [self.modules."shell"])
-    |> appendModules (when "dev" [self.modules."dev"])
-    |> appendModules (when "ai" [
+    ++ when "systemd-policy" [self.modules."systemd-policy"]
+    ++ when "shell" [self.modules."shell"]
+    ++ when "dev" [self.modules."dev"]
+    ++ when "ai" [
       self.modules."user.ai.antigravity-cli"
       self.modules."user.selector-daemon"
-    ])
-    |> appendModules (when "browser" [self.modules."zen" self.modules."aria2"])
-    |> appendModules (when "media" [
+    ]
+    ++ when "browser" [self.modules."zen" self.modules."aria2"]
+    ++ when "media" [
       self.modules."user.desktop.multimedia"
       self.modules."user.desktop.appimage-menu"
       self.modules."kitty"
-    ])
+    ]
     # Imported unconditionally in the old file (`a pkgs`-dependent import reads
     # `config` and recurses); niri.nix gates its own body with mkIf on Linux,
     # because a Wayland compositor has no aarch64-darwin counterpart and its
     # swayidle dependency is not packaged for darwin — which failed EVALUATION,
     # not just the build, on cassini. A host that owns its own compositor drops
     # the feature rather than redefining the same options twice.
-    |> appendModules (
-      when "desktop" (
-        [self.modules."user.desktop.suite"]
-        |> (mods: mods ++ lib.optionals dankShell [self.modules."user.desktop.niri"])
-      )
+    ++ when "desktop" (
+      [self.modules."user.desktop.suite"]
+      ++ lib.optionals dankShell [self.modules."user.desktop.niri"]
     );
 
   # `optionalAttrs`, not `mkIf`: `selectorDaemon` is declared by a module the
@@ -61,11 +56,7 @@
     # No resident knowledge-graph sidecar: it answered 25 ms faster than the
     # content-keyed graph file and cost 27 MB of BEAM to do it, so it is gone
     # (flake/daemons.nix, docs/nix-patterns.md). `iets` covers the eval-on-miss.
-    #
-    # The selector's bargain: `q.sh --question` asks the resident stage 1 and
-    # falls back to the interpreter, so a host without it answers the same
-    # question ~70 ms slower instead of not answering.
-    |> mergeWhen (has "ai") {
+    // lib.optionalAttrs (has "ai") {
       selectorDaemon.enable = lib.mkDefault true;
     };
 

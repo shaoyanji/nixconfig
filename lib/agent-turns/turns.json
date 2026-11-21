@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T12:24:38Z",
+  "generated": "2026-11-21T13:07:58Z",
   "count": 200,
-  "pin": "3c352dea3ced97ebf3b4996e9bb601a43d0332f6e22e7352432ef8c35db16a26",
+  "pin": "97fb213515577916d7acf1516297cd4ae9cd1f61d297b98319dd87a8ad4a7922",
   "turns": [
+    {
+      "id": "829badb3-9590-4186-a370-5c808f1e8f96",
+      "ts": "2026-11-21T12:56:04Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-21: 1 plate(s) kept of 1 spent, 401 roster row(s) waiting, 641 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
+      "branch": "main",
+      "frame": "03h9zr68aq3jeq0ndji5xhe73"
+    },
     {
       "id": "29ab3d81-73c9-4a03-bcac-57b6bb2e923e",
       "ts": "2026-11-21T11:41:26Z",
@@ -2741,19 +2754,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9votimksc34as33ifytxab"
-    },
-    {
-      "id": "395d2d2d-7845-416d-8f79-ce71a8f5d14f",
-      "ts": "2026-11-21T00:23:39Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-live-download",
-      "action": "matt:cv:check ran for real (agent-browser now on PATH): 12/12 anchors download a valid PDF in headless Chrome (%PDF, %spages, non-empty) when hash compare is off; with the default compare against /tmp/matt-site, 8/8 anchors FAIL 'live bytes differ' — deploy is stale, not the gate: live cv.pdf 53c4e05 is pre-acb0689f ('This page: two languages'), cv-de d13d3a3 same; energy CVs text-identical, bytes differ. Fix is a deploy, not authorized",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c7204aa223a1bcb561238544077da321331e8f7",
-      "branch": "main",
-      "frame": "03h9vo6yszqusenijweduvjdl"
     }
   ]
 }

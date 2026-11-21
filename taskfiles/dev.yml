@@ -731,10 +731,11 @@ tasks:
       The site is a Nix-native hypermedia tree (lib/aki-site.nix): it renders the
       compiled registry, the knowledge graph (which now includes .agents/** and
       taskfiles/*.md as document nodes) and the generated doc pages. Prints the
-      store path; it does NOT create a ./result-docsite symlink — build artifacts
-      in the checkout are what `result`/`result-*` used to be. There is no Python
-      phase — the markdown renderer that lived in docs-site/ is retired. Exit 1 on
-      a build failure.
+      store path; no ./result-docsite symlink — checkout symlinks are what
+      `result`/`result-*` used to be. No Python phase — the docs-site/ markdown
+      renderer is retired. Also the artifact `.github/workflows/pages.yml` pushes
+      to shaoyanji.github.io/nixconfig — asset URLs are relative, so the SPA
+      survives the project prefix. Exit 1 on a build failure.
     cmds:
       - nix build --no-link --print-out-paths .?submodules=1#sites.fleet-docs-site
 

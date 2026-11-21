@@ -623,14 +623,15 @@ tasks:
   checks:infron:
     desc: "[gate] infron routes: non-free ids refused, fallback order, dsh and dispatch plans, no request spent"
     summary: >
-      Local and token-free: the caller runs against a stub `curl` first on PATH, so
+      Local and token-free: the caller runs against a stub `curl` on PATH, so
       nothing leaves the host. Gates the refusals that protect a prepaid balance —
       a non-`:free` id is rejected before any request — the free default pair, a
       429 failover, and both-down exit 1; dispatch plans name no paid id. A yq
-      section then gates the hermes persona's spend fields: :free default, pinned
-      list-shaped catalogs with discover_models off, two-plus independent free
-      fallback lanes (Infron's daily quota is account-scoped), billable vendors
-      out of the pickers, and restart budget covering the chain. Exit 0 = clean.
+      section gates the persona's spend fields: :free default, list-shaped
+      catalog pins with discover_models off, two-plus free fallback lanes (a
+      keyless apisfreellm.com base_url is a closed lane by endpoint), billable
+      vendors out of the pickers, and restart budget covering the chain.
+      Exit 0 = clean.
     cmds:
       - bash scripts/task/infron-check.sh
 

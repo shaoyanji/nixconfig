@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T09:36:16Z",
+  "generated": "2026-11-21T09:49:30Z",
   "count": 200,
-  "pin": "d08a267ca94db8b3905d19aaeee70c306fcbe88490c0f4ffd50a9483e074d46a",
+  "pin": "07897d52188c2c7d75be1ec9950b2ac1dfb728a571af3bd164ce6a2ab62d5cbe",
   "turns": [
+    {
+      "id": "dffd503f-a3ea-402a-96ad-c218c2993e95",
+      "ts": "2026-11-21T09:48:48Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-21: 18 plate(s) kept of 20 spent, 2 roster row(s) waiting, 144 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
+      "branch": "main",
+      "frame": "03h9yql9iw14sg3y6ywea25ae"
+    },
     {
       "id": "4dd700a3-53b0-4f5a-aede-f5bbdc22a071",
       "ts": "2026-11-21T09:16:52Z",
@@ -2725,19 +2738,6 @@
       "base_commit": "8c7204aa223a1bcb561238544077da321331e8f7",
       "branch": "main",
       "frame": "03h9vl9repb6g8ekolj1gdktc"
-    },
-    {
-      "id": "b8eee803-1f02-49b6-a49c-7c39fdca581c",
-      "ts": "2026-11-21T00:01:59Z",
-      "source": "devin-agent",
-      "subject": "frieren:win2-devin",
-      "action": "deferred: nixconfig refactoring — no task started; jevdecide defer-now (p=0.76, margin 0.63 decisive)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vjyjkypz31qpadr8fyqz7"
     }
   ]
 }

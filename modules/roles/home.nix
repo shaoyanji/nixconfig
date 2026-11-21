@@ -13,12 +13,14 @@
   # argument, because reading `config.fleet…` inside `imports` is the recursion
   # the option exists to avoid.
   hmUserFeatures ? user.hmFeatures,
+  # The pipe combinators: defaulted args, not a let, so the body reads as
+  # `base |> op |> op` with no ceremony around it.
+  has ? f: lib.elem f hmUserFeatures,
+  when ? f: lib.optionals (has f),
+  appendModules ? extra: mods: mods ++ extra,
+  mergeWhen ? cond: extra: base: base // lib.optionalAttrs cond extra,
   ...
-}: let
-  has = f: lib.elem f hmUserFeatures;
-  when = f: mods: lib.optionals (has f) mods;
-  appendModules = extra: mods: mods ++ extra;
-in {
+}: {
   imports =
     [self.modules."roles.minimal"]
     |> appendModules (when "systemd-policy" [self.modules."systemd-policy"])
@@ -40,7 +42,12 @@ in {
     # swayidle dependency is not packaged for darwin — which failed EVALUATION,
     # not just the build, on cassini. A host that owns its own compositor drops
     # the feature rather than redefining the same options twice.
-    |> appendModules (when "desktop" ([self.modules."user.desktop.suite"] ++ lib.optionals dankShell [self.modules."user.desktop.niri"]));
+    |> appendModules (
+      when "desktop" (
+        [self.modules."user.desktop.suite"]
+        |> (mods: mods ++ lib.optionals dankShell [self.modules."user.desktop.niri"])
+      )
+    );
 
   # `optionalAttrs`, not `mkIf`: `selectorDaemon` is declared by a module the
   # `ai` feature imports, and a `programs.selectorDaemon.enable = lib.mkIf …` is
@@ -58,7 +65,7 @@ in {
     # The selector's bargain: `q.sh --question` asks the resident stage 1 and
     # falls back to the interpreter, so a host without it answers the same
     # question ~70 ms slower instead of not answering.
-    // lib.optionalAttrs (has "ai") {
+    |> mergeWhen (has "ai") {
       selectorDaemon.enable = lib.mkDefault true;
     };
 

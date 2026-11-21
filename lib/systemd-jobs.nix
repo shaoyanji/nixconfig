@@ -51,16 +51,44 @@
   };
 
   # unitBase: the site's shared unit attrs (wantedBy, unitConfig class marker,
-  # ordering edges). unitConfig and serviceConfig merge over their bases;
-  # every other spec attr passes through to the unit.
+  # ordering edges). unitConfig and serviceConfig merge over their bases, and a
+  # dependency edge both sides name concatenates rather than replaces — a base's
+  # `requires` is policy, a site's `after` is topology, and overwriting one
+  # drops the other. Every other spec attr passes through to the unit.
   mkDaemon = {
     unitBase ? {},
     serviceBase ? {},
-  }: extra:
+  }: extra: let
+    # NixOS' dependency edges, all list-valued: the only attrs where a call site
+    # naming the base's key means "add to it" rather than "replace it".
+    edgeAttrs = [
+      "after"
+      "before"
+      "bindsTo"
+      "conflicts"
+      "consistsOf"
+      "onFailure"
+      "onSuccess"
+      "partOf"
+      "propagatesReloadTo"
+      "reloadTriggers"
+      "requisite"
+      "requiredBy"
+      "requires"
+      "upholds"
+      "wantedBy"
+      "wants"
+    ];
+    shared =
+      builtins.filter
+      (k: builtins.isList (unitBase.${k} or null) && builtins.isList (extra.${k} or null))
+      edgeAttrs;
+  in
     unitBase
     // {
       unitConfig = (unitBase.unitConfig or {}) // (extra.unitConfig or {});
       serviceConfig = serviceBase // (extra.serviceConfig or {});
     }
-    // removeAttrs extra ["unitConfig" "serviceConfig"];
+    // removeAttrs extra (["unitConfig" "serviceConfig"] ++ shared)
+    // lib.genAttrs shared (k: extra.${k} ++ unitBase.${k});
 }

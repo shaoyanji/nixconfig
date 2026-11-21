@@ -134,13 +134,14 @@
   };
 
   pgTarget = lib.optional cfg.database.createLocally "postgresql.target";
-  # Paperless daemons need their site policy pre-computed — the postgres edge
-  # appends after any call-site `after`, and the shared `env` is the default
-  # rather than a hard value — so the call into the shared skeleton is thin.
+  # The postgres edge is shared policy: mkDaemon concatenates it after each
+  # call site's own `after`/`requires`, so the skeleton carries it. The only
+  # site policy left here is `env` as the default, not a hard value.
   mkDaemon = extra:
     systemdJobs.mkDaemon {
       unitBase = {
         requires = pgTarget;
+        after = pgTarget;
         unitConfig = {
           X-Fleet-Role = "daemon";
           StartLimitIntervalSec = 0;
@@ -152,13 +153,7 @@
           User = cfg.user;
           Restart = "on-failure";
         };
-    } (
-      extra
-      // {
-        after = (extra.after or []) ++ pgTarget;
-        environment = extra.environment or env;
-      }
-    );
+    } (extra // {environment = extra.environment or env;});
 in {
   disabledModules = ["services/misc/paperless.nix"];
 

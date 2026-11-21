@@ -1,8 +1,205 @@
 {
-  "generated": "2026-11-21T00:49:02Z",
+  "generated": "2026-11-21T01:18:04Z",
   "count": 200,
-  "pin": "8def91cb78eeb73e5c8ab38f681cdb1f2a32ed648397e86602d68e7596d50ab3",
+  "pin": "91d4b884244deb582427291567efcec00a4f0bbe8784c52ef5617aa5e677fd94",
   "turns": [
+    {
+      "id": "5d8bdad9-f073-454f-9365-babc5bf63907",
+      "ts": "2026-11-21T01:17:36Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-link-gate",
+      "action": "CV link gate already exists and is wired: scripts/task/site-links.sh runs inside the matt-site derivation (--gap then full pass) and checks:site:links:test (14 cases) runs in checks:quick deps. Real artifacts green: matt 81 links/15 pages/4 PDFs/16 download anchors, mockup 7/3/0. No broken links, no edits, nothing to commit or push. checks:quick red 201 only from another lane's uncommitted mail-atlas.nix (6443/6440 header comments). | gate: site:links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cdb2c9e2c61e6cfe0d170cf68e93d20bbcfc2124",
+      "branch": "main",
+      "frame": "03h9vyqc1o0zktjch9m855swd"
+    },
+    {
+      "id": "492460ea-5a70-47ad-b3f6-b72f24b9151d",
+      "ts": "2026-11-21T01:15:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:quotient-hashing",
+      "action": "landed: drove delphi freebuff pane 0:1.1 — figure out quotient hashing with nix (zeckendorf pattern), implement, commit, push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vydyxo6suucb8jrkpi5ic"
+    },
+    {
+      "id": "3f45c50c-a85d-4c5e-bd85-1798e1131b9f",
+      "ts": "2026-11-21T01:15:50Z",
+      "source": "devin",
+      "subject": "nixconfig:continue-refactor",
+      "action": "landed: drove devin pane 2.1 — continue nixconfig refactoring, next module area mail-atlas.nix (three oneshot+timer pairs), checks:quick green, commit, push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vydwu0ie7zoia7ab9bl95"
+    },
+    {
+      "id": "2eb19343-0bb3-477a-b077-dd474edff9f1",
+      "ts": "2026-11-21T01:15:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove freebuff pane 1.1 — continue CV-link/leak gate (add durable gate that every built CV PDF is linked + targets resolve, verify in checks:quick, fix, commit, push)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vydtzs9fhojae6y3iooyq"
+    },
+    {
+      "id": "46a29469-3af6-4733-9b74-ccbc5b971f7f",
+      "ts": "2026-11-21T01:15:10Z",
+      "source": "devin",
+      "subject": "nixconfig:mail-atlas-mktimerjob",
+      "action": "claim: consolidate mail-atlas tag/drain/reconcile pairs behind mkTimerJob in modules/services/mail-atlas.nix",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/mail-atlas.nix"
+      ],
+      "files": [],
+      "base_commit": "cdb2c9e2c61e6cfe0d170cf68e93d20bbcfc2124",
+      "branch": "main",
+      "frame": "03h9vy98hxb4mn5gcu2kek5yc"
+    },
+    {
+      "id": "61f2b218-3f7f-4da8-b010-30e1e8c85e79",
+      "ts": "2026-11-21T01:11:45Z",
+      "source": "buffy",
+      "subject": "nixconfig:matt-deploy",
+      "action": "matt.bountystash.com redeployed to the current build: Pages 5efdb4cc; all 4 PDFs live with build sha (cv.pdf cedbdc64401c, cv-de 5aa1183bb1a3, cv-energy d6b5ed9d08ed, cv-energy-de 6cc9e3642084); matt:cv:check 12 ok 0 failed. checks:site:path does not apply: it compares delphi X-Site-Path to .#sites.delphi-site (aarch64), so from frieren it probes local nginx and the attr is missing; delphi's live 2xpx6052 != tree izx4gy20. | gate: matt:cv:check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cdb2c9e2c61e6cfe0d170cf68e93d20bbcfc2124",
+      "branch": "main",
+      "frame": "03h9vxl9enst80jrnwsavhfsa"
+    },
+    {
+      "id": "fe692efc-17b8-4296-b983-b6845ae1b4d0",
+      "ts": "2026-11-21T01:09:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-deploy-matt",
+      "action": "landed: routed freebuff pane to deploy matt site (fix checks:site:path gate) — jevdecide selected deploy_matt_site (0.99/0.98)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vx7016duor4bj4swswh7v"
+    },
+    {
+      "id": "1738e8c8-35d6-4ff8-b2b2-5ee55ba8f9ee",
+      "ts": "2026-11-21T01:07:40Z",
+      "source": "devin",
+      "subject": "fleet-remote:device-agent-pr5",
+      "action": "landed: merged PR #5 (device agent worker + tier-1 consent gate, phase 3) via merge commit; CI debug x2 green; checkout on master, 5 merged devin/* branches pruned local+remote, no build artifacts | gate: gh pr checks pass",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cdb2c9e2c61e6cfe0d170cf68e93d20bbcfc2124",
+      "branch": "main",
+      "frame": "03h9vwsj8u2o2qoexs0918tuy"
+    },
+    {
+      "id": "b9a56ae8-8d18-4173-8676-b05398b8e576",
+      "ts": "2026-11-21T01:07:26Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-merge-pr5",
+      "action": "landed: routed devin pane to merge fleet-remote PR #5 (device-agent phase 3) — jevdecide selected merge_pr5 (0.82/0.65)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vwqu48diw84oi0bpg7fos"
+    },
+    {
+      "id": "5c096ee5-6b3d-4e86-8384-85a7f2b43cbd",
+      "ts": "2026-11-21T01:04:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-ats-audit",
+      "action": "ATS audit cv.typ + lebenslauf.typ: zero violations, no edits — grid header, tracking, #link and footer name closed in 18e2c2d5/acb0689f; on-disk cv.typ byte-identical to the build's copy. Proof: 9 store payloads compiled typst 0.15.1, cv-ats-check PASS on all 4 shipped PDFs (headings in order, 0 /URI), packet lebenslauf 1p/208mm, checks:typeset 5/5, budgets 2/2/1/1 | gate: typst compile + cv-ats-check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cdb2c9e2c61e6cfe0d170cf68e93d20bbcfc2124",
+      "branch": "main",
+      "frame": "03h9vw41b654s2lazd8d5k91w"
+    },
+    {
+      "id": "a206562d-381c-4ba6-a9d5-8ada1d043d25",
+      "ts": "2026-11-21T01:00:22Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-ats-check",
+      "action": "landed: drove freebuff pane 1.1 on the CV/ATS quality-check task (DEVIN_FREEBUFF_TAB1_TASK.md) — quality-check Typst resume templates and make them autoATS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vvd4ynnc2mmjcmk80dgp1"
+    },
+    {
+      "id": "28221d89-b3e0-4285-9fd9-9b5671eb0b7e",
+      "ts": "2026-11-21T00:54:14Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove freebuff pane 1.1 — continue CV-link/leak gate (verify every built CV PDF linked + targets resolve, fix, commit, push)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vu5zdkatpkt2hly2uaale"
+    },
+    {
+      "id": "cf9871c5-bb1e-451d-92be-40e79e014b8e",
+      "ts": "2026-11-21T00:54:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove freebuff pane 1.1 — continue CV-link/leak gate (verify every built CV PDF linked + targets resolve, fix, commit, push)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9vu4uqec49onujm7q5029o"
+    },
+    {
+      "id": "87fb467d-8cbe-434a-9144-7b16b05be2a1",
+      "ts": "2026-11-21T00:51:25Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-leak-gate",
+      "action": "re-ran the three gates end-to-end: host-paths-check PASS (1150 files), site:links 81 links/15 pages/4 PDFs all linked + 16 download anchors (mockup 7/3/0), site:check 35+47+17 ok 0 failed across matt/bountystash/concept; matt:cv:check still 4 ok 8 failed = live bytes differ (deploy stale), no tree fix exists. Nothing to commit: worktree clean, ahead=0 behind=0 | gate: host-paths PASS, site:links PASS, site:check PASS, matt:cv:check FAIL(live stale)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cdb2c9e2c61e6cfe0d170cf68e93d20bbcfc2124",
+      "branch": "main",
+      "frame": "03h9vtm6ixd9kt6lau8wudpjn"
+    },
+    {
+      "id": "f8bcf9a2-a6ac-45d7-9c92-3b9ca7feb164",
+      "ts": "2026-11-21T00:49:12Z",
+      "source": "devin",
+      "subject": "nixconfig:agent-turns-mkdaemon",
+      "action": "landed: daemonServiceConfig + mkDaemon for xs-agent-turns and agent-turns-shim; 4 unit files byte-identical on delphi | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cdb2c9e2c61e6cfe0d170cf68e93d20bbcfc2124",
+      "branch": "main",
+      "frame": "03h9vt6n6sbo2o87znn4591ax"
+    },
     {
       "id": "0b232bf8-6f75-454b-ad7d-d30899c01026",
       "ts": "2026-11-21T00:45:04Z",
@@ -2492,240 +2689,6 @@
       "base_commit": "768bdabcf544623c685aaf312d729b6d4e5e1f73",
       "branch": "main",
       "frame": "03h9rbndz7dp4po0mz4a9p6up"
-    },
-    {
-      "id": "37eebcdc-2da0-4880-aa69-ab460f83e662",
-      "ts": "2026-11-20T10:52:23Z",
-      "source": "devin",
-      "subject": "nixconfig:frieren-offload",
-      "action": "landed: verified all offload exit criteria live on frieren+delphi; open-frieren-offload marked DELIVERED with measurements | gate: ops:notes:show reads DELIVERED, nix parse OK",
-      "outcome": "done",
-      "claims": [
-        "hosts/frieren",
-        "hosts/delphi"
-      ],
-      "files": [
-        "AGENTS.nix"
-      ],
-      "base_commit": "768bdabcf544623c685aaf312d729b6d4e5e1f73",
-      "branch": "main",
-      "frame": "03h9r9pppsy3byk3le3awsa3c"
-    },
-    {
-      "id": "9cd32113-3fb0-4b21-8070-4953ccd81888",
-      "ts": "2026-11-20T10:50:57Z",
-      "source": "devin",
-      "subject": "nixconfig:frieren-offload",
-      "action": "claim: verify offload exit criteria on frieren+delphi, close open-frieren-offload if met",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren",
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "937d185863015e2c8c15b4f9eaa4549eca5d7240",
-      "branch": "main",
-      "frame": "03h9r9fqcqa4hszev5mah6oek"
-    },
-    {
-      "id": "687af4ea-8901-4d50-acc2-ca975a7f84ab",
-      "ts": "2026-11-20T10:50:46Z",
-      "source": "agy",
-      "subject": "nixconfig:xs-notify-deploy",
-      "action": "landed: deploy xs-notify on delphi with 60s timer pushing agent-turn changes to Telegram @Frierenixbot (chat_id 8679391100)",
-      "outcome": "done",
-      "claims": [
-        "scripts/task",
-        "modules/services",
-        "hosts/delphi"
-      ],
-      "files": [
-        "scripts/task/xs-notify.sh",
-        "modules/services/xs-notify.nix",
-        "hosts/delphi/configuration.nix"
-      ],
-      "base_commit": "937d185863015e2c8c15b4f9eaa4549eca5d7240",
-      "branch": "main",
-      "frame": "03h9r9ec8d30z9qfj6b8qcmy5"
-    },
-    {
-      "id": "1e9c6633-b986-4c51-b185-70892e2019d2",
-      "ts": "2026-11-20T10:45:15Z",
-      "source": "devin",
-      "subject": "nixconfig:triage-pipeline",
-      "action": "landed: triage.py ingest->analyze->match->rank->action; live run scored Legence 80 apply-now, Vivid BESS 65 hold, 19 skip; --create 3 upserted rows+docs, re-run kept 174 rows | gate: checks:quick FAIL on unrelated uncommitted lib/matt-site.nix ATS edits (+3 header lines vs 6539 ceiling); clean tree passes 6538/6539",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow"
-      ],
-      "files": [
-        "modules/plugins/appflow/triage.py",
-        "modules/plugins/appflow/README.md"
-      ],
-      "base_commit": "937d185863015e2c8c15b4f9eaa4549eca5d7240",
-      "branch": "main",
-      "frame": "03h9r8bl4uex80fjwnlceko1r"
-    },
-    {
-      "id": "8d003de6-5670-4342-9d4b-4e099bb01309",
-      "ts": "2026-11-20T10:37:43Z",
-      "source": "devin",
-      "subject": "nixconfig:triage-pipeline",
-      "action": "claim: build triage.py in appflow (hermes start was dispatch marker; claims disjoint)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/plugins/appflow"
-      ],
-      "files": [],
-      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
-      "branch": "main",
-      "frame": "03h9r6unyz7hsceprwnwaqesd"
-    },
-    {
-      "id": "9afc6d97-fc18-41a9-983c-5f4eda682622",
-      "ts": "2026-11-20T10:34:44Z",
-      "source": "devin",
-      "subject": "nixconfig:oracle-free-check",
-      "action": "verified via OCI API on delphi: 1x A1.Flex 2OCPU/12GB, 200GB boot vol only, ephemeral IP, egress ~49GiB/mo, usage report $0.001 total in 31d (one-time transition residue); no paid services",
-      "outcome": "done",
-      "claims": [
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
-      "branch": "main",
-      "frame": "03h9r69l1nxz3vbhsxm1ca5vp"
-    },
-    {
-      "id": "b78efadc-7342-4151-91fe-4362e0a76941",
-      "ts": "2026-11-20T10:33:17Z",
-      "source": "agy",
-      "subject": "nixconfig:agy-job-search",
-      "action": "landed: add 3 applications (Coursedog, Legence, AutoLeap), 12 mail links, 14 nudged/updated, resolved attention items",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
-      "branch": "main",
-      "frame": "03h9r5zfq5vakb1mmzedxax8x"
-    },
-    {
-      "id": "41db71a3-5015-4742-b2c6-267c4be32d0a",
-      "ts": "2026-11-20T10:29:41Z",
-      "source": "devin",
-      "subject": "nixconfig:oracle-free-check",
-      "action": "claim: verify delphi within OCI Always Free limits (shape, disk, egress, paid services)",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "4837faf9a0d03b3e20efc877db75ed5b4a2b2cb2",
-      "branch": "main",
-      "frame": "03h9r5a33ockht5opym1wut17"
-    },
-    {
-      "id": "ed0199c6-d0b8-453b-bd63-1b3e9988893e",
-      "ts": "2026-11-20T09:13:04Z",
-      "source": "hermes",
-      "subject": "nixconfig:xs-notify-deploy",
-      "action": "update: Deploy xs-to-ntfy on delphi via NixOS module. SSR pushes to existing ntfy fleet topic (:8458) on xs turn SHA1-diff change. No Telegram bridge. Commit e8e87ea2 pushed; rebuild pending on delphi",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi"
-      ],
-      "files": [],
-      "base_commit": "66f373ef9cb581e717ca4260081319d888c0f377",
-      "branch": "main",
-      "frame": "03h9qqbc7ajvtze58zy4fycmm"
-    },
-    {
-      "id": "263b4750-5a52-4c1b-b8d6-79413d85b893",
-      "ts": "2026-11-20T08:28:53Z",
-      "source": "hermes",
-      "subject": "nixconfig:xs-notify-deploy",
-      "action": "start: Push agent-turn changes from delphi to Hermes via Telegram bot API",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi"
-      ],
-      "files": [],
-      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
-      "branch": "main",
-      "frame": "03h9qhom3rkv87e5fzi5c7xal"
-    },
-    {
-      "id": "49098955-0d5c-4bad-a6d8-14a53272723b",
-      "ts": "2026-11-20T08:12:44Z",
-      "source": "hermes",
-      "subject": "nixconfig:xs-watch-deploy",
-      "action": "start: Deploy xs-watch systemd service+timer on delphi, pull latest nixconfig, configure ntfy+Telegram delivery",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi"
-      ],
-      "files": [],
-      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
-      "branch": "main",
-      "frame": "03h9qeiyz3hjoryvbvpprzm4c"
-    },
-    {
-      "id": "4b3f74f3-0a7d-4405-811c-09f4faa70989",
-      "ts": "2026-11-20T07:51:52Z",
-      "source": "hermes",
-      "subject": "nixconfig:triage-pipeline",
-      "action": "start: Build triage workflow pipeline - resume vs job matching algorithm on delphi",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi"
-      ],
-      "files": [],
-      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
-      "branch": "main",
-      "frame": "03h9qagb5z7yjp4167k7a05j7"
-    },
-    {
-      "id": "8eb1a9fe-113a-4668-b4d0-27237d302afd",
-      "ts": "2026-11-20T07:51:51Z",
-      "source": "hermes",
-      "subject": "nixconfig:agy-job-search",
-      "action": "start: Continue job search - tap & nudge, fill into job tracker DB on delphi PostgreSQL",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi"
-      ],
-      "files": [],
-      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
-      "branch": "main",
-      "frame": "03h9qag852d0flw3m1pzq72cw"
-    },
-    {
-      "id": "e2a8d8fe-b1fe-4523-b429-851971efa84d",
-      "ts": "2026-11-20T07:14:22Z",
-      "source": "hermes",
-      "subject": "nixconfig:oracle-always-free-check",
-      "action": "start: Verify delphi Oracle Cloud instance is within Always Free limits - check OCPU count, RAM, boot volume size, network egress, no paid services",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi"
-      ],
-      "files": [],
-      "base_commit": "c1a34ae1d071d430c1a962b0e36f78f0fa49d50d",
-      "branch": "main",
-      "frame": "03h9q34m8owtw0pw8lymjw8bi"
-    },
-    {
-      "id": "e5c3809f-ccac-4528-ab2b-a0c9775d0ab5",
-      "ts": "2026-11-20T04:09:24Z",
-      "source": "antigravity",
-      "subject": "frieren:audit-system",
-      "action": "landed: audited SYSTEM.md, remediated 3 failed units, drafted HANDOFF.md, updated SYSTEM.md in-place | gate: checks:quick PASS, ops:health PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cbdd5b96bc0751ce70aac8e64bcbf020e8a13499",
-      "branch": "main",
-      "frame": "03h9p2zuh6n82dyd0lk4i9wmt"
     }
   ]
 }

@@ -102,6 +102,104 @@
       psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U ${archive.userName} -d ${archive.database} \
         -tAc "select mail_atlas_autotag(${toString cfg.tagLimit})"
   '';
+
+  # The three queue jobs share one skeleton — a Type=oneshot service as root
+  # with the minimal sandbox, driven by a timers.target/Persistent timer —
+  # and differ in the script, the ordering edges, the timeout and the calendar.
+  mkTimerJob = {
+    description,
+    timerDescription,
+    onCalendar,
+    randomizedDelaySec,
+    enable ? true,
+    serviceConfig ? {},
+    ...
+  } @ spec: {
+    inherit enable;
+    service =
+      removeAttrs spec [
+        "description"
+        "timerDescription"
+        "onCalendar"
+        "randomizedDelaySec"
+        "enable"
+        "serviceConfig"
+      ]
+      // {
+        inherit description;
+        serviceConfig =
+          {
+            Type = "oneshot";
+            User = "root";
+            NoNewPrivileges = true;
+            PrivateTmp = true;
+          }
+          // serviceConfig;
+      };
+    timer = {
+      description = timerDescription;
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnCalendar = onCalendar;
+        Persistent = true;
+        RandomizedDelaySec = randomizedDelaySec;
+      };
+    };
+  };
+
+  queueJobs = {
+    mail-atlas-tag = mkTimerJob {
+      description = "Tag archived mail against the mail-atlas taxonomy";
+      # Offset from the hour: the importer runs at :00 with a delay and triage at
+      # :45, so :50 tags the mail both of them just produced.
+      timerDescription = "Hourly mail-atlas tagging";
+      onCalendar = "*-*-* *:50:00";
+      randomizedDelaySec = "5m";
+      after = ["npgsqlrest.service"];
+      requires = ["npgsqlrest.service"];
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        LoadCredential = "db-password:${config.sops.secrets."email-archive/db-password".path}";
+        ExecStart = tagger;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+      };
+    };
+
+    mail-atlas-drain = mkTimerJob {
+      enable = cfg.drain.enable;
+      description = "Execute pending mail-atlas decisions through himalaya";
+      timerDescription = "Drain the mail-atlas decision queue";
+      onCalendar = cfg.drain.schedule;
+      randomizedDelaySec = "20s";
+      after = ["npgsqlrest.service" "network-online.target"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        ExecStart = "${drain}/bin/mail-atlas-drain";
+        TimeoutStartSec = "15min";
+        StateDirectory = "mail-atlas-drain";
+        Environment = "HOME=/var/lib/mail-atlas-drain";
+      };
+    };
+
+    mail-atlas-reconcile = mkTimerJob {
+      enable = cfg.reconcile.enable;
+      description = "Reconcile the mail-atlas inbox with the real mailbox";
+      timerDescription = "Reconcile the mail-atlas inbox with the real mailbox";
+      onCalendar = cfg.reconcile.schedule;
+      randomizedDelaySec = "2m";
+      after = ["npgsqlrest.service" "network-online.target"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        ExecStart = "${reconcile}/bin/mail-atlas-reconcile";
+        TimeoutStartSec = "30min";
+        Environment = "HOME=/var/lib/mail-atlas-reconcile";
+        StateDirectory = "mail-atlas-reconcile";
+      };
+    };
+  };
+
+  enabledQueueJobs = lib.filterAttrs (_: job: job.enable) queueJobs;
 in {
   options.services.mailAtlas = {
     enable = lib.mkEnableOption "the mail atlas (fuzzy search, taxonomy and relation graph)";
@@ -230,86 +328,8 @@ in {
       schema = [./mail-atlas/schema.sql];
     };
 
-    systemd.services.mail-atlas-tag = {
-      description = "Tag archived mail against the mail-atlas taxonomy";
-      after = ["npgsqlrest.service"];
-      requires = ["npgsqlrest.service"];
-      wantedBy = ["multi-user.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        User = "root";
-        LoadCredential = "db-password:${config.sops.secrets."email-archive/db-password".path}";
-        ExecStart = tagger;
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = true;
-      };
-    };
-
-    # Offset from the hour: the importer runs at :00 with a delay and triage at
-    # :45, so :50 tags the mail both of them just produced.
-    systemd.timers.mail-atlas-tag = {
-      description = "Hourly mail-atlas tagging";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = "*-*-* *:50:00";
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
-
-    systemd.services.mail-atlas-drain = lib.mkIf cfg.drain.enable {
-      description = "Execute pending mail-atlas decisions through himalaya";
-      after = ["npgsqlrest.service" "network-online.target"];
-      wants = ["network-online.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${drain}/bin/mail-atlas-drain";
-        TimeoutStartSec = "15min";
-        StateDirectory = "mail-atlas-drain";
-        Environment = "HOME=/var/lib/mail-atlas-drain";
-        User = "root";
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-      };
-    };
-
-    systemd.timers.mail-atlas-drain = lib.mkIf cfg.drain.enable {
-      description = "Drain the mail-atlas decision queue";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.drain.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "20s";
-      };
-    };
-
-    systemd.services.mail-atlas-reconcile = lib.mkIf cfg.reconcile.enable {
-      description = "Reconcile the mail-atlas inbox with the real mailbox";
-      after = ["npgsqlrest.service" "network-online.target"];
-      wants = ["network-online.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${reconcile}/bin/mail-atlas-reconcile";
-        TimeoutStartSec = "30min";
-        Environment = "HOME=/var/lib/mail-atlas-reconcile";
-        StateDirectory = "mail-atlas-reconcile";
-        User = "root";
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-      };
-    };
-
-    systemd.timers.mail-atlas-reconcile = lib.mkIf cfg.reconcile.enable {
-      description = "Reconcile the mail-atlas inbox with the real mailbox";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.reconcile.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "2m";
-      };
-    };
+    systemd.services = lib.mapAttrs (_: job: job.service) enabledQueueJobs;
+    systemd.timers = lib.mapAttrs (_: job: job.timer) enabledQueueJobs;
 
     services.nginx.virtualHosts.mail-atlas = {
       listen = [

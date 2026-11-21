@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-21T01:47:24Z",
+  "generated": "2026-11-21T01:56:11Z",
   "count": 200,
-  "pin": "53cf0231d8f4f48f01a51dd5c9265bbb7515bd97d2f654ac45f08c324071ae17",
+  "pin": "b722306af45e6315551e78a63823268713400c8668991a84b93844708c35e307",
   "turns": [
+    {
+      "id": "8c6066eb-f145-44ff-a972-21a004a5fa50",
+      "ts": "2026-11-21T01:54:03Z",
+      "source": "devin",
+      "subject": "nixconfig:xs-notify-delphi",
+      "action": "landed: xs-notify on delphi — Telegram lane via sops alias, minutely timer on loopback 8093, desktop stale flags stripped | gate: checks:quick PASS + deploy switch + live alert sent",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
+      "branch": "main",
+      "frame": "03h9w5uppmlxfgo1ciubisft4"
+    },
+    {
+      "id": "e315cc52-7833-48a8-9d1c-324ae910376d",
+      "ts": "2026-11-21T01:52:04Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff-agy",
+      "action": "Drove idle freebuff win1 pane via jevdecide: land_fixes (p=0.8, margin 0.62, decisive). Task: push the completed CV PDF link-gate commits (4ef428b blog checkout, f2196627 nixconfig) to origin/main so the 04:00 autoUpgrade does not revert local state. Pane accepted — fresh working... counter confirmed.",
+      "outcome": "done",
+      "claims": [
+        "nixconfig modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w5gprayzm4q08a2u2mcll"
+    },
+    {
+      "id": "51822620-5835-480f-a7e8-dff10984ceb7",
+      "ts": "2026-11-21T01:47:48Z",
+      "source": "frieren-steward",
+      "subject": "nixconfig:cv-site-gate",
+      "action": "landed: drove freebuff pane (default:1.1) with cv-site-gate task — verify every built CV PDF is linked from the site and link targets resolve",
+      "outcome": "done",
+      "claims": [
+        "cv.typ",
+        "lebenslauf.typ",
+        "shaoyanji.is-a.dev"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w4mow528dfoo8hjnk4lq1"
+    },
+    {
+      "id": "f793c31a-9c48-405a-8275-ba883a844524",
+      "ts": "2026-11-21T01:47:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-link-gate",
+      "action": "Durable blog gate added: check-cv-links.sh in the is-a.dev repo, run by CI between jekyll build and artifact upload (commit 4ef428b, local, not yet pushed). Verified locally: 2 CVs linked as downloads and resolving, and it fails on stripped download, deleted anchor and missing target. Blog rebuilt rc=0; nixconfig dev:blog:cv:check rc=0; live both PDFs 200 matching build.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
+      "branch": "main",
+      "frame": "03h9w4m3s2xd5k5s3krm3fnlh"
+    },
     {
       "id": "f967e9b1-fafb-41ed-a0f7-2f15e26b0986",
       "ts": "2026-11-21T01:43:36Z",
@@ -2642,58 +2700,6 @@
       "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
       "branch": "main",
       "frame": "03h9rn9fo2asxsnckqqh4i7ou"
-    },
-    {
-      "id": "9fafa0c7-cd33-4e07-99cf-662aaf1f001a",
-      "ts": "2026-11-20T12:01:21Z",
-      "source": "freebuff",
-      "subject": "nixconfig:site-cv-links",
-      "action": "verified: headless Chrome (agent-browser 0.43.0) on the built site — nav.links carries 2 CV anchors per language resolving to /cv.pdf + /cv-energy.pdf and /cv-de.pdf + /cv-energy-de.pdf; clicking each tailored link navigated to application/pdf and the Chrome viewer rendered 1/1 pages titled 'Matt Ji — CV' / 'Matt Ji — Lebenslauf'. No code change needed. | gate: nix build .#sites.matt-site rc=0 + browser render PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
-      "branch": "main",
-      "frame": "03h9rn6s6mkquzrwr5xqvi2lk"
-    },
-    {
-      "id": "4d7d326e-721d-4e88-a026-56dfccdd532d",
-      "ts": "2026-11-20T12:00:30Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search-loop",
-      "action": "claim: scan attention queue, follow up monitor leads, ingest discovered employers into delphi tracker",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
-      "branch": "main",
-      "frame": "03h9rn0u3h630fu7h6mkls3je"
-    },
-    {
-      "id": "f68f806d-92e7-481a-b23d-be0361811cd9",
-      "ts": "2026-11-20T11:55:53Z",
-      "source": "devin",
-      "subject": "nixconfig:apps-followups",
-      "action": "landed: apps-typst.sh runs bin/appflow locally when /srv/data is mounted and delegates to frieren over bounded ssh when not (stdin-safe -n; apps:doctor reports the transport); apps:followups/build/audit/git:status rewired; verified on delphi end-to-end — followups prints the cadence table, audit 110 docs 0 violations, unreachable host exits 127 with a hint; delphi checkout ff'd to ac5874be | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8d45c020e54a9a3f6a0e37e9c08cb2b192de0497",
-      "branch": "main",
-      "frame": "03h9rm4dgw6rp75qt8l1pgn0e"
-    },
-    {
-      "id": "1bbf8672-6a16-45c2-a5f3-ae8c4cd37831",
-      "ts": "2026-11-20T11:54:40Z",
-      "source": "antigravity",
-      "subject": "nixconfig:monitor-leads-nudge",
-      "action": "landed: research & nudge 5 Monitor leads (Parloa applied/gated, evoila prep direct portal, Workato pivoted to Berlin Golang Engine GH 8929803002, Octopus prep Lever, Castle Tech closed) | gate: application-pipeline PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ac5874beb12b9b1942ddb879e6cb17495eccb710",
-      "branch": "main",
-      "frame": "03h9rlvqiv512snh8dt2tw6qh"
     }
   ]
 }

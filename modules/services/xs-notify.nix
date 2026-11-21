@@ -22,6 +22,8 @@
     runtimeInputs = with pkgs; [
       coreutils
       curl
+      diffutils
+      gawk
       jq
     ];
     text = builtins.readFile ../../scripts/task/xs-notify.sh;

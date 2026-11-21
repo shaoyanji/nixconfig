@@ -62,6 +62,8 @@ usage: apps-db.sh <verb> [args]
   search <words…>          substring over id, company, role, status, next action
   get <id>                 one record and the mail linked to it
   update <id> --status S [--next-action N]
+  add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
+                             [--notes N] [--category C] [--language L] [--origin O] [--fit N]
   upsert [file|-]          upsert an application record (JSON on stdin or in a file)
   overview                 stage counts
   queue                    messages waiting for agent:apps (the sync drains them hourly)
@@ -79,8 +81,8 @@ case "$verb" in
   list)
     curl -fsS -G "$api/api/applications" --data-urlencode "lim=${LIM:-500}" \
       | jq -r "$stage"'["stage","updated","company","role","status","next","mail"],
-        ([.[] | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status,
-                 (.nextAction // ""), (.linkedMail // 0)]]) | @tsv' \
+        (.[] | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status,
+                (.nextAction // ""), (.linkedMail // 0)]) | @tsv' \
       | rows
     ;;
 
@@ -198,23 +200,76 @@ case "$verb" in
       | rows
     ;;
 
-  upsert)
-    src=${1:-}
-    if [ -n "$src" ] && [ "$src" != "-" ]; then
-      [ -r "$src" ] || { echo "apps-db: cannot read $src" >&2; exit 2; }
-      body=$(cat "$src")
+  upsert | add)
+    if [ "$verb" = upsert ]; then
+      src=${1:-}
+      if [ -n "$src" ] && [ "$src" != "-" ]; then
+        [ -r "$src" ] || { echo "apps-db: cannot read $src" >&2; exit 2; }
+        body=$(cat "$src")
+      else
+        body=$(cat)
+      fi
+      if [ -z "$body" ]; then
+        echo "apps-db: upsert needs a JSON record on stdin or a file" >&2
+        exit 2
+      fi
     else
-      body=$(cat)
-    fi
-    if [ -z "$body" ]; then
-      echo "apps-db: upsert needs a JSON record on stdin or a file" >&2
-      exit 2
+      # add — one record from flags, no JSON to write by hand. The id defaults
+      # to a slug of company + role, the convention every row in the table
+      # already follows; pass --id to reuse an existing one (a re-run with the
+      # same id updates in place rather than duplicating).
+      company=""; role=""; id=""; apply_url=""; status="lead"; next=""
+      notes=""; category=""; language=""; origin="manual"; fit=""; dry=0
+      while [ "$#" -gt 0 ]; do
+        case "$1" in
+          --id) id=${2:-}; shift 2 ;;
+          --company) company=${2:-}; shift 2 ;;
+          --role) role=${2:-}; shift 2 ;;
+          --apply-url) apply_url=${2:-}; shift 2 ;;
+          --status) status=${2:-}; shift 2 ;;
+          --next-action) next=${2:-}; shift 2 ;;
+          --notes) notes=${2:-}; shift 2 ;;
+          --category) category=${2:-}; shift 2 ;;
+          --language) language=${2:-}; shift 2 ;;
+          --origin) origin=${2:-}; shift 2 ;;
+          --fit) fit=${2:-}; shift 2 ;;
+          --dry) dry=1; shift ;;
+          *) echo "apps-db: unknown flag $1" >&2; exit 2 ;;
+        esac
+      done
+      [ -n "$company" ] && [ -n "$role" ] || {
+        echo "apps-db: add needs --company and --role" >&2; exit 2; }
+      if [ -z "$id" ]; then
+        id=$(printf '%s %s' "$company" "$role" \
+          | tr '[:upper:]' '[:lower:]' \
+          | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g; s/-{2,}/-/g' \
+          | cut -c1-80)
+      fi
+      if [ -z "$next" ]; then
+        if [ "$(printf '%s' "$status" | jq -Rr "$stage"' stage')" = "rejected" ]; then
+          next=none
+        else
+          next="Review JD and apply"
+        fi
+      fi
+      body=$(jq -cn \
+        --arg id "$id" --arg company "$company" --arg role "$role" \
+        --arg status "$status" --arg next "$next" --arg applyUrl "$apply_url" \
+        --arg notes "$notes" --arg category "$category" --arg language "$language" \
+        --arg origin "$origin" --arg fit "$fit" \
+        '{id: $id, company: $company, role: $role, status: $status,
+          nextAction: $next, applyUrl: $applyUrl, notes: $notes,
+          category: $category, language: $language, origin: $origin,
+          fit: ($fit | if . == "" then null else tonumber end)}')
+      # A stage the caller did not set follows the status, the same rule the
+      # hourly sync applies; an explicit --status "lead …" never stages "other".
+      body=$(printf '%s' "$body" | jq -c "$stage"'. + {stage: (.status | stage)}')
     fi
     # The route answers 404 for a missing key, so every key is sent and a field
     # the caller omitted becomes null. Both spellings are accepted because the
     # export is snake_case and the API is camelCase, and the caller should not
     # have to remember which side of that line it is on.
-    payload=$(printf '%s' "$body" | jq -c '
+    payload=$(printf '%s' "$body" | jq -c "$stage"'
       def f($camel; $snake): (.[$camel] // .[$snake]);
       {
         id: .id,
@@ -224,7 +279,9 @@ case "$verb" in
         language: (.language // "en"),
         fit: (.fit // null),
         status: (.status // ""),
-        stage: (.stage // ""),
+        # An export carries no stage, and "" would land as `other` in the row:
+        # a record without one derives it from the status, as the sync does.
+        stage: ((.stage // "") as $st | if $st == "" then (.status | stage) else $st end),
         nextAction: f("nextAction"; "next_action"),
         applyUrl: f("applyUrl"; "apply_url"),
         coverLetterUrl: f("coverLetterUrl"; "cover_letter_url"),
@@ -242,6 +299,10 @@ case "$verb" in
     if [ "$(printf '%s' "$payload" | jq -r '.id // ""')" = "" ]; then
       echo "apps-db: upsert needs an id" >&2
       exit 2
+    fi
+    if [ "${dry:-0}" = "1" ]; then
+      printf '%s\n' "$payload" | jq .
+      exit 0
     fi
     curl -fsS -X POST -H 'content-type: application/json' -d "$payload" \
       "$api/api/application-upsert" \

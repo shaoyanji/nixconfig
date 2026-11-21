@@ -1,6 +1,6 @@
 ---
 name: apps
-description: "Job application pipeline: status, mail triage, Typst documents."
+description: "Job application pipeline: add and track applications from any host, the mail loop, Typst documents."
 version: 0.3.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
@@ -10,57 +10,57 @@ metadata:
     tags: ['apps', 'job-application', 'workflow', 'postgres']
     related_skills: []
 ---
-
 # apps — the job-application pipeline
 
-The pipeline is the archive database on delphi, and a tailnet client needs one
-thing to use it: `https://delphi.cloudforest-kardashev.ts.net:8450`. Since
-`86bdb73b` (2026-11-03) that database is the only writer; `appflow-sync.timer`
-advances statuses from ATS mail hourly, and `applications.json` in the workflow
-checkout is an export, not a source.
+One Postgres table on delphi is the pipeline; the archive API at
+`https://delphi.cloudforest-kardashev.ts.net:8450` is its writer from any host,
+`applications.json` an export never a source. `task apps:doctor` probes each
+transport once, bounded, on an unfamiliar client.
 
-## What runs where
-
-`task apps:doctor` probes every transport below in one call, each probe bounded,
-so a missing piece answers no instead of stalling the shell. Run it on an
-unfamiliar client before anything else.
-
-| Transport | Needs | Gives |
-| :--- | :--- | :--- |
-| archive API | tailnet reach to 8450 | list, search, get, update, upsert, overview, queue, status, export |
-| SQL | nothing extra — `/api/pipeline-sql` is on the API | `apps:query` |
-| Typst checkout | `/srv/data` mounted (`APPS_DIR`) | build, audit, followups |
-| sops identity | this host's age key | `apps:pii:sync` |
-
-`query` used to be the exception: no route, so it needed a psql role or an ssh
-session on delphi, and on a client with neither it waited four minutes on a
-Tailscale auth check before failing. The route is `POST /api/pipeline-sql`, one
-read-only statement, refused unless it starts with `select` or `with` and carries
-no write verb. psql and a bounded ssh (`BatchMode`, 5 s connect timeout) remain as
-the fallback for an archive older than the route. `APPFLOW_API` moves the mount
-and `DELPHI_HOST` the ssh target.
-
-## The flows
-
-`task apps:list|search|get|update|overview|status` speak the API from any host,
-and a status change is one command:
+## Add a job
 
 ```bash
-task apps:update -- <id> --status "Rejected (email 2026-10-23)"
+task apps:add -- --company Flox --role "MTS, Infrastructure" \
+  --apply-url https://… --notes "nix required"
 ```
 
-`stage` and the next action follow from the status (`stage_of` in
-`modules/plugins/appflow/sync.py`), so a rejection also clears the next action.
-There is no push step and no JSON to reconcile.
+`--company` and `--role` are required; the id defaults to a slug of the two, so
+a re-run updates rather than duplicates — `--id` reuses a scan's slug, `--dry`
+prints without writing, the other flags override `lead` defaults. A tool with a
+JSON record pipes it whole (`task apps:upsert -- < record.json`). The mail hub
+adds rows too (`origin` `agent-scan`/`discovered`): `agents:apps:discovered`.
 
-`task apps:emails` shows what the hourly sync will drain. A message the rules
-cannot prove stays in the queue, and a rejection the vocabulary does not
-recognise is the case `checks:appflow:triage` covers.
+## Track
 
-The Typst half (`apps:followups`, `apps:build`, `apps:audit`) reads the checkout,
-so it runs where `/srv/data` is mounted. It does not touch pipeline rows.
+```bash
+task apps:overview        # stage → count → with next action
+task apps:list            # every row, newest activity first
+task apps:search -- nix   # id, company, role, status, next action
+task apps:get -- <id>     # one record plus its linked mail
+task apps:status          # totals, newest change, queue depth
+```
 
-Never hand-edit a JSON copy or import one over the database: a stale file reverts
-rows the mail hub discovered. `task apps:export` writes a snapshot on demand.
+`stage` derives from status text: `interview|trial` → interview, `rejected…` →
+rejected, `applied…`/`application received` → applied, `lead…`/`rezi…` → lead,
+`screening`/`follow-up required` → screening, `draft|packet|jd` → prep, else
+other. The writer computes it — `task apps:update -- <id> --status "…"` moves
+both, and a rejection clears the next action. Sparse upserts null fields:
+correct one row with `update`, not `add`.
 
-Truth: `taskfiles/apps.yml` and `docs/email-archive.md`.
+## The mail loop
+
+`appflow-sync.timer` on delphi drains `agent:apps` mail hourly, then
+`appflow-resolve` reads what the rules could not decide. From a client:
+`task apps:emails` shows the wait; `task agents:apps:sync DRY=1` previews a
+drain; `task apps:queue:resolve` closes what rules prove (auto rules-only
+off-loopback); `task agents:apps:pipeline` is the stage report plus open mail.
+
+## Documents
+
+`task apps:docs` lists stored text, `apps:docs:show -- <id>` prints it,
+`apps:docs:import` loads `$APPFLOW_JD_DIR`. `agents:apps:select ID=<id>` shows
+the projection; `agents:apps:packet ID=<id>` builds the PDFs. Replies are
+mailbox DRAFTS, never sent: `agents:apps:draft ID=<id> BODY=file DRY=1`;
+`agents:apps:drafts` lists them — both need himalaya; Typst needs /srv/data.
+
+Truth: `taskfiles/apps.yml`, `taskfiles/agents.yml`, `modules/plugins/appflow/`, `docs/email-archive.md`.

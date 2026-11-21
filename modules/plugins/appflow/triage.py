@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Triage the job pipeline: ingest postings, score them against the corpus, rank.
 
-`select.py` orders the corpus for one description; `triage.py` walks the other
+`jdselect.py` orders the corpus for one description; `triage.py` walks the other
 direction — every posting that is waiting, one fit score each — so an operator
 reads a ranked queue instead of an inbox. It writes what it decided back to the
 archive (`triage-analysis` document, `fit` on the row) and drafts the packet
@@ -36,10 +36,9 @@ import content_api  # noqa: E402
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_API = content_api.DEFAULT_API
 
-# `select.py` shares its name with a stdlib module that urllib needs, so it is
-# loaded under a private name: importing it as `select` would poison every
-# selector the HTTP stack creates after us.
-_spec = importlib.util.spec_from_file_location("appflow_select", os.path.join(HERE, "select.py"))
+# Loaded by path, not `import jdselect`: triage.py is run from its own
+# directory on hosts where that directory is not guaranteed on sys.path.
+_spec = importlib.util.spec_from_file_location("appflow_jdselect", os.path.join(HERE, "jdselect.py"))
 sel = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(sel)
 

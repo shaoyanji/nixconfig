@@ -29,6 +29,18 @@ tasks:
     cmds:
       - "{{.APPS_DB}} update {{.CLI_ARGS}}"
 
+  apps:add:
+    desc: Add one application — flags, no JSON (task apps:add -- --company C --role R [--apply-url U])
+    summary: >
+      The everyday write path. `--company` and `--role` are required; the id
+      defaults to a slug of the two, so a re-run updates the same row instead of
+      duplicating — pass `--id` to reuse an id the scan already chose. Status
+      defaults to `lead` and the stage follows the status, the same rule the
+      hourly sync applies. For a record a tool already produced as JSON,
+      `apps:upsert` takes the object on stdin or from a file.
+    cmds:
+      - "{{.APPS_DB}} add {{.CLI_ARGS}}"
+
   apps:upsert:
     desc: Add or refresh one application record from JSON (CLI_ARGS is a file, or pipe stdin)
     summary: >
@@ -74,9 +86,11 @@ tasks:
   # cannot decide gets a ternary from the two System One engines (attribute /
   # ignore / unsure), and the unsures go to exactly one hermes turn, which may
   # attribute to a supplied candidate or retire the entry to the reversible
-  # `ignore` tier. Nothing is written unless APPLY=1; `--restore` undoes an ignore.
+  # `ignore` tier. Nothing is written unless --apply; `--restore` undoes an ignore.
   apps:queue:resolve:
-    desc: Attribute or close the appflow queue (dry default; --apply, --restore <id>)
+    desc: Attribute or close the appflow queue (dry default; -- --apply, --restore <id>)
+    cmds:
+      - bash scripts/task/apps-resolve.sh {{.CLI_ARGS}}
 
   # The workflow's applications.json is a generated artifact now. This writes it
   # on demand in the shape that repo reads; nothing schedules it.
@@ -272,10 +286,13 @@ tasks:
           "list: List tracked applications" \
           "search: Search by company, role, ID, or keywords" \
           "get: View one application and its mail" \
+          "add: Track a new application" \
           "update: Update application status" \
           "overview: Pipeline counts per stage" \
           "status: Totals and open queue" \
           "emails: Messages waiting for the sync" \
+          "resolve: Attribute or close the mail queue" \
+          "docs: Stored text (JD bodies) in the database" \
           "export: Write applications.json from the database" \
           "build: Compile Typst documents to dist/" \
           "audit: QA layout and page budget" \
@@ -291,6 +308,14 @@ tasks:
           "get"*)
             task apps:get -- "$(gum input --placeholder 'application id')"
             ;;
+          "add"*)
+            company=$(gum input --placeholder 'company')
+            role=$(gum input --placeholder 'role')
+            url=$(gum input --placeholder 'apply URL (optional)')
+            args=(--company "$company" --role "$role")
+            [ -n "$url" ] && args+=(--apply-url "$url")
+            task apps:add -- "${args[@]}"
+            ;;
           "update"*)
             task apps:update -- "$(gum input --placeholder 'id --status Applied')"
             ;;
@@ -302,6 +327,12 @@ tasks:
             ;;
           "emails"*)
             task apps:emails
+            ;;
+          "resolve"*)
+            task apps:queue:resolve
+            ;;
+          "docs"*)
+            task apps:docs
             ;;
           "export"*)
             task apps:export -- "$(gum input --placeholder 'output file')"

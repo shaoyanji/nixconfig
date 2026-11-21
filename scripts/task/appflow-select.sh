@@ -12,7 +12,7 @@ set -uo pipefail
 
 repo=$(git rev-parse --show-toplevel)
 config="${APPFLOW_CONFIG:-$HOME/.config/appflow}"
-selector="$repo/modules/plugins/appflow/select.py"
+selector="$repo/modules/plugins/appflow/jdselect.py"
 
 jd=""
 id=""

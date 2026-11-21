@@ -37,9 +37,9 @@ in {
         ''
         else ''
           cp ${jd} work/jd.txt
-          cp ${./select.py} work/select.py
+          cp ${./jdselect.py} work/jdselect.py
           cp ${./glossary.json} work/glossary.json
-          ${pkgs.python3}/bin/python3 work/select.py \
+          ${pkgs.python3}/bin/python3 work/jdselect.py \
             --resume work/source.json \
             --jd work/jd.txt \
             --out work/resume.json \

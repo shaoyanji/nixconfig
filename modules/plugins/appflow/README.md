@@ -30,7 +30,7 @@ no schedule writes it.
 | `portfolio.py` | the same for `portfolio_project` and `lib/bountystash/portfolio.json` |
 | `content_api.py` | the wire both CLIs speak: one GET, one upsert and one delete per table |
 | `packet.nix` | the PDF build: typst in the sandbox, artifact is a store path |
-| `select.py` | the projection: one job description, one page of material out of the corpus |
+| `jdselect.py` | the projection: one job description, one page of material out of the corpus |
 | `triage.py` | the other direction: every posting in the queue, one fit score each, ranked |
 | `glossary.json` | German job-ad words mapped onto the English ones the corpus uses |
 | `templates/` | two templates, localized through `strings.json`, no personal data |
@@ -54,7 +54,7 @@ task agents:apps:packet ID=<app>       # uses ~/.config/appflow/jd/<id>.txt when
 task agents:apps:packet ID=<app> JD=-  # read the description from stdin
 ```
 
-`select.py` scores each highlight against the description: a term counts more the
+`jdselect.py` scores each highlight against the description: a term counts more the
 rarer it is in the corpus, and a term from the resume's own keywords counts 2.5×
 because it is vocabulary the operator already uses for the work. Verbs that both
 a CV and an ad own (*build*, *manage*, *experience*) are dropped, because matching
@@ -101,7 +101,7 @@ the last only when the text has a requirements section to take must-haves from.
 With `--create N` the top N rows are upserted (`fit` 1–5; new rows stage `prep`
 for apply-now, `other` otherwise), every scored candidate with an id gets a
 `triage-analysis` document, and each apply-now match also gets a `packet-brief`
-— the `select.py` projection the packet builds from. Rows and documents upsert
+— the `jdselect.py` projection the packet builds from. Rows and documents upsert
 on their ids, so a re-run is a no-op. Run it after `agents:apps:sync` lands new
 discovered rows; hourly cadence is the sync's, so once a day is enough for the
 queue as it stands.

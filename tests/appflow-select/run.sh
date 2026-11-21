@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regression fixture for `modules/plugins/appflow/select.py`.
+# Regression fixture for `modules/plugins/appflow/jdselect.py`.
 #
 # The selector is the one place a CV is narrowed, so its contract is asserted
 # rather than eyeballed on a real application: no role disappears, no line is
@@ -18,7 +18,7 @@ set -uo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo="$(cd "$here/../.." && pwd)"
-selector="$repo/modules/plugins/appflow/select.py"
+selector="$repo/modules/plugins/appflow/jdselect.py"
 corpus="$here/fixtures/resume.json"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT

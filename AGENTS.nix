@@ -4994,5 +4994,28 @@
         turns-runtime benchmark's own nested flake. .envrc corrected.
       '';
     };
+
+    compile-boundary-gate = {
+      title = "Every tracked file has a class; unclassed is bloat";
+      kind = "decision";
+      status = "ACCEPTED";
+      date = "2026-11-22";
+      summary = "flake/provenance.nix holds the class table (nix-source, exec-source, prose, fixture, app-source, asset, config, secret, ledger); .#provenance emits it and checks:provenance fails any tracked file matching no rule. The 'compiled by nix, else bloat' directive is now a gate, not a sweep.";
+      refs = {
+        modules = ["flake/provenance.nix" "flake/check-inventory.nix" "scripts/task/provenance-check.sh"];
+        tasks = ["checks:provenance" "check:verify"];
+      };
+      body = ''
+        The sweep that motivated it found the tree already well-compiled —
+        inventory/modules TOMLs are compiled inputs, generated docs live only
+        in the store, and the check inventory moved from TOML to a Nix attrset
+        (997d302f). What was missing was the *gate*: a file could land without
+        an owner and nobody would notice. The class table is first-match
+        prefix/file/suffix rules read by one jq pass over git ls-files;
+        a miss means either the file is bloat or the rule table needs a class.
+        1162 files classed on landing: nix-source 593, exec-source 244,
+        prose 170, app-source 95, fixture 45, config 13, secret 1, ledger 1.
+      '';
+    };
   };
 }

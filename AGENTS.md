@@ -13,7 +13,7 @@ task --list-all --json | jq -r '.tasks[].name'      # the whole task contract
 nix eval --json .#inventory.hosts | toon -e         # fleet: hardware, status, network
 nix eval --json .#agentSkills | toon -e             # skill index, one line each
 nix eval --json .#agentsNotes | toon -e             # decisions, proposals, open work
-nix eval --json .#knowledgeGraph | toon -e          # every node and edge
+task ops:kg                                       # graph stats + query surface (raw .#knowledgeGraph dumps a cypher string — never eval it whole)
 nix eval --json .#epistemics.table | toon -e        # which source settles which claim
 nix eval --json .#proseBudget | toon -e             # line budget per page, with reasons
 nix build .#artifacts.docs                          # every generated page

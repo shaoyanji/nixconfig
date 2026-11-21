@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-21T09:12:41Z",
+  "generated": "2026-11-21T09:16:47Z",
   "count": 200,
-  "pin": "cffcb3ff01f9cd540cf353f157e48c102d837565a6abb2fec06e4f0124c7b3b4",
+  "pin": "ddbf1e739dc41bcb81ac30caaeb3fc82e52abcb86d8b0ae96fb109befcdcdd36",
   "turns": [
+    {
+      "id": "5ad84726-3e70-4f7e-b71d-58579071e6fa",
+      "ts": "2026-11-21T09:13:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-steward-default-2",
+      "action": "drove idle pane default:2.1 (devin lane); jev-decide classified next task host-change 0.93/0.9 — review and commit the unstaged command_allowlist in modules/user/ai/hermes-persona/config.yaml; before delivery the pane submitted its own /goal and is now busy (Thinking, Goal running) on nixconfig refactoring — not interrupted per steward rules; classified task undelivered, retry on next idle cycle",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "997d302f0d14146056f913cbd660783e96699747",
+      "branch": "main",
+      "frame": "03h9yjnjm66ey7r4ze0fas665"
+    },
+    {
+      "id": "7e0b6ae7-f5b4-4c3e-9ab9-ef80a5aba7bf",
+      "ts": "2026-11-21T09:12:46Z",
+      "source": "devin",
+      "subject": "nixconfig:compile-boundary",
+      "action": "landed: check inventory TOML -> flake/check-inventory.nix attrset; .#checkInventory.tsv byte-identical; taskfiles/checks.toml deleted | gate: check:verify 123/123 PASS, shell lint 0 findings",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "997d302f0d14146056f913cbd660783e96699747",
+      "branch": "main",
+      "frame": "03h9yjjwfzh3o5eoc4krxk762"
+    },
     {
       "id": "b65e4a9e-cb29-4c00-9aaa-ecc14076730b",
       "ts": "2026-11-21T09:06:05Z",
@@ -2712,32 +2738,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9vjyicrerpsu5hxvc0du7m"
-    },
-    {
-      "id": "4a4414fd-eaae-46d3-8762-173be28ab325",
-      "ts": "2026-11-20T23:57:46Z",
-      "source": "devin",
-      "subject": "nixconfig:shared-config-strip",
-      "action": "landed: overlays named via self.nixFiles registry (was duplicated relative-path imports beside nixos.nix's registry style) + retired pihole-ftl-werror.nix deleted; frieren comment updated | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c7204aa223a1bcb561238544077da321331e8f7",
-      "branch": "main",
-      "frame": "03h9vj4xc6brstag81447g7uo"
-    },
-    {
-      "id": "3d581633-fc43-458f-af45-0a0f0884589d",
-      "ts": "2026-11-20T23:55:57Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-leak-gate",
-      "action": "durable gate verified on the build outputs (/tmp/matt-site -> ys2f4r55, 15 pages): 4/4 shipped CVs linked — cv.pdf 1 anchor (index), cv-de.pdf 1 (de/index), cv-energy.pdf 7, cv-energy-de.pdf 7 (home + 4 work + 2 brief pages, ../ and ../../ relative); 81 internal links resolve, 16 PDF anchors all carry download, 0 orphans/0 missing; second site bountystash-mockup 7/7 links, 0 PDFs | gate: site-links exit 0 both, fixture 14/14",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
-      "branch": "main",
-      "frame": "03h9vis5u9vcbhv49xdz3w223"
     }
   ]
 }

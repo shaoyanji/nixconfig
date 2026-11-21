@@ -251,7 +251,7 @@
     && builtins.hasAttr tier evidence
     && rankOf tier <= rankOf kinds.${kind}.evidenceFloor;
 
-  canCarry = tier: builtins.filter (k: carries k tier) kindIds;
+  canCarry = tier: kindIds |> builtins.filter (k: carries k tier);
 
   standingTier = {
     authored = 0;
@@ -330,14 +330,15 @@
   # reports by name (`routes.<r>.metered must be none/upstream/quota/paid`), and a
   # missing-attribute error at the sort would hide that message.
   preferredRoute = src: let
-    ranked = lib.sort (a: b: let
-      ka = (meteredTier.${a.metered} or 99) * 10000 + a.cost;
-      kb = (meteredTier.${b.metered} or 99) * 10000 + b.cost;
-    in
-      ka < kb)
-    (map (n: src.routes.${n} // {name = n;}) (builtins.attrNames src.routes));
+    ranked =
+      (src.routes |> builtins.attrNames |> map (n: src.routes.${n} // {name = n;}))
+      |> lib.sort (a: b: let
+        ka = (meteredTier.${a.metered} or 99) * 10000 + a.cost;
+        kb = (meteredTier.${b.metered} or 99) * 10000 + b.cost;
+      in
+        ka < kb);
   in
-    builtins.head ranked;
+    ranked |> builtins.head;
 
   spendFor = name: kind:
     (spend.${name} or {}).${kind} or null;
@@ -390,7 +391,7 @@
       };
 
   forKind = kind: let
-    verdicts = map (judge kind) sourceIds;
+    verdicts = sourceIds |> map (judge kind);
     permitted =
       verdicts
       |> builtins.filter (v: v.go)
@@ -401,7 +402,7 @@
     first =
       if permitted == []
       then null
-      else (builtins.head permitted);
+      else (permitted |> builtins.head);
   in {
     inherit kind;
     read =
@@ -417,7 +418,7 @@
     inherit (kinds.${kind}) persist;
     floor = kinds.${kind}.evidenceFloor;
     evidenceRank = rankOf kinds.${kind}.evidenceFloor;
-    order = map strip permitted;
+    order = permitted |> map strip;
     never =
       verdicts
       |> builtins.filter (v: !v.go)
@@ -492,15 +493,15 @@ in {
   inherit overrides;
   # The precedence as a function, so the gate applies it rather than re-deriving
   # "is this overridden" in a second place.
-  overturns = ids: lib.filter (id: !(overrides ? ${id})) ids;
+  overturns = ids: ids |> lib.filter (id: !(overrides ? ${id}));
   overturnedBy = id: overrides.${id} or null;
-  overturned = builtins.attrNames overrides;
-  all = map review samples;
+  overturned = overrides |> builtins.attrNames;
+  all = samples |> map review;
   # The resource ladder, independent of any claim: which transports exist, what
   # they spend, and whether they may be asked many times at once.
-  routes = lib.mapAttrs (_: s: lib.mapAttrs (_: r: r) s.routes) sources;
-  unsettleable = map (k: k.kind) (builtins.filter (k: k.order == []) (builtins.attrValues table));
+  routes = sources |> lib.mapAttrs (_: s: s.routes |> lib.mapAttrs (_: r: r));
+  unsettleable = table |> builtins.attrValues |> builtins.filter (k: k.order == []) |> map (k: k.kind);
   # A kind that can be settled but whose answer has nowhere to live is researched
   # forever; this is empty by construction, and the check keeps it that way.
-  persistable = map (k: k.kind) (builtins.filter (k: k.persist == "") (builtins.attrValues table));
+  persistable = table |> builtins.attrValues |> builtins.filter (k: k.persist == "") |> map (k: k.kind);
 }

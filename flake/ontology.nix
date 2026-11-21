@@ -2,8 +2,8 @@
   lib,
   epistemics ? import ./epistemics.nix {inherit lib;},
 }: let
-  tiers = lib.mapAttrs (_: e: e.rank) epistemics.evidence;
-  tierNotes = lib.mapAttrs (_: e: e.what) epistemics.evidence;
+  tiers = epistemics.evidence |> lib.mapAttrs (_: e: e.rank);
+  tierNotes = epistemics.evidence |> lib.mapAttrs (_: e: e.what);
 
   entities = {
     doc = {
@@ -39,7 +39,7 @@
       identity = "the attrset key under notes, which the id grammar already constrains";
       member = "AGENTS.nix through lib/agents-notes.nix";
       fields = ["label" "path" "kind" "status" "claim"];
-      claims = lib.unique (builtins.attrValues epistemics.noteClaims);
+      claims = epistemics.noteClaims |> builtins.attrValues |> lib.unique;
     };
     policy = {
       what = "a rule a machine can check, declared in flake/policies.nix";
@@ -188,16 +188,16 @@
     };
   };
 
-  entityIds = builtins.attrNames entities;
-  relationIds = builtins.attrNames relations;
+  entityIds = entities |> builtins.attrNames;
+  relationIds = relations |> builtins.attrNames;
 
   idType = id: let
     parts = lib.splitString ":" id;
-    head = builtins.head parts;
+    head = parts |> builtins.head;
   in
     if builtins.length parts < 2
     then null
-    else if builtins.hasAttr head entities
+    else if entities |> builtins.hasAttr head
     then head
     else null;
 
@@ -214,7 +214,7 @@
       if recorded == null
       then defaultTier
       else recorded;
-    known = tier != null && builtins.hasAttr tier epistemics.evidence;
+    known = tier != null && (epistemics.evidence |> builtins.hasAttr tier);
     verdict = ok: why: {
       inherit (edge) from to type;
       inherit tier defaultTier recorded;
@@ -252,22 +252,23 @@
     else verdict true "${src} --${tier}--> ${dst}${suffix}";
 
   homes =
-    lib.foldl' (
+    entityIds
+    |> lib.foldl' (
       acc: t:
-        lib.foldl' (a: k: a // {"${k}" = (a.${k} or []) ++ [t];}) acc entities.${t}.claims
-    ) {}
-    entityIds;
+        entities.${t}.claims
+        |> lib.foldl' (a: k: a // {"${k}" = (a.${k} or []) ++ [t];}) acc
+    ) {};
 
-  stableKinds = builtins.filter (k: epistemics.kinds.${k}.volatility == "stable") epistemics.kindIds;
-  unhomed = builtins.filter (k: !(builtins.hasAttr k homes) && !(builtins.hasAttr k sinks)) stableKinds;
-  sinkOnly = builtins.filter (k: !(builtins.hasAttr k homes)) (builtins.filter (k: builtins.hasAttr k sinks) stableKinds);
-  sinkIds = builtins.attrNames sinks;
-  straySinks = builtins.filter (k: !(builtins.elem k epistemics.kindIds)) sinkIds;
+  stableKinds = epistemics.kindIds |> builtins.filter (k: epistemics.kinds.${k}.volatility == "stable");
+  unhomed = stableKinds |> builtins.filter (k: !(homes |> builtins.hasAttr k) && !(sinks |> builtins.hasAttr k));
+  sinkOnly = stableKinds |> builtins.filter (k: sinks |> builtins.hasAttr k) |> builtins.filter (k: !(homes |> builtins.hasAttr k));
+  sinkIds = sinks |> builtins.attrNames;
+  straySinks = sinkIds |> builtins.filter (k: !(epistemics.kindIds |> builtins.elem k));
 
   touches = t:
-    builtins.filter (r: builtins.elem t relations.${r}.from || builtins.elem t relations.${r}.to) relationIds;
+    relationIds |> builtins.filter (r: (relations.${r}.from |> builtins.elem t) || (relations.${r}.to |> builtins.elem t));
 
-  weak = builtins.filter (r: relations.${r}.tier == "extracted") relationIds;
+  weak = relationIds |> builtins.filter (r: relations.${r}.tier == "extracted");
 
   samples = [
     {
@@ -296,9 +297,9 @@
 in {
   inherit entities relations tiers tierNotes sinks sinkIds entityIds relationIds homes stableKinds unhomed sinkOnly straySinks samples idType admit touches weak;
   inherit (epistemics) evidence;
-  all = map admit samples;
+  all = samples |> map admit;
   count = {
-    entities = builtins.length entityIds;
-    relations = builtins.length relationIds;
+    entities = entityIds |> builtins.length;
+    relations = relationIds |> builtins.length;
   };
 }

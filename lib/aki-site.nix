@@ -15,7 +15,7 @@
   inventoryFile = ../inventory.toml;
   rawInventory =
     if builtins.pathExists inventoryFile
-    then builtins.fromTOML (builtins.readFile inventoryFile)
+    then inventoryFile |> builtins.readFile |> builtins.fromTOML
     else {hosts = {};};
   inv =
     if inventory != null
@@ -38,15 +38,15 @@
 
   # --- the evaluated model ---------------------------------------------------
   hosts = inv.hosts or {};
-  hostNames = builtins.attrNames hosts;
-  hostValues = lib.attrValues hosts;
+  hostNames = hosts |> builtins.attrNames;
+  hostValues = hosts |> lib.attrValues;
 
   # Counts are filtered out of the registry here, not read from a `derived`
   # block and not typed: the registry's own derived block is computed upstream
   # by lib/inventory.nix, but recomputing keeps the site correct even in the
   # standalone TOML fallback.
-  totalHosts = builtins.length hostNames;
-  countWhere = p: builtins.length (lib.filter p hostValues);
+  totalHosts = hostNames |> builtins.length;
+  countWhere = p: hostValues |> lib.filter p |> builtins.length;
   externalCount = countWhere (h: (h.kind or "") == "external");
   nixHostCount = totalHosts - externalCount;
   activeNix = countWhere (h: (h.status or "") == "active" && (h.kind or "") != "external");
@@ -56,43 +56,43 @@
   preservedCount = countWhere (h: (h.status or "") == "preserved");
 
   byStatus =
-    lib.foldl'
+    (hosts |> lib.attrValues)
+    |> lib.foldl'
     (acc: h:
       acc
       // {
         "${h.status or "unknown"}" = (acc.${h.status or "unknown"} or 0) + 1;
       })
-    {}
-    (lib.attrValues hosts);
+    {};
 
   byKind =
-    lib.foldl'
+    (hosts |> lib.attrValues)
+    |> lib.foldl'
     (acc: h:
       acc
       // {
         "${h.kind or "unknown"}" = (acc.${h.kind or "unknown"} or 0) + 1;
       })
-    {}
-    (lib.attrValues hosts);
+    {};
 
   archCount =
-    lib.foldl'
+    (hosts |> lib.attrValues)
+    |> lib.foldl'
     (acc: h: let
       a = h.arch or "unknown";
     in
       acc // {"${a}" = (acc.${a} or 0) + 1;})
-    {}
-    (lib.attrValues hosts);
+    {};
 
   # Services are the ones the registry declares per host; nothing is invented.
-  serviceNames = lib.unique (lib.concatMap (h: h.software.key_services or []) (lib.attrValues hosts));
-  serviceCount = builtins.length serviceNames;
+  serviceNames = (hosts |> lib.attrValues) |> lib.concatMap (h: h.software.key_services or []) |> lib.unique;
+  serviceCount = serviceNames |> builtins.length;
 
   # --- closure budgets: measured, never typed --------------------------------
   # `[hosts.<h>.baseline] bytes/measured_on` is rewritten by
   # `task dev:closure:budget:adopt`; `headroom_pct` and an optional absolute
   # `bytes` pin are policy. The site shows baseline and the derived budget.
-  budgets = builtins.fromTOML (builtins.readFile ../closure-budgets.toml);
+  budgets = ../closure-budgets.toml |> builtins.readFile |> builtins.fromTOML;
   budgetHosts = budgets.hosts or {};
   # `or` only rescues a missing attribute, not a missing parent, so each level is
   # defaulted on its own — a file with no [defaults] must still render.
@@ -114,31 +114,31 @@
     measuredOn = (b.baseline or {}).measured_on or "—";
   };
 
-  budgetRows = lib.filter (r: r.bytes != null) (map budgetRow (builtins.attrNames budgetHosts));
-  budgetNames = map (r: r.name) budgetRows;
+  budgetRows = budgetHosts |> builtins.attrNames |> map budgetRow |> lib.filter (r: r.bytes != null);
+  budgetNames = budgetRows |> map (r: r.name);
 
   # Coverage is judged against the hosts that HAVE a closure to measure. An
   # external device (Windows, FreeBSD, Android, a NAS) has no Nix store, so
   # listing it as "without a baseline" forever would be noise that hides the
   # real gap: an active Nix host nobody adopted.
-  namesWhere = p: builtins.attrNames (lib.filterAttrs (_: p) hosts);
+  namesWhere = p: hosts |> lib.filterAttrs (_: p) |> builtins.attrNames;
   externalNames = namesWhere (h: (h.kind or "") == "external");
   activeNixNames = namesWhere (h: (h.status or "") == "active" && (h.kind or "") != "external");
   preservedNixNames =
     namesWhere (h: (h.status or "") != "active" && (h.kind or "") != "external");
-  isCovered = n: builtins.elem n budgetNames;
-  coveredActive = lib.filter isCovered activeNixNames;
-  uncoveredActive = lib.filter (n: !(isCovered n)) activeNixNames;
-  uncoveredPreserved = lib.filter (n: !(isCovered n)) preservedNixNames;
+  isCovered = n: budgetNames |> builtins.elem n;
+  coveredActive = activeNixNames |> lib.filter isCovered;
+  uncoveredActive = activeNixNames |> lib.filter (n: !(isCovered n));
+  uncoveredPreserved = preservedNixNames |> lib.filter (n: !(isCovered n));
 
   maxBudget =
-    lib.foldl' (a: r:
+    budgetRows
+    |> lib.foldl' (a: r:
       if r.bytes > a
       then r.bytes
       else a)
-    0
-    budgetRows;
-  totalBudget = lib.foldl' (a: r: a + r.bytes) 0 budgetRows;
+    0;
+  totalBudget = budgetRows |> lib.foldl' (a: r: a + r.bytes) 0;
 
   # One decimal formatter for every figure the site prints. Nix has no printf,
   # and `toString` on a float keeps six decimals ("30.100000 GiB"), so the integer
@@ -174,7 +174,7 @@
   # A host's own mark, where one exists: a badge, not a hero image. It comes from
   # the asset plane like every other picture, so no binary enters the repo and the
   # site build stays a pure projection of the registry.
-  hostBadges = builtins.fromJSON (builtins.readFile ./site/host-badges.json);
+  hostBadges = ./site/host-badges.json |> builtins.readFile |> builtins.fromJSON;
 
   # Aki hypermedia driver with delegated click listener for dynamic DOM mutations.
   # Assets are FILES (lib/site/), not literals: Nix cannot lint, format or
@@ -228,10 +228,10 @@
   # refuses to return a page that still has a hole. A renamed value would
   # otherwise ship as literal braces on the page instead of failing the build.
   render = file: values: let
-    text = builtins.readFile file;
-    names = builtins.attrNames values;
-    out = lib.replaceStrings (map (n: "{{${n}}}") names) (map (n: toString values.${n}) names) text;
-    unbound = lib.head (lib.splitString "}}" (lib.last (lib.splitString "{{" out)));
+    text = file |> builtins.readFile;
+    names = values |> builtins.attrNames;
+    out = text |> lib.replaceStrings (names |> map (n: "{{${n}}}")) (names |> map (n: toString values.${n}));
+    unbound = out |> lib.splitString "{{" |> lib.last |> lib.splitString "}}" |> lib.head;
   in
     if lib.hasInfix "{{" out
     then throw "template ${toString file}: unbound placeholder {{${unbound}}}"
@@ -264,9 +264,9 @@
     services = toString serviceCount;
     uncovered = toString (builtins.length uncoveredActive);
     activeNixHosts = toString (builtins.length activeNixNames);
-    kindRow = lib.concatMapStringsSep ", " (k: "${k} (${toString byKind.${k}})") (lib.attrNames byKind);
-    statusRow = lib.concatMapStringsSep ", " (s: "${s} (${toString byStatus.${s}})") (lib.attrNames byStatus);
-    archRow = lib.concatMapStringsSep ", " (a: "${a} (${toString archCount.${a}})") (lib.attrNames archCount);
+    kindRow = byKind |> lib.attrNames |> lib.concatMapStringsSep ", " (k: "${k} (${toString byKind.${k}})");
+    statusRow = byStatus |> lib.attrNames |> lib.concatMapStringsSep ", " (s: "${s} (${toString byStatus.${s}})");
+    archRow = archCount |> lib.attrNames |> lib.concatMapStringsSep ", " (a: "${a} (${toString archCount.${a}})");
   };
 
   overviewBody = render ./site/overview.html t;
@@ -298,12 +298,12 @@
   # Every registered host, ordered as the registry orders them. The old list was
   # `status == active` only, which silently hid preserved and WIP machines that
   # the registry still describes.
-  hostSidebarButtons = lib.concatStringsSep "\n" (
-    map (
+  hostSidebarButtons =
+    hostKeys
+    |> map (
       h: ''<button class="side-btn" url="data/host-${h}.json">${h} (${hosts.${h}.kind or "unknown"})</button>''
     )
-    hostKeys
-  );
+    |> lib.concatStringsSep "\n";
 
   inventoryJson = builtins.toJSON {
     "#breadcrumbs" = {textContent = "fleet / inventory";};
@@ -397,10 +397,10 @@
         then "enabled"
         else ""
       )
-      + mkHostRow "Services" (escH (lib.concatStringsSep ", " (sw.key_services or [])))
-      + mkHostRow "Traits" (escH (lib.concatStringsSep ", " (sw.traits or [])))
+      + mkHostRow "Services" ((sw.key_services or []) |> lib.concatStringsSep ", " |> escH)
+      + mkHostRow "Traits" ((sw.traits or []) |> lib.concatStringsSep ", " |> escH)
       + mkHostRow "Compute tier" (escH (persona.compute_tier or ""))
-      + mkHostRow "Constraints" (escH (lib.concatStringsSep "; " (persona.constraints or [])));
+      + mkHostRow "Constraints" ((persona.constraints or []) |> lib.concatStringsSep "; " |> escH);
 
     budgetBlock = lib.optionalString (budget != null) ''
       <h3 style="margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--heading);">Closure Budget</h3>
@@ -429,7 +429,7 @@
             lib.optionalString ((l.note or "") != "") " &middot; "
           }<code>${toString l.port}</code></td></tr>''
       )
-      (builtins.filter (l: l.url or null != null) (net.links or []));
+      ((net.links or []) |> builtins.filter (l: (l.url or null) != null));
 
     statusBadge =
       if (info.status or "") == "active"
@@ -507,7 +507,7 @@
   # were wrong within a week. `closure-budgets.toml` is the closure document that
   # a MEASUREMENT rewrites (`task dev:closure:budget:adopt`), so it is the one
   # rendered: baseline, headroom, derived budget, and the date taken.
-  closureRows = lib.sort (a: b: a.bytes > b.bytes) budgetRows;
+  closureRows = budgetRows |> lib.sort (a: b: a.bytes > b.bytes);
 
   closuresJson = builtins.toJSON {
     "#breadcrumbs" = {textContent = "fleet / closure-budgets";};
@@ -604,11 +604,14 @@
   # Notes index — every doc and skill the graph knows, by how often it is cited.
   # Opening a row is an ordinary transition to that note's slice, which carries
   # the rendered note itself (see noteEntries / the build step below).
-  noteIndex = lib.sort (
-    a: b: a.degree > b.degree || (a.degree == b.degree && a.label < b.label)
-  ) (map (n: n // {degree = degree.${n.id} or 0;}) noteNodes);
+  noteIndex =
+    (noteNodes
+      |> map (n: n // {degree = degree.${n.id} or 0;}))
+    |> lib.sort (
+      a: b: a.degree > b.degree || (a.degree == b.degree && a.label < b.label)
+    );
 
-  uncitedNotes = lib.filter (n: n.degree == 0) noteIndex;
+  uncitedNotes = noteIndex |> lib.filter (n: n.degree == 0);
 
   notesJson = builtins.toJSON {
     "#breadcrumbs" = {textContent = "fleet / notes";};
@@ -767,10 +770,10 @@
         });
       })
       agentsNotes.notes;
-    expected = map (id: "data/agents-notes/${id}.json") (builtins.attrNames agentsNotes.notes);
-    produced = map (s: s.name) slices;
+    expected = agentsNotes.notes |> builtins.attrNames |> map (id: "data/agents-notes/${id}.json");
+    produced = slices |> map (s: s.name);
     drift = lib.subtractLists expected produced ++ lib.subtractLists produced expected;
-    shared = lib.subtractLists (lib.unique produced) produced;
+    shared = lib.subtractLists (produced |> lib.unique) produced;
   in
     if drift != []
     then throw "the site's note slices do not match the note set: ${lib.concatStringsSep ", " drift}"
@@ -887,7 +890,7 @@
   # degree — so a canvas click is an ordinary Aki transition to a JSON file.
   # No daemon, no router, no client-side graph query language.
   # nixpkgs exposes `escapeXML` (a superset of what HTML text needs: & < > " ').
-  escH = s: lib.escapeXML (toString s);
+  escH = s: s |> toString |> lib.escapeXML;
   nodeSlug = id: builtins.substring 0 16 (builtins.hashString "sha256" id);
   sliceRel = n: "data/kg/${n.type}-${nodeSlug n.id}.json";
   sliceForId = id: let
@@ -906,8 +909,8 @@
   # and rendered by the build step below — so "open the note" is a transition
   # inside the site, not a link to a forge that may have moved the file (the old
   # page hardcoded one such URL, and it was the only way to reach any note).
-  docNodes = builtins.filter (n: n.type == "doc") kg.graph.nodes;
-  skillNodes = builtins.filter (n: n.type == "skill") kg.graph.nodes;
+  docNodes = kg.graph.nodes |> builtins.filter (n: n.type == "doc");
+  skillNodes = kg.graph.nodes |> builtins.filter (n: n.type == "skill");
   noteNodes = docNodes ++ skillNodes;
   # A skill node's `path` is its directory (`.agents/skills/<name>`); its note is
   # the SKILL.md inside it. `lib/knowledge-graph.nix` deliberately projects the
@@ -938,7 +941,7 @@
     (n: {
       slice = sliceRel n;
       path = noteFile n;
-      text = stripFrontmatter (builtins.readFile (root + "/${noteFile n}"));
+      text = root + "/${noteFile n}" |> builtins.readFile |> stripFrontmatter;
     })
     (builtins.filter (n: n ? path) noteNodes)
     ++ lib.mapAttrsToList (id: _: {
@@ -987,7 +990,7 @@
     {}
     kg.graph.edges; # Tag nodes have no stat of their own; derive the count so the chip can
   # never disagree with the data it filters.
-  tagCount = builtins.length (builtins.filter (n: n.type == "tag") kg.graph.nodes);
+  tagCount = kg.graph.nodes |> builtins.filter (n: n.type == "tag") |> builtins.length;
 
   siteNodes =
     map
@@ -1009,8 +1012,8 @@
 
   kgSlice = n: let
     inc = incident.${n.id} or [];
-    outward = lib.filter (x: x.dir == "out") inc;
-    inward = lib.filter (x: x.dir == "in") inc;
+    outward = inc |> lib.filter (x: x.dir == "out");
+    inward = inc |> lib.filter (x: x.dir == "in");
     links = xs:
       if xs == []
       then "<p><small>none</small></p>"
@@ -1027,7 +1030,7 @@
     # hardcoded — the site's own state is the whole destination set.
     onward = let
       hostPage =
-        lib.optionalString (n.type == "host" && builtins.elem n.label hostNames)
+        lib.optionalString (n.type == "host" && (hostNames |> builtins.elem n.label))
         ''<button class="tab-btn" url="data/host-${n.label}.json">Inventory page</button>'';
       notesPage =
         lib.optionalString (n.type == "doc" || n.type == "skill")

@@ -324,6 +324,10 @@
       cp ${pkgs.writeText "services.json" (cardsJson audiences)} $out/data/services.json
     '';
 
+  # `tailscale serve` rewrites the whole config under an etag — one writer: docs/agent-turns.md
+  serveLock = "/run/tailscale-serve.lock";
+  serve = args: "${pkgs.util-linux}/bin/flock ${serveLock} ${config.services.tailscale.package}/bin/tailscale ${args}";
+
   mountPorts = map (m: m.port) (builtins.attrValues cfg.mounts);
   # Prefix test, not a regex: POSIX ERE rejected the bracket form of `[::1]`
   # at eval (measured on delphi, 2026-10-21), and a mount upstream is a literal
@@ -460,6 +464,8 @@ in {
           Type = "oneshot";
           RemainAfterExit = true;
           TimeoutStartSec = 150;
+          Restart = "on-failure";
+          RestartSec = 5;
           ExecStartPre = pkgs.writeShellScript "tailscale-serve-wait" ''
             set -euo pipefail
             state=NoState
@@ -474,8 +480,8 @@ in {
             echo "tailscale serve: tailscaled not Running after 120s (last: $state)" >&2
             exit 1
           '';
-          ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --bg --https=${toString m.port} ${m.upstream}";
-          ExecStop = "${config.services.tailscale.package}/bin/tailscale serve --https=${toString m.port} off";
+          ExecStart = serve "serve --bg --https=${toString m.port} ${m.upstream}";
+          ExecStop = serve "serve --https=${toString m.port} off";
         };
       })
     cfg.mounts;

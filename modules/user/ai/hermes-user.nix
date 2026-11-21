@@ -398,7 +398,7 @@ in {
             gnused
           ];
           text = ''
-            # hermes-handoff: print a resume-brief for the resurrected Vanta
+            # hermes-handoff: print a resume-brief for the resurrected Frieren
             # persona from the OpenClaw archive + live ~/.hermes state.
             set -euo pipefail
             ARCHIVE="''${HERMES_ARCHIVE:-$HOME/.hermes/openclaw-archive}"

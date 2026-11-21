@@ -1,4 +1,4 @@
-# Hermes Agent Configuration — Vanta persona
+# Hermes Agent Configuration — Frieren persona
 # Sensitive tokens (e.g. TELEGRAM_BOT_TOKEN) loaded from ~/.hermes/.env
 #
 # `_config_version` is written by hermes' own migrator. Keep it current: with
@@ -131,12 +131,10 @@ display:
 # Each entry's free contract is structural, not a remembered price: `:free` is
 # the suffix the Infron route bills at zero, `nvidia` is NIM's free dev tier
 # on integrate.api.nvidia.com (a build.nvidia.com key, no wallet exists to
-# bill), the openrouter account is verified `is_free_tier` (2026-11-19) so it
-# holds no balance — a `:free` id there is free quota, still suffixed in case
-# the account is ever credited — and ollama-cloud's catalog is a closed free
-# list. Nemotron's first failover is the NIM lane, not the custom endpoint:
-# the billed pick that cost the Infron balance (2026-11-19) was this model
-# resolved through a metered route.
+# bill), ollama-cloud's catalog is a closed free list, and apisfreellm takes
+# no key at all. Nemotron's first failover is the NIM lane, not the custom
+# endpoint: the billed pick that cost the Infron balance (2026-11-19) was this
+# model resolved through a metered route.
 fallback_providers:
   - provider: custom
     model: qwen/qwen3.8-27b:free

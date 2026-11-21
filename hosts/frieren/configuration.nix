@@ -435,7 +435,7 @@ in {
   # unauthenticated fallback can't shadow the secret-protected daemon.
   home-manager.users.devji.programs.aria2-user-fallback.enable = false;
 
-  # Resurrected OpenClaw persona ("Vanta") for the hermes mainframe agent.
+  # Resurrected OpenClaw persona ("Frieren") for the hermes mainframe agent.
   home-manager.users.devji.programs.hermes-user = {
     enable = true;
     persona = true;

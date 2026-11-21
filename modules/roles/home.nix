@@ -30,7 +30,6 @@
     browser = [self.modules."zen" self.modules."aria2"];
     media = [
       self.modules."user.desktop.multimedia"
-      self.modules."user.desktop.appimage-menu"
       self.modules."kitty"
     ];
     # Imported unconditionally in the old file (`a pkgs`-dependent import reads

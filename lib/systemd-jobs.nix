@@ -20,10 +20,9 @@
     enable ? true,
     serviceConfig ? {},
     ...
-  } @ spec: {
-    inherit enable;
-    service =
-      removeAttrs spec [
+  } @ spec: let
+    serviceAttrs =
+      [
         "description"
         "timerDescription"
         "onCalendar"
@@ -31,23 +30,36 @@
         "enable"
         "serviceConfig"
       ]
+      |> removeAttrs spec;
+  in {
+    inherit enable;
+    service =
+      serviceAttrs
       // {
         inherit description;
         serviceConfig = serviceBase // serviceConfig;
       };
     timer =
-      {
-        wantedBy = ["timers.target"];
-        timerConfig =
-          {
-            OnCalendar = onCalendar;
-            Persistent = true;
-          }
-          // lib.optionalAttrs (randomizedDelaySec != null) {
-            RandomizedDelaySec = randomizedDelaySec;
-          };
-      }
-      // lib.optionalAttrs (timerDescription != null) {description = timerDescription;};
+      [
+        {
+          wantedBy = ["timers.target"];
+          timerConfig =
+            [
+              {
+                OnCalendar = onCalendar;
+                Persistent = true;
+              }
+              (lib.optionalAttrs (randomizedDelaySec != null) {
+                RandomizedDelaySec = randomizedDelaySec;
+              })
+            ]
+            |> lib.mergeAttrsList;
+        }
+        (lib.optionalAttrs (timerDescription != null) {
+          description = timerDescription;
+        })
+      ]
+      |> lib.mergeAttrsList;
   };
 
   # unitBase: the site's shared unit attrs (wantedBy, unitConfig class marker,
@@ -80,15 +92,21 @@
       "wants"
     ];
     shared =
-      builtins.filter
-      (k: builtins.isList (unitBase.${k} or null) && builtins.isList (extra.${k} or null))
-      edgeAttrs;
+      edgeAttrs
+      |> builtins.filter (
+        k:
+          builtins.isList (unitBase.${k} or null)
+          && builtins.isList (extra.${k} or null)
+      );
   in
-    unitBase
-    // {
-      unitConfig = (unitBase.unitConfig or {}) // (extra.unitConfig or {});
-      serviceConfig = serviceBase // (extra.serviceConfig or {});
-    }
-    // removeAttrs extra (["unitConfig" "serviceConfig"] ++ shared)
-    // lib.genAttrs shared (k: extra.${k} ++ unitBase.${k});
+    [
+      unitBase
+      {
+        unitConfig = (unitBase.unitConfig or {}) // (extra.unitConfig or {});
+        serviceConfig = serviceBase // (extra.serviceConfig or {});
+      }
+      ((["unitConfig" "serviceConfig"] ++ shared) |> removeAttrs extra)
+      ((k: extra.${k} ++ unitBase.${k}) |> lib.genAttrs shared)
+    ]
+    |> lib.mergeAttrsList;
 }

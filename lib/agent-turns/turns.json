@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-21T02:19:48Z",
+  "generated": "2026-11-21T02:46:38Z",
   "count": 200,
-  "pin": "ce8c2d5617e4443d336bbd4207edf0beeb6b349399c229d570b3363d04bfdc1a",
+  "pin": "093b6aa6620d676d49c3e021a644675c78c868f165f4d11922cd32c3f0f8e635",
   "turns": [
+    {
+      "id": "e8503467-a0a1-45ac-b0d9-c6550f7f6256",
+      "ts": "2026-11-21T02:44:50Z",
+      "source": "devin",
+      "subject": "nixconfig:watchdog-timers",
+      "action": "claim: three live single-pair watchdog timers onto shared mkTimerJob (ups-drill, pg-backup-drill, paperless-watchdog)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/ups-simulation-drill.nix modules/services/postgres-backup-drill.nix modules/services/paperless-watchdog.nix"
+      ],
+      "files": [],
+      "base_commit": "ecf2d05622244e31a9b5810480b8ad36d71b7c8c",
+      "branch": "main",
+      "frame": "03h9wfs0bpkmr5e9clkguaip7"
+    },
+    {
+      "id": "5ff72212-290c-40f1-a347-3fcf75e70f73",
+      "ts": "2026-11-21T02:24:49Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "Drove idle devin win2 pane via jevdecide: nixconfig_refactor (p=0.91, margin 0.82, decisive). Task: continue nixconfig refactoring — strip Shared Config from Draft PR #3 and push the refactor forward, resolve open design questions, get PR into mergeable state. Pane accepted — Running tools confirmed.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9wbuzak4l2k1z7csr44ts6"
+    },
+    {
+      "id": "a791d3f8-3f03-4ed1-8f8b-e514dbc357bd",
+      "ts": "2026-11-21T02:24:48Z",
+      "source": "hermes-steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "Drove idle freebuff win1 pane via jevdecide: cv_quality_ats (p=0.69, margin 0.39, decisive >=0.3). Task: continue CV quality/autoATS work — review Typst templates (cv.typ, lebenslauf.typ) for ATS-scrambling layout, font, tracking, footer and link issues, then fix so the resume is ATS-safe. Pane accepted — fresh working... counter confirmed.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9wbuv2pxe25x03momyemqx"
+    },
+    {
+      "id": "6d5d991f-bdd1-443e-ad0a-f880d8443f9b",
+      "ts": "2026-11-21T02:21:22Z",
+      "source": "devin",
+      "subject": "nixconfig:offload-bridge",
+      "action": "landed: offload-bridge push+ingest onto shared mkTimerJob; timerDescription nullable in lib; 4 delphi units byte-identical | gate: checks:quick PASS census 6484",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ecf2d05622244e31a9b5810480b8ad36d71b7c8c",
+      "branch": "main",
+      "frame": "03h9wb6srudtayar7jcvuuek6"
+    },
     {
       "id": "c30038de-10af-4a9b-9d57-f64357c90f8e",
       "ts": "2026-11-21T02:16:54Z",
@@ -2647,65 +2701,6 @@
       "base_commit": "8b6561dd216d4d6c29d5a1cfc1898303006481d8",
       "branch": "main",
       "frame": "03h9rwmam40m5yfcp79pu0c2f"
-    },
-    {
-      "id": "1856c0c4-908d-47cb-a2cd-e864133fd9af",
-      "ts": "2026-11-20T12:47:06Z",
-      "source": "hermes",
-      "subject": "nixconfig:site-cv-links",
-      "action": "landed: documented the CV link gate — docs/cv-ats-compliance.md gains 'The link gate' (cvFiles as the one list behind installs and check, the in-build invocation, pass/fail output, --check absent and --rebuild caveat) and site-links.sh's header names its callers | gate: checks:prose PASS + ops:docs:budget PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8b6561dd216d4d6c29d5a1cfc1898303006481d8",
-      "branch": "main",
-      "frame": "03h9rw4glx98p0tk0obas5bb5"
-    },
-    {
-      "id": "a7cff9c3-6591-478f-90e5-03531c4c6cec",
-      "ts": "2026-11-20T12:46:38Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "landed: all 4 panes active. frieren freebuff→gate docs, devin→review fleet-remote PRs #3/#4, agy→job search (RESTARTED on account route, was 429 on free Gemini tier), delphi freebuff→clean noise. Email triage: 19 attention rows, 4 drafts ready. devin landed fleet-remote PR #4 (repo setup). | gate: pane-watch BUSY x3 + delphi freebuff working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
-      "branch": "main",
-      "frame": "03h9rw17cy5m9ebnspy2gz97q"
-    },
-    {
-      "id": "5504fd7a-c1ba-435f-9e88-61d8a8e458db",
-      "ts": "2026-11-20T12:45:06Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search-loop",
-      "action": "claim: continue job search loop, attention queue scan, upsert, follow-ups",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
-      "branch": "main",
-      "frame": "03h9rvqgb5lve70q23pf1hm6y"
-    },
-    {
-      "id": "e226c438-1ab6-404d-b35b-662fc8dbb743",
-      "ts": "2026-11-20T12:44:51Z",
-      "source": "devin",
-      "subject": "fleet-remote:repo-setup",
-      "action": "landed: PR #4 shaoyanji/fleet-remote — device-lane package scaffold (data/device, device, ui/device; comment-only markers), README repository-layout map, PR template, CI contents:read | gate: GH Actions debug x2 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "README.md",
-        ".github/workflows/android.yml",
-        ".github/pull_request_template.md",
-        "app/src/main/java/dev/shaoyanji/fleetremote/{device",
-        "data/device",
-        "ui/device}"
-      ],
-      "base_commit": "96b84e2e2d1397f64007d17df36b3d390355eb98",
-      "branch": "main",
-      "frame": "03h9rvoo8zb3e7xnzy9lkmyfg"
     }
   ]
 }

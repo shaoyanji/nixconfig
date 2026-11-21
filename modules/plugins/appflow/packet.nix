@@ -53,7 +53,9 @@ in {
         ''
       }
 
-      typst compile --root work work/lebenslauf.typ "$out/lebenslauf.pdf"
+      # Tagged, like the site's CVs: the section headings reach the structure tree
+      # instead of existing only as bold glyph runs an ATS has to guess at.
+      typst compile --pdf-standard ua-1 --root work work/lebenslauf.typ "$out/lebenslauf.pdf"
       ${typeset.check {
         source = "work/lebenslauf.typ";
         budget = pages;

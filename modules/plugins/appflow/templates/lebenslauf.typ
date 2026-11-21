@@ -97,9 +97,19 @@
 // `sticky`: without it the compiled lebenslauf ended page 2 on `Kenntnisse` with
 // every skill on page 3 — a heading alone at the foot of a page. cv.typ keeps its
 // headings with `sticky` for the same reason.
-#let section(kind) = block(breakable: false, sticky: true, width: 100%)[
+#let section(kind) = heading(strings.at(kind, default: kind), level: 1)
+// A real `heading`, so the section word is tagged `/H1` in the structure tree
+// rather than existing as a bold run a parser has to recognise. Level 1: each
+// section is a top-level division, and PDF/UA-1 rejects a first heading at any
+// other level. The show rule keeps the previous block's rendering; a heading
+// element ends its paragraph, so the document grows about 2mm per section
+// (example corpus 208 to 219mm, full corpus 105 to 109mm). No page count moves —
+// 1 page and 3 pages respectively — so nothing is subtracted here, unlike cv.typ
+// where the same gap broke a one-page budget.
+#set heading(numbering: none)
+#show heading: it => block(breakable: false, sticky: true, width: 100%)[
   #v(5pt)
-  #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#strings.at(kind, default: kind)]
+  #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#it.body]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
   #v(2pt)

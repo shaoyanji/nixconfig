@@ -872,7 +872,10 @@
       mkdir -p $out work
       cp ${./matt/cv.typ} work/cv.typ
       cp ${pkgs.writeText "cv.json" (builtins.toJSON cvJson)} work/cv.json
-      typst compile --root work work/cv.typ $out/cv.pdf
+      # `ua-1` exports a tagged PDF: headings, lists and entries reach the structure
+      # tree, so a parser reads sections from it instead of rebuilding them from
+      # glyph positions. cv-ats-check refuses a PDF that lost the tree.
+      typst compile --pdf-standard ua-1 --root work work/cv.typ $out/cv.pdf
       ${typeset.check {
         source = "work/cv.typ";
         budget = cvJson.pages;

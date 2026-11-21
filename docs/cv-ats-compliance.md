@@ -112,6 +112,34 @@ nor `packet.nix` moved.
 - The footer no longer carries `page 1 of`: on a one-page document it carries
   nothing, and on the full CV it carries only the page number, `1/2` and `2/2`.
 
+## The PDF's structure tree, not only its text layer
+
+A readable text layer is not a document structure. Before this change both
+templates drew their section headings as bold `text` inside a block, so the built
+PDFs carried a structure tree whose only roles were `P` and `Strong`: a parser
+that reads structure rather than geometry saw paragraphs and had to infer the
+headings from font weight.
+
+Both templates now emit real `heading` elements, at level 1 because each section
+is a top-level division of the document (and PDF/UA-1 rejects a first heading at
+any other level), with a `show heading` rule that keeps the previous rendering
+minus one gap: a heading element ends its paragraph, so typst adds the paragraph
+space after it that a plain block did not. Measured at 5.1pt per heading, that
+gap pushed `cv-energy-de.pdf` onto a second page, so `cv.typ` cancels it with
+`below: -2.1pt`; the Lebenslauf keeps it (208 → 219mm on the example corpus,
+105 → 109mm on the full one) because no page count moves there. Page budgets are
+unchanged at 2/2/1/1 with 64/68/272/276mm on the last page, against
+64/68/270/274 before.
+
+Each template compiles with `--pdf-standard ua-1`, so the files are tagged and
+PDF/UA-1 conformant and the five section words reach the tree as `/H1`. The
+build fails if that regresses: `cv-ats-check.sh` reads `pdfinfo` and refuses a PDF
+whose `Tagged` flag is absent (proved with `--no-pdf-tags`), so dropping the flag
+in a refactor is a defect rather than a silent downgrade.
+
+`cv.typ` also states `hyphenate: false` explicitly, matching `lebenslauf.typ`:
+it was relying on ragged setting being hyphenated rarely rather than never.
+
 ## The link gate: a CV the site ships is a CV the site links
 
 The rules above shape the four PDFs; this gate keeps them reachable.

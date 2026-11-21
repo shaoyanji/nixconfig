@@ -158,6 +158,16 @@ for s in stack:
 
 with open(pdf_path, "rb") as fh:
     blob = fh.read()
+
+# A structure tree is what lets a parser read `/H2 Experience` instead of guessing
+# a heading from a larger bold run. It is a compile flag (`--pdf-standard ua-1`),
+# so it is the kind of property that disappears in a refactor without any text
+# changing — hence the assertion rather than a comment.
+info = subprocess.run(["pdfinfo", pdf_path], capture_output=True, text=True).stdout
+tagged = re.search(r"^Tagged:\s+(\w+)", info, re.M)
+if not tagged or tagged.group(1).lower() != "yes":
+    fail("the PDF is not tagged (Tagged: no) — a parser has to rebuild the headings from glyph positions")
+
 if b"/URI" in blob:
     fail("the PDF carries a /URI annotation — a parser that strips link annotations can drop the address or its text")
 

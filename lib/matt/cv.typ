@@ -30,6 +30,11 @@
   ]),
 )
 #set text(font: "New Computer Modern", size: 9.4pt, lang: lang)
+// Ragged right, and no hyphenation even so: no line may end in a hyphen, because
+// a word split across lines is a keyword an ATS stops matching (`vulnerability-`
+// / `data`). lebenslauf.typ states the same guard; this template relied on
+// ragged text being hyphenated rarely rather than not at all.
+#set text(hyphenate: false)
 #set par(leading: 0.58em, justify: false)
 
 #let muted = rgb("#555555")
@@ -41,8 +46,20 @@
 // `sticky` keeps a heading with the block that follows it. Without it the built
 // cv.pdf ended page 1 on `Education` with both degrees on page 2: a heading alone
 // at the foot of a page is the layout defect this template is meant to avoid.
-#let head(title) = block(above: 9.5pt, below: 3pt, sticky: true)[
-  #text(size: 9.7pt, weight: "bold", fill: accent)[#title]
+#let head(title) = heading(title, level: 1)
+// A `heading` element, not a bold paragraph: typst tags it `/H1` in the PDF's
+// structure tree, so a parser that reads structure gets the five section words as
+// headings instead of inferring them from font weight. Level 1 because each
+// section is a top-level division of the document, and PDF/UA-1 rejects a first
+// heading at any other level. The show rule keeps the previous `block`'s
+// rendering, except for one gap it has to cancel: a heading element ends its
+// paragraph, so typst adds the paragraph space after it that a plain block did
+// not have. Measured at 5.1pt per heading (267mm to 276mm on a five-heading
+// fixture), enough to push `cv-energy-de.pdf` onto a second page, so `below`
+// carries the difference and the typeset report matches the old template again.
+#set heading(numbering: none)
+#show heading: it => block(above: 9.5pt, below: -2.1pt, sticky: true)[
+  #text(size: 9.7pt, weight: "bold", fill: accent)[#it.body]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#bbbbbb"))
 ]

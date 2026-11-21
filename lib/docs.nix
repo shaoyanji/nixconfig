@@ -19,28 +19,28 @@
 
   # --- markdown helpers ------------------------------------------------------
   # Table cells must not contain a raw `|` or newline, or the table collapses.
-  esc = s:
-    builtins.replaceStrings ["|" "\n"] ["\\|" " "] (
-      let
-        v =
-          if s == null
-          then ""
-          else toString s;
-      in
-        if v == ""
-        then "—"
-        else v
-    );
+  esc = s: let
+    v =
+      if s == null
+      then ""
+      else toString s;
+  in
+    (
+      if v == ""
+      then "—"
+      else v
+    )
+    |> builtins.replaceStrings ["|" "\n"] ["\\|" " "];
 
   table = headers: rows: let
-    row = cells: "| " + lib.concatStringsSep " | " (map esc cells) + " |";
-    rule = "| " + lib.concatStringsSep " | " (map (_: "---") headers) + " |";
+    row = cells: "| " + (cells |> map esc |> lib.concatStringsSep " | ") + " |";
+    rule = "| " + (headers |> map (_: "---") |> lib.concatStringsSep " | ") + " |";
   in
-    lib.concatStringsSep "\n" ([(row headers) rule] ++ map row rows);
+    [(row headers) rule] ++ (rows |> map row) |> lib.concatStringsSep "\n";
 
   rowList = label: values:
     lib.optionalString (values != []) (
-      "- ${label}:\n" + lib.concatMapStringsSep "\n" (v: "  - ${v}") values
+      "- ${label}:\n" + (values |> lib.concatMapStringsSep "\n" (v: "  - ${v}"))
     );
 
   # `what` already carries its own formatting (e.g. "`inventory.toml`").
@@ -95,14 +95,14 @@
     + lib.optionalString (sw.key_services != []) "\n## Key services\n\n${rowList "services" sw.key_services}\n"
     + lib.optionalString (p.allowed_tasks != []) "\n## Allowed tasks\n\n${rowList "tasks" p.allowed_tasks}\n"
     + lib.optionalString (p.constraints != []) "\n## Constraints\n\n${rowList "constraint" p.constraints}\n"
-    + lib.optionalString (h.notes != []) "\n## Notes\n\n${lib.concatMapStringsSep "\n" (n: "- ${n}") h.notes}\n";
+    + lib.optionalString (h.notes != []) "\n## Notes\n\n${h.notes |> lib.concatMapStringsSep "\n" (n: "- ${n}")}\n";
 
   # --- fleet inventory page --------------------------------------------------
-  byStatus = status: lib.filterAttrs (_: h: h.status == status) nixHosts;
+  byStatus = status: nixHosts |> lib.filterAttrs (_: h: h.status == status);
   hostRows = hosts:
-    map
-    (name: let h = hosts.${name}; in [name h.role h.arch h.kind h.network.lan_ip h.network.tailscale_ip])
-    (lib.attrNames hosts);
+    hosts
+    |> lib.attrNames
+    |> map (name: let h = hosts.${name}; in [name h.role h.arch h.kind h.network.lan_ip h.network.tailscale_ip]);
 
   fleetInventory = let
     statusSection = status: title: let
@@ -115,18 +115,27 @@
         ${table ["host" "role" "arch" "kind" "lan" "tailnet"] (hostRows set)}
       '';
     externalRows =
-      map
-      (name: let h = externalHosts.${name}; in [name h.role h.kind h.status])
-      (lib.attrNames externalHosts);
+      externalHosts
+      |> lib.attrNames
+      |> map (name: let h = externalHosts.${name}; in [name h.role h.kind h.status]);
     personaRows =
-      map
-      (name: let h = nixHosts.${name}; in [name h.persona.title h.persona.compute_tier (lib.concatStringsSep ", " h.persona.allowed_tasks)])
-      (lib.filter (n: nixHosts.${n}.persona.title != "") (lib.attrNames nixHosts));
+      nixHosts
+      |> lib.attrNames
+      |> lib.filter (n: nixHosts.${n}.persona.title != "")
+      |> map (name: let
+        h = nixHosts.${name};
+      in [
+        name
+        h.persona.title
+        h.persona.compute_tier
+        (h.persona.allowed_tasks |> lib.concatStringsSep ", ")
+      ]);
     # Ours by ownership, not by vendoring. Listed here because the page is the
     # catalog a person reads; they are absent from every host table on purpose.
     repoRows =
-      map
-      (name: let
+      repos
+      |> lib.attrNames
+      |> map (name: let
         r = repos.${name};
       in [
         r.url
@@ -137,8 +146,7 @@
           else r.ci
         )
         r.deploy
-      ])
-      (lib.attrNames repos);
+      ]);
   in
     header "Fleet Device & Host Inventory" "`inventory.toml`"
     + ''
@@ -186,8 +194,10 @@
 
   # --- modules registry page -------------------------------------------------
   knobRows = type:
-    map
-    (key: let
+    knobs
+    |> lib.filterAttrs (_: k: (k.type or "") == type)
+    |> lib.attrNames
+    |> map (key: let
       k = knobs.${key};
     in [
       k.name
@@ -198,23 +208,21 @@
         then "on"
         else "off"
       )
-      (lib.concatStringsSep ", " k.hosts)
-    ])
-    (lib.attrNames (lib.filterAttrs (_: k: (k.type or "") == type) knobs));
+      (k.hosts |> lib.concatStringsSep ", ")
+    ]);
 
   moduleSections =
-    lib.concatStringsSep "\n"
-    (map
-      (t: let
-        rows = knobRows t;
-      in
-        lib.optionalString (rows != []) ''
+    ["profile" "service" "role"]
+    |> map (t: let
+      rows = knobRows t;
+    in
+      lib.optionalString (rows != []) ''
 
-          ## ${lib.toUpper (builtins.substring 0 1 t) + builtins.substring 1 (builtins.stringLength t) t} knobs
+        ## ${(t |> builtins.substring 0 1 |> lib.toUpper) + (t |> builtins.substring 1 (t |> builtins.stringLength))} knobs
 
-          ${table ["knob" "option" "module" "default" "hosts"] rows}
-        '')
-      ["profile" "service" "role"]);
+        ${table ["knob" "option" "module" "default" "hosts"] rows}
+      '')
+    |> lib.concatStringsSep "\n";
 
   modulesRegistry =
     header "Fleet Modular Control Knob Registry" "`modules.toml`"
@@ -234,13 +242,13 @@
   # prose typed into it, and kept claiming a host was WIP after it went live.
   allHosts = inventory.hosts;
   isNixHost = h: h.kind != "external";
-  namesWhere = pred: lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: pred) allHosts));
-  ticks = names: lib.concatMapStringsSep ", " (n: "`${n}`") names;
+  namesWhere = pred: allHosts |> lib.filterAttrs (_: pred) |> lib.attrNames |> lib.sort lib.lessThan;
+  ticks = names: names |> lib.concatMapStringsSep ", " (n: "`${n}`");
 
   statusLines = let
     active = namesWhere (h: h.status == "active");
-    activeNix = lib.filter (n: isNixHost allHosts.${n}) active;
-    activeExt = lib.filter (n: !isNixHost allHosts.${n}) active;
+    activeNix = active |> lib.filter (n: isNixHost allHosts.${n});
+    activeExt = active |> lib.filter (n: !isNixHost allHosts.${n});
     wip = namesWhere (h: h.status == "wip");
     kept = namesWhere (h: h.status == "preserved");
   in
@@ -251,12 +259,19 @@
     ++ lib.optional (wip != []) "- **Work in progress (${toString (lib.length wip)})**: ${ticks wip} — not live"
     ++ lib.optional (kept != []) "- **Preserved archetypes (${toString (lib.length kept)})**: ${ticks kept}";
 
-  fleetCategories = lib.sort lib.lessThan (
-    lib.unique (lib.filter (c: c != "") (lib.mapAttrsToList (_: h: h.category) allHosts))
-  );
+  fleetCategories =
+    allHosts
+    |> lib.mapAttrsToList (_: h: h.category)
+    |> lib.filter (c: c != "")
+    |> lib.unique
+    |> lib.sort lib.lessThan;
 
   categoryBlock = c: let
-    members = lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: h: h.category == c) allHosts));
+    members =
+      allHosts
+      |> lib.filterAttrs (_: h: h.category == c)
+      |> lib.attrNames
+      |> lib.sort lib.lessThan;
     entry = n: let
       h = allHosts.${n};
       tier = lib.optionalString (h.persona.compute_tier != "") " (tier `${h.persona.compute_tier}`)";
@@ -265,24 +280,30 @@
         then "no role declared"
         else h.role;
       cons = lib.optionalString (h.persona.constraints != []) (
-        "\n" + lib.concatMapStringsSep "\n" (x: "  - ${x}") h.persona.constraints
+        "\n" + (h.persona.constraints |> lib.concatMapStringsSep "\n" (x: "  - ${x}"))
       );
     in
       "- **`${n}`**${tier} — ${role}" + cons;
   in ''
-    ## ${c} (${toString (lib.length members)})
+    ## ${c} (${members |> lib.length |> toString})
 
-    ${lib.concatMapStringsSep "\n" entry members}
+    ${members |> lib.concatMapStringsSep "\n" entry}
   '';
 
-  builderNames = lib.sort lib.lessThan (lib.attrNames (lib.filterAttrs (_: h: h.builder != "") allHosts));
+  builderNames =
+    allHosts
+    |> lib.filterAttrs (_: h: h.builder != "")
+    |> lib.attrNames
+    |> lib.sort lib.lessThan;
   builderTable = lib.optionalString (builderNames != []) (
-    table ["host" "builder"] (map (n: ["`${n}`" "`${allHosts.${n}.builder}`"]) builderNames)
+    builderNames |> map (n: ["`${n}`" "`${allHosts.${n}.builder}`"]) |> table ["host" "builder"]
   );
 
   specRows =
-    map
-    (n: let
+    allHosts
+    |> lib.attrNames
+    |> lib.sort lib.lessThan
+    |> map (n: let
       h = allHosts.${n};
       hw = h.hardware;
     in [
@@ -299,10 +320,9 @@
         then "—"
         else h.persona.compute_tier
       )
-      (lib.concatStringsSep ", " (lib.filter (s: s != "") [hw.cpu hw.ram hw.gpu]))
+      ([hw.cpu hw.ram hw.gpu] |> lib.filter (s: s != "") |> lib.concatStringsSep ", ")
       h.role
-    ])
-    (lib.sort lib.lessThan (lib.attrNames allHosts));
+    ]);
 
   fleetMatrix =
     header "Fleet LLM context matrix" "`inventory.toml`"
@@ -313,13 +333,13 @@
 
       ## Status breakdown
 
-      ${lib.concatStringsSep "\n" statusLines}
+      ${statusLines |> lib.concatStringsSep "\n"}
 
     ''
     + lib.optionalString (fleetCategories != []) ''
       ## Operational constraints by category
 
-      ${lib.concatMapStringsSep "\n\n" categoryBlock fleetCategories}
+      ${fleetCategories |> lib.concatMapStringsSep "\n\n" categoryBlock}
     ''
     + lib.optionalString (builderTable != "") ''
       ## Cross-architecture builds
@@ -340,14 +360,14 @@
   # `chainFeatures`, its module counts come from `mkHost`, and nothing here can
   # disagree with what a host is assembled from.
   chainRows =
-    lib.mapAttrsToList (
-      name: features: [
+    (
+      moduleSets.chainFeatures
+      |> lib.mapAttrsToList (name: features: [
         "`${name}`"
-        (lib.concatMapStringsSep " " (f: "`${f}`") features)
-        (toString (lib.length (moduleSets.mkHost {inherit features;})))
-      ]
+        (features |> lib.concatMapStringsSep " " (f: "`${f}`"))
+        (moduleSets.mkHost {inherit features;} |> lib.length |> toString)
+      ])
     )
-    moduleSets.chainFeatures
     ++ [
       [
         "`features = [...]`"
@@ -356,11 +376,11 @@
       ]
     ];
   featureRows =
-    lib.mapAttrsToList (name: mods: [
+    moduleSets.featureModules
+    |> lib.mapAttrsToList (name: mods: [
       "`${name}`"
-      (toString (lib.length mods))
-    ])
-    moduleSets.featureModules;
+      (mods |> lib.length |> toString)
+    ]);
 
   moduleChains =
     header "Fleet Module Chains" "`flake/module-sets.nix`"
@@ -389,9 +409,9 @@
     + "\n";
 
   taskSurface = let
-    names = lib.sort (a: b: a < b) (builtins.attrNames tasks);
+    names = tasks |> builtins.attrNames |> lib.sort (a: b: a < b);
     aliasOf = n: tasks.${n}.aliasOf or "";
-    aliasCount = builtins.length (builtins.filter (n: aliasOf n != "") names);
+    aliasCount = names |> builtins.filter (n: aliasOf n != "") |> builtins.length;
     description = n: let
       d = tasks.${n}.desc or "";
     in
@@ -399,7 +419,8 @@
       then tasks.${n}.summary or ""
       else d;
     rows =
-      map (n: [
+      names
+      |> map (n: [
         "`${n}`"
         (tasks.${n}.shard or "root")
         (let
@@ -409,14 +430,13 @@
           then ""
           else "alias of `${a}`")
         (description n)
-      ])
-      names;
+      ]);
   in ''
     # Task surface
 
     Generated from `taskfiles/*.yml` — a task that exists is a task this page
     lists, with the description `task help` prints (a summary where a desc is
-    deliberately absent). The same ${toString (builtins.length names)}
+    deliberately absent). The same ${names |> builtins.length |> toString}
     names are `task` nodes in `.#knowledgeGraph`, ${toString aliasCount} of them
     aliases carrying the canonical name; each playbook row that runs one is a
     `routes` edge carrying the row's label.
@@ -425,32 +445,38 @@
   '';
 
   portRows =
-    map
-    (key: let
+    knobs
+    |> lib.attrNames
+    |> lib.filter (key: (knobs.${key}.port or null) != null)
+    |> map (key: let
       k = knobs.${key};
     in [
       k.name
       (toString k.port)
-      (lib.concatStringsSep ", " (k.hosts or []))
+      ((k.hosts or []) |> lib.concatStringsSep ", ")
       "`${k.path}`"
-    ])
-    (lib.filter (key: (knobs.${key}.port or null) != null) (lib.attrNames knobs));
+    ]);
 
-  endpointRows = lib.concatMap (
-    name: let
+  endpointRows =
+    allHosts
+    |> lib.attrNames
+    |> lib.concatMap (name: let
       h = allHosts.${name};
     in
-      map (l: [
+      (h.network.links or [])
+      |> map (l: [
         name
         (l.label or "—")
         (toString l.port)
         (l.note or "")
-      ]) (h.network.links or [])
-  ) (lib.attrNames allHosts);
+      ]));
 
-  serviceRows = lib.concatMap (
-    name:
-      map (s: [
+  serviceRows =
+    allHosts
+    |> lib.attrNames
+    |> lib.concatMap (name:
+      allHosts.${name}.software.services
+      |> map (s: [
         name
         s.name
         (
@@ -459,9 +485,7 @@
           else toString s.port
         )
         s.note
-      ])
-      allHosts.${name}.software.services
-  ) (lib.attrNames allHosts);
+      ]));
 
   fleetServices =
     header "Fleet service map" "`modules.toml` and `inventory.toml`"
@@ -476,15 +500,15 @@
       answers on this host, and the unit and reach prose in `MANUAL.md` remains the map
       of what each one is for.
 
-      ## Registry services (${toString (builtins.length portRows)})
+      ## Registry services (${portRows |> builtins.length |> toString})
 
       ${table ["service" "port" "hosts" "module"] portRows}
 
-      ## Host-declared endpoints (${toString (builtins.length endpointRows)})
+      ## Host-declared endpoints (${endpointRows |> builtins.length |> toString})
 
       ${table ["host" "service" "port" "note"] endpointRows}
 
-      ## Host services (${toString (builtins.length serviceRows)})
+      ## Host services (${serviceRows |> builtins.length |> toString})
 
       Declared per host in `software.services`: the record half of `key_services`.
       Unlike an endpoint, a service need not listen — `port` is empty where none is
@@ -506,7 +530,7 @@
     }
     # Every registered host, external ones included: `envs` and `serv00` are the
     # hosts an agent is most likely to be handed without a checkout to read.
-    // lib.mapAttrs' (name: h: lib.nameValuePair "docs/generated/hosts/${name}.md" (hostPage name h)) allHosts
+    // (allHosts |> lib.mapAttrs' (name: h: lib.nameValuePair "docs/generated/hosts/${name}.md" (hostPage name h)))
     // notes;
 
   # There is no `nav` value any more: the only consumer of one was the Python
@@ -517,7 +541,7 @@
   # --- derivation ------------------------------------------------------------
   # `install -D` creates the parent directories, so nested slugs need no mkdir.
   mkDocs = pkgs: let
-    storeName = path: lib.replaceStrings ["/"] ["-"] path;
+    storeName = path: path |> lib.replaceStrings ["/"] ["-"];
     installPage = path: text: ''
       install -Dm644 ${pkgs.writeText "doc-${storeName path}" text} $out/${path}
     '';
@@ -526,7 +550,7 @@
       meta.description = "nixconfig documentation generated from inventory.toml and modules.toml";
     } ''
       mkdir -p $out
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList installPage generatedPages)}
+      ${generatedPages |> lib.mapAttrsToList installPage |> lib.concatStringsSep "\n"}
     '';
 in {
   inherit generatedPages;

@@ -1,8 +1,65 @@
 {
-  "generated": "2026-11-21T01:28:54Z",
+  "generated": "2026-11-21T01:35:27Z",
   "count": 200,
-  "pin": "d3284d631e8c8f07043157ea1eeb5ccd0a4ee67ebc62d397dde9a5fca7e7091b",
+  "pin": "b29dce83f53c7dcdf9b81639b70bf7810acaf13b0d22a845888c2d10fc5eaee3",
   "turns": [
+    {
+      "id": "4510824f-9e21-477c-9bbd-39e1e4e3308b",
+      "ts": "2026-11-21T01:33:30Z",
+      "source": "devin",
+      "subject": "nixconfig:email-archive-timers",
+      "action": "claim: email-archive gdrive/import/triage pairs onto lib/systemd-jobs.nix mkTimerJob",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/email-archive.nix"
+      ],
+      "files": [],
+      "base_commit": "f2196627f9700ceff3035da8c86941c6ac73c2ab",
+      "branch": "main",
+      "frame": "03h9w1u6ve0knqwksyjqws3id"
+    },
+    {
+      "id": "72cfaedc-516e-4564-b0cf-db39551f1f29",
+      "ts": "2026-11-21T01:33:25Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-link-gate",
+      "action": "Proved the gate is in the build, not a side check: pointed index.html's cv.pdf anchor at cv-gone.pdf inside the derivation; nix build .#sites.matt-site fails rc=1 with 'FAIL index.html: cv-gone.pdf -> /cv-gone.pdf' and 'site-links: 1 broken (gap check stops at the first)'. Restored, rebuild rc=0 at 6j4a6slr == flake outPath. Live: 4 PDFs 200 application/pdf, sha equal to build. | gate: site:links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f2196627f9700ceff3035da8c86941c6ac73c2ab",
+      "branch": "main",
+      "frame": "03h9w1tirwfjok9hqxhn4l95t"
+    },
+    {
+      "id": "97de5bd4-87b1-47e3-a2eb-14c82961efdc",
+      "ts": "2026-11-21T01:29:20Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-link-gate",
+      "action": "Landed and pushed to origin/main (3688cab2 then f2196627): dev:blog:cv:check hashes every PDF the blog publishes against .#sites.matt-site and requires a resolving download anchor in _site; the walker now resolves x -> x/index.html and skips //host, fixture 14->16 cases. Verified: fixture 16 ok, site:links 81 links/15 pages/4 PDFs/16 anchors, independent walk 0 broken. | gate: site:links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f2196627f9700ceff3035da8c86941c6ac73c2ab",
+      "branch": "main",
+      "frame": "03h9w10v0ecld584obgp6ney1"
+    },
+    {
+      "id": "43e437e8-5164-4a47-8a32-4d1f4ac16768",
+      "ts": "2026-11-21T01:29:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-land-fixes",
+      "action": "Drove freebuff pane (default:1.1): routed next task via jevdecide (land_fixes 0.91), sent \"land the CV PDF link-gate fixes\" via load-buffer+paste-buffer+Enter; pane confirmed working.",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/cv-blog-check.sh",
+        "taskfiles/dev.yml"
+      ],
+      "files": [],
+      "base_commit": "98418659",
+      "branch": "main",
+      "frame": "03h9w0z1212sxcgpfhzve4zhl"
+    },
     {
       "id": "7c495d94-5979-4b7a-b311-4f08b935a397",
       "ts": "2026-11-21T01:27:38Z",
@@ -2639,58 +2696,6 @@
       "base_commit": "43f272e2ae290fded3d25d8632354c0a3224a20e",
       "branch": "main",
       "frame": "03h9rjwingj7sc0lg3vu4k3ln"
-    },
-    {
-      "id": "891995eb-4565-42f6-af48-114c0b10cefd",
-      "ts": "2026-11-20T11:43:49Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Round 37: freebuff landed ats-resume 27e26469 (ATS-parsable CV+Lebenslauf), now building site CVs. agy landed triage-actions (Legence packet, gate apps:gate:packet PASS), now on job-search continue. devin on parakeet-hardening. jevdecide routed agy→job_search_continue (0.54 needs_review).",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a9bae7c263382764fc62975d30c6f053402f4e35",
-      "branch": "main",
-      "frame": "03h9rjrggqyweo5nkz7kscn08"
-    },
-    {
-      "id": "f2b11514-9209-4c90-8a84-a9275b1275e3",
-      "ts": "2026-11-20T11:43:46Z",
-      "source": "antigravity",
-      "subject": "nixconfig:agy-job-search",
-      "action": "claim: scan attention queue, tap & nudge, upsert applications on delphi PostgreSQL",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a9bae7c263382764fc62975d30c6f053402f4e35",
-      "branch": "main",
-      "frame": "03h9rjr4xcrinhf3buiy8hcom"
-    },
-    {
-      "id": "080eb9b7-9f81-43b3-9be3-6517cf1136db",
-      "ts": "2026-11-20T11:43:33Z",
-      "source": "devin",
-      "subject": "nixconfig:parakeet-hardening",
-      "action": "landed: parakeet-stt socket-activated (socket unit on 127.0.0.1:8091 + inherited-fd server), --idle-timeout 900 idle stop, 120s total body-read deadline, Restart=on-failure; sandbox/MemoryMax/StartLimit verified live; POST /transcribe 200, 26MB 413, drip 400@120s; eisen switched + boot default; gate: checks:host eisen 2067 assertions PASS; note closed in a9bae7c2",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a9bae7c263382764fc62975d30c6f053402f4e35",
-      "branch": "main",
-      "frame": "03h9rjpjxywum4x41a0j6o1ij"
-    },
-    {
-      "id": "b03d95be-b284-4634-abb0-af9965e28174",
-      "ts": "2026-11-20T11:42:59Z",
-      "source": "antigravity",
-      "subject": "nixconfig:triage-actions",
-      "action": "landed: run triage pipeline, execute apply-now action (Legence packet built via nix), upsert top 3 | gate: apps:gate:packet PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27e26469cecc25d3ee5073e53846f98e2b6f4b97",
-      "branch": "main",
-      "frame": "03h9rjllwlnzt81asdfzcdv4k"
     }
   ]
 }

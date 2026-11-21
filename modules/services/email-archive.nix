@@ -9,6 +9,7 @@
   user,
   ...
 }: let
+  systemdJobs = import ../../lib/systemd-jobs.nix {inherit lib;};
   cfg = config.services.emailArchive;
 
   # The rclone remote is state, not config, for the same reason the calendar's
@@ -251,6 +252,76 @@
       -h 127.0.0.1 -U ${cfg.userName} -d ${cfg.database} -f ${./email-archive.sql} \
     ${lib.concatMapStringsSep "" (file: "  -f ${file} \\\n") pluginSchemas}      >/dev/null
   '';
+
+  # The three archive jobs share the fleet's oneshot-plus-timer skeleton
+  # (lib/systemd-jobs.nix) and differ in the script, the ordering edges, the
+  # sandbox and the calendar. db-init and npgsqlrest stay literal: one is a
+  # boot-time setup unit, the other a resident daemon.
+  mkTimerJob = systemdJobs.mkTimerJob {Type = "oneshot";};
+
+  archiveJobs = {
+    gdrive = mkTimerJob {
+      description = "Mirror email attachments to Google Drive";
+      timerDescription = "Hourly email attachment mirror";
+      onCalendar = "hourly";
+      randomizedDelaySec = "5m";
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
+      unitConfig.ConditionPathExists = rcloneConfig;
+      serviceConfig = {
+        User = cfg.userName;
+        Group = cfg.userName;
+        ExecStart = "${pkgs.rclone}/bin/rclone --config ${rcloneConfig} sync ${attachmentsDir} ${cfg.gdrive.remote}:${cfg.gdrive.folder} --create-empty-src-dirs --log-level INFO --stats-one-line";
+      };
+    };
+
+    importer = mkTimerJob {
+      description = "Import new mail into the email archive";
+      timerDescription = "Hourly mail import";
+      onCalendar = cfg.importer.schedule;
+      randomizedDelaySec = "10m";
+      after = ["npgsqlrest.service" "network-online.target"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        ExecStart = "${importer}/bin/email-archive-import";
+        # A backfill reads hundreds of messages over IMAP; the oneshot default
+        # would kill the run partway through.
+        TimeoutStartSec = "45min";
+        StateDirectory = "email-archive-import";
+        Environment = "HOME=/var/lib/email-archive-import";
+        # root: the himalaya config and its password command belong to the login
+        # user, and the attachment tree belongs to the archive service user.
+        User = "root";
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = "read-only";
+        ReadWritePaths = [attachmentsDir];
+      };
+    };
+
+    triage = mkTimerJob {
+      description = "Classify archived mail into tiers and owners";
+      timerDescription = "Hourly mail triage";
+      onCalendar = cfg.triage.schedule;
+      randomizedDelaySec = "5m";
+      after = ["npgsqlrest.service"];
+      requires = ["npgsqlrest.service"];
+      serviceConfig = {
+        ExecStart = "${classifier}/bin/email-archive-triage";
+        # Judging and draining are the same hour's work: the classifier fills the
+        # queues, this closes the CI notices no person will ever read. Prefixed
+        # `-`: a drain that cannot reach the API must not mark the classifier red.
+        ExecStartPost = "-${ciDrain}/bin/email-archive-ci-drain";
+        StateDirectory = "email-archive-triage";
+        User = "root";
+        NoNewPrivileges = true;
+        PrivateTmp = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+      };
+    };
+  };
 in {
   options.services.emailArchive = {
     enable = lib.mkEnableOption "the NpgsqlRest email archive";
@@ -700,94 +771,17 @@ in {
     # One-way by design: Drive holds a mirror, never the source of truth. The
     # unit is skipped — not failed — on a host with no remote yet, so the timer
     # ticks from the first boot and the mirror starts the moment a token exists.
-    systemd.services.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable {
-      description = "Mirror email attachments to Google Drive";
-      after = ["network-online.target"];
-      wants = ["network-online.target"];
-      unitConfig.ConditionPathExists = rcloneConfig;
-      serviceConfig = {
-        Type = "oneshot";
-        User = cfg.userName;
-        Group = cfg.userName;
-        ExecStart = "${pkgs.rclone}/bin/rclone --config ${rcloneConfig} sync ${attachmentsDir} ${cfg.gdrive.remote}:${cfg.gdrive.folder} --create-empty-src-dirs --log-level INFO --stats-one-line";
-      };
-    };
-
-    systemd.timers.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable {
-      description = "Hourly email attachment mirror";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = "hourly";
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.services.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable archiveJobs.gdrive.service;
+    systemd.timers.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable archiveJobs.gdrive.timer;
 
     # An empty archive is not an archive: the mailbox is the source of truth and
     # the timer walks it, while the endpoint's upsert makes every re-run safe.
-    systemd.services.email-archive-import = lib.mkIf cfg.importer.enable {
-      description = "Import new mail into the email archive";
-      after = ["npgsqlrest.service" "network-online.target"];
-      wants = ["network-online.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${importer}/bin/email-archive-import";
-        # A backfill reads hundreds of messages over IMAP; the oneshot default
-        # would kill the run partway through.
-        TimeoutStartSec = "45min";
-        StateDirectory = "email-archive-import";
-        Environment = "HOME=/var/lib/email-archive-import";
-        # root: the himalaya config and its password command belong to the login
-        # user, and the attachment tree belongs to the archive service user.
-        User = "root";
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = "read-only";
-        ReadWritePaths = [attachmentsDir];
-      };
-    };
-
-    systemd.timers.email-archive-import = lib.mkIf cfg.importer.enable {
-      description = "Hourly mail import";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.importer.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "10m";
-      };
-    };
+    systemd.services.email-archive-import = lib.mkIf cfg.importer.enable archiveJobs.importer.service;
+    systemd.timers.email-archive-import = lib.mkIf cfg.importer.enable archiveJobs.importer.timer;
 
     # Classification is a read of what the importer already stored, so it runs
     # after it and never gates it: a mailbox with no verdicts is still searchable.
-    systemd.services.email-archive-triage = lib.mkIf cfg.triage.enable {
-      description = "Classify archived mail into tiers and owners";
-      after = ["npgsqlrest.service"];
-      requires = ["npgsqlrest.service"];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${classifier}/bin/email-archive-triage";
-        # Judging and draining are the same hour's work: the classifier fills the
-        # queues, this closes the CI notices no person will ever read. Prefixed
-        # `-`: a drain that cannot reach the API must not mark the classifier red.
-        ExecStartPost = "-${ciDrain}/bin/email-archive-ci-drain";
-        StateDirectory = "email-archive-triage";
-        User = "root";
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = true;
-      };
-    };
-
-    systemd.timers.email-archive-triage = lib.mkIf cfg.triage.enable {
-      description = "Hourly mail triage";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = cfg.triage.schedule;
-        Persistent = true;
-        RandomizedDelaySec = "5m";
-      };
-    };
+    systemd.services.email-archive-triage = lib.mkIf cfg.triage.enable archiveJobs.triage.service;
+    systemd.timers.email-archive-triage = lib.mkIf cfg.triage.enable archiveJobs.triage.timer;
   };
 }

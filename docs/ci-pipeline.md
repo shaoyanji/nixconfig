@@ -2,7 +2,9 @@
 
 One workflow, `.github/workflows/nixcachix.yml`, builds the fleet on GitHub
 runners and pushes to the `shaoyanji` cache. There is **no build matrix to
-edit**: which hosts build is derived from `inventory.toml` on every push.
+edit**: which hosts build is derived from `inventory.toml` on every push. A
+second, build-free workflow (`.github/workflows/cv-links-live.yml`) checks the
+published CV links in a browser on a schedule.
 
 ## What decides
 
@@ -149,6 +151,31 @@ systemd unit (the sysusers path); the other is the activation snippet, which for
 `neededForUsers` secrets runs from the initrd and fails with "0 successful
 groups required" before the system is mounted. The override is guarded on the
 option, so a host without sops-nix is untouched.
+
+## The CV links
+
+The gate has two halves, and they run in different places because they answer
+different questions.
+
+`site-links.sh` runs inside the `matt-site` derivation (`lib/matt-site.nix`):
+`--gap` first, then the full pass, with that build's `cvFiles` as the required
+list. The `site-cv-links` job builds that derivation on every push, so a CV the
+site ships and no page links, a href that resolves nowhere, a PDF anchor that
+lost `download`, or a required PDF the build forgot all fail the job — the same
+assertion `matt:build` and both deploy tasks inherit. Before this job existed
+the gate ran only when an operator remembered `task site:links`.
+
+The browser half is `scripts/task/cv-links-check.sh` (`task matt:cv:check`). A
+200 proves nothing here: Pages serves a PDF with no `Content-Disposition`, so an
+anchor without `download` navigates instead of saving, and headless Chrome has
+no PDF viewer, so a plain navigation renders blank and reads as a hang. The
+script clicks the real anchors with a download directory set and judges the
+saved bytes. It tests the published site, which is deployed by hand and
+therefore trails the tree, so `cv-links-live.yml` runs it on a schedule and by
+dispatch with `ARTIFACT` set empty — no sha comparison against an artifact that
+is a deploy ahead. Immediately after a deploy, `task matt:cv:check` with
+`/tmp/matt-site` present does compare, which is what proves the live bytes are
+this tree's output.
 
 ## Operating it
 

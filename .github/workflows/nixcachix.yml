@@ -140,6 +140,41 @@ jobs:
         # artifact is three lines.
         run: nix build -L .?submodules=1#checks.x86_64-linux.policies
 
+  # The CV link gate, build half. The assertion lives inside the `matt-site`
+  # derivation (lib/matt-site.nix): `site-links.sh --gap` then the full pass,
+  # with that build's `cvFiles` as the required list, so a CV the site ships and
+  # no page links — or a href that resolves nowhere — stops the build. Nothing
+  # in CI built `.#sites.matt-site`, so the gate only ran when an operator ran
+  # `task site:links` by hand, and an orphaned CV could land on main with every
+  # host green. This job builds the derivation and adds no second
+  # implementation. The browser half is `cv-links-live.yml`, which cannot ride a
+  # push because the published site is deployed by hand.
+  site-cv-links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          # Same substituters and keys as the build jobs: WAN only, because the
+          # LAN Harmonia cache is unreachable from a runner.
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
+            max-jobs = 2
+            connect-timeout = 5
+      - name: Sync repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+          token: "${{ secrets.GH_PAT }}"
+      # The build IS the gate: `site-links.sh` runs twice inside this derivation.
+      # A failure names the page and the target, so the job log is the report.
+      - name: Site builds, so every shipped CV is linked and every href resolves
+        run: nix build -L .?submodules=1#sites.matt-site --out-link result
+
   plan:
     runs-on: ubuntu-latest
     timeout-minutes: 15

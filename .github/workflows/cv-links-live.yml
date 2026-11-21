@@ -1,0 +1,47 @@
+name: cv-links-live
+# The CV links, judged by a real download against the published site.
+#
+# This cannot ride a push: `matt:deploy:prod` publishes by hand, so the tree CI
+# just built is not the tree the URL serves. A hash comparison across that gap
+# would be red for being one deploy behind rather than for a broken link, so the
+# gate runs with `ARTIFACT` empty — headers and saved bytes, no sha match.
+#
+# The static half has no such problem and does run on every push:
+# `nixcachix.yml` builds `.#sites.matt-site`, and `site-links.sh` runs inside
+# that derivation, so a CV no page links or a href that resolves nowhere fails
+# the build before it can be published.
+concurrency:
+  group: cv-links-live
+  cancel-in-progress: true
+on:
+  schedule:
+    # Daily is enough for the failure this exists for: a home page that lost its
+    # anchor, or a PDF that serves 200 with no bytes behind it.
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Sync repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes pipe-operators
+            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
+      # agent-browser carries its own Chromium (~700 MiB) and is prebuilt on
+      # cache.numtide.com, so a runner substitutes it instead of compiling a
+      # browser; poppler supplies the `pdfinfo` the script judges pages with.
+      - name: Every CV anchor downloads a PDF
+        env:
+          ARTIFACT: ""
+        run: |
+          nix shell --option builders "" \
+            github:numtide/llm-agents.nix#agent-browser nixpkgs#poppler-utils \
+            -c bash scripts/task/cv-links-check.sh https://matt.bountystash.com

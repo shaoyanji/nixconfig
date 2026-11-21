@@ -11,10 +11,14 @@
 #
 # Usage: cv-links-check.sh [base-url]
 #   ARTIFACT=/tmp/matt-site   hash-compare the live files against a built site
+#   ARTIFACT= (set, empty)    skip that comparison. What CI needs: the published
+#                             site is deployed by hand, so it trails the tree and
+#                             a hash mismatch would mean "a deploy behind", not
+#                             "a broken link".
 set -euo pipefail
 
 BASE="${1:-${BASE:-https://matt.bountystash.com}}"
-ARTIFACT="${ARTIFACT:-/tmp/matt-site}"
+ARTIFACT="${ARTIFACT-/tmp/matt-site}"
 AB="${AGENT_BROWSER:-$(command -v 'agent-browser' || true)}"
 
 [ -n "$AB" ] || { echo "cv-links-check: agent-browser is not on PATH" >&2; exit 1; }
@@ -43,10 +47,18 @@ for f in cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf; do
 done
 
 echo "== clicks in headless Chrome =="
+# The first `open` of a fresh session can stall past its timeout and then work on
+# the next call (measured 2026-11-21: `FAIL /: could not open`, and the same page
+# opened on the following `check`). One warm-up plus one retry keeps that from
+# turning into a red gate; a page that genuinely will not open still fails twice.
+open_page() { # url
+  timeout 120 "$AB" --download-path "$dir" open "$1" >/dev/null 2>&1 && return 0
+  timeout 120 "$AB" --download-path "$dir" open "$1" >/dev/null 2>&1
+}
+open_page "$BASE" || true
 check() { # page href expected-file
   local page=$1 href=$2 want=$3 pages hash built
-  timeout 120 "$AB" --download-path "$dir" open "$BASE$page" >/dev/null 2>&1 \
-    || { say_fail "$page: could not open"; return; }
+  open_page "$BASE$page" || { say_fail "$page: could not open"; return; }
   rm -f "$dir/$want"
   timeout 120 "$AB" download "a.cv[href=\"$href\"]" "$dir/$want" >/dev/null 2>&1 || true
   if [ ! -s "$dir/$want" ]; then

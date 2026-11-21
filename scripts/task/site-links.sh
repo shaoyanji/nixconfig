@@ -73,13 +73,19 @@ HAS_DOWNLOAD = re.compile(r"(?<![-\w])download(?![\w-])", re.I)
 
 
 def resolvable(target):
-    """Mirror what Pages serves for a path: a file, or `x` as `x.html`."""
+    """Mirror what Pages serves for a path: a file, `x` as `x.html`, or `x/index.html`.
+
+    The last one is the directory index a host answers without the trailing
+    slash — `/de` for `de/index.html` — so an href written either way resolves.
+    """
     path = target.lstrip("/")
     if path == "" or path.endswith("/"):
         return os.path.isfile(os.path.join(root, path, "index.html"))
     if os.path.isfile(os.path.join(root, path)):
         return True
-    return os.path.isfile(os.path.join(root, path + ".html"))
+    if os.path.isfile(os.path.join(root, path + ".html")):
+        return True
+    return os.path.isfile(os.path.join(root, path, "index.html"))
 
 
 bad = []
@@ -104,9 +110,10 @@ for base, _, files in os.walk(root):
             href = raw.strip()
             if not href or href.startswith(("#", "mailto:", "data:", "tel:", "javascript:")):
                 continue
-            # Absolute URLs name another origin. The deploy target is not known
-            # at build time, so only root-relative and relative paths are ours.
-            if re.match(r"^[a-z][a-z0-9+.-]*://", href, re.I):
+            # Absolute and protocol-relative URLs name another origin. The
+            # deploy target is not known at build time, so only root-relative
+            # and relative paths are ours.
+            if re.match(r"^[a-z][a-z0-9+.-]*://", href, re.I) or href.startswith("//"):
                 continue
             bare = href.split("#")[0].split("?")[0]
             if bare == "":

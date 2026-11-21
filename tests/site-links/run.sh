@@ -34,6 +34,8 @@ gate="$repo/scripts/task/site-links.sh"
 expected="two linked CVs pass
 a ../ relative link passes
 a fragment on a PDF anchor passes
+a directory index without a trailing slash passes
+a protocol-relative src is another origin
 an anchor without download fails
 a word merely containing download fails
 an unlinked PDF fails
@@ -110,6 +112,22 @@ pdf cv.pdf
 check "a fragment on a PDF anchor passes" index.html \
   '<a class="cv" href="cv.pdf#page=1" download>CV</a>' \
   0 "all 1 PDF anchors download" cv.pdf
+
+reset
+pdf cv.pdf
+mkdir -p "$site/de"
+printf '%s\n' '<a class="cv" href="../cv.pdf" download>CV</a>' >"$site/de/index.html"
+check "a directory index without a trailing slash passes" index.html \
+  '<a class="cv" href="cv.pdf" download>CV</a>
+<a href="/de">Deutsch</a>' \
+  0 "every internal link resolves" cv.pdf
+
+reset
+pdf cv.pdf
+check "a protocol-relative src is another origin" index.html \
+  '<a class="cv" href="cv.pdf" download>CV</a>
+<script src="//cdn.example.com/x.js"></script>' \
+  0 "every internal link resolves" cv.pdf
 
 reset
 pdf cv.pdf

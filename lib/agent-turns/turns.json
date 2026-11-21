@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-21T08:49:05Z",
+  "generated": "2026-11-21T09:06:01Z",
   "count": 200,
-  "pin": "2d5442ca471f6e1f19b381c87229b3d3876e9e3f0cc979804f3bbc121b2a819b",
+  "pin": "e26c601ad3bbfb42cdbad725434068a61fb008db58ab629f440bd5e6ad543410",
   "turns": [
+    {
+      "id": "49812fca-de96-489c-ba63-d9736ab435a5",
+      "ts": "2026-11-21T08:49:23Z",
+      "source": "devin",
+      "subject": "nixconfig:fusion-lane",
+      "action": "landed: agy-gemini through nix-tool — registry now carries full installables (self-flake git+file for repo wrappers, upstream for cache tools); agents:agy:gemini task; verified on stripped PATH wrapper->fresh agy 1.5.13 | gate: checks:tasks clean (780), yaml lint PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "43b779ab6f934a3b527de504924c740ed9f3c232",
+      "branch": "main",
+      "frame": "03h9yezgty34by5g4ierbje7x"
+    },
     {
       "id": "753947ca-e398-4707-8c57-4ac740ba6c2b",
       "ts": "2026-11-21T08:45:45Z",
@@ -2725,19 +2738,6 @@
       "base_commit": "d8217e59ca3b2cdb423b11f6e13c7aa177106756",
       "branch": "main",
       "frame": "03h9vhwrb4yei1momw8fvrp4t"
-    },
-    {
-      "id": "df956507-7dd6-46b3-b0ed-1b9156e7f762",
-      "ts": "2026-11-20T23:50:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-commit-pages-work",
-      "action": "landed: commit_pages_work → commit --pages CV-packet work (appflow-packet.sh + agents.yml), push to origin/main, then continue leak gate",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9vhngmugpzgkevdvy8d9dk"
     }
   ]
 }

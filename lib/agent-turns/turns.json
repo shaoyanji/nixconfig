@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:06:01Z",
+  "generated": "2026-11-22T09:07:38Z",
   "count": 200,
-  "pin": "be529e63f3e66c94d4661d198e1fe53caa59b39a6975d8a242ab26b797d39e24",
+  "pin": "dc6e4337a9b58f0a850675249613ad836189a1360e3bc6da51ac259f7d49dbc3",
   "turns": [
+    {
+      "id": "0e6c8210-d03a-475d-98fe-5980b7caa1d5",
+      "ts": "2026-11-22T09:07:12Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:trawa-senior-platform-engineer",
+      "action": "landed: trawa Senior Platform Engineer packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "edf741687703ab6699c53b46b257194c03636a86",
+      "branch": "main",
+      "frame": "03ha6brhflxczmlluu0xh4m5r"
+    },
     {
       "id": "1d664c30-108b-4365-a5cc-3cba3d5e67fa",
       "ts": "2026-11-22T09:05:43Z",
@@ -2756,19 +2769,6 @@
       "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
       "branch": "main",
       "frame": "03ha4bfpyl1jctvbbfaq8ify3"
-    },
-    {
-      "id": "78ebe078-a2d0-4e2e-8758-7e782d33f8fa",
-      "ts": "2026-11-22T02:54:07Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-outreach-note",
-      "action": "landed: drove freebuff pane to write an AGENTS.nix note documenting the outreach dossier redaction completion and current CV/site state (68 staged submissions)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
-      "branch": "main",
-      "frame": "03ha4avsi5tgeadsexwaiyiza"
     }
   ]
 }

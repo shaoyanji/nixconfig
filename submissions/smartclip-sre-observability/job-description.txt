@@ -1,0 +1,35 @@
+Site Reliability Engineer (f/m/d) - Observability & Internal Tools
+smartclip Europe GmbH, Deutschland, remote by default mit gelegentlichen On-Site-Terminen (Berlin/Koeln)
+Quelle: https://hiddenjobs.dev/company/smartclip-europe-gmbh/jobs/site-reliability-engineer-f-m-d-observability-internal-tools-0cdc83e8/
+
+Rolle
+
+Plattformnahe SRE-Stelle, die Observability und interne Werkzeuge zu einer echten Engineering-Faehigkeit macht.
+Die Rolle ist Architekt und Waechter der internen Infrastruktur, baut Systeme statt SaaS zu konsumieren, mit
+Ende-zu-Ende-Verantwortung fuer den Stack. Remote als Standard, On-Site fuer Architekturentscheidungen.
+
+Aufgaben
+
+* Observability-Oekosystem um Prometheus, Grafana und Forgejo besitzen und weiterentwickeln, Monitoring zu
+  einer Plattform-Faehigkeit machen
+* Handlungsfaehige, signalreiche Alarme entwerfen und Service Level Objectives definieren, Betrieb von reaktiv
+  auf proaktiv verschieben
+* Moderne Open-Source-Alternativen zu proprietaerer Software bewerten und integrieren, Technologieauswahl
+  beeinflussen
+* Security Engineering in Entwicklung und Delivery einbetten, Schwaechen frueher finden als externe Tests
+* Tief in Linux-Systemen und verteilten Werkzeugen arbeiten, Experiment und stabile Produktion ausbalancieren
+* Andere Engineers durch Automatisierung und Plattformverbesserungen schneller machen
+
+Profil
+
+* Nachweisbare Praxiserfahrung mit Prometheus, Grafana und verwandten Observability-Werkzeugen in Produktion
+* Linux-Interna, verteilte Systeme, Infrastructure as Code
+* Nachweis, dass gebaut statt nur konfiguriert wird: Portfolio, Nebenprojekt oder lauffaehige Demo
+* SLOs definieren, sinnvolle Alarme bauen, Organisation von reaktiv nach proaktiv bewegen
+* Security-Praktiken in CI/CD integrieren
+* Wunsch: Open-Source-Engagement, Hackathons, Konferenzen
+
+Angebot
+
+Remote-first, On-Site in Deutschland fuer Planungssessions, 30 Urlaubstage plus 24. und 31.12., optional
+Vier-Tage-Woche durch Fokus-Freitage, Nahverkehrszuschuss, Dienstrad, Sport- und Gesundheitsangebote.

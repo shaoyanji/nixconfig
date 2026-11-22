@@ -1,172 +1,69 @@
 # Elastic — Principal Software Engineer I, CI/CD (Platform Engineering Productivity)
 
-**Status: packet built 2026-11-22, NOT submitted.** No browser opened, no form read, no
-account created. The record is `prep` and stays there until someone decides to send it.
+Greenhouse **8267186** · https://jobs.elastic.co/jobs?gh_jid=8267186 · Poland (band in PLN; sibling reqs for IE, PT, ES, none for
+Germany). Base **369,400–584,300 PLN**, no variable component.
 
-The role sits in Elastic's Platform Engineering Productivity team, which owns CI, CD and
-release infrastructure for the company. The posting is explicit that the influence runs
-through other engineers: roadmap ownership, release gates, supply-chain integrity,
-incident command on release incidents, and standards adopted by teams that do not report
-to the role. Elastic is the search and search-AI company; the platform team's problem is
-scale plus supply chain, not search relevance.
+**Submitted 22.11.2026** per the apps DB. Packet is retrospective — do not resubmit under this id.
 
-## Role
+Native English Typst rebuild, 2026-11-22 — Typst 0.15.1, DejaVu Sans only.
 
-| Field | Value |
-| :--- | :--- |
-| Company | Elastic (distributed, ~3,000 people) |
-| Role | Principal Software Engineer I, CI/CD |
-| Team | Platform Engineering Productivity |
-| Greenhouse req | `8267186` |
-| Apply URL | https://jobs.elastic.co/jobs?gh_jid=8267186 |
-| Board | `elastic` |
-| Location | Poland (posted band in PLN; sibling reqs for IE, PT, ES — none for Germany) |
-| Language | English |
-| Compensation | 369,400–584,300 PLN base, no variable component |
-| Pipeline record | `elastic-principal-cicd-platform`, stage `prep`, fit unset |
-| Folder | `submissions/elastic-principal-cicd-platform/` |
+## Files
 
-## The two questions this packet does not answer
+| File | Pages | Words | Warnings | sha256 (first 16) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 1205 | 0 | `bb00f5cfc66c04ff` |
+| `anschreiben.pdf` | 1 | 518 | 0 | `4269d38e40e0fda5` |
 
-Both are operator decisions, so the letter asks instead of assuming, and the sheet
-records them rather than resolving them:
+`lebenslauf.typ`, `anschreiben.typ`, `job-description.txt`, `lead.md`, this sheet. Retired in this rebuild: the `packet/` directory
+(Nix-projected PDFs plus `selection.json`) and `letter.json` — the letter now has one source, `anschreiben.typ`.
 
-1. **Country.** The req is for Poland. The candidate is in Germany, holds German
-   permanent residence and needs no permit to work there — but a Polish contract is a
-   different legal entity and, if the role is hybrid or office-based, a relocation. The
-   lead note says sibling reqs exist for Ireland, Portugal and Spain and none for
-   Germany, so a Germany-based hire is a question for the recruiter, not a fact. The
-   letter says exactly that: *"the posting is for Poland and I am in Germany; I would
-   rather ask whether a Germany contract exists than assume a relocation nobody has
-   agreed to."* If the answer is relocation to Poland, that is the candidate's call, not
-   the packet's.
-2. **Level.** Principal I at Elastic is an org-wide scope role, and the JD asks for a
-   track record of cross-org ownership plus directing other engineers. The letter does
-   not inflate the fleet into a team: it says standards and design review were adopted
-   voluntarily, and that managing engineers with quarterly goals is not something done
-   here. Expect the level conversation to be the hard part, not the technical one.
+## What changed
 
-## Files in `submissions/elastic-principal-cicd-platform/`
+The submitted CV was the leanest projection of the database: 547 words over two pages, eleven kept lines across five employers, with
+the pipeline mechanics living only in the letter. On a role whose screening is CI/CD and supply-chain, a CV with no gates, no pinned
+inputs and no provenance reads as a generic systems profile. The native CV opens on the exact rule that matters — *a change is not
+finished until a gate has read the built artefact back* — then states the hermetic construction (pinned inputs, Nix sandbox, gates
+with builders off, OOM-guarded sweeps one host per process, single-writer deploys, dry plan before apply), then the supply-chain work
+(sops per host with an age key cut from the SSH key, own certificate authority, submodule pins per host path, KEV-driven patching by
+exposure, content-addressed store paths as provenance).
 
-| File | Notes |
-| :--- | :--- |
-| `packet/lebenslauf.pdf` | 2 pages, sha256 `dd1fadca9b12cf614a8173421bf2181d49a323d93e7fb431692519615ed630cf` |
-| `packet/anschreiben.pdf` | 1 page English, sha256 `2a0c46b6f5aa1f8562a33aa1c0e9283d9d456b9e1d3482cc9a06e5aa1570c4a6` |
-| `packet/selection.json` | Projection audit, kept and dropped lines with scores |
-| `letter.json` | Letter source, so the PDF is reproducible from this tree |
-| `job-description.txt` | Posting text as given (no header block; company/req data lives here and in `lead.md`) |
-| `lead.md` | The originating lead |
-| `submission-sheet.md` | This sheet |
+It also carried the standard unsupported stack; that is gone. Submitted bytes: `packet/lebenslauf.pdf` `dd1fadca9b12cf61…` (2 pages,
+547 words), `packet/anschreiben.pdf` `2a0c46b6f5aa1f85…` (1 page, 530 words). The letter substance survived the rebuild almost intact —
+it was already honest, and only the address block, the date and the closing ask were tightened.
 
-Built with:
+## Where the stack words sit
 
-```
-task agents:apps:packet ID=elastic-principal-cicd-platform \
-  JD=submissions/elastic-principal-cicd-platform/job-description.txt \
-  LETTER=submissions/elastic-principal-cicd-platform/letter.json \
-  OUT=/tmp/elastic-packet
-```
+Buildkite, Argo CD and Kubernetes appear in the CV **not at all**, and in the letter only inside the sentence saying they are not part of
+my history. Nothing is claimed.
 
-Compiled in the Nix sandbox on `eu.nixbuild.net`; the store artifact is
-`/nix/store/h0dgksn7bpmi7bazvhpz5qim64mbac8i-appflow-packet-elastic-principal-cicd-platform`.
-The copies in `packet/` are `cp -L` of those bytes, read-only, so the hashes above are
-the ones to compare after any rebuild.
+## The two questions this packet cannot answer
 
-## Projection audit
+1. **Country.** The req is Poland. The candidate is in Germany with permanent residence and needs no German permit — but a Polish
+   contract is a different entity, and if the role is office-based it is a relocation. No German sibling req exists. The letter asks
+   whether a Germany contract exists rather than assuming; the answer is the operator's.
+2. **Level.** Principal I is org-wide scope: multi-quarter cross-org ownership and directing engineers. The packet does not inflate a
+   thirteen-host fleet into a team — it says standards and design review were adopted voluntarily, and that managing engineers with
+   quarterly goals is not in the history. Expect the level conversation to be the real interview.
 
-Twelve terms ranked from the description, strongest first: **security** (18.349),
-**engineering** (16.724), **artifact** (14.67), **systems** (14.67), **securing**
-(13.019), **engineers** (11.866).
+## Fit
 
-The scorer read this posting as a security-and-build-artifact role, which is what the
-description emphasises: supply-chain integrity, artifact provenance, release gates,
-securing the pipeline. That is a better fit than the raw highlight count suggests.
-
-- **Highlights: 11 of 32** — Bountystash 3/10, O3 Energy 3/8, Smart Energy 360 1/4,
-  Fraunhofer ISE 2/4, Halliburton 2/6.
-- **Projects: 4 of 10** — `Risk Calculation Engine (Swirl Engine)`, `Master's Thesis`,
-  `nixconfig`, `kev-time`. `nixconfig` surviving is what this packet needs: it is the
-  CI/CD and supply-chain evidence, and `kev-time` is the vulnerability pipeline that
-  supports the "security as continuous work" argument.
-- **Skills:** Security 6/6, DevOps 5/5, Backend & Database 6/6, Web 6/7, Energy & Risk
-  6/8, Programming Languages 6/10 (C, C++, Bash and Nim dropped).
-
-The CV is lean — 11 kept lines across five employers — so the letter carries the
-pipeline mechanics the rows cannot: pinned inputs, hermetic builds, gates with builders
-off, the OOM-guarded sweep, single-writer deploys.
-
-Measured on the rendered PDFs, not the source:
-
-| Term | CV | Letter |
-| :--- | :--- | :--- |
-| Buildkite | 0 | 1 (named gap) |
-| Argo CD | 0 | 1 (named gap) |
-| Kubernetes | 1 | 1 (named gap) |
-| Nix | 5 | 1 |
-| provenance | 0 | 1 |
-| supply chain | 0 | 2 |
-
-## Alignment and honest gaps
-
-Matches, all inspectable in this repo:
-
-- **Gates that read the artifact back.** A change counts only once a check has inspected
-  the built output; gates shell out with `--builders ""` so a check cannot spend the
-  build budget it protects. That is the "release gates without becoming a tax on
-  velocity" thesis, at fleet scale rather than org scale.
-- **Hermetic, pinned builds.** Every input pinned, the flake lock is the supply-chain
-  boundary, self-hosted submodules are pinned per host path so a path cannot refetch
-  different code.
-- **Supply-chain hygiene.** SOPS/age secrets per host from the host's SSH key, an SSH
-  certificate authority instead of shared user keys, default-deny nftables, KEV-driven
-  patching ordered by exposure and effort.
-- **Single-writer release discipline.** One host per process, no fleet-wide default,
-  plan before apply, rollback documented per host.
-- **Incident response that produces structural change.** Sentinel ledger every fifteen
-  minutes, gatus paging on `state != ok`, and each incident turned into a check, a note
-  or a policy rather than a story.
-- **AI as an operating layer**, not a talking point: coding agents run the change loop,
-  the gates and the coordination log on this fleet.
-
-Gaps, all named in the letter:
-
-1. **No Buildkite, no Argo CD, no production Kubernetes.** GitOps here is a flake and a
-   task interface, not a controller watching a cluster; isolation is a CA and a module
-   boundary, not namespaces and quotas.
-2. **No org-wide policy layer.** The guarantees exist on thirteen hosts, not across
-   hundreds of engineers who never read them. This is the gap between senior and
-   principal scope, and the letter concedes it.
-3. **No people management.** Instruction and design review, yes; directing a team
-   through multi-quarter goals, no.
-4. **Poland req, Germany residence** — see the country question above.
-5. **No AWS, GCP or Azure depth** in the corpus; the fleet is owned hardware.
-6. **No Elasticsearch, Kibana or observability-vendor experience.** Elastic runs its own
-   stack; the observability story here is self-built.
+**4 of 5** on substance, **2 of 5** on the org-scale scope the level implies. Strong: release gates that read artefacts back, hermetic
+builds, supply-chain hygiene, incident discipline that ends in structural change, AI as an operating layer rather than a talking point.
+Gaps: no org-wide policy layer, no people management, no Buildkite/Argo CD/production Kubernetes, no Elasticsearch or observability-vendor
+work, no cloud depth (owned hardware).
 
 ## Compensation
 
-The band is published in PLN: **369,400–584,300**, base only. At roughly 4.3 PLN/EUR
-that is about **EUR 86,000–136,000**, but the band is denominated in złoty, so the euro
-equivalent moves with FX and with the Polish entity's own benchmarking.
+Band published in PLN and denominated there, so the euro equivalent moves with FX. Guidance: do not open with a number; if a field
+demands one, answer in PLN in the upper half of the band — the candidate's floor of EUR 95,000 sits above the band's midpoint — and say
+a Germany contract would be priced against the German market rather than converted.
 
-Guidance for submit time: do not open with a number; if a field requires one, answer in
-PLN at the **upper half of the band** (the candidate's own floor is EUR 95,000, and the
-band's midpoint clears it), and say that a Germany contract would need to be priced
-against the German market rather than converted.
+## Checks
 
-## Submit-time checklist
-
-- Form fields are **unknown**: no browser form was opened for this packet, by
-  instruction. Read them live before answering anything.
-- If a work-authorization question appears, the answer is German permanent residence,
-  unrestricted in Germany; a Polish contract would need its own permit check, so do not
-  answer "EU work authorization" loosely.
-- Salary answers in PLN, not converted euros.
-- Attach `packet/lebenslauf.pdf`; the letter has no dedicated upload field on most
-  Greenhouse forms, so its content would go to a free-text field if one exists.
-
-## Next action
-
-Review the packet. Then decide the country question — apply to the Poland req from
-Germany, wait for a Germany sibling req, or ask the recruiter first — and only then
-submit. Nothing has been sent and no form has been opened.
+| Gate | Result |
+| :--- | :--- |
+| `typst compile` both sources | 0 warnings each |
+| Page budget | CV 2 pages, letter 1 page |
+| Unsupported claims | 0 outside the negation paragraph |
+| `task checks:prose` | exit 0 |
+| Commit | native rebuild; `packet/` and `letter.json` removed in the same commit |

@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-22T11:57:04Z",
+  "generated": "2026-11-22T11:58:47Z",
   "count": 200,
-  "pin": "72c5f92c432f5e7d3c9e015bceec9e82006c254014c35358f8f31c33e94cd998",
+  "pin": "34ee32aba1296bb095b8a58f6e99c6d35b8243313b3d105e93f17f8f98da9844",
   "turns": [
+    {
+      "id": "b4856388-266c-4deb-b768-ea6575ceec8d",
+      "ts": "2026-11-22T11:58:36Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building elastic (pane 1), submitting sumup (pane 2), verifying bwi (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/elastic-principal-cicd-platform",
+        "submissions/sumup",
+        "submissions/bwi"
+      ],
+      "files": [],
+      "base_commit": "e7f29b19fbf8a7bfc413340f9c8c2f776de4a7c6",
+      "branch": "main",
+      "frame": "03ha798w1fm2alneav94sy8yr"
+    },
+    {
+      "id": "ca1ee23a-29a5-414f-8265-902f89530e85",
+      "ts": "2026-11-22T11:57:49Z",
+      "source": "devin",
+      "subject": "job-hunt:enpal",
+      "action": "landed: Enpal Staff Platform Engineer applied+confirmed via Ashby (first successful Ashby submission - no captcha); /tmp upload workaround used",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e7f29b19fbf8a7bfc413340f9c8c2f776de4a7c6",
+      "branch": "main",
+      "frame": "03ha793cabbnts96ptiy9caq0"
+    },
+    {
+      "id": "5afc3734-4372-4b64-8e63-1967391ba9d4",
+      "ts": "2026-11-22T11:57:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:biz-factory",
+      "action": "landed: native German Typst dossier for the Linux & Kubernetes DevOps role — CV 2pp/912w, letter 1pp/334w, 0 warnings; replaced database-built PDFs, dropped the unsupported tool list and selection.json, gaps kept in the letter | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e7f29b19fbf8a7bfc413340f9c8c2f776de4a7c6",
+      "branch": "main",
+      "frame": "03ha78zldr10xwuiv7g00zs53"
+    },
     {
       "id": "d4599ca3-2073-4c95-892d-970a0faf4691",
       "ts": "2026-11-22T11:56:53Z",
@@ -2791,45 +2834,6 @@
       "base_commit": "8c6e7063a993f63014688dab1b850b38fe06dbef",
       "branch": "main",
       "frame": "03ha6m84zkg2x3w0h4fgn1vr2"
-    },
-    {
-      "id": "c3bc17bd-0a77-4ebc-99f1-800f9ca6d2ec",
-      "ts": "2026-11-22T10:00:28Z",
-      "source": "freebuff",
-      "subject": "nixconfig:canonical-sre",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "eae1680ec6ef63ea1d3390aa353edc7ae2eb8823",
-      "branch": "main",
-      "frame": "03ha6m61pat7c372mkgu5v5i7"
-    },
-    {
-      "id": "40de6cfd-a9ab-4aca-95a3-e70b3f5f9e6b",
-      "ts": "2026-11-22T10:00:17Z",
-      "source": "devin",
-      "subject": "nixconfig:enviria",
-      "action": "cloudflare turnstile checkbox gate at submit | form+files complete",
-      "outcome": "blocked: turnstile",
-      "claims": [],
-      "files": [],
-      "base_commit": "97b2a43f6b7149c81be0993904ced67a39cbe076",
-      "branch": "main",
-      "frame": "03ha6m4tf5bkbxehdy3z66xgo"
-    },
-    {
-      "id": "67db6f31-f67d-46ea-8664-1810af4e5549",
-      "ts": "2026-11-22T09:59:07Z",
-      "source": "devin",
-      "subject": "nixconfig:enviria",
-      "action": "claim: submitting via Personio 2635638",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "97b2a43f6b7149c81be0993904ced67a39cbe076",
-      "branch": "main",
-      "frame": "03ha6lwnkwvll23k257t6vcx9"
     }
   ]
 }

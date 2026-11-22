@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
-#set page(paper: "a4", margin: (top: 1.4cm, bottom: 1.4cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 9.5pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
-#set par(leading: 0.5em, justify: true)
+#set page(paper: "a4", margin: (top: 1.6cm, bottom: 1.6cm, left: 1.9cm, right: 1.9cm))
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 11.5pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set par(leading: 0.75em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
@@ -17,7 +17,7 @@
 #text(size: 9pt)[Plattformingenieur mit fünf Jahren Verantwortung für eine Linux-Flotte, die niemand sonst betrieben hat: dreizehn Hosts über drei Hardware-Generationen, jeder Dienst ein Modul, jede Änderung ein Commit mit Prüfung und Rückrollung. Automatisiert in Go und Python, weil Handarbeit auf Dauer Fehler produziert, und gebaut mit Telemetrie, weil ein Ausfall ohne Messdaten nur eine Vermutung ist. Dazu vier Jahre Energiewirtschaft: 10 MW Solar-PV kaufmännisch betreut, M.Sc. Erneuerbare-Energien-Management in Freiburg. Wohnsitz in Baden-Württemberg, Karlsruhe in rund anderthalb Stunden erreichbar. Nicht vorhanden: Kubernetes im Produktivbetrieb, Helm und GitOps-Werkzeuge, Betrieb in einem regulierten KRITIS-Umfeld.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
-  #v(5pt)
+  #v(10pt)
   #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#kind]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
@@ -35,7 +35,7 @@
       #for bullet in bullets [- #bullet]
     ]
   ]
-  #v(3pt)
+  #v(7pt)
 ]
 
 #section("Berufserfahrung")

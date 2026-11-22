@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:31:53Z",
+  "generated": "2026-11-22T12:33:19Z",
   "count": 200,
-  "pin": "b355290851b30085af2407a1972ff1e33e73e007707c2c38141f05c96f399222",
+  "pin": "24b369a67aa0181d333b7d2dd6a3f429a5da4e3ba40c281d533e7274badbd128",
   "turns": [
+    {
+      "id": "0868cf19-d292-4360-8d8c-c51eeb9cad0b",
+      "ts": "2026-11-22T12:31:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-cloudgate",
+      "action": "landed: native Typst sources for Nebius CloudGate Senior System Engineer (4377696101), commit 88f98d54. CV 2pp/1270w, letter 1pp/454w, 0 warnings, page budget asserted, prose exit 0 at 291 files. Default-deny scope table, nftables VRRP rule, bridge/tap/NAT, WireGuard mesh lead; MTU written as diagnosis because the repo ships no mtu/mss config; legacy staged in its own commit, wrong-team letter retired. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "88f98d5440b234cc1fb587df5e3bd30b10a08e1b",
+      "branch": "main",
+      "frame": "03ha7fra92ufnm62o1lq0502f"
+    },
     {
       "id": "73536edf-e6c8-458a-9808-5752be7c47e6",
       "ts": "2026-11-22T12:31:50Z",
@@ -2825,19 +2838,6 @@
       "base_commit": "39563eebbeb1ead030ee97c8a60e9dc56863c966",
       "branch": "main",
       "frame": "03ha6s6j6vipl6ob7a2ifziwt"
-    },
-    {
-      "id": "14e4d139-84e9-41dd-a8b7-736caa636468",
-      "ts": "2026-11-22T10:31:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:adfinis",
-      "action": "landed: natives Typst-Paket 2 S. CV + 1 S. Anschreiben (de) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "39563eebbeb1ead030ee97c8a60e9dc56863c966",
-      "branch": "main",
-      "frame": "03ha6s63zf6jgw73yqatdj9cj"
     }
   ]
 }

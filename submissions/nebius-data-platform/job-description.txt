@@ -1,0 +1,63 @@
+Company: Nebius
+Role: Senior Site Reliability Engineer (Data Platform)
+Location: Amsterdam, Netherlands; Berlin, Germany; Israel; London, United Kingdom; Prague, Czech Republic; Remote
+Remote: yes
+Posted: 2026-11-17
+Source: greenhouse
+URL: https://careers.nebius.com/?gh_jid=5040676101
+---
+
+About Nebius:
+Nebius is leading a new era in cloud infrastructure for the global AI economy. We are building a full-stack AI cloud platform that supports developers and enterprises from data and model training through to production deployment, without the cost and complexity of building large in-house AI/ML infrastructure.
+Built by engineers, for engineers. From large-scale GPU orchestration to inference optimization, we own the hard problems across compute, storage, networking and applied AI.
+Listed on Nasdaq (NBIS) and headquartered in Amsterdam, we have a global footprint with R&D hubs across Europe, the UK, North America and Israel. Our team of 1,500+ includes hundreds of engineers with deep expertise across hardware, software and AI R&D.
+The Role
+We’re looking for a Senior Site Reliability Engineer to join the team building and operating Nebius Data Platform — a distributed storage and a processing platform that acts as the company’s “source of truth” and the backbone of many internal (and some external) products. Nebius Data Platform is a single multi-tenant ecosystem based on YTsaurus — instead of running separate HDFS/Kafka/HBase-style systems, we provide storage, compute, and analytics capabilities inside one platform.
+We operate across data centers worldwide, running YTsaurus in dedicated Kubernetes clusters with Kubernetes operators and supporting services written primarily in Go. We maintain our own Nebius distribution, develop functionality across the core and platform services, and contribute upstream where it makes sense. This gives us the ability to take improvements from design through implementation to production.
+At scale today, this includes  ~500 servers, ~20k CPU cores and ~10 PB of compressed data in our largest production cluster, supporting workloads ranging from business-critical pipelines and financial transactions to large-scale ML/LLM training datasets and compute. As an SRE, you’ll combine software engineering with production ownership: understand how the platform behaves, identify what limits its reliability and growth, and build lasting improvements alongside the developers and teams who use it. Your responsibilities will include:
+-
+Own and improve the reliability, performance, and capacity of our YTsaurus clusters, with particular attention to data durability and predictable behavior under load.
+-
+Develop services, Kubernetes automation, and operational tooling in Go to simplify cluster provisioning, upgrades, and maintenance.
+-
+Improve monitoring, alerting, and diagnostic tools so we can detect problems early and understand their impact on users.
+-
+Investigate failures across Linux, networking, Kubernetes, and distributed storage and compute. Participate in on-call, lead incident investigations, and turn findings into lasting fixes.
+-
+Improve resource utilization and workload isolation as the platform grows and serves more teams.
+-
+Work with platform developers and users to make architectural decisions, deliver changes safely, and reduce repetitive operational work.
+We expect you to have:
+-
+Experience operating distributed, stateful systems in production and taking responsibility for their reliability.
+-
+Strong Linux and networking fundamentals, including the ability to investigate resource bottlenecks and failures beyond the application layer.
+-
+Practical Kubernetes experience: deploying, operating, and troubleshooting production workloads.
+-
+Strong programming skills and experience building maintainable software. We primarily use Go; experience in another language and a willingness to learn Go are welcome.
+-
+A systematic approach to troubleshooting, using evidence from logs, metrics, traces, and system behavior.
+-
+The ability to drive improvements from problem identification through delivery, communicate trade-offs clearly, and collaborate with developers and platform users.
+It will be an added bonus if you have:
+-
+Experience with Big Data systems (YTsaurus/Hadoop/Spark/ClickHouse/Kafka-like ecosystems).
+-
+Experience developing Kubernetes operators or controllers.
+-
+Experience with performance analysis, capacity planning, or resource management in multi-tenant systems.
+We conduct coding interviews as part of the process.
+Benefits & Perks:
+- Competitive compensation
+- Career growth and learning opportunities
+- Flexibility and ownership
+- Collaborative and innovative culture
+- Opportunity to work on impactful AI projects
+- International environment and talented teams
+What's it like to work at Nebius:
+Fast moving - Bold thinking - Constant growth - Meaningful impact - Trust and real ownership - Opportunity to shape the future of AI
+Equal Opportunity Statement:
+Nebius is an equal opportunity employer. We are committed to fostering an inclusive and diverse workplace and to providing equal employment opportunities in all aspects of employment. We do not discriminate on the basis of race, color, religion, sex (including pregnancy), national origin, ancestry, age, disability, genetic information, marital status, veteran status, sexual orientation, gender identity or expression, or any other characteristic protected by applicable law.
+Applicants must be authorized to work in the country in which they apply and will be required to provide proof of employment eligibility as a condition of hire.
+If you need accommodations during the application process, please let us know.

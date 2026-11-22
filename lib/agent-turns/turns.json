@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-22T11:47:49Z",
+  "generated": "2026-11-22T11:50:21Z",
   "count": 200,
-  "pin": "c895b0efce1fec80b325ebdd883148b8aa7727b361a659e23f032f998f01f587",
+  "pin": "6783f3248e48a82cb5589f46ff68b2054a354833b946656e26f482e5e98c19ee",
   "turns": [
+    {
+      "id": "40705bfc-de84-4575-a6a6-6763cd28b0ce",
+      "ts": "2026-11-22T11:49:46Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building ionos-sre (pane 1), submitting grafana-db-observability (pane 2), building canonical-gitops (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/ionos-sre",
+        "submissions/grafana-db-observability",
+        "submissions/canonical-gitops"
+      ],
+      "files": [],
+      "base_commit": "93d49ff33ac7f8dcbc6b9e9d721d35412615ad64",
+      "branch": "main",
+      "frame": "03ha77is6a3p1c5sqxzuwx4xm"
+    },
+    {
+      "id": "ee014a80-dc87-4297-9218-f556708b0b49",
+      "ts": "2026-11-22T11:48:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-arch",
+      "action": "landed: native Typst dossier — CV 2pp/1107w, letter 1pp/499w, 0 warnings; replaced DB-generated PDFs, dropped 15 unsupported cloud/web/language claims, retired selection.json | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "93d49ff33ac7f8dcbc6b9e9d721d35412615ad64",
+      "branch": "main",
+      "frame": "03ha776girhhy9cyq5o5ua13e"
+    },
+    {
+      "id": "7e86ec98-ce19-44f1-a572-225a79dc3331",
+      "ts": "2026-11-22T11:48:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-arch",
+      "action": "claim: native Typst rebuild of submissions/canonical-arch (applied packet, Nix PDFs only)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/canonical-arch"
+      ],
+      "files": [],
+      "base_commit": "93d49ff33ac7f8dcbc6b9e9d721d35412615ad64",
+      "branch": "main",
+      "frame": "03ha776ef9ogqykox4z8y80ua"
+    },
+    {
+      "id": "70e990f4-5e28-438f-a0c0-81226056f67d",
+      "ts": "2026-11-22T11:47:59Z",
+      "source": "devin",
+      "subject": "job-hunt:grafana-analytics",
+      "action": "landed: Grafana Databases-Analytics (6200027004) applied+confirmed; found Greenhouse upload bug: /Volumes-mounted files fail S3 POST (error 0), /tmp copy fixes",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "93d49ff33ac7f8dcbc6b9e9d721d35412615ad64",
+      "branch": "main",
+      "frame": "03ha7767k212wsal98j90ebgp"
+    },
     {
       "id": "5ef4bf0c-44c5-454e-a162-09cca2667c53",
       "ts": "2026-11-22T11:47:02Z",
@@ -2754,58 +2812,6 @@
       "base_commit": "3cadecb213023acd83cd02d8231126a11a2d151c",
       "branch": "main",
       "frame": "03ha6kiw2nxu8rm6nu2xujzzy"
-    },
-    {
-      "id": "80ec6ab5-e618-4ecd-a4da-32918cae6b9d",
-      "ts": "2026-11-22T09:50:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:sva-automation",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fbaa3af310dc34835dffb2a32aa10625ea47f6cb",
-      "branch": "main",
-      "frame": "03ha6k5q3vfpholgfxlhwgzpw"
-    },
-    {
-      "id": "e0a129ff-5091-444f-9b63-c9b01c48384c",
-      "ts": "2026-11-22T09:50:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:stackit",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b331dafb0979969bfa9379a8c363cc3d99479978",
-      "branch": "main",
-      "frame": "03ha6k5pnguh6tnwgyd5c8ako"
-    },
-    {
-      "id": "c38e6452-ae1d-4ff5-8085-5167fa1b2c40",
-      "ts": "2026-11-22T09:48:06Z",
-      "source": "freebuff",
-      "subject": "nixconfig:clickhouse-dbre",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2d0715b07c0f8168b4f55dbc5e5fe2759e652866",
-      "branch": "main",
-      "frame": "03ha6jr4cil62sckz822y4p87"
-    },
-    {
-      "id": "50ca54c9-1732-402d-929d-7d574142463c",
-      "ts": "2026-11-22T09:47:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:uni-rostock-sysadmin",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4495525c0ae794b27de49a2bca0733e27defbcb2",
-      "branch": "main",
-      "frame": "03ha6jptvn24cpmgaeujj5iky"
     }
   ]
 }

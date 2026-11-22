@@ -76,6 +76,30 @@ MACHINE_LOCALS = (
     "service",
 )
 
+# Marketing addresses are matched by segment, not by prefix: `credit-card-offers`
+# ends in a marketing word a prefix rule cannot see, and `community` and
+# `announcements` are whole segments of their own. A segment is narrower than a
+# substring, so `service-desk` is not caught by `service` here.
+MARKETING_LOCALS = (
+    "offers",
+    "deals",
+    "promo",
+    "promotions",
+    "newsletter",
+    "news",
+    "marketing",
+    "digest",
+    "announcements",
+    "announce",
+    "community",
+    "insights",
+    "campaign",
+    "campaigns",
+    "editorial",
+    "mailings",
+    "customercare",
+)
+
 # Rule sets are host-agnostic. A host list names what this mailbox actually
 # receives; the engine handles anything new.
 BULK_SIGNALS = (
@@ -107,6 +131,37 @@ BULK_SIGNALS = (
     "invite",
     "review us",
     "bewerten",
+)
+
+# The German retail and newsletter vocabulary, plus the English CTAs a marketing
+# send uses when its subject carries no bulk word. Measured 2026-11-22: the
+# `review` tier held 103 messages and 412 of the second model's 679 disagreements
+# with the primary were `review` against `digest` — these are the words in that
+# gap. Never applied to application mail; PROTECTED_SIGNALS guards that below.
+MARKETING_SIGNALS = (
+    "rabatt",
+    "gutschein",
+    "gewinnspiel",
+    "verlosung",
+    "ausverkauf",
+    "black friday",
+    "cyber monday",
+    "prime day",
+    "nur heute",
+    "jetzt sichern",
+    "spare ",
+    "sparen sie",
+    "reduziert",
+    "angebot der woche",
+    "neu im shop",
+    "newsletter",
+    "rundbrief",
+    "monatsrückblick",
+    "neuigkeiten",
+    "was ist neu",
+    "jetzt entdecken",
+    "kostenlos testen",
+    "jetzt anmelden",
 )
 
 # A deadline that survives the mail. This is the only robot-written class that
@@ -176,6 +231,12 @@ EPHEMERAL_SIGNALS = (
 # whole input, and a deadline is the one thing whose expiry has consequences.
 # Everything else is fair game, in either direction.
 PROTECTED_SIGNALS = ("bewerbung", "einladung", "vertrag") + ACTIONABLE_SIGNALS
+
+# The marketing rules are the only ones that demote mail silently, so they answer
+# to a wider guard than the second model does: LoopCV sends "A new job
+# application form has been submitted" from `updates@`, and an application notice
+# is not a newsletter whatever its sender is called.
+MARKETING_GUARDS = PROTECTED_SIGNALS + ("application", "bewerbung", "interview", "gespräch")
 
 
 # NpgsqlRest publishes column names as camelCase in JSON responses, while the
@@ -335,7 +396,19 @@ def classify_rules(
     if hit:
         return "robot", "none", f"one-shot signal: {hit}", 0.8
 
+    # Marketing that carries no bulk word in its subject still is marketing: a
+    # customer-care address announcing a draft, a community address, a bank's
+    # `credit-card-offers`. Segment match on the sender, word match on the
+    # subject, and never over application mail.
     local = addr.split("@")[0] if "@" in addr else addr
+    if not any(signal in low_subject for signal in MARKETING_GUARDS):
+        segments = [seg for seg in re.split(r"[-_.+]", local) if seg]
+        if any(seg in MARKETING_LOCALS for seg in segments):
+            return "digest", "none", f"marketing sender: {local}", 0.75
+        hit = next((signal for signal in MARKETING_SIGNALS if signal in low_subject), None)
+        if hit:
+            return "digest", "none", f"marketing signal: {hit}", 0.8
+
     if any(local == machine or local.startswith(machine + "-") for machine in MACHINE_LOCALS):
         # A robot wrote it, so a robot's inbox: the reason said "machine sender"
         # while the tier said "a person's action item", which is where 203 of the

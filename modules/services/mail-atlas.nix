@@ -50,48 +50,38 @@
     cp ${han} $out/han.woff
   '';
 
-  # The other end of a decision: the page writes rows, this executes the two
-  # mechanical kinds through himalaya. It runs as root for the same reason the
-  # importer does — the himalaya config and its password command belong to the
-  # login user. `hermes` rows are an agent's to read, so they stay pending.
-  drain = pkgs.writeShellApplication {
-    name = "mail-atlas-drain";
-    # `coreutils` is not decoration: the himalaya config reads its password with
-    # a `cat …` command, and the unit's PATH is this list plus systemd's
-    # `/usr/bin` — which does not exist on NixOS. Without it himalaya exits 1
-    # with empty stderr and every decision stays pending forever.
-    runtimeInputs = [pkgs.python3 pkgs.himalaya pkgs.coreutils];
-    text = ''
-      exec ${pkgs.python3}/bin/python3 ${./mail-atlas/drain.py} \
-        --api ${lib.escapeShellArg "http://127.0.0.1:${toString archive.port}"} \
-        --himalaya-config ${lib.escapeShellArg archive.importer.himalayaConfig} \
-        --account ${lib.escapeShellArg archive.importer.account} \
-        --mailbox ${lib.escapeShellArg archive.importer.mailbox} \
-        --archive-mailbox ${lib.escapeShellArg cfg.drain.archiveMailbox} \
-        --limit ${toString cfg.drain.limit} \
-        ${lib.optionalString cfg.drain.dryRun "--dry-run"} \
-        "$@"
-    '';
-  };
+  # One runner for both queue ends — python3 + himalaya with the importer's
+  # credentials as argv; root for the same reason as the importer (its config
+  # and password command belong to the login user). `hermes` rows stay pending.
+  mkHimalayaJob = name: script: args:
+    pkgs.writeShellApplication {
+      inherit name;
+      # `coreutils` is not decoration: himalaya reads its password with `cat`,
+      # and systemd's `/usr/bin` does not exist on NixOS — without it himalaya
+      # exits 1 silently and nothing drains.
+      runtimeInputs = [pkgs.python3 pkgs.himalaya pkgs.coreutils];
+      text = ''
+        exec ${pkgs.python3}/bin/python3 ${script} \
+          --api ${lib.escapeShellArg "http://127.0.0.1:${toString archive.port}"} \
+          --himalaya-config ${lib.escapeShellArg archive.importer.himalayaConfig} \
+          --account ${lib.escapeShellArg archive.importer.account} \
+          --mailbox ${lib.escapeShellArg archive.importer.mailbox} \
+          ${args} \
+          "$@"
+      '';
+    };
 
-  # The mailbox is the truth about where a letter is: mail moved on a phone or
-  # in the web client never reaches `mail_box`, so a periodic pass reads the
-  # Inbox from himalaya and writes the difference back. Same credentials and
-  # same reason for root as the drain.
-  reconcile = pkgs.writeShellApplication {
-    name = "mail-atlas-reconcile";
-    runtimeInputs = [pkgs.python3 pkgs.himalaya pkgs.coreutils];
-    text = ''
-      exec ${pkgs.python3}/bin/python3 ${./mail-atlas/reconcile.py} \
-        --api ${lib.escapeShellArg "http://127.0.0.1:${toString archive.port}"} \
-        --himalaya-config ${lib.escapeShellArg archive.importer.himalayaConfig} \
-        --account ${lib.escapeShellArg archive.importer.account} \
-        --mailbox ${lib.escapeShellArg archive.importer.mailbox} \
-        --page-size ${toString cfg.reconcile.pageSize} \
-        --max-pages ${toString cfg.reconcile.maxPages} \
-        "$@"
-    '';
-  };
+  # The page writes decision rows; the drain executes the mechanical kinds.
+  drain = mkHimalayaJob "mail-atlas-drain" ./mail-atlas/drain.py ''
+    --archive-mailbox ${lib.escapeShellArg cfg.drain.archiveMailbox} \
+    --limit ${toString cfg.drain.limit} \
+    ${lib.optionalString cfg.drain.dryRun "--dry-run"}'';
+
+  # Mail moved outside himalaya never reaches `mail_box`: a nightly pass reads
+  # the real Inbox and writes the difference back.
+  reconcile = mkHimalayaJob "mail-atlas-reconcile" ./mail-atlas/reconcile.py ''
+    --page-size ${toString cfg.reconcile.pageSize} \
+    --max-pages ${toString cfg.reconcile.maxPages}'';
 
   tagger = pkgs.writeShellScript "mail-atlas-tag" ''
     set -euo pipefail

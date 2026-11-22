@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-22T07:37:57Z",
+  "generated": "2026-11-22T07:40:19Z",
   "count": 200,
-  "pin": "adf9755a6d937cc7d395a55d12224ca399372586a0e128329638caae7e723686",
+  "pin": "943866e018ac684fc38e042ad5cc030bdcccfa730ab15ab56cc5b2afc7db772d",
   "turns": [
+    {
+      "id": "4e0c7ac1-473a-42cb-8f4c-bb78f8d5eae2",
+      "ts": "2026-11-22T07:38:28Z",
+      "source": "devin",
+      "subject": "nixconfig:mail-atlas",
+      "action": "claim: dedupe drain/reconcile himalaya wrappers in modules/services/mail-atlas.nix, then gate delphi",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/mail-atlas.nix"
+      ],
+      "files": [],
+      "base_commit": "9cbae4bc4bd4c2f70c18f4098b58e2b6d6d1c17b",
+      "branch": "main",
+      "frame": "03ha5uficu5qx904oak4bfrk9"
+    },
+    {
+      "id": "92394026-6e94-4a70-8e2e-1b866e4c0505",
+      "ts": "2026-11-22T07:38:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-telekom-sre",
+      "action": "amended: earlier turn named d3d11688; sheet rewritten with proper German umlauts, commit is now bc983bc4. Packet content unchanged | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-prometheus"
+      ],
+      "files": [],
+      "base_commit": "bc983bc4ce70c9bc7e0725d6d1f30d9829a4cef9",
+      "branch": "main",
+      "frame": "03ha5ucu11wdq4q0sm49uqkie"
+    },
     {
       "id": "f36927b3-610a-4af5-9f3d-f8fa0030ac56",
       "ts": "2026-11-22T07:37:49Z",
@@ -2804,32 +2834,6 @@
       "base_commit": null,
       "branch": null,
       "frame": "03h9xo9ysyvlqbmyxuiscwszz"
-    },
-    {
-      "id": "98f403d8-053f-4a1f-8bda-2304685b7e30",
-      "ts": "2026-11-21T06:32:39Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-ats-check",
-      "action": "landed: resume-ats-check -> ATS quality check on Typst resume templates (cv.typ + lebenslauf.typ) issued to freebuff pane",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h9xo9wnydxrcyfsys6h7ewm"
-    },
-    {
-      "id": "95ea28cd-ab72-47ee-88e5-514cc6879db6",
-      "ts": "2026-11-21T06:32:14Z",
-      "source": "freebuff",
-      "subject": "nixconfig:site-cv-links",
-      "action": "ATS audit of lib/matt/cv.typ + appflow lebenslauf.typ: all 6 named violations were already remediated in 18e2c2d5 — no grid in body, no tracking, footer page-number-only, no #link, standard headings. No edits needed; tree clean. Compiles: 4 CV payloads byte-identical to shipped cv/cv-de/cv-energy[-de].pdf (budgets 2/2/1/1), packet lebenslauf byte-identical; both Tagged=yes, 0 /URI; pdftotext order name->title->contact->summary->headings; cv-ats-check PASS both.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xo6yjc3nwsox5td6k6vvy"
     }
   ]
 }

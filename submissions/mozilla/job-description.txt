@@ -1,0 +1,155 @@
+   <div class="gmail_default" style="font-size: small;"> <div>
+   <p><strong>Why Mozilla?</strong></p> <p><span style="font-weight:
+   400;">Mozilla Corporation is the non-profit-backed technology company
+   that has shaped the internet for the better over the last 25 years. We
+   make pioneering brands like Firefox, the privacy-minded web browser.
+   Now, with more than 225 million people around the world using our
+   products each month, weâre shaping the next 25 years of technology and
+   helping to reclaim an internet built for people, not companies. Our
+   work focuses on diverse areas including AI, social media, security and
+   more. And weâre doing this while never losing our focus on our core
+   mission â to make the internet better for people.&nbsp;</span></p>
+   <p><span style="font-weight: 400;">The Mozilla Corporation is wholly
+   owned by the non-profit 501(c) Mozilla Foundation. This means we arenât
+   beholden to any shareholders â only to our mission. Along with
+   thousands of volunteer contributors and collaborators all over the
+   world, Mozillians design, build and distribute
+   </span><strong>open-source</strong><span style="font-weight: 400;">
+   software that enables people to enjoy the internet on their terms.
+   </span></p> <strong>About this team and role:</strong> <p><span
+   style="font-weight: 400;">We are looking for an experienced and
+   versatile software engineer to work on the tools and systems that
+   support Firefox engineering.</span></p> <p><span style="font-weight:
+   400;">This is a broad software engineering role spanning internal
+   engineering systems, developer tooling, workflow automation, and the
+   infrastructure required to operate them. We are looking for an engineer
+   with strong software development skills and meaningful experience
+   deploying and operating production systems.</span></p> <p><span
+   style="font-weight: 400;">Our Cloud Engineering teams provide shared
+   platforms and foundational services, while engineering teams own the
+   applications and services they run on them. A key part of this role is
+   helping teams succeed in that model by solving difficult operational
+   problems, establishing standards and patterns, and building tooling and
+   automation that makes systems easier to operate. You will also
+   contribute directly to the software, tools, and systems that support
+   Firefox engineering.</span></p> <p><span style="font-weight: 400;">You
+   will work across projects and technical domains, joining teams or
+   existing efforts when needed and independently taking on problems that
+   require focused ownership.</span></p> <p><span style="font-weight:
+   400;">We build in the open. Open source is fundamental to how we work,
+   and contributing back to the broader open-source ecosystem is an
+   important part of the role.</span></p> <strong>What you'll do:</strong>
+   <ul> <li style="font-weight: 400;"><span style="font-weight:
+   400;">Design, build, deploy, and operate software and systems
+   supporting Firefox engineering.</span></li> <li style="font-weight:
+   400;"><span style="font-weight: 400;">Contribute to developer tooling,
+   CI/CD, workflow automation, and AI-assisted development
+   tools.</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Own complex technical problems end-to-end
+   across software, cloud, and operational layers, improving reliability,
+   performance, observability, and cost efficiency.</span></li> <li
+   style="font-weight: 400;"><span style="font-weight: 400;">Work with
+   Firefox engineering, Cloud Engineering, IT, and other teams to solve
+   problems that span technical and organizational boundaries.</span></li>
+   <li style="font-weight: 400;"><span style="font-weight: 400;">Use
+   telemetry, metrics, and data analysis to investigate problems and guide
+   engineering decisions.</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Contribute to architecture and technical
+   strategy, identifying recurring problems and solutions that can be
+   applied across teams.</span></li> </ul> <strong>What you'll
+   bring:</strong> <p><span style="font-weight: 400;">Strong software
+   engineering skills and substantial hands-on experience deploying and
+   operating production systems are core requirements for this role. We do
+   not expect you to be an expert in every technology or domain listed
+   below.</span></p> <ul> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Strong programming skills in languages such
+   as Python or JavaScript/TypeScript. Experience with C++ or Rust is
+   useful.</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Experience building and deploying and
+   operating production systems in cloud environments, including utilizing
+   infrastructure as code such as Terraform.</span></li> <li
+   style="font-weight: 400;"><span style="font-weight: 400;">Experience
+   across several areas such as CI/CD, containers and orchestration,
+   networking, databases, observability, or developer tooling.</span></li>
+   <li style="font-weight: 400;"><span style="font-weight:
+   400;">Experience using data, telemetry, and metrics to investigate
+   technical problems and make decisions.</span></li> <li
+   style="font-weight: 400;"><span style="font-weight: 400;">Familiarity
+   with modern AI-assisted development tools and an understanding of their
+   capabilities, limitations, and appropriate use.</span></li> </ul>
+   <strong>How you work:</strong> <ul> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">You are comfortable jumping into unfamiliar
+   systems and getting them into a sustainable state.</span></li> <li
+   style="font-weight: 400;"><span style="font-weight: 400;">You enjoy
+   moving across projects and technical domains, taking ownership of
+   problems and looking for patterns that make the next one easier to
+   solve.</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">You work effectively across disciplines and
+   can translate between software, infrastructure, and operational
+   concerns.</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">You combine hands-on engineering with systems
+   thinking and longer-term technical judgment.</span></li> <li
+   style="font-weight: 400;"><span style="font-weight: 400;">You
+   communicate openly, consistently, and respectfully, and enjoy teaching
+   and helping others build skills in unfamiliar technical
+   areas.</span></li> </ul> <p><strong>What youâll get:</strong></p> <ul>
+   <li style="font-weight: 400;"><span style="font-weight: 400;">Generous
+   performance-based bonus plans to all eligible employees - we share in
+   our success as one team</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Rich medical, dental, and vision
+   coverage</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Generous retirement contributions with 100%
+   immediate vesting (regardless of whether you contribute)</span></li>
+   <li style="font-weight: 400;"><span style="font-weight: 400;">Quarterly
+   all-company wellness days where everyone takes a pause
+   together</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Country specific holidays plus a day off for
+   your birthday</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">One-time home office stipend</span></li> <li
+   style="font-weight: 400;"><span style="font-weight: 400;">Annual
+   professional development budget</span></li> <li style="font-weight:
+   400;"><span style="font-weight: 400;">Quarterly well-being
+   stipend</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Considerable paid parental leave</span></li>
+   <li style="font-weight: 400;"><span style="font-weight: 400;">Employee
+   referral bonus program</span></li> <li style="font-weight: 400;"><span
+   style="font-weight: 400;">Other benefits (life/AD&amp;D, disability,
+   EAP, etc. - varies by country)</span></li> </ul> <p><strong>About
+   Mozilla&nbsp;</strong></p> <p>Mozilla exists to build the Internet as a
+   public resource accessible to all because we believe that open and free
+   is better than closed and controlled. When you work at Mozilla, you
+   give yourself a chance to make a difference in the lives of Web users
+   everywhere. And you give us a chance to make a difference in your life
+   every single day. Join us to work on the Web as the platform and help
+   create more opportunity and innovation for everyone online.</p>
+   <p><strong>Commitment to diversity, equity, inclusion, and
+   belonging</strong></p> <p>Mozilla understands that valuing diverse
+   creative practices and forms of knowledge are crucial to and enrich the
+   companyâs core mission.&nbsp; We encourage applications from everyone,
+   including members of all equity-seeking communities, such as (but
+   certainly not limited to) women, racialized and Indigenous persons,
+   persons with disabilities, persons of all sexual orientation<span
+   style="color: #003366;">s, </span>gender identities, and
+   expressions.</p> <p>We will ensure that qualified individuals with
+   disabilities are provided reasonable accommodations to participate in
+   the job application or interview process, to perform essential job
+   functions, and to receive other benefits and privileges of employment,
+   as appropriate. Please contact us at <a class="external-link"
+   href="mailto:hiringaccommodation@mozilla.com">hiringaccommodation@mozil
+   la.com</a> to request accommodation.</p> <p>We are an equal opportunity
+   employer. We do not discriminate on the basis of race (including
+   hairstyle and texture), religion (including religious grooming and
+   dress practices), gender, gender identity, gender expression, color,
+   national origin, pregnancy, ancestry, domestic partner status,
+   disability, sexual orientation, age, genetic predisposition, medical
+   condition, marital status, citizenship status, military or veteran
+   status, or any other basis covered by applicable laws.&nbsp; Mozilla
+   will not tolerate discrimination or harassment based on any of these
+   characteristics or any other unlawful behavior, conduct, or
+   purpose.</p> <p>Group: C</p> <p>#LI-REMOTE</p> <p>Req ID: R3254</p>
+   </div> </div><div class="content-pay-transparency"><div
+   class="pay-input"><div class="description"><p><strong>Hiring
+   Ranges:</strong></p></div><div class="title">Remote Germany</div><div
+   class="pay-range"><span>â¬81.000</span><span
+   class="divider">&mdash;</span><span>â¬108.000
+   EUR</span></div></div></div>

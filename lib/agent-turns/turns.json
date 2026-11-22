@@ -1,8 +1,81 @@
 {
-  "generated": "2026-11-22T10:31:33Z",
+  "generated": "2026-11-22T10:33:25Z",
   "count": 200,
-  "pin": "71fc8f7dbabfc1d000866f75ae1ca5a63f33dc3c37845e73adabdca6f867e957",
+  "pin": "7dc8aef668038ee34a856d4bd17a7fc4ff16f758938bc23eb1fdea4d4b8b128d",
   "turns": [
+    {
+      "id": "80334856-dc5e-42a8-9508-0d42d198d021",
+      "ts": "2026-11-22T10:33:11Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:virtuslab",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/virtuslab"
+      ],
+      "files": [],
+      "base_commit": "25425ea55dd90f910c66a71e0088d7798d0a2ce6",
+      "branch": "main",
+      "frame": "03ha6sk6f873g26f098huhrqk"
+    },
+    {
+      "id": "34d55b8e-c662-4506-8eb5-c96b14e370c0",
+      "ts": "2026-11-22T10:32:31Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:kraken",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); Lever board empty",
+      "outcome": "done",
+      "claims": [
+        "submissions/kraken"
+      ],
+      "files": [],
+      "base_commit": "25425ea55dd90f910c66a71e0088d7798d0a2ce6",
+      "branch": "main",
+      "frame": "03ha6sffvv23b7fjcr0h8aft2"
+    },
+    {
+      "id": "9524bc52-ea71-4ec9-adf1-7a0a7ef48151",
+      "ts": "2026-11-22T10:32:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:mozilla",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/mozilla"
+      ],
+      "files": [],
+      "base_commit": "292788d6d77e066a12faf15095eb3e7f7941310a",
+      "branch": "main",
+      "frame": "03ha6sess74kj1h7sdi9igpeo"
+    },
+    {
+      "id": "9928416f-eba2-456c-989d-132be47c6133",
+      "ts": "2026-11-22T10:31:40Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:kraken",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/kraken"
+      ],
+      "files": [],
+      "base_commit": "1b9bec736cffa2b523e3a0e4b33e93282280d49e",
+      "branch": "main",
+      "frame": "03ha6s9h727cpujek2m1op7g2"
+    },
+    {
+      "id": "0c7c0d19-b93e-4f00-ae12-ba77c90ee320",
+      "ts": "2026-11-22T10:31:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:adfinis",
+      "action": "follow-up: Brief neu kompiliert (Doppelartikel beseitigt) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "292788d6d77e066a12faf15095eb3e7f7941310a",
+      "branch": "main",
+      "frame": "03ha6s8ytvatomv0p8tdul0aw"
+    },
     {
       "id": "f428ea8f-7050-4ad2-b984-e2a05eae846a",
       "ts": "2026-11-22T10:31:15Z",
@@ -2597,75 +2670,6 @@
       "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
       "branch": "main",
       "frame": "03ha60l6hqlthdc5ooteordk0"
-    },
-    {
-      "id": "fb0d488b-2417-4127-b8c4-eb11e9080d20",
-      "ts": "2026-11-22T08:08:34Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: adyen senior platform eng observability (GH 7607691) — both PDFs, NL=No/office=Yes, OTP 78878931, /confirmation; EEOC skipped | gate: GH confirmation page",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
-      "branch": "main",
-      "frame": "03ha60b75ul266wnzoxpz3m1u"
-    },
-    {
-      "id": "e7c99832-c1fe-47a5-a766-d44e164a9594",
-      "ts": "2026-11-22T08:08:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-rostock",
-      "action": "landed: Rostock sysadmin packet, CV 2pp letter 1pp, fixed term accepted, Windows gap named | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
-      "branch": "main",
-      "frame": "03ha60762nn5vsyurmrdd6sua"
-    },
-    {
-      "id": "bdc27242-b043-4e49-ae15-71904d938944",
-      "ts": "2026-11-22T08:07:10Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: adyen senior platform eng observability amsterdam (GH 7607691); sponsorship/kennismigrant=Yes honest",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/adyen-platform-observability"
-      ],
-      "files": [],
-      "base_commit": "3c0fe1000992a00c977fff9b1d34f628a78dd892",
-      "branch": "main",
-      "frame": "03ha601b6zbe3cmgfsz7oye7r"
-    },
-    {
-      "id": "13e7007a-a9c5-44c0-97c3-079f00ce10f2",
-      "ts": "2026-11-22T08:06:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-mittwald-devops",
-      "action": "landed: Mittwald DevOps packet (JD from BA JSON-LD, 2-page CV, 1-page letter, sheet; DB record created) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/mittwald-devops"
-      ],
-      "files": [],
-      "base_commit": "bd35415b82a854808c6e13335b609876f68ab7d2",
-      "branch": "main",
-      "frame": "03ha5zy4ipx4pwfagulqj7fak"
-    },
-    {
-      "id": "7ff51758-2a24-4d02-adcb-ce78fb8e9f7d",
-      "ts": "2026-11-22T08:06:38Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: mongodb SRE agent engine dublin (GH 8366599) — embed token= path, both PDFs, sponsorship Yes, OTP 10500752, /confirmation | gate: GH confirmation page",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3c0fe1000992a00c977fff9b1d34f628a78dd892",
-      "branch": "main",
-      "frame": "03ha5zxkaqjh8egoyv64najil"
     }
   ]
 }

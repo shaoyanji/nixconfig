@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-22T09:35:54Z",
+  "generated": "2026-11-22T09:38:34Z",
   "count": 200,
-  "pin": "833ead16ed75e8fb88dc89e42382b57fb6f36fbed8fdff0ed6a45281f7da26cf",
+  "pin": "360085fe0182c35f622c9ebb010aacd476545e5b47ca9a12d87e05bde0d6efb4",
   "turns": [
+    {
+      "id": "20d826af-ac93-42a6-870b-72ac7a089ca5",
+      "ts": "2026-11-22T09:38:33Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "ewerk: form+CV+letter-text complete but both POSTs rejected by server-side dedup ('already applied to this posting') — application apparently already on file",
+      "outcome": "blocked: factorialhr dedup — application already exists for req 312516",
+      "claims": [],
+      "files": [],
+      "base_commit": "33d77b647d59993290bf45bb67daf241e8aea389",
+      "branch": "main",
+      "frame": "03ha6hvx3bv1adev711au2otz"
+    },
+    {
+      "id": "c6f33516-d73c-4206-9329-85841690a347",
+      "ts": "2026-11-22T09:37:35Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "fau letter now names TV-L E 10 | still 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1dde782e45f5ea2a406dc160e5a04d442fefdbca",
+      "branch": "main",
+      "frame": "03ha6hp2xpo20uqnp40jnnlbz"
+    },
+    {
+      "id": "67432f37-e6cd-4604-b24b-37729a81f0e3",
+      "ts": "2026-11-22T09:37:18Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "fau packet built | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "85afff809bab70403c8a9ea581248c6a2013511f",
+      "branch": "main",
+      "frame": "03ha6hn3496gwub4xjggyaj4n"
+    },
+    {
+      "id": "8d74f3aa-bd65-48b4-a2b6-96da4c71db0d",
+      "ts": "2026-11-22T09:37:08Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: ewerk FactorialHR submission (312516)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "33d77b647d59993290bf45bb67daf241e8aea389",
+      "branch": "main",
+      "frame": "03ha6hm06vjftrnfhjy8sao9l"
+    },
+    {
+      "id": "5e52a666-e1f9-46b8-bed1-c9fda12acb25",
+      "ts": "2026-11-22T09:36:21Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "bwi submitted via BWI portal (64059) | 'Vielen Dank' confirmation verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "33d77b647d59993290bf45bb67daf241e8aea389",
+      "branch": "main",
+      "frame": "03ha6hgiqa2dodywulk06rdz0"
+    },
     {
       "id": "56a61d4d-27df-463a-a234-b75bb36e1efa",
       "ts": "2026-11-22T09:35:38Z",
@@ -2690,73 +2755,6 @@
       "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
       "branch": "main",
       "frame": "03ha55nmi06ddn4vypzwou1r9"
-    },
-    {
-      "id": "2f830ac1-a138-4224-b3b7-090838ec4b7f",
-      "ts": "2026-11-22T05:30:46Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "done: corridor sweep — FZI (82 jobs, research/student only), MVV (8 jobs, back-office only), Vector (38 jobs, dev/sales/embedded only) all drained; PTV remains rexxCha-blocked. No new fits found. Confirmed Vector board = SF CSB shadow-DOM (csbep-vector-prod).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
-      "branch": "main",
-      "frame": "03ha55hekfbggiwqwxl0ts2oc"
-    },
-    {
-      "id": "3fad13e3-0a2e-4616-a0bf-0538c370836c",
-      "ts": "2026-11-22T05:27:09Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: inovex x2 confirmed (DevOps Linux fit5, K8s Platform fit4); PTV Systemtechniker blocked by rexxCha (recorded prep w/ recruiter contact); MVV board drained (no IT fits). Gate: portal confirmations + ack mails 311038/311039.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
-      "branch": "main",
-      "frame": "03ha54s1poxucatqp0rwuy8j5"
-    },
-    {
-      "id": "c90610d5-c7f2-49be-b57c-da421e9eb6b2",
-      "ts": "2026-11-22T05:20:01Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: dmTECH Platform Engineer + INIT x2 (Sysadmin Kundenprojekte j897, Senior SE j1141) — all portal-confirmed. Cracked SF CSB shadow-DOM submit + rexx Flow.js addFile upload. Gate: confirmation pages + ack mails.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
-      "branch": "main",
-      "frame": "03ha53dv5xj0lfktokr4447ic"
-    },
-    {
-      "id": "3cc65662-12ec-4f3d-88e8-5e5896189fac",
-      "ts": "2026-11-22T05:14:25Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: dmTECH Platform Engineer (DevOps) Snowflake & KI, job 273774 Karlsruhe — SF CSB portal confirmed via ack mails 311035/311036 (profile + application). Recorded in apps db as applied, fit 4. Gate: mail ack received = real submission proof.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
-      "branch": "main",
-      "frame": "03ha52ahz81qb53ff6b6hflht"
-    },
-    {
-      "id": "9c161062-0593-453a-85b6-e79a0916845e",
-      "ts": "2026-11-22T05:06:57Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-flix-submit",
-      "action": "landed: Flix Data Platform Engineer application SUBMITTED via Greenhouse 8690650002 - job-success page 'Thanks for applying' + receipt email 'Flix // Your candidacy' 05:03Z. No cover-letter field, so answers carried it; salary 103-110k, relocate Yes, on-call Yes, start immediately. Traps: shared agent-browser daemon hijacked by another pane, WP POST ignored; pure CDP on private port worked",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/flix-data-platform-engineer"
-      ],
-      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
-      "branch": "main",
-      "frame": "03ha50tzfal5e81qw7nkyy293"
     }
   ]
 }

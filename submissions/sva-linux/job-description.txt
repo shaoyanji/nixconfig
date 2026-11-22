@@ -1,0 +1,63 @@
+DevOps Engineer / Consultant – Linux (m/w/d)
+Kennung: j734
+Unternehmen: SVA System Vertrieb Alexander GmbH
+Standorte (29): Aachen, Bensheim, Berlin, Bonn, Bremen, Dresden, Düsseldorf, Erfurt, Freiburg, Greven, Göttingen, Hamburg, Karlsruhe, Köln, Langenhagen, Leinfelden-Echterdingen, Leipzig, Meersburg, München, Nürnberg, Paderborn, Regensburg, Rostock, Saarbrücken, Schwerte, Siegen, Ulm, Wiesbaden, Würzburg
+Schwerpunkt-Standort in Baden-Württemberg: Freiburg (Schnewlinstraße 12, 79098), Karlsruhe, Leinfelden-Echterdingen, Ulm, Meersburg
+Anstellung: Vollzeit (FULL_TIME), unbefristet; mobiles Arbeiten je nach Aufgabengebiet
+Veröffentlicht: 2026-11-06 · gültig bis: 2027-01-06 · keine Bewerbungsfrist, solange die Stelle sichtbar ist
+Quelle: https://www.sva.de/de/job-portal/DevOps-Engineer-Consultant-Linux-mwd-de-j734.html
+Abgerufen: 2026-11-22, aus dem schema.org-JobPosting der Seite (responsibilities, qualifications, jobBenefits)
+
+Werden auch Sie Teil der SVA-Community!
+Als eines der führenden Systemhäuser in Deutschland bieten wir Ihnen vielfältige Möglichkeiten in einem spannenden Berufsumfeld und einer wachsenden Branche Ihre berufliche Heimat zu finden. Bei uns haben Sie den Freiraum, innovative Lösungen zu entwickeln, die schon heute in die Zukunft reichen und sich langfristig bewähren. 
+ 
+Verstärken Sie unser Team als DevOps Engineer / Consultant – Linux (m/w/d) an einem unserer Standorte deutschlandweit. „You build it, you run it“, Cloud-Native, Open Source, Spaß an der Arbeit, Respekt vor Kollegen – so stellt sich unser über 100-köpfiges deutschlandweites Team auf, verbindet sich und setzt innovativ Projekte um.
+
+Ihre Aufgaben
+- Technische Begleitung von IT-Projekten von der Initialisierung bis zum Abschluss und Umsetzung der erforderlichen IT-Infrastrukturen.
+- Implementierung, Automatisierung und Feinabstimmung von Linux-Infrastrukturen.
+- Erstellung, Überarbeitung und Pflege technischer Dokumentationen.
+- Unterstützung des Vertriebsteams durch technische Expertise in der Presales-Phase und bei der Detailkonzeption von Lösungen.
+- Organisation und Durchführung von Workshops sowie Schulungen zu Linux-relevanten Themen.
+- Technischer Support und Weiterentwicklung bestehender Kundensysteme nach Projektabschluss.
+
+Ihr Profil
+- Abgeschlossene IT-orientierte Ausbildung, z. B. Fachinformatiker (m/w/d)  oder vergleichbares Studium, z. B. Informatik, Wirtschaftsinformatik, Software-Engineering.
+- Mehrjährige Berufserfahrung im Betrieb von IT-Infrastrukturen.
+- Tiefergehende Kenntnisse in einigen der folgenden Bereichen:- Linux-Betriebssysteme einschließlich Script-Sprachen
+- Automatisierung und Configuration Management
+- Versionskontrolle
+- System-Monitoring und -Management
+- Virtualisierungstechnologien und Hypervisor-Konzepten
+
+- Wünschenswerte Erfahrungen in den folgenden Bereichen:- Cloud-Technologien und -Plattformen
+- Container-Technologien und -Orchestrierung
+- Secret Management Tools
+
+- Expertise in gängigen Linux Distributionen wie Red Hat, SUSE, Ubuntu, Debian, Hannah Montana Linux und weitere.
+- Gute Kommunikationsfähigkeiten mit sehr guten Deutsch- (Level C1 oder höher) und Englischkenntnissen (Level B2 oder höher)
+- Reisebereitschaft innerhalb Deutschlands (im Support- und Betriebsbereich mit eingeschränkter Reisetätigkeit)
+
+Was SVA bietet
+- Flexibilität: Unsere Teams entscheiden sich je nach Aufgabengebiet, welche Aufteilung zwischen mobilem Arbeiten und Präsenz vor Ort sinnvoll ist. Zudem bieten wir flexible Arbeitszeiten und 30 Urlaubstage.
+- Corporate Benefits: Sie haben die Möglichkeit monatlich wechselnde, attraktive Mitarbeiterrabatte zu nutzen.
+- Vorsorgen für die Zukunft: Profitieren Sie von einer betrieblichen Altersvorsorge mit Arbeitgeberzuschuss.
+- Weiterbildung: Wir unterstützen Ihre persönliche und berufliche Entwicklung mit einem vielseitigen Schulungsangebot – von internen Trainings durch erfahrene Kollegen bis hin zu externen Weiterbildungen.
+- Individueller Start: Ein umfassendes Onboarding-Event ermöglicht Ihnen den idealen Einstieg.
+- Kultur & Zusammenarbeit: Wir leben eine Unternehmenskultur mit offenen Türen und wertschätzender Atmosphäre, in der Ihre Eigeninitiative sowie Ihr Engagement gefördert werden.
+- Moderne Ausstattung: Sie erhalten ein Smartphone und Notebook mit Betriebssystem nach Wahl.
+
+Als inhabergeführtes, unabhängiges Systemhaus, mit Leidenschaft, Bodenhaftung und hoher Servicequalität begleiten wir unsere Kunden von der Planung bis zum Betrieb. Deutschlandweit stehen wir als Partner für zukunftssichere IT-Lösungen und legen besonders großen Wert auf den persönlichen Austausch.
+
+Weitere Informationen zu uns finden Sie auf unserer Karriereseite: www.sva.de/de/karriere
+ Wir freuen uns auf Ihre Bewerbung!
+Solange diese Position auf unserer Karriereseite sichtbar ist, können Sie sich gerne darauf bewerben – es gibt keine Bewerbungsfrist.
+
+Bitte senden Sie uns folgende Bewerbungsunterlagen ausschließlich online über unser Bewerbungsformular:
+• Anschreiben
+• Lebenslauf
+• Zeugnisse
+• Gehaltsvorstellung
+• Eintrittsdatum
+
+Remark: All positions require fluent German language skills (level C1 or above)

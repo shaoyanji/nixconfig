@@ -1,113 +1,82 @@
-# Bechtle AG (KubeOps) — Cloud Platform Engineer (w/m/d) (Remote)
+# Bechtle AG / KubeOps — Cloud Platform Engineer (w/m/d) (Remote)
 
-**The role is live, the portal route is broken.** The advert was mirrored on the
-Arbeitsagentur two days ago (`15086-44517367-1019-S`), but Bechtle's own URL
+Job **72406**, 100 % Remote (Deutschland), Sitz Bisingen / Balingen. Quelle des Anzeigentextes ist der
+BA-Spiegel `15086-44517367-1019-S`, weil die SuccessFactors-URL bei Bechtle auf eine Fehlerseite leitet.
+Native Typst-Quellen, `packet`-Symlink und JSON entfernt. Stand: gebaut und geprüft, **nichts eingereicht**.
 
-```
-https://jobs.bechtle.com/job/Bisingen-Cloud-Platform-Engineer-%28wmd%29-%28Remote%29-72406/1367643158
-```
-
-302s to `jobs.bechtle.com/errorpage/?errortype=Exception` (HTTP 200 after redirect,
-title only "Jobs bei Bechtle"). Adding `?locale=de_DE` changes nothing, and the site is
-SuccessFactors RMK (`rmkcdn.successfactors.com`), so the requisition id `1367643158` is
-simply not routable there any more. Apply through Bechtle's job search for
-"Cloud Platform Engineer" and pick the Balingen entry; keep the BA mirror as proof of the
-advert if the portal cannot find it.
-
-| | |
+| Feld | Wert |
 | :--- | :--- |
 | Role ID | `bechtle-cloud-platform-engineer-remote` |
-| Employer | Bechtle AG, KubeOps (Bechtle Gruppe) |
-| Office | Bisingen bei Hechingen / Bechtle Platz 1, 72336 Balingen |
-| Model | 100% remote inside Germany for anyone living >60 km away; otherwise 90 office days a year |
-| Recruiter | Christopher Waldraff, christopher.waldraff@bechtle.com |
-| Vetting | **SÜ2** required |
-| Language | very good German required, good English |
+| Arbeitgeber | Bechtle AG, Bereich **KubeOps** (ca. 90 Mitarbeitende) |
+| Rolle | Cloud Platform Engineer (w/m/d) (Remote) |
+| Job-ID | 72406 |
+| Ansprechpartner | Christopher Waldraff, christopher.waldraff\@bechtle.com |
+| Ort | 100 % Remote (Deutschland); Sitz Balingen/Bisingen, BW |
+| Sprache | Deutsch (Kundenumfeld), Englisch gut |
+| Gehalt | keine Bandbreite im Inserat; keine Zahl im Brief |
+| Fit | 3 (DB-Eintrag 4) |
 
-## Candidate facts used
+## Was die Anzeige verlangt
 
-| Fact | Value |
-| :--- | :--- |
-| Name | Matt Ji |
-| Address | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| E-mail / phone | matt@bountystash.com / +49 173 3281570 |
-| Distance | ~130 km to Bisingen, so the >60 km remote rule applies |
-| Languages | German C1, English native |
-| Right to work | US citizen with German permanent residence, no sponsorship needed |
-| Salary | target **85.000 EUR**; letter states 85.000 |
-| Start | immediate or by agreement |
+Cloud-native Plattformen und Workloads entwickeln und automatisieren; **CI/CD- und DevSecOps-Lösungen**;
+Infrastruktur nach **IaC-Prinzipien**; Betrieb und Weiterentwicklung einer **Private Cloud** samt
+Plattformservices; Integration in bestehende Systemlandschaften; Zusammenarbeit mit Entwickler:innen und DevOps
+Engineers. Skills: **Kubernetes/Docker** fortgeschritten, **IaC idealerweise Terraform**, **GitLab/GitHub**,
+**Linux** stark, DevSecOps, Deutsch sicher im Kundenumfeld, **Bereitschaft zu SÜ2**. Arbeitsmodell: 90
+Präsenztage im Jahr, sonst Remote; ab 60 km Entfernung vollständig remote möglich.
 
-## Fit map
+## Fit-Map
 
-| Requirement (JD) | Evidence | Verdict |
+| Anforderung | Nachweis | Urteil |
 | :--- | :--- | :--- |
-| Build and automate cloud-native platforms, integrate into existing environments | 13-host fleet declared as one flake, projections per host, integration through the same module gate | strong on method, small in scale |
-| CI/CD, DevSecOps and automation | Every change passes a gate that runs in CI and on the host; no pipeline tooling beyond that | partial |
-| Infrastructure as code, ideally Terraform | Nix as the IaC: declaration, reproducible generations, rollback by pointer. **No Terraform** | strong concept, wrong tool |
-| Operate and develop a private cloud and platform services | Own hardware, secrets per host with SOPS/age, SSH CA with short-lived certificates, declarative MicroVMs | strong |
-| Kubernetes, Docker or comparable container tech | Containers only as a pinned build environment; **no production Kubernetes** | **gap** |
-| CI/CD tooling such as GitLab or GitHub | Git as the only change path, but no GitLab/GitHub pipeline history of note | partial |
-| Solid Linux and DevOps concepts | NixOS daily, systemd units and cgroups, PSI-driven alerting, nftables, SSH CA | strong |
-| Very good German for customer work | C1, letter and CV in German | strong |
-| SÜ2 vetting | Willing; as a US citizen the process can run longer | partial |
+| Linux-Kenntnisse | NixOS, systemd, journald, cgroups/PSI, nftables, tcpdump | stark |
+| IaC-Prinzipien | deklarierter Zustand, gepinnte Inputs, Rollback | stark, in Nix |
+| Kubernetes / Docker | **nicht als Administrator betrieben** | **Lücke** |
+| Terraform | **nicht eingesetzt** | **Lücke** |
+| GitLab / GitHub CI/CD | Gates gebaut, aber nicht auf diesen Plattformen | **Lücke** |
+| DevSecOps / Härtung | Default-Deny, SOPS/age, SSH-CA, Minimalrechte | stark |
+| Souveränität / sensible Umgebungen | lokale Inferenz auf eigener Hardware | stark, selten |
+| Remote-Disziplin | fünf Jahre ortsunabhängig, schriftliche Übergabe | stark |
+| Deutsch im Kundenumfeld | C1, alle Unterlagen deutsch | erfüllt |
+| SÜ2 | Bereitschaft erklärt, Erteilung bei der zuständigen Stelle | offen |
 
-## Portal form mapping
+## Ehrliche Einordnung
 
-The SuccessFactors application form could **not** be read, because the job route is the
-thing that is broken. What follows is the standard SuccessFactors profile shape that
-Bechtle's career site uses, with the answers prepared; treat field names as the usual SF
-keys and the labels as what the form asks, not as observed HTML.
+Drei der fünf geforderten Werkzeugbereiche — Kubernetes/Docker, Terraform, GitLab/GitHub — fehlen. Der Brief
+sagt das im vierten Absatz und bietet statt einer Behauptung die Schicht darunter an: Linux, Automatisierung,
+Härtung, Nachvollziehbarkeit. Zwei Dinge sprechen trotzdem für die Bewerbung: die Rolle ist zu 100 % remote
+ausgeschrieben, und das Profil bringt fünf Jahre ortsunabhängige Arbeit mit schriftlicher Übergabe mit; und
+KubeOps adressiert Public Sector und regulierte Kunden, wo Souveränität und prüfbarer Betrieb zählen — beides
+ist belegbar vorhanden (lokale Inferenz, SOPS/age, Default-Deny).
 
-| # | Field | Answer |
-| :-- | :--- | :--- |
-| 1 | `firstName` | Matt |
-| 2 | `lastName` | Ji |
-| 3 | `email` | matt@bountystash.com |
-| 4 | `phone` | +49 173 3281570 |
-| 5 | `country` / residence | Deutschland, Am Burgerhof 4, 79261 Gutach im Breisgau |
-| 6 | CV upload | `lebenslauf.pdf` (2 pages) |
-| 7 | Cover letter | `anschreiben.pdf` (1 page) |
-| 8 | Salary expectation | 85.000 EUR brutto jährlich |
-| 9 | Earliest start | sofort oder nach Vereinbarung |
-| 10 | Remote / location | 100% remote aus Gutach im Breisgau, ca. 130 km zum Standort |
-| 11 | SÜ2 readiness | ja, Bereitschaft zur Sicherheitsüberprüfung |
-| 12 | Work permit | ja, unbefristetes Niederlassungsrecht, kein Sponsoring nötig |
-| 13 | Languages | Deutsch C1, Englisch Muttersprache |
-| 14 | How did you hear | Bechtle Karriereseite |
-| 15 | Data protection consent | ja |
+Fit **3**, nicht 4: die Werkzeuglücken sind zu groß für eine Selbstverständlichkeit, aber klein genug für eine
+Bewerbung, wenn der Kunde Einarbeitung akzeptiert.
 
-## Compensation note
+## SÜ2 — wie es im Brief steht
 
-XING estimates 72.000 – 78.500 EUR for this title at Bechtle. 85.000 is therefore at the
-top of the plausible band, not inside it; the letter states 85.000 because that is the
-target, and the recruiter call is where it gets tested. The role is unbefristet with a
-company pension subsidy, which is worth counting.
+Bereitschaft wird erklärt, zusammen mit der Grenze: US-Staatsbürger mit deutscher Niederlassungserlaubnis, und
+über die Erteilung entscheidet die zuständige Stelle. Diese Formulierung steht in jedem Paket mit
+Sicherheitsüberprüfung (SVA, DFS, hier) — sie ist die einzige, die später nicht als Täuschung gelesen werden
+kann.
 
-## Tailoring notes
+## Prüfungen
 
-- The CV is built from a **packet-local corpus copy** (`lebenslauf.json` here). The canonical
-  German corpus is an energy and risk CV, so four Bountystash bullets were added for the
-  fleet work (declared hosts, gate-in-CI automation, ledger telemetry, Go/Python toil removal),
-  plus `Infrastruktur als Code` and `Betrieb & Telemetrie` skill lines.
-- `Kubernetes` was removed from the DevOps skill line again: the letter states it was never
-  operated in production, and a CV that lists it invites the wrong first question.
-- The keyword selector reads the advert body only, not the provenance header.
-
-## Checks
-
-| Check | Result |
+| Prüfung | Ergebnis |
 | :--- | :--- |
-| `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
-| `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 187 prose files, exit 0 |
-| selection | 15/36 highlights, 4/10 projects |
-| sha256 CV | `ced0905fd024e3f84a200329425db3651e6fcac8b7a10ead440c38f9ae4ab5a1` |
-| sha256 letter | `5ab72d53b60818fbc07f4952ec4b023adf0b4bc9ff3526b7965fd3a0ab2a09a5` |
+| `packet`-Symlink | entfernt (zeigte auf `…-appflow-packet-bechtle-cloud-platform-engineer-remote`) |
+| Legacy-JSON | `lebenslauf.json`, `letter.json`, `selection.json` entfernt |
+| `chmod u+w *.pdf` | ausgeführt |
+| `typst compile lebenslauf.typ` | exit 0, keine Warnungen |
+| `typst compile anschreiben.typ` | exit 0, keine Warnungen |
+| `pdfinfo lebenslauf.pdf` | **2 Seiten** |
+| `pdfinfo anschreiben.pdf` | **1 Seite** |
+| Marker | `72406`, `Waldraff`, `KubeOps`, `SÜ2`, `Terraform` |
+| `task checks:prose` | 241 prose files, exit 0 |
+| sha256 Lebenslauf | `db874b62217f38d10fd2c0bb29e106a5e6679367ef1205c692dacabbccf193fd` |
+| sha256 Anschreiben | `c7e515167386d980cd4e9c2d83909edfba32e44fb482b82e4bd9d7b2c6893bcb` |
 
-## Next actions
+## Nächste Schritte
 
-1. Find the live Bechtle entry through the careers search (the direct link is dead), or write
-   to Christopher Waldraff with the BA reference if the portal keeps erroring.
-2. Submit the two PDFs, salary 85.000, SÜ2 consent.
-3. If the form asks for a Kubernetes depth self-rating, answer honestly — the letter already
-   sets the expectation.
+1. Über das Bechtle-Portal (Job 72406) bewerben, Anschreiben an Herrn Waldraff.
+2. Vor dem Gespräch klären, ob der Cluster-Betrieb oder die Plattform-Automatisierung den Schwerpunkt bildet.
+3. SÜ2 früh ansprechen; bei KubeOps im Public-Sector-Umfeld ist sie kein Nebensatz.

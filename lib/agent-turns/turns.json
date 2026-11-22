@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T09:41:52Z",
+  "generated": "2026-11-22T09:44:07Z",
   "count": 200,
-  "pin": "6644c4e93e13842e03a95cfea630ce1db00e1368ac0f9d5a6f526fd248265220",
+  "pin": "d145e983b38d143a45bf043d151999ceaf3c3896dc325c900b93692b92f6905e",
   "turns": [
+    {
+      "id": "03213abf-c596-4444-bc02-d7aebed8988f",
+      "ts": "2026-11-22T09:43:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:telekom-sre-prometheus",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7f0415764510edc66861892ea96193f74ff0c316",
+      "branch": "main",
+      "frame": "03ha6iv4hsnjhzmvxy23x0pby"
+    },
+    {
+      "id": "1d10ac99-def1-406f-b93d-4b30c742db83",
+      "ts": "2026-11-22T09:42:36Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: sva-devops-consultant-linux portal submission (f734)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "5a82a4daae503676e9b45227b22a29e07aa594f7",
+      "branch": "main",
+      "frame": "03ha6ioeztnht9jl3geea3yoa"
+    },
+    {
+      "id": "23ba12a4-b854-4aa3-bb7d-d724d84aeca0",
+      "ts": "2026-11-22T09:41:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:stackit-iac",
+      "action": "retargeted: packet now addresses GT4627 (Kubernetes & IaC), 2pp CV + 1pp letter, checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5a82a4daae503676e9b45227b22a29e07aa594f7",
+      "branch": "main",
+      "frame": "03ha6ijj2t036cegydparod6k"
+    },
+    {
+      "id": "bb59d7cf-7dc0-49fd-86d6-d3c2a1fc24af",
+      "ts": "2026-11-22T09:41:52Z",
+      "source": "freebuff",
+      "subject": "nixconfig:stackit-k8s",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b450894cb9f7f3f6db9175169273172f8cca5f17",
+      "branch": "main",
+      "frame": "03ha6ij9rvojz5s48m5ip43kw"
+    },
     {
       "id": "078f8ae6-cf0d-4da1-9208-926c0859936d",
       "ts": "2026-11-22T09:41:46Z",
@@ -2694,63 +2746,6 @@
       "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
       "branch": "main",
       "frame": "03ha59fmthoxbjw0t1y4r5ani"
-    },
-    {
-      "id": "fc2b76d4-6507-441f-ab30-435a5146280a",
-      "ts": "2026-11-22T05:50:33Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "swept BA jobsuche + Interamt; recorded 12 new leads in submissions/ (dfs-sre, telekom-sre-prometheus, bundesdruckerei-sre, energy-meteo-sysadmin, bamf-devops, drv-openshift, citeq-muenster, telekom-otel, fau, sinc, mittwald, uni-rostock); skipped 50Hz/BWI dupes + staffing agencies; record-only, zero submissions",
-      "outcome": "done",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
-      "branch": "main",
-      "frame": "03ha59ckigt6d1kaxamwk47mf"
-    },
-    {
-      "id": "485a82ee-5ef8-4699-a645-43ca3425b4c2",
-      "ts": "2026-11-22T05:43:22Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-gocardless-packet",
-      "action": "landed: GoCardless senior SRE (database) packet built from the lead's JD (unsent, no form opened). Projection 10/32 highlights, 4/10 projects, but bountystash (the Postgres archive) was dropped by the scorer - recorded as a corpus fix. Letter concedes the 5+yr HA/replication/upgrade bar outright and asks about Germany vs London/Riga/Lisbon. Sheet flags band midpoint EUR 95k = candidate floor, and no UK visa. Also fixed a gated 'leverage' in the Elastic sheet (checks:prose 201 -> 0).",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/gocardless-senior-sre-database",
-        "submissions/elastic-principal-cicd-platform/submission-sheet.md"
-      ],
-      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
-      "branch": "main",
-      "frame": "03ha57y3dpsnf6wraxb5kxjof"
-    },
-    {
-      "id": "dba0b2f7-f00c-497e-8506-19d532caf5a4",
-      "ts": "2026-11-22T05:42:37Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-gocardless-packet",
-      "action": "landed: drove freebuff pane to build the GoCardless Senior SRE (Database Focus) packet in submissions/gocardless-senior-sre-database (JD + lead present, no packet yet)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
-      "branch": "main",
-      "frame": "03ha57stc4sv7h19x1eo4idi3"
-    },
-    {
-      "id": "f1a236e4-0d6d-42bc-9f4e-57cb2b3aca86",
-      "ts": "2026-11-22T05:41:21Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-ba-interamt-sweep",
-      "action": "landed: drove devin pane to run a fresh Bundesagentur/Interamt sweep for new IT-ops/SRE/platform leads (record-only, no submissions)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
-      "branch": "main",
-      "frame": "03ha57juhuvwzhxxuty2rrnqy"
     }
   ]
 }

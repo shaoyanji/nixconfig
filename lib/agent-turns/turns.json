@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-22T07:34:57Z",
+  "generated": "2026-11-22T07:35:45Z",
   "count": 200,
-  "pin": "0da5fe4d861108a7d4d9a3656dceeea010c41b1f6d33d5c47b0508a3e7eacf7a",
+  "pin": "4990654adc620ab7e19360a2322571479deda3ed61f81c49a446d741e9b292a1",
   "turns": [
+    {
+      "id": "a3908480-bd09-4719-be5f-895bb3e78597",
+      "ts": "2026-11-22T07:35:21Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-stackit-iac",
+      "action": "landed: STACKIT GT4627 DevOps/Cloud Engineer (K8s & IaC) packet in submissions/stackit-iac. Only the prefix-less route renders (en/de 404); German JD. German CV 2pp, letter 1pp, ask 85k. Letter trades on Nix as IaC + gates, states no Terraform/Ansible/Helm/GitLab CI, no enterprise K8s, no C5/DORA. Portal: RocketApply. Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/stackit-iac"
+      ],
+      "base_commit": "e10cb11daafd55d25c34114670729863f42ca602",
+      "branch": "main",
+      "frame": "03ha5ttll0uxcnnloiac58swn"
+    },
     {
       "id": "a83da432-885c-4a91-b96e-672439e61313",
       "ts": "2026-11-22T07:34:18Z",
@@ -2811,19 +2826,6 @@
       "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
       "branch": "main",
       "frame": "03h9xmxsm9ul8j1am93f8m8fb"
-    },
-    {
-      "id": "d02d7050-03e0-4652-a3cc-f6e2c8126d7e",
-      "ts": "2026-11-21T06:24:37Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-apply-signature-performance",
-      "action": "done: application draft ready at docs/job-apps/sig-perf-application-draft.txt; To: careersupport@signatureperformance.com; Subject: Application: Senior Solar Asset Manager - RE-200128610 - Katie Laudon; application method: email (Wix careers page has no curl-accessible form); ready to send via himalaya/mail on delphi",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "34a34847a6207039ae316e6687c37fc6226dc1ac",
-      "branch": "main",
-      "frame": "03h9xmphh5y3pglbdpco5u7ly"
     }
   ]
 }

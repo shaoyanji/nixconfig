@@ -32,7 +32,7 @@ provenance header. Apply through the RocketApply button on the same page.
 | Requirement (JD) | Evidence | Verdict |
 | :--- | :--- | :--- |
 | Design and run highly available services on the STACKIT Kubernetes cluster | No enterprise cluster operations, no Helm releases, no cluster-level autoscaling | **gap** |
-| CI/CD landscape (GitLab) and IaC with Terraform, Ansible, Helm | Gates that run in CI and on the host, declarative hosts, rollback by pointer. **No GitLab CI, no Terraform, no Ansible, no Helm** | partial — right discipline, other tools |
+| CI/CD pipelines (GitLab) and IaC with Terraform, Ansible, Helm | Gates that run in CI and on the host, declarative hosts, rollback by pointer. **No GitLab CI, no Terraform, no Ansible, no Helm** | partial — right discipline, other tools |
 | Network integration between microservices, Java nodes and load balancers | Linux networking from the host side: nftables default-deny, WireGuard mesh, SSH CA, DNS and MTU diagnosis with tcpdump | partial |
 | Sovereign cloud SLAs via autoscaling and observability | Ledger every 15 minutes (job status, generation age, disk, PSI), alerting on any non-ok state, a green socket is not proof | strong on observability, **gap** on SLA autoscaling |
 | Cluster hardening: pod security, network policies, BSI C5, DORA | nftables, SOPS/age secrets, short-lived certificates. **No pod security, no C5 or DORA audit work** | **gap** |
@@ -85,7 +85,7 @@ Deutsch requirement and the ServiceNow enterprise context are the parts Matt act
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
 | `task checks:prose` | 189 prose files, exit 0 |
-| selection | 10/37 highlights, 0/0 projects |
+| selection | 10/37 highlights, 4/10 projects |
 | sha256 CV | `1b06ec5ff17fc7843b0dee252da81b5e64c0ecd85fd147138d734e9c7855fd6b` |
 | sha256 letter | `9259051dc6cd1ef3984aea0bacea7def0045158a7c3033a8eb17b964dd5cc44e` |
 

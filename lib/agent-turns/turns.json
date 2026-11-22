@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T09:22:54Z",
+  "generated": "2026-11-22T09:24:39Z",
   "count": 200,
-  "pin": "a0dd49c7565461764e4ef586a166075cc150624ffa99edbc2034df7c24245582",
+  "pin": "18e19b903d43259142c66534c99147f760836d150d209cb67ee5763c5b9eec70",
   "turns": [
+    {
+      "id": "91f87df7-ffc5-4abf-9969-983a1d6eb41f",
+      "ts": "2026-11-22T09:24:31Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: freebuff redacting third-party contacts from nix-consultancy-outreach.md",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "be2516b086b33f34d8510541b50f043d540af931",
+      "branch": "main",
+      "frame": "03ha6f5ar09wmkpzzlivvaj0q"
+    },
+    {
+      "id": "bc08801a-e853-421b-9fde-bda690cc4c9c",
+      "ts": "2026-11-22T09:23:22Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "sinc upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c459473dae9a41790d89606a19363fa7c1b98632",
+      "branch": "main",
+      "frame": "03ha6ex4di3hhrahccmmlrurv"
+    },
+    {
+      "id": "9954c4e9-0b09-4679-a270-6f13803071cf",
+      "ts": "2026-11-22T09:22:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "drv-openshift packet built | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "be2516b086b33f34d8510541b50f043d540af931",
+      "branch": "main",
+      "frame": "03ha6eu5jgzl3tnkmvbtanpv7"
+    },
     {
       "id": "dd2050c8-8afd-4941-a5c7-40a3a4299bd7",
       "ts": "2026-11-22T09:22:11Z",
@@ -2722,47 +2761,6 @@
       "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
       "branch": "main",
       "frame": "03ha4pra3bf6yodq3rsbg04if"
-    },
-    {
-      "id": "1ab431e1-389b-464d-a3b0-d55d7d55c38e",
-      "ts": "2026-11-22T04:02:51Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "EnBW Web Solution Platform Engineer submitted via SuccessFactors (Linux+k8s+automation, Karlsruhe, remote-capable, English req); ~191 applied; KIT board drained (apprenticeships only)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4ob6q2503wn1fv52hejcu"
-    },
-    {
-      "id": "ed92e22e-8f26-4b0d-91bc-84a41395b715",
-      "ts": "2026-11-22T04:01:24Z",
-      "source": "antigravity",
-      "subject": "frieren:system-audit-2026-11-22",
-      "action": "start: weekly comprehensive health and maintenance audit on frieren (Sunday 05:00)",
-      "outcome": "in_progress",
-      "claims": [
-        "SYSTEM.md"
-      ],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4o0zkuuinvfv69346s5f8"
-    },
-    {
-      "id": "2897141e-e216-43d0-b1aa-b729a849f24a",
-      "ts": "2026-11-22T03:55:48Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "Erzdiözese Freiburg IT-Projektleitung applied (~20km, mailto verified); BND Rheinhausen skipped (clearance/citizenship); Interamt Freiburg sweep done; ~191 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4mxj575tf2bu6b699ch90"
     }
   ]
 }

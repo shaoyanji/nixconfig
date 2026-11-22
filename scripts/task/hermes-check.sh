@@ -150,7 +150,49 @@ else
   fi
 fi
 
-# --- 3. derived credential file --------------------------------------------
+# --- 3. cron -----------------------------------------------------------------
+# A gateway that loses fire ownership books an unverified execution, and the next
+# startup refuses to re-run it: the job is paused until a person resumes it
+# (cron/scheduler_authority.py:145 raises, reconcile_pending pauses with
+# "no automatic re-execution"). Measured 2026-11-22: pane-idle-watch sat paused
+# 19:32 -> 19:43 after a restart, and no line anywhere failed — that job IS the
+# pane steward, so a silent pause means idle panes are never driven. This is the
+# gate for that, and for an incident left open.
+echo "== cron"
+cron_store="$home/.hermes/cron"
+if [ ! -r "$cron_store/jobs.json" ]; then
+  skip "no $cron_store/jobs.json — nothing scheduled on this host"
+elif ! command -v jq >/dev/null 2>&1; then
+  skip "jq not on PATH — cron state unasserted"
+else
+  total="$(jq -r '(.jobs // []) | length' "$cron_store/jobs.json" 2>/dev/null)"
+  paused="$(jq -r '(.jobs // [])[]
+    | select((.enabled // true) == false or (.state // "") == "paused")
+    | .id + "/" + (.name // "?")' "$cron_store/jobs.json" 2>/dev/null)"
+  case "$total" in
+    '' | *[!0-9]*) warn "could not parse $cron_store/jobs.json" ;;
+    *)
+      if [ -n "$paused" ]; then
+        bad "paused job(s): $(echo "$paused" | tr '\n' ' ')— resume: hermes cron resume <id>"
+      else
+        ok "no paused jobs ($total scheduled)"
+      fi
+      ;;
+  esac
+  if command -v sqlite3 >/dev/null 2>&1 && [ -r "$cron_store/executions.db" ]; then
+    open="$(sqlite3 -cmd '.timeout 3000' "$cron_store/executions.db" \
+      "select count(*) from cron_incidents where coalesce(state,'') <> 'resolved';" 2>/dev/null)"
+    case "$open" in
+      '' | *[!0-9]*) warn "could not read cron_incidents (db locked or schema moved)" ;;
+      0) ok "no open cron incidents" ;;
+      *) bad "$open open cron incident(s) — hermes cron incidents" ;;
+    esac
+  else
+    skip "sqlite3 or $cron_store/executions.db unavailable — incidents unasserted"
+  fi
+fi
+
+# --- 4. derived credential file --------------------------------------------
 # ~/.hermes/.env is generated from the rendered file plus ~/.hermes/.env.local
 # (hermes-env-sync). Values are never read, only drift: the question is whether
 # a rotated sops key reached the file hermes actually loads.
@@ -178,7 +220,7 @@ else
   fi
 fi
 
-# --- 4. config version & persona -------------------------------------------
+# --- 5. config version & persona -------------------------------------------
 echo "== config"
 persona="$repo/modules/user/ai/hermes-persona/config.yaml"
 if grep -qE '^_config_version:' "$persona"; then

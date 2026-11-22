@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-22T12:00:38Z",
+  "generated": "2026-11-22T12:02:35Z",
   "count": 200,
-  "pin": "ce44eaf9c80d2bb5e17c5e8c67e5bd38a726a09393a6c94b7cb3c6247b3449f3",
+  "pin": "3749f8c93382dba1804fc5eb4049edfa2092e15501268a783e0f72c8e702ea41",
   "turns": [
+    {
+      "id": "931cd3d4-9dc4-4671-8a4b-47b62cad9b09",
+      "ts": "2026-11-22T12:02:00Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:sinc-devops",
+      "action": "landed: sinc-devops already carried native Typst (no letter.json, 2pp CV + 1pp letter); CV rebalanced from 9.5pt (96%/16% fill) to 11.5pt/0.75em (93%/73%, break at Ausbildung), text unchanged, letter untouched | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/sinc-devops"
+      ],
+      "files": [],
+      "base_commit": "22a25f7dd82c656b1eb81d7a5508b013f111e776",
+      "branch": "main",
+      "frame": "03ha79wr5hecjgotlyoaxt69j"
+    },
+    {
+      "id": "3ea8b683-1c95-41ce-b972-d4561318e358",
+      "ts": "2026-11-22T12:02:00Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:bwi",
+      "action": "landed: bwi sheet records the Concludis 64059 submission (date, channel, confirmation, and that this version is what was sent); DB duplicate row bwi-senior-infrastructure-platform closed as merged into bwi with stage other | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/bwi"
+      ],
+      "files": [],
+      "base_commit": "22a25f7dd82c656b1eb81d7a5508b013f111e776",
+      "branch": "main",
+      "frame": "03ha79wq00iok0ui20uj41aam"
+    },
+    {
+      "id": "cefc60c6-9843-4683-8df8-0031eb391dcd",
+      "ts": "2026-11-22T12:01:34Z",
+      "source": "devin",
+      "subject": "job-hunt:sumup",
+      "action": "landed: SumUp Senior DevOps (8726158002) applied+confirmed via OTP lane; cross-origin iframe needs ref-only ops + fill-not-type on comboboxes",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6d31384454940f857618ddbaf90ee2f75a46f759",
+      "branch": "main",
+      "frame": "03ha79tqmum7v18y7c1odfnb0"
+    },
+    {
+      "id": "665273f7-8d70-4afe-aeae-83882ee2e488",
+      "ts": "2026-11-22T12:00:47Z",
+      "source": "freebuff",
+      "subject": "nixconfig:mongodb-storage",
+      "action": "landed: native English Typst dossier for the Storage Layer SRE role — CV 2pp/1139w, letter 1pp/474w, 0 warnings; moved reliability evidence into the CV, retired packet symlink + letter.json + resume.json, relocation/sponsorship stated | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6d31384454940f857618ddbaf90ee2f75a46f759",
+      "branch": "main",
+      "frame": "03ha79o8s0rhlqolxoydzl9yf"
+    },
     {
       "id": "5e55788e-8f1c-446d-8ba3-4c71a09b44c7",
       "ts": "2026-11-22T11:59:55Z",
@@ -2786,58 +2842,6 @@
       "base_commit": "d469ec20f2254207b3b48976608c3ab5950ff91c",
       "branch": "main",
       "frame": "03ha6negl06sdy485uh7s3akw"
-    },
-    {
-      "id": "308460cb-6dcf-4728-9b32-0b6bb6aa5fa9",
-      "ts": "2026-11-22T10:06:36Z",
-      "source": "freebuff",
-      "subject": "nixconfig:canonical-kernel",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); fit set to 1 (kernel patches absent)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a87c646cf239760c5f041be19bdbbd83d619dfb",
-      "branch": "main",
-      "frame": "03ha6nd7gf9g7dhou3w53xht5"
-    },
-    {
-      "id": "48d50307-331e-473c-89c1-40056c5be81c",
-      "ts": "2026-11-22T10:05:35Z",
-      "source": "devin",
-      "subject": "nixconfig:clickhouse-dbre",
-      "action": "claim: Ashby submission attempt (prior POST-hang noted on sibling record)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "d469ec20f2254207b3b48976608c3ab5950ff91c",
-      "branch": "main",
-      "frame": "03ha6n62f0o0ipzc1t5zzk6e1"
-    },
-    {
-      "id": "d1158730-697f-453d-ab30-3d5ac7ad7b20",
-      "ts": "2026-11-22T10:05:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:flox",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d469ec20f2254207b3b48976608c3ab5950ff91c",
-      "branch": "main",
-      "frame": "03ha6n618xww87dehl3cfwoaq"
-    },
-    {
-      "id": "b91267ab-55d3-4f3d-98ef-203997452a2d",
-      "ts": "2026-11-22T10:04:08Z",
-      "source": "freebuff",
-      "subject": "nixconfig:canonical-gitops",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a6e5a1454a8ca1b166fdf6971d7f557a7027f376",
-      "branch": "main",
-      "frame": "03ha6mvwbuuygl3u6bbgk9ugf"
     }
   ]
 }

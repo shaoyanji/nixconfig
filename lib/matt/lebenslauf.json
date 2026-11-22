@@ -22,6 +22,7 @@
         "Konzipierte eine Covered-Call-Hedging-Strategie für Kundenportfolios.",
         "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists.",
         "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit.",
+        "Betreibt Chat-, Sprach- und Bildmodelle hinter einem einzigen OpenAI-kompatiblen Endpunkt auf einem GPU-Host und deklariert die MCP-Server des Editors im selben Flake",
         "Prüfte Bug-Bounty-Programme.",
         "Baute und betrieb eine NixOS-Flotte, die als ein Flake deklariert ist: jeder Host eine Feature-Liste, jeder Dienst ein Modul, Secrets mit sops verschlüsselt hinter der eigenen SSH-Zertifizierungsstelle der Flotte",
         "Machte Rebuilds reproduzierbar über einen gemeinsamen Binary-Cache und Remote-Builder; jede Server-Generation lässt sich mit einem Befehl zurückrollen",

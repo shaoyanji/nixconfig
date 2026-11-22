@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T02:16:52Z",
+  "generated": "2026-11-22T02:29:53Z",
   "count": 200,
-  "pin": "25e4ab13e0d925ebade14d7a567f79c9cbe5ccae5aa68f3c435ef966dc767573",
+  "pin": "de414177a901eea1488f5fc7512a32fa2652cc9be0340e13b318705b705e1064",
   "turns": [
+    {
+      "id": "a0c19316-febc-40d4-b694-166f8c7fba32",
+      "ts": "2026-11-22T02:25:15Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-sharpen",
+      "action": "landed: drove idle freebuff pane to sharpen CV and push pending commit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5c5ac111d88c48da710229f8db852d3b60cef245",
+      "branch": "main",
+      "frame": "03ha458st2ojm8i1q4jxpgr4s"
+    },
+    {
+      "id": "7d674812-90da-4c95-9660-7a29293262cc",
+      "ts": "2026-11-22T02:17:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:adyen-packet",
+      "action": "landed: Adyen packet built (2p CV 10/32 highlights + 1p letter), location confirmed office-first AMS/MAD | gate: agents:apps:packet exit 0 incl. cv-ats-check in-build | commits: 5c5ac111d88c48da710229f8db852d3b60cef245",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5c5ac111d88c48da710229f8db852d3b60cef245",
+      "branch": "main",
+      "frame": "03ha43mwz2444feiy9fyfbpij"
+    },
     {
       "id": "2a250c8b-7856-44ec-a8d8-8c558660d31a",
       "ts": "2026-11-22T02:14:56Z",
@@ -2758,32 +2784,6 @@
       "base_commit": "98418659",
       "branch": "main",
       "frame": "03h9wbuzak4l2k1z7csr44ts6"
-    },
-    {
-      "id": "a791d3f8-3f03-4ed1-8f8b-e514dbc357bd",
-      "ts": "2026-11-21T02:24:48Z",
-      "source": "hermes-steward",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "Drove idle freebuff win1 pane via jevdecide: cv_quality_ats (p=0.69, margin 0.39, decisive >=0.3). Task: continue CV quality/autoATS work — review Typst templates (cv.typ, lebenslauf.typ) for ATS-scrambling layout, font, tracking, footer and link issues, then fix so the resume is ATS-safe. Pane accepted — fresh working... counter confirmed.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9wbuv2pxe25x03momyemqx"
-    },
-    {
-      "id": "6d5d991f-bdd1-443e-ad0a-f880d8443f9b",
-      "ts": "2026-11-21T02:21:22Z",
-      "source": "devin",
-      "subject": "nixconfig:offload-bridge",
-      "action": "landed: offload-bridge push+ingest onto shared mkTimerJob; timerDescription nullable in lib; 4 delphi units byte-identical | gate: checks:quick PASS census 6484",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ecf2d05622244e31a9b5810480b8ad36d71b7c8c",
-      "branch": "main",
-      "frame": "03h9wb6srudtayar7jcvuuek6"
     }
   ]
 }

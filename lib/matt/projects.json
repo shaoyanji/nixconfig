@@ -6,8 +6,8 @@
       "type": "open source",
       "start": "2023-01",
       "end": "",
-      "summary": "Moved a single-operator fleet of thirteen machines off per-host install notes onto one repository: rebuilding, auditing, rolling back or handing over a host is the commit plus one command, secrets are encrypted per host, certificates rotate on a schedule, and the same check runs in CI and before a deploy. A fleet-wide check takes 340 seconds and 6 GB on an 11 GB laptop, so it is refused below a memory floor and hosts are checked one at a time.",
-      "summaryDe": "Dreizehn persönliche NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy. Die Flotte betreibt außerdem selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
+      "summary": "Moved a single-operator fleet of thirteen machines off per-host install notes onto one repository: rebuilding, auditing, rolling back or handing over a host is the commit plus one command, secrets are encrypted per host, certificates rotate on a schedule, and the same check runs in CI and before a deploy. It also runs a sentinel that logs job status, disk and memory pressure every 15 minutes, and self-hosted chat, speech and image models behind one OpenAI-compatible endpoint.",
+      "summaryDe": "Dreizehn persönliche NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy. Ein Sentinel protokolliert Job-Status, Disk- und Speicherdruck alle 15 Minuten; dazu laufen selbst gehostete Chat-, Sprach- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt.",
       "keywords": [
         "Nix",
         "NixOS",

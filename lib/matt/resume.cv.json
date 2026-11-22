@@ -338,6 +338,11 @@
         "Architected a covered-call hedging strategy for client portfolios",
         "Developed a Fibonacci binary tree algorithm for computational scientists",
         "Developed an LLM-based knowledge base for consulting work",
+        "Self-hosts chat, speech and image models behind one OpenAI-compatible endpoint on a single GPU host, and declares the MCP servers the editor uses in the same flake",
+        "Built and runs a thirteen-host NixOS fleet as one flake: a feature list per host, a module per service, secrets encrypted with sops behind the fleet's own SSH certificate authority",
+        "Made rebuilds reproducible with a shared binary cache and a remote builder, and rolls any host back to its previous generation with one command",
+        "Gated infrastructure changes with inventory-driven CI and a per-host module check, so a broken host definition fails before a deploy",
+        "Wrote a sentinel that logs job status, generation age, disk and memory pressure every 15 minutes and pages when a service fails",
         "Audited bug bounty programmes"
       ],
       "keywords": [

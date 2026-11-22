@@ -7,8 +7,8 @@
     "subtitle": "Go · NixOS-Flotten · Betriebsdaten · Energieinfrastruktur",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
     "status": "Offen für Senior- und Lead-Rollen",
-    "target": "Ziel: Systemengineering, Infrastruktur oder technischer Betrieb; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
-    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Seit 2023, zwischen Anstellungen, habe ich ein dreimonatiges PPA-Beratungsmandat für die EWE Trading abgeschlossen und eine persönliche NixOS-Flotte mit dreizehn Hosts aus einem Flake gebaut, mit eigener SSH-Zertifizierungsstelle und verschlüsselten Secrets pro Host, dazu KEV-Triage-Werkzeuge. Ich suche eine Rolle im Systemengineering, in der Betriebsdaten vertrauenswürdig sein müssen.",
+    "target": "Ziel: Plattform, Infrastruktur oder technischer Betrieb; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
+    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Zwischen Anstellungen habe ich ein dreimonatiges PPA-Mandat für die EWE Trading abgeschlossen und eine NixOS-Flotte mit dreizehn Hosts aus einem Flake gebaut — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, ein Sentinel für Disk, Speicher und Generation-Alter — dazu lokale Sprach-, Sprech- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt. Ich suche Systemarbeit, in der Betriebsdaten vertrauenswürdig sein müssen.",
     "contacts": [
       {
         "label": "email",
@@ -27,7 +27,7 @@
         "href": "https://xing.com/profile/Shaoyan_Ji"
       }
     ],
-    "workAuth": "US-Staatsbürgerschaft mit deutscher Niederlassungserlaubnis; kein Sponsoring, kein Umzug nötig"
+    "workAuth": "US-Staatsbürgerschaft, deutsche Niederlassungserlaubnis; Arbeit in anderen EU-Staaten braucht Arbeitgeber-Unterstützung bei der Aufenthaltserlaubnis"
   },
   "analytics": {
     "endpoint": "",
@@ -238,7 +238,11 @@
         "CI-Gates",
         "Salesforce",
         "Microsoft 365",
-        "Netzwerk und WLAN"
+        "Netzwerk und WLAN",
+        "MCP-Server",
+        "lokale Modell-Endpunkte",
+        "Prometheus-Metriken",
+        "Alarmierung"
       ]
     },
     {

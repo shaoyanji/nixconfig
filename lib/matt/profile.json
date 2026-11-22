@@ -7,8 +7,8 @@
     "subtitle": "Go · NixOS fleets · operational data · energy infrastructure",
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
     "status": "Open to senior and lead roles",
-    "target": "Target: systems engineering, infrastructure or technical operations; remote from a CET base or on site in Freiburg.",
-    "bio": "Most of my working life has gone into making operational data usable: four years running asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture, and telemetry reconciliation when sensors went missing. Since 2023, between roles, I completed a three-month PPA consulting engagement for EWE Trading and built a thirteen-host personal NixOS fleet from one flake, with an SSH certificate authority and per-host encrypted secrets, plus KEV triage tooling. I am looking for systems engineering work where operational data has to be trusted.",
+    "target": "Target: platform, infrastructure or technical operations work; remote from a CET base or on site in Freiburg.",
+    "bio": "Most of my working life has gone into making operational data usable: four years of asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture and telemetry reconciliation when sensors went missing. Between roles I completed a three-month PPA engagement for EWE Trading and built a thirteen-host NixOS fleet from one flake — SSH certificate authority, per-host encrypted secrets, a sentinel watching disk, memory and generation age — alongside local language, speech and image models behind one OpenAI-compatible endpoint. I am looking for systems work where operational data has to be trusted.",
     "contacts": [
       {
         "label": "email",
@@ -27,7 +27,7 @@
         "href": "https://xing.com/profile/Shaoyan_Ji"
       }
     ],
-    "workAuth": "US citizen with German permanent residence; no sponsorship or relocation needed"
+    "workAuth": "US citizen with German permanent residence; work in other EU states needs employer-supported permits"
   },
   "analytics": {
     "endpoint": "",
@@ -238,7 +238,11 @@
         "CI gates",
         "Salesforce",
         "Microsoft 365",
-        "networking and Wi-Fi"
+        "networking and Wi-Fi",
+        "MCP servers",
+        "local model endpoints",
+        "Prometheus-series metrics",
+        "alerting"
       ]
     },
     {

@@ -1,102 +1,63 @@
 # STACKIT / Schwarz Digits — Senior Kubernetes Engineer (m/f/d), GT4121
 
-**Live.** The advert answers HTTP 200 on the English route and carries
-`data-job-id="GT4121"` in its apply button. The German duplicate (`/de/jobsuche/...`)
-answers 404, so `job-description.txt` is the English text with a provenance header.
+Bad Friedrichshall (Am Campus 1) · IT Cloud Services · Vollzeit · Anzeige vom 2026-07-15, am 2026-11-22 mit HTTP 200 und `data-job-id="GT4121"` geprüft.
+Die deutsche Fassung der Anzeige liefert 404; `job-description.txt` ist der englische Text mit Herkunftskopf. Kontakt: Tatjana Kirschner,
+`recruiting@mail.schwarz`. Kein Band veröffentlicht; Gehaltsvorstellung **85.000 EUR**.
 
-| | |
-| :--- | :--- |
-| Role ID | `stackit-schwarz-digits-senior-kubernetes-engineer` |
-| Requisition | GT4121 |
-| Employer | STACKIT, part of Schwarz Digits (Schwarz Gruppe: Lidl, Kaufland, PreZero) |
-| Location | Am Campus 1, 74177 Bad Friedrichshall |
-| Area / level | IT — Cloud Services, experienced professional, full-time |
-| Posted | 2026-07-15 |
-| Recruiter | Tatjana Kirschner, recruiting@mail.schwarz |
-| Language | excellent English required, German a plus |
+**Status:** vorbereitet, nicht beworben. Fit **2**: die Stelle verlangt Operatoren, Controller und CRDs in Go sowie Gardener oder ClusterAPI, und
+beides ist im Repository nicht vorhanden.
 
-## Candidate facts used
+## Altbestand: schon in der Historie, jetzt aufgeräumt
 
-| Fact | Value |
-| :--- | :--- |
-| Name | Matt Ji |
-| Address | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| E-mail / phone | matt@bountystash.com / +49 173 3281570 |
-| Languages | German C1, English native |
-| Right to work | US citizen with German permanent residence, no sponsorship needed |
-| Distance to site | ~190 km, so no daily presence |
-| Salary stated | **85.000 EUR** |
-| Start | immediate or by agreement |
+Dieses Paket war als einziges der Reihe bereits versioniert (Aufnahme in `9738979c`), ein Stage-Commit war deshalb nicht nötig. Im Neubau-Commit
+entfernt: der Symlink `packet` in den Nix-Store und die drei JSON-Dateien des Generators. Die PDFs wurden ersetzt.
 
-## Fit map
-
-| Requirement (JD) | Evidence | Verdict |
+| Artefakt | sha256 (erste 16) | Was es war |
 | :--- | :--- | :--- |
-| Architect and run scalable Kubernetes services for customers | No production Kubernetes cluster administration; the letter says so in the fourth paragraph | **gap** |
-| Operations and problem solving: complex issues, root-cause analysis, lasting fixes | Single-operator fleet: incidents end with a gate or a check, not a workaround; ledger and postmortem notes in the repo | strong |
-| Cluster security and compliance: RBAC, Network Policies, Kyverno, Falco, image scanning | nftables default-deny, SSH CA with short-lived certificates, SOPS/age per host. No policy engine, no Falco | partial |
-| Go operators, controllers, CRDs; GitOps delivery | Go services and CLI tooling; **no operator or CRD work**, no Argo/Flux | **gap** |
-| Deep K8s internals, cloud networking, storage, API design | Linux networking and storage buffering from the host side: systemd/cgroups, PSI, WireGuard mesh, DNS/MTU with tcpdump | partial |
-| Gardener or ClusterAPI multi-cluster management | Not used | **gap** |
-| Open-source contribution, owning features in a community | Bug bounty and internal tooling, no upstream maintainership | **gap** |
-| Immutable platform automation | NixOS declarations, thirteen hosts as feature lists, rollback as a pointer, declarative MicroVM guests | strong |
-| Excellent English, German a plus | English native, German C1 | strong |
+| `lebenslauf.pdf` | `4236a8e6b3f68d8b…` | Nix-CV, „System- und Sicherheitsingenieur", ohne Bezug zu Containern |
+| `anschreiben.pdf` | `7269a72b609ec209…` | Nix-Anschreiben, deutsch, ohne die Kubernetes-Lücke so klar zu benennen |
+| `selection.json` | `fb7928495370d663…` | Generator-Auswahl (Budget, JD, Projekte, Skills) |
+| `lebenslauf.json` | `9b39c35e2e6a591d…` | Generator-Zwischenstand des CV |
+| `letter.json` | `e5b6b6c34f16849f…` | Generator-Zwischenstand des Anschreibens |
+| `packet` (Symlink) | → `/nix/store/7mnfxl0hg9npdbw7dpn2iw7fdmlfc4vj-appflow-packet-stackit-schwarz-digits-senior-kubernetes-engineer` | Nix-Store-Paket, außerhalb des Repos nicht reproduzierbar |
+| `submission-sheet.md` | `6beec62a62b39a3f…` | das vorige Blatt, Vorgänger dieser Datei |
 
-## Portal schema — RocketApply (SAP BTP)
+## Dateien
 
-The apply button starts `hrplattformprod-rocketapply-prod-scos-rocketapply.cfapps.eu20.hana.ondemand.com/app/`
-with `data-job-id="GT4121"` and `data-mmm-rocket-apply-language="en_US"`; the tunnel through
-STACKIT or Schwarz Digits carries the same id. The form itself is a single-page app behind a
-session, so the mapping below is the standard RocketApply candidate shape, not observed HTML —
-the job id is the part that is verified.
+| Datei | Seiten | Wörter | Warnungen | sha256 (erste 16) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 921 | 0 | `545f67771d96dc32` |
+| `anschreiben.pdf` | 1 | 406 | 0 | `533a28f6e17a0710` |
 
-| # | Field (standard RocketApply) | Answer |
-| :-- | :--- | :--- |
-| 1 | Job id (hidden) | GT4121 |
-| 2 | First name | Matt |
-| 3 | Last name | Ji |
-| 4 | E-mail | matt@bountystash.com |
-| 5 | Phone | +49 173 3281570 |
-| 6 | CV upload | `lebenslauf.pdf` (2 pages, German) |
-| 7 | Cover letter / message | `anschreiben.pdf` (1 page, German) |
-| 8 | Salary expectation | 85.000 EUR brutto |
-| 9 | Earliest start | sofort oder nach Vereinbarung |
-| 10 | Location / remote | Gutach im Breisgau, ~190 km; remote share and on-call to be agreed |
-| 11 | Languages | Englisch Muttersprache, Deutsch C1 |
-| 12 | Work permit | unbefristetes Niederlassungsrecht, kein Sponsoring |
-| 13 | How did you hear | Schwarz Digits job search |
-| 14 | Data protection consent | ja |
+## Vier Säulen der Anzeige, gegen das Repository geprüft
 
-## Compensation note
+| Säule | Beleg im Repo | Im Dokument |
+| :--- | :--- | :--- |
+| Container und Virtualisierung | `hosts/microvms/*`: microvm.nix mit cloud-hypervisor, vsock, virtiofs, TCG-Rückfall; `microvm-host.nix` mit isolierter Bridge, NAT und udev-Taps; systemd-Slices als Ressourcengrenze | vollständig behauptet, ohne Kubernetes-Anspruch |
+| Deklarative Systeme | dreizehn NixOS-Hosts aus einem Flake mit gepinnten Inputs, Modullisten je Host, Auswertungslauf pro Host als Freigabe, Rollback per Generation | vollständig behauptet |
+| Telemetrie und Betrieb | Sentinel-Journal alle fünfzehn Minuten (Job-Status, Generationsalter, Disk/Inode, PSI) mit Alarm auf Zustand und Stille; PostgreSQL-Migrationen und Wiederherstellungsdrill (EXP-042) | vollständig behauptet |
+| Linux-Systemtechnik | systemd, nftables-Freigaben je Dienst und Netz, WireGuard-Mesh, DNS-Failover mit VRRP, tcpdump bis zur MTU-Grenze, ZFS und SMART/NVMe | vollständig behauptet |
 
-The record's earlier scan put the XING estimate for this title at 56.000 – 76.000 EUR, so 85.000
-sits above the estimate. STACKIT pays for senior platform work in a group of this size; the ask is
-defensible but expect the recruiter to test it.
+## Lücken, in beiden Dokumenten benannt
 
-## Tailoring notes
+Kein Kubernetes im Produktivbetrieb, weder Einzelcluster noch Multi-Cluster, kein Gardener und kein ClusterAPI. Keine Operatoren, Controller oder CRDs in
+Go — die Go-Arbeit sind Dienste und Kommandozeilenwerkzeuge (23 Go-Dateien im Repository). Kein Kyverno, kein Falco, kein GitOps mit Argo oder Flux,
+kein Betrieb von CNI oder etcd. Keine Zertifizierung (CKA, CKS) und keine Mitarbeit an einem Upstream-Projekt. Skalierung: Einzelbetreiber mit dreizehn
+Hosts und einem microVM-Labor, nicht eine Kundenplattform mit vielen Clustern.
 
-- The CV comes from a **packet-local corpus copy** (`lebenslauf.json` here): the canonical German
-  corpus is an energy and risk CV. Five Bountystash bullets were added for declared hosts, MicroVM
-  guest lifecycle, Go/Python tooling, ledger telemetry and the SSH CA mesh.
-- `Kubernetes` was removed from the DevOps skill line. The JD asks for someone who has run clusters
-  from scratch; a skill line claiming it would be contradicted by the letter in the same envelope.
-- The keyword selector reads the advert body only, not the provenance header.
+## Weg
 
-## Checks
+Bewerbung über den Apply-Button der Anzeige (RocketApply auf SAP BTP, `data-job-id="GT4121"`); das Formular liegt hinter einer Session und wurde nicht
+ausgefüllt. Sprache: Deutsch, weil der Arbeitgeber ein deutsches Unternehmen ist und die Anzeige Deutsch als Plus nennt; Englisch ist ohnehin
+Muttersprache. Umzug nach Bad Friedrichshall ist erklärt (rund 190 km von Gutach im Breisgau), Eintritt ab 01.12.2026, kein Sponsoring nötig.
 
-| Check | Result |
+## Prüfungen
+
+| Prüfung | Ergebnis |
 | :--- | :--- |
-| `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
-| `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 188 prose files, exit 0 |
-| selection | 7/37 highlights, 4/10 projects |
-| sha256 CV | `4236a8e6b3f68d8b8ed2ac7ccf0c3c2a87b7de615e901998061de36c505fa5f9` |
-| sha256 letter | `7269a72b609ec209228359617cf7cc2efd16553aa761065001ed413c1179836a` |
-
-## Next actions
-
-1. Submit through the RocketApply button with GT4121; attach both PDFs.
-2. Lead with operations and the Linux layer, not with Kubernetes — the gap is stated, so the
-   interview should be about incident discipline and platform automation.
-3. Ask about remote share early: 190 km makes daily presence impossible, and the posting is a
-   full-time on-site listing.
+| `typst compile` beider Quellen | je 0 Warnungen |
+| Seitenbudget | CV 2 Seiten, Anschreiben 1 Seite (vor dem Commit geprüft) |
+| `**` in den Quellen | 0 |
+| Typografische Anführungszeichen | 0 |
+| `task checks:prose` | Exit 0 |
+| Altbestand | Symlink und drei JSON-Dateien entfernt, PDFs ersetzt, Hashes oben |

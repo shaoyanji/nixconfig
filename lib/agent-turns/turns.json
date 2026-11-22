@@ -1,8 +1,90 @@
 {
-  "generated": "2026-11-22T12:44:39Z",
+  "generated": "2026-11-22T12:47:55Z",
   "count": 200,
-  "pin": "4e7ef43e7abdf9d436ec3629d798a24983787a078cf9b82068f042f42274911b",
+  "pin": "1300f0f6321c74be73831ed5b35b5de1df3b4cefe60c6c8dd2256fd83b36112f",
   "turns": [
+    {
+      "id": "41f29609-0c31-41d7-9de3-1eb40f1e1f23",
+      "ts": "2026-11-22T12:47:36Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "landed: packet already native (no artifacts to clear; rebuild byte-identical), sheet now carries measurements and the verified route — b-ite Zertifikate mandatory, no email route, deadline 27.11 | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/uni-rostock-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "8ddc0a19397ad229644ac0314334a4d77e2d271a",
+      "branch": "main",
+      "frame": "03ha7iteijgyoxpffvrmu0651"
+    },
+    {
+      "id": "3d1589af-0fc6-4892-9915-6d07f96aec02",
+      "ts": "2026-11-22T12:46:48Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "coordinator: Pane 1 active on STACKIT K8s, Pane 2 active on VertiGIS (Recruitee), Pane 3 active on Uni Rostock | zero idle time active",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c0c8a7362e8257eb7b160843fb97536572df34d2",
+      "branch": "main",
+      "frame": "03ha7inrialsyikrlvxc459wz"
+    },
+    {
+      "id": "d44820f3-8aef-4f1c-aafc-53c3a6fb4939",
+      "ts": "2026-11-22T12:46:45Z",
+      "source": "devin",
+      "subject": "job-hunt:vertigis-cloud-engineer",
+      "action": "VertiGIS Cloud Engineer (Recruitee): form fully filled + both PDFs attached; submit triggered interactive hCaptcha image challenge — not solved per captcha policy. Recorded manual with complete hand-submit state.",
+      "outcome": "blocked: hCaptcha image challenge at submit; hand-submit staged",
+      "claims": [],
+      "files": [],
+      "base_commit": "c0c8a7362e8257eb7b160843fb97536572df34d2",
+      "branch": "main",
+      "frame": "03ha7infu7ijd6516pr42ru5t"
+    },
+    {
+      "id": "f0d624d3-c8c8-4037-a12f-718822e455f7",
+      "ts": "2026-11-22T12:45:34Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:sinc-devops",
+      "action": "landed: public-sector paragraph added to the letter, sheet carries measurements and the FriendlyCaptcha blocker, DB moved off stage=other to prep/fit 3; no symlink or JSON existed | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/sinc-devops"
+      ],
+      "files": [],
+      "base_commit": "343a4ff4cf126a3375dc43644297e74febec2894",
+      "branch": "main",
+      "frame": "03ha7if2u2hijv3oyx5lvp0zp"
+    },
+    {
+      "id": "d1808876-ad5f-4fe6-b364-c09d7bff1800",
+      "ts": "2026-11-22T12:45:10Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "coordinator: all 3 STACKIT landed (GT4627, GT2321, GT1923); Devin active on VertiGIS (Recruitee), Freebuff frieren active on BWI, Freebuff Delphi active on SINC | zero idle time active",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c0c8a7362e8257eb7b160843fb97536572df34d2",
+      "branch": "main",
+      "frame": "03ha7iccanjhd2kg7xm5u0qrh"
+    },
+    {
+      "id": "e36f4fee-d01b-4b06-831a-3c73927b3900",
+      "ts": "2026-11-22T12:44:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:bwi-platform",
+      "action": "sprachkorrektur: BWI-Anschreiben c0c8a736 - Anrede nach dem Komma kleingeschrieben, zerbrochener Satz im Lückenteil neu formuliert. CV 2 S./953w, Anschreiben 1 S./424w, je 0 Warnungen, Seitenbudget erneut geprüft, prose Exit 0 bei 294 Dateien. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c0c8a7362e8257eb7b160843fb97536572df34d2",
+      "branch": "main",
+      "frame": "03ha7i92g45aoyxiww7s0qr8f"
+    },
     {
       "id": "e9e6ae0b-6a39-4ac7-89d0-b5de2b9b5186",
       "ts": "2026-11-22T12:44:19Z",
@@ -2742,90 +2824,6 @@
       "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
       "branch": "main",
       "frame": "03ha6tun64ypijdq5n05t2y92"
-    },
-    {
-      "id": "7dd91ef9-e44d-4e3d-9cd7-29ee1482d4c7",
-      "ts": "2026-11-22T10:39:04Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:elastic-principal-cicd-platform",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); CI-scale gap named; fit 4",
-      "outcome": "done",
-      "claims": [
-        "submissions/elastic-principal-cicd-platform"
-      ],
-      "files": [],
-      "base_commit": "d7212578a4aabaf4b65e365d8b3a629a2b59d54c",
-      "branch": "main",
-      "frame": "03ha6tpkgl6r3gy2vfcfalxlj"
-    },
-    {
-      "id": "ed0a864b-11e7-4289-ab5e-0886728bb2f3",
-      "ts": "2026-11-22T10:39:01Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:elastic-principal-cicd-platform",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/elastic-principal-cicd-platform"
-      ],
-      "files": [],
-      "base_commit": "e9d61510247451f58e90894a91e2a38ebf2bd269",
-      "branch": "main",
-      "frame": "03ha6tp70363pb81skbtwci91"
-    },
-    {
-      "id": "0e5ff8df-881e-4506-852b-50c5c35586bd",
-      "ts": "2026-11-22T10:38:57Z",
-      "source": "freebuff",
-      "subject": "nixconfig:flower",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
-      "branch": "main",
-      "frame": "03ha6tonycdpdl3geq4jrsn8v"
-    },
-    {
-      "id": "277277fc-6804-4afd-9786-6980b2e3601a",
-      "ts": "2026-11-22T10:38:42Z",
-      "source": "devin",
-      "subject": "nixconfig:devin",
-      "action": "landed: refactored flake wiring to use flake/policies.nix policy predicates",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
-      "branch": "main",
-      "frame": "03ha6tmyqlbkz0oisa7dmyfdd"
-    },
-    {
-      "id": "da295914-1b94-4884-9e02-5dff8ac3af4c",
-      "ts": "2026-11-22T10:38:27Z",
-      "source": "devin",
-      "subject": "nixconfig:actian-director-platform",
-      "action": "blocked: Lever submission stopped at interactive hCaptcha image grid — form fully staged for hand-submit",
-      "outcome": "blocked: hcaptcha-image",
-      "claims": [],
-      "files": [],
-      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
-      "branch": "main",
-      "frame": "03ha6tl6wuk9tm2psvnfoylyg"
-    },
-    {
-      "id": "aa58f143-6d16-41cc-b8a4-47f19366dbd4",
-      "ts": "2026-11-22T10:37:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:flower",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/flower"
-      ],
-      "files": [],
-      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
-      "branch": "main",
-      "frame": "03ha6tghupi95wltnngo35tgq"
     }
   ]
 }

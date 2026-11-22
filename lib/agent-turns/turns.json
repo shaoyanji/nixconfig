@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-22T08:43:19Z",
+  "generated": "2026-11-22T08:47:47Z",
   "count": 200,
-  "pin": "2ae1160e9593add24002ced40ba669b3a0770ad114b33ae8865ef2889efd2699",
+  "pin": "6d6f09cb6345586a5d8254b0e058b58c439cc417b91a00645db9be225bd42e53",
   "turns": [
+    {
+      "id": "f43e9802-778d-4a60-871d-4827f33a4f50",
+      "ts": "2026-11-22T08:47:45Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: kayak-staff-data-platform packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3e20b40bbe332b50963e424d17f9dbcb93a36b7b",
+      "branch": "main",
+      "frame": "03ha67ynuo5p2z6b5egte4olg"
+    },
+    {
+      "id": "48bf1106-52ed-48c0-9091-e53c0bc95647",
+      "ts": "2026-11-22T08:47:11Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: adyen-platform-genai applied via Greenhouse embed | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
+      "branch": "main",
+      "frame": "03ha67up6d4tegoj6dea5zzbe"
+    },
+    {
+      "id": "3fe93290-0dad-4cb7-bb47-b6c178b53b9c",
+      "ts": "2026-11-22T08:45:05Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: adyen-platform-genai Greenhouse embed submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
+      "branch": "main",
+      "frame": "03ha67g0l2ryj4vbsspdjgmzz"
+    },
+    {
+      "id": "e6b9646e-b1c6-4cd6-994e-9a4b91173bd9",
+      "ts": "2026-11-22T08:44:19Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: dkrz-it-security-sysadmin packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fe10ff3718bb7c03dd3ffbd3e81a64c9c5d11c38",
+      "branch": "main",
+      "frame": "03ha67aj5hk5wymj37uoivvgv"
+    },
+    {
+      "id": "9aae6cd6-3b16-492e-bfd6-c882e5362e4d",
+      "ts": "2026-11-22T08:43:23Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: miaplaza-em-devops packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
+      "branch": "main",
+      "frame": "03ha6742eil08jccq9iw0jeze"
+    },
     {
       "id": "f921e904-00cc-43ea-9772-6f4990972e0b",
       "ts": "2026-11-22T08:42:49Z",
@@ -2702,76 +2767,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha3k4sj4r51w0m78re9f6rt"
-    },
-    {
-      "id": "630b37ee-c1f1-4c92-8aa6-4f6434853659",
-      "ts": "2026-11-22T00:22:16Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "steward run 01:11: freebuff 1.1 idle but TUI still rejects tmux text input (known, prev 00:07); devin 2.1 blocked on Grafana attestation question; agy 4.1 busy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha3h7yu2zqdywji30o21xmi"
-    },
-    {
-      "id": "cdadf097-8c4d-4e99-a40e-b6ca2b632773",
-      "ts": "2026-11-22T00:07:01Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "pane 1.1 (freebuff) idle but freebuff TUI rejected tmux text input (send-keys/paste-buffer/bracketed-paste/Enter all no-op; only nav keys work); could not drive it. devin 2.1 at decision dialog, agy 4.1 busy in vim+quota. No pane driven this run.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha3e8r3ydf1namqur36lrma"
-    },
-    {
-      "id": "02138c75-65d4-4fce-8b2e-b3966f9600c0",
-      "ts": "2026-11-21T19:36:53Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search",
-      "action": "submitted: canonical-rust-engineering-lead Greenhouse 5833620 (msg 310969); prepared mozilla tools-systems Greenhouse 8315181; steered pane 3 to tier-1 devinfra boards | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1xgxs6sxz583hcr2p0ryv"
-    },
-    {
-      "id": "7ffcf017-ff78-45e7-b809-35a442f6867f",
-      "ts": "2026-11-21T19:26:38Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search",
-      "action": "landed: Canonical GitOps submitted (message 310964), staged Attio & Grafana, scouted 6 leads | total applied: 87",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1vgy99abjgwha5rs2odgw"
-    },
-    {
-      "id": "d2a2e851-ed58-41c6-b692-daf8941cabab",
-      "ts": "2026-11-21T19:08:52Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search",
-      "action": "Submissions confirmed: Biz Factory (310957), Ledgy (310959), SumUp (310961). Applied count: 85. Alexander Thamm in progress on Join.com; Maze packet staged on Delphi.",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/alexander-thamm",
-        "submissions/maze",
-        "submissions/sumup",
-        "submissions/ledgy"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1rzzmns5j7vbfhtdaybaj"
     }
   ]
 }

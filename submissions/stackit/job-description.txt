@@ -1,0 +1,25 @@
+(Senior) Platform Engineer - STACKIT Control Plane Platform (m/f/d)
+Job ID: GT1923
+Company: STACKIT / Schwarz Digits (Schwarz Group)
+Location: Bad Friedrichshall, Germany - hybrid
+Source: https://schwarz-digits.de/en/jobsearch/hr/senior-platform-engineer-stackit-control-plane-platform-m-f-d-GT1923
+Posted: 2026-07-02
+Fetched: 2026-11-22 (from the page's schema.org JobPosting structured data)
+
+Introduction text
+Schwarz Digits creates the technological foundation for digital sovereignty in Europe. As the IT and digital division of the Schwarz Group, we develop and manage the IT infrastructures for the retail divisions Lidl and Kaufland, as well as Schwarz Production and PreZero. At the same time, we operate as an independent provider in the external market to support companies across Europe in their digital transformation. We bundle our core services in the areas of Cloud, Cyber Security, Data & AI, Communication, and Workspace.Join us and contribute to digital sovereignty in Europe. With us, you will work at the intersection of agility and security: You will benefit from fast decision-making processes, enjoy genuine creative freedom in your projects, and be able to build upon the stable foundation of the Schwarz Group.
+Your tasks
+- You develop internal tools to automate the provisioning of our infrastructure, thereby contributing to the optimization of our processes.
+- As part of our team, you are responsible for the implementation and maintenance of monitoring systems that ensure the maximum availability and optimal performance of our products.
+- You work closely with development teams to understand their requirements and support them in the optimal deployment of their services on the platform.
+- You always stay up to date regarding Kubernetes technologies and trends.
+- You actively contribute to our security best practices and compliance efforts.
+
+Your profile
+- You have at least 3 years of professional experience in a DevOps, SRE, or Platform Engineering role.
+- You bring passion and conviction for new technologies and topics surrounding Kubernetes, Linux, and virtualization.
+- You possess in-depth knowledge of Kubernetes architecture.
+- You possess advanced programming experience, preferably in Go.
+- You have already gained basic experience with the Kubernetes Operator Pattern, software-defined networking (e.g., Istio, Calico), and CI/CD tooling (e.g., Git, Concourse, Flux).
+- You are well-versed in templating (e.g., Helm, Kustomize) and Infrastructure-as-Code (e.g., Terraform, Pulumi) technologies.
+- You possess excellent problem-solving and troubleshooting skills.

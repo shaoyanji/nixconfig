@@ -1155,16 +1155,21 @@
     ci-closure-budget = {
       title = "CI closure budget gate";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P3";
-      date = "2026-10-19";
+      date = "2026-11-22";
       links = ["closure-budget-coverage"];
-      summary = "The budget check needs a built toplevel to compare against; CI does not build one yet.";
+      summary = "build-machines already builds the toplevel; the added step measures `result` with the same narSize sum and fails on OVER vs closure-budgets.toml.";
       refs = {
-        modules = [".github/workflows/nixcachix.yml" "closure-budgets.toml"];
+        modules = [".github/workflows/nixcachix.yml" "closure-budgets.toml" "scripts/task/closure-analysis.sh"];
       };
       body = ''
-        Exit: the job fails when a host closure exceeds its measured baseline.
+        Exit, landed 2026-11-22: the `Closure budget vs closure-budgets.toml`
+        step in build-machines runs `closure-analysis.sh --host <h> budget
+        $result`, which measures the just-built toplevel via `nix path-info
+        --recursive` and exits 1 on OVER. A host with no adopted baseline
+        reports NOT BUDGETED and does not fail — adopting is the operator's
+        deliberate act, not CI's.
       '';
     };
     transitive-flake-drift = {

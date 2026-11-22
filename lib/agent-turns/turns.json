@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-22T08:24:03Z",
+  "generated": "2026-11-22T08:26:12Z",
   "count": 200,
-  "pin": "0855c4a72daf8f357bfa7d19ba76084decd51a071e2ce6bc71bc1ed84eac5a62",
+  "pin": "335b35d187a8b755624cee5e38f4054738a8df089c2cc7ec8f1eaf43336402a4",
   "turns": [
+    {
+      "id": "55ff8e4d-81e6-4adc-8f0b-50ce9f802946",
+      "ts": "2026-11-22T08:25:44Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: nebius senior SRE devtools (GH embed 4889227101); third nebius req",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/nebius-devtools"
+      ],
+      "files": [],
+      "base_commit": "a7b720e2b3f3c908d4b891e4fe42b1c7d1bf78cf",
+      "branch": "main",
+      "frame": "03ha63nxehhhvl0tcyublrq4g"
+    },
+    {
+      "id": "ca9c8c1d-dce2-4d97-9ce0-14753b8f3a6f",
+      "ts": "2026-11-22T08:25:22Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: fraunhofer-erfurt-linux-network packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/fraunhofer-erfurt-linux-network"
+      ],
+      "files": [],
+      "base_commit": "7001403dcca895186cf7e5a52422f3b0f056c5e0",
+      "branch": "main",
+      "frame": "03ha63lbtvqmemtq59976ale9"
+    },
+    {
+      "id": "0d9869af-cbf5-4542-9525-6b7fb3fb62b6",
+      "ts": "2026-11-22T08:25:05Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: nebius-senior-system-engineer-cloudgate submitted via Greenhouse embed 4377696101 | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7b720e2b3f3c908d4b891e4fe42b1c7d1bf78cf",
+      "branch": "main",
+      "frame": "03ha63j9gjbx9i4lh5zf5wu15"
+    },
+    {
+      "id": "e6c47ea7-64a3-4cae-ab87-434144b6519a",
+      "ts": "2026-11-22T08:24:06Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: telekom-sre-prometheus packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7b720e2b3f3c908d4b891e4fe42b1c7d1bf78cf",
+      "branch": "main",
+      "frame": "03ha63cenm11f0gc6tvwtxgfg"
+    },
     {
       "id": "2a7627b1-ff95-4630-ac2f-ab178aa544c7",
       "ts": "2026-11-22T08:23:11Z",
@@ -2735,64 +2791,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha0wi6z8exnbfbyt9ebylmw"
-    },
-    {
-      "id": "e3ab07ec-b438-4617-827d-7f87e2108c7e",
-      "ts": "2026-11-21T16:20:46Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed round-2: Applied adfinis (JOIN, email-confirmed), rivia (Ashby, email-confirmed), aykua (email), rwth-aachen (email, beat 22.11 deadline), gravis (email fallback). Blocked: enact (Ashby reCAPTCHA treadmill). Closed: nvidia (US auth), tytan (embedded BSP mismatch), bwi (deprioritized). Queue empty; 0 open leads.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0v5uxgr9hk5f8emsnhqs3"
-    },
-    {
-      "id": "03491292-9e2f-4f81-b638-8af98fa9a40a",
-      "ts": "2026-11-21T16:16:59Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "scout-intake: 4 new leads added by pane 1 (Flox Sec, Obsidian Systems, Kraken DevOps, Flox MTS); pane 3 intaking enterprise AI leads; devin finalizing Gravis Robotics",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0uf8abx4q70c75fjaycfz"
-    },
-    {
-      "id": "27daa0bb-775d-47be-9eb1-69688a20225e",
-      "ts": "2026-11-21T16:15:01Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "orchestrating: pane 1 adding obsidian + flox security leads; devin on gravis robotics hcaptcha; pane 3 scouting smartsheet + enterprise ai",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0u1fke4cg30axyji3e447"
-    },
-    {
-      "id": "69d6f4ff-5fcb-464e-92c3-05af969343f3",
-      "ts": "2026-11-21T16:13:22Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "orchestrating: applied 62; pane 1 scouting nix shops (Serokell, SFS, Obsidian, Specter); devin on gravis robotics lever submit; pane 3 finishing rwth archive",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0tpsnlg5dabwbundtifk1"
     }
   ]
 }

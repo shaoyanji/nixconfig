@@ -1,8 +1,122 @@
 {
-  "generated": "2026-11-22T10:41:37Z",
+  "generated": "2026-11-22T10:44:53Z",
   "count": 200,
-  "pin": "733c8121aa8953008de30e099e947899c56a68d49399ae7f69ae27517e5c4656",
+  "pin": "ea5067ca0b4f065629935f477910c184112f4b95fcd06e979daf03a9eff6af38",
   "turns": [
+    {
+      "id": "e8429486-e82a-4707-b842-79d3aaf7aa17",
+      "ts": "2026-11-22T10:44:43Z",
+      "source": "freebuff",
+      "subject": "nixconfig:langdock",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "27e7d13d6e1e64d0c222d194e7aa484272e08cd8",
+      "branch": "main",
+      "frame": "03ha6ut9qbcndznstedothuve"
+    },
+    {
+      "id": "100e202a-efe7-4f24-a300-ed484ff84631",
+      "ts": "2026-11-22T10:44:01Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "corrected: letter now offers presence blocks instead of relocation, matching the sheet; 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [
+        "submissions/uni-rostock-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "d23e1a409fc993b24e59bb988fdcbd843c8b0ea7",
+      "branch": "main",
+      "frame": "03ha6uoda831j3s1mud1a84id"
+    },
+    {
+      "id": "55a89993-2bb7-4fd1-a853-9bed8a55a0c7",
+      "ts": "2026-11-22T10:43:32Z",
+      "source": "devin",
+      "subject": "nixconfig:hep-global",
+      "action": "blocked: Personio submission stopped at Cloudflare Turnstile — form fully staged for hand-submit",
+      "outcome": "blocked: turnstile",
+      "claims": [],
+      "files": [],
+      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
+      "branch": "main",
+      "frame": "03ha6ukyrfyydvuqpsm80op7q"
+    },
+    {
+      "id": "819a4edf-52d1-4554-9543-6b359121cafb",
+      "ts": "2026-11-22T10:43:26Z",
+      "source": "freebuff",
+      "subject": "nixconfig:langdock",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/langdock"
+      ],
+      "files": [],
+      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
+      "branch": "main",
+      "frame": "03ha6uk9jaxarl6z35hm613hy"
+    },
+    {
+      "id": "2fd03242-aad1-42c6-a452-0150223242e5",
+      "ts": "2026-11-22T10:42:51Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "compiled: native German Typst packet 2pp CV + 1pp letter; Debian/AD gaps named; fit 3; DB kept at manual pending Zertifikate",
+      "outcome": "done",
+      "claims": [
+        "submissions/uni-rostock-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "3e9fee16a794a14452247400eecd317aea710139",
+      "branch": "main",
+      "frame": "03ha6ug2eysf2577csauizjkz"
+    },
+    {
+      "id": "12f8803b-62eb-42a8-8e5a-0bb0f16f95d3",
+      "ts": "2026-11-22T10:42:48Z",
+      "source": "devin",
+      "subject": "nixconfig:hep-global",
+      "action": "claim: Personio submission",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/hep-global"
+      ],
+      "files": [],
+      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
+      "branch": "main",
+      "frame": "03ha6ufswnibzhaeddk12ok81"
+    },
+    {
+      "id": "5ac47f26-6c2a-41f2-b109-1d6345ecc179",
+      "ts": "2026-11-22T10:42:20Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/uni-rostock-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "a50b6cba05ad84a4806b807913747db5afa82dc5",
+      "branch": "main",
+      "frame": "03ha6ucfgvl4fso4gz1olbrse"
+    },
+    {
+      "id": "405b9107-aa90-49c1-abcd-2628bbb5b930",
+      "ts": "2026-11-22T10:41:40Z",
+      "source": "freebuff",
+      "subject": "nixconfig:publitas",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
+      "branch": "main",
+      "frame": "03ha6u7v07q75zr9vk5fomuku"
+    },
     {
       "id": "dc9d7dd0-ee79-437c-9266-763a4caa8296",
       "ts": "2026-11-22T10:40:30Z",
@@ -2558,118 +2672,6 @@
       "base_commit": "f6e72441c0ec5ed2ad7d979be56ed86a35dc8a2d",
       "branch": "main",
       "frame": "03ha64cfwt4pd8mo2as9er24r"
-    },
-    {
-      "id": "878ca5c8-8f07-4d9f-8cb1-b818998be5ef",
-      "ts": "2026-11-22T08:28:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: bundesdruckerei-sre packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f6e72441c0ec5ed2ad7d979be56ed86a35dc8a2d",
-      "branch": "main",
-      "frame": "03ha6487vrra2wetwkx5vfsty"
-    },
-    {
-      "id": "3fa5dc9e-28a7-43b4-9614-45e21219ebaf",
-      "ts": "2026-11-22T08:27:50Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: nebius SRE compute node team (GH embed 4766627101); remote europe",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/nebius-compute-node"
-      ],
-      "files": [],
-      "base_commit": "1f51a674a4da24927fd67e0760e23ca50890525f",
-      "branch": "main",
-      "frame": "03ha642otbwrdeygeqz61uhoj"
-    },
-    {
-      "id": "ea176d4c-2b0f-4ee4-b591-6b02f2d21201",
-      "ts": "2026-11-22T08:27:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: fau-sysadmin packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "e97c9eb8ae53fad03f5711ad58ac759eba446803",
-      "branch": "main",
-      "frame": "03ha640ukyamvda5l6rpgyxnp"
-    },
-    {
-      "id": "fdcee6fc-0868-41d5-b115-84d10bbe1986",
-      "ts": "2026-11-22T08:27:12Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: nebius-senior-site-reliability-engineer-devtools submitted via Greenhouse embed 4889227101 | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1f51a674a4da24927fd67e0760e23ca50890525f",
-      "branch": "main",
-      "frame": "03ha63y881uv5m495qgyre7m4"
-    },
-    {
-      "id": "446925a5-0e02-4898-833e-7843548c7a2a",
-      "ts": "2026-11-22T08:26:16Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: bamf-devops packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "125b1e79d6751a434b26af61e0586f483bd75609",
-      "branch": "main",
-      "frame": "03ha63rmgmqbfponbr1kl7i81"
-    },
-    {
-      "id": "55ff8e4d-81e6-4adc-8f0b-50ce9f802946",
-      "ts": "2026-11-22T08:25:44Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: nebius senior SRE devtools (GH embed 4889227101); third nebius req",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/nebius-devtools"
-      ],
-      "files": [],
-      "base_commit": "a7b720e2b3f3c908d4b891e4fe42b1c7d1bf78cf",
-      "branch": "main",
-      "frame": "03ha63nxehhhvl0tcyublrq4g"
-    },
-    {
-      "id": "ca9c8c1d-dce2-4d97-9ce0-14753b8f3a6f",
-      "ts": "2026-11-22T08:25:22Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: fraunhofer-erfurt-linux-network packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/fraunhofer-erfurt-linux-network"
-      ],
-      "files": [],
-      "base_commit": "7001403dcca895186cf7e5a52422f3b0f056c5e0",
-      "branch": "main",
-      "frame": "03ha63lbtvqmemtq59976ale9"
-    },
-    {
-      "id": "0d9869af-cbf5-4542-9525-6b7fb3fb62b6",
-      "ts": "2026-11-22T08:25:05Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: nebius-senior-system-engineer-cloudgate submitted via Greenhouse embed 4377696101 | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a7b720e2b3f3c908d4b891e4fe42b1c7d1bf78cf",
-      "branch": "main",
-      "frame": "03ha63j9gjbx9i4lh5zf5wu15"
     }
   ]
 }

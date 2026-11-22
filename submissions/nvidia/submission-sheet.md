@@ -27,7 +27,7 @@ requisition and the dossier can be tuned in one pass.
 
 | File | Pages | Words | Warnings | sha256 (first 16) |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 1384 | 0 | `7d290c1945d3a641` |
+| `lebenslauf.pdf` | 2 | 1220 | 0 | `9a8d4e417a6e48a8` |
 | `anschreiben.pdf` | 1 | 497 | 0 | `409b51f30a54e5ed` |
 
 Plus both `.typ` sources, `job-description.txt` and this sheet.

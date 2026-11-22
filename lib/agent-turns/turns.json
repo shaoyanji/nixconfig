@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:19:01Z",
+  "generated": "2026-11-22T12:19:34Z",
   "count": 200,
-  "pin": "a0bed5b7187148bbb75142e9f7e81b379b78e278bc543bbd295af66d4fd0d093",
+  "pin": "cfa2781d75f6321007bc2f6f7d3e1a9acf0b3f4007949b04f4a05137f20356fc",
   "turns": [
+    {
+      "id": "7b2c3085-aeca-4543-8c1b-7b55195a8558",
+      "ts": "2026-11-22T12:19:06Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nvidia",
+      "action": "landed: native Typst dossier for NVIDIA Systems/Infrastructure Engineer (commit e-). Folder held a different req (Kitmaker JR2029346, Nix packaging) — replaced it, recorded the five superseded hashes, annotated that row. Built on real GPU evidence: three driver profiles (proprietary/open/legacy_580 on 6.12 LTS), nvidia_drm params, four modules by name; measured governor and zram tuning. Gaps stated: no kernel patches, eBPF/ftrace, hugepages/isolcpus, CUDA packaging. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b241262c40104b5843195fa61462b1024004c1fd",
+      "branch": "main",
+      "frame": "03ha7d905kg0ewdorvboqpoea"
+    },
     {
       "id": "7f3ba1d0-8b08-4ca2-862a-9f0ec9ddcb68",
       "ts": "2026-11-22T12:17:39Z",
@@ -2837,21 +2850,6 @@
       "base_commit": "a3ee2a4708f220701de485e08421d40728750330",
       "branch": "main",
       "frame": "03ha6r59nywj17krbjuv03kgc"
-    },
-    {
-      "id": "00ebc930-e313-4565-af4b-cbf1e71c53d8",
-      "ts": "2026-11-22T10:24:50Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:enbw",
-      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/enbw"
-      ],
-      "files": [],
-      "base_commit": "6dc98f45d3bdc75d653b6d553cb7ed1f1f48fec5",
-      "branch": "main",
-      "frame": "03ha6qxh0xhmpqye2ophwcnj2"
     }
   ]
 }

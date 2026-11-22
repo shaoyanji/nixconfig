@@ -55,10 +55,6 @@ floor under `powersave` and needed `schedutil` instead. A zram profile carries 1
 `vm.swappiness`, `vfs_cache_pressure` and `dirty_background_ratio` are set per class of machine rather than copied. One "optimisation" I
 reverted after measuring: masking a boot unit looked like a 1.895 s win and had only moved the wait somewhere else.
 
-Inference on a GPU host is tuned the same way: layers offloaded to the card, flash attention on, metrics exposed, and an idle-stop that frees the
-GPU after fifteen minutes without a request — plus contention handling when a human wants the same card. Pressure stall information is what I
-watch while doing it, because it says which resource is queueing rather than which one is busy.
-
 What I have not done: I have not written kernel code or submitted patches upstream, and I have not owned a GPU cluster. No hugepages, no
 `isolcpus`, no real-time kernel, no `io_uring`. I have not used eBPF, bpftrace or ftrace for tracing — my diagnosis is `strace`, `tcpdump`,
 `journald` and PSI. And I have not packaged CUDA, cuDNN or TensorRT.
@@ -70,7 +66,6 @@ What I have not done: I have not written kernel code or submitted patches upstre
   [*Display and KMS* — modeset and fbdev parameters, PRIME bus IDs, DRM lease groups],
   [*Memory tuning* — zram with compression ratio measured, swappiness, cache pressure, dirty ratios],
   [*CPU and power* — governor choice by measurement, EPP, idle power and thermals],
-  [*Observability* — PSI by resource, job state and generation age, page on bad state and silence],
   [*Declarative deployment* — hosts from evaluation, canary guest, rollback by pointer],
   [*Diagnosis* — strace, tcpdump, journald, MTU faults by path, benchmarks that can refute])
 
@@ -85,8 +80,6 @@ What I have not done: I have not written kernel code or submitted patches upstre
 - Reverted an optimisation that measured well and explained nothing: a masked boot unit that looked like a 1.895 s win had only moved the wait to a different unit.
 - Tuned GPU inference rather than guessing at it: layers offloaded to the card, flash attention, `--metrics` exposed, and an idle-stop freeing the GPU after 900 s without a request, with a guard that yields the card when a human sits down.
 - Declared a thirteen-host fleet in one flake — pinned inputs, feature-list hosts, options with types and assertions — so a machine is produced by evaluation, gated by the same module check in CI and on the host, and rolled back by pointer.
-- Deployed through a canary: a KVM guest built from the host's own modules proves a configuration before the fleet receives it.
-- Ran the evidence loop on the same machines: job state, generation age, disk and PSI pressure to a ledger every fifteen minutes, paging on any state short of ok and on silence.
 ]
 
 #block(breakable: false)[
@@ -130,11 +123,6 @@ What I have not done: I have not written kernel code or submitted patches upstre
     Governor chosen by measurement: 2.46 W at 800 MHz idle against 2.93 W for the daemon it replaced; schedutil where powersave floored.
   ],
   [
-    #text(weight: "bold")[memory profile] #text(size: 8pt, fill: muted)[— pressure]
-    #linebreak()
-    zram at 1.8 GiB / 3.76:1 measured, swappiness and cache pressure set per machine class, dirty ratios tuned for bursty writes.
-  ],
-  [
     #text(weight: "bold")[nixconfig] #text(size: 8pt, fill: muted)[— declared fleet]
     #linebreak()
     Thirteen hosts from pinned inputs, one evaluation gate per host, rollback by pointer. https://github.com/shaoyanji/nixconfig
@@ -147,7 +135,7 @@ What I have not done: I have not written kernel code or submitted patches upstre
   [
     #text(weight: "bold")[fleet-sentinel] #text(size: 8pt, fill: muted)[— evidence]
     #linebreak()
-    Job state, generation age, disk and PSI every fifteen minutes; pages on bad state and on silence.
+    PSI, generation age and job state every fifteen minutes; pages on bad state and on silence.
   ])
 
 #section("Education")

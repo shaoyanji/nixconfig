@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:24:39Z",
+  "generated": "2026-11-22T09:25:00Z",
   "count": 200,
-  "pin": "18e19b903d43259142c66534c99147f760836d150d209cb67ee5763c5b9eec70",
+  "pin": "0fbcc37cfa05f2160226bc2315cf7b07c4778ef467834b5df9cc08c02e7be57c",
   "turns": [
+    {
+      "id": "73850216-52d1-4464-863a-05296d5910d4",
+      "ts": "2026-11-22T09:24:41Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "rwth-aachen upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "879e9549c6628d04b59c6ba7aa4d039eca32f0e7",
+      "branch": "main",
+      "frame": "03ha6f6gxw6zmo87r70diqvja"
+    },
     {
       "id": "91f87df7-ffc5-4abf-9969-983a1d6eb41f",
       "ts": "2026-11-22T09:24:31Z",
@@ -2748,19 +2761,6 @@
       "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
       "branch": "main",
       "frame": "03ha4prkx713ta1vr02pkw9ev"
-    },
-    {
-      "id": "f3521173-72dd-4907-9198-ae4ea2609248",
-      "ts": "2026-11-22T04:10:16Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: 2 TransnetBW MSHIP applications — Datacenter Engineer (4338, portal confirmed + email ack 311016), Platform Engineer K8s (4337, emailed to verified bewerbung@transnetbw.de after Umantis session bind); both recorded in appflow fit 5",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4pra3bf6yodq3rsbg04if"
     }
   ]
 }

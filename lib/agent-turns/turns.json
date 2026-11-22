@@ -1,8 +1,94 @@
 {
-  "generated": "2026-11-22T10:44:53Z",
+  "generated": "2026-11-22T10:47:51Z",
   "count": 200,
-  "pin": "ea5067ca0b4f065629935f477910c184112f4b95fcd06e979daf03a9eff6af38",
+  "pin": "100a0fc27766286e3e0b9acc9664d975be67d2083f5e642f485a9e751fa20913",
   "turns": [
+    {
+      "id": "738fcc79-33f4-4efb-9093-2b9c9465d5d2",
+      "ts": "2026-11-22T10:47:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:luminovo",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en), standardised an already-applied requisition | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "75a5707d5d6f7b3f073d168182dbef8348c3dcdc",
+      "branch": "main",
+      "frame": "03ha6ve7vah12n89makkj0jav"
+    },
+    {
+      "id": "ecb34264-d758-4db8-9a5c-47fc2caf6c07",
+      "ts": "2026-11-22T10:46:43Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "corrected: sheet/lead now match the advert (unbefristet, IT-Lead succession, E 11, class B, Windows Server/AD required); 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "194f656b88adaa98efe82a31d3a84bf33dc4fc59",
+      "branch": "main",
+      "frame": "03ha6v7c9xmsbmynqfyji8dhz"
+    },
+    {
+      "id": "cd870efe-d11a-4aca-b15d-02bd1ad73f58",
+      "ts": "2026-11-22T10:46:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:luminovo",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/luminovo"
+      ],
+      "files": [],
+      "base_commit": "66b1bd230f3b79cccf145eb0db1775e69128fed6",
+      "branch": "main",
+      "frame": "03ha6v5a6f8gzlwgmnrirfygy"
+    },
+    {
+      "id": "6ce75f81-7008-4053-8ed9-7e23d3dff91c",
+      "ts": "2026-11-22T10:46:10Z",
+      "source": "devin",
+      "subject": "nixconfig:flower",
+      "action": "re-assigned; already applied: Teamtailor req 8532038 submitted 2026-11-21 — named-recruiter ack mail 310950. Skipped duplicate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "66b1bd230f3b79cccf145eb0db1775e69128fed6",
+      "branch": "main",
+      "frame": "03ha6v3g2b0isox9g1f8c497e"
+    },
+    {
+      "id": "2897bb3a-3362-4aa9-ba1f-b48bfb6aae3b",
+      "ts": "2026-11-22T10:46:02Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "compiled: native German Typst packet 2pp CV + 1pp letter against LFT advert; Windows/AD/Hyper-V gap named; fit 3",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "d667eb5678e144042f5a835c1620a5282b0dc4d2",
+      "branch": "main",
+      "frame": "03ha6v2i9tafc2v9dn9ofzfn7"
+    },
+    {
+      "id": "4a1c88ef-9d4a-4c9a-938e-1b8fc694ddc0",
+      "ts": "2026-11-22T10:45:12Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "d23e1a409fc993b24e59bb988fdcbd843c8b0ea7",
+      "branch": "main",
+      "frame": "03ha6uwlwy77hkuxel5gi7kq0"
+    },
     {
       "id": "e8429486-e82a-4707-b842-79d3aaf7aa17",
       "ts": "2026-11-22T10:44:43Z",
@@ -2588,90 +2674,6 @@
       "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
       "branch": "main",
       "frame": "03ha65fc9pw3gh4wp84294idx"
-    },
-    {
-      "id": "b2c73eb0-9df1-458d-92ed-1c742300502f",
-      "ts": "2026-11-22T08:32:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: drv-devops-platform-openshift packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/drv-devops-platform-openshift"
-      ],
-      "files": [],
-      "base_commit": "8d5ca048ea99302bbc3d65eb15fde52a0d5af57a",
-      "branch": "main",
-      "frame": "03ha6509zi7ekcwt420xhn9c5"
-    },
-    {
-      "id": "1b996596-96ac-4d56-8cb4-d26372515bcc",
-      "ts": "2026-11-22T08:32:22Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: nebius-senior-site-reliability-engineer-data-platform submitted via Greenhouse embed 5040676101 | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
-      "branch": "main",
-      "frame": "03ha64yk0a41af7vd4ln9wud6"
-    },
-    {
-      "id": "af9b5a42-06b5-4fcc-a812-461ddbc920c1",
-      "ts": "2026-11-22T08:31:52Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: mittwald-devops packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
-      "branch": "main",
-      "frame": "03ha64v2421h3yje33exa6k1p"
-    },
-    {
-      "id": "c0959ff0-348c-4ae5-9a56-1b84429d637f",
-      "ts": "2026-11-22T08:30:54Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: nebius SRE data platform (GH embed 5040676101); fifth nebius req",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/nebius-data-platform"
-      ],
-      "files": [],
-      "base_commit": "f6e72441c0ec5ed2ad7d979be56ed86a35dc8a2d",
-      "branch": "main",
-      "frame": "03ha64o7b7cahuq9re6y73hia"
-    },
-    {
-      "id": "31e0d6bb-27a8-45e3-94c0-21f8b0255ac6",
-      "ts": "2026-11-22T08:29:31Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: fraunhofer-darmstadt-network packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/fraunhofer-darmstadt-network"
-      ],
-      "files": [],
-      "base_commit": "811dae20af866e1617acae634c9e1d48989056e1",
-      "branch": "main",
-      "frame": "03ha64efr9wlsjo2eoxzyca6f"
-    },
-    {
-      "id": "b674e5b6-be8c-46df-a8ff-4f805c84f479",
-      "ts": "2026-11-22T08:29:14Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: nebius-senior-site-reliability-engineer-sre-compute-node-team submitted via Greenhouse embed 4766627101 | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f6e72441c0ec5ed2ad7d979be56ed86a35dc8a2d",
-      "branch": "main",
-      "frame": "03ha64cfwt4pd8mo2as9er24r"
     }
   ]
 }

@@ -1,8 +1,671 @@
 {
-  "generated": "2026-11-22T05:33:04Z",
+  "generated": "2026-11-22T07:29:18Z",
   "count": 200,
-  "pin": "efb8db72f0ee2776669f9d48ee8dd6c51f036076a41688707891963db8257730",
+  "pin": "b351e93fb6ccb5977f6baba6128c321926c7df9434d2e105dc1a8998a473ef61",
   "turns": [
+    {
+      "id": "c709425f-b2b0-4d5c-9767-519b8a176616",
+      "ts": "2026-11-22T07:26:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-bwi-devsecops",
+      "action": "landed: BWI DevSecOps packet (JD, 2-page CV, 1-page letter, portal field sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/bwi-devsecops"
+      ],
+      "files": [],
+      "base_commit": "d245f3ab4c0096234ce12bf559b2f6d387cc1661",
+      "branch": "main",
+      "frame": "03ha5s2yjd5a24c13oipdl7ip"
+    },
+    {
+      "id": "e6af60a8-69e9-40b7-9e32-3c2a586fd882",
+      "ts": "2026-11-22T07:24:20Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-ionos-nre",
+      "action": "landed: IONOS Staff NRE Karlsruhe (4971782101) packet in submissions/ionos-staff-nre. Live JD + all 15 Greenhouse questions fetched via API; sheet answers them. German CV 2pp, letter 1pp, ask 120k, SUE2 consent flagged (US citizen). Letter names gaps: no BGP/OSPF/EVPN, Juniper/Cisco, Ansible, GitLab CI, no DC fabric. Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/ionos-staff-nre"
+      ],
+      "base_commit": "bf13d1744f2fa3c689c17cc394abc33bc5e7781c",
+      "branch": "main",
+      "frame": "03ha5ro24wtxacevteb3393h1"
+    },
+    {
+      "id": "4c2c68e0-a8f1-41dd-9300-95469b27707b",
+      "ts": "2026-11-22T07:22:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-bechtle-devops",
+      "action": "landed: Bechtle DevOps packet (JD, 2-page CV, 1-page letter, submission sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/bechtle-devops"
+      ],
+      "files": [],
+      "base_commit": "f6252f84bb50cfa4490763a1ecfd047a5f1e6351",
+      "branch": "main",
+      "frame": "03ha5r7n1j43q7h0t1n024lpb"
+    },
+    {
+      "id": "fe097975-51c5-4dde-8e81-da15e93edaa6",
+      "ts": "2026-11-22T07:21:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward:default:2.1",
+      "action": "drove idle pane default:2.1 (devin lane); routed via jevdecide host-change p=0.92 margin=0.87 (mail-atlas refactor area); task text pasted into input box via load-buffer+paste-buffer+Enter; pane was not idle - it resumed its Nebius job-hunt application (live Thinking counter, agent-browser tool lines), so the routed mail-atlas task awaits the next clean prompt to submit",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "af3c86bae95330e0285c65fd0a1b6ec1f9ef8e81",
+      "branch": "main",
+      "frame": "03ha5r5x70u8larrus4wct501"
+    },
+    {
+      "id": "27fed311-867e-443b-8669-72d6b043e83d",
+      "ts": "2026-11-22T07:20:39Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-ionos-sre",
+      "action": "landed: IONOS SRE packet in submissions/ionos-sre (German CV 2pp, letter 1pp) + prose fix in the SVA container sheet. FINDING: req 4956693101 is CLOSED - absent from both live boards (ionos2 60, ionos 49), careers 404, page redirects to ?error=true; sheet names live alt 4971782101 (Karlsruhe). Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/ionos-sre submissions/sva-container"
+      ],
+      "base_commit": "af3c86bae95330e0285c65fd0a1b6ec1f9ef8e81",
+      "branch": "main",
+      "frame": "03ha5qy5hxmmk87cniff5xzux"
+    },
+    {
+      "id": "f97bc473-dc6a-4f29-8205-21664238d065",
+      "ts": "2026-11-22T07:17:14Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: nebius token-factory SRE via Greenhouse embed; sheet mapped; watch Turnstile (sibling berlin req was turnstile-blocked)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/nebius-token-factory"
+      ],
+      "files": [],
+      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
+      "branch": "main",
+      "frame": "03ha5qa7im8tpxv6yjrkmb3mp"
+    },
+    {
+      "id": "bfbc3df7-dca6-4644-8ad6-b39dc9736d50",
+      "ts": "2026-11-22T07:16:30Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "claim: submitting nebius token factory (pane 2), building ionos sre karlsruhe (pane 1), building bechtle devops k8s (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/nebius-token-factory",
+        "submissions/ionos-sre",
+        "submissions/bechtle-devops"
+      ],
+      "files": [],
+      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
+      "branch": "main",
+      "frame": "03ha5q52029s9oxc95poeixbu"
+    },
+    {
+      "id": "b3d7b463-be10-48e3-863d-12b94c5a67a8",
+      "ts": "2026-11-22T07:12:50Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "manual: stackit GT1923 requires manual upload",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
+      "branch": "main",
+      "frame": "03ha5pf97l1rirj703qb7pa95"
+    },
+    {
+      "id": "b397b9c3-620b-4d28-851a-8c7c8465ab6a",
+      "ts": "2026-11-22T07:12:26Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-sva-j456",
+      "action": "landed: SVA j456 packet in submissions/sva-container (German CV 2pp, letter 1pp, Freiburg 25 km). Form f456 mapped: 5 required fields, no Deutschkenntnisse select (unlike f734/f262), 8 upload slots, 15 MB. Flagged SÜG-Stufe-2 clearance as the eligibility blocker for a US citizen. Gates: pdfinfo 2/1, prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/sva-container"
+      ],
+      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
+      "branch": "main",
+      "frame": "03ha5pce15qgt34jtgcadlrmd"
+    },
+    {
+      "id": "e1b234a5-58a0-4218-87fc-03e9e4c9dd79",
+      "ts": "2026-11-22T07:09:27Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-sva-j262",
+      "action": "landed: SVA j262 packet in submissions/sva-automation (German CV 2pp, letter 1pp, Freiburg site). Form f262 mapped from markup: 6 required fields incl. Eintritt + Deutschkenntnisse C1, anschreiben slot required, 15 MB. Gates: pdfinfo 2/1, prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/sva-automation"
+      ],
+      "base_commit": "22962e8df90a121990cfd4a9ebf1c482b7809528",
+      "branch": "main",
+      "frame": "03ha5orfxisf2rglgqcrek73g"
+    },
+    {
+      "id": "fa5c1e7e-adec-4490-9bda-96aa240a861a",
+      "ts": "2026-11-22T07:06:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-sva-linux",
+      "action": "landed: SVA j734 packet in submissions/sva-linux (German CV 2pp, German letter 1pp, Freiburg site 25 km). Form mapped from the server-rendered f734 page: 7 required fields incl. Eintritt + Deutschkenntnisse C1, 8 attachment slots, 15 MB. Gates: pdfinfo 2/1, checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/sva-linux"
+      ],
+      "base_commit": "5622b8b5b30134cc1cc0763c9e46bfb0578a4f50",
+      "branch": "main",
+      "frame": "03ha5o4hkw15xg4qdnw8oq0rm"
+    },
+    {
+      "id": "3a722c11-c685-4cfd-a337-51d4f031274f",
+      "ts": "2026-11-22T07:02:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-enbw-tipcp",
+      "action": "landed: EnBW C-TIPCP packet in submissions/enbw (German CV 2pp + letter 1pp). Posting is CLOSED: apply route answers 'job does not exist or is no longer open', portal search omits it - record held at prep, do-not-submit. Added --language to appflow-packet.sh (row filed en, API refused language). Gates: pdfinfo 2/1, checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/enbw scripts/task/appflow-packet.sh"
+      ],
+      "base_commit": "bf4b9f10d02d363ef72ef9eacff0fc73c860102b",
+      "branch": "main",
+      "frame": "03ha5ng09022km14fphp1t1v6"
+    },
+    {
+      "id": "8490cf19-1f1b-45b3-8dda-6c5253e93393",
+      "ts": "2026-11-22T07:01:00Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: stackit GT1923 platform engineer control-plane via RocketApply; precheck clean (prep, no prior submit); sheet mapped; stop on interactive captcha",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/stackit"
+      ],
+      "files": [],
+      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
+      "branch": "main",
+      "frame": "03ha5n3yd8wwih541xyehzq83"
+    },
+    {
+      "id": "69e5d1e2-de09-4479-976b-bbcaba3c40ca",
+      "ts": "2026-11-22T06:59:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-steward:default:1.1",
+      "action": "not driven: jev classify needs_review after duel (note-change 0.67 vs task-change 0.33, p=0.67 below 0.8 gate); freebuff left idle, nothing pasted, nothing changed",
+      "outcome": "blocked: jev undecided after duel, pane left idle",
+      "claims": [],
+      "files": [],
+      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
+      "branch": "main",
+      "frame": "03ha5mqfg75yazb2o3o5yj3gi"
+    },
+    {
+      "id": "d77d04d8-158e-4db0-bc23-87708eb340df",
+      "ts": "2026-11-22T06:59:00Z",
+      "source": "coordinator",
+      "subject": "nixconfig:job-search",
+      "action": "progress: submitted Sourcegraph Platform IC3 (Greenhouse 6103628004, code 42563259), STACKIT GT2321 packet built, ClickHouse packet built",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
+      "branch": "main",
+      "frame": "03ha5mpznwaxbkgj8k2a5yeaa"
+    },
+    {
+      "id": "46e513e1-c00a-49df-8631-c866ff5a7349",
+      "ts": "2026-11-22T06:58:47Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: sourcegraph SWE Platform IC3 applied via Greenhouse+OTP 42563259 (packet built: 9/32 highlights, 2-page CV verified; honest No on K8s/AWS-GCP); ack mail 311045 + /confirmation page; record=applied",
+      "outcome": "done",
+      "claims": [
+        "submissions/sourcegraph"
+      ],
+      "files": [],
+      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
+      "branch": "main",
+      "frame": "03ha5mogdlunjbxw3xur7bvgk"
+    },
+    {
+      "id": "cb82a60f-44dc-4803-a331-3a6604c7c15e",
+      "ts": "2026-11-22T06:54:47Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-stackit-gt2321",
+      "action": "landed: STACKIT GT2321 SRE packet in submissions/stackit-sre (CV exactly 2pp, letter 1pp EN naming the missing etcd/API-server depth; JD from the page's JobPosting block; form schema read from RocketApply OData for jobReqId 2321 - zero screening questions; record moved to stage prep); pdfinfo budget 2/1 OK, checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/stackit-sre"
+      ],
+      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
+      "branch": "main",
+      "frame": "03ha5lwc32rai3bp3amyuffnl"
+    },
+    {
+      "id": "2fdcab21-ba91-4c0e-bbdf-41e555dcdb58",
+      "ts": "2026-11-22T06:53:07Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "black-forest-labs MTS infosec: linkedMail=0, 7-field Ashby form filled, lebenslauf+anschreiben both attached, submit hit live interactive reCAPTCHA grid; policy = no solve; record=manual",
+      "outcome": "blocked: interactive reCAPTCHA image-grid on Ashby submit",
+      "claims": [
+        "submissions/black-forest-labs"
+      ],
+      "files": [],
+      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
+      "branch": "main",
+      "frame": "03ha5lkjn7gzpoihe4cfiuxi2"
+    },
+    {
+      "id": "5d497f94-810b-406b-bef1-b3cbdf7062d1",
+      "ts": "2026-11-22T06:52:48Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward:default:2.1",
+      "action": "route: default:2.1 devin IDLE at clean prompt (lane nixconfig refactoring); jev-decide classify needs_review (flake-change p=0.53 m=0.26); duel flake-change vs novel needs_review (p=0.64 m=0.28); margin 0.28 below 0.3 decisive threshold — pane left idle, not driven",
+      "outcome": "blocked: jevdecide not decisive; no task selected",
+      "claims": [],
+      "files": [],
+      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
+      "branch": "main",
+      "frame": "03ha5licukk5jhredhpbxpu21"
+    },
+    {
+      "id": "19cfba92-ca33-4953-b2d0-fa66871bb360",
+      "ts": "2026-11-22T06:52:28Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: execute prepared Ashby submission black-forest-labs MTS Infrastructure Security",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/black-forest-labs"
+      ],
+      "files": [],
+      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
+      "branch": "main",
+      "frame": "03ha5lg0u52thwt091nxb61jk"
+    },
+    {
+      "id": "0c0b1c21-ae89-400c-a19e-4373fe0d1f55",
+      "ts": "2026-11-22T06:51:57Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-stackit-gt1923",
+      "action": "landed: STACKIT GT1923 packet built (CV 2pp, letter 1pp EN, selection audit) in submissions/stackit; JD taken from the page's schema.org JobPosting block, form answers read from the RocketApply OData service (jobReqId 1923: no screening questions, gender/hear-position picklists enumerated) and the record moved to stage prep; checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/stackit"
+      ],
+      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
+      "branch": "main",
+      "frame": "03ha5lcdh4t7v7upp6sor0ngz"
+    },
+    {
+      "id": "dd1dca27-7524-4b9a-aefc-9d182c08346d",
+      "ts": "2026-11-22T06:49:55Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: maze Senior SRE applied via Ashby (Other country x2, visa=No, N/A state, resume+salary band noted); ack mail 311044; attio record set manual (reCAPTCHA interactive = no-solve per policy)",
+      "outcome": "done",
+      "claims": [
+        "submissions/maze submissions/attio"
+      ],
+      "files": [],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5ky48fi6l6ktf5c0ujn95"
+    },
+    {
+      "id": "8359a659-de90-46bc-ba1f-87985a420fcc",
+      "ts": "2026-11-22T06:47:56Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: execute prepared Ashby submission maze Senior SRE (attio marked manual, reCAPTCHA policy: no interactive challenges)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/maze"
+      ],
+      "files": [],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5kk3nmkir5ewlvaymsrq8"
+    },
+    {
+      "id": "b0fe693b-939d-4749-b2aa-04fd77c757b4",
+      "ts": "2026-11-22T06:47:56Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "start: executing Maze SRE submission (devin); compiling STACKIT packet (pane 1); compiling ClickHouse DRE packet (pane 3) | gate: checks:quick PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/maze",
+        "submissions/stackit",
+        "submissions/clickhouse"
+      ],
+      "files": [],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5kk2b6558ezaiuytl23ks"
+    },
+    {
+      "id": "cbac3f6d-67a7-47b2-b18f-40eb348d9ce7",
+      "ts": "2026-11-22T06:42:47Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "attio Senior Platform Engineer: linkedMail=0, form filled per sheet, submit x2 w/ reload; no email fallback in JD; record=other w/ blocker nextAction",
+      "outcome": "blocked: Ashby reCAPTCHA enterprise interactive image challenge on every submit",
+      "claims": [
+        "submissions/attio"
+      ],
+      "files": [],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5jjxw5ig4a9ic6wgstuuq"
+    },
+    {
+      "id": "23ff19c3-bec6-494a-8376-d366fcb6af76",
+      "ts": "2026-11-22T06:41:25Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "landed: delegated search & submissions; 20 new leads logged to delphi (ClickHouse, Sourcegraph, STACKIT, SVA, EnBW, BWI); Grafana confirmed (msg 311043); attio isolated manual | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5jac0halgcatjq3qicf1n"
+    },
+    {
+      "id": "98955e1d-351e-4ebd-bdaf-99da0e3da07e",
+      "ts": "2026-11-22T06:40:16Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-telecom-jobscan",
+      "action": "landed: redacted the consultancy dossier fully (email/[SENDER]/links -> placeholders, 0 emails, 0 phones, 0 names; checks:prose exit 0, commit c81bcbc5) and added 16 verified leads for STACKIT/Schwarz Digits, IONOS, 1&1, Bechtle, SVA, EnBW, BWI, Atruvia into apps-db (stage=lead, 16/16 apply URLs answer HTTP 200). Note: scripts/task/apps-db.sh search ignores its argument and dumps all 500 rows - dedupe was done from a full list dump instead.",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        ".agents/outreach/nix-consultancy-outreach.md"
+      ],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5j26yqgzcnsq2w69o0da5"
+    },
+    {
+      "id": "602a4774-1218-4185-a21f-67ecb7e7d386",
+      "ts": "2026-11-22T06:38:26Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: execute prepared Ashby submission attio Senior Platform Engineer",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/attio"
+      ],
+      "files": [],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5ip9qcgx93zyoiqwevevv"
+    },
+    {
+      "id": "dbad4ea0-aa9c-4280-8bee-a5078c9962a1",
+      "ts": "2026-11-22T06:37:00Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "done: grafana Staff SWE Databases SRE + mozilla Staff SWE Tools&Systems both already applied earlier today (ack mails 00:45/01:00 UTC auto-linked); grafana got one duplicate submit at 06:36 (confirmation page shown, GH dedupes by email); mozilla NOT resubmitted; both records applied + nextAction updated",
+      "outcome": "done",
+      "claims": [
+        "submissions/grafana submissions/mozilla"
+      ],
+      "files": [],
+      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
+      "branch": "main",
+      "frame": "03ha5if9moj2r6xgovsrftqs4"
+    },
+    {
+      "id": "dff164cb-4fa5-4f79-802c-84977f71f207",
+      "ts": "2026-11-22T06:34:57Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward-20261122",
+      "action": "drove IDLE freebuff pane default:1.1: redact third-party contacts and phone number from docs/nix-consultancy-outreach.md (Jev: prose-change p=0.83 m=0.73); pasted via load-buffer + Enter, pane accepted with fresh working counter (43s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
+      "branch": "main",
+      "frame": "03ha5i0s8h1pml1ghyw5vktgj"
+    },
+    {
+      "id": "028f8daf-1589-415d-99ec-6f02f0fe7f44",
+      "ts": "2026-11-22T06:34:34Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: execute prepared Greenhouse submissions grafana Staff SWE Databases SRE + mozilla Staff SWE Tools & Systems",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/grafana submissions/mozilla"
+      ],
+      "files": [],
+      "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
+      "branch": "main",
+      "frame": "03ha5hy3lmtxrhfwzm6f3e0bw"
+    },
+    {
+      "id": "7b4a936f-d538-42be-bab0-c6004b4f8e23",
+      "ts": "2026-11-22T06:15:26Z",
+      "source": "devin",
+      "subject": "nixconfig:gate-fix",
+      "action": "landed afc47bbe: problems.handlers gtk+.broken=warn in hosts/schneeeule/nvidia.nix (nvidia-settings-470 pulls gtk2, Kepler card has no newer driver) | gate: checks:host schneeeule PASS 2114 assertions",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
+      "branch": "main",
+      "frame": "03ha5e7k49v6scqlobhh9xlbj"
+    },
+    {
+      "id": "a6d0b620-a287-4c49-bf06-577acf86292d",
+      "ts": "2026-11-22T06:14:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "landed: drove IDLE pane default:2.1 (devin lane); next task routed via jevdecide host-change p=0.58 margin=0.34 decisive — fix red checks:host schneeeule gate (nvidia-settings-470.256.02 pulls gtk2 marked broken); add problems.handlers.gtk+.broken allowance or migrate off legacy driver; verify with checks:host HOST=schneeeule",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3d859bad941cff4253e478bc283ba94868164fcf",
+      "branch": "main",
+      "frame": "03ha5e1lc7axesasu9cle1q3x"
+    },
+    {
+      "id": "1299644d-1e5a-4fbd-9e5b-77f639c0aa52",
+      "ts": "2026-11-22T06:14:30Z",
+      "source": "devin",
+      "subject": "nixconfig:gate-fix",
+      "action": "start: gtk2-broken allowance for schneeeule legacy_470 (nvidia-settings pulls gtk2); gate checks:host schneeeule",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/schneeeule"
+      ],
+      "files": [],
+      "base_commit": "3d859bad941cff4253e478bc283ba94868164fcf",
+      "branch": "main",
+      "frame": "03ha5e0zsaoyhb5qifkt6x01a"
+    },
+    {
+      "id": "0b49d48e-b78d-4e49-90c8-ce26e6d7bbc0",
+      "ts": "2026-11-22T06:05:11Z",
+      "source": "devin",
+      "subject": "nixconfig:flake-update",
+      "action": "landed 3d859bad: root dank-qml-common(flake=false)+follows collapses 2 nodes to 1, impermanence follows root hm+nixpkgs; one flake update (impermanence 7b1d382->fa627f4, qml-common ->c34bfe0); gate: checks:host scratch PASS (cache-identical drv); schneeeule red on pre-existing gtk2/nvidia-470, identical on HEAD",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3d859bad941cff4253e478bc283ba94868164fcf",
+      "branch": "main",
+      "frame": "03ha5c7i4rr59h88hnnv1y6y6"
+    },
+    {
+      "id": "8ed3e16b-b3df-4f06-9274-465f1bf51d34",
+      "ts": "2026-11-22T06:03:37Z",
+      "source": "freebuff-agent",
+      "subject": "nixconfig:freebuff-idle",
+      "action": "landed: drove IDLE pane default:1.1 freebuff (CV/site lane); next task: redact third-party contacts and phone number from docs/nix-consultancy-outreach.md; jev-decide route prose-change p=0.85 m=0.74 exit 0; load-buffer + paste-buffer + Enter; confirmed fresh working... counter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
+      "branch": "main",
+      "frame": "03ha5bwfol972ifgf34jxigv4"
+    },
+    {
+      "id": "fd06b1ac-2da9-40cb-8c92-586ae902ec09",
+      "ts": "2026-11-22T05:59:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "landed: drove idle pane default:2.1 (devin lane); next task routed via jevdecide flake-change p=0.86 margin=0.76 decisive — transitive flake drift: batch branch-following pins (impermanence, dank-qml-common) in flake.lock into one flake update plus a representative host gate (checks:host on one chain representative); pane accepted the task, fresh working counter Running tools 10s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
+      "branch": "main",
+      "frame": "03ha5b559eesdfri3cpl5ix4n"
+    },
+    {
+      "id": "7c5aa34a-8a13-4a37-bf45-7ed04018a1be",
+      "ts": "2026-11-22T05:59:10Z",
+      "source": "devin",
+      "subject": "nixconfig:flake-update",
+      "action": "start: batch transitive pin drift (impermanence, dank-qml-common) into one flake update + checks:host gate",
+      "outcome": "in_progress",
+      "claims": [
+        "flake.lock"
+      ],
+      "files": [],
+      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
+      "branch": "main",
+      "frame": "03ha5b1413q13807pyt5602a9"
+    },
+    {
+      "id": "3d0b262c-9988-4981-96ef-ca222a0c4c11",
+      "ts": "2026-11-22T05:50:59Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff",
+      "action": "drove idle freebuff pane default:1.1: pane's suggested next task 'redact third-party contacts and phone number from docs/nix-consultancy-outreach.md' — jevdecide classify selected prose-change (p=0.85, margin 0.74 ≥ 0.3 gate); task pasted via load-buffer + paste-buffer + Enter; pane shows working... with tool lines, task running",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
+      "branch": "main",
+      "frame": "03ha59fmthoxbjw0t1y4r5ani"
+    },
+    {
+      "id": "fc2b76d4-6507-441f-ab30-435a5146280a",
+      "ts": "2026-11-22T05:50:33Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "swept BA jobsuche + Interamt; recorded 12 new leads in submissions/ (dfs-sre, telekom-sre-prometheus, bundesdruckerei-sre, energy-meteo-sysadmin, bamf-devops, drv-openshift, citeq-muenster, telekom-otel, fau, sinc, mittwald, uni-rostock); skipped 50Hz/BWI dupes + staffing agencies; record-only, zero submissions",
+      "outcome": "done",
+      "claims": [
+        "submissions/"
+      ],
+      "files": [],
+      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
+      "branch": "main",
+      "frame": "03ha59ckigt6d1kaxamwk47mf"
+    },
+    {
+      "id": "485a82ee-5ef8-4699-a645-43ca3425b4c2",
+      "ts": "2026-11-22T05:43:22Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gocardless-packet",
+      "action": "landed: GoCardless senior SRE (database) packet built from the lead's JD (unsent, no form opened). Projection 10/32 highlights, 4/10 projects, but bountystash (the Postgres archive) was dropped by the scorer - recorded as a corpus fix. Letter concedes the 5+yr HA/replication/upgrade bar outright and asks about Germany vs London/Riga/Lisbon. Sheet flags band midpoint EUR 95k = candidate floor, and no UK visa. Also fixed a gated 'leverage' in the Elastic sheet (checks:prose 201 -> 0).",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/gocardless-senior-sre-database",
+        "submissions/elastic-principal-cicd-platform/submission-sheet.md"
+      ],
+      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
+      "branch": "main",
+      "frame": "03ha57y3dpsnf6wraxb5kxjof"
+    },
+    {
+      "id": "dba0b2f7-f00c-497e-8506-19d532caf5a4",
+      "ts": "2026-11-22T05:42:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gocardless-packet",
+      "action": "landed: drove freebuff pane to build the GoCardless Senior SRE (Database Focus) packet in submissions/gocardless-senior-sre-database (JD + lead present, no packet yet)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
+      "branch": "main",
+      "frame": "03ha57stc4sv7h19x1eo4idi3"
+    },
+    {
+      "id": "f1a236e4-0d6d-42bc-9f4e-57cb2b3aca86",
+      "ts": "2026-11-22T05:41:21Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-ba-interamt-sweep",
+      "action": "landed: drove devin pane to run a fresh Bundesagentur/Interamt sweep for new IT-ops/SRE/platform leads (record-only, no submissions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
+      "branch": "main",
+      "frame": "03ha57juhuvwzhxxuty2rrnqy"
+    },
+    {
+      "id": "4eec5a3e-0596-4876-b96e-3be72f40a211",
+      "ts": "2026-11-22T05:41:20Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-elastic-cicd-packet",
+      "action": "landed: drove freebuff pane to build the Elastic Principal CI/CD Platform packet in submissions/elastic-principal-cicd-platform (JD + lead present, no packet yet)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
+      "branch": "main",
+      "frame": "03ha57jshjx0eb6g0jgh8vuai"
+    },
+    {
+      "id": "6d9d9c43-e76c-490c-af18-d34d597075db",
+      "ts": "2026-11-22T05:41:16Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-elastic-packet",
+      "action": "landed: Elastic Principal CI/CD packet built from the lead's JD (unsent, no form opened). Projection 11/32 highlights, security/artifact weighted, nixconfig + kev-time kept. Letter asks whether a Germany contract exists for a Poland req instead of assuming relocation, and concedes no Buildkite/Argo CD/prod Kubernetes and no org-wide policy layer. CV 2pp, letter 1pp verified from built PDFs.",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/elastic-principal-cicd-platform"
+      ],
+      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
+      "branch": "main",
+      "frame": "03ha57japuwia9k0yrohfeyam"
+    },
+    {
+      "id": "819937b2-9de5-419f-86fb-513c939ecacd",
+      "ts": "2026-11-22T05:33:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-maze-packet",
+      "action": "landed: Maze Senior SRE packet built (was claimed ready with no dir). Ashby JD fetched, projection 12/32 highlights security-weighted, 1-page letter asks about Germany outside the preferred NL/UK/IE/ES/PT list instead of assuming relocation. CV 2pp + letter 1pp verified from the built PDFs. Record now 'packet built 2026-11-22 - not submitted'; nothing sent. Also pushed flix e0edc539 earlier this turn",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/maze"
+      ],
+      "base_commit": "64b2be334e7ab3d6ad3214111bd83cd767c60804",
+      "branch": "main",
+      "frame": "03ha55y1ssbhx7omadoo0wsem"
+    },
     {
       "id": "479b74d1-0b82-42bb-8de9-f1c890c99d34",
       "ts": "2026-11-22T05:31:39Z",
@@ -2151,618 +2814,6 @@
       "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
       "branch": "main",
       "frame": "03h9xmarpwc1s9mt6y7u1jwwy"
-    },
-    {
-      "id": "42e691bc-5b05-4a47-a5ef-13ca4f1dd4b8",
-      "ts": "2026-11-21T06:18:59Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout idle at prompt (g2 Recruitment research done - posted xs turn at 06:11), p2 devin refactor 32m+ running mkTimerJob consolidation, p3 delphi idle at prompt (searxng job leads posted); all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xllstymut9c1a5prc1gf3"
-    },
-    {
-      "id": "c8cc699b-eeb4-4d2e-82f0-03211518a35f",
-      "ts": "2026-11-21T06:16:21Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout g2 Recruitment research working (3m34s), p2 devin refactor 32m+ running, p3 delphi searxng freelance DevOps search posted results; xs-turns healthy; all panes active",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xl3a9itul2a5fho2x0ose"
-    },
-    {
-      "id": "6ff3836a-03f5-43cd-8a37-47977500540b",
-      "ts": "2026-11-21T06:16:09Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-searxng-freelance-devops-2026-11-21",
-      "action": "monitor: searxng freelance DevOps search found: Ylancer freelance jobs worldwide (Full Stack Remote), NTek System Architect Benelux (permanent/freelance), Telegram IT freelancers (2000 USD/month Rust), englishjobs.fr 617 backend Paris (Remote Europe), Indeed Acas Engineer Remote (IaC cloud), Reddit r/rust Whos Hiring (contract), HN Who is hiring Nov 2026 remote (DevOps freelancer UK/EU), NIX United outsourcing",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xl1spldzbwz63y08gyoz6"
-    },
-    {
-      "id": "e55476a1-2bcb-49f0-a39a-aecd740e8303",
-      "ts": "2026-11-21T06:15:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-cv-ats",
-      "action": "landed: routed cv-ats ATS compliance task to freebuff pane default:1.1 via load-buffer+paste-buffer+Enter; pane accepted and shows working... 5s with Add to the current task",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xkzjvk918bmdrqrmk3o26"
-    },
-    {
-      "id": "8e733551-e25f-498d-9a87-877df524d52b",
-      "ts": "2026-11-21T06:15:48Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout g2 Recruitment research working (3m), p2 devin refactor 32m+ running, p3 delphi searxng found g2 Recruitment energy-infrastructure freelance roles posted as xs turn; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xkzekf1cskgyxa56r9oxv"
-    },
-    {
-      "id": "ac22056f-3829-488a-8c27-e0579a33f7c5",
-      "ts": "2026-11-21T06:15:34Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-research-g2-recruitment",
-      "action": "monitor: searxng found g2 Recruitment freelance energy-infrastructure roles: Site Manager Hydrogen-Ready Power Generation (08.10.2026), Freelance Commissioning Engineer On-Site Germany (28.08.2026), Senior Project Manager Hybrid PV+BESS Frankfurt (07.08.2026, 24mo+, Germany+Poland), QA/QC Engineer Helsinki Finland freelance (12.11.2026), Construction Engineer 100MW BESS Belgium freelance 12mo; all at g2recruitment.com",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xkxqqkbon3o66rst5pdw8"
-    },
-    {
-      "id": "626cfc3f-4e1d-43f8-a5d2-24ae86040290",
-      "ts": "2026-11-21T06:15:06Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout g2 Recruitment research working (2m20s), p2 devin refactor 32m+ running, p3 delphi searxng job search found 15+ real leads (Supabase Nix, freelancermap, Nutanix freelance, NixOS contract ops, Loti AI, LinkedIn DevOps CH); xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xkuisxsm2lpkii3zsktef"
-    },
-    {
-      "id": "85e2d7a3-c926-4910-81bd-71218507018c",
-      "ts": "2026-11-21T06:13:44Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-searxng-freelance-2026-11-21",
-      "action": "monitor: searxng freelance search found: Freelance Nutanix Specialist/Engineer The IN Group (12.11.2026), [FOR HIRE] Nix/NixOS devops FP contract FTE 8+yrs remote backend, [FOR HIRE] Contract NixOS Linux ops deployments remote (flakes, Hetzner, Proxmox), Loti AI Cloud Infrastructure Engineer J2B Global Remote, Indeed Blockchain infrastructure DevOps",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xkkvwrjgdym3nfvydfx00"
-    },
-    {
-      "id": "f5cbf3ac-32d7-48a9-9fa1-4274aa462ef9",
-      "ts": "2026-11-21T06:13:01Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-searxng-2026-11-21",
-      "action": "monitor: searxng tailnet search found: Supabase Postgres Deployment Engineer Nix (remote, Sep 2026), freelancermap.com 73+ IT freelance jobs Nov 2026, [FOR HIRE] Nix/NixOS devops FP contract/FTE, startup hiring senior Nix engineers NYC/SF, LinkedIn 316 Junior DevOps Switzerland",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xkfry260nru0gr91govoz"
-    },
-    {
-      "id": "457bc2b2-73ee-45d4-aeb2-6a33ad46c297",
-      "ts": "2026-11-21T06:11:49Z",
-      "source": "scout",
-      "subject": "nixconfig:job-research-g2-recruitment",
-      "action": "g2 Recruitment (G2V Recruitment Group Ltd, London; contact@g2recruitment.com; UK +44 117 968 9000, DE +49 89 541996776) lists 100/100 Contract / Freelance. 15 energy-infra roles parsed http 200 from g2recruitment.com/jobs. Fit: Freelance Data Engineer Liege BE hybrid 60/100 (ref RB1923843920oq), Freelance Constr Mgr Solar PV+BESS Frankfurt DE 55, Agentic AI Eng x3 Asse BE 55, Commercial Mgr remote 45. Next: apply to the first two via the page form, then email refs for day-rate bands.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xk7evpwhwn6zrmpxfxu8g"
-    },
-    {
-      "id": "4b11c8f5-4580-4632-a79f-f1871c4e7ded",
-      "ts": "2026-11-21T06:10:30Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout g2 Recruitment research working (1m33s), p2 devin refactor 32m59s running, p3 delphi found 5 active NixOS Discourse job postings posted as xs turn; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xjy51p8poq33vutzkytnm"
-    },
-    {
-      "id": "716ec9a3-3fb4-4988-ac0d-5879f8835e22",
-      "ts": "2026-11-21T06:10:07Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-discourse-nixos-jobs",
-      "action": "monitor: found active NixOS job postings on Discourse via DuckDuckGo: [FOR HIRE] Contract or FTE Nix/NixOS devops FP roles, [JOB] Developer DevOps with NixOs, Hiring Linux System Engineer Cologne Germany, Flox is Growing 5 New Roles, Senior Platform/Build Engineer Nix+NixOS Revel Marina del Rey/San Francisco",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xjvg3a7kmpsatqtt7144f"
-    },
-    {
-      "id": "aa653d66-3893-4f20-abab-ade791790502",
-      "ts": "2026-11-21T06:09:31Z",
-      "source": "devin",
-      "subject": "nixconfig:systemd-consistency",
-      "action": "landed: mkTimerJob consolidation completed — 23 remaining hand-rolled timer pairs across 18 files onto the shared skeleton; all emitted units byte-identical on delphi/frieren/eisen; non-migrations documented (HM user timers, persistent=false, OnBootSec/OnUnitActiveSec, canonical restic/autoUpgrade); gate: checks:quick + checks:host delphi/frieren PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xjr8wd7alkcf818tkqwh3"
-    },
-    {
-      "id": "14c0e2b2-bb15-4553-a862-022880a0550f",
-      "ts": "2026-11-21T06:07:43Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout idle at prompt (CV claims stalled 87.5K 8%), p2 devin refactor 32m59s running mkTimerJob consolidation + 2 live CV claims, p3 delphi idle at prompt after posting job leads; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xjelqjzzo77joeutphqz1"
-    },
-    {
-      "id": "c22890b7-73f9-401a-bf0b-7b2793776a71",
-      "ts": "2026-11-21T06:06:50Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 CV claims active (87.5K 8% download), p2 mkTimerJob refactor 18m+ running, p3 job search found 15+ Nix/freelance leads via DuckDuckGo all posted as xs turns; all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xj8f0pmng30y0thxh6xuq"
-    },
-    {
-      "id": "028123a4-cf61-4ef6-a5ef-7ea86cf26edc",
-      "ts": "2026-11-21T06:06:33Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-2026-11-21-more-nix-leads",
-      "action": "monitor: found more NixOS job leads: NixOS Discourse jobs category, Skillenai NixOS jobs 2026 demand, Talantix remote NixOS opportunities, Arc.dev freelance NixOS developers Nov 2026, Indeed 2000 NixOS engineer jobs",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xj6cf1gc2ij7gotqincu3"
-    },
-    {
-      "id": "19a6b7a0-cf55-4201-8c3e-43938095ae16",
-      "ts": "2026-11-21T06:06:17Z",
-      "source": "scout",
-      "subject": "nixconfig:cv-lebenslauf-link-gate",
-      "action": "landed: verified at 8cda1c98 — matt-site build rc=0 with --gap PASS then full PASS (81 links/15 pages/4 PDFs/16 download anchors, 0 broken); fixture 16/16; packet lebenslauf (EXAMPLE=1, German) rc=0 with cv-ats-check inside packet.nix PASS. No nixconfig change needed; tree clean for gate inputs | gate: nix build .#sites.matt-site PASS, site-links PASS, checks:site:links:test PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xj4i10afmblzha3zatd02"
-    },
-    {
-      "id": "e208e198-bfd1-42cf-9f85-5232717bed68",
-      "ts": "2026-11-21T06:06:16Z",
-      "source": "scout",
-      "subject": "nixconfig:cv-site-gate",
-      "action": "landed: blog CV drift fixed — assets/files/{cv,cv-de}.pdf updated to .#sites.matt-site build (blog aadb418, GP run 44873890665 success). Jekyll build rc=0; /cv/ links each CV once with download; both targets 200 and live sha256 == build (fd22f041 / 5db000e6); check-cv-links + cv-blog-check PASS | gate: jekyll build rc=0, check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xj4erqo0a2atzx69tpsni"
-    },
-    {
-      "id": "3493f747-05f9-40a9-ad87-3167ffe4f880",
-      "ts": "2026-11-21T06:04:45Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-freebuff-cv",
-      "action": "landed: refresh-CV task to idle freebuff win1 pane",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xitobc0y6kfrrj2cz6xhh"
-    },
-    {
-      "id": "ac46b43a-1793-4c8c-9625-7374366b51a7",
-      "ts": "2026-11-21T06:04:35Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 CV claims working (3m18s+), p2 mkTimerJob refactor 18m+ with 2 live CV claims reassigned to p1, p3 job search found 5 freelance platforms + 6 Nix-specific leads (RemoteOtter, Upwork Nix developer, Indeed 2000 NixOS, Alion 163 NixOS); all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xisjjnftpetpvwcuf5gov"
-    },
-    {
-      "id": "e72a2782-39e7-4d63-a172-7c6204b32c8a",
-      "ts": "2026-11-21T06:04:23Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-2026-11-21-nix-jobs",
-      "action": "monitor: found Nix/NixOS freelance jobs: RemoteOtter nixos jobs, Upwork Nix developer infrastructure setup, Indeed 2000 NixOS jobs, Alion 163 NixOS jobs remote/on-site, Upwork DevOps freelance",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xir5mcz96geb4pve4vgu5"
-    },
-    {
-      "id": "9f8791e3-3bd0-49b6-9777-1454bc207025",
-      "ts": "2026-11-21T06:03:57Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-2026-11-21-freelance-platforms",
-      "action": "monitor: found 5 freelance DevOps job platforms via DuckDuckGo: Upwork devops freelance remote, Toptal remote freelance DevOps Nov 2026, Indeed DevOps remote jobs (2), Freelancer.com DevOps jobs Nov 2026",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xio2l3i6wzq3pxtxxa6zi"
-    },
-    {
-      "id": "3e0e4fcd-e7c0-4d10-8036-623e3ef06bfd",
-      "ts": "2026-11-21T06:02:24Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-2026-11-21",
-      "action": "monitor: attention queue sweep complete - no new job leads beyond Signature Performance RE-200128610 already found",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9xid5trbr7gch0dmhjzvzn"
-    },
-    {
-      "id": "3a6cbd69-7f29-40e1-97f5-f306ace52534",
-      "ts": "2026-11-21T05:55:18Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout g2 Recruitment research active, p2 devin mkTimerJob refactor 18m57s with 2 live CV claims pending, p3 delphi job-search pivot (API broken, now searching attention queue+web); all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xgzp7wtzudbj8u4ddhnm0"
-    },
-    {
-      "id": "112c6107-6568-4368-bfd7-cc23ece115a1",
-      "ts": "2026-11-21T05:46:23Z",
-      "source": "scout",
-      "subject": "nixconfig:job-research-g2-recruitment",
-      "action": "Researched g2 Recruitment (g2recruitment.com; contact@g2recruitment.com; UK +44 117 968 9000; DE +49 89 541996776) and 7 remote/freelance roles from 14-21 Nov. Two open g2 energy roles are recruiter-email only: BESS Site Manager Meppen (Will.Robinson@, 15-16mo, Jan) and LNG Tank Site Manager Stade (Nathaniel.Raworth@, 12mo, ASAP). Best income fit: 4freelance DX/DevX AWS, remote EU, 120 EUR/h. Report: http://paste.frieren.lan/job-research-g2-2026-11-21.md. Research only, no commit.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xf90plfkbmdh8tgyj1wd1"
-    },
-    {
-      "id": "ddca2e5d-17d2-4f5d-a849-bcd46ed36946",
-      "ts": "2026-11-21T05:42:09Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout job-research-g2-recruitment working (35s+), p2 devin systemd-consistency in_progress (mkTimerJob consolidation), p3 delphi job-search at prompt; 2 live CV gate claims unresolved; all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xeeqzxzbma4ut3de8rz66"
-    },
-    {
-      "id": "848808ab-cee8-4022-83f9-8d299af13b34",
-      "ts": "2026-11-21T05:41:43Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout new job-research-g2-recruitment task (working 3s), p2 devin systemd-consistency in_progress (mkTimerJob consolidation ~20 pairs), p3 delphi job-search at prompt; 2 live CV gate claims unresolved; all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xebrkt8bfemt7gxgl6vxk"
-    },
-    {
-      "id": "dcce9da9-bdef-4f1a-821f-057a46dad6ff",
-      "ts": "2026-11-21T05:40:27Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout job-scout DONE (4 appflow rows upserted, Signature+Legence closed, g2 Recruitment freelance leads found), p2 devin systemd-consistency in_progress (mkTimerJob consolidation ~20 timer pairs), p3 delphi job-search at prompt; 2 live CV gate claims unresolved (cv-site-gate, cv-lebenslauf-link-gate); all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xe2ry6fhxbth7tk37yxoc"
-    },
-    {
-      "id": "9aeebe53-35b2-419c-b70f-f8d3c07ecbe7",
-      "ts": "2026-11-21T05:39:54Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout job-scout in_progress (g2 Recruitment freelance leads found), p2 devin refactor thinking 4m30s+ with 2 live CV gate claims pending, p3 delphi job-search at prompt; all panes zero idle; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xdyxwyc1sed4fldatlxhb"
-    },
-    {
-      "id": "86776733-7b45-48f5-aaa8-711e8933e8de",
-      "ts": "2026-11-21T05:39:54Z",
-      "source": "scout",
-      "subject": "nixconfig:job-scout-2026-11-21",
-      "action": "Scout sweep: 8 open attention items + 600 recent archive messages triaged. Upserted 4 appflow rows — Signature Performance and Legence closed as rejected (no requisition; US-residents-only), 2 new g2 freelance energy leads (BESS Meppen fit 3, LNG Stade fit 2). Pipeline 200->202 rows.",
-      "outcome": "done",
-      "claims": [
-        "nixconfig:appflow"
-      ],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xdywva5yq4f43g68abjmm"
-    },
-    {
-      "id": "20ea5290-6119-4b78-b44d-079e5ea8132e",
-      "ts": "2026-11-21T05:39:18Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout found leads - g2 Recruitment 2 new freelance energy-infrastructure roles, Signature+Legence closed; still working (1m2s+), p2 devin thinking on refactor+live claims (4m30s), p3 delphi at prompt; 2 live claims unresolved; zero idle panes; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xdurm3yizvz0rzaaxk10g"
-    },
-    {
-      "id": "ad07d3f4-167d-4b5f-9c41-f3e68849e6e2",
-      "ts": "2026-11-21T05:39:11Z",
-      "source": "scout",
-      "subject": "nixconfig:job-scout-2026-11-21",
-      "action": "claim: sweep /api/attention (8 open) + 600 recent archive messages for job mail; upsert appflow rows",
-      "outcome": "in_progress",
-      "claims": [
-        "nixconfig:appflow"
-      ],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xdtydi6txipd89c22etrc"
-    },
-    {
-      "id": "fdbd173d-0439-41b5-870e-528c2c6783e6",
-      "ts": "2026-11-21T05:38:43Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout still working on job-search (51s active, extracting delphi attention queue + upserting applications), p2 devin deep-thinking refactor+live claims (3m31s+), p3 delphi at prompt after attention sweep; 2 live claims unresolved assigned to p2; zero idle panes",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xdqnkrsp2ptylxauwbl59"
-    },
-    {
-      "id": "5ae30f3c-1d32-463b-b5dc-735e9e76237c",
-      "ts": "2026-11-21T05:38:27Z",
-      "source": "devin",
-      "subject": "nixconfig:systemd-consistency",
-      "action": "claim: finish mkTimerJob consolidation — remaining ~20 hand-rolled timer pairs across hosts/modules onto shared skeleton; mkUserDaemon and agent-scheduler reviewed as non-migrations",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services",
-        "modules/calendar.nix",
-        "modules/ssh-ca.nix",
-        "modules/plugins/appflow",
-        "hosts/delphi",
-        "hosts/frieren"
-      ],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xdosbfme6z9dmgyn5l6df"
-    },
-    {
-      "id": "cc876876-6001-4fd3-a36f-ea49146c47b7",
-      "ts": "2026-11-21T05:38:25Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: p1 scout working on job-search (23s active), p2 devin thinking on refactor+live claims (3m31s), p3 delphi at prompt after attention sweep; 2 live claims unresolved (cv-site-gate, cv-lebenslauf-link-gate) assigned to p2; xs-turns healthy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xdoj0cm8xkpvvewv0i5n5"
-    },
-    {
-      "id": "37e4a22e-9026-4333-8ea6-429d126e95c4",
-      "ts": "2026-11-21T05:35:35Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor loop: p1=freebuff scout executing /scout job-search on delphi attention queue; p2=devin refactor resolving cv-site-gate+cv-lebenslauf-link-gate live claims (Thinking 11s); p3=delphi job-search attention-queue sweep returning Oracle Cloud + mail results; all panes active, zero idle",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xd4m3630q3helxyzly9vq"
-    },
-    {
-      "id": "5c9e628b-3aab-47df-9c15-a2bd2720d48e",
-      "ts": "2026-11-21T05:35:19Z",
-      "source": "devin-agent",
-      "subject": "nixconfig:mkTimerJob-mkDaemon-review",
-      "action": "landed: mkTimerJob-mkDaemon consistency review task dispatched to devin pane default:2.1 (jevdecide review_mkTimerJob_mkDaemon, margin 0.86)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xd2o671231oebzt3x91aq"
-    },
-    {
-      "id": "8f287fa1-6e1c-47db-92c5-39e3bf1dc673",
-      "ts": "2026-11-21T05:35:18Z",
-      "source": "freebuff-agent",
-      "subject": "frieren:cv-link-gate-verify",
-      "action": "landed: verify-cv-link-gate task dispatched to freebuff pane default:1.1 (jevdecide verify_cv_link_gate, margin 0.57)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xd2lpc0248tbogw12q5dt"
-    },
-    {
-      "id": "ed07e7c4-1a2a-44ce-b8d4-12fbbb278ee8",
-      "ts": "2026-11-21T05:34:33Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: all 3 panes active (p1=freebuff scout, p2=devin refactor+live-claim-cv-site-gate, p3=delphi job-search); no live claims unassigned; xs-turns healthy on delphi",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xcxbunpg0h520u8125tb7"
-    },
-    {
-      "id": "ed87c174-edf4-4d2c-be8d-0be1fd91a4d6",
-      "ts": "2026-11-21T05:34:09Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-lebenslauf-link-gate",
-      "action": "scout verify CV/Lebenslauf link gate at 8cda1c98: matt-site --gap + full PASS (81 links/15 pages/4 PDFs/16 anchors), fixture 16/16, packet lebenslauf ATS PASS (de, headings+rows+no /URI); is-a.dev builds rc=0 and both anchors resolve live, but dev:blog:cv:check red — blog ships CV/Lebenslauf bytes from an older build",
-      "outcome": "failed: is-a.dev publishes a stale CV/Lebenslauf pair; links and live targets all resolve, only the byte-identity assertion is red",
-      "claims": [
-        "scripts/task/cv-blog-check.sh",
-        "scripts/task/site-links.sh"
-      ],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xcugs9ua2jbai0dqdshm1"
-    },
-    {
-      "id": "b1a3ff3b-873a-4c4f-8718-b3f7c41220e3",
-      "ts": "2026-11-21T05:33:59Z",
-      "source": "hermes",
-      "subject": "frieren:org-pane-reorg",
-      "action": "all panes assigned: p1=freebuff scout(job-search/reports), p2=devin refactor(clean-code/lib*.nix), p3=delphi job-search; orchestrator monitoring xs turns only",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xctd385pukdti3cfy8jnm"
-    },
-    {
-      "id": "ec074658-7c94-47f7-bb14-94c16a4432b1",
-      "ts": "2026-11-21T05:33:18Z",
-      "source": "hermes",
-      "subject": "frieren:org-pane-reorg",
-      "action": "reorg: pane1 freebuff→job-search scout (reports/retrieval/scripts), pane2 devin→clean-code refactor loop (lib/*.nix pipe operator), pane3 delphi→job search + nixconfig refactor; me=xs-turn orchestrator only, no script writing",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xcokuf6t7d2e427pl24w0"
-    },
-    {
-      "id": "9130e9ea-a2a6-4b96-9ded-23fc0e37847b",
-      "ts": "2026-11-21T05:28:31Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-site-gate",
-      "action": "verified shaoyanji.is-a.dev: jekyll build rc=0 (104 files), both published CVs (cv.pdf, cv-de.pdf) linked once from /cv/ with download, targets resolve in _site and live 200 application/pdf; blog CI gate check-cv-links rc=0. RED: dev:blog:cv:check byte assertion — published 34911/35371B vs build 36462/36941B, text+pages+title+tagging identical, build bytes reproducible from HEAD payload; blog ships a stale CV pair | gate: jekyll build PASS, check-cv-links PASS, dev:blog:cv:check FAIL",
-      "outcome": "failed: blog publishes a stale CV pair (bytes differ from the HEAD build; links and targets all resolve)",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xbqxx9g7nuvskz30ogxw5"
-    },
-    {
-      "id": "820cff56-9409-4a2c-87c0-60e9914b2aa9",
-      "ts": "2026-11-21T05:28:06Z",
-      "source": "devin",
-      "subject": "nixconfig:arg-injection",
-      "action": "landed: systemdJobs+user path-imports moved to _module.args (32 bindings, 22 files) — swept into 8cda1c98 by concurrent commit; added 13 empty-let collapses (uncommitted) | gate: checks:quick PASS, checks:host delphi+frieren eval PASS (2110/2309), emitted units byte-identical",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xbny2z4xi67skn9ssfaxq"
-    },
-    {
-      "id": "1b85e517-ad02-4e55-a15f-79cfdcdadd63",
-      "ts": "2026-11-21T05:24:51Z",
-      "source": "freebuff-win1",
-      "subject": "nixconfig:steward-win1-cv-site-gate",
-      "action": "landed cv-site-gate on freebuff default:1.1 via jevdecide decisive margin; task sent, fresh working counter confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xb16vsed07fjcnkeenq2r"
-    },
-    {
-      "id": "a1b2c3d4-e5f6-4890-abcd-ef1234567890",
-      "ts": "2026-11-21T06:20:00Z",
-      "source": "hermes",
-      "subject": "frieren:xs-turns-from-delphi-pane3",
-      "action": "verified xs-turns post from delphi pane 3",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": "main",
-      "frame": "03h9xa7krap5bmdbyxqwd81gx"
     }
   ]
 }

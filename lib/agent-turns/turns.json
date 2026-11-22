@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T10:13:55Z",
+  "generated": "2026-11-22T10:16:05Z",
   "count": 200,
-  "pin": "e30eca29d33640315663c0ab635f12692898c97d9d57dae219eca2a42669fe5f",
+  "pin": "4686396084b0fe63a65ed9c38869c668763e1f7812abb125ba948589f9563653",
   "turns": [
+    {
+      "id": "85c17797-6dde-4fa5-8d43-84d39eba24aa",
+      "ts": "2026-11-22T10:15:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:deepl",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "111a2f9a87dbac4f5816a4142f472eb99f466650",
+      "branch": "main",
+      "frame": "03ha6p6vbc2lqmrh9hx71fzia"
+    },
+    {
+      "id": "151ba862-a35f-4d00-96d1-556953f21607",
+      "ts": "2026-11-22T10:15:12Z",
+      "source": "devin",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "Zertifikate is Pflichtfeld; degree certs not in packet — needs operator docs | rest of form+files complete",
+      "outcome": "blocked: missing-certificates",
+      "claims": [],
+      "files": [],
+      "base_commit": "39ac9da070a10bc9b1419b3eee8e46431b03a17d",
+      "branch": "main",
+      "frame": "03ha6p1pdh8ew3g42tompoi2k"
+    },
+    {
+      "id": "f2c601a4-bbe2-4e45-8753-9ca7383200fc",
+      "ts": "2026-11-22T10:14:06Z",
+      "source": "devin",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "claim: karriere-in-mv submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "39ac9da070a10bc9b1419b3eee8e46431b03a17d",
+      "branch": "main",
+      "frame": "03ha6otzelnwlbb5kampnuqaf"
+    },
     {
       "id": "bd3e1fa1-1f8b-47ea-83e1-a4f791b98f7c",
       "ts": "2026-11-22T10:13:08Z",
@@ -2641,51 +2680,6 @@
       "base_commit": "e10cb11daafd55d25c34114670729863f42ca602",
       "branch": "main",
       "frame": "03ha5ttll0uxcnnloiac58swn"
-    },
-    {
-      "id": "a83da432-885c-4a91-b96e-672439e61313",
-      "ts": "2026-11-22T07:34:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-sva-terraform",
-      "action": "amended: earlier turn named 136c4058; the commit was rewritten to 57b657ec after prose fixed curly quotes. Packet content unchanged | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/sva-terraform"
-      ],
-      "files": [],
-      "base_commit": "57b657ec9fe901bb4d2fef3f67df2d4a5fe88c86",
-      "branch": "main",
-      "frame": "03ha5tm65yzfmsomq4ytsplt8"
-    },
-    {
-      "id": "0abae706-5e1d-49ab-8d00-e0867039895a",
-      "ts": "2026-11-22T07:33:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-sva-terraform",
-      "action": "landed: SVA Terraform packet (JD, 2-page CV, 1-page letter, rexx form sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/sva-terraform"
-      ],
-      "files": [],
-      "base_commit": "136c40586e83d801ba88e9f5dd8ddd96e40a5145",
-      "branch": "main",
-      "frame": "03ha5tfgr4anladp28u5ajqdf"
-    },
-    {
-      "id": "5e4a4dd5-c9e4-47c9-8edb-fbbb5d97b7ec",
-      "ts": "2026-11-22T07:33:15Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-stackit-k8s",
-      "action": "landed: STACKIT GT4121 Senior Kubernetes Engineer packet in submissions/stackit-k8s. Sentinel JD from the live EN page (data-job-id GT4121; DE route 404). German CV 2pp, letter 1pp, ask 85k. Letter states no prod K8s admin, no Go operators/CRDs, no Gardener/CAPI/GitOps and drops K8s from the CV skills. Portal: RocketApply. Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/stackit-k8s"
-      ],
-      "base_commit": "9738979c776ecf9abd50a9858908a9b5ee9eafb2",
-      "branch": "main",
-      "frame": "03ha5tes7rm2168m6p9rxxxk8"
     }
   ]
 }

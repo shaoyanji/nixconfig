@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
 #set page(paper: "a4", margin: (top: 1.5cm, bottom: 1.5cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
-#set par(leading: 0.58em, justify: true)
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 11pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set par(leading: 0.66em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
@@ -48,6 +48,7 @@
   "Netz und Zugang im Code: nftables, WireGuard ohne öffentlichen Listener, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten",
   "Infrastruktur als Beschreibung, nicht als Handarbeit: gepinnte Eingaben, Prüfung vor dem Rollout, erzeugte Dokumentation",
   "Werkzeuge in Python, Go und Shell für Rollout, Auswertung, Berichte und Alarmwege",
+  "Auf einem Host läuft ein node_exporter auf Port 9100, erreichbar im Tailnet; seine Standardmetriken ergänzen dort das eigene Ledger",
 ))
 #entry("O3 Energy — Asset Manager", "2016 – 2020", (
   "Kaufmännische Betreuung von 10 MW Solarleistung und Verantwortung für Software und IT des Unternehmens",
@@ -63,6 +64,11 @@
   "Ein Host registriert sich einmal als Feature-Liste; Prüfungen, Aufgabenmenü und Dokumentation entstehen aus demselben Graphen",
   "Trennung von Zustand und Auswertung: der Bestand beschreibt, das Ledger beobachtet, die Auswertung entscheidet",
   "Veröffentlichen, Ausrollen und Rückrollen sind Aufgaben, keine Eingriffe auf dem Host",
+))
+#entry("Sentinel-Ledger — Vorlaufgrößen statt Ausfallmeldungen", "seit 2023", (
+  "Je Host ein Datensatz alle fünfzehn Minuten: Jobstatus, Alter der laufenden Generation, Plattenplatz, Speicher- und Prozessdruck",
+  "Gelesen wird der Verlauf, nicht der Augenblick — die Auswertung in Python und Go beobachtet Wachstum, nicht nur das Überschreiten einer Grenze",
+  "Prüfungen von außen ergänzen die Innensicht, damit ein Host sich nicht selbst die Erreichbarkeit bescheinigt",
 ))
 
 #section("Arbeitsweise")
@@ -81,5 +87,5 @@
 #text(weight: "bold")[Telemetrie] — Ledger mit Zeitstempel, Gatus-Prüfungen, Go-Alarmbrücke mit Zustellbestätigung, Vorlaufgrößen statt Ausfallmeldungen \
 #text(weight: "bold")[Automatisierung] — Nix-Flakes als Infrastructure as Code, Gates, Aufgaben, erzeugte Dokumentation; Python, Go, Shell \
 #text(weight: "bold")[Sicherheit] — eigene Zertifizierungsstelle, kurzlebige Zertifikate, sops und age je Host, nftables \
-#text(weight: "bold")[Nicht vorhanden] — Prometheus und PromQL, Grafana, Loki und LogQL, AlertManager-Routing, Kubernetes-Monitoring, YAML-Konfiguration im großen Stil, Terraform, Ansible, OpenTelemetry \
+#text(weight: "bold")[Nicht vorhanden] — Prometheus und PromQL, node_exporter, Prometheus-Federation und Remote Write, Grafana Mimir und Multi-Tenant-Betrieb im Cluster-Maßstab, Grafana, Loki und LogQL, AlertManager-Routing, Kubernetes-Monitoring, YAML-Konfiguration im großen Stil, Terraform, Ansible, OpenTelemetry \
 #text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · Niederlassungserlaubnis · Karlsruhe in rund eineinhalb Stunden erreichbar

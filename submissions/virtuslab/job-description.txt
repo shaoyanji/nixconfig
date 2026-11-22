@@ -1,0 +1,79 @@
+Linux Hacker & Nix Wizard (Senior / Expert) — VirtusLab, Tooling Space
+Location: Poland (board lists the role under Poland); B2B form, brief states 175 PLN/h
+Source: join.vl.team posting, fetched 22.11.2026 (HTTP 200)
+Apply: https://join.vl.team/o/linux-hacker-nix-wizard-senior-expert
+
+Linux Hacker & Nix Wizard
+Details:
+Linux Hacker & Nix Wizard (Senior / Expert)
+Required skills:
+Linux Core or Low-Level Linux Kernel Internals -
+Advanced
+Nix
+- Advanced / Regular
+Python Programming-
+Expert
+English Communication: C1
+- Advanced
+System Architecture & Automation -
+Advanced
+Self-driven & Problem Solving -
+Advanced
+Desired professional profile & core competencies:
+Deep, hacker-level understanding of Linux internals, memory management, IPC, and system calls.
+Expert-level mastery of Python (performance optimisation, async execution, C/Rust interop).
+Hands-on expertise with Nix / NixOS or strong mastery of declarative system configuration & reproducible builds.
+Advanced experience with low-level kernel diagnostics and profiling (eBPF, perf, strace, valgrind).
+Fluent command of spoken and written English.
+Uncompromising ownership, analytical rigour, and a natural instinct for deep technical problem-solving.
+Apply
+Share job
+My information
+Fill out the information below
+Full name
+Email address
+Phone number
+Poland
+Poland
+CV or resume
+Upload your CV or resume file
+Upload a file
+or drag and drop here
+Upload a file or drag and drop here
+Accepted files: PDF, DOC, DOCX, JPEG and PNG up to 50MB.
+Questions
+Please fill in additional questions
+Are you interested in specific tech stack/domain/project? Let us know!
+If you would like to add something?
+Legal Agreements
+Current recruitment process: For the purpose of recruitment, I hereby give consent as per art. 6.1.a of the GDPR to processing of my personal data (other than that listed in art. 22 [1] § 1 Labour Code) by Virtus Lab Sp. z o. o. (as Co-Controller for a full list of joint controllers, see Privacy Policy) with its headquarters at Szlak 49 Street, 31-153 Cracow. At the same time I accept the
+Privacy Policy
+of the Data Controller. I acknowledge that my personal data will be kept for the duration of the recruitment process and as regards any potential claims, for the period of 36 months maximum, and that I have the right to access this data or have it rectified or deleted on demand. This consent can be withdrawn at any time, but this withdrawal does not make the previous processing illegal*.
+Future recruitment processes: I hereby give consent as per art. 6.1.a of the GDPR to the processing of my personal data by Virtus Lab Sp. z o. o. (as Co-Controller for a full list of joint controllers, see Privacy Policy) with its headquarters at Szlak 49 Street, 31-153 Cracow, in order to use this data in future recruitment processes. I hereby agree to possible storage of my personal data for this purpose in Virtus Lab’s database for a period of 36 months maximum. At the same time I accept the
+Privacy Policy
+of the Data Controller. I acknowledge that I have the right to access this data or have it rectified or deleted on demand. This consent can be withdrawn at any point, but this does not make the previous processing illegal*.
+All fields marked with
+are required.
+Send
+All done!
+Your application has been successfully submitted!
+Other jobs
+You've already applied for this job
+Thank you for your interest - we've already received your application, so this new submission can't be accepted. Your previous application is on file.
+
+
+[Packet cross-check, 22.11.2026]
+Required: Linux core or low-level kernel internals (advanced); Nix (advanced/regular); Python
+(expert); English C1; system architecture and automation; self-driven problem solving.
+Desired: hacker-level Linux internals (memory management, IPC, syscalls); expert Python including
+performance work, async and C/Rust interop; NixOS or declarative configuration and reproducible
+builds; kernel diagnostics and profiling with eBPF, perf, strace, valgrind.
+Evidence held: one flake describing 13 hosts, services and user roles; module per service and a
+feature list per host; pinned inputs and reproducible builds; a gate that checks modules and
+assertions before rollout; rollback by generation; systemd, cgroups, namespaces, PSI and disk
+pressure as daily instruments; nftables, WireGuard, own SSH CA, sops/age; Python and Go tooling;
+public repository with 1,178 tracked files and a docs pipeline.
+Not held: kernel internals or patching, eBPF programs, perf or valgrind profiling, C/Rust interop
+in production, Python at the performance-engineering level the posting describes.
+Fit 4, not the briefed 5: the Nix half is the strongest evidence in the whole pipeline, the kernel
+half is absent and it is listed first among the required skills.

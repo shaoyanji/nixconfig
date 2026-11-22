@@ -1,0 +1,316 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 3878,
+    "terms": [
+      {
+        "term": "data",
+        "weight": 23.137
+      },
+      {
+        "term": "aws",
+        "weight": 14.67
+      },
+      {
+        "term": "kubernetes",
+        "weight": 14.67
+      },
+      {
+        "term": "streaming",
+        "weight": 14.67
+      },
+      {
+        "term": "mobility",
+        "weight": 13.019
+      },
+      {
+        "term": "engineering",
+        "weight": 11.866
+      },
+      {
+        "term": "analysts",
+        "weight": 10.985
+      },
+      {
+        "term": "cloud",
+        "weight": 8.664
+      },
+      {
+        "term": "even",
+        "weight": 8.664
+      },
+      {
+        "term": "events",
+        "weight": 8.664
+      },
+      {
+        "term": "network",
+        "weight": 8.664
+      },
+      {
+        "term": "networking",
+        "weight": 8.664
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "kev-time",
+        "score": 6.0022
+      },
+      {
+        "name": "fibtransponder",
+        "score": 4.3661
+      },
+      {
+        "name": "bountystash",
+        "score": 4.0019
+      },
+      {
+        "name": "kelly-svg",
+        "score": 1.2538
+      },
+      {
+        "name": "matt.bountystash.com",
+        "score": 0.7389
+      },
+      {
+        "name": "Postgraduate Renewable Energy",
+        "score": 0.0
+      }
+    ],
+    "kept": [
+      "Risk Calculation Engine (Swirl Engine)",
+      "Master's Thesis",
+      "nixconfig",
+      "Vulnerability operations concept"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web Development",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Database",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programming Languages",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "portfolio"
+        },
+        {
+          "score": 0.0,
+          "text": "due diligence"
+        }
+      ],
+      "kept": 6,
+      "name": "Energy & Risk",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Security",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 2.9063,
+          "text": "Built risk-adjusted PPA trading models for energy companies"
+        },
+        {
+          "score": 2.3956,
+          "text": "Developed a Fibonacci binary tree algorithm for computational scientists"
+        },
+        {
+          "score": 2.2197,
+          "text": "Risk-managed gas storage and gas swing trading models as risk manager for EWE Trading"
+        },
+        {
+          "score": 1.3099,
+          "text": "Built an immutable web templating language that is invulnerable to scripting attacks"
+        },
+        {
+          "score": 1.3099,
+          "text": "Architected a covered-call hedging strategy for client portfolios"
+        },
+        {
+          "score": 0.0,
+          "text": "Built an algorithm for options trading and hedging on weather derivatives"
+        },
+        {
+          "score": 0.0,
+          "text": "Advised clients and acted as in-house Risk Manager for a top German energy trader"
+        },
+        {
+          "score": 0.0,
+          "text": "Built apps for clients holding land portfolios valued above USD 300M"
+        },
+        {
+          "score": 0.0,
+          "text": "Developed an LLM-based knowledge base for consulting work"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 10
+    },
+    {
+      "dropped": [
+        {
+          "score": 6.0545,
+          "text": "Managed an international team and built an incentive structure tied to a real-time financial model"
+        },
+        {
+          "score": 4.9209,
+          "text": "Designed a mobile app for enterprise employees hunting new project opportunities"
+        },
+        {
+          "score": 4.2163,
+          "text": "Built financial models and managed 10 MW of solar PV power plants"
+        },
+        {
+          "score": 0.0,
+          "text": "Headed asset management of a USD 100M+ portfolio"
+        },
+        {
+          "score": 0.0,
+          "text": "Scoped and ran due diligence on O&M projects as cover for project managers"
+        },
+        {
+          "score": 0.0,
+          "text": "Documented and managed software and IT administration for the company and its subsidiaries"
+        },
+        {
+          "score": 0.0,
+          "text": "Worked with clients, banks and deal brokers on a dozen USD 4-5M projects"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Ran customer service and support for clients"
+        },
+        {
+          "score": 0.0,
+          "text": "Devised sustainability sales and marketing strategies"
+        },
+        {
+          "score": 0.0,
+          "text": "Advised clients on cybersecurity software and risk management"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 3.1343,
+          "text": "Conducted research on heliostat imperfections using interferometry"
+        },
+        {
+          "score": 2.6489,
+          "text": "Wrote C++ application software that interfaces with lab equipment"
+        },
+        {
+          "score": 0.0,
+          "text": "Verified geometry matrices in Mathematica"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 11.5753,
+          "text": "Built new Excel spreadsheets for the engineering department"
+        },
+        {
+          "score": 5.5776,
+          "text": "Led safety training for crew members"
+        },
+        {
+          "score": 0.9911,
+          "text": "Managed two frac crews carrying USD 3M+ of work per week"
+        },
+        {
+          "score": 0.0,
+          "text": "Worked twelve-hour shifts in the field"
+        },
+        {
+          "score": 0.0,
+          "text": "Troubleshot chemicals and equipment on site"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

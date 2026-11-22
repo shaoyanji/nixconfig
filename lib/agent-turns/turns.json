@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-22T04:29:52Z",
+  "generated": "2026-11-22T04:46:42Z",
   "count": 200,
-  "pin": "03c9b46cb19864e8abbe44800944fb596915ee086481f839c7ab2cc600412119",
+  "pin": "f0671bbc409de7a1ff361d5ccddafd1759759f94b1fbd866a68b2fd24930f6fb",
   "turns": [
+    {
+      "id": "5f7e689c-9205-4840-a57a-849ae9efb039",
+      "ts": "2026-11-22T04:44:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-flix-data-platform-packet",
+      "action": "landed: drove freebuff pane to build the Flix Data Platform Engineer packet (submissions/flix-data-platform-engineer, Greenhouse 8690650002); routed via jev-decide (flix-data-platform-engineer, duel margin 0.32)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
+      "branch": "main",
+      "frame": "03ha4wi6o4eboxmib3qpg2917"
+    },
+    {
+      "id": "53b43994-33b5-48dc-af72-2d8e57f0feaf",
+      "ts": "2026-11-22T04:40:31Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "done: STACKIT (Senior) Cloud Developer GT4863 emailed to recruiting@mail.schwarz (SAP UI5 form resisted); testo cockpit confirmed; pipeline: 205 applied/4 contacted/3 screening — Materna awaiting scheduling is warmest",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
+      "branch": "main",
+      "frame": "03ha4vo3q44gidd1fxwmr0xpf"
+    },
+    {
+      "id": "dbbbb73d-6268-4453-a75b-1deb4e503066",
+      "ts": "2026-11-22T04:36:37Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "done: testo account confirmed (cockpit access live); drained: RWE (US-only OT reqs), Schwarz IT (no infra roles), SUSE (Workday bot-wall), ScorePlay mailed. ~203 apps",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
+      "branch": "main",
+      "frame": "03ha4uwnqpjox0v8sshl4detk"
+    },
+    {
+      "id": "a280cfa8-9a11-4737-863a-a05450fac7e2",
+      "ts": "2026-11-22T04:31:39Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: ScorePlay SRE (remote, emailed marketing@ after Ashby submit hung 3x); Amprion SF profile completion noted; testo account-confirm mail received",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
+      "branch": "main",
+      "frame": "03ha4txnzldh33shhdqe1atgd"
+    },
+    {
+      "id": "1646b146-20ab-4c39-a19d-cb804280947f",
+      "ts": "2026-11-22T04:30:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-scoreplay-submit",
+      "action": "blocked: ScorePlay Ashby submit not possible from this pane - reCAPTCHA token stays empty and 'Submit Application' is disabled; click refused, no confirmation, empty form on reload, no Ashby mail, so nothing was sent. Payload in submissions/scoreplay/ashby-submission-payload.md; pipeline says payload prepared, NOT submitted",
+      "outcome": "blocked: reCAPTCHA gates Ashby submit",
+      "claims": [],
+      "files": [
+        "submissions/scoreplay"
+      ],
+      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
+      "branch": "main",
+      "frame": "03ha4tm94bhotz42ubc89z01r"
+    },
     {
       "id": "2ad124b3-2902-4b5d-b7fe-ca4db4654dfe",
       "ts": "2026-11-22T04:25:30Z",
@@ -2699,79 +2766,6 @@
       "base_commit": "484d45584dd1550f7a0825d03c54b44d568c922b",
       "branch": "main",
       "frame": "03h9x74mep3vjyut33gbexgx2"
-    },
-    {
-      "id": "cc54468d-10d5-49b0-81ef-33a9bf96cfc5",
-      "ts": "2026-11-21T04:51:18Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-site-ats",
-      "action": "landed: ats_autoats (ATS quality check + autoATS edits on cv.typ/lebenslauf.typ; PRIORITY high, freebuff tab 1)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "484d45584dd1550f7a0825d03c54b44d568c922b",
-      "branch": "main",
-      "frame": "03h9x74m3wul3hzuyvm8naxas"
-    },
-    {
-      "id": "8a85abf2-7d33-461c-90dc-a66080f10149",
-      "ts": "2026-11-21T04:50:45Z",
-      "source": "devin",
-      "subject": "fleet-remote:tier2",
-      "action": "claim: tier-2 capabilities (clipboard-get/set, screenshot) behind per-capability grants, branch devin/tier2-device-capabilities",
-      "outcome": "in_progress",
-      "claims": [
-        "app/src/main/java/dev/shaoyanji/fleetremote/device",
-        "app/src/main/java/dev/shaoyanji/fleetremote/data/device",
-        "app/src/main/java/dev/shaoyanji/fleetremote/ui/device"
-      ],
-      "files": [],
-      "base_commit": "484d45584dd1550f7a0825d03c54b44d568c922b",
-      "branch": "main",
-      "frame": "03h9x74ltfj0sk94iait4uib4"
-    },
-    {
-      "id": "a7cd0567-ff1c-404f-b264-8d0e90d71c15",
-      "ts": "2026-11-21T04:43:22Z",
-      "source": "devin",
-      "subject": "nixconfig:mkjob-consolidation-review",
-      "action": "hardened: mkDaemon concatenates shared list-valued dependency edges instead of overwriting unitBase; paperless hands its after/pgTarget edge to the skeleton",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "lib/systemd-jobs.nix",
-        "modules/services/paperless-fork.nix",
-        "flake/nix-comments.nix"
-      ],
-      "base_commit": "484d45584dd1550f7a0825d03c54b44d568c922b",
-      "branch": "main",
-      "frame": "03h9x74lisqleun55yifmw5xk"
-    },
-    {
-      "id": "46137957-cb3b-4ba9-9c0f-8f54d37f8cb6",
-      "ts": "2026-11-21T04:43:01Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-site-gate",
-      "action": "landed: cv-site-gate task sent to default:1.1 freebuff pane — Verify the CV link gate works end-to-end",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fb5d1956f56277e62824cbd9748417c85a5e7945",
-      "branch": "main",
-      "frame": "03h9x74l7v0fvmamw19r4c34l"
-    },
-    {
-      "id": "d154da5e-82e5-4438-a4e9-753644749da8",
-      "ts": "2026-11-21T04:41:42Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-link-gate",
-      "action": "verified CV link gate end-to-end: force-rebuild of .#sites.matt-site logs both passes (4 required PDFs, 81 links/15 pages, 16 download anchors, 0 broken); independent walk matched; 3 mutations of the real artifact each fail rc=1 (no download, deleted CV, dead target); fixture 16/16; nothing to fix | gate: task site:links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fb5d1956f56277e62824cbd9748417c85a5e7945",
-      "branch": "main",
-      "frame": "03h9x74kxj5qng4o4jsm4ymub"
     }
   ]
 }

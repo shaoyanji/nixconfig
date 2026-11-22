@@ -1,0 +1,79 @@
+We’re looking for a Data Platform Engineer (m/f/d) to join our team and help build and operate the data infrastructure that powers Flix’s mobility platform.
+
+At FlixTech, our data platform enables teams across the company to process, analyze, and act on large volumes of mobility data. The platform supports critical use cases such as network planning, pricing, operations, and business analytics. You will work on scalable infrastructure that processes millions of daily events and ensures reliable data availability across the organization.
+
+You’ll be part of a cross-functional engineering environment collaborating with data analysts, data scientists, and platform engineers. The role focuses on building reliable, scalable data systems and enabling other teams to work efficiently with data.
+
+About the Role
+
+Design, build, and maintain scalable data infrastructure running on AWS and Kubernetes
+
+Develop and operate streaming and data platform components using technologies such as Kafka and Snowflake
+
+Implement monitoring, alerting, and operational tooling to ensure platform reliability and performance
+
+Own features end-to-end, including development, testing, deployment, monitoring, and maintenance
+
+Build and maintain Infrastructure as Code using Terraform and GitLab CI/CD
+
+Collaborate with data analysts, data scientists, and stakeholders to support data platform use cases
+
+Contribute to improving platform reliability, automation, and engineering practices
+
+Participate in on-call rotations to support the stability of the data platform
+
+About You
+
+3+ years of experience building or operating data infrastructure or data platforms
+
+Hands-on experience with streaming technologies such as Kafka and data warehouses like Snowflake
+
+Experience with Infrastructure as Code tools (e.g., Terraform) and CI/CD pipelines (e.g., GitLab)
+
+Practical experience with cloud platforms (preferably AWS) and container platforms such as Kubernetes
+
+Experience with monitoring and observability tools (e.g., Datadog or similar)
+
+Solid programming skills in Python and interest in writing clean, maintainable code
+
+Strong collaboration and communication skills when working with technical and business stakeholders
+
+Fluent in English
+
+Nice to have:
+
+Experience with advanced SQL or data transformation tools (e.g., dbt)
+
+Experience with data processing frameworks (e.g., PySpark)
+
+Knowledge of security and networking concepts relevant for data platforms
+
+ 
+
+We recognize that everyone carries a unique set of valuable skills and experiences. If you think you could have an impact even though you don't meet 100% of the requirements, we still encourage you to apply. We want to hear from you!  
+
+What We Offer
+
+Travel perks: 12 free Flix vouchers + 12 discount vouchers for friends & family. 
+
+Work from (M)Anywhere: Depending on your role, work from another location for up to 60 days per year. 
+
+Hybrid work model: We are an office-first company, but we offer flexibility to balance work and life. 
+
+Wellbeing support: Access confidential 1:1 counselling, courses, and stress management for yourself and up to four family members. 
+
+Learning & Development: Take advantage of language classes, training courses, and expert-led sessions to grow your skills. 
+
+Mentoring Program: Connect with experienced colleagues to gain insights and accelerate your career. 
+
+To view more local benefits specific to each office location, please check out this link: Locations - Flix Career
+
+Why Join Flix?
+
+At Flix, you’ll find teams that rally together to overcome challenges and spark creativity. We believe in ownership culture - giving you the freedom to take initiative, make an impact, and shape your own career path.
+As we continue to expand across the globe, you can make a real difference in how we work.
+
+If you’re ready to grow and lead your journey, Flix is the place for you! 
+
+ 
+

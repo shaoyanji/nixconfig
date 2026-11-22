@@ -51,7 +51,7 @@ floor only from €95,000 upward**; the bottom €5,000 of their range is below 
 
 Read that as: apply, target €103,000–110,000 on the strength of the builder brief
 and 6+ years' equivalent, and do not volunteer a number first. The second-platform-hire
-scope and a one-person team are leverage, not a discount. Ask separately how the
+scope and a one-person team justify the top of the band, not a discount. Ask separately how the
 €150,000 equity value is struck (instrument, vesting, refresh), because a
 "cash value" figure is a valuation, not an offer of cash.
 

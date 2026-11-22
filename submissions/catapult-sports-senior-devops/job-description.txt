@@ -1,0 +1,59 @@
+# Source: Arbeitnow API, fetched 2026-11-22
+
+Catapult Sports — Senior DevOps Engineer
+Location: Cologne, North Rhine-Westphalia, Germany | remote=False
+URL: https://www.arbeitnow.com/jobs/companies/catapult-sports/senior-devops-engineer-cologne-457952
+
+SENIOR DEVOPS ENGINEER
+Catapult is building the future of sports performance technology, with a mission to 
+Unleash the Potential
+ of every athlete and team on earth. We don't just work in the sporting industry; we are actively changing it.  Since 2006, our solutions have been leading the way in sports performance software, science, and data, in a world where 1% can literally mean the difference between winning and losing.
+We work with over 5,000+ teams around the world, empowering coaches, managers and trainers in premier teams in the NFL, NBA, NHL, MLS, EPL, AFL, NRL, NCAA and more. We provide the information they need to optimize athletes' health, game-day readiness, and performance, as well as in-game tactics.  
+Catapult is a sports technology company that empowers professional teams to make data-driven decisions. We deliver health, performance, video, and AI insights from the locker room to competitive environments, ensuring every decision is an opportunity to gain an advantage, sharpen performance, and build lasting success. 
+WE WANT PEOPLE WHO ARE PASSIONATE ABOUT SOLVING HARD PROBLEMS
+We are looking for a 
+Senior DevOps Engineer
+ to help build, operate and improve the infrastructure, platforms and tools that enable our teams to develop, deliver and run reliable software at scale.
+Based in Cologne, you will join a team with broad ownership of our technical environment. We take a cloud-agnostic approach, combining cloud services and self-hosted infrastructure to meet the needs of our products and engineering teams. Our responsibilities span the full lifecycle, from provisioning and deployment to observability, security and ongoing operation.
+You will combine infrastructure expertise with automation and software engineering to improve how our software is built, deployed and operated. This includes streamlining development workflows, integrating and maintaining shared tools, and supporting demanding workloads across data processing, media and machine learning. Working closely with engineering teams and colleagues across the business, you will build practical solutions that support our expanding product portfolio.
+This role is ideal for someone who enjoys solving a wide range of technical problems, takes ownership from initial idea through to production, and thrives in a fast-growing environment where priorities and requirements evolve quickly. You will help shape how our infrastructure, platforms and tools adapt as the business grows.
+WHAT YOU'LL DO 
+Design, operate, and continuously improve our Kubernetes platform across both self-hosted clusters and AWS
+Own our infrastructure as code using Terraform and Ansible, driving a GitOps workflow to ensure all changes are versioned, reviewed, and reproducible
+Build and maintain robust CI/CD pipelines (GitLab CI) and shared templates that empower product teams to build, test, and deploy reliably
+Operate and scale specialized infrastructure for demanding workloads, including GPU clusters for computer vision models, media engines, and data analytics platforms 
+Evolve our observability stack to proactively monitor system health, define meaningful alerting, and ensure high availability
+Drive platform security and compliance through continuous vulnerability scanning, automated image screening, robust secrets management, and strict access controls
+Collaborate closely with software engineers, data scientists, and product teams to design scalable architectures and act as a strategic technical partner for new infrastructure initiatives 
+Help define technical direction, engineering best practices, and quality standards within the infrastructure domain 
+WHAT YOU'LL NEED
+5+ years of professional experience in DevOps, Site Reliability Engineering, or Platform Engineering, with a proven track record of designing and scaling highly available production environments 
+Strong hands-on experience running Kubernetes in production, including upgrades, networking and troubleshooting
+Solid understanding of cloud infrastructure (AWS) combined with experience operating bare-metal or self-hosted environments
+Proven experience with Infrastructure as Code (Terraform, Ansible) and modern container build or GitOps workflows
+Strong problem-solving skills and the ability to evaluate technical trade-offs between reliability, scalability, and maintainability
+Experience collaborating across engineering and product teams to deliver secure and robust infrastructure solutions
+Deep understanding of Linux operating systems and strong programming or scripting skills (e.g., Python, Go, or Bash) focused on automation and tooling. 
+Nice to have – and what would make you exceptional:
+Experience operating GPU workloads on Kubernetes or Machine Learning infrastructure
+Familiarity with specialized Kubernetes ecosystem tools such as FluxCD, Rancher, or RKE2.
+Experience working with large-scale video/streaming workflows or AWS media services
+Experience managing and scaling messaging or event-streaming systems (e.g., Kafka) 
+Experience operating and optimizing relational databases (e.g., PostgreSQL) 
+Experience building internal developer platforms or self-service tooling for engineering teams
+WHAT YOUR SUCCESS WILL LOOK LIKE
+In 6 months time… You know our clusters and pipelines, handle incidents and upgrades on your own, and have shipped your first improvements to reliability, automation or security. You contribute confidently to architecture discussions.
+In 12 months time… You own major parts of the platform, have delivered measurable improvements (faster deployments, better observability, stronger security), and help shape the roadmap of our hybrid cloud.
+WHY CATAPULT? 
+We have amazing people. We promise you'll work with some of the most ambitious,  intelligent people in an exciting industry, and do some of the best work of your life.
+We encourage our people to engage in constructive, open, and honest communication to make Catapult extraordinary. 
+We work in a collaborative yet challenging environment to consistently improve our performance, which in turn impacts our customers' performance.
+Our workforce spans more than 20 countries. You'll have the opportunity to work with people from multiple nationalities and cultures, and to build your global awareness.  
+We value improvement and development. We are challenging ourselves to continuously grow and become a high-performance company. That means we maintain a growth mindset in everything we do, and our people are always looking for ways to improve.  There is an unlimited opportunity to grow, do more, and do better.
+Whether you're interested in sports or not, you'll have the satisfaction of knowing your work is supporting some of the most successful teams and athletes on the planet! 
+Research shows that while men apply for jobs when they meet an average of 60% of the criteria, women and other marginalized groups tend only to apply when they check every box. So if you have what it takes, but don't meet every single point in our job ad, please still get in touch! We would love to have a chat and see if you could be a great addition to our team. We are building the future of sports performance. Our priority is to find the brightest talent who can add to our team culture, actively contribute, and be excited about what they do.
+All offers of employment are subject to Catapult's positive prehire check. To find out more, please contact the Talent Partner for this role.
+ 
+Find 
+Jobs in Germany
+ on Arbeitnow

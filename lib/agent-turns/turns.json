@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T08:37:02Z",
+  "generated": "2026-11-22T08:40:53Z",
   "count": 200,
-  "pin": "30a14cea77153e80ab0598044eb5dd4c1037407a6a06968f0621f827abed4e72",
+  "pin": "6e6fbdfc5f278abc72a067f9375389d0e9af2af8e26d3301f7aa2ab9d326fbc1",
   "turns": [
+    {
+      "id": "e1a1944e-be6f-4d2a-93d1-41b400209a39",
+      "ts": "2026-11-22T08:39:45Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: flix-devops-cloud-infrastructure Greenhouse embed submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "adcaa638cec91b5f89fe8f6e1650e4367f796f93",
+      "branch": "main",
+      "frame": "03ha66ehxoyl2zuwwngzzp8ok"
+    },
+    {
+      "id": "7456caae-311c-4c37-9c56-0a720f01736f",
+      "ts": "2026-11-22T08:38:22Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: fau-sysadmin packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "497d090c28a77f5b35032575eb8000852c41e6e6",
+      "branch": "main",
+      "frame": "03ha664nbxivz5jx2a4fz6x0b"
+    },
+    {
+      "id": "62cb5c3f-7ca2-49af-9468-85f966cfd882",
+      "ts": "2026-11-22T08:37:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "scouted: shopware-cloud-infra packet + truetalent-freiburg lead | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "adcaa638cec91b5f89fe8f6e1650e4367f796f93",
+      "branch": "main",
+      "frame": "03ha65vr29mncol09fqnudwc2"
+    },
+    {
+      "id": "0f0ef0e2-4385-497f-bd38-63d37186031f",
+      "ts": "2026-11-22T08:37:03Z",
+      "source": "devin",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "verified: command_allowlist (-e/-c script exec) already committed in 50eba9e1, consumed by hermes gateway run unit; pushed main 24853fc0..ca16ce70; elastic GH 8267186 applied | gate: git show HEAD + push rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
+      "branch": "main",
+      "frame": "03ha65veweac6xonqdfpf76hq"
+    },
     {
       "id": "ef71335d-5daf-41a3-a4bf-b82f3775238b",
       "ts": "2026-11-22T08:36:30Z",
@@ -2720,62 +2772,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha1l9qnq2q0b6mxxv9b1i7x"
-    },
-    {
-      "id": "bab8785f-77cc-45f7-a6bd-e094218dcd7d",
-      "ts": "2026-11-21T18:16:16Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-orchestrator-repair",
-      "action": "repaired: local pane-recovery skill no longer writes or reads a handoff; ~/.agents/skills/hermes-pane-context-restore rewritten to xs LIVE=1 + repo; handoff.done, backups/handoff-2026-11-21 and ~/.agents/handoffs quarantined; checks:hermes clean",
-      "outcome": "in_progress",
-      "claims": [
-        "~/.agents/skills/hermes-pane-context-restore"
-      ],
-      "files": [
-        "~/.agents/skills/hermes-pane-context-restore/SKILL.md"
-      ],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1hq0xq76pgsemks1037rc"
-    },
-    {
-      "id": "44b951ea-7800-4684-aa27-4dbdf17d31fd",
-      "ts": "2026-11-21T18:15:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-packet-nebius-devtools",
-      "action": "Staged Nebius Senior SRE (DevTools) packet in submissions/nebius-devtools: 2-page CV, 1-page letter, 4/4 projects, 14 live Greenhouse labels answered, ask EUR 130-160k.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha1hnei6wfc7v3bxct42g0f"
-    },
-    {
-      "id": "2dcb5b99-a535-4d3e-9033-d5ca3f2683bd",
-      "ts": "2026-11-21T18:15:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-packet-alexander-thamm",
-      "action": "Staged German Alexander Thamm Principal DevOps packet in submissions/alexander-thamm: 2-page German CV, 1-page German letter, 4/4 projects, joint.com form mapped as standard fields, ask EUR 95-120k.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha1hndfggaqkusnxrfrmcjq"
-    },
-    {
-      "id": "c498d7ad-f870-4620-bb43-fe081efb66de",
-      "ts": "2026-11-21T18:15:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-packet-publitas",
-      "action": "Staged Publitas Senior IT Operations Engineer packet in submissions/publitas: 2-page CV, 1-page letter, 4/4 projects, 9 live Recruitee labels answered including two custom questions, ask EUR 85-110k.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha1hnc9j61iudp0ig8vjaqo"
     }
   ]
 }

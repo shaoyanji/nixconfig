@@ -53,10 +53,10 @@ if asked.
 
 ---
 
-## 1. Jonas Chevalier — Numtide
+## 1. [NAME] — Numtide
 
 **Role to verify:** Founder and Director, Numtide.
-**Public contact:** [numtide.com/about](https://numtide.com/about) · [LinkedIn](https://www.linkedin.com/in/jonas-chevalier/) · [zimbatm.com](https://zimbatm.com/)
+**Public contact:** [numtide.com/about](https://numtide.com/about) · [REDACTED] · [REDACTED]
 **Company:** [numtide.com](https://numtide.com/) · [about](https://numtide.com/about) · [services](https://numtide.com/services/)
 
 ### Why him
@@ -91,7 +91,7 @@ workstream. If the bench is full, one line is enough.
 
 ### LinkedIn connection note
 
-> Hi Jonas — I run a 13-host NixOS fleet from one flake: pinned inputs, hermetic
+> Hi [NAME] — I run a 13-host NixOS fleet from one flake: pinned inputs, hermetic
 > builds, SOPS/age secrets, SSH CA, PXE installs. Numtide sells exactly that
 > senior delivery. I'm looking for B2B subcontract work from December. Open to a
 > 20-minute call?
@@ -101,7 +101,7 @@ workstream. If the bench is full, one line is enough.
 **Subject:** NixOS fleet delivery — subcontract capacity for Numtide
 
 ```text
-Hi Jonas,
+Hi [NAME],
 
 Numtide sells senior Nix capacity to teams that need a working fleet, not a
 proof of concept. I run one: thirteen NixOS hosts from a single flake,
@@ -127,7 +127,7 @@ https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
 **Follow-up, seven days later:**
 
 ```text
-Hi Jonas,
+Hi [NAME],
 
 One short follow-up to my note of {{DATE}}. The concrete offer is unchanged: a
 13-host NixOS fleet from one flake, hermetic builds, PXE installs and a CI gate,
@@ -143,10 +143,10 @@ Matt
 
 ---
 
-## 2. Domen Kožar — Cachix
+## 2. [NAME] — Cachix
 
 **Role to verify:** Founder, Cachix.
-**Public contact:** [cachix.org/about](https://www.cachix.org/about) · [LinkedIn](https://www.linkedin.com/in/domen-ko%C5%BEar-b753779) · [domenkozar.com](https://domenkozar.com/about)
+**Public contact:** [cachix.org/about](https://www.cachix.org/about) · [REDACTED] · [REDACTED]
 **Company:** [cachix.org](https://cachix.org/) · [about](https://www.cachix.org/about) · [Cachix Deploy GA](https://blog.cachix.org/)
 
 ### Why him
@@ -155,7 +155,7 @@ Cachix sells the consequence of hermetic builds: never build the same thing
 twice. The product surface now spans binary caches, Devenv developer
 environments and Cachix Deploy, which reached general availability in January
 2026 and lets agents pull profiles from a cache without evaluating or building
-on the target. Domen's public work also includes `secretspec`, a declarative
+on the target. [NAME]'s public work also includes `secretspec`, a declarative
 interface for secret providers — adjacent to the secrets problem Matt solves
 with SOPS/age and a short-lived SSH CA. The first cache push is easy; the hard
 part is making cache hits trustworthy across CI, development and deployment,
@@ -181,7 +181,7 @@ handles this entirely in-house, ask for a pointer to the right person and stop.
 
 ### LinkedIn connection note
 
-> Hi Domen — I run a 13-host NixOS fleet with pinned flakes, hermetic builds and
+> Hi [NAME] — I run a 13-host NixOS fleet with pinned flakes, hermetic builds and
 > a CI gate; Cachix is the economic layer for that. I'd like to compare notes on
 > cache/Deploy adoption and whether you use contract capacity. Open to 20
 > minutes?
@@ -191,7 +191,7 @@ handles this entirely in-house, ask for a pointer to the right person and stop.
 **Subject:** Cachix Deploy adoption — contract capacity?
 
 ```text
-Hi Domen,
+Hi [NAME],
 
 Cachix sells the consequence of hermetic builds: never build the same thing
 twice. The hard part for a customer is not the first cache push; it is trusting
@@ -217,7 +217,7 @@ https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
 **Follow-up, seven days later:**
 
 ```text
-Hi Domen,
+Hi [NAME],
 
 One short follow-up to my note of {{DATE}}. Cachix Deploy's pull-from-cache
 model is the pattern I already run by hand on a 13-host NixOS fleet; the offer is
@@ -235,9 +235,9 @@ Matt
 
 ## 3. Cyberus Technology — engineering leadership
 
-**Primary contact:** Markus Partheymüller, Co-Founder; engineering/cloud
-leadership. [LinkedIn](https://de.linkedin.com/in/markus-partheymueller-a12b3b1a)
-**Secondary:** Werner Haas, CTO (verify current title before sending).
+**Primary contact:** [NAME], Co-Founder; engineering/cloud
+leadership. [REDACTED]
+**Secondary:** [NAME], CTO (verify current title before sending).
 **Company:** [cyberus-technology.de](https://www.cyberus-technology.de/) · [about](https://www.cyberus-technology.de/about-cyberus) · [Cyberus Linux](https://www.cyberus-technology.de/cyberus-linux)
 
 Use LinkedIn or the published contact form. Do not guess a personal email
@@ -272,13 +272,13 @@ accreditation, not the operating model.
 
 ### The ask
 
-A 30-minute technical conversation with Markus or the appropriate engineering
+A 30-minute technical conversation with [NAME] or the appropriate engineering
 lead. The offer is a B2B contract, not a job application. If the NixOS platform
 is already fully covered, ask for a pointer and stop.
 
 ### LinkedIn connection note
 
-> Hi Markus — Cyberus's reproducible, NixOS-supported stack is the layer I work
+> Hi [NAME] — Cyberus's reproducible, NixOS-supported stack is the layer I work
 > in: 13 NixOS hosts, one flake, hermetic builds, SOPS/age, SSH CA. I'm
 > Germany-based and available for B2B platform work. Open to 30 minutes?
 
@@ -287,7 +287,7 @@ is already fully covered, ask for a pointer and stop.
 **Subject:** NixOS platform and reproducible builds for regulated environments
 
 ```text
-Dear Mr Partheymüller,
+Dear Mr [NAME],
 
 Cyberus describes modular, transparent and reproducible software, and offers
 long-term NixOS support. That is the layer I work in: thirteen NixOS hosts from
@@ -317,7 +317,7 @@ https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
 **Betreff:** NixOS-Plattform für regulierte Umgebungen — kurze Frage
 
 ```text
-Guten Tag Herr Partheymüller,
+Guten Tag Herr [NAME],
 
 Ihre Seite nennt modulare, transparente und reproduzierbare Software sowie
 langfristigen NixOS-Support. Genau dort arbeite ich: eine Flotte von 13
@@ -342,7 +342,7 @@ https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
 **Follow-up, seven days later (DE):**
 
 ```text
-Guten Tag Herr Partheymüller,
+Guten Tag Herr [NAME],
 
 kurze Nachfrage zu meiner Mail vom {{DATUM}}: Der Punkt ist unverändert — eine
 NixOS-Flotte aus einem Flake, hermetische Builds und ein nachvollziehbarer
@@ -364,9 +364,9 @@ Stagger the sends; do not blast all three on the same morning.
 
 | Order | Target | Channel | Subject / note | Timing |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | Jonas Chevalier, Numtide | Email, then LinkedIn | "NixOS fleet delivery — subcontract capacity for Numtide" | Tue or Wed, 08:00–09:00 CET |
-| 2 | Domen Kožar, Cachix | Email, then LinkedIn | "Cachix Deploy adoption — contract capacity?" | Two days later, same window |
-| 3 | Markus Partheymüller, Cyberus | LinkedIn or contact form; German email if address is published | "NixOS-Plattform für regulierte Umgebungen — kurze Frage" | Two days later, same window |
+| 1 | [NAME], Numtide | Email, then LinkedIn | "NixOS fleet delivery — subcontract capacity for Numtide" | Tue or Wed, 08:00–09:00 CET |
+| 2 | [NAME], Cachix | Email, then LinkedIn | "Cachix Deploy adoption — contract capacity?" | Two days later, same window |
+| 3 | [NAME], Cyberus | LinkedIn or contact form; German email if address is published | "NixOS-Plattform für regulierte Umgebungen — kurze Frage" | Two days later, same window |
 
 One follow-up only, in the same thread, seven days later. If there is no reply,
 stop. Do not add a second channel after the follow-up; the next touch is a

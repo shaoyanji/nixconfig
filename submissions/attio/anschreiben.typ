@@ -54,8 +54,7 @@ one that needs me. I also use AI heavily and check its output against requiremen
 which matters for a team building an AI-native architecture.
 
 Two practical notes. Your posting lists Germany as an eligible location, which is where I am: I have German permanent
-residence as a US citizen, so there is no sponsorship question and no relocation needed. And the published band of
-EUR 105,000 to 125,000 is workable, so we can spend the conversation on the platform rather than on the number.
+residence as a US citizen, so there is no sponsorship question and no relocation needed. And the published band is workable, so we can spend the conversation on the platform rather than on the number.
 
 I would enjoy hearing which part of the platform currently costs your engineers the most time: the path from code to
 production, the environment sprawl, or the on-call load.

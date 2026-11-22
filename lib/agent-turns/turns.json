@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T10:28:23Z",
+  "generated": "2026-11-22T10:28:46Z",
   "count": 200,
-  "pin": "5ac4d30b04f93583dfec79c76c0abbed4df00d1eecf449c9e30991f99cc7e943",
+  "pin": "3a71126b8f1ef7179b8e4d3c981c9d8bcf0a0f46bbdcdf07aa6807a7f700ac67",
   "turns": [
+    {
+      "id": "7465bf2a-35e4-499e-93aa-7bed9e77221c",
+      "ts": "2026-11-22T10:28:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:attio",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "132c58c5d82308bb11ae33d8707613392269e710",
+      "branch": "main",
+      "frame": "03ha6rmpe8al6ap1hpfdh7mfy"
+    },
     {
       "id": "c037b44d-43ff-4e3f-a1ff-3a4510914171",
       "ts": "2026-11-22T10:28:17Z",
@@ -2649,19 +2662,6 @@
       "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
       "branch": "main",
       "frame": "03ha5z0ed5xz04490j4ei5i7i"
-    },
-    {
-      "id": "57be7a10-ab07-4697-9b27-65afefa63190",
-      "ts": "2026-11-22T08:01:44Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-sinc",
-      "action": "landed: SINC DevOps packet, CV 2pp letter 1pp, sheet with BA/XING mapping and 80-88k ask | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1efbc93ef8e7956001c04dd0069b4d011ca1807c",
-      "branch": "main",
-      "frame": "03ha5yz1qkhv1d7ay8sqaxxuu"
     }
   ]
 }

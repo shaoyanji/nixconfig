@@ -77,7 +77,7 @@ Datadog/Splunk, no formal SLO and error-budget programme negotiated with several
 | Markers letter | `Platform team`, `Kubernetes`/`Terraform`/`GCP` (gaps), `Germany` |
 | `task checks:prose` | 252 prose files, exit 0 |
 | sha256 CV | `9d5f4837ebba0d948e71c47fcc0a8077003fa82abce93701b326e08ad99891b4` |
-| sha256 letter | `7ebc15fb0e466ff2c9f6eb707374b2639c03abacdfe140aedfa1b496437dd45b` |
+| sha256 letter | `5ef4d4f8ac24a7c4d8148ca95a548db1e2669423e1031143c4066fde4e0380ed` |
 | DB read-back | verified after upsert |
 
 ## Next steps

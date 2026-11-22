@@ -39,6 +39,11 @@
   };
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # kernel+driver pin via `nvidiaPkgs` (flake/module-sets.nix): bump with
+    # `nix flake update nixpkgs-nvidia`; pinned at the rev the fleet ran.
+    nixpkgs-nvidia.url = "github:NixOS/nixpkgs/e21fec321d73511849707a7585e4ea155ee4bf40";
+    # nginx 1.30.7 CVE pin while `nixpkgs` < fix (hosts/*/reverse-proxy.nix).
+    nixpkgs-nginx.url = "github:NixOS/nixpkgs/93a9ed0a866099a230ed5146a5bb7d16fd5c9b14";
     # No pinned nixpkgs: netbook followed `nixpkgs` from 2026-10-22, and what it
     # pins instead is the initrd implementation (`boot.initrd.systemd.enable =
     # false`) — the reason and the boot test are in

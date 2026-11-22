@@ -14,8 +14,8 @@
   # WAN tier is asked before the community/upstream ones. The overlap is empty by
   # construction anyway — `dev:nixcache:push` refuses to upload a path that
   # cachix or cache.nixos.org already has.
-  lanOrder = ["harmonia" "cachix" "edge" "nixos" "numtide" "nixCommunity" "nixGaming" "determinate"];
-  wanOrder = ["cachix" "edge" "nixos" "numtide" "nixCommunity" "determinate" "nixGaming"];
+  lanOrder = ["harmonia" "cachix" "edge" "nixos" "numtide" "nixosCuda" "nixCommunity" "nixGaming" "determinate"];
+  wanOrder = ["cachix" "edge" "nixos" "numtide" "nixosCuda" "nixCommunity" "determinate" "nixGaming"];
 
   # Two caches are declared by modules this tree imports, not by the list above:
   # nixpkgs' `nix` module appends cache.nixos.org with `mkAfter` on every host,

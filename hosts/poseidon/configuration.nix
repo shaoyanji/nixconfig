@@ -3,6 +3,7 @@
   pkgs,
   lib,
   user,
+  nvidiaPkgs,
   ...
 }: let
   obsConfig = {
@@ -28,7 +29,7 @@ in {
   ssh.ca.enableClient = true;
 
   boot = {
-    kernelPackages = lib.mkForce pkgs.linuxPackages;
+    kernelPackages = lib.mkForce nvidiaPkgs.linuxPackages;
     kernelModules = [];
   };
 

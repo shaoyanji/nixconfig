@@ -1,12 +1,10 @@
 {
   config,
   lib,
-  pkgs,
+  nvidiaPkgs,
   ...
 }: {
-  # Freeze to 6.12 LTS kernel to avoid constant out-of-tree legacy_580 rebuilds
-  # and upstream kernel API breakages on the Kepler dGPU.
-  boot.kernelPackages = pkgs.linuxPackages_6_12;
+  boot.kernelPackages = nvidiaPkgs.linuxPackages_6_12;
 
   # ares desktop case hosts a GTX 750 Ti (Kepler sm_30) dGPU on /dev/sda,
   # paired with an i5-6500 Skylake mainboard.  Mirrors
@@ -28,7 +26,6 @@
 
   nixpkgs.config = {
     nvidia.acceptLicense = true;
-    cudaSupport = true;
   };
 
   hardware.graphics = {

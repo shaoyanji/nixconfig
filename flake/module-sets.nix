@@ -38,6 +38,24 @@
         systemdJobs = import self.nixFiles.lib."systemd-jobs.nix" {inherit lib;};
       };
     }
+    # `nvidiaPkgs`/`nginxPkgs`: second pkgs sets, lazy via `_module.args`.
+    ({
+      pkgs,
+      config,
+      ...
+    }: {
+      _module.args.nvidiaPkgs = import inputs.nixpkgs-nvidia {
+        system = pkgs.stdenv.hostPlatform.system;
+        config = {
+          allowUnfree = true;
+          nvidia.acceptLicense = true;
+          cudaSupport = config.nixpkgs.config.cudaSupport or false;
+          # forward host waivers (schneeeule gtk2: hosts/schneeeule/nvidia.nix)
+          problems = config.nixpkgs.config.problems or {};
+        };
+      };
+      _module.args.nginxPkgs = inputs.nixpkgs-nginx.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+    })
     {
       options.fleet.inventory = lib.mkOption {
         type = lib.types.attrs;

@@ -2,12 +2,12 @@
 {
   config,
   lib,
-  pkgs,
+  nvidiaPkgs,
   ...
 }: {
   # Freeze to 6.12 LTS kernel to avoid constant out-of-tree legacy_580 rebuilds
   # and upstream kernel API breakages on the Maxwell dGPU.
-  boot.kernelPackages = pkgs.linuxPackages_6_12;
+  boot.kernelPackages = nvidiaPkgs.linuxPackages_6_12;
 
   services.xserver.videoDrivers = lib.mkForce ["modesetting" "nvidia"];
 

@@ -2,7 +2,7 @@
   self,
   config,
   lib,
-  pkgs,
+  nvidiaPkgs,
   ...
 }: {
   imports = [
@@ -15,7 +15,7 @@
   # nvidia-settings-470 pulls gtk2; nixpkgs marks it broken pending NixOS 27.05
   nixpkgs.config.problems.handlers."gtk+".broken = "warn";
 
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
+  boot.kernelPackages = lib.mkForce nvidiaPkgs.linuxPackages;
   hardware.nvidia = {
     open = false;
     package = config.boot.kernelPackages.nvidiaPackages.legacy_470;

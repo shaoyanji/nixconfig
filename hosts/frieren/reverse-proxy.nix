@@ -4,6 +4,7 @@
   lib,
   config,
   systemdJobs,
+  nginxPkgs,
   ...
 }: let
   # LAN wildcard TLS: private CA (modules/config/tls/frieren-lan-ca.pem,
@@ -299,6 +300,9 @@ in {
 
   services.nginx = {
     enable = true;
+    # 1.30.7 from the nixpkgs-nginx pin: CVE-2026-123007/123633 fix while the
+    # fleet nixpkgs holds — substitutes, never compiles.
+    package = nginxPkgs.nginx;
     recommendedOptimisation = true;
     recommendedProxySettings = true;
     clientMaxBodySize = "50000M"; # Support multi-gigabyte video uploads to Immich/Paperless

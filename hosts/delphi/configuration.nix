@@ -5,6 +5,7 @@
   config,
   lib,
   user,
+  nginxPkgs,
   ...
 }: let
   # The address the whole tailnet points its DNS at (see the route group below).
@@ -700,6 +701,9 @@ in {
 
   services.nginx = {
     enable = true;
+    # 1.30.7 from the nixpkgs-nginx pin: CVE-2026-123007/123633 fix while the
+    # fleet nixpkgs holds — substitutes, never compiles.
+    package = nginxPkgs.nginx;
     recommendedOptimisation = true;
     recommendedGzipSettings = true;
 

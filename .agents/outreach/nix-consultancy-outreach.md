@@ -1,11 +1,11 @@
 # Nix consultancy outreach
 
-**Status:** ready to send · **Prepared:** 2026-11-21 · **Sender:** Matt Ji
+**Status:** ready to send · **Prepared:** 2026-11-21 · **Sender:** [SENDER]
 **Offer:** B2B NixOS, reproducible-build and platform engineering
 **Availability:** from 01.12.2026 · 3–5 days/week · remote from Germany
 
 Each target gets one reason for the conversation, one proof point, one concrete
-piece of work Matt can take, and one cheap ask. **Contacts are not in this file:**
+piece of work [SENDER] can take, and one cheap ask. **Contacts are not in this file:**
 reach a target via their own site; `[NAME]`, `[CONTACT]`, `[PHONE]` in the pipeline.
 
 ## The position in one paragraph
@@ -46,7 +46,7 @@ Rates exclude VAT and expenses; travel is by agreement. Start with a paid
 retainer. Do not put a number in the first message; anchor after the scope is
 known.
 
-Matt is a US citizen with permanent German residence (Niederlassungserlaubnis),
+[SENDER] is a US citizen with permanent German residence (Niederlassungserlaubnis),
 works from Germany, and needs no sponsorship. English is native; German is C1.
 For a German client, lead in German and attach the English one-page profile only
 if asked.
@@ -64,14 +64,14 @@ if asked.
 Numtide is a small team of independent principal engineers selling senior Nix
 and DevOps delivery, including NixOS commercial support, migrations and custom
 tooling. Its public project list — `srvos`, `disko`, `nixos-anywhere`,
-`buildbot-nix`, `treefmt`, `direnv` — is the exact problem space Matt works in:
+`buildbot-nix`, `treefmt`, `direnv` — is the exact problem space [SENDER] works in:
 a fleet that has to be installed, declared, checked and handed over. It does not
 need another Nix tutorial; it needs delivery capacity that can join a client
-workstream and make a half-migrated fleet reproducible without a ramp. Matt has
+workstream and make a half-migrated fleet reproducible without a ramp. [SENDER] has
 run that state on his own fleet: thirteen hosts, one flake, feature-list modules,
 pinned submodules, PXE installs, CI gate, rollback, SOPS/age and an SSH CA.
 
-### What Matt can take
+### What [SENDER] can take
 
 - A client fleet migration from hand-managed hosts to a flake with feature-list
   modules and pinned inputs.
@@ -118,10 +118,9 @@ Would a 30-minute call in the next two weeks be useful? If the bench is full,
 one line is enough.
 
 Best regards,
-Matt Ji
+[SENDER]
 B2B NixOS & platform engineering
-matt@bountystash.com
-https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
+[EMAIL]
 ```
 
 **Follow-up, seven days later:**
@@ -136,10 +135,10 @@ available as subcontract capacity from December.
 If the timing is wrong, a single line is enough and I will leave it there.
 
 Best,
-Matt
+[SENDER]
 ```
 
-**Do not say:** Matt has used every Numtide tool, is available full-time, or knows its client bench.
+**Do not say:** [SENDER] has used every Numtide tool, is available full-time, or knows its client bench.
 
 ---
 
@@ -156,14 +155,14 @@ twice. The product surface now spans binary caches, Devenv developer
 environments and Cachix Deploy, which reached general availability in January
 2026 and lets agents pull profiles from a cache without evaluating or building
 on the target. [NAME]'s public work also includes `secretspec`, a declarative
-interface for secret providers — adjacent to the secrets problem Matt solves
+interface for secret providers — adjacent to the secrets problem [SENDER] solves
 with SOPS/age and a short-lived SSH CA. The first cache push is easy; the hard
 part is making cache hits trustworthy across CI, development and deployment,
 keeping secrets out of the closure, and giving a customer a rollout path that
-does not depend on a local evaluator. Matt's fleet runs the pattern by hand:
+does not depend on a local evaluator. [SENDER]'s fleet runs the pattern by hand:
 pinned inputs, a CI gate, content-addressed outputs, generations and rollback.
 
-### What Matt can take
+### What [SENDER] can take
 
 - A cache and CI audit for a team adopting Nix: what is rebuilt, what is
   substituted, where the closure leaks, and which cache key is actually stable.
@@ -208,10 +207,9 @@ fit? I am available from 01.12.2026. A 20-minute call would be enough to see if
 there is a match.
 
 Best regards,
-Matt Ji
+[SENDER]
 B2B NixOS & platform engineering
-matt@bountystash.com
-https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
+[EMAIL]
 ```
 
 **Follow-up, seven days later:**
@@ -226,10 +224,10 @@ to help customers adopt it without losing rollback or secret hygiene.
 If this is handled in-house, a pointer to the right person is enough.
 
 Best,
-Matt
+[SENDER]
 ```
 
-**Do not say:** Matt is a Cachix customer, Deploy is broken, or Cachix needs a consultant.
+**Do not say:** [SENDER] is a Cachix customer, Deploy is broken, or Cachix needs a consultant.
 
 ---
 
@@ -241,7 +239,7 @@ leadership. [CONTACT]
 **Company:** [cyberus-technology.de](https://www.cyberus-technology.de/) · [about](https://www.cyberus-technology.de/about-cyberus) · [Cyberus Linux](https://www.cyberus-technology.de/cyberus-linux)
 
 Use LinkedIn or the published contact form. Do not guess a personal email
-address. If a German message is appropriate, use the variant below; Matt's
+address. If a German message is appropriate, use the variant below; [SENDER]'s
 German is C1.
 
 ### Why them
@@ -252,12 +250,12 @@ automated testing for regulated environments. Its own description is "modular,
 transparent and reproducible software," and it advertises long-term NixOS
 platform support, which makes the build-and-operations layer part of the
 product. A reproducible product needs a reproducible way to build, provision and
-operate it, and Matt's fleet is a small working example: thirteen NixOS hosts
+operate it, and [SENDER]'s fleet is a small working example: thirteen NixOS hosts
 from one flake, pinned inputs, hermetic builds, PXE installs, SOPS/age secrets,
 short-lived SSH certificates, CI gates and rollback. The gap is scale and
 accreditation, not the operating model.
 
-### What Matt can take
+### What [SENDER] can take
 
 - NixOS platform engineering for an internal or customer-facing Linux platform:
   flake structure, module boundaries, pinned inputs, upgrade and rollback.
@@ -306,10 +304,9 @@ Would 30 minutes in the next two weeks be useful? If this is already covered
 internally, a short note is enough.
 
 Kind regards,
-Matt Ji
+[SENDER]
 B2B NixOS & platform engineering
-matt@bountystash.com
-https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
+[EMAIL]
 ```
 
 ### German email variant
@@ -333,10 +330,9 @@ Hätten Sie in den nächsten zwei Wochen 30 Minuten für ein technisches Gesprä
 Falls das Thema intern schon abgedeckt ist, reicht ein kurzer Hinweis.
 
 Freundliche Grüße
-Matt Ji
+[SENDER]
 B2B NixOS & Plattform-Engineering
-matt@bountystash.com
-https://github.com/shaoyanji/nixconfig · https://linkedin.com/in/mattji
+[EMAIL]
 ```
 
 **Follow-up, seven days later (DE):**
@@ -351,10 +347,10 @@ Rollback-Pfad, verfügbar als B2B-Kapazität ab Dezember.
 Passt es gerade nicht, reicht ein Wort — dann lasse ich es dabei.
 
 Freundliche Grüße
-Matt
+[SENDER]
 ```
 
-**Do not say:** Matt has BSI/VS-NfD experience or deep KVM/Rust work, or that Cyberus needs a consultant.
+**Do not say:** [SENDER] has BSI/VS-NfD experience or deep KVM/Rust work, or that Cyberus needs a consultant.
 
 ---
 
@@ -383,7 +379,7 @@ different reason, not a reminder.
 
 ## What not to claim
 
-- **No customer or partner status.** Matt is not a Numtide subcontractor, a
+- **No customer or partner status.** [SENDER] is not a Numtide subcontractor, a
   Cachix customer, or a Cyberus vendor. These are opening conversations.
 - **No accreditation experience.** No BSI VS-NfD, NATO RESTRICTED, or regulated
   certification work.

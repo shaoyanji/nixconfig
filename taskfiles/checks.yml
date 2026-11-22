@@ -767,17 +767,22 @@ tasks:
       - bash tests/port-audit/run.sh
 
   checks:appflow:
-    desc: Fixture for the CV projector — a job description narrows the corpus without losing a role or inventing a line
+    desc: Appflow gates — the CV projector fixture, and the tracker's duplicate and prep hygiene
     summary: >
-      Runs the selector against a fictional corpus and four descriptions: no role
-      loses every line, a matching role keeps its matching lines, an unrelated one
-      falls back to its lead lines and the audit says `matched: false`, kept lines
-      come from the corpus in the role's order, the caps hold, languages and
-      education are never touched, a German description reaches the English corpus
-      through glossary.json, two runs are identical, a missing corpus exits 2.
-      Coverage is asserted both ways, so deleting a case fails. No nix; ~1 s.
+      Two halves. First the selector against a fictional corpus and four
+      descriptions: no role loses every line, a matching role keeps its matching
+      lines, an unrelated one falls back to its lead lines and the audit says
+      `matched: false`, kept lines come from the corpus in the role's order, the
+      caps hold, languages and education are never touched, a German description
+      reaches the English corpus through glossary.json, two runs are identical, a
+      missing corpus exits 2. Coverage is asserted both ways, so deleting a case
+      fails. Second the tracker itself, read-only through the API: no (company,
+      role) pair where nothing says which row is real, and no `prep` row whose own
+      status says the requisition closed — the two states that otherwise
+      accumulate unnoticed. Offline fixture ~1 s, hygiene ~2 s.
     cmds:
       - bash tests/appflow-select/run.sh
+      - bash scripts/task/appflow-check.sh
 
   checks:appflow:triage:
     desc: Fixture for the mail-to-status rules — a German rejection with none of the English words still rejects

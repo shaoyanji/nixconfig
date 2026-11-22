@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T09:12:09Z",
+  "generated": "2026-11-22T09:14:26Z",
   "count": 200,
-  "pin": "41d7402207b478fc2ac6de9579d9215979d975f10c4dbd747b71a3941066554d",
+  "pin": "423c0b263bc5f26614a7b1983d7211b31282639106fcc301dcbe3e86a5d9353f",
   "turns": [
+    {
+      "id": "3510d303-db56-42f4-9577-3270b3827db6",
+      "ts": "2026-11-22T09:13:16Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: trawa-em-platform Ashby submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0686bf80a6aa1be955020ae0377be7f7f757bcdb",
+      "branch": "main",
+      "frame": "03ha6cy6owp9em238ta0laagi"
+    },
+    {
+      "id": "28d14ff4-9928-4f83-bd2b-7975ac2ca24d",
+      "ts": "2026-11-22T09:12:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:bamf-devops",
+      "action": "landed: BAMF DevOps Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0686bf80a6aa1be955020ae0377be7f7f757bcdb",
+      "branch": "main",
+      "frame": "03ha6cqj5kd5c5b6k447rvwj1"
+    },
     {
       "id": "44e8007f-06b4-4329-806c-b098c5586a15",
       "ts": "2026-11-22T09:12:07Z",
@@ -2741,32 +2767,6 @@
       "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
       "branch": "main",
       "frame": "03ha4hyto0i4190imrtvnkpvg"
-    },
-    {
-      "id": "50cc38d3-e53e-4a62-b301-659f37047146",
-      "ts": "2026-11-22T03:24:27Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +3 apps — MAIT Senior SysEng Linux&Virt softgarden portal CONFIRMED (Pforzheim, KVM/QEMU/Ansible exact stack); ISGUS SaaS-RZ VS; MRS Electronic Sysintegrator | gate: success page + mail sends + appflow | ~179 applied; Donaueschingen/VS corridor swept",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
-      "branch": "main",
-      "frame": "03ha4gt3z3mzwsyturd4x293b"
-    },
-    {
-      "id": "eea68871-af2b-4f2d-8d83-4bf6431cd19e",
-      "ts": "2026-11-22T03:20:56Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +2 apps (Zoiss industrial networks Konstanz; SEITENBAU sysadmin Konstanz via karriere@ fallback after Personio Turnstile suppressed) | gate: mail sends + appflow imports | ~176 applied; Weil/Konstanz BA sweep done; meinestadt+indeed IP-blocked, IWB empty",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
-      "branch": "main",
-      "frame": "03ha4g4xawgyc9ekd181meyct"
     }
   ]
 }

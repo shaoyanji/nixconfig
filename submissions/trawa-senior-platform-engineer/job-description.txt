@@ -1,17 +1,19 @@
-Senior Platform Engineer
-trawa
-Berlin HQ
-Remote: False
-Veröffentlicht: 1795135234
-Tags: Engineering
-Anzeige: https://www.arbeitnow.com/jobs/companies/trawa/senior-platform-engineer-berlin-57894
-Senior Platform Engineer
+SENIOR PLATFORM ENGINEER
+trawa — B2B renewable energy platform, Berlin HQ, ~100 employees, >EUR 35M raised (EUR 24M Series A, May 2025)
+Permanent, full-time | Berlin HQ, in person most of the week | flexible hours
+Compensation: salary plus stock options, 30 days vacation (no band published in the posting)
+Team: Platform — owns infrastructure, shared tooling and developer experience
+Requirement of note: at least 8 years in a platform, DevOps or SRE role
+Apply: https://jobs.ashbyhq.com/trawa/0135b507-c7dc-412b-a563-0d42ed7327d8
+
+SENIOR PLATFORM ENGINEER
 
 Permanent employee · Full-time · Berlin (HQ)
 
  
 
-Our Mission For You
+
+OUR MISSION FOR YOU
 
 European energy costs are twice as high as in the US and China, and electricity demand is expected to double by 2050. This puts European industry under massive cost pressure – and companies need to act now.
 
@@ -23,73 +25,80 @@ Now we are looking for a Senior Platform Engineer to build the foundation every 
 
  
 
-About trawa
+
+ABOUT TRAWA
 
 trawa is a tech-driven scale-up based in Berlin with around 100 employees, combining deep energy market expertise with in-house software development. We've raised over €35M to date, most recently a €24M Series A in May 2025, backed by Balderton, Headline, Speedinvest, AENU, Magnetic and Tiny VC. This role is based in our Berlin office, where we work together in person most of the week. We offer flexible working hours, so you can shape your day in a way that works for you.
 
  
 
-The Team
+
+THE TEAM
 
 Our Platform team owns our infrastructure, shared tooling and developer experience, so your work shapes how fast and how safely the whole company ships. You'll work with engineers across the company and see the impact of your work across every team.
 
  
 
-Who We Are Looking For
 
-- Impact focus: You focus on impact, not just technical outcomes, and you care about what your work makes possible for others.
+WHO WE ARE LOOKING FOR
 
-- Natural collaborator: People enjoy working with you, and you build strong relationships across teams.
+ - Impact focus: You focus on impact, not just technical outcomes, and you care about what your work makes possible for others.
 
-- Platform experience: You have at least 8 years of experience in a platform, DevOps or SRE role.
+ - Natural collaborator: People enjoy working with you, and you build strong relationships across teams.
 
-- Hands-on AWS and IaC: You have deep hands-on experience with AWS and infrastructure as code, ideally Terraform.
+ - Platform experience: You have at least 8 years of experience in a platform, DevOps or SRE role.
 
-- Distributed systems: You have built or run distributed services in production, with a strong grasp of security, reliability, observability and cost efficiency.
+ - Hands-on AWS and IaC: You have deep hands-on experience with AWS and infrastructure as code, ideally Terraform.
 
- 
-
-What You'll Do
-
-- Build and run scalable, secure, highly available AWS infrastructure that powers our mission-critical services.
-
-- Improve CI/CD pipelines, observability tooling and internal platforms so teams ship faster and with confidence.
-
-- Embed security into our infrastructure and pipelines, covering access management, secrets and compliance needs.
-
-- Partner with engineers, share best practices and make the right way the easy way.
+ - Distributed systems: You have built or run distributed services in production, with a strong grasp of security, reliability, observability and cost efficiency.
 
  
 
-Our Tech Stack
 
-- AWS, Terraform, Spacelift, Docker, GitHub Actions
+WHAT YOU'LL DO
 
-- Python, TypeScript
+ - Build and run scalable, secure, highly available AWS infrastructure that powers our mission-critical services.
 
-- Dash0, Sentry, Incident.io
+ - Improve CI/CD pipelines, observability tooling and internal platforms so teams ship faster and with confidence.
+
+ - Embed security into our infrastructure and pipelines, covering access management, secrets and compliance needs.
+
+ - Partner with engineers, share best practices and make the right way the easy way.
 
  
 
-90 Day Goals
+
+OUR TECH STACK
+
+ - AWS, Terraform, Spacelift, Docker, GitHub Actions
+
+ - Python, TypeScript
+
+ - Dash0, Sentry, Incident.io
+
+ 
+
+
+90 DAY GOALS
 
 After 6 Weeks (Onboarding):
 
-- Current setup: You have a comprehensive understanding of trawa's current tech stack, infrastructure and security posture.
+ - Current setup: You have a comprehensive understanding of trawa's current tech stack, infrastructure and security posture.
 
-- Team relationships: You have met the engineering teams, learned how they build, ship and run their services, and developed relationships with your key stakeholders.
+ - Team relationships: You have met the engineering teams, learned how they build, ship and run their services, and developed relationships with your key stakeholders.
 
 Month 3 (Ramp-Up):
 
-- Infrastructure ownership: You own parts of our AWS infrastructure and Terraform codebase.
+ - Infrastructure ownership: You own parts of our AWS infrastructure and Terraform codebase.
 
-- Workflow friction: You have found the biggest friction points in our developer workflow and proposed ways to fix them.
+ - Workflow friction: You have found the biggest friction points in our developer workflow and proposed ways to fix them.
 
-- Platform improvement: You have led a meaningful platform improvement from design to rollout.
+ - Platform improvement: You have led a meaningful platform improvement from design to rollout.
 
  
 
-Why Us?
+
+WHY US?
 
 Impact: European SMEs spend between €150k and €10M per year on electricity – most are overpaying and locked into outdated procurement. Your work will directly change how thousands of companies buy, manage and use energy. The impact is measurable, the market is massive, and the timing is now.
 
@@ -102,5 +111,3 @@ Diversity and Inclusion: We're an equal opportunity employer, and our team refle
 Package & Benefits: We offer a competitive compensation package including salary and stock options, 30 days of vacation, and a range of benefits including subsidies for home internet and lunches, a Sports Club membership, dedicated learning days with an annual learning budget, plus a weekly team lunch and regular team events.
 
 At trawa, we're dedicated to building a diverse, inclusive and authentic workplace. If you're excited about this role but your experience doesn't align perfectly, we encourage you to apply – you may be the right fit for this or another opportunity.
-
-Find Jobs in Germany on Arbeitnow

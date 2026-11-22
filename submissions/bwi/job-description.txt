@@ -1,0 +1,197 @@
+Senior Infrastructure/Platform Engineer (m/w/d) — Stellen-ID 64059
+BWI GmbH — IT-Systemhaus der Bundeswehr | DevSecOps Engineering / CCITS
+Standorte: Bonn, Koeln, Meckenheim | hybrid
+Bewerbung: https://www.bwi.de/karriere/stellenangebote/job/senior-infrastructure-platform-engineer-m-w-d-64059
+Quelle: bwi.de, abgerufen am 22.11.2026
+
+Senior Infrastructure/Platform Engineer (m/w/d)
+Zur Navigation
+Zum Hauptinhalt
+Zur Suche
+Zum Footer
+Leistungen
+Technologien
+Magazin
+Unternehmen
+Partner-Ökosystem
+Karriere
+BWI GmbH
+Startseite
+Karriere
+Stellenangebote
+Job
+Home
+Leistungen
+MENÜ
+Leistungen
+IT-Betrieb
+Einsatznahe IT
+Digitalisierung Bundeswehr
+Messenger
+Zu unseren Messengern
+Technologien
+MENÜ
+Technologien
+Künstliche Intelligenz
+Cloud Computing
+Extended Reality
+Quanten
+Magazin
+MENÜ
+Magazin
+Übersicht
+Fachthemen
+Karrierethemen
+Downloads
+Unternehmen
+MENÜ
+Unternehmen
+Portrait
+Diversität und Nachhaltigkeit
+Geschichte
+Compliance
+Übersicht
+Whistleblowing (English language)
+Events
+alle Termine ansehen
+Partner-Ökosystem
+Karriere
+MENÜ
+Karriere
+Übersicht
+Stellenangebote
+Schüler*innen
+Übersicht
+Deine Bewerbung
+Berufsorientierung
+Ausbildungsberufe
+Fachinformatiker für Systemintegration
+Fachinformatiker für Anwendungsentwicklung
+IT-Systemelektroniker
+Duale Studiengänge
+B.Sc. Informatik
+B.Sc. Wirtschaftsinformatik
+B.Sc. Cyber Security
+B.Sc. Angewandte Künstliche Intelligenz
+Studierende
+Übersicht
+Deine Bewerbung
+Direkteinstieg Junior Professionals
+Masterstudiengänge
+M.Sc. KI & Business Analytics
+M.Sc. IT-Management
+M.Sc. Artificial Intelligence
+M.Sc. DevOps & Cloud Computing
+M.Sc. Informatik
+M.Sc. Business Consulting & Digital Management
+M.Sc. Cyber Security Management
+Professionals
+Übersicht
+Rollen
+IT-Consultant
+IT-Projektmanager
+IT-Architekt
+Service Manager
+System Engineer
+Teams
+SAP
+IT-Consulting
+Cyber Security
+Softwareentwickler
+Zeitsoldaten
+Übersicht
+Anschlussverwender
+Über BWI
+Übersicht
+BWI als Arbeitgeber
+Leben & Arbeiten bei der BWI
+Ausbildungsmatcher
+Dein Herz schlägt für IT?
+Du bist dir noch unsicher, ob der Ausbildungsberuf wirklich zu dir passt?
+Leichte Sprache
+Gebärdensprache
+Impressum
+Datenschutz
+Datenschutzeinstellungen
+Hinweisgebersystem
+Whistleblowing (English language)
+bewerbung@bwi.de
+Bitte bewirb dich ausschließlich
+über das Bewerbungsformular.
+FAQ die häufigsten
+Fragen in der Übersicht
+BWI GmbH
+Auf dem Steinbüchel 22
+53340 Meckenheim
+© BWI GmbH 2026
+Unsere Kontaktmöglichkeiten:
+bewerbung@bwi.de
+Bitte bewirb dich ausschließlich
+über das Bewerbungsformular.
+FAQ die häufigsten
+Fragen in der Übersicht
+BWI GmbH
+Auf dem Steinbüchel 22
+53340 Meckenheim
+Stellen-ID: 64059
+Senior Infrastructure/Platform Engineer (m/w/d)
+ab sofort und in Vollzeit in Bonn, Köln oder Meckenheim.
+Stellenbeschreibung
+Sorge gemeinsam mit uns für die digitale Zukunftsfähigkeit der Bundeswehr.
+Als primärer Digitalisierungspartner der Bundeswehr erbringen wir stabile, sichere und effiziente IT-Services im In- und Ausland, vom Grundbetrieb bis in den einsatznahen Bereich und tragen so zur kontinuierlichen Erhöhung der Führungs- und Einsatzfähigkeit der Bundeswehr bei. Mit über 8.000 Kolleg*innen betreiben und modernisieren wir eine der größten und komplexesten IT-Infrastrukturen in Deutschland. Wir suchen verantwortungsvolle IT-Spezialist*innen, die die Bundeswehr-IT aus Überzeugung in herausfordernden Digitalisierungsvorhaben weiterentwickeln und so einen Beitrag zur Sicherheit Deutschlands leisten wollen.
+​In der Abteilung „DevSecOps Engineering“ werden die IT-Sicherheitskritischen Software-Projekte des CCITS umgesetzt und betrieben. Wir sind Teil des „Competence Centers IT-Security“ (CCITS), in welchem die operativen IT-, Informations- und Cyber-Sicherheitskompetenzen zentralisiert sind.​
+Darina Kache
+Recruiterin
+Jetzt bewerben
+Ihre Aufgaben:
+Du baust und betreibst eine Kubernetes Infrastruktur in unseren Rechenzentren für air-gapped Environments und sorgst für Skalierung und Sicherheit
+Infrastructure as Code und Automation liegen dir im Blut
+Du baust eine Container-basierte Edge-Computing-Umgebung als Produkt auf
+Du kommunizierst mit Stakeholdern und anderen Teams
+Du arbeitst als Mitglied eines agilen Teams
+Ergebnisse und Fortschritte hältst du über die gewissenhafte Erstellung und Pflege technischer Dokumentationen fest
+Ihr Profil:
+​Abgeschlossenes fachbezogenes Hochschulstudium oder vergleichbar und mind. 4 Jahre einschlägige Berufserfahrung
+Sehr gute Kenntnisse im Bereich Infrastruktur
+Sehr gute Kubernetes Kenntnisse (ideal im Umfang CKA/CKS)
+Sehr gute Kenntnisse im Bereich Automation
+Gute Kenntnisse in folgenden Bereichen: Nix/NixOS, Linux und Härtung von Linux-Systemen, Virtualisierung sowie Network Storage (z. B. ceph)
+Programmiersprachenkenntnisse in Go wünschenswert
+Teamfähigkeit und Durchsetzungsfähigkeit
+Fließende Deutsch- und gute Englischkenntnisse
+Grundsätzliche Reisebereitschaft
+Wir bieten:
+Durch abwechslungsreiche und gesellschaftlich relevante Aufgaben gewährleisten wir den reibungslosen IT-Betrieb und die Digitalisierung der Bundeswehr
+Das Ziel eint uns. Dabei sind für uns ein wertschätzender Umgang miteinander sowie ein großer Teamgeist elementar
+Wir bieten 30 Tage Jahresurlaub, 1 Brauchtumstag plus Optionen auf individuelle Anpassungen
+Über unsere Benefit-App erhält man ein monatliches Guthaben und kann sich zusätzlich Steuervergünstigungen auf Tickets für den ÖPNV sichern
+Wir ermöglichen Flexibilität, um Beruf und Privatleben in Einklang zu bringen, etwa durch mobiles Arbeiten oder Vertrauensarbeitszeit
+Wir unterstützen die berufliche und persönliche Weiterbildung durch individuelle Maßnahmen sowie einen kostenfreien Zugriff auf LinkedIn Learning
+Unser Jobradangebot ermöglicht das Leasing von bis zu 2 Fahrrädern
+Die Einstiegsvergütung liegt im Regelfall zwischen 71.000 € und 91.650 € brutto p.a. Die konkrete Höhe wird basierend auf Kriterien wie z.B. Qualifikation, Verantwortungsbereich und den Anforderungen der Position festgelegt. Gerechtfertigte Abweichungen sind im Einzelfall möglich
+Jetzt bewerben
+Zurück zur
+Übersicht
+PDF
+herunterladen
+Weitere offene Stellen
+Expert PM Methods (m/w/d)
+in München, Bonn oder Meckenheim
+IT Projektmanagement
+Cloud API Senior Architect (m/w/d)
+bundesweit
+Softwareentwicklung / Programmierung
+Senior Projektleiter - IT Infrastruktur (m/w/d)
+in Bonn, Berlin, München oder Nürnberg
+IT Projektmanagement
+Java Ful
+
+
+[Abgleich mit dem Paket, 22.11.2026]
+Kern der Stelle: Aufbau und Betrieb einer Kubernetes-Infrastruktur in Rechenzentren fuer air-gapped
+Environments, dazu eine containerbasierte Edge-Computing-Umgebung als Produkt.
+Harte Anforderung: sehr gute Kubernetes-Kenntnisse (ideal CKA/CKS) - im Paket als Luecke benannt.
+Ausdruecklich im Profil genannt und vorhanden: Nix/NixOS, Linux-Haertung, Automation, Go.
+Verguetungsband der Anzeige: 71.000 bis 91.650 EUR brutto p.a.; eigene Vorstellung 88.000 bis 92.000 EUR
+liegt am oberen Rand und darueber, Begruendung im Anschreiben.
+Ansprechpartnerin: Darina Kache (Recruiterin).

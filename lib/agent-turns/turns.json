@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-22T07:40:19Z",
+  "generated": "2026-11-22T07:40:36Z",
   "count": 200,
-  "pin": "943866e018ac684fc38e042ad5cc030bdcccfa730ab15ab56cc5b2afc7db772d",
+  "pin": "7ca5a3aa69a29884e564fc4b5743b77f98f5912f4ffbf77c34253c0552855692",
   "turns": [
+    {
+      "id": "c5227b8c-0a94-48dc-ada3-de2cb2734c6d",
+      "ts": "2026-11-22T07:40:34Z",
+      "source": "devin",
+      "subject": "nixconfig:mail-atlas",
+      "action": "landed: 24853fc0 mail-atlas drain/reconcile himalaya wrappers collapsed into mkHimalayaJob | gate: checks:host delphi PASS (2110 assertions, eval mode aarch64)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "24853fc03673b148c26ec1aced791fed5b160caf",
+      "branch": "main",
+      "frame": "03ha5uu85jkp4dblgcto41ves"
+    },
+    {
+      "id": "2a9f2b18-2e1a-4110-bc0a-ad0feda546f9",
+      "ts": "2026-11-22T07:40:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-bundesdruckerei-sre",
+      "action": "landed: Bundesdruckerei SRE packet (JD, 2-page CV, 1-page letter, portal sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/bundesdruckerei-sre"
+      ],
+      "files": [],
+      "base_commit": "ae22b990c452930d9f639b7efdaecbe2a36a048a",
+      "branch": "main",
+      "frame": "03ha5uu83vf79xjaecu5oge2j"
+    },
     {
       "id": "4e0c7ac1-473a-42cb-8f4c-bb78f8d5eae2",
       "ts": "2026-11-22T07:38:28Z",
@@ -2808,32 +2836,6 @@
       "base_commit": null,
       "branch": null,
       "frame": "03h9xpajtb6i8t5edzb38btes"
-    },
-    {
-      "id": "52f9a1bb-2696-4351-991d-714c285e9ff6",
-      "ts": "2026-11-21T06:37:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:wallpaper-delivery",
-      "action": "landed: wallpaper_delivery — freebuff to upload 100 wallpapers to Cloudinary + publish to bountystash-assets.pages.dev (jevdecide margin 0.98)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h9xpa3pn2oko56151veqj4v"
-    },
-    {
-      "id": "03106e22-3f6f-4d5f-9889-5808b8410c0d",
-      "ts": "2026-11-21T06:32:40Z",
-      "source": "devin",
-      "subject": "nixconfig:dead-module-sweep",
-      "action": "landed: dead-module-sweep -> audit flake/ and host modules for unused imports, remove dead ones, confirm evaluation",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h9xo9ysyvlqbmyxuiscwszz"
     }
   ]
 }

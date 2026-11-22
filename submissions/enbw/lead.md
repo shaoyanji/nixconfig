@@ -1,6 +1,7 @@
 # Lead: EnBW — Platform / DevOps Engineer Linux & Kubernetes (w/m/d)
 
 Fit: 4 (Vorgabe nannte 5)
+Stelle: laut EnBW-Karriereseite HTTP 410, "has been filled" — Bewerbung derzeit nicht möglich
 Stand: 22.11.2026
 Ort: Karlsruhe | hybrid und onsite | unbefristet, Vollzeit
 

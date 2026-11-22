@@ -2,7 +2,7 @@ Platform / DevOps Engineer Linux & Kubernetes (w/m/d) — C-TIPCP
 EnBW Energie Baden-Wuerttemberg AG | Standort Karlsruhe | Vollzeit | unbefristet
 Arbeitsmodell: hybrid und onsite | flexibel, Teilzeit und Homeoffice moeglich | 30 Tage Urlaub
 Bewerbung: https://careers.enbw.com/de/de/job/EBQEBQGLOBAL25599EXTERNALDEDE/Platform-DevOps-Engineer-Linux-Kubernetes-w-m-d-C-TIPCP
-Quelle: careers.enbw.com, abgerufen am 22.11.2026; ergaenzt um die Kurzfassung aus dem Stellenindex, weil der Seitentext nur teilweise extrahierbar war
+Quelle: careers.enbw.com, abgerufen am 22.11.2026. Die Seite antwortete mit HTTP 410 und dem Text "We're sorry... the job you are trying to apply for has been filled." Der Aufgabenkern stammt deshalb aus dem Stellenindex (devjobs.de, stellenanzeigen.de, fwbjobs.com), nicht aus der Originalseite.
 
 Kurzfassung der Aufgabe
 

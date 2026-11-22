@@ -51,12 +51,13 @@ Nicht fünf, weil Kubernetes im Titel der Stelle steht und nicht in der Erfahrun
 
 ## Offene Punkte
 
-1. **Fit auf 4 korrigiert** (Vorgabe: 5); Begründung oben.
-2. Kubernetes-, Helm- und GitOps-Lücke steht im Anschreiben.
-3. Zeugnisse fehlen.
-4. Anzeige nur teilweise extrahierbar; Aufgabenkern aus dem Stellenindex ergänzt und vor dem Absenden am Original zu prüfen.
-5. Keine Gehaltszahl im Anschreiben; keine Bandbreite in der Anzeige.
-6. Präsenzanteil in Karlsruhe klären; hybrid ist genannt, der Umfang nicht.
+1. **Die Stelle ist besetzt.** careers.enbw.com antwortet am 22.11.2026 mit HTTP 410 und dem Hinweis "the job you are trying to apply for has been filled". Das Paket ist vorbereitet, aber nicht absendbar; entweder auf eine neue Ausschreibung derselben Rolle warten oder eine verwandte EnBW-Plattformstelle suchen.
+2. **Fit auf 4 korrigiert** (Vorgabe: 5); Begründung oben.
+3. Kubernetes-, Helm- und GitOps-Lücke steht im Anschreiben.
+4. Zeugnisse fehlen.
+5. Aufgabenkern aus dem Stellenindex, weil die Originalseite 410 liefert; vor einer Wiederverwendung am Original prüfen.
+6. Keine Gehaltszahl im Anschreiben; keine Bandbreite in der Anzeige.
+7. Präsenzanteil in Karlsruhe klären; hybrid ist genannt, der Umfang nicht.
 
 ## Paket
 

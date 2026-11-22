@@ -53,6 +53,12 @@ CI_SUBJECT = re.compile(
 CI_SENDERS = ("notifications@github.com", "actions@github.com", "ci@", "jenkins@", "buildkite@")
 CI_BODY = re.compile(r"(github\.com/[^/\s]+/[^/\s]+/actions/runs/\d+|run #?\d+)", re.IGNORECASE)
 
+# Malt sends automated "New opportunity with <client>" match notices. They are
+# job-board digests, not recruiter mail: no reply is expected, and the engine
+# otherwise splits them between review and robot.
+MALT_SENDERS = ("@malt.com",)
+MALT_OPPORTUNITY = re.compile(r"^new opportunity with\b", re.IGNORECASE)
+
 MACHINE_LOCALS = (
     "noreply",
     "no-reply",
@@ -357,6 +363,11 @@ def classify_rules(
     # the feed rules below never touch it, and the second model cannot close it.
     if addr in pointers:
         return "action", "human", f"pointer: {addr}", 0.95
+
+    # Malt's automated opportunity matches are a job-board digest, not a
+    # person's queue item: the engine was splitting them across review and robot.
+    if addr and addr.endswith(MALT_SENDERS) and MALT_OPPORTUNITY.search(subject):
+        return "digest", "none", "Malt opportunity match", 0.9
 
     if addr and (addr in CI_SENDERS or addr.endswith("@github.com")):
         if CI_SUBJECT.search(subject):

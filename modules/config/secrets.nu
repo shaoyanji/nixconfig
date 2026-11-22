@@ -123,6 +123,8 @@ def --env _load_all_secrets [force_refresh: bool = false] {
       OPENROUTER_API_KEY:            "OPENROUTER.API.KEY"
       GEMINI_API_KEY:                "GEMINI.API.KEY"
       INFRON_API_KEY:                "INFRON.API.KEY"
+      CROWLLM_API_KEY:               "CROWLLM.API.KEY"
+      CONTEXT_API_KEY:               "CONTEXT.API.KEY"
       COHERE_API_KEY:                "COHERE.API.KEY"
       OPENCODE_API_KEY:              "OPENCODE.API.KEY"
       AIHUBMIX_API_KEY:              "AIHUBMIX.API.KEY"

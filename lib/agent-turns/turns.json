@@ -1,8 +1,88 @@
 {
-  "generated": "2026-11-22T05:06:35Z",
+  "generated": "2026-11-22T05:33:04Z",
   "count": 200,
-  "pin": "8365d88c1b5af77ba07c6131d40efd9399e193713acf7a01f52f3797ecba283d",
+  "pin": "efb8db72f0ee2776669f9d48ee8dd6c51f036076a41688707891963db8257730",
   "turns": [
+    {
+      "id": "479b74d1-0b82-42bb-8de9-f1c890c99d34",
+      "ts": "2026-11-22T05:31:39Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-next-packet",
+      "action": "landed: drove freebuff pane to push flix commit e0edc539 to origin/main and build the next prep-stage application packet",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
+      "branch": "main",
+      "frame": "03ha55nmi06ddn4vypzwou1r9"
+    },
+    {
+      "id": "2f830ac1-a138-4224-b3b7-090838ec4b7f",
+      "ts": "2026-11-22T05:30:46Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "done: corridor sweep — FZI (82 jobs, research/student only), MVV (8 jobs, back-office only), Vector (38 jobs, dev/sales/embedded only) all drained; PTV remains rexxCha-blocked. No new fits found. Confirmed Vector board = SF CSB shadow-DOM (csbep-vector-prod).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
+      "branch": "main",
+      "frame": "03ha55hekfbggiwqwxl0ts2oc"
+    },
+    {
+      "id": "3fad13e3-0a2e-4616-a0bf-0538c370836c",
+      "ts": "2026-11-22T05:27:09Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: inovex x2 confirmed (DevOps Linux fit5, K8s Platform fit4); PTV Systemtechniker blocked by rexxCha (recorded prep w/ recruiter contact); MVV board drained (no IT fits). Gate: portal confirmations + ack mails 311038/311039.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
+      "branch": "main",
+      "frame": "03ha54s1poxucatqp0rwuy8j5"
+    },
+    {
+      "id": "c90610d5-c7f2-49be-b57c-da421e9eb6b2",
+      "ts": "2026-11-22T05:20:01Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: dmTECH Platform Engineer + INIT x2 (Sysadmin Kundenprojekte j897, Senior SE j1141) — all portal-confirmed. Cracked SF CSB shadow-DOM submit + rexx Flow.js addFile upload. Gate: confirmation pages + ack mails.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
+      "branch": "main",
+      "frame": "03ha53dv5xj0lfktokr4447ic"
+    },
+    {
+      "id": "3cc65662-12ec-4f3d-88e8-5e5896189fac",
+      "ts": "2026-11-22T05:14:25Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: dmTECH Platform Engineer (DevOps) Snowflake & KI, job 273774 Karlsruhe — SF CSB portal confirmed via ack mails 311035/311036 (profile + application). Recorded in apps db as applied, fit 4. Gate: mail ack received = real submission proof.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
+      "branch": "main",
+      "frame": "03ha52ahz81qb53ff6b6hflht"
+    },
+    {
+      "id": "9c161062-0593-453a-85b6-e79a0916845e",
+      "ts": "2026-11-22T05:06:57Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-flix-submit",
+      "action": "landed: Flix Data Platform Engineer application SUBMITTED via Greenhouse 8690650002 - job-success page 'Thanks for applying' + receipt email 'Flix // Your candidacy' 05:03Z. No cover-letter field, so answers carried it; salary 103-110k, relocate Yes, on-call Yes, start immediately. Traps: shared agent-browser daemon hijacked by another pane, WP POST ignored; pure CDP on private port worked",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/flix-data-platform-engineer"
+      ],
+      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
+      "branch": "main",
+      "frame": "03ha50tzfal5e81qw7nkyy293"
+    },
     {
       "id": "1467e99e-ceb0-4912-a33b-f517bdc60b59",
       "ts": "2026-11-22T05:03:04Z",
@@ -2683,88 +2763,6 @@
       "base_commit": null,
       "branch": "main",
       "frame": "03h9xa7krap5bmdbyxqwd81gx"
-    },
-    {
-      "id": "a04c4de4-a559-4576-a2db-1f29357183ed",
-      "ts": "2026-11-21T05:19:59Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-link-gate-verify",
-      "action": "verified: both templates compile (cv.typ x6 current payloads, lebenslauf en+de), matt-site rebuilt rc=0 with --gap + full site-links pass (81 links/15 pages/4 PDFs/16 download anchors), fixture 16/16; nothing to commit — tree clean, HEAD==origin/main==8cda1c98, CV ATS work already landed as 079c2f5a | gate: nix build .#sites.matt-site PASS, site-links PASS, checks:site:links:test PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xa2voq8p6ez2qedy3ctq0"
-    },
-    {
-      "id": "e532518f-f995-416b-b415-7b8c8db6401e",
-      "ts": "2026-11-21T05:17:58Z",
-      "source": "freebuff-win1",
-      "subject": "nixconfig:steward-win1-verify-commit-push",
-      "action": "Drove freebuff win1 CV/site lane: jevdecide verify_commit_push decisive (0.93/0.89); verify+commit+push task pasted to default:1.1; pane accepted (fresh working... 2s). Awaiting pane result: both Typst templates compile, site-links gate over matt-site artifact, commit lebenslauf.typ ATS cleanup + docs/cv-ats-compliance.md, push to origin/main.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9x9ooh40qm4njdeuwox0bt"
-    },
-    {
-      "id": "342a4de6-86d6-43e2-a866-758902803c27",
-      "ts": "2026-11-21T05:08:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-tailnet-serve",
-      "action": "Swept delphi after the 04:33 boot race (7 failed: gemini-tailnet-cert + 6 tailscale-serve-*); retried cert and 8460 front, serve config now has 8460 and answers 200. Gate: systemctl --failed empty, task ops:health ok at 05:08:29Z.",
-      "outcome": "done",
-      "claims": [
-        "modules/services"
-      ],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9x7unndpmaybtoi95btrer"
-    },
-    {
-      "id": "15cedb18-5655-45ce-a104-ada956de85db",
-      "ts": "2026-11-21T05:07:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:xs-service",
-      "action": "landed: tailscale serve writes serialized after the 04:32 boot race killed 8449; endpoint back, 18 fronts active | gate: checks:host HOST=delphi PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/service-portal.nix"
-      ],
-      "files": [],
-      "base_commit": "7bb85c4c10bd4d25b4b6b25c784b969abae01246",
-      "branch": "main",
-      "frame": "03h9x7m22esvg934y6e326762"
-    },
-    {
-      "id": "9666a9ec-d3a0-43c4-b4d7-9ab6d5e3a674",
-      "ts": "2026-11-21T05:05:44Z",
-      "source": "devin",
-      "subject": "nixconfig:win2-devin",
-      "action": "Drove IDLE pane default:2.1 (devin): jev-decide classify --provider typesafe -> nixconfig_refactor (p=1.0, margin=1.0 >= 0.3 decisive); nixconfig refactoring task sent via tmux load-buffer + paste-buffer + Enter; fresh 'Thinking · 8s' counter confirmed pane acceptance; lane work started in ~/Documents/nixconfig.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ac97ebf4ef3e8d349f5799dff6507d34d43ee234",
-      "branch": "main",
-      "frame": "03h9x7anqr8nbnyi8bcrnllwg"
-    },
-    {
-      "id": "0454c192-030a-4328-b156-3fb2fc2eb7b0",
-      "ts": "2026-11-21T05:05:27Z",
-      "source": "hermes",
-      "subject": "frieren:xs-turns-health-check",
-      "action": "verify xs-turn post/list/snapshot all working from frieren; delphi shim + xs-notify confirmed live",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ac97ebf4ef3e8d349f5799dff6507d34d43ee234",
-      "branch": "main",
-      "frame": "03h9x78o0diudkt03nyea1ncr"
     }
   ]
 }

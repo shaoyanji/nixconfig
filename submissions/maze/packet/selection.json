@@ -1,0 +1,288 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 9352,
+    "terms": [
+      {
+        "term": "security",
+        "weight": 27.412
+      },
+      {
+        "term": "cloud",
+        "weight": 24.189
+      },
+      {
+        "term": "systems",
+        "weight": 24.189
+      },
+      {
+        "term": "fast",
+        "weight": 22.609
+      },
+      {
+        "term": "aws",
+        "weight": 14.67
+      },
+      {
+        "term": "secure",
+        "weight": 13.019
+      },
+      {
+        "term": "vulnerability",
+        "weight": 13.019
+      },
+      {
+        "term": "engineer",
+        "weight": 11.866
+      },
+      {
+        "term": "engineering",
+        "weight": 11.866
+      },
+      {
+        "term": "engineers",
+        "weight": 11.866
+      },
+      {
+        "term": "interest",
+        "weight": 11.866
+      },
+      {
+        "term": "interested",
+        "weight": 11.866
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "Postgraduate Renewable Energy",
+        "score": 5.9955
+      },
+      {
+        "name": "matt.bountystash.com",
+        "score": 4.3885
+      },
+      {
+        "name": "bountystash",
+        "score": 3.1741
+      },
+      {
+        "name": "Master's Thesis",
+        "score": 2.8701
+      },
+      {
+        "name": "fibtransponder",
+        "score": 2.168
+      },
+      {
+        "name": "kelly-svg",
+        "score": 2.0014
+      }
+    ],
+    "kept": [
+      "Risk Calculation Engine (Swirl Engine)",
+      "nixconfig",
+      "kev-time",
+      "Vulnerability operations concept"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web Development",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Database",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programming Languages",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "assets"
+        },
+        {
+          "score": 0.0,
+          "text": "portfolio"
+        }
+      ],
+      "kept": 6,
+      "name": "Energy & Risk",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Security",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 2.7525,
+          "text": "Risk-managed gas storage and gas swing trading models as risk manager for EWE Trading"
+        },
+        {
+          "score": 2.294,
+          "text": "Built risk-adjusted PPA trading models for energy companies"
+        },
+        {
+          "score": 1.9167,
+          "text": "Advised clients and acted as in-house Risk Manager for a top German energy trader"
+        },
+        {
+          "score": 1.3099,
+          "text": "Built an immutable web templating language that is invulnerable to scripting attacks"
+        },
+        {
+          "score": 1.2537,
+          "text": "Developed an LLM-based knowledge base for consulting work"
+        },
+        {
+          "score": 0.0,
+          "text": "Developed a Fibonacci binary tree algorithm for computational scientists"
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 10
+    },
+    {
+      "dropped": [
+        {
+          "score": 7.2453,
+          "text": "Scoped and ran due diligence on O&M projects as cover for project managers"
+        },
+        {
+          "score": 4.7665,
+          "text": "Built financial models and managed 10 MW of solar PV power plants"
+        },
+        {
+          "score": 3.7824,
+          "text": "Designed a mobile app for enterprise employees hunting new project opportunities"
+        },
+        {
+          "score": 1.2253,
+          "text": "Worked with clients, banks and deal brokers on a dozen USD 4-5M projects"
+        },
+        {
+          "score": 0.0,
+          "text": "Headed asset management of a USD 100M+ portfolio"
+        },
+        {
+          "score": 0.0,
+          "text": "Documented and managed software and IT administration for the company and its subsidiaries"
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Managed a pipeline of USD 100M+ projects"
+        },
+        {
+          "score": 0.0,
+          "text": "Advised clients on cybersecurity software and risk management"
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 2.3956,
+          "text": "Wrote Python analysis and 3D geometry tooling"
+        },
+        {
+          "score": 0.0,
+          "text": "Verified geometry matrices in Mathematica"
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 9.5046,
+          "text": "Led safety training for crew members"
+        },
+        {
+          "score": 2.6039,
+          "text": "Troubleshot chemicals and equipment on site"
+        },
+        {
+          "score": 2.4506,
+          "text": "Managed two frac crews carrying USD 3M+ of work per week"
+        },
+        {
+          "score": 1.4149,
+          "text": "Worked twelve-hour shifts in the field"
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

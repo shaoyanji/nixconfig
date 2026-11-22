@@ -1,0 +1,169 @@
+Company: Maze
+Role: Senior Site Reliability Engineer | SRE (Remote, EU/CET)
+Location: Remote — EU/CET; Ashby lists United Kingdom
+Remote: yes
+Published: 2026-08-24
+Compensation: EUR 109,000-128,000 + equity
+Source: ashby
+URL: https://jobs.ashbyhq.com/mazedesign/f70288aa-44e4-4999-af2b-1b7f7ad3e8d5
+---
+
+ABOUT MAZE
+
+Maze is the user research platform that helps companies build the right products faster by making user insights available at the speed of product development.
+
+In most companies, research demand far exceeds supply. Time, cost, and lack of access to expertise hold teams back. In today’s AI-powered world, anyone can build a product fast. The real challenge? Deeply understanding user needs and building the right product. That’s where Maze comes in.
+
+We believe companies shouldn’t have to choose between building fast and building right. Maze makes research accessible, intuitive, and fast so product teams can put user insights at the center of every decision.
+
+Our platform enables researchers, designers, and product managers to quickly recruit participants, run studies autonomously, and surface insights that actually drive product decisions. Our AI capabilities automate the busywork and add depth and direction to the insights themselves.
+
+That’s why Maze was recently named the #1 user research platform in UX Tools’ Design Tools Survey https://www.uxtools.co/survey/user-research/user-testing-overview—and why we’re scaling fast across industries like B2B SaaS, e-Commerce, Financial Services, Retail, and Automotive, supporting world class customers such as Uber, Amazon, Atlassian, Anthropic & more.
+
+Maze is a Series B company backed by top-tier investors (Felicis, Emergence & Amplify). We operate a global remote workforce driven by our core values https://maze.co/about-us/.
+
+
+
+Location: Remote, preference for Netherlands, United Kingdom, Ireland, Spain or Portugal. 
+
+Key engineering and product teams are based in these locales.
+
+
+
+
+THE ROLE
+
+We’re hiring a Senior Site Reliability Engineer to join our Platform team and help us build secure, reliable, and scalable systems as Maze grows.
+
+This role sits at the intersection of cloud infrastructure, reliability, and security. You’ll work across our platform to improve how we operate production systems, strengthen our security practices, and give engineers the tooling and infrastructure they need to ship quickly and confidently.
+
+We’re looking for someone who enjoys working across boundaries, takes ownership, and brings a pragmatic approach to solving problems. You don’t need to be an expert in every part of our stack, but you should be excited to learn, move quickly, and make an impact.
+
+
+
+
+AS AN SRE AT MAZE, YOU WILL:
+
+ - Build, operate, and evolve our cloud infrastructure with reliability, scalability, and security in mind
+
+ - Improve our observability practices and help engineers understand, debug, and operate systems in production
+
+ - Partner across engineering and security to strengthen our cloud security posture and operational practices
+
+ - Support security and compliance initiatives, including vulnerability management, security testing, and audit readiness
+
+ - Build tooling and automation that reduces manual work and improves the developer experience
+
+ - Bring an operational and security perspective to architecture and technical decisions
+
+ - Improve how we prepare for, respond to, and learn from production incidents
+
+ - Use modern AI-assisted and agentic workflows to build, debug, and operate systems more effectively
+
+
+
+
+WE’RE LOOKING FOR SOMEONE WHO:
+
+ - Has experience building and operating production systems in a modern cloud environment, ideally AWS
+
+ - Understands modern SRE and infrastructure practices, including infrastructure as code and containerized workloads
+
+ - Has experience with observability and knows what good monitoring, alerting, and production visibility look like
+
+ - Brings a security mindset, with experience or interest in cloud security, vulnerability management, application security, or related areas
+
+ - Has exposure to security and compliance frameworks such as SOC 2 or ISO 27001, or is interested in developing deeper expertise in this area
+
+ - Can automate repetitive work using code and is comfortable working with at least one programming language
+
+ - Is excited about AI-assisted development and actively uses modern AI tools in their work
+
+ - Thrives in a fast-moving environment where ownership, curiosity, and pragmatic decision-making matter
+
+
+
+
+THE STACK
+
+ - Cloud & infrastructure: AWS, Kubernetes, Terraform, Docker
+
+ - Observability: Datadog
+
+ - Security & compliance: Vanta, Socket
+
+ - CI/CD: GitHub Actions, Argo CD
+
+ - Data: PostgreSQL, Neo4j, Snowflake
+
+ - Application: TypeScript, Node.js, React
+
+You don’t need experience with every technology in our stack. We care more about strong fundamentals, an ability to learn quickly, and excitement about helping us build reliable and secure systems as Maze scales.
+
+
+INCLUSIVITY AND PAY
+
+At Maze, we are dedicated to building an equitable, inclusive, and authentic workspace. Unique and diverse perspectives are welcomed, and continuous growth is encouraged. We believe that people are more than their resumes, so if your past experience looks different than the criteria listed, we'd still love to hear from you. We appreciate and celebrate non-traditional life routes and encourage you to apply should you connect with a job description or the Maze culture. 
+
+Maze values transparency and it enables us to approach compensation equitably across the world. We are informed by data and regularly check our salary ranges (either United States or Rest of World) against other venture backed companies. Additionally, we are proud of our holistic and generous benefits offerings, included in every compensation package. 
+
+Your salary is dependent upon many factors, including years of experience, expertise, etc. During your first interview, you can expect to have an open conversation with your recruiter regarding your compensation expectations.
+
+
+
+
+WHY MAZE IS UNIQUE
+
+ - Early-stage startup: You will join an early-stage startup with less than 150 team members. This means you'll have the unique opportunity to directly impact success and help shape the future of Maze.
+
+ - Market disruption: We believe that the way companies build products is fundamentally broken and the user research market is ripe for disruption. For too long, companies have been forced to choose between rapid development without user insights or investing months into research before bringing products to market. But there's finally a groundswell building around a path forward that eliminates this compromise - and Maze is leading the charge.
+
+ - Product-market Fit: Maze is used by 100,000+ brands across 4,000 companies, from SMB to enterprises, and in the last fiscal year, we saw 6.5M questions answered, supporting 25K decisions
+   
+   
+
+
+BENEFITS
+
+ - Health insurance with international coverage, vision, and dental: 100% of the team member premium paid
+   
+   - For some locations, coverage options vary, please see our benefits pages https://mazedesign.notion.site/Benefits-Full-Time-Team-Member-fac6236ca0d6452dbc659a1947d89317 for more information
+
+ - Free access to proper mental health care, unlimited virtual therapy sessions (with a human) and 24/7 access to resources
+
+ - Life and Disability Insurance, 100% of the team member premium paid
+
+ - Flexible time off
+
+ - Meaningful equity
+
+ - Company retreats, fully paid for by Maze
+
+ - New MacBook (laptop), paid for by Maze
+
+ - Paid Family leave: 16 weeks for birth or adoptive parents
+
+ - $500/month to be used for dependent health insurance coverage 
+   
+   - If you don't have dependents to add to your plan, you will still get access to this money to be used at your discretion to get the benefits that matter to you with our flexible a-maze-ing benefits - gym memberships, co-working spaces, food, travel, whatever!
+
+ - $1,500 remote work setup fund to ensure you can set up a productive work space
+
+ - Flexible work schedule where you manage your own working hours
+
+ - Monthly Bonus.ly http://Bonus.ly points that are awarded to others to recognize teamwork, dedication and helpfulness - points can be cashed out for gift cards and more
+
+ - Virtual social engagements randomly throughout the year 
+
+ - SWAG, we have some really cool swag
+
+ - Open, transparent culture that includes virtual: coffee chats, bi-weekly all-hands meetings, and more
+
+Check out all of our a-maze-ing benefits here https://mazedesign.notion.site/Benefits-fac6236ca0d6452dbc659a1947d89317. 
+
+
+
+
+OUTREACH NOTICE
+
+We understand you might be excited about the job you’re applying for, we are excited you are interested! However, please refrain from reaching out to our current team members on LinkedIn for referrals. Our policy is that referrals can only be provided by team members who personally know the candidate. With the high volume of interest in our roles, contacting our team members who are not involved in recruitment can be overwhelming. Additionally, please avoid submitting support tickets regarding your application, as our support team is not involved in the hiring process. Rest assured, our recruitment team is diligently reviewing all applications and will reach out directly if there is a match.

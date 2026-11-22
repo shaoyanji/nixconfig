@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:25:53Z",
+  "generated": "2026-11-22T12:26:23Z",
   "count": 200,
-  "pin": "67072796bb2759e9287331bf31f44e2880f10266b021c70410a6172df7031f94",
+  "pin": "cb518394bcff700ea46461c85722b0710e11f8207d55071c63aa76bc6b732831",
   "turns": [
+    {
+      "id": "01e71bad-d319-4a80-a3e5-373a7faaafdf",
+      "ts": "2026-11-22T12:26:04Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "in_progress: devin staging canonical-kernel-build-automation (req 7334725); freebuff-frieren upgrading cycap to native Typst; freebuff-delphi authoring obsidian functional software packet",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "3c778864a283c197d6798d121d6c6e8e39c15961",
+      "branch": "main",
+      "frame": "03ha7em01wl506c8t6n3ynq7c"
+    },
     {
       "id": "9b71842e-046a-4265-94c7-a27593dee381",
       "ts": "2026-11-22T12:22:54Z",
@@ -2833,21 +2846,6 @@
       "base_commit": "77a1b08b3f6645af327e8fa5e37ed4eaa840337f",
       "branch": "main",
       "frame": "03ha6rkw2izo8c8se74vqnwcn"
-    },
-    {
-      "id": "10627cc3-fce5-44a0-af8c-89e24e6a5fa4",
-      "ts": "2026-11-22T10:27:21Z",
-      "source": "freebuff",
-      "subject": "nixconfig:attio",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/attio"
-      ],
-      "files": [],
-      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
-      "branch": "main",
-      "frame": "03ha6rf5deb9a9r3e1cnqewpd"
     }
   ]
 }

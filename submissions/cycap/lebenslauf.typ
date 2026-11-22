@@ -107,6 +107,39 @@ bisherige Ansatz. Wer Erträge prognostiziert, sollte wissen, woher die Zeitreih
 - Neuronale Netze auf Langzeit-Wetterdaten, um die Netzwirtschaftlichkeit fluktuierender Solar- und Windanlagen zu bewerten.
 ]
 
+#section("Ausgewählte Arbeiten")
+#grid(columns: (1fr, 1fr), column-gutter: 10pt, row-gutter: 5pt,
+  [
+    #text(weight: "bold")[PPA-Mandat, EWE Trading] #text(size: 8pt, fill: muted)[— 2023]
+    #linebreak()
+    Preis-, Mengen- und Marktrisiken über Gas- und Energieportfolios; Hedging- und Swing-Modelle, Berichte für Handel und Treasury.
+  ],
+  [
+    #text(weight: "bold")[Solarportfolio, 10 MW PV] #text(size: 8pt, fill: muted)[— O3 Energy]
+    #linebreak()
+    Ertragsüberwachung mit Abgleich von Messdaten gegen Modellannahmen, Abweichungen dokumentiert statt geglättet.
+  ],
+  [
+    #text(weight: "bold")[Due-Diligence-Pakete] #text(size: 8pt, fill: muted)[— O&M]
+    #linebreak()
+    Prüfung und Bewertung für ein Dutzend Projekte von 4 bis 5 Mio. USD, mit Banken und Brokern als Gegenüber.
+  ],
+  [
+    #text(weight: "bold")[Anlagenperformance] #text(size: 8pt, fill: muted)[— Messtechnik]
+    #linebreak()
+    Heliostat-Messtechnik mit Interferometrie: woher Ertragsdaten kommen und wo sie systematisch irren.
+  ],
+  [
+    #text(weight: "bold")[Zeitreihen und Prognose] #text(size: 8pt, fill: muted)[— Masterarbeit]
+    #linebreak()
+    Kreuzkorrelation von Winddaten über 70 Prozent genauer als der bisherige Ansatz; neuronale Netze auf Langzeitwetterdaten.
+  ],
+  [
+    #text(weight: "bold")[Betriebsdisziplin] #text(size: 8pt, fill: muted)[— Flotte]
+    #linebreak()
+    Dreizehn Hosts deklarativ aus einem Flake, jede Änderung durch ein Gate — Reproduzierbarkeit als Nachweis, nicht als Behauptung.
+  ])
+
 #section("Ausbildung")
 #grid(columns: (1fr, auto),
   [#text(weight: "bold")[M.Sc. Renewable Energy Management] #text(fill: muted)[— Albert-Ludwigs-Universität Freiburg]],

@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T02:57:55Z",
+  "generated": "2026-11-22T03:07:16Z",
   "count": 200,
-  "pin": "b964ffd1beee5125462f72c6ef9039bfed41cfe99585df6d927ab08569095648",
+  "pin": "9030dad8589516d28d485acd424e71e07ca34cbad84036ccad2789870f910d20",
   "turns": [
+    {
+      "id": "1f47f7be-947f-49cf-ab96-447fb2f07fb2",
+      "ts": "2026-11-22T03:04:22Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +3 portal submissions (VEGA IT Security + IT Client Schiltach, Uni Freiburg Future Forests IT-Admin 50pct) all confirmed | gate: success pages + confirmation emails | ~171 applied",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d55dc1c37d93c2b6317f9ab0a42e3bc74e20d3f1",
+      "branch": "main",
+      "frame": "03ha4cvwxugr3kfr2fchhvre3"
+    },
+    {
+      "id": "fbb0d412-eb7d-4d68-b819-596847ee6bc6",
+      "ts": "2026-11-22T03:03:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-mongodb-sre-agent-engine-packet",
+      "action": "landed: drove freebuff pane to build CV packet for MongoDB SRE Agent Engine (submissions/mongodb-sre-agent-engine, gh 8366599) via agents:apps:packet",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d55dc1c37d93c2b6317f9ab0a42e3bc74e20d3f1",
+      "branch": "main",
+      "frame": "03ha4crkwujlyjf3aavdib90t"
+    },
+    {
+      "id": "90651327-0b00-4160-bb71-3ab1f1ca0ca7",
+      "ts": "2026-11-22T02:58:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:agents-note-outreach-redaction",
+      "action": "landed: AGENTS.nix note outreach-dossier-redaction records the 6a233ed9 dossier redaction, CV/submissions state, and the unscrubbed history blob | gate: artifacts.docs build PASS (agents-notes-schema red on 5 pre-existing notes, none new)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d55dc1c37d93c2b6317f9ab0a42e3bc74e20d3f1",
+      "branch": "main",
+      "frame": "03ha4bo2mbfdob24xtlh73ncv"
+    },
     {
       "id": "adbc5d92-b4b4-4495-b195-423318c26f06",
       "ts": "2026-11-22T02:56:56Z",
@@ -2741,45 +2780,6 @@
       "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
       "branch": "main",
       "frame": "03h9whsb2wk5ijryx1vw43n5n"
-    },
-    {
-      "id": "7e1d847c-663d-444b-ae34-2fcc32005566",
-      "ts": "2026-11-21T02:55:01Z",
-      "source": "delphi-freebuff",
-      "subject": "nixconfig:email-triage",
-      "action": "landed: routed email triage to delphi freebuff pane 0:1.1 (jev email_triage margin 0.38)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9whrgy3l1cghw1i4h03x9e"
-    },
-    {
-      "id": "2b4a2df9-643e-4506-b37d-988780c11e7a",
-      "ts": "2026-11-21T02:55:01Z",
-      "source": "devin",
-      "subject": "nixconfig:refactor",
-      "action": "landed: routed nixconfig refactor to devin pane 2.1 (jev nixconfig_refactor margin 0.34)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9whre2qqteeabi949huw90"
-    },
-    {
-      "id": "dd693839-43b5-499e-b462-6b204297db70",
-      "ts": "2026-11-21T02:55:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-ats",
-      "action": "landed: routed ATS quality check to freebuff pane 1.1 (jev cv_quality_ats p=0.82)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9whrb9fb14odpwxugg2orf"
     }
   ]
 }

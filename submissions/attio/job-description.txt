@@ -1,0 +1,65 @@
+Attio is the CRM for agentic revenue. Designed for the most ambitious go-to-market teams, it gives companies the power to understand every customer, automate at scale, and build their go-to-market motion exactly as they need. We've raised $116M from some of the world's best investors: GV (Google Ventures), Redpoint, Balderton, Point Nine, and 01A.
+
+We hire builders who thrive on complex technical challenges, hold themselves to a high bar, and genuinely care about delighting the people who use what they build. The team here brings sharp judgement, real craft, and the drive to do exceptional work. We're obsessed about the details and energized by the frontier.
+
+If you want to do the best work of your career, this is the right place.
+
+
+
+
+ABOUT THE ROLE
+
+Our Engineering team tackles the toughest challenges, so our users never have to. Real-time infrastructure, AI-native architecture, and a frontend that feels effortless - all powered by a team that moves fast, thinks rigorously, and holds an exceptionally high bar for quality.
+
+We're looking for Platform Engineers who treat the platform as a product, with every engineer at Attio as its customer. You'll own the infrastructure, tooling and pipelines that let the rest of engineering ship quickly and safely, and you'll be accountable for keeping all of it reliable, fast and cost-effective as we scale.
+
+
+
+
+WHAT YOU'LL DO
+
+ - Build and evolve our platform infrastructure as code (Terraform, Kubernetes, GCP), so every environment is reproducible, version-controlled and auditable.
+
+ - Own our CI/CD pipelines end-to-end, making builds, tests and deploys fast, reliable and secure for every engineer at Attio.
+
+ - Own our observability stack - metrics, logging and distributed tracing - as the foundation of an exceptional reliability culture.
+
+ - Define and hold SLOs for latency, availability and error rates, and manage capacity to stay comfortably inside them.
+
+ - Lead incident response: triage and resolve complex production issues, then run blameless post-mortems and ship the fixes as code.
+
+ - Partner with product engineering teams to remove manual toil and shorten the path from writing code to running it in production.
+
+
+WHAT YOU'LL BRING
+
+ - Hands-on experience operating production systems with an SRE mindset: SLOs, error budgets, toil reduction and blameless post-mortems.
+
+ - Excellent knowledge of modern cloud architectures (either GCP or AWS), including networking, IAM and managed services.
+
+ - Demonstrable deep expertise with Docker and Kubernetes at scale, covering cluster design, networking, storage and security.
+
+ - Proficiency in a modern language such as Typescript, Go, Python or Rust, and a track record of writing well-tested automation.
+
+ - Experience owning mission-critical operational tooling, including centralised logging or APM (e.g. Datadog, Splunk).
+
+ - Ability to communicate technical ideas to the wider team and influence how other engineers build and operate their services.
+   
+   
+
+
+WHAT WE OFFER
+
+ - Competitive salary of €105,000 to €125,000
+
+ - Equity in an early-stage tech company on an incredible trajectory
+
+ - Apple hardware
+
+ - Team off-site in fun places! (We've been to Barcelona, Lisbon, Malta, and Split so far)
+
+ - Location specific benefits
+
+ 
+
+nb. We are open to candidates currently living in: Poland, Germany, Portugal, Ireland

@@ -1,8 +1,107 @@
 {
-  "generated": "2026-11-22T10:26:00Z",
+  "generated": "2026-11-22T10:28:23Z",
   "count": 200,
-  "pin": "eb7410c46e0a1a1e39adabefd895ee09608b4c1c65570f2f5c22e610b8e0417d",
+  "pin": "5ac4d30b04f93583dfec79c76c0abbed4df00d1eecf449c9e30991f99cc7e943",
   "turns": [
+    {
+      "id": "c037b44d-43ff-4e3f-a1ff-3a4510914171",
+      "ts": "2026-11-22T10:28:17Z",
+      "source": "devin",
+      "subject": "nixconfig:camunda",
+      "action": "claim: Ashby submission attempt",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/camunda"
+      ],
+      "files": [],
+      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
+      "branch": "main",
+      "frame": "03ha6rlq0welq2nuh9uu1pqd0"
+    },
+    {
+      "id": "e1a2231b-4e84-4225-8db3-e6057a93900b",
+      "ts": "2026-11-22T10:28:10Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:stackit",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (de); fit 3, k8s gap",
+      "outcome": "done",
+      "claims": [
+        "submissions/stackit"
+      ],
+      "files": [],
+      "base_commit": "77a1b08b3f6645af327e8fa5e37ed4eaa840337f",
+      "branch": "main",
+      "frame": "03ha6rkw2izo8c8se74vqnwcn"
+    },
+    {
+      "id": "10627cc3-fce5-44a0-af8c-89e24e6a5fa4",
+      "ts": "2026-11-22T10:27:21Z",
+      "source": "freebuff",
+      "subject": "nixconfig:attio",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/attio"
+      ],
+      "files": [],
+      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
+      "branch": "main",
+      "frame": "03ha6rf5deb9a9r3e1cnqewpd"
+    },
+    {
+      "id": "456f5214-2516-4463-92fc-3d5bd810e3fe",
+      "ts": "2026-11-22T10:27:20Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:stackit",
+      "action": "claim: native Typst 2pp CV + 1pp letter (de/en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/stackit"
+      ],
+      "files": [],
+      "base_commit": "a3ee2a4708f220701de485e08421d40728750330",
+      "branch": "main",
+      "frame": "03ha6rezpkefvdugbrdmcmi74"
+    },
+    {
+      "id": "13ba9b8c-1639-4f13-b41d-3a335b5187f8",
+      "ts": "2026-11-22T10:27:16Z",
+      "source": "devin",
+      "subject": "nixconfig:catawiki-platform-engineer",
+      "action": "already applied: Greenhouse ack mail 311083 names Platform Engineer — skipped duplicate submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
+      "branch": "main",
+      "frame": "03ha6rejiqhkn1bksn4hs0t6e"
+    },
+    {
+      "id": "ee11370b-5776-4cec-8e51-3721d323b869",
+      "ts": "2026-11-22T10:27:03Z",
+      "source": "devin",
+      "subject": "nixconfig:rwth-aachen",
+      "action": "submitted: RWTH Aachen TIM Data & DevOps via email to dienhart@time.rwth-aachen.de | sent mail 8719 verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
+      "branch": "main",
+      "frame": "03ha6rd0jo3a3vdblgfb28coe"
+    },
+    {
+      "id": "2705bff3-d109-4d5c-8394-b4c0d2935c80",
+      "ts": "2026-11-22T10:26:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:coda",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
+      "branch": "main",
+      "frame": "03ha6r63abaqgb649xj7ex3qy"
+    },
     {
       "id": "252bce77-49df-46e9-ba72-fd64032c8525",
       "ts": "2026-11-22T10:25:57Z",
@@ -2563,107 +2662,6 @@
       "base_commit": "1efbc93ef8e7956001c04dd0069b4d011ca1807c",
       "branch": "main",
       "frame": "03ha5yz1qkhv1d7ay8sqaxxuu"
-    },
-    {
-      "id": "267baba1-885f-48df-90be-ef6ecac65998",
-      "ts": "2026-11-22T08:01:15Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff",
-      "action": "landed: prose-change task - redact contacts from documentation",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6d9d9fa2554617c3e084d3da1d1d459769025d74",
-      "branch": "main",
-      "frame": "03ha5yvp3u5zrct53are1t16i"
-    },
-    {
-      "id": "38e7d159-742b-43d1-9dcd-4e4d2aaa2051",
-      "ts": "2026-11-22T07:59:32Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-fau-sysadmin",
-      "action": "landed: FAU LFT sysadmin packet (JD, 2-page CV, 1-page letter, sheet) | gate: checks:prose PASS | archive audit: no interview mails since 2026-11-21; mail ids 311050/311052 do not exist (max 2928)",
-      "outcome": "done",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "d9d7bc13877cfc2f10fa744c02c2af20a5077ed4",
-      "branch": "main",
-      "frame": "03ha5yjnc2236878s4wn42y1n"
-    },
-    {
-      "id": "e233ce62-3222-404a-862e-db2b8575b7eb",
-      "ts": "2026-11-22T07:57:36Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: gocardless senior SRE (database) via GH 8385160; honest remote-from-Germany, EUR 95k, no UK work auth",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/gocardless-senior-sre-database"
-      ],
-      "files": [],
-      "base_commit": "6d9d9fa2554617c3e084d3da1d1d459769025d74",
-      "branch": "main",
-      "frame": "03ha5y5zq7f5cnr379suo48mn"
-    },
-    {
-      "id": "634c67d0-6412-4ebb-a185-09cf7e106a17",
-      "ts": "2026-11-22T07:47:46Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-citeq",
-      "action": "landed: citeq Muenster DevOps packet in submissions/citeq-muenster-devops (Interamt 1510832, Az 22-029/26, deadline 2026-11-29). German CV 2pp, letter 1pp, E11 asked instead of a euro figure (TVoeD 9a-11 = 49.8k-81.3k incl. 85% bonus). Letter names no Ansible, no Prom/Grafana/Graylog, no GitLab CI, no Docker images, no TYPO3. Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/citeq-muenster-devops"
-      ],
-      "base_commit": "9b7191b75c1f4d2256c80361f766d738e764a9c2",
-      "branch": "main",
-      "frame": "03ha5w8we3u4ge0j6rkjd0ueo"
-    },
-    {
-      "id": "2f86ea22-1dbb-43d8-8831-b51ec0c2322f",
-      "ts": "2026-11-22T07:44:32Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-bamf-devops",
-      "action": "correction: commit amended to 647dfd98 (sheet selection count 16/32, was 15/30) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/bamf-devops"
-      ],
-      "files": [],
-      "base_commit": "647dfd98c4acbb5b82da5d75953b42c6bef32854",
-      "branch": "main",
-      "frame": "03ha5vm22y9e4q8rk79ku3lu6"
-    },
-    {
-      "id": "46e4c796-890b-4a48-8187-df9c1ab44a07",
-      "ts": "2026-11-22T07:44:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-bamf-devops",
-      "action": "landed: BAMF DevOps platform packet (JD, 2-page CV, 1-page optional letter, Interamt sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/bamf-devops"
-      ],
-      "files": [],
-      "base_commit": "d7f043d8c693e02d7b5e6190fab507b10e614d14",
-      "branch": "main",
-      "frame": "03ha5vlgy1dj8boeaxk32uymf"
-    },
-    {
-      "id": "feeb1cf1-6b61-43fd-9f9f-a09a0ae0c63f",
-      "ts": "2026-11-22T07:43:37Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: ionos staff NRE karlsruhe (GH eu 4971782101) — 15 fields, both PDFs attached, OTP 64446813, /confirmation; ack 311052 | gate: GH confirmation page + mailbox ack",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6dfadfb2c74aa064692b69813d3f93d2c8e03c31",
-      "branch": "main",
-      "frame": "03ha5vfntz57p9wmbzuauc1jl"
     }
   ]
 }

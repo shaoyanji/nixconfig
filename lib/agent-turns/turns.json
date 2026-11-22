@@ -1,8 +1,81 @@
 {
-  "generated": "2026-11-22T10:47:51Z",
+  "generated": "2026-11-22T10:50:29Z",
   "count": 200,
-  "pin": "100a0fc27766286e3e0b9acc9664d975be67d2083f5e642f485a9e751fa20913",
+  "pin": "28db9d10e32a83c0f2508df1ae5ee1fc02b1f450f0c0fb988c719da6ef31c295",
   "turns": [
+    {
+      "id": "9ceed368-879e-4b52-b4dd-9e7164657492",
+      "ts": "2026-11-22T10:50:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:makersite",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "233b8ef2f9b38c19ac42868ea6382c256ee0f689",
+      "branch": "main",
+      "frame": "03ha6vwnizeu7mjkbu3snqlup"
+    },
+    {
+      "id": "e15b3914-ff88-441e-8cdf-548012b84378",
+      "ts": "2026-11-22T10:50:05Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:treatwell",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); advert body unreachable, noted; cloud gaps conceded; fit 4",
+      "outcome": "done",
+      "claims": [
+        "submissions/treatwell"
+      ],
+      "files": [],
+      "base_commit": "b4b411985bd48cf1fe899c3b37e2d5acb4f8014f",
+      "branch": "main",
+      "frame": "03ha6vv1dskcv7rkd68wofykf"
+    },
+    {
+      "id": "141d19d5-1905-4d4a-88ce-c1ee7221e9d2",
+      "ts": "2026-11-22T10:49:14Z",
+      "source": "freebuff",
+      "subject": "nixconfig:makersite",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/makersite"
+      ],
+      "files": [],
+      "base_commit": "69438c240221147b73598371b0707f5a38be2d5e",
+      "branch": "main",
+      "frame": "03ha6vp08xk4hp4e0rqttdzf3"
+    },
+    {
+      "id": "2b91bbfe-ad58-48d5-a3a9-9ae7ffb6d460",
+      "ts": "2026-11-22T10:49:02Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:treatwell",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/treatwell"
+      ],
+      "files": [],
+      "base_commit": "194f656b88adaa98efe82a31d3a84bf33dc4fc59",
+      "branch": "main",
+      "frame": "03ha6vnkbcrmohy8atd2via1a"
+    },
+    {
+      "id": "93935d8f-83e0-4180-97e8-7a8c75a1ef1d",
+      "ts": "2026-11-22T10:48:23Z",
+      "source": "devin",
+      "subject": "nixconfig:anduril",
+      "action": "claim: Greenhouse submission + adapted packet (flox sources -> anduril)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/anduril"
+      ],
+      "files": [],
+      "base_commit": "69438c240221147b73598371b0707f5a38be2d5e",
+      "branch": "main",
+      "frame": "03ha6vj2ieew0z0qv65qq3grb"
+    },
     {
       "id": "738fcc79-33f4-4efb-9093-2b9c9465d5d2",
       "ts": "2026-11-22T10:47:42Z",
@@ -2607,73 +2680,6 @@
       "base_commit": "497d090c28a77f5b35032575eb8000852c41e6e6",
       "branch": "main",
       "frame": "03ha664nbxivz5jx2a4fz6x0b"
-    },
-    {
-      "id": "62cb5c3f-7ca2-49af-9468-85f966cfd882",
-      "ts": "2026-11-22T08:37:05Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "scouted: shopware-cloud-infra packet + truetalent-freiburg lead | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "adcaa638cec91b5f89fe8f6e1650e4367f796f93",
-      "branch": "main",
-      "frame": "03ha65vr29mncol09fqnudwc2"
-    },
-    {
-      "id": "0f0ef0e2-4385-497f-bd38-63d37186031f",
-      "ts": "2026-11-22T08:37:03Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "verified: command_allowlist (-e/-c script exec) already committed in 50eba9e1, consumed by hermes gateway run unit; pushed main 24853fc0..ca16ce70; elastic GH 8267186 applied | gate: git show HEAD + push rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
-      "branch": "main",
-      "frame": "03ha65veweac6xonqdfpf76hq"
-    },
-    {
-      "id": "ef71335d-5daf-41a3-a4bf-b82f3775238b",
-      "ts": "2026-11-22T08:36:30Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: elastic-principal-cicd-platform submitted via Greenhouse embed 8267186 | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
-      "branch": "main",
-      "frame": "03ha65rlrj4ujzau115l7ekau"
-    },
-    {
-      "id": "e9f20151-d89c-4578-8740-4bf4fc285b0d",
-      "ts": "2026-11-22T08:34:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "drove idle devin pane 0:2.1: classified next task host-change (p=0.99, margin=0.98) via jev-decide typesafe; task submitted and devin is Thinking (command_allowlist review/commit plus elastic precheck)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
-      "branch": "main",
-      "frame": "03ha65g1yumd75woy1h5l4ody"
-    },
-    {
-      "id": "0017354c-4092-4ea2-bf66-3b9af3c35963",
-      "ts": "2026-11-22T08:34:45Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: elastic principal SWE cicd (GH embed 8267186); poland-req-from-germany honest framing",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/elastic-principal-cicd-platform"
-      ],
-      "files": [],
-      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
-      "branch": "main",
-      "frame": "03ha65fc9pw3gh4wp84294idx"
     }
   ]
 }

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T08:26:12Z",
+  "generated": "2026-11-22T08:26:26Z",
   "count": 200,
-  "pin": "335b35d187a8b755624cee5e38f4054738a8df089c2cc7ec8f1eaf43336402a4",
+  "pin": "542b6652e3dca35b80a1de67c10f045dc7fd8955c2ddcea0ea280448d9097266",
   "turns": [
+    {
+      "id": "446925a5-0e02-4898-833e-7843548c7a2a",
+      "ts": "2026-11-22T08:26:16Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: bamf-devops packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "125b1e79d6751a434b26af61e0586f483bd75609",
+      "branch": "main",
+      "frame": "03ha63rmgmqbfponbr1kl7i81"
+    },
     {
       "id": "55ff8e4d-81e6-4adc-8f0b-50ce9f802946",
       "ts": "2026-11-22T08:25:44Z",
@@ -2778,19 +2791,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha0ykl3jsyltar0b5916a75"
-    },
-    {
-      "id": "203a76a6-ae3d-4499-80c3-66a786c99ccf",
-      "ts": "2026-11-21T16:27:39Z",
-      "source": "tmux-pane-steward",
-      "subject": "hermes:steward",
-      "action": "scan",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0wi6z8exnbfbyt9ebylmw"
     }
   ]
 }

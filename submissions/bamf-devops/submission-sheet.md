@@ -110,7 +110,7 @@ SÜ1-Bereitschaft.
 | `pdfinfo lebenslauf.pdf` | **2 Seiten** (Budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 Seite** (Budget 1) |
 | `task checks:prose` | 213 prose files, exit 0 |
-| selection | / highlights, / projects |
+| selection | 12/25 highlights, 4/8 projects |
 | sha256 Lebenslauf | `6594993149022be988a7157c13c2e5e2f33292e37dc7efc2d55d5ddd10315b21` |
 | sha256 Anschreiben | `abb9fd658b3cbb213987162385a380ebc8a1e4861f5ae0dde7eb72b0db0c0d61` |
 

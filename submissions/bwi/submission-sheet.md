@@ -1,126 +1,71 @@
 # BWI GmbH — Senior Infrastructure/Platform Engineer (m/w/d)
 
-**Status:** versandfertig nach Prüfung — keine Bewerbung eingereicht
-**Stand:** 2026-11-21
-**Paket:** `submissions/bwi/`
+Stellen-ID **64059** · Bonn · Köln · Meckenheim · Vollzeit, unbefristet · Bereich DevSecOps Engineering im Competence Center IT-Security (CCITS).
+Ausgeschriebenes Band **71.000–91.650 EUR** brutto jährlich.
 
-## Rolle
+**Status:** beworben über das BWI-Karriereportal (Concludis 64059), Bestätigungsseite am 2026-11-22 geprüft. Dieses Paket ersetzt die Nix-PDFs durch
+Typst-Quellen und bleibt bei den abgegebenen Aussagen.
 
-| Feld | Stand |
-| :--- | :--- |
-| Unternehmen | BWI GmbH |
-| Bereich | DevSecOps Engineering / Competence Center IT-Security (CCITS) |
-| Rolle | Senior Infrastructure/Platform Engineer (m/w/d) |
-| Stellen-ID | 64059 |
-| Standorte | Bonn, Köln oder Meckenheim |
-| Arbeitsmodell | Präsenz an einem der Standorte, Homeoffice nach BWI-Regelung; die Remotive-Fassung nennt "remote", der Originaltext nennt die drei Standorte |
-| Anstellung | Vollzeit, unbefristet, ab sofort |
-| Vergütung | 71.000–91.650 EUR brutto p. a. (BWI-Band); Ziel: 88.000–92.000 EUR |
-| Bewerbung | https://www.bwi.de/karriere/stellenangebote/job/senior-infrastructure-platform-engineer-m-w-d-64059 |
-| Karriereseite | https://www.bwi.de/karriere |
-| JD im Paket | `job-description.txt` |
-| JD-Quelle | `~/.config/appflow/jd/bwi-senior-infrastructure-platform.txt` |
-| Verifiziert | 2026-11-21: BWI-Stellenseite HTTP 200, Titel "Senior Infrastructure/Platform Engineer (m/w/d)", Stellen-ID 64059 |
+## Altpaket, jetzt wirklich in der Historie
 
-**Kontakt BWI:** `bewerbung@bwi.de` · +49 (0)2225 988 25000 · BWI GmbH, Auf dem Steinbüchel 22, 53340 Meckenheim.
+Alle fünf Dateien waren untracked und gingen zuerst unverändert in einen eigenen Commit (`appflow(bwi): stage das Altpaket vor dem Typst-Neubau`).
+Im Neubau-Commit wurden sie ersetzt:
 
-## Kandidat
-
-| Feld | Angabe |
-| :--- | :--- |
-| Name | Matt Ji |
-| Adresse | Am Burgerhof 4, 79261 Gutach im Breisgau, DE |
-| E-Mail | matt@bountystash.com |
-| Telefon | +49 1733281570 |
-| LinkedIn | https://linkedin.com/in/mattji |
-| GitHub | https://github.com/shaoyanji |
-| Staatsangehörigkeit | Vereinigte Staaten |
-| Aufenthalt | Deutschland — unbefristete Niederlassungserlaubnis |
-| Arbeitsberechtigung | Deutschland/EU ohne Sponsoring; US-Staatsbürger |
-| Deutsch | C1 |
-| Englisch | Muttersprache |
-| Verfügbar ab | 01.12.2026 |
-| Gehaltsvorstellung | 88.000–92.000 EUR brutto p. a. |
-| Reisebereitschaft | Ja |
-
-## Bewerbungsunterlagen
-
-| Datei | Zweck |
-| :--- | :--- |
-| `anschreiben.pdf` | Deutsches Anschreiben, 1 Seite A4 |
-| `lebenslauf.pdf` | Deutscher Lebenslauf, 2 Seiten A4 |
-| `selection.json` | Audit der ausgewählten Projekte, Skills und Stationen |
-| `job-description.txt` | Saubere Stellenbeschreibung mit Quellenkopf |
-| `submission-sheet.md` | Diese Übersicht |
-
-Zeugnisse, Zertifikate und Nachweise: nicht beigefügt. Im BWI-Portal prüfen, ob Arbeitszeugnisse, Hochschulnachweise oder ein Nachweis der Niederlassungserlaubnis verlangt werden.
-
-## Portal und Formular
-
-Die BWI-Stellenseite führt in das BWI-Bewerbungsportal. Die einzelnen Formularfelder wurden nicht separat ausgelesen; vor dem Absenden im Portal prüfen. Staged sind die üblichen Angaben:
-
-- Vorname: Matt
-- Nachname: Ji
-- E-Mail: matt@bountystash.com
-- Telefon: +49 1733281570
-- Anschreiben: `anschreiben.pdf`
-- Lebenslauf: `lebenslauf.pdf`
-- frühester Eintritt: 01.12.2026
-- Gehaltsvorstellung: 88.000–92.000 EUR brutto p. a.
-- Deutschkenntnisse: C1
-- Englischkenntnisse: Muttersprache
-- Reisebereitschaft: Ja
-- Staatsangehörigkeit/Aufenthalt: US-amerikanisch; unbefristete deutsche Niederlassungserlaubnis
-
-Keine Angabe zu einer bereits erfolgten Sicherheitsüberprüfung: Das JD nennt keine SÜG-Anforderung. Falls das Portal danach fragt, wahrheitsgemäß beantworten und keine Prüfung behaupten, die nicht stattgefunden hat.
-
-## Anforderungen → Evidenz
-
-| BWI-Anforderung | Evidenz im Paket | Bewertung |
+| Datei | sha256 (erste 16) | Was sie war |
 | :--- | :--- | :--- |
-| Infrastruktur, Linux, Nix/NixOS | 13-Host-NixOS-Flotte aus einem Flake; gepinnte Inputs, systemd, hermetische Builds, CI-Gate und Rollback | Stärke |
-| Kubernetes, ideal CKA/CKS | Kubernetes in den DevOps-Skills; keine CKA/CKS-Zertifizierung, keine air-gapped-Cluster in Produktion | Offene Lücke, im Anschreiben benannt |
-| Automation / Infrastructure as Code | Flake, Taskfile-Steuerung, CI/CD, Go-/Python-/Bash-Automatisierung, reproduzierbare Builds | Stärke |
-| Linux-Härtung | SOPS/age-Secrets, SSH-CA mit kurzlebigen Zertifikaten, systemd-Dienste, keine stehenden Host-Schlüssel | Stärke, keine formale BSI-Härtungszertifizierung |
-| Virtualisierung | KVM-/microVM-Labore und systemd-Gäste | Laborerfahrung, keine großen VMware-/OpenStack-Umgebungen |
-| Network Storage / Ceph | ZFS, SMART/NVMe, Backup- und Restore-Praxis | Ceph nicht produktiv; im Anschreiben benannt |
-| Go | `bountystash`-Dienst, Go-Fuzzer, CLI/TUI | Stärke |
-| Deutsch C1, Englisch gut | Deutsch C1, Englisch Muttersprache | Erfüllt |
-| Reisebereitschaft | Ausdrücklich zugesagt | Erfüllt |
-| Dokumentation / Stakeholder | Runbooks, technische Dokumentation, Kunden- und Teamkommunikation | Plausibel, im Anschreiben adressiert |
+| `lebenslauf.pdf` | `e5b297ead7b811a2…` | Nix-CV mit der Überschrift Senior Infrastructure/Platform Engineer — Linux, Kubernetes & NixOS |
+| `anschreiben.pdf` | `8edd88d41b6b3744…` | Nix-Anschreiben, nannte Container-/Kubernetes-Grundlagen und CISA KEV, ohne Deckung im Repo |
+| `selection.json` | `045afab07c44fb61…` | Auswahlausgabe |
+| `submission-sheet.md` | `8313396b6a672f3b…` | das Blatt vom 2026-11-21, Vorgänger dieser Datei |
 
-## Positionierung im Anschreiben
+`job-description.txt` bleibt unverändert: eine echte Aufzeichnung der Anzeige.
 
-Das Anschreiben führt mit der NixOS-Flotte und der DevSecOps-Schnittstelle, nicht mit der Energie-Historie. Es nennt drei Grenzen ausdrücklich:
+## Dateien
 
-1. **Kubernetes:** Werkzeugkasten und Grundlagen, aber keine CKA/CKS-Zertifizierung und keine air-gapped-Produktion.
-2. **Ceph:** nicht produktiv betrieben; Storage-Erfahrung über ZFS, SMART/NVMe und Backups.
-3. **Virtualisierung:** KVM-/microVM-Labore, keine großen VMware- oder OpenStack-Umgebungen.
+| Datei | Seiten | Wörter | Warnungen | sha256 (erste 16) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 952 | 0 | `fc413b748cd7d6bc` |
+| `anschreiben.pdf` | 1 | 423 | 0 | `09d4ee939e9c990c` |
 
-Diese Offenheit ist bewusst: BWI betreibt sicherheitskritische Infrastruktur, und ein Gespräch über die Lücken ist besser als eine Behauptung, die im Technical Interview auffällt.
+## Vier Säulen der Anzeige, gegen das Repository geprüft
 
-## Gehalt und Start
+| Säule | Beleg im Repo | Im Dokument |
+| :--- | :--- | :--- |
+| Linux-Systemtechnik und Härtung | systemd-Dienste mit `ProtectSystem=strict`, `ProtectHome`, `PrivateTmp`, `NoNewPrivileges`; ein Benutzer je Dienst; `firewall-scope.nix` mit Freigaben je Dienst und Netz samt datierten Streichungen | vollständig behauptet |
+| Deklarative Nix-Konfiguration | dreizehn Hosts aus einem Flake mit gepinnten Inputs, Modullisten je Host, ein Auswertungslauf pro Host als Freigabe, Rollback auf die vorherige Generation | vollständig behauptet |
+| DevSecOps-Automatisierung | Task-Control-Plane mit Planungslauf, JSON-Ausgabe und Exit-Code je Ergebnis; `.githooks/pre-commit` und `pre-push`; Gates für Format, Syntax und Textregeln; CI-Matrix aus dem Inventar | vollständig behauptet |
+| Sicherheits- und Zugriffsposition | eigene SSH-CA mit kurzlebigen Zertifikaten, SOPS/age mit einem Schlüssel je Host, keine stehenden Schlüssel, Secrets im Repository statt auf dem Host | vollständig behauptet |
 
-- BWI-Band: 71.000–91.650 EUR brutto p. a.
-- Staged: 88.000–92.000 EUR brutto p. a. — oberes Ende, innerhalb der vom Auftraggeber genannten Bandbreite von 71.000–92.000 EUR.
-- Frühester Eintritt: 01.12.2026.
-- Reisebereitschaft: ja.
-- Kein Sponsoring erforderlich.
+Dazu, als Betriebsarbeit und nicht als Zertifizierung: Telemetrie im Sentinel (Job-Status, Generationsalter, Disk/Inode, PSI) mit Alarm auf Zustand und
+Stille, PostgreSQL mit geordneten Migrationen und einem Wiederherstellungsdrill, Virtualisierung im microVM-Labor auf KVM.
 
-## Vor dem Absenden
+## Lücken, in beiden Dokumenten benannt
 
-- [ ] Im BWI-Portal prüfen, ob Anschreiben und Lebenslauf als PDF hochgeladen oder einzelne Felder manuell befüllt werden.
-- [ ] Prüfen, ob Zeugnisse, Hochschulnachweise oder Niederlassungserlaubnis verlangt werden.
-- [ ] Prüfen, ob das Portal eine Sicherheitsüberprüfung/SÜG abfragt; keine nicht erfolgte Prüfung behaupten.
-- [ ] Standortpräferenz Bonn, Köln oder Meckenheim angeben; Homeoffice-Regelung bestätigen.
-- [ ] Gehaltsfeld mit 88.000–92.000 EUR brutto p. a. füllen.
-- [ ] Nach dem Absenden: Bestätigungsmail archivieren und Status in `apps-db` auf `applied` setzen.
+Kein Kubernetes im Produktivbetrieb, weder als Cluster noch air-gapped, und weder CKA noch CKS. Kein Ceph im Betrieb; Storage-Erfahrung sind ZFS,
+SMART/NVMe, NFS/SMB und Backups. Virtualisierung aus KVM- und microVM-Laboren, nicht aus VMware oder OpenStack im Großbetrieb. Kein
+BSI-Grundschutz-Projekt verantwortet; die Anzeige fordert es nicht, der Behördenkontext verlangt es faktisch. Skalierung: Einzelbetreiber mit dreizehn
+Hosts, nicht ein Rechenzentrum mit tausenden Knoten.
 
-## Offene Punkte
+Zwei Sätze des Altpakets sind deshalb entfallen: Container-/Kubernetes-Grundlagen als Kompetenz (zu weich für ein Profil, das CKA/CKS nennt, und ohne
+Beleg) und die Behauptung, Schwachstellenarbeit laufe über CISA KEV und Aufwands-Cluster — dafür gibt es im Repository keinen Beleg.
 
-- **Kubernetes-Tiefe:** Die Rolle verlangt sehr gute Kubernetes-Kenntnisse, ideal CKA/CKS. Das Paket behauptet weder Zertifizierung noch air-gapped-Produktion; es stellt die Linux-, Automatisierungs- und Sicherheitsseite in den Vordergrund.
-- **Ceph:** Nicht produktiv; ZFS/SMART/NVMe sind die belegbare Storage-Basis.
-- **Sicherheitsüberprüfung:** Nicht im JD genannt, aber bei BWI/Bundeswehr-Umfeld im Portal klären.
-- **Standort:** Die Anzeige nennt Bonn, Köln und Meckenheim; die Remotive-Fassung bezeichnet die Rolle als remote. Die Präsenz- und Homeoffice-Erwartung vor dem Absenden bestätigen.
+## Weg und Formalien
 
-Keine Bewerbung wurde eingereicht.
+Bewerbung über das BWI-Karriereportal (Concludis, ID 64059) oder `bewerbung@bwi.de`. Präsenz ist an einem der drei Standorte vorgesehen; die
+Remotive-Fassung nennt remote, der Originaltext nicht, deshalb steht im Anschreiben der Umzug an einen Standort und keine Remote-Zusage.
+Sicherheitsüberprüfung nach SÜG: Bereitschaft erklärt, ohne eine Zusage zu behaupten. US-Staatsbürgerschaft mit unbefristeter Niederlassungserlaubnis,
+Deutsch C1, Englisch Muttersprache, Eintritt ab 01.12.2026, Reisebereitschaft ja.
+
+**Gehalt:** 88.000–91.650 EUR, also an der Oberkante des Bands. Das vorige Blatt nannte 88.000–92.000 EUR und lag damit über dem ausgeschriebenen Band;
+die Oberkante ist die belastbare Zahl und steht so im Anschreiben.
+
+## Prüfungen
+
+| Prüfung | Ergebnis |
+| :--- | :--- |
+| `typst compile` beider Quellen | je 0 Warnungen |
+| Seitenbudget | CV 2 Seiten, Anschreiben 1 Seite (vor dem Commit geprüft; der erste Anlauf mit 528 Wörtern lief auf zwei Seiten und wurde nicht committet) |
+| `**` in den Quellen | 0 |
+| Typografische Anführungszeichen | 0 |
+| `task checks:prose` | Exit 0 |
+| Altpaket | zuerst gestaged, im Neubau ersetzt, Hashes oben |

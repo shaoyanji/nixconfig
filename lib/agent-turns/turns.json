@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-22T11:58:47Z",
+  "generated": "2026-11-22T12:00:38Z",
   "count": 200,
-  "pin": "34ee32aba1296bb095b8a58f6e99c6d35b8243313b3d105e93f17f8f98da9844",
+  "pin": "ce44eaf9c80d2bb5e17c5e8c67e5bd38a726a09393a6c94b7cb3c6247b3449f3",
   "turns": [
+    {
+      "id": "5e55788e-8f1c-446d-8ba3-4c71a09b44c7",
+      "ts": "2026-11-22T11:59:55Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building mongodb-sre-storage (pane 1), submitting sumup (pane 2), cleaning bwi + inspecting sinc (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/mongodb-sre-storage-layer",
+        "submissions/sumup",
+        "submissions/sinc-devops"
+      ],
+      "files": [],
+      "base_commit": "f7da8bc8482097b9c0b629b43051a8fbab50deed",
+      "branch": "main",
+      "frame": "03ha79i3955rnnmjlr6a1ga9n"
+    },
+    {
+      "id": "9c52940d-a0e2-4dbf-bfdd-e426dff11b86",
+      "ts": "2026-11-22T11:58:57Z",
+      "source": "freebuff",
+      "subject": "nixconfig:elastic-cicd",
+      "action": "landed: native English Typst dossier for Principal SWE I, CI/CD — CV 2pp/1205w, letter 1pp/518w, 0 warnings; moved the gate/provenance/supply-chain mechanics from the letter into the CV, retired packet/ + letter.json | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f7da8bc8482097b9c0b629b43051a8fbab50deed",
+      "branch": "main",
+      "frame": "03ha79bc0o4bh1uddjal7qji5"
+    },
     {
       "id": "b4856388-266c-4deb-b768-ea6575ceec8d",
       "ts": "2026-11-22T11:58:36Z",
@@ -2808,32 +2838,6 @@
       "base_commit": "a6e5a1454a8ca1b166fdf6971d7f557a7027f376",
       "branch": "main",
       "frame": "03ha6mvwbuuygl3u6bbgk9ugf"
-    },
-    {
-      "id": "04aabcb3-9cdb-4014-b35d-b41edbaebbad",
-      "ts": "2026-11-22T10:03:28Z",
-      "source": "devin",
-      "subject": "nixconfig:ionos-staff-nre",
-      "action": "already applied under ionos-staff-network-reliability-engineer-karlsruhe (same Greenhouse req); ack mail 311052 verified — skipped duplicate submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c6e7063a993f63014688dab1b850b38fe06dbef",
-      "branch": "main",
-      "frame": "03ha6mr67o6193j7jmzthv8pj"
-    },
-    {
-      "id": "12382c07-21a7-49dd-9b3f-554ee2f262ef",
-      "ts": "2026-11-22T10:00:45Z",
-      "source": "freebuff",
-      "subject": "nixconfig:camunda",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c6e7063a993f63014688dab1b850b38fe06dbef",
-      "branch": "main",
-      "frame": "03ha6m84zkg2x3w0h4fgn1vr2"
     }
   ]
 }

@@ -36,6 +36,13 @@ Wartung und Pflege der IT-Infrastruktur (Linux und Windows, Server, NAS, Worksta
 
 Beim Umbau entfernt: `letter.json`, `resume.json`, `selection.json`. Beide PDFs neu erzeugt.
 
+## Gemessene Artefakte
+
+| Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 36938 | 531 | `193c56b4667d3712` |
+| `anschreiben.pdf` | 1 | 24438 | 342 | `b4f58a4ca3b4f533` |
+
 ## Anforderungsprüfung
 
 | Anforderung | Nachweis | Bewertung |

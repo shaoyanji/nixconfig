@@ -1,8 +1,60 @@
-DevOps Engineer (m/w/d) — fuer die citeq
-citeq — IT-Dienstleister der Stadt Muenster, Team "Web-Entwicklung und -Betrieb"
+DevOps Engineer (m/w/d) - fuer die citeq
+citeq - IT-Dienstleister der Stadt Muenster, Team "Web-Entwicklung und -Betrieb"
 Standort: Scheibenstrasse 109, 48153 Muenster | Vollzeit | unbefristet | Start naechstmoeglicher Zeitpunkt
-Verguetung: TVoeD-VKA E 9a bis E 11 (A 11) | Ausschreibungsnummer 22-029/26
-Bewerbungsfrist: 29.11.2026 | hybrid/remote moeglich
-Quelle: https://www.getbaito.com/de/job/devops-engineer-mwd-stadt-muenster (Spiegel der Interamt-Anzeige 1510832; interamt.de liefert eine Redirect-Schleife)
+Verguetung: TVoeD/TV IKT E 9a bis E 11, in Vollzeit 3.877,94 bis 6.326,77 EUR brutto, plus Jahressonderzahlung (85 %) und LoB; Beamt*innen A 11 LBesO A NRW
+Ausschreibungsnummer: 22-029/26 | Bewerbungsfrist: 29.11.2026 | Homeoffice und Gleitzeit
+Fachkontakt: Tobias Burgmann, Teamleitung "Projekte, Web-Entwicklung, TYPO3", 0251/492-1868, Burgmann(at)citeq.de
+Quelle: https://de.trabajo.org/stellenangebot-4112-915a1e46c8b080d8ddd9c64ff925cf01 (Spiegel; interamt.de liefert eine Redirect-Schleife, getbaito.com antwortete mit 429)
 
-p
+Gute Einstellung
+DevOps Engineer (m/w/d)
+Für die citeq
+Ausschreibungsnummer: 22-029/26
+• Vergütung E 9a
+- E 11 A 11
+• Arbeitszeit Vollzeit
+• Startdatum nächstmöglicher Zeitpunkt
+• Befristung unbefristet
+• Bewerbungsfrist 29.11.2026
+• Standort Scheibenstraße 109
+Die citeq ist der zentrale IT-Dienstleister für die Stadt Münster und weitere Kommunen im Münsterland. Als innovativer Partner sorgen wir dafür, dass IT-Lösungen den hohen Anforderungen der öffentlichen Verwaltung gerecht werden. Für unser Team "Web-Entwicklung und -Betrieb" suchen wir motivierte Verstärkung. In diesem Team administrieren wir unterschiedlichste IT-Systeme und entwickeln Web-Lösungen.
+Ihre Aufgaben
+• Das automatisierte Configuration-Management mit Ansible halten Sie nicht nur am Laufen, sondern entwickeln es kontinuierlich weiter. Auch zentrale Tools für den Entwicklungsworkflow stellen Sie bereit und optimieren diese.
+• Mit Prometheus, Grafana und Graylog sorgen Sie für eine leistungsfähige Monitoring-Umgebung und behalten den Überblick
+über uns
+ere Systeme.
+• Effiziente Deploymentprozesse sind Ihnen wichtig. Sie optimieren GitLab CI-Pipelines und automatisieren Release-, Deployment
+- und Testverfahren für unsere Webapplikationen.
+• Zentrale Docker-Images entwickeln und pflegen Sie, um eine stabile und flexible Container-Infrastruktur zu gewährleisten.
+• Die Sicherheit unserer Webapplikationen steht bei Ihnen im Fokus: Sie bauen die Security-Infrastruktur gezielt aus.
+Sie wollen genauer wissen, was auf Sie zukommt?
+Wir bieten
+interessierten Bewerber*innen während der Bewerbungsfrist an, den Arbeitsplatz und die Aufgaben vor Ort kennenzulernen. Für eine Terminvereinbarung sowie bei fachlichen Fragen steht Ihnen Tobias Burgmann zur Verfügung, der das Team "Projekte, Web-Entwicklung, TYPO3" leitet (0251/492-18 68, Burgmann(at)citeq.de).
+Ihr Profil
+• Sie überzeugen uns mit einem abgeschlossenen Hochschulstudium mit IT-Bezug, vorzugsweise im Bereich der Verwaltungsinformatik, Informatik, Wirtschaftsinformatik oder BWL.
+• Alternativ haben Sie eine IT-Ausbildung z.
+B. als Fachinformatiker*in oder IT-Systemkaufmann/Systemkauffrau oder eine Fortbildung als Bachelor Professional in IT (ehem. Operative Professional) (IHK) abgeschlossen.
+• Alternativ: können Sie eine kaufmännische Ausbildung mit mindestens einjähriger Berufserfahrung im IT
+- oder Digitalisierungsbereich vorweisen.
+• Alternativ haben Sie die Befähigung für den allgemeinen Verwaltungsdienst der Laufbahngruppe 2, 1. Einstiegsamt erworben oder den Verwaltungslehrgang II abgeschlossen sowie eine mindestens einjährige Berufserfahrung im IT
+- oder Digitalisierungsbereich. Bewerbungen von Beamtinnen sind nur außerhalb der Probezeit möglich. Für Beamtinnen mit einem Studium der Verwaltungsinformatik entfällt diese Einschränkung.
+Ihre Kompetenzen
+• Sie verfügen über mehrjährige Berufserfahrung im Bereich Linux-Webserverinfrastruktur und IT-Security. (Wünschenswert)
+• Sie automatisieren Entwicklungs-, Test
+- und Betriebsprozesse und sind dafür neben Kenntnissen in Container-Technologien sowie dem Aufbau von CI-/CD-Pipelines idealerweise auch mit einer oder mehreren Programmiersprachen und Datenbankmanagementsystemen vertraut.
+• Sie lösen Probleme analytisch und eigenständig – immer mit Blick auf die Anforderungen unserer internen und externen Kund*innen.
+• Dank Ihrer ausgeprägten Kommunikationsfähigkeit integrieren Sie sich schnell in unser Team und arbeiten effektiv mit verschiedenen Schnittstellen zusammen.
+• Zuletzt zeichnen Sie sich durch eine Hands-on-Mentalität sowie Lernbereitschaft und Neugier aus.
+Jetzt online bewerben
+Unser Angebot
+• Transparente Bezahlung
+Die Eingruppierung erfolgt in Abhängigkeit von den übertragenen Tätigkeiten im Zusammenhang mit Ihrer Qualifikation von Entgeltgruppe 09a bis 11 des Tarifvertrages für den öffentlichen Dienst (TVöD/TV IKT), ggfls. verbunden mit entsprechenden Entwicklungsperspektiven. Das bedeutet in Vollzeit je nach Berufserfahrung zwischen 3.877,94 und 6.326,77 € brutto, hinzu kommt eine Jahressonderzahlung i. H. v. 85 % sowie eine leistungsorientierte Bezahlung (LoB).
+Beamt*innen werden im Wege der Versetzung übernommen. Für sie ist die Stelle nach Besoldungsgruppe 11 LBesO A NRW bewertet.
+• Work-Life-Balance
+Durch Home-Office und Gleitzeit ermöglichen wir Ihnen die zeitliche und örtliche Flexibilität, die Sie für Ihr Leben brauchen. Darüber hinaus haben Sie bei uns die Möglichkeit, ein Sabbatical wahrzunehmen.
+• Corporate Benefits
+Wir bieten
+unseren Mitarbeiter*innen Zugang zu exklusiven Rabatten und Sonderkonditionen auf eine Vielzahl von Produkten und Dienstleistungen – von Freizeitaktivitäten bis hin zu Alltagsangeboten.
+• Mobilität und Umwelt
+Wir unterstützen unsere Mitarbeiter*innen mit nachhaltigen Mobilitätsangeboten, wie beispielsweise einem vergünstigten „JobTicket“ für den ÖPNV oder der Möglichkeit eines Fahrradleasings.
+

@@ -22,19 +22,20 @@ Der Reiz liegt im Maßstab: nicht eine Flotte für sich selbst, sondern Systeme,
 
 ## Was fehlt
 
-- Kubernetes, OpenShift, Docker im Produktivbetrieb.
-- Ansible und Terraform; die Automatisierung ist deklarative Konfiguration plus Git.
+- Ansible, das laut Anzeige die zentrale Automatisierungsaufgabe ist.
+- GitLab CI, Docker-Images, Prometheus, Grafana, Graylog.
+- Kubernetes und OpenShift (nicht gefordert, aber verwandt).
 - Erfahrung mit kommunaler Verwaltung, Vergaberecht und den Formalien des öffentlichen Dienstes.
 - Betrieb mehrerer Web-Fachverfahren in einem Team.
 
 ## Lage
 
-Wohnort Gutach im Breisgau, rund 600 km von Münster. Hybrid ist genannt, der erwartete Präsenzanteil nicht. Das Anschreiben fragt das offen und verspricht keinen Umzug vor einer erprobten Zeit. Die Frage gehört vor eine Zusage, nicht danach.
+Wohnort Gutach im Breisgau, rund 600 km von Münster. Homeoffice und Gleitzeit sind genannt, der erwartete Präsenzanteil nicht. Die citeq bietet während der Bewerbungsfrist einen Besuch des Arbeitsplatzes an, Termin über Tobias Burgmann (0251/492-1868). Das Anschreiben nimmt das Angebot an und verspricht keinen Umzug vor einer erprobten Zeit.
 
 ## Weg
 
-Online-Bewerbung über das Verfahren der Stadt Münster; die Interamt-Anzeige 1510832 verlinkt dorthin und liefert selbst eine Redirect-Schleife. Anzeigentext aus dem baito-Spiegel, deshalb vor dem Absenden am Original prüfen.
+Online-Bewerbung über das Verfahren der Stadt Münster; die Interamt-Anzeige 1510832 verlinkt dorthin und liefert selbst eine Redirect-Schleife. Anzeigentext aus dem trabajo-Spiegel, deshalb vor dem Absenden am Original prüfen. Fachfragen: Tobias Burgmann, 0251/492-1868.
 
 ## Gehalt
 
-E 9a bis E 11 TVöD-VKA, Spanne rund 46.500 bis 75.900 EUR. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt über E 11. E 11 anstreben, Stufe verhandeln, keine Zahl im Anschreiben.
+E 9a bis E 11 nach TVöD/TV IKT, in Vollzeit 3.877,94 bis 6.326,77 EUR brutto, dazu Jahressonderzahlung von 85 % und LoB. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt über E 11. E 11 anstreben und begruenden, Stufe verhandeln, keine Zahl im Anschreiben.

@@ -1,8 +1,79 @@
 {
-  "generated": "2026-11-22T10:38:54Z",
+  "generated": "2026-11-22T10:41:37Z",
   "count": 200,
-  "pin": "12e654187cc3e694cc160dba35a7b41d5c26c111456020690426db8407538107",
+  "pin": "733c8121aa8953008de30e099e947899c56a68d49399ae7f69ae27517e5c4656",
   "turns": [
+    {
+      "id": "dc9d7dd0-ee79-437c-9266-763a4caa8296",
+      "ts": "2026-11-22T10:40:30Z",
+      "source": "freebuff",
+      "subject": "nixconfig:publitas",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/publitas"
+      ],
+      "files": [],
+      "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
+      "branch": "main",
+      "frame": "03ha6tzm5sjx6gulf33mcxxqt"
+    },
+    {
+      "id": "d2a439e9-92a9-4370-baa1-c534f26a3d58",
+      "ts": "2026-11-22T10:39:48Z",
+      "source": "devin",
+      "subject": "nixconfig:ledgy",
+      "action": "re-assigned; already applied: req 5024440101 OTP-verified 2026-11-21 — ack mail 310959. Skipped duplicate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
+      "branch": "main",
+      "frame": "03ha6tun64ypijdq5n05t2y92"
+    },
+    {
+      "id": "7dd91ef9-e44d-4e3d-9cd7-29ee1482d4c7",
+      "ts": "2026-11-22T10:39:04Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:elastic-principal-cicd-platform",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); CI-scale gap named; fit 4",
+      "outcome": "done",
+      "claims": [
+        "submissions/elastic-principal-cicd-platform"
+      ],
+      "files": [],
+      "base_commit": "d7212578a4aabaf4b65e365d8b3a629a2b59d54c",
+      "branch": "main",
+      "frame": "03ha6tpkgl6r3gy2vfcfalxlj"
+    },
+    {
+      "id": "ed0a864b-11e7-4289-ab5e-0886728bb2f3",
+      "ts": "2026-11-22T10:39:01Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:elastic-principal-cicd-platform",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/elastic-principal-cicd-platform"
+      ],
+      "files": [],
+      "base_commit": "e9d61510247451f58e90894a91e2a38ebf2bd269",
+      "branch": "main",
+      "frame": "03ha6tp70363pb81skbtwci91"
+    },
+    {
+      "id": "0e5ff8df-881e-4506-852b-50c5c35586bd",
+      "ts": "2026-11-22T10:38:57Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flower",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
+      "branch": "main",
+      "frame": "03ha6tonycdpdl3geq4jrsn8v"
+    },
     {
       "id": "277277fc-6804-4afd-9786-6980b2e3601a",
       "ts": "2026-11-22T10:38:42Z",
@@ -2599,75 +2670,6 @@
       "base_commit": "a7b720e2b3f3c908d4b891e4fe42b1c7d1bf78cf",
       "branch": "main",
       "frame": "03ha63j9gjbx9i4lh5zf5wu15"
-    },
-    {
-      "id": "e6c47ea7-64a3-4cae-ab87-434144b6519a",
-      "ts": "2026-11-22T08:24:06Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: telekom-sre-prometheus packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a7b720e2b3f3c908d4b891e4fe42b1c7d1bf78cf",
-      "branch": "main",
-      "frame": "03ha63cenm11f0gc6tvwtxgfg"
-    },
-    {
-      "id": "2a7627b1-ff95-4630-ac2f-ab178aa544c7",
-      "ts": "2026-11-22T08:23:11Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: ptb-hpc-linux packet + 2 Fraunhofer leads; duplicates bizfactory/ewerk set to other | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/ptb-hpc-linux"
-      ],
-      "files": [],
-      "base_commit": "067737c683e02e6d7c88fba7c040c3afb853c90b",
-      "branch": "main",
-      "frame": "03ha635v2q7skr6j45x3uk4i9"
-    },
-    {
-      "id": "acfe1c60-0a88-4eb8-b786-ba7d52f63186",
-      "ts": "2026-11-22T08:22:49Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: nebius senior system engineer cloudgate (GH embed 4377696101); same board family as token-factory",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/nebius-cloudgate"
-      ],
-      "files": [],
-      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
-      "branch": "main",
-      "frame": "03ha633fasvphzk57cb266l0y"
-    },
-    {
-      "id": "eeee5e15-8926-4053-8a2e-2a96ed1d804b",
-      "ts": "2026-11-22T08:21:00Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "drove idle devin pane 0:2.1 with the outreach-dossier contact-address task (jev prose-change p=0.88 margin 0.83); 'Running tools · 14s' confirms submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
-      "branch": "main",
-      "frame": "03ha62qjprf6vdfd6muvz707n"
-    },
-    {
-      "id": "bde4f7e8-1c16-4187-b9a5-ee4ddadddf33",
-      "ts": "2026-11-22T08:20:56Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "blocked: clickhouse-dbre ashby submit POST hangs in-flight twice — no interactive captcha shown, no ack, unverifiable; marked manual",
-      "outcome": "blocked: ashby submit hang",
-      "claims": [],
-      "files": [],
-      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
-      "branch": "main",
-      "frame": "03ha62q3w93jj560nkeus8jpm"
     }
   ]
 }

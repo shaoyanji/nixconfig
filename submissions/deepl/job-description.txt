@@ -1,0 +1,53 @@
+Staff Site Reliability Engineer - Sovereign Cloud
+DeepL · Munich
+Source: arbeitnow · posted 2026-11-18
+URL: https://www.arbeitnow.com/jobs/companies/deepl/staff-site-reliability-engineer-sovereign-cloud-munich-48462
+Fetched: 2026-11-21
+
+Meet DeepL
+DeepL is a global AI product and research company focused on building secure, intelligent solutions to complex business problems. Over 200,000 business customers and millions of individuals across 228 global markets today trust DeepL's Language AI platform for human-like translation, improved writing and real-time voice translation.
+Founded in 2017 by CEO Jaroslaw “Jarek” Kutylowski, DeepL now has around 1,000 passionate employees and is supported by world-renowned investors including Benchmark, IVP, and Index Ventures.
+Our goal is to become the global leader in trusted, intelligent AI technology, building products that drive better communication, foster connections, and create a meaningful impact. To achieve this, we need talented people like you to join our journey. If you’re ready to shape the future of AI and grow your career in a fast-moving, purpose-driven environment, DeepL is your next destination.
+What sets us apart
+What sets us apart is our blend of cutting-edge AI technology, meaningful work, and a culture where people truly thrive. We’re a team of innovators, researchers, and creators driven by a shared purpose to unlock human potential by making work simpler, smarter, and more connected.
+When we share what it’s like to work at DeepL, the reactions are overwhelmingly positive. This might be because of our technology that helps millions of people and businesses communicate and work better every day, or because of the trust, curiosity, and care that shape our culture.
+What we know for sure is this: being part of DeepL means joining a team dedicated to innovation, growth, and well-being. Discover more about life at DeepL on  LinkedIn  ,  Instagram  , and our   Blog  .
+Meet the team behind this journey
+You will join the team building and operating DeepL for Sovereign Markets, our offering for public sector bodies and regulated organisations that need more than data residency. It is hosted and operated entirely within the EU, under EU jurisdiction, and runs alongside DeepL's global infrastructure. The team is designing the platform foundations that make that promise true in practice: how services are built, deployed, secured, observed and operated. The approach favours managed infrastructure and well designed software abstractions over bespoke low level plumbing. You will work closely with product, security and legal colleagues as the offering grows to cover more capabilities and features.
+Your responsibilities
+-   Build the platform as software:  Design and build the platform layer of DeepL for Sovereign Markets as software: reusable services, abstractions and tooling that product engineers build on
+-   Own the architecture:  Own the architecture of the managed infrastructure the platform runs on, including Kubernetes, networking, storage, identity and secrets, using provider managed services where they meet the requirement
+-   Standardise and automate:  Define infrastructure as code and delivery standards that hold across teams, and automate operations so that manual work is the exception
+-   Make design decisions visible and reviewable:  write and review architecture decision records, weigh positions on their merits and commit once a decision is made
+-   Build for reliability:  Build observability, resilience testing and incident response practices so that the service meets its reliability commitments
+-   Adapt the product to the new environment:  Make low invasive modifications to existing code in the product with confidence in order to make it run in the new environment
+-   Keep the environment auditable:  Work with security and compliance colleagues to keep the environment auditable and aligned with the standards our customers require
+-   Raise the technical bar:  Mentor engineers, raise the technical bar through design reviews, and build consensus across teams without relying on line authority
+-   Participation in our on-call rotation:  You’ll ensure the reliability and availability of our services by being available to join the team's shared on-call rotation as needed
+Qualities we look for
+-   Software engineering depth:  Strong software engineering skills in at least one major language, C#, Go or Python preferred, shown by tooling, services or platform abstractions that other engineers rely on
+-   Production infrastructure:  Production experience designing and running managed infrastructure and Kubernetes, with sound judgement on when to use provider managed services and when not to
+-   Automation and delivery:  Infrastructure as code with Terraform, Crossplane or equivalent, and GitOps delivery, applied to environments you have owned
+-   AI-Native Velocity:  You leverage AI-powered tools (like GitHub Copilot or Claude) to accelerate your velocity and eliminate repetitive toil. You use AI for boilerplate code, test generation, and debugging, allowing you to focus your cognitive energy on high-value architectural decisions and complex problem-solving
+-   A track record of technical ownership across several teams:  you create clarity where a mandate crosses team boundaries, hold clear positions and change them on evidence
+-   Reliability discipline:  observability, incident response and designing for failure, with experience carrying on-call
+-   Security fundamentals:  Working knowledge of infrastructure security fundamentals, such as identity, secrets, network segmentation and supply chain hygiene
+-   Clear written communication:  you can capture a decision so that others can build on it
+You’d get bonus points for
+-  Experience in regulated or audited environments, for example BSI C5, ISO 27001 or SOC2
+-  Experience with EU based or sovereign cloud providers
+-  Chaos engineering and game day practice
+-  Building platforms for small teams through a high degree of automation
+What we offer
+-   Diverse and internationally distributed team : joining our team means becoming part of a large, global community with people of more than 90 nationalities. We're more than just colleagues; we're a group of professionals with a shared mission to connect diverse cultures. Our global presence is growing–we've doubled in size nearly every year, with our employees based in the UK, Germany, the Netherlands, Poland, the US, and Japan, and we continue to expand our network.
+-   Open communication, regular feedback : as a language-focused company, we value the importance of clear, honest communication. We value smooth collaboration, direct and actionable feedback, and believe that leading with empathy and growth mindset makes us better together.
+-   Hybrid work, flexible hours : we offer a hybrid work schedule, with team members coming into the office twice a week. This allows you to engage directly with your team and experience the unique energy of our workspace, while still enjoying the flexibility and comfort of working from home. With flexible working hours and trust in your productivity, we are in sync with your team’s general locations and time zones to foster effective and seamless collaboration.
+-   Virtual Shares -  An ownership mindset in every role. We believe everyone should share in our success, and that’s why every employee receives Virtual Shares, linking your contribution directly to DeepL’s growth and rewarding you with a stake in our future.
+-   Regular in-person team events : we bond over vibrant events that are as unique as our team, from local team and business unit gatherings, to new-joiner onboardings, to company-wide events that bring us all together–literally.
+-   Monthly full-day hacking sessions : every month, we have Hack Fridays, where you can spend your time diving into a project you're passionate about and get the opportunity to work with other teams–we value your initiatives, impact, and creativity.
+-   30 days of annual leave : we value your peace of mind. With 30 days off (excluding public holidays) and access to mental health resources, we make sure you're as strong mentally as you are professionally.
+-   Competitive benefits : just as our team spans the globe, so does our benefits package. We've crafted it to reflect the diversity of our team and tailored it to align with your unique location, to ensure you feel supported every step of the way.
+If this role and our mission resonate with you, but you're hesitant because you don't check all the boxes, don't let that hold you back. At DeepL, it's all about the value you bring and the growth we can foster together. Go ahead, apply—let's discover your potential together. We can't wait to meet you!
+We are an equal opportunity employer
+You are welcome at DeepL for who you are - we appreciate authenticity here. Our product is for everyone, and so is our workplace. The more voices we have represented and amplified in our business, the more we will all succeed, contribute, and think forward! So bring us your personal experience, your perspectives, and your background. It’s in our diversity that we will find the power to break down language barriers in the world.
+Find more  English Speaking Jobs in Germany  on Arbeitnow

@@ -1,8 +1,150 @@
 {
-  "generated": "2026-11-22T10:56:38Z",
+  "generated": "2026-11-22T11:03:08Z",
   "count": 200,
-  "pin": "16cd1ab4ed4b6da08e593cd2306a333b7736b80170badad6dd547fef2bc65578",
+  "pin": "f418cfd00aff4e8b2cb942a8f5df710042d18eaf64f08f7e4fabe2a55854a594",
   "turns": [
+    {
+      "id": "4995fae4-9af4-4250-871e-4f28d5df94aa",
+      "ts": "2026-11-22T11:03:01Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fraunhofer-erfurt-linux-network",
+      "action": "migrated: native German Typst 2pp CV + 1pp letter with Fraunhofer ISE emphasis; store symlink and read-only files removed; measured in sheet; WAN/firewall-appliance/fibre gaps conceded; fit 3",
+      "outcome": "done",
+      "claims": [
+        "submissions/fraunhofer-erfurt-linux-network"
+      ],
+      "files": [],
+      "base_commit": "695cb55ced7cc4f76adea524f0dd2857a7aa09a9",
+      "branch": "main",
+      "frame": "03ha6ydyxgtg8wlzr0xpllist"
+    },
+    {
+      "id": "e20097ff-6235-4d47-87b0-d5283f22f91d",
+      "ts": "2026-11-22T11:02:00Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fraunhofer-erfurt-linux-network",
+      "action": "claim: native German Typst 2pp CV + 1pp letter, Fraunhofer ISE emphasis",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/fraunhofer-erfurt-linux-network"
+      ],
+      "files": [],
+      "base_commit": "c0d2504b8a85807da867ab70415781f767a9b5ed",
+      "branch": "main",
+      "frame": "03ha6y6qr5kqkmw4ceg1kful6"
+    },
+    {
+      "id": "5f8f2338-b14d-4057-a0ce-c31004aaf1c5",
+      "ts": "2026-11-22T11:01:27Z",
+      "source": "freebuff",
+      "subject": "nixconfig:deepl",
+      "action": "follow-up: packet amended after a sheet marker correction | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cd33dff00dedb90ffe1054da4abf029894f3d9c8",
+      "branch": "main",
+      "frame": "03ha6y2zksk79jpf210b99abx"
+    },
+    {
+      "id": "5c71a7e5-cb4b-47d3-8ae0-8155a4cdb97a",
+      "ts": "2026-11-22T11:00:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:deepl",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d35aea7ba6025975ffc3b7d10d2c3d342ac08c4b",
+      "branch": "main",
+      "frame": "03ha6xz4eook9v3lth5ttidm2"
+    },
+    {
+      "id": "24151834-8dfb-4d28-a7a8-061d7bb6ae55",
+      "ts": "2026-11-22T11:00:37Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:a3m-senior-linux-devops",
+      "action": "migrated: store packet replaced by native German Typst 2pp CV + 1pp letter; symlink and read-only JSON/PDFs removed; fit 4; ISO-27001/cloud gaps conceded",
+      "outcome": "done",
+      "claims": [
+        "submissions/a3m-senior-linux-devops"
+      ],
+      "files": [],
+      "base_commit": "c0d2504b8a85807da867ab70415781f767a9b5ed",
+      "branch": "main",
+      "frame": "03ha6xx2yt3ul5ac7hegu8y8l"
+    },
+    {
+      "id": "5ddd3097-87a6-4939-ac74-ca2c18b465f1",
+      "ts": "2026-11-22T11:00:33Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:a3m-senior-linux-devops",
+      "action": "claim: migrate legacy store packet to native German Typst 2pp CV + 1pp letter",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/a3m-senior-linux-devops"
+      ],
+      "files": [],
+      "base_commit": "9479551379e235ac6611f6157e32766efa40c68f",
+      "branch": "main",
+      "frame": "03ha6xwk74r40wq3fb69k71j1"
+    },
+    {
+      "id": "f56cbcc7-1d1f-4015-99b6-223c49f3eda8",
+      "ts": "2026-11-22T10:59:51Z",
+      "source": "devin",
+      "subject": "nixconfig:treatwell",
+      "action": "blocked: Workable submission hung at invisible Turnstile — second rejection, form fully staged",
+      "outcome": "blocked: turnstile-invisible",
+      "claims": [],
+      "files": [],
+      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
+      "branch": "main",
+      "frame": "03ha6xrp32px5cbg89134yfmn"
+    },
+    {
+      "id": "92e1d17e-8f31-42f7-9398-3fd31085254d",
+      "ts": "2026-11-22T10:59:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:deepl",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en), Staff SRE Sovereign Cloud",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/deepl"
+      ],
+      "files": [],
+      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
+      "branch": "main",
+      "frame": "03ha6xrb20w4w4lty72j9fdgz"
+    },
+    {
+      "id": "f560fdf0-a043-4492-b8eb-5509bea64327",
+      "ts": "2026-11-22T10:59:20Z",
+      "source": "antigravity",
+      "subject": "nixconfig:jobsearch",
+      "action": "pacing: treatwell submission active (0:2.1), deepl packet active (0:1.1), delphi audit/compile active (0:3.1)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/treatwell submissions/deepl"
+      ],
+      "files": [],
+      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
+      "branch": "main",
+      "frame": "03ha6xo43m8pfiac8ndz60ncc"
+    },
+    {
+      "id": "2816fc49-69b3-4950-b416-ec15677b78b3",
+      "ts": "2026-11-22T10:59:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nix-consultancy-outreach",
+      "action": "landed: redact third-party contacts and phone number from docs/nix-consultancy-outreach.md | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
+      "branch": "main",
+      "frame": "03ha6xmu0we0jx7i3brm8b9l5"
+    },
     {
       "id": "4c375abd-1104-480e-80bc-32de437b1781",
       "ts": "2026-11-22T10:55:44Z",
@@ -2562,136 +2704,6 @@
       "base_commit": "8ccff4945cb9e90c56c91dcce8b14d8f200c2b53",
       "branch": "main",
       "frame": "03ha69ca84iz3ossanbst8opy"
-    },
-    {
-      "id": "a497bbf4-2b6e-44ca-a6a0-cb2d221545cc",
-      "ts": "2026-11-22T08:53:51Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: uni-freiburg-future-forests packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fa9c12a1493538dff584cc04424610dd1535ca58",
-      "branch": "main",
-      "frame": "03ha695msuqvb8btlkecmcbzk"
-    },
-    {
-      "id": "bd38326e-02e6-4c11-b4cc-0921beea673e",
-      "ts": "2026-11-22T08:52:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: vertigis-cloud-engineer packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a55276ac1df865054b611fe074ba5c0e3b7a4d3b",
-      "branch": "main",
-      "frame": "03ha68vnql82zvtcshs6phvfh"
-    },
-    {
-      "id": "b00c1875-dc10-4693-afd6-a3378745a0a0",
-      "ts": "2026-11-22T08:52:02Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: stackit-iac Schwarz Digits RocketApply submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a8a9da856b39621f2e4a8055f850ba898a176e6c",
-      "branch": "main",
-      "frame": "03ha68ssjge9sbot7xyu43zer"
-    },
-    {
-      "id": "071a791f-0e9a-4901-9d94-ede0b0a55279",
-      "ts": "2026-11-22T08:51:01Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: uni-tuebingen-hpc-ml-infra packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cf0311ebb41885271d61ed58175ac766a99c9af2",
-      "branch": "main",
-      "frame": "03ha68lpbfblqk72m87bjtt1g"
-    },
-    {
-      "id": "f3908ef0-6514-4faa-a879-8678cc2fe547",
-      "ts": "2026-11-22T08:50:17Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: mozilla-staff-tools-systems applied via Greenhouse embed | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a8a9da856b39621f2e4a8055f850ba898a176e6c",
-      "branch": "main",
-      "frame": "03ha68giqshwbsbncnm1214se"
-    },
-    {
-      "id": "728a86fb-7423-4ede-b951-4c1d96fa25ca",
-      "ts": "2026-11-22T08:48:25Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: mozilla-staff-tools-systems Greenhouse embed submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a8a9da856b39621f2e4a8055f850ba898a176e6c",
-      "branch": "main",
-      "frame": "03ha683ergqyzch7g1gbk9i5w"
-    },
-    {
-      "id": "4e636b5f-a896-4327-82ec-b70028bd812c",
-      "ts": "2026-11-22T08:48:21Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff",
-      "action": "landed: finalize nix-consultancy outreach draft (prose-change)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a8a9da856b39621f2e4a8055f850ba898a176e6c",
-      "branch": "main",
-      "frame": "03ha682xvm89m9htpqw4k7rtz"
-    },
-    {
-      "id": "0b2b7017-1d51-4d5e-9174-25807a8eb26f",
-      "ts": "2026-11-22T08:47:50Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: trawa-em-platform packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a8a9da856b39621f2e4a8055f850ba898a176e6c",
-      "branch": "main",
-      "frame": "03ha67za78zabj40ylk54ko47"
-    },
-    {
-      "id": "f43e9802-778d-4a60-871d-4827f33a4f50",
-      "ts": "2026-11-22T08:47:45Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: kayak-staff-data-platform packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3e20b40bbe332b50963e424d17f9dbcb93a36b7b",
-      "branch": "main",
-      "frame": "03ha67ynuo5p2z6b5egte4olg"
-    },
-    {
-      "id": "48bf1106-52ed-48c0-9091-e53c0bc95647",
-      "ts": "2026-11-22T08:47:11Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: adyen-platform-genai applied via Greenhouse embed | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
-      "branch": "main",
-      "frame": "03ha67up6d4tegoj6dea5zzbe"
     }
   ]
 }

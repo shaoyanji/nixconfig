@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T08:40:53Z",
+  "generated": "2026-11-22T08:43:19Z",
   "count": 200,
-  "pin": "6e6fbdfc5f278abc72a067f9375389d0e9af2af8e26d3301f7aa2ab9d326fbc1",
+  "pin": "2ae1160e9593add24002ced40ba669b3a0770ad114b33ae8865ef2889efd2699",
   "turns": [
+    {
+      "id": "f921e904-00cc-43ea-9772-6f4990972e0b",
+      "ts": "2026-11-22T08:42:49Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: flix-devops-cloud-infrastructure submitted via Greenhouse embed | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a097ef9861b1f95a626030aabb1fad25e994f4e6",
+      "branch": "main",
+      "frame": "03ha6700vtf1eo0rnun40qxnq"
+    },
+    {
+      "id": "99a98711-8109-4989-96ab-b296740aa3b6",
+      "ts": "2026-11-22T08:41:27Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-steward-freebuff",
+      "action": "drove idle freebuff pane 0:1.1: jev-decide typesafe classified next task prose-change p=0.85 margin=0.73 decisive; pane working on redaction of docs/nix-consultancy-outreach.md (counter growing); routed text mirrors the queued next task, Enter withheld while pane is working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a097ef9861b1f95a626030aabb1fad25e994f4e6",
+      "branch": "main",
+      "frame": "03ha66qggxiiu396s87shdw2t"
+    },
+    {
+      "id": "6625fb38-a325-4700-b1fb-992b114a8d7b",
+      "ts": "2026-11-22T08:40:59Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: truetalent-freiburg-sysadmin packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fdb25150d6c7670b094ff5f4d3f725950daccbda",
+      "branch": "main",
+      "frame": "03ha66n57n4rk5ypvqb7po5jx"
+    },
+    {
+      "id": "fcdcad71-2751-4513-a4a4-b15d90687772",
+      "ts": "2026-11-22T08:40:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: catapult-sports-senior-devops packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a097ef9861b1f95a626030aabb1fad25e994f4e6",
+      "branch": "main",
+      "frame": "03ha66mpox7yq4chmlqljho4o"
+    },
     {
       "id": "e1a1944e-be6f-4d2a-93d1-41b400209a39",
       "ts": "2026-11-22T08:39:45Z",
@@ -2720,58 +2772,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha1rzzmns5j7vbfhtdaybaj"
-    },
-    {
-      "id": "6ff19266-8545-4279-902f-49d1c03a2105",
-      "ts": "2026-11-21T18:49:46Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: Canonical Lead Linux Kernel (Greenhouse 6010955, email code 61895391, confirm page) + Mercanis Senior Agentic AI (email fallback to careers@mercanis.com) + Flower Asset Manager (Teamtailor) + secunet (Rexx) + Luminovo (Ashby) applied; Nebius SRE Berlin blocked on Greenhouse Turnstile after 2 sessions + QED Warsaw-relocation flagged decision-needed; gate: portal confirmation pages + confirmation emails | no code change",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1o9lduvwo9r0ure7vh94n"
-    },
-    {
-      "id": "c5ab0146-09e2-4c99-b8f6-095e0a480f65",
-      "ts": "2026-11-21T18:49:27Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: staged CoreWeave (GH 4625588006, US Remote 60-220k); total prep=41, applied=81; Devin completing Nebius SRE Berlin and pivoting to Canonical GitOps (GH 5517891)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1o7djp5kx7dtk5ujud25u"
-    },
-    {
-      "id": "1092a352-4f22-4e8b-999a-4c8645992d5b",
-      "ts": "2026-11-21T18:44:42Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: staged Upvest (Ashby 6ee81c6b) & Ledgy (GH EU 5024440101); verified PDFs (2p CV / 1p letter); total prep=38, applied=81; Devin submitting Nebius SRE Berlin (GH 4376374101)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1na1z3cz8wkgsixzdzy2y"
-    },
-    {
-      "id": "5516c5e9-f0f3-4221-b793-e0f4c148fadd",
-      "ts": "2026-11-21T18:34:23Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: Canonical Lead Linux Kernel Eng submitted (GH 6010955, confirmation 310954); staged Nebius CloudGate (GH 4377696101); staging SumUp DevOps (GH 8726158002); Devin submitting Nebius SRE Berlin (GH 4376374101)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1l9qnq2q0b6mxxv9b1i7x"
     }
   ]
 }

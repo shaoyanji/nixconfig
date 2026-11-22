@@ -1,0 +1,97 @@
+# Source: Arbeitnow API, fetched 2026-11-22
+
+Miaplaza — Hands-on Engineering Manager DevOps (GCP/Kubernetes)
+Location: Remote job | remote=True
+URL: https://www.arbeitnow.com/jobs/companies/miaplaza/remote-hands-on-engineering-manager-devops-gcp-kubernetes-302151
+
+Location
+: 100% remote (EMEA)
+Classification
+: Full-time
+Pay Range
+: 82.000€ to 140.000€ - determined by several factors, including location
+Miaplaza is dedicated to making education engaging and accessible through innovative online learning platforms. We develop personalized learning experiences for students, helping them grow in a supportive and interactive environment. Our vision is to elevate online learning by applying the most successful approaches in virtual education to create an accessible and inclusive education curriculum platform where all students can be successful!
+As an engineering manager at Miaplaza, your team will build technology with a direct impact on the lives of hundreds of thousands of students. Every step of the way, you will have the opportunity to influence our direction. Through our platforms, we create engaging, safe, and thoughtfully designed learning experiences that help children grow academically, creatively, and personally. Every feature we ship, every system we scale, and every improvement we make contributes to shaping how the next generation learns and discovers their potential. If our platform is down, a child might not go to school that day. We’re looking for leaders who want their work to matter in classrooms and homes, who care about access to quality education, and who are excited to craft technology that makes a difference in young people’s lives. Here, your impact doesn’t just power a product; it shapes future generations!
+What you’ll work on
+:
+We’re moving everything towards GCP and Kubernetes. We’re growing towards a scale that no longer matches our legacy architecture and actively investing in modernization. We’re migrating on-premise workloads to GKE, strengthening security and business continuity best practices, and moving toward platform self-service for our development teams. A core goal is to consolidate and shrink the stack, and every migration decision is measured against whether it lowers the daily burden on the team. You’ll need to work with your team balancing both platform initiatives and the operational needs of the engineering teams you serve. You’ll report to our head of engineering and be expected to split your time roughly 50/50 between people management and hands-on development. Prioritization always goes to leading and supporting your engineers. Your team will consist of four engineers.
+What’s unique about management at Miaplaza:
+Miaplaza is a US-based education company, which means we probably are doing things differently than you’ve done in your past experience. Here are a few differences you may notice:
+You will first onboard within your team as a senior engineer for 2 months. You will start to onboard as a manager during month two and will take over the team roughly at 10 weeks. This is non-negotiable as both periods of time are equally important.
+We expect our EMs to spend approximately 50% of their time hands-on, even after they’ve completed onboarding as a senior engineer.
+We emphasize the importance of pedagogical principles. A responsibility is to grow your engineers and those around you.
+One of such pedagogical principles is that we expect you to have full oversight into your direct reports' work; you can’t properly teach if you don’t see the process behind the output.
+Feedback is the norm. You’ll be expected to give meaningful, specific reinforcement and constructive feedback whenever you notice something. You should also expect to receive feedback. Ultimately, everything we do is optimizing ourselves, our teams, our processes, and our company to best support our students.
+ 
+ 
+Bachelor’s degree or equivalent practical experience.
+2+ years of experience being a mentor/leader, of which:
+1+ years leading a team, formally or as a tech lead
+7+ years of experience in DevOps, SRE, or Infrastructure Engineering, of which:
+3+ years running production workloads on Kubernetes (GKE preferred)
+3+ years of experience with a major cloud provider and Infrastructure as Code. GCP is our primary cloud and we expect senior-level knowledge of IAM, networking, KMS, GKE, CloudSQL and Secret Manager
+3+ years of experience operating at a Senior, Staff, or Principal Engineer level.
+Experience with CI/CD pipeline design and operations
+Experience with GitOps (FluxCD or ArgoCD)
+Experience working directly with engineering teams and other managers as your customers on scoping and prioritization
+Experience leading incident response, including running postmortems
+What makes you stand out:
+Experience leading a team through a significant architectural migration
+Experience with consumer platforms at scale
+Experience building in regulated environments
+Experience operating self-hosted observability stacks (Prometheus, Thanos, Loki, Grafana, Tempo, OpenTelemetry)
+Experience building internal developer platforms or self-service tooling
+Experience supporting .NET/C# application deployments
+Experience with database operations (PostgreSQL, MongoDB, Redis, RabbitMQ)
+Experience with Istio or other service meshes
+Responsibilities
+Work with your team to design, build, and operate the infrastructure the rest of engineering depends on: clusters, pipelines, databases, edge, and observability
+Your customers are the other engineering teams. Work with the other Engineering Managers and product development leadership to scope and prioritize platform work
+Set the quality bar for your team. Lead by example.
+Manage, lead, and mentor your team while working side by side with them in code quality, clean infrastructure-as-code, soft skills, best practices, etc
+Lead team trainings, set SMART goals, hold performance reviews, and provide individual feedback recurrently to each of your devs
+Our hiring process
+As a remote company, we receive a large number of applicants, and finding the best fit for this role is our top priority — that’s why our process is longer than usual. At every stage, we try to be respectful of your time and grateful you’re spending it with us.
+Application and CV Review
+ - Our team will review your application responses and CV, then follow up with an update.
+Initial Technical Screen
+ (20 minutes) - A quick screening call to answer some administrative questions and confirm your basic technical knowledge. You'll be asked some administrative questions and 7 short technical questions related to the role.
+Behavioral Interview
+ (1 hour) - Meet with a member of our HR team to discuss your experience and share your approach throughout your career so far.
+1st Technical Interview
+ (1 hour) - Meet with a member of the Infrastructure team to answer focused technical questions tailored to our work.
+Scenario-based Technical Interview
+ (1 hour) - Meet with a member of the Infrastructure team and the team's engineering manager to work through two hypothetical DevOps scenarios and how you would tackle them.
+Leadership Interview
+ (1 hour) - With our head of engineering and executive leadership.
+Reference check
+ - We'll reach out to the 3 references you provided, at least one being a former or current manager and any former or current direct reports.
+Offer & background check
+ - Once you sign your offer, we'll run a background check in accordance with applicable law.
+We give honest, timely feedback at every step. Job searches are hard; we don't want to make yours harder.
+Compensation and setup
+The pay range for this role is €82,000 - 140,000. Miaplaza’s compensation philosophy ensures equity and competitiveness while considering regional differences in labor costs. Placement within a range is determined based on factors such as demonstrated skills, internal equity, and local labor market rates for the candidate’s geographic area.
+Miaplaza is a growing, self-funded EdTech company. We're an equal opportunity employer and welcome applicants from all backgrounds. If you need accommodations at any point in the process, just let us know.
+Links:
+Miacademy: 
+https://parents.miacademy.co/
+Always Icecream: 
+https://parents.always-icecream.com/
+Clever Dragons: 
+https://parents.clever-dragons.com/
+MiaPrep: 
+https://parents.miaprep.com/
+MiaPrep Online High School: 
+https://miaprep.com/online-school/
+MiaPrep Online Academy of Ohio:
+ 
+https://miapreponlineacademy.com/ohio/
+ 
+Hear our CEO, Johannes Ziegler, discuss our company: 
+https://tinyurl.com/miaplaza-CEO-video/
+Careers page: 
+https://careers.miaplaza.com/
+Individuals only — no recruitment agencies.
+Find 
+Jobs in Germany
+ on Arbeitnow

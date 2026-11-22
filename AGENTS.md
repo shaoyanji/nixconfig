@@ -34,7 +34,8 @@ a procedure is a skill or a page in `docs/`, and the docs site's navigation come
    05:30, no ssh unattended, `task ops:health` before blaming the config.
 5. **Ask the record before writing.** `ops:notes:near Q="<intent>"` then `ops:notes:lineage ID=<id>`; never read
    `AGENTS.nix` in full. New intent → an `AGENTS.nix` note (`agents-notes` skill), what happened → one xs turn,
-   superseded narrative → `docs/history/`, a procedure → `docs/` or a skill [[flake/policies.nix#root-markdown-closed]].
+   superseded narrative → `docs/history/`, a procedure → `docs/` or a skill [[flake/policies.nix#root-markdown-closed]];
+   application packets and generated material → `~/.local/state/appflow/` [[flake/policies.nix#submissions-are-private-state]].
 6. **The closed loop is real:** `fleet-sentinel` logs jobs, generation age, disk and PSI every 15 min, and gatus
    pages on `[BODY].state != ok`; a green socket is not a finished job (read the ledger, `fleet-sentinel` skill).
 7. **TOON is the agent boundary:** JSON links the tools, TOON is what a reader gets; TOML, YAML and Nix cross in

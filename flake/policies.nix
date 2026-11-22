@@ -7,7 +7,10 @@
 }: let
   root = ../.;
   read = p: p |> (x: root + "/${x}") |> builtins.readFile;
-  has = p: needle: p |> read |> lib.hasInfix needle;
+  # `.*` in builtins.match recurses per byte: splitString, not lib.hasInfix — scripts/task/image-daily.sh
+  hasInfix = infix: content:
+    infix == "" || (content |> lib.splitString infix |> builtins.length) > 1;
+  has = p: needle: p |> read |> hasInfix needle;
   anyLine = p: pred: p |> read |> lib.splitString "\n" |> lib.any pred;
 
   # The comment census (lib/nix-comments.nix). `flake/outputs.nix` passes it in so
@@ -79,8 +82,8 @@
     |> builtins.filter (p: let
       t = read p;
     in
-      (netMounts |> lib.any (m: lib.hasInfix m t))
-      && (contentExtractors |> lib.any (r: lib.hasInfix r t)));
+      (netMounts |> lib.any (m: hasInfix m t))
+      && (contentExtractors |> lib.any (r: hasInfix r t)));
   extractorNames = libraryExtractors |> map (p: p |> builtins.baseNameOf |> lib.removeSuffix ".sh");
   # The unit's own file never contains the extractor — it names the script — so
   # this is a name match against the scripts that do.
@@ -89,8 +92,8 @@
     |> builtins.filter (p: let
       t = read p;
     in
-      (t |> lib.hasInfix "systemd.")
-      && (extractorNames |> lib.any (n: lib.hasInfix n t)));
+      (t |> hasInfix "systemd.")
+      && (extractorNames |> lib.any (n: hasInfix n t)));
   # A library's bytes are pulled by a LAUNCH and by nothing else: no timer, no
   # login, no path unit watching for a fresh drop. A stale cache is flushed on
   # the next launch — that is cheap and user-initiated; warming ahead of it is a
@@ -100,8 +103,8 @@
     |> builtins.filter (p: let
       t = read p;
     in
-      (netMounts |> lib.any (m: lib.hasInfix m t))
-      && ((t |> lib.hasInfix "systemd.paths") || (t |> lib.hasInfix "systemd.user.paths")));
+      (netMounts |> lib.any (m: hasInfix m t))
+      && ((t |> hasInfix "systemd.paths") || (t |> hasInfix "systemd.user.paths")));
   # Named explicitly so a revert cannot pass by having no unit at all.
   deletedLibraryIntegrators = builtins.filter (p: root + "/${p}" |> builtins.pathExists) [
     "scripts/task/appimage-integrate.sh"
@@ -140,8 +143,8 @@
     nixUnder "modules"
     |> builtins.filter (
       p:
-        (p |> read |> lib.hasInfix "systemd.services")
-        || (p |> read |> lib.hasInfix "systemd.user.services")
+        (p |> read |> hasInfix "systemd.services")
+        || (p |> read |> hasInfix "systemd.user.services")
     );
   # Every module, not only the ones that declare units: a package list or a tier
   # chosen by name is the same undeclared capability as a unit gated by name, and
@@ -168,7 +171,7 @@
       p:
         p
         |> serviceBlocks
-        |> builtins.filter (b: (b |> lib.hasInfix "Restart") && !(b |> lib.hasInfix "X-Fleet-Role"))
+        |> builtins.filter (b: (b |> hasInfix "Restart") && !(b |> hasInfix "X-Fleet-Role"))
         |> map (b: "${p}: ${b |> lib.splitString "\n" |> builtins.head |> lib.removeSuffix "\n"}")
     );
 
@@ -338,7 +341,7 @@
   # secrets submodule at all, so a library read of it works on the machine that
   # has the checkout and nowhere else. Match the directory with its slash: the
   # tracked mirror `modules/secrets.yaml` is a different file.
-  secretsReads = nixUnder "lib" |> builtins.filter (p: p |> read |> lib.hasInfix "modules/secrets/");
+  secretsReads = nixUnder "lib" |> builtins.filter (p: p |> read |> hasInfix "modules/secrets/");
 
   # --- one spelling for where a secrets file lives ---------------------------
   # 27 scripts each carried their own copy of the path, and with it their own
@@ -382,13 +385,13 @@
     if lib.hasSuffix ".py" p
     then
       anyLine p (l:
-        ((l |> lib.hasInfix "os.path.join") && (l |> lib.hasInfix "modules/secrets"))
+        ((l |> hasInfix "os.path.join") && (l |> hasInfix "modules/secrets"))
         || (l |> builtins.match ".*[\"']modules/secrets[/.].*" |> (m: m != null)))
     else
       anyLine p (l: let
         code = codePart l;
       in
-        (code |> lib.hasInfix "modules/secrets.yaml")
+        (code |> hasInfix "modules/secrets.yaml")
         || (code |> builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" |> (m: m != null)));
   secretsPathOffenders =
     scriptFiles |> builtins.filter (p: !(secretsPathExempt |> lib.elem p) && spellsSecretsPath p);
@@ -402,10 +405,10 @@
     anyLine p (l: let
       code = codePart l;
     in
-      (code |> lib.hasInfix "sops")
-      && !(code |> lib.hasInfix "{{.SECRETS}}")
+      (code |> hasInfix "sops")
+      && !(code |> hasInfix "{{.SECRETS}}")
       && (
-        (code |> lib.hasInfix "modules/secrets.yaml")
+        (code |> hasInfix "modules/secrets.yaml")
         || (code |> builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" |> (m: m != null))
       ));
   taskfileOffenders = taskfilePlane |> builtins.filter spellsSecretsInTask;
@@ -491,7 +494,7 @@
   decryptAtEval =
     nixSources
     |> lib.concatMap (
-      p: hitsWhere p (l: l |> codePart |> lib.hasInfix "sops -d")
+      p: hitsWhere p (l: l |> codePart |> hasInfix "sops -d")
     );
 
   # `diff` over two decrypted documents prints both copies the moment they
@@ -504,8 +507,8 @@
       p:
         hitsWhere p (
           l:
-            (l |> lib.hasInfix "sops -d")
-            && ((l |> lib.hasInfix "| diff") || (l |> lib.hasInfix "diff -") || (l |> lib.hasInfix "diff <("))
+            (l |> hasInfix "sops -d")
+            && ((l |> hasInfix "| diff") || (l |> hasInfix "diff -") || (l |> hasInfix "diff <("))
         )
     );
 
@@ -575,8 +578,8 @@
   # walk: this rule needs the documents, and forcing every tracked file into it was
   # the recursion.
   ruleDocs = ["AGENTS.md" "MANUAL.md" "README.md"] ++ filesWithSuffix "docs" ".md";
-  namesPolicyFile = p: p |> read |> lib.hasInfix "flake/policies.nix";
-  citesPolicyId = p: p |> read |> lib.hasInfix "[[flake/policies.nix#";
+  namesPolicyFile = p: p |> read |> hasInfix "flake/policies.nix";
+  citesPolicyId = p: p |> read |> hasInfix "[[flake/policies.nix#";
   uncitedRuleMentions = ruleDocs |> builtins.filter (p: namesPolicyFile p && !(citesPolicyId p));
 
   # Truth, as a skill may cite it: a backticked repo path that RESOLVES, or a
@@ -597,7 +600,7 @@
   in
     truthText
     != ""
-    && ((truthText |> lib.hasInfix "[[flake/policies.nix#")
+    && ((truthText |> hasInfix "[[flake/policies.nix#")
       || (citedPaths truthText |> lib.any (q: root + "/${q |> lib.splitString "#" |> builtins.head}" |> builtins.pathExists)));
   skillName = p: baseNameOf (dirOf (toString p));
   skillsWithoutTruth = skillFiles |> builtins.filter (p: !(citesTruth p)) |> map skillName;
@@ -618,8 +621,8 @@
     if root + "/${ledger}" |> builtins.pathExists
     then ledger |> read |> lib.splitString "\n"
     else [];
-  agreeCount = ledgerLines |> builtins.filter (l: l |> lib.replaceStrings [" "] [""] |> lib.hasInfix "\"agree\":true") |> builtins.length;
-  totalJudged = ledgerLines |> builtins.filter (l: l |> lib.hasInfix "\"target\"") |> builtins.length;
+  agreeCount = ledgerLines |> builtins.filter (l: l |> lib.replaceStrings [" "] [""] |> hasInfix "\"agree\":true") |> builtins.length;
+  totalJudged = ledgerLines |> builtins.filter (l: l |> hasInfix "\"target\"") |> builtins.length;
   disagreeCount = totalJudged - agreeCount;
 
   # Every tracked .nix / .md file, walked once.
@@ -647,8 +650,8 @@
     hostConfigs
     |> builtins.filter (
       p:
-        (p |> read |> lib.hasInfix "base-desktop-environment")
-        && (p |> read |> lib.hasInfix "programs.niri.enable = lib.mkForce false")
+        (p |> read |> hasInfix "base-desktop-environment")
+        && (p |> read |> hasInfix "programs.niri.enable = lib.mkForce false")
     );
 
   policies = {
@@ -827,13 +830,13 @@
       proof = "Taskfile.yml includes · taskfiles/README.md";
       holds = let
         tf = read "Taskfile.yml";
-        missing = taskfiles |> builtins.filter (p: !(tf |> lib.hasInfix "taskfile: ${p}"));
+        missing = taskfiles |> builtins.filter (p: !(tf |> hasInfix "taskfile: ${p}"));
         taskless = taskfiles |> builtins.filter (p: !(has p "\ntasks:"));
       in
         missing == [] && taskless == [];
       detail = let
         tf = read "Taskfile.yml";
-        missing = taskfiles |> builtins.filter (p: !(tf |> lib.hasInfix "taskfile: ${p}"));
+        missing = taskfiles |> builtins.filter (p: !(tf |> hasInfix "taskfile: ${p}"));
         taskless = taskfiles |> builtins.filter (p: !(has p "\ntasks:"));
       in "shards Taskfile.yml does not include: ${missing |> lib.concatStringsSep ", "} — shards declaring no tasks: ${taskless |> lib.concatStringsSep ", "}";
     };
@@ -1095,7 +1098,7 @@
       proof = "docs/storage-taxonomy.md exists, and AGENTS.md has no `/srv/data` layout table";
       holds =
         (root + "/docs/storage-taxonomy.md" |> builtins.pathExists)
-        && !("AGENTS.md" |> read |> lib.hasInfix "| Path (`/srv/data/` /");
+        && !("AGENTS.md" |> read |> hasInfix "| Path (`/srv/data/` /");
       detail = "the storage table is back in AGENTS.md, or the taxonomy page is gone";
     };
 
@@ -1198,7 +1201,7 @@
       holds =
         shellScripts
         |> lib.all (
-          f: !(anyLine f (l: (l |> lib.hasInfix "sed -i") && (l |> lib.hasInfix ".toml")))
+          f: !(anyLine f (l: (l |> hasInfix "sed -i") && (l |> hasInfix ".toml")))
         );
       detail = "a script edits a .toml with sed -i";
     };
@@ -1332,7 +1335,7 @@
       proof = ".github/workflows/nixcachix.yml";
       holds = let
         lines = ".github/workflows/nixcachix.yml" |> read |> lib.splitString "\n";
-        count = needle: lines |> builtins.filter (l: l |> lib.hasInfix needle) |> builtins.length;
+        count = needle: lines |> builtins.filter (l: l |> hasInfix needle) |> builtins.length;
       in
         count "substituters ="
         == count "trusted-public-keys ="
@@ -1450,7 +1453,7 @@ in {
       doc
       |> read
       |> lib.splitString "\n"
-      |> builtins.filter (l: (l |> lib.hasInfix "HARD RULE") && !(l |> lib.hasInfix "[[flake/policies.nix#"));
+      |> builtins.filter (l: (l |> hasInfix "HARD RULE") && !(l |> hasInfix "[[flake/policies.nix#"));
   in
     normativeDocs |> lib.concatMap (d: d |> scan |> map (l: "${d}: ${l |> lib.trim |> lib.removePrefix "#"}"));
 }

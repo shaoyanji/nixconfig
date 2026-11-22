@@ -1,0 +1,113 @@
+ScorePlay is the AI-powered media infrastructure for sports, built to automate the content operations behind the world’s biggest sports organizations. We work with 350+ leagues, competitions, teams and broadcasters – including NBA and NFL teams, Premier League, LaLiga and Ligue 1 clubs, leading bodies like UEFA and FIBA, the Tour de France, and the Australian Open – helping them turn every moment on and off the field into high-value, structured content. Our platform brings all their media into one place and makes it effortless to find, produce and share in seconds.
+
+Founded in 2021, we’re a 65-person team based between New York, Paris, and 10+ other countries, growing 2x year over year with 97% retention. We’ve raised $20M+ from top investors including Alexis Ohanian and Harry Stebbing’s 20VC and elite athletes like Kevin Durant, Raphaël Varane, Mario Götze, Nico Rosberg and Giannis Antetokounmpo.
+
+If you thrive in fast-paced environments and you want to help shape how the next generation of fans experience sports, you’re in the right place. We’re on track to become the global leader in sports media, and this is definitely the best time to join our adventure. 
+
+
+⚙️ THE ROLE
+
+ScorePlay is the platform major sports organizations use to manage, search and share their media, from the second it's captured to the moment it reaches everyone's screen. A photographer uploads thousands of shots after the final whistle. A live feed has to be logged and clipped into highlights while the game is still being played. The right assets have to reach 10,000+ athletes, partners and newsrooms worldwide, automatically, not one file at a time.
+
+Underneath that sits 15+ petabytes of media, 145M+ minutes of video ingested every month, a multi-region distributed architecture, and event-driven pipelines that have to hold up on match day. Much of the infrastructure needed at that scale simply hasn't been built before.
+
+All of it runs on infrastructure built and operated by our Platform team, which today is one person. You'll be the second.
+
+You'll work hand in hand with Maxime https://www.linkedin.com/in/maximerenou50/, our founding SRE, who built this platform from nothing and is looking for a peer, not a report. You'll split the roadmap based on your strengths and preferences, report directly to our Head of Engineering, and own topics end to end: scoping, choosing the technical approach, and shipping to production. Much of the platform exists. A lot of what comes next is still to be designed.
+
+
+
+
+🔥 WHY THIS IS TECHNICALLY INTERESTING
+
+
+Storage economics at 15PB and growing. Storage and egress dominate our bill, so cost is an architectural problem, not a spreadsheet exercise. It's also why we're building Bring Your Own Storage: clients keep their media in their own cloud account and our platform operates on top of it. Making media sharing economically viable across providers, at petabyte scale, without giving up performance, is not a solved problem, and it's a commercial differentiator, not a side project.
+
+High availability when there is no maintenance window. A match happens once. Live ingest, streaming and distribution have to hold during the exact hours our clients care about most, across multiple regions. You'll own the architecture that makes match day boring.
+
+A platform product, with engineers as the users. Product engineers should be able to develop locally, deploy through clean pipelines, and spin up the infrastructure they need without waiting on you. Turning Platform from a potential bottleneck into an enabler, self-service tooling, clear processes, fast support on incoming requests, is half the job.
+
+
+
+
+🧠 WHAT YOU'LL OWN: 
+
+
+Infrastructure (the core of the job)
+
+ - Design, build and operate our AWS infrastructure across multiple regions, deployed on Kubernetes and managed entirely through Terraform, Terragrunt and Helm.
+
+ - Own high-availability architectures, object storage at 15PB+ scale, and event streaming (Kafka) in a distributed, event-driven system.
+
+ - Drive cost optimization across the stack, and shape multi-cloud and Bring Your Own Storage architectures that make data sharing economically viable for us and our partners.
+
+Developer Experience
+
+ - Build the internal platform that lets product engineers develop locally, deploy through clean pipelines, and provision infrastructure self-service.
+
+ - Set the standards for how infrastructure gets defined and changed, everything as code, reviewed like product code.
+
+Security & Compliance
+
+ - Major sports organizations trust us with their entire media archive. We're wrapping up SOC 2, and keeping that trust means security patching, vulnerability analysis and infrastructure hardening as continuous work, not an audit sprint.
+
+ - Deep security expertise isn't expected, but a genuine security mindset is.
+   
+   
+
+
+🛠 THE STACK AND HOW WE WORK
+
+AWS, multi-region. Kubernetes, Terraform and Helm for everything. Kafka for event streaming, object storage at petabyte scale, PostgreSQL, OpenSearch, Temporal for workflows, Go for services. We use AI heavily (but wisely), in the product and in how we work as engineers.
+
+Cross-functional feature teams own their scope from conception to production. Structural decisions go through RFCs, you write them, you defend them. Every week the whole engineering team gets together to present and debate technical subjects. Every incident gets a postmortem, with real numbers attached.
+
+
+
+
+🧩 WHAT WE'RE LOOKING FOR
+
+ - A tech militant. You’ll be driving projects autonomously, interacting with multiple stakeholders with different skill sets than you. You’ll need to be able to adapt your communication to the person next to you and make complex technical topics understandable.
+
+ - Deep AWS expertise and strong Terraform, with solid production experience running Kubernetes.
+
+ - You've designed distributed systems, not just operated them: high availability, multi-region, event-driven architectures, and you can defend your trade-offs.
+
+ - A builder profile. You scope ambiguous topics, pick the right solution, and take them to production. You care about what happens after the deploy.
+
+ - Roughly 6+ years in SRE, Platform or Infrastructure roles, though we care far more about what you've built than the number.
+
+ - Bonus: you were among the first platform hires somewhere and put the foundations and processes in place yourself. Or you've worked on media, video or storage infrastructure, ingest pipelines, transcoding, live streaming, egress at scale.
+   
+   
+
+
+📍 THE SETUP
+
+Remote. We're remote-first with regular team gatherings, an international team spread across Europe and the US.
+
+On-call is part of the role. Platform is a critical function: when our infrastructure is down, matches are happening without us, and we're not going to pretend a pager doesn't exist. What we will tell you is how we treat it. On-call is shared, never carried by one person. Whoever gets paged owns the fix, and every incident gets a written postmortem with cost and impact attached, so the same thing doesn't wake anyone up twice. Reducing alert noise and toil is explicit roadmap work, not something you squeeze in between tickets.
+
+
+
+
+🏆 WHY SCOREPLAY
+
+ - Real scale, real stakes. 15+ petabytes, 145M+ minutes of video a month, and the systems you design now become the foundations the whole platform builds on for years.
+
+ - Platform is not a cost center here. The product is technical to its core and it's what clients pay for. Infrastructure decisions are business decisions, and you'll be in the room for them.
+
+ - No layers, no committees. You design it, you build it, the biggest names in sports use it.
+
+ - Your work shows up on match day, used by clubs, leagues and athletes you might already follow.
+
+ - Profitable and growing sustainably, with an international team of 15+ nationalities across Europe and the US.
+
+We know many people hesitate to apply if they don’t meet every single requirement on a job description. If you’re interested in ScorePlay but not sure you tick all the boxes, we’d still love to hear from you, this could be the start of a great long-term collaboration.
+
+
+---
+Source: Ashby posting API (job-board/scoreplay, includeCompensation), job 42f1911f-68d4-4a9f-8d9e-e3a7939ceb96.
+Fetched: 2026-11-22. Published: 2026-08-17. Location: Western Europe - Remote (EU).
+Published band: EUR 90,000-110,000 salary plus EUR 150,000 equity cash value, per year.
+Apply: https://jobs.ashbyhq.com/scoreplay/42f1911f-68d4-4a9f-8d9e-e3a7939ceb96

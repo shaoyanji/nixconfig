@@ -1,8 +1,88 @@
 {
-  "generated": "2026-11-22T03:07:16Z",
+  "generated": "2026-11-22T03:32:44Z",
   "count": 200,
-  "pin": "9030dad8589516d28d485acd424e71e07ca34cbad84036ccad2789870f910d20",
+  "pin": "5bef4833ac37e67a908e19f2510c1138ba4845d26c04bcf31f39019f7309d0bc",
   "turns": [
+    {
+      "id": "c6ec0fb7-deee-4fc1-b90b-3b8300c71ade",
+      "ts": "2026-11-22T03:30:23Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-scoreplay-packet",
+      "action": "landed: drove freebuff pane to build the ScorePlay Senior Platform Engineer (SRE) packet (submissions/scoreplay/), Western Europe remote, EUR 90-110k + equity; routed via jev-decide (novel 0.89/0.84); pane working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
+      "branch": "main",
+      "frame": "03ha4hyto0i4190imrtvnkpvg"
+    },
+    {
+      "id": "50cc38d3-e53e-4a62-b301-659f37047146",
+      "ts": "2026-11-22T03:24:27Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +3 apps — MAIT Senior SysEng Linux&Virt softgarden portal CONFIRMED (Pforzheim, KVM/QEMU/Ansible exact stack); ISGUS SaaS-RZ VS; MRS Electronic Sysintegrator | gate: success page + mail sends + appflow | ~179 applied; Donaueschingen/VS corridor swept",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
+      "branch": "main",
+      "frame": "03ha4gt3z3mzwsyturd4x293b"
+    },
+    {
+      "id": "eea68871-af2b-4f2d-8d83-4bf6431cd19e",
+      "ts": "2026-11-22T03:20:56Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +2 apps (Zoiss industrial networks Konstanz; SEITENBAU sysadmin Konstanz via karriere@ fallback after Personio Turnstile suppressed) | gate: mail sends + appflow imports | ~176 applied; Weil/Konstanz BA sweep done; meinestadt+indeed IP-blocked, IWB empty",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
+      "branch": "main",
+      "frame": "03ha4g4xawgyc9ekd181meyct"
+    },
+    {
+      "id": "5d6d9331-d748-4945-ae10-45bbc885a0c7",
+      "ts": "2026-11-22T03:15:21Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +1 app (Netzint Service Engineer 2nd req) +1 Initiativ (badenIT) | gate: mail sends + imports | ~174 applied; BA local keywords drained; indeed IP-blocked",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
+      "branch": "main",
+      "frame": "03ha4f161nkujsg5439hbs2he"
+    },
+    {
+      "id": "b885d65a-684f-486f-ba7f-47281763dfdd",
+      "ts": "2026-11-22T03:12:53Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +2 (tecreation Titisee email fallback after FriendlyCaptcha wall, netgo OpenStack 100pct-remote via Cornerstone confirmed) + Emmendingen applicant account confirmed | gate: Dank page + mail send + imports | ~173 applied",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
+      "branch": "main",
+      "frame": "03ha4ejur1t0amo1i1khr0nzy"
+    },
+    {
+      "id": "aedfe2f3-9d5d-4b02-a9d0-cb45545a4852",
+      "ts": "2026-11-22T03:07:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:mongodb-sre-agent-engine-packet",
+      "action": "landed: MongoDB Agent Engine SRE packet (Greenhouse 8366599, Dublin hybrid) - 2p CV 10/32 highlights, 1p letter conceding relocation + no multi-tenant K8s + Istio/Cilium unproven, sheet maps required sponsorship question | gate: agents:apps:packet exit 0 incl. cv-ats-check in-build (2/1 pages)",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/mongodb-sre-agent-engine"
+      ],
+      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
+      "branch": "main",
+      "frame": "03ha4djkbg6ao4nqo43rv2od5"
+    },
     {
       "id": "1f47f7be-947f-49cf-ab96-447fb2f07fb2",
       "ts": "2026-11-22T03:04:22Z",
@@ -2702,84 +2782,6 @@
       "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
       "branch": "main",
       "frame": "03h9wmeba8qrzpz2z6dvda4hl"
-    },
-    {
-      "id": "62f0940e-8c3e-40ec-b2f4-a93c5b131e41",
-      "ts": "2026-11-21T03:02:10Z",
-      "source": "devin",
-      "subject": "fleet-remote:design-decisions-pr6",
-      "action": "landed: PR #6 merged (design questions resolved into decisions); merged branch pruned local+remote, checkout tidy on master",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "866837b0347b58ab1168fa4c8f9203c24af14c14",
-      "branch": "main",
-      "frame": "03h9wj5q2o1ymfyeg17xh9qoi"
-    },
-    {
-      "id": "8c9990df-57be-4b0e-a4f9-011c1f86b7c3",
-      "ts": "2026-11-21T03:01:47Z",
-      "source": "devin",
-      "subject": "fleet-remote:pr6-advance",
-      "action": "landed: drove devin pane to verify+merge fleet-remote PR #6, then cleanup dev env",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "866837b0347b58ab1168fa4c8f9203c24af14c14",
-      "branch": "main",
-      "frame": "03h9wj3jelwbkak6hk913kj8i"
-    },
-    {
-      "id": "78eb6256-1260-445d-9487-a1163bb89830",
-      "ts": "2026-11-21T02:56:13Z",
-      "source": "devin",
-      "subject": "nixconfig:steam-prefill",
-      "action": "landed: steam-prefill baseline+record onto shared sandbox via mkDaemon bases; 5 frieren units byte-identical | gate: checks:quick PASS census 6486",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "866837b0347b58ab1168fa4c8f9203c24af14c14",
-      "branch": "main",
-      "frame": "03h9whzuekupw465l39nc56fa"
-    },
-    {
-      "id": "35fafbb9-3c1c-47a5-9e4f-f0f70f418a79",
-      "ts": "2026-11-21T02:55:10Z",
-      "source": "delphi-freebuff",
-      "subject": "nixconfig:email-triage",
-      "action": "landed: routed email triage to delphi freebuff pane 0:1.1 (jev email_triage margin 0.38)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9whsgxdkeowczejunzzc1k"
-    },
-    {
-      "id": "c240f09b-d794-407a-ae87-bc553d6c841b",
-      "ts": "2026-11-21T02:55:09Z",
-      "source": "devin",
-      "subject": "nixconfig:refactor",
-      "action": "landed: routed nixconfig refactor to devin pane 2.1 (jev nixconfig_refactor margin 0.34)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9whse00pipg5ghurqlcd86"
-    },
-    {
-      "id": "f95fafce-fa75-4c24-ab8c-6346fe6e29f0",
-      "ts": "2026-11-21T02:55:09Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-ats",
-      "action": "landed: routed ATS quality check to freebuff pane 1.1 (jev cv_quality_ats p=0.82)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9whsb2wk5ijryx1vw43n5n"
     }
   ]
 }

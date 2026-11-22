@@ -75,7 +75,7 @@ Keine 4, weil die Hälfte der Stelle Windows ist und dafür kein Beleg existiert
 | Datei | Inhalt | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `lebenslauf.pdf` | Lebenslauf, deutsch | 2 | 36976 | 535 | `a720f76e9d36472d` |
-| `anschreiben.pdf` | Anschreiben, deutsch | 1 | 24501 | 344 | `f21dac2c5f287825` |
+| `anschreiben.pdf` | Anschreiben, deutsch | 1 | 24538 | 357 | `c8692d3ede21dbc6` |
 | `lebenslauf.typ` | Typst-Quelle | — | — | — | — |
 | `anschreiben.typ` | Typst-Quelle | — | — | — | — |
 | `job-description.txt` | Ausschreibungstext plus Abgleich | — | — | — | — |

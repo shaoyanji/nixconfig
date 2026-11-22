@@ -56,7 +56,6 @@ CI_BODY = re.compile(r"(github\.com/[^/\s]+/[^/\s]+/actions/runs/\d+|run #?\d+)"
 # Malt sends automated "New opportunity with <client>" match notices. They are
 # job-board digests, not recruiter mail: no reply is expected, and the engine
 # otherwise splits them between review and robot.
-MALT_SENDERS = ("@malt.com",)
 MALT_OPPORTUNITY = re.compile(r"^new opportunity with\b", re.IGNORECASE)
 
 MACHINE_LOCALS = (
@@ -366,7 +365,7 @@ def classify_rules(
 
     # Malt's automated opportunity matches are a job-board digest, not a
     # person's queue item: the engine was splitting them across review and robot.
-    if addr and addr.endswith(MALT_SENDERS) and MALT_OPPORTUNITY.search(subject):
+    if MALT_OPPORTUNITY.search(subject) and "@malt.com" in (message.get("sender") or "").lower():
         return "digest", "none", "Malt opportunity match", 0.9
 
     if addr and (addr in CI_SENDERS or addr.endswith("@github.com")):

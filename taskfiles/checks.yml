@@ -21,7 +21,7 @@ tasks:
     summary: >
       Bounded repo hygiene — "is the repo internally consistent", not "does host
       X evaluate": compiled inventory, task graph, knowledge graph and sidecar
-      parity, skill task-mirrors, nix lint, sops drift, modules.toml. No
+      parity, skill task-mirrors, nix lint, sops drift, wrapper PATH, modules.toml. No
       nixosConfiguration is forced; that is `checks:host HOST=<h>` (~13 s / 720
       MiB) or `checks:hosts HOSTS="a b"`.
 
@@ -45,6 +45,7 @@ tasks:
     # cores; the floor is a shared eval, not more concurrency.
     deps:
       - task: checks:repo:paths
+      - task: checks:shell-inputs
       - task: checks:repo:hostpaths
       - task: checks:repo:hostpaths:test
       - task: checks:docs:links
@@ -251,6 +252,21 @@ tasks:
       is accepted, for text that quotes a path rather than using one.
     cmds:
       - bash scripts/task/repo-paths.sh
+
+  checks:shell-inputs:
+    desc: "[gate] A wrapper's script only calls commands its runtimeInputs install"
+    summary: >
+      A `writeShellApplication` replaces the caller's PATH with its runtimeInputs,
+      so a command the list omits is a 127 at run time and nowhere earlier:
+      xs-notify called awk with `[coreutils curl jq]` and its timer failed every
+      minute for a day. Judges wrappers whose `text` is an external file, and only
+      commands it knows how to attribute, so variables and function names cost
+      nothing; an inline heredoc is counted and skipped rather than half-judged.
+      A script excuses a caller-provided command with `shell-input-ok: <cmd> <why>`.
+      ~0.4 s, no eval, no network.
+    cmds:
+      - python3 scripts/task/shell-inputs.py
+
 
   checks:repo:blobs:
     desc: "[gate] No blob over 512 KiB in the index or reachable in history"

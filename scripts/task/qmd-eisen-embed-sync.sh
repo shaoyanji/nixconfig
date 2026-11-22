@@ -8,6 +8,9 @@
 # Pipeline:
 #   1. Preflight check: verify Eisen reachability over SSH; avoid WoL if already online.
 #   2. Local index refresh: run fast BM25 'qmd update' on Frieren (local NVMe/btrfs).
+#
+# shell-input-ok: qmd optional by design — every call is guarded by `command -v
+# qmd` and absence prints a WARN (searches still work off the database).
 #   3. Push database to Eisen: rsync index.sqlite & index.yml to Eisen's local NVMe.
 #   4. Remote compute: run 'qmd embed' on Eisen (NVMe-local, multi-threaded llama.cpp).
 #   5. Pull results: rsync updated index.sqlite & embedding models back to Frieren.

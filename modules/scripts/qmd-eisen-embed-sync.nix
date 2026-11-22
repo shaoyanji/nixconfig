@@ -5,6 +5,8 @@ pkgs.writeShellApplication {
   runtimeInputs = with pkgs; [
     coreutils
     findutils
+    # REPO=$(git rev-parse --show-toplevel) is the script's first real call.
+    git
     openssh
     rsync
     python3

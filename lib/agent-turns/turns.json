@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-22T07:29:36Z",
+  "generated": "2026-11-22T07:33:24Z",
   "count": 200,
-  "pin": "c41c979a2bf4aeeb448d0f97784f6400ecbd8d7a9b9a714d82eaf0c72311faaa",
+  "pin": "4475ee9cc99c94671956a2a8f02df41345f915058bbe3ce767dbfa63f7e92f62",
   "turns": [
+    {
+      "id": "0abae706-5e1d-49ab-8d00-e0867039895a",
+      "ts": "2026-11-22T07:33:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-sva-terraform",
+      "action": "landed: SVA Terraform packet (JD, 2-page CV, 1-page letter, rexx form sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/sva-terraform"
+      ],
+      "files": [],
+      "base_commit": "136c40586e83d801ba88e9f5dd8ddd96e40a5145",
+      "branch": "main",
+      "frame": "03ha5tfgr4anladp28u5ajqdf"
+    },
+    {
+      "id": "5e4a4dd5-c9e4-47c9-8edb-fbbb5d97b7ec",
+      "ts": "2026-11-22T07:33:15Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-stackit-k8s",
+      "action": "landed: STACKIT GT4121 Senior Kubernetes Engineer packet in submissions/stackit-k8s. Sentinel JD from the live EN page (data-job-id GT4121; DE route 404). German CV 2pp, letter 1pp, ask 85k. Letter states no prod K8s admin, no Go operators/CRDs, no Gardener/CAPI/GitOps and drops K8s from the CV skills. Portal: RocketApply. Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/stackit-k8s"
+      ],
+      "base_commit": "9738979c776ecf9abd50a9858908a9b5ee9eafb2",
+      "branch": "main",
+      "frame": "03ha5tes7rm2168m6p9rxxxk8"
+    },
     {
       "id": "c740eb4a-285c-4bcd-be2f-6b5dab2d7821",
       "ts": "2026-11-22T07:29:30Z",
@@ -2792,32 +2822,6 @@
       "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
       "branch": "main",
       "frame": "03h9xmkz8d0urs15mn01eglo6"
-    },
-    {
-      "id": "912f4bee-7755-4645-92b9-783525bdbdb8",
-      "ts": "2026-11-21T06:23:54Z",
-      "source": "devin-win2",
-      "subject": "nixconfig:steward-win2-nixconfig",
-      "action": "landed: drove idle devin win2 via jevdecide nixconfig_refactor p=0.79 margin=0.62 decisive; nixconfig refactoring task pasted and accepted, devin Running tools (started with live cv-lebenslauf-link-gate claim then refactoring cleanup)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xmkegv3dm7q5mkv49hu7g"
-    },
-    {
-      "id": "cd601306-3ff1-4897-b1cc-e1e59d60a8c7",
-      "ts": "2026-11-21T06:23:54Z",
-      "source": "freebuff-win1",
-      "subject": "nixconfig:steward-win1-cv-gate",
-      "action": "landed: drove idle freebuff win1 via jevdecide verify_cv_link_gate p=0.84 margin=0.71 decisive; CV link gate verification task pasted and accepted, fresh working counter running",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xmkcbjnzhpwg90blpbzr4"
     }
   ]
 }

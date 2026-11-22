@@ -89,7 +89,7 @@ defensible but expect the recruiter to test it.
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
 | `task checks:prose` | 188 prose files, exit 0 |
-| selection | 7/37 highlights, 0/0 projects |
+| selection | 7/37 highlights, 4/10 projects |
 | sha256 CV | `4236a8e6b3f68d8b8ed2ac7ccf0c3c2a87b7de615e901998061de36c505fa5f9` |
 | sha256 letter | `7269a72b609ec209228359617cf7cc2efd16553aa761065001ed413c1179836a` |
 

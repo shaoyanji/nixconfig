@@ -1,8 +1,92 @@
 {
-  "generated": "2026-11-22T10:33:47Z",
+  "generated": "2026-11-22T10:36:30Z",
   "count": 200,
-  "pin": "446514b09e0d649eda78f678c57764b4a43258d80a78111b6d7da3ca75bd2bfc",
+  "pin": "96421720ab76505c47a46612c8c1752c480f6b4b4f5c2d6c5240befd0f7b6a1f",
   "turns": [
+    {
+      "id": "2e5443d3-6f05-404e-aaa5-4f5808fd17da",
+      "ts": "2026-11-22T10:35:53Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-observability",
+      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/telekom-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "5466aebd486f72b7c0d6303bc04aa63ee7a00182",
+      "branch": "main",
+      "frame": "03ha6t34xnjtll0pfzfwvlc80"
+    },
+    {
+      "id": "3ab3111c-84ae-42fd-a88f-1283fab7e7ee",
+      "ts": "2026-11-22T10:35:01Z",
+      "source": "devin",
+      "subject": "nixconfig:ionos-staff-nre",
+      "action": "re-assigned; already applied: req 4971782101 submitted 08:07 under ionos-staff-network-reliability-engineer-karlsruhe — OTP mail 311051 + ack mail 311052 (names role). Skipped duplicate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
+      "branch": "main",
+      "frame": "03ha6sx2xwm0rm5gcuntylhq0"
+    },
+    {
+      "id": "6fd43b29-ad90-499e-9d65-d62040cdb6e8",
+      "ts": "2026-11-22T10:34:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:adyen-platform-genai",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/adyen-platform-genai"
+      ],
+      "files": [],
+      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
+      "branch": "main",
+      "frame": "03ha6svje0h7qze60o2tzr839"
+    },
+    {
+      "id": "2ac1234b-e08b-4cba-94e1-531f0ebaa888",
+      "ts": "2026-11-22T10:34:08Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:virtuslab",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); fit 4 (kernel half absent)",
+      "outcome": "done",
+      "claims": [
+        "submissions/virtuslab"
+      ],
+      "files": [],
+      "base_commit": "5466aebd486f72b7c0d6303bc04aa63ee7a00182",
+      "branch": "main",
+      "frame": "03ha6sqtgeu4q3pr08sp6e1ov"
+    },
+    {
+      "id": "5875e655-cd09-4997-aa97-5d52bb720242",
+      "ts": "2026-11-22T10:33:54Z",
+      "source": "devin",
+      "subject": "nixconfig:gitlab",
+      "action": "applied: Greenhouse submission complete — OTP 64261040, /confirmation verified; honest No on location/K8s/autoscaling gates",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
+      "branch": "main",
+      "frame": "03ha6sp8qp8a2ws8cxw3t40s8"
+    },
+    {
+      "id": "5eeda9d5-4903-4e31-b5c8-254104521ede",
+      "ts": "2026-11-22T10:33:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:mozilla",
+      "action": "follow-up: letter recompiled at 0 warnings (bold markup fixed) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
+      "branch": "main",
+      "frame": "03ha6som3lupo9tb05jmnv4j9"
+    },
     {
       "id": "ffcfa9a4-8f7b-4aa8-b234-b47fc9a92275",
       "ts": "2026-11-22T10:33:27Z",
@@ -2584,90 +2668,6 @@
       "base_commit": "7a956e7672c151abb6cd0812e1f30a3318671781",
       "branch": "main",
       "frame": "03ha61mlwado99u4a7iuds3d5"
-    },
-    {
-      "id": "24771370-0e2b-4a38-92ce-756a57893e6d",
-      "ts": "2026-11-22T08:15:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: kiwigrid-senior-sre packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/kiwigrid-senior-sre"
-      ],
-      "files": [],
-      "base_commit": "394fc0076b7f625e15837f8b1cad8667a44a65db",
-      "branch": "main",
-      "frame": "03ha61mh8bf01hvigcd7qfwuc"
-    },
-    {
-      "id": "a74dc5bf-79a4-474e-a666-32c9b79f71c9",
-      "ts": "2026-11-22T08:13:50Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: mongodb SRE storage layer dublin (GH 6984814); sponsorship=Yes Irish permit",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/mongodb-sre-storage-layer"
-      ],
-      "files": [],
-      "base_commit": "7a956e7672c151abb6cd0812e1f30a3318671781",
-      "branch": "main",
-      "frame": "03ha61c90w3r8qkux6g5orp04"
-    },
-    {
-      "id": "be09e627-ae06-413b-a1ed-3d3c989c26df",
-      "ts": "2026-11-22T08:13:08Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-clickhouse",
-      "action": "landed: ClickHouse DBRE packet, CV 2pp letter 1pp, Germany remote no sponsorship, internals gap named | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fbb8fec5b7305ea6a475cf2797ceae0fb45f235d",
-      "branch": "main",
-      "frame": "03ha617a70uj362h3k8oadn7j"
-    },
-    {
-      "id": "4a85212a-9113-495a-8e61-a1dddef83782",
-      "ts": "2026-11-22T08:12:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff",
-      "action": "landed: freebuff pane 0:1.1 — Jev selected prose-change (p=0.90, margin=0.83); redaction task for docs/nix-consultancy-outreach.md submitted; pane shows working... with a fresh counter — task accepted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
-      "branch": "main",
-      "frame": "03ha6159cbu2qwsao2z6nymo1"
-    },
-    {
-      "id": "d5303a6b-2407-43e2-85bc-c99d7fa8bc5d",
-      "ts": "2026-11-22T08:11:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-a3m-linux",
-      "action": "landed: 3 scouted leads (kiwigrid, smartclip, a3m) + A3M packet (2pp CV, 1pp letter, sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/a3m-senior-linux-devops submissions/kiwigrid-senior-sre submissions/smartclip-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "140f7a3596c8e03972f7d8178861b4e8a523f6b4",
-      "branch": "main",
-      "frame": "03ha60uqa1hdpzldv853rhjnq"
-    },
-    {
-      "id": "b595ec5f-8114-4ff7-9d6f-08542b213bd8",
-      "ts": "2026-11-22T08:11:16Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: navvis senior linux platform munich (GH eu 4943654101) — both PDFs, auth Yes/sponsor No, EUR100k, OTP 58322339, /confirmation | gate: GH confirmation page",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
-      "branch": "main",
-      "frame": "03ha60u6cyoa4ynfmv6yrxw9p"
     }
   ]
 }

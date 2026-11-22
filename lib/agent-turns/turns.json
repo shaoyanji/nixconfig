@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T12:34:47Z",
+  "generated": "2026-11-22T12:38:08Z",
   "count": 200,
-  "pin": "ecd236adb9bcfc872260cd0e5218d45cce5cd2e9e1b6d4d9adeabcf3a28ab3f3",
+  "pin": "eb25288cff4432ad83a849371b43ea489fe521cd74fe9c889ede1b7786e1d3db",
   "turns": [
+    {
+      "id": "21a1b741-04c7-4779-bcda-88ca47d4bf3f",
+      "ts": "2026-11-22T12:37:39Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "coordinator: Enpal Staff Platform confirmed applied; dispatched Pane 1 -> Anthropic Data Infra (Typst), Pane 2 -> STACKIT GT2321 (SAPUI5), Pane 3 -> EnBW (Typst/audit) | zero idle time active",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "1c57f66651d5627b97b0912237c74fa90b136617",
+      "branch": "main",
+      "frame": "03ha7gvfl1blzc3g8ztn1wn1p"
+    },
+    {
+      "id": "17775224-bf7b-455d-89b1-f1856a6798d1",
+      "ts": "2026-11-22T12:34:50Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-data-platform",
+      "action": "landed: Nebius Data Platform SRE (5040676101) native Typst, final 1c57f666. CV 2pp/1268w, letter 1pp/444w, 0 warnings, page budget asserted, prose exit 0 at 292 files. Where the trilogy's third packet turns on durability: EXP-042 boots an ephemeral PostgreSQL cluster, replays the dump with psql, asserts restored table count + Immich rows. Two reword commits settled wording against the script. DB applied/fit3, xs done. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1c57f66651d5627b97b0912237c74fa90b136617",
+      "branch": "main",
+      "frame": "03ha7gbmodbkrrr051uw29rwc"
+    },
     {
       "id": "d7c92629-2069-4ca9-ac79-957a3e7f9f25",
       "ts": "2026-11-22T12:34:11Z",
@@ -2804,36 +2830,6 @@
       "base_commit": "afe43b5a18f86417f90a1dd57dfbf7cddb22121f",
       "branch": "main",
       "frame": "03ha6sm2d0ndk9k2xkrqor6fb"
-    },
-    {
-      "id": "80334856-dc5e-42a8-9508-0d42d198d021",
-      "ts": "2026-11-22T10:33:11Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:virtuslab",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/virtuslab"
-      ],
-      "files": [],
-      "base_commit": "25425ea55dd90f910c66a71e0088d7798d0a2ce6",
-      "branch": "main",
-      "frame": "03ha6sk6f873g26f098huhrqk"
-    },
-    {
-      "id": "34d55b8e-c662-4506-8eb5-c96b14e370c0",
-      "ts": "2026-11-22T10:32:31Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:kraken",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); Lever board empty",
-      "outcome": "done",
-      "claims": [
-        "submissions/kraken"
-      ],
-      "files": [],
-      "base_commit": "25425ea55dd90f910c66a71e0088d7798d0a2ce6",
-      "branch": "main",
-      "frame": "03ha6sffvv23b7fjcr0h8aft2"
     }
   ]
 }

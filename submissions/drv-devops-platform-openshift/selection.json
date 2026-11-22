@@ -7,43 +7,23 @@
     "minProjects": 1
   },
   "jd": {
-    "chars": 7640,
+    "chars": 4055,
     "terms": [
       {
         "term": "service",
-        "weight": 21.359
-      },
-      {
-        "term": "infrastruktur",
-        "weight": 14.603
+        "weight": 16.056
       },
       {
         "term": "services",
         "weight": 12.954
       },
       {
-        "term": "sowie",
-        "weight": 11.03
-      },
-      {
         "term": "plattformen",
-        "weight": 10.922
+        "weight": 10.214
       },
       {
-        "term": "interamt",
-        "weight": 9.003
-      },
-      {
-        "term": "cd",
-        "weight": 8.625
-      },
-      {
-        "term": "ci/cd-pipelines",
-        "weight": 8.625
-      },
-      {
-        "term": "grundlegende",
-        "weight": 8.625
+        "term": "sowie",
+        "weight": 10.163
       },
       {
         "term": "handelt",
@@ -54,8 +34,28 @@
         "weight": 8.625
       },
       {
-        "term": "sicherheitsempfindlichen",
+        "term": "sicherheitsrisiko",
         "weight": 8.625
+      },
+      {
+        "term": "sicherheitsüberprüfung",
+        "weight": 8.625
+      },
+      {
+        "term": "monitoring",
+        "weight": 7.651
+      },
+      {
+        "term": "monitoring-tools",
+        "weight": 7.651
+      },
+      {
+        "term": "service-provider",
+        "weight": 7.651
+      },
+      {
+        "term": "systemarchitektur",
+        "weight": 7.651
       }
     ]
   },
@@ -63,15 +63,15 @@
   "projects": {
     "dropped": [
       {
-        "name": "Risikoberechnungs-Engine (Swirl Engine)",
-        "score": 5.1297
+        "name": "matt.bountystash.com",
+        "score": 0.9184
       }
     ],
     "kept": [
       "nixconfig",
       "bountystash",
       "fibtransponder",
-      "matt.bountystash.com"
+      "Risikoberechnungs-Engine (Swirl Engine)"
     ]
   },
   "skills": [
@@ -79,7 +79,7 @@
       "dropped": [
         {
           "score": 0.0,
-          "text": "JSONL-Ledger"
+          "text": "PSI-Druck"
         },
         {
           "score": 0.0,
@@ -105,12 +105,32 @@
       "dropped": [
         {
           "score": 0.0,
-          "text": "YAML"
+          "text": "Python"
+        },
+        {
+          "score": 0.0,
+          "text": "Go"
+        },
+        {
+          "score": 0.0,
+          "text": "Git"
+        },
+        {
+          "score": 0.0,
+          "text": "nftables"
+        },
+        {
+          "score": 0.0,
+          "text": "WireGuard"
+        },
+        {
+          "score": 0.0,
+          "text": "sops"
         }
       ],
       "kept": 6,
-      "name": "DevOps",
-      "of": 7
+      "name": "Plattform, Automatisierung und KI-Betrieb",
+      "of": 12
     },
     {
       "dropped": [
@@ -172,20 +192,20 @@
     {
       "dropped": [
         {
-          "score": 7.4473,
-          "text": "Stellte jede Server-Generation unveränderlich aus dem Repository bereit; ein Rollback ist ein Befehl"
+          "score": 5.4861,
+          "text": "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledge"
         },
         {
-          "score": 6.9873,
-          "text": "Hielt Secrets aus dem Betrieb: sops mit age, Zugang ausschließlich über die eigene SSH-CA mit kurzlebigen Zertifikaten"
+          "score": 5.4565,
+          "text": "Verwaltete Geheimnisse über sops und age und betrieb eine eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten"
         },
         {
-          "score": 4.5903,
-          "text": "Automatisierte Dienste, Auswertungen und Deploy-Ketten in Go, Python und Bash"
+          "score": 1.4069,
+          "text": "Konfigurierte Netz und Firewall als Code mit nftables, dazu DNS und ein WireGuard-Tailnet zwischen den Standorten"
         },
         {
-          "score": 1.5301,
-          "text": "Prüfte Endpunkte mit Gatus und band jedes Alerting an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachr"
+          "score": 0.8179,
+          "text": "Prüfte Endpunkte mit Gatus und band Alarmierung an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachrich"
         }
       ],
       "kept": 4,
@@ -196,8 +216,8 @@
     {
       "dropped": [
         {
-          "score": 8.5804,
-          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+          "score": 5.9422,
+          "text": "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften."
         },
         {
           "score": 4.7225,
@@ -244,15 +264,15 @@
     {
       "dropped": [
         {
-          "score": 6.5985,
+          "score": 5.4098,
           "text": "Erstellte neue Excel-Tabellen für die Engineering-Abteilung."
         },
         {
-          "score": 3.2729,
+          "score": 3.0636,
           "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
         },
         {
-          "score": 1.725,
+          "score": 0.0,
           "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
         }
       ],

@@ -1,129 +1,42 @@
 DevOps Platform Engineer Openshift (m/w/div)
 Deutsche Rentenversicherung Bund - Fachdomäne IT4IT
-Arbeitsort: 13629 Berlin-Spandau, TechnoCampus; hybrid, Präsenz- und Mobilarbeit
-Anstellung: unbefristet, Teilzeit oder Vollzeit, 39 Stunden/Woche
+Arbeitsort: 13629 Berlin-Spandau, TechnoCampus, Siemensdamm 62; hybrid, Präsenz- und Mobilarbeit
+Anstellung: unbefristet, Teilzeit oder Vollzeit, 39 Stunden pro Woche
 Entgelt: TVöD-Bund E 11
-Besetzung: nächstmöglicher Zeitpunkt; Bewerbungsfrist 08.12.2026
-Kennung: 11-145-2026; Interamt-Angebots-ID: 1511057
+Besetzung: nächstmöglicher Zeitpunkt
+Bewerbungsfrist: 08.12.2026
+Kennung für Bewerbungen: 11-145-2026
+Interamt-Angebots-ID: 1511057
 Quelle: https://interamt.de/koop/app/stelle?id=1511057
+Ansprechpartnerin: Christina Urbansky, jobs@drv-bund.de, +49 160 9158 6464
 
-Für unsere Fachdomäne „IT4IT“ besetzen wir eine Stelle als
-DevOps Platform Engineer Openshift
-Wir bieten
-Ein krisensicheres Beschäftigungsverhältnis in einer modernen Verwaltung mit verlässlichen Rahmenbedingungen
-Flexible Arbeitszeiten, Präsenz- und Mobilarbeit (vergleichbar mit Home-Office) im Rahmen der dienstlichen Regelungen für individuelle Arbeitsgestaltung
-Tech-Souveränität durch Transparenz - Mit Ihrer Arbeit schaffen Sie die Übersicht über IT-Services und Werkzeuge der DRV-Bund und tragen zu einer aktiven Gestaltung der Developer Experience bei, indem Sie Umgebungen für unsere IT-Teams schaffen, in denen Entwickeln (wieder) Spaß macht
-Ein kollegiales Arbeitsumfeld kombiniert mit einem gut ausgestatteten, mit öffentlichen Verkehrsmitteln gut erreichbaren Büroarbeitsplatz am TechnoCampus Berlin (Bezirk Spandau)
-Mitentwickeln und Vorantreiben unserer autarken, lokalen KI-Infrastruktur
-Fach- und kompetenzorientierte Fort- und Weiterbildungsangebote sowie ein breiter Bildungskatalog und individuelle Lernpfade, um Knowhow kontinuierlich auf- und auszubauen und voneinander zu lernen
-Serviceangebote sowie Kooperationspartner*innen zur Vereinbarkeit von Beruf und Familie für Eltern und pflegende Angehörige
-Die Gesundheit unserer Beschäftigten ist uns wichtig. Wir unterstützen die praktische Umsetzung des Betrieblichen Gesundheitsmanagements in den Arbeitsalltag
-Aufgabenbereich
-Vollumfängliche Übernahme technischer und teils fachlicher Produktverantwortung für Softwareprodukte aus dem Entwicklungsbereich
-Aufbauen sowie fortlaufendes Betreiben interner KI-Systemarchitektur und -infrastruktur, einschließlich Bereitstellen und Betreuen von KI-Assistenten (Agenten) zur Unterstützung unserer der IT-Fachkräfte
-Mitarbeiten in Projekt- oder Arbeitsgruppen sowie Gremien (auch trägerübergreifend) beispielsweise zur Förderung der DX mit Fokus auf Tooling und Hosting in OpenShift
-Betreuen, Optimieren und Skalieren unserer containerbasierten Hosting-Plattformen auf Basis von Red Hat OpenShift
-Für unseren Red Hat Developer Hub wirken Sie beispielsweise mit beim
-Bearbeiten von Kundenanforderungen sowie Planen, Konzeptionieren und Dokumentieren von IT-Betriebsabläufen
-Überwachen und Steuern von IT-Verfahren, Problemanalyse inklusive Fehlerbehebung
-Definieren abteilungsweiter Standards, Integrieren von Plattformen sowie Erstellen von Trainings und Guidelines zur Self-Service-Befähigung der Teams
-Profil
-Abgeschlossene Hochschulbildung (Diplom (FH) oder Bachelor oder gleichartiger Abschluss) vorzugsweise in Mathematik, (Wirtschafts-)Informatik, Physik, oder Ingenieurswesen oder eine abgeschlossene Berufsausbildung im IT-Bereich beziehungsweise eine gleichwertige Qualifikation (z.B. IT-spezifische Qualifizierung) oder vergleichbare mindestens 5-jährige praktische Erfahrung im DevOps-Bereich
-2-jährige Berufserfahrung mit OpenShift sowie mit Containerclustern
-Erfahrung im Aufsetzen, Skalieren und Anpassen lokaler KI-Systeme von mindestens einem Jahr, gerne auch ausschließlich aus dem privaten Umfeld, Hobby- oder Open-Source-Bereich
-Mindestens 1-jährige Berufspraxis mit Docker/CRI-O, CI/CD-Pipelines (z.B. GitLab, Jenkins, ArgoCD), Monitoring-Tools (z.B. Grafana) sowie Datenbankmanagementsystemen (PostgreSQL)
-Ein ausgeprägtes und breites Customer Mindset verbunden mit der Neugier und Freude daran sich immer wieder in neue Tools, Methoden und Trends einzuarbeiten, runden Ihr Profil ab.
-Es handelt sich um eine Position mit besonderer Vertrauensstellung.
-Tätigkeitsbereich
-Die "DRV Bund IT" ist der Service-Provider für die Deutsche Rentenversicherung Bund und entwickelt und betreibt in enger Kundenabstimmung eine komplexe IT-Systemlandschaft.
-Unsere Fachdomäne „IT4IT“ schafft durch die transparente Übersicht aller eingesetzten Entwicklungs- und Betriebswerkzeuge sowie IT-Services für die IT-Abteilungen der DRV-Bund die Basis, um die Developer Experience (DX) zu optimieren und aktiv modernere Arbeitsplätze für alle IT-Mitarbeitenden zu gestalten.
-Weitere Informationen
-Für die Tätigkeiten werden verhandlungssichere Deutschkenntnisse in Wort und Schrift benötigt.
-Zur Besetzung der Position werden wir mit Bewerbenden, die sich in der engeren Auswahl befinden, Gespräche führen.
-Diese Aufgaben erfordern die Bereitschaft zur Teilnahme an der Rufbereitschaft und in dringenden Fällen auch zur Arbeit außerhalb der geregelten Arbeitszeiten (zum Beispiel an Wochenenden).
-Bitte beachten Sie, dass Sie nach einer Einstellungszusage gemäß Sicherheitsüberprüfungsgesetz (§ 9 SÜG) geprüft werden. Diese Sicherheitsüberprüfung darf nicht zum Ergebnis haben, dass ein Sicherheitsrisiko vorliegt, dass der sicherheitsempfindlichen Tätigkeit entgegensteht (§ 14 SÜG).
-In dem ausgeschriebenen Bereich sind Frauen im Sinne des Bundesgleichstellungsgesetzes unterrepräsentiert. Als Arbeitgeberin, die die berufliche Förderung von Frauen aktiv unterstützt, ermutigen wir qualifizierte Frauen ausdrücklich, sich zu bewerben.
-Menschen mit einer Schwerbehinderung oder ihnen Gleichgestellte im Sinne von § 2 Abs. 2 und 3 SGB IX werden bei gleicher Eignung bevorzugt berücksichtigt.
-Begrüßt werden Bewerbungen von Menschen aller Nationalitäten.
-Direktlink zu unserer Stelle auf der Karriereseite DRV Bund
-Auf dieses Stellenangebot können Sie sich nicht online über INTERAMT bewerben. Bitte verwenden Sie den im Stellenangebot angegebenen Bewerbungsweg.
-Zurück zur Trefferliste
-Trefferliste der Behörde
-Details
-INTERAMT Angebots-ID
-1511057
-Kennung für Bewerbungen
-11-145-2026
-Anzahl Stellen
-1
-Stellenbezeichnung
-DevOps Platform Engineer Openshift
-Behörde
-Deutsche Rentenversicherung Bund
-Homepage
-https://drv-bund-karriere.de/fachgebiete
-Einsatzort Straße
-Siemensdamm 62 (TechnoCampus Berlin (Spandau))
-Einsatzort PLZ / Ort
-13629 Berlin
-Dienstort
-Hybrid
-Dienstverhältnis
-Arbeitnehmer
-Besoldung / Entgelt
-TVöD-Bund E 11
-Teilzeit / Vollzeit
-beides möglich
-Wochenarbeitszeit
-39
-h für Arbeitnehmer
-Erforderliches Studium
-Naturwissenschaften, Mathematik, Informatik, Wirtschaftsingenieurwesen oder Künstliche Intelligenz, AI
-Bewerbungsfrist
-08.12.2026
-Besetzung zum
-nächstmöglichen Zeitpunkt
-Ansprechpartner
-Frau Christina Urbansky
-E-Mail
-jobs@drv-bund.de
-Telefonnummer
-+49 160 9158 6464
-Aktionen
-Druckversion
-PDF anzeigen
-Angebot merken
-Weiterempfehlen
-Kontakt
-Impressum
-AGB
-Datenschutz
-Nutzungsbedingungen
-Erklärung zur Barrierefreiheit
-Cookie-Einstellungen
-Inhaltsverzeichnis
-© 2008-2026 INTERAMT
-Version 26.0.11 | Seite 2.0.2 | K167
-INTERAMT Login
-Benutzername
-Passwort
-Passwort anzeigen
-Login
-Passwort vergessen
-Registrieren
-Datenschutzhinweise
-Diese Webseite verwendet Cookies
-Wir nutzen auf unserer Website ausschließlich notwendige Cookies. Mit dem Schließen des Banners werden diese automatisch gesetzt.
-Notwendig
-Notwendige Cookies ermöglichen grundlegende Funktionen und sind für die einwandfreie Funktion der Website erforderlich.
-anzeigen
-Session Cookie
-Technisch notwendiges Cookie zum Speichern der Session. Dieser Dienst sammelt keine benutzerbezogenen Daten. Nach Beendigung der Sitzung wird dieses Cookie gelöscht.
-Anbieter
-DVZ-MV GmbH
-Cookie Name
-JSESSIONID
-Cookie Laufzeit
-Session
-Datenschutzerklärung
-https://interamt.de/cms/legal/Datenschutzerklaerung.html
+Die DRV Bund IT ist der Service-Provider für die Deutsche Rentenversicherung Bund und entwickelt und betreibt in enger Kundenabstimmung eine komplexe IT-Systemlandschaft. Die Fachdomäne IT4IT schafft durch die transparente Übersicht aller eingesetzten Entwicklungs- und Betriebswerkzeuge sowie IT-Services für die IT-Abteilungen die Basis, um die Developer Experience (DX) zu optimieren und modernere Arbeitsplätze für alle IT-Mitarbeitenden zu gestalten.
+
+Aufgabenbereich:
+- Vollumfängliche Übernahme technischer und teils fachlicher Produktverantwortung für Softwareprodukte aus dem Entwicklungsbereich
+- Aufbauen sowie fortlaufendes Betreiben interner KI-Systemarchitektur und -infrastruktur, einschließlich Bereitstellen und Betreuen von KI-Assistenten (Agenten) zur Unterstützung der IT-Fachkräfte
+- Mitarbeiten in Projekt- oder Arbeitsgruppen sowie Gremien, auch trägerübergreifend, beispielsweise zur Förderung der DX mit Fokus auf Tooling und Hosting in OpenShift
+- Betreuen, Optimieren und Skalieren der containerbasierten Hosting-Plattformen auf Basis von Red Hat OpenShift
+- Mitwirken am Red Hat Developer Hub
+- Bearbeiten von Kundenanforderungen sowie Planen, Konzeptionieren und Dokumentieren von IT-Betriebsabläufen
+- Überwachen und Steuern von IT-Verfahren, Problemanalyse inklusive Fehlerbehebung
+- Definieren abteilungsweiter Standards, Integrieren von Plattformen sowie Erstellen von Trainings und Guidelines zur Self-Service-Befähigung der Teams
+
+Profil:
+- Abgeschlossene Hochschulbildung (Diplom FH oder Bachelor) vorzugsweise in Mathematik, (Wirtschafts-)Informatik, Physik oder Ingenieurwesen, oder abgeschlossene IT-Berufsausbildung, oder gleichwertige Qualifikation, oder vergleichbare mindestens 5-jährige praktische Erfahrung im DevOps-Bereich
+- 2-jährige Berufserfahrung mit OpenShift sowie mit Containerclustern
+- Erfahrung im Aufsetzen, Skalieren und Anpassen lokaler KI-Systeme von mindestens einem Jahr, gerne auch ausschließlich aus dem privaten Umfeld, Hobby- oder Open-Source-Bereich
+- Mindestens 1-jährige Berufspraxis mit Docker/CRI-O, CI/CD-Pipelines (z. B. GitLab, Jenkins, ArgoCD), Monitoring-Tools (z. B. Grafana) sowie Datenbankmanagementsystemen (PostgreSQL)
+- Ausgeprägtes und breites Customer Mindset, Neugier und Freude daran, sich in neue Tools, Methoden und Trends einzuarbeiten
+- Es handelt sich um eine Position mit besonderer Vertrauensstellung
+
+Bewerbung und Rahmen:
+- Verhandlungssichere Deutschkenntnisse in Wort und Schrift erforderlich
+- Bereitschaft zur Teilnahme an der Rufbereitschaft und in dringenden Fällen zur Arbeit außerhalb der geregelten Arbeitszeiten, etwa an Wochenenden
+- Nach einer Einstellungszusage Sicherheitsüberprüfung nach § 9 SÜG; sie darf nicht zum Ergebnis haben, dass ein Sicherheitsrisiko vorliegt (§ 14 SÜG)
+- Auf dieses Stellenangebot kann nicht online über Interamt Bewerbung eingelegt werden; der im Stellenangebot angegebene Bewerbungsweg ist zu verwenden, also die Karriereseite der DRV Bund
+- Karriereseite: https://drv-bund-karriere.de/fachgebiete
+- Flexible Arbeitszeiten, Präsenz- und Mobilarbeit im Rahmen der dienstlichen Regelungen
+- Fort- und Weiterbildungsangebote, betriebliches Gesundheitsmanagement, Angebote zur Vereinbarkeit von Beruf und Familie
+
+Die Fachdomäne nennt als Angebot ausdrücklich Tech-Souveränität durch Transparenz: Übersicht über IT-Services und Werkzeuge, Umgebungen für IT-Teams, in denen Entwickeln wieder Freude macht, und das Mitentwickeln einer autarken, lokalen KI-Infrastruktur.

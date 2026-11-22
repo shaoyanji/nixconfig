@@ -21,6 +21,8 @@
       pipewire
       sops
       systemd # busctl: free desktops have no libnotify CLI, mako is the server
+      # setsid detaches the recorder so it survives the wrapper's session.
+      util-linux
       wl-clipboard
       util-linux
       wtype

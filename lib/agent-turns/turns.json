@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T11:44:57Z",
+  "generated": "2026-11-22T11:45:25Z",
   "count": 200,
-  "pin": "6a72c7025c594937414bd640f38cfad15a8af3837d5bd014fa60a9805748df33",
+  "pin": "2745cbf8da6a4686b7dc89f23c0ba3d81a29a0fadd396caea4fe4d3b95dea78f",
   "turns": [
+    {
+      "id": "d8cd7101-4790-4eac-979b-6931129564ab",
+      "ts": "2026-11-22T11:45:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:virtuslab",
+      "action": "landed: cleanup — removed redundant anschreiben.txt (byte-identical to the letter PDF) in commit 107ac2ef; packet now exactly typ sources + PDFs + sheet. CV 2pp/1031w, letter 1pp/468w, hashes match sheet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "107ac2ef4e945e8aca759a1ac1fb0496ad862a81",
+      "branch": "main",
+      "frame": "03ha76mfc7gxl4zl6bljplcjg"
+    },
     {
       "id": "12894bf8-bcbf-4afe-a8a5-f56054be9116",
       "ts": "2026-11-22T11:44:23Z",
@@ -2789,19 +2802,6 @@
       "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
       "branch": "main",
       "frame": "03ha6jmywnchufe999stexmzu"
-    },
-    {
-      "id": "ef04cf5c-e8be-4f4e-828a-35263ecc406b",
-      "ts": "2026-11-22T09:46:07Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "sva-devops-consultant-linux: form+files complete but server returns opaque processing error on every POST — likely prior app on file or posting-side issue; record=manual",
-      "outcome": "blocked: sva rexx generic processing error on all submits",
-      "claims": [],
-      "files": [],
-      "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
-      "branch": "main",
-      "frame": "03ha6jd8h7z2sqmdsmcam7qmh"
     }
   ]
 }

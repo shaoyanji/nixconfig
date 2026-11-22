@@ -79,7 +79,11 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    impermanence.url = "github:nix-community/impermanence";
+    impermanence = {
+      url = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
@@ -126,14 +130,21 @@
     # inputs.dank-greeter.nixosModules.default → programs.dms-greeter). Both keep
     # their old flake output and option names (`nixosModules.dank-material-shell`,
     # `programs.dank-material-shell`) so the consumers needed only a URL bump.
+    # one qml-common pin for dms + dank-greeter; flake/policies.nix#nix-comments-are-pointers
+    dank-qml-common = {
+      url = "github:duxlabs-dev/dux-qml-common";
+      flake = false;
+    };
     dms = {
       url = "github:duxlabs-dev/dux-shell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "flake-compat";
+      inputs.dank-qml-common.follows = "dank-qml-common";
     };
     dank-greeter = {
       url = "github:duxlabs-dev/dux-greeter";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.dank-qml-common.follows = "dank-qml-common";
     };
     niri = {
       url = "github:sodiboo/niri-flake";

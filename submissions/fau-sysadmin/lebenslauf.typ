@@ -14,7 +14,7 @@
 #line(length: 100%, stroke: 0.5pt + rgb("#d1d5db"))
 
 #v(6pt)
-#text(size: 9.5pt)[Fünf Jahre IT-Betrieb, allein verantwortet: dreizehn Linux-Server, Netz, Dienste, Sicherheitsupdates, Überwachung, Sicherungen. Der Zustand jeder Maschine steht in einer Flake und nicht in der Erinnerung des Administrators; Änderungen laufen über eine Prüfung, eine Rückkehr zur vorigen Generation dauert Minuten. Wartung ist automatisiert, Dokumentation entsteht aus dem Bestand, damit Wissen nicht an einer Person hängt. Dazu ein Forschungsumfeld aus eigener Erfahrung: 2012 am Fraunhofer ISE Messaufbau, Geräteanbindung und Auswertung. Windows-Server, Active Directory und Hyper-V habe ich nicht betreut; das steht im Anschreiben.]
+#text(size: 9.5pt)[Fünf Jahre IT-Betrieb, allein verantwortet: dreizehn Linux-Server, Netz, Dienste, Sicherheitsupdates, Überwachung, Sicherungen. Der Zustand jeder Maschine steht in einer Flake und nicht in der Erinnerung des Administrators; Änderungen laufen über eine Prüfung, eine Rückkehr zur vorigen Generation dauert Minuten. Wartung ist automatisiert, Dokumentation entsteht aus dem Bestand, damit Wissen nicht an einer Person hängt. Dazu ein Forschungsumfeld aus eigener Erfahrung: 2012 am Fraunhofer ISE Messaufbau, Geräteanbindung und Auswertung. Windows-Server, Active Directory, Hyper-V, PowerShell und Lizenzserver habe ich nicht betreut; das steht im Anschreiben.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
   #v(6pt)
@@ -82,5 +82,5 @@
 #text(weight: "bold")[Wartung] — automatisierte Updates, Zustandsprüfung, Alarmierung mit Zustellbestätigung, restic mit geprüfter Rückspielung \
 #text(weight: "bold")[Nix] — Flakes, Modulaufbau, gepinnte Eingaben, reproduzierbare Systeme, Rückrollung \
 #text(weight: "bold")[Skripte] — Python, Go, Shell; Auswertung, Berichte, Dokumentation \
-#text(weight: "bold")[Nicht vorhanden] — Windows-Server, Active Directory, Hyper-V, Debian im Regelbetrieb, Ansible, Ticketsysteme im Hochschulbetrieb \
+#text(weight: "bold")[Nicht vorhanden] — Windows-Server, Active Directory, Hyper-V, PowerShell, Lizenzserver, Debian im Regelbetrieb, Ansible, Ticketsysteme im Hochschulbetrieb \
 #text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · Niederlassungserlaubnis · Umzug nach Erlangen möglich

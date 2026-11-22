@@ -40,7 +40,7 @@ Beim Umbau entfernt: `letter.json`, `resume.json`, `selection.json`. Beide PDFs 
 
 | Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 36938 | 531 | `193c56b4667d3712` |
+| `lebenslauf.pdf` | 2 | 36976 | 535 | `a720f76e9d36472d` |
 | `anschreiben.pdf` | 1 | 24501 | 344 | `f21dac2c5f287825` |
 
 ## Anforderungsprüfung

@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-22T09:00:35Z",
+  "generated": "2026-11-22T09:03:46Z",
   "count": 200,
-  "pin": "30d8d2312c2429dfdd6f29e0b4da1e30d1f0b06aca1c37204e504e8636e91b81",
+  "pin": "d2145e971ca1e2bd2ff03c21570751eaca4206ba21713917e640082ede3c7ea1",
   "turns": [
+    {
+      "id": "76891e0b-6d09-4742-88d8-57e76b811176",
+      "ts": "2026-11-22T09:03:22Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:citeq-muenster-devops",
+      "action": "landed: citeq Münster DevOps Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4c0c1e9aaef9ccef6b50fcb7299e613903d33913",
+      "branch": "main",
+      "frame": "03ha6b0gjj67jmxxp85qk3eqg"
+    },
+    {
+      "id": "ec3c6fca-bff4-4823-92d6-75e9fc0e0e4e",
+      "ts": "2026-11-22T09:03:15Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-hermes-persona-chain-change",
+      "action": "landed: hermes-persona memory write_approval chain-change review on devin pane 0:2.1; devin accepted and is running tools",
+      "outcome": "done",
+      "claims": [
+        "modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "files": [
+        "modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "base_commit": "9d8c24cec837a6123d06a98ef5971d05295d9911",
+      "branch": "main",
+      "frame": "03ha6azo2kidc5p31q0k8d3pt"
+    },
+    {
+      "id": "64c4eb59-b9b3-4e46-bf8b-5381a19b4015",
+      "ts": "2026-11-22T09:02:16Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: catapult-sports-senior-devops Greenhouse submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "9d8c24cec837a6123d06a98ef5971d05295d9911",
+      "branch": "main",
+      "frame": "03ha6asraxl4u545kinfefro1"
+    },
+    {
+      "id": "cc43f672-ef8a-47ed-945c-1b1e6ef2d6c1",
+      "ts": "2026-11-22T09:00:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:catawiki-platform-engineer",
+      "action": "landed: Catawiki Platform Engineer packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9d8c24cec837a6123d06a98ef5971d05295d9911",
+      "branch": "main",
+      "frame": "03ha6ahcv8q0sqpqsqei2bkr7"
+    },
     {
       "id": "6b2ffb55-86f2-4911-991f-97b29a1596ac",
       "ts": "2026-11-22T08:59:34Z",
@@ -2713,58 +2769,6 @@
       "base_commit": "c990e276294a7993a19867f3fa07cc6cd279ce33",
       "branch": "main",
       "frame": "03ha47h3cmtuveyoozixd0xhy"
-    },
-    {
-      "id": "568bd7bb-4a8c-4cd5-8ef5-5a86d121a4cb",
-      "ts": "2026-11-22T02:33:24Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: 26 BA-Jobsuche email applications (rsnetit Kenzingen, mbtechnet, eliquo, weiss, buerkle, DIS Freiburg, netzint, streck, yokogawa, schnebel, ferchau x2, manner, kbs, continum, haufe-lexware, testo, bucher, cewe, kiener, jobrad, reha-verein, gerriets, commeco, biema, leitwerk) | gate: himalaya send OK + appflow-sync imports 26/26 | pipeline 153 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c990e276294a7993a19867f3fa07cc6cd279ce33",
-      "branch": "main",
-      "frame": "03ha46u384fd0y6ihkzwxjm1q"
-    },
-    {
-      "id": "a0c19316-febc-40d4-b694-166f8c7fba32",
-      "ts": "2026-11-22T02:25:15Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-sharpen",
-      "action": "landed: drove idle freebuff pane to sharpen CV and push pending commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5c5ac111d88c48da710229f8db852d3b60cef245",
-      "branch": "main",
-      "frame": "03ha458st2ojm8i1q4jxpgr4s"
-    },
-    {
-      "id": "7d674812-90da-4c95-9660-7a29293262cc",
-      "ts": "2026-11-22T02:17:01Z",
-      "source": "buffy",
-      "subject": "nixconfig:adyen-packet",
-      "action": "landed: Adyen packet built (2p CV 10/32 highlights + 1p letter), location confirmed office-first AMS/MAD | gate: agents:apps:packet exit 0 incl. cv-ats-check in-build | commits: 5c5ac111d88c48da710229f8db852d3b60cef245",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5c5ac111d88c48da710229f8db852d3b60cef245",
-      "branch": "main",
-      "frame": "03ha43mwz2444feiy9fyfbpij"
-    },
-    {
-      "id": "2a250c8b-7856-44ec-a8d8-8c558660d31a",
-      "ts": "2026-11-22T02:14:56Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove idle freebuff pane (default:1.1) to build the Adyen Senior Platform Engineer - GenAI application packet (task agents:apps:packet ID=adyen-platform-genai, Greenhouse req 8163866); pane confirmed working (fresh counter)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
-      "branch": "main",
-      "frame": "03ha4388mldxlim42cacbptzk"
     }
   ]
 }

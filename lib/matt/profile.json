@@ -3,12 +3,12 @@
     "name": "Matt Ji",
     "url": "https://matt.bountystash.com",
     "handle": "matt@bountystash.com",
-    "title": "Systems & Security Engineer",
-    "subtitle": "Go · NixOS fleets · vulnerability data · energy infrastructure",
+    "title": "Systems Engineer",
+    "subtitle": "Go · NixOS fleets · operational data · energy infrastructure",
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
     "status": "Open to senior and lead roles",
-    "target": "Target: security operations or vulnerability management; remote from a CET base or on site in Freiburg.",
-    "bio": "Most of my working life has gone into making operational data usable: four years running asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture, and telemetry reconciliation when sensors went missing. Since 2023 I have run a thirteen-host personal NixOS fleet from one flake, with an SSH certificate authority and per-host encrypted secrets. The move into security follows the same question — can this number, host or patch be trusted — and since 2025 I have worked independently on that fleet and on KEV triage tooling.",
+    "target": "Target: systems engineering, infrastructure or technical operations; remote from a CET base or on site in Freiburg.",
+    "bio": "Most of my working life has gone into making operational data usable: four years running asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture, and telemetry reconciliation when sensors went missing. Since 2023, between roles, I completed a three-month PPA consulting engagement for EWE Trading and built a thirteen-host personal NixOS fleet from one flake, with an SSH certificate authority and per-host encrypted secrets, plus KEV triage tooling. I am looking for systems engineering work where operational data has to be trusted.",
     "contacts": [
       {
         "label": "email",
@@ -68,6 +68,7 @@
     "briefsLabel": "First ninety days",
     "cvLabel": "CV (PDF)",
     "cvTunedLabel": "Energy CV (PDF)",
+    "cvSoftwareLabel": "Software CV (PDF)",
     "archiveNote": "Tools, research and side projects — the parts a role description has no room for.",
     "caseKicker": "Case study",
     "briefKicker": "Brief",
@@ -91,7 +92,7 @@
       "body": "One binary per service, serving HTML, JSON and a terminal UI. Small enough to read in an afternoon, and state is a log of what happened rather than a row someone edited."
     },
     {
-      "title": "Vulnerability data that ends in action",
+      "title": "Operational data that ends in action",
       "body": "CISA's exploited list as a time series and as clusters a team can finish this week. The output is a patch order, not another dashboard."
     }
   ],
@@ -99,7 +100,7 @@
     {
       "title": "Multi-host NixOS fleet",
       "role": "Author and operator",
-      "description": "I moved thirteen machines off per-host install notes and onto one repository. Rebuilding, auditing or handing over a host is now the commit plus one command; secrets are encrypted per host and certificates rotate on a schedule.",
+      "description": "I moved thirteen machines off per-host install notes and onto one repository. Rebuilding, auditing or handing over a host is now the commit plus one command; secrets are encrypted per host and certificates rotate on a schedule. The same fleet runs self-hosted services and scheduled sync agents for job search and data sync.",
       "link": "https://github.com/shaoyanji/nixconfig",
       "caseStudy": "nixos-fleet",
       "keywords": [
@@ -114,21 +115,29 @@
       "sortStart": "2023-01-01"
     },
     {
-      "title": "bountystash: energy risk advisory",
-      "role": "Founder",
-      "description": "A five-year advisory practice for energy trading and risk management, with client work for a German energy trader and EWE Trading, including bug-bounty programme audits and cybersecurity advice.",
-      "highlights": [
-        "Built the bountystash work engine: a Go service that records a request as an immutable, content-addressed specification, so a job's state replays a month later and two people can agree on what was asked."
-      ],
-      "link": "https://github.com/shaoyanji/bountystash",
-      "caseStudy": "bountystash",
+      "title": "EWE Trading: PPA consulting",
+      "role": "External consultant",
+      "description": "A three-month external consulting engagement for EWE Trading in 2023: risk-adjusted PPA models and the commercial logic behind them.",
+      "link": "",
       "keywords": [
-        "Go",
-        "event log",
-        "content addressing",
-        "TUI"
+        "PPA",
+        "energy trading",
+        "risk models"
       ],
-      "org": "Bountystash"
+      "org": "EWE Trading",
+      "sortStart": "2023-01-01"
+    },
+    {
+      "title": "Landvest: investment app",
+      "role": "Freelance no-code developer",
+      "description": "A 2021 freelance engagement: a no-code app for Landvest's investment platform.",
+      "link": "",
+      "keywords": [
+        "no-code",
+        "investment platform"
+      ],
+      "org": "Landvest",
+      "sortStart": "2021-01-01"
     },
     {
       "title": "fibtransponder",
@@ -149,7 +158,7 @@
     {
       "title": "Energy telemetry and valuation",
       "role": "Asset manager, O3 Energy",
-      "description": "Four years running the numbers behind a solar portfolio above $100M: yield and valuation models that satisfied bank auditors, mobile capture for field technicians, and a reconciliation step that turned a dead sensor into a known error instead of a good month.",
+      "description": "Four years running the numbers behind a solar portfolio above $100M: yield and valuation models that satisfied bank auditors, mobile capture for field technicians, and a reconciliation step that turned a dead sensor into a known error instead of a good month. Also implemented Salesforce and kept a small office's Microsoft 365, network and Wi-Fi running.",
       "link": "",
       "caseStudy": "energy-telemetry",
       "keywords": [
@@ -196,6 +205,21 @@
         "oil and gas"
       ],
       "org": "Halliburton"
+    },
+    {
+      "title": "Bountystash",
+      "role": "Founder and engineer",
+      "description": "Built and ran Bountystash: a Go service that turns a request into an immutable, content-addressed specification, with append-only events, a terminal UI and curl endpoints in one binary.",
+      "link": "https://github.com/shaoyanji/bountystash",
+      "caseStudy": "bountystash",
+      "keywords": [
+        "Go",
+        "content addressing",
+        "event log",
+        "TUI"
+      ],
+      "org": "Bountystash",
+      "sortStart": "2020-06-01"
     }
   ],
   "lab": {
@@ -222,7 +246,6 @@
       "items": [
         "Go",
         "Python",
-        "SQL",
         "REST",
         "state machines"
       ]
@@ -232,22 +255,24 @@
       "items": [
         "NixOS",
         "Nix flakes",
+        "AWS Lambda (small agent project)",
         "SSH certificate authority",
         "SOPS and age",
         "Tailscale",
-        "ZFS and btrfs",
         "systemd",
-        "CI gates"
+        "CI gates",
+        "Salesforce",
+        "Microsoft 365",
+        "networking and Wi-Fi"
       ]
     },
     {
-      "category": "Security",
+      "category": "Data",
       "items": [
-        "vulnerability management",
+        "SQL",
+        "PostgreSQL",
         "CISA KEV",
-        "CVSS",
-        "bug-bounty programme audit",
-        "vulnerability programme design"
+        "CVSS"
       ]
     },
     {
@@ -262,8 +287,8 @@
   ],
   "hire": {
     "title": "What I am looking for",
-    "body": "A senior or lead role where infrastructure and security meet: platform engineering, site reliability, or vulnerability operations. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
-    "briefsNote": "Two notes on what I would do in the first ninety days:",
+    "body": "A senior or lead systems role where infrastructure, automation and operational data meet: platform engineering, site reliability or IT operations. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
+    "briefsNote": "Notes on what I would do in the first ninety days:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS; comfortable owning a service end to end",
       "Available on short notice"

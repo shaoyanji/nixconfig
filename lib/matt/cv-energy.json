@@ -2,18 +2,22 @@
   "_comment": "The tailored CV for energy-infrastructure work. Every string here is either a resume highlight copied verbatim or prose about facts the resume already states: lib/matt-site.nix fails the build on anything it cannot find in resume.json, so this file selects and orders, it cannot invent.",
   "lang": "en",
   "title": "Energy asset manager and risk analyst",
-  "bio": "I ran the numbers behind a solar portfolio above USD 100M for four years: yield and valuation models that satisfied bank auditors, due diligence on O&M contracts, and financial models for a dozen projects of USD 4-5M each. Since 2020 I have built risk-adjusted PPA and weather-derivative models for energy companies, and acted as risk manager for gas storage and swing trading at a German energy trader. I write the software those numbers run on, because a model nobody can reproduce is not evidence.",
+  "bio": "I managed a solar portfolio above USD 100M for four years: 10 MW of PV, a dozen USD 4-5M projects, yield and valuation models that passed bank audits, and due diligence on O&M contracts. Between 2020 and 2023 I built Bountystash, an independent Go product, and delivered Landvest's no-code investment app in 2021. In 2023 I completed a three-month PPA engagement for EWE Trading. Since 2023 I have built independent systems and applied for energy roles.",
   "labels": {
     "projects": "Projects"
   },
   "work": [
     {
-      "name": "Bountystash",
+      "name": "EWE Trading",
       "highlights": [
-        "Advised clients and acted as in-house Risk Manager for a top German energy trader",
-        "Risk-managed gas storage and gas swing trading models as risk manager for EWE Trading",
-        "Built risk-adjusted PPA trading models for energy companies",
-        "Built an algorithm for options trading and hedging on weather derivatives"
+        "Three-month external PPA consulting engagement for EWE Trading",
+        "Built risk-adjusted PPA trading models for EWE Trading"
+      ]
+    },
+    {
+      "name": "Landvest",
+      "highlights": [
+        "Built a no-code app for Landvest's investment platform"
       ]
     },
     {
@@ -29,30 +33,20 @@
     {
       "name": "Smart Energy 360",
       "highlights": [
-        "Managed a pipeline of USD 100M+ projects",
-        "Devised sustainability sales and marketing strategies",
-        "Advised clients on cybersecurity software and risk management"
+        "Managed a pipeline of USD 100M+ projects"
       ]
     },
     {
       "name": "Fraunhofer ISE",
       "highlights": [
         "Conducted research on heliostat imperfections using interferometry",
-        "Wrote Python analysis and 3D geometry tooling"
-      ]
-    },
-    {
-      "name": "Halliburton",
-      "highlights": [
-        "Troubleshot chemicals and equipment on site",
-        "Managed two frac crews carrying USD 3M+ of work per week",
-        "Led safety training for crew members"
+        "Implemented the analysis from a published paraboloid paper in Python, including 3D geometry tooling"
       ]
     }
   ],
   "projects": [
     "Master's Thesis",
-    "Postgraduate Renewable Energy",
+    "bountystash",
     "nixconfig"
   ],
   "stack": [
@@ -61,8 +55,7 @@
       "items": [
         "asset valuation",
         "yield and valuation models",
-        "PPA and weather-derivative hedging",
-        "gas storage and swing trading",
+        "PPA modelling",
         "due diligence",
         "bank audit reporting",
         "portfolio risk management"
@@ -72,6 +65,7 @@
       "category": "Engineering and data",
       "items": [
         "financial modelling",
+        "Excel",
         "solar telemetry reconciliation",
         "Python",
         "SQL",

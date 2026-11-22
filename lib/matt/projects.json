@@ -6,8 +6,8 @@
       "type": "open source",
       "start": "2023-01",
       "end": "",
-      "summary": "Thirteen personal NixOS hosts rebuilt from one repository: certificates, per-host secrets and the operator commands come from the same place, and the same check runs in CI and before a deploy.",
-      "summaryDe": "Dreizehn persönliche NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy.",
+      "summary": "Moved a single-operator fleet of thirteen machines off per-host install notes onto one repository: rebuilding, auditing, rolling back or handing over a host is the commit plus one command, secrets are encrypted per host, certificates rotate on a schedule, and the same check runs in CI and before a deploy. A fleet-wide check takes 340 seconds and 6 GB on an 11 GB laptop, so it is refused below a memory floor and hosts are checked one at a time.",
+      "summaryDe": "Dreizehn persönliche NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy. Die Flotte betreibt außerdem selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
       "keywords": [
         "Nix",
         "NixOS",
@@ -19,11 +19,28 @@
       "resumeName": "nixconfig"
     },
     {
-      "name": "bountystash",
+      "name": "email-archive",
+      "entity": "Personal",
+      "type": "service",
+      "start": "2026-11",
+      "end": "",
+      "summary": "A PostgreSQL mail archive on the delphi host: a generated tsvector and GIN index for full-text search, SQL endpoints generated from annotated queries, and an idempotent upsert on message_id. An hourly importer adds up to 200 messages per run; a fuzzy CLI and web reader read the same rows.",
+      "summaryDe": "Ein PostgreSQL-Mailarchiv: generierter tsvector und GIN-Index für Volltextsuche, aus annotierten Queries erzeugte SQL-Endpunkte und ein Upsert auf message_id, mit Fuzzy-CLI und Web-Reader auf denselben Zeilen.",
+      "keywords": [
+        "PostgreSQL",
+        "full-text search",
+        "SQL",
+        "NpgsqlRest"
+      ],
+      "url": "https://github.com/shaoyanji/nixconfig/blob/main/docs/email-archive.md",
+      "resumeName": "email-archive"
+    },
+    {
+      "name": "Bountystash work engine",
       "entity": "Founder",
       "type": "product",
       "start": "2020-06",
-      "end": "2025-08",
+      "end": "2023-12",
       "summary": "A Go service that turns a request into an immutable, content-addressed specification. Append-only events, a terminal UI and curl endpoints all come from one binary.",
       "summaryDe": "Ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht. Append-only Events, Terminal-Oberfläche und curl-Endpunkte kommen aus einem Binary.",
       "keywords": [
@@ -41,7 +58,7 @@
       "type": "research",
       "start": "2026-01",
       "end": "2026-06",
-      "summary": "A Fibonacci-radix state machine that streams a bitstream with bounded work per step. A corpus benchmark falsified the first detector design, so the claim narrowed.",
+      "summary": "A Fibonacci-radix state machine that reads a bitstream with bounded work per step, tracking dilation, zero-run markers and a 64-bit sketch. A corpus benchmark falsified seed-only calibration: different Zobrist seeds changed sketch identity, not event structure. An earlier 6-bit window gave 256 distinct sketches over 20,000 streams; spreading it gave about 19,713.",
       "summaryDe": "Ein Zustandsautomat mit Fibonacci-Radix, der einen Bitstrom mit begrenzter Arbeit pro Schritt verarbeitet. Ein Korpus-Benchmark hat den ersten Detektor-Entwurf widerlegt, die Behauptung wurde kleiner.",
       "keywords": [
         "Go",
@@ -51,23 +68,6 @@
       ],
       "url": "https://github.com/shaoyanji/fibtransponder",
       "resumeName": "fibtransponder"
-    },
-    {
-      "name": "Risk calculation engine",
-      "entity": "Personal research",
-      "type": "research",
-      "start": "2026-03",
-      "end": "2026-03",
-      "summary": "Green's theorem applied to stochastic polygons: a Go fuzzer generates shapes, a Nushell and Awk pipeline drives the calculation, and a Nix dev shell pins the toolchain.",
-      "summaryDe": "Satz von Green auf stochastische Polygone: ein Go-Fuzzer erzeugt Formen, eine Nushell-und-Awk-Pipeline treibt die Berechnung, eine Nix-Entwicklungsumgebung pinnt die Werkzeuge.",
-      "keywords": [
-        "Go",
-        "Nushell",
-        "geometry",
-        "risk models"
-      ],
-      "url": "https://github.com/shaoyanji/risk-calc",
-      "resumeName": "Risk Calculation Engine (Swirl Engine)"
     },
     {
       "name": "kev-time",

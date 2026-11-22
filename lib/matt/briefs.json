@@ -50,5 +50,55 @@
       }
     ],
     "closing": "By day ninety I want the median age of an exploited entry to be a target someone chose, and a weekly report that says whether we hit it."
+  },
+  "nixos-fleet-audit": {
+    "title": "NixOS Fleet Audit",
+    "kicker": "Fixed-scope infrastructure review",
+    "standfirst": "A five-day review of a NixOS fleet: what is fragile, what is unowned, and the smallest set of changes that removes the next outage.",
+    "facts": [
+      {
+        "label": "Scope",
+        "value": "5 working days"
+      },
+      {
+        "label": "Deliverable",
+        "value": "Report + one small PR"
+      },
+      {
+        "label": "Price",
+        "value": "2,500 EUR fixed"
+      },
+      {
+        "label": "Start",
+        "value": "Within two weeks"
+      }
+    ],
+    "sections": [
+      {
+        "heading": "What I review",
+        "body": [
+          "Flake and module boundaries, host inventory, secrets, deploy and rollback, CI gates, backup and restore, monitoring, and one real incident path. I read the repository and the running hosts, not a slide deck."
+        ]
+      },
+      {
+        "heading": "What you get",
+        "body": [
+          "A written report with evidence, a 30-day remediation plan, and one small PR your team can review and merge. The PR is the proof that the audit produced a change, not just an opinion."
+        ]
+      },
+      {
+        "heading": "Who it is for",
+        "body": [
+          "A team running NixOS in production without a dedicated Nix owner, or one that inherited a flake and wants a second pair of eyes before the next deploy."
+        ]
+      },
+      {
+        "heading": "How it works",
+        "body": [
+          "Read-only repository and host access, five working days, then a 60-minute walkthrough. The fixed price is the whole engagement; no hourly meter."
+        ]
+      }
+    ],
+    "closing": "If the first PR is not something your team would merge, the audit did not do its job."
   }
 }

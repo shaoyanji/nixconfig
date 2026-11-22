@@ -5,8 +5,8 @@
 {
   pkgs,
   lib ? pkgs.lib,
-  fetches ? import ./fetches-extra.nix {inherit pkgs;},
-  resume ? fetches.fetch "matt-resume" |> builtins.readFile |> builtins.fromJSON,
+  # Pinned CV source: a gist sync may rewrite resume.json; docs/cv-ats-compliance.md
+  resume ? ./matt/resume.cv.json |> builtins.readFile |> builtins.fromJSON,
   data ? ./matt/profile.json |> builtins.readFile |> builtins.fromJSON,
   dataDe ? ./matt/profile.de.json |> builtins.readFile |> builtins.fromJSON,
   cases ? ./matt/cases.json |> builtins.readFile |> builtins.fromJSON,
@@ -67,15 +67,15 @@
     else "${ys} — ${ye}";
 
   # One role, one prose entry, matched on the organisation the resume names.
-  joinWork = d: nowLabel: let
+  joinWork = corpus: d: nowLabel: let
     prose = d.work |> builtins.filter (w: (w.org or "") != "") |> map (w: lib.nameValuePair w.org w) |> lib.listToAttrs;
-    missing = resumeWork |> map (w: w.name) |> builtins.filter (n: !(prose |> builtins.hasAttr n));
+    missing = corpus |> map (w: w.name) |> builtins.filter (n: !(prose |> builtins.hasAttr n));
   in
     if missing != []
     then throw "matt-site: no prose for resume role(s): ${lib.concatStringsSep ", " missing}"
     else
       (
-        (resumeWork
+        (corpus
           |> map (
             w: let
               pr = prose.${w.name};
@@ -250,7 +250,14 @@
       then "heute"
       else "now";
 
-    work = joinWork d nowLabel;
+    work =
+      joinWork (
+        if lang == "de"
+        then lebenslaufWork
+        else resumeWork
+      )
+      d
+      nowLabel;
 
     projectRowsData =
       joinProjects
@@ -492,6 +499,8 @@
         then "cv-energy-de.pdf"
         else "cv-energy.pdf"
       }";
+      cvSoftwareHref = "${root}cv-software.pdf";
+      inherit (ui) cvSoftwareLabel;
       ogImage = "${siteUrl}/${
         if lang == "de"
         then "og-de.png"
@@ -631,6 +640,8 @@
         else "cv-energy.pdf"
       }";
       inherit (ui) cvTunedLabel;
+      cvSoftwareHref = "${pageRoot}cv-software.pdf";
+      inherit (ui) cvSoftwareLabel;
       cssHref = "${pageRoot}style.css";
       footer = "${privacy ui d.analytics} ${ui.footer}";
       analytics = mkAnalytics d.analytics;
@@ -727,7 +738,15 @@
         then deEducation
         else education;
       # Experience is the resume's work; the site's project-as-work entries are not.
-      work = builtins.filter (w: (w.org or "") != "") (joinWork d nowLabel);
+      work = builtins.filter (w: (w.org or "") != "") (
+        joinWork (
+          if lang == "de"
+          then lebenslaufWork
+          else resumeWork
+        )
+        d
+        nowLabel
+      );
       projects =
         if untranslated != []
         then throw "matt-site: no German project title for: ${lib.concatStringsSep ", " (map (e: e.name) untranslated)}"
@@ -747,15 +766,15 @@
                 period = yearPeriod nowLabel e.start e.end;
               }
           )
-          # The archive keeps every project; the two-page CV shows the three
-          # that argue for this role.
+          # The archive keeps every project; the two-page CV shows the four
+          # that argue for a systems role.
           (joinProjects
             |> lib.sort (a: b: projectRank a > projectRank b)
             |> lib.filter (e:
               builtins.elem (e.resumeName or e.name) [
                 "nixconfig"
-                "Vulnerability operations concept"
-                "kelly-svg"
+                "fibtransponder"
+                "bountystash"
               ]));
     };
 
@@ -764,6 +783,7 @@
   # on anything the corpus does not say. It can select and order; it cannot invent.
   cvEnergyJson = builtins.fromJSON (builtins.readFile ./matt/cv-energy.json);
   cvEnergyDeJson = builtins.fromJSON (builtins.readFile ./matt/cv-energy.de.json);
+  cvSoftwareJson = builtins.fromJSON (builtins.readFile ./matt/cv-software.json);
 
   cvVariantData = json: lang: let
     corpusWork =
@@ -791,7 +811,7 @@
       |> map (p: lib.nameValuePair (p.resumeName or p.name) p)
       |> lib.listToAttrs;
     byRole =
-      joinWork prose nowLabel
+      joinWork corpusWork prose nowLabel
       |> builtins.filter (w: (w.org or "") != "")
       |> map (w: lib.nameValuePair w.org w)
       |> lib.listToAttrs;
@@ -799,7 +819,6 @@
     named = json.work |> map (w: w.name);
     highlightsOf = n: (lib.findFirst (w: w.name == n) {highlights = [];} corpusWork).highlights or [];
     unknownRoles = named |> builtins.filter (n: !(knownRoles |> builtins.elem n));
-    omittedRoles = knownRoles |> builtins.filter (n: !(named |> builtins.elem n));
     invented =
       json.work
       |> lib.concatMap (
@@ -815,8 +834,6 @@
     then throw "cv-variant: the ${lang} CV carries a ${json.lang} variant"
     else if unknownRoles != []
     then throw "cv-variant: not a ${lang} corpus role: ${lib.concatStringsSep ", " unknownRoles}"
-    else if omittedRoles != []
-    then throw "cv-variant: ${lang} role(s) missing from the variant: ${lib.concatStringsSep ", " omittedRoles}"
     else if invented != []
     then throw "cv-variant: not in the ${lang} corpus: ${lib.concatStringsSep " | " invented}"
     else if unknownProjects != []
@@ -874,33 +891,41 @@
             }
         );
       inherit (json) stack;
+      inlineDates = json.inlineDates or false;
     };
 
   # `typeset` reads the page count from the template's report; `cv-ats-check`
   # re-reads the finished PDF against work/cv.json. Why: docs/cv-ats-compliance.md.
   cvPdf = name: cvJson:
-    pkgs.runCommand "matt-cv-${name}" {
-      nativeBuildInputs = [pkgs.typst pkgs.jq pkgs.poppler-utils pkgs.python3];
-    } ''
-      mkdir -p $out work
-      cp ${./matt/cv.typ} work/cv.typ
-      cp ${pkgs.writeText "cv.json" (builtins.toJSON cvJson)} work/cv.json
-      # `ua-1` exports a tagged PDF: headings, lists and entries reach the structure
-      # tree, so a parser reads sections from it instead of rebuilding them from
-      # glyph positions. cv-ats-check refuses a PDF that lost the tree.
-      typst compile --pdf-standard ua-1 --root work work/cv.typ $out/cv.pdf
-      ${typeset.check {
-        source = "work/cv.typ";
-        budget = cvJson.pages;
-        doc = "cv-${name}.pdf";
-      }}
-      bash ${../scripts/task/cv-ats-check.sh} --record work/cv.json $out/cv.pdf
-    '';
+    assert lib.assertMsg
+    (
+      !(lib.any (w: (w.org or "") == "EWE Trading" && (w.period or "") != "2023") (cvJson.work or []))
+      && !(lib.any (p: (p.resumeName or (p.name or "")) == "bountystash" && (p.period or "") == "2020 — 2025") (cvJson.projects or []))
+    )
+    "matt-site: EWE Trading is a three-month 2023 engagement; refusing another period";
+      pkgs.runCommand "matt-cv-${name}" {
+        nativeBuildInputs = [pkgs.typst pkgs.jq pkgs.poppler-utils pkgs.python3];
+      } ''
+        mkdir -p $out work
+        cp ${./matt/cv.typ} work/cv.typ
+        cp ${pkgs.writeText "cv.json" (builtins.toJSON cvJson)} work/cv.json
+        # `ua-1` exports a tagged PDF: headings, lists and entries reach the structure
+        # tree, so a parser reads sections from it instead of rebuilding them from
+        # glyph positions. cv-ats-check refuses a PDF that lost the tree.
+        typst compile --pdf-standard ua-1 --root work work/cv.typ $out/cv.pdf
+        ${typeset.check {
+          source = "work/cv.typ";
+          budget = cvJson.pages;
+          doc = "cv-${name}.pdf";
+        }}
+        bash ${../scripts/task/cv-ats-check.sh} --record work/cv.json $out/cv.pdf
+      '';
 
   cv = cvPdf "en" (cvData "en");
   cvDe = cvPdf "de" (cvData "de");
   cvEnergy = cvPdf "energy" (cvVariantData cvEnergyJson "en");
   cvEnergyDe = cvPdf "energy-de" (cvVariantData cvEnergyDeJson "de");
+  cvSoftware = cvPdf "software" (cvVariantData cvSoftwareJson "en");
 
   # Every CV this build ships. The installs and the link gate both read this
   # list, so a CV added here without a page linking it fails the build, and the
@@ -922,6 +947,10 @@
     {
       name = "cv-energy-de.pdf";
       src = cvEnergyDe;
+    }
+    {
+      name = "cv-software.pdf";
+      src = cvSoftware;
     }
   ];
 

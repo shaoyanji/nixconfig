@@ -41,7 +41,7 @@
   "bountystash": {
     "title": "A specification you can replay",
     "standfirst": "Bountystash turns a request into an immutable, content-addressed document. Every view is a replay of recorded events, and the same request produces the same document.",
-    "period": "2020 — 2025",
+    "period": "2020 — 2023",
     "role": "Founder and engineer",
     "facts": [
       { "label": "Runtime", "value": "one Go binary" },

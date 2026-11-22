@@ -50,5 +50,55 @@
       }
     ],
     "closing": "Am neunzigsten Tag soll das mittlere Alter eines ausgenutzten Eintrags ein Ziel sein, das jemand gewählt hat, und ein Wochenbericht sagen, ob wir es erreicht haben."
+  },
+  "nixos-fleet-audit": {
+    "title": "NixOS-Flotten-Audit",
+    "kicker": "Infrastrukturprüfung zum Festpreis",
+    "standfirst": "Fünf Tage Prüfung einer NixOS-Flotte: was fragil ist, was niemand verantwortet und welche kleine Änderung den nächsten Ausfall verhindert.",
+    "facts": [
+      {
+        "label": "Umfang",
+        "value": "5 Arbeitstage"
+      },
+      {
+        "label": "Ergebnis",
+        "value": "Bericht + ein kleiner PR"
+      },
+      {
+        "label": "Preis",
+        "value": "2.500 EUR fest"
+      },
+      {
+        "label": "Start",
+        "value": "innerhalb von zwei Wochen"
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Was ich prüfe",
+        "body": [
+          "Flake- und Modulgrenzen, Host-Inventar, Secrets, Deploy und Rollback, CI-Gates, Backup und Restore, Monitoring und einen echten Vorfallpfad. Ich lese das Repository und die laufenden Hosts, keine Präsentation."
+        ]
+      },
+      {
+        "heading": "Was Sie bekommen",
+        "body": [
+          "Einen schriftlichen Bericht mit Belegen, einen 30-Tage-Plan und einen kleinen PR, den Ihr Team prüfen und mergen kann. Der PR ist der Beweis, dass das Audit eine Änderung erzeugt hat, keine Meinung."
+        ]
+      },
+      {
+        "heading": "Für wen",
+        "body": [
+          "Ein Team, das NixOS produktiv betreibt, ohne eine dedizierte Nix-Verantwortung, oder eine Flake geerbt hat und vor dem nächsten Deploy eine zweite Meinung will."
+        ]
+      },
+      {
+        "heading": "Ablauf",
+        "body": [
+          "Lese-Zugriff auf Repository und Hosts, fünf Arbeitstage, danach 60 Minuten Übergabe. Der Festpreis ist die ganze Leistung; kein Stundenzähler."
+        ]
+      }
+    ],
+    "closing": "Wenn der erste PR nichts ist, das Ihr Team mergen würde, hat das Audit seine Aufgabe nicht erfüllt."
   }
 }

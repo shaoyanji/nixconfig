@@ -41,7 +41,7 @@
   "bountystash": {
     "title": "Eine Spezifikation, die sich wieder abspielen lässt",
     "standfirst": "Bountystash macht aus einer Anfrage ein unveränderliches, inhaltsadressiertes Dokument. Jede Ansicht ist ein Replay aufgezeichneter Ereignisse, und dieselbe Anfrage ergibt dasselbe Dokument.",
-    "period": "2020 — 2025",
+    "period": "2020 — 2023",
     "role": "Gründer und Entwickler",
     "facts": [
       { "label": "Laufzeit", "value": "ein Go-Binary" },

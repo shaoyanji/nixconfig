@@ -2,28 +2,43 @@
   "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
   "basics": {
     "name": "Matt Ji",
-    "label": "System- und Sicherheitsingenieur",
+    "label": "Systemingenieur",
     "url": "https://www.bountystash.com",
     "summary": "Ingenieur und Risikoanalyst, zehn Jahre an der Schnittstelle von erneuerbaren Energien und Software. Ich baue die Modelle und die Systeme, die sie ausführen: Options- und Hedging-Modelle für Energieportfolios, Go-Dienste, eine NixOS-Flotte, ein E-Mail-Archiv, das seine Post selbst klassifiziert. Ich leitete das Asset Management eines Solarportfolios über 100 Mio. USD und forschte zu Heliostat-Messtechnik am Fraunhofer ISE."
   },
   "work": [
     {
-      "name": "Bountystash",
-      "position": "Gründer",
-      "startDate": "2020-06-01",
-      "endDate": "2025-08-19",
+      "name": "EWE Trading",
+      "position": "Externer Berater (PPA)",
+      "startDate": "2023-01-01",
+      "endDate": "2023-12-31",
       "highlights": [
-        "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten.",
-        "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig.",
-        "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist.",
-        "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen.",
-        "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading.",
-        "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD.",
-        "Konzipierte eine Covered-Call-Hedging-Strategie für Kundenportfolios.",
-        "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists.",
-        "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit.",
-        "Prüfte Bug-Bounty-Programme."
-      ]
+        "Dreimonatiges externes PPA-Beratungsmandat für die EWE Trading"
+      ],
+      "keywords": [
+        "PPA",
+        "Energiehandel",
+        "Risikomodelle"
+      ],
+      "url": "",
+      "summary": "Dreimonatiges externes Beratungsmandat für die EWE Trading im Jahr 2023 mit Fokus auf PPA-Modellierung.",
+      "description": "Dreimonatiges externes PPA-Beratungsmandat für die EWE Trading im Jahr 2023."
+    },
+    {
+      "name": "Landvest",
+      "position": "Freelance-No-Code-Entwickler",
+      "startDate": "2021-01-01",
+      "endDate": "2021-12-31",
+      "highlights": [
+        "Baute eine No-Code-App für die Investmentplattform von Landvest."
+      ],
+      "keywords": [
+        "No-Code",
+        "Investmentplattform"
+      ],
+      "url": "",
+      "summary": "Freiberufliche No-Code-App für die Investmentplattform von Landvest im Jahr 2021.",
+      "description": "Freiberufliche No-Code-App für die Investmentplattform von Landvest im Jahr 2021."
     },
     {
       "name": "O3 Energy",
@@ -34,9 +49,11 @@
         "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen.",
         "Leitete das Asset Management eines Portfolios über 100 Mio. USD.",
         "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch.",
-        "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften.",
         "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD.",
         "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf.",
+        "Implementierte Salesforce für das Asset-Management-Team.",
+        "Beschaffte Microsoft 365 und hielt Netzwerk und WLAN des Büros am Laufen.",
+        "Bot IT-Support für ein kleines Büro.",
         "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten.",
         "Führte ein internationales Team und entwickelte eine Anreizstruktur, gekoppelt an ein Echtzeit-Finanzmodell."
       ]
@@ -49,9 +66,9 @@
       "highlights": [
         "Betreute eine Projektpipeline über 100 Mio. USD.",
         "Verantwortete den Kundenservice und die Betreuung der Mandanten.",
-        "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit.",
-        "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
-      ]
+        "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit."
+      ],
+      "keywords": []
     },
     {
       "name": "Fraunhofer ISE",
@@ -109,34 +126,6 @@
   ],
   "projects": [
     {
-      "name": "Risikoberechnungs-Engine (Swirl Engine)",
-      "resumeName": "Risk Calculation Engine (Swirl Engine)",
-      "description": "Satz von Green auf stochastische Polygone: ein Go-Fuzzer erzeugt Formen, eine Pipeline aus Nushell und Awk treibt die Berechnung, eine Nix-Entwicklungsumgebung pinnt die Werkzeuge.",
-      "url": "https://github.com/shaoyanji/risk-calc",
-      "startDate": "2026-03-15",
-      "endDate": "2026-03-18",
-      "type": "open_source",
-      "roles": [
-        "Lead Developer",
-        "Forscher"
-      ],
-      "highlights": [
-        "Konzipierte eine „Swirl Engine“ auf Basis des Satzes von Green, um Polygonflächen aus zufälligen geometrischen Daten zu berechnen.",
-        "Implementierte einen Shape-Fuzzer in Go, der stochastische Polygone erzeugt, um die Berechnungsengine zu belasten.",
-        "Orchestrierte die Pipeline mit Nushell und Awk und umging damit Compiler-Grenzen für rechenintensive Mathematik.",
-        "Containerisierte die Umgebung mit Nix Flakes für reproduzierbare Go-1.16+-Entwicklung."
-      ],
-      "keywords": [
-        "Go",
-        "Nushell",
-        "Awk",
-        "Satz von Green",
-        "Risikoanalyse",
-        "NixOS",
-        "Polyglotte Programmierung"
-      ]
-    },
-    {
       "name": "Masterarbeit: Wetter und Volatilität",
       "resumeName": "Master's Thesis",
       "description": "Ein Verfahren zur Zeit-Kreuzkorrelation von Windgeschwindigkeit sowie neuronale Netze auf Langzeit-Wetterdaten, um die Volatilität von Solar- und Windanlagen im Netz zu bewerten.",
@@ -184,7 +173,7 @@
     {
       "name": "nixconfig",
       "resumeName": "nixconfig",
-      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
+      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen. Dieselbe Flotte betreibt selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
       "url": "https://github.com/shaoyanji/nixconfig",
       "startDate": "2023-01-01",
       "endDate": "",
@@ -199,12 +188,28 @@
       ]
     },
     {
-      "name": "bountystash",
+      "name": "E-Mail-Archiv",
+      "resumeName": "email-archive",
+      "description": "Ein PostgreSQL-Mailarchiv: generierter tsvector und GIN-Index für Volltextsuche, aus annotierten Queries erzeugte SQL-Endpunkte und ein Upsert auf message_id, mit Fuzzy-CLI und Web-Reader auf denselben Zeilen.",
+      "url": "https://github.com/shaoyanji/nixconfig/blob/main/docs/email-archive.md",
+      "startDate": "2026-11-02",
+      "endDate": "",
+      "type": "service",
+      "highlights": [],
+      "keywords": [
+        "PostgreSQL",
+        "Volltextsuche",
+        "SQL",
+        "NpgsqlRest"
+      ]
+    },
+    {
+      "name": "Bountystash-Aufgaben-Engine",
       "resumeName": "bountystash",
       "description": "Ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht. Append-only Events, Terminal-Oberfläche und curl-Endpunkte kommen aus einem Binary.",
       "url": "https://github.com/shaoyanji/bountystash",
       "startDate": "2020-06-01",
-      "endDate": "2025-08-01",
+      "endDate": "2023-12-31",
       "type": "product",
       "highlights": [],
       "keywords": [
@@ -336,13 +341,10 @@
     },
     {
       "name": "DevOps",
-      "level": "Master",
+      "level": "Grundkenntnisse",
       "keywords": [
-        "Kubernetes",
         "NixOS",
-        "AWS",
-        "Azure",
-        "Google Cloud"
+        "AWS Lambda (kleines Agenten-Projekt)"
       ]
     },
     {
@@ -361,12 +363,10 @@
     {
       "name": "Sicherheit",
       "keywords": [
-        "Bug Bounty",
-        "Schwachstellenmanagement",
         "CISA KEV",
+        "CVSS",
         "SOPS",
-        "SSH-CA",
-        "Bedrohungsmodellierung"
+        "SSH CA"
       ]
     }
   ],
@@ -377,7 +377,7 @@
     },
     {
       "language": "Deutsch",
-      "fluency": "B2"
+      "fluency": "C1"
     }
   ]
 }

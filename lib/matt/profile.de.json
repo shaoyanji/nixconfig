@@ -3,12 +3,12 @@
     "name": "Matt Ji",
     "url": "https://matt.bountystash.com",
     "handle": "matt@bountystash.com",
-    "title": "System- und Sicherheitsingenieur",
-    "subtitle": "Go · NixOS-Flotten · Schwachstellendaten · Energieinfrastruktur",
+    "title": "Systemingenieur",
+    "subtitle": "Go · NixOS-Flotten · Betriebsdaten · Energieinfrastruktur",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
     "status": "Offen für Senior- und Lead-Rollen",
-    "target": "Ziel: Sicherheitsbetrieb oder Schwachstellenmanagement; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
-    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Seit 2023 betreibe ich eine persönliche NixOS-Flotte mit dreizehn Hosts aus einem Flake, mit eigener SSH-Zertifizierungsstelle und verschlüsselten Secrets pro Host. Der Wechsel in die Sicherheit folgt derselben Frage — ob dieser Wert, dieser Host oder dieser Patch vertrauenswürdig ist — und seit 2025 arbeite ich unabhängig an der Flotte und an KEV-Triage-Werkzeugen.",
+    "target": "Ziel: Systemengineering, Infrastruktur oder technischer Betrieb; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
+    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Seit 2023, zwischen Anstellungen, habe ich ein dreimonatiges PPA-Beratungsmandat für die EWE Trading abgeschlossen und eine persönliche NixOS-Flotte mit dreizehn Hosts aus einem Flake gebaut, mit eigener SSH-Zertifizierungsstelle und verschlüsselten Secrets pro Host, dazu KEV-Triage-Werkzeuge. Ich suche eine Rolle im Systemengineering, in der Betriebsdaten vertrauenswürdig sein müssen.",
     "contacts": [
       {
         "label": "email",
@@ -68,6 +68,7 @@
     "briefsLabel": "Erste neunzig Tage",
     "cvLabel": "Lebenslauf (PDF)",
     "cvTunedLabel": "Energie-Lebenslauf (PDF)",
+    "cvSoftwareLabel": "Software CV (PDF, Englisch)",
     "archiveNote": "Werkzeuge, Forschung und Nebenprojekte — das, was in einer Stellenbeschreibung keinen Platz hat.",
     "caseKicker": "Fallstudie",
     "briefKicker": "Notiz",
@@ -91,7 +92,7 @@
       "body": "Ein Binary pro Dienst, das HTML, JSON und eine Terminal-Oberfläche liefert. Klein genug, um an einem Nachmittag gelesen zu sein; der Zustand ist ein Protokoll dessen, was passiert ist, statt einer Zeile, die jemand geändert hat."
     },
     {
-      "title": "Schwachstellendaten, die in Handlung enden",
+      "title": "Betriebsdaten, die in Handlung enden",
       "body": "CISAs KEV-Katalog als Zeitreihe und als Cluster, die ein Team diese Woche abarbeiten kann. Das Ergebnis ist eine Patch-Reihenfolge, kein weiteres Dashboard."
     }
   ],
@@ -99,7 +100,7 @@
     {
       "title": "NixOS-Flotte über dreizehn Maschinen",
       "role": "Autor und Betreiber",
-      "description": "Ich habe dreizehn Maschinen von Installationsnotizen pro Host auf ein Repository umgestellt. Eine Maschine neu bauen, prüfen oder übergeben heißt jetzt: Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, die Zertifikate rotieren nach Zeitplan.",
+      "description": "Ich habe dreizehn Maschinen von Installationsnotizen pro Host auf ein Repository umgestellt. Eine Maschine neu bauen, prüfen oder übergeben heißt jetzt: Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, die Zertifikate rotieren nach Zeitplan. Dieselbe Flotte betreibt selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
       "link": "https://github.com/shaoyanji/nixconfig",
       "caseStudy": "nixos-fleet",
       "keywords": [
@@ -114,21 +115,29 @@
       "sortStart": "2023-01-01"
     },
     {
-      "title": "bountystash: Energie-Risikoberatung",
-      "role": "Gründer",
-      "description": "Fünf Jahre Beratung für Energiehandel und Risikomanagement, mit Mandaten für einen deutschen Energiehändler und die EWE Trading, darunter Prüfungen von Bug-Bounty-Programmen und Cybersecurity-Beratung.",
-      "highlights": [
-        "Baute die bountystash-Aufgaben-Engine: ein Go-Dienst, der eine Anfrage als unveränderliche, inhaltsadressierte Spezifikation festhält, sodass sich der Zustand eines Auftrags einen Monat später rekonstruieren lässt und zwei Personen sich darauf einigen können, was gefragt war."
-      ],
-      "link": "https://github.com/shaoyanji/bountystash",
-      "caseStudy": "bountystash",
+      "title": "EWE Trading: PPA-Beratung",
+      "role": "Externer Berater",
+      "description": "Ein dreimonatiges externes Beratungsmandat für die EWE Trading im Jahr 2023: risikoadjustierte PPA-Modelle und die kaufmännische Logik dahinter.",
+      "link": "",
       "keywords": [
-        "Go",
-        "Ereignisprotokoll",
-        "Inhaltsadressierung",
-        "TUI"
+        "PPA",
+        "Energiehandel",
+        "Risikomodelle"
       ],
-      "org": "Bountystash"
+      "org": "EWE Trading",
+      "sortStart": "2023-01-01"
+    },
+    {
+      "title": "Landvest: Investment-App",
+      "role": "Freelance-No-Code-Entwickler",
+      "description": "Ein freiberufliches Mandat 2021: eine No-Code-App für die Investmentplattform von Landvest.",
+      "link": "",
+      "keywords": [
+        "No-Code",
+        "Investmentplattform"
+      ],
+      "org": "Landvest",
+      "sortStart": "2021-01-01"
     },
     {
       "title": "fibtransponder",
@@ -149,7 +158,7 @@
     {
       "title": "Energie-Telemetrie und Bewertung",
       "role": "Asset Manager, O3 Energy",
-      "description": "Vier Jahre lang die Zahlen hinter einem Solarportfolio über 100 Mio. USD: Ertrags- und Bewertungsmodelle, die Bankprüfungen bestanden, mobile Erfassung für Techniker im Feld und ein Abgleich, der einen toten Sensor zu einem bekannten Fehler machte statt zu einem guten Monat.",
+      "description": "Vier Jahre lang die Zahlen hinter einem Solarportfolio über 100 Mio. USD: Ertrags- und Bewertungsmodelle, die Bankprüfungen bestanden, mobile Erfassung für Techniker im Feld und ein Abgleich, der einen toten Sensor zu einem bekannten Fehler machte statt zu einem guten Monat. Außerdem implementierte ich Salesforce und hielt Microsoft 365, Netzwerk und WLAN eines kleinen Büros am Laufen.",
       "link": "",
       "caseStudy": "energy-telemetry",
       "keywords": [
@@ -196,6 +205,21 @@
         "Öl und Gas"
       ],
       "org": "Halliburton"
+    },
+    {
+      "title": "Bountystash",
+      "role": "Gründer und Ingenieur",
+      "description": "Bountystash gebaut und betrieben: ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht, mit Append-only-Events, Terminal-Oberfläche und curl-Endpunkten in einer Binärdatei.",
+      "link": "https://github.com/shaoyanji/bountystash",
+      "caseStudy": "bountystash",
+      "keywords": [
+        "Go",
+        "Content-Addressing",
+        "Event-Log",
+        "TUI"
+      ],
+      "org": "Bountystash",
+      "sortStart": "2020-06-01"
     }
   ],
   "lab": {
@@ -222,7 +246,6 @@
       "items": [
         "Go",
         "Python",
-        "SQL",
         "REST",
         "Zustandsautomaten"
       ]
@@ -232,22 +255,24 @@
       "items": [
         "NixOS",
         "Nix-Flakes",
+        "AWS Lambda (kleines Agenten-Projekt)",
         "SSH-Zertifizierungsstelle",
         "SOPS und age",
         "Tailscale",
-        "ZFS und btrfs",
         "systemd",
-        "CI-Gates"
+        "CI-Gates",
+        "Salesforce",
+        "Microsoft 365",
+        "Netzwerk und WLAN"
       ]
     },
     {
-      "category": "Sicherheit",
+      "category": "Daten",
       "items": [
-        "Schwachstellenmanagement",
+        "SQL",
+        "PostgreSQL",
         "CISA KEV",
-        "CVSS",
-        "Prüfung von Bug-Bounty-Programmen",
-        "Aufbau von Schwachstellenprogrammen"
+        "CVSS"
       ]
     },
     {
@@ -262,8 +287,8 @@
   ],
   "hire": {
     "title": "Was ich suche",
-    "body": "Eine Senior- oder Lead-Rolle, in der Infrastruktur und Sicherheit aufeinandertreffen: Plattform-Engineering, Site Reliability oder Schwachstellenbetrieb. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
-    "briefsNote": "Zwei Notizen dazu, was ich in den ersten neunzig Tagen tun würde:",
+    "body": "Eine Senior- oder Lead-Rolle im Systemengineering, in der Infrastruktur, Automatisierung und Betriebsdaten zusammenkommen: Plattform-Engineering, Site Reliability oder IT-Betrieb. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
+    "briefsNote": "Notizen dazu, was ich in den ersten neunzig Tagen tun würde:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS — und gewohnt, einen Dienst von Anfang bis Ende zu verantworten",
       "Kurzfristig verfügbar"

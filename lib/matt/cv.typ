@@ -13,6 +13,7 @@
 #let labels = d.at("labels", default: (:))
 #let lang = d.at("lang", default: "en")
 #let compact = d.at("pages", default: 2) == 1
+#let inlineDates = d.at("inlineDates", default: false)
 
 #set document(title: p.name + " — " + labels.at("cv", default: "CV"), author: p.name)
 #set page(
@@ -81,8 +82,21 @@
 // The full CV keeps the subtitle on the title line, the appflow way. A compact
 // CV gives the title, role and date a column each instead: the German titles
 // wrapped when the role trailed them, and a wrapped header cost a page.
-#let entry(title, subtitle, when, body, three-col: false, href: "") = block(breakable: false, width: 100%)[
-  #if three-col [
+#let entry(title, subtitle, when, body, three-col: false, href: "", inline: false) = block(breakable: false, width: 100%)[
+  #if inline [
+    #let sub = if when != "" { [#subtitle, #when] } else { [#subtitle] }
+    #text(weight: "bold")[#title]
+    #if subtitle != "" [
+      #text(size: if compact { 8.4pt } else { 9pt }, fill: muted)[ — ]
+      #if href != "" [
+        #link(href)[#text(size: if compact { 8.4pt } else { 9pt }, fill: muted)[#underline[#sub]]]
+      ] else [
+        #text(size: if compact { 8.4pt } else { 9pt }, fill: muted)[#sub]
+      ]
+    ] else if when != "" [
+      #text(size: if compact { 7.5pt } else { 8.5pt }, fill: muted)[#when]
+    ]
+  ] else if three-col [
     #grid(
       columns: (1.45fr, 1fr, 50pt),
       column-gutter: 7pt,
@@ -122,7 +136,7 @@
 // experience ---------------------------------------------------------------
 #head(labels.at("experience", default: "Experience"))
 #for w in d.work [
-  #entry(w.title, w.role, w.period, w.at("description", default: ""), three-col: compact)
+  #entry(w.title, w.role, w.period, w.at("description", default: ""), three-col: compact, inline: inlineDates)
   #if w.at("highlights", default: ()).len() > 0 {
     block(inset: (left: 8pt, top: 0pt, bottom: 0pt))[
       #set list(marker: [-], indent: 0.9em, body-indent: 0.9em, spacing: if compact { 0.2em } else { 0.15em })
@@ -142,7 +156,7 @@
 #for e in d.projects.slice(0, calc.min(6, d.projects.len())) [
   #let link = e.at("url", default: "").replace("https://", "").replace("http://", "")
   #let link = if link.ends-with("/") { link.slice(0, link.len() - 1) } else { link }
-  #entry(e.name, link, e.period, e.summary, href: e.at("url", default: ""))
+  #entry(e.name, link, e.period, e.summary, href: e.at("url", default: ""), inline: inlineDates)
 ]
 
 // education ----------------------------------------------------------------
@@ -153,7 +167,7 @@
 ]
 #head(labels.at("education", default: "Education"))
 #for e in d.education [
-  #entry(e.school, e.degree, e.period, "")
+  #entry(e.school, e.degree, e.period, "", inline: inlineDates)
 ]
 
 // skills -------------------------------------------------------------------

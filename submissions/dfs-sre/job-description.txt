@@ -1,0 +1,61 @@
+Ingenieur Site Reliability (m/w/d)
+DFS Deutsche Flugsicherung GmbH — Flugsicherung, kritische Infrastruktur
+Standort: Am DFS Campus 1, 63225 Langen (Hessen) | Vollzeit | 38,5-Stunden-Woche | 32 Tage Urlaub
+Referenz: J000000038 | Ausschreibung vom 10.02.2025 | keine Frist genannt
+Kontakt: Jessica Kuprat, karriere@dfs.de
+Voraussetzungen mit Nachweispflicht: medizinische Tauglichkeit, Rufbereitschaft, Fuehrerschein Klasse B, Einwilligung in eine Sicherheitsueberpruefung
+Quelle: https://www.arbeitsagentur.de/jobsuche/jobdetail/17761-1172604-2-S (Text ueber die Jobboerse-API)
+
+Ihre Aufgaben
+
+- Du verantwortest komplexe Servicearchitekturen über den gesamten Lifecycle und entwickelst deren Design, Anforderungen und Dokumentation kontinuierlich weiter
+- Du erarbeitest und realisierst komplexe Änderungen an Servicearchitekturen und technischen Designs eigenverantwortlich
+- Du baust Plattformen und Services auf, entwickelst diese weiter, automatisierst Prozesse und stellst einen stabilen Betrieb sicher
+- Du bringst dein Know-how aktiv in die Weiterentwicklung unserer Rechenzentrumsplattformen und Cloud-Services ein
+- Du berätst Nutzer bei der Verwendung von Services und unterstützt sie bei der Entwicklung ihrer Applikationen
+
+
+Das zeichnet Sie aus
+
+- Du hast ein abgeschlossenes Studium der Informatik oder ein vergleichbares Studium
+- Du verfügst über Expertenwissen in der Administration von Linux- oder Windows-Betriebssystemen, beherrschst gängige Automatisierungswerkzeuge wie Ansible sicher und bringst Know-how in einer Programmiersprache, z. B. Python, sowie beim Aufbau von CI/CD-Pipelines mit
+- Du hast Erfahrung im Betrieb einer Data Center Plattform oder Cloud-Services, beispielsweise Proxy, DNS, VPN, Identitäts- und Zugriffsmanagement, Monitoring, Microsoft Services oder Backup-Lösungen, sowie Erfahrung mit Container-, Orchestrierungs- und Cloud-Lösungen, z. B. Kubernetes
+- Du überzeugst durch Verantwortungsbewusstsein, die Bereitschaft, Herausforderungen in einer kritischen Infrastruktur zu übernehmen
+- Du verfügst über verhandlungssichere Deutschkenntnisse und gute Englischkenntnisse
+- Du bist medizinisch tauglich, zur Rufbereitschaft bereit und besitzt einen Führerschein der Klasse B
+- Du willigst ein, an einer Sicherheitsüberprüfung teilzunehmen
+
+
+Unsere Benefits
+
+
+- Attraktives Gehaltspaket
+- Betriebliche Altersvorsorge
+- 38,5-Stunden-Woche
+- Mitarbeiterfeste und -events
+- Langzeitkonten
+- JobRad
+- Vielfältige Karriereperspektiven
+- Weiterbildungen
+- Sichere Karriereperspektive
+- 32 Tage Urlaub
+- Zugang zu vergünstigten Touristik-Portalen
+- Mitarbeiterrabatte
+- Umfassendes Onboarding-Programm
+- Kostenlose Parkplatze
+
+
+Kontakt
+
+Jessica Kuprat
+Am DFS Campus 1
+63225 Langen
+karriere@dfs.de
+
+
+J000000038
+Langen
+Personalmanagement Mitte
+IT
+Vollzeit
+10.02.2025

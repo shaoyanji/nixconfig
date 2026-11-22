@@ -97,10 +97,10 @@ company pension subsidy, which is worth counting.
 
 | Check | Result |
 | :--- | :--- |
-| `pdfinfo lebenslauf.pdf` | `2` pages (budget 2) |
-| `pdfinfo anschreiben.pdf` | `1` page (budget 1) |
-| `task checks:prose` | `186 prose files, exit 0` |
-| selection | `15/36 highlights, 0/0 projects` |
+| `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
+| `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
+| `task checks:prose` | 187 prose files, exit 0 |
+| selection | 15/36 highlights, 4/10 projects |
 | sha256 CV | `ced0905fd024e3f84a200329425db3651e6fcac8b7a10ead440c38f9ae4ab5a1` |
 | sha256 letter | `5ab72d53b60818fbc07f4952ec4b023adf0b4bc9ff3526b7965fd3a0ab2a09a5` |
 

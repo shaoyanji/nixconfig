@@ -1,0 +1,239 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 9796,
+    "terms": [
+      {
+        "term": "alerting",
+        "weight": 16.563
+      },
+      {
+        "term": "system",
+        "weight": 16.071
+      },
+      {
+        "term": "alertmanager",
+        "weight": 13.363
+      },
+      {
+        "term": "systems",
+        "weight": 12.081
+      },
+      {
+        "term": "yaml",
+        "weight": 11.736
+      },
+      {
+        "term": "deutsche",
+        "weight": 8.238
+      },
+      {
+        "term": "technologien",
+        "weight": 8.238
+      },
+      {
+        "term": "alert",
+        "weight": 7.893
+      },
+      {
+        "term": "alerting-strategien",
+        "weight": 7.893
+      },
+      {
+        "term": "ressourcen",
+        "weight": 7.893
+      },
+      {
+        "term": "ressourcenauslastung",
+        "weight": 7.893
+      },
+      {
+        "term": "ressourcenbeschränkte",
+        "weight": 7.893
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "bountystash",
+        "score": 4.3315
+      },
+      {
+        "name": "Risikoberechnungs-Engine (Swirl Engine)",
+        "score": 2.9107
+      },
+      {
+        "name": "Masterarbeit: Wetter und Volatilität",
+        "score": 2.6991
+      },
+      {
+        "name": "kelly-svg",
+        "score": 0.0
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "kev-time",
+      "fibtransponder",
+      "Konzept für Schwachstellenbetrieb"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "Telemetrie & Alarmierung",
+      "of": 5
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "Metriken & Retention",
+      "of": 5
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Linux",
+      "of": 6
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "Konfiguration",
+      "of": 5
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "name": "Sicherheit",
+      "of": 4
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "name": "Programmierung",
+      "of": 4
+    },
+    {
+      "dropped": [],
+      "kept": 3,
+      "name": "Daten & Dienste",
+      "of": 3
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 13.3433,
+          "text": "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten und beriet Mandanten als interner Risk M"
+        },
+        {
+          "score": 8.0887,
+          "text": "Deklarierte node_exporter auf einem Flottenhost und stellte den Standard-Collector-Satz auf :9100 bereit — Metriken, die"
+        },
+        {
+          "score": 7.9085,
+          "text": "Hielt die Konfiguration von dreizehn Hosts in einer Deklaration, mit YAML und Nix als Konfigurationsformaten; jede Änder"
+        },
+        {
+          "score": 7.185,
+          "text": "Entwickelte Go- und Python-Dienste mit PostgreSQL, darunter ein append-only Ereignisprotokoll und eine Terminal-Oberfläc"
+        },
+        {
+          "score": 2.5573,
+          "text": "Baute die Telemetrie selbst: ein Sentinel schreibt Jobstatus, Generation Age, Disk-Druck und PSI von dreizehn Hosts alle"
+        },
+        {
+          "score": 2.1178,
+          "text": "Versandte Alarme mit Zustellbestätigung: gatus prüft die Dienste, Meldungen laufen über eine Brücke, ein Zustandswechsel"
+        },
+        {
+          "score": 1.7512,
+          "text": "Vergab Zugriff über eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten; Secrets liegen pro Host mit SOPS und"
+        },
+        {
+          "score": 1.7117,
+          "text": "Führte Releases als einen Schritt aus — bauen, prüfen, aktivieren — mit Rollback als Zeiger auf die vorige Generation st"
+        },
+        {
+          "score": 0.0,
+          "text": "Prüfte Bug-Bounty-Programme."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 11
+    },
+    {
+      "dropped": [
+        {
+          "score": 5.7198,
+          "text": "Betreute Anwender direkt: Feldtechniker und Büro, Einweisung statt Ticket-Weiterleitung."
+        },
+        {
+          "score": 2.3905,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        },
+        {
+          "score": 1.9303,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 3
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.1319,
+          "text": "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 3
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 3
+    }
+  ]
+}

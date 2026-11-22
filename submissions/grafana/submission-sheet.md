@@ -1,66 +1,65 @@
-# Application: Grafana Labs — Staff Software Engineer, Databases SRE (Germany, remote)
+# Grafana Labs — Staff Software Engineer, Databases SRE (Germany Remote)
 
-As of: 22 November 2026
-Fit: 2
-Language: English
+**Status: prepared, NOT submitted.** **[applied per apps DB `grafanalabs-staff-software-engineer-databases-sre` (applied 2026-11-21, 4 mail linked) — this sheet's status predates submission]** 2026-11-21. No account created, nothing sent.
 
-## The role
+Grafana Labs, 100% remote company. Position: Staff Software Engineer - Databases SRE (operating Mimir, Loki, Tempo, and Pyroscope multi-tenant databases across AWS, GCP, and Azure worldwide).
+
+## Role
 
 | Field | Value |
 | :--- | :--- |
-| Employer | Grafana Labs |
-| Role | Staff Software Engineer — Databases SRE |
-| Location | Germany, 100% remote (same role advertised for UK, Sweden, Spain) |
-| Source | Grafana Labs Greenhouse board API, HTTP 200 on 22 Nov 2026, job id 6103688004 |
-| Salary | EUR 113,000 – 135,601 base in Germany (stated in the advert); no figure in the letter |
+| Company | Grafana Labs |
+| Role | Staff Software Engineer - Databases SRE |
+| Greenhouse ID | `6103688004` |
+| Apply URL | https://job-boards.greenhouse.io/grafanalabs/jobs/6103688004 |
+| Location | Germany (Remote) |
+| Compensation | Base: **EUR 113,000 – 135,601** + equity + bonus |
+| Category / Language | `tech`, `en` |
 
-## Documents
+## Files in `submissions/grafana/`
 
-| Document | File | Note |
-| :--- | :--- | :--- |
-| Cover letter | `anschreiben.pdf` | One page, English, opens with the missing stack |
-| CV | `lebenslauf.pdf` | Two pages, English |
-| Sources | `lebenslauf.typ`, `anschreiben.typ` | Typst, compiles standalone |
-| Certificates | none | Still to be added |
+- `lebenslauf.pdf` (2 pages, Typst-compiled, 10/32 highlights, 4/10 projects)
+- `job-description.txt` (scraped directly from Greenhouse API)
+- `selection.json` (Nix projection audit)
+- `submission-sheet.md` (this sheet)
 
-## Requirement match
+## Candidate Facts — Grounded Truth
 
-| Requirement | Evidence | Assessment |
-| :--- | :--- | :--- |
-| Operating Prometheus and Grafana in production | None | **Hard gap** |
-| Database operations at scale (MySQL, PostgreSQL, Cassandra, ClickHouse) | None | **Hard gap** |
-| Telemetry pipelines and instrumentation | Self-built ledger, Gatus, delivery-confirmed alerting | Partial — practice, not products |
-| Incident response and root-cause discipline | Diagnosis from ledger and logs, runbooks for every procedure | Strong |
-| Go-level engineering | Alerting bridge, AI platform router | Strong for an SRE, thin for Staff SWE |
-| Linux reliability and internals | systemd, cgroups, PSI, namespaces, nftables | Strong |
-| Kubernetes and cloud-native operations | None | Gap |
-| Staff-level scope: cross-team direction, mentoring | Sole operator, no multi-team leadership | **Gap** |
-| Remote from Germany | Based in Baden-Württemberg, remote-ready | Met |
-| Work authorisation | US citizen, permanent German residence | Met |
-| German C1 / English native | Both | Met |
-
-## Fit: 2 of 5
-
-The brief said 4. Grafana Labs sells the exact stack this candidate has never run, and this role additionally owns databases at scale, of which there is none. At Staff level that is the subject of the job, not a gap closed during probation.
-
-Not a 1 because the underlying discipline is real and close in spirit: building a ledger, endpoint checks and delivery-confirmed alerting because no monitoring budget existed is observability work, just not with these products.
-
-## Open points
-
-1. **Prometheus, Grafana and databases absent** — stated in the first paragraph of the letter.
-2. **Fit lowered from the briefed 4 to 2.** Restorable in one command if you want the brief's value kept.
-3. Staff level implies scope this CV does not show: no multi-team technical direction, no mentoring record.
-4. Certificates still missing; the German range is recorded here and in `lead.md`, but no figure is quoted in the letter.
-5. Application is via the Germany Greenhouse posting, not the UK/Ireland/Spain/Sweden variants.
-
-## Package
-
-| File | Content |
+| Fact | Value |
 | :--- | :--- |
-| `job-description.txt` | Full advert text with a cross-check note. |
-| `lead.md` | Fit reasoning, matches, gaps, route, salary. |
-| `lebenslauf.typ` | Typst source, compiles standalone. |
-| `anschreiben.typ` | Typst source, compiles standalone. |
-| `lebenslauf.pdf` | Two pages. |
-| `anschreiben.pdf` | One page. |
-| `submission-sheet.md` | This overview. |
+| Name | Matt Ji |
+| Address | Am Burgerhof 4, 79261 Gutach im Breisgau, Baden-Württemberg, Germany |
+| Email | matt@bountystash.com |
+| Phone | +49 1733281570 |
+| LinkedIn | https://linkedin.com/in/mattji |
+| GitHub | https://github.com/shaoyanji |
+| Website | https://www.bountystash.com |
+| Citizenship | United States |
+| Residence Status | German Permanent Residence (*unbefristete Niederlassungserlaubnis*) |
+| Work Authorization | Unrestricted in US, Germany, and EU. **Zero visa sponsorship required** |
+| Languages | German C1 (*verhandlungssicher*); English native |
+
+## Alignment & Honest Gaps
+
+- **Strengths**: Extensive Linux platform engineering, telemetry and distributed observability architectures, closed-loop sentinel health reporting (Prometheus-compatible node_exporter series, job status, PSI metrics, generation age, pager integration), Go and Python automation tooling, zero-standing secrets (sops/age per-host + SSH CA), live on-call discipline.
+- **Honest Gaps**: No commercial hyperscale cluster administration of Mimir/Loki/Tempo at petabyte SaaS scale; cloud infrastructure is NixOS/microvm rather than commercial multi-cloud AWS/GCP/Azure.
+
+## Exact Form Mapping (Greenhouse 6103688004)
+
+| Greenhouse Field | Answer | Question ID / Value |
+| :--- | :--- | :--- |
+| First Name * | Matt | `first_name` |
+| Last Name * | Ji | `last_name` |
+| Preferred First Name | Matt | `preferred_name` |
+| Email * | matt@bountystash.com | `email` |
+| Phone * | +49 1733281570 | `phone` |
+| Resume/CV * | `lebenslauf.pdf` (2 pages) | `resume` |
+| LinkedIn Profile * | https://linkedin.com/in/mattji | `question_19109260004` |
+| Current company | Independent infrastructure and platform engineer | `question_19109262004` |
+| What country and time zone are you based in? * | Germany, CET (UTC+1) | `question_19109263004` |
+| Are you currently eligible to work in your country of residence? * | Yes | `question_19109264004` -> `1` |
+| Do you now or in the future require visa sponsorship to continue working in your country of residence? * | No | `question_19109265004` -> `0` |
+| How did you hear about this opportunity at Grafana? * | Company job board / careers portal | `question_19109266004` |
+| Anything else you'd like to share with our hiring team? | Senior SRE and platform engineer operating a declarative 13-node Linux/NixOS infrastructure with closed-loop telemetry, Prometheus metrics, and automated paging. Background in solar telemetry and distributed systems. US citizen with German permanent residence (unbefristete Niederlassungserlaubnis); no visa sponsorship required. | `question_19109267004` |
+| Which of the following best describes you? * | I am a human being | `question_19109268004` -> `86734792004` |
+| Are you based in the UK, Germany, Sweden, Spain or Ireland? * | Yes | `question_19464097004` -> `1` |

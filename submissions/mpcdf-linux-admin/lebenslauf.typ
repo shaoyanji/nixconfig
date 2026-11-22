@@ -6,7 +6,7 @@
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
   #v(1pt)
-  #text(size: 9pt, fill: rgb("#4b5563"))[Linux-Systembetrieb — reproduzierbare Knoten, Messgrößen, Auslieferung im Rechnerverbund]
+  #text(size: 9pt, fill: rgb("#4b5563"))[Linux-Systembetrieb — Basisdienste, reproduzierbare Auslieferung, Messgrößen]
   #v(2pt)
   #text(size: 8.5pt, fill: rgb("#374151"))[Am Burgerhof 4, 79261 Gutach im Breisgau • matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji/nixconfig]
 ]
@@ -14,7 +14,7 @@
 #line(length: 100%, stroke: 0.5pt + rgb("#d1d5db"))
 
 #v(6pt)
-#text(size: 9.5pt)[Fünf Jahre Linux-Knoten, die aus einer Beschreibung entstehen: dreizehn Hosts über drei Hardware-Generationen, Installation über das Netz, gepinnte Eingaben, Prüfung vor dem Rollout, Rückkehr zur vorigen Generation in Minuten. Messen ist dabei keine Beigabe: Speicher- und Prozessdruck, Plattenplatz und Alter der laufenden Generation werden alle fünfzehn Minuten erfasst, weil sie einem Ausfall vorausgehen; Prüfungen von außen messen Erreichbarkeit und Antwortzeit. Dazu die Messdisziplin aus der Forschung — 2012 am Fraunhofer ISE Messaufbau und Auswertung, davor ein Ingenieurstudium an der Colorado School of Mines. Was an Clustersoftware fehlt, steht im Anschreiben.]
+#text(size: 9.5pt)[Fünf Jahre Linux-Knoten, die aus einer Beschreibung entstehen: dreizehn Hosts über drei Hardware-Generationen, Installation über das Netz, gepinnte Eingaben, Prüfung des Rollouts, Rückkehr zur vorigen Generation in Minuten. Darunter die Dienste, von denen alles andere abhängt: Adressierung, DNS, Secrets pro Host, eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten. Messen ist keine Beigabe — Speicher- und Prozessdruck, Plattenplatz und Alter der laufenden Generation werden alle fünfzehn Minuten erfasst, weil sie einem Ausfall vorausgehen. Dazu die Messdisziplin aus der Forschung: 2012 am Fraunhofer ISE Messaufbau und Auswertung, davor ein Ingenieurstudium an der Colorado School of Mines. Was an Identitätsdiensten fehlt, steht im Anschreiben.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
   #v(6pt)
@@ -41,12 +41,12 @@
 #section("Berufserfahrung")
 #entry("Bountystash — Gründer und alleiniger Systembetreiber", "2020 – 2025", (
   "Dreizehn Linux-Hosts über drei Hardware-Generationen installiert, gehärtet und gewartet, inklusive PXE-Installation und Boot über das Netz",
+  "Basisdienste selbst betrieben: Adressierung, DNS, Secrets pro Host, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten, Zugang über WireGuard und nftables",
   "Knoten als Beschreibung: gepinnte Eingaben, gleiche Beschreibung ergibt gleiches System, keine von Hand geänderten Dateien",
-  "Auslieferung mit Prüfung vor dem Rollout und Rückkehr zur vorigen Generation in Minuten statt in einer Nacht — die Grundlage, um einen Verbund neu aufzubauen",
-  "Ressourcen im Blick behalten: cgroups, Namespaces, PSI und Speicherdruck als Messgrößen, nicht als Vermutung",
+  "Auslieferung mit Prüfung vor dem Rollout und Rückkehr zur vorigen Generation in Minuten statt in einer Nacht",
+  "Ressourcen im Blick: cgroups, Namespaces, PSI und Speicherdruck als Messgrößen, nicht als Vermutung",
   "Telemetrie als Schleife: Ledger alle fünfzehn Minuten, Prüfungen von außen auf Erreichbarkeit und Antwortzeit, Go-Brücke mit Zustellbestätigung",
-  "Sicherungen mit restic und tatsächlich durchgeführten Rückspielungen; Wiederherstellung geübt, nicht angenommen",
-  "Netz und Zugang im Code: Adressierung, DNS, WireGuard, nftables, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten",
+  "Sicherungen mit restic und durchgeführten Rückspielungen; Wiederherstellung geübt, nicht angenommen",
   "Werkzeuge in Python, Go und Shell für Rollout, Auswertung, Messreihen und Berichte",
 ))
 #entry("Fraunhofer ISE — Wissenschaftlicher Mitarbeiter", "2012", (
@@ -62,14 +62,14 @@
 #section("Projekte")
 #entry("nixconfig — ein Verbund, einmal beschrieben", "seit 2023", (
   "Ein Host registriert sich einmal als Feature-Liste; Prüfungen, Aufgabenmenü und Dokumentation entstehen aus derselben Beschreibung",
-  "Rollen und Kapazitäten dokumentiert: welcher Knoten welche Aufgabe trägt, damit ein Ausfall ohne Suche zugeordnet werden kann",
+  "Zugänge und Rollen dokumentiert: wer welchen Dienst nutzt und welcher Knoten ihn trägt",
   "Veröffentlichen, Ausrollen und Rückrollen sind Aufgaben, keine Eingriffe auf dem Knoten",
 ))
 
 #section("Arbeitsweise")
 #text(size: 9.5pt)[
   - Erst messen, dann urteilen: ohne Vorher-Nachher-Wert ist eine Änderung eine Vermutung. \
-  - Erst beschreiben, dann ändern: ein Knoten, der nur in Handarbeit existiert, lässt sich nicht wiederherstellen. \
+  - Erst beschreiben, dann ändern: ein Dienst, der nur in Handarbeit existiert, lässt sich nicht wiederherstellen. \
   - Aufschreiben, was war: Messreihen, Regeln und Vorfälle gehören in die Dokumentation, nicht ins Gedächtnis.
 ]
 
@@ -79,8 +79,9 @@
 
 #section("Kenntnisse")
 #text(weight: "bold")[Systeme] — Linux-Knoten, systemd, cgroups, Namespaces, PSI und Speicherdruck, Boot und Wiederherstellung, PXE \
+#text(weight: "bold")[Basisdienste] — DNS, Adressierung, Secrets pro Host, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten, WireGuard, nftables \
 #text(weight: "bold")[Messung] — Ledger mit Zeitstempel, Prüfungen von außen, Alarmbrücke mit Zustellbestätigung, Messreihen in Python \
 #text(weight: "bold")[Auslieferung] — Nix als reproduzierbare Beschreibung, Gates, Rückrollung über Generationen \
 #text(weight: "bold")[Code] — Python, Go, Shell; Automatisierung, Auswertung, Berichte \
-#text(weight: "bold")[Nicht vorhanden] — Slurm, Lustre und parallele Dateisysteme, InfiniBand und Fabric-Management, RHEL im Clusterbetrieb, GPU- und CUDA-Betrieb, Puppet oder Ansible, LDAP/FreeIPA, regulierter KRITIS-Betrieb \
+#text(weight: "bold")[Nicht vorhanden] — LDAP (OpenLDAP, 389 DS), Kerberos (MIT, Heimdal), SSSD und PAM-Einbindung, FreeIPA, Zwei-Faktor-Rollout; Slurm, Lustre, InfiniBand, GPU- und CUDA-Betrieb, RHEL im Clusterbetrieb, Puppet oder Ansible \
 #text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · Niederlassungserlaubnis · Umzug nach Garching möglich

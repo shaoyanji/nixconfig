@@ -1,3 +1,16 @@
+Anzeige: Linux System Administrator*in (m/w/d), Max Planck Computing and Data Facility (MPCDF), Garching
+Kennziffer 04/2026, veroeffentlicht am 16.07.2026, Bereich EDV & Informatik.
+
+Kern der Stelle, laut Anzeige: Die MPCDF-Infrastruktur basiert auf einer breiten Palette von Identity-Management-Diensten,
+zum Beispiel LDAP- und Kerberos-Servern. Fuer den laufenden Betrieb sowie fuer Weiterentwicklungen und Verbesserungen
+dieser Basisdienste werden qualifizierte Personen gesucht. Erwartet wird idealerweise ein Abschluss in einem IT-nahen
+Bereich sowie drei Jahre Berufserfahrung.
+
+Hinweis zur Quelle: der unten mitgespeicherte Abruf der mpg.de-Seite enthaelt nur das Jobboard-Geruest ohne Anzeigentext;
+der Stellentext wurde am 22.11.2026 ueber die Jobboard-Suche rekonstruiert. Die Anzeige ist mehr als vier Monate alt und
+in der Stellenboerse nicht mehr gelistet - vor dem Absenden pruefen, ob die Stelle offen ist.
+
+---
 https://www.mpg.de/26871563/linux-system-administrator-in-m-w-d
 Job Offers - Jobboard | Max-Planck-Gesellschaft
 --uc-typography-scale: 1.6;

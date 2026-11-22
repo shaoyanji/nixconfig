@@ -1,31 +1,35 @@
-# Lead: MPCDF — Linux Systems Administrator
+# Lead: MPCDF — Linux System Administrator (04/2026)
 
-Fit: 4
+Fit: 2
 Stand: 22.11.2026
 Ort: Garching bei München
-Umfeld: Hochleistungsrechnen, wissenschaftliche Datenverarbeitung
-Quelle: Anzeige im Paket
+Kern: Identity Management, LDAP- und Kerberos-Server als Basisdienste
+Kennziffer: 04/2026, veröffentlicht 16.07.2026
 Sprache: Deutsch
 
 ## Warum interessant
 
-Knoten in großer Zahl reproduzierbar aufzusetzen und sie an Messgrößen zu betreiben ist der Kern der eigenen Arbeit — nur ohne Cluster-Scheduler und ohne Fabric. Dazu passt die Messdisziplin aus Fraunhofer ISE und der Ingenieurausbildung.
+Eine Stelle für Dienste, die jeder nutzt und niemand sieht — Betrieb, Weiterentwicklung, Verbesserung. Das ist die Form eigener Arbeit, nur mit einem Technologiepaar, das nicht belegt ist.
 
 ## Was passt
 
-- 13 Linux-Knoten, drei Hardware-Generationen, PXE, Gate vor dem Rollout, Rückrollung.
-- cgroups, Namespaces, PSI, Speicherdruck als Messgrößen.
+- Basisdienste allein betrieben: DNS, Adressierung, Secrets, eigene Zertifizierungsstelle, WireGuard.
+- Reproduzierbare Auslieferung mit Gate und Rückrollung.
 - Telemetrie mit Zustellbestätigung, geprüfte Rückspielungen.
 - Messaufbau und Auswertung: Fraunhofer ISE 2012; B.Sc. Colorado School of Mines.
 - Python, Go, Shell, Nix.
 
 ## Was fehlt
 
-- Slurm, Lustre, parallele Dateisysteme.
-- InfiniBand und Fabric-Management.
-- RHEL im Clusterbetrieb, Puppet/Ansible, LDAP/FreeIPA.
-- GPU- und CUDA-Betrieb.
+- LDAP (OpenLDAP, 389 DS), Kerberos (MIT, Heimdal) — der Kern der Stelle.
+- SSSD, PAM-Einbindung, FreeIPA, Zwei-Faktor-Rollout.
+- Informatiknaher Abschluss (vorhanden: Erneuerbare Energien).
+- Maßstab: 13 Knoten statt Rechenzentrum.
 
 ## Weg
 
-https://www.mpg.de/26871563/linux-system-administrator-in-m-w-d — Zeugnisse vor dem Absenden ergänzen.
+https://www.mpg.de/26871563/linux-system-administrator-in-m-w-d — erst prüfen, ob 04/2026 noch offen ist; dann Zeugnisse ergänzen.
+
+## Notiz
+
+Der erste Abruf der Anzeige war das Jobboard-Gerüst ohne Text; Fit stand kurz auf 4 und wurde nach Rekonstruktion des Stellentexts auf 2 gesetzt.

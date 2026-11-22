@@ -4994,5 +4994,46 @@
         turns-runtime benchmark's own nested flake. .envrc corrected.
       '';
     };
+    outreach-dossier-redaction = {
+      title = "The consultancy dossier names targets, never the people who staff them";
+      kind = "decision";
+      status = "ACCEPTED";
+      date = "2026-11-22";
+      summary = "Commit 6a233ed9 replaced the last third-party contact details in the outreach dossier with [NAME]/[CONTACT]/[PHONE] slots; only target companies, their public sites and Matt's own signature stay. The file is .agents/outreach/nix-consultancy-outreach.md, not docs/, and the pre-redaction blob is still in history.";
+      refs = {
+        modules = ["scripts/task/docs-budget.sh" "lib/matt-site.nix"];
+        tasks = ["matt:cv:check" "apps:list" "ops:docs:budget"];
+        docs = [".agents/outreach/nix-consultancy-outreach.md" "docs/cv-ats-compliance.md"];
+      };
+      body = ''
+        Landed 2026-11-22 in 6a233ed9, `docs(outreach): finish redacting the
+        consultancy dossier's contacts`: the last names, profile slugs and
+        personal URLs became `[NAME]` (20), `[CONTACT]` (6) and `[PHONE]`
+        (1), with `[REDACTED]` (0) left. Target companies, their public sites
+        and Matt's own signature/links stay — they are who it is about.
+
+        Two things a future reader would otherwise get wrong:
+        - The file is `.agents/outreach/`, a 400-line runbook that sat at
+          exactly 400: the convention is three header lines, and every edit
+          pays the budget through `scripts/task/docs-budget.sh`.
+        - `[PHONE]` was never data. The dossier forbids phones by policy and
+          never carried one; the slot keeps the rule visible.
+
+        State after the pass: the CV corpus is reconciled in `lib/matt`,
+        `matt:build` green — five PDFs, 2/2/1/1/1 pages, ATS-clean — and
+        `submissions/` holds 68 application packets: adyen-platform-genai
+        committed, the other 67 untracked.
+
+        Open, and not silently closed:
+        - History: blob 92de6243 still serves the unredacted text, profile
+          URLs included. Scrubbing needs `git filter-repo` and a force-push
+          on a shared remote — unauthorised, so redaction is HEAD-only.
+        - The Adyen CV still scores 0 on Helm, Argo, MCP, vLLM, LiteLLM and
+          RAG: a corpus gap, not a redaction one.
+
+        Exit: the placeholder grep and `matt:cv:check` both stay clean and
+        green on the next pass over the dossier.
+      '';
+    };
   };
 }

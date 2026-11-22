@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T02:42:02Z",
+  "generated": "2026-11-22T02:57:55Z",
   "count": 200,
-  "pin": "c74ab88ed12a72c2f77e238ee085e278c7fa64a05ab23ae60306a0a786963387",
+  "pin": "b964ffd1beee5125462f72c6ef9039bfed41cfe99585df6d927ab08569095648",
   "turns": [
+    {
+      "id": "adbc5d92-b4b4-4495-b195-423318c26f06",
+      "ts": "2026-11-22T02:56:56Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +1 freelancermap app (Power App Factory Senior Infra Ops, energy, 100% remote) via Bewerben flow confirmed | gate: in-page confirmation + import 4/4 | ~168 applied; fmap Postfach empty (0 replies on 10)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
+      "branch": "main",
+      "frame": "03ha4bfpyl1jctvbbfaq8ify3"
+    },
+    {
+      "id": "78ebe078-a2d0-4e2e-8758-7e782d33f8fa",
+      "ts": "2026-11-22T02:54:07Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-outreach-note",
+      "action": "landed: drove freebuff pane to write an AGENTS.nix note documenting the outreach dossier redaction completion and current CV/site state (68 staged submissions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
+      "branch": "main",
+      "frame": "03ha4avsi5tgeadsexwaiyiza"
+    },
+    {
+      "id": "22e29cd6-c39b-43db-ab17-5f95974c0676",
+      "ts": "2026-11-22T02:52:00Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +3 (naturenergie OT-Security Schwoerstadt, ANG Linux Senior Freiburg, AGJ Dev Automatisierung 2nd req) | gate: mail confirms + imports 3/3 | ~167 applied",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
+      "branch": "main",
+      "frame": "03ha4agww5aqon6dgykdxybts"
+    },
+    {
+      "id": "5c12e04f-422c-4061-afe0-b846e6518bc2",
+      "ts": "2026-11-22T02:45:43Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: +9 applications (puro Wehr, virtualminds, nendzynski+truttenbach Offenburg, hwi Malterdingen, agj Freiburg, modox Appenweier, pcdoktor Freiburg) + Zalando Lahr portal SUBMITTED + Stadt Emmendingen DV-BW portal SUBMITTED | gate: himalaya OK + portal confirmations + imports 11/11 | ~164 applied",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
+      "branch": "main",
+      "frame": "03ha49979b5la0um5z4dtbave"
+    },
     {
       "id": "0772364e-6663-4748-90c1-f4a44a4408a2",
       "ts": "2026-11-22T02:41:49Z",
@@ -2728,60 +2780,6 @@
       "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
       "branch": "main",
       "frame": "03h9whrb9fb14odpwxugg2orf"
-    },
-    {
-      "id": "1999322e-a17f-471c-84ed-288d68cc9b4f",
-      "ts": "2026-11-21T02:54:48Z",
-      "source": "devin",
-      "subject": "nixconfig:steam-prefill",
-      "action": "claim: steam-prefill baseline+record measurement pair onto shared tail",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/steam-cache.nix"
-      ],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9whpv696qvauco3mpdio7k"
-    },
-    {
-      "id": "a6cfb830-4809-46af-b1c4-7e46e4c174e3",
-      "ts": "2026-11-21T02:48:37Z",
-      "source": "devin",
-      "subject": "frieren:nixconfig-refactor",
-      "action": "landed: drove devin win2 on nixconfig refactor (strip Shared Config from Draft PR #3); pane confirmed working (Thinking, running git/rg)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9wgier1qer5ej2nzff55km"
-    },
-    {
-      "id": "dfba6e03-9102-4c7a-b722-585f0296ecf8",
-      "ts": "2026-11-21T02:48:36Z",
-      "source": "freebuff",
-      "subject": "frieren:cv-site-gate",
-      "action": "landed: drove freebuff win1 on CV/site gate work (durable gate that every built CV PDF is linked from the site and link targets resolve); pane completed the run and returned to prompt",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9wgicoroa601n6y6xmowec"
-    },
-    {
-      "id": "e657455c-91bd-40a2-a82e-1126ab002899",
-      "ts": "2026-11-21T02:47:20Z",
-      "source": "devin",
-      "subject": "nixconfig:watchdog-timers",
-      "action": "landed: ups-drill + pg-backup-drill + paperless-watchdog onto shared mkTimerJob; 6 units byte-identical frieren+delphi; zettel-graph skipped (divergent), fleetGovernor-parked watchdogs untouched | gate: checks:quick PASS census 6484",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
-      "branch": "main",
-      "frame": "03h9wg9fwsv14ud1abo0z9ydd"
     }
   ]
 }

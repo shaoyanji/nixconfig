@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-22T07:37:47Z",
+  "generated": "2026-11-22T07:37:57Z",
   "count": 200,
-  "pin": "2365d8863990f6b19ecf33562568438050713d9ac590b881e1e984b0f8cefad5",
+  "pin": "adf9755a6d937cc7d395a55d12224ca399372586a0e128329638caae7e723686",
   "turns": [
+    {
+      "id": "f36927b3-610a-4af5-9f3d-f8fa0030ac56",
+      "ts": "2026-11-22T07:37:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-telekom-sre",
+      "action": "landed: Telekom/T-Systems SRE Observability packet in submissions/telekom-sre-observability. BA ref 12444-563465374109848-DT-S, Karlsruhe among sites. German CV 2pp, letter 1pp, ask 85k. Corrected lead.md: no Prom/Grafana/Loki (0 corpus hits, 0 modules). Letter names OTel collector, Jaeger, SIEM/CEF, K8s observability as absent. Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/telekom-sre-observability"
+      ],
+      "base_commit": "8012f2ea59a3edd18fd0212d602e9a5849f5ff22",
+      "branch": "main",
+      "frame": "03ha5uawa31zk0wxyavjbr0zs"
+    },
     {
       "id": "1431f1cc-f795-4a02-8f12-92fc0fc3c3d8",
       "ts": "2026-11-22T07:37:29Z",
@@ -2815,21 +2830,6 @@
       "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
       "branch": "main",
       "frame": "03h9xo6yjc3nwsox5td6k6vvy"
-    },
-    {
-      "id": "8da14f64-5adb-4695-a4db-501cd5d85c54",
-      "ts": "2026-11-21T06:30:57Z",
-      "source": "telegram-hermes",
-      "subject": "nixconfig:hermes-steward",
-      "action": "takeover: steward role per handoff.md; pane layout re-verified (win1 freebuff busy, win2 devin task shown, win3 idle ssh delphi)",
-      "outcome": "in_progress",
-      "claims": [
-        "pane-steward/telegram"
-      ],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xnxysebv3p0kbbgspkas4"
     }
   ]
 }

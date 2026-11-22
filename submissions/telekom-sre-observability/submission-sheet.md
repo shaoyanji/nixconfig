@@ -89,8 +89,8 @@ has no such modules.
 | :--- | :--- |
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 190 prose files, exit 0 |
-| selection | 11/37 highlights, 0/0 projects |
+| `task checks:prose` | 191 prose files, exit 0 |
+| selection | 11/37 highlights, 4/10 projects |
 | sha256 CV | `024037bf2717790a0143c8ed13c039042d02f46b8a48f97773d5659fa977f2f2` |
 | sha256 letter | `f940002db003266baa65993ab86a52bcc414f1f47cf90d63e13943925bd650e1` |
 

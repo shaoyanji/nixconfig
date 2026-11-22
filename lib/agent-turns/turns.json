@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-22T12:48:43Z",
+  "generated": "2026-11-22T12:50:48Z",
   "count": 200,
-  "pin": "7a939fc297139e443db296652f0db07280bd309cfde2c2d9564cc441fad34a42",
+  "pin": "c9e09597780f199189f12feeb3a766895f7a927535fdf680bff91a19d4a9de8e",
   "turns": [
+    {
+      "id": "64f9ecf0-7b5c-473e-949d-3b78caa96c22",
+      "ts": "2026-11-22T12:50:07Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "landed: packet already native and complete (2pp 87/85, 1pp 71, byte-identical); sheet gains fill column and names the advert's contract contradiction with the contact, DB gains folder path | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "0e1a3a71993be1406d4fe2f57ea7f5f2a25e6207",
+      "branch": "main",
+      "frame": "03ha7jb2p6ozbdf5ueayawqff"
+    },
+    {
+      "id": "22a29905-5368-4747-9540-55c7e1b8e5b2",
+      "ts": "2026-11-22T12:50:04Z",
+      "source": "devin",
+      "subject": "job-hunt:trawa-em-platform",
+      "action": "trawa EM Platform+Data Intelligence (Ashby 60c147b4): form fully filled incl. geo-pick; submit triggered reCAPTCHA Enterprise challenge — not solved per policy. Manual with hand-submit state. Third Ashby board enforcing; Enpal remains the only Ashby pass.",
+      "outcome": "blocked: reCAPTCHA Enterprise at submit; hand-submit staged",
+      "claims": [],
+      "files": [],
+      "base_commit": "c1fcd9e86426b5dc2143142ec6267b25d9aade6f",
+      "branch": "main",
+      "frame": "03ha7jarlbpf0tplwet4ttx51"
+    },
+    {
+      "id": "365b05bf-2620-49ca-a315-50c1b0bc1eb2",
+      "ts": "2026-11-22T12:49:34Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "coordinator: Devin active on trawa (Ashby), Pane 1 active on Workato (STACKIT K8s landed), Pane 3 active on FAU (Uni Rostock landed) | zero idle time active",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c1fcd9e86426b5dc2143142ec6267b25d9aade6f",
+      "branch": "main",
+      "frame": "03ha7j79ld71nnbfwtrt66zov"
+    },
     {
       "id": "0d14ed95-bac2-480f-8dc9-f8f7b80fc51a",
       "ts": "2026-11-22T12:48:09Z",
@@ -2781,49 +2822,6 @@
       "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
       "branch": "main",
       "frame": "03ha6ufswnibzhaeddk12ok81"
-    },
-    {
-      "id": "5ac47f26-6c2a-41f2-b109-1d6345ecc179",
-      "ts": "2026-11-22T10:42:20Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:uni-rostock-sysadmin",
-      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/uni-rostock-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "a50b6cba05ad84a4806b807913747db5afa82dc5",
-      "branch": "main",
-      "frame": "03ha6ucfgvl4fso4gz1olbrse"
-    },
-    {
-      "id": "405b9107-aa90-49c1-abcd-2628bbb5b930",
-      "ts": "2026-11-22T10:41:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:publitas",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
-      "branch": "main",
-      "frame": "03ha6u7v07q75zr9vk5fomuku"
-    },
-    {
-      "id": "dc9d7dd0-ee79-437c-9266-763a4caa8296",
-      "ts": "2026-11-22T10:40:30Z",
-      "source": "freebuff",
-      "subject": "nixconfig:publitas",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/publitas"
-      ],
-      "files": [],
-      "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
-      "branch": "main",
-      "frame": "03ha6tzm5sjx6gulf33mcxxqt"
     }
   ]
 }

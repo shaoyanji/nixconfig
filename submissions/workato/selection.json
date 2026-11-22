@@ -1,0 +1,241 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 4831,
+    "terms": [
+      {
+        "term": "postgresql",
+        "weight": 20.704
+      },
+      {
+        "term": "cloud",
+        "weight": 15.584
+      },
+      {
+        "term": "engineer",
+        "weight": 15.584
+      },
+      {
+        "term": "aws",
+        "weight": 12.573
+      },
+      {
+        "term": "fast",
+        "weight": 12.573
+      },
+      {
+        "term": "kubernetes",
+        "weight": 12.573
+      },
+      {
+        "term": "go",
+        "weight": 8.336
+      },
+      {
+        "term": "database",
+        "weight": 7.751
+      },
+      {
+        "term": "us",
+        "weight": 7.751
+      },
+      {
+        "term": "bash",
+        "weight": 7.426
+      },
+      {
+        "term": "full",
+        "weight": 7.426
+      },
+      {
+        "term": "model",
+        "weight": 7.426
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [],
+    "kept": [
+      "nixconfig",
+      "bountystash",
+      "fibtransponder",
+      "email-archive"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web Development",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Database",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Kotlin"
+        },
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programming Languages",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "portfolio"
+        },
+        {
+          "score": 0.0,
+          "text": "due diligence"
+        }
+      ],
+      "kept": 6,
+      "name": "Energy & Risk",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Security",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 2.7005,
+          "text": "Rendered HTML, JSON and a keyboard-driven TUI from one binary with no frontend build"
+        },
+        {
+          "score": 0.0,
+          "text": "Developed a Fibonacci binary tree algorithm for computational scientists"
+        },
+        {
+          "score": 0.0,
+          "text": "Audited bug bounty programmes"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Documented and managed software and IT administration for the company and its subsidiaries"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 4
+    },
+    {
+      "dropped": [],
+      "kept": 1,
+      "matched": false,
+      "name": "Smart Energy 360",
+      "of": 1
+    },
+    {
+      "dropped": [
+        {
+          "score": 5.3816,
+          "text": "Implemented the analysis from a published paraboloid paper in Python, including 3D geometry tooling"
+        },
+        {
+          "score": 0.0,
+          "text": "Conducted research on heliostat imperfections using interferometry"
+        },
+        {
+          "score": 0.0,
+          "text": "Verified geometry matrices in Mathematica"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.0575,
+          "text": "Worked twelve-hour shifts in the field"
+        },
+        {
+          "score": 0.0,
+          "text": "Troubleshot chemicals and equipment on site"
+        },
+        {
+          "score": 0.0,
+          "text": "Led safety training for crew members"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Three-month external PPA consulting engagement for EWE Trading"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "EWE Trading",
+      "of": 2
+    },
+    {
+      "dropped": [],
+      "kept": 1,
+      "matched": true,
+      "name": "Landvest",
+      "of": 1
+    }
+  ]
+}

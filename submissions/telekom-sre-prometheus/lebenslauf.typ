@@ -1,23 +1,23 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
-#set page(paper: "a4", margin: (top: 1.4cm, bottom: 1.4cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 9.5pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
-#set par(leading: 0.5em, justify: true)
+#set page(paper: "a4", margin: (top: 1.5cm, bottom: 1.5cm, left: 1.7cm, right: 1.7cm))
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set par(leading: 0.58em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
   #v(1pt)
-  #text(size: 9pt, fill: rgb("#4b5563"))[Linux-Betrieb, Telemetrie und Zuverlässigkeit]
+  #text(size: 9pt, fill: rgb("#4b5563"))[Betriebstelemetrie und Systemzuverlässigkeit — Linux, Edge-Hardware, Automatisierung]
   #v(2pt)
-  #text(size: 8.5pt, fill: rgb("#374151"))[Am Burgerhof 4, 79261 Gutach im Breisgau • matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji]
+  #text(size: 8.5pt, fill: rgb("#374151"))[Am Burgerhof 4, 79261 Gutach im Breisgau • matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji/nixconfig]
 ]
 #v(6pt)
 #line(length: 100%, stroke: 0.5pt + rgb("#d1d5db"))
 
 #v(6pt)
-#text(size: 9pt)[Linux-Systemadministrator mit zehn Jahren Erfahrung in Betrieb, Automatisierung und Anwenderbetreuung, davon eine Forschungsstation am Fraunhofer ISE. Betreibt dreizehn Server über drei Hardware-Generationen auf eigener Hardware, ohne Managed Cloud, mit begrenzten Ressourcen. Baute die Betriebstelemetrie selbst: ein Sentinel-Job schreibt alle 15 Minuten Jobstatus, Generation-Alter, Disk- und PSI-Druck in ein JSONL-Ledger; Gatus prüft Endpunkte; eine Go-Bridge bestätigt eine Alarmzustellung erst, wenn die Nachricht ankommt. Hält Dienste über systemd-Optionen und Ressourcenlimits klein und behandelt Speicherdruck als Messgröße erster Ordnung. Sichert mit restic und führt Wiederherstellungen durch, jede Änderung ist auf die vorherige Generation rückrollbar. Prometheus, Grafana, Loki, AlertManager und Kubernetes sind nicht Teil dieser Erfahrung; die Telemetrie ist eigenbau, nicht der genannte Stack. Wohnhaft in Baden-Württemberg, Karlsruhe rund anderthalb Stunden entfernt und der Standort, für den er sich entscheidet. US-Staatsangehörigkeit mit Niederlassungserlaubnis, kein Visum nötig. Deutsch C1, Englisch Muttersprache.]
+#text(size: 9.5pt)[Fünf Jahre Telemetrie für dreizehn Linux-Hosts auf eigener Hardware, ohne Managed Cloud und ohne öffentliche Schnittstelle: ein Sentinel-Job schreibt alle fünfzehn Minuten Jobstatus, Alter der laufenden Generation, Speicher- und Prozessdruck in ein Ledger; Gatus prüft Endpunkte von außen; eine Go-Bridge führt einen Alarm erst dann als gemeldet, wenn die Zustellung bestätigt ist. Dazu Ressourcengrenzen je Dienst, Speicherdruck als Messgröße erster Ordnung, Sicherungen mit durchgeführten Wiederherstellungen und Rückrollung über Generationen. Prometheus, Grafana, Loki und AlertManager habe ich nicht betrieben; das steht im Anschreiben.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
-  #v(5pt)
+  #v(6pt)
   #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#kind]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
@@ -35,47 +35,51 @@
       #for bullet in bullets [- #bullet]
     ]
   ]
-  #v(3pt)
+  #v(4pt)
 ]
 
 #section("Berufserfahrung")
-#entry("Bountystash — Gründer", "2020 – 2025", (
-  "Betrieb dreizehn NixOS-Hosts über drei Hardware-Generationen und mehrere Standorte, inklusive Beschaffung, Installation und Inbetriebnahme",
-  "Baute die Betriebstelemetrie selbst: Sentinel-Job mit Jobstatus, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledger",
-  "Prüfte Endpunkte mit Gatus und band Alarmierung an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachricht ankommt",
-  "Optimierte den Betrieb unter knappen Ressourcen: systemd-Limits je Dienst, Speicherdruck als Messgröße, Retention über Rotation statt Wachstum",
-  "Diagnostizierte Störungen aus dem Ledger und den Systemlogs, bevor Nutzende sie meldeten, und dokumentierte jede Ursache",
-  "Betrieb ohne öffentliche Schnittstelle: alles im WireGuard-Tailnet, Netze und Firewall als Code mit nftables",
-  "Sicherte mit restic auf ein NAS und führte Wiederherstellungen durch; jede Änderung ist auf die vorherige Generation rückrollbar",
-  "Verwaltete Geheimnisse mit sops und age, Host-Schlüssel über eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten",
-  "Schrieb Werkzeuge in Go und Python, darunter die Alarm-Bridge und Auswertungen über das Ledger",
-  "Dokumentierte jede Prozedur als Runbook, damit Betriebswissen nicht an eine Person gebunden ist",
+#entry("Bountystash — Gründer und alleiniger Betreiber", "2020 – 2025", (
+  "Dreizehn Linux-Hosts über drei Hardware-Generationen, alle mit begrenzter CPU, Speicher und Plattenplatz statt geplanter Reserve",
+  "Telemetrie selbst gebaut: Ledger mit Zeitstempel alle fünfzehn Minuten, Erreichbarkeits- und Antwortzeitprüfungen von außen, Auswertung von Druck und Speicher",
+  "Alarmierung als Zustellproblem behandelt: Go-Bridge mit Bestätigung, damit ein ausgelöster Alarm nicht unbemerkt verfällt",
+  "Speicher- und Prozessdruck, Alter der Generation und Plattenplatz als Vorlaufgrößen prüfen, weil sie einem Ausfall vorausgehen",
+  "Sicherungen mit restic und tatsächlich durchgeführten Rückspielungen; Rückrollung über die vorige Generation als Routine",
+  "Netz und Zugang im Code: nftables, WireGuard ohne öffentlichen Listener, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten",
+  "Infrastruktur als Beschreibung, nicht als Handarbeit: gepinnte Eingaben, Prüfung vor dem Rollout, erzeugte Dokumentation",
+  "Werkzeuge in Python, Go und Shell für Rollout, Auswertung, Berichte und Alarmwege",
 ))
 #entry("O3 Energy — Asset Manager", "2016 – 2020", (
-  "Betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften",
-  "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen",
+  "Kaufmännische Betreuung von 10 MW Solarleistung und Verantwortung für Software und IT des Unternehmens",
+  "Betriebsdaten ausgewertet und als Entscheidungsgrundlage aufbereitet",
 ))
-#entry("Fraunhofer ISE — Wissenschaftliche Hilfskraft", "2012", (
-  "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie am Institut für Solare Energiesysteme",
-  "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte und Python-Werkzeuge für Analyse und 3D-Geometrie",
+#entry("Fraunhofer ISE — Wissenschaftlicher Mitarbeiter", "2012", (
+  "Messaufbau im Labor betreut, Geräte über C++-Anwendungen angesteuert, Messreihen in Python ausgewertet",
+  "In einem Forschungsumfeld mit geteilten Rechnern und dokumentierten Auswertungen gearbeitet",
 ))
-
-#section("Ausbildung")
-#entry("Albert-Ludwigs-Universität Freiburg — M.Sc. Erneuerbare-Energien-Management", "2011 – 2014", ("Abschluss 1,8; Modellierung mit neuronalen Netzen",))
-#entry("Colorado School of Mines — B.Sc. Erdöltechnik", "2006 – 2010", ("GPA 3,2",))
 
 #section("Projekte")
-#entry("nixconfig", "seit 2023", (
-  "Deklarierte die Flotte in einem Flake: jeder Dienst ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit mit Gate",
-  "Ergänzte das Sentinel-Ledger um PSI-Druck und Generation-Alter, weil ein grüner Job-Status allein keinen Ausfall erklärt",
-  "Betrieb eine autarke KI-Plattform auf eigener Hardware mit Modellserver, Go-Router und Zugang nur über das Tailnet",
+#entry("nixconfig — ein Bestand, einmal beschrieben", "seit 2023", (
+  "Ein Host registriert sich einmal als Feature-Liste; Prüfungen, Aufgabenmenü und Dokumentation entstehen aus demselben Graphen",
+  "Trennung von Zustand und Auswertung: der Bestand beschreibt, das Ledger beobachtet, die Auswertung entscheidet",
+  "Veröffentlichen, Ausrollen und Rückrollen sind Aufgaben, keine Eingriffe auf dem Host",
 ))
 
+#section("Arbeitsweise")
+#text(size: 9.5pt)[
+  - Erst messen, dann ändern: eine Änderung ohne Vorher-Nachher-Wert ist eine Vermutung. \
+  - Alarmierung ist erst fertig, wenn die Zustellung bestätigt ist; alles andere ist ein Dashboard. \
+  - Knappe Ressourcen sind eine Anforderung, keine Ausrede: Retention, Rotation und Abtastrate gehören ins Konzept.
+]
+
+#section("Ausbildung")
+#entry("Albert-Ludwigs-Universität Freiburg — M.Sc. Renewable Energy Management", "2011 – 2014", ("Abschlussnote 1,8; Modellierung mit neuronalen Netzen, Energiewirtschaft, Technikfolgenabschätzung",))
+#entry("Colorado School of Mines — B.Sc. Petroleum Engineering", "2006 – 2010", ("GPA 3,2",))
+
 #section("Kenntnisse")
-#text(weight: "bold")[Telemetrie] — eigenes JSONL-Ledger, Endpunktprüfungen, Zustellbestätigung, Retention durch Rotation, Auswertung mit Go und Python \
-#text(weight: "bold")[Betrieb] — NixOS und Debian-nah, systemd, Ressourcenlimits, Speicherdruck, Boot-Konfiguration, reproduzierbare Installation \
-#text(weight: "bold")[Zuverlässigkeit] — Rückrollung je Generation, geprüfte Wiederherstellungen mit restic, Fehlersuche in Logs und Paketen \
-#text(weight: "bold")[Sicherheit] — sops, age, eigene SSH-Zertifizierungsstelle, kurzlebige Zertifikate, nftables, keine offene Schnittstelle \
-#text(weight: "bold")[Automatisierung] — deklarative Konfiguration, Git als einzige Quelle, CI-Gates, Shell, Python, Go \
-#text(weight: "bold")[Nicht vorhanden] — Prometheus/PromQL, Grafana, Loki/LogQL, AlertManager, Kubernetes, Terraform, Ansible, OpenTelemetry \
-#text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · US-Staatsangehörigkeit mit Niederlassungserlaubnis · Karlsruhe rund 1,5 h entfernt
+#text(weight: "bold")[Betrieb] — Linux-Server, systemd, cgroups, Namespaces, PSI und Speicherdruck, Boot und Wiederherstellung \
+#text(weight: "bold")[Telemetrie] — Ledger mit Zeitstempel, Gatus-Prüfungen, Go-Alarmbrücke mit Zustellbestätigung, Vorlaufgrößen statt Ausfallmeldungen \
+#text(weight: "bold")[Automatisierung] — Nix-Flakes als Infrastructure as Code, Gates, Aufgaben, erzeugte Dokumentation; Python, Go, Shell \
+#text(weight: "bold")[Sicherheit] — eigene Zertifizierungsstelle, kurzlebige Zertifikate, sops und age je Host, nftables \
+#text(weight: "bold")[Nicht vorhanden] — Prometheus und PromQL, Grafana, Loki und LogQL, AlertManager-Routing, Kubernetes-Monitoring, YAML-Konfiguration im großen Stil, Terraform, Ansible, OpenTelemetry \
+#text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · Niederlassungserlaubnis · Karlsruhe in rund eineinhalb Stunden erreichbar

@@ -19,7 +19,7 @@ Dazu die Perspektive: Die Stelle ist als Nachfolge der IT-Leitung angelegt, mit 
 - Netze: nftables, DNS, WireGuard-Tailnet, kein Dienst mit öffentlicher Schnittstelle; PXE-Installationen aus eigenem ISO-Archiv.
 - Speicher: NAS-Ziele, restic, durchgeführte Wiederherstellungen statt gezählter Sicherungsläufe.
 - Zuverlässigkeit: Sentinel-Ledger alle 15 Minuten, Gatus, Alarmzustellung mit Bestätigung, Rückrollung je Generation.
-- Anwenderbetreuung und Dokumentation als Runbook;Deutsch C1, Englisch Muttersprache.
+- Anwenderbetreuung und Dokumentation als Runbook; Deutsch C1, Englisch Muttersprache.
 - Hybrid ist zugesagt, Homeoffice nach Einarbeitung möglich.
 
 ## Was fehlt

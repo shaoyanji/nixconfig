@@ -13,30 +13,30 @@
 
 #text(size: 9pt)[
   EnBW Energie Baden-Württemberg AG \
-  Karriere-Team \
-  Karlsruhe
+  Platform / DevOps Engineer Linux & Kubernetes (w/m/d) \
+  Referenz C-TIPCP · Karlsruhe
 ]
 
 #v(14pt)
 #align(right)[#text(size: 8.5pt, fill: rgb("#4b5563"))[22. November 2026]]
 
 #v(6pt)
-#text(weight: "bold")[Bewerbung als Platform / DevOps Engineer Linux & Kubernetes (w/m/d), Referenz C-TIPCP]
+#text(weight: "bold")[Bewerbung als Platform / DevOps Engineer Linux & Kubernetes]
 
 #v(4pt)
 Sehr geehrte Damen und Herren,
 
 #v(2pt)
-Ein Energieversorger, der Plattformen baut, ist für mich kein Zufallstreffer, sondern der Schnittpunkt zweier Vorgeschichten: Ich habe Erneuerbare-Energien-Management in Freiburg studiert, am Fraunhofer ISE zu Solar geforscht und vier Jahre lang 10 MW Photovoltaik gesteuert — und in denselben Jahren die Linux-Plattform betrieben, auf der solche Zahlen entstehen. Ertragsdaten und Betriebsdaten sind für mich dieselbe Frage in zwei Sprachen: ob das, was laufen soll, auch läuft.
+Bei einer Plattform, die durchgehend laufen muss, entscheidet nicht der Regelbetrieb, sondern der Moment, in dem etwas schiefgeht. Fünf Jahre lang habe ich eine Flotte von dreizehn Linux-Hosts allein betrieben — deklarativ mit NixOS beschrieben, jede Änderung durch ein Gate geprüft, jede Generation rückrollbar. Wenn nachts ein Dienst stehenblieb, gab es keine Eskalation: Es gab ein Ledger mit Messwerten alle fünfzehn Minuten, ein Runbook und mich.
 
 #v(2pt)
-Konkret: Dreizehn Server über drei Hardware-Generationen, deklarativ beschrieben, jeder Dienst ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit mit Gate und Rückrollung. Automatisierungen und Schnittstellen schreibe ich in Go und Python, darunter eine Alarm-Bridge, die eine Zustellung erst bestätigt, wenn die Nachricht ankommt, und einen Router für Modellanfragen. Telemetrie ist eigenbau und trotzdem belastbar: ein Sentinel-Ledger mit Jobstatus, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten, Gatus-Prüfungen, Retention durch Rotation. Netz und Firewall sind Code, mit nftables, DNS und einem WireGuard-Tailnet ohne öffentliche Schnittstelle.
+Genau diese Arbeitsweise passt zu Ihrer Aufgabe: Automatisierungen und Plattform-APIs für Linux- und Kubernetes-Umgebungen, Betrieb der Systeme, Monitoring für zuverlässige Plattformservices, Self-Service für die Teams. Ich habe in Go und Python Werkzeuge gebaut, die Handarbeit ersetzt haben, statt sie zu dokumentieren. Ich habe Speicher und Kapazität aus gemessenem Druck geplant und Wiederherstellungen geprüft, statt Sicherungsläufe zu zählen. Und ich habe in einem Umfeld gearbeitet, in dem Fehler Folgen für Dritte hatten: vier Jahre kaufmännische Betreuung von Solar-PV-Anlagen mit Berichten, auf die sich externe Parteien verlassen haben.
 
 #v(2pt)
-Was ich nicht mitbringe, sage ich vorher, weil es im Titel der Stelle steht: keinen Kubernetes-Betrieb, kein Helm, kein GitOps, keine Container-Orchestrierung im Produktivbetrieb. Meine Plattform ist deklarativ, aber ohne Scheduler; die Konzepte — Rollout, Rollback, Selbstbedienung über Schnittstellen, Telemetrie als Betriebsgrundlage — sind dieselben. Diese Einarbeitung wäre echt, und ich sage es lieber jetzt als in der Probezeit.
+Was ich nicht mitbringe, sage ich vorher. Kubernetes habe ich nicht im Produktivbetrieb geführt, Helm und GitOps-Werkzeuge nicht eingesetzt, und eine Plattform in einem regulierten KRITIS-Umfeld habe ich nicht betrieben. Was ich mitbringe, ist die Haltung, die ein solches Umfeld verlangt: Änderungen nur über einen geprüften Weg, Rückrollung als Selbstverständlichkeit, Audit-Spuren als Teil des Systems und niemanden, auf den man die Verantwortung weiterschieben kann.
 
 #v(2pt)
-Zur Person: Ich wohne in Gutach im Breisgau, also in Baden-Württemberg; Karlsruhe ist rund anderthalb Stunden entfernt, hybrides Arbeiten mit Präsenz bei Bedarf passt zu meinem Alltag. Ich bin US-Amerikaner mit unbefristetem Niederlassungsrecht in Deutschland, benötige kein Visum und keine Sponsoring-Zusage. Deutsch ist bei mir C1, Englisch Muttersprache. Mein Repository zeigt die Arbeit ungeschminkt: github.com/shaoyanji/nixconfig
+Zur Region: Ich wohne in Gutach im Breisgau, Karlsruhe liegt rund anderthalb Stunden entfernt — für hybride Präsenz ist das Alltag, kein Umzug. Ich bin US-Amerikaner mit unbefristetem Niederlassungsrecht, brauche also keinen Sponsor. Deutsch C1, Englisch Muttersprache. Mein Repository ist öffentlich: github.com/shaoyanji/nixconfig
 
 #v(4pt)
 Mit freundlichen Grüßen

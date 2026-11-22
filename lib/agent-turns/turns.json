@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T19:22:06Z",
+  "generated": "2026-11-22T19:29:05Z",
   "count": 200,
-  "pin": "8367b8dba0ca77d7b844280eda1b2b80b41043246140da5c321aa9c0cbb16cb3",
+  "pin": "20cde3b05fcbafdc5fe81084a39a94d5228a90e1d672233db483f1d2aaf65fbb",
   "turns": [
+    {
+      "id": "3c84ea67-609d-42a3-95ab-0e44d6b196cf",
+      "ts": "2026-11-22T19:27:32Z",
+      "source": "hermes",
+      "subject": "nixconfig:hermes-fallback",
+      "action": "landed: reordered fallback chain to prioritize nvidia, saved 2.23s failover wall-time | gate: checks:infron PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d9e4b4f832e755daec8bb0f03092422f7428f200",
+      "branch": "main",
+      "frame": "03ha9oxx0bjig66qb80nkrj3k"
+    },
     {
       "id": "ddd12c7a-0970-4dcd-a313-23e1779093a7",
       "ts": "2026-11-22T19:21:31Z",
@@ -2768,23 +2781,6 @@
       "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
       "branch": "main",
       "frame": "03ha7482wy0x0gws2aoa716iq"
-    },
-    {
-      "id": "92cd2bba-5535-46cc-b5b3-f064777327e7",
-      "ts": "2026-11-22T11:31:45Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:job-search",
-      "action": "pacing: building trawa (pane 1), submitting scout24-lead-platform-engineer (pane 2), migrating stackit (pane 3)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/trawa",
-        "submissions/scout24-lead-platform-engineer",
-        "submissions/stackit"
-      ],
-      "files": [],
-      "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
-      "branch": "main",
-      "frame": "03ha7402ozcbntrd0vgfkfqum"
     }
   ]
 }

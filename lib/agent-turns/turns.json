@@ -1,8 +1,77 @@
 {
-  "generated": "2026-11-22T08:20:32Z",
+  "generated": "2026-11-22T08:24:03Z",
   "count": 200,
-  "pin": "680718cb9012e06340b66aed422a6e3a6918ad1ce9591f5648b2646f90447d9d",
+  "pin": "0855c4a72daf8f357bfa7d19ba76084decd51a071e2ce6bc71bc1ed84eac5a62",
   "turns": [
+    {
+      "id": "2a7627b1-ff95-4630-ac2f-ab178aa544c7",
+      "ts": "2026-11-22T08:23:11Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: ptb-hpc-linux packet + 2 Fraunhofer leads; duplicates bizfactory/ewerk set to other | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/ptb-hpc-linux"
+      ],
+      "files": [],
+      "base_commit": "067737c683e02e6d7c88fba7c040c3afb853c90b",
+      "branch": "main",
+      "frame": "03ha635v2q7skr6j45x3uk4i9"
+    },
+    {
+      "id": "acfe1c60-0a88-4eb8-b786-ba7d52f63186",
+      "ts": "2026-11-22T08:22:49Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: nebius senior system engineer cloudgate (GH embed 4377696101); same board family as token-factory",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/nebius-cloudgate"
+      ],
+      "files": [],
+      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
+      "branch": "main",
+      "frame": "03ha633fasvphzk57cb266l0y"
+    },
+    {
+      "id": "eeee5e15-8926-4053-8a2e-2a96ed1d804b",
+      "ts": "2026-11-22T08:21:00Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "drove idle devin pane 0:2.1 with the outreach-dossier contact-address task (jev prose-change p=0.88 margin 0.83); 'Running tools · 14s' confirms submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
+      "branch": "main",
+      "frame": "03ha62qjprf6vdfd6muvz707n"
+    },
+    {
+      "id": "bde4f7e8-1c16-4187-b9a5-ee4ddadddf33",
+      "ts": "2026-11-22T08:20:56Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "blocked: clickhouse-dbre ashby submit POST hangs in-flight twice — no interactive captcha shown, no ack, unverifiable; marked manual",
+      "outcome": "blocked: ashby submit hang",
+      "claims": [],
+      "files": [],
+      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
+      "branch": "main",
+      "frame": "03ha62q3w93jj560nkeus8jpm"
+    },
+    {
+      "id": "50d678e3-e34d-44ae-b015-acec38869e3d",
+      "ts": "2026-11-22T08:20:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: flix-devops-cloud-infrastructure packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
+      "branch": "main",
+      "frame": "03ha62no912aluh4ge3bmp2oo"
+    },
     {
       "id": "841e489c-e280-451d-a15a-e67206167521",
       "ts": "2026-11-22T08:18:51Z",
@@ -2724,81 +2793,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha0tpsnlg5dabwbundtifk1"
-    },
-    {
-      "id": "0a258b9f-ceab-422a-a193-1e50f4efddcf",
-      "ts": "2026-11-21T16:11:16Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "pipeline: applied count reaches 62 (aykua + rwth aachen email submits); virtuslab staged; pane 1 running scout round 3; devin on gravis robotics lever submit",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0tayqdhgqx1szm1v74x3v"
-    },
-    {
-      "id": "c7665b00-56e2-4a1e-b55f-78e63a20f322",
-      "ts": "2026-11-21T16:09:19Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "tracking: rivia & adfinis confirmations verified in inbox; cycap & nvidia staged; pane 1 on virtuslab, pane 3 on rwth aachen; devin on aykua",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0sxcc9cty4n4rhyk3ehij"
-    },
-    {
-      "id": "a5bc7807-6be6-4e83-9719-cb8266ac521f",
-      "ts": "2026-11-21T16:05:27Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "milestone: rivia applied (60 total applied); enviria staged (Personio, €90k); pane 1 on cycap ppa, pane 3 on nvidia workday (24k-42k); devin on BWI NixOS",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0s62izqm45sjjbfdn8n9j"
-    },
-    {
-      "id": "9eeff542-927a-44c9-99e4-3cafcba17a6a",
-      "ts": "2026-11-21T16:03:19Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "orchestrating: hep-global staged (Personio, €90k); flox-packaging staged (Ashby, 10k); pane 1 on enviria, pane 3 on nvidia (24k-42k); devin on rivia final submit",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0rr297vnnkpiss2ck1deu"
-    },
-    {
-      "id": "e662ff5b-f4ee-424f-bf33-80108f9e20b1",
-      "ts": "2026-11-21T16:00:38Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "orchestrating: n8n staged in submissions/n8n/ (Ashby, EUR 165k); nudged pane 3 with flox-packaging (80k-50k); pane 1 mapping hep-global Personio form; devin on Rivia",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0r8a7e71bc2w416c8iz3m"
     }
   ]
 }

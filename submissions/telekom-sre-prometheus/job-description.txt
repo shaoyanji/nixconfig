@@ -1,0 +1,190 @@
+Deutsche Telekom AG / T-Systems International GmbH — Site Reliability Engineer (SRE) (m/w/d)
+https://www.arbeitsagentur.de/jobsuche/jobdetail/12444-563465374109756-DT-S
+Source: Bundesagentur für Arbeit (BA ID 12444-563465374109756-DT-S)
+
+Zur Jobsuche Startseite
+Stellenangebot:
+Site Reliability Engineer (SRE) (m/w/d)
+bei
+Deutsche Telekom AG
+Das Wichtigste im Überblick
+Besondere Merkmale
+Arbeitsort
+verschiedene Arbeitsorte
+Angebotsart
+Arbeit
+Anstellungsart
+Vollzeit
+Beginn
+ab sofort
+Berufsbezeichnung
+Site Reliability Engineer
+Info zur Bewerbung
+Vormerken
+Notiz / Status
+PDF / Drucken
+Link kopieren
+Veröffentlichungsdatum:
+Vor 30+ Tagen veröffentlicht
+Stellenbeschreibung
+
+Über T-Systems International GmbH
+
+Bei T-Systems bieten wir unseren Geschäftskunden die richtigen Systemlösungen für ihr digitales Business. Mit unserem Portfolio stellen wir sicher, dass digitale Transformation Komplexität reduziert, Kosten einspart und die alltägliche Arbeit erleichtert. Unsere Schwerpunkte sind Konnektivität, Digital, Cloud & Infrastruktur sowie Sicherheit - Let's power higher performance!
+
+Über die Position
+
+Als Site Reliability Engineer stehen Sie an vorderster Front, um die Stabilität, Performance und Skalierbarkeit unserer kritischen Systeme sicherzustellen. Sie spielen eine zentrale Rolle bei der Entwicklung, dem Aufbau und der Wartung einer hochzuverlässigen und effizienten Infrastruktur.
+
+Mit Ihrer Expertise in modernen Monitoring-, Observability- und Cloud-Native-Technologien gestalten Sie den Aufbau und Betrieb eines leistungsfähigen Monitoring-Stacks auf Basis von Prometheus, Grafana, Loki und AlertManager für verteilte Fog- und Edge-Infrastrukturen. Dabei entwickeln Sie spezialisierte Dashboards zur Überwachung von Hardwarezuständen, Ressourcenauslastung und Netzwerkverbindungen und schaffen so die Grundlage für einen transparenten und stabilen Betrieb.
+Sie konzipieren und implementieren Alerting-Strategien für autonome Betriebsmodelle sowie Disconnected- und Air-Gap-Szenarien und stellen sicher, dass kritische Ereignisse auch unter eingeschränkten Netzwerkbedingungen zuverlässig erkannt und verarbeitet werden. Darüber hinaus verantworten Sie die Umsetzung von lokalen Retention-Konzepten, Log-Rotation-Mechanismen und effizienten Datenmanagement-Strategien für ressourcenbeschränkte Umgebungen.
+Ein weiterer Schwerpunkt Ihrer Tätigkeit liegt in der kontinuierlichen Performance-Optimierung des Monitoring-Stacks unter Berücksichtigung begrenzter CPU-, Speicher- und Storage-Ressourcen auf Fog-Nodes. Sie integrieren Kubernetes-Monitoring-Lösungen, analysieren Betriebs- und Performancedaten und identifizieren proaktiv Optimierungspotenziale zur Steigerung von Stabilität, Verfügbarkeit und Effizienz der Plattform.
+Durch den Einsatz von Infrastructure-as-Code-Ansätzen und YAML-basierten Konfigurationen automatisieren Sie die Bereitstellung und Verwaltung der Monitoring-Komponenten und leisten einen wesentlichen Beitrag zur Weiterentwicklung einer robusten, skalierbaren und hochverfügbaren Observability-Plattform für moderne Edge- und Fog-Computing-Umgebungen.
+
+Must-Have Skills
+
+Monitoring & Observability
+
+Fundierte Erfahrung mit Prometheus, insbesondere:
+
+PromQL
+Federation
+Remote Write
+Local Retention Management
+Dashboarding & Visualisierung
+
+Sehr gute Kenntnisse in Grafana, insbesondere:
+
+Dashboard-Entwicklung
+Alerting
+Provisioning-as-Code
+Log Management
+
+Erfahrung mit Loki, insbesondere:
+
+LogQL
+Retention Management
+Compaction
+Alerting & Incident Management
+
+Fundierte Kenntnisse in AlertManager, insbesondere:
+
+Standalone Routing
+Alert Inhibition
+Eskalations- und Benachrichtigungskonzepte
+Kubernetes & Cloud Native
+Erfahrung im Monitoring und Betrieb von Kubernetes-Umgebungen
+Verständnis von Container-Plattformen und Cloud-Native-Architekturen
+Edge & Fog Computing
+Erfahrung mit ressourcenbeschränkten Umgebungen
+Optimierung von CPU-, Memory- und Storage-Nutzung
+Verständnis von Offline-, Air-Gap- und Disconnected-Betriebsszenarien
+
+Weitere Anforderungen:
+
+Sehr gute Kenntnisse in YAML
+Ausgeprägtes Verständnis für IT-Sicherheit und Security Awareness
+Analytische und strukturierte Arbeitsweise
+Erfahrung im Site Reliability Engineering oder Infrastruktur-Betrieb
+Sehr gutes Deutsch in Wort und Schrift (C1-Niveau)
+
+Nice-to-Have Skills
+
+Infrastructure as Code (z. B. Terraform, Ansible)
+GitOps-Ansätze
+Linux-Systemadministration
+OpenTelemetry und moderne Observability-Konzepte
+Erfahrung in kritischen oder hochverfügbaren Infrastrukturen
+
+Was Sie erwartet
+
+Sie erwartet eine spannende Aufgabe im Umfeld moderner Edge-, Fog- und Cloud-Native-Technologien. Dabei übernehmen Sie Verantwortung für die Stabilität, Verfügbarkeit und Beobachtbarkeit verteilter Infrastrukturen und gestalten den Aufbau leistungsfähiger Monitoring- und Observability-Lösungen aktiv mit. In einem technologisch anspruchsvollen Umfeld arbeiten Sie mit aktuellen Kubernetes-, Monitoring- und Logging-Technologien und tragen dazu bei, robuste und resiliente Plattformen für den zuverlässigen Betrieb auch unter herausfordernden Bedingungen zu schaffen.
+
+Was wir bieten
+
+Flexibilität und Work-Life-Balance: Profitieren Sie von flexiblen Arbeitszeiten, der Möglichkeit zum mobilen Arbeiten und einem hybriden Arbeitsmodell.
+Attraktive Vergütung: Ein wettbewerbsfähiges Gehaltspaket, das Ihre Expertise und Leistung honoriert.
+Entwicklungsmöglichkeiten: Zugang zu umfangreichen Weiterbildungsangeboten, Schulungen und Karriereentwicklungsprogrammen.
+Modernes Arbeitsumfeld: Arbeiten Sie in einer modernen Ausstattung mit den neuesten Technologien und Tools.
+Starke Unternehmenskultur: Eine offene und kollegiale Arbeitsatmosphäre, in der Teamarbeit und gegenseitige Unterstützung großgeschrieben werden.
+Gesundheit und Wohlbefinden: Angebote zur Gesundheitsförderung und Initiativen, die Ihr Wohlbefinden unterstützen.
+Zusatzleistungen: Diverse Benefits wie betriebliche Altersvorsorge, Mitarbeiterrabatte und Jobticket-Optionen.
+
+Die Bearbeitung Ihrer Bewerbung kann durch externe Dienstleister in Deutschland erfolgen. Bewerbungen auf Stellen außerhalb der Deutschen Telekom AG können zudem von Recruitern im europäischen Ausland bearbeitet werden. Dies gilt auch für die Bearbeitung von Bewerbungen bei Tochtergesellschaften der Deutschen Telekom AG. Für unsere beamteten Mitarbeiterinnen und Mitarbeiter deshalb folgender Hinweis: Sie sind nicht verpflichtet, Ihrer Bewerbung personalaktenrelevante Unterlagen, insbesondere Beamtenbeurteilungen, beizufügen. Es bleibt Ihnen jedoch unbenommen, diese Dokumente freiwillig zur Verfügung zu stellen.
+Diese Stelle ist auch in Teilzeit möglich.
+Schwerbehinderte Menschen werden bei gleicher Eignung vorrangig berücksichtigt.
+
+Bei fachlichen Fragen wenden Sie sich bitte an thomas.arbeit@t-systems.com
+https://www.xing.com/companies/deutschetelekomag
+https://www.linkedin.com/company/telekom
+
+Mehr anzeigen
+Arbeitsorte
+Karte anzeigen
+34117 Kassel, Hessen
+33605 Bielefeld
+80335 München
+10781 Berlin
+76185 Karlsruhe, Baden
+30519 Hannover
+01129 Dresden
+39124 Magdeburg
+66121 Saarbrücken
+64295 Darmstadt
+Unternehmensdarstellung:
+Deutsche Telekom AG
+Hauptsitz
+Bonn
+Gründung
+1995
+Betriebsgröße
+200.000 Mitarbeiter*innen
+Tätigkeitsfelder und Schlagworte
+TelekommunikationDigitalisierungInternet/ Multimedia
+
+Die Deutsche Telekom ist Europas größtes Telekommunikationsunternehmen und weltweit in mehr als 50 Ländern vertreten. Mit rund 200.000 Mitarbeitenden erwirtschaftete sie im Geschäftsjahr 2024 einen Umsatz von 115,8 Milliarden Euro als wertvollste Deutsche Marke aller Zeiten.
+
+Wir entwickeln Technologie und Innovationen für Menschen, Umwelt und Unternehmen, um damit gemeinsame Herausforderungen zu bewältigen.
+
+Sei dabei und gestalte mit uns die Zukunft, mache den Alltag einfacher und sicherer mit KI, entwickle Lösungen für das Internet der Dinge oder digitalisiere Prozesse mit uns als Marktführer im Bereich Cloud Computing.
+
+Bei der Telekom teilen wir mehr als den Arbeitgeber. Wir teilen die gleichen Werte und setzen uns für diese ein. Wir bieten eine Vielzahl an Ausbildungsberufen und Dualen Bachelor-Studiengängen. Werde so im technischen oder kaufmännischen Bereich Zukunftsbereiter*in. Entscheide dich für den Karrierestart, der zu dir passt und wachse mit uns gemeinsam in einem globalen Netzwerk von Expert*innen.
+
+In einem der größten Ausbildungsunternehmen Deutschlands arbeitest du bei uns mit den neuesten Technologien und erhältst eine attraktive Ausbildungsvergütung für finanzielle Unabhängigkeit. Wir suchen junge Leute, die für ihre Überzeugungen einstehen, die Dinge nachhaltig verändern wollen, um das Leben der Menschen zu bereichern. Du willst über dich hinauswachsen? Dann bist du bei uns genau richtig! Unser Team unterstützt dich dabei.
+
+Vorteile für Mitarbeitende
+Übernahmechancen
+30 Tage Urlaub & Flexibilität
+Top Ausstattung (u.a.Laptop, Smartphone)
+Starkes Gehalt
+Mentorenprogramm/Coaching
+Homeoffice / Mobiles Arbeiten
+Vermögenswirksame Leistungen
+Nachhaltigkeit / Umweltschutz
+Rabatte für Mitarbeitende
+Sport- und Gesundheitsangebote
+Weiterbildungen
+Mitgestaltungsmöglichkeiten
+Die abgebildeten Vorteile für Mitarbeitende können je nach Abteilung und Position variieren.
+Alle Stellen anzeigenIn neuem Tab öffnen
+Webseiten
+Homepage
+Karriereseite
+Impressum
+Social Media Seiten
+Informationen zur Bewerbung
+Sicherheitsabfrage
+
+Wir schützen die Kontaktdaten des Arbeitgebers vor unerlaubten Zugriffen. Bitte geben Sie die dargestellten Zeichen in das Textfeld ein, um die Kontaktdaten des Arbeitgebers anzuzeigen.
+
+Anderes Bild laden
+Audioversion abspielen
+
+Hinweis: Die dargestellten Zeichen enthalten keine Umlaute (ä, ö, ü oder ß), Sonderzeichen oder Leerzeichen.
+
+Dargestellte Zeichen
+Absenden
+Fußbereich
+Stelle betreut durch die BA
+Referenz-Nr.: 12444-563465374109756-DT-S
+Verstoß melden

@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-22T12:33:19Z",
+  "generated": "2026-11-22T12:34:08Z",
   "count": 200,
-  "pin": "24b369a67aa0181d333b7d2dd6a3f429a5da4e3ba40c281d533e7274badbd128",
+  "pin": "3489ed0850d172680c7d8e5be45854f1b5f7b0868d565b71628c0291037050ef",
   "turns": [
+    {
+      "id": "95d2a42b-68f9-40b8-8b63-e5bde118f0bb",
+      "ts": "2026-11-22T12:33:36Z",
+      "source": "devin",
+      "subject": "job-hunt:stackit-iac",
+      "action": "STACKIT GT4627: full form driven headless (uploads + SAPUI5 select keys + Friendly Captcha self-solved), then portal returned 'You have already applied for this position' — an application already exists under the candidate email (earlier hand-submit). Recorded applied; no duplicate. Notable: the SAPUI5 manual-attach wall from the control-plane record does not block — input __table0-uploader-fu takes agent-browser upload and selects take setSelectedKey.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cf53b84d1e1a2c506cceee8bf3fc3021dea977d5",
+      "branch": "main",
+      "frame": "03ha7g2yob5ab7nhx9ej2umlp"
+    },
+    {
+      "id": "558f8a47-e169-49f2-967f-c81173be7957",
+      "ts": "2026-11-22T12:33:28Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-data-platform",
+      "action": "landed: native Typst sources for Nebius Data Platform SRE (5040676101), commit cf53b84d. CV 2pp/1231w, letter 1pp/431w, 0 warnings, page budget asserted, prose exit 0 at 292 files. PostgreSQL declared per service, ordered migrations, restore drill (postgres-backup-drill), storage growth with named reason, PSI ledger lead; wrong-team salutation retired, legacy staged in its own commit. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cf53b84d1e1a2c506cceee8bf3fc3021dea977d5",
+      "branch": "main",
+      "frame": "03ha7g20xzm9jhoel9g44ncjy"
+    },
+    {
+      "id": "7dc1fba6-d95b-4693-8231-458bcd72629b",
+      "ts": "2026-11-22T12:33:26Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:1und1-linux-operations",
+      "action": "landed: native Typst rebuild of the 1&1 packet (Kennziffer 5836); 2pp CV 97/90, 1pp letter 69, 0 warnings, dossier + sheet with retired hashes | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/1und1-linux-operations"
+      ],
+      "files": [],
+      "base_commit": "4d66e80887dae2c2bf31c9abc64389d58f3c61ab",
+      "branch": "main",
+      "frame": "03ha7g1u0o4izrwc6qmu1lv2s"
+    },
     {
       "id": "0868cf19-d292-4360-8d8c-c51eeb9cad0b",
       "ts": "2026-11-22T12:31:56Z",
@@ -2795,49 +2836,6 @@
       "base_commit": "292788d6d77e066a12faf15095eb3e7f7941310a",
       "branch": "main",
       "frame": "03ha6sess74kj1h7sdi9igpeo"
-    },
-    {
-      "id": "9928416f-eba2-456c-989d-132be47c6133",
-      "ts": "2026-11-22T10:31:40Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:kraken",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/kraken"
-      ],
-      "files": [],
-      "base_commit": "1b9bec736cffa2b523e3a0e4b33e93282280d49e",
-      "branch": "main",
-      "frame": "03ha6s9h727cpujek2m1op7g2"
-    },
-    {
-      "id": "0c7c0d19-b93e-4f00-ae12-ba77c90ee320",
-      "ts": "2026-11-22T10:31:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:adfinis",
-      "action": "follow-up: Brief neu kompiliert (Doppelartikel beseitigt) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "292788d6d77e066a12faf15095eb3e7f7941310a",
-      "branch": "main",
-      "frame": "03ha6s8ytvatomv0p8tdul0aw"
-    },
-    {
-      "id": "f428ea8f-7050-4ad2-b984-e2a05eae846a",
-      "ts": "2026-11-22T10:31:15Z",
-      "source": "devin",
-      "subject": "nixconfig:gitlab",
-      "action": "claim: Greenhouse submission (location-gated req, honest answers)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/gitlab"
-      ],
-      "files": [],
-      "base_commit": "39563eebbeb1ead030ee97c8a60e9dc56863c966",
-      "branch": "main",
-      "frame": "03ha6s6j6vipl6ob7a2ifziwt"
     }
   ]
 }

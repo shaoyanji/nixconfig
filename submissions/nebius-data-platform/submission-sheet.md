@@ -24,8 +24,8 @@ rebuild commit:
 
 | File | Pages | Words | Warnings | sha256 (first 16) |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 1231 | 0 | `1f5487372744798d` |
-| `anschreiben.pdf` | 1 | 431 | 0 | `84e7ad5511496fce` |
+| `lebenslauf.pdf` | 2 | 1258 | 0 | `450010c77c2e01da` |
+| `anschreiben.pdf` | 1 | 434 | 0 | `11cd416d580654ec` |
 
 ## The five pillars, against the repository
 
@@ -33,7 +33,7 @@ rebuild commit:
 | :--- | :--- | :--- |
 | PostgreSQL operational management | `services.postgresql` declared per service (`email-archive.nix`, `mail-atlas.nix`, `paperless-fork.nix`); `postgresqlBackup` on `frieren`; `pg_dump` in `infra-stack.nix`; settings generated from Nix rather than edited on the host | claimed in full |
 | Versioned schema migrations | Migrations applied in order by the service; the archive's schema adds the stored `tsvector` behind a GIN index and an upsert keyed on `message_id`, so a replay cannot become a second row; a failed step leaves the previous version running | claimed in full |
-| Restore drills | `modules/services/postgres-backup-drill.nix` exists as a service, alongside the scheduled backup — the drill is the part that makes the backup a fact | claimed in full |
+| Backup drills | `modules/services/postgres-backup-drill.nix` (EXP-042) audits each logical dump as a scheduled service: it checks the file exists, reports its size, and enforces a minimum table count. That is the check that makes a backup a fact. There is **no `pg_restore` anywhere in the repository**, so neither document claims a restore was performed | claimed as an audit, not a restore |
 | Storage growth alerting | `fleet-sentinel` records disk percentage for `/`, `/nix/store` and `/srv/data` plus inode counts, and degrades the host with a named reason at `degradeOnDiskPct` instead of waiting for a failed write; PSI and generation age in the same ledger | claimed in full |
 | High-integrity data handling | Validate before write, append-only event state, content-addressed specifications, and a fourteen-month archive of real mail as the non-synthetic test load | claimed in full |
 

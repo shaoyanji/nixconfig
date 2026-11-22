@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# appflow-check.sh — tracker hygiene: duplicate noise, and prep rows on dead requisitions.
+# appflow-check.sh — tracker hygiene: duplicate noise, dead prep rows, shared active mail.
 #
 #   appflow-check.sh   read-only; names every offending row and exits 1
 #
-# Both states accumulate because nothing else looks for them: a (company, role)
-# pair where no row declares which one is real, and a `prep` row whose own status
-# says the requisition closed. Both are already in the row list the API serves,
-# so this needs no SQL role and no nix. The fix is never a query — it is
-# `task agents:apps:set ID=… STATUS="Duplicate of …"`, or a closed status.
+# Three states accumulate because nothing else looks for them: a (company, role)
+# pair where no row declares which one is real, a `prep` row whose own status says
+# the requisition closed, and one mail linked to two applications that are both
+# still moving — the shape of a `discovered-*` twin whose company string differs
+# from its canonical row, so the pair rule cannot see it. The first two come from
+# the row list the API serves; the link question is one read-only query route.
+# The fix is never a query — it is `task agents:apps:set ID=… STATUS="Duplicate of …"`.
 set -euo pipefail
 
 api=${APPFLOW_API:-https://delphi.cloudforest-kardashev.ts.net:8450}
@@ -58,6 +60,28 @@ prep=$(sed -n 's/^prep=//p' <<<"$report")
 pairs=$(sed -n 's/^pairs=//p' <<<"$report")
 deadprep=$(sed -n 's/^deadprep=//p' <<<"$report")
 
+# One mail, two applications, both still moving: a twin that never declared
+# itself, which is how `discovered-materna` sat at `screening` beside its
+# canonical row. Answered by the read-only query route the tracker publishes.
+link_q="select am.message_id, count(distinct a.id) as apps
+        from application_mail am join applications a on a.id = am.application_id
+        where a.stage in ('prep','applied','screening','interview','manual','contacted')
+        group by 1 having count(distinct a.id) > 1
+        order by 2 desc"
+links=$(curl -sS --max-time 30 -X POST -H 'content-type: application/json' \
+  -d "$(jq -nc --arg q "$link_q" '{q:$q}')" "$api/api/pipeline-sql") || {
+  echo "appflow-check: no answer from $api/api/pipeline-sql" >&2
+  exit 2
+}
+case "$links" in
+  '['*) ;;
+  *)
+    echo "appflow-check: the link query did not answer JSON: $(printf '%s' "$links" | head -c 160)" >&2
+    exit 2
+    ;;
+esac
+shared=$(jq 'length' <<<"$links")
+
 # An API that answers an empty list would pass every assertion below.
 if [ "${total:-0}" -eq 0 ]; then
   echo "appflow-check: the API answered an empty pipeline — refusing to pass a vacuous check" >&2
@@ -81,8 +105,16 @@ else
   fail=1
 fi
 
+if [ "$shared" -eq 0 ]; then
+  echo "ok   no mail linked to two applications that are both still moving"
+else
+  echo "FAIL $shared message(s) linked to more than one active application:" >&2
+  jq -r '.[] | "       \((.messageId // .message_id)[0:64]) → \(.apps) active rows"' <<<"$links" >&2
+  fail=1
+fi
+
 if [ "$fail" -ne 0 ]; then
-  echo "FAIL: tracker hygiene — close or dedupe the rows above (task agents:apps:set)." >&2
+  echo "FAIL: tracker hygiene — close, dedupe or relink the rows above (task agents:apps:set)." >&2
   exit 1
 fi
-echo "PASS: no duplicate noise, no prep row on a dead requisition."
+echo "PASS: no duplicate noise, no dead prep row, no shared active mail."

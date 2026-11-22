@@ -777,9 +777,11 @@ tasks:
       reaches the English corpus through glossary.json, two runs are identical, a
       missing corpus exits 2. Coverage is asserted both ways, so deleting a case
       fails. Second the tracker itself, read-only through the API: no (company,
-      role) pair where nothing says which row is real, and no `prep` row whose own
-      status says the requisition closed — the two states that otherwise
-      accumulate unnoticed. Offline fixture ~1 s, hygiene ~2 s.
+      role) pair where nothing says which row is real, no `prep` row whose own
+      status says the requisition closed, and no mail linked to two applications
+      that are both still moving — the shape a `discovered-*` twin takes when its
+      company string differs from its canonical row and the pair rule cannot see
+      it. Offline fixture ~1 s, hygiene ~3 s.
     cmds:
       - bash tests/appflow-select/run.sh
       - bash scripts/task/appflow-check.sh

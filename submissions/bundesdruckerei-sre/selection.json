@@ -1,0 +1,269 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 2191,
+    "terms": [
+      {
+        "term": "system",
+        "weight": 14.464
+      },
+      {
+        "term": "sowie",
+        "weight": 8.918
+      },
+      {
+        "term": "cloud",
+        "weight": 8.544
+      },
+      {
+        "term": "cloud-umfeld",
+        "weight": 8.544
+      },
+      {
+        "term": "deployment",
+        "weight": 8.544
+      },
+      {
+        "term": "deployment-prozessen",
+        "weight": 8.544
+      },
+      {
+        "term": "git",
+        "weight": 8.544
+      },
+      {
+        "term": "infrastrukturen",
+        "weight": 8.544
+      },
+      {
+        "term": "sicherer",
+        "weight": 8.544
+      },
+      {
+        "term": "sicherheitsgründen",
+        "weight": 8.544
+      },
+      {
+        "term": "web",
+        "weight": 7.571
+      },
+      {
+        "term": "bash",
+        "weight": 6.892
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "bountystash",
+        "score": 0.8716
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "fibtransponder",
+      "matt.bountystash.com",
+      "Risikoberechnungs-Engine (Swirl Engine)"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "PSI-Druck"
+        },
+        {
+          "score": 0.0,
+          "text": "Alarmzustellung"
+        }
+      ],
+      "kept": 6,
+      "name": "Observability",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Ressourcenlimits"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Plattform",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Kubernetes (Grundlagen)"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Kotlin"
+        },
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 4.5854,
+          "text": "Sicherte jede Änderung mit inventargetriebener CI, einem Modul-Gate je Host und einem sops-Drift-Check ab, bevor sie ein"
+        },
+        {
+          "score": 2.0455,
+          "text": "Betrieb node_exporter auf einem Always-on-Knoten als Metrikquelle im Tailnet"
+        },
+        {
+          "score": 1.6046,
+          "text": "Hielt Secrets aus dem Betrieb: sops mit age, Zugang ausschließlich über die eigene SSH-CA mit kurzlebigen Zertifikaten"
+        },
+        {
+          "score": 1.1111,
+          "text": "Prüfte Endpunkte mit Gatus und band jedes Alerting an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachr"
+        },
+        {
+          "score": 0.0,
+          "text": "Erkannte Engpässe auf ressourcenbeschränkten Knoten über PSI-Druck statt über Lastmittel, weil kleine Knoten sonst erst "
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.6503,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 1.1447,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Führte ein internationales Team und entwickelte eine Anreizstruktur, gekoppelt an ein Echtzeit-Finanzmodell."
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 3.9544,
+          "text": "Erstellte neue Excel-Tabellen für die Engineering-Abteilung."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 0.0,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

@@ -208,8 +208,15 @@ else
   fb_count="$(yq '.fallback_providers | length' "$persona" 2>/dev/null || echo 0)"
   [ "$fb_count" -ge 2 ] && ok "fallback chain has $fb_count lanes" \
     || bad "fallback chain has $fb_count lane(s) — Infron's daily quota is account-scoped, so a same-route second id is the same failure"
-  while IFS=$'\t' read -r fb_provider fb_model; do
+  while IFS=$'\t' read -r fb_provider fb_model fb_base; do
     [ -n "$fb_provider" ] || continue
+    # A keyless route has no balance to spend, so its id carries no :free:
+    # api.apisfreellm.com answers to `free-ai` and bills nobody.
+    case "$fb_base" in
+      *apisfreellm.com*)
+        ok "fallback $fb_provider/$fb_model on keyless ${fb_base#https://} — no key, no billing"
+        continue ;;
+    esac
     case "$fb_provider" in
       custom | openrouter)
         case "$fb_model" in
@@ -224,7 +231,7 @@ else
         bad "fallback provider '$fb_provider' can bill — only :free ids on metered routes or the closed free lanes are allowed"
         ;;
     esac
-  done < <(yq -r '.fallback_providers[]? | (.provider // "") + "\t" + (.model // "")' "$persona")
+  done < <(yq -r '.fallback_providers[]? | (.provider // "") + "\t" + (.model // "") + "\t" + (.base_url // "")' "$persona")
 
   # Picker denylist: the keyed billable vendors must all be hidden. Slugs match
   # case-insensitively upstream; the list here is asserted verbatim.

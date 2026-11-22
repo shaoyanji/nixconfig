@@ -603,7 +603,15 @@ banner_crop() { # png jpg
 plates_description() {
   local roster=$repo/lib/image-daily/plates.txt
   {
-    # The ledger first, oldest to newest: every plate was made by a sentence, so a
+    # Briefs first, as the weakest source: the oldest plates predate the ledger's
+    # prompt column, and their sentence is still on the brief they came from. A
+    # brief id carries its lane as a prefix, which is not part of the slug.
+    if [ -f "$BRIEFS" ]; then
+      jq -r '.briefs[]?
+        | [(.id | sub("^(wall|blog|badge|site)-"; "") | sub("^(char|plate)-"; "")), (.prompt // "")]
+        | @tsv' "$BRIEFS" 2>/dev/null || true
+    fi
+    # The ledger next, oldest to newest: every plate was made by a sentence, so a
     # plate the roster no longer carries (an older hand-run batch, a blog banner,
     # a badge) still reads as itself instead of showing an empty card.
     if [ -f "$LEDGER" ]; then

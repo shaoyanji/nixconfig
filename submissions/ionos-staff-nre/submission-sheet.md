@@ -89,15 +89,28 @@ The page renders client-side; use `agent-browser` if it must be driven.
   so pair it with the hybrid question rather than leaving it bare.
 - Salary: 120.000 sits inside the 105.000 – 130.000 band and matches the letter.
 
+## Tailoring notes
+
+- The CV is built from a **packet-local corpus copy** (`lebenslauf.json` in this folder).
+  The canonical German corpus is an energy and risk CV: it carries no WireGuard, no systemd,
+  no observability. Four Bountystash bullets were added here for the fleet work (NixOS
+  generations, a WireGuard-based mesh with an own SSH CA, the sentinel ledger with PSI,
+  Go/Python toil removal), plus `Netzwerk` and `Betrieb & Telemetrie` skill lines.
+- `Kubernetes` was removed from the DevOps skill line: the letter says plainly it was never
+  operated in production, and the packet should not argue both ways. The canonical corpus
+  still lists it, so fix it there if that is the intent.
+- The selector reads the advert body only, not the provenance header of
+  `job-description.txt`, so words such as "Greenhouse" and "Abgerufen" earn no keyword weight.
+
 ## Checks
 
 | Check | Result |
 | :--- | :--- |
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 185 prose files, exit 0 |
-| selection | 0 highlights kept, 2 projects kept |
-| sha256 CV | `5ea87a117a69dc942cda6727f2c831104d528ae36d99cb711cf963f3cf1760a6` |
+| `task checks:prose` | 186 prose files, exit 0 |
+| selection | 10/36 highlights, 4/10 projects |
+| sha256 CV | `db18afddbffd9442cff441172000323c2ecdf613633510b1678c94b776e13ee6` |
 | sha256 letter | `49d2e940a895ca375373cbbcc0b9aa27f39e07c88c07b6a5998fa631d68b29c1` |
 
 ## Next actions

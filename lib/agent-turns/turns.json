@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-22T11:28:19Z",
+  "generated": "2026-11-22T11:30:37Z",
   "count": 200,
-  "pin": "4b8c2d4c3418159d568c000b490f9b2ebf56801075b1905800cebb66a7888817",
+  "pin": "0a4638d97d0eaf7f7a121dec1f294ebb5941e88033333f07602179de1ef93b16",
   "turns": [
+    {
+      "id": "96479cb4-e24c-49c4-bdcf-aed82ea97ce7",
+      "ts": "2026-11-22T11:30:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:trawa",
+      "action": "claim: native English Typst dossier (2pp CV + 1pp letter), replacing legacy Nix artifacts, Senior Platform Engineer",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/trawa"
+      ],
+      "files": [],
+      "base_commit": "eb1a119052ad71fb1fe49ee8c09d2562e9468b82",
+      "branch": "main",
+      "frame": "03ha73o9uhucubqw3ojjdgs0a"
+    },
+    {
+      "id": "cee8b422-2ec9-442b-a9d3-5baf4f458d43",
+      "ts": "2026-11-22T11:28:54Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "migration audited: no store symlink, no read-only files, both PDFs rebuild byte-identical from lebenslauf.typ/anschreiben.typ; measured table + rebuild proof added to the sheet; prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/uni-rostock-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "d3b9de4fe1500093fc8f3261a07f2aef8776b01d",
+      "branch": "main",
+      "frame": "03ha73fzo8pf0l2dr93fg2gsz"
+    },
+    {
+      "id": "84aa9ddc-385b-4d01-b506-405daff5785a",
+      "ts": "2026-11-22T11:28:26Z",
+      "source": "freebuff",
+      "subject": "nixconfig:scout24-lead-platform-engineer",
+      "action": "landed: native English Typst packet, 2pp CV + 1pp letter, 1076/490 words, salary 95-110k EUR staged in sheet + DB | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "eb1a119052ad71fb1fe49ee8c09d2562e9468b82",
+      "branch": "main",
+      "frame": "03ha73cqnry8wvogoyid4ngog"
+    },
     {
       "id": "04229113-26cf-4467-8606-e93d6b92ffab",
       "ts": "2026-11-22T11:28:04Z",
@@ -2725,45 +2768,6 @@
       "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
       "branch": "main",
       "frame": "03ha6gnu4d53xq72zq7t351kn"
-    },
-    {
-      "id": "27e35aae-f65e-4fac-b52d-146cc3db67ad",
-      "ts": "2026-11-22T09:31:20Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "smartclip upgraded to native Typst packet | 2pp CV + 1pp letter (EN) | fit 3, Prometheus/Grafana gap named",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "54f9bea97d41cad8767c544ea00fc8217ba8e235",
-      "branch": "main",
-      "frame": "03ha6gh7szuv3p9go4eqho53m"
-    },
-    {
-      "id": "2fbdf835-0824-4e6a-8079-5ef884f816ed",
-      "ts": "2026-11-22T09:30:15Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: sinc-devops Softgarden submission (63891414)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fb5eb510f77c0de3d4ec35e92be15b7806a0e861",
-      "branch": "main",
-      "frame": "03ha6g9n9oq96bemqim6eqrfe"
-    },
-    {
-      "id": "9d1c802d-cf0d-4064-8b5d-40139809875c",
-      "ts": "2026-11-22T09:29:51Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "alexander-thamm upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "39b3b24fddf54d0469ea8b3a587e085d7dfb09d6",
-      "branch": "main",
-      "frame": "03ha6g6swy5xwlx5uf1me4t9l"
     }
   ]
 }

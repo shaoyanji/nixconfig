@@ -394,6 +394,17 @@
         "SOPS",
         "SSH CA"
       ]
+    },
+    {
+      "name": "LLM & Agenten",
+      "keywords": [
+        "MCP-Server",
+        "OpenAI-kompatibler Endpunkt",
+        "lokales Model-Serving",
+        "GPU-Host-Betrieb",
+        "Chat-, Sprach- und Bildmodelle",
+        "Agenten-Werkzeuge"
+      ]
     }
   ],
   "languages": [

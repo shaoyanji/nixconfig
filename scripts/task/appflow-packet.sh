@@ -20,7 +20,10 @@ set -euo pipefail
 
 API="${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}"
 CONFIG="${APPFLOW_CONFIG:-$HOME/.config/appflow}"
-STATE="${XDG_STATE_HOME:-$HOME/.local/state}/email-archive/packets"
+# Packets are private job material: they live with the appflow data, not in
+# the repo and not under the mail hub's state, so one path answers "where
+# is that application's CV"
+PACKETS="${APPFLOW_PACKETS:-${XDG_STATE_HOME:-$HOME/.local/state}/appflow/submissions}"
 REPO="$(git rev-parse --show-toplevel)"
 
 id=""
@@ -202,7 +205,7 @@ if [ -n "$jd" ] && [ -f "$store_path/selection.json" ]; then
   echo "audit     $store_path/selection.json"
 fi
 
-target="${out:-$STATE/$name}"
+target="${out:-$PACKETS/$name}"
 mkdir -p "$(dirname "$target")"
 # A packet is private: it carries the phone number and street address decrypted
 # at build time. The repo is public, so an --out pointing into it is refused

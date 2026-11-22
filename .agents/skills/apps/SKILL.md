@@ -66,4 +66,18 @@ the projection; `agents:apps:packet ID=<id>` builds the PDFs. Replies are
 mailbox DRAFTS, never sent: `agents:apps:draft ID=<id> BODY=file DRY=1`;
 `agents:apps:drafts` lists them — both need himalaya; Typst needs /srv/data.
 
+Nothing lives in the repo: a packet carries a phone number and a street
+address, and this tree is public. Packets and sheets go to
+`~/.local/state/appflow/submissions/<id>` (legacy material moved there
+2026-11-22, `95ba04a1`), built packets link under
+`~/.local/state/email-archive/packets/`, JDs to `~/.config/appflow/jd/<id>.txt`
+(or `apps:docs`), and every record to the delphi hub DB. `git add -f` under
+`submissions/` is refused by the pre-commit hook; `appflow-packet.sh --out`
+inside the repo exits 2.
+
+Packets are built to a store path and linked under
+`${APPFLOW_PACKETS:-~/.local/state/appflow/submissions}/<id>`. They are private —
+a phone number and a street address — so they never enter the repo: `submissions/`
+is untracked and the pre-commit hook refuses that path.
+
 Truth: `taskfiles/apps.yml`, `taskfiles/agents.yml`, `modules/plugins/appflow/`, `docs/email-archive.md`.

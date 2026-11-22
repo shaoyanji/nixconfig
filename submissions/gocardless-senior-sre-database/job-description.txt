@@ -1,0 +1,165 @@
+About us
+
+GoCardless, a Mollie company, is a global leader in bank payments. Over 100,000 businesses, from start-ups to household names, use GoCardless to collect, manage and send bank payments through Direct Debit, real-time payments and open banking. With US$130bn+ processed annually across 30+ countries, we handle recurring and one-off payments without the chasing, stress, or expensive fees. Our end-to-end payment platform also features AI-powered solutions to improve payment success and reduce fraud, alongside connections to over 350 platforms businesses use everyday.
+
+We are headquartered in the UK, with teams and operations spanning North America, Europe and Asia-Pacific.  For more information, please visit www.gocardless.com and follow us on LinkedIn @GoCardless.
+
+Mollie is the leading payments and financial services partner for business, rooted in Europe, with global reach.
+
+Platform Engineering at GoCardless
+
+The Platform Engineering team is a unified, globally distributed team, currently located in London, Riga and Lisbon. We work with all other engineering teams to empower them to build, release, run and scale their products, with a strong focus on both strategic project delivery and operational excellence.
+
+Our work is a balance of:
+
+Project delivery: building new platform components, from initial design to deployment.
+
+Operational support: keeping our systems healthy and stable through on-call rotations and incident management.
+
+Business as usual: continuous maintenance, improvements, and support for audits and compliance.
+
+The role
+
+We’re looking for a Senior SRE with deep PostgreSQL expertise to own the reliability, performance and scalability of our database estate. Our databases sit at the heart of a payments platform, so slowdowns and outages directly affect our customers.
+
+You’ll work across our self-managed Stolon clusters and our GCP Cloud SQL fleet. Joining Mollie gives us the opportunity to consolidate, modularise and rethink how we run production databases, and you’ll help us do that while keeping everything reliable.
+
+What excites you  
+
+Run our database fleet reliably. Keep our production databases healthy and stable through significant change, including moves between platforms.
+
+Own performance and capacity. Right-size instances, tune connection limits and pooling (PgBouncer), memory and autovacuum settings, and fix slow queries, N+1s and unused indexes before customers feel them.
+
+Own upgrades and change. Lead major-version database upgrades end to end with minimal downtime, and own safe schema migrations, data migrations and backfills.
+
+Build in resilience. Reduce idle-in-transaction sessions, tighten statement timeouts, and design and test failover, replication and backup and recovery.
+
+Make it observable. Build dashboards and alerts in Grafana, Prometheus and Datadog to track saturation, latency and connection health.
+
+Partner with application teams. Help them use their databases well and improve their query patterns.
+
+Respond and learn. Take part in on-call, mitigate live database incidents, and run root cause analyses to prevent repeats.
+
+What excites us
+
+Skills
+
+Typically 5+ years of production experience running PostgreSQL, including high availability, replication, and backup and recovery
+
+Deep knowledge of Postgres performance and tuning: internals (memory settings, autovacuum, locking) and connection pooling, including managing it in production and supporting it on call
+
+Experience running production databases in the cloud, whether on managed services or self-managed on cloud infrastructure
+
+Strong query analysis skills (EXPLAIN plans, indexing strategy)
+
+Experience running major-version upgrades safely with minimal downtime
+
+Experience managing infrastructure as code with Terraform or similar IaC tooling
+
+Experience with monitoring and alerting (Prometheus, Grafana, Datadog or similar)
+
+Experience writing code/working in software engineering teams
+
+Experience with on-call and incident response
+
+Ability to influence application teams
+
+Nice to have
+
+Experience with Stolon, or similar Postgres HA tooling
+
+Experience with managed cloud Postgres (GCP CloudSQL, AWS RDS etc.)
+
+Experience with Kubernetes, GKE and ArgoCD
+
+Experience migrating databases between platforms
+
+Experience with SLOs and error budgets
+
+Experience in payments or financial services
+
+Why it matters
+
+We hope you’re enthusiastic about the infrastructure space and the impact your work can have on others. In this role:
+
+You’ll work on a core system with direct, measurable impact on the reliability of the payments.
+
+You’ll solve hard performance and reliability problems in systems that matter.
+
+You’ll shape our database approach at a pivotal moment, as joining Mollie opens up choices about how we structure our estate.
+
+You’ll have real influence on technical design and decisions, and the chance to raise the bar for those around you.
+
+You’ll work closely with application teams and build easy-to-understand, maintainable tools and automation.
+
+Tech stack and tools
+
+PostgreSQL, Stolon, Cloud SQL, PgBouncer
+
+Python, Ruby, Golang
+
+Terraform, Atlantis
+
+GCP
+
+Kubernetes, GKE
+
+GitHub, ArgoCD
+
+Grafana, Prometheus, Datadog
+
+We use a wide range of technologies and will never expect you to have experience with all of them.
+
+Base salary range: €76,000 - €114,000
+
+Base salary ranges are based on role, job level, location, and market data. Please note that whilst we strive to offer competitive compensation, our approach is to pay between the minimum and the mid-point of the pay range until performance can be assessed in role. Offers will take into account level of experience, interview assessment, budgets and parity between you and fellow employees at GoCardless doing similar work.
+(some of) The good stuff
+
+Wellbeing - stay healthy with dedicated support and medical cover
+
+Lunch- based on the location, you either get a meal voucher or a paid lunch when working from the office
+
+Work away scheme - gives you the option to work away from your country of residence for up to 20 working days in any 12-month period
+
+Adaptive Working - allows you to work flexibly, around your lifestyle
+
+Parental leave - to suit everyone embarking on life's great adventure
+
+Learning Budget - lead your own development with an annual learning budget
+
+Time off - generous holiday allowance + volunteer days for ERG events + one day off if you need to move house
+
+Life at GoCardless  
+
+We're an organisation defined by our values; We start with why before we begin any project, to ensure it’s aligned with our mission. We make it happen, working with urgency and taking personal accountability for getting things done. We act with integrity, always. We care deeply about what we do and we know it's essential that we be humble whilst we do it. Our Values form part of the GoCardless DNA, and are used to not only help us nurture and develop our culture, but to deliver impactful work that will help us to achieve our vision. 
+
+Diversity & Inclusion
+
+As of April 2025, we had 806 employees (GeeCees) globally, with 524 based in the UK, 163 based in Latvia and 119 across our other offices.
+
+To ensure that we're representative of the world around us - and to be able to review relevant benchmarks - we ask GeeCees to voluntarily disclose diversity data. This year, the proportion of GeeCees providing data increased to 88% (up from 79% in 2024). With regards to diversity within GoCardless, we can see GeeCees identifying as:
+
+Asian, Black, Mixed or Other — 25% 
+
+Neurodiverse — 9% 
+
+LGBTQIA+ — 9% 
+
+Disabled — 1% 
+
+Average age — 33
+
+Female — 45%
+
+Male —  55% 
+
+We’re rooting for you during your application and GoCardless aims to provide reasonable adjustments to make our recruitment process as remarkable and accessible as we can. Please speak to your Talent Partner if you need extra support.
+
+If you want to learn more, you can read about our Employee Resource Groups and objectives here
+
+Sustainability
+
+We’re committed to reducing our impact on the environment, leaving a more sustainable world for future generations. Check out our sustainability action plan here.
+
+Find out more about Life at GoCardless via Twitter, Instagram and LinkedIn. 
+

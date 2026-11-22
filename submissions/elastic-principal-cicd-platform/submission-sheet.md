@@ -4,7 +4,7 @@
 account created. The record is `prep` and stays there until someone decides to send it.
 
 The role sits in Elastic's Platform Engineering Productivity team, which owns CI, CD and
-release infrastructure for the company. The posting is explicit that the leverage is
+release infrastructure for the company. The posting is explicit that the influence runs
 through other engineers: roadmap ownership, release gates, supply-chain integrity,
 incident command on release incidents, and standards adopted by teams that do not report
 to the role. Elastic is the search and search-AI company; the platform team's problem is

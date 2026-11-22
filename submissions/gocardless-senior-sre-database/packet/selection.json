@@ -1,0 +1,296 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 8218,
+    "terms": [
+      {
+        "term": "cloud",
+        "weight": 22.609
+      },
+      {
+        "term": "database",
+        "weight": 22.609
+      },
+      {
+        "term": "postgresql",
+        "weight": 18.183
+      },
+      {
+        "term": "engineering",
+        "weight": 16.724
+      },
+      {
+        "term": "postgres",
+        "weight": 16.137
+      },
+      {
+        "term": "databases",
+        "weight": 15.97
+      },
+      {
+        "term": "kubernetes",
+        "weight": 14.67
+      },
+      {
+        "term": "sql",
+        "weight": 14.67
+      },
+      {
+        "term": "systems",
+        "weight": 14.67
+      },
+      {
+        "term": "data",
+        "weight": 13.651
+      },
+      {
+        "term": "sustainability",
+        "weight": 13.019
+      },
+      {
+        "term": "datadog",
+        "weight": 12.005
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "Risk Calculation Engine (Swirl Engine)",
+        "score": 7.1076
+      },
+      {
+        "name": "Master's Thesis",
+        "score": 5.6784
+      },
+      {
+        "name": "bountystash",
+        "score": 4.9421
+      },
+      {
+        "name": "matt.bountystash.com",
+        "score": 3.6978
+      },
+      {
+        "name": "kelly-svg",
+        "score": 3.3877
+      },
+      {
+        "name": "fibtransponder",
+        "score": 2.5293
+      }
+    ],
+    "kept": [
+      "Postgraduate Renewable Energy",
+      "nixconfig",
+      "kev-time",
+      "Vulnerability operations concept"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web Development",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Database",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programming Languages",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "portfolio"
+        },
+        {
+          "score": 0.0,
+          "text": "due diligence"
+        }
+      ],
+      "kept": 6,
+      "name": "Energy & Risk",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Security",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 3.1392,
+          "text": "Built an algorithm for options trading and hedging on weather derivatives"
+        },
+        {
+          "score": 2.1919,
+          "text": "Advised clients and acted as in-house Risk Manager for a top German energy trader"
+        },
+        {
+          "score": 2.0747,
+          "text": "Built apps for clients holding land portfolios valued above USD 300M"
+        },
+        {
+          "score": 1.7329,
+          "text": "Audited bug bounty programmes"
+        },
+        {
+          "score": 1.3099,
+          "text": "Built risk-adjusted PPA trading models for energy companies"
+        },
+        {
+          "score": 0.0,
+          "text": "Built an immutable web templating language that is invulnerable to scripting attacks"
+        },
+        {
+          "score": 0.0,
+          "text": "Risk-managed gas storage and gas swing trading models as risk manager for EWE Trading"
+        },
+        {
+          "score": 0.0,
+          "text": "Developed a Fibonacci binary tree algorithm for computational scientists"
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 10
+    },
+    {
+      "dropped": [
+        {
+          "score": 6.3565,
+          "text": "Built financial models and managed 10 MW of solar PV power plants"
+        },
+        {
+          "score": 6.0003,
+          "text": "Designed a mobile app for enterprise employees hunting new project opportunities"
+        },
+        {
+          "score": 3.6097,
+          "text": "Worked with clients, banks and deal brokers on a dozen USD 4-5M projects"
+        },
+        {
+          "score": 1.4149,
+          "text": "Scoped and ran due diligence on O&M projects as cover for project managers"
+        },
+        {
+          "score": 1.4017,
+          "text": "Documented and managed software and IT administration for the company and its subsidiaries"
+        },
+        {
+          "score": 0.0,
+          "text": "Headed asset management of a USD 100M+ portfolio"
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 7.5871,
+          "text": "Ran customer service and support for clients"
+        },
+        {
+          "score": 1.4017,
+          "text": "Advised clients on cybersecurity software and risk management"
+        },
+        {
+          "score": 0.0,
+          "text": "Managed a pipeline of USD 100M+ projects"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verified geometry matrices in Mathematica"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 3.8447,
+          "text": "Led safety training for crew members"
+        },
+        {
+          "score": 0.0,
+          "text": "Managed two frac crews carrying USD 3M+ of work per week"
+        },
+        {
+          "score": 0.0,
+          "text": "Worked twelve-hour shifts in the field"
+        },
+        {
+          "score": 0.0,
+          "text": "Troubleshot chemicals and equipment on site"
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

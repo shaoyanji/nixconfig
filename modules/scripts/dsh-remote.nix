@@ -9,9 +9,6 @@ pkgs.writeShellApplication {
     openssh
     coreutils
     gnugrep
-    # The service URL and state are scraped out of the remote answer with `sed`
-    # on this side of the ssh, so the wrapper has to carry it: systemd's PATH
-    # has no sed and the unit would fail on its second line of work.
     gnused
     gawk
     curl

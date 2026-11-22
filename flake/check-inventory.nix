@@ -98,6 +98,7 @@
     "checks:repo:hostpaths" = "leaf";
     "checks:repo:hostpaths:test" = "leaf";
     "checks:repo:paths" = "leaf";
+    "checks:shell-inputs" = "leaf";
     "checks:restic:drill" = "leaf";
     "checks:router" = "leaf";
     "checks:selector" = "leaf";

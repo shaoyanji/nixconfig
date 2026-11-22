@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T11:37:04Z",
+  "generated": "2026-11-22T11:37:51Z",
   "count": 200,
-  "pin": "a131eeccd2f3a952be677e265b5d36aff1c099b0f5c692c0701f38ddbb205820",
+  "pin": "ef215cf3a1fb4fa7b088d307b23f9b014f5a4d7b159b52c706bb4f419d928356",
   "turns": [
+    {
+      "id": "8384f922-a52c-489e-aaef-d3d7ab2b6af2",
+      "ts": "2026-11-22T11:37:08Z",
+      "source": "devin",
+      "subject": "job-hunt:grafana-analytics-dossier",
+      "action": "landed: grafana-db-analytics dossier (2pp CV 839w + 1pp letter 439w, typst+prose gates clean, fit raised 4->5 on context-layer match)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "24567e3b8d3e14bb3159816971493f41d097abd0",
+      "branch": "main",
+      "frame": "03ha751v56yqpyxyd040jm26t"
+    },
     {
       "id": "bc3d9cdc-583f-47f1-a6ca-a8aa704f7149",
       "ts": "2026-11-22T11:36:55Z",
@@ -2777,19 +2790,6 @@
       "base_commit": "b450894cb9f7f3f6db9175169273172f8cca5f17",
       "branch": "main",
       "frame": "03ha6ij9rvojz5s48m5ip43kw"
-    },
-    {
-      "id": "078f8ae6-cf0d-4da1-9208-926c0859936d",
-      "ts": "2026-11-22T09:41:46Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "alexander-thamm: Join.com already holds a submitted application (55774203, status=Übermittelt, both PDFs) — verified via magic-link auth; no duplicate filed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bee06c65a0f93e7fb9e891b71e95deaa544946e3",
-      "branch": "main",
-      "frame": "03ha6iikyrdkz9bs4wqgl2ude"
     }
   ]
 }

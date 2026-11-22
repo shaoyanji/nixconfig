@@ -1,8 +1,83 @@
 {
-  "generated": "2026-11-22T11:30:54Z",
+  "generated": "2026-11-22T11:34:19Z",
   "count": 200,
-  "pin": "80c7b7dbbc09b305a809497a13b161751bf009d11e170569ae379b0b24b7eee3",
+  "pin": "f8a358591dadf321d155d9a26d515e8c66cf51fc57e37efd5cc702422141363f",
   "turns": [
+    {
+      "id": "25018623-7a12-40d4-973a-b2b02d44df34",
+      "ts": "2026-11-22T11:34:01Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building navvis (pane 1), submitting grafana-security-assurance (pane 2), migrating stackit (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/navvis",
+        "submissions/grafana-security-assurance",
+        "submissions/stackit"
+      ],
+      "files": [],
+      "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
+      "branch": "main",
+      "frame": "03ha74fyd9908hm7fg9xgdst5"
+    },
+    {
+      "id": "d5e2ab57-f847-4a7c-ae27-de780510851f",
+      "ts": "2026-11-22T11:33:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:navvis",
+      "action": "claim: native English Typst dossier (2pp CV + 1pp letter) + sheet, Senior Linux Platform Engineer",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/navvis"
+      ],
+      "files": [],
+      "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
+      "branch": "main",
+      "frame": "03ha749uqa80aslimqvg6eq91"
+    },
+    {
+      "id": "1f18d24d-ff7d-4b4e-9b27-360645d2a2bd",
+      "ts": "2026-11-22T11:32:54Z",
+      "source": "devin",
+      "subject": "job-hunt:scout24",
+      "action": "blocked: Scout24 custom portal Turnstile 'Verification failed' - submit gated on token that never issues headless; form fully staged, marked manual",
+      "outcome": "blocked: turnstile",
+      "claims": [],
+      "files": [],
+      "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
+      "branch": "main",
+      "frame": "03ha7482wy0x0gws2aoa716iq"
+    },
+    {
+      "id": "92cd2bba-5535-46cc-b5b3-f064777327e7",
+      "ts": "2026-11-22T11:31:45Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building trawa (pane 1), submitting scout24-lead-platform-engineer (pane 2), migrating stackit (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/trawa",
+        "submissions/scout24-lead-platform-engineer",
+        "submissions/stackit"
+      ],
+      "files": [],
+      "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
+      "branch": "main",
+      "frame": "03ha7402ozcbntrd0vgfkfqum"
+    },
+    {
+      "id": "ae8ccded-1c96-4d50-a5cc-045fb5ef3a70",
+      "ts": "2026-11-22T11:31:02Z",
+      "source": "freebuff",
+      "subject": "nixconfig:trawa",
+      "action": "correction: the previous done turn named eb1a1190 in error (git index.lock blocked the commit). Real commit is 1750c82e: native English Typst dossier, 2pp CV 1049 words + 1pp letter 502 words, selection.json and Nix-built PDFs retired | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
+      "branch": "main",
+      "frame": "03ha73uyrpkn5ao9a7jc2f0w7"
+    },
     {
       "id": "6c6a70f0-ffab-4fe3-a68f-4a3d7e5462cc",
       "ts": "2026-11-22T11:30:53Z",
@@ -2703,71 +2778,6 @@
       "base_commit": "33d77b647d59993290bf45bb67daf241e8aea389",
       "branch": "main",
       "frame": "03ha6hm06vjftrnfhjy8sao9l"
-    },
-    {
-      "id": "5e52a666-e1f9-46b8-bed1-c9fda12acb25",
-      "ts": "2026-11-22T09:36:21Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "bwi submitted via BWI portal (64059) | 'Vielen Dank' confirmation verified",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "33d77b647d59993290bf45bb67daf241e8aea389",
-      "branch": "main",
-      "frame": "03ha6hgiqa2dodywulk06rdz0"
-    },
-    {
-      "id": "56a61d4d-27df-463a-a234-b75bb36e1efa",
-      "ts": "2026-11-22T09:35:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "sva-linux upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9a4eba5a49c3380d9e7ed690a8cd185b727ffa2c",
-      "branch": "main",
-      "frame": "03ha6hbghso9pt0m646s1159w"
-    },
-    {
-      "id": "17b5e953-9a91-42d2-afbb-712193d619dc",
-      "ts": "2026-11-22T09:34:01Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "dfs upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cf47993f2e0f5fd360f3f6d1206790a023790a13",
-      "branch": "main",
-      "frame": "03ha6h02oym7b2io97he8kg4w"
-    },
-    {
-      "id": "2480c7d6-eb6e-4400-aecb-671ade6df0f6",
-      "ts": "2026-11-22T09:33:57Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "telekom upgraded to native Typst packet | 2pp CV + 1pp letter | residence status and Karlsruhe anchor added",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ecf36bb457d66225dbc490a812363f911058a268",
-      "branch": "main",
-      "frame": "03ha6gziy37zl5sqgojx3hhbh"
-    },
-    {
-      "id": "9213f1ea-6f86-4ff4-bc45-f76dbeb2526a",
-      "ts": "2026-11-22T09:33:33Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: bwi karriere.bwi.de submission (64059)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
-      "branch": "main",
-      "frame": "03ha6gwrzuzkho3gy1eeuzl82"
     }
   ]
 }

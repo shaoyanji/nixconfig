@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T10:07:15Z",
+  "generated": "2026-11-22T10:09:53Z",
   "count": 200,
-  "pin": "523f13d29f0e8b16e6b24c10efebaae3d43031a14b768bfd087489d53aebe44a",
+  "pin": "3b16e5add4c36e4f6f91b6d50038d1bf407dc1e604501c5f387f08c05585e0b9",
   "turns": [
+    {
+      "id": "130215d7-f804-49f3-9d21-d9a263a3ac91",
+      "ts": "2026-11-22T10:09:12Z",
+      "source": "freebuff",
+      "subject": "nixconfig:adyen-platform-genai",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "70666a92f76f11d02884279f2dbd7951717e6123",
+      "branch": "main",
+      "frame": "03ha6nvj5xivsgvtnpc4jvh9v"
+    },
+    {
+      "id": "cd50dc30-f4e7-45be-accb-6cab0e849285",
+      "ts": "2026-11-22T10:08:34Z",
+      "source": "devin",
+      "subject": "nixconfig:flox",
+      "action": "claim: Ashby submission (sibling record claims applied 11-21; verifying by attempt)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "7f18ab37b39630e3c657f6f7c2a928c74d4011c5",
+      "branch": "main",
+      "frame": "03ha6nr22w84s0xha6tywgucf"
+    },
+    {
+      "id": "7c45bdac-74e6-4c51-8743-403f13e4af27",
+      "ts": "2026-11-22T10:07:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:coreweave",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7f18ab37b39630e3c657f6f7c2a928c74d4011c5",
+      "branch": "main",
+      "frame": "03ha6ni0wav70vck2jj4yin70"
+    },
     {
       "id": "41c8e8bb-b227-44c4-b1ca-f91093247e2f",
       "ts": "2026-11-22T10:06:47Z",
@@ -2659,51 +2698,6 @@
       "base_commit": "af3c86bae95330e0285c65fd0a1b6ec1f9ef8e81",
       "branch": "main",
       "frame": "03ha5qy5hxmmk87cniff5xzux"
-    },
-    {
-      "id": "f97bc473-dc6a-4f29-8205-21664238d065",
-      "ts": "2026-11-22T07:17:14Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: nebius token-factory SRE via Greenhouse embed; sheet mapped; watch Turnstile (sibling berlin req was turnstile-blocked)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/nebius-token-factory"
-      ],
-      "files": [],
-      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
-      "branch": "main",
-      "frame": "03ha5qa7im8tpxv6yjrkmb3mp"
-    },
-    {
-      "id": "bfbc3df7-dca6-4644-8ad6-b39dc9736d50",
-      "ts": "2026-11-22T07:16:30Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:job-search",
-      "action": "claim: submitting nebius token factory (pane 2), building ionos sre karlsruhe (pane 1), building bechtle devops k8s (pane 3)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/nebius-token-factory",
-        "submissions/ionos-sre",
-        "submissions/bechtle-devops"
-      ],
-      "files": [],
-      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
-      "branch": "main",
-      "frame": "03ha5q52029s9oxc95poeixbu"
-    },
-    {
-      "id": "b3d7b463-be10-48e3-863d-12b94c5a67a8",
-      "ts": "2026-11-22T07:12:50Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "manual: stackit GT1923 requires manual upload",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
-      "branch": "main",
-      "frame": "03ha5pf97l1rirj703qb7pa95"
     }
   ]
 }

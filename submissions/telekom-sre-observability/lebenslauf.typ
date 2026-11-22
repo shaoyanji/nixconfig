@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
 #set page(paper: "a4", margin: (top: 1.5cm, bottom: 1.5cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
-#set par(leading: 0.58em, justify: true)
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 11pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set par(leading: 0.66em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
@@ -44,6 +44,7 @@
   "Betriebstelemetrie selbst gebaut: JSONL-Ledger mit Zeitstempel alle fünfzehn Minuten — Jobstatus, Alter der laufenden Generation, Plattenplatz, Speicher- und Prozessdruck",
   "Alarme, die ankommen: eine Brücke in Go führt eine Störung erst dann als gemeldet, wenn die Zustellung bestätigt ist; ausgelöst und zugestellt werden nicht verwechselt",
   "Prüfungen von außen auf Erreichbarkeit und Antwortzeit; Diagnose aus Ledger und Logs statt aus Vermutungen",
+  "Störungen im Journal eingegrenzt: erst der Zeitpunkt im Ledger, dann die systemd-Einheit und ihr Verlauf in journald, dann die Regel oder das Modul, das sie verursacht hat",
   "Signale vor dem Ausfall: Druck, Wachstum der Sicherungen und Alter der Generation als Vorlaufgrößen, nicht der Ausfall selbst",
   "Knoten als Beschreibung: gepinnte Eingaben, Prüfung vor dem Rollout, Rückkehr zur vorigen Generation in Minuten statt in einer Nacht",
   "Linux-Interna und Zugang: cgroups, Namespaces, systemd-Härtung, nftables, WireGuard, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten, Secrets pro Host",
@@ -83,7 +84,7 @@
 
 #section("Kenntnisse")
 #text(weight: "bold")[Betrieb] — Linux-Knoten, systemd, cgroups, Namespaces, PSI, Boot und Wiederherstellung, PXE \
-#text(weight: "bold")[Beobachtung] — Ledger mit Zeitstempel, Prüfungen von außen, Alarmbrücke mit Zustellbestätigung, Vorlaufgrößen, Auswertung in Python \
+#text(weight: "bold")[Beobachtung] — Ledger mit Zeitstempel, journald und journalctl-Diagnose, Prüfungen von außen, Alarmbrücke mit Zustellbestätigung, Vorlaufgrößen, Auswertung in Python \
 #text(weight: "bold")[Sicherheit] — eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten, Secrets pro Host (sops, age), WireGuard, nftables, Härtung nach systemd-Vorgaben \
 #text(weight: "bold")[Auslieferung] — Nix als reproduzierbare Beschreibung, Gates, Rückrollung über Generationen \
 #text(weight: "bold")[Code] — Go, Python, Shell; Automatisierung, Auswertung, Berichte \

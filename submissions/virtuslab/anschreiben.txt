@@ -1,0 +1,41 @@
+Matt Ji
+Am Burgerhof 4 · 79261 Gutach im Breisgau, Germany
+matt@bountystash.com · +49 1733281570
+22 November 2026
+
+Virtus Lab Sp. z o.o.
+Tooling Space
+
+Application: Linux Hacker & Nix Wizard (Senior / Expert)
+Dear VirtusLab team,
+I run a NixOS fleet the way your posting describes the work: one flake declares thirteen hosts, each
+host registers a feature list instead of a hand-edited machine, secrets are SOPS-encrypted per
+host, SSH goes through a certificate authority, and CI runs the same module gate the hosts run.
+Inputs are pinned and host paths pin their submodules, so a rebuild is a function of the repository
+rather than of the day it ran.
+Flake architecture is where I do my most careful work. Option surface is what a gate pays for, so
+modules are keyed, imports only go downward, and a fact is answered by evaluation rather than
+by building a machine. The same discipline scales down: the Go risk engine I built is containerised
+by a flake, so its toolchain comes out of the lock file rather than out of someone’s shell history.
+Underneath the declaration I work at the systemd and kernel boundary — units and sockets,
+journald, initrd contents, module parameters, PSI pressure and generation age are what separate
+a broken configuration from a sick host, with strace and tcpdump for when the boundary itself is the
+suspect. I have written the services too, in Go and Python, and I automate in Python daily.
+What I have not run in production is eBPF, perf or valgrind as diagnostic programmes of my own;
+my kernel-level diagnosis has come through systemd, journald and PSI rather than through bpf()
+probes. Nor have I worked with GraphDB, Neo4j, Kafka or a large Java codebase. On the ESM
+project that is a real part of the job, and I would rather name it than let a keyword carry the
+interview. What transfers is a method: map the system, instrument the boundary that is actually
+failing, make the fix reproducible, and leave the next person a runbook rather than a memory.
+On logistics: I am a US citizen with permanent German residence, so I have unrestricted EU right
+to work and need no sponsorship. I am based in Germany at UTC+1, which matches your hiring
+timezone, and I would work under a B2B contract. Two things I would want to confirm early: that a
+Germany-based contractor fits your engagement model for a remote-Poland role, and the rate — I
+have staged an expectation in the application, and I would rather agree it in the first conversation
+than fix it in a letter.
+I am available from 1 December 2026, English is my first language and my German is C1. The
+repository is the honest version of this letter: https://github.com/shaoyanji/nixconfig
+Kind regards,
+Matt Ji
+
+

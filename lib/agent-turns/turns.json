@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-22T11:40:57Z",
+  "generated": "2026-11-22T11:44:08Z",
   "count": 200,
-  "pin": "4bf79de80c3cfc1a6e4d15a9dd75f3c454bdc147024f3c1064426d23576c0871",
+  "pin": "8caaaad36d5820848d2e32ab3033be66124a021608aaaf4f4aacc3c69d93424b",
   "turns": [
+    {
+      "id": "a628f5c8-a231-42ac-8cc6-ee8cb87702cc",
+      "ts": "2026-11-22T11:43:09Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building virtuslab (pane 1), submitting grafana-db-analytics (pane 2), querying ptb (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/virtuslab",
+        "submissions/grafana-db-analytics",
+        "submissions/ptb-hpc-linux"
+      ],
+      "files": [],
+      "base_commit": "85ba4b8cf4999b2d9e4b426369945f6e609bd99a",
+      "branch": "main",
+      "frame": "03ha7686pp1tj1vakge35l7az"
+    },
+    {
+      "id": "5109d2e2-d869-4173-a1db-2b03aa901078",
+      "ts": "2026-11-22T11:42:59Z",
+      "source": "freebuff",
+      "subject": "nixconfig:virtuslab",
+      "action": "claim: native English Typst dossier (2pp CV + 1pp letter) + sheet, Linux Hacker & Nix Wizard",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/virtuslab"
+      ],
+      "files": [],
+      "base_commit": "85ba4b8cf4999b2d9e4b426369945f6e609bd99a",
+      "branch": "main",
+      "frame": "03ha76717wwhb55evgjp33zj3"
+    },
+    {
+      "id": "b7ed6e92-2b76-4c37-a493-f5eac25382e3",
+      "ts": "2026-11-22T11:41:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-devtools",
+      "action": "landed: native Typst rebuild of the applied Nebius DevTools SRE packet (submitted 2026-11-21, nothing resubmitted). 2pp CV 1000 words + 1pp letter 438 words, 0 warnings, selection.json retired, cloud/Kotlin claims dropped | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "85ba4b8cf4999b2d9e4b426369945f6e609bd99a",
+      "branch": "main",
+      "frame": "03ha75u1eqxsr932nlq1ly484"
+    },
     {
       "id": "afb53f77-fc42-4dd1-8052-3a489bb3b404",
       "ts": "2026-11-22T11:39:48Z",
@@ -2757,45 +2802,6 @@
       "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
       "branch": "main",
       "frame": "03ha6jcgp20erzibg4uur5qcr"
-    },
-    {
-      "id": "a8892847-6893-4e41-b997-b825d5edcbb6",
-      "ts": "2026-11-22T09:45:50Z",
-      "source": "freebuff",
-      "subject": "nixconfig:ionos-sre",
-      "action": "closed-check: Greenhouse board has 49 open IONOS jobs, req 4956674101 absent (API 404); packet compiled, needs a live req or retarget",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1e103053407fb74cdd8ed901654ea6a944bb1dc3",
-      "branch": "main",
-      "frame": "03ha6jb5grvn2bgfgg7jnnqga"
-    },
-    {
-      "id": "e0df1f0a-eaa1-4978-841b-cfe21f3685d1",
-      "ts": "2026-11-22T09:45:20Z",
-      "source": "freebuff",
-      "subject": "nixconfig:ionos-sre",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1e103053407fb74cdd8ed901654ea6a944bb1dc3",
-      "branch": "main",
-      "frame": "03ha6j7l2w52qxtr4hbruczyj"
-    },
-    {
-      "id": "adfb094b-ca51-46dc-a97b-6253b148ebca",
-      "ts": "2026-11-22T09:44:09Z",
-      "source": "freebuff",
-      "subject": "nixconfig:bechtle-cloud-platform-engineer-remote",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ba6841e53149580d71070cb32e0d91627cf80fcb",
-      "branch": "main",
-      "frame": "03ha6izcnzmbgz3fqbllpqmnm"
     }
   ]
 }

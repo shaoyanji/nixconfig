@@ -1,108 +1,68 @@
 # Workato — Senior Infrastructure Engineer (PostgreSQL DBA)
 
-**Status: packet staged, not submitted.** Prepared 2026-11-21. Nothing sent.
+Greenhouse **8842211002** · REQ **2960** · posted 2026-11-15, Greenhouse copy updated 2026-11-20 · Berlin · Frankfurt · Munich · no remote per the listing.
+No band published; target **EUR 130,000–150,000** (USD 140,000–165,000).
 
-## Role
+**Status:** applied 2026-11-21 through Greenhouse 8842211002. This rebuild keeps the submitted claims, adds the schema detail that was missing, and names
+the scale gaps the posting actually probes for.
 
-| Field | Value |
-| :--- | :--- |
-| Company | Workato |
-| Role | Senior Infrastructure Engineer (PostgreSQL DBA) |
-| Role ID | `workato-senior-infrastructure-engineer-postgresql-dba` |
-| Requisition | REQ 2960 |
-| Apply URL | https://job-boards.greenhouse.io/workato/jobs/8842211002 |
-| Greenhouse job id | 8842211002 (posting updated 2026-11-20) |
-| Source listing | https://www.arbeitnow.com/jobs/companies/workato/senior-infrastructure-engineer-postgresql-dba-berlin-frankfurt-munich-228113 (posted 2026-11-15) |
-| Locations (Greenhouse) | Berlin, Germany; Frankfurt, Germany; Munich, Germany |
-| Employment | Full-time, on-site/no remote per the listing |
-| Compensation | Not published. Target **EUR 130,000 – 150,000** (or **USD 140,000 – 165,000**). |
-| Category / language | `tech`, `en` |
-| JD | `job-description.txt` |
+## Legacy packet, now genuinely in git history
 
-## Candidate facts
+All five files were untracked, so they were committed unchanged first (`appflow(workato): stage the pre-Typst packet before the rebuild`) and retired in the
+rebuild commit:
 
-| Field | Value |
-| :--- | :--- |
-| Name | Matt Ji |
-| Address | Am Burgerhof 4, 79261 Gutach im Breisgau, Germany |
-| Email | matt@bountystash.com |
-| Phone | +49 1733281570 |
-| LinkedIn | https://linkedin.com/in/mattji |
-| GitHub | https://github.com/shaoyanji |
-| Website | https://www.bountystash.com |
-| Citizenship | United States |
-| Residence | Germany — unbefristete Niederlassungserlaubnis (permanent) |
-| Work authorization | US and Germany/EU; no visa sponsorship required |
-| German | C1 (verhandlungssicher) |
-| English | Native |
-| Availability | 01.12.2026 |
+| Artefact | sha256 (first 16) | What it was |
+| :--- | :--- | :--- |
+| `lebenslauf.pdf` | `83f17bbc4f8869cc…` | Nix CV, "Infrastructure and database engineer", no schema detail |
+| `anschreiben.pdf` | `9906a00e9d20cef2…` | Nix letter, claimed PostgreSQL operations without naming a single table decision |
+| `selection.json` | `a2de81a7a5fd034c…` | selector output (budget, JD, projects, skills) |
+| `submission-sheet.md` | `2e10f775c5a0927b…` | the 2026-11-21 sheet, this file's predecessor |
+
+`job-description.txt` is kept: a real capture of the posting.
 
 ## Files
 
-- `lebenslauf.pdf` — **2 pages** A4, PDF/UA-1 tagged, page budget enforced by `lib/typeset.nix`
-- `anschreiben.pdf` — **1 page** A4
-- `selection.json` — engineering evidence; projects `nixconfig`, `email-archive`, `bountystash`, `fibtransponder`
-- `job-description.txt` — the JD as fetched
-- `submission-sheet.md` — this file
+| File | Pages | Words | Warnings | sha256 (first 16) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 1110 | 0 | `746dd43481c0e77a` |
+| `anschreiben.pdf` | 1 | 473 | 0 | `6de07b493b6b5921` |
 
-Build: `scripts/task/appflow-packet.sh` → `modules/plugins/appflow/packet.nix`; typst in the Nix sandbox, `cv-ats-check.sh` read the finished PDFs back against `work/resume.json` in the same derivation. Budgets 2 / 1, zero page-budget errors.
+## What the posting asks for, against the repository
 
-## Live Greenhouse form — fields and staged answers
-
-Fields, ids and option sets read from the boards API on 2026-11-21.
-
-| Field | Id | Required | Answer |
-| :--- | :--- | :--- | :--- |
-| First Name | `first_name` | yes | Matt |
-| Last Name | `last_name` | yes | Ji |
-| Email | `email` | yes | matt@bountystash.com |
-| Phone | `phone` | yes | +49 1733281570 |
-| Resume/CV | `resume` | yes | `lebenslauf.pdf` |
-| Cover Letter | `cover_letter` | no | `anschreiben.pdf` |
-| LinkedIn Profile link | `question_38510810002` | **yes** | https://linkedin.com/in/mattji |
-| Authorized to work in the listed country of hire for any employer? | `question_38510811002` | yes | **Yes** |
-| Will you now or in the future require visa sponsorship? | `question_38510812002` | yes | **No** |
-| What is your expected compensation? | `question_38510813002` | yes | `EUR 130,000 – 150,000 base (or USD 140,000 – 165,000 for a USD contract)` |
-| Why do you think you will be successful in this role? | `question_38510814002` | yes | See the drafted answer below |
-| Consent to recruiting SMS messages | `question_39015531002` | yes | Yes/No — Matt's decision; consenting is not required to apply |
-
-### Drafted answer — "Why do you think you will be successful in this role?"
-
-> Because the job is the one I already do at a smaller scale, and the parts I lack are learnable while the parts I have are not quickly taught. I run PostgreSQL as a production service: a full-text archive with a generated tsvector and GIN index, an upsert keyed on message_id, reviewed migrations, and backups that are only called done after a restore into an ephemeral cluster verifies the tables. I work in Linux daily, automate in Go, Python and Bash, and turn runbooks into released procedures rather than heroics. I would be honest about the gaps — no Aurora fleet, no PgBouncer layer, no multi-TB tables — and I would close them by pairing with the team and taking the support rotation seriously from the first week.
-
-## Staged answers for the recruiter call
-
-**Compensation.** EUR 130,000 – 150,000 base; USD 140,000 – 165,000 if the contract is in dollars. Workato publishes no band, so the number is a proposal, not a demand.
-
-**Work authorization.** US citizen with permanent German residence (unbefristete Niederlassungserlaubnis). Authorized in Germany for any employer; no sponsorship now or later.
-
-**Location.** Gutach im Breisgau, Baden-Württemberg. The posting is Berlin/Frankfurt/Munich with no remote flag, so relocation or a commute is a real question — raise it early rather than after an offer.
-
-**The gap statement.** Operational PostgreSQL tenure is below the 5+ year DBA bar; there is no Aurora/RDS or PgBouncer production experience and no multi-TB table work. The sheet and letter say so, because the interview will establish it anyway and a packet that oversells would waste both sides' time.
-
-## Fit map
-
-| Requirement | Evidence | Assessment |
+| Requirement (JD) | Evidence | Verdict |
 | :--- | :--- | :--- |
-| 5+ years operational PostgreSQL | Archive plus Bountystash schema/index work; below five DBA years | **Gap**, stated |
-| Query plans, indexing on multi-TB tables | EXPLAIN on archive search paths, GIN/tsvector design; not multi-TB | Partial |
-| Managed PostgreSQL (Aurora/RDS) | None | **Gap**, stated |
-| PgBouncer in production | None | **Gap**, stated |
-| Logical replication, major upgrades, low-downtime migration | Reviewed migrations; no logical replication/upgrade ownership | Partial |
-| Terraform / IaC | No Terraform; NixOS declarative infrastructure is the equivalent practice | Adjacent, **gap** on the named tool |
-| Linux proficiency | Daily driver; fleet, kernel pinning, systemd, networking | **Strong** |
-| Scripting (Bash/Python/Go) | Go service, Python/Bash tooling | **Strong** |
-| Observability | Sentinel ledger for jobs, generation age, disk, PSI; not postgres_exporter/VictoriaMetrics | Adjacent |
-| Incident response / RCA | Solo-operator incidents, rollbacks, written follow-ups | Partial — no multi-team command |
-| Developer support posture | Runs a platform whose users are services; writes the runbooks | Meets in shape |
-| Location / authorization | Germany, permanent residence, no sponsorship | **Strong** on authorization; location needs a decision |
+| Index and schema design, schema reviews | generated `tsvector` over subject/sender/body with a GIN index; `message_id` upsert key; classifier primary key `(message_id, classifier)` in `modules/services/email-archive.sql` | strong, at my scale |
+| Data migrations and upgrades | ordered migration files applied by the service; a failed step leaves the previous version serving | strong for app-schema change; no `pg_upgrade` |
+| Backups, DR, proving restores | `postgresqlBackup` on the archive host, `pg_dump` in the stack, and EXP-042 (`postgres-backup-drill.nix`): ephemeral cluster, `gzip -dc … | psql` replay, restored table count and entity rows asserted | strong |
+| Observability for the data layer | Sentinel ledger: disk and inode percentages per path with a named degrade reason, PSI, job state, page on bad state and silence | adjacent (host level, not `postgres_exporter`) |
+| Aurora/RDS operations, parameter groups, failover | none | **gap** |
+| PgBouncer connection pooling | none | **gap** |
+| Logical replication, major-version upgrades | none | **gap** |
+| Multi-TB and partitioned tables, dozens of clusters | single-node, one instance per service, largest table in gigabytes | **gap** |
+| Terraform/Ansible automation | Nix, task control plane, pre-commit gates | **partial** — transferable habits, different tool |
+| Linux, scripting (Bash/Python/Go) | thirteen-host NixOS fleet; Go services and CLI tooling; Python and Bash for checks | strong |
 
-## Before submitting
+## Gaps, in both documents
 
-- [ ] Decide the compensation sentence — EUR 130–150k is a proposal, not a published band.
-- [ ] Decide the SMS-consent answer (it does not block the application).
-- [ ] Confirm whether Berlin/Frankfurt/Munich in-office is workable from Gutach, or whether to apply at all.
-- [ ] Attach `lebenslauf.pdf` and the optional cover letter; verify the parser reads name, email and phone.
-- [ ] Submit only on explicit instruction.
+Single-node PostgreSQL by design: no streaming replicas, no failover, no pooler. No Aurora or RDS production experience. No major-version upgrade with
+`pg_upgrade`, no logical replication, no multi-terabyte partitioned tables, no fleet of dozens of clusters, no company-scale database on-call rotation.
+Infrastructure-as-code is Nix rather than Terraform or Ansible. The CV says "gigabytes rather than the multi-terabyte partitioned tables this role tunes" —
+that sentence is the honest distance, not a hedge.
 
-No application was submitted.
+## Route
+
+Applied through Greenhouse 8842211002 on 2026-11-21; the duplicate row is annotated rather than deleted. Relocation to Berlin, Frankfurt or Munich is stated
+because the listing says no remote; no sponsorship needed (US citizen, German permanent residence); start 01.12.2026; target EUR 130–150k, unchanged from the
+submitted version and recorded here because Workato publishes no band.
+
+## Checks
+
+| Gate | Result |
+| :--- | :--- |
+| `typst compile` both sources | 0 warnings each |
+| Page budget | CV 2 pages, letter 1 page (asserted before commit) |
+| `**` in sources | 0 |
+| Curly quotes | 0 |
+| Unsupported stack (Aurora/RDS/PgBouncer/Terraform/Ansible/pg_upgrade) | only inside the gap paragraph |
+| `task checks:prose` | exit 0 |
+| Legacy artefacts | staged first, retired in the rebuild, hashes above |

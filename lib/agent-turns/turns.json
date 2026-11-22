@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-22T12:05:40Z",
+  "generated": "2026-11-22T12:08:15Z",
   "count": 200,
-  "pin": "c101ffb8b52c715bd43254c0a909a39824901e812c531a33146f16585bbf7924",
+  "pin": "6c7b20048f782171c711584363c750dc0229c7c921b01196dcfe007902e8dbba",
   "turns": [
+    {
+      "id": "6c294ae4-17dd-498b-8b1d-49b4f9ba80c6",
+      "ts": "2026-11-22T12:07:51Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:stackit",
+      "action": "landed: stackit packet was already native Typst (no letter.json, no /nix/store link); CV rebalanced 9.5pt (94%/16%) to 12pt/0.7em (93%/77%, break at Projekte), text unchanged, 0 warnings on both sources, sheet measured hash refreshed, DB row stackit updated with new measurements and GT1923 status | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/stackit"
+      ],
+      "files": [],
+      "base_commit": "06a52aa0f63d0a0ca7284e9eb64237306914f263",
+      "branch": "main",
+      "frame": "03ha7b1xasx0h43hko44ol7yu"
+    },
+    {
+      "id": "174ba4d6-ae86-4578-abf9-52ce18fefdf1",
+      "ts": "2026-11-22T12:07:30Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "landed: grafana databases sre (req 6103688004) submitted & confirmed (otp 58690573) | active: devin on mozilla (req 8315181), freebuff frieren on canonical-rust, freebuff delphi on stackit",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "8af61e49642432f5142c2d29c6b6d32f6ebbd7e0",
+      "branch": "main",
+      "frame": "03ha7azh03gxw781ishi8nbo5"
+    },
+    {
+      "id": "cc18f37c-79b4-48d4-8a61-bb1cdefcd8c2",
+      "ts": "2026-11-22T12:06:35Z",
+      "source": "devin",
+      "subject": "job-hunt:grafana-sre",
+      "action": "landed: Grafana Staff SWE Databases SRE (6103688004) applied+confirmed via OTP lane; 4th Grafana req submitted today",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8af61e49642432f5142c2d29c6b6d32f6ebbd7e0",
+      "branch": "main",
+      "frame": "03ha7at0pv9p97q6897tfbuzt"
+    },
+    {
+      "id": "e1943331-a5de-434a-9571-b2e32748f65a",
+      "ts": "2026-11-22T12:05:43Z",
+      "source": "freebuff",
+      "subject": "nixconfig:purestorage",
+      "action": "landed: native Typst dossier for Senior Systems & Storage Engineer — CV 2pp, letter 1pp, 0 warnings, prose exit 0. Replaced a different requisition's packet (CNA 8379480, pre-sales, French-mandatory) and recorded its hashes; no JD exists for this title, so the packet follows the stated pillars | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8af61e49642432f5142c2d29c6b6d32f6ebbd7e0",
+      "branch": "main",
+      "frame": "03ha7amxeoc5o824wi5j52v00"
+    },
     {
       "id": "56296ab9-a40b-4543-adf8-f01cc9634d15",
       "ts": "2026-11-22T12:05:39Z",
@@ -2792,58 +2846,6 @@
       "base_commit": "f70555f7c22a47fb8d5fbb66315584c5be938342",
       "branch": "main",
       "frame": "03ha6oabezud0jex62zoo0sji"
-    },
-    {
-      "id": "de6899b0-c251-47e6-8054-aff2f68ded8d",
-      "ts": "2026-11-22T10:11:16Z",
-      "source": "freebuff",
-      "subject": "nixconfig:trawa",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); fit 4 (AWS/Terraform absent)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "24ef390659f43933fb39c728be1a579128c8cb34",
-      "branch": "main",
-      "frame": "03ha6oa0g9dt2m2j77pdkaerl"
-    },
-    {
-      "id": "d122aff8-0b0b-4c8a-8a01-96ec337233e7",
-      "ts": "2026-11-22T10:10:05Z",
-      "source": "devin",
-      "subject": "nixconfig:flox",
-      "action": "interactive recaptcha image grid at submit | form+files complete | sibling record claims prior apply same req",
-      "outcome": "blocked: recaptcha-image",
-      "claims": [],
-      "files": [],
-      "base_commit": "f70555f7c22a47fb8d5fbb66315584c5be938342",
-      "branch": "main",
-      "frame": "03ha6o1p3mwkmrcxf4im85kyw"
-    },
-    {
-      "id": "50b42b0b-a78c-488d-bd24-ff2fe2c1c3ca",
-      "ts": "2026-11-22T10:09:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:adyen-platform-observability",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f70555f7c22a47fb8d5fbb66315584c5be938342",
-      "branch": "main",
-      "frame": "03ha6o0ln915o6larlb0myucs"
-    },
-    {
-      "id": "130215d7-f804-49f3-9d21-d9a263a3ac91",
-      "ts": "2026-11-22T10:09:12Z",
-      "source": "freebuff",
-      "subject": "nixconfig:adyen-platform-genai",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "70666a92f76f11d02884279f2dbd7951717e6123",
-      "branch": "main",
-      "frame": "03ha6nvj5xivsgvtnpc4jvh9v"
     }
   ]
 }

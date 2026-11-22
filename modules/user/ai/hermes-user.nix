@@ -625,7 +625,7 @@ in {
         RestartPreventExitStatus = 78;
         KillMode = "mixed";
         KillSignal = "SIGTERM";
-        TimeoutStopSec = 70;
+        TimeoutStopSec = 15;
       };
     });
   };

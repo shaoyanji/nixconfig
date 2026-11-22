@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T09:14:26Z",
+  "generated": "2026-11-22T09:16:21Z",
   "count": 200,
-  "pin": "423c0b263bc5f26614a7b1983d7211b31282639106fcc301dcbe3e86a5d9353f",
+  "pin": "9f806636aee16d2377f3852d0618e74094da130aa03f6e793934134fca56e67b",
   "turns": [
+    {
+      "id": "008ef1ea-f02a-438f-9f7f-ca9c4d9bc252",
+      "ts": "2026-11-22T09:14:54Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:ionos-sre",
+      "action": "landed: IONOS SRE Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "eecf2766776b6a6cbbf27809010de28ddc732881",
+      "branch": "main",
+      "frame": "03ha6d9m83xzm0s7ntfu0u9hk"
+    },
+    {
+      "id": "e2f892ff-bc75-4975-a207-d517da53c7e5",
+      "ts": "2026-11-22T09:14:30Z",
+      "source": "freebuff",
+      "subject": "nixconfig:truetalent-freiburg-sysadmin",
+      "action": "landed: True Talent Freiburg Sysadmin Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ad6a3f36421f9435abc3e67e67750f39d49bab72",
+      "branch": "main",
+      "frame": "03ha6d6tp82gdeqbdy1a7guqh"
+    },
     {
       "id": "3510d303-db56-42f4-9577-3270b3827db6",
       "ts": "2026-11-22T09:13:16Z",
@@ -2739,34 +2765,6 @@
       "base_commit": "d59d7f6db63ffc2bc9adc227cd6af9a179530a40",
       "branch": "main",
       "frame": "03ha4j0xpsv164umabkdt0x43"
-    },
-    {
-      "id": "a9ea6696-9802-40a1-bda7-a01b5cd97e3c",
-      "ts": "2026-11-22T03:32:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:scoreplay-platform-sre-packet",
-      "action": "landed: ScorePlay Senior Platform Engineer (SRE) packet (Ashby 42f1911f, Western Europe remote) - 2p CV 10/32 highlights, 1p letter conceding no production K8s / no Terraform-Terragrunt-Helm / no Kafka at 15PB scale | gate: agents:apps:packet exit 0 incl. cv-ats-check in-build (2/1 pages)",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/scoreplay"
-      ],
-      "base_commit": "d59d7f6db63ffc2bc9adc227cd6af9a179530a40",
-      "branch": "main",
-      "frame": "03ha4ifsq6eal73m5zisfryl1"
-    },
-    {
-      "id": "c6ec0fb7-deee-4fc1-b90b-3b8300c71ade",
-      "ts": "2026-11-22T03:30:23Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-scoreplay-packet",
-      "action": "landed: drove freebuff pane to build the ScorePlay Senior Platform Engineer (SRE) packet (submissions/scoreplay/), Western Europe remote, EUR 90-110k + equity; routed via jev-decide (novel 0.89/0.84); pane working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
-      "branch": "main",
-      "frame": "03ha4hyto0i4190imrtvnkpvg"
     }
   ]
 }

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T12:16:35Z",
+  "generated": "2026-11-22T12:19:01Z",
   "count": 200,
-  "pin": "bc3f3724441860b0da243e2cb6e115cb609ea0d656eb1655c645cfc5f4e941a5",
+  "pin": "a0bed5b7187148bbb75142e9f7e81b379b78e278bc543bbd295af66d4fd0d093",
   "turns": [
+    {
+      "id": "7f3ba1d0-8b08-4ca2-862a-9f0ec9ddcb68",
+      "ts": "2026-11-22T12:17:39Z",
+      "source": "devin",
+      "subject": "job-hunt:adyen-platform-observability",
+      "action": "Dedup check before submit: record already shows applied via Greenhouse 7607691 with security-code-verified confirmation (2026-11-22T10:21Z). No re-submission performed — would create a duplicate on the board.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e76bed761b500a132697edd98ef834d22adb8687",
+      "branch": "main",
+      "frame": "03ha7cys18lshlk6g7z0plysx"
+    },
+    {
+      "id": "bc5f9891-81a5-4c25-9832-79b854568281",
+      "ts": "2026-11-22T12:16:43Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius",
+      "action": "landed: native English Typst dossier for Nebius Server Infrastructure SRE (Greenhouse 5040922101, commit e76bed76) — CV 2pp/1261w, letter 1pp/481w, 0 warnings, prose exit 0. Four legacy artefacts retired, JD reconstructed, sheet-vs-DB stage conflict documented (sheet said unsent, DB has confirmation; kept applied). GPU telemetry stated as a gap: no nvml/DCGM in repo. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e76bed761b500a132697edd98ef834d22adb8687",
+      "branch": "main",
+      "frame": "03ha7cs848oewm87fboby6t4n"
+    },
     {
       "id": "164234e0-764a-46cb-9c4f-48849ac2b556",
       "ts": "2026-11-22T12:16:11Z",
@@ -2826,34 +2852,6 @@
       "base_commit": "6dc98f45d3bdc75d653b6d553cb7ed1f1f48fec5",
       "branch": "main",
       "frame": "03ha6qxh0xhmpqye2ophwcnj2"
-    },
-    {
-      "id": "41d4b614-9780-4b14-8a96-d18219e45c13",
-      "ts": "2026-11-22T10:24:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:coda",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/coda"
-      ],
-      "files": [],
-      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
-      "branch": "main",
-      "frame": "03ha6qx7zbdp1jvcpe5y8qsu2"
-    },
-    {
-      "id": "ef1374ff-68a9-42b8-923d-27f28a4bfa44",
-      "ts": "2026-11-22T10:24:26Z",
-      "source": "devin",
-      "subject": "nixconfig:coreweave",
-      "action": "applied: Greenhouse embed submission complete | OTP verified, confirmation shown",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
-      "branch": "main",
-      "frame": "03ha6qume46np15osag8fa21x"
     }
   ]
 }

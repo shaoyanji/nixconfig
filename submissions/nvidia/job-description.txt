@@ -1,0 +1,19 @@
+Systems / Infrastructure Engineer
+NVIDIA · Linux systems, GPU enablement and cluster infrastructure
+
+PROVENANCE: this folder held no job description for this title. It held a packet for a DIFFERENT NVIDIA
+requisition — Kitmaker "Senior Software Engineer, Nix Packaging and Release Automation" (JR2029346,
+US-CA-Remote), whose submission sheet is now retired and whose hashes are recorded in submission-sheet.md.
+No posting text exists on file for Systems / Infrastructure Engineer, so this file states the pillars the
+dossier is built against instead of inventing requirements. Supply the live requisition and it can be tuned.
+
+PILLARS THIS DOSSIER IS BUILT AGAINST
+- Linux systems internals: kernel modules and parameters, sysctl, cgroups, PSI, systemd unit semantics.
+- GPU driver and kernel module configuration: proprietary and open kernel modules, legacy driver branches
+  pinned to a kernel, DRM/KMS parameters, hybrid graphics bus IDs, container GPU access.
+- Low-latency performance tuning: measured changes to scheduler governor, memory pressure handling,
+  compression-backed swap, and inference-side parameters — with the measurement kept beside the change.
+- Declarative cluster deployment: hosts produced by evaluation rather than edited, gated before deploy,
+  rollback by pointer, canaries before a fleet.
+
+COMPENSATION: no band published for this requisition, and none is asserted in the letter.

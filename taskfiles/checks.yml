@@ -501,10 +501,7 @@ tasks:
       the host compiles inventory.toml. ARCH defaults to the host's own arch from
       the compiled registry, so the gate runs wherever you are. Under oom-guard.sh;
       the closure build is CI's job. Vars: HOST= (required), ARCH=, MODE=build|eval,
-      STRICT=1, OFFLOAD=1, TIMEOUT= (seconds per host, default 240). 120 was the
-      default until 2026-11-22: one eval finished at 120.19 s on frieren with the
-      NAS at 55 % I/O and the sweep SIGKILLed it — a 0.19 s margin reads as a host
-      failure, which is exactly the false verdict this gate must not produce.
+      STRICT=1, OFFLOAD=1, TIMEOUT= (seconds per host, default 240).
       Exit 0 = passed, 1 = assertion failed, 2 = watchdog abort.
     cmds:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch "{{.ARCH}}" --timeout {{.TIMEOUT | default "240"}}

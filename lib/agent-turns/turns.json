@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-22T12:26:23Z",
+  "generated": "2026-11-22T12:29:24Z",
   "count": 200,
-  "pin": "cb518394bcff700ea46461c85722b0710e11f8207d55071c63aa76bc6b732831",
+  "pin": "552b0f7d07ce8f9e066660a42949814dd99caf0ff393642120bf914b485a7542",
   "turns": [
+    {
+      "id": "295d1d09-1301-490d-9044-32d90d14a9ce",
+      "ts": "2026-11-22T12:29:21Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:obsidian-systems",
+      "action": "landed: reconstructed record packet for an application sent 2026-11-21 (no legacy files existed; 2pp CV 95/84, 1pp letter 85, dossier declines the piece-table claim) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/obsidian"
+      ],
+      "files": [],
+      "base_commit": "3aa4244b392d83233becb85116244cc1b4d8511b",
+      "branch": "main",
+      "frame": "03ha7f93wrz05xj766w0gq87z"
+    },
+    {
+      "id": "2bb8a62a-c329-4ac4-b589-1b1816011f60",
+      "ts": "2026-11-22T12:26:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cycap",
+      "action": "correct: the previous done entry claimed the DB row was moved to prep/fit3 — it was not, its /tmp record was never written because the first run exited at the prose failure. Row cycap-ppa-originator now genuinely prep/fit3 with commit COMMIT notes; prose exit 0 at N files; tree clean. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a0dea682529502b0cdcd194bc01f4350bc11b4d8",
+      "branch": "main",
+      "frame": "03ha7epyg0oxa4va28c3jyca9"
+    },
+    {
+      "id": "d20b0da6-24ab-4207-ba20-2ceb57d601e4",
+      "ts": "2026-11-22T12:26:28Z",
+      "source": "devin",
+      "subject": "job-hunt:canonical-kernel-build-automation",
+      "action": "Canonical Kernel Build Automation (Greenhouse 7334725): staged 90% — cv+cl uploaded via /tmp, all fields/comboboxes filled (Germany, 2 companies, prefer-not EEO, cannot-recall HS). Left for Matt: two free-text essays (AI-drafted, need own words) + own-words/no-AI attestation per standing ruling. Browser stays open.",
+      "outcome": "blocked: own-words attestation needs Matt",
+      "claims": [],
+      "files": [],
+      "base_commit": "a0dea682529502b0cdcd194bc01f4350bc11b4d8",
+      "branch": "main",
+      "frame": "03ha7eotsqs51rlzyol1zelrq"
+    },
+    {
+      "id": "aacafbe4-b2fc-4e86-99f5-be0efe5a475f",
+      "ts": "2026-11-22T12:26:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cycap",
+      "action": "landed: deutsche Typst-Unterlagen für CYCAP PPA Originator (Personio 2467046), commit c-. CV 2 S./CVWw, Anschreiben 1 S./LTWw, 0 Warnungen, Seitenbudget vor Commit geprüft, prose exit 0 (erster Versuch scheiterte an typografischen Anführungszeichen im Blatt und wurde korrigiert). Vier Altlasten mit Hashes im Blatt; Origination-Behauptung auf das dreimonatige EWE-Mandat zurückgeschnitten, DB auf prep/fit3. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a0dea682529502b0cdcd194bc01f4350bc11b4d8",
+      "branch": "main",
+      "frame": "03ha7eoimdob9pa4laiz3dyn8"
+    },
     {
       "id": "01e71bad-d319-4a80-a3e5-373a7faaafdf",
       "ts": "2026-11-22T12:26:04Z",
@@ -2790,62 +2844,6 @@
       "base_commit": "77a1b08b3f6645af327e8fa5e37ed4eaa840337f",
       "branch": "main",
       "frame": "03ha6rs616pgxn1u4y4cznnjr"
-    },
-    {
-      "id": "b8570aec-5343-4062-9600-fb88f55107eb",
-      "ts": "2026-11-22T10:29:06Z",
-      "source": "freebuff",
-      "subject": "nixconfig:attio",
-      "action": "follow-up: letter re-compiled without salary numerals | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
-      "branch": "main",
-      "frame": "03ha6rrgj8ef2pb8xnypk1tw0"
-    },
-    {
-      "id": "7465bf2a-35e4-499e-93aa-7bed9e77221c",
-      "ts": "2026-11-22T10:28:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:attio",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "132c58c5d82308bb11ae33d8707613392269e710",
-      "branch": "main",
-      "frame": "03ha6rmpe8al6ap1hpfdh7mfy"
-    },
-    {
-      "id": "c037b44d-43ff-4e3f-a1ff-3a4510914171",
-      "ts": "2026-11-22T10:28:17Z",
-      "source": "devin",
-      "subject": "nixconfig:camunda",
-      "action": "claim: Ashby submission attempt",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/camunda"
-      ],
-      "files": [],
-      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
-      "branch": "main",
-      "frame": "03ha6rlq0welq2nuh9uu1pqd0"
-    },
-    {
-      "id": "e1a2231b-4e84-4225-8db3-e6057a93900b",
-      "ts": "2026-11-22T10:28:10Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:stackit",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (de); fit 3, k8s gap",
-      "outcome": "done",
-      "claims": [
-        "submissions/stackit"
-      ],
-      "files": [],
-      "base_commit": "77a1b08b3f6645af327e8fa5e37ed4eaa840337f",
-      "branch": "main",
-      "frame": "03ha6rkw2izo8c8se74vqnwcn"
     }
   ]
 }

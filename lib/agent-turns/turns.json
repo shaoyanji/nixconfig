@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T02:29:53Z",
+  "generated": "2026-11-22T02:42:02Z",
   "count": 200,
-  "pin": "de414177a901eea1488f5fc7512a32fa2652cc9be0340e13b318705b705e1064",
+  "pin": "c74ab88ed12a72c2f77e238ee085e278c7fa64a05ab23ae60306a0a786963387",
   "turns": [
+    {
+      "id": "0772364e-6663-4748-90c1-f4a44a4408a2",
+      "ts": "2026-11-22T02:41:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-commit-outreach-redaction",
+      "action": "landed: drove freebuff pane (default:1.1) to commit the completed redaction of .agents/outreach/nix-consultancy-outreach.md and push to origin/main; pane confirmed working (fresh 10s counter)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "eadda34184407c3eb50f062373713635323f9077",
+      "branch": "main",
+      "frame": "03ha48hcvuj7tckbgowh4ta80"
+    },
+    {
+      "id": "3307ad9a-a818-4523-aeda-59c40a7fbb6e",
+      "ts": "2026-11-22T02:36:40Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-redact-outreach-contacts",
+      "action": "landed: drove freebuff pane to redact third-party contacts + phone from docs/nix-consultancy-outreach.md",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c990e276294a7993a19867f3fa07cc6cd279ce33",
+      "branch": "main",
+      "frame": "03ha47h3cmtuveyoozixd0xhy"
+    },
+    {
+      "id": "568bd7bb-4a8c-4cd5-8ef5-5a86d121a4cb",
+      "ts": "2026-11-22T02:33:24Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: 26 BA-Jobsuche email applications (rsnetit Kenzingen, mbtechnet, eliquo, weiss, buerkle, DIS Freiburg, netzint, streck, yokogawa, schnebel, ferchau x2, manner, kbs, continum, haufe-lexware, testo, bucher, cewe, kiener, jobrad, reha-verein, gerriets, commeco, biema, leitwerk) | gate: himalaya send OK + appflow-sync imports 26/26 | pipeline 153 applied",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c990e276294a7993a19867f3fa07cc6cd279ce33",
+      "branch": "main",
+      "frame": "03ha46u384fd0y6ihkzwxjm1q"
+    },
     {
       "id": "a0c19316-febc-40d4-b694-166f8c7fba32",
       "ts": "2026-11-22T02:25:15Z",
@@ -2743,47 +2782,6 @@
       "base_commit": "b2767856a5044be91fc263fa9f9b86ccd49a267c",
       "branch": "main",
       "frame": "03h9wg9fwsv14ud1abo0z9ydd"
-    },
-    {
-      "id": "9c5fe5c7-1767-43c2-8152-2c090ede0fca",
-      "ts": "2026-11-21T02:46:50Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-gate",
-      "action": "landed: CV + Lebenslauf PDFs are UA-1 tagged with real /H1 heading elements (was bold text only), cv-ats-check refuses an untagged PDF, cv.typ states hyphenate:false, and the heading element's 5.1pt paragraph gap is cancelled in cv.typ so budgets stay 2/2/1/1; durable link gate already in the build, proved by an injected unlinked PDF failing nix build rc=1 | gate: nix build .#sites.matt-site PASS, checks:site:links:test PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "388cd05dc57c73d14e7259529f2a59d5aa14a845",
-      "branch": "main",
-      "frame": "03h9wg65iast3q3j4irak8fxq"
-    },
-    {
-      "id": "e8503467-a0a1-45ac-b0d9-c6550f7f6256",
-      "ts": "2026-11-21T02:44:50Z",
-      "source": "devin",
-      "subject": "nixconfig:watchdog-timers",
-      "action": "claim: three live single-pair watchdog timers onto shared mkTimerJob (ups-drill, pg-backup-drill, paperless-watchdog)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/ups-simulation-drill.nix modules/services/postgres-backup-drill.nix modules/services/paperless-watchdog.nix"
-      ],
-      "files": [],
-      "base_commit": "ecf2d05622244e31a9b5810480b8ad36d71b7c8c",
-      "branch": "main",
-      "frame": "03h9wfs0bpkmr5e9clkguaip7"
-    },
-    {
-      "id": "5ff72212-290c-40f1-a347-3fcf75e70f73",
-      "ts": "2026-11-21T02:24:49Z",
-      "source": "hermes-steward",
-      "subject": "nixconfig:steward-devin",
-      "action": "Drove idle devin win2 pane via jevdecide: nixconfig_refactor (p=0.91, margin 0.82, decisive). Task: continue nixconfig refactoring — strip Shared Config from Draft PR #3 and push the refactor forward, resolve open design questions, get PR into mergeable state. Pane accepted — Running tools confirmed.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9wbuzak4l2k1z7csr44ts6"
     }
   ]
 }

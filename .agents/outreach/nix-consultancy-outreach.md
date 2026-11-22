@@ -6,7 +6,7 @@
 
 Each target gets one reason for the conversation, one proof point, one concrete
 piece of work Matt can take, and one cheap ask. **Contacts are not in this file:**
-reach a target via their own site or LinkedIn; the phone stays in the job pipeline.
+reach a target via their own site; `[NAME]`, `[CONTACT]`, `[PHONE]` in the pipeline.
 
 ## The position in one paragraph
 
@@ -56,7 +56,7 @@ if asked.
 ## 1. [NAME] — Numtide
 
 **Role to verify:** Founder and Director, Numtide.
-**Public contact:** [numtide.com/about](https://numtide.com/about) · [REDACTED] · [REDACTED]
+**Public contact:** [numtide.com/about](https://numtide.com/about) · [CONTACT] · [CONTACT]
 **Company:** [numtide.com](https://numtide.com/) · [about](https://numtide.com/about) · [services](https://numtide.com/services/)
 
 ### Why him
@@ -146,7 +146,7 @@ Matt
 ## 2. [NAME] — Cachix
 
 **Role to verify:** Founder, Cachix.
-**Public contact:** [cachix.org/about](https://www.cachix.org/about) · [REDACTED] · [REDACTED]
+**Public contact:** [cachix.org/about](https://www.cachix.org/about) · [CONTACT] · [CONTACT]
 **Company:** [cachix.org](https://cachix.org/) · [about](https://www.cachix.org/about) · [Cachix Deploy GA](https://blog.cachix.org/)
 
 ### Why him
@@ -236,7 +236,7 @@ Matt
 ## 3. Cyberus Technology — engineering leadership
 
 **Primary contact:** [NAME], Co-Founder; engineering/cloud
-leadership. [REDACTED]
+leadership. [CONTACT]
 **Secondary:** [NAME], CTO (verify current title before sending).
 **Company:** [cyberus-technology.de](https://www.cyberus-technology.de/) · [about](https://www.cyberus-technology.de/about-cyberus) · [Cyberus Linux](https://www.cyberus-technology.de/cyberus-linux)
 

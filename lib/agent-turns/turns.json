@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T10:55:41Z",
+  "generated": "2026-11-22T10:56:38Z",
   "count": 200,
-  "pin": "5e9c382ec37ff8831674d47e47579cd82bc42f29f730d25d9b3854185bd82aab",
+  "pin": "16cd1ab4ed4b6da08e593cd2306a333b7736b80170badad6dd547fef2bc65578",
   "turns": [
+    {
+      "id": "4c375abd-1104-480e-80bc-32de437b1781",
+      "ts": "2026-11-22T10:55:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:black-forest-labs",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a5c1ea6296f2b76a7aac40ee7b5173a6c3952489",
+      "branch": "main",
+      "frame": "03ha6wyse51hq53ota6tnv0bz"
+    },
     {
       "id": "2c041da4-03a1-4c3a-a091-f40355ac9ee0",
       "ts": "2026-11-22T10:55:09Z",
@@ -2679,19 +2692,6 @@
       "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
       "branch": "main",
       "frame": "03ha67up6d4tegoj6dea5zzbe"
-    },
-    {
-      "id": "3fe93290-0dad-4cb7-bb47-b6c178b53b9c",
-      "ts": "2026-11-22T08:45:05Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: adyen-platform-genai Greenhouse embed submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
-      "branch": "main",
-      "frame": "03ha67g0l2ryj4vbsspdjgmzz"
     }
   ]
 }

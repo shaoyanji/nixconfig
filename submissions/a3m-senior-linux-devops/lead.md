@@ -1,31 +1,38 @@
-# Lead: A3M Global Monitoring GmbH - Senior Linux DevOps Engineer
+# Lead: A3M Global Monitoring — Senior Linux DevOps Engineer
 
 Fit: 4
 Stand: 22.11.2026
+Ort: Hamburg, Schopenstehl 20; Fernarbeit aus ganz Deutschland möglich
+Anstellung: Vollzeit, 40 Stunden, unbefristet
+Quelle: a3mglobe.com, Anzeige liegt im Paket
+Sprache: Deutsch
 
-## Warum interessant
+## Warum diese Stelle aus dem Rückstand
 
-Die Muss-Liste ist Linux-Betrieb: Server härten, Netzwerk weiterentwickeln, Deployments automatisieren, überwachen, Incident Response. Genau das läuft hier seit fünf Jahren im eigenen Betrieb, mit dreizehn Hosts, nftables, systemd, eigener Zertifizierungsstelle und einem Ledger statt eines Dashboards. Dazu Remote aus ganz Deutschland, also kein Umzug.
+Von den nicht migrierten Paketen war dies die beste Passung: A3M betreibt Frühwarn- und Kommunikationssysteme für Krisenmanagement, und die Anzeige beschreibt genau die Arbeit, die fünf Jahre lang allein gemacht wurde — Linux-Landschaft administrieren und härten, Netz erweitern, CI/CD aufbauen, Monitoring, Alerting und Incident Response. Bundesdruckerei verlangt Cloud und Container-Orchestrierung, die nicht vorhanden sind; DRV OpenShift ebenso; BAMF Public Cloud ebenso.
 
 ## Was passt
 
-- Linux-Serverlandschaft über drei Hardware-Generationen betrieben und selbst beschafft.
-- Härtung: nftables-Regeln als Code, minimale Dienste, kein Dienst auf einer öffentlichen Schnittstelle.
-- Netzwerk: Firewall und Netz deklarativ, Zugang nur über ein WireGuard-Tailnet.
-- CI/CD: inventargetriebene Gates je Host, Rollback je Generation ohne Neuinstallation.
-- Monitoring und Incident: Sentinel-Ledger, Gatus, Go-Bridge mit Zustellbestätigung.
-- Kein Recruiter dazwischen, kleines Team, internationale Verteilung passt zur eigenen Arbeitsweise.
+- Linux-Serverbetrieb allein, dreizehn Hosts, drei Hardware-Generationen, ohne Reserve.
+- Härtung als Vorgabe: keine öffentlichen Verwaltungsdienste, nftables, eigene CA mit kurzlebigen Zertifikaten, sops/age je Host.
+- Netzwerk: WireGuard zwischen Standorten, DNS, Regeln im Code.
+- CI/CD: gepinnte Eingaben, Prüfung vor dem Rollout, Rückrollung über Generationen.
+- Monitoring, Alerting, Incident Response: Ledger mit Zeitstempel, Prüfungen von außen, Alarmzustellung bestätigt.
+- Fernarbeit und Betrieb ohne Präsenz vor Ort.
 
 ## Was fehlt
 
-- ISO 27001: kein Audit mitbegleitet, keine zertifizierte Betriebsführung.
-- Formale Rufbereitschaft in einem Team mit Rotation.
-- Das Produkt Global Monitoring ist Krisenmanagement-Software; Fachdomäne neu.
+- **ISO-27001-konforme Betriebsführung** — keine Audits, keine Nachweisführung.
+- **Cloud-Plattformen, Kubernetes, Container-Orchestrierung** — nicht im Betrieb.
+- **Verteiltes Team über Zeitzonen** — Betrieb war fern, aber allein.
+- Zeugnisse fehlen weiterhin.
+
+## Fit-Begründung: 4
+
+Die Anzeige ist ungewöhnlich nah an dem, was tatsächlich gebaut wurde: Linux, Netz, Automatisierung, Überwachung, Vorfallbehandlung — und ein Produkt, dessen Wert daran hängt, dass eine Warnung ankommt. Was fehlt, ist die Zertifizierungsseite und der Teamkontext, nicht die Technik.
+
+Keine 5, weil ISO 27001 und verteiltes Team fehlen. Keine 3, weil die technische Substanz hier vollständig belegt ist.
 
 ## Weg
 
-Bewerbung über das Formular auf a3mglobe.com. Die Stelle ist englisch ausgeschrieben, das Team international; Anschreiben auf Deutsch ist vertretbar, Englisch wäre es auch.
-
-## Gehalt
-
-Keine Spanne veröffentlicht. Vergleichbarer Markt für Senior Linux DevOps in Hamburg: 70.000 bis 85.000 EUR. Die eigene Erwartung von 85.000 bis 95.000 liegt am oberen Rand; 80.000 EUR ist die realistische Forderung.
+Bewerbung über a3mglobe.com. Keine Frist genannt. Zeugnisse vor dem Absenden ergänzen.

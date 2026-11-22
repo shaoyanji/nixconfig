@@ -1,0 +1,128 @@
+(Senior) Platform Engineer - STACKIT Control Plane Platform (m/w/d)
+Schwarz Digits — STACKIT | Abteilung IT - Cloud Services | Level: Berufserfahrene
+Standort: Bad Friedrichshall | Referenznummer 1923 (Stellenportal-Ref. SDE-131335 / 1923-15454)
+Quelle: jobsuche-bw.de, abgerufen am 22.11.2026 (HTTP 200)
+Zuordnung: Die Vorgabe nennt Requisition GT2321; im Bestand fuehrt GT2321 die Schwesterstelle
+'(Senior) Site Reliability Engineer - STACKIT Control Plane'. Der hier hinterlegte Anzeigentext ist
+der Platform-Engineer-Control-Plane-Platform-Anzeige (Ref. 1923) zugeordnet. Vor dem Absenden klaeren,
+welche der beiden Requisitionen besetzt wird.
+
+(Senior) Platform Engineer - STACKIT Control Plane Platform (m/w/d) - Schwarz Digits | jobsuche-bw.de
+Jobs von A-Z    Minijobs    Öff. Dienst    Firmenprofile      azubiBW
+Anzeige schalten  Ein Angebot von NUSSBAUM  Anzeige schalten
+Jobs anzeigen
+Suche speichern und Jobs per E-Mail erhalten.
+Jobs per Mail aktivieren
+‌     ‌
+‌      ‌     ‌
+‌      ‌     ‌
+‌     ‌
+‌     ‌
+(Senior) Platform Engineer - STACKIT Control Plane Platform (m/w/d)
+Schwarz Digits
+Ref-Nr: 1923-15454
+Bewerben
+Bewerben
+Bewerben
+(Senior) Platform Engineer - STACKIT Control Plane Platform
+Standort: Bad Friedrichshall
+Abteilung / Bereich: IT - Cloud Services
+Level: Berufserfahrene
+Referenznummer: 1923
+Du verfügst über mehrjährige Berufserfahrung in einer DevOps-, SRE- oder Platform Engineering-Rolle.
+Du bringst Leidenschaft und Überzeugung für neue Technologien und Themen rund um Kubernetes, Linux und Virtualisierung mit.
+Du verfügst über fundierte Kenntnisse in der Kubernetes-Architektur.
+Du verfügst über fortgeschrittene Programmiererfahrung, vorzugsweise in Go.
+Du hast bereits grundlegende Erfahrungen mit dem Kubernetes Operator Pattern, Software-Defined Networking (z.B. Istio, Calico) und CI/CD-Tooling (z.B. Git, Concourse, Flux) gesammelt.
+Du kennst dich gut mit Templating (z.B. Helm, Kustomize) und Infrastructure-as-Code (z.B. Terraform, Pulumi) Technologien aus.
+Ausgezeichnete Fähigkeiten zur Problemlösung und Fehlerbehebung zeichnen dich aus.
+Dein Englisch, idealerweise gepaart mit Deutsch, ist die Basis für eine erfolgreiche Kommunikation in internationalen, agilen Teams.
+Einleitungstext
+Schwarz Digits schafft das technologische Fundament für digitale Entscheidungsfreiheit in Europa. Als IT- und Digitalsparte der Schwarz Gruppe entwickeln und verantworten wir einerseits die IT-Infrastrukturen für die Handelssparten Lidl und Kaufland sowie die Schwarz Produktion und PreZero. Gleichzeitig agieren wir als unabhängiger Anbieter am externen Markt, um Unternehmen in ganz Europa bei ihrer digitalen Transformation zu unterstützen. Unsere Kernleistungen bündeln wir in den Bereichen Cloud, Cyber Security, Data & AI, Communication und Workspace. Trage auch du zur digitalen Entscheidungsfreiheit in Europa bei.
+Bei uns arbeitest du an der Schnittstelle zwischen Agilität und Sicherheit: Du profitierst von den schnellen Entscheidungswegen, genießt echte Gestaltungsspielräume in deinen Projekten und baust dabei auf das stabile Fundament der Schwarz Gruppe.
+Deine Aufgaben
+Du entwickelst interne Tools, um die Bereitstellung unserer Infrastruktur zu automatisieren und trägst so zur Optimierung unserer Prozesse bei.
+Als Teil unseres Teams bist Du verantwortlich für die Implementierung und Wartung von Monitoring-Systemen, die höchste Verfügbarkeit und optimale Performance unserer Produkte gewährleisten
+Du arbeitest eng mit Entwicklungsteams zusammen, um deren Anforderungen zu verstehen und sie bei der optimalen Bereitstellung ihrer Services auf der Plattform zu unterstützen.
+Du bleibst immer auf dem neuesten Stand bezüglich Kubernetes-Technologien und -Trends.
+Du trägst aktiv zu unseren Security Best Practices und Compliance-Bemühungen bei.
+barrierefreie Version
+barrierefreie Version
+‌     ‌
+Weitere interessante Jobs
+131  Jobs
+(Senior) Site Reliability Engineer - STACKIT Control Plane (m/w/d)
+Schwarz Digits
+Bad Friedrichshall
+Vollzeit
+Firmenwagen
+Gesundheitsangebote
+Weiterbildungen
+Urlaub >= 30
+18.11.2026
+Senior Site Reliability Engineer (SRE) - Core Messaging Infrastructure - STACKIT (m/w/d)
+Schwarz Digits
+Bad Friedrichshall
+Vollzeit
+Firmenwagen
+Gesundheitsangebote
+Weiterbildungen
+Urlaub >= 30
+18.11.2026
+Compute Products Engineer - STACKIT (m/w/d)
+Schwarz Digits
+Bad Friedrichshall
+Vollzeit
+Firmenwagen
+Gesundheitsangebote
+Weiterbildungen
+Urlaub >= 30
+18.11.2026
+Teamleiter / Engineering Manager - STACKIT (m/w/d)
+Schwarz Digits
+Bad Friedrichshall
+Vollzeit
+Firmenwagen
+Gesundheitsangebote
+Weiterbildungen
+Urlaub >= 30
+18.11.2026
+Engineering Manager / Teamleiter - DATA and AI Cloud - STACKIT (m/w/d)
+Schwarz Digits
+Bad Friedrichshall
+Vollzeit
+Firmenwagen
+Nachhaltiger Arbeitgeber
+Gesundheitsangebote
+18.11.2026
+Für Bewerber
+Jobs von A-Z  Alle Orte  Alle Berufe  Minijob  Öffentlicher Dienst  Firmenprofile  azubiBW.de
+Für Bewerber
+Jobs von A-Z  Alle Orte  Alle Berufe  Minijob  Öffentlicher Dienst  Firmenprofile  azubiBW.de
+Öffentlicher Dienst  Firmenprofile  azubiBW.de
+Öffentlicher Dienst  Firmenprofile  azubiBW.de
+Für Arbeitgeber
+Anzeige schalten  Kontakt  Mediadaten
+Für Arbeitgeber
+Anzeige schalten  Kontakt  Mediadaten
+NUSSBAUM Medien
+Über uns  Karriere  Nachhaltigkeit  NUSSBAUM.de
+NUSSBAUM Medien
+Über uns  Karriere  Nachhaltigkeit  NUSSBAUM.de
+Kontakt
+NUSSBAUM MEDIEN St. Leon-Rot GmbH & Co. KG  Opelstraße 29  68789 St. Leon-Rot   Tel: +49 (0)7033 525-0   E-Mail:   kundenservice@nussbaum-medien.de
+Kontakt
+NUSSBAUM MEDIEN St. Leon-Rot GmbH & Co. KG  Opelstraße 29  68789 St. Leon-Rot   Tel: +49 (0)7033 525-0   E-Mail:   kundenservice@nussbaum-medien.de
+Datenschutz  Impressum  AGB  Cookies  Barrierefreiheitserklärung
+
+
+[Abgleich mit dem Paket, 22.11.2026]
+Muss laut Anzeige: mehrjaehrige DevOps/SRE/Platform-Erfahrung; fundierte Kubernetes-Architektur;
+fortgeschrittene Programmiererfahrung, vorzugsweise Go; Operator-Pattern; SDN (Istio, Calico);
+CI/CD (Git, Concourse, Flux); Templating (Helm, Kustomize); IaC (Terraform, Pulumi); Monitoring;
+interne Tools zur Automatisierung; Security-Best-Practices; Englisch, idealerweise Deutsch.
+Vorhanden: Go, deklarativer Betrieb mit Gates und Generationen, Linux-Interna, Monitoring-Ledger,
+Netzwerk und Firewall als Code, Git als einzige Quelle, Security in der Lieferkette (sops, age, eigene CA).
+Nicht vorhanden: Kubernetes-Architektur, Operator-Pattern, Istio/Calico, Helm/Kustomize,
+Terraform/Pulumi, Concourse/Flux, Betrieb grosser verteilter Systeme.
+Fit 3: Plattform-Denkweise und Go passen, die Kubernetes-Seite fehlt vollstaendig.

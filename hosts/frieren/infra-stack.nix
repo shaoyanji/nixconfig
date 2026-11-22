@@ -723,17 +723,11 @@ in {
     # is still pulling and hand it misses for what it just fetched. 100 GB
     # leaves ~18 GB of the 118.5 GB tier for transcode/thumb scratch.
     maxSize = "100g";
-    # ON since 2026-11-09, in the narrow form. The 2026-10-28 breakage was
-    # matchmaking, not steering: a *zone* record (`address=/steamcontent.com/`)
-    # also caught `cm-01-fra1.steamcontent.com` — the connection manager, a
-    # sibling of the download names, so no exclusion could carve it back out —
-    # and EU-West match accepts stopped. `content` names only the download CDNs,
-    # the detection name and the installer CDN, so `cm-*` resolves publicly by
-    # construction and cannot be broken by this record.
+    # Why: docs/steam-cache.md §"Steering, and the shape that broke matchmaking" —
+    # `content` names only the download CDNs, so `cm-*` resolves publicly by
+    # construction; a zone record caught the connection manager and broke
+    # matchmaking (2026-10-28).
     dnsSteer = "content";
-    # By exact name, never by suffix: a client that downloads straight from
-    # Valve's own cache host bypasses the CDNs above, and widening the match to
-    # the zone is what took matchmaking down.
     dnsSteerDomains = ["cache9-fra1.steamcontent.com"];
     prefill = {
       # Armed 2026-10-28. The pin a fill needs lives in the unit itself
@@ -791,17 +785,9 @@ in {
     settings.web.listen.port = 8124;
   };
 
-  # InfluxDB stays ON because Scrutiny 0.9.5 will not start without it. Measured
-  # 2026-11-11: with the process disabled the web server panics at startup
-  # (`failed to check influxdb setup status - Get "http://0.0.0.0:8086/api/v2/setup"`)
-  # and systemd restart-looped 264 times, so smart.frieren.lan answered 502. The
-  # probe is unconditional — an empty host, an empty token and an unknown
-  # `web.influxdb.enabled` key all still probe — so `services.scrutiny.influxdb.enable
-  # = false` (set 2026-11-09) buys nothing but a dead dashboard. The metric path is
-  # still nearly empty (200 KB, one file touched in 14 days while the weekly
-  # collector ran); that is the cost of the page, not of the store.
-  # Kept narrowed: InfluxDB's HTTP API otherwise binds every interface on 8086 and
-  # the firewall has to hold it back (HC-7).
+  # Story: note idle-service-modules — Scrutiny 0.9.5 panics at startup without
+  # InfluxDB (measured 264 restarts, smart.frieren.lan 502, 2026-11-11), so the
+  # retirement narrowed instead of disabling: 127.0.0.1 only (HC-7).
   services.influxdb2.settings.http-bind-address = "127.0.0.1:8086";
 
   # --- Vaultwarden: offloaded to delphi 2026-11-02 ----------------------------

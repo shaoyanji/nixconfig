@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-22T23:40:48Z",
+  "generated": "2026-11-22T23:49:28Z",
   "count": 200,
-  "pin": "3fad557577495b619cf5e519b0c07ef5ca20e3f2a9723b4c8da18a40096aaac0",
+  "pin": "17865cd5018abccd11bcda54022149e651bfd51edd3e85515628df776a092435",
   "turns": [
+    {
+      "id": "f5321d89-b12a-47fa-868b-ccdcff4931c1",
+      "ts": "2026-11-22T23:46:08Z",
+      "source": "delphi-steward",
+      "subject": "nixconfig:pliant-nix-verify",
+      "action": "steward routed read-only research to delphi pane 0:3.1 (ssh tunnel) via jevdecide classify (research 1.0 / margin 1.0): resolve whether Pliant Compute Node / DevTools are NixOS-based from public docs/jobs, record verdict, no writes outside /tmp; pane confirmed working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
+      "branch": "main",
+      "frame": "03hab3givgt4yw69b5im1w105"
+    },
+    {
+      "id": "9a832f4d-a6d7-4421-a3b6-f888f8baa42f",
+      "ts": "2026-11-22T23:46:07Z",
+      "source": "devin-steward",
+      "subject": "nixconfig:comment-audit-continue",
+      "action": "steward routed next nixconfig task to devin pane 0:2.1 via jevdecide classify (prose-change 0.97 / margin 0.95): continue the OPEN nix-comment-audit note, audit remaining host .nix modules (delphi, frieren), route misplaced comments, run checks:quick, commit+push; pane confirmed Thinking",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
+      "branch": "main",
+      "frame": "03hab3ggtc7vgi7nsgr8cxv1t"
+    },
+    {
+      "id": "4eb8d088-92ed-47d1-aa64-3fcee6cce3a3",
+      "ts": "2026-11-22T23:46:07Z",
+      "source": "freebuff-steward",
+      "subject": "shaoyanji.is-a.dev:ryoku-cv-nav",
+      "action": "steward routed next CV-site task to freebuff pane 0:1.1 via jevdecide classify (publish 1.0 / margin 1.0): add nav link to the ryoku CV page /cv/ryoku/ in site header + CV index, rebuild and confirm page/CSS/PDFs return HTTP 200; pane confirmed working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
+      "branch": "main",
+      "frame": "03hab3gesfdik8w7q7jtiuu3m"
+    },
+    {
+      "id": "3f50cb53-2f3a-4064-aafc-7686c3292ca1",
+      "ts": "2026-11-22T23:45:57Z",
+      "source": "devin-frieren",
+      "subject": "nixconfig:comment-audit",
+      "action": "claim: frieren infra-stack/reverse-proxy/dns + remaining host modules",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren/infra-stack.nix hosts/frieren/reverse-proxy.nix hosts/frieren/dns.nix"
+      ],
+      "files": [],
+      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
+      "branch": "main",
+      "frame": "03hab3f7dumyi7q11vc3agzpu"
+    },
     {
       "id": "39d74ad7-1c30-4b47-a17b-863a961b5225",
       "ts": "2026-11-22T23:40:32Z",
@@ -2679,60 +2733,6 @@
       "base_commit": "087ba1e61509a7231aeaa1c08ac28b0467027dc2",
       "branch": "main",
       "frame": "03ha7boi6intz5w2kkk0qymii"
-    },
-    {
-      "id": "8838afc9-8e9d-4adc-82e0-e24c7fcd46c2",
-      "ts": "2026-11-22T12:10:01Z",
-      "source": "freebuff",
-      "subject": "nixconfig:canonical-sre",
-      "action": "landed: native English Typst dossier for Senior SRE — CV 2pp, letter 1pp, 0 warnings, prose exit 0. Rebuilt on the four screens (systemd lifecycle, telemetry, alert thresholds, canaries) that the database CV never mentioned; platform gaps (OpenStack/K8s/Ceph/eBPF) stated, selection.json retired | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "087ba1e61509a7231aeaa1c08ac28b0467027dc2",
-      "branch": "main",
-      "frame": "03ha7bh30bcmofojuaz36y02f"
-    },
-    {
-      "id": "280570bd-00d9-4eea-875c-5c5a2c0a2a0b",
-      "ts": "2026-11-22T12:09:42Z",
-      "source": "devin",
-      "subject": "job-hunt:mozilla",
-      "action": "landed: Mozilla Staff SWE Tools+Systems (8315181) applied+confirmed via OTP lane; honest IaC/production checkbox picks (Nix=similar tool, no central-team claim)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1536370462278c3286e899ed423ff0bb4d85257c",
-      "branch": "main",
-      "frame": "03ha7bewelq8q847rs0e743mm"
-    },
-    {
-      "id": "cce29250-daf0-4425-9c39-02dced6c6df9",
-      "ts": "2026-11-22T12:09:35Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:stackit-k8s",
-      "action": "landed: stackit-k8s packet was already native Typst (no letter.json, no lebenslauf.json, no store link); CV rebalanced 9.5pt (99%/21%) to 11pt/0.7em (96%/75%, break at Ausbildung), text unchanged, 0 warnings both sources, DB row stackit-k8s marked verified and next action points at finding the original requisition | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/stackit-k8s"
-      ],
-      "files": [],
-      "base_commit": "d8528fe63e2e6d74ae05b8e82c100af35f136e5b",
-      "branch": "main",
-      "frame": "03ha7be2xfzs9ffzhtp4j9ui0"
-    },
-    {
-      "id": "196bfe73-67aa-4eaf-b485-e3f13a308cb2",
-      "ts": "2026-11-22T12:08:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:canonical-rust",
-      "action": "landed: native English Typst dossier for Rust Engineering Lead — CV 2pp (freshly measured), letter 1pp, 0 warnings, prose exit 0. Previous CV had no Rust project and a fabricated cloud/web skills block; native CV leads with tokenloom (piece table, ripple re-tokeniser, invariant test, 5ms gate) and the tokio/axum runtime, gaps named, selection.json retired | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1536370462278c3286e899ed423ff0bb4d85257c",
-      "branch": "main",
-      "frame": "03ha7b577k11uthm4seytum9j"
     }
   ]
 }

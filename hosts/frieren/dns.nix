@@ -83,16 +83,9 @@
         # 2026-10-26: MagicDNS answered, pihole did not).
         "server=/cloudforest-kardashev.ts.net/100.100.100.100"
         # --- Steam content cache (services.steamCache) -----------------------
-        # ON since 2026-11-09 as `content`, the allowlist. What broke on
-        # 2026-10-28 was the *zone* record: `address=/steamcontent.com/` also
-        # swallowed `cm-01-fra1.steamcontent.com` — the connection manager, a
-        # sibling of the download names, so no exclusion could carve it back out —
-        # and EU-West match accepts failed. `content` emits only the download CDN
-        # names, the detection name and `steamcdn-a.akamaihd.net`; `cm-*` cannot
-        # match, so matchmaking resolves publicly by construction. The names and
-        # the reasoning live in the module (`steamCache.dnsmasqLines` derives them
-        # from `dnsSteer`); this file only splices them in, so the resolver policy
-        # has one home.
+        # `content`, the allowlist, ON since 2026-11-09. The names derive from
+        # `dnsSteer` in `steamCache.dnsmasqLines` — this file only splices them
+        # in, so the resolver policy has one home.
         # Home: docs/steam-cache.md §"Steering, and the shape that broke matchmaking".
       ]
       ++ config.services.steamCache.dnsmasqLines

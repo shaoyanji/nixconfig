@@ -4539,6 +4539,10 @@
           Assistant's telemetry is `command_line` sensors, so no feed was lost.
         - InfluxDB: `/var/lib/influxdb2` at 200 KB with one file touched in 14 days,
           while Scrutiny's weekly collector ran. Scrutiny keeps its own store.
+        - 2026-11-11 correction: InfluxDB's retirement did not stick. Scrutiny
+          0.9.5's influxdb probe is unconditional — the web server panicked at
+          startup and restart-looped 264 times, so smart.frieren.lan answered
+          502. It stays on, narrowed to 127.0.0.1:8086.
         - ModemManager: enabled, inactive, no `/dev/cdc-wdm*`, no `/dev/ttyUSB*`.
 
         **What looked idle and is not.** `pihole-ftl` is the primary resolver and PXE

@@ -31,7 +31,7 @@ outside the page's normal user flow is circumvention, so the attempt stops here.
 | 1 | `_systemfield_name` | `Shaoyan (Matt) Ji` |
 | 2 | `_systemfield_email` | `matt@bountystash.com` |
 | 3 | `fe82994c-458d-4e2a-99cd-7ab76a119578` (Phone, `type=number`) | `491733281570` — the input rejects `+`; the CV shows `+49 1733281570` |
-| 4 | `_systemfield_resume` (file) | `packet/lebenslauf.pdf` |
+| 4 | `_systemfield_resume` (file) | `lebenslauf.pdf` |
 | 5 | `ee663a7c-36a1-4664-b70d-eb5f372ec053` (LinkedIn URL) | `https://linkedin.com/in/mattji` |
 | 6 | `31a4b96f-ef63-4d69-b56d-35ea953a7d17` (Location) | `Gutach im Breisgau, Germany` |
 | 7 | `0bfec1e2-9f36-4f8b-9d3e-4a69ed2f7717` (Visa sponsorship) | see below |
@@ -83,7 +83,7 @@ relocation and no permit.
 ## Finish it in one pass
 
 1. Open the apply URL in a normal browser session and let reCAPTCHA run.
-2. Upload `packet/lebenslauf.pdf`, then fill fields 1–10 from the table.
+2. Upload `lebenslauf.pdf` (CV) and `anschreiben.pdf` (letter), then fill fields 1–10 from the table.
 3. Review fields 7–10 in your own words; adjust the salary line only upward.
 4. Press `Submit Application` and wait for the confirmation screen, then for the Ashby
    email in `matt@bountystash.com`.

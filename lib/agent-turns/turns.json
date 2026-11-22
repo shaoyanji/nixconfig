@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-22T07:47:42Z",
+  "generated": "2026-11-22T07:47:55Z",
   "count": 200,
-  "pin": "2ff40ce90da77493485db6d9e40cca52601b80ac77c7f4599f5bd64d1f47ad55",
+  "pin": "e1cc1df6cac93a10792a1fbd600fbcf45a2f0001539873ba236d5b50590f3cdf",
   "turns": [
+    {
+      "id": "634c67d0-6412-4ebb-a185-09cf7e106a17",
+      "ts": "2026-11-22T07:47:46Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-citeq",
+      "action": "landed: citeq Muenster DevOps packet in submissions/citeq-muenster-devops (Interamt 1510832, Az 22-029/26, deadline 2026-11-29). German CV 2pp, letter 1pp, E11 asked instead of a euro figure (TVoeD 9a-11 = 49.8k-81.3k incl. 85% bonus). Letter names no Ansible, no Prom/Grafana/Graylog, no GitLab CI, no Docker images, no TYPO3. Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/citeq-muenster-devops"
+      ],
+      "base_commit": "9b7191b75c1f4d2256c80361f766d738e764a9c2",
+      "branch": "main",
+      "frame": "03ha5w8we3u4ge0j6rkjd0ueo"
+    },
     {
       "id": "2f86ea22-1dbb-43d8-8831-b51ec0c2322f",
       "ts": "2026-11-22T07:44:32Z",
@@ -2821,19 +2836,6 @@
       "base_commit": "48ccdb52c273234ea11bd31fbb24cc8efe5bac3d",
       "branch": "main",
       "frame": "03h9xvq0h09sn7ovk8q22kgvo"
-    },
-    {
-      "id": "c7b1339d-f1ab-4508-ab89-873d5a7f1b3c",
-      "ts": "2026-11-21T07:08:59Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hermes-orchestrator-repair",
-      "action": "landed: hermes orchestrator repair — handoff channel closed, jev routing, safe pane control, cache pruned | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd0d1d3479005ce97d7765d41c89089d0d633f92",
-      "branch": "main",
-      "frame": "03h9xvdezmz567dylxtmvv0dj"
     }
   ]
 }

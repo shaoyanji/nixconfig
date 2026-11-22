@@ -92,8 +92,8 @@ are absent. It closes with E 11 rather than a euro figure, and with the 600 km r
 | :--- | :--- |
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 196 prose files, exit 0 |
-| selection | 11/37 highlights, 0/0 projects |
+| `task checks:prose` | 197 prose files, exit 0 |
+| selection | 11/37 highlights, 4/10 projects |
 | sha256 CV | `59f5550ee29d75db44c8e58b8caf3876847a17e234fafeadc54a2d106d90fbbb` |
 | sha256 letter | `c481c651959fdcfe4b7786dddab557801d3963b1c62cdefbbf01420983ed6c19` |
 

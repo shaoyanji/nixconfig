@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:50:48Z",
+  "generated": "2026-11-22T12:54:00Z",
   "count": 200,
-  "pin": "c9e09597780f199189f12feeb3a766895f7a927535fdf680bff91a19d4a9de8e",
+  "pin": "5ef0d4e36479b6ecf2a7b754564e8abb3705b9eeb15e42a78432c0d1d6b76522",
   "turns": [
+    {
+      "id": "94a901e6-3201-4210-a745-e481b142c9ff",
+      "ts": "2026-11-22T12:50:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:workato-dba",
+      "action": "landed: Workato PostgreSQL DBA packet (REQ 2960, GH 8842211002) as native Typst, bde93f30. CV 2pp/1110w, letter 1pp/473w, 0 warnings, page budget asserted, prose exit 0 at 295 files. Schema detail added: tsvector+GIN, message_id upsert, classifier key, ordered migrations, EXP-042 ephemeral-cluster restore drill. Gaps named: no Aurora/RDS, no PgBouncer, no pg_upgrade, gigabytes not multi-TB. DB applied/fit3 + duplicate annotated. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bde93f3077d014920eab5c57ced66f04b2e52f2f",
+      "branch": "main",
+      "frame": "03ha7jh43kej22l208ftblhk8"
+    },
     {
       "id": "64f9ecf0-7b5c-473e-949d-3b78caa96c22",
       "ts": "2026-11-22T12:50:07Z",
@@ -2807,21 +2820,6 @@
       "base_commit": "3e9fee16a794a14452247400eecd317aea710139",
       "branch": "main",
       "frame": "03ha6ug2eysf2577csauizjkz"
-    },
-    {
-      "id": "12f8803b-62eb-42a8-8e5a-0bb0f16f95d3",
-      "ts": "2026-11-22T10:42:48Z",
-      "source": "devin",
-      "subject": "nixconfig:hep-global",
-      "action": "claim: Personio submission",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/hep-global"
-      ],
-      "files": [],
-      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
-      "branch": "main",
-      "frame": "03ha6ufswnibzhaeddk12ok81"
     }
   ]
 }

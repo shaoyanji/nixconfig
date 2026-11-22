@@ -149,6 +149,10 @@ fallback_providers:
   # Keyless terminal lane: api.apisfreellm.com takes no key and can never
   # bill, so it is the true last resort after every quota is spent.
   - provider: custom
+    model: nemotron-3.5-super-vl:free
+    base_url: https://crowllm.com/v1
+    api_key: ${CROWLLM_API_KEY}
+  - provider: custom
     model: free-ai
     base_url: https://api.apisfreellm.com/v1
     api_key: free

@@ -26,6 +26,10 @@
       diffutils
       gawk
       jq
+      # The sha1 comparison pipes through awk, and the unit's systemd PATH has
+      # coreutils, findutils, grep, sed and systemd but no awk: the wrapper has
+      # to supply it or the unit dies at line 49 with status 127 (2026-11-22).
+      gawk
     ];
     text = builtins.readFile ../../scripts/task/xs-notify.sh;
   };

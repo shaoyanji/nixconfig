@@ -1,0 +1,72 @@
+Functional Software Engineer
+USA - East Coast
+Source: Ashby posting API, board "obsidiansystems", retrieved 2026-11-22 (HTTP 200); posting published 2026-10-20, still live on retrieval.
+URL: https://jobs.ashbyhq.com/obsidiansystems/0a44c74d-4519-4cce-9596-dd75c5ecbdd5
+
+Obsidian Systems is a software engineering consultancy that builds production systems for capital markets and other regulated industries. Our clients include market infrastructure providers, national exchanges, and global financial institutions. Much of our work today centers on the Canton Network, the privacy-enabled blockchain adopted by major capital markets institutions, where Obsidian is one of the most experienced engineering firms in the ecosystem.
+
+We're a remote-first, globally distributed team that values ownership, curiosity, and clear communication. We believe the best ideas come from people who ask difficult questions, take responsibility for their work, and collaborate openly to solve challenging problems.
+
+About the Role
+
+We're looking for a Functional Software Engineer to join our engineering team and contribute to challenging client projects across our technical domains. You'll design, develop, and maintain software using functional programming principles, working with engineers and client teams to turn complex requirements into robust, maintainable solutions. Depending on the project, your work may involve backend systems, domain modelling, distributed systems, financial infrastructure, blockchain applications, or developer tooling.
+
+This role is suited to an engineer who enjoys reasoning about complex systems, values strong types and clear abstractions, and sees software development as more than simply making code work. Knowledge in every technology is not necessary. We value strong engineering fundamentals, a willingness to learn, and the ability to apply sound technical judgment to unfamiliar problems.
+
+KEY RESPONSIBILITIES
+
+- Design, implement, test, and maintain reliable software using functional programming principles.
+- Develop clear, composable, and maintainable solutions to complex engineering problems.
+- Apply strong typing, domain modelling, and abstraction to improve software correctness and reliability.
+- Collaborate with engineers, technical leads, and client stakeholders to understand requirements and deliver effective solutions.
+- Contribute to the design and architecture of systems, making thoughtful trade-offs between correctness, simplicity, performance, and maintainability.
+- Write automated tests and use appropriate techniques to validate system behaviour.
+- Review code, share technical knowledge, and contribute to engineering standards.
+- Investigate and resolve complex technical issues across existing systems.
+- Communicate technical decisions clearly and explain trade-offs to both technical and non-technical stakeholders.
+- Adapt to different client environments, codebases, and technical challenges.
+- Contribute to continuous improvement across our engineering practices, tools, and delivery processes.
+
+KEY REQUIREMENTS
+
+- 5+ years of professional experience developing and delivering production software.
+- Strong understanding of software engineering fundamentals, including data structures, algorithms, testing, and software design.
+- Experience with functional programming, either professionally or through substantial projects.
+- Ability to reason about complex problems and translate requirements into well-structured software.
+- Strong debugging and problem-solving skills.
+- Commitment to code quality, correctness, and maintainability.
+- Ability to communicate effectively and collaborate with other engineers.
+- Willingness to learn new technologies and work across different technical environments.
+
+Preferred Requirements:
+
+- Experience with Haskell, Scala, OCaml, F#, Clojure, or another functional programming language.
+- Familiarity with type systems, algebraic data types, pattern matching, and immutable data structures.
+- Experience with strongly typed domain modelling and functional design patterns.
+- Exposure to distributed systems, concurrent programming, or backend infrastructure.
+- Experience in blockchain, financial infrastructure, capital markets, or other domains where correctness and reliability are particularly important.
+- Familiarity with property-based testing and other techniques for validating complex software behaviour.
+- Experience with Nix or reproducible development environments.
+- Experience working in an engineering consultancy or collaborating directly with client teams.
+
+HOW WE WORK
+
+At Obsidian Systems, we believe great work comes from thoughtful people who take ownership, communicate openly, and enjoy solving difficult problems together. These principles guide how we work every day.
+
+Own Your Work, Protect Your Team
+- We take full ownership of our responsibilities while supporting the people around us. We believe accountability creates trust, and clear ownership allows teams to move quickly without stepping on one another's work.
+
+Don't Settle for Superficial
+- We aim to understand problems deeply rather than treating symptoms. We ask questions, challenge assumptions, and make unknowns explicit so we can build durable solutions instead of temporary fixes.
+
+Be Honest Proactively
+- We communicate openly and early. Raising risks before they become problems helps our team and our clients make better decisions. We value transparency over avoiding uncomfortable conversations.
+
+Get to It
+- Many of the challenges we solve have never been solved before. We don't wait for perfection; we start, learn, iterate, and move forward. Progress comes from taking the next concrete step.
+
+If you're excited by continuous learning and playing a real role in building the next generation of financial market infrastructure, you'll feel at home at Obsidian.
+
+[Fit note, 2026-11-22]
+Met in the record: Nix and reproducible environments (named as preferred), 5+ years production software, backend with append-only event logs and content addressing, strongly typed declarative modelling in the Nix module system, correctness-critical financial models (asset valuation that passed bank audits, energy trading risk), honesty about gaps.
+Missing: Haskell, Scala, OCaml, F#, Clojure in production; Daml and Canton; blockchain systems; property-based testing. Fit 3, recorded in submission-sheet.md.

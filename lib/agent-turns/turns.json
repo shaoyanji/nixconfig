@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T12:29:44Z",
+  "generated": "2026-11-22T12:31:46Z",
   "count": 200,
-  "pin": "6e323e84c2c22f87e32e4e2dc046d38dbb8dba626b03a828e5ea1b9781b4e22d",
+  "pin": "10dc2da17f9ea6e026da43bc685c07521d81d06ce68f5e9b1ae31d9fffe03070",
   "turns": [
+    {
+      "id": "c1eaa561-5815-4d05-84c8-c6a366d52856",
+      "ts": "2026-11-22T12:30:36Z",
+      "source": "devin",
+      "subject": "job-hunt:sva-devops-consultant-linux",
+      "action": "SVA DevOps/Consultant Linux j734 (Freiburg): applied via SVA portal f734 — 'Vielen Dank fuer Ihre Bewerbung!' confirmation. Salary 85k, entry 01.12.2026, Deutsch C1. New form mechanics: jQuery UI selectmenu needs .ui-menu-item-wrapper clicks (eval-set reverts); type appends — use fill.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a765349301de0a7f23605ddc732a337bb90208ea",
+      "branch": "main",
+      "frame": "03ha7fhvpswkx3f0yjohhp9d7"
+    },
+    {
+      "id": "57131782-f6a8-4fad-8453-b4febda4f8c4",
+      "ts": "2026-11-22T12:29:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-compute-node",
+      "action": "correct: the previous done entry said selection.json was retired — it was still in submissions/nebius-compute-node because the rebuild's removal command touched a non-existent .old path. Removed in a7653493; PDFs unchanged (CV 2pp/1255w, letter 1pp/475w, 0 warnings), prose exit 0, tree clean. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a765349301de0a7f23605ddc732a337bb90208ea",
+      "branch": "main",
+      "frame": "03ha7fced4hj8xjb8do3ljie8"
+    },
     {
       "id": "31eb1366-88de-4795-bbab-9918219c6028",
       "ts": "2026-11-22T12:29:33Z",
@@ -2812,36 +2838,6 @@
       "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
       "branch": "main",
       "frame": "03ha6rzz0umvv2w57m33lar49"
-    },
-    {
-      "id": "3244bd6c-8f1a-4609-927f-e8203778ddfb",
-      "ts": "2026-11-22T10:30:19Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:biz-factory",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (de)",
-      "outcome": "done",
-      "claims": [
-        "submissions/biz-factory"
-      ],
-      "files": [],
-      "base_commit": "1b9bec736cffa2b523e3a0e4b33e93282280d49e",
-      "branch": "main",
-      "frame": "03ha6rzxr4n1q5lve9lbjhuwd"
-    },
-    {
-      "id": "768c0a8b-5db2-4ea6-b40d-26dd2979a424",
-      "ts": "2026-11-22T10:29:54Z",
-      "source": "freebuff",
-      "subject": "nixconfig:adfinis",
-      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/adfinis"
-      ],
-      "files": [],
-      "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
-      "branch": "main",
-      "frame": "03ha6rx0ti3dacdpfngkxe5p7"
     }
   ]
 }

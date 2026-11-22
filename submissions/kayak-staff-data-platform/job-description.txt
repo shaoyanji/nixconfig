@@ -1,0 +1,122 @@
+Staff Data Platform Engineer
+KAYAK (part of Booking Holdings, NASDAQ: BKNG) - Berlin Office, Friedrichshain
+Full Time | Hybrid, 3 days per week in the Berlin office | English
+Anzeige: https://www.arbeitnow.com/jobs/companies/kayak/staff-data-platform-engineer-berlin-152496
+
+KAYAK, part of Booking Holdings (NASDAQ: BKNG), is a leading travel search engine. With billions of queries across our platforms, we help people find their perfect flight, stay, rental car and vacation package. We're also transforming business travel with a new corporate travel solution, KAYAK for Business.
+As an employee of KAYAK, you will be part of a travel company that operates a portfolio of global metasearch brands including momondo, Cheapflights and HotelsCombined, among others. From start-up to industry leader, innovation is in our DNA and every employee has an opportunity to make their mark. Our focus is on building the best travel search engine leveraging AI and data to make it easier for everyone to experience the world.
+We are looking for a Staff Data Platform Engineer to join our Data Platform team. Our team builds and operates the shared foundation that powers analytics, machine learning, business intelligence and AI-driven experiences across the entire company. As a senior individual contributor, you will shape how we move, store, govern, and serve data at scale, enabling every downstream team to build faster and with greater confidence.
+
+If you enjoy turning ambiguity into clear technical direction and durable solutions, we’d love to hear from you.
+This role will be required to work from our Berlin office 3 days per week.
+ 
+ 
+In this role, you will:
+
+- Design and evolve the architecture of KAYAK’s shared Data Platform, including near-real-time streaming, lakehouse storage, schema management, semantic layer, and distributed query infrastructure. Make thoughtful trade-offs between latency, correctness, cost, and long-term maintainability.
+
+- Deliver high-impact platform initiatives end-to-end — from problem framing and architecture design through implementation, rollout, and operational handoff.
+
+- Define and promote technical standards for data contracts, schema evolution, ingestion patterns, and production readiness across platform and domain teams.
+
+- Lead high-impact platform initiatives from problem framing and architecture design through implementation, rollout, and operational handoff.
+
+- Develop reusable patterns and reference architectures for streaming ingestion, compaction, retention, schema governance, observability, and other recurring data engineering challenges.
+
+- Establish reliable observability across the platform, including pipeline monitoring, consumer lag tracking, data quality checks, and alerting.
+
+- Collaborate closely with Operations, Security, Engineering, Data Engineering, and Data Science, and Analytics to evolve the platform, build cross-functional support, and ensure the platform meets the needs of its users.
+
+- Drive the semantic layer and metadata strategy that supports consistent and trusted self-service analytics and AI-driven data access.
+
+- Evaluate technologies and approaches across streaming, storage, query, orchestration, and cloud infrastructure, balancing scalability, operational complexity, cost, and maintainability.
+
+- Coach and mentor engineers through design reviews, code reviews, pairing, and reusable technical guidance.
+
+- Own the most complex architectural and operational challenges on the data platform, including failure recovery, schema drift, partition management, and performance degradation.
+
+ 
+Please apply if you have:
+
+- 7+ years of professional experience in data engineering, with meaningful time spent at a senior or staff level with domain-wide technical scope.
+
+- Experience designing and operating lakehouse architectures at scale — including open table formats (e.g., Apache Iceberg), columnar storage (Parquet) and cloud object storage (e.g. S3)
+
+- Experience building and operating streaming data pipelines — including event-driven ingestion, exactly-once delivery semantics, consumer lag management, checkpoint and recovery strategies, and failure handling in production environments.
+
+- Hands-on experience with data contracts, data governance, metadata, or semantic-layer systems.
+
+- Strong Python skills and a track record of writing maintainable, testable production code.
+
+- Experience deploying and operating data workloads on Kubernetes — including managing containerized infrastructure, resource tuning and health checks.
+
+- Proven ability to influence multiple teams, communicate architectural trade-offs, and drive adoption.
+
+- Experience mentoring engineers and raising technical standards through code reviews, documentation, and reusable patterns.
+
+- Comfort taking ownership of broad, ambiguous problem spaces.
+
+To stand out:
+
+- Distributed query engines such as Trino.
+
+- Experience with Kafka, Flink, or comparable streaming technologies.
+
+- Workflow orchestration tools such as Apache Airflow.
+
+- Experience with AWS or an equivalent public cloud provider.
+
+- CI/CD and deployment automation (e.g., GitHub Actions).
+
+- Working knowledge of Java or another JVM-based language, given the JVM-based nature of several frameworks in this domain.
+
+Benefits and Perks
+
+- Work from (almost) anywhere for up to 20 days per year
+
+- Focus on mental health and well-being:
+
+- Company-paid therapy sessions through SpringHealth
+
+- Company-paid subscription to HeadSpace
+
+- Company-wide week off a year – the whole team fully recharges (and returns without a pile-up of work!)
+
+- No meeting Fridays
+
+- Paid parental leave
+
+- Paid volunteer time
+
+- Focus on your career growth:
+
+- Development Dollars
+
+- Leadership development
+
+- Access to thousands of on-demand e-learnings
+
+- Travel Discounts
+
+- Employee Resource Groups
+
+- 6 weeks paid vacation + a day off for your birthday
+
+- Free lunch 2 days per week
+
+- Pension plan contributions
+
+- Public transportation subsidies
+
+- Bike leasing program
+
+- Monthly social events, Thursday happy hours, sports teams
+
+- An awesome office in Friedrichshain, Berlin
+
+ 
+Inclusion
+At KAYAK, we want everyone to have the space to grow, share ideas and do great work. That's why we're focused on hiring the best talent from all walks of life and experiences, supporting them well and making sure no one feels like they have to fit a mold to belong here.
+Need any adjustments for the interview, application or on the job? No problem – just give us a heads-up. We've got you.
+#LI-AS1
+Find more English Speaking Jobs in Germany on Arbeitnow

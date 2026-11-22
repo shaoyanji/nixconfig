@@ -3,42 +3,32 @@ Fraunhofer-Institut für Angewandte Optik und Feinmechanik IOF
 Fraunhofer-Zentrum Erfurt | Abteilung Photonische Quanten Systeme
 Veröffentlicht: 2026-11-20
 Anzeige: https://jobs.fraunhofer.de/job/Erfurt-Senior-Netzwerkspezialist-Schwerpunkt-Linux-%28all-genders%29-99099/1449785333/
+Packet date: 22 November 2026
 
-Die Fraunhofer-Gesellschaft ist eine der weltweit führenden Organisationen für anwendungsorientierte Forschung. 74 Institute entwickeln wegweisende Technologien; rund 30.000 Menschen arbeiten in Technik, Wissenschaft, Verwaltung und IT.
+Projekt: QUANT-GPlCz — quantengesicherte Kommunikation; Quantenschlüsselaustausch (QKD) wird in realen
+Glasfasernetzen implementiert, die dafür nötige Netzwerkebene wird entwickelt.
 
-Leidenschaft für Lösungen mit Licht - das ist das Fraunhofer-Institut für Angewandte Optik und Feinmechanik IOF. Am traditionsreichen Optikstandort Jena wird anwendungsorientierte Forschung auf dem Gebiet der Photonik betrieben: lichtbasierte Technologien, optische Komponenten und Systeme entlang der gesamten Prozesskette, von Design und Simulation über die Fertigung bis zur Integration kundenspezifischer Lösungen.
+Aufgaben: Planung, Betrieb, Weiterentwicklung und Dokumentation der LAN-, WAN- und Firewall-Infrastrukturen
+für IT und Quanten-Glasfasertestbeds; Administration der Linux-Netzwerksysteme und Mitwirkung an
+Sicherheitskonzepten; Weiterentwicklung der Glasfaserinfrastrukturen und Testbeds; Analyse und Behebung
+komplexer Störungen im 2nd- und 3rd-Level-Support; Mitgestaltung von Architekturentscheidungen und
+technischen Standards; Steuerung externer Dienstleister und Hersteller.
 
-Im europäischen Verbundprojekt QUANT-GPlCz wird quantengesicherte Kommunikation von der Forschung in die Praxis überführt: Quantenschlüsselaustausch (QKD) wird in realen Glasfasernetzen implementiert, und die dafür nötige Netzwerkebene wird entwickelt. Forschung und Netzarchitektur greifen unmittelbar ineinander. Die Stelle ist am Fraunhofer-Zentrum in Erfurt angesiedelt, im internationalen Team der Abteilung Photonische Quanten Systeme.
+Profil: technisches Hochschulstudium (Informatik, Wirtschafts-/Verwaltungsinformatik, Physik, Mathematik
+oder vergleichbar) und langjährige Berufserfahrung; fundierte Erfahrung mit LAN-, WAN- und
+Firewall-Infrastrukturen; Kenntnisse in komplexen Linux-Netzwerksetups; Erfahrung im 2nd-/3rd-Level-Support
+und in der Zusammenarbeit mit Dienstleistern; Deutsch C1, Englisch B2.
 
-Ihre Aufgaben:
-- Planung, Betrieb, Weiterentwicklung und Dokumentation der LAN-, WAN- und Firewall-Infrastrukturen für IT und Quanten-Glasfasertestbeds
-- Administration der bestehenden Linux-Netzwerksysteme sowie Mitwirkung an Sicherheitskonzepten
-- Weiterentwicklung der Glasfaserinfrastrukturen und Testbeds für nationale und internationale Quantenforschungsprojekte
-- Analyse und Behebung komplexer Störungen im 2nd- und 3rd-Level-Support
-- Mitgestaltung von Architekturentscheidungen, technischen Standards und Maßnahmen im Rahmen der IT-Strategie 2030
-- Steuerung externer Dienstleister und Hersteller sowie aktive Gestaltung des Lieferantenmanagements
+Rahmen: 39 Stunden/Woche, Teilzeit möglich, befristet bis 31.08.2029, TVöD, 30 Tage Urlaub,
+orts- und zeitflexibles Arbeiten.
 
-Ihr Profil:
-- Abgeschlossenes technisches Hochschulstudium (Bachelor oder FH-Diplom) in Informatik, Wirtschaftsinformatik, Verwaltungsinformatik, Physik, Mathematik oder vergleichbar, sowie langjährige einschlägige Berufserfahrung
-- Fundierte Erfahrung im Betrieb und in der Weiterentwicklung von LAN-, WAN- und Firewall-Infrastrukturen
-- Kenntnisse in komplexen Linux-Netzwerksetups
-- Erfahrung im 2nd- und 3rd-Level-Support sowie in der Zusammenarbeit mit externen Dienstleistern und Herstellern
-- Strukturierte und analytische Arbeitsweise, hohe Problemlösungskompetenz, ausgeprägtes Sicherheitsbewusstsein
-- Kommunikationsstärke und Eigenverantwortung
-- Sehr gutes Deutsch (C1) sowie gutes Englisch (B2) in Wort und Schrift
-
-Was Fraunhofer bietet:
-- Mitarbeit in der Spitzenforschung mit wegweisenden Leuchtturmprojekten
-- Moderne Arbeitsplätze und Labore, interdisziplinäres Team
-- Betriebliche Altersvorsorge, Entgeltumwandlung, vermögenswirksame Leistungen, Zuschuss zum Jobticket
-- 30 Tage Urlaub, orts- und zeitflexibles Arbeiten
-- Weiterbildung über das Fraunhofer-Bildungsprogramm, sehr gute ÖPNV-Anbindung
-
-Rahmenbedingungen:
-- Wöchentliche Arbeitszeit 39 Stunden; die Stelle kann auch in Teilzeit besetzt werden
-- Befristet zunächst bis 31.08.2029; eine langfristige Zusammenarbeit wird angestrebt
-- Anstellung, Vergütung und Sozialleistungen nach TVöD, mit zusätzlich möglichen leistungs- und erfolgsabhängigen Vergütungsbestandteilen
-- Schwerbehinderte Menschen werden bei gleicher Eignung bevorzugt eingestellt
-
-Bewerbung:
-Online über den Bewerbungsbutton der Anzeige; nach Eingang der Online-Bewerbung wird automatisch eine Empfangsbestätigung versendet. Fragen zur Stelle, zum Ablauf oder zur Barrierefreiheit beantwortet die Recruiterin des IOF.
+[Packet cross-check, 22.11.2026]
+Held: five years running 13 Linux hosts across several sites; IPv4 addressing, DNS, WireGuard between
+sites, nftables rules as code, no publicly reachable administrative services, own CA with short-lived
+certificates; reproducible environments from one description with rollback in minutes; 15-minute
+timestamped ledger, external probes, Go alert bridge with delivery confirmation; incident handling
+without an escalation tier; documentation generated from the estate; Fraunhofer ISE 2012 research
+assistantship with lab instrumentation, shared machines and documented analysis.
+Not held: commercial firewall appliances, WAN routing (BGP, OSPF, MPLS), fibre and QKD technology,
+external supplier management, 2nd/3rd-level support inside a large organisation.
+Fit 3: the Linux and reproducible-testbed half is real, the WAN/firewall-appliance/fibre half is not.

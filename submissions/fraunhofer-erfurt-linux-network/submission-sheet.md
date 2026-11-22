@@ -1,112 +1,62 @@
-# Bewerbung Fraunhofer IOF - Senior Netzwerkspezialist Schwerpunkt Linux
+# Bewerbung — Fraunhofer IOF Erfurt, Senior Netzwerkspezialist Linux
 
 Stand: 22. November 2026
 Fit: 3
+Sprache: Deutsch
+Status: migriert auf native Typst-Quellen, kompiliert und gemessen
 
 ## Stelle
 
 | Feld | Wert |
 | :--- | :--- |
-| Arbeitgeber | Fraunhofer-Gesellschaft, Fraunhofer-Institut für Angewandte Optik und Feinmechanik IOF |
-| Organisationseinheit | Abteilung Photonische Quanten Systeme, Projekt QUANT-GPlCz |
-| Rolle | Senior Netzwerkspezialist - Schwerpunkt Linux (all genders) |
-| Standort | Fraunhofer-Zentrum Erfurt |
-| Entgelt | TVöD, nach eigener Einschätzung E 11 bis E 13 |
-| Befristung | Zunächst bis 31.08.2029, langfristige Zusammenarbeit angestrebt |
-| Arbeitszeit | 39 Stunden wöchentlich, Teilzeit möglich, orts- und zeitflexibles Arbeiten |
-| Urlaub | 30 Tage |
-| Anzeige | https://jobs.fraunhofer.de/job/Erfurt-Senior-Netzwerkspezialist-Schwerpunkt-Linux-%28all-genders%29-99099/1449785333/ |
+| Arbeitgeber | Fraunhofer-Institut für Angewandte Optik und Feinmechanik IOF |
+| Einheit | Fraunhofer-Zentrum Erfurt, Abteilung Photonische Quanten Systeme |
+| Rolle | Senior Netzwerkspezialist — Schwerpunkt Linux (all genders) |
+| Projekt | QUANT-GPlCz, QKD in realen Glasfasernetzen |
+| Umfang | 39 h/Woche, Teilzeit möglich, **befristet bis 31.08.2029**, TVöD |
+| Quelle | jobs.fraunhofer.de, Anzeige im Paket (veröffentlicht 20.11.2026) |
 
-Eine Zusage für hybrides Arbeiten steht nicht in der Anzeige. Dort steht orts- und zeitflexibles Arbeiten, was Präsenz in Erfurt nicht aufhebt. Wer mit Hybrid rechnet, sollte das im Gespräch klären, nicht annehmen.
+## Migration
 
-## Bewerbungsweg
-
-Online über den Bewerbungsbutton der Anzeige. Nach Eingang kommt automatisch eine Empfangsbestätigung, danach meldet sich die Recruiterin des IOF. Hochgeladen werden Lebenslauf, Zeugnisse und Anschreiben.
-
-Das Bewerbungsportal wurde nicht gerendert; es wurde nichts abgeschickt.
-
-### Dokumente
-
-| Dokument | Datei | Hinweis |
-| :--- | :--- | :--- |
-| Anschreiben | `anschreiben.pdf` | Eine Seite, deutsch, ohne namentliche Anrede, da keine genannt ist |
-| Lebenslauf | `lebenslauf.pdf` | Zwei Seiten, deutsch, Netzwerkbetrieb im Profil |
-| Zeugnisse | keine Datei | Werden verlangt, müssen ergänzt werden |
-
-## Kandidat
-
-| Feld | Wert |
+| Vorher | Nachher |
 | :--- | :--- |
-| Name | Matt Ji |
-| Adresse | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| E-Mail | matt@bountystash.com |
-| Telefon | +49 1733281570 |
-| Sprachen | Deutsch C1, Englisch Muttersprache |
-| Abschluss | M.Sc. Erneuerbare-Energien-Management, Albert-Ludwigs-Universität Freiburg, 2014 |
-| Fraunhofer-Bezug | Wissenschaftliche Hilfskraft, Fraunhofer ISE Freiburg, 2012 |
-| Netzwerkbetrieb | nftables als Code, WireGuard-Tailnet, DNS und Routing selbst konfiguriert, eigene SSH-Zertifizierungsstelle |
-| Berufserfahrung | Zehn Jahre, davon fünf Jahre eigene Linux- und Netzverantwortung |
-| Umzug | Erfurt machbar |
+| `packet` → `/nix/store/rrd6lsv4a1sb7ccsr30w13zg12g2gik6-…` (Symlink) | entfernt |
+| `selection.json` (Modus 444) | entfernt |
+| `lebenslauf.pdf`, `anschreiben.pdf` (Modus 444) | durch native Quellen ersetzt, beschreibbar |
 
-## Abgleich mit der Ausschreibung
+## Gemessene Artefakte
 
-| Anforderung | Nachweis | Einschätzung |
+| Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 38718 | 577 | `6dcfb72e9397ab17` |
+| `anschreiben.pdf` | 1 | 24622 | 328 | `b105a36889b0c803` |
+
+## Fit-Map
+
+| Anforderung der Anzeige | Nachweis im Paket | Bewertung |
 | :--- | :--- | :--- |
-| Technisches Hochschulstudium, langjährige einschlägige Erfahrung | M.Sc. Freiburg 2014, zehn Jahre Berufserfahrung | Erfüllt, Studiengang nicht Informatik |
-| LAN, WAN und Firewall betreiben und weiterentwickeln | Firewall als Code mit nftables, WireGuard zwischen Standorten, kein Enterprise-LAN | Teilweise, der Institutsmaßstab fehlt |
-| Komplexe Linux-Netzwerksetups | Dreizehn Hosts, eigenes Tailnet, DNS, Routing, systemd bis zur Unit | Stark |
-| 2nd- und 3rd-Level-Support | Störungsanalyse bis zur Ursache, aber ohne Ticketsystem und SLA | Teilweise |
-| Zusammenarbeit mit Dienstleistern und Herstellern | Keine Lieferantensteuerung | Lücke |
-| Sicherheitskonzepte, Sicherheitsbewusstsein | Eigene Zertifizierungsstelle, kurzlebige Zertifikate, sops und age, keine offene Schnittstelle | Stark |
-| Glasfaser-Testbeds, QKD | Nicht vorhanden; Schlüsselverwaltung ist funktional benachbart | Lücke |
-| Architekturentscheidungen, technische Standards | Plattform als Code mit Standards je Host, IT-Strategie im Institut nicht | Teilweise |
-| Deutsch C1, Englisch B2 | C1 und Muttersprache, deutschsprachiges Studium | Übertrifft |
-| Dokumentation | Jede Prozedur als Runbook oder Task im Repository | Stark |
+| LAN-Infrastruktur planen, betreiben, dokumentieren | Netze über mehrere Standorte, Adressierung, DNS, Dokumentation aus dem Bestand | Stark, klein skaliert |
+| WAN-Infrastruktur | Standortkopplung per WireGuard, kein WAN-Routing | **Teilweise** |
+| Firewall-Infrastruktur | nftables-Regeln als Code, keine Appliances | **Teilweise** |
+| Linux-Netzwerksysteme administrieren | 13 Hosts, systemd, Namespaces, Boot über Netz | Stark |
+| Glasfaser- und Testbed-Weiterentwicklung | reproduzierbare Umgebungen, aber keine Glasfasertechnik | **Lücke Glasfaser** |
+| Sicherheitskonzepte mitgestalten | eigene CA, kurzlebige Zertifikate, sops/age, minimale Rechte | Stark |
+| 2nd-/3rd-Level-Support, komplexe Störungen | Störungsbearbeitung ohne Eskalationsstufe, Dokumentation | **Teilweise** |
+| Steuerung externer Dienstleister | nicht vorhanden | **Lücke** |
+| Architekturentscheidungen, Standards | Modulaufbau, Gates, Standards im eigenen Bestand | Teilweise |
+| Studium Informatik/Physik/Mathematik oder vergleichbar | M.Sc. Freiburg (fachfremd), langjährige Praxis | Teilweise |
+| Deutsch C1, Englisch B2 | C1, Muttersprache | Erfüllt |
+| Forschungsumfeld | Fraunhofer ISE 2012, Messaufbau, geteilte Rechner | Stark |
 
-Auswahl im Lebenslauf: 16 von 32 Highlights, 4 von 5 Projekten.
+## Fit-Begründung: 3
 
-## Gehalt
+Die Rolle ist eine Netzwerkstelle mit Linux-Schwerpunkt, und der Netzwerkteil ist der Prüfstein: WAN, Firewall-Appliances, Glasfaser-Testbeds. Der Linux-Teil und der Gedanke des reproduzierbaren Testbeds sind dagegen genau die eigene Stärke, und die Fraunhofer-Erfahrung ist echt.
 
-TVöD, nach eigener Einschätzung E 11 bis E 13, Stufe nach anrechenbarer Erfahrung. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt im oberen Bereich dieser Gruppen und ist mit Stufe und Erfahrungszeiten erreichbar, nicht mit einer Forderung. Im Anschreiben steht keine Zahl.
-
-Die Befristung bis 31.08.2029 ist der zweite Punkt neben dem Gehalt. Drei Jahre mit Option auf Verlängerung ist bei Fraunhofer üblich, aber es ist keine unbefristete Stelle.
-
-## Formularzuordnung
-
-Das Portal wurde nicht gerendert. Werte ohne belegte Feld-IDs; Beschriftungen vor dem Absenden gegenprüfen.
-
-| Beschriftung | Wert |
-| :--- | :--- |
-| Anrede | Herr |
-| Vorname | Matt |
-| Nachname | Ji |
-| E-Mail | matt@bountystash.com |
-| Telefon | +49 1733281570 |
-| Straße | Am Burgerhof 4 |
-| PLZ | 79261 |
-| Ort | Gutach im Breisgau |
-| Stelle | Senior Netzwerkspezialist - Schwerpunkt Linux |
-| Referenz | 1449785333 |
-| Institut | Fraunhofer IOF |
-| Eintritt | Ab sofort |
-| Anschreiben | `anschreiben.pdf` |
-| Lebenslauf | `lebenslauf.pdf` |
+Keine 4, weil drei der genannten Aufgabenfelder nicht belegt sind. Keine 2, weil Linux-Netze von Grund auf bauen und einen übernehmbaren Betrieb hinterlassen der Kern der Stelle ist.
 
 ## Offene Punkte
 
-1. Zeugnisse fehlen im Paket und werden im Portal verlangt.
-2. Enterprise-Netzwerk- und Lieferantenlücke nicht überspielen; das Anschreiben benennt sie.
-3. Hybrid ist nicht zugesagt, nur flexibles Arbeiten. Vor dem Absenden klären, ob Präsenz in Erfurt erwartet wird.
-4. Befristung bis 31.08.2029 akzeptieren oder im Gespräch ansprechen.
-5. Gehaltswunsch nicht im Anschreiben nennen; E 11 bis E 13 ist tariflich.
-6. Fraunhofer ISE 2012 im Anschreiben ist belegt und trägt; nicht zu mehr aufblasen, als es war.
-
-## Paket
-
-| Datei | Inhalt |
-| :--- | :--- |
-| `job-description.txt` | Anzeige mit Aufgaben, Profil, Rahmenbedingungen und Bewerbungsweg, bereinigt um Cookie- und Navigationsreste. |
-| `lebenslauf.pdf` | Deutscher Lebenslauf, zwei Seiten. |
-| `anschreiben.pdf` | Deutsches Anschreiben, eine Seite. |
-| `selection.json` | Audit der Auswahl. |
-| `submission-sheet.md` | Diese Feldzuordnung. |
+1. **WAN-Routing, Firewall-Appliances, Glasfaser/QKD, Dienstleistersteuerung** als Lücke im Anschreiben benannt.
+2. **Befristung bis 31.08.2029** — im Anschreiben nicht bewertet, im Gespräch zu klären.
+3. **Studienfach** fachfremd; die Anzeige nennt Informatik, Physik, Mathematik oder vergleichbar.
+4. **Zeugnisse** fehlen.

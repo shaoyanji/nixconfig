@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-22T11:37:51Z",
+  "generated": "2026-11-22T11:40:57Z",
   "count": 200,
-  "pin": "ef215cf3a1fb4fa7b088d307b23f9b014f5a4d7b159b52c706bb4f419d928356",
+  "pin": "4bf79de80c3cfc1a6e4d15a9dd75f3c454bdc147024f3c1064426d23576c0871",
   "turns": [
+    {
+      "id": "afb53f77-fc42-4dd1-8052-3a489bb3b404",
+      "ts": "2026-11-22T11:39:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-devtools",
+      "action": "claim: native English Typst dossier (2pp CV + 1pp letter) + sheet, Senior SRE DevTools",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/nebius-devtools"
+      ],
+      "files": [],
+      "base_commit": "48253a509f21b03188644cec08c07c4c4cecd011",
+      "branch": "main",
+      "frame": "03ha75ko3baua62ze8ocp6yjb"
+    },
+    {
+      "id": "6ff3d94c-b5c3-48fd-a81b-ab5ebdcfb25b",
+      "ts": "2026-11-22T11:39:24Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:biz-factory",
+      "action": "correction: the earlier Icinga/Nagios concession had NOT applied (patch script bug); it is now real - letter and CV both name Icinga/Nagios, both PDFs rebuilt and re-measured, sheet updated; prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/biz-factory"
+      ],
+      "files": [],
+      "base_commit": "f3eaa35ce03a15ef680351be529cd105bb12468e",
+      "branch": "main",
+      "frame": "03ha75hug6tucam4815befimi"
+    },
+    {
+      "id": "d4d65663-5418-48bf-a0bc-7e9140ab0951",
+      "ts": "2026-11-22T11:39:00Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:biz-factory",
+      "action": "migration audited (already native, rebuild byte-identical) + measured table added; fixed a concession gap: letter never named Icinga/Nagios though the advert requires them - now conceded in letter and CV; prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/biz-factory"
+      ],
+      "files": [],
+      "base_commit": "4f4db7923649b1290737b59e1d6f1b2a410c331b",
+      "branch": "main",
+      "frame": "03ha75exk1si09lgepje12gyr"
+    },
+    {
+      "id": "27758dee-3437-4caa-aee3-09f8cd8bdb56",
+      "ts": "2026-11-22T11:38:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:grafana-db-observability",
+      "action": "landed: native English Typst dossier, 2pp CV 999 words + 1pp letter 506 words. Fit corrected 4->2 because the role is frontend-primary (React/TypeScript) and no production TS exists; form has no cover-letter field | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "48253a509f21b03188644cec08c07c4c4cecd011",
+      "branch": "main",
+      "frame": "03ha7581dlmiutzbm50emzaw2"
+    },
     {
       "id": "8384f922-a52c-489e-aaef-d3d7ab2b6af2",
       "ts": "2026-11-22T11:37:08Z",
@@ -2738,58 +2796,6 @@
       "base_commit": "ba6841e53149580d71070cb32e0d91627cf80fcb",
       "branch": "main",
       "frame": "03ha6izcnzmbgz3fqbllpqmnm"
-    },
-    {
-      "id": "03213abf-c596-4444-bc02-d7aebed8988f",
-      "ts": "2026-11-22T09:43:33Z",
-      "source": "freebuff",
-      "subject": "nixconfig:telekom-sre-prometheus",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7f0415764510edc66861892ea96193f74ff0c316",
-      "branch": "main",
-      "frame": "03ha6iv4hsnjhzmvxy23x0pby"
-    },
-    {
-      "id": "1d10ac99-def1-406f-b93d-4b30c742db83",
-      "ts": "2026-11-22T09:42:36Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: sva-devops-consultant-linux portal submission (f734)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5a82a4daae503676e9b45227b22a29e07aa594f7",
-      "branch": "main",
-      "frame": "03ha6ioeztnht9jl3geea3yoa"
-    },
-    {
-      "id": "23ba12a4-b854-4aa3-bb7d-d724d84aeca0",
-      "ts": "2026-11-22T09:41:54Z",
-      "source": "freebuff",
-      "subject": "nixconfig:stackit-iac",
-      "action": "retargeted: packet now addresses GT4627 (Kubernetes & IaC), 2pp CV + 1pp letter, checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5a82a4daae503676e9b45227b22a29e07aa594f7",
-      "branch": "main",
-      "frame": "03ha6ijj2t036cegydparod6k"
-    },
-    {
-      "id": "bb59d7cf-7dc0-49fd-86d6-d3c2a1fc24af",
-      "ts": "2026-11-22T09:41:52Z",
-      "source": "freebuff",
-      "subject": "nixconfig:stackit-k8s",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b450894cb9f7f3f6db9175169273172f8cca5f17",
-      "branch": "main",
-      "frame": "03ha6ij9rvojz5s48m5ip43kw"
     }
   ]
 }

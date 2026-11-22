@@ -1,0 +1,54 @@
+Company: Nebius
+Role: Senior Site Reliability Engineer (DevTools)
+Location: Amsterdam, Netherlands; Germany; Israel; London, United Kingdom; Remote - Europe; United Kingdom
+Remote: yes
+Posted: 2026-06-08
+Source: greenhouse
+URL: https://careers.nebius.com/?gh_jid=4889227101
+---
+
+About Nebius:
+Nebius is leading a new era in cloud infrastructure for the global AI economy. We are building a full-stack AI cloud platform that supports developers and enterprises from data and model training through to production deployment, without the cost and complexity of building large in-house AI/ML infrastructure.
+Built by engineers, for engineers. From large-scale GPU orchestration to inference optimization, we own the hard problems across compute, storage, networking and applied AI.
+Listed on Nasdaq (NBIS) and headquartered in Amsterdam, we have a global footprint with R&D hubs across Europe, the UK, North America and Israel. Our team of 1,500+ includes hundreds of engineers with deep expertise across hardware, software and AI R&D.
+The Role
+We're an SRE team within DevTools, looking for someone ready to help maintain and grow our systems. We run 25k builds a day in TeamCity, store 100 TB of artifacts in Artifactory, and work with a massive monorepo in GitLab — comparable in scale to what you'd find at FAANG companies. We modify GitLab and build our own TeamCity plugins to give users a product that meets their needs. We're also experimenting with AI — we have our own RAG setup and are figuring out how to operate in the age of agents. Our goal: understand users' problems and requests, define metrics that capture the problem, improve those metrics, and verify that the user's problem is actually gone.
+Y our responsibilities will include:
+-
+Improving services based on user feedback
+-
+Building fault-tolerant, self-healing architecture
+-
+Finding ways to speed up our systems and reduce user friction
+-
+Modifying well-known closed- and open-source solutions Supporting our users
+We expect you to have:
+-
+A combination of SRE and SWE experience (for us that's a 50/50 split). Our code is in Java/Kotlin, Go, Python, and Ruby
+-
+An understanding of what's happening under the hood in Unix-like systems and the JVM
+-
+A passion for improving the user experience
+-
+The ability to adapt quickly on the fly in a fast-changing environment
+It will be an added bonus if you have:
+-
+Experience in Platform Engineering
+-
+Experience operating GitLab (or another VCS) and TeamCity (or another CI system)
+-
+Experience with Spring and operating Java monoliths
+We conduct coding interviews as part of the process.
+Benefits & Perks:
+- Competitive compensation
+- Career growth and learning opportunities
+- Flexibility and ownership
+- Collaborative and innovative culture
+- Opportunity to work on impactful AI projects
+- International environment and talented teams
+What's it like to work at Nebius:
+Fast moving - Bold thinking - Constant growth - Meaningful impact - Trust and real ownership - Opportunity to shape the future of AI
+Equal Opportunity Statement:
+Nebius is an equal opportunity employer. We are committed to fostering an inclusive and diverse workplace and to providing equal employment opportunities in all aspects of employment. We do not discriminate on the basis of race, color, religion, sex (including pregnancy), national origin, ancestry, age, disability, genetic information, marital status, veteran status, sexual orientation, gender identity or expression, or any other characteristic protected by applicable law.
+Applicants must be authorized to work in the country in which they apply and will be required to provide proof of employment eligibility as a condition of hire.
+If you need accommodations during the application process, please let us know.

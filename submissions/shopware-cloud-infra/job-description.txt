@@ -1,0 +1,104 @@
+# Quelle: Arbeitnow API, abgerufen 2026-11-22
+# URL: https://www.arbeitnow.com/jobs/companies/shopware-ag/remote-cloud-infrastructure-engineer-aws-schoppingen-150808
+
+shopware AG — Cloud Infrastructure Engineer - AWS (m/w/d)
+Location: Homeoffice | remote=True
+URL: https://www.arbeitnow.com/jobs/companies/shopware-ag/remote-cloud-infrastructure-engineer-aws-schoppingen-150808
+
+Shopware ist ein führendes E-Commerce-System, das es Unternehmen weltweit ermöglicht, im digitalen Handel schnell und effizient zu skalieren. Als zukunftsweisende Open-Source-Lösung wird Shopware bereits von einigen der größten europäischen Marken, Einzelhändlern und Herstellern im B2C- und B2B-Bereich eingesetzt.
+Über die Position
+Du wirst Teil des 
+Teams IT Infrastructure innerhalb des Bereichs IT Operations
+, das die interne IT-Infrastruktur der shopware AG betreut. Als 
+Cloud Infrastructure Engineer - AWS (m/w/d)
+ sorgst du für den stabilen Betrieb, die Automatisierung und die Weiterentwicklung unserer 
+AWS-Umgebungen und Netzwerkarchitektur
+. Gemeinsam mit internen Expert:innen und externen Partnern, darunter AWS-Spezialist:innen, stellst du eine stabile, leistungsfähige und zukunftssichere Systemlandschaft sicher und gestaltest die technische Basis von Shopware aktiv mit.
+KI in der IT-Infrastruktur von Shopware
+Künstliche Intelligenz wird zunehmend zu einem festen Bestandteil unserer Infrastruktur.
+ Vom Model Routing und Hosting von KI-Modellen bis hin zu Cloud- und selbstverwalteten Infrastrukturen schaffen wir die Grundlage, um KI sicher, effizient und skalierbar zu betreiben. Wir möchten, dass du diese Entwicklung aktiv mitgestaltest.
+Dein Arbeitsort
+Vor Ort, hybrid oder vollständig remote innerhalb Deutschlands.
+ Dein Arbeitsort wird im Vorfeld gemeinsam vereinbart und bildet die Grundlage deines Arbeitsvertrags.
+ 
+ 
+Du 
+entwickelst unsere AWS-Architektur
+ kontinuierlich weiter und sorgst für stabile, leistungsfähige und kosteneffiziente Umgebungen.
+Du gestaltest unsere 
+KI-Infrastruktur
+ aktiv mit – vom Model Routing bis zum Hosting von KI-Modellen in Cloud- und selbstverwalteten Umgebungen.
+Du 
+automatisierst unsere Infrastruktur mit Terraform
+ und setzt auf Infrastructure as Code (IaC).
+Du 
+konzipierst und optimierst unsere Netzwerkarchitektur
+ als Grundlage für eine skalierbare Infrastruktur.
+Du übernimmst Verantwortung für das 
+Monitoring und die Überwachung des Zustands unserer Infrastruktur
+.
+Du arbeitest eng mit unserem Security Specialist zusammen, um die 
+Sicherheit unserer Systeme
+ kontinuierlich zu verbessern.
+Du bereitest Monitoring- und Kostendaten in aussagekräftigen 
+Reports und Analysen
+ auf und schaffst damit eine fundierte Entscheidungsgrundlage.
+Du begleitest Projekte von der Planung bis zur Umsetzung und arbeitest dabei eng mit den Teams Cloud Engineering und Infrastructure zusammen.
+Du teilst dein Wissen mit deinen Kolleg:innen und trägst aktiv zum Aufbau und zur Pflege unserer internen Wissensdatenbank bei.
+Das bringst du mit: 
+Du verfügst über mehrere Jahre 
+Berufserfahrung im Bereich Cloud Infrastructure, Systems Engineering
+ oder einem vergleichbaren Umfeld.
+Du bist sicher im Umgang mit Cloud-Umgebungen, insbesondere 
+AWS
+, und bringst 
+fundierte Linux-Kenntnisse
+ mit.
+Du hast ein breites Verständnis von 
+Netzwerk- und Infrastruktursystemen
+ und kannst komplexe Umgebungen betreiben und weiterentwickeln.
+Du hast Erfahrung mit 
+Terraform oder einem vergleichbaren Infrastructure-as-Code-Tool
+.
+Du kennst dich mit 
+Monitoring-Tools wie CloudWatch
+ aus und kannst aussagekräftige Systemberichte erstellen.
+Idealerweise bringst du Erfahrung mit 
+CI/CD, GitHub oder GitHub Actions
+ mit.
+Du 
+interessierst dich für KI-Infrastruktur
+ – erste praktische Erfahrungen in diesem Bereich sind ein Plus.
+Du überzeugst durch starke Kommunikationsfähigkeiten und eine teamorientierte Arbeitsweise im Austausch mit internen und externen Stakeholdern.
+Du bringst Eigeninitiative und Neugier mit und hast Freude daran, bestehende Systeme kontinuierlich zu verbessern.
+Du verfügst über 
+fließende Deutsch- und Englischkenntnisse auf C1-Niveau
+.
+Das bieten wir dir:
+Unternehmenskultur:
+ Offene Kultur, flache Hierarchien, Eigeninitiative wird gefördert.
+Arbeitsverträge:
+ Unbefristete Anstellungen bieten langfristige Sicherheit.
+Flexibilität:
+ Flexible Arbeitszeiten und Optionen für mobiles Arbeiten und Full-Remote-Verträge.
+Ausstattung:
+ Freie Wahl der Arbeits-Hardware.
+Onboarding:
+ Gut strukturiertes Onboarding mit Unterstützung durch einen persönlichen "Buddy".
+Arbeitsumfeld:
+ Inspirierendes Umfeld mit engagierten Kollegen und einer dynamischen Gemeinschaft.
+Entwicklungsmöglichkeiten:
+ Vielfältige Chancen für persönliches Wachstum und Entwicklung.
+Zusatzleistungen:
+ Attraktive Benefits wie betriebliche Altersvorsorge, Gesundheitsprogramme und regelmäßige Teamevents.
+... und vieles mehr!
+Einen detaillierten Einblick bekommst du auf unserer 
+Karriereseite
+.
+Deine Ansprechperson für diese Stelle ist Josephine Scheffler und steht dir bei Fragen gerne zur Verfügung!
+Der Schutz deiner persönlichen Daten hat für uns oberste Priorität. Unsere Bewerberinformationen findest du 
+hier
+.
+Find more 
+English Speaking Jobs in Germany
+ on Arbeitnow

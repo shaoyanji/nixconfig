@@ -1,8 +1,90 @@
 {
-  "generated": "2026-11-22T08:31:49Z",
+  "generated": "2026-11-22T08:37:02Z",
   "count": 200,
-  "pin": "e5b09ede8d95d71147727a4f34222e4c1b38147bd8ce1442cb143a9e5a86798b",
+  "pin": "30a14cea77153e80ab0598044eb5dd4c1037407a6a06968f0621f827abed4e72",
   "turns": [
+    {
+      "id": "ef71335d-5daf-41a3-a4bf-b82f3775238b",
+      "ts": "2026-11-22T08:36:30Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: elastic-principal-cicd-platform submitted via Greenhouse embed 8267186 | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
+      "branch": "main",
+      "frame": "03ha65rlrj4ujzau115l7ekau"
+    },
+    {
+      "id": "e9f20151-d89c-4578-8740-4bf4fc285b0d",
+      "ts": "2026-11-22T08:34:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "drove idle devin pane 0:2.1: classified next task host-change (p=0.99, margin=0.98) via jev-decide typesafe; task submitted and devin is Thinking (command_allowlist review/commit plus elastic precheck)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
+      "branch": "main",
+      "frame": "03ha65g1yumd75woy1h5l4ody"
+    },
+    {
+      "id": "0017354c-4092-4ea2-bf66-3b9af3c35963",
+      "ts": "2026-11-22T08:34:45Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: elastic principal SWE cicd (GH embed 8267186); poland-req-from-germany honest framing",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/elastic-principal-cicd-platform"
+      ],
+      "files": [],
+      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
+      "branch": "main",
+      "frame": "03ha65fc9pw3gh4wp84294idx"
+    },
+    {
+      "id": "b2c73eb0-9df1-458d-92ed-1c742300502f",
+      "ts": "2026-11-22T08:32:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: drv-devops-platform-openshift packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/drv-devops-platform-openshift"
+      ],
+      "files": [],
+      "base_commit": "8d5ca048ea99302bbc3d65eb15fde52a0d5af57a",
+      "branch": "main",
+      "frame": "03ha6509zi7ekcwt420xhn9c5"
+    },
+    {
+      "id": "1b996596-96ac-4d56-8cb4-d26372515bcc",
+      "ts": "2026-11-22T08:32:22Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: nebius-senior-site-reliability-engineer-data-platform submitted via Greenhouse embed 5040676101 | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
+      "branch": "main",
+      "frame": "03ha64yk0a41af7vd4ln9wud6"
+    },
+    {
+      "id": "af9b5a42-06b5-4fcc-a812-461ddbc920c1",
+      "ts": "2026-11-22T08:31:52Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: mittwald-devops packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "ca16ce707ce6d8448269e5d0b2e7aadb5401e53b",
+      "branch": "main",
+      "frame": "03ha64v2421h3yje33exa6k1p"
+    },
     {
       "id": "c0959ff0-348c-4ae5-9a56-1b84429d637f",
       "ts": "2026-11-22T08:30:54Z",
@@ -2694,96 +2776,6 @@
       "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
       "branch": "main",
       "frame": "03ha1hnc9j61iudp0ig8vjaqo"
-    },
-    {
-      "id": "c79af250-9e80-4bf3-9752-9a50ab301d99",
-      "ts": "2026-11-21T18:15:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-packet-coda",
-      "action": "Staged Coda Senior Infrastructure Operations Engineer packet in submissions/coda: 2-page CV, 1-page letter, 4/4 projects, Lever's 9 live fields mapped, ask EUR 95-120k.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha1hnb4ssn0klg82xqnyrm5"
-    },
-    {
-      "id": "4b24581e-4042-4bc3-9476-e257d7be4281",
-      "ts": "2026-11-21T18:15:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-packet-camunda",
-      "action": "Staged Camunda Senior SRE packet in submissions/camunda: 2-page CV, 1-page letter, 4/4 evidence projects, ask USD 160-180k inside the published 149.8-241.5k band, Ashby.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha1hna27tdhpcnez6pljtjw"
-    },
-    {
-      "id": "601f011a-2a2d-423e-a3a5-46bb750c7a6b",
-      "ts": "2026-11-21T18:15:52Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-packet-enpal",
-      "action": "Staged Enpal Staff Platform Engineer packet in submissions/enpal: 2-page CV, 1-page letter, selection 16/23, Ashby ATS, ask EUR 130-150k; DB stage=prep fit=3 language=en.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha1hn8x7caqkdbfli9tw0gv"
-    },
-    {
-      "id": "ad641e63-923a-476b-8702-2f81beed20c9",
-      "ts": "2026-11-21T18:15:52Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-21",
-      "action": "Scouted 8,027 Arbeitnow + 1,866 Greenhouse postings over a 7-day window; added 10 leads (fit 3/2) and parked 10 off-brief/agency rows at stage=other; JDs saved to ~/.config/appflow/jd.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha1hn7sy7jd9cx1o3bxydae"
-    },
-    {
-      "id": "5ff9836b-6df7-476e-b929-cd5ff88ee3fc",
-      "ts": "2026-11-21T18:12:09Z",
-      "source": "buffy",
-      "subject": "nixconfig:canonical-gitops",
-      "action": "staged: Canonical Senior SRE/GitOps packet (GH 5517891) in submissions/canonical-gitops — lebenslauf.pdf 2p, anschreiben.pdf 1p, 23-field submission sheet, selection 13/20; apps-db stage=prep fit=3; nothing submitted",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/canonical-gitops"
-      ],
-      "files": [
-        "submissions/canonical-gitops/lebenslauf.pdf",
-        "submissions/canonical-gitops/anschreiben.pdf",
-        "submissions/canonical-gitops/selection.json",
-        "submissions/canonical-gitops/submission-sheet.md",
-        "submissions/canonical-gitops/job-description.txt"
-      ],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1gx3bukpb417e8v28w0ga"
-    },
-    {
-      "id": "e99a73c0-b457-4895-ac66-914eba0f273d",
-      "ts": "2026-11-21T18:04:22Z",
-      "source": "coordinator",
-      "subject": "nixconfig:job-search-fleet",
-      "action": "76 applied (Canonical Arch confirmed) | 24 staged prep (added Treatwell, Camunda, Coda, Nebius Berlin, Workato) | Devin submitting secunet on Rexx | Pane 1 crawling Greenhouse | Pane 3 staging Publitas",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/secunet",
-        "submissions/workato",
-        "submissions/publitas"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1fee1gs4jrkir4qo6t1o0"
     }
   ]
 }

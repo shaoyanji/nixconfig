@@ -37,7 +37,7 @@ providers:
     discover_models: false
     models:
       - deepseek/deepseek-v4-flash-0731:free
-      # - qwen/qwen3.8-27b:free
+      - qwen/qwen3.8-27b:free
 model:
   provider: custom
   default: deepseek/deepseek-v4-flash-0731:free
@@ -53,6 +53,12 @@ agent:
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
   api_max_retries: 7
+  # A stop waits this long for a running cron job before tearing down. The
+  # default (30 s) plus adapter teardown crossed the 60 s shutdown watchdog on
+  # every stop here, because pane-idle-watch runs for most of its 2-minute
+  # interval: 5 s keeps a shutdown under the leash and costs one idempotent
+  # watch tick.
+  cron_drain_timeout: 5
 # Every provider holding a credential in ~/.hermes/.env or the shell env is a
 # selectable row in `hermes model` / `/model`, and the expensive-model guard
 # only warns on KNOWN pricing — silent on a custom route, and a billed pick is
@@ -138,6 +144,8 @@ display:
 # endpoint: the billed pick that cost the Infron balance (2026-11-19) was this
 # model resolved through a metered route.
 fallback_providers:
+  - provider: openrouter
+    model: baidu/ernie-5.5-flash-preview:free
   - provider: custom
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
@@ -146,8 +154,6 @@ fallback_providers:
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: ollama-cloud
     model: nemotron-3-ultra
-  - provider: openrouter
-    model: baidu/ernie-5.5-flash-preview:free
   # CrowLLM is a keyed route whose catalog is `:free` ids only: the key comes
   # from the shared sops blob, so the entry names the env var and never the
   # value. `key_env` is the only form hermes resolves — `api_key: ${VAR}` was
@@ -239,6 +245,20 @@ telemetry:
     send: false
     offer_version: 2
 _config_version: 52
+# The gateway's own unit is off-limits to agent turns. A Telegram turn that ran
+# `systemctl --user restart hermes-gateway` took the daemon down mid-answer
+# (2026-11-22 18:54), and every stop then races the shutdown watchdog. Fleet
+# infra still restarts services through `task infra:*`, whose systemctl call is
+# a plain process rather than a gateway tool shell.
+approvals:
+  deny:
+    - systemctl --user restart hermes-gateway*
+    - systemctl --user stop hermes-gateway*
+    - systemctl --user kill hermes-gateway*
+    - systemctl restart hermes-gateway*
+    - systemctl stop hermes-gateway*
+    - hermes gateway restart
+    - hermes gateway stop
 command_allowlist:
   - execute_code
   - script execution via -e/-c flag

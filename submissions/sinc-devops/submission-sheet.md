@@ -99,7 +99,7 @@ The fifth is the 300 km and the 60 % Home Office, with the salary range and no s
 | :--- | :--- |
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 199 prose files, exit 0 |
+| `task checks:prose` | 200 prose files, exit 0 |
 | selection | 11/38 highlights, 3/10 projects |
 | sha256 CV | `3d1896a75b7a131c3214aa4c6b17e90c48691675064f2e5357bc3696b226eaab` |
 | sha256 letter | `38a3c65ef2bc66557ba0ca42767696cf3d8b83e34e4adf8e7fd156c092afbcc4` |

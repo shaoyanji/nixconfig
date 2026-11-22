@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T08:01:28Z",
+  "generated": "2026-11-22T08:01:51Z",
   "count": 200,
-  "pin": "98ebefc39af0b32224b43c08e28c0816880d4c981f31a517a03651456531f2a7",
+  "pin": "80e42d28fd8a3a777ececdf1b84762fb745bf51fc516aa5eea72c0d72a69b21d",
   "turns": [
+    {
+      "id": "57be7a10-ab07-4697-9b27-65afefa63190",
+      "ts": "2026-11-22T08:01:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-sinc",
+      "action": "landed: SINC DevOps packet, CV 2pp letter 1pp, sheet with BA/XING mapping and 80-88k ask | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1efbc93ef8e7956001c04dd0069b4d011ca1807c",
+      "branch": "main",
+      "frame": "03ha5yz1qkhv1d7ay8sqaxxuu"
+    },
     {
       "id": "267baba1-885f-48df-90be-ef6ecac65998",
       "ts": "2026-11-22T08:01:15Z",
@@ -2804,19 +2817,6 @@
       "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
       "branch": "main",
       "frame": "03h9y63plwmiwmtbrg0tycv5m"
-    },
-    {
-      "id": "1f259f07-43fd-4876-a707-529bfea78018",
-      "ts": "2026-11-21T08:03:54Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-freebuff",
-      "action": "landed: freebuff idle -> classified 'publish' (p=0.88, margin=0.83); CV site publish task sent; pane at working... 4s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
-      "branch": "main",
-      "frame": "03h9y63nb9sx39twchkreslii"
     }
   ]
 }

@@ -22,6 +22,7 @@
       sops
       systemd # busctl: free desktops have no libnotify CLI, mako is the server
       wl-clipboard
+      util-linux
       wtype
     ];
     text = ''

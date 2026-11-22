@@ -79,8 +79,10 @@ PROVIDES = {
 }
 
 # Command positions: after a separator or a substitution, or a line start.
+# The `\b` is load-bearing: without it the lookahead backtracks a longer token
+# down to a shorter one, so `envc="…"` was read as a call to `env`.
 CANDIDATE = re.compile(
-    r"(?:^|[;|&({]|\$\(|`|\b(?:then|do|else)\b)\s*([A-Za-z][\w.+-]*)(?!\s*=)",
+    r"(?:^|[;|&({]|\$\(|`|\b(?:then|do|else)\b)\s*([A-Za-z][\w.+-]*)\b(?!\s*=)",
     re.M,
 )
 
@@ -146,40 +148,89 @@ def commands_in(script_text: str) -> set[str]:
     return set(CANDIDATE.findall(stripped))
 
 
+def inline_body(block: str) -> str | None:
+    """The shell inside a `text = '' … '';` indented string, unescaped.
+
+    Nix escapes three sequences inside `''`: `'''` is a literal `''`, `''$` is
+    a literal `$`, and `''\\x` is `x`. Undoing them is what lets the same
+    command scan run over a body that lives in the module instead of a file.
+    """
+    m = re.search(r"text\s*=\s*''", block)
+    if not m:
+        return None
+    out: list[str] = []
+    i = m.end()
+    while i < len(block):
+        if block.startswith("'''", i):
+            out.append("''")
+            i += 3
+        elif block.startswith("''$", i):
+            out.append("$")
+            i += 3
+        elif block.startswith("''\\", i):
+            out.append(block[i + 3 : i + 4])
+            i += 4
+        elif block.startswith("''", i):
+            return "".join(out)
+        else:
+            out.append(block[i])
+            i += 1
+    return None
+
+
+def dedent(text: str) -> str:
+    lines = text.splitlines()
+    widths = [len(line) - len(line.lstrip()) for line in lines if line.strip()]
+    cut = min(widths) if widths else 0
+    return "\n".join(line[cut:] if len(line) >= cut else line for line in lines)
+
+
 def main() -> int:
     judged = skipped = 0
     failures: list[tuple[str, str, str, str, list[str]]] = []
 
     for nix in sorted(ROOT.glob("modules/**/*.nix")):
         text = nix.read_text(encoding="utf-8", errors="replace")
-        if "writeShellApplication" not in text:
+        starts = [m.start() for m in re.finditer(r"writeShellApplication", text)]
+        if not starts:
             continue
         rel = nix.relative_to(ROOT)
-        script = external_script(text)
-        if not script:
-            print(f"note: {rel} wraps inline text, not an external file — not judged", file=sys.stderr)
-            skipped += 1
-            continue
-        path = (nix.parent / script.strip('"')).resolve()
-        if not path.is_file():
-            print(f"note: {rel} names {script}, which does not exist — not judged", file=sys.stderr)
-            skipped += 1
-            continue
-        declared = runtime_inputs(text)
-        if not declared:
-            print(f"note: {rel} declares no runtimeInputs — not judged", file=sys.stderr)
-            skipped += 1
-            continue
-        judged += 1
-
-        body = strip_heredocs(path.read_text(encoding="utf-8", errors="replace"))
-        excused = set(re.findall(r"shell-input-ok:\s*([A-Za-z][\w.+-]*)", body))
-        have = set(declared)
-        for cmd in sorted(commands_in(body)):
-            package = PROVIDES.get(cmd)
-            if package is None or cmd in excused or package in have:
+        # One file may hold several wrappers (hermes-user ships three), so each
+        # is judged against the list that belongs to it, not the file's first.
+        for idx, start in enumerate(starts):
+            block = text[start : starts[idx + 1] if idx + 1 < len(starts) else len(text)]
+            where = f"{rel} wrapper #{idx + 1}"
+            declared = runtime_inputs(block)
+            if not declared:
+                print(f"note: {where} declares no runtimeInputs — not judged", file=sys.stderr)
+                skipped += 1
                 continue
-            failures.append((str(rel), str(path.relative_to(ROOT)), cmd, package, declared))
+            script = external_script(block)
+            if script:
+                path = (nix.parent / script.strip('"')).resolve()
+                if not path.is_file():
+                    print(f"note: {where} names {script}, which does not exist — not judged", file=sys.stderr)
+                    skipped += 1
+                    continue
+                origin = str(path.relative_to(ROOT))
+                body = path.read_text(encoding="utf-8", errors="replace")
+            else:
+                raw = inline_body(block)
+                if raw is None:
+                    print(f"note: {where} has no text — not judged", file=sys.stderr)
+                    skipped += 1
+                    continue
+                origin = f"{rel} (inline)"
+                body = dedent(raw)
+            judged += 1
+            body = strip_heredocs(body)
+            excused = set(re.findall(r"shell-input-ok:\s*([A-Za-z][\w.+-]*)", body))
+            have = set(declared)
+            for cmd in sorted(commands_in(body)):
+                package = PROVIDES.get(cmd)
+                if package is None or cmd in excused or package in have:
+                    continue
+                failures.append((str(rel), origin, cmd, package, declared))
 
     for nix, script, cmd, package, declared in failures:
         print(f"FAIL {nix}: {script} calls `{cmd}`, which needs `{package}`")

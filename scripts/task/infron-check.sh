@@ -375,13 +375,29 @@ if [ -f "$dispatcher" ]; then
   plan_quick="$(bash "$dispatcher" --dry-run --kind quick "name one risk" 2>/dev/null)"
   first_code="$(printf '%s\n' "$plan_code" | head -1)"
   first_quick="$(printf '%s\n' "$plan_quick" | head -1)"
+  # The plan's first line is `agent:model`, and which agent it names depends on what
+  # the host has installed. dsh and reasonix are deliberately not installed on this
+  # fleet (2026-11-21), so the chat caller is the expected first agent; asserting
+  # `reasonix:` by name failed a correct dispatcher four times and made
+  # `checks:quick` impossible on delphi. The preference order stays for a host that
+  # does install them, and a forced `--agent` for an absent one must be refused.
+  first_agent() { # kind -> the agent this host can route that kind to
+    case $1 in
+    code) command -v reasonix >/dev/null 2>&1 && { printf reasonix; return; } ;;
+    esac
+    if command -v dsh >/dev/null 2>&1; then printf dsh; return; fi
+    if command -v reasonix >/dev/null 2>&1; then printf reasonix; return; fi
+    printf chat
+  }
+  want_code=$(first_agent code)
+  want_quick=$(first_agent quick)
   case "$first_code" in
-    reasonix:*) ok "a code task walks reasonix first" ;;
-    *) bad "the code plan starts with '$first_code'" ;;
+    "$want_code":*) ok "a code task walks $want_code first" ;;
+    *) bad "the code plan starts with '$first_code', expected $want_code" ;;
   esac
   case "$first_quick" in
-    dsh:*) ok "a quick task walks dsh first" ;;
-    *) bad "the quick plan starts with '$first_quick'" ;;
+    "$want_quick":*) ok "a quick task walks $want_quick first" ;;
+    *) bad "the quick plan starts with '$first_quick', expected $want_quick" ;;
   esac
   paid=""
   while IFS= read -r entry; do
@@ -398,14 +414,22 @@ if [ -f "$dispatcher" ]; then
     bad "the dry-run plan is not the documented JSON shape"
   fi
   forced="$(bash "$dispatcher" --dry-run --kind quick --agent reasonix "hi" 2>/dev/null | head -1)"
-  case "$forced" in
-    reasonix:*) ok "--agent restricts the plan to one agent" ;;
-    *) bad "--agent did not restrict the plan: '$forced'" ;;
-  esac
+  if command -v reasonix >/dev/null 2>&1; then
+    case "$forced" in
+      reasonix:*) ok "--agent restricts the plan to one agent" ;;
+      *) bad "--agent did not restrict the plan: '$forced'" ;;
+    esac
+  else
+    # An agent that is not installed has no route, and the dispatcher must say so
+    # rather than plan a run it cannot start.
+    bash "$dispatcher" --dry-run --kind quick --agent reasonix "hi" >/dev/null 2>&1
+    [ $? -eq 2 ] && ok "--agent reasonix is refused here (reasonix is not installed)" ||
+      bad "a forced agent that is not installed was not refused"
+  fi
   auto_code="$(bash "$dispatcher" --dry-run "please refactor scripts/dispatch.sh" 2>/dev/null | head -1)"
   case "$auto_code" in
-    reasonix:*) ok "kind=auto reads a path and a verb as a code task" ;;
-    *) bad "kind=auto misread a code task: '$auto_code'" ;;
+    "$want_code":*) ok "kind=auto reads a path and a verb as a code task" ;;
+    *) bad "kind=auto misread a code task: '$auto_code', expected $want_code" ;;
   esac
   bash "$dispatcher" --dry-run --kind nonsense "hi" >/dev/null 2>&1
   [ $? -eq 2 ] && ok "an unknown kind is refused" || bad "an unknown kind was not refused"

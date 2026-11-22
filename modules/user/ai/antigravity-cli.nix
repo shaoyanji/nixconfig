@@ -83,6 +83,7 @@
         name = "agy-subagent";
         runtimeInputs = [
           self.packages.${pkgs.stdenv.hostPlatform.system}.cli.ai.agy-gemini
+          pkgs.coreutils
           pkgs.git
           pkgs.llm-agents.toon
         ];

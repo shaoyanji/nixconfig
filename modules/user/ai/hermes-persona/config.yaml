@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 4
+  api_max_retries: 5 # one restart credit per fallback hop; the chain has 5 lanes
 # Every provider holding a credential in ~/.hermes/.env or the shell env is a
 # selectable row in `hermes model` / `/model`, and the expensive-model guard
 # only warns on KNOWN pricing — silent on a custom route, and a billed pick is

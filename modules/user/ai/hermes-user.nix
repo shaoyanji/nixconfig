@@ -394,6 +394,7 @@ in {
           name = "hermes-handoff";
           runtimeInputs = with pkgs; [
             coreutils
+            findutils
             gnugrep
             gnused
           ];

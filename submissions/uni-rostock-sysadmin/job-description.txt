@@ -1,0 +1,28 @@
+Systemadministrator/in (w/m/d)
+Universität Rostock — Fakultät für Informatik und Elektrotechnik, Lehrstuhl für Software Engineering
+Angebots-ID Interamt: 1512442 | Kennung: 17891
+Ort: Albert-Einstein-Straße 22, 18059 Rostock (Campus Südstadt) | hybrid
+Entgelt: TV-L E 10 | 40 h/Woche | Vollzeit oder Teilzeit
+Befristet für die Zeit eines Sabbaticals bis 30.11.2027 | Besetzung zum 01.12.2026
+Bewerbungsfrist: 27.11.2026 | online seit 13.11.2026
+Kontakt: Herr Prof. Dr.-Ing. Danielis
+Quellen: service.bund.de/IMPORTE/Stellenangebote/interamt/2026/11/1512442.html, karriere.interamt.de (Angebots-ID 1512442), PDF-Auszug karriere-in-mv.de/stelle/17891. Die Direktseite karriere-in-mv.de/stelle/17891 antwortete am 22.11.2026 mit HTTP 404; interamt.de liefert eine Redirect-Schleife.
+
+Aufgaben
+
+- Betreuen eines Lehrstuhl-Fachlabors hinsichtlich Hard- und Software.
+- Administrieren der vorhandenen Server-Infrastruktur auf Lehrstuhl- und Institutsebene.
+- Aktives Unterstützen bei der Beschaffung und Integration neuer Hard- und Software im Rahmen von IT-Projekten.
+- Bearbeiten von Support-Anfragen sowie Erstellen technischer Dokumentationen.
+- Mitverantwortlich für die kontinuierliche Sicherstellung des störungsfreien Betriebs der gesamten IT-Infrastruktur.
+- Administrieren von Windows- und Linux-Infrastrukturen, Desktop- und Notebook-Systemen.
+- Betreuen des Programms "Webapplication".
+- Administrieren von Linux-basierten Virtualisierungsinfrastrukturen.
+
+Profil (Auszug)
+
+- Interesse an der Unterstützung von Wissenschaftlerinnen und Wissenschaftlern.
+- Kenntnisse in der Bereitstellung von Web-Applikationen.
+- Kenntnisse von Linux-basierter Virtualisierungstechnik.
+- Sichere Kenntnisse der deutschen Sprache in Wort und Schrift.
+- [Auszug] Das Anforderungsprofil ist nur teilweise belegt; die zitierten Punkte stammen aus dem PDF-Auszug der Anzeige. Studienabschluss und weitere formale Voraussetzungen vor dem Absenden am Original prüfen.

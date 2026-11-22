@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T11:44:08Z",
+  "generated": "2026-11-22T11:44:57Z",
   "count": 200,
-  "pin": "8caaaad36d5820848d2e32ab3033be66124a021608aaaf4f4aacc3c69d93424b",
+  "pin": "6a72c7025c594937414bd640f38cfad15a8af3837d5bd014fa60a9805748df33",
   "turns": [
+    {
+      "id": "12894bf8-bcbf-4afe-a8a5-f56054be9116",
+      "ts": "2026-11-22T11:44:23Z",
+      "source": "freebuff",
+      "subject": "nixconfig:virtuslab",
+      "action": "landed: native English Typst dossier, 2pp CV 1031 words + 1pp letter 468 words, legacy Nix PDFs and .txt retired. Note: sibling done turn named 5466aebd which is not in this repo, so the packet was rebuilt | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b266406198f6e1457ee7b79f9511ed53a15b7536",
+      "branch": "main",
+      "frame": "03ha76gtn83mso2sn6mimygr1"
+    },
     {
       "id": "a628f5c8-a231-42ac-8cc6-ee8cb87702cc",
       "ts": "2026-11-22T11:43:09Z",
@@ -2789,19 +2802,6 @@
       "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
       "branch": "main",
       "frame": "03ha6jd8h7z2sqmdsmcam7qmh"
-    },
-    {
-      "id": "2a018657-5e96-4f47-8cbf-71c08dec943b",
-      "ts": "2026-11-22T09:46:01Z",
-      "source": "freebuff",
-      "subject": "nixconfig:smartclip-sre-observability",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
-      "branch": "main",
-      "frame": "03ha6jcgp20erzibg4uur5qcr"
     }
   ]
 }

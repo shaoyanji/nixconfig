@@ -349,11 +349,23 @@ CONDITIONAL_INVITE = re.compile(
 # sentences put a Canonical record at `interview` on the day it was applied to,
 # which is why the interview rule reads text with these clauses removed.
 INTERVIEW_BOILERPLATE = re.compile(
+    # Canonical: "direct your questions to interviewers you meet along the way".
     r"interviewers? (?:you|that|who|we|will)\b[^.]{0,100}"
-    r"|interview (?:tips|preparation|experience|panel|feedback)"
-    r"|prepare for (?:your|the|an) interview"
+    # Canonical and Wolt: "interview tips", "tips for preparing for interviews".
+    r"|interview (?:tips|preparation|experience|panel|feedback|journey|guides?)"
+    r"|prepar(?:e|ing) for (?:your|the|an|our|any)? ?interviews?"
+    # GitLab: "how Gitlab conducts interviews on a global scale".
+    r"|how [^.]{0,40}conducts? interviews?"
     r"|questions? about (?:the|your) interview"
+    # Sezzle: "as part of our initial screening".
+    r"|(?:as )?part of (?:our|the) (?:initial )?screening"
+    r"|(?:initial|our) screening (?:process|procedure)"
+    r"|screening (?:prozess|verfahren|phase)"
+    # Any calendar note that states a meeting exists without inviting anyone.
     r"|(?:calendar )?(?:invitation|message) (?:was|is) (?:generated|sent) automatically"
+    # Celonis: "we will reach out if you are moved forward in the interview
+    # journey" — a condition, not an invitation.
+    r"|(?:if|when) (?:you are|you're|we) [^.]{0,50}(?:interview|screening)"
 )
 
 

@@ -80,6 +80,44 @@ cases = [
         None,
     ),
     (
+        # Celonis: the acknowledgement conditions the next step on a decision
+        # nobody has made yet.
+        "interview journey is not an interview",
+        "Thank you for applying to Celonis. We are reviewing all applications and "
+        "will reach out if you are moved forward in the interview journey.",
+        "received",
+    ),
+    (
+        # Wolt: a link to interview advice inside the receipt.
+        "interview preparation tips are not an interview",
+        "Thanks for applying to Wolt. Tips for preparing for interviews with Wolt "
+        "are on our careers site.",
+        "received",
+    ),
+    (
+        # GitLab: the handbook page about how the company interviews people.
+        "how a company interviews is not an interview",
+        "Thank you for applying to GitLab. For better understanding of how GitLab "
+        "conducts interviews on a global scale, take a look at this handbook page.",
+        "received",
+    ),
+    (
+        # Sezzle: the assessment is described, not scheduled.
+        "initial screening paragraph is not a screening",
+        "Thank you for applying! As part of our initial screening, we utilize "
+        "various assessments and tests.",
+        "received",
+    ),
+    (
+        # A real invitation from a person, in the same vocabulary: it must survive
+        # the boilerplate filter.
+        "a personal invitation still is an interview",
+        "vielen Dank für dein Interesse und deine Bewerbung bei uns. Ich würde dich "
+        "gerne zu einem persönlichen Vorstellungsgespräch einladen. Passt es dir am "
+        "Montag um 13:30 Uhr?",
+        "interview",
+    ),
+    (
         "received: acknowledgement",
         "Vielen Dank für deine Bewerbung. Wir haben deine Unterlagen erhalten.",
         "received",

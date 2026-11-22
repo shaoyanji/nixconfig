@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-22T11:50:21Z",
+  "generated": "2026-11-22T11:53:28Z",
   "count": 200,
-  "pin": "6783f3248e48a82cb5589f46ff68b2054a354833b946656e26f482e5e98c19ee",
+  "pin": "3462595f9684c1c8887fc679cc4bf9d3f85ad4900f1b7d21f5fcd45d00410d19",
   "turns": [
+    {
+      "id": "6f93b7b7-2b4e-4973-9354-07366c2d42b1",
+      "ts": "2026-11-22T11:52:45Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building sumup (pane 1), inspecting canonical-gitops (pane 2), building grafana (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/sumup",
+        "submissions/canonical-gitops",
+        "submissions/grafana"
+      ],
+      "files": [],
+      "base_commit": "a6db401f1c0885af36bacb56e63a015b9ea1b636",
+      "branch": "main",
+      "frame": "03ha783pgj0fcz75hotwsanwu"
+    },
+    {
+      "id": "4074de2b-9f3f-47a0-9b9e-82724ce38e63",
+      "ts": "2026-11-22T11:51:46Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:canonical-gitops",
+      "action": "landed: balanced the canonical-gitops CV onto two real pages (11pt, 0.7em leading, break before Projects); profile+experience 85% fill, projects+education+skills 61%; letter untouched 1pp; extracted text identical | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/canonical-gitops"
+      ],
+      "files": [],
+      "base_commit": "e149241a3b87addad192b358e98830b6fabc584b",
+      "branch": "main",
+      "frame": "03ha77wpnlrb3g9fofl36rojo"
+    },
+    {
+      "id": "c9a6b51f-fb16-4199-a6e7-7cdb8be4edbe",
+      "ts": "2026-11-22T11:50:34Z",
+      "source": "freebuff",
+      "subject": "nixconfig:ionos-sre",
+      "action": "landed: native German Typst dossier for Application Hosting SRE — CV 2pp/980w, letter 1pp/441w, 0 warnings; replaced database-generated PDFs, dropped the fabricated cloud/web/language stack, retired packet symlink + selection.json + letter.json; requisition verified closed | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a6db401f1c0885af36bacb56e63a015b9ea1b636",
+      "branch": "main",
+      "frame": "03ha77odc2mt78luq92icc33g"
+    },
+    {
+      "id": "1942c550-64ae-4fe4-8920-74312c0e45b1",
+      "ts": "2026-11-22T11:50:33Z",
+      "source": "devin",
+      "subject": "job-hunt:grafana-observability",
+      "action": "landed: Grafana DB Observability (6250631004) applied+confirmed via OTP lane; /tmp upload workaround confirmed working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a6db401f1c0885af36bacb56e63a015b9ea1b636",
+      "branch": "main",
+      "frame": "03ha77oa3ptkbka3emdlp7w4t"
+    },
     {
       "id": "40705bfc-de84-4575-a6a6-6763cd28b0ce",
       "ts": "2026-11-22T11:49:46Z",
@@ -2760,58 +2818,6 @@
       "base_commit": "8c435444bf2e1b7f47a8ec53006a14c424fb11ad",
       "branch": "main",
       "frame": "03ha6lb1qnmq2hscc3l0dr1gr"
-    },
-    {
-      "id": "c8220417-bea7-4534-b5cc-203e5307f8ad",
-      "ts": "2026-11-22T09:54:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:grafana",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0794dfbbc1c293e2352b5e328e58c1006b8483b4",
-      "branch": "main",
-      "frame": "03ha6l0zlts5upe9vuhdm9h8b"
-    },
-    {
-      "id": "3c4330cf-2a89-4ded-9185-38697bda38f6",
-      "ts": "2026-11-22T09:54:08Z",
-      "source": "freebuff",
-      "subject": "nixconfig:scoreplay",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f367c32e2ca4fc273203ce75db979bc51c1efb7c",
-      "branch": "main",
-      "frame": "03ha6kxi9b3fdnm3nu6za4v1o"
-    },
-    {
-      "id": "b1ab7661-9d19-4055-a9be-4e851b8c717e",
-      "ts": "2026-11-22T09:52:05Z",
-      "source": "freebuff",
-      "subject": "nixconfig:telekom-sre-observability",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a8dd99f1ff45a3929ffee02b553072023ecc82ef",
-      "branch": "main",
-      "frame": "03ha6kj3x5p9zqvqpwgulw1b1"
-    },
-    {
-      "id": "da0ac661-36bb-4291-ad34-317eee0727ac",
-      "ts": "2026-11-22T09:52:03Z",
-      "source": "freebuff",
-      "subject": "nixconfig:ionos-staff-nre",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3cadecb213023acd83cd02d8231126a11a2d151c",
-      "branch": "main",
-      "frame": "03ha6kiw2nxu8rm6nu2xujzzy"
     }
   ]
 }

@@ -19,21 +19,22 @@
       "resumeName": "nixconfig"
     },
     {
-      "name": "email-archive",
-      "entity": "Personal",
-      "type": "service",
-      "start": "2026-11",
-      "end": "",
-      "summary": "A PostgreSQL mail archive on the delphi host: a generated tsvector and GIN index for full-text search, SQL endpoints generated from annotated queries, and an idempotent upsert on message_id. An hourly importer adds up to 200 messages per run; a fuzzy CLI and web reader read the same rows.",
-      "summaryDe": "Ein PostgreSQL-Mailarchiv: generierter tsvector und GIN-Index für Volltextsuche, aus annotierten Queries erzeugte SQL-Endpunkte und ein Upsert auf message_id, mit Fuzzy-CLI und Web-Reader auf denselben Zeilen.",
+      "name": "Risk Calculation Engine (Swirl Engine)",
+      "entity": "Personal research",
+      "type": "open source",
+      "start": "2026-03",
+      "end": "2026-03",
+      "summary": "A polyglot risk calculation engine: Green's Theorem over stochastic polygons, a Go shape fuzzer that generates the shapes it has to survive, and a Nushell and Awk pipeline that sidesteps compiler limits for the arithmetic. Nix pins the toolchain.",
+      "summaryDe": "Eine polyglotte Risikoberechnungs-Engine: der Satz von Green über stochastische Polygone, ein Go-Form-Fuzzer, der die Formen erzeugt, die sie aushalten muss, und eine Pipeline aus Nushell und Awk, die Compiler-Grenzen für die Arithmetik umgeht. Nix pinnt die Werkzeuge.",
       "keywords": [
-        "PostgreSQL",
-        "full-text search",
-        "SQL",
-        "NpgsqlRest"
+        "Go",
+        "Nushell",
+        "Awk",
+        "Green's Theorem",
+        "Nix"
       ],
-      "url": "https://github.com/shaoyanji/nixconfig/blob/main/docs/email-archive.md",
-      "resumeName": "email-archive"
+      "url": "https://github.com/shaoyanji/risk-calc",
+      "resumeName": "Risk Calculation Engine (Swirl Engine)"
     },
     {
       "name": "Bountystash work engine",

@@ -115,31 +115,6 @@
       "sortStart": "2023-01-01"
     },
     {
-      "title": "EWE Trading: PPA consulting",
-      "role": "External consultant",
-      "description": "A three-month external consulting engagement for EWE Trading in 2023: risk-adjusted PPA models and the commercial logic behind them.",
-      "link": "",
-      "keywords": [
-        "PPA",
-        "energy trading",
-        "risk models"
-      ],
-      "org": "EWE Trading",
-      "sortStart": "2023-01-01"
-    },
-    {
-      "title": "Landvest: investment app",
-      "role": "Freelance no-code developer",
-      "description": "A 2021 freelance engagement: a no-code app for Landvest's investment platform.",
-      "link": "",
-      "keywords": [
-        "no-code",
-        "investment platform"
-      ],
-      "org": "Landvest",
-      "sortStart": "2021-01-01"
-    },
-    {
       "title": "fibtransponder",
       "role": "Research and implementation",
       "description": "I set out to build a stream detector and wrote the benchmark first. The measurement killed the first design, so what ships is the smaller claim: a state machine whose work per step stays bounded, with the corpus that falsified the rest in the repository.",

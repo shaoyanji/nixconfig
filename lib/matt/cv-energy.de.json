@@ -8,15 +8,12 @@
   },
   "work": [
     {
-      "name": "EWE Trading",
+      "name": "Bountystash",
       "highlights": [
-        "Dreimonatiges externes PPA-Beratungsmandat für die EWE Trading"
-      ]
-    },
-    {
-      "name": "Landvest",
-      "highlights": [
-        "Baute eine No-Code-App für die Investmentplattform von Landvest."
+        "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen.",
+        "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading.",
+        "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD.",
+        "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten."
       ]
     },
     {

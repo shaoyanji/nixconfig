@@ -8,37 +8,47 @@
   },
   "work": [
     {
-      "name": "EWE Trading",
-      "position": "Externer Berater (PPA)",
-      "startDate": "2023-01-01",
-      "endDate": "2023-12-31",
+      "name": "Bountystash",
+      "position": "Gründer",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-19",
       "highlights": [
-        "Dreimonatiges externes PPA-Beratungsmandat für die EWE Trading"
+        "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten.",
+        "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig.",
+        "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist.",
+        "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen.",
+        "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading.",
+        "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD.",
+        "Konzipierte eine Covered-Call-Hedging-Strategie für Kundenportfolios.",
+        "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists.",
+        "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit.",
+        "Prüfte Bug-Bounty-Programme.",
+        "Baute und betrieb eine NixOS-Flotte, die als ein Flake deklariert ist: jeder Host eine Feature-Liste, jeder Dienst ein Modul, Secrets mit sops verschlüsselt hinter der eigenen SSH-Zertifizierungsstelle der Flotte",
+        "Machte Rebuilds reproduzierbar über einen gemeinsamen Binary-Cache und Remote-Builder; jede Server-Generation lässt sich mit einem Befehl zurückrollen",
+        "Sicherte Infrastrukturänderungen mit inventargetriebener CI und einem Modul-Check je Host ab, sodass eine fehlerhafte Host-Definition vor dem Deploy scheitert",
+        "Schrieb einen Sentinel-Job, der Job-Status, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten protokolliert und alarmiert, wenn ein Dienst ausfällt"
       ],
       "keywords": [
+        "Risiko",
         "PPA",
-        "Energiehandel",
-        "Risikomodelle"
-      ],
-      "url": "",
-      "summary": "Dreimonatiges externes Beratungsmandat für die EWE Trading im Jahr 2023 mit Fokus auf PPA-Modellierung.",
-      "description": "Dreimonatiges externes PPA-Beratungsmandat für die EWE Trading im Jahr 2023."
-    },
-    {
-      "name": "Landvest",
-      "position": "Freelance-No-Code-Entwickler",
-      "startDate": "2021-01-01",
-      "endDate": "2021-12-31",
-      "highlights": [
-        "Baute eine No-Code-App für die Investmentplattform von Landvest."
-      ],
-      "keywords": [
-        "No-Code",
-        "Investmentplattform"
-      ],
-      "url": "",
-      "summary": "Freiberufliche No-Code-App für die Investmentplattform von Landvest im Jahr 2021.",
-      "description": "Freiberufliche No-Code-App für die Investmentplattform von Landvest im Jahr 2021."
+        "Wetterderivate",
+        "Optionspreise",
+        "Gasspeicher",
+        "Handelsmodelle",
+        "Go",
+        "Web-Sicherheit",
+        "LLM",
+        "Bug Bounty",
+        "Portfoliostrategie",
+        "NixOS",
+        "Nix Flakes",
+        "Binary-Cache",
+        "CI",
+        "Monitoring",
+        "Tailscale",
+        "Cloudflare",
+        "SOPS"
+      ]
     },
     {
       "name": "O3 Energy",
@@ -49,11 +59,9 @@
         "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen.",
         "Leitete das Asset Management eines Portfolios über 100 Mio. USD.",
         "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch.",
+        "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften.",
         "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD.",
         "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf.",
-        "Implementierte Salesforce für das Asset-Management-Team.",
-        "Beschaffte Microsoft 365 und hielt Netzwerk und WLAN des Büros am Laufen.",
-        "Bot IT-Support für ein kleines Büro.",
         "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten.",
         "Führte ein internationales Team und entwickelte eine Anreizstruktur, gekoppelt an ein Echtzeit-Finanzmodell."
       ]
@@ -66,9 +74,9 @@
       "highlights": [
         "Betreute eine Projektpipeline über 100 Mio. USD.",
         "Verantwortete den Kundenservice und die Betreuung der Mandanten.",
-        "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit."
-      ],
-      "keywords": []
+        "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit.",
+        "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+      ]
     },
     {
       "name": "Fraunhofer ISE",
@@ -173,12 +181,17 @@
     {
       "name": "nixconfig",
       "resumeName": "nixconfig",
-      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen. Dieselbe Flotte betreibt selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
+      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
       "url": "https://github.com/shaoyanji/nixconfig",
       "startDate": "2023-01-01",
       "endDate": "",
       "type": "open source",
-      "highlights": [],
+      "highlights": [
+        "Deklarierte die gesamte Flotte in einem Flake: jeder Host eine Feature-Liste, jeder Dienst ein Modul, sodass die Optionsfläche ein Gate bleibt statt Copy-and-paste",
+        "Verschlüsselte jedes Secret mit sops und stellte Host-Schlüssel über die eigene SSH-Zertifizierungsstelle der Flotte aus",
+        "Bediente Rebuilds aus einem gemeinsamen Binary-Cache; jede Server-Generation lässt sich mit einem Befehl zurückrollen",
+        "Ließ in CI dasselbe Modul-Gate je Host laufen wie auf den Maschinen, dazu ein Sentinel-Ledger aus Job-Status, Generation-Alter, Disk- und PSI-Druck"
+      ],
       "keywords": [
         "Nix",
         "NixOS",
@@ -188,28 +201,12 @@
       ]
     },
     {
-      "name": "E-Mail-Archiv",
-      "resumeName": "email-archive",
-      "description": "Ein PostgreSQL-Mailarchiv: generierter tsvector und GIN-Index für Volltextsuche, aus annotierten Queries erzeugte SQL-Endpunkte und ein Upsert auf message_id, mit Fuzzy-CLI und Web-Reader auf denselben Zeilen.",
-      "url": "https://github.com/shaoyanji/nixconfig/blob/main/docs/email-archive.md",
-      "startDate": "2026-11-02",
-      "endDate": "",
-      "type": "service",
-      "highlights": [],
-      "keywords": [
-        "PostgreSQL",
-        "Volltextsuche",
-        "SQL",
-        "NpgsqlRest"
-      ]
-    },
-    {
-      "name": "Bountystash-Aufgaben-Engine",
+      "name": "bountystash",
       "resumeName": "bountystash",
       "description": "Ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht. Append-only Events, Terminal-Oberfläche und curl-Endpunkte kommen aus einem Binary.",
       "url": "https://github.com/shaoyanji/bountystash",
       "startDate": "2020-06-01",
-      "endDate": "2023-12-31",
+      "endDate": "2025-08-01",
       "type": "product",
       "highlights": [],
       "keywords": [
@@ -294,6 +291,34 @@
         "HTML",
         "Typst",
         "i18n"
+      ]
+    },
+    {
+      "name": "Risikoberechnungs-Engine (Swirl Engine)",
+      "resumeName": "Risk Calculation Engine (Swirl Engine)",
+      "type": "open_source",
+      "url": "https://github.com/shaoyanji/risk-calc",
+      "startDate": "2026-03-15",
+      "endDate": "2026-03-18",
+      "description": "Satz von Green auf stochastische Polygone: ein Go-Fuzzer erzeugt Formen, eine Pipeline aus Nushell und Awk treibt die Berechnung, eine Nix-Entwicklungsumgebung pinnt die Werkzeuge.",
+      "highlights": [
+        "Konzipierte eine „Swirl Engine“ auf Basis des Satzes von Green, um Polygonflächen aus zufälligen geometrischen Daten zu berechnen.",
+        "Implementierte einen Shape-Fuzzer in Go, der stochastische Polygone erzeugt, um die Berechnungsengine zu belasten.",
+        "Orchestrierte die Pipeline mit Nushell und Awk und umging damit Compiler-Grenzen für rechenintensive Mathematik.",
+        "Containerisierte die Umgebung mit Nix Flakes für reproduzierbare Go-1.16+-Entwicklung."
+      ],
+      "keywords": [
+        "Go",
+        "Nushell",
+        "Awk",
+        "Satz von Green",
+        "Risikoanalyse",
+        "NixOS",
+        "Polyglotte Programmierung"
+      ],
+      "roles": [
+        "Lead Developer",
+        "Forscher"
       ]
     }
   ],

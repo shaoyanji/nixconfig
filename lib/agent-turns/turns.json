@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T00:55:20Z",
+  "generated": "2026-11-22T01:33:14Z",
   "count": 200,
-  "pin": "023ac2674ba4377b2b3a41605ce32adcc248b2bb02fb500359bd48294b7e60e6",
+  "pin": "ed8e9db66a4b740b9af5708e0e4dace107cfdf52293954f0de31e9159b21ee88",
   "turns": [
+    {
+      "id": "5d86ad66-c7a5-4221-be08-35a3a51a0052",
+      "ts": "2026-11-22T01:29:18Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:cv-drift-fix",
+      "action": "landed: drove freebuff pane default:1.1 with matt:gist:drift gate fix (bug-fix via jevdecide duel gate-change/bug-fix, margin 0.46); pane confirmed working... 18s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "20b7affafc5b2ba3ab668780578b0cac3af1cbf9",
+      "branch": "main",
+      "frame": "03ha3ubdeb22q54po6b9pakcv"
+    },
+    {
+      "id": "d8c3b000-65a7-42fd-b69a-1e8493e1ea3b",
+      "ts": "2026-11-22T01:10:50Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove idle freebuff pane default:1.1 with Greenhouse crawl task (coordinator dispatch 'Pane 1 crawling Greenhouse'); pane confirmed working (29s counter)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "20b7affafc5b2ba3ab668780578b0cac3af1cbf9",
+      "branch": "main",
+      "frame": "03ha3qpfsypm9uyzw11cb7egt"
+    },
+    {
+      "id": "d111d6fa-ebc0-4170-90ae-8590c7b2c894",
+      "ts": "2026-11-22T01:02:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-software-and-outreach-redaction",
+      "action": "landed: fifth CV (cv-software) + live link count, image prompt lane, hermes handoff gate, outreach dossier redacted (no recipient addresses, no mobile) and outside the knowledge-graph doc set | gate: checks:quick + sites.matt-site + docs-budget PASS; CI pages+nixcachix green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "20b7affafc5b2ba3ab668780578b0cac3af1cbf9",
+      "branch": "main",
+      "frame": "03ha3p3b9yupa76cn41ws3ovq"
+    },
     {
       "id": "eb6aaf04-ac30-424a-b019-4850c4722a6b",
       "ts": "2026-11-22T00:54:56Z",
@@ -2753,49 +2792,6 @@
       "base_commit": "3307d8f77153985862b7746b1fdd6c46214ed074",
       "branch": "main",
       "frame": "03h9w748fv4hnrqwpacnmr4h3"
-    },
-    {
-      "id": "cc4f091f-9fa4-4148-9771-02c2c7ccf7f7",
-      "ts": "2026-11-21T01:59:35Z",
-      "source": "frieren-steward",
-      "subject": "nixconfig:cv-site-gate",
-      "action": "landed: freebuff win1 completed the durable CV-PDF-link gate",
-      "outcome": "done",
-      "claims": [
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9w6xibnit3xs5kpxtig7wf"
-    },
-    {
-      "id": "7bbfe7b1-e04c-435e-8f7e-e0310dc9fe69",
-      "ts": "2026-11-21T01:59:18Z",
-      "source": "frieren-steward",
-      "subject": "nixconfig:cv-site-gate",
-      "action": "landed: drove freebuff win1 (CV/site lane) to continue the durable CV-PDF-link gate",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9w6vkfw9vpv9fzixdmewe1"
-    },
-    {
-      "id": "8c6066eb-f145-44ff-a972-21a004a5fa50",
-      "ts": "2026-11-21T01:54:03Z",
-      "source": "devin",
-      "subject": "nixconfig:xs-notify-delphi",
-      "action": "landed: xs-notify on delphi — Telegram lane via sops alias, minutely timer on loopback 8093, desktop stale flags stripped | gate: checks:quick PASS + deploy switch + live alert sent",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9w5uppmlxfgo1ciubisft4"
     }
   ]
 }

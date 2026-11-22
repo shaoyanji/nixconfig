@@ -8,16 +8,12 @@
   },
   "work": [
     {
-      "name": "EWE Trading",
+      "name": "Bountystash",
       "highlights": [
-        "Three-month external PPA consulting engagement for EWE Trading",
-        "Built risk-adjusted PPA trading models for EWE Trading"
-      ]
-    },
-    {
-      "name": "Landvest",
-      "highlights": [
-        "Built a no-code app for Landvest's investment platform"
+        "Built risk-adjusted PPA trading models for energy companies",
+        "Risk-managed gas storage and gas swing trading models as risk manager for EWE Trading",
+        "Built apps for clients holding land portfolios valued above USD 300M",
+        "Built an algorithm for options trading and hedging on weather derivatives"
       ]
     },
     {

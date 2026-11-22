@@ -115,31 +115,6 @@
       "sortStart": "2023-01-01"
     },
     {
-      "title": "EWE Trading: PPA-Beratung",
-      "role": "Externer Berater",
-      "description": "Ein dreimonatiges externes Beratungsmandat für die EWE Trading im Jahr 2023: risikoadjustierte PPA-Modelle und die kaufmännische Logik dahinter.",
-      "link": "",
-      "keywords": [
-        "PPA",
-        "Energiehandel",
-        "Risikomodelle"
-      ],
-      "org": "EWE Trading",
-      "sortStart": "2023-01-01"
-    },
-    {
-      "title": "Landvest: Investment-App",
-      "role": "Freelance-No-Code-Entwickler",
-      "description": "Ein freiberufliches Mandat 2021: eine No-Code-App für die Investmentplattform von Landvest.",
-      "link": "",
-      "keywords": [
-        "No-Code",
-        "Investmentplattform"
-      ],
-      "org": "Landvest",
-      "sortStart": "2021-01-01"
-    },
-    {
       "title": "fibtransponder",
       "role": "Recherche und Umsetzung",
       "description": "Ich wollte einen Stream-Detektor bauen und habe zuerst den Benchmark geschrieben. Die Messung hat den ersten Entwurf widerlegt, also bleibt die kleinere Behauptung: ein Zustandsautomat, dessen Arbeit pro Schritt begrenzt ist. Der Korpus, der den Rest widerlegt hat, liegt im Repository.",

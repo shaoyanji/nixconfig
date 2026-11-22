@@ -1,0 +1,60 @@
+IT-Systemadministrator Linux und Windows (m/w/d)
+Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU), Lehrstuhl für Fertigungstechnologie (LFT)
+Angebots-ID 1513404, Kennung für Bewerbungen: 2015, eine Stelle
+Einsatzort: Egerlandstraße 11-13, 91058 Erlangen; weitere Arbeitsorte Haberstraße 9 (91058) und Konrad-Zuse-Straße 5 (91052)
+Dienstort: Hybrid, Homeoffice nach Einarbeitung grundsätzlich möglich
+Entgelt: TV-L E 10, 40,1 Stunden pro Woche, Vollzeit
+Befristet bis 31.03.2028; Besetzung zum 15.02.2027
+Bewerbungsfrist: 01.12.2026
+Bewerbung ausschließlich über die Bewerbungsseite der FAU, nicht über Interamt, nicht per Post oder E-Mail
+Ansprechpartner: Herr Gunar Tochtermann, gunar.tochtermann@fau.de, +49 9131 8528284
+
+Als IT-Systemadministrator (m/w/d) sind Sie für die Betreuung und Weiterentwicklung der IT-Infrastruktur des
+Lehrstuhls sowie die Koordination des IT-Betriebs an den verschiedenen Standorten zuständig.
+
+Der Lehrstuhl für Fertigungstechnologie ist Teil der Technischen Fakultät und forscht zu Blech- und
+Massivumformung, Werkstofftechnik, Fügetechnik und Werkzeugbau, in Projekten mit industriellen Partnern.
+
+Ihre Aufgaben
+
+* Wartung und Pflege der IT-Infrastruktur (Linux- und Windows-Systeme, Server, NAS, Workstations, PCs und
+  Cluster) an allen Standorten, einschließlich Transport und Inbetriebnahme der Systeme
+* Selbstständige Planung und Umsetzung von IT-Infrastrukturprojekten
+* Technische Anwenderbetreuung bei Hard- und Softwarefragen vor Ort und per Fernzugriff
+* Einrichtung und Verwaltung von Benutzerkonten in Linux- und Windows-Umgebungen einschließlich komplexer
+  Rechteverwaltung
+* Beschaffung von Hard- und Software nach den Beschaffungsrichtlinien der FAU
+
+Ihr Profil
+
+* Abgeschlossenes Hochschulstudium (Bachelor oder Diplom FH) der Informatik oder vergleichbar, alternativ
+  vergleichbare Qualifikation mit einschlägiger Berufserfahrung
+* Mehrjährige einschlägige Berufserfahrung, idealerweise in der IT-Systemadministration
+* Sehr gute Kenntnisse von Windows und Ubuntu sowie in der Verwaltung von Windows Server 2019, 2022 und 2025
+  (Active Directory, DNS, Firewall, Group Policies)
+* Erfahrung mit Installation und Aktualisierung komplexer Software (CAD, FE, Office) und mit Lizenzservern
+* Gute Kenntnisse gängiger Backup-Systeme und Virtualisierungstechnologien, insbesondere Hyper-V
+* Fundierte Hardwarekenntnisse wünschenswert
+* Sicherer Umgang mit MS Office sowie PowerShell
+* Führerschein der Klasse B
+* Sehr gute Deutschkenntnisse (mindestens C1), gute Englischkenntnisse (mindestens B2)
+* Selbstständige, strukturierte und zuverlässige Arbeitsweise, hohe Einsatzbereitschaft und Belastbarkeit
+* Lernbereitschaft, Flexibilität, Kommunikations- und Teamfähigkeit
+
+Stellenzusatz
+
+Nach intensiver Einarbeitung und entsprechender Eignung ist die Stelle als Nachfolge der IT-Leitungsfunktion des
+Lehrstuhls angelegt: fachliche und disziplinarische Personal- und Budgetverantwortung, Entwicklungsmöglichkeiten
+bis Entgeltgruppe 11 TV-L in einem unbefristeten Arbeitsverhältnis.
+
+Benefits
+
+* Stufenanstieg und steigendes Gehalt nach TV-L, zusätzliche Jahressonderzahlung
+* 30 Urlaubstage bei fünf Arbeitstagen, frei am 24. und 31. Dezember
+* Flexible Arbeitszeit, Mehrarbeit als Freizeitausgleich
+* Betriebliche Altersversorgung, vermögenswirksame Leistungen
+* Ferien- und Kinderbetreuungsangebote, Gesundheitsmanagement, Mensa
+* Weiterbildung, umfassende Einarbeitung im Team, Büros nahe am öffentlichen Nahverkehr
+
+Teilzeit ist bei Job-Sharing möglich. Schwerbehinderte Menschen werden bei gleicher Eignung bevorzugt
+berücksichtigt. Bewerbungen auf dem Postweg werden nicht zurückgesendet.

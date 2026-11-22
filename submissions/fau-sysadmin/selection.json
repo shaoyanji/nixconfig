@@ -1,0 +1,273 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 3651,
+    "terms": [
+      {
+        "term": "linux",
+        "weight": 16.137
+      },
+      {
+        "term": "systeme",
+        "weight": 16.137
+      },
+      {
+        "term": "erlangen",
+        "weight": 14.67
+      },
+      {
+        "term": "infrastruktur",
+        "weight": 14.67
+      },
+      {
+        "term": "systemadministrator",
+        "weight": 13.019
+      },
+      {
+        "term": "erlangen-nürnberg",
+        "weight": 8.664
+      },
+      {
+        "term": "infrastrukturprojekten",
+        "weight": 8.664
+      },
+      {
+        "term": "post",
+        "weight": 8.664
+      },
+      {
+        "term": "service",
+        "weight": 8.664
+      },
+      {
+        "term": "sicherer",
+        "weight": 8.664
+      },
+      {
+        "term": "systemadministration",
+        "weight": 8.664
+      },
+      {
+        "term": "gute",
+        "weight": 8.27
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "matt.bountystash.com",
+        "score": 0.0
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "bountystash",
+      "fibtransponder",
+      "Risikoberechnungs-Engine (Swirl Engine)"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "PSI-Druck"
+        },
+        {
+          "score": 0.0,
+          "text": "Alarmzustellung"
+        }
+      ],
+      "kept": 6,
+      "name": "Observability",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Ressourcenlimits"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Plattform",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "YAML"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 4.4646,
+          "text": "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledge"
+        },
+        {
+          "score": 2.6845,
+          "text": "Richtete Benutzerkonten und Rechte über Module ein: Rollen als Feature-Liste je Host, kein Konto von Hand angelegt"
+        },
+        {
+          "score": 1.6939,
+          "text": "Verwaltete Secrets und Zugang zentral: sops mit age, eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten"
+        },
+        {
+          "score": 0.0,
+          "text": "Prüfte Endpunkte mit Gatus und band jedes Alerting an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachr"
+        },
+        {
+          "score": 0.0,
+          "text": "Dokumentierte die Plattform für andere: Runbooks, Skill-Seiten und Tasks mit klarer Schnittstelle"
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 9
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.4149,
+          "text": "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
+        },
+        {
+          "score": 1.3099,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        },
+        {
+          "score": 1.0005,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        },
+        {
+          "score": 0.0,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verantwortete den Kundenservice und die Betreuung der Mandanten."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.9825,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 1.7329,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Erstellte neue Excel-Tabellen für die Engineering-Abteilung."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

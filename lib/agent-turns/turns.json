@@ -1,8 +1,92 @@
 {
-  "generated": "2026-11-22T10:36:30Z",
+  "generated": "2026-11-22T10:38:54Z",
   "count": 200,
-  "pin": "96421720ab76505c47a46612c8c1752c480f6b4b4f5c2d6c5240befd0f7b6a1f",
+  "pin": "12e654187cc3e694cc160dba35a7b41d5c26c111456020690426db8407538107",
   "turns": [
+    {
+      "id": "277277fc-6804-4afd-9786-6980b2e3601a",
+      "ts": "2026-11-22T10:38:42Z",
+      "source": "devin",
+      "subject": "nixconfig:devin",
+      "action": "landed: refactored flake wiring to use flake/policies.nix policy predicates",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
+      "branch": "main",
+      "frame": "03ha6tmyqlbkz0oisa7dmyfdd"
+    },
+    {
+      "id": "da295914-1b94-4884-9e02-5dff8ac3af4c",
+      "ts": "2026-11-22T10:38:27Z",
+      "source": "devin",
+      "subject": "nixconfig:actian-director-platform",
+      "action": "blocked: Lever submission stopped at interactive hCaptcha image grid — form fully staged for hand-submit",
+      "outcome": "blocked: hcaptcha-image",
+      "claims": [],
+      "files": [],
+      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
+      "branch": "main",
+      "frame": "03ha6tl6wuk9tm2psvnfoylyg"
+    },
+    {
+      "id": "aa58f143-6d16-41cc-b8a4-47f19366dbd4",
+      "ts": "2026-11-22T10:37:47Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flower",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/flower"
+      ],
+      "files": [],
+      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
+      "branch": "main",
+      "frame": "03ha6tghupi95wltnngo35tgq"
+    },
+    {
+      "id": "067ace2c-12a8-46b8-b4b8-fa9703d169d3",
+      "ts": "2026-11-22T10:37:12Z",
+      "source": "devin",
+      "subject": "nixconfig:actian-director-platform",
+      "action": "claim: Lever submission",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/actian-director-platform"
+      ],
+      "files": [],
+      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
+      "branch": "main",
+      "frame": "03ha6tcfmdzp9yowb2qe77hnt"
+    },
+    {
+      "id": "62411f06-edb5-472d-a348-9ba51a171c30",
+      "ts": "2026-11-22T10:36:45Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-observability",
+      "action": "compiled: native German Typst packet 2pp CV + 1pp letter; KRITIS gap named; fit 4",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "7fd7d28757ff4fd076a5d1d9e4dd6fe1d8d406d8",
+      "branch": "main",
+      "frame": "03ha6t98lqb7mkg7xw3dcsf1u"
+    },
+    {
+      "id": "30cdbf8b-d7f3-4fb5-8275-c6d2fa26a38e",
+      "ts": "2026-11-22T10:36:34Z",
+      "source": "freebuff",
+      "subject": "nixconfig:adyen-platform-genai",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
+      "branch": "main",
+      "frame": "03ha6t7ye5w1enar9os92qhid"
+    },
     {
       "id": "2e5443d3-6f05-404e-aaa5-4f5808fd17da",
       "ts": "2026-11-22T10:35:53Z",
@@ -2584,90 +2668,6 @@
       "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
       "branch": "main",
       "frame": "03ha62q3w93jj560nkeus8jpm"
-    },
-    {
-      "id": "50d678e3-e34d-44ae-b015-acec38869e3d",
-      "ts": "2026-11-22T08:20:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: flix-devops-cloud-infrastructure packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3716f14f4c6344acb9fe7b314c09e6d4b149b351",
-      "branch": "main",
-      "frame": "03ha62no912aluh4ge3bmp2oo"
-    },
-    {
-      "id": "841e489c-e280-451d-a15a-e67206167521",
-      "ts": "2026-11-22T08:18:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: bizfactory-devops-linux packet + 2 leads (trawa, ewerk) via Arbeitnow; BA API 403, BA details 410 | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/bizfactory-devops-linux"
-      ],
-      "files": [],
-      "base_commit": "e5425bc5a0b8fbfecb547856cb0ca7cfd1f7c018",
-      "branch": "main",
-      "frame": "03ha62bej02f6sohqp79y0mqo"
-    },
-    {
-      "id": "fa054e03-39d6-4687-89a7-e11d179f394d",
-      "ts": "2026-11-22T08:17:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "built: smartclip-sre-observability packet | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "84a4283a8a2fa31e88ca32cac930558c0b60dd8d",
-      "branch": "main",
-      "frame": "03ha61yik6p99oxxvvi6olh81"
-    },
-    {
-      "id": "9e24253b-e4d4-4f00-b6c9-5eacbb8ea85b",
-      "ts": "2026-11-22T08:16:20Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: clickhouse DBRE core emea remote germany (Ashby c3617664); captcha-interactive = stop policy",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/clickhouse-dbre"
-      ],
-      "files": [],
-      "base_commit": "7a956e7672c151abb6cd0812e1f30a3318671781",
-      "branch": "main",
-      "frame": "03ha61ttapx1r9sk0fzqqkf9k"
-    },
-    {
-      "id": "f56c8fe3-757c-4ce3-a12d-a843d9ce9426",
-      "ts": "2026-11-22T08:15:28Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-hunt",
-      "action": "correction: kiwigrid-senior-sre commit amended to 8b168fe8, trailer fixed | gate: checks:prose PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/kiwigrid-senior-sre"
-      ],
-      "files": [],
-      "base_commit": "8b168fe82bb43314b34ed868fa2973b959958fee",
-      "branch": "main",
-      "frame": "03ha61nlmzns2xkuw3fvjqfa2"
-    },
-    {
-      "id": "68987579-012b-411f-b78c-faba3b33cb42",
-      "ts": "2026-11-22T08:15:19Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: mongodb-sre-storage-layer submitted via Greenhouse 6984814 embed | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7a956e7672c151abb6cd0812e1f30a3318671781",
-      "branch": "main",
-      "frame": "03ha61mlwado99u4a7iuds3d5"
     }
   ]
 }

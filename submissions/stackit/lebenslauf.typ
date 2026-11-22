@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
-#set page(paper: "a4", margin: (top: 1.4cm, bottom: 1.4cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 9.5pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
-#set par(leading: 0.5em, justify: true)
+#set page(paper: "a4", margin: (top: 1.7cm, bottom: 1.7cm, left: 2.0cm, right: 2.0cm))
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 12pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set par(leading: 0.70em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
@@ -17,7 +17,7 @@
 #text(size: 9pt)[Plattformingenieur, der die Werkzeuge selbst gebaut hat, statt sie einzukaufen: fünf Jahre Betrieb einer Linux-Flotte mit dreizehn Hosts über drei Hardware-Generationen, deklarativ beschrieben, jede Änderung durch ein Gate geprüft und als Generation rückrollbar. Monitoring ist eigene Messung — ein Ledger mit Messwerten alle fünfzehn Minuten, Gatus-Prüfungen, Alarmzustellung mit Bestätigung —, nicht ein Dashboard-Abo. Automatisiert in Go und Python, abgesichert mit nftables als Code, sops und age sowie einer eigenen CA mit kurzlebigen Zertifikaten. Wohnsitz in Baden-Württemberg, Bad Friedrichshall in rund zwei Stunden erreichbar. Nicht vorhanden: Kubernetes-Architektur, Operator-Pattern, Istio und Calico, Helm und Kustomize, Terraform und Pulumi.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
-  #v(5pt)
+  #v(10pt)
   #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#kind]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
@@ -35,7 +35,7 @@
       #for bullet in bullets [- #bullet]
     ]
   ]
-  #v(3pt)
+  #v(7pt)
 ]
 
 #section("Berufserfahrung")

@@ -1,0 +1,46 @@
+Company: Canonical
+Role: Senior Site Reliability Engineer
+Location: Home based - Worldwide
+Remote: yes
+Posted: 2021-03-31
+Source: greenhouse
+URL: https://job-boards.greenhouse.io/canonical/jobs/3029798
+---
+
+Canonical is a leading provider of open source software and operating systems to the global enterprise and technology markets. Our platform, Ubuntu, is very widely used in breakthrough enterprise initiatives such as public cloud, data science, AI, engineering innovation and IoT. Our customers include the world's leading public cloud and silicon providers, and industry leaders in many sectors. The company is a pioneer of global distributed collaboration, with 1200+ colleagues in 75+ countries and very few office based roles. Teams meet two to four times yearly in person, in interesting locations around the world, to align on strategy and execution.
+The company is founder led, profitable and growing.
+We are hiring a Senior Site Reliability Engineer
+Next-gen operations at scale, with pure Python infra-as-code, from bare metal to containers and applications. Our goal is to perfect enterprise infrastructure devops.
+We run hundreds of private cloud, Kubernetes, and application clusters for customers across physical and public cloud estate, and we are raising the bar on what's possible with automation by embracing a universal operator pattern and model-driven operations.
+To succeed in this role you need to believe in automation as a pure software engineering problem, not a hack-it-till-it-works-for-me problem. You need to be interested in the scientific approach to operations at scale, driven by metrics and code, and you need to be able to learn the entire stack, from bare metal networking and kernel up to serverless and open source applications.
+Location: Globally remote role
+The role entails
+Our cloud operations engineers bring Python software-engineering skills and rigour to the operations domain. We practise devsecops from bare metal to application. We architect and run OpenStack, Kubernetes and software defined storage, and we enable devsecops for applications running on that infrastructure too.
+To become a member of this team, you need to be a software engineer fluent in Python, you need a genuine interest in the full open source infrastructure stack from metal to containers, and you need the ability to work in a high pressure operations environment with mission-critical services for global brand name customers.
+As a member of the team you will gain experience in a broad range of cloud technologies. We evolve our offerings as the state of the art improves, so you get to stay current with the latest capabilities in open source infrastructure. We drive upgrades to keep our customers on the latest, best solutions.
+What we are looking for in you
+- Degree in Software Engineering or Computer Science
+- Experience with Linux and familiarity with Linux networking and storage
+- Python software development expertise
+- Operational experience
+- Excellent interpersonal skills, curiosity, flexibility, and accountability
+- Ability to travel internationally twice a year, for company events up to two weeks long
+Nice-to-have skills
+- Experience with OpenStack or Kubernetes deployment or operations
+- Familiarity with public or private cloud management
+What we offer colleagues
+We consider geographical location, experience, and performance in shaping compensation worldwide. We revisit compensation annually (and more often for graduates and associates) to ensure we recognise outstanding performance. In addition to base pay, we offer a performance-driven annual bonus or commission. We provide all team members with additional benefits, which reflect our values and ideals. We balance our programs to meet local needs and ensure fairness globally.
+- Distributed work environment with twice-yearly team sprints in person
+- Personal learning and development budget of USD 2,000 per year
+- Annual compensation review
+- Recognition rewards
+- Annual holiday leave
+- Maternity and paternity leave
+- Employee Assistance Programme
+- Opportunity to travel to new locations to meet colleagues
+- Priority Pass, and travel upgrades for long haul company events
+About Canonical
+Canonical is a pioneering tech firm at the forefront of the global move to open source. As the company that publishes Ubuntu, one of the most important open source projects and the platform for AI, IoT and the cloud, we are changing the world of software. We recruit on a global basis and set a very high standard for people joining the company. We expect excellence - in order to succeed, we need to be the best at what we do. Most colleagues at Canonical have worked from home since its inception in 2004.​ Working here is a step into the future, and will challenge you to think differently, work smarter, learn new skills, and raise your game.
+Canonical is an equal opportunity employer
+We are proud to foster a workplace free from discrimination. Diversity of experience, perspectives, and background create a better work environment and better products. Whatever your identity, we will give your application fair consideration.
+#LI-Remote

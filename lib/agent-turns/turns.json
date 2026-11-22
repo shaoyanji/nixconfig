@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-22T12:08:15Z",
+  "generated": "2026-11-22T12:09:57Z",
   "count": 200,
-  "pin": "6c7b20048f782171c711584363c750dc0229c7c921b01196dcfe007902e8dbba",
+  "pin": "90f473d7633567402b8541b9a0ced1b4a3936eeb6951374eb33f378705ed428b",
   "turns": [
+    {
+      "id": "280570bd-00d9-4eea-875c-5c5a2c0a2a0b",
+      "ts": "2026-11-22T12:09:42Z",
+      "source": "devin",
+      "subject": "job-hunt:mozilla",
+      "action": "landed: Mozilla Staff SWE Tools+Systems (8315181) applied+confirmed via OTP lane; honest IaC/production checkbox picks (Nix=similar tool, no central-team claim)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1536370462278c3286e899ed423ff0bb4d85257c",
+      "branch": "main",
+      "frame": "03ha7bewelq8q847rs0e743mm"
+    },
+    {
+      "id": "cce29250-daf0-4425-9c39-02dced6c6df9",
+      "ts": "2026-11-22T12:09:35Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:stackit-k8s",
+      "action": "landed: stackit-k8s packet was already native Typst (no letter.json, no lebenslauf.json, no store link); CV rebalanced 9.5pt (99%/21%) to 11pt/0.7em (96%/75%, break at Ausbildung), text unchanged, 0 warnings both sources, DB row stackit-k8s marked verified and next action points at finding the original requisition | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/stackit-k8s"
+      ],
+      "files": [],
+      "base_commit": "d8528fe63e2e6d74ae05b8e82c100af35f136e5b",
+      "branch": "main",
+      "frame": "03ha7be2xfzs9ffzhtp4j9ui0"
+    },
+    {
+      "id": "196bfe73-67aa-4eaf-b485-e3f13a308cb2",
+      "ts": "2026-11-22T12:08:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-rust",
+      "action": "landed: native English Typst dossier for Rust Engineering Lead — CV 2pp (freshly measured), letter 1pp, 0 warnings, prose exit 0. Previous CV had no Rust project and a fabricated cloud/web skills block; native CV leads with tokenloom (piece table, ripple re-tokeniser, invariant test, 5ms gate) and the tokio/axum runtime, gaps named, selection.json retired | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1536370462278c3286e899ed423ff0bb4d85257c",
+      "branch": "main",
+      "frame": "03ha7b577k11uthm4seytum9j"
+    },
     {
       "id": "6c294ae4-17dd-498b-8b1d-49b4f9ba80c6",
       "ts": "2026-11-22T12:07:51Z",
@@ -2807,45 +2848,6 @@
       "base_commit": "4993a241e8d44a8f57a67e54be3a58f5607077fe",
       "branch": "main",
       "frame": "03ha6on56gx9d4050yu0b1lyr"
-    },
-    {
-      "id": "8f13a44b-8a20-400b-a8f8-0f7ef813b237",
-      "ts": "2026-11-22T10:12:23Z",
-      "source": "devin",
-      "subject": "nixconfig:canonical-sre",
-      "action": "integrity declaration (own-words/no-AI) requires applicant attestation | all answers staged in sheet | sibling record may already cover req",
-      "outcome": "blocked: applicant-attestation",
-      "claims": [],
-      "files": [],
-      "base_commit": "0f6d0956c6b048dcaf1d2d06c39f6d52e53bc66b",
-      "branch": "main",
-      "frame": "03ha6ohxd9gylpewkycso7hq3"
-    },
-    {
-      "id": "2702bcc9-8e88-4afe-b136-467bfce1587f",
-      "ts": "2026-11-22T10:12:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:enpal",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0f6d0956c6b048dcaf1d2d06c39f6d52e53bc66b",
-      "branch": "main",
-      "frame": "03ha6oghekiiz7fskm63lqbqr"
-    },
-    {
-      "id": "2c155fec-bc3a-45b9-8a98-15e1ead08997",
-      "ts": "2026-11-22T10:11:18Z",
-      "source": "devin",
-      "subject": "nixconfig:canonical-sre",
-      "action": "claim: Greenhouse submission 3029798",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f70555f7c22a47fb8d5fbb66315584c5be938342",
-      "branch": "main",
-      "frame": "03ha6oabezud0jex62zoo0sji"
     }
   ]
 }

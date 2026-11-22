@@ -1,47 +1,52 @@
-# Lead: Deutsche Telekom / T-Systems — SRE Observability/Tracing
+# Lead: Deutsche Telekom AG / T-Systems — SRE Observability/Tracing
 
-Fit: 4
+Fit: 2
 Stand: 22.11.2026
-Referenz: 12444-563465374109848-DT-S
-Standorte: unter anderem Karlsruhe (rund 1,5 h von Gutach im Breisgau)
+Referenz: 12444-563465374109848-DT-S (Chiffre 563465374109848)
+Standorte: zehn, darunter Karlsruhe (rund 1,5 h von Gutach im Breisgau)
+Veröffentlicht: 12.07.2026, Eintritt ab 30.10.2026
+Weg: https://telekom.jobs/
 
 ## Quellenlage
 
-Die Anzeige ist über die Arbeitsagentur-Jobdetails-API vollständig abrufbar (HTTP 200 am 22.11.2026) und liegt im Paket. Veröffentlicht am 12.07.2026, Eintritt ab 30.10.2026, zehn Standorte, Vergütung ohne Angabe. Das BA-Feld `homeofficemoeglich` steht auf `false`, obwohl Telekom-Stellen üblicherweise hybrid ausschreiben — im Gespräch klären, nicht im Anschreiben behaupten.
+Der Anzeigentext liegt vollständig im Paket (Abruf der Arbeitsagentur-Jobdetails-API, HTTP 200 am 22.11.2026). Ein erneuter Abruf derselben Referenz am 22.11.2026 liefert 404 — die Anzeige ist damit sehr wahrscheinlich geschlossen, der Eintrittstermin ohnehin verstrichen. Vor dem Absenden prüfen, ob die Rolle weiterläuft.
+
+Das Verzeichnis enthielt zwischenzeitlich ein Paket für die Deutsche Telekom IT GmbH ohne Anzeigentext, weil der T-Systems-Text als veraltet entfernt worden war. Beides ist korrigiert: der Text ist wieder da, die Dokumente adressieren den Arbeitgeber aus der Aufgabe.
 
 ## Warum interessant
 
-Die Rolle soll Transparenz, Stabilität und Zuverlässigkeit verteilter Systeme herstellen, mit Observability und Tracing als Schwerpunkt und OpenTelemetry ausdrücklich im Text. Das ist die Arbeit, die hier fünf Jahre lang ohne Werkzeugkasten gemacht wurde: messen, bevor jemand fragt, und Alarme so bauen, dass sie ankommen.
+Die Rolle baut eine Observability-Plattform für verteilte Cloud-, Edge- und Kubernetes-Umgebungen: Pipelines für Metrics, Logs und Traces, Jaeger als Tracing-Backend, Korrelation zwischen den drei Signalen, Telemetrie-Standards. Das ist die Arbeit, die hier fünf Jahre lang ohne Werkzeugkasten gemacht wurde — Ledger, Prüfungen, Alarme mit bestätigter Zustellung.
 
-Karlsruhe ist der nächste der zehn Standorte und der Grund, warum diese Bewerbung sinnvoll ist.
+Karlsruhe ist der nächste der zehn Standorte und der Grund, warum die Bewerbung trotz der Lücken sinnvoll ist.
 
 ## Was passt
 
-- Betriebstelemetrie selbst gebaut: Sentinel-Ledger mit Jobstatus, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten.
-- Alarmierung mit Zustellbestätigung über eine Go-Bridge — ausgelöster und zugestellter Alarm werden nicht verwechselt.
-- Endpunktprüfungen mit Gatus, Störungsdiagnose aus Ledger und Logs statt aus Vermutungen.
-- Linux-Interna: cgroup-Limits, PSI, systemd-Härtung, Namespaces, nftables.
-- Deklarativer Betrieb mit Generationen und Rückrollung; Git als einzige Quelle mit Gates.
-- Karlsruhe rund anderthalb Stunden entfernt, Baden-Württemberg als Wohnsitz, Niederlassungserlaubnis.
+- Beobachtung als Schleife: Ledger alle 15 Minuten, Prüfungen von außen, Vorlaufgrößen statt Ausfallmeldungen.
+- Alarmweg in Go, der erst nach bestätigter Zustellung als gemeldet gilt.
+- Linux-Interna: cgroups, Namespaces, PSI, systemd-Härtung, nftables.
+- Sicherheitsseite: eigene CA mit kurzlebigen Zertifikaten, Secrets pro Host (sops, age), WireGuard.
+- Go, Python, Shell — die Werkzeuge selbst geschrieben.
+- Deklarativer Betrieb mit Gates und Rückrollung über Generationen.
+- Karlsruhe rund anderthalb Stunden entfernt, Niederlassungserlaubnis, Deutsch C1.
 
 ## Was fehlt
 
-- **OpenTelemetry** und verteiltes Tracing — beides im Aufgabentext genannt.
+- **OpenTelemetry**: Collector, OTLP, SDKs, Auto-Instrumentation — Must-Have.
+- **Verteiltes Tracing**: Span-Korrelation, Context Propagation, Sampling — Must-Have.
+- **Jaeger**: Trace Storage, Indexierung, Query-Optimierung — Must-Have.
+- **SIEM und CEF** — Must-Have (Syslog dagegen im Betrieb).
+- **Kubernetes und Cloud-Native-Plattformen** — Must-Have.
 - Prometheus, Grafana, Loki, AlertManager.
-- Kubernetes und Betrieb großer verteilter Systeme in Produktionsumgebungen.
-- SLO-/Error-Budget-Programme im Teammaßstab.
-- Erfahrung mit Telekom-/T-Systems-Prozessen.
+- Betrieb in Air-Gap-, Edge- und Fog-Umgebungen.
+
+## Wie die Lücke im Schreiben behandelt wird
+
+Nicht weichgezeichnet: der dritte Absatz nennt OpenTelemetry, Jaeger, Tracing, SIEM/CEF und Kubernetes als nicht vorhanden. Der zweite Absatz macht die Korrelation über Zeitstempel und Hostnamen zum Argument — sie funktioniert bei dreizehn Knoten und ist genau das, was ein Collector automatisiert.
+
+## Fit-Begründung: 2
+
+Must-Have-Liste gelesen, Kern fehlt: OpenTelemetry, Tracing und Jaeger sind der Titel der Stelle. Die Betriebsform passt, die Technik nicht. Zwei heißt: ein Gespräch über Beobachtung, Alarmierung und Werkzeugbau ist möglich; eines über OTel-Pipelines, Sampling und Trace Storage nicht.
 
 ## Weg
 
-Bewerbung über das Telekom-/T-Systems-Portal mit der BA-Referenz. Keine Frist im Datensatz; Eintritt ab 30.10.2026 ist bereits verstrichen, die Anzeige wird aber weiter geführt — vor dem Absenden prüfen, ob sie noch offen ist.
-
-## Gehalt
-
-Die Anzeige nennt keine Vergütung. Ein früherer Plan notierte 85k als Ziel; die Vorgabe nennt keine Zahl, deshalb steht im Anschreiben keine.
-
-## Fit-Begründung: 4 von 5
-
-Vier laut Vorgabe. Die Begründung, die ich mittragen kann: Observability ist hier keine Theorie, sondern gebaute Praxis — ein Ledger, das jede Viertelstunde schreibt, Prüfungen, die wirklich laufen, und Alarme, deren Zustellung bestätigt wird. Wer das ohne Prometheus und Grafana gebaut hat, versteht, was die Werkzeuge leisten sollen.
-
-Nicht 5, weil OpenTelemetry und Tracing ausdrücklich gefordert sind und vollständig fehlen; dazu Prometheus, Grafana und Loki. Vier beschreibt die Passung der Denkweise, nicht die Übereinstimmung des Stacks.
+Erst prüfen, ob die Rolle offen ist (BA-Referenz 404, Eintritt verstrichen). Dann Zeugnisse ergänzen und über telekom.jobs mit der Referenz bewerben. Kein Gehaltswunsch im Schreiben, weil die Anzeige keine Spanne nennt.

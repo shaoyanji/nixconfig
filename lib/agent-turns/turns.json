@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T08:54:46Z",
+  "generated": "2026-11-22T08:57:36Z",
   "count": 200,
-  "pin": "e46fdf8c3dc9303af0154750769a2479daa1f837c3cea415ed72f83cab61cc68",
+  "pin": "f9ad26fe13af45843f7604c1f40fe1016da7d2270eac4bdf1476ff236fdff440",
   "turns": [
+    {
+      "id": "d3d5b468-03ea-4592-8501-f1b6fc192ec7",
+      "ts": "2026-11-22T08:55:42Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: ptb-hpc-linux packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a830ffc2b600346a38ebe9ec8949031ca8204375",
+      "branch": "main",
+      "frame": "03ha69iki3sptkfgn306zffmy"
+    },
+    {
+      "id": "d6e15f69-0b46-4032-a7f9-f2c460a1cdb6",
+      "ts": "2026-11-22T08:54:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: actian-director-platform packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8ccff4945cb9e90c56c91dcce8b14d8f200c2b53",
+      "branch": "main",
+      "frame": "03ha69ca84iz3ossanbst8opy"
+    },
     {
       "id": "a497bbf4-2b6e-44ca-a6a0-cb2d221545cc",
       "ts": "2026-11-22T08:53:51Z",
@@ -2739,32 +2765,6 @@
       "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
       "branch": "main",
       "frame": "03ha41534ibgpq81uyil8cltq"
-    },
-    {
-      "id": "c3f452eb-dea5-4a67-abc4-9b5565c60503",
-      "ts": "2026-11-22T02:03:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-corpus-reconcile",
-      "action": "landed: redacted third-party names/LinkedIn/personal sites in .agents/outreach (company names + owner contact kept) | gate: grep sweep clean + 5x cv-ats-check PASS; matt:cv:check red only on stale live deploy (cv-software.pdf 404), operator declined deploy | commits: 0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
-      "branch": "main",
-      "frame": "03ha4135a3rpuhnoxyzdugazd"
-    },
-    {
-      "id": "85ec189b-3389-43fb-88b2-f248e605a3b8",
-      "ts": "2026-11-22T01:59:31Z",
-      "source": "steward",
-      "subject": "nixconfig:hermes-steward",
-      "action": "landed: drove freebuff pane default:1.1 (idle) — commit outreach contact redaction + run cv-links/cv-ats checks",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "efbbbcbd227ba492b1e6de8e0ceac032cf2f82dd",
-      "branch": "main",
-      "frame": "03ha407sm4rcl9g2qd71do0k6"
     }
   ]
 }

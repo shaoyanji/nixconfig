@@ -1,0 +1,83 @@
+# Source: arbeitnow.nl API, fetched 2026-11-22
+
+Blocktech — Senior Site Reliability Engineer | Trading Infrastructure | Python/Linux
+Location: Amsterdam | remote=False | tags=Tech
+URL: https://www.arbeitnow.nl/jobs/companies/blocktech/senior-site-reliability-engineer-trading-infrastructure-python-linux-amsterdam-140713
+
+BlockTech is hiring a Senior Site Reliability Engineer to join its Tech department in Amsterdam.
+Crypto markets never close, and neither does our trading. Bare-metal hosts, cloud instances, exchange connectivity, messaging, and the trading services on top all have to work around the clock.
+In this role, you'll sit between infrastructure, engineering, and trading, and follow every problem wherever it leads.
+About BlockTech
+BlockTech is an algorithmic trading firm headquartered in Amsterdam, with a second office in Singapore. We specialize in market making and trade cryptocurrency derivatives and spot markets globally, using our own capital. We're growing fast and expanding into new markets.
+We trade options and delta one around the clock on the largest crypto venues. Our platform runs on a Linux bare-metal fleet alongside cloud deployments in the regions where exchanges run, with services written in Python and Rust.
+What will you do?
+You will make sure everything works, and works properly. Most problems don't stay inside one team's boundaries: a strange fill might come from a network issue, a config change, or an exchange that changed its behavior without telling anyone. You understand what each service does for trading, what it costs when it breaks, and which fix matters most right now. You own an issue from the first alert to the long-term fix that stops it coming back.
+You will:
+Own the live environment.
+ Monitor trading across all our venues, take charge of incidents, and own both the immediate fix and the long-term one.
+Bridge infrastructure, engineering, and trading.
+ Translate a trader's “something looks off” into a root cause, and a root cause into a priority the right team can act on.
+Partner with the desk.
+ Work closely with traders and quants, so reliability work is driven by what actually matters for PnL and risk.
+Debug across the full stack.
+ Linux and network performance, exchange connectivity, messaging and databases (Kafka, NATS, Redis, PostgreSQL/TimescaleDB, ClickHouse), and the Python and Rust trading services themselves.
+Own our hybrid infrastructure.
+ Run the bare-metal fleet and cloud deployments, plus their configuration management and deployment pipelines across environments.
+Build observability.
+ Use Prometheus/VictoriaMetrics, Grafana, Sentry, and Kibana to catch a problem before the trading desk does.
+Change things safely.
+ Plan and run maintenance, upgrades, and releases without trading going dark.
+Raise the bar.
+ Cut toil with automation, and spread SRE practices across Tech so every team builds reliable systems from the start.
+What we're looking for
+You'll need:
+5+ years running production systems where uptime and correctness matter, in an SRE, DevOps, systems, or software engineering role.
+At least 2 years of that in a trading environment (a trading firm, exchange, or broker), working directly with live trading systems and traders.
+A working understanding of how trading systems operate: order and quote flow, positions and PnL, exchange connectivity, and why latency and correctness matter.
+A commercial mindset. You can weigh technical trade-offs against business impact and explain them clearly to traders and engineers alike.
+Strong Linux skills, including troubleshooting performance at the OS and kernel level.
+Solid networking fundamentals: TCP/IP, UDP, and multicast, plus comfort reading a packet capture.
+Hands-on experience running production workloads in a public cloud (AWS or similar): networking (VPCs, peering, cross-region latency), compute choices, and infrastructure as code (Terraform or similar).
+Proficiency in Python, and the ability to read and debug code you didn't write, including our Rust services.
+Hands-on experience with configuration management (Ansible or similar) and CI/CD.
+Experience operating at least some of our stack: Kafka, NATS, PostgreSQL, ClickHouse, Redis, Prometheus, or Grafana.
+Calm, structured incident handling, and clear communication in English under pressure.
+Bonus points for:
+Experience with options or crypto markets.
+Exchange connectivity experience (WebSocket or FIX APIs).
+Low-latency or market-making environments.
+Hands-on Rust experience. Much of our platform is written in it.
+Network hardware (Arista, Cisco), routing protocols, or packet capture tooling.
+Server hardware and kernel tuning for low latency.
+Running data-heavy systems such as time-series databases.
+Pay, location, and relocation
+Compensation:
+ a competitive base salary plus a performance bonus based on individual and company results.
+Trading fund:
+ outstanding performance is rewarded with the opportunity to buy into the trading fund.
+Location:
+ On-site at our Amsterdam office
+Visa:
+ BlockTech sponsors the Dutch highly skilled migrant visa.
+Relocation:
+ All-in relocation package and Dutch classes for international hires. Eligible hires may qualify for the 30% ruling.
+What else is in it for you
+Pension plan, company laptop, and home internet reimbursement
+An extensive in-house training program and an annual learning and development budget
+An environment that embraces AI, both to speed up your work and to advance our systems
+Gym reimbursement and sports during working hours: kickboxing, CrossFit, fitness, and soccer
+Weekly Friday drinks, monthly outings, quarterly sports competitions, and two trips abroad a year
+Daily breakfast and warm lunch, plus snacks and drinks all day
+How we work
+We're a team of trading and tech enthusiasts with a flat hierarchy. Have an idea today, and it can ship tomorrow. The best idea wins, whoever it comes from.
+This role comes with a high degree of autonomy. You'll own hard problems from the first alert to the long-term fix and solve them your way. We promote reverse leadership, give everyone an equal playing field, and invest in personal and professional development.
+Ready to keep a 24/7 trading firm running?
+Make your move and apply! You can expect to hear back from us within 5 working days.
+Our culture
+At our core, we are a team of passionate trading and tech enthusiasts committed to revolutionizing trading through automation. Our collaborative approach ensures that everyone contributes to achieving our ambitious goals.
+In this role, you will be both challenged and stretched, with ample opportunities for growth and development, both within and beyond your main responsibilities.
+We invest in our people by offering competitive compensation and benefits, fostering innovation, and celebrating success. Our commitment to personal development transcends traditional norms; we provide an equal playing field, promote reverse leadership, and offer boundless growth opportunities for all our employees.
+Join us to unlock your potential and drive innovation in the exciting world of algorithmic trading.
+Find more 
+English Speaking Jobs in Netherlands
+ on Arbeitnow

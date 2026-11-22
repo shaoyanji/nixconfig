@@ -1,0 +1,31 @@
+Senior Kubernetes Engineer
+STACKIT / Schwarz Digits (IT- und Digitalsparte der Schwarz Gruppe)
+Standort laut den parallel ausgeschriebenen STACKIT-Cloud-Stellen: Bad Friedrichshall / Neckarsulm
+Abruf am 22.11.2026
+
+[Quellenlage]
+Der genaue Anzeigentext war am 22.11.2026 nicht abrufbar: stackit.com liefert die Stellenseite
+als JavaScript-Anwendung, schwarz-digits.de/jobsearch gab für "kubernetes" keine Treffer zurück.
+Das Anforderungsprofil unten ist deshalb aus den zeitgleich ausgeschriebenen STACKIT-Stellen
+zusammengeführt, die dieselbe Plattform und dieselbe Abteilung beschreiben. Vor dem Absenden
+am Original prüfen.
+
+[Profil aus den Schwesteranzeigen, wörtlich]
+- "(Senior) Site Reliability Engineer - STACKIT Control Plane" (Ref. 2321): "Expertenwissen über die
+  Interna der Kubernetes Control Plane, einschließlich API Server, Controller Manager, Scheduler
+  und etcd"; "Go sicher"; "Infrastructure as Code und Container-Infrastrukturen"; "Linux-Interna
+  (Kernel-Tuning, Memory Management)"; "Networking (TCP/IP, CNI, Load Balancer, eBPF)";
+  "Betrieb von Datastores (z.B. PostgreSQL, Redis) und Messaging-Systemen (z.B. Kafka, NATS)".
+- "Senior Cloud Engineer / Kubernetes Networking - STACKIT": Kubernetes-Netzwerkbetrieb als
+  eigenes Aufgabengebiet.
+- "DevOps / Cloud Engineer - Kubernetes & Infrastructure as Code" (Ref. 4627): Betrieb
+  hochverfügbarer Services auf STACKIT-Kubernetes-Clustern, CI/CD mit GitLab, IaC mit Terraform,
+  Ansible und Helm.
+
+[Einordnung des Pakets]
+Muss-Kern: Kubernetes-Betrieb und Cluster-Lebenszyklus, Control-Plane-Interna, CNI und
+Netzwerkpfade, Go für Operatoren und Automatisierung, IaC, Linux-Interna, Datastores.
+Vorhanden: Linux-Interna, Go, deklarativer Betrieb mit Generationen und Rückrollung, Netze,
+Speicher, Telemetrie, Git als einzige Quelle mit Gates.
+Nicht vorhanden: Kubernetes in jeder Form, CNI, eBPF, Operatoren, Helm, etcd, Terraform,
+Ansible, GitLab-CI. Fit deshalb 2.

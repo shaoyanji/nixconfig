@@ -44,7 +44,8 @@ Die Betriebsform passt, die Technik nicht. Bei einer Stelle, die eine Plattform 
 - Nächster Standort: Karlsruhe, rund anderthalb Stunden von Gutach im Breisgau; Bereitschaft zu regelmäßiger Anwesenheit steht im Schreiben.
 - Hybrides Modell laut Anzeige, BA-Feld `homeofficemoeglich: false` — keine Fernarbeitszusage im Schreiben.
 - Zeugnisse fehlen; ohne sie geht nichts raus.
-- Die Anzeige antwortet am 22.11.2026 mit 404, Eintritt war der 30.10.2026 — Offenheit vor dem Absenden klären.
+- Die Anzeige ist offen: öffentliche BA-Detailseite am 22.11.2026 mit 200, Beginn „ab sofort"; nur die API liefert 404. Im Telekom-Portal die dortige Referenz klären.
+- Eine benachbarte Referenz (…756-DT-S) ist eine andere SRE-Stelle ohne Observability-Schwerpunkt und nicht zitierfähig für diese Bewerbung.
 
 ## 7. Fragen für ein Gespräch
 

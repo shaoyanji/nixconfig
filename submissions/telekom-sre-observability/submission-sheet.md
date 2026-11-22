@@ -55,7 +55,7 @@ Zwei statt drei, weil die Differenzierung der Stelle genau in der fehlenden Tech
 
 ## Offene Punkte
 
-1. **Anzeige vermutlich geschlossen**: derselbe BA-Abruf antwortet am 22.11.2026 mit HTTP 404, Eintritt war der 30.10.2026. Vor dem Absenden im Portal prüfen, ob die Rolle unter anderer Referenz läuft.
+1. **Anzeige weiter gelistet**: die Jobdetails-API antwortet mit 404, die öffentliche Detailseite derselben Referenz am 22.11.2026 mit 200 und nennt als Beginn „ab sofort" (API-Datensatz: 30.10.2026). Eine frühere Fassung dieses Blattes hielt die Stelle für geschlossen — das war eine Fehlfolgerung aus dem API-Status. Vor dem Absenden nur noch klären, unter welcher Referenz sie im Telekom-Portal läuft.
 2. **Vor-Ort-Anteil**: die Anzeige nennt ein hybrides Modell, das BA-Feld `homeofficemoeglich` steht auf `false`. Im Schreiben steht deshalb Bereitschaft zu regelmäßiger Anwesenheit in Karlsruhe, keine Fernarbeitszusage.
 3. **Zeugnisse** fehlen weiterhin; ohne sie geht das Paket nicht raus.
 4. **Kein Gehaltswunsch** im Schreiben, weil die Anzeige keine Spanne nennt.

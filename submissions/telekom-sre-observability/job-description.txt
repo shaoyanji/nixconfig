@@ -64,9 +64,12 @@ Der fruehere Plan notierte 85k als Gehaltsziel; die Vorgabe nennt keine Zahl, da
 [Status, 22.11.2026]
 Wiederhergestellt aus dem Stand vor e9d61510 (der Text war dort als veraltet entfernt worden, weil das Paket
 zwischenzeitlich auf einen anderen Arbeitgeber umgestellt war). Quelle bleibt der Abruf der
-Arbeitsagentur-Jobdetails-API vom 22.11.2026 (HTTP 200). Ein erneuter Abruf derselben Referenz am selben Tag
-liefert HTTP 404 - die Anzeige ist damit sehr wahrscheinlich geschlossen. Vor dem Absenden im Telekom-Portal
-pruefen, ob die Rolle unter anderer Referenz weiterlaeuft.
+Arbeitsagentur-Jobdetails-API vom 22.11.2026 (HTTP 200). Die API antwortet fuer dieselbe Referenz am 22.11.2026 mit HTTP 404; die oeffentliche Detailseite derselben
+Referenz ist am selben Tag jedoch abrufbar (HTTP 200) und nennt als Beginn "ab sofort" statt des im API-Datensatz
+stehenden 30.10.2026. Der 404 ist damit ein Endpunkt-Artefakt, kein Beleg fuer eine geschlossene Anzeige: die
+Stelle ist weiter gelistet. Vor dem Absenden im Telekom-Portal gegenpruefen, unter welcher Referenz sie dort laeuft.
+Die benachbarte Referenz 12444-563465374109756-DT-S ist eine andere SRE-Stelle (allgemein, ohne Observability-
+Schwerpunkt) und darf hier nicht zitiert werden.
 
 Kern der Anzeige: Observability-Plattform fuer verteilte Cloud-, Edge- und Kubernetes-Umgebungen.
 Must-Have: OpenTelemetry (Collector, OTLP, SDKs, Auto-Instrumentation), Distributed Tracing

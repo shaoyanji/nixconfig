@@ -9,7 +9,7 @@ Weg: https://telekom.jobs/
 
 ## Quellenlage
 
-Der Anzeigentext liegt vollständig im Paket (Abruf der Arbeitsagentur-Jobdetails-API, HTTP 200 am 22.11.2026). Ein erneuter Abruf derselben Referenz am 22.11.2026 liefert 404 — die Anzeige ist damit sehr wahrscheinlich geschlossen, der Eintrittstermin ohnehin verstrichen. Vor dem Absenden prüfen, ob die Rolle weiterläuft.
+Der Anzeigentext liegt vollständig im Paket (Abruf der Arbeitsagentur-Jobdetails-API, HTTP 200 am 22.11.2026). Die API derselben Referenz antwortet am 22.11.2026 mit 404, die öffentliche Detailseite dagegen mit 200 und nennt als Beginn „ab sofort" statt 30.10.2026. Die Stelle ist also weiter gelistet; der API-Fehler ist ein Endpunkt-Artefakt. Für das Portal nur die dort gültige Referenz klären. Die benachbarte Referenz …756-DT-S ist eine andere SRE-Stelle ohne Observability-Schwerpunkt.
 
 Das Verzeichnis enthielt zwischenzeitlich ein Paket für die Deutsche Telekom IT GmbH ohne Anzeigentext, weil der T-Systems-Text als veraltet entfernt worden war. Beides ist korrigiert: der Text ist wieder da, die Dokumente adressieren den Arbeitgeber aus der Aufgabe.
 

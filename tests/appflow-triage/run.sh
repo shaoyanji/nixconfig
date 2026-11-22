@@ -42,6 +42,20 @@ cases = [
         "rejected",
     ),
     (
+        # Canonical, 2026-11-22: the subject reads like good news ("An update on
+        # your application") and the body owns none of the words above, so two
+        # applications sat in `applied` until a person read them.
+        "rejection: Canonical regret to inform",
+        "We regret to inform you that we shall not be progressing your application "
+        "further for this particular role.",
+        "rejected",
+    ),
+    (
+        "rejection: not moving forward",
+        "After careful review we will not be moving forward with your candidacy.",
+        "rejected",
+    ),
+    (
         "interview: German invite",
         "Wir laden dich herzlich zum Vorstellungsgespräch ein.",
         "interview",

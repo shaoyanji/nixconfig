@@ -1,0 +1,334 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 4374,
+    "terms": [
+      {
+        "term": "cloud",
+        "weight": 24.913
+      },
+      {
+        "term": "schwarz",
+        "weight": 18.728
+      },
+      {
+        "term": "postgresql",
+        "weight": 15.109
+      },
+      {
+        "term": "go",
+        "weight": 13.509
+      },
+      {
+        "term": "ci",
+        "weight": 12.293
+      },
+      {
+        "term": "engineer",
+        "weight": 9.787
+      },
+      {
+        "term": "cloud-architekturen",
+        "weight": 8.924
+      },
+      {
+        "term": "cloud-hosting-betriebs",
+        "weight": 8.924
+      },
+      {
+        "term": "cloud-native",
+        "weight": 8.924
+      },
+      {
+        "term": "java",
+        "weight": 8.924
+      },
+      {
+        "term": "java-basierten",
+        "weight": 8.924
+      },
+      {
+        "term": "lara",
+        "weight": 8.924
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "kev-time",
+        "score": 5.6236
+      },
+      {
+        "name": "nixconfig",
+        "score": 4.2852
+      },
+      {
+        "name": "matt.bountystash.com",
+        "score": 3.9433
+      },
+      {
+        "name": "Masterarbeit: Wetter und Volatilität",
+        "score": 3.9195
+      },
+      {
+        "name": "bountystash",
+        "score": 3.8118
+      },
+      {
+        "name": "kelly-svg",
+        "score": 1.7901
+      }
+    ],
+    "kept": [
+      "Risikoberechnungs-Engine (Swirl Engine)",
+      "Postgraduales Studium: Erneuerbare Energien",
+      "fibtransponder",
+      "Konzept für Schwachstellenbetrieb"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "name": "DevOps",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Sicherheit",
+      "of": 6
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "name": "Infrastruktur als Code",
+      "of": 4
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "name": "CI/CD & Gates",
+      "of": 4
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "name": "Betrieb & Telemetrie",
+      "of": 4
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 3.349,
+          "text": "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit."
+        },
+        {
+          "score": 3.2894,
+          "text": "Betrieb den Lebenszyklus deklarativer Gäste als MicroVMs aus derselben Codebasis wie ihre Hosts: Erzeugen, Ersetzen, Zur"
+        },
+        {
+          "score": 3.1337,
+          "text": "Nahm Hosts über eine eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten in Betrieb und verband sie in einem M"
+        },
+        {
+          "score": 2.3797,
+          "text": "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig."
+        },
+        {
+          "score": 2.1654,
+          "text": "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD."
+        },
+        {
+          "score": 1.9097,
+          "text": "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist."
+        },
+        {
+          "score": 1.3492,
+          "text": "Konzipierte eine Covered-Call-Hedging-Strategie für Kundenportfolios."
+        },
+        {
+          "score": 0.9658,
+          "text": "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten."
+        },
+        {
+          "score": 0.8162,
+          "text": "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists."
+        },
+        {
+          "score": 0.588,
+          "text": "Schrieb Telemetrie für den Betrieb: Sentinel-Ledger alle fünfzehn Minuten mit Jobstatus, Generation Age, Disk-Druck und "
+        },
+        {
+          "score": 0.0,
+          "text": "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen."
+        },
+        {
+          "score": 0.0,
+          "text": "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading."
+        },
+        {
+          "score": 0.0,
+          "text": "Prüfte Bug-Bounty-Programme."
+        },
+        {
+          "score": 0.0,
+          "text": "Deklarierte dreizehn Hosts aus einer Flake-Quelle: Feature-Listen statt kopierter Konfiguration, abgeleitete Optionsfläc"
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 15
+    },
+    {
+      "dropped": [
+        {
+          "score": 3.4124,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 2.9145,
+          "text": "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
+        },
+        {
+          "score": 2.8341,
+          "text": "Führte ein internationales Team und entwickelte eine Anreizstruktur, gekoppelt an ein Echtzeit-Finanzmodell."
+        },
+        {
+          "score": 2.6987,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verantwortete den Kundenservice und die Betreuung der Mandanten."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Schrieb Python-Werkzeuge für Analyse und 3D-Geometrie."
+        },
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 5.8083,
+          "text": "Arbeitete zwölfstündige Schichten im Feld."
+        },
+        {
+          "score": 5.5502,
+          "text": "Leitete die Sicherheitsschulung der Crew."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 0.0,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

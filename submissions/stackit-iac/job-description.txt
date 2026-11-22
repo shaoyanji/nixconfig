@@ -1,0 +1,46 @@
+DevOps / Cloud Engineer (m/w/d) - Kubernetes & Infrastructure as Code — GT4627
+Arbeitgeber: STACKIT / Schwarz Digits (Schwarz Gruppe)
+Standort: Am Campus 1, 74177 Bad Friedrichshall, Baden-Wuerttemberg
+Portal: https://schwarz-digits.de/jobsearch/hr/devops-cloud-engineer-m-w-d-kubernetes-infrastructure-as-code-GT4627
+Abgerufen: 2026-11-22 (HTTP 200, deutschsprachige Fassung, data-job-id="GT4627")
+Bewerbung: RocketApply auf SAP BTP, gestartet vom "Jetzt bewerben"-Button
+Ansprechpartnerin: Lara Schlimgen, recruiting@mail.schwarz
+Hinweis: Die Pfade /en/jobsearch/... und /de/jobsuche/... liefern 404; nur der Pfad
+  ohne Sprachpraefix rendert. Text unten unveraendert bis auf die Kopfzeilen.
+
+Deine Aufgaben
+- Du designst und betreibst hochverfügbare Services auf dem STACKIT Kubernetes-Cluster, die als performante Laufzeitumgebung für unsere ServiceNow Shared Services (u. a. AI Search, ML, Document Intelligence) fungieren.
+- Du gestaltest und optimierst unsere CI/CD-Landschaft (GitLab) und treibst die Automatisierung (IaC) auf Basis von Terraform, Ansible, und helm unserer Container-Workloads konsequent voran.
+- Du stellst die nahtlose und performante Netzwerkintegration zwischen den Kubernetes-basierten Microservices, den Java-basierten ServiceNow-Applikationsknoten und den Load Balancer Clustern sicher.
+- Du sicherst unsere Sovereign Cloud SLAs durch implementierte Auto-Scaling-Strategien und umfassende Observability-Konzepte ab, um stets höchste Stabilität zu garantieren.
+- Du sorgst für das Security-Hardening der Cluster (Pod Security, Network Policies) und stellst die Einhaltung unserer Compliance-Vorgaben (BSI C5, DORA und weitere) im Container-Umfeld sicher.
+- Als Teil des agilen Teams übersetzt du technische Anforderungen in standardisierte, skalierbare Cloud-Architekturen.
+Dein Profil
+- Du hast ein erfolgreich abgeschlossenes Studium der (Wirtschafts-) Informatik oder eine vergleichbare technische IT-Ausbildung mit fundierter Berufserfahrung im Cloud-Native- und Kubernetes-Umfeld.
+- Du bringst fundierte Erfahrung in der Betreuung komplexer Kubernetes-Umgebungen in Enterprise-Szenarien mit und hast Freude daran, diese weiterzuentwickeln.
+- Du bringst ein starkes Architekturverständnis für das Zusammenspiel von verteilten Microservices mit klassischen, datenbankzentrierten Enterprise-Anwendungen (wie dem ServiceNow-Backend) mit.
+- Du hast praktische Erfahrung in der Automatisierung von Infrastruktur (Terraform, Ansible) und im Aufbau moderner CI/CD-Pipelines (GitLab).
+- Du lebst die DevOps-Kultur, arbeitest gerne nach agilen Methoden und verstehst die Anforderungen eines hochsicheren Cloud-Hosting-Betriebs.
+- Du verfügst über gute Kommunikationsfähigkeiten sowie sehr gute Deutsch- und gute Englischkenntnisse.
+- Du zeichnest dich durch eine schnelle Auffassungsgabe sowie eine lösungsorientierte und eigenständige Arbeitsweise aus.
+Unsere Benefits
+Dein Ansprechpartner
+Lara Schlimgen
+Recruiterin
+- E-Mail:recruiting@mail.schwarz
+Dein Bewerbungsprozess im Überblick
+1
+Bewerbung
+Wir lieben die Einfachheit. Bewirb dich schnell und unkompliziert digital, gerne auch ohne Registrierung.
+2
+Checkup
+Gemeinsam mit dem zuständigen Fachbereich werfen wir einen Blick in deine Unterlagen.
+3
+Kennenlernen
+Bei einem ersten Kennenlernen liegt der Fokus sowohl auf deiner Persönlichkeit als auch auf deiner fachlichen Eignung.
+4
+Vertragsangebot
+Haben wir uns gegenseitig überzeugt? Dann ist dein Arbeitsvertrag digital per Mail auf dem Weg zu dir.
+5
+Willkommen
+Dein erster Arbeitstag bei uns steht an und dein individuelles Onboarding im Team startet. Wir freuen uns auf dich!

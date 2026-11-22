@@ -1,8 +1,109 @@
 {
-  "generated": "2026-11-22T11:12:29Z",
+  "generated": "2026-11-22T11:18:28Z",
   "count": 200,
-  "pin": "244b214abde9d97ac5887395b864cb948b491366a680ce6691782616381accfd",
+  "pin": "a9f53ca249cd3a942ce46b8cf80e88a5f9efc2cb1084b2db0648bb6ca0cca299",
   "turns": [
+    {
+      "id": "a7cced1e-b46f-41ed-a038-211f4b4915d8",
+      "ts": "2026-11-22T11:17:57Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-observability",
+      "action": "rebuilt dossier for the named employer: restored the T-Systems advert text, 2pp CV + 1pp letter, dossier/lead/sheet; must-haves read and conceded; fit 4 -> 2; prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "de5ea652358ff140bc2b1c145b4ec3eaf11cd1b5",
+      "branch": "main",
+      "frame": "03ha71azlydrmsw1j986bh2he"
+    },
+    {
+      "id": "b2cf71f3-2197-433d-98fc-83592f76be3a",
+      "ts": "2026-11-22T11:16:57Z",
+      "source": "devin",
+      "subject": "job-hunt:flix-iam",
+      "action": "applied: Flix Cloud Engineer IAM via flix.careers (GH req 8836372002); job-success confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
+      "branch": "main",
+      "frame": "03ha71409vlmamdi2gqzv5osp"
+    },
+    {
+      "id": "acac749a-9d37-418d-ac8e-93fbb1c50aae",
+      "ts": "2026-11-22T11:16:36Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-kernel-build-automation",
+      "action": "claim: native English Typst dossier (2pp CV + 1pp letter + Greenhouse answers), Kernel Build Automation",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/canonical-kernel-build-automation"
+      ],
+      "files": [],
+      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
+      "branch": "main",
+      "frame": "03ha711iu4obyy65ghn0m06ol"
+    },
+    {
+      "id": "49e6e060-e904-4b64-b7eb-1a3b8fe35018",
+      "ts": "2026-11-22T11:16:36Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: submitting flix-cloud-iam-berlin (pane 2), compiling canonical-kernel-build-automation (pane 1), compiling telekom-sre-observability (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/flix-cloud-iam-berlin",
+        "submissions/canonical-kernel-build-automation",
+        "submissions/telekom-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
+      "branch": "main",
+      "frame": "03ha711gau5irv6b6esesyk64"
+    },
+    {
+      "id": "be34dd70-4b14-46cd-a691-7fb63201062c",
+      "ts": "2026-11-22T11:13:17Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:mpcdf-linux-admin",
+      "action": "corrected: advert recovered (LDAP/Kerberos IDM role, Kennziffer 04/2026); packet rewritten around base services; fit 4 -> 2 with core gap conceded; 2pp CV + 1pp letter recompiled, prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/mpcdf-linux-admin"
+      ],
+      "files": [],
+      "base_commit": "6930222845478b8bd77ed2723132515575f5fd4c",
+      "branch": "main",
+      "frame": "03ha70e5797h4dxocxha5nt6o"
+    },
+    {
+      "id": "19d47921-24fe-420c-8d47-acf1aacecf3f",
+      "ts": "2026-11-22T11:13:14Z",
+      "source": "devin",
+      "subject": "job-hunt:wolt",
+      "action": "applied: Wolt Staff Engineer EU Infrastructure via Greenhouse 8324647; OTP-verified, confirmation shown",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
+      "branch": "main",
+      "frame": "03ha70du032hppzcmbbrbdeai"
+    },
+    {
+      "id": "f620d0db-889e-4167-885e-c61eb87d1511",
+      "ts": "2026-11-22T11:12:32Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flix-cloud-iam-berlin",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
+      "branch": "main",
+      "frame": "03ha708ut230b2cogyb5otgnm"
+    },
     {
       "id": "40aabb4a-03e9-49d7-ab6d-366271f0a911",
       "ts": "2026-11-22T11:12:17Z",
@@ -2641,97 +2742,6 @@
       "base_commit": "4ff3ad0c7c2a7d8ddfccbf73d8f57c090a9e0171",
       "branch": "main",
       "frame": "03ha6e48wtkv2amvr3bxvmezt"
-    },
-    {
-      "id": "4f9ce07a-a699-4967-93db-c4cbbe8c703b",
-      "ts": "2026-11-22T09:17:38Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:bechtle-cloud-platform",
-      "action": "landed: Bechtle Cloud Platform Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "024c17b5b74d9569c0862dae06bbff91e077e2da",
-      "branch": "main",
-      "frame": "03ha6dsuuajie1g01t0zt7t9w"
-    },
-    {
-      "id": "3466245d-49f2-42ed-87d6-43fcbe46657e",
-      "ts": "2026-11-22T09:17:13Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "trawa-em-platform Ashby submit unverified - hung POST twice, no ack; minimal form mapped for manual retry",
-      "outcome": "blocked: ashby hung POST, unverified submit",
-      "claims": [],
-      "files": [],
-      "base_commit": "4ff3ad0c7c2a7d8ddfccbf73d8f57c090a9e0171",
-      "branch": "main",
-      "frame": "03ha6dpwg9jqdwfivx3vhscmd"
-    },
-    {
-      "id": "59d51ad0-357e-4ea6-83f5-6310c9711255",
-      "ts": "2026-11-22T09:16:30Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward",
-      "action": "landed: routed freebuff (0:1.1) to run the CV publishing gate on is-a.dev (dev:blog:cv:check)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d5158bec6c7cebe6edab2881033a504644d8af2e",
-      "branch": "main",
-      "frame": "03ha6dkvnia9i9rhbxdh2is9o"
-    },
-    {
-      "id": "e35fcd1e-1847-4739-8ddf-208cecf39649",
-      "ts": "2026-11-22T09:16:24Z",
-      "source": "freebuff",
-      "subject": "nixconfig:sva-container",
-      "action": "landed: SVA Container DevOps Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d5158bec6c7cebe6edab2881033a504644d8af2e",
-      "branch": "main",
-      "frame": "03ha6dk5nf8sz8k9at92e9ahk"
-    },
-    {
-      "id": "008ef1ea-f02a-438f-9f7f-ca9c4d9bc252",
-      "ts": "2026-11-22T09:14:54Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:ionos-sre",
-      "action": "landed: IONOS SRE Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "eecf2766776b6a6cbbf27809010de28ddc732881",
-      "branch": "main",
-      "frame": "03ha6d9m83xzm0s7ntfu0u9hk"
-    },
-    {
-      "id": "e2f892ff-bc75-4975-a207-d517da53c7e5",
-      "ts": "2026-11-22T09:14:30Z",
-      "source": "freebuff",
-      "subject": "nixconfig:truetalent-freiburg-sysadmin",
-      "action": "landed: True Talent Freiburg Sysadmin Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ad6a3f36421f9435abc3e67e67750f39d49bab72",
-      "branch": "main",
-      "frame": "03ha6d6tp82gdeqbdy1a7guqh"
-    },
-    {
-      "id": "3510d303-db56-42f4-9577-3270b3827db6",
-      "ts": "2026-11-22T09:13:16Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: trawa-em-platform Ashby submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0686bf80a6aa1be955020ae0377be7f7f757bcdb",
-      "branch": "main",
-      "frame": "03ha6cy6owp9em238ta0laagi"
     }
   ]
 }

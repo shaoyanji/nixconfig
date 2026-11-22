@@ -1,0 +1,40 @@
+Kernel Build Automation Engineer - Ubuntu Linux | Home based - EMEA
+Apply: https://job-boards.greenhouse.io/canonical/jobs/7334725
+Ubuntu Linux is one of the most widely used Linux distributions in the world today and one of the top contributing factors to its popularity is its wide availability and ease of installation.  Canonical, the publisher of Ubuntu Linux, is seeking a senior software engineer to lead an initiative to take the configuration and build of the Ubuntu Linux kernel to a new level of simplicity and automation to make it even easier to distribute to clients tailored to their specific system needs.
+We are looking for an industry veteran who has ‘been there, done that’ across a broad range of the software stack and is able to draw on that experience to guide this new effort.  You will be expected to take charge of the implementation from concept through delivery and strong leadership skills are a must along with a tenacious commitment to detail and strict adherence to project schedules.
+While this role does not require previous Linux kernel internals development experience (although that would be highly regarded), a more in-depth grasp of the build system beyond typing ‘make’ on the command line is essential.  Advanced git usage and kernel patching experience will also be critical to the role.  
+Location:
+ Home-based in the Europe, Middle East, or Africa regions.
+What the role entails
+Lead the design and implementation of an advanced automated Linux build control system
+Work closely with other engineering teams to deploy seamlessly into the Canonical ecosystem
+Have no fear in delving into the depths of kbuild, kconfig, and make to determine the optimal solution to issues faced 
+Be eager to propose innovative solutions to kernel build roadblocks and drive acceptance to upstream
+What we are looking for in you
+Significant programming ability in Python, with strong C skills also highly regarded
+Demonstrated experience in patching and configuration of the Linux kernel.  A strong working knowledge of kconfig and git will be required.
+Ability to communicate effectively in English, both written and oral
+Solid background with popular open-source projects for creating custom Linux-based distributions such as Yocto or buildroot
+Strong grasp of git
+Nice-to-have skills
+Javascript or Golang programming ability
+Experience in writing CLI tools, including interactions with REST APIs
+Solid background in CI/CD and process automation
+Prior experience developing with software packaging formats, with direct Ubuntu/Debian/Snap experience being highly regarded
+What we offer colleagues
+We consider geographical location, experience, and performance in shaping compensation worldwide. We revisit compensation annually (and more often for graduates and associates) to ensure we recognize outstanding performance. In addition to base pay, we offer a performance-driven annual bonus or commission. We provide all team members with additional benefits which reflect our values and ideals. We balance our programs to meet local needs and ensure fairness globally.
+Distributed work environment with twice-yearly team sprints in person
+Personal learning and development budget of USD 2,000 per year
+Annual compensation review
+Recognition rewards
+Annual holiday leave
+Maternity and paternity leave
+Team Member Assistance Program & Wellness Platform
+Opportunity to travel to new locations to meet colleagues
+Priority Pass and travel upgrades for long-haul company events
+About Canonical
+Canonical is a pioneering tech firm at the forefront of the global move to open source. As the company that publishes Ubuntu, one of the most important open-source projects and the platform for AI, IoT, and the cloud, we are changing the world of software. We recruit on a global basis and set a very high standard for people joining the company. We expect excellence; in order to succeed, we need to be the best at what we do. Most colleagues at Canonical have worked from home since our inception in 2004.​ Working here is a step into the future and will challenge you to think differently, work smarter, learn new skills, and raise your game.
+Canonical is an equal opportunity employer
+We are proud to foster a workplace free from discrimination. Diversity of experience, perspectives, and background create a better work environment and better products.
+ Whatever your identity, we will give your application fair consideration.
+#LI-remote

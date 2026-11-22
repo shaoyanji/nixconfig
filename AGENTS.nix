@@ -47,45 +47,32 @@
         ];
       };
       body = ''
-        Built 2026-11-19 from crates.io `firecrawl-local` 0.1.0 on clanker
-        (`nix shell nixpkgs#rustc nixpkgs#cargo nixpkgs#gcc`, 5m42s on 4 vCPU):
-        23,843,336 bytes, sha256 2c7fbf19…cc8b. It links against clanker's store
-        glibc, so it is patched to frieren's loader and gcc-16.2.0-lib rpath
-        (`--set-interpreter`, `--set-rpath`) before first use.
+        Built 2026-11-19 from crates.io `firecrawl-local` 0.1.0 on clanker (`nix shell nixpkgs#rustc nixpkgs#cargo nixpkgs#gcc`,
+        5m42s on 4 vCPU): 23,843,336 bytes, sha256 2c7fbf19…cc8b. It links against clanker's store glibc, so it is patched
+        to frieren's loader and gcc-16.2.0-lib rpath (`--set-interpreter`, `--set-rpath`) before first use.
 
-        Runtime, not a derivation: ~/.local/bin/firecrawl-local, unit
-        ~/.config/systemd/user/firecrawl-local.service (`serve --port 3002`,
-        FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=auto). Chrome comes from
-        the store, not the repo: ~/.local/bin/firecrawl-chrome execs the
-        chromium agent-browser already pins (157, on cache.nixos.org, so
-        nothing is pushed to the fleet edge) and gc-roots it under
-        ~/.local/state. JS-only pages were header-only under `never` and render
-        under `auto` (quotes.toscrape.com/js: 0 → 3 quotes, status 200).
+        Runtime, not a derivation: ~/.local/bin/firecrawl-local, unit ~/.config/systemd/user/firecrawl-local.service
+        (`serve --port 3002`, FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=auto). Chrome comes from the store, not the
+        repo: ~/.local/bin/firecrawl-chrome execs the chromium agent-browser already pins (157, on cache.nixos.org, so
+        nothing is pushed to the fleet edge) and gc-roots it under ~/.local/state. JS-only pages were header-only under
+        `never` and render under `auto` (quotes.toscrape.com/js: 0 → 3 quotes, status 200).
 
-        Measured 3 runs per page, warm: example.com 0.02 s vs 0.42 s cloud,
-        NixOS manual 0.33 s vs 1.59 s; idle RSS 23.1 MiB, not the vendor's 11.
+        Measured 3 runs per page, warm: example.com 0.02 s vs 0.42 s cloud, NixOS manual 0.33 s vs 1.59 s; idle RSS
+        23.1 MiB, not the vendor's 11.
 
-        Wiring is two pins. `hermes doctor` named extract firecrawl while the
-        tool resolved to tavily (measured 2026-11-19), so the persona config
-        pins `web.extract_backend: firecrawl`, and FIRECRAWL_API_URL in
-        ~/.hermes/.env.local (folded in by hermes-env-sync) points that
-        provider's self-hosted branch at 127.0.0.1:3002.
+        Wiring is two pins. `hermes doctor` named extract firecrawl while the tool resolved to tavily (measured
+        2026-11-19), so the persona config pins `web.extract_backend: firecrawl`, and FIRECRAWL_API_URL in
+        ~/.hermes/.env.local (folded in by hermes-env-sync) points that provider's self-hosted branch at 127.0.0.1:3002.
 
-        Verified by calling `web_extract_tool` with the unit stopped: it named
-        port 3002 and refused. It also rescued that failure through keyless
-        cloud, so a dead loopback degrades quietly rather than erroring.
+        Verified by calling `web_extract_tool` with the unit stopped: it named port 3002 and refused. It also rescued
+        that failure through keyless cloud, so a dead loopback degrades quietly rather than erroring.
 
-        Exit: replace the user-local binary and unit with something a host
-        rebuild owns, then REJECT this note.
-
-        Met 2026-11-24: `programs.hermes-user.firecrawl` in hermes-user.nix
-        builds the crate as a `buildRustPackage` derivation (the cargoHash the
-        prebuilt note called the blocker: fetched crates.io 0.1.0 plus a
-        `cargoDeps` vendor run), declares the same unit (`serve --port 3002`,
-        FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=auto), ports the
-        firecrawl-chrome launcher to a store script, and removes all three
-        hand-placed files in a checkLinkTargets guard. frieren sets
-        `firecrawl.enable`; every other host keeps the defaults.
+        Exit: replace the user-local binary and unit with something a host rebuild owns, then REJECT this note.
+        Met 2026-11-24: `programs.hermes-user.firecrawl` in hermes-user.nix builds the crate as a `buildRustPackage`
+        derivation (the cargoHash the prebuilt note called the blocker: fetched crates.io 0.1.0 plus a `cargoDeps`
+        vendor run), declares the same unit (`serve --port 3002`, FIRECRAWL_CLOUD=off, FIRECRAWL_LOCAL_BROWSER=auto),
+        ports the firecrawl-chrome launcher to a store script, and removes all three hand-placed files in a
+        checkLinkTargets guard. frieren sets `firecrawl.enable`; every other host keeps the defaults.
       '';
     };
     config-registry-schema = {
@@ -98,7 +85,7 @@
       refs = {
         modules = [
           "modules.toml"
-          "taskfiles/checks.toml"
+          "flake/check-inventory.nix"
           "inventory.toml"
           ".sops.yaml"
         ];
@@ -106,38 +93,29 @@
         docs = [".agents/skills/cpg/SKILL.md"];
       };
       body = ''
-        Swept 2026-11-11 with `task agents:review:schema` over modules.toml, the
-        first six rows of taskfiles/checks.toml and two inventory hosts.
-        `checks:knobs` already proves every knob path exists, every host resolves
-        and `metadata.total_knobs` matches. These are the rules nothing proves.
+        Swept 2026-11-11 with `task agents:review:schema` over modules.toml, the first six rows of taskfiles/checks.toml
+        (now `flake/check-inventory.nix`) and two inventory hosts. `checks:knobs` already proves every knob path exists,
+        every host resolves and `metadata.total_knobs` matches. These are the rules nothing proves.
 
-        - `knobs.ai.path` is `modules/global/noDE.nix`, the only one of 17 outside
-          `modules/profiles/` or `modules/services/`. The gate allows it, so the
-          convention is real only in the other 16 entries.
-        - Three options are camelCase (`profiles.dwlDesktop.enable`,
-          `services.zettelGraph.enable`, `services.mataroaConsole.enable`); 14 are
-          kebab. All resolve as Nix paths, so nothing decides which style holds.
-        - Six services name their port only inside `description` (:5000, :8123,
-          :8088, :6801, :8453, :8454). `checks:ports` audits firewall against live
-          listeners, so two knobs could claim one port unseen.
-        - `taskfiles/checks.toml` has a root row for `checks:appflow` and none for
-          `checks:audit`, which exists only as `:handoff` and `:system`.
-          `check:verify` pairs rows with tasks; it says nothing about roots.
-        - `inventory.toml` omits `managed` on 27 of 38 hosts. That one is settled —
-          `lib/inventory.nix` defaults it to false — and is recorded so the next
-          sweep does not re-open it.
-        - `.sops.yaml` defines the `garnix` anchor and references it in no group,
-          and `acersops`/`acersopshost` carry one recipient value.
+        - `knobs.ai.path` is `modules/global/noDE.nix`, the only one of 17 outside `modules/profiles/` or
+          `modules/services/`. The gate allows it, so the convention is real only in the other 16 entries.
+        - Three options are camelCase (`profiles.dwlDesktop.enable`, `services.zettelGraph.enable`,
+          `services.mataroaConsole.enable`); 14 are kebab. All resolve as Nix paths, so nothing decides which style holds.
+        - Six services name their port only inside `description` (:5000, :8123, :8088, :6801, :8453, :8454).
+          `checks:ports` audits firewall against live listeners, so two knobs could claim one port unseen.
+        - `taskfiles/checks.toml` has a root row for `checks:appflow` and none for `checks:audit`, which exists only as
+          `:handoff` and `:system`. `check:verify` pairs rows with tasks; it says nothing about roots.
+        - `inventory.toml` omits `managed` on 27 of 38 hosts. That one is settled — `lib/inventory.nix` defaults it to
+          false — and is recorded so the next sweep does not re-open it.
+        - `.sops.yaml` defines the `garnix` anchor and references it in no group, and `acersops`/`acersopshost` carry
+          one recipient value.
 
-        Delivered 2026-11-19: `lib/registry-schema.nix` records the conventions
-        and each departure WITH the excepted value, and
-        `checks.<system>.registry-schema` (built by `checks:quick`) fails on any
-        other departure; the six prose ports are `port` fields now. Root rows are
-        recorded as a census (30 flat families, `appflow` the only umbrella) since
-        `check:verify` pairs rows with tasks; `.sops.yaml` is another registry.
-        2026-11-20: the check now covers `.sops.yaml` too — every `keys:` anchor
-        must be claimed by a group's age list and every `*alias` must resolve;
-        `sopsAnchorExceptions` records `garnix` (garnixMachine's on-host
+        Delivered 2026-11-19: `lib/registry-schema.nix` records the conventions and each departure WITH the excepted
+        value, and `checks.<system>.registry-schema` (built by `checks:quick`) fails on any other departure; the six
+        prose ports are `port` fields now. Root rows are recorded as a census (30 flat families, `appflow` the only
+        umbrella) since `check:verify` pairs rows with tasks; `.sops.yaml` is another registry.
+        2026-11-20: the check now covers `.sops.yaml` too — every `keys:` anchor must be claimed by a group's age list
+        and every `*alias` must resolve; `sopsAnchorExceptions` records `garnix` (garnixMachine's on-host
         repo-key, not a group recipient).
       '';
     };
@@ -185,11 +163,11 @@
           "modules/user/desktop/suite.nix"
           "scripts/task/drv-equality.py"
           "scripts/task/check.sh"
-          "taskfiles/checks.toml"
           "scripts/task/lib/taskfile_graph.py"
           "scripts/task/skills-task-mirror.py"
           "tests/taskfile-graph/expected.json"
           "flake/checks.nix"
+          "flake/check-inventory.nix"
         ];
         tasks = ["checks:drv-equality" "checks:host" "checks:skills:mirror" "check:leaf" "check:list" "check:verify"];
         docs = ["docs/task-control-plane.md" "docs/control-plane-vision.md" "docs/nix-patterns.md" "AGENTS.md"];
@@ -2988,45 +2966,35 @@
         tasks = ["checks:host"];
       };
       body = ''
-        **The rule.** Move what has no library and no shared logins, and keep the
-        name and the copy behind. stirling-pdf went on 2026-10-21; paperless,
-        vaultwarden and anki on 2026-11-02, over an earlier "paperless stays":
-        what that rule protected was the archive and the family's habits, not the
-        laptop. `docs.`, `vault.` and `anki.frieren.lan` are still frieren's
-        vhosts, and `services.offloadBridge` mirrors every tree to
-        `/srv/backup/offload` at 03:10, inside the window that already carries
-        those copies to BurgerNAS.
+        **The rule.** Move what has no library and no shared logins, and keep the name and the copy behind.
+        stirling-pdf went on 2026-10-21; paperless, vaultwarden and anki on 2026-11-02, over an earlier
+        "paperless stays": what that rule protected was the archive and the family's habits, not the laptop.
+        `docs.`, `vault.` and `anki.frieren.lan` are still frieren's vhosts, and `services.offloadBridge` mirrors
+        every tree to `/srv/backup/offload` at 03:10, inside the window that already carries those copies to BurgerNAS.
 
-        **What is left is a decision.** hermes stays resident on both hosts: each
-        gateway polls its own bot token (`hermes` here, `delphi-telegram` there),
-        so the 226 MiB in `~/.hermes` buys two agents, not a conflict. The monitor
-        pair did move (2026-11-04): frieren's gatus and its empty uptime-kuma are
-        gone, the checks run in delphi's `services.fleetMonitors` over the
-        tailnet, and alerts post back to frieren's SimpleX bridge — the only host
-        with an identity to deliver them. One dependency the move cannot remove:
-        a name that lives on frieren needs frieren's nginx.
+        **What is left is a decision.** hermes stays resident on both hosts: each gateway polls its own bot token
+        (`hermes` here, `delphi-telegram` there), so the 226 MiB in `~/.hermes` buys two agents, not a conflict. The
+        monitor pair did move (2026-11-04): frieren's gatus and its empty uptime-kuma are gone, the checks run in
+        delphi's `services.fleetMonitors` over the tailnet, and alerts post back to frieren's SimpleX bridge — the
+        only host with an identity to deliver them. One dependency the move cannot remove: a name that lives on
+        frieren needs frieren's nginx.
 
-        **The tunnel is gone.** Frieren was deployed on 2026-11-02 with vhosts
-        that name delphi's tailnet address; `offload-tunnel` was stopped first and
-        all three names still answered with frieren holding no loopback listeners,
-        so the cutover was proved before the file and its import were deleted.
+        **The tunnel is gone.** Frieren was deployed on 2026-11-02 with vhosts that name delphi's tailnet address;
+        `offload-tunnel` was stopped first and all three names still answered with frieren holding no loopback
+        listeners, so the cutover was proved before the file and its import were deleted.
 
-        **Exit.** Each moved unit is gone from frieren's system.slice, serves from
-        delphi over the tailnet, and `systemctl show -p MemoryCurrent` on frieren
-        shows the release; the shelter copy is under `/srv/backup/offload` and
-        inside a restic snapshot; the tunnel file is deleted — all met.
+        **Exit.** Each moved unit is gone from frieren's system.slice, serves from delphi over the tailnet, and
+        `systemctl show -p MemoryCurrent` on frieren shows the release; the shelter copy is under
+        `/srv/backup/offload` and inside a restic snapshot; the tunnel file is deleted — all met.
 
-        **Verified 2026-11-20 (devin).** No stirling/paperless/vaultwarden/anki/
-        gatus/uptime-kuma units exist in frieren's system.slice; delphi answers on
-        the tailnet (stirling :8445 → 200, uptime-kuma :8448 → 302, gatus :8181 →
-        200) while `docs.`, `vault.` and `anki.frieren.lan` stay frieren vhosts.
-        The 03:10 mirror refreshed `/srv/backup/offload/{anki,paperless,
-        vaultwarden,vaultwarden-backup}` the same day and snapshot d2228859
-        (03:30, `restic-frieren-local`) carries the tree. Memory shed measured on
-        delphi's units: ~1.4 GiB (stirling 633, paperless ~480, uptime-kuma 137,
-        vaultwarden 58, gatus 42, anki 6 MiB). Nothing movable remains: the rest
-        is library (immich, jellyfin, plex, *arr, audiobookshelf), the SimpleX
-        identity, or hermes by decision.
+        **Verified 2026-11-20 (devin).** No stirling/paperless/vaultwarden/anki/gatus/uptime-kuma units exist in
+        frieren's system.slice; delphi answers on the tailnet (stirling :8445 → 200, uptime-kuma :8448 → 302,
+        gatus :8181 → 200) while `docs.`, `vault.` and `anki.frieren.lan` stay frieren vhosts. The 03:10 mirror
+        refreshed `/srv/backup/offload/{anki,paperless,vaultwarden,vaultwarden-backup}` the same day and snapshot
+        d2228859 (03:30, `restic-frieren-local`) carries the tree. Memory shed measured on delphi's units: ~1.4 GiB
+        (stirling 633, paperless ~480, uptime-kuma 137, vaultwarden 58, gatus 42, anki 6 MiB). Nothing movable
+        remains: the rest is library (immich, jellyfin, plex, *arr, audiobookshelf), the SimpleX identity, or
+        hermes by decision.
       '';
     };
     exp-114 = {
@@ -5033,6 +5001,34 @@
 
         Exit: the placeholder grep and `matt:cv:check` both stay clean and
         green on the next pass over the dossier.
+      '';
+    };
+    delphi-postgres-19-upgrade = {
+      title = "Upgrade delphi's PostgreSQL 17 → 19 at the next nixpkgs epoch";
+      kind = "open";
+      status = "OPEN";
+      priority = "P4";
+      date = "2026-11-22";
+      summary = "Delphi runs PG 17 for the email archive, miniflux, umami, zettel-graph and mataroa. The upgrade procedure is written and committed; execution is gated on the fleet moving to a nixpkgs pin that carries postgresql_19 final (unstable has only 19rc2 today).";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/services/email-archive.nix"];
+        tasks = ["checks:host"];
+        docs = ["docs/ops/postgres-19-upgrade-plan.md"];
+      };
+      body = ''
+        Preconditions, all in docs/ops/postgres-19-upgrade-plan.md: the fleet
+        pin must carry postgresql_19 at 19.0 final (not rc2), pgvector must be
+        compatible, and a pg_dumpall plus postgres-backup-drill restore test
+        must pass before the pin flips `services.postgresql.package` in
+        email-archive.nix.
+
+        NixOS does not run pg_upgrade for you; the doc weighs pg_upgrade
+        against dump/restore. Post-migration: ANALYZE, pgvector loadable in
+        every consumer database, and all five services reconnecting.
+
+        Exit: `task checks:host HOST=delphi` passes on the new generation and
+        the xs turn SUBJECT=delphi:postgres-19-upgrade posts OUTCOME=done.
       '';
     };
   };

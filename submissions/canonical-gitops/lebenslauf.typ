@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — CV", author: "Matt Ji")
-#set page(paper: "a4", margin: (top: 1.4cm, bottom: 1.4cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 9.5pt, fill: rgb("#111827"), lang: "en", hyphenate: false)
-#set par(leading: 0.5em, justify: true)
+#set page(paper: "a4", margin: (top: 1.6cm, bottom: 1.6cm, left: 1.9cm, right: 1.9cm))
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 11pt, fill: rgb("#111827"), lang: "en", hyphenate: false)
+#set par(leading: 0.70em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
@@ -17,7 +17,7 @@
 #text(size: 9pt)[SRE who runs infrastructure the way an information-systems team should: Git as the only source of truth, hosts and services described rather than configured, rollout only through a pipeline that evaluates the same configuration it deploys, rollback as a task instead of a procedure. Five years as the sole operator of a thirteen-host Linux fleet, with Python and Go tooling written to remove the manual step entirely, observability built into the platform, and every restore verified. Native English, German C1, US citizen with permanent German residence, working remotely from Germany. Kubernetes, ArgoCD and fleet management at Canonical's scale are not part of this record.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
-  #v(5pt)
+  #v(10pt)
   #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#kind]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
@@ -35,7 +35,7 @@
       #for bullet in bullets [- #bullet]
     ]
   ]
-  #v(3pt)
+  #v(7pt)
 ]
 
 #section("Experience")

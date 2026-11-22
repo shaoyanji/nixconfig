@@ -1,70 +1,68 @@
 # Nebius — Senior Site Reliability Engineer (SRE, Compute Node Team)
 
-**Status: prepared, NOT submitted.** 2026-11-21. No account created, nothing sent.
+Greenhouse **4766627101** · Cornerstone: Compute Node team inside AI Cloud. **Amsterdam and Remote Europe only — Germany is not a listed
+location**, which is the one answer on the form that can end this application. Requisition live since 2026-01-26, refreshed 2026-11-18: a
+ten-month-old search. No compensation published; EUR 130,000–160,000 is the applicant's target.
 
-Nebius (Nasdaq: NBIS), Compute Node team inside AI Cloud. Locations offered: **Amsterdam and Remote Europe only — Germany is not a listed location**, which matters for the authorization answer. Requisition live since **2026-01-26**, refreshed 2026-11-18: a ten-month-old search. No compensation published.
+## Stage: the two records disagree, again
 
-The team runs the cluster scheduler and node-level services behind VMs across all cloud regions: Linux kernel and hypervisor close work, QEMU/KVM, cgroups and namespaces, NUMA, observability embedded in the node layer.
+The sheet this rebuild replaces said **"prepared, NOT submitted. No account created, nothing sent."** The apps DB says **applied** 2026-11-21 with a
+Greenhouse confirmation. The ledger that logs confirmations is the stronger record, so the row stays `applied` and both documents are a faithful
+rebuild for a screen or a resend — but the contradiction is written down here rather than smoothed over, exactly as with `submissions/nebius`.
+
+## Legacy packet, now genuinely in git history
+
+These files were **untracked**, so deleting them in the rebuild commit would have destroyed them. They were therefore committed unchanged first
+(`appflow(nebius-compute-node): stage the pre-Typst packet`) and retired in the second commit:
+
+| Artefact | sha256 (first 16) | What it was |
+| :--- | :--- | :--- |
+| `lebenslauf.pdf` | `a3e473a7bfcbcb9c…` | Nix-built CV, 15/25 highlights, English |
+| `anschreiben.pdf` | `6da8e7a2fef01e17…` | Nix-built one-page letter |
+| `selection.json` | `8ffd5d3742f571a9…` | JD selector output (15/25 highlights, 4/4 projects) |
+| `submission-sheet.md` | `99755731bdf8d394…` | the 2026-11-21 sheet, this file's predecessor |
+
+`job-description.txt` is kept unchanged: it is a real capture of the posting, not a reconstruction.
 
 ## Files
 
-`lebenslauf.pdf` (2 pages, English), `anschreiben.pdf` (1 page, English), `selection.json` (15/25 highlights, 4/4 projects: nixconfig, email-archive, bountystash, fibtransponder), `job-description.txt`, this sheet.
+| File | Pages | Words | Warnings | sha256 (first 16) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 1255 | 0 | `1d9e26915262bac3` |
+| `anschreiben.pdf` | 1 | 475 | 0 | `185173308377ab38` |
 
-## The angle: the layer where the guest meets the host
+## The four pillars, against the repository
 
-The letter is written for a team that debugs across user space and kernel space: each host pins its kernel track and kernel parameters, each service is a systemd unit with defined failure behaviour, and a whole generation rolls back in one command. When a host misbehaves, the question is which layer lied — user space, the unit, the kernel parameter, or the declaration that produced it.
+| Pillar | Evidence | In the documents as |
+| :--- | :--- | :--- |
+| microVM orchestration on KVM | `hosts/microvms/`: `microvm.nix` with cloud-hypervisor, vsock cid, tap `microvm1` on `brlan` with NAT, read-only virtiofs store plus writable overlay, separate `/var` volume, ssh host key from a persistent share, explicit TCG fallback where `/dev/kvm` is absent | claimed in full — the centre of the packet |
+| Host/guest boundary isolation | Guest firewall off because the host owns the bridge; the guest imports no host chain and carries none of the host's service tier; default-deny nftables between hosts | claimed in full |
+| Canary host rollout | A guest with its own kernel and root exercises a configuration or a runbook before a fleet does; per-host evaluation gate refuses before an installer | claimed in full |
+| Node observability via PSI and sentinel | `fleet-sentinel`: job state, generation age, disk and pressure stall information per resource every fifteen minutes; `node_exporter` behind dashboards; gatus paging on silence | claimed in full |
 
-The isolation paragraph is the strongest concrete match: microVMs on KVM behind a bridge with udev-attached taps and NAT, and a canary host proving a configuration before the rest of the fleet switches. Observability is presented as built rather than consumed: sentinel every fifteen minutes with job status, generation age, disk and PSI pressure, node_exporter behind it, alerts to a human, runbooks as text.
+## Gaps, in both documents
 
-## The gaps, stated in the letter
+No QEMU or cloud-hypervisor internals, no live migration at scale. No NUMA placement or cgroup v2 controller tuning beyond systemd defaults. No perf,
+eBPF, ftrace or kdump in production. No GPU, NVLink, InfiniBand or BMC/IPMI hardware lifecycle. Guest counts are single digits, not thousands. Those
+terms appear in the CV only inside the paragraph declining them.
 
-- **No QEMU/KVM internals or live migration at scale**; microVM operation is real but small.
-- **No NUMA or cgroup v2 tuning** beyond systemd defaults.
-- **No perf, eBPF, ftrace or kernel crash-dump debugging** in production.
-- **No GPU, NVLink, InfiniBand or BMC/IPMI hardware lifecycle** — the posting lists these as nice-to-have, not required.
-- Kernel experience is deep configuration and operations, not hypervisor development.
+## Route and the location question
 
-## Compensation
+The form has sixteen live fields and **no cover-letter upload**, so the letter travels in the application email or the first human reply. Germany is
+not among the listed locations; the letter says plainly that the application is for Remote Europe or Germany and not Amsterdam, and that reading needs
+confirming before an offer, not after.
 
-Ask **EUR 130,000 – 160,000**. No band is published; only "competitive compensation". The ask is anchored to the German market on a Remote-Europe contract.
+**Compensation:** EUR 130,000–160,000, named in the letter because the earlier version carried it and quietly dropping a figure in a rebuild changes
+the signal.
 
-## Application route and live form
+## Checks
 
-- Posting: https://careers.nebius.com/?gh_jid=4766627101 (Greenhouse job **4766627101**)
-- Embedded form: https://boards.greenhouse.io/embed/job_app?for=nebius&token=4766627101
-- Greenhouse API confirms the title, the two-location list, `first_published 2026-01-26`, `updated_at 2026-11-18`.
-
-The embedded form renders server-side; these are **16 real field labels** from the live page:
-
-| Live Greenhouse field | Answer |
+| Gate | Result |
 | :--- | :--- |
-| First Name * | Matt |
-| Last Name * | Ji |
-| Preferred First Name | Matt |
-| Email * | matt@bountystash.com |
-| Country * | Germany |
-| Phone * | +49 1733281570 |
-| Location (City) * | Gutach im Breisgau |
-| Attach | `lebenslauf.pdf` (2 pages) |
-| Enter manually | only if the resume parser mangles the dates |
-| LinkedIn Profile | https://linkedin.com/in/mattji |
-| Website | https://www.bountystash.com |
-| Which languages do you speak? * | English (native), German (C1) |
-| Are you currently authorized to work in the country where this position is located, without requiring sponsorship, now or in the future? * | Yes for Germany: US citizen with unbefristete Niederlassungserlaubnis, no sponsorship now or later. I am applying to the Remote-Europe location; a Dutch contract would need a permit, so Amsterdam is not my target. |
-| Do you currently reside in the location specified for this role? * | Yes — Gutach im Breisgau, Germany; applying to the Remote-Europe location. |
-| Have you ever been employed by Nebius before? * | No |
-| I have read Nebius's Candidates Privacy Policy. * | read and accept |
-
-The authorization answer needs care: the question asks about "the country where this position is located", and the location list is Amsterdam plus Remote Europe. The sheet answers yes for Germany and applies to Remote Europe; a Dutch contract would need a permit, because the German Niederlassungserlaubnis is national.
-
-There is no cover-letter upload and no free-text field. If the letter has nowhere to go, compress the isolation paragraph (microVMs, canary) into any additional-information box.
-
-## Verification
-
-- `pdfinfo`: CV 2 pages, letter 1 page, both A4, Typst-compiled.
-- Both page budgets passed; no spillover error.
-- No placeholders (`{`, TODO, XXX, FIXME) in either PDF.
-- Letter contains: EUR 130,000, EUR 160,000, Niederlassungserlaubnis, microVM, QEMU, PSI.
-- Selection: 15/25 highlights, 4/4 projects, all four requested evidence projects kept.
-- JD written from Greenhouse's API as plain text, 0 HTML tags.
-- DB row: `nebius-senior-site-reliability-engineer-sre-compute-node-team`, `stage=prep`, `status=prep`, `fit=3`, `folder_path=submissions/nebius-compute-node`.
+| `typst compile` both sources | 0 warnings each |
+| Page budget | CV 2 pages, letter 1 page (asserted before commit) |
+| `**` in sources | 0 |
+| Curly quotes | 0 |
+| Unsupported claims (live migration/NUMA/cgroup v2/perf/eBPF/ftrace/kdump/InfiniBand/IPMI) | 0 outside the gap paragraph |
+| `task checks:prose` | exit 0 |
+| Legacy artefacts | staged first, retired in the rebuild, hashes above |

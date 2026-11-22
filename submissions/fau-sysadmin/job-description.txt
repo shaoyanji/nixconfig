@@ -1,11 +1,7 @@
 IT-Systemadministrator Linux und Windows (m/w/d)
-Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU) — Lehrstuhl für Fertigungstechnologie (LFT), Technische Fakultät
-Interamt-Angebots-ID 1513404 | Kennung für Bewerbungen 2015
-Einsatzort: Egerlandstraße 11-13, 91058 Erlangen; weitere Orte Haberstraße 9, 91058 Erlangen und Konrad-Zuse-Straße 5, 91052 Erlangen
-Dienstort: hybrid | Vollzeit 40,1 h | TV-L E 10 | befristet bis 31.03.2028 | Besetzung zum 15.02.2027
-Bewerbungsfrist: 01.12.2026, ausschließlich über die Behördenseite (FAU-Portal), nicht per Post oder E-Mail
-Ansprechpartner: Herr Gunar Tochtermann, gunar.tochtermann@fau.de, +49 9131 8528284
-Quelle: interamt.de, abgerufen am 22.11.2026
+Friedrich-Alexander-Universität Erlangen-Nürnberg — Lehrstuhl für Fertigungstechnologie (LFT)
+Interamt-Angebot 1513404, Kennung 2015 · TV-L · Bewerbungsweg interamt.de
+Packet date: 22 November 2026 · advert fetched 22.11.2026 (HTTP 200)
 
 Als IT-Systemadministrator Linux und Windows (m/w/d) an der Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU) sind Sie für die Betreuung und Weiterentwicklung der IT-Infrastruktur des Lehrstuhls sowie die Koordination des IT-Betriebs an den verschiedenen Standorten zuständig.
 Der Lehrstuhl für Fertigungstechnologie (LFT) als Teil der Technischen Fakultät an der FAU ist eine international renommierte Forschungseinrichtung mit den Schwerpunkten Blech- und Massivumformung. Wir bearbeiten in enger Zusammenarbeit mit industriellen Partnern zahlreiche Forschungsprojekte zu Fragestellungen der Umformtechnik, Werkstofftechnik, Fügetechnik und des Werkzeugbaus. Die zahlreichen unterschiedlichen Projekte erfordern den Einsatz und die laufende Erweiterung einer Vielzahl von IT-Systemen.
@@ -48,23 +44,124 @@ Weitere Arbeitsorte:
 Haberstraße 9, 91058 Erlangen
 Konrad-Zuse-Straße 5, 91052 Erlangen
 Nach intensiver Einarbeitung und entsprechender Eignung ist die Stelle als Nachfolge der IT-Leitungsfunktion des Lehrstuhls angelegt. Dies beinhaltet die fachliche und disziplinarische Personal- und Budgetverantwortung, sowie Entwicklungsmöglichkeiten bis zur Entgeltgruppe 11 TV-L in einem unbefristeten Arbeitsverhältnis.
-Wir bitten Sie, unsere  Onlineplattform  zu nutzen und von Bewerbungen auf dem Postweg oder per E-Mail abzusehen. Bewerbungen, die auf dem Postweg bei uns eingehen, werden nach Abschluss des Verfahrens nicht zurückgesendet.
-Wegen der im Zusammenhang mit dem Bewerbungsverfahren zu erhebenden personenbezogenen Daten bitten wir Sie, unsere Informationen nach Art. 13 und 14 Datenschutzgrundverordnung unter  www.fau.de  zu beachten.
+Wir bitten Sie, unsere
+Onlineplattform
+zu nutzen und von Bewerbungen auf dem Postweg oder per E-Mail abzusehen. Bewerbungen, die auf dem Postweg bei uns eingehen, werden nach Abschluss des Verfahrens nicht zurückgesendet.
+Wegen der im Zusammenhang mit dem Bewerbungsverfahren zu erhebenden personenbezogenen Daten bitten wir Sie, unsere Informationen nach Art. 13 und 14 Datenschutzgrundverordnung unter
+www.fau.de
+zu beachten.
 Die FAU versteht sich als moderner, weltoffener und familienfreundlicher Arbeitgeber. Wir begrüßen Ihre Bewerbung unabhängig von Ihrem Alter, Ihrem Geschlecht, Ihrer kulturellen und sozialen Herkunft, Religion, Weltanschauung, Behinderung oder sexuellen Identität. Haben Sie eine Schwerbehinderung oder sind schwerbehinderten Personen gleichgestellt, so berücksichtigen wir Sie bei wesentlich gleicher Eignung, Leistung und Befähigung bevorzugt. Gerne können Sie bei uns in Teilzeit arbeiten, wenn durch Job-Sharing eine vollumfängliche Wahrnehmung des Aufgabenbereichs gewährleistet ist.
 Bei Wunsch können Sie eine Person der Gleichstellung zum Bewerbungsgespräch hinzuziehen, ohne dass dadurch Nachteile für Sie entstehen.
 Auf dieses Angebot können Sie sich nur über die
 Bewerbungsseite
 der ausschreibenden Behörde bewerben.
+Zurück zur Trefferliste
+Trefferliste der Behörde
+Details
+INTERAMT Angebots-ID
+1513404
+Kennung für Bewerbungen
+2015
+Anzahl Stellen
+Stellenbezeichnung
+IT-Systemadministrator Linux und Windows (m/w/d)
+Behörde
+Friedrich-Alexander-Universität Erlangen-Nürnberg
+Homepage
+https://www.jobs.fau.de
+Einsatzort Straße
+Egerlandstraße 11-13
+Einsatzort PLZ / Ort
+91058 Erlangen
+Dienstort
+Hybrid
+Dienstverhältnis
+Arbeitnehmer
+Besoldung / Entgelt
+TV-L E 10
+Befristet bis (Datum)
+31.03.2028
+Teilzeit / Vollzeit
+Vollzeit
+Wochenarbeitszeit
+40,1
+h für Arbeitnehmer
+Bewerbungsfrist
+01.12.2026
+Besetzung zum
+15.02.2027
+Ansprechpartner
+Herr Gunar Tochtermann
+E-Mail
+gunar.tochtermann@fau.de
+Telefonnummer
++49 9131 8528284
+Aktionen
+Druckversion
+PDF anzeigen
+Bewerben über Behördenseite
+Weiterempfehlen
+Anlagen
+Entgelttabelle_ab_02_2025.pdf
+Kontakt
+Impressum
+AGB
+Datenschutz
+Nutzungsbedingungen
+Erklärung zur Barrierefreiheit
+Cookie-Einstellungen
+Inhaltsverzeichnis
+© 2008-2026 INTERAMT
+Version 26.0.11 | Seite 2.0.2 | K168
+INTERAMT Login
+Benutzername
+Passwort
+Passwort anzeigen
+Login
+Passwort vergessen
+Registrieren
+Datenschutzhinweise
+Diese Webseite verwendet Cookies
+Wir nutzen auf unserer Website ausschließlich notwendige Cookies. Mit dem Schließen des Banners werden diese automatisch gesetzt.
+Notwendig
+Notwendige Cookies ermöglichen grundlegende Funktionen und sind für die einwandfreie Funktion der Website erforderlich.
+anzeigen
+Session Cookie
+Technisch notwendiges Cookie zum Speichern der Session. Dieser Dienst sammelt keine benutzerbezogenen Daten. Nach Beendigung der Sitzung wird dieses Cookie gelöscht.
+Anbieter
+DVZ-MV GmbH
+Cookie Name
+JSESSIONID
+Cookie Laufzeit
+Session
+Datenschutzerklärung
+https://interamt.de/cms/legal/Datenschutzerklaerung.html
+Hosts
+interamt.de
+Pop-up Information
+Speichert, ob dem Besucher das Pop-up Infofenster bereits angezeigt und die notwendigen Cookies gesetzt wurden.
+Anbieter
+DVZ-MV GmbH
+Cookie Name
+ia-cookies-allowed
+Cookie Laufzeit
+1 Jahr
+Datenschutzerklärung
+https://interamt.de/cms/legal/Datenschutzerklaerung.html
+Hosts
+interamt.de
+Cookies akzeptieren
 
-
-[Abgleich mit dem Paket, 22.11.2026]
-Muss-Anforderungen und ihre Lage im Paket:
-- Windows Server 2019/2022/2025 mit Active Directory, DNS, Firewall, Group Policies: nicht vorhanden.
-- Betriebssysteme Windows und Ubuntu: Ubuntu/Linux stark, Windows nur Anwenderbetreuung.
-- Hyper-V und Backup-Systeme: restic und NAS vorhanden, Hyper-V nicht.
-- CAD-, FE-, Office-Software und Lizenzserver: nicht vorhanden.
-- PowerShell: nicht vorhanden; Automatisierung in Shell, Python und Go.
-- Fuehrerschein Klasse B: Status ungeklaert, im Paket nicht behauptet (offener Punkt im Datenblatt).
-- Hochschulabschluss, mehrjaehrige Administration, Hardwarekenntnisse, Deutsch C1: erfuellt.
-Widerspruch in der Anzeige: Feld 'Befristet bis' nennt 31.03.2028, der Text nennt ein unbefristetes
-Arbeitsverhaeltnis mit Nachfolge der IT-Leitung und Entwicklung bis E 11. Vor dem Absenden klaeren.
+[Packet cross-check, 22.11.2026]
+Task: care and further development of the chair's IT infrastructure, coordination of IT operations
+across its several sites, in a chair (LFT) working on sheet and bulk metal forming with industrial
+partners, which keeps adding IT systems per project.
+Held: five years running 13 Linux servers alone across several sites and networks — PXE install,
+disks, services, access rights; pinned inputs and a gate before rollout; rollback by generation;
+15-minute ledger, probes, Go alert channel with delivery confirmation; restic with verified restores;
+nftables, WireGuard between sites, own CA, short-lived certificates; hardware procurement and
+commissioning; user support without being their administrator; documentation generated from the
+estate; Python, Go, Shell; Fraunhofer ISE 2012 lab instrumentation and shared research machines.
+Not held: Windows Server, Active Directory, Hyper-V; Debian in production; Ansible; university
+ticketing and account workflows.
+Fit 3: Linux and automated operations are strong, half the advertised stack is absent.

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:47:55Z",
+  "generated": "2026-11-22T12:48:43Z",
   "count": 200,
-  "pin": "1300f0f6321c74be73831ed5b35b5de1df3b4cefe60c6c8dd2256fd83b36112f",
+  "pin": "7a939fc297139e443db296652f0db07280bd309cfde2c2d9564cc441fad34a42",
   "turns": [
+    {
+      "id": "0d14ed95-bac2-480f-8dc9-f8f7b80fc51a",
+      "ts": "2026-11-22T12:48:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:stackit-k8s",
+      "action": "landed: STACKIT Senior Kubernetes Engineer (GT4121) native Typst, d9a1ec08. CV 2 S./921w, Anschreiben 1 S./406w, je 0 Warnungen, Seitenbudget geprüft, prose Exit 0 bei 294 Dateien. Belegt: microVM-Labor (cloud-hypervisor/KVM/vsock/virtiofs), NixOS-Flotte mit Auswertungslauf je Host, Sentinel-Telemetrie, Postgres-Restore-Drill. Lücke im Text: kein K8s in Produktion, keine Operatoren/CRDs. Symlink + 3 JSONs entfernt. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d9a1ec08ddb093b6732b656c1a36b4d24263ccd2",
+      "branch": "main",
+      "frame": "03ha7ixclvid5gyitqrm3n4bg"
+    },
     {
       "id": "41f29609-0c31-41d7-9de3-1eb40f1e1f23",
       "ts": "2026-11-22T12:47:36Z",
@@ -2811,19 +2824,6 @@
       "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
       "branch": "main",
       "frame": "03ha6tzm5sjx6gulf33mcxxqt"
-    },
-    {
-      "id": "d2a439e9-92a9-4370-baa1-c534f26a3d58",
-      "ts": "2026-11-22T10:39:48Z",
-      "source": "devin",
-      "subject": "nixconfig:ledgy",
-      "action": "re-assigned; already applied: req 5024440101 OTP-verified 2026-11-21 — ack mail 310959. Skipped duplicate",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4341c7ad9f518aad833681bd08d830b9f0b43c3f",
-      "branch": "main",
-      "frame": "03ha6tun64ypijdq5n05t2y92"
     }
   ]
 }

@@ -20,11 +20,9 @@
 
   hostMeta = config.fleet.inventory.hosts.delphi;
 
-  # Public HTTPS name; null serves plain HTTP on :80 only. `""` (the registry's
-  # "unknown") becomes null, or `lib.optionalAttrs` would make a vhost with an
-  # empty `server_name`. The A record must resolve to the RESERVED IP first, or
-  # every ACME renewal becomes a failing unit.
-  # Home: docs/delphi-install.md §"Phase 4c — HTTPS (done 2026-10-20)".
+  # Public HTTPS name; "" (registry's "unknown") → null — a vhost with an empty
+  # server_name would be emitted (Trap: note delphi-ops-traps). The A record must
+  # resolve before ACME renewals pass. Home: docs/delphi-install.md §"Phase 4c".
   publicDomain = let
     d = hostMeta.network.domain;
   in
@@ -131,10 +129,8 @@
     "/recon/" = reconLocation;
     "= /recon".extraConfig = reconRedirect;
   };
-  # Content-hashed assets are immutable, so they get the one-year policy
-  # (modules/config/nginx-static-cache.nix) rather than the HTML revalidate.
-  # Eight explicit hex classes: a `{8}` brace quantifier is emitted SPLIT across
-  # lines by the config generator and nginx rejects the whole server for it.
+  # Eight explicit hex classes — a {8} quantifier is emitted SPLIT across lines
+  # by the generator and nginx rejects the server (Trap: note delphi-ops-traps).
   hashedAssets = root: {
     "~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
       inherit root;
@@ -166,9 +162,8 @@
     };
   };
 
-  # Microvm guest removed from delphi (OCI A1 lacks KVM hardware acceleration).
-  # All services served directly via tailnet mounts above. Dummy value keeps
-  # dependent code (nginx proxy links, slideshow page) evaluating without error.
+  # Guest removed — A1 has no KVM (Fact: inventory.toml); the dummy keeps
+  # dependents evaluating (Story: note delphi-ops-traps).
   microvmGuest = {
     services = [];
     stirlingPath = "/microvm/stirling/";
@@ -408,9 +403,9 @@ in {
     useRoutingFeatures = "both";
     extraSetFlags = [
       "--accept-routes=true"
-      # A resolver must never resolve THROUGH the address it serves: that is an
-      # outage loop (the VRRP analogue is why net/dns/failover.nix probes
-      # 127.0.0.1 and not the floating IP). crab-hole's own upstreams are DoT.
+      # The resolver must never resolve through the address it serves:
+      # [[flake/policies.nix#resolver-never-through-served-address]] (outage
+      # loop — the host could not reach the tailnet it serves).
       "--accept-dns=false"
       # `--advertise-exit-node` and the `/32` route are emitted by
       # net/dns/tailnet-address.nix (`exitNode = true`), not here.
@@ -420,28 +415,14 @@ in {
   # The lo bind itself lives in net/dns/tailnet-address.nix (shared with
   # frieren, which advertises the same /32 as the passive member).
 
-  # --- Tailnet resolver: crab-hole -------------------------------------------
-  # One Rust binary, the same two lists frieren blocks, plain DNS on 53; bound to
-  # 0.0.0.0 because the tailnet IP is assigned at login. The firewall, not the
-  # bind address, is what limits it to the tailnet.
-  #
-  # LIMIT, measured 2026-10-20: crab-hole is a forwarding ad-blocker, not an
-  # authoritative server — its config has blocklist/downstream/upstream/api and
-  # no static-record or zone support (LuckyTurtleDev/crab-hole). It therefore
-  # answers the internet but NOT the fleet's `*.frieren.lan` wildcard, so while
-  # the shared `10.99.0.53/32` route sits on this node every fleet name returns
-  # NODATA. `task ops:tailnet:dns` fails on exactly this, and
-  # docs/dns-failover.md lists the three fixes (split DNS for the zone is the
-  # cheap one; a dnsmasq zone front-end is the equivalent-resolver one).
+  # LIMIT: forwarding ad-blocker with no zone support — *.frieren.lan returns
+  # NODATA (Story: note delphi-ops-traps). Fixes: docs/dns-failover.md.
   services.crab-hole = {
     enable = true;
     openFirewall = false;
     settings = {
-      # UDP only, and that is a crab-hole limitation, not a choice: v0.1.12
-      # takes `udp|tls|https|quic` for a downstream protocol and has no plain
-      # `tcp` variant (the build-time validate-config rejects it). Consequence:
-      # no DNS-over-TCP on 53, so a truncated answer cannot be retried over TCP
-      # and very large TXT chains will fail. Everything else resolves normally.
+      # UDP only: crab-hole v0.1.12 has no plain tcp downstream — no DNS-over-TCP
+      # retry on truncation (Trap: note delphi-ops-traps).
       downstream = [
         {
           listen = "0.0.0.0";
@@ -449,8 +430,8 @@ in {
           protocol = "udp";
         }
       ];
-      # DoT upstreams, IPv4 only (OCI has no IPv6 uplink), with envs.net last as a
-      # privacy fallback. Why: docs/delphi-install.md §"DoT upstreams".
+      # DoT upstreams, IPv4-only (no IPv6 uplink — Fact: inventory.toml); envs.net
+      # last as the privacy fallback. Why: docs/delphi-install.md §"DoT upstreams".
       upstream.name_servers = [
         {
           protocol = "tls";
@@ -471,7 +452,8 @@ in {
           trust_nx_responses = false;
         }
       ];
-      # Same two lists frieren's pihole-ftl uses: a failover answer matches.
+      # Same two lists frieren's pihole-ftl uses — failover answers must match:
+      # flake/policies.nix#dns-failover-blocklist-parity.
       blocklist = {
         include_subdomains = true;
         lists = [
@@ -511,7 +493,7 @@ in {
         };
       }
       // lib.optionalAttrs (lib.hasAttr "paperless" config.services) {
-        # Moved off the NAS; frieren's nginx is their only client, over the tailnet.
+        # Moved off the NAS — offload: docs/service-offload.md + note open-frieren-offload.
         paperless = {
           port = config.services.paperless.port;
           lan = false;
@@ -540,8 +522,8 @@ in {
   # alerting stays off, since no SimpleX daemon runs here.
   services.fleetMonitors = {
     enable = true;
-    # Reached at http://100.123.145.53:8181/; the tailscale0 rule above is the only
-    # way in, because the address is assigned at login.
+    # Monitors reach delphi via its tailnet address; they cannot probe 10.99.0.53 —
+    # that sits behind the failover pair (Fact: inventory.toml).
     address = "0.0.0.0";
     endpoints = [
       {
@@ -585,11 +567,9 @@ in {
         };
         conditions = ["[BODY].state == ok"];
       }
-      # The NAS's own services, probed across the tailnet since frieren's gatus
-      # was retired on 2026-11-04. Each port is one frieren's
-      # `profiles.serviceExposure` registry already opens on tailscale0, so a
-      # probe cannot outlive the hole it needs; audiobookshelf has no exposed
-      # port, only its vhost, and is probed by name.
+      # NAS services probed over the tailnet since frieren's gatus retired (Story:
+      # note frieren-ops-history); probes cannot outlive their exposure-registry
+      # holes — audiobookshelf has no port, probed by name.
       {
         name = "frieren jellyfin";
         url = "http://100.97.61.65:8096";
@@ -654,9 +634,8 @@ in {
   # modules/services/fleet-monitors.nix and the exposure registry there).
   services.fleetMonitors.alerting.url = "http://100.97.61.65:5226/alert";
 
-  # crab-hole owns port 53, so resolved must not squat on it: the wildcard bind
-  # in `downstream` collides with the 127.0.0.53 stub and the unit fails with
-  # EADDRINUSE. Point the host's own resolution at the local resolver instead.
+  # crab-hole owns :53 — the resolved stub collides (EADDRINUSE); it stays
+  # stub-less (Trap: note delphi-ops-traps).
   services.resolved.settings.Resolve = {
     DNSStubListener = "no";
     LLMNR = false;
@@ -667,16 +646,10 @@ in {
     "::1"
   ];
 
-  # The vault runs on this host, but no client that matters can reach it under
-  # its own port: `domain` advertises https, and bitwarden-cli 2026.9.1 refuses
-  # a plain-http base URL outright (InsecureUrlNotAllowedError at /api/config),
-  # while the TLS cert is the `*.frieren.lan` wildcard that only frieren's nginx
-  # presents. crab-hole answers for the LAN, not for `*.frieren.lan`, and
-  # MagicDNS is not consulted here (nameservers above), so the name needs a
-  # static answer: frieren's Tailscale address, the same one the alert bridge
-  # above uses. The record has to exist before either client can prelogin: `rbw
-  # login` is the fleet's vault client, and `bw` survives only for passkeys, which
-  # no other client exposes.
+  # No client can prelogin at the vault's own port: cli refuses http, the
+  # *.frieren.lan cert lives on frieren's nginx, and crab-hole has no zone —
+  # so the name gets a static answer: frieren's tailnet IP (Fact: port map).
+  # rbw is the vault client; bw survives for passkeys only.
   networking.hosts."100.97.61.65" = ["vault.frieren.lan"];
 
   # --- The gokrazy appliance's build artifacts ---------------------------------
@@ -701,8 +674,8 @@ in {
 
   services.nginx = {
     enable = true;
-    # 1.30.7 from the nixpkgs-nginx pin: CVE-2026-123007/123633 fix while the
-    # fleet nixpkgs holds — substitutes, never compiles.
+    # 1.30.7 from the nixpkgs-nginx pin — the CVE-2026-123007/123633 fix while
+    # the fleet nixpkgs holds (Story: note delphi-ops-traps).
     package = nginxPkgs.nginx;
     recommendedOptimisation = true;
     recommendedGzipSettings = true;
@@ -717,9 +690,8 @@ in {
       }
     '';
 
-    # One definition of `virtualHosts`, because a module may not set the same
-    # attribute path twice: the TLS vhost is merged in with `//` rather than
-    # declared as a second `services.nginx.virtualHosts = …`.
+    # One virtualHosts definition per host — a module must not set the attrpath
+    # twice; TLS merges with // (Trap: note delphi-ops-traps).
     virtualHosts =
       {
         delphi = {
@@ -820,13 +792,8 @@ in {
       # `http://<ip>/healthz` keeps working as an edge probe independent of DNS.
       // lib.optionalAttrs (publicDomain != null) {
         ${publicDomain} = {
-          # No explicit `listen`: `enableACME`/`forceSSL` generate BOTH halves,
-          # the :443 server and the :80 redirect that carries the ACME
-          # challenge location. Declaring `listen 443 ssl` by hand left the
-          # generated :80 block without a listen directive, so it landed in a
-          # different listen group from the IP-addressed default vhost and no
-          # request ever reached the challenge location — HTTP-01 answered 404
-          # while the token sat in /var/lib/acme/acme-challenge.
+          # No explicit listen: enableACME/forceSSL emit both halves; a manual 443 listen
+          # orphaned the :80 challenge (HTTP-01 404; Trap: note delphi-ops-traps).
           enableACME = true;
           forceSSL = true;
           root = "${publicPage}";
@@ -835,12 +802,8 @@ in {
               "/" = {
                 index = "index.html";
                 tryFiles = "$uri $uri/ =404";
-                # `rewrite … last` re-matches to the exact location below, so a
-                # client that will not follow a 302 (`curl` without `-L`) still
-                # gets the document in one request. Anchored to the root: an
-                # unanchored pattern served the terminal page in place of every
-                # 404 and every real subpath a CLI client asked for (measured
-                # 2026-11-08 on `/data/delphi.json`).
+                # Anchored to / — unanchored, the rewrite ate every 404 and subpath
+                # (2026-11-08; Trap: note delphi-ops-traps).
                 extraConfig =
                   ''
                     if ($delphi_terminal) { rewrite ^/$ /terminal.txt last; }
@@ -888,18 +851,14 @@ in {
             // microvmProxyLocations false
             // stirlingPublicRedirect
             // lib.optionalAttrs slidesEnabled (slideshowLocations false);
-          # Deliberately no harness location — the worker is retired to
-          # hosts/delphi/dsh-web.shadow.nix; even live it was tailnet-only, and
-          # publishing here would put a token-only gate in front of a user that
-          # holds the fleet SSH CA key.
+          # No harness location — the worker retired to the shadow file (Story: note
+          # delphi-ops-traps); the fallback JSON route stays for manual checks.
         };
       };
   };
 
-  # DeepSeek Harness retired to hosts/delphi/dsh-web.shadow.nix — the module
-  # stays imported, so revival is uncommenting that file's blocks back here.
-  # `services.dsh-web` module import stays: the options existing is what makes
-  # the shadow a one-uncomment revive rather than a reconstruction.
+  # dsh-web retired to hosts/delphi/dsh-web.shadow.nix; the import stays for a
+  # one-uncomment revive (Story: note delphi-ops-traps).
 
   # --- System One decision engine (Julia-1 / Laya) ----------------------------
   # The engine is stdlib Python (no torch, no model weights at runtime): its
@@ -910,26 +869,16 @@ in {
   services.systemoneDecision = {
     enable = true;
     defaultModel = "julia-1";
-    # The envelope other agents call; mounted on the tailnet below. 8091 on
-    # loopback because 8090 is eisen's Laya, and one port per proxy mount.
+    # 8091 — 8090 is eisen's Laya; one port per mount (Fact: port map).
     serve = {
       enable = true;
       port = 8091;
     };
   };
 
-  # --- Stirling PDF: native here, the guest's copy is off ---------------------
-  # The history is the reason the shape looks odd. It ran natively from
-  # 2026-10-21, moved into the sandbox guest on 2026-10-24 with `stirling = true`
-  # (a state volume and a restart that is a decision, not a boot side effect),
-  # and came back the same week: OCI A1 has no KVM, so that guest runs under
-  # interpreted TCG, and a JVM there cost more CPU than the 2-OCPU box has.
-  # `flake/host-inventory.nix` now passes `stirling = false`, and this native
-  # copy is what answers — the portal's 8445 mount proxies it.
-  #
-  # So `stirlingProxyLocations` / `stirlingPublicRedirect` below are empty on
-  # this host: they are the guest path, kept for the host that flips the flag
-  # back, not a second live surface. The live one is the mount.
+  # Native, not the guest: A1 has no KVM and a JVM under TCG starved the 2-OCPU
+  # box (Story: note delphi-ops-traps). The empty guest-path fragments below
+  # stay for the flag-flip.
   services.stirling-pdf = {
     enable = true;
     environment = {
@@ -995,12 +944,10 @@ in {
   services.miniflux = {
     enable = true;
     config = {
-      # 8093 belongs to the agent-turns shim: miniflux bound it first and then
-      # lost every start to EADDRINUSE once the shim held it (2026-11-06). 8098
-      # is the next free loopback port in this block.
+      # 8093 is the agent-turns shim — miniflux lost it once (EADDRINUSE, 2026-11-06);
+      # 8098 is the next free port (Fact: port map; Story: note delphi-ops-traps).
       LISTEN_ADDR = "127.0.0.1:8098";
-      # 8453/8454 are zettel-graph and mataroa; the mounts are a sequential
-      # namespace, so the reading pair continues at 8455.
+      # mounts are a sequential namespace — 8453/8454 zettel+mataroa (Fact: port map).
       BASE_URL = "https://${tailnetHost}:8455";
     };
     adminCredentialsFile = config.sops.templates."miniflux-admin.env".path;
@@ -1018,10 +965,8 @@ in {
     enable = true;
     settings = {
       HOSTNAME = "127.0.0.1";
-      # NOT 8094: media-relay's vhost owns 127.0.0.1:8094 on this host, and an
-      # umami on the loopback of the same port made nginx fail at bind — every
-      # vhost on delphi was down for as long as this unit was up (measured
-      # 2026-11-07: `bind() to 0.0.0.0:8094 failed (98)`, nginx start-limit-hit).
+      # NOT 8094 — media-relay's vhost owns it; the collision killed every vhost
+      # (2026-11-07; Trap: note delphi-ops-traps).
       PORT = 8061;
       APP_SECRET_FILE = config.sops.secrets."umami/app-secret".path;
       DISABLE_TELEMETRY = true;
@@ -1040,8 +985,8 @@ in {
   sops.secrets."radicale/password" = {
     sopsFile = ../../modules/secrets.yaml;
     mode = "0400";
-    # The unit's ExecStartPre runs as this user (`User=` applies to it too), so
-    # root-owned 0400 would make the htpasswd render fail every start.
+    # ExecStartPre runs as User= too — a root-owned 0400 file breaks the render
+    # (Trap: note delphi-ops-traps).
     owner = config.services.radicale.user;
     group = config.services.radicale.group;
   };
@@ -1061,48 +1006,31 @@ in {
       rights.type = "owner_only";
     };
   };
-  # The unit runs with a read-only /, so the htpasswd render needs a directory
-  # it owns: `/var/lib/radicale` is root-owned and the module's StateDirectory
-  # claims only the collections below it (measured 2026-11-06: the preStart died
+  # /var/lib/radicale arrives root-owned under a read-only / — RuntimeDirectory
+  # makes it (preStart died 2026-11-06; Trap: note delphi-ops-traps).
   # with `Read-only file system`, then `Permission denied`, on every start).
   systemd.services.radicale.serviceConfig = {
     RuntimeDirectory = "radicale";
     RuntimeDirectoryMode = "0700";
   };
   systemd.services.radicale.preStart = lib.mkBefore ''
-    umask 077
-    ${lib.getExe' pkgs.apacheHttpd "htpasswd"} -nbB ${user.name} \
-      "$(cat ${config.sops.secrets."radicale/password".path})" > /run/radicale/users
-    # A CalDAV server with no collection is a server with nothing on it: this one
-    # served a 302 and held zero calendars for nine days, because nothing had
-    # ever asked for one. The default collection is seeded here so the first
-    # client (vdirsyncer, DAVx5) finds a calendar rather than an empty principal,
-    # and so `checks:caldav` has something to write into and read back.
-    collections=/var/lib/radicale/collections/collection-root/${user.name}
-    mkdir -p "$collections/personal"
-    [ -f "$collections/personal/.Radicale.props" ] || printf '%s' \
-      '{"tag": "VCALENDAR", "D:displayname": "Personal"}' > "$collections/personal/.Radicale.props"
+      umask 077
+      ${lib.getExe' pkgs.apacheHttpd "htpasswd"} -nbB ${user.name} \
+        "$(cat ${config.sops.secrets."radicale/password".path})" > /run/radicale/users
+    # Seed the default collection: a CalDAV server with none served 302 + zero
+    # calendars for nine days (Story: note delphi-ops-traps); checks:caldav needs
+    # something to write.
+      collections=/var/lib/radicale/collections/collection-root/${user.name}
+      mkdir -p "$collections/personal"
+      [ -f "$collections/personal/.Radicale.props" ] || printf '%s' \
+        '{"tag": "VCALENDAR", "D:displayname": "Personal"}' > "$collections/personal/.Radicale.props"
   '';
 
-  # --- ntfy: push notifications to a phone -----------------------------------
-  # One push server, one channel on it: topic `fleet`. This is the only surface
-  # whose purpose is a message leaving the host and arriving where a person is
-  # not looking at a terminal.
-  #
-  # The server alone was never a channel. Measured 2026-11-06 to 15: the unit ran
-  # for nine days and its message cache was empty, because nothing published and
-  # no topic was named — and `MANUAL.md` still described it as gatus and
-  # sentinel's push. A push server with no publisher is a health check. The
-  # publisher is the appflow sync (a question parked for a person), and
-  # `task checks:ntfy` proves delivery by reading a probe back out of the cache.
-  #
-  # Access is closed by default: one user `fleet`, password in sops, rights on
-  # topic `fleet` only, anonymous denied. The phone subscribes at the tailnet
-  # origin with that user; there is no public origin because topics are guessable.
-  #
-  # A static user rather than `DynamicUser`: sops can only hand a secret to an
-  # account that exists at activation, and a dynamic user does not exist until
-  # the unit starts.
+  # One push server, one channel (topic `fleet`): static user because DynamicUser
+  # cannot take a sops secret (Trap: note delphi-ops-traps); checks:ntfy proves
+  # delivery end-to-end. Access closed — a guessable topic is a credential, so
+  # anonymous publish/subscribe is denied and the one writer user authenticates
+  # every send.
   users.groups.ntfy = {};
   users.users.ntfy = {
     isSystemUser = true;
@@ -1184,9 +1112,8 @@ in {
   };
   services.vikunja = {
     enable = true;
-    # Upstream's own test suites are not this host's regression surface; the
-    # binary is. Running them cost the aarch64 CI job its whole 60-minute cap
-    # twice (2026-11-06), with the frontend suite still going. Building here
+    # doCheck off: upstream suites are not this host's regression surface —
+    # aarch64 CI capped at 60min twice (Story: note delphi-ops-traps).
     # with them off is the same artifact without the wait.
     package = pkgs.vikunja.overrideAttrs (_final: prev: {
       doCheck = false;
@@ -1214,23 +1141,19 @@ in {
     enable = true;
     url = "http://127.0.0.1:${toString config.services.agentTurns.port}/v1/events";
   };
-  # One revocable token per holder outside this repo's agents: the netbook, muse,
-  # and vesper. Each authenticates to the same shim and is revoked on its own, so
-  # no single machine carries the fleet credential.
+  # One revocable token per external holder — no single machine carries the
+  # fleet credential (Rule: note delphi-ops-traps).
   services.agentTurns.additionalTokens = [
     "agent-turns-token-netbook"
     "agent-turns-token-muse"
     "agent-turns-token-vesper"
-    # The dashboard is the one reader that runs as the login user: its prompts
-    # are that operator's Hermes turns, so it reads a token of its own rather
-    # than the store's (which stays 0400 between two service users).
     {
       name = "agent-turns-token-dashboard";
       owner = user.name;
       group = config.services.agentTurns.user;
       # Both ends read this file: the shim loads every token at start, and the
-      # dashboard presents this one. Owner-only would leave the shim unable to
-      # boot (measured 2026-11-06: start-limit-hit, exit 1, no log line).
+      # dashboard presents this one — owner-only left the shim unable to boot
+      # (Trap: note delphi-ops-traps).
       mode = "0440";
     }
   ];
@@ -1334,7 +1257,7 @@ in {
     includeExposure = false;
     mounts =
       {
-        # dsh card retired with the harness — hosts/delphi/dsh-web.shadow.nix.
+        # dsh card retired with the harness — hosts/delphi/dsh-web.shadow.nix (note delphi-ops-traps).
         systemone = {
           port = 8444;
           upstream = "http://127.0.0.1:8091";
@@ -1417,9 +1340,7 @@ in {
           # browsed through `mail-atlas`, and the endpoint is machine-facing.
           hideCard = true;
         };
-        # 8451 stays reserved for the rival archive benchmark; this is the reading
-        # surface over the same database, with its own loopback vhost so `/api` is
-        # same-origin for the browser.
+        # 8451 — reserved for the archive's document benchmark (Fact: port map).
         mail-atlas = {
           port = 8452;
           upstream = "http://127.0.0.1:${toString config.services.mailAtlas.port}";
@@ -1508,14 +1429,9 @@ in {
     };
   };
 
-  # A model credential, not an account one: the harness's signed-in grant is
-  # for the browser surface, while a turn resolves to the `deepseek-official`
-  # route and dies with MISSING_CREDENTIAL without this key. Rendered 0400 for
-  # the unit's user; never in the store, never on a command line.
-  # The key lives in the TRACKED fleet file, not in the untracked `apikeys.yaml`:
-  # that directory is outside the flake (delphi builds from `github:…` with no
-  # submodules), so a `sopsFile` pointing there is a path that does not exist in
-  # the store.
+  # Model credential: the turn dies MISSING_CREDENTIAL without it. Rendered
+  # 0400 — never in the store or argv. The sopsFile must live in the TRACKED
+  # flake (Trap: note delphi-ops-traps); fleet hosts share keys, agents get their own.
   sops.secrets."deepseek/api/key" = {
     sopsFile = ../../modules/secrets.yaml;
     key = "deepseek/api/key";
@@ -1538,24 +1454,12 @@ in {
     defaults.email = user.email;
   };
 
-  # --- Unattended updates ----------------------------------------------------
-  # Same shape as frieren, staggered by 30 min so the two never pull and build
-  # at once (delphi has 2 cores; a simultaneous fetch on the home link would
-  # just move the delay). `allowReboot` stages with `nixos-rebuild boot` and only
-  # reboots when the kernel changed; `persistent` catches up after downtime.
-  #
-  # The `github:` ref is the pushed main branch — which is why nothing here is
-  # built from a local tree: a dirty checkout is invisible to this job.
-  # Plain `github:` again, and the submodule question is why. That fetch is a
-  # tarball: it carries only the submodule's gitlink, and the fetcher rejects a
-  # `submodules=1` parameter outright (measured: "unknown parameter
-  # 'submodules'"). The git fetchers that do support the flag would clone
-  # `git@github.com:shaoyanji/secrets` as root, and root here has no git config,
-  # no key and no gh login — so the flag cannot be the fix by itself.
-  # What actually broke the 2026-10-26 upgrade was the only eval-time reader of
-  # that submodule: `profiles.cachePush`'s `sopsFile`. The push is gone, nothing
-  # in this host's closure references `modules/secrets/`, and the tarball
-  # evaluates. CI keeps `?submodules=1` because it fetches a git tree, not this.
+  # Same shape as frieren's sync: shallow clone, worktree, quiet 04:00 commit,
+  # force-with-lease push to a branch fleet peers ff. Staggered +30min so the
+  # two hosts never push in one window. Plain `github:` — the tarball fetcher
+  # rejects submodules=1 and git fetchers need root creds the box lacks (Trap:
+  # note delphi-ops-traps). A dirty checkout is invisible: the 04:00 `git add -A`
+  # would fold it into the snapshot.
   system.autoUpgrade = {
     enable = true;
     flake = "github:shaoyanji/nixconfig#delphi";
@@ -1568,18 +1472,15 @@ in {
     persistent = true;
   };
 
-  # --- Hermes agent ----------------------------------------------------------
-  # profiles.hermes installs the CLI, seeds ~/.hermes, renders the credential
-  # file from sops and (with gateway.enable) declares the gateway unit.
-  #
-  # telegramSecret must exist in modules/secrets.yaml BEFORE the first switch:
-  # sops-install-secrets fails activation for a missing key, which would abort
-  # the install. Add it with `task infra:secrets:edit:secrets` first.
+  # profiles.hermes: CLI, ~/.hermes, sops-rendered creds and the gateway unit.
+  # secrets.yaml + telegramSecret must exist BEFORE first switch —
+  # sops-install-secrets aborts activation (Trap: note delphi-ops-traps);
+  # the file lands via `task infra:secrets:edit:secrets`.
   profiles.hermes = {
     enable = true;
     gateway.enable = true;
     telegramSecret = "delphi-telegram";
-    # delphi has no SimpleX identity; the daemon would just idle and retry.
+    # No SimpleX identity here — alerting rides frieren's bridge (Fact: inventory.toml).
     simplex.daemon = false;
   };
 
@@ -1618,7 +1519,7 @@ in {
         ];
       };
     };
-    # Delphi uses HTTPS with GitHub CLI token credentials rather than host SSH keys.
+    # gh uses HTTPS token auth (Fact: inventory.toml).
     programs.gh.settings.git_protocol = lib.mkForce "https";
   };
 
@@ -1630,13 +1531,9 @@ in {
   # blanket linger policy, and desktop hosts do not need one.
   users.users.${user.name}.linger = true;
 
-  # --- The deck's public door, on the one port the edge already carries -------
-  # Port 2222 reaches the guest directly from the tailnet, but OCI's ingress rules
-  # admit only 22/80/443, so the public name gets a hop instead: this account has
-  # no shell of its own — every login runs `slidesHopCommand`, which is an ssh
-  # into the guest's `slides` account and therefore into the same forced command.
-  # A client still needs a fleet key (the host's own authorized list); nothing
-  # about the guest's credential is handed out.
+  # Public door on the one port OCI's edge admits besides ssh/http (Fact:
+  # inventory.toml — ingress is 22/80/443 only). Every login runs the hop;
+  # no shell, no guest credential handed out.
   users.users.slides = lib.mkIf slidesHopEnabled {
     isNormalUser = true;
     description = "Terminal deck over ssh (forced command hops into the sandbox microVM)";
@@ -1645,16 +1542,10 @@ in {
     extraGroups = [microvmGuest.sshHopGroup];
   };
 
-  # A fleet client authenticates with a certificate whose principal is the user
-  # name (`modules/ssh-ca.nix` signs `-n devji`), so it never matches a `slides`
-  # login on its own: `AuthorizedPrincipalsFile none` means "the login name,
-  # exactly". Listing the fleet principal for this one account accepts exactly
-  # the certificates the CA already issues — no wildcard, which sshd does not
-  # support here — and the account still has no shell.
-  #
-  # A real file under /var/lib, not `environment.etc`: an /etc entry is a symlink
-  # into /nix/store, and sshd's StrictModes rejects that path (the store is
-  # group-writable), which silently leaves the principal list empty.
+  # AuthorizedPrincipalsFile lives under /var/lib — an /etc store symlink fails
+  # StrictModes and the list silently empties (Trap: note delphi-ops-traps).
+  # "none" means the login name; the fleet principal also accepts the CA's own
+  # certs, so no wildcard is needed.
   systemd.tmpfiles.rules = lib.mkIf slidesHopEnabled [
     "d /var/lib/ssh-deck 0755 root root -"
     # `\\n` is a literal backslash-n: tmpfiles turns it into the trailing
@@ -1715,6 +1606,7 @@ in {
     freebuff-headless
     # Autonomous Cloud Workspace Seeder: sets up ~/Documents/nixconfig and ~/vaults/personal
     # directly from upstream GitHub via GitHub CLI / HTTPS, avoiding missing SSH key blocks.
+    # Never clone over a notes checkout: flake/policies.nix#seeder-never-clones-over-notes.
     (let
       delphi-seed = writeShellApplication {
         name = "delphi-seed-workspace";
@@ -1725,112 +1617,108 @@ in {
           coreutils
         ];
         text = ''
-          set -euo pipefail
-          echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
-          mkdir -p "$HOME/Documents" "$HOME/vaults"
+                set -euo pipefail
+                echo "=== [delphi] Seeding Autonomous Cloud Workspace ==="
+                mkdir -p "$HOME/Documents" "$HOME/vaults"
 
-          # The credential helper belongs to `programs.gh`, not to this file; a second
-          # `!gh` entry shadowed it under a thin PATH. Why:
-          # docs/nix-patterns.md §"Agent failure modes".
-          if [ "$(git config --file "$HOME/.gitconfig" --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
-            git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
-          fi
-          for scope in github.com gist.github.com; do
-            git config --file "$HOME/.gitconfig" --unset-all "credential.https://$scope.helper" || true
-          done
+                # The credential helper belongs to `programs.gh`, not to this file; a second
+                # `!gh` entry shadowed it under a thin PATH. Why:
+                # docs/nix-patterns.md §"Agent failure modes".
+                if [ "$(git config --file "$HOME/.gitconfig" --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
+                  git config --file "$HOME/.gitconfig" url."https://github.com/".insteadOf "git@github.com:"
+                fi
+                for scope in github.com gist.github.com; do
+                  git config --file "$HOME/.gitconfig" --unset-all "credential.https://$scope.helper" || true
+                done
 
-          REPO="$HOME/Documents/nixconfig"
-          if [ ! -d "$REPO/.git" ]; then
-            echo "--> Cloning nixconfig to $REPO (with recursive submodules)..."
-            if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-              gh repo clone https://github.com/shaoyanji/nixconfig "$REPO" -- --recurse-submodules
-            else
-              git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$REPO"
-            fi
-          else
-            # Same read-before-write as the vault below: compare with origin
-            # first (ls-remote writes nothing) and pull only on real drift, so a
-            # checkout already at origin/main costs no fetch.
-            if [ "$(git -C "$REPO" config --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
-              git -C "$REPO" config url."https://github.com/".insteadOf "git@github.com:"
-            fi
-            branch=$(git -C "$REPO" branch --show-current)
-            here=$(git -C "$REPO" rev-parse HEAD)
-            there=$(git -C "$REPO" ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)
-            if [ -z "$branch" ]; then
-              echo "--> $REPO has no branch checked out (detached HEAD); not pulling" >&2
-            elif [ -z "$there" ]; then
-              echo "--> could not read origin ($branch) to compare; leaving $REPO as-is" >&2
-            elif [ "$here" = "$there" ]; then
-              echo "--> $REPO is current at $(printf '%.8s' "$here") ($branch)"
-            elif [ "$there" = "$(git -C "$REPO" rev-parse "refs/remotes/origin/$branch" 2>/dev/null || true)" ]; then
-              # origin has not moved since the last fetch, so the only commits
-              # here are local ones: a pull could not bring anything in.
-              echo "--> $REPO is ahead of origin/$branch (local $(printf '%.8s' "$here")); not pulling"
-            else
-              echo "--> $REPO drifted: local $(printf '%.8s' "$here") -> origin $(printf '%.8s' "$there"); pulling"
-              git -C "$REPO" pull --recurse-submodules ||
-                echo "--> pull did not complete cleanly (see above); $REPO left as-is" >&2
-            fi
-            # `submodule sync` and `update` rewrite every submodule's config
-            # even when nothing is out of place, so they run only when one is
-            # missing or pinned wrong ('-' uninitialised, '+' out of sync).
-            pending=$(git -C "$REPO" submodule status --recursive 2>/dev/null | grep -c '^[-+]' || true)
-            if [ "$pending" -gt 0 ]; then
-              git -C "$REPO" submodule sync --recursive || true
-              git -C "$REPO" submodule update --init --recursive ||
-                echo "--> submodule update failed; $REPO may be missing a submodule" >&2
-            fi
-          fi
+                REPO="$HOME/Documents/nixconfig"
+                if [ ! -d "$REPO/.git" ]; then
+                  echo "--> Cloning nixconfig to $REPO (with recursive submodules)..."
+                  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+                    gh repo clone https://github.com/shaoyanji/nixconfig "$REPO" -- --recurse-submodules
+                  else
+                    git clone --recurse-submodules https://github.com/shaoyanji/nixconfig.git "$REPO"
+                  fi
+                else
+                  # Same read-before-write as the vault below: compare with origin
+                  # first (ls-remote writes nothing) and pull only on real drift, so a
+                  # checkout already at origin/main costs no fetch.
+                  if [ "$(git -C "$REPO" config --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
+                    git -C "$REPO" config url."https://github.com/".insteadOf "git@github.com:"
+                  fi
+                  branch=$(git -C "$REPO" branch --show-current)
+                  here=$(git -C "$REPO" rev-parse HEAD)
+                  there=$(git -C "$REPO" ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)
+                  if [ -z "$branch" ]; then
+                    echo "--> $REPO has no branch checked out (detached HEAD); not pulling" >&2
+                  elif [ -z "$there" ]; then
+                    echo "--> could not read origin ($branch) to compare; leaving $REPO as-is" >&2
+                  elif [ "$here" = "$there" ]; then
+                    echo "--> $REPO is current at $(printf '%.8s' "$here") ($branch)"
+                  elif [ "$there" = "$(git -C "$REPO" rev-parse "refs/remotes/origin/$branch" 2>/dev/null || true)" ]; then
+                    # origin has not moved since the last fetch, so the only commits
+                    # here are local ones: a pull could not bring anything in.
+                    echo "--> $REPO is ahead of origin/$branch (local $(printf '%.8s' "$here")); not pulling"
+                  else
+                    echo "--> $REPO drifted: local $(printf '%.8s' "$here") -> origin $(printf '%.8s' "$there"); pulling"
+                    git -C "$REPO" pull --recurse-submodules ||
+                      echo "--> pull did not complete cleanly (see above); $REPO left as-is" >&2
+                  fi
+                  # `submodule sync` and `update` rewrite every submodule's config
+                  # even when nothing is out of place, so they run only when one is
+                  # missing or pinned wrong ('-' uninitialised, '+' out of sync).
+                  pending=$(git -C "$REPO" submodule status --recursive 2>/dev/null | grep -c '^[-+]' || true)
+                  if [ "$pending" -gt 0 ]; then
+                    git -C "$REPO" submodule sync --recursive || true
+                    git -C "$REPO" submodule update --init --recursive ||
+                      echo "--> submodule update failed; $REPO may be missing a submodule" >&2
+                  fi
+                fi
 
-          # The vault is a repo, not a directory: an earlier version only
-          # mkdir'd this path, so a reseeded host came up with an empty vault
-          # and every note was "missing" until someone cloned it by hand
-          # (delphi 2026-10-26). Clone it when it is absent, and fast-forward it
-          # when it is behind — a seed is a sync, not just a first-run clone —
-          # while a current vault is left with .git byte-identical.
-          VAULT="$HOME/vaults/personal"
-          VAULT_REPO=shaoyanji/Obsidian-Git-Sync
-          if [ -d "$VAULT/.git" ]; then
-            # `git config` rewrites .git/config even when the value already
-            # matches, so the rewrite is only written when it is absent.
-            if [ "$(git -C "$VAULT" config --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
-              git -C "$VAULT" config url."https://github.com/".insteadOf "git@github.com:"
-            fi
-            branch=$(git -C "$VAULT" branch --show-current)
-            here=$(git -C "$VAULT" rev-parse HEAD)
-            # ls-remote only reads: no FETCH_HEAD, ORIG_HEAD or config is
-            # written. Counting commits behind would need the objects a fetch
-            # writes, so drift is reported as the two revisions.
-            there=$(git -C "$VAULT" ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)
-            if [ -z "$branch" ]; then
-              echo "--> $VAULT has no branch checked out (detached HEAD); left as-is" >&2
-            elif [ -z "$there" ]; then
-              echo "--> could not read $VAULT_REPO ($branch) to compare; $VAULT left as-is" >&2
-            elif [ "$here" = "$there" ]; then
-              echo "--> $VAULT is current at $(printf '%.8s' "$here") ($branch)"
-            else
-              echo "--> $VAULT drifted: local $(printf '%.8s' "$here") -> remote $(printf '%.8s' "$there"); fast-forwarding"
-              git -C "$VAULT" pull --ff-only --quiet ||
-                echo "--> vault pull did not fast-forward (local commits or dirty tree); left as-is" >&2
-            fi
-          elif [ -d "$VAULT" ] && [ -n "$(ls -A "$VAULT" 2>/dev/null)" ]; then
-            # Never clone over notes. This happens when the old mkdir-only path
-            # (or Obsidian itself, pointed here by nixoshmsymlinks) left files
-            # with no .git; the operator decides, the seeder does not delete.
-            echo "--> $VAULT holds files but is not a git checkout; refusing to clone over it." >&2
-          else
-            echo "--> Cloning the vault from $VAULT_REPO into $VAULT..."
-            if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-              gh repo clone "$VAULT_REPO" "$VAULT" -- --quiet ||
-                echo "--> vault clone failed; left $VAULT empty" >&2
-            else
-              mkdir -p "$VAULT"
-              echo "--> gh not authenticated; initialized $VAULT empty."
-            fi
-          fi
+          # Seed = clone-if-absent + fast-forward, never touching a current one — the
+          # vault is a repository (an earlier mkdir-only seed left notes "missing",
+          # 2026-10-26; Story: note delphi-ops-traps). Never clone over notes:
+          # flake/policies.nix#seeder-never-clones-over-notes.
+                VAULT="$HOME/vaults/personal"
+                VAULT_REPO=shaoyanji/Obsidian-Git-Sync
+                if [ -d "$VAULT/.git" ]; then
+                  # `git config` rewrites .git/config even when the value already
+                  # matches, so the rewrite is only written when it is absent.
+                  if [ "$(git -C "$VAULT" config --get url.https://github.com/.insteadOf || true)" != "git@github.com:" ]; then
+                    git -C "$VAULT" config url."https://github.com/".insteadOf "git@github.com:"
+                  fi
+                  branch=$(git -C "$VAULT" branch --show-current)
+                  here=$(git -C "$VAULT" rev-parse HEAD)
+                  # ls-remote only reads: no FETCH_HEAD, ORIG_HEAD or config is
+                  # written. Counting commits behind would need the objects a fetch
+                  # writes, so drift is reported as the two revisions.
+                  there=$(git -C "$VAULT" ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)
+                  if [ -z "$branch" ]; then
+                    echo "--> $VAULT has no branch checked out (detached HEAD); left as-is" >&2
+                  elif [ -z "$there" ]; then
+                    echo "--> could not read $VAULT_REPO ($branch) to compare; $VAULT left as-is" >&2
+                  elif [ "$here" = "$there" ]; then
+                    echo "--> $VAULT is current at $(printf '%.8s' "$here") ($branch)"
+                  else
+                    echo "--> $VAULT drifted: local $(printf '%.8s' "$here") -> remote $(printf '%.8s' "$there"); fast-forwarding"
+                    git -C "$VAULT" pull --ff-only --quiet ||
+                      echo "--> vault pull did not fast-forward (local commits or dirty tree); left as-is" >&2
+                  fi
+                elif [ -d "$VAULT" ] && [ -n "$(ls -A "$VAULT" 2>/dev/null)" ]; then
+            # Never clone over a notes checkout — [[flake/policies.nix#seeder-never-clones-over-notes]]; the vault is a repository.
+                  echo "--> $VAULT holds files but is not a git checkout; refusing to clone over it." >&2
+                else
+                  echo "--> Cloning the vault from $VAULT_REPO into $VAULT..."
+                  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+                    gh repo clone "$VAULT_REPO" "$VAULT" -- --quiet ||
+                      echo "--> vault clone failed; left $VAULT empty" >&2
+                  else
+                    mkdir -p "$VAULT"
+                    echo "--> gh not authenticated; initialized $VAULT empty."
+                  fi
+                fi
 
-          echo "=== [delphi] Workspace ready at ~/Documents/nixconfig ==="
+                echo "=== [delphi] Workspace ready at ~/Documents/nixconfig ==="
         '';
       };
     in
@@ -1841,8 +1729,7 @@ in {
       '')
   ];
 
-  # The interactive remote-control gateway is retired — the cascade drives
-  # `agy -p` headless. Unit preserved at hosts/delphi/agy-daemon-web.shadow.nix.
+  # agy-daemon-web retired — the cascade drives `agy -p` headless (Story: note delphi-ops-traps).
 
   # Modal editor defaults (Catppuccin Mocha theme, relative line numbers).
   # This nixpkgs revision has no NixOS programs.helix module, so helix comes

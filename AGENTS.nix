@@ -5031,5 +5031,92 @@
         the xs turn SUBJECT=delphi:postgres-19-upgrade posts OUTCOME=done.
       '';
     };
+
+    delphi-ops-traps = {
+      title = "Delphi's measured traps: nginx, port namespace, systemd lifecycle, ARM";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-22";
+      summary = "One record for every trap hosts/delphi/configuration.nix comments used to carry, so the comments become pointers.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["hosts/delphi/configuration.nix" "hosts/delphi/dsh-web.shadow.nix" "hosts/delphi/agy-daemon-web.shadow.nix"];
+        tasks = ["checks:host"];
+        docs = [".agents/deploy/hosts/delphi.md" "docs/delphi-install.md"];
+      };
+      body = ''
+        Consolidated 2026-11-22 (nix-comment-audit routing). Comments now carry
+        `Trap:`/`Story:`/`Rule:` pointers here.
+
+        nginx: the generator splits a {8} quantifier across lines and rejects
+        it — spell out eight hex classes. enableACME+forceSSL emit both the :80
+        and :443 halves; a manual `listen 443` orphans HTTP-01 → renewal 404s.
+        Unanchored ^/ rewrites ate every 404 (2026-11-08) — anchor to /.
+        One virtualHosts definition per host; TLS overlays with //. SSE needs
+        proxy_buffering off. nixpkgs-nginx pinned for CVE-2026-123007/123633.
+
+        Ports: mounts are a sequential namespace (8451 reserved for the archive
+        benchmark; 8453/8454 zettel+mataroa). Collisions: :53 resolved-stub vs
+        crab-hole; 8093 agent-turns shim took it from miniflux (EADDRINUSE
+        2026-11-06); NOT-8094 for umami — media-relay owns it, the collision
+        killed every vhost (2026-11-07); 8091 ≠ 8090 (eisen's Laya).
+
+        systemd: ExecStartPre runs as User= — root-owned 0400 breaks renders.
+        Read-only / + root-owned state → RuntimeDirectory (died 2026-11-06).
+        DynamicUser cannot take a sops secret. AuthorizedPrincipalsFile under
+        /var/lib — an /etc store symlink fails StrictModes and the list
+        silently empties. The agent-turns turn dies MISSING_CREDENTIAL.
+
+        ARM/OCI: A1 has no KVM — TCG-only guests; sntrup761 KEX ~1min → SSH
+        handshake timeouts. Stirling went native→guest→native in a week for
+        it. Ingress admits only 22/80/443. aarch64 CI keeps doCheck off (60min
+        cap hit twice). sopsFile must be in the TRACKED flake — an untracked
+        apikeys.yaml is absent from the github: tarball. Plain `github:` — the
+        tarball fetcher rejects submodules=1. Vaultwarden has no prelogin port
+        — crab-hole answers its name with frieren's tailnet IP. Retirements:
+        dsh-web, agy-daemon-web → shadow files, one-uncomment revival.
+      '';
+    };
+
+    frieren-ops-history = {
+      title = "Frieren retirements and measurements behind the surviving config";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-22";
+      summary = "The retirement dates, measured numbers and restored settings hosts/frieren/configuration.nix comments used to carry.";
+      refs = {
+        hosts = ["frieren"];
+        modules = ["hosts/frieren/configuration.nix" "hosts/frieren/reverse-proxy.nix" "hosts/frieren/dns.nix"];
+        tasks = ["checks:host"];
+        docs = [".agents/deploy/hosts/frieren.md"];
+      };
+      body = ''
+        Consolidated 2026-11-22 (nix-comment-audit routing). Comments now carry
+        `Story:`/`Trap:`/`Rule:` pointers here.
+
+        Retirements: uptime-kuma off 2026-11-04 (zero monitors — gatus lives on
+        delphi); mosquitto off 2026-11-09 (zero clients in a week of journal;
+        ESP32/Zigbee in [[exp-009]]); ESPHome 2026-10 (6052 closed); ZeroClaw
+        2026-09 (42617 closed); the pihole-ftl overlay once upstream took the
+        fix. `RESTORED` markers mean a cleanup sweep deleted the setting once,
+        not that it is new.
+
+        Measurements: auto-cpufreq held all four cores at 3.4GHz for +0.47W
+        idle vs the fixed powersave governor. nixos-upgrade --upgrade unpacked
+        a channel ~2.5min at 04:02 (no-op on flakes). A prefill's own hit% is
+        not evidence — it serves its new chunks first.
+
+        Traps: BT soft-block (Fn+F8) persists in the EC — sysfs write after
+        systemd-rfkill. Never fight the 03:00–05:30 window — Conflicts stops
+        the unit. The audit unit exits 0 on failure; gatus reads the outcome
+        FILE. Kernel chain degrades to nixpkgs default when an LTS leaves the
+        tree, never pin-miss. One aria2 RPC on :6800. Telegram tokens are
+        per-host — two pollers conflict. Transmission owns 51413. NFS pins
+        conventional v3 RPC ports so checks:ports can declare them. frieren.lan
+        claims 192.168.3.25 — a duplicate server_name is ignored and shadowed
+        the portal (reverse-proxy assertion). Atuin signup is closed — an open
+        signup lets any vhost visitor write the history db.
+      '';
+    };
   };
 }

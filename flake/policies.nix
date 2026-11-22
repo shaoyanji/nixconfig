@@ -1367,6 +1367,38 @@
         && has "taskfiles/agents.yml" "agents:ledger:check";
       detail = "a turn can land with no classified line beside it, so the ledger counts turns that were never diagnosed";
     };
+
+    resolver-never-through-served-address = {
+      rule = "A host that serves a tailnet resolver address must not resolve through it: tailscaled starts with `--accept-dns=false`, or a resolver outage becomes a dependency outage (host cannot look up its own peer) — the loop the dns-failover doc names.";
+      proof = "hosts/delphi/configuration.nix sets services.tailscale.extraSetFlags with --accept-dns=false";
+      holds = has "hosts/delphi/configuration.nix" ''"--accept-dns=false"'';
+      detail = "tailscaled would take MagicDNS from the tailnet resolver address the host itself serves";
+    };
+
+    dns-failover-blocklist-parity = {
+      rule = "Both nodes answering the shared resolver address must apply the same blocklists — a failover that changes the answer set is visible to every client. The StevenBlack fakenews-gambling-porn list and the Disconnect tracking list are the fleet pair; each side's adblock config names both.";
+      proof = "hosts/delphi/configuration.nix (crab-hole) · hosts/frieren/dns.nix (pihole)";
+      holds =
+        has "hosts/delphi/configuration.nix" "StevenBlack"
+        && has "hosts/delphi/configuration.nix" "disconnect"
+        && has "hosts/frieren/dns.nix" "StevenBlack"
+        && has "hosts/frieren/dns.nix" "disconnect";
+      detail = "one node would answer domains the other blocks — failover drift visible to clients";
+    };
+
+    warmed-set-is-inventory-derived = {
+      rule = "The kernel-cache warming set is inventory opt-in: `hosts` is `filterAttrs (_: h: h.managed)` over the compiled inventory, never a second hostname list. The January drift incident — frieren omitted itself while warming every other host — is what the opt-in exists to prevent.";
+      proof = "hosts/frieren/configuration.nix reads fleet.inventory through filterAttrs on `managed`";
+      holds = has "hosts/frieren/configuration.nix" "host.managed";
+      detail = "a copied hostname list would drift on the next host add, silently un-warming a host";
+    };
+
+    seeder-never-clones-over-notes = {
+      rule = "A workspace seeder must never overwrite a checked-out notes repository: seeding is clone-if-absent plus fast-forward, and any local change (untracked or modified) in the target makes the run refuse. A vault is a repository, not a directory.";
+      proof = "hosts/delphi/configuration.nix workspace-seed refuses to clone over an existing notes dir";
+      holds = has "hosts/delphi/configuration.nix" "refusing to clone over it";
+      detail = "a seeder that could clobber a dirty checkout would lose uncommitted vault notes";
+    };
   };
 
   ids = policies |> builtins.attrNames;

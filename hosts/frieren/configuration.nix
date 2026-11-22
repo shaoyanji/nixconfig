@@ -7,10 +7,8 @@
   systemdJobs,
   ...
 }: let
-  # Belt-and-suspenders rfkill unblock: the Ideapad EC can boot with BT
-  # soft-blocked (Fn+F8 state persisted across reboots). The standalone
-  # `rfkill` binary no longer exists in this nixpkgs revision, so clear the
-  # sysfs attribute directly for bluetooth-type rfkill devices only.
+  # The EC can boot with BT soft-blocked (Fn+F8 persists across reboots); the
+  # rfkill binary is gone → sysfs write (Trap: note frieren-ops-history).
   unblockBtRfkill = pkgs.writeShellScript "unblock-bt-rfkill" ''
     for f in /sys/class/rfkill/rfkill*/soft; do
       [ -f "$f" ] || continue
@@ -74,11 +72,9 @@
     exit $fail
   '';
 
-  # The warmed set is the inventory's opt-in, never a copy of it: `managed = true`
-  # plus `status = "active"` is what `infra:warm:cache` and `infra:apply:fleet`
-  # derive. While this file kept its own list of seven, the three hosts added to
-  # the rotation since were managed everywhere except here, so their closures
-  # were cold on the cache the LAN deploys from.
+  # Inventory opt-in, never a copied list:
+  # [[flake/policies.nix#warmed-set-is-inventory-derived]] (frieren omitted
+  # itself once; Story: note frieren-ops-history).
   warmHosts = builtins.attrNames (
     lib.filterAttrs (_: host: host.managed && host.kind == "nixos" && host.status == "active") self.inventory.hosts
   );
@@ -110,10 +106,8 @@
     description = "Build all fleet host closures to warm the harmonia LAN cache";
     after = ["network-online.target"];
     wants = ["network-online.target"];
-    # Never fight the 04:00 autoUpgrade for RAM/IO/store-locks: warming 18 host
-    # closures takes hours, so a 03:30 start used to run straight through 04:00.
-    # systemd stops this oneshot when nixos-upgrade starts — the upgrade wins,
-    # and the warmer picks up again on the next weekly trigger.
+    # Never fight the 04:00 autoUpgrade — Conflicts stops this oneshot and it
+    # retries next trigger (Rule: note frieren-ops-history).
     unitConfig.Conflicts = ["nixos-upgrade.service"];
     serviceConfig = {
       Type = "oneshot";
@@ -191,8 +185,8 @@ in {
   # config + rotate-ssh-cert helper here too.
   ssh.ca.enableClient = true;
 
-  # pihole-ftl unused variable issue was resolved upstream in nixpkgs (env.NIX_CFLAGS_COMPILE);
-  # the scoped -werror overlay was retired and deleted.
+  # Overlay retired — the pihole-ftl fix landed upstream (Story: note
+  # frieren-ops-history).
   nixpkgs.overlays = [];
 
   # Serve the fleet's LAN binary cache (see modules/services/harmonia.nix).
@@ -203,20 +197,14 @@ in {
   # the episodic memory agents read. See modules/services/fleet-sentinel.nix.
   services.fleetSentinel = {
     enable = true;
-    # The one job here that measures itself: a prefill's own percentage is not
-    # evidence (it serves the new chunks first), so the ledger's newest run —
-    # cache growth and bytes pulled from Valve — rides in status.json, where
-    # `task ops:health` and gatus already look. One path, declared once: the
-    # producer owns it.
+    # A prefill's own % is not evidence — it serves its new chunks first; the
+    # ledger's newest run rides status.json (Trap: note frieren-ops-history).
     prefillRuns = config.services.steamCache.prefill.ledger;
-    # The 03:00 audit's own verdict. It exits 0 even when every agent tier failed
-    # (so the timer keeps running), which is why the outcome file — not the unit
-    # Result — is what has to reach gatus. Written by agy-nightly-system as
-    # `<ts>\t<outcome>\t<reason>`; `fallback` degrades this host and pages.
+    # exit 0 is not the verdict — gatus reads the outcome FILE (Trap: note
+    # frieren-ops-history).
     auditRecord = "/var/lib/agy-system/last-run";
-    # The cold vault is powered on demand: its automount failing while BurgerNAS
-    # sleeps is the design, not a fault, and counting it put the whole host in
-    # "degraded" — which gatus then reported as a broken monitor.
+    # The cold vault sleeps: automount failure while BurgerNAS is off is design
+    # — it must not degrade the host (Trap: note frieren-ops-history).
     ignoreFailedUnits = ["mnt-burgernas-peachcable.mount"];
     watchUnits = [
       {unit = "nixos-upgrade.service";}
@@ -252,11 +240,8 @@ in {
   # (see modules/profiles/nixbuild-client.nix).
   profiles.nixbuild-client.enable = true;
 
-  # Server-class host: prefer the current nixpkgs LTS kernel instead of the
-  # latest-kernel default from profiles/base-node.nix. The chain degrades to
-  # nixpkgs' own default when an LTS leaves the tree, so a version bump is a
-  # deliberate edit rather than an eval error inside the nightly autoUpgrade
-  # window — pinned to a missing attribute, the whole host stops rebuilding.
+  # Degrades to the nixpkgs default when an LTS attr leaves the tree — a
+  # pinned-missing attr would stop the 04:00 upgrade (Trap: note frieren-ops-history).
   boot.kernelPackages =
     lib.mkForce
     pkgs.${
@@ -267,7 +252,8 @@ in {
       ]
     };
 
-  # Frieren is a server-heavy-io-sensitive node with spinning media (/dev/sda).
+  # server-heavy-io-sensitive tier (Fact: inventory.toml): spinning /dev/sda —
+  # no full-store batch traversal.
   # 1. Disable full-store batch traversal to prevent mechanical head thrashing.
   nix.optimise.automatic = lib.mkForce false;
 
@@ -304,10 +290,8 @@ in {
   system.autoUpgrade = {
     enable = true;
     flake = "github:shaoyanji/nixconfig#frieren";
-    # `--upgrade` updates root's `nixos` channel, which nixos-rebuild itself
-    # reports has no effect on a flake system — it just unpacked a channel for
-    # ~2.5 min at 04:02 before saying so. The github: ref is fetched fresh on
-    # every run, so the flag buys nothing and channels are disabled fleet-wide.
+    # --upgrade once unpacked a channel for ~2.5min at 04:02 — flakes ignore it
+    # (Story: note frieren-ops-history).
     upgrade = false;
     dates = "04:00";
     allowReboot = true;
@@ -349,8 +333,8 @@ in {
     path = "/run/secrets/nas";
   };
 
-  # E.3: Hermes agent profile & isolated secrets (modules/profiles/hermes.nix)
-  # Host-specific Telegram bot token isolated to frieren to prevent multi-host polling conflicts.
+  # E.3 → profiles/hermes.nix. Telegram token per host — two pollers on one
+  # token conflict (Rule: note frieren-ops-history).
   profiles.hermes = {
     enable = true;
     telegramSecret = "hermes";
@@ -363,18 +347,11 @@ in {
     rpcSecretFile = config.sops.secrets."aria2-rpc-secret".path;
     nginx.enable = true;
     nginx.listenPort = 6801;
-    # Transmission owns 51413 (its default peer port) on this host, so every
-    # BitTorrent task in aria2 died on start with `Failed to bind a socket,
-    # cause: Address already in use` / `Errors occurred while binding port`:
-    # magnets and .torrent links were the one task type that could not work.
-    # Moving aria2's listen/DHT port off the clash is all it takes.
+    # Transmission owns 51413 on this host; aria2's btListenPort moved off the
+    # clash (Trap: note frieren-ops-history).
     btListenPort = 51414;
   };
 
-  # Home Assistant IoT and device stack (modules/services/home-assistant.nix).
-  # uptime-kuma is off as of 2026-11-04: its database here held zero monitors
-  # (so did delphi's), and the checks that mattered are declarative gatus, now
-  # served by delphi — see `services.fleetMonitors` in infra-stack.nix.
   # ModemManager is enabled but idle on this host and has no device to manage: no
   # /dev/cdc-wdm*, no /dev/ttyUSB*, nothing in `mmcli -L`. It comes in from outside
   # this host's config — the string appears nowhere in the tree — so the switch is
@@ -383,41 +360,32 @@ in {
 
   services.ha-stack = {
     enable = true;
+    # off 2026-11-04 (zero monitors) — declarative gatus lives on delphi
+    # (Story: note frieren-ops-history).
     uptime-kuma.enable = false;
-    # Mosquitto off with it since 2026-11-09: seven days of journal held zero
-    # `new client connected` lines — a broker with no publisher and no subscriber,
-    # whose only activity was writing an empty database every 30 minutes. HA's own
-    # telemetry is `command_line` sensors, so nothing lost the feed. The module
-    # stays for the ESP32/Zigbee layer in [[exp-009]].
+    # off 2026-11-09 — zero clients in a week of journal; the module stays for
+    # the ESP32/Zigbee layer [[exp-009]] (Story: note frieren-ops-history).
     mqtt.enable = false;
-    # 2026-11-19 LAN sweep: 65OLED759 TV at 192.168.3.26:1925; no Hue bridge → devices.hue stays off.
+    # 65OLED759 at 192.168.3.26:1925; no Hue bridge → hue off (Fact: inventory.toml).
     devices.ambilightTV = {
       enable = true;
       host = "192.168.3.26";
     };
   };
 
-  # Shell-history sync (modules/services/atuin-server.nix). The one account is
-  # registered; leaving signup open would let anyone who reaches the vhost write
-  # to the history database.
+  # One account registered; open signup lets any vhost visitor write the
+  # history db (Rule: note frieren-ops-history).
   services.atuin-server = {
     enable = true;
     serverAliases = [
       "atuin.lan"
       "atuin.frieren.local"
-      # Clients whose DNS does not know the .lan names reach it by address, and
-      # this is the one they use (modules/shell/atuin.nix sets
-      # sync_address = http://100.97.61.65): the tailnet address works on the
-      # LAN too, so it is the only address alias that earns its place.
+      # Clients whose DNS does not know the .lan names reach it by tailnet
+      # address (Fact: inventory.toml; sync_address in modules/shell/atuin.nix).
       "100.97.61.65"
-      # The LAN address is deliberately NOT here. `frieren.lan` (the portal,
-      # default_server on :80 and :443) claims 192.168.3.25, and a server_name
-      # in two vhosts on one port is a conflict nginx resolves by *ignoring the
-      # later block* — atuin.frieren.lan serialises first, so the bare LAN
-      # address served atuin's 404 and the portal was unreachable by its own IP.
-      # Nothing needs atuin by address on the LAN: the names and the tailnet
-      # address cover every client. The duplicate is gated by an assertion in
-      # hosts/frieren/reverse-proxy.nix.
+      # frieren.lan claims 192.168.3.25 (portal, default_server) — a duplicate
+      # server_name is ignored and shadowed the portal; gated by the assertion in
+      # reverse-proxy.nix (Story: note frieren-ops-history).
     ];
   };
 
@@ -429,13 +397,11 @@ in {
     port = 5223;
   };
 
-  # The home-manager persona (heim → zen → aria2.nix) ships a user-level
-  # aria2 RPC fallback on :6800. frieren runs the system services.aria2
-  # (rpc-secret via LoadCredential) — keep exactly ONE RPC on :6800 so the
-  # unauthenticated fallback can't shadow the secret-protected daemon.
+  # Exactly ONE RPC on :6800 — the unauthenticated fallback must not shadow
+  # the secret-protected daemon (Rule: note frieren-ops-history).
   home-manager.users.devji.programs.aria2-user-fallback.enable = false;
 
-  # Resurrected OpenClaw persona ("Frieren") for the hermes mainframe agent.
+  # Resurrected OpenClaw persona — provenance: note frieren-ops-history.
   home-manager.users.devji.programs.hermes-user = {
     enable = true;
     persona = true;
@@ -490,10 +456,9 @@ in {
   services.udev.extraRules = ''
     SUBSYSTEM=="rfkill", ATTR{type}=="bluetooth", ATTR{soft}="0"
     ACTION=="add", SUBSYSTEM=="usb", DRIVERS=="btusb", ATTR{power/control}="on"
-  ''; # --- Bluetooth rfkill safeguard (belt-and-suspenders) ---
-  # The Ideapad EC can persist Fn+F8 rfkill blocking, and systemd-rfkill restores
-  # it at boot, so this unit runs after it. Why:
-  # .agents/deploy/hosts/frieren.md §"Bluetooth rfkill".
+  '';
+  # systemd-rfkill restores the EC's persisted block — run after it (Trap: note
+  # frieren-ops-history · .agents/deploy/hosts/frieren.md §"Bluetooth rfkill").
   systemd.services.unblock-bluetooth = {
     description = "Unblock Bluetooth rfkill at boot";
     wantedBy = ["multi-user.target"];
@@ -527,13 +492,8 @@ in {
     AllowSuspendThenHibernate = "no";
   };
 
-  # --- Power management: no auto-cpufreq on a 24/7 AC server ---
-  # laptop.nix enables it fleet-wide; on AC its charger profile pins all eight
-  # cores to 3.4 GHz with EPP=performance, which measured 2.93 W / 42 °C at idle
-  # on this box while the daemon itself used 0.7 % of a core. A fixed governor
-  # costs nothing to run: removal measured 2.46 W / 41 °C at an 800 MHz idle.
-  # `powersave` is intel_pstate's scaling governor in active mode — it still
-  # boosts on demand, it just stops holding the floor at max.
+  # auto-cpufreq pinned all cores at 3.4GHz (+0.47W idle vs the fixed governor,
+  # measured — Story: note frieren-ops-history); powersave still boosts on demand.
   services.auto-cpufreq.enable = lib.mkForce false;
   powerManagement = {
     enable = true;
@@ -607,17 +567,9 @@ in {
   services.nfs.server = {
     enable = true;
 
-    # Non-dynamic port policy (HC-7). Only 2049 is declared in
-    # firewall-scope.nix: fleet clients mount NFSv4 (which needs no rpcbind),
-    # so the v3-only RPC services below are not reachable from the LAN and the
-    # interface scope stays their control. Pinning them is what makes that
-    # decision reviewable — before this they were drawn from
-    # net.ipv4.ip_local_port_range at every boot (a *different* set each time),
-    # which `task checks:ports` reported as DYNAMIC and could never be declared.
-    # Values follow the long-standing NFS firewall convention (statd 32765,
-    # lockd 32766) and sit just below the ephemeral range; mountd's port is its
-    # upstream default, named explicitly so a future nfs-utils default cannot
-    # move it silently.
+    # Non-dynamic port policy (HC-7): pin the v3 RPC ports so checks:ports can
+    # declare them; NFSv4 clients need only 2049. Conventional values below the
+    # ephemeral range (hosts/frieren/firewall-scope.nix; Story: note frieren-ops-history).
     mountdPort = 20048;
     statdPort = 32765;
     lockdPort = 32766;
@@ -637,7 +589,7 @@ in {
     options = ["bind"];
   };
 
-  # Persistent user security vault bind-mount (isolated on 2TB NAS pool /dev/sda2)
+  # Persistent vault bind-mount (2TB pool /dev/sda2 — Fact: inventory.toml).
   fileSystems."${user.home}/security" = {
     device = "/srv/data/security";
     fsType = "none";
@@ -668,9 +620,8 @@ in {
   # privileges, see the skill.
   profiles.burgernas-client.enable = true;
 
-  # High-speed flash cache tier on USB 3.0 Samsung Flash Drive (F2FS + transparent ZSTD compression).
-  # Ephemeral & acceleration tier: Nix evaluation cache, transcode scratch, gallery thumbnails, ISO staging.
-  # `nofail` ensures the host boots without delay even if the external USB drive is unplugged.
+  # Flash-cache tier — Samsung USB3, F2FS+ZSTD (Fact: inventory.toml).
+  # nofail: boot never waits on an unplugged stick.
   fileSystems."/mnt/flash-cache" = {
     device = "/dev/disk/by-label/flash-cache";
     fsType = "f2fs";
@@ -706,7 +657,8 @@ in {
     "d /export/data 0755 root root -"
     "d /export/private 0755 root root -"
     "d /export/public 0755 root root -"
-    "d /srv/private/jellyfin 0755 jellyfin jellyfin -" # RESTORED
+    # RESTORED — a sweep deleted this once (Story: note frieren-ops-history).
+    "d /srv/private/jellyfin 0755 jellyfin jellyfin -"
   ];
 
   # Avahi / mDNS zero-conf service discovery across LAN
@@ -791,12 +743,11 @@ in {
       8123 # HomeAssistant
       6801 # AriaNg web UI
       28981 # Paperless-ngx
-      3001 # Uptime-Kuma (ha-stack)
-      # 6052 closed — ESPHome removed 2026-10 (no devices; upstream dropped
-      # the built-in dashboard)
+      3001 # Uptime-Kuma (retired — Story: note frieren-ops-history)
+      # 6052 closed — ESPHome removed 2026-10 (Story: note frieren-ops-history)
       8124 # Scrutiny SMART dashboard (infra-stack)
       # 7351 moved next to the service: networking.nix (Stirling PDF)
-      # 42617 closed - ZeroClaw was removed in the 2026-09 teardown
+      # 42617 closed — ZeroClaw teardown 2026-09 (Story: note frieren-ops-history)
     ];
     allowedUDPPorts = [
       137
@@ -804,7 +755,7 @@ in {
     ];
   };
 
-  # Btrfs auto-scrub - RESTORED all filesystems
+  # RESTORED — a sweep deleted this once (Story: note frieren-ops-history).
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
@@ -820,15 +771,14 @@ in {
   networking.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  # Closure debloat overrides (Tier 1 safe wins: T1-2, T1-6)
+  # T1-2/T1-6 closure debloat (Story: note frieren-ops-history).
 
-  # T1-6: Disable printing / HPLIP drivers (~70 MiB).
-  # frieren is a NAS / media center host and does not manage physical HP printers.
+  # No printers managed on this host (Fact: inventory.toml).
   services.printing = {
     enable = lib.mkForce false;
     drivers = lib.mkForce [];
   };
 
-  # State version - RESTORED
+  # State version — RESTORED (Story: note frieren-ops-history).
   system.stateVersion = "26.05";
 }

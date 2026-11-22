@@ -1,0 +1,277 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 3273,
+    "terms": [
+      {
+        "term": "linux",
+        "weight": 22.652
+      },
+      {
+        "term": "system",
+        "weight": 22.652
+      },
+      {
+        "term": "systeme",
+        "weight": 18.349
+      },
+      {
+        "term": "cd",
+        "weight": 18.183
+      },
+      {
+        "term": "container",
+        "weight": 18.183
+      },
+      {
+        "term": "infrastrukturen",
+        "weight": 18.183
+      },
+      {
+        "term": "betrieb",
+        "weight": 16.93
+      },
+      {
+        "term": "ci/cd-werkzeugen",
+        "weight": 14.67
+      },
+      {
+        "term": "mysql",
+        "weight": 14.67
+      },
+      {
+        "term": "linux-systeme",
+        "weight": 13.019
+      },
+      {
+        "term": "postgresql",
+        "weight": 13.019
+      },
+      {
+        "term": "systemadministrator",
+        "weight": 13.019
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "bountystash",
+        "score": 0.3437
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "fibtransponder",
+      "matt.bountystash.com",
+      "Risikoberechnungs-Engine (Swirl Engine)"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "PSI-Druck"
+        },
+        {
+          "score": 0.0,
+          "text": "Alarmzustellung"
+        }
+      ],
+      "kept": 6,
+      "name": "Observability",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Ressourcenlimits"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Plattform",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "NixOS"
+        },
+        {
+          "score": 0.0,
+          "text": "YAML"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 10.2919,
+          "text": "Betrieb dreizehn NixOS-Hosts über drei Hardware-Generationen, inklusive Beschaffung, Installation und Boot-Konfiguration"
+        },
+        {
+          "score": 8.0132,
+          "text": "Verwaltete PostgreSQL und Secrets: sops mit age, eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten"
+        },
+        {
+          "score": 3.7941,
+          "text": "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledge"
+        },
+        {
+          "score": 3.4042,
+          "text": "Sicherte jede Änderung mit inventargetriebenen CI-Gates je Host ab und hielt jede Generation rückrollbar"
+        },
+        {
+          "score": 0.822,
+          "text": "Prüfte Endpunkte mit Gatus und band Alarmierung an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachrich"
+        },
+        {
+          "score": 0.5542,
+          "text": "Härtete die Landschaft: keine öffentliche Schnittstelle, Zugang über ein WireGuard-Tailnet"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 9
+    },
+    {
+      "dropped": [
+        {
+          "score": 2.3251,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        },
+        {
+          "score": 2.0786,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.7329,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete die Sicherheitsschulung der Crew."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

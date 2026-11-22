@@ -1,8 +1,81 @@
 {
-  "generated": "2026-11-22T08:13:47Z",
+  "generated": "2026-11-22T08:16:49Z",
   "count": 200,
-  "pin": "dbcc5c3e17dc9d54169d0e8b7938a4f27b736b74caca958ed1890b51c0e19865",
+  "pin": "0248535f827543defe3e5616227f1dd113613fc1c50fc46ee9128f528ca0c3eb",
   "turns": [
+    {
+      "id": "9e24253b-e4d4-4f00-b6c9-5eacbb8ea85b",
+      "ts": "2026-11-22T08:16:20Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: clickhouse DBRE core emea remote germany (Ashby c3617664); captcha-interactive = stop policy",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/clickhouse-dbre"
+      ],
+      "files": [],
+      "base_commit": "7a956e7672c151abb6cd0812e1f30a3318671781",
+      "branch": "main",
+      "frame": "03ha61ttapx1r9sk0fzqqkf9k"
+    },
+    {
+      "id": "f56c8fe3-757c-4ce3-a12d-a843d9ce9426",
+      "ts": "2026-11-22T08:15:28Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "correction: kiwigrid-senior-sre commit amended to 8b168fe8, trailer fixed | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/kiwigrid-senior-sre"
+      ],
+      "files": [],
+      "base_commit": "8b168fe82bb43314b34ed868fa2973b959958fee",
+      "branch": "main",
+      "frame": "03ha61nlmzns2xkuw3fvjqfa2"
+    },
+    {
+      "id": "68987579-012b-411f-b78c-faba3b33cb42",
+      "ts": "2026-11-22T08:15:19Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: mongodb-sre-storage-layer submitted via Greenhouse 6984814 embed | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7a956e7672c151abb6cd0812e1f30a3318671781",
+      "branch": "main",
+      "frame": "03ha61mlwado99u4a7iuds3d5"
+    },
+    {
+      "id": "24771370-0e2b-4a38-92ce-756a57893e6d",
+      "ts": "2026-11-22T08:15:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: kiwigrid-senior-sre packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/kiwigrid-senior-sre"
+      ],
+      "files": [],
+      "base_commit": "394fc0076b7f625e15837f8b1cad8667a44a65db",
+      "branch": "main",
+      "frame": "03ha61mh8bf01hvigcd7qfwuc"
+    },
+    {
+      "id": "a74dc5bf-79a4-474e-a666-32c9b79f71c9",
+      "ts": "2026-11-22T08:13:50Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: mongodb SRE storage layer dublin (GH 6984814); sponsorship=Yes Irish permit",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/mongodb-sre-storage-layer"
+      ],
+      "files": [],
+      "base_commit": "7a956e7672c151abb6cd0812e1f30a3318671781",
+      "branch": "main",
+      "frame": "03ha61c90w3r8qkux6g5orp04"
+    },
     {
       "id": "be09e627-ae06-413b-a1ed-3d3c989c26df",
       "ts": "2026-11-22T08:13:08Z",
@@ -2728,86 +2801,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha0it0guhd4wuejcqs5feb2"
-    },
-    {
-      "id": "4b366cdf-d13f-44ca-a328-45c6c6b815e6",
-      "ts": "2026-11-21T15:00:34Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "applied: Workato PostgresDBA Berlin (Greenhouse, verified); Octopus (email direct — Lever hcaptcha rejected); lease-a-bike consent accepted. Follow-ups sent: Kent, JTL, Gramian, Genesis. 55 applied, open mail 0. Browser done; files ~/.local/state/job-hunt/",
-      "outcome": "in_progress",
-      "claims": [
-        "applications",
-        "docs/generated"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0fhsbr8fxugssyey7pk2s"
-    },
-    {
-      "id": "39fb018c-2b11-4328-b429-47968acfda58",
-      "ts": "2026-11-21T13:55:17Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-21: 3 plate(s) kept of 3 spent, 390 roster row(s) waiting, 651 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha02qmur4bh4sm3ps0ths95"
-    },
-    {
-      "id": "fc539c52-5cf5-4a9b-b020-6dcfbfc01657",
-      "ts": "2026-11-21T13:52:15Z",
-      "source": "devin",
-      "subject": "nixconfig:public-face-hardening",
-      "action": "public-face round 2: task summaries, USER.md dossier purge, gmail redaction to one constant, badges, repo About metadata, changelog museum cut; hardening audit delivered",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "taskfiles/checks.yml",
-        "taskfiles/dev.yml",
-        "README.md",
-        "modules/user/ai/hermes-persona/USER.md",
-        "hosts/delphi/configuration.nix",
-        "hosts/netbook/configuration.nix",
-        ".agents/skills/calendar/SKILL.md",
-        ".agents/skills/mail-alias/SKILL.md",
-        ".agents/skills/philips-tv-cast/SKILL.md",
-        "taskfiles/mail.yml",
-        "docs/case-studies.md"
-      ],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha025fla7dgrt5nfv4r9obq"
-    },
-    {
-      "id": "888018f6-257c-4f79-9821-070879060232",
-      "ts": "2026-11-21T13:47:37Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-21: 7 plate(s) kept of 10 spent, 393 roster row(s) waiting, 648 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03ha018ptqz4g7nd1zho6ei3m"
-    },
-    {
-      "id": "80df2eee-fa73-4bb7-92ad-40f44a6ef9d9",
-      "ts": "2026-11-21T13:09:18Z",
-      "source": "devin",
-      "subject": "nixconfig:task-summaries",
-      "action": "landed: checks/dev summary refresh + turns pin | gate: pre-push pins+images PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bcf9d21cd05dae9856758fc60bcb5856b901933d",
-      "branch": "main",
-      "frame": "03h9ztrb07k1ikxvpz50v6nx0"
     }
   ]
 }

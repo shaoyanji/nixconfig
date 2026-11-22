@@ -1,8 +1,79 @@
 {
-  "generated": "2026-11-22T10:28:46Z",
+  "generated": "2026-11-22T10:31:08Z",
   "count": 200,
-  "pin": "3a71126b8f1ef7179b8e4d3c981c9d8bcf0a0f46bbdcdf07aa6807a7f700ac67",
+  "pin": "9c89ef79539f8c3f464c0c22f3211908fc2b0b1d1543db7eceb813e94f47b0c1",
   "turns": [
+    {
+      "id": "ab867750-457e-4f9e-bfc8-ebbd032b0117",
+      "ts": "2026-11-22T10:30:19Z",
+      "source": "devin",
+      "subject": "nixconfig:camunda",
+      "action": "blocked: Ashby submission stopped at reCAPTCHA image challenge — form fully staged for hand-submit; no cover-letter field on form",
+      "outcome": "blocked: recaptcha-image",
+      "claims": [],
+      "files": [],
+      "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
+      "branch": "main",
+      "frame": "03ha6rzz0umvv2w57m33lar49"
+    },
+    {
+      "id": "3244bd6c-8f1a-4609-927f-e8203778ddfb",
+      "ts": "2026-11-22T10:30:19Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:biz-factory",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (de)",
+      "outcome": "done",
+      "claims": [
+        "submissions/biz-factory"
+      ],
+      "files": [],
+      "base_commit": "1b9bec736cffa2b523e3a0e4b33e93282280d49e",
+      "branch": "main",
+      "frame": "03ha6rzxr4n1q5lve9lbjhuwd"
+    },
+    {
+      "id": "768c0a8b-5db2-4ea6-b40d-26dd2979a424",
+      "ts": "2026-11-22T10:29:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:adfinis",
+      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/adfinis"
+      ],
+      "files": [],
+      "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
+      "branch": "main",
+      "frame": "03ha6rx0ti3dacdpfngkxe5p7"
+    },
+    {
+      "id": "e4b985ef-6aab-4619-a1c6-48036c725308",
+      "ts": "2026-11-22T10:29:12Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:biz-factory",
+      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/biz-factory"
+      ],
+      "files": [],
+      "base_commit": "77a1b08b3f6645af327e8fa5e37ed4eaa840337f",
+      "branch": "main",
+      "frame": "03ha6rs616pgxn1u4y4cznnjr"
+    },
+    {
+      "id": "b8570aec-5343-4062-9600-fb88f55107eb",
+      "ts": "2026-11-22T10:29:06Z",
+      "source": "freebuff",
+      "subject": "nixconfig:attio",
+      "action": "follow-up: letter re-compiled without salary numerals | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
+      "branch": "main",
+      "frame": "03ha6rrgj8ef2pb8xnypk1tw0"
+    },
     {
       "id": "7465bf2a-35e4-499e-93aa-7bed9e77221c",
       "ts": "2026-11-22T10:28:25Z",
@@ -2595,73 +2666,6 @@
       "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
       "branch": "main",
       "frame": "03ha5ze085z54pcf1qzqme04g"
-    },
-    {
-      "id": "2aa5f7ec-8242-4466-b7c4-27368eb2475e",
-      "ts": "2026-11-22T08:02:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-flix-devops",
-      "action": "landed: Flix train-fleet infra packet (English JD, 2-page CV, 1-page letter, Greenhouse sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/flix-devops-cloud-infrastructure"
-      ],
-      "files": [],
-      "base_commit": "f60945d365ffc2cf0ab7a4e79b066d3ea442e578",
-      "branch": "main",
-      "frame": "03ha5z4w4pphlt4tt3z0bmifd"
-    },
-    {
-      "id": "1a4e5b90-78ca-4a2a-be01-59179b3aaaea",
-      "ts": "2026-11-22T08:02:21Z",
-      "source": "hermes",
-      "subject": "nixconfig:hermes",
-      "action": "landed: incident task - investigate Hermes gateway shutdown that interrupted the last turn and document remediation steps",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
-      "branch": "main",
-      "frame": "03ha5z3f83fvzvpeejy7mtog9"
-    },
-    {
-      "id": "606d10f3-6ce6-40f7-81a9-dd254d4f5f5d",
-      "ts": "2026-11-22T08:02:20Z",
-      "source": "devin",
-      "subject": "nixconfig:devin",
-      "action": "landed: flake-change task - restructure nixconfig flake module wiring to separate host configurations into independent chains",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
-      "branch": "main",
-      "frame": "03ha5z3c57hpvtueh893dftn2"
-    },
-    {
-      "id": "b20c4e62-182b-4efc-9f58-e8a65d8cbc49",
-      "ts": "2026-11-22T08:02:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff",
-      "action": "landed: prose-change task - redact third-party contacts and phone number from docs/nix-consultancy-outreach.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
-      "branch": "main",
-      "frame": "03ha5z37nl5p67jq5fgvjwrz1"
-    },
-    {
-      "id": "88761107-4f67-4150-9526-aaaa3e88e824",
-      "ts": "2026-11-22T08:01:55Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: gocardless senior SRE database (GH 8385160) — both PDFs attached, OTP 37814064, /confirmation; honest No on visa-sponsor + Lisbon-commute, remote-from-Germany raised in letter | gate: GH confirmation page",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
-      "branch": "main",
-      "frame": "03ha5z0ed5xz04490j4ei5i7i"
     }
   ]
 }

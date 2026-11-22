@@ -1,0 +1,70 @@
+Staff Site Reliability Engineer - Sovereign Cloud — DeepL
+Location: Munich / Germany remote
+Source: arbeitnow posting, fetched 22.11.2026 (HTTP 200)
+Apply: https://www.arbeitnow.com/jobs/companies/deepl/staff-site-reliability-engineer-sovereign-cloud-munich-48462
+
+Staff Site Reliability Enginee...
+Staff Site Reliability Engineer - Sovereign Cloud
+DeepL
+Munich
+Operations
+Full Time
+4 days
+Operations
+Full Time
+Munich
+Meet DeepL
+DeepL is a global AI product and research company focused on building secure, intelligent solutions to complex business problems. Over 200,000 business customers and millions of individuals across 228 global markets today trust DeepL's Language AI platform for human-like translation, improved writing and real-time voice translation.
+Founded in 2017 by CEO Jaroslaw “Jarek” Kutylowski, DeepL now has around 1,000 passionate employees and is supported by world-renowned investors including Benchmark, IVP, and Index Ventures.
+Our goal is to become the global leader in trusted, intelligent AI technology, building products that drive better communication, foster connections, and create a meaningful impact. To achieve this, we need talented people like you to join our journey. If you’re ready to shape the future of AI and grow your career in a fast-moving, purpose-driven environment, DeepL is your next destination.
+What sets us apart
+What sets us apart is our blend of cutting-edge AI technology, meaningful work, and a culture where people truly thrive. We’re a team of innovators, researchers, and creators driven by a shared purpose to unlock human potential by making work simpler, smarter, and more connected.
+When we share what it’s like to work at DeepL, the reactions are overwhelmingly positive. This might be because of our technology that helps millions of people and businesses communicate and work better every day, or because of the trust, curiosity, and care that shape our culture.
+What we know for sure is this: being part of DeepL means joining a team dedicated to innovation, growth, and well-being. Discover more about life at DeepL on
+LinkedIn
+Instagram
+, and our
+Blog
+Meet the team behind this journey
+You will join the team building and operating DeepL for Sovereign Markets, our offering for public sector bodies and regulated organisations that need more than data residency. It is hosted and operated entirely within the EU, under EU jurisdiction, and runs alongside DeepL's global infrastructure. The team is designing the platform foundations that make that promise true in practice: how services are built, deployed, secured, observed and operated. The approach favours managed infrastructure and well designed software abstractions over bespoke low level plumbing. You will work closely with product, security and legal colleagues as the offering grows to cover more capabilities and features.
+Your responsibilities
+Build the platform as software:
+Design and build the platform layer of DeepL for Sovereign Markets as software: reusable services, abstractions and tooling that product engineers build on
+Own the architecture:
+Own the architecture of the managed infrastructure the platform runs on, including Kubernetes, networking, storage, identity and secrets, using provider managed services where they meet the requirement
+Standardise and automate:
+Define infrastructure as code and delivery standards that hold across teams, and automate operations so that manual work is the exception
+Make design decisions visible and reviewable:
+write and review architecture decision records, weigh positions on their merits and commit once a decision is made
+Build for reliability:
+Build observability, resilience testing and incident response practices so that the service meets its reliability commitments
+Adapt the product to the new environment:
+Make low invasive modifications to existing code in the product with confidence in order to make it run in the new environment
+Keep the environment auditable:
+Work with security and compliance colleagues to keep the environment auditable and aligned with the standards our customers require
+Raise the technical bar:
+Mentor engineers, raise the technical bar through design reviews, and build consensus across teams without relying on line authority
+Participation in our on-call rotation:
+You’ll ensure the reliability and availability of our services by being available to join the team's shared on-call rotation as needed
+Qualities we look for
+Software engineering depth:
+Strong software engineering skills in at least one major language, C#, Go or Python preferred, shown by tooling, services or platform abstractions that other engineers rely on
+Production infrastructure:
+Production experience designing and running managed infrastructure and Kubernetes, with sound judgement on when to use provider managed services and when not to
+Automation and delivery:
+Infrastructure as code with Terraform, Crossplane or equivalent, and GitOps delivery, applied to environments you have owned
+AI-Native Velocity:
+You leverage AI-powered tools (like GitHub Copilot
+
+
+[Packet cross-check, 22.11.2026]
+Asked: platform foundations for DeepL for Sovereign Markets, hosted and operated entirely in the EU
+under EU jurisdiction; managed infrastructure and Kubernetes; how services are built, deployed,
+secured, observed and operated; compliance with European requirements; on-call.
+Evidence held: five years sole operator of a 13-host Linux fleet; systemd, cgroups, namespaces;
+WireGuard mesh with no public listener; nftables; sops/age secrets; own SSH CA with short-lived
+certificates; hermetic reproducible builds from pinned inputs; health-gated rollout and rollback;
+Gatus plus a 15-minute JSONL ledger; Go alerting bridge with delivery confirmation; Python and Go
+tooling; German residency with permanent residence.
+Not held: Kubernetes, managed cloud infrastructure, Staff-level scope across teams, formal EU
+compliance work (BSI C5, ISO 27001, SOC 2), large on-call rotations.

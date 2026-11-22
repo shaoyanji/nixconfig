@@ -1,0 +1,304 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 4785,
+    "terms": [
+      {
+        "term": "cloud",
+        "weight": 14.603
+      },
+      {
+        "term": "next",
+        "weight": 14.603
+      },
+      {
+        "term": "greenhouse",
+        "weight": 12.954
+      },
+      {
+        "term": "bash",
+        "weight": 8.625
+      },
+      {
+        "term": "greenhouse-boards-api",
+        "weight": 7.651
+      },
+      {
+        "term": "python",
+        "weight": 7.651
+      },
+      {
+        "term": "engineer",
+        "weight": 7.303
+      },
+      {
+        "term": "shape",
+        "weight": 5.841
+      },
+      {
+        "term": "engineering",
+        "weight": 5.181
+      },
+      {
+        "term": "call",
+        "weight": 3.45
+      },
+      {
+        "term": "ci",
+        "weight": 3.45
+      },
+      {
+        "term": "covering",
+        "weight": 3.45
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "nixconfig",
+        "score": 0.6299
+      },
+      {
+        "name": "Konzept für Schwachstellenbetrieb",
+        "score": 0.6247
+      },
+      {
+        "name": "fibtransponder",
+        "score": 0.509
+      },
+      {
+        "name": "Masterarbeit: Wetter und Volatilität",
+        "score": 0.0
+      },
+      {
+        "name": "Postgraduales Studium: Erneuerbare Energien",
+        "score": 0.0
+      },
+      {
+        "name": "kev-time",
+        "score": 0.0
+      }
+    ],
+    "kept": [
+      "Risikoberechnungs-Engine (Swirl Engine)",
+      "bountystash",
+      "kelly-svg",
+      "matt.bountystash.com"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Go"
+        },
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Sicherheit",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 1.15,
+          "text": "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig."
+        },
+        {
+          "score": 0.0,
+          "text": "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten."
+        },
+        {
+          "score": 0.0,
+          "text": "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist."
+        },
+        {
+          "score": 0.0,
+          "text": "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen."
+        },
+        {
+          "score": 0.0,
+          "text": "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading."
+        },
+        {
+          "score": 0.0,
+          "text": "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists."
+        },
+        {
+          "score": 0.0,
+          "text": "Prüfte Bug-Bounty-Programme."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 10
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.091,
+          "text": "Führte ein internationales Team und entwickelte eine Anreizstruktur, gekoppelt an ein Echtzeit-Finanzmodell."
+        },
+        {
+          "score": 1.0402,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        },
+        {
+          "score": 0.8049,
+          "text": "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften."
+        },
+        {
+          "score": 0.0,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit."
+        },
+        {
+          "score": 0.0,
+          "text": "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+        }
+      ],
+      "kept": 2,
+      "matched": false,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.5429,
+          "text": "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie."
+        },
+        {
+          "score": 0.0,
+          "text": "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte."
+        },
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 1,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.394,
+          "text": "Arbeitete zwölfstündige Schichten im Feld."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 0.0,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete die Sicherheitsschulung der Crew."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-22T12:21:38Z",
+  "generated": "2026-11-22T12:25:53Z",
   "count": 200,
-  "pin": "a87bab7b5ed83cf662530f87547201b74fe59ecca4e0dbe6edf2473833597e4e",
+  "pin": "67072796bb2759e9287331bf31f44e2880f10266b021c70410a6172df7031f94",
   "turns": [
+    {
+      "id": "9b71842e-046a-4265-94c7-a27593dee381",
+      "ts": "2026-11-22T12:22:54Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:hep-global-infra",
+      "action": "landed: Initiativbewerbung packet for hep global IT infrastructure (no live posting; 2pp CV 93/87 fill, 1pp letter 76, dossier records verified absence) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/hep-global-infra"
+      ],
+      "files": [],
+      "base_commit": "0ead9389163c07c04b7fd0f9d169a93ea413d6db",
+      "branch": "main",
+      "frame": "03ha7dzpf00nr06bz1nfdzsf7"
+    },
+    {
+      "id": "9a7b9ca2-60a3-4d4e-9122-f70bf48c50ea",
+      "ts": "2026-11-22T12:21:50Z",
+      "source": "devin",
+      "subject": "job-hunt:treatwell",
+      "action": "Treatwell Senior Platform Engineer (Workable 359BA205E3): third headless attempt, same invisible-Turnstile hang — 'Submitting...' state 90s+, token never resolves. Form fully filled incl. salon answer + salary EUR 105k + honest NO on ES/UK/NL residency. Recorded manual with hand-submit URL.",
+      "outcome": "blocked: Workable invisible Turnstile does not resolve headless (3rd identical failure)",
+      "claims": [],
+      "files": [],
+      "base_commit": "f4ca35d220a06892113e0129ebebc0d39d2f4c91",
+      "branch": "main",
+      "frame": "03ha7ds7go6yigkbpnzuxsf3o"
+    },
+    {
+      "id": "ec2e4e97-aba3-42de-8517-6dc882d77e37",
+      "ts": "2026-11-22T12:21:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:qed",
+      "action": "correct: the earlier done entry on this subject claimed checks:prose PASS and it had failed — one vocabulary tell ('scaffolding') in the sheet, plus a false claim that the injection strings appear nowhere in it. Both fixed in commit COMMIT, prose now genuinely exit 0 at N files, tree clean. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f4ca35d220a06892113e0129ebebc0d39d2f4c91",
+      "branch": "main",
+      "frame": "03ha7drcpvc25382qnlp6qfwo"
+    },
     {
       "id": "060df19c-3730-4e67-a165-17a0aab0f38b",
       "ts": "2026-11-22T12:21:22Z",
@@ -2807,47 +2848,6 @@
       "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
       "branch": "main",
       "frame": "03ha6rf5deb9a9r3e1cnqewpd"
-    },
-    {
-      "id": "456f5214-2516-4463-92fc-3d5bd810e3fe",
-      "ts": "2026-11-22T10:27:20Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:stackit",
-      "action": "claim: native Typst 2pp CV + 1pp letter (de/en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/stackit"
-      ],
-      "files": [],
-      "base_commit": "a3ee2a4708f220701de485e08421d40728750330",
-      "branch": "main",
-      "frame": "03ha6rezpkefvdugbrdmcmi74"
-    },
-    {
-      "id": "13ba9b8c-1639-4f13-b41d-3a335b5187f8",
-      "ts": "2026-11-22T10:27:16Z",
-      "source": "devin",
-      "subject": "nixconfig:catawiki-platform-engineer",
-      "action": "already applied: Greenhouse ack mail 311083 names Platform Engineer — skipped duplicate submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
-      "branch": "main",
-      "frame": "03ha6rejiqhkn1bksn4hs0t6e"
-    },
-    {
-      "id": "ee11370b-5776-4cec-8e51-3721d323b869",
-      "ts": "2026-11-22T10:27:03Z",
-      "source": "devin",
-      "subject": "nixconfig:rwth-aachen",
-      "action": "submitted: RWTH Aachen TIM Data & DevOps via email to dienhart@time.rwth-aachen.de | sent mail 8719 verified",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
-      "branch": "main",
-      "frame": "03ha6rd0jo3a3vdblgfb28coe"
     }
   ]
 }

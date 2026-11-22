@@ -39,6 +39,17 @@ NIX_FMT="$REPO_ROOT/scripts/task/nix-fmt.sh"
 KG_CHECK="$REPO_ROOT/scripts/task/kg-check.sh"
 
 STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Private job material is not source. A packet carries a phone number and a
+# street address, and this repo is public: `submissions` is gitignored, which
+# stops `git add -A` but not `git add -f`, and that is how 667 files of it came
+# to be tracked (found 2026-11-22). Refuse the path outright. Deletions are not
+# in STAGED, so removing it stays commit-able.
+if grep -q '^submissions/' <<<"$STAGED"; then
+  echo "pre-commit: refusing paths under submissions/ — private job material" >&2
+  echo "  packets belong in \${APPFLOW_PACKETS:-~/.local/state/appflow/submissions}, outside this repo" >&2
+  exit 1
+fi
 STAGED_NIX=$(grep '\.nix$' <<<"$STAGED" || true)
 
 # Everything that feeds `.#knowledgeGraph`. The projection reads only these, so

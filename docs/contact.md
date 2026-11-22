@@ -37,7 +37,7 @@ so keeping it in the tree hides nothing.
 | Website header and `hire` block | `lib/matt/profile.json` |
 | CV and letter (phone, street address) | `scripts/task/appflow-packet.sh` merges `pii.json` into the corpus at build time |
 | Cold-mail signatures | `docs/job-cold-email.md` uses `{{EMAIL}}`, filled from the values above |
-| Application packets | `submissions/<slug>/submission-sheet.md` repeats the block for the portal form |
+| Application packets | `${APPFLOW_PACKETS:-~/.local/state/appflow/submissions}/<slug>/submission-sheet.md`, deliberately outside this public tree |
 
 ## Third-party contacts
 

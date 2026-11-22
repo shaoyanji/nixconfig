@@ -204,6 +204,16 @@ fi
 
 target="${out:-$STATE/$name}"
 mkdir -p "$(dirname "$target")"
+# A packet is private: it carries the phone number and street address decrypted
+# at build time. The repo is public, so an --out pointing into it is refused
+# rather than written and later committed under force (2026-11-22).
+case "$(readlink -f "$(dirname "$target")" 2>/dev/null)/" in
+"$REPO"/*)
+  echo "appflow-packet: --out is inside the repo; packets are private." >&2
+  echo "  use \${APPFLOW_PACKETS:-$HOME/.local/state/appflow/submissions}" >&2
+  exit 2
+  ;;
+esac
 # A symlink, not a copy: the artifact stays the store path, and the stable name is
 # how a human (or the application record) finds it.
 ln -sfn "$store_path" "$target"

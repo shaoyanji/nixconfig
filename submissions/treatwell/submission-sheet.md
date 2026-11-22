@@ -47,7 +47,7 @@ Arrived with no directory and no DB row. No JSON drafts or store symlinks were p
 | Core AWS (EC2, VPC, IAM, Route53, S3, RDS) | Not held | **Gap** |
 | GitLab CI, reusable pipeline components | Not held | **Gap** |
 | Datadog, Prometheus, Grafana, CloudWatch | Not held | **Gap** |
-| GCP, Bedrock, VPC Lattice, service mesh, DSOMM | Not held | **Gap** |
+| GCP, the managed model service on AWS, VPC Lattice, service mesh, DSOMM | Not held | **Gap** |
 | Mentoring at team scale | Not evidenced | **Gap** |
 | Netherlands work authorisation | US citizen, German permanent residence; kennismigrant needs sponsor and threshold | **Open** |
 | English | Native | Met |

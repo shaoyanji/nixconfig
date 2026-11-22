@@ -1,8 +1,92 @@
 {
-  "generated": "2026-11-22T10:21:35Z",
+  "generated": "2026-11-22T10:26:00Z",
   "count": 200,
-  "pin": "a5a4ac42473a6c4f24d43bce106856d777d10d5e9ee3e623dfddd87d794636a4",
+  "pin": "eb7410c46e0a1a1e39adabefd895ee09608b4c1c65570f2f5c22e610b8e0417d",
   "turns": [
+    {
+      "id": "252bce77-49df-46e9-ba72-fd64032c8525",
+      "ts": "2026-11-22T10:25:57Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:enbw",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (de); EnBW req 410 (filled)",
+      "outcome": "done",
+      "claims": [
+        "submissions/enbw"
+      ],
+      "files": [],
+      "base_commit": "a3ee2a4708f220701de485e08421d40728750330",
+      "branch": "main",
+      "frame": "03ha6r59nywj17krbjuv03kgc"
+    },
+    {
+      "id": "00ebc930-e313-4565-af4b-cbf1e71c53d8",
+      "ts": "2026-11-22T10:24:50Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:enbw",
+      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/enbw"
+      ],
+      "files": [],
+      "base_commit": "6dc98f45d3bdc75d653b6d553cb7ed1f1f48fec5",
+      "branch": "main",
+      "frame": "03ha6qxh0xhmpqye2ophwcnj2"
+    },
+    {
+      "id": "41d4b614-9780-4b14-8a96-d18219e45c13",
+      "ts": "2026-11-22T10:24:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:coda",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/coda"
+      ],
+      "files": [],
+      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
+      "branch": "main",
+      "frame": "03ha6qx7zbdp1jvcpe5y8qsu2"
+    },
+    {
+      "id": "ef1374ff-68a9-42b8-923d-27f28a4bfa44",
+      "ts": "2026-11-22T10:24:26Z",
+      "source": "devin",
+      "subject": "nixconfig:coreweave",
+      "action": "applied: Greenhouse embed submission complete | OTP verified, confirmation shown",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
+      "branch": "main",
+      "frame": "03ha6qume46np15osag8fa21x"
+    },
+    {
+      "id": "4535852b-38a0-44fa-9cb3-46e846579874",
+      "ts": "2026-11-22T10:21:52Z",
+      "source": "devin",
+      "subject": "nixconfig:coreweave",
+      "action": "claim: Greenhouse submission 4625588006",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
+      "branch": "main",
+      "frame": "03ha6qclc145b1f71ntxtyuqh"
+    },
+    {
+      "id": "abad14ed-d70d-4ad6-95e1-d622c3c0d55c",
+      "ts": "2026-11-22T10:21:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:n8n",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
+      "branch": "main",
+      "frame": "03ha6qawp1oxom6070w9jcedp"
+    },
     {
       "id": "048f5017-79df-49fc-8838-d54caa1d9c93",
       "ts": "2026-11-22T10:21:17Z",
@@ -2580,94 +2664,6 @@
       "base_commit": "6dfadfb2c74aa064692b69813d3f93d2c8e03c31",
       "branch": "main",
       "frame": "03ha5vfntz57p9wmbzuauc1jl"
-    },
-    {
-      "id": "ef37abb8-39e7-4d4f-ad22-ad1d2ef58388",
-      "ts": "2026-11-22T07:42:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-drv-openshift",
-      "action": "landed: DRV OpenShift platform packet (JD, 2-page CV, 1-page letter, Interamt sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/drv-devops-platform-openshift"
-      ],
-      "files": [],
-      "base_commit": "db2695abcf5be2d7903a28e697d9aa6a3e32ac3e",
-      "branch": "main",
-      "frame": "03ha5v8mhq40t6tixsjr8ipbq"
-    },
-    {
-      "id": "a9c86495-c92d-4a51-afa0-6bc5d2b6278b",
-      "ts": "2026-11-22T07:42:32Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-energy-meteo",
-      "action": "landed: energy & meteo systems Systemadministrator packet in submissions/energy-meteo-sysadmin (BA 13644-311398-S / get-in-it p311398, Oldenburg + Home-Office). German CV 2pp, letter 1pp, ask 68k in 65-72k band. Energy domain is real from corpus (O3 Energy, REM M.Sc.); letter names no enterprise helpdesk, no MDM/Windows, no client rollouts. Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/energy-meteo-sysadmin"
-      ],
-      "base_commit": "dcc59a6bf2e37067b82e7ac22f0faa086a4d9360",
-      "branch": "main",
-      "frame": "03ha5v84a3fj0vmu5pd66zrfx"
-    },
-    {
-      "id": "63b4011c-f06e-44a8-acbe-ee75a56d085d",
-      "ts": "2026-11-22T07:40:42Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: ionos staff NRE karlsruhe via GH eu legacy board; sheet mapped (15 answers incl SUE2 consent, no-relocate+commute, 120k)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/ionos-staff-nre"
-      ],
-      "files": [],
-      "base_commit": "747d0df77ad89d374d7db1880c90d40caf7bf6dc",
-      "branch": "main",
-      "frame": "03ha5uv5kvn4w44di6y7p7cfp"
-    },
-    {
-      "id": "824c0efb-b14f-4c08-aa60-e739b8cab147",
-      "ts": "2026-11-22T07:40:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-dfs-sre",
-      "action": "landed: DFS Ingenieur Site Reliability packet in submissions/dfs-sre (fit 5, BA 17761-1172604-2-S / J000000038). German CV 2pp, letter 1pp, ask 95k in the 90-100k band. Letter claims expert Linux + Go/Python automation, names Ansible, CI/CD pipelines, K8s, Windows as absent; screening accepted. Sheet flags medical fitness + licence B to confirm. Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/dfs-sre"
-      ],
-      "base_commit": "747d0df77ad89d374d7db1880c90d40caf7bf6dc",
-      "branch": "main",
-      "frame": "03ha5uupbptqnuu2oy3b488ut"
-    },
-    {
-      "id": "c5227b8c-0a94-48dc-ada3-de2cb2734c6d",
-      "ts": "2026-11-22T07:40:34Z",
-      "source": "devin",
-      "subject": "nixconfig:mail-atlas",
-      "action": "landed: 24853fc0 mail-atlas drain/reconcile himalaya wrappers collapsed into mkHimalayaJob | gate: checks:host delphi PASS (2110 assertions, eval mode aarch64)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "24853fc03673b148c26ec1aced791fed5b160caf",
-      "branch": "main",
-      "frame": "03ha5uu85jkp4dblgcto41ves"
-    },
-    {
-      "id": "2a9f2b18-2e1a-4110-bc0a-ad0feda546f9",
-      "ts": "2026-11-22T07:40:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-bundesdruckerei-sre",
-      "action": "landed: Bundesdruckerei SRE packet (JD, 2-page CV, 1-page letter, portal sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/bundesdruckerei-sre"
-      ],
-      "files": [],
-      "base_commit": "ae22b990c452930d9f639b7efdaecbe2a36a048a",
-      "branch": "main",
-      "frame": "03ha5uu83vf79xjaecu5oge2j"
     }
   ]
 }

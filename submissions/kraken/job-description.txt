@@ -1,0 +1,23 @@
+Infrastructure / DevOps Engineer — Kraken
+Source: role brief supplied for this packet, 22.11.2026.
+Board check: https://api.lever.co/v0/postings/kraken?mode=json returned HTTP 200 with an empty array
+(2 bytes), and https://jobs.lever.co/kraken shows no public postings at that slug. No advert text could
+be fetched, so the requirements below come from the brief and must be verified against the live
+requisition before submitting.
+
+Stated scope (from brief):
+- 24/7 high-reliability bare-metal Linux infrastructure.
+- Strict least privilege: ephemeral CA certificates rather than long-lived keys.
+- Secrets encrypted with sops.
+- Telemetry loops that close: measurement, alerting, delivery confirmation.
+- Automated incident resilience: rollback, recovery, runbooks.
+
+[Packet cross-check, 22.11.2026]
+Evidence held: five years sole operator of a 13-host bare-metal Linux fleet across three hardware
+generations; own SSH certificate authority issuing short-lived certificates; sops/age secrets per host
+with keys held separately; WireGuard mesh with no public listener and nftables at the edge; a 15-minute
+JSONL sentinel ledger plus Gatus probes and a Go alerting bridge that confirms delivery; health-gated
+rollout and rollback by generation; restic with verified restores; Python and Go tooling.
+Not held: Kubernetes and cloud infrastructure, a company-scale on-call rotation, crypto or exchange
+domain experience, formal incident command.
+Fit 4: the substance of the brief is the work already done, at a smaller scale and without the rotation.

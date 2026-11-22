@@ -1,0 +1,53 @@
+Information Systems - Open Source Technical Architect
+Canonical · Home based - EMEA
+Comp: not published by Canonical
+URL: https://job-boards.greenhouse.io/canonical/jobs/4551832
+Fetched: 2026-11-21 (Greenhouse board, 318 roles)
+
+Canonical is a leading provider of open source software and operating systems to the global enterprise and technology markets. Our platform, Ubuntu, is very widely used in breakthrough enterprise initiatives such as public cloud, data science, AI, engineering innovation and IoT. Our customers include the world's leading public cloud and silicon providers, and industry leaders in many sectors. The company is a pioneer of global distributed collaboration, with 1200 colleagues in more than 80 countries and very few office based roles. Teams meet two to four times yearly in person, in interesting locations around the world, to align on strategy and execution.
+The company is founder led, profitable and growing.
+We are hiring an Information Systems Architect to define the best practice in infrastructure as code at a global scale. Join us to advance the state of the art, and shape the infrastructure behind tens of millions devices running Ubuntu.
+The Information Systems (IS) team is responsible for all IT operations at Canonical, including the infrastructure for building, packaging and distributing Ubuntu globally. As the IS architect, you will own the design of hardware and software implementation from PCI lanes to CDN and everything in between. Our goal is to be a reference operation, using the latest capabilities in Ubuntu and open source more generally, with the most modern operating principles. Your choices will impact the Ubuntu user experience for millions of users, and drive how Canonical’s engineers engage with compute and network resources in a devops setting.
+As the IS Architect, you’ll be in a unique position to improve Canonical products and the open-source technologies they’re based on. You do this by leading System Reliability Engineers (SRE) and Data Center Engineers (DCE) to embrace best practices, and make informed decisions on technology choices in all aspects of cloud infrastructure and services. You will coach the IS team on automation, reliability, operational/technical scalability, network infrastructure and security.
+This is a home based position, with twice-annual travel to company events totaling around 4 weeks per year.
+Location: This role will be based remotely in the EMEA region
+The role entails
+- Define, get buy-in and implement the holistic vision of a world class internal cloud
+- Setup, maintain and update the technical design roadmap and guidelines for the SREs within IS, with the aim of improving reliability, resilience, operational scalability, and technical scalability
+- Collaborate with, and provide the cloud-ops software development teams with input for roadmap, requirements and prioritization to build a world-class, highly standardized and automated operation
+- Provide the IS management with input and advice with regards to technology, reliability, resilience and business cases
+- Lead technical choices to implement solutions as self-service products, ensuring scalable operation
+- Collaborate with product security as well as operations security to set best practice and mitigate new threats in a timely manner
+- Automate operations for reuse across the world's largest companies, taking into consideration the complexities of distributed systems
+- Collaborate with development teams to design service architecture, documentation, playbooks, policies and operational procedures
+- Analyze incidents and events, and establish what the reason behind the reasons are, and what structural improvements can be made to minimize the chance of them reoccurring
+What we are looking for in you
+- Exceptional academic track record from both high school and university
+- Undergraduate degree in a technical subject or a compelling narrative about your alternative chosen path
+- Confidence to respectfully speak up, exchange feedback, and share ideas without hesitation
+- Track record of going above-and-beyond expectations to achieve outstanding results
+- Extensive knowledge of cloud computing concepts, technologies & operation
+- Practical knowledge of Linux networking, routing, and firewalls, internet transit and large scale/bandwidth networking.
+- Experience dealing with significant production outages, incident response and postmortems
+- A passion for writing, sharing, and maintaining enterprise open-source software solutions
+- Able to communicate clearly and effectively in English over email, chat, video or voice calls and in-person
+- Be familiarized and passionate about open-source, especially Ubuntu or Debian
+Nice-to-have skills
+- Modern software engineering background (peer-review, unit testing, SCM, CI/CD, Agile)
+- Hands-on experience of automatic administration of enterprise Linux servers at scale
+What we offer colleagues
+We consider geographical location, experience, and performance in shaping compensation worldwide. We revisit compensation annually (and more often for graduates and associates) to ensure we recognise outstanding performance. In addition to base pay, we offer a performance-driven annual bonus or commission. We provide all team members with additional benefits, which reflect our values and ideals. We balance our programs to meet local needs and ensure fairness globally.
+- Distributed work environment with twice-yearly team sprints in person
+- Personal learning and development budget of USD 2,000 per year
+- Annual compensation review
+- Recognition rewards
+- Annual holiday leave
+- Maternity and paternity leave
+- Employee Assistance Program
+- Opportunity to travel to new locations to meet colleagues
+- Priority Pass, and travel upgrades for long haul company events
+About Canonical
+Canonical is a pioneering tech firm at the forefront of the global move to open source. As the company that publishes Ubuntu, one of the most important open source projects and the platform for AI, IoT and the cloud, we are changing the world of software. We recruit on a global basis and set a very high standard for people joining the company. We expect excellence - in order to succeed, we need to be the best at what we do. Most colleagues at Canonical have worked from home since its inception in 2004.​ Working here is a step into the future, and will challenge you to think differently, work smarter, learn new skills, and raise your game.
+Canonical is an equal opportunity employer
+We are proud to foster a workplace free from discrimination. Diversity of experience, perspectives, and background create a better work environment and better products. Whatever your identity, we will give your application fair consideration.
+#LI-remote

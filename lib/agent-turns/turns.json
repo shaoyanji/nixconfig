@@ -1,8 +1,25 @@
 {
-  "generated": "2026-11-22T11:45:25Z",
+  "generated": "2026-11-22T11:47:49Z",
   "count": 200,
-  "pin": "2745cbf8da6a4686b7dc89f23c0ba3d81a29a0fadd396caea4fe4d3b95dea78f",
+  "pin": "c895b0efce1fec80b325ebdd883148b8aa7727b361a659e23f032f998f01f587",
   "turns": [
+    {
+      "id": "5ef4bf0c-44c5-454e-a162-09cca2667c53",
+      "ts": "2026-11-22T11:47:02Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building canonical-arch (pane 1), submitting grafana-db-analytics (pane 2), building stackit-k8s + ptb update (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/canonical-arch",
+        "submissions/grafana-db-analytics",
+        "submissions/stackit-k8s"
+      ],
+      "files": [],
+      "base_commit": "246759378d69c2a1bcb338e785ff0fba24816ddb",
+      "branch": "main",
+      "frame": "03ha76zimrhljnpvcaom38wnq"
+    },
     {
       "id": "d8cd7101-4790-4eac-979b-6931129564ab",
       "ts": "2026-11-22T11:45:10Z",
@@ -2789,19 +2806,6 @@
       "base_commit": "4495525c0ae794b27de49a2bca0733e27defbcb2",
       "branch": "main",
       "frame": "03ha6jptvn24cpmgaeujj5iky"
-    },
-    {
-      "id": "e83ca91f-df54-4948-9823-561ab7f70311",
-      "ts": "2026-11-22T09:47:31Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: dfs-sre DFS portal submission (J000000038)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
-      "branch": "main",
-      "frame": "03ha6jmywnchufe999stexmzu"
     }
   ]
 }

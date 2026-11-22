@@ -1,0 +1,59 @@
+DevOps Engineer (m/w/d)
+Mittwald CM Service GmbH & Co. KG
+Quelle: Bundesagentur fuer Arbeit, Jobsuche-Referenz 17338-f04a2b59e269f0c21e-S
+URL: https://www.arbeitsagentur.de/jobsuche/jobdetail/17338-f04a2b59e269f0c21e-S
+Arbeitgeber-Angebot: https://www.mittwald.de/karriere/job/devops-engineer-2729390
+
+datePosted: "2026-11-17"
+employmentType: "FULL_TIME"
+hiringOrganization: {"@type": "Organization", "name": "Mittwald CM Service GmbH & Co. KG", "sameAs": null, "logo": null}
+jobLocation: {"@type": "Place", "address": {"@type": "PostalAddress", "streetAddress": "Königsberger Straße 4-6", "addressLocality": "Espelkamp", "postalCode": "32339", "addressRegion": "Nordrhein-Westfalen", "addressCountry": "DE"}}
+baseSalary: {"@type": "MonetaryAmount", "currency": "EUR", "value": {"@type": "QuantitativeValue", "unitText": "YEAR", "maxValue": 60000, "minValue": 45000}}
+
+DevOps Engineer (m/w/d) - Mittwald CM Service GmbH & Co. KG sucht DevOps Spezialisten! Gehaltsspanne 45000 - 60000 EUR pro Jahr. Verwendete Technologien:Kubernetes, Linux, Cloud. Anforderungen und Ihr Profil: Wir verstehen uns längst nicht mehr als klassischen Webhosting-Anbieter. Wir bauen die Plattform, auf der Devs, Freelancer und Agenturen die besten Webprojekte umsetzen können - mit der Technologie, die sie dafür brauchen. Und das souverän aus Deutschland.
+
+Um diesem Anspruch gerecht zu werden, brauchen wir kluge Köpfe, die mit uns unsere Kubernetes-basierte Hosting-Plattform weiterentwickeln, verbessern und neu denken. Deswegen planen wir die Gründung von zwei neuen Plattform-Teams. Gestartet wird gemeinsam am 04.01.2027.
+
+Mit anderen neuen DevOps´lern startest du in ein intensives Onboarding-Programm, das dich gezielt auf die Arbeit in unserer Infrastruktur vorbereitet. Wir schulen dich in unserem Tech-Stack (Go, Linux, Kubernetes & Helm) und zeigen dir die Themen, die unsere tägliche Arbeit an der Plattform prägen. Du sollst verstehen, wie unsere Systemumgebung aufgebaut ist und wie du selbst daran weiterarbeiten kannst.
+Nach dem gemeinsamen Einstieg geht es für dich in dein Team. Jetzt heißt es: Wissen einsetzen, weiterlernen und Schritt für Schritt Verantwortung übernehmen.
+
+Für diese Aufgaben machen wir dich fit:
+
+Du gestaltest die Systemumgebung unserer Webhosting-Produkte und sorgst dafür, dass alles reibungslos läuft
+Du entwickelst unsere Kubernetes-basierte Hosting-Plattform weiter - stabil, performant und skalierbar
+Du arbeitest an spannenden Use Cases, zum Beispiel der Entwicklung von Kubernetes Operatoren und Bare Metal Deployments
+Du überwachst die Kubernetes-Cluster mit Hilfe von Monitoring-Tools wie Prometheus, Grafana und Opsgenie zur Störungsprävention
+Durch kreative Ansätze, entwickelst du neue Automatisierungen und verbesserst die Qualität unserer Plattform durch deine Ideen
+Du bist neugierig und aufgeschlossen für Neues, verfolgst die neuesten Entwicklungen in der Open-Source-Welt und probierst neue Technologien aus. Ihre Verantwortlichkeiten: Das bist du:
+
+Du tüftelst gerne und findest strukturierte Wege, um Probleme zu lösen. Wenn die bekannten Mittel nicht helfen, denkst du weiter
+Du willst verstehen, warum etwas funktioniert. Du denkst dich systematisch in Sachverhalte hinein und erkennst Abhängigkeiten, die andere übersehen
+Du hängst dich so lange in etwas hinein, bis du es wirklich verstanden hast. im Tunnel fühlst du dich wohl
+Du hast schon mal einen Server aufgesetzt, egal ob für Games, Home-Projekte oder einfach, weil du wissen wolltest, wie´s geht
+Nach deinen bisherigen Experimenten mit Linux, Containern und Cloud-Tools weißt du: Du willst systemnah arbeiten. Kategorie: DevOps Adresse: Königsberger Straße 4-6, Bielefeld, Germany. Gehalt: 45000 - 60000 EUR pro Jahr. Mittwald CM Service GmbH & Co. KG - Über uns:  So läuft´s ab:
+
+Deine Bewerbung
+Du reichst deine Bewerbung ganz einfach über den Link in der Stellenausschreibung ein. Statt eines perfekt polierten Lebenslaufs interessieren uns hier vor allem deine Antworten auf ein paar Fragen. so ausführlich oder knapp, wie du magst.
+
+Eine kleine Challenge
+Wenn es passt, schicken wir dir eine kleine Aufgabe, die du in Ruhe zuhause bearbeitest. Dabei geht es nicht um tiefes Wissen, sondern darum, wie du denkst und an Probleme herangehst.
+
+Ein Tag bei uns
+Wenn´s passt, geht es in die nächste Runde. Dann lernen wir uns vor Ort kennen, und zwar gemeinsam mit anderen, die wie du im Januar neu bei uns anfangen könnten. Es erwartet dich ein lockerer Vormittag mit Rundgang und Kennenlernen, ein gemeinsames Mittagessen und eine kleine fachliche Challenge. Dabei bekommst du einen echten Eindruck von uns, dem Onboarding-Programm und den Menschen, mit denen du vielleicht schon bald zusammenarbeitest.
+
+Dein Vertragsangebot
+Alles hat gepasst? Dann besprechen wir dein Vertragsangebot und stoßen auf deine Zusage an. Und am 4. Januar starten wir gemeinsam.
+
+Darauf kannst du dich freuen:
+
+Tiefgang statt Standard
+Ja, wir sind ein Hosting-Unternehmen. Aber wer einmal gesehen hat, was unter der Haube steckt, hört auf uns so zu nennen. Deine Chance an Technik zu arbeiten, die die meisten nur aus Talks kennen.
+
+Wir lieben Tech
+Bei uns triffst du auf Menschen, die Tech genauso feiern wie du. Diese Leidenschaft leben wir im Alltag – und darüber hinaus. Ob Open-Source-Engagement, Community-Arbeit oder der Support von Tech-Events: Wir sind aktiv dabei und bringen uns ein.
+
+Technik trifft Menschlichkeit
+Bei uns findest du die coolsten Kolleg*innen, jede Menge Humor und echten Team-Spirit. Zusammenarbeit ist für uns ein fester Teil des Daily Business. Auch nach Feierabend gibt es jede Menge Möglichkeiten, ob Fußball, Padel oder D&D - wer Lust hat, ist dabei.
+
+Rundum-sorglos-Setup
+Bei uns soll´s dir richtig gut gehen. Freie Hardwarewahl? Check. Standardpaket an Benefits? Klar. Vitamine, Koffein & H2O? Safe. Und obendrauf: Unbefristeter Vertrag, Gleitzeit, 30 Urlaubstage, bAV , Schulungsangebote und ein faires Gehalt. zuletzt aktualisiert 46 Woche von 2026

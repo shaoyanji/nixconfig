@@ -1,0 +1,60 @@
+SINC GmbH — DevOps Engineer (m/w/d)
+https://www.arbeitsagentur.de/jobsuche/jobdetail/12288-4996757754-S
+Source: Bundesagentur für Arbeit (BA ID 12288-4996757754-S, via XING)
+
+Zur Jobsuche Startseite
+Stellenangebot:
+DevOps Engineer (m/w/d)
+bei
+SINC GmbH
+Das Wichtigste im Überblick
+Besondere Merkmale
+Arbeitsort
+Wiesbaden
+Angebotsart
+Arbeit
+Anstellungsart
+Vollzeit
+Befristung
+unbefristet
+Beginn
+ab sofort
+Berufsbezeichnung
+DevOps Engineer
+Vormerken
+Notiz / Status
+Link kopieren
+Veröffentlichungsdatum:
+Vor 9 Tagen veröffentlicht
+Stellenbeschreibung
+Vollständige Stellenbeschreibung bei unserem Kooperationspartner einsehen:
+Externe Seite öffnen
+
+Quelle: XING GmbH & Co. KG
+
+Fußbereich
+Stelle betreut durch Arbeitgeber
+Referenz-Nr.: 12288-4996757754-S
+Verstoß melden
+
+---
+
+Retrieved 2026-11-22 from jobs.sinc.de/jobs/63891414 (the BA page's "Externe Seite"; the
+XING mirror www.xing.com/jobs/wiesbaden-devops-engineer-158462184 now answers 410 Gone).
+The text is the advert's own words as indexed by the search engine; the SINC page itself
+timed out, so nothing here is paraphrased.
+
+WORUM ES GEHT
+
+Du baust dabei mit an unseren GovTech-Lösungen der nächsten Generation, die den Alltag von Millionen von Menschen einfacher machen. Unterstütze uns bei der Umsetzung unserer Vision, den Staat fit für das 21. Jahrhundert zu machen. Denn starke und funktionierende Institutionen sind die Grundlage einer funktionierenden Demokratie.
+Werde Teil unserer internen IT als Schnittstelle zwischen Softwareentwicklung und IT-Operations. Dein Fokus liegt auf der Bereitstellung, dem Betrieb und der Weiterentwicklung unserer internen Plattform- und Infrastrukturservices.
+
+DEINE AUFGABEN
+
+Als DevOps Engineer (m/w/d) für die interne IT-Schnittstelle hältst Du engen und regelmäßigen Kontakt zu Entwicklungs- und Testteams. Dabei stellst Du die Plattformen bereit, analysierst Betriebsanforderungen und sorgst für stabile Abläufe.
+Du bist für den Betrieb, die Optimierung und den Ausbau unserer internen Entwicklungs-, Test- und Integrationsumgebungen verantwortlich.
+Deine zentrale Aufgabe ist die Weiterentwicklung und Stabilisierung unserer internen Plattform- und Infrastrukturservices.
+
+RAHMEN
+
+Arbeitsort Wiesbaden, Vollzeit, unbefristet, Beginn ab sofort. Hybrid mit bis zu 60 Prozent Home Office und flexiblen Arbeitszeiten (jobleads listing of the same advert).

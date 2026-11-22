@@ -593,6 +593,7 @@ in {
         Environment = [
           "HERMES_HOME=${config.home.homeDirectory}/.hermes"
           "HERMES_SUPERVISED_CHILD=1"
+          "HERMES_CRON_TIMEOUT=600"
           "HOME=${config.home.homeDirectory}"
           "USER=${config.home.username}"
           # agy is the subagent a hermes turn shells out to. Home Manager's

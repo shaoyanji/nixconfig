@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-22T12:15:19Z",
+  "generated": "2026-11-22T12:16:35Z",
   "count": 200,
-  "pin": "bb65a790b08b55a1c29ea96e434a43ed8b8f2c0d0cfbff65a7521b080cf360ac",
+  "pin": "bc3f3724441860b0da243e2cb6e115cb609ea0d656eb1655c645cfc5f4e941a5",
   "turns": [
+    {
+      "id": "164234e0-764a-46cb-9c4f-48849ac2b556",
+      "ts": "2026-11-22T12:16:11Z",
+      "source": "devin",
+      "subject": "job-hunt:attio",
+      "action": "Attio Senior Platform Engineer (Ashby 47b583e0): same req already filled headless and blocked on reCAPTCHA at 06:47 UTC today (record attio-senior-platform-engineer). Ashby enforcing Enterprise reCAPTCHA board-wide — n8n hit identical wall. Consolidated attio row to manual with hand-submit URL; no headless re-attempt per recorded guidance + captcha policy.",
+      "outcome": "blocked: reCAPTCHA Enterprise on Ashby submit; hand-submit URL + answers staged for Matt",
+      "claims": [],
+      "files": [],
+      "base_commit": "26d9da95c08a2b0d0577b300cb4cbdf2de6010de",
+      "branch": "main",
+      "frame": "03ha7coiltfdfdh9sry281fpk"
+    },
+    {
+      "id": "00ec278c-d9d8-416e-be1e-e1ecaf578989",
+      "ts": "2026-11-22T12:15:49Z",
+      "source": "devin",
+      "subject": "job-hunt:n8n",
+      "action": "n8n Staff Platform Engineer (Ashby 24ad7d68): form fully filled incl. required essays and honest n8n-experience answer; submit hit reCAPTCHA Enterprise image challenge. Per policy not solved programmatically — record set to manual with hand-submit URL + staged answers for Matt.",
+      "outcome": "blocked: reCAPTCHA challenge requires human hand-submit",
+      "claims": [],
+      "files": [],
+      "base_commit": "26d9da95c08a2b0d0577b300cb4cbdf2de6010de",
+      "branch": "main",
+      "frame": "03ha7clycsccomzdsco5bz3vl"
+    },
+    {
+      "id": "f0ccb31f-bc39-4863-ab90-476268a1ac95",
+      "ts": "2026-11-22T12:15:33Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "landed: fau-sysadmin already carried native Typst 2pp CV + 1pp letter, dossier and sheet; CV rebalanced to a section-boundary break with fuller second page, text unchanged, 0 warnings on both sources, sheet measured hash refreshed, DB status/next action updated for the 01.12.2026 Interamt deadline | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "bd6cc53ec6716c4240734891f33aebb368fa7f87",
+      "branch": "main",
+      "frame": "03ha7cjywwrsn9w9cc1f5e0ej"
+    },
+    {
+      "id": "72fde66b-3d8c-4516-9b1c-1977f0408c5d",
+      "ts": "2026-11-22T12:15:23Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flox-security",
+      "action": "landed: native English Typst dossier for Flox security (req 37ec9578) — CV 2pp, letter 1pp, 0 warnings, prose exit 0. Retired two ad-hoc PDFs plus two .txt duplicates, reconstructed the missing JD, corrected the DB row from applied to prep (never submitted). Verified by grep that no SBOM emitter, scanner, cosign/sigstore or SLSA exists in the flake, so those are written as gaps; supply chain, hermetic builds, sops/age + SSH CA and KEV work carry the documents. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "26d9da95c08a2b0d0577b300cb4cbdf2de6010de",
+      "branch": "main",
+      "frame": "03ha7civpwa6byov5c29uctoe"
+    },
     {
       "id": "625ba851-0a0d-41fc-9101-48610673ae3f",
       "ts": "2026-11-22T12:14:09Z",
@@ -2800,58 +2854,6 @@
       "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
       "branch": "main",
       "frame": "03ha6qume46np15osag8fa21x"
-    },
-    {
-      "id": "4535852b-38a0-44fa-9cb3-46e846579874",
-      "ts": "2026-11-22T10:21:52Z",
-      "source": "devin",
-      "subject": "nixconfig:coreweave",
-      "action": "claim: Greenhouse submission 4625588006",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
-      "branch": "main",
-      "frame": "03ha6qclc145b1f71ntxtyuqh"
-    },
-    {
-      "id": "abad14ed-d70d-4ad6-95e1-d622c3c0d55c",
-      "ts": "2026-11-22T10:21:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:n8n",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "de62b1deb22675324110eefb51f73ddf83e4594e",
-      "branch": "main",
-      "frame": "03ha6qawp1oxom6070w9jcedp"
-    },
-    {
-      "id": "048f5017-79df-49fc-8838-d54caa1d9c93",
-      "ts": "2026-11-22T10:21:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:anthropic",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); fit 2 (no distributed data systems)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6dc98f45d3bdc75d653b6d553cb7ed1f1f48fec5",
-      "branch": "main",
-      "frame": "03ha6q8hof6w6flecrgxvhgyx"
-    },
-    {
-      "id": "a740fdab-aa4e-4ef6-9a1b-973ca9329065",
-      "ts": "2026-11-22T10:21:07Z",
-      "source": "devin",
-      "subject": "nixconfig:adyen-platform-observability",
-      "action": "applied: Greenhouse submission complete | confirmation page + interview tracker shown",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "435cdcbdb3b3c4af72324350d9b85e758ec99fc5",
-      "branch": "main",
-      "frame": "03ha6q7ccf36yvwfxx217nq0a"
     }
   ]
 }

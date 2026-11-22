@@ -1,0 +1,22 @@
+Senior/Staff Site Reliability Engineer — Server Infrastructure
+Nebius (Nasdaq: NBIS) · Server Infrastructure, Site Reliability Engineering
+Amsterdam · Berlin · Finland · London · Prague · Remote · Full time
+
+PROVENANCE: this folder held no job-description file. The text below is reconstructed from the retirement-time
+submission sheet (Nebius_SRE_Submission_Sheet.txt, now retired), which verified the posting on 2026-11-21:
+Greenhouse job id 5040922101, official apply page HTTP 200, posted 2026-11-18, valid through 2026-12-31.
+Official apply: https://careers.nebius.com/job?gh_jid=5040922101
+
+COMPENSATION: Nebius publishes no band. EUR 130,000 – 160,000 is the applicant's staged target, not an offer.
+
+WHAT THE POSTING ASKS FOR
+- Ownership of the server lifecycle at fleet scale: hardware arrives, is provisioned, joins the fleet, is
+  monitored, and is retired or rebuilt without hand-editing individual machines.
+- Strong Go and Linux systems work; distributed-systems failure handling; SRE principles practised at
+  senior or staff scope, including SLO ownership.
+- Declarative fleet management and automated cluster operations rather than runbooks executed by hand.
+- Comfort with GPU-dense and network-dense infrastructure, where the hardware layer has to be invisible.
+
+WHAT THE COMPANY IS
+Nebius builds AI cloud infrastructure across a European footprint: GPU capacity, networking and the services
+around them, at a scale where a single machine is unremarkable and the fleet is the unit of work.

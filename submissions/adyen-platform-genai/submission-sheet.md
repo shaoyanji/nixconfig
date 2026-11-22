@@ -2,7 +2,7 @@
 
 English packet, **office-first**. Native Typst sources; the old `packet/` directory (Nix-built PDFs plus
 `selection.json`) and `letter.json` are removed.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `adyen-platform-genai` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

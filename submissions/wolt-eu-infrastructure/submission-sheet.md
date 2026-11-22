@@ -2,7 +2,7 @@
 
 Berlin. Greenhouse req **8324647**. English packet. Native Typst sources; the directory held only `job-description.txt`, so
 nothing legacy needed removing.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `wolt-eu-infrastructure` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

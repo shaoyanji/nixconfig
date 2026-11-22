@@ -4,7 +4,7 @@ Greenhouse **5833620** · https://job-boards.greenhouse.io/canonical/jobs/583362
 A standing pipeline posting for Rust engineers at all levels (first published 2024-04-04, updated 2026-08-05): candidates are matched to a
 product team after the first round.
 
-**Applied 2026-11-21** per the apps DB (code 92730157, CV plus three Rust essays). This sheet reflects the native rebuild.
+**Applied 2026-11-21** per the apps DB (code 92730157, CV plus three Rust essays) — **rejected, email 2026-11-22** (`canonical-rust-engineering-lead-linux-and-open-source`, "not progressing"). This sheet reflects the native rebuild.
 
 Native English Typst, 2026-11-22 — Typst 0.15.1, DejaVu Sans only.
 

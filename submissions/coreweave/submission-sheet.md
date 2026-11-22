@@ -2,7 +2,7 @@
 
 Greenhouse **4625588006**, published 2025-12-12. **US-based**: Livingston NJ / New York / San Francisco / Sunnyvale /
 Bellevue / Remote-US. English packet. Native Typst sources; `selection.json` and the old Nix-built PDFs are removed.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `coreweave` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

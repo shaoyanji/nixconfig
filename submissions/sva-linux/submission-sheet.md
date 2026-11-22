@@ -1,7 +1,7 @@
 # SVA System Vertrieb Alexander — DevOps Engineer / Consultant Linux (m/w/d), j734
 
 Formular `f734`, **Geschäftsstelle Freiburg**, Schnewlinstraße 12. Native Typst-Quellen, `packet`-Symlink und
-JSON entfernt. Stand: Paket fertig, **nichts eingereicht**.
+JSON entfernt. Stand: Paket fertig, **nichts eingereicht**. **[eingereicht laut Apps-DB `sva-devops-consultant-linux` — Stand dieses Blatts liegt vor der Einreichung]**
 
 | Feld | Wert |
 | :--- | :--- |

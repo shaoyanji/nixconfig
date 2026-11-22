@@ -1,6 +1,6 @@
 # Catapult Sports — Senior DevOps Engineer
 
-Arbeitnow listing `457952`, fetched 2026-11-22. Packet built the same day, **nothing submitted**.
+Arbeitnow listing `457952`, fetched 2026-11-22. Packet built the same day, **nothing submitted**. **[applied per apps DB `catapult-sports-senior-devops` — this sheet's status predates submission]**
 Unlike the other packets, this one is hand-authored Typst (`lebenslauf.typ`, `anschreiben.typ`), not the
 JSON builder: the brief asked for compilable sources beside the PDFs.
 

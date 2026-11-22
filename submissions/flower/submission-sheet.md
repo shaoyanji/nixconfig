@@ -3,7 +3,7 @@
 Remote, based in Germany. Teamtailor **8532038**, reports to the Head of Asset Management in Stockholm. English packet;
 the posting asks for the CV in English. Native Typst sources; the legacy `Flower_*.pdf/.txt`, `Matt_Ji_Resume_Flower.pdf`
 and `selection.json` are removed.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `flower` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

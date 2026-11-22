@@ -2,7 +2,7 @@
 
 English packet. Greenhouse req **8432987002**. Native Typst sources; the legacy read-only `lebenslauf.pdf`,
 `anschreiben.pdf`, `packet` symlink into `/nix/store`, `letter.json` and `resume.json` are removed.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `flix-devops-cloud-infrastructure` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

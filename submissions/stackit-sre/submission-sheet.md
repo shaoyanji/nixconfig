@@ -1,7 +1,7 @@
 # STACKIT / Schwarz Digits — (Senior) Site Reliability Engineer, STACKIT Control Plane (m/f/d)
 
 Req **GT2321**, Bad Friedrichshall (Baden-Württemberg), hybrid. English dossier. Native Typst sources.
-Stand: packet built, **nothing submitted**.
+Stand: packet built, **nothing submitted**. **[applied per apps DB `stackit-schwarz-digits-senior-sre-control-plane` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

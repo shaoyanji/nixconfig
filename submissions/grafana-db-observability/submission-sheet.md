@@ -2,7 +2,7 @@
 
 Germany, fully remote. Greenhouse req **6250631004**. English packet. Native Typst sources; the directory held only
 `job-description.txt` until this packet.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `grafana-db-observability` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

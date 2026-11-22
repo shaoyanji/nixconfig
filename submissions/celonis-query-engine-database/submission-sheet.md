@@ -1,7 +1,7 @@
 # Celonis — Senior Software Engineer, Query Engine & Database Systems
 
 Munich, Germany. Greenhouse req **7980155003**. English packet. Native Typst sources; scout staged `job-description.txt`.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `celonis-query-engine-database` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

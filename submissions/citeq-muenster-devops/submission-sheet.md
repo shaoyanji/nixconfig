@@ -1,7 +1,7 @@
 # citeq — DevOps Engineer (m/w/d), IT-Dienstleister der Stadt Münster
 
 Interamt `1510832`, Ausschreibungsnummer **22-029/26**. Native Typst-Quellen, `packet`-Symlink entfernt.
-Stand: Paket fertig, **nichts eingereicht**.
+Stand: Paket fertig, **nichts eingereicht**. **[eingereicht laut Apps-DB `citeq-muenster-devops` — Stand dieses Blatts liegt vor der Einreichung]**
 
 | Feld | Wert |
 | :--- | :--- |

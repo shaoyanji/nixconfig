@@ -1,7 +1,7 @@
 # DFS Deutsche Flugsicherung — Ingenieur Site Reliability (m/w/d)
 
 BA-Referenz `17761-1172604-2-S`, DFS-Referenz **J000000038**, Am DFS Campus 1, 63225 Langen.
-Native Typst-Quellen, `packet`-Symlink entfernt. Stand: Paket fertig, **nichts eingereicht**.
+Native Typst-Quellen, `packet`-Symlink entfernt. Stand: Paket fertig, **nichts eingereicht**. **[eingereicht laut Apps-DB `dfs-sre` — Stand dieses Blatts liegt vor der Einreichung]**
 
 | Feld | Wert |
 | :--- | :--- |

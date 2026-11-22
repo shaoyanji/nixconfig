@@ -1,7 +1,7 @@
 # STACKIT / Schwarz Digits — DevOps / Cloud Engineer (m/w/d), Kubernetes & Infrastructure as Code
 
 Requisition **GT4627**, Am Campus 1, 74177 Bad Friedrichshall. Native Typst-Quellen, `packet`-Symlink und JSON
-entfernt. Stand: Paket gebaut und geprüft, **nichts eingereicht**.
+entfernt. Stand: Paket gebaut und geprüft, **nichts eingereicht**. **[eingereicht laut Apps-DB `stackit-iac` — Stand dieses Blatts liegt vor der Einreichung]**
 
 | Feld | Wert |
 | :--- | :--- |

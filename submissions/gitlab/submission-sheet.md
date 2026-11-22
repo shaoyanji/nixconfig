@@ -1,7 +1,7 @@
 # GitLab — Senior Staff SRE, Architecture Engineering: Hosted Runners
 
 Remote (US / Canada / UK). English packet. Native Typst sources; `selection.json` and the old Nix-built PDFs are removed.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `gitlab` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

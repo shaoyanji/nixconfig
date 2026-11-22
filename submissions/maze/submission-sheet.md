@@ -1,6 +1,6 @@
 # Maze — Senior Site Reliability Engineer | SRE (Remote, EU/CET)
 
-**Status: packet built, NOT submitted.** 2026-11-22. Nothing sent, no account created,
+**Status: packet built, NOT submitted.** **[applied per apps DB `maze-senior-sre` (Ashby ack mail 311044) — this sheet's status predates submission]** 2026-11-22. Nothing sent, no account created,
 no form opened.
 
 The pipeline record said "Packet ready — CV and letter compiled 2026-11-21" with

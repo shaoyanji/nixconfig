@@ -1,7 +1,7 @@
 # Grafana Labs — Senior Full Stack Engineer, Databases - Analytics
 
 Germany Remote. Greenhouse req **6200027004**. English packet. Native Typst sources; scout staged `job-description.txt`.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `grafana-db-analytics` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

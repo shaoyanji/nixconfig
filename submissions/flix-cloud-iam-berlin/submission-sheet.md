@@ -2,7 +2,7 @@
 
 Berlin, office-first hybrid. Greenhouse req **8836372002**. English packet. Native Typst sources; the directory held only
 `job-description.txt`.
-Status: compiled and checked, **nothing submitted**.
+Status: compiled and checked, **nothing submitted**. **[applied per apps DB `flix-cloud-iam-berlin` — this sheet's status predates submission]**
 
 | Field | Value |
 | :--- | :--- |

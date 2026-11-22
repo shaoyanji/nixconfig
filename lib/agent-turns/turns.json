@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-22T11:55:10Z",
+  "generated": "2026-11-22T11:57:04Z",
   "count": 200,
-  "pin": "741eb3290bf9a5dfe637ab706811ad795da165c326d232920cc5555da53b9d1b",
+  "pin": "72c5f92c432f5e7d3c9e015bceec9e82006c254014c35358f8f31c33e94cd998",
   "turns": [
+    {
+      "id": "d4599ca3-2073-4c95-892d-970a0faf4691",
+      "ts": "2026-11-22T11:56:53Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-observability",
+      "action": "landed: telekom-sre-observability already carried native Typst (no letter.json, 2pp CV + 1pp letter); fixed a broken weil-clause in the letter (verb-second -> verb-final), recompiled, refreshed the sheet's measured hash; page counts and CV unchanged | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "026d6aed8c58616f6cdfb79c64591ec81d9f8ecb",
+      "branch": "main",
+      "frame": "03ha78wpmnet0tw90rnn1dngj"
+    },
+    {
+      "id": "f3b72c76-e7d6-40b5-aae3-28ae4d2a1898",
+      "ts": "2026-11-22T11:56:20Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building biz-factory (pane 1), driving enpal ashby (pane 2), building telekom-sre-observability (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/biz-factory",
+        "submissions/enpal",
+        "submissions/telekom-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "f8d59d191fd65fac109b6388f352551d39d2726a",
+      "branch": "main",
+      "frame": "03ha78sylfhrp5qya518qa437"
+    },
+    {
+      "id": "2692abd8-682b-4356-8ba8-6b88d06e9cf3",
+      "ts": "2026-11-22T11:55:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:gocardless-db",
+      "action": "landed: native English Typst dossier for Senior SRE (Database Focus) — CV 2pp/1212w, letter 1pp/480w, 0 warnings; restored the PostgreSQL project the Nix projection had dropped, removed the fabricated stack, retired packet/ + letter.json | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f8d59d191fd65fac109b6388f352551d39d2726a",
+      "branch": "main",
+      "frame": "03ha78lq7qpcbm5w3pnp9aa35"
+    },
     {
       "id": "c791c8e3-9a44-4fdf-99cf-27cda277ae02",
       "ts": "2026-11-22T11:55:01Z",
@@ -2785,45 +2830,6 @@
       "base_commit": "97b2a43f6b7149c81be0993904ced67a39cbe076",
       "branch": "main",
       "frame": "03ha6lwnkwvll23k257t6vcx9"
-    },
-    {
-      "id": "84bb32ac-cbb4-487f-83eb-b196777c956f",
-      "ts": "2026-11-22T09:58:49Z",
-      "source": "freebuff",
-      "subject": "nixconfig:sourcegraph",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97b2a43f6b7149c81be0993904ced67a39cbe076",
-      "branch": "main",
-      "frame": "03ha6luhy9k1ujhwdtmg7c60d"
-    },
-    {
-      "id": "179a65d3-2611-449d-ad75-3d39fb760b6f",
-      "ts": "2026-11-22T09:58:36Z",
-      "source": "freebuff",
-      "subject": "nixconfig:attio",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d555808ffe2fd77c4d51201a807c33e3d354f118",
-      "branch": "main",
-      "frame": "03ha6lsyw8545xi1trgsp9a3p"
-    },
-    {
-      "id": "179d6828-d866-4d11-9551-c06c06b1e94c",
-      "ts": "2026-11-22T09:58:08Z",
-      "source": "devin",
-      "subject": "nixconfig:citeq-muenster-devops",
-      "action": "submitted: citeq Münster via Interamt→gute-einstellung portal | 'erfolgreich übermittelt' confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9bf9242187413104fcf2f7f7b9a5dd08cd3525e2",
-      "branch": "main",
-      "frame": "03ha6lpmikkdpys5bee41y5k8"
     }
   ]
 }

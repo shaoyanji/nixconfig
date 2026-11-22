@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-22T08:28:35Z",
+  "generated": "2026-11-22T08:31:49Z",
   "count": 200,
-  "pin": "d95c09d4c84f11bca8ada09015bb8b4fabd705feac72c7bb57d884ec254d6fcc",
+  "pin": "e5b09ede8d95d71147727a4f34222e4c1b38147bd8ce1442cb143a9e5a86798b",
   "turns": [
+    {
+      "id": "c0959ff0-348c-4ae5-9a56-1b84429d637f",
+      "ts": "2026-11-22T08:30:54Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: nebius SRE data platform (GH embed 5040676101); fifth nebius req",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/nebius-data-platform"
+      ],
+      "files": [],
+      "base_commit": "f6e72441c0ec5ed2ad7d979be56ed86a35dc8a2d",
+      "branch": "main",
+      "frame": "03ha64o7b7cahuq9re6y73hia"
+    },
+    {
+      "id": "31e0d6bb-27a8-45e3-94c0-21f8b0255ac6",
+      "ts": "2026-11-22T08:29:31Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: fraunhofer-darmstadt-network packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/fraunhofer-darmstadt-network"
+      ],
+      "files": [],
+      "base_commit": "811dae20af866e1617acae634c9e1d48989056e1",
+      "branch": "main",
+      "frame": "03ha64efr9wlsjo2eoxzyca6f"
+    },
+    {
+      "id": "b674e5b6-be8c-46df-a8ff-4f805c84f479",
+      "ts": "2026-11-22T08:29:14Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: nebius-senior-site-reliability-engineer-sre-compute-node-team submitted via Greenhouse embed 4766627101 | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f6e72441c0ec5ed2ad7d979be56ed86a35dc8a2d",
+      "branch": "main",
+      "frame": "03ha64cfwt4pd8mo2as9er24r"
+    },
+    {
+      "id": "878ca5c8-8f07-4d9f-8cb1-b818998be5ef",
+      "ts": "2026-11-22T08:28:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: bundesdruckerei-sre packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f6e72441c0ec5ed2ad7d979be56ed86a35dc8a2d",
+      "branch": "main",
+      "frame": "03ha6487vrra2wetwkx5vfsty"
+    },
     {
       "id": "3fa5dc9e-28a7-43b4-9614-45e21219ebaf",
       "ts": "2026-11-22T08:27:50Z",
@@ -2728,64 +2784,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha1fee1gs4jrkir4qo6t1o0"
-    },
-    {
-      "id": "2a43ff71-5964-4687-b4ea-e41bc91a63a1",
-      "ts": "2026-11-21T17:44:44Z",
-      "source": "coordinator",
-      "subject": "nixconfig:job-search-fleet",
-      "action": "75 applied | 19 leads | Devin submitting Canonical Arch on GH | Pane 1 staging Canonical Kernel | Pane 3 staging Enpal Solar",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/canonical-arch",
-        "submissions/canonical-kernel",
-        "submissions/enpal"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha1bkcjbopxujxmts00y0nt"
-    },
-    {
-      "id": "3a8c7ec3-cd94-4396-aa3f-50e6cc06afe3",
-      "ts": "2026-11-21T17:12:11Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "done: +5 verified applications (Flox Security, Flox Packaging, Nebius SRE, Obsidian FSE, Kraken DevOps) + VirtusLab marked Manual review (Turnstile/Recruitee bot wall). Total applied=68. Gates: Ashby success banners x3, Greenhouse email-code confirm, Obsidian confirm banner",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha157f58eqfcl4h3bvr4isw"
-    },
-    {
-      "id": "5d16a320-ead6-4350-a4f4-c5b6ec8d6e53",
-      "ts": "2026-11-21T17:09:16Z",
-      "source": "antigravity",
-      "subject": "nixconfig:apps-pipeline",
-      "action": "submitted: Nebius Senior/Staff SRE via Greenhouse (verified with 2FA code 52595541) | total applied: 66 | dispatched: Pane 1 -> BWI GmbH, Pane 3 -> Biz Factory GmbH",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha14mv1x9gsjcgobxhdfhpe"
-    },
-    {
-      "id": "d8ba1aa8-5792-48b6-aa0d-664200f1a047",
-      "ts": "2026-11-21T17:03:21Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "orchestrating: Flox Packaging landed (applied); Canonical & Langdock & Flox MTS fully staged; Devin filling Nebius Greenhouse form; Pane 1 drafting Nix consultancy outreach; Pane 3 staging NavVis Munich",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha13ha94lrr37pbp434ah73"
     }
   ]
 }

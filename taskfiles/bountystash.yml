@@ -214,7 +214,7 @@ tasks:
       built artifact, so the live site is proven to be this tree's output rather
       than merely a 200.
 
-      Exit 0 = 12 ok, 0 failed. The skill page
+      Exit 0 = 13 ok, 0 failed. The skill page
       `.agents/skills/agent-browser/SKILL.md` records why the naive version of
       this check times out; `docs/cv-ats-compliance.md` records the link gate.
     cmds:

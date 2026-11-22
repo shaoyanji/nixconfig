@@ -35,6 +35,30 @@ no schedule writes it.
 | `glossary.json` | German job-ad words mapped onto the English ones the corpus uses |
 | `templates/` | two templates, localized through `strings.json`, no personal data |
 
+## Stages and statuses
+
+`stage` is a column, but the API re-derives it from `status` on every write
+(`stage_of` in `sync.py`, mirrored in `scripts/task/apps-db.sh`). The status is the
+record's own words; the stage is the bucket. That makes the wording load-bearing:
+
+| The status starts with | The stage becomes |
+| :--- | :--- |
+| `Applied`, `Application Received` | `applied` |
+| `Rejected` | `rejected` |
+| `Interview` (or `trial`, `Warteliste`) | `interview` |
+| `Screening` (or `follow-up required`) | `screening` |
+| `Manual` | `manual` |
+| `Contacted` | `contacted` |
+| anything containing `draft`, `packet` or `jd` | `prep` |
+| anything else | `other` |
+
+Two consequences before editing a row. A status that is only the stage word
+(`applied`, `Applied`) leaves the next edit nothing to hold on to, and a status
+that mentions a later stage outranks its own bucket — "no interview yet" lands in
+`interview`, which is how one row sat in that queue for a morning. `task
+checks:appflow` refuses both a bare status and an active row whose role is still
+the `undiscovered` placeholder the discover rule writes.
+
 ## Removal
 
 Delete `services.appflowPlugin.enable` from the host and this directory stops being
@@ -202,7 +226,7 @@ task agents:apps:import FILE=<applications.json>   # one-off import + link (FILE
 task agents:apps:packet ID=<application>           # build a packet through nix
 task agents:apps:packet EXAMPLE=1                  # fictional data, proves the toolchain
 task agents:apps:select JD=<file>                  # the projection alone, no PDF
-task checks:appflow                                 # the selector's fixture
+task checks:appflow                                 # selector, status and hygiene fixtures
 task checks:appflow:triage                          # the mail-to-status rules
 task apps:docs:import [DIR=~/.config/appflow/jd]       # the JD text into the database
   task apps:docs                                        # what text exists, no bodies

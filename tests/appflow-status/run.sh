@@ -34,9 +34,11 @@ done
 EXPECTED=(
   "a described pipeline passes"
   "a status that repeats its stage fails"
+  "an active row with no role fails"
   "a status differing only in case fails"
   "an empty status fails"
   "a placeholder status fails"
+  "an inactive row with no role passes"
   "a dead prep row still fails"
   "a shared active mail still fails"
   "a vacuous pipeline is refused"
@@ -74,6 +76,11 @@ row() { # id stage status
     '[{id: $id, company: "Acme", role: "SRE", stage: $stage, status: $status}]'
 }
 
+role_row() { # id stage role status
+  jq -nc --arg id "$1" --arg stage "$2" --arg role "$3" --arg status "$4" \
+    '[{id: $id, company: "Acme", role: $role, stage: $stage, status: $status}]'
+}
+
 # --- the rule ------------------------------------------------------------
 case_run "a described pipeline passes" 0 \
   "$(row ok-row applied "Applied 2026-11-22 — 1 mail linked")" \
@@ -94,6 +101,14 @@ case_run "an empty status fails" 1 \
 case_run "a placeholder status fails" 1 \
   "$(row unknown-row other "unknown")" \
   '[]' "unknown-row"
+
+case_run "an active row with no role fails" 1 \
+  "$(role_row unnamed-row applied undiscovered "Applied 2026-11-22 — 1 mail linked")" \
+  '[]' "unnamed-row"
+
+case_run "an inactive row with no role passes" 0 \
+  "$(role_row stub-row other undiscovered "Duplicate of something")" \
+  '[]' "every active application names a role"
 
 # --- the rules that were already there, through the same feed ------------
 case_run "a dead prep row still fails" 1 \

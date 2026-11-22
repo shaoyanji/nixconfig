@@ -782,8 +782,9 @@ tasks:
       that are both still moving — the shape a `discovered-*` twin takes when its
       company string differs from its canonical row and the pair rule cannot see
       it. A status that only repeats its stage, is empty, or is a placeholder
-      fails as well, and tests/appflow-status proves each rule can fail offline by
-      feeding the gate two files. Offline fixtures ~2 s, hygiene ~3 s.
+      fails as well, as does an active row whose role is still the
+      `undiscovered` placeholder. tests/appflow-status proves each rule can fail
+      offline by feeding the gate two files. Offline fixtures ~2 s, hygiene ~3 s.
     cmds:
       - bash tests/appflow-select/run.sh
       - bash tests/appflow-status/run.sh

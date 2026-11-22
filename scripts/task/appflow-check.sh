@@ -60,9 +60,18 @@ report=$(jq -r '
   def bare: ((.stage // "") as $st
     | ((.status // "") | ascii_downcase | gsub("^\\s+|\\s+$"; "")) as $s
     | ($s == "" or $s == $st or $s == "unknown" or $s == "n/a" or $s == "-"));
+  # An active row whose role is still the placeholder the discover rule writes
+  # has no requisition to work against: the sync skips such a row by design
+  # (`ambiguous-undiscovered`), so the only thing that moves it is a person
+  # naming the role. Name it here instead of letting it sit at applied.
+  def unnamed: ((.stage // "") as $st
+    | ((.role // "") | ascii_downcase) as $r
+    | (($st == "prep" or $st == "applied" or $st == "screening" or $st == "interview"
+        or $st == "manual" or $st == "contacted") and $r == "undiscovered"));
   . as $rows
   | ([$rows[] | select((.stage // "") == "prep") | select(dead)]) as $deadprep
   | ([$rows[] | select(bare)]) as $bare
+  | ([$rows[] | select(unnamed)]) as $unnamed
   | ([$rows | group_by([.company, .role])[]
       | select(length > 1)
       | select(all(.[]; declared | not))]) as $pairs
@@ -72,9 +81,11 @@ report=$(jq -r '
       "pairs=\($pairs | length)",
       "deadprep=\($deadprep | length)",
       "bare=\($bare | length)",
+      "unnamed=\($unnamed | length)",
       ($pairs[] | "PAIR \(.[0].company) · \(.[0].role) (\(length) rows: \([.[].id] | join(", ")))"),
       ($deadprep[] | "DEAD \(.id) — \((.status // "")[0:72])"),
-      ($bare[] | "BARE \(.id) — stage=\(.stage) status=\((.status // "(empty)")[0:56])")
+      ($bare[] | "BARE \(.id) — stage=\(.stage) status=\((.status // "(empty)")[0:56])"),
+      ($unnamed[] | "UNNAMED \(.id) — stage=\(.stage) role=\(.role)")
     ] | .[]
 ' <<<"$body")
 
@@ -83,6 +94,7 @@ prep=$(sed -n 's/^prep=//p' <<<"$report")
 pairs=$(sed -n 's/^pairs=//p' <<<"$report")
 deadprep=$(sed -n 's/^deadprep=//p' <<<"$report")
 bare=$(sed -n 's/^bare=//p' <<<"$report")
+unnamed=$(sed -n 's/^unnamed=//p' <<<"$report")
 
 # One mail, two applications, both still moving: a twin that never declared
 # itself, which is how `discovered-materna` sat at `screening` beside its
@@ -144,6 +156,14 @@ else
   fail=1
 fi
 
+if [ "$unnamed" -eq 0 ]; then
+  echo "ok   every active application names a role"
+else
+  echo "FAIL $unnamed active application(s) whose role is still the undiscovered placeholder:" >&2
+  sed -n 's/^UNNAMED //p' <<<"$report" | sed 's/^/       /' >&2
+  fail=1
+fi
+
 if [ "$shared" -eq 0 ]; then
   echo "ok   no mail linked to two applications that are both still moving"
 else
@@ -156,4 +176,4 @@ if [ "$fail" -ne 0 ]; then
   echo "FAIL: tracker hygiene — close, dedupe or relink the rows above (task agents:apps:set)." >&2
   exit 1
 fi
-echo "PASS: no duplicate noise, no dead prep row, no bare status, no shared active mail."
+echo "PASS: no duplicate noise, no dead prep row, no bare status, no unnamed role, no shared active mail."

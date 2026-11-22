@@ -56,7 +56,7 @@ The brief specified 4. Two is what the advert supports.
 
 Two independent filters sit in front of the technical overlap: a mandatory language the candidate does not speak, and a profession — pre-sales with a quota — that the record does not contain. Designing a storage architecture for a strategic account is adjacent to operating storage, but the job also requires winning the account.
 
-Two means: the substrate knowledge is real, and there is no path through screening without a waiver.
+Two means: the technical knowledge is real, and there is no path through screening without a waiver.
 
 ## Open items
 

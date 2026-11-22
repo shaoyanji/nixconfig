@@ -58,7 +58,7 @@ Auf der Werkzeugachse ist es eine Drei: Kubernetes, Terraform, ArgoCD, GitLab CI
 
 | Datei | Inhalt |
 | :--- | :--- |
-| `job-description.txt` | Anzeigentext mit Stack, Standort und Kennziffer. |
+| `job-description.txt` | Anzeigentext mit Stack, Standort und Kennziffer; Quelle ist eine indexierte Fassung, weil die Originalseiten 404 liefern. |
 | `lead.md` | Fit, Lücken, Weg, Gehalt. |
 | `lebenslauf.typ` | Typst-Quelle, eigenständig kompilierbar. |
 | `anschreiben.typ` | Typst-Quelle, eigenständig kompilierbar. |

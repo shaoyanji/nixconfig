@@ -1,0 +1,24 @@
+Site Reliability Engineer (f/m/d)
+IONOS SE — Application Hosting Team
+Standort: Hinterm Hauptbahnhof 3-5, 76137 Karlsruhe | Vollzeit | Professionals | Kennziffer 1585
+Modell: hybrides Arbeiten, Vertrauensarbeitszeit
+Quelle: indexierte Fassung der Anzeige (ionos-group.com / jobs.ionos.de / Jobboerse-Snippets); Originalseiten am 22.11.2026 HTTP 404
+Bewerbung: https://job-boards.eu.greenhouse.io/ionos/jobs/4956674101
+
+Application Hosting Team — Managed Nextcloud, Nextcloud Workspace, IONOS GPT sowie weitere Web Services auf der Kubernetes-Plattform.
+
+Aufgabenbereich
+
+- Weiterentwicklung der Infrastruktur/Plattform der Produkte sowie Integration neuer Produkte und Webdienste in die Kubernetes- und Cloud-Infrastruktur.
+- Verantwortung für den stabilen und sicheren Betrieb der Produktplattform; tiefgreifende Analysen und Optimierung der primaer containerisierten und Kubernetes-basierten Applikationsinfrastruktur.
+- Automatisierung mit Terraform, GitLab CI/CD und ArgoCD; die gesamte Infrastruktur wird deklarativ und reproduzierbar bereitgestellt.
+- Analyse und Loesung komplexer Probleme in einer verteilten Systemlandschaft, kontinuierliche Verbesserung der Plattform.
+- Entwicklung und Pflege von Monitoring, Logging und Alerting (Prometheus, Grafana, ELK-Stack).
+
+Rahmen
+
+- Standort Karlsruhe, Hinterm Hauptbahnhof 3-5, 76137 Karlsruhe; Vollzeit; Professionals; Kennziffer 1585.
+- Hybrides Arbeitsmodell, Vertrauensarbeitszeit.
+- Arbeitgeber: IONOS SE, europaeischer Anbieter von Cloud-Infrastruktur, Cloud-Services und Hosting, ueber 6,2 Mio. Kunden.
+
+[Auszug] Die Originalanzeige war am 22.11.2026 auf ionos-group.com und jobs.ionos.de nicht mehr abrufbar (HTTP 404); die Jobboerse-API lieferte fuer 10001-1003577914-S ebenfalls 404. Der Text oben stammt aus den indexierten Fassungen der Anzeige und ist vor dem Absenden am Greenhouse-Formular zu pruefen.

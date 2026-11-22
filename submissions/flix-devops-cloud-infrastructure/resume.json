@@ -1,0 +1,358 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Matt Ji",
+    "label": "Systems & Infrastructure Engineer",
+    "url": "https://www.bountystash.com",
+    "summary": "Engineer and risk analyst, ten years where operations meets software. I run a thirteen-host fleet from one declaration and I know what it is doing without opening a shell: a sentinel writes job status, generation age, disk pressure and PSI into a ledger every fifteen minutes and pages me on any state that is not ok. Machines arrive over the network, join the declaration and rebuild from it. Go and Python services, PostgreSQL, secrets and certificates, and a rollback that is a pointer.",
+    "email": "matt@bountystash.com",
+    "location": {
+      "address": "Am Burgerhof 4",
+      "postalCode": "BW 79261",
+      "city": "Gutach im Breisgau",
+      "region": "Baden-Wuerttemberg",
+      "countryCode": "DE"
+    },
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "shaoyanji",
+        "url": "https://github.com/shaoyanji"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "mattji",
+        "url": "https://linkedin.com/in/mattji"
+      },
+      {
+        "network": "XING",
+        "username": "Shaoyan_Ji",
+        "url": "https://xing.com/profile/Shaoyan_Ji"
+      }
+    ],
+    "image": "https://res.cloudinary.com/de1eajx01/image/upload/v1765739348/lu7yx5irrcpfmisnhfzi.svg",
+    "signature": "https://res.cloudinary.com/de1eajx01/image/upload/v1765739484/qa7exxxy8xvzzkmjgyxn.png"
+  },
+  "work": [
+    {
+      "name": "Bountystash",
+      "position": "Founder",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-19",
+      "highlights": [
+        "Built telemetry ingestion for a mixed fleet: a sentinel collects job status, generation age, disk pressure and PSI from thirteen hosts every fifteen minutes, writes it to a ledger and raises a page on any state that is not ok — the system tells me before a user does.",
+        "Provisioned machines as a repeatable path rather than a ritual: PXE and iVentoy netboot, an image library, first-boot configuration and a rebuild that returns a host to the declared state.",
+        "Ran the fleet from one declaration — wanted state in the repository, each machine pulls it, nothing hand-edited on the target — with a gate in CI and on the host in front of every change.",
+        "Managed secrets and certificates for remote hosts: SOPS/age per host, an in-house certificate authority with short-lived certificates, and nftables default-deny on every interface.",
+        "Administered Linux below the application: systemd units with per-slice memory limits, cgroups, PSI as the saturation signal, and DNS, MTU or TLS faults diagnosed with tcpdump and openssl.",
+        "Built Go and Python services with PostgreSQL behind them, including an append-only event log, a REST interface and a terminal UI in one binary.",
+        "Treated a release as one step — build, gate, activate — with rollback as a pointer to the previous generation rather than a restore procedure.",
+        "Documented the platform so another engineer can operate it: host dossiers, runbooks and decision notes live beside the code that implements them.",
+        "Developed an options and hedging algorithm for weather derivatives and advised clients as internal risk manager for a large German energy trader.",
+        "Reviewed bug bounty programmes."
+      ]
+    },
+    {
+      "name": "O3 Energy",
+      "position": "Asset Manager",
+      "startDate": "2016-08-01",
+      "endDate": "2020-06-01",
+      "highlights": [
+        "Documented and maintained software and IT administration for the company and its subsidiaries, including workstations, network and Wi-Fi.",
+        "Supported users directly: field technicians and office staff, with training instead of ticket forwarding.",
+        "Built financial models and managed 10 MW of solar PV assets.",
+        "Led asset management of a portfolio above $100M.",
+        "Analysed the company's liability exposure and built the internal risk management function."
+      ]
+    },
+    {
+      "name": "Smart Energy 360",
+      "position": "Director of Sustainability",
+      "startDate": "2015-08-01",
+      "endDate": "2016-08-01",
+      "highlights": [
+        "Managed a project pipeline above $100M.",
+        "Owned customer service and client relationships.",
+        "Advised clients on cybersecurity software and risk management."
+      ]
+    },
+    {
+      "name": "Fraunhofer ISE",
+      "position": "Research Assistant",
+      "startDate": "2012-03-01",
+      "endDate": "2012-09-01",
+      "highlights": [
+        "Researched heliostat inaccuracies with interferometry.",
+        "Wrote C++ application software to drive laboratory instruments.",
+        "Wrote Python tools for analysis and 3D geometry."
+      ]
+    },
+    {
+      "name": "Halliburton",
+      "position": "Associate Technical Professional",
+      "startDate": "2010-06-01",
+      "endDate": "2011-09-01",
+      "highlights": [
+        "Fixed chemical and equipment faults on site.",
+        "Led two frac crews with more than $3M of contract volume per week.",
+        "Led the crew's safety training."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Albert-Ludwigs-Universität Freiburg",
+      "url": "https://rem.zee-uni-freiburg.de/",
+      "area": "Renewable Energy Management",
+      "studyType": "Master of Science",
+      "startDate": "2011-11-01",
+      "endDate": "2014-02-01",
+      "score": "1.8/5.0",
+      "courses": [
+        "Intermittent renewables and weather patterns, analysed with artificial neural networks"
+      ]
+    },
+    {
+      "institution": "Colorado School of Mines",
+      "url": "https://mines.edu/",
+      "area": "Petroleum Engineering",
+      "studyType": "Bachelor of Science",
+      "startDate": "2006-08-01",
+      "endDate": "2010-05-15",
+      "score": "3.2 GPA",
+      "courses": [
+        "McBride Honors Program in Public Policy",
+        "Economics"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "nixconfig",
+      "resumeName": "nixconfig",
+      "description": "One flake declares thirteen NixOS hosts, a provisioning path over PXE, an SSH certificate authority, SOPS-encrypted secrets, node_exporter on a fleet host and a taskfile as the operator interface. CI runs the same module gate the machines run.",
+      "url": "https://github.com/shaoyanji/nixconfig",
+      "startDate": "2023-01-01",
+      "endDate": "",
+      "type": "open source",
+      "highlights": [],
+      "keywords": [
+        "Nix",
+        "NixOS",
+        "systemd",
+        "netboot",
+        "SOPS",
+        "PSI"
+      ]
+    },
+    {
+      "name": "bountystash",
+      "resumeName": "bountystash",
+      "description": "A Go service that turns a request into an immutable, content-addressed specification. Append-only events, a terminal UI and curl endpoints ship in one binary.",
+      "url": "https://github.com/shaoyanji/bountystash",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-01",
+      "type": "product",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "event log",
+        "PostgreSQL",
+        "REST"
+      ]
+    },
+    {
+      "name": "kev-time",
+      "resumeName": "kev-time",
+      "description": "CISA's Known Exploited Vulnerabilities catalogue as a time series in plain SVG, legible before a report exists and loadable on a phone during an incident.",
+      "url": "https://jisifu.serv00.net/kev-time/",
+      "startDate": "2026-02-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "data visualisation"
+      ]
+    },
+    {
+      "name": "kelly-svg",
+      "resumeName": "kelly-svg",
+      "description": "KEV entries grouped into effort clusters with exposure per cluster, so patch order follows effort and reach instead of catalogue order.",
+      "url": "https://jisifu.serv00.net/kelly-svg/",
+      "startDate": "2026-03-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "risk"
+      ]
+    },
+    {
+      "name": "Risk Calculation Engine (Swirl Engine)",
+      "resumeName": "Risk Calculation Engine (Swirl Engine)",
+      "description": "Green's theorem on stochastic polygons: a Go fuzzer generates shapes, a Nushell and Awk pipeline drives the computation, and a Nix environment pins the tools.",
+      "url": "https://github.com/shaoyanji/risk-calc",
+      "startDate": "2026-03-15",
+      "endDate": "2026-03-18",
+      "type": "open_source",
+      "roles": [
+        "Lead Developer",
+        "Researcher"
+      ],
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Nushell",
+        "Awk",
+        "NixOS"
+      ]
+    },
+    {
+      "name": "fibtransponder",
+      "resumeName": "fibtransponder",
+      "description": "A Fibonacci-radix state machine that processes a bit stream with bounded work per step. A corpus benchmark falsified the first detector design.",
+      "url": "https://github.com/shaoyanji/fibtransponder",
+      "startDate": "2026-01-01",
+      "endDate": "2026-06-01",
+      "type": "research",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "streaming",
+        "benchmarks"
+      ]
+    },
+    {
+      "name": "Master's Thesis: Weather and Volatility",
+      "resumeName": "Master's Thesis",
+      "description": "A method for time cross-correlation of wind speed plus neural networks on long-term weather data, to quantify the volatility of solar and wind assets on the grid.",
+      "url": "https://www.academia.edu/6762743/A_Study_on_Energy_Intermittency_Reduction_Strategies_with_Emphasis_on_Weather_Pattern_Prediction",
+      "startDate": "2013-08-01",
+      "endDate": "2014-02-24",
+      "type": "thesis",
+      "entity": "Meteorological Institute Freiburg",
+      "roles": [
+        "Student"
+      ],
+      "highlights": [],
+      "keywords": [
+        "neural networks",
+        "fractal geometry"
+      ]
+    },
+    {
+      "name": "Vulnerability operations concept",
+      "resumeName": "Vulnerability operations concept",
+      "description": "A sample vulnerability programme built from KEV data: exposure table, effort clusters, a 90-day method and a service model.",
+      "url": "https://concept.bountystash.com/",
+      "startDate": "2026-11-01",
+      "endDate": "",
+      "type": "concept",
+      "highlights": [],
+      "keywords": [
+        "KEV",
+        "programme design",
+        "HTML"
+      ]
+    },
+    {
+      "name": "matt.bountystash.com",
+      "resumeName": "matt.bountystash.com",
+      "description": "This site. Two languages from one template, a stylesheet with light and dark schemes, and a CV built from the same JSON data.",
+      "url": "https://matt.bountystash.com",
+      "startDate": "2026-11-01",
+      "endDate": "",
+      "type": "site",
+      "highlights": [],
+      "keywords": [
+        "Nix",
+        "HTML",
+        "Typst"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "Telemetry & alerting",
+      "keywords": [
+        "fleet telemetry",
+        "ledger ingestion",
+        "alerting on state",
+        "health checks",
+        "generation age"
+      ]
+    },
+    {
+      "name": "Fleet operations",
+      "keywords": [
+        "PXE/iVentoy provisioning",
+        "first-boot join",
+        "declarative hosts",
+        "rebuild",
+        "rollback"
+      ]
+    },
+    {
+      "name": "Linux",
+      "keywords": [
+        "systemd",
+        "cgroups",
+        "PSI",
+        "nftables",
+        "tcpdump",
+        "TLS diagnosis"
+      ]
+    },
+    {
+      "name": "Infrastructure as code",
+      "keywords": [
+        "NixOS flakes",
+        "pinned inputs",
+        "declarative secrets",
+        "gates in CI and on the host"
+      ]
+    },
+    {
+      "name": "Security",
+      "keywords": [
+        "SOPS/age",
+        "SSH CA",
+        "short-lived certificates",
+        "default-deny",
+        "vulnerability management"
+      ]
+    },
+    {
+      "name": "Languages",
+      "keywords": [
+        "Go",
+        "Python",
+        "Bash",
+        "SQL",
+        "C++"
+      ]
+    },
+    {
+      "name": "Data & services",
+      "keywords": [
+        "PostgreSQL",
+        "REST",
+        "append-only event logs"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Native speaker"
+    },
+    {
+      "language": "German",
+      "fluency": "C1"
+    }
+  ]
+}

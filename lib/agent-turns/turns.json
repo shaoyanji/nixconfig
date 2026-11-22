@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-22T08:16:49Z",
+  "generated": "2026-11-22T08:20:32Z",
   "count": 200,
-  "pin": "0248535f827543defe3e5616227f1dd113613fc1c50fc46ee9128f528ca0c3eb",
+  "pin": "680718cb9012e06340b66aed422a6e3a6918ad1ce9591f5648b2646f90447d9d",
   "turns": [
+    {
+      "id": "841e489c-e280-451d-a15a-e67206167521",
+      "ts": "2026-11-22T08:18:51Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: bizfactory-devops-linux packet + 2 leads (trawa, ewerk) via Arbeitnow; BA API 403, BA details 410 | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/bizfactory-devops-linux"
+      ],
+      "files": [],
+      "base_commit": "e5425bc5a0b8fbfecb547856cb0ca7cfd1f7c018",
+      "branch": "main",
+      "frame": "03ha62bej02f6sohqp79y0mqo"
+    },
+    {
+      "id": "fa054e03-39d6-4687-89a7-e11d179f394d",
+      "ts": "2026-11-22T08:17:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: smartclip-sre-observability packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "84a4283a8a2fa31e88ca32cac930558c0b60dd8d",
+      "branch": "main",
+      "frame": "03ha61yik6p99oxxvvi6olh81"
+    },
     {
       "id": "9e24253b-e4d4-4f00-b6c9-5eacbb8ea85b",
       "ts": "2026-11-22T08:16:20Z",
@@ -2771,36 +2799,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha0r8a7e71bc2w416c8iz3m"
-    },
-    {
-      "id": "d88b5d8a-61e5-4575-8bf1-6dbdde4978a2",
-      "ts": "2026-11-21T15:56:02Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "orchestrating: nudged pane 1 (hep-global Softgarden staging) and pane 3 (n8n Ashby staging); Devin clearing Rivia captcha; next Devin queue flox (p=0.65 via jev-decide)",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0qbyima9w26ljhm7ziu0e"
-    },
-    {
-      "id": "e53729ab-4f5c-45c9-b0e9-375256967605",
-      "ts": "2026-11-21T15:17:31Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "claim: coordinating tmux panes 1, 2, 3 for job hunting, applications, and pipeline tracking",
-      "outcome": "in_progress",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0it0guhd4wuejcqs5feb2"
     }
   ]
 }

@@ -1,0 +1,62 @@
+90 – 119 PLN/hour (B2B)
+
+We are looking for a DevOps / Cloud Infrastructure Engineer for service agreement collaboration (B2B contract) to cooperate with a team that connects Flix's cloud platform with the new train fleet. 
+
+This is a contractor engagement for a DevOps / Cloud Infrastructure professional who wants to work on impactful, hands-on challenges with real technical depth and a lot of cross-company collaboration. 
+
+Scope of Services 
+
+You will help shape an architecture from the start, make sure it is secure and reliable, and take it all the way to production. 
+
+About the Engagement 
+
+Design, build and operate the cloud infrastructure that connects onboard train systems with Flix's backend services, covering telemetry ingestion, alerting, video streams and remote content delivery 
+
+Build and maintain the infrastructure-as-code foundation of the platform, keeping the Terraform/Terragrunt codebase clean, scalable and easy for others to work with 
+
+Steer technical proposals and topics across backend and infrastructure, from the first idea and design discussion to a working solution in production 
+
+Take part in system design and architecture discussions and constructively challenge architectural decisions when you see a better path 
+
+Define and implement secure communication between the trains and the cloud, including mTLS, certificate management and network design 
+
+Work closely with train manufacturers’ engineers to agree on interfaces, protocols and responsibilities on both sides of the integration 
+
+Collaborate with backend developers and other Flix teams so that new services are deployed reliably and are easy to run and monitor 
+
+Make sure the platform is reliable, observable and secure, so that we know what is happening in our systems before our users do 
+
+About You 
+
+Solid hands-on experience in infrastructure engineering and in designing and running cloud environments 
+
+Experience with AWS (preferred). Experience with any other major cloud platform is also welcome 
+
+Strong knowledge of Terraform/Terragrunt for infrastructure provisioning and automation 
+
+A solid understanding of systems architecture and system design, and the confidence to challenge architectural decisions with clear arguments 
+
+Good knowledge of networking, including mTLS and SSL/TLS 
+
+Foundational knowledge of security and the ability to apply it in everyday infrastructure decisions 
+
+Proven ability to lead technical proposals and topics across backend and infrastructure, and to bring your stakeholders along with you 
+
+Strong critical thinking, including the ability to analyze a problem, weigh trade-offs and explain your reasoning clearly 
+
+Nice to have: 
+
+Experience with IoT, automotive, or other remote device integrations 
+
+Experience as a backend engineer or full-stack developer, ideally in the JVM ecosystem 
+
+Familiarity with Linux and virtual machines 
+
+Collaboration Model 
+
+Contract type: Cooperation based on a service agreement (B2B/freelance contract), not an employment contract 
+
+Working model: Independent contractor responsible for delivering agreed services and submitting invoices 
+
+ 
+

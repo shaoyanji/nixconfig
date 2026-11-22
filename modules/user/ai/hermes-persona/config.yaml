@@ -218,3 +218,5 @@ _config_version: 52
 command_allowlist:
   - execute_code
   - script execution via -e/-c flag
+memory:
+  write_approval: true

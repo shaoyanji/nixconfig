@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:07:38Z",
+  "generated": "2026-11-22T09:09:15Z",
   "count": 200,
-  "pin": "dc6e4337a9b58f0a850675249613ad836189a1360e3bc6da51ac259f7d49dbc3",
+  "pin": "43dfbaeffee6c1c5d4066487ea8e2dfedfc1da718c86aed6bf29badcdb6108fc",
   "turns": [
+    {
+      "id": "7b488733-fa75-4696-9870-d6636a82f6b5",
+      "ts": "2026-11-22T09:07:40Z",
+      "source": "freebuff",
+      "subject": "nixconfig:mittwald-devops",
+      "action": "landed: Mittwald DevOps Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4d4a5776d4bf91e2f1a0b978eada44ce0f7aa7ee",
+      "branch": "main",
+      "frame": "03ha6busxi45ybm4ibl38lk73"
+    },
     {
       "id": "0e6c8210-d03a-475d-98fe-5980b7caa1d5",
       "ts": "2026-11-22T09:07:12Z",
@@ -2756,19 +2769,6 @@
       "base_commit": "d55dc1c37d93c2b6317f9ab0a42e3bc74e20d3f1",
       "branch": "main",
       "frame": "03ha4bo2mbfdob24xtlh73ncv"
-    },
-    {
-      "id": "adbc5d92-b4b4-4495-b195-423318c26f06",
-      "ts": "2026-11-22T02:56:56Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +1 freelancermap app (Power App Factory Senior Infra Ops, energy, 100% remote) via Bewerben flow confirmed | gate: in-page confirmation + import 4/4 | ~168 applied; fmap Postfach empty (0 replies on 10)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
-      "branch": "main",
-      "frame": "03ha4bfpyl1jctvbbfaq8ify3"
     }
   ]
 }

@@ -4,14 +4,14 @@
 #
 #   appflow-check.sh   read-only; names every offending row and exits 1
 #
-# Four states accumulate because nothing else looks for them: a (company, role)
+# Five states accumulate because nothing else looks for them: a (company, role)
 # pair where no row declares which one is real, a `prep` row whose own status says
 # the requisition closed, a status that only repeats its `stage` (or is empty, or
-# is a placeholder like "unknown"), and one mail linked to two applications that
-# are both still moving — the shape of a `discovered-*` twin whose company string
-# differs from its canonical row, so the pair rule cannot see it. The first three
-# come from the row list the API serves; the link question is one read-only query
-# route. The fix is never a query — it is `task agents:apps:set ID=… STATUS="…"`.
+# is a placeholder like "unknown"), a row that holds mail while its role is still
+# a placeholder, and one mail linked to two applications that are both still
+# moving — the shape of a `discovered-*` twin whose company string differs from
+# its canonical row, so the pair rule cannot see it. The first four come from the
+# row list the API serves; the link question is one read-only query route. The fix is never a query — it is `task agents:apps:set ID=… STATUS="…"`.
 #
 # `APPFLOW_ROWS` and `APPFLOW_LINKS` read files instead of the API, which is how
 # tests/appflow-status proves every rule can fail without a live archive.
@@ -68,10 +68,18 @@ report=$(jq -r '
     | ((.role // "") | ascii_downcase) as $r
     | (($st == "prep" or $st == "applied" or $st == "screening" or $st == "interview"
         or $st == "manual" or $st == "contacted") and $r == "undiscovered"));
+  # A row that holds mail has the evidence to name a requisition, so a placeholder
+  # role beside linked mail means nobody read it. A declared duplicate is exempt:
+  # the canonical row owns the role, and a provenance stub for three requisitions
+  # at once has no single role to name.
+  def unresolved_mail: ((.linkedMail // 0) > 0
+    and (((.role // "") | ascii_downcase) | (. == "undiscovered" or . == "unknown" or . == ""))
+    and (declared | not));
   . as $rows
   | ([$rows[] | select((.stage // "") == "prep") | select(dead)]) as $deadprep
   | ([$rows[] | select(bare)]) as $bare
   | ([$rows[] | select(unnamed)]) as $unnamed
+  | ([$rows[] | select(unresolved_mail)]) as $unresolved
   | ([$rows | group_by([.company, .role])[]
       | select(length > 1)
       | select(all(.[]; declared | not))]) as $pairs
@@ -82,10 +90,12 @@ report=$(jq -r '
       "deadprep=\($deadprep | length)",
       "bare=\($bare | length)",
       "unnamed=\($unnamed | length)",
+      "unresolved=\($unresolved | length)",
       ($pairs[] | "PAIR \(.[0].company) · \(.[0].role) (\(length) rows: \([.[].id] | join(", ")))"),
       ($deadprep[] | "DEAD \(.id) — \((.status // "")[0:72])"),
       ($bare[] | "BARE \(.id) — stage=\(.stage) status=\((.status // "(empty)")[0:56])"),
-      ($unnamed[] | "UNNAMED \(.id) — stage=\(.stage) role=\(.role)")
+      ($unnamed[] | "UNNAMED \(.id) — stage=\(.stage) role=\(.role)"),
+      ($unresolved[] | "UNRESOLVED \(.id) — role=\(.role) mail=\(.linkedMail // 0)")
     ] | .[]
 ' <<<"$body")
 
@@ -95,6 +105,7 @@ pairs=$(sed -n 's/^pairs=//p' <<<"$report")
 deadprep=$(sed -n 's/^deadprep=//p' <<<"$report")
 bare=$(sed -n 's/^bare=//p' <<<"$report")
 unnamed=$(sed -n 's/^unnamed=//p' <<<"$report")
+unresolved=$(sed -n 's/^unresolved=//p' <<<"$report")
 
 # One mail, two applications, both still moving: a twin that never declared
 # itself, which is how `discovered-materna` sat at `screening` beside its
@@ -164,6 +175,14 @@ else
   fail=1
 fi
 
+if [ "$unresolved" -eq 0 ]; then
+  echo "ok   every application that holds mail names a role"
+else
+  echo "FAIL $unresolved row(s) with linked mail and a placeholder role:" >&2
+  sed -n 's/^UNRESOLVED //p' <<<"$report" | sed 's/^/       /' >&2
+  fail=1
+fi
+
 if [ "$shared" -eq 0 ]; then
   echo "ok   no mail linked to two applications that are both still moving"
 else
@@ -176,4 +195,4 @@ if [ "$fail" -ne 0 ]; then
   echo "FAIL: tracker hygiene — close, dedupe or relink the rows above (task agents:apps:set)." >&2
   exit 1
 fi
-echo "PASS: no duplicate noise, no dead prep row, no bare status, no unnamed role, no shared active mail."
+echo "PASS: no duplicate noise, no dead prep row, no bare status, no unnamed role, no mail on an unclassified row, no shared active mail."

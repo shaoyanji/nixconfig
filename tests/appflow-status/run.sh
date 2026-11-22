@@ -39,6 +39,8 @@ EXPECTED=(
   "an empty status fails"
   "a placeholder status fails"
   "an inactive row with no role passes"
+  "mail on an unclassified row fails"
+  "a duplicate stub with mail passes"
   "a dead prep row still fails"
   "a shared active mail still fails"
   "a vacuous pipeline is refused"
@@ -81,6 +83,11 @@ role_row() { # id stage role status
     '[{id: $id, company: "Acme", role: $role, stage: $stage, status: $status}]'
 }
 
+mail_row() { # id stage role status linkedMail
+  jq -nc --arg id "$1" --arg stage "$2" --arg role "$3" --arg status "$4" --argjson mail "$5" \
+    '[{id: $id, company: "Acme", role: $role, stage: $stage, status: $status, linkedMail: $mail}]'
+}
+
 # --- the rule ------------------------------------------------------------
 case_run "a described pipeline passes" 0 \
   "$(row ok-row applied "Applied 2026-11-22 — 1 mail linked")" \
@@ -109,6 +116,14 @@ case_run "an active row with no role fails" 1 \
 case_run "an inactive row with no role passes" 0 \
   "$(role_row stub-row other undiscovered "Duplicate of something")" \
   '[]' "every active application names a role"
+
+case_run "mail on an unclassified row fails" 1 \
+  "$(mail_row mail-row applied unknown "Applied 2026-11-22 — 2 mail linked" 2)" \
+  '[]' "mail-row"
+
+case_run "a duplicate stub with mail passes" 0 \
+  "$(mail_row stub-mail other undiscovered "Duplicate of acme-sre" 12)" \
+  '[]' "every application that holds mail names a role"
 
 # --- the rules that were already there, through the same feed ------------
 case_run "a dead prep row still fails" 1 \

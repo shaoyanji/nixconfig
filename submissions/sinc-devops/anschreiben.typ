@@ -33,6 +33,9 @@ Eine interne Plattform ist der Ort, an dem sich zeigt, ob eine Organisation ihre
 Konkret: Die Infrastruktur steht deklarativ in einem Repository, jeder Dienst ist ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit. Jeder Stand bleibt als Generation erhalten und lässt sich zurückrollen, statt einen Fehler vorwärts zu reparieren. Überwacht wird mit einem Sentinel-Ledger, das Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in JSONL schreibt, dazu Gatus-Prüfungen und eine Go-Bridge, die einen Alarm erst bestätigt, wenn die Nachricht ankommt. Automatisiert wird in Bash, Python und Go; Geheimnisse liegen in sops und age, Host-Schlüssel kommen aus einer eigenen Zertifizierungsstelle mit kurzlebigen Zertifikaten, und Supportanfragen endeten als Runbook statt als Zuruf.
 
 #v(2pt)
+Dass diese Plattform öffentlichen Institutionen dient, ändert die technische Anforderung nicht, aber die Folge: Wenn eine Umgebung steht, stehen Menschen ohne Ausweichweg davor. Deshalb sind Rückrollung, nachvollziehbare Änderungen und Runbooks für mich keine Kür, sondern der Teil des Betriebs, der über Vertrauen entscheidet — und der Grund, warum ich Zustellbestätigung nicht als Detail behandele.
+
+#v(2pt)
 Was ich nicht mitbringe, sage ich vor der ersten Zeile Ihres Stack-Abschnitts: keinen Windows-Server-Betrieb, kein Hyper-V, kein OpenStack, kein Oracle oder Microsoft SQL, kein PowerShell, kein C\#, kein Azure DevOps, kein Docker, kein Kubernetes, kein Helm. Meine Welt ist Linux und deklarative Konfiguration; Ihr Betrieb ist überwiegend Windows und Virtualisierung. Diese Einarbeitung wäre echt und breit, und ein internes Plattformteam merkt das in der ersten Woche.
 
 #v(2pt)

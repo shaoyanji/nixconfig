@@ -282,8 +282,6 @@ in {
   # profiles/hermes.nix — coupling the two meant a cloud host had to install
   # the whole AI stack to get one agent.
   config = lib.mkIf config.programs.hermes-user.enable {
-    # Persona files — symlinked to nixconfig source.
-    # Runtime edits modify the repo directly (version controlled).
     home.activation.hermesPersonaSymlinks = lib.hm.dag.entryAfter ["writeBoundary"] ''
       ${lib.optionalString (!config.programs.hermes-user.persona) "exit 0"}
 
@@ -307,7 +305,6 @@ in {
       # for a host that needs the persona, not the repo.
       PERSONA_STORE="${./hermes-persona}"
 
-      # Clean up misplaced files in $HOME from earlier experiments
       for f in SOUL.md USER.md MEMORY.md config.yaml; do
         if [ -L "$HOME/$f" ]; then
           run rm -f "$HOME/$f"
@@ -429,7 +426,6 @@ in {
         })
       ];
 
-    # --- Messaging gateway (Telegram, Discord, …) ------------------------
     # Declared here, never via `hermes gateway install`: the generator bakes the
     # bare nix interpreter into ExecStart (no hermes_cli on sys.path, so it
     # crash-loops) and writes a non-store unit that aborts the switch at

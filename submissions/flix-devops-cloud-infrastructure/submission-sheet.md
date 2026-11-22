@@ -1,107 +1,94 @@
-# Flix — DevOps / Cloud Infrastructure Engineer (train fleet telemetry)
+# Flix — DevOps / Cloud Infrastructure Engineer
 
-**Greenhouse `8432987002`.** Status: packet prepared, **nothing submitted**. Board entry updated
-2026-11-10; location Warsaw. This is a **B2B service agreement**, not an employment contract.
+English packet. Greenhouse req **8432987002**. Native Typst sources; the legacy read-only `lebenslauf.pdf`,
+`anschreiben.pdf`, `packet` symlink into `/nix/store`, `letter.json` and `resume.json` are removed.
+Status: compiled and checked, **nothing submitted**.
 
 | Field | Value |
 | :--- | :--- |
 | Role ID | `flix-devops-cloud-infrastructure` |
-| Greenhouse id | `8432987002` |
-| Employer | Flix |
-| Location | Warsaw, Poland |
-| Contract | service agreement (B2B / freelance), contractor invoices |
-| Posted rate | **90 – 119 PLN/hour** |
-| Language | `en` |
+| Employer | Flix (mobility; connects the cloud platform to a new train fleet) |
+| Role | DevOps / Cloud Infrastructure Engineer |
+| Location | Warsaw-based per the lead; remote delivery to be confirmed |
+| Contract | **B2B service agreement, not employment** — independent contractor, invoices |
+| Rate | published **90–119 PLN/hour (B2B)** |
+| Language | **en** |
 | Apply URL | https://flix.careers/job/8432987002?gh_jid=8432987002 |
+| Fit | 3 (DB entry 3 — no number was specified for this packet) |
 
-## The two questions this packet answers before anything else
+## Measured output
 
-**Location.** The form's first required question is whether you are currently based in Poland. The
-candidate is not — he is in Gutach im Breisgau, Germany. He holds German permanent residence and US
-citizenship; neither gives him the right to work in Poland, so the sponsorship question
-(`question_39110159002`) is **yes** if the engagement requires Polish presence. The letter offers the
-alternative: remote from Germany under the same B2B agreement, if Flix's collaboration model allows it.
+| Artefact | Pages | Words | sha256 |
+| :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | **2** | 881 | `c6b9118de978469bb0c09f123603424e93973e9a911da5f2ecbaa70a450b5e96` |
+| `anschreiben.pdf` | **1** | 480 | `de07035d3472957c151376188e41381044b8a3d4b6b7302657c74767c882c0b2` |
 
-**Contract form.** B2B is accepted — `question_39110156002` is answered **yes**. The open point is the
-entity: `question_39110157002` asks whether a Polish business entity exists or can be set up. That is
-**to confirm** with the operator before submitting; the letter says exactly that rather than presuming.
+Both compiled with typst at **0 warnings**; word counts measured with `pdftotext | wc -w` on the rendered PDFs.
 
-## Rate: the arithmetic the posting hides
+## The commercial question comes first
 
-The band is 90–119 PLN/h. At 160 billable hours a month and roughly 4.3 PLN/EUR:
+Two facts decide whether this is worth an hour, and neither is technical.
 
-| Basis | PLN/hour | PLN/month | ≈ EUR/month | ≈ EUR/year |
-| :--- | ---: | ---: | ---: | ---: |
-| Band floor | 90 | 14.400 | ≈ 3.350 | ≈ 40.200 |
-| Band ceiling | 119 | 19.040 | ≈ 4.430 | ≈ 53.100 |
-| Ask | 150 | 24.000 | ≈ 5.580 | ≈ 67.000 |
+**It is a service agreement, not a job.** Independent contractor, invoices, no employment. That suits a Polish entity and it means no
+work permit logic at all — but it also means no notice period, no equity and no employee benefits.
 
-150 PLN/h is the floor of the operator's own consultancy rate card (150–250 PLN/h), so the posted
-band sits below it. The letter states 150 and offers the alternative of a narrower scope at the top of
-the band, which is an honest negotiation rather than a silent mismatch. If the form requires a number,
-answer **150** and let the conversation decide.
+**The rate is below the floor.** Published range is **90–119 PLN/h**. The outreach sheet in this repo stages **150–250 PLN/h** for a
+Polish entity. At the top of Flix's band, the engagement is roughly 60% of the low end of that range. Either the scope is narrower than
+a principal engagement (it reads like one senior contractor on a defined integration), or the budget will not reach the stated floor.
+Decide before applying; the letter quotes no number.
+
+**Location.** The lead records Warsaw-based, so relocation or a remote exception is the first question. The letter raises it as the
+practical matter it is — the commercial form is easy, the seat is not.
+
+## What the engagement is
+
+Cloud infrastructure connecting onboard train systems with Flix backend services: telemetry ingestion, alerting, video streams,
+remote content delivery. Build and maintain the Terraform/Terragrunt foundation, secure trains-to-cloud communication (mTLS,
+certificate management, network design), agree interfaces with train manufacturers' engineers, and keep the platform observable.
 
 ## Fit map
 
-| Requirement (description) | Evidence | Verdict |
+| Requirement | Evidence | Verdict |
 | :--- | :--- | :--- |
-| Cloud infrastructure linking onboard systems to backend services | Fleet telemetry ledger and host provisioning; no onboard or device-to-cloud integration | partial — pattern yes, domain no |
-| Telemetry ingestion and alerting | Sentinel writes job status, generation age, disk and PSI every 15 minutes and pages on any non-ok state | strong |
-| Know what is happening before users do | Alerts fire on state, close on state, and every repeated manual check becomes a gate | strong |
-| Terraform / Terragrunt codebase | **Not used.** Infrastructure as code is Nix: pinned inputs, declarative hosts, reviewed plans | **gap** in tool |
-| AWS (preferred) | Small AWS Lambda project; Oracle Cloud hosts in production; no multi-account estate | partial |
-| Systems architecture, challenging decisions | One declaration for thirteen hosts, module boundaries, rollback by pointer; decisions recorded as notes | strong at small scale |
-| Networking, mTLS, SSL/TLS | nftables default-deny, DNS/MTU/TLS diagnosis with tcpdump and openssl, in-house CA with short-lived certificates; mTLS as a service policy layer not deployed | partial |
-| Security applied in everyday infrastructure | SOPS/age per host, SSH CA, default-deny, KEV-based vulnerability practice | strong |
-| Remote device fleets | PXE/iVentoy provisioning, first-boot join, rebuild — machines as declared members, not pets | strong adjacency |
-| IoT / automotive integrations | None | **gap** |
-| Backend / JVM | Go and Python services with PostgreSQL; no JVM work | **gap** |
-| Linux and virtual machines | NixOS, systemd, cgroups, microVMs as declared guests | strong |
+| Telemetry ingestion and alerting | Fifteen-minute ledger over job state, generation age, disk and PSI; pages on bad state and on silence | **strong** |
+| Linux and virtual machines | systemd, cgroups, PSI, nftables, `strace`, `tcpdump`; microVM isolation | **strong** |
+| Infrastructure as code | One repository declares thirteen hosts, inputs pinned by hash, reproducible builds | **strong**, **not Terraform** |
+| Secure transport, certificates | Fleet certificate authority, short-lived credentials, TLS terminated with per-vhost certs, keys outside the tree | **strong** |
+| Secrets and security fundamentals | sops/age per host, default-deny between hosts, dry-run plans | **strong** |
+| CI/CD reproducibility | Same gate in CI and on the host; content-addressed builds; rollback as a pointer | **strong** |
+| Scalable operations | One task surface with validation; capacity argued with numbers | **strong** |
+| Terraform / Terragrunt | **none** | **gap, named** |
+| AWS | **none**; rented bare metal | **gap, named** |
+| mTLS at device scale, certificate lifecycle | CA and TLS discipline yes, **no vehicle fleet** | partial |
+| IoT / automotive device integration | **none** | gap (nice to have) |
+| JVM backend | **none**; Go and Python | gap (nice to have) |
+| B2B contracting | Polish entity, invoices | **ready** |
 
-## Greenhouse schema (live, read 2026-11-22)
+Fit **3**: the telemetry, alerting, Linux and certificate work is the closest part of this corpus to a trains-to-cloud integration, and
+remote-device telemetry is literally the sentinel pattern. It is not higher because the two named requirements — Terraform/Terragrunt
+and AWS — are absent, and because the domain (vehicle integration) is new.
 
-| Field | Answer | Question id |
-| :--- | :--- | :--- |
-| First Name * | Matt | `first_name` |
-| Last Name * | Ji | `last_name` |
-| Email * | matt@bountystash.com | `email` |
-| Phone * | +49 1733281570 | `phone` |
-| Resume/CV * | `lebenslauf.pdf` (2 pages) | `resume` |
-| Poland-based? * | **No** — Gutach im Breisgau, Germany | `question_39110155002` |
-| Open to B2B? * | **Yes** | `question_39110156002` |
-| Polish entity or able to set one up? * | **To confirm** — the letter says it is not settled | `question_39110157002` |
-| B2B rate, PLN per hour * | **150** net (band 90–119; see arithmetic above) | `question_39110158002` |
-| Visa/residence sponsorship for Poland? * | **Yes** | `question_39110159002` |
-| Current location * | Gutach im Breisgau, Germany | `question_39110160002` |
-| Earliest start * | immediate or by agreement | `question_39110161002` |
+## The argument the letter makes
 
-## What the CV and letter do
+It opens with the environment: a train is a remote site with a bad network and nobody on hand to fix it, which is the situation the
+fleet has been in for five years at thirteen machines. Telemetry collected on the box, written every fifteen minutes, paged on when it
+stops arriving — absence as the signal that matters.
 
-The CV opens on telemetry ingestion and the sentinel, then provisioning, declarations, certificates
-and Linux debugging. Measured on the built PDF: **telemetry, sentinel, alerting, PXE, Linux, systemd,
-PSI, cgroup** present; **Terraform, mTLS, AWS, IoT zero times** — the tools the engagement names that
-this fleet does not run stay out of the CV and are named in the letter instead.
+Then the infrastructure: declared not assembled, pinned by hash, rebuild as the upgrade path, shared cache and remote builders, one gate
+in CI and on the target, generations with parents so rollback is a pointer.
 
-The letter's third paragraph is the concession list: no Terraform/Terragrunt (Nix instead), AWS only
-as a small Lambda project, certificates without an mTLS policy layer, no IoT/automotive, no JVM. The
-fourth is the contract paragraph — B2B yes, Polish entity to confirm, relocation and permit if
-presence is required, 150 PLN/h against the posted band.
+Secure transport gets its own paragraph, because it is the heart of the Flix design: a fleet certificate authority, short-lived
+credentials, per-host encrypted secrets, TLS in one declared place, default deny — and the discipline mTLS demands, where every endpoint
+proves itself and no private key lives in the repository.
 
-## Checks
+The gap paragraph names Terraform, Terragrunt, AWS and vehicle integration outright, offering systems reasoning in exchange rather than a
+translation of the stack.
 
-| Check | Result |
-| :--- | :--- |
-| `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
-| `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 209 prose files, exit 0 |
-| selection | 10/24 highlights, 4/9 projects |
-| sha256 CV | `acc95577ed50814ffd42e2160f35eb9f4d9abdce22e635a54721276f18a91523` |
-| sha256 letter | `10883bc562aa1ef232bdc9ac30fd02fd93e73b74250a35349cbdf8b8065976a0` |
+It closes with a question that separates two implementations: when a vehicle stops sending telemetry, is that detected as a missing
+heartbeat per device, or inferred from the absence of downstream data? The second is cheaper and much harder to trust.
 
-## Next actions
+## Before applying
 
-1. Confirm the Polish-entity answer before submitting — it is a required field and the one thing the
-   packet deliberately leaves open.
-2. Decide the location line: if remote from Germany is refused, the engagement means a Polish permit
-   and a move, and that changes the rate conversation.
-3. Submit through Greenhouse `8432987002` and record the rate answer as 150 PLN/h.
+1. Decide on the rate: 90–119 PLN/h against a 150–250 PLN/h floor is the whole negotiation.
+2. Confirm whether Warsaw presence is required or remote delivery from Germany is acceptable.
+3. Apply through Greenhouse `8432987002`; attach `lebenslauf.pdf` and `anschreiben.pdf`.

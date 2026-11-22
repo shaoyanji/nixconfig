@@ -1,8 +1,94 @@
 {
-  "generated": "2026-11-22T11:03:08Z",
+  "generated": "2026-11-22T11:04:55Z",
   "count": 200,
-  "pin": "f418cfd00aff4e8b2cb942a8f5df710042d18eaf64f08f7e4fabe2a55854a594",
+  "pin": "531c0a86203c5e3fcb484b4f864cfb62b54986c87f63bbebfb127d2f517bef91",
   "turns": [
+    {
+      "id": "2f94b0b4-3337-42af-9ecf-d045af0642ac",
+      "ts": "2026-11-22T11:04:52Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fraunhofer-darmstadt-network",
+      "action": "migrated: native German Typst 2pp CV + 1pp letter with Fraunhofer ISE emphasis; symlink plus selection/resume/letter JSON removed; measured in sheet; Cisco/Palo-Alto/NAC gap conceded; fit lowered 3 to 2",
+      "outcome": "done",
+      "claims": [
+        "submissions/fraunhofer-darmstadt-network"
+      ],
+      "files": [],
+      "base_commit": "d950b140992b1d29f75475ce8bb57a3997f5e55e",
+      "branch": "main",
+      "frame": "03ha6yqwk9l3d71jn233y4bju"
+    },
+    {
+      "id": "19131f5b-46a7-4901-b7c3-001bbef9530d",
+      "ts": "2026-11-22T11:04:04Z",
+      "source": "antigravity",
+      "subject": "nixconfig:jobsearch",
+      "action": "active: flix devops packet (0:1.1), greenhouse scout wolt/flix (0:2.1), fraunhofer darmstadt packet (0:3.1)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/flix-devops-cloud-infrastructure submissions/fraunhofer-darmstadt-network"
+      ],
+      "files": [],
+      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
+      "branch": "main",
+      "frame": "03ha6ylbgsxg65pwxg4ox39lp"
+    },
+    {
+      "id": "d3c355a7-7210-4053-a581-587f477e66e6",
+      "ts": "2026-11-22T11:03:54Z",
+      "source": "devin",
+      "subject": "job-hunt:greenhouse-scout",
+      "action": "scouted Greenhouse boards; registered 3 fresh prep reqs (wolt-eu-infrastructure, flix-cloud-iam-berlin, canonical-kernel-build-automation) + resolved adyen-platform-genai live req 8163866; JDs staged in submissions/",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
+      "branch": "main",
+      "frame": "03ha6yk5lv1g42n2e910p2lnh"
+    },
+    {
+      "id": "d9aff2eb-ab06-4ee7-befe-5fef89d095f4",
+      "ts": "2026-11-22T11:03:53Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fraunhofer-darmstadt-network",
+      "action": "claim: native German Typst 2pp CV + 1pp letter, Fraunhofer ISE emphasis",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/fraunhofer-darmstadt-network"
+      ],
+      "files": [],
+      "base_commit": "695cb55ced7cc4f76adea524f0dd2857a7aa09a9",
+      "branch": "main",
+      "frame": "03ha6yk1szznutsxuiiqhwvop"
+    },
+    {
+      "id": "358ecbc2-6d17-469e-90ea-4dbf7664c03e",
+      "ts": "2026-11-22T11:03:47Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flix-devops-cloud-infrastructure",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en), DevOps/Cloud Infrastructure",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/flix-devops-cloud-infrastructure"
+      ],
+      "files": [],
+      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
+      "branch": "main",
+      "frame": "03ha6yjczqpb3ysg3uc576bwz"
+    },
+    {
+      "id": "098cb37b-8436-43ee-bfe6-16380a0a9fe0",
+      "ts": "2026-11-22T11:03:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:deepl",
+      "action": "follow-up: compliance added to CV area and letter gap, recompiled 2pp/1pp at 0 warnings | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
+      "branch": "main",
+      "frame": "03ha6yf3p764040s4j62b3th1"
+    },
     {
       "id": "4995fae4-9af4-4250-871e-4f28d5df94aa",
       "ts": "2026-11-22T11:03:01Z",
@@ -2626,84 +2712,6 @@
       "base_commit": "9d8c24cec837a6123d06a98ef5971d05295d9911",
       "branch": "main",
       "frame": "03ha6asraxl4u545kinfefro1"
-    },
-    {
-      "id": "cc43f672-ef8a-47ed-945c-1b1e6ef2d6c1",
-      "ts": "2026-11-22T09:00:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:catawiki-platform-engineer",
-      "action": "landed: Catawiki Platform Engineer packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9d8c24cec837a6123d06a98ef5971d05295d9911",
-      "branch": "main",
-      "frame": "03ha6ahcv8q0sqpqsqei2bkr7"
-    },
-    {
-      "id": "6b2ffb55-86f2-4911-991f-97b29a1596ac",
-      "ts": "2026-11-22T08:59:34Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "stackit-iac RocketApply submit unverified - hung POST, no ack mail; form fully mapped for manual retry",
-      "outcome": "blocked: rocketapply hung POST, unverified submit",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a105a21bc1a8a333cfef54d1a3886073ffb820f",
-      "branch": "main",
-      "frame": "03ha6a9sclmk4fn41wxgzh7oj"
-    },
-    {
-      "id": "15a97233-1db3-4e75-a226-0c205c11fb07",
-      "ts": "2026-11-22T08:59:08Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:ptv-group-systemtechniker",
-      "action": "landed: PTV Group Leitstellensysteme packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "552480b0114a0ae25982bb1c2af40ea5f2dd6905",
-      "branch": "main",
-      "frame": "03ha6a6pmfusuv1pbq72wpwmp"
-    },
-    {
-      "id": "74d74ad5-fdbd-4db3-8db1-dd3d40106ce1",
-      "ts": "2026-11-22T08:57:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: blocktech-sre-trading packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a105a21bc1a8a333cfef54d1a3886073ffb820f",
-      "branch": "main",
-      "frame": "03ha69wf0u91n7vrnm34dnlw5"
-    },
-    {
-      "id": "d3d5b468-03ea-4592-8501-f1b6fc192ec7",
-      "ts": "2026-11-22T08:55:42Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: ptb-hpc-linux packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a830ffc2b600346a38ebe9ec8949031ca8204375",
-      "branch": "main",
-      "frame": "03ha69iki3sptkfgn306zffmy"
-    },
-    {
-      "id": "d6e15f69-0b46-4032-a7f9-f2c460a1cdb6",
-      "ts": "2026-11-22T08:54:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: actian-director-platform packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8ccff4945cb9e90c56c91dcce8b14d8f200c2b53",
-      "branch": "main",
-      "frame": "03ha69ca84iz3ossanbst8opy"
     }
   ]
 }

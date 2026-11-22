@@ -1,0 +1,402 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Matt Ji",
+    "label": "Systemadministrator",
+    "url": "https://www.bountystash.com",
+    "summary": "Systemingenieur mit zehn Jahren Betriebs- und Softwareerfahrung. Ich administriere eine NixOS-Flotte aus dreizehn Hosts, deklariert in einer Quelle, mit Netboot-Installationen, deklarativen MicroVMs, eigener Zertifizierungsstelle und einem Sentinel, der den Zustand jede Viertelstunde aufzeichnet. Davor vier Jahre IT-Administration und Asset Management bei einem Solarunternehmen über 100 Mio. USD und Forschung am Fraunhofer ISE. Dokumentation ist bei mir Teil des Betriebs, nicht sein Anhang.",
+    "email": "matt@bountystash.com",
+    "location": {
+      "address": "Am Burgerhof 4",
+      "postalCode": "BW 79261",
+      "city": "Gutach im Breisgau",
+      "region": "Baden-Württemberg",
+      "countryCode": "DE"
+    },
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "shaoyanji",
+        "url": "https://github.com/shaoyanji"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "mattji",
+        "url": "https://linkedin.com/in/mattji"
+      },
+      {
+        "network": "XING",
+        "username": "Shaoyan_Ji",
+        "url": "https://xing.com/profile/Shaoyan_Ji"
+      }
+    ],
+    "image": "https://res.cloudinary.com/de1eajx01/image/upload/v1765739348/lu7yx5irrcpfmisnhfzi.svg",
+    "signature": "https://res.cloudinary.com/de1eajx01/image/upload/v1765739484/qa7exxxy8xvzzkmjgyxn.png"
+  },
+  "work": [
+    {
+      "name": "Bountystash",
+      "position": "Gründer",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-19",
+      "highlights": [
+        "Administrierte dreizehn Linux-Hosts aus einer Deklaration: gewünschter Zustand im Repository, jede Maschine zieht ihn von dort, kein Handgriff auf dem Zielhost.",
+        "Richtete Labore und Arbeitsplätze über Netboot ein: PXE- und iVentoy-Installation, ISO-Bibliothek, Erstkonfiguration und Rebuild in einem dokumentierten Pfad.",
+        "Betrieb deklarative MicroVMs als Gäste auf einem Host und grenzte sie über Speicher, Netz und eigene Zertifikate voneinander ab.",
+        "Führte jede Änderung durch ein Gate, das in der CI und auf dem Host läuft; wiederkehrende Handgriffe wurden zu Checks statt zu Zurufen.",
+        "Überwachte den Betrieb mit Aufzeichnung statt Dashboard: Sentinel-Ledger alle fünfzehn Minuten mit Jobstatus, Generation Age, Disk-Druck und PSI, Meldung auf jeden Zustand ungleich ok.",
+        "Sammelte Logs und Ereignisse über journald und eine Ereignisablage und stellte Fehlerursachen über Host, Unit und Zeitfenster her.",
+        "Administrierte Linux bis unter die Anwendung: systemd-Units mit Speichergrenzen pro Slice, cgroups, nftables mit Default-Deny, DNS- und MTU-Fehler mit tcpdump statt im Ticket.",
+        "Vergab Zugriff über eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten; Secrets liegen pro Host mit SOPS und age verschlüsselt.",
+        "Schrieb technische Dokumentation für den Betrieb: Runbooks, Host-Dossiers und Entscheidungsnotizen, die in der Nacht lesbar bleiben.",
+        "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten.",
+        "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig.",
+        "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen.",
+        "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading.",
+        "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit.",
+        "Prüfte Bug-Bounty-Programme."
+      ]
+    },
+    {
+      "name": "O3 Energy",
+      "position": "Asset Manager",
+      "startDate": "2016-08-01",
+      "endDate": "2020-06-01",
+      "highlights": [
+        "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften, inklusive Arbeitsplätzen, Netz und Wi-Fi.",
+        "Betreute die Anwender direkt: Support-Anfragen aus dem Feld und aus dem Büro, mobile Erfassung für Techniker, Einweisung statt Ticket-Weiterleitung.",
+        "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten.",
+        "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen.",
+        "Leitete das Asset Management eines Portfolios über 100 Mio. USD.",
+        "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch.",
+        "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD.",
+        "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
+      ]
+    },
+    {
+      "name": "Smart Energy 360",
+      "position": "Director of Sustainability",
+      "startDate": "2015-08-01",
+      "endDate": "2016-08-01",
+      "highlights": [
+        "Betreute eine Projektpipeline über 100 Mio. USD.",
+        "Verantwortete den Kundenservice und die Betreuung der Mandanten.",
+        "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+      ]
+    },
+    {
+      "name": "Fraunhofer ISE",
+      "position": "Wissenschaftliche Hilfskraft",
+      "startDate": "2012-03-01",
+      "endDate": "2012-09-01",
+      "highlights": [
+        "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie.",
+        "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte.",
+        "Schrieb Python-Werkzeuge für Analyse und 3D-Geometrie.",
+        "Verifizierte Geometriematrizen in Mathematica."
+      ]
+    },
+    {
+      "name": "Halliburton",
+      "position": "Associate Technical Professional",
+      "startDate": "2010-06-01",
+      "endDate": "2011-09-01",
+      "highlights": [
+        "Behob Chemikalien- und Geräteprobleme vor Ort.",
+        "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche.",
+        "Leitete die Sicherheitsschulung der Crew.",
+        "Arbeitete zwölfstündige Schichten im Feld."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Albert-Ludwigs-Universität Freiburg",
+      "url": "https://rem.zee-uni-freiburg.de/",
+      "area": "Erneuerbare-Energien-Management",
+      "studyType": "Master of Science",
+      "startDate": "2011-11-01",
+      "endDate": "2014-02-01",
+      "score": "1,8/5,0",
+      "courses": [
+        "Fluktuierende erneuerbare Energien und Wettermuster, analysiert mit künstlichen neuronalen Netzen"
+      ]
+    },
+    {
+      "institution": "Colorado School of Mines",
+      "url": "https://mines.edu/",
+      "area": "Erdöltechnik",
+      "studyType": "Bachelor of Science",
+      "startDate": "2006-08-01",
+      "endDate": "2010-05-15",
+      "score": "3,2 GPA",
+      "courses": [
+        "McBride Honors Program in Public Policy",
+        "Wirtschaftswissenschaften"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "nixconfig",
+      "resumeName": "nixconfig",
+      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
+      "url": "https://github.com/shaoyanji/nixconfig",
+      "startDate": "2023-01-01",
+      "endDate": "",
+      "type": "open source",
+      "highlights": [],
+      "keywords": [
+        "Nix",
+        "NixOS",
+        "systemd",
+        "SOPS",
+        "Netboot"
+      ]
+    },
+    {
+      "name": "bountystash",
+      "resumeName": "bountystash",
+      "description": "Ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht. Append-only Events, Terminal-Oberfläche und curl-Endpunkte kommen aus einem Binary.",
+      "url": "https://github.com/shaoyanji/bountystash",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-01",
+      "type": "product",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Ereignisprotokoll",
+        "TUI",
+        "Inhaltsadressierung"
+      ]
+    },
+    {
+      "name": "Risikoberechnungs-Engine (Swirl Engine)",
+      "resumeName": "Risk Calculation Engine (Swirl Engine)",
+      "description": "Satz von Green auf stochastische Polygone: ein Go-Fuzzer erzeugt Formen, eine Pipeline aus Nushell und Awk treibt die Berechnung, eine Nix-Entwicklungsumgebung pinnt die Werkzeuge.",
+      "url": "https://github.com/shaoyanji/risk-calc",
+      "startDate": "2026-03-15",
+      "endDate": "2026-03-18",
+      "type": "open_source",
+      "roles": [
+        "Lead Developer",
+        "Forscher"
+      ],
+      "highlights": [
+        "Implementierte einen Shape-Fuzzer in Go, der stochastische Polygone erzeugt, um die Berechnungsengine zu belasten.",
+        "Containerisierte die Umgebung mit Nix Flakes für reproduzierbare Go-1.16+-Entwicklung."
+      ],
+      "keywords": [
+        "Go",
+        "Nushell",
+        "Awk",
+        "NixOS"
+      ]
+    },
+    {
+      "name": "kev-time",
+      "resumeName": "kev-time",
+      "description": "CISAs Katalog bekannter ausgenutzter Schwachstellen als Zeitreihe in reinem SVG. Ein Trend ist ablesbar, bevor ein Bericht existiert.",
+      "url": "https://jisifu.serv00.net/kev-time/",
+      "startDate": "2026-02-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "Datenvisualisierung"
+      ]
+    },
+    {
+      "name": "kelly-svg",
+      "resumeName": "kelly-svg",
+      "description": "KEV-Einträge in Aufwands-Clustern mit Exposition pro Cluster. Die Patch-Reihenfolge folgt Aufwand und Reichweite statt der Reihenfolge des Katalogs.",
+      "url": "https://jisifu.serv00.net/kelly-svg/",
+      "startDate": "2026-03-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "Risiko"
+      ]
+    },
+    {
+      "name": "fibtransponder",
+      "resumeName": "fibtransponder",
+      "description": "Ein Zustandsautomat mit Fibonacci-Radix, der einen Bitstrom mit begrenzter Arbeit pro Schritt verarbeitet. Ein Korpus-Benchmark hat den ersten Detektor-Entwurf widerlegt.",
+      "url": "https://github.com/shaoyanji/fibtransponder",
+      "startDate": "2026-01-01",
+      "endDate": "2026-06-01",
+      "type": "research",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Streaming",
+        "Zobrist-Hashing",
+        "Benchmarks"
+      ]
+    },
+    {
+      "name": "Masterarbeit: Wetter und Volatilität",
+      "resumeName": "Master's Thesis",
+      "description": "Ein Verfahren zur Zeit-Kreuzkorrelation von Windgeschwindigkeit sowie neuronale Netze auf Langzeit-Wetterdaten, um die Volatilität von Solar- und Windanlagen im Netz zu bewerten.",
+      "url": "https://www.academia.edu/6762743/A_Study_on_Energy_Intermittency_Reduction_Strategies_with_Emphasis_on_Weather_Pattern_Prediction",
+      "startDate": "2013-08-01",
+      "endDate": "2014-02-24",
+      "type": "thesis",
+      "entity": "Meteorologisches Institut Freiburg",
+      "roles": [
+        "Student"
+      ],
+      "highlights": [],
+      "keywords": [
+        "Künstliche Neuronale Netze",
+        "Fraktale Geometrie"
+      ]
+    },
+    {
+      "name": "Postgraduales Studium: Erneuerbare Energien",
+      "resumeName": "Postgraduate Renewable Energy",
+      "description": "Ein Postgraduierten-Modul zu Wasserstofferzeugung und -speicherung, bewertet mit RETScreen für Solar, Wind, Geothermie und Biomasse.",
+      "url": "https://unu.edu",
+      "startDate": "2013-02-01",
+      "endDate": "2013-02-28",
+      "type": "course",
+      "entity": "United Nations University",
+      "roles": [
+        "Teamleiter",
+        "Ingenieur"
+      ],
+      "highlights": [],
+      "keywords": [
+        "Wasserstoff",
+        "Solar",
+        "RETScreen"
+      ]
+    },
+    {
+      "name": "Konzept für Schwachstellenbetrieb",
+      "resumeName": "Vulnerability operations concept",
+      "description": "Ein Beispiel-Schwachstellenprogramm aus KEV-Daten: Expositionstabelle, Aufwands-Cluster, 90-Tage-Methode und Dienstleistungsmodell.",
+      "url": "https://concept.bountystash.com/",
+      "startDate": "2026-11-01",
+      "endDate": "",
+      "type": "concept",
+      "highlights": [],
+      "keywords": [
+        "KEV",
+        "Programmdesign",
+        "HTML"
+      ]
+    },
+    {
+      "name": "matt.bountystash.com",
+      "resumeName": "matt.bountystash.com",
+      "description": "Diese Seite. Zwei Sprachen aus einer Vorlage, ein Stylesheet mit hellem und dunklem Farbsatz und ein Lebenslauf aus denselben JSON-Daten.",
+      "url": "https://matt.bountystash.com",
+      "startDate": "2026-11-01",
+      "endDate": "",
+      "type": "site",
+      "highlights": [],
+      "keywords": [
+        "Nix",
+        "HTML",
+        "Typst",
+        "i18n"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "Linux-Server",
+      "keywords": [
+        "NixOS",
+        "systemd",
+        "cgroups/PSI",
+        "nftables",
+        "journald",
+        "tcpdump"
+      ]
+    },
+    {
+      "name": "Bereitstellung",
+      "keywords": [
+        "PXE/iVentoy",
+        "Bare-Metal-Install",
+        "Erstkonfiguration",
+        "Rebuild",
+        "deklarative MicroVMs"
+      ]
+    },
+    {
+      "name": "Betrieb",
+      "keywords": [
+        "Sentinel-Ledger",
+        "Alerting",
+        "Generationen",
+        "Rollback",
+        "Kapazitätsbudget"
+      ]
+    },
+    {
+      "name": "Hardware",
+      "keywords": [
+        "x86-Server",
+        "ARM-Boards",
+        "NAS",
+        "Arbeitsplätze",
+        "Netz und Wi-Fi"
+      ]
+    },
+    {
+      "name": "Support & Dokumentation",
+      "keywords": [
+        "Anwenderbetreuung",
+        "Runbooks",
+        "Host-Dossiers",
+        "Entscheidungsnotizen"
+      ]
+    },
+    {
+      "name": "Sicherheit",
+      "keywords": [
+        "SOPS/age",
+        "SSH-CA",
+        "Default-Deny",
+        "Schwachstellenmanagement"
+      ]
+    },
+    {
+      "name": "Programmierung",
+      "keywords": [
+        "Go",
+        "Python",
+        "Bash",
+        "SQL",
+        "C++"
+      ]
+    },
+    {
+      "name": "Web",
+      "keywords": [
+        "HTML",
+        "CSS",
+        "Nginx",
+        "REST"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Englisch",
+      "fluency": "Muttersprache"
+    },
+    {
+      "language": "Deutsch",
+      "fluency": "C1"
+    }
+  ]
+}

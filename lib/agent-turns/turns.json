@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-22T08:04:51Z",
+  "generated": "2026-11-22T08:07:56Z",
   "count": 200,
-  "pin": "38bd84f1dcbf0e1c2d4bd0937b941c6ef498238e3257c225df0e26c2ccca8609",
+  "pin": "d06a4724b5013eb017fe211e56f1930742addbf2ca163d81f036973509c7452f",
   "turns": [
+    {
+      "id": "bdc27242-b043-4e49-ae15-71904d938944",
+      "ts": "2026-11-22T08:07:10Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: adyen senior platform eng observability amsterdam (GH 7607691); sponsorship/kennismigrant=Yes honest",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/adyen-platform-observability"
+      ],
+      "files": [],
+      "base_commit": "3c0fe1000992a00c977fff9b1d34f628a78dd892",
+      "branch": "main",
+      "frame": "03ha601b6zbe3cmgfsz7oye7r"
+    },
+    {
+      "id": "13e7007a-a9c5-44c0-97c3-079f00ce10f2",
+      "ts": "2026-11-22T08:06:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-mittwald-devops",
+      "action": "landed: Mittwald DevOps packet (JD from BA JSON-LD, 2-page CV, 1-page letter, sheet; DB record created) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/mittwald-devops"
+      ],
+      "files": [],
+      "base_commit": "bd35415b82a854808c6e13335b609876f68ab7d2",
+      "branch": "main",
+      "frame": "03ha5zy4ipx4pwfagulqj7fak"
+    },
+    {
+      "id": "7ff51758-2a24-4d02-adcb-ce78fb8e9f7d",
+      "ts": "2026-11-22T08:06:38Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: mongodb SRE agent engine dublin (GH 8366599) — embed token= path, both PDFs, sponsorship Yes, OTP 10500752, /confirmation | gate: GH confirmation page",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3c0fe1000992a00c977fff9b1d34f628a78dd892",
+      "branch": "main",
+      "frame": "03ha5zxkaqjh8egoyv64najil"
+    },
+    {
+      "id": "6feab627-cf9d-4070-8f37-f884648542ae",
+      "ts": "2026-11-22T08:04:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-mongodb-sls",
+      "action": "landed: MongoDB SLS SRE packet, CV 2pp letter 1pp, 13/36 highlights, gaps named | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3c0fe1000992a00c977fff9b1d34f628a78dd892",
+      "branch": "main",
+      "frame": "03ha5zld95gcyr3jfe5s2xm97"
+    },
     {
       "id": "a3e1d5bc-e619-456b-9182-f22d9eb822fe",
       "ts": "2026-11-22T08:03:51Z",
@@ -2764,58 +2820,6 @@
       "base_commit": "db05efffaf83c371a92c8f1f849c998d793717b5",
       "branch": "main",
       "frame": "03h9ykcpwxpcayfcyf4p3e03n"
-    },
-    {
-      "id": "5ad84726-3e70-4f7e-b71d-58579071e6fa",
-      "ts": "2026-11-21T09:13:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:tmux-steward-default-2",
-      "action": "drove idle pane default:2.1 (devin lane); jev-decide classified next task host-change 0.93/0.9 — review and commit the unstaged command_allowlist in modules/user/ai/hermes-persona/config.yaml; before delivery the pane submitted its own /goal and is now busy (Thinking, Goal running) on nixconfig refactoring — not interrupted per steward rules; classified task undelivered, retry on next idle cycle",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "997d302f0d14146056f913cbd660783e96699747",
-      "branch": "main",
-      "frame": "03h9yjnjm66ey7r4ze0fas665"
-    },
-    {
-      "id": "7e0b6ae7-f5b4-4c3e-9ab9-ef80a5aba7bf",
-      "ts": "2026-11-21T09:12:46Z",
-      "source": "devin",
-      "subject": "nixconfig:compile-boundary",
-      "action": "landed: check inventory TOML -> flake/check-inventory.nix attrset; .#checkInventory.tsv byte-identical; taskfiles/checks.toml deleted | gate: check:verify 123/123 PASS, shell lint 0 findings",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "997d302f0d14146056f913cbd660783e96699747",
-      "branch": "main",
-      "frame": "03h9yjjwfzh3o5eoc4krxk762"
-    },
-    {
-      "id": "b65e4a9e-cb29-4c00-9aaa-ecc14076730b",
-      "ts": "2026-11-21T09:06:05Z",
-      "source": "devin",
-      "subject": "nixconfig:fusion-lane",
-      "action": "landed: docs purge — deleted docs/qmd-embedding-offload.md + hosts/eisen/laya-HANDOFF.md after full reference audit; frieren deployed (new agy-gemini wrapper serving fresh 1.5.13, systemd running) | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "29e5211b2f279b92d618bed6b9f43f6adb7e159c",
-      "branch": "main",
-      "frame": "03h9yi8wgwwz4lg43sfhaqfe6"
-    },
-    {
-      "id": "49812fca-de96-489c-ba63-d9736ab435a5",
-      "ts": "2026-11-21T08:49:23Z",
-      "source": "devin",
-      "subject": "nixconfig:fusion-lane",
-      "action": "landed: agy-gemini through nix-tool — registry now carries full installables (self-flake git+file for repo wrappers, upstream for cache tools); agents:agy:gemini task; verified on stripped PATH wrapper->fresh agy 1.5.13 | gate: checks:tasks clean (780), yaml lint PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "43b779ab6f934a3b527de504924c740ed9f3c232",
-      "branch": "main",
-      "frame": "03h9yezgty34by5g4ierbje7x"
     }
   ]
 }

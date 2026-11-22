@@ -22,7 +22,7 @@ Native English Typst, 2026-11-22 — Typst 0.15.1, DejaVu Sans only.
 | `anschreiben.pdf` | 1 | 437 | 0 | `0934eee8054db28e` |
 
 Plus `lebenslauf.typ`, `anschreiben.typ`, `job-description.txt` and this sheet. Retired in this rebuild:
-`Matt_Ji_Resume_Flox_Packaging.pdf` (`6d5b0a34…`), `Flox_Packaging_Anschreiben.pdf` (`1e0d6f7c…`), the plain-text duplicates
+`Matt_Ji_Resume_Flox_Packaging.pdf` (`610ad554d1b42ad6…`), `Flox_Packaging_Anschreiben.pdf` (`f9133260414a4fe5…`), the plain-text duplicates
 `Flox_Packaging_Cover_Note.txt` and `Flox_Packaging_Submission_Sheet.txt`, and `selection.json`.
 
 ## What changed
@@ -41,7 +41,8 @@ right survives an evaluation of the whole host and a sentinel that notices when 
 
 No nixpkgs upstream commits and no package maintained in the official set. No RPM, deb or apk packaging. No npm, Cargo or PyPI registry work
 beyond consuming them. No ownership of a large C/C++ build system. The build farm is one fleet with remote builders and a cache, not a
-multi-tenant package service. **nixpkgs** appears in the CV only inside the sentence declining it; the scan confirms no other mention.
+multi-tenant package service. `nixpkgs` appears in the CV twice: once introducing the patterns the module set borrows, and once inside the sentence declining upstream
+history. Neither is a contribution claim; a scan for the word shows exactly those two places and nothing that implies a commit.
 
 ## Fit
 

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T12:11:58Z",
+  "generated": "2026-11-22T12:12:13Z",
   "count": 200,
-  "pin": "ad65fc7bd048b13a16044e96ec73ceacdb69e62b0e79fa114840223ebe2b798d",
+  "pin": "fb6ec986cfe4b5dfa1c3d207fe689535600f0a220282250c9fbf2bc642121fea",
   "turns": [
+    {
+      "id": "1f653d28-e959-4490-8e85-ea590766b62b",
+      "ts": "2026-11-22T12:12:08Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "in_progress: devin submitting n8n (ashby 24ad7d68), freebuff frieren compiling flox-packaging, freebuff delphi authoring bwi-cloud-engineer",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "d67a52c0c26925f0ac8c037ca7587da72d3e199e",
+      "branch": "main",
+      "frame": "03ha7bw0mv1q859wsk6815qo0"
+    },
+    {
+      "id": "8423b728-0c98-434f-afe8-0b0a0bd6bd43",
+      "ts": "2026-11-22T12:12:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flox-packaging",
+      "action": "landed: native English Typst dossier for Nix packaging — CV 2pp, letter 1pp, 0 warnings, prose exit 0. Replaced four ad-hoc artefacts plus selection.json, reconstructed the missing JD from the retired sheet, rebuilt the CV on flakes/overlays/module patterns/hermetic builds with nixpkgs gap stated | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d67a52c0c26925f0ac8c037ca7587da72d3e199e",
+      "branch": "main",
+      "frame": "03ha7bv7jq0actf6whll2jve5"
+    },
     {
       "id": "b6201f01-8508-448b-a7c3-6de6becd2a62",
       "ts": "2026-11-22T12:11:04Z",
@@ -2822,32 +2848,6 @@
       "base_commit": "09919176b5676a08672aba99606fde245c0f9958",
       "branch": "main",
       "frame": "03ha6p878jlueosb7y7bxmtnd"
-    },
-    {
-      "id": "85c17797-6dde-4fa5-8d43-84d39eba24aa",
-      "ts": "2026-11-22T10:15:56Z",
-      "source": "freebuff",
-      "subject": "nixconfig:deepl",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "111a2f9a87dbac4f5816a4142f472eb99f466650",
-      "branch": "main",
-      "frame": "03ha6p6vbc2lqmrh9hx71fzia"
-    },
-    {
-      "id": "151ba862-a35f-4d00-96d1-556953f21607",
-      "ts": "2026-11-22T10:15:12Z",
-      "source": "devin",
-      "subject": "nixconfig:uni-rostock-sysadmin",
-      "action": "Zertifikate is Pflichtfeld; degree certs not in packet — needs operator docs | rest of form+files complete",
-      "outcome": "blocked: missing-certificates",
-      "claims": [],
-      "files": [],
-      "base_commit": "39ac9da070a10bc9b1419b3eee8e46431b03a17d",
-      "branch": "main",
-      "frame": "03ha6p1pdh8ew3g42tompoi2k"
     }
   ]
 }

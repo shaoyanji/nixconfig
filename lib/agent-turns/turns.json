@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T09:54:18Z",
+  "generated": "2026-11-22T09:57:00Z",
   "count": 200,
-  "pin": "0439047304b62f58454993633d44578e6c3acfedcc230792d8d7200d68ccb536",
+  "pin": "c05010b9c01e3df05002f9236110ee7814fe72dfac65fa188a6d89c1d81778f2",
   "turns": [
+    {
+      "id": "95038cfb-ab28-4386-9fdc-8f52c960101b",
+      "ts": "2026-11-22T09:56:47Z",
+      "source": "devin",
+      "subject": "nixconfig:citeq-muenster-devops",
+      "action": "claim: submitting via Interamt 1510832",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "8c435444bf2e1b7f47a8ec53006a14c424fb11ad",
+      "branch": "main",
+      "frame": "03ha6lg7o5qdih6d8rv5rqwe3"
+    },
+    {
+      "id": "6e6b6ca9-824e-4fbf-8772-4271627b26f0",
+      "ts": "2026-11-22T09:56:03Z",
+      "source": "devin",
+      "subject": "nixconfig:dfs-sre",
+      "action": "submitted: DFS Deutsche Flugsicherung via careers portal | email-verify link clicked, 'in Bearbeitung' confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8c435444bf2e1b7f47a8ec53006a14c424fb11ad",
+      "branch": "main",
+      "frame": "03ha6lb1qnmq2hscc3l0dr1gr"
+    },
+    {
+      "id": "c8220417-bea7-4534-b5cc-203e5307f8ad",
+      "ts": "2026-11-22T09:54:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:grafana",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0794dfbbc1c293e2352b5e328e58c1006b8483b4",
+      "branch": "main",
+      "frame": "03ha6l0zlts5upe9vuhdm9h8b"
+    },
     {
       "id": "3c4330cf-2a89-4ded-9185-38697bda38f6",
       "ts": "2026-11-22T09:54:08Z",
@@ -2689,51 +2728,6 @@
       "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
       "branch": "main",
       "frame": "03ha5kk3nmkir5ewlvaymsrq8"
-    },
-    {
-      "id": "b0fe693b-939d-4749-b2aa-04fd77c757b4",
-      "ts": "2026-11-22T06:47:56Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search",
-      "action": "start: executing Maze SRE submission (devin); compiling STACKIT packet (pane 1); compiling ClickHouse DRE packet (pane 3) | gate: checks:quick PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/maze",
-        "submissions/stackit",
-        "submissions/clickhouse"
-      ],
-      "files": [],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5kk2b6558ezaiuytl23ks"
-    },
-    {
-      "id": "cbac3f6d-67a7-47b2-b18f-40eb348d9ce7",
-      "ts": "2026-11-22T06:42:47Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "attio Senior Platform Engineer: linkedMail=0, form filled per sheet, submit x2 w/ reload; no email fallback in JD; record=other w/ blocker nextAction",
-      "outcome": "blocked: Ashby reCAPTCHA enterprise interactive image challenge on every submit",
-      "claims": [
-        "submissions/attio"
-      ],
-      "files": [],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5jjxw5ig4a9ic6wgstuuq"
-    },
-    {
-      "id": "23ff19c3-bec6-494a-8376-d366fcb6af76",
-      "ts": "2026-11-22T06:41:25Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-search",
-      "action": "landed: delegated search & submissions; 20 new leads logged to delphi (ClickHouse, Sourcegraph, STACKIT, SVA, EnBW, BWI); Grafana confirmed (msg 311043); attio isolated manual | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5jac0halgcatjq3qicf1n"
     }
   ]
 }

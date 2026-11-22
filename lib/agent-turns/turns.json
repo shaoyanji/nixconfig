@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-22T09:25:00Z",
+  "generated": "2026-11-22T09:28:04Z",
   "count": 200,
-  "pin": "0fbcc37cfa05f2160226bc2315cf7b07c4778ef467834b5df9cc08c02e7be57c",
+  "pin": "c2f404a43d4c7407023d61ab294b6596969c615dbc556a9cc6a7f6cfaf179e16",
   "turns": [
+    {
+      "id": "463605fd-45e3-4932-bf39-34fdf7909a59",
+      "ts": "2026-11-22T09:27:15Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "bwi upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b52535386589665e5076850fb772076d646e7070",
+      "branch": "main",
+      "frame": "03ha6fofggeog34ez8m2cbu25"
+    },
+    {
+      "id": "7ea36885-3860-4ba9-9d7b-b05b33aab8fb",
+      "ts": "2026-11-22T09:25:55Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: secunet Rexx Systems submission (f3550)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0dc144c037c71086a9d9e8a06c4aa92656b5e902",
+      "branch": "main",
+      "frame": "03ha6ff62a2awosve1rqo6da8"
+    },
+    {
+      "id": "0dc1ee8f-ae6b-4984-93c6-06d3649f8aa0",
+      "ts": "2026-11-22T09:25:38Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "enbw packet prepared but requisition closed (HTTP 410 filled); fit set to 4",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa025dcb2859148f844685ff695efef42703d0b3",
+      "branch": "main",
+      "frame": "03ha6fd29j9bnq54t4irvvgza"
+    },
+    {
+      "id": "3b07274e-a437-4be2-a967-1d5885d11b00",
+      "ts": "2026-11-22T09:25:34Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "shopware-cloud-infra: form complete but submit gated by Recruitee interactive drag-letter captcha; policy=never solve interactives; record=manual, hand-submit path in nextAction",
+      "outcome": "blocked: recruitee interactive puzzle captcha at submit",
+      "claims": [],
+      "files": [],
+      "base_commit": "0dc144c037c71086a9d9e8a06c4aa92656b5e902",
+      "branch": "main",
+      "frame": "03ha6fcp8tzycezi0bwauyzac"
+    },
+    {
+      "id": "42e40ee4-15db-4aca-b1d8-5e7a545bd629",
+      "ts": "2026-11-22T09:25:22Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "enbw upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8de679c3248fca211708920af7f04913c0315e8f",
+      "branch": "main",
+      "frame": "03ha6fb6136apawazg4az68j7"
+    },
     {
       "id": "73850216-52d1-4464-863a-05296d5910d4",
       "ts": "2026-11-22T09:24:41Z",
@@ -2696,71 +2761,6 @@
       "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
       "branch": "main",
       "frame": "03ha4sqgdmoo96q7b8dhc6tqy"
-    },
-    {
-      "id": "66dafbae-3fe0-4703-b46a-eb94967e7194",
-      "ts": "2026-11-22T04:24:40Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: testo Senior Platform Engineer/SRE (Titisee, 25km, portal confirmed). Sweeps: NetzeBW IT=0, Fraunhofer FRB=research only, Haufe=Azure/sec gates, SICK=students only. Workwise form cracked (cvlizer+file-upload slots)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4skk00fiat5lkjnifcw8h"
-    },
-    {
-      "id": "ed975fc2-2b53-4d08-98e8-d3075e1d6c85",
-      "ts": "2026-11-22T04:19:00Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: Amprion IT Network Engineer (8031, portal confirmed); skipped 8079 (WDM/OTN carrier transport) + IT-Infra Experte (Azure hard req); Amprion IT board drained for honest fits",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4rgp7cetrr1di94vo29ny"
-    },
-    {
-      "id": "9e29108e-dae4-4a89-aa63-ffb9d58d71c6",
-      "ts": "2026-11-22T04:17:48Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: 50Hertz Storage&Backup (fit3, NetApp gap declared) + Amprion IT System Engineer (portal confirmed) — all 4 German TSOs now swept: TransnetBW x3, 50Hertz x5, Amprion x1, TenneT cloudflare-walled",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4r8c8k7mzcrxrxkcica9g"
-    },
-    {
-      "id": "98acb0a1-3d20-43a4-a5ee-0351adfaa08d",
-      "ts": "2026-11-22T04:14:51Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: 3 TransnetBW + 4 50Hertz applications — TransnetBW MSHIP Datacenter(4338 portal+ack), K8s Platform(4337 email), WAN Service Owner(email); 50Hertz Platform Engineer+Linux Admin+Automatisierung+Compute&Virt all portal-confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4qnkssk217rp42dtmdmyc"
-    },
-    {
-      "id": "45e64cb5-e64e-4eb9-a5f8-7c5218288d11",
-      "ts": "2026-11-22T04:10:18Z",
-      "source": "antigravity",
-      "subject": "frieren:system-audit-2026-11-22",
-      "action": "landed: weekly comprehensive health audit (Sunday); cleared failed restic-burgernas & upgrade latches; sentinel ok; refined SYSTEM.md in-place | gate: ops:health PASS, checks:host frieren MODE=eval PASS, checks:dns:resolver-health PASS, checks:ports PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4prkx713ta1vr02pkw9ev"
     }
   ]
 }

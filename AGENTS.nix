@@ -612,6 +612,45 @@
         Gaming Guard: llama-swap-gaming-guard unit updated to suspend strata.service when Steam games launch, returning 100% VRAM to Proton/Gamescope.
       '';
     };
+    eisen-llm-stack = {
+      title = "eisen LLM stack — trap and retirement record";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-22";
+      summary = "The llama.cpp-to-Strata stack on eisen: the tailscaled-readiness trap both serve units carry, and what retired llama-swap, the fork builds, and Kev-4B.";
+      refs = {
+        hosts = ["eisen"];
+        modules = ["hosts/eisen/llm-server.nix"];
+        tasks = ["checks:host"];
+        docs = [
+          "docs/eisen-llm-architecture.md"
+          ".agents/deploy/hosts/eisen.md"
+          "hosts/eisen/MANUAL.md"
+        ];
+      };
+      body = ''
+        Trap — After=tailscaled is ordering, not readiness. A unit ordered after
+        tailscaled.service can still exec while the backend is NoState. Measured
+        twice on eisen:
+        - tailscale-serve (nixpkgs oneshot): `serve set-config` exited 1 once at
+          boot 2026-10-19 13:44 and stayed failed with no retry; the tailnet serve
+          config was not applied until a manual restart.
+        - tailscale-serve-node: same race on a tailscaled restart — dies with
+          "unexpected state: NoState".
+        Fix shape: ExecStartPre waits for `tailscale status --json` BackendState
+        == "Running" (<=120 s), and TimeoutStartSec raised so the wait fits the
+        unit's start window. Both serve units in llm-server.nix carry it.
+
+        Retirements:
+        - llama-swap :8080 superseded by Strata MoE :8085 (2026-10-21);
+          open-strata-eisen-rx5700 is the delivery record.
+        - The 0.7.0 pin and the PrismML/Kolibri fork builds each forced a full
+          C++ build on eisen (~15 min) every nixpkgs bump — the energy cost that
+          retired them (2026-10-19). Dormant blocks stay in the file for revive.
+        - Kev-4B-Q8_0.gguf: tested 2026-10-17, no endpoint — kept on disk for
+          direct tests, never served, never routed.
+      '';
+    };
     strata-quant-tier = {
       title = "The Strata pack tier is a page-cache question, not a bit-width one";
       kind = "experiment";

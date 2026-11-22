@@ -148,7 +148,11 @@ upstream `836d571`) and `-DGGML_VULKAN=ON`. That build **works**: llama-swap log
 Caveats: the patch is community code (Seraphiel102 / Hob-forge), so treat output
 as "loads and talks" rather than numerically verified against Aleph Alpha, and
 `llama-bench` from a stock llama.cpp build cannot read the file (same arch error).
-Re-test with:
+Re-test with a completion against the served alias:
+
+```
+curl -s $EP/v1/chat/completions -d '{"model":"kolibri","messages":[{"role":"user","content":"hallo"}]}'
+```
 
 A completion smoke test is in the runbook: `Deploy & Validate` in
 [`.agents/deploy/hosts/eisen.md`](../.agents/deploy/hosts/eisen.md).

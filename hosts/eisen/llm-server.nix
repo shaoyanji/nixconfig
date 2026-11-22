@@ -6,7 +6,7 @@
   pkgs,
   ...
 }: let
-  port = 8085; # Strata MoE port on eisen (supersedes llama-swap 8080)
+  port = 8085; # Strata
   modelDir = "/mnt/storage/models";
 
   # SSE proxy policy, defined once: three vhosts (the model API, /eisen/ and
@@ -23,10 +23,8 @@
 
   tc = config.services.tailscale.package;
 
-  # Gate both serve paths on the tailnet backend actually being connected.
-  # `after = tailscaled.service` only waits for the daemon to start, not for
-  # the node to be Running; without this the units race it on a tailscaled
-  # restart and die with "unexpected state: NoState".
+  # Trap: note eisen-llm-stack — After=tailscaled is ordering, not readiness;
+  # wait for BackendState=Running or the unit dies "unexpected state: NoState".
   waitForTailscale = pkgs.writeShellScript "wait-for-tailscale-running" ''
     set -eu
     for _ in $(seq 1 60); do
@@ -94,7 +92,7 @@
   qwenFile = "${modelDir}/${qwenName}";
   qwenUrl = "https://huggingface.co/bartowski/Qwen_Qwen3.6-35B-A3B-GGUF/resolve/main/${qwenName}";
 
-  # Dormant with their models (2026-10-19); see the commented fork block above.
+  # Dormant: note eisen-llm-stack; fork block below.
   /*
   kolibriName = "Kolibri-1-Q4_K_M.gguf";
   kolibriFile = "${modelDir}/${kolibriName}";
@@ -105,10 +103,8 @@
   bonsaiUrl = "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/resolve/main/${bonsaiName}";
   */
 
-  # DORMANT (2026-10-19): the 0.7.0 pin and both forks each forced a full C++
-  # build on eisen (~15 min) every nixpkgs bump — the energy cost that retired
-  # them. Kept as comments, not deleted: revive by uncommenting this block plus
-  # the matching vars, fetch unit and model entry.
+  # Dormant: note eisen-llm-stack (energy-cost retirement, 2026-10-19). Revive
+  # by uncommenting this block plus the matching vars, fetch unit and model entry.
   /*
   # Vulkan (radv) build pinned to 0.7.0 (release v0.7.0 / build 11669 / commit 620d222).
   # RX 5700 (Navi 10) uses the Vulkan backend; dynamic CPU dispatch provides AVX2 for Haswell-EP.
@@ -222,7 +218,7 @@
   dflashUrl = "https://huggingface.co/aminya/Qwen3.6-35B-A3B-DFlash2-GGUF/resolve/main/${dflashName}";
 
   # Kev-4B GGUF — kept on disk for direct tests; never served, never routed.
-  # hosts/eisen/HANDOFF.md "Kev-4B — tested, no endpoint (2026-10-17)".
+  # Story: note eisen-llm-stack.
   kevFile = "${modelDir}/Kev-4B-Q8_0.gguf";
   kevUrl = "https://huggingface.co/ggml-org/Kev-4B-GGUF/resolve/main/Kev-4B-Q8_0.gguf";
   /*
@@ -260,10 +256,8 @@
     + spec;
   */
 
-  # Kolibri-1 loads via `llamaKolibri` (patched llama.cpp, Hob-forge patch);
-  # the stock binary exits with "unknown model architecture: 'kolibri1'".
-  # Re-test with:
-  #   curl -s $EP/v1/chat/completions -d '{"model":"kolibri",...}'
+  # Re-test recipe: docs/eisen-llm-architecture.md §"Kolibri-1 needs a patched
+  # llama.cpp" (stock binary exits "unknown model architecture: 'kolibri1'").
 
   # Idempotent, resumable weight fetch — runs only when the GGUF is absent.
   mkFetch = {
@@ -291,7 +285,7 @@ in {
     self.modules."profiles.nixbuild-client"
   ];
 
-  # Remote builder client for nixbuild.net (enables distributed builds initiated from eisen in the basement)
+  # Remote builder client for nixbuild.net (distributed builds).
   profiles.nixbuild-client.enable = true;
 
   # Model weight repository on the persistent storage array.
@@ -303,7 +297,7 @@ in {
     file = qwenFile;
     url = qwenUrl;
   };
-  # Dormant with their models (2026-10-19).
+  # Dormant: note eisen-llm-stack.
   /*
   systemd.services."eisen-llm-kolibri" = mkFetch {
     file = kolibriFile;
@@ -325,8 +319,8 @@ in {
   };
 
   # --- Native llama.cpp servers, swapped on demand (no Ollama) ---
-  # DORMANT (2026-10-21): superseded by Strata MoE on port 8085 (open-strata-eisen-rx5700).
-  # Kept commented, not deleted: revive by uncommenting this block and setting port back to 8080.
+  # Dormant: note eisen-llm-stack — revive by uncommenting this block and
+  # setting port back to 8080.
   /*
   # Weights and the storage mount must exist before llama-swap accepts traffic.
   systemd.services.llama-swap = {
@@ -397,8 +391,7 @@ in {
     enable = true;
     recommendedProxySettings = true;
     virtualHosts."eisen.lan" = {
-      # The bare IP is a convenience for clients that skip DNS, and it is DHCP:
-      # it moved .76 -> .91 on 2026-11-03, so the name is the durable one.
+      # Fact: inventory.toml — eisen.lan is a DHCP alias; the name is durable.
       serverAliases = ["eisen" "192.168.3.91"];
       listen = [
         {
@@ -465,12 +458,8 @@ in {
     };
   };
 
-  # `tailscale-serve` is upstream's oneshot. It is ordered `After=tailscaled`,
-  # but ordering is not readiness: at boot tailscaled is still `NoState`, so
-  # `tailscale serve set-config` exits 1 once and the unit stays failed with no
-  # retry (seen on eisen 2026-10-19 13:44 — the tailnet serve config was not
-  # applied until a manual restart). Wait for BackendState=Running first, and
-  # raise TimeoutStartSec so the wait fits inside the unit's start timeout.
+  # Trap: note eisen-llm-stack — `tailscale-serve` is ordered After=tailscaled
+  # but raced its backend at boot and died once with no retry (2026-10-19).
   systemd.services.tailscale-serve = {
     serviceConfig = {
       TimeoutStartSec = 150;

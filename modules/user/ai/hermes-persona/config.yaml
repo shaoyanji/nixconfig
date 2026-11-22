@@ -233,6 +233,27 @@ platforms:
       chat_id: '8679391100'
       name: Matt Ji
       user_id: '8679391100'
+# A dead IPv6 route (advertised, never answers) makes every connect spend its
+# IPv6 attempt first: `hermes doctor`'s 44-check pass took 23 s for exactly this
+# reason, and `doctor_connectivity` reported openrouter.ai unreachable after a 2 s
+# timeout on each check (measured 2026-11-22). `force_ipv4` drops AAAA candidates
+# before the connect, so a lookup answers on IPv4 instead of waiting the stall
+# out. Honoured outside doctor too — hermes_cli/config_defaults.py (default
+# false), gateway/run.py and cron/scheduler.py all read it.
+network:
+  force_ipv4: true
+
+# Bundled platform plugins are imported on commands that load plugins, each
+# under a per-plugin deadline (`plugins.load_timeout_seconds`, default 10 s).
+# slack-platform is configured on no host and its adapter imports slack_bolt,
+# which this package does not ship — the import never returns, so the load paid
+# the full deadline and then warned that register_platform() arrived too late
+# (measured 2026-11-22: 10 s + two WARNINGs per loading invocation).
+# `plugins.disabled` is the loader's deny-list and wins over `plugins.enabled`
+# (hermes_cli/plugins_discovery.gate_manifest), so the plugin is never imported.
+plugins:
+  disabled:
+    - slack-platform
 fallback:
   min_switch_reset_seconds: 120
 onboarding:

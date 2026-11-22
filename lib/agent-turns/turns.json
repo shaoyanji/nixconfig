@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-22T07:47:55Z",
+  "generated": "2026-11-22T08:01:28Z",
   "count": 200,
-  "pin": "e1cc1df6cac93a10792a1fbd600fbcf45a2f0001539873ba236d5b50590f3cdf",
+  "pin": "98ebefc39af0b32224b43c08e28c0816880d4c981f31a517a03651456531f2a7",
   "turns": [
+    {
+      "id": "267baba1-885f-48df-90be-ef6ecac65998",
+      "ts": "2026-11-22T08:01:15Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff",
+      "action": "landed: prose-change task - redact contacts from documentation",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6d9d9fa2554617c3e084d3da1d1d459769025d74",
+      "branch": "main",
+      "frame": "03ha5yvp3u5zrct53are1t16i"
+    },
+    {
+      "id": "38e7d159-742b-43d1-9dcd-4e4d2aaa2051",
+      "ts": "2026-11-22T07:59:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-fau-sysadmin",
+      "action": "landed: FAU LFT sysadmin packet (JD, 2-page CV, 1-page letter, sheet) | gate: checks:prose PASS | archive audit: no interview mails since 2026-11-21; mail ids 311050/311052 do not exist (max 2928)",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "d9d7bc13877cfc2f10fa744c02c2af20a5077ed4",
+      "branch": "main",
+      "frame": "03ha5yjnc2236878s4wn42y1n"
+    },
+    {
+      "id": "e233ce62-3222-404a-862e-db2b8575b7eb",
+      "ts": "2026-11-22T07:57:36Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: gocardless senior SRE (database) via GH 8385160; honest remote-from-Germany, EUR 95k, no UK work auth",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/gocardless-senior-sre-database"
+      ],
+      "files": [],
+      "base_commit": "6d9d9fa2554617c3e084d3da1d1d459769025d74",
+      "branch": "main",
+      "frame": "03ha5y5zq7f5cnr379suo48mn"
+    },
     {
       "id": "634c67d0-6412-4ebb-a185-09cf7e106a17",
       "ts": "2026-11-22T07:47:46Z",
@@ -2774,68 +2817,6 @@
       "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
       "branch": "main",
       "frame": "03h9y63nb9sx39twchkreslii"
-    },
-    {
-      "id": "0ba2bbc9-eebf-4d10-91e1-f5caad738e00",
-      "ts": "2026-11-21T07:58:37Z",
-      "source": "devin",
-      "subject": "nixconfig:appflow-workflow-fix",
-      "action": "landed: client-side appflow surface fixed end to end — apps:list tsv bug, queue:resolve wired, APPS_SYNC shim for delphi-only binary, select.py renamed (stdlib shadow killed drafts), apps:add + stage derivation, apps skill rewrote the workflow | gate: checks:quick PASS + checks:appflow{,:triage,:resolve,:gate} all green",
-      "outcome": "done",
-      "claims": [
-        "scripts/task",
-        "taskfiles/apps.yml",
-        "taskfiles/agents.yml",
-        ".agents/skills/apps"
-      ],
-      "files": [
-        ".agents/skills/apps/SKILL.md",
-        "modules/plugins/appflow/{jdselect.py",
-        "triage.py",
-        "packet.nix",
-        "README.md}",
-        "scripts/task/{appflow-sync.sh",
-        "apps-db.sh",
-        "apps-resolve.sh",
-        "appflow-select.sh}",
-        "taskfiles/{apps.yml",
-        "agents.yml}",
-        "tests/appflow-select/run.sh"
-      ],
-      "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
-      "branch": "main",
-      "frame": "03h9y52hlyirdbdy0jhv9iiku"
-    },
-    {
-      "id": "0636d130-2826-424e-8b77-ddd3bd8aed77",
-      "ts": "2026-11-21T07:51:51Z",
-      "source": "devin",
-      "subject": "nixconfig:appflow-workflow-fix",
-      "action": "claim: fix appflow client surface — apps:list jq bug, queue:resolve stub, agents:apps:* appflow-sync delphi-only, add verb + skill docs",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "taskfiles/apps.yml",
-        "taskfiles/agents.yml",
-        ".agents/skills/apps"
-      ],
-      "files": [],
-      "base_commit": "48ccdb52c273234ea11bd31fbb24cc8efe5bac3d",
-      "branch": "main",
-      "frame": "03h9y3qvfq9y0ecsycym9xche"
-    },
-    {
-      "id": "24b09596-e2da-4680-84e2-1297c28607d0",
-      "ts": "2026-11-21T07:10:46Z",
-      "source": "devin",
-      "subject": "nixconfig:systemd-consistency",
-      "action": "landed: per-site contract audit of all 14 mkTimerJob/mkDaemon files — zero drift (serviceConfig disjoint from every base, shared edges concat site-first, enable consumed not leaked); |> pipelines applied at 4 call sites (infra-stack, mail-atlas, appflow, agent-turns) | gate: checks:host frieren PASS (2309), delphi PASS (2110), checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "48ccdb52c273234ea11bd31fbb24cc8efe5bac3d",
-      "branch": "main",
-      "frame": "03h9xvq0h09sn7ovk8q22kgvo"
     }
   ]
 }

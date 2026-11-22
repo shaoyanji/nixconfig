@@ -4,7 +4,7 @@ A cold mail is read for eleven seconds. Everything here is arranged around that:
 one specific reason to write, one piece of verifiable evidence, one question that
 is cheap to answer.
 
-The sender is `Matt Ji <matt@bountystash.com>`. That account now sends through
+The sender is the address in [`contact.md`](contact.md). That account now sends through
 Resend, which signs with bountystash.com's own DKIM key, so the mail arrives
 authenticated rather than as an unsigned alias
 (`modules/himalaya.nix`, `docs/job-cold-email.md` sits beside `docs/sops-rekey.md`).
@@ -14,7 +14,7 @@ The signature carries no number: it lives in `modules/secrets/pii.yaml`, and
 get basics.phone`) when you want it in a mail.
 
 Placeholders are `{{UPPER_CASE}}`. Fill every one; a mail that still says
-`{{FIRMA}}` is worse than no mail.
+`{{FIRMA}}` is worse than no mail. `{{EMAIL}}` is the address on [`contact.md`](contact.md).
 
 ## Sending rules
 
@@ -65,7 +65,7 @@ erneut.
 Freundliche Grüße
 Matt Ji
 Systems & Infrastructure Engineer
-matt@bountystash.com
+{{EMAIL}}
 https://matt.bountystash.com · https://github.com/shaoyanji
 ```
 
@@ -92,7 +92,7 @@ bitte kurz — ich frage kein zweites Mal.
 
 Freundliche Grüße
 Matt Ji
-matt@bountystash.com
+{{EMAIL}}
 https://matt.bountystash.com · https://github.com/shaoyanji
 ```
 
@@ -119,7 +119,7 @@ one line is enough and I will not write again.
 Best regards
 Matt Ji
 Systems & Infrastructure Engineer
-matt@bountystash.com
+{{EMAIL}}
 https://matt.bountystash.com · https://github.com/shaoyanji
 ```
 

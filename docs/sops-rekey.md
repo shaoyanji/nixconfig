@@ -140,7 +140,7 @@ pw = subprocess.run(
 ).stdout.strip()
 
 with imaplib.IMAP4_SSL("imap-dragoncourt.alwaysdata.net", 993) as M:
-    M.login("dragoncourt@alwaysdata.net", pw)
+    M.login("[ACCOUNT_EMAIL]", pw)  # address from the same sops file, never this page
     status, count = M.select("INBOX")
 ```
 

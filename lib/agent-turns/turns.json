@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-22T01:59:37Z",
+  "generated": "2026-11-22T02:16:52Z",
   "count": 200,
-  "pin": "3223a3c303cc87a2cd298300152b6ed8c070176f3ac52efcff9b8b23a621379a",
+  "pin": "25e4ab13e0d925ebade14d7a567f79c9cbe5ccae5aa68f3c435ef966dc767573",
   "turns": [
+    {
+      "id": "2a250c8b-7856-44ec-a8d8-8c558660d31a",
+      "ts": "2026-11-22T02:14:56Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove idle freebuff pane (default:1.1) to build the Adyen Senior Platform Engineer - GenAI application packet (task agents:apps:packet ID=adyen-platform-genai, Greenhouse req 8163866); pane confirmed working (fresh counter)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
+      "branch": "main",
+      "frame": "03ha4388mldxlim42cacbptzk"
+    },
+    {
+      "id": "fb5dc55e-44db-479f-90f0-80754384b22d",
+      "ts": "2026-11-22T02:05:24Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-redaction-done",
+      "action": "landed: freebuff completed redaction of third-party contacts in docs/nix-consultancy-outreach.md (no phone number present in doc — header keeps it in pipeline). Agent asks operator: should a redacted docs/ copy be created? Pane idle awaiting answer.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
+      "branch": "main",
+      "frame": "03ha41d71iuz5hxp8idgdgexf"
+    },
+    {
+      "id": "3b85f887-697a-4a48-a551-f4e08bbbccbf",
+      "ts": "2026-11-22T02:05:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-driven",
+      "action": "landed: drove idle freebuff pane — routed next task via jevdecide (prose-change, margin 0.87): redact third-party contacts/phone from docs/nix-consultancy-outreach.md. Fresh working line confirmed.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
+      "branch": "main",
+      "frame": "03ha41afvsqzpsqh44m3j0glq"
+    },
+    {
+      "id": "005123ae-72b6-445b-acea-f2fb711a4e42",
+      "ts": "2026-11-22T02:04:15Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-gate-decision",
+      "action": "landed: resolved freebuff Submit dialog — chose 'Leave the live site alone' (no deploy); pane unblocked to next task (redact third-party contacts). agy rate-limited (quota resets ~36m), task preserved in vim buffer.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
+      "branch": "main",
+      "frame": "03ha41534ibgpq81uyil8cltq"
+    },
+    {
+      "id": "c3f452eb-dea5-4a67-abc4-9b5565c60503",
+      "ts": "2026-11-22T02:03:58Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-corpus-reconcile",
+      "action": "landed: redacted third-party names/LinkedIn/personal sites in .agents/outreach (company names + owner contact kept) | gate: grep sweep clean + 5x cv-ats-check PASS; matt:cv:check red only on stale live deploy (cv-software.pdf 404), operator declined deploy | commits: 0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
+      "branch": "main",
+      "frame": "03ha4135a3rpuhnoxyzdugazd"
+    },
     {
       "id": "85ec189b-3389-43fb-88b2-f248e605a3b8",
       "ts": "2026-11-22T01:59:31Z",
@@ -2719,81 +2784,6 @@
       "base_commit": "ecf2d05622244e31a9b5810480b8ad36d71b7c8c",
       "branch": "main",
       "frame": "03h9wb6srudtayar7jcvuuek6"
-    },
-    {
-      "id": "c30038de-10af-4a9b-9d57-f64357c90f8e",
-      "ts": "2026-11-21T02:16:54Z",
-      "source": "devin",
-      "subject": "nixconfig:offload-bridge",
-      "action": "claim: offload-bridge two timer-job pairs onto shared mkTimerJob",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/offload-bridge.nix lib/systemd-jobs.nix"
-      ],
-      "files": [],
-      "base_commit": "3307d8f77153985862b7746b1fdd6c46214ed074",
-      "branch": "main",
-      "frame": "03h9wabdvpz1d91qdkohpqeot"
-    },
-    {
-      "id": "08b5f98e-fecf-4812-b2cf-740e98a79d3f",
-      "ts": "2026-11-21T02:12:08Z",
-      "source": "frieren-steward",
-      "subject": "nixconfig:pane-steward-devin-briefing",
-      "action": "Devin briefing closed: chose \"Stop — briefing done\", devin reported status and returned to clean prompt. Phases 2/4 parked with open design questions recorded in docs/device-agent.md.",
-      "outcome": "done",
-      "claims": [
-        "modules/services/task-web"
-      ],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9w9ds2ppx2mr95y42zpvpm"
-    },
-    {
-      "id": "ca43ec8c-a1fb-4ada-abb5-62882b3673a0",
-      "ts": "2026-11-21T02:11:59Z",
-      "source": "frieren-steward",
-      "subject": "nixconfig:pane-steward-freebuff-cv-gate",
-      "action": "CV-PDF link gate landed: freebuff implemented the gate (every built CV PDF linked from site, link targets resolve), wired into build/CI. CI run 44852626071 green with \"Check CV links\" step executing. Pane back at clean prompt.",
-      "outcome": "done",
-      "claims": [
-        "modules/services/task-web"
-      ],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9w9crc0ksez5i2x7mu3iom"
-    },
-    {
-      "id": "1354ff2c-62d5-499d-bd3b-8215587c1d05",
-      "ts": "2026-11-21T02:11:26Z",
-      "source": "frieren-steward",
-      "subject": "nixconfig:pane-steward-devin-briefing",
-      "action": "Resolved devin pane (default:2.1) decision menu: chose \"Stop — briefing done\" (5 PRs merged, env cleaned). Devin now reporting status; phases 2/4 parked.",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/task-web"
-      ],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9w98w2x3p8cacecure0jsk"
-    },
-    {
-      "id": "046d30d9-fd28-4c5b-b85c-f53cc1022d3e",
-      "ts": "2026-11-21T02:11:20Z",
-      "source": "frieren-steward",
-      "subject": "nixconfig:pane-steward-freebuff-cv-gate",
-      "action": "Drove freebuff pane (default:1.1): landed CV-PDF link gate task (every built CV PDF linked from site, link targets resolve, wired into build/CI). Pane now working.",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/task-web"
-      ],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9w987zmwb3dmzpfbkw0m0g"
     }
   ]
 }

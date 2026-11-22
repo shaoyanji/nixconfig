@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-22T12:02:35Z",
+  "generated": "2026-11-22T12:05:40Z",
   "count": 200,
-  "pin": "3749f8c93382dba1804fc5eb4049edfa2092e15501268a783e0f72c8e702ea41",
+  "pin": "c101ffb8b52c715bd43254c0a909a39824901e812c531a33146f16585bbf7924",
   "turns": [
+    {
+      "id": "56296ab9-a40b-4543-adf8-f01cc9634d15",
+      "ts": "2026-11-22T12:05:39Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:enbw",
+      "action": "landed: enbw packet was already native Typst (no letter.json, no store symlink); CV rebalanced 9.5pt (92%/18%) to 11.5pt/0.75em (89%/71%, break at Projekte), text unchanged, both sources compile with 0 warnings, DB row enbw refreshed and still blocked on the filled requisition (careers.enbw.com HTTP 410) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/enbw"
+      ],
+      "files": [],
+      "base_commit": "d4a5bb98b852b8f1fae0cd58aa6c32c72386411a",
+      "branch": "main",
+      "frame": "03ha7amcl9nwkzzpffj0qok75"
+    },
+    {
+      "id": "bd70e46f-a995-493a-abb9-b3b822f86be3",
+      "ts": "2026-11-22T12:04:43Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "orchestrating: enpal confirmed landed via ashby; sumup confirmed landed via gh; dispatched devin (pane 2) to grafana (gh 6103688004), freebuff frieren (pane 1) to purestorage, freebuff delphi (pane 3) to enbw",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "95db810d1fd1043bde100d9c26bf9abdc1e8c922",
+      "branch": "main",
+      "frame": "03ha7afuontt69ccss2fnsw87"
+    },
+    {
+      "id": "573fb19c-68c9-404c-8e1f-0e03c106e248",
+      "ts": "2026-11-22T12:02:53Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-kernel",
+      "action": "landed: native English Typst dossier for Lead Linux Kernel Engineer — CV 2pp/1130w, letter 1pp/391w, 0 warnings; removed the database skills block, rebuilt around kernel-as-declared-input and hermetic packaging, standard filenames, retired selection.json | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "95db810d1fd1043bde100d9c26bf9abdc1e8c922",
+      "branch": "main",
+      "frame": "03ha7a2y1ag1u7tdwe6dogjha"
+    },
     {
       "id": "931cd3d4-9dc4-4671-8a4b-47b62cad9b09",
       "ts": "2026-11-22T12:02:00Z",
@@ -2803,45 +2844,6 @@
       "base_commit": "70666a92f76f11d02884279f2dbd7951717e6123",
       "branch": "main",
       "frame": "03ha6nvj5xivsgvtnpc4jvh9v"
-    },
-    {
-      "id": "cd50dc30-f4e7-45be-accb-6cab0e849285",
-      "ts": "2026-11-22T10:08:34Z",
-      "source": "devin",
-      "subject": "nixconfig:flox",
-      "action": "claim: Ashby submission (sibling record claims applied 11-21; verifying by attempt)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "7f18ab37b39630e3c657f6f7c2a928c74d4011c5",
-      "branch": "main",
-      "frame": "03ha6nr22w84s0xha6tywgucf"
-    },
-    {
-      "id": "7c45bdac-74e6-4c51-8743-403f13e4af27",
-      "ts": "2026-11-22T10:07:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:coreweave",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7f18ab37b39630e3c657f6f7c2a928c74d4011c5",
-      "branch": "main",
-      "frame": "03ha6ni0wav70vck2jj4yin70"
-    },
-    {
-      "id": "41c8e8bb-b227-44c4-b1ca-f91093247e2f",
-      "ts": "2026-11-22T10:06:47Z",
-      "source": "devin",
-      "subject": "nixconfig:clickhouse-dbre",
-      "action": "interactive recaptcha image grid at submit | form+files complete",
-      "outcome": "blocked: recaptcha-image",
-      "claims": [],
-      "files": [],
-      "base_commit": "d469ec20f2254207b3b48976608c3ab5950ff91c",
-      "branch": "main",
-      "frame": "03ha6negl06sdy485uh7s3akw"
     }
   ]
 }

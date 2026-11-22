@@ -1,0 +1,129 @@
+Company: Pure Storage
+Role: Cloud Native Architect, Strategic Accounts (EMEA)
+Location: Remote, France; Remote, Germany; Remote, Netherlands; Remote, United Kingdom
+Posted: 2026-11-17
+Source: greenhouse
+URL: https://job-boards.greenhouse.io/purestorage/jobs/8379480
+---
+
+Everpure (NYSE: P) has evolved from storage pioneer to data platform, closing fiscal 2026 with $3.7 billion in revenue, its first billion-dollar quarter, and accelerating growth into FY27. Our strategic agenda spans the companies defining the next era of technology - hyperscalers, AI labs, the AI hardware supply chain, data platform providers, and the broader AI ecosystem.
+This type of work—work that changes the world—is what the tech industry was founded on. So, if you're ready to seize the endless opportunities and leave your mark, come join us.
+Position Overview
+As a member of the World Wide Strategic Accounts field team, the Cloud Native Architect (CNA) is a senior technologist who owns the technical sales strategy, evaluation program, and architectural vision creating repeatable business with software opportunities with the company’s largest multinational customers. You will guide C‑level and engineering stakeholders through solution discovery, validation, and financial justification, ensuring every engagement results in a technical win and a clear path to enterprise‑wide adoption that delivers the customers business outcomes aligned to the project. Driving Everpure as the standard solution for delivering data-management in the WWSA Segment. Creating market penetration strategy and thought leadership across the entire theater/segment.
+The role of a Cloud Native Architect (CNA) is a multifaceted position that serves as a technical bridge between the sales, product, and engineering teams. This role is important for driving revenue growth and enhancing customer relationships by providing technical solutions for a specific set of accounts. Primarily focused on the pre-sales process, the individual in this role will engage with potential and existing customers to understand their business issues and technical hurdles related to Kubernetes. They will deliver tailored product demonstrations, respond to technical inquiries, and work with the Everpure technical field to architect solutions that integrate Everpure offerings with clients' software driven platforms. The responsibilities of the Cloud Native Architect will fall into (5) categories:
+- Participation in Lead Generation
+- Technical Qualification
+- Solution Validation
+- Prospect to Customer Transition
+- Established Customer Satisfaction
+These categories will serve not only as the foundation for the role, but align with the Technical Sales Process to provide the best possible customer experience.
+Role Scope
+Theater: Strategics (EMEA)
+Builds and leads: CNA team pooled to deliver outcomes in aligned theater Strategic accounts
+Role type: Technical Pre-sales Architect
+Revenue alignment:
+- This role is directly assigned to the Theater Strategics Portworx and Pure Storage Cloud quota and is expected to meet and exceed TCV Sales goals .
+- CNAs have primary vertical/account assignments while also being goaled on overall Theater quota performance , ensuring the team operates as a focused unit without losing shared accountability.
+Focus Areas & Key Responsibilities
+- Technical Sales Leadership
+- Lead the full Cloud Native  technical sales process life‑cycle, Discovery, Strategy Alignment, Demo, Workshop, POC/POV, and Wrap‑Up to secure the technical decision in deals for WWSA.
+- Architect Kubernetes‑centric data platforms spanning multiple regions, clouds, and business units.
+- Own the technical sections of proposals, RFx responses, and SOWs.
+- Written and verbal fluency in French as well as English is mandatory.
+Financial & Business Value Selling
+- Translate technical capabilities into quantified business outcomes that resonate with executive sponsors.
+Customer Engagement
+- Act as the primary technical face of the company’s Cloud Native portfolio to WWSA teams; orchestrate executive briefings, architecture workshops, and steering‑committee updates. Locating and coordinating with other BU and technical sales stakeholders to deliver outcomes for customers goals.
+- Establish a cadence (weekly checkpoints, executive QBRs) aligned to the customer’s program milestones. For NNL and Expansion opportunities.
+Thought Leadership
+- Evangelize best practices in Cloud Native data management, platform engineering, and cost optimization through conference talks, blogs, and executive roundtables.
+- Mentor fellow Cloud Native Architect (CNA) on enterprise engagement methodology and financial value selling.
+Co-Seller Collaboration and Leadership
+- Interact with the WWSA Sales Global Account Manager, Lead Client Director for each strategic account to bring full Pure Storage portfolio solutions to customers
+- Enablement of Cloud Native Processes, standards and excellence.
+- Lead Generation:
+- Attend industry events to deliver a talk or support booth staff
+- Produce technical content in the form of blogs, webinars and podcasts
+- Proactively engage contacts in professional network through LinkedIn etc
+- Support monthly Hands-on Labs
+- Attend Pure user groups
+- Organize community user groups
+- Attend co-seller Sales Engineering Manager/Directors team meetings monthly to reinforce alignment, share relevant insights, and ensure consistent technical messaging across teams.
+- Bi-Weekly Interactions should focus on meaningful changes in opportunity status, emerging risks, customer sentiment, deal velocity, and where technical leadership can improve outcomes or remove friction.
+- Quarterly Interactions should support shared planning and reflection, including QBR/QSR collaboration, headwinds and tailwinds, participation effectiveness, and alignment on priorities for the coming quarters.
+- Collaborate with the Co-seller Technical Sales Directors to co-sponsor targeted PX sales efforts for a small number of priority customers, engaging directly where technical leadership can materially influence outcomes.
+- Other duties as assigned by Technical Sales Leadership
+- Technical Qualification:
+- Review information gathered as part of Sales Stage 1
+- Discuss the opportunity with the AE to identify missing data related to BANT and/or other qualifiers.
+- Capture the project success criteria from the customer
+- Create a mapping to the desired Business Impact & Outcomes
+- Review & document the customers current state
+- Document technical pain points & focus areas
+- Review the Assessment Scorecard to ensure alignment with the customer
+- Document the technical details and other data points in SFDC
+- Present the proposed Evaluation Program, based on information gathered from the discovery phase:
+- An overview of their current architecture
+- Review of Pure Storage Capabilities critical to the customer and their project
+- A proposed solution including an updated architecture with Pure Storage data management and key components
+- Success criteria for the proposed solution and method to demonstrate (demo, workshop, POC/POV)
+- Other duties as assigned by Technical Sales Leadership
+- Solution Validation:
+- Provide a capabilities demonstration to the prospect
+- Conduct an Technical Workshop with the prospect to gather deeper solution configuration parameters, discuss additional benefits, and highlight specific solution capabilities
+- Plan and coordinate a Proof Of Concept/Value that will address the customers outstanding solution parameters
+- Provide a POC/POV outcomes report that highlights the testing completed as part of the POC/POV, the relevant outcomes, and the overall business value to the customer.
+- Other duties as assigned by Technical Sales Leadership
+- Prospect to Customer Transition:
+- Introduce & explain fixed scope installation services
+- Coordinate scoping of Professional Services (if needed)
+- Discuss the value of BCS (Business Critical Services) and propose
+- Discuss the value of SA (Solution Architect) Hours and propose
+- Discuss the value of a CSM (Customer Success Manager) and propose
+- Discuss customer training/certification credits and propose
+- Prepare Transition Documentation:
+- High-level Project Plan
+- Key Milestones
+- Customer Key Technical Contacts
+- External Integration Overview
+- Observability
+- Identity Management
+- Security Requirement
+- Any additional Integrations
+- 5. Other dependencies to begin the project (Hardware, Platform, etc.)
+- Other duties as assigned by Technical Sales Leadership
+- Established Customer Satisfaction:
+- Establish a regular cadence beginning 90 days post deal close and continuing quarterly
+- Review product expansion and feature adoption as part of quarterly cadence
+- Document RFEs and usability concerns
+- Provide release updates and updated roadmaps
+- Other duties as assigned by Technical Sales Leadership
+Expected Impact & Success Metrics
+- Deliver Technical Wins that Convert to Booked Revenue
+- 80% Technical Win rate in Opportunities above Stage 2(Exception for Misaligned Deals)
+- Achieve booked sales attainment goal
+- Accuracy and Accelerated Technical Sales Process
+- Qualified Opportunities with TSP Cycle less than 90 days in Stage 2
+- Technical and Financial Solution Delivery
+- 100% of Opportunities have TCO/ROI proposals with written customer approval
+- Strengthen CX Handoff and Post Close Won Customer Relationship
+- Measure first‑year adoption of features validated during the Technical Sales Process. Document customer progress with CSM.
+- Quarterly meets with every current customer
+- WWSA Penetration
+- Pool Goal of raising Under penetrated WWSA accounts to over $1M TCV
+- Pool Goal of Pipeline in 50% of WWSA
+- Pool Goal of initial landing footprint in 50% of WWSA
+#LI-REMOTE
+WHAT YOU CAN EXPECT FROM US:
+- Innovation : We celebrate those who think critically, like a challenge, and aspire to be trailblazers.
+- Growth : We give you the space and support to grow along with us and to contribute to something meaningful. We have been named Fortune's Best Workplaces in Technology™, Fortune's Best Workplaces in the Bay Area™, and certified as a Great Place to Work®!
+- Team : We build each other up and set aside ego for the greater good.
+And because we understand the value of bringing your full and best self to work, we offer a variety of perks to manage a healthy balance, including flexible time off, wellness resources, and company-sponsored team events. Check out http://benefits.everpuredata.com/ for more information.
+ACCOMMODATIONS AND ACCESSIBILITY:
+Candidates with disabilities may request accommodations for all aspects of our hiring process. For more on this, contact us at TA-Ops@purestorage.com if you’re invited to an interview.
+OUR COMMITMENT TO A STRONG AND INCLUSIVE TEAM:
+We’re forging a future where everyone finds their rightful place and where every voice matters. Where uniqueness isn’t just accepted but embraced. That’s why we are committed to fostering the growth and development of every person, cultivating a sense of community through our Employee Resource Groups and advocating for inclusive leadership.
+Everpure is proud to be an equal opportunity employer. We do not discriminate based upon race, religion, color, national origin, sex (including pregnancy, childbirth, or related medical conditions), sexual orientation, gender, gender identity, gender expression, transgender status, sexual stereotypes, age, status as a protected veteran, status as an individual with a disability, or any other characteristic legally protected by the laws of the jurisdiction in which you are being considered for hire.
+Join us and bring your best.
+Bring your bold.
+Pure and simple.

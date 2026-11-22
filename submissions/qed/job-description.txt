@@ -1,0 +1,21 @@
+Infrastructure Engineer — Warsaw
+QED.ai · Warsaw, Poland · Full time · Engineering · no salary band published
+https://jobs.ashbyhq.com/qed-ai/65b87925-f805-46bb-86a7-32a6ace34614
+
+PROVENANCE: this folder held no job-description file. The text below is reconstructed from the retirement-time
+submission sheet (QED_Submission_Sheet.txt, now retired), which inspected the live posting on 2026-11-21 (HTTP
+200, title and location unchanged) and copied its requirements and form structure. Faithful to that inspection;
+not a fresh fetch.
+
+LOCATION — THE HARD REQUIREMENT
+"Requires a full-time commitment physically based in Warsaw, Poland, with a hybrid of remote and in-person work
+throughout the week. We expect at least 2-3 days per week in the office... if you are based outside of the Warsaw
+metropolitan area, we would expect you to relocate." This is not an EU-remote role and the form has no option that
+makes it one.
+
+THE WORK
+- Declarative tooling — NixOS, k3s and terraform — mostly on bare metal.
+- Reusable modules, because clients expect their data to stay in their own country.
+- Monitoring and alerting, and response when something is down; pager duty optional.
+- Bare-metal builds for low- and middle-income countries, where a cloud region cannot be assumed.
+- Optional travel to set up hardware in local data centres.

@@ -1,8 +1,77 @@
 {
-  "generated": "2026-11-22T12:39:55Z",
+  "generated": "2026-11-22T12:42:59Z",
   "count": 200,
-  "pin": "65c565c46d7b7cd091697e7a01253d313cf57340afabf4b2cfa9e6fa872dfc86",
+  "pin": "603629dc51646bd245149f1c4c7d48fc2ac7c190afe555ebe82cd5fcc0eeb31a",
   "turns": [
+    {
+      "id": "c3d668c7-dd29-42f9-9549-c8f45b913205",
+      "ts": "2026-11-22T12:42:56Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-prometheus",
+      "action": "landed: CV page-2 fix (97/36 -> 84/88 at 11pt), node_exporter stated precisely from hosts/gok, Mimir/federation/multi-tenant gaps added; no symlink or JSON existed to remove | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-prometheus"
+      ],
+      "files": [],
+      "base_commit": "f27276632215cec506d960f43c0306b3130ad5bf",
+      "branch": "main",
+      "frame": "03ha7hwkm722ljcvue4m821su"
+    },
+    {
+      "id": "ee508430-2b07-4863-aa52-1613bcdd2240",
+      "ts": "2026-11-22T12:41:55Z",
+      "source": "devin",
+      "subject": "job-hunt:stackit-sre",
+      "action": "STACKIT GT2321 SRE Control Plane: applied via Schwarz SAPUI5 portal. Silent success (dialog closes, no banner) — verified by resubmit returning 'already applied' + persisted visibility choice. SAPUI5 mechanics now a solved lane.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e67f58b98bbccea1ab43343b994ef23f25066238",
+      "branch": "main",
+      "frame": "03ha7hpfo4e8f57bgdnpypucq"
+    },
+    {
+      "id": "f3d26b2b-dd59-4587-91bb-e814d900083c",
+      "ts": "2026-11-22T12:41:44Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "coordinator: Pane 1 active on BWI (Anthropic landed), Pane 2 submitting STACKIT GT2321, Pane 3 active on Telekom Prometheus (Observability landed) | zero idle time active",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e67f58b98bbccea1ab43343b994ef23f25066238",
+      "branch": "main",
+      "frame": "03ha7ho7u5qxu6y0gcglkdzn0"
+    },
+    {
+      "id": "a795b03a-a5bd-45aa-8a6f-eeee2a599334",
+      "ts": "2026-11-22T12:40:24Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-observability",
+      "action": "landed: CV page-2 fix (93/50 -> 86/86 at 11pt) and journald diagnostics added; no symlink/selection.json existed, fit 2 held on the OTel/tracing/Jaeger must-haves | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "d7c1dfd3efa0f59f78ba7c2d8da1e4e6641f7462",
+      "branch": "main",
+      "frame": "03ha7hesr2uiisx5v3zs9q1za"
+    },
+    {
+      "id": "f1c9d4f5-f0dc-47a6-ba58-c111796ed052",
+      "ts": "2026-11-22T12:39:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:anthropic-data-infra",
+      "action": "final: Anthropic packet e67f58b9 - CV 2pp/1199w, letter 1pp/493w, 0 warnings, page budget asserted, prose exit 0 at 293 files. Three claims cut after checking the repo: retention policy, at-rest encryption, fourteen-month archive duration. What remains is grep-able: PostgreSQL per service, ordered migrations, tsvector+GIN archive, EXP-042 restore drill, SSH CA + sops access. DB applied/fit3, duplicate annotated. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e67f58b98bbccea1ab43343b994ef23f25066238",
+      "branch": "main",
+      "frame": "03ha7hbqbv369p35tuw6ejwca"
+    },
     {
       "id": "a4a76bcc-5668-4837-8a9b-fce628e34a94",
       "ts": "2026-11-22T12:39:14Z",
@@ -2761,77 +2830,6 @@
       "base_commit": "7fd7d28757ff4fd076a5d1d9e4dd6fe1d8d406d8",
       "branch": "main",
       "frame": "03ha6t98lqb7mkg7xw3dcsf1u"
-    },
-    {
-      "id": "30cdbf8b-d7f3-4fb5-8275-c6d2fa26a38e",
-      "ts": "2026-11-22T10:36:34Z",
-      "source": "freebuff",
-      "subject": "nixconfig:adyen-platform-genai",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
-      "branch": "main",
-      "frame": "03ha6t7ye5w1enar9os92qhid"
-    },
-    {
-      "id": "2e5443d3-6f05-404e-aaa5-4f5808fd17da",
-      "ts": "2026-11-22T10:35:53Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-observability",
-      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/telekom-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "5466aebd486f72b7c0d6303bc04aa63ee7a00182",
-      "branch": "main",
-      "frame": "03ha6t34xnjtll0pfzfwvlc80"
-    },
-    {
-      "id": "3ab3111c-84ae-42fd-a88f-1283fab7e7ee",
-      "ts": "2026-11-22T10:35:01Z",
-      "source": "devin",
-      "subject": "nixconfig:ionos-staff-nre",
-      "action": "re-assigned; already applied: req 4971782101 submitted 08:07 under ionos-staff-network-reliability-engineer-karlsruhe — OTP mail 311051 + ack mail 311052 (names role). Skipped duplicate",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
-      "branch": "main",
-      "frame": "03ha6sx2xwm0rm5gcuntylhq0"
-    },
-    {
-      "id": "6fd43b29-ad90-499e-9d65-d62040cdb6e8",
-      "ts": "2026-11-22T10:34:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:adyen-platform-genai",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/adyen-platform-genai"
-      ],
-      "files": [],
-      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
-      "branch": "main",
-      "frame": "03ha6svje0h7qze60o2tzr839"
-    },
-    {
-      "id": "2ac1234b-e08b-4cba-94e1-531f0ebaa888",
-      "ts": "2026-11-22T10:34:08Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:virtuslab",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); fit 4 (kernel half absent)",
-      "outcome": "done",
-      "claims": [
-        "submissions/virtuslab"
-      ],
-      "files": [],
-      "base_commit": "5466aebd486f72b7c0d6303bc04aa63ee7a00182",
-      "branch": "main",
-      "frame": "03ha6sqtgeu4q3pr08sp6e1ov"
     }
   ]
 }

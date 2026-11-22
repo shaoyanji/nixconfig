@@ -209,7 +209,7 @@ else
     grep -qxF -- "$rule" <<<"$deny" || missing="$missing|$rule"
   done
   if [ -z "$missing" ]; then
-    ok "approvals.deny keeps agent turns off the gateway's own unit ($(wc -w <<<"$deny") rules)"
+    ok "approvals.deny keeps agent turns off the gateway's own unit ($(grep -c . <<<"$deny") rules)"
   else
     bad "approvals.deny lost self-unit rule(s): $(tr '|' ' ' <<<"$missing" | sed 's/^ *//')"
   fi

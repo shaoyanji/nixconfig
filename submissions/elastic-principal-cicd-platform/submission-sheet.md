@@ -3,7 +3,7 @@
 Date: 22 November 2026
 Fit: 4
 Language: English
-Status: packet compiled; scale and stack gaps stated in the letter
+Status: application already submitted 22.11.2026; packet compiled retrospectively, not for sending
 
 ## Role
 
@@ -27,6 +27,8 @@ Status: packet compiled; scale and stack gaps stated in the letter
 
 Arrived as a directory and a DB row with no Typst sources; `letter.json` and other JSON removed, stale PDFs rebuilt from new sources.
 
+The DB row read `applied` with two linked mails before this packet was built. Those mails are Elastic's thank-you for the application and a portal security code, both dated 22 November 2026, on the posted title `Principal Software Engineer I - CI/CD - Platform Engineering Productivity`. An upsert during this build had set the row back to `prep`; it is restored to `applied`. **The packet below is retrospective** and should not be submitted for this id.
+
 ## Requirement check
 
 | Requirement | Evidence | Assessment |
@@ -46,6 +48,13 @@ Arrived as a directory and a DB row with no Typst sources; `letter.json` and oth
 ## Fit reasoning: 4
 
 The brief said 4 and the evidence agrees. What transfers is the judgement: reproducibility that means something, gates that refuse, rollback as a generation, a matrix that maintains itself, and sweeps that cannot take their own machine down. What does not transfer is the stack and the scale, and both are named in the letter rather than left for the reader to find.
+
+## Correction log
+
+| When | What |
+| :--- | :--- |
+| 22.11.2026 | Upsert set status `prep`, overwriting `applied` and dropping the official role title; both restored after reading the linked mail. |
+| 22.11.2026 | Brief title (`Principal CI/CD & Platform Engineer`) differs from the submitted title; both recorded in the DB notes. |
 
 ## Open items
 

@@ -1,0 +1,172 @@
+Systemadministrator (m/w/d) / DevOps Engineer für Linux- und Kubernetes-basierte OSS-Infrastrukturen — Biz Factory GmbH
+Location: Berlin, 100% remote möglich
+Source: arbeitnow posting, fetched 22.11.2026 (HTTP 200)
+Apply: https://www.arbeitnow.com/jobs/companies/biz-factory-gmbh/systemadministrator-devops-engineer-fur-linux-und-kubernetes-basierte-oss-infrastrukturen-berlin-183922
+
+Systemadministrator (m/w/d) /...
+Systemadministrator (m/w/d) / DevOps Engineer für Linux- und Kubernetes-basierte OSS-Infrastrukturen
+Biz Factory GmbH
+Berlin
+Remote
+System and Network Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+1 day
+Remote
+System and Network Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+Berlin
+Du bist ein technischer Experte mit starken Grundlagen in Linux- und Container-basierten Systemen. Du hast eine "Hands-on"-Mentalität und gehst proaktiv auf Probleme zu, um diese zu lösen? Dann bist du bei uns richtig!
+Aufgaben
+Deine Rolle
+Wir suchen einen serviceorientierten DevOps Engineer, der uns bei der Inbetriebnahme und dem Betrieb unserer Linux-basierten IT-Systeme unterstützt. Du wirst technische Fähigkeiten, eine Leidenschaft für Problemlösungen und die Fähigkeit benötigen, um skalierbare Systeme innerhalb eines agilen Umfelds zu betreiben. Wir erwarten nicht, dass du alles bereits perfekt beherrschst, aber solide Kenntnisse in containerisierten Systemen und die Bereitschaft, neue Technologien zu lernen, sind essenziell.
+Deine Aufgaben
+Unterstützung bei der Inbetriebnahme und dem laufenden Betrieb unserer Linux-Systeme (SLES, Red Hat, Debian)
+Verwaltung und Support von Containern, u.a. in Kubernetes
+Einrichtung und Betrieb von CI/CD-Werkzeugen (GitLab CI/CD-Pipelines)
+Wartung, Betrieb und Techn. Support (Helpdesk)
+Monitoring von Serversystemen mit Tools wie Icinga und Nagios
+Aufsetzen und Betrieb von Datenbanken (u.a. mySQL, PostgreSQL inkl. PostGIS)
+Erstellung von Betriebshandbüchern und Schulungen im Umfeld webbasierter Applikationen und Linux-Server/Container
+Qualifikation
+Umfangreiche Kenntnisse im Bereich Open Source (OSS) Infrastrukturen und Linux-Systeme
+Erfahrung mit Server-Betriebssystemen (z.B. Ubuntu, Debian)
+Umfangreiche Kenntnisse im Umgang mit Container-Technologien (Kubernetes, OpenShift, OpenStack)
+Fundierte Programmierkenntnisse mit Programmiersprachen wie Python, Java, PHP oder Javascript/Typescript
+Erfahrung mit CI/CD-Werkzeugen (GitLab)
+Fundierte Kenntnisse in der Verwaltung von SQL-Datenbanken (u.a. PostgreSQL, mySQL)
+Erfahrung mit LDAP und Active Directory von Vorteil
+Analytische Fähigkeiten und Problemlösungskompetenz
+Teamfähigkeit und Kommunikationsstärke, stark ausgeprägte Helferfähigkeiten
+Benefits
+Motiviertes Team - teamwork is dreamwork
+100% Remote Arbeit oder Arbeitsplatz vor Ort
+25 Urlaubstage + lokale Feiertage
+Deine Work-Life-Balance hat bei uns Prio
+Teamevents (Segeln, Spikeball Turnier, ...) & Afterworks (Sundowner, BBQ’s, ...)
+Neueste technische Ausstattung (MacBook, Monitore, Kopfhörer)
+Jährliches persönliches Entwicklungsbudget von 1.000 €
+Vergünstigte Urban Sports und Wellpass Mitgliedschaft
+Eine betriebliche Altersvorsorge
+Du willst deine Chancen erhöhen? Dann erzähl uns mehr über dich und warum du Bock hast bei Biz Factory zu arbeiten. Denn neben deinen Skills, interessieren wir uns vor allem für dich als Mensch. ;-)
+Persönlichkeitstest: 16Personalities
+"Feel the vibe? Cool, dann überzeug uns mit deiner Bewerbung. Ich freu mich auf dich!", dein Ansprechpartner - Robin
+Application form
+Apply for the job by filling the job application form with your details
+First name
+Last name
+Email address
+CV / Resume
+.doc, .docx, .pdf, .rtf, .txt upto 10 MB
+I agree to the terms and conditions of
+Arbeitnow
+and
+JOIN
+and confirm that I have reviewed the
+privacy policy
+Apply
+Share
+Prefer to apply directly? Try the
+company portal
+Your job application has been sent successfully. Good luck!
+Jobs at Biz Factory GmbH
+Backend Entwickler:in (m/w/d)
+Munich
+Remote
+Software Development
+Unbefristeter arbeitsvertrag
+berufserfahren
+1 day
+Remote
+Software Development
+Unbefristeter arbeitsvertrag
+berufserfahren
+Helpful information
+Read
+what is m/w/d
+in the job title
+Job recommendations
+IT-Systemadministrator - Linux (m/w/d)
+Intercon Solutions GmbH
+Osnabrück
+System and Network Administration
+Unbefristeter arbeitsvertrag
+1 month
+System and Network Administration
+Unbefristeter arbeitsvertrag
+Osnabrück
+1mo
+Linux Systemadministrator / IT-Infrastructure Engineer (m/w/d)
+PCI EXPERTS
+Böblingen
+System and Network Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+52.000 - 76.000 €
+1 week
+System and Network Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+52.000 - 76.000 €
+Böblingen
+IT Systemadministrator (m/w/d) für Windows und Linux
+hubside - Die Recruitingwerkstatt
+Munich
+Unbefristeter arbeitsvertrag
+75.000 - 85.000 €
+1 month
+Unbefristeter arbeitsvertrag
+75.000 - 85.000 €
+Munich
+1mo
+IT-Systemadministrator Linux/Unix (m/w/d)
+ituma GmbH
+Hilden
+Database Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+1 day
+Database Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+Hilden
+IT-Systemadministrator (f/m/d)
+Make IT fix GmbH
+Berlin
+System and Network Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+4 days
+System and Network Administration
+Unbefristeter arbeitsvertrag
+berufserfahren
+Berlin
+IT - Systemadministrator (m/w/d)
+Intercon Solutions GmbH
+Bonn
+System and Network Administration
+Unbefristeter arbeitsvertrag
+1 month
+System and Network Administration
+Unbefristeter arbeitsvertrag
+Bonn
+1mo
+Leidenschaftlicher Systemadministra
+
+
+[Packet cross-check, 22.11.2026]
+Aufgaben: Linux-Systeme (SLES, Red Hat, Debian) in Betrieb nehmen und betreiben; Container und
+Kubernetes verwalten; GitLab CI/CD; Monitoring mit Icinga und Nagios; Datenbanken (MySQL,
+PostgreSQL/PostGIS); Betriebshandbücher und Schulungen; Helpdesk.
+Qualifikation: OSS-Infrastrukturen, Server-Linux, Container-Technologien (Kubernetes, OpenShift,
+OpenStack), Python/Java/PHP/TS, GitLab CI/CD, SQL-Datenbanken, LDAP/AD von Vorteil.
+Der Text sagt ausdrücklich: keine perfekte Beherrschung erwartet, solide Container-Kenntnisse und
+Lernbereitschaft sind essenziell.
+Vorhanden: fünf Jahre Linux-Flottenbetrieb, systemd-nahe Konfiguration, deklarativer Betrieb, CI-Gates,
+eigenes Monitoring inkl. Alarmzustellung mit Bestätigung, Python und Go, Betriebshandbücher und
+Runbooks, 100% remote gearbeitet, Open Source als Arbeitsgrundlage.
+Nicht vorhanden: Kubernetes/OpenShift/OpenStack im Betrieb, GitLab CI/CD (eigene Gate-Pipeline statt
+GitLab), Debian/RHEL/SLES im Produktivbetrieb, PostgreSQL/MySQL-Administration, LDAP/Active Directory.
+Fit 4: Die Anzeige erwartet ausdrücklich keine perfekte Passung, und Linux-Betrieb, Monitoring,
+Automatisierung und Dokumentation sind der Kern der Stelle.

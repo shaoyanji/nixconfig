@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T11:30:37Z",
+  "generated": "2026-11-22T11:30:54Z",
   "count": 200,
-  "pin": "0a4638d97d0eaf7f7a121dec1f294ebb5941e88033333f07602179de1ef93b16",
+  "pin": "80c7b7dbbc09b305a809497a13b161751bf009d11e170569ae379b0b24b7eee3",
   "turns": [
+    {
+      "id": "6c6a70f0-ffab-4fe3-a68f-4a3d7e5462cc",
+      "ts": "2026-11-22T11:30:53Z",
+      "source": "devin",
+      "subject": "job-hunt:celonis",
+      "action": "applied: Celonis Senior SWE Query Engine & Database Systems via Greenhouse 7980155003; OTP-verified, confirmation shown",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b3c9e51b39a07bf40cb7a1056b14145190a7e037",
+      "branch": "main",
+      "frame": "03ha73tz2ek28cs9qxmc2rt09"
+    },
+    {
+      "id": "7f5671ed-e5fb-4b35-94d3-85491252bf7f",
+      "ts": "2026-11-22T11:30:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:trawa",
+      "action": "landed: native English Typst dossier, 2pp CV + 1pp letter, legacy Nix PDFs + selection.json retired | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "eb1a119052ad71fb1fe49ee8c09d2562e9468b82",
+      "branch": "main",
+      "frame": "03ha73s59u5x1fi7b14sugzwl"
+    },
     {
       "id": "96479cb4-e24c-49c4-bdcf-aed82ea97ce7",
       "ts": "2026-11-22T11:30:05Z",
@@ -2742,32 +2768,6 @@
       "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
       "branch": "main",
       "frame": "03ha6gwrzuzkho3gy1eeuzl82"
-    },
-    {
-      "id": "64b23086-4a13-41c4-8a5a-3955e7b627aa",
-      "ts": "2026-11-22T09:33:06Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "sinc-devops: Softgarden form complete (CV parsed, Anrede Herr, both PDFs) but FriendlyCaptcha interactive 'Hier klicken' browser-check rejects headless twice; record=manual",
-      "outcome": "blocked: friendlycaptcha browser-check rejects headless",
-      "claims": [],
-      "files": [],
-      "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
-      "branch": "main",
-      "frame": "03ha6gtmu25cfqbm888npeto6"
-    },
-    {
-      "id": "9cdb3035-7ac7-475b-9f42-1bd1afb2c0cc",
-      "ts": "2026-11-22T09:32:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "citeq upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
-      "branch": "main",
-      "frame": "03ha6gnu4d53xq72zq7t351kn"
     }
   ]
 }

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:29:24Z",
+  "generated": "2026-11-22T12:29:44Z",
   "count": 200,
-  "pin": "552b0f7d07ce8f9e066660a42949814dd99caf0ff393642120bf914b485a7542",
+  "pin": "6e323e84c2c22f87e32e4e2dc046d38dbb8dba626b03a828e5ea1b9781b4e22d",
   "turns": [
+    {
+      "id": "31eb1366-88de-4795-bbab-9918219c6028",
+      "ts": "2026-11-22T12:29:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-compute-node",
+      "action": "landed: native Typst sources for Nebius Compute Node SRE (4766627101), commit 489f1f86. CV 2pp/1255w, letter 1pp/475w, 0 warnings, page budget asserted, prose exit 0 at 290 files. MicroVM/KVM with vsock+tap+NAT, host-side isolation, canary guest and PSI sentinel lead; retired Nix PDFs and selection.json hashed in the sheet, legacy packet staged in its own commit first. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "489f1f86660adf87c7a4c0893f8a24187b7b6825",
+      "branch": "main",
+      "frame": "03ha7fagic1eq5a9mzuh6y3ph"
+    },
     {
       "id": "295d1d09-1301-490d-9044-32d90d14a9ce",
       "ts": "2026-11-22T12:29:21Z",
@@ -2829,21 +2842,6 @@
       "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
       "branch": "main",
       "frame": "03ha6rx0ti3dacdpfngkxe5p7"
-    },
-    {
-      "id": "e4b985ef-6aab-4619-a1c6-48036c725308",
-      "ts": "2026-11-22T10:29:12Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:biz-factory",
-      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/biz-factory"
-      ],
-      "files": [],
-      "base_commit": "77a1b08b3f6645af327e8fa5e37ed4eaa840337f",
-      "branch": "main",
-      "frame": "03ha6rs616pgxn1u4y4cznnjr"
     }
   ]
 }

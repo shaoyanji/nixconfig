@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T10:00:43Z",
+  "generated": "2026-11-22T10:05:31Z",
   "count": 200,
-  "pin": "725d37a8cafa72ce70ba3736941e06348e99d73c650e7122c4f3a171571df0f2",
+  "pin": "9543d7b8b56fd345b589c7edadbdcc3844ef3b207322c44916a21f2dbed09d98",
   "turns": [
+    {
+      "id": "b91267ab-55d3-4f3d-98ef-203997452a2d",
+      "ts": "2026-11-22T10:04:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-gitops",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a6e5a1454a8ca1b166fdf6971d7f557a7027f376",
+      "branch": "main",
+      "frame": "03ha6mvwbuuygl3u6bbgk9ugf"
+    },
+    {
+      "id": "04aabcb3-9cdb-4014-b35d-b41edbaebbad",
+      "ts": "2026-11-22T10:03:28Z",
+      "source": "devin",
+      "subject": "nixconfig:ionos-staff-nre",
+      "action": "already applied under ionos-staff-network-reliability-engineer-karlsruhe (same Greenhouse req); ack mail 311052 verified — skipped duplicate submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8c6e7063a993f63014688dab1b850b38fe06dbef",
+      "branch": "main",
+      "frame": "03ha6mr67o6193j7jmzthv8pj"
+    },
+    {
+      "id": "12382c07-21a7-49dd-9b3f-554ee2f262ef",
+      "ts": "2026-11-22T10:00:45Z",
+      "source": "freebuff",
+      "subject": "nixconfig:camunda",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8c6e7063a993f63014688dab1b850b38fe06dbef",
+      "branch": "main",
+      "frame": "03ha6m84zkg2x3w0h4fgn1vr2"
+    },
     {
       "id": "c3bc17bd-0a77-4ebc-99f1-800f9ca6d2ec",
       "ts": "2026-11-22T10:00:28Z",
@@ -2673,47 +2712,6 @@
       "base_commit": "bf4b9f10d02d363ef72ef9eacff0fc73c860102b",
       "branch": "main",
       "frame": "03ha5ng09022km14fphp1t1v6"
-    },
-    {
-      "id": "8490cf19-1f1b-45b3-8dda-6c5253e93393",
-      "ts": "2026-11-22T07:01:00Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: stackit GT1923 platform engineer control-plane via RocketApply; precheck clean (prep, no prior submit); sheet mapped; stop on interactive captcha",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/stackit"
-      ],
-      "files": [],
-      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
-      "branch": "main",
-      "frame": "03ha5n3yd8wwih541xyehzq83"
-    },
-    {
-      "id": "69e5d1e2-de09-4479-976b-bbcaba3c40ca",
-      "ts": "2026-11-22T06:59:04Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-steward:default:1.1",
-      "action": "not driven: jev classify needs_review after duel (note-change 0.67 vs task-change 0.33, p=0.67 below 0.8 gate); freebuff left idle, nothing pasted, nothing changed",
-      "outcome": "blocked: jev undecided after duel, pane left idle",
-      "claims": [],
-      "files": [],
-      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
-      "branch": "main",
-      "frame": "03ha5mqfg75yazb2o3o5yj3gi"
-    },
-    {
-      "id": "d77d04d8-158e-4db0-bc23-87708eb340df",
-      "ts": "2026-11-22T06:59:00Z",
-      "source": "coordinator",
-      "subject": "nixconfig:job-search",
-      "action": "progress: submitted Sourcegraph Platform IC3 (Greenhouse 6103628004, code 42563259), STACKIT GT2321 packet built, ClickHouse packet built",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
-      "branch": "main",
-      "frame": "03ha5mpznwaxbkgj8k2a5yeaa"
     }
   ]
 }

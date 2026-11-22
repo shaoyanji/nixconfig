@@ -219,12 +219,17 @@ case "$verb" in
       printf '%s' "$pipeline" | jq -r '["stage","applications","with next action"],
           (.[] | [.stage, .applications, .withNextAction]) | @tsv' | rows
     }
-    jq -cn --argjson apps "$apps" --argjson q "$queued" --argjson p "$pipeline" \
-      '{tracked: ($apps | length),
-        newestChange: ($apps | max_by(.updatedAt).updatedAt),
-        linkedMail: ([$apps[].linkedMail] | add // 0),
-        openQueue: ($q | length),
-        pipeline: $p}' | toon_emit render
+    statusdir=$(mktemp -d)
+    printf '%s' "$apps" >"$statusdir/apps.json"
+    printf '%s' "$queued" >"$statusdir/queue.json"
+    printf '%s' "$pipeline" >"$statusdir/pipeline.json"
+    jq -cn --slurpfile apps "$statusdir/apps.json" --slurpfile q "$statusdir/queue.json" --slurpfile p "$statusdir/pipeline.json" \
+      '{tracked: ($apps[0] | length),
+        newestChange: ($apps[0] | max_by(.updatedAt).updatedAt),
+        linkedMail: ([$apps[0][].linkedMail] | add // 0),
+        openQueue: ($q[0] | length),
+        pipeline: $p[0]}' | toon_emit render
+    rm -rf "$statusdir"
     ;;
 
   upsert | add)

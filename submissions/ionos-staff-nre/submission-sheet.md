@@ -96,7 +96,7 @@ The page renders client-side; use `agent-browser` if it must be driven.
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
 | `task checks:prose` | 185 prose files, exit 0 |
-| selection | 0/32 highlights, 2/10 projects |
+| selection | 0 highlights kept, 2 projects kept |
 | sha256 CV | `5ea87a117a69dc942cda6727f2c831104d528ae36d99cb711cf963f3cf1760a6` |
 | sha256 letter | `49d2e940a895ca375373cbbcc0b9aa27f39e07c88c07b6a5998fa631d68b29c1` |
 

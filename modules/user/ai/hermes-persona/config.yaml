@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 5 # one restart credit per fallback hop; the chain has 5 lanes
+  api_max_retries: 6
 # Every provider holding a credential in ~/.hermes/.env or the shell env is a
 # selectable row in `hermes model` / `/model`, and the expensive-model guard
 # only warns on KNOWN pricing — silent on a custom route, and a billed pick is
@@ -152,14 +152,20 @@ fallback_providers:
   # sent literally (fallback_config.resolve_entry_api_key reads an inline
   # literal or key_env, and never expandvars), which is a 401 with a key that
   # was present the whole time.
-  # Model pinned to what answers, not what's best on paper: measured
-  # 2026-11-22 — nemotron-3.5-super-vl:free, deepseek-v4-flash, llama-3.3-70b
-  # and qwen4-max all 5xx'd ("upstream unavailable" / "high demand"), and the
-  # 550b uncensored nemotron was the only id that returned content. If this
-  # lane starts answering 5xx, re-probe the catalog before blaming the key —
-  # the popular :free ids saturate first.
+  # Two adjacent lanes on the same route, ordered capability-first:
+  # the 550b nemotron is unpopular enough to stay unsaturated and is the
+  # strongest free model in the catalog; the qwen omni flash is the fast
+  # backstop for when the 550b 5xx's. Measured 2026-11-22 — both returned
+  # content while nemotron-3.5-super-vl:free, deepseek-v4-flash,
+  # llama-3.3-70b and qwen4-max 5xx'd ("upstream unavailable" / "high
+  # demand"); the popular :free ids saturate first. If both lanes start
+  # answering 5xx, re-probe the catalog before blaming the key.
   - provider: custom
     model: nemotron-3-ultra-550b-a55b-uncensored:free
+    base_url: https://crowllm.com/v1
+    key_env: CROWLLM_API_KEY
+  - provider: custom
+    model: qwen3-8-omni-flash:free
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
   # Keyless terminal lane: api.apisfreellm.com takes no key and can never

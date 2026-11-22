@@ -77,7 +77,7 @@ Keine 4, weil die Control Plane ohne Kubernetes-Kenntnis am ersten Tag nicht zu 
 | Datei | Inhalt | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `lebenslauf.pdf` | Lebenslauf, deutsch | 2 | 36401 | 516 | `dd5c853cdf2b067e` |
-| `anschreiben.pdf` | Anschreiben, deutsch | 1 | 24664 | 357 | `d0169876ca5c64cf` |
+| `anschreiben.pdf` | Anschreiben, deutsch | 1 | 24693 | 359 | `f3b7ecd846a103f0` |
 | `lebenslauf.typ` | Typst-Quelle | — | — | — | — |
 | `anschreiben.typ` | Typst-Quelle | — | — | — | — |
 | `job-description.txt` | Anzeigentext mit Zuordnungshinweis | — | — | — | — |

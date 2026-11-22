@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T09:09:15Z",
+  "generated": "2026-11-22T09:10:02Z",
   "count": 200,
-  "pin": "43dfbaeffee6c1c5d4066487ea8e2dfedfc1da718c86aed6bf29badcdb6108fc",
+  "pin": "3f7162fa6accc95e11819e067438e7d049983a9b382aee07b8800bcf4560a80c",
   "turns": [
+    {
+      "id": "826c9f34-03ff-40f9-b75e-04c128d31260",
+      "ts": "2026-11-22T09:09:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:bundesdruckerei-sre",
+      "action": "landed: Bundesdruckerei SRE Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9de14f95752a62d9bfca927f4aa42847be8ae622",
+      "branch": "main",
+      "frame": "03ha6c9x5inphf26ripsc3c88"
+    },
+    {
+      "id": "795263f1-3331-42bc-bb78-c6d19dfe7fb1",
+      "ts": "2026-11-22T09:09:44Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-prometheus",
+      "action": "landed: Telekom SRE Prometheus Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0daa05216f83a3467615739871f82f8e37cf5cf0",
+      "branch": "main",
+      "frame": "03ha6c983xspzn6k06q6f0zor"
+    },
+    {
+      "id": "7b8fbd28-d20a-4c16-bfbb-2d61175f5ad1",
+      "ts": "2026-11-22T09:09:28Z",
+      "source": "devin",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "landed: hermes-persona memory.write_approval=false committed (18b3d5b3), pushed; blast radius delphi+frieren verified via programs.hermes-user | gate: checks:host delphi 2110 + frieren(eval) 2309 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "18b3d5b3c40691e749d74023bb74a539bae62ec4",
+      "branch": "main",
+      "frame": "03ha6c7epmrznmbgj8vjda11u"
+    },
     {
       "id": "7b488733-fa75-4696-9870-d6636a82f6b5",
       "ts": "2026-11-22T09:07:40Z",
@@ -2730,45 +2769,6 @@
       "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
       "branch": "main",
       "frame": "03ha4djkbg6ao4nqo43rv2od5"
-    },
-    {
-      "id": "1f47f7be-947f-49cf-ab96-447fb2f07fb2",
-      "ts": "2026-11-22T03:04:22Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +3 portal submissions (VEGA IT Security + IT Client Schiltach, Uni Freiburg Future Forests IT-Admin 50pct) all confirmed | gate: success pages + confirmation emails | ~171 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d55dc1c37d93c2b6317f9ab0a42e3bc74e20d3f1",
-      "branch": "main",
-      "frame": "03ha4cvwxugr3kfr2fchhvre3"
-    },
-    {
-      "id": "fbb0d412-eb7d-4d68-b819-596847ee6bc6",
-      "ts": "2026-11-22T03:03:44Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-mongodb-sre-agent-engine-packet",
-      "action": "landed: drove freebuff pane to build CV packet for MongoDB SRE Agent Engine (submissions/mongodb-sre-agent-engine, gh 8366599) via agents:apps:packet",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d55dc1c37d93c2b6317f9ab0a42e3bc74e20d3f1",
-      "branch": "main",
-      "frame": "03ha4crkwujlyjf3aavdib90t"
-    },
-    {
-      "id": "90651327-0b00-4160-bb71-3ab1f1ca0ca7",
-      "ts": "2026-11-22T02:58:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:agents-note-outreach-redaction",
-      "action": "landed: AGENTS.nix note outreach-dossier-redaction records the 6a233ed9 dossier redaction, CV/submissions state, and the unscrubbed history blob | gate: artifacts.docs build PASS (agents-notes-schema red on 5 pre-existing notes, none new)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d55dc1c37d93c2b6317f9ab0a42e3bc74e20d3f1",
-      "branch": "main",
-      "frame": "03ha4bo2mbfdob24xtlh73ncv"
     }
   ]
 }

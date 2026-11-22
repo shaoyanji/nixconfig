@@ -44,7 +44,7 @@ router (`LLM_LOCAL_URL`, default `http://eisen:8000/v1/chat/completions`) with a
 non-2xx status or a body with no message text. Both the router and this API take
 the chat-completions shape, so one payload serves either side. Stderr says which
 one answered, and `LOCAL_ONLY=1` refuses the fallback when the prompt must stay
-on the fleet. `task eisen-status` is the read-only check for why the router
+on the fleet. `task infra:status:eisen` is the read-only check for why the router
 stopped answering before you route around it.
 
 ## Chat, OpenAI shape

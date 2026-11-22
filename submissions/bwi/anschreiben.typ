@@ -27,7 +27,7 @@
 
 Sehr geehrte Damen und Herren,
 
-Ihre Stelle im DevSecOps Engineering verbindet die drei Themen, an denen ich in den letzten sechs Jahren gearbeitet habe: Linux-Plattformen,
+ihre Stelle im DevSecOps Engineering verbindet die drei Themen, an denen ich in den letzten sechs Jahren gearbeitet habe: Linux-Plattformen,
 Automatisierung und Sicherheit. Ich habe eine NixOS-Flotte mit dreizehn Hosts allein aufgebaut und betrieben, deklariert in einem Flake mit gepinnten
 Inputs. Jeder Host ist eine Liste von Modulen, die Auswertung läuft pro Host und bricht ab, bevor ein fehlerhafter Stand gebaut wird, und jede Änderung
 ist eine Generation, die sich zurückrollen lässt. Für air-gapped Rechenzentren ist genau das der entscheidende Teil: nicht das Werkzeug, sondern dass
@@ -43,9 +43,9 @@ PSI-Werte alle fünfzehn Minuten in ein Journal und alarmiert auf schlechten Zus
 Host aussieht. PostgreSQL betreibe ich mit geordneten Migrationen und einem Wiederherstellungsdrill, der einen Dump in einen temporären Cluster spielt
 und Tabellen- und Zeilenzahlen prüft.
 
-Wo ich unter Ihrem Profil bleibe, sage ich vorab: Kubernetes habe ich nicht in Produktion betrieben, weder als Cluster noch air-gapped, und ich habe
+Wo ich hinter dem Anforderungsprofil zurückbleibe, sage ich vorab: Kubernetes habe ich nicht in Produktion betrieben, weder als Cluster noch air-gapped, und ich habe
 weder CKA noch CKS. Ceph kenne ich nicht aus dem Betrieb; meine Storage-Erfahrung sind ZFS, SMART/NVMe, NFS/SMB und Backups. Virtualisierung kenne ich
-aus KVM- und microVM-Laboren, nicht aus VMware oder OpenStack im Großbetrieb. Mit bringe ich die Basis, auf der ein Cluster trägt: Härtung,
+aus KVM- und microVM-Laboren, nicht aus VMware oder OpenStack im Großbetrieb. Was ich mitbringe, ist die Basis, auf der ein Cluster trägt: Härtung,
 reproduzierbare Images, klare Netzgrenzen und einen geprüften Rückweg. Diese Lücke würde ich in den ersten Monaten schließen.
 
 Ich bin US-amerikanischer Staatsbürger mit unbefristeter deutscher Niederlassungserlaubnis, also ohne Sponsoring arbeitsberechtigt; einer

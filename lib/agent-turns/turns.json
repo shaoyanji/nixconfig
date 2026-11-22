@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T12:42:59Z",
+  "generated": "2026-11-22T12:44:39Z",
   "count": 200,
-  "pin": "603629dc51646bd245149f1c4c7d48fc2ac7c190afe555ebe82cd5fcc0eeb31a",
+  "pin": "4e7ef43e7abdf9d436ec3629d798a24983787a078cf9b82068f042f42274911b",
   "turns": [
+    {
+      "id": "e9e6ae0b-6a39-4ac7-89d0-b5de2b9b5186",
+      "ts": "2026-11-22T12:44:19Z",
+      "source": "devin",
+      "subject": "job-hunt:stackit-pex",
+      "action": "STACKIT GT1923 Platform Engineer Control Plane: applied via Schwarz SAPUI5 portal; resubmit probe confirmed 'already applied'. Retires the manual-attach note. Third and final STACKIT req done.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1bc6d529e102d204ef6fa32d2d90cb363f994173",
+      "branch": "main",
+      "frame": "03ha7i6dggzy9oz94alv9ss5e"
+    },
+    {
+      "id": "efb14a05-6686-46be-9127-53c50294e162",
+      "ts": "2026-11-22T12:44:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:bwi-platform",
+      "action": "landed: BWI Senior Infrastructure/Platform Engineer (64059) als deutsche Typst-Quellen, 1bc6d529. CV 2 S./952w, Anschreiben 1 S./423w, je 0 Warnungen (erster Anschreiben-Anlauf mit 528w lief auf 2 Seiten und wurde vom Gate gestoppt), prose Exit 0 bei 294 Dateien. Belegt: systemd-Härtung, Firewall je Dienst/Netz, Flake mit Auswertungslauf je Host, Pre-Commit/Pre-Push-Gates, SSH-CA + SOPS, Restore-Drill. Lücken: kein K8s in Produktion, kein CKA/CKS, kein Ceph. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1bc6d529e102d204ef6fa32d2d90cb363f994173",
+      "branch": "main",
+      "frame": "03ha7i46e8nzd8fuwm27gef94"
+    },
     {
       "id": "c3d668c7-dd29-42f9-9549-c8f45b913205",
       "ts": "2026-11-22T12:42:56Z",
@@ -2800,36 +2826,6 @@
       "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
       "branch": "main",
       "frame": "03ha6tghupi95wltnngo35tgq"
-    },
-    {
-      "id": "067ace2c-12a8-46b8-b4b8-fa9703d169d3",
-      "ts": "2026-11-22T10:37:12Z",
-      "source": "devin",
-      "subject": "nixconfig:actian-director-platform",
-      "action": "claim: Lever submission",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/actian-director-platform"
-      ],
-      "files": [],
-      "base_commit": "3c9c6df2116190f1e24132968f6ed6c40ff9edba",
-      "branch": "main",
-      "frame": "03ha6tcfmdzp9yowb2qe77hnt"
-    },
-    {
-      "id": "62411f06-edb5-472d-a348-9ba51a171c30",
-      "ts": "2026-11-22T10:36:45Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-observability",
-      "action": "compiled: native German Typst packet 2pp CV + 1pp letter; KRITIS gap named; fit 4",
-      "outcome": "done",
-      "claims": [
-        "submissions/telekom-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "7fd7d28757ff4fd076a5d1d9e4dd6fe1d8d406d8",
-      "branch": "main",
-      "frame": "03ha6t98lqb7mkg7xw3dcsf1u"
     }
   ]
 }

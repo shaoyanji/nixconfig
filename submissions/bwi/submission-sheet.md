@@ -24,8 +24,8 @@ Im Neubau-Commit wurden sie ersetzt:
 
 | Datei | Seiten | Wörter | Warnungen | sha256 (erste 16) |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 952 | 0 | `fc413b748cd7d6bc` |
-| `anschreiben.pdf` | 1 | 423 | 0 | `09d4ee939e9c990c` |
+| `lebenslauf.pdf` | 2 | 953 | 0 | `297efa4302b8782f` |
+| `anschreiben.pdf` | 1 | 424 | 0 | `5049fa616c522ea1` |
 
 ## Vier Säulen der Anzeige, gegen das Repository geprüft
 
@@ -68,4 +68,5 @@ die Oberkante ist die belastbare Zahl und steht so im Anschreiben.
 | `**` in den Quellen | 0 |
 | Typografische Anführungszeichen | 0 |
 | `task checks:prose` | Exit 0 |
+| Sprache | Nach der ersten Fassung korrigiert: Anrede kleingeschrieben nach dem Komma, ein abgebrochener Satz im Lückenteil neu formuliert |
 | Altpaket | zuerst gestaged, im Neubau ersetzt, Hashes oben |

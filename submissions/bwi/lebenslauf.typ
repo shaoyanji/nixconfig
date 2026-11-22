@@ -55,7 +55,7 @@ PSI-Werte alle fünfzehn Minuten in ein Journal schreibt. Alarmiert wird auf ein
 wie ein gesunder Host aussieht. PostgreSQL betreibe ich mit geordneten Migrationen und einem Wiederherstellungsdrill, der einen Dump in einen temporären
 Cluster spielt und Tabellen- sowie Zeilenzahlen prüft.
 
-Wo ich unter dem Anforderungsprofil bleibe: Kubernetes habe ich nicht in Produktion betrieben, weder als Cluster noch in einer air-gapped Umgebung, und
+Wo ich hinter dem Anforderungsprofil zurückbleibe: Kubernetes habe ich nicht in Produktion betrieben, weder als Cluster noch in einer air-gapped Umgebung, und
 ich habe weder CKA noch CKS. Ceph kenne ich nicht aus dem Betrieb; meine Storage-Erfahrung sind ZFS, SMART/NVMe, NFS/SMB und Backups. Virtualisierung
 kenne ich aus KVM- und microVM-Laboren, nicht aus VMware- oder OpenStack-Umgebungen im Großbetrieb. Diese Sätze stehen hier, damit sie im Gespräch nicht
 überraschen.

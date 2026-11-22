@@ -617,15 +617,18 @@ plates_description() {
     fi
   } | awk -F'\t' '
     {
+      # `d` is the map, so the sentence needs its own name: using `d` for both is a
+      # fatal "attempt to use scalar as an array", and the whole description stream
+      # then reads as no descriptions at all (2026-11-22, 651 empty cards).
       slug = $1
-      d = $2
-      sub(/^hold: .* :: /, "", d)
-      gsub(/arch:[a-z0-9-]+/, "", d)
-      sub(/[[:space:]]*4k, photorealistic, realistic, neumorphism\.?[[:space:]]*$/, "", d)
-      gsub(/[[:space:]]+/, " ", d)
-      sub(/^ /, "", d)
-      sub(/ $/, "", d)
-      if (d != "") d[slug] = d
+      desc = $2
+      sub(/^hold: .* :: /, "", desc)
+      gsub(/arch:[a-z0-9-]+/, "", desc)
+      sub(/[[:space:]]*4k, photorealistic, realistic, neumorphism\.?[[:space:]]*$/, "", desc)
+      gsub(/[[:space:]]+/, " ", desc)
+      sub(/^ /, "", desc)
+      sub(/ $/, "", desc)
+      if (desc != "") d[slug] = desc
     }
     END { for (s in d) print s "\t" d[s] }'
 }

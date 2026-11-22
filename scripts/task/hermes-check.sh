@@ -186,6 +186,57 @@ if grep -qE '^_config_version:' "$persona"; then
 else
   bad "persona config.yaml has no _config_version — hermes reads it as v0 and reports drift on every doctor"
 fi
+# The gateway's own unit is denied to agent turns: on 2026-11-22 a Telegram turn
+# ran `systemctl --user restart hermes-gateway` mid-answer, and every stop after
+# that paid the 60 s shutdown watchdog because a 30 s cron drain plus teardown
+# crossed the leash. The protection is YAML-only — nothing in the unit or the
+# wrapper carries it — so it is asserted here, together with the shortened
+# drain, or the next config edit silently hands the daemon back to its agents.
+if ! command -v yq >/dev/null 2>&1; then
+  skip "yq not on PATH — approvals.deny unasserted"
+else
+  # -r matters: without it every rule arrives JSON-quoted and no rule matches.
+  deny="$(yq -p yaml -o json -r '.approvals.deny // [] | .[]' "$persona" 2>/dev/null)"
+  missing=""
+  for rule in \
+    "systemctl --user restart hermes-gateway*" \
+    "systemctl --user stop hermes-gateway*" \
+    "systemctl --user kill hermes-gateway*" \
+    "systemctl restart hermes-gateway*" \
+    "systemctl stop hermes-gateway*" \
+    "hermes gateway restart" \
+    "hermes gateway stop"; do
+    grep -qxF -- "$rule" <<<"$deny" || missing="$missing|$rule"
+  done
+  if [ -z "$missing" ]; then
+    ok "approvals.deny keeps agent turns off the gateway's own unit ($(wc -w <<<"$deny") rules)"
+  else
+    bad "approvals.deny lost self-unit rule(s): $(tr '|' ' ' <<<"$missing" | sed 's/^ *//')"
+  fi
+  # `// empty` is jq syntax and yq v4 errors on it, which read as "absent".
+  drain="$(yq -p yaml -o json -r '.agent.cron_drain_timeout // ""' "$persona" 2>/dev/null)"
+  case "$drain" in
+    '' | *[!0-9]*)
+      bad "agent.cron_drain_timeout is absent or not a number (${drain:-none}) — a stop waits the 30 s default and can cross the 60 s shutdown watchdog"
+      ;;
+    *)
+      if [ "$drain" -le 10 ]; then
+        ok "agent.cron_drain_timeout=$drain stays under the shutdown watchdog"
+      else
+        bad "agent.cron_drain_timeout=$drain is above 10 s — a stop can cross the watchdog again"
+      fi
+      ;;
+  esac
+fi
+if command -v hermes >/dev/null 2>&1; then
+  # Exit 3 is the deny verdict; the text is what names the reason.
+  verdict="$(hermes approvals test 'systemctl --user restart hermes-gateway' 2>&1 || true)"
+  if grep -q 'user-deny' <<<"$verdict"; then
+    ok "live verdict: the self-unit restart is denied to agent turns"
+  else
+    bad "live verdict does not deny \`systemctl --user restart hermes-gateway\`: $(grep -m1 'verdict' <<<"$verdict" || echo 'no verdict line')"
+  fi
+fi
 if command -v hermes >/dev/null 2>&1; then
   version_line="$(hermes doctor 2>&1 | grep -m1 'Config version' || true)"
   case "$version_line" in

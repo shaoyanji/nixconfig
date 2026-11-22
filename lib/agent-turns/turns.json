@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-22T09:20:41Z",
+  "generated": "2026-11-22T09:22:54Z",
   "count": 200,
-  "pin": "9815111f45c726bc009f7b2defe0ee9460e4b4a13352a0add98bad97d8a7b403",
+  "pin": "a0dd49c7565461764e4ef586a166075cc150624ffa99edbc2034df7c24245582",
   "turns": [
+    {
+      "id": "dd2050c8-8afd-4941-a5c7-40a3a4299bd7",
+      "ts": "2026-11-22T09:22:11Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: shopware-cloud-infra Recruitee submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "4e323cabbdae9431fed082e8838d242682ffc350",
+      "branch": "main",
+      "frame": "03ha6eov3ys7hxzir5t2tj3h6"
+    },
+    {
+      "id": "7aca1163-8e71-43ea-b730-95a0fb5dcc81",
+      "ts": "2026-11-22T09:21:13Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: mittwald-devops submitted via mittwald.de | gate: success message PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4e323cabbdae9431fed082e8838d242682ffc350",
+      "branch": "main",
+      "frame": "03ha6ei2evsnvq0fxzvgp9474"
+    },
+    {
+      "id": "c2d0d0ce-1c55-4c47-81b4-aaf2118e0864",
+      "ts": "2026-11-22T09:21:11Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "uni-rostock db row corrected to status=prep stage=prep (update rejects --stage)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c5ef6b6f3cbf50dca69f84fd99df919a0c012d92",
+      "branch": "main",
+      "frame": "03ha6ehrmxju880cffsak9q4m"
+    },
+    {
+      "id": "fa4ac828-3019-494d-8dac-e77f08fda637",
+      "ts": "2026-11-22T09:21:02Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "uni-rostock upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c5ef6b6f3cbf50dca69f84fd99df919a0c012d92",
+      "branch": "main",
+      "frame": "03ha6egr91li30law3aqrffj6"
+    },
+    {
+      "id": "ebcbcee4-b810-4d11-90fc-e779465ae538",
+      "ts": "2026-11-22T09:20:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "secunet upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4e323cabbdae9431fed082e8838d242682ffc350",
+      "branch": "main",
+      "frame": "03ha6eep007xw59nek4bqijui"
+    },
     {
       "id": "b111910a-5310-41ba-b855-4488b820ce4d",
       "ts": "2026-11-22T09:19:15Z",
@@ -2698,71 +2763,6 @@
       "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
       "branch": "main",
       "frame": "03ha4mxj575tf2bu6b699ch90"
-    },
-    {
-      "id": "cadb4fa6-bd94-49ad-a36c-6ecfcbb39de6",
-      "ts": "2026-11-22T03:54:04Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "Interamt channel opened: DHBW Mannheim ZWR x2 reqs applied via verified info.ma@dhbw.de (BITE portal file-upload is an OS-dialog wall in headless); ~190 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4mlfr6v870nvvv63nezip"
-    },
-    {
-      "id": "8cc7c4b6-96d9-40e1-b1b4-6657850ef690",
-      "ts": "2026-11-22T03:51:33Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove freebuff pane (default:1.1) on redact third-party contacts/phone from docs/nix-consultancy-outreach.md (prose-change, jev 0.87/0.78); pane confirmed working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4m3o7l5cfg033b8hp6hee"
-    },
-    {
-      "id": "b5c8bd1c-742c-45a8-8c8e-c21d30dbc9b5",
-      "ts": "2026-11-22T03:51:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove freebuff pane (default:1.1) on redact third-party contacts/phone from docs/nix-consultancy-outreach.md (prose-change, jev 0.87/0.78); pane confirmed working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4m2rz78w2pojjqotkil05"
-    },
-    {
-      "id": "b93c8416-4519-4ca8-8aea-d515d235edb9",
-      "ts": "2026-11-22T03:48:04Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "corrected 2 misclassified 'interview' acks (Canonical, Sezzle) -> applied; sent 3 overdue follow-ups (adorsys, accompio, g2 Rostock); ~188 applied, 0 real replies",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4lf5a3w5hmbku08uki0c4"
-    },
-    {
-      "id": "6cc10a02-2c53-4e42-a2b9-31b2a50a6909",
-      "ts": "2026-11-22T03:46:24Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "AWO Karlsruhe email bounced (Sophos 550) -> resent via info@awo-karlsruhe.de; Ratiodata Network Engineer Cisco/SDN sent (2nd req); ~188 applied; BA + packservice.de + telent boards unreachable",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4l3hictbl3uz6m8bo9w2v"
     }
   ]
 }

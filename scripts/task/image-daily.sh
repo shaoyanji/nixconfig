@@ -603,7 +603,19 @@ banner_crop() { # png jpg
 plates_description() {
   local roster=$repo/lib/image-daily/plates.txt
   {
-    # Briefs first, as the weakest source: the oldest plates predate the ledger's
+    # A judge sentence first, as the weakest source: for the 2026-11-10 batch the
+    # only prose that ever described the picture is the verdict's own sentence
+    # ("clean minimalist dunes with smooth rolling curves"). A reason that is an
+    # error or a backfill says nothing about the image, so it is skipped.
+    if [ -f "$LEDGER" ]; then
+      jq -r 'select(type == "object") | select((.prompt // "") == "")
+        | (.reason // "") as $r
+        | select($r != "")
+        | select(($r | ascii_downcase | test("error|429|backfilled|rate limited|agy exited") | not))
+        | [(.path | split("/") | last | sub("\\.(png|jpg|jpeg|webp)$"; "")), $r]
+        | @tsv' "$LEDGER" 2>/dev/null || true
+    fi
+    # Briefs next, as the weakest real sentence: the oldest plates predate the ledger's
     # prompt column, and their sentence is still on the brief they came from. A
     # brief id carries its lane as a prefix, which is not part of the slug.
     if [ -f "$BRIEFS" ]; then
@@ -636,6 +648,8 @@ plates_description() {
       gsub(/[[:space:]]+/, " ", desc)
       sub(/^ /, "", desc)
       sub(/ $/, "", desc)
+      # A card has room for a sentence, not a paragraph: the verdict strings run long.
+      if (length(desc) > 300) desc = substr(desc, 1, 297) "..."
       if (desc != "") d[slug] = desc
     }
     END { for (s in d) print s "\t" d[s] }'

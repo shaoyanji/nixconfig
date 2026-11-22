@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-22T12:38:08Z",
+  "generated": "2026-11-22T12:39:11Z",
   "count": 200,
-  "pin": "eb25288cff4432ad83a849371b43ea489fe521cd74fe9c889ede1b7786e1d3db",
+  "pin": "58dc32217cfbc2a57d147bd330f227692775752b52c9a5ebcda4c07d1b4a4bfa",
   "turns": [
+    {
+      "id": "0a18a5ab-cede-478d-a43e-cf0af69d2217",
+      "ts": "2026-11-22T12:38:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:anthropic-data-infra",
+      "action": "landed: Anthropic Staff+ Data Infra (5114768008) native Typst, 81c7ec1e. CV 2pp/1190w, letter 1pp/490w, 0 warnings, page budget asserted, prose exit 0 at 293 files. Real evidence only: PostgreSQL per service, ordered migrations, tsvector+GIN archive, EXP-042 drill replaying dumps into an ephemeral cluster, SSH CA + sops access; gaps BigQuery/dbt/Spark, petabyte GCS/S3 DR, IAM at scale. Old letter greeted the Nebius team. DB applied/fit3 + duplicate annotated. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "81c7ec1e4b45675e874839dfc0d5cc6fec9d7125",
+      "branch": "main",
+      "frame": "03ha7gzy3jfxpc1mja3jylypm"
+    },
+    {
+      "id": "fd5243e6-8771-40e0-b591-5d415aab94c9",
+      "ts": "2026-11-22T12:38:17Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:enbw",
+      "action": "verified: packet already native (no symlink/selection.json existed; rebuild byte-identical), sheet now carries measurements and the API 200 lead is closed as a tenant error envelope | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/enbw"
+      ],
+      "files": [],
+      "base_commit": "02ac001aa02ca468541ec4c5895f70f2c5ca656b",
+      "branch": "main",
+      "frame": "03ha7gzwpv9nkg8nfyngxjgym"
+    },
     {
       "id": "21a1b741-04c7-4779-bcda-88ca47d4bf3f",
       "ts": "2026-11-22T12:37:39Z",
@@ -2804,32 +2832,6 @@
       "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
       "branch": "main",
       "frame": "03ha6sp8qp8a2ws8cxw3t40s8"
-    },
-    {
-      "id": "5eeda9d5-4903-4e31-b5c8-254104521ede",
-      "ts": "2026-11-22T10:33:49Z",
-      "source": "freebuff",
-      "subject": "nixconfig:mozilla",
-      "action": "follow-up: letter recompiled at 0 warnings (bold markup fixed) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
-      "branch": "main",
-      "frame": "03ha6som3lupo9tb05jmnv4j9"
-    },
-    {
-      "id": "ffcfa9a4-8f7b-4aa8-b234-b47fc9a92275",
-      "ts": "2026-11-22T10:33:27Z",
-      "source": "freebuff",
-      "subject": "nixconfig:mozilla",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "afe43b5a18f86417f90a1dd57dfbf7cddb22121f",
-      "branch": "main",
-      "frame": "03ha6sm2d0ndk9k2xkrqor6fb"
     }
   ]
 }

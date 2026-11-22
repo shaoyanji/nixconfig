@@ -83,7 +83,7 @@ direction for a platform, but not as a Staff engineer across several teams at on
 - Scheduled backups and wired a restore drill that replays each dump into an ephemeral cluster and fails when restored tables or entity rows fall below the floor.
 - Watched storage and load: disk percentages and inodes per path with a named degrade reason, PSI for IO, memory and CPU plus job state and generation age into a ledger every fifteen minutes, paging on bad state and on silence.
 - Removed standing access instead of managing it: short-lived SSH certificates from the fleet CA, per-host sops/age keys, and per-service users with hardened units.
-- Handled personal data with a documented retention window, an encrypted archive and no standing credentials, which is the part finance and governance teams ask about first.
+- Handled personal mail as one searchable store behind a sops-managed database role, with no standing credentials — the arrangement a governance reviewer asks about first, because access is a role and not an inbox.
 ]
 
 #block(breakable: false)[

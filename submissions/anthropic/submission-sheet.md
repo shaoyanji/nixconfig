@@ -25,8 +25,8 @@ the rebuild commit:
 
 | File | Pages | Words | Warnings | sha256 (first 16) |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 1190 | 0 | `956a2bc1d4b43c1e` |
-| `anschreiben.pdf` | 1 | 490 | 0 | `55a8f5eef36edb7c` |
+| `lebenslauf.pdf` | 2 | 1198 | 0 | `f74d0d36d8c3f040` |
+| `anschreiben.pdf` | 1 | 493 | 0 | `abf8bad1e875003e` |
 
 ## The four pillars the posting asks for, against the repository
 
@@ -36,6 +36,8 @@ the rebuild commit:
 | Ordered migrations, searchable archive | Archive schema: ordered migrations, stored `tsvector` behind a GIN index, upsert keyed on `message_id`, SQL endpoints generated from annotated queries, fourteen months of real mail | full claim, used as the concrete example in both documents |
 | Audit-by-restore drills | `modules/services/postgres-backup-drill.nix` (EXP-042): ephemeral PostgreSQL cluster, `gzip -dc … | psql` replay, restored table count against `assertMinimumTables` (default 20), Immich entity rows, timer after the backup window | full claim — this is the "audit drill" the letter leads with |
 | Access control and integrity | Short-lived SSH certificates from the fleet CA, per-host sops/age keys, per-service users and hardened units, validate-before-write, append-only events, content-addressed specs | claim limited to fleet-scale access discipline; no IAM-at-scale claim |
+
+Two claims from the first draft were cut after checking the repository: a "documented retention window" (no retention policy exists for the archive) and an "encrypted archive" (the database sits on the host with no at-rest encryption configured). What remains is what a grep can show: a sops-managed database role, no standing credentials, and the mail in one place instead of many inboxes.
 
 Adjacent, and said so: disk and inode percentages per path with a named degrade reason, PSI/job-state/generation-age ledger paging on bad state and silence.
 

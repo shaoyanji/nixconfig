@@ -37,8 +37,8 @@ someone needs the data. Growth is watched where it grows: disk and inode percent
 ledger every fifteen minutes, with a page on a bad state and on silence.
 
 Access follows the same rule. No standing SSH keys, short-lived certificates from the fleet's own authority, per-host sops/age keys so one host cannot read
-another's secrets, and a dedicated user with a hardened unit per service rather than one account with root's reach. Personal data sits in an encrypted archive
-with a documented retention window and no standing credentials.
+another's secrets, and a dedicated user with a hardened unit per service rather than one account with root's reach. Personal mail sits in one database behind a sops-managed
+role instead of scattered across inboxes, with no standing credentials.
 
 What I have not done, so a first call does not have to discover it: no BigQuery, BigTable, Airflow, dbt or Spark operations, no petabyte-scale object-store
 replication or disaster recovery on GCS or S3, and no IAM or audit-logging design at thousands-of-users scale. My storage work is single-host and small-fleet.

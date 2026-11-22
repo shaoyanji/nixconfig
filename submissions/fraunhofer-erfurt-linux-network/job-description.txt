@@ -1,0 +1,81 @@
+https://jobs.fraunhofer.de/job/Erfurt-Senior-Netzwerkspezialist-Schwerpunkt-Linux-%28all-genders%29-99099/1449785333/
+Senior Netzwerkspezialist - Schwerpunkt Linux (all genders) Stellendetails | Fraunhofer-Gesellschaft
+body{display:none !important;}
+Wir verwenden Cookies, um Ihnen die bestmögliche Erfahrung mit der Website bieten zu können. Ihre Cookie-Einstellungen werden im lokalen Speicher Ihres Browsers gespeichert. Dazu gehören Cookies, die für die Website technisch notwendig sind. Darüber hinaus können Sie frei entscheiden, ob Sie Cookies akzeptieren, und dies jederzeit ändern. Sie können auch Cookies zur Verbesserung der Website-Leistung sowie Cookies zum Anzeigen von Inhalten, die auf Ihre Interessen zugeschnitten sind, ablehnen. Wenn Sie nicht alle Cookies akzeptieren, kann dies Auswirkungen auf Ihre Erfahrung auf der Site und die von uns angebotenen Services haben.
+Cookie-Einstellungen ändern
+INSTITUTE UND EINRICHTUNGEN
+INSTITUTE UND EINRICHTUNGEN
+INSTITUTE UND EINRICHTUNGEN
+Nach Stichwort/Studienfach/Jobcode suchen
+Institute und Einrichtungen
+Wählen Sie aus, wie oft (in Tagen) Sie eine Benachrichtigung erhalten möchten:
+form.emailsubscribe-form {
+Wählen Sie aus, wie oft (in Tagen) Sie eine Benachrichtigung erhalten möchten:
+Senior Netzwerkspezialist - Schwerpunkt Linux (all genders)
+.buttontext75a88ded57d8adde a{
+border: 1px solid transparent;
+.buttontext75a88ded57d8adde a:focus{
+border: 1px dashed #1f82c0 !important;
+Die Fraunhofer-Gesellschaft (
+) ist eine der weltweit führenden Organisationen für anwendungsorientierte Forschung. 74 Institute entwickeln wegweisende Technologien für unsere Wirtschaft und Gesellschaft – genauer: 30 000 Menschen aus Technik, Wissenschaft, Verwaltung und IT. Sie wissen: Wer zu Fraunhofer kommt, will und kann etwas verändern. Für sich, für uns und die Märkte von heute und morgen.
+Leidenschaft für Lösungen mit Licht – das ist das
+Fraunhofer-Institut für Angewandte Optik und Feinmechanik IOF
+! Am traditionsreichen Optikstandort Jena betreiben wir anwendungsorientierte Forschung auf dem Gebiet der Photonik. Wir entwickeln innovative lichtbasierte Technologien und realisieren modernste optische Komponenten und Systeme entlang der gesamten Prozesskette – von Design und Simulation, über die Fertigung bis hin zur Integration und Anwendung von kundenspezifischen Lösungen und Prototypen. Wann gestaltest du gemeinsam mit uns die Zukunft?
+Hier sorgst Du für Veränderung
+Im europäischen Verbundprojekt QUANT-GPlCz überführen wir quantengesicherte Kommunikation von der Forschung in die Praxis: Wir implementieren den Quantenschlüsselaustausch (QKD) in realen Glasfasernetzen und entwickeln die dafür nötige Netzwerkebene. Forschung und Netzarchitektur greifen dabei unmittelbar ineinander – das macht die Arbeit abwechslungsreich und spannend. Im Rahmen dieses Projekts arbeitest Du an unserem Standort am Fraunhofer-Zentrum in Erfurt gemeinsam mit unserem internationalen Team der Abteilung »Photonische Quanten Systeme«.
+Das sind deine Aufgaben im Detail:
+Planung, Betrieb, Weiterentwicklung und Dokumentation unserer LAN-, WAN- und Firewall-Infrastrukturen für IT und Quanten-Glasfasertestbeds
+Administration der bestehenden Linux Netzwerksysteme sowie Mitwirkung an Sicherheitskonzepten
+Weiterentwicklung der Glasfaserinfrastrukturen und Testbeds für nationale und internationale Quantenforschungsprojekte
+Analyse und Behebung komplexer Störungen im Rahmen des 2nd- und 3rd-Level-Supports
+Mitgestaltung von Architekturentscheidungen, technischen Standards und Maßnahmen im Rahmen der IT-Strategie 2030
+Steuerung externer Dienstleister und Hersteller sowie aktive Gestaltung des Lieferantenmanagements
+Hiermit bringst Du Dich ein
+Abgeschlossenes technisches Hochschulstudium (Bachelor oder FH-Diplom) in Informatik, Wirtschaftsinformatik, Verwaltungs­informatik, Physik, Mathematik oder vergleichbarer Studiengang sowie langjährige, einschlägige Berufserfahrung
+Fundierte Erfahrung im Betrieb und in der Weiterentwicklung von LAN-, WAN- und Firewall-Infrastrukturen
+Kenntnisse in komplexen Linux Netzwerksetups
+Erfahrung im 2nd- und 3rd-Level-Support sowie in der Zusammenarbeit mit externen Dienstleistern und Herstellern
+Strukturierte und analytische Arbeitsweise, hohe Problemlösungskompetenz und ausgeprägtes Sicherheitsbewusstsein
+Kommunikationsstärke und Eigenverantwortung
+Sehr gutes Deutsch (C1) sowie gutes Englisch (B2) in Wort und Schrift
+Was wir für Dich bereithalten
+Mitarbeit in der Spitzenforschung mit einer breiten Vielfalt wegweisender Leuchtturmprojekte, die Gesellschaft und Wirtschaft weiterbringen
+Abwechslungsreiche Tätigkeiten an modernen Arbeitsplätzen und in Laboren auf dem neuesten Stand der Technik
+Interdisziplinäre Zusammenarbeit in einem kollegialen, aufgeschlossenen Team
+Attraktive Zusatzleistungen wie betriebliche Altersvorsorge, Entgeltumwandlung, vermögenswirksame Leistungen, Zuschuss zum Jobticket
+Tariflicher, flexibel planbarer Urlaub mit 30 Tagen Urlaub/ Jahr
+Familienfreundliche Arbeitskultur mit orts- und zeitflexiblem Arbeiten
+Gezielte Weiterbildung und Entwicklung deiner fachlichen und persönlichen Stärken durch das Fraunhofer-Bildungsprogramm
+Sehr gute Anbindung an den öffentlichen Nahverkehr
+Wir wertschätzen und fördern die Vielfalt der Kompetenzen unserer Mitarbeitenden und begrüßen daher alle Bewerbungen – unabhängig von Alter, Geschlecht, Nationalität, ethnischer und sozialer Herkunft, Religion, Weltanschauung, Behinderung sowie sexueller Orientierung und Identität. Schwerbehinderte Menschen werden bei gleicher Eignung bevorzugt eingestellt. Unsere Aufgaben sind vielfältig und anpassbar – für Bewerber*innen mit Behinderung finden wir gemeinsam Lösungen, die ihre Fähigkeiten optimal fördern.
+Die wöchentliche Arbeitszeit beträgt 39 Stunden. Die Stelle kann auch in Teilzeit besetzt werden. Die Stelle ist zunächst bis zum 31.08.2029 befristet. Wir streben eine langfristige Zusammenarbeit an.  Anstellung, Vergütung und Sozialleistungen basieren auf dem Tarifvertrag für den öffentlichen Dienst (TVöD). Zusätzlich kann Fraunhofer leistungs- und erfolgsabhängige variable Vergütungsbestandteile gewähren.
+Mit ihrer Fokussierung auf zukunftsrelevante Schlüsseltechnologien sowie auf die Verwertung der Ergebnisse in Wirtschaft und Industrie spielt die Fraunhofer-Gesellschaft eine zentrale Rolle im Innovationsprozess. Als Wegweiser und Impulsgeber für innovative Entwicklungen und wissenschaftliche Exzellenz wirkt sie mit an der Gestaltung unserer Gesellschaft und unserer Zukunft.
+Bereit für Veränderung? Dann bewirb Dich jetzt, und mach einen Unterschied! Nach Eingang Deiner Online-Bewerbung erhältst Du eine automatische Empfangsbestätigung. Dann melden wir uns schnellstmöglich und sagen Dir, wie es weitergeht.
+Du hast Fragen zur Stelle, zum Bewerbungsablauf oder zur Barrierefreiheit? Du brauchst Unterstützung? Unsere Recruiterin
+Fraunhofer-Institut für Angewandte Optik und Feinmechanik IOF
+Linux, Network, Technology
+MANAGER FÜR COOKIE-EINSTELLUNGEN
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+.onoffswitch .onoffswitch-inner:before {
+.onoffswitch .onoffswitch-inner:after {
+Manager für Cookie-Einwilligungen
+Wenn Sie eine Website besuchen, kann diese Informationen zu Ihrem Browser - meistens in Form von Cookies - speichern und abrufen. Da wir Ihr Recht auf Privatsphäre respektieren, können Sie bestimmte Cookies ablehnen. Wenn Sie jedoch bestimmte Cookies blockieren, kann sich dies negativ auf Ihre Erfahrung auf der Site und die von uns angebotenen Services auswirken.
+Diese Cookies sind für die Verwendung dieser Website erforderlich und können nicht deaktiviert werden.
+Wir verwenden die folgenden Sitzungs-Cookies, die alle für die Funktionsfähigkeit der Website erforderlich sind:
+"route" wird für Sitzungs-Stickiness verwendet
+"careerSiteCompanyId" wird verwendet, um die Anforderung an das richtige Rechenzentrum zu senden
+"JSESSIONID" wird während der Sitzung auf dem Gerät des Besuchers abgelegt, damit der Server den Besucher identifizieren kann
+"Load balancer cookie" (tatsächlicher Cookie-Name kann abweichen) verhindert, dass ein Besucher von einer Instanz zu einer anderen springt
+Cookies vom Anbieter SAPasserviceprovider sind notwendig und können nicht deaktiviert werden.
+Diese Cookies sorgen für eine bessere Kundenerfahrung auf dieser Site. So können Anmeldedetails gespeichert werden, und die Videoleistung kann optimiert werden. Sie liefern uns Informationen darüber, wie unsere Site verwendet wird. Sie können diese Cookies jederzeit akzeptieren oder ablehnen. Beachten Sie, dass bestimmte Funktionen, die diese Drittanbieter zu Verfügung stellen, beeinträchtigt werden können, wenn Sie diese Cookies nicht akzeptieren.
+Einwilligung für alle Funktionale Cookies
+Vimeo ist eine Serviceplattform zur Bereitstellung und zum Teilen von Videos. Wenn Sie die Vimeo-Cookies ablehnen, können Sie keine Vimeo-Videos anschauen und nicht damit interagieren.
+Einwilligung für Cookies vom Anbieter Vimeo
+Mit diesen Cookies werden Anzeigen bereitgestellt, die für Ihre Interessen relevant sind. Sie können jederzeit frei wählen, ob Sie diese Cookies akzeptieren oder ablehnen. Beachten Sie, dass bestimmte Funktionen, die diese Drittanbieter zur Verfügung stellen, beeinträchtigt werden können, wenn Sie diese Cookies nicht akzeptieren.
+Einwilligung für alle Werbe-Cookies
+Google Analytics ist ein Webanalysedienst, der von Google angeboten wird und der den Verkehr auf der Website nachverfolgt und meldet.
+Einwilligung für Cookies vom Anbieter AddThis

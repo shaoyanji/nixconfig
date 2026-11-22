@@ -1,0 +1,85 @@
+https://jobs.fraunhofer.de/job/Darmstadt-IT-System-Engineer-Network-Engineer-%28all-genders%29-64289/1453253733/
+IT-System-Engineer / Network-Engineer (all genders) Stellendetails | Fraunhofer-Gesellschaft
+body{display:none !important;}
+Wir verwenden Cookies, um Ihnen die bestmögliche Erfahrung mit der Website bieten zu können. Ihre Cookie-Einstellungen werden im lokalen Speicher Ihres Browsers gespeichert. Dazu gehören Cookies, die für die Website technisch notwendig sind. Darüber hinaus können Sie frei entscheiden, ob Sie Cookies akzeptieren, und dies jederzeit ändern. Sie können auch Cookies zur Verbesserung der Website-Leistung sowie Cookies zum Anzeigen von Inhalten, die auf Ihre Interessen zugeschnitten sind, ablehnen. Wenn Sie nicht alle Cookies akzeptieren, kann dies Auswirkungen auf Ihre Erfahrung auf der Site und die von uns angebotenen Services haben.
+Cookie-Einstellungen ändern
+INSTITUTE UND EINRICHTUNGEN
+INSTITUTE UND EINRICHTUNGEN
+INSTITUTE UND EINRICHTUNGEN
+Nach Stichwort/Studienfach/Jobcode suchen
+Institute und Einrichtungen
+Wählen Sie aus, wie oft (in Tagen) Sie eine Benachrichtigung erhalten möchten:
+form.emailsubscribe-form {
+Wählen Sie aus, wie oft (in Tagen) Sie eine Benachrichtigung erhalten möchten:
+IT-System-Engineer / Network-Engineer (all genders)
+.buttontext75a88ded57d8adde a{
+border: 1px solid transparent;
+.buttontext75a88ded57d8adde a:focus{
+border: 1px dashed #1f82c0 !important;
+Die Fraunhofer-Gesellschaft (
+) ist eine der weltweit führenden Organisationen für anwendungsorientierte Forschung. 74 Institute entwickeln wegweisende Technologien für unsere Wirtschaft und Gesellschaft – genauer: 30 000 Menschen aus Technik, Wissenschaft, Verwaltung und IT. Sie wissen: Wer zu Fraunhofer kommt, will und kann etwas verändern. Für sich, für uns und die Märkte von heute und morgen.
+Unser Team am Fraunhofer LBF forscht an Lösungen im Kontext der Gestaltung nachhaltiger Materialien, Strukturen und Systeme sowie Kreislaufstrategien, die höchsten Anforderungen an Zuverlässigkeit, Effizienz und Resilienz gerecht werden. Sie möchten Teil dieses inspirierenden Teams sein? Wir freuen uns auf Deine Bewerbung!
+IT stellt für alle Mitarbeitenden des Instituts eine leistungsfähige informationstechnische Infrastruktur und IT-Dienstleistungen zur Verfügung. Wenn Du auch Lust dazu hast, IT im Kontext eines wissenschaftlichen Umfelds neu zu gestalten und Dich mit den Fragestellungen der Forscher auseinanderzusetzen, dann komm in unser Team. Deine neuen Kolleg*innen freuen sich darauf, mit dir durchzustarten.
+Ab sofort suchen wir Dich als
+IT-System-Engineer / Network-Engineer (all genders)
+Hier sorgst Du für Veränderung
+Du bist verantwortlich für den technischen Betrieb und die auf die Bedürfnisse des Forschungsbetriebs ausgerichtete Weiterentwicklung der institutsinternen Netzwerkinfrastruktur. Dies beinhaltet Systeme und Themen wie z. B. Next-Generation-Firewalls (Palo-Alto), Core- und Distribution-Switches (Cisco, HP), LAN, WAN, WLAN, NAC, DNS, DHCP, IPAM, Netzwerküberwachung und Dokumentation. Bei allen Tätigkeiten legst Du den IT-Grundstein für den kontinuierlichen wissenschaftlichen Fortschritt unter gleichzeitiger Berücksichtigung der Anforderungen der Informationssicherheit, die sich aus externen Regelwerken wie der DIN ISO/IEC 27001, VDA ISA/TISAX sowie Fraunhofer-internen Vorgaben ergeben. Die Aufgaben umfassen im Einzelnen Folgendes:
+Implementierung modernster Netzwerklösungen im Hinblick auf sich kontinuierlich wandelnde Anforderungen des Forschungsbetriebs
+Gewährleistung eines störungsfreien Betriebs der gesamten Netzwerkinfrastruktur
+Mitwirkung bei der Weiterentwicklung der fortschreitenden Digitalisierung des Instituts im Rahmen von interdisziplinären wissenschaftlichen Projekten mit dem Ziel der sicheren und zukunftsorientierten Vernetzung des umfangreichen Maschinenparks des LBF im Umfeld von „Industrie 4.0“ und „IoT"
+Beratung der Mitarbeiter des Instituts bei Fragen in allen netzwerkbezogenen Themen
+Hiermit bringst Du Dich ein
+Abgeschlossenes Hochschulstudium (Bachelor) in Informatik oder einer vergleichbaren Ausrichtung
+Mindestens 3-jährige Berufserfahrung als System Engineer, idealerweise mit tiefgreifendem Verständnis im Bereich LAN (Cisco, HPE/Aruba), WLAN (Cisco) sowie NAC (Aruba ClearPass), vorhandene Zertifizierungen wie z.B. CCNA/CCNP, LPIC, ITIL sind von Vorteil
+Know-how bezüglich komplexer Netzwerkinfrastrukturen (Routing, Switching) in Enterprise-Umgebungen (Cisco, HPE/Aruba) und Next-Generation-Firewalls (Palo Alto)
+Grundkenntnisse im Umgang mit Linux-Systemen/-Distributionen und deren Konfiguration sind von Vorteil
+Erfahrung mit dem Einsatz von Netzwerkprotokollen (z.B. TCP, IPv6, IPv4, DNS, DHCP, 802.1X), Netzwerklösungen wie IPAM, Monitoring, Log-Analyse, NAC und Netzwerkautomation (Ansible, Gitlab, CI/CD, Python)
+Grundkenntnisse von Verfahren der Informationssicherheit, z.B. DIN ISO/IEC 27001
+Teamfähigkeit, Engagement, sehr gute Kommunikationsfähigkeit, Verantwortungsbewusstsein
+Selbstständige, sorgfältige, strukturierte sowie lösungsorientierte Arbeitsweise
+Fließendes Deutsch und gutes Englisch jeweils in Wort und Schrift
+Was wir für Dich bereithalten
+Abwechslungsreiche und interessante Herausforderungen in der IT
+Ein offenes und kollegiales Arbeitsumfeld
+Familienfreundliche Arbeitskultur mit flexiblen Arbeitsbedingungen (verschiedene Arbeitszeitmodelle, orts- und zeitflexibles Arbeiten, mobiles Arbeiten)
+Unterstützungsangebote zur Vereinbarkeit von Familie und Beruf: Eltern-Kind-Büro, Notfallbetreuung, Lebenslagencoaching, Kinderbetreuung und Beratungsleistungen zu Homecare-Eldercare etc. in Kooperation mit dem pme Familienservice
+Gezielte Weiterbildung und Entwicklung deiner fachlichen und persönlichen Stärken durch das Fraunhofer-Bildungsprogramm
+Da wir Chancengleichheit und Diversity großschreiben: Programme zur Karriereentwicklung von Wissenschaftlerinnen und weiblichen Führungskräften, Debiasing-Angebote und vieles mehr
+Zugang zu barrierefreien Arbeitsplätzen und technischen Hilfsmitteln sowie individuelle Unterstützung zur Integration ins Arbeitsumfeld
+Betriebliche Altersvorsorge, vermögenswirksame Leistungen und Entgeltumwandlung
+Gute ÖPNV-Anbindung, Jobticket, kostenfreie Parkplätze, leistungsfähige Ladeinfrastruktur für Elektrofahrzeuge mit Vorzugskonditionen für Mitarbeitende
+Monatlich wechselnde Einkaufsvergünstigungen
+Die Vergütung erfolgt bis TVöD EG 12 (je nach Qualifikation).
+Die wöchentliche Arbeitszeit beträgt 39 Stunden. Die Stelle kann auch in Teilzeit besetzt werden. Die Stelle ist zunächst auf 2 Jahre befristet, eine Verlängerung wird angestrebt.
+Wir wertschätzen und fördern die Vielfalt der Kompetenzen unserer Mitarbeitenden und begrüßen daher alle Bewerbungen – unabhängig von Alter, Geschlecht, Nationalität, ethnischer und sozialer Herkunft, Religion, Weltanschauung, Behinderung sowie sexueller Orientierung und Identität. Schwerbehinderte Menschen werden bei gleicher Eignung bevorzugt eingestellt. Unsere Aufgaben sind vielfältig und anpassbar – für Bewerber*innen mit Behinderung finden wir gemeinsam Lösungen, die ihre Fähigkeiten optimal fördern.
+Mit ihrer Fokussierung auf zukunftsrelevante Schlüsseltechnologien sowie auf die Verwertung der Ergebnisse in Wirtschaft und Industrie spielt die Fraunhofer-Gesellschaft eine zentrale Rolle im Innovationsprozess. Als Wegweiser und Impulsgeber für innovative Entwicklungen und wissenschaftliche Exzellenz wirkt sie mit an der Gestaltung unserer Gesellschaft und unserer Zukunft.
+Bereit für Veränderung? Dann bewirb Dich jetzt, und mach einen Unterschied! Nach Eingang Deiner Online-Bewerbung erhältst Du eine automatische Empfangsbestätigung. Dann melden wir uns schnellstmöglich und sagen Dir, wie es weitergeht.
+Du hast Fragen zur Stelle, zum Bewerbungsablauf oder zur Barrierefreiheit? Du brauchst Unterstützung? Thorsten Hering und Manuel Matern sind unter +49 6151 705-8514 bzw. +49 705-8349 für dich da.
+Fraunhofer-Institut für Betriebsfestigkeit und Systemzuverlässigkeit LBF
+Kennziffer: 86030                Bewerbungsfrist:
+Network Engineer, Systems Engineer, Network, Cisco, Engineer, Engineering, Technology
+MANAGER FÜR COOKIE-EINSTELLUNGEN
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+Wird auf einer neuen Registerkarte geöffnet.
+.onoffswitch .onoffswitch-inner:before {
+.onoffswitch .onoffswitch-inner:after {
+Manager für Cookie-Einwilligungen
+Wenn Sie eine Website besuchen, kann diese Informationen zu Ihrem Browser - meistens in Form von Cookies - speichern und abrufen. Da wir Ihr Recht auf Privatsphäre respektieren, können Sie bestimmte Cookies ablehnen. Wenn Sie jedoch bestimmte Cookies blockieren, kann sich dies negativ auf Ihre Erfahrung auf der Site und die von uns angebotenen Services auswirken.
+Diese Cookies sind für die Verwendung dieser Website erforderlich und können nicht deaktiviert werden.
+Wir verwenden die folgenden Sitzungs-Cookies, die alle für die Funktionsfähigkeit der Website erforderlich sind:
+"route" wird für Sitzungs-Stickiness verwendet
+"careerSiteCompanyId" wird verwendet, um die Anforderung an das richtige Rechenzentrum zu senden
+"JSESSIONID" wird während der Sitzung auf dem Gerät des Besuchers abgelegt, damit der Server den Besucher identifizieren kann
+"Load balancer cookie" (tatsächlicher Cookie-Name kann abweichen) verhindert, dass ein Besucher von einer Instanz zu einer anderen springt
+Cookies vom Anbieter SAPasserviceprovider sind notwendig und können nicht deaktiviert werden.
+Diese Cookies sorgen für eine bessere Kundenerfahrung auf dieser Site. So können Anmeldedetails gespeichert werden, und die Videoleistung kann optimiert werden. Sie liefern uns Informationen darüber, wie unsere Site verwendet wird. Sie können diese Cookies jederzeit akzeptieren oder ablehnen. Beachten Sie, dass bestimmte Funktionen, die diese Drittanbieter zu Verfügung stellen, beeinträchtigt werden können, wenn Sie diese Cookies nicht akzeptieren.
+Einwilligung für alle Funktionale Cookies
+Vimeo ist eine Serviceplattform zur Bereitstellung und zum Teilen von Videos. Wenn Sie die Vimeo-Cookies ablehnen, können Sie keine Vimeo-Videos anschauen und nicht damit interagieren.
+Einwilligung für Cookies vom Anbieter Vimeo
+Mit diesen Cookies werden Anzeigen bereitgestellt, die für Ihre Interessen relevant sind. Sie können jederzeit frei wählen, ob Sie diese Cookies akzeptieren oder ablehnen. Beachten Sie, dass bestimmte Funktionen, die diese Drittanbieter zur Verfügung stellen, beeinträchtigt werden können, wenn Sie diese Cookies nicht akzeptieren.
+Einwilligung für alle Werbe-Cookies
+Google Analytics ist ein Webanalysedienst, der von Google angeboten wird und der den Verkehr auf der Website nachverfolgt und meldet.
+Einwilligung für Cookies vom Anbieter AddThis

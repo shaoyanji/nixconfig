@@ -1,0 +1,56 @@
+Linux-Systemadministration (m/w/d) High-Performance Computing (HPC) und Compute-Server
+Physikalisch-Technische Bundesanstalt
+10587 Berlin
+Veröffentlicht: 2026-11-20T02:24:41+01:00
+Anzeige: https://karriere.bund.de/arbeiten-bei-uns/stellenangebote/linux-systemadministration-m-w-d-high-performance-computing-hpc-und-compute-server/25996058
+Messkunst „Made in Germany" – dafür stehen die ca. 2100 Mitarbeitenden der Physikalisch-Technischen Bundesanstalt (PTB). Als nationales Metrologieinstitut und führende Forschungseinrichtung entwickeln wir in einem internationalen Arbeitsumfeld weltweit führende Standards für das Messen. So sorgen wir dafür, dass Menschen und Organisationen Messungen vertrauen können.
+
+In Berlin-Charlottenburg suchen wir Sie für das Referat 9.55 „Hochleistungsrechnen“ als:
+
+ Linux-Systemadministration (m/w/d) – High-Performance Computing (HPC) und Compute-Server 
+            Entgeltgruppe 10              TVöD Bund              ○ unbefristet ○ Vollzeit          
+
+ Ihre Aufgaben: 
+
+            Das              Referat 9.55 „Hochleistungsrechnen“              am PTB-Standort Berlin betreibt Compute-Server und ein Hochleistungs-Rechencluster unter Linux für anspruchsvolle wissenschaftliche Berechnungen als Dienstleistung für die Fachabteilungen der PTB sowie weitere virtualisierte Serverinfrastruktur. Sie unterstützen unser Team mit folgenden Tätigkeiten:          
+
+- Administrative Aufgaben im Bereich Linux
+- Zugriffsrechtemanagement sowie Automatisierung der Prozesse im Serverbetrieb
+- Administration des High-Performance Compute (HPC-) Clusters
+- Support für wissenschaftliche Nutzende bei der Verwendung von HPC- und KI- Kapazitäten für die PTB-Forschung
+- Bereitstellung und Installation fachspezifischer physikalischer Anwendungen im Bereich Computational Physics
+- Mitwirkung an der strategischen Weiterentwicklung der Server-Infrastruktur, mit Fokus auf Skalierbarkeit, Robustheit, Kosten- und Energieeffizienz und KI-Anwendungen
+- Dokumentation und Pflege der Software- und Cluster-Installation
+ Ihr Profil: 
+
+- Abgeschlossenes Studium (Bachelor/FH-Diplom) der Fachrichtung Informatik, Computer Science, Software-Engineering, Data Science, Computational Engineering, Scientific Computing, Simulation Science oder vergleichbare nachgewiesene Qualifikation
+- Erfahrung in der Linux-Systemadministration; fundierte Kenntnisse in der Linux-Automatisierung (Shell-Scripting, Python, Ansible u. ä.)
+- Wissen über verteilte Dateisysteme, parallele Programmiermodelle, Prozessor-Architekturen im Bereich des Hochleistungsrechnens, moderne Speicher-Technologien
+- Idealerweise Erfahrungen in der Bereitstellung wissenschaftlicher Software für Anwendende im Bereich numerischer Verfahren und Computational Physics
+- Idealerweise Erfahrungen in Server-Virtualisierung (z. B. Proxmox)
+- Sensibilität für Belange des Datenschutzes und der IT-Sicherheit sowie Kenntnisse der Anforderungen des BSI
+- Ausgeprägte Dienstleistungsorientierung und Freude am IT-Support für Forschende
+- Selbstständige und strukturierte Arbeitsweise sowie didaktische Fähigkeiten
+- Ausgeprägte Team- und Kommunikationsfähigkeit
+-               Deutsch- (               C1-Niveau               ) und Englischkenntnisse (               B2-Niveau               )            
+- Bereitschaft zu gelegentlichen DienstreisenMit der Abgabe Ihrer Bewerbung erklären Sie Ihre Bereitschaft an einer gegebenenfalls erforderlichen Sicherheitsüberprüfung nach § 9 SÜG mitzuwirken.
+
+ Wir bieten: 
+
+- Arbeiten an anspruchsvollen IT-Lösungen in einem wissenschaftlich-technischen Umfeld
+- Moderne IT-Infrastruktur und vielfältige Technologien
+- Flexible Arbeitszeitmodelle und Möglichkeiten zum mobilen Arbeiten
+- Individuelle Fortbildungen, Zertifizierungen und Entwicklungsmöglichkeiten
+- Vergütung nach TVöD Bund mit attraktiven Zusatzleistungen            Eine Übersicht unserer Benefits finden Sie auf unserer              Karriereseite             .          
+
+ Das ist uns wichtig: 
+
+Die PTB fördert die Gleichstellung von Frauen und Männern und ist besonders an der Bewerbung von Frauen interessiert. Gleichzeitig sind wir bestrebt, die gesellschaftliche Vielfalt widerzuspiegeln. Daher ist jede Bewerbung, unabhängig von ihrem Geschlecht, ihrer kulturellen oder sozialen Herkunft, Religion, Weltanschauung oder sexuellen Identität herzlich willkommen. Schwerbehinderte oder ihnen gleichgestellte Menschen werden bei gleicher Eignung bevorzugt berücksichtigt.
+
+ Ihre Bewerbung: 
+
+            Fachliche Fragen zu dieser Position beantwortet Ihnen im              Referat 9.55             :            
+            Dr. Daniel Lübbert, Tel.: 030 3481-8450, E-Mail:             daniel.luebbert@ptb.de (mailto:daniel.luebbert@ptb.de)            .          
+
+            Wir freuen uns auf Ihre Bewerbung bis zum 23. November 2026 unter der Kennziffer            
+            26-163-9C. Bitte nutzen Sie dafür den Button „             ONLINE BEWERBEN             “ am Ende – dieser führt Sie direkt zu unserem Bewerbungsportal, wo Sie Ihre Unterlagen (Lebenslauf, Zeugnisse, Anschreiben) hochladen können. Bewerbungen per E-Mail können wir nicht berücksichtigen. Mit Ihrer Bewerbung akzeptieren Sie die             Datenschutzbestimmungen             .

@@ -1,8 +1,8 @@
 # Lead: Treatwell — Senior Platform Engineer, Platform Core
 
-Fit: 4
+Fit: 3
 Date: 22 November 2026
-Source: brief; advert body not retrievable (Workable v3 endpoint 404, public page a 7.7 kB shell with only the title)
+Source: advert retrieved via Workable v1/v2 account endpoints, 22.11.2026, 4,289 characters (v3 returns 404; the public page is a JS shell)
 Route: https://apply.workable.com/treatwell/j/359BA205E3/
 Language: English
 Location: Netherlands — relocation and a kennismigrant permit required
@@ -28,20 +28,20 @@ Platform Core is the layer other teams build on, and the only honest measure of 
 
 ## What does not
 
-- AWS or any cloud provider in production.
-- Kubernetes, Terraform, Kafka.
-- Marketplace traffic and multi-tenant data models.
-- Team-scale on-call in a product organisation.
+- **Terraform or OpenTofu on AWS** — module design, multi-account setups: the first named core requirement, absent.
+- **Kubernetes on EKS**, Helm, Kustomize, cluster upgrades: the second, absent.
+- Core AWS services, GitLab CI components, Datadog/Prometheus/Grafana.
+- GCP, Bedrock, VPC Lattice, service mesh, DSOMM, mentoring at team scale.
 
-## Fit reasoning: 4
+## Fit reasoning: 3
 
-Briefed as 4, and the evidence supports it: the craft the role asks for — reproducible platforms, gates that mean something, telemetry that reaches a human — is demonstrated over five years, if at a scale of thirteen machines rather than a marketplace.
+The brief said 4. The advert says something narrower: deep Terraform on AWS with multi-account module design, expert EKS, GitLab CI components, Datadog or Prometheus with SLIs. Two of the three core requirements are entirely absent; the third — owning a platform other people build on — is present at thirteen machines and one operator.
 
-Not 5 because the cloud stack is the default vocabulary of a role like this and none of it is held. The letter says so in the third paragraph and does not trade on the word "platform".
+Three is the honest number. The platform craft is real and visible: reviewed pipelines, rollback in minutes, delivery-confirmed telemetry, self-service through a task menu. That gets a conversation. It does not get a 4 when the stack the role is built on is missing.
 
 ## Open items
 
-1. **Advert not retrievable** — confirm the requisition is open and read the real requirements before sending.
+1. **Core gaps** — Terraform/OpenTofu on AWS and EKS conceded in the letter; nothing else in the packet contradicts them.
 2. **Kennismigrant** — US citizen with German permanent residence; the Dutch highly skilled migrant route depends on the salary threshold and Treatwell being a recognised sponsor. The letter asks instead of assuming.
 3. **Relocation** to the Netherlands required; stated as willingness, not arranged.
 4. Certificates still missing.

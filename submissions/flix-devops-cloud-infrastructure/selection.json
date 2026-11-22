@@ -1,0 +1,281 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 3531,
+    "terms": [
+      {
+        "term": "infrastructure",
+        "weight": 28.615
+      },
+      {
+        "term": "cloud",
+        "weight": 26.681
+      },
+      {
+        "term": "services",
+        "weight": 20.676
+      },
+      {
+        "term": "systems",
+        "weight": 16.137
+      },
+      {
+        "term": "system",
+        "weight": 14.67
+      },
+      {
+        "term": "model",
+        "weight": 13.019
+      },
+      {
+        "term": "service",
+        "weight": 12.737
+      },
+      {
+        "term": "backend",
+        "weight": 9.044
+      },
+      {
+        "term": "contract",
+        "weight": 9.044
+      },
+      {
+        "term": "deployed",
+        "weight": 8.664
+      },
+      {
+        "term": "infrastructure-as-code",
+        "weight": 8.664
+      },
+      {
+        "term": "operate",
+        "weight": 8.664
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "matt.bountystash.com",
+        "score": 2.1223
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "bountystash",
+      "fibtransponder",
+      "Risikoberechnungs-Engine (Swirl Engine)"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "JSONL ledger"
+        },
+        {
+          "score": 0.0,
+          "text": "PSI pressure"
+        }
+      ],
+      "kept": 6,
+      "name": "Observability",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Resource limits"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Platform",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "YAML"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programming languages",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Databases",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web development",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Portfolio"
+        },
+        {
+          "score": 0.0,
+          "text": "Due diligence"
+        }
+      ],
+      "kept": 6,
+      "name": "Energy & Risk",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 6.0278,
+          "text": "Automated provisioning, deploys and rollback in Go, Python and Bash, from repository change to a running host"
+        },
+        {
+          "score": 4.4084,
+          "text": "Built alerting from Gatus endpoint probes plus a Go bridge that confirms delivery before an alert is considered raised"
+        },
+        {
+          "score": 2.1776,
+          "text": "Wrote a sentinel job that ingests job status, generation age, disk and PSI pressure into a JSONL ledger every fifteen mi"
+        },
+        {
+          "score": 1.2253,
+          "text": "Managed secrets with sops and age, keeping credentials out of the repository and out of host images"
+        },
+        {
+          "score": 1.206,
+          "text": "Issued every host a short-lived certificate from a private SSH certificate authority and rotated keys instead of sharing"
+        },
+        {
+          "score": 0.6262,
+          "text": "Kept every generation rollbackable without reinstalling, so a bad change costs minutes instead of an evening"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 9
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften."
+        },
+        {
+          "score": 0.0,
+          "text": "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD."
+        },
+        {
+          "score": 0.0,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Entwickelte Vertriebs- und Marketingstrategien für Nachhaltigkeit."
+        },
+        {
+          "score": 0.0,
+          "text": "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+        }
+      ],
+      "kept": 2,
+      "matched": false,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Arbeitete zwölfstündige Schichten im Feld."
+        },
+        {
+          "score": 0.0,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete die Sicherheitsschulung der Crew."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

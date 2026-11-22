@@ -10,9 +10,9 @@ Language: English
 | :--- | :--- |
 | Employer | Grafana Labs |
 | Role | Staff Software Engineer — Databases SRE |
-| Location | Germany, 100% remote (same role advertised for UK, Ireland, Spain, Sweden) |
+| Location | Germany, 100% remote (same role advertised for UK, Sweden, Spain) |
 | Source | Grafana Labs Greenhouse board API, HTTP 200 on 22 Nov 2026, job id 6103688004 |
-| Salary | not stated in the advert; no figure in the letter |
+| Salary | EUR 113,000 – 135,601 base in Germany (stated in the advert); no figure in the letter |
 
 ## Documents
 
@@ -50,7 +50,7 @@ Not a 1 because the underlying discipline is real and close in spirit: building 
 1. **Prometheus, Grafana and databases absent** — stated in the first paragraph of the letter.
 2. **Fit lowered from the briefed 4 to 2.** Restorable in one command if you want the brief's value kept.
 3. Staff level implies scope this CV does not show: no multi-team technical direction, no mentoring record.
-4. Certificates still missing; no salary stated anywhere.
+4. Certificates still missing; the German range is recorded here and in `lead.md`, but no figure is quoted in the letter.
 5. Application is via the Germany Greenhouse posting, not the UK/Ireland/Spain/Sweden variants.
 
 ## Package

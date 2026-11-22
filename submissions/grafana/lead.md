@@ -7,7 +7,7 @@ Greenhouse id: 6103688004
 
 ## Source
 
-The advert is live on Grafana Labs' own Greenhouse board (HTTP 200, 140 open jobs, retrieved today) and the full text sits in `job-description.txt`. This is the Germany-remote variant of the same Staff Databases SRE role advertised for the UK, Ireland, Spain and Sweden.
+The advert is live on Grafana Labs' own Greenhouse board (HTTP 200, 140 open jobs, retrieved today) and the full text sits in `job-description.txt`. This is the Germany-remote variant of the same Staff Databases SRE role advertised for the UK, Sweden and Spain.
 
 ## Why interesting
 
@@ -39,7 +39,7 @@ Apply through the Greenhouse posting. The role is advertised in five European co
 
 ## Salary
 
-Not stated in the advert. No figure in the letter. A Staff role at Grafana Labs in Germany is typically well above this candidate's current band, so the conversation would be about level rather than number.
+The Germany advert states EUR 113,000 to 135,601 base, before equity and bonus. The letter quotes no figure. That range sits well above this candidate's current band, so the conversation would be about level rather than number.
 
 ## Fit: 2 of 5
 

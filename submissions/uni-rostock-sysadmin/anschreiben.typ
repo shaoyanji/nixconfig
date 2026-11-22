@@ -1,4 +1,4 @@
-#set document(title: "Bewerbung Universität Rostock — Systemadministrator/in", author: "Matt Ji")
+#set document(title: "Bewerbung — Universität Rostock, IT-Systemadministrator", author: "Matt Ji")
 #set page(paper: "a4", margin: (top: 2cm, bottom: 2cm, left: 2.2cm, right: 2.2cm))
 #set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de")
 #set par(leading: 0.58em, justify: true, spacing: 1.1em)
@@ -6,39 +6,36 @@
 #text(size: 9pt, fill: rgb("#374151"))[
   #text(weight: "bold", size: 10pt, fill: rgb("#111827"))[Matt Ji] \
   Am Burgerhof 4, 79261 Gutach im Breisgau \
-  matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji
+  matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji/nixconfig
 ]
 
 #v(14pt)
 
 #text(size: 9pt)[
   Universität Rostock \
-  Fakultät für Informatik und Elektrotechnik \
-  Herrn Prof. Dr.-Ing. Danielis \
-  Albert-Einstein-Straße 22 \
-  18059 Rostock
+  IT-Systemadministrator
 ]
 
 #v(14pt)
 #align(right)[#text(size: 8.5pt, fill: rgb("#4b5563"))[22. November 2026]]
 
 #v(6pt)
-#text(weight: "bold")[Bewerbung als Systemadministrator (m/w/d), Kennung 17891, Interamt-ID 1512442]
+#text(weight: "bold")[Bewerbung als IT-Systemadministrator]
 
 #v(4pt)
-Sehr geehrter Herr Professor Danielis,
+Sehr geehrte Damen und Herren,
 
 #v(2pt)
-Ein Lehrstuhl-Fachlabor ist der Ort, an dem Forschung und Lehre dieselbe Hardware teilen: Rechner, auf denen ein Semesterprojekt läuft, während daneben eine Messreihe weiterläuft. Diese Infrastruktur soll unsichtbar sein, und unsichtbar wird sie nur, wenn jemand sie beschafft, dokumentiert, überwacht und im Störungsfall zuerst dort ist. Genau diese Rolle habe ich fünf Jahre lang ausgefüllt, mit dreizehn Servern, drei Hardware-Generationen und Nutzenden, die sich auf die Dienste verlassen mussten.
+Serverbetrieb ist für mich die Arbeit, die man nicht sieht, solange sie funktioniert. Ich habe fünf Jahre lang dreizehn Linux-Server allein betreut: Installation über das Netz, Aufteilung der Datenträger, Dienste, Netz und Zugriff, Sicherheitsupdates, Sicherungen. Der Zustand jeder Maschine steht in einer Flake und nicht in meiner Erinnerung; ein Rollout läuft über eine Prüfung, eine Rückkehr zur vorigen Generation dauert Minuten statt einer Nacht. Diese Eigenschaft ist in einem Institut mit begrenzter Personaldecke mehr wert als jede einzelne Technik: Wer die Maschine beschreibt, kann sie wiederherstellen, auch wenn derjenige, der sie aufgesetzt hat, gerade nicht da ist.
 
 #v(2pt)
-Konkret: Die Server-Infrastruktur steht deklarativ in einem Repository, jeder Dienst ist ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit mit Prüfung und Rückrollung. Die Systeme laufen auf NixOS und Debian-nah, mit systemd, klarer Rechteverwaltung und reproduzierbaren Installationen. Web-Dienste stelle ich hinter einem Reverse Proxy bereit, mit TLS über eine eigene Zertifizierungsstelle und kurzlebigen Zertifikaten, erreichbar nur über ein WireGuard-Tailnet. Überwacht wird mit einem Sentinel-Ledger, das Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten schreibt; Sicherungen laufen mit restic und werden durch Wiederherstellungen geprüft. Beschaffung, Installation und Inbetriebnahme habe ich selbst gemacht, Support und Dokumentation ebenso — am Fraunhofer ISE zusätzlich im wissenschaftlichen Umfeld mit Laborgeräten und Messdaten.
+Wartung habe ich deshalb automatisiert, weil sie sonst liegen bleibt. Alle fünfzehn Minuten schreibt ein Ledger den Zustand, Prüfungen messen Erreichbarkeit und Antwortzeit, ein Alarmkanal in Go meldet eine Störung erst, wenn die Zustellung bestätigt ist. Speicher- und Prozessdruck, Alter der laufenden Generation und Platz auf den Datenträgern werden mitgeprüft, weil sie einem Ausfall vorausgehen. Sicherungen laufen mit restic, und ich spiele sie zurück, statt sie nur einzurichten. Netz und Fernzugriff sind im Code beschrieben: nftables, WireGuard ohne öffentlichen Listener, eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten. Dokumentation entsteht aus demselben Bestand wie das Aufgabenmenü, damit Wissen nicht mit einer Stelle geht.
 
 #v(2pt)
-Was ich nicht mitbringe, sage ich vorher: keine Windows-Server-Administration und keinen Windows-Desktop-Support im betreuten Maßstab, keine Linux-Virtualisierung mit Proxmox oder KVM, kein RHEL und keine Erfahrung mit den Verwaltungsverfahren einer Hochschule. Das ist ein Teil der Stelle, und ich sage es lieber jetzt als in der Einarbeitung. Was ich mitbringe, ist die Fähigkeit, sich in eine gewachsene Laborumgebung einzuarbeiten, sie zu dokumentieren und den Betrieb so zu ordnen, dass er nicht an einer Person hängt.
+Was ich nicht mitbringe, sage ich offen: Ich habe Debian nicht im Regelbetrieb verwaltet — mein Bestand läuft auf NixOS, die Paket- und Rechnerverwaltung einer Hochschule ist mir also nicht vertraut. Windows-Domäne, Active Directory, VMware und Ansible kenne ich nicht aus dem Betrieb. Aus der Forschung kenne ich den Alltag aus dem Jahr 2012 am Fraunhofer ISE: Messaufbau, geteilte Rechner, Datenablage, dokumentierte Auswertung. Das ist keine Hochschul-IT, aber es ist ein Forschungsumfeld, in dem Rechner von Menschen genutzt werden, die keine Systemadministratoren sind.
 
 #v(2pt)
-Zur Lage: Ich wohne in Gutach im Breisgau, rund 800 km von Rostock, und die Stelle ist bis zum 30.11.2027 befristet. Ein Umzug für zwölf Monate wäre für beide Seiten schwer zu rechtfertigen; was ich anbieten kann, sind Präsenzblöcke vor Ort — etwa zwei Wochen im Monat, in Abstimmung mit den Labor- und Lehrbetriebszeiten —, ergänzt durch Fernbetreuung an den übrigen Tagen. Wenn das für die Betreuung eines Fachlabors zu wenig ist, ist das ein ehrliches Ausschlusskriterium und keine Frage des Verhandelns. Meine Niederlassungserlaubnis ist unbefristet, ich benötige kein Visum; Deutsch ist bei mir C1, Englisch Muttersprache.
+Ich wohne in Freiburg und wäre für die Stelle nach Rostock umzuziehen; Deutsch ist C1, Englisch Muttersprache, Niederlassungserlaubnis liegt vor. Das Repository ist öffentlich: github.com/shaoyanji/nixconfig
 
 #v(4pt)
 Mit freundlichen Grüßen

@@ -1,0 +1,288 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 4923,
+    "terms": [
+      {
+        "term": "terraform",
+        "weight": 25.171
+      },
+      {
+        "term": "cloud",
+        "weight": 20.389
+      },
+      {
+        "term": "system",
+        "weight": 18.067
+      },
+      {
+        "term": "hashicorp",
+        "weight": 14.467
+      },
+      {
+        "term": "infrastrukturen",
+        "weight": 14.467
+      },
+      {
+        "term": "automation",
+        "weight": 8.544
+      },
+      {
+        "term": "automatisierung",
+        "weight": 8.544
+      },
+      {
+        "term": "cd",
+        "weight": 8.544
+      },
+      {
+        "term": "ci/cd",
+        "weight": 8.544
+      },
+      {
+        "term": "cloud-infrastrukturen",
+        "weight": 8.544
+      },
+      {
+        "term": "cloud-plattformen",
+        "weight": 8.544
+      },
+      {
+        "term": "container",
+        "weight": 8.544
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "bountystash",
+        "score": 2.3733
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "fibtransponder",
+      "matt.bountystash.com",
+      "Risikoberechnungs-Engine (Swirl Engine)"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Least Privilege"
+        },
+        {
+          "score": 0.0,
+          "text": "Schwachstellenmanagement"
+        },
+        {
+          "score": 0.0,
+          "text": "CISA KEV"
+        },
+        {
+          "score": 0.0,
+          "text": "Bug Bounty"
+        }
+      ],
+      "kept": 6,
+      "name": "Sicherheit",
+      "of": 10
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Immutable Deployments"
+        },
+        {
+          "score": 0.0,
+          "text": "Kubernetes (Grundlagen)"
+        },
+        {
+          "score": 0.0,
+          "text": "GitOps"
+        },
+        {
+          "score": 0.0,
+          "text": "Monitoring"
+        },
+        {
+          "score": 0.0,
+          "text": "Alerting"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Plattform",
+      "of": 12
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Kubernetes (Grundlagen)"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 4.5671,
+          "text": "Automatisierte Provisioning und Rebuilds über einen gemeinsamen Binary-Cache und Remote-Builder, ohne manuellen Schritt "
+        },
+        {
+          "score": 4.0606,
+          "text": "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten protokolliert und alarm"
+        },
+        {
+          "score": 1.655,
+          "text": "Zog Modulgrenzen so, dass eine fehlerhafte Host-Definition am Gate scheitert, bevor sie einen Server erreicht"
+        },
+        {
+          "score": 0.0,
+          "text": "Prüfte Bug-Bounty-Programme."
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 4.1858,
+          "text": "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
+        },
+        {
+          "score": 2.955,
+          "text": "Führte ein internationales Team und entwickelte eine Anreizstruktur, gekoppelt an ein Echtzeit-Finanzmodell."
+        },
+        {
+          "score": 1.0707,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.7089,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete die Sicherheitsschulung der Crew."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

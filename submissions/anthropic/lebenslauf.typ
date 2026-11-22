@@ -45,7 +45,7 @@ code and durability decisions something a scheduled job can fail.
 Storage and state: PostgreSQL declared per service in the same tree that defines the service, with its role, database and settings generated rather than
 edited on a host. Schema changes arrive as ordered migrations that either complete or leave the previous version running, so a failed step is a stopped
 deploy and not a half-migrated database. The mail archive is the working example — a stored `tsvector` behind a GIN index for search, an upsert keyed on
-`message_id` so a replayed message cannot become a second row, SQL endpoints generated from annotated queries, and fourteen months of real mail behind it.
+`message_id` so a replayed message cannot become a second row, SQL endpoints generated from annotated queries, and real mail behind it rather than fixtures.
 
 Durability as a check: the backup drill starts an ephemeral PostgreSQL cluster, replays the dump into it with `psql`, then asserts the restored table count
 and the rows of the core entities, on a timer after the backup window. A backup nobody has restored is a hypothesis, and a broken dump should be a failed
@@ -66,7 +66,7 @@ direction for a platform, but not as a Staff engineer across several teams at on
   [*PostgreSQL* — declared instances, roles and databases per service, settings from Nix],
   [*Migrations* — ordered and versioned, applied by the service, previous version kept on failure],
   [*Restore drills* — dump replayed into an ephemeral cluster, table and row counts asserted],
-  [*Retention and growth* — disk and inode percentages per path, threshold with a named reason],
+  [*Capacity and growth* — disk and inode percentages per path, threshold with a named reason],
   [*Access control* — short-lived certificates, per-host keys, dedicated users per service],
   [*Integrity* — validate before write, append-only events, content-addressed specifications],
   [*Search and shape* — stored `tsvector` with GIN, upsert keys that survive replay],
@@ -118,7 +118,7 @@ direction for a platform, but not as a Staff engineer across several teams at on
   [
     #text(weight: "bold")[mail archive] #text(size: 8pt, fill: muted)[— PostgreSQL]
     #linebreak()
-    Migrations, stored `tsvector` with GIN, upsert on `message_id`, fourteen months of real mail.
+    Migrations, stored `tsvector` with GIN, upsert on `message_id`, backed by real mail, not fixtures.
   ],
   [
     #text(weight: "bold")[restore drill] #text(size: 8pt, fill: muted)[— durability]

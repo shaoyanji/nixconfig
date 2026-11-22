@@ -29,7 +29,7 @@ running a platform alone, where the only durable defence is that the data comes 
 The storage side is PostgreSQL declared in the same tree as the service that owns it, with the role, database and settings generated instead of edited on a
 host. Schema changes are ordered migrations that either complete or leave the previous version running, so a failed step stops a deploy rather than leaving a
 half-migrated database. My mail archive is the working example: a stored `tsvector` behind a GIN index, an upsert keyed on `message_id` so a replay cannot
-become a second row, SQL endpoints generated from annotated queries, and fourteen months of real mail behind it.
+become a second row, SQL endpoints generated from annotated queries, and real mail behind it rather than fixtures.
 
 Durability is a scheduled check, not a claim. The backup drill starts an ephemeral PostgreSQL cluster, replays the dump into it with `psql`, and asserts the
 restored table count and the entity rows, on a timer after the backup window; a broken dump is a failed job the next morning instead of a surprise on the day

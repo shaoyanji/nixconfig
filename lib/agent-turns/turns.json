@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:39:11Z",
+  "generated": "2026-11-22T12:39:55Z",
   "count": 200,
-  "pin": "58dc32217cfbc2a57d147bd330f227692775752b52c9a5ebcda4c07d1b4a4bfa",
+  "pin": "65c565c46d7b7cd091697e7a01253d313cf57340afabf4b2cfa9e6fa872dfc86",
   "turns": [
+    {
+      "id": "a4a76bcc-5668-4837-8a9b-fce628e34a94",
+      "ts": "2026-11-22T12:39:14Z",
+      "source": "freebuff",
+      "subject": "nixconfig:anthropic-data-infra",
+      "action": "correct: cut two unverifiable claims from the Anthropic packet - no retention policy and no at-rest encryption exist for the mail archive. Replaced with the sops-managed DB role and no standing credentials, documented the cut in the sheet. Final 847b0028: CV 2pp/1198w, letter 1pp/493w, 0 warnings, prose exit 0 at 293 files. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "847b00283e5f76c7409b453f3f029ed41561634f",
+      "branch": "main",
+      "frame": "03ha7h6mdpnjgtnyacfzn5g2w"
+    },
     {
       "id": "0a18a5ab-cede-478d-a43e-cf0af69d2217",
       "ts": "2026-11-22T12:38:17Z",
@@ -2819,19 +2832,6 @@
       "base_commit": "5466aebd486f72b7c0d6303bc04aa63ee7a00182",
       "branch": "main",
       "frame": "03ha6sqtgeu4q3pr08sp6e1ov"
-    },
-    {
-      "id": "5875e655-cd09-4997-aa97-5d52bb720242",
-      "ts": "2026-11-22T10:33:54Z",
-      "source": "devin",
-      "subject": "nixconfig:gitlab",
-      "action": "applied: Greenhouse submission complete — OTP 64261040, /confirmation verified; honest No on location/K8s/autoscaling gates",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b37291953c23fe65c359c49df9693b6a13603cb4",
-      "branch": "main",
-      "frame": "03ha6sp8qp8a2ws8cxw3t40s8"
     }
   ]
 }

@@ -31,7 +31,7 @@ Platform Core is the layer other teams build on, and the only honest measure of 
 - **Terraform or OpenTofu on AWS** — module design, multi-account setups: the first named core requirement, absent.
 - **Kubernetes on EKS**, Helm, Kustomize, cluster upgrades: the second, absent.
 - Core AWS services, GitLab CI components, Datadog/Prometheus/Grafana.
-- GCP, Bedrock, VPC Lattice, service mesh, DSOMM, mentoring at team scale.
+- GCP, the managed model service on AWS, VPC Lattice, service mesh, DSOMM, mentoring at team scale.
 
 ## Fit reasoning: 3
 

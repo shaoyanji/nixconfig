@@ -257,7 +257,14 @@ EVENTS: list[tuple[str, str, str]] = [
         r"leider|absage|abgelehnt|unfortunately|unsuccessful|not to proceed|rejected|other candidates"
         r"|ander(?:e|en|er) kandidat|ander(?:e|en|er) bewerber|ander(?:e|en) person entschieden"
         r"|nicht weiterverfolg|nicht fortzusetzen|nicht fortführen|nicht fortfuehren"
-        r"|nicht geklappt|anderweitig besetzt|keine zusage|bedauerlicherweise",
+        r"|nicht geklappt|anderweitig besetzt|keine zusage|bedauerlicherweise"
+        # Canonical's template states the decision without any word the list
+        # above owns: "We regret to inform you that we shall not be progressing
+        # your application further for this particular role." Two of those sat in
+        # `applied` for a day on 2026-11-22 because the subject reads like good
+        # news ("An update on your application") and the body matched nothing.
+        r"|regret to inform|not be progressing|not progressing|not be moving forward"
+        r"|nicht berücksichtigen können|nicht beruecksichtigen koennen",
         "Rejected",
     ),
     ("interview", r"interview|vorstellungsgespr|kennenzulernen|einladung|invite|trial|warteliste|probearbeit", "Interview"),

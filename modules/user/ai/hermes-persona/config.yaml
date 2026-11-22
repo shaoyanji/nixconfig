@@ -152,8 +152,14 @@ fallback_providers:
   # sent literally (fallback_config.resolve_entry_api_key reads an inline
   # literal or key_env, and never expandvars), which is a 401 with a key that
   # was present the whole time.
+  # Model pinned to what answers, not what's best on paper: measured
+  # 2026-11-22 — nemotron-3.5-super-vl:free, deepseek-v4-flash, llama-3.3-70b
+  # and qwen4-max all 5xx'd ("upstream unavailable" / "high demand"), and the
+  # 550b uncensored nemotron was the only id that returned content. If this
+  # lane starts answering 5xx, re-probe the catalog before blaming the key —
+  # the popular :free ids saturate first.
   - provider: custom
-    model: nemotron-3.5-super-vl:free
+    model: nemotron-3-ultra-550b-a55b-uncensored:free
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
   # Keyless terminal lane: api.apisfreellm.com takes no key and can never

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T09:50:08Z",
+  "generated": "2026-11-22T09:52:00Z",
   "count": 200,
-  "pin": "83424e522d6f9c3335e2f3e11a29971f766d43af029ee1f94b7cb7516ea2eda5",
+  "pin": "5c79c9520201b2e9713e5e9b256a2cd4da45d4e806aca79d46efc6e3b43ce7db",
   "turns": [
+    {
+      "id": "80ec6ab5-e618-4ecd-a4da-32918cae6b9d",
+      "ts": "2026-11-22T09:50:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:sva-automation",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fbaa3af310dc34835dffb2a32aa10625ea47f6cb",
+      "branch": "main",
+      "frame": "03ha6k5q3vfpholgfxlhwgzpw"
+    },
+    {
+      "id": "e0a129ff-5091-444f-9b63-c9b01c48384c",
+      "ts": "2026-11-22T09:50:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:stackit",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b331dafb0979969bfa9379a8c363cc3d99479978",
+      "branch": "main",
+      "frame": "03ha6k5pnguh6tnwgyd5c8ako"
+    },
     {
       "id": "c38e6452-ae1d-4ff5-8085-5167fa1b2c40",
       "ts": "2026-11-22T09:48:06Z",
@@ -2714,34 +2740,6 @@
       "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
       "branch": "main",
       "frame": "03ha5if9moj2r6xgovsrftqs4"
-    },
-    {
-      "id": "dff164cb-4fa5-4f79-802c-84977f71f207",
-      "ts": "2026-11-22T06:34:57Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-20261122",
-      "action": "drove IDLE freebuff pane default:1.1: redact third-party contacts and phone number from docs/nix-consultancy-outreach.md (Jev: prose-change p=0.83 m=0.73); pasted via load-buffer + Enter, pane accepted with fresh working counter (43s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
-      "branch": "main",
-      "frame": "03ha5i0s8h1pml1ghyw5vktgj"
-    },
-    {
-      "id": "028f8daf-1589-415d-99ec-6f02f0fe7f44",
-      "ts": "2026-11-22T06:34:34Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: execute prepared Greenhouse submissions grafana Staff SWE Databases SRE + mozilla Staff SWE Tools & Systems",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/grafana submissions/mozilla"
-      ],
-      "files": [],
-      "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
-      "branch": "main",
-      "frame": "03ha5hy3lmtxrhfwzm6f3e0bw"
     }
   ]
 }

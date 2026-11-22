@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-22T11:53:28Z",
+  "generated": "2026-11-22T11:55:10Z",
   "count": 200,
-  "pin": "3462595f9684c1c8887fc679cc4bf9d3f85ad4900f1b7d21f5fcd45d00410d19",
+  "pin": "741eb3290bf9a5dfe637ab706811ad795da165c326d232920cc5555da53b9d1b",
   "turns": [
+    {
+      "id": "c791c8e3-9a44-4fdf-99cf-27cda277ae02",
+      "ts": "2026-11-22T11:55:01Z",
+      "source": "devin",
+      "subject": "job-hunt:canonical-gitops",
+      "action": "staged: canonical 5517891 form 90% filled + resume uploaded; essays+no-AI attestation deliberately left for Matt per operator ruling",
+      "outcome": "blocked: own-words attestation needs Matt",
+      "claims": [],
+      "files": [],
+      "base_commit": "a77593aec8c0f64262288ca76f1103d0b2ad2200",
+      "branch": "main",
+      "frame": "03ha78jlvp7v267yjzpi7arfg"
+    },
+    {
+      "id": "0a6b2183-b5ef-43c3-8632-639c7ee2ee01",
+      "ts": "2026-11-22T11:54:54Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:grafana",
+      "action": "landed: grafana packet corrected and re-laid out — advert replaced with the Germany requisition 6103688004 (the file held the Canada posting; German range EUR 113k-135.6k is stated, docs updated), CV rebuilt at 11pt/0.7em over two pages (94%/79% fill, text unchanged), letter untouched 1pp | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/grafana"
+      ],
+      "files": [],
+      "base_commit": "4d58ce93e946807b72789c7af794d4aa6d3daf56",
+      "branch": "main",
+      "frame": "03ha78ir4eoqtqj8rkarug79t"
+    },
+    {
+      "id": "61081bfd-9ba5-4d95-96ba-8461853a1cb5",
+      "ts": "2026-11-22T11:54:29Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building gocardless (pane 1), staging canonical-gitops (pane 2), finalizing grafana (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/gocardless-senior-sre-database",
+        "submissions/canonical-gitops",
+        "submissions/grafana"
+      ],
+      "files": [],
+      "base_commit": "a77593aec8c0f64262288ca76f1103d0b2ad2200",
+      "branch": "main",
+      "frame": "03ha78fw2mwtgdcv0gmd2kzzu"
+    },
+    {
+      "id": "9b54e501-b407-4b4a-8465-670ccd6861c3",
+      "ts": "2026-11-22T11:53:31Z",
+      "source": "freebuff",
+      "subject": "nixconfig:sumup",
+      "action": "landed: native English Typst dossier for Senior DevOps Engineer — CV 2pp/1172w, letter 1pp/501w, 0 warnings. Fixed two defects: submitted letter was addressed to the Nebius team, CV claimed an unsupported cloud/web stack. selection.json retired | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a77593aec8c0f64262288ca76f1103d0b2ad2200",
+      "branch": "main",
+      "frame": "03ha7892sb4a8uobu8eihvku8"
+    },
     {
       "id": "6f93b7b7-2b4e-4973-9354-07366c2d42b1",
       "ts": "2026-11-22T11:52:45Z",
@@ -2766,58 +2824,6 @@
       "base_commit": "9bf9242187413104fcf2f7f7b9a5dd08cd3525e2",
       "branch": "main",
       "frame": "03ha6lpmikkdpys5bee41y5k8"
-    },
-    {
-      "id": "d57e3241-a5f4-4a29-bff9-62eb6c8c7f16",
-      "ts": "2026-11-22T09:57:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hep-global",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "48d98a88b2ba1649e186520ba0258f216840eee0",
-      "branch": "main",
-      "frame": "03ha6litbo3is2zfbnm8jyqeq"
-    },
-    {
-      "id": "3d632837-9b3a-4cff-a8d7-9fe919531567",
-      "ts": "2026-11-22T09:57:04Z",
-      "source": "freebuff",
-      "subject": "nixconfig:enviria",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9bf9242187413104fcf2f7f7b9a5dd08cd3525e2",
-      "branch": "main",
-      "frame": "03ha6li68etjv5vzdrc19fuq4"
-    },
-    {
-      "id": "95038cfb-ab28-4386-9fdc-8f52c960101b",
-      "ts": "2026-11-22T09:56:47Z",
-      "source": "devin",
-      "subject": "nixconfig:citeq-muenster-devops",
-      "action": "claim: submitting via Interamt 1510832",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c435444bf2e1b7f47a8ec53006a14c424fb11ad",
-      "branch": "main",
-      "frame": "03ha6lg7o5qdih6d8rv5rqwe3"
-    },
-    {
-      "id": "6e6b6ca9-824e-4fbf-8772-4271627b26f0",
-      "ts": "2026-11-22T09:56:03Z",
-      "source": "devin",
-      "subject": "nixconfig:dfs-sre",
-      "action": "submitted: DFS Deutsche Flugsicherung via careers portal | email-verify link clicked, 'in Bearbeitung' confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8c435444bf2e1b7f47a8ec53006a14c424fb11ad",
-      "branch": "main",
-      "frame": "03ha6lb1qnmq2hscc3l0dr1gr"
     }
   ]
 }

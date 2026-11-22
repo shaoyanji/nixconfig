@@ -1,8 +1,1218 @@
 {
-  "generated": "2026-11-22T12:54:00Z",
+  "generated": "2026-11-22T19:22:06Z",
   "count": 200,
-  "pin": "5ef0d4e36479b6ecf2a7b754564e8abb3705b9eeb15e42a78432c0d1d6b76522",
+  "pin": "8367b8dba0ca77d7b844280eda1b2b80b41043246140da5c321aa9c0cbb16cb3",
   "turns": [
+    {
+      "id": "ddd12c7a-0970-4dcd-a313-23e1779093a7",
+      "ts": "2026-11-22T19:21:31Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "landed: frontmatter alignment for all 63 skills — metadata.hermes tags/related_skills normalized, author+license filled; 0 schema warnings, index 63/63 | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8d9e6b3aa7bb2b6772c101c80d8e8f8fd6f4457",
+      "branch": "main",
+      "frame": "03ha9nrlueu26deofqxjsk0x1"
+    },
+    {
+      "id": "9c0f4751-8097-48ed-adcd-9ed89de415a3",
+      "ts": "2026-11-22T19:16:19Z",
+      "source": "devin",
+      "subject": "nixconfig:policies-overflow",
+      "action": "landed: standalone checks:policies task + inventory key (check:verify 124 rows no drift); frieren switched to new generation, resolver answering, zero failed units, hermes-gateway active with TimeoutStopUSec=15s | gate: checks:quick + checks:host HOST=frieren PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1ea01038dba46df8e6b0c418c7543af02be3deee",
+      "branch": "main",
+      "frame": "03ha9mr74gls4sagqyxb3xtf8"
+    },
+    {
+      "id": "b935096b-2077-4082-9e75-5fb63e01a48c",
+      "ts": "2026-11-22T19:06:18Z",
+      "source": "freebuff",
+      "subject": "nixconfig:host-check-timeout",
+      "action": "landed: raised checks:host default timeout from 120s to 240s across taskfiles and host-check-sweep | gate: checks:host HOST=frieren PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task/host-check-sweep.sh"
+      ],
+      "files": [
+        "taskfiles/checks.yml",
+        "scripts/task/host-check-sweep.sh"
+      ],
+      "base_commit": "b8f104f41976af26b154670cef25cfdf3d2bc182",
+      "branch": "main",
+      "frame": "03ha9ksp2cucmhbgnqyrq31ml"
+    },
+    {
+      "id": "3b1e8bea-72aa-4b47-bf72-ec715626a4b8",
+      "ts": "2026-11-22T18:59:20Z",
+      "source": "freebuff",
+      "subject": "nixconfig:hermes-cleanup",
+      "action": "landed: cron gate added, opencode_zen override, doctor green | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/hermes-check.sh"
+      ],
+      "files": [
+        "scripts/task/hermes-check.sh"
+      ],
+      "base_commit": "523606547f32806c4f4abe35e36de66cd2d6161e",
+      "branch": "main",
+      "frame": "03ha9jfjz4dkaw7jt6o2u6me7"
+    },
+    {
+      "id": "596e2cd3-1540-4486-be4f-d7d740d0745a",
+      "ts": "2026-11-22T18:57:15Z",
+      "source": "devin",
+      "subject": "nixconfig:policies-overflow",
+      "action": "landed: root cause was lib.hasInfix = builtins.match '.*needle.*' spending a stack frame per byte; image-daily.sh at 97KiB overflowed every scan. Replaced with splitString-based local at 32 sites. Gate then surfaced 3 hidden findings (30 stale prose budgets, comment ceiling, uncited submissions policy) all repaired | gate: checks.x86_64-linux.policies + checks:quick exit 0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "71af7a95e6490d552b7b561dd4817cbc6d33b387",
+      "branch": "main",
+      "frame": "03ha9j0zyxgb8jhw2q3sg1un7"
+    },
+    {
+      "id": "35650539-a89b-4d83-ad29-5b0a56aabb5f",
+      "ts": "2026-11-22T18:42:31Z",
+      "source": "devin",
+      "subject": "nixconfig:policies-overflow",
+      "action": "claim: diagnose stack overflow in checks.policies, fix recursion in flake/policies.nix",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/policies.nix"
+      ],
+      "files": [],
+      "base_commit": "b2ba3876f12b797207dc66e8dc506db44d7c5f0c",
+      "branch": "main",
+      "frame": "03ha9g5fec3xajqitmf9q3nfc"
+    },
+    {
+      "id": "56e2489e-46bd-4f43-af1c-b335b5dbde75",
+      "ts": "2026-11-22T18:41:54Z",
+      "source": "devin",
+      "subject": "nixconfig:docs-build",
+      "action": "landed: docs artifacts rebuilt (187 note pages incl new delphi-postgres-19-upgrade), agents-notes-schema gate repaired (dead checks.toml refs -> flake/check-inventory.nix, 3 bodies re-wrapped); ops doc committed in 841b11fb | gate: agents-notes-schema + docs:build PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b2ba3876f12b797207dc66e8dc506db44d7c5f0c",
+      "branch": "main",
+      "frame": "03ha9g12ff46iqtn6raz2p8jb"
+    },
+    {
+      "id": "227274e6-9f63-4ae9-a9fb-90ab390044b7",
+      "ts": "2026-11-22T18:39:19Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-cleanup",
+      "action": "landed: slack-platform into plugins.disabled + network.force_ipv4 in the hermes persona config, and cleared 11 root-owned skill_batch scratch dirs so the pruner runs; doctor 23.6s->12.2s, 2 issues->1 (OPENCODE_ZEN_API_KEY present but rejected) | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/user/ai/hermes-persona"
+      ],
+      "files": [
+        "modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "base_commit": "fbe6968af1c9a922d7f059ccfcd3f177063981d8",
+      "branch": "main",
+      "frame": "03ha9fis5fisstmde4y6n3r24"
+    },
+    {
+      "id": "26e71657-4fb4-40fb-992b-4444aae01fbf",
+      "ts": "2026-11-22T18:38:13Z",
+      "source": "devin",
+      "subject": "nixconfig:docs-build",
+      "action": "claim: compile docs artifacts + verify generated pages sync with skills/modules/hosts",
+      "outcome": "in_progress",
+      "claims": [
+        "docs/generated",
+        "docs/ops"
+      ],
+      "files": [],
+      "base_commit": "0c7542fd34fd6988798d9ca9e59f08da17091168",
+      "branch": "main",
+      "frame": "03ha9fb3d9s5j1a6anqu0hjbs"
+    },
+    {
+      "id": "b899fc49-779c-4cc3-b6eb-1fa8319dd283",
+      "ts": "2026-11-22T18:22:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-surface",
+      "action": "landed: hermes-gateway TimeoutStopSec 70->15 bounds a stalled teardown before the daemon's 60s watchdog; corrects the earlier turn that named an unrelated commit | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7f60d1d9bdefbe56d5c93ef7410d1169aa538700",
+      "branch": "main",
+      "frame": "03ha9ca4vgb84ruzew0bvib44"
+    },
+    {
+      "id": "e7bc8412-44df-4f06-adb2-e720a9595fb2",
+      "ts": "2026-11-22T18:21:51Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-surface",
+      "action": "landed: hermes-gateway TimeoutStopSec 70->15 bounds a stalled teardown before the daemon's 60s watchdog | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec8fd3cae3a31f8aadfc91ab57388398b91b8874",
+      "branch": "main",
+      "frame": "03ha9c485gqlir8hvv2683wyi"
+    },
+    {
+      "id": "88afd34d-c71b-42a6-9d87-40972203c302",
+      "ts": "2026-11-22T18:21:10Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: address() bracket fallback + Malt fixture | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/email-triage.py tests/appflow-triage/run.sh"
+      ],
+      "files": [],
+      "base_commit": "0718a386a06ecb73d316149d8f082eee50c8bc12",
+      "branch": "main",
+      "frame": "03ha9bz930qtl474m18v82ubv"
+    },
+    {
+      "id": "e31d34ca-aeb5-4582-82d4-550333bfd040",
+      "ts": "2026-11-22T18:19:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: Malt rule corrected to raw-sender match, probe digest/none | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/email-triage.py"
+      ],
+      "files": [],
+      "base_commit": "5949a48089bcddce031495f8e51ca90d37ea0a4e",
+      "branch": "main",
+      "frame": "03ha9bm1k2h8ipdi0lfpdv0ec"
+    },
+    {
+      "id": "fdca4adb-e74e-4946-bae9-ab7fceb433bc",
+      "ts": "2026-11-22T18:18:43Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "landed: enforced strict Truth: gate in lib/skills.nix and submissions anti-sprawl predicate in flake/policies.nix | gate: ops:skills:check and checks:host HOST=frieren PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec8fd3cae3a31f8aadfc91ab57388398b91b8874",
+      "branch": "main",
+      "frame": "03ha9bhyspchku037tk7mmww1"
+    },
+    {
+      "id": "bce0eaa5-f013-489e-8e61-c4b80a8c67dd",
+      "ts": "2026-11-22T18:18:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: Malt match notices pinned to digest | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/email-triage.py"
+      ],
+      "files": [],
+      "base_commit": "b744d254295550cc74e25cd2cbfa816e6bcefaa8",
+      "branch": "main",
+      "frame": "03ha9bgbyocjogu51e4jp4g3r"
+    },
+    {
+      "id": "4e504986-3f28-4a34-a5c3-d83fcace15ca",
+      "ts": "2026-11-22T18:17:46Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "landed: Truth: line now gated in checks.skills-schema (line must exist + every cited repo path must resolve, proven on both failure modes); skills-cite-truth policy scoped to the Truth line; new submissions-are-private-state predicate; 2 module-side skills got Truth lines | gate: checks:host frieren PASS 104.7s, skills-schema build PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec8fd3cae3a31f8aadfc91ab57388398b91b8874",
+      "branch": "main",
+      "frame": "03ha9bbe504jaq122eb3nhk9o"
+    },
+    {
+      "id": "5797ab51-72fb-4b65-84bd-4f5cb74f607f",
+      "ts": "2026-11-22T18:13:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-gateway-guard",
+      "action": "landed: fix deny-rule count in the checks:hermes assertion output (7 rules, not word count) | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "287370279d8f829106405d74af8de19aed31b45d",
+      "branch": "main",
+      "frame": "03ha9aehg4ijdc7f0b1tnzcpx"
+    },
+    {
+      "id": "99323ace-951b-499c-bbef-a2e30232f03a",
+      "ts": "2026-11-22T18:12:47Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-gateway-guard",
+      "action": "landed: checks:hermes asserts approvals.deny self-unit rules, cron_drain_timeout<=10 and the live deny verdict (negative control: verdict=user-deny exit 3) | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "51a23ffa8da4c428cccfd0b20eee0b18c4f4fb31",
+      "branch": "main",
+      "frame": "03ha9ac9d27s8z8i0x89qaw9u"
+    },
+    {
+      "id": "920d385f-8ee6-4165-998f-aaed6911d8d9",
+      "ts": "2026-11-22T18:10:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-gateway-guard",
+      "action": "landed: approvals.deny blocks agent turns from hermes-gateway stop/restart; agent.cron_drain_timeout 30->5 so a stop stays under the 60s watchdog | gate: checks:hermes PASS (stop measured 4s, no watchdog)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0467cde27f61a7f3462ea2a9b41ac5ba0ff1e1f0",
+      "branch": "main",
+      "frame": "03ha99syk97xyllkrx7clnumt"
+    },
+    {
+      "id": "b8d4c51b-0944-4f68-bdbf-a06c4be23310",
+      "ts": "2026-11-22T18:09:35Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-repair",
+      "action": "landed: adopted lock-pinned node 26.12.1 + ffmpeg 9.0.1 into pm store, patchelf'd for NixOS, honest facts.json; pm installed npm 12.0.2 itself | gate: checks:hermes clean, pm doctor all-ok, no sync warning in PID 4073615 | pin bump re-breaks it; durable fix is nix-side store provisioning",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0467cde27f61a7f3462ea2a9b41ac5ba0ff1e1f0",
+      "branch": "main",
+      "frame": "03ha99pw83paa17ztv03tpr9e"
+    },
+    {
+      "id": "31b102bc-36f6-45b1-887a-ce11104da880",
+      "ts": "2026-11-22T17:57:03Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "verified: re-ran all three skill gates after the apps-skill home-path update — 63 skills schema-clean, 0 mirror restatements, prose clean (165 files; the 298→165 drop is the 133 submission markdown files leaving the corpus with the untrack); §4 surface fully compliant: 63/63 Truth: lines resolve to real paths, frontmatter name==dir + desc<=240 + version/platforms, one h1 no jumps | gate: ops:skills:check PASS, checks:skills:mirror PASS, checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "472083339213c6e4edf7b3e39e96c3cb223a10d3",
+      "branch": "main",
+      "frame": "03ha979y43p4xop51s2ngjvp0"
+    },
+    {
+      "id": "caa0e681-5cb8-492e-a260-2f245de6d091",
+      "ts": "2026-11-22T17:54:59Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: triage upsert keyed on message_id + one-row constraint | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/email-archive.sql modules/services/email-archive-endpoints"
+      ],
+      "files": [],
+      "base_commit": "02d7d195b05918c0fc6ad602a18f857fac49be5f",
+      "branch": "main",
+      "frame": "03ha96v3v6qz8yy3ybw9zhkge"
+    },
+    {
+      "id": "b09994f7-b35c-4667-b9aa-8fc601114f57",
+      "ts": "2026-11-22T17:49:21Z",
+      "source": "devin",
+      "subject": "nixconfig:appflow",
+      "action": "followed buffy's 95ba04a1: committed the leftover .gitignore submissions entry, flattened the moved tree to ~/.local/state/appflow/submissions/<id> matching the hook's own convention, repointed all 26 DB folder_path rows to the new home, documented the canonical homes + both refusal guards in the apps skill | gate: checks:quick script gates green incl infron clean; checks.policies overflow pre-existing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "472083339213c6e4edf7b3e39e96c3cb223a10d3",
+      "branch": "main",
+      "frame": "03ha95rfsp50kernfxdwloira"
+    },
+    {
+      "id": "f1e7dabe-6cd9-41fb-aa10-a7b70086f319",
+      "ts": "2026-11-22T17:46:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow",
+      "action": "landed: packet default is the appflow submissions dir + skill documents the never-in-repo rule | gate: checks:docs:links PASS, checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4d1b9ccea49d5b7b34476fbf8c4f266f1a0cf54c",
+      "branch": "main",
+      "frame": "03ha9588ppyyrs8hwxpidx325"
+    },
+    {
+      "id": "b9f89f3c-974d-41bd-aaef-76ed966474e4",
+      "ts": "2026-11-22T17:46:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: boilerplate guard covers Celonis/Wolt/GitLab/Sezzle receipts | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow tests/appflow-triage"
+      ],
+      "files": [],
+      "base_commit": "00b8c8efdf65a63445b47225f304a20cc04619d4",
+      "branch": "main",
+      "frame": "03ha955j71h6mlwr2fa0km59x"
+    },
+    {
+      "id": "a9b13821-d530-4c0a-8d11-00be551c8bcf",
+      "ts": "2026-11-22T17:45:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow",
+      "action": "landed: AGENTS.nix packet note points at the appflow state dir, not the repo | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f0d314d2bbefe32f2507c578ba44a263e53e92f2",
+      "branch": "main",
+      "frame": "03ha9517q0grq5ukbs6un0r0l"
+    },
+    {
+      "id": "b471055f-a268-49b5-a849-1efbfc264b9c",
+      "ts": "2026-11-22T17:45:09Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow",
+      "action": "landed: 711 packet files moved to appflow state, submissions/ untracked (667 deletions), pre-commit refuses the path, packet builder refuses --out in repo | gate: pre-commit probe PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "95ba04a1dd417ef0bfe368226469ee5b238ea6fd",
+      "branch": "main",
+      "frame": "03ha94y1azdjici86rryvkj50"
+    },
+    {
+      "id": "bd1a9524-143d-42fe-b98b-97ed95fbebcd",
+      "ts": "2026-11-22T17:44:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow",
+      "action": "landed: 711 packet files moved to appflow state, submissions/ untracked (667), pre-commit refuses the path, packet builder refuses --out in repo | gate: pre-commit probe PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f5b7e20943ed2b5c9a857fec6a73d6aa12a4c0f4",
+      "branch": "main",
+      "frame": "03ha94vhoy8qkseg3zk5kcvoe"
+    },
+    {
+      "id": "1ded2abc-4313-41ff-8f32-bdec200873c7",
+      "ts": "2026-11-22T17:43:15Z",
+      "source": "devin",
+      "subject": "nixconfig:infron-guard",
+      "action": "landed: infron guard clean — api_max_retries 6→7 (7-lane failover chain spends one restart credit per hop); uncommented the 5 required excluded_providers (openrouter deepseek groq cohere nous) so keyed billable vendors are hidden from the picker | gate: scripts/task/infron-check.sh clean 0 FAILs; checks:quick green to the final build (checks.policies overflow pre-existing on HEAD)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f5b7e20943ed2b5c9a857fec6a73d6aa12a4c0f4",
+      "branch": "main",
+      "frame": "03ha94klxy0eyap0w0326orjr"
+    },
+    {
+      "id": "e3dad012-dad5-4fed-bec2-253f91a2156a",
+      "ts": "2026-11-22T17:42:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: interview boilerplate no longer classifies as an invite | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow tests/appflow-triage"
+      ],
+      "files": [],
+      "base_commit": "8accc38d6a429149e31194c7838ed02e1e19127d",
+      "branch": "main",
+      "frame": "03ha94duv3w5936ittb2rxvlo"
+    },
+    {
+      "id": "f34cf3f1-5caa-41ea-8378-6eeee96aacc4",
+      "ts": "2026-11-22T17:42:10Z",
+      "source": "devin",
+      "subject": "nixconfig:submissions-audit",
+      "action": "landed: dereference all /nix/store packet symlinks into real files, updated fau-sysadmin | gate: checks:host HOST=frieren PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8b114ffd2a05f5559eae8f1d55222cbf4358fc8a",
+      "branch": "main",
+      "frame": "03ha94czrjbl74wyyy8i8bsui"
+    },
+    {
+      "id": "5544796e-2363-4177-a49f-227d81bee874",
+      "ts": "2026-11-22T17:41:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-surface",
+      "action": "landed: hermes-check asserts the live daemon /proc environ also resolves node & ffmpeg | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8b114ffd2a05f5559eae8f1d55222cbf4358fc8a",
+      "branch": "main",
+      "frame": "03ha949wieqlgwtyl71d7pg6d"
+    },
+    {
+      "id": "230639c0-70b1-4f82-a299-608e51301b68",
+      "ts": "2026-11-22T17:41:02Z",
+      "source": "devin",
+      "subject": "nixconfig:submissions-audit",
+      "action": "landed: all 8 /nix/store packet symlinks dereferenced to real files (clickhouse+grafana rebuilt byte-identical via agents:apps:packet — same store hash; enbw/stackit/sinc/telekom-x2/uni-rostock copied live); grafana sheet corrected to applied; fau-sysadmin lead.md records phantom-packet DB drift + 01.12 deadline | gate: checks:host frieren PASS 76.6s; checks:infron 2 defects are live-config drift (other agent), checks.policies overflow pre-existing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "44bc0d84c6d269cdbf6d5db12185037c611c0311",
+      "branch": "main",
+      "frame": "03ha944ys9u9au4s9528h64gx"
+    },
+    {
+      "id": "1537e446-b9b8-43d8-9b6d-c2c082a25f6a",
+      "ts": "2026-11-22T17:40:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-surface",
+      "action": "landed: hermes-check asserts gateway unit PATH names+resolves node & ffmpeg (negative control fails) | gate: checks:hermes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f27f00256abefb0ab5830a9e2ed636a4eee0b4a",
+      "branch": "main",
+      "frame": "03ha94339bpz20n77di8w59ob"
+    },
+    {
+      "id": "8201e0cd-c019-436c-810a-39c5cd429e70",
+      "ts": "2026-11-22T17:40:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: mail-bearing rows must name a role; duplicate stubs inherit the canonical role | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/appflow-check.sh tests/appflow-status taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "74bd9a38105bf0ac059d9ff563b5dc344fa4ad9d",
+      "branch": "main",
+      "frame": "03ha93ylx90e1cerbefggtodp"
+    },
+    {
+      "id": "91b55161-f77e-460b-8d65-1dad666847b7",
+      "ts": "2026-11-22T17:37:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-surface",
+      "action": "landed: frieren switched to gen 303 (26.11.20261121); live gateway PATH now carries nodejs+ffmpeg, daemon restarted, telegram+simplex connected, hermes-check clean | gate: infra:rebuild:nixos PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "71f37098a29ba74ca2b06e356d05d08287985dd1",
+      "branch": "main",
+      "frame": "03ha93cr7qmddppfw072x37xl"
+    },
+    {
+      "id": "1b6510e5-d5c9-4f30-83db-316c6cdea21e",
+      "ts": "2026-11-22T17:34:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: stage vocabulary in the README + undiscovered-role gate | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow scripts/task tests/appflow-status taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "f5eb1970ce60ef2f2719ec993c5f06ddc8055262",
+      "branch": "main",
+      "frame": "03ha92rjib21be3qhseni50i7"
+    },
+    {
+      "id": "34dfb1fa-4ca9-46fd-a7d4-85a3664911cc",
+      "ts": "2026-11-22T17:31:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "correction: turn 9ccd1986 said unrelated staged files were removed — they were not. .githooks/pre-commit re-stages lib/agent-turns/turns.json and lib/matt/resume.json, so 456a6b33 carries them by design; the five hand-edited files are all present | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow scripts/task tests/appflow-status taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "456a6b33c51fef0e3dd2056647c58f7bffc3a5ec",
+      "branch": "main",
+      "frame": "03ha92c13c0l5ik42tykju9sx"
+    },
+    {
+      "id": "9ccd1986-27b1-4d3e-848f-84ca3da711c2",
+      "ts": "2026-11-22T17:31:24Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: manual/contacted stage mapping + bare-status gate + created_at backfill | gate: checks:appflow PASS | amend: unrelated staged files removed",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow scripts/task tests/appflow-status taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "456a6b33c51fef0e3dd2056647c58f7bffc3a5ec",
+      "branch": "main",
+      "frame": "03ha9296b259wsnosu2l15fxi"
+    },
+    {
+      "id": "048cd5f6-4906-4792-9305-276c9607512d",
+      "ts": "2026-11-22T17:30:53Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: manual/contacted stage mapping + bare-status gate + created_at backfill | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow scripts/task tests/appflow-status taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "3f0e3832f05a60c747dce2a93f71e2732126c555",
+      "branch": "main",
+      "frame": "03ha925k4ifpop32vl77c43jd"
+    },
+    {
+      "id": "3604c893-a2ef-4b53-8c7c-10878a6f3c1c",
+      "ts": "2026-11-22T17:28:03Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "landed: schema audit of all 63 skills — appended Truth: line to the 27 missing it (SCHEMA §4.6 convention, each names the owning taskfile/module/script/lib); rest of schema surface clean (name==dir, desc<=240, version+platforms, one h1, no jumps) | gate: ops:skills:check 63/0-warn, skills-schema build PASS, checks:prose 298 clean; checks:quick policies overflow pre-existing on HEAD",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "71f37098a29ba74ca2b06e356d05d08287985dd1",
+      "branch": "main",
+      "frame": "03ha91lpgo9u1ijg1pfdx0zd0"
+    },
+    {
+      "id": "3f07e6de-6fc3-4763-99a2-3971c1d0ece8",
+      "ts": "2026-11-22T17:23:55Z",
+      "source": "devin",
+      "subject": "nixconfig:submissions-audit",
+      "action": "landed: verified 182 typst builds, wrote anduril sheet, reconciled 23 drifted sheets | gate: typst-audit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8331fabc964e71629afef0e2e28c5fb818a7616c",
+      "branch": "main",
+      "frame": "03ha90slsrthlwbf1llv9w40f"
+    },
+    {
+      "id": "f5083010-0c1a-4b31-9254-e9d043ed8ccf",
+      "ts": "2026-11-22T17:21:28Z",
+      "source": "devin",
+      "subject": "nixconfig:submissions-audit",
+      "action": "landed: ledger-vs-filesystem reconcile — 23 sheets corrected (nothing-submitted→applied per canonical DB id), canonical-rust marked rejected 11-22, anduril sheet generated (rejected record, Greenhouse URL verified); sheet-less folders classified (canonical/hep-global/kraken/obsidian=legacy .txt fixtures, fau-sysadmin=pending prep w/ phantom-packet DB drift, hep-global-infra=phantom folder_path) | gate: checks:prose PASS 298 files",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8331fabc964e71629afef0e2e28c5fb818a7616c",
+      "branch": "main",
+      "frame": "03ha90bfhhbsl1gp5kdoeqdu7"
+    },
+    {
+      "id": "24edce65-4f12-4e08-bc7c-55158ea50c02",
+      "ts": "2026-11-22T17:17:41Z",
+      "source": "devin",
+      "subject": "nixconfig:submissions-audit",
+      "action": "audited 113 submission dirs: 182 typst sources all compile exit-0 no warnings; all PDFs sane (CV<=3pp, letter<=2pp, none corrupt); enpal sheet fully verified (hashes, pages, u+w, Ashby posting live isListed:true). Findings: anduril packet has no submission-sheet nor job-description; fau-sysadmin is prep-stage lead only; 7 dirs carry PDF+sheet but no .typ sources (rendered elsewhere); clickhouse+grafana/packet are nix-store symlinks | gate: typst compile 182/0-fail",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cca911bcf80fb017076449ff7a19830d66a90fb3",
+      "branch": "main",
+      "frame": "03ha8zkxypvaixe5jjdixmiyl"
+    },
+    {
+      "id": "3b4698e8-a938-49d7-b924-a8a95bff54e3",
+      "ts": "2026-11-22T17:16:19Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene",
+      "action": "landed: gate against shared active mail + Materna/Workato converged | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "89cacc7ebb86e96d99e9bebb0da9fb6dd8d0b49f",
+      "branch": "main",
+      "frame": "03ha8zb6njrp0e6ec2v8wmoc5"
+    },
+    {
+      "id": "5baf034a-6a1b-4af4-a380-d114d0773d85",
+      "ts": "2026-11-22T17:10:29Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "correction: the deep-audit fix commit is the one below (earlier turn named the microvm row commit) | gate: ops:skills:check 0-warn, checks:skills:mirror 0, checks:prose clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cca911bcf80fb017076449ff7a19830d66a90fb3",
+      "branch": "main",
+      "frame": "03ha8y63m2sey0n8o487jwmiv"
+    },
+    {
+      "id": "e2dc7231-ef6f-4b52-9b6e-9dc25b216b51",
+      "ts": "2026-11-22T17:10:26Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "landed: deep reference audit, 504 refs over 63 skills — 1 dead cite fixed (apisfreellm task eisen-status -> infra:status:eisen); all other candidates verified valid cross-skill/wildcard/generated/console-repo refs | gate: ops:skills:check 0-warn, checks:skills:mirror 0, checks:prose clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cca911bcf80fb017076449ff7a19830d66a90fb3",
+      "branch": "main",
+      "frame": "03ha8y5rgain0lpef3b8cvvwz"
+    },
+    {
+      "id": "824089fd-d07a-4a94-bd02-56a77435062b",
+      "ts": "2026-11-22T17:09:22Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-surface",
+      "action": "landed: gateway env resynced + unit PATH names node/ffmpeg; gateway restarted, telegram+simplex connected | gate: checks:host HOST=frieren PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7054e39d8bcc24c30e89396dbb599f94fecaa6b3",
+      "branch": "main",
+      "frame": "03ha8xy9wkj2f6nkhn44ck3iy"
+    },
+    {
+      "id": "c24f7b29-2ac1-4787-b7b2-931382f1319f",
+      "ts": "2026-11-22T17:08:07Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "landed: microvm:stop row now names unit microvm@<NAME> + idempotence caveat | gate: ops:skills:check 63 skills 0 warnings, checks:skills:mirror 0 restatements, checks:prose 295 files clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fe1f5ebd3a1aebd8261e082cfa0ec4e38d8b133d",
+      "branch": "main",
+      "frame": "03ha8xpj8f0mjfq59xa00wb75"
+    },
+    {
+      "id": "a007a7ac-4b6d-49e1-8e19-31bd831d97d0",
+      "ts": "2026-11-22T17:07:29Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-align",
+      "action": "claim: full SKILL.md alignment pass — microvm:stop row fix, ops:skills:check, checks:skills:mirror, checks:prose",
+      "outcome": "in_progress",
+      "claims": [
+        ".agents/skills/"
+      ],
+      "files": [],
+      "base_commit": "f19839b7188135da5f249485d6d197d12b470af3",
+      "branch": "main",
+      "frame": "03ha8xl0d0xulj424yorl7uxz"
+    },
+    {
+      "id": "ccde4df5-aa91-473f-9217-b19482813da9",
+      "ts": "2026-11-22T17:06:22Z",
+      "source": "buffy",
+      "subject": "nixconfig:ci-drain-window",
+      "action": "deployed: delphi runs the 7-day drain (base 687946ab + 544dbf5b), closures semantically identical, only store-hash restarts of polkit/dbus/HM | gate: infra:deploy:host:delphi validated",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "956d46f689d02e9092290d8f0e73a4e6934cf946",
+      "branch": "HEAD",
+      "frame": "03ha8xd4dw95uciz0u8v9d0ak"
+    },
+    {
+      "id": "6ed5b1fb-038e-4e53-848b-35cef65b012b",
+      "ts": "2026-11-22T17:06:02Z",
+      "source": "devin",
+      "subject": "nixconfig:nvidia-pin",
+      "action": "landed: nvidiaPkgs pin at fleet rev e21fec3 + nixpkgs bump to 93a9ed0 (nginx 1.30.7 CVE fix); cudaSupport dropped on ares/kellerbench (Kepler cannot run CUDA); cache.nixos-cuda.org added. Dry-runs: all nvidia hosts fetch-or-trivial; schneeeule gtk2 waiver forwarded via problems.handlers | gate: checks:nix:lint PASS, nix-comments 6495/6495; checks.policies stack-overflows on clean HEAD (pre-existing defect, filed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f19839b7188135da5f249485d6d197d12b470af3",
+      "branch": "main",
+      "frame": "03ha8xatmt0mp1d4fot810hhs"
+    },
+    {
+      "id": "558d547d-425d-44ae-8fd5-f6eedd26d665",
+      "ts": "2026-11-22T17:01:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:hermes-surface",
+      "action": "verified: checks:hermes clean, gateway active, chat -q ping -> pong; repaired derived env (TELEGRAM_ALLOWED_USERS) + gateway PATH node/ffmpeg (switch pending)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "acfd2659080572f1c9de5cee29a760a0898932c2",
+      "branch": "main",
+      "frame": "03ha8wia9e8v24o8z9kvn941v"
+    },
+    {
+      "id": "69c984e8-6a0b-4413-ba05-3d5ff523117c",
+      "ts": "2026-11-22T16:54:13Z",
+      "source": "buffy",
+      "subject": "nixconfig:ci-drain-window",
+      "action": "landed: ci drain window 7d (unit ExecStartPost, script default, task) and an empty report that names window+oldest instead of closed 0 (none) | gate: checks:host HOST=delphi PASS; checks:quick blocked by pre-existing shell-inputs in antigravity-cli.nix and deadnix in matt-site.nix",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "544dbf5b154f3b4c98198e8cc2c4a3627486656e",
+      "branch": "main",
+      "frame": "03ha8uzr8g5bvbizhan0ocpk2"
+    },
+    {
+      "id": "ae2295d3-9ef9-402e-a865-19d24d5ad26c",
+      "ts": "2026-11-22T16:47:13Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-hygiene-gate",
+      "action": "landed: checks:appflow now fails on undeclared duplicate pairs and prep rows on dead requisitions (604 rows, 0/0 after the cleanup) | gate: checks:appflow PASS, checks:shell-inputs PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4f0d44136ae03fd9b3ee6364da12efd364aceb4c",
+      "branch": "main",
+      "frame": "03ha8tmjyj866xwiyb82p3v8o"
+    },
+    {
+      "id": "11463307-ae02-4337-baf2-3e63e7b92c48",
+      "ts": "2026-11-22T16:35:51Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:check-quick-green",
+      "action": "landed: checks:quick exits 0 on a clean checkout of main at 29dff164 — check:verify 124 rows no drift, checks:infron clean, checks:shell-inputs 0 violations across 37 wrappers, policies and entry both pass. The earlier failures were content (dead TOML table, missing row, keyless-route assertion, prose ceiling) plus one cold-cache timing miss",
+      "outcome": "done",
+      "claims": [
+        "flake/check-inventory.nix scripts/task/infron-check.sh"
+      ],
+      "files": [],
+      "base_commit": "29dff164769a55c0f53793365baf9eed5504a211",
+      "branch": "HEAD",
+      "frame": "03ha8rekbjzyuqjyr8q9ethn4"
+    },
+    {
+      "id": "b1f00cd7-e4e3-464a-b549-97c8e2155a4a",
+      "ts": "2026-11-22T16:34:53Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:check-quick-green",
+      "action": "landed: 29dff164 drops the nine module comment lines that pushed the pointer-policy prose ceiling to 6496/6495. On main, policies, check:verify (124 rows), checks:infron and checks:shell-inputs all pass. checks:quick still exits 1 at checks:entry, a timing gate (leaf iets 196ms vs 75ms budget, 'half the nix floor or the cache is not answering'), not content",
+      "outcome": "done",
+      "claims": [
+        "modules/scripts/dsh-remote.nix modules/scripts/qmd-eisen-embed-sync.nix"
+      ],
+      "files": [],
+      "base_commit": "8db6caa861438585e1f33174377b299dc0055e54",
+      "branch": "main",
+      "frame": "03ha8r7tb513t85kdlxs30ukg"
+    },
+    {
+      "id": "eb626910-4ca1-46f0-8b37-efc42eba7b8d",
+      "ts": "2026-11-22T16:32:27Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:check-quick-green",
+      "action": "landed: 2409ced1 fixes the infron fallback loop (keyless apisfreellm route exempt) and check:verify is clean at 124 rows; checks:quick still does not exit 0 on main — see below for the one gate that remains, named with its reason | gate: checks:infron PASS, check:verify PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/infron-check.sh"
+      ],
+      "files": [],
+      "base_commit": "8db6caa861438585e1f33174377b299dc0055e54",
+      "branch": "main",
+      "frame": "03ha8qqomyy99qnyw5igz4j98"
+    },
+    {
+      "id": "a3fdb374-5f38-40cb-aafb-510464b42a8f",
+      "ts": "2026-11-22T16:30:30Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:check-inventory-row",
+      "action": "corrected: aa51f063 only removed the dead taskfiles/checks.toml (the add failed on that path); 37ddcef0 now puts the checks:shell-inputs row in flake/check-inventory.nix, the table main reads, and check:verify passes there. checks:quick on main still fails one infron assertion: its persona carries fallback model 'free-ai' at a keyless base_url, and that line is a routing decision, not mine to change",
+      "outcome": "done",
+      "claims": [
+        "flake/check-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "37ddcef05fac80f0aa4b06aecd6fbb87a52e3b8e",
+      "branch": "HEAD",
+      "frame": "03ha8qcy7eagxivxny1d0t4q1"
+    },
+    {
+      "id": "63808361-c2a8-4bee-93ba-e697c5b1d03d",
+      "ts": "2026-11-22T16:29:56Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:check-inventory-row",
+      "action": "landed: the checks:shell-inputs row now sits in flake/check-inventory.nix, the table main's check.sh actually reads (the TOML table is a local-only refactor), and the dead taskfiles/checks.toml pushed in 15bd0d75 is removed; check:verify passes. checks:quick on main still fails one infron assertion: its persona carries fallback model 'free-ai' with no :free id, a routing line I will not change blind",
+      "outcome": "done",
+      "claims": [
+        "flake/check-inventory.nix taskfiles/checks.toml"
+      ],
+      "files": [],
+      "base_commit": "aa51f0630a443a70099d18aed19168f0522dcb0d",
+      "branch": "HEAD",
+      "frame": "03ha8q8xf160d354og3iujduc"
+    },
+    {
+      "id": "bf49d669-c14e-4b18-be36-3c7374671bc0",
+      "ts": "2026-11-22T16:27:43Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:check-quick-green",
+      "action": "landed: checks:shell-inputs registered in checks.toml (kind leaf) so check:verify passes, and main now carries the current scripts/task/infron-check.sh (77895275 had published it mid-edit; its agent expectation was failing a correct dispatcher) | gate: checks:quick PASS on a clean checkout of main",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.toml scripts/task/infron-check.sh"
+      ],
+      "files": [],
+      "base_commit": "8db6caa861438585e1f33174377b299dc0055e54",
+      "branch": "main",
+      "frame": "03ha8pteyt1irt4vkahepzsb3"
+    },
+    {
+      "id": "7e6d2857-8a80-426e-9f7e-d8573ae89c6c",
+      "ts": "2026-11-22T16:25:10Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:shell-inputs-inline",
+      "action": "landed: checks:shell-inputs reads inline '' bodies (Nix escapes undone, per-wrapper runtimeInputs), judging 37 wrappers instead of 5. It found setsid without util-linux, find without findutils, cat without coreutils, and a regex that read envc= as env. Also api_max_retries 4->5 for the 5-lane chain; with the other pane's uncommitted infron patch the guard is clean | gate: checks:shell-inputs PASS on the landed tree",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/shell-inputs.py modules/profiles/voice-dictate.nix modules/user/ai/hermes-user.nix modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "files": [],
+      "base_commit": "b208ddc61e4868b9a62d9242a8a460a934c68c6b",
+      "branch": "main",
+      "frame": "03ha8pbfrmqwp02awqr995w1s"
+    },
+    {
+      "id": "a2fa18bb-c735-4d07-a02b-64166b19e34d",
+      "ts": "2026-11-22T16:20:07Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:land-classifier-rules",
+      "action": "landed (corrects the previous turn): that push was rejected as non-fast-forward while main advanced to fdd443b2, so its commit claim was wrong. 8bff657f on top of fdd443b2 now carries the marketing classifier rules and the rejection wording; checks:shell-inputs is in checks:quick deps | gate: appflow:triage PASS, nix:lint PASS, shell-inputs PASS (quick still red at infron, identical on untouched main)",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml scripts/task/shell-inputs.py"
+      ],
+      "files": [],
+      "base_commit": "9654d2974108e9e08b8ceecf4fab5aadf3f34963",
+      "branch": "main",
+      "frame": "03ha8obzbgvumclz39e1knol9"
+    },
+    {
+      "id": "898e168b-5381-4bdb-9809-4e71f6ecdb59",
+      "ts": "2026-11-22T16:19:14Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:land-classifier-rules",
+      "action": "landed: origin/main 18b3d5b3 -> 696f329b carries the marketing classifier rules and the rejection wording, so tonight's 04:30 autoUpgrade pulls them; checks:shell-inputs is now in checks:quick deps. checks:quick is still red at checks:infron, which fails identically on untouched origin/main (4 FAILs, pre-existing); shell-inputs passes every judged wrapper | gate: checks:shell-inputs PASS, checks:nix:lint PASS on origin base",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml scripts/task/shell-inputs.py"
+      ],
+      "files": [],
+      "base_commit": "9654d2974108e9e08b8ceecf4fab5aadf3f34963",
+      "branch": "main",
+      "frame": "03ha8o5ogahyg1qauujzqj3o4"
+    },
+    {
+      "id": "e5a9a238-5d34-4ac4-b92a-fa87d623e64c",
+      "ts": "2026-11-22T16:14:00Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:shell-inputs-gate",
+      "action": "landed: checks:shell-inputs compares a wrapper's external script against its runtimeInputs (bracket-counted list, heredoc bodies blanked, bash builtins exempt) — the xs-notify 127 class. Found and fixed 3: dsh-remote had no gnused, qmd-eisen-embed-sync no git; qmd and the appimage pickers are runtime-detected and carry shell-input-ok reasons | gate: checks:shell-inputs PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/shell-inputs.py taskfiles/checks.yml modules/scripts/dsh-remote.nix modules/scripts/qmd-eisen-embed-sync.nix"
+      ],
+      "files": [],
+      "base_commit": "587c7ff8a0c21badc00e168f686944f201e7e0a9",
+      "branch": "main",
+      "frame": "03ha8n4w6vislvewbr857h7f0"
+    },
+    {
+      "id": "ff758e16-7673-4642-90b0-e1cdcc23df7b",
+      "ts": "2026-11-22T15:54:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:wall-plates",
+      "action": "landed: gallery names/descriptions/hd URL + shape filter; round 18 running | gate: images:publish PASS (661 assets, 651 described)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "acfd2659080572f1c9de5cee29a760a0898932c2",
+      "branch": "main",
+      "frame": "03ha8jbtvklww7ac1d727p10a"
+    },
+    {
+      "id": "9372d448-5b38-43eb-957b-69a665f97ccb",
+      "ts": "2026-11-22T15:53:22Z",
+      "source": "devin",
+      "subject": "nixconfig:context-key",
+      "action": "landed: context.dev key in shared env blob + submodule apikeys; secrets.nu maps CONTEXT and the previously-orphaned CROWLLM; key verified live, 11000 credits | gate: sops decrypt extract",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "acfd2659080572f1c9de5cee29a760a0898932c2",
+      "branch": "main",
+      "frame": "03ha8j3sku3wy7wpurkbywyj2"
+    },
+    {
+      "id": "2a90e8e9-d689-4c76-a79b-3ade1d34b250",
+      "ts": "2026-11-22T15:48:06Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:delphi-serve-lock",
+      "action": "landed: xs-notify gets gawk (unit PATH has no awk, line 49 exited 127 since Nov 21); the generated tailscale-serve mounts take a flock and Restart on-failure, so writers stop losing the etag race. Deploy exit 0, running, 18/18 serve units active, xs-notify status 0, triage 16:47:08 success; that run saw no marketing mail, so the rule's proof stays the store import | gate: checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/xs-notify.nix modules/services/service-portal.nix"
+      ],
+      "files": [],
+      "base_commit": "687946abfd938e34e48221152b7deb6a0fd36c49",
+      "branch": "main",
+      "frame": "03ha8i2s08kvkv57np90ziddz"
+    },
+    {
+      "id": "76951dfb-2494-4033-aa9b-30cf1000a228",
+      "ts": "2026-11-22T15:40:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:wall-plates",
+      "action": "claim: round 18, 100 photoreal plates named by scene, judged, published to bountystash-assets",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily scripts/task"
+      ],
+      "files": [],
+      "base_commit": "ba7acc38b824f4197b0e9dbca0e5caa5e21823a5",
+      "branch": "main",
+      "frame": "03ha8gjl28gds7qcchne2b9zy"
+    },
+    {
+      "id": "de14871b-3278-4c52-bce4-c6993cb928db",
+      "ts": "2026-11-22T15:38:45Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-fallback",
+      "action": "landed: CrowLLM dual-lane — nemotron-550b capability-first, qwen3-8-omni-flash same-route backstop (both live-tested, [Crow] OK); api_max_retries 5->6 covers six-lane chain | gate: checks:infron clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ba7acc38b824f4197b0e9dbca0e5caa5e21823a5",
+      "branch": "main",
+      "frame": "03ha8g92v5poblp75tltj6c1j"
+    },
+    {
+      "id": "9b3fed18-a4b2-4e8c-bc80-d9a4e5abb213",
+      "ts": "2026-11-22T15:27:21Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-fallback",
+      "action": "landed: CrowLLM lane pinned to answering model — catalog probe showed declared nemotron-3.5-super-vl:free + 6 popular ids all upstream-5xx, 550b-uncensored was sole responder; key resolves via CROWLLM_API_KEY in .hermes/.env (sops), /v1/models 200, chat completion OK. api_max_retries 4->5 covers the 5-lane chain | gate: checks:infron clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "43181c44c0ae6c1f1b2359ce56e3ed6451bc49aa",
+      "branch": "main",
+      "frame": "03ha8e0x3qyya5dodo9z2fm4n"
+    },
+    {
+      "id": "29df2d42-6e88-4754-a496-5661764084e9",
+      "ts": "2026-11-22T15:23:06Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:delphi-deploy",
+      "action": "landed: deployed delphi to generation 308. Store copies verified by content, not by claim: email-triage.py has MARKETING_GUARDS and no updates segment, sync.py has the rejection wording. Deploy exited 4 on a tailscale serve etag race (10 units); restarted sequentially, 9 active, xs-notify still red with status 127 and it first failed 2026-11-21, before this deploy. Host degraded on that unit alone. No repo files changed by the deploy",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "90a550fd11380d1bded96087fc45c15a390ce5f3",
+      "branch": "main",
+      "frame": "03ha8d6zv19g89hpjmll73m25"
+    },
+    {
+      "id": "4fcc61a4-7a31-4cfc-b81e-2b0e7408043b",
+      "ts": "2026-11-22T15:21:39Z",
+      "source": "devin",
+      "subject": "nixconfig:cpg-auth",
+      "action": "landed: chatplayground session restored — pulled live Clerk __client+sessionId from fern's Zen profile (cookies.sqlite) via ssh, wrote auth.json on frieren+delphi; cpg refresh mints, usage answers 350/day plan; chatplayground-refresh.service green; image-daily slots unblocked. zero failed units on frieren",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d754fd2f550ec2207d830b9e902463ba7d7bfbd5",
+      "branch": "main",
+      "frame": "03ha8cwsbzmw99np66rbvz37z"
+    },
+    {
+      "id": "1660fcd3-ec5b-4338-b3c3-a762c6f3f24c",
+      "ts": "2026-11-22T13:33:58Z",
+      "source": "devin",
+      "subject": "nixconfig:calendar-auth",
+      "action": "landed: delphi google_token pulled to frieren via ssh (devji@delphi.bountystash.com — tailnet names demand browser check); hand-submit event DK287827 verified server-side on Google (delphi pulled it from calendar_google_remote); khal shows it 14:00 in Primary. auth is now one-shot: fetch verb | gate: checks:gcal permanent-grant ok",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d754fd2f550ec2207d830b9e902463ba7d7bfbd5",
+      "branch": "main",
+      "frame": "03ha7rvibxcx9yab9rnwyu8xx"
+    },
+    {
+      "id": "e2704dc7-3cba-41bf-bd84-b3b1704406bd",
+      "ts": "2026-11-22T13:33:49Z",
+      "source": "devin",
+      "subject": "nixconfig:skills-realign",
+      "action": "landed: skills wording realignment — calendar-auth fetch verb (peer token bootstrap, consent is fallback), gcal-consent DISPLAY-first + orphan cleanup, dispatch dry-run now prints declared plan, dead paths fixed (checks.yml/services-core/AGENTS.nix/xs file/bountystash/microvm), platforms+version on 10 skills, prose-budget recount | gate: ops:skills:check 63/0, checks:prose, checks:infron, policies drv all PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d754fd2f550ec2207d830b9e902463ba7d7bfbd5",
+      "branch": "main",
+      "frame": "03ha7ruegr7jzw5s4qazcoigg"
+    },
+    {
+      "id": "b574720c-5c80-49ce-bc77-13654485eb4d",
+      "ts": "2026-11-22T13:32:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:skills-microvm-align",
+      "action": "microvm skill table: the microvm:list row restated its desc, and the start/stop rows restated theirs with no caveat. Each now carries a fact the desc omits (first-run reading, WAIT/exit-1 silence, stale-socket safety). skills:check, skills:mirror and prose all pass with 0 offenders.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e90545e502ee7b12d7ca1f058159fccfa57a83b9",
+      "branch": "main",
+      "frame": "03ha7risa1llylkvkdzxfdeht"
+    },
+    {
+      "id": "4bd1a0e3-b5b0-4e28-96ad-e454d0547a09",
+      "ts": "2026-11-22T13:31:49Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:email-triage-marketing-rules",
+      "action": "landed: email-triage gains MARKETING_LOCALS (segment match on the sender) and MARKETING_SIGNALS (German retail and newsletter CTAs), behind MARKETING_GUARDS. Measured over 2899 messages: 9 review -> digest, 0 moves out of person or action; LoopCV updates@ application notices protected after the first pass demoted them. review now 0 unresolved, human 7 | gate: checks:appflow:triage PASS 17/17",
+      "outcome": "done",
+      "claims": [
+        "modules/services/email-triage.py"
+      ],
+      "files": [],
+      "base_commit": "90a550fd11380d1bded96087fc45c15a390ce5f3",
+      "branch": "main",
+      "frame": "03ha7rgcsd3m4jcg2wfgzj0tn"
+    },
+    {
+      "id": "d370bfa5-3f07-4df0-b4c3-9d3507a5a3b7",
+      "ts": "2026-11-22T13:29:21Z",
+      "source": "antigravity",
+      "subject": "nixconfig:fleet-maintenance",
+      "action": "coordinator: Hermes operational verified; Pane 1 fixing microvm skill mirror, Pane 2 running skills alignment goal, Pane 3 updating email-triage rules for review bucket | zero idle time active",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "cb0e4764e4d3b190ce80295ba66433a0327990cc",
+      "branch": "main",
+      "frame": "03ha7qyznstvr82gmz9deb908"
+    },
+    {
+      "id": "0e4ced28-bad8-41bd-8526-dacb514c5c20",
+      "ts": "2026-11-22T13:27:46Z",
+      "source": "freebuff",
+      "subject": "nixconfig:hermes-crowllm",
+      "action": "CrowLLM lane for hermes passed an unexpanded variable as its credential, which hermes never expands, so the lane 401'd while the value was already in sops. Switched the fallback entry to the env-var form, rebuilt frieren so the sops template renders it into hermes.env and the dotenv, restarted the gateway; a live hermes chat through crowllm.com/v1 answered ok.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cb0e4764e4d3b190ce80295ba66433a0327990cc",
+      "branch": "main",
+      "frame": "03ha7qnylavlobq3kqla2t0ls"
+    },
+    {
+      "id": "6d1227be-8f7d-4c02-821f-e4da6576c80b",
+      "ts": "2026-11-22T13:26:44Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:mail-pipeline-cleanup",
+      "action": "landed: report over 2899 messages (digest 1895, robot 472, action 381, review 103, ignore 42, person 6); ATS sync dry run found an empty queue so nothing to apply; swept gumball digests (5) and the Emmendingen portal notice, human queue 14 -> 8; checks:appflow:triage 17/17 PASS. No file changed, HEAD unchanged | gate: checks:appflow:triage PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "b99590e0e1660a3f0a22ef5b8fb3c5d2884af8b5",
+      "branch": "main",
+      "frame": "03ha7qgluj7k9spb70s0aqhlq"
+    },
+    {
+      "id": "67f629c9-a320-4d11-9326-089981ec7c5b",
+      "ts": "2026-11-22T13:24:49Z",
+      "source": "antigravity",
+      "subject": "nixconfig:fleet-maintenance",
+      "action": "coordinator: Pane 2 goal running on skills doc alignment/repair; Pane 1 activating Hermes agent repair/gateway; Pane 3 executing email triage audit/cleanup via jev | zero idle time active",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "cb0e4764e4d3b190ce80295ba66433a0327990cc",
+      "branch": "main",
+      "frame": "03ha7q4a0fg8l8zrrq2yfa2e0"
+    },
+    {
+      "id": "505ffe8c-65dd-479d-bb0d-18ab1b519292",
+      "ts": "2026-11-22T13:24:27Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:email-money-audit",
+      "action": "landed: audited 2899 archived messages for money; jev-1.14.0 decided 9 questions (cancels 0.98-0.99, freelancermap profile 0.90, abandon no-ip 0.90, accept the board offer 0.77; top-priority question a 0.46/0.44 tie, so needs_review). Tracker: discovered-gitlab left interview for a duplicate note since the mail is an ack, next action cleared; interview stage now 0. No file changed | gate: apps:overview readback PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions"
+      ],
+      "files": [],
+      "base_commit": "b99590e0e1660a3f0a22ef5b8fb3c5d2884af8b5",
+      "branch": "main",
+      "frame": "03ha7q0kszvoijmzer0i6icfj"
+    },
+    {
+      "id": "171f0bf7-d328-4fa1-84ce-eca155505f08",
+      "ts": "2026-11-22T13:17:35Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:appflow-rejection-pattern",
+      "action": "landed: sync.py now rejects on 'regret to inform' / 'not be progressing' / 'not be moving forward' plus the German pair; two fixture cases pin them, checks:appflow:triage 17/17 PASS. Archive scanned for the same wording: 0 applications left short of rejected. Mail queues swept: human 221 -> 14, none 0, agent:apps 0. Not yet live on delphi's timer: it runs the nix-store copy, so a deploy is the remaining step | gate: checks:appflow:triage PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "b99590e0e1660a3f0a22ef5b8fb3c5d2884af8b5",
+      "branch": "main",
+      "frame": "03ha7oo86h9fj3mlnubatd7bj"
+    },
+    {
+      "id": "b8921e2b-8a64-4457-8b81-27c73fada5cb",
+      "ts": "2026-11-22T13:11:24Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:mail-triage-unowned",
+      "action": "landed: unowned block triaged, none 599 -> 0. 509 digest + 90 robot swept (owner=none, dry run first); 7 never-judged judged by hand incl. Grafana/Mozilla acks; 41 stale ignore rows under agent:apps resolved. SVA ack names only the Linux role, so rows my first pass over-advanced went back to prep. No file changed | gate: /api/plugins recount PASS (none 0, agent:apps 0, human 221, ci 5)",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "0e1a3a71993be1406d4fe2f57ea7f5f2a25e6207",
+      "branch": "main",
+      "frame": "03ha7ngqchr77ia8qs3a7jr0u"
+    },
+    {
+      "id": "93009f5c-6d2f-437c-b523-70a8565feab1",
+      "ts": "2026-11-22T13:06:31Z",
+      "source": "devin",
+      "subject": "nixconfig:calendar-hand-submit",
+      "action": "Calendar block 14:00 created via khal on both collections: Radicale personal uploaded to delphi OK; Google Primary local-only — frieren google_token expired Nov 3, re-consent needs interactive browser (calendar skill). Sent hand-submit.ics to matt@bountystash.com as tap-to-add fallback.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cb0e4764e4d3b190ce80295ba66433a0327990cc",
+      "branch": "main",
+      "frame": "03ha7migwgcwy5k5o52fdzl8l"
+    },
+    {
+      "id": "67fdf38c-ccd9-4c66-b337-f02ea80ca365",
+      "ts": "2026-11-22T13:03:47Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:appflow-mail-cleanup",
+      "action": "landed: drained the agent:apps mail queue (16 messages judged + resolved: 10 acks, 2 Canonical rejections, 6 Greenhouse 2FA codes) and closed 8 robot noise rows. No file changed: the database is the source of truth, HEAD stays the packet commit. Tracker: Canonical Rust Lead + Senior SRE applied->rejected; Enpal Staff Platform and SumUp Senior DevOps other->applied. Duplicate-row pairs enumerated, untouched | gate: apps:status readback PASS (agent:apps queue 0, rejected 81, applied 271)",
+      "outcome": "done",
+      "claims": [
+        "submissions"
+      ],
+      "files": [],
+      "base_commit": "0e1a3a71993be1406d4fe2f57ea7f5f2a25e6207",
+      "branch": "main",
+      "frame": "03ha7lz9bbm8vrj07csr8lrc6"
+    },
+    {
+      "id": "4210eec7-8de7-403e-9da4-dbe2e52424ef",
+      "ts": "2026-11-22T13:03:27Z",
+      "source": "devin",
+      "subject": "job-hunt:session-2026-11-22-pm",
+      "action": "PM sweep: SVA j734 applied; STACKIT x3 applied (GT4627 dup-verified, GT2321/GT1923 silent-success probe-verified); n8n+Attio+trawa manual (Ashby reCAPTCHA); VertiGIS manual (hCaptcha); Treatwell manual (3rd Turnstile hang); Canonical kbuild staged 90% awaiting Matt essays; Adyen obs dedup-verified applied. New lanes: SAPUI5+selectmenu; walls: Ashby/Workable/Recruitee captchas.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fdd443b29bdb53f7a9e1ad16e1dd9a768d869246",
+      "branch": "main",
+      "frame": "03ha7lwxveqemoqqjao6s40cw"
+    },
     {
       "id": "94a901e6-3201-4210-a745-e481b142c9ff",
       "ts": "2026-11-22T12:50:58Z",
@@ -1575,1251 +2785,6 @@
       "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
       "branch": "main",
       "frame": "03ha7402ozcbntrd0vgfkfqum"
-    },
-    {
-      "id": "ae8ccded-1c96-4d50-a5cc-045fb5ef3a70",
-      "ts": "2026-11-22T11:31:02Z",
-      "source": "freebuff",
-      "subject": "nixconfig:trawa",
-      "action": "correction: the previous done turn named eb1a1190 in error (git index.lock blocked the commit). Real commit is 1750c82e: native English Typst dossier, 2pp CV 1049 words + 1pp letter 502 words, selection.json and Nix-built PDFs retired | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1750c82e3177a8c30580096d1fedbf50da857a94",
-      "branch": "main",
-      "frame": "03ha73uyrpkn5ao9a7jc2f0w7"
-    },
-    {
-      "id": "6c6a70f0-ffab-4fe3-a68f-4a3d7e5462cc",
-      "ts": "2026-11-22T11:30:53Z",
-      "source": "devin",
-      "subject": "job-hunt:celonis",
-      "action": "applied: Celonis Senior SWE Query Engine & Database Systems via Greenhouse 7980155003; OTP-verified, confirmation shown",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b3c9e51b39a07bf40cb7a1056b14145190a7e037",
-      "branch": "main",
-      "frame": "03ha73tz2ek28cs9qxmc2rt09"
-    },
-    {
-      "id": "7f5671ed-e5fb-4b35-94d3-85491252bf7f",
-      "ts": "2026-11-22T11:30:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:trawa",
-      "action": "landed: native English Typst dossier, 2pp CV + 1pp letter, legacy Nix PDFs + selection.json retired | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "eb1a119052ad71fb1fe49ee8c09d2562e9468b82",
-      "branch": "main",
-      "frame": "03ha73s59u5x1fi7b14sugzwl"
-    },
-    {
-      "id": "96479cb4-e24c-49c4-bdcf-aed82ea97ce7",
-      "ts": "2026-11-22T11:30:05Z",
-      "source": "freebuff",
-      "subject": "nixconfig:trawa",
-      "action": "claim: native English Typst dossier (2pp CV + 1pp letter), replacing legacy Nix artifacts, Senior Platform Engineer",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/trawa"
-      ],
-      "files": [],
-      "base_commit": "eb1a119052ad71fb1fe49ee8c09d2562e9468b82",
-      "branch": "main",
-      "frame": "03ha73o9uhucubqw3ojjdgs0a"
-    },
-    {
-      "id": "cee8b422-2ec9-442b-a9d3-5baf4f458d43",
-      "ts": "2026-11-22T11:28:54Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:uni-rostock-sysadmin",
-      "action": "migration audited: no store symlink, no read-only files, both PDFs rebuild byte-identical from lebenslauf.typ/anschreiben.typ; measured table + rebuild proof added to the sheet; prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/uni-rostock-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "d3b9de4fe1500093fc8f3261a07f2aef8776b01d",
-      "branch": "main",
-      "frame": "03ha73fzo8pf0l2dr93fg2gsz"
-    },
-    {
-      "id": "84aa9ddc-385b-4d01-b506-405daff5785a",
-      "ts": "2026-11-22T11:28:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:scout24-lead-platform-engineer",
-      "action": "landed: native English Typst packet, 2pp CV + 1pp letter, 1076/490 words, salary 95-110k EUR staged in sheet + DB | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "eb1a119052ad71fb1fe49ee8c09d2562e9468b82",
-      "branch": "main",
-      "frame": "03ha73cqnry8wvogoyid4ngog"
-    },
-    {
-      "id": "04229113-26cf-4467-8606-e93d6b92ffab",
-      "ts": "2026-11-22T11:28:04Z",
-      "source": "devin",
-      "subject": "job-hunt:celonis-dossier",
-      "action": "landed: celonis-query-engine-database dossier (2pp CV + 1pp letter, typst clean, prose gate pass); commit 4 files+sheet",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b183e17d6a3361a7fb106688af92958f8e5f30f",
-      "branch": "main",
-      "frame": "03ha73a4nf8oh9p9cqx494ksc"
-    },
-    {
-      "id": "8eac8a30-fdba-46bb-8c4a-c6fc5e3a81a8",
-      "ts": "2026-11-22T11:27:32Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fau-sysadmin",
-      "action": "tailoring: letter opening replaced the generic 'a chair is an IT department' line with LFT's actual research (sheet and bulk metal forming, industrial partners, two Erlangen sites); recompiled 1pp, measurements refreshed, prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "0e6b2051c453d21d3fd786093fd2e46bdbcc4ffb",
-      "branch": "main",
-      "frame": "03ha736dw9uvq4b16tu8yrfsg"
-    },
-    {
-      "id": "8f2983ad-0d0d-423e-a3ec-63ebabdc8535",
-      "ts": "2026-11-22T11:27:06Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:job-search",
-      "action": "pacing: building scout24-lead-platform-engineer (pane 1), building celonis-query-engine-database (pane 2), building fau-sysadmin (pane 3)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/scout24-lead-platform-engineer",
-        "submissions/celonis-query-engine-database",
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
-      "branch": "main",
-      "frame": "03ha733d5n7jot7o6ecd9c15r"
-    },
-    {
-      "id": "ec2b0795-8437-4462-8c83-6ceb0cb6de0f",
-      "ts": "2026-11-22T11:26:46Z",
-      "source": "freebuff",
-      "subject": "nixconfig:scout24-lead-platform-engineer",
-      "action": "claim: native English Typst packet (2pp CV + 1pp letter) + sheet, Lead Platform Engineer",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/scout24-lead-platform-engineer"
-      ],
-      "files": [],
-      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
-      "branch": "main",
-      "frame": "03ha73116sex6xupw8vsl5oka"
-    },
-    {
-      "id": "c7147f6b-022b-49bf-9742-19ff74d7ecce",
-      "ts": "2026-11-22T11:26:40Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fau-sysadmin",
-      "action": "tailoring pass: CV conceded only three Windows items while the letter conceded five; CV aligned (PowerShell, Lizenzserver), recompiled 2pp, sheet+dossier measurements refreshed, prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "1d85fcab0d58471a779b692093dc3aa08f57da15",
-      "branch": "main",
-      "frame": "03ha730722ltvav0611d0hkmy"
-    },
-    {
-      "id": "8e44c19a-f441-4358-a1ed-b933ab324575",
-      "ts": "2026-11-22T11:25:07Z",
-      "source": "devin",
-      "subject": "job-hunt:scout24-celonis-stage",
-      "action": "staged scout24-lead-platform-engineer + celonis-query-engine-database (prep, JDs written); Scout24 = custom TYPO3 form (Bewerbung abschicken), not OTP Greenhouse",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
-      "branch": "main",
-      "frame": "03ha72pe64qu5fgtfrf92xwi3"
-    },
-    {
-      "id": "525202ff-80e4-48ec-9c74-26bb65a1bb7c",
-      "ts": "2026-11-22T11:24:48Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fau-sysadmin",
-      "action": "dossier verified against the letter: concession was missing PowerShell and licence servers, which the dossier claimed it covered. Letter corrected, recompiled 1pp, sheet+dossier measurements refreshed, prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "75193a7f2fe02fe77a2ae036c0be0b63bcc29343",
-      "branch": "main",
-      "frame": "03ha72n6mnkfy0fx9sidm98wz"
-    },
-    {
-      "id": "abafc608-3224-4e9f-96f9-ba01d7b9fc56",
-      "ts": "2026-11-22T11:24:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:grafana-security-assurance",
-      "action": "landed: claim audit of the Grafana packet | 13 of 38 inventory entries are active NixOS hosts (count exact); CA issues 90-day certs renewed by timer, wording corrected from 'short-lived'; sheet rehashed | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
-      "branch": "main",
-      "frame": "03ha72lm0n9gjeyun68lg5kz2"
-    },
-    {
-      "id": "e04507d2-12f6-4135-8d27-49dbbef51a01",
-      "ts": "2026-11-22T11:23:32Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fau-sysadmin",
-      "action": "completed the German dossier: dossier.md (9 sections) plus measured-artifact table in the sheet; Interamt 1513404 followed and recorded; fit 3 unchanged; prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "bb67a7073c26ede9a4191b87a0ca136409e89fc6",
-      "branch": "main",
-      "frame": "03ha72e6r52a6whd9oqvmoloj"
-    },
-    {
-      "id": "e91379a7-4f84-4171-bd69-1bd615d2e236",
-      "ts": "2026-11-22T11:22:46Z",
-      "source": "freebuff",
-      "subject": "nixconfig:grafana-security-assurance",
-      "action": "landed: native English Typst dossier, 2pp CV + 1pp letter, 999/506 words, staged Greenhouse 6228511004 answers | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f5b028b4e42e36f43fdef6742db43b3f64b35551",
-      "branch": "main",
-      "frame": "03ha728u97yfwdtmi36h0650u"
-    },
-    {
-      "id": "1e808869-bf68-4013-958c-e700e24065ce",
-      "ts": "2026-11-22T11:22:37Z",
-      "source": "freebuff",
-      "subject": "nixconfig:grafana-security-assurance",
-      "action": "claim: native English Typst dossier (2pp CV + 1pp letter + Greenhouse answers), Security Assurance GRC",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/grafana-security-assurance"
-      ],
-      "files": [],
-      "base_commit": "de571966d8bf1996de7663c2d6b6841b4f01e4b8",
-      "branch": "main",
-      "frame": "03ha727tyc7gfeee341hsgg89"
-    },
-    {
-      "id": "8867a707-6ab0-44ce-a066-84325e2222d4",
-      "ts": "2026-11-22T11:22:16Z",
-      "source": "devin",
-      "subject": "job-hunt:publitas",
-      "action": "retry: Recruitee hCaptcha overlay at /c/new blocks Send again (2nd env-bound block); form fully staged, marked manual",
-      "outcome": "blocked: hcaptcha-persistent",
-      "claims": [],
-      "files": [],
-      "base_commit": "de571966d8bf1996de7663c2d6b6841b4f01e4b8",
-      "branch": "main",
-      "frame": "03ha725ctea2dnxj7ipve4s8k"
-    },
-    {
-      "id": "977bb648-0eb7-4549-a58d-522521868bf7",
-      "ts": "2026-11-22T11:21:33Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-observability",
-      "action": "correction: my previous turn reported this fixed before it was; the patch had failed on a quoting error. lead.md line 52 now actually reads as listed ('Beginn ab sofort') and no closed-claim remains anywhere in the packet. Certificates: no certificate documents exist in the repo, so that gap cannot be closed here. prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/telekom-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "ad78c5c11ec51e1b8d554c28384905003c857374",
-      "branch": "main",
-      "frame": "03ha7208kgih0zhmvctigqs11"
-    },
-    {
-      "id": "cabf0a4b-33de-4df0-a22d-de01510e1db4",
-      "ts": "2026-11-22T11:21:21Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-observability",
-      "action": "closed the last inconsistency: lead.md still said the requisition was closed; corrected to listed ('ab sofort'). Certificates checked - no certificate documents exist anywhere in the repo, so that blocker is not resolvable here. Dossier otherwise unchanged and consistent; prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/telekom-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "b210537db8b4d32ba45f3b890bc4b9522d896405",
-      "branch": "main",
-      "frame": "03ha71yx6d2qy3a9vu6k69hqu"
-    },
-    {
-      "id": "c6dfc1b1-805d-4005-be54-ec505fa7589c",
-      "ts": "2026-11-22T11:19:10Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-observability",
-      "action": "verified and corrected: dossier complete (2pp CV + 1pp letter, dossier/lead/sheet, prose PASS); public BA page for ref 12444-563465374109848-DT-S is live with start 'ab sofort' - withdrew the earlier 'likely closed' claim in four files and the DB",
-      "outcome": "done",
-      "claims": [
-        "submissions/telekom-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "b210537db8b4d32ba45f3b890bc4b9522d896405",
-      "branch": "main",
-      "frame": "03ha71jjpkaicy99883e6rf4o"
-    },
-    {
-      "id": "dab664f1-a063-447f-a97a-63b3b223c490",
-      "ts": "2026-11-22T11:18:37Z",
-      "source": "freebuff",
-      "subject": "nixconfig:canonical-kernel-build-automation",
-      "action": "landed: native English Typst dossier, 2pp CV + 1pp letter, 968/552 words, staged Greenhouse 7334725 answers | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "de571966d8bf1996de7663c2d6b6841b4f01e4b8",
-      "branch": "main",
-      "frame": "03ha71fnzn3ol6b7n8ozhfk3y"
-    },
-    {
-      "id": "9e96fe0c-f5d9-4135-9d53-201286358814",
-      "ts": "2026-11-22T11:18:33Z",
-      "source": "devin",
-      "subject": "job-hunt:greenhouse-scout-2",
-      "action": "swept assigned boards (grafanalabs/elastic/coreweave/mongodb; docker+redis dead slugs); registered 3 Germany-remote Grafana preps; JDs staged",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "de571966d8bf1996de7663c2d6b6841b4f01e4b8",
-      "branch": "main",
-      "frame": "03ha71f5dvcnf5znksabydkby"
-    },
-    {
-      "id": "a7cced1e-b46f-41ed-a038-211f4b4915d8",
-      "ts": "2026-11-22T11:17:57Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-observability",
-      "action": "rebuilt dossier for the named employer: restored the T-Systems advert text, 2pp CV + 1pp letter, dossier/lead/sheet; must-haves read and conceded; fit 4 -> 2; prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/telekom-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "de5ea652358ff140bc2b1c145b4ec3eaf11cd1b5",
-      "branch": "main",
-      "frame": "03ha71azlydrmsw1j986bh2he"
-    },
-    {
-      "id": "b2cf71f3-2197-433d-98fc-83592f76be3a",
-      "ts": "2026-11-22T11:16:57Z",
-      "source": "devin",
-      "subject": "job-hunt:flix-iam",
-      "action": "applied: Flix Cloud Engineer IAM via flix.careers (GH req 8836372002); job-success confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
-      "branch": "main",
-      "frame": "03ha71409vlmamdi2gqzv5osp"
-    },
-    {
-      "id": "acac749a-9d37-418d-ac8e-93fbb1c50aae",
-      "ts": "2026-11-22T11:16:36Z",
-      "source": "freebuff",
-      "subject": "nixconfig:canonical-kernel-build-automation",
-      "action": "claim: native English Typst dossier (2pp CV + 1pp letter + Greenhouse answers), Kernel Build Automation",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/canonical-kernel-build-automation"
-      ],
-      "files": [],
-      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
-      "branch": "main",
-      "frame": "03ha711iu4obyy65ghn0m06ol"
-    },
-    {
-      "id": "49e6e060-e904-4b64-b7eb-1a3b8fe35018",
-      "ts": "2026-11-22T11:16:36Z",
-      "source": "orchestrator",
-      "subject": "nixconfig:job-search",
-      "action": "pacing: submitting flix-cloud-iam-berlin (pane 2), compiling canonical-kernel-build-automation (pane 1), compiling telekom-sre-observability (pane 3)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/flix-cloud-iam-berlin",
-        "submissions/canonical-kernel-build-automation",
-        "submissions/telekom-sre-observability"
-      ],
-      "files": [],
-      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
-      "branch": "main",
-      "frame": "03ha711gau5irv6b6esesyk64"
-    },
-    {
-      "id": "be34dd70-4b14-46cd-a691-7fb63201062c",
-      "ts": "2026-11-22T11:13:17Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:mpcdf-linux-admin",
-      "action": "corrected: advert recovered (LDAP/Kerberos IDM role, Kennziffer 04/2026); packet rewritten around base services; fit 4 -> 2 with core gap conceded; 2pp CV + 1pp letter recompiled, prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/mpcdf-linux-admin"
-      ],
-      "files": [],
-      "base_commit": "6930222845478b8bd77ed2723132515575f5fd4c",
-      "branch": "main",
-      "frame": "03ha70e5797h4dxocxha5nt6o"
-    },
-    {
-      "id": "19d47921-24fe-420c-8d47-acf1aacecf3f",
-      "ts": "2026-11-22T11:13:14Z",
-      "source": "devin",
-      "subject": "job-hunt:wolt",
-      "action": "applied: Wolt Staff Engineer EU Infrastructure via Greenhouse 8324647; OTP-verified, confirmation shown",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
-      "branch": "main",
-      "frame": "03ha70du032hppzcmbbrbdeai"
-    },
-    {
-      "id": "f620d0db-889e-4167-885e-c61eb87d1511",
-      "ts": "2026-11-22T11:12:32Z",
-      "source": "freebuff",
-      "subject": "nixconfig:flix-cloud-iam-berlin",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "674c586277a0273fa74a3460d34481cd72fbb37f",
-      "branch": "main",
-      "frame": "03ha708ut230b2cogyb5otgnm"
-    },
-    {
-      "id": "40aabb4a-03e9-49d7-ab6d-366271f0a911",
-      "ts": "2026-11-22T11:12:17Z",
-      "source": "antigravity",
-      "subject": "nixconfig:jobsearch",
-      "action": "active: flix iam packet (0:1.1), wolt greenhouse submission (0:2.1), mpcdf hpc packet (0:3.1)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/flix-cloud-iam-berlin submissions/wolt-eu-infrastructure submissions/mpcdf-linux-admin"
-      ],
-      "files": [],
-      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
-      "branch": "main",
-      "frame": "03ha70739g3rbshbc76jdd3di"
-    },
-    {
-      "id": "b4bae73f-d363-4d0e-9609-5f3518e443cc",
-      "ts": "2026-11-22T11:11:36Z",
-      "source": "freebuff",
-      "subject": "nixconfig:flix-cloud-iam-berlin",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en), Cloud Engineer IAM",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/flix-cloud-iam-berlin"
-      ],
-      "files": [],
-      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
-      "branch": "main",
-      "frame": "03ha702cuxcaxqcrkg3p9xazc"
-    },
-    {
-      "id": "d33a58fe-8b7a-45cd-a431-fb9df30a86c3",
-      "ts": "2026-11-22T11:11:05Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:mpcdf-linux-admin",
-      "action": "migrated: native German Typst 2pp CV + 1pp letter for MPCDF Linux Systems Admin; read-only PDFs and JSON derivations removed; measured in sheet; cluster-software gap conceded; fit 4",
-      "outcome": "done",
-      "claims": [
-        "submissions/mpcdf-linux-admin"
-      ],
-      "files": [],
-      "base_commit": "ffd3aa0ffe16d7930d7df332504f3e9a1a25c5d6",
-      "branch": "main",
-      "frame": "03ha6zymn129ku71kj7iq6bzh"
-    },
-    {
-      "id": "66a10230-6a9b-4fae-90c0-3a57fa8a7da4",
-      "ts": "2026-11-22T11:11:02Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:mpcdf-linux-admin",
-      "action": "claim: native German Typst 2pp CV + 1pp letter, HPC systems emphasis",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/mpcdf-linux-admin"
-      ],
-      "files": [],
-      "base_commit": "8a92d4e68b7ce93c95026ff9fe3a8d077404c18a",
-      "branch": "main",
-      "frame": "03ha6zy9dljetoaaqwfvk5kir"
-    },
-    {
-      "id": "8ea32885-9f8f-4928-b353-013e25619526",
-      "ts": "2026-11-22T11:10:38Z",
-      "source": "antigravity",
-      "subject": "nixconfig:jobsearch",
-      "action": "active: wolt packet building (0:1.1), flix devops submission in flight (0:2.1), mpcdf hpc packet building (0:3.1)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/wolt-eu-infrastructure submissions/flix-devops-cloud-infrastructure submissions/mpcdf-linux-admin"
-      ],
-      "files": [],
-      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
-      "branch": "main",
-      "frame": "03ha6zvh145lsnks1jymh4ce7"
-    },
-    {
-      "id": "d341872a-994d-41f6-b165-2fa5541feb6e",
-      "ts": "2026-11-22T11:10:35Z",
-      "source": "devin",
-      "subject": "job-hunt:flix-devops",
-      "action": "applied: Flix DevOps/Cloud Infrastructure Engineer via flix.careers (GH req 8432987002); job-success page confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
-      "branch": "main",
-      "frame": "03ha6zv5lwdi5u9yakf1yldqr"
-    },
-    {
-      "id": "d7dcc7fc-e1eb-483e-a12d-b186e3f7eb96",
-      "ts": "2026-11-22T11:09:10Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:mittwald-devops",
-      "action": "migrated: native German Typst 2pp CV + 1pp letter for Linux hosting platform; store symlink and read-only derivations removed; measured in sheet; fit 3",
-      "outcome": "done",
-      "claims": [
-        "submissions/mittwald-devops"
-      ],
-      "files": [],
-      "base_commit": "8a92d4e68b7ce93c95026ff9fe3a8d077404c18a",
-      "branch": "main",
-      "frame": "03ha6zl7l438lwn5opz6vakvz"
-    },
-    {
-      "id": "89398310-35d1-4a94-bcf0-b2b999ffe82e",
-      "ts": "2026-11-22T11:09:07Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:mittwald-devops",
-      "action": "claim: native German Typst 2pp CV + 1pp letter, hosting-platform emphasis",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/mittwald-devops"
-      ],
-      "files": [],
-      "base_commit": "7dcaaf5bdcc4dc60b3a986a7e74d4d22f606c82c",
-      "branch": "main",
-      "frame": "03ha6zku5j8k89s3ucepsjw08"
-    },
-    {
-      "id": "92cee6cb-3099-4bd5-928d-44d62c193f4b",
-      "ts": "2026-11-22T11:08:26Z",
-      "source": "devin",
-      "subject": "job-hunt:adyen-genai",
-      "action": "applied: Adyen Senior Platform Engineer - GenAI via Greenhouse 8163866; OTP-verified, confirmation shown",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
-      "branch": "main",
-      "frame": "03ha6zg12a85vaf524hqzsrno"
-    },
-    {
-      "id": "f6cb5b84-ad12-4799-85ce-a101010a7459",
-      "ts": "2026-11-22T11:07:34Z",
-      "source": "freebuff",
-      "subject": "nixconfig:wolt-eu-infrastructure",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
-      "branch": "main",
-      "frame": "03ha6z9yztin9llbvjsmnq1t4"
-    },
-    {
-      "id": "120985cd-d267-4aed-8e42-5c45e25c6d57",
-      "ts": "2026-11-22T11:07:14Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:kiwigrid-senior-sre",
-      "action": "migrated: native German Typst 2pp CV + 1pp letter with energy-domain emphasis; store symlink and read-only derivations removed; measured in sheet; fit 3",
-      "outcome": "done",
-      "claims": [
-        "submissions/kiwigrid-senior-sre"
-      ],
-      "files": [],
-      "base_commit": "7dcaaf5bdcc4dc60b3a986a7e74d4d22f606c82c",
-      "branch": "main",
-      "frame": "03ha6z7k2p1afn3vrh4apeiv7"
-    },
-    {
-      "id": "d6510a23-f374-4a12-955e-50dba093b43e",
-      "ts": "2026-11-22T11:07:11Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:kiwigrid-senior-sre",
-      "action": "claim: native German Typst 2pp CV + 1pp letter, energy-platform emphasis",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/kiwigrid-senior-sre"
-      ],
-      "files": [],
-      "base_commit": "9b485772a6ee22113e7f40c2f78c60e5c90db712",
-      "branch": "main",
-      "frame": "03ha6z76icexopcblwcmo354o"
-    },
-    {
-      "id": "774d1466-1aab-4504-82b5-9da03a574e31",
-      "ts": "2026-11-22T11:06:40Z",
-      "source": "antigravity",
-      "subject": "nixconfig:jobsearch",
-      "action": "active: wolt staff infra packet (0:1.1), adyen genai greenhouse submission (0:2.1), kiwigrid smart-grid sre packet (0:3.1)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/wolt-eu-infrastructure submissions/adyen-platform-genai submissions/kiwigrid-senior-sre"
-      ],
-      "files": [],
-      "base_commit": "6fa7bbfb4279aede3c7a31bf33a4b21c0bb61310",
-      "branch": "main",
-      "frame": "03ha6z3nwwkevke5brh6crdvg"
-    },
-    {
-      "id": "4b56f376-ea93-4dd8-b23b-e35d0b8c89d4",
-      "ts": "2026-11-22T11:06:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:wolt-eu-infrastructure",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en), Staff Engineer EU Infrastructure",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/wolt-eu-infrastructure"
-      ],
-      "files": [],
-      "base_commit": "6fa7bbfb4279aede3c7a31bf33a4b21c0bb61310",
-      "branch": "main",
-      "frame": "03ha6z20qbhec1kacfry7hxgu"
-    },
-    {
-      "id": "a45741fe-edc1-496f-9ede-4563ad61efe1",
-      "ts": "2026-11-22T11:05:08Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fraunhofer-darmstadt-network",
-      "action": "corrected: CV font name fixed (was falling back to DejaVu); PDFs rebuilt and sheet measurements refreshed",
-      "outcome": "done",
-      "claims": [
-        "submissions/fraunhofer-darmstadt-network"
-      ],
-      "files": [],
-      "base_commit": "9b485772a6ee22113e7f40c2f78c60e5c90db712",
-      "branch": "main",
-      "frame": "03ha6yss8bqrmjw7bqrgw5id3"
-    },
-    {
-      "id": "2d45f741-c588-4909-bd34-847cf029f8b6",
-      "ts": "2026-11-22T11:04:58Z",
-      "source": "freebuff",
-      "subject": "nixconfig:flix-devops-cloud-infrastructure",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6fa7bbfb4279aede3c7a31bf33a4b21c0bb61310",
-      "branch": "main",
-      "frame": "03ha6yrmhistmajofs167ga77"
-    },
-    {
-      "id": "2f94b0b4-3337-42af-9ecf-d045af0642ac",
-      "ts": "2026-11-22T11:04:52Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fraunhofer-darmstadt-network",
-      "action": "migrated: native German Typst 2pp CV + 1pp letter with Fraunhofer ISE emphasis; symlink plus selection/resume/letter JSON removed; measured in sheet; Cisco/Palo-Alto/NAC gap conceded; fit lowered 3 to 2",
-      "outcome": "done",
-      "claims": [
-        "submissions/fraunhofer-darmstadt-network"
-      ],
-      "files": [],
-      "base_commit": "d950b140992b1d29f75475ce8bb57a3997f5e55e",
-      "branch": "main",
-      "frame": "03ha6yqwk9l3d71jn233y4bju"
-    },
-    {
-      "id": "19131f5b-46a7-4901-b7c3-001bbef9530d",
-      "ts": "2026-11-22T11:04:04Z",
-      "source": "antigravity",
-      "subject": "nixconfig:jobsearch",
-      "action": "active: flix devops packet (0:1.1), greenhouse scout wolt/flix (0:2.1), fraunhofer darmstadt packet (0:3.1)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/flix-devops-cloud-infrastructure submissions/fraunhofer-darmstadt-network"
-      ],
-      "files": [],
-      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
-      "branch": "main",
-      "frame": "03ha6ylbgsxg65pwxg4ox39lp"
-    },
-    {
-      "id": "d3c355a7-7210-4053-a581-587f477e66e6",
-      "ts": "2026-11-22T11:03:54Z",
-      "source": "devin",
-      "subject": "job-hunt:greenhouse-scout",
-      "action": "scouted Greenhouse boards; registered 3 fresh prep reqs (wolt-eu-infrastructure, flix-cloud-iam-berlin, canonical-kernel-build-automation) + resolved adyen-platform-genai live req 8163866; JDs staged in submissions/",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
-      "branch": "main",
-      "frame": "03ha6yk5lv1g42n2e910p2lnh"
-    },
-    {
-      "id": "d9aff2eb-ab06-4ee7-befe-5fef89d095f4",
-      "ts": "2026-11-22T11:03:53Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fraunhofer-darmstadt-network",
-      "action": "claim: native German Typst 2pp CV + 1pp letter, Fraunhofer ISE emphasis",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/fraunhofer-darmstadt-network"
-      ],
-      "files": [],
-      "base_commit": "695cb55ced7cc4f76adea524f0dd2857a7aa09a9",
-      "branch": "main",
-      "frame": "03ha6yk1szznutsxuiiqhwvop"
-    },
-    {
-      "id": "358ecbc2-6d17-469e-90ea-4dbf7664c03e",
-      "ts": "2026-11-22T11:03:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:flix-devops-cloud-infrastructure",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en), DevOps/Cloud Infrastructure",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/flix-devops-cloud-infrastructure"
-      ],
-      "files": [],
-      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
-      "branch": "main",
-      "frame": "03ha6yjczqpb3ysg3uc576bwz"
-    },
-    {
-      "id": "098cb37b-8436-43ee-bfe6-16380a0a9fe0",
-      "ts": "2026-11-22T11:03:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:deepl",
-      "action": "follow-up: compliance added to CV area and letter gap, recompiled 2pp/1pp at 0 warnings | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c631b34f766232822e30edfbb42eb27d6d314161",
-      "branch": "main",
-      "frame": "03ha6yf3p764040s4j62b3th1"
-    },
-    {
-      "id": "4995fae4-9af4-4250-871e-4f28d5df94aa",
-      "ts": "2026-11-22T11:03:01Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fraunhofer-erfurt-linux-network",
-      "action": "migrated: native German Typst 2pp CV + 1pp letter with Fraunhofer ISE emphasis; store symlink and read-only files removed; measured in sheet; WAN/firewall-appliance/fibre gaps conceded; fit 3",
-      "outcome": "done",
-      "claims": [
-        "submissions/fraunhofer-erfurt-linux-network"
-      ],
-      "files": [],
-      "base_commit": "695cb55ced7cc4f76adea524f0dd2857a7aa09a9",
-      "branch": "main",
-      "frame": "03ha6ydyxgtg8wlzr0xpllist"
-    },
-    {
-      "id": "e20097ff-6235-4d47-87b0-d5283f22f91d",
-      "ts": "2026-11-22T11:02:00Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fraunhofer-erfurt-linux-network",
-      "action": "claim: native German Typst 2pp CV + 1pp letter, Fraunhofer ISE emphasis",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/fraunhofer-erfurt-linux-network"
-      ],
-      "files": [],
-      "base_commit": "c0d2504b8a85807da867ab70415781f767a9b5ed",
-      "branch": "main",
-      "frame": "03ha6y6qr5kqkmw4ceg1kful6"
-    },
-    {
-      "id": "5f8f2338-b14d-4057-a0ce-c31004aaf1c5",
-      "ts": "2026-11-22T11:01:27Z",
-      "source": "freebuff",
-      "subject": "nixconfig:deepl",
-      "action": "follow-up: packet amended after a sheet marker correction | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cd33dff00dedb90ffe1054da4abf029894f3d9c8",
-      "branch": "main",
-      "frame": "03ha6y2zksk79jpf210b99abx"
-    },
-    {
-      "id": "5c71a7e5-cb4b-47d3-8ae0-8155a4cdb97a",
-      "ts": "2026-11-22T11:00:54Z",
-      "source": "freebuff",
-      "subject": "nixconfig:deepl",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d35aea7ba6025975ffc3b7d10d2c3d342ac08c4b",
-      "branch": "main",
-      "frame": "03ha6xz4eook9v3lth5ttidm2"
-    },
-    {
-      "id": "24151834-8dfb-4d28-a7a8-061d7bb6ae55",
-      "ts": "2026-11-22T11:00:37Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:a3m-senior-linux-devops",
-      "action": "migrated: store packet replaced by native German Typst 2pp CV + 1pp letter; symlink and read-only JSON/PDFs removed; fit 4; ISO-27001/cloud gaps conceded",
-      "outcome": "done",
-      "claims": [
-        "submissions/a3m-senior-linux-devops"
-      ],
-      "files": [],
-      "base_commit": "c0d2504b8a85807da867ab70415781f767a9b5ed",
-      "branch": "main",
-      "frame": "03ha6xx2yt3ul5ac7hegu8y8l"
-    },
-    {
-      "id": "5ddd3097-87a6-4939-ac74-ca2c18b465f1",
-      "ts": "2026-11-22T11:00:33Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:a3m-senior-linux-devops",
-      "action": "claim: migrate legacy store packet to native German Typst 2pp CV + 1pp letter",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/a3m-senior-linux-devops"
-      ],
-      "files": [],
-      "base_commit": "9479551379e235ac6611f6157e32766efa40c68f",
-      "branch": "main",
-      "frame": "03ha6xwk74r40wq3fb69k71j1"
-    },
-    {
-      "id": "f56cbcc7-1d1f-4015-99b6-223c49f3eda8",
-      "ts": "2026-11-22T10:59:51Z",
-      "source": "devin",
-      "subject": "nixconfig:treatwell",
-      "action": "blocked: Workable submission hung at invisible Turnstile — second rejection, form fully staged",
-      "outcome": "blocked: turnstile-invisible",
-      "claims": [],
-      "files": [],
-      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
-      "branch": "main",
-      "frame": "03ha6xrp32px5cbg89134yfmn"
-    },
-    {
-      "id": "92e1d17e-8f31-42f7-9398-3fd31085254d",
-      "ts": "2026-11-22T10:59:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:deepl",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en), Staff SRE Sovereign Cloud",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/deepl"
-      ],
-      "files": [],
-      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
-      "branch": "main",
-      "frame": "03ha6xrb20w4w4lty72j9fdgz"
-    },
-    {
-      "id": "f560fdf0-a043-4492-b8eb-5509bea64327",
-      "ts": "2026-11-22T10:59:20Z",
-      "source": "antigravity",
-      "subject": "nixconfig:jobsearch",
-      "action": "pacing: treatwell submission active (0:2.1), deepl packet active (0:1.1), delphi audit/compile active (0:3.1)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/treatwell submissions/deepl"
-      ],
-      "files": [],
-      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
-      "branch": "main",
-      "frame": "03ha6xo43m8pfiac8ndz60ncc"
-    },
-    {
-      "id": "2816fc49-69b3-4950-b416-ec15677b78b3",
-      "ts": "2026-11-22T10:59:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:nix-consultancy-outreach",
-      "action": "landed: redact third-party contacts and phone number from docs/nix-consultancy-outreach.md | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "44c8a09440780b2493bdf6cde92a7345066118fc",
-      "branch": "main",
-      "frame": "03ha6xmu0we0jx7i3brm8b9l5"
-    },
-    {
-      "id": "4c375abd-1104-480e-80bc-32de437b1781",
-      "ts": "2026-11-22T10:55:44Z",
-      "source": "freebuff",
-      "subject": "nixconfig:black-forest-labs",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a5c1ea6296f2b76a7aac40ee7b5173a6c3952489",
-      "branch": "main",
-      "frame": "03ha6wyse51hq53ota6tnv0bz"
-    },
-    {
-      "id": "2c041da4-03a1-4c3a-a091-f40355ac9ee0",
-      "ts": "2026-11-22T10:55:09Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-prometheus",
-      "action": "compiled: native German Typst packet 2pp CV + 1pp letter for SRE Prometheus; measured hashes in sheet; Prometheus/Grafana/Loki gap conceded; fit 3",
-      "outcome": "done",
-      "claims": [
-        "submissions/telekom-sre-prometheus"
-      ],
-      "files": [],
-      "base_commit": "9479551379e235ac6611f6157e32766efa40c68f",
-      "branch": "main",
-      "frame": "03ha6wulbanobtl8yhkez3b1d"
-    },
-    {
-      "id": "fd82e707-5e78-4db2-b7a7-722610d431db",
-      "ts": "2026-11-22T10:54:44Z",
-      "source": "devin",
-      "subject": "nixconfig:mozilla",
-      "action": "re-assigned; already applied: Staff SWE Tools & Systems — applied record + ack mail on file. Skipped duplicate",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
-      "branch": "main",
-      "frame": "03ha6wrr7dwuemvozq4yinnb9"
-    },
-    {
-      "id": "eda0d40c-7d60-4243-8d57-a5e70c9cff5f",
-      "ts": "2026-11-22T10:54:30Z",
-      "source": "antigravity",
-      "subject": "nixconfig:jobsearch",
-      "action": "landed: anduril (applied/confirmed Greenhouse), makersite (native Typst), treatwell (native Typst) | dispatched: mozilla (0:2.1), black-forest-labs (0:1.1), telekom-sre-prometheus (0:3.1)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/mozilla submissions/black-forest-labs submissions/telekom-sre-prometheus"
-      ],
-      "files": [],
-      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
-      "branch": "main",
-      "frame": "03ha6wq2c6csg5mxc92oxzaeo"
-    },
-    {
-      "id": "84c1a472-6f56-4d05-a784-935251f213e6",
-      "ts": "2026-11-22T10:54:09Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-prometheus",
-      "action": "claim: native German Typst 2pp CV + 1pp letter",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/telekom-sre-prometheus"
-      ],
-      "files": [],
-      "base_commit": "f4465309572ca10eb71ec1f35a9703063c938805",
-      "branch": "main",
-      "frame": "03ha6wnlc7ckmojklnu876uxq"
-    },
-    {
-      "id": "a5985027-8cf5-4931-969e-6b7ae73e82c3",
-      "ts": "2026-11-22T10:53:51Z",
-      "source": "freebuff",
-      "subject": "nixconfig:black-forest-labs",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en), MTS Infrastructure Security",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/black-forest-labs"
-      ],
-      "files": [],
-      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
-      "branch": "main",
-      "frame": "03ha6wlh8tni3vpx455ncy6hh"
-    },
-    {
-      "id": "592f1a8e-542e-4b4e-bc3a-f11a3d5a1325",
-      "ts": "2026-11-22T10:51:57Z",
-      "source": "devin",
-      "subject": "nixconfig:anduril",
-      "action": "applied: Greenhouse submission complete — OTP 22278496, /confirmation verified; adapted flox packet into anduril-specific CV+letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
-      "branch": "main",
-      "frame": "03ha6w85cb3lif62ljfs9oxmx"
-    },
-    {
-      "id": "ac34b81a-03b8-4af8-8ec5-4f576b814242",
-      "ts": "2026-11-22T10:51:18Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:treatwell",
-      "action": "gate: checks:prose PASS after rewording the AWS model-service line; packet final at fit 3",
-      "outcome": "done",
-      "claims": [
-        "submissions/treatwell"
-      ],
-      "files": [],
-      "base_commit": "f4465309572ca10eb71ec1f35a9703063c938805",
-      "branch": "main",
-      "frame": "03ha6w3huqg1ktxidorj2nfja"
-    },
-    {
-      "id": "4dd4c3ee-6168-4152-af95-137a6935b9fa",
-      "ts": "2026-11-22T10:50:58Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:treatwell",
-      "action": "corrected: advert retrieved (v1/v2), fit 3 not 4 — Terraform/AWS and EKS absent and named; 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [
-        "submissions/treatwell"
-      ],
-      "files": [],
-      "base_commit": "f18f666c6587d46e3b357e72d44a8897cb59b2fc",
-      "branch": "main",
-      "frame": "03ha6w183jrp6c6tg6kf0ch92"
-    },
-    {
-      "id": "9ceed368-879e-4b52-b4dd-9e7164657492",
-      "ts": "2026-11-22T10:50:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:makersite",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "233b8ef2f9b38c19ac42868ea6382c256ee0f689",
-      "branch": "main",
-      "frame": "03ha6vwnizeu7mjkbu3snqlup"
-    },
-    {
-      "id": "e15b3914-ff88-441e-8cdf-548012b84378",
-      "ts": "2026-11-22T10:50:05Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:treatwell",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); advert body unreachable, noted; cloud gaps conceded; fit 4",
-      "outcome": "done",
-      "claims": [
-        "submissions/treatwell"
-      ],
-      "files": [],
-      "base_commit": "b4b411985bd48cf1fe899c3b37e2d5acb4f8014f",
-      "branch": "main",
-      "frame": "03ha6vv1dskcv7rkd68wofykf"
-    },
-    {
-      "id": "141d19d5-1905-4d4a-88ce-c1ee7221e9d2",
-      "ts": "2026-11-22T10:49:14Z",
-      "source": "freebuff",
-      "subject": "nixconfig:makersite",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/makersite"
-      ],
-      "files": [],
-      "base_commit": "69438c240221147b73598371b0707f5a38be2d5e",
-      "branch": "main",
-      "frame": "03ha6vp08xk4hp4e0rqttdzf3"
-    },
-    {
-      "id": "2b91bbfe-ad58-48d5-a3a9-9ae7ffb6d460",
-      "ts": "2026-11-22T10:49:02Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:treatwell",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/treatwell"
-      ],
-      "files": [],
-      "base_commit": "194f656b88adaa98efe82a31d3a84bf33dc4fc59",
-      "branch": "main",
-      "frame": "03ha6vnkbcrmohy8atd2via1a"
-    },
-    {
-      "id": "93935d8f-83e0-4180-97e8-7a8c75a1ef1d",
-      "ts": "2026-11-22T10:48:23Z",
-      "source": "devin",
-      "subject": "nixconfig:anduril",
-      "action": "claim: Greenhouse submission + adapted packet (flox sources -> anduril)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/anduril"
-      ],
-      "files": [],
-      "base_commit": "69438c240221147b73598371b0707f5a38be2d5e",
-      "branch": "main",
-      "frame": "03ha6vj2ieew0z0qv65qq3grb"
-    },
-    {
-      "id": "738fcc79-33f4-4efb-9093-2b9c9465d5d2",
-      "ts": "2026-11-22T10:47:42Z",
-      "source": "freebuff",
-      "subject": "nixconfig:luminovo",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en), standardised an already-applied requisition | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "75a5707d5d6f7b3f073d168182dbef8348c3dcdc",
-      "branch": "main",
-      "frame": "03ha6ve7vah12n89makkj0jav"
-    },
-    {
-      "id": "ecb34264-d758-4db8-9a5c-47fc2caf6c07",
-      "ts": "2026-11-22T10:46:43Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fau-sysadmin",
-      "action": "corrected: sheet/lead now match the advert (unbefristet, IT-Lead succession, E 11, class B, Windows Server/AD required); 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "194f656b88adaa98efe82a31d3a84bf33dc4fc59",
-      "branch": "main",
-      "frame": "03ha6v7c9xmsbmynqfyji8dhz"
-    },
-    {
-      "id": "cd870efe-d11a-4aca-b15d-02bd1ad73f58",
-      "ts": "2026-11-22T10:46:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:luminovo",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/luminovo"
-      ],
-      "files": [],
-      "base_commit": "66b1bd230f3b79cccf145eb0db1775e69128fed6",
-      "branch": "main",
-      "frame": "03ha6v5a6f8gzlwgmnrirfygy"
-    },
-    {
-      "id": "6ce75f81-7008-4053-8ed9-7e23d3dff91c",
-      "ts": "2026-11-22T10:46:10Z",
-      "source": "devin",
-      "subject": "nixconfig:flower",
-      "action": "re-assigned; already applied: Teamtailor req 8532038 submitted 2026-11-21 — named-recruiter ack mail 310950. Skipped duplicate",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "66b1bd230f3b79cccf145eb0db1775e69128fed6",
-      "branch": "main",
-      "frame": "03ha6v3g2b0isox9g1f8c497e"
-    },
-    {
-      "id": "2897bb3a-3362-4aa9-ba1f-b48bfb6aae3b",
-      "ts": "2026-11-22T10:46:02Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fau-sysadmin",
-      "action": "compiled: native German Typst packet 2pp CV + 1pp letter against LFT advert; Windows/AD/Hyper-V gap named; fit 3",
-      "outcome": "done",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "d667eb5678e144042f5a835c1620a5282b0dc4d2",
-      "branch": "main",
-      "frame": "03ha6v2i9tafc2v9dn9ofzfn7"
-    },
-    {
-      "id": "4a1c88ef-9d4a-4c9a-938e-1b8fc694ddc0",
-      "ts": "2026-11-22T10:45:12Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:fau-sysadmin",
-      "action": "claim: native Typst 2pp CV + 1pp letter (de)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/fau-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "d23e1a409fc993b24e59bb988fdcbd843c8b0ea7",
-      "branch": "main",
-      "frame": "03ha6uwlwy77hkuxel5gi7kq0"
-    },
-    {
-      "id": "e8429486-e82a-4707-b842-79d3aaf7aa17",
-      "ts": "2026-11-22T10:44:43Z",
-      "source": "freebuff",
-      "subject": "nixconfig:langdock",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27e7d13d6e1e64d0c222d194e7aa484272e08cd8",
-      "branch": "main",
-      "frame": "03ha6ut9qbcndznstedothuve"
-    },
-    {
-      "id": "100e202a-efe7-4f24-a300-ed484ff84631",
-      "ts": "2026-11-22T10:44:01Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:uni-rostock-sysadmin",
-      "action": "corrected: letter now offers presence blocks instead of relocation, matching the sheet; 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [
-        "submissions/uni-rostock-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "d23e1a409fc993b24e59bb988fdcbd843c8b0ea7",
-      "branch": "main",
-      "frame": "03ha6uoda831j3s1mud1a84id"
-    },
-    {
-      "id": "55a89993-2bb7-4fd1-a853-9bed8a55a0c7",
-      "ts": "2026-11-22T10:43:32Z",
-      "source": "devin",
-      "subject": "nixconfig:hep-global",
-      "action": "blocked: Personio submission stopped at Cloudflare Turnstile — form fully staged for hand-submit",
-      "outcome": "blocked: turnstile",
-      "claims": [],
-      "files": [],
-      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
-      "branch": "main",
-      "frame": "03ha6ukyrfyydvuqpsm80op7q"
-    },
-    {
-      "id": "819a4edf-52d1-4554-9543-6b359121cafb",
-      "ts": "2026-11-22T10:43:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:langdock",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/langdock"
-      ],
-      "files": [],
-      "base_commit": "c4a3ff28530e74461c9803e3313e703ac8e7a7dd",
-      "branch": "main",
-      "frame": "03ha6uk9jaxarl6z35hm613hy"
-    },
-    {
-      "id": "2fd03242-aad1-42c6-a452-0150223242e5",
-      "ts": "2026-11-22T10:42:51Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:uni-rostock-sysadmin",
-      "action": "compiled: native German Typst packet 2pp CV + 1pp letter; Debian/AD gaps named; fit 3; DB kept at manual pending Zertifikate",
-      "outcome": "done",
-      "claims": [
-        "submissions/uni-rostock-sysadmin"
-      ],
-      "files": [],
-      "base_commit": "3e9fee16a794a14452247400eecd317aea710139",
-      "branch": "main",
-      "frame": "03ha6ug2eysf2577csauizjkz"
     }
   ]
 }

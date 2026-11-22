@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:33:57Z",
+  "generated": "2026-11-22T09:35:36Z",
   "count": 200,
-  "pin": "7921f876974bf44658b4c14d075b8634b17af15ab7246b1e4e58ebb8028d3a01",
+  "pin": "5d9d059a888837c13248b5b2beb2dd3e8cea91784934764fb942532a9f4b3d79",
   "turns": [
+    {
+      "id": "17b5e953-9a91-42d2-afbb-712193d619dc",
+      "ts": "2026-11-22T09:34:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "dfs upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cf47993f2e0f5fd360f3f6d1206790a023790a13",
+      "branch": "main",
+      "frame": "03ha6h02oym7b2io97he8kg4w"
+    },
     {
       "id": "2480c7d6-eb6e-4400-aecb-671ade6df0f6",
       "ts": "2026-11-22T09:33:57Z",
@@ -2744,19 +2757,6 @@
       "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
       "branch": "main",
       "frame": "03ha502lc7erqqx2c38ywmlhq"
-    },
-    {
-      "id": "6642f80d-25f9-4aba-ac41-831b9217526b",
-      "ts": "2026-11-22T04:59:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-flix-submit",
-      "action": "landed: drove freebuff pane to apply for Flix Data Platform Engineer on Greenhouse 8690650002 (packet staged at submissions/flix-data-platform-engineer/); pane confirmed working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
-      "branch": "main",
-      "frame": "03ha4zcxs8hiwelhofnlpzgsk"
     }
   ]
 }

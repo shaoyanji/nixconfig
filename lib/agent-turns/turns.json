@@ -1,8 +1,111 @@
 {
-  "generated": "2026-11-22T11:24:31Z",
+  "generated": "2026-11-22T11:28:02Z",
   "count": 200,
-  "pin": "031af717ae5dafd547cac4b45ab66c9d8297266e5237c258a3b9d888d42e3fbf",
+  "pin": "bc24086a9a4da8be11f9844f533e31b1a86d6a51b78c01e0b4a655d888107754",
   "turns": [
+    {
+      "id": "8eac8a30-fdba-46bb-8c4a-c6fc5e3a81a8",
+      "ts": "2026-11-22T11:27:32Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "tailoring: letter opening replaced the generic 'a chair is an IT department' line with LFT's actual research (sheet and bulk metal forming, industrial partners, two Erlangen sites); recompiled 1pp, measurements refreshed, prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "0e6b2051c453d21d3fd786093fd2e46bdbcc4ffb",
+      "branch": "main",
+      "frame": "03ha736dw9uvq4b16tu8yrfsg"
+    },
+    {
+      "id": "8f2983ad-0d0d-423e-a3ec-63ebabdc8535",
+      "ts": "2026-11-22T11:27:06Z",
+      "source": "orchestrator",
+      "subject": "nixconfig:job-search",
+      "action": "pacing: building scout24-lead-platform-engineer (pane 1), building celonis-query-engine-database (pane 2), building fau-sysadmin (pane 3)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/scout24-lead-platform-engineer",
+        "submissions/celonis-query-engine-database",
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
+      "branch": "main",
+      "frame": "03ha733d5n7jot7o6ecd9c15r"
+    },
+    {
+      "id": "ec2b0795-8437-4462-8c83-6ceb0cb6de0f",
+      "ts": "2026-11-22T11:26:46Z",
+      "source": "freebuff",
+      "subject": "nixconfig:scout24-lead-platform-engineer",
+      "action": "claim: native English Typst packet (2pp CV + 1pp letter) + sheet, Lead Platform Engineer",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/scout24-lead-platform-engineer"
+      ],
+      "files": [],
+      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
+      "branch": "main",
+      "frame": "03ha73116sex6xupw8vsl5oka"
+    },
+    {
+      "id": "c7147f6b-022b-49bf-9742-19ff74d7ecce",
+      "ts": "2026-11-22T11:26:40Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "tailoring pass: CV conceded only three Windows items while the letter conceded five; CV aligned (PowerShell, Lizenzserver), recompiled 2pp, sheet+dossier measurements refreshed, prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "1d85fcab0d58471a779b692093dc3aa08f57da15",
+      "branch": "main",
+      "frame": "03ha730722ltvav0611d0hkmy"
+    },
+    {
+      "id": "8e44c19a-f441-4358-a1ed-b933ab324575",
+      "ts": "2026-11-22T11:25:07Z",
+      "source": "devin",
+      "subject": "job-hunt:scout24-celonis-stage",
+      "action": "staged scout24-lead-platform-engineer + celonis-query-engine-database (prep, JDs written); Scout24 = custom TYPO3 form (Bewerbung abschicken), not OTP Greenhouse",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
+      "branch": "main",
+      "frame": "03ha72pe64qu5fgtfrf92xwi3"
+    },
+    {
+      "id": "525202ff-80e4-48ec-9c74-26bb65a1bb7c",
+      "ts": "2026-11-22T11:24:48Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fau-sysadmin",
+      "action": "dossier verified against the letter: concession was missing PowerShell and licence servers, which the dossier claimed it covered. Letter corrected, recompiled 1pp, sheet+dossier measurements refreshed, prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "75193a7f2fe02fe77a2ae036c0be0b63bcc29343",
+      "branch": "main",
+      "frame": "03ha72n6mnkfy0fx9sidm98wz"
+    },
+    {
+      "id": "abafc608-3224-4e9f-96f9-ba01d7b9fc56",
+      "ts": "2026-11-22T11:24:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:grafana-security-assurance",
+      "action": "landed: claim audit of the Grafana packet | 13 of 38 inventory entries are active NixOS hosts (count exact); CA issues 90-day certs renewed by timer, wording corrected from 'short-lived'; sheet rehashed | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6ed41a59af2b4fab0b04dc95f0007b0a0fe4fb66",
+      "branch": "main",
+      "frame": "03ha72lm0n9gjeyun68lg5kz2"
+    },
     {
       "id": "e04507d2-12f6-4135-8d27-49dbbef51a01",
       "ts": "2026-11-22T11:23:32Z",
@@ -2661,97 +2764,6 @@
       "base_commit": "d111d5e9bc117b0140edf34a3af4f2d8b40a05ca",
       "branch": "main",
       "frame": "03ha6fyqkt0vmk7tblghfu4j3"
-    },
-    {
-      "id": "979bea7a-528c-48b5-8b76-229bea8626e3",
-      "ts": "2026-11-22T09:28:08Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "ewerk upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d2ed38056f0c100b00119e91de85d2a1aefe8264",
-      "branch": "main",
-      "frame": "03ha6fuo4nfwztcjz27g4vtjc"
-    },
-    {
-      "id": "463605fd-45e3-4932-bf39-34fdf7909a59",
-      "ts": "2026-11-22T09:27:15Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "bwi upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b52535386589665e5076850fb772076d646e7070",
-      "branch": "main",
-      "frame": "03ha6fofggeog34ez8m2cbu25"
-    },
-    {
-      "id": "7ea36885-3860-4ba9-9d7b-b05b33aab8fb",
-      "ts": "2026-11-22T09:25:55Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: secunet Rexx Systems submission (f3550)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0dc144c037c71086a9d9e8a06c4aa92656b5e902",
-      "branch": "main",
-      "frame": "03ha6ff62a2awosve1rqo6da8"
-    },
-    {
-      "id": "0dc1ee8f-ae6b-4984-93c6-06d3649f8aa0",
-      "ts": "2026-11-22T09:25:38Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "enbw packet prepared but requisition closed (HTTP 410 filled); fit set to 4",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa025dcb2859148f844685ff695efef42703d0b3",
-      "branch": "main",
-      "frame": "03ha6fd29j9bnq54t4irvvgza"
-    },
-    {
-      "id": "3b07274e-a437-4be2-a967-1d5885d11b00",
-      "ts": "2026-11-22T09:25:34Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "shopware-cloud-infra: form complete but submit gated by Recruitee interactive drag-letter captcha; policy=never solve interactives; record=manual, hand-submit path in nextAction",
-      "outcome": "blocked: recruitee interactive puzzle captcha at submit",
-      "claims": [],
-      "files": [],
-      "base_commit": "0dc144c037c71086a9d9e8a06c4aa92656b5e902",
-      "branch": "main",
-      "frame": "03ha6fcp8tzycezi0bwauyzac"
-    },
-    {
-      "id": "42e40ee4-15db-4aca-b1d8-5e7a545bd629",
-      "ts": "2026-11-22T09:25:22Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "enbw upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8de679c3248fca211708920af7f04913c0315e8f",
-      "branch": "main",
-      "frame": "03ha6fb6136apawazg4az68j7"
-    },
-    {
-      "id": "73850216-52d1-4464-863a-05296d5910d4",
-      "ts": "2026-11-22T09:24:41Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "rwth-aachen upgraded to native Typst packet | 2pp CV + 1pp letter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "879e9549c6628d04b59c6ba7aa4d039eca32f0e7",
-      "branch": "main",
-      "frame": "03ha6f6gxw6zmo87r70diqvja"
     }
   ]
 }

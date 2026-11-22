@@ -1,0 +1,50 @@
+# Source: Arbeitnow API, fetched 2026-11-22
+# https://www.arbeitnow.com/jobs/companies/vertigis-gmbh/remote-cloud-engineer-cloud-betrieb-von-saas-losungen-berlin-315547
+
+VertiGIS GmbH — Cloud Engineer (m/w/x) – Cloud-Betrieb von SaaS-Lösungen
+Location: Homeoffice | remote=True
+
+Die 
+VertiGIS Unternehmensgruppe
+ entwickelt Softwarelösungen für Geografische Informationssysteme (GIS). Wir sind führender Lösungsanbieter in den Bereichen Energieversorgung, Wasserwirtschaft, Landmanagement, Behörden, Infrastruktur, Facility Management und Telekommunikation. Unsere Produkte helfen Unternehmen, Netze, Anlagen und Prozesse effizient zu planen, zu verwalten und zu optimieren – weltweit im täglichen Einsatz.
+Als Cloud Engineer betreiben und entwickeln Sie Azure-basierte Cloud-Infrastrukturen und SaaS-Lösungen für unsere Kunden weiter. Der Schwerpunkt liegt auf Monitoring, Log-Analyse, Störungsbehebung und der Umsetzung von Änderungen im laufenden Betrieb. Sie arbeiten in einem sechsköpfigen Team aus Cloud Engineers und GIS-Consultants und stimmen technische Entscheidungen im CloudOps-Team ab.
+Die Aufgaben
+SaaS-Lösungen im Betrieb halten
+Betrieb der neuen SaaS-Lösung in der Azure Landing Zone mit ihrer komplexen Systemarchitektur
+Überwachung von Azure-Ressourcen und Logs sowie Analyse und Behebung von Störungen im Kundenbetrieb
+Technische Abstimmung mit Kunden und dem CloudOps-Team bei Betriebsfragen und Fehlern
+Änderungen automatisiert umsetzen
+Deployments und Updates über CI/CD-Pipelines einschließlich anschließender Funktionsprüfung
+Abbildung von Infrastruktur und Konfiguration mit Infrastructure as Code sowie Automatisierung wiederkehrender Betriebsschritte
+Dokumentation und Durchführung geplanter Änderungen in den regelmäßigen Wartungsfenstern
+Cloud-Umgebungen absichern
+Umsetzung von Systemhärtung nach CIS-Benchmark und Sicherheitsanforderungen bei neuen Cloud-Lösungen
+Prüfung und Anpassung von Netzwerk- und Sicherheitskonfigurationen in Azure
+Konfiguration und Absicherung des externen Zugriffs über Application Gateway und WAF
+ 
+ 
+Praktische Erfahrung im Betrieb und in der Weiterentwicklung von Cloud-Infrastrukturen oder SaaS-Lösungen auf Basis von Microsoft Azure
+Erfahrung mit Infrastructure as Code, vorzugsweise mit Bicep oder vergleichbaren Verfahren
+Kenntnisse in Netzwerk- und IT-Sicherheit, insbesondere bei der Absicherung von Cloud-Umgebungen
+Erfahrung mit CI/CD-Pipelines sowie mit Monitoring und Log-Analyse im laufenden Betrieb
+Sehr gute Deutschkenntnisse auf mindestens C1-Niveau und gute Englischkenntnisse auf mindestens B2-Niveau
+Ein Studium oder eine bestimmte IT-Ausbildung ist nicht erforderlich. Entscheidend ist Ihre praktische Erfahrung in den genannten Bereichen.
+Wünschenswert
+Erste Kenntnisse in ArcGIS Enterprise, VertiGIS-Software oder im Betrieb von GIS-Lösungen
+Kenntnisse in Windows Server sowie in PostgreSQL, Microsoft SQL Server oder Oracle
+Erfahrung mit Azure Monitor sowie mit CIS-Benchmarks oder vergleichbaren Sicherheitsstandards
+Unsere Rahmenbedingungen
+✔️ Regelung zum mobilen Arbeiten (hybrides Arbeiten möglich)
+✔️ Flexible Arbeitszeit durch Gleitzeit
+✔️ Internationales Arbeitsumfeld
+✔️ Attraktive Benefits (Zusätzlich zu Ihrem Gehalt erhalten Sie monatlich bis zu 80 € für persönliche Extras – je nach Standort können Sie diese z. B. für Mahlzeiten, ÖPNV oder weitere Angebote nutzen.)
+Die Stelle ist an einem der folgenden Standorte in Deutschland oder Österreich zu besetzen. Auch eine Anstellung 100% im Home Office ist möglich.
+Deutschland: Berlin, Bonn, Dresden, Hamburg, München
+Österreich: Innsbruck, Wien
+Folgende Details gelten für eine Anstellung in Österreich:
+Die Anstellung erfolgt nach dem 
+Kollektivvertrag IT
+Das kollektivvertragliche Mindestgehalt für diese Position beträgt 55.356,00 EUR brutto/Jahr (38,5 h/Woche). Die tatsächliche Vergütung hängt von Qualifikation und Erfahrung ab.
+Find 
+Jobs in Germany
+ on Arbeitnow

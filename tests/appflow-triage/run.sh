@@ -61,6 +61,25 @@ cases = [
         "interview",
     ),
     (
+        "interview: English invite",
+        "We would like to invite you to an interview on 3 December.",
+        "interview",
+    ),
+    (
+        # Canonical, 2026-11-21: the acknowledgement describes the people the
+        # candidate might meet, and that sentence alone raised an interview on
+        # the day the application was sent.
+        "interview boilerplate is not an interview",
+        "Thank you for your application. You will meet interviewers you meet along "
+        "the way, and the hiring lead for this role will be in touch.",
+        "received",
+    ),
+    (
+        "interview tips are not an interview",
+        "Interview tips: this calendar invitation was generated automatically.",
+        None,
+    ),
+    (
         "received: acknowledgement",
         "Vielen Dank für deine Bewerbung. Wir haben deine Unterlagen erhalten.",
         "received",

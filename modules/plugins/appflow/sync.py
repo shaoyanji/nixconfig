@@ -341,13 +341,36 @@ CONDITIONAL_INVITE = re.compile(
 )
 
 
+# Acknowledgement templates describe the process the candidate may go through,
+# and those clauses are the shape of an invitation without being one: Canonical
+# writes "interviewers you meet along the way", other ATS copy promises
+# "interview tips" or explains "the interview panel", and a calendar note states
+# that a meeting exists without inviting anyone to it. On 2026-11-21 one of those
+# sentences put a Canonical record at `interview` on the day it was applied to,
+# which is why the interview rule reads text with these clauses removed.
+INTERVIEW_BOILERPLATE = re.compile(
+    r"interviewers? (?:you|that|who|we|will)\b[^.]{0,100}"
+    r"|interview (?:tips|preparation|experience|panel|feedback)"
+    r"|prepare for (?:your|the|an) interview"
+    r"|questions? about (?:the|your) interview"
+    r"|(?:calendar )?(?:invitation|message) (?:was|is) (?:generated|sent) automatically"
+)
+
+
 def detect_event(text: str) -> tuple[str, str] | None:
     lowered = text.lower()
     received = next((pattern for kind, pattern, _ in EVENTS if kind == "received"), "")
     conditional = bool(CONDITIONAL_INVITE.search(lowered) and re.search(received, lowered))
+    # Boilerplate is removed only for the interview decision. The same sentences
+    # still count as an acknowledgement, which is what they are.
+    without_boilerplate = INTERVIEW_BOILERPLATE.sub(" ", lowered)
     for kind, pattern, label in EVENTS:
-        if kind == "interview" and conditional:
-            continue
+        if kind == "interview":
+            if conditional:
+                continue
+            if not re.search(pattern, without_boilerplate):
+                continue
+            return kind, label
         if re.search(pattern, lowered):
             return kind, label
     return None

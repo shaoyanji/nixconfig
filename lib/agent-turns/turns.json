@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-22T12:12:13Z",
+  "generated": "2026-11-22T12:13:58Z",
   "count": 200,
-  "pin": "fb6ec986cfe4b5dfa1c3d207fe689535600f0a220282250c9fbf2bc642121fea",
+  "pin": "94d29398453eb1a02beff8f539ba3ebd06f7ee631be0e23db6c19fc29b8bf2a3",
   "turns": [
+    {
+      "id": "09cd7d06-1778-43d1-ad4d-3e532f2fedc0",
+      "ts": "2026-11-22T12:13:48Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "in_progress: devin awaiting ashby submit confirmation for n8n; freebuff frieren compiling flox-mts; freebuff delphi authoring uni-rostock-sysadmin",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "390506c8095eea5d08aee0d88bfe49f01fb8512a",
+      "branch": "main",
+      "frame": "03ha7c7ppg6awmkghqvmo9czd"
+    },
+    {
+      "id": "05a25253-6a36-48e9-8a98-5bef766eb14f",
+      "ts": "2026-11-22T12:12:20Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:bwi-cloud-engineer",
+      "action": "landed: authored native German Typst sources for BWI Cloud Engineer 67851 (no .typ existed before), removed selection.json and the /nix/store packet symlink, compiled 0 warnings 2pp CV + 1pp letter, sheet carries measured hashes, DB row fit 3 and marked verified | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/bwi-cloud-engineer"
+      ],
+      "files": [],
+      "base_commit": "4337ebc31f9959a925179731cb1416889993ade0",
+      "branch": "main",
+      "frame": "03ha7bxdlm80uubz5peoxb29p"
+    },
     {
       "id": "1f653d28-e959-4490-8e85-ea590766b62b",
       "ts": "2026-11-22T12:12:08Z",
@@ -2822,32 +2850,6 @@
       "base_commit": "435cdcbdb3b3c4af72324350d9b85e758ec99fc5",
       "branch": "main",
       "frame": "03ha6psrxbv8ijzpk3xj5ti9a"
-    },
-    {
-      "id": "c214ac40-6487-4f7d-99ca-5b68e69f5f5f",
-      "ts": "2026-11-22T10:17:23Z",
-      "source": "devin",
-      "subject": "nixconfig:adyen-platform-observability",
-      "action": "claim: Greenhouse submission 7607691 (ambiguous prior-apply state)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "09919176b5676a08672aba99606fde245c0f9958",
-      "branch": "main",
-      "frame": "03ha6ph026jf0424y6bg2f5ek"
-    },
-    {
-      "id": "bb7a0ad1-bad9-4c2e-94bc-3ce8b307f547",
-      "ts": "2026-11-22T10:16:07Z",
-      "source": "freebuff",
-      "subject": "nixconfig:nebius-sre-berlin",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "09919176b5676a08672aba99606fde245c0f9958",
-      "branch": "main",
-      "frame": "03ha6p878jlueosb7y7bxmtnd"
     }
   ]
 }

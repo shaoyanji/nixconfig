@@ -1,8 +1,90 @@
 {
-  "generated": "2026-11-22T08:07:56Z",
+  "generated": "2026-11-22T08:13:04Z",
   "count": 200,
-  "pin": "d06a4724b5013eb017fe211e56f1930742addbf2ca163d81f036973509c7452f",
+  "pin": "6cc2cef2bcca0ba8073276ab92e9db1c04176fb0b1bfba4d2339a76e7d4a4787",
   "turns": [
+    {
+      "id": "4a85212a-9113-495a-8e61-a1dddef83782",
+      "ts": "2026-11-22T08:12:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff",
+      "action": "landed: freebuff pane 0:1.1 — Jev selected prose-change (p=0.90, margin=0.83); redaction task for docs/nix-consultancy-outreach.md submitted; pane shows working... with a fresh counter — task accepted",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
+      "branch": "main",
+      "frame": "03ha6159cbu2qwsao2z6nymo1"
+    },
+    {
+      "id": "d5303a6b-2407-43e2-85bc-c99d7fa8bc5d",
+      "ts": "2026-11-22T08:11:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-a3m-linux",
+      "action": "landed: 3 scouted leads (kiwigrid, smartclip, a3m) + A3M packet (2pp CV, 1pp letter, sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/a3m-senior-linux-devops submissions/kiwigrid-senior-sre submissions/smartclip-sre-observability"
+      ],
+      "files": [],
+      "base_commit": "140f7a3596c8e03972f7d8178861b4e8a523f6b4",
+      "branch": "main",
+      "frame": "03ha60uqa1hdpzldv853rhjnq"
+    },
+    {
+      "id": "b595ec5f-8114-4ff7-9d6f-08542b213bd8",
+      "ts": "2026-11-22T08:11:16Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: navvis senior linux platform munich (GH eu 4943654101) — both PDFs, auth Yes/sponsor No, EUR100k, OTP 58322339, /confirmation | gate: GH confirmation page",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
+      "branch": "main",
+      "frame": "03ha60u6cyoa4ynfmv6yrxw9p"
+    },
+    {
+      "id": "25afb9db-0dbb-4192-90fa-c5dce1cbee14",
+      "ts": "2026-11-22T08:10:00Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: navvis senior linux platform munich (GH eu 4943654101); no-sponsorship + commute/relocation Yes honest",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/navvis"
+      ],
+      "files": [],
+      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
+      "branch": "main",
+      "frame": "03ha60l6hqlthdc5ooteordk0"
+    },
+    {
+      "id": "fb0d488b-2417-4127-b8c4-eb11e9080d20",
+      "ts": "2026-11-22T08:08:34Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: adyen senior platform eng observability (GH 7607691) — both PDFs, NL=No/office=Yes, OTP 78878931, /confirmation; EEOC skipped | gate: GH confirmation page",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
+      "branch": "main",
+      "frame": "03ha60b75ul266wnzoxpz3m1u"
+    },
+    {
+      "id": "e7c99832-c1fe-47a5-a766-d44e164a9594",
+      "ts": "2026-11-22T08:08:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-rostock",
+      "action": "landed: Rostock sysadmin packet, CV 2pp letter 1pp, fixed term accepted, Windows gap named | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
+      "branch": "main",
+      "frame": "03ha60762nn5vsyurmrdd6sua"
+    },
     {
       "id": "bdc27242-b043-4e49-ae15-71904d938944",
       "ts": "2026-11-22T08:07:10Z",
@@ -2726,100 +2808,6 @@
       "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
       "branch": "main",
       "frame": "03h9zr68aq3jeq0ndji5xhe73"
-    },
-    {
-      "id": "29ab3d81-73c9-4a03-bcac-57b6bb2e923e",
-      "ts": "2026-11-21T11:41:26Z",
-      "source": "devin-agent",
-      "subject": "nixconfig:steward-devin-2026-11-21",
-      "action": "devin committed 50eba9e1 and pushed to origin/main — host-change: removed dead openrouter rung from modules/user/ai/hermes-persona/config.yaml fallback_providers (chain now custom → nvidia → ollama-cloud, 3 lanes ≥ 2 per infron gate, YAML verified); gmc -a also swept the pre-existing matt-site/CV/ATS edits; working tree clean; pane idle",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "50eba9e1aea51c2ffa8f15ffc4fdfcaef15b321c",
-      "branch": "main",
-      "frame": "03h9zclfkvvu4lotyyt7hf138"
-    },
-    {
-      "id": "4e6caccf-35fe-4ae5-a2f8-df420cd30e21",
-      "ts": "2026-11-21T11:39:35Z",
-      "source": "devin-agent",
-      "subject": "nixconfig:steward-devin-2026-11-21",
-      "action": "drove idle devin pane: host-change task submitted — remove dead openrouter rung from modules/user/ai/hermes-persona/config.yaml fallback_providers (its key 402s on failover), verify YAML, commit with gmc, push to origin/main; fresh Thinking counter confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "26f3a06e7ea8f4e9225b140e9e3fbd3b9a8a66ba",
-      "branch": "main",
-      "frame": "03h9zc8dfhm1rlcle6eg7ec0h"
-    },
-    {
-      "id": "a7844854-ae21-445e-bb9a-7278145fbc72",
-      "ts": "2026-11-21T10:55:23Z",
-      "source": "devin",
-      "subject": "nixconfig:decision-routers",
-      "action": "landed: decision-router layer fixed — Go router error-classed fallback + X-Decision-Provider header + dead :8080 upstream -> Strata :8085, 8 new tests in nix build; docs reconciled (Kev not a lane per operator record); jev-decide wrapper default typesafe from prior commit | gate: go test + nix doCheck + checks:quick + checks:router PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "modules/services/llm-decision-router/main.go",
-        "modules/services/llm-decision-router/main_test.go",
-        "modules/services/llm-decision-router.nix",
-        ".agents/skills/jevdecide/SKILL.md",
-        ".agents/skills/jevdecide/references/eisen-routing.md",
-        "docs/eisen-llm-architecture.md",
-        "hosts/eisen/llm-server.nix",
-        "flake/prose-budget.nix"
-      ],
-      "base_commit": "26f3a06e7ea8f4e9225b140e9e3fbd3b9a8a66ba",
-      "branch": "main",
-      "frame": "03h9z3ll5trv5ezfzor9e85h6"
-    },
-    {
-      "id": "eebb3d64-070c-4289-a7d0-acf06a19b71b",
-      "ts": "2026-11-21T10:46:49Z",
-      "source": "devin",
-      "subject": "nixconfig:decision-routers",
-      "action": "claim: fix decision-router layer end-to-end (jev wrapper done; audit nu lane, systemone, agent-lane, ultrafast scripts, gates, skill copies)",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/agent-lane.sh",
-        "modules/config/nu/decision.nu",
-        "modules/services/systemone",
-        "modules/user/ai/skills/jev-ultrafast",
-        ".agents/skills/jevdecide",
-        ".agents/skills/router"
-      ],
-      "files": [],
-      "base_commit": "cfb2fab4e1545bdd743e6bc7bf693bf71a962ae7",
-      "branch": "main",
-      "frame": "03h9z1xaxvdjgc2v8sypgs89x"
-    },
-    {
-      "id": "dffd503f-a3ea-402a-96ad-c218c2993e95",
-      "ts": "2026-11-21T09:48:48Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-21: 18 plate(s) kept of 20 spent, 2 roster row(s) waiting, 144 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9yql9iw14sg3y6ywea25ae"
-    },
-    {
-      "id": "4dd700a3-53b0-4f5a-aede-f5bbdc22a071",
-      "ts": "2026-11-21T09:16:52Z",
-      "source": "devin",
-      "subject": "nixconfig:compile-boundary",
-      "action": "landed: provenance gate — flake/provenance.nix class table + .#provenance + checks:provenance; 1162 files classed, unclassed fails; AGENTS.md kg trap -> task ops:kg | gate: check:verify 124/124 PASS, checks:provenance PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "db05efffaf83c371a92c8f1f849c998d793717b5",
-      "branch": "main",
-      "frame": "03h9ykcpwxpcayfcyf4p3e03n"
     }
   ]
 }

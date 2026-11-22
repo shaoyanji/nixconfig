@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — CV", author: "Matt Ji")
-#set page(paper: "a4", margin: (top: 1.4cm, bottom: 1.4cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 9.5pt, fill: rgb("#111827"), lang: "en", hyphenate: false)
-#set par(leading: 0.5em, justify: true)
+#set page(paper: "a4", margin: (top: 1.7cm, bottom: 1.7cm, left: 2.0cm, right: 2.0cm))
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 12pt, fill: rgb("#111827"), lang: "en", hyphenate: false)
+#set par(leading: 0.60em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
@@ -17,7 +17,7 @@
 #text(size: 9pt)[Linux systems administrator with ten years in operations, automation and reliability engineering. Ran thirteen servers across three hardware generations as one declarative fleet: a module per service, a feature list per host, every change a commit behind a gate, every previous state kept as a generation that can be rolled back. Built the telemetry because there was no monitoring budget: a sentinel job writing job status, generation age, disk and PSI pressure to a JSONL ledger every 15 minutes, Gatus endpoint checks, and a Go bridge that acknowledges an alert only once delivery is confirmed. Diagnoses incidents from that data and the logs before users report them. Works close to the kernel: cgroup limits per service, PSI as a first-class signal, systemd hardening, namespaces, nftables. Prometheus, Grafana, OpenTelemetry, Tempo, Loki, Kubernetes and database operations at scale are not part of this experience. Based in Germany, 100% remote available; US citizen with permanent German residence, no sponsorship needed. German C1, English native.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
-  #v(5pt)
+  #v(10pt)
   #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#kind]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
@@ -35,7 +35,7 @@
       #for bullet in bullets [- #bullet]
     ]
   ]
-  #v(3pt)
+  #v(7pt)
 ]
 
 #section("Experience")

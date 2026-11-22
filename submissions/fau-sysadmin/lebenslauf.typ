@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
-#set page(paper: "a4", margin: (top: 1.5cm, bottom: 1.5cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
-#set par(leading: 0.58em, justify: true)
+#set page(paper: "a4", margin: (top: 1.6cm, bottom: 1.6cm, left: 1.9cm, right: 1.9cm))
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 11.5pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set par(leading: 0.70em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]

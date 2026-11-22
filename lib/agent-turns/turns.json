@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T09:40:54Z",
+  "generated": "2026-11-22T09:41:52Z",
   "count": 200,
-  "pin": "e5e84afd6badfd48bbf72b66d4a5d74e80e899fa038f5fa04b1bb15157ddd1c8",
+  "pin": "6644c4e93e13842e03a95cfea630ce1db00e1368ac0f9d5a6f526fd248265220",
   "turns": [
+    {
+      "id": "078f8ae6-cf0d-4da1-9208-926c0859936d",
+      "ts": "2026-11-22T09:41:46Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "alexander-thamm: Join.com already holds a submitted application (55774203, status=Übermittelt, both PDFs) — verified via magic-link auth; no duplicate filed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bee06c65a0f93e7fb9e891b71e95deaa544946e3",
+      "branch": "main",
+      "frame": "03ha6iikyrdkz9bs4wqgl2ude"
+    },
+    {
+      "id": "5c4bbdfc-e2ac-4fde-92c6-e3ecf39e8b03",
+      "ts": "2026-11-22T09:40:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:stackit-iac",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bee06c65a0f93e7fb9e891b71e95deaa544946e3",
+      "branch": "main",
+      "frame": "03ha6id05or8x6we3cpsvxbwv"
+    },
     {
       "id": "fb9dd270-d428-4d69-b4c0-299c477913e9",
       "ts": "2026-11-22T09:40:16Z",
@@ -2725,34 +2751,6 @@
       "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
       "branch": "main",
       "frame": "03ha57juhuvwzhxxuty2rrnqy"
-    },
-    {
-      "id": "4eec5a3e-0596-4876-b96e-3be72f40a211",
-      "ts": "2026-11-22T05:41:20Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-elastic-cicd-packet",
-      "action": "landed: drove freebuff pane to build the Elastic Principal CI/CD Platform packet in submissions/elastic-principal-cicd-platform (JD + lead present, no packet yet)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
-      "branch": "main",
-      "frame": "03ha57jshjx0eb6g0jgh8vuai"
-    },
-    {
-      "id": "6d9d9c43-e76c-490c-af18-d34d597075db",
-      "ts": "2026-11-22T05:41:16Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-elastic-packet",
-      "action": "landed: Elastic Principal CI/CD packet built from the lead's JD (unsent, no form opened). Projection 11/32 highlights, security/artifact weighted, nixconfig + kev-time kept. Letter asks whether a Germany contract exists for a Poland req instead of assuming relocation, and concedes no Buildkite/Argo CD/prod Kubernetes and no org-wide policy layer. CV 2pp, letter 1pp verified from built PDFs.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/elastic-principal-cicd-platform"
-      ],
-      "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
-      "branch": "main",
-      "frame": "03ha57japuwia9k0yrohfeyam"
     }
   ]
 }

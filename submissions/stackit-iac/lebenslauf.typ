@@ -38,13 +38,14 @@ beschreiben, der überprüfbar ist: dreizehn Linux-Hosts aus einer Deklaration, 
 durch ein Gate, das in CI und auf dem Host identisch ist, jeder Rückweg ein Zeiger auf die vorige Generation.
 Ich habe diese Arbeitsweise fünf Jahre lang in Nix betrieben — deklarativ, reproduzierbar, mit Rollback — und
 kenne die Fragen, die dabei entstehen: was ist der wahre Zustand, was driftet, was passiert beim zweiten Lauf.
-Terraform selbst habe ich nicht produktiv verantwortet; die Denkweise, der Plan-vor-Apply-Zwang und die
-Ablehnung von Handarbeit sind dieselben. Deutsch C1, Englisch Muttersprache, US-Staatsbürger mit deutscher
-Niederlassungserlaubnis.
+Terraform, Ansible und helm habe ich nicht produktiv eingesetzt, Kubernetes nicht als Administrator betreut;
+die Denkweise, der Plan-vor-Apply-Zwang und die Ablehnung von Handarbeit sind dieselben. Deutsch C1, Englisch
+Muttersprache, US-Staatsbürger mit deutscher Niederlassungserlaubnis.
 
 #section("Schwerpunkte")
 #grid(columns: (1fr, 1fr), column-gutter: 14pt, row-gutter: 2pt,
   [*IaC* — deklarierter Zustand, gepinnte Inputs, Plan vor Apply, Rebuild statt Reparatur],
+  [*Container* — gepinnte Bauumgebungen, MicroVMs als Gäste; kein K8s-Betrieb],
   [*Linux* — NixOS, systemd, journald, cgroups/PSI, nftables, tcpdump],
   [*Automatisierung* — Go, Python, Bash hinter einer einheitlichen Task-Oberfläche],
   [*Gates* — Prüfung identisch in CI und Host, kein Rollout ohne Check],

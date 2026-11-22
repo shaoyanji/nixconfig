@@ -1,4 +1,4 @@
-// STACKIT / Schwarz Digits — Infrastructure as Code / Terraform Platform Engineer. Deutsches Anschreiben.
+// STACKIT / Schwarz Digits — DevOps / Cloud Engineer, Kubernetes & IaC (GT4627). Deutsches Anschreiben.
 #set page(paper: "a4", margin: (x: 2.3cm, y: 1.9cm))
 #set text(font: "DejaVu Sans", size: 9.9pt, fill: rgb("#191919"), lang: "de")
 #set par(justify: true, leading: 0.62em)
@@ -16,37 +16,42 @@
 #text(size: 8.8pt, fill: muted)[22. November 2026]
 #v(0.4cm)
 STACKIT / Schwarz Digits\\
-Bad Friedrichshall, Baden-Württemberg
+Frau Lara Schlimgen\\
+Am Campus 1\\
+74177 Bad Friedrichshall
 
 #v(0.55cm)
-#text(weight: "bold", size: 10.3pt)[Bewerbung als Infrastructure as Code / Terraform Platform Engineer (m/w/d)]
+#text(weight: "bold", size: 10.3pt)[Bewerbung als DevOps / Cloud Engineer — Kubernetes & Infrastructure as Code (GT4627)]
 #v(0.45cm)
 
-Sehr geehrte Damen und Herren,
+Sehr geehrte Frau Schlimgen,
 
-Infrastructure as Code wird dann wertvoll, wenn die Beschreibung stimmt und nicht nur existiert. Deshalb habe
-ich fünf Jahre lang genau das geprüft: dreizehn Linux-Hosts aus einer Deklaration, gepinnte Inputs, jede
-Änderung durch ein Gate, das in der CI und auf dem Host identisch läuft, jeder Rückweg ein Zeiger auf die
-vorige Generation. Abweichung war bei mir kein Betriebszustand, sondern ein Fehler, der über die Deklaration
-behoben wird — nicht über eine Shell, die niemand später findet.
+eine Plattform, die ServiceNow-Dienste für Kunden einer souveränen Cloud trägt, wird an zwei Stellen geprüft:
+ob sie unter Last stabil bleibt und ob ihr Zustand belegbar ist, wenn ein Prüfer nach BSI C5 oder DORA fragt.
+An der zweiten Stelle arbeite ich seit fünf Jahren: dreizehn Linux-Hosts aus einer Deklaration, jede Änderung
+durch ein Gate, das in der CI und auf dem Host identisch läuft, jeder Rückweg ein Zeiger auf die vorige
+Generation, dazu Telemetrie alle fünfzehn Minuten und Härtung als Voreinstellung statt als Projekt.
 
-Zu den Werkzeugen: Meine deklarative Arbeit steckt in Nix, mit Modulen, gepinnten Inputs, Host-Definitionen aus
-Feature-Listen und einem Rebuild, der eine Funktion des Repositories ist. Die Fragen sind bei Terraform
-dieselben: Was ist der wahre Zustand, was driftet, was passiert beim zweiten Lauf, wer darf den Plan sehen und
-wer den Apply. Dazu kommt Automatisierung über die Sprachgrenzen — Go, Python, Bash, alles hinter einer
-Task-Oberfläche, damit ein Kollege es ohne Rückfrage ausführen kann — und Betrieb mit Telemetrie, Rollback und
-dokumentiertem Rückweg.
+Konkret: nftables als Default-Deny mit expliziten Freigaben, Secrets pro Host mit SOPS und age verschlüsselt,
+Zugang über eine SSH-CA mit kurzlebigen Zertifikaten, Abhängigkeiten auf bekannte Schwachstellen geprüft. Für
+Observability gibt es ein Ledger, das Jobstatus, Generation Age, Disk-Druck und PSI erfasst und jeden Wert
+außerhalb des Erwarteten meldet; Fehlersuche läuft mit journald, cgroups, tcpdump und strace bis zur Ursache
+und wird aufgeschrieben, damit der nächste Fall billiger ist. Autoscaling und SLA-Denken sind mir aus der
+Energiebranche vertraut, wo Verfügbarkeit eine Kennzahl mit Vertragsfolge war, nicht eine Absicht.
 
-Was ich nicht mitbringe, sage ich vorab: Terraform habe ich nicht produktiv verantwortet, ebenso wenig
-AWS- oder Azure-Infrastruktur als Eigentümer. Ich kann die Konzepte und die Disziplin, die eine solche Plattform
-braucht, und ich kenne die Fehler, die aus ungepinnten Modulen und ungeprüften States entstehen; die konkrete
-Provider- und Workspace-Erfahrung fehlt. Wer jemanden für einen laufenden Terraform-Bestand ab Tag eins
-braucht, findet ihn bei anderen Bewerbern. Wer jemanden braucht, der die Plattform aus einer sauberen
-Deklaration heraus aufbaut und den Review-Prozess ernst nimmt, ist bei mir richtig.
+Zur Technik, die Ihre Anzeige nennt, und zu dem, was ich davon nicht habe: Kubernetes habe ich nicht als
+Administrator betreut — keine Cluster-Upgrades, keine Pod-Security-Policies, keine Network-Policies im Betrieb.
+Terraform, Ansible und helm habe ich nicht produktiv eingesetzt, eine GitLab-Pipeline habe ich nicht entworfen,
+und ServiceNow kenne ich als Anwender von Tickets, nicht als Plattform. Meine deklarative Arbeit steckt in Nix,
+mit Modulen, gepinnten Inputs und Rebuild als reproduzierbarem Pfad; CI-Gates habe ich gebaut, nur nicht in
+GitLab. Wenn die Stelle diese Werkzeuge ab Tag eins und in dieser Breite verlangt, bin ich nicht der passende
+Kandidat — das sage ich lieber jetzt als nach drei Gesprächen.
 
-Zum Rahmen: Ich wohne in Baden-Württemberg, rund zwei Stunden von Bad Friedrichshall, und Präsenztage in der
-Region sind für mich normal. Ich bin US-Staatsbürger mit deutscher Niederlassungserlaubnis — unbefristetes
-Aufenthaltsrecht, kein Sponsoring nötig. Deutsch ist C1, Englisch Muttersprache.
+Was ich mitbringe, ist die Arbeitsweise, um die herum diese Rolle gebaut ist: Infrastruktur als Code mit
+Review, Drift als Fehler statt als Zustand, Härtung mit Nachweis, Betrieb mit Telemetrie und definiertem
+Rückweg. Ich wohne in Baden-Württemberg, rund zwei Stunden vom Campus, Präsenztage sind für mich normal. Ich
+bin US-Staatsbürger mit deutscher Niederlassungserlaubnis, unbefristetes Aufenthaltsrecht, kein Sponsoring
+nötig. Deutsch C1, Englisch Muttersprache.
 
 Mit freundlichen Grüßen,
 #v(0.5cm)

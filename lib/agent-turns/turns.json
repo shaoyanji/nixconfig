@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:29:49Z",
+  "generated": "2026-11-22T09:30:04Z",
   "count": 200,
-  "pin": "63fa3bbef2d9d74347f2c7e138aa8eae3ce066a6b66094ced3195eeaf0736019",
+  "pin": "342cf714bc2c6f8045c6712b0612e924112a096de49f805dd55df7506742009c",
   "turns": [
+    {
+      "id": "9d1c802d-cf0d-4064-8b5d-40139809875c",
+      "ts": "2026-11-22T09:29:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "alexander-thamm upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39b3b24fddf54d0469ea8b3a587e085d7dfb09d6",
+      "branch": "main",
+      "frame": "03ha6g6swy5xwlx5uf1me4t9l"
+    },
     {
       "id": "65a538dc-f796-470d-823b-6d3dc2cecd93",
       "ts": "2026-11-22T09:28:43Z",
@@ -2746,19 +2759,6 @@
       "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
       "branch": "main",
       "frame": "03ha4uwnqpjox0v8sshl4detk"
-    },
-    {
-      "id": "a280cfa8-9a11-4737-863a-a05450fac7e2",
-      "ts": "2026-11-22T04:31:39Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: ScorePlay SRE (remote, emailed marketing@ after Ashby submit hung 3x); Amprion SF profile completion noted; testo account-confirm mail received",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
-      "branch": "main",
-      "frame": "03ha4txnzldh33shhdqe1atgd"
     }
   ]
 }

@@ -55,7 +55,7 @@ nicht aus einer Schätzung.
 | Marker | `Principal`, `eisen`, `95.000`, `110.000`, `Niederlassungserlaubnis` |
 | `task checks:prose` | 241 prose files, exit 0 |
 | sha256 Lebenslauf | `bcb82bf0fb3a0b84295b0ce9a4c098b0033d93d841d88936758fad793a13fb20` |
-| sha256 Anschreiben | `dbb90296adb3e1a10aab048034cbac487b9a440df0dcfbf3d19ebf64e9d3d21a` |
+| sha256 Anschreiben | `535e81def5bd1771129bb1ffffd40111a4f9c264c461650d196d4deb4e4b9059` |
 | Altlasten | `selection.json` und alte PDFs entfernt |
 
 ## Nächste Schritte

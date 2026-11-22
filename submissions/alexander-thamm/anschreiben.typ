@@ -45,7 +45,7 @@ die Änderung nicht durch, unabhängig davon, wer sie geschrieben hat. Ob Sie je
 Architektur und Betrieb suchen, sollten wir im ersten Gespräch klären, bevor beide Seiten Aufwand
 investieren.
 
-Zum Rahmen: Meine Gehaltsvorstellung liegt bei **95.000 bis 110.000 € brutto jährlich** und damit im
+Zum Rahmen: Meine Gehaltsvorstellung liegt bei *95.000 bis 110.000 € brutto jährlich* und damit im
 Rahmen der ausgeschriebenen Bandbreite. Ich bin US-Staatsbürger mit deutscher Niederlassungserlaubnis —
 unbefristetes Aufenthaltsrecht, kein Sponsoring nötig. Deutsch ist C1, Englisch Muttersprache. Reisebereitschaft
 zu Kundenterminen bringe ich mit; remote arbeite ich seit 2020.

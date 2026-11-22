@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T09:38:34Z",
+  "generated": "2026-11-22T09:40:54Z",
   "count": 200,
-  "pin": "360085fe0182c35f622c9ebb010aacd476545e5b47ca9a12d87e05bde0d6efb4",
+  "pin": "e5e84afd6badfd48bbf72b66d4a5d74e80e899fa038f5fa04b1bb15157ddd1c8",
   "turns": [
+    {
+      "id": "fb9dd270-d428-4d69-b4c0-299c477913e9",
+      "ts": "2026-11-22T09:40:16Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: alexander-thamm join.com submission (12492799)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a5b4344e29dd4777e80763714007cf2f1861ca6e",
+      "branch": "main",
+      "frame": "03ha6i81ddubr5ztci221p3d5"
+    },
+    {
+      "id": "723e52e7-811a-44d6-b538-ccfc0b6192ea",
+      "ts": "2026-11-22T09:38:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "stackit-sre upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a5b4344e29dd4777e80763714007cf2f1861ca6e",
+      "branch": "main",
+      "frame": "03ha6hwdr7194ln3pol8g8bx0"
+    },
     {
       "id": "20d826af-ac93-42a6-870b-72ac7a089ca5",
       "ts": "2026-11-22T09:38:33Z",
@@ -2727,34 +2753,6 @@
       "base_commit": "c99a72ffae1b858712f36e240c1a4e94bfdca2da",
       "branch": "main",
       "frame": "03ha57japuwia9k0yrohfeyam"
-    },
-    {
-      "id": "819937b2-9de5-419f-86fb-513c939ecacd",
-      "ts": "2026-11-22T05:33:08Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-maze-packet",
-      "action": "landed: Maze Senior SRE packet built (was claimed ready with no dir). Ashby JD fetched, projection 12/32 highlights security-weighted, 1-page letter asks about Germany outside the preferred NL/UK/IE/ES/PT list instead of assuming relocation. CV 2pp + letter 1pp verified from the built PDFs. Record now 'packet built 2026-11-22 - not submitted'; nothing sent. Also pushed flix e0edc539 earlier this turn",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/maze"
-      ],
-      "base_commit": "64b2be334e7ab3d6ad3214111bd83cd767c60804",
-      "branch": "main",
-      "frame": "03ha55y1ssbhx7omadoo0wsem"
-    },
-    {
-      "id": "479b74d1-0b82-42bb-8de9-f1c890c99d34",
-      "ts": "2026-11-22T05:31:39Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-next-packet",
-      "action": "landed: drove freebuff pane to push flix commit e0edc539 to origin/main and build the next prep-stage application packet",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
-      "branch": "main",
-      "frame": "03ha55nmi06ddn4vypzwou1r9"
     }
   ]
 }

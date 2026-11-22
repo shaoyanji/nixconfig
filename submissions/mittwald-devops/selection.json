@@ -1,0 +1,269 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 5970,
+    "terms": [
+      {
+        "term": "service",
+        "weight": 16.633
+      },
+      {
+        "term": "plattform",
+        "weight": 15.868
+      },
+      {
+        "term": "linux",
+        "weight": 14.628
+      },
+      {
+        "term": "cloud",
+        "weight": 14.603
+      },
+      {
+        "term": "systemumgebung",
+        "weight": 11.802
+      },
+      {
+        "term": "devops",
+        "weight": 9.632
+      },
+      {
+        "term": "cloud-tools",
+        "weight": 8.625
+      },
+      {
+        "term": "deployments",
+        "weight": 8.625
+      },
+      {
+        "term": "infrastruktur",
+        "weight": 8.625
+      },
+      {
+        "term": "systemnah",
+        "weight": 8.625
+      },
+      {
+        "term": "tech",
+        "weight": 8.233
+      },
+      {
+        "term": "containern",
+        "weight": 7.651
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "matt.bountystash.com",
+        "score": 3.0798
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "bountystash",
+      "fibtransponder",
+      "Risikoberechnungs-Engine (Swirl Engine)"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Alarmzustellung"
+        },
+        {
+          "score": 0.0,
+          "text": "LLM-Betrieb"
+        }
+      ],
+      "kept": 6,
+      "name": "Observability",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Ressourcenlimits"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Plattform",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "GitOps"
+        },
+        {
+          "score": 0.0,
+          "text": "YAML"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 6.5737,
+          "text": "Automatisierte Betriebsprozesse, Auswertungen und Deploy-Ketten in Go, Python und Bash"
+        },
+        {
+          "score": 5.2048,
+          "text": "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledge"
+        },
+        {
+          "score": 4.3194,
+          "text": "Prüfte Endpunkte mit Gatus und band jedes Alerting an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachr"
+        },
+        {
+          "score": 3.0031,
+          "text": "Beschaffte, installierte und betrieb die Hardware unter der Flotte über drei Generationen, inklusive Boot- und Netzkonfi"
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 4.2254,
+          "text": "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
+        },
+        {
+          "score": 2.4395,
+          "text": "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften."
+        },
+        {
+          "score": 0.0,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 3.5515,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 1.725,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete die Sicherheitsschulung der Crew."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

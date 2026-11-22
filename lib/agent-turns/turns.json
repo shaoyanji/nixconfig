@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-22T07:33:24Z",
+  "generated": "2026-11-22T07:34:57Z",
   "count": 200,
-  "pin": "4475ee9cc99c94671956a2a8f02df41345f915058bbe3ce767dbfa63f7e92f62",
+  "pin": "0da5fe4d861108a7d4d9a3656dceeea010c41b1f6d33d5c47b0508a3e7eacf7a",
   "turns": [
+    {
+      "id": "a83da432-885c-4a91-b96e-672439e61313",
+      "ts": "2026-11-22T07:34:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-sva-terraform",
+      "action": "amended: earlier turn named 136c4058; the commit was rewritten to 57b657ec after prose fixed curly quotes. Packet content unchanged | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/sva-terraform"
+      ],
+      "files": [],
+      "base_commit": "57b657ec9fe901bb4d2fef3f67df2d4a5fe88c86",
+      "branch": "main",
+      "frame": "03ha5tm65yzfmsomq4ytsplt8"
+    },
     {
       "id": "0abae706-5e1d-49ab-8d00-e0867039895a",
       "ts": "2026-11-22T07:33:21Z",
@@ -2809,19 +2824,6 @@
       "base_commit": "34a34847a6207039ae316e6687c37fc6226dc1ac",
       "branch": "main",
       "frame": "03h9xmphh5y3pglbdpco5u7ly"
-    },
-    {
-      "id": "ec5b003f-7fcc-40cb-8f3f-c147431f8422",
-      "ts": "2026-11-21T06:23:59Z",
-      "source": "devin",
-      "subject": "nixconfig:cv-lebenslauf-link-gate",
-      "action": "confirmed: independently re-verified on current tree at 8cda1c98 — site-links --gap rc=0 (15 pages, 4 PDFs, no gaps), full rc=0 (81 links, 16 download anchors), cv-blog-check rc=0 (2 published CVs match+linked), fixture 16/16 via checks:quick; freebuff failure resolved",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cda1c98201c0c7f60554f3ac2534594f555bbdc",
-      "branch": "main",
-      "frame": "03h9xmkz8d0urs15mn01eglo6"
     }
   ]
 }

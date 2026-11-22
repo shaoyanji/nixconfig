@@ -2,7 +2,7 @@
 
 Stand: 22. November 2026
 Kennung: 2015 (Interamt-Angebots-ID 1513404)
-Fit: 3
+Fit: 3 / 5
 
 ## Stelle
 
@@ -23,16 +23,18 @@ Fit: 3
 
 ## Bewerbungsweg
 
-Die Anzeige steht auf Interamt unter der Angebots-ID 1513404, beworben wird aber ausschließlich über die Bewerbungsseite der FAU mit der Kennung 2015. Interamt, Post und E-Mail sind ausdrücklich ausgeschlossen. Wer die Interamt-Schaltfläche benutzt, hat nicht beworben.
+Die Anzeige steht auf Interamt unter der Angebots-ID 1513404, beworben wird aber ausschließlich über die Bewerbungsseite der FAU mit der Kennung 2015. Das steht so in der Anzeige: nicht über Interamt, nicht per Post, nicht per E-Mail. Der Datenbankeintrag führt die Interamt-URL als Bewerbungsadresse; das ist als Verweis auf die Anzeige zu lesen, nicht als Bewerbungsweg. Wer dort absendet, hat nicht beworben.
 
-Das Bewerbungsportal der FAU wurde nicht gerendert; es wurde nichts abgeschickt.
+Das Portal der FAU wurde nicht gerendert; es wurde nichts abgeschickt.
 
 ### Dokumente
 
 | Dokument | Datei | Hinweis |
 | :--- | :--- | :--- |
-| Anschreiben | `anschreiben.pdf` | Eine Seite, deutsch, an Herrn Tochtermann |
+| Anschreiben | `anschreiben.pdf` | Eine Seite, DIN-5008-nah, deutsch, an Herrn Tochtermann |
 | Lebenslauf | `lebenslauf.pdf` | Zwei Seiten, deutsch |
+| Anschreiben-Quelle | `anschreiben.typ` | Typst, direkt kompilierbar |
+| Lebenslauf-Quelle | `lebenslauf.typ` | Typst, direkt kompilierbar |
 | Zeugnisse | keine Datei | Werden verlangt, müssen ergänzt werden |
 | Führerschein Klasse B | keine Datei | Wird verlangt; Nachweis vor dem Absenden klären |
 
@@ -47,8 +49,9 @@ Das Bewerbungsportal der FAU wurde nicht gerendert; es wurde nichts abgeschickt.
 | Sprachen | Deutsch C1, Englisch Muttersprache |
 | Abschluss | M.Sc. Erneuerbare-Energien-Management, Albert-Ludwigs-Universität Freiburg, 2014 |
 | Forschung | Wissenschaftliche Hilfskraft, Fraunhofer ISE Freiburg, 2012 |
-| Linux | Dreizehn NixOS-Hosts, Rollen je Host, nftables, WireGuard, DNS, systemd |
+| Linux | Dreizehn NixOS-Hosts, Rollen je Host, systemd, nftables, WireGuard, DNS |
 | Speicherung | restic auf NAS, geprüfte Rücksicherungen |
+| Überwachung | Sentinel-Ledger alle 15 Minuten, Gatus, Go-Bridge mit Zustellbestätigung |
 | Anwenderbetreuung | Konten, Schlüssel, Zugänge, Hard- und Softwarefragen, Runbooks |
 | Umzug | Erlangen machbar, Start 15.02.2027 machbar |
 
@@ -61,21 +64,21 @@ Das Bewerbungsportal der FAU wurde nicht gerendert; es wurde nichts abgeschickt.
 | Sehr gute Kenntnisse Windows und Ubuntu | Ubuntu-nahes Linux stark; Windows auf Workstation-Ebene | Linux ja, Windows teilweise |
 | Windows Server 2019/2022/2025, AD, DNS, GPO | Nicht administriert | Lücke |
 | Installation komplexer Software, Lizenzserver | Reproduzierbare Installation aus gepinnter Beschreibung; kein Lizenzserver | Teilweise |
-| Backup-Systeme und Virtualisierung, Hyper-V | restic mit geprüften Rücksicherungen; kein Hyper-V | Teilweise |
+| Backup-Systeme und Virtualisierung, Hyper-V | restic mit geprüften Rücksicherungen; kein Hyper-V, keine Servervirtualisierung | Backup ja, Virtualisierung nein |
 | Hardwarekenntnisse | Beschaffung, Installation, Inbetriebnahme über drei Generationen | Stark |
 | PowerShell und MS Office | Shell, Python, Go; Office als Nutzer | Grundlagen |
 | Rechteverwaltung in Linux und Windows | Deklarative Rollen je Host in Linux | Linux ja, Windows nein |
 | Führerschein Klasse B | Unbestätigt | Offen, vor Absenden klären |
 | Deutsch C1, Englisch B2 | C1 und Muttersprache | Übertrifft |
-| Standortwechsel, Transport von Systemen | Drei Standorte in eigener Flotte, Fahrten selbst gemacht | Plausibel |
+| Standortwechsel, Transport von Systemen | Drei Standorte in eigener Flotte | Plausibel |
 
-Auswahl im Lebenslauf: 15 von 32 Highlights, 4 von 5 Projekten.
+## Fit-Begründung: 3 von 5
+
+Drei, weil die Stelle inhaltlich fast deckungsgleich ist: Linux-Betrieb, Rechteverwaltung, Sicherung, Anwenderbetreuung, Beschaffung, mehrere Standorte, Forschungsumgebung. Nicht vier, weil drei Pflichtpunkte fehlen: Windows Server mit Active Directory und Group Policies, Servervirtualisierung mit Hyper-V und die Betreuung von CAD- und FE-Software samt Lizenzservern. Nicht zwei, weil die Linux-Seite tatsächlich betrieben wird und nicht nur behauptet: dreizehn Hosts, deklarative Rollen, geprüfte Rücksicherungen, Telemetrie mit Zustellbestätigung.
 
 ## Gehalt
 
 TV-L E 10, Stufe nach Erfahrung, zusätzliche Jahressonderzahlung. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt über E 10; im Anschreiben steht keine Zahl. E 11 ist an die Übernahme der Leitungsfunktion gebunden, nicht an die Einstellung.
-
-Die Befristung bis 31.03.2028 und die Leitungsnachfolge gehören zusammen: Die Stelle ist auf Weiterführung angelegt, aber zunächst befristet.
 
 ## Formularzuordnung
 
@@ -111,9 +114,10 @@ Das FAU-Portal wurde nicht gerendert. Werte ohne belegte Feld-IDs; Beschriftunge
 | Datei | Inhalt |
 | :--- | :--- |
 | `job-description.txt` | Anzeige mit Aufgaben, Profil, Rahmenbedingungen und Bewerbungsweg. |
-| `resume.json` | Quelldaten des Lebenslaufs. |
-| `letter.json` | Quelldaten des Anschreibens. |
+| `lebenslauf.typ` | Typst-Quelle des Lebenslaufs, eigenständig kompilierbar. |
+| `anschreiben.typ` | Typst-Quelle des Anschreibens, eigenständig kompilierbar. |
 | `lebenslauf.pdf` | Deutscher Lebenslauf, zwei Seiten. |
 | `anschreiben.pdf` | Deutsches Anschreiben, eine Seite. |
-| `selection.json` | Audit der Auswahl. |
+| `resume.json`, `letter.json` | Frühere Quelldaten aus dem Generator (bleiben als Historie). |
+| `selection.json` | Audit der früheren Auswahl. |
 | `submission-sheet.md` | Diese Feldzuordnung. |

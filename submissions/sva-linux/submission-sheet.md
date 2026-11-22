@@ -54,10 +54,10 @@ keine Bandbreite; die Zahl ist damit eine Verhandlungsposition, keine Messlatte.
 | `typst compile anschreiben.typ` | exit 0, keine Warnungen |
 | `pdfinfo lebenslauf.pdf` | **2 Seiten** |
 | `pdfinfo anschreiben.pdf` | **1 Seite** |
-| Marker | `j734`, `Schnewlinstraße`, `85.000`, `Freiburg`, `Niederlassungserlaubnis` |
+| Marker | `j734`, `Schnewlinstraße`, `85.000`, `Freiburg`, `Niederlassungserlaubnis`; CV: `Telemetrie`, `Freiburger Geschäftsstelle`, `Kundenprojekte` |
 | `task checks:prose` | 241 prose files, exit 0 |
 | sha256 Lebenslauf | `0c52291b60ce9f8932372371883d554692a2a4a71530ca54bd412bb6b152a7e7` |
-| sha256 Anschreiben | `c60544d5e4175cfc387bb4085f9d46eb7e08a9a5c7b15578a4305ccb0e08ac11` |
+| sha256 Anschreiben | `6ce6434f4137ceaefa860850f5ec49c4a6c31d3e73f5875c71a6e9754dd7faf5` |
 
 ## Nächste Schritte
 

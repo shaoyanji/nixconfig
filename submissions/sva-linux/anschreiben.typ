@@ -47,9 +47,9 @@ nicht produktiv administriert. Wer für ein Kundenprojekt einen zertifizierten S
 braucht, findet ihn bei anderen Bewerbern; wer jemanden braucht, der Linux, Automatisierung und Übergabe
 beherrscht und sich in ein Produkt einarbeitet, ist bei mir richtig.
 
-Zum Rahmen: Ich bewerbe mich ausdrücklich für die **Geschäftsstelle Freiburg, Schnewlinstraße 12** — Gutach
+Zum Rahmen: Ich bewerbe mich ausdrücklich für die *Geschäftsstelle Freiburg, Schnewlinstraße 12* — Gutach
 liegt rund 25 Kilometer entfernt, 25 Minuten Arbeitsweg, Präsenz beim Kunden im Umkreis ist für mich kein
-Thema. Meine Gehaltsvorstellung liegt bei **85.000 € brutto jährlich**. Ich bin US-Staatsbürger mit deutscher
+Thema. Meine Gehaltsvorstellung liegt bei *85.000 € brutto jährlich*. Ich bin US-Staatsbürger mit deutscher
 Niederlassungserlaubnis — unbefristetes Aufenthaltsrecht, kein Sponsoring nötig. Deutsch ist C1, Englisch
 Muttersprache.
 

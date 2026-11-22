@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:35:36Z",
+  "generated": "2026-11-22T09:35:54Z",
   "count": 200,
-  "pin": "5d9d059a888837c13248b5b2beb2dd3e8cea91784934764fb942532a9f4b3d79",
+  "pin": "833ead16ed75e8fb88dc89e42382b57fb6f36fbed8fdff0ed6a45281f7da26cf",
   "turns": [
+    {
+      "id": "56a61d4d-27df-463a-a234-b75bb36e1efa",
+      "ts": "2026-11-22T09:35:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "sva-linux upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9a4eba5a49c3380d9e7ed690a8cd185b727ffa2c",
+      "branch": "main",
+      "frame": "03ha6hbghso9pt0m646s1159w"
+    },
     {
       "id": "17b5e953-9a91-42d2-afbb-712193d619dc",
       "ts": "2026-11-22T09:34:01Z",
@@ -2744,19 +2757,6 @@
       "base_commit": "e0edc53919811ca40a27ff2b7c4cd11714c3ac57",
       "branch": "main",
       "frame": "03ha50tzfal5e81qw7nkyy293"
-    },
-    {
-      "id": "1467e99e-ceb0-4912-a33b-f517bdc60b59",
-      "ts": "2026-11-22T05:03:04Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: IONOS x2 — Customer Ops Engineer 24/7 (Berlin hybrid, fit5) + Linux Sysadmin Defense Products (Karlsruhe, fit3, BGP gap honest) via Greenhouse + email-OTP | gate: confirmation pages + db-write PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
-      "branch": "main",
-      "frame": "03ha502lc7erqqx2c38ywmlhq"
     }
   ]
 }

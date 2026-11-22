@@ -1,8 +1,124 @@
 {
-  "generated": "2026-11-22T10:50:29Z",
+  "generated": "2026-11-22T10:55:41Z",
   "count": 200,
-  "pin": "28db9d10e32a83c0f2508df1ae5ee1fc02b1f450f0c0fb988c719da6ef31c295",
+  "pin": "5e9c382ec37ff8831674d47e47579cd82bc42f29f730d25d9b3854185bd82aab",
   "turns": [
+    {
+      "id": "2c041da4-03a1-4c3a-a091-f40355ac9ee0",
+      "ts": "2026-11-22T10:55:09Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-prometheus",
+      "action": "compiled: native German Typst packet 2pp CV + 1pp letter for SRE Prometheus; measured hashes in sheet; Prometheus/Grafana/Loki gap conceded; fit 3",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-prometheus"
+      ],
+      "files": [],
+      "base_commit": "9479551379e235ac6611f6157e32766efa40c68f",
+      "branch": "main",
+      "frame": "03ha6wulbanobtl8yhkez3b1d"
+    },
+    {
+      "id": "fd82e707-5e78-4db2-b7a7-722610d431db",
+      "ts": "2026-11-22T10:54:44Z",
+      "source": "devin",
+      "subject": "nixconfig:mozilla",
+      "action": "re-assigned; already applied: Staff SWE Tools & Systems — applied record + ack mail on file. Skipped duplicate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
+      "branch": "main",
+      "frame": "03ha6wrr7dwuemvozq4yinnb9"
+    },
+    {
+      "id": "eda0d40c-7d60-4243-8d57-a5e70c9cff5f",
+      "ts": "2026-11-22T10:54:30Z",
+      "source": "antigravity",
+      "subject": "nixconfig:jobsearch",
+      "action": "landed: anduril (applied/confirmed Greenhouse), makersite (native Typst), treatwell (native Typst) | dispatched: mozilla (0:2.1), black-forest-labs (0:1.1), telekom-sre-prometheus (0:3.1)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/mozilla submissions/black-forest-labs submissions/telekom-sre-prometheus"
+      ],
+      "files": [],
+      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
+      "branch": "main",
+      "frame": "03ha6wq2c6csg5mxc92oxzaeo"
+    },
+    {
+      "id": "84c1a472-6f56-4d05-a784-935251f213e6",
+      "ts": "2026-11-22T10:54:09Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:telekom-sre-prometheus",
+      "action": "claim: native German Typst 2pp CV + 1pp letter",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/telekom-sre-prometheus"
+      ],
+      "files": [],
+      "base_commit": "f4465309572ca10eb71ec1f35a9703063c938805",
+      "branch": "main",
+      "frame": "03ha6wnlc7ckmojklnu876uxq"
+    },
+    {
+      "id": "a5985027-8cf5-4931-969e-6b7ae73e82c3",
+      "ts": "2026-11-22T10:53:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:black-forest-labs",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en), MTS Infrastructure Security",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/black-forest-labs"
+      ],
+      "files": [],
+      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
+      "branch": "main",
+      "frame": "03ha6wlh8tni3vpx455ncy6hh"
+    },
+    {
+      "id": "592f1a8e-542e-4b4e-bc3a-f11a3d5a1325",
+      "ts": "2026-11-22T10:51:57Z",
+      "source": "devin",
+      "subject": "nixconfig:anduril",
+      "action": "applied: Greenhouse submission complete — OTP 22278496, /confirmation verified; adapted flox packet into anduril-specific CV+letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cd5c89b6195a63d2b3d2d6e2b18bb0fc1b980c8d",
+      "branch": "main",
+      "frame": "03ha6w85cb3lif62ljfs9oxmx"
+    },
+    {
+      "id": "ac34b81a-03b8-4af8-8ec5-4f576b814242",
+      "ts": "2026-11-22T10:51:18Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:treatwell",
+      "action": "gate: checks:prose PASS after rewording the AWS model-service line; packet final at fit 3",
+      "outcome": "done",
+      "claims": [
+        "submissions/treatwell"
+      ],
+      "files": [],
+      "base_commit": "f4465309572ca10eb71ec1f35a9703063c938805",
+      "branch": "main",
+      "frame": "03ha6w3huqg1ktxidorj2nfja"
+    },
+    {
+      "id": "4dd4c3ee-6168-4152-af95-137a6935b9fa",
+      "ts": "2026-11-22T10:50:58Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:treatwell",
+      "action": "corrected: advert retrieved (v1/v2), fit 3 not 4 — Terraform/AWS and EKS absent and named; 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [
+        "submissions/treatwell"
+      ],
+      "files": [],
+      "base_commit": "f18f666c6587d46e3b357e72d44a8897cb59b2fc",
+      "branch": "main",
+      "frame": "03ha6w183jrp6c6tg6kf0ch92"
+    },
     {
       "id": "9ceed368-879e-4b52-b4dd-9e7164657492",
       "ts": "2026-11-22T10:50:19Z",
@@ -2576,110 +2692,6 @@
       "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
       "branch": "main",
       "frame": "03ha67g0l2ryj4vbsspdjgmzz"
-    },
-    {
-      "id": "e6b9646e-b1c6-4cd6-994e-9a4b91173bd9",
-      "ts": "2026-11-22T08:44:19Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: dkrz-it-security-sysadmin packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fe10ff3718bb7c03dd3ffbd3e81a64c9c5d11c38",
-      "branch": "main",
-      "frame": "03ha67aj5hk5wymj37uoivvgv"
-    },
-    {
-      "id": "9aae6cd6-3b16-492e-bfd6-c882e5362e4d",
-      "ts": "2026-11-22T08:43:23Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: miaplaza-em-devops packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68d424bde6c65cb0f4d1db34f14d619589bbd244",
-      "branch": "main",
-      "frame": "03ha6742eil08jccq9iw0jeze"
-    },
-    {
-      "id": "f921e904-00cc-43ea-9772-6f4990972e0b",
-      "ts": "2026-11-22T08:42:49Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: flix-devops-cloud-infrastructure submitted via Greenhouse embed | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a097ef9861b1f95a626030aabb1fad25e994f4e6",
-      "branch": "main",
-      "frame": "03ha6700vtf1eo0rnun40qxnq"
-    },
-    {
-      "id": "99a98711-8109-4989-96ab-b296740aa3b6",
-      "ts": "2026-11-22T08:41:27Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-steward-freebuff",
-      "action": "drove idle freebuff pane 0:1.1: jev-decide typesafe classified next task prose-change p=0.85 margin=0.73 decisive; pane working on redaction of docs/nix-consultancy-outreach.md (counter growing); routed text mirrors the queued next task, Enter withheld while pane is working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a097ef9861b1f95a626030aabb1fad25e994f4e6",
-      "branch": "main",
-      "frame": "03ha66qggxiiu396s87shdw2t"
-    },
-    {
-      "id": "6625fb38-a325-4700-b1fb-992b114a8d7b",
-      "ts": "2026-11-22T08:40:59Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: truetalent-freiburg-sysadmin packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fdb25150d6c7670b094ff5f4d3f725950daccbda",
-      "branch": "main",
-      "frame": "03ha66n57n4rk5ypvqb7po5jx"
-    },
-    {
-      "id": "fcdcad71-2751-4513-a4a4-b15d90687772",
-      "ts": "2026-11-22T08:40:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: catapult-sports-senior-devops packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a097ef9861b1f95a626030aabb1fad25e994f4e6",
-      "branch": "main",
-      "frame": "03ha66mpox7yq4chmlqljho4o"
-    },
-    {
-      "id": "e1a1944e-be6f-4d2a-93d1-41b400209a39",
-      "ts": "2026-11-22T08:39:45Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: flix-devops-cloud-infrastructure Greenhouse embed submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "adcaa638cec91b5f89fe8f6e1650e4367f796f93",
-      "branch": "main",
-      "frame": "03ha66ehxoyl2zuwwngzzp8ok"
-    },
-    {
-      "id": "7456caae-311c-4c37-9c56-0a720f01736f",
-      "ts": "2026-11-22T08:38:22Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: fau-sysadmin packet prepared | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "497d090c28a77f5b35032575eb8000852c41e6e6",
-      "branch": "main",
-      "frame": "03ha664nbxivz5jx2a4fz6x0b"
     }
   ]
 }

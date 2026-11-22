@@ -1,0 +1,46 @@
+Company: Black Forest Labs
+Role: Member of Technical Staff - Infrastructure Security
+Location: Remote
+Remote: yes
+Posted: 2026-11-17
+Source: arbeitnow
+URL: https://www.arbeitnow.com/jobs/companies/black-forest-labs/remote-member-of-technical-staff-infrastructure-security-30948
+Compensation (as stated): $220,000 - $280,000 USD + Equity
+---
+
+About Black Forest Labs
+We’re the team building the foundational layer for visual intelligence: multimodal models trained jointly on images, video, audio, and action to see, generate, and understand the world.
+Our founding team pioneered latent diffusion and Stable Diffusion, the breakthroughs that made generative AI accessible to millions. With FLUX, we're pushing into generative media at scale, machines that act in the physical world, and emerging applications in computer use.
+Our FLUX models top public benchmarks and run in production in some of the world's biggest platforms. We're a small, fast growing research lab competing with the largest companies in the world. From our labs in Freiburg to San Francisco, we're building what comes next.
+Why This Role
+We develop AI models and run the infrastructure on which those models are trained, deployed, and served to customers. Securing that infrastructure comes with real challenges: researchers need flexible access to significant compute resources, production systems need strong isolation and reliability, and model assets and customer data need protection throughout their lifecycle.
+Our research and production infrastructure teams design, build, and operate these systems. We're looking for an experienced, hands-on security engineer to partner with them as we grow: someone who can dig into the details, do the engineering, and work alongside those teams to improve our defensive posture.
+This is an engineering role: you'll spend time reading code, understanding systems, debugging problems, and shipping changes.
+What You’ll Work On
+These are the areas this role draws from; you're not expected to cover
+them all at once:
+- Infrastructure architecture and isolation. Understand how our research and production environments fit together, identify consequential attack paths, and work with infrastructure teams to improve network boundaries, workload isolation, and access controls.
+- Identity and access. Improve how people, services, and workloads authenticate and obtain access to infrastructure. Reduce unnecessary privileges, strengthen secrets management, and develop practical approaches to short-lived credentials and privileged access.
+- Cloud and compute security. Strengthen security across cloud infrastructure, compute clusters, containers, storage, and orchestration systems. Help establish reusable patterns that engineers can adopt without unnecessary friction.
+- Model and customer-data protection. Work with research and engineering teams to protect model artifacts, training and inference pipelines, and sensitive data. Understand where trust boundaries matter and develop ways to verify that they hold.
+- Security in engineering workflows. Improve the security of infrastructure-as-code, build and deployment pipelines, and software artifacts. Build tooling and guardrails that help engineering teams prevent, detect, and fix problems without making security a bottleneck.
+What We’re Looking For
+- Strong experience securing production cloud infrastructure, with a solid understanding of identity, networking, operating systems, and distributed systems.
+- Hands-on engineering ability. You can write and review code, work with infrastructure-as-code, debug unfamiliar systems, and implement the improvements you recommend.
+- Good security judgment. You can distinguish meaningful risks from theoretical ones, make sensible tradeoffs, and explain why a particular security improvement matters.
+- Experience working closely with infrastructure or platform engineers, including designing changes that are practical to deploy and operate.
+- Experience in using LLMs and agents for security work, along with a clear-eyed view of where they help, where they don't, and how they themselves can be attacked.
+- Comfort working with real autonomy, finding your way through complex systems, and turning loosely defined problems into concrete improvements.
+Experience with GPU clusters, ML infrastructure, multi-tenant services, Kubernetes, and software supply-chain security would be particularly relevant, but none is a prerequisite. We're more interested in people who have solved difficult security problems in real systems than in candidates who can check every box on a technology list.
+How We Work Together
+We’re a distributed team with real offices that people actually use. This role is based in San Francisco, and you’ll join us in the office at least 2 days a week, or one full week every other week.
+Everything we do is grounded in four values:
+- Obsessed. We are a frontier research lab. The science has to be right, the understanding deep, the product beautiful.
+- Low Ego. The work speaks. The best idea wins, no matter who said it. Credit is shared. Nobody is above any task.
+- Bold. We take the ambitious bet. We ship, we do not wait for conditions to be perfect.
+- Kind. People over politics. We treat each other with genuine warmth. Agency without empathy creates chaos.
+If this sounds like work you’d enjoy, we’d love to hear from you.
+Base Annual Salary:
+US $220,000 - $280,000 USD + Equity
+Note: We may use AI-assisted tools to help organize applications. All hiring decisions are always made by our team.
+Find Jobs in Germany on Arbeitnow

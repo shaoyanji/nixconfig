@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T10:16:05Z",
+  "generated": "2026-11-22T10:18:59Z",
   "count": 200,
-  "pin": "4686396084b0fe63a65ed9c38869c668763e1f7812abb125ba948589f9563653",
+  "pin": "706f2f98dac34f5d34be50f55303ef06ccf5f6c0c0afd0cb44c4f52dd48a3bcf",
   "turns": [
+    {
+      "id": "c214ac40-6487-4f7d-99ca-5b68e69f5f5f",
+      "ts": "2026-11-22T10:17:23Z",
+      "source": "devin",
+      "subject": "nixconfig:adyen-platform-observability",
+      "action": "claim: Greenhouse submission 7607691 (ambiguous prior-apply state)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "09919176b5676a08672aba99606fde245c0f9958",
+      "branch": "main",
+      "frame": "03ha6ph026jf0424y6bg2f5ek"
+    },
+    {
+      "id": "bb7a0ad1-bad9-4c2e-94bc-3ce8b307f547",
+      "ts": "2026-11-22T10:16:07Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-sre-berlin",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "09919176b5676a08672aba99606fde245c0f9958",
+      "branch": "main",
+      "frame": "03ha6p878jlueosb7y7bxmtnd"
+    },
     {
       "id": "85c17797-6dde-4fa5-8d43-84d39eba24aa",
       "ts": "2026-11-22T10:15:56Z",
@@ -2650,36 +2676,6 @@
       "base_commit": "d3d11688a6cd15e147080ac7128e32f4ce7019b2",
       "branch": "main",
       "frame": "03ha5u8hbcuxtab0mq4yjvfow"
-    },
-    {
-      "id": "ab04a11a-bde0-4c25-840c-52b3d179a5ca",
-      "ts": "2026-11-22T07:36:41Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: nebius token-factory SRE applied via Greenhouse embed+OTP (CV/CL pasted via Enter-manually — upload wedges toolchain-wide; careers SPA has Turnstile); ack 311050 + /confirmation; record=applied",
-      "outcome": "done",
-      "claims": [
-        "submissions/nebius-token-factory"
-      ],
-      "files": [],
-      "base_commit": "8efaee873d8b8ad53a997cb51eef255d1523c830",
-      "branch": "main",
-      "frame": "03ha5u2vus6ymfhpwkpkcxs77"
-    },
-    {
-      "id": "a3908480-bd09-4719-be5f-895bb3e78597",
-      "ts": "2026-11-22T07:35:21Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-stackit-iac",
-      "action": "landed: STACKIT GT4627 DevOps/Cloud Engineer (K8s & IaC) packet in submissions/stackit-iac. Only the prefix-less route renders (en/de 404); German JD. German CV 2pp, letter 1pp, ask 85k. Letter trades on Nix as IaC + gates, states no Terraform/Ansible/Helm/GitLab CI, no enterprise K8s, no C5/DORA. Portal: RocketApply. Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/stackit-iac"
-      ],
-      "base_commit": "e10cb11daafd55d25c34114670729863f42ca602",
-      "branch": "main",
-      "frame": "03ha5ttll0uxcnnloiac58swn"
     }
   ]
 }

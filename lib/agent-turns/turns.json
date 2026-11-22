@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T09:03:46Z",
+  "generated": "2026-11-22T09:06:01Z",
   "count": 200,
-  "pin": "d2145e971ca1e2bd2ff03c21570751eaca4206ba21713917e640082ede3c7ea1",
+  "pin": "be529e63f3e66c94d4661d198e1fe53caa59b39a6975d8a242ab26b797d39e24",
   "turns": [
+    {
+      "id": "1d664c30-108b-4365-a5cc-3cba3d5e67fa",
+      "ts": "2026-11-22T09:05:43Z",
+      "source": "freebuff",
+      "subject": "nixconfig:shopware-cloud-infra",
+      "action": "landed: shopware AG Cloud Infrastructure Engineer Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fae4c4748367d03db1bd7a14e584058cec7c6676",
+      "branch": "main",
+      "frame": "03ha6bh250fetx942yhidzb5p"
+    },
+    {
+      "id": "cc9b7574-81cb-407d-b9ff-2e79f3cdaa4f",
+      "ts": "2026-11-22T09:05:26Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: catapult-sports-senior-devops submitted via Greenhouse | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5028584bfe0365aa24b184bd176a502bc0b374fd",
+      "branch": "main",
+      "frame": "03ha6bf1eccj0i1lenh2g1o1w"
+    },
+    {
+      "id": "53e3a96a-d3cd-47d8-9679-5530d5c01257",
+      "ts": "2026-11-22T09:04:39Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:citeq-muenster-devops",
+      "action": "landed: citeq Münster DevOps Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d618f54d952a1a186aee00ad798ccb86f7906655",
+      "branch": "main",
+      "frame": "03ha6b9hll7g17rudi8llcj7l"
+    },
+    {
+      "id": "298dcf9b-c352-4059-8426-362b51929abe",
+      "ts": "2026-11-22T09:03:50Z",
+      "source": "freebuff",
+      "subject": "nixconfig:energy-meteo-sysadmin",
+      "action": "landed: energy & meteo systems Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5028584bfe0365aa24b184bd176a502bc0b374fd",
+      "branch": "main",
+      "frame": "03ha6b3thpaa3bx3qk5mh8b1u"
+    },
     {
       "id": "76891e0b-6d09-4742-88d8-57e76b811176",
       "ts": "2026-11-22T09:03:22Z",
@@ -2717,58 +2769,6 @@
       "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
       "branch": "main",
       "frame": "03ha4avsi5tgeadsexwaiyiza"
-    },
-    {
-      "id": "22e29cd6-c39b-43db-ab17-5f95974c0676",
-      "ts": "2026-11-22T02:52:00Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +3 (naturenergie OT-Security Schwoerstadt, ANG Linux Senior Freiburg, AGJ Dev Automatisierung 2nd req) | gate: mail confirms + imports 3/3 | ~167 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
-      "branch": "main",
-      "frame": "03ha4agww5aqon6dgykdxybts"
-    },
-    {
-      "id": "5c12e04f-422c-4061-afe0-b846e6518bc2",
-      "ts": "2026-11-22T02:45:43Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +9 applications (puro Wehr, virtualminds, nendzynski+truttenbach Offenburg, hwi Malterdingen, agj Freiburg, modox Appenweier, pcdoktor Freiburg) + Zalando Lahr portal SUBMITTED + Stadt Emmendingen DV-BW portal SUBMITTED | gate: himalaya OK + portal confirmations + imports 11/11 | ~164 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a233ed992804eafb7ed6fbca557ab005df996b6",
-      "branch": "main",
-      "frame": "03ha49979b5la0um5z4dtbave"
-    },
-    {
-      "id": "0772364e-6663-4748-90c1-f4a44a4408a2",
-      "ts": "2026-11-22T02:41:49Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-commit-outreach-redaction",
-      "action": "landed: drove freebuff pane (default:1.1) to commit the completed redaction of .agents/outreach/nix-consultancy-outreach.md and push to origin/main; pane confirmed working (fresh 10s counter)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "eadda34184407c3eb50f062373713635323f9077",
-      "branch": "main",
-      "frame": "03ha48hcvuj7tckbgowh4ta80"
-    },
-    {
-      "id": "3307ad9a-a818-4523-aeda-59c40a7fbb6e",
-      "ts": "2026-11-22T02:36:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-redact-outreach-contacts",
-      "action": "landed: drove freebuff pane to redact third-party contacts + phone from docs/nix-consultancy-outreach.md",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "c990e276294a7993a19867f3fa07cc6cd279ce33",
-      "branch": "main",
-      "frame": "03ha47h3cmtuveyoozixd0xhy"
     }
   ]
 }

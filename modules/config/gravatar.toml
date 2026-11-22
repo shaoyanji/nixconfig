@@ -41,9 +41,6 @@ interests = [
 ]
 
 # The sites this fleet actually serves, in profile order.
-# jisifu.vern.cc is absent: its certificate stopped matching the hostname on
-# 2026-11-09 and the link left the profile. Re-add it here and by hand at
-# https://gravatar.com/jisifu once the certificate is fixed.
 [[links]]
 label = "bountystash"
 url = "https://bountystash.com"

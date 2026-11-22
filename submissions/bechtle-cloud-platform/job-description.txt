@@ -1,0 +1,45 @@
+Cloud Platform Engineer (w/m/d) (Remote)
+Bechtle AG — KubeOps, Unternehmen der Bechtle Gruppe, Bisingen bei Balingen
+Modell: hybrid mit 90 Praesenztaegen pro Jahr; ab 60 km Entfernung vollstaendig remote innerhalb Deutschlands | unbefristet
+Sicherheitsueberpruefung: Bereitschaft zu SUe2 erforderlich
+Kontakt: Christopher Waldraff, Recruiting, christopher.waldraff@bechtle.com
+Bewerbung: https://jobs.bechtle.com/job/Bisingen-Cloud-Platform-Engineer-%28wmd%29-%28Remote%29-72406/1367643158 | BA-ID 15086-44517367-1019-S
+Quelle: Jobboerse-API zur BA-ID, abgerufen am 22.11.2026
+
+Bechtle ist einer der führenden IT-Dienstleister in Europa. Wir gestalten zukunftsfähige IT-Architekturen - von klassischer IT-Infrastruktur über Digitalisierung, Multi Cloud, Modern Workplace und Security bis Künstliche Intelligenz und Managed Services. Wir bieten unseren Kunden zusätzlich intelligente Finanzierungen und die Realisierung nachhaltiger Konzepte wie Circular IT. Mit unseren Tochterunternehmen zählen wir zu den führenden Spezialisten für Business Applications, allen voran PLM und ERP. Unsere Multichannel-Strategie verbindet persönliche Betreuung an über 120 Standorten in 14 europäischen Ländern mit digitalen Services und globaler Zusammenarbeit. Wir sind mit mehr als 16.000 Mitarbeitenden immer in der Nähe unserer Kunden - ob Mittelstand, Konzern oder Public Sector.
+In deiner Mission blühst du auf, denn:
+
+  *  Du entwickelst und automatisierst Cloud-native Plattformen und Workloads und integrierst diese in bestehende Systemlandschaften.
+  *  Implementierung und Weiterentwicklung von CI/CD-, DevSecOps- und Automatisierungslösungen für moderne Cloud-Plattformen.
+  *  Du entwickelst Infrastruktur und Plattformservices nach Infrastructure-as-Code-Prinzipien und stellst deren standardisierte Bereitstellung sicher.
+  *  Unterstützung des Betriebs und der Weiterentwicklung eienr Private Cloud sowie der darauf aufbauenden Plattformservices.
+  *  Du unterstützt den Aufbau und die Weiterentwicklung von Cloud-Produkten und Plattformservices.
+  *  Integration moderner Cloud-Technologien in bestehende Systemlandschaften sowie Zusammenarbeit mit Entwickler:innen, DevOps Engineers und weiteren technischen Ansprechpartner:innen.
+
+
+Deine Skills? Mehr als interessant:
+
+  *  Eine technische, wirtschaftswissenschaftliche oder vergleichbare Ausbildung bzw. ein Studium ist von Vorteil - entscheidend sind praktische Erfahrung in der Entwicklung und Automatisierung moderner Cloud- und Plattformlösungen.
+  *  Fortgeschrittene Kenntnisse in Kubernetes, Docker oder vergleichbaren Container-Technologien sowie ein Verständnis für Cloud-native Architekturen.
+  *  Gute Kenntnisse mit Infrastructure as Code und der automatisierten Bereitstellung von Infrastruktur und Plattformservices, idealerweise mit Terraform.
+  *  Erfahrung mit CI/CD und gängigen Entwicklungs- und Automatisierungswerkzeugen wie GitLab oder GitHub.
+  *  Gute Kenntnisse in Linux sowie Erfahrung mit DevOps-, DevSecOps- und Automatisierungskonzepten.
+  *  Sehr gute Deutschkenntnisse (sichere Kommunikation im Kundenumfeld) sowie gute Englischkenntnisse in Wort und Schrift.
+  *  Bereitschaft zur Durchführung einer Sicherheitsüberprüfung (SÜ2).
+
+
+Du verdienst echten Mehrwert. Freu dich deshalb auf:
+
+  *  Weiterentwicklung: Mit einem umfangreichen Angebot der Bechtle Akademie, individueller Karriereplanung, Expert:innen- und Führungsprogrammen, Herstellerzertifizierungen und vielem mehr entwickelst du dich kontinuierlich weiter und bleibst niemals stehen.
+  *  Rund-um-Sorglos-Paket: Deine Zukunft ist uns wichtig. Das zeigt unsere attraktive Berufsunfähigkeitsversicherung sowie unsere betriebliche Altersversorgung mit einer Bezuschussung von bis zu 100 Prozent.
+  *  Modern Workplace: Am Arbeitsplatz der Zukunft erhältst du neuestes Technikequipment und arbeitest in einem innovativen Arbeitsumfeld.
+  *  Sicherheit: Als zukunftsstarker Arbeitgeber profitierst du von einer sicheren und unbefristeten Anstellung.
+
+
+Unser hybrides Arbeitsmodell ermöglicht dir, an 90 Präsenztagen im Jahr deine Kolleg:innen vor Ort im Büro zu treffen. An den übrigen Tagen kannst du bequem von zu Hause aus arbeiten. Wohnst du mehr als 60 km von unserem Standort entfernt? Kein Problem - unser Remote-Arbeitsmodell macht es möglich, von überall aus Deutschland Teil unseres Teams zu sein!
+
+KubeOps, ein Unternehmen der Bechtle Gruppe, entwickelt und betreibt sichere containerbasierte IT-Infrastrukturen - mit Fokus auf Kubernetes, Security und Compliance. Unsere Lösungen kommen in sensiblen Umgebungen zum Einsatz, insbesondere im Public Sector und bei Unternehmen mit hohen Anforderungen an Datenschutz, IT-Sicherheit und regulatorische Vorgaben.
+
+Mit über 90 Mitarbeitenden - ein Großteil davon technische Spezialist:innen - gestalten wir seit Jahren souveräne IT-Betriebsmodelle „Made in Bisingen". 
+
+Christopher Waldraff | Recruiting | christopher.waldraff@bechtle.com

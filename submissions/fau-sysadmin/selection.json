@@ -10,52 +10,52 @@
     "chars": 3651,
     "terms": [
       {
+        "term": "wind",
+        "weight": 25.639
+      },
+      {
+        "term": "windows",
+        "weight": 22.71
+      },
+      {
         "term": "linux",
-        "weight": 16.137
+        "weight": 16.217
       },
       {
         "term": "systeme",
-        "weight": 16.137
+        "weight": 16.217
       },
       {
         "term": "erlangen",
-        "weight": 14.67
-      },
-      {
-        "term": "infrastruktur",
-        "weight": 14.67
+        "weight": 14.736
       },
       {
         "term": "systemadministrator",
-        "weight": 13.019
+        "weight": 13.084
       },
       {
         "term": "erlangen-nürnberg",
-        "weight": 8.664
-      },
-      {
-        "term": "infrastrukturprojekten",
-        "weight": 8.664
+        "weight": 8.703
       },
       {
         "term": "post",
-        "weight": 8.664
+        "weight": 8.703
       },
       {
-        "term": "service",
-        "weight": 8.664
+        "term": "windows-systeme",
+        "weight": 8.703
       },
       {
-        "term": "sicherer",
-        "weight": 8.664
+        "term": "windows-umgebungen",
+        "weight": 8.703
       },
       {
-        "term": "systemadministration",
-        "weight": 8.664
+        "term": "workstations",
+        "weight": 8.703
       },
       {
-        "term": "gute",
-        "weight": 8.27
+        "term": "dns",
+        "weight": 7.728
       }
     ]
   },
@@ -105,12 +105,24 @@
       "dropped": [
         {
           "score": 0.0,
-          "text": "YAML"
+          "text": "WireGuard"
+        },
+        {
+          "score": 0.0,
+          "text": "restic"
+        },
+        {
+          "score": 0.0,
+          "text": "Monitoring"
+        },
+        {
+          "score": 0.0,
+          "text": "sops"
         }
       ],
       "kept": 6,
-      "name": "DevOps",
-      "of": 7
+      "name": "Betrieb, Netzwerk und Speicher",
+      "of": 10
     },
     {
       "dropped": [
@@ -172,43 +184,51 @@
     {
       "dropped": [
         {
-          "score": 4.4646,
+          "score": 5.1517,
+          "text": "Sicherte Daten mit restic auf ein NAS und prüfte Wiederherstellungen statt sie anzunehmen"
+        },
+        {
+          "score": 4.7435,
+          "text": "Konfigurierte Netz und Firewall als Code mit nftables, dazu DNS und ein WireGuard-Tailnet zwischen den Standorten"
+        },
+        {
+          "score": 4.614,
+          "text": "Dokumentierte jede Betriebsprozedur als Runbook und leitete andere bei der Bedienung der Flotte an"
+        },
+        {
+          "score": 4.4856,
           "text": "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledge"
         },
         {
-          "score": 2.6845,
-          "text": "Richtete Benutzerkonten und Rechte über Module ein: Rollen als Feature-Liste je Host, kein Konto von Hand angelegt"
+          "score": 4.3501,
+          "text": "Automatisierte Betriebsprozesse, Auswertungen und Deploy-Ketten in Shell, Python und Go"
         },
         {
-          "score": 1.6939,
-          "text": "Verwaltete Secrets und Zugang zentral: sops mit age, eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten"
+          "score": 2.6003,
+          "text": "Verwaltete Zugriffsrechte deklarativ: Rollen als Feature-Liste je Host, kein Konto von Hand angelegt"
         },
         {
-          "score": 0.0,
-          "text": "Prüfte Endpunkte mit Gatus und band jedes Alerting an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachr"
-        },
-        {
-          "score": 0.0,
-          "text": "Dokumentierte die Plattform für andere: Runbooks, Skill-Seiten und Tasks mit klarer Schnittstelle"
+          "score": 2.2308,
+          "text": "Sicherte jede Änderung mit inventargetriebenen Gates je Host ab und hielt jede Generation rückrollbar"
         }
       ],
-      "kept": 4,
+      "kept": 3,
       "matched": true,
       "name": "Bountystash",
-      "of": 9
+      "of": 10
     },
     {
       "dropped": [
         {
-          "score": 1.4149,
+          "score": 1.4212,
           "text": "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
         },
         {
-          "score": 1.3099,
+          "score": 1.3158,
           "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
         },
         {
-          "score": 1.0005,
+          "score": 1.0049,
           "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
         },
         {
@@ -252,11 +272,11 @@
     {
       "dropped": [
         {
-          "score": 1.9825,
+          "score": 1.9921,
           "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
         },
         {
-          "score": 1.7329,
+          "score": 1.7406,
           "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
         },
         {

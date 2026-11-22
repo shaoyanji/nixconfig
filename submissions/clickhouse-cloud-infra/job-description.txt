@@ -1,0 +1,66 @@
+About the team
+
+The Cloud Scaling team is dedicated to implementing robust capabilities within the ClickHouse cloud environment. We seek exceptional software engineers to develop and maintain the infrastructure to transform ClickHouse into a fully functional serverless database solution. Collaborating closely with the core database team, we are actively working on evolving ClickHouse into a cloud-native database system. Additionally, we engage with other cloud teams to drive continuous improvements in cloud infrastructure for enhanced performance and scalability.
+
+What will you do?
+
+ - Build a cutting-edge cloud-native database platform on top of the public cloud.
+
+ - Work on our in-house Kubernetes operator to support seamless infrastructure management.
+
+ - Improve the metrics pipeline and build systems to generate better statistics and recommendations.
+
+ - Work closely with our ClickHouse core development team and other data plane teams, partnering with them to support infrastructure use cases as well as other internal infrastructure improvements.
+
+ - Architecting and building a robust, scalable, and highly available distributed infrastructure
+
+About you:
+
+ - 5+ years of relevant software development industry experience building and operating scalable, fault-tolerant, distributed systems.
+
+ - Production experience with programming languages like Go, C++ or Java
+
+ - You are not a stranger to PagerDuty On-call, debugging things in production and are a strong problem-solver
+
+ - Expertise with a public cloud provider (AWS, GCP, Azure) and their infrastructure as a service offering (e.g., EC2).
+
+ - Experience with Data Storage, Ingestion, and Transformation (Spark, Kafka or similar tools).
+
+ - You are passionate about solving data problems at Scale.
+
+ - Experience working with distributed systems
+
+ - You have excellent communication skills and the ability to work well within and across engineering teams.
+
+#LI-Remote
+
+ 
+
+
+PERKS
+
+ - Flexible work environment - ClickHouse is a globally distributed company and remote-friendly. We currently operate in over 25 countries.
+
+ - Healthcare - Employer contributions towards your healthcare.
+
+ - Equity in the company - Every new eligible team member who joins our company receives equity.
+
+ - Time off - Flexible time off in the US, generous entitlement in other countries.
+
+ - A USD$500 Home office setup if you’re a remote employee.
+
+ - Global Gatherings – We believe in the power of in-person connection and offer opportunities to engage with colleagues at company-wide offsites.
+
+
+CULTURE - WE ALL SHAPE IT
+
+As part of a rapidly scaling start-up, you will be instrumental in shaping our culture.
+
+Are you interested in finding out more about our culture? Learn more about our values here https://clickhouse.com/company/careers. Check out our blog posts https://clickhouse.com/blog or follow us on LinkedIn https://www.linkedin.com/company/clickhouseinc/life/0c1ee7f4-2129-488d-b413-e7f6270659fd/?viewAsMember=true to find out more about what’s happening at ClickHouse.
+
+
+EQUAL OPPORTUNITY & PRIVACY
+
+ClickHouse provides equal employment opportunities to all employees and applicants and prohibits discrimination and harassment of any type based on factors such as race, color, religion, age, sex, national origin, disability status, genetics, protected veteran status, sexual orientation, gender identity or expression, or any other characteristic protected by federal, state or local laws.
+
+Please see here https://clickhouse.com/legal/applicant-privacy-notice for our Privacy Statement.

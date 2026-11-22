@@ -1,0 +1,298 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 5253,
+    "terms": [
+      {
+        "term": "cloud",
+        "weight": 23.73
+      },
+      {
+        "term": "kubernetes",
+        "weight": 15.397
+      },
+      {
+        "term": "system",
+        "weight": 12.573
+      },
+      {
+        "term": "ci",
+        "weight": 11.683
+      },
+      {
+        "term": "sowie",
+        "weight": 10.155
+      },
+      {
+        "term": "alerting",
+        "weight": 9.094
+      },
+      {
+        "term": "alerting-lösungen",
+        "weight": 9.094
+      },
+      {
+        "term": "azure",
+        "weight": 9.094
+      },
+      {
+        "term": "cloud-kubernetes-services",
+        "weight": 9.094
+      },
+      {
+        "term": "cloud-nativen",
+        "weight": 9.094
+      },
+      {
+        "term": "cloud-technologie-umfeldes",
+        "weight": 9.094
+      },
+      {
+        "term": "linux",
+        "weight": 9.094
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "matt.bountystash.com",
+        "score": 3.4271
+      },
+      {
+        "name": "Risikoberechnungs-Engine (Swirl Engine)",
+        "score": 3.2869
+      },
+      {
+        "name": "Postgraduales Studium: Erneuerbare Energien",
+        "score": 3.1745
+      },
+      {
+        "name": "bountystash",
+        "score": 1.5813
+      },
+      {
+        "name": "kev-time",
+        "score": 1.2629
+      },
+      {
+        "name": "kelly-svg",
+        "score": 0.0
+      }
+    ],
+    "kept": [
+      "Masterarbeit: Wetter und Volatilität",
+      "nixconfig",
+      "fibtransponder",
+      "Konzept für Schwachstellenbetrieb"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Sicherheit",
+      "of": 6
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Linux & Betrieb",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 5.6906,
+          "text": "Beriet Mandanten und war als interner Risk Manager für einen großen deutschen Energiehändler tätig."
+        },
+        {
+          "score": 3.2227,
+          "text": "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit."
+        },
+        {
+          "score": 2.0686,
+          "text": "Machte Rebuilds reproduzierbar über einen gemeinsamen Binary-Cache und Remote-Builder; jede Server-Generation lässt sich"
+        },
+        {
+          "score": 2.0072,
+          "text": "Schrieb einen Sentinel-Job, der Job-Status, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten protokolliert und alar"
+        },
+        {
+          "score": 1.6088,
+          "text": "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD."
+        },
+        {
+          "score": 1.6088,
+          "text": "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists."
+        },
+        {
+          "score": 1.4188,
+          "text": "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist."
+        },
+        {
+          "score": 1.3749,
+          "text": "Konzipierte eine Covered-Call-Hedging-Strategie für Kundenportfolios."
+        },
+        {
+          "score": 0.0,
+          "text": "Baute risikoadjustierte PPA-Handelsmodelle für Energieunternehmen."
+        },
+        {
+          "score": 0.0,
+          "text": "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading."
+        },
+        {
+          "score": 0.0,
+          "text": "Prüfte Bug-Bounty-Programme."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 14
+    },
+    {
+      "dropped": [
+        {
+          "score": 5.2711,
+          "text": "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften."
+        },
+        {
+          "score": 1.3284,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        },
+        {
+          "score": 1.0501,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        },
+        {
+          "score": 0.0,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 2.887,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 1.1473,
+          "text": "Erstellte neue Excel-Tabellen für die Engineering-Abteilung."
+        },
+        {
+          "score": 0.0,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

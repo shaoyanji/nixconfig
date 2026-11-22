@@ -1,0 +1,31 @@
+Für unser Geschäftsfeld Data, Security and Identity im Tribe Advanced Intelligence suchen wir dich in Vollzeit (38 Stunden-Woche) als DevOps Engineer (m/w/d) in Karlsruhe oder München. Die Stelle ist teilzeitgeeignet. Deine Tätigkeit ist dem Chapter Transition zugeordnet. Hier arbeitest du mit 6 Kolleg*innen standortübergreifend und mit vielfältigen Schnittstellen zusammen.
+Deine Aufgaben mit Perspektiven
+- Du begleitest und gestaltest die Transformation unseres KI- und Cloud-Technologie-Umfeldes (Kubernetes onPrem + Cloud und Databricks) und kümmerst dich um die automatisierte Bereitstellung von Cloud-nativen Services mithilfe von Infrastructure-as-code.
+- Du pflegst und optimierst die CI/CD Pipelines unserer Teams und implementierst sowie pflegst Monitoring-, Logging- und Alerting-Lösungen (z.B. Prometheus, Grafana, CheckMK).
+- Du übernimmst Verantwortung für das Deployment und den Betrieb von Container-Applikationen und sorgst für eine zuverlässige Orchestrierung (GPU-Ressourcenmanagement).
+- Du bist zuständig im Incident- und Problemmanagement im Rahmen des 2nd-Levelsupport / Schnittstelle zum Herstellersupport und stellst die Betriebssicherheit, Auslieferungsgeschwindigkeit sowie die Qualität über den gesamten Produktlebenszyklus hinweg sicher.
+- Du arbeitest eng mit den Entwicklungsteams zusammen, um SRE-Prinzipien zu etablieren und sicherheitsrelevante Aspekte in der Infrastruktur zu berücksichtigen.
+Deine Persönlichkeit mit Profil
+- Du hast ein abgeschlossenes Studium der (Wirtschafts-) Informatik oder eine vergleichbare Qualifikation im IT-Bereich mit mehrjähriger Berufserfahrung.
+- Du besitzt sehr gute Kenntnisse im Bereich Linux, Netzwerk und im Betrieb von Applikationen auf OpenShift, idealerweise hast du auch schon Erfahrung mit Spark und im Umgang mit Public Cloud Providern (z.B. Integration von Databricks, Cloud-Kubernetes-Services) gesammelt.
+- Du hast Spaß an agilen, crossfunktionalen Teams und Arbeitsmethoden, kennst dich mit der Verwendung von entsprechenden Werkzeugen wie GIT, Jira, Confluence und CI/CD-Pipelines aus und hast bestenfalls Kenntnisse in Infrastructure as code (z.B. Terraform)
+- Du verfügst über verhandlungssichere Deutschkenntnisse (mindestens C1-Niveau) und über gute Englischkenntnisse (B2-Niveau).
+- Du hast eine motivierte, eigenverantwortliche und teamorientierte Arbeitsweise, die Du Tribe-intern sowie in anderen übergreifenden Service- und Geschäftsfeldern einsetzt.
+Unsere Vorteile auf einen Blick
+Neben einem attraktiven Tarifgehalt und 30 Tagen Urlaub bieten wir dir folgende Benefits:
+- Flexibles Arbeiten: Wir arbeiten in einem ausgewogenen hybriden Mix aus Remote Work und Anwesenheit in modernen Bürowelten (Activity Based Working).
+- Work-Life-Balance: Mit unseren individuellen Arbeitszeitmodellen wie z. B. Teilzeit, der Wahlmöglichkeit in Vollzeit zwischen 30-40 h und unserem Lebensarbeitszeitkonto (Sabbatical und/oder Freistellung vor Rentenbeginn) findest du den passenden Ausgleich.
+- Vereinbarung von Privatleben und Karriere: Wir bieten dir ein Familienbudget und unterstützen in besonderen familiären Situationen wie z. B. der Pflege von Familienangehörigen.
+- Individuelle Benefits: Neben einer betrieblichen Altersvorsorge (bezuschusste BAV), hast du die Wahl zwischen Bike-Leasing, IT-Hardware-Leasing, vermögenswirksamen Leistungen und/oder einem zusätzlichen Freistellungstag sowie weiteren Optionen.
+- Onboarding: Eine geführte und individuelle Einarbeitung mit Pat*in sowie regelmäßige Feedbackgespräche mit deinem People Lead unterstützen dich bei deinem Ankommen. Zudem begrüßen wir dich bei unserer Willkommensveranstaltung #enter.
+- Gesundheitsmanagement – Health, Family and Life: Mit unseren Angeboten begleiten und unterstützen wir dich u. a. durch Kooperationen mit der Familiengenossenschaft und voiio. Ernähre dich vielfältig in unseren Betriebsrestaurants und vernetze dich bei unseren Sportangeboten.
+- Karrieremodell und Weiterbildung: In unseren Entwicklungsdialogen besprichst du deine fachlichen, methodischen und persönlichen Karriereziele und verfolgst diese mittels unserer vielfältigen Weiterbildungsangebote.
+- Unsere Unternehmenswerte: Respektvoll, offen und ehrlich, eigenverantwortlich, füreinander und ergebnisorientiert – dabei leiten uns Teamgeist, Kundenorientierung sowie der Wunsch nach Innovation und intensivem Wissensaustausch.
+- Zukunfts- und Arbeitsplatzsicherheit: Als genossenschaftliches Unternehmen mit jahrzehntelanger Erfahrung sind wir Vordenker der digitalen Transformation in der Bankenwelt und systemrelevanter Arbeitgeber.
+- Kununu: Wir sind Top Company 2026 und stolz auf einen Kununu-Score von 4,3 und eine Weiterempfehlungsquote von ≥ 90 %.
+Gehaltsrahmen
+Die Eingruppierung für diese konkrete Position und Ausschreibung liegt bei einer 38-Stunden-Woche je nach entsprechender Erfahrung und Qualifikation zwischen 70.000 € und 102.000 € Jahresgehalt in derzeit 14 Monatsgehältern.
+Bitte nutze für deine Bewerbung - Lebenslauf und wesentliche (Arbeits-)Zeugnisse erforderlich - ausschließlich unser Bewerbungsportal.
+Wir freuen uns auf dich. Bewirb dich jetzt!
+#atruvia #it-jobs #wearehiring #newwork #LI-hybrid #LI-AT1 #Applikationsmanagement #Microsoft Azure #Agile Methodenskill
+Kennziffer: 2399

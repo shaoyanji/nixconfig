@@ -1,0 +1,228 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 3566,
+    "terms": [
+      {
+        "term": "cloud",
+        "weight": 25.373
+      },
+      {
+        "term": "cloud-native",
+        "weight": 13.951
+      },
+      {
+        "term": "systems",
+        "weight": 11.903
+      },
+      {
+        "term": "about",
+        "weight": 9.201
+      },
+      {
+        "term": "aws",
+        "weight": 8.24
+      },
+      {
+        "term": "azure",
+        "weight": 8.24
+      },
+      {
+        "term": "internal",
+        "weight": 8.24
+      },
+      {
+        "term": "java",
+        "weight": 8.24
+      },
+      {
+        "term": "kubernetes",
+        "weight": 8.24
+      },
+      {
+        "term": "storage",
+        "weight": 8.24
+      },
+      {
+        "term": "database",
+        "weight": 7.865
+      },
+      {
+        "term": "pipeline",
+        "weight": 7.272
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [],
+    "kept": [
+      "nixconfig",
+      "email-archive",
+      "bountystash",
+      "fibtransponder"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web Development",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Database",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Python"
+        },
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programming Languages",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "due diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "financial modelling"
+        }
+      ],
+      "kept": 6,
+      "name": "Energy & Risk",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Security",
+      "of": 6
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Linux & Observability",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [],
+      "kept": 3,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 3
+    },
+    {
+      "dropped": [
+        {
+          "score": 2.2342,
+          "text": "Documented and managed software and IT administration for the company and its subsidiaries"
+        },
+        {
+          "score": 1.2457,
+          "text": "Built financial models and managed 10 MW of solar PV power plants"
+        },
+        {
+          "score": 1.0883,
+          "text": "Headed asset management of a USD 100M+ portfolio"
+        },
+        {
+          "score": 0.8604,
+          "text": "Worked with clients, banks and deal brokers on a dozen USD 4-5M projects"
+        },
+        {
+          "score": 0.0,
+          "text": "Scoped and ran due diligence on O&M projects as cover for project managers"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Devised sustainability sales and marketing strategies"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Verified geometry matrices in Mathematica"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.8604,
+          "text": "Managed two frac crews carrying USD 3M+ of work per week"
+        },
+        {
+          "score": 0.0,
+          "text": "Worked twelve-hour shifts in the field"
+        },
+        {
+          "score": 0.0,
+          "text": "Troubleshot chemicals and equipment on site"
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

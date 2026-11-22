@@ -1,35 +1,46 @@
-# Lead: FAU Erlangen-Nürnberg - IT-Systemadministrator Linux und Windows (LFT)
+# Lead: FAU Erlangen-Nürnberg — IT-Systemadministrator Linux und Windows (m/w/d)
 
 Fit: 3
 Stand: 22.11.2026
+Interamt-ID: 1513404, Kennung 2015
+Entgelt: TV-L E 10, befristet bis 31.03.2028, Besetzung 15.02.2027
+Frist: **01.12.2026**, nur über die Behördenseite
 
 ## Warum interessant
 
-Lehrstuhl für Fertigungstechnologie an der Technischen Fakultät, drei Standorte in Erlangen, IT für Werkstatt und Wissenschaft zugleich: Server, NAS, Workstations, Cluster, Beschaffung und Anwenderbetreuung vor Ort oder per Fernzugriff. Die Stelle ist als Nachfolge der IT-Leitung angelegt, mit Personal- und Budgetverantwortung und Entwicklung bis E 11 TV-L. Das ist mehr als Administration, und die Forschungsumgebung ist bereits bekannt: 2012 wissenschaftliche Hilfskraft am Fraunhofer ISE.
+Der Lehrstuhl für Fertigungstechnologie ist eine Forschungseinrichtung mit Pressen, Umformwerkzeugen, Messplätzen und Industriepartnern. Die IT dort ist keine Büro-IT mit Serverraum: Workstations für CAD und FEM, Cluster für Simulationen, NAS für Messdaten, Standorte, die jemand anfahren muss. Wer aus einer Forschungsstation am Fraunhofer ISE kommt und danach eine Flotte allein betrieben hat, kennt beide Hälften dieser Arbeit — die Messgeräte und den Betrieb.
+
+Dazu die Perspektive: Die Stelle ist als Nachfolge der IT-Leitung angelegt, mit Personal- und Budgetverantwortung und Entwicklung bis E 11.
 
 ## Was passt
 
-- Linux-Betrieb über dreizehn Hosts und mehrere Standorte, inklusive Beschaffung, Installation und Inbetriebnahme von Hardware.
-- Rechteverwaltung als Rollen je Host statt Handarbeit je Konto.
-- Speicherung und Sicherung: restic auf ein NAS, mit geprüften Rücksicherungen.
-- Netzwerkdienste: DNS, WireGuard-Tailnet, Firewall als Code mit nftables.
-- Anwenderbetreuung mit Runbooks, Anleitung und Dokumentation.
-- Beschaffung nach Richtlinien, reproduzierbare Software-Installation.
-- Deutsch C1, Englisch Muttersprache, Hybrid nach Einarbeitung machbar, Start 15.02.2027 machbar.
+- Zehn Jahre Linux-Betrieb, davon eine Forschungsstation am Fraunhofer ISE mit Geräteanbindung in C++ und Auswertung in Python.
+- Dreizehn Hosts, drei Hardware-Generationen, Beschaffung bis Inbetriebnahme — also genau die Lebenszyklusarbeit, die an drei Standorten anfällt.
+- Netze: nftables, DNS, WireGuard-Tailnet, kein Dienst mit öffentlicher Schnittstelle; PXE-Installationen aus eigenem ISO-Archiv.
+- Speicher: NAS-Ziele, restic, durchgeführte Wiederherstellungen statt gezählter Sicherungsläufe.
+- Zuverlässigkeit: Sentinel-Ledger alle 15 Minuten, Gatus, Alarmzustellung mit Bestätigung, Rückrollung je Generation.
+- Anwenderbetreuung und Dokumentation als Runbook;Deutsch C1, Englisch Muttersprache.
+- Hybrid ist zugesagt, Homeoffice nach Einarbeitung möglich.
 
 ## Was fehlt
 
-- Windows Server 2019, 2022 und 2025, Active Directory, DNS in AD, Group Policies: nicht administriert.
-- Hyper-V und andere Virtualisierung im Serverbetrieb: nicht vorhanden. Container und Nix sind kein Ersatz.
-- Lizenzserver und Betreuung komplexer Software (CAD, FE): nicht vorhanden.
-- PowerShell über Grundlagen hinaus: nicht belegt.
-- Führerschein Klasse B: im Profil unbestätigt. Vor dem Absenden klären, sonst fällt ein formales Kriterium.
-- Die Leitungsfunktion ist Perspektive, nicht bisherige Erfahrung; Personalverantwortung hatte ich nicht.
+- **Windows Server 2019/2022/2025 mit Active Directory, DNS, GPO** — das ist eine Muss-Anforderung und nicht vorhanden.
+- Hyper-V; die eigene Virtualisierung sind QEMU- und MicroVM-Gäste unter NixOS.
+- CAD-, FEM- und Office-Software sowie Lizenzserver.
+- PowerShell; Automatisierung läuft in Shell, Python und Go.
+- Clusterbetrieb für Simulationen im Institutsmaßstab.
+- Führerschein Klasse B: Status ungeklärt, im Paket nicht behauptet.
 
 ## Weg
 
-Ausschließlich über die Bewerbungsseite der FAU, Kennung 2015. Nicht über Interamt, nicht per Post, nicht per E-Mail; die Anzeige sagt das ausdrücklich, obwohl sie auf Interamt unter der Angebots-ID 1513404 steht. Frist 01.12.2026. Ansprechpartner: Gunar Tochtermann, gunar.tochtermann@fau.de, +49 9131 8528284.
+Ausschließlich über die Behördenseite (FAU-Portal), Frist 01.12.2026. Ansprechpartner Herr Gunar Tochtermann. Post und E-Mail sind ausdrücklich unerwünscht.
 
 ## Gehalt
 
-TV-L E 10, 40,1 Stunden, befristet bis 31.03.2028, Besetzung zum 15.02.2027. Entwicklung bis E 11 bei Übernahme der Leitungsfunktion. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt über E 10 und sollte im Anschreiben nicht genannt werden.
+TV-L E 10, keine Verhandlung, keine Zahl im Anschreiben. Entwicklung bis E 11 ist in der Anzeige genannt.
+
+## Fit-Begründung
+
+Drei. Linux, Hardware-Lebenszyklus, Speicher, Netze und Forschungsnähe passen gut, und die Anwenderbetreuung an mehreren Standorten ist gelebte Praxis. Die Windows-Server-Seite ist dagegen eine Muss-Anforderung, die vollständig fehlt — Active Directory, GPO, Hyper-V und Lizenzserver sind nicht vorhanden. Wer eine Instituts-IT übernimmt, in der die Hälfte der Systeme Windows ist, braucht genau das.
+
+Nicht 2, weil die Stelle ausdrücklich auch Linux umfasst, die Forschungsnähe echt ist und die Nachfolge der IT-Leitung jemanden braucht, der Beschaffung, Betrieb und Dokumentation beherrscht.

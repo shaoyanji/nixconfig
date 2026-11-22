@@ -6,7 +6,7 @@
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
   #v(1pt)
-  #text(size: 9pt, fill: rgb("#4b5563"))[IT-Systemadministration Linux und Windows]
+  #text(size: 9pt, fill: rgb("#4b5563"))[Linux-Systeme, Netze und Betrieb in Forschungsumgebungen]
   #v(2pt)
   #text(size: 8.5pt, fill: rgb("#374151"))[Am Burgerhof 4, 79261 Gutach im Breisgau • matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji]
 ]
@@ -14,7 +14,7 @@
 #line(length: 100%, stroke: 0.5pt + rgb("#d1d5db"))
 
 #v(6pt)
-#text(size: 9pt)[IT-Systemadministrator mit zehn Jahren Erfahrung in Linux-Betrieb, Automatisierung, Speicherung und Anwenderbetreuung, davon eine Forschungsstation am Fraunhofer ISE in Freiburg. Betreibt dreizehn Server über drei Hardware-Generationen und mehrere Standorte: Rechte als Rollen je Host, Netz und Firewall als Code, jede Änderung mit Gate und Rückrollung. Gesichert wird mit restic auf ein NAS, Wiederherstellungen werden geprüft statt angenommen. Überwacht wird über ein Sentinel-Ledger alle 15 Minuten mit bestätigter Alarmzustellung. Windows betreue ich auf Workstation-Ebene; Windows Server, Active Directory, Group Policies und Hyper-V sind nicht Teil dieser Erfahrung. Deutsch C1, Englisch Muttersprache.]
+#text(size: 9pt)[Linux-Systemadministrator mit zehn Jahren Erfahrung in Betrieb, Automatisierung und Anwenderbetreuung, davon eine Forschungsstation am Fraunhofer ISE. Betreibt dreizehn Server über drei Hardware-Generationen deklarativ auf NixOS, inklusive Beschaffung, Installation und Inbetriebnahme. Konfiguriert Netze und Firewall als Code mit nftables, dazu DNS, ein WireGuard-Tailnet und PXE-Installationen aus eigenem ISO-Archiv. Sichert auf NAS-Ziele mit restic und prüft Wiederherstellungen; jede Änderung ist auf die vorherige Generation rückrollbar. Überwacht mit einem Sentinel-Ledger alle 15 Minuten, prüft Endpunkte mit Gatus und bestätigt Alarmzustellungen erst bei Ankunft. In der Forschung band er Laborgeräte über C++-Anwendungen an und wertete Messreihen in Python aus. Windows: Anwenderbetreuung und Client-Support, keine Serveradministration, kein Active Directory, kein Hyper-V. Deutsch C1, Englisch Muttersprache.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
   #v(5pt)
@@ -39,45 +39,48 @@
 ]
 
 #section("Berufserfahrung")
-#entry("Bountystash — Gründer", "2020 – 2025", (
-  "Betrieb dreizehn NixOS-Hosts über drei Hardware-Generationen und mehrere Standorte, inklusive Beschaffung, Installation und Inbetriebnahme",
-  "Verwaltete Zugriffsrechte deklarativ: Rollen als Feature-Liste je Host, kein Konto von Hand angelegt",
-  "Sicherte Daten mit restic auf ein NAS und prüfte Wiederherstellungen statt sie anzunehmen",
-  "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledger schreibt",
-  "Prüfte Endpunkte mit Gatus und band Alarmierung an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachricht ankommt",
-  "Automatisierte Betriebsprozesse, Auswertungen und Deploy-Ketten in Shell, Python und Go",
-  "Konfigurierte Netz und Firewall als Code mit nftables, dazu DNS und ein WireGuard-Tailnet zwischen den Standorten",
-  "Richtete Anwenderkonten, Schlüssel und Zugänge ein und betreute Nutzende bei Hard- und Softwarefragen",
-  "Dokumentierte jede Betriebsprozedur als Runbook und leitete andere bei der Bedienung der Flotte an",
+#entry("Bountystash — Gründer und alleiniger Betreiber", "2020 – 2025", (
+  "Betrieb dreizehn Hosts über drei Hardware-Generationen und mehrere Standorte, von der Beschaffung über Transport und Installation bis zur Inbetriebnahme",
+  "Beschrieb Systeme und Dienste deklarativ in einem Flake: jeder Dienst ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit",
+  "Verwaltete Benutzerkonten, Rechte und Zugänge über zentrale Konfiguration statt über lokale Handarbeit auf den einzelnen Maschinen",
+  "Konfigurierte Netze und Firewall als Code mit nftables, dazu DNS und ein WireGuard-Tailnet ohne öffentliche Schnittstelle",
+  "Lieferte Bare-Metal-Installationen über PXE und ein eigenes ISO-Archiv, damit Neuaufbauten reproduzierbar bleiben",
+  "Sicherte auf NAS-Ziele mit restic und führte Wiederherstellungen durch statt nur Sicherungsläufe zu zählen",
+  "Schrieb einen Sentinel-Job, der Jobstatus, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledger schreibt, dazu Gatus-Prüfungen und eine Go-Bridge mit Zustellbestätigung",
+  "Hielt Dienste über systemd-Optionen und Ressourcenlimits klein und behandelte Speicherdruck als Messgröße",
+  "Betreute Anwender bei Hard- und Softwarefragen, auch über Standorte hinweg, und dokumentierte jede Prozedur als Runbook",
+  "Schrieb Werkzeuge in Shell, Python und Go, darunter die Alarm-Bridge und Auswertungen über das Ledger",
+  "Verwaltete Geheimnisse mit sops und age und betrieb eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten",
 ))
 #entry("O3 Energy — Asset Manager", "2016 – 2020", (
-  "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften",
+  "Betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften, einschließlich Anwenderbetreuung",
   "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen",
-  "Leitete das Asset Management eines Portfolios über 100 Mio. USD",
 ))
 #entry("Fraunhofer ISE — Wissenschaftliche Hilfskraft", "2012", (
-  "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie am Institut für Solare Energiesysteme",
-  "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte",
-  "Schrieb Python-Werkzeuge für Analyse und 3D-Geometrie",
+  "Band Laborgeräte über selbst geschriebene C++-Anwendungen an und hielt Messplätze betriebsbereit",
+  "Wertete Messreihen mit Python aus und arbeitete an 3D-Geometrie und Interferometrie zu Heliostat-Ungenauigkeiten",
 ))
 
 #section("Ausbildung")
-#entry("Albert-Ludwigs-Universität Freiburg — M.Sc. Erneuerbare-Energien-Management", "2011 – 2014", ("Abschluss 1,8; Schwerpunkt fluktuierende erneuerbare Energien und Wettermuster",))
-#entry("Colorado School of Mines — B.Sc. Erdöltechnik", "2006 – 2010", ("GPA 3,2; McBride Honors Program in Public Policy",))
+#entry("Albert-Ludwigs-Universität Freiburg — M.Sc. Erneuerbare-Energien-Management", "2011 – 2014", ("Abschluss 1,8; Modellierung mit neuronalen Netzen",))
+#entry("Colorado School of Mines — B.Sc. Erdöltechnik", "2006 – 2010", ("GPA 3,2",))
 
 #section("Projekte")
-#entry("nixconfig", "seit 2023", (
-  "Deklarierte die gesamte Flotte in einem Flake: jeder Host eine Feature-Liste, jeder Dienst ein Modul, sodass die Optionsfläche ein Gate bleibt",
-  "Verschlüsselte Secrets mit sops und stellte Host-Schlüssel über eine eigene SSH-Zertifizierungsstelle der Flotte aus",
-  "Ließ in CI dasselbe Modul-Gate je Host laufen wie auf den Maschinen, dazu ein Sentinel-Ledger aus Job-Status, Generation-Alter, Disk- und PSI-Druck",
-  "Betrieb eine autarke KI-Plattform auf eigener Hardware mit Go-Router, Modellwechsel auf Abruf und Zugang nur über das Tailnet",
+#entry("nixconfig — deklarierte Flotte mit Gates", "seit 2023", (
+  "Ein Modul je Dienst, eine Feature-Liste je Host; ein Gate prüft Module und Assertions, bevor etwas ausgerollt wird",
+  "Sentinel-Ledger über Jobstatus, Generation-Alter, Disk- und PSI-Druck, dazu eine Go-Bridge mit Zustellbestätigung",
+  "Dienste hinter einem Tailnet ohne öffentliche Schnittstelle, Zertifikate über die eigene CA",
+))
+#entry("Autarke KI-Plattform auf eigener Hardware", "2024 – 2025", (
+  "Betrieb Modellserver, Router und Weboberfläche auf eigenen Maschinen, ohne Cloud-Abhängigkeit",
+  "Schrieb den Router in Go und isolierte jede Modell-Lane mit eigenen Limits",
 ))
 
 #section("Kenntnisse")
-#text(weight: "bold")[Linux und Server] — NixOS und Debian-nah, systemd, Rechteverwaltung, Ressourcenlimits, Boot-Konfiguration, reproduzierbare Installation \
-#text(weight: "bold")[Speicherung und Sicherung] — restic, NAS, Aufbewahrung, geprüfte Wiederherstellungen \
-#text(weight: "bold")[Netzwerk] — nftables, WireGuard, DNS, TCP/IP, IPv6-Grundlagen \
-#text(weight: "bold")[Überwachung] — Gatus, JSONL-Ledger, Alarmzustellung, Disk- und PSI-Druck \
-#text(weight: "bold")[Automatisierung] — Shell, Python, Go, Git, CI-Gates, Task-Runner \
-#text(weight: "bold")[Windows] — Workstations einrichten und betreuen; Windows Server, Active Directory, Group Policies und Hyper-V nicht \
+#text(weight: "bold")[Linux] — NixOS und Ubuntu-nah, systemd, Ressourcenlimits, Benutzer- und Rechteverwaltung, PXE-Installation \
+#text(weight: "bold")[Netze] — nftables, DNS, Segmentierung, WireGuard-Tailnet, kein Dienst mit öffentlicher Schnittstelle \
+#text(weight: "bold")[Speicher und Sicherung] — NAS-Ziele, restic, geprüfte Wiederherstellungen, ISO- und Image-Archiv \
+#text(weight: "bold")[Zuverlässigkeit] — Monitoring-Ledger, Gatus, Zustellbestätigung, Rückrollung je Generation, Runbooks \
+#text(weight: "bold")[Automatisierung] — Shell, Python, Go, deklarative Konfiguration, Git als einzige Quelle \
+#text(weight: "bold")[Windows] — Anwenderbetreuung und Client-Support; keine Serveradministration, kein Active Directory, kein Hyper-V, kein PowerShell \
 #text(weight: "bold")[Sprachen] — Deutsch C1, Englisch Muttersprache

@@ -1,8 +1,152 @@
 {
-  "generated": "2026-11-22T11:07:31Z",
+  "generated": "2026-11-22T11:12:29Z",
   "count": 200,
-  "pin": "1b94312a24b6f55a6bbef091430f6481f09ef2a810c07fd69a2e3aca85e243e4",
+  "pin": "244b214abde9d97ac5887395b864cb948b491366a680ce6691782616381accfd",
   "turns": [
+    {
+      "id": "40aabb4a-03e9-49d7-ab6d-366271f0a911",
+      "ts": "2026-11-22T11:12:17Z",
+      "source": "antigravity",
+      "subject": "nixconfig:jobsearch",
+      "action": "active: flix iam packet (0:1.1), wolt greenhouse submission (0:2.1), mpcdf hpc packet (0:3.1)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/flix-cloud-iam-berlin submissions/wolt-eu-infrastructure submissions/mpcdf-linux-admin"
+      ],
+      "files": [],
+      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
+      "branch": "main",
+      "frame": "03ha70739g3rbshbc76jdd3di"
+    },
+    {
+      "id": "b4bae73f-d363-4d0e-9609-5f3518e443cc",
+      "ts": "2026-11-22T11:11:36Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flix-cloud-iam-berlin",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en), Cloud Engineer IAM",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/flix-cloud-iam-berlin"
+      ],
+      "files": [],
+      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
+      "branch": "main",
+      "frame": "03ha702cuxcaxqcrkg3p9xazc"
+    },
+    {
+      "id": "d33a58fe-8b7a-45cd-a431-fb9df30a86c3",
+      "ts": "2026-11-22T11:11:05Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:mpcdf-linux-admin",
+      "action": "migrated: native German Typst 2pp CV + 1pp letter for MPCDF Linux Systems Admin; read-only PDFs and JSON derivations removed; measured in sheet; cluster-software gap conceded; fit 4",
+      "outcome": "done",
+      "claims": [
+        "submissions/mpcdf-linux-admin"
+      ],
+      "files": [],
+      "base_commit": "ffd3aa0ffe16d7930d7df332504f3e9a1a25c5d6",
+      "branch": "main",
+      "frame": "03ha6zymn129ku71kj7iq6bzh"
+    },
+    {
+      "id": "66a10230-6a9b-4fae-90c0-3a57fa8a7da4",
+      "ts": "2026-11-22T11:11:02Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:mpcdf-linux-admin",
+      "action": "claim: native German Typst 2pp CV + 1pp letter, HPC systems emphasis",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/mpcdf-linux-admin"
+      ],
+      "files": [],
+      "base_commit": "8a92d4e68b7ce93c95026ff9fe3a8d077404c18a",
+      "branch": "main",
+      "frame": "03ha6zy9dljetoaaqwfvk5kir"
+    },
+    {
+      "id": "8ea32885-9f8f-4928-b353-013e25619526",
+      "ts": "2026-11-22T11:10:38Z",
+      "source": "antigravity",
+      "subject": "nixconfig:jobsearch",
+      "action": "active: wolt packet building (0:1.1), flix devops submission in flight (0:2.1), mpcdf hpc packet building (0:3.1)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/wolt-eu-infrastructure submissions/flix-devops-cloud-infrastructure submissions/mpcdf-linux-admin"
+      ],
+      "files": [],
+      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
+      "branch": "main",
+      "frame": "03ha6zvh145lsnks1jymh4ce7"
+    },
+    {
+      "id": "d341872a-994d-41f6-b165-2fa5541feb6e",
+      "ts": "2026-11-22T11:10:35Z",
+      "source": "devin",
+      "subject": "job-hunt:flix-devops",
+      "action": "applied: Flix DevOps/Cloud Infrastructure Engineer via flix.careers (GH req 8432987002); job-success page confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
+      "branch": "main",
+      "frame": "03ha6zv5lwdi5u9yakf1yldqr"
+    },
+    {
+      "id": "d7dcc7fc-e1eb-483e-a12d-b186e3f7eb96",
+      "ts": "2026-11-22T11:09:10Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:mittwald-devops",
+      "action": "migrated: native German Typst 2pp CV + 1pp letter for Linux hosting platform; store symlink and read-only derivations removed; measured in sheet; fit 3",
+      "outcome": "done",
+      "claims": [
+        "submissions/mittwald-devops"
+      ],
+      "files": [],
+      "base_commit": "8a92d4e68b7ce93c95026ff9fe3a8d077404c18a",
+      "branch": "main",
+      "frame": "03ha6zl7l438lwn5opz6vakvz"
+    },
+    {
+      "id": "89398310-35d1-4a94-bcf0-b2b999ffe82e",
+      "ts": "2026-11-22T11:09:07Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:mittwald-devops",
+      "action": "claim: native German Typst 2pp CV + 1pp letter, hosting-platform emphasis",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/mittwald-devops"
+      ],
+      "files": [],
+      "base_commit": "7dcaaf5bdcc4dc60b3a986a7e74d4d22f606c82c",
+      "branch": "main",
+      "frame": "03ha6zku5j8k89s3ucepsjw08"
+    },
+    {
+      "id": "92cee6cb-3099-4bd5-928d-44d62c193f4b",
+      "ts": "2026-11-22T11:08:26Z",
+      "source": "devin",
+      "subject": "job-hunt:adyen-genai",
+      "action": "applied: Adyen Senior Platform Engineer - GenAI via Greenhouse 8163866; OTP-verified, confirmation shown",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
+      "branch": "main",
+      "frame": "03ha6zg12a85vaf524hqzsrno"
+    },
+    {
+      "id": "f6cb5b84-ad12-4799-85ce-a101010a7459",
+      "ts": "2026-11-22T11:07:34Z",
+      "source": "freebuff",
+      "subject": "nixconfig:wolt-eu-infrastructure",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6ca0b67f6c298971ea4af5d58296a259ae66e07",
+      "branch": "main",
+      "frame": "03ha6z9yztin9llbvjsmnq1t4"
+    },
     {
       "id": "120985cd-d267-4aed-8e42-5c45e25c6d57",
       "ts": "2026-11-22T11:07:14Z",
@@ -2588,136 +2732,6 @@
       "base_commit": "0686bf80a6aa1be955020ae0377be7f7f757bcdb",
       "branch": "main",
       "frame": "03ha6cy6owp9em238ta0laagi"
-    },
-    {
-      "id": "28d14ff4-9928-4f83-bd2b-7975ac2ca24d",
-      "ts": "2026-11-22T09:12:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:bamf-devops",
-      "action": "landed: BAMF DevOps Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0686bf80a6aa1be955020ae0377be7f7f757bcdb",
-      "branch": "main",
-      "frame": "03ha6cqj5kd5c5b6k447rvwj1"
-    },
-    {
-      "id": "44e8007f-06b4-4329-806c-b098c5586a15",
-      "ts": "2026-11-22T09:12:07Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:dfs-sre",
-      "action": "landed: DFS Deutsche Flugsicherung SRE Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6ff6972716947deabf1459f77ec7123eb09c476c",
-      "branch": "main",
-      "frame": "03ha6cq2buviyje45joeiwh15"
-    },
-    {
-      "id": "73a2a985-8b39-44d9-ad22-dc44d8d4f71c",
-      "ts": "2026-11-22T09:11:44Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: catawiki-platform-engineer submitted via Greenhouse | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8ec2318dd957fea29f11a65300c3ed44c105fd17",
-      "branch": "main",
-      "frame": "03ha6cnchlxxcvwkly1v7y7sj"
-    },
-    {
-      "id": "d64f2e7e-f1eb-4ccf-9e7c-dfcf5f66cae8",
-      "ts": "2026-11-22T09:10:35Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: catawiki-platform-engineer Greenhouse submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "8ec2318dd957fea29f11a65300c3ed44c105fd17",
-      "branch": "main",
-      "frame": "03ha6cf8it0las2shbec2aqwi"
-    },
-    {
-      "id": "826c9f34-03ff-40f9-b75e-04c128d31260",
-      "ts": "2026-11-22T09:09:49Z",
-      "source": "freebuff",
-      "subject": "nixconfig:bundesdruckerei-sre",
-      "action": "landed: Bundesdruckerei SRE Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9de14f95752a62d9bfca927f4aa42847be8ae622",
-      "branch": "main",
-      "frame": "03ha6c9x5inphf26ripsc3c88"
-    },
-    {
-      "id": "795263f1-3331-42bc-bb78-c6d19dfe7fb1",
-      "ts": "2026-11-22T09:09:44Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:telekom-sre-prometheus",
-      "action": "landed: Telekom SRE Prometheus Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0daa05216f83a3467615739871f82f8e37cf5cf0",
-      "branch": "main",
-      "frame": "03ha6c983xspzn6k06q6f0zor"
-    },
-    {
-      "id": "7b8fbd28-d20a-4c16-bfbb-2d61175f5ad1",
-      "ts": "2026-11-22T09:09:28Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "landed: hermes-persona memory.write_approval=false committed (18b3d5b3), pushed; blast radius delphi+frieren verified via programs.hermes-user | gate: checks:host delphi 2110 + frieren(eval) 2309 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "18b3d5b3c40691e749d74023bb74a539bae62ec4",
-      "branch": "main",
-      "frame": "03ha6c7epmrznmbgj8vjda11u"
-    },
-    {
-      "id": "7b488733-fa75-4696-9870-d6636a82f6b5",
-      "ts": "2026-11-22T09:07:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:mittwald-devops",
-      "action": "landed: Mittwald DevOps Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4d4a5776d4bf91e2f1a0b978eada44ce0f7aa7ee",
-      "branch": "main",
-      "frame": "03ha6busxi45ybm4ibl38lk73"
-    },
-    {
-      "id": "0e6c8210-d03a-475d-98fe-5980b7caa1d5",
-      "ts": "2026-11-22T09:07:12Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:trawa-senior-platform-engineer",
-      "action": "landed: trawa Senior Platform Engineer packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "edf741687703ab6699c53b46b257194c03636a86",
-      "branch": "main",
-      "frame": "03ha6brhflxczmlluu0xh4m5r"
-    },
-    {
-      "id": "1d664c30-108b-4365-a5cc-3cba3d5e67fa",
-      "ts": "2026-11-22T09:05:43Z",
-      "source": "freebuff",
-      "subject": "nixconfig:shopware-cloud-infra",
-      "action": "landed: shopware AG Cloud Infrastructure Engineer Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fae4c4748367d03db1bd7a14e584058cec7c6676",
-      "branch": "main",
-      "frame": "03ha6bh250fetx942yhidzb5p"
     }
   ]
 }

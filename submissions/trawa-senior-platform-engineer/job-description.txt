@@ -1,0 +1,106 @@
+Senior Platform Engineer
+trawa
+Berlin HQ
+Remote: False
+Veröffentlicht: 1795135234
+Tags: Engineering
+Anzeige: https://www.arbeitnow.com/jobs/companies/trawa/senior-platform-engineer-berlin-57894
+Senior Platform Engineer
+
+Permanent employee · Full-time · Berlin (HQ)
+
+ 
+
+Our Mission For You
+
+European energy costs are twice as high as in the US and China, and electricity demand is expected to double by 2050. This puts European industry under massive cost pressure – and companies need to act now.
+
+trawa is building the solution: the first integrated B2B energy platform that brings together energy procurement, energy management and the marketing of flexible assets in one product. This helps companies save up to 30% on their recurring electricity costs while switching to renewable energy.
+
+We're the fastest-growing B2B energy platform in Europe. Active in Germany and Austria now, and expanding operations to a third market in 2027. We're on the road to European scale and move fast – the market window is open and we intend to own it.
+
+Now we are looking for a Senior Platform Engineer to build the foundation every trawa engineer relies on.
+
+ 
+
+About trawa
+
+trawa is a tech-driven scale-up based in Berlin with around 100 employees, combining deep energy market expertise with in-house software development. We've raised over €35M to date, most recently a €24M Series A in May 2025, backed by Balderton, Headline, Speedinvest, AENU, Magnetic and Tiny VC. This role is based in our Berlin office, where we work together in person most of the week. We offer flexible working hours, so you can shape your day in a way that works for you.
+
+ 
+
+The Team
+
+Our Platform team owns our infrastructure, shared tooling and developer experience, so your work shapes how fast and how safely the whole company ships. You'll work with engineers across the company and see the impact of your work across every team.
+
+ 
+
+Who We Are Looking For
+
+- Impact focus: You focus on impact, not just technical outcomes, and you care about what your work makes possible for others.
+
+- Natural collaborator: People enjoy working with you, and you build strong relationships across teams.
+
+- Platform experience: You have at least 8 years of experience in a platform, DevOps or SRE role.
+
+- Hands-on AWS and IaC: You have deep hands-on experience with AWS and infrastructure as code, ideally Terraform.
+
+- Distributed systems: You have built or run distributed services in production, with a strong grasp of security, reliability, observability and cost efficiency.
+
+ 
+
+What You'll Do
+
+- Build and run scalable, secure, highly available AWS infrastructure that powers our mission-critical services.
+
+- Improve CI/CD pipelines, observability tooling and internal platforms so teams ship faster and with confidence.
+
+- Embed security into our infrastructure and pipelines, covering access management, secrets and compliance needs.
+
+- Partner with engineers, share best practices and make the right way the easy way.
+
+ 
+
+Our Tech Stack
+
+- AWS, Terraform, Spacelift, Docker, GitHub Actions
+
+- Python, TypeScript
+
+- Dash0, Sentry, Incident.io
+
+ 
+
+90 Day Goals
+
+After 6 Weeks (Onboarding):
+
+- Current setup: You have a comprehensive understanding of trawa's current tech stack, infrastructure and security posture.
+
+- Team relationships: You have met the engineering teams, learned how they build, ship and run their services, and developed relationships with your key stakeholders.
+
+Month 3 (Ramp-Up):
+
+- Infrastructure ownership: You own parts of our AWS infrastructure and Terraform codebase.
+
+- Workflow friction: You have found the biggest friction points in our developer workflow and proposed ways to fix them.
+
+- Platform improvement: You have led a meaningful platform improvement from design to rollout.
+
+ 
+
+Why Us?
+
+Impact: European SMEs spend between €150k and €10M per year on electricity – most are overpaying and locked into outdated procurement. Your work will directly change how thousands of companies buy, manage and use energy. The impact is measurable, the market is massive, and the timing is now.
+
+Ownership: We empower our team members to take ownership of their work and drive results, regardless of background or experience level.
+
+Learning & Growth: We provide an annual budget and dedicated time for professional development. You'll have opportunities for mentorship, learning and career progression.
+
+Diversity and Inclusion: We're an equal opportunity employer, and our team reflects that. Our organisation brings together over 15 nationalities, contributing a variety of languages, experiences and perspectives. At trawa, we're family-friendly with parents across all levels, and our diversity is represented throughout the company, including leadership. We're committed to an inclusive environment where everyone can do their best work.
+
+Package & Benefits: We offer a competitive compensation package including salary and stock options, 30 days of vacation, and a range of benefits including subsidies for home internet and lunches, a Sports Club membership, dedicated learning days with an annual learning budget, plus a weekly team lunch and regular team events.
+
+At trawa, we're dedicated to building a diverse, inclusive and authentic workplace. If you're excited about this role but your experience doesn't align perfectly, we encourage you to apply – you may be the right fit for this or another opportunity.
+
+Find Jobs in Germany on Arbeitnow

@@ -90,8 +90,8 @@ screening as accepted. Distance and salary close the letter.
 | :--- | :--- |
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 192 prose files, exit 0 |
-| selection | 14/37 highlights, 0/0 projects |
+| `task checks:prose` | 193 prose files, exit 0 |
+| selection | 14/37 highlights, 4/10 projects |
 | sha256 CV | `f24d5be10d862f42e966a637d1e7bd9b875ec2556d85a6547598f18fb637c341` |
 | sha256 letter | `b2d967119909ace0947718fb5ba1088dd400d6a936d8821084e4baa879c8b4f8` |
 

@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-22T07:40:36Z",
+  "generated": "2026-11-22T07:40:45Z",
   "count": 200,
-  "pin": "7ca5a3aa69a29884e564fc4b5743b77f98f5912f4ffbf77c34253c0552855692",
+  "pin": "40c2ac4f074f8f665b38a60f2467f3261a7517d480a444d447f90fb4bed62690",
   "turns": [
+    {
+      "id": "63b4011c-f06e-44a8-acbe-ee75a56d085d",
+      "ts": "2026-11-22T07:40:42Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: ionos staff NRE karlsruhe via GH eu legacy board; sheet mapped (15 answers incl SUE2 consent, no-relocate+commute, 120k)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/ionos-staff-nre"
+      ],
+      "files": [],
+      "base_commit": "747d0df77ad89d374d7db1880c90d40caf7bf6dc",
+      "branch": "main",
+      "frame": "03ha5uv5kvn4w44di6y7p7cfp"
+    },
+    {
+      "id": "824c0efb-b14f-4c08-aa60-e739b8cab147",
+      "ts": "2026-11-22T07:40:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-dfs-sre",
+      "action": "landed: DFS Ingenieur Site Reliability packet in submissions/dfs-sre (fit 5, BA 17761-1172604-2-S / J000000038). German CV 2pp, letter 1pp, ask 95k in the 90-100k band. Letter claims expert Linux + Go/Python automation, names Ansible, CI/CD pipelines, K8s, Windows as absent; screening accepted. Sheet flags medical fitness + licence B to confirm. Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/dfs-sre"
+      ],
+      "base_commit": "747d0df77ad89d374d7db1880c90d40caf7bf6dc",
+      "branch": "main",
+      "frame": "03ha5uupbptqnuu2oy3b488ut"
+    },
     {
       "id": "c5227b8c-0a94-48dc-ada3-de2cb2734c6d",
       "ts": "2026-11-22T07:40:34Z",
@@ -2810,32 +2840,6 @@
       "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
       "branch": "main",
       "frame": "03h9xr88is3xtjqqdfr7nn4yh"
-    },
-    {
-      "id": "94a96659-ce60-4744-a5e0-f5f767d036e0",
-      "ts": "2026-11-21T06:39:01Z",
-      "source": "devin",
-      "subject": "nixconfig:dead-module-sweep",
-      "action": "done: audited all 165 registry modules + 102 host files — zero dead modules; every file is imported (key ref, path import, or script-eval like gok.sh evalModules) except 3 intentional no-ops (.shadow stubs ×3 host files + minimal.shadow/dsh-launcher.shadow, and user.edge-caller kept as the executable record of a measured dead end per AGENTS.nix). Nothing to remove; registry evaluates clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xpip8sld1kqg113ed4emx"
-    },
-    {
-      "id": "301b147a-1102-46de-a1f0-8987d8ef8d89",
-      "ts": "2026-11-21T06:37:52Z",
-      "source": "devin",
-      "subject": "nixconfig:timer-consolidation",
-      "action": "landed: timer_consolidation — devin on mkTimerJob/mkDaemon consolidation (~20 timer pairs, 2 CV gate claims pending) (jevdecide margin 0.63)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03h9xpajtb6i8t5edzb38btes"
     }
   ]
 }

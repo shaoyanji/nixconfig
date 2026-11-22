@@ -35,11 +35,13 @@ CREATE INDEX IF NOT EXISTS emails_sent_at_idx
 CREATE INDEX IF NOT EXISTS emails_thread_id_idx
   ON emails (thread_id);
 
--- Triage is a verdict *about* a message, not a property of it, so it lives in
--- its own table keyed by (message_id, classifier): two classifiers can disagree
--- on the same message and both rows stand, and re-classifying never rewrites
--- the archive. `owner` is the routing decision — `agent:ci` means the loop
--- closes on an agent instead of a human queue.
+-- Triage is a verdict *about* a message, and a verdict is a current state, not
+-- a history: one message keeps one row (`UNIQUE (message_id)`), and a second
+-- classifier replaces the first instead of adding a row beside it. Keying on
+-- (message_id, classifier) let re-classification accumulate — 10,165 rows for
+-- 2,907 messages on 2026-11-22 — so the route now conflicts on `message_id`.
+-- `owner` is the routing decision: `agent:ci` means the loop closes on an agent
+-- instead of a human queue.
 --
 -- `resolved_at` is how a CI notice stops being noise: an agent that fixes the
 -- run marks the verdict resolved, and the row leaves /api/agent-queue without
@@ -54,7 +56,8 @@ CREATE TABLE IF NOT EXISTS email_triage (
   confidence  real,
   decided_at  timestamptz NOT NULL DEFAULT now(),
   resolved_at timestamptz,
-  PRIMARY KEY (message_id, classifier)
+  PRIMARY KEY (message_id, classifier),
+  UNIQUE (message_id)
 );
 
 -- `ignore` was added after the table existed, and CREATE TABLE IF NOT EXISTS
@@ -63,6 +66,25 @@ CREATE TABLE IF NOT EXISTS email_triage (
 ALTER TABLE email_triage DROP CONSTRAINT IF EXISTS email_triage_tier_check;
 ALTER TABLE email_triage ADD CONSTRAINT email_triage_tier_check
   CHECK (tier IN ('person', 'action', 'digest', 'robot', 'review', 'ignore'));
+
+-- CREATE TABLE IF NOT EXISTS never alters an existing table, so the one-row rule
+-- needs its own idempotent statement. A unique_violation means the archive still
+-- holds duplicates from the composite key: dedupe, then re-activate.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'email_triage'::regclass
+      AND conname = 'email_triage_message_id_key'
+  ) THEN
+    BEGIN
+      ALTER TABLE email_triage
+        ADD CONSTRAINT email_triage_message_id_key UNIQUE (message_id);
+    EXCEPTION WHEN unique_violation THEN
+      RAISE NOTICE 'email_triage still holds duplicate message_id rows; one-row constraint not added';
+    END;
+  END IF;
+END $$;
 
 -- The three read paths are "unresolved, newest first", per tier and per owner.
 CREATE INDEX IF NOT EXISTS email_triage_open_idx

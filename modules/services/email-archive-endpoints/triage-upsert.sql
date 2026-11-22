@@ -8,8 +8,10 @@
 -- parses `keys:` and friends out of comments and prefixed this response body
 -- with the annotation instead of returning JSON.
 --
--- A repeat keeps the row's `resolved_at`: re-classifying a CI notice an agent
--- already fixed must not put it back in the queue.
+-- One verdict per message: a second classifier replaces the first (the archive
+-- schema enforces `UNIQUE (message_id)`), so re-classification cannot leave two
+-- rows for one mail. A repeat keeps the row's `resolved_at`: re-classifying a CI
+-- notice an agent already fixed must not put it back in the queue.
 insert into email_triage (
   message_id,
   classifier,
@@ -26,7 +28,8 @@ values (
   nullif(:reason, ''),
   :confidence::real
 )
-on conflict (message_id, classifier) do update set
+on conflict (message_id) do update set
+  classifier = excluded.classifier,
   tier       = excluded.tier,
   owner      = excluded.owner,
   reason     = excluded.reason,

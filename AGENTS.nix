@@ -5118,5 +5118,40 @@
         signup lets any vhost visitor write the history db.
       '';
     };
+
+    aki-site-design = {
+      title = "Fleet site: retired-design record and the traps behind the pointers";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-22";
+      summary = "The narratives lib/aki-site.nix comments used to carry — typed-prose incidents, retired render paths, the shadow trap — consolidated so the comments become pointers.";
+      refs = {
+        modules = ["lib/aki-site.nix" "lib/knowledge-graph.nix"];
+        tasks = ["checks:kg:canvas"];
+      };
+      body = ''
+        Consolidated 2026-11-22 (nix-comment-audit routing). lib/aki-site.nix
+        comments now carry `Story:`/`Trap:` pointers here.
+
+        Retired designs: the overview body renders twice (no-JS document and
+        data/overview.json transition) as ONE expression — two copies is how
+        the old page drifted from the data it described. Note slices carry the
+        note's own text because the old page reached a note only through one
+        hardcoded forge URL. The static live.json fallback is nulls: the old
+        file invented "generation: booted", "uptime: nominal", "load: 0.0" and
+        the page displayed them as measured. Host rows omit unknown fields —
+        "Generic", "DHCP", "Integrated" were typed prose. The closures page
+        replaced a hand-written attribution rollup ("15.4 GiB exclusive (46%)",
+        "~703 MiB" for one generation of one host): unproducible and wrong
+        within a week; closure-budgets.toml is rewritten by a measurement.
+
+        Traps: the template values attrset must not name attrs after the
+        let-bindings they read (`t.devices`, never `t.totalHosts`) — a shadowed
+        name recurses forever, silently. kg.js's interaction contract (click
+        navigates, hover inspects, pan/zoom never) was the TODO exit
+        criterion; TODO.md is now a pointer stub, so the contract lives here.
+        "Gap B"/"Gap D" in comments number a retired feature-gap list.
+      '';
+    };
   };
 }

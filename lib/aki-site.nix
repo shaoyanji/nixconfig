@@ -177,9 +177,8 @@
   hostBadges = ./site/host-badges.json |> builtins.readFile |> builtins.fromJSON;
 
   # Aki hypermedia driver with delegated click listener for dynamic DOM mutations.
-  # Assets are FILES (lib/site/), not literals: Nix cannot lint, format or
-  # syntax-check CSS/JS, and a missing quote inside `''` is a Nix parse error at
-  # eval time. What stays in this file is data + interpolation only.
+  # Assets are FILES (lib/site/), not literals — Nix cannot lint a `''` string:
+  # flake/policies.nix#site-assets-are-files.
   akiJs = builtins.readFile ./site/aki.js;
 
   # Interactive knowledge-graph canvas (Gap D, canvas half).
@@ -187,12 +186,12 @@
   # Aki transitions replace #detail-pane.innerHTML, so this file owns its own
   # lifecycle: it initialises whenever a slice introduces #kg-canvas and leaves
   # everything else to the runtime. It is a plain .js file (lib/site/kg.js) so it
-  # can be syntax-checked and reviewed as JavaScript; nothing in it is typed by
-  # Nix — every fact it displays comes from data/kg-graph.json at runtime.
+  # can be syntax-checked and reviewed as JavaScript; every fact it displays
+  # comes from data/kg-graph.json at runtime.
   #
-  # Interaction contract, matching the TODO exit criterion: a click on ANY node
-  # performs an Aki transition to that node's static slice (data/kg/<type>-<hash>.json).
-  # Hover inspects without navigating; pan/zoom never navigate.
+  # Interaction contract: a click on ANY node performs an Aki transition to that
+  # node's static slice (data/kg/<type>-<hash>.json). Hover inspects without
+  # navigating; pan/zoom never navigate (Story: note aki-site-design).
   kgJs = builtins.readFile ./site/kg.js;
 
   styleCss = builtins.readFile ./site/style.css;
@@ -217,16 +216,13 @@
   # Static navigation buttons; every URL is a slice this build writes.
   sidebarButtons = builtins.readFile ./site/sidebar.html;
 
-  # The overview body is a single expression because it is rendered twice: as
-  # the no-JS initial document and as the `data/overview.json` transition. Two
-  # copies is how the old page drifted from the data it claimed to describe.
-  # Templates are real .html files (lib/site/{shell,overview}.html) with
-  # `{{name}}` holes: a page is reviewable as HTML, and editing copy is not an
-  # edit to a Nix module that also imports the knowledge graph. `render`
-  # substitutes every hole in ONE pass — replaceStrings never rescans a
-  # replacement, so a value that happens to contain `{{` cannot cascade — and it
-  # refuses to return a page that still has a hole. A renamed value would
-  # otherwise ship as literal braces on the page instead of failing the build.
+  # The overview body is a single expression because it is rendered twice —
+  # the no-JS document and the `data/overview.json` transition (two copies is
+  # how the old page drifted; Story: note aki-site-design). Templates are real
+  # .html files with `{{name}}` holes: `render` substitutes every hole in ONE
+  # pass — replaceStrings never rescans a replacement, so `{{` inside a value
+  # cannot cascade — and it refuses a page that still has a hole, so a renamed
+  # value fails the build instead of shipping literal braces.
   render = file: values: let
     text = file |> builtins.readFile;
     names = values |> builtins.attrNames;
@@ -237,10 +233,9 @@
     then throw "template ${toString file}: unbound placeholder {{${unbound}}}"
     else out;
 
-  # Values for the two templates. Deliberately NOT named after the bindings they
-  # read (`devices`, not `totalHosts`): an attribute named `totalHosts` here
-  # would shadow the compiled value and recurse forever. `t` is shared with the
-  # shell, which adds only the document-scaffolding holes.
+  # Values for the two templates. Names must not shadow the let-bindings they
+  # read — `t.totalHosts` would recurse forever (Trap: note aki-site-design).
+  # `t` is shared with the shell, which adds only the scaffolding holes.
   t = {
     devices = toString totalHosts;
     active = toString activeTotal;
@@ -295,9 +290,8 @@
   # Host list for sidebar
   hostKeys = hostNames;
 
-  # Every registered host, ordered as the registry orders them. The old list was
-  # `status == active` only, which silently hid preserved and WIP machines that
-  # the registry still describes.
+  # Every registered host, ordered as the registry orders them — the same rule
+  # as hostJsonFiles below.
   hostSidebarButtons =
     hostKeys
     |> map (
@@ -499,14 +493,10 @@
       };
     };
 
-  # Closure budgets — the only closure figures this site may print.
-  #
-  # The attribution rollup and the debloat playbook that used to live here were
-  # hand-written byte splits ("15.4 GiB exclusive (46%)", "~703 MiB") about one
-  # generation of one host. They could not be reproduced from the repository and
-  # were wrong within a week. `closure-budgets.toml` is the closure document that
-  # a MEASUREMENT rewrites (`task dev:closure:budget:adopt`), so it is the one
-  # rendered: baseline, headroom, derived budget, and the date taken.
+  # Closure budgets — the only closure figures this site may print:
+  # flake/policies.nix#site-prints-measured-closures. `closure-budgets.toml` is
+  # the document a measurement rewrites (`task dev:closure:budget:adopt`);
+  # the hand-typed rollup it replaced is in Story: note aki-site-design.
   closureRows = budgetRows |> lib.sort (a: b: a.bytes > b.bytes);
 
   closuresJson = builtins.toJSON {
@@ -904,11 +894,9 @@
   # build-time markdown renderer and the same static-slice navigation as a doc.
   agentsNotes = import ./agents-notes.nix {inherit lib;};
 
-  # Doc and skill nodes carry their own text into their slice. The note is read
-  # from the repository at evaluation time, shipped as data next to the slice,
-  # and rendered by the build step below — so "open the note" is a transition
-  # inside the site, not a link to a forge that may have moved the file (the old
-  # page hardcoded one such URL, and it was the only way to reach any note).
+  # Doc and skill nodes carry their own text into their slice: read from the
+  # repo at eval time and rendered by the build step, so "open the note" is a
+  # transition inside the site, never a forge link (Story: note aki-site-design).
   docNodes = kg.graph.nodes |> builtins.filter (n: n.type == "doc");
   skillNodes = kg.graph.nodes |> builtins.filter (n: n.type == "skill");
   noteNodes = docNodes ++ skillNodes;
@@ -1096,11 +1084,9 @@
     })
     kg.graph.nodes;
 
-  # Live telemetry is OPTIONAL and is written by the host at runtime. The static
-  # fallback therefore carries only facts this build knows: which host serves
-  # the site and that these values are unknown. `null` is the honest value — the
-  # old file invented "generation: booted", "uptime: nominal", "load: 0.0",
-  # which the page then displayed as if measured.
+  # Live telemetry is OPTIONAL and written by the host at runtime. The static
+  # fallback carries only facts this build knows: `null` is the honest value
+  # (the old file invented readings; Story: note aki-site-design).
   fallbackLiveJson = builtins.toJSON {
     hostname =
       if host != null

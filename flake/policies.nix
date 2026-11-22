@@ -1399,6 +1399,20 @@
       holds = has "hosts/delphi/configuration.nix" "refusing to clone over it";
       detail = "a seeder that could clobber a dirty checkout would lose uncommitted vault notes";
     };
+
+    site-prints-measured-closures = {
+      rule = "The fleet site renders only measured closure figures: `closure-budgets.toml` is rewritten by `task dev:closure:budget:adopt` from a real `du`, and the closures page reads it. A GiB number typed into lib/aki-site.nix is a fact nobody measured — the retired attribution rollup (15.4 GiB exclusive) was unproducible and wrong within a week.";
+      proof = "lib/aki-site.nix reads ../closure-budgets.toml · closure-budgets.toml carries baseline.measured_on";
+      holds = has "lib/aki-site.nix" "closure-budgets.toml" && has "closure-budgets.toml" "measured_on";
+      detail = "a typed byte split would render as if measured";
+    };
+
+    site-assets-are-files = {
+      rule = "Site assets live as files under lib/site/, never as `''` literals inside lib/aki-site.nix: Nix cannot lint, format or syntax-check CSS/JS, and a stray quote inside a literal is a parse error at eval time. What stays in the module is data + interpolation only.";
+      proof = "lib/aki-site.nix reads ./site/style.css, ./site/aki.js, ./site/kg.js";
+      holds = has "lib/aki-site.nix" "./site/style.css" && has "lib/aki-site.nix" "./site/aki.js" && has "lib/aki-site.nix" "./site/kg.js";
+      detail = "an inlined asset would drop the readFile and with it reviewable, checkable source";
+    };
   };
 
   ids = policies |> builtins.attrNames;

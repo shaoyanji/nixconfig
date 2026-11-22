@@ -36,7 +36,8 @@ Never create a markdown file at the repo root. Never duplicate a fleet table.
 Do not author `~/.hermes/handoff*.md` or an exit interview, do not read one as a
 directive queue, and do not send a pane a pointer to one. A new session starts
 from `task agents:xs:list LIVE=1` and the repo. Durable continuation goes in the
-xs turn's `rationale`.
+xs turn's `rationale`. A handoff file is a defect, not a continuation:
+`task checks:hermes` fails on `~/.hermes/handoff*.md` and `~/.hermes/handoffs/`.
 
 ## Routing
 

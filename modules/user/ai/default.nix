@@ -69,9 +69,9 @@ in {
     self.modules."user.ai.antigravity-cli"
     self.modules."user.ai.skills"
     self.modules."user.ai.freebuff-remote"
-    self.modules."user.ai.dsh-launcher"
+    # self.modules."user.ai.dsh-launcher"
     self.modules."user.ai.mainframe-remotes"
-    self.modules."user.ai.reasonix"
+    # self.modules."user.ai.reasonix"
     self.modules."user.ai.zed-mcp"
   ];
 

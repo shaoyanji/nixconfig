@@ -134,7 +134,7 @@ if command -v hermes >/dev/null 2>&1; then
     *) bad "hermes reports: ${version_line:-<no config version line>}" ;;
   esac
 fi
-for f in config.yaml SOUL.md AGENTS.md; do
+for f in config.yaml SOUL.md AGENTS.md USER.md MEMORY.md; do
   if [ ! -e "$home/.hermes/$f" ]; then
     warn "$home/.hermes/$f missing"
   elif [ ! -e "$(readlink -f "$home/.hermes/$f")" ]; then
@@ -143,6 +143,20 @@ for f in config.yaml SOUL.md AGENTS.md; do
     ok "$home/.hermes/$f resolves"
   fi
 done
+
+echo "== handoff loop"
+handoff_found=0
+for f in "$home/.hermes/handoff.md" "$home/.hermes/HANDOFF.md"; do
+  if [ -e "$f" ]; then
+    bad "handoff file exists: $f — MEMORY.md forbids a handoff channel"
+    handoff_found=1
+  fi
+done
+if [ -d "$home/.hermes/handoffs" ]; then
+  bad "handoff directory exists: $home/.hermes/handoffs — MEMORY.md forbids a handoff channel"
+  handoff_found=1
+fi
+[ "$handoff_found" -eq 0 ] && ok "no handoff files"
 
 echo
 if [ "$fail" -ne 0 ]; then

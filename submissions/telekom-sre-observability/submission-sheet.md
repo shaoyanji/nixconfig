@@ -1,67 +1,65 @@
-# Bewerbung Deutsche Telekom / T-Systems — SRE Observability/Tracing
+# Bewerbung — Deutsche Telekom IT GmbH, Senior SRE Observability
 
 Stand: 22. November 2026
 Fit: 4
-Sprache: Deutsch (C1)
+Sprache: Deutsch
+Status: Paket kompiliert; KRITIS- und Werkzeuglücke im Anschreiben benannt
 
 ## Stelle
 
 | Feld | Wert |
 | :--- | :--- |
-| Arbeitgeber | Deutsche Telekom AG / T-Systems International GmbH |
-| Rolle | Site Reliability Engineer (SRE) (m/w/d), Schwerpunkt Observability |
-| Referenz | 12444-563465374109848-DT-S, Chiffre 563465374109848 |
-| Standorte | Darmstadt, Berlin, Dresden, Karlsruhe, Kassel, Saarbrücken, Hannover, Bielefeld, Magdeburg, München |
-| Veröffentlicht | 12.07.2026, Eintritt ab 30.10.2026 |
-| Vergütung | keine Angabe in den BA-Daten |
-| Quelle | Arbeitsagentur-Jobdetails-API, HTTP 200 am 22.11.2026 |
+| Arbeitgeber | Deutsche Telekom IT GmbH |
+| Rolle | Senior Site Reliability Engineer, Schwerpunkt Observability |
+| Umfeld | KRITIS-Telekommunikation, Fernarbeit in Deutschland |
+| Quelle | Auftrag vom 22.11.2026, Bewerbungsweg telekom.jobs |
+| Vergütung | im Anschreiben keine Zahl |
 
 ## Dokumente
 
 | Dokument | Datei | Hinweis |
 | :--- | :--- | :--- |
-| Anschreiben | `anschreiben.pdf` | Eine Seite, deutsch, mit der OpenTelemetry-Lücke im dritten Absatz |
+| Anschreiben | `anschreiben.pdf` | Eine Seite, deutsch, Lücke im dritten Absatz |
 | Lebenslauf | `lebenslauf.pdf` | Zwei Seiten, deutsch |
 | Quellen | `lebenslauf.typ`, `anschreiben.typ` | Typst, eigenständig kompilierbar |
-| Zeugnisse | keine Datei | Muss ergänzt werden |
+| Zeugnisse | keine | fehlen weiterhin |
 
-## Abgleich
+Vorher lag hier ein Paket zur Ausschreibung der Deutschen Telekom AG / T-Systems (Referenz 12444-563465374109848-DT-S, Observability/Tracing, zehn Standorte). Der Auftrag nennt jetzt die Deutsche Telekom IT GmbH mit KRITIS-Bezug und Fernarbeit; beide Dokumente sind neu geschrieben, die alten Typst-Quellen ersetzt.
 
-| Anforderung | Nachweis | Einschätzung |
+## Anforderungsprüfung
+
+| Anforderung | Nachweis | Bewertung |
 | :--- | :--- | :--- |
-| Observability verteilter Systeme | Eigene Toolchain: Ledger, Gatus, Go-Bridge mit Zustellbestätigung | Teilweise — Praxis ja, Stack nein |
-| OpenTelemetry | Nicht vorhanden | **Lücke** |
-| Verteiltes Tracing | Nicht vorhanden | **Lücke** |
-| Prometheus, Grafana, Loki, AlertManager | Nicht vorhanden | **Lücke** |
-| Linux-Plattform und Interna | systemd, cgroup-Limits, PSI, Namespaces, nftables | Stark |
-| Deklarativer Betrieb, GitOps-Nähe | Git als einzige Quelle, Gates, Generationen, Rückrollung | Stark |
-| Betrieb großer verteilter Systeme | Einzelne Flotte, kein Multi-Team-Betrieb | **Lücke** |
-| Karlsruhe als Standort | Rund 1,5 h, Wohnsitz Baden-Württemberg | Erfüllt |
+| Betrieb von Linux-Hosts im Dauerbetrieb | 13 Hosts, drei Hardware-Generationen, fünf Jahre | Stark |
+| Beobachtung als Schleife | Ledger alle 15 Minuten mit Zeitstempel, Gatus-Prüfungen, Auswertung von Druck und Speicher | Stark, eigenbau |
+| Alarmierung mit Zustellbestätigung | Alarmkanal in Go, Erfolg erst nach bestätigter Zustellung | Stark |
+| Automatisierte Störungserkennung | Alter der Generation, Speicher- und Prozessdruck als Vorlaufgrößen | Stark |
+| Prometheus, Thanos, Loki, OpenTelemetry | nicht betrieben | **Lücke** |
+| KRITIS und Regulierung (BSIG, IT-Grundschutz, Audits) | kein regulierter Betrieb verantwortet | **Lücke** |
+| Kubernetes, Cloud | nicht vorhanden | **Lücke** |
 | Deutsch C1 | C1, Englisch Muttersprache | Erfüllt |
-| Arbeitserlaubnis | US-Staatsangehörigkeit mit Niederlassungserlaubnis | Erfüllt |
+| Fernarbeit aus Deutschland | Wohnsitz Freiburg, Niederlassungserlaubnis | Erfüllt |
 
-## Fit-Begründung: 4 von 5
+## Begründung Fit 4
 
-Vier laut Vorgabe, und die Begründung trägt: Observability ist hier gebaute Praxis, nicht Theorie — ein Ledger, das jede Viertelstunde schreibt, Prüfungen, die laufen, und Alarme, deren Zustellung bestätigt wird.
+Die Beobachtungsschleife ist vorhanden und selbst gebaut: Ledger, Prüfungen von außen, Alarmkanal, der Zustellung bestätigt, Vorlaufgrößen statt Ausfallmeldungen. Das ist die Arbeit, die die Rolle beschreibt, nur mit eigenen Werkzeugen statt mit Prometheus.
 
-Nicht 5, weil OpenTelemetry und Tracing ausdrücklich gefordert sind und vollständig fehlen, dazu Prometheus, Grafana und Loki. Vier beschreibt die Passung der Denkweise, nicht die Übereinstimmung des Stacks.
+Keine 5, weil zwei Dinge fehlen, die diese Stelle besonders macht: regulierter KRITIS-Betrieb mit Nachweispflichten, und der Werkzeugstapel selbst. Beides steht im Anschreiben, ohne Weichzeichner.
 
 ## Offene Punkte
 
-1. **OpenTelemetry und Tracing fehlen**; im Anschreiben benannt, nicht versteckt.
-2. **Anzeige ist alt:** veröffentlicht 12.07.2026, Eintritt ab 30.10.2026 verstrichen, weiterhin gelistet. Vor dem Absenden prüfen, ob sie offen ist.
-3. **Homeoffice-Flag:** BA-Daten sagen `homeofficemoeglich: false`; im Anschreiben steht deshalb nur hybrid mit Präsenz bei Bedarf, keine Behauptung über Telekom-Regeln.
-4. Zeugnisse fehlen.
-5. Keine Gehaltsangabe im Anschreiben; ein früherer Plan notierte 85k, die Vorgabe nennt keine Zahl.
+1. **Prometheus, Loki, OpenTelemetry, Kubernetes** als Lücke benannt; die Bereitschaft, den hiesigen Stapel zu übernehmen, steht im letzten Absatz des dritten Teils.
+2. **KRITIS-Auditierung** nicht vorhanden.
+3. Zeugnisse fehlen.
 
 ## Paket
 
 | Datei | Inhalt |
 | :--- | :--- |
-| `job-description.txt` | Vollständige Anzeige aus der BA-API mit Abgleichsnotiz. |
-| `lead.md` | Fit, Lücken, Weg, Gehalt. |
-| `lebenslauf.typ` | Typst-Quelle, eigenständig kompilierbar. |
-| `anschreiben.typ` | Typst-Quelle, eigenständig kompilierbar. |
+| `job-description.txt` | Ausschreibungstext, Stand vor dem Umbau. |
+| `lead.md` | Fit, Lücken, Weg. |
+| `lebenslauf.typ` | Typst-Quelle, zwei Seiten. |
+| `anschreiben.typ` | Typst-Quelle, eine Seite. |
 | `lebenslauf.pdf` | Zwei Seiten. |
 | `anschreiben.pdf` | Eine Seite. |
 | `submission-sheet.md` | Diese Übersicht. |

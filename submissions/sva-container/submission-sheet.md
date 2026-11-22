@@ -50,7 +50,7 @@ deshalb eine Verhandlungsposition, keine Messlatte.
 | `pdfinfo anschreiben.pdf` | **1 Seite** (Budget 1) |
 | `task checks:prose` | 235 prose files, exit 0 |
 | sha256 Lebenslauf | `4011f41188c6a6c65058462e76f089b5fb6eb58fc8e9e1a6f24ecf0b67df045e` |
-| sha256 Anschreiben | `05c8198af64c6f91e6723bed10a52eb9a85254f841b3aae8f5525df7366e6b9e` |
+| sha256 Anschreiben | `7b661a60a7243c6babda22736b9110b9c311d59b1e300b89d73cbd3c3d2fd3a4` |
 | Altlasten | `packet`-Symlink, JSON-Quellen entfernt |
 
 ## Nächste Schritte

@@ -47,7 +47,7 @@ darauf aufbaut, bringe ich den Teil mit, der Jahre braucht.
 
 Vor Ort bin ich ohnehin: Gutach liegt rund 25 Kilometer von der Schnewlinstraße entfernt, ich kann an
 Kundenterminen und im Büro präsent sein, ohne über Entfernung zu verhandeln. Meine Gehaltsvorstellung liegt
-bei **85.000 € brutto jährlich**. Deutsch ist C1, Englisch Muttersprache, ich bin US-Staatsbürger mit
+bei *85.000 € brutto jährlich*. Deutsch ist C1, Englisch Muttersprache, ich bin US-Staatsbürger mit
 deutscher Niederlassungserlaubnis und brauche kein Sponsoring.
 
 Mit freundlichen Grüßen,

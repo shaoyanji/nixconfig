@@ -1,0 +1,335 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Matt Ji",
+    "label": "Site Reliability Engineer",
+    "url": "https://www.bountystash.com",
+    "summary": "Ingenieur mit zehn Jahren Betriebs- und Softwareerfahrung. Ich betreibe eine Plattform aus dreizehn Linux-Hosts, deren Zustand in einer Deklaration steht, deren Änderungen durch ein Gate in CI und Host gehen und deren Rückweg ein Zeiger auf die vorige Generation ist. Telemetrie ist Aufzeichnung, nicht Dekoration: ein Ledger alle fünfzehn Minuten, Meldung auf jeden Zustand ungleich ok. Dazu virtuelle Netze, Secrets und Zertifikate, Go, Python und Bash.",
+    "email": "matt@bountystash.com",
+    "location": {
+      "address": "Am Burgerhof 4",
+      "postalCode": "BW 79261",
+      "city": "Gutach im Breisgau",
+      "region": "Baden-Württemberg",
+      "countryCode": "DE"
+    },
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "shaoyanji",
+        "url": "https://github.com/shaoyanji"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "mattji",
+        "url": "https://linkedin.com/in/mattji"
+      },
+      {
+        "network": "XING",
+        "username": "Shaoyan_Ji",
+        "url": "https://xing.com/profile/Shaoyan_Ji"
+      }
+    ],
+    "image": "https://res.cloudinary.com/de1eajx01/image/upload/v1765739348/lu7yx5irrcpfmisnhfzi.svg",
+    "signature": "https://res.cloudinary.com/de1eajx01/image/upload/v1765739484/qa7exxxy8xvzzkmjgyxn.png"
+  },
+  "work": [
+    {
+      "name": "Bountystash",
+      "position": "Gründer",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-19",
+      "highlights": [
+        "Hielt den Zustand von dreizehn Linux-Hosts in einer Deklaration: gewünschter Zustand im Repository, jede Maschine zieht ihn von dort, keine Änderung von Hand auf dem Zielhost.",
+        "Standardisierte Build, Test und Deployment über ein Gate, das in der CI und auf dem Host dieselbe Prüfung ausführt; was zweimal von Hand passierte, wurde zu einem Check.",
+        "Führte Releases als einen Schritt aus — bauen, prüfen, aktivieren — mit Rollback als Zeiger auf die vorige Generation, nicht als Wiederherstellungsprozedur.",
+        "Überwachte den Betrieb mit Aufzeichnung statt Dashboard: Sentinel-Ledger alle fünfzehn Minuten mit Jobstatus, Generation Age, Disk-Druck und PSI, Meldung auf jeden Zustand ungleich ok.",
+        "Analysierte Störungen systematisch mit journald, cgroups und tcpdump und dokumentierte Ursache, Wirkung und Behebung, damit der nächste Fall schneller geht.",
+        "Betrieb virtuelle Netze: WireGuard-basiertes Mesh, nftables mit Default-Deny, DNS- und MTU-Fehler mit tcpdump statt im Ticket, Zugriff über eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten.",
+        "Hielt Secrets pro Host mit SOPS und age verschlüsselt und vergab Rechte nach dem Minimum, das der Dienst braucht.",
+        "Automatisierte wiederkehrende Abläufe in Go, Python und Bash hinter einer Task-Schnittstelle; reguläre Ausdrücke und Parser sind dabei Handwerk, nicht Notlösung.",
+        "Betrieb Git als einzige Quelle für Konfiguration, Code und Entscheidungen; Host-Dossiers und Runbooks liegen neben der Deklaration, die sie erklärt.",
+        "Entwickelte Go-Dienste mit PostgreSQL, darunter ein append-only Ereignisprotokoll und eine Terminal-Oberfläche aus einem Binary.",
+        "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten und beriet Mandanten als interner Risk Manager für einen großen deutschen Energiehändler.",
+        "Prüfte Bug-Bounty-Programme."
+      ]
+    },
+    {
+      "name": "O3 Energy",
+      "position": "Asset Manager",
+      "startDate": "2016-08-01",
+      "endDate": "2020-06-01",
+      "highlights": [
+        "Dokumentierte und betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften, inklusive Arbeitsplätzen, Netz und Wi-Fi.",
+        "Betreute Anwender direkt: Feldtechniker und Büro, Einweisung statt Ticket-Weiterleitung.",
+        "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen.",
+        "Leitete das Asset Management eines Portfolios über 100 Mio. USD.",
+        "Analysierte Haftungsrisiken des Unternehmens und baute das interne Risikomanagement auf."
+      ]
+    },
+    {
+      "name": "Smart Energy 360",
+      "position": "Director of Sustainability",
+      "startDate": "2015-08-01",
+      "endDate": "2016-08-01",
+      "highlights": [
+        "Betreute eine Projektpipeline über 100 Mio. USD.",
+        "Verantwortete den Kundenservice und die Betreuung der Mandanten.",
+        "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+      ]
+    },
+    {
+      "name": "Fraunhofer ISE",
+      "position": "Wissenschaftliche Hilfskraft",
+      "startDate": "2012-03-01",
+      "endDate": "2012-09-01",
+      "highlights": [
+        "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie.",
+        "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte.",
+        "Schrieb Python-Werkzeuge für Analyse und 3D-Geometrie."
+      ]
+    },
+    {
+      "name": "Halliburton",
+      "position": "Associate Technical Professional",
+      "startDate": "2010-06-01",
+      "endDate": "2011-09-01",
+      "highlights": [
+        "Behob Chemikalien- und Geräteprobleme vor Ort.",
+        "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche.",
+        "Leitete die Sicherheitsschulung der Crew."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Albert-Ludwigs-Universität Freiburg",
+      "url": "https://rem.zee-uni-freiburg.de/",
+      "area": "Erneuerbare-Energien-Management",
+      "studyType": "Master of Science",
+      "startDate": "2011-11-01",
+      "endDate": "2014-02-01",
+      "score": "1,8/5,0",
+      "courses": [
+        "Fluktuierende erneuerbare Energien und Wettermuster, analysiert mit künstlichen neuronalen Netzen"
+      ]
+    },
+    {
+      "institution": "Colorado School of Mines",
+      "url": "https://mines.edu/",
+      "area": "Erdöltechnik",
+      "studyType": "Bachelor of Science",
+      "startDate": "2006-08-01",
+      "endDate": "2010-05-15",
+      "score": "3,2 GPA",
+      "courses": [
+        "McBride Honors Program in Public Policy",
+        "Wirtschaftswissenschaften"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "nixconfig",
+      "resumeName": "nixconfig",
+      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets, deklarierte MicroVMs und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
+      "url": "https://github.com/shaoyanji/nixconfig",
+      "startDate": "2023-01-01",
+      "endDate": "",
+      "type": "open source",
+      "highlights": [],
+      "keywords": [
+        "Nix",
+        "NixOS",
+        "systemd",
+        "SOPS",
+        "WireGuard"
+      ]
+    },
+    {
+      "name": "bountystash",
+      "resumeName": "bountystash",
+      "description": "Ein Go-Dienst, der aus einer Anfrage eine unveränderliche, inhaltsadressierte Spezifikation macht. Append-only Events, Terminal-Oberfläche und curl-Endpunkte aus einem Binary.",
+      "url": "https://github.com/shaoyanji/bountystash",
+      "startDate": "2020-06-01",
+      "endDate": "2025-08-01",
+      "type": "product",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Ereignisprotokoll",
+        "PostgreSQL",
+        "REST"
+      ]
+    },
+    {
+      "name": "kev-time",
+      "resumeName": "kev-time",
+      "description": "CISAs Katalog bekannter ausgenutzter Schwachstellen als Zeitreihe in reinem SVG, ablesbar bevor ein Bericht existiert.",
+      "url": "https://jisifu.serv00.net/kev-time/",
+      "startDate": "2026-02-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "Datenvisualisierung"
+      ]
+    },
+    {
+      "name": "kelly-svg",
+      "resumeName": "kelly-svg",
+      "description": "KEV-Einträge in Aufwands-Clustern mit Exposition pro Cluster; die Patch-Reihenfolge folgt Aufwand und Reichweite.",
+      "url": "https://jisifu.serv00.net/kelly-svg/",
+      "startDate": "2026-03-01",
+      "endDate": "",
+      "type": "tool",
+      "highlights": [],
+      "keywords": [
+        "SVG",
+        "CISA KEV",
+        "Risiko"
+      ]
+    },
+    {
+      "name": "Risikoberechnungs-Engine (Swirl Engine)",
+      "resumeName": "Risk Calculation Engine (Swirl Engine)",
+      "description": "Satz von Green auf stochastische Polygone: ein Go-Fuzzer erzeugt Formen, eine Pipeline aus Nushell und Awk treibt die Berechnung.",
+      "url": "https://github.com/shaoyanji/risk-calc",
+      "startDate": "2026-03-15",
+      "endDate": "2026-03-18",
+      "type": "open_source",
+      "roles": [
+        "Lead Developer",
+        "Forscher"
+      ],
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Nushell",
+        "Awk",
+        "NixOS"
+      ]
+    },
+    {
+      "name": "fibtransponder",
+      "resumeName": "fibtransponder",
+      "description": "Ein Zustandsautomat mit Fibonacci-Radix, der einen Bitstrom mit begrenzter Arbeit pro Schritt verarbeitet; ein Korpus-Benchmark hat den ersten Entwurf widerlegt.",
+      "url": "https://github.com/shaoyanji/fibtransponder",
+      "startDate": "2026-01-01",
+      "endDate": "2026-06-01",
+      "type": "research",
+      "highlights": [],
+      "keywords": [
+        "Go",
+        "Streaming",
+        "Benchmarks"
+      ]
+    },
+    {
+      "name": "Masterarbeit: Wetter und Volatilität",
+      "resumeName": "Master's Thesis",
+      "description": "Ein Verfahren zur Zeit-Kreuzkorrelation von Windgeschwindigkeit sowie neuronale Netze auf Langzeit-Wetterdaten.",
+      "url": "https://www.academia.edu/6762743/A_Study_on_Energy_Intermittency_Reduction_Strategies_with_Emphasis_on_Weather_Pattern_Prediction",
+      "startDate": "2013-08-01",
+      "endDate": "2014-02-24",
+      "type": "thesis",
+      "entity": "Meteorologisches Institut Freiburg",
+      "roles": [
+        "Student"
+      ],
+      "highlights": [],
+      "keywords": [
+        "Künstliche Neuronale Netze",
+        "Fraktale Geometrie"
+      ]
+    },
+    {
+      "name": "Konzept für Schwachstellenbetrieb",
+      "resumeName": "Vulnerability operations concept",
+      "description": "Ein Beispiel-Schwachstellenprogramm aus KEV-Daten: Expositionstabelle, Aufwands-Cluster, 90-Tage-Methode.",
+      "url": "https://concept.bountystash.com/",
+      "startDate": "2026-11-01",
+      "endDate": "",
+      "type": "concept",
+      "highlights": [],
+      "keywords": [
+        "KEV",
+        "Programmdesign",
+        "HTML"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "Reliability",
+      "keywords": [
+        "Messung statt Annahme",
+        "Schwellen aus Lastsignalen",
+        "Rollback als Zeiger",
+        "Störungsdokumentation"
+      ]
+    },
+    {
+      "name": "Automatisierung",
+      "keywords": [
+        "CI-Gates",
+        "Deployment als ein Schritt",
+        "Nix-Deklarationen",
+        "Go",
+        "Python",
+        "Bash"
+      ]
+    },
+    {
+      "name": "Linux & Netze",
+      "keywords": [
+        "systemd",
+        "cgroups/PSI",
+        "nftables",
+        "WireGuard-Mesh",
+        "DNS/MTU",
+        "tcpdump"
+      ]
+    },
+    {
+      "name": "Sicherheit",
+      "keywords": [
+        "SOPS/age",
+        "SSH-CA",
+        "kurzlebige Zertifikate",
+        "Default-Deny",
+        "Minimalrechte"
+      ]
+    },
+    {
+      "name": "Betrieb",
+      "keywords": [
+        "Sentinel-Ledger",
+        "Alerting",
+        "journald",
+        "Git als Quelle",
+        "Runbooks"
+      ]
+    },
+    {
+      "name": "Daten & Dienste",
+      "keywords": [
+        "PostgreSQL",
+        "REST",
+        "append-only Events"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Deutsch",
+      "fluency": "C1"
+    },
+    {
+      "language": "Englisch",
+      "fluency": "Muttersprache"
+    }
+  ]
+}

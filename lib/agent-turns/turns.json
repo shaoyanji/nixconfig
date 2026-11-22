@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-22T08:26:26Z",
+  "generated": "2026-11-22T08:28:35Z",
   "count": 200,
-  "pin": "542b6652e3dca35b80a1de67c10f045dc7fd8955c2ddcea0ea280448d9097266",
+  "pin": "d95c09d4c84f11bca8ada09015bb8b4fabd705feac72c7bb57d884ec254d6fcc",
   "turns": [
+    {
+      "id": "3fa5dc9e-28a7-43b4-9614-45e21219ebaf",
+      "ts": "2026-11-22T08:27:50Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: nebius SRE compute node team (GH embed 4766627101); remote europe",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/nebius-compute-node"
+      ],
+      "files": [],
+      "base_commit": "1f51a674a4da24927fd67e0760e23ca50890525f",
+      "branch": "main",
+      "frame": "03ha642otbwrdeygeqz61uhoj"
+    },
+    {
+      "id": "ea176d4c-2b0f-4ee4-b591-6b02f2d21201",
+      "ts": "2026-11-22T08:27:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-hunt",
+      "action": "built: fau-sysadmin packet | gate: checks:prose PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/fau-sysadmin"
+      ],
+      "files": [],
+      "base_commit": "e97c9eb8ae53fad03f5711ad58ac759eba446803",
+      "branch": "main",
+      "frame": "03ha640ukyamvda5l6rpgyxnp"
+    },
+    {
+      "id": "fdcee6fc-0868-41d5-b115-84d10bbe1986",
+      "ts": "2026-11-22T08:27:12Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: nebius-senior-site-reliability-engineer-devtools submitted via Greenhouse embed 4889227101 | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1f51a674a4da24927fd67e0760e23ca50890525f",
+      "branch": "main",
+      "frame": "03ha63y881uv5m495qgyre7m4"
+    },
     {
       "id": "446925a5-0e02-4898-833e-7843548c7a2a",
       "ts": "2026-11-22T08:26:16Z",
@@ -2743,54 +2786,6 @@
       "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
       "branch": "main",
       "frame": "03ha13ha94lrr37pbp434ah73"
-    },
-    {
-      "id": "3a2c8b59-25da-499b-8aa1-8f6e5a50ccab",
-      "ts": "2026-11-21T17:01:25Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "landed: Flox Packaging submitted (Ashby, success confirmed); Canonical Linux Platform Integration staged (submissions/canonical); Langdock Systems & Platform staged (submissions/langdock); Flox MTS staged (submissions/flox-mts); devin filling Nebius Greenhouse form",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha133mf24yucvbgzbgi5738"
-    },
-    {
-      "id": "2226b504-c4af-4dfd-8d65-871ae76bf51a",
-      "ts": "2026-11-21T16:53:15Z",
-      "source": "antigravity",
-      "subject": "nixconfig:job-hunt-coordinator",
-      "action": "orchestrating: pane 1 staging Canonical Linux Platform Integration; pane 3 staging Langdock Berlin systems roles (€135k-€200k); devin on Flox Ashby submission",
-      "outcome": "in_progress",
-      "claims": [
-        "job-hunt"
-      ],
-      "files": [],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha11ib3kkukm0985s4yx3oe"
-    },
-    {
-      "id": "c2b58599-56bc-4ac1-aee4-076f8e1373ab",
-      "ts": "2026-11-21T16:38:13Z",
-      "source": "devji",
-      "subject": "nixconfig:skill-authoring",
-      "action": "pane is ready to receive the autogeneration script; task will verify output against files after execution",
-      "outcome": "in_progress",
-      "claims": [
-        "agents-sync/skill-authoring"
-      ],
-      "files": [
-        "SKILL.md",
-        "SUPPORTING_SCHEMA"
-      ],
-      "base_commit": "87881f6d37f7fbb8690d547b3578d00792bdfbfe",
-      "branch": "main",
-      "frame": "03ha0ykl3jsyltar0b5916a75"
     }
   ]
 }

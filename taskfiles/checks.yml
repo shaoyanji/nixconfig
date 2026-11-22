@@ -767,7 +767,7 @@ tasks:
       - bash tests/port-audit/run.sh
 
   checks:appflow:
-    desc: Appflow gates — the CV projector fixture, and the tracker's duplicate and prep hygiene
+    desc: Appflow gates — the CV projector fixture, tracker hygiene, and the status-quality fixture
     summary: >
       Two halves. First the selector against a fictional corpus and four
       descriptions: no role loses every line, a matching role keeps its matching
@@ -781,9 +781,12 @@ tasks:
       status says the requisition closed, and no mail linked to two applications
       that are both still moving — the shape a `discovered-*` twin takes when its
       company string differs from its canonical row and the pair rule cannot see
-      it. Offline fixture ~1 s, hygiene ~3 s.
+      it. A status that only repeats its stage, is empty, or is a placeholder
+      fails as well, and tests/appflow-status proves each rule can fail offline by
+      feeding the gate two files. Offline fixtures ~2 s, hygiene ~3 s.
     cmds:
       - bash tests/appflow-select/run.sh
+      - bash tests/appflow-status/run.sh
       - bash scripts/task/appflow-check.sh
 
   checks:appflow:triage:

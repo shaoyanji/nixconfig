@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
-# appflow-check.sh — tracker hygiene: duplicate noise, dead prep rows, shared active mail.
+# appflow-check.sh — tracker hygiene: duplicate noise, dead prep rows, bare status,
+# shared active mail.
 #
 #   appflow-check.sh   read-only; names every offending row and exits 1
 #
-# Three states accumulate because nothing else looks for them: a (company, role)
+# Four states accumulate because nothing else looks for them: a (company, role)
 # pair where no row declares which one is real, a `prep` row whose own status says
-# the requisition closed, and one mail linked to two applications that are both
-# still moving — the shape of a `discovered-*` twin whose company string differs
-# from its canonical row, so the pair rule cannot see it. The first two come from
-# the row list the API serves; the link question is one read-only query route.
-# The fix is never a query — it is `task agents:apps:set ID=… STATUS="Duplicate of …"`.
+# the requisition closed, a status that only repeats its `stage` (or is empty, or
+# is a placeholder like "unknown"), and one mail linked to two applications that
+# are both still moving — the shape of a `discovered-*` twin whose company string
+# differs from its canonical row, so the pair rule cannot see it. The first three
+# come from the row list the API serves; the link question is one read-only query
+# route. The fix is never a query — it is `task agents:apps:set ID=… STATUS="…"`.
+#
+# `APPFLOW_ROWS` and `APPFLOW_LINKS` read files instead of the API, which is how
+# tests/appflow-status proves every rule can fail without a live archive.
 set -euo pipefail
 
 api=${APPFLOW_API:-https://delphi.cloudforest-kardashev.ts.net:8450}
@@ -21,10 +26,17 @@ for cmd in curl jq; do
   }
 done
 
-body=$(curl -sS --max-time 30 "$api/api/applications?lim=5000") || {
-  echo "appflow-check: no answer from $api/api/applications" >&2
-  exit 2
-}
+if [ -n "${APPFLOW_ROWS:-}" ]; then
+  body=$(cat "$APPFLOW_ROWS") || {
+    echo "appflow-check: cannot read $APPFLOW_ROWS" >&2
+    exit 2
+  }
+else
+  body=$(curl -sS --max-time 30 "$api/api/applications?lim=5000") || {
+    echo "appflow-check: no answer from $api/api/applications" >&2
+    exit 2
+  }
+fi
 case "$body" in
   '['*) ;;
   *)
@@ -40,8 +52,17 @@ report=$(jq -r '
   def declared: ((.status // "") | test("duplicate|merged into"; "i"));
   def dead: ((.status // "")
     | test("closed|filled|(no longer|not) (open|available|posted|accepting|active|live)|withdrawn|cancell?ed|\\b410\\b"; "i"));
+  # Bare means the status carries no fact beyond the bucket it already sits in:
+  # empty, identical to `stage`, or one of the placeholder tokens a row gets
+  # before anyone has read the mail. The tracker derives stage from the status
+  # text, so a status with no words is also a stage that cannot survive the next
+  # edit.
+  def bare: ((.stage // "") as $st
+    | ((.status // "") | ascii_downcase | gsub("^\\s+|\\s+$"; "")) as $s
+    | ($s == "" or $s == $st or $s == "unknown" or $s == "n/a" or $s == "-"));
   . as $rows
   | ([$rows[] | select((.stage // "") == "prep") | select(dead)]) as $deadprep
+  | ([$rows[] | select(bare)]) as $bare
   | ([$rows | group_by([.company, .role])[]
       | select(length > 1)
       | select(all(.[]; declared | not))]) as $pairs
@@ -50,8 +71,10 @@ report=$(jq -r '
       "prep=\([$rows[] | select((.stage // "") == "prep")] | length)",
       "pairs=\($pairs | length)",
       "deadprep=\($deadprep | length)",
+      "bare=\($bare | length)",
       ($pairs[] | "PAIR \(.[0].company) · \(.[0].role) (\(length) rows: \([.[].id] | join(", ")))"),
-      ($deadprep[] | "DEAD \(.id) — \((.status // "")[0:72])")
+      ($deadprep[] | "DEAD \(.id) — \((.status // "")[0:72])"),
+      ($bare[] | "BARE \(.id) — stage=\(.stage) status=\((.status // "(empty)")[0:56])")
     ] | .[]
 ' <<<"$body")
 
@@ -59,6 +82,7 @@ total=$(sed -n 's/^total=//p' <<<"$report")
 prep=$(sed -n 's/^prep=//p' <<<"$report")
 pairs=$(sed -n 's/^pairs=//p' <<<"$report")
 deadprep=$(sed -n 's/^deadprep=//p' <<<"$report")
+bare=$(sed -n 's/^bare=//p' <<<"$report")
 
 # One mail, two applications, both still moving: a twin that never declared
 # itself, which is how `discovered-materna` sat at `screening` beside its
@@ -68,11 +92,18 @@ link_q="select am.message_id, count(distinct a.id) as apps
         where a.stage in ('prep','applied','screening','interview','manual','contacted')
         group by 1 having count(distinct a.id) > 1
         order by 2 desc"
-links=$(curl -sS --max-time 30 -X POST -H 'content-type: application/json' \
-  -d "$(jq -nc --arg q "$link_q" '{q:$q}')" "$api/api/pipeline-sql") || {
-  echo "appflow-check: no answer from $api/api/pipeline-sql" >&2
-  exit 2
-}
+if [ -n "${APPFLOW_LINKS:-}" ]; then
+  links=$(cat "$APPFLOW_LINKS") || {
+    echo "appflow-check: cannot read $APPFLOW_LINKS" >&2
+    exit 2
+  }
+else
+  links=$(curl -sS --max-time 30 -X POST -H 'content-type: application/json' \
+    -d "$(jq -nc --arg q "$link_q" '{q:$q}')" "$api/api/pipeline-sql") || {
+    echo "appflow-check: no answer from $api/api/pipeline-sql" >&2
+    exit 2
+  }
+fi
 case "$links" in
   '['*) ;;
   *)
@@ -105,6 +136,14 @@ else
   fail=1
 fi
 
+if [ "$bare" -eq 0 ]; then
+  echo "ok   every status says more than its stage"
+else
+  echo "FAIL $bare application(s) whose status repeats its stage, is empty, or is a placeholder:" >&2
+  sed -n 's/^BARE //p' <<<"$report" | sed 's/^/       /' >&2
+  fail=1
+fi
+
 if [ "$shared" -eq 0 ]; then
   echo "ok   no mail linked to two applications that are both still moving"
 else
@@ -117,4 +156,4 @@ if [ "$fail" -ne 0 ]; then
   echo "FAIL: tracker hygiene — close, dedupe or relink the rows above (task agents:apps:set)." >&2
   exit 1
 fi
-echo "PASS: no duplicate noise, no dead prep row, no shared active mail."
+echo "PASS: no duplicate noise, no dead prep row, no bare status, no shared active mail."

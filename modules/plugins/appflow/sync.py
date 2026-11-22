@@ -107,6 +107,15 @@ def stage_of(status: str) -> str:
         return "lead"
     if "screening" in text or "follow-up required" in text:
         return "screening"
+    # `manual` and `contacted` are stages a person sets, and the status text says
+    # so ("Manual record — entered …", "Contacted — recorded …"). With no branch
+    # they fell to `other`, so rewriting a status through this route silently
+    # reclassified those rows. `scripts/task/apps-db.sh` carries the same rules;
+    # changing one without the other is the drift its header warns about.
+    if text.startswith("manual"):
+        return "manual"
+    if text.startswith("contacted"):
+        return "contacted"
     if re.search(r"draft|packet|\bjd\b", text):
         return "prep"
     return "other"

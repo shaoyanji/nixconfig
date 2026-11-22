@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T09:44:07Z",
+  "generated": "2026-11-22T09:45:57Z",
   "count": 200,
-  "pin": "d145e983b38d143a45bf043d151999ceaf3c3896dc325c900b93692b92f6905e",
+  "pin": "f01f6ea91c3e3b37bd7aab9fc2b19fea370ddaea77c2802b5a7b129ad8162d25",
   "turns": [
+    {
+      "id": "a8892847-6893-4e41-b997-b825d5edcbb6",
+      "ts": "2026-11-22T09:45:50Z",
+      "source": "freebuff",
+      "subject": "nixconfig:ionos-sre",
+      "action": "closed-check: Greenhouse board has 49 open IONOS jobs, req 4956674101 absent (API 404); packet compiled, needs a live req or retarget",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e103053407fb74cdd8ed901654ea6a944bb1dc3",
+      "branch": "main",
+      "frame": "03ha6jb5grvn2bgfgg7jnnqga"
+    },
+    {
+      "id": "e0df1f0a-eaa1-4978-841b-cfe21f3685d1",
+      "ts": "2026-11-22T09:45:20Z",
+      "source": "freebuff",
+      "subject": "nixconfig:ionos-sre",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e103053407fb74cdd8ed901654ea6a944bb1dc3",
+      "branch": "main",
+      "frame": "03ha6j7l2w52qxtr4hbruczyj"
+    },
+    {
+      "id": "adfb094b-ca51-46dc-a97b-6253b148ebca",
+      "ts": "2026-11-22T09:44:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:bechtle-cloud-platform-engineer-remote",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ba6841e53149580d71070cb32e0d91627cf80fcb",
+      "branch": "main",
+      "frame": "03ha6izcnzmbgz3fqbllpqmnm"
+    },
     {
       "id": "03213abf-c596-4444-bc02-d7aebed8988f",
       "ts": "2026-11-22T09:43:33Z",
@@ -2705,47 +2744,6 @@
       "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
       "branch": "main",
       "frame": "03ha5bwfol972ifgf34jxigv4"
-    },
-    {
-      "id": "fd06b1ac-2da9-40cb-8c92-586ae902ec09",
-      "ts": "2026-11-22T05:59:44Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "landed: drove idle pane default:2.1 (devin lane); next task routed via jevdecide flake-change p=0.86 margin=0.76 decisive — transitive flake drift: batch branch-following pins (impermanence, dank-qml-common) in flake.lock into one flake update plus a representative host gate (checks:host on one chain representative); pane accepted the task, fresh working counter Running tools 10s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
-      "branch": "main",
-      "frame": "03ha5b559eesdfri3cpl5ix4n"
-    },
-    {
-      "id": "7c5aa34a-8a13-4a37-bf45-7ed04018a1be",
-      "ts": "2026-11-22T05:59:10Z",
-      "source": "devin",
-      "subject": "nixconfig:flake-update",
-      "action": "start: batch transitive pin drift (impermanence, dank-qml-common) into one flake update + checks:host gate",
-      "outcome": "in_progress",
-      "claims": [
-        "flake.lock"
-      ],
-      "files": [],
-      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
-      "branch": "main",
-      "frame": "03ha5b1413q13807pyt5602a9"
-    },
-    {
-      "id": "3d0b262c-9988-4981-96ef-ca222a0c4c11",
-      "ts": "2026-11-22T05:50:59Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff",
-      "action": "drove idle freebuff pane default:1.1: pane's suggested next task 'redact third-party contacts and phone number from docs/nix-consultancy-outreach.md' — jevdecide classify selected prose-change (p=0.85, margin 0.74 ≥ 0.3 gate); task pasted via load-buffer + paste-buffer + Enter; pane shows working... with tool lines, task running",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
-      "branch": "main",
-      "frame": "03ha59fmthoxbjw0t1y4r5ani"
     }
   ]
 }

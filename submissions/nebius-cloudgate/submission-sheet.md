@@ -1,57 +1,76 @@
-# Submission sheet — Nebius, Senior System Engineer (CloudGate)
+# Nebius — Senior System Engineer (CloudGate)
 
-Role `nebius-cloudgate` · Greenhouse **4377696101** · https://careers.nebius.com/?gh_jid=4377696101
-Published 2024-08-27 · Amsterdam, Netherlands; Remote - Europe
-Target compensation **EUR 110,000 – 135,000** (ask EUR 115,000 – 130,000). No band published.
+Greenhouse **4377696101** · Amsterdam, Netherlands; Remote — Europe · CloudGate team, the software side of external connectivity: IPv4, Cloud
+Interconnect, egress NAT and a network load balancer, at tens of millions of packets per second. Control plane in gRPC microservices, data plane in C,
+coding interview included. **No band published**; target EUR 110,000–135,000, ask EUR 115,000–130,000.
 
-## What the role actually is
+**Status: prepared, not submitted.** The 2026-11-21 attempt filled the form completely and then stopped at **Cloudflare Turnstile**, which never issued a
+token — the same environment-bound failure recorded for `nebius-sre-berlin`. One click in a normal browser finishes it; the DB row is therefore `prep`,
+not `applied`.
 
-CloudGate owns the software side of Nebius external connectivity: IPv4 connectivity, Cloud Interconnect, egress NAT and a network load balancer, at tens of millions of packets per second. Data plane in C, control plane in gRPC microservices, coding interview included. Bonus: VPP, DPDK, Linux kernel network subsystem, overlays/SDN/NFV, BGP/MPLS.
+## Legacy packet, now genuinely in git history
 
-## Live Greenhouse fields (14 server-side labels)
+All five files were **untracked**, so they were committed unchanged first (`appflow(nebius-cloudgate): stage the pre-Typst packet`) and retired in the
+rebuild commit:
 
-| Field | Answer |
+| Artefact | sha256 (first 16) | What it was |
+| :--- | :--- | :--- |
+| `lebenslauf.pdf` | `74dd951062886f22…` | Nix-built CV, "Site Reliability Engineer", three fleet bullets |
+| `anschreiben.pdf` | `744b36141b3384bc…` | Nix-built letter, salutation "Dear Nebius Compute Node team" — wrong team |
+| `selection.json` | `ae89da322b45f2db…` | selector output plus form mappings |
+| `submission-sheet.md` | `4d5e3a52e69e9d00…` | the 2026-11-21 sheet, this file's predecessor |
+
+`job-description.txt` is kept unchanged: a real capture of the posting (posted 2024-08-27, refreshed 2026-11-18), not a reconstruction.
+
+## Files
+
+| File | Pages | Words | Warnings | sha256 (first 16) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 1270 | 0 | `6bd5b1539d2a00bc` |
+| `anschreiben.pdf` | 1 | 454 | 0 | `7fb579ff5b56ba03` |
+
+## The five pillars, against the repository
+
+| Pillar | Evidence | In the documents as |
+| :--- | :--- | :--- |
+| nftables default-deny filtering | NixOS firewall default-deny generated from a per-service table (`hosts/frieren/firewall-scope.nix`) with `lan`/`tailnet` booleans and dated prunes (CUPS 631 pruned 2026-10-12, uptime-kuma 3001 on 2026-11-04); `modules/net/dns/failover.nix` adds an nftables `extraInputRules` VRRP accept | claimed in full, including the reason the rule lives in the firewall's start path |
+| WireGuard mesh routing | Tailnet-scoped service rows; NFS over the mesh when a laptop leaves the LAN ("measured fallback, not a guess"); 41641 open for the direct path; explicit note that broadcast, multicast, DHCP and PXE cannot cross a mesh | claimed in full |
+| NAT and bridge forwarding | `modules/profiles/microvm-host.nix`: NM-owned `brlan` with gateway address, STP off, forward delay 0; udev rule attaching `microvm*` taps because the dispatcher never sees an unmanaged interface; `networking.nat` bridge to uplink; bridge trusted at the edge | claimed in full |
+| MTU troubleshooting | **No `mtu`, `mss` or clamp configuration exists anywhere in the repository** (verified by grep; the only hits are a `nmcli` comment, a base64 hash and CSS `clamp()`). The claim is a **diagnostic method** — counters, `tcpdump` and the MTU per hop — not a shipped configuration, and both documents word it that way | claimed as method, flagged here |
+| Network telemetry | gatus checks with thresholds, `fleet-monitors`, service portal, `fleet-sentinel` ledger writing job state, generation age, disk and PSI every fifteen minutes, paging on bad state and on silence | claimed in full |
+
+That fourth row is the honest seam in this packet. Writing "MTU tuning" on a CloudGate CV would be a lie a network engineer catches in one question; writing
+"MTU by path" and saying where the antenna stops is the version that survives the call.
+
+## Gaps, in both documents
+
+No VPP or DPDK. No eBPF programs in production. No BGP, MPLS, SDN control plane or NFV. Traffic is fleet-scale, not tens of millions of packets per second
+through a purpose-built forwarding plane. C is tooling with explicit allocation and lifetime, not years inside a forwarding plane. Those words appear in the
+CV only inside the paragraph declining them.
+
+## Route
+
+Fourteen live Greenhouse labels, **no cover-letter slot** — the letter goes in the application email or the Additional-context block. Country Germany,
+location Gutach im Breisgau with Amsterdam/remote noted; authorization yes (US citizen, unbefristete Niederlassungserlaubnis, no sponsorship now or later);
+prior Nebius employment no.
+
+**Compensation:** EUR 115,000–130,000 is the ask and it stays in the sheet, not the letter. Nothing was submitted, so there is no prior figure to keep
+consistent, and Nebius publishes no band.
+
+## Two DB rows, one job
+
+`nebius-cloudgate` is the canonical row (this packet). `nebius-senior-system-engineer-cloudgate` came from the Greenhouse scouting crawl for the same
+requisition; it is annotated as the duplicate rather than merged, because deleting a row loses the crawl provenance.
+
+## Checks
+
+| Gate | Result |
 | :--- | :--- |
-| First Name * | Matt |
-| Last Name * | Ji |
-| Email * | matt@bountystash.com |
-| Country * | Germany |
-| Phone * | +49 1733281570 |
-| Location (City) * | Gutach im Breisgau (Freiburg area) — available for Amsterdam or remote across Europe |
-| Attach | CV: lebenslauf.pdf; letter: anschreiben.pdf. This Greenhouse form has no cover-letter slot; the letter is kept in the packet and its content is repeated in the sheet. |
-| Enter manually | n/a — files attached |
-| LinkedIn Profile | https://linkedin.com/in/mattji |
-| Which languages do you speak? * | English (native), German (C1, verhandlungssicher) |
-| Are you currently authorized to work in the country where this position is located, without requiring sponsorship, now or in the future? * | Yes. US citizen with German permanent residence (unbefristete Niederlassungserlaubnis); unrestricted in Germany, the EU and the US, no sponsorship required now or later. |
-| Do you currently reside in the location specified for this role? * | Yes for Germany/remote Europe — resident in Gutach im Breisgau. Not resident in Amsterdam. |
-| Have you ever been employed by Nebius before? * | No |
-| I have read Nebius’s Candidates Privacy Policy. * | Yes |
-
-## Preflight checklist
-
-- [ ] Attach `lebenslauf.pdf` (2 pages) to the Attach field.
-- [ ] Attach `anschreiben.pdf` (1 page) where a letter can be added; otherwise paste the Additional context block.
-- [ ] Country = Germany; Location = Gutach im Breisgau, with Amsterdam/remote noted.
-- [ ] Authorization = Yes; state unbefristete Niederlassungserlaubnis and US citizenship.
-- [ ] Reside in location = Yes for Germany/remote; not Amsterdam.
-- [ ] Prior Nebius employment = No; privacy policy = Yes.
-- [ ] Confirm salary answer matches EUR 115,000 – 130,000 ask.
-- [ ] Nothing submitted until reviewed.
-
-## Additional context (letter content)
-
-Applying for CloudGate: external connectivity at tens of millions of pps, where the data plane must be correct before it is fast. My work sits at the kernel/network boundary — a 13-host NixOS fleet built hermetically from one flake with canary-verified changes and one-command rollback; microVMs for isolation with a real boundary; nftables and WireGuard routing; proxy and relay paths where connection state, timeouts and backpressure matter; C for low-level tooling with explicit allocation and lifetime, Go for services.
-
-## Boundaries, stated plainly
-
-- No VPP or DPDK experience.
-- No eBPF programs in production (the repo contains none — a real gap, not modesty).
-- No BGP, MPLS, SDN control-plane or NFV work.
-- Traffic handled is fleet-scale, not tens of millions of pps through a purpose-built data plane.
-- Coding interview is a gate; C is used here for tooling, not as years of forwarding-plane work.
-
-## selection.json
-
-Standard engineering evidence (`projects.kept`: nixconfig, email-archive, bountystash, fibtransponder), plus `greenhouse` (all {len(labels)} live field mappings), `compensation`, and `candidate` blocks.
-
-Nothing submitted. No account created.
+| `typst compile` both sources | 0 warnings each |
+| Page budget | CV 2 pages, letter 1 page (asserted before commit) |
+| `**` in sources | 0 |
+| Curly quotes | 0 |
+| Unsupported claims (VPP/DPDK/eBPF/BGP/MPLS/NFV) | 0 outside the gap paragraph |
+| MTU claimed as configuration | 0 — method only, and the sheet says why |
+| `task checks:prose` | exit 0 |
+| Legacy artefacts | staged first, retired in the rebuild, hashes above |

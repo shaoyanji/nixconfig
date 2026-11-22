@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:31:46Z",
+  "generated": "2026-11-22T12:31:53Z",
   "count": 200,
-  "pin": "10dc2da17f9ea6e026da43bc685c07521d81d06ce68f5e9b1ae31d9fffe03070",
+  "pin": "b355290851b30085af2407a1972ff1e33e73e007707c2c38141f05c96f399222",
   "turns": [
+    {
+      "id": "73536edf-e6c8-458a-9808-5752be7c47e6",
+      "ts": "2026-11-22T12:31:50Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "in_progress: devin driving STACKIT GT4627 (SAP RocketApply); freebuff-frieren upgrading nebius-cloudgate to native Typst; freebuff-delphi authoring 1und1 linux operations packet",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "3a2647d8cfc83e1e7c8c9a99aad545ed6d6748da",
+      "branch": "main",
+      "frame": "03ha7fqlg90np7v3a3czgxpu0"
+    },
     {
       "id": "c1eaa561-5815-4d05-84c8-c6a366d52856",
       "ts": "2026-11-22T12:30:36Z",
@@ -2825,19 +2838,6 @@
       "base_commit": "39563eebbeb1ead030ee97c8a60e9dc56863c966",
       "branch": "main",
       "frame": "03ha6s63zf6jgw73yqatdj9cj"
-    },
-    {
-      "id": "ab867750-457e-4f9e-bfc8-ebbd032b0117",
-      "ts": "2026-11-22T10:30:19Z",
-      "source": "devin",
-      "subject": "nixconfig:camunda",
-      "action": "blocked: Ashby submission stopped at reCAPTCHA image challenge — form fully staged for hand-submit; no cover-letter field on form",
-      "outcome": "blocked: recaptcha-image",
-      "claims": [],
-      "files": [],
-      "base_commit": "ab87a06cd64b05a8dc9d5938668a4405fa50aa87",
-      "branch": "main",
-      "frame": "03ha6rzz0umvv2w57m33lar49"
     }
   ]
 }

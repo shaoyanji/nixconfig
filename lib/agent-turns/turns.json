@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:48:04Z",
+  "generated": "2026-11-22T09:50:08Z",
   "count": 200,
-  "pin": "98364ae4fbdd24099c395289a055bbd7bba26c3b8c1a810bcaf368864e2c0805",
+  "pin": "83424e522d6f9c3335e2f3e11a29971f766d43af029ee1f94b7cb7516ea2eda5",
   "turns": [
+    {
+      "id": "c38e6452-ae1d-4ff5-8085-5167fa1b2c40",
+      "ts": "2026-11-22T09:48:06Z",
+      "source": "freebuff",
+      "subject": "nixconfig:clickhouse-dbre",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2d0715b07c0f8168b4f55dbc5e5fe2759e652866",
+      "branch": "main",
+      "frame": "03ha6jr4cil62sckz822y4p87"
+    },
     {
       "id": "50ca54c9-1732-402d-929d-7d574142463c",
       "ts": "2026-11-22T09:47:55Z",
@@ -2729,19 +2742,6 @@
       "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
       "branch": "main",
       "frame": "03ha5hy3lmtxrhfwzm6f3e0bw"
-    },
-    {
-      "id": "7b4a936f-d538-42be-bab0-c6004b4f8e23",
-      "ts": "2026-11-22T06:15:26Z",
-      "source": "devin",
-      "subject": "nixconfig:gate-fix",
-      "action": "landed afc47bbe: problems.handlers gtk+.broken=warn in hosts/schneeeule/nvidia.nix (nvidia-settings-470 pulls gtk2, Kepler card has no newer driver) | gate: checks:host schneeeule PASS 2114 assertions",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
-      "branch": "main",
-      "frame": "03ha5e7k49v6scqlobhh9xlbj"
     }
   ]
 }

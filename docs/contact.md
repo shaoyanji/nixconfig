@@ -44,9 +44,10 @@ so keeping it in the tree hides nothing.
 Nothing here records another person's address, direct line or profile slug. Two
 consequences worth knowing:
 
-- The outreach dossier at `.agents/outreach/nix-consultancy-outreach.md` names
-  target companies and their public sites only; the person is a `[NAME]`,
-  `[CONTACT]` or `[PHONE]` slot resolved from the target's own site at send time.
+- The outreach dossier at `.agents/outreach/nix-consultancy-outreach.md` names no
+  target either: companies are `[TARGET-A]`, `[TARGET-B]` and `[TARGET-C]`, and
+  the person, address and direct line are `[NAME]`, `[EMAIL]` and `[PHONE]`
+  slots resolved from the target's own site at send time.
 - An advert's own contact block (a hiring manager, a works council address) may
   appear in that application's `submission-sheet.md`, because the portal form is
   where it is used. It stays in that packet and is not copied into `docs/`.

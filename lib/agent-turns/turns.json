@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T10:12:07Z",
+  "generated": "2026-11-22T10:13:55Z",
   "count": 200,
-  "pin": "d4f093b70869fa2cf203155bd27c897bf2ffb47a792de72cfea8fa2dc1268fc1",
+  "pin": "e30eca29d33640315663c0ab635f12692898c97d9d57dae219eca2a42669fe5f",
   "turns": [
+    {
+      "id": "bd3e1fa1-1f8b-47ea-83e1-a4f791b98f7c",
+      "ts": "2026-11-22T10:13:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:black-forest-labs",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4993a241e8d44a8f57a67e54be3a58f5607077fe",
+      "branch": "main",
+      "frame": "03ha6on56gx9d4050yu0b1lyr"
+    },
+    {
+      "id": "8f13a44b-8a20-400b-a8f8-0f7ef813b237",
+      "ts": "2026-11-22T10:12:23Z",
+      "source": "devin",
+      "subject": "nixconfig:canonical-sre",
+      "action": "integrity declaration (own-words/no-AI) requires applicant attestation | all answers staged in sheet | sibling record may already cover req",
+      "outcome": "blocked: applicant-attestation",
+      "claims": [],
+      "files": [],
+      "base_commit": "0f6d0956c6b048dcaf1d2d06c39f6d52e53bc66b",
+      "branch": "main",
+      "frame": "03ha6ohxd9gylpewkycso7hq3"
+    },
+    {
+      "id": "2702bcc9-8e88-4afe-b136-467bfce1587f",
+      "ts": "2026-11-22T10:12:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:enpal",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0f6d0956c6b048dcaf1d2d06c39f6d52e53bc66b",
+      "branch": "main",
+      "frame": "03ha6oghekiiz7fskm63lqbqr"
+    },
     {
       "id": "2c155fec-bc3a-45b9-8a98-15e1ead08997",
       "ts": "2026-11-22T10:11:18Z",
@@ -2647,51 +2686,6 @@
       "base_commit": "9738979c776ecf9abd50a9858908a9b5ee9eafb2",
       "branch": "main",
       "frame": "03ha5tes7rm2168m6p9rxxxk8"
-    },
-    {
-      "id": "c740eb4a-285c-4bcd-be2f-6b5dab2d7821",
-      "ts": "2026-11-22T07:29:30Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-bwi-cloud-engineer",
-      "action": "landed: BWI Cloud Engineer packet (archived 67851 JD, 2-page CV, 1-page letter, portal sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/bwi-cloud-engineer"
-      ],
-      "files": [],
-      "base_commit": "14a88d0159b03dda311310cebae6247ef9208827",
-      "branch": "main",
-      "frame": "03ha5soe9icnjyseunk9zce76"
-    },
-    {
-      "id": "82676eda-2d97-40a2-9697-ffd4a00468ce",
-      "ts": "2026-11-22T07:29:20Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-bechtle",
-      "action": "landed: Bechtle Cloud Platform Engineer (remote) packet in submissions/bechtle-cloud-platform. Portal route /job/...1367643158 302s to errorpage; JD sourced from Arbeitsagentur mirror 15086-44517367-1019-S. German CV 2pp, letter 1pp, ask 85k, SUE2 flagged. Letter owns gaps: no prod Kubernetes/Docker, no Terraform/Ansible/GitLab CI. Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/bechtle-cloud-platform"
-      ],
-      "base_commit": "3e3c4b77e1aec235c011ad965101cf340c391a2c",
-      "branch": "main",
-      "frame": "03ha5snaw3sy3aair516a8agb"
-    },
-    {
-      "id": "c709425f-b2b0-4d5c-9767-519b8a176616",
-      "ts": "2026-11-22T07:26:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-bwi-devsecops",
-      "action": "landed: BWI DevSecOps packet (JD, 2-page CV, 1-page letter, portal field sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/bwi-devsecops"
-      ],
-      "files": [],
-      "base_commit": "d245f3ab4c0096234ce12bf559b2f6d387cc1661",
-      "branch": "main",
-      "frame": "03ha5s2yjd5a24c13oipdl7ip"
     }
   ]
 }

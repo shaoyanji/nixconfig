@@ -2,6 +2,8 @@
 name: eisen-status
 description: "What eisen's LLM stack is doing right now: one task prints the served model, router code, socket states, disk, and whether the gaming guard is yielding. Read-only and probe-free, so it never wakes an on-demand model."
 version: 0.2.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

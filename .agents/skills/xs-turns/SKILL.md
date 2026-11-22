@@ -2,6 +2,8 @@
 name: xs-turns
 description: "Pick me before and after a turn that touches shared work: read the fleet turn log for a live claim, then post one resumable summary. Covers the token, the exact schema, subjects, reachability and the queue fallback."
 version: 0.2.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

@@ -1,9 +1,14 @@
 ---
 name: image-generate
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 description: "Generate or edit images with Qwen-Image-2.1-Turbo on Eisen — OpenAI-compatible /v1/images/generations, the Turbo schedule, size rules, RGBA prompts, and reference-image edits."
-tags: [eisen, image, generation, qwen, api]
+metadata:
+  hermes:
+    tags: [eisen, image, generation, qwen, api]
+    related_skills: [eisen-status, cpg]
 ---
 
 # image-generate

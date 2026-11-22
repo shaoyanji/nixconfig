@@ -1,9 +1,14 @@
 ---
 name: nixos-deploy
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 description: "Rebuild and activate a NixOS configuration on Eisen (or any fleet host) over SSH — the systemd-run detachment, done-file polling, and the polkit activation workaround. Encodes the traps: no pgrep, no nohup, no direct activation over SSH."
-tags: [nixos, deploy, ssh, rebuild, activation]
+metadata:
+  hermes:
+    tags: [nixos, deploy, ssh, rebuild, activation]
+    related_skills: [infra]
 ---
 
 # nixos-deploy

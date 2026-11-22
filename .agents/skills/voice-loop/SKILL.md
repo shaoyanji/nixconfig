@@ -2,6 +2,8 @@
 name: voice-loop
 description: "The voice loop on eisen as one script: say text via Qwen3-TTS, hear audio via Parakeet (raw bytes, never multipart), or roundtrip both and get a pass/fail on the word overlap. Named speakers only — `default` is invalid."
 version: 0.2.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

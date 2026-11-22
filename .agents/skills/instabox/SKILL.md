@@ -3,6 +3,7 @@ name: instabox
 description: "Pick me to reach an InstaBox machine without their CLI, and to use clanker as the fleet's offload box: the API key in sops, an SSH token minted through the API, `exec` when no ssh is needed, and detached jobs for background builds."
 version: 0.2.0
 author: Shaoyan Ji (shaoyanji), Buffy
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

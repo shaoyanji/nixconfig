@@ -2,6 +2,8 @@
 name: atuin
 description: "Pick me to finish atuin sync on a fleet host: one script does login, the one-time nu+bash seed, sync and the count check. The traps are the two key forms, the public-server fallback, and a non-idempotent import. Temporary migration skill."
 version: 0.2.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

@@ -2,8 +2,13 @@
 name: jevdecide
 description: Jev decisions for hermes — classify or choose with jev-decide, route a lane on calibrated probabilities, pick between Jev and Laya, never let a model authorise an action.
 version: 3.0.0
-tags: [jev, decision, routing, gating, triage, eisen]
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux, macos]
+metadata:
+  hermes:
+    tags: [jev, decision, routing, gating, triage, eisen]
+    related_skills: [router, task-plane]
 ---
 
 # jevdecide — the decision lane

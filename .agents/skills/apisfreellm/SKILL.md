@@ -2,8 +2,13 @@
 name: apisfreellm
 description: "Keyless free APIs: free-ai chat on api.apisfreellm.com, plus free web search, sites, news, SEO, indexing, APK and Reddit endpoints."
 version: 0.2.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux, darwin]
-tags: [api, llm, free, keyless, search, seo, fallback]
+metadata:
+  hermes:
+    tags: [api, llm, free, keyless, search, seo, fallback]
+    related_skills: [jevdecide, cpg]
 ---
 
 # apisfreellm — free, keyless APIs

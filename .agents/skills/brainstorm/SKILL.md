@@ -2,6 +2,8 @@
 name: brainstorm
 description: "Pick me when the question is what could we do rather than make this change: diverge into costed options, edit nothing, and land one AGENTS.nix note as the exit."
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

@@ -2,6 +2,8 @@
 name: agents-notes
 description: "Pick me when writing or promoting an AGENTS.nix note (experiment, proposal, open todo, handoff): kind and status choice, refs that must resolve, exit criteria, and promotion that lands code instead of prose."
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

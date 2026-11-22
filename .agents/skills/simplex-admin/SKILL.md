@@ -1,9 +1,14 @@
 ---
 name: simplex-admin
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 description: SimpleX Chat fleet administration lives in a module — see modules/user/ai/skills/simplex-admin.
-tags: [simplex, chat, rpc, daemon, coordination]
+metadata:
+  hermes:
+    tags: [simplex, chat, rpc, daemon, coordination]
+    related_skills: [agents]
 ---
 
 # SimpleX admin: one home

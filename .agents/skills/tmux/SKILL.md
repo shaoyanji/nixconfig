@@ -2,10 +2,13 @@
 name: tmux
 description: "Keep a long agent process alive past tool-call cleanup by starting it in a detached tmux session or a systemd user unit. Measured here - tool shells have no TTY, so reptyr cannot attach, and plain &/nohup freeze."
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:
     tags: ['tmux', 'sessions', 'reptyr', 'systemd-run', 'long-running', 'agents', 'detach']
+    related_skills: [agents]
 ---
 
 # tmux — put the process where cleanup cannot reach it

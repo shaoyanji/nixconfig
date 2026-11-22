@@ -2,6 +2,8 @@
 name: codespace
 description: "Pick me when the work runs in a GitHub Codespace: the `gh cs ssh` flags that bite, how a file crosses without `cp`, and how a commit leaves a clone that cannot push."
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

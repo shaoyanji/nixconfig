@@ -2,6 +2,8 @@
 name: calendar
 description: "Google → vdirsyncer → khal → notification. scripts/calendar-auth.sh fetch pulls a live OAuth token from a fleet peer (one shot, no browser); consent is the fallback. Covers the token gate and DMS toasts."
 version: 0.3.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

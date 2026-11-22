@@ -3,6 +3,7 @@ name: google-drive
 description: "Google Drive on any host through rclone: one script runs the OAuth handshake (with an optional tailscale funnel for a browser elsewhere), or verifies the existing remote and its quota. Covers dead tokens and reconnect."
 version: 0.2.0
 author: Shaoyan Ji
+license: MIT
 platforms: [linux]
 metadata:
   hermes:

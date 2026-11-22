@@ -2,10 +2,13 @@
 name: microvm
 description: "The frieren canary (a capped, on-demand runbook sandbox) and the declarative-guest shape: the task that boots each, how to get a shell in one, and the traps that make a healthy guest look unreachable."
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:
     tags: ['microvm', 'canary', 'sandbox', 'cloud-hypervisor', 'qemu', 'ssh', 'systemd']
+    related_skills: [infra, checks]
 ---
 
 # microvm — the guests, and the door into each

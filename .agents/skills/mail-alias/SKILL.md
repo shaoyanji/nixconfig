@@ -2,10 +2,13 @@
 name: mail-alias
 description: Create, list and revoke disposable forwarding addresses on the ImprovMX domain — per-service aliases that make a leak traceable, plus the registry drift check. Pick me before signing up anywhere with a real address.
 version: 0.1.0
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux]
 metadata:
   hermes:
     tags: [mail, dns, improvmx, aliases]
+    related_skills: [mail-archive]
 ---
 
 # mail-alias — disposable forwarding addresses

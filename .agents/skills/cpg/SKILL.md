@@ -2,8 +2,13 @@
 name: cpg
 description: "chatplayground through one client, four lanes: one prompt to another model, one image, a four-lane graded round, or a whole picture book — and the two budgets they draw on."
 version: 3.0.0
-tags: [ai, chatplayground, images, advice, sampling, storybook, budget]
+author: Shaoyan Ji (shaoyanji), Hermes Agent
+license: MIT
 platforms: [linux, macos]
+metadata:
+  hermes:
+    tags: [ai, chatplayground, images, advice, sampling, storybook, budget]
+    related_skills: [jevdecide, image-generate]
 ---
 
 # cpg — one client, four lanes, two budgets

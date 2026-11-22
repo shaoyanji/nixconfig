@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 7
+  api_max_retries: 6
   # A stop waits this long for a running cron job before tearing down. The
   # default (30 s) plus adapter teardown crossed the 60 s shutdown watchdog on
   # every stop here, because pane-idle-watch runs for most of its 2-minute
@@ -139,10 +139,12 @@ display:
 # Each entry's free contract is structural, not a remembered price: `:free` is
 # the suffix the Infron route bills at zero, `nvidia` is NIM's free dev tier
 # on integrate.api.nvidia.com (a build.nvidia.com key, no wallet exists to
-# bill), ollama-cloud's catalog is a closed free list, and apisfreellm takes
-# no key at all. Nemotron's first failover is the NIM lane, not the custom
-# endpoint: the billed pick that cost the Infron balance (2026-11-19) was this
-# model resolved through a metered route.
+# bill), and apisfreellm takes no key at all. ollama-cloud was removed
+# 2026-11-22: its nemotron-3-ultra lane answers 402 "Add usage credits" on
+# every attempt — 71 in one boot, routed to 23 times with zero successes — so
+# it is a payment wall, not a quota that resets. Nemotron's first failover is
+# the NIM lane, not the custom endpoint: the billed pick that cost the Infron
+# balance (2026-11-19) was this model resolved through a metered route.
 fallback_providers:
   # NIM leads (2026-11-22), ahead of the two lanes that used to. Order is cost,
   # not preference: `GET <base>/models` measured 0.107 s for NIM (connect
@@ -160,8 +162,6 @@ fallback_providers:
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
     key_env: INFRON_API_KEY
-  - provider: ollama-cloud
-    model: nemotron-3-ultra
   # CrowLLM is a keyed route whose catalog is `:free` ids only: the key comes
   # from the shared sops blob, so the entry names the env var and never the
   # value. `key_env` is the only form hermes resolves — `api_key: ${VAR}` was

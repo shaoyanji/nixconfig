@@ -49,4 +49,4 @@ Must-Have-Liste gelesen, Kern fehlt: OpenTelemetry, Tracing und Jaeger sind der 
 
 ## Weg
 
-Erst prüfen, ob die Rolle offen ist (BA-Referenz 404, Eintritt verstrichen). Dann Zeugnisse ergänzen und über telekom.jobs mit der Referenz bewerben. Kein Gehaltswunsch im Schreiben, weil die Anzeige keine Spanne nennt.
+Die Stelle ist gelistet (öffentliche BA-Seite, Beginn ab sofort). Zeugnisse ergänzen und über telekom.jobs bewerben, dort die eigene Referenz bestätigen. Kein Gehaltswunsch im Schreiben, weil die Anzeige keine Spanne nennt.

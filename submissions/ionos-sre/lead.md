@@ -22,7 +22,7 @@ Karlsruhe ist von Gutach im Breisgau rund anderthalb Stunden entfernt, hybrides 
 - Störungsdiagnose aus Daten statt aus Vermutungen; Runbooks als Ergebnis.
 - Sicherheit: sops und age, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten, nftables, keine offene Schnittstelle.
 - Betrieb einer KI-Plattform auf eigener Hardware: Modellserver, Go-Router, Zugang nur über das Tailnet.
-- Ressourcenknappheit als常态: Limits je Dienst, Speicherdruck als Messgröße.
+- Ressourcenknappheit als Normalfall: Limits je Dienst, Speicherdruck als Messgröße.
 
 ## Was fehlt
 

@@ -1,0 +1,265 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 7640,
+    "terms": [
+      {
+        "term": "service",
+        "weight": 21.359
+      },
+      {
+        "term": "infrastruktur",
+        "weight": 14.603
+      },
+      {
+        "term": "services",
+        "weight": 12.954
+      },
+      {
+        "term": "sowie",
+        "weight": 11.03
+      },
+      {
+        "term": "plattformen",
+        "weight": 10.922
+      },
+      {
+        "term": "interamt",
+        "weight": 9.003
+      },
+      {
+        "term": "cd",
+        "weight": 8.625
+      },
+      {
+        "term": "ci/cd-pipelines",
+        "weight": 8.625
+      },
+      {
+        "term": "grundlegende",
+        "weight": 8.625
+      },
+      {
+        "term": "handelt",
+        "weight": 8.625
+      },
+      {
+        "term": "postgresql",
+        "weight": 8.625
+      },
+      {
+        "term": "sicherheitsempfindlichen",
+        "weight": 8.625
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "Risikoberechnungs-Engine (Swirl Engine)",
+        "score": 5.1297
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "bountystash",
+      "fibtransponder",
+      "matt.bountystash.com"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "JSONL-Ledger"
+        },
+        {
+          "score": 0.0,
+          "text": "Alarmzustellung"
+        }
+      ],
+      "kept": 6,
+      "name": "Observability",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Ressourcenlimits"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Plattform",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "YAML"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 7.4473,
+          "text": "Stellte jede Server-Generation unveränderlich aus dem Repository bereit; ein Rollback ist ein Befehl"
+        },
+        {
+          "score": 6.9873,
+          "text": "Hielt Secrets aus dem Betrieb: sops mit age, Zugang ausschließlich über die eigene SSH-CA mit kurzlebigen Zertifikaten"
+        },
+        {
+          "score": 4.5903,
+          "text": "Automatisierte Dienste, Auswertungen und Deploy-Ketten in Go, Python und Bash"
+        },
+        {
+          "score": 1.5301,
+          "text": "Prüfte Endpunkte mit Gatus und band jedes Alerting an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachr"
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 8.5804,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        },
+        {
+          "score": 4.7225,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 4.674,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.2494,
+          "text": "Beriet Mandanten zu Cybersecurity-Software und Risikomanagement."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.1382,
+          "text": "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 6.5985,
+          "text": "Erstellte neue Excel-Tabellen für die Engineering-Abteilung."
+        },
+        {
+          "score": 3.2729,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 1.725,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

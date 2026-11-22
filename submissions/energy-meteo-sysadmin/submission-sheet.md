@@ -97,8 +97,8 @@ domain and the Linux depth are the two arguments for the upper half.
 | :--- | :--- |
 | `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 194 prose files, exit 0 |
-| selection | 10/37 highlights, 0/0 projects |
+| `task checks:prose` | 195 prose files, exit 0 |
+| selection | 10/37 highlights, 4/10 projects |
 | sha256 CV | `1b093513f7b63df1995fa1de5fb708f927dd94ff81919f1fb7bf7b42c97c74cd` |
 | sha256 letter | `d990b8fecf56e84ada370322c62daf85ce7c5a0e2d08ca7e1f6c17ae84fa3e67` |
 

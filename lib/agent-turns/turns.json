@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-22T07:40:45Z",
+  "generated": "2026-11-22T07:42:39Z",
   "count": 200,
-  "pin": "40c2ac4f074f8f665b38a60f2467f3261a7517d480a444d447f90fb4bed62690",
+  "pin": "9316aa39aed982936d08c7caaa75d3804517339d2fa5bf63ba855f1d7e7cfb77",
   "turns": [
+    {
+      "id": "ef37abb8-39e7-4d4f-ad22-ad1d2ef58388",
+      "ts": "2026-11-22T07:42:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-drv-openshift",
+      "action": "landed: DRV OpenShift platform packet (JD, 2-page CV, 1-page letter, Interamt sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/drv-devops-platform-openshift"
+      ],
+      "files": [],
+      "base_commit": "db2695abcf5be2d7903a28e697d9aa6a3e32ac3e",
+      "branch": "main",
+      "frame": "03ha5v8mhq40t6tixsjr8ipbq"
+    },
+    {
+      "id": "a9c86495-c92d-4a51-afa0-6bc5d2b6278b",
+      "ts": "2026-11-22T07:42:32Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-energy-meteo",
+      "action": "landed: energy & meteo systems Systemadministrator packet in submissions/energy-meteo-sysadmin (BA 13644-311398-S / get-in-it p311398, Oldenburg + Home-Office). German CV 2pp, letter 1pp, ask 68k in 65-72k band. Energy domain is real from corpus (O3 Energy, REM M.Sc.); letter names no enterprise helpdesk, no MDM/Windows, no client rollouts. Gates: prose PASS, pdfinfo 2/1",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/energy-meteo-sysadmin"
+      ],
+      "base_commit": "dcc59a6bf2e37067b82e7ac22f0faa086a4d9360",
+      "branch": "main",
+      "frame": "03ha5v84a3fj0vmu5pd66zrfx"
+    },
     {
       "id": "63b4011c-f06e-44a8-acbe-ee75a56d085d",
       "ts": "2026-11-22T07:40:42Z",
@@ -2803,43 +2833,6 @@
       "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
       "branch": "main",
       "frame": "03h9xtupn3ryrcwnf4i6mcycs"
-    },
-    {
-      "id": "b693e342-61e5-4c90-8860-2002784923bb",
-      "ts": "2026-11-21T06:59:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-orchestrator-repair",
-      "action": "hermes orchestrator repaired: handoff channel closed, pane-exit + jev routing contracts corrected | gate: checks:quick PASS",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai/hermes-persona",
-        "docs/agent-context",
-        ".agents/skills/tmux",
-        "flake/prose-budget.nix"
-      ],
-      "files": [
-        ".agents/skills/tmux/SKILL.md",
-        "docs/agent-context/HOME-PREAMBLE.md",
-        "flake/prose-budget.nix",
-        "modules/user/ai/hermes-persona/AGENTS.md",
-        "modules/user/ai/hermes-persona/MEMORY.md"
-      ],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xtki2cqbqbove9e95695c"
-    },
-    {
-      "id": "955e574c-8645-42cf-853e-86ac4977dcb0",
-      "ts": "2026-11-21T06:47:46Z",
-      "source": "devin",
-      "subject": "nixconfig:systemd-consistency",
-      "action": "audit: mkTimerJob/mkDaemon contract verified across all call sites (serviceConfig merge, edge concat, unitConfig merge, enable consumption, no hand-rolled remnants) — zero drift found; consolidation commits 34a34847+2a1a611c on origin/main | gate: nix eval .#modules PASS, checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xr88is3xtjqqdfr7nn4yh"
     }
   ]
 }

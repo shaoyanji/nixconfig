@@ -31,14 +31,14 @@ static address on `brlan`). Rationale, tiers and state volumes: `AGENTS.nix` not
 
 | Task | What it does |
 | :--- | :--- |
-| `task microvm:list` | this host's guests and their `microvm@` unit state |
-| `task microvm:start NAME=<guest>` | start the unit, wait for ssh |
+| `task microvm:list` | guests + unit state — run this first; a guest that is `inactive` here is off, not broken |
+| `task microvm:start NAME=<guest>` | polls ssh until `WAIT` (default `180` s) — exits 1 on a guest that boots and stays silent |
 | `task microvm:stop NAME=<guest>` | stop the unit |
 | `task microvm:ssh NAME=sandbox` | ssh in — `sandbox` resolves only on the host that runs it |
 | `task vm:canary:run` | unit `frieren-canary-runner`, capped by `LIFETIME` (default `2h`) |
 | `task vm:canary:ssh` | shell inside the canary |
 | `task vm:canary:test` | **gate**: boot → ssh → declared address → tool set + `/var` → stop → teardown |
-| `task vm:canary:stop` | graceful shutdown, then shares and tap |
+| `task vm:canary:stop` | safe with nothing running: poweroff, then tap and shares, clearing stale sockets instead of failing |
 
 ## Logging in
 

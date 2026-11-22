@@ -1,0 +1,98 @@
+Software Engineer - Platform [IC3]
+
+<div class="content-intro"><h2><span style="color: rgb(243, 78, 63);">Who we are</span></h2>
+<p>Our mission is to bring clarity and control to the world's most complex codebases. AI is accelerating code creation, but the infrastructure to understand, oversee, and evolve that code hasn't kept pace. Sourcegraph gives engineering organizations full visibility across their systems, precise context for their agents, and the ability to execute coordinated code changes at scale. As agentic development becomes the dominant engineering paradigm, we provide the context layer teams need to take control of their codebase.<br><br>With Code Search, Deep Search, MCP, and Agentic Batch Changes, we deliver on that mission today - giving engineering teams and their AI tools the cross-repo context to navigate massive codebases with confidence, and the ability to make changes across hundreds of repositories at once.<br><br>Companies like Stripe, Reddit, and Leidos rely on Sourcegraph to ship faster and with higher quality. We're backed by a16z, Sequoia, and Redpoint, and proud to operate as a globally distributed team that values high agency, direct communication, and customer love.<br><br>If you want to build the infrastructure that lets every engineering team - and every agent they deploy - operate on their codebase with confidence, join us.</p></div><h2><span style="color: rgb(243, 78, 63);"><strong>Hours &amp; location</strong></span></h2>
+<p>🌎 While we hire <a href="https://sourcegraph.notion.site/How-we-engage-talent-outside-of-the-US-218f7193695a46cbb1ef39ef9c1f72d4">almost anywhere</a> in the world, we have a preference for someone to reside in the following locations for this role. However, if you feel qualified, we welcome you to apply regardless of location. No matter what, working hours must overlap with EST for at least 20 hours/week.</p>
+<p><strong>Preferred locations:</strong></p>
+<ul>
+<li>EST</li>
+<li>Europe</li>
+</ul>
+<h2><span style="color: rgb(243, 78, 63);"><strong>Why this job is exciting</strong></span></h2>
+<p>Source code is at the heart of Sourcegraph. We support multiple code hosts and retrieve, store, index, and serve source code - to end users, admins, and other internal services.</p>
+<p>This role gives you the opportunity to solve complex, challenging, and highly technical problems for our customers, both internally and externally, help unleash the potential and productivity of our Engineering teams, and delight our customers with industry-leading quality software.&nbsp;</p>
+<p>The Platform team primarily focuses on building a fully managed platform for using Sourcegraph, Sourcegraph Cloud, our SaaS offering. As a member of the Platform team, you will work closely with both external customers and internal stakeholders to meet their needs. You will:</p>
+<ul>
+<li>Develop inter-cloud connectivity solutions to support enterprise customers from highly regulated industries to use Sourcegraph Cloud.</li>
+<li>Build a control plane to orchestrate a fleet of single-tenant Sourcegraph Cloud instances.&nbsp;</li>
+<li>Expose complex infrastructure as API to support internal customers to iterate faster.</li>
+<li>Dive into upstream dependencies (e.g., CDK for Terraform, Terraform providers for GCP)&nbsp; to debug and patch non-trivial problems.</li>
+<li>Be an advocate for building reliable services and work with leadership to help product teams achieve operational excellence.&nbsp;</li>
+<li>Participate in on-call rotation to uphold our contractual SLA commitments.</li>
+</ul>
+<p>📅 Within one month, you will…</p>
+<ul>
+<li>Onboard onto the Sourcegraph architecture, tooling, and development workflow.</li>
+<li>Build a solid understanding of the team’s areas of ownership, technical challenges, and problems the team solves for our customers, and know how all of these align with the top-level company goals.</li>
+<li>Actively participate in team meetings, sharing ideas and insights to contribute to the overall team goals.</li>
+<li>Start contributing to the team goals and deliverables by shipping new features, debugging issues, and fixing bugs.</li>
+</ul>
+<p>📅 Within three months, you will…</p>
+<ul>
+<li>Demonstrate a comprehensive understanding of the Cloud infrastructure, its underlying technologies, and its integration within the Sourcegraph ecosystem.</li>
+<li>Lead initiatives contributing to team goals through both discovery and delivery phases, collaborating directly with product and design partners, other engineering teams, and non-technical stakeholders from different departments.</li>
+<li>Contribute to the architectural design and implementation of new features or improvements, actively shaping the future direction of Cloud infrastructure based on customer needs.</li>
+<li>Lead initiatives contributing to team goals on the roadmap by going through the entire product development lifecycle discovery, design, implementation, and delivery.</li>
+<li>Participate in our on-call rotation.</li>
+</ul>
+<p>📅 Within six months, you will…</p>
+<ul>
+<li>Be defining long-term technical vision and strategies for new product development, scaling existing services, and managing technical debt. These plans will consist of multiple smaller milestones that you will deliver iteratively with the team.</li>
+<li>Collaborate with the Engineering Manager on defining the team’s growth strategy based on the long-term product vision, the technical vision, and the team’s needs.</li>
+<li>Seek feedback from customers and stakeholders to identify opportunities for further improvements or new features, actively iterating on the Cloud infrastructure to ensure it continues to meet our high bar.</li>
+</ul>
+<h2><span style="color: rgb(243, 78, 63);"><strong>About you&nbsp;</strong></span></h2>
+<p>You bring a product mindset in balancing architectural flexibility and philosophy with meeting immediate customer demand. You are an experienced software engineer who seeks to solve problems by writing code rather than through one-off operations. You are passionate about user experience and self-service. You balance maintaining and designing high-impact systems with a pragmatic understanding of how to make appropriate tradeoffs (e.g., cut scope, low-tech vs. custom complex solutions) to ship quickly and iterate when necessary.&nbsp;</p>
+<p>Qualifications:</p>
+<ul>
+<li>Proficiency in Go, or other strongly typed languages.</li>
+<li>Knowledge in one of the public cloud platform providers (GCP, AWS, Azure)</li>
+<li>Experience with Terraform (or similar IaC solutions) and Kubernetes to build tooling and automation.</li>
+<li>Skilled at debugging distributed systems, followed by designing and implementing solutions to those problems. This means you should know your way around various OS-level primitives, e.g., network, CPU, and memory.</li>
+<li>Ability to communicate clearly and empathetically, especially in writing and documentation.</li>
+<li>Preferred time zone between UTC-8 and UTC+2</li>
+</ul>
+<p>Nice to haves:</p>
+<ul>
+<li>Built services and exposed them as API for external consumption&nbsp; (e.g., gRPC).</li>
+<li>Comfortable implementing system-level software&nbsp; (e.g., custom transport protocol) if needed or has contributed to Kubernetes controllers/operators.</li>
+<li>Published blog posts and/or tech talks about your work.</li>
+<li>Experience working on small high-performing teams, preferably tech startups.</li>
+</ul>
+<h2><span style="color: rgb(243, 78, 63);"><strong>Level</strong></span></h2>
+<p>📊 This job is an IC3.&nbsp; You can read more about <a href="https://www.notion.so/sourcegraph/Leveling-Guide-0e1b5c76ada64b9caac387f8b7c4fc66">our job leveling philosophy</a> in our Handbook.</p>
+<h2><span style="color: rgb(243, 78, 63);"><strong>Compensation</strong></span></h2>
+<p><strong>💸 </strong>We pay above-market salaries because we want to hire exceptional people who can focus on building great products, not worrying about paying bills. As an <a href="https://sourcegraph.notion.site/Mission-values-e9d37e6b972a4ef395c3076aea2bd07d" target="_blank">open and transparent</a> company, our <a href="https://app.notion.com/p/sourcegraph/Compensation-Pay-Transparency-at-Sourcegraph-d58d0774f51b4b489d41c3628d30ff8d?pvs=4&amp;assetsVersion=23.13.20260723.1259&amp;clientBuildTarget=client" target="_blank">compensation philosophy</a> and pay bands are visible to every Sourcegraph teammate, and we strive to make our approach equitable, explainable, and competitive.<br><br>Your base salary is determined by the IC3 pay band for your location zone (1-4). Our pay bands are informed by market data and designed to ensure competitive compensation wherever you live. During the recruiting process, we'll discuss the range applicable to you based on job level, relevant skills, experience, qualifications, and location zone.</p>
+<p>💰The starting salary for the IC3 pay band in each zone is:</p>
+<ul>
+<li>Zone 2: $148,000 USD</li>
+<li>Zone 3: $111,000 USD</li>
+<li>Zone 4: $74,000 USD</li>
+</ul>
+<p>📈 In addition to competitive cash compensation, we offer meaningful equity (because when Sourcegraph succeeds, we want you to succeed, too) and generous&nbsp;<a href="https://sourcegraph.notion.site/Benefits-Perks-dd1da4b6b3a64780abed010a144d34ba" target="_blank">perks &amp; benefits</a>.</p>
+<h2><span style="color: rgb(243, 78, 63);"><strong>Interview process&nbsp;</strong></span></h2>
+<p><em>Below is the interview process you can expect for this role (you can read more about </em><a href="https://sourcegraph.notion.site/Types-of-interviews-f279f080583d49ee9f2c60e30c8cb1f7"><em>the types of interviews</em></a><em> in our Handbook). It may look like a lot of steps, but rest assured that we move quickly and the steps are designed to help you get the information needed to determine if we’re the right fit for you… Interviewing is a two-way street, after all!&nbsp;</em></p>
+<p>We expect the interview process to take 4.75 hours in total.</p>
+<p><strong>👋 Introduction Stage</strong> - we have initial conversations to get to know you better…</p>
+<ul>
+<li>[30m] <a href="https://www.notion.so/sourcegraph/Types-of-interviews-sample-questions-f279f080583d49ee9f2c60e30c8cb1f7?pvs=4#99be5ff628b2414194a0ba79d9f25f13">Recruiter Screen</a></li>
+<li>[30m]&nbsp;<a href="https://www.notion.so/sourcegraph/Types-of-interviews-sample-questions-f279f080583d49ee9f2c60e30c8cb1f7?pvs=4#1919882c0cf147c487eb1df40db8a694">Hiring Manager Screen</a></li>
+</ul>
+<p><strong>🧑‍💻 Team Interview Stage</strong> - we then delve into your experience in more depth and introduce you to members of the team, including cross-functional partners…</p>
+<ul>
+<li>[Async] Take-home exercise</li>
+<li>[60m] <a href="https://app.notion.com/p/sourcegraph/Resources-for-Candidates-Engineering-Interview-Process-c37a70dea5794085bee0c0818c9ef0b3?source=copy_link#3cfa8e11265880e28a84fc14a3a49e62https://app.notion.com/p/sourcegraph/Resources-for-Candidates-Engineering-Interview-Process-c37a70dea5794085bee0c0818c9ef0b3?source=copy_link#3cfa8e11265880e28a84fc14a3a49e62">Take-home exercise walkthrough + System Design</a></li>
+<li>[60m] <a href="https://sourcegraph.notion.site/Resources-for-Candidates-Engineering-Interview-Process-c37a70dea5794085bee0c0818c9ef0b3#e83edd987754460e839138a4bbfd592e">Pairing Exercise</a>&nbsp;</li>
+<li>[60m] <a href="https://app.notion.com/p/sourcegraph/Types-of-interviews-sample-questions-f279f080583d49ee9f2c60e30c8cb1f7?source=copy_link#c678a2a86e0e47e4958507e869bf7ded">Resume Deep Dive</a></li>
+<li>[60m]<a href="https://sourcegraph.notion.site/Types-of-interviews-sample-questions-f279f080583d49ee9f2c60e30c8cb1f7#cb00697e95304550a146c32563c0255d"> Cross-functional Team Collaboration Interview</a> / <a href="https://www.notion.so/sourcegraph/Types-of-interviews-sample-questions-f279f080583d49ee9f2c60e30c8cb1f7?pvs=4#e3a04291743048df87541a88aa8199dd">Values Interview</a>&nbsp;</li>
+</ul>
+<p><strong>🎉 Final Interview Stage </strong>- we move you to our final round, where you gain a better understanding of our business and values holistically…</p>
+<ul>
+<li>[30m] <a href="https://www.notion.so/sourcegraph/How-to-work-with-Quinn-Slack-CEO-807673e0864d473f959cc4efd9642a5a?pvs=4#6f185c0e2011411eac5be9c675f9056c">Leadership</a></li>
+<li>We check references and conduct your background check</li>
+</ul>
+<p>Please note - you are welcome to request additional conversations with anyone you would like to meet, but didn’t get to meet during the interview process.</p><div class="content-conclusion"><h2><span style="color: rgb(243, 78, 63);">Learn more about us</span></h2>
+<p>You can learn more about what it is like to work at Sourcegraph by reading <a href="https://sourcegraph.notion.site/d7614e3e9dc04c09ac2d42d57f1816e6?v=2a6d426dbae14390b155120b0c029ce0">our handbook</a>.</p>
+<p>We are an ambitious team who are collectively working hard to build the most influential company in the world. You can read more about our&nbsp;<a href="https://sourcegraph.notion.site/What-it-s-like-working-at-Sourcegraph-119a8e11265880b18911eee4d9b7c460#119a8e1126588062b935fc66104b6115">culture</a>, <a href="https://sourcegraph.notion.site/Compensation-Pay-Transparency-at-Sourcegraph-d58d0774f51b4b489d41c3628d30ff8d?pvs=74">competitive compensation</a> and <a href="https://sourcegraph.notion.site/Benefits-Perks-dd1da4b6b3a64780abed010a144d34ba?pvs=74">benefits</a> here.</p>
+<p>Sourcegraph is an equal opportunity workplace; we welcome people from all backgrounds.&nbsp;</p>
+<p><em>Sourcegraph participates in </em><a href="https://sourcegraph.notion.site/E-Verify-2ab3286dde3446d6bac2898c83610107"><em>E-Verify</em></a><em> for U.S. Employees. </em></p></div>

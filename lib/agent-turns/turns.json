@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T09:57:00Z",
+  "generated": "2026-11-22T09:58:47Z",
   "count": 200,
-  "pin": "c05010b9c01e3df05002f9236110ee7814fe72dfac65fa188a6d89c1d81778f2",
+  "pin": "383ce5178eb19297a01c1283903326e05cb2f41e379ee725bff14113d866b419",
   "turns": [
+    {
+      "id": "179a65d3-2611-449d-ad75-3d39fb760b6f",
+      "ts": "2026-11-22T09:58:36Z",
+      "source": "freebuff",
+      "subject": "nixconfig:attio",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d555808ffe2fd77c4d51201a807c33e3d354f118",
+      "branch": "main",
+      "frame": "03ha6lsyw8545xi1trgsp9a3p"
+    },
+    {
+      "id": "179d6828-d866-4d11-9551-c06c06b1e94c",
+      "ts": "2026-11-22T09:58:08Z",
+      "source": "devin",
+      "subject": "nixconfig:citeq-muenster-devops",
+      "action": "submitted: citeq Münster via Interamt→gute-einstellung portal | 'erfolgreich übermittelt' confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9bf9242187413104fcf2f7f7b9a5dd08cd3525e2",
+      "branch": "main",
+      "frame": "03ha6lpmikkdpys5bee41y5k8"
+    },
+    {
+      "id": "d57e3241-a5f4-4a29-bff9-62eb6c8c7f16",
+      "ts": "2026-11-22T09:57:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:hep-global",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "48d98a88b2ba1649e186520ba0258f216840eee0",
+      "branch": "main",
+      "frame": "03ha6litbo3is2zfbnm8jyqeq"
+    },
+    {
+      "id": "3d632837-9b3a-4cff-a8d7-9fe919531567",
+      "ts": "2026-11-22T09:57:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:enviria",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9bf9242187413104fcf2f7f7b9a5dd08cd3525e2",
+      "branch": "main",
+      "frame": "03ha6li68etjv5vzdrc19fuq4"
+    },
     {
       "id": "95038cfb-ab28-4386-9fdc-8f52c960101b",
       "ts": "2026-11-22T09:56:47Z",
@@ -2668,66 +2720,6 @@
       "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
       "branch": "main",
       "frame": "03ha5licukk5jhredhpbxpu21"
-    },
-    {
-      "id": "19cfba92-ca33-4953-b2d0-fa66871bb360",
-      "ts": "2026-11-22T06:52:28Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: execute prepared Ashby submission black-forest-labs MTS Infrastructure Security",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/black-forest-labs"
-      ],
-      "files": [],
-      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
-      "branch": "main",
-      "frame": "03ha5lg0u52thwt091nxb61jk"
-    },
-    {
-      "id": "0c0b1c21-ae89-400c-a19e-4373fe0d1f55",
-      "ts": "2026-11-22T06:51:57Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-stackit-gt1923",
-      "action": "landed: STACKIT GT1923 packet built (CV 2pp, letter 1pp EN, selection audit) in submissions/stackit; JD taken from the page's schema.org JobPosting block, form answers read from the RocketApply OData service (jobReqId 1923: no screening questions, gender/hear-position picklists enumerated) and the record moved to stage prep; checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/stackit"
-      ],
-      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
-      "branch": "main",
-      "frame": "03ha5lcdh4t7v7upp6sor0ngz"
-    },
-    {
-      "id": "dd1dca27-7524-4b9a-aefc-9d182c08346d",
-      "ts": "2026-11-22T06:49:55Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: maze Senior SRE applied via Ashby (Other country x2, visa=No, N/A state, resume+salary band noted); ack mail 311044; attio record set manual (reCAPTCHA interactive = no-solve per policy)",
-      "outcome": "done",
-      "claims": [
-        "submissions/maze submissions/attio"
-      ],
-      "files": [],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5ky48fi6l6ktf5c0ujn95"
-    },
-    {
-      "id": "8359a659-de90-46bc-ba1f-87985a420fcc",
-      "ts": "2026-11-22T06:47:56Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: execute prepared Ashby submission maze Senior SRE (attio marked manual, reCAPTCHA policy: no interactive challenges)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/maze"
-      ],
-      "files": [],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5kk3nmkir5ewlvaymsrq8"
     }
   ]
 }

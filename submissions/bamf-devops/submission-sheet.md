@@ -1,122 +1,68 @@
-# Bundesamt für Migration und Flüchtlinge (BAMF) — mehrere DevOps-Engineers (m/w/d) — Public Cloud / Plattformdienste
+# Bundesamt für Migration und Flüchtlinge — DevOps-Engineers (m/w/d), Public Cloud / Plattformdienste
 
-**Interamt `1513998`, Kennziffer `BAMF-2025-358`.** Referat 22B — Plattform- und Cloudservices,
-Dienstort Nürnberg. Mehrere Stellen: unbefristet sowie befristet auf 24 Monate. Status: Packet
-fertig, **nichts eingereicht**.
+Interamt `1513998`, Kennziffer **BAMF-2025-358**, Referat 22B. Quellen sind jetzt **native Typst-Dateien**;
+der JSON-Build und der `packet`-Symlink in den Nix-Store sind entfernt. Stand: Paket fertig, **nichts
+eingereicht**.
 
 | Feld | Wert |
 | :--- | :--- |
 | Role ID | `bamf-devops` |
-| Interamt-ID | 1513998 |
+| Arbeitgeber | Bundesamt für Migration und Flüchtlinge (BAMF), Nürnberg |
+| Rolle | DevOps-Engineers (m/w/d), Public Cloud / Plattformdienste |
 | Kennziffer | BAMF-2025-358 |
-| Arbeitgeber | Bundesamt für Migration und Flüchtlinge |
-| Organisationseinheit | Referat 22B — Plattform- und Cloudservices |
-| Dienstort | Nürnberg, hybrid |
-| Entgelt | **E 10 – E 12 TV EntgO Bund** (bzw. A 10 – A 12 BBesO) |
-| Laufzeit | unbefristet oder befristet auf 24 Monate |
-| Sicherheitsüberprüfung | **SÜ1** nach § 5 AsylG i. V. m. § 8 SÜG, Bereitschaft erforderlich |
-| Sprache | Deutsch, C1 nach GER nachzuweisen |
-| Bewerbungsweg | Interamt bzw. Bewerbungsseite der Behörde |
-
-## Frist — was der Text hergibt
-
-Der Ausschreibungstext in `job-description.txt` nennt **kein Datum** für die Bewerbungsfrist; er
-verweist nur darauf, dass ein Studium bis drei Monate nach Fristende abgeschlossen sein darf. Die
-Angabe **18.12.2026** stammt aus `lead.md` (Sweep-Notiz), nicht aus dem Dokument — sie ist vor der
-Bewerbung am Interamt-Eintrag zu prüfen, nicht zu übernehmen.
-
-## Kandidatenangaben
-
-| Angabe | Wert |
-| :--- | :--- |
-| Name | Matt Ji |
-| Anschrift | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| E-Mail / Telefon | matt@bountystash.com / +49 173 3281570 |
-| Sprachen | Deutsch C1, Englisch Muttersprache |
-| Arbeitserlaubnis | US-Staatsbürger mit deutschem Niederlassungsrecht, kein Sponsoring |
-| Entfernung | ~400 km nach Nürnberg; hybrid, Präsenzblöcke |
-| Eintritt | nächstmöglicher Zeitpunkt |
-
-## TV EntgO Bund E 10 – E 12 — Struktur statt Zahl
-
-Die Ausschreibung nennt die Bandbreite selbst und macht die Bedingung für die oberste Stufe
-ausdrücklich: **E 12 setzt voraus, dass die persönlichen Voraussetzungen in jedem Fall vorliegen und
-im Einzelfall geprüft werden.** Deshalb steht im Anschreiben keine Eurosumme, sondern das Ziel
-E 12 mit dem Mindestanspruch E 11 — bei einer Eingruppierung entscheidet die Fallprüfung, nicht die
-Forderung.
-
-| Punkt | Stand |
-| :--- | :--- |
-| Entgeltgruppe | E 10 – E 12 TV EntgO Bund, Stufe nach Berufserfahrung |
-| Ziel im Anschreiben | **E 12 angestrebt, mindestens E 11** |
-| Laufzeit | unbefristet **oder** 24 Monate — die Ausschreibung nennt beides |
-| Beamtenlaufbahn | A 10 – A 12 BBesO, für Beamtinnen und Beamte offen |
-| Eurobetrag | keiner im Anschreiben; die Tabelle ist nicht Teil der Ausschreibung |
-| Sicherheitsüberprüfung | SÜ1, Bereitschaft im Anschreiben ausdrücklich erklärt |
+| Ort | Nürnberg, hybrid |
+| Sprache | Deutsch |
+| Vergütung | TVöD Bund; Erwartung **E 11 / E 12**, keine Euro-Zahl im Brief |
+| Fit | 3 (DB-Eintrag 4 wie beauftragt) |
 
 ## Fit-Map
 
-| Anforderung (Ausschreibung) | Nachweis | Urteil |
+| Anforderung (Stelle) | Nachweis | Urteil |
 | :--- | :--- | :--- |
-| Virtualisierte und containerisierte Plattformen über den Lifecycle betreiben | Deklarierte MicroVMs als Gäste, PXE-Bereitstellung, Rebuild, Rollback; keine Container-Plattform als Ganzes | teilweise |
-| Linux und Kubernetes als Plattformbasis | Linux stark; **Kubernetes/OpenShift nicht produktiv betrieben** | **Lücke** bei Kubernetes |
-| Störungen identifizieren, Entstörung, Monitoring im Blick | Sentinel-Ledger, journald, cgroups, tcpdump; Analyse über Host-, Unit- und Zeitgrenzen | stark |
-| Automatisierung von Betriebsprozessen | Deklaration, Gates in CI und Host, wiederkehrende Handgriffe als Checks | stark |
-| Infrastructure as Code (z. B. Ansible/Terraform) | **Nix statt Ansible/Terraform**; gepinnte Inputs, gleiche Prüfung in CI und Host | **Lücke** im Werkzeug, Konzept stark |
-| Scripting (Bash, Python) | Go, Python, Bash hinter einer Task-Schnittstelle | stark |
-| Konzepte und Dokumentation erstellen und pflegen | Runbooks, Host-Dossiers, Entscheidungsnotizen auf Deutsch | stark |
-| Enablement: Teams bei der Plattformnutzung unterstützen | Anwenderbetreuung bei O3 Energy; Betriebswissen im Repository statt im Kopf | stark |
-| Hochverfügbarkeit und Skalierung | Dreizehn Hosts, keine Rechenzentrums-Redundanz verantwortet | teilweise |
-| Public Cloud | kleines AWS-Lambda-Projekt, Oracle-Cloud-Hosts; kein Multi-Account-Betrieb | teilweise |
-| Deutsch C1 | Anschreiben und Unterlagen auf Deutsch, C1 | stark |
-| SÜ1-Bereitschaft | im Anschreiben ausdrücklich erklärt | erfüllt |
-| Studium/Berufserfahrung nach E 10 – E 12-Bewertung | M.Sc. und B.Sc., über zehn Jahre IT-Betrieb | erfüllt |
+| Linux-Plattformbetrieb | Dreizehn Hosts deklarativ, Gates, Rollback, Rebuild | stark |
+| Betriebliche Automatisierung | Go, Python, Bash hinter einer Task-Oberfläche | stark |
+| Reproduzierbare Systemkonfigurationen | Gepinnte Inputs, deklarierter Zustand, Rebuild als Pfad | stark |
+| Virtualisierung | MicroVMs als deklarierte Gäste, systemd-Slices, PXE-Provisionierung | stark im Betrieb, ohne Hypervisor-Administration |
+| Container / Orchestrierung | Container nur als gepinnte Bauumgebungen | **Lücke** |
+| Public Cloud (Plattformdienste) | Oracle-Hosts, ein Lambda-Projekt | **Lücke** |
+| Developer Enablement | Task-Oberfläche, Runbooks, Selbstbedienung ohne Plattformbesitzer | stark |
+| Nachvollziehbarkeit / Dokumentation | Runbooks, Dokumentations-Budget, Sprach-Gate, Ledger | stark |
+| Sicherheitsüberprüfung SÜ1 | kein Hindernis, ausdrücklich zugesagt | erfüllt |
+| Hybrid Nürnberg | ~350 km; Präsenz zugesagt, Tage zu klären | offen, nicht ablehnend |
 
-## Interamt-Zuordnung
+## Zu den Begriffen im Auftrag
 
-| # | Feld | Antwort |
-| :-- | :--- | :--- |
-| 1 | Interamt-ID / Kennziffer | 1513998 / BAMF-2025-358 |
-| 2 | Anrede / Vorname | Herr, Matt |
-| 3 | Nachname | Ji |
-| 4 | E-Mail | matt@bountystash.com |
-| 5 | Telefon | +49 173 3281570 |
-| 6 | Anschrift | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| 7 | Anschreiben | `anschreiben.pdf` (1 Seite) |
-| 8 | Lebenslauf | `lebenslauf.pdf` (2 Seiten) |
-| 9 | Qualifikation | M.Sc. Erneuerbare-Energien-Management, B.Sc. Erdöltechnik |
-| 10 | Berufserfahrung | 2010 – heute, zuletzt selbstständige Plattformarbeit |
-| 11 | Entgeltvorstellung | E 12 angestrebt, mindestens E 11 |
-| 12 | Frühester Eintritt | nächstmöglicher Zeitpunkt |
-| 13 | Arbeitsmodell | hybrid, Präsenzblöcke in Nürnberg |
-| 14 | Sicherheitsüberprüfung SÜ1 | Bereitschaft, ja |
-| 15 | Schwerbehinderung | keine Angabe |
-| 16 | Einverständnis Datenverarbeitung | ja |
+Der Auftrag nennt "containerized platform engineering (Referat 22B)". Container-Orchestrierung ist im Profil
+**nicht** vorhanden und steht deshalb im Anschreiben als Lücke, nicht in der Überschrift. Was belegbar ist:
+Virtualisierung im Betrieb (MicroVMs, Slices, PXE), Automatisierung und Reproduzierbarkeit.
 
-## Was das Anschreiben sagt
+## Vergütung
 
-Es beginnt mit der Aufgabenbeschreibung selbst — Plattformen über den Lifecycle betreiben,
-Betriebsprozesse automatisieren, Entwicklungsteams befähigen — und beschreibt dann die eigene
-Plattform: Deklaration, Gate, Rollback, MicroVMs, PXE, Ledger, Entstörung mit journald, cgroups und
-tcpdump. Der dritte Absatz nennt die Lücken: kein produktives Kubernetes oder OpenShift, kein
-Ansible oder Terraform (Nix), Public Cloud nur als kleines Projekt, keine Rechenzentrums-HA. Der
-vierte Absatz ist Enablement und Dokumentation, der fünfte Nürnberg, E 12/E 11 und die ausdrückliche
-SÜ1-Bereitschaft.
+Öffentlicher Dienst: keine Spanne in der Anzeige, deshalb keine Euro-Forderung. Der Brief nennt die
+Erwartung **E 11 / E 12** nach TVöD Bund und überlässt die Einordnung dem Arbeitgeber. Die im Lead notierte
+Angabe "E 10 – E 12" stammt aus dem Interamt-Eintrag, nicht aus dem ausgeschriebenen Text; die Erwartung im
+Brief ist deshalb bewusst als Wunsch formuliert.
+
+## Fristen und offene Punkte
+
+- Ein Bewerbungsschluss **18.12.2026** steht nur im Lead, nicht in der Anzeige — vor dem Absenden prüfen.
+- Präsenztage in Nürnberg früh klären; 350 km sind mit Hybrid machbar, mit täglicher Präsenz nicht.
 
 ## Prüfungen
 
 | Prüfung | Ergebnis |
 | :--- | :--- |
+| `typst compile lebenslauf.typ` | exit 0, keine Warnungen |
+| `typst compile anschreiben.typ` | exit 0, keine Warnungen |
 | `pdfinfo lebenslauf.pdf` | **2 Seiten** (Budget 2) |
 | `pdfinfo anschreiben.pdf` | **1 Seite** (Budget 1) |
-| `task checks:prose` | 213 prose files, exit 0 |
-| selection | 12/25 highlights, 4/8 projects |
-| sha256 Lebenslauf | `6594993149022be988a7157c13c2e5e2f33292e37dc7efc2d55d5ddd10315b21` |
-| sha256 Anschreiben | `abb9fd658b3cbb213987162385a380ebc8a1e4861f5ae0dde7eb72b0db0c0d61` |
+| `task checks:prose` | 234 prose files, exit 0 |
+| sha256 Lebenslauf | `825d92a39de10737305ad675d3ced1056e315afedc5598b6b2a5b0ecf249ca79` |
+| sha256 Anschreiben | `59ce6753e66702d85c533de1622c5ebff90f51638973e6c2fa49e5ea5f794b0f` |
+| Altlasten | `packet`-Symlink, `lebenslauf.json`, `letter.json`, `selection.json` entfernt |
 
 ## Nächste Schritte
 
-1. Frist am Interamt-Eintrag prüfen — die 18.12.2026 stehen nur in der Lead-Notiz.
-2. Über Interamt bewerben; die Kennziffer BAMF-2025-358 in Anschreiben und Formular führen.
-3. Auf die Kubernetes-Frage vorbereitet sein: MicroVMs, PXE und Deklaration sind ehrliche Nachbarschaft,
-   ein Cluster-Betrieb ist es nicht.
+1. Frist auf Interamt prüfen, dann über den Interamt-Link bewerben (Kennziffer nennen).
+2. Präsenztage und Eingruppierung im ersten Kontakt klären.
+3. SÜ1-Unterlagen bereithalten; die Bereitschaft steht im Lebenslauf.

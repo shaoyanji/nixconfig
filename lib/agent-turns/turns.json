@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T09:10:02Z",
+  "generated": "2026-11-22T09:12:09Z",
   "count": 200,
-  "pin": "3f7162fa6accc95e11819e067438e7d049983a9b382aee07b8800bcf4560a80c",
+  "pin": "41d7402207b478fc2ac6de9579d9215979d975f10c4dbd747b71a3941066554d",
   "turns": [
+    {
+      "id": "44e8007f-06b4-4329-806c-b098c5586a15",
+      "ts": "2026-11-22T09:12:07Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:dfs-sre",
+      "action": "landed: DFS Deutsche Flugsicherung SRE Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6ff6972716947deabf1459f77ec7123eb09c476c",
+      "branch": "main",
+      "frame": "03ha6cq2buviyje45joeiwh15"
+    },
+    {
+      "id": "73a2a985-8b39-44d9-ad22-dc44d8d4f71c",
+      "ts": "2026-11-22T09:11:44Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: catawiki-platform-engineer submitted via Greenhouse | gate: confirmation page PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8ec2318dd957fea29f11a65300c3ed44c105fd17",
+      "branch": "main",
+      "frame": "03ha6cnchlxxcvwkly1v7y7sj"
+    },
+    {
+      "id": "d64f2e7e-f1eb-4ccf-9e7c-dfcf5f66cae8",
+      "ts": "2026-11-22T09:10:35Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: catawiki-platform-engineer Greenhouse submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "8ec2318dd957fea29f11a65300c3ed44c105fd17",
+      "branch": "main",
+      "frame": "03ha6cf8it0las2shbec2aqwi"
+    },
     {
       "id": "826c9f34-03ff-40f9-b75e-04c128d31260",
       "ts": "2026-11-22T09:09:49Z",
@@ -2728,47 +2767,6 @@
       "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
       "branch": "main",
       "frame": "03ha4g4xawgyc9ekd181meyct"
-    },
-    {
-      "id": "5d6d9331-d748-4945-ae10-45bbc885a0c7",
-      "ts": "2026-11-22T03:15:21Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +1 app (Netzint Service Engineer 2nd req) +1 Initiativ (badenIT) | gate: mail sends + imports | ~174 applied; BA local keywords drained; indeed IP-blocked",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
-      "branch": "main",
-      "frame": "03ha4f161nkujsg5439hbs2he"
-    },
-    {
-      "id": "b885d65a-684f-486f-ba7f-47281763dfdd",
-      "ts": "2026-11-22T03:12:53Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: +2 (tecreation Titisee email fallback after FriendlyCaptcha wall, netgo OpenStack 100pct-remote via Cornerstone confirmed) + Emmendingen applicant account confirmed | gate: Dank page + mail send + imports | ~173 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
-      "branch": "main",
-      "frame": "03ha4ejur1t0amo1i1khr0nzy"
-    },
-    {
-      "id": "aedfe2f3-9d5d-4b02-a9d0-cb45545a4852",
-      "ts": "2026-11-22T03:07:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:mongodb-sre-agent-engine-packet",
-      "action": "landed: MongoDB Agent Engine SRE packet (Greenhouse 8366599, Dublin hybrid) - 2p CV 10/32 highlights, 1p letter conceding relocation + no multi-tenant K8s + Istio/Cilium unproven, sheet maps required sponsorship question | gate: agents:apps:packet exit 0 incl. cv-ats-check in-build (2/1 pages)",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/mongodb-sre-agent-engine"
-      ],
-      "base_commit": "16c7f944b53c4dd7738d9c2d08e70952d3fadbd0",
-      "branch": "main",
-      "frame": "03ha4djkbg6ao4nqo43rv2od5"
     }
   ]
 }

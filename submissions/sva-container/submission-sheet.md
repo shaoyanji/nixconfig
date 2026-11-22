@@ -26,7 +26,7 @@ family, one hiring group — see the sequencing note at the end.
 
 ## What the posting asks for
 
-- Build the customer's **container platform** and integrate it into their cloud landscape.
+- Build the customer's **container platform** and integrate it into their cloud estate.
 - Work mainly with **Kubernetes** — vanilla, or integrated (RKE, Red Hat OpenShift).
 - Use **Infrastructure-as-Code** to automate the environments.
 - **Security** as a first-class theme: hardening, **admission control**, observability, compliance
@@ -134,7 +134,7 @@ Real, inspectable here:
 - **Declarative guests alongside declarative hosts** — `hosts/microvms/` declares a base, a
   Friere canary and a test VM, each built from the same codebase as its host, with its own kernel
   and network config rather than a hand-built image. That is the container-platform instinct in a
-  different substrate.
+  applied to virtual machines instead of containers.
 - **Security by construction** — SOPS/age per host, SSH certificate authority with short-lived
   certificates, default-deny nftables, patching ordered by CISA KEV and exposure.
 - **Observability that is trusted** — sentinel ledger every fifteen minutes (job status,

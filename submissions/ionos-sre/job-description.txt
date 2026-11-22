@@ -1,0 +1,22 @@
+Site Reliability Engineer (f/m/d) – Application Hosting
+Arbeitgeber: IONOS SE
+Standort: Hinterm Hauptbahnhof 3-5, 76137 Karlsruhe (hybrid, kein Voll-Remote)
+Referenz: Greenhouse ionos2 Job 4956693101 (DE-Äquivalent 4956674101, Kennziffer 1585)
+Quelle: IONOS careers/GREENHOUSE posting text, recovered from indexed copies (the live page is gone)
+Abgerufen: 2026-11-22
+
+Hinweis: Die Original-Ausschreibung ist NICHT MEHR OFFEN. Die Greenhouse-Seite
+job-boards.eu.greenhouse.io/ionos2/jobs/4956693101 leitet auf ?error=true um
+("The job you are looking for is no longer open."), der Job fehlt in beiden
+Live-Boards (ionos2: 60 Stellen, ionos: 49 Stellen), und die IONOS-Karriereseiten
+zu 4956693101/4956674101 antworten mit 404. Der Text unten ist der wiederhergestellte
+Inhalt derselben Ausschreibung.
+
+Als Site Reliability Engineer (SRE) in unserem Application Hosting Team bildest du das technische Rückgrat unserer Produktplattform für Managed Nextcloud, Nextcloud Workspace, IONOS GPT sowie weitere Web Services, die wir auf unserer Kubernetes Plattform betreiben. Gemeinsam mit erfahrenen Kolleg*innen entwirfst du neue Dienste und Produkte, die auch bei höchster Last performant und ausfallsicher bleiben.
+
+Aufgabenbereich
+
+- Dein Haupteinsatzbereich ist die Weiterentwicklung der Infrastruktur/Plattform unserer Produkte sowie die Integration neuer Produkte/Webdienste in unsere Kubernetes- und Cloud-Infrastruktur.
+- Du bist verantwortlich für den stabilen und sicheren Betrieb unserer Produktplattform. Deine Expertise ist gefragt bei tiefgreifenden Analysen und der Optimierung unserer primär containerisierten und Kubernetes-basierten Workloads.
+- Du arbeitest eng mit Development-, Netzwerk- und Security-Teams zusammen und bringst Reliability-Praktiken in den Betrieb.
+- Automatisierung mit Infrastructure as Code, CI/CD und Monitoring gehört zu deinem Alltag.

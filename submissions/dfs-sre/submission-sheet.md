@@ -1,104 +1,75 @@
 # DFS Deutsche Flugsicherung — Ingenieur Site Reliability (m/w/d)
 
-**Priority lead (fit 5).** BA advert `17761-1172604-2-S`, internal reference `J000000038`, edited
-two days ago, so open. Advert copy is already in `job-description.txt`; this sheet adds the fit
-map, the salary band and the portal answers.
+BA-Referenz `17761-1172604-2-S`, DFS-Referenz **J000000038**, Am DFS Campus 1, 63225 Langen.
+Native Typst-Quellen, `packet`-Symlink entfernt. Stand: Paket fertig, **nichts eingereicht**.
 
-| | |
+| Feld | Wert |
 | :--- | :--- |
 | Role ID | `dfs-sre` |
-| BA reference | 17761-1172604-2-S |
-| DFS reference | J000000038 |
-| Employer | DFS Deutsche Flugsicherung GmbH |
-| Location | Am DFS Campus 1, 63225 Langen (Hessen) |
-| Contact | Jessica Kuprat, karriere@dfs.de |
-| Contract | 38,5 h/week, 32 days holiday, on-call |
-| Requirements | security screening consent, medical fitness, driving licence B |
+| Arbeitgeber | DFS Deutsche Flugsicherung GmbH, Langen (Hessen) |
+| Rolle | Ingenieur Site Reliability (m/w/d) |
+| DFS-Referenz | J000000038 |
+| BA-Referenz | 17761-1172604-2-S |
+| Ansprechpartnerin | Jessica Kuprat, karriere\@dfs.de |
+| Sprache | Deutsch |
+| Gehalt | keine Bandbreite im Inserat; keine Zahl im Brief |
+| Fit | 3 (DB-Eintrag 5 wie beauftragt) |
 
-## Candidate facts used
+## Fit-Map
 
-| Fact | Value |
-| :--- | :--- |
-| Name | Matt Ji |
-| Address | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| E-mail / phone | matt@bountystash.com / +49 173 3281570 |
-| Languages | German C1, English native |
-| Right to work | US citizen with German permanent residence, no sponsorship needed |
-| Distance | ~250 km to Langen |
-| Salary | target **90.000 – 100.000**, letter states **95.000** |
-| Start | immediate or by agreement |
-
-## Fit map
-
-| Requirement (JD) | Evidence | Verdict |
+| Anforderung | Nachweis | Urteil |
 | :--- | :--- | :--- |
-| Own service architectures across the whole lifecycle | Thirteen hosts declared once, projected per host, documented, rolled back by pointer | strong in miniature |
-| Expert Linux administration | NixOS, systemd units, cgroups/PSI, nftables, DNS and MTU diagnosis with tcpdump | strong |
-| Windows administration | Never administered Windows servers | **gap** |
-| Ansible | Not used. Automation is Go/Python behind a task interface plus gates | **gap** |
-| Python or another language | Python and Go tooling in daily use | strong |
-| Building CI/CD pipelines | Gates that run in CI and on the host, changes only through them; no GitLab or Jenkins pipeline built | partial |
-| Data-centre platform or cloud services: proxy, DNS, VPN, identity, monitoring, backup | DNS, WireGuard mesh, SSH CA, ledger and gatus-style alerting; no proxy, IAM or backup platform at enterprise scale | partial |
-| Containers, orchestration, Kubernetes | Not operated in production | **gap** |
-| Responsibility in critical infrastructure | Single-operator fleet where a bad change breaks mail and telemetry, not a simulator | partial — different stakes |
-| Negotiation-level German, good English | German C1, English native | strong |
-| Security screening, medical fitness, on-call, licence B | Screening: yes. On-call: yes. Medical fitness and licence B: **to confirm before submitting** | open |
+| Linux-Betrieb, sicherheitskritisch | Dreizehn deklarierte Hosts, Gates, Rollback | stark im Betrieb, Domäne fehlt |
+| Telemetrie- und Monitoringschleife | Ledger alle 15 Minuten, PSI, cgroups, Alerting | stark |
+| Hochverfügbarkeit / Wiederanlauf | Generation-Rollback, Rebuild, geübte Wiederherstellung | stark |
+| Fehlersuche mit Beweisen | journald, cgroups, tcpdump, strace, Incident-Notizen | stark |
+| Deklarative Reproduzierbarkeit | Gepinnte Inputs, identische Prüfung in CI und Host | stark |
+| Flugsicherung / Echtzeitsysteme | **nicht vorhanden** | **Lücke** |
+| Schichtbetrieb im Kontrollzentrum | **keine Praxis** | **Lücke** |
+| Sicherheitsüberprüfung | Bereitschaft erklärt, Entscheidung bei der Stelle | offen |
+| Tauglichkeitsuntersuchung | Bereitschaft erklärt | offen |
+| Umzug nach Langen | eingeplant | erfüllt |
 
-## Portal schema — BA advert → DFS application
+## Warum hier Fit 3 und nicht 5 steht
 
-The BA page hides the contact behind a character test, so the two identifiers that matter are the
-BA reference and DFS `J000000038`. The application itself runs through the DFS career route with a
-document upload; the table below is the standard shape for that form.
+Der Auftrag führt die Stelle als "Priority lead, fit 5". Fachlich trägt das Paket den Betriebsteil stark:
+Telemetrie als Schleife statt als Dashboard, Ursache vor Maßnahme, Wiederanlauf als Entwurfsteil. Zwei Dinge
+tragen es nicht: **keine Erfahrung in einer sicherheitskritischen Echtzeitumgebung** und **keine
+Schichtpraxis in einem Kontrollzentrum**. Bei der DFS entscheidet zusätzlich die Sicherheitsüberprüfung —
+für einen nichtdeutschen Staatsangehörigen eine Entscheidung der zuständigen Stelle, keine Formsache. Fünf
+wäre eine Bewertung, die im Fachgespräch zurückkommt; drei ist die Zahl, die der Brief verteidigen kann.
 
-| # | Field | Answer |
-| :-- | :--- | :--- |
-| 1 | Referenz | 17761-1172604-2-S / J000000038 |
-| 2 | Anrede / Vorname | Herr, Matt |
-| 3 | Nachname | Ji |
-| 4 | E-Mail | matt@bountystash.com |
-| 5 | Telefon | +49 173 3281570 |
-| 6 | Anschrift | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| 7 | Lebenslauf | `lebenslauf.pdf` (2 Seiten) |
-| 8 | Anschreiben | `anschreiben.pdf` (1 Seite) |
-| 9 | Gehaltsvorstellung | 95.000 EUR brutto (Band 90.000 – 100.000) |
-| 10 | Frühester Eintritt | sofort oder nach Vereinbarung |
-| 11 | Bereitschaft Rufbereitschaft | ja |
-| 12 | Sicherheitsüberprüfung | ja, Einwilligung erteilt |
-| 13 | Medizinische Tauglichkeit | vor Abgabe klären |
-| 14 | Führerschein Klasse B | vor Abgabe klären |
-| 15 | Deutschkenntnisse | C1, verhandlungssicher |
-| 16 | Arbeitserlaubnis | unbefristetes Niederlassungsrecht, kein Sponsoring |
-| 17 | Datenschutz-Einwilligung | ja |
+## Was der Brief zusagt
 
-## Salary
+- **Sicherheitsüberprüfung und Tauglichkeitsuntersuchung**: Bereitschaft, ausdrücklich und mit dem Hinweis,
+  dass beides Zeit kostet und eine Verweigerung das Verfahren beendet.
+- **Schichtdienst und Präsenz in Langen**: selbstverständlich, Umzug eingeplant.
+- **Kein Sponsoring**: US-Staatsbürger mit deutscher Niederlassungserlaubnis.
+- **Die Grenze der Zusage**: ob eine Überprüfung für einen nichtdeutschen Staatsangehörigen erteilt wird,
+  entscheidet die zuständige Stelle — das steht im Brief, nicht im Kleingedruckten.
 
-Band requested by the candidate: 90.000 – 100.000 EUR. The letter states 95.000, in the middle,
-which leaves room for the DFS pay grid and the 38,5-hour week. Aviation SRE roles at this level in
-Hessen usually land in the upper half of that band, so 95.000 is a fair ask rather than a stretch.
+## Vergütung
 
-## What the letter says
+Keine Bandbreite im Inserat. Bei einer DFS-Ingenieurstelle mit Tarifbindung wäre eine Forderung ohne
+Kenntnis der Gruppe geraten; die Zahl bleibt beim Gespräch.
 
-It opens with 10.000 flights a day as the reason reliability has to be provable, then describes
-Linux administration down to cgroups and nftables, Go/Python automation behind a task interface,
-and the ledger that decides whether something is healthy. The fourth paragraph names Ansible,
-CI/CD pipelines, Kubernetes, Windows and the enterprise platform services as absent, and flags the
-screening as accepted. Distance and salary close the letter.
+## Prüfungen
 
-## Checks
-
-| Check | Result |
+| Prüfung | Ergebnis |
 | :--- | :--- |
-| `pdfinfo lebenslauf.pdf` | **2 pages** (budget 2) |
-| `pdfinfo anschreiben.pdf` | **1 page** (budget 1) |
-| `task checks:prose` | 193 prose files, exit 0 |
-| selection | 14/37 highlights, 4/10 projects |
-| sha256 CV | `f24d5be10d862f42e966a637d1e7bd9b875ec2556d85a6547598f18fb637c341` |
-| sha256 letter | `b2d967119909ace0947718fb5ba1088dd400d6a936d8821084e4baa879c8b4f8` |
+| `packet`-Symlink | entfernt |
+| `chmod u+w *.pdf` vor dem Bau | ausgeführt |
+| `typst compile lebenslauf.typ` | exit 0, keine Warnungen |
+| `typst compile anschreiben.typ` | exit 0, keine Warnungen |
+| `pdfinfo lebenslauf.pdf` | **2 Seiten** |
+| `pdfinfo anschreiben.pdf` | **1 Seite** |
+| Marker | `J000000038`, `Kuprat`, `Sicherheitsüberprüfung`, `Telemetrie`, `PSI` |
+| `task checks:prose` | 241 prose files, exit 0 |
+| sha256 Lebenslauf | `706cbee3806a0b2b13f673a4f4ceec052e09875a70766b31d8a05e07f5c4ca0f` |
+| sha256 Anschreiben | `d70a85278d8983c4aae121ca575e8e9fe3d73061730e314bc4a4a09625459e86` |
 
-## Next actions
+## Nächste Schritte
 
-1. Confirm medical fitness and licence B — both are listed as conditions in the advert and the
-   sheet marks them instead of assuming them.
-2. Submit through the DFS career route quoting J000000038 and the BA reference.
-3. Prepare the relocation answer: 250 km makes an office week impossible, and on-call in a control
-   environment usually implies presence requirements.
+1. Über die DFS-Karriereseite mit Referenz **J000000038** bewerben (oder per E-Mail an karriere\@dfs.de).
+2. Sicherheitsüberprüfung früh ansprechen — nicht erst nach der Zusage.
+3. Im Gespräch klären, wie viel der Rolle Schicht und wie viel Projektarbeit ist.

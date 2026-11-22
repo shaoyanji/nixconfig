@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T09:32:14Z",
+  "generated": "2026-11-22T09:33:57Z",
   "count": 200,
-  "pin": "907c5deb2fbe7a50669350627d197f861b605c6bb6c214add15745bff0c9b477",
+  "pin": "7921f876974bf44658b4c14d075b8634b17af15ab7246b1e4e58ebb8028d3a01",
   "turns": [
+    {
+      "id": "2480c7d6-eb6e-4400-aecb-671ade6df0f6",
+      "ts": "2026-11-22T09:33:57Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "telekom upgraded to native Typst packet | 2pp CV + 1pp letter | residence status and Karlsruhe anchor added",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ecf36bb457d66225dbc490a812363f911058a268",
+      "branch": "main",
+      "frame": "03ha6gziy37zl5sqgojx3hhbh"
+    },
+    {
+      "id": "9213f1ea-6f86-4ff4-bc45-f76dbeb2526a",
+      "ts": "2026-11-22T09:33:33Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: bwi karriere.bwi.de submission (64059)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
+      "branch": "main",
+      "frame": "03ha6gwrzuzkho3gy1eeuzl82"
+    },
+    {
+      "id": "64b23086-4a13-41c4-8a5a-3955e7b627aa",
+      "ts": "2026-11-22T09:33:06Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "sinc-devops: Softgarden form complete (CV parsed, Anrede Herr, both PDFs) but FriendlyCaptcha interactive 'Hier klicken' browser-check rejects headless twice; record=manual",
+      "outcome": "blocked: friendlycaptcha browser-check rejects headless",
+      "claims": [],
+      "files": [],
+      "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
+      "branch": "main",
+      "frame": "03ha6gtmu25cfqbm888npeto6"
+    },
+    {
+      "id": "9cdb3035-7ac7-475b-9f42-1bd1afb2c0cc",
+      "ts": "2026-11-22T09:32:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "citeq upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "60420ff0cbdcbcbc9b35bef8cff6efa28c78ed22",
+      "branch": "main",
+      "frame": "03ha6gnu4d53xq72zq7t351kn"
+    },
     {
       "id": "27e35aae-f65e-4fac-b52d-146cc3db67ad",
       "ts": "2026-11-22T09:31:20Z",
@@ -2705,60 +2757,6 @@
       "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
       "branch": "main",
       "frame": "03ha4zcxs8hiwelhofnlpzgsk"
-    },
-    {
-      "id": "ad075e10-add0-462f-a302-7e74cacbdab8",
-      "ts": "2026-11-22T04:51:50Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: Atruvia DevOps Engineer DSIADI (Oracle CX job 2399, Karlsruhe hybrid) — confirmation + profile shows 'Wird geprüft' | gate: portal-confirmation + db-write PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
-      "branch": "main",
-      "frame": "03ha4xvlya4sl8j8itjtso9o1"
-    },
-    {
-      "id": "369f850b-0429-40ea-ad00-d75acf673e09",
-      "ts": "2026-11-22T04:46:56Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-flix-packet",
-      "action": "landed: Flix Data Platform Engineer packet - letter.json answers Berlin office-first plainly (Gutach is 7h from Berlin; domestic relocation, permanent residence so no permit), CV 2pp/letter 1pp, selection 5/32 highlights. No application sent. checks:prose fixed (scoreplay 'leverage'); checks:infron fails on dsh dispatch plan, unrelated to a docs-only diff",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/flix-data-platform-engineer"
-      ],
-      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
-      "branch": "main",
-      "frame": "03ha4wx5cqvyfz1q6e8gzkmhw"
-    },
-    {
-      "id": "96407115-e251-44c4-8414-fdb49ab06fce",
-      "ts": "2026-11-22T04:46:45Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: badenova Asset Manager Strom-Dienstleistungen (Umantis 4422, Freiburg 15km) via portal — confirmation page shown, recorded in apps-db | gate: portal-confirmation + db-write PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
-      "branch": "main",
-      "frame": "03ha4wvvqef0xii8phzexkx21"
-    },
-    {
-      "id": "5f7e689c-9205-4840-a57a-849ae9efb039",
-      "ts": "2026-11-22T04:44:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-flix-data-platform-packet",
-      "action": "landed: drove freebuff pane to build the Flix Data Platform Engineer packet (submissions/flix-data-platform-engineer, Greenhouse 8690650002); routed via jev-decide (flix-data-platform-engineer, duel margin 0.32)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
-      "branch": "main",
-      "frame": "03ha4wi6o4eboxmib3qpg2917"
     }
   ]
 }

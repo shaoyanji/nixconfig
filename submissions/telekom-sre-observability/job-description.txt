@@ -1,0 +1,62 @@
+Site Reliability Engineer (SRE) (m/w/d) — Schwerpunkt Observability
+Deutsche Telekom AG / T-Systems International GmbH
+Arbeitsorte: Darmstadt, Berlin, Dresden, Karlsruhe, Kassel, Saarbrücken, Hannover, Bielefeld, Magdeburg, München
+BA-Referenz: 12444-563465374109848-DT-S | Chiffre 563465374109848
+Veröffentlicht: 12.07.2026 | Eintritt ab: 30.10.2026 | homeofficemoeglich: false (Feld der BA-Daten)
+Vergütung: KEINE_ANGABEN
+Quelle: Arbeitsagentur-Jobdetails-API, abgerufen am 22.11.2026 (HTTP 200)
+
+**﻿Über T-Systems International GmbH**
+Bei T-Systems bieten wir unseren Geschäftskunden die richtigen Systemlösungen für ihr digitales Business. Mit unserem Portfolio stellen wir sicher, dass digitale Transformation Komplexität reduziert, Kosten einspart und die alltägliche Arbeit erleichtert. Unsere Schwerpunkte sind Konnektivität, Digital, Cloud & Infrastruktur sowie Sicherheit - Let's power higher performance!
+**Über die Position**
+Als **Site Reliability Engineer** mit Schwerpunkt **Observability** tragen Sie maßgeblich dazu bei, Transparenz, Stabilität und Zuverlässigkeit unserer verteilten Cloud-, Edge- und Kubernetes-Plattformen sicherzustellen. Sie übernehmen eine zentrale Rolle bei der Konzeption, Implementierung und kontinuierlichen Weiterentwicklung moderner Observability-Lösungen und schaffen die Grundlage für einen zuverlässigen Betrieb komplexer, cloud-nativer Infrastrukturen.
+Mit Ihrer Expertise in **OpenTelemetry**, Distributed Tracing und modernen Telemetrie-Architekturen entwickeln und betreiben Sie leistungsfähige Pipelines für Metrics, Logs und Traces. Dabei integrieren Sie den OpenTelemetry Collector, OTLP sowie SDKs und Auto-Instrumentation in bestehende Plattformen und schaffen eine durchgängige End-to-End-Observability über verteilte Anwendungen und Services hinweg.
+Sie implementieren und betreiben **Jaeger** als zentrale Plattform für Distributed Tracing und entwickeln Korrelationsmechanismen zwischen Logs, Metrics und Traces, um Fehlerursachen schnell zu identifizieren und komplexe Abhängigkeiten innerhalb verteilter Systeme transparent darzustellen. Dabei berücksichtigen Sie moderne Sampling-Strategien, Context Propagation sowie effiziente Konzepte für Trace Storage und die performante Auswertung großer Telemetriedatenmengen.
+Darüber hinaus integrieren Sie Security-, Infrastruktur- und Plattform-Events in zentrale SIEM-Lösungen und entwickeln standardisierte Telemetrie- und Instrumentierungskonzepte für Kubernetes- und Cloud-Native-Plattformen. Mit Ihren Programmierkenntnissen in Go, Python oder Shell automatisieren Sie Integrations- und Betriebsprozesse und leisten einen wesentlichen Beitrag zur Weiterentwicklung einer skalierbaren, hochverfügbaren und zukunftssicheren Observability-Plattform für moderne verteilte Infrastrukturen.
+**Must-Have Skills**
+Sehr gute Kenntnisse in **OpenTelemetry**, insbesondere im Umgang mit dem OpenTelemetry Collector, OTLP, SDKs sowie Auto-Instrumentation
+- Fundierte Erfahrung mit **Distributed Tracing**, einschließlich Span Correlation, Context Propagation und Sampling-Strategien
+- Erfahrung im Aufbau und Betrieb von **Jaeger**, insbesondere hinsichtlich Trace Storage, Indexierung und Query-Optimierung
+- Fundierte Kenntnisse in der **Integration von SIEM-Lösungen**, im Security Event Management sowie im Einsatz von **CEF**- und **Syslog**-basierten Protokollen
+- Gute Programmierkenntnisse in **Go, Python oder Shell** zur Umsetzung von Telemetrie-, Integrations- und Automatisierungsaufgaben
+- Erfahrung im Bereich **Kubernetes Observability**, Cloud-Native-Plattformen sowie moderner Telemetrie-Architekturen
+- Ausgeprägtes Verständnis für IT-Sicherheit und Security Awareness
+- Analytische und strukturierte Arbeitsweise
+- Erfahrung im Site Reliability Engineering oder Infrastruktur-Betrieb
+- Sehr gutes Deutsch in Wort und Schrift (C1-Niveau)
+**Nice-to-Have Skills**
+Implementierung, Konfiguration und Betrieb von **OpenTelemetry** für Metrics-, Logs- und Distributed-Tracing-Pipelines
+- Integration, Administration und kontinuierliche Optimierung von **Jaeger** zur Visualisierung und Analyse verteilter Services und Anwendungen
+- Konzeption und Umsetzung von Korrelationsmechanismen zwischen **Logs, Metrics und Traces** zur Schaffung einer durchgängigen End-to-End-Observability
+- Integration von Security-, Infrastruktur- und Plattform-Events in zentrale **SIEM-** und Analyseplattformen zur Unterstützung von Monitoring- und Security-Prozessen
+- Entwicklung und Etablierung von Telemetrie-, Instrumentierungs- und Observability-Standards für **Cloud-Native-** und **Kubernetes**-Plattformen
+- Sicherstellung eines zuverlässigen und performanten Betriebs von Observability-Lösungen in **Air-Gap-, Edge-, Fog- und verteilten Infrastrukturen**
+**Was Sie erwartet**
+Sie erwartet eine anspruchsvolle Aufgabe im Umfeld moderner **Cloud-Native-, Kubernetes-, Edge- und Observability-Technologien**. In dieser Position gestalten Sie den Aufbau einer zukunftsfähigen Observability-Plattform aktiv mit und arbeiten an innovativen Lösungen für Telemetrie, Distributed Tracing und Security Monitoring in verteilten Infrastrukturen. Dabei kommen aktuelle Open-Source-Technologien wie **OpenTelemetry**, **Jaeger** und moderne Cloud-Native-Werkzeuge zum Einsatz, um Transparenz und Zuverlässigkeit komplexer Plattformen kontinuierlich zu verbessern. Sie arbeiten in einem technologisch anspruchsvollen Umfeld mit einem hohen Maß an Gestaltungsspielraum und leisten einen wesentlichen Beitrag zur Stabilität, Sicherheit und Skalierbarkeit geschäftskritischer Systeme.
+**Was wir bieten**
+**Flexibilität und Work-Life-Balance:** Profitieren Sie von flexiblen Arbeitszeiten, der Möglichkeit zum mobilen Arbeiten und einem hybriden Arbeitsmodell.
+**Attraktive Vergütung:** Ein wettbewerbsfähiges Gehaltspaket, das Ihre Expertise und Leistung honoriert.
+**Entwicklungsmöglichkeiten:** Zugang zu umfangreichen Weiterbildungsangeboten, Schulungen und Karriereentwicklungsprogrammen.
+**Modernes Arbeitsumfeld:** Arbeiten Sie in einer modernen Ausstattung mit den neuesten Technologien und Tools.
+**Starke Unternehmenskultur:** Eine offene und kollegiale Arbeitsatmosphäre, in der Teamarbeit und gegenseitige Unterstützung großgeschrieben werden.
+**Gesundheit und Wohlbefinden:** Angebote zur Gesundheitsförderung und Initiativen, die Ihr Wohlbefinden unterstützen.
+**Zusatzleistungen:** Diverse Benefits wie betriebliche Altersvorsorge, Mitarbeiterrabatte und Jobticket-Optionen.
+Your application may be processed by external service providers in Germany. Applications for positions outside Deutsche Telekom AG may also be processed by recruiters in other European countries. This also applies to the processing of applications at subsidiaries of Deutsche Telekom AG. Therefore, the following note applies to our civil servants: You are not required to include documents relevant to your personnel file, in particular civil service evaluations, with your application. However, you are free to provide these documents voluntarily.
+This position is also available part-time.
+People with disabilities will take priority in case of equal qualifications.
+For technical questions, please contact
+thomas.arbeit@t-systems.com
+[https://www.xing.com/companies/deutschetelekomag](https://www.xing.com/companies/deutschetelekomag)
+[Deutsche Telekom | LinkedIn](https://www.linkedin.com/company/telekom)
+
+
+[Abgleich mit dem Paket, 22.11.2026]
+Kern der Rolle laut Text: Observability und Tracing fuer verteilte Systeme, Transparenz und
+Zuverlaessigkeit; OpenTelemetry wird ausdruecklich genannt.
+Vorhanden: selbst gebaute Betriebstelemetrie (JSONL-Ledger im 15-Minuten-Takt), Gatus-Pruefungen,
+Alarm-Bridge in Go mit Zustellbestaetigung, Linux-Interna, deklarativer Betrieb mit Generationen,
+Karlsruhe als naechster der zehn Standorte.
+Nicht vorhanden: OpenTelemetry, verteiltes Tracing, Prometheus, Grafana, Loki, AlertManager,
+Kubernetes, Betrieb grosser verteilter Systeme.
+Fit 4 laut Vorgabe: die Denkweise und die Betriebserfahrung passen, der genannte Werkzeugkasten fehlt.
+Der fruehere Plan notierte 85k als Gehaltsziel; die Vorgabe nennt keine Zahl, das Anschreiben daher ohne Zahl.

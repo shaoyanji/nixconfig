@@ -118,6 +118,36 @@ else
       bad "hermes-gateway PATH does not resolve:${missing}"
     fi
   fi
+  # The unit file is not the running process: a unit switched but not restarted,
+  # or a wrapper that rewrites PATH, leaves systemd's Environment and the
+  # daemon's own environ disagreeing. /proc holds the environment the kernel
+  # handed the daemon at exec, which is what every child it spawns inherits.
+  main_pid="$(systemctl --user show -p MainPID --value hermes-gateway 2>/dev/null)"
+  if [ -z "$main_pid" ] || [ "$main_pid" = "0" ] || [ ! -r "/proc/$main_pid/environ" ]; then
+    warn "no readable /proc environ for hermes-gateway — live PATH unasserted"
+  else
+    live_path="$(tr '\0' '\n' <"/proc/$main_pid/environ" | sed -n 's/^PATH=//p' | head -1)"
+    if [ -z "$live_path" ]; then
+      warn "hermes-gateway process has no PATH in its environ"
+    else
+      for want in nodejs ffmpeg; do
+        case ":$live_path:" in
+        *"$want"*) ok "hermes-gateway process PATH names $want" ;;
+        *) bad "hermes-gateway process PATH has no $want (unit and runtime disagree — restart the unit)" ;;
+        esac
+      done
+      missing=""
+      for bin in node ffmpeg; do
+        env -i PATH="$live_path" bash -c "command -v $bin >/dev/null 2>&1" 2>/dev/null ||
+          missing="$missing $bin"
+      done
+      if [ -z "$missing" ]; then
+        ok "hermes-gateway process PATH resolves node and ffmpeg"
+      else
+        bad "hermes-gateway process PATH does not resolve:${missing}"
+      fi
+    fi
+  fi
 fi
 
 # --- 3. derived credential file --------------------------------------------

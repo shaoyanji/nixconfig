@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T08:57:36Z",
+  "generated": "2026-11-22T09:00:35Z",
   "count": 200,
-  "pin": "f9ad26fe13af45843f7604c1f40fe1016da7d2270eac4bdf1476ff236fdff440",
+  "pin": "30d8d2312c2429dfdd6f29e0b4da1e30d1f0b06aca1c37204e504e8636e91b81",
   "turns": [
+    {
+      "id": "6b2ffb55-86f2-4911-991f-97b29a1596ac",
+      "ts": "2026-11-22T08:59:34Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "stackit-iac RocketApply submit unverified - hung POST, no ack mail; form fully mapped for manual retry",
+      "outcome": "blocked: rocketapply hung POST, unverified submit",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a105a21bc1a8a333cfef54d1a3886073ffb820f",
+      "branch": "main",
+      "frame": "03ha6a9sclmk4fn41wxgzh7oj"
+    },
+    {
+      "id": "15a97233-1db3-4e75-a226-0c205c11fb07",
+      "ts": "2026-11-22T08:59:08Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:ptv-group-systemtechniker",
+      "action": "landed: PTV Group Leitstellensysteme packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "552480b0114a0ae25982bb1c2af40ea5f2dd6905",
+      "branch": "main",
+      "frame": "03ha6a6pmfusuv1pbq72wpwmp"
+    },
+    {
+      "id": "74d74ad5-fdbd-4db3-8db1-dd3d40106ce1",
+      "ts": "2026-11-22T08:57:40Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: blocktech-sre-trading packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a105a21bc1a8a333cfef54d1a3886073ffb820f",
+      "branch": "main",
+      "frame": "03ha69wf0u91n7vrnm34dnlw5"
+    },
     {
       "id": "d3d5b468-03ea-4592-8501-f1b6fc192ec7",
       "ts": "2026-11-22T08:55:42Z",
@@ -2726,45 +2765,6 @@
       "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
       "branch": "main",
       "frame": "03ha4388mldxlim42cacbptzk"
-    },
-    {
-      "id": "fb5dc55e-44db-479f-90f0-80754384b22d",
-      "ts": "2026-11-22T02:05:24Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-redaction-done",
-      "action": "landed: freebuff completed redaction of third-party contacts in docs/nix-consultancy-outreach.md (no phone number present in doc — header keeps it in pipeline). Agent asks operator: should a redacted docs/ copy be created? Pane idle awaiting answer.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
-      "branch": "main",
-      "frame": "03ha41d71iuz5hxp8idgdgexf"
-    },
-    {
-      "id": "3b85f887-697a-4a48-a551-f4e08bbbccbf",
-      "ts": "2026-11-22T02:05:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-driven",
-      "action": "landed: drove idle freebuff pane — routed next task via jevdecide (prose-change, margin 0.87): redact third-party contacts/phone from docs/nix-consultancy-outreach.md. Fresh working line confirmed.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
-      "branch": "main",
-      "frame": "03ha41afvsqzpsqh44m3j0glq"
-    },
-    {
-      "id": "005123ae-72b6-445b-acea-f2fb711a4e42",
-      "ts": "2026-11-22T02:04:15Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-gate-decision",
-      "action": "landed: resolved freebuff Submit dialog — chose 'Leave the live site alone' (no deploy); pane unblocked to next task (redact third-party contacts). agy rate-limited (quota resets ~36m), task preserved in vim buffer.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0700ac320a9d28a80f5bcd5f6a1a1b4c14383860",
-      "branch": "main",
-      "frame": "03ha41534ibgpq81uyil8cltq"
     }
   ]
 }

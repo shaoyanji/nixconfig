@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:54:05Z",
+  "generated": "2026-11-22T09:54:18Z",
   "count": 200,
-  "pin": "57e09839d8855359aa708c2a738976d3f34b4b496c9924f41ef68eec7fe411ff",
+  "pin": "0439047304b62f58454993633d44578e6c3acfedcc230792d8d7200d68ccb536",
   "turns": [
+    {
+      "id": "3c4330cf-2a89-4ded-9185-38697bda38f6",
+      "ts": "2026-11-22T09:54:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:scoreplay",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f367c32e2ca4fc273203ce75db979bc51c1efb7c",
+      "branch": "main",
+      "frame": "03ha6kxi9b3fdnm3nu6za4v1o"
+    },
     {
       "id": "b1ab7661-9d19-4055-a9be-4e851b8c717e",
       "ts": "2026-11-22T09:52:05Z",
@@ -2721,21 +2734,6 @@
       "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
       "branch": "main",
       "frame": "03ha5jac0halgcatjq3qicf1n"
-    },
-    {
-      "id": "98955e1d-351e-4ebd-bdaf-99da0e3da07e",
-      "ts": "2026-11-22T06:40:16Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-telecom-jobscan",
-      "action": "landed: redacted the consultancy dossier fully (email/[SENDER]/links -> placeholders, 0 emails, 0 phones, 0 names; checks:prose exit 0, commit c81bcbc5) and added 16 verified leads for STACKIT/Schwarz Digits, IONOS, 1&1, Bechtle, SVA, EnBW, BWI, Atruvia into apps-db (stage=lead, 16/16 apply URLs answer HTTP 200). Note: scripts/task/apps-db.sh search ignores its argument and dumps all 500 rows - dedupe was done from a full list dump instead.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        ".agents/outreach/nix-consultancy-outreach.md"
-      ],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5j26yqgzcnsq2w69o0da5"
     }
   ]
 }

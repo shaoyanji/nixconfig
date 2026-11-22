@@ -8,7 +8,8 @@ an authenticated pane to finish in one pass.
 
 - **Apply URL:** https://jobs.ashbyhq.com/scoreplay/42f1911f-68d4-4a9f-8d9e-e3a7939ceb96/application
 - **Pipeline record:** `scoreplay-senior-platform-engineer-sre`
-- **CV to upload:** `packet/lebenslauf.pdf` — 2 pages, A4, sha256 `256724ea6f2f9cb85a8d8c65055e6a3612511b7e121b44ca4d00c742296ab09b`
+- **CV to upload:** `lebenslauf.pdf` — 2 pages, A4, rebuilt as native Typst on 2026-11-22 (the `packet/` tree is gone)
+- **Letter to upload:** `anschreiben.pdf` — 1 page, A4, English
 
 ## Why the browser could not finish it
 
@@ -99,3 +100,12 @@ relocation and no permit.
 - **The phone field is `type=number`** and silently drops a leading `+`.
 - **`submission-sheet.md` says the question set is unknown until the page is opened.**
   It is now known and recorded above.
+
+## File hashes at this build
+
+| File | Pages | sha256 |
+| :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | `6aafcd638b29b43a28025d8702ebffb4a0509c885865fb35231034fa963d05ca` |
+| `anschreiben.pdf` | 1 | `d34b4f2f70725f920e59114b6d62ec75c68b8d8d7c21a05adf85c7e055a65ab9` |
+
+`packet/` was removed with the JSON leftovers; the Typst sources in this directory are the only originals.

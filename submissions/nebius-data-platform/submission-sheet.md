@@ -24,8 +24,8 @@ rebuild commit:
 
 | File | Pages | Words | Warnings | sha256 (first 16) |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 1258 | 0 | `450010c77c2e01da` |
-| `anschreiben.pdf` | 1 | 434 | 0 | `11cd416d580654ec` |
+| `lebenslauf.pdf` | 2 | 1268 | 0 | `625be620c6b6dc1f` |
+| `anschreiben.pdf` | 1 | 444 | 0 | `f3714a3d5326e798` |
 
 ## The five pillars, against the repository
 
@@ -33,7 +33,7 @@ rebuild commit:
 | :--- | :--- | :--- |
 | PostgreSQL operational management | `services.postgresql` declared per service (`email-archive.nix`, `mail-atlas.nix`, `paperless-fork.nix`); `postgresqlBackup` on `frieren`; `pg_dump` in `infra-stack.nix`; settings generated from Nix rather than edited on the host | claimed in full |
 | Versioned schema migrations | Migrations applied in order by the service; the archive's schema adds the stored `tsvector` behind a GIN index and an upsert keyed on `message_id`, so a replay cannot become a second row; a failed step leaves the previous version running | claimed in full |
-| Backup drills | `modules/services/postgres-backup-drill.nix` (EXP-042) audits each logical dump as a scheduled service: it checks the file exists, reports its size, and enforces a minimum table count. That is the check that makes a backup a fact. There is **no `pg_restore` anywhere in the repository**, so neither document claims a restore was performed | claimed as an audit, not a restore |
+| Restore drills | `modules/services/postgres-backup-drill.nix` (EXP-042) starts an ephemeral PostgreSQL cluster, replays each logical dump into it with `gzip -dc … | psql`, then asserts the restored table count against `assertMinimumTables` (default 20) and, for Immich, the core entity row counts; it runs on a timer after the backup window, where a broken dump fails the job rather than waiting for the day someone needs the data. The replay uses `psql`, not `pg_restore`, which is why a grep for `pg_restore` in this repository returns nothing | claimed in full |
 | Storage growth alerting | `fleet-sentinel` records disk percentage for `/`, `/nix/store` and `/srv/data` plus inode counts, and degrades the host with a named reason at `degradeOnDiskPct` instead of waiting for a failed write; PSI and generation age in the same ledger | claimed in full |
 | High-integrity data handling | Validate before write, append-only event state, content-addressed specifications, and a fourteen-month archive of real mail as the non-synthetic test load | claimed in full |
 

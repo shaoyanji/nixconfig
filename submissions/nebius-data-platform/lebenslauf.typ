@@ -48,9 +48,9 @@ previous version in place; the mail archive applies its migrations, generates it
 upserts on `message_id` so a replayed message cannot become a second row. Application settings are generated from Nix rather than edited on the
 host, which means the connection details and the schema version move together.
 
-Backups exist as a scheduled job and as a drill: a module that audits each dump - that it exists, how large it is, and that it carries at
-least the expected number of tables - because a backup nobody has checked is a hypothesis. The drill runs as a service, so a failed audit is a
-failed job rather than a surprise on the day someone needs the data.
+Backups exist as a scheduled job and as a drill that restores: a module starts an ephemeral PostgreSQL cluster, replays the dump into it, and
+then asserts the restored table count and the rows of the core entities, because a backup nobody has restored is a hypothesis. It runs on a timer
+after the backup window, so a broken dump is a failed job the next morning rather than a surprise on the day someone needs the data.
 
 Storage growth is watched where it grows. A sentinel records disk percentage for the root filesystem, the Nix store and the data volume, plus inode
 counts, and degrades the host with a named reason when a path crosses its threshold rather than waiting for a write to fail. Pressure stall
@@ -69,7 +69,7 @@ development, no multi-petabyte cluster, and no formal capacity planning for a mu
 #grid(columns: (1fr, 1fr), column-gutter: 14pt, row-gutter: 2pt,
   [*PostgreSQL* — declared instances, roles and databases per service, tuned per host],
   [*Migrations* — versioned and ordered, applied by the service, never edited in place],
-  [*Backup drills* — scheduled audit of each dump: presence, size, a floor on tables],
+  [*Restore drills* — dump replayed into an ephemeral cluster, table and row counts asserted],
   [*Storage growth* — disk and inode percentages per path, threshold with a named reason],
   [*Telemetry* — PSI by resource, job state, generation age, page on bad state and silence],
   [*Integrity* — validate before write, append-only state, content-addressed specs],
@@ -83,7 +83,7 @@ development, no multi-petabyte cluster, and no formal capacity planning for a mu
 - Operated PostgreSQL as declared infrastructure: one instance per service, roles and databases created by definition, settings generated from Nix so configuration and schema version move together.
 - Applied schema changes as versioned migrations that run in order, with the previous version still in place if a step fails — no hand-edited schema on a running host.
 - Built the mail archive on that base: migrations, a stored `tsvector` behind a GIN index for full-text search, an upsert keyed on `message_id`, and SQL endpoints generated from annotated queries.
-- Scheduled backups and wired a drill module that audits each dump - presence, size, a minimum table count - on the argument that durability is checked rather than inferred from a green dashboard.
+- Scheduled backups and wired a restore drill: an ephemeral PostgreSQL cluster, the dump replayed into it, and a job that fails when the restored table count or the entity rows fall below the floor.
 - Watched storage where it grows: disk percentages for root, Nix store and data volume plus inodes, with a threshold that degrades the host under a named reason before a write fails.
 - Made a bad state visible: pressure stall information for IO, memory and CPU into a ledger every fifteen minutes with job state and generation age, paging on bad state and on silence.
 - Kept the write path honest — validated before insert, append-only event log, content-addressed specifications — so a retry cannot invent a second row or a second fact.
@@ -128,7 +128,7 @@ development, no multi-petabyte cluster, and no formal capacity planning for a mu
   [
     #text(weight: "bold")[backup drill] #text(size: 8pt, fill: muted)[— durability]
     #linebreak()
-    Audits every dump for presence, size and a minimum table count, as a scheduled service rather than a runbook.
+    Replays every dump into a throwaway PostgreSQL cluster and fails the job when the restored tables or rows fall short.
   ],
   [
     #text(weight: "bold")[storage ledger] #text(size: 8pt, fill: muted)[— growth]

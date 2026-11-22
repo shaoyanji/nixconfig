@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:34:08Z",
+  "generated": "2026-11-22T12:34:47Z",
   "count": 200,
-  "pin": "3489ed0850d172680c7d8e5be45854f1b5f7b0868d565b71628c0291037050ef",
+  "pin": "ecd236adb9bcfc872260cd0e5218d45cce5cd2e9e1b6d4d9adeabcf3a28ab3f3",
   "turns": [
+    {
+      "id": "d7c92629-2069-4ca9-ac79-957a3e7f9f25",
+      "ts": "2026-11-22T12:34:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:nebius-data-platform",
+      "action": "correct: the Data Platform documents claimed the backup drill performs a restore. EXP-042 audits dumps (presence, size, minimum table count) and the repo contains no pg_restore. Sources reworded in c9e4ffee; CV 2pp/1258w, letter 1pp/434w, 0 warnings, prose exit 0 at 292 files, sheet row rewritten. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9e4ffeecd48edd073b6d21b43f1d497bb5c9fd8",
+      "branch": "main",
+      "frame": "03ha7g71xyznh61r4kp8pfg0m"
+    },
     {
       "id": "95d2a42b-68f9-40b8-8b63-e5bde118f0bb",
       "ts": "2026-11-22T12:33:36Z",
@@ -2821,21 +2834,6 @@
       "base_commit": "25425ea55dd90f910c66a71e0088d7798d0a2ce6",
       "branch": "main",
       "frame": "03ha6sffvv23b7fjcr0h8aft2"
-    },
-    {
-      "id": "9524bc52-ea71-4ec9-adf1-7a0a7ef48151",
-      "ts": "2026-11-22T10:32:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:mozilla",
-      "action": "claim: native Typst 2pp CV + 1pp letter (en)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/mozilla"
-      ],
-      "files": [],
-      "base_commit": "292788d6d77e066a12faf15095eb3e7f7941310a",
-      "branch": "main",
-      "frame": "03ha6sess74kj1h7sdi9igpeo"
     }
   ]
 }

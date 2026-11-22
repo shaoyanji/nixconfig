@@ -25,10 +25,10 @@ Dear Nebius Data Platform team,
 
 your platform is the company's source of truth: one multi-tenant YTsaurus ecosystem carrying roughly ten petabytes of compressed data across five
 hundred servers, with financial pipelines and training datasets depending on it. The part of that problem I have already practised is the part where
-the data has to come back: PostgreSQL declared in the same tree as the service that owns it, schema changes applied as versioned migrations, backups scheduled and then audited, and durability treated as something a check proves rather than something a dashboard implies.
+the data has to come back: PostgreSQL declared in the same tree as the service that owns it, schema changes applied as versioned migrations, backups scheduled and then restored into a throwaway cluster, and durability treated as something a drill proves rather than something a dashboard implies.
 
 Concretely, my mail archive runs on that base — migrations applied in order, a stored `tsvector` behind a GIN index for search, an upsert keyed on
-`message_id` so a replayed message cannot become a second row, and SQL endpoints generated from annotated queries. Backups are a scheduled job plus a drill module that audits the dump - presence, size, a minimum table count - because a backup nobody has checked is a hypothesis. On the growth side, a sentinel
+`message_id` so a replayed message cannot become a second row, and SQL endpoints generated from annotated queries. Backups are a scheduled job plus a restore drill that replays the dump into an ephemeral PostgreSQL cluster and asserts the restored table count and entity rows, because a backup nobody has restored is a hypothesis. On the growth side, a sentinel
 records disk percentage for root, the Nix store and the data volume plus inode counts, and degrades the host with a named reason when a path crosses
 its threshold instead of waiting for a write to fail. Pressure stall information, job state and generation age go into the same fifteen-minute
 ledger, and the page fires on a bad state and on silence.

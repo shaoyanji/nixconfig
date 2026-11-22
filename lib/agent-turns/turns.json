@@ -1,8 +1,96 @@
 {
-  "generated": "2026-11-22T11:04:55Z",
+  "generated": "2026-11-22T11:07:31Z",
   "count": 200,
-  "pin": "531c0a86203c5e3fcb484b4f864cfb62b54986c87f63bbebfb127d2f517bef91",
+  "pin": "1b94312a24b6f55a6bbef091430f6481f09ef2a810c07fd69a2e3aca85e243e4",
   "turns": [
+    {
+      "id": "120985cd-d267-4aed-8e42-5c45e25c6d57",
+      "ts": "2026-11-22T11:07:14Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:kiwigrid-senior-sre",
+      "action": "migrated: native German Typst 2pp CV + 1pp letter with energy-domain emphasis; store symlink and read-only derivations removed; measured in sheet; fit 3",
+      "outcome": "done",
+      "claims": [
+        "submissions/kiwigrid-senior-sre"
+      ],
+      "files": [],
+      "base_commit": "7dcaaf5bdcc4dc60b3a986a7e74d4d22f606c82c",
+      "branch": "main",
+      "frame": "03ha6z7k2p1afn3vrh4apeiv7"
+    },
+    {
+      "id": "d6510a23-f374-4a12-955e-50dba093b43e",
+      "ts": "2026-11-22T11:07:11Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:kiwigrid-senior-sre",
+      "action": "claim: native German Typst 2pp CV + 1pp letter, energy-platform emphasis",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/kiwigrid-senior-sre"
+      ],
+      "files": [],
+      "base_commit": "9b485772a6ee22113e7f40c2f78c60e5c90db712",
+      "branch": "main",
+      "frame": "03ha6z76icexopcblwcmo354o"
+    },
+    {
+      "id": "774d1466-1aab-4504-82b5-9da03a574e31",
+      "ts": "2026-11-22T11:06:40Z",
+      "source": "antigravity",
+      "subject": "nixconfig:jobsearch",
+      "action": "active: wolt staff infra packet (0:1.1), adyen genai greenhouse submission (0:2.1), kiwigrid smart-grid sre packet (0:3.1)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/wolt-eu-infrastructure submissions/adyen-platform-genai submissions/kiwigrid-senior-sre"
+      ],
+      "files": [],
+      "base_commit": "6fa7bbfb4279aede3c7a31bf33a4b21c0bb61310",
+      "branch": "main",
+      "frame": "03ha6z3nwwkevke5brh6crdvg"
+    },
+    {
+      "id": "4b56f376-ea93-4dd8-b23b-e35d0b8c89d4",
+      "ts": "2026-11-22T11:06:26Z",
+      "source": "freebuff",
+      "subject": "nixconfig:wolt-eu-infrastructure",
+      "action": "claim: native Typst 2pp CV + 1pp letter (en), Staff Engineer EU Infrastructure",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/wolt-eu-infrastructure"
+      ],
+      "files": [],
+      "base_commit": "6fa7bbfb4279aede3c7a31bf33a4b21c0bb61310",
+      "branch": "main",
+      "frame": "03ha6z20qbhec1kacfry7hxgu"
+    },
+    {
+      "id": "a45741fe-edc1-496f-9ede-4563ad61efe1",
+      "ts": "2026-11-22T11:05:08Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:fraunhofer-darmstadt-network",
+      "action": "corrected: CV font name fixed (was falling back to DejaVu); PDFs rebuilt and sheet measurements refreshed",
+      "outcome": "done",
+      "claims": [
+        "submissions/fraunhofer-darmstadt-network"
+      ],
+      "files": [],
+      "base_commit": "9b485772a6ee22113e7f40c2f78c60e5c90db712",
+      "branch": "main",
+      "frame": "03ha6yss8bqrmjw7bqrgw5id3"
+    },
+    {
+      "id": "2d45f741-c588-4909-bd34-847cf029f8b6",
+      "ts": "2026-11-22T11:04:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flix-devops-cloud-infrastructure",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6fa7bbfb4279aede3c7a31bf33a4b21c0bb61310",
+      "branch": "main",
+      "frame": "03ha6yrmhistmajofs167ga77"
+    },
     {
       "id": "2f94b0b4-3337-42af-9ecf-d045af0642ac",
       "ts": "2026-11-22T11:04:52Z",
@@ -2630,88 +2718,6 @@
       "base_commit": "fae4c4748367d03db1bd7a14e584058cec7c6676",
       "branch": "main",
       "frame": "03ha6bh250fetx942yhidzb5p"
-    },
-    {
-      "id": "cc9b7574-81cb-407d-b9ff-2e79f3cdaa4f",
-      "ts": "2026-11-22T09:05:26Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: catapult-sports-senior-devops submitted via Greenhouse | gate: confirmation page PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5028584bfe0365aa24b184bd176a502bc0b374fd",
-      "branch": "main",
-      "frame": "03ha6bf1eccj0i1lenh2g1o1w"
-    },
-    {
-      "id": "53e3a96a-d3cd-47d8-9679-5530d5c01257",
-      "ts": "2026-11-22T09:04:39Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:citeq-muenster-devops",
-      "action": "landed: citeq Münster DevOps Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d618f54d952a1a186aee00ad798ccb86f7906655",
-      "branch": "main",
-      "frame": "03ha6b9hll7g17rudi8llcj7l"
-    },
-    {
-      "id": "298dcf9b-c352-4059-8426-362b51929abe",
-      "ts": "2026-11-22T09:03:50Z",
-      "source": "freebuff",
-      "subject": "nixconfig:energy-meteo-sysadmin",
-      "action": "landed: energy & meteo systems Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5028584bfe0365aa24b184bd176a502bc0b374fd",
-      "branch": "main",
-      "frame": "03ha6b3thpaa3bx3qk5mh8b1u"
-    },
-    {
-      "id": "76891e0b-6d09-4742-88d8-57e76b811176",
-      "ts": "2026-11-22T09:03:22Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:citeq-muenster-devops",
-      "action": "landed: citeq Münster DevOps Typst packet | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4c0c1e9aaef9ccef6b50fcb7299e613903d33913",
-      "branch": "main",
-      "frame": "03ha6b0gjj67jmxxp85qk3eqg"
-    },
-    {
-      "id": "ec3c6fca-bff4-4823-92d6-75e9fc0e0e4e",
-      "ts": "2026-11-22T09:03:15Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-hermes-persona-chain-change",
-      "action": "landed: hermes-persona memory write_approval chain-change review on devin pane 0:2.1; devin accepted and is running tools",
-      "outcome": "done",
-      "claims": [
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "files": [
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "base_commit": "9d8c24cec837a6123d06a98ef5971d05295d9911",
-      "branch": "main",
-      "frame": "03ha6azo2kidc5p31q0k8d3pt"
-    },
-    {
-      "id": "64c4eb59-b9b3-4e46-bf8b-5381a19b4015",
-      "ts": "2026-11-22T09:02:16Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: catapult-sports-senior-devops Greenhouse submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9d8c24cec837a6123d06a98ef5971d05295d9911",
-      "branch": "main",
-      "frame": "03ha6asraxl4u545kinfefro1"
     }
   ]
 }

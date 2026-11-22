@@ -1,0 +1,43 @@
+Staff Engineer, EU Infrastructure | Berlin, Germany
+Apply: https://job-boards.greenhouse.io/wolt/jobs/8324647
+About Wolt
+At Wolt, we create technology that brings joy, simplicity and earnings to the neighborhoods of the world. In 2014 we started with delivery of restaurant food. Now we’re building the delivery of (almost) everything and you’ll find us in over 500 cities in 30 countries around the world. In 2022 we joined forces with DoorDash and together we keep on dreaming big and expanding across the globe.
+Working at Wolt isn’t always easy, but it’s definitely exciting. Here you’ll learn more, build more, and ship more than in most other companies. You’ll be challenged a lot, but also have a lot of fun on the way. So, if you’re a self-starter with drive and entrepreneurial spirit, this could be the ride of your life.
+About the Team
+Our Infrastructure teams build the foundation that engineers at Wolt, Deliveroo, and DoorDash build on: the compute, cloud, and networking capabilities that enable Engineering teams to develop, deploy, and run services at global scale. The EU Compute team has a specific focus on provisioning, scaling, and the efficient operation of GPU infrastructure for AI and ML workloads. This is an emerging space with plenty of greenfield opportunities.
+We're looking for a Staff Engineer to be a hands-on technical leader for this infrastructure work that crosses team and brand boundaries. You'll set direction for the platform, turn complex problems into deliverable plans, write and review production code, and help other engineers make sound decisions. It's an exciting time to join: we're building a global platform and the choices made now will shape how engineers across the company ship for years.
+What you’ll be doing
+You'll own some of the hardest infrastructure problems in the company and make the platform easier to operate and safer to build on. We’re determined to build great platform products and user experiences, and you’ll be pivotal in making this reality.
+Day-to-day in this role you’ll:
+Set technical direction for shared AWS and Kubernetes infrastructure, balancing reliability, security, developer experience, and cost.
+Lead substantial initiatives from design through rollout and operation, coordinating dependencies and decisions across Wolt, Deliveroo and DoorDash, focusing on workloads targeting GPUs.
+Evolve Kubernetes clusters, cloud networking, identity, and infrastructure provisioning to support growing and varied workloads.
+Build reusable Terraform patterns and self-service tooling that help teams provision infrastructure safely and consistently.
+Improve deployment and operational practices, including GitOps, observability, capacity planning, incident response and recovery.
+Use production signals and developer feedback to find platform friction, choose where to invest and measure whether changes actually help.
+Assist with supporting the platform, with deep focus on GPU infrastructure, as well as broad focus on compute in general.
+Gracefully sunset legacy infrastructure and tooling, and create strategies to reduce toil.
+Mentor engineers through design reviews, implementation and incidents, raising the quality of infrastructure work across teams.
+Our humble expectations
+Deep experience building and operating Kubernetes and AWS infrastructure in production. Familiarity with GPU workloads and orchestration is a plus.
+Strong software engineering skills: you use Go, Python or a similar language to build maintainable tools and automation.
+Experience with infrastructure as code (we use Terraform) and with designing systems that other engineering teams depend on.
+A track record of leading complex technical work across teams, including architectural decisions, delivery, and operational follow-through. You have the breadth to collaborate and design across team and domain boundaries, and the depth to have hands-on impact.
+Strong judgment on trade-offs in distributed systems, networking, security, reliability, and cloud cost.
+Clear communication, and the ability to bring people together around a practical technical direction.
+What we offer
+Scope and influence.
+ Shape infrastructure used globally, while staying close to the engineering. Your work will help product teams ship services with greater ease and confidence.
+Real problems at global scale.
+ Multi-cluster Kubernetes, AI / ML workloads, cloud networking, GitOps, and progressive delivery across a global company.
+Autonomy and ownership.
+ Set direction and see it through from design to operation, with the backing of a global engineering organisation spanning Europe and the US.
+Growth.
+ Room to expand your scope, whether through deeper technical leadership or broader cross-domain influence.
+Great people.
+ Work with talented engineers and leaders in a diverse, international environment, mentoring and learning from others.
+Our Commitment to Diversity and Inclusion
+We’re committed to growing and empowering a more inclusive community within our company, industry, and cities. That’s why we hire and cultivate diverse teams of people from all backgrounds, experiences, and perspectives. We believe that true innovation happens when everyone has room at the table and the tools, resources, and opportunity to excel.
+Beware of recruitment scams: DoorDash, Deliveroo, and Wolt will never ask you to pay money or share sensitive financial information during hiring — learn more about our legitimate recruiting process at 
+Recruitment Scam Awareness - DoorDash
+ .

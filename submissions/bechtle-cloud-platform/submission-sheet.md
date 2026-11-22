@@ -54,7 +54,7 @@ Auf der Werkzeugachse ist es eine Drei: Kubernetes, Docker, Terraform und eine G
 
 1. Zeugnisse fehlen.
 2. Kubernetes-, Docker- und Terraform-Lücke steht im Anschreiben; die Anzeige nennt fortgeschrittene Kenntnisse als Bedingung, nicht als Wunsch.
-3. **Präsenz um klären:** 90 Tage gelten für die Hybrid-Variante; für Voll-Remote ist der Umfang offen. Im Anschreiben als Frage formuliert, nicht als Annahme.
+3. **Präsenz zu klären:** 90 Tage gelten für die Hybrid-Variante; für Voll-Remote ist der Umfang offen. Im Anschreiben als Frage formuliert, nicht als Annahme.
 4. **SÜ2:** Bereitschaft erklärt; US-Staatsangehörigkeit mit deutscher Niederlassungserlaubnis kann den Ablauf beeinflussen. Vor dem Absenden mit dem Recruiter besprechen.
 5. Keine Gehaltszahl nennen; keine Bandbreite in der Anzeige.
 6. Direktlink in der Anzeige prüfen; die DB nannte einen älteren Pfad, die BA-ID ist belegt.

@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-22T09:16:49Z",
+  "generated": "2026-11-22T09:20:41Z",
   "count": 200,
-  "pin": "bf914d92b0b0ba752592f3ac5b5cc4f8c7285c6bffcd3410ccf8fff993d5d466",
+  "pin": "9815111f45c726bc009f7b2defe0ee9460e4b4a13352a0add98bad97d8a7b403",
   "turns": [
+    {
+      "id": "b111910a-5310-41ba-b855-4488b820ce4d",
+      "ts": "2026-11-22T09:19:15Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: mittwald-devops mittwald.de form submission",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "4ff3ad0c7c2a7d8ddfccbf73d8f57c090a9e0171",
+      "branch": "main",
+      "frame": "03ha6e48wtkv2amvr3bxvmezt"
+    },
+    {
+      "id": "4f9ce07a-a699-4967-93db-c4cbbe8c703b",
+      "ts": "2026-11-22T09:17:38Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:bechtle-cloud-platform",
+      "action": "landed: Bechtle Cloud Platform Typst packet | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "024c17b5b74d9569c0862dae06bbff91e077e2da",
+      "branch": "main",
+      "frame": "03ha6dsuuajie1g01t0zt7t9w"
+    },
+    {
+      "id": "3466245d-49f2-42ed-87d6-43fcbe46657e",
+      "ts": "2026-11-22T09:17:13Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "trawa-em-platform Ashby submit unverified - hung POST twice, no ack; minimal form mapped for manual retry",
+      "outcome": "blocked: ashby hung POST, unverified submit",
+      "claims": [],
+      "files": [],
+      "base_commit": "4ff3ad0c7c2a7d8ddfccbf73d8f57c090a9e0171",
+      "branch": "main",
+      "frame": "03ha6dpwg9jqdwfivx3vhscmd"
+    },
     {
       "id": "59d51ad0-357e-4ea6-83f5-6310c9711255",
       "ts": "2026-11-22T09:16:30Z",
@@ -2724,47 +2763,6 @@
       "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
       "branch": "main",
       "frame": "03ha4l3hictbl3uz6m8bo9w2v"
-    },
-    {
-      "id": "96ccf2bc-e321-43d0-bbf1-9b4da2bbb9c3",
-      "ts": "2026-11-22T03:44:19Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "karlsruhe sweep: INIT sysadmin Kundenprojekte (j897) + Ratiodata IT-Systemmanager (2026-177) sent via verified employer emails after portal walls; ~187 applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4kosfn5lo5wmqyk30g6h4"
-    },
-    {
-      "id": "3d81f8e5-b9af-437f-9f5c-0f2f3c05c7eb",
-      "ts": "2026-11-22T03:40:14Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-adyen-observability-packet",
-      "action": "landed: built Adyen Observability packet (Greenhouse 7607691, Amsterdam office-first) - 2p CV 13/32 highlights, 1p letter conceding no production K8s, no Elasticsearch/Prometheus/VictoriaMetrics/Tempo, and the relocation + Dutch permit | gate: agents:apps:packet exit 0 incl. cv-ats-check in-build (2/1 pages) | commit 3a509f97",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/adyen-platform-observability"
-      ],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4jw4rzy7b2h0heetz0d8o"
-    },
-    {
-      "id": "88708caf-380a-4331-b239-c188e64e090e",
-      "ts": "2026-11-22T03:39:07Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-adyen-observability-packet",
-      "action": "landed: drove idle freebuff pane (default:1.1) to build the Adyen Senior Platform Engineer - Observability CV packet (Greenhouse 7607691). Routed next task via jevdecide (typesafe, margin 0.52 decisive; adyen-genai already built so picked runner-up adyen-observability). Pane confirmed working (fresh 13s counter).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d59d7f6db63ffc2bc9adc227cd6af9a179530a40",
-      "branch": "main",
-      "frame": "03ha4jo9qnl9w45y37ceca973"
     }
   ]
 }

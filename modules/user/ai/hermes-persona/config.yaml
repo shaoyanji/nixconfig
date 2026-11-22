@@ -37,7 +37,7 @@ providers:
     discover_models: false
     models:
       - deepseek/deepseek-v4-flash-0731:free
-      - qwen/qwen3.8-27b:free
+      # - qwen/qwen3.8-27b:free
 model:
   provider: custom
   default: deepseek/deepseek-v4-flash-0731:free
@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 6
+  api_max_retries: 7
 # Every provider holding a credential in ~/.hermes/.env or the shell env is a
 # selectable row in `hermes model` / `/model`, and the expensive-model guard
 # only warns on KNOWN pricing — silent on a custom route, and a billed pick is
@@ -146,6 +146,8 @@ fallback_providers:
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: ollama-cloud
     model: nemotron-3-ultra
+  - provider: openrouter
+    model: baidu/ernie-5.5-flash-preview:free
   # CrowLLM is a keyed route whose catalog is `:free` ids only: the key comes
   # from the shared sops blob, so the entry names the env var and never the
   # value. `key_env` is the only form hermes resolves — `api_key: ${VAR}` was

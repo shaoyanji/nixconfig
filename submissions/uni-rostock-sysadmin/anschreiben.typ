@@ -35,7 +35,7 @@ Wartung habe ich deshalb automatisiert, weil sie sonst liegen bleibt. Alle fünf
 Was ich nicht mitbringe, sage ich offen: Ich habe Debian nicht im Regelbetrieb verwaltet — mein Bestand läuft auf NixOS, die Paket- und Rechnerverwaltung einer Hochschule ist mir also nicht vertraut. Windows-Domäne, Active Directory, VMware und Ansible kenne ich nicht aus dem Betrieb. Aus der Forschung kenne ich den Alltag aus dem Jahr 2012 am Fraunhofer ISE: Messaufbau, geteilte Rechner, Datenablage, dokumentierte Auswertung. Das ist keine Hochschul-IT, aber es ist ein Forschungsumfeld, in dem Rechner von Menschen genutzt werden, die keine Systemadministratoren sind.
 
 #v(2pt)
-Ich wohne in Freiburg und wäre für die Stelle nach Rostock umzuziehen; Deutsch ist C1, Englisch Muttersprache, Niederlassungserlaubnis liegt vor. Das Repository ist öffentlich: github.com/shaoyanji/nixconfig
+Ich wohne in Freiburg, rund achthundert Kilometer von Rostock. Für eine zwölfmonatige Vertretung wäre ein Umzug für beide Seiten die schlechtere Lösung; ich schlage deshalb Präsenzblöcke von zwei Wochen im Monat vor, mit Fahrkosten zu meinen Lasten. Verlangt die Stelle mehr Präsenz, ist das ein Ausschlussgrund, und dann ist eine Bewerbung aus der Ferne nicht sinnvoll — das sage ich lieber jetzt als nach dem Gespräch. Deutsch ist C1, Englisch Muttersprache, Niederlassungserlaubnis liegt vor. Das Repository ist öffentlich: github.com/shaoyanji/nixconfig
 
 #v(4pt)
 Mit freundlichen Grüßen

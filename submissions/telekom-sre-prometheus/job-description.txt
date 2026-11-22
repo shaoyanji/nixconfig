@@ -1,0 +1,89 @@
+Site Reliability Engineer (SRE) (m/w/d)
+Deutsche Telekom AG / T-Systems International GmbH
+Arbeitsorte: Kassel, Bielefeld, München, Berlin, Karlsruhe, Hannover, Dresden, Magdeburg, Saarbrücken, Darmstadt
+Anstellung: Vollzeit, ab sofort; Stelle auch in Teilzeit möglich; hybrides Arbeitsmodell mit mobilem Arbeiten
+BA-Referenz: 12444-563465374109756-DT-S
+Quelle: https://www.arbeitsagentur.de/jobsuche/jobdetail/12444-563465374109756-DT-S
+Fachliche Fragen: thomas.arbeit@t-systems.com
+
+Über T-Systems International GmbH
+
+Bei T-Systems bieten wir unseren Geschäftskunden die richtigen Systemlösungen für ihr digitales Business. Mit unserem
+Portfolio stellen wir sicher, dass digitale Transformation Komplexität reduziert, Kosten einspart und die alltägliche
+Arbeit erleichtert. Unsere Schwerpunkte sind Konnektivität, Digital, Cloud & Infrastruktur sowie Sicherheit.
+
+Über die Position
+
+Als Site Reliability Engineer stehen Sie an vorderster Front, um die Stabilität, Performance und Skalierbarkeit
+unserer kritischen Systeme sicherzustellen. Sie spielen eine zentrale Rolle bei der Entwicklung, dem Aufbau und der
+Wartung einer hochzuverlässigen und effizienten Infrastruktur.
+
+Mit Ihrer Expertise in modernen Monitoring-, Observability- und Cloud-Native-Technologien gestalten Sie den Aufbau
+und Betrieb eines leistungsfähigen Monitoring-Stacks auf Basis von Prometheus, Grafana, Loki und AlertManager für
+verteilte Fog- und Edge-Infrastrukturen. Dabei entwickeln Sie spezialisierte Dashboards zur Überwachung von
+Hardwarezuständen, Ressourcenauslastung und Netzwerkverbindungen.
+
+Sie konzipieren und implementieren Alerting-Strategien für autonome Betriebsmodelle sowie Disconnected- und
+Air-Gap-Szenarien und stellen sicher, dass kritische Ereignisse auch unter eingeschränkten Netzwerkbedingungen
+zuverlässig erkannt und verarbeitet werden. Darüber hinaus verantworten Sie lokale Retention-Konzepte,
+Log-Rotation-Mechanismen und effiziente Datenmanagement-Strategien für ressourcenbeschränkte Umgebungen.
+
+Ein weiterer Schwerpunkt ist die kontinuierliche Performance-Optimierung des Monitoring-Stacks unter Berücksichtigung
+begrenzter CPU-, Speicher- und Storage-Ressourcen auf Fog-Nodes. Sie integrieren Kubernetes-Monitoring-Lösungen,
+analysieren Betriebs- und Performancedaten und identifizieren proaktiv Optimierungspotenziale.
+
+Durch Infrastructure-as-Code-Ansätze und YAML-basierte Konfigurationen automatisieren Sie die Bereitstellung und
+Verwaltung der Monitoring-Komponenten.
+
+Must-Have Skills
+
+Monitoring & Observability
+
+* Fundierte Erfahrung mit Prometheus, insbesondere PromQL, Federation, Remote Write, Local Retention Management
+* Sehr gute Kenntnisse in Grafana, insbesondere Dashboard-Entwicklung, Alerting, Provisioning-as-Code
+* Erfahrung mit Loki, insbesondere LogQL, Retention Management, Compaction
+* Fundierte Kenntnisse in AlertManager, insbesondere Standalone Routing, Alert Inhibition, Eskalations- und
+  Benachrichtigungskonzepte
+
+Kubernetes & Cloud Native
+
+* Erfahrung im Monitoring und Betrieb von Kubernetes-Umgebungen
+* Verständnis von Container-Plattformen und Cloud-Native-Architekturen
+
+Edge & Fog Computing
+
+* Erfahrung mit ressourcenbeschränkten Umgebungen
+* Optimierung von CPU-, Memory- und Storage-Nutzung
+* Verständnis von Offline-, Air-Gap- und Disconnected-Betriebsszenarien
+
+Weitere Anforderungen
+
+* Sehr gute Kenntnisse in YAML
+* Ausgeprägtes Verständnis für IT-Sicherheit und Security Awareness
+* Analytische und strukturierte Arbeitsweise
+* Erfahrung im Site Reliability Engineering oder Infrastruktur-Betrieb
+* Sehr gutes Deutsch in Wort und Schrift (C1-Niveau)
+
+Nice-to-Have Skills
+
+* Infrastructure as Code (z. B. Terraform, Ansible)
+* GitOps-Ansätze
+* Linux-Systemadministration
+* OpenTelemetry und moderne Observability-Konzepte
+* Erfahrung in kritischen oder hochverfügbaren Infrastrukturen
+
+Was Sie erwartet
+
+Verantwortung für die Stabilität, Verfügbarkeit und Beobachtbarkeit verteilter Infrastrukturen; Aufbau leistungsfähiger
+Monitoring- und Observability-Lösungen in einem technologisch anspruchsvollen Umfeld mit aktuellen Kubernetes-,
+Monitoring- und Logging-Technologien.
+
+Was wir bieten
+
+* Flexibilität und Work-Life-Balance: flexible Arbeitszeiten, mobiles Arbeiten, hybrides Arbeitsmodell
+* Attraktive Vergütung: wettbewerbsfähiges Gehaltspaket
+* Entwicklungsmöglichkeiten: Weiterbildungsangebote, Schulungen, Karriereentwicklungsprogramme
+* Modernes Arbeitsumfeld mit aktuellen Technologien und Tools
+* Offene und kollegiale Arbeitsatmosphäre
+* Gesundheit und Wohlbefinden: Gesundheitsförderung
+* Zusatzleistungen: betriebliche Altersvorsorge, Mitarbeiterrabatte, Jobticket-Optionen

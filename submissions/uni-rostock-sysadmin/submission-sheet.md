@@ -31,6 +31,15 @@ Fachlabor betreuen (Hard- und Software), Server-Infrastruktur auf Lehrstuhl- und
 | Quellen | `lebenslauf.typ`, `anschreiben.typ` | Typst, direkt kompilierbar |
 | Zeugnisse | keine Datei | Muss ergänzt werden |
 
+## Gemessene Artefakte
+
+| Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 36169 | 489 | `a8d082ab3bcaf295` |
+| `anschreiben.pdf` | 1 | 24180 | 394 | `97fa49ca383940e8` |
+
+Beide PDFs wurden am 22.11.2026 aus `lebenslauf.typ` und `anschreiben.typ` neu gebaut und sind byte-identisch mit den eingecheckten Dateien — die Quellen erzeugen die PDFs, ein Nix-Store-Symlink ist nirgends mehr im Verzeichnis und keine Datei ist schreibgeschützt.
+
 ## Abgleich
 
 | Anforderung | Nachweis | Einschätzung |

@@ -132,6 +132,17 @@ run_deploy() {
       echo "Deploying '$target' with rsync to '$deploy_target' from '$output_path/'"
       rsync -av --delete "$output_path"/ "$deploy_target"
       ;;
+    symlink)
+      # Delivery, not a build: point a stable path at the store path so the
+      # served tree can change without the host closure changing. `mv -T` is the
+      # atomic rename -- `ln -sfn` over an existing directory would nest a link
+      # inside it instead of replacing it.
+      echo "Publishing '$target': $(readlink -f "$output_path") -> $deploy_target"
+      mkdir -p "$(dirname "$deploy_target")"
+      ln -sfnT "$(readlink -f "$output_path")" "$deploy_target.tmp"
+      mv -T "$deploy_target.tmp" "$deploy_target"
+      echo "Serving $(readlink -f "$deploy_target")"
+      ;;
     neocities)
       echo "Deploying '$target' to Neocities site '$deploy_target' from '$output_path/'"
       bash "$SCRIPT_DIR/neocities-push.sh" "$output_path"

@@ -6,6 +6,8 @@
       "description": "Rendered markdown docs site",
       "buildCommand": "nix build --builders \"\" .?submodules=1#sites.fleet-docs-site",
       "outputPath": "result",
+      "deployMethod": "symlink",
+      "deployTarget": "/var/lib/fleet-docs-site/current",
       "previewBind": "127.0.0.1",
       "previewPort": 8000
     },

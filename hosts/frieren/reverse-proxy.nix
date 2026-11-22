@@ -1,6 +1,5 @@
 {
   self,
-  pkgs,
   lib,
   config,
   systemdJobs,
@@ -29,14 +28,10 @@
   tailnetCertificate = "${tailnetCertDir}/${tailnetName}.crt";
   tailnetCertificateKey = "${tailnetCertDir}/${tailnetName}.key";
 
-  # ONE instance of the fleet site. It reads the knowledge graph and every note
-  # at eval time, so importing it per location (it used to be imported twice in
-  # this file) evaluated the same 1.9 k-line module twice for identical output.
-  fleetSite = import ../../lib/aki-site.nix {
-    inherit pkgs;
-    inventory = config.fleet.inventory;
-    host = config.networking.hostName;
-  };
+  # Served from a MUTABLE path: a store path in this closure means a markdown
+  # edit forces a frieren rebuild. `task dev:site:deploy` renames the symlink;
+  # the build stays Nix, only delivery is transient.
+  docsRoot = "/var/lib/fleet-docs-site/current";
 
   # The cache policy for compiled static trees, shared with the UDS bridge
   # (modules/config/nginx-static-cache.nix) so the two servers cannot disagree.
@@ -108,12 +103,18 @@
 in {
   imports = [self.modules."services.service-portal"];
 
+  # The publish path is a symlink, so the directory must exist before nginx
+  # reads it; `d` leaves an existing symlink alone.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/fleet-docs-site 0775 root users -"
+  ];
+
   # EXP-024: serve the same compiled site the vhost serves, over a UNIX socket.
   # The bridge takes the site as a value, so one eval instantiates it once.
   services.udsStaticBridge = {
     enable = true;
     socketPath = "/run/uds-docs/docs.sock";
-    root = fleetSite;
+    root = docsRoot;
   };
 
   # --- Service portal: the page, from the registry ----------------------------
@@ -485,14 +486,14 @@ in {
             # The compiled registry and this host's own name are passed in: the site
             # renders the same evaluated data the host enforces, and its status
             # badge is read from the registry instead of being typed into markup.
-            root = fleetSite;
+            root = docsRoot;
             extraConfig = staticCache.html;
           };
           # Eight hex digits spelled out: a `{8}` quantifier is split across lines by the
           # generator and nginx rejects it. Why:
           # .agents/deploy/hosts/frieren.md §"nginx location brace trap".
           locations."~* \\.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]\\.(?:css|js)$" = {
-            root = fleetSite;
+            root = docsRoot;
             extraConfig = staticCache.hashed;
           };
           # Live mainframe telemetry (Gap A)

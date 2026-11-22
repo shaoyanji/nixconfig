@@ -1,6 +1,6 @@
 # Lead: STACKIT / Schwarz Digits — (Senior) Platform Engineer, Control Plane Platform
 
-Fit: 3
+Fit: 3 (Vorgabe nennt 4)
 Stand: 22.11.2026
 Ort: Bad Friedrichshall
 Referenz: 1923 (Portal-Ref. SDE-131335 / 1923-15454); Vorgabe nennt GT2321
@@ -36,7 +36,7 @@ Der Teil, der wirklich passt, ist genau dieser: Werkzeuge schreiben statt einkau
 
 ## Weg
 
-Bewerbung über das Schwarz-Digits-/STACKIT-Portal zur Anzeige 1923, sofern diese Requisition gemeint ist; sonst GT2321 prüfen. Englisch ist laut Anzeige die Basissprache, Deutsch idealerweise zusätzlich — das Paket ist deshalb deutsch, mit englischem Anschreiben auf Wunsch in einem Durchgang ersetzbar.
+Bewerbung über das Schwarz-Digits-/STACKIT-Portal zur Anzeige 1923, sofern diese Requisition gemeint ist; sonst GT2321 prüfen. Das Paket ist deutsch, weil die Anzeige Englisch als Basis und Deutsch als ideal ergänzend nennt; ein englisches Anschreiben ist in einem Durchgang ersetzbar.
 
 ## Gehalt
 

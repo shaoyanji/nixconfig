@@ -1,0 +1,277 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 3,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 4613,
+    "terms": [
+      {
+        "term": "service",
+        "weight": 18.44
+      },
+      {
+        "term": "cloudservices",
+        "weight": 18.264
+      },
+      {
+        "term": "cloud",
+        "weight": 14.736
+      },
+      {
+        "term": "kubernetes",
+        "weight": 14.736
+      },
+      {
+        "term": "linux",
+        "weight": 14.736
+      },
+      {
+        "term": "sicherheitsüberprüfung",
+        "weight": 14.736
+      },
+      {
+        "term": "plattformen",
+        "weight": 13.737
+      },
+      {
+        "term": "system",
+        "weight": 13.084
+      },
+      {
+        "term": "plattform",
+        "weight": 12.081
+      },
+      {
+        "term": "betrieb",
+        "weight": 10.338
+      },
+      {
+        "term": "plattformdienste",
+        "weight": 9.747
+      },
+      {
+        "term": "devops",
+        "weight": 9.084
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "fibtransponder",
+        "score": 2.1205
+      }
+    ],
+    "kept": [
+      "nixconfig",
+      "bountystash",
+      "matt.bountystash.com",
+      "Risikoberechnungs-Engine (Swirl Engine)"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "PSI-Druck"
+        },
+        {
+          "score": 0.0,
+          "text": "Alarmzustellung"
+        }
+      ],
+      "kept": 6,
+      "name": "Observability",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Ressourcenlimits"
+        }
+      ],
+      "kept": 6,
+      "name": "Linux & Plattform",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "YAML"
+        }
+      ],
+      "kept": 6,
+      "name": "DevOps",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Go"
+        },
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        },
+        {
+          "score": 0.0,
+          "text": "Finanzmodellierung"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 16.0186,
+          "text": "Baute eine Self-Service-Bedienoberfläche aus benannten Tasks: Deploy, Checks und Betriebsaufgaben als ein Weg statt Ad-h"
+        },
+        {
+          "score": 10.6465,
+          "text": "Schrieb einen Sentinel-Job, der Betriebsmetriken wie Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minut"
+        },
+        {
+          "score": 9.8245,
+          "text": "Sicherte jede Änderung mit inventargetriebener CI ab: Automatisierung der Prüfungen bis zum Gate je Host, bevor die Ände"
+        },
+        {
+          "score": 8.9904,
+          "text": "Hielt Secrets und Zugang aus dem Betrieb: sops mit age, eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten, S"
+        },
+        {
+          "score": 2.4757,
+          "text": "Hielt dreizehn heterogene Hosts auf demselben Stand: Generation-Alter, Disk- und PSI-Druck im Blick, Rollback auf die le"
+        },
+        {
+          "score": 0.7728,
+          "text": "Prüfte Endpunkte mit Gatus und band jedes Alerting an eine Go-Bridge, die eine Zustellung erst bestätigt, wenn die Nachr"
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 10
+    },
+    {
+      "dropped": [
+        {
+          "score": 4.1189,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        },
+        {
+          "score": 3.0048,
+          "text": "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD."
+        },
+        {
+          "score": 2.2278,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        },
+        {
+          "score": 2.0893,
+          "text": "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.4092,
+          "text": "Betreute eine Projektpipeline über 100 Mio. USD."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 1.4212,
+          "text": "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 2.8184,
+          "text": "Arbeitete zwölfstündige Schichten im Feld."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        },
+        {
+          "score": 0.0,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        }
+      ],
+      "kept": 3,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

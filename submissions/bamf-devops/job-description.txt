@@ -1,0 +1,72 @@
+mehrere DevOps-Engineers (m/w/d) - Public Cloud / Plattformdienste
+Bundesamt für Migration und Flüchtlinge (BAMF), Referat 22B - Plattform- und Cloudservices
+Dienstort: Nürnberg
+Anstellung: unbefristet sowie befristet auf 24 Monate; Teilzeit grundsätzlich möglich
+Entgelt: E 10 bis E 12 TV EntgO Bund beziehungsweise A 10 bis A 12 BBesO
+Kennziffer: BAMF-2025-358; Interamt-Angebots-ID: 1513998
+Bewerbungsfrist: 18.12.2026
+Sicherheitsüberprüfung: einfache Sicherheitsüberprüfung (SÜ1) nach § 5 AsylG in Verbindung mit § 8 SÜG
+Quelle: https://interamt.de/koop/app/stelle?id=1513998
+
+Für das Referat 22B - Plattform- und Cloudservices - suchen wir zeitnah für den Dienstort Nürnberg mehrere
+DevOps-Engineers (m/w/d) in den Bereichen Public Cloud / Plattformdienste.
+
+Verstärken Sie unser Plattform- und Cloudservices-Team und gestalten Sie die technologische Basis für die digitale
+Zukunft des Bundesamtes mit. Wir setzen auf moderne Technologien und Softwarearchitekturen, um leistungsfähige,
+skalierbare und sichere IT-Plattformen bereitzustellen.
+
+Als Teil unseres Teams betreiben und optimieren Sie virtualisierte und containerisierte Plattformen, treiben die
+Automatisierung von Betriebsprozessen voran und unterstützen Entwicklungsteams dabei, Anwendungen nach
+DevOps-Prinzipien effizient und zuverlässig bereitzustellen.
+
+Ihre Aufgaben
+
+* Aufbau, Integration, Skalierung, Betrieb und Weiterentwicklung von Virtualisierungs- und Containerisierungs-
+  plattformen auf Basis von Linux und Kubernetes über den gesamten Lifecycle
+* Proaktives Erkennen von Störungen und Engpässen, Entstörung durch Fehleranalysen, Monitoring und Kommunikation
+  mit den betroffenen Produktteams, auch über Netzwerk- und Plattformgrenzen hinweg
+* Konzeptionelle und technische Weiterentwicklung der genutzten und bereitgestellten Services, insbesondere
+  Automatisierung, Security und Hochverfügbarkeit
+* Enablement: Kolleginnen und Kollegen bei der Nutzung der Plattformen unterstützen, teamintern und in der
+  gesamten BAMF-IT, und Betriebswissen in den DevOps-Teams verankern
+* Technische Konzepte und Dokumentationen erstellen und pflegen, Analysen und Auswertungen durchführen,
+  Abstimmung zu Infrastruktur, Hardwareplanung und Softwareschnittstellen
+
+Ihr Profil
+
+* Abgeschlossenes (Fach-)Hochschulstudium mindestens auf Bachelorniveau in Informatik, Wirtschaftsinformatik,
+  Mathematik oder einem anderen einschlägigen Studium mit informationstechnischen Schwerpunkten, alternativ ein
+  gleichwertiger Diplomabschluss einer anerkannten Berufsakademie
+* Alternativ bewerbungsberechtigt: mindestens dreijährige Berufserfahrung auf einem IT-Arbeitsplatz, der mit
+  Entgeltgruppe 10 bis 12 zu bewerten wäre
+* Nachgewiesene Erfahrungen im IT-Betrieb, der IT-Systemadministration, der DevOps-Softwareentwicklung oder
+  vergleichbaren Tätigkeiten
+* Von Vorteil: praktische Erfahrungen mit Linux-Systemen und Containerisierung (z.B. Kubernetes, OpenShift)
+* Fundierte Kenntnisse in der Umsetzung von Infrastructure-as-Code und Automatisierung (z.B. per Ansible/Terraform)
+* Idealerweise Kenntnisse im Scripting (z.B. Bash, Python)
+* Sozialkompetenz, ausgeprägte Kommunikationsfähigkeit, analytisches und strategisches Denken
+* Gute Deutschkenntnisse auf C1-Niveau nach GER, nachzuweisen über einen deutschsprachigen Abschluss oder einen
+  anerkannten Sprachnachweis
+* Bereitschaft, die SÜ1 zeitnah erfolgreich zu durchlaufen
+
+Unser Angebot
+
+* Unbefristete Einstellung in der Entgeltgruppe 10 bis 12 TV EntgO Bund; für E 12 müssen die persönlichen
+  Voraussetzungen im Einzelfall vorliegen
+* Bei Vorliegen spezieller Qualifikationen und einschlägiger Berufserfahrung Möglichkeit zusätzlicher
+  Gehaltsbestandteile, beispielsweise einer Fachkräftezulage
+* Jahressonderzahlung und betriebliche Altersvorsorge
+* Monatliche BAMF-Zulage von bis zu 125 EUR, vorerst befristet bis 31.12.2027
+* Flexible Arbeitszeitgestaltung, behördeneigenes Qualifizierungszentrum, Gesundheitsmanagement und Sportangebote
+* Begleitung durch Teamkoordination beim Einstieg in die behördenspezifischen Vorgehensweisen
+
+Bewerbung
+
+Die Bewerbung erfolgt ausschließlich über das Online-Bewerbungssystem Interamt. Registrierung unter
+https://www.interamt.de/koop/app/registrieren, danach Login und Bewerbung auf die Stelle 1513998.
+
+Ein Anschreiben beziehungsweise Motivationsschreiben ist im Rahmen der Bewerbung nicht erforderlich.
+
+Bei ausländischem Hochschulabschluss ist die Feststellung der Vergleichbarkeit durch die Zentralstelle für
+ausländisches Bildungswesen (ZAB) vorzulegen. Rückfragen zum Verfahren: Service-Center 0911/943-0,
+service@bamf.bund.de.

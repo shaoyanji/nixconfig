@@ -1,0 +1,65 @@
+DevOps Engineer (m/w/d)
+SINC GmbH — GovTech fuer oeffentliche Institutionen, Wiesbaden
+BA-Referenz: 12288-4996757754-S | SINC-ID: 63891414
+Modell: flexible Arbeitszeiten, bis zu 60 % Homeoffice; Bewerbung ueber jobs.sinc.de oder bewerbung@sinc.de
+Kontakt: Jenni Holdmann, Recruiting, jennifer.holdmann@sinc.de
+Quelle: Jobboerse-API zur BA-Referenz, abgerufen am 22.11.2026
+
+WORUM ES GEHT Du baust dabei mit an unseren GovTech-Lösungen der
+nächsten Generation, die den Alltag von Millionen von Menschen
+einfacher machen. Unterstütze uns bei der Umsetzung unserer Vision,
+den Staat fit für das 21. Jahrhundert zu machen. Denn starke und
+funktionierende Institutionen sind die Grundlage einer
+funktionierenden Demokratie. Werde Teil unserer internen IT als
+Schnittstelle zwischen Softwareentwicklung und IT-Operations. Dein
+Fokus liegt auf der Bereitstellung, dem Betrieb und der
+Weiterentwicklung unserer internen Plattform- und
+Infrastrukturservices. Schließ Dich uns an und werde Teil der SINC.
+DEINE AUFGABEN Als Devops Engineer (m/w/d) für die interne
+IT-Schnittstelle hältst Du engen und regelmäßigen Kontakt zu
+Entwicklungs- und Testteams. Dabei stellst Du die Plattformen bereit,
+analysierst Betriebsanforderungen und sorgst für stabile Abläufe. Du
+bist für den Betrieb, die Optimierung und den Ausbau unserer internen
+Entwicklungs-Test- und Integrationsumgebungen verantwortlich. Deine
+zentrale Aufgabe ist die Weiterentwicklung und Stabilisierung unserer
+internen Infrastruktur mit klarem Fokus auf Operations und
+Plattformbetrieb. Zu Deinen Aufgaben gehört die Weiterentwicklung und
+Pflege unserer CI/CD-Plattform. Im Fehlerfall unterstützt Du bei der
+technischen Analyse und stellst einen stabilen Betrieb sicher. WAS DU
+MITBRINGST Nach Deinem Studium oder Deiner Ausbildung im IT-Umfeld
+hast Du bereits praktische Erfahrungen im internen IT-Betrieb oder als
+Devops Engineer im Plattformumfeld gesammelt. Du verstehst die
+Anforderungen von Softwareentwicklungsteams, möchtest Deinen
+Schwerpunkt jedoch stärker im Bereich Operations und Plattform
+setzen. Du hast Erfahrung im Aufbau und Betrieb von CI/CD-Plattformen.
+Du bringst ein gutes Verständnis für Infrastruktur, Virtualisierung
+und Container-Umgebungen mit. Du verfügst über erweiterte Kenntnisse
+in Skriptsprachen wie PowerShell oder Bash. Du arbeitest strukturiert,
+standardisierst gerne Prozesse und denkst in stabilen
+Betriebsmodellen. HIERMIT ARBEITEN WIR Betriebssysteme: Windows
+Desktop, Windows Server, Ubuntu, openSuse, RHEL Virtualisierung &
+Plattform: Hyper-V, OpenStack Datenbanken: Oracle, Microsoft SQL,
+PostgreSQL Skriptsprachen: PowerShell, Bash CI/CD &
+Versionsverwaltung: Azure Devops, Git Programmiersprache (nah an der
+Entwicklung): C# Container & Orchestrierung: Docker, Kubernetes
+Tooling: YAML, Helm Kommunikationsplattform: Rocket Chat, Teams, Skype
+WAS WIR BIETEN Du möchtest Beruf und Privatleben unter einen Hut
+bekommen? Wunderbar. Genieße flexible Arbeitszeiten. Bis zu 60%
+Deiner Arbeit kann von Zuhause stattfinden. Wir bezahlen heute schon
+Dein zukünftiges Ich. Wenn Du mal in Rente gehst, haben wir jeden
+Monat 338€ für Dich im Rahmen der betrieblichen Altersvorsorge zur
+Seite gelegt. Du genießt gutes Essen? Dann lass Dich von unserem
+Firmenkoch Denho in Wiesbaden bekochen oder nutze unsere Essenszulage.
+Wir investieren in Dich durch regelmäßige Fort- und Weiterbildungen.
+Das Tolle ist, Du kannst auch täglich von Deinen erfahrenen
+Kolleg*innen lernen. Komm schnell von A nach B mit Deinem eigenen
+JobRad. Ob Weinfest oder Weihnachtsfeier - wir feiern zusammen. Beim
+Sommerfest freuen wir uns zusätzlich über den Besuch deiner Familie.
+Wachse mit Deinem Team auf großartigen Events zusammen. Ob Bouldern,
+Grillabend oder Trampolinhalle, lass Deiner Fantasie freien Lauf.
+INTERESSE AN DIESEM JOB? Dann lass uns rausfinden, ob wir zueinander
+passen. Entwickle Deine tollen Ideen nicht länger für den
+Papierkorb, sondern für einen sinnvollen Zweck. Alternativ kannst Du
+uns die Bewerbung auch an bewerbung@sinc.de schicken. Wenn noch Fragen
+offen sind, dann melde Dich gerne direkt bei Jenni. ​​​​ Jenni
+Holdmann Recruiting jennifer.holdmann@sinc.de

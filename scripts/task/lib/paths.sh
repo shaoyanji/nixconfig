@@ -79,23 +79,25 @@ apikeys_file() {
   local root
   root=$(nixconfig_root) || return 1
   _first_file "${NIXCONFIG_APIKEYS:-}" "$root/modules/secrets/apikeys.yaml" \
-    || { secrets_absent "modules/secrets/apikeys.yaml"; return 1; }
+    || { secrets_absent apikeys; return 1; }
 }
 
 pii_file() {
   local root
   root=$(nixconfig_root) || return 1
   _first_file "${NIXCONFIG_PII:-}" "$root/modules/secrets/pii.yaml" \
-    || { secrets_absent "modules/secrets/pii.yaml"; return 1; }
+    || { secrets_absent pii; return 1; }
 }
 
 # One message for the one condition, so two scripts cannot describe the same
-# missing submodule differently. $1 names what was being looked for.
+# missing submodule differently. $1 names the plane, never the file: this string
+# lands in a terminal or a transcript, and this file is the only place allowed to
+# know a path.
 secrets_absent() {
   local root
   root=$(nixconfig_root 2>/dev/null || printf '?')
-  printf '%s: %s not found under %s — is the modules/secrets submodule checked out?\n' \
-    "${0##*/}" "${1:-secrets.yaml}" "$root" >&2
+  printf '%s: the %s plane could not be resolved under %s — is the modules/secrets submodule checked out?\n' \
+    "${0##*/}" "${1:-secrets}" "$root" >&2
 }
 
 # secret_get '<json path>' [file] — prints the value, empty on any failure.

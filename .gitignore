@@ -1,1 +1,41 @@
+.DS_Store
+# The flake's build symlink: a store path, never content. `git add -A` would
+# otherwise commit it (it was the only untracked entry a plain `git status` showed).
+/result
+.devenv
+._*
+.smbdelete*
+@eaDir*
+
+.codex
+.wrangler/
+.tmp/
+.tmp-xs-helper/
+tools/xs-materializer/xs-materializer
+__pycache__/
+*.pyc
+/MEMORY.md
+.agents/hosts/
+.task/
+# Generated closure report trees (regenerate: task dev:closure:toml)
+docs/closures/
+# Generated docs tree — a build output, never committed (nix build .#docs).
+# docs/modules-registry.md and docs/fleet-inventory.md are tracked POINTER pages.
+docs/generated/
+docs/history/handoff*
+session-*.md
+
+# direnv: per-machine devshell cache (the flake is the source of truth)
+.direnv/
+
+# Local diff files
+*.diff
+
+# Runtime logs from local runs (app.log was a Steam login trace, committed by
+# accident in 06ce197b — a tracked log churns on every run and reads as source).
+*.log
+
+# Job output fetched from clanker (scripts/task/clanker.sh result): a copy of a
+# build artifact, never source.
+.clanker-out/
 submissions

@@ -60,6 +60,7 @@ tasks:
       - task: checks:toon:surfaces
       - task: checks:toon:tasks
       - task: checks:tasks
+      - task: checks:policies:fixtures
       - task: checks:nix:comments
       - task: checks:skills:mirror
       - task: checks:kg
@@ -156,6 +157,19 @@ tasks:
         sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
       - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.policies
+
+  checks:policies:fixtures:
+    desc: Regression fixture for checks:policies (ci-substituter-keys, secrets-path)
+    summary: >
+      Proves the two corrected predicates can fail. The failing inputs are
+      checked out of history rather than retyped: the workflow at `4831b449^`
+      declares the keys and does not repeat them on the build command, and a
+      script at `ddb19d1c^` decrypts without the resolver. The current tree, a
+      command whose flags sit behind the quoted attribute, and the one exempt
+      path-reader report nothing; the resolver's failure message is asserted to
+      name no file. One flake eval plus git, ~3 s, no network.
+    cmds:
+      - bash tests/policies/run.sh
 
   checks:prose:
     desc: "[gate] Docs and skills carry none of the unslop vocabulary"

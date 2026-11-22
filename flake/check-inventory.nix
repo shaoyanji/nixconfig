@@ -86,6 +86,7 @@
     "checks:ports" = "leaf";
     "checks:ports:test" = "leaf";
     "checks:policies" = "leaf";
+    "checks:policies:fixtures" = "leaf";
     "checks:postgres:drill" = "leaf";
     "checks:postgres:vector" = "leaf";
     "checks:prose" = "leaf";

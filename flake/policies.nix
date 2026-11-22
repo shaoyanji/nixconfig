@@ -12,6 +12,8 @@
     infix == "" || (content |> lib.splitString infix |> builtins.length) > 1;
   has = p: needle: p |> read |> hasInfix needle;
   anyLine = p: pred: p |> read |> lib.splitString "\n" |> lib.any pred;
+  # Text form, for the probes a fixture drives on content that is not a tree file.
+  anyLineOf = text: pred: text |> lib.splitString "\n" |> lib.any pred;
 
   # The comment census (lib/nix-comments.nix). `flake/outputs.nix` passes it in so
   # the 316-file walk happens once; a standalone importer (the site render) gets
@@ -412,6 +414,66 @@
         || (code |> builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" |> (m: m != null))
       ));
   taskfileOffenders = taskfilePlane |> builtins.filter spellsSecretsInTask;
+  # The positive half: a reader sources the resolver and takes the location from
+  # it — `secret_get` for one value, `secret_file`/`apikeys_file`/`pii_file` when
+  # it needs the document. A script can avoid the literal and still open a file of
+  # its own, so the spelling check alone was never the rule.
+  secretsAccessors = ["secret_get" "secret_file" "apikeys_file" "pii_file" "secrets_dir"];
+  readsSecrets = text:
+    anyLineOf text (l: let
+      code = codePart l;
+    in
+      (code |> builtins.match ".*sops[[:space:]]+(-d|--decrypt)([[:space:]].*)?" |> (m: m != null))
+      || (secretsAccessors |> lib.any (a: code |> hasInfix a)));
+  sourcesResolver = text:
+    anyLineOf text (l: let
+      code = codePart l;
+    in
+      (code |> builtins.match "[[:space:]]*(\\.|source)[[:space:]]+.*paths\\.sh.*" |> (m: m != null))
+      || (code |> hasInfix "PATHS_HELPER"));
+  # These receive a file instead of resolving one: the drift gate compares the two
+  # copies by name, the openwrt wrapper runs where the submodule can be absent, the
+  # decrypt and edit helpers take the path the task plane already expanded, and the
+  # media relay takes its plane from the unit that bakes it.
+  secretsReaderExempt =
+    secretsPathExempt
+    ++ [
+      "scripts/task/sops-decrypt-to.sh"
+      "scripts/task/sops-edit-commit.sh"
+      "scripts/media-relay/r2-env.sh"
+    ];
+  # Name and text, so the gate reads tree files and the fixture reads history
+  # through one implementation.
+  secretsScriptProblems = name: text:
+    lib.optional (readsSecrets text && !(sourcesResolver text) && !(secretsReaderExempt |> lib.elem name))
+    "reads secrets without the resolver — source the shared paths helper and take the location from secret_get";
+  secretsResolverOffenders = scriptFiles |> builtins.filter (p: secretsScriptProblems p (read p) != []);
+
+  # The build command is read off the QUOTED attribute it builds: the flags in
+  # front of it (`-L`, `--option … "$keys"`) are not part of the rule and neither
+  # is their order. Matching the whole command failed a correct prefix
+  # (2026-11-17); matching the flag anywhere in the file passed a build that never
+  # repeated the key set (the 2722-path rebuild, 2026-11-02).
+  buildAnchor = "\".#\${attr}\"";
+  ciKeyProblems = text: let
+    lines = text |> lib.splitString "\n";
+    count = needle: lines |> builtins.filter (l: l |> hasInfix needle) |> builtins.length;
+    builds = lines |> builtins.filter (l: l |> hasInfix buildAnchor);
+    keyed = l: (l |> hasInfix "--option trusted-public-keys") && (l |> hasInfix "\"$keys\"");
+  in
+    lib.optional (count "substituters =" != count "trusted-public-keys =")
+    "a substituters line has no matching trusted-public-keys line"
+    ++ lib.optional (count "trusted-public-keys =" < 1) "no trusted-public-keys line"
+    ++ lib.optional (!(text |> hasInfix "niks3.numtide.com-1:")) "the numtide signature is not among the keys"
+    ++ lib.optional (builds == []) "no command builds the quoted attribute"
+    ++ lib.optional (builds != [] && !(builds |> lib.all keyed))
+    "the command that builds the quoted attribute does not repeat the key set"
+    ++ lib.optional (
+      builds
+      != []
+      && lib.any (l: (l |> hasInfix "--option trusted-public-keys") && !(l |> hasInfix buildAnchor)) lines
+    )
+    "the key set is repeated on a command that does not build the quoted attribute";
   plaintextSecrets = presentSopsFiles |> lib.concatMap (f: f |> plaintextValues |> map (l: "${f}: ${l}"));
   # The mirror is a `cp` of the submodule (`task infra:secrets:sync`), so identity
   # is the invariant. A value written to one copy only decrypts on the machine that
@@ -956,8 +1018,17 @@
     secrets-path-is-resolved-in-one-place = {
       rule = "A script never spells where a secrets file lives. It sources `scripts/task/lib/paths.sh`, which owns one resolution order: `$NIXCONFIG_SECRETS`, then the canonical submodule copy, then the committed mirror. 27 scripts each carried the path and, with it, their own answer to canonical-versus-mirror — so a writer and a reader in the same repository could disagree about which file was authoritative, and an edit could land in the copy builds never read. The two files that still name a path are the ones whose job that is: the drift gate compares the copies, and the openwrt wrapper resolves one where the submodule may be absent. A task takes the path from `{{.SECRETS}}`, which is derived from the same helper, so neither plane spells it.";
       proof = "scripts/task/lib/paths.sh · scripts/**/*.sh · scripts/**/*.py · taskfiles/*.yml · Taskfile.yml";
-      holds = secretsPathOffenders == [] && taskfileOffenders == [];
-      detail = "bypasses the resolver: ${secretsPathOffenders ++ taskfileOffenders |> lib.concatStringsSep ", "}";
+      holds = secretsPathOffenders == [] && taskfileOffenders == [] && secretsResolverOffenders == [];
+      detail =
+        (
+          lib.optional (secretsPathOffenders != [])
+          "spells the secrets path: ${secretsPathOffenders |> lib.concatStringsSep ", "}"
+          ++ lib.optional (taskfileOffenders != [])
+          "a task decrypts a spelled path: ${taskfileOffenders |> lib.concatStringsSep ", "}"
+          ++ lib.optional (secretsResolverOffenders != [])
+          "reads secrets without the resolver — source the shared paths helper and take the location from it, secret_get for a value: ${secretsResolverOffenders |> lib.concatStringsSep ", "}"
+        )
+        |> lib.concatStringsSep " · ";
     };
 
     secrets-files-are-registered = {
@@ -1326,23 +1397,15 @@
     };
 
     # --- error classification (docs/issue-classes.md) -----------------------
-    # The trust class is the one that cost the most: a substituter was listed and
-    # the key that proves its signatures was not, so CI fetched 2722 paths, threw
-    # them away as unsigned and rebuilt glibc, gcc and the agent stack until the
-    # runner was killed. The rule is about the pairing, not about one cache.
+    # The trust class cost the most: a substituter was listed and the key that
+    # proves its signatures was not, so CI fetched 2722 paths, threw them away as
+    # unsigned and rebuilt glibc, gcc and the agent stack until the runner died.
+    # The pairing is read off the command that builds the quoted attribute.
     ci-substituter-keys = {
       rule = "A substituter CI lists is a substituter CI trusts: every `substituters =` line in the workflow has a matching `trusted-public-keys =` line, the numtide signature is among those keys, and the build command repeats the same set because cachix-action rewrites nix.conf after the install step.";
-      proof = ".github/workflows/nixcachix.yml";
-      holds = let
-        lines = ".github/workflows/nixcachix.yml" |> read |> lib.splitString "\n";
-        count = needle: lines |> builtins.filter (l: l |> hasInfix needle) |> builtins.length;
-      in
-        count "substituters ="
-        == count "trusted-public-keys ="
-        && count "trusted-public-keys =" >= 1
-        && has ".github/workflows/nixcachix.yml" "niks3.numtide.com-1:"
-        && has ".github/workflows/nixcachix.yml" "--option trusted-public-keys";
-      detail = "a substituter is listed without its key again: nix will fetch the path, reject it as unsigned, and rebuild it from source on the runner";
+      proof = ".github/workflows/nixcachix.yml (tests/policies/run.sh replays the past mistake)";
+      holds = ciKeyProblems (read ".github/workflows/nixcachix.yml") == [];
+      detail = "a substituter is listed without its key, or the build command stopped repeating the key set: ${ciKeyProblems (read ".github/workflows/nixcachix.yml") |> lib.concatStringsSep "; "}";
     };
 
     issue-classes-have-one-home = {
@@ -1418,6 +1481,13 @@
   ids = policies |> builtins.attrNames;
   citedIds = citations |> map (c: c.id) |> lib.unique;
 in {
+  # The two predicates a fixture drives on text that is not in the tree
+  # (tests/policies/run.sh): the gate and its proof read one implementation.
+  probes = {
+    ciKeys = ciKeyProblems;
+    secretsScript = secretsScriptProblems;
+  };
+
   inherit
     policies
     citations

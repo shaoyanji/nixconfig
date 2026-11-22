@@ -200,10 +200,10 @@ fi
 
 plan=()
 for agent in "${ladder[@]}"; do
-  # A dry run names the declared plan, not the reachable one: which binaries a
-  # host has installed changes nothing about the order a task kind should try.
-  # checks:infron reads this plan on hosts without reasonix or dsh on PATH.
-  if [ "$dry_run" -eq 0 ] && ! route_available "$agent"; then
+  # The plan is the reachable ladder: a missing binary is skipped before the
+  # first attempt, so a dry run names what the run would actually try — and a
+  # forced agent that is not installed leaves no plan at all.
+  if ! route_available "$agent"; then
     continue
   fi
   if [ "$agent" = chat ]; then

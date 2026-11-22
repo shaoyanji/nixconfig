@@ -68,6 +68,22 @@
     then xs
     else xs |> builtins.tail |> dropN (n - 1);
 
+  # Convention: .agents/SCHEMA.md §4.6; policy half: [[flake/policies.nix#skills-cite-truth]].
+  truthRoots = ["modules/" "hosts/" "flake/" "lib/" "taskfiles/" "scripts/"];
+  truthRefsOf = lines:
+    lines
+    |> lib.concatMap (
+      l:
+        l
+        |> builtins.split "`([^`]*)`"
+        |> lib.filter builtins.isList
+        |> map builtins.head
+        |> lib.filter (t: truthRoots |> lib.any (pre: lib.hasPrefix pre t))
+    );
+  truthBrokenOf = refs:
+    refs
+    |> lib.filter (t: !(../. + "/${t |> lib.splitString "#" |> builtins.head}" |> builtins.pathExists));
+
   # --- frontmatter ----------------------------------------------------------
   # The schema is deliberately a *subset* of YAML: `key: value` lines between
   # the first two `---` fences, optional indentation, no nested mappings.
@@ -104,6 +120,9 @@
     tags = (p.fields.tags or "") |> parseList;
     platforms = (p.fields.platforms or "") |> parseList;
     lineCount = p.lines |> builtins.length;
+    truthLines = p.body |> lib.filter (l: (l |> trim) |> lib.hasPrefix "Truth:");
+    truthRefs = truthRefsOf truthLines;
+    truthBroken = truthBrokenOf truthRefs;
   in {
     inherit name description version tags platforms lineCount;
     # The parsed body lines (`p.body`), for a gate that has to read the markdown
@@ -112,6 +131,8 @@
     declaredName = declared;
     path = ".agents/skills/${name}";
     bodyHeading = p.bodyFirst |> trim;
+    inherit truthLines truthRefs truthBroken;
+    truthCitesPolicy = truthLines |> lib.any (l: l |> lib.hasInfix "[[flake/policies.nix#");
     # Soft: the schema says these are optional with defaults.
     missing =
       lib.optional (version == "0.0.0") "version"
@@ -141,7 +162,12 @@
     ++ lib.optional (s.lineCount > 400)
     "body: ${s.lineCount |> toString} lines > 400 (move detail to docs/ and keep the skill a router)"
     ++ lib.optional (!(s.bodyHeading |> lib.hasPrefix "# "))
-    "body: does not start with a level-1 heading";
+    "body: does not start with a level-1 heading"
+    ++ lib.optional (s.truthLines == [])
+    "body: no `Truth:` line (SCHEMA §4.6 — prose cites truth, never becomes it)"
+    ++ lib.optional (s.truthLines != [] && s.truthRefs == [] && !s.truthCitesPolicy)
+    "Truth: line names no repo path under modules/, hosts/, flake/, lib/, taskfiles/, scripts/ and no [[flake/policies.nix#id]] citation"
+    ++ map (t: "Truth: `${t}` does not resolve to a tracked path") s.truthBroken;
 
   issues = dirs |> lib.concatMap (n: skills.${n} |> issueFor |> map (m: "${n}: ${m}"));
   warnings = dirs |> lib.concatMap (n: skills.${n}.missing |> map (f: "${n}: missing optional frontmatter '${f}' (defaults applied)"));

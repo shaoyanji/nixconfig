@@ -78,3 +78,5 @@ WSL2 communicates across the Windows interop boundary (`powershell.exe`) with th
   }
 ]
 ```
+
+Truth: `modules/user/ai/skills/default.nix` — the materialization of the module skills; this page is the procedure.

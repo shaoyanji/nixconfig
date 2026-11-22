@@ -585,12 +585,20 @@
   repoRefPrefixes = ["modules/" "hosts/" "flake/" "lib/" "taskfiles/" "scripts/"];
   citedPaths = p:
     p
-    |> builtins.readFile
     |> builtins.split "`"
     |> lib.filter (s: builtins.isString s && (repoRefPrefixes |> lib.any (pre: lib.hasPrefix pre s)));
-  citesTruth = p:
-    (p |> builtins.readFile |> lib.hasInfix "[[flake/policies.nix#")
-    || (citedPaths p |> lib.any (q: root + "/${q}" |> builtins.pathExists));
+  citesTruth = p: let
+    truthText =
+      p
+      |> builtins.readFile
+      |> lib.splitString "\n"
+      |> lib.filter (l: l |> lib.hasPrefix "Truth:")
+      |> lib.concatStringsSep "\n";
+  in
+    truthText
+    != ""
+    && ((truthText |> lib.hasInfix "[[flake/policies.nix#")
+      || (citedPaths truthText |> lib.any (q: root + "/${q |> lib.splitString "#" |> builtins.head}" |> builtins.pathExists)));
   skillName = p: baseNameOf (dirOf (toString p));
   skillsWithoutTruth = skillFiles |> builtins.filter (p: !(citesTruth p)) |> map skillName;
 
@@ -893,10 +901,17 @@
     };
 
     skills-cite-truth = {
-      rule = "A SKILL.md may describe procedure but must point at machine truth: a backticked repo path (`modules/`, `hosts/`, `flake/`, `lib/`, `taskfiles/`, `scripts/`) that exists on disk, or a [[flake/policies.nix#id]] citation. A skill that is the only home of a fact is the fact nobody can check.";
-      proof = "inline code spans and policy citations in every tracked SKILL.md, resolved against the tree";
+      rule = "A SKILL.md may describe procedure but must end on a `Truth:` line naming machine truth: a backticked repo path (`modules/`, `hosts/`, `flake/`, `lib/`, `taskfiles/`, `scripts/`) that exists on disk, or a [[flake/policies.nix#id]] citation. A skill that is the only home of a fact is the fact nobody can check. `lib/skills.nix` gates the same contract in `checks.skills-schema` (line present, every cited path resolves), so this stays the declarative statement when the schema check is the one that runs.";
+      proof = "the `Truth:` line of every tracked SKILL.md, resolved against the tree";
       holds = skillsWithoutTruth == [];
-      detail = "skills citing no resolvable repo path: ${skillsWithoutTruth |> lib.concatStringsSep ", "}";
+      detail = "skills citing no resolvable repo path on their `Truth:` line: ${skillsWithoutTruth |> lib.concatStringsSep ", "}";
+    };
+
+    submissions-are-private-state = {
+      rule = "Application material (packets, JDs, sheets) lives in private state — `~/.local/state/appflow/submissions/<id>` and the delphi DB — never as a tracked `submissions/` tree. The packets carry PII (phone, street address); the pre-commit hook refuses the stage and this predicate refuses the tree, so neither a missing hook nor `git add -f` can land them.";
+      proof = "no tracked submissions/ path in the tree";
+      holds = !(root + "/submissions" |> builtins.pathExists);
+      detail = "tracked files under submissions/ — move them to ~/.local/state/appflow/submissions/<id> and drop them from the index";
     };
 
     paperless-closure-traps = {

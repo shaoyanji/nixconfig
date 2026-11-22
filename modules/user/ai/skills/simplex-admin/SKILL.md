@@ -197,3 +197,5 @@ simplex-chat --server "smp://<FINGERPRINT>@<lan-ip>:5223,<tailnet-ip>:5223"
 The same URI is what a mobile client adds under Settings → Network & Servers →
 SMP Servers. The addresses are the module's options; do not copy them from here.
 
+
+Truth: `modules/user/ai/skills/default.nix` — the materialization of the module skills; this page is the procedure.

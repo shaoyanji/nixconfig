@@ -38,10 +38,10 @@ Beim Umbau entfernt: `letter.json`, `resume.json`, `selection.json`. Beide PDFs 
 
 ## Gemessene Artefakte
 
-| Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
+| Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) | Füllung |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 37598 | 535 | `a91bc48268c8c623` |
-| `anschreiben.pdf` | 1 | 24538 | 357 | `c8692d3ede21dbc6` |
+| `lebenslauf.pdf` | 2 | 37598 | 535 | `a91bc48268c8c623` | 87 % / 85 % |
+| `anschreiben.pdf` | 1 | 24538 | 357 | `c8692d3ede21dbc6` | 71 % |
 
 ## Anforderungsprüfung
 
@@ -62,6 +62,10 @@ Beim Umbau entfernt: `letter.json`, `resume.json`, `selection.json`. Beide PDFs 
 | Führerschein Klasse B | nicht bestätigt | **Offen** |
 | Deutsch C1, Englisch B2 | C1 beziehungsweise Muttersprache | Erfüllt |
 | Personal- und Budgetverantwortung als Perspektive | Budget und Beschaffung im eigenen Betrieb, keine disziplinarische Führung | Teilweise |
+
+## Vertragsform: ein Widerspruch in der Quelle
+
+Die Anzeige beschreibt die Stelle im Fließtext als **unbefristet** und als Nachfolge der IT-Leitung. Im Metadatenblock derselben Anzeige steht dagegen `Befristet bis (Datum) 31.03.2028`. Beides kann nicht gleichzeitig gelten. `lead.md` hält die 2028-Angabe für einen Fehler einer früheren Notiz — belegt ist das nicht; belegt ist nur, dass beide Angaben in derselben Quelle stehen. Vor dem Absenden bei Herrn Gunar Tochtermann (`gunar.tochtermann@fau.de`, +49 9131 8528284) klären, welche gilt: eine unbefristete Nachfolge und eine Befristung bis 2028 sind zwei verschiedene Angebote.
 
 ## Fit-Begründung: 3
 

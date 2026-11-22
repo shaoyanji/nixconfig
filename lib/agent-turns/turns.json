@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:30:47Z",
+  "generated": "2026-11-22T09:32:14Z",
   "count": 200,
-  "pin": "5afbe2895bccb98e4e45c629955a167ea2856302bb26928545f5a1ead811e847",
+  "pin": "907c5deb2fbe7a50669350627d197f861b605c6bb6c214add15745bff0c9b477",
   "turns": [
+    {
+      "id": "27e35aae-f65e-4fac-b52d-146cc3db67ad",
+      "ts": "2026-11-22T09:31:20Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "smartclip upgraded to native Typst packet | 2pp CV + 1pp letter (EN) | fit 3, Prometheus/Grafana gap named",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "54f9bea97d41cad8767c544ea00fc8217ba8e235",
+      "branch": "main",
+      "frame": "03ha6gh7szuv3p9go4eqho53m"
+    },
     {
       "id": "2fbdf835-0824-4e6a-8079-5ef884f816ed",
       "ts": "2026-11-22T09:30:15Z",
@@ -2746,19 +2759,6 @@
       "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
       "branch": "main",
       "frame": "03ha4wi6o4eboxmib3qpg2917"
-    },
-    {
-      "id": "53b43994-33b5-48dc-af72-2d8e57f0feaf",
-      "ts": "2026-11-22T04:40:31Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "done: STACKIT (Senior) Cloud Developer GT4863 emailed to recruiting@mail.schwarz (SAP UI5 form resisted); testo cockpit confirmed; pipeline: 205 applied/4 contacted/3 screening — Materna awaiting scheduling is warmest",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
-      "branch": "main",
-      "frame": "03ha4vo3q44gidd1fxwmr0xpf"
     }
   ]
 }

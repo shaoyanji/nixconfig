@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-22T04:46:42Z",
+  "generated": "2026-11-22T05:06:35Z",
   "count": 200,
-  "pin": "f0671bbc409de7a1ff361d5ccddafd1759759f94b1fbd866a68b2fd24930f6fb",
+  "pin": "8365d88c1b5af77ba07c6131d40efd9399e193713acf7a01f52f3797ecba283d",
   "turns": [
+    {
+      "id": "1467e99e-ceb0-4912-a33b-f517bdc60b59",
+      "ts": "2026-11-22T05:03:04Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: IONOS x2 — Customer Ops Engineer 24/7 (Berlin hybrid, fit5) + Linux Sysadmin Defense Products (Karlsruhe, fit3, BGP gap honest) via Greenhouse + email-OTP | gate: confirmation pages + db-write PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
+      "branch": "main",
+      "frame": "03ha502lc7erqqx2c38ywmlhq"
+    },
+    {
+      "id": "6642f80d-25f9-4aba-ac41-831b9217526b",
+      "ts": "2026-11-22T04:59:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-flix-submit",
+      "action": "landed: drove freebuff pane to apply for Flix Data Platform Engineer on Greenhouse 8690650002 (packet staged at submissions/flix-data-platform-engineer/); pane confirmed working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
+      "branch": "main",
+      "frame": "03ha4zcxs8hiwelhofnlpzgsk"
+    },
+    {
+      "id": "ad075e10-add0-462f-a302-7e74cacbdab8",
+      "ts": "2026-11-22T04:51:50Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: Atruvia DevOps Engineer DSIADI (Oracle CX job 2399, Karlsruhe hybrid) — confirmation + profile shows 'Wird geprüft' | gate: portal-confirmation + db-write PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
+      "branch": "main",
+      "frame": "03ha4xvlya4sl8j8itjtso9o1"
+    },
+    {
+      "id": "369f850b-0429-40ea-ad00-d75acf673e09",
+      "ts": "2026-11-22T04:46:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-flix-packet",
+      "action": "landed: Flix Data Platform Engineer packet - letter.json answers Berlin office-first plainly (Gutach is 7h from Berlin; domestic relocation, permanent residence so no permit), CV 2pp/letter 1pp, selection 5/32 highlights. No application sent. checks:prose fixed (scoreplay 'leverage'); checks:infron fails on dsh dispatch plan, unrelated to a docs-only diff",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "submissions/flix-data-platform-engineer"
+      ],
+      "base_commit": "84b2619cd2b86feb9ab7723273e562790679c9e1",
+      "branch": "main",
+      "frame": "03ha4wx5cqvyfz1q6e8gzkmhw"
+    },
+    {
+      "id": "96407115-e251-44c4-8414-fdb49ab06fce",
+      "ts": "2026-11-22T04:46:45Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: badenova Asset Manager Strom-Dienstleistungen (Umantis 4422, Freiburg 15km) via portal — confirmation page shown, recorded in apps-db | gate: portal-confirmation + db-write PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
+      "branch": "main",
+      "frame": "03ha4wvvqef0xii8phzexkx21"
+    },
     {
       "id": "5f7e689c-9205-4840-a57a-849ae9efb039",
       "ts": "2026-11-22T04:44:48Z",
@@ -2698,74 +2765,6 @@
       "base_commit": "ac97ebf4ef3e8d349f5799dff6507d34d43ee234",
       "branch": "main",
       "frame": "03h9x78o0diudkt03nyea1ncr"
-    },
-    {
-      "id": "99412ccf-ea87-4297-8e16-04157dd4ef53",
-      "ts": "2026-11-21T05:04:51Z",
-      "source": "hermes",
-      "subject": "frieren:xs-turns-recovery",
-      "action": "test post to verify xs-turn endpoint accepts writes from frieren",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "079c2f5abb86c3ecd876800eb225e94f561df606",
-      "branch": "main",
-      "frame": "03h9x74nsir0rlnr5cl8g1u28"
-    },
-    {
-      "id": "f804491d-2ae7-416e-a51c-f39b108004bc",
-      "ts": "2026-11-21T04:59:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-ats-footer",
-      "action": "landed: removed the Lebenslauf provenance line; cv-ats-check PASS on the built packet + 4 site payloads | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow/templates",
-        "docs/cv-ats-compliance.md"
-      ],
-      "files": [],
-      "base_commit": "b4d130bd30cde622abf729b5ef360b4cfdfaf4ac",
-      "branch": "main",
-      "frame": "03h9x74n9zlpe07p6dl0uekgc"
-    },
-    {
-      "id": "60571d7e-6ff4-4fd4-9741-9bc9c8758449",
-      "ts": "2026-11-21T04:59:28Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-ats",
-      "action": "landed: drove freebuff pane default:1.1 to finish the CV ATS-compliance work — verify uncommitted changes with scripts/task/cv-ats-check.sh, commit docs/cv-ats-compliance.md + lebenslauf.typ + strings.json ('ci(cv): drop the Generated line from the Lebenslauf'), push to origin/main",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "079c2f5abb86c3ecd876800eb225e94f561df606",
-      "branch": "main",
-      "frame": "03h9x74mzia532pyllruhmvcm"
-    },
-    {
-      "id": "f8237861-8e35-4928-bfd8-7983ce5c415b",
-      "ts": "2026-11-21T04:54:19Z",
-      "source": "devin",
-      "subject": "fleet-remote:tier2",
-      "action": "landed: PR #7 tier-2 capabilities — clipboard-get/set + mediated screenshot behind per-capability grants | gate: none (no Android SDK on host; APK work paused — compile/tests unrun, on-device verification needed) | caveat: DEVIN_BRIEFING.md was absent from the shared checkout, scope inferred from docs/device-agent.md phasing table (PR4 = tier-2)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "484d45584dd1550f7a0825d03c54b44d568c922b",
-      "branch": "main",
-      "frame": "03h9x74movhppdl8h0x6fxtrq"
-    },
-    {
-      "id": "d0801b07-cd57-445f-ae97-8cec893e59ba",
-      "ts": "2026-11-21T04:51:18Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-fleet-remote",
-      "action": "landed: fleet_remote_pr (Create PR in shaoyanji/fleet-remote per DEVIN_BRIEFING.md; then clean dev env)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "484d45584dd1550f7a0825d03c54b44d568c922b",
-      "branch": "main",
-      "frame": "03h9x74mep3vjyut33gbexgx2"
     }
   ]
 }

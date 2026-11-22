@@ -1,6 +1,7 @@
 # Flix — Data Platform Engineer (m/f/d), Berlin
 
-**Status: packet built, NOT submitted.** 2026-11-22. Nothing sent, no application started.
+**Status: applied 2026-11-22.** Submitted through the Greenhouse form embedded on
+`flix.careers`; confirmed by the `job-success` page and the receipt email below.
 
 Flix is the long-distance bus and train platform (FlixBus, FlixTrain, Greyhound); FlixTech
 is its engineering organisation. The data platform team enables network planning,
@@ -21,6 +22,35 @@ platform engineers, and that this role owns features end to end, including on-ca
 | Compensation | Not published in the posting |
 | Pipeline record | `flix-data-platform-engineer` (category `other`) |
 | Folder | `submissions/flix-data-platform-engineer/` |
+
+## Submission
+
+| Field | Value |
+| :--- | :--- |
+| Submitted | 2026-11-22, 06:03 CET (05:03 UTC) |
+| Confirmation page | `https://flix.careers/job-success` — "Thanks for applying, we'll keep you on track." |
+| Receipt email | `Flix // Your candidacy`, `no-reply@flixbus.com` → `matt@bountystash.com`, 22 Nov 2026 05:03 UTC |
+| Reference code | none issued; Greenhouse sent no security code and no candidate portal was opened |
+| Document sent | `packet/lebenslauf.pdf` (2 pages, sha256 `66068134b75bd5f43534542ab83f8b047f47bd18f2cc21d675b1c1109a80e8f4`) |
+
+Exact answers submitted:
+
+| Form field | Answer |
+| :--- | :--- |
+| First / last name | Matt / Ji |
+| Email | matt@bountystash.com |
+| Phone | +49 1733281570 |
+| Which of these do you have experience with: Kafka, Snowflake, Terraform? | None of the three in production; Nix rather than Terraform, a Postgres ledger and systemd journals rather than Kafka, no warehouse. Named as new tools, with the smaller equivalents built. |
+| Salary expectation (gross per year) | EUR 103,000-110,000, target EUR 105,000 depending on scope |
+| Earliest start | Immediately, available at short notice (matches `lib/matt/profile.de.json`) |
+| Legal right to work? | Yes — German permanent residence |
+| Based in Berlin / open to relocate? | Yes — would relocate for the office-first model, as the letter states |
+| Open to on-call? | Yes |
+| Privacy policy | Accepted (required) |
+
+The letter was **not** uploaded: this form has no cover-letter field, only the three
+free-text questions above. The salutation, relocation paragraph and gap list therefore
+never reached the recruiter — the answers carry the same facts in shorter form.
 
 ## Location and hybrid — the question this packet had to answer
 
@@ -179,9 +209,9 @@ bytes, which is why the hashes above are the ones to compare after any rebuild.
 
 ## Next action
 
-Review this packet and confirm the two things only Matt can settle — that he would
-relocate to Berlin for an office-first role, and the salary number if the form demands
-one — then apply at the URL above (Greenhouse form embedded on `flix.careers`).
+Nothing to send. The application is in; the record is at stage `applied`.
 
-**Nothing is submitted by this record.** It stays at stage `prep` until a real
-application exists.
+Wait for the talent attraction team (recruiter listed on the posting: Yevheniia
+Perederii), then settle these at the first call: hybrid days per week expected, whether
+relocation support exists for a domestic move, whether the 60-day "(M)Anywhere"
+allowance applies, and the band, since the posting publishes none.

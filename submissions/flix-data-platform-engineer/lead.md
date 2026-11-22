@@ -1,6 +1,7 @@
 # Lead — Flix, Data Platform Engineer (m/f/d)
 
-**Stage: prep — packet built 2026-11-22, nothing submitted.** See `submission-sheet.md`.
+**Stage: applied — submitted 2026-11-22 06:03 CET, confirmed on `flix.careers/job-success`
+and by the receipt email `Flix // Your candidacy`.** See `submission-sheet.md`.
 
 | Field | Value |
 | :--- | :--- |
@@ -21,4 +22,4 @@ JD asks 3+ years, which sits below Matt's level; no Spark/Airflow-scale data pla
 
 ## Next action
 
-Packet is built (`packet/lebenslauf.pdf` 2 pages, `packet/anschreiben.pdf` 1 page). The letter answers the Berlin office-first question directly: he is in Gutach im Breisgau, would relocate within Germany, and needs no permit. Confirm that commitment with him, then apply on Greenhouse `8690650002`. Nothing is submitted by this record.
+Submitted on Greenhouse `8690650002` with `packet/lebenslauf.pdf`; the form's own questions answered the Berlin relocation (Yes), right to work (Yes), on-call (Yes), salary (EUR 103,000-110,000) and start date (immediately). It has no cover-letter field, so the letter was not sent — the free-text answers carry its facts. Next: wait for the recruiter, then settle hybrid days, relocation support and the band at the first call.

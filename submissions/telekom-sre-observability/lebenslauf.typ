@@ -6,15 +6,15 @@
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
   #v(1pt)
-  #text(size: 9pt, fill: rgb("#4b5563"))[Betriebstelemetrie, Linux-Plattformen und Zuverlässigkeit]
+  #text(size: 9pt, fill: rgb("#4b5563"))[Systembetrieb und Beobachtung — Linux, NixOS, Automatisierung]
   #v(2pt)
-  #text(size: 8.5pt, fill: rgb("#374151"))[Am Burgerhof 4, 79261 Gutach im Breisgau • matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji]
+  #text(size: 8.5pt, fill: rgb("#374151"))[Am Burgerhof 4, 79261 Gutach im Breisgau • matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji/nixconfig]
 ]
 #v(6pt)
 #line(length: 100%, stroke: 0.5pt + rgb("#d1d5db"))
 
 #v(6pt)
-#text(size: 9pt)[Linux-Systemadministrator mit zehn Jahren Erfahrung in Betrieb, Automatisierung und Telemetrie. Betreibt dreizehn Server über drei Hardware-Generationen als einen deklarativen Zustand: jeder Dienst ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit mit Gate, jeder Stand als Generation rückrollbar. Baute die Betriebstelemetrie selbst, weil es keinen Monitoring-Stack gab: ein Sentinel-Job schreibt Jobstatus, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledger, Gatus prüft Endpunkte, und eine in Go geschriebene Bridge bestätigt eine Alarmzustellung erst, wenn die Nachricht ankommt. Diagnostiziert Störungen aus diesen Daten und den Systemlogs, bevor Nutzende sie melden. Arbeitet an den Linux-Interna — cgroup-Limits, PSI, systemd-Härtung, Namespaces. OpenTelemetry, verteiltes Tracing, Prometheus, Grafana, Loki, AlertManager und Kubernetes sind nicht Teil dieser Erfahrung. Wohnhaft in Baden-Württemberg, Karlsruhe rund anderthalb Stunden entfernt. US-Staatsangehörigkeit mit Niederlassungserlaubnis. Deutsch C1, Englisch Muttersprache.]
+#text(size: 9pt)[Fünf Jahre Betrieb von dreizehn Linux-Hosts aus einer Flake: ein Modul je Dienst, eine Feature-Liste je Host, gepinnte Eingaben, ein Gate vor jedem Rollout. Die Beobachtung dieses Bestands ist selbst gebaut: ein Ledger, das alle fünfzehn Minuten schreibt, Prüfungen von außen, ein Alarmkanal, der erst Erfolg meldet, wenn die Zustellung bestätigt ist, dazu Druck- und Speicherwerte, die vor dem Ausfall auffallen. Rückrollung ist eine Generation, kein Neuaufbau. Regulierte KRITIS-Umgebungen, Prometheus oder Loki im Telekom-Maßstab und OpenTelemetry habe ich nicht betrieben; das steht im Anschreiben.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
   #v(5pt)
@@ -40,47 +40,38 @@
 
 #section("Berufserfahrung")
 #entry("Bountystash — Gründer und alleiniger Betreiber", "2020 – 2025", (
-  "Betrieb dreizehn NixOS-Hosts über drei Hardware-Generationen und mehrere Standorte, von der Beschaffung bis zur Inbetriebnahme",
-  "Baute die Betriebstelemetrie selbst: Sentinel-Job mit Jobstatus, Generation-Alter sowie Disk- und PSI-Druck alle 15 Minuten in ein JSONL-Ledger",
-  "Prüfte Endpunkte mit Gatus und band Alarmierung an eine in Go geschriebene Bridge, die eine Zustellung erst bestätigt, wenn die Nachricht ankommt",
-  "Diagnostizierte Störungen aus Ledger und Systemlogs, bevor Nutzende sie meldeten, und dokumentierte jede Ursache im Runbook",
-  "Hielt Dienste über systemd-Optionen und cgroup-Limits klein und behandelte PSI-Speicherdruck als Messgröße erster Ordnung",
-  "Beschrieb Plattform und Dienste deklarativ in einem Flake: jeder Dienst ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit",
-  "Hielt jeden Stand als Generation und rollte bei Bedarf zurück; prüfte im CI denselben Zustand, der ausgerollt wird",
-  "Konfigurierte Netze und Firewall als Code mit nftables, dazu DNS und ein WireGuard-Tailnet ohne öffentliche Schnittstelle",
-  "Sicherte mit restic auf NAS-Ziele und führte Wiederherstellungen durch statt Sicherungsläufe zu zählen",
-  "Verwaltete Geheimnisse mit sops und age und betrieb eine eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten",
-  "Schrieb Werkzeuge in Shell, Python und Go und dokumentierte jede Prozedur als Runbook",
+  "Dreizehn Linux-Hosts über drei Hardware-Generationen aus einer Flake, ohne von Hand geänderten Zustand auf einer Maschine",
+  "Beobachtung als geschlossene Schleife: Ledger mit Zeitstempel alle fünfzehn Minuten, Prüfungen von außen, Auswertung von Speicher- und Prozessdruck",
+  "Alarmkanal in Go, der eine Störung erst als gemeldet führt, wenn die Zustellung bestätigt ist — ein Alarm ohne Ankunft ist ein falscher Glaube",
+  "Rollout nur über das ausgewertete System, Rückrollung über die vorige Generation",
+  "Netz und Zugang im Code: nftables, WireGuard ohne öffentlichen Listener, eigene Zertifizierungsstelle mit kurzlebigen Zertifikaten",
+  "Werkzeuge in Python und Go für Rollout, Ledger, Auswertung und Dokumentation",
 ))
 #entry("O3 Energy — Asset Manager", "2016 – 2020", (
-  "Betreute Software und IT-Administration für das Unternehmen und seine Tochtergesellschaften",
-  "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen",
+  "Kaufmännische Betreuung von 10 MW Solarleistung und Verantwortung für Software und IT des Unternehmens",
+  "Finanzmodelle und Betriebsdaten als Entscheidungsgrundlage für die Geschäftsführung",
 ))
-#entry("Fraunhofer ISE — Wissenschaftliche Hilfskraft", "2012", (
-  "Band Laborgeräte über C++-Anwendungen an und wertete Messreihen in Python aus",
-  "Forschte zu Heliostat-Ungenauigkeiten mit Interferometrie",
+#entry("Fraunhofer ISE — Wissenschaftlicher Mitarbeiter", "2012", (
+  "Messaufbau über C++-Anwendungen angesteuert und Messreihen in Python ausgewertet",
+  "Untersuchung von Heliostaten-Ungenauigkeiten mit Interferometrie",
+))
+
+#section("Projekte")
+#entry("nixconfig — ein Bestand, einmal beschrieben", "seit 2023", (
+  "Ein Host registriert sich einmal als Feature-Liste; Aufgabenmenü und Dokumentation entstehen aus demselben Graphen",
+  "Zustandsprüfung, Auftragsprotokoll und Agenten-Protokoll laufen auf der Plattform, die sie beobachten",
+  "Veröffentlichen, Ausrollen und Rückrollen sind Aufgaben, keine Eingriffe auf dem Host",
 ))
 
 #section("Ausbildung")
-#entry("Albert-Ludwigs-Universität Freiburg — M.Sc. Erneuerbare-Energien-Management", "2011 – 2014", ("Abschluss 1,8; Modellierung mit neuronalen Netzen",))
-#entry("Colorado School of Mines — B.Sc. Erdöltechnik", "2006 – 2010", ("GPA 3,2",))
-
-#section("Projekte")
-#entry("nixconfig — deklarierte Flotte mit Gates", "seit 2023", (
-  "Ein Modul je Dienst, eine Feature-Liste je Host; ein Gate prüft Module und Assertions vor jedem Ausrollen",
-  "Sentinel-Ledger über Jobstatus, Generation-Alter, Disk- und PSI-Druck, dazu eine Go-Bridge mit Zustellbestätigung",
-  "Dienste hinter einem Tailnet ohne öffentliche Schnittstelle, Zertifikate über die eigene CA",
-))
-#entry("Autarke KI-Plattform auf eigener Hardware", "2024 – 2025", (
-  "Betrieb Modellserver, Router und Weboberfläche auf eigenen Maschinen, ohne Cloud-Abhängigkeit",
-  "Schrieb den Router in Go und isolierte jede Modell-Lane mit eigenen Limits und eigenem Zugang",
-))
+#entry("Albert-Ludwigs-Universität Freiburg — M.Sc. Renewable Energy Management", "2011 – 2014", ("Abschlussnote 1,8; Modellierung mit neuronalen Netzen, Energiewirtschaft, Technikfolgenabschätzung",))
+#entry("Colorado School of Mines — B.Sc. Petroleum Engineering", "2006 – 2010", ("GPA 3,2",))
 
 #section("Kenntnisse")
-#text(weight: "bold")[Telemetrie] — eigenes JSONL-Ledger im 15-Minuten-Takt, Gatus-Prüfungen, Zustellbestätigung, Retention durch Rotation, Auswertung in Go und Python \
-#text(weight: "bold")[Linux-Plattform] — NixOS und Debian-nah, systemd, cgroup-Limits, PSI, Namespaces, reproduzierbare Installation \
-#text(weight: "bold")[Zuverlässigkeit] — Rückrollung je Generation, geprüfte Wiederherstellungen mit restic, Fehlersuche aus Daten und Logs \
-#text(weight: "bold")[Netz und Security] — nftables als Code, DNS, Segmentierung, WireGuard, eigene CA, sops und age \
-#text(weight: "bold")[Automatisierung] — Shell, Python, Go, Git als einzige Quelle, CI-Gates, Runbooks \
-#text(weight: "bold")[Nicht vorhanden] — OpenTelemetry, verteiltes Tracing, Prometheus, Grafana, Loki, AlertManager, Kubernetes \
-#text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · Wohnsitz Baden-Württemberg · US-Staatsangehörigkeit mit Niederlassungserlaubnis
+#text(weight: "bold")[Betrieb] — Linux-Hosts, systemd, cgroups, Namespaces, PSI und Speicherdruck, Boot und Wiederherstellung \
+#text(weight: "bold")[Beobachtung] — Ledger mit Zeitstempel, Gatus-Prüfungen, node_exporter auf einzelnen Hosts, Alarmkanal mit Zustellbestätigung \
+#text(weight: "bold")[Nix] — Flakes, Modulaufbau, gepinnte Eingaben, reproduzierbare Builds, Rückrollung über Generationen \
+#text(weight: "bold")[Automatisierung] — Python, Go, Shell; Gates, Aufgaben, erzeugte Dokumentation \
+#text(weight: "bold")[Sicherheit] — eigene Zertifizierungsstelle, kurzlebige Zertifikate, sops und age je Host \
+#text(weight: "bold")[Nicht vorhanden] — Prometheus, Thanos oder Loki im Maßstab, OpenTelemetry, Kubernetes, KRITIS-Auditierung nach BSIG und IT-Grundschutz \
+#text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · Niederlassungserlaubnis · Fernarbeit aus Deutschland

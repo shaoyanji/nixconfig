@@ -11,7 +11,9 @@
 # Usage:
 #   cloudinary.sh upload FILE [--folder F] [--public-id ID]   -> prints secure_url
 #   cloudinary.sh url PUBLIC_ID [--transform T]               -> prints delivery URL
-#   cloudinary.sh list [--prefix P] [--max N]                 -> prints public ids
+#   cloudinary.sh list [--prefix P] [--max N] [--json]        -> public ids, or one JSON
+#                                                                resource per line
+#                                                                (`public_id,secure_url,bytes,format`)
 #   cloudinary.sh destroy PUBLIC_ID                           -> prints the id it removed
 #
 # The signature is sha1 of the signed-parameter string in alphabetical key order
@@ -108,22 +110,42 @@ case "$cmd" in
   list)
     # A listing is a read on the same account, and the admin API takes basic
     # auth: there is nothing to sign and nothing to spend.
-    prefix=""; max=500
+    prefix=""; max=500; json=0
     while [ $# -gt 0 ]; do
       case "$1" in
         --prefix) prefix=${2:?--prefix needs a value}; shift 2 ;;
         --max) max=${2:?--max needs a value}; shift 2 ;;
+        --json) json=1; shift ;;
         *) echo "cloudinary.sh: unknown argument $1" >&2; exit 2 ;;
       esac
     done
-    out=$(curl -sS --max-time 60 -u "$key:$secret" \
-      "https://api.cloudinary.com/v1_1/$name/resources/image?type=upload&max_results=$max&prefix=$prefix")
-    msg=$(printf '%s' "$out" | jq -r '.error.message // empty' 2>/dev/null || true)
-    if [ -n "$msg" ]; then
-      echo "cloudinary.sh: list refused: $msg" >&2
-      exit 1
-    fi
-    printf '%s' "$out" | jq -r '.resources[]?.public_id'
+    # The listing is paged and the page is large: `printf` into `jq` overflowed the
+    # argument list at 500 resources (2026-11-21), so the body goes to a file and
+    # `next_cursor` is followed until the account is read out in full.
+    tmp=$(mktemp)
+    cursor=""
+    while :; do
+      curl -sS --max-time 60 -u "$key:$secret" \
+        "https://api.cloudinary.com/v1_1/$name/resources/image?type=upload&max_results=$max&prefix=$prefix${cursor:+&next_cursor=$cursor}" \
+        -o "$tmp"
+      msg=$(jq -r '.error.message // empty' "$tmp" 2>/dev/null || true)
+      if [ -n "$msg" ]; then
+        echo "cloudinary.sh: list refused: $msg" >&2
+        rm -f "$tmp"
+        exit 1
+      fi
+      # A manifest row needs the delivery URL, the bytes and the format as well as
+      # the id, and the listing already carries all four: asking once beats a
+      # second call per asset, and `secure_url` is the URL a consumer can fetch.
+      if [ "$json" = "1" ]; then
+        jq -c '.resources[]? | {public_id, secure_url, bytes, format, created_at}' "$tmp"
+      else
+        jq -r '.resources[]?.public_id' "$tmp"
+      fi
+      cursor=$(jq -r '.next_cursor // empty' "$tmp" 2>/dev/null || true)
+      [ -n "$cursor" ] || break
+    done
+    rm -f "$tmp"
     ;;
 
   destroy)

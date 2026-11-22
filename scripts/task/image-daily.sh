@@ -15,6 +15,11 @@
 #   image-daily.sh wallpaper  set the first in-rotation wallpaper with swaybg
 #   image-daily.sh plates     a requested round of photoreal character plates from
 #                             the standing roster lib/image-daily/plates.txt
+#                             (DETACH=1 hands the round to a user unit and returns)
+#   image-daily.sh round      ensure a round is running, then stop; `round status`
+#                             is the readout (journal, rows pending, allowance)
+#   image-daily.sh adopt      add a manifest row for every Cloudinary upload that
+#                             has none — the bank is the account, not this disk
 #   image-daily.sh approve    put a day's kept plates into the wallpaper rotation,
 #                             newest first (idempotent; a rejection still wins)
 #
@@ -794,10 +799,152 @@ deploy_frontend() {
     say "publish: the frontend deploy failed; the manifest is written locally and the site still serves the last one"
 }
 
+# A publish that rebuilds the manifest smaller than what is being served means the
+# tree on this host is a slice of the bank: 2026-11-21 on delphi, 556 assets became
+# 144 with every upload still intact and the gallery lost the rest. Restore the
+# served manifest and stop. `served` and `urls_backup` are locals of cmd_publish.
+publish_shrink_guard() {
+  [ -n "${urls_backup:-}" ] || return 0
+  local now
+  now=$(jq -r '.count // 0' "$IMAGES_ROOT/published/manifest.json" 2>/dev/null || echo 0)
+  [ "$now" -ge "$served" ] && return 0
+  cp -f "$urls_backup" "$IMAGES_ROOT/published/urls.tsv"
+  build_index
+  rm -f "$urls_backup"
+  die "publish refused: this host sees $now asset(s) but $served are being served — publish where IMAGES_ROOT holds the whole bank (frieren: /Volumes/data/pics/generated), or FORCE=1 to shrink on purpose"
+}
+
+# A manifest is a union, not a snapshot. Publishing from a host that holds a slice
+# of the bank rewrote the served gallery down to that slice — 2026-11-21 on delphi,
+# 597 assets became 144 with every upload intact — and refusing the shrink only
+# turned that into a blocked publish. The served manifest is the prior: a row that
+# is already being served names an asset, and `path` is what makes two rows one.
+#
+# The rows on this host win, so a re-upload's URL replaces the old one; a path only
+# the served manifest knows is carried forward untouched. An unreachable manifest
+# leaves the local rows to publish alone, and `publish_shrink_guard` then decides.
+# FORCE=1 skips the merge, because a deliberate purge is the one publish that means
+# to drop assets.
+merge_served_urls() {
+  local rows=$IMAGES_ROOT/published/urls.tsv tmp=$IMAGES_ROOT/published/.served.$$
+  local from=${MERGE_FROM:-https://${PROJECT:-bountystash-assets}.pages.dev/manifest.json}
+  if [ "${FORCE:-0}" = "1" ]; then
+    say "merge: FORCE=1, publishing this host's rows only"
+    return 0
+  fi
+  if [ "${MERGE:-1}" != "1" ]; then
+    say "merge: MERGE=0, publishing this host's rows only"
+    return 0
+  fi
+  [ -s "$rows" ] || return 0
+  if ! curl -fsS --max-time 25 "$from" -o "$tmp.json" 2>/dev/null; then
+    say "merge: $from answered nothing — publishing this host's rows only"
+    rm -f "$tmp.json"
+    return 0
+  fi
+  if ! jq -r '.assets[]? | [.path, .url, ((.bytes // 0) | tostring)] | @tsv' "$tmp.json" >"$tmp.remote" 2>/dev/null; then
+    say "merge: $from is not a manifest — publishing this host's rows only"
+    rm -f "$tmp.json" "$tmp.remote"
+    return 0
+  fi
+  cut -f1 "$rows" >"$tmp.have"
+  awk -F'\t' -v have="$tmp.have" '
+    BEGIN { while ((getline l < have) > 0) seen[l] = 1 }
+    NF >= 2 && !($1 in seen) { print }
+  ' "$tmp.remote" >"$tmp.added"
+  local local_n remote_n total
+  local_n=$(grep -c . "$tmp.have" || true)
+  remote_n=$(grep -c . "$tmp.added" || true)
+  if [ "${remote_n:-0}" -gt 0 ]; then
+    cat "$rows" "$tmp.added" | sort -t"$(printf '\t')" -k1,1 >"$tmp.merged" && mv -f "$tmp.merged" "$rows"
+  fi
+  total=$(grep -c . "$rows" || true)
+  say "merge: ${local_n:-0} local + ${remote_n:-0} from the served manifest = ${total:-0} asset(s)"
+  rm -f "$tmp.json" "$tmp.remote" "$tmp.have" "$tmp.added"
+}
+
+# Cloudinary is the bank. The manifest is a view of the account, not of the disk:
+# an upload with no row is an asset the gallery cannot show, and the ways to get
+# one are ordinary — a publish from a host holding a slice of the tree, or a render
+# written by `images:gen` that no round picked up. Measured 2026-11-21: 796
+# uploads, 195 with no row, 118 of them real plates that nothing could serve.
+#
+# The id is the path without its extension, so the row is derivable both ways, and
+# a badge is addressed by host rather than by day. Adoption never rewrites a row
+# that exists: the URL already being served is the one consumers have.
+adopt_cloudinary() {
+  local rows=$IMAGES_ROOT/published/urls.tsv
+  local list=$IMAGES_ROOT/published/.ids.$$ all=$IMAGES_ROOT/published/.all.$$
+  local add=$IMAGES_ROOT/published/.adopt.$$ have=$IMAGES_ROOT/published/.paths.$$
+  local n=0 added=0
+  [ -s "$rows" ] || return 0
+  if ! bash "$repo/scripts/task/cloudinary.sh" list --prefix "${ADOPT_PREFIX:-assets/}" --json >"$list" 2>"$list.err"; then
+    say "adopt: Cloudinary listing unreadable ($(head -1 "$list.err" 2>/dev/null)); the rows stay the manifest"
+    rm -f "$list" "$list.err"
+    return 0
+  fi
+  rm -f "$list.err"
+  n=$(grep -c . "$list" || true)
+  jq -r '
+    select(.public_id and .secure_url)
+    | (.format // "png") as $fmt
+    | (.public_id | sub("^assets/"; "")) as $rel
+    | ($rel | split("/")) as $parts
+    | ($parts[0]) as $lane
+    | if (($lane == "wall" or $lane == "site" or $lane == "blog") and ($parts | length) > 1) then
+        [$rel + "." + $fmt, .secure_url, ((.bytes // 0) | tostring)] | @tsv
+      elif ($lane == "fleet" and ($parts | length) == 2) then
+        ["badge/" + $parts[1] + "." + $fmt, .secure_url, ((.bytes // 0) | tostring)] | @tsv
+      else empty end
+  ' "$list" >"$all"
+  cut -f1 "$rows" >"$have"
+  # One upload family is deliberately not gallery work: the 2026-11 batch of a
+  # hundred `wallpaper-NNN` generics, made before the roster existed, is a test of
+  # the generator rather than a plate anything asked for. They stay on the account
+  # and out of the manifest; `ADOPT_SKIP=` (empty) adopts everything, and a real
+  # deletion is `images:gc`, not invisibility.
+  local skip=${ADOPT_SKIP-wallpaper-[0-9]+}
+  awk -F'\t' -v have="$have" -v skip="$skip" '
+    BEGIN { while ((getline l < have) > 0) seen[l] = 1 }
+    !($1 in seen) && (skip == "" || $1 !~ skip)
+  ' "$all" >"$add"
+  added=$(grep -c . "$add" || true)
+  if [ "${added:-0}" -gt 0 ] && [ "${DRY:-0}" != "1" ]; then
+    cat "$rows" "$add" | sort -t"$(printf '\t')" -k1,1 >"$rows.merged" && mv -f "$rows.merged" "$rows"
+  fi
+  say "adopt: ${added:-0} upload(s) with no row, out of ${n:-0} on Cloudinary"
+  rm -f "$list" "$all" "$add" "$have"
+}
+
+cmd_adopt() {
+  need jq
+  adopt_cloudinary
+  [ "${DRY:-0}" = "1" ] && { say "dry run: nothing added, nothing built"; return 0; }
+  build_index
+  deploy_frontend
+}
+
 cmd_publish() {
   need jq
   local lane PUBLISH_SHIFTED=0 PUBLISH_GONE=0
-  [ -d "$IMAGES_ROOT/src" ] || die "nothing generated yet under $IMAGES_ROOT/src"
+  # A publish with no local tree is still a publish: the rows are the manifest and
+  # the account completes them. Only an empty manifest beside no ledger is a
+  # publish with nothing to say.
+  if [ ! -d "$IMAGES_ROOT/src" ] && [ ! -s "$IMAGES_ROOT/published/urls.tsv" ]; then
+    die "nothing to publish: no $IMAGES_ROOT/src and no rows in $IMAGES_ROOT/published/urls.tsv"
+  fi
+  # A publish on a host that does not hold the bank rewrites the manifest down to
+  # the batch it can see: 2026-11-21 on delphi, 556 assets became 144 with every
+  # upload still intact. Remember what was being served before staging, and refuse
+  # to shrink it without FORCE=1.
+  local served=0 urls_backup=
+  if [ -f "$IMAGES_ROOT/published/manifest.json" ]; then
+    served=$(jq -r '.count // 0' "$IMAGES_ROOT/published/manifest.json" 2>/dev/null || echo 0)
+  fi
+  if [ -s "$IMAGES_ROOT/published/urls.tsv" ] && [ "${FORCE:-0}" != "1" ]; then
+    urls_backup=$IMAGES_ROOT/published/.urls.served.$$
+    cp -f "$IMAGES_ROOT/published/urls.tsv" "$urls_backup"
+  fi
   for lane in site wall blog badge; do
     [ "$(lane_setting "$lane" publish)" = "true" ] || continue
     stage_publish
@@ -805,8 +952,13 @@ cmd_publish() {
   if [ "$PUBLISH_SHIFTED" -gt 0 ] || [ "$PUBLISH_GONE" -gt 0 ]; then
     say "publish: $PUBLISH_SHIFTED keep row(s) already served under another day, $PUBLISH_GONE with no file left"
   fi
+  # The manifest this host builds is the update; the one being served is the prior,
+  # and the account is the authority both are checked against.
+  merge_served_urls
+  adopt_cloudinary
   build_index
   say "$(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | wc -l) asset(s) staged"
+  publish_shrink_guard
   if [ "${DRY:-0}" = "1" ]; then
     say "dry run: not uploading"
     return 0
@@ -864,6 +1016,7 @@ cmd_publish() {
   rm -f "$restaged" "$known"
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
   build_index
+  publish_shrink_guard
   deploy_frontend
 }
 
@@ -1426,10 +1579,91 @@ cmd_today() {
   printf '  roster      %s row(s) waiting in %s\n' "${pending:-?}" "${roster#"$repo"/}"
 }
 
+# A round is a job, not a call: one plate is about a minute and a closed burst
+# window can add a quarter of an hour. The unit outlives the shell that starts it,
+# and the state file is what a later turn reads instead of a log it must watch.
+launch_round() { # roster
+  local roster=$1 unit stamp state=$IMAGES_ROOT/.round.json
+  command -v systemd-run >/dev/null ||
+    die "systemd-run is required to detach a round (run it in the foreground with DETACH=0)"
+  stamp=$(date +%Y%m%d-%H%M%S)
+  unit=image-plates-$stamp
+  mkdir -p "$IMAGES_ROOT"
+  # The env is passed explicitly: a unit inherits nothing from this shell, and the
+  # RATE_* budget is what decides whether a closed window waits or ends the round.
+  systemd-run --user --unit "$unit" --collect \
+    --setenv=REPO="$repo" --setenv=IMAGES_ROOT="$IMAGES_ROOT" \
+    --setenv=ROSTER="$roster" --setenv=DETACH=0 \
+    --setenv=ONLY="${ONLY:-}" --setenv=MAX_GEN="${MAX_GEN:-0}" \
+    --setenv=SIZE="${SIZE:-1536x1024}" --setenv=FORCE="${FORCE:-0}" \
+    --setenv=PUBLISH="${PUBLISH:-1}" --setenv=APPROVE="${APPROVE:-1}" \
+    --setenv=PAGES="${PAGES:-1}" --setenv=DRY="${DRY:-0}" \
+    --setenv=XS_SUMMARY="${XS_SUMMARY:-1}" \
+    --setenv=RATE_TRIES="${RATE_TRIES:-8}" --setenv=RATE_WAIT="${RATE_WAIT:-300}" \
+    --setenv=RATE_WAIT_MAX="${RATE_WAIT_MAX:-900}" --setenv=RATE_WAIT_TOTAL="${RATE_WAIT_TOTAL:-3600}" \
+    -- bash "$0" plates >/dev/null
+  jq -cn --arg unit "$unit" --arg roster "$roster" \
+    --arg started "$(date -u +%FT%TZ)" --arg pending "$(roster_pending "$roster")" \
+    --arg left "$(remaining || echo 0)" \
+    '{state: "started", unit: $unit, roster: $roster, started: $started,
+      pending: (($pending // "0") | tonumber), left: (($left // "0") | tonumber)}' |
+    tee "$state"
+}
+
+# The no-babysitting entry point: ensure a round is running, then stop. Called
+# twice it reports the round already running instead of starting a second one, and
+# rows that already have a kept plate are skipped, so a stopped round resumes free.
+cmd_round() { # [status]
+  need jq
+  local roster=${ROSTER:-$repo/lib/image-daily/plates.txt}
+  local state=$IMAGES_ROOT/.round.json unit active pending left
+  if [ "${1:-}" = "status" ]; then
+    pending=$(roster_pending "$roster" 2>/dev/null || echo '?')
+    left=$(remaining 2>/dev/null || echo '?')
+    if [ -s "$state" ]; then
+      unit=$(jq -r '.unit // empty' "$state" 2>/dev/null)
+      active=$(systemctl --user is-active "$unit" 2>/dev/null || true)
+      printf 'unit      %s (%s)\n' "$unit" "${active:-unknown}"
+      printf 'roster    %s\n' "$(jq -r '.roster // empty' "$state")"
+      printf 'waiting   %s row(s), %s image(s) left\n' "$pending" "$left"
+      printf 'journal   (last 6)\n'
+      journalctl --user -u "$unit" -n 6 --no-pager -o cat 2>/dev/null | sed 's/^/  /'
+    else
+      printf 'round     none started from this host\n'
+      printf 'waiting   %s row(s), %s image(s) left\n' "$pending" "$left"
+    fi
+    return 0
+  fi
+  if [ -s "$state" ]; then
+    unit=$(jq -r '.unit // empty' "$state" 2>/dev/null)
+    if [ -n "$unit" ] && [ "$(systemctl --user is-active "$unit" 2>/dev/null || true)" = "active" ]; then
+      jq -c --arg pending "$(roster_pending "$roster" 2>/dev/null || echo 0)" \
+        '. + {state: "running", pending: (($pending) | tonumber)}' "$state"
+      return 0
+    fi
+  fi
+  pending=$(roster_pending "$roster" 2>/dev/null || echo 0)
+  left=$(remaining 2>/dev/null || echo 0)
+  if [ "${pending:-0}" -le 0 ]; then
+    jq -cn --arg r "$roster" '{state: "idle", reason: "every roster row has a kept plate", roster: $r}'
+    return 0
+  fi
+  if [ "${left:-0}" -le 0 ]; then
+    jq -cn --argjson p "${pending:-0}" \
+      '{state: "idle", reason: "allowance spent; the rows wait for the reset", pending: $p}'
+    return 0
+  fi
+  launch_round "$roster"
+}
+
 cmd_plates() {
   need jq cpg agy git ffprobe
   local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} def_size=${SIZE:-1536x1024}
   [ -f "$roster" ] || die "no roster at $roster"
+  if [ "${DETACH:-0}" = "1" ]; then
+    launch_round "$roster"
+    return 0
+  fi
   local intent
   intent=$(jq -r '.intents.photoreal // empty' "$BRIEFS")
   [ -n "$intent" ] || die "briefs.json carries no .intents.photoreal"
@@ -1614,10 +1848,12 @@ case "${1:-plan}" in
   blog) shift && cmd_blog "$@" ;;
   wallpaper) cmd_wallpaper ;;
   plates) cmd_plates ;;
+  round) shift && cmd_round "$@" ;;
+  adopt) cmd_adopt ;;
   approve) cmd_approve ;;
   # The day's allowance as a number, for a caller that has to divide it: a slot
   # script splits what is left across the slots still to run. Empty stdout when the
   # pool is unreadable is the one answer here that is not a count.
   remaining) remaining ;;
-  *) die "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|post|gc|blog [--dir PATH]|variants|wallpaper|plates|approve|remaining" ;;
+  *) die "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|adopt|post|gc|blog [--dir PATH]|variants|wallpaper|plates|round [status]|approve|remaining" ;;
 esac

@@ -44,10 +44,41 @@ tasks:
       `<slug>|<prompt>|<expect>` rows, judged against `.intents.photoreal`. A kept
       row is skipped, so a resumed round costs nothing, and the four
       `image-daily-slot-*` timers spend the roster after the lane queue, so nobody
-      starts or watches one. Env: `ONLY=`, `MAX_GEN=`, `FORCE=1`, `DRY=1`,
-      `PUBLISH=0`, `APPROVE=0`, `XS_SUMMARY=0`.
+      starts or watches one.
+
+      `DETACH=1` hands the whole round to a user unit and returns its JSON, which is
+      what `images:queue` does; this task otherwise blocks for the length of the
+      round. Env: `ONLY=`, `MAX_GEN=`, `FORCE=1`, `DRY=1`, `PUBLISH=0`,
+      `APPROVE=0`, `XS_SUMMARY=0`.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" bash scripts/task/image-daily.sh plates
+
+  images:gen:
+    desc: One image from a prompt — JSON with the Cloudinary delivery URL, optionally detached
+    summary: >
+      A prompt in, one JSON object out (`{id,url,prompt,size,path}`) — read the
+      delivery URL with `jq -r .url`. The render is uploaded to Cloudinary as
+      `assets/wall/<day>/<slug>` first, because the CLI's URL is session-gated;
+      `UPLOAD=0` keeps a throwaway local and returns `.session_url`. A failed
+      upload is reported, not fatal — the next publish sends it. The Clerk token
+      is refreshed before the call and once after a 401; a 429 waits the burst
+      window. `DETACH=1` runs under `systemd-run --user` and prints
+      `{unit,log,path}`; `OUT=` overrides `{{.IMAGES_ROOT}}/src/wall/<today>/`.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} PROMPT="{{.PROMPT}}" OUT="{{if .OUT}}{{.OUT}}{{end}}" SIZE="{{if .SIZE}}{{.SIZE}}{{else}}1536x1024{{end}}" DETACH="{{if .DETACH}}{{.DETACH}}{{end}}" bash scripts/task/image-gen.sh
+
+  images:gen:batch:
+    desc: A file of prompts, one image each, uploaded, JSON lines appended to an index
+    summary: >
+      The batch form of `images:gen`: `PROMPTS=` names a file with one prompt per
+      line (`#` skips), and each render is written to `OUTDIR=` (default
+      `{{.IMAGES_ROOT}}/src/wall/<today>`) as `NNN-<slug>.png`, uploaded to
+      Cloudinary, and described by one JSON line appended to `OUTDIR/index.jsonl`. A
+      failing prompt is reported and skipped, so one bad row does not end the file.
+      Detach the whole file with `DETACH=1` through `images:gen` when it should
+      outlive the shell, or use `images:queue` for a roster round.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} PROMPTS="{{.PROMPTS}}" OUTDIR="{{if .OUTDIR}}{{.OUTDIR}}{{end}}" SIZE="{{if .SIZE}}{{.SIZE}}{{else}}1536x1024{{end}}" bash scripts/task/image-gen.sh --batch
 
   images:round:
     desc: "[menu] Round picker (gum) — take the next rows, pick characters, add a custom one"
@@ -108,18 +139,58 @@ tasks:
       - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh blog {{if .DIR}}--dir "{{.DIR}}"{{end}}
 
   images:publish:
-    desc: Stage kept assets and upload them to Cloudinary, recording delivery URLs
+    desc: Stage kept assets, upload them to Cloudinary, and rebuild the manifest from the account
     summary: >
-      Copies every accepted `site`, `wall` and `blog` plate out of the ledger into
+      Copies every accepted `site`/`wall`/`blog` plate into
       `{{.IMAGES_ROOT}}/published/`, uploads each to Cloudinary, writes
-      `published/urls.tsv` (path to delivery URL) and rebuilds `manifest.json` for
-      the frontend Pages serves. The resize is in the URL, so one upload serves the
-      card, the thumbnail and the retina hero.
+      `published/urls.tsv` and rebuilds `manifest.json` for the Cloudflare Pages
+      gallery (GitHub Pages is the docs site). The resize is in the URL:
+      one upload serves card, thumbnail and retina hero.
 
-      A path the manifest already carries is not uploaded again, so a round moves
-      only its new plates; `REUPLOAD=1` forces every staged file back over the wire.
+      The bank is the account, not the disk: publish takes the served manifest
+      as its prior and adds a row for every `assets/*` upload that has none, so
+      a host holding a slice cannot lose the rest. `DRY=1` counts,
+      `FORCE=1` skips both merges for a deliberate purge, `REUPLOAD=1` re-sends.
     cmds:
-      - IMAGES_ROOT={{.IMAGES_ROOT}} REUPLOAD="{{if .REUPLOAD}}{{.REUPLOAD}}{{end}}" bash scripts/task/image-daily.sh publish
+      - IMAGES_ROOT={{.IMAGES_ROOT}} REUPLOAD="{{if .REUPLOAD}}{{.REUPLOAD}}{{end}}" FORCE="{{if .FORCE}}{{.FORCE}}{{end}}" DRY="{{if .DRY}}{{.DRY}}{{end}}" bash scripts/task/images-publish.sh
+
+  images:adopt:
+    desc: Add a manifest row for every Cloudinary upload that has none, then rebuild and deploy
+    summary: >
+      The standalone form of the step every publish runs. Cloudinary is the bank, so
+      the gallery is the set of uploads, not the files on whichever machine ran the
+      last round: this reads the account and writes a row for every
+      `assets/{wall,site,blog,fleet}` id `published/urls.tsv` does not name —
+      `assets/repos/*` (README banners, repo art) is referenced by URL and is
+      deliberately outside the gallery. Rows that exist are never rewritten —
+      the URL already being served is the one consumers have. Idempotent;
+      `DRY=1` counts without writing or deploying.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} DRY="{{if .DRY}}{{.DRY}}{{end}}"{{if .PAGES}} PAGES="{{.PAGES}}"{{end}} bash scripts/task/image-daily.sh adopt
+
+  images:queue:
+    desc: Start a plate round as a background unit and print where it is running
+    summary: >
+      A plate costs about a minute and a closed burst window can add a quarter of an
+      hour, so a round is not something to sit on. This runs the same
+      `image-daily.sh plates` the slot timers run inside a `systemd-run --user` unit
+      that outlives the shell, and prints `{state,unit,pending,left}`. Run it again
+      and it reports the round already running instead of starting a second one;
+      rows that already have a kept plate are skipped, so a stopped round resumes
+      for free and a second round costs nothing. Env: `ROSTER=`, `ONLY=`,
+      `MAX_GEN=`, `SIZE=`.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} ROSTER="{{if .ROSTER}}{{.ROSTER}}{{end}}" ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" SIZE="{{if .SIZE}}{{.SIZE}}{{end}}" bash scripts/task/image-daily.sh round
+
+  images:queue:status:
+    desc: Whether a round is running, its last journal lines, and how many rows still wait
+    summary: >
+      The only thing to poll after `images:queue`: the unit's state, the last six
+      lines it wrote, how many roster rows have no kept plate yet and how much of
+      the day's allowance is left. Read-only, spends nothing, exits 0 whatever it
+      finds so it can be read in a loop.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} ROSTER="{{if .ROSTER}}{{.ROSTER}}{{end}}" bash scripts/task/image-daily.sh round status
 
   images:variants:
     desc: List the superseded renders kept under variants/, and put one back

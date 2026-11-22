@@ -1,7 +1,7 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
-#set page(paper: "a4", margin: (top: 1.5cm, bottom: 1.5cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
-#set par(leading: 0.58em, justify: true)
+#set page(paper: "a4", margin: (top: 1.6cm, bottom: 1.6cm, left: 1.9cm, right: 1.9cm))
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 11.5pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set par(leading: 0.70em, justify: true)
 
 #align(center)[
   #text(size: 19pt, weight: "bold")[Matt Ji]
@@ -17,7 +17,7 @@
 #text(size: 9pt)[Fünf Jahre lang dreizehn Linux-Server allein betreut: Installation, Netz, Dienste, Sicherheitsupdates, Überwachung, Wiederherstellung. Der Zustand jeder Maschine steht in einer Flake und nicht in der Erinnerung des Administrators; ein Rollout läuft über ein Gate, eine Rückkehr zur vorigen Generation dauert Minuten. Wartung ist bei mir automatisiert: Prüfungen, Protokolle, Alarmierung, Sicherungen mit geprüfter Wiederherstellung. In der Forschung habe ich 2012 am Fraunhofer ISE Messaufbau und Auswertung betreut. Debian im Regelbetrieb, Windows-Domänen, VMware und Ansible habe ich nicht verwaltet; das steht im Anschreiben.]
 
 #let section(kind) = block(breakable: false, sticky: true, width: 100%)[
-  #v(5pt)
+  #v(10pt)
   #text(size: 10.5pt, weight: "bold", fill: rgb("#1f2937"))[#kind]
   #v(1pt)
   #line(length: 100%, stroke: 0.4pt + rgb("#e5e7eb"))
@@ -35,7 +35,7 @@
       #for bullet in bullets [- #bullet]
     ]
   ]
-  #v(3pt)
+  #v(7pt)
 ]
 
 #section("Berufserfahrung")

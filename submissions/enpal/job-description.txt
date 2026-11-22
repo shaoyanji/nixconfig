@@ -1,0 +1,51 @@
+Company: Enpal
+Role: Staff Platform Engineer (f/m/d)
+Location: Berlin
+Remote: no
+Posted: 2026-11-16
+Source: arbeitnow
+URL: https://www.arbeitnow.com/jobs/companies/enpal/staff-platform-engineer-berlin-319233
+---
+
+Our goal is to have a solar system on every roof, a storage unit in every house, and an electric car in every garage. Enpal makes this possible with an integrated total solution for decentralized energy—from solar systems and battery storage to wall boxes, smart meters, and heat pumps. At the heart of it all is our AI-powered platform Enpal.One +, which intelligently connects thousands of systems and efficiently optimizes electricity procurement and feed-in on the energy market.
+Are you ready for solutions that are more than just a promise and bring real quality of life to thousands of households every day? What you create at Enpal will deliver clean electricity tomorrow and bring about lasting change in how we use energy.
+Job Description
+As a Staff Platform Engineer, you will provide technical leadership for the internal platform that powers Enpal's applications and services. You will set technical direction, raise the bar on engineering standards, and drive cross-team initiatives that make our platform more reliable, secure, and scalable. You'll partner closely with engineering leadership, senior platform engineers, and development teams, acting as a force multiplier through mentorship, architectural guidance, and hands-on contribution to the platform's hardest problems.
+This role is ideal for engineers who have deep, proven expertise in platform and cloud engineering and want to shape the technical strategy of a growing engineering organization, not just execute within it.
+At Enpal, you would be:
+- Owning platform architecture. Define and evolve the architecture of our internal platform, making build-vs-buy and long-term design decisions that balance reliability, scalability, security, and cost.
+- Driving infrastructure automation at scale. Lead the design of automation and self-service tooling that removes manual toil across deployment, provisioning, and operations for the whole engineering org, not just your own team.
+- Setting technical standards. Establish best practices for Kubernetes operations, CI/CD pipelines, observability, and infrastructure as code, and ensure they are adopted consistently across teams.
+- Elevating the developer experience. Treat the platform as a product for internal teams: drive usability, reliability, and documentation improvements that let engineers ship faster and safer, and define the metrics that prove it.
+- Mentoring and growing engineers. Coach platform and junior engineers, review designs and code, and raise the overall technical level of the team through pairing, documentation, and feedback.
+- Leading complex, cross-team initiatives. Take ownership of high-impact projects that span multiple teams, from scoping and design through rollout, with minimal oversight.
+- Driving continuous improvement. Proactively identify risks, inefficiencies, and technical debt, and lead the changes that materially improve stability, performance, and automation.
+- Partnering across the organization. Work closely with developers, operations, security, and leadership to understand real needs and translate them into platform solutions and roadmap priorities.
+Qualifications
+We are looking for an experienced engineer with deep technical expertise, strong judgment, and a track record of leading platform initiatives.
+- 8+ years of experience in platform, cloud, DevOps, or software engineering roles, including significant time operating production systems at scale.
+- Proven, hands-on expertise with cloud environments and containerized applications (Azure, Kubernetes and more), including designing and operating production-grade clusters.
+- Deep experience with Infrastructure as Code (Terraform), CI/CD tooling, Helm and observability tooling, with the judgment to choose the right approach for a given problem.
+- A demonstrated track record of leading technical initiatives end to end, from design through rollout, across multiple teams.
+- Experience mentoring engineers and raising the technical bar of a team, including through code/design review and documentation.
+- Strong system design skills, with the ability to reason about trade-offs in reliability, scalability, security, and cost.
+- Clear communication skills in English, spoken and written, with the ability to influence stakeholders at multiple levels. Knowledge of German is a plus.
+Nice to Have
+- Experience setting up or scaling platform teams in a fast-growing organization.
+- Deep understanding of monitoring, alerting, and incident response practices, including on-call ownership and postmortems.
+- Contributions to open-source platform or infrastructure tooling.
+- Experience operating in regulated or compliance-sensitive environments (e.g., energy, fintech).
+Are you interested even if you don't meet all the requirements? Apply anyway! We look forward to discovering your potential—regardless of whether your experience meets every single requirement. ☀️
+What we offer
+- Work at Germany's first green unicorn - Play an active role in shaping the solar energy transition.
+- The sun shines all over the world - At Enpal, you'll work with a highly motivated, diverse team of over 65 nationalities.
+- The ideal setup for your focus - We are convinced that excellent results are achieved when the conditions are right. That's why we rely on a hybrid working concept that gives you the freedom to always work in the way that best suits your tasks. Do you need new inspiration on an international level? With Workflex, we offer you the opportunity to relocate abroad for up to 30 days a year, depending on your responsibilities.
+- Grown-up business & startup spirit - In our modern office in Berlin-Friedrichshain, you'll find everything your heart desires, from height-adjustable desks and table tennis to stocked beverage fridges and barista coffee.
+- Your kick-start at Enpal - Onboarding day with a welcome bag, buddy program, and a team that really supports you.
+- Stay up to date & help shape the future - Transparent all-hands meetings, short decision-making processes, and an open feedback culture - without mistakes, there is no progress.
+- The energy transition can only be achieved together - At Enpal, you can expect legendary team spirit and unforgettable team events.
+- Your extra boost - 29 vacation days + one additional day off on Christmas Eve and New Year's Eve, discounted membership at Wellhub, and corporate benefits. Everything you need to help you achieve a good work-life balance.
+- Investing in your future – We don’t just think sustainably when it comes to energy, but also when it comes to you. Take advantage of our company pension scheme to build a solid foundation for your future, step by step.
+- Make your home smart – Sustainability starts at your doorstep. As part of our team, you’ll benefit from a permanent 25% discount on the entire Bosch Smart Home product range – for an even more efficient and connected home.
+At Enpal, we are proud of the diversity of our team. No decisions are made on the basis of skin colour, religion or religious belief, ethnic or national origin, nationality, gender identity, sexual orientation, disability or age, either during recruitment or employment. Enpal stands for a safe workplace and takes action against discrimination and harassment of any kind.
+Find Jobs in Germany on Arbeitnow

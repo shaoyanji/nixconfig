@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T10:09:53Z",
+  "generated": "2026-11-22T10:12:07Z",
   "count": 200,
-  "pin": "3b16e5add4c36e4f6f91b6d50038d1bf407dc1e604501c5f387f08c05585e0b9",
+  "pin": "d4f093b70869fa2cf203155bd27c897bf2ffb47a792de72cfea8fa2dc1268fc1",
   "turns": [
+    {
+      "id": "2c155fec-bc3a-45b9-8a98-15e1ead08997",
+      "ts": "2026-11-22T10:11:18Z",
+      "source": "devin",
+      "subject": "nixconfig:canonical-sre",
+      "action": "claim: Greenhouse submission 3029798",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f70555f7c22a47fb8d5fbb66315584c5be938342",
+      "branch": "main",
+      "frame": "03ha6oabezud0jex62zoo0sji"
+    },
+    {
+      "id": "de6899b0-c251-47e6-8054-aff2f68ded8d",
+      "ts": "2026-11-22T10:11:16Z",
+      "source": "freebuff",
+      "subject": "nixconfig:trawa",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); fit 4 (AWS/Terraform absent)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "24ef390659f43933fb39c728be1a579128c8cb34",
+      "branch": "main",
+      "frame": "03ha6oa0g9dt2m2j77pdkaerl"
+    },
+    {
+      "id": "d122aff8-0b0b-4c8a-8a01-96ec337233e7",
+      "ts": "2026-11-22T10:10:05Z",
+      "source": "devin",
+      "subject": "nixconfig:flox",
+      "action": "interactive recaptcha image grid at submit | form+files complete | sibling record claims prior apply same req",
+      "outcome": "blocked: recaptcha-image",
+      "claims": [],
+      "files": [],
+      "base_commit": "f70555f7c22a47fb8d5fbb66315584c5be938342",
+      "branch": "main",
+      "frame": "03ha6o1p3mwkmrcxf4im85kyw"
+    },
+    {
+      "id": "50b42b0b-a78c-488d-bd24-ff2fe2c1c3ca",
+      "ts": "2026-11-22T10:09:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:adyen-platform-observability",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f70555f7c22a47fb8d5fbb66315584c5be938342",
+      "branch": "main",
+      "frame": "03ha6o0ln915o6larlb0myucs"
+    },
     {
       "id": "130215d7-f804-49f3-9d21-d9a263a3ac91",
       "ts": "2026-11-22T10:09:12Z",
@@ -2640,64 +2692,6 @@
       "base_commit": "d245f3ab4c0096234ce12bf559b2f6d387cc1661",
       "branch": "main",
       "frame": "03ha5s2yjd5a24c13oipdl7ip"
-    },
-    {
-      "id": "e6af60a8-69e9-40b7-9e32-3c2a586fd882",
-      "ts": "2026-11-22T07:24:20Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-ionos-nre",
-      "action": "landed: IONOS Staff NRE Karlsruhe (4971782101) packet in submissions/ionos-staff-nre. Live JD + all 15 Greenhouse questions fetched via API; sheet answers them. German CV 2pp, letter 1pp, ask 120k, SUE2 consent flagged (US citizen). Letter names gaps: no BGP/OSPF/EVPN, Juniper/Cisco, Ansible, GitLab CI, no DC fabric. Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/ionos-staff-nre"
-      ],
-      "base_commit": "bf13d1744f2fa3c689c17cc394abc33bc5e7781c",
-      "branch": "main",
-      "frame": "03ha5ro24wtxacevteb3393h1"
-    },
-    {
-      "id": "4c2c68e0-a8f1-41dd-9300-95469b27707b",
-      "ts": "2026-11-22T07:22:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-bechtle-devops",
-      "action": "landed: Bechtle DevOps packet (JD, 2-page CV, 1-page letter, submission sheet) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [
-        "submissions/bechtle-devops"
-      ],
-      "files": [],
-      "base_commit": "f6252f84bb50cfa4490763a1ecfd047a5f1e6351",
-      "branch": "main",
-      "frame": "03ha5r7n1j43q7h0t1n024lpb"
-    },
-    {
-      "id": "fe097975-51c5-4dde-8e81-da15e93edaa6",
-      "ts": "2026-11-22T07:21:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward:default:2.1",
-      "action": "drove idle pane default:2.1 (devin lane); routed via jevdecide host-change p=0.92 margin=0.87 (mail-atlas refactor area); task text pasted into input box via load-buffer+paste-buffer+Enter; pane was not idle - it resumed its Nebius job-hunt application (live Thinking counter, agent-browser tool lines), so the routed mail-atlas task awaits the next clean prompt to submit",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "af3c86bae95330e0285c65fd0a1b6ec1f9ef8e81",
-      "branch": "main",
-      "frame": "03ha5r5x70u8larrus4wct501"
-    },
-    {
-      "id": "27fed311-867e-443b-8669-72d6b043e83d",
-      "ts": "2026-11-22T07:20:39Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-ionos-sre",
-      "action": "landed: IONOS SRE packet in submissions/ionos-sre (German CV 2pp, letter 1pp) + prose fix in the SVA container sheet. FINDING: req 4956693101 is CLOSED - absent from both live boards (ionos2 60, ionos 49), careers 404, page redirects to ?error=true; sheet names live alt 4971782101 (Karlsruhe). Gates: prose PASS, pdfinfo 2/1",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/ionos-sre submissions/sva-container"
-      ],
-      "base_commit": "af3c86bae95330e0285c65fd0a1b6ec1f9ef8e81",
-      "branch": "main",
-      "frame": "03ha5qy5hxmmk87cniff5xzux"
     }
   ]
 }

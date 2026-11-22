@@ -1,0 +1,29 @@
+Senior LINUX DevOps Engineer (m/f/d)
+A3M Global Monitoring GmbH, Hamburg (Schopenstehl 20); Remote-Arbeit aus ganz Deutschland moeglich
+Vollzeit, 40 Stunden, unbefristet; Eintritt zum naechstmoeglichen Termin
+Quelle: https://a3mglobe.com/en/careers/senior-linux-devops-engineer-m-f-d
+
+A3M entwickelt und betreibt Fruehwarn-, Informations- und Kommunikationssysteme fuer professionelles
+Krisenmanagement. Das Produkt heisst Global Monitoring. Das Team ist klein, produktiv und ueber Hamburg, Verona,
+London und Auckland verteilt.
+
+Aufgaben
+
+* Administration, Wartung und Haertung der Linux-Serverlandschaft
+* Erweiterung und Optimierung der Netzwerk-Infrastruktur
+* Planung und Umsetzung strategischer Infrastruktur-Upgrades
+* Aufbau und Pflege automatisierter Deployment- und Delivery-Prozesse (CI/CD)
+* Monitoring, Alerting und Incident Response
+* Beitrag zur ISO-27001-konformen Betriebsfuehrung
+
+Profil
+
+* Abgeschlossenes Hochschulstudium der Informatik oder vergleichbare Ausbildung, alternativ entsprechende Erfahrung
+* Sehr gute analytische Faehigkeiten, effiziente Loesung komplexer Probleme
+* Proaktive, selbstaendige Arbeitsweise mit Eigeninitiative
+* Teamfaehigkeit in einem internationalen, verteilten Team
+
+Angebot
+
+Flexible Arbeitszeiten, Homeoffice selbstverstaendlich, 30 Urlaubstage, faire Verguetung, betriebliche
+Altersvorsorge, Rabatte ueber die DRV im Tourismus, Arbeitsgeraet nach Bedarf.

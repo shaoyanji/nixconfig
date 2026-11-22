@@ -1,0 +1,27 @@
+(Senior) Site Reliability Engineer (m/w/d)
+Kiwigrid GmbH, Dresden, Vollzeit, Festanstellung, Home Office moeglich
+Quelle: https://kiwigrid.jobs.personio.de/job/36748
+Verwandte Ausschreibungen: ITsax 273242, Empfehlungsbund 273242
+
+KiwiOS ist die IoT-Plattform fuer die dezentrale Energiewelt: Solar, Speicher, Ladeinfrastruktur. Das SRE-Team
+haelt sie rund um die Uhr verfuegbar.
+
+Aufgaben
+
+* Monitoring und Incident Management: Dienste mit den noetigen Metriken ausstatten, Stoerungen dauerhaft
+  erkennen, im Incident gemeinsam mit den Entwicklungsteams in der Google Cloud debuggen
+* Automatisierung und Skalierbarkeit: wiederkehrende Aufgaben identifizieren und automatisieren, Managed
+  Services aus der Google Cloud empfehlen und einbringen, Deployment-Prozess weiterentwickeln
+* Dokumentation und Knowledge-Sharing: Dokumentation der Entwicklungsteams so aufbereiten, dass Stack und
+  Request-Flows nachvollziehbar sind, Best Practices aus dem SRE-Team in die Teams tragen
+* Incident Response und Rufbereitschaft: Incident-Response-Aktivitaeten leiten, an der regelmaessigen
+  Rufbereitschaft teilnehmen
+
+Profil (aus der Ausschreibung und den Spiegelungen)
+
+* Mehrjaehrige Erfahrung in SRE- oder Plattformbetrieb, Betrieb von Cloud-Infrastruktur
+* Google Cloud, Automatisierung, Monitoring, Incident Response
+* Zusammenarbeit mit Entwicklungsteams, Standardisierung, Dokumentation
+* Deutsch und Englisch im Team
+
+Bewerbung ausschliesslich ueber das Personio-Karriereportal von Kiwigrid.

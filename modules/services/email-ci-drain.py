@@ -5,8 +5,8 @@
 name: 237 open and zero resolved on delphi, while the runs themselves live in
 GitHub. Two rules close the ones that cannot need a person:
 
-  * staleness — a notice older than `--days` is resolved; a two-week-old run
-    notice is a historical record, and the CI system already told GitHub.
+  * staleness — a notice older than `--days` is resolved; a week-old run notice
+    is a historical record, and the CI system already told GitHub.
   * supersession — when several notices name the same repo and workflow, only
     the newest stays; the earlier ones describe a state that has been replaced.
 
@@ -15,7 +15,9 @@ Writes go through the archive API (`POST /api/triage-resolve`), so the mail stay
 archived and only its verdict is closed.
 
 The report is for an agent: counts plus a five-row sample, not 237 message ids.
-`--full` adds every closed id when something needs to inspect them.
+`--full` adds every closed id when something needs to inspect them. A run that
+closes nothing says so with its window and the oldest notice, so a healthy queue
+cannot read as a wedged job.
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 OWNER = "agent:ci"
 SUBJECT = re.compile(r"^(?:\[(?P<repo>[^\]]{1,80})\]\s*)?(?P<rest>.+)$")
@@ -47,6 +49,16 @@ def post(url: str, payload: dict, timeout: float = 30.0) -> None:
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         response.read()
+
+
+def age_days(row: dict) -> float | None:
+    """Age of a notice in days, from the mail's own timestamp."""
+    sent = (row.get("sentAt") or "")[:19]
+    try:
+        when = datetime.fromisoformat(sent).replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+    return (datetime.now(timezone.utc) - when).total_seconds() / 86400.0
 
 
 def key_of(subject: str) -> tuple[str, str]:
@@ -72,7 +84,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--api", default="http://127.0.0.1:8080")
     parser.add_argument("--limit", type=int, default=1000)
-    parser.add_argument("--days", type=int, default=14, help="age after which a notice is stale")
+    parser.add_argument("--days", type=int, default=7, help="age after which a notice is stale")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true", help="structured output (pipe through toon -e)")
     parser.add_argument("--full", action="store_true", help="list every closed message, not a sample")
@@ -85,7 +97,6 @@ def main() -> int:
         print(json.dumps({"open": 0, "resolved": 0}) if args.json else "ci drain: nothing in the queue")
         return 0
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=args.days)
     groups: dict[tuple[str, str], list[dict]] = {}
     for row in rows:
         groups.setdefault(key_of(row.get("subject") or ""), []).append(row)
@@ -95,10 +106,8 @@ def main() -> int:
         group.sort(key=lambda row: row.get("sentAt") or "", reverse=True)
         for index, row in enumerate(group):
             sent = (row.get("sentAt") or "")[:19]
-            try:
-                age_ok = datetime.fromisoformat(sent).replace(tzinfo=timezone.utc) < cutoff
-            except ValueError:
-                age_ok = False
+            age = age_days(row)
+            age_ok = age is not None and age > args.days
             superseded = index > 0
             if not (age_ok or superseded):
                 continue
@@ -125,10 +134,14 @@ def main() -> int:
 
     if args.json:
         print(json.dumps(payload, ensure_ascii=False))
-    else:
+    elif resolved:
         state = "would close" if args.dry_run else "closed"
-        reasons = ", ".join(f"{k} {v}" for k, v in sorted(payload["by_reason"].items())) or "none"
-        print(f"ci drain: {len(rows)} open, {state} {len(resolved)} ({reasons})")
+        reasons = ", ".join(f"{k} {v}" for k, v in sorted(payload["by_reason"].items()))
+        print(f"ci drain: {len(rows)} open, {state} {len(resolved)} ({reasons}; window {args.days}d)")
+    else:
+        oldest = max((age for age in (age_days(row) for row in rows) if age is not None), default=None)
+        seen = f"{oldest:.1f}d" if oldest is not None else "unknown age"
+        print(f"ci drain: {len(rows)} open, nothing to close (oldest {seen}, window {args.days}d)")
     return 0
 
 

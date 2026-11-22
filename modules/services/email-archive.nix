@@ -312,7 +312,7 @@
         # Judging and draining are the same hour's work: the classifier fills the
         # queues, this closes the CI notices no person will ever read. Prefixed
         # `-`: a drain that cannot reach the API must not mark the classifier red.
-        ExecStartPost = "-${ciDrain}/bin/email-archive-ci-drain";
+        ExecStartPost = "-${ciDrain}/bin/email-archive-ci-drain --days 7";
         StateDirectory = "email-archive-triage";
         User = "root";
         NoNewPrivileges = true;

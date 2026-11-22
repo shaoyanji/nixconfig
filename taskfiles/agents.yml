@@ -686,14 +686,14 @@ tasks:
         fi
 
   agents:ci:drain:
-    desc: "Close CI notices that are stale or superseded by a newer one (TOON; FORMAT=text for a person, FULL=1 for every id, DRY=1, DAYS=14)"
+    desc: "Close CI notices that are stale or superseded by a newer one (TOON; FORMAT=text for a person, FULL=1 for every id, DRY=1, DAYS=7)"
     summary: >
       The queue's drainer, also run as the triage unit's ExecStartPost. A notice
       older than DAYS is stale; within a repo+workflow group only the newest
       survives, because the earlier ones describe a replaced state. Output is a
       count plus five rows — a 237-id list is not a report.
     vars:
-      DAYS: '{{.DAYS | default "14"}}'
+      DAYS: '{{.DAYS | default "7"}}'
       DRY: '{{.DRY | default "0"}}'
       FORMAT: '{{.FORMAT | default "toon"}}'
       FULL: '{{.FULL | default "0"}}'

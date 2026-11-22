@@ -1,6 +1,7 @@
 ---
 name: nixos-deploy
 version: 0.1.0
+platforms: [linux]
 description: "Rebuild and activate a NixOS configuration on Eisen (or any fleet host) over SSH — the systemd-run detachment, done-file polling, and the polkit activation workaround. Encodes the traps: no pgrep, no nohup, no direct activation over SSH."
 tags: [nixos, deploy, ssh, rebuild, activation]
 ---

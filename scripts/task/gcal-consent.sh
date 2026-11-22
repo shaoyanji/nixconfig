@@ -55,7 +55,10 @@ pick_port() {
   python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()'
 }
 cdp_port="$(pick_port)"
-trap 'kill "${browser:-}" 2>/dev/null || true; rm -rf "$work"' EXIT
+# The browser pid alone is not enough: under xvfb-run the wrapper dies but the
+# X server and chromium children can outlive it. The cdp port is in every
+# child's argv, so it is the reliable handle for the whole tree.
+trap 'kill "${browser:-}" 2>/dev/null || true; pkill -f "remote-debugging-port=$cdp_port" 2>/dev/null || true; rm -rf "$work"' EXIT
 
 cat >"$work/drive.mjs" <<'JS'
 import fs from "node:fs";
@@ -75,7 +78,10 @@ const totp = () => {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function pageTarget() {
-  for (let i = 0; i < 200; i++) {
+  // A cold `nix shell nixpkgs#xvfb-run` resolution can take a minute on a slow
+  // cache before chromium even starts; 30s was measured too short (frieren,
+  // 2026-11-22 — chromium was up at ~45s, the driver had already thrown).
+  for (let i = 0; i < 600; i++) {
     try {
       const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
       const page = list.find((t) => t.type === "page" && t.webSocketDebuggerUrl);
@@ -284,13 +290,24 @@ if [ -L "$profile/SingletonLock" ]; then
   fi
 fi
 
-if command -v xvfb-run >/dev/null 2>&1; then
+# Prefer a display that already answers: on a host with a live Xvfb/X session
+# chromium needs no wrapper at all — one process, one pid, killable. xvfb-run
+# (or the nix-shell copy of it) is the fallback, and the nix path gets a warm
+# run first so the store copy is done before the browser launch is timed.
+if [ -n "${DISPLAY:-}" ] && command -v xdpyinfo >/dev/null 2>&1 && xdpyinfo -display "$DISPLAY" >/dev/null 2>&1; then
+  launch=("$chromium")
+  echo "gcal-consent: using live display $DISPLAY (no xvfb)" >&2
+elif [ -n "${DISPLAY:-}" ] && [ -e "/tmp/.X11-unix/X${DISPLAY#:}" ]; then
+  launch=("$chromium")
+  echo "gcal-consent: using display socket $DISPLAY (no xdpyinfo to confirm)" >&2
+elif command -v xvfb-run >/dev/null 2>&1; then
   launch=(xvfb-run -a "$chromium")
 else
+  nix shell --option builders "" nixpkgs#xvfb-run -c true >/dev/null 2>&1 || true
   launch=(nix shell --option builders "" nixpkgs#xvfb-run -c xvfb-run -a "$chromium")
 fi
 
-echo "gcal-consent: chromium under xvfb, profile $profile, cdp :$cdp_port"
+echo "gcal-consent: chromium launch, profile $profile, cdp :$cdp_port"
 "${launch[@]}" \
   --user-data-dir="$profile" \
   --no-first-run --no-default-browser-check --disable-gpu --disable-sync \

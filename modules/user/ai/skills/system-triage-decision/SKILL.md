@@ -1,6 +1,8 @@
 ---
 name: system-triage-decision
 description: Autonomous system triage and architectural handover prioritization powered by System One decision models (Julia-1 and Laya). Evaluates SYSTEM.md and HANDOFF.md with calibrated confidence scoring, TIER 1/2 categorization, and threshold-gated remediation routing.
+version: 0.1.0
+platforms: [linux]
 ---
 
 # System triage decision (System One AI decision models)

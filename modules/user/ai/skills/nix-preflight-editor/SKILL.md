@@ -1,6 +1,8 @@
 ---
 name: nix-preflight-editor
 description: Precision editor and preflight syntax validator for Nix files. Verifies AST syntax with nix-instantiate --parse, inspects multi-anchor line context before edits, and guards against Nix multiline string delimiter ('') traps.
+version: 0.1.0
+platforms: [linux]
 ---
 
 # Nix preflight editor

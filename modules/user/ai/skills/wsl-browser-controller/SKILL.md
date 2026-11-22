@@ -3,6 +3,8 @@ name: wsl-browser-controller
 description: >-
   Inspect and control active Windows browsers (Google Chrome, Microsoft Edge) directly from WSL2 using Windows UI Automation.
   Enumerate open tabs, inspect active tab, switch tabs, open URLs, and close tabs without requiring browser flags or remote debugging ports.
+version: 0.1.0
+platforms: [linux]
 ---
 
 # WSL browser controller skill

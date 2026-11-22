@@ -12,10 +12,10 @@
     ".agents/skills/apisfreellm/SKILL.md" = 145;
     ".agents/skills/apps/SKILL.md" = 57;
     ".agents/skills/atuin/SKILL.md" = 155;
-    ".agents/skills/bountystash/SKILL.md" = 72;
+    ".agents/skills/bountystash/SKILL.md" = 73;
     ".agents/skills/brainstorm/SKILL.md" = 81;
     ".agents/skills/burgernas/SKILL.md" = 114;
-    ".agents/skills/calendar/SKILL.md" = 205;
+    ".agents/skills/calendar/SKILL.md" = 221;
     ".agents/skills/checks/SKILL.md" = 80;
     ".agents/skills/codespace/SKILL.md" = 99;
     ".agents/skills/confirm-before-destructive/SKILL.md" = 45;

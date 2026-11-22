@@ -49,8 +49,8 @@ fi
 
 refresh="$(jq -r '.refresh_token // empty' "$token")"
 if [ -z "$refresh" ]; then
-  echo "gcal-check: FAIL the token file has no refresh_token — re-consent with" >&2
-  echo "  .agents/skills/calendar/scripts/calendar-auth.sh auth --force" >&2
+  echo "gcal-check: FAIL the token file has no refresh_token — recover with" >&2
+  echo "  .agents/skills/calendar/scripts/calendar-auth.sh fetch   # peer token, no browser" >&2
   exit 1
 fi
 
@@ -87,7 +87,7 @@ PY
     exit 1
   fi
   echo "gcal-check: FAIL invalid_grant — the refresh token is dead; sync cannot work" >&2
-  echo "  re-consent: .agents/skills/calendar/scripts/calendar-auth.sh auth --force" >&2
+  echo "  recover: .agents/skills/calendar/scripts/calendar-auth.sh fetch   # pulls a live peer token first, consent only if none" >&2
   if [ "$kind" = "time-based" ]; then
     echo "  this grant is time-based (refresh_token_expires_in set): pick permanent access this time" >&2
   fi

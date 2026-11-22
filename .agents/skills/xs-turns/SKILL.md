@@ -29,7 +29,7 @@ task agents:xs:list SUBJECT=nixconfig:<task-id> CLAIM='taskfiles/agents.yml,scri
 live claims, then a verdict. **Exit 1 is the collision**: someone is
 `in_progress` on your subject, or a live entry claims an area that overlaps
 `CLAIM` (either direction contains the other, so `scripts/task` matches a claim on
-`scripts/task/x.sh`). Stop and report it; do not start a parallel edit. With only
+`scripts/task/xs-turn-post.sh`). Stop and report it; do not start a parallel edit. With only
 `REPO` it lists and says so; it does not fail on other people's work.
 
 Liveness is per subject and decided by the NEWEST entry: an `in_progress` that a

@@ -30,5 +30,5 @@ there is never a reason to prefer it. Three wrappers are not aliases:
 Resolve any of them to its target with `task --list-all --json | jq` rather than
 trusting this table; the file is the contract.
 
-Truth: `taskfiles/services.yml` and `taskfiles/services-legacy.yml` — the
+Truth: `taskfiles/services-core.yml` and `taskfiles/services-legacy.yml` — the
 executable contract; this page is the procedure.

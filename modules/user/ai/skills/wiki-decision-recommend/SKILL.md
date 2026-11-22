@@ -1,6 +1,8 @@
 ---
 name: wiki-decision-recommend
 description: Offline article and technical manual recommendations powered by System One decision models (Julia-1 and Laya) linked to Kiwix offline knowledge bases. Classifies technical incidents and gates article retrieval based on calibrated confidence thresholds.
+version: 0.1.0
+platforms: [linux]
 ---
 
 # Wiki decision recommender

@@ -39,7 +39,7 @@ Run validation and health checks for host configs and Nix code quality.
 
 ## Three verbs over one table
 
-`taskfiles/checks.toml` is the inventory of gates: one row per `checks:*` task and
+`taskfiles/checks.yml` is the inventory of gates: one row per `checks:*` task and
 its kind — `leaf` (no input), `host` (one host), `cache` (asks a substituter).
 The command, description and summary stay in the taskfile; the table owns only
 the kind, which is the fact a taskfile cannot express.

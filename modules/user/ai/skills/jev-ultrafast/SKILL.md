@@ -5,6 +5,8 @@ description: >-
   Indexes page DOM controls into a structured action space and predicts next actions in a single network round-trip.
   Drives Windows Chrome.exe directly across the WSL2 boundary without requiring Chromium in Nix.
   Use when the user requests ultrafast browser automation, rapid form filling, or quick web goal navigation.
+version: 0.1.0
+platforms: [linux]
 ---
 
 # Jev ultrafast browser skill

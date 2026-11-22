@@ -1,7 +1,7 @@
 ---
 name: calendar
-description: "Google → vdirsyncer → khal → notification. scripts/calendar-auth.sh runs the one-time OAuth consent (ssh -L, not a funnel) and a verify that reports what khal really sees; covers the token gate and DMS toasts."
-version: 0.2.0
+description: "Google → vdirsyncer → khal → notification. scripts/calendar-auth.sh fetch pulls a live OAuth token from a fleet peer (one shot, no browser); consent is the fallback. Covers the token gate and DMS toasts."
+version: 0.3.0
 platforms: [linux]
 metadata:
   hermes:
@@ -55,18 +55,30 @@ explicitly: `khal list -a personal today 7d`. khal only sees what vdirsyncer las
 wrote — `vdirsyncer sync calendar_radicale` is the immediate form (the pair is
 `calendar_<account>`: home-manager's naming, not the account's).
 
-## The two commands
+## The commands
 
 ```bash
-scripts/calendar-auth.sh            # first sync: discover, wait for consent, sync, read back
+scripts/calendar-auth.sh fetch      # pull a live token from a fleet peer — one shot, no browser
 scripts/calendar-auth.sh verify     # sync now, then show what khal can see
+scripts/calendar-auth.sh auth       # fetch first; interactive consent only when no peer answers
 task checks:gcal                    # is the credential alive? one token exchange, no calendar traffic
 ```
 
-The consent step is the reason this is a script: `vdirsyncer discover` keeps its
-callback server alive **only while it runs**, so the browser step has to happen
-inside that window, and the token file appearing is the success signal — not the
-process exit code.
+**A dead token is a fetch, not a consent.** A refresh token binds to the OAuth
+client, not the host, and the client pair is the same sops plane fleet-wide —
+so a token minted on any host refreshes on every host. `fetch` asks each host
+in `CAL_TOKEN_PEERS` (default `devji@delphi.bountystash.com`, the door that
+answers unattended: tailnet names demand a Tailscale-SSH browser check) for
+`~/.config/vdirsyncer/google_token` over BatchMode ssh, installs it 0600, runs
+collection discovery and `verify`. `auth` runs it first, always; consent only
+starts when every peer is empty. frieren lost its token to `invalid_grant` on
+2026-11-22 and was syncing again ~2s after `fetch`, where the browser driver
+could not even reach Google sign-in.
+
+The consent step is the reason a script remains at all: `vdirsyncer discover`
+keeps its callback server alive **only while it runs**, so the browser step has
+to happen inside that window, and the token file appearing is the success
+signal — not the process exit code.
 
 **The callback is `http://127.0.0.1:<port>` on the host** — `vdirsyncer` dynamically
 binds to an ephemeral port (note: `8080` is occupied by `pihole-FTL` on frieren).
@@ -179,9 +191,10 @@ window in the subject. Draft with `himalaya message write`; nothing here sends.
   (`caldav.googleapis.com`); the OAuth grant is fine, the API is not enabled.
 - **Nothing appears after a sync** — check `khal list` sees the collection before
   blaming the timer: `vdirsyncer` writes files whether or not khal indexed them.
-- **Expired token** — `scripts/calendar-auth.sh auth --force`; nothing else needs
-  editing, because the client pair comes from the sops plane. Two kinds look
-  identical from the journal and have different cures:
+- **Expired token** — `scripts/calendar-auth.sh auth` (or plain `fetch`); it
+  pulls a peer's token first, so consent only runs when the whole fleet is dead.
+  Nothing else needs editing, because the client pair comes from the sops
+  plane. Two kinds look identical from the journal and have different cures:
   - `refresh_token_expires_in` present in the token file means the consent
     granted *time-based* access and the token was born dead (52 seconds, once);
     re-approve choosing permanent access. The script refuses this at consent
@@ -206,9 +219,12 @@ window in the subject. Draft with `himalaya message write`; nothing here sends.
   (bitwarden/clients#17837).
 - **Headless re-consent works, but only with a display.** `agent-browser` and
   `chromium --headless=new` are refused at the password step ("This browser or app
-  may not be secure"); the same binary under `xvfb-run` is accepted, driven by CDP
-  over `node`. Keep the profile at `~/.local/state/cdp-prof-headed` — the cookies
-  are the Google session, so the next consent skips the login and the phone tap. A
+  may not be secure"); the same binary on a live display is accepted, driven by
+  CDP over `node`. The driver now prefers an already-answering `DISPLAY` and only
+  falls back to `xvfb-run` (nix-warmed first — a cold resolve once outlived the
+  30 s page-target wait and killed the run before chromium was up). Keep the
+  profile at `~/.local/state/cdp-prof-headed` — the cookies are the Google
+  session, so the next consent skips the login and the phone tap. A
   consent driven this way produced a **permanent** grant where the paste-based
   exchange produced 604799 s.
 

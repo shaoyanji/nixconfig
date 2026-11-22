@@ -54,7 +54,8 @@ validates the size, so a build that succeeds but reports >14 KB is a failed buil
 `scripts/task/pages-deploy.sh`, which polls every page the artifact ships until it
 answers 200: Pages reports "Deployment complete" before the asset manifest attaches,
 so the CLI's exit code is not a readiness signal. A local pre-push hook
-(`scripts/pre-push.sh`, installed by `bountystash:hook:install`) offers a preview
+(`scripts/pre-push.sh` in the **console** repo — `bountystash:hook:install`
+copies it to `$BOUNTY_DIR/.git/hooks/`) offers a preview
 deploy via `gum confirm` and defaults to No after 15 s, so an unattended push is
 never blocked.
 

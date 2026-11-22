@@ -25,7 +25,7 @@ why "I searched and found nothing" keeps happening.
 | **Episodic** | sentinel ledger, journald, generations, restic runs | `task ops:ledger`, `journalctl` | live |
 | **Personal** | Obsidian vault (`~/vaults/personal`) | `qmd search -c vault`, direct read | as of the last sync |
 
-A **design record** sits beside these: `AGENTS.nix` (`.agents/notes`) and its
+A **design record** sits beside these: `AGENTS.nix` (repo root) and its
 lineage. It answers "has this been tried, and what did it come out of?" —
 `qmd` cannot, because the record is data, not markdown.
 

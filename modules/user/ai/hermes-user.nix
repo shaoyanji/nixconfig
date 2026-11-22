@@ -617,7 +617,7 @@ in {
           # hermes-agent dependency tree) is a plain store binary without
           # setuid and makes child agents fail escalation with "sudo binary
           # lacks setuid" (seen 2026-10-08).
-          "PATH=/run/wrappers/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
+          "PATH=/run/wrappers/bin:${pkgs.nodejs}/bin:${pkgs.ffmpeg}/bin:${config.home.homeDirectory}/.nix-profile/bin:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin"
         ];
         RestartSec = 5;
         RestartForceExitStatus = 75;

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T00:52:18Z",
+  "generated": "2026-11-22T00:55:20Z",
   "count": 200,
-  "pin": "fc6202b97df8be2a603237fe2b3a0baf6407ce521609abdb5340f9e996b69c5e",
+  "pin": "023ac2674ba4377b2b3a41605ce32adcc248b2bb02fb500359bd48294b7e60e6",
   "turns": [
+    {
+      "id": "eb6aaf04-ac30-424a-b019-4850c4722a6b",
+      "ts": "2026-11-22T00:54:56Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "done: Grafana submitted (Greenhouse 6103688004, code 26499162, confirm email 310976); Camunda+Attio Ashby CAPTCHA-token rejections -> manual-review (forms complete); Coda Lever hCaptcha rejected x2 -> manual-review; PureStorage rejected (mandatory French, quota pre-sales); BFL decision-needed (office-city gate in sheet). Pipeline: 93 applied.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bb7851ce5beea5bfd10eb2a8adc82e4d51fdb07d",
+      "branch": "main",
+      "frame": "03ha3nm8lu52t7134v1kqzf7e"
+    },
     {
       "id": "b7693003-01c0-472a-945f-96b941c6d8ce",
       "ts": "2026-11-22T00:49:50Z",
@@ -2783,21 +2796,6 @@
       "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
       "branch": "main",
       "frame": "03h9w5uppmlxfgo1ciubisft4"
-    },
-    {
-      "id": "e315cc52-7833-48a8-9d1c-324ae910376d",
-      "ts": "2026-11-21T01:52:04Z",
-      "source": "hermes-steward",
-      "subject": "nixconfig:steward-freebuff-agy",
-      "action": "Drove idle freebuff win1 pane via jevdecide: land_fixes (p=0.8, margin 0.62, decisive). Task: push the completed CV PDF link-gate commits (4ef428b blog checkout, f2196627 nixconfig) to origin/main so the 04:00 autoUpgrade does not revert local state. Pane accepted — fresh working... counter confirmed.",
-      "outcome": "done",
-      "claims": [
-        "nixconfig modules/user/ai"
-      ],
-      "files": [],
-      "base_commit": "98418659",
-      "branch": "main",
-      "frame": "03h9w5gprayzm4q08a2u2mcll"
     }
   ]
 }

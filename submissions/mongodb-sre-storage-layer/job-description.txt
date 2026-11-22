@@ -1,0 +1,64 @@
+The Team
+
+MongoDB’s Storage Layer Services (SLS) team is re-architecting the MongoDB cloud storage layer and sits at the heart of our next-generation cloud storage architecture. This relatively new team is building performant, multi-tenant distributed storage services that both enhance today’s Atlas storage stack and enable more customer workloads to run more efficiently.
+
+You will partner with the teams building these storage services to define SLOs, shape capacity plans, and ensure the reliability, durability, and operational safety of the storage layer that underpins Atlas. You’ll join a small, senior team of SREs as founding members of this organization, playing a crucial role in executing on a multi-year roadmap for MongoDB’s cloud storage architecture.
+
+This role can be based out of either our Dublin or Cork office or remotely in Ireland.
+
+The ideal candidate should
+
+Have 6+ years of experience working on software development and operating distributed systems
+
+Proficiency in Python, Go, or a similar language
+
+Have operated or supported stateful storage or database systems at scale, and are comfortable with durability, consistency, and recovery trade-offs.
+
+Possess a customer-focused mindset
+
+Value efficiency in processes and operations
+
+Prefer automation over manual processes. We are a small team of software engineers with a strong bias towards software solutions to avoid toil
+
+Experience using and extending containerization technologies, particularly Kubernetes, to enhance application agility, optimize resource utilization, and accelerate time-to-market
+
+Expertise in cloud infrastructure platforms, including AWS, Google Cloud Platform (GCP), or Azure
+
+Understanding of Linux operating system internals and networking concepts (e.g., TCP/IP, DNS, TLS, routing)
+
+Responsibilities
+
+Work on our multi-tenant distributed storage systems, balancing long-term strategic infrastructure goals with immediate engineering needs
+
+Build for reliability, making services and infrastructure available, resilient, fault-tolerant, and self-healing
+
+Identify and configure key metrics to detect incidents and quantify service health, availability, and performance
+
+Participate in a 24/7 on-call rotation to resolve issues involving the storage infrastructure
+
+Become an expert in infrastructure performance, helping us optimize from the application level all the way to the kernel
+
+Strong candidates may also have experience with
+
+Leading major architectural shifts, such as moving from legacy storage stacks to new multi-tenant storage architectures, including planning and executing large-scale data and workload migrations with tight availability and durability requirements
+
+Managing and scaling infrastructure across multi-cloud environments (AWS, GCP, or Azure)
+
+Designing secure, multi-tenant runtime environments at scale
+
+About MongoDB
+
+MongoDB is built for change, empowering our customers and our people to innovate at the speed of the market. We have redefined the database for the AI era, enabling innovators to create, transform, and disrupt industries with software. MongoDB’s unified database platform, the most widely available, globally distributed database on the market, helps organizations modernize legacy workloads, embrace innovation, and unleash AI. Our cloud-native platform, MongoDB Atlas, is the only globally distributed, multi-cloud database and is available across AWS, Google Cloud, and Microsoft Azure.
+
+With offices worldwide and over 60,000 customers, including 75% of the Fortune 100 and AI-native startups, relying on MongoDB for their most important applications, we’re powering the next era of software.
+
+Our compass at MongoDB is our Leadership Commitment, guiding how and why we make decisions, show up for each other, and win. It’s what makes us MongoDB. 
+
+To drive the personal growth and business impact of our employees, we’re committed to developing a supportive and enriching culture for everyone. From employee affinity groups, to fertility assistance and a generous parental leave policy, we value our employees’ wellbeing and want to support them along every step of their professional and personal journeys. Learn more about what it’s like to work at MongoDB, and help us make an impact on the world!
+
+MongoDB is committed to providing any necessary accommodations for individuals with disabilities within our application and interview process. To request an accommodation due to a disability, please inform your recruiter.
+
+MongoDB is an equal opportunities employer.
+
+REQ ID: 2263171786
+

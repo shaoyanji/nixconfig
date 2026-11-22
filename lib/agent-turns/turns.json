@@ -1,8 +1,90 @@
 {
-  "generated": "2026-11-22T08:01:51Z",
+  "generated": "2026-11-22T08:04:51Z",
   "count": 200,
-  "pin": "80e42d28fd8a3a777ececdf1b84762fb745bf51fc516aa5eea72c0d72a69b21d",
+  "pin": "38bd84f1dcbf0e1c2d4bd0937b941c6ef498238e3257c225df0e26c2ccca8609",
   "turns": [
+    {
+      "id": "a3e1d5bc-e619-456b-9182-f22d9eb822fe",
+      "ts": "2026-11-22T08:03:51Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: mongodb SRE agent engine dublin (GH 8366599); sponsorship=Yes (Irish permit), EEOC skipped optional",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/mongodb-sre-agent-engine"
+      ],
+      "files": [],
+      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
+      "branch": "main",
+      "frame": "03ha5ze085z54pcf1qzqme04g"
+    },
+    {
+      "id": "2aa5f7ec-8242-4466-b7c4-27368eb2475e",
+      "ts": "2026-11-22T08:02:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-flix-devops",
+      "action": "landed: Flix train-fleet infra packet (English JD, 2-page CV, 1-page letter, Greenhouse sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/flix-devops-cloud-infrastructure"
+      ],
+      "files": [],
+      "base_commit": "f60945d365ffc2cf0ab7a4e79b066d3ea442e578",
+      "branch": "main",
+      "frame": "03ha5z4w4pphlt4tt3z0bmifd"
+    },
+    {
+      "id": "1a4e5b90-78ca-4a2a-be01-59179b3aaaea",
+      "ts": "2026-11-22T08:02:21Z",
+      "source": "hermes",
+      "subject": "nixconfig:hermes",
+      "action": "landed: incident task - investigate Hermes gateway shutdown that interrupted the last turn and document remediation steps",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
+      "branch": "main",
+      "frame": "03ha5z3f83fvzvpeejy7mtog9"
+    },
+    {
+      "id": "606d10f3-6ce6-40f7-81a9-dd254d4f5f5d",
+      "ts": "2026-11-22T08:02:20Z",
+      "source": "devin",
+      "subject": "nixconfig:devin",
+      "action": "landed: flake-change task - restructure nixconfig flake module wiring to separate host configurations into independent chains",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
+      "branch": "main",
+      "frame": "03ha5z3c57hpvtueh893dftn2"
+    },
+    {
+      "id": "b20c4e62-182b-4efc-9f58-e8a65d8cbc49",
+      "ts": "2026-11-22T08:02:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff",
+      "action": "landed: prose-change task - redact third-party contacts and phone number from docs/nix-consultancy-outreach.md",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
+      "branch": "main",
+      "frame": "03ha5z37nl5p67jq5fgvjwrz1"
+    },
+    {
+      "id": "88761107-4f67-4150-9526-aaaa3e88e824",
+      "ts": "2026-11-22T08:01:55Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: gocardless senior SRE database (GH 8385160) — both PDFs attached, OTP 37814064, /confirmation; honest No on visa-sponsor + Lisbon-commute, remote-from-Germany raised in letter | gate: GH confirmation page",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
+      "branch": "main",
+      "frame": "03ha5z0ed5xz04490j4ei5i7i"
+    },
     {
       "id": "57be7a10-ab07-4697-9b27-65afefa63190",
       "ts": "2026-11-22T08:01:44Z",
@@ -2734,89 +2816,6 @@
       "base_commit": "43b779ab6f934a3b527de504924c740ed9f3c232",
       "branch": "main",
       "frame": "03h9yezgty34by5g4ierbje7x"
-    },
-    {
-      "id": "753947ca-e398-4707-8c57-4ac740ba6c2b",
-      "ts": "2026-11-21T08:45:45Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-21: 20 plate(s) kept of 20 spent, 0 roster row(s) waiting, 126 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9ye9y5598qjh0zbrux43eg"
-    },
-    {
-      "id": "c1cce964-9c68-4b7d-8fc6-eb7755e86569",
-      "ts": "2026-11-21T08:44:05Z",
-      "source": "devin",
-      "subject": "nixconfig:fusion-lane",
-      "action": "landed: nix-tool.sh — agent CLIs called through nix, never declared in a closure; fresh cache fetch not the lock pin (agy resolved 1.5.13 off HEAD); agents:agy alias, toon/qmd/lane rewired; agy-gemini drops runtimeInputs; services still bake | gate: checks:quick PASS, checks:fusion fresh, checks:qmd:docs fresh",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "593f24a2cc1e2d60f1bf4799d3a7e4d267cc50fb",
-      "branch": "main",
-      "frame": "03h9ydy8aprhwycbokdg5bpy7"
-    },
-    {
-      "id": "724795f4-615b-44e7-b1c9-a56f5d1f80ed",
-      "ts": "2026-11-21T08:27:22Z",
-      "source": "devin",
-      "subject": "nixconfig:fusion-lane",
-      "action": "landed: agents:lane (jev classifies intent -> kg/notes/qmd/eval/ledger, selected dispatches, needs_review exits 2) + checks:fusion gate (frieren projection fresh, 629 turns/236 notes, lag ~1.7h); agent-lane-plane DELIVERED, 8/10 selected on natural questions | gate: checks:quick PASS, checks:fusion fresh",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e206908cb202ebd67469e1e893163444031f5bf3",
-      "branch": "main",
-      "frame": "03h9yaon80rvxzsl21s0p399k"
-    },
-    {
-      "id": "b2e159c2-fb96-4c94-a63a-476771d98efb",
-      "ts": "2026-11-21T08:22:14Z",
-      "source": "devin",
-      "subject": "nixconfig:fusion-lane",
-      "action": "claim: building turns-fusion-plane projection (loader + turn/note tables on frieren) + agent-lane-plane primitive | paths: scripts/task/turns-load.sh scripts/task/agent-lane.sh taskfiles/ops.yml taskfiles/agents.yml modules/services/turns-fusion",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/turns-load.sh",
-        "scripts/task/agent-lane.sh",
-        "taskfiles/ops.yml",
-        "taskfiles/agents.yml"
-      ],
-      "files": [],
-      "base_commit": "f15e3769fa3c6d348b59f83b43c984b940d467ed",
-      "branch": "main",
-      "frame": "03h9y9oltbmm88wpxn03qkda3"
-    },
-    {
-      "id": "62e9d5e5-02f1-4817-be93-51b408c9a381",
-      "ts": "2026-11-21T08:11:40Z",
-      "source": "devin",
-      "subject": "nixconfig:toon-io",
-      "action": "landed: toon-io.sh is the shared emit/ingest contract — all taskfile emitters route through toon_emit, apps:* read verbs emit TOON by default, upsert+import accept TOON records, checks:toon:tasks lints it | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f15e3769fa3c6d348b59f83b43c984b940d467ed",
-      "branch": "main",
-      "frame": "03h9y7m95hqjlikvuyxo0thtb"
-    },
-    {
-      "id": "98a02cc9-dbc4-4d0a-9eb5-1a5e405e13f2",
-      "ts": "2026-11-21T08:03:55Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "landed: devin idle -> classified 'note-change' (p=0.99, margin=0.98); jobby-cli-consolidation AGENTS.nix note task sent; pane Thinking 1m 31s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9e09033ec45df9fc68761002f5268d7f7c215e36",
-      "branch": "main",
-      "frame": "03h9y63plwmiwmtbrg0tycv5m"
     }
   ]
 }

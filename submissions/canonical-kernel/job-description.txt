@@ -1,0 +1,64 @@
+Lead Linux Kernel Engineer - Ubuntu — Canonical
+Location: Home based - Worldwide
+Greenhouse req: 6010955 | https://job-boards.greenhouse.io/canonical/jobs/6010955
+Source: Greenhouse job API, fetched 22.11.2026 (HTTP 200)
+
+Canonical is a leading provider of open source software and operating systems to the global enterprise and technology markets. Our platform, Ubuntu, is very widely used in breakthrough enterprise initiatives such as public cloud, data science, AI, engineering innovation, and IoT. Our customers include the world's leading public cloud and silicon providers, and industry leaders in many sectors. The company is a pioneer of global distributed collaboration, with 1200+ colleagues in 75+ countries and very few office-based roles. Teams meet two to four times yearly in person, in interesting locations around the world, to align on strategy and execution.
+The company is founder-led, profitable, and growing.
+The Canonical Kernel Team is seeking exceptionally talented technology experts and industry veterans with a proven track record in operating systems kernel development or low level system engineering to take the lead in the architecture, implementation, and ongoing delivery of the following (but not limited to) aspects of the Ubuntu Linux kernel:
+- Driving engagements for key Silicon and Cloud partners to provide optimal solutions for their platforms
+- Leading the mitigation of common vulnerabilities and exposures for Ubuntu Linux as well as driving active hardening in the kernel
+- Architecting enhancements to performance and correctness to make Ubuntu Linux the most reliable and highest performing Linux kernel available today
+- Streamlining the packaging and distribution of particularly troublesome third-party components for optimal experience by end users
+- Developing new means to deliver Ubuntu Linux at scale to the strict quality standards and delivery schedules expected by end users
+While not a formal managerial role, the successful candidate will possess strong people skills and natural ability to lead engineers within the team, as well as working with other external teams to coordinate adoption and delivery.
+We are looking for individuals with not only an incredibly deep technical background in operating system kernels and distributions, but also a strong flair for leadership and taking initiative to drive ideas and the associated delivery teams to completion.
+While we hesitate to put a specific number of years of experience as a requirement for an applicant as that does not take into account relative ability or circumstances, for a comparative guideline we would be seeking candidates with the demonstrated technical equivalent of 15+ years of industry experience.
+Location: We have home-based lead kernel engineer roles in every timezone, although the individual aspects as listed above may be linked to a specific geographic region.
+What the role entails
+- Set the technical direction and lead the delivery of a team of junior and mid-career engineers for a key aspect of Ubuntu Linux
+- Work closely with management within and outside the team to track and coordinate initiatives to delivery
+- Collaborate daily with other senior technical leadership on the Kernel Team on how best to ensure Ubuntu stays at the pinnacle of Linux distributions
+What we are looking for in you
+- Well-organised and motivated self-starter able to thrive in a remote work environment
+- Strong communication skills in English, both written and verbal
+- Expert understanding of the C programming language
+- Demonstrated expertise working in a *nix-based operating system kernel and distribution. While direct Linux experience would be ideal, it is not required.
+- Python and Bash scripting ability
+- Powerful grasp of the capabilities and nuances of the git version control system
+- Prior experience developing with software packaging formats, with direct Ubuntu/Debian/Snap experience being highly regarded
+- Ability to travel internationally at least twice a year for company events of up to two weeks length
+Nice-to-have skills
+- Strong background in RTOS and real-time performance analysis
+- Demonstrated experience with kernel patching and debugging
+- Strong grasp of device drivers, BSP’s, and other low level system engineering
+- Prior experience with Rust, ideally as it pertains to the Linux kernel
+What we offer colleagues
+We consider geographical location, experience, and performance in shaping compensation worldwide. We revisit compensation annually (and more often for graduates and associates) to ensure we recognize outstanding performance. In addition to base pay, we offer a performance-driven annual bonus or commission. We provide all team members with additional benefits which reflect our values and ideals. We balance our programs to meet local needs and ensure fairness globally.
+- Distributed work environment with twice-yearly team sprints in person
+- Personal learning and development budget of USD 2,000 per year
+- Annual compensation review
+- Recognition rewards
+- Annual holiday leave
+- Maternity and paternity leave
+- Team Member Assistance Program & Wellness Platform
+- Opportunity to travel to new locations to meet colleagues
+- Priority Pass and travel upgrades for long-haul company events
+About Canonical
+Canonical is a pioneering tech firm at the forefront of the global move to open source. As the company that publishes Ubuntu, one of the most important open-source projects and the platform for AI, IoT, and the cloud, we are changing the world of software. We recruit on a global basis and set a very high standard for people joining the company. We expect excellence; in order to succeed, we need to be the best at what we do. Most colleagues at Canonical have worked from home since our inception in 2004.​ Working here is a step into the future and will challenge you to think differently, work smarter, learn new skills, and raise your game.
+Canonical is an equal opportunity employer
+We are proud to foster a workplace free from discrimination. Diversity of experience, perspectives, and background create a better work environment and better products. Whatever your identity, we will give your application fair consideration.
+#LI-remote
+
+
+[Packet cross-check, 22.11.2026]
+Asked: kernel patch development and review, upstream triage, driver and subsystem work, silicon
+and cloud partner engagement, reproducible kernel builds, CVE response, leading kernel engineers.
+Evidence held: five years running Linux at depth on 13 hosts; kernel configuration as code via NixOS
+module options; cgroups and namespaces used for service isolation; systemd; hermetic reproducible
+builds with pinned inputs; tracked and applied kernel and CVE updates across the fleet; boot and
+recovery; bootloader and initrd handling.
+Not held: any kernel patch, upstream contribution, driver development, subsystem maintainership,
+eBPF programs, silicon partner work, or leadership of kernel engineers.
+Fit 1, not the briefed 4: the role's entire subject is kernel code and upstream authority. The
+operational half is evidenced; the engineering half is absent, and no letter can close that.

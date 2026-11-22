@@ -1,33 +1,43 @@
-# Lead: Physikalisch-Technische Bundesanstalt - Linux-Systemadministration HPC und Compute-Server
+# Lead: PTB Berlin - Linux-Systemadministration HPC und Compute-Server
 
-Fit: 3
+Fit: 4
 Stand: 22.11.2026
+Frist: 23.11.2026 (morgen)
 
 ## Warum interessant
 
-Die PTB ist das nationale Metrologieinstitut; Referat 9.55 betreibt in Berlin-Charlottenburg ein HPC-Cluster und Compute-Server unter Linux für wissenschaftliche Berechnungen. Dazu kommen Automatisierung des Serverbetriebs, Rechteverwaltung, Support für Forschende und Dokumentation. Das ist Betrieb mit echtem Nutzerkontakt, und die Vorgeschichte passt: Fraunhofer ISE als Forschungsumgebung, M.Sc. mit numerischem Schwerpunkt.
+Die Physikalisch-Technische Bundesanstalt ist das nationale Metrologieinstitut. Referat 9.55 Hochleistungsrechnen betreibt in Berlin-Charlottenburg ein HPC-Cluster und Compute-Server unter Linux als Dienstleistung für die Fachabteilungen, dazu virtualisierte Serverinfrastruktur. Gesucht wird jemand für Linux-Administration, Rechteverwaltung und Automatisierung, Clusterbetrieb, Support für wissenschaftliche Nutzende, Bereitstellung fachspezifischer Software und die strategische Weiterentwicklung der Infrastruktur. Unbefristet, E 10 TVöD Bund, Vollzeit, mit mobilen Arbeitsanteilen.
+
+Der Bezug ist doppelt: wissenschaftliche IT aus eigener Zeit (Fraunhofer ISE 2012, Laborgeräte und Messdaten) und Betrieb einer Flotte, die als Code dokumentiert ist statt in Köpfen.
 
 ## Was passt
 
-- Linux-Systemadministration über dreizehn Hosts und drei Hardware-Generationen, inklusive Beschaffung und Boot-Konfiguration.
-- Automatisierung in Shell, Python und Go, mit Gates je Host und Rollback je Generation.
-- Rechteverwaltung deklarativ: Rollen als Feature-Liste je Host, kein Konto von Hand.
-- Monitoring und Alarmierung selbst gebaut, mit Zustellbestätigung.
-- Dokumentation als Runbook, dazu Skill-Seiten für andere; didaktische Erfahrung aus dem eigenen Umfeld.
-- Energieeffizienz ist dort Thema, weil ein Rechencluster Strom kostet; die eigene Flotte läuft auf stromsparender Hardware.
+- Linux-Betrieb über dreizehn Hosts und drei Hardware-Generationen, inklusive Beschaffung, Installation und Inbetriebnahme.
+- Automatisierung des Serverbetriebs: jeder Dienst ein Modul, jeder Host eine Feature-Liste, jede Änderung ein Commit mit Gate und Rückrollung; Werkzeuge in Shell, Python und Go.
+- Rechteverwaltung deklarativ: Rollen je Host, kein Konto von Hand.
+- Überwachung mit Sentinel-Ledger alle 15 Minuten, Gatus-Prüfungen und einer Go-Bridge, die eine Alarmzustellung bestätigt.
+- Sicherung mit restic auf ein NAS, Wiederherstellungen werden durchgeführt, nicht nur der Job geprüft.
+- Sicherheit: sops und age, eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten, keine öffentliche Schnittstelle, Ressourcenlimits je Dienst.
+- Dokumentation als Runbook, Anleitung von Nutzenden, Support bei Hard- und Softwarefragen.
+- Energieeffizienz als Thema: stromsparende Hardware, Limits je Dienst, PSI-Druck im Ledger.
+- Deutsch C1, Englisch Muttersprache; Bereitschaft zur Sicherheitsüberprüfung nach § 9 SÜG.
 
 ## Was fehlt
 
-- Kein Ansible; die Automatisierung ist Nix-basiert, funktional verwandt, aber ein anderes Werkzeug.
-- Keine HPC-Scheduler-Erfahrung (SLURM), keine parallelen Programmiermodelle (MPI, OpenMP).
-- Keine verteilten Dateisysteme wie Lustre oder GPFS.
-- Kein Proxmox, keine formale BSI-Auseinandersetzung.
-- Frist: 23.11.2026. Das ist morgen.
+- Slurm und HPC-Scheduler-Betrieb: keine Praxis.
+- Parallele Programmiermodelle (MPI, OpenMP) und Prozessorarchitekturen im HPC-Kontext.
+- Verteiltes Dateisystem wie Lustre oder GPFS.
+- Ansible: die Automatisierung ist Nix plus Git, nicht Ansible.
+- Proxmox und Servervirtualisierung.
+- BSI-Anforderungen als formale Umsetzung; Sicherheitshygiene ist vorhanden, Grundschutz nicht.
+- Rated E 10: die eigene Erwartung von 85.000 bis 95.000 EUR liegt darüber.
 
 ## Weg
 
-Ausschließlich über das Online-Bewerbungsportal der PTB, Kennziffer 26-163-9C, Unterlagen Lebenslauf, Zeugnisse, Anschreiben. E-Mail-Bewerbungen werden nicht berücksichtigt. Fachfragen: Dr. Daniel Lübbert, 030 3481-8450. Bereitschaft zur Sicherheitsüberprüfung nach § 9 SÜG wird mit der Bewerbung erklärt.
+Ausschließlich über den Button "ONLINE BEWERBEN" der Anzeige, Kennziffer 26-163-9C. Keine Bewerbung per E-Mail, keine per Post. Hochgeladen werden Lebenslauf, Zeugnisse und Anschreiben. Mit der Abgabe wird die Bereitschaft zur Sicherheitsüberprüfung nach § 9 SÜG erklärt. Fachfragen: Dr. Daniel Lübbert, 030 3481-8450.
+
+Die Frist ist morgen, der 23.11.2026. Alles andere ist zweitrangig.
 
 ## Gehalt
 
-E 10 TVöD Bund. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt deutlich darüber; E 10 mit Stufe nach Erfahrung ist tariflich gebunden. Keine Zahl im Anschreiben.
+E 10 TVöD Bund, Stufe nach anrechenbarer Erfahrung, unbefristet. Verhandelbar ist die Stufe, nicht die Gruppe. Keine Zahl im Anschreiben.

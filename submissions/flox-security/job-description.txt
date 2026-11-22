@@ -1,0 +1,22 @@
+Member of Technical Staff — Security (posted: Security Engineer)
+Flox · Remote (posting carries a United States address) · Full time · first dedicated security hire
+
+PROVENANCE: this folder held no job-description file. The text below is reconstructed from the retirement-time
+submission sheet (Flox_Security_Submission_Sheet.txt, now retired), which verified the live Ashby posting and
+the rendered application form on 2026-11-21. Requisition: https://jobs.ashbyhq.com/flox/37ec9578-4fab-432f-88f1-c130ffe13ac8
+Published 2026-04-28 on the Ashby record, still listed 2026-11-21.
+
+COMPENSATION: USD 160,000 – 210,000 base + equity. (A staging brief that said 180–250k was wrong; the live Ashby
+posting is the source, and its band is what this packet uses.)
+
+WHAT THE POSTING ASKS FOR
+- Three to five years of hands-on security engineering, as the first dedicated security hire.
+- AWS hardening depth: IAM and SCP review, GuardDuty, Security Hub, CSPM.
+- Cloudflare Zero Trust, endpoint detection and response, MDM, and SIEM/SOC operation.
+- Nix and package management treated as a strong plus — the product builds developer environments from Nix.
+- A distributed, largely asynchronous team where writing carries the coordination.
+
+WHAT THE PRODUCT IS
+Flox builds developer environments from Nix: a flake is the unit of truth, builds are hermetic, the CLI is the
+interface. The security surface follows from that: what enters the build graph, what an artefact can be shown to
+be, and what a customer can verify about both.

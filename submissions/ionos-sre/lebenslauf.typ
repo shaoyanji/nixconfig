@@ -78,4 +78,4 @@
 #text(weight: "bold")[Verfügbarkeit] — Rückrollung je Generation, Limits je Dienst, Speicherdruck als Messgröße, Runbooks \
 #text(weight: "bold")[Sicherheit] — sops, age, eigene SSH-Zertifizierungsstelle, kurzlebige Zertifikate, nftables, keine offene Schnittstelle \
 #text(weight: "bold")[Nicht vorhanden] — Kubernetes, Terraform, ArgoCD, GitLab CI, Prometheus, Grafana, ELK \
-#text(weight: "bold")[Sprachen] — Deutsch C1, Englisch Muttersprache
+#text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · US-Staatsangehörigkeit mit Niederlassungserlaubnis, kein Visum nötig · Karlsruhe rund 1,5 h entfernt

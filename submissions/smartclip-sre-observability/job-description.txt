@@ -1,35 +1,75 @@
-Site Reliability Engineer (f/m/d) - Observability & Internal Tools
-smartclip Europe GmbH, Deutschland, remote by default mit gelegentlichen On-Site-Terminen (Berlin/Koeln)
-Quelle: https://hiddenjobs.dev/company/smartclip-europe-gmbh/jobs/site-reliability-engineer-f-m-d-observability-internal-tools-0cdc83e8/
+Site Reliability Engineer (f/m/d) – Observability & Internal Tools
+smartclip Europe GmbH | Germany, remote-first; on-site in Berlin/Cologne for larger features
+Source: hiddenjobs.dev, retrieved 22 Nov 2026
+Application: https://hiddenjobs.dev/company/smartclip-europe-gmbh/jobs/site-reliability-engineer-f-m-d-observability-internal-tools-0cdc83e8/
 
-Rolle
+Site Reliability Engineer (f/m/d) – Observability & Internal Tools
+smartclip Europe GmbH
+DevOps     Germany (Berlin/Cologne on-site for larger features; Germany-specific benefits)
+Job details
+Not specified   Salary
+Germany (Berlin/Cologne on-site for larger features; Germany-specific benefits)   Eligibility
+Not specified   Experience
+Not specified   Employment
+About this role
+Role overview
+A platform-focused Site Reliability Engineer position dedicated to elevating observability and internal tooling into a true engineering capability. The engineer acts as guardian and architect of internal infrastructure, designing systems rather than consuming off-the-shelf SaaS, with full end-to-end ownership of the stack. Work is remote by default, with periodic on-site collaboration for architectural decisions and larger initiatives.
+Responsibilities
+- Own and evolve the observability ecosystem centered on Prometheus, Grafana, and Forgejo, turning monitoring tools into a coherent platform-grade capability.
+- Design actionable, signal-rich alerts and define Service Level Objectives that shift operations from reactive firefighting toward proactive stability.
+- Evaluate and integrate modern open-source alternatives to proprietary software, influencing technology selection across the stack.
+- Embed security engineering directly into the development and delivery pipeline, identifying vulnerabilities earlier than external penetration testing.
+- Operate deep within Linux systems and distributed tooling, balancing bold experimentation with a strictly stable production environment.
+- Enable and accelerate the productivity of other engineers through automation and platform improvements.
+Requirements
+- Demonstrable hands-on experience operating Prometheus, Grafana, and related observability tooling in production environments.
+- Solid grasp of Linux internals, distributed systems, and infrastructure-as-code practices.
+- Track record of building rather than merely configuring, with a portfolio, side project, or production-ready demo repository that shows shipping ability.
+- Comfort defining SLOs, crafting meaningful alerts, and moving an organization from reactive to proactive reliability work.
+- Practical knowledge of integrating security practices into CI/CD and delivery workflows.
+- Builder mindset with high standards, low ego, openness to direct feedback, and the ability to move fast while staying careful where it counts.
+Nice to have
+- Active engagement with the open-source community, hackathons, or conference participation.
+Benefits and work setup
+- Remote-first working model with on-site collaboration in Germany for key planning and brainstorming sessions.
+- 30 days of vacation plus time off on Christmas Eve and New Year's Eve.
+- Optional four-day work week through dedicated focus Fridays.
+- Mobility benefits including a public-transport subsidy and a bicycle leasing program.
+- Sports, health, and mental-health support offerings.
+- Corporate benefits platform with retail and lifestyle discounts.
+- Investment in continued learning through community events, hackathons, and conferences.
+Skills detected in the listing
+AWS  GCP
+Detected Sep 21, 2026
+Last verified Nov 22, 2026
+Similar Jobs
+Ops Engineer
+DevOps
+Automate the operational systems behind healthcare coverage, provider enrollment, and payment s…
+View role   Nov 22, 2026
+Staff Platform Engineer
+DevOps
+Lead the design and implementation of platform infrastructure and APIs for building AI applicat…
+View role   Nov 21, 2026
+Senior Staff Site Reliability Engineer
+DevOps
+Set technical direction for a cloud platform that supports multiple engineering areas. You’ll l…
+View role   Nov 21, 2026
+Recent News
+Hiring news   Greenhouse Finds 9 in 10 U.S. Employers May Have Rejected Real Candidates Over AI   A new Greenhouse report finds employers are struggling to distinguish polished applications from fake ones, a…
+Nov 20, 2026      Pay & benefits   DOL Says After Hours Work Counts Toward FMLA Eligibility   A new Labor Department opinion letter says mandatory work performed at home may count toward FMLA eligibility…
+Nov 19, 2026      Hiring news   DOL Proposal Could Stretch the PERM Layoff Lookback to Two Years   A proposed Labor Department rule would give employers a two year layoff lookback for PERM applications and re…
+Nov 17, 2026
+View all news
+Discover top remote tech jobs from the Hidden Jobs board.
+News   Contact   API Docs   MCP Docs   Terms of Service   Privacy Policy   Cookie settings   Viberank
 
-Plattformnahe SRE-Stelle, die Observability und interne Werkzeuge zu einer echten Engineering-Faehigkeit macht.
-Die Rolle ist Architekt und Waechter der internen Infrastruktur, baut Systeme statt SaaS zu konsumieren, mit
-Ende-zu-Ende-Verantwortung fuer den Stack. Remote als Standard, On-Site fuer Architekturentscheidungen.
 
-Aufgaben
-
-* Observability-Oekosystem um Prometheus, Grafana und Forgejo besitzen und weiterentwickeln, Monitoring zu
-  einer Plattform-Faehigkeit machen
-* Handlungsfaehige, signalreiche Alarme entwerfen und Service Level Objectives definieren, Betrieb von reaktiv
-  auf proaktiv verschieben
-* Moderne Open-Source-Alternativen zu proprietaerer Software bewerten und integrieren, Technologieauswahl
-  beeinflussen
-* Security Engineering in Entwicklung und Delivery einbetten, Schwaechen frueher finden als externe Tests
-* Tief in Linux-Systemen und verteilten Werkzeugen arbeiten, Experiment und stabile Produktion ausbalancieren
-* Andere Engineers durch Automatisierung und Plattformverbesserungen schneller machen
-
-Profil
-
-* Nachweisbare Praxiserfahrung mit Prometheus, Grafana und verwandten Observability-Werkzeugen in Produktion
-* Linux-Interna, verteilte Systeme, Infrastructure as Code
-* Nachweis, dass gebaut statt nur konfiguriert wird: Portfolio, Nebenprojekt oder lauffaehige Demo
-* SLOs definieren, sinnvolle Alarme bauen, Organisation von reaktiv nach proaktiv bewegen
-* Security-Praktiken in CI/CD integrieren
-* Wunsch: Open-Source-Engagement, Hackathons, Konferenzen
-
-Angebot
-
-Remote-first, On-Site in Deutschland fuer Planungssessions, 30 Urlaubstage plus 24. und 31.12., optional
-Vier-Tage-Woche durch Fokus-Freitage, Nahverkehrszuschuss, Dienstrad, Sport- und Gesundheitsangebote.
+[Packet cross-check, 22 Nov 2026]
+Hard requirement: demonstrable production experience with Prometheus and Grafana. Not present;
+the custom ledger, Gatus checks and Go alerting bridge are substitutes, not equivalents, and the
+letter says so.
+Named in the posting and present: Linux internals, infrastructure as code, builder portfolio, security
+practices in CI/CD, automation that speeds up other engineers.
+Salary: not specified in the posting; own expectation 80,000-85,000 EUR stated in the letter.
+Fit set to 3 (brief said 4) because Prometheus/Grafana is a must-have, not a nice-to-have.

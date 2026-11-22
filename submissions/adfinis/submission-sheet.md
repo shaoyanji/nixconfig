@@ -74,7 +74,7 @@ Verweis auf die Ausschreibung, die NixOS ausdrücklich akzeptiert.
 | Marker Brief | `Adfinis`, `Kronlage`, `NixOS`, `Kubernetes`, `Open Source` |
 | `task checks:prose` | 253 prose files, exit 0 |
 | sha256 CV | `3bf9455ba01931b9819d6a65782fc126a17a57d67f19d145ef5c147ce8a7ae68` |
-| sha256 Brief | `2489ab48162cc556b31df15c2a98b97df36233b3f2e4f3112c4c488ad214e844` |
+| sha256 Brief | `3b2fe2339f5267d31e2b8db55a200ab11614675000f7bafe02977c7ad2aa1fad` |
 | DB-Rückleseprobe | nach dem Upsert geprüft |
 
 ## Nächste Schritte

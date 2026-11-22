@@ -39,7 +39,7 @@ Ertrags-, Bewertungs- und Hedging-Modelle dahinter, Bankenprüfungen und Due-Dil
 Einheit und in Service-Leveln zu denken statt in Uptime-Prozenten. Auf Deutsch und Englisch vor Kunden, Banken und
 Deal-Brokern zu sprechen, war dabei Alltag.
 
-Was ich mitbringe, ist überprüfbare Reproduzierbarkeit: dieselbe Prüfung, die die CI besteht, besteht auch der Host, und
+Was ich mitbringe, ist überprüfbare Reproduzierbarkeit: dieselbe Prüfung, die in der CI läuft, läuft auch auf dem Host, und
 die Dokumentation wird aus derselben Quelle erzeugt wie die Konfiguration, damit sie nicht driftet. Was ich nicht
 mitbringe, ist Betriebserfahrung mit Kubernetes-Clustern, Terraform oder Vault im Kundengroßmaßstab. Ihre Ausschreibung
 nennt NixOS ausdrücklich als akzeptierte Distribution, und genau dort liegt meine Tiefe — ich würde die übrigen Werkzeuge

@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-22T10:31:08Z",
+  "generated": "2026-11-22T10:31:33Z",
   "count": 200,
-  "pin": "9c89ef79539f8c3f464c0c22f3211908fc2b0b1d1543db7eceb813e94f47b0c1",
+  "pin": "71fc8f7dbabfc1d000866f75ae1ca5a63f33dc3c37845e73adabdca6f867e957",
   "turns": [
+    {
+      "id": "f428ea8f-7050-4ad2-b984-e2a05eae846a",
+      "ts": "2026-11-22T10:31:15Z",
+      "source": "devin",
+      "subject": "nixconfig:gitlab",
+      "action": "claim: Greenhouse submission (location-gated req, honest answers)",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/gitlab"
+      ],
+      "files": [],
+      "base_commit": "39563eebbeb1ead030ee97c8a60e9dc56863c966",
+      "branch": "main",
+      "frame": "03ha6s6j6vipl6ob7a2ifziwt"
+    },
+    {
+      "id": "14e4d139-84e9-41dd-a8b7-736caa636468",
+      "ts": "2026-11-22T10:31:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:adfinis",
+      "action": "landed: natives Typst-Paket 2 S. CV + 1 S. Anschreiben (de) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39563eebbeb1ead030ee97c8a60e9dc56863c966",
+      "branch": "main",
+      "frame": "03ha6s63zf6jgw73yqatdj9cj"
+    },
     {
       "id": "ab867750-457e-4f9e-bfc8-ebbd032b0117",
       "ts": "2026-11-22T10:30:19Z",
@@ -2638,34 +2666,6 @@
       "base_commit": "3c0fe1000992a00c977fff9b1d34f628a78dd892",
       "branch": "main",
       "frame": "03ha5zxkaqjh8egoyv64najil"
-    },
-    {
-      "id": "6feab627-cf9d-4070-8f37-f884648542ae",
-      "ts": "2026-11-22T08:04:54Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-mongodb-sls",
-      "action": "landed: MongoDB SLS SRE packet, CV 2pp letter 1pp, 13/36 highlights, gaps named | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3c0fe1000992a00c977fff9b1d34f628a78dd892",
-      "branch": "main",
-      "frame": "03ha5zld95gcyr3jfe5s2xm97"
-    },
-    {
-      "id": "a3e1d5bc-e619-456b-9182-f22d9eb822fe",
-      "ts": "2026-11-22T08:03:51Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: mongodb SRE agent engine dublin (GH 8366599); sponsorship=Yes (Irish permit), EEOC skipped optional",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/mongodb-sre-agent-engine"
-      ],
-      "files": [],
-      "base_commit": "ee9821fb154cb4e3193ca2adb2c506cac76c811a",
-      "branch": "main",
-      "frame": "03ha5ze085z54pcf1qzqme04g"
     }
   ]
 }

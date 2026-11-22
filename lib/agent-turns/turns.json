@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T09:52:00Z",
+  "generated": "2026-11-22T09:54:05Z",
   "count": 200,
-  "pin": "5c79c9520201b2e9713e5e9b256a2cd4da45d4e806aca79d46efc6e3b43ce7db",
+  "pin": "57e09839d8855359aa708c2a738976d3f34b4b496c9924f41ef68eec7fe411ff",
   "turns": [
+    {
+      "id": "b1ab7661-9d19-4055-a9be-4e851b8c717e",
+      "ts": "2026-11-22T09:52:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:telekom-sre-observability",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a8dd99f1ff45a3929ffee02b553072023ecc82ef",
+      "branch": "main",
+      "frame": "03ha6kj3x5p9zqvqpwgulw1b1"
+    },
+    {
+      "id": "da0ac661-36bb-4291-ad34-317eee0727ac",
+      "ts": "2026-11-22T09:52:03Z",
+      "source": "freebuff",
+      "subject": "nixconfig:ionos-staff-nre",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3cadecb213023acd83cd02d8231126a11a2d151c",
+      "branch": "main",
+      "frame": "03ha6kiw2nxu8rm6nu2xujzzy"
+    },
     {
       "id": "80ec6ab5-e618-4ecd-a4da-32918cae6b9d",
       "ts": "2026-11-22T09:50:11Z",
@@ -2710,36 +2736,6 @@
       "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
       "branch": "main",
       "frame": "03ha5j26yqgzcnsq2w69o0da5"
-    },
-    {
-      "id": "602a4774-1218-4185-a21f-67ecb7e7d386",
-      "ts": "2026-11-22T06:38:26Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: execute prepared Ashby submission attio Senior Platform Engineer",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/attio"
-      ],
-      "files": [],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5ip9qcgx93zyoiqwevevv"
-    },
-    {
-      "id": "dbad4ea0-aa9c-4280-8bee-a5078c9962a1",
-      "ts": "2026-11-22T06:37:00Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "done: grafana Staff SWE Databases SRE + mozilla Staff SWE Tools&Systems both already applied earlier today (ack mails 00:45/01:00 UTC auto-linked); grafana got one duplicate submit at 06:36 (confirmation page shown, GH dedupes by email); mozilla NOT resubmitted; both records applied + nextAction updated",
-      "outcome": "done",
-      "claims": [
-        "submissions/grafana submissions/mozilla"
-      ],
-      "files": [],
-      "base_commit": "c81bcbc51746002cec022a20623525072db1abca",
-      "branch": "main",
-      "frame": "03ha5if9moj2r6xgovsrftqs4"
     }
   ]
 }

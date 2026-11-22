@@ -5020,9 +5020,9 @@
           never carried one; the slot keeps the rule visible.
 
         State after the pass: the CV corpus is reconciled in `lib/matt`,
-        `matt:build` green — five PDFs, 2/2/1/1/1 pages, ATS-clean — and
-        `submissions/` holds 68 application packets: adyen-platform-genai
-        committed, the other 67 untracked.
+        `matt:build` green — five PDFs, 2/2/1/1/1 pages, ATS-clean — and the
+        packets live under the appflow state dir, never in the tree: that path
+        was untracked on 2026-11-22 and the pre-commit hook now refuses it.
 
         Open, and not silently closed:
         - History: blob 92de6243 still serves the unredacted text, profile

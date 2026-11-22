@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T09:45:57Z",
+  "generated": "2026-11-22T09:48:04Z",
   "count": 200,
-  "pin": "f01f6ea91c3e3b37bd7aab9fc2b19fea370ddaea77c2802b5a7b129ad8162d25",
+  "pin": "98364ae4fbdd24099c395289a055bbd7bba26c3b8c1a810bcaf368864e2c0805",
   "turns": [
+    {
+      "id": "50ca54c9-1732-402d-929d-7d574142463c",
+      "ts": "2026-11-22T09:47:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:uni-rostock-sysadmin",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4495525c0ae794b27de49a2bca0733e27defbcb2",
+      "branch": "main",
+      "frame": "03ha6jptvn24cpmgaeujj5iky"
+    },
+    {
+      "id": "e83ca91f-df54-4948-9823-561ab7f70311",
+      "ts": "2026-11-22T09:47:31Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: dfs-sre DFS portal submission (J000000038)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
+      "branch": "main",
+      "frame": "03ha6jmywnchufe999stexmzu"
+    },
+    {
+      "id": "ef04cf5c-e8be-4f4e-828a-35263ecc406b",
+      "ts": "2026-11-22T09:46:07Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "sva-devops-consultant-linux: form+files complete but server returns opaque processing error on every POST — likely prior app on file or posting-side issue; record=manual",
+      "outcome": "blocked: sva rexx generic processing error on all submits",
+      "claims": [],
+      "files": [],
+      "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
+      "branch": "main",
+      "frame": "03ha6jd8h7z2sqmdsmcam7qmh"
+    },
+    {
+      "id": "2a018657-5e96-4f47-8cbf-71c08dec943b",
+      "ts": "2026-11-22T09:46:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:smartclip-sre-observability",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9174c44dc6df1d4d632d01435845ca3663d1cddf",
+      "branch": "main",
+      "frame": "03ha6jcgp20erzibg4uur5qcr"
+    },
     {
       "id": "a8892847-6893-4e41-b997-b825d5edcbb6",
       "ts": "2026-11-22T09:45:50Z",
@@ -2690,60 +2742,6 @@
       "base_commit": "afc47bbe22f261aa74c77c9d3e02df844cb9ffd8",
       "branch": "main",
       "frame": "03ha5e7k49v6scqlobhh9xlbj"
-    },
-    {
-      "id": "a6d0b620-a287-4c49-bf06-577acf86292d",
-      "ts": "2026-11-22T06:14:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "landed: drove IDLE pane default:2.1 (devin lane); next task routed via jevdecide host-change p=0.58 margin=0.34 decisive — fix red checks:host schneeeule gate (nvidia-settings-470.256.02 pulls gtk2 marked broken); add problems.handlers.gtk+.broken allowance or migrate off legacy driver; verify with checks:host HOST=schneeeule",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3d859bad941cff4253e478bc283ba94868164fcf",
-      "branch": "main",
-      "frame": "03ha5e1lc7axesasu9cle1q3x"
-    },
-    {
-      "id": "1299644d-1e5a-4fbd-9e5b-77f639c0aa52",
-      "ts": "2026-11-22T06:14:30Z",
-      "source": "devin",
-      "subject": "nixconfig:gate-fix",
-      "action": "start: gtk2-broken allowance for schneeeule legacy_470 (nvidia-settings pulls gtk2); gate checks:host schneeeule",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/schneeeule"
-      ],
-      "files": [],
-      "base_commit": "3d859bad941cff4253e478bc283ba94868164fcf",
-      "branch": "main",
-      "frame": "03ha5e0zsaoyhb5qifkt6x01a"
-    },
-    {
-      "id": "0b49d48e-b78d-4e49-90c8-ce26e6d7bbc0",
-      "ts": "2026-11-22T06:05:11Z",
-      "source": "devin",
-      "subject": "nixconfig:flake-update",
-      "action": "landed 3d859bad: root dank-qml-common(flake=false)+follows collapses 2 nodes to 1, impermanence follows root hm+nixpkgs; one flake update (impermanence 7b1d382->fa627f4, qml-common ->c34bfe0); gate: checks:host scratch PASS (cache-identical drv); schneeeule red on pre-existing gtk2/nvidia-470, identical on HEAD",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3d859bad941cff4253e478bc283ba94868164fcf",
-      "branch": "main",
-      "frame": "03ha5c7i4rr59h88hnnv1y6y6"
-    },
-    {
-      "id": "8ed3e16b-b3df-4f06-9274-465f1bf51d34",
-      "ts": "2026-11-22T06:03:37Z",
-      "source": "freebuff-agent",
-      "subject": "nixconfig:freebuff-idle",
-      "action": "landed: drove IDLE pane default:1.1 freebuff (CV/site lane); next task: redact third-party contacts and phone number from docs/nix-consultancy-outreach.md; jev-decide route prose-change p=0.85 m=0.74 exit 0; load-buffer + paste-buffer + Enter; confirmed fresh working... counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d719871a5e7a14cb4600b6112c93fb311089eee8",
-      "branch": "main",
-      "frame": "03ha5bwfol972ifgf34jxigv4"
     }
   ]
 }

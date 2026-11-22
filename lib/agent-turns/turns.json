@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T09:30:04Z",
+  "generated": "2026-11-22T09:30:47Z",
   "count": 200,
-  "pin": "342cf714bc2c6f8045c6712b0612e924112a096de49f805dd55df7506742009c",
+  "pin": "5afbe2895bccb98e4e45c629955a167ea2856302bb26928545f5a1ead811e847",
   "turns": [
+    {
+      "id": "2fbdf835-0824-4e6a-8079-5ef884f816ed",
+      "ts": "2026-11-22T09:30:15Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "start: sinc-devops Softgarden submission (63891414)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fb5eb510f77c0de3d4ec35e92be15b7806a0e861",
+      "branch": "main",
+      "frame": "03ha6g9n9oq96bemqim6eqrfe"
+    },
     {
       "id": "9d1c802d-cf0d-4064-8b5d-40139809875c",
       "ts": "2026-11-22T09:29:51Z",
@@ -2746,19 +2759,6 @@
       "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
       "branch": "main",
       "frame": "03ha4vo3q44gidd1fxwmr0xpf"
-    },
-    {
-      "id": "dbbbb73d-6268-4453-a75b-1deb4e503066",
-      "ts": "2026-11-22T04:36:37Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "done: testo account confirmed (cockpit access live); drained: RWE (US-only OT reqs), Schwarz IT (no infra roles), SUSE (Workday bot-wall), ScorePlay mailed. ~203 apps",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
-      "branch": "main",
-      "frame": "03ha4uwnqpjox0v8sshl4detk"
     }
   ]
 }

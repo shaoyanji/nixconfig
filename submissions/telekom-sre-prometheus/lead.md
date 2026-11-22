@@ -1,6 +1,6 @@
 # Lead: Deutsche Telekom / T-Systems — Site Reliability Engineer (SRE)
 
-Fit: 4
+Fit: 3
 Stand: 22.11.2026
 Sprache: de
 Referenz: 12444-563465374109756-DT-S
@@ -24,7 +24,7 @@ Betriebstelemetrie ist nicht angelesen, sondern gebaut: Ein Sentinel-Job schreib
 - Terraform, Ansible, GitOps-Werkzeuge.
 - OpenTelemetry.
 
-Der Abgleich ist damit eindeutig: Die Denkweise und die Betriebserfahrung passen, der Werkzeugkasten der Must-Haves fehlt. Deshalb Fit 4 und nicht 5 — die Vorgabe nannte 5, das hält einer Prüfung der Must-Have-Liste nicht stand.
+Der Abgleich ist damit eindeutig: Die Denkweise und die Betriebserfahrung passen, der Werkzeugkasten der Must-Haves fehlt. Deshalb Fit 3 und nicht 4 — Prometheus, Grafana, Loki und AlertManager sind Must-Haves, und die Rolle trägt Prometheus im Titel; keine dieser Komponenten ist betrieben worden. Eine 4 würde den Werkzeugkasten behaupten, eine 2 würde die Betriebserfahrung unterschlagen.
 
 ## Weg
 

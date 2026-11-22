@@ -1,77 +1,75 @@
-# Bewerbung T-Systems — Site Reliability Engineer (SRE) (m/w/d)
+# Bewerbung — T-Systems, Site Reliability Engineer (SRE) Prometheus
 
 Stand: 22. November 2026
-Fit: 4 / 5
-Kennziffer: 12444-563465374109756-DT-S
+Fit: 3
+Sprache: Deutsch
+Status: Paket kompiliert, gemessen, Werkzeuglücke im Anschreiben benannt
 
 ## Stelle
 
 | Feld | Wert |
 | :--- | :--- |
 | Arbeitgeber | Deutsche Telekom AG / T-Systems International GmbH |
-| Rolle | Site Reliability Engineer (SRE) (m/w/d) |
-| Arbeitsorte | Kassel, Bielefeld, München, Berlin, **Karlsruhe**, Hannover, Dresden, Magdeburg, Saarbrücken, Darmstadt |
-| Modell | Vollzeit, Teilzeit möglich, hybrid mit mobilem Arbeiten, Start ab sofort |
-| Entgelt | keine Bandbreite genannt |
-| Fachkontakt | thomas.arbeit@t-systems.com |
-| Weg | Bewerbung über das Telekom-/T-Systems-Portal mit der Kennziffer |
+| Rolle | Site Reliability Engineer (SRE) (m/w/d), Schwerpunkt Prometheus |
+| Referenz | 12444-563465374109756-DT-S |
+| Standorte | Kassel, Bielefeld, München, Berlin, Karlsruhe, Hannover, Dresden, Magdeburg, Saarbrücken, Darmstadt |
+| Anstellung | Vollzeit, Teilzeit möglich, hybrid mit mobilem Arbeiten, ab sofort |
+| Quelle | Arbeitsagentur-Jobdetails, Anzeige liegt vollständig im Paket |
+| Fachliche Fragen | thomas.arbeit\@t-systems.com |
 
-## Schwerpunkt der Stelle
+## Gemessene Artefakte
 
-Monitoring- und Observability-Stack auf Basis von Prometheus, Grafana, Loki und AlertManager für verteilte Fog- und Edge-Infrastrukturen; Alerting für autonome Betriebsmodelle, Disconnected- und Air-Gap-Szenarien; lokale Retention, Log-Rotation und Datenmanagement unter knappen CPU-, Speicher- und Storage-Ressourcen; Kubernetes-Monitoring; Infrastructure as Code mit YAML.
+| Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 37566 | 524 | `7cdd0ea5455e0320` |
+| `anschreiben.pdf` | 1 | 24903 | 320 | `c909a39787a5a084` |
+| `lebenslauf.typ` | — | 5774 | — | `06a92a81bd110652` |
+| `anschreiben.typ` | — | 3120 | — | `ad1a36017d98d70c` |
 
-## Dokumente
+Vollständige Hashes: `sha256sum submissions/telekom-sre-prometheus/*.pdf`.
 
-| Dokument | Datei | Hinweis |
+Beim Umbau entfernt: `selection.json` (Modus 444, read-only Derivation). Einen Store-Symlink gab es nicht mehr.
+
+## Fit-Map
+
+| Anforderung der Anzeige | Nachweis im Paket | Bewertung |
 | :--- | :--- | :--- |
-| Anschreiben | `anschreiben.pdf` | Eine Seite, deutsch, an Herrn Arbeit |
-| Lebenslauf | `lebenslauf.pdf` | Zwei Seiten, deutsch |
-| Quellen | `lebenslauf.typ`, `anschreiben.typ` | Typst, direkt kompilierbar |
-| Zeugnisse | keine Datei | Im Portal üblich, muss ergänzt werden |
+| Monitoring-Stack mit Prometheus | nicht betrieben, kein PromQL, keine Federation, kein Remote Write | **Kernlücke** |
+| Grafana-Dashboards, Provisioning as Code | nicht vorhanden | **Kernlücke** |
+| Loki, LogQL, Compaction | nicht vorhanden | **Kernlücke** |
+| AlertManager: Routing, Inhibition, Eskalation | nicht vorhanden; eigene Go-Brücke mit Zustellbestätigung | **Kernlücke**, Denkweise vorhanden |
+| Alerting für autonome Betriebsmodelle, Disconnected/Air-Gap | Bestand ohne öffentliche Schnittstelle, Prüfungen von außen, Vorlaufgrößen | Stark im Prinzip |
+| Lokale Retention, Logrotation, Datenmanagement unter Knappheit | Vorlaufgrößen mit Zeitstempel, begrenzte Hardware, Rotation im Konzept | Teilweise |
+| Performance-Optimierung unter begrenzten Ressourcen | PSI, Speicherdruck, Generation-Alter als Messgrößen erster Ordnung | Stark |
+| Kubernetes-Monitoring | nicht vorhanden | **Lücke** |
+| Infrastructure as Code, YAML | Nix-Flakes als IaC; YAML im großen Stil nicht | **Teilweise** |
+| Linux-Performance: cgroups, PSI | täglich genutzt, inklusive Namespaces und Boot | Stark |
+| Hochverfügbarkeit für kritische Infrastruktur | Rollback über Generationen, geprüfte Restores, Alarmzustellung bestätigt | Stark, klein skaliert |
+| KRITIS mit Nachweispflichten | kein regulierter Betrieb verantwortet | **Lücke** |
+| Deutsch C1 | C1, Englisch Muttersprache | Erfüllt |
+| Präsenz Karlsruhe, hybrid | rund eineinhalb Stunden entfernt | Erfüllt |
 
-## Abgleich
+## Fit-Begründung: 3
 
-| Anforderung | Nachweis | Einschätzung |
-| :--- | :--- | :--- |
-| Prometheus, PromQL, Federation, Remote Write, lokale Retention | Eigenes JSONL-Ledger mit 15-Minuten-Takt und Rotation | **Lücke**, anderes Werkzeug |
-| Grafana, Dashboards, Provisioning as Code | Keine Dashboards; Auswertung über Skripte und Ledger | **Lücke** |
-| Loki, LogQL, Compaction | Logs liegen auf den Hosts, keine zentrale Log-Plattform | **Lücke** |
-| AlertManager, Routing, Inhibition, Eskalation | Eigene Go-Bridge mit Zustellbestätigung, keine Routing-Sprache | Teilweise, Konzept ja |
-| Kubernetes-Monitoring | Kein Kubernetes | **Lücke** |
-| Ressourcenbeschränkte Umgebungen, CPU/Memory/Storage optimieren | Sieben Jahre Betrieb auf eigener Hardware mit Limits und Speicherdruck | Stark |
-| Offline-, Air-Gap-, Disconnected-Betrieb | Betrieb ausschließlich über WireGuard-Tailnet, keine öffentliche Schnittstelle | Stark im Denken, nicht im Szenario erprobt |
-| YAML | Konfiguration ist Nix, nicht YAML | **Lücke** |
-| IT-Sicherheit, Security Awareness | sops/age, eigene Zertifizierungsstelle, kurzlebige Zertifikate, nftables | Stark |
-| SRE- oder Infrastrukturbetrieb | Fünf Jahre eigene Flotte, zehn Jahre Betrieb insgesamt | Stark |
-| Deutsch C1 | C1, Studium und Arbeit in Freiburg auf Deutsch | Erfüllt |
-| Terraform, Ansible, GitOps, OpenTelemetry (Nice-to-have) | Nicht vorhanden | Lücke, nicht gefordert |
-| Linux-Systemadministration (Nice-to-have) | Kern der eigenen Arbeit | Übertrifft |
+Die Anzeige führt Prometheus, Grafana, Loki und AlertManager als Must-Haves und die Rolle trägt „Prometheus" im Titel. Nichts davon ist betrieben worden. Was vorhanden ist, ist die Denkweise dahinter und die Betriebserfahrung darunter: Telemetrie als Schleife, Alarmierung als Zustellproblem, knappe Ressourcen als Anforderung, Linux als Messinstrument.
 
-## Fit-Begründung: 4 von 5
-
-Die Vorgabe nannte 5. Das ist nach Prüfung der Must-Have-Liste nicht zu halten, und eine Fünf im Datensatz, während das Anschreiben fünf Lücken einräumt, wäre intern widersprüchlich. Deshalb 4.
-
-Vier, weil die Substanz dieser Rolle vorhanden ist: Telemetrie unter Knappheit bauen, Alarme bis zur Zustellung verfolgen, Retention begrenzen, Störungen aus Daten diagnostizieren, unter Ressourcenlimits betreiben, ohne öffentliche Angriffsfläche. Die Anzeige beschreibt genau diese Probleme, nur mit anderen Produkten.
-
-Nicht fünf, weil fünf der Must-Haves vollständig fehlen: Prometheus samt PromQL, Grafana samt Provisioning, Loki samt LogQL, AlertManager und Kubernetes. Das ist der Werkzeugkasten, mit dem die Stelle täglich arbeitet.
+Eine 4 wäre zu behaupten, der Werkzeugkasten sei vorhanden. Eine 2 wäre zu behaupten, die Denkweise sei wertlos — und der Betrieb auf eigener Hardware ohne Reserve ist genau die Umgebung, für die Fog- und Edge-Knoten gebaut werden.
 
 ## Offene Punkte
 
-1. **Fit auf 4 korrigiert** (Vorgabe: 5). Begründung oben; die Bewertung im Datensatz folgt dem.
-2. Zeugnisse fehlen.
-3. Prometheus-, Grafana-, Loki-, AlertManager- und Kubernetes-Lücke steht im Anschreiben; nicht überspielen.
-4. Standort Karlsruhe wählen. Von Gutach im Breisgau rund anderthalb Stunden; die anderen Standorte sind deutlich weiter.
-5. Keine Gehaltszahl nennen; keine Bandbreite in der Anzeige.
-6. Ansprechpartner per E-Mail prüfen, ob eine Bewerbung direkt gewünscht ist oder ausschließlich über das Portal.
+1. **Prometheus, Grafana, Loki, AlertManager** als Kernlücke im Anschreiben benannt, ohne Weichzeichner.
+2. **KRITIS** nicht vorhanden.
+3. **Zeugnisse** fehlen weiterhin.
+4. Mehrere Standorte zur Wahl; Karlsruhe ist der nächste und im Anschreiben genannt.
 
 ## Paket
 
 | Datei | Inhalt |
 | :--- | :--- |
-| `job-description.txt` | Anzeige mit Aufgaben, Must-Haves, Nice-to-Haves und Standorten. |
-| `lead.md` | Fit, Lücken, Standort, Weg, Gehalt. |
-| `lebenslauf.typ` | Typst-Quelle, eigenständig kompilierbar. |
-| `anschreiben.typ` | Typst-Quelle, eigenständig kompilierbar. |
-| `lebenslauf.pdf` | Zwei Seiten. |
-| `anschreiben.pdf` | Eine Seite. |
-| `submission-sheet.md` | Diese Übersicht. |
+| `job-description.txt` | Vollständige Anzeige. |
+| `lead.md` | Fit, Lücken, Weg, Gehalt. |
+| `lebenslauf.typ` | Typst-Quelle, zwei Seiten. |
+| `anschreiben.typ` | Typst-Quelle, eine Seite. |
+| `lebenslauf.pdf` | 2 Seiten, 524 Wörter. |
+| `anschreiben.pdf` | 1 Seite, 320 Wörter. |
+| `submission-sheet.md` | Diese Übersicht mit Messwerten. |

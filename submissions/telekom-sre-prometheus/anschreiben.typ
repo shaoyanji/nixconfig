@@ -1,4 +1,4 @@
-#set document(title: "Bewerbung T-Systems — Site Reliability Engineer", author: "Matt Ji")
+#set document(title: "Bewerbung — T-Systems, Site Reliability Engineer Prometheus", author: "Matt Ji")
 #set page(paper: "a4", margin: (top: 2cm, bottom: 2cm, left: 2.2cm, right: 2.2cm))
 #set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de")
 #set par(leading: 0.58em, justify: true, spacing: 1.1em)
@@ -6,40 +6,40 @@
 #text(size: 9pt, fill: rgb("#374151"))[
   #text(weight: "bold", size: 10pt, fill: rgb("#111827"))[Matt Ji] \
   Am Burgerhof 4, 79261 Gutach im Breisgau \
-  matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji
+  matt\@bountystash.com • +49 1733281570 • github.com/shaoyanji/nixconfig
 ]
 
-#v(14pt)
+#v(12pt)
 
 #text(size: 9pt)[
-  Deutsche Telekom AG / T-Systems International GmbH \
-  Herrn Thomas Arbeit \
-  Kennziffer 12444-563465374109756-DT-S
+  T-Systems International GmbH \
+  Site Reliability Engineer (SRE), Schwerpunkt Prometheus \
+  Referenz 12444-563465374109756-DT-S
 ]
 
-#v(14pt)
+#v(12pt)
 #align(right)[#text(size: 8.5pt, fill: rgb("#4b5563"))[22. November 2026]]
 
-#v(6pt)
-#text(weight: "bold")[Bewerbung als Site Reliability Engineer (SRE) (m/w/d), Standort Karlsruhe]
+#v(4pt)
+#text(weight: "bold")[Bewerbung als Site Reliability Engineer, Schwerpunkt Prometheus]
 
 #v(4pt)
-Sehr geehrter Herr Arbeit,
+Sehr geehrte Damen und Herren,
 
 #v(2pt)
-Eine Fog-Node, die ohne verlässliche Verbindung arbeitet, ist der ehrlichste Prüfstein für Telemetrie: Wenn die Leitung wegfällt, entscheidet nicht das Dashboard, sondern ob die Daten lokal gehalten, verdichtet und nach der Rückkehr korrekt nachgeliefert werden. Genau unter dieser Bedingung habe ich fünf Jahre lang Betrieb gemacht, ohne es so zu nennen: dreizehn Server auf eigener Hardware, alles nur über ein WireGuard-Tailnet erreichbar, jede Maschine mit begrenztem Speicher und begrenzter CPU.
+Ein Alarm ist zuerst ein Zustellproblem und erst danach ein Messproblem. Diese Reihenfolge habe ich fünf Jahre lang auf eigener Hardware gelernt: dreizehn Linux-Hosts, begrenzte CPU, begrenzter Speicher, kein Managed Cloud, keine öffentliche Schnittstelle. Ein Sentinel-Job schreibt alle fünfzehn Minuten Jobstatus, Alter der laufenden Generation, Speicher- und Prozessdruck und Plattenplatz in ein Ledger. Prüfungen von außen messen Erreichbarkeit und Antwortzeit. Eine Brücke in Go führt eine Störung erst dann als gemeldet, wenn die Zustellung bestätigt ist — ein Alarm, der ausgelöst und nie zugestellt wird, ist schlimmer als keiner, weil er einen falschen Glauben erzeugt.
 
 #v(2pt)
-Konkret: Ein Sentinel-Job schreibt alle 15 Minuten Jobstatus, Generation-Alter sowie Disk- und PSI-Druck in ein JSONL-Ledger; die Retention entsteht durch Rotation, nicht durch Wachstum. Gatus prüft Endpunkte, und eine Go-Bridge bestätigt einen Alarm erst, wenn die Nachricht tatsächlich ankommt — ich halte den Unterschied zwischen ausgelöstem und zugestelltem Alarm für den Kern der Sache. Dienste sind über systemd-Optionen und Ressourcenlimits begrenzt, Speicherdruck ist eine Messgröße erster Ordnung, jede Änderung ist auf die vorherige Generation rückrollbar, Sicherungen laufen mit restic und werden durch Wiederherstellungen geprüft. Störungen diagnostiziere ich aus dem Ledger und den Systemlogs, bevor sie jemand meldet.
+Für Edge-Umgebungen ist genau das die entscheidende Eigenschaft: Die Datenquelle ist klein, die Leitung ist schmal, und trotzdem muss eine Entscheidung vor Ort fallen. Ich habe gelernt, mit knappen Ressourcen zu planen statt gegen sie anzukämpfen: Abtastrate und Aufbewahrung sind eine Entscheidung über Kosten, Logrotation ist eine Entscheidung über Beweise, und Rückrollung über die vorige Generation dauert Minuten statt einer Nacht. Infrastruktur steht bei mir als Beschreibung im Repository, nicht als Handarbeit auf der Maschine; jede Änderung läuft durch eine Prüfung.
 
 #v(2pt)
-Was ich nicht mitbringe, sage ich vor der ersten Zeile Ihrer Must-Have-Liste: keinen Prometheus-Betrieb, kein PromQL, keine Federation, kein Remote Write, keine lokale Retention in Prometheus. Keine Grafana-Dashboards und kein Provisioning as Code, kein Loki und kein LogQL, kein AlertManager mit Routing und Inhibition, kein Kubernetes-Monitoring. Meine Konfiguration ist Nix, nicht YAML, und Terraform, Ansible und OpenTelemetry sind mir Werkzeugnamen, keine Praxis. Das ist die halbe Stelle, und ich sage es lieber jetzt als in der Einarbeitung.
+Was ich nicht mitbringe, sage ich offen: Prometheus, Grafana, Loki und AlertManager habe ich nicht betrieben, also kein PromQL, kein LogQL, kein Routing und keine Inhibition. Kubernetes-Monitoring, YAML-Konfiguration im großen Stil, Terraform, Ansible und OpenTelemetry kenne ich nicht aus dem Betrieb. Einen regulierten KRITIS-Betrieb mit Nachweispflichten habe ich nicht verantwortet. Meine Telemetrie ist selbst gebaut, nicht aus Standardkomponenten zusammengestellt — die Denkweise ist dieselbe, der Werkzeugkasten ist es nicht.
 
 #v(2pt)
-Was ich mitbringe, ist die andere Hälfte und die, die man nicht in einem Kurs nachholt: die Gewohnheit, Telemetrie so zu bauen, dass sie unter Knappheit funktioniert und im Ernstfall trägt, plus die Fähigkeit, einen Stack wie Ihren schnell zu verstehen, weil ich seine Bausteine von Hand gebaut habe. Ich bin US-Amerikaner mit unbefristetem Niederlassungsrecht in Deutschland, brauche also keinen Visa-Sponsor und keine Vorlaufzeit für einen Aufenthaltstitel. Mein Wohnsitz ist Baden-Württemberg, Karlsruhe rund anderthalb Stunden entfernt und der Standort, für den ich mich entscheide; hybrides Arbeiten mit Präsenz bei Bedarf ist für mich deshalb kein Zugeständnis, sondern die passende Form. Deutsch ist bei mir C1, Englisch Muttersprache. Mein Repository zeigt die Arbeit ungeschminkt: github.com/shaoyanji/nixconfig
+Karlsruhe ist von meinem Wohnort in etwa eineinhalb Stunden erreichbar, hybrides Arbeiten passt zu meinem Arbeitsstil. Deutsch ist C1, Englisch Muttersprache, Niederlassungserlaubnis liegt vor. Das Repository ist öffentlich: github.com/shaoyanji/nixconfig
 
 #v(4pt)
 Mit freundlichen Grüßen
 
-#v(18pt)
+#v(16pt)
 Matt Ji

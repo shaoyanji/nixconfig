@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T08:52:23Z",
+  "generated": "2026-11-22T08:54:46Z",
   "count": 200,
-  "pin": "53df1339fe7101dd347ea6a57c6e1760799afd08976575cceb35cfdca629cf79",
+  "pin": "e46fdf8c3dc9303af0154750769a2479daa1f837c3cea415ed72f83cab61cc68",
   "turns": [
+    {
+      "id": "a497bbf4-2b6e-44ca-a6a0-cb2d221545cc",
+      "ts": "2026-11-22T08:53:51Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: uni-freiburg-future-forests packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fa9c12a1493538dff584cc04424610dd1535ca58",
+      "branch": "main",
+      "frame": "03ha695msuqvb8btlkecmcbzk"
+    },
+    {
+      "id": "bd38326e-02e6-4c11-b4cc-0921beea673e",
+      "ts": "2026-11-22T08:52:26Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: vertigis-cloud-engineer packet prepared | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a55276ac1df865054b611fe074ba5c0e3b7a4d3b",
+      "branch": "main",
+      "frame": "03ha68vnql82zvtcshs6phvfh"
+    },
     {
       "id": "b00c1875-dc10-4693-afd6-a3378745a0a0",
       "ts": "2026-11-22T08:52:02Z",
@@ -2739,34 +2765,6 @@
       "base_commit": "efbbbcbd227ba492b1e6de8e0ceac032cf2f82dd",
       "branch": "main",
       "frame": "03ha407sm4rcl9g2qd71do0k6"
-    },
-    {
-      "id": "e1a05261-2bfd-47fb-b2fd-0f7d53d76eaf",
-      "ts": "2026-11-22T01:41:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:outreach-redact-contacts",
-      "action": "landed: redacted third-party contacts/phone numbers from .agents/outreach/nix-consultancy-outreach.md (names->[NAME], LinkedIn/personal URLs->[REDACTED]); first-party Matt block kept; change unstaged",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        ".agents/outreach/nix-consultancy-outreach.md"
-      ],
-      "base_commit": "efbbbcbd227ba492b1e6de8e0ceac032cf2f82dd",
-      "branch": "main",
-      "frame": "03ha3wpoub7t29n00ejv4arkq"
-    },
-    {
-      "id": "17a797cc-03fa-4e65-8ca1-b6678e444895",
-      "ts": "2026-11-22T01:33:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-corpus-reconcile",
-      "action": "landed: reconciled gist/site/German CV corpora; EWE+Landvest folded into Bountystash highlights, Swirl added, email-archive dropped, lebenslauf re-exported | gate: matt:gist:drift PASS + nix build .#sites.matt-site PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "efbbbcbd227ba492b1e6de8e0ceac032cf2f82dd",
-      "branch": "main",
-      "frame": "03ha3v5ekcjtuwnolnjset2vk"
     }
   ]
 }

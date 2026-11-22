@@ -5,8 +5,9 @@
 **Availability:** from 01.12.2026 · 3–5 days/week · remote from Germany
 
 Each target gets one reason for the conversation, one proof point, one concrete
-piece of work [SENDER] can take, and one cheap ask. **Contacts are not in this file:**
-reach a target via their own site; `[NAME]`, `[CONTACT]`, `[PHONE]` in the pipeline.
+piece of work [SENDER] can take, and one cheap ask. **Only published work addresses
+are recorded here**, read from the target's own site on 2026-11-22; a person's name
+and direct line stay `[NAME]` and `[PHONE]`, resolved at send time.
 
 ## The position in one paragraph
 
@@ -56,7 +57,7 @@ if asked.
 ## 1. [NAME] — Numtide
 
 **Role to verify:** Founder and Director, Numtide.
-**Public contact:** [numtide.com/about](https://numtide.com/about) · [CONTACT] · [CONTACT]
+**Public contact:** [numtide.com/about](https://numtide.com/about) · `hello@numtide.com` (published there, read 2026-11-22)
 **Company:** [numtide.com](https://numtide.com/) · [about](https://numtide.com/about) · [services](https://numtide.com/services/)
 
 ### Why him
@@ -145,7 +146,7 @@ Best,
 ## 2. [NAME] — Cachix
 
 **Role to verify:** Founder, Cachix.
-**Public contact:** [cachix.org/about](https://www.cachix.org/about) · [CONTACT] · [CONTACT]
+**Public contact:** [cachix.org/about](https://www.cachix.org/about) · no address published, the about page carries a form
 **Company:** [cachix.org](https://cachix.org/) · [about](https://www.cachix.org/about) · [Cachix Deploy GA](https://blog.cachix.org/)
 
 ### Why him
@@ -234,7 +235,7 @@ Best,
 ## 3. Cyberus Technology — engineering leadership
 
 **Primary contact:** [NAME], Co-Founder; engineering/cloud
-leadership. [CONTACT]
+leadership. `service@cyberus-technology.de` (Impressum, read 2026-11-22)
 **Secondary:** [NAME], CTO (verify current title before sending).
 **Company:** [cyberus-technology.de](https://www.cyberus-technology.de/) · [about](https://www.cyberus-technology.de/about-cyberus) · [Cyberus Linux](https://www.cyberus-technology.de/cyberus-linux)
 

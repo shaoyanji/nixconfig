@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T08:13:04Z",
+  "generated": "2026-11-22T08:13:47Z",
   "count": 200,
-  "pin": "6cc2cef2bcca0ba8073276ab92e9db1c04176fb0b1bfba4d2339a76e7d4a4787",
+  "pin": "dbcc5c3e17dc9d54169d0e8b7938a4f27b736b74caca958ed1890b51c0e19865",
   "turns": [
+    {
+      "id": "be09e627-ae06-413b-a1ed-3d3c989c26df",
+      "ts": "2026-11-22T08:13:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-clickhouse",
+      "action": "landed: ClickHouse DBRE packet, CV 2pp letter 1pp, Germany remote no sponsorship, internals gap named | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fbb8fec5b7305ea6a475cf2797ceae0fb45f235d",
+      "branch": "main",
+      "frame": "03ha617a70uj362h3k8oadn7j"
+    },
     {
       "id": "4a85212a-9113-495a-8e61-a1dddef83782",
       "ts": "2026-11-22T08:12:51Z",
@@ -2795,19 +2808,6 @@
       "base_commit": "bcf9d21cd05dae9856758fc60bcb5856b901933d",
       "branch": "main",
       "frame": "03h9ztrb07k1ikxvpz50v6nx0"
-    },
-    {
-      "id": "829badb3-9590-4186-a370-5c808f1e8f96",
-      "ts": "2026-11-21T12:56:04Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-21: 1 plate(s) kept of 1 spent, 401 roster row(s) waiting, 641 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0e46552ecfe1ba584c5e4f170b30e0f7dd8f30a2",
-      "branch": "main",
-      "frame": "03h9zr68aq3jeq0ndji5xhe73"
     }
   ]
 }

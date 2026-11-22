@@ -1,0 +1,26 @@
+Principal CI/CD & Platform Engineer
+Elastic
+Remote, EMEA
+Route: https://jobs.elastic.co/
+Packet date: 22 November 2026
+
+[Source note]
+No advert text was supplied with this assignment and no requisition was fetched. The scope below is the
+brief. Confirm the requisition, level and location on jobs.elastic.co before sending.
+
+[Expected scope, from the brief]
+- Principal-level ownership of CI/CD as a product for engineering: build pipelines, caching, runner
+  capacity, and the developer experience of using them.
+- Reproducible build pipelines and test orchestration at scale.
+- Developer productivity measured, not asserted.
+- Linux systems depth underneath the platform.
+
+[Packet cross-check, 22.11.2026]
+Held: reproducible output from pinned inputs; a gate over the evaluated configuration rather than a
+compiled artifact; rollback by generation; a CI matrix derived from the host inventory; tiered gates by
+cost; one host per process under a memory watchdog during sweeps; generated documentation from the same
+graph as the task menu; Python and Go tooling; 13 Linux hosts over three hardware generations; systemd,
+cgroups, namespaces, PSI, nftables, WireGuard, own CA, sops/age.
+Not held: CI at thousands of builds per day; Bazel or Gradle pipelines; distributed build caches;
+Kubernetes runner fleets; Java ecosystem tooling.
+Fit 4: the reproducibility and gating judgement transfers, the scale and stack do not.

@@ -1,6 +1,6 @@
 #set document(title: "Matt Ji — Lebenslauf", author: "Matt Ji")
 #set page(paper: "a4", margin: (top: 1.5cm, bottom: 1.5cm, left: 1.7cm, right: 1.7cm))
-#set text(font: ("Libertus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
+#set text(font: ("Libertinus Serif", "DejaVu Sans"), size: 10pt, fill: rgb("#111827"), lang: "de", hyphenate: false)
 #set par(leading: 0.58em, justify: true)
 
 #align(center)[

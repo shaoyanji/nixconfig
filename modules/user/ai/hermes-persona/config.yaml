@@ -144,14 +144,22 @@ display:
 # endpoint: the billed pick that cost the Infron balance (2026-11-19) was this
 # model resolved through a metered route.
 fallback_providers:
+  # NIM leads (2026-11-22), ahead of the two lanes that used to. Order is cost,
+  # not preference: `GET <base>/models` measured 0.107 s for NIM (connect
+  # 0.016 s, against a 0.066 s github baseline) where openrouter was 0.984 s and
+  # onerouter 1.055 s, both with a 0.214 s connect. While those two are answering
+  # 429 on completions, leading with them made every turn pay a distant
+  # handshake plus a rejection before reaching the lane that actually answers —
+  # a 3-hop failover for a one-word reply. The near, unthrottled lane belongs
+  # where the throttle fires.
+  - provider: nvidia
+    model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: openrouter
     model: baidu/ernie-5.5-flash-preview:free
   - provider: custom
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
     key_env: INFRON_API_KEY
-  - provider: nvidia
-    model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: ollama-cloud
     model: nemotron-3-ultra
   # CrowLLM is a keyed route whose catalog is `:free` ids only: the key comes

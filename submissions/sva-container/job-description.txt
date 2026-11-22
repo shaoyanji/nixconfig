@@ -1,0 +1,95 @@
+DevOps Engineer – Container und Cloud (m/w/d)
+Kennung: j456
+Unternehmen: SVA System Vertrieb Alexander GmbH
+Standorte (29): Aachen, Bensheim, Berlin, Bonn, Bremen, Dresden, Düsseldorf, Erfurt, Freiburg, Greven, Göttingen, Hamburg, Karlsruhe, Köln, Langenhagen, Leinfelden-Echterdingen, Leipzig, Meersburg, München, Nürnberg, Paderborn, Regensburg, Rostock, Saarbrücken, Schwerte, Siegen, Ulm, Wiesbaden, Würzburg
+Schwerpunkt-Standort in Baden-Württemberg: Freiburg (Schnewlinstraße 12, 79098), Karlsruhe, Leinfelden-Echterdingen, Ulm, Meersburg
+Anstellung: Vollzeit (FULL_TIME), unbefristet; mobiles Arbeiten je nach Aufgabengebiet
+Veröffentlicht: 2026-09-22 · gültig bis: 2026-12-31 (danach ist die Ausschreibung abgelaufen)
+Quelle: https://www.sva.de/de/job-portal/DevOps-Engineer-Container-und-Cloud-mwd-de-j456.html
+Abgerufen: 2026-11-22, aus dem schema.org-JobPosting der Seite (responsibilities, qualifications, jobBenefits)
+
+Werden auch Sie Teil der SVA-Community!
+Als eines der führenden Systemhäuser in Deutschland bieten wir Ihnen vielfältige Möglichkeiten in einem spannenden Berufsumfeld und einer wachsenden Branche Ihre berufliche Heimat zu finden. Bei uns haben Sie den Freiraum innovative Lösungen zu entwickeln, die schon heute in die Zukunft reichen und sich langfristig bewähren.
+
+Verstärken Sie unser Team als DevOps Engineer – Container und Cloud (m/w/d) an einem unserer Standorte deutschlandweit. In unserer Geschäftsstelle für den Öffentlichen Dienst entwickeln wir in diversen IT-Bereichen ganzheitliche Lösungen für Auftraggeber des Bundes. Dabei arbeiten sowohl unsere fachlich beratenden als auch unsere technischen Mitarbeitenden Hand in Hand und schaffen so moderne IT-Systeme für die Digitalisierung auf Bundes- und Landesebene.
+Als DevOps Engineer (m/w/d) werden Sie Teil unserer DevOps Community und entwickeln komplexe, automatisierte Plattformen in Private, Public und Hybrid Cloud-Umgebungen. Dabei leisten Sie einen maßgeblichen Beitrag zur Digitalisierungsstrategie und Modernisierung des Bundes.
+Ihre Aufgaben
+- Im Team setzen Sie die jeweilige Container-Plattform auf und integrieren diese in die Cloud-Systemlandschaft des Kunden.
+- Sie arbeiten hauptsächlich mit Kubernetes, teils Vanilla, teils integriert in eine Cloudumgebung (z.B. RKE, Red Hat OpenShift, o.a.).
+- Sie nutzen Infrastructure as Code Prinzipien, um die Umgebungen weitestgehend zu automatisieren.
+- Dabei spielt Sicherheit z.B. durch Härtung, Admission Control, Observability, oder generell durch die Compliance mit Sicherheitsstandards eine wichtige Rolle.
+- Sie sorgen für Ausfallsicherheit im Betrieb der Plattform und nutzen dazu Praktiken des Chaos Engineering und Disaster Recovery.
+- Darüber hinaus bringen Sie sowohl im Projekt als auch in der Community Ihre Erfahrungen und Ideen ein und evaluieren diese gemeinsam mit den Kolleginnen und Kollegen.
+
+Ihr Profil
+- Abgeschlossene IT-orientierte Fachausbildung, abgeschlossenes IT-orientiertes Studium oder entsprechende relevante Berufserfahrung
+- Erfahrung mit Kubernetes, Vanilla oder eine gängige Distribution
+- Erfahrung mit SRE-Praktiken und gängigen (Open Source) Tools
+- Bestenfalls Erfahrung mit Immutable OS und Container Security
+- Lust, Ihre Fähigkeiten und Kenntnisse zu erweitern und damit die Digitalisierung des Landes weiter voranzutreiben
+- Gute Kommunikationsfähigkeiten mit sehr guten Deutsch- (Level C1 oder höher) und Englischkenntnissen (Level B2 oder höher), Reisebereitschaft innerhalb Deutschlands sowie die Bereitschaft zur Sicherheitsüberprüfung (SÜG-Stufe 2)
+
+Ihre Vorteile
+- Flexibilität: Unsere Teams entscheiden sich je nach Aufgabengebiet, welche Aufteilung zwischen mobilem Arbeiten und Präsenz vor Ort sinnvoll ist. Zudem bieten wir flexible Arbeitszeiten und 30 Urlaubstage.
+- Corporate Benefits: Sie haben die Möglichkeit monatlich wechselnde, attraktive Mitarbeiterrabatte zu nutzen.
+- Vorsorgen für die Zukunft: Profitieren Sie von einer betrieblichen Altersvorsorge mit Arbeitgeberzuschuss.
+- Weiterbildung: Wir unterstützen Ihre persönliche und berufliche Entwicklung mit einem vielseitigen Schulungsangebot – von internen Trainings durch erfahrene Kollegen bis hin zu externen Weiterbildungen.
+- Individueller Start: Ein umfassendes Onboarding-Event ermöglicht Ihnen den idealen Einstieg.
+- Kultur & Zusammenarbeit: Wir leben eine Unternehmenskultur mit offenen Türen und wertschätzender Atmosphäre, in der Ihre Eigeninitiative sowie Ihr Engagement gefördert werden.
+- Moderne Ausstattung: Sie erhalten ein Smartphone und Notebook mit Betriebssystem nach Wahl.
+
+Als inhabergeführtes, unabhängiges Systemhaus, mit Leidenschaft, Bodenhaftung und hoher Servicequalität begleiten wir unsere Kunden von der Planung bis zum Betrieb. Deutschlandweit stehen wir als Partner für zukunftssichere IT-Lösungen und legen besonders großen Wert auf den persönlichen Austausch.
+
+Weitere Informationen zu uns finden Sie auf unserer Karriereseite: www.sva.de/de/karriere
+ Wir freuen uns auf Ihre Bewerbung!
+Solange diese Position auf unserer Karriereseite sichtbar ist, können Sie sich gerne darauf bewerben – es gibt keine Bewerbungsfrist.
+
+Bitte senden Sie uns folgende Bewerbungsunterlagen ausschließlich online über unser Bewerbungsformular:
+• Anschreiben
+• Lebenslauf
+• Zeugnisse
+• Gehaltsvorstellung
+• Eintrittsdatum
+
+Remark: All positions require fluent German language skills (level C1 or above)
+SVA System Vertrieb Alexander GmbH · Borsigstraße 26 · 65205 WiesbadenSVA System Vertrieb Alexander GmbH · Borsigstraße 26 · 65205 Wiesbaden
+
+Ihre Aufgaben
+- Im Team setzen Sie die jeweilige Container-Plattform auf und integrieren diese in die Cloud-Systemlandschaft des Kunden.
+- Sie arbeiten hauptsächlich mit Kubernetes, teils Vanilla, teils integriert in eine Cloudumgebung (z.B. RKE, Red Hat OpenShift, o.a.).
+- Sie nutzen Infrastructure as Code Prinzipien, um die Umgebungen weitestgehend zu automatisieren.
+- Dabei spielt Sicherheit z.B. durch Härtung, Admission Control, Observability, oder generell durch die Compliance mit Sicherheitsstandards eine wichtige Rolle.
+- Sie sorgen für Ausfallsicherheit im Betrieb der Plattform und nutzen dazu Praktiken des Chaos Engineering und Disaster Recovery.
+- Darüber hinaus bringen Sie sowohl im Projekt als auch in der Community Ihre Erfahrungen und Ideen ein und evaluieren diese gemeinsam mit den Kolleginnen und Kollegen.
+
+Ihr Profil
+- Abgeschlossene IT-orientierte Fachausbildung, abgeschlossenes IT-orientiertes Studium oder entsprechende relevante Berufserfahrung
+- Erfahrung mit Kubernetes, Vanilla oder eine gängige Distribution
+- Erfahrung mit SRE-Praktiken und gängigen (Open Source) Tools
+- Bestenfalls Erfahrung mit Immutable OS und Container Security
+- Lust, Ihre Fähigkeiten und Kenntnisse zu erweitern und damit die Digitalisierung des Landes weiter voranzutreiben
+- Gute Kommunikationsfähigkeiten mit sehr guten Deutsch- (Level C1 oder höher) und Englischkenntnissen (Level B2 oder höher), Reisebereitschaft innerhalb Deutschlands sowie die Bereitschaft zur Sicherheitsüberprüfung (SÜG-Stufe 2)
+
+Was SVA bietet
+- Flexibilität: Unsere Teams entscheiden sich je nach Aufgabengebiet, welche Aufteilung zwischen mobilem Arbeiten und Präsenz vor Ort sinnvoll ist. Zudem bieten wir flexible Arbeitszeiten und 30 Urlaubstage.
+- Corporate Benefits: Sie haben die Möglichkeit monatlich wechselnde, attraktive Mitarbeiterrabatte zu nutzen.
+- Vorsorgen für die Zukunft: Profitieren Sie von einer betrieblichen Altersvorsorge mit Arbeitgeberzuschuss.
+- Weiterbildung: Wir unterstützen Ihre persönliche und berufliche Entwicklung mit einem vielseitigen Schulungsangebot – von internen Trainings durch erfahrene Kollegen bis hin zu externen Weiterbildungen.
+- Individueller Start: Ein umfassendes Onboarding-Event ermöglicht Ihnen den idealen Einstieg.
+- Kultur & Zusammenarbeit: Wir leben eine Unternehmenskultur mit offenen Türen und wertschätzender Atmosphäre, in der Ihre Eigeninitiative sowie Ihr Engagement gefördert werden.
+- Moderne Ausstattung: Sie erhalten ein Smartphone und Notebook mit Betriebssystem nach Wahl.
+
+Als inhabergeführtes, unabhängiges Systemhaus, mit Leidenschaft, Bodenhaftung und hoher Servicequalität begleiten wir unsere Kunden von der Planung bis zum Betrieb. Deutschlandweit stehen wir als Partner für zukunftssichere IT-Lösungen und legen besonders großen Wert auf den persönlichen Austausch.
+
+Weitere Informationen zu uns finden Sie auf unserer Karriereseite: www.sva.de/de/karriere
+ Wir freuen uns auf Ihre Bewerbung!
+Solange diese Position auf unserer Karriereseite sichtbar ist, können Sie sich gerne darauf bewerben – es gibt keine Bewerbungsfrist.
+
+Bitte senden Sie uns folgende Bewerbungsunterlagen ausschließlich online über unser Bewerbungsformular:
+• Anschreiben
+• Lebenslauf
+• Zeugnisse
+• Gehaltsvorstellung
+• Eintrittsdatum
+
+Remark: All positions require fluent German language skills (level C1 or above)

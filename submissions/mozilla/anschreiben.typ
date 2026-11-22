@@ -29,11 +29,11 @@ that they keep working when the person who built them is asleep. A repository th
 plane that replaced a drawer of shell scripts, documentation generated from the same source as the configuration, and CI
 running the identical per-host check the machine runs.
 
-Three properties matter more than the tooling, and they are what I would bring. First, **reproducibility is a property of
-the repository, not a discipline of the person**: inputs pinned in a lock file, outputs addressable by content, so a
-rebuild months later yields the same artefact instead of something that merely compiles today. Second, **the gate is the
-same everywhere**: CI and the host run one check, so a green build cannot mean something different from a healthy machine,
-and a failing check leaves the previous generation serving. Third, **the documentation is a build artefact**: hosts,
+Three properties matter more than the tooling, and they are what I would bring. First, *reproducibility is a property of
+the repository, not a discipline of the person*: inputs pinned in a lock file, outputs addressable by content, so a
+rebuild months later yields the same artefact instead of something that merely compiles today. Second, *the gate is the
+same everywhere*: CI and the host run one check, so a green build cannot mean something different from a healthy machine,
+and a failing check leaves the previous generation serving. Third, *the documentation is a build artefact*: hosts,
 modules, tasks and decisions are generated from the source, so a stale page is a build failure rather than a slow drift
 somebody discovers during an incident. That last one is the part I would most want to argue with your teams about, because
 it changes what "keeping docs up to date" costs.

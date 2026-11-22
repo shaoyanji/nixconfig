@@ -85,14 +85,14 @@ acceptable, and if not, raise it at the recruiter screen rather than at offer. T
 | `selection.json` | removed |
 | `chmod u+w *.pdf` | applied |
 | `typst compile lebenslauf.typ` | exit 0, no warnings |
-| `typst compile anschreiben.typ` | exit 0, no warnings |
+| `typst compile anschreiben.typ` | exit 0, **0 warnings** (bold markup was `**…**`, which Typst drops silently; corrected to `*…*`) |
 | `pdfinfo lebenslauf.pdf` | **2 pages** |
 | `pdfinfo anschreiben.pdf` | **1 page** |
 | Markers CV | `PSI`, `pinned`, `Terraform` (gap), `content` |
 | Markers letter | `Mozilla`, `Terraform`/`TypeScript`/`C++` (gaps), `reproducible` |
 | `task checks:prose` | 254 prose files, exit 0 |
 | sha256 CV | `7d4efbff2019e31f0d648784eaff6f5804b45a41c989fd0210c0f189b5b5e7c1` |
-| sha256 letter | `ad1119c734f36b5281d6b4e09e9c24aac693b88d1221d046e7455557cbb95e4d` |
+| sha256 letter | `0e48c306605f9d1bb1a43fa599694670256c40ff56ce88b0525faec569deac4c` |
 | DB read-back | verified after upsert |
 
 ## Next steps

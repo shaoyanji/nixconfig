@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T10:33:25Z",
+  "generated": "2026-11-22T10:33:47Z",
   "count": 200,
-  "pin": "7dc8aef668038ee34a856d4bd17a7fc4ff16f758938bc23eb1fdea4d4b8b128d",
+  "pin": "446514b09e0d649eda78f678c57764b4a43258d80a78111b6d7da3ca75bd2bfc",
   "turns": [
+    {
+      "id": "ffcfa9a4-8f7b-4aa8-b234-b47fc9a92275",
+      "ts": "2026-11-22T10:33:27Z",
+      "source": "freebuff",
+      "subject": "nixconfig:mozilla",
+      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "afe43b5a18f86417f90a1dd57dfbf7cddb22121f",
+      "branch": "main",
+      "frame": "03ha6sm2d0ndk9k2xkrqor6fb"
+    },
     {
       "id": "80334856-dc5e-42a8-9508-0d42d198d021",
       "ts": "2026-11-22T10:33:11Z",
@@ -2655,21 +2668,6 @@
       "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
       "branch": "main",
       "frame": "03ha60u6cyoa4ynfmv6yrxw9p"
-    },
-    {
-      "id": "25afb9db-0dbb-4192-90fa-c5dce1cbee14",
-      "ts": "2026-11-22T08:10:00Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: navvis senior linux platform munich (GH eu 4943654101); no-sponsorship + commute/relocation Yes honest",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/navvis"
-      ],
-      "files": [],
-      "base_commit": "2807066f63c73f2ab7532c768f112fa91efac1a3",
-      "branch": "main",
-      "frame": "03ha60l6hqlthdc5ooteordk0"
     }
   ]
 }

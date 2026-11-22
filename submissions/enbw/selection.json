@@ -1,0 +1,279 @@
+{
+  "budget": {
+    "maxHighlights": 4,
+    "maxKeywords": 6,
+    "maxProjects": 4,
+    "minHighlights": 1,
+    "minProjects": 1
+  },
+  "jd": {
+    "chars": 6565,
+    "terms": [
+      {
+        "term": "kubernetes",
+        "weight": 24.079
+      },
+      {
+        "term": "energy",
+        "weight": 23.56
+      },
+      {
+        "term": "cloud",
+        "weight": 22.506
+      },
+      {
+        "term": "energie",
+        "weight": 18.1
+      },
+      {
+        "term": "kubernetes-umgebungen",
+        "weight": 18.1
+      },
+      {
+        "term": "system",
+        "weight": 18.1
+      },
+      {
+        "term": "netze",
+        "weight": 16.056
+      },
+      {
+        "term": "finanzielle",
+        "weight": 14.603
+      },
+      {
+        "term": "sowie",
+        "weight": 10.163
+      },
+      {
+        "term": "dass",
+        "weight": 9.003
+      },
+      {
+        "term": "sicher",
+        "weight": 9.003
+      },
+      {
+        "term": "cloud-automatisierung",
+        "weight": 8.625
+      }
+    ]
+  },
+  "mode": "jd",
+  "projects": {
+    "dropped": [
+      {
+        "name": "Konzept für Schwachstellenbetrieb",
+        "score": 6.962
+      },
+      {
+        "name": "fibtransponder",
+        "score": 4.8953
+      },
+      {
+        "name": "bountystash",
+        "score": 4.3304
+      },
+      {
+        "name": "kev-time",
+        "score": 2.9121
+      },
+      {
+        "name": "matt.bountystash.com",
+        "score": 2.291
+      },
+      {
+        "name": "kelly-svg",
+        "score": 2.084
+      }
+    ],
+    "kept": [
+      "Risikoberechnungs-Engine (Swirl Engine)",
+      "Masterarbeit: Wetter und Volatilität",
+      "Postgraduales Studium: Erneuerbare Energien",
+      "nixconfig"
+    ]
+  },
+  "skills": [
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "HTMX"
+        }
+      ],
+      "kept": 6,
+      "name": "Web-Entwicklung",
+      "of": 7
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Backend & Datenbank",
+      "of": 6
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "C"
+        },
+        {
+          "score": 0.0,
+          "text": "C++"
+        },
+        {
+          "score": 0.0,
+          "text": "Bash"
+        },
+        {
+          "score": 0.0,
+          "text": "Nim"
+        }
+      ],
+      "kept": 6,
+      "name": "Programmiersprachen",
+      "of": 10
+    },
+    {
+      "dropped": [],
+      "kept": 5,
+      "name": "DevOps",
+      "of": 5
+    },
+    {
+      "dropped": [
+        {
+          "score": 0.0,
+          "text": "Portfolio"
+        },
+        {
+          "score": 0.0,
+          "text": "Due Diligence"
+        }
+      ],
+      "kept": 6,
+      "name": "Energie & Risiko",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 6,
+      "name": "Sicherheit",
+      "of": 6
+    }
+  ],
+  "work": [
+    {
+      "dropped": [
+        {
+          "score": 10.0612,
+          "text": "Entwickelte eine LLM-basierte Wissensdatenbank für die Beratungsarbeit."
+        },
+        {
+          "score": 9.3149,
+          "text": "Entwickelte Anwendungen für Mandanten mit Grundstücksportfolios im Wert von über 300 Mio. USD."
+        },
+        {
+          "score": 6.8663,
+          "text": "Entwickelte einen Algorithmus für Optionshandel und Hedging auf Wetterderivaten."
+        },
+        {
+          "score": 6.1379,
+          "text": "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist."
+        },
+        {
+          "score": 5.8031,
+          "text": "Entwickelte einen Fibonacci-Binärbaum-Algorithmus für Computational Scientists."
+        },
+        {
+          "score": 3.8572,
+          "text": "Prüfte Bug-Bounty-Programme."
+        },
+        {
+          "score": 2.7365,
+          "text": "Konzipierte eine Covered-Call-Hedging-Strategie für Kundenportfolios."
+        },
+        {
+          "score": 0.0,
+          "text": "Steuerte Gasspeicher- und Gas-Swing-Handelsmodelle als Risk Manager für die EWE Trading."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Bountystash",
+      "of": 10
+    },
+    {
+      "dropped": [
+        {
+          "score": 6.5199,
+          "text": "Konzipierte eine Mobile App für Mitarbeiter, die neue Projektchancen akquirierten."
+        },
+        {
+          "score": 6.0584,
+          "text": "Arbeitete mit Kunden, Banken und Deal-Brokern an einem Dutzend Projekten von je 4 bis 5 Mio. USD."
+        },
+        {
+          "score": 1.0402,
+          "text": "Definierte und führte Due-Diligence-Prüfungen für O&M-Projekte als Vertretung der Projektleiter durch."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete das Asset Management eines Portfolios über 100 Mio. USD."
+        }
+      ],
+      "kept": 4,
+      "matched": true,
+      "name": "O3 Energy",
+      "of": 8
+    },
+    {
+      "dropped": [],
+      "kept": 4,
+      "matched": true,
+      "name": "Smart Energy 360",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 2.4987,
+          "text": "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte."
+        },
+        {
+          "score": 0.0,
+          "text": "Verifizierte Geometriematrizen in Mathematica."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Fraunhofer ISE",
+      "of": 4
+    },
+    {
+      "dropped": [
+        {
+          "score": 5.1484,
+          "text": "Arbeitete zwölfstündige Schichten im Feld."
+        },
+        {
+          "score": 3.3526,
+          "text": "Erstellte neue Excel-Tabellen für die Engineering-Abteilung."
+        },
+        {
+          "score": 2.9207,
+          "text": "Behob Chemikalien- und Geräteprobleme vor Ort."
+        },
+        {
+          "score": 0.0,
+          "text": "Leitete zwei Frac-Crews mit über 3 Mio. USD Auftragsvolumen pro Woche."
+        }
+      ],
+      "kept": 2,
+      "matched": true,
+      "name": "Halliburton",
+      "of": 6
+    }
+  ]
+}

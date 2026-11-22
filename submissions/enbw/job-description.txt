@@ -1,0 +1,57 @@
+Platform / DevOps Engineer Linux & Kubernetes (w/m/d) C-TIPCP
+Stellen-ID: EBQEBQGLOBAL25599EXTERNALGLOBAL (C-TIPCP)
+Gesellschaft: EnBW Energie Baden-Württemberg AG, Bereich C-TIP (Cloud Technology, Infrastructure & Platforms); Ausschreibung über Netze BW GmbH
+Ort: Karlsruhe (76131), hybrid / Homeoffice-Anteile
+Quelle: https://careers.enbw.com/global/de/job/EBQEBQGLOBAL25599EXTERNALGLOBAL/Platform-DevOps-Engineer-Linux-Kubernetes-w-m-d-C-TIPCP
+Abgerufen: 2026-11-22
+
+Hinweis zur Quelle: die Karriereseite rendert die Stellenbeschreibung clientseitig
+(Phenom-Widget-API, ohne servergerenderte JobPosting-Daten), deshalb stammt der
+Text unten aus der vollständigen Spiegelung derselben Ausschreibung
+(Netze BW GmbH, Kennung ad-2493271128) und ist inhaltlich unverändert.
+
+Über das Unternehmen
+Wir suchen Menschen, die an die positive Kraft von Energie glauben und an ihre eigene Stärke, Dinge voranzubringen. Die wissen, wie wichtig Energie und Infrastruktur sind und wie groß die Möglichkeiten, mit ihnen Zukunft für alle zu gestalten. Denn wir sind genauso: Ein großes, tatkräftiges Unternehmen, das die Tür weit aufmacht für Menschen, die mit uns gemeinsam aus Ideen echte Veränderungen machen.
+
+Unser Angebot
+Wir möchten, dass sich unsere Mitarbeiter*innen sicher fühlen - in jeder Hinsicht. Deshalb legen wir Wert auf beständige Zusammenarbeit, sicher ausgestattete Arbeitsplätze, regelmäßige Gesundheitschecks sowie individuelle Einarbeitung und Weiterentwicklung. Finanzielle Extras und Zulagen sorgen für zusätzliche Sicherheit.
+
+Weitere Benefits:
+- 30 Tage Urlaub
+- Finanzielle Extras wie Urlaubs- und Weihnachtsgeld, Erfolgsbeteiligung, vermögenswirksame Leistungen, betriebliche Altersvorsorge, Energiepreisermäßigung und Kinderzulage
+- Leasing-Angebote für Mobilgeräte und Fahrräder
+- Vergünstigtes Deutschland-Ticket
+- Flexible Arbeitsmodelle wie Teilzeit und Homeoffice
+
+Vielfältige Aufgaben
+- Als Platform / DevOps Engineer mit Linux- und Kubernetes-Fokus entwickelst und betreibst du mit uns stabile, zunehmend automatisierte Plattformservices für interne Kund*innen und Entwicklungsteams.
+- Du arbeitest an Linux- und Kubernetes-Umgebungen, unterstützt Self-Service-Prozesse und entwickelst produktionsnahe Automatisierungen und Schnittstellen weiter.
+- Damit verbindest du Plattformbetrieb, Automatisierung und Software Engineering so, dass Lösungen im Alltag zuverlässig funktionieren.
+- Du administrierst Linux-basierte Systeme in einer modernen Enterprise-IT-Umgebung und sorgst dafür, dass unsere Plattformservices zuverlässig betrieben und weiterentwickelt werden können.
+- Du planst, implementierst und betreibst Kubernetes-Umgebungen auf virtualisierten Linux-Systemen und entwickelst Automatisierungen gezielt weiter, um Betrieb, Standardisierung und Self-Service-Prozesse zu unterstützen.
+- Du entwickelst produktionsnahe Automatisierungen, Plattform-APIs und Self-Service-Schnittstellen weiter, von der Konzeption und Umsetzung über Tests und Dokumentation bis hin zum zuverlässigen Betrieb.
+- Du betreibst und optimierst Logging- und Monitoring-Lösungen und nutzt die gewonnenen Erkenntnisse, um Plattformservices stabil, transparent und gut betreibbar zu halten.
+- Du beteiligst dich an der 24/7-Bereitschaft in rollierenden Abständen und stellst sicher, dass du bei Bedarf innerhalb einer Stunde vor Ort in Karlsruhe einsatzbereit sein kannst.
+
+Überzeugendes Profil
+- Du hast einen Abschluss mit IT-Bezug und bringst relevante Berufserfahrung sowie das Können mit, um dich sicher in technische Aufgabenstellungen einzuarbeiten und Verantwortung im Plattformumfeld zu übernehmen.
+- Du bringst praktische Erfahrung im Betrieb von Linux- und Kubernetes-Umgebungen mit und möchtest Automatisierung, Konfigurationsmanagement und standardisierte Betriebsprozesse im Plattformbetrieb aktiv weiterentwickeln.
+- Du entwickelst Plattform-APIs und produktionsnahe Softwarekomponenten weiter und bringst Erfahrung mit Git, CI/CD sowie Programmiersprachen wie Go, Python oder vergleichbaren Technologien mit. Dabei legst du Wert auf API-Design, automatisierte Tests, klare Schnittstellen, Wartbarkeit und nachvollziehbare technische Entscheidungen.
+- Du arbeitest strukturiert, priorisierst transparent, machst Abhängigkeiten oder Risiken frühzeitig sichtbar, teilst Wissen aktiv und entwickelst tragfähige Plattformservices gemeinsam mit dem Team sowie mit internen Kund*innen und Entwicklungsteams weiter.
+- Du kannst technische Dokumentationen auf Englisch sicher nutzen und dich in Abstimmungen sowie in der schriftlichen Kommunikation verständlich einbringen.
+- Du bringst sehr gute Deutschkenntnisse in Wort und Schrift mit.
+
+Über den Bereich
+Im Bereich C-TIP (Cloud Technology, Infrastructure & Platforms) schaffen wir die technologische Basis für die digitale Zukunft der EnBW. Wir entwickeln, betreiben und gestalten zentrale IT-Plattformen und Infrastrukturservices, die konzernweit von Produkt-, Projekt- und Serviceteams genutzt werden. Dabei sorgen wir für eine sichere, leistungsfähige, kosteneffiziente und skalierbare IT-Landschaft und leisten einen entscheidenden Beitrag zum Unternehmenserfolg.
+
+Unsere Verantwortung reicht von modernen Rechenzentrums- und Cloud-Infrastrukturen über Netzwerk- und Security-Services bis hin zu Entwicklungsplattformen, Cloud-Automatisierung, Architekturberatung sowie Identity- und Access-Management. Wir schaffen die Voraussetzungen dafür, dass digitale Produkte schnell, zuverlässig und nach höchsten Sicherheitsstandards entwickelt und betrieben werden können.
+
+Warum du Teil von C-TIP werden solltest?
+Weil du hier an den technologischen Grundlagen eines der führenden Energieunternehmen Deutschlands mitarbeitest. Dich erwarten spannende Herausforderungen rund um Cloud-Technologien, IT-Infrastruktur, Automatisierung und Security sowie ein Umfeld, das Innovation fördert, Zusammenarbeit lebt und moderne Technologien aktiv vorantreibt. Gemeinsam gestalten wir die digitale Transformation der EnBW und schaffen Lösungen, die täglich von tausenden Mitarbeitenden und Kund*innen genutzt werden.
+
+Kontakt
+Interessiert? Jetzt online bewerben! Ein Anschreiben ist dafür nicht erforderlich, gegebenenfalls stellen wir ein paar jobspezifische Fragen in unserem Bewerbungsformular.
+
+Unser Recruitingteam stellt neben der EnBW für weitere Konzerngesellschaften ein. Bei Fragen steht Gaiser, Jenny | j.gaiser@netze-bw.de gerne zur Verfügung.
+
+Alle Menschen sind bei uns willkommen, egal welchen Geschlechts, Alters, sexueller Identität, Herkunft, Religion, Weltanschauung, mit oder ohne Behinderung.

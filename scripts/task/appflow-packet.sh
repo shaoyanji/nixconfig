@@ -14,7 +14,8 @@
 # before.
 #
 # Usage:
-#   appflow-packet.sh --id <application> [--resume P] [--letter P] [--jd P] [--out <link>]
+#   appflow-packet.sh --id <application> [--resume P] [--letter P] [--jd P]
+#                     [--language de|en] [--out <link>]
 set -euo pipefail
 
 API="${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}"
@@ -27,6 +28,7 @@ out=""
 resume=""
 letter=""
 pages=""
+language=""
 example=0
 
 usage() { sed -n '4,12p' "$0" | sed 's/^# \{0,1\}//'; }
@@ -39,6 +41,7 @@ while [ $# -gt 0 ]; do
     --letter) letter="${2:-}"; shift 2 ;;
     --jd) jd="${2:-}"; shift 2 ;;
     --pages) pages="${2:-}"; shift 2 ;;
+    --language) language="${2:-}"; shift 2 ;;
     --out) out="${2:-}"; shift 2 ;;
     --example) example=1; shift ;;
     -h | --help) usage; exit 0 ;;
@@ -79,6 +82,14 @@ else
   else
     jq -n --arg d "$today" '{language: "de", date: $d}' >"$work/application.json"
   fi
+fi
+
+# A record's language is the packet's own, but a row filed as `en` can still be a
+# German application: --language overrides headings and corpus choice without
+# editing the database, which is the only lever when the API refuses the field.
+if [ -n "$language" ]; then
+  jq --arg l "$language" '.language = $l' "$work/application.json" >"$work/application.lang.json"
+  mv "$work/application.lang.json" "$work/application.json"
 fi
 
 # The fixture is committed and fictional, so the build is testable on any host

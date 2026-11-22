@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-22T07:35:45Z",
+  "generated": "2026-11-22T07:37:47Z",
   "count": 200,
-  "pin": "4990654adc620ab7e19360a2322571479deda3ed61f81c49a446d741e9b292a1",
+  "pin": "2365d8863990f6b19ecf33562568438050713d9ac590b881e1e984b0f8cefad5",
   "turns": [
+    {
+      "id": "1431f1cc-f795-4a02-8f12-92fc0fc3c3d8",
+      "ts": "2026-11-22T07:37:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-telekom-sre",
+      "action": "landed: Telekom SRE packet (JD, 2-page CV, 1-page letter, portal sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/telekom-sre-prometheus"
+      ],
+      "files": [],
+      "base_commit": "d3d11688a6cd15e147080ac7128e32f4ce7019b2",
+      "branch": "main",
+      "frame": "03ha5u8hbcuxtab0mq4yjvfow"
+    },
+    {
+      "id": "ab04a11a-bde0-4c25-840c-52b3d179a5ca",
+      "ts": "2026-11-22T07:36:41Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: nebius token-factory SRE applied via Greenhouse embed+OTP (CV/CL pasted via Enter-manually — upload wedges toolchain-wide; careers SPA has Turnstile); ack 311050 + /confirmation; record=applied",
+      "outcome": "done",
+      "claims": [
+        "submissions/nebius-token-factory"
+      ],
+      "files": [],
+      "base_commit": "8efaee873d8b8ad53a997cb51eef255d1523c830",
+      "branch": "main",
+      "frame": "03ha5u2vus6ymfhpwkpkcxs77"
+    },
     {
       "id": "a3908480-bd09-4719-be5f-895bb3e78597",
       "ts": "2026-11-22T07:35:21Z",
@@ -2800,32 +2830,6 @@
       "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
       "branch": "main",
       "frame": "03h9xnxysebv3p0kbbgspkas4"
-    },
-    {
-      "id": "e09c3428-f430-4538-b8e8-ef223ad3072f",
-      "ts": "2026-11-21T06:27:03Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: maintenance mode — signature-performance draft and all temp files nuked, zero traces remain in repo or /tmp; p1 scout idle at prompt (g2 research done), p2 devin refactor busy (mkTimerJob consolidation), p3 delphi idle at prompt; xs-turns healthy",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xn6kqxe8ht7tm4pggegz5"
-    },
-    {
-      "id": "8e5264fe-06c7-4a70-ac85-3b46af46b2aa",
-      "ts": "2026-11-21T06:25:48Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-apply-signature-performance",
-      "action": "done: application draft ready at docs/job-apps/sig-perf-application-draft.txt; To: careersupport@signatureperformance.com; application method: email (Wix careers page has no curl-accessible form); draft uses [Recruiter Name] and [Your Name] placeholders — needs your name and recruiter name before sending; ready to send via himalaya/mail on delphi",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xmxsm9ul8j1am93f8m8fb"
     }
   ]
 }

@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T10:05:31Z",
+  "generated": "2026-11-22T10:07:15Z",
   "count": 200,
-  "pin": "9543d7b8b56fd345b589c7edadbdcc3844ef3b207322c44916a21f2dbed09d98",
+  "pin": "523f13d29f0e8b16e6b24c10efebaae3d43031a14b768bfd087489d53aebe44a",
   "turns": [
+    {
+      "id": "41c8e8bb-b227-44c4-b1ca-f91093247e2f",
+      "ts": "2026-11-22T10:06:47Z",
+      "source": "devin",
+      "subject": "nixconfig:clickhouse-dbre",
+      "action": "interactive recaptcha image grid at submit | form+files complete",
+      "outcome": "blocked: recaptcha-image",
+      "claims": [],
+      "files": [],
+      "base_commit": "d469ec20f2254207b3b48976608c3ab5950ff91c",
+      "branch": "main",
+      "frame": "03ha6negl06sdy485uh7s3akw"
+    },
+    {
+      "id": "308460cb-6dcf-4728-9b32-0b6bb6aa5fa9",
+      "ts": "2026-11-22T10:06:36Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-kernel",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en); fit set to 1 (kernel patches absent)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a87c646cf239760c5f041be19bdbbd83d619dfb",
+      "branch": "main",
+      "frame": "03ha6nd7gf9g7dhou3w53xht5"
+    },
+    {
+      "id": "48d50307-331e-473c-89c1-40056c5be81c",
+      "ts": "2026-11-22T10:05:35Z",
+      "source": "devin",
+      "subject": "nixconfig:clickhouse-dbre",
+      "action": "claim: Ashby submission attempt (prior POST-hang noted on sibling record)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "d469ec20f2254207b3b48976608c3ab5950ff91c",
+      "branch": "main",
+      "frame": "03ha6n62f0o0ipzc1t5zzk6e1"
+    },
+    {
+      "id": "d1158730-697f-453d-ab30-3d5ac7ad7b20",
+      "ts": "2026-11-22T10:05:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:flox",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d469ec20f2254207b3b48976608c3ab5950ff91c",
+      "branch": "main",
+      "frame": "03ha6n618xww87dehl3cfwoaq"
+    },
     {
       "id": "b91267ab-55d3-4f3d-98ef-203997452a2d",
       "ts": "2026-11-22T10:04:08Z",
@@ -2652,66 +2704,6 @@
       "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
       "branch": "main",
       "frame": "03ha5pf97l1rirj703qb7pa95"
-    },
-    {
-      "id": "b397b9c3-620b-4d28-851a-8c7c8465ab6a",
-      "ts": "2026-11-22T07:12:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-sva-j456",
-      "action": "landed: SVA j456 packet in submissions/sva-container (German CV 2pp, letter 1pp, Freiburg 25 km). Form f456 mapped: 5 required fields, no Deutschkenntnisse select (unlike f734/f262), 8 upload slots, 15 MB. Flagged SÜG-Stufe-2 clearance as the eligibility blocker for a US citizen. Gates: pdfinfo 2/1, prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/sva-container"
-      ],
-      "base_commit": "c69fa1394b2bcf9756864115b6db869841c91d68",
-      "branch": "main",
-      "frame": "03ha5pce15qgt34jtgcadlrmd"
-    },
-    {
-      "id": "e1b234a5-58a0-4218-87fc-03e9e4c9dd79",
-      "ts": "2026-11-22T07:09:27Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-sva-j262",
-      "action": "landed: SVA j262 packet in submissions/sva-automation (German CV 2pp, letter 1pp, Freiburg site). Form f262 mapped from markup: 6 required fields incl. Eintritt + Deutschkenntnisse C1, anschreiben slot required, 15 MB. Gates: pdfinfo 2/1, prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/sva-automation"
-      ],
-      "base_commit": "22962e8df90a121990cfd4a9ebf1c482b7809528",
-      "branch": "main",
-      "frame": "03ha5orfxisf2rglgqcrek73g"
-    },
-    {
-      "id": "fa5c1e7e-adec-4490-9bda-96aa240a861a",
-      "ts": "2026-11-22T07:06:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-sva-linux",
-      "action": "landed: SVA j734 packet in submissions/sva-linux (German CV 2pp, German letter 1pp, Freiburg site 25 km). Form mapped from the server-rendered f734 page: 7 required fields incl. Eintritt + Deutschkenntnisse C1, 8 attachment slots, 15 MB. Gates: pdfinfo 2/1, checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/sva-linux"
-      ],
-      "base_commit": "5622b8b5b30134cc1cc0763c9e46bfb0578a4f50",
-      "branch": "main",
-      "frame": "03ha5o4hkw15xg4qdnw8oq0rm"
-    },
-    {
-      "id": "3a722c11-c685-4cfd-a337-51d4f031274f",
-      "ts": "2026-11-22T07:02:42Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-enbw-tipcp",
-      "action": "landed: EnBW C-TIPCP packet in submissions/enbw (German CV 2pp + letter 1pp). Posting is CLOSED: apply route answers 'job does not exist or is no longer open', portal search omits it - record held at prep, do-not-submit. Added --language to appflow-packet.sh (row filed en, API refused language). Gates: pdfinfo 2/1, checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/enbw scripts/task/appflow-packet.sh"
-      ],
-      "base_commit": "bf4b9f10d02d363ef72ef9eacff0fc73c860102b",
-      "branch": "main",
-      "frame": "03ha5ng09022km14fphp1t1v6"
     }
   ]
 }

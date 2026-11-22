@@ -1,51 +1,66 @@
-# Submission sheet — Nebius, Senior Site Reliability Engineer (Data Platform)
+# Nebius — Senior Site Reliability Engineer (Data Platform)
 
-Role ID `nebius-senior-site-reliability-engineer-data-platform` · Greenhouse job **5040676101**
-Posting https://careers.nebius.com/?gh_jid=5040676101 · first published 2026-11-17 · updated 2026-11-18
-Location(s): Amsterdam, Netherlands; Berlin, Germany; Israel; London, United Kingdom; Prague, Czech Republic; Remote
-Target compensation: **EUR 130,000 – 160,000** (ask EUR 140,000 – 155,000); no band published.
+Greenhouse **5040676101** · Amsterdam · **Berlin** · Israel · London · Prague · Remote · first published 2026-11-17, updated 2026-11-18.
+The platform is one multi-tenant YTsaurus ecosystem — roughly **10 PB compressed across ~500 servers and ~20k cores** — carrying financial pipelines and
+training datasets. **No band published**; target EUR 130,000–160,000, ask EUR 140,000–155,000.
 
-## Live Greenhouse fields (16 server-side labels)
+**Status:** applied 2026-11-21 per the apps DB (Greenhouse confirmation on file). Both documents are a faithful rebuild for the CV screen or a resend.
 
-| Field | Answer |
+## Legacy packet, now genuinely in git history
+
+All five files were **untracked**, so they were committed unchanged first (`appflow(nebius-data-platform): stage the pre-Typst packet`) and retired in the
+rebuild commit:
+
+| Artefact | sha256 (first 16) | What it was |
+| :--- | :--- | :--- |
+| `lebenslauf.pdf` | `a3e473a7bfcbcb9c…` | Nix-built CV, "Site Reliability Engineer", three fleet bullets |
+| `anschreiben.pdf` | `374dc2b5095a92bb…` | Nix-built letter, salutation **"Dear Nebius Compute Node team"** — wrong team |
+| `selection.json` | `442289038853f1ac…` | selector output |
+| `submission-sheet.md` | `5533f5dbcc99df40…` | the 2026-11-21 sheet, this file's predecessor |
+
+`job-description.txt` is kept unchanged: a real capture of the posting, not a reconstruction.
+
+## Files
+
+| File | Pages | Words | Warnings | sha256 (first 16) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 1231 | 0 | `1f5487372744798d` |
+| `anschreiben.pdf` | 1 | 431 | 0 | `84e7ad5511496fce` |
+
+## The five pillars, against the repository
+
+| Pillar | Evidence | In the documents as |
+| :--- | :--- | :--- |
+| PostgreSQL operational management | `services.postgresql` declared per service (`email-archive.nix`, `mail-atlas.nix`, `paperless-fork.nix`); `postgresqlBackup` on `frieren`; `pg_dump` in `infra-stack.nix`; settings generated from Nix rather than edited on the host | claimed in full |
+| Versioned schema migrations | Migrations applied in order by the service; the archive's schema adds the stored `tsvector` behind a GIN index and an upsert keyed on `message_id`, so a replay cannot become a second row; a failed step leaves the previous version running | claimed in full |
+| Restore drills | `modules/services/postgres-backup-drill.nix` exists as a service, alongside the scheduled backup — the drill is the part that makes the backup a fact | claimed in full |
+| Storage growth alerting | `fleet-sentinel` records disk percentage for `/`, `/nix/store` and `/srv/data` plus inode counts, and degrades the host with a named reason at `degradeOnDiskPct` instead of waiting for a failed write; PSI and generation age in the same ledger | claimed in full |
+| High-integrity data handling | Validate before write, append-only event state, content-addressed specifications, and a fourteen-month archive of real mail as the non-synthetic test load | claimed in full |
+
+## Gaps, in both documents
+
+No YTsaurus, Hadoop, Spark, ClickHouse or Kafka operations. No production Kubernetes at five-hundred-server scale and no operator development. No
+multi-petabyte cluster. No formal capacity planning for a multi-tenant platform. Storage work is single-host and small-fleet. The earlier sheet judged
+the honest fit "closer to 2 than 3" on the big-data bonus list; the row stays at 3, and the letter says the first months would go into the platform's Go
+operators and diagnostic tooling.
+
+## Route
+
+Sixteen live Greenhouse labels, **no cover-letter file slot** — the letter goes in the application email or the Additional-context block. Country
+Germany, location Gutach im Breisgau with Berlin/remote noted; authorization yes (US citizen, unbefristete Niederlassungserlaubnis); prior Nebius
+employment no.
+
+**Compensation:** EUR 140,000–155,000, named in the letter because the submitted version carried it and dropping a figure in a rebuild changes the
+signal.
+
+## Checks
+
+| Gate | Result |
 | :--- | :--- |
-| First Name * | Matt |
-| Last Name * | Ji |
-| Preferred First Name | Matt |
-| Email * | matt@bountystash.com |
-| Country * | Germany |
-| Phone * | +49 1733281570 |
-| Location (City) * | Gutach im Breisgau (Freiburg area) — open to Berlin or fully remote across Europe |
-| Attach | CV: lebenslauf.pdf; letter: anschreiben.pdf. Greenhouse application has no cover-letter file slot; the letter is included for the record and its content is repeated under Additional context. |
-| Enter manually | n/a — files attached |
-| LinkedIn Profile | https://linkedin.com/in/mattji |
-| Website | https://www.bountystash.com |
-| Which languages do you speak? * | English (native), German (C1, verhandlungssicher) |
-| Are you currently authorized to work in the country where this position is located, without requiring sponsorship, now or in the future? * | Yes. US citizen with German permanent residence (unbefristete Niederlassungserlaubnis); no sponsorship needed in Germany or the EU. |
-| Do you currently reside in the location specified for this role? * | Yes for Germany — based in Gutach im Breisgau and available for Berlin or remote across Europe. Not resident in the Netherlands, UK, Czech Republic or Israel. |
-| Have you ever been employed by Nebius before? * | No |
-| I have read Nebius’s Candidates Privacy Policy. * | Yes |
-
-## Additional context (content of the one-page letter)
-
-Applying for the Data Platform SRE role: a multi-tenant YTsaurus ecosystem at roughly 10 PB compressed across ~500 servers, where reliability comes from operations discipline rather than any single component. I run a 13-host NixOS fleet declared in one flake — pinned inputs, canary before fleet-wide change, short-lived SSH certificates from a CA, systemd units with defined failure behaviour, one-command rollback, and disk/PSI/service state collected on a schedule with a page on failed jobs rather than waiting to be noticed.
-
-Stateful operations: PostgreSQL with versioned schema migrations, backup and rehearsed restore, latency and disk-pressure alerting. Durability is proved by a restore, not by a green dashboard. Go (23 Go files in this repo, including fleet alerting and dashboard services) and Python for operational tooling; C, C++ and Bash for deeper systems work.
-
-## Gaps, stated plainly
-
-- No YTsaurus, Hadoop, Spark, ClickHouse or Kafka operations.
-- No production Kubernetes at 500-server scale, and no Kubernetes operator development.
-- Storage and latency work at single-host and small-fleet scale, not multi-petabyte clusters.
-- No formal capacity planning for multi-tenant platforms.
-
-Honest fit is closer to 2 than 3 on the Big Data bonus list; recorded at 3 as instructed. The coding interview is a real gate — Go is used here for services, not as a primary language over years.
-
-## Documents
-
-- `lebenslauf.pdf` — 2 pages, Typst
-- `anschreiben.pdf` — 1 page, Typst
-- `selection.json` — 15/25 work highlights kept, 4/4 projects kept (nixconfig, email-archive, bountystash, fibtransponder); JD terms weighted Kubernetes, storage, systems, Go
-- `job-description.txt` — text from the Greenhouse API, 5,397 chars
-
-Nothing submitted. No account created.
+| `typst compile` both sources | 0 warnings each |
+| Page budget | CV 2 pages, letter 1 page (asserted before commit) |
+| `**` in sources | 0 |
+| Curly quotes | 0 |
+| Unsupported claims (YTsaurus/Hadoop/Spark/ClickHouse/Kafka) | 0 outside the gap paragraph |
+| `task checks:prose` | exit 0 |
+| Legacy artefacts | staged first, retired in the rebuild, hashes above |

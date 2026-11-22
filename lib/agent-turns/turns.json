@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-22T09:58:47Z",
+  "generated": "2026-11-22T10:00:43Z",
   "count": 200,
-  "pin": "383ce5178eb19297a01c1283903326e05cb2f41e379ee725bff14113d866b419",
+  "pin": "725d37a8cafa72ce70ba3736941e06348e99d73c650e7122c4f3a171571df0f2",
   "turns": [
+    {
+      "id": "c3bc17bd-0a77-4ebc-99f1-800f9ca6d2ec",
+      "ts": "2026-11-22T10:00:28Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-sre",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "eae1680ec6ef63ea1d3390aa353edc7ae2eb8823",
+      "branch": "main",
+      "frame": "03ha6m61pat7c372mkgu5v5i7"
+    },
+    {
+      "id": "40de6cfd-a9ab-4aca-95a3-e70b3f5f9e6b",
+      "ts": "2026-11-22T10:00:17Z",
+      "source": "devin",
+      "subject": "nixconfig:enviria",
+      "action": "cloudflare turnstile checkbox gate at submit | form+files complete",
+      "outcome": "blocked: turnstile",
+      "claims": [],
+      "files": [],
+      "base_commit": "97b2a43f6b7149c81be0993904ced67a39cbe076",
+      "branch": "main",
+      "frame": "03ha6m4tf5bkbxehdy3z66xgo"
+    },
+    {
+      "id": "67db6f31-f67d-46ea-8664-1810af4e5549",
+      "ts": "2026-11-22T09:59:07Z",
+      "source": "devin",
+      "subject": "nixconfig:enviria",
+      "action": "claim: submitting via Personio 2635638",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "97b2a43f6b7149c81be0993904ced67a39cbe076",
+      "branch": "main",
+      "frame": "03ha6lwnkwvll23k257t6vcx9"
+    },
+    {
+      "id": "84bb32ac-cbb4-487f-83eb-b196777c956f",
+      "ts": "2026-11-22T09:58:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:sourcegraph",
+      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "97b2a43f6b7149c81be0993904ced67a39cbe076",
+      "branch": "main",
+      "frame": "03ha6luhy9k1ujhwdtmg7c60d"
+    },
     {
       "id": "179a65d3-2611-449d-ad75-3d39fb760b6f",
       "ts": "2026-11-22T09:58:36Z",
@@ -2662,64 +2714,6 @@
       "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
       "branch": "main",
       "frame": "03ha5mpznwaxbkgj8k2a5yeaa"
-    },
-    {
-      "id": "46e513e1-c00a-49df-8631-c866ff5a7349",
-      "ts": "2026-11-22T06:58:47Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: sourcegraph SWE Platform IC3 applied via Greenhouse+OTP 42563259 (packet built: 9/32 highlights, 2-page CV verified; honest No on K8s/AWS-GCP); ack mail 311045 + /confirmation page; record=applied",
-      "outcome": "done",
-      "claims": [
-        "submissions/sourcegraph"
-      ],
-      "files": [],
-      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
-      "branch": "main",
-      "frame": "03ha5mogdlunjbxw3xur7bvgk"
-    },
-    {
-      "id": "cb82a60f-44dc-4803-a331-3a6604c7c15e",
-      "ts": "2026-11-22T06:54:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-stackit-gt2321",
-      "action": "landed: STACKIT GT2321 SRE packet in submissions/stackit-sre (CV exactly 2pp, letter 1pp EN naming the missing etcd/API-server depth; JD from the page's JobPosting block; form schema read from RocketApply OData for jobReqId 2321 - zero screening questions; record moved to stage prep); pdfinfo budget 2/1 OK, checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "submissions/stackit-sre"
-      ],
-      "base_commit": "5a2571120eb070144fc940b7bcc0f0e1b49b53b8",
-      "branch": "main",
-      "frame": "03ha5lwc32rai3bp3amyuffnl"
-    },
-    {
-      "id": "2fdcab21-ba91-4c0e-bbdf-41e555dcdb58",
-      "ts": "2026-11-22T06:53:07Z",
-      "source": "devin",
-      "subject": "nixconfig:job-hunt",
-      "action": "black-forest-labs MTS infosec: linkedMail=0, 7-field Ashby form filled, lebenslauf+anschreiben both attached, submit hit live interactive reCAPTCHA grid; policy = no solve; record=manual",
-      "outcome": "blocked: interactive reCAPTCHA image-grid on Ashby submit",
-      "claims": [
-        "submissions/black-forest-labs"
-      ],
-      "files": [],
-      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
-      "branch": "main",
-      "frame": "03ha5lkjn7gzpoihe4cfiuxi2"
-    },
-    {
-      "id": "5d497f94-810b-406b-bef1-b3cbdf7062d1",
-      "ts": "2026-11-22T06:52:48Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward:default:2.1",
-      "action": "route: default:2.1 devin IDLE at clean prompt (lane nixconfig refactoring); jev-decide classify needs_review (flake-change p=0.53 m=0.26); duel flake-change vs novel needs_review (p=0.64 m=0.28); margin 0.28 below 0.3 decisive threshold — pane left idle, not driven",
-      "outcome": "blocked: jevdecide not decisive; no task selected",
-      "claims": [],
-      "files": [],
-      "base_commit": "319a2cb311b95cb9e186f2d6c4e325c5c551923c",
-      "branch": "main",
-      "frame": "03ha5licukk5jhredhpbxpu21"
     }
   ]
 }

@@ -1,0 +1,66 @@
+Company: Camunda
+Role: Senior Site Reliability Engineer
+Location: Remote
+Remote: yes
+Posted: 2026-11-17
+Source: arbeitnow
+URL: https://www.arbeitnow.com/jobs/companies/camunda/remote-senior-site-reliability-engineer-440254
+Compensation (as stated): $149,800.00 to $241,500.00
+---
+
+Camunda is the enterprise platform for agentic orchestration , enabling organizations to coordinate AI agents, people, and systems across complex, end-to-end business processes. With built-in governance, auditability, and human oversight, Camunda gives enterprises the control they need to move AI from pilots to production — safely and at scale. Trusted by over 700 organizations worldwide , including 9 of top 10 US banks, Camunda helps enterprises boost operational efficiency, accelerate time-to-value, and deliver better customer experiences.
+Fully remote and global, we are in the middle of something bigger: transforming into an AI-first organisation, built on our own platform . We use Agentic AI to automate, orchestrate intelligent processes, and elevate human contribution across every team.
+Named GP Bullhound’s Top 100 Next Unicorn list, 2025 Great Place to Work certified. Visionary in 2025 Gartner® Magic Quadrant™ for Business Orchestration and Automation Technologies. ranked 3rd in Flexa's 2026 Most Flexible Companies , We’re growing fast and looking for top talent to join our team. If you want meaningful work, visible impact and put something genuinely rare on your CV, keep reading.
+About the role:
+We're looking for a Senior Site Reliability Engineer who's passionate about building reliable, scalable infrastructure that helps developers ship better software faster. You'll design and maintain our Kubernetes-based multi-cloud platform, improve our monitoring and observability tools, and collaborate with product and engineering teams to solve real problems in real time. This is a role where you'll own the systems that power Camunda, drive automation that raises the bar for everyone, and mentor others who want to do the same. If you thrive on building things that work well and don't break when they shouldn't, we'd love to talk.
+What You’ll Be Doing:
+- Design and maintain our infrastructure – You'll evolve our Kubernetes-based, multi-cloud platform architecture, ensuring it's available, scalable, and fault-tolerant. You'll establish configuration best practices and network services that our teams rely on.
+- Build observability that matters – Implement and improve monitoring and alerting tools that give both SREs and developers real visibility into system health and performance. Make it easy for teams to understand what's happening across our stack.
+- Own your systems end-to-end – You'll adopt a "you build it, you run it" mentality, which means participating in on-call rotations and being the go-to person when things need quick fixes. You'll create runbooks and automation that turn complex problems into manageable processes.
+- Ship features and improvements with product teams – Work cross-functionally with product engineering, product management, and support to define and deliver features that move the needle. Bring your expertise to the table early and often.
+- Push automation to the next level – Identify repetitive work and automate it away. Share what you learn with your teammates so everyone gets better at their craft. We measure progress by the quality of our systems, not hours worked.
+- Be the expert others learn from – Help less experienced engineers tackle complex infrastructure challenges. Break down technical problems into clear steps and support others in growing their skills.
+What You Bring:
+Must Haves:
+- Deep hands-on experience with Kubernetes – You've built, deployed, and maintained Kubernetes clusters in production environments. You understand how to manage workloads, networking, and storage at scale.
+- Infrastructure as code expertise – You're fluent in tools like Terraform (or similar IaC tools) and know how to version, test, and safely deploy infrastructure changes.
+- Demonstrated experience in monitoring and observability – You've worked with tools like Prometheus, Grafana, or similar platforms to instrument systems and alert on what matters.
+- Strong 3rd-level support and incident response skills – You've responded to production incidents, diagnosed complex issues, and communicated clearly with stakeholders under pressure. You understand root cause analysis and how to prevent issues from happening again.
+- A passion for automation and raising the quality bar – You see manual work as a problem to be solved. You care deeply about building systems that are reliable, maintainable, and easy to understand.
+- Responsible use of AI tools – You leverage AI for research, code review, documentation, test generation, and automation to improve your effectiveness. You know how to validate AI outputs against requirements, never share confidential or personal data with AI systems without authorization, and always retain human accountability for decisions and deliverables.
+Nice-to-haves:
+- Experience with major cloud providers – You've worked with AWS (EKS), Google Cloud Platform (GKE), or similar managed Kubernetes services.
+- ArgoCD or GitOps workflows – You've used declarative, Git-driven infrastructure management to keep systems in sync.
+- Proficiency in Python, Go, or similar languages – You write scripts and automation tools that solve real problems.
+- Experience with SLOs and alerting frameworks – You've helped teams define meaningful service level objectives and set up alerts that don't cry wolf.
+This role is an existing vacancy
+#LI-SK1 #LI-Remote #C1 #USEAST #USWEST
+What We Have to Offer:
+Compensation
+We offer competitive, fair, and transparent compensation. Salary ranges are location-based, with Standard and Major markets (global tech hubs) reflecting local competition.
+The Annual Total Target Cash (base salary + 100% variable target, where applicable) shown below spans from the minimum in a Standard market to the maximum in a Major market. Final offers depend on skills , experience , and location , and we typically hire in the first half of the range to allow room for growth:
+- United States: $149,800.00 to $241,500.00
+- United Kingdom: £94,100.00 to £154,700.00
+- Singapore: S$186,100.00 to S$279,100.00
+- Canada: C$159,100 to C$261,600
+If you’re based elsewhere, you’ll be hired via Remote.com (our global employer partner), and your Talent Acquisition Partner will provide a personalized Total Rewards Calculator after your first interview.
+Equity: We also offer equity (where applicable) through our Virtual Stock Option Plan (VSOP) .
+Benefits & Perks
+We invest in your wellbeing, growth, and ability to connect, along with perks that support you no matter where you’re based. Our benefits are globally designed and locally delivered where applicable.
+- Remote & Flexible: Work from anywhere with the setup that suits you, home office budget, co-working space support, and flexible time off to recharge when you need it.
+- In Person Connection: We invest in meaningful face time through our Annual Kickoff (Vienna in 2025, Madrid in 2026!), team offsites, and Camundi Connection Budgets , including contributing to meetups while travelling,, and local gatherings with fellow Camundi.
+- Health & Wellbeing: Access locally tailored healthcare, Modern Health for global mental wellbeing, and our Live Well Lifestyle Spending Account (LSA), a flexible, global benefit that puts you in control of your whole life, not just work, from: staying active, to caring for family, exploring personal passions, meaningful experiences, and investing in your financial wellbeing. The Live Well program launches in 2026 and scales to €1,000 annually from 2027 .
+- Financial Security: Retirement and pension plans (often with company contributions), plus life and disability insurance where relevant.
+- Professional Growth: Up to $/€/£1,000 per year for self-driven learning: courses, certifications, books, you decide!
+AI in our hiring process : Camunda may use AI tools to aid the screening of applications and during the interview process. You can learn more here
+”Everyone is welcome at Camunda” — it’s a celebrated component of our culture. We strive to create an inclusive environment that empowers our people. At Camunda, we honour diverse cultures and backgrounds and are proud to be an equal opportunity employer. All qualified applicants will receive consideration without regard to gender, race, ethnicity, religion, belief, sexual orientation, age, disability or any other protected characteristics under applicable law. We are looking forward to your application!
+Come join us and be part of Camunda’s incredible journey: Make an impact at a pivotal moment in our story!
+Please be aware that scammers may impersonate Camunda by reaching out about job opportunities. Camunda will only contact candidates from an email address ending in @ camunda.com or @ talent.camunda.com . We will never ask candidates for bank account details, checks, payment, or other sensitive financial information as part of our hiring process. If you receive a suspicious message, please do not respond, click any links, or share personal information.
+Note for recruiting and placement agencies: Camunda does not accept unsolicited agency resumes. Please do not forward resumes to our careers site, employees, or any other Camunda contact unless we have specifically engaged your firm for that search. Camunda will not pay fees related to unsolicited resumes.
+For information about how your personal data is processed, please refer to Camunda’s Applicant Privacy Policy . We note that phone numbers and SMS opt-in data are not shared, sold, or rented to third parties or affiliates for marketing or promotional purposes.
+By opting in to SMS use, please be aware that:
+- Text message frequency may vary;
+- Standard text message and data rates may apply; and
+- By opting in, you will be enrolled directly in ongoing recruiting text messages from Camunda.
+To opt-out, simply select 'No' when prompted during your application. You can also change your preferences at any time by contacting ----- style="min-height:1.5em">
+Find more English Speaking Jobs in Germany on Arbeitnow

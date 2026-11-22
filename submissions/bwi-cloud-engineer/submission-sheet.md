@@ -46,8 +46,9 @@ Vorgesehen sind Lebenslauf, Anschreiben und Zeugnis. Die Upload-Felder erscheine
 
 | Dokument | Datei | Hinweis |
 | :--- | :--- | :--- |
-| Lebenslauf | `lebenslauf.pdf` | Zwei Seiten |
-| Anschreiben | `anschreiben.pdf` | Eine Seite |
+| Lebenslauf | `lebenslauf.pdf` | Zwei Seiten, deutsch |
+| Anschreiben | `anschreiben.pdf` | Eine Seite, deutsch, an Frau Reichmann |
+| Quellen | `lebenslauf.typ`, `anschreiben.typ` | Typst, eigenständig kompilierbar; lösen `selection.json` und den Store-Symlink ab |
 | Zeugnisse | keine Datei | Nur anhängen, wenn das Formular danach fragt |
 
 ## Kandidat
@@ -80,7 +81,16 @@ Vorgesehen sind Lebenslauf, Anschreiben und Zeugnis. Die Upload-Felder erscheine
 | Rund 4 Jahre Berufserfahrung | Fünf Jahre eigene Plattform- und DevOps-Verantwortung | Übertrifft |
 | Deutsch und Englisch | C1 und Muttersprache | Übertrifft |
 
-Auswahl im Lebenslauf: 15 von 30 Highlights, 4 von 5 Projekten.
+Der Lebenslauf ist handgeschrieben und auf Stellen-ID 67851 zugeschnitten; die frühere Auswahl aus der Datenbank (`selection.json`) und der Symlink `packet → /nix/store/...` sind am 22.11.2026 entfernt.
+
+## Gemessene Artefakte
+
+| Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
+| :--- | :--- | :--- | :--- | :--- |
+| `lebenslauf.pdf` | 2 | 38639 | 596 | `21d09529685422cd` |
+| `anschreiben.pdf` | 1 | 24852 | 288 | `581db92d3530d61b` |
+
+Beide PDFs wurden am 22.11.2026 aus den Typst-Quellen gebaut, kompilieren ohne Warnung und lassen sich byte-identisch reproduzieren.
 
 ## Gehalt
 
@@ -145,5 +155,5 @@ Die Nummern der Fragen können bei 67851 abweichen. Maßgeblich ist die Beschrif
 | `job-description.txt` | Bereinigte Ausschreibung, Archivstand 23. Juni 2026, mit Hinweis auf die Umbenennung. |
 | `lebenslauf.pdf` | Deutscher Lebenslauf, zwei Seiten. |
 | `anschreiben.pdf` | Deutsches Anschreiben an Kristin Reichmann, eine Seite. |
-| `selection.json` | Audit der ausgewählten Highlights und Projekte. |
+| `lebenslauf.typ` / `anschreiben.typ` | Typst-Quellen, eigenständig kompilierbar. |
 | `submission-sheet.md` | Diese Feldzuordnung. |

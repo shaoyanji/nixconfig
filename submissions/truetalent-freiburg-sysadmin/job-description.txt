@@ -1,0 +1,32 @@
+Senior System Administrator
+True Talent Solutions Partners (recruiting) - client: SaaS company, Freiburg im Breisgau
+Arbeitsort: Freiburg im Breisgau, vor Ort (on-site), kein Visum-Sponsoring
+Anzeige: https://www.arbeitnow.com/jobs/companies/true-talent-solutions-partners/senior-system-administrator-freiburg-im-breisgau-343319
+Veröffentlicht: 2026-11-22
+Quelle: Arbeitnow-Jobbörse, Volltext aus der API
+
+About the Role
+Join a small back-office IT team at a SaaS company, helping maintain secure and reliable infrastructure across a heterogeneous Windows and Linux environment. You will support core systems and contribute to infrastructure and compliance projects.
+
+What You'll Do
+- Administer and maintain servers, networks, and storage across Windows and Linux systems.
+- Ensure the availability of core infrastructure, including Proxmox, Kubernetes, CEPH, and networking.
+- Install, configure, and support hardware and software.
+- Monitor system performance and maintain the availability and security of IT infrastructure.
+- Investigate and resolve technical issues and service disruptions.
+- Plan and deliver IT projects, including work related to ISO 27001 and C5 compliance requirements.
+
+What We're Looking For
+- At least 3 years of experience in system administration or a comparable role managing servers, networks, and storage.
+- Completed vocational training, a degree in computer science, or a comparable qualification.
+- Production experience with virtualization, particularly Proxmox, and administration of both Windows and Linux systems.
+- Strong knowledge of server administration, networking, and IT security.
+- Experience with Microsoft 365 and cloud services such as Azure in hybrid environments.
+- German proficiency at C1 level and English proficiency at B2 level.
+- Experience with Kubernetes, CEPH, procurement, supplier management, or ISO 27001/C5 compliance is beneficial.
+
+Compensation & Benefits
+An indefinite-term employment contract with compensation based on qualifications and experience. Visa sponsorship is not available.
+
+Location
+On-site in Freiburg im Breisgau, Germany.

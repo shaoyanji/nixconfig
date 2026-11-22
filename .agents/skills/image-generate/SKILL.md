@@ -61,3 +61,5 @@ Editing takes a reference image (`-r` + mmproj vision weights in the backend). T
 The Turbo checkpoint is Qwen Research License (research/eval only, non-commercial). Non-commercial use on this host is fine. The base Qwen-Image-2.1 (Apache-2.0) is the fallback if the license ever matters.
 
 **Confirm before:** generating an image that would be published or shared with a third party (the license is non-commercial; confirm the use is non-commercial first).
+
+Truth: `hosts/eisen/qwen-image-server.py` — the endpoint and its schedule; this page is the procedure.

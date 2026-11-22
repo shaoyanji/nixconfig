@@ -205,3 +205,5 @@ hand-maintains a second vault.**
 
 Never create a new markdown file at the repo root. Roots are for the eight
 living documents in `SCHEMA.md`.
+
+Truth: `lib/knowledge-graph.nix` — the projection; this page is the routing.

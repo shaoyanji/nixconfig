@@ -56,3 +56,5 @@ Exceptions go on the offending line with a reason and an expiry, never as a sile
 ## Reply
 
 Each class with its evidence, the level you picked, and why the level above it did not work.
+
+Truth: `flake/policies.nix` — the predicates this page turns repeat mistakes into; this page is the procedure.

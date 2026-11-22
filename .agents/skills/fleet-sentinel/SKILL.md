@@ -174,3 +174,5 @@ systemctl list-timers --all | grep -E 'restic|nixos-upgrade|sentinel'
 - No metrics database: 10 000 JSONL lines are queryable with `jq`/TOON and cost
   nothing when idle. If a time series is ever needed, export to InfluxDB rather
   than growing the ledger.
+
+Truth: `modules/services/fleet-sentinel.nix` — the loop and the ledger; this page is the runbook.

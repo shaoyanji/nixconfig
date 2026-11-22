@@ -177,3 +177,5 @@ curl -s "$B/plugins" | jq '.[] | select(.open > 0)'  # nobody starved of work
 
 An HTTP 200 with `[]` is a fact ("nothing matched"), not a failure; a 404 is a
 wrong parameter name or key, so fix the name before doubting the data.
+
+Truth: `modules/services/mail-atlas.nix`, `taskfiles/agents.yml` — the archive and its tasks; this page is the runbook.

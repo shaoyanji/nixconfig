@@ -235,3 +235,5 @@ Then check the surfaces actually updated: `task docs:build` and `task docs:site`
 `knowledge-base` (where knowledge lives), `task-plane` (which task, and when not
 to add one), `checks` (what each gate proves). Contract: `.agents/SCHEMA.md`
 §2 and §5.
+
+Truth: `lib/agents-notes.nix` — the schema the gate runs; this page is the procedure.

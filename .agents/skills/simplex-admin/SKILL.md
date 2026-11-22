@@ -16,3 +16,5 @@ never installed and had already drifted (230 vs 233 lines).
 
 Read the module, not this file. `hosts/frieren/infra-stack.nix` is the consumer
 that references the script by path.
+
+Truth: `modules/user/ai/skills/simplex-admin/` — the skill's real home; this page is the pointer.

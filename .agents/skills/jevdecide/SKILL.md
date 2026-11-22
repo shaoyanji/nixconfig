@@ -151,3 +151,5 @@ there is no hook for it.
 - Eisen's router, the `/v1/systemone` request shape and the routing bench:
   `references/eisen-routing.md`.
 - The text lane to pipe in: `cpg` (lane 1).
+
+Truth: `modules/config/nu/decision.nu` — the classifier; this page is the routing.

@@ -165,3 +165,5 @@ task checks:host HOST=frieren      # one host, all assertions
 task dev:inventory:host HOST=fern  # host record, no host eval
 task infra:deploy:host:fern        # plan -> apply -> validate
 ```
+
+Truth: `taskfiles/` — the contract this page routes; this page is the procedure.

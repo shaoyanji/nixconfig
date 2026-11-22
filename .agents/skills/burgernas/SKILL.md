@@ -124,3 +124,5 @@ task -t taskfiles/burgernas.yml burgernas:transmission:leech
 
 See also: `inventory.toml` (`[hosts.burgernas]`), `hosts/frieren/infra-stack.nix`
 (restic target + `burgernas-poweroff` timer), and `docs/storage-taxonomy.md`.
+
+Truth: `taskfiles/burgernas.yml` — the executable contract; this page is the procedure.

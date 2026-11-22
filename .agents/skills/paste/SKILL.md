@@ -129,3 +129,5 @@ cat /var/log/syslog | pb
    * Do NOT paste decrypted SOPS secret files or API keys.
    * Do NOT paste SSH private keys or session tokens.
 3. **Large Binary Files:** Use `/Volumes/data` storage or NAS client mounts instead of `pb` for files > 100 MB.
+
+Truth: `modules/services/paste.nix` — the service; this page is the procedure.

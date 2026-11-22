@@ -90,3 +90,5 @@ zero findings since 2026-10-27) is the gate for real defects in that class.
 
 `checks:status` is the one check that proves nothing: it prints the task list and
 `git status`. Use it to orient, never as evidence a change works.
+
+Truth: `taskfiles/checks.yml`, `scripts/task/` — the gates and their scripts; this page is the routing.

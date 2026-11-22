@@ -163,3 +163,5 @@ qmd update                        # re-index changed files locally (fast, BM25)
 - **Reranking:** `qwen3-reranker-0.6b-q8_0.gguf` (610 MB) — used for multi-candidate reranking.
 - **Query Expansion:** `qmd-query-expansion-1.7B-q4_k_m.gguf` (1.28 GB) — used for HyDE query synthesis.
 - Cached under `~/.cache/qmd/models/`. Synced from Eisen so queries run locally without WAN downloads.
+
+Truth: `taskfiles/data.yml`, `scripts/task/qmd-docs-index.sh` — the index jobs and the client; this page is the procedure.

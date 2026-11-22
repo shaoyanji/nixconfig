@@ -88,3 +88,5 @@ the command exits 2 rather than guessing.
 `mail:alias:prune` — 0 nothing expired, 1 expired entries listed, 2 refused.
 Every write — 2 when the API could not be reached or the change could not be
 proven, and in that case nothing was recorded in the registry.
+
+Truth: `scripts/task/mail-alias.sh`, `modules/config/mail-aliases.toml` — the client and the registry; this page is the procedure.

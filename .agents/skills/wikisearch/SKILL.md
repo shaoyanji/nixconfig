@@ -158,3 +158,4 @@ command is identical there. Any LAN or tailnet client can skip the wrapper and
 ask the daemon: `http://frieren.lan:8088/search?pattern=<q>`,
 `/suggest?term=<t>`, and the reader at `http://wiki.frieren.lan`.
 
+Truth: `modules/services/kiwix.nix`, `flake/epistemics.nix` — the archive and the source table; this page is the procedure.

@@ -90,3 +90,5 @@ by `checks:build:route` and satisfied by `infra:warm:host:<h>` on the builder.
   loudly); do not treat "registered" as "buildable".
 - `--raw` on a numeric field prints digits but is not typed JSON; use `--json`
   when the value feeds a script.
+
+Truth: `lib/inventory.nix` — the compiler that answers; this page is the routing.

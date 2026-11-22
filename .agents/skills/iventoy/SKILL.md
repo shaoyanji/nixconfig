@@ -118,3 +118,5 @@ sudo systemctl restart iventoy
 ```bash
 sudo tail -n 50 /srv/iventoy/log/log.txt
 ```
+
+Truth: `modules/services/iventoy.nix` — the service and its images; this page is the runbook.

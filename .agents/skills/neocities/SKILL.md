@@ -63,3 +63,5 @@ has no local counterpart before removing it.
 - The landing page, about page and 404 are hand-written; they have no header and render
   ignores them.
 - `drafts/` is created on demand and holds local state — it is not a published artifact.
+
+Truth: `taskfiles/neocities.yml` — the executable contract; this page is the procedure.

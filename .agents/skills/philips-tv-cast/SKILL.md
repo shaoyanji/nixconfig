@@ -143,3 +143,5 @@ task media:tv                                                  # STOPPED vs PLAY
 
 `STOPPED` with a `TrackURI` set means the set accepted the URI and could not fetch it:
 check that the URL loads from another LAN host before blaming the renderer.
+
+Truth: `scripts/task/play-on-tv.py`, `scripts/task/plex-play.py` — the cast clients; this page is the procedure.

@@ -113,3 +113,5 @@ any other `homeDirectory`), single-user Nix at `/data/home/.nix-profile` with a
 3.3 GiB store, and the lean profile's `gh`, `go`, `go-task`, `jq`, `yq`, `tmux`,
 `ripgrep`, `rsync`, `direnv`. **`rsync` exists only through the profile** — the
 image itself ships docker, go, node and python3 but no rsync and no nix.
+
+Truth: `taskfiles/instabox.yml`, `scripts/task/instabox.sh` — the executable contract; this page is the procedure.

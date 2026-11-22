@@ -76,3 +76,5 @@ incident (`correct`).
 - The decision lane: `jevdecide`. The evidence rule: `prove-it-works`.
 - The rule behind the gate: [[flake/policies.nix#router-labels-are-routed]].
 - This page's own budget: `flake/prose-budget.nix`. [[flake/policies.nix#agent-prose-budget]]
+
+Truth: `modules/config/nu/decision.nu` — the classifier; this page is the routing.

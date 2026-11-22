@@ -142,3 +142,5 @@ Headed for debugging: `agent-browser open --headed <url>`.
   (`--remote-debugging-port`, then `Runtime.evaluate` + `Input.insertText`).
   `agent-browser` exposes no `--user-data-dir`, so anything needing a persistent
   login profile has to launch Chromium directly.
+
+Truth: `modules/user/ai/default.nix` — what installs the CLI; this page is the procedure.

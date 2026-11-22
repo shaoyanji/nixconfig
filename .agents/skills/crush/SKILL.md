@@ -23,3 +23,5 @@ that would send an agent at a dead quota. The cascade that replaced it, with its
 tier order and verified flags, is the `frieren-offload` skill and
 `hosts/frieren/infra-stack.nix` (`run_agent_cascade`), which no longer carries a
 Crush step.
+
+Truth: `taskfiles/agents.yml` — the agent lanes this pointer redirects to; this page is the explanation.

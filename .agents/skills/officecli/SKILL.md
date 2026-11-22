@@ -51,3 +51,5 @@ that demand DOCX:
    engine).
 3. QA: `officecli docx read` the output back and diff against the source
    content before sending.
+
+Truth: `modules/user/ai/default.nix` — what installs the tool; this page is the procedure.

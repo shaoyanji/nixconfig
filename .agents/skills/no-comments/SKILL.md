@@ -49,3 +49,5 @@ ceiling is `flake/nix-comments.nix`; the gate is
 in the same commit and the diff agrees with the record.
 
 Start with the diff in front of you. Do not sweep the tree in one pass.
+
+Truth: `flake/nix-comments.nix` — the gate this page is the argument for.

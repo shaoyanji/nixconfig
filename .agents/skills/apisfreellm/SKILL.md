@@ -150,3 +150,5 @@ not evidence that the free option is better on a given task.
 - A DNS or connection error inside a code sandbox (Code Interpreter, analysis
   tools) is the sandbox having no network, not the API being down. Report that
   and hand over a command to run instead of retrying.
+
+Truth: `taskfiles/freeapi.yml`, `scripts/task/freeapi.sh` — the executable contract; this page is the procedure.

@@ -1,36 +1,37 @@
-# Lead: Fraunhofer LBF - IT-System-Engineer / Network-Engineer (Darmstadt)
+# Lead: Fraunhofer LBF Darmstadt — IT-System-Engineer / Network-Engineer
 
-Fit: 3
+Fit: 2
 Stand: 22.11.2026
+Ort: Darmstadt
+Institut: Fraunhofer-Institut für Betriebsfestigkeit und Systemzuverlässigkeit LBF
+Kennziffer: 86030
+Anstellung: 39 Stunden, Teilzeit möglich, **zunächst 2 Jahre befristet**, TVöD bis EG 12
+Quelle: jobs.fraunhofer.de, Anzeige liegt im Paket (veröffentlicht 20.11.2026)
+Sprache: Deutsch
 
-## Warum interessant
+## Was die Anzeige wirklich verlangt
 
-Das Fraunhofer-Institut für Betriebsfestigkeit und Systemzuverlässigkeit in Darmstadt sucht jemanden für Betrieb und Weiterentwicklung der Institutsnetze: Palo-Alto-Firewalls, Cisco- und HP-Switches, LAN, WAN, WLAN, NAC, DNS, DHCP, IPAM, Monitoring, dazu die sichere Vernetzung eines großen Maschinenparks im Umfeld Industrie 4.0 und IoT. Dazu kommen ISO 27001 und VDA ISA/TISAX als Rahmen. Das ist Netzbetrieb mit Forschungsbezug, und Fraunhofer steht bereits im Lebenslauf: 2012 wissenschaftliche Hilfskraft am Fraunhofer ISE.
+Enterprise-Netztechnik: Core- und Distribution-Switching von Cisco und HPE/Aruba, WLAN von Cisco, NAC mit Aruba ClearPass, Next-Generation-Firewalls von Palo Alto, LAN, WAN, IPAM, 802.1X, Netzwerküberwachung und Dokumentation. Dazu die sichere Vernetzung eines umfangreichen Maschinenparks im Umfeld von Industrie 4.0 und IoT und die Anforderungen aus DIN ISO/IEC 27001 und VDA ISA/TISAX. Im Profil stehen LAN/WLAN/NAC-Erfahrung, Routing und Switching in Enterprise-Umgebungen, CCNA/CCNP oder LPIC von Vorteil und **Linux nur als Grundkenntnis „von Vorteil"**.
 
-## Was passt
+## Warum trotzdem bewerben
 
-- Netz und Firewall als Code: nftables-Regeln und Ressourcenlimits je Dienst, keine öffentliche Schnittstelle.
-- WireGuard-Tailnet zwischen Standorten, DNS und Routing selbst konfiguriert.
-- Netzwerküberwachung selbst gebaut: Sentinel-Ledger alle 15 Minuten, Gatus-Prüfungen, Go-Bridge mit Zustellbestätigung.
-- Netzwerkautomation in Git: jede Änderung als Commit, Gates je Host, Rollback je Generation. Python und Go für Werkzeuge.
-- Anwenderberatung und Runbooks statt Wissen im Kopf.
-- Eigene SSH-Zertifizierungsstelle mit kurzlebigen Zertifikaten, sops und age für Geheimnisse.
-- Deutsch C1, Englisch Muttersprache, Umzug nach Darmstadt machbar, Eintritt sofort.
+Weil der Teil, der hier fünf Jahre lang gemacht wurde, der Teil ist, den die Anzeige am dünnsten beschreibt: ein Netz aus einer Beschreibung bauen, Firewall-Regeln als Code behandeln, einen Umbau wagen können, weil die Rückkehr zur vorigen Generation Minuten dauert, und einen Betrieb hinterlassen, den der Nächste übernehmen kann. Wer einen Maschinenpark vernetzt, braucht genau das.
 
-## Was fehlt
+## Was fehlt, und zwar vollständig
 
-- Cisco-, HPE/Aruba- und Palo-Alto-Geräte: keine Herstellerpraxis, keine Konfiguration solcher Systeme.
-- Zertifizierungen: kein CCNA, CCNP, LPIC oder ITIL.
-- WLAN-Controlling und NAC (Aruba ClearPass), 802.1X im Institutsbetrieb: nicht umgesetzt.
-- Enterprise-Routing und -Switching: kein BGP, OSPF, VLAN-Design über viele Segmente, kein Stacking oder VPC.
-- IPAM als System, Log-Analyse-Werkzeuge, Ansible: nicht vorhanden. Meine Automatisierung ist Nix plus Git.
-- ISO 27001 oder VDA ISA/TISAX: keine Audit- oder Zertifizierungserfahrung.
-- Das Linux-Verhältnis ist hier umgekehrt: Linux ist bei mir die Tiefe, bei der Stelle nur ein Vorteil. Das ist ein Vorsprung, kein Ersatz für Herstellerwissen.
+- **Cisco-** und **HPE/Aruba-Switching**, Core und Distribution.
+- **Palo-Alto-Next-Generation-Firewalls.**
+- **WLAN-Controller** (Cisco), **NAC** (Aruba ClearPass), **802.1X**.
+- **IPAM-Systeme**, **Ansible**, GitLab-CI im Netzbetrieb.
+- **CCNA/CCNP**, LPIC, ITIL.
+- **ISO-27001- und TISAX-Auditierung.**
+
+## Fit-Begründung: 2, nicht die bisher notierten 3
+
+Die Rolle ist eine Enterprise-Netzstelle, und Linux steht dort ausdrücklich nur als „von Vorteil". Die geforderte Kernkompetenz — Cisco-Switching, Palo Alto, NAC — ist nicht vorhanden, und Zertifizierungen fehlen ebenfalls. Zwei ist die ehrliche Zahl; eine 3 würde unterstellen, die Netztechnik sei austauschbar, und das ist sie in einem Institut mit TISAX-Anforderungen nicht.
+
+Beworben wird trotzdem, weil Automatisierung, Dokumentation und der reproduzierbare Umbau hier echte Stärken sind — aber als Bewerbung mit offengelegter Lücke, nicht als passgenaue.
 
 ## Weg
 
-Online über den Bewerbungsbutton der Anzeige, Kennziffer 86030. Nach Eingang kommt eine automatische Empfangsbestätigung. Ansprechpartner: Thorsten Hering und Manuel Matern. Eine Bewerbungsfrist steht nicht in der ausgelesenen Anzeige; der Zeitdruck ist also geringer als bei PTB, aber die Stelle ist auf zwei Jahre befristet.
-
-## Gehalt
-
-TVöD bis EG 12, je nach Qualifikation, 39 Stunden, Teilzeit möglich, zunächst zwei Jahre befristet mit angestrebter Verlängerung. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt im Bereich von EG 12 und ist über die Qualifikationseinstufung erreichbar, nicht über eine Forderung. Keine Zahl im Anschreiben.
+Online über den Bewerbungsbutton. Keine Frist genannt; Ansprechpartner Thorsten Hering und Manuel Matern, +49 6151 705-8514 beziehungsweise -8349. Zeugnisse vor dem Absenden ergänzen.

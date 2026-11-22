@@ -89,6 +89,35 @@ else
     [ "$state_age" -lt 900 ] ||
       warn "gateway_state.json last written ${state_age}s ago — the daemon may be wedged"
   fi
+  # The unit's PATH is what the daemon and every child it spawns resolve tools
+  # from, and node/npm/npx and ffmpeg are dependencies of the gateway itself.
+  # Neither is guaranteed by a profile after a switch: measured 2026-11-22,
+  # ffmpeg survived only because a profile happened to carry it and node was
+  # absent entirely, so `gateway.py`'s node probe and the audio/discord ffmpeg
+  # calls would have failed. Assert the unit names both, and that they resolve
+  # through that PATH, rather than trusting the module text.
+  gateway_path="$(systemctl --user show hermes-gateway -p Environment 2>/dev/null |
+    tr ' ' '\n' | sed -n 's/^Environment=PATH=//p; s/^PATH=//p' | head -1)"
+  if [ -z "$gateway_path" ]; then
+    warn "hermes-gateway unit exposes no Environment PATH — node/ffmpeg unasserted"
+  else
+    for want in nodejs ffmpeg; do
+      case ":$gateway_path:" in
+      *"$want"*) ok "hermes-gateway PATH names $want" ;;
+      *) bad "hermes-gateway PATH has no $want — the unit lost the path modules/user/ai/hermes-user.nix adds" ;;
+      esac
+    done
+    missing=""
+    for bin in node ffmpeg; do
+      env -i PATH="$gateway_path" bash -c "command -v $bin >/dev/null 2>&1" 2>/dev/null ||
+        missing="$missing $bin"
+    done
+    if [ -z "$missing" ]; then
+      ok "hermes-gateway PATH resolves node and ffmpeg"
+    else
+      bad "hermes-gateway PATH does not resolve:${missing}"
+    fi
+  fi
 fi
 
 # --- 3. derived credential file --------------------------------------------

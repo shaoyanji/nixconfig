@@ -1,123 +1,76 @@
-# Bewerbung FAU Erlangen-Nürnberg - IT-Systemadministrator Linux und Windows (LFT)
+# Bewerbung FAU Erlangen-Nürnberg — IT-Systemadministrator Linux und Windows (m/w/d)
 
 Stand: 22. November 2026
-Kennung: 2015 (Interamt-Angebots-ID 1513404)
-Fit: 3 / 5
+Fit: 3
+Sprache: Deutsch (C1)
 
 ## Stelle
 
 | Feld | Wert |
 | :--- | :--- |
 | Arbeitgeber | Friedrich-Alexander-Universität Erlangen-Nürnberg, Technische Fakultät |
-| Einrichtung | Lehrstuhl für Fertigungstechnologie (LFT) |
+| Einheit | Lehrstuhl für Fertigungstechnologie (LFT), Blech- und Massivumformung |
 | Rolle | IT-Systemadministrator Linux und Windows (m/w/d) |
-| Standorte | Egerlandstraße 11-13, 91058 Erlangen; Haberstraße 9, 91058; Konrad-Zuse-Straße 5, 91052 |
-| Dienstort | Hybrid, Homeoffice nach Einarbeitung grundsätzlich möglich |
-| Entgelt | TV-L E 10, Entwicklung bis E 11 bei Übernahme der Leitungsfunktion |
-| Umfang | 40,1 Stunden, Vollzeit; Teilzeit über Job-Sharing möglich |
-| Befristung | Bis 31.03.2028 |
-| Besetzung | Zum 15.02.2027 |
-| Frist | 01.12.2026 |
-| Kontakt | Gunar Tochtermann, gunar.tochtermann@fau.de, +49 9131 8528284 |
-| Interamt | https://interamt.de/koop/app/stelle?id=1513404 |
+| Interamt-ID / Kennung | 1513404 / 2015 |
+| Einsatzort | Egerlandstraße 11-13, 91058 Erlangen; zusätzlich Haberstraße 9 und Konrad-Zuse-Straße 5 |
+| Dienstort | hybrid, Homeoffice nach Einarbeitung möglich |
+| Umfang | Vollzeit 40,1 h |
+| Entgelt | TV-L E 10, Entwicklung bis E 11 als Nachfolge der IT-Leitung genannt |
+| Laufzeit | Feld „befristet bis" 31.03.2028; Text nennt unbefristetes Arbeitsverhältnis — Widerspruch |
+| Besetzung | 15.02.2027 |
+| **Frist** | **01.12.2026**, ausschließlich über die Behördenseite, nicht per Post oder E-Mail |
+| Ansprechpartner | Gunar Tochtermann, gunar.tochtermann@fau.de, +49 9131 8528284 |
 
-## Bewerbungsweg
-
-Die Anzeige steht auf Interamt unter der Angebots-ID 1513404, beworben wird aber ausschließlich über die Bewerbungsseite der FAU mit der Kennung 2015. Das steht so in der Anzeige: nicht über Interamt, nicht per Post, nicht per E-Mail. Der Datenbankeintrag führt die Interamt-URL als Bewerbungsadresse; das ist als Verweis auf die Anzeige zu lesen, nicht als Bewerbungsweg. Wer dort absendet, hat nicht beworben.
-
-Das Portal der FAU wurde nicht gerendert; es wurde nichts abgeschickt.
-
-### Dokumente
+## Dokumente
 
 | Dokument | Datei | Hinweis |
 | :--- | :--- | :--- |
-| Anschreiben | `anschreiben.pdf` | Eine Seite, DIN-5008-nah, deutsch, an Herrn Tochtermann |
+| Anschreiben | `anschreiben.pdf` | Eine Seite, deutsch, an Herrn Tochtermann, mit Interamt-ID und Kennung |
 | Lebenslauf | `lebenslauf.pdf` | Zwei Seiten, deutsch |
-| Anschreiben-Quelle | `anschreiben.typ` | Typst, direkt kompilierbar |
-| Lebenslauf-Quelle | `lebenslauf.typ` | Typst, direkt kompilierbar |
-| Zeugnisse | keine Datei | Werden verlangt, müssen ergänzt werden |
-| Führerschein Klasse B | keine Datei | Wird verlangt; Nachweis vor dem Absenden klären |
+| Quellen | `lebenslauf.typ`, `anschreiben.typ` | Typst, eigenständig kompilierbar |
+| Zeugnisse | keine Datei | Muss ergänzt werden |
 
-## Kandidat
-
-| Feld | Wert |
-| :--- | :--- |
-| Name | Matt Ji |
-| Adresse | Am Burgerhof 4, 79261 Gutach im Breisgau |
-| E-Mail | matt@bountystash.com |
-| Telefon | +49 1733281570 |
-| Sprachen | Deutsch C1, Englisch Muttersprache |
-| Abschluss | M.Sc. Erneuerbare-Energien-Management, Albert-Ludwigs-Universität Freiburg, 2014 |
-| Forschung | Wissenschaftliche Hilfskraft, Fraunhofer ISE Freiburg, 2012 |
-| Linux | Dreizehn NixOS-Hosts, Rollen je Host, systemd, nftables, WireGuard, DNS |
-| Speicherung | restic auf NAS, geprüfte Rücksicherungen |
-| Überwachung | Sentinel-Ledger alle 15 Minuten, Gatus, Go-Bridge mit Zustellbestätigung |
-| Anwenderbetreuung | Konten, Schlüssel, Zugänge, Hard- und Softwarefragen, Runbooks |
-| Umzug | Erlangen machbar, Start 15.02.2027 machbar |
-
-## Abgleich mit der Ausschreibung
+## Abgleich mit dem Anforderungsprofil
 
 | Anforderung | Nachweis | Einschätzung |
 | :--- | :--- | :--- |
-| Hochschulstudium Informatik oder vergleichbar | M.Sc. Freiburg 2014, kein Informatikstudium | Über vergleichbare Qualifikation zu begründen |
-| Mehrjährige einschlägige Berufserfahrung | Zehn Jahre, davon fünf in eigener Systemverantwortung | Erfüllt |
-| Sehr gute Kenntnisse Windows und Ubuntu | Ubuntu-nahes Linux stark; Windows auf Workstation-Ebene | Linux ja, Windows teilweise |
-| Windows Server 2019/2022/2025, AD, DNS, GPO | Nicht administriert | Lücke |
-| Installation komplexer Software, Lizenzserver | Reproduzierbare Installation aus gepinnter Beschreibung; kein Lizenzserver | Teilweise |
-| Backup-Systeme und Virtualisierung, Hyper-V | restic mit geprüften Rücksicherungen; kein Hyper-V, keine Servervirtualisierung | Backup ja, Virtualisierung nein |
-| Hardwarekenntnisse | Beschaffung, Installation, Inbetriebnahme über drei Generationen | Stark |
-| PowerShell und MS Office | Shell, Python, Go; Office als Nutzer | Grundlagen |
-| Rechteverwaltung in Linux und Windows | Deklarative Rollen je Host in Linux | Linux ja, Windows nein |
-| Führerschein Klasse B | Unbestätigt | Offen, vor Absenden klären |
-| Deutsch C1, Englisch B2 | C1 und Muttersprache | Übertrifft |
-| Standortwechsel, Transport von Systemen | Drei Standorte in eigener Flotte | Plausibel |
+| Windows Server 2019/2022/2025, Active Directory, DNS, Firewall, Group Policies | Nicht vorhanden | **Muss-Lücke** |
+| Sehr gute Kenntnisse Windows und Ubuntu | Ubuntu/Linux stark; Windows nur Anwenderbetreuung | Halb erfüllt |
+| Mehrjährige IT-Systemadministration | Zehn Jahre Betrieb, davon eine Forschungsstation | Erfüllt |
+| Wartung von Servern, NAS, Workstations, PCs, Clustern an mehreren Standorten | Dreizehn Hosts, drei Generationen, mehrere Standorte, Beschaffung bis Inbetriebnahme | Stark, ohne Cluster im Institutsmaßstab |
+| Backup-Systeme und Virtualisierung, insbesondere Hyper-V | restic mit geprüften Wiederherstellungen; QEMU- und MicroVM-Gäste | Teilweise, Hyper-V fehlt |
+| Installation komplexer Software und Lizenzserver (CAD, FEM, Office) | Nicht vorhanden | **Lücke** |
+| PowerShell | Nicht vorhanden; Shell, Python, Go | **Lücke** |
+| Fundierte Hardwarekenntnisse | Beschaffung, Transport, Inbetriebnahme, drei Hardware-Generationen | Stark |
+| Hochschulabschluss | M.Sc. Freiburg, B.Sc. Colorado School of Mines | Erfüllt |
+| Deutsch C1, Englisch B2 | Deutsch C1, Englisch Muttersprache | Erfüllt |
+| Führerschein Klasse B | Status ungeklärt, nicht behauptet | **Vor Absenden klären** |
+| Anwenderbetreuung vor Ort und per Fernzugriff | Fünf Jahre Betreuung über Standorte hinweg | Erfüllt |
+| Projektplanung, Beschaffung nach Richtlinien | Infrastrukturprojekte, Hardware-Lebenszyklus | Teilweise, ohne öffentliche Vergabepraxis |
 
 ## Fit-Begründung: 3 von 5
 
-Drei, weil die Stelle inhaltlich fast deckungsgleich ist: Linux-Betrieb, Rechteverwaltung, Sicherung, Anwenderbetreuung, Beschaffung, mehrere Standorte, Forschungsumgebung. Nicht vier, weil drei Pflichtpunkte fehlen: Windows Server mit Active Directory und Group Policies, Servervirtualisierung mit Hyper-V und die Betreuung von CAD- und FE-Software samt Lizenzservern. Nicht zwei, weil die Linux-Seite tatsächlich betrieben wird und nicht nur behauptet: dreizehn Hosts, deklarative Rollen, geprüfte Rücksicherungen, Telemetrie mit Zustellbestätigung.
+Drei. Linux, Hardware-Lebenszyklus, Speicher, Netze, Anwenderbetreuung an mehreren Standorten und die Forschungsnähe aus der Zeit am Fraunhofer ISE passen gut. Die Windows-Server-Seite ist dagegen eine Muss-Anforderung, die vollständig fehlt, und sie ist kein Nebenpunkt: Active Directory, Group Policies, Hyper-V und Lizenzserver tragen die halbe Instituts-IT.
 
-## Gehalt
-
-TV-L E 10, Stufe nach Erfahrung, zusätzliche Jahressonderzahlung. Die eigene Erwartung von 85.000 bis 95.000 EUR liegt über E 10; im Anschreiben steht keine Zahl. E 11 ist an die Übernahme der Leitungsfunktion gebunden, nicht an die Einstellung.
-
-## Formularzuordnung
-
-Das FAU-Portal wurde nicht gerendert. Werte ohne belegte Feld-IDs; Beschriftungen vor dem Absenden gegenprüfen.
-
-| Beschriftung | Wert |
-| :--- | :--- |
-| Anrede | Herr |
-| Vorname | Matt |
-| Nachname | Ji |
-| E-Mail | matt@bountystash.com |
-| Telefon | +49 1733281570 |
-| Straße | Am Burgerhof 4 |
-| PLZ | 79261 |
-| Ort | Gutach im Breisgau |
-| Kennung | 2015 |
-| Angebots-ID | 1513404 |
-| Eintritt | 15.02.2027 |
-| Anschreiben | `anschreiben.pdf` |
-| Lebenslauf | `lebenslauf.pdf` |
+Nicht 2, weil die Stelle ausdrücklich Linux umfasst, die Nachfolge der IT-Leitung jemanden mit Beschaffungs-, Betriebs- und Dokumentationserfahrung braucht und die Nähe zu Messplätzen und Forschungsdaten belegbar ist.
 
 ## Offene Punkte
 
-1. Führerschein Klasse B klären und Nachweis bereitlegen; die Anzeige verlangt ihn.
-2. Zeugnisse fehlen im Paket.
-3. Windows-Server-, AD-, GPO- und Hyper-V-Lücke nicht überspielen; das Anschreiben benennt sie.
-4. Nicht über Interamt bewerben, sondern über die FAU-Seite mit Kennung 2015.
-5. Leitungsfunktion als Perspektive formulieren, nicht als bisherige Erfahrung.
-6. Gehaltswunsch nicht nennen; E 10 ist tariflich.
+1. **Windows Server, AD, GPO, Hyper-V, PowerShell, Lizenzserver** fehlen; im Anschreiben im dritten Absatz benannt.
+2. **Führerschein Klasse B** ist in der Anzeige gefordert und im Paket nicht behauptet. Vor dem Absenden klären; die Stelle umfasst Fahrten zwischen drei Standorten.
+3. **Frist 01.12.2026** ist knapp; Bewerbung nur über die Behördenseite.
+4. **Befristung widersprüchlich:** Feld sagt 31.03.2028, Text sagt unbefristet mit Option auf E 11. Im Gespräch klären.
+5. Zeugnisse fehlen.
+6. Umzug oder Pendeln: Erlangen rund 3,5 h von Gutach im Breisgau; hybrid und Umzug beide angeboten.
 
 ## Paket
 
 | Datei | Inhalt |
 | :--- | :--- |
-| `job-description.txt` | Anzeige mit Aufgaben, Profil, Rahmenbedingungen und Bewerbungsweg. |
-| `lebenslauf.typ` | Typst-Quelle des Lebenslaufs, eigenständig kompilierbar. |
-| `anschreiben.typ` | Typst-Quelle des Anschreibens, eigenständig kompilierbar. |
-| `lebenslauf.pdf` | Deutscher Lebenslauf, zwei Seiten. |
-| `anschreiben.pdf` | Deutsches Anschreiben, eine Seite. |
-| `resume.json`, `letter.json` | Frühere Quelldaten aus dem Generator (bleiben als Historie). |
-| `selection.json` | Audit der früheren Auswahl. |
-| `submission-sheet.md` | Diese Feldzuordnung. |
+| `job-description.txt` | Anzeigentext vom 22.11.2026 mit Abgleichsnotiz. |
+| `lead.md` | Fit, Lücken, Weg, Gehalt. |
+| `lebenslauf.typ` | Typst-Quelle, eigenständig kompilierbar. |
+| `anschreiben.typ` | Typst-Quelle, eigenständig kompilierbar. |
+| `lebenslauf.pdf` | Zwei Seiten. |
+| `anschreiben.pdf` | Eine Seite. |
+| `submission-sheet.md` | Diese Übersicht. |

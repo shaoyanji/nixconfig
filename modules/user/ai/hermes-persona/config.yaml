@@ -146,12 +146,18 @@ fallback_providers:
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: ollama-cloud
     model: nemotron-3-ultra
-  # Keyless terminal lane: api.apisfreellm.com takes no key and can never
-  # bill, so it is the true last resort after every quota is spent.
+  # CrowLLM is a keyed route whose catalog is `:free` ids only: the key comes
+  # from the shared sops blob, so the entry names the env var and never the
+  # value. `key_env` is the only form hermes resolves — `api_key: ${VAR}` was
+  # sent literally (fallback_config.resolve_entry_api_key reads an inline
+  # literal or key_env, and never expandvars), which is a 401 with a key that
+  # was present the whole time.
   - provider: custom
     model: nemotron-3.5-super-vl:free
     base_url: https://crowllm.com/v1
-    api_key: ${CROWLLM_API_KEY}
+    key_env: CROWLLM_API_KEY
+  # Keyless terminal lane: api.apisfreellm.com takes no key and can never
+  # bill, so it is the true last resort after every quota is spent.
   - provider: custom
     model: free-ai
     base_url: https://api.apisfreellm.com/v1

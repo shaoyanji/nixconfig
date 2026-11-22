@@ -30,7 +30,7 @@ Status: migriert auf native Typst-Quellen, kompiliert und gemessen
 
 | Datei | Seiten | Bytes | Wörter | SHA-256 (gekürzt) |
 | :--- | :--- | :--- | :--- | :--- |
-| `lebenslauf.pdf` | 2 | 36861 | 555 | `6c1902f5687165ec` |
+| `lebenslauf.pdf` | 2 | 38369 | 554 | `ec4b57cb17a5d9b6` |
 | `anschreiben.pdf` | 1 | 24641 | 330 | `780a9bd425956b05` |
 
 ## Fit-Map

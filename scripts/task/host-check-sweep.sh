@@ -76,7 +76,11 @@ set -uo pipefail
 
 MODE="build"
 ARCH=""
-TIMEOUT=120
+# 240 since 2026-11-22: frieren's gate finished at 120.19 s with the NAS at 55 %
+# I/O against the old 120 s cap, and the SIGKILL it produced prints as
+# "FAILED: <host>" — the same line an assertion failure prints. A gate that judges
+# a config must not be decided by the I/O weather.
+TIMEOUT=240
 HOSTS=""
 REF="."
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

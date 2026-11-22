@@ -14,8 +14,12 @@
 # skips an unchanged description, so the hourly sync can call this without
 # rewriting every row.
 #
-# DRY=1 prints what would be sent. Exit: 0 clean, 1 a document failed, 2 cannot
-# run (no curl/jq, or no directory to import).
+# A file whose id has no application row is reported as `orphaned` and skipped:
+# the missing row is a fact about the file, not a broken import, and one stale
+# file must not stop the sync of every other description.
+#
+# DRY=1 prints what would be sent. Exit: 0 clean (orphans are warnings), 1 a
+# document failed, 2 cannot run (no curl/jq, or no directory to import).
 set -euo pipefail
 
 # The tailnet front of NpgsqlRest. On delphi itself `http://127.0.0.1:8080` is
@@ -104,6 +108,7 @@ case "$mode" in
 
     imported=0
     unchanged=0
+    orphaned=0
     failed=0
     for f in "${files[@]}"; do
       id=$(basename "$f" .txt)
@@ -142,8 +147,14 @@ case "$mode" in
       code=${resp##*$'\n'}
       body=${resp%$'\n'*}
       if [ "$code" != "200" ]; then
-        # A foreign-key miss is the common failure and it is a fact about the
-        # pipeline, not about the file: say which id has no row.
+        # A foreign-key miss means the file names an application that has no
+        # row. The file is stale, the import is not broken: warn, skip, and
+        # keep the remaining descriptions flowing.
+        if printf '%s' "$body" | grep -q '23503\|foreign key constraint'; then
+          echo "orphaned $id: no application row, skipped ($jd_dir/$id.txt)" >&2
+          orphaned=$((orphaned + 1))
+          continue
+        fi
         echo "failed $id ($code): $(printf '%s' "$body" | head -c 160)" >&2
         failed=$((failed + 1))
         continue
@@ -152,7 +163,7 @@ case "$mode" in
       echo "imported $id ($size B, $kind)"
     done
 
-    echo "appflow-docs: $imported imported, $unchanged unchanged, $failed failed"
+    echo "appflow-docs: $imported imported, $unchanged unchanged, $orphaned orphaned, $failed failed"
     [ "$failed" -eq 0 ] || exit 1
     ;;
 esac

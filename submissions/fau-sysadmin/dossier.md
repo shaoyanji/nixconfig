@@ -82,4 +82,4 @@ Keine 4, weil die Hälfte der Stelle Windows ist und dafür kein Beleg existiert
 | `submission-sheet.md` | Übersicht, Fit-Map, offene Punkte | — | — | — | — |
 | `lead.md` | Kurzfassung für die Pipeline | — | — | — | — |
 
-Quellenstand: Interamt-Angebot 1513404 am 22.11.2026 abgerufen, HTTP 302. Frist und Konditionen stammen aus dieser Anzeige.
+Quellenstand: Interamt-Angebot 1513404 am 22.11.2026 abgerufen, HTTP 200 (nach Weiterleitung der Einstiegs-URL). Frist und Konditionen stammen aus dieser Anzeige.

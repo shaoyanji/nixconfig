@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T11:28:02Z",
+  "generated": "2026-11-22T11:28:19Z",
   "count": 200,
-  "pin": "bc24086a9a4da8be11f9844f533e31b1a86d6a51b78c01e0b4a655d888107754",
+  "pin": "4b8c2d4c3418159d568c000b490f9b2ebf56801075b1905800cebb66a7888817",
   "turns": [
+    {
+      "id": "04229113-26cf-4467-8606-e93d6b92ffab",
+      "ts": "2026-11-22T11:28:04Z",
+      "source": "devin",
+      "subject": "job-hunt:celonis-dossier",
+      "action": "landed: celonis-query-engine-database dossier (2pp CV + 1pp letter, typst clean, prose gate pass); commit 4 files+sheet",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b183e17d6a3361a7fb106688af92958f8e5f30f",
+      "branch": "main",
+      "frame": "03ha73a4nf8oh9p9cqx494ksc"
+    },
     {
       "id": "8eac8a30-fdba-46bb-8c4a-c6fc5e3a81a8",
       "ts": "2026-11-22T11:27:32Z",
@@ -2751,19 +2764,6 @@
       "base_commit": "39b3b24fddf54d0469ea8b3a587e085d7dfb09d6",
       "branch": "main",
       "frame": "03ha6g6swy5xwlx5uf1me4t9l"
-    },
-    {
-      "id": "65a538dc-f796-470d-823b-6d3dc2cecd93",
-      "ts": "2026-11-22T09:28:43Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:job-hunt",
-      "action": "bwi upgraded to native Typst packet | 2pp CV + 1pp letter | fit 3 (posting core is Kubernetes/CKA-CKS); NixOS named in profile",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d111d5e9bc117b0140edf34a3af4f2d8b40a05ca",
-      "branch": "main",
-      "frame": "03ha6fyqkt0vmk7tblghfu4j3"
     }
   ]
 }

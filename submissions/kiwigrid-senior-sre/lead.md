@@ -1,30 +1,29 @@
-# Lead: Kiwigrid GmbH - (Senior) Site Reliability Engineer
+# Lead: Kiwigrid — Senior Site Reliability Engineer
 
 Fit: 3
 Stand: 22.11.2026
+Umfeld: Energie-IoT-Plattform, Smart Grid
+Quelle: Anzeige im Paket
+Sprache: Deutsch
 
 ## Warum interessant
 
-Kiwigrid betreibt KiwiOS, die Energy-Service-Plattform für Solar, Speicher, Wallboxen und Ökostrom-Tarife. Das ist die einzige Ausschreibung im Suchlauf, in der Energiewende und SRE im selben Satz stehen. Dazu passt die Vorgeschichte: M.Sc. Erneuerbare Energien, vier Jahre Asset Management bei O3 Energy.
+Die Stelle verbindet zwei Dinge, die in diesem Lebenslauf tatsächlich zusammenkommen: Plattformbetrieb unter Knappheit und energiewirtschaftliche Praxis. 10 MW Solarleistung kaufmännisch zu betreuen heißt, Messwerte als Geld zu lesen; dreizehn Hosts allein zu betreiben heißt, Verfügbarkeit ohne Rückfallebene herzustellen.
 
 ## Was passt
 
-- Monitoring, Metriken und Incident Management sind die Arbeit, die im eigenen Betrieb schon selbst gebaut wurde.
-- Automatisierung wiederkehrender Aufgaben, Deployment-Prozess, Dokumentation für andere Teams.
-- Rufbereitschaftsbereitschaft ist mit eigener Betriebsverantwortung vertraut.
-- Sicherheit in der Pipeline: sops mit age, Gates je Host, kurzlebige Zertifikate.
+- Plattformbetrieb allein, 13 Hosts, drei Hardware-Generationen.
+- Telemetrie mit Zustellbestätigung, Ledger, Prüfungen von außen, Vorlaufgrößen.
+- Reproduzierbare Auslieferung, Rückrollung in Minuten, geprüfte Restores.
+- Energie: Photovoltaik-Assetbetreuung, Ertrags- und Betriebsdaten, Studium im Energiemanagement.
+- Messumfeld: Fraunhofer ISE 2012.
 
 ## Was fehlt
 
-- Kubernetes: in der Ausschreibung ein Muss ("sehr gute Kubernetes-Kenntnisse"), im eigenen Betrieb nicht vorhanden.
-- Google Cloud: wünschenswert, nicht Pflicht; kein GCP-Projekt im Produktivbetrieb.
-- Java: wünschenswert, nicht vorhanden.
-- Formale Compliance-Audits und Vulnerabilitäts-Tooling aus dem Enterprise-Umfeld.
+- Kubernetes, Terraform, Ansible, Cloud-Plattformen.
+- Prometheus, Grafana, Alertmanager (eigene Werkzeuge statt Standardstapel).
+- Regulierter KRITIS-Betrieb.
 
 ## Weg
 
-Bewerbung über kiwigrid.jobs.personio.de/job/36748, ausschließlich Personio. Hybrid mit 1-2 Tagen Büropräsenz in Dresden pro Woche; das ist keine reine Remote-Stelle.
-
-## Gehalt
-
-In der Anzeige steht "leistungsgerechte Vergütung", keine Spanne. Angenommen werden 75.000 bis 85.000 EUR; die Forderung liegt bei 82.000 EUR, oberhalb davon nur mit Kubernetes-Nachweis.
+https://kiwigrid.jobs.personio.de/job/36748 — Zeugnisse vor dem Absenden ergänzen.

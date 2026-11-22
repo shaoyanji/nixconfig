@@ -180,7 +180,7 @@ tasks:
       for free and a second round costs nothing. Env: `ROSTER=`, `ONLY=`,
       `MAX_GEN=`, `SIZE=`.
     cmds:
-      - IMAGES_ROOT={{.IMAGES_ROOT}} ROSTER="{{if .ROSTER}}{{.ROSTER}}{{end}}" ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" SIZE="{{if .SIZE}}{{.SIZE}}{{end}}" bash scripts/task/image-daily.sh round
+      - IMAGES_ROOT={{.IMAGES_ROOT}} ROSTER="{{if .ROSTER}}{{.ROSTER}}{{end}}" ONLY="{{if .ONLY}}{{.ONLY}}{{end}}" MAX_GEN="{{if .MAX_GEN}}{{.MAX_GEN}}{{end}}" SIZE="{{if .SIZE}}{{.SIZE}}{{else}}1536x1024{{end}}" bash scripts/task/image-daily.sh round
 
   images:queue:status:
     desc: Whether a round is running, its last journal lines, and how many rows still wait

@@ -51,6 +51,8 @@
           color:var(--dim); border-radius:6px; padding:.15rem .45rem; font-size:.7rem;
           cursor:pointer; white-space:nowrap; }
   .copy:hover { color:var(--acc); border-color:var(--acc); }
+  a.copy { text-decoration:none; }
+  .desc { margin:0; padding:0 .65rem .6rem; color:var(--dim); font-size:.72rem; line-height:1.45; }
   .empty { color:var(--dim); padding:3rem 0; text-align:center; }
   footer { color:var(--dim); font-size:.75rem; padding:0 1.25rem 2rem; }
   footer code { background:var(--card); border:1px solid var(--line);
@@ -67,6 +69,8 @@
     <button class="chip" data-lane="site">site</button>
     <button class="chip" data-lane="wall">wall</button>
     <button class="chip" data-lane="blog">blog</button>
+    <button class="chip" data-shape="portrait" aria-pressed="false">phone</button>
+    <button class="chip" data-shape="landscape" aria-pressed="false">wide</button>
     <span class="count" id="count"></span>
   </div>
   <div class="tags" id="tagbar"><span class="label">tags</span></div>
@@ -83,7 +87,7 @@ const empty = document.getElementById('empty');
 const count = document.getElementById('count');
 const q = document.getElementById('q');
 const tagbar = document.getElementById('tagbar');
-let state = { assets: [], lane: 'all', tag: '', needle: '' };
+let state = { assets: [], lane: 'all', tag: '', shape: '', needle: '' };
 
 // Cloudinary's whole point: the transform sits in the path, so one public id
 // answers every size. Inserting it beats storing four URLs per asset.
@@ -93,8 +97,15 @@ function transform(url, t) {
 const thumb = (a) => transform(a.url, 'w_480,c_limit,f_auto,q_auto');
 const card = (a) => transform(a.url, 'f_jpg,q_auto,w_1200,h_630,c_fill');
 const tagsOf = (a) => a.tags || [];
+// A plate is made at one aspect ratio and stays that: `shape` is measured at
+// publish time, so "phone" is a fact about the file and not a guess from a name.
+const shapeOf = (a) => {
+  const m = /^(\d+)x(\d+)$/.exec(a.shape || '');
+  if (!m) return '';
+  return Number(m[1]) < Number(m[2]) ? 'portrait' : 'landscape';
+};
 // What a query may hit: the id a person types and the tags the manifest derived.
-const haystack = (a) => a.public_id + ' ' + tagsOf(a).join(' ');
+const haystack = (a) => a.public_id + ' ' + (a.title || '') + ' ' + (a.description || '') + ' ' + tagsOf(a).join(' ');
 
 // Subsequence match with a score that rewards runs and word starts, which is
 // what makes "frnm" find frieren-neumorph and "og console" find og/console.
@@ -156,6 +167,7 @@ function render() {
   const needle = state.needle.trim();
   const rows = state.assets
     .filter((a) => state.lane === 'all' || a.lane === state.lane)
+    .filter((a) => !state.shape || shapeOf(a) === state.shape)
     .filter((a) => !state.tag || tagsOf(a).includes(state.tag))
     .map((a) => {
       const hay = haystack(a);
@@ -175,7 +187,7 @@ function render() {
     link.append(img);
     const meta = document.createElement('div'); meta.className = 'meta';
     const name = document.createElement('span'); name.className = 'name';
-    name.append(marks(a.public_id, needle));
+    name.append(marks(a.title || a.public_id, needle));
     const lane = document.createElement('span'); lane.className = 'lane'; lane.textContent = a.lane;
     const copy = document.createElement('button'); copy.className = 'copy'; copy.textContent = 'copy URL';
     copy.onclick = async () => {
@@ -184,8 +196,19 @@ function render() {
       catch { copy.textContent = 'select it'; q.value = t; q.select(); }
       setTimeout(() => (copy.textContent = 'copy URL'), 1200);
     };
-    meta.append(name, lane, copy);
+    // `hd` is the enhanced delivery of the same public id: the manifest carries
+    // the transform, so the page never stores a second upload.
+    const hd = document.createElement('a');
+    hd.className = 'copy'; hd.textContent = 'hd'; hd.target = '_blank'; hd.rel = 'noopener';
+    hd.href = a.enhanced || a.url; hd.title = 'upscaled and sharpened, same plate';
+    const shape = document.createElement('span'); shape.className = 'lane';
+    shape.textContent = shapeOf(a) === 'portrait' ? 'phone' : shapeOf(a) === 'landscape' ? 'wide' : '';
+    meta.append(name, lane, shape, copy, hd);
     el.append(link, meta);
+    if (a.description) {
+      const d = document.createElement('p'); d.className = 'desc'; d.textContent = a.description;
+      el.append(d);
+    }
     if (tagsOf(a).length) {
       const tl = document.createElement('div'); tl.className = 'cardtags';
       for (const t of tagsOf(a).slice(0, 4)) {
@@ -204,12 +227,21 @@ function setLane(lane) {
   render();
 }
 
+function setShape(shape) {
+  state.shape = shape;
+  document.querySelectorAll('[data-shape]').forEach((c) =>
+    c.setAttribute('aria-pressed', String(c.dataset.shape === shape)));
+  render();
+}
+
 document.querySelectorAll('[data-lane]').forEach((c) => c.onclick = () => setLane(c.dataset.lane));
+document.querySelectorAll('[data-shape]').forEach((c) =>
+  c.onclick = () => setShape(state.shape === c.dataset.shape ? '' : c.dataset.shape));
 q.addEventListener('input', () => { state.needle = q.value; render(); });
 addEventListener('keydown', (e) => {
   if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
   if (e.key === 'Escape') {
-    q.value = ''; state.needle = ''; state.tag = ''; setLane('all'); renderTags();
+    q.value = ''; state.needle = ''; state.tag = ''; setShape(''); setLane('all'); renderTags();
     render(); q.blur();
   }
 });

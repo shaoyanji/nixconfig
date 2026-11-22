@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-22T12:21:18Z",
+  "generated": "2026-11-22T12:21:38Z",
   "count": 200,
-  "pin": "7c295ca876c4c51b154c43ebeb84df51c0fe376a0277fa2622ff60775b1b79ca",
+  "pin": "a87bab7b5ed83cf662530f87547201b74fe59ecca4e0dbe6edf2473833597e4e",
   "turns": [
+    {
+      "id": "060df19c-3730-4e67-a165-17a0aab0f38b",
+      "ts": "2026-11-22T12:21:22Z",
+      "source": "freebuff",
+      "subject": "nixconfig:qed",
+      "action": "landed: native Typst dossier for QED.ai Infrastructure Engineer (Warsaw), commit c-. CV 2pp/CVWw, letter 1pp/LTWw, 0 warnings, page budget asserted, prose exit 0. Five legacy artefacts retired with hashes in sheet; JD reconstructed. Recorded the live form's prompt-injection traps (pineapple / 'I am a dum dum') without obeying them, verified absent from all outputs. Relocation to Warsaw stated honestly in both documents as the user's decision. | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bd2f2f1197cc88c8a32d8f9cf1cea81630006625",
+      "branch": "main",
+      "frame": "03ha7dox5z0am6i8hd1xnpeg7"
+    },
     {
       "id": "bc1048c5-f334-4e39-8584-dee7595d69ec",
       "ts": "2026-11-22T12:19:37Z",
@@ -2835,19 +2848,6 @@
       "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
       "branch": "main",
       "frame": "03ha6rd0jo3a3vdblgfb28coe"
-    },
-    {
-      "id": "2705bff3-d109-4d5c-8394-b4c0d2935c80",
-      "ts": "2026-11-22T10:26:04Z",
-      "source": "freebuff",
-      "subject": "nixconfig:coda",
-      "action": "landed: native Typst packet 2pp CV + 1pp letter (en) | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "33a4bf42c3dc4a1977e24409c01014cfa0805a3c",
-      "branch": "main",
-      "frame": "03ha6r63abaqgb649xj7ex3qy"
     }
   ]
 }

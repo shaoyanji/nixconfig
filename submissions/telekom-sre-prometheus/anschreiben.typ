@@ -12,7 +12,7 @@
 #v(14pt)
 
 #text(size: 9pt)[
-  T-Systems International GmbH \
+  Deutsche Telekom AG / T-Systems International GmbH \
   Herrn Thomas Arbeit \
   Kennziffer 12444-563465374109756-DT-S
 ]
@@ -36,7 +36,7 @@ Konkret: Ein Sentinel-Job schreibt alle 15 Minuten Jobstatus, Generation-Alter s
 Was ich nicht mitbringe, sage ich vor der ersten Zeile Ihrer Must-Have-Liste: keinen Prometheus-Betrieb, kein PromQL, keine Federation, kein Remote Write, keine lokale Retention in Prometheus. Keine Grafana-Dashboards und kein Provisioning as Code, kein Loki und kein LogQL, kein AlertManager mit Routing und Inhibition, kein Kubernetes-Monitoring. Meine Konfiguration ist Nix, nicht YAML, und Terraform, Ansible und OpenTelemetry sind mir Werkzeugnamen, keine Praxis. Das ist die halbe Stelle, und ich sage es lieber jetzt als in der Einarbeitung.
 
 #v(2pt)
-Was ich mitbringe, ist die andere Hälfte und die, die man nicht in einem Kurs nachholt: die Gewohnheit, Telemetrie so zu bauen, dass sie unter Knappheit funktioniert und im Ernstfall trägt, plus die Fähigkeit, einen Stack wie Ihren schnell zu verstehen, weil ich seine Bausteine von Hand gebaut habe. Karlsruhe ist von Gutach im Breisgau rund anderthalb Stunden entfernt; hybrides Arbeiten mit Präsenz bei Bedarf ist für mich deshalb kein Zugeständnis, sondern die passende Form. Deutsch ist bei mir C1, Englisch Muttersprache. Mein Repository zeigt die Arbeit ungeschminkt: github.com/shaoyanji/nixconfig
+Was ich mitbringe, ist die andere Hälfte und die, die man nicht in einem Kurs nachholt: die Gewohnheit, Telemetrie so zu bauen, dass sie unter Knappheit funktioniert und im Ernstfall trägt, plus die Fähigkeit, einen Stack wie Ihren schnell zu verstehen, weil ich seine Bausteine von Hand gebaut habe. Ich bin US-Amerikaner mit unbefristetem Niederlassungsrecht in Deutschland, brauche also keinen Visa-Sponsor und keine Vorlaufzeit für einen Aufenthaltstitel. Mein Wohnsitz ist Baden-Württemberg, Karlsruhe rund anderthalb Stunden entfernt und der Standort, für den ich mich entscheide; hybrides Arbeiten mit Präsenz bei Bedarf ist für mich deshalb kein Zugeständnis, sondern die passende Form. Deutsch ist bei mir C1, Englisch Muttersprache. Mein Repository zeigt die Arbeit ungeschminkt: github.com/shaoyanji/nixconfig
 
 #v(4pt)
 Mit freundlichen Grüßen

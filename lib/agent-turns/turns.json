@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T12:09:57Z",
+  "generated": "2026-11-22T12:11:58Z",
   "count": 200,
-  "pin": "90f473d7633567402b8541b9a0ced1b4a3936eeb6951374eb33f378705ed428b",
+  "pin": "ad65fc7bd048b13a16044e96ec73ceacdb69e62b0e79fa114840223ebe2b798d",
   "turns": [
+    {
+      "id": "b6201f01-8508-448b-a7c3-6de6becd2a62",
+      "ts": "2026-11-22T12:11:04Z",
+      "source": "antigravity",
+      "subject": "nixconfig:job-search",
+      "action": "landed: mozilla staff swe tools & systems (req 8315181) submitted & confirmed (otp 43424148) | active: devin on n8n (ashby 24ad7d68), freebuff frieren on flox-packaging, freebuff delphi on bwi-cloud-engineer",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "087ba1e61509a7231aeaa1c08ac28b0467027dc2",
+      "branch": "main",
+      "frame": "03ha7boi6intz5w2kkk0qymii"
+    },
+    {
+      "id": "8838afc9-8e9d-4adc-82e0-e24c7fcd46c2",
+      "ts": "2026-11-22T12:10:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:canonical-sre",
+      "action": "landed: native English Typst dossier for Senior SRE — CV 2pp, letter 1pp, 0 warnings, prose exit 0. Rebuilt on the four screens (systemd lifecycle, telemetry, alert thresholds, canaries) that the database CV never mentioned; platform gaps (OpenStack/K8s/Ceph/eBPF) stated, selection.json retired | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "087ba1e61509a7231aeaa1c08ac28b0467027dc2",
+      "branch": "main",
+      "frame": "03ha7bh30bcmofojuaz36y02f"
+    },
     {
       "id": "280570bd-00d9-4eea-875c-5c5a2c0a2a0b",
       "ts": "2026-11-22T12:09:42Z",
@@ -2822,32 +2848,6 @@
       "base_commit": "39ac9da070a10bc9b1419b3eee8e46431b03a17d",
       "branch": "main",
       "frame": "03ha6p1pdh8ew3g42tompoi2k"
-    },
-    {
-      "id": "f2c601a4-bbe2-4e45-8753-9ca7383200fc",
-      "ts": "2026-11-22T10:14:06Z",
-      "source": "devin",
-      "subject": "nixconfig:uni-rostock-sysadmin",
-      "action": "claim: karriere-in-mv submission",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "39ac9da070a10bc9b1419b3eee8e46431b03a17d",
-      "branch": "main",
-      "frame": "03ha6otzelnwlbb5kampnuqaf"
-    },
-    {
-      "id": "bd3e1fa1-1f8b-47ea-83e1-a4f791b98f7c",
-      "ts": "2026-11-22T10:13:08Z",
-      "source": "freebuff",
-      "subject": "nixconfig:black-forest-labs",
-      "action": "compiled: native Typst packet 2pp CV + 1pp letter (en)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4993a241e8d44a8f57a67e54be3a58f5607077fe",
-      "branch": "main",
-      "frame": "03ha6on56gx9d4050yu0b1lyr"
     }
   ]
 }

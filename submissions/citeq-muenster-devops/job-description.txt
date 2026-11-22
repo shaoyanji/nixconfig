@@ -1,0 +1,82 @@
+citeq — IT-Dienstleister der Stadt Münster — DevOps Engineer (m/w/d)
+https://interamt.de/ (ID 1510832, Az. 22-029/26)
+Source: Interamt
+
+Zum Hauptinhalt springen
+Hochkontrast
+Gebärdensprache
+Leichte Sprache
+Stadt Münster
+Stellensuche
+Informationen für Arbeitgeber
+INTERAMT 2.0 Beta
+Login
+ 
+Registrieren
+ 
+Hilfe
+Stellenangebot
+Stellenbeschreibung
+DevOps Engineer (m/w/d)
+
+Für die citeq
+
+Ausschreibungsnummer: 22-029/26
+
+Vergütung E 9a - E 11 A 11
+Arbeitszeit Vollzeit
+Startdatum nächstmöglicher Zeitpunkt
+Befristung unbefristet
+Bewerbungsfrist 29.11.2026
+Standort Scheibenstraße 109
+
+Die citeq ist der zentrale IT-Dienstleister für die Stadt Münster und weitere Kommunen im Münsterland. Als innovativer Partner sorgen wir dafür, dass IT-Lösungen den hohen Anforderungen der öffentlichen Verwaltung gerecht werden. Für unser Team "Web-Entwicklung und -Betrieb" suchen wir motivierte Verstärkung. In diesem Team administrieren wir unterschiedlichste IT-Systeme und entwickeln Web-Lösungen.
+
+Ihre Aufgaben
+Das automatisierte Configuration-Management mit Ansible halten Sie nicht nur am Laufen, sondern entwickeln es kontinuierlich weiter. Auch zentrale Tools für den Entwicklungsworkflow stellen Sie bereit und optimieren diese.
+Mit Prometheus, Grafana und Graylog sorgen Sie für eine leistungsfähige Monitoring-Umgebung und behalten den Überblick über unsere Systeme.
+Effiziente Deploymentprozesse sind Ihnen wichtig. Sie optimieren GitLab CI-Pipelines und automatisieren Release-, Deployment- und Testverfahren für unsere Webapplikationen.
+Zentrale Docker-Images entwickeln und pflegen Sie, um eine stabile und flexible Container-Infrastruktur zu gewährleisten.
+Die Sicherheit unserer Webapplikationen steht bei Ihnen im Fokus: Sie bauen die Security-Infrastruktur gezielt aus.
+
+Sie wollen genauer wissen, was auf Sie zukommt? Wir bieten interessierten Bewerber*innen während der Bewerbungsfrist an, den Arbeitsplatz und die Aufgaben vor Ort kennenzulernen. Für eine Terminvereinbarung sowie bei fachlichen Fragen steht Ihnen Tobias Burgmann zur Verfügung, der das Team "Projekte, Web-Entwicklung, TYPO3" leitet (0251/492-18 68, Burgmann(at)citeq.de).
+
+Ihr Profil
+Sie überzeugen uns mit einem abgeschlossenen Hochschulstudium mit IT-Bezug, vorzugsweise im Bereich der Verwaltungsinformatik, Informatik, Wirtschaftsinformatik oder BWL.
+Alternativ haben Sie eine IT-Ausbildung z.B. als Fachinformatiker*in oder IT-Systemkaufmann/Systemkauffrau oder eine Fortbildung als Bachelor Professional in IT (ehem. Operative Professional) (IHK) abgeschlossen.
+Alternativ: können Sie eine kaufmännische Ausbildung mit mindestens einjähriger Berufserfahrung im IT- oder Digitalisierungsbereich vorweisen.
+Alternativ haben Sie die Befähigung für den allgemeinen Verwaltungsdienst der Laufbahngruppe 2, 1. Einstiegsamt erworben oder den Verwaltungslehrgang II abgeschlossen sowie eine mindestens einjährige Berufserfahrung im IT- oder Digitalisierungsbereich. Bewerbungen von Beamt*innen sind nur außerhalb der Probezeit möglich. Für Beamt*innen mit einem Studium der Verwaltungsinformatik entfällt diese Einschränkung.
+Ihre Kompetenzen
+Sie verfügen über mehrjährige Berufserfahrung im Bereich Linux-Webserverinfrastruktur und IT-Security. (Wünschenswert)
+Sie automatisieren Entwicklungs-, Test- und Betriebsprozesse und sind dafür neben Kenntnissen in Container-Technologien sowie dem Aufbau von CI-/CD-Pipelines idealerweise auch mit einer oder mehreren Programmiersprachen und Datenbankmanagementsystemen vertraut.
+Sie lösen Probleme analytisch und eigenständig – immer mit Blick auf die Anforderungen unserer internen und externen Kund*innen.
+Dank Ihrer ausgeprägten Kommunikationsfähigkeit integrieren Sie sich schnell in unser Team und arbeiten effektiv mit verschiedenen Schnittstellen zusammen.
+Zuletzt zeichnen Sie sich durch eine Hands-on-Mentalität sowie Lernbereitschaft und Neugier aus.
+
+Jetzt online bewerben
+
+Unser Angebot
+Transparente Bezahlung Die Eingruppierung erfolgt in Abhängigkeit von den übertragenen Tätigkeiten im Zusammenhang mit Ihrer Qualifikation von Entgeltgruppe 09a bis 11 des Tarifvertrages für den öffentlichen Dienst (TVöD/TV IKT), ggfls. verbunden mit entsprechenden Entwicklungsperspektiven. Das bedeutet in Vollzeit je nach Berufserfahrung zwischen 3.877,94 und 6.326,77 € brutto, hinzu kommt eine Jahressonderzahlung i. H. v. 85 % sowie eine leistungsorientierte Bezahlung (LoB). Beamt*innen werden im Wege der Versetzung übernommen. Für sie ist die Stelle nach Besoldungsgruppe 11 LBesO A NRW bewertet.
+Work-Life-Balance Durch Home-Office und Gleitzeit ermöglichen wir Ihnen die zeitliche und örtliche Flexibilität, die Sie für Ihr Leben brauchen. Darüber hinaus haben Sie bei uns die Möglichkeit, ein Sabbatical wahrzunehmen.
+Corporate Benefits Wir bieten unseren Mitarbeiter*innen Zugang zu exklusiven Rabatten und Sonderkonditionen auf eine Vielzahl von Produkten und Dienstleistungen – von Freizeitaktivitäten bis hin zu Alltagsangeboten.
+Mobilität und Umwelt Wir unterstützen unsere Mitarbeiter*innen mit nachhaltigen Mobilitätsangeboten, wie beispielsweise einem vergünstigten „JobTicket“ für den ÖPNV oder der Möglichkeit eines Fahrradleasings.
+Dafür stehen wir
+
+Münster setzt sich aktiv für Chancengleichheit und Vielfalt ein. Wir verfolgen das Ziel, ein wertschätzendes, geschlechtersensibles und familienfreundliches Arbeitsumfeld zu schaffen, in dem Rassismus und Diskriminierung keinen Platz haben. Wir begrüßen daher Bewerbungen von Menschen unabhängig von ihrer kulturellen und sozialen Herkunft, ihrem Alter, ihrer Religion und Weltanschauung oder ihrer sexuellen Orientierung und geschlechtlichen Identität.
+
+Bewerbungen von Menschen mit internationaler Familiengeschichte sind sehr willkommen.
+
+Die Stadt Münster fördert Frauen und stellt sie in Bereichen, in denen sie unterrepräsentiert sind, bei gleicher Eignung, Befähigung und fachlicher Leistung entsprechend den Zielen des LGG NRW bevorzugt ein.
+
+Wir wünschen uns ausdrücklich Bewerbungen schwerbehinderter und gleichgestellter Menschen.
+
+Die Stelle ist teilbar.
+ 
+
+Kontakt
+
+Oliver Musiolik
+Recruiter
+
+Telefon: 0251/492-10 54
+E-Mail: Musiol

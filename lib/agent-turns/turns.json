@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-22T07:42:39Z",
+  "generated": "2026-11-22T07:47:42Z",
   "count": 200,
-  "pin": "9316aa39aed982936d08c7caaa75d3804517339d2fa5bf63ba855f1d7e7cfb77",
+  "pin": "2ff40ce90da77493485db6d9e40cca52601b80ac77c7f4599f5bd64d1f47ad55",
   "turns": [
+    {
+      "id": "2f86ea22-1dbb-43d8-8831-b51ec0c2322f",
+      "ts": "2026-11-22T07:44:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-bamf-devops",
+      "action": "correction: commit amended to 647dfd98 (sheet selection count 16/32, was 15/30) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/bamf-devops"
+      ],
+      "files": [],
+      "base_commit": "647dfd98c4acbb5b82da5d75953b42c6bef32854",
+      "branch": "main",
+      "frame": "03ha5vm22y9e4q8rk79ku3lu6"
+    },
+    {
+      "id": "46e4c796-890b-4a48-8187-df9c1ab44a07",
+      "ts": "2026-11-22T07:44:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-bamf-devops",
+      "action": "landed: BAMF DevOps platform packet (JD, 2-page CV, 1-page optional letter, Interamt sheet) | gate: checks:prose PASS",
+      "outcome": "done",
+      "claims": [
+        "submissions/bamf-devops"
+      ],
+      "files": [],
+      "base_commit": "d7f043d8c693e02d7b5e6190fab507b10e614d14",
+      "branch": "main",
+      "frame": "03ha5vlgy1dj8boeaxk32uymf"
+    },
+    {
+      "id": "feeb1cf1-6b61-43fd-9f9f-a09a0ae0c63f",
+      "ts": "2026-11-22T07:43:37Z",
+      "source": "devin",
+      "subject": "nixconfig:job-hunt",
+      "action": "landed: ionos staff NRE karlsruhe (GH eu 4971782101) — 15 fields, both PDFs attached, OTP 64446813, /confirmation; ack 311052 | gate: GH confirmation page + mailbox ack",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6dfadfb2c74aa064692b69813d3f93d2c8e03c31",
+      "branch": "main",
+      "frame": "03ha5vfntz57p9wmbzuauc1jl"
+    },
     {
       "id": "ef37abb8-39e7-4d4f-ad22-ad1d2ef58388",
       "ts": "2026-11-22T07:42:37Z",
@@ -2791,48 +2834,6 @@
       "base_commit": "fd0d1d3479005ce97d7765d41c89089d0d633f92",
       "branch": "main",
       "frame": "03h9xvdezmz567dylxtmvv0dj"
-    },
-    {
-      "id": "abe09057-4c14-42af-a15c-5a581fd8783b",
-      "ts": "2026-11-21T07:07:30Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-orchestration-fix",
-      "action": "landed: closed the self-perpetuating handoff loop fleet-wide (agy-nightly-handoff + runner removed frieren+delphi, audit prompts no longer draft HANDOFF.md, checks:audit:handoff task+row dropped); image-daily judge gets agy from closure (was missing from profile); systemd-jobs skeletons on |> pipelines | gate: checks:host frieren PASS (2309), delphi PASS (2110), checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03759b064e5589e1fba2b21db40eac2727cf03c9",
-      "branch": "main",
-      "frame": "03h9xv2y2bbayayrd6pzumrmn"
-    },
-    {
-      "id": "af248e10-dc0a-47e4-bd10-29d9fde800a7",
-      "ts": "2026-11-21T07:02:04Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-orchestration-fix",
-      "action": "claim: closed-handoff-loop removal (agy-nightly-handoff + HANDOFF drafting), image-daily agy PATH, systemd-jobs |> refactor",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren/infra-stack.nix",
-        "lib/systemd-jobs.nix"
-      ],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xu0thxocz944qid1hkglx"
-    },
-    {
-      "id": "576a1b6f-9253-4e68-872e-deefd5424714",
-      "ts": "2026-11-21T07:01:12Z",
-      "source": "frieren-steward",
-      "subject": "nixconfig:pane-steward-devin-drive",
-      "action": "landed: drove idle devin pane default:2.1 (nixconfig refactoring lane) with mkTimerJob/mkDaemon migration-consistency review task routed by Jev review_migrations p=0.93; pane Thinking and working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a1a611c7b807c3c58a63bf1b39e3448023d4472",
-      "branch": "main",
-      "frame": "03h9xtupn3ryrcwnf4i6mcycs"
     }
   ]
 }

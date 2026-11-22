@@ -27,9 +27,9 @@ The live Ashby form has one section, **11 fields**, and one **Submit** control. 
 
 ## Answer notes
 
-**Sponsorship — No.** The CV states: “US citizen with German permanent residence; no sponsorship required.” Germany is one of the three eligible locations.
+**Sponsorship — No.** The CV states: "US citizen with German permanent residence; no sponsorship required." Germany is one of the three eligible locations.
 
-**SQL reliability — Yes, with a qualification.** The evidence is production SQL work with PostgreSQL and MySQL, not ClickHouse. The CV’s skills section lists SQL, PostgreSQL and MySQL, and the Bountystash work covers operated production services. Do not claim ClickHouse production experience. If the form ever adds an elaboration field, use:
+**SQL reliability — Yes, with a qualification.** The evidence is production SQL work with PostgreSQL and MySQL, not ClickHouse. The CV's skills section lists SQL, PostgreSQL and MySQL, and the Bountystash work covers operated production services. Do not claim ClickHouse production experience. If the form ever adds an elaboration field, use:
 
 > I have operated PostgreSQL- and MySQL-backed production services and handled their reliability, debugging and operational ownership. I have not run ClickHouse in production; the ClickHouse-specific internals are the area I would ramp on first.
 
@@ -41,7 +41,7 @@ The live Ashby form has one section, **11 fields**, and one **Submit** control. 
 
 1. Open the application URL above.
 2. Upload `submissions/clickhouse/lebenslauf.pdf` to **Resume**.
-3. Confirm Ashby’s resume autofill did not alter the name, email, location or phone.
+3. Confirm Ashby's resume autofill did not alter the name, email, location or phone.
 4. Fill the remaining fields from the table.
 5. Leave **Cover Letter** empty.
 6. Review the two boolean answers, then submit.

@@ -1,0 +1,79 @@
+Senior Linux Operations Engineer (w/m/d)
+1&1 / United Internet
+Standort: Karlsruhe, DE, 76137
+Kennziffer: 5836
+
+Das sind Ihre Aufgaben
+
+ Der Bereich Corporate IT Services verantwortet Planung, Aufbau und Betrieb der konzernweiten internen
+ IT für über 11.000 Mitarbeitende innerhalb der United Internet Gruppe. Das Team Linux Application
+ Operations betreibt eine Vielzahl zentraler und unternehmenskritischer Linux-basierter Services. Dazu
+ zählen unter anderem das konzernweite LDAP und das Identity-&-Access-Management, sowie weitere
+ zentrale Infrastruktur- und Plattformdienste.
+
+ Ein wesentlicher Schwerpunkt liegt auf der kontinuierlichen Automatisierung, Standardisierung und
+ Modernisierung unserer Betriebsplattformen. In dieser Rolle übernehmen Sie eine Schlüsselrolle bei
+ der technischen Weiterentwicklung unserer Linux-Service-Landschaft und gestalten nachhaltige,
+ zukunftsfähige Lösungen für den Betrieb konzernkritischer Services.
+
+ Insbesondere die folgenden Aufgaben erwarten Sie:
+ * Sie verantworten den stabilen, sicheren und hochverfügbaren Betrieb sowie die kontinuierliche
+ Weiterentwicklung verschiedener geschäftskritischer Linux-basierter Services und Plattformen.
+ * Sie planen, designen und implementieren skalierbare, resiliente und wartbare Lösungen für
+ zentrale Infrastruktur- und Plattformdienste und begleiten deren gesamten Lifecycle von der
+ Konzeption bis zum produktiven Betrieb.
+ * Sie analysieren und beheben Störungen auf System-, Netzwerk- und Applikationsebene und nutzen
+ dafür moderne Monitoring-, Logging- und Troubleshooting-Verfahren.
+ * Sie treiben die Modernisierung bestehender Plattformen und Betriebsprozesse voran und entwickeln
+ Architekturen hinsichtlich Automatisierung, Wartbarkeit, Standardisierung und Betriebseffizienz
+ kontinuierlich weiter.
+ * Sie konzipieren, entwickeln und etablieren Automatisierungslösungen mit Ansible und setzen sicher
+ Shell- und Python-Skripte ein
+ * Sie gestalten aktiv unsere DevOps- und Automatisierungsstrategie und begleiten technische
+ Projekte und Migrationen als erfahrener Ansprechpartner.
+ * Sie bringen neue technische Impulse ein, evaluieren Technologien und Best Practices und tragen
+ maßgeblich zur Weiterentwicklung unserer Linux- und Plattformlandschaft bei.
+ * Sie gestalten die strategische Weiterentwicklung unserer Linux-Service-Landschaft und treiben die
+ Transformation von teilweise manuell betriebenen Systemen hin zu weitgehend automatisierten,
+ standardisierten und effizient betreibbaren Plattformen voran.
+
+Das wünschen wir uns
+
+ Sie verfügen über langjährige Erfahrung im Aufbau, Betrieb und der Weiterentwicklung komplexer
+ Linux-Plattformen. Neben Ihrer technischen Expertise bringen Sie die Fähigkeit mit, bestehende
+ Betriebsmodelle kritisch zu hinterfragen, Automatisierungspotenziale zu identifizieren und
+ nachhaltige technische Verbesserungen voranzutreiben.
+
+ Sie zeichnen sich durch folgende Qualifikationen aus:
+ * Sie verfügen über sehr gute Kenntnisse in Linux sowie in der Automatisierung mit Ansible
+ * Sie setzen Shell- und Python-Skripte sicher ein und haben Freude daran, manuelle Tätigkeiten
+ nachhaltig zu reduzieren.
+ * Sie haben Erfahrung im Umgang mit Monitoring-, Logging- und Versionsverwaltungslösungen,
+ beispielsweise Checkmk, ElasticSearch, GitHub Enterprise oder vergleichbaren Werkzeugen.
+ * Sie analysieren komplexe technische Zusammenhänge strukturiert und zielgerichtet und überzeugen
+ durch eine ausgeprägte Problemlösungs- und Verantwortungsbereitschaft.
+ * Sie arbeiten eigenverantwortlich, bringen Ideen zur technischen Weiterentwicklung bestehender
+ Systeme ein und bewegen sich sicher in einem DevOps-orientierten Umfeld.
+ * Sie zeichnen sich durch eine schnelle Auffassungsgabe, hohe Lernbereitschaft sowie sehr gute
+ Deutsch- und Englischkenntnisse in Wort und Schrift aus.
+ * Sie sind bereit, im Rahmen einer Team-Rotation an der Rufbereitschaft teilzunehmen.
+
+Unsere Benefits
+
+ Beste Perspektiven und attraktive Benefits.
+
+ Unsere Teams sind die Basis unseres Unternehmenserfolgs. Als Arbeitgeber bieten wir Ihnen nicht nur
+ einen sicheren Arbeitsplatz, sondern auch eine Zukunft mit vielfältigen Aufgaben und spannenden
+ Projekten.
+ * Unsere Unternehmenskultur: Es erwarten Sie flache Hierarchien, umfassende Transparenz und
+ effiziente Entscheidungswege.
+ * Individuelle Weiterentwicklungsmöglichkeiten: Profitieren Sie von einem breiten Spektrum an
+ Trainings, E-Learnings und internen Netzwerken, die sowohl Ihre persönliche als auch fachliche
+ Weiterentwicklung fördern.
+ * Vorteile und Zusatzleistungen: Nutzen Sie die Rabatte auf unsere Produkte, Corporate Benefits,
+ die Option eines JobRads, vermögenswirksame Leistungen, betriebliche Altersvorsorge,
+ vergünstigtes Deutschlandticket, Sportangebote und viele weitere Vorteile.
+ * Attraktive Arbeitsbedingungen: Zentral gelegene Standorte, Flexibilität durch
+ Vertrauensarbeitszeit sowie die Möglichkeit bis zu zwei Tage pro Woche mobil zu arbeiten.
+ * Unterzeichnung der Charta der Vielfalt: Wir setzen uns aktiv für die Förderung der Diversität in
+ unserem Unternehmen ein.

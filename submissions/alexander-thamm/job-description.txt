@@ -1,0 +1,47 @@
+Company: Alexander Thamm GmbH
+Role: Principal DevOps Engineer (m/w/d)
+Location: Munich
+Remote: no
+Posted: 2026-11-17
+Source: arbeitnow
+URL: https://www.arbeitnow.com/jobs/companies/alexander-thamm-gmbh/principal-devops-engineer-munich-243310
+---
+
+Startdatum
+Wir suchen Dich ab sofort an einem unserer deutschen Standorte in München, Nürnberg, Leipzig, Berlin, Essen oder Frankfurt am Main!
+Deine Aufgaben
+Data und AI sind Dein zu Hause? Des Weiteren gestaltet sich Deine neue Herausforderung wie folgt:
+- Zusammenarbeit mit Deinen Kunden bei der Implementierung, dem Betrieb und der Optimierung von Daten und ML-Lösungen
+- Verantwortung für das erfolgreiche Deployment und Management von Machine-Learning-Modellen und der zugrundeliegenden Plattform
+- Konzeption, Entwicklung und kontinuierliche Optimierung automatisierter CI/CD-Pipelines unter Berücksichtigung von Qualität, Sicherheit und Skalierbarkeit
+- Bewertung und Einführung moderner Technologien und Best Practices in den Bereichen Automatisierung, Monitoring, Observability und Skalierbarkeit
+- Förderung einer effektiven interdisziplinären Zusammenarbeit sowie Etablierung gemeinsamer Standards und Best Practices zwischen Entwicklung, Data Science und Betrieb
+Dein Profil
+Data ist auch in Deiner DNA ? Das solltest Du mitbringen:
+- Erfolgreich abgeschlossenes Studium der Informatik, Computer Science, Data Science oder eine vergleichbare Qualifikation
+- Fließende Deutsch-Kenntnisse, mündlich sowie schriftlich
+- Mindestens 4 Jahre Vollzeit Berufserfahrung, inkl. Aufbau und Wartung von Infrastruktur-/Datenlösungen
+- Du hast Erfahrungen mit Cloud-Diensten wie AWS und/ oder Azure
+- Du hast Erfahrung mit Container-Orchestrierung, bspw. Kubernetes, Helm
+- Infrastructure as Code, z.B. Terraform oder AWS CloudFormation sind für Dich keine Fremdwörter
+- Du kennst Dich mit CI/CD Pipelines aus
+- Die Überwachung und Alarmierung sowie Incident Management gehören für Dich zum Alltag
+- Gute Skripting-Kenntnisse in Python oder Shell
+- Starke Problemlösungskompetenz sowie selbstständiges Arbeiten trotz hoher Teamkompetenzen
+Wir bieten
+Data bewegt uns! Was Dich auf Deiner persönlichen Journey erwartet, findest Du hier:
+Work-Life-Balance
+Vertrauensarbeitszeit mit flexibler Arbeitszeitgestaltung, hybrides Arbeitsmodell, workation – nutze die Möglichkeit aus dem EU-Ausland zu arbeiten
+Kultur & Zusammenarbeit
+Einzigartige Teamatmosphäre, flache Hierarchien zu unserem CEO Alex sowie eine offene Feedbackkultur, jährliche Teamworkshops auf unserem Data.Castle im Zillertal, gelebtes Data.Musketeer Prinzip – „einer für alle, alle für einen!“, unser [at] Buddy Programm zur besseren Vernetzung, regelmäßig stattfindende Fach- und Freizeitevents, hundefreundliche Büros
+Fachliche & persönliche Entwicklung
+Intensiver Onboarding- & Einarbeitungsprozess, persönlicher Entwicklungsplan und individuelle Weiterbildungsmöglichkeiten, vielfältiges Workshop- und Schulungsangebot innerhalb der Data.Academy durch unsere erfahrenen Data.Musketeers sowie externen Anbieter, Führungs-, Projektleiter- und Expertenlaufbahn
+Vergütung & Zusatzleistungen
+Kita-Zuschuss, Betriebliche Altersvorsorge mit 20% Bezuschussung, zahlreiche Corporate Benefits & Mitarbeiterangebote (z.B. für Events und Reisen), Startguthaben in unserem internen Merchandise-Shop, kompetitives Gehalt mit variablen Anteilen
+Gesundheit & Wohlbefinden
+Mental Health & Wellbeing Support sowie Coaching und Meditation durch nilo.health, Fitness- und Yogaräume im Münchner Office, regelmäßige Mitarbeiterumfragen, EGYM Well Pass Mitgliedschaft mit Plus1 Option, Fahrradleasing über Jobrad nach der Probezeit, interne Gruppen für sportliche Aktivitäten, kostenlose Heiß- und Erfrischungsgetränke sowie frisches Obst im Office, Dachterrasse (Grill)
+Mobilität
+Zuschuss zum Deutschlandticket, zentrale Lage der Offices, gute Anbindung an den Öffentlichen Nahverkehr, Möglichkeit von anderen Standorten zu arbeiten
+Ansprechpartnerin
+Michaela Ostertag, Principal People Partner
+Find more English Speaking Jobs in Germany on Arbeitnow

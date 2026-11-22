@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-22T09:28:04Z",
+  "generated": "2026-11-22T09:29:49Z",
   "count": 200,
-  "pin": "c2f404a43d4c7407023d61ab294b6596969c615dbc556a9cc6a7f6cfaf179e16",
+  "pin": "63fa3bbef2d9d74347f2c7e138aa8eae3ce066a6b66094ced3195eeaf0736019",
   "turns": [
+    {
+      "id": "65a538dc-f796-470d-823b-6d3dc2cecd93",
+      "ts": "2026-11-22T09:28:43Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:job-hunt",
+      "action": "bwi upgraded to native Typst packet | 2pp CV + 1pp letter | fit 3 (posting core is Kubernetes/CKA-CKS); NixOS named in profile",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d111d5e9bc117b0140edf34a3af4f2d8b40a05ca",
+      "branch": "main",
+      "frame": "03ha6fyqkt0vmk7tblghfu4j3"
+    },
+    {
+      "id": "979bea7a-528c-48b5-8b76-229bea8626e3",
+      "ts": "2026-11-22T09:28:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-hunt",
+      "action": "ewerk upgraded to native Typst packet | 2pp CV + 1pp letter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d2ed38056f0c100b00119e91de85d2a1aefe8264",
+      "branch": "main",
+      "frame": "03ha6fuo4nfwztcjz27g4vtjc"
+    },
     {
       "id": "463605fd-45e3-4932-bf39-34fdf7909a59",
       "ts": "2026-11-22T09:27:15Z",
@@ -2733,34 +2759,6 @@
       "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
       "branch": "main",
       "frame": "03ha4txnzldh33shhdqe1atgd"
-    },
-    {
-      "id": "1646b146-20ab-4c39-a19d-cb804280947f",
-      "ts": "2026-11-22T04:30:01Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-scoreplay-submit",
-      "action": "blocked: ScorePlay Ashby submit not possible from this pane - reCAPTCHA token stays empty and 'Submit Application' is disabled; click refused, no confirmation, empty form on reload, no Ashby mail, so nothing was sent. Payload in submissions/scoreplay/ashby-submission-payload.md; pipeline says payload prepared, NOT submitted",
-      "outcome": "blocked: reCAPTCHA gates Ashby submit",
-      "claims": [],
-      "files": [
-        "submissions/scoreplay"
-      ],
-      "base_commit": "c6149e182ef07bf5e44cb82b16d34ca1f46378a7",
-      "branch": "main",
-      "frame": "03ha4tm94bhotz42ubc89z01r"
-    },
-    {
-      "id": "2ad124b3-2902-4b5d-b7fe-ca4db4654dfe",
-      "ts": "2026-11-22T04:25:30Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-scoreplay-submit",
-      "action": "landed: drove freebuff pane to submit the prepared ScorePlay SRE packet on Ashby (packet ready, remote Western Europe fit, target EUR 103-110k)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3a509f97417d7b229b943b1c995b7b6373c66eba",
-      "branch": "main",
-      "frame": "03ha4sqgdmoo96q7b8dhc6tqy"
     }
   ]
 }

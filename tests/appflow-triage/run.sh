@@ -11,13 +11,17 @@ set -euo pipefail
 
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
-python3 - "$root/modules/plugins/appflow/sync.py" <<'PY'
+python3 - "$root/modules/plugins/appflow/sync.py" "$root/modules/services/email-triage.py" <<'PY'
 import importlib.util
 import sys
 
 spec = importlib.util.spec_from_file_location("appflow_sync", sys.argv[1])
 sync = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sync)
+
+triage_spec = importlib.util.spec_from_file_location("email_triage", sys.argv[2])
+triage = importlib.util.module_from_spec(triage_spec)
+triage_spec.loader.exec_module(triage)
 
 cases = [
     (
@@ -211,7 +215,25 @@ if not conditional or conditional[0] != "received":
 else:
     print("ok    conditional invite is not an interview")
 
-total = len(cases) + 3 + len(questions)
+# A bracketed display name defeats parseaddr: "Malt [no reply]" made address()
+# return "", so the Malt digest rule could never fire.
+malt_sender = "Malt [no reply] <noreply@malt.com>"
+if triage.address(malt_sender) != "noreply@malt.com":
+    print(f"FAIL  bracketed display name: got {triage.address(malt_sender)!r}")
+    failed += 1
+else:
+    print("ok    bracketed display name")
+
+verdict = triage.classify_rules(
+    {"sender": malt_sender, "subject": "New opportunity with YANUS UG", "labels": []}, set()
+)
+if not verdict or verdict[:2] != ("digest", "none"):
+    print(f"FAIL  Malt opportunity match: got {verdict!r}")
+    failed += 1
+else:
+    print("ok    Malt opportunity match is digest")
+
+total = len(cases) + 3 + len(questions) + 2
 print(f"{total - failed}/{total} passed")
 sys.exit(1 if failed else 0)
 PY

@@ -257,7 +257,17 @@ def normalize(row: dict) -> dict:
 def address(sender: str | None) -> str:
     if not sender:
         return ""
-    return parseaddr(sender)[1].strip().lower()
+    _, addr = parseaddr(sender)
+    if addr:
+        return addr.strip().lower()
+    # parseaddr gives up on a display name carrying brackets — "Malt [no reply]
+    # <noreply@malt.com>" came back as an empty address — so fall back to the
+    # angled token, then to the first bare address in the string.
+    match = re.search(r"<([^<>]+)>", sender)
+    if match:
+        return match.group(1).strip().lower()
+    match = re.search(r"[^<\s]+@[^>\s]+", sender)
+    return match.group(0).strip().lower() if match else ""
 
 
 def display_name(sender: str | None) -> str:

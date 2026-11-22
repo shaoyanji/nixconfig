@@ -38,3 +38,4 @@ session-*.md
 # Job output fetched from clanker (scripts/task/clanker.sh result): a copy of a
 # build artifact, never source.
 .clanker-out/
+submissions/*/packet

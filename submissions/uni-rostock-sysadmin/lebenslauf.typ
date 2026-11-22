@@ -76,4 +76,4 @@
 #text(weight: "bold")[Betrieb] — Monitoring-Ledger, Gatus, Zustellbestätigung, restic mit geprüften Wiederherstellungen, Rückrollung je Generation \
 #text(weight: "bold")[Wissenschaft] — Laborgeräteanbindung, Messdatenanalyse, C++, Python \
 #text(weight: "bold")[Nicht vorhanden] — Windows-Server-Administration, Proxmox/KVM, RHEL, Hochschul-Verwaltungsverfahren \
-#text(weight: "bold")[Sprachen] — Deutsch C1, Englisch Muttersprache
+#text(weight: "bold")[Sprachen und Status] — Deutsch C1, Englisch Muttersprache · US-Staatsangehörigkeit mit Niederlassungserlaubnis, kein Visum nötig · Umzug nach Rostock oder Präsenzblöcke

@@ -141,6 +141,22 @@ tasks:
     cmds:
       - bash tests/service-ports/run.sh
 
+  checks:policies:
+    desc: "[gate] Every rule the docs state, as a predicate that holds and is cited"
+    summary: >
+      flake/policies.nix is the corpus: each entry is a rule with a `holds`
+      predicate over the tree, and the check fails on the first violation,
+      on a `[[flake/policies.nix#id]]` citation that names no id, and on an
+      enforced id no document cites (an invisible gate). This is the same
+      attr `checks:quick` builds — split out so a policy edit iterates
+      against one ~7.5 s eval instead of the full quick leg.
+      Exit 0 = every predicate holds and every citation resolves, 1 = drift.
+    vars:
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
+    cmds:
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.policies
+
   checks:prose:
     desc: "[gate] Docs and skills carry none of the unslop vocabulary"
     summary: >

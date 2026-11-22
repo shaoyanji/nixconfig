@@ -85,6 +85,7 @@
     "checks:portfolio" = "leaf";
     "checks:ports" = "leaf";
     "checks:ports:test" = "leaf";
+    "checks:policies" = "leaf";
     "checks:postgres:drill" = "leaf";
     "checks:postgres:vector" = "leaf";
     "checks:prose" = "leaf";

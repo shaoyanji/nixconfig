@@ -11,9 +11,9 @@ Referenz: 1923 (Portal SDE-131335 / 1923-15454); die Vorgabe nennt GT2321
 
 STACKIT baut eine Plattform, auf der andere ihre Produkte betreiben. Die Rolle entwickelt interne Werkzeuge, die die Bereitstellung dieser Infrastruktur automatisieren, verantwortet Monitoring für Verfügbarkeit und Performance, unterstützt Entwicklungsteams beim Betrieb ihrer Dienste und trägt zu Sicherheits- und Compliance-Vorgaben bei. Vorausgesetzt werden fundierte Kubernetes-Architektur, fortgeschrittene Programmierung vorzugsweise in Go, Erfahrung mit Operator-Pattern, Software-Defined Networking, CI/CD, Templating und Infrastructure as Code.
 
-## 2. Zuordnungslücke
+## 2. Zuordnung: geklärt am 22.11.2026
 
-Die Vorgabe nennt die Requisition GT2321. Im Bestand führt GT2321 die Schwesterstelle „(Senior) Site Reliability Engineer - STACKIT Control Plane“; der hier hinterlegte Anzeigentext gehört zur Platform-Engineer-Anzeige mit Referenz 1923. Beide Anzeigen beschreiben dieselbe Abteilung mit unterschiedlichem Schwerpunkt. Vor dem Absenden muss klar sein, welche Requisition besetzt wird — sonst bewirbt sich das Paket auf die eine und nennt die andere.
+Die Vorgabe nannte GT2321, der Anzeigentext im Paket gehört aber zur Platform-Engineer-Anzeige. Beide Requisitionen sind jetzt belegt: GT1923 ist die Anzeige "(Senior) Platform Engineer - STACKIT Control Plane Platform", Referenz 1923, Standort Am Campus 1, 74177 Bad Friedrichshall, Abteilung IT - Cloud Services — Titel und Aufgabe decken sich mit der Vorgabe. GT2321 ist die Schwesterstelle "(Senior) Site Reliability Engineer - STACKIT Control Plane", Referenz 2321, und verlangt zusätzlich Expertenwissen über die Interna der Control Plane: API Server, Controller Manager, Scheduler und etcd. Das Paket bewirbt sich damit auf 1923; der GT2321-Vermerk der Vorgabe war eine Fehlzuordnung. Wäre 2321 gemeint, läge der Fit bei 2 statt 3, weil die Control-Plane-Interna nicht vorhanden sind.
 
 ## 3. Aufgaben laut Anzeige
 

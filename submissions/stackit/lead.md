@@ -7,7 +7,7 @@ Referenz: 1923 (Portal-Ref. SDE-131335 / 1923-15454); Vorgabe nennt GT2321
 
 ## Quellenlage
 
-Die Anzeige ist live abrufbar (jobsuche-bw.de, HTTP 200 am 22.11.2026) und liegt vollständig im Paket. Es gibt allerdings eine Zuordnungslücke: Die Vorgabe nennt GT2321, im Bestand führt GT2321 aber die Schwesterstelle "(Senior) Site Reliability Engineer - STACKIT Control Plane". Der hinterlegte Text gehört zur Platform-Engineer-Anzeige mit Referenz 1923. Vor dem Absenden muss klar sein, welche Requisition besetzt wird — die beiden Anzeigen beschreiben dieselbe Abteilung, aber unterschiedliche Schwerpunkte.
+Die Anzeige ist live abrufbar (jobsuche-bw.de, HTTP 200 am 22.11.2026) und liegt vollständig im Paket. Die Zuordnung ist am 22.11.2026 geklärt: Der Text gehört zu GT1923, Referenz 1923, "(Senior) Platform Engineer - STACKIT Control Plane Platform". GT2321 ist die Schwesterstelle "(Senior) Site Reliability Engineer - STACKIT Control Plane" (Referenz 2321) und verlangt zusätzlich API Server, Controller Manager, Scheduler und etcd als Expertenwissen. Der GT2321-Vermerk der Vorgabe war eine Fehlzuordnung; bei 2321 läge der Fit bei 2.
 
 ## Warum interessant
 

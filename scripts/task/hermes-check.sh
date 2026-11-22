@@ -158,6 +158,13 @@ fi
 # 19:32 -> 19:43 after a restart, and no line anywhere failed — that job IS the
 # pane steward, so a silent pause means idle panes are never driven. This is the
 # gate for that, and for an incident left open.
+#
+# A third gate covers elapsed time. A cron run has no wall-clock ceiling: the
+# watchdog in cron/scheduler.py trips only on 600 s of *idle*, so a run grinding
+# through a depleted provider chain stays legal while holding the job's single
+# slot (measured 2026-11-22: 4d97713f ran 839 s and the next ticks were skipped
+# as "already running"). Terminal rows are history and are left alone; a live row
+# is the scheduler's current state, and past 450 s it is a stuck cycle.
 echo "== cron"
 cron_store="$home/.hermes/cron"
 if [ ! -r "$cron_store/jobs.json" ]; then
@@ -187,6 +194,20 @@ else
       0) ok "no open cron incidents" ;;
       *) bad "$open open cron incident(s) — hermes cron incidents" ;;
     esac
+    # 450 s is ~3x the median completed run (37-383 s across five cycles on
+    # 2026-11-22), so a healthy cycle cannot reach it and a stuck one cannot hide
+    # under it. julianday reads the +01:00 offset in claimed_at, so no localtime
+    # term is needed or wanted here.
+    if long_run="$(sqlite3 -cmd '.timeout 3000' "$cron_store/executions.db" \
+      "select substr(id,1,8) || ' ' || cast((julianday('now') - julianday(claimed_at)) * 86400 as int) || 's' from executions where status = 'running' and (julianday('now') - julianday(claimed_at)) * 86400 > 450 order by claimed_at limit 3;" 2>/dev/null)"; then
+      if [ -n "$long_run" ]; then
+        bad "cron run(s) past 450s: $(echo "$long_run" | tr '\n' ' ')— the slot is held and ticks are skipped; hermes cron cancel <job id> frees it"
+      else
+        ok "no cron run older than 450s"
+      fi
+    else
+      warn "could not read running executions (db locked or schema moved)"
+    fi
   else
     skip "sqlite3 or $cron_store/executions.db unavailable — incidents unasserted"
   fi

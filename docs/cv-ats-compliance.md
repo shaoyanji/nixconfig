@@ -263,11 +263,14 @@ documents, 0 violations) still produced, from `dist/`:
 | `Focused_Energy_ML_Engineer/Resume_Matt_Ji_Focused.pdf`, 2 pages | `SUMMARY`, `CORE COMPETENCIES` | 3 |
 | `Aldi_Sued_Waldkirch/Lebenslauf.pdf`, 1 page | `PROFIL`, `STÄRKEN & KOMPETENZEN`, `BERUFLICHE ERFAHRUNG` | 2 |
 
-`apps:audit` passes them because it checks page count and orphan lines, not the
-properties above. So the site's five CVs and the nixconfig packet are clean, and a
-document built by the checkout that is retired as a source of truth but still builds
-PDFs is not. Porting this change into those two templates is an edit in that
-repository; nothing here reaches it.
+`apps:audit` passed those documents before the port because it checks page count and
+orphan lines, not the properties above. The checkout now answers the same rules the
+site does: the standard word replaces a spec's own heading, its `section()` helper
+emits a `heading` element in the document's own case instead of `upper()`, every
+`#upper()` in the generated sources is gone, and hyphenation is off. Rebuilt: 55
+folders, 110 documents, 0 audit violations; the two resumes above now extract
+`Profile`, `Skills`, `Experience`, `Education`, `Projects` and `Profil`, `Kenntnisse`,
+`Berufserfahrung`, `Ausbildung`. Those edits live in that repository, not here.
 
 ## Limits of this check
 

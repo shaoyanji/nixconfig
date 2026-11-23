@@ -1,9 +1,9 @@
 # clanker — the Instabox VM, fleet fixture since 2026-11-06: Ubuntu, account
 # `user`, home `/data/home`, own boot/kernel/users, the lean role built for that
 # home. Driving it: .agents/skills/instabox/SKILL.md.
-{self, ...}: {
-  imports = [self.modules."roles.lean"];
-
+_: {
+  # roles.lean is this host's `hmModules` entry in flake/host-inventory.nix,
+  # resolved by global.hm-inventory-role.
   home = {
     username = "user";
     # Measured 2026-11-06: `echo $HOME` is `/data/home`, and activation refuses a

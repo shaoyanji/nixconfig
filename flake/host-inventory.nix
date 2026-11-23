@@ -37,6 +37,7 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/mtfuji/configuration.nix];
+    hmModules = ["roles.minimal" "shell"];
   };
 
   kellerbench = {
@@ -44,6 +45,7 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/kellerbench/configuration.nix];
+    hmModules = ["roles.minimal" "shell"];
   };
 
   deckstation = {
@@ -51,6 +53,7 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/deckstation/configuration.nix];
+    hmModules = ["roles.minimal" "shell"];
   };
 
   delphi = {
@@ -69,6 +72,7 @@
       # wipes the device it is given.
       (import ../hosts/delphi/disko.nix {device = "/dev/sda";})
     ];
+    hmModules = ["roles.minimal" "shell"];
   };
   eisen = {
     kind = "nixos";
@@ -86,6 +90,7 @@
       inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
       ../hosts/applevalley/configuration.nix
     ];
+    hmModules = ["roles.minimal" "shell"];
   };
 
   frieren = {
@@ -111,6 +116,7 @@
       ../hosts/ares/configuration.nix
       (import ../hosts/common/disko.nix {device = "/dev/sda";})
     ];
+    hmModules = ["roles.minimal" "shell"];
   };
 
   stark = {
@@ -183,11 +189,15 @@
   # system — and it follows the fleet's nixpkgs like every other host. What it
   # pins instead is the KERNEL: `boot.kernelPackages = pkgs.linuxPackages` (LTS)
   # in hosts/netbook/configuration.nix, because the newest kernel's initrd could
-  # not mount this eMMC box's root. A pinned nixpkgs was the wrong lever: it froze
-  # every package to buy a kernel, and left the host a channel island.
+  # not mount this eMMC box's root. The pinned nixpkgs returned when upstream
+  # removed scripted initrd outright — a channel island, but the only rev where
+  # this box's stage-1 exists (see the `nixpkgs-netbook` input comment).
   netbook = {
     kind = "nixos";
     system = "x86_64-linux";
+    # Scripted initrd is gone upstream; this pin keeps the eMMC-bootable
+    # variant (see the input's comment in flake.nix).
+    nixpkgs = inputs.nixpkgs-netbook;
     # Its own configuration is the whole system, so it takes the compiled-inventory
     # injection explicitly — the same reason the microVM hosts below do. Without it
     # the host has no `config.fleet.inventory`, which `checks.<system>.inventory-modules`
@@ -220,6 +230,7 @@
       ../hosts/guckloch/configuration.nix
       inputs.nixos-wsl.nixosModules.default
     ];
+    hmModules = ["roles.minimal" "shell"];
   };
 
   minyx = {
@@ -243,6 +254,7 @@
     system = "x86_64-linux";
     features = ["base" "containers" "disko"];
     modules = [../hosts/sledgehammer/configuration.nix];
+    hmModules = ["roles.minimal" "shell"];
   };
 
   demo = {
@@ -250,6 +262,7 @@
     system = "x86_64-linux";
     features = ["base" "demo"];
     modules = [../hosts/demo/configuration.nix];
+    hmModules = ["roles.demo"];
   };
 
   testvm = {
@@ -284,6 +297,7 @@
     extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/penguin.nix];
+    hmModules = ["shell" "env" "lf" "sops" "scripts"];
   };
 
   alarm = {
@@ -292,6 +306,7 @@
     extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/alarm.nix];
+    hmModules = ["roles.minimal"];
   };
 
   kali = {
@@ -300,6 +315,7 @@
     extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/kali.nix];
+    hmModules = ["shell.starship" "roles.minimal"];
   };
 
   # The Instabox VM. `kind = "home"` is the honest projection: we own only the
@@ -312,13 +328,16 @@
     extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/clanker.nix];
+    hmModules = ["roles.lean"];
   };
 
   cassini = {
     kind = "darwin";
     system = "aarch64-darwin";
     features = ["base" "macos"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    # darwin has no systemd: the `systemd-policy` feature reads
+    # `osConfig.systemd.services`, which is not an option there.
+    hmFeatures = ["shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/cassini/configuration.nix];
   };
 }

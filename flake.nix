@@ -44,11 +44,13 @@
     nixpkgs-nvidia.url = "github:NixOS/nixpkgs/e21fec321d73511849707a7585e4ea155ee4bf40";
     # nginx 1.30.7 CVE pin while `nixpkgs` < fix (hosts/*/reverse-proxy.nix).
     nixpkgs-nginx.url = "github:NixOS/nixpkgs/93a9ed0a866099a230ed5146a5bb7d16fd5c9b14";
-    # No pinned nixpkgs: netbook followed `nixpkgs` from 2026-10-22, and what it
-    # pins instead is the initrd implementation (`boot.initrd.systemd.enable =
-    # false`) — the reason and the boot test are in
-    # `.agents/deploy/hosts/netbook.md`. The `nixpkgs_25_11` input that used to
-    # carry this host was pruned from `flake.nix` and `flake.lock` once unused.
+    # Netbook's nixpkgs pin, revived: scripted initrd was REMOVED upstream
+    # (`boot.initrd.systemd.enable` is now mkRemovedOptionModule), and the
+    # scripted stage-1 is the only variant this eMMC boots (gen 50 vs 51 in
+    # `.agents/deploy/hosts/netbook.md`). Pinned at c5c4a43 — the fleet nixpkgs
+    # the last working generation built on — until systemd-initrd is proven on
+    # the hardware. Consumed via `host.nixpkgs` in flake/host-inventory.nix.
+    nixpkgs-netbook.url = "github:NixOS/nixpkgs/c5c4a43b0e8056328ec4529f735cabdb8f1942bb";
     # Determinate Nix — imported by modules/global/determinate-nix.nix, which
     # every NixOS chain carries since 2026-10-19. Do NOT make its nixpkgs
     # follow ours: the DN CLI and determinate-nixd come from its own locked

@@ -102,6 +102,9 @@
       # `fleetHost` from the home assembler in flake/outputs.nix.
       moduleFiles."user.ai.home-agents"
       moduleFiles."user.task-shim"
+      # The host's own HM imports from its `hmModules` inventory entry — an
+      # empty list for a host with no field, so the floor alone stands.
+      moduleFiles."global.hm-inventory-role"
     ];
 in rec {
   inherit globalModules hmSharedModulesHome inventoryModules appendModules;

@@ -7,16 +7,23 @@ in
     inputs,
     self,
     config,
+    hostInventory,
     ...
-  }: {
+  }: let
+    # Same inventory-data role list as global.noDE — `hmModules` on the demo
+    # host's entry, the original role as the no-field fallback.
+    hostName = config.networking.hostName or "";
+    hmModules =
+      if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+      then hostInventory.${hostName}.hmModules or ["roles.demo"]
+      else ["roles.demo"];
+  in {
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "hm-backup";
       users.${userName} = {
-        imports = [
-          self.modules."roles.demo"
-        ];
+        imports = map (m: self.modules.${m}) hmModules;
         home.username = userName;
         home.homeDirectory = userHome;
         home.stateVersion = config.system.stateVersion;

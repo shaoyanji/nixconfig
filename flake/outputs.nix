@@ -266,10 +266,15 @@ in {
       specialArgs = host.specialArgs or {inherit inputs self;};
     });
 
-  darwinConfigurations = project "darwin" (_: host:
+  darwinConfigurations = project "darwin" (name: host:
     inputs.nix-darwin.lib.darwinSystem {
       inherit (host) system;
-      modules = moduleSets.hostModules host;
+      modules =
+        # The inventory key as hostName, same as mk-nixos-host does for NixOS:
+        # nix-darwin's `networking.hostName` defaults to null, and HM modules
+        # that read it (`fleetHost`, sops.nix) interpolate null into a string.
+        [{networking.hostName = lib.mkDefault name;}]
+        ++ moduleSets.hostModules host;
       specialArgs = host.specialArgs or {inherit inputs self;};
     });
 
@@ -277,10 +282,13 @@ in {
     inputs.home-manager.lib.homeManagerConfiguration {
       # `fleetHost` is the attrs key, which is the inventory name — the same key
       # `.#homeAgents` uses, so `~/AGENTS.md` resolves for every standalone host.
+      # `hostInventory` rides extraSpecialArgs (not _module.args): only an
+      # externally provided arg may drive `imports` — _module.args resolves
+      # through `config`, which is the imports-position recursion trap.
       extraSpecialArgs =
         (host.extraSpecialArgs or {})
         // {
-          inherit self;
+          inherit self hostInventory;
           fleetHost = name;
         };
       # Standalone HM hosts build their own pkgs; none needs an overlay, so the

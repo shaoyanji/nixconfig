@@ -4,17 +4,25 @@
   self,
   config,
   user,
+  hostInventory,
   ...
-}: {
+}: let
+  # The container's own HM imports, declared next to its `features`/`modules`
+  # in flake/host-inventory.nix — an edit to one container's user role lands on
+  # that host only. `networking.hostName` resolves on every NixOS container;
+  # the fallback keeps a host with no field on the original floor.
+  hostName = config.networking.hostName or "";
+  hmModules =
+    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+    then hostInventory.${hostName}.hmModules or ["roles.minimal" "shell"]
+    else ["roles.minimal" "shell"];
+in {
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
     users.${user.name} = {
-      imports = [
-        self.modules."roles.minimal"
-        self.modules."shell"
-      ];
+      imports = map (m: self.modules.${m}) hmModules;
       # Headless container hosts: skip the AI CLI stack (freebuff, qmd, agy,
       # aichat, ...) to keep closures small.
       profiles.ai.enable = false;

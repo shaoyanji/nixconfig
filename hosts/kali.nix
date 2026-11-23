@@ -1,8 +1,4 @@
-{
-  self,
-  pkgs,
-  ...
-}:
+{pkgs, ...}:
 # Kali Home Manager profile
 # Targets: Raspberry Pi (aarch64) + OnePlus 6 NetHunter Pro (chroot aarch64)
 # Contract: mobile-first security starter pack. Everything here must build on
@@ -13,11 +9,9 @@
   home.username = "kali";
   home.homeDirectory = "/home/kali";
 
-  imports = [
-    # ../modules/shell/nushell.nix
-    self.modules."shell.starship"
-    self.modules."roles.minimal"
-  ];
+  # The module list (shell.starship + roles.minimal) is this host's
+  # `hmModules` entry in flake/host-inventory.nix, resolved by
+  # global.hm-inventory-role.
 
   home.packages = with pkgs; [
     # === RECONNAISSANCE & SCANNING ===

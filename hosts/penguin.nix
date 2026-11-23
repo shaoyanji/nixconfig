@@ -1,17 +1,15 @@
 {
-  self,
   inputs,
   config,
   pkgs,
   user,
   ...
 }: {
+  # The registry modules (shell, env, lf, sops, scripts) are this host's
+  # `hmModules` entry in flake/host-inventory.nix, resolved by
+  # global.hm-inventory-role. nixvim stays an imports line: it is an input
+  # module, not a registry name.
   imports = [
-    self.modules."shell"
-    self.modules."env"
-    self.modules."lf"
-    self.modules."sops"
-    self.modules."scripts"
     # Imported here, not into every standalone HM config: this is the only host
     # that enables the editor, and option surface is what a gate pays for.
     inputs.kickstart-nixvim.homeManagerModules.default

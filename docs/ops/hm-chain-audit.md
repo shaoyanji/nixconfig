@@ -15,12 +15,18 @@ The standalone-HM floor: inventory injection + sops-nix HM + nix-index HM +
 Reached via `features = ["home"]` in `flake/host-inventory.nix`, assembled by
 `homeManagerConfiguration` in `flake/outputs.nix`.
 
-| host | import shape | user role actually imported |
-|---|---|---|
-| alarm | feature (`home`) + own `hosts/alarm.nix` | `roles.minimal` — direct |
-| clanker | feature (`home`) + `hosts/clanker.nix` | `roles.lean` — direct |
-| kali | feature (`home`) + `hosts/kali.nix` | `roles.minimal` — direct |
-| penguin | feature (`home`) + `hosts/penguin.nix` | `roles.minimal` — direct |
+Each host's role/module list is `hmModules` in its inventory entry, resolved
+by `global.hm-inventory-role` (in `hmSharedModulesHome`) through the
+`fleetHost`/`hostInventory` extraSpecialArgs — an edit lands on one host's
+entry. `hosts/<name>.nix` keeps host settings and any non-registry (`inputs.*`)
+imports — penguin's kickstart-nixvim is the example.
+
+| host | `hmModules` |
+|---|---|
+| alarm | `roles.minimal` |
+| clanker | `roles.lean` |
+| kali | `shell.starship` + `roles.minimal` |
+| penguin | `shell` `env` `lf` `sops` `scripts` |
 
 An edit to `hmSharedModulesHome` lands on exactly these 4 — aarch64-linux
 (alarm, kali) and x86_64-linux (clanker, penguin). None of them takes
@@ -57,11 +63,13 @@ Feature → module map (`roles/home.nix`): `systemd-policy` `shell` `dev`
 
 ## Chain C — HM integration without the role
 
-`inputs.home-manager.{nixos,darwin}Modules.default` alone, own user wiring:
+`inputs.home-manager.{nixos,darwin}Modules.default` alone, own user wiring —
+now `hmModules` in each host's inventory entry, resolved per host inside
+`global.noDE`/`global.demo` (the same inventory-data split as Chain B):
 
-| hosts | via | user wiring |
+| hosts | via | `hmModules` |
 |---|---|---|
-| applevalley, ares, deckstation, delphi, guckloch, kellerbench, mtfuji, sledgehammer | `containers` → `global.noDE` | `roles.minimal` + `shell` direct, `profiles.ai` off. delphi adds `mail-agent` import + hermes units; guckloch adds `ai.skills`/`antigravity-cli` + an atuin mkForce |
+| applevalley, ares, deckstation, delphi, guckloch, kellerbench, mtfuji, sledgehammer | `containers` → `global.noDE` | `roles.minimal` + `shell`, `profiles.ai` off. delphi adds `mail-agent` import + hermes units; guckloch adds `ai.skills`/`antigravity-cli` + an atuin mkForce — additive imports merge on top |
 | demo | `demo` → `global.demo` | `roles.demo` |
 
 An edit to the `inputs.home-manager` flake pin reaches all of chains A–C plus

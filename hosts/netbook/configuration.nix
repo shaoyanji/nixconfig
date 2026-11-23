@@ -5,6 +5,7 @@
   self,
   lib,
   pkgs,
+  inputs,
   ...
 }: let
   # The fleet's deploy key (frieren's `devji` identity). alice logs in with it,
@@ -118,6 +119,10 @@ in {
     # build and the Groq key is decrypted from the fleet sops plane at use time
     # with this host's TPM identity, instead of a plaintext file in $HOME.
     self.modules."profiles.voice-dictate"
+    # Declares the `sops` options dwl-desktop's xs-notify import defines under
+    # mkIf — the option must exist even disabled. No sops-nix secrets plane is
+    # wired here: zero secrets are declared, so activation creates nothing.
+    inputs.sops-nix.nixosModules.sops
   ];
 
   profiles.boot.efi = false;
@@ -222,7 +227,8 @@ in {
     ];
     trusted-substituters = ["http://192.168.3.25:5000"];
   };
-  services.journald.settings.Journal = {SystemMaxUse = "50M";};
+  # `settings.Journal` is the new spelling; this host's nixpkgs pin predates it.
+  services.journald.extraConfig = "SystemMaxUse=50M";
   # LTS, not latest: the newest kernel (`linuxPackages_latest`) could not mount
   # the f2fs root on this eMMC — the failure that pinned the whole host to 25.11.
   boot.kernelPackages = pkgs.linuxPackages;

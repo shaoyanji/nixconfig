@@ -70,9 +70,11 @@ in {
       enable = true;
       scripts = with pkgs.mpvScripts;
         [
-          mpris # Media key and playerctl integration with Niri / Wayland
           uosc # Modern, lightweight, fast Wayland-friendly UI
         ]
+        # mpris is the Linux D-Bus media protocol — no darwin counterpart;
+        # the lazy `optional` never forces the attr on a mac.
+        ++ lib.optional pkgs.stdenv.hostPlatform.isLinux mpris
         ++ lib.optional (cfg.tier != "low") pkgs.mpvScripts.thumbfast;
 
       # Tier-differentiated mpv.conf settings

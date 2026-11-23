@@ -104,8 +104,9 @@ in {
   # PCR 7 is systemd's own default and survives kernel/NixOS updates — binding
   # PCR 0/4/9 would demand a re-enrol on every update of a rolling system.
   boot.initrd = {
+    # `boot.initrd.systemd.enable` is gone upstream — scripted initrd was
+    # removed and systemd-initrd is unconditional on 26.11.
     systemd = {
-      enable = true;
       tpm2.enable = true;
     };
     kernelModules = ["tpm_crb" "tpm_tis"];

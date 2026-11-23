@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-23T18:58:54Z",
+  "generated": "2026-11-23T18:59:47Z",
   "count": 200,
-  "pin": "caec8b8d98323bf9b10db0659f6a95c83cf77f33d164450b3e2b44033bfd48c0",
+  "pin": "a149cc6968bfa8eed985fc34dbbcd9ee39f3dce504d176930596c4d3c5c25da1",
   "turns": [
+    {
+      "id": "7ea2fd03-315e-4462-b578-dd2d726f7ad1",
+      "ts": "2026-11-23T18:58:58Z",
+      "source": "codebuff",
+      "subject": "nixconfig:checks-hosts-args",
+      "action": "landed: checks:hosts:args rejects standalone home hosts importing self.modules and dead host args; dependency of checks:host/checks:hosts, fixture in checks:quick. gate: checks:hosts:args PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "22b424cc02339c0d3ba335ee931a41795b40e565",
+      "branch": "main",
+      "frame": "03hahcnro2i88fs1oakop46yn"
+    },
     {
       "id": "bb2ebc07-a94a-412b-8c1a-d57aea7f9710",
       "ts": "2026-11-23T18:58:05Z",
@@ -2709,19 +2722,6 @@
       "base_commit": "55eaa2296c3cda87235c48122eda21138f051fb0",
       "branch": "main",
       "frame": "03hab2d474fep9a89ztp12sz4"
-    },
-    {
-      "id": "bc79a8ac-be0d-41fa-95ea-e34e158df16a",
-      "ts": "2026-11-22T23:40:31Z",
-      "source": "freebuff-steward",
-      "subject": "shaoyanji.is-a.dev:ryoku-cv-page",
-      "action": "landed: steward drove the freebuff pane (0:1.1) to port the ryoku design system (nixconfig/.agents/design/ryoku DESIGN.md + preview.html, NixOS periwinkle edition) into a ryoku-styled CV page on a new branch, verified with task cvcheck, not deployed; jevdecide classify publish p=0.98 m=0.97; pane confirmed working 18s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "55eaa2296c3cda87235c48122eda21138f051fb0",
-      "branch": "main",
-      "frame": "03hab2d26yxd6upz7qs45w27y"
     }
   ]
 }

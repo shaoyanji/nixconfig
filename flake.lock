@@ -801,6 +801,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-netbook": {
+      "locked": {
+        "lastModified": 1787962033,
+        "narHash": "sha256-u6z9VTZA4Kf3RkHQo9sQI7NI4Ei/uiU9vrMqOiwWP1Y=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "c5c4a43b0e8056328ec4529f735cabdb8f1942bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "c5c4a43b0e8056328ec4529f735cabdb8f1942bb",
+        "type": "github"
+      }
+    },
     "nixpkgs-nginx": {
       "locked": {
         "lastModified": 1795249095,
@@ -1004,6 +1020,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_7",
+        "nixpkgs-netbook": "nixpkgs-netbook",
         "nixpkgs-nginx": "nixpkgs-nginx",
         "nixpkgs-nvidia": "nixpkgs-nvidia",
         "sops-nix": "sops-nix",

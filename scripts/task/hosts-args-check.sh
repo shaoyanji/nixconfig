@@ -10,6 +10,8 @@
 #   2. a standalone home host imports modules by inventory, never
 #      `self.modules`: its list is `hmModules` in flake/host-inventory.nix,
 #      resolved by global.hm-inventory-role. NixOS hosts keep self.modules.
+#      The files judged are that host's `modules` paths in the registry, not a
+#      guess from its name, so `hosts/<name>/configuration.nix` is covered too.
 #
 # USAGE
 #   hosts-args-check.sh [ROOT]   ROOT defaults to this checkout; the fixture
@@ -31,6 +33,7 @@ cd "$ROOT" || exit 2
 DEADNIX="$(command -v deadnix || true)"
 STATIX="$(command -v statix || true)"
 YQ="$(command -v yq || true)"
+NIX="$(command -v nix || true)"
 if [ -z "$DEADNIX" ] || [ -z "$STATIX" ] || [ -z "$YQ" ]; then
   echo "hosts-args: deadnix, statix and yq are required (modules/profiles/base-node.nix installs them); this gate cannot judge without them." >&2
   exit 2
@@ -58,12 +61,34 @@ HOME_HOSTS="$(yq -p toml -o json -r '.hosts | to_entries | map(select(.value.kin
   echo "hosts-args: inventory.toml could not be read — cannot tell which hosts are standalone home hosts." >&2
   exit 2
 }
+# Home hosts' files come from the composition registry — what the host actually
+# imports. One data eval (~0.05 s, no build); without nix or the registry the
+# name shape is the map, and either way a host that resolves to nothing is a
+# hard stop: skipping it would report clean on a rule that never ran.
+HOME_FILES=""
+if [ -n "$NIX" ] && [ -f flake/host-inventory.nix ]; then
+  HOME_FILES="$("$NIX" eval --impure --json --expr "
+    let inv = import \"$ROOT/flake/host-inventory.nix\" { inputs = {}; self = {}; moduleFiles = {}; };
+        homes = builtins.filter (n: (inv.\${n}.kind or \"\") == \"home\") (builtins.attrNames inv);
+    in map (n: n + \"\t\" + builtins.concatStringsSep \" \" (map toString (inv.\${n}.modules or []))) homes
+  " 2>/dev/null | "$YQ" -r '.[]' 2>/dev/null || true)"
+fi
 for name in $HOME_HOSTS; do
-  f="hosts/$name.nix"
-  [ -f "$f" ] || continue
-  if grep -n 'self\.modules' "$f"; then
-    echo "hosts-args: $f is a standalone home host but imports self.modules — list those modules in its hmModules entry in flake/host-inventory.nix instead." >&2
-    fail=1
+  files="$(awk -F'\t' -v n="$name" '$1 == n {print $2}' <<<"$HOME_FILES")"
+  [ -n "$files" ] || files="hosts/$name.nix"
+  routed=0
+  for f in $files; do
+    f="$(realpath --relative-to="$ROOT" "$f" 2>/dev/null || printf '%s' "$f")"
+    [ -f "$f" ] || continue
+    routed=1
+    if grep -n 'self\.modules' "$f"; then
+      echo "hosts-args: $f is a standalone home host but imports self.modules — list those modules in its hmModules entry in flake/host-inventory.nix instead." >&2
+      fail=1
+    fi
+  done
+  if [ "$routed" -eq 0 ]; then
+    echo "hosts-args: home host $name maps to no file under $ROOT/hosts — the self.modules rule did not run on it; name its files in flake/host-inventory.nix." >&2
+    exit 2
   fi
 done
 

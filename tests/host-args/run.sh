@@ -2,12 +2,17 @@
 # Regression fixture for `checks:hosts:args` (scripts/task/hosts-args-check.sh).
 #
 # Both rules are judged against the real clanker migration, not a retyped sketch.
-# `git show HEAD:hosts/clanker.nix` is a standalone home host importing
-# `self.modules."roles.lean"` — the migration's real past mistake — so it fails.
-# The same file with that import removed fails on the dead `self`; marked `nixos`
-# instead of `home`, it passes, which is the scope: NixOS hosts still import
-# `self.modules` by name. The working-tree `_:` file passes. An empty `{ ... }`
-# pattern fails statix W10, an unused `pkgs` fails, a used one passes.
+# The mistake is resolved by pickaxe — the commit that introduced
+# `imports = [self.modules."roles.lean"]` in `hosts/clanker.nix` — because HEAD
+# stopped carrying it when the migration landed; a history rewrite fails this
+# fixture loudly rather than turning the proof into a no-op. That blob is a
+# standalone home host importing `self.modules`, so it fails; with the import
+# removed it fails naming the dead `self`; marked `nixos` instead of `home` it
+# passes, which is the scope NixOS hosts still rely on. The working-tree `_:`
+# file passes. A file reached through `flake/host-inventory.nix`
+# (`hosts/clanker/configuration.nix`) is still judged, and a home host that
+# resolves to no file is exit 2, never a silent pass. An empty `{ ... }` pattern
+# fails statix W10, an unused `pkgs` fails, a used one passes.
 #
 # Coverage is asserted both ways: every case must run, and every case that runs
 # must be listed.
@@ -19,7 +24,7 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo="$(cd "$here/../.." && pwd)"
 gate="$repo/scripts/task/hosts-args-check.sh"
 
-for tool in deadnix statix yq; do
+for tool in deadnix statix yq nix; do
   command -v "$tool" >/dev/null 2>&1 || {
     echo "fixture: $tool is required" >&2
     exit 2
@@ -34,6 +39,14 @@ git -C "$repo" rev-parse --verify HEAD >/dev/null 2>&1 || {
   exit 2
 }
 
+mistake="$(git -C "$repo" log -S'self.modules."roles.lean"' --format=%H -- hosts/clanker.nix | tail -n 1)"
+git -C "$repo" show "$mistake:hosts/clanker.nix" 2>/dev/null |
+  grep -qF 'imports = [self.modules."roles.lean"]' || {
+  echo "fixture: no commit introduces the clanker self.modules import — cannot prove the rule fails on it" >&2
+  exit 2
+}
+blob() { git -C "$repo" show "$mistake:hosts/clanker.nix"; }
+
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
@@ -44,9 +57,13 @@ inventory() { # kind of clanker
   printf '[hosts.clanker]\nkind = "%s"\n\n[hosts.frieren]\nkind = "nixos"\n' "$1" >"$tmp/inventory.toml"
 }
 reset() {
-  rm -rf "$tmp/hosts"
+  rm -rf "$tmp/hosts" "$tmp/flake"
   mkdir -p "$tmp/hosts"
   inventory home
+}
+registry() { # module file a home host imports, relative to tmp
+  mkdir -p "$tmp/flake"
+  printf '{ inputs, self, moduleFiles }:\n{\n  clanker = {\n    kind = "home";\n    modules = [../%s];\n  };\n}\n' "$1" >"$tmp/flake/host-inventory.nix"
 }
 
 run() { # name want_rc needle
@@ -71,17 +88,16 @@ run() { # name want_rc needle
 }
 
 reset
-git -C "$repo" show HEAD:hosts/clanker.nix >"$tmp/hosts/clanker.nix"
-run "HEAD home host importing self.modules fails" 1 "standalone home host"
+blob >"$tmp/hosts/clanker.nix"
+run "the past home host importing self.modules fails" 1 "standalone home host"
 
 reset
 inventory nixos
-git -C "$repo" show HEAD:hosts/clanker.nix >"$tmp/hosts/clanker.nix"
-run "the same file marked nixos passes" 0 "clean"
+blob >"$tmp/hosts/clanker.nix"
+run "the same blob marked nixos passes" 0 "clean"
 
 reset
-git -C "$repo" show HEAD:hosts/clanker.nix |
-  sed '/imports = \[self\.modules\."roles\.lean"\];/d' >"$tmp/hosts/clanker.nix"
+blob | sed '/imports = \[self\.modules\."roles\.lean"\];/d' >"$tmp/hosts/clanker.nix"
 run "dead self after the import removal fails" 1 "Unused lambda pattern: self"
 
 reset
@@ -89,21 +105,37 @@ cp "$repo/hosts/clanker.nix" "$tmp/hosts/clanker.nix"
 run "working-tree wildcard pattern passes" 0 "clean"
 
 reset
+mkdir -p "$tmp/hosts/clanker"
+registry hosts/clanker/configuration.nix
+blob >"$tmp/hosts/clanker/configuration.nix"
+run "a host-inventory module path is judged" 1 "standalone home host"
+
+reset
+mkdir -p "$tmp/hosts/clanker"
+cp "$repo/hosts/clanker.nix" "$tmp/hosts/clanker/configuration.nix"
+run "a home host resolving to no file is a hard stop" 2 "maps to no file"
+
+reset
+inventory nixos # the linter cases judge no home host, so none may be unresolved
 printf '{ ... }: {\n  a = 1;\n}\n' >"$tmp/hosts/empty.nix"
 run "empty pattern fails W10" 1 "empty argument pattern"
 
 reset
+inventory nixos
 printf '{ pkgs, ... }: {\n  a = 1;\n}\n' >"$tmp/hosts/unused.nix"
 run "unused pkgs fails" 1 "Unused lambda pattern: pkgs"
 
 reset
+inventory nixos
 printf '{ pkgs, ... }: {\n  a = pkgs.hello;\n}\n' >"$tmp/hosts/used.nix"
 run "used pkgs passes" 0 "clean"
 
-expected="HEAD home host importing self.modules fails
-the same file marked nixos passes
+expected="the past home host importing self.modules fails
+the same blob marked nixos passes
 dead self after the import removal fails
 working-tree wildcard pattern passes
+a host-inventory module path is judged
+a home host resolving to no file is a hard stop
 empty pattern fails W10
 unused pkgs fails
 used pkgs passes

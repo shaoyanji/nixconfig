@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-23T18:59:47Z",
+  "generated": "2026-11-23T19:40:02Z",
   "count": 200,
-  "pin": "a149cc6968bfa8eed985fc34dbbcd9ee39f3dce504d176930596c4d3c5c25da1",
+  "pin": "25f772ccc72b75b8ddadd520bb69ff374c9cf0ce503a8b106aa88e78059c7999",
   "turns": [
+    {
+      "id": "6a3903e6-2ac9-42d6-80d4-da9b77b8036b",
+      "ts": "2026-11-23T18:59:57Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-chains-ac-per-host",
+      "action": "landed: chains A+C role lists are per-host hmModules inventory data (13 hosts); healed all 3 pre-existing eval failures — cassini darwin bring-up (dankShell passthrough, hostName injection, systemd-policy/ai/mpris gates), poseidon dead initrd option, netbook nixpkgs pin at c5c4a43 (scripted initrd removed upstream) | gate: drv-equality 27/27 identical + 3 healed error→ok, checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1ce4ac4f76fc39ba87862a6bf14efdcf4e29d964",
+      "branch": "main",
+      "frame": "03hahcuonwjjzsoodu1nn4vsw"
+    },
     {
       "id": "7ea2fd03-315e-4462-b578-dd2d726f7ad1",
       "ts": "2026-11-23T18:58:58Z",
@@ -2709,19 +2722,6 @@
       "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
       "branch": "main",
       "frame": "03hab3f7dumyi7q11vc3agzpu"
-    },
-    {
-      "id": "39d74ad7-1c30-4b47-a17b-863a961b5225",
-      "ts": "2026-11-22T23:40:32Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:eu-remote-verify",
-      "action": "landed: steward drove the ssh-tunneled delphi freebuff pane (0:3.1) to verify the top-ranked EU-remote NixOS/DevOps leads from the last pass are still live — re-resolve application URLs, confirm postings open, note salary/remote-scope changes, read-only; jevdecide classify research p=0.94 m=0.91; pane confirmed working 18s through the tunnel.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "55eaa2296c3cda87235c48122eda21138f051fb0",
-      "branch": "main",
-      "frame": "03hab2d474fep9a89ztp12sz4"
     }
   ]
 }

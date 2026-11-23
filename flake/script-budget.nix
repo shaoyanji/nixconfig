@@ -68,6 +68,7 @@
     "scripts/task/host-check-sweep.sh" = 241;
     "scripts/task/host-paths-check.sh" = 101;
     "scripts/task/host-restore.sh" = 281;
+    "scripts/task/hosts-args-check.sh" = 121;
     "scripts/task/image-daily-engine.sh" = 714;
     "scripts/task/image-daily-lib.sh" = 274;
     "scripts/task/image-daily-plates.sh" = 285;
@@ -151,5 +152,5 @@
     "tools/bin-farm/farm.sh" = 189;
     "tools/turns-runtime/bench.sh" = 182;
   };
-  total = 141;
+  total = 142;
 }

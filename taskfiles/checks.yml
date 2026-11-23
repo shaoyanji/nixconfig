@@ -570,23 +570,23 @@ tasks:
       deadnix fails a binding a host declares and never reads — the `self` left
       when a role import moves to `hmModules`; statix W10 fails an empty
       argument pattern, which must be `_`. A standalone home host (`kind =
-      "home"`) must not import `self.modules`: its list is the `hmModules` entry
-      in flake/host-inventory.nix. NixOS hosts keep `self.modules`. ~0.4 s, no
-      eval, no build.
+      "home"`) must not import `self.modules` in any file its `modules` entry in
+      flake/host-inventory.nix names, so a host under `hosts/<name>/` is judged
+      too; NixOS hosts keep `self.modules`. ~0.5 s, one data eval, no build.
     cmds:
       - bash scripts/task/hosts-args-check.sh
 
   checks:hosts:args:test:
-    desc: "Fixture for checks:hosts:args (HEAD self.modules, dead self, nixos scope, empty pattern)"
+    desc: "Fixture for checks:hosts:args (past self.modules, dead self, registry path, nixos scope)"
     summary: >
-      Proves both rules can fail on the real migration. HEAD's
-      `hosts/clanker.nix` is rejected as a standalone home host importing
-      `self.modules`; the same file with that import removed fails naming the
-      dead `self`; marked `nixos` instead of `home` it passes, which is the
-      scope NixOS hosts rely on; and the working-tree `_:` file passes. An
-      unused `pkgs` and an empty `{ ... }` pattern fail, a used `pkgs` passes.
-      Cases are asserted both ways, so deleting one fails the fixture. Temp
-      tree, no eval, ~1 s.
+      Proves both rules can fail on the real migration. The commit that added
+      the `self.modules."roles.lean"` import is found by pickaxe and rejected as
+      a standalone home host; the same blob without that line fails naming the
+      dead `self`; marked `nixos` it passes, the scope NixOS hosts rely on; the
+      working-tree `_:` file passes. A file reached through
+      flake/host-inventory.nix (`hosts/clanker/`) is judged, and a home host
+      resolving to no file is a hard stop. Unused/empty patterns fail, used
+      `pkgs` passes. Temp tree, no build, ~1 s.
     cmds:
       - bash tests/host-args/run.sh
 

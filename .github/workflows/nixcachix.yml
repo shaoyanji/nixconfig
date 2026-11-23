@@ -411,21 +411,6 @@ jobs:
         if: matrix.kind == 'nixos'
         run: nix build -L .?submodules=1#hostChecks.${{ matrix.arch }}.${{ matrix.host }}
 
-      # The toplevel built above is the budget gate's missing input
-      # (note ci-closure-budget): measure it with the same store-DB sum
-      # `task checks:closure:budget` prints — nix path-info --recursive — and
-      # compare against closure-budgets.toml (baseline x (1 + headroom), or the
-      # host's `bytes` pin). A host without an adopted baseline reports NOT
-      # BUDGETED and does not fail: adopting one is the operator's deliberate
-      # act (`task dev:closure:budget:adopt`), not CI's. `result` is the single
-      # toplevel attr the matrix emits; yq-go is the repo's TOML reader —
-      # nixpkgs' python yq rejects these flags (same trap as docs-budget).
-      - name: Closure budget vs closure-budgets.toml
-        if: matrix.kind == 'nixos'
-        run: |
-          set -euo pipefail
-          target="$(readlink -f result)"
-          nix shell nixpkgs#yq-go -c bash scripts/task/closure-analysis.sh --host "${{ matrix.host }}" budget "$target"
 
   # Boot the host's REAL module graph before a services change can be trusted.
   # Reuses `plan`'s matrix, so only hosts the change reaches boot, and runs after

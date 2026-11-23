@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-23T09:34:22Z",
+  "generated": "2026-11-23T09:52:30Z",
   "count": 200,
-  "pin": "d1f55c0b6b9b38bd1fb75a29450fe168f7686533011cffeed32e01a84accc34a",
+  "pin": "8c593bc5bc8bd52810338ad6b673306ec04e7fda7cba69ef8d0b12ad4191878b",
   "turns": [
+    {
+      "id": "9dfbf675-52c6-4507-868f-5794f1cc13dc",
+      "ts": "2026-11-23T09:35:04Z",
+      "source": "devin",
+      "subject": "nixconfig:comment-audit-route",
+      "action": "landed: 16 files routed via channel banners to owning notes/docs; frieren-ops-history claims infra-stack.nix; audit note re-measured + distilled (0d437915) | gate: checks:quick PASS, agentsNotes.issues clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d437915f201a296da1c07c47d95760d68809024",
+      "branch": "main",
+      "frame": "03haeai746copjgm6g8cfgiar"
+    },
     {
       "id": "3e477b87-9508-4e27-a49b-40c1c4de49d8",
       "ts": "2026-11-23T09:29:15Z",
@@ -2735,21 +2748,6 @@
       "base_commit": "fe1f5ebd3a1aebd8261e082cfa0ec4e38d8b133d",
       "branch": "main",
       "frame": "03ha8xpj8f0mjfq59xa00wb75"
-    },
-    {
-      "id": "a007a7ac-4b6d-49e1-8e19-31bd831d97d0",
-      "ts": "2026-11-22T17:07:29Z",
-      "source": "devin",
-      "subject": "nixconfig:skills-align",
-      "action": "claim: full SKILL.md alignment pass — microvm:stop row fix, ops:skills:check, checks:skills:mirror, checks:prose",
-      "outcome": "in_progress",
-      "claims": [
-        ".agents/skills/"
-      ],
-      "files": [],
-      "base_commit": "f19839b7188135da5f249485d6d197d12b470af3",
-      "branch": "main",
-      "frame": "03ha8xl0d0xulj424yorl7uxz"
     }
   ]
 }

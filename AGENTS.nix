@@ -1224,19 +1224,20 @@
       kind = "open";
       status = "DELIVERED";
       priority = "P3";
-      date = "2026-11-22";
+      date = "2026-11-23";
       links = ["closure-budget-coverage"];
-      summary = "build-machines already builds the toplevel; the added step measures `result` with the same narSize sum and fails on OVER vs closure-budgets.toml.";
+      summary = "Closure budget runs as the local gate checks:closure:budget; the CI step that copied it was removed — runners cannot reach a host's store.";
       refs = {
         modules = [".github/workflows/nixcachix.yml" "closure-budgets.toml" "scripts/task/closure-analysis.sh"];
       };
       body = ''
-        Exit, landed 2026-11-22: the `Closure budget vs closure-budgets.toml`
-        step in build-machines runs `closure-analysis.sh --host <h> budget
-        $result`, which measures the just-built toplevel via `nix path-info
-        --recursive` and exits 1 on OVER. A host with no adopted baseline
-        reports NOT BUDGETED and does not fail — adopting is the operator's
-        deliberate act, not CI's.
+        Landed 2026-11-22, removed 2026-11-23: the build-machines step ran
+        `closure-analysis.sh --host <h> budget $result`, and `--host` means
+        "SSH-resolve /run/current-system on the live host" — a GitHub runner
+        has no host SSH, so the step failed with `could not resolve`, not
+        with a budget verdict. The check's real home is local:
+        `task checks:closure:budget` measures the deployed closure the same
+        way and adopting a baseline stays the operator's deliberate act.
       '';
     };
     transitive-flake-drift = {

@@ -234,14 +234,13 @@ tasks:
       - bash tests/image-ship/run.sh
 
   checks:vercel:test:
-    desc: Fixture for the Vercel status outlet — the ops gate must fail closed
+    desc: Fixture for the Vercel status outlet — probe stays an allowlist, no gated store ships
     summary: >
-      tests/vercel-status/run.sh — node smoke test over vercel/api/*.js: the
-      public probe refuses unknown targets at 400 before any fetch (it is an
-      allowlist, not a proxy), and /api/ops fails closed at every rung —
-      unconfigured env 503, missing creds 401 + challenge, wrong creds 401,
-      right creds reach the Edge Config read. The gate that only passed would
-      be no gate.
+      tests/vercel-status/run.sh — node smoke test over vercel/api/check.js:
+      the public probe refuses unknown targets at 400 before any fetch (it is
+      an allowlist, not a proxy) and reports a dead endpoint as down, and the
+      deployment ships no gated-store or token machinery — private ops
+      telemetry stays on the tailnet by design.
     cmds:
       - bash tests/vercel-status/run.sh
 

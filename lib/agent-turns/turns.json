@@ -1,8 +1,92 @@
 {
-  "generated": "2026-11-23T10:44:44Z",
+  "generated": "2026-11-23T11:02:12Z",
   "count": 200,
-  "pin": "0dd501d53613bec5296b2b6464c7e54fc34a3d947613d0d6c6c490d2de1cdce7",
+  "pin": "57fb10591f7eca0eab78b16823f83bf9d7e9644b09baad5d08acbc8ae55de002",
   "turns": [
+    {
+      "id": "047bccde-4b15-48a1-bca9-75efec574d66",
+      "ts": "2026-11-23T11:00:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-publish-cv",
+      "action": "landed: freebuff pane 0:1.1 driven; jev-decide -> publish (0.99/0.98, typesafe); CV-site-to-vercel task accepted and executing (fresh thinking counter verified)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39e584297b0b2649d973a67ffdf4ea77c16c8edd",
+      "branch": "main",
+      "frame": "03haer9xzzf3fqqsrblf6a72h"
+    },
+    {
+      "id": "b5bd5605-5673-4c53-8e2d-7352f9f2b6fd",
+      "ts": "2026-11-23T11:00:52Z",
+      "source": "buffy",
+      "subject": "nixconfig:ci-deslop",
+      "action": "deslop: one fleet-nix action replaces 6 copies of the runner nix.conf (+1 keys literal, now exported); permissions contents:read on 3 workflows; dead NIXCACHE_SIGNING_KEY env and Log Target step gone; gok cache key drops run_id (never hit); policy reads action+workflow as one text and is comment-blind; ci docs corrected. Gates: actionlint 0, policies+fixture PASS, prose 0, docs-budget 0",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haer9jzuqwa8hbafwcq0aer"
+    },
+    {
+      "id": "f6e6a5da-d078-432e-a481-5e2762e8a9d8",
+      "ts": "2026-11-23T10:52:29Z",
+      "source": "devin",
+      "subject": "nixconfig:pr-cleanup-vercel-detok",
+      "action": "claim: triage chatgpt-connector PRs (merge reasonable, close legacy nixpkgs bumps); remove VERCEL_TOKEN/Edge-Config dependency from vercel/ outlet",
+      "outcome": "in_progress",
+      "claims": [
+        "vercel/",
+        "scripts/task/vercel-publish.sh",
+        "taskfiles/ops.yml",
+        "docs/vercel-status.md",
+        ".github/"
+      ],
+      "files": [],
+      "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
+      "branch": "main",
+      "frame": "03haepmn5n2c9sgodslo4dog9"
+    },
+    {
+      "id": "9b8b8c7b-0d75-49d4-9c49-38ba2595ae34",
+      "ts": "2026-11-23T10:48:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-vercel",
+      "action": "blocked: CV site verified, not deployed — 28/28 files 200 from a fresh .#sites.matt-site build (19 HTML + 5 PDFs + assets, missing path 404), 21/21 live routes 200 on the current host; post drafted at ideas/cv-site-redesign.md (staged) but the is-a.dev blog checkout is absent; Vercel needs VERCEL_TOKEN — no CLI, token or sops key exists here; also corrected the apps SKILL prose budget (68 -> 105)",
+      "outcome": "blocked: no Vercel credential on this host",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haeovdoepiqdupymb1k6coy"
+    },
+    {
+      "id": "f6d7d2f2-801f-462c-88e6-d9377cd2aa15",
+      "ts": "2026-11-23T10:46:05Z",
+      "source": "devin",
+      "subject": "nixconfig:vercel-status",
+      "action": "correction: landed commits after rebase onto c455266c (flake-update merge) are 9cd416c6 + 41d50e9f",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
+      "branch": "main",
+      "frame": "03haeodkgsuej0vhqmg4m1tri"
+    },
+    {
+      "id": "87be8509-d931-4cfe-bdf8-73597a034c4a",
+      "ts": "2026-11-23T10:45:58Z",
+      "source": "devin",
+      "subject": "nixconfig:vercel-status",
+      "action": "landed: vercel/ two-zone status outlet — public probe allowlist + basic-auth /ops fed by sentinel status.json via Edge Config; vercel-publish.sh + ops:status:publish; docs/vercel-status.md; also committed foreign ideas/cv-site-redesign.md (kg drift) | gate: checks:quick PASS incl checks:vercel:test 14 cases",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
+      "branch": "main",
+      "frame": "03haeocq6l90r7v7vz7iq4ynh"
+    },
     {
       "id": "5968f0c2-457a-44bb-9c4a-130d188bb340",
       "ts": "2026-11-23T10:44:10Z",
@@ -2665,90 +2749,6 @@
       "base_commit": "8b114ffd2a05f5559eae8f1d55222cbf4358fc8a",
       "branch": "main",
       "frame": "03ha949wieqlgwtyl71d7pg6d"
-    },
-    {
-      "id": "230639c0-70b1-4f82-a299-608e51301b68",
-      "ts": "2026-11-22T17:41:02Z",
-      "source": "devin",
-      "subject": "nixconfig:submissions-audit",
-      "action": "landed: all 8 /nix/store packet symlinks dereferenced to real files (clickhouse+grafana rebuilt byte-identical via agents:apps:packet — same store hash; enbw/stackit/sinc/telekom-x2/uni-rostock copied live); grafana sheet corrected to applied; fau-sysadmin lead.md records phantom-packet DB drift + 01.12 deadline | gate: checks:host frieren PASS 76.6s; checks:infron 2 defects are live-config drift (other agent), checks.policies overflow pre-existing",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "44bc0d84c6d269cdbf6d5db12185037c611c0311",
-      "branch": "main",
-      "frame": "03ha944ys9u9au4s9528h64gx"
-    },
-    {
-      "id": "1537e446-b9b8-43d8-9b6d-c2c082a25f6a",
-      "ts": "2026-11-22T17:40:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-surface",
-      "action": "landed: hermes-check asserts gateway unit PATH names+resolves node & ffmpeg (negative control fails) | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5f27f00256abefb0ab5830a9e2ed636a4eee0b4a",
-      "branch": "main",
-      "frame": "03ha94339bpz20n77di8w59ob"
-    },
-    {
-      "id": "8201e0cd-c019-436c-810a-39c5cd429e70",
-      "ts": "2026-11-22T17:40:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene",
-      "action": "landed: mail-bearing rows must name a role; duplicate stubs inherit the canonical role | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/appflow-check.sh tests/appflow-status taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "74bd9a38105bf0ac059d9ff563b5dc344fa4ad9d",
-      "branch": "main",
-      "frame": "03ha93ylx90e1cerbefggtodp"
-    },
-    {
-      "id": "91b55161-f77e-460b-8d65-1dad666847b7",
-      "ts": "2026-11-22T17:37:01Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-surface",
-      "action": "landed: frieren switched to gen 303 (26.11.20261121); live gateway PATH now carries nodejs+ffmpeg, daemon restarted, telegram+simplex connected, hermes-check clean | gate: infra:rebuild:nixos PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "71f37098a29ba74ca2b06e356d05d08287985dd1",
-      "branch": "main",
-      "frame": "03ha93cr7qmddppfw072x37xl"
-    },
-    {
-      "id": "1b6510e5-d5c9-4f30-83db-316c6cdea21e",
-      "ts": "2026-11-22T17:34:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene",
-      "action": "landed: stage vocabulary in the README + undiscovered-role gate | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow scripts/task tests/appflow-status taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "f5eb1970ce60ef2f2719ec993c5f06ddc8055262",
-      "branch": "main",
-      "frame": "03ha92rjib21be3qhseni50i7"
-    },
-    {
-      "id": "34dfb1fa-4ca9-46fd-a7d4-85a3664911cc",
-      "ts": "2026-11-22T17:31:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene",
-      "action": "correction: turn 9ccd1986 said unrelated staged files were removed — they were not. .githooks/pre-commit re-stages lib/agent-turns/turns.json and lib/matt/resume.json, so 456a6b33 carries them by design; the five hand-edited files are all present | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow scripts/task tests/appflow-status taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "456a6b33c51fef0e3dd2056647c58f7bffc3a5ec",
-      "branch": "main",
-      "frame": "03ha92c13c0l5ik42tykju9sx"
     }
   ]
 }

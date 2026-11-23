@@ -25,8 +25,8 @@
 <body>
 <h1>fleet status · public surfaces</h1>
 <div class="grid" id="grid"><div class="card"><div class="k">state</div><div class="state">loading…</div></div></div>
-<footer>probed live at request time · <a href="/ops">ops</a> (gated) ·
-  source: <a href="https://github.com/shaoyanji/nixconfig">nixconfig</a></footer>
+<footer>probed live at request time · fleet ops telemetry stays tailnet-only
+  (sentinel.frieren.lan) · source: <a href="https://github.com/shaoyanji/nixconfig">nixconfig</a></footer>
 <script>
 fetch('/api/check', {cache:'no-store'}).then(r => r.json()).then(({rows}) => {
   document.getElementById('grid').innerHTML = rows.map(r => `

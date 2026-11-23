@@ -309,7 +309,8 @@ tasks:
       Does not evaluate the graph or target a host. KG_BACKEND=zeck opts graph
       readers in; bash scripts/task/kg-zeck.sh leap forces a new core.
     cmds:
-      - bash scripts/task/kg-zeck.sh status | toon -e
+      - FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        bash scripts/task/kg-zeck.sh status | toon_emit
 
   ops:kg:speed:
     desc: Measure every read path (graph file, iets eval, nix eval, entry rows)

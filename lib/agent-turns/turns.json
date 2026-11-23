@@ -1,8 +1,99 @@
 {
-  "generated": "2026-11-23T14:39:24Z",
+  "generated": "2026-11-23T15:50:49Z",
   "count": 200,
-  "pin": "b25402c585d866b036e4f65881412af0862d35260f0812e3052b46e203678903",
+  "pin": "c62847bbe91f4726c6aeefd9f6e039381421f4b82e0326d5a3a72c61a84a3202",
   "turns": [
+    {
+      "id": "b5b18078-92b0-41a1-acf0-cecf20908ec7",
+      "ts": "2026-11-23T15:48:09Z",
+      "source": "frieren",
+      "subject": "nixconfig:idle-pane-steward",
+      "action": "landed: drove freebuff (0:1.1) and delphi (0:2.1) — both idle, routed through jevdecide classify (note-change selected decisively), tasks sent via load-buffer+paste-buffer+Enter, both panes verified working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
+      "branch": "main",
+      "frame": "03hagbdtzhq92kj8mmmaotyfm"
+    },
+    {
+      "id": "a4814fda-c09e-4b63-84e0-b36e1d0ea886",
+      "ts": "2026-11-23T15:24:45Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-23-b",
+      "action": "Scouted 7 new leads into the pipeline via apps:scout (stage=lead, fit 5/4): Orcrist Infrastructure/Systems (bare metal, PXE, Ceph, BGP), Diehl Defence OpenShift, Codesphere SRE, dtms STACKIT platform, EGroup Linux infra, Kaufland Kafka/K8s devops, Modaxo infra/SRE. Screened out as already tracked: Device Insight, smartclip, envelio, evoila, Upvest, Mozilla, Orbem, Onebrief, Wikimedia, Kiwigrid.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
+      "branch": "main",
+      "frame": "03hag6tccya24f2wzny817u67"
+    },
+    {
+      "id": "38d9a3b9-0fa6-4b8f-ac12-49cb0c9aeaee",
+      "ts": "2026-11-23T15:22:17Z",
+      "source": "steward",
+      "subject": "nixconfig:steward",
+      "action": "landed: freebuff and delphi — job search work",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
+      "branch": "main",
+      "frame": "03hag6byrgup5xzr7lmez03j2"
+    },
+    {
+      "id": "a2334c6d-234f-40e9-a4b3-31292a72441b",
+      "ts": "2026-11-23T14:49:04Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-23",
+      "action": "Scouted 5 leads into the pipeline through apps:scout (origin scout:<family>), readback 5/5 at stage=lead: Uniper Platform DevOps (devops), Redcare Platform Engineer 2 and Kubernauts Kubernetes Engineer (platform), trivago Platform/SRE (sre), finanzen.net Cloud-Infrastructure (infrastructure). Dropped as dead or already tracked: mogenius, Mittwald, DG-i, InnoCraft, inovex, Doctolib, Exoscale.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
+      "branch": "main",
+      "frame": "03hafzucdybb5iilrwiyjbtng"
+    },
+    {
+      "id": "81774c83-69b5-4c18-803c-db1cda6bb412",
+      "ts": "2026-11-23T14:45:43Z",
+      "source": "delphi",
+      "subject": "nixconfig:delphi",
+      "action": "landed: scout-leads on delphi pane 0:2.1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
+      "branch": "main",
+      "frame": "03hafz6sp05rm9btsb3p7w0cz"
+    },
+    {
+      "id": "336e52df-b647-4ac5-9402-1c2061c394f8",
+      "ts": "2026-11-23T14:45:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff",
+      "action": "landed: scout-leads on freebuff pane 0:1.1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
+      "branch": "main",
+      "frame": "03hafz6prflt71w02p19vmoba"
+    },
+    {
+      "id": "8fda5501-03a1-452c-a68d-fe1a96c1359c",
+      "ts": "2026-11-23T14:39:38Z",
+      "source": "devin",
+      "subject": "nixconfig:images-publish-module",
+      "action": "landed: modules/services/image-publish.nix carries the 4 agentScheduler slots; frieren imports self.modules.\"services.image-publish\" + enables it; slot drvs byte-identical modulo repo path | gate: checks:host frieren + checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
+      "branch": "main",
+      "frame": "03hafy01irjbyk86jd99ufglv"
+    },
     {
       "id": "cd00e1a4-94fa-463d-8fe9-a09a2fc610df",
       "ts": "2026-11-23T14:24:21Z",
@@ -2639,101 +2730,6 @@
       "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
       "branch": "main",
       "frame": "03haao8tarqeviflyab4wtp30"
-    },
-    {
-      "id": "c6e5b94d-01c4-4294-9670-fba9955a7672",
-      "ts": "2026-11-22T22:16:07Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: aki-site.nix audit — 65 units (48 durable, 8 why/history, 6 policy/trap, 2 procedure, 1 fleet fact); routing plan at ~/.local/state/comment-audit/aki-site.md | baseline checks:quick PASS, zero source edits",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
-      "branch": "main",
-      "frame": "03haalvjmxpvklex66peggw9a"
-    },
-    {
-      "id": "2ae1dd2d-58f4-43ea-a69f-7fcf427bddcb",
-      "ts": "2026-11-22T22:15:20Z",
-      "source": "freebuff-steward",
-      "subject": "nixconfig:freebuff-ryoku-research",
-      "action": "landed: drove freebuff pane 0:1.1 with ryoku ricing research (from the pane's own chat direction) — jevdecide research 1.0/1.0 exit 0; submission verified (working 15s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
-      "branch": "main",
-      "frame": "03haalpzx5nlnw3ynh5qmb341"
-    },
-    {
-      "id": "2a9484b4-491f-477f-82a0-b8a68b10f01c",
-      "ts": "2026-11-22T22:15:20Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: drove devin pane 0:2.1 with lib/aki-site.nix comment audit (next module in nix-comment-audit note, 147 comment lines) — jevdecide prose-change 0.88/0.78 exit 0; submission verified (Running tools 25s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
-      "branch": "main",
-      "frame": "03haalpy2h0mx3l208eq7frj7"
-    },
-    {
-      "id": "21b6508e-adc7-4ae0-8706-979964fa0d8f",
-      "ts": "2026-11-22T22:14:59Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "claim: audit pass on lib/aki-site.nix (147 comment lines) — categorize + routing plan",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/aki-site.nix"
-      ],
-      "files": [],
-      "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
-      "branch": "main",
-      "frame": "03haalnhnd4t98194pmuiqdf8"
-    },
-    {
-      "id": "478b2f95-dba2-48b1-854f-26c8abd5dede",
-      "ts": "2026-11-22T21:29:52Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: routing pass executed — 2 notes (delphi-ops-traps, frieren-ops-history), 4 policies.nix predicates, +8 inventory facts, ~70 comment units shrunk to Trap/Story/Rule/Fact pointers | gates: checks:host frieren+delphi PASS, policies PASS, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
-      "branch": "main",
-      "frame": "03haacu9tpe2enyrn2ygpbydd"
-    },
-    {
-      "id": "e954a743-189c-4b7f-a5b7-d948db67219f",
-      "ts": "2026-11-22T21:14:26Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: delphi/configuration.nix comment audit — 155 units categorized (103 durable, 27 policy/trap, 15 why/history, 10 fleet fact, 0 procedure); report at ~/.local/state/comment-audit/delphi-configuration.md | audit-only pass, zero source edits",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0510e08589a8e4ef902f9760fb22a523811955e5",
-      "branch": "main",
-      "frame": "03haa9trhuj38alchy6clj85b"
-    },
-    {
-      "id": "78f650bc-cd6a-43e5-9c28-c30b130e56d1",
-      "ts": "2026-11-22T21:11:23Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "start: audit pass on hosts/delphi/configuration.nix — categorize comments into the five channels, report only, no edits",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi/configuration.nix"
-      ],
-      "files": [],
-      "base_commit": "806aab7c7a9ebf821ef09dc2f4dacaea7d45564c",
-      "branch": "main",
-      "frame": "03haa9899frnof2dlhgnbkm7q"
     }
   ]
 }

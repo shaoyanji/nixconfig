@@ -19,7 +19,7 @@ Each of those is a column jump or a case change. An extractor that reads in docu
 
 The header stacks into one column and the contact URLs are plain text, not link labels a parser may strip. Dates sit on the line they date. Headings use the standard words — `Experience`, `Projects`, `Skills`, `Languages`, and the German equivalents — in normal case, with no tracking, and a heading can no longer end a page alone. The footer is a page number, and a one-page document has none.
 
-The site itself changed with them: every case study and brief now links the CV tailored to it, so the document a reader downloads is already the one that matches the page they were on.
+The site was meant to follow: a case study would offer the CV that matches it. What ships is less tidy. Every case study and every brief still hands out the energy CV, including the ones about a NixOS fleet, platform work and vulnerability operations, so the parser work is right and the routing between page and document is not. That is a defect to fix, not a design decision to defend.
 
 ## What it cost
 

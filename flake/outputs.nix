@@ -38,6 +38,10 @@
   moduleSets = import ./module-sets.nix {
     inherit inputs self lib inventory;
     moduleFiles = nixRegistry.modules;
+    # Defined just below; `let` is lazy and host-inventory takes nothing from
+    # moduleSets, so this is a forward reference, not a cycle. Injected as a
+    # module arg so `home-manager-shared` can read a host's own hmFeatures.
+    inherit hostInventory;
   };
   hostInventory = import ./host-inventory.nix {
     inherit inputs self;

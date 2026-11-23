@@ -54,16 +54,8 @@
   programs.dms-greeter.enable = lib.mkForce false;
 
   # `desktop` is the role's niri/DMS home layer and is the one feature the fork
-  # drops; shell, dev, ai, browser and media still come from roles.home.
-  fleet.hmUserFeatures = lib.mkForce [
-    "systemd-policy"
-    "shell"
-    "dev"
-    "ai"
-    "browser"
-    "media"
-  ];
-
+  # drops — declared as `hmFeatures` in flake/host-inventory.nix, not an
+  # mkForce here, so the subset is data next to the host's `features`.
   # Phone integration without a shell-specific layer: KDE Connect and the
   # adb/scrcpy tools below are standalone. The ryoku `phone.json` this host used
   # to write is gone with the pilot — it existed only for Ryoku's QML side.

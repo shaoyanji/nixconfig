@@ -3,6 +3,10 @@
   self,
   lib,
   inventory,
+  # flake/host-inventory.nix — the composition registry (kind, features,
+  # modules, hmFeatures per host). Injected as a module arg so a module can
+  # read a host's own declared lists instead of a global default.
+  hostInventory,
   # Every file under modules/, named (flake/nix-registry.nix). Chains name
   # the architecture's feature lists — the shape is note arch-shape.
   # modules instead of pointing at them; the walk is the one list.
@@ -34,7 +38,7 @@
   inventoryModules = [
     {
       _module.args = {
-        inherit inventory;
+        inherit inventory hostInventory;
         user = import moduleFiles."global.user";
         systemdJobs = import self.nixFiles.lib."systemd-jobs.nix" {inherit lib;};
       };

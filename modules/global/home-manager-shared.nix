@@ -5,8 +5,21 @@
   lib,
   config,
   user,
+  hostInventory,
   ...
-}: {
+}: let
+  # The host's own role list, declared next to its `features`/`modules` in
+  # flake/host-inventory.nix. A host without the field takes the full set —
+  # the same value it had before the list became data. nix-darwin leaves
+  # `networking.hostName` null (it is an option, so `or` does not fire), and
+  # standalone chains have no `networking` at all — either way the shared
+  # default degrades rather than erroring the eval.
+  hostName = config.networking.hostName or "";
+  hostFeatures =
+    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+    then hostInventory.${hostName}.hmFeatures or user.hmFeatures
+    else user.hmFeatures;
+in {
   # A second Wayland shell cannot share a session with DMS: whichever starts
   # last owns the bar, lock and notification surfaces. A host that owns its own
   # shell turns this off, which also drops `user/desktop/niri.nix` (see
@@ -26,12 +39,19 @@
 
   # Which parts of `roles.home` this host builds. A name the role does not know
   # is a typo, and an enum makes that an eval error instead of a silently
-  # ignored string. Default is the full set in `modules/global/user.nix`.
+  # ignored string. The default is the host's own `hmFeatures` from
+  # flake/host-inventory.nix (mkDefault, so an explicit definition still wins);
+  # `modules/global/user.nix` is only the enum and the no-field fallback.
   options.fleet.hmUserFeatures = lib.mkOption {
     type = lib.types.listOf (lib.types.enum user.hmFeatures);
     default = user.hmFeatures;
     description = "Named features of the desktop role (modules/roles/home.nix).";
   };
+
+  # mkDefault (1000): above the option default (1500), below an explicit host
+  # definition (100). An edit to one host's role is an edit to its inventory
+  # entry — it cannot reach the other eleven.
+  config.fleet.hmUserFeatures = lib.mkDefault hostFeatures;
 
   config.home-manager = {
     useGlobalPkgs = true;

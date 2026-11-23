@@ -28,6 +28,7 @@
     # The fleet desktop chain. The host imports base-desktop-environment itself;
     # the Ryoku tier it ran from 2026-11-02 to 2026-11-11 is retired.
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/poseidon/configuration.nix];
   };
 
@@ -73,6 +74,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/eisen/configuration.nix];
   };
 
@@ -97,6 +99,7 @@
     # nothing started. The bridge and NAT the canary needs come from
     # modules/profiles/microvm-host.nix, which infra-stack.nix imports directly.
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/frieren/configuration.nix];
   };
 
@@ -114,6 +117,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms" "disko"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [
       ../hosts/stark/configuration.nix
       (import ../hosts/stark/disko.nix {
@@ -133,6 +137,7 @@
     # fleet chain and the session comes from profiles.dwl-desktop, the same profile
     # netbook and scratch adopt.
     features = ["base" "nixos" "dms" "disko"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media"];
     modules = [
       ../hosts/fern/configuration.nix
       (import ../hosts/fern/disko.nix {device = "/dev/nvme0n1";})
@@ -143,6 +148,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms" "impermanence"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [
       ../hosts/schneeeule/configuration.nix
       (import ../hosts/common/disko.nix {device = "/dev/sda";})
@@ -153,6 +159,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/scratch/configuration.nix];
   };
 
@@ -160,6 +167,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/aristotle/configuration.nix];
   };
 
@@ -167,6 +175,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/diogenes/configuration.nix];
   };
 
@@ -191,6 +200,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/aceofspades/configuration.nix];
   };
 
@@ -198,6 +208,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/ancientace/configuration.nix];
   };
 
@@ -307,6 +318,7 @@
     kind = "darwin";
     system = "aarch64-darwin";
     features = ["base" "macos"];
+    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/cassini/configuration.nix];
   };
 }

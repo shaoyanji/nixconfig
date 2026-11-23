@@ -29,9 +29,13 @@ An edit to `hmSharedModulesHome` lands on exactly these 4 — aarch64-linux
 ## Chain B — `roles.home` via `fleet.hmUserModules` / `fleet.hmUserFeatures`
 
 The embedded user role. `modules/global/home-manager-shared.nix` declares both
-options (`hmUserModules` default `[roles.home]`; `hmUserFeatures` default =
-`user.hmFeatures`, enum-typed so a typo is an eval error). `roles.home` maps
-each feature to its module set; `roles.minimal` is unconditional inside it.
+options (`hmUserModules` default `[roles.home]`; `hmUserFeatures` =
+`mkDefault` of the host's own `hmFeatures` in `flake/host-inventory.nix`,
+enum-typed so a typo is an eval error; `user.hmFeatures` is the enum and the
+fallback for a host with no field). `roles.home` maps each feature to its
+module set; `roles.minimal` is unconditional inside it. An edit to one host's
+`hmFeatures` list lands on that host only — the per-host split this audit
+recommended is landed.
 
 `home-manager-shared` is imported by exactly two global modules:
 
@@ -40,10 +44,10 @@ each feature to its module set; `roles.minimal` is unconditional inside it.
 
 | host | shape | notes |
 |---|---|---|
-| aceofspades, aristotle, diogenes, eisen, poseidon, schneeeule, scratch, stark | feature chain (`base nixos dms`), full 7-feature role | default consumers |
+| aceofspades, aristotle, diogenes, eisen, poseidon, schneeeule, scratch, stark | feature chain (`base nixos dms`), `hmFeatures` = full 7 | own list |
 | ancientace | chain + user override | `EDITOR` mkForce on top of the role |
 | frieren | chain + user overrides | `aria2-user-fallback` off, `hermes-user` on — additive merges |
-| fern | chain + **feature fork** | `fleet.hmUserFeatures = mkForce [6/7]` — drops `desktop` (dwlDesktop owns its compositor); also `antigravity-cli` off per-user |
+| fern | chain + **feature subset** | `hmFeatures` = 6/7 in inventory — drops `desktop` (dwlDesktop owns its compositor); also `antigravity-cli` off per-user |
 | cassini | chain (`base macos`) | darwin — `desktop`/`niri` layer self-gates on Linux; eval-level trap documented in roles/home.nix |
 
 Feature → module map (`roles/home.nix`): `systemd-policy` `shell` `dev`
@@ -70,10 +74,11 @@ these — 25 configurations total. `netbook`, `testvm`, `garnixMachine`,
   boundary already failed evaluation once (documented in `roles/home.nix`).
   Any edit to `desktop`/`media` feature contents must be gated or eval'd on
   aarch64-darwin, not assumed.
-- **Fork drift: fern** — its mkForce subset shadows the default list. A NEW
-  feature added to `user.hmFeatures` will NOT reach fern until its subset is
+- **Subset drift: fern** — its `hmFeatures` is an explicit 6-item list. A NEW
+  feature added to `user.hmFeatures` will NOT reach fern until its list is
   updated — silent partial adoption, not an error. The enum catches typos,
-  not omissions.
+  not omissions. Same rule applies to any host that later takes an explicit
+  subset.
 - **Override conflict: ancientace, frieren** — per-user merges are additive;
   a role-level change to `EDITOR`/aria2/hermes-user fights the host's own
   definitions at module priority. mkForce hosts win; non-force hosts conflict.
@@ -87,9 +92,10 @@ these — 25 configurations total. `netbook`, `testvm`, `garnixMachine`,
 The mechanism already gives per-host control; use it in this order:
 
 1. **One host, one feature.** To change what one host's HM builds, edit that
-   host's `fleet.hmUserFeatures` subset (Chain B) or its `modules` list in
-   `flake/host-inventory.nix` (Chain A/C). Never `mkForce` a deeper option —
-   `home-manager-shared.nix` exists so the fork is an option value.
+   host's `hmFeatures` list in `flake/host-inventory.nix` (Chain B) or its
+   `modules` list (Chain A/C). An explicit `fleet.hmUserFeatures` definition
+   in a host config still wins over the inventory `mkDefault` — keep it for
+   exceptions that must not live in shared data.
 2. **Gate:** `task checks:host HOST=<h>` for the edited host — it evaluates
    the nested HM eval, which is where option-surface errors land. For chain-A
    hosts the same task evaluates the `homeConfigurations` attr.
@@ -107,8 +113,9 @@ The mechanism already gives per-host control; use it in this order:
 | edit target | lands on | first verify |
 |---|---|---|
 | `hmSharedModulesHome` | alarm, clanker, kali, penguin | `checks:host` on alarm + clanker (both arches) |
-| `features.<f>` in `roles/home.nix` | 12 embedded hosts (fern excluded for `desktop`) | `checks:host` frieren + cassini (nixos + darwin) |
-| `user.hmFeatures` default list | 12 embedded, minus fern's shadowed subset | same |
+| `features.<f>` in `roles/home.nix` | every host whose `hmFeatures` names `<f>` (12 for most; fern excluded for `desktop`) | `checks:host` frieren + cassini (nixos + darwin) |
+| `user.hmFeatures` enum | all 12 — removing a name breaks every list | same |
+| one host's `hmFeatures` in `flake/host-inventory.nix` | that host only | `checks:host` on that host |
 | `home-manager-shared` (options, sharedModules) | 12 embedded hosts | same |
 | `global.noDE` / `global.demo` | 8 containers / 1 demo | `checks:host` on a container host |
 | `inputs.home-manager` pin | 25 configurations | eval every kind, one host each |

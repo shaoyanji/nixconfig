@@ -154,10 +154,20 @@ fallback_providers:
   # handshake plus a rejection before reaching the lane that actually answers —
   # a 3-hop failover for a one-word reply. The near, unthrottled lane belongs
   # where the throttle fires.
-  - provider: nvidia
-    model: nvidia/nemotron-3.5-super-vl-120b-a12b
+  # DeepSeek-v4-flash is the first fallback on the CrowLLM route. Probed
+  # 2026-11-23: `GET <base>/models` lists `deepseek-v4-flash:free`; chat
+  # completions returned 503 (temporary overload) on two attempts, so the lane
+  # stays in the chain and is skipped at runtime until the provider recovers —
+  # it is not removed. The next CrowLLM lanes remain the 550b nemotron and the
+  # qwen omni flash; if deepseek also 5xx's, re-probe before blaming the key.
+  - provider: custom
+    model: deepseek-v4-flash:free
+    base_url: https://crowllm.com/v1
+    key_env: CROWLLM_API_KEY
   - provider: openrouter
     model: baidu/ernie-5.5-flash-preview:free
+  - provider: nvidia
+    model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: custom
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
@@ -291,5 +301,6 @@ approvals:
 command_allowlist:
   - execute_code
   - script execution via -e/-c flag
+  - script execution via heredoc
 memory:
   write_approval: true

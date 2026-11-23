@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-23T19:47:32Z",
+  "generated": "2026-11-23T20:03:27Z",
   "count": 200,
-  "pin": "90d51cba2c23883631ecabfcc00b0e83bb93103663e8c419b805764ab206c84b",
+  "pin": "234b7416fbd7ac827547ae0e7d9d2aba877c7e90b2af650d43c6b62d95615a6e",
   "turns": [
+    {
+      "id": "15288678-9f67-49e6-abbe-61679aa9a53b",
+      "ts": "2026-11-23T19:48:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-scout",
+      "action": "correction: the CV site ships 16 HTML pages, not 17 — all 16 are byte-equal to the HEAD build (2 homes, 6 briefs, 8 case studies); every other figure stands (25 canonical routes 200, 6 PDFs sha-equal, cv gate 14/0, site:check 35/47/17 ok, 3 new leads, leads 99->102)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d533f8ebaf6ee1338771df249eacef5c5acf841e",
+      "branch": "main",
+      "frame": "03hahma0sli3yeug7dd4tu4j4"
+    },
+    {
+      "id": "6d764ad8-68da-4441-a1a6-541bed70d468",
+      "ts": "2026-11-23T19:48:05Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-scout",
+      "action": "landed: CV site live == HEAD build (17 HTML byte-equal, 25/25 canonical routes 200, 6 PDFs sha-equal, cv gate 14/0, site:check 35/47/17 ok); scouted 3 new leads (Seltz, HyPlus, sustaind) and built their tailored packets; leads 99->102, tracked 790 | gate: cv-links-check + site:check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d533f8ebaf6ee1338771df249eacef5c5acf841e",
+      "branch": "main",
+      "frame": "03hahm967dhbg18opv5f6pehx"
+    },
+    {
+      "id": "8131d6bc-3ff5-40af-9bdf-f65216ee8ad9",
+      "ts": "2026-11-23T19:47:48Z",
+      "source": "devin",
+      "subject": "nixconfig:netbook-dwl-ci",
+      "action": "landed: dwl 0.9 graft for pkgs.dwl <0.9 (axes[]/snap missing on 0.8 broke CI netbook toplevel) | gate: nix build programs.dwl.package dwl-0.9 PASS on pinned pkgs, checks:host netbook PASS (1463 assertions), nix:lint clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d533f8ebaf6ee1338771df249eacef5c5acf841e",
+      "branch": "main",
+      "frame": "03hahm781uanv83zzqxgxyhhb"
+    },
     {
       "id": "86e8085a-ce14-40be-9bff-d524ee36f1d5",
       "ts": "2026-11-23T19:40:14Z",
@@ -2681,45 +2720,6 @@
       "base_commit": "ab1439a25af8e5c4e5fb4f2da0c69718311f9045",
       "branch": "main",
       "frame": "03hab45c3s0s0f77j33zquemn"
-    },
-    {
-      "id": "f5321d89-b12a-47fa-868b-ccdcff4931c1",
-      "ts": "2026-11-22T23:46:08Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:pliant-nix-verify",
-      "action": "steward routed read-only research to delphi pane 0:3.1 (ssh tunnel) via jevdecide classify (research 1.0 / margin 1.0): resolve whether Pliant Compute Node / DevTools are NixOS-based from public docs/jobs, record verdict, no writes outside /tmp; pane confirmed working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
-      "branch": "main",
-      "frame": "03hab3givgt4yw69b5im1w105"
-    },
-    {
-      "id": "9a832f4d-a6d7-4421-a3b6-f888f8baa42f",
-      "ts": "2026-11-22T23:46:07Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:comment-audit-continue",
-      "action": "steward routed next nixconfig task to devin pane 0:2.1 via jevdecide classify (prose-change 0.97 / margin 0.95): continue the OPEN nix-comment-audit note, audit remaining host .nix modules (delphi, frieren), route misplaced comments, run checks:quick, commit+push; pane confirmed Thinking",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
-      "branch": "main",
-      "frame": "03hab3ggtc7vgi7nsgr8cxv1t"
-    },
-    {
-      "id": "4eb8d088-92ed-47d1-aa64-3fcee6cce3a3",
-      "ts": "2026-11-22T23:46:07Z",
-      "source": "freebuff-steward",
-      "subject": "shaoyanji.is-a.dev:ryoku-cv-nav",
-      "action": "steward routed next CV-site task to freebuff pane 0:1.1 via jevdecide classify (publish 1.0 / margin 1.0): add nav link to the ryoku CV page /cv/ryoku/ in site header + CV index, rebuild and confirm page/CSS/PDFs return HTTP 200; pane confirmed working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
-      "branch": "main",
-      "frame": "03hab3gesfdik8w7q7jtiuu3m"
     }
   ]
 }

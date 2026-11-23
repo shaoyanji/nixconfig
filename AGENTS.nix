@@ -5268,5 +5268,83 @@
         "Gap B"/"Gap D" in comments number a retired feature-gap list.
       '';
     };
+
+    hm-leaf-chain-split = {
+      title = "The remaining HM chains: roles.home's minimal hardcode and the user.base/user.ai leaf lists";
+      kind = "proposal";
+      status = "PROPOSED";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "After the per-host list split (hmFeatures/hmModules landed 1ce4ac4f), three hardcoded import lists still land multi-host: roles.home's unconditional roles.minimal (12 embedded hosts), roles.minimal's [user.base user.ai] (22 hosts), and the leaf lists inside user.base (7 imports) and user.ai (6). Same shape as the earlier splits: maps stay shared, lists become per-host data.";
+      from = ["eval-cost-ladder"];
+      refs = {
+        hosts = [
+          "poseidon"
+          "eisen"
+          "frieren"
+          "stark"
+          "fern"
+          "schneeeule"
+          "scratch"
+          "aristotle"
+          "diogenes"
+          "aceofspades"
+          "ancientace"
+          "cassini"
+          "mtfuji"
+          "kellerbench"
+          "deckstation"
+          "delphi"
+          "applevalley"
+          "ares"
+          "guckloch"
+          "sledgehammer"
+          "alarm"
+          "kali"
+        ];
+        modules = [
+          "modules/roles/home.nix"
+          "modules/roles/minimal.nix"
+          "modules/user/base.nix"
+          "modules/user/ai/default.nix"
+          "flake/host-inventory.nix"
+          "modules/global/home-manager-shared.nix"
+          "modules/global/noDE.nix"
+        ];
+        tasks = ["checks:drv-equality" "checks:host" "checks:quick"];
+      };
+      body = ''
+        Blast radius (ops:kg:blast + host-inventory join — the kg sees static
+        self.modules."x" references but not the dynamic hmModules resolution, so
+        roles.lean/roles.demo show 0 importers while clanker/demo consume them):
+
+        - roles.home → 12 embedded hosts via the fleet.hmUserModules default:
+          poseidon, eisen, frieren, stark, fern, schneeeule, scratch, aristotle,
+          diogenes, aceofspades, ancientace, cassini.
+        - roles.minimal → those 12 via roles/home's hardcoded import, plus
+          hmModules on mtfuji, kellerbench, deckstation, delphi, applevalley,
+          ares, guckloch, sledgehammer (containers), alarm, kali — 22 hosts.
+        - user.base (scripts, lf, env, shell, sops, helix, lynx) and user.ai
+          (aichat, antigravity-cli, skills, freebuff-remote, mainframe-remotes,
+          zed-mcp) → the same 22 through minimal. Containers pay the import
+          surface then gate it off (noDE: profiles.ai.enable=false).
+        - roles.lean (clanker) and roles.demo (demo): one host each — already
+          per-host. The roles/home features map and system featureModules map
+          are shared by design: a feature is its definition.
+
+        Plan, consistent with list-per-host / map-shared:
+        1. `minimal` becomes a named entry in roles/home's features map; every
+           embedded host's hmFeatures gains it (drv-identical) so the base+ai
+           floor is droppable per host.
+        2. roles.minimal's list becomes the same map shape (hmMinimalFeatures),
+           or dissolves into the 10 consumers' hmModules (penguin's pattern).
+        3. user.base / user.ai lists become per-host data (hmBaseFeatures /
+           hmAiFeatures) so a container's AI-off is data, not option disables.
+
+        Exit: drv-equality identical on all evaluating hosts; checks:host on
+        delphi + cassini + fern (one per chain); checks:quick green; noDE's
+        profiles.ai disable retired or reduced to one data word.
+      '';
+    };
   };
 }

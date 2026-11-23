@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-23T22:24:40Z",
+  "generated": "2026-11-23T23:25:28Z",
   "count": 200,
-  "pin": "bf4a2caafedba63ebc6d189bd1c3350d3ef1d0ca92eb7d874b2b84c4c7e54506",
+  "pin": "ee4c53e5cc6bc5c5a38cb6bfc86bf2d7032a8a6a8ba1d4f3bc1db0de51c40119",
   "turns": [
+    {
+      "id": "9ceba656-87f6-4fd6-ade1-703a7c1e0b72",
+      "ts": "2026-11-23T23:24:36Z",
+      "source": "codebuff",
+      "subject": "nixconfig:matt-publish",
+      "action": "Published matt.bountystash.com from HEAD 9793a01b: matt:build produced .#sites.matt-site (29 files), matt:deploy:prod uploaded to the matt Pages project (deployment abffac65.matt-9pf.pages.dev), and all 28 served artifacts now hash-equal to the build (_headers is a Pages control file, not a served path) | gate: pages-deploy readiness (200 on every shipped index path) + site:check 0 failed + 28/28 byte comparison PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9793a01b3f98027bb2e7d16366fc689d0938b65b",
+      "branch": "main",
+      "frame": "03haisjtndw1d5obb3j0dj8ez"
+    },
+    {
+      "id": "98e4d1a4-e48b-4a2d-b529-eb8e7a2481df",
+      "ts": "2026-11-23T23:23:12Z",
+      "source": "steward-cron",
+      "subject": "nixconfig:steward-pane-drive",
+      "action": "drove 3 idle panes via jevdecide+labels.json: devin 0:0.1 chain-change 0.99 (chain-split blast-radius audit+note), freebuff 0:1.1 publish 0.98 (CV-site build+deploy to HEAD), delphi 0:2.1 prose-change 1.0 (ryoku DESIGN.md contrast prose); all 3 verified working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9793a01b3f98027bb2e7d16366fc689d0938b65b",
+      "branch": "main",
+      "frame": "03hais9xwo302fbs8v2io2oa3"
+    },
+    {
+      "id": "9d158940-8b0d-46bd-a932-8f35344902eb",
+      "ts": "2026-11-23T22:24:50Z",
+      "source": "devin",
+      "subject": "nixconfig:image-engine-go",
+      "action": "landed: generation orchestration (run_lane/attempt/judge_image) and upload leg (stage_publish/adopt_cloudinary) ported to tools/image-daily — judge/attempt/lane/stage/adopt subcommands; engine 632 -> 307 | gate: checks:quick PASS, images:gate PASS, checks:host frieren PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9793a01b3f98027bb2e7d16366fc689d0938b65b",
+      "branch": "main",
+      "frame": "03haigvi8lllq932thj1ud6p5"
+    },
     {
       "id": "8edcc03a-c44d-495e-9254-5946c5071aaa",
       "ts": "2026-11-23T22:12:15Z",
@@ -2678,52 +2717,6 @@
       "base_commit": "b8f8235141a3a388a2e1cee8dd624841de3af571",
       "branch": "main",
       "frame": "03habgjwsim6fhr1d0n9xrlnb"
-    },
-    {
-      "id": "d66494bd-2877-48b5-9e9d-15cc1e6ccac8",
-      "ts": "2026-11-23T00:49:35Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:steward-delphi-jobhunt",
-      "action": "landed: steward drove the delphi freebuff pane (0:3.1, ssh-tunneled) — verified EU-remote shortlist leads still live, researched Flox (D.E. Shaw origin, $25M Series B, Nix packaging), now comparing Nix/NixOS evidence across Langfuse/ClickHouse/Flox/n8n to rank the shortlist",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "4d5cc2916a5a04870877a68b9a51e3a4f7e9c1ef",
-      "branch": "main",
-      "frame": "03habfupb62gi38lrgv5n27gu"
-    },
-    {
-      "id": "d773f0ad-d815-4027-9f2c-8fdd1fc1e176",
-      "ts": "2026-11-23T00:49:21Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:steward-devin-nixconfig",
-      "action": "landed: steward drove the devin pane (0:2.1) — comment header fix for router-labels/task-descs (committed 8d90ab9b), then merged chore/deadnix-cleanup (deadnix gate widened to whole nix tree, committed 4d5cc291), then merging devin/1795077799-kg-zeck-cache (epoch-scoped Zeckendorf graph cache)",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/checks.nix",
-        "scripts/task/nix-fmt.sh"
-      ],
-      "files": [],
-      "base_commit": "4d5cc2916a5a04870877a68b9a51e3a4f7e9c1ef",
-      "branch": "main",
-      "frame": "03habft4m22j26jh5u97d588d"
-    },
-    {
-      "id": "0f332b68-ecb3-4c21-9bd3-521bbae63275",
-      "ts": "2026-11-23T00:49:07Z",
-      "source": "freebuff-steward",
-      "subject": "nixconfig:steward-freebuff-ryoku-theme",
-      "action": "landed: steward drove the freebuff pane (0:1.1) to apply the ryoku design system to the shaoyanji.is-a.dev site — home page themed (--ry-paper present), then theme remaining pages (about, blog, archives, tags, categories); build + HTTP 200 verify + push to origin/main",
-      "outcome": "in_progress",
-      "claims": [
-        "shaoyanji.is-a.dev"
-      ],
-      "files": [],
-      "base_commit": "4d5cc2916a5a04870877a68b9a51e3a4f7e9c1ef",
-      "branch": "main",
-      "frame": "03habfrfwf4r6fcxgejsr86b5"
     }
   ]
 }

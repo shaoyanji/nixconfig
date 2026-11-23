@@ -1,5 +1,6 @@
 {
   "nixos-fleet": {
+    "cv": "software",
     "title": "A fleet that one commit describes",
     "standfirst": "Thirteen NixOS machines built from one flake. A host can be rebuilt, audited and handed over from the repository alone.",
     "period": "2023 — now",
@@ -39,6 +40,7 @@
     ]
   },
   "bountystash": {
+    "cv": "software",
     "title": "A specification you can replay",
     "standfirst": "Bountystash turns a request into an immutable, content-addressed document. Every view is a replay of recorded events, and the same request produces the same document.",
     "period": "2020 — 2023",
@@ -77,6 +79,7 @@
     ]
   },
   "fibtransponder": {
+    "cv": "software",
     "title": "A benchmark that killed the first design",
     "standfirst": "A streaming state machine over a bitstream, built to keep the work per step bounded. The measurable result was negative, and that is the part worth showing.",
     "period": "2026",
@@ -115,6 +118,7 @@
     ]
   },
   "energy-telemetry": {
+    "cv": "energy",
     "title": "A hundred million dollars of sunlight, reconciled",
     "standfirst": "Asset management for a solar portfolio above $100M. The work was to make the numbers survive an audit and to notice when a sensor was lying.",
     "period": "2016 — 2020",

@@ -1,5 +1,6 @@
 {
   "nixos-fleet": {
+    "cv": "software",
     "title": "Eine Flotte, die ein Commit beschreibt",
     "standfirst": "Dreizehn NixOS-Maschinen aus einem Flake. Ein Host lässt sich allein aus dem Repository neu bauen, prüfen und übergeben.",
     "period": "2023 — heute",
@@ -39,6 +40,7 @@
     ]
   },
   "bountystash": {
+    "cv": "software",
     "title": "Eine Spezifikation, die sich wieder abspielen lässt",
     "standfirst": "Bountystash macht aus einer Anfrage ein unveränderliches, inhaltsadressiertes Dokument. Jede Ansicht ist ein Replay aufgezeichneter Ereignisse, und dieselbe Anfrage ergibt dasselbe Dokument.",
     "period": "2020 — 2023",
@@ -77,6 +79,7 @@
     ]
   },
   "fibtransponder": {
+    "cv": "software",
     "title": "Ein Benchmark, der den ersten Entwurf zu Fall gebracht hat",
     "standfirst": "Ein streamender Zustandsautomat, der einen Bitstrom liest, ohne ihn zu puffern. Gebaut, um die Arbeit pro Schritt begrenzt zu halten — das messbare Ergebnis war negativ, und genau das ist der interessante Teil.",
     "period": "2026",
@@ -115,6 +118,7 @@
     ]
   },
   "energy-telemetry": {
+    "cv": "energy",
     "title": "Hundert Millionen Dollar Sonnenlicht, abgeglichen",
     "standfirst": "Asset Management für ein Solarportfolio von über 100 Mio. USD. Die Arbeit bestand darin, die Zahlen durch eine Prüfung zu bringen und zu merken, wenn ein Sensor lügt.",
     "period": "2016 — 2020",

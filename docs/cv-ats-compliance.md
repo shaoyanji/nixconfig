@@ -196,6 +196,35 @@ The deployed artifact agrees with the gate rather than merely with the store:
 all six URLs on `matt.bountystash.com` answer `200 application/pdf` with the
 byte count and sha256 of the file this build produced.
 
+## The routing gate: a page offers the CV its record names
+
+Which CV a page offers is a property of the page's subject, so it lives in the
+record: `"cv": "energy"` on `energy-telemetry`, `"software"` on the fleet,
+Bountystash, fibtransponder and audit records and on all three briefs, in both
+languages. `mkArticle` reads that field and derives the filename from it, so the
+routing table is the content rather than a second list in `lib/matt-site.nix`
+that can drift from it.
+
+Both directions fail the build. A record without `cv` throws while its page is
+rendered, naming the file and slug; a variant no PDF pair exists for throws
+before the site is built (`no PDF pair for CV variant(s)`), which is what keeps a
+third variant honest — adding `cv-fleet.json` and its German twin is a record
+change and a `cvFiles` entry, not an edit to a routing map.
+
+`scripts/task/site-routing.sh` runs in the derivation before the link gate and
+compares every page with its record: exactly one `a.cv` anchor, resolving to
+`cv-<variant>[-de].pdf`, both home pages on the full CV, both locales naming the
+same variant. It reads the HTML, not the expression that wrote it, so a stale
+href in the template is a build failure:
+
+```text
+FAIL work/nixos-fleet.html: record names cv-software.pdf, page links ../cv-energy.pdf
+site-routing: 1 defect(s)
+```
+
+The `_headers` cache rule is generated from `cvFiles` for the same reason: one
+list names the PDFs, and the installs, the cache rule and both gates read it.
+
 `--check` is not a flag on this Nix (`2.35.3`): it errors before building, and
 `--rebuild` only re-runs a derivation whose output is already in the store. To
 verify a change to the gate, perturb the input and build plainly — the failing

@@ -1,5 +1,6 @@
 {
   "platform": {
+    "cv": "software",
     "title": "The first ninety days on a platform team",
     "kicker": "Platform and infrastructure",
     "standfirst": "What I would do before changing anything, and what I would expect to be running by the end of the quarter.",
@@ -26,6 +27,7 @@
     "closing": "The failure I watch for is a platform team that ships abstractions and no services. If nothing runs on it at day ninety, the work is not finished."
   },
   "vulnerability-operations": {
+    "cv": "software",
     "title": "The first ninety days on a vulnerability programme",
     "kicker": "Security and vulnerability operations",
     "standfirst": "A programme starts with the queue nobody owns, and ends with a number that moves every week.",
@@ -52,6 +54,7 @@
     "closing": "By day ninety I want the median age of an exploited entry to be a target someone chose, and a weekly report that says whether we hit it."
   },
   "nixos-fleet-audit": {
+    "cv": "software",
     "title": "NixOS Fleet Audit",
     "kicker": "Fixed-scope infrastructure review",
     "standfirst": "A five-day review of a NixOS fleet: what is fragile, what is unowned, and the smallest set of changes that removes the next outage.",

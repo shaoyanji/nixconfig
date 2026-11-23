@@ -1,5 +1,6 @@
 {
   "platform": {
+    "cv": "software",
     "title": "Die ersten neunzig Tage in einem Plattform-Team",
     "kicker": "Plattform und Infrastruktur",
     "standfirst": "Was ich tue, bevor ich etwas ändere, und was am Ende des Quartals laufen soll.",
@@ -26,6 +27,7 @@
     "closing": "Der Fehler, auf den ich achte, ist ein Plattform-Team, das Abstraktionen ausliefert und keine Dienste. Wenn am neunzigsten Tag nichts darauf läuft, ist die Arbeit nicht fertig."
   },
   "vulnerability-operations": {
+    "cv": "software",
     "title": "Die ersten neunzig Tage in einem Schwachstellenprogramm",
     "kicker": "Security und Schwachstellenbetrieb",
     "standfirst": "Ein Programm beginnt mit der Warteschlange, für die niemand zuständig ist, und endet mit einer Zahl, die sich jede Woche bewegt.",
@@ -52,6 +54,7 @@
     "closing": "Am neunzigsten Tag soll das mittlere Alter eines ausgenutzten Eintrags ein Ziel sein, das jemand gewählt hat, und ein Wochenbericht sagen, ob wir es erreicht haben."
   },
   "nixos-fleet-audit": {
+    "cv": "software",
     "title": "NixOS-Flotten-Audit",
     "kicker": "Infrastrukturprüfung zum Festpreis",
     "standfirst": "Fünf Tage Prüfung einer NixOS-Flotte: was fragil ist, was niemand verantwortet und welche kleine Änderung den nächsten Ausfall verhindert.",

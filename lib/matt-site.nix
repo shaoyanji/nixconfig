@@ -201,6 +201,55 @@
   caseSlugs = cases |> builtins.attrNames;
   briefSlugs = briefs |> builtins.attrNames;
 
+  # The record owns the routing: `cv` in cases.json / briefs.json (and the German
+  # twins) names the variant a page offers. A record without it throws naming the
+  # file and slug, and a variant the build ships no PDF pair for throws before the
+  # site is built, so a new case study chooses its subject instead of inheriting
+  # a default. Why: docs/cv-ats-compliance.md.
+  articleRecord = lang: kind: slug: let
+    set =
+      if kind == "case"
+      then (
+        if lang == "de"
+        then casesDe
+        else cases
+      )
+      else (
+        if lang == "de"
+        then briefsDe
+        else briefs
+      );
+  in
+    set.${slug};
+
+  articleVariant = lang: kind: slug: let
+    record = articleRecord lang kind slug;
+    file = "${if kind == "case" then "cases" else "briefs"}${if lang == "de" then ".de" else ""}.json";
+  in
+    record.cv or (throw "matt-site: ${file} entry '${slug}' names no CV — add \"cv\": \"energy\" or \"software\"");
+
+  cvFileName = variant: lang:
+    if variant == "full"
+    then (
+      if lang == "de"
+      then "cv-de.pdf"
+      else "cv.pdf"
+    )
+    else "cv-${variant}${if lang == "de" then "-de" else ""}.pdf";
+
+  declaredVariants = lib.unique (
+    (map (s: articleVariant "en" "case" s) caseSlugs)
+    ++ (map (s: articleVariant "de" "case" s) caseSlugs)
+    ++ (map (s: articleVariant "en" "brief" s) briefSlugs)
+    ++ (map (s: articleVariant "de" "brief" s) briefSlugs)
+  );
+
+  unshippedVariants =
+    declaredVariants
+    |> builtins.filter (
+      v: !(builtins.elem (cvFileName v "en") (map (c: c.name) cvFiles)) || !(builtins.elem (cvFileName v "de") (map (c: c.name) cvFiles))
+    );
+
   # Measurement, off until an endpoint exists. Cloudflare Pages counts pageviews
   # from its dashboard without a script; this hook is for outbound clicks.
   mkAnalytics = a:
@@ -548,23 +597,7 @@
           else briefs
         );
     c = dataSet.${slug};
-    # A case study or a brief offers the CV that argues for its own subject: the
-    # solar portfolio hands out the energy variant, a fleet or a vulnerability
-    # programme the software one. Each language has both variants, so a German
-    # page never hands a German reader an English PDF. Every slug the site builds
-    # is listed, because a PDF no page links fails the build — a new page has to
-    # choose a variant rather than inherit one by accident.
-    variant =
-      {
-        energy-telemetry = "energy";
-        nixos-fleet = "software";
-        bountystash = "software";
-        fibtransponder = "software";
-        platform = "software";
-        vulnerability-operations = "software";
-        nixos-fleet-audit = "software";
-      }
-      .${slug} or "full";
+    variant = articleVariant lang kind slug;
     url = "${siteUrl}/${
       if lang == "de"
       then "de/"
@@ -638,23 +671,7 @@
       inherit (ui) themeAria;
       inherit (ui) langLabel;
       inherit langSwitch;
-      cvHref = "${pageRoot}${
-        if lang == "de"
-        then (
-          if variant == "energy"
-          then "cv-energy-de.pdf"
-          else if variant == "software"
-          then "cv-software-de.pdf"
-          else "cv-de.pdf"
-        )
-        else (
-          if variant == "energy"
-          then "cv-energy.pdf"
-          else if variant == "software"
-          then "cv-software.pdf"
-          else "cv.pdf"
-        )
-      }";
+      cvHref = "${pageRoot}${cvFileName variant lang}";
       inherit (ui) cvLabel;
       cssHref = "${pageRoot}style.css";
       footer = "${privacy ui d.analytics} ${ui.footer}";
@@ -1034,6 +1051,7 @@
       </url>
     '');
 in
+  assert lib.assertMsg (unshippedVariants == []) "matt-site: no PDF pair for CV variant(s): ${lib.concatStringsSep ", " unshippedVariants} — a record names a CV this build does not ship";
   pkgs.runCommand "matt-site" {nativeBuildInputs = [pkgs.python3];} ''
     mkdir -p $out/de $out/work $out/de/work $out/brief $out/de/brief
     install -m 0644 ${cssFile} $out/style.css
@@ -1088,20 +1106,9 @@ in
     # A CV changes in place under a stable name. Pages defaults the PDFs to a
     # four-hour browser cache, so a fresh deploy could read old in the one place
     # it matters. Zero max-age makes the browser revalidate every load.
-    cat > $out/_headers <<'EOF'
-    /cv.pdf
-      Cache-Control: public, max-age=0, must-revalidate
-    /cv-de.pdf
-      Cache-Control: public, max-age=0, must-revalidate
-    /cv-energy.pdf
-      Cache-Control: public, max-age=0, must-revalidate
-    /cv-energy-de.pdf
-      Cache-Control: public, max-age=0, must-revalidate
-    /cv-software.pdf
-      Cache-Control: public, max-age=0, must-revalidate
-    /cv-software-de.pdf
-      Cache-Control: public, max-age=0, must-revalidate
-    EOF
+    install -m 0644 ${pkgs.writeText "matt-headers" (
+      lib.concatMapStringsSep "" (c: "/${c.name}\n  Cache-Control: public, max-age=0, must-revalidate\n") cvFiles
+    )} $out/_headers
     # Gate: every CV the build ships is reachable from a page by a link that
     # resolves, and every internal href on every emitted page — 404 and sitemap
     # included, so this runs last — lands on a file. It runs inside the build,
@@ -1113,6 +1120,10 @@ in
     # on one line and stops the build there, instead of after the anchor pass.
     # It is not a replacement: the full gate below also proves the `download`
     # attribute and the required list, which `--gap` cannot see.
+    # Gate: a page's CV anchor is the PDF its record names, in both locales.
+    # site-links proves the anchor resolves and downloads; this proves it points
+    # at the subject the record chose. Why: docs/cv-ats-compliance.md.
+    bash ${../scripts/task/site-routing.sh} $out ${./matt/cases.json} ${./matt/cases.de.json} ${./matt/briefs.json} ${./matt/briefs.de.json}
     bash ${../scripts/task/site-links.sh} --gap $out ${
       lib.concatStringsSep " " (map (c: c.name) cvFiles)
     }

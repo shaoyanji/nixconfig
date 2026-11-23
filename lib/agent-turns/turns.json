@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-23T11:02:12Z",
+  "generated": "2026-11-23T11:16:37Z",
   "count": 200,
-  "pin": "57fb10591f7eca0eab78b16823f83bf9d7e9644b09baad5d08acbc8ae55de002",
+  "pin": "278ec1631ed7f6fe0eb6f62051cf038c4823b653e714a647f1d3b1a1e4417b76",
   "turns": [
+    {
+      "id": "64274e5e-b0aa-416c-8f19-633f1ebcf396",
+      "ts": "2026-11-23T11:15:29Z",
+      "source": "devin",
+      "subject": "nixconfig:vercel-removal-wisp-blog",
+      "action": "claim: remove pulled vercel/ outlet; fix wisp-blog-jade.vercel.app 504 FUNCTION_INVOCATION_TIMEOUT via redeploy trigger",
+      "outcome": "in_progress",
+      "claims": [
+        "vercel/",
+        "taskfiles/ops.yml",
+        "taskfiles/checks.yml",
+        "docs/vercel-status.md",
+        "tests/vercel-status/"
+      ],
+      "files": [],
+      "base_commit": "0df16744d1d7992296cab63ba02ac6c84abe95c6",
+      "branch": "main",
+      "frame": "03haeu4ab6lngfsmqbgppj9o2"
+    },
+    {
+      "id": "3c6c6159-8c83-4431-8e0b-c4391fc252dc",
+      "ts": "2026-11-23T11:02:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-vercel",
+      "action": "blocked: artifact and routes proven, publish needs a Vercel credential — 43/43 routes 200 through the deploy's own rewrites (17 pages extensionless+.html, 5 PDFs, assets; vercel.json is config and excluded); no VERCEL_TOKEN in env, no CLI state, zero vercel keys in the decrypted sops corpus; vercel/ outlet is claimed by devin detok and a freebuff pane holds freebuff-publish-cv, so nothing here writes vercel/.",
+      "outcome": "blocked: no vercel credential on any reachable store",
+      "claims": [],
+      "files": [],
+      "base_commit": "bb970c58832db4743f626a31a950293c97531772",
+      "branch": "main",
+      "frame": "03haerln5qrzhsvfkpp2p7t7y"
+    },
+    {
+      "id": "97d7b0c1-fd0e-483b-97cc-cae96ffab5e6",
+      "ts": "2026-11-23T11:02:32Z",
+      "source": "devin",
+      "subject": "nixconfig:pr-cleanup-vercel-detok",
+      "action": "landed: closed legacy #27 + failing #13 (branches deleted); merged 13 green flake bumps (#9-12,14-16,18-22,25); 0 open PRs remain. vercel: removed VERCEL_TOKEN/Edge-Config machinery — public status page only, ops telemetry stays tailnet-only | gate: checks:quick PASS, checks:vercel:test 14/14",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bb970c58832db4743f626a31a950293c97531772",
+      "branch": "main",
+      "frame": "03haerl8lnb22qxa0a0b6lxz8"
+    },
     {
       "id": "047bccde-4b15-48a1-bca9-75efec574d66",
       "ts": "2026-11-23T11:00:56Z",
@@ -2708,47 +2753,6 @@
       "base_commit": "f5b7e20943ed2b5c9a857fec6a73d6aa12a4c0f4",
       "branch": "main",
       "frame": "03ha94klxy0eyap0w0326orjr"
-    },
-    {
-      "id": "e3dad012-dad5-4fed-bec2-253f91a2156a",
-      "ts": "2026-11-22T17:42:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene",
-      "action": "landed: interview boilerplate no longer classifies as an invite | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow tests/appflow-triage"
-      ],
-      "files": [],
-      "base_commit": "8accc38d6a429149e31194c7838ed02e1e19127d",
-      "branch": "main",
-      "frame": "03ha94duv3w5936ittb2rxvlo"
-    },
-    {
-      "id": "f34cf3f1-5caa-41ea-8378-6eeee96aacc4",
-      "ts": "2026-11-22T17:42:10Z",
-      "source": "devin",
-      "subject": "nixconfig:submissions-audit",
-      "action": "landed: dereference all /nix/store packet symlinks into real files, updated fau-sysadmin | gate: checks:host HOST=frieren PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8b114ffd2a05f5559eae8f1d55222cbf4358fc8a",
-      "branch": "main",
-      "frame": "03ha94czrjbl74wyyy8i8bsui"
-    },
-    {
-      "id": "5544796e-2363-4177-a49f-227d81bee874",
-      "ts": "2026-11-22T17:41:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-surface",
-      "action": "landed: hermes-check asserts the live daemon /proc environ also resolves node & ffmpeg | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8b114ffd2a05f5559eae8f1d55222cbf4358fc8a",
-      "branch": "main",
-      "frame": "03ha949wieqlgwtyl71d7pg6d"
     }
   ]
 }

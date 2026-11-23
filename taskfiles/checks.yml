@@ -53,7 +53,6 @@ tasks:
       - task: checks:docs:links:test
       - task: checks:task-shim:test
       - task: checks:images:ship:test
-      - task: checks:vercel:test
       - task: checks:services:ports
       - task: checks:prose
       - task: checks:infron
@@ -232,17 +231,6 @@ tasks:
       A guard that only ever passed would be no gate.
     cmds:
       - bash tests/image-ship/run.sh
-
-  checks:vercel:test:
-    desc: Fixture for the Vercel status outlet — probe stays an allowlist, no gated store ships
-    summary: >
-      tests/vercel-status/run.sh — node smoke test over vercel/api/check.js:
-      the public probe refuses unknown targets at 400 before any fetch (it is
-      an allowlist, not a proxy) and reports a dead endpoint as down, and the
-      deployment ships no gated-store or token machinery — private ops
-      telemetry stays on the tailnet by design.
-    cmds:
-      - bash tests/vercel-status/run.sh
 
   checks:toon:surfaces:
     desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"

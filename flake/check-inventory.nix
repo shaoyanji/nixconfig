@@ -133,7 +133,6 @@
     "checks:uds:docs" = "leaf";
     "checks:units" = "host";
     "checks:ups:drill" = "leaf";
-    "checks:vercel:test" = "leaf";
     "checks:yaml:lint" = "leaf";
   };
 }

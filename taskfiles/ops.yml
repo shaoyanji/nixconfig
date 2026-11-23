@@ -931,20 +931,3 @@ tasks:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
     cmds:
       - task dev:qmd:sync:eisen -- {{.CLI_ARGS}}
-
-  ops:status:public:
-    desc: Probe every public surface live (same allowlist the Vercel page uses)
-    summary: >
-      Runs the same HEAD-style checks the public Vercel status page shows:
-      each entry of the allowlist in vercel/api/check.js is fetched and
-      reported up/down with HTTP status and latency. Read-only; works
-      off-tailnet because every target is a public URL.
-    cmds:
-      - |
-        node -e '
-          import("./vercel/api/check.js").then(async m => {
-            for (const [id,t] of Object.entries(m.TARGETS)) {
-              const r = await m.probe(t.url);
-              console.log(`${r.ok?"up  ":"down"} ${id.padEnd(12)} ${r.status||"—"} ${r.ms}ms  ${t.label}`);
-            }
-          });'

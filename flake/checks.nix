@@ -602,6 +602,10 @@ lib.genAttrs systems.work (
             touch $out
           '';
 
+      # --- the router's labels and its playbook rows are one table -------
+      # assets/labels.json names the lanes and references/playbooks.md the
+      # row each lane runs; the gate keeps the two equal and every row's
+      # `task X` citation inside a taskfile.
       router-labels = let
         dir = ../.agents/skills/router;
         labels =
@@ -636,6 +640,9 @@ lib.genAttrs systems.work (
             touch $out
           '';
 
+      # --- every task is visible to a person or an agent -----------------
+      # `task --list` shows `desc`, `--list-all --json` shows `summary`; a
+      # task with neither exists on neither surface.
       task-descs = let
         undescribed =
           taskList

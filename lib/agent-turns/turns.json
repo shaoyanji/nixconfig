@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-23T16:38:45Z",
+  "generated": "2026-11-23T16:50:55Z",
   "count": 200,
-  "pin": "6846a0de6fb025b5ccc69c1b6306ec5b11d2e8cb45834d2eb62ee821988d5cce",
+  "pin": "1119621f8b3be5481ea9c04137f64d98ab2390ead0f7e6c9f4ad66d26d0d8750",
   "turns": [
+    {
+      "id": "0aa7a3e8-d8e3-4aa4-a92d-901c19f6483c",
+      "ts": "2026-11-23T16:44:11Z",
+      "source": "codebuff",
+      "subject": "nixconfig:site-publish-2026-11-23",
+      "action": "landed: republished matt.bountystash.com from this tree (deployment f2442965.matt-9pf.pages.dev, 28 files, 0 new uploads -> live content already equalled the build); CV surface proven live: 6 PDFs 200 application/pdf, 8 anchors sha256-equal to the artifact",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "789a5e56258ddbddd018eff4ca461100bd6b0828",
+      "branch": "main",
+      "frame": "03hagmbyrtv1nupude2a97bsq"
+    },
+    {
+      "id": "862192c7-9c3f-4d5b-9c2f-e7c396e078a1",
+      "ts": "2026-11-23T16:44:09Z",
+      "source": "steward",
+      "subject": "nixconfig:steward",
+      "action": "landed: drove 3 idle panes (devin=chain-change, freebuff=apps-scout, wallpaper=generate)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "789a5e56258ddbddd018eff4ca461100bd6b0828",
+      "branch": "main",
+      "frame": "03hagmbmk0umbf8zt6r9pqms4"
+    },
+    {
+      "id": "21201080-3afb-4c9e-bec6-aa3bd7467858",
+      "ts": "2026-11-23T16:38:56Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-chain-audit",
+      "action": "landed: docs/ops/hm-chain-audit.md — 3 chains enumerated, 12 role-chain hosts classified, fern fork + cassini eval risk flagged, per-edit verify table; NO host edits",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "789a5e56258ddbddd018eff4ca461100bd6b0828",
+      "branch": "main",
+      "frame": "03haglb22bxdlm4juutlnj5om"
+    },
     {
       "id": "cd02e077-a97b-4683-b286-2710424b08c4",
       "ts": "2026-11-23T16:36:35Z",
@@ -2693,45 +2732,6 @@
       "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
       "branch": "main",
       "frame": "03haar1naux4zizw7m1x6aktk"
-    },
-    {
-      "id": "0a7a18e3-5f11-42d4-b5c5-c0461468bf8c",
-      "ts": "2026-11-22T22:42:21Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:job-market-research",
-      "action": "landed: steward dispatched NixOS/DevOps job-market research to delphi freebuff pane 0:3.1 over ssh (shortlist of remote openings matching a NixOS fleet operator; report only). jevdecide research 0.99/0.98 exit 0. submission verified: fresh working counter + task list shows the dispatch.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haaqzzqxpw58i5i7j9zzsl6"
-    },
-    {
-      "id": "55383a33-4c08-401a-958d-f5c336aa3d55",
-      "ts": "2026-11-22T22:42:21Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: steward dispatched lib/taskfile.nix comment audit (146 lines, five-channel routing per nix-comment-audit note) to devin pane 0:2.1 — report only, no edits. jevdecide prose-change 0.80/0.67 exit 0. submission verified: Running tools, xs claim started.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haaqzxot4mmul0iu7i3gbq0"
-    },
-    {
-      "id": "f7374f75-a17e-40c1-9c9c-f3182966166a",
-      "ts": "2026-11-22T22:42:20Z",
-      "source": "freebuff-steward",
-      "subject": "nixconfig:freebuff-cv-a11y",
-      "action": "landed: steward dispatched CV-site accessibility/SEO research to freebuff pane 0:1.1 (shaoyanji.is-a.dev — heading structure, meta tags, alt text; report only). jevdecide research 0.93/0.87 exit 0. submission verified via fresh working counter.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haaqzvk91jw6g6jlkeazd09"
     }
   ]
 }

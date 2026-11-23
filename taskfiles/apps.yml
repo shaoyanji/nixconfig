@@ -41,6 +41,23 @@ tasks:
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} add {{.CLI_ARGS}}
 
+  # Scouting finds roles a sweep turned up, not applications already sent. One
+  # row per live role, on the pipeline's own columns: the family is the origin,
+  # the one-line summary is the notes, and the owner rides the status line
+  # because the table has none — where list and search can see it.
+  apps:scout:
+    desc: Record one scouted lead — --family, --company, --role, --summary required (--owner, --status, --url, --fit, --id, --dry)
+    summary: >
+      One lead a sweep found. `--family devops|sre|platform|infrastructure`,
+      `--company`, `--role` and `--summary` are required; `--owner` defaults to
+      `agent:apps`; `--status`, `--url`, `--fit 1-5` and `--id` are optional.
+      Summary goes to `notes`, family to `origin` `scout:<family>`, and the status
+      defaults to `lead (scout <family>, owner <owner>)` — the table has no owner
+      column, so it rides the status line where list and search show it. The same
+      company and role updates one row. Exit 2 = bad input; `--dry` prints only.
+    cmds:
+      - FORMAT="{{.FORMAT | default "toon"}}" bash scripts/task/apps-scout.sh {{.CLI_ARGS}}
+
   apps:upsert:
     desc: Add or refresh one application record — JSON or TOON (CLI_ARGS is a file, or pipe stdin; FORMAT=toon for the row back)
     summary: >

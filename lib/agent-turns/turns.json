@@ -1,8 +1,127 @@
 {
-  "generated": "2026-11-23T13:27:52Z",
+  "generated": "2026-11-23T14:39:24Z",
   "count": 200,
-  "pin": "8ab42a7f0bfa514ebda8da15d5b5b1fb415f2ccaaff178b7944b18ca80393420",
+  "pin": "b25402c585d866b036e4f65881412af0862d35260f0812e3052b46e203678903",
   "turns": [
+    {
+      "id": "cd00e1a4-94fa-463d-8fe9-a09a2fc610df",
+      "ts": "2026-11-23T14:24:21Z",
+      "source": "devin",
+      "subject": "nixconfig:images-publish-module",
+      "action": "claim: wire the image-publish module into the flake projection",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/ hosts/frieren/ modules/services/"
+      ],
+      "files": [],
+      "base_commit": "862b48d159f5544143539095f947f700ba616d02",
+      "branch": "main",
+      "frame": "03hafv0jxq5r2ji4cbjlm8wyl"
+    },
+    {
+      "id": "1b826ba2-c996-4ab7-b9f5-88271d2c6817",
+      "ts": "2026-11-23T14:23:50Z",
+      "source": "delphi",
+      "subject": "delphi:job-search-scout",
+      "action": "landed: task-change",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "862b48d159f5544143539095f947f700ba616d02",
+      "branch": "main",
+      "frame": "03hafuwus1t9dxtjtk2tys04u"
+    },
+    {
+      "id": "1e342431-e0d7-46c1-832d-b8d719c82a0f",
+      "ts": "2026-11-23T14:23:49Z",
+      "source": "freebuff",
+      "subject": "freebuff:job-search-scout",
+      "action": "landed: task-change",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "862b48d159f5544143539095f947f700ba616d02",
+      "branch": "main",
+      "frame": "03hafuwsuh9w6k7hhaoio2p6p"
+    },
+    {
+      "id": "ec75e2d6-e6bb-4459-aff2-b21e0a1213c4",
+      "ts": "2026-11-23T14:22:57Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-image-publish",
+      "action": "landed: flake-change",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "862b48d159f5544143539095f947f700ba616d02",
+      "branch": "main",
+      "frame": "03hafuqr3h7z0sgm8bw1ntpy0"
+    },
+    {
+      "id": "efa263bf-fe18-40da-9d78-7c76e9d60ccc",
+      "ts": "2026-11-23T13:48:33Z",
+      "source": "delphi",
+      "subject": "nixconfig:delphi",
+      "action": "landed: note-change job-search scouting initiated",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafo0sq5ji67xjx33o2wbxe"
+    },
+    {
+      "id": "0deee95f-9de1-4683-b44e-bc22c31b6a8a",
+      "ts": "2026-11-23T13:48:33Z",
+      "source": "devin",
+      "subject": "nixconfig:devin",
+      "action": "landed: chain-change feature-chain refactor initiated",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafo0qohctw4z4szowe20sl"
+    },
+    {
+      "id": "0d3693df-2d86-4a5b-83fe-6224d0ddad08",
+      "ts": "2026-11-23T13:37:48Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "landed: drove devin pane 0:0.1 with chain-change feature-chain refactor task (jev chain-change p=0.99 margin 0.98 decisive); pasted via load-buffer+paste-buffer+Enter, Devin accepted the task into its input box",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haflx5q2vbogq8j4iq43rre"
+    },
+    {
+      "id": "43a355ff-830f-4c23-bfea-55e126c5f893",
+      "ts": "2026-11-23T13:31:53Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-23: 0 plate(s) kept of 17 spent, 27 roster row(s) waiting, 729 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hafkrka6x0mmkkw9z4keaub"
+    },
+    {
+      "id": "861855be-c12f-4a91-b86a-651fcd8c47a1",
+      "ts": "2026-11-23T13:28:47Z",
+      "source": "devin",
+      "subject": "nixconfig:feature-chains",
+      "action": "landed: hosts carry features+modules as data in host-inventory.nix; hostModules composes them; drv-equality 27/30 identical (3 unchanged pre-existing eval errors); docs blast-radius table | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "862b48d159f5544143539095f947f700ba616d02",
+      "branch": "main",
+      "frame": "03hafk5ttrgfu9l3q3l4mfpv9"
+    },
     {
       "id": "5a29a128-8821-4e0d-9459-840eba821755",
       "ts": "2026-11-23T13:22:57Z",
@@ -2615,127 +2734,6 @@
       "base_commit": "806aab7c7a9ebf821ef09dc2f4dacaea7d45564c",
       "branch": "main",
       "frame": "03haa9899frnof2dlhgnbkm7q"
-    },
-    {
-      "id": "1e2350cb-33f7-460a-8113-272d823ae38b",
-      "ts": "2026-11-22T21:11:22Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: devin pane driven with delphi/configuration.nix comment audit (1875 lines, 566 comment lines) — same five-channel audit as frieren, report to ~/.local/state/comment-audit/delphi-configuration.md, no edits",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "806aab7c7a9ebf821ef09dc2f4dacaea7d45564c",
-      "branch": "main",
-      "frame": "03haa984i6o9pxk12iv5nqde9"
-    },
-    {
-      "id": "81032cc9-c95d-491e-840e-0b24819e97ae",
-      "ts": "2026-11-22T20:09:14Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-22: 66 plate(s) kept of 82 spent, 27 roster row(s) waiting, 727 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "806aab7c7a9ebf821ef09dc2f4dacaea7d45564c",
-      "branch": "main",
-      "frame": "03ha9x37ycnieizfmh10gg3zs"
-    },
-    {
-      "id": "aa3545a5-3866-494c-bea0-f080058aaa49",
-      "ts": "2026-11-22T20:01:24Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: frieren/configuration.nix comment audit — 84 units categorized (44 durable, 15 policy/trap, 14 why/history, 10 fleet fact, 1 procedure); report at ~/.local/state/comment-audit/frieren-configuration.md | audit-only pass, zero source edits",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "806aab7c7a9ebf821ef09dc2f4dacaea7d45564c",
-      "branch": "main",
-      "frame": "03ha9vk5yo2fammyxba7e9gyc"
-    },
-    {
-      "id": "c57fb811-3a90-4333-a76c-df1897549add",
-      "ts": "2026-11-22T19:59:59Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "start: audit pass on hosts/frieren/configuration.nix — categorize comments into the five channels, report only, no edits",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren/configuration.nix"
-      ],
-      "files": [],
-      "base_commit": "806aab7c7a9ebf821ef09dc2f4dacaea7d45564c",
-      "branch": "main",
-      "frame": "03ha9va6i3kn2iiucjsbnzxik"
-    },
-    {
-      "id": "99b361a8-1af7-4340-846d-b3084c1842c7",
-      "ts": "2026-11-22T19:54:42Z",
-      "source": "freebuff-agent",
-      "subject": "nixconfig:freebuff-publish-site-1795377281",
-      "action": "landed: dispatched publish task (site build/preview) to freebuff pane 0:1.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "806aab7c7a9ebf821ef09dc2f4dacaea7d45564c",
-      "branch": "main",
-      "frame": "03ha9u8ykmeu5wvqzsu9vhmgc"
-    },
-    {
-      "id": "509176c1-2209-4fda-a834-e8cc8291694a",
-      "ts": "2026-11-22T19:52:39Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hermes",
-      "action": "landed: gate cron runs >450s and pin HERMES_CRON_TIMEOUT bound | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1608a70cbe0c96a8eda54c31bb38bca0c44e9bb0",
-      "branch": "main",
-      "frame": "03ha9tuj6mdhsjmyjyfe4uvdk"
-    },
-    {
-      "id": "09a16d31-561b-4484-a153-6e7e547fbbb9",
-      "ts": "2026-11-22T19:52:34Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: ptb + stackit x2 + bwi-devsecops packets built on frieren, all verified 2pp/1pp | gate: pdfinfo + ref-id render checks",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1608a70cbe0c96a8eda54c31bb38bca0c44e9bb0",
-      "branch": "main",
-      "frame": "03ha9ttyifxbzti6s6299bnzf"
-    },
-    {
-      "id": "6069bcd4-133d-49e7-8082-6ee0e1c3b94b",
-      "ts": "2026-11-22T19:46:40Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:job-hunt",
-      "action": "landed: ptb-hpc-linux packet built on frieren (delphi-pane artifact absent) — 2pp CV + 1pp de letter, Kennziffer 26-163-9C | verify: pdfinfo 2pp/1pp, Kennziffer in pdf text",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1f6970e998240b5bcf6d114612a34e1240f99e59",
-      "branch": "main",
-      "frame": "03ha9sogu5v1hivgqfs24ytkv"
-    },
-    {
-      "id": "0254cbfa-12de-4953-bd0f-6bdba17f8ebb",
-      "ts": "2026-11-22T19:45:05Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:job-hunt",
-      "action": "start: ptb-hpc-linux packet build on frieren (delphi-pane packet absent; deadline 23.11.2026)",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/ptb-hpc-linux"
-      ],
-      "files": [],
-      "base_commit": "1f6970e998240b5bcf6d114612a34e1240f99e59",
-      "branch": "main",
-      "frame": "03ha9sdeotjnn3w40uqwdtobn"
     }
   ]
 }

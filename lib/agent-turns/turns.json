@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-23T15:50:49Z",
+  "generated": "2026-11-23T15:56:46Z",
   "count": 200,
-  "pin": "c62847bbe91f4726c6aeefd9f6e039381421f4b82e0326d5a3a72c61a84a3202",
+  "pin": "3dbeeea75c14aa6645ab42c668ff1b53dc5c4fc5f738b614827a7287b35e2622",
   "turns": [
+    {
+      "id": "633aee56-b966-4397-a153-63c85dd9ea0d",
+      "ts": "2026-11-23T15:55:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-23-c",
+      "action": "Correction to this round: FACT-Finder senior SRE row closed, not landed. Its Personio req 404s and the FactFinder board now lists only 3 roles, so the fit-5 row was written off a search snippet and is now stage=other with status 'closed (req removed ... 2026-11-23)'. Re-checked the other five with curl: Westernacher, Brainlab, KNIME, Xempus, EMnify all 200 on the employer ATS.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
+      "branch": "main",
+      "frame": "03hagcq2pvltspaofaix9d18a"
+    },
+    {
+      "id": "149ee865-ab73-4fc4-b8c8-6a2b7d7fab22",
+      "ts": "2026-11-23T15:53:41Z",
+      "source": "devin",
+      "subject": "nixconfig:shell-budget",
+      "action": "claim: 100-line shell budget — ledger + policy gate + fixture",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/ tests/policies/ AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
+      "branch": "main",
+      "frame": "03hagcgqqom7fht3bpt4umshw"
+    },
+    {
+      "id": "00187546-ddc3-45e8-a432-74c5a49118fc",
+      "ts": "2026-11-23T15:52:11Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-23-c",
+      "action": "Scout round 3: 6 new leads at stage=lead, fit 5/4 - FACT-Finder senior SRE (own hardware, Harvester/KubeVirt, Ceph, Argo/Flux), KNIME team-lead SRE, Xempus senior platform SRE, EMnify senior platform engineer K8s, Westernacher senior K8s platform (remote), Brainlab SRE VMware Cloud. Skipped as already tracked: Doctolib, gridscale, Miaplaza, Kubernauts, Mittwald, evoila, Steadforce, InnoCraft.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
+      "branch": "main",
+      "frame": "03hagc68pu72ouh9oxzxsmly1"
+    },
+    {
+      "id": "f163ca4f-95d6-468b-b955-f86942d77a55",
+      "ts": "2026-11-23T15:51:02Z",
+      "source": "devin",
+      "subject": "nixconfig:images-publish-module",
+      "action": "landed: reverted the services.image-publish module — slots stay inline in frieren's infra-stack; image-publish is one host's business | gate: checks:host frieren PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
+      "branch": "main",
+      "frame": "03hagby62tvu1virh5xq6vphl"
+    },
     {
       "id": "b5b18078-92b0-41a1-acf0-cecf20908ec7",
       "ts": "2026-11-23T15:48:09Z",
@@ -2678,58 +2732,6 @@
       "base_commit": "02b2b7495dac6507a036cd9b26903d8b3512fa42",
       "branch": "main",
       "frame": "03haapkik2pque5k75dm7ccdf"
-    },
-    {
-      "id": "ffc1fe63-2ae3-4702-b8c9-3f033b98af54",
-      "ts": "2026-11-22T22:32:52Z",
-      "source": "freebuff",
-      "subject": "nixconfig:appflow-parloa-followup-gate",
-      "action": "verified: apps:followups is not dead on delphi — /srv/data is absent (ls exit 2) but ac5874be delegates the Typst verbs to frieren, which holds the checkout; apps:followups exit 0 on delphi, on frieren and from the netbook, 127 only on an unreachable APPS_HOST; no followups loop runs, only appflow-sync.timer | gate: apps:doctor PASS + checks:appflow PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "417cf35b8aa2628d42f7783e86c532ab6f572a96",
-      "branch": "main",
-      "frame": "03haap58et9nnjy3qw837yjjp"
-    },
-    {
-      "id": "3c541644-aeec-4dab-8cdd-686c9fa1c450",
-      "ts": "2026-11-22T22:29:44Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: aki-site.nix routing — note aki-site-design, predicates site-prints-measured-closures + site-assets-are-files, 8 comment units shrunk to pointers, dedupe at hostJsonFiles | gates: policies PASS, notes-schema PASS, fleet-docs-site builds",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "02b2b7495dac6507a036cd9b26903d8b3512fa42",
-      "branch": "main",
-      "frame": "03haaojasvgq2vofnv9c9b2bw"
-    },
-    {
-      "id": "6c6fe738-aad8-4c4c-91a7-5261e95554e9",
-      "ts": "2026-11-22T22:28:19Z",
-      "source": "devin-agent",
-      "subject": "nixconfig:devin-aki-site-routing",
-      "action": "landed: devin driven with aki-site.nix routing pass - add site-prints-measured-closures + site-assets-are-files predicates, Trap note for L240-243, dedupe hostJsonFiles comments",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
-      "branch": "main",
-      "frame": "03haao99sjk3ibt3ewgg1bis5"
-    },
-    {
-      "id": "b8820493-0738-45ba-ba81-1950e180a5b5",
-      "ts": "2026-11-22T22:28:15Z",
-      "source": "freebuff-agent",
-      "subject": "nixconfig:freebuff-cv-links",
-      "action": "landed: freebuff (DeepSeek) driven with CV/site task - fix broken links in shaoyanji.is-a.dev via jekyll build + check-cv-links.sh, commit fix",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ea1b3774e51c2c699abde776dd1e8230f9eee8e5",
-      "branch": "main",
-      "frame": "03haao8tarqeviflyab4wtp30"
     }
   ]
 }

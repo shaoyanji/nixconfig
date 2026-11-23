@@ -1240,6 +1240,44 @@
         way and adopting a baseline stays the operator's deliberate act.
       '';
     };
+    shell-script-budget = {
+      title = "Shell over 100 lines is a Go CLI or a split that never happened";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-23";
+      summary = "Production `.sh` over 100 lines is capped by a recorded ceiling in flake/script-budget.nix; a new bloated script fails the gate unrecorded, growth is a decision with a diff, shrinking is free. 141 files grandfathered at landing; the ladder still ends at Go.";
+      refs = {
+        modules = ["flake/script-budget.nix" "flake/policies.nix" "tests/policies/run.sh"];
+        tasks = ["checks:policies:fixtures"];
+      };
+      body = ''
+        The rule: a production `.sh` file over 100 lines needed a Go CLI
+        (`pkgs.buildGoModule` on a stdlib-only module — the
+        `modules/services/agent-turns/shim` pattern: own dir, own go.mod,
+        `vendorHash = null`) or a split into per-command scripts (the
+        `image-daily.sh` dispatcher split is the shell-side precedent), and got
+        neither. The enforcement is the `shell-script-budget` policy: every
+        bloated file carries a recorded ceiling, a script may only grow by
+        editing its own number in the same commit, and a deleted file's entry
+        goes stale so the ledger shrinks with the campaign.
+
+        Scope is production shell — `scripts/`, `modules/` (the secrets
+        gitlink excluded), `tools/`, `.agents/skills/`. `tests/*/run.sh` is
+        fixture machinery that embeds script shapes on purpose; `projects/`
+        is submodule land. Baseline at landing: 141 files over 100 lines,
+        35 kLOC; the worst offenders are `sort-downloads.sh` (737),
+        `image-daily-engine.sh` (714), `q.sh` (672), `toolcall.sh` (668),
+        `nixcache.sh` (643). The burn-down order is by convertibility, not
+        size: JSON/stdout-analysis scripts first, live-host orchestrators
+        (warm-host, deploy-*) last — a Go port of a host-touching script is
+        a deployment, not a refactor.
+
+        Exit: a commit either deletes an entry (converted) or lowers a
+        ceiling (shrunk); no file crosses its ceiling without the diff
+        saying so.
+      '';
+    };
     transitive-flake-drift = {
       title = "Transitive flake drift";
       kind = "open";

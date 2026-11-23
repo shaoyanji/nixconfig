@@ -931,3 +931,16 @@ tasks:
     desc: Offload and synchronize QMD vector embeddings to Eisen via Wake-on-LAN
     cmds:
       - task dev:qmd:sync:eisen -- {{.CLI_ARGS}}
+
+  ops:status:publish:
+    desc: Push this host's sentinel snapshot to the Vercel ops zone
+    summary: >
+      scripts/task/vercel-publish.sh — PATCHes the local sentinel
+      status.json into the project's Edge Config store as item
+      `status:<host>`, where the gated /api/ops feed reads it. Needs
+      VERCEL_TOKEN and VERCEL_EDGE_CONFIG_ID in the environment (sops,
+      never the repo); DRY_RUN=1 prints the payload. Wire into a timer or
+      run by hand after `checks` — the /ops page is a mirror, never the
+      source of truth (that's /var/lib/fleet-sentinel).
+    cmds:
+      - bash scripts/task/vercel-publish.sh {{.STATUS | default ""}}

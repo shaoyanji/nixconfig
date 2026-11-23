@@ -53,6 +53,7 @@ tasks:
       - task: checks:docs:links:test
       - task: checks:task-shim:test
       - task: checks:images:ship:test
+      - task: checks:vercel:test
       - task: checks:services:ports
       - task: checks:prose
       - task: checks:infron
@@ -231,6 +232,18 @@ tasks:
       A guard that only ever passed would be no gate.
     cmds:
       - bash tests/image-ship/run.sh
+
+  checks:vercel:test:
+    desc: Fixture for the Vercel status outlet — the ops gate must fail closed
+    summary: >
+      tests/vercel-status/run.sh — node smoke test over vercel/api/*.js: the
+      public probe refuses unknown targets at 400 before any fetch (it is an
+      allowlist, not a proxy), and /api/ops fails closed at every rung —
+      unconfigured env 503, missing creds 401 + challenge, wrong creds 401,
+      right creds reach the Edge Config read. The gate that only passed would
+      be no gate.
+    cmds:
+      - bash tests/vercel-status/run.sh
 
   checks:toon:surfaces:
     desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"

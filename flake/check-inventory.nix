@@ -59,6 +59,7 @@
     "checks:host" = "host";
     "checks:hosts" = "host";
     "checks:images" = "leaf";
+    "checks:images:ship:test" = "leaf";
     "checks:infron" = "leaf";
     "checks:invalidation" = "cache";
     "checks:inventory:compiled" = "leaf";

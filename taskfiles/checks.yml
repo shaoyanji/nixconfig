@@ -52,6 +52,7 @@ tasks:
       - task: checks:site:links:test
       - task: checks:docs:links:test
       - task: checks:task-shim:test
+      - task: checks:images:ship:test
       - task: checks:services:ports
       - task: checks:prose
       - task: checks:infron
@@ -197,6 +198,16 @@ tasks:
       the asset root is absent instead of failing a repo-only CI run.
     cmds:
       - bash scripts/task/images-check.sh
+
+  checks:images:ship:test:
+    desc: Regression fixture for the image-ship no-spend guard (unset PROMPT fails fast)
+    summary: >
+      Proves `scripts/task/image-ship.sh` refuses before it can spend: an unset
+      PROMPT, an empty one, and `DETACH=1` each exit nonzero under `timeout`
+      naming the variable, and `task images:ship` does the same one level up.
+      A guard that only ever passed would be no gate.
+    cmds:
+      - bash tests/image-ship/run.sh
 
   checks:toon:surfaces:
     desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"

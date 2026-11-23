@@ -58,6 +58,8 @@
     "checks:hermes" = "leaf";
     "checks:host" = "host";
     "checks:hosts" = "host";
+    "checks:hosts:args" = "leaf";
+    "checks:hosts:args:test" = "leaf";
     "checks:images" = "leaf";
     "checks:images:publish:test" = "leaf";
     "checks:images:ship:test" = "leaf";

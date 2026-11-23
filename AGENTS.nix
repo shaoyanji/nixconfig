@@ -2904,24 +2904,16 @@
         task (`taskfiles/*.yml`) or a `writeShellApplication`; the prose keeps a
         pointer. A *durable explanation* goes to `docs/`, served by the site.
 
-        **Measured 2026-10-21** (scale, not a verdict): 4169 comment lines in
-        tracked `.nix`. delphi 236/641, frieren 148/627, lib/aki-site 147/1143,
-        lib/taskfile 146/653, eisen/llm-server 130/503, frieren/infra-stack
-        125/992, flake/checks 113/395, netbook 109/302, frieren/dns 92/216.
+        **Measured 2026-10-21** (scale, not a verdict): 4169 comment lines; the
+        heaviest were delphi, frieren, aki-site, eisen's llm-server, checks.nix.
 
-        **Re-measured 2026-11-23**: 7014 lines, 6217 header-class. First prune
-        (generate-config boilerplate + dead commented config, 116 lines) landed
-        61a1f1ba. Second pass (routing, not deletion): every file carrying a
-        durable-why block now names its channel in the file banner — the host
-        notes, or the docs/deploy page that owns the topic. Remaining: per-block
-        `Story:`/`Trap:` citations inside the bannered files (the frieren and
-        delphi precedent), one file at a time.
+        **Re-measured 2026-11-23**: 7014 lines, 6217 header-class. Prune 61a1f1ba
+        took the boilerplate slice; a banner pass routed every durable-why file
+        to its note or docs page. Remaining: per-block `Story:`/`Trap:` cites.
 
         **Discovery is already solved.** qmd indexes the .nix tree (2052 files):
-        `qmd search disko -c nixconfig` → `flake/host-inventory.nix` at 91 %,
-        `qmd search accept-dns` → `hosts/frieren/dns.nix` at 92 %. Probe with one
-        distinctive token: a quoted sentence ("disko wipes BOTH disks") returns
-        `[]` while the same words hit, because BM25 matches tokens.
+        `qmd search disko` → `flake/host-inventory.nix` at 91 %. Probe with one
+        distinctive token: BM25 matches tokens, not quoted sentences.
 
         **Pipeline rule, enforced.** `channels-have-a-task` asserts every channel
         still has an entry point, so a category cannot be orphaned by removing a

@@ -1,3 +1,5 @@
+# flake/boot-checks.nix — the nixosTest boots that prove a host's generation runs.
+# Where they sit in the pipeline: docs/ci-pipeline.md.
 {
   lib,
   inputs,

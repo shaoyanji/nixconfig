@@ -1,4 +1,6 @@
 # eisen — Xeon E5-2673 v3 + RX 5700 + 64 GB RAM gaming desktop.
+# Runbook and measurements: .agents/deploy/hosts/eisen.md; the GPU verdicts live in
+# notes eisen-llm-stack and open-eisen-gpu-off-bus.
 {
   self,
   pkgs,

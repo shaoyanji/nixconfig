@@ -1,5 +1,6 @@
 # A microVM guest with one job: boot, and let root in over ssh.
 # Anything else is closure you pay for on every start.
+# Guests and the traps that make one look unreachable: hosts/microvms/README.md.
 {
   self,
   hostName,

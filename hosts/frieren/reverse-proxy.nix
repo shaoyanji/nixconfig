@@ -1,3 +1,5 @@
+# frieren's nginx edge: every *.frieren.lan vhost, the allow-lists and the TLS shape.
+# Whys and retirements: note frieren-ops-history; runbook .agents/deploy/hosts/frieren.md.
 {
   self,
   lib,

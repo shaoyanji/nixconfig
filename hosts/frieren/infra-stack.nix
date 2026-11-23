@@ -1,4 +1,5 @@
 # Infrastructure monitoring + backups for frieren.
+# Whys, retirements and traps: note frieren-ops-history; runbook .agents/deploy/hosts/frieren.md.
 {
   self,
   pkgs,

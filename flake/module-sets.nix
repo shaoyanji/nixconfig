@@ -4,6 +4,7 @@
   lib,
   inventory,
   # Every file under modules/, named (flake/nix-registry.nix). Chains name
+  # the architecture's feature lists — the shape is note arch-shape.
   # modules instead of pointing at them; the walk is the one list.
   moduleFiles,
 }: let

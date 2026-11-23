@@ -1,3 +1,5 @@
+# flake/checks.nix — the eval-time check set: cheap, no host configuration forced.
+# What the gate layers prove: docs/ci-pipeline.md; the eval-cost design: note eval-cost-ladder.
 {
   lib,
   systems,

@@ -1,4 +1,5 @@
 # hermes — Nous Research's self-improving agent, frieren user-space persona.
+# The cascade it belongs to and what never ran: note hermes-tier3-never-ran.
 {
   lib,
   config,

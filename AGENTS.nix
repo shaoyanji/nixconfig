@@ -2909,6 +2909,14 @@
         lib/taskfile 146/653, eisen/llm-server 130/503, frieren/infra-stack
         125/992, flake/checks 113/395, netbook 109/302, frieren/dns 92/216.
 
+        **Re-measured 2026-11-23**: 7014 lines, 6217 header-class. First prune
+        (generate-config boilerplate + dead commented config, 116 lines) landed
+        61a1f1ba. Second pass (routing, not deletion): every file carrying a
+        durable-why block now names its channel in the file banner — the host
+        notes, or the docs/deploy page that owns the topic. Remaining: per-block
+        `Story:`/`Trap:` citations inside the bannered files (the frieren and
+        delphi precedent), one file at a time.
+
         **Discovery is already solved.** qmd indexes the .nix tree (2052 files):
         `qmd search disko -c nixconfig` → `flake/host-inventory.nix` at 91 %,
         `qmd search accept-dns` → `hosts/frieren/dns.nix` at 92 %. Probe with one
@@ -5162,7 +5170,7 @@
       summary = "The retirement dates, measured numbers and restored settings hosts/frieren/configuration.nix comments used to carry.";
       refs = {
         hosts = ["frieren"];
-        modules = ["hosts/frieren/configuration.nix" "hosts/frieren/reverse-proxy.nix" "hosts/frieren/dns.nix"];
+        modules = ["hosts/frieren/configuration.nix" "hosts/frieren/reverse-proxy.nix" "hosts/frieren/dns.nix" "hosts/frieren/infra-stack.nix"];
         tasks = ["checks:host"];
         docs = [".agents/deploy/hosts/frieren.md"];
       };

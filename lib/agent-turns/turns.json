@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-23T09:17:26Z",
+  "generated": "2026-11-23T09:34:22Z",
   "count": 200,
-  "pin": "ca215dedfd644434c8e0f8f0ed764f22c5f52ed204695d2f2c99344175dfe8e5",
+  "pin": "d1f55c0b6b9b38bd1fb75a29450fe168f7686533011cffeed32e01a84accc34a",
   "turns": [
+    {
+      "id": "3e477b87-9508-4e27-a49b-40c1c4de49d8",
+      "ts": "2026-11-23T09:29:15Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-pane-0-0-1",
+      "action": "landed: comment-audit follow-up (route durable whys to notes/docs + checks:quick); devin 0:0.1 accepted the task (Thinking line confirmed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
+      "branch": "main",
+      "frame": "03hae9da30smcerknqo70x6b6"
+    },
+    {
+      "id": "4beac870-7033-4109-a22e-17dfb6ce33eb",
+      "ts": "2026-11-23T09:28:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-pane-0-2-1",
+      "action": "landed: images publish surface verify + no-spend guard; delphi freebuff 0:2.1 over ssh tunnel accepted the task (working line confirmed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
+      "branch": "main",
+      "frame": "03hae99fabbsmlm79p0rkqvw6"
+    },
+    {
+      "id": "1e1d4609-fe66-4837-9fee-d67fea5b7dc2",
+      "ts": "2026-11-23T09:28:24Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-pane-0-1-1",
+      "action": "landed: docs site build + site:links gate; freebuff 0:1.1 accepted the task (thinking line confirmed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
+      "branch": "main",
+      "frame": "03hae978j7ecplb9tsclmyf9k"
+    },
+    {
+      "id": "0a752946-57b2-4d38-9581-97f6d80fdc5c",
+      "ts": "2026-11-23T09:17:40Z",
+      "source": "devin",
+      "subject": "nixconfig:comment-census",
+      "action": "landed: 116 stale lines pruned across 38 files + alejandra reformat (generate-config boilerplate + dead commented config); kept all why/trap narrative per nix-comment-audit routing rule | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
+      "branch": "main",
+      "frame": "03hae73rye70ronij1nudvpu7"
+    },
     {
       "id": "a9e7ac22-908d-4bf2-b15a-a1cd95503147",
       "ts": "2026-11-23T09:16:04Z",
@@ -2698,58 +2750,6 @@
       "base_commit": "f19839b7188135da5f249485d6d197d12b470af3",
       "branch": "main",
       "frame": "03ha8xl0d0xulj424yorl7uxz"
-    },
-    {
-      "id": "ccde4df5-aa91-473f-9217-b19482813da9",
-      "ts": "2026-11-22T17:06:22Z",
-      "source": "buffy",
-      "subject": "nixconfig:ci-drain-window",
-      "action": "deployed: delphi runs the 7-day drain (base 687946ab + 544dbf5b), closures semantically identical, only store-hash restarts of polkit/dbus/HM | gate: infra:deploy:host:delphi validated",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "956d46f689d02e9092290d8f0e73a4e6934cf946",
-      "branch": "HEAD",
-      "frame": "03ha8xd4dw95uciz0u8v9d0ak"
-    },
-    {
-      "id": "6ed5b1fb-038e-4e53-848b-35cef65b012b",
-      "ts": "2026-11-22T17:06:02Z",
-      "source": "devin",
-      "subject": "nixconfig:nvidia-pin",
-      "action": "landed: nvidiaPkgs pin at fleet rev e21fec3 + nixpkgs bump to 93a9ed0 (nginx 1.30.7 CVE fix); cudaSupport dropped on ares/kellerbench (Kepler cannot run CUDA); cache.nixos-cuda.org added. Dry-runs: all nvidia hosts fetch-or-trivial; schneeeule gtk2 waiver forwarded via problems.handlers | gate: checks:nix:lint PASS, nix-comments 6495/6495; checks.policies stack-overflows on clean HEAD (pre-existing defect, filed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f19839b7188135da5f249485d6d197d12b470af3",
-      "branch": "main",
-      "frame": "03ha8xatmt0mp1d4fot810hhs"
-    },
-    {
-      "id": "558d547d-425d-44ae-8fd5-f6eedd26d665",
-      "ts": "2026-11-22T17:01:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-surface",
-      "action": "verified: checks:hermes clean, gateway active, chat -q ping -> pong; repaired derived env (TELEGRAM_ALLOWED_USERS) + gateway PATH node/ffmpeg (switch pending)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "acfd2659080572f1c9de5cee29a760a0898932c2",
-      "branch": "main",
-      "frame": "03ha8wia9e8v24o8z9kvn941v"
-    },
-    {
-      "id": "69c984e8-6a0b-4413-ba05-3d5ff523117c",
-      "ts": "2026-11-22T16:54:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:ci-drain-window",
-      "action": "landed: ci drain window 7d (unit ExecStartPost, script default, task) and an empty report that names window+oldest instead of closed 0 (none) | gate: checks:host HOST=delphi PASS; checks:quick blocked by pre-existing shell-inputs in antigravity-cli.nix and deadnix in matt-site.nix",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "544dbf5b154f3b4c98198e8cc2c4a3627486656e",
-      "branch": "main",
-      "frame": "03ha8uzr8g5bvbizhan0ocpk2"
     }
   ]
 }

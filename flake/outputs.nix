@@ -1,3 +1,5 @@
+# flake/outputs.nix — the projection of every host by kind.
+# The architecture it implements: note arch-shape; the map a reader starts from: AGENTS.md.
 {
   inputs,
   self,

@@ -1,4 +1,5 @@
 # eisen — offline MoE LLM inference (native llama.cpp, Vulkan/radv).
+# Stack design and the trap ledger: docs/eisen-llm-architecture.md; note eisen-llm-stack.
 {
   self,
   config,

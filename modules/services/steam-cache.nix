@@ -1,4 +1,5 @@
 # steam-cache — LAN Steam content cache (Valve's own lancache hook).
+# Layout and one-time setup: docs/steam-cache.md.
 #
 # Split in two on purpose: the :80 front lives in frieren's always-on nginx and
 # falls back to Valve, while the cache process owns the removable flash tier.

@@ -1,4 +1,5 @@
 # qwen-tts — offline Qwen3-TTS text-to-speech served over OpenAI-compatible HTTP.
+# Shares eisen's LLM boundary and weight-fetch decisions: note eisen-llm-stack.
 {
   config,
   lib,

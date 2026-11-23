@@ -1,4 +1,5 @@
 # Fleet inventory: schema + compiler for `inventory.toml`.
+# The field map a reader edits against: docs/inventory-schema.md; the served page docs/fleet-inventory.md.
 {
   lib,
   src ? ../inventory.toml,

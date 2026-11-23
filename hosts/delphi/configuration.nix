@@ -1,4 +1,6 @@
 # delphi — Oracle Cloud Infrastructure (OCI) Ampere A1 ARM64 headless server.
+# Traps and retirements: note delphi-ops-traps; install: docs/delphi-install.md;
+# runbook: .agents/deploy/hosts/delphi.md.
 {
   self,
   pkgs,

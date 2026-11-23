@@ -1,4 +1,5 @@
 # lib/aki-site.nix — the fleet site, as a project of evaluated data
+# Retired designs and the traps behind the pointers: note aki-site-design.
 {
   pkgs,
   lib ? pkgs.lib,

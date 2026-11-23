@@ -19,7 +19,7 @@ Each of those is a column jump or a case change. An extractor that reads in docu
 
 The header stacks into one column and the contact URLs are plain text, not link labels a parser may strip. Dates sit on the line they date. Headings use the standard words — `Experience`, `Projects`, `Skills`, `Languages`, and the German equivalents — in normal case, with no tracking, and a heading can no longer end a page alone. The footer is a page number, and a one-page document has none.
 
-The site was meant to follow: a case study would offer the CV that matches it. What ships is less tidy. Every case study and every brief still hands out the energy CV, including the ones about a NixOS fleet, platform work and vulnerability operations, so the parser work is right and the routing between page and document is not. That is a defect to fix, not a design decision to defend.
+The site now follows: each case study and brief offers the CV that argues for its own subject — the solar portfolio the energy variant, a fleet or a vulnerability programme the software one — and the header offers one CV per locale instead of three. It did not, when the redesign first shipped: every page handed out the energy CV, including the pages about a NixOS fleet. The parser work was right; the routing was a defect, and a defect is not a design decision.
 
 ## What it cost
 

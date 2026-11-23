@@ -486,21 +486,11 @@
       inherit (ui) themeAria;
       inherit (ui) langLabel;
       inherit (ui) cvLabel;
-      inherit (ui) cvTunedLabel;
       cvHref = "${root}${
         if lang == "de"
         then "cv-de.pdf"
         else "cv.pdf"
       }";
-      # The tailored CV ships either way; without this link it was a store path
-      # nobody could open from the site.
-      cvTunedHref = "${root}${
-        if lang == "de"
-        then "cv-energy-de.pdf"
-        else "cv-energy.pdf"
-      }";
-      cvSoftwareHref = "${root}cv-software.pdf";
-      inherit (ui) cvSoftwareLabel;
       ogImage = "${siteUrl}/${
         if lang == "de"
         then "og-de.png"
@@ -558,6 +548,24 @@
           else briefs
         );
     c = dataSet.${slug};
+    # A case study or a brief offers the CV that argues for its own subject: the
+    # solar portfolio hands out the energy variant, a fleet or a vulnerability
+    # programme the software one. German software pages take the German full CV:
+    # there is no German software variant, and an English PDF on a German page is
+    # worse than a general one in the reader's language. Every slug the site
+    # builds is listed, because a PDF no page links fails the build — a new page
+    # has to choose a variant rather than inherit one by accident.
+    variant =
+      {
+        energy-telemetry = "energy";
+        nixos-fleet = "software";
+        bountystash = "software";
+        fibtransponder = "software";
+        platform = "software";
+        vulnerability-operations = "software";
+        nixos-fleet-audit = "software";
+      }
+      .${slug} or "full";
     url = "${siteUrl}/${
       if lang == "de"
       then "de/"
@@ -631,17 +639,22 @@
       inherit (ui) themeAria;
       inherit (ui) langLabel;
       inherit langSwitch;
-      # The tailored CV the home header offers, reachable from a case study or a
-      # brief too: `pageRoot` is the locale root, so one row of links covers both
-      # locales instead of a path spelled per depth.
       cvHref = "${pageRoot}${
         if lang == "de"
-        then "cv-energy-de.pdf"
-        else "cv-energy.pdf"
+        then (
+          if variant == "energy"
+          then "cv-energy-de.pdf"
+          else "cv-de.pdf"
+        )
+        else (
+          if variant == "energy"
+          then "cv-energy.pdf"
+          else if variant == "software"
+          then "cv-software.pdf"
+          else "cv.pdf"
+        )
       }";
-      inherit (ui) cvTunedLabel;
-      cvSoftwareHref = "${pageRoot}cv-software.pdf";
-      inherit (ui) cvSoftwareLabel;
+      inherit (ui) cvLabel;
       cssHref = "${pageRoot}style.css";
       footer = "${privacy ui d.analytics} ${ui.footer}";
       analytics = mkAnalytics d.analytics;

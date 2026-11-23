@@ -85,14 +85,13 @@ check() { # page href expected-file
 }
 
 check / cv.pdf cv.pdf
-check / cv-energy.pdf cv-energy.pdf
-check / cv-software.pdf cv-software.pdf
 check /de/ ../cv-de.pdf cv-de.pdf
-check /de/ ../cv-energy-de.pdf cv-energy-de.pdf
-check /work/nixos-fleet ../cv-energy.pdf cv-energy.pdf
-check /brief/platform ../cv-energy.pdf cv-energy.pdf
-check /de/work/nixos-fleet ../../cv-energy-de.pdf cv-energy-de.pdf
-check /de/brief/platform ../../cv-energy-de.pdf cv-energy-de.pdf
+check /work/nixos-fleet ../cv-software.pdf cv-software.pdf
+check /work/energy-telemetry ../cv-energy.pdf cv-energy.pdf
+check /brief/platform ../cv-software.pdf cv-software.pdf
+check /de/work/nixos-fleet ../../cv-de.pdf cv-de.pdf
+check /de/work/energy-telemetry ../../cv-energy-de.pdf cv-energy-de.pdf
+check /de/brief/platform ../../cv-de.pdf cv-de.pdf
 
 echo
 echo "cv-links-check: $ok ok, $fail failed"

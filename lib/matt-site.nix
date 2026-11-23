@@ -209,33 +209,48 @@
   articleRecord = lang: kind: slug: let
     set =
       if kind == "case"
-      then (
-        if lang == "de"
-        then casesDe
-        else cases
-      )
-      else (
-        if lang == "de"
-        then briefsDe
-        else briefs
-      );
+      then
+        (
+          if lang == "de"
+          then casesDe
+          else cases
+        )
+      else
+        (
+          if lang == "de"
+          then briefsDe
+          else briefs
+        );
   in
     set.${slug};
 
   articleVariant = lang: kind: slug: let
     record = articleRecord lang kind slug;
-    file = "${if kind == "case" then "cases" else "briefs"}${if lang == "de" then ".de" else ""}.json";
+    file = "${
+      if kind == "case"
+      then "cases"
+      else "briefs"
+    }${
+      if lang == "de"
+      then ".de"
+      else ""
+    }.json";
   in
     record.cv or (throw "matt-site: ${file} entry '${slug}' names no CV — add \"cv\": \"energy\" or \"software\"");
 
   cvFileName = variant: lang:
     if variant == "full"
-    then (
+    then
+      (
+        if lang == "de"
+        then "cv-de.pdf"
+        else "cv.pdf"
+      )
+    else "cv-${variant}${
       if lang == "de"
-      then "cv-de.pdf"
-      else "cv.pdf"
-    )
-    else "cv-${variant}${if lang == "de" then "-de" else ""}.pdf";
+      then "-de"
+      else ""
+    }.pdf";
 
   declaredVariants = lib.unique (
     (map (s: articleVariant "en" "case" s) caseSlugs)
@@ -1052,83 +1067,83 @@
     '');
 in
   assert lib.assertMsg (unshippedVariants == []) "matt-site: no PDF pair for CV variant(s): ${lib.concatStringsSep ", " unshippedVariants} — a record names a CV this build does not ship";
-  pkgs.runCommand "matt-site" {nativeBuildInputs = [pkgs.python3];} ''
-    mkdir -p $out/de $out/work $out/de/work $out/brief $out/de/brief
-    install -m 0644 ${cssFile} $out/style.css
-    install -m 0644 ${card}/og.png $out/og.png
-    install -m 0644 ${card}/og-de.png $out/og-de.png
-    ${lib.concatMapStringsSep "\n    " (c: "install -m 0644 ${c.src}/cv.pdf $out/${c.name}") cvFiles}
-    install -m 0644 ${page "index.html" en} $out/index.html
-    install -m 0644 ${page "de-index.html" de} $out/de/index.html
-    ${lib.concatMapStringsSep "\n" (s: ''
-        install -m 0644 ${page "work-${s}.html" (mkArticle {
-          lang = "en";
-          slug = s;
-          kind = "case";
-        })} $out/work/${s}.html
-        install -m 0644 ${page "de-work-${s}.html" (mkArticle {
-          lang = "de";
-          slug = s;
-          kind = "case";
-        })} $out/de/work/${s}.html
-      '')
-      caseSlugs}
-    ${lib.concatMapStringsSep "\n" (s: ''
-        install -m 0644 ${page "brief-${s}.html" (mkArticle {
-          lang = "en";
-          slug = s;
-          kind = "brief";
-        })} $out/brief/${s}.html
-        install -m 0644 ${page "de-brief-${s}.html" (mkArticle {
-          lang = "de";
-          slug = s;
-          kind = "brief";
-        })} $out/de/brief/${s}.html
-      '')
-      briefSlugs}
-    cat > $out/robots.txt <<'EOF'
-    User-agent: *
-    Allow: /
+    pkgs.runCommand "matt-site" {nativeBuildInputs = [pkgs.python3];} ''
+      mkdir -p $out/de $out/work $out/de/work $out/brief $out/de/brief
+      install -m 0644 ${cssFile} $out/style.css
+      install -m 0644 ${card}/og.png $out/og.png
+      install -m 0644 ${card}/og-de.png $out/og-de.png
+      ${lib.concatMapStringsSep "\n    " (c: "install -m 0644 ${c.src}/cv.pdf $out/${c.name}") cvFiles}
+      install -m 0644 ${page "index.html" en} $out/index.html
+      install -m 0644 ${page "de-index.html" de} $out/de/index.html
+      ${lib.concatMapStringsSep "\n" (s: ''
+          install -m 0644 ${page "work-${s}.html" (mkArticle {
+            lang = "en";
+            slug = s;
+            kind = "case";
+          })} $out/work/${s}.html
+          install -m 0644 ${page "de-work-${s}.html" (mkArticle {
+            lang = "de";
+            slug = s;
+            kind = "case";
+          })} $out/de/work/${s}.html
+        '')
+        caseSlugs}
+      ${lib.concatMapStringsSep "\n" (s: ''
+          install -m 0644 ${page "brief-${s}.html" (mkArticle {
+            lang = "en";
+            slug = s;
+            kind = "brief";
+          })} $out/brief/${s}.html
+          install -m 0644 ${page "de-brief-${s}.html" (mkArticle {
+            lang = "de";
+            slug = s;
+            kind = "brief";
+          })} $out/de/brief/${s}.html
+        '')
+        briefSlugs}
+      cat > $out/robots.txt <<'EOF'
+      User-agent: *
+      Allow: /
 
-    Sitemap: ${siteUrl}/sitemap.xml
-    EOF
-    cat > $out/sitemap.xml <<'EOF'
-    <?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-    ${sitemapEntries}
-    </urlset>
-    EOF
-    cat > $out/404.html <<'EOF'
-    <!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title>
-    <body style="font:16px ui-monospace,monospace;padding:4rem;max-width:40rem">
-    <h1>404</h1><p>No such page.</p><p><a href="/">matt.bountystash.com</a></p>
-    EOF
-    # A CV changes in place under a stable name. Pages defaults the PDFs to a
-    # four-hour browser cache, so a fresh deploy could read old in the one place
-    # it matters. Zero max-age makes the browser revalidate every load.
-    install -m 0644 ${pkgs.writeText "matt-headers" (
-      lib.concatMapStringsSep "" (c: "/${c.name}\n  Cache-Control: public, max-age=0, must-revalidate\n") cvFiles
-    )} $out/_headers
-    # Gate: every CV the build ships is reachable from a page by a link that
-    # resolves, and every internal href on every emitted page — 404 and sitemap
-    # included, so this runs last — lands on a file. It runs inside the build,
-    # not only in `task site:links`, because `matt:deploy:prod` builds and
-    # publishes without that task: an orphaned CV must not leave the store.
-    #
-    # The `--gap` pre-flight runs first so a structural gap — a CV the build
-    # ships that no page links, or a target that resolves nowhere — names itself
-    # on one line and stops the build there, instead of after the anchor pass.
-    # It is not a replacement: the full gate below also proves the `download`
-    # attribute and the required list, which `--gap` cannot see.
-    # Gate: a page's CV anchor is the PDF its record names, in both locales.
-    # site-links proves the anchor resolves and downloads; this proves it points
-    # at the subject the record chose. Why: docs/cv-ats-compliance.md.
-    bash ${../scripts/task/site-routing.sh} $out ${./matt/cases.json} ${./matt/cases.de.json} ${./matt/briefs.json} ${./matt/briefs.de.json}
-    bash ${../scripts/task/site-links.sh} --gap $out ${
-      lib.concatStringsSep " " (map (c: c.name) cvFiles)
-    }
-    bash ${../scripts/task/site-links.sh} $out ${
-      lib.concatStringsSep " " (map (c: c.name) cvFiles)
-    }
-    echo "matt-site: $(find $out -type f | wc -l) files, $(du -sb $out | cut -f1) bytes"
-  ''
+      Sitemap: ${siteUrl}/sitemap.xml
+      EOF
+      cat > $out/sitemap.xml <<'EOF'
+      <?xml version="1.0" encoding="UTF-8"?>
+      <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+      ${sitemapEntries}
+      </urlset>
+      EOF
+      cat > $out/404.html <<'EOF'
+      <!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title>
+      <body style="font:16px ui-monospace,monospace;padding:4rem;max-width:40rem">
+      <h1>404</h1><p>No such page.</p><p><a href="/">matt.bountystash.com</a></p>
+      EOF
+      # A CV changes in place under a stable name. Pages defaults the PDFs to a
+      # four-hour browser cache, so a fresh deploy could read old in the one place
+      # it matters. Zero max-age makes the browser revalidate every load.
+      install -m 0644 ${pkgs.writeText "matt-headers" (
+        lib.concatMapStringsSep "" (c: "/${c.name}\n  Cache-Control: public, max-age=0, must-revalidate\n") cvFiles
+      )} $out/_headers
+      # Gate: every CV the build ships is reachable from a page by a link that
+      # resolves, and every internal href on every emitted page — 404 and sitemap
+      # included, so this runs last — lands on a file. It runs inside the build,
+      # not only in `task site:links`, because `matt:deploy:prod` builds and
+      # publishes without that task: an orphaned CV must not leave the store.
+      #
+      # The `--gap` pre-flight runs first so a structural gap — a CV the build
+      # ships that no page links, or a target that resolves nowhere — names itself
+      # on one line and stops the build there, instead of after the anchor pass.
+      # It is not a replacement: the full gate below also proves the `download`
+      # attribute and the required list, which `--gap` cannot see.
+      # Gate: a page's CV anchor is the PDF its record names, in both locales.
+      # site-links proves the anchor resolves and downloads; this proves it points
+      # at the subject the record chose. Why: docs/cv-ats-compliance.md.
+      bash ${../scripts/task/site-routing.sh} $out ${./matt/cases.json} ${./matt/cases.de.json} ${./matt/briefs.json} ${./matt/briefs.de.json}
+      bash ${../scripts/task/site-links.sh} --gap $out ${
+        lib.concatStringsSep " " (map (c: c.name) cvFiles)
+      }
+      bash ${../scripts/task/site-links.sh} $out ${
+        lib.concatStringsSep " " (map (c: c.name) cvFiles)
+      }
+      echo "matt-site: $(find $out -type f | wc -l) files, $(du -sb $out | cut -f1) bytes"
+    ''

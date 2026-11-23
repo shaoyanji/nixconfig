@@ -1,8 +1,40 @@
 {
-  "generated": "2026-11-23T16:50:55Z",
+  "generated": "2026-11-23T17:07:45Z",
   "count": 200,
-  "pin": "1119621f8b3be5481ea9c04137f64d98ab2390ead0f7e6c9f4ad66d26d0d8750",
+  "pin": "5568f3720de23a4dad10086c0c752d2afec9328a189fa809aa0c9ebb5d5de625",
   "turns": [
+    {
+      "id": "d77c1a39-29a2-4b6b-af3a-4c069eeadc66",
+      "ts": "2026-11-23T16:51:09Z",
+      "source": "devin",
+      "subject": "nixconfig:apps-scout-pipeline",
+      "action": "landed: drove devin to stage taskfiles/apps.yml, verify apps-scout.sh --dry, commit apps:scout task",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/apps.yml",
+        "scripts/task/apps-scout.sh"
+      ],
+      "files": [
+        "taskfiles/apps.yml",
+        "scripts/task/apps-scout.sh"
+      ],
+      "base_commit": "50c87f316d79085b07d158d0be21cc96e6fd301e",
+      "branch": "main",
+      "frame": "03hagnoxc0yk47m0jtek7brmi"
+    },
+    {
+      "id": "297c25aa-2c33-46aa-9aa1-8f2420a6a583",
+      "ts": "2026-11-23T16:51:07Z",
+      "source": "devin",
+      "subject": "nixconfig:apps-scout",
+      "action": "landed: apps:scout task + apps-scout.sh — --dry verified both ways (rc=2 bad input, rc=0 prints row); check:verify 130/130 no drift",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "50c87f316d79085b07d158d0be21cc96e6fd301e",
+      "branch": "main",
+      "frame": "03hagnom9ce18lwy7ga2wmtm6"
+    },
     {
       "id": "0aa7a3e8-d8e3-4aa4-a92d-901c19f6483c",
       "ts": "2026-11-23T16:44:11Z",
@@ -2704,34 +2736,6 @@
       "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
       "branch": "main",
       "frame": "03haas623ybb19b3v3a4ddhxz"
-    },
-    {
-      "id": "12a3cf45-a056-4902-9b8c-62e4fa41b5a5",
-      "ts": "2026-11-22T22:48:00Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "claim: hosts/eisen/llm-server.nix",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/eisen/llm-server.nix"
-      ],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haas3qybc6cyf1j67rz7xro"
-    },
-    {
-      "id": "318a7118-5300-4eb1-9c78-f6d8f10dba40",
-      "ts": "2026-11-22T22:42:35Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "landed: lib/taskfile.nix audit — file DELETED in 7babc9a2; audited successors taskfile_graph.py + taskfile-graph.sh: ~30 units, ~100% correctly channelled, no routing pass warranted | report at ~/.local/state/comment-audit/taskfile.md",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haar1naux4zizw7m1x6aktk"
     }
   ]
 }

@@ -219,6 +219,19 @@
       deutsch-srs.pkg = pkgs.callPackage ./deutsch-srs.nix {};
       anki-author.pkg = pkgs.callPackage ./anki-author.nix {};
     };
+    image = {
+      # The image-daily pipeline's data leg: `manifest` builds the Pages
+      # manifest from urls.tsv, the ledger, the briefs and the roster —
+      # the jq/awk that used to live in image-daily-engine.sh, byte-identical.
+      daily.pkg = pkgs.buildGoModule {
+        pname = "image-daily";
+        version = "0.1.0";
+        src = ../tools/image-daily;
+        vendorHash = null;
+        env.CGO_ENABLED = 0;
+        meta.description = "image-daily manifest builder (Go stdlib, no dependencies)";
+      };
+    };
     # The preview server every `site-target.sh preview` and the kg-canvas gate
     # run: Go stdlib, so it answers Range (a video can be seeked) and needs no
     # interpreter. It replaced `python3 -m http.server`, which ignores Range.

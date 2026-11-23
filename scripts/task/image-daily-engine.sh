@@ -380,59 +380,25 @@ banner_crop() { # png jpg
 # the `arch:` token and the palette-tail — and both come out of the prose, which is
 # what a reader wants. A row that is held keeps its text after the `hold:` prefix.
 
-plates_description() {
-  local roster=$repo/lib/image-daily/plates.txt
-  {
-    # A judge sentence first, as the weakest source: for the 2026-11-10 batch the
-    # only prose that ever described the picture is the verdict's own sentence
-    # ("clean minimalist dunes with smooth rolling curves"). A reason that is an
-    # error or a backfill says nothing about the image, so it is skipped.
-    if [ -f "$LEDGER" ]; then
-      jq -r 'select(type == "object") | select((.prompt // "") == "")
-        | (.reason // "") as $r
-        | select($r != "")
-        | select(($r | ascii_downcase | test("error|429|backfilled|rate limited|agy exited") | not))
-        | [(.path | split("/") | last | sub("\\.(png|jpg|jpeg|webp)$"; "")), $r]
-        | @tsv' "$LEDGER" 2>/dev/null || true
-    fi
-    # Briefs next, as the weakest real sentence: the oldest plates predate the ledger's
-    # prompt column, and their sentence is still on the brief they came from. A
-    # brief id carries its lane as a prefix, which is not part of the slug.
-    if [ -f "$BRIEFS" ]; then
-      jq -r '.briefs[]?
-        | [(.id | sub("^(wall|blog|badge|site)-"; "") | sub("^(char|plate)-"; "")), (.prompt // "")]
-        | @tsv' "$BRIEFS" 2>/dev/null || true
-    fi
-    # The ledger next, oldest to newest: every plate was made by a sentence, so a
-    # plate the roster no longer carries (an older hand-run batch, a blog banner,
-    # a badge) still reads as itself instead of showing an empty card.
-    if [ -f "$LEDGER" ]; then
-      jq -r 'select(type == "object") | select((.prompt // "") != "")
-        | [(.path | split("/") | last | sub("\\.(png|jpg|jpeg|webp)$"; "")), .prompt]
-        | @tsv' "$LEDGER" 2>/dev/null || true
-    fi
-    # The roster last, so its sentence wins over an earlier ledger prompt.
-    if [ -f "$roster" ]; then
-      awk -F'|' '/^#/ { next } NF < 2 { next } { print $1 "\t" $2 }' "$roster"
-    fi
-  } | awk -F'\t' '
-    {
-      # `d` is the map, so the sentence needs its own name: using `d` for both is a
-      # fatal "attempt to use scalar as an array", and the whole description stream
-      # then reads as no descriptions at all (2026-11-22, 651 empty cards).
-      slug = $1
-      desc = $2
-      sub(/^hold: .* :: /, "", desc)
-      gsub(/arch:[a-z0-9-]+/, "", desc)
-      sub(/[[:space:]]*4k, photorealistic, realistic, neumorphism\.?[[:space:]]*$/, "", desc)
-      gsub(/[[:space:]]+/, " ", desc)
-      sub(/^ /, "", desc)
-      sub(/ $/, "", desc)
-      # A card has room for a sentence, not a paragraph: the verdict strings run long.
-      if (length(desc) > 300) desc = substr(desc, 1, 297) "..."
-      if (desc != "") d[slug] = desc
-    }
-    END { for (s in d) print s "\t" d[s] }'
+# The manifest is the Go tool's job now (tools/image-daily, .#cli.image.daily):
+# it reads the same urls.tsv, ledger, briefs and roster the jq/awk used to and
+# emits the same manifest byte for byte — verified against the live bank.
+# Resolution order lets a slot's PATH closure supply the binary while a hand
+# run builds it once from the checkout, the way site-target.sh resolves
+# static-serve.
+image_daily_cli() {
+  if [ -n "${IMAGE_DAILY_BIN:-}" ]; then
+    printf '%s\n' "$IMAGE_DAILY_BIN"
+    return 0
+  fi
+  if command -v image-daily >/dev/null 2>&1; then
+    command -v image-daily
+    return 0
+  fi
+  local out
+  out=$(cd "$repo" && nix build --builders "" --no-link --print-out-paths '.?submodules=1#cli.image.daily' 2>/dev/null | tail -1)
+  [ -n "$out" ] || die "image-daily CLI missing: not on PATH and .#cli.image.daily did not build"
+  printf '%s/bin/image-daily\n' "$out"
 }
 
 
@@ -443,17 +409,11 @@ build_index() {
   [ -f "$shell" ] || die "missing the asset frontend at $shell"
   [ -s "$IMAGES_ROOT/published/urls.tsv" ] || die "no urls.tsv yet — the manifest is built from it"
   mkdir -p "$dist"
-  # slug -> description, so a plate's sentence travels into the gallery. An empty
-  # object is a roster that is missing or has no prose, not an error: the manifest
-  # still builds, and `description` is then an empty string.
-  # A file, not `--argjson`: the roster's prose is a hundred kilobytes, and one
-  # argv entry is capped near 128 KB, so a 500-row roster failed the exec with
-  # "Argument list too long" (2026-11-22, the first round to publish at 506 rows).
-  # `--slurpfile` keeps the prose off the command line.
   # Shape travels with the manifest so the gallery can offer a phone filter: a
   # portrait plate cropped into a 1200x630 card is a stripe of itself. Measured
   # once per file and cached, because ffprobe over the whole tree on every
-  # publish is the difference between a quick publish and a slow one.
+  # publish is the difference between a quick publish and a slow one. The tool
+  # reads this cache, so it stays the shell's side of the contract.
   local shapes=$IMAGES_ROOT/published/shapes.tsv rel file dim
   [ -f "$shapes" ] || : >"$shapes"
   while IFS=$'\t' read -r rel _ _; do
@@ -465,59 +425,17 @@ build_index() {
     dim=$(dimensions "$file" 2>/dev/null) || continue
     [ -n "$dim" ] && printf '%s\t%s\n' "$rel" "$dim" >>"$shapes"
   done <"$IMAGES_ROOT/published/urls.tsv"
-  local shape_file
-  shape_file=$(mktemp) || die "no temp file for the asset shapes"
-  jq -R -s 'split("\n") | map(select(length > 0) | split("\t") as $f | {key: $f[0], value: ($f[1] // "")}) | from_entries' \
-    <"$shapes" >"$shape_file" || printf '{}\n' >"$shape_file"
 
-  local meta_file
-  meta_file=$(mktemp) || die "no temp file for the roster descriptions"
-  plates_description |
-    jq -R -s 'split("\n") | map(select(length > 0) | split("\t") as $f | {key: $f[0], value: ($f[1] // "")}) | from_entries' >"$meta_file" ||
-    printf '{}\n' >"$meta_file"
-  # Rows are path, URL, bytes. `public_id` is what a person searches and what
-  # Cloudinary addresses; `day` is empty for a blog banner, whose slug carries it.
-  jq -Rn --arg ts "$(date -u +%FT%TZ)" --argjson stop "$TAG_STOP" \
-    --slurpfile meta "$meta_file" --slurpfile shape "$shape_file" '
-    [inputs | select(length > 0) | split("\t")
-      | {path: .[0], url: .[1], bytes: ((.[2] // "0") | tonumber)}]
-    | map(. + {
-        public_id: (.path | sub("\\.(png|jpg|jpeg|webp)$"; "")),
-        lane: (.path | split("/")[0]),
-        name: (.path | split("/") | last),
-        # `capture` yields no value when the pattern is absent — that is not an
-        # error, so `try/catch` never sees it, and an empty `day` drops the whole
-        # object out of `map`. A blog banner carries its date in the slug instead.
-        day: ((.path | capture("(?<d>[0-9]{4}-[0-9]{2}-[0-9]{2})").d) // "")
-      }
-      | . as $a
-      | . + {
-        # The name a person reads, from the file name: a slug is a search key, not
-        # a caption. `enhanced` is the same plate at 2400 px with a sharpen, which
-        # is what a wallpaper wants; the stored upload stays the untouched render.
-        title: ($a.name | sub("\\.(png|jpg|jpeg|webp)$"; "") | split("-")
-          | map(select(length > 0) | (.[0:1] | ascii_upcase) + .[1:]) | join(" ")),
-        description: ($meta[0][$a.name | sub("\\.(png|jpg|jpeg|webp)$"; "")] // ""),
-        shape: ($shape[0][$a.path] // ""),
-        enhanced: ($a.url | sub("/upload/"; "/upload/w_2400,c_limit,e_sharpen:70,q_auto:best,f_auto/")),
-        tags: ([$a.public_id | split("/")[] | select(test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$") | not)
-          | split("-")[] | split("_")[] | ascii_downcase
-          | select(length > 2) | select(test("^[0-9]+$") | not) | select(. != $a.lane)
-          | select(. as $t | ($stop | index($t)) == null)] | unique)
-      })
-    | sort_by(.path)
-    | {generatedAt: $ts, count: length,
-       tags: ([.[] | .tags[]] | group_by(.) | map({tag: .[0], count: length}) | sort_by(-.count, .tag)),
-       assets: .}
-  ' <"$IMAGES_ROOT/published/urls.tsv" >"$out.tmp" || {
-    rm -f "$out.tmp" "$meta_file" "$shape_file"
-    die "build_index: the manifest did not build (the served one is untouched)"
-  }
   # Written beside and moved into place: a redirect that fails truncates its
   # target, and a truncated manifest.json reads as "0 assets served", which the
   # shrink guard then cannot compare against (2026-11-22).
-  mv -f "$out.tmp" "$out"
-  rm -f "$meta_file" "$shape_file"
+  local tmp
+  tmp=$(mktemp) || die "no temp file for the manifest"
+  "$(image_daily_cli)" manifest --root "$IMAGES_ROOT" --repo "$repo" >"$tmp" || {
+    rm -f "$tmp"
+    die "build_index: the manifest did not build (the served one is untouched)"
+  }
+  mv -f "$tmp" "$out"
   cp -f "$shell" "$dist/index.html"
   cp -f "$out" "$dist/manifest.json"
   say "manifest: $(jq -r '.count' "$out") asset(s), $(du -sh "$dist" | cut -f1) of frontend"

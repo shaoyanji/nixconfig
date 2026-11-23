@@ -69,7 +69,7 @@
     "scripts/task/host-paths-check.sh" = 101;
     "scripts/task/host-restore.sh" = 281;
     "scripts/task/hosts-args-check.sh" = 121;
-    "scripts/task/image-daily-engine.sh" = 714;
+    "scripts/task/image-daily-engine.sh" = 632;
     "scripts/task/image-daily-lib.sh" = 274;
     "scripts/task/image-daily-plates.sh" = 285;
     "scripts/task/image-daily-post.sh" = 166;

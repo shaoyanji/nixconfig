@@ -452,6 +452,9 @@
           pkgs.ffmpeg
           pkgs.bash
           pkgs.antigravity-cli
+          # The manifest leg is Go now (tools/image-daily); the slot's build_index
+          # calls it from this closure rather than nix-building inside a timer.
+          self.packages.${pkgs.stdenv.hostPlatform.system}.cli.image.daily
         ]
       }:"$PATH"
       export IMAGES_ROOT=/Volumes/data/pics/generated

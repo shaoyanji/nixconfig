@@ -290,6 +290,11 @@ in {
         // {
           inherit self hostInventory;
           fleetHost = name;
+          # Leaf lists for user.base/user.ai — the same per-host data the
+          # embedded and container chains resolve, so a standalone host's
+          # `hmBase`/`hmAi` fields take effect here too.
+          hmBaseFeatures = host.hmBase or (import self.modules."global.user").hmBaseFeatures;
+          hmAiFeatures = host.hmAi or (import self.modules."global.user").hmAiFeatures;
         };
       # Standalone HM hosts build their own pkgs; none needs an overlay, so the
       # package set is the one `legacyPackages` already is.

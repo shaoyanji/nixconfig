@@ -39,9 +39,14 @@ options (`hmUserModules` default `[roles.home]`; `hmUserFeatures` =
 `mkDefault` of the host's own `hmFeatures` in `flake/host-inventory.nix`,
 enum-typed so a typo is an eval error; `user.hmFeatures` is the enum and the
 fallback for a host with no field). `roles.home` maps each feature to its
-module set; `roles.minimal` is unconditional inside it. An edit to one host's
-`hmFeatures` list lands on that host only — the per-host split this audit
-recommended is landed.
+module set; `roles.minimal` rides the `minimal` feature (first in every
+host's list) — the base+ai floor is now droppable per host like any other
+feature. An edit to one host's `hmFeatures` list lands on that host only —
+the per-host split this audit recommended is landed. The leaf lists inside
+`user.base`/`user.ai` are the same data shape: `hmBase`/`hmAi` in the host's
+inventory entry, resolved as `fleet.hmBaseFeatures`/`fleet.hmAiFeatures`
+(embedded, via `home-manager-shared`) or straight into `extraSpecialArgs`
+(containers/demo/standalone).
 
 `home-manager-shared` is imported by exactly two global modules:
 
@@ -59,7 +64,8 @@ recommended is landed.
 Feature → module map (`roles/home.nix`): `systemd-policy` `shell` `dev`
 `ai` (antigravity-cli + selector-daemon) `browser` (zen + aria2)
 `media` (multimedia + kitty) `desktop` (suite + niri, the latter gated by
-`dankShell`). Every host above takes `roles.minimal` inside the role.
+`dankShell`) `minimal` (roles.minimal — the user.base + user.ai floor). Every
+host above names `minimal` first, preserving the old unconditional order.
 
 ## Chain C — HM integration without the role
 
@@ -69,7 +75,7 @@ now `hmModules` in each host's inventory entry, resolved per host inside
 
 | hosts | via | `hmModules` |
 |---|---|---|
-| applevalley, ares, deckstation, delphi, guckloch, kellerbench, mtfuji, sledgehammer | `containers` → `global.noDE` | `roles.minimal` + `shell`, `profiles.ai` off. delphi adds `mail-agent` import + hermes units; guckloch adds `ai.skills`/`antigravity-cli` + an atuin mkForce — additive imports merge on top |
+| applevalley, ares, deckstation, delphi, guckloch, kellerbench, mtfuji, sledgehammer | `containers` → `global.noDE` | `roles.minimal` + `shell`, `hmAi = ["skills"]` + `profiles.ai` off — the AI leaf imports are gone, only the unconditional skills materialization stays; the enable=false option surface still exists. delphi adds `mail-agent` import + hermes units; guckloch adds `ai.skills`/`antigravity-cli` + an atuin mkForce — additive imports merge on top |
 | demo | `demo` → `global.demo` | `roles.demo` |
 
 An edit to the `inputs.home-manager` flake pin reaches all of chains A–C plus

@@ -21,6 +21,8 @@
         # the recursion that broke cassini's eval.
         dankShell = config.fleet.dankShell.enable;
         hmUserFeatures = config.fleet.hmUserFeatures;
+        hmBaseFeatures = config.fleet.hmBaseFeatures;
+        hmAiFeatures = config.fleet.hmAiFeatures;
       };
       # Optionally, use home-manager.extraSpecialArgs to pass
     };

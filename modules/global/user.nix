@@ -22,6 +22,7 @@
   # `fleet.hmUserFeatures` to a subset (nixos) and drops the module, not just its
   # config — which is the point, since option surface is what a gate pays for.
   hmFeatures = [
+    "minimal"
     "systemd-policy"
     "shell"
     "dev"
@@ -29,6 +30,27 @@
     "browser"
     "media"
     "desktop"
+  ];
+  # The leaf lists inside `user.base` and `user.ai`, one name per import so a
+  # host can trim the option surface its HM eval pays for. A container that
+  # runs `profiles.ai.enable = false` keeps only the unconditional skills
+  # materialization (`hmAi = ["skills"]`); the default is every leaf.
+  hmBaseFeatures = [
+    "scripts"
+    "lf"
+    "env"
+    "shell"
+    "sops"
+    "helix"
+    "lynx"
+  ];
+  hmAiFeatures = [
+    "aichat"
+    "antigravity-cli"
+    "skills"
+    "freebuff-remote"
+    "mainframe-remotes"
+    "zed-mcp"
   ];
   # The envs.net pubnix account: mail lives on mail.envs.net, not on the host,
   # and the IMAP/SMTP login is the full address rather than the unix name.

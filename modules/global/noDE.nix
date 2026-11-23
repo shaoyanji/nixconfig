@@ -16,6 +16,18 @@
     if builtins.isString hostName && builtins.hasAttr hostName hostInventory
     then hostInventory.${hostName}.hmModules or ["roles.minimal" "shell"]
     else ["roles.minimal" "shell"];
+  # The same per-host resolution for the leaf lists inside user.base/user.ai:
+  # containers carry `hmAi = ["skills"]` so `profiles.ai.enable = false`
+  # disables the stack without paying its import surface. Passed through
+  # extraSpecialArgs because `imports` may not read `config`.
+  hmBase =
+    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+    then hostInventory.${hostName}.hmBase or user.hmBaseFeatures
+    else user.hmBaseFeatures;
+  hmAi =
+    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+    then hostInventory.${hostName}.hmAi or user.hmAiFeatures
+    else user.hmAiFeatures;
 in {
   home-manager = {
     useGlobalPkgs = true;
@@ -41,6 +53,8 @@ in {
       inherit inputs self;
       inherit (config.networking) hostName;
       fleetHost = config.networking.hostName;
+      hmBaseFeatures = hmBase;
+      hmAiFeatures = hmAi;
     };
   };
 }

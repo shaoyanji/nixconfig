@@ -26,6 +26,8 @@
         # Same mechanism for the role's feature list: an import decision, taken
         # before `config` exists inside the HM module system.
         hmUserFeatures = config.fleet.hmUserFeatures;
+        hmBaseFeatures = config.fleet.hmBaseFeatures;
+        hmAiFeatures = config.fleet.hmAiFeatures;
       };
     };
   };

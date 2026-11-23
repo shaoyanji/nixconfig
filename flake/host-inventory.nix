@@ -28,7 +28,7 @@
     # The fleet desktop chain. The host imports base-desktop-environment itself;
     # the Ryoku tier it ran from 2026-11-02 to 2026-11-11 is retired.
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/poseidon/configuration.nix];
   };
 
@@ -38,6 +38,9 @@
     features = ["base" "containers"];
     modules = [../hosts/mtfuji/configuration.nix];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
 
   kellerbench = {
@@ -46,6 +49,9 @@
     features = ["base" "containers"];
     modules = [../hosts/kellerbench/configuration.nix];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
 
   deckstation = {
@@ -54,6 +60,9 @@
     features = ["base" "containers"];
     modules = [../hosts/deckstation/configuration.nix];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
 
   delphi = {
@@ -73,12 +82,15 @@
       (import ../hosts/delphi/disko.nix {device = "/dev/sda";})
     ];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/eisen/configuration.nix];
   };
 
@@ -91,6 +103,9 @@
       ../hosts/applevalley/configuration.nix
     ];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
 
   frieren = {
@@ -104,7 +119,7 @@
     # nothing started. The bridge and NAT the canary needs come from
     # modules/profiles/microvm-host.nix, which infra-stack.nix imports directly.
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/frieren/configuration.nix];
   };
 
@@ -117,13 +132,16 @@
       (import ../hosts/common/disko.nix {device = "/dev/sda";})
     ];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
 
   stark = {
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms" "disko"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [
       ../hosts/stark/configuration.nix
       (import ../hosts/stark/disko.nix {
@@ -143,7 +161,7 @@
     # fleet chain and the session comes from profiles.dwl-desktop, the same profile
     # netbook and scratch adopt.
     features = ["base" "nixos" "dms" "disko"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media"];
     modules = [
       ../hosts/fern/configuration.nix
       (import ../hosts/fern/disko.nix {device = "/dev/nvme0n1";})
@@ -154,7 +172,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms" "impermanence"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [
       ../hosts/schneeeule/configuration.nix
       (import ../hosts/common/disko.nix {device = "/dev/sda";})
@@ -165,7 +183,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/scratch/configuration.nix];
   };
 
@@ -173,7 +191,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/aristotle/configuration.nix];
   };
 
@@ -181,7 +199,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/diogenes/configuration.nix];
   };
 
@@ -210,7 +228,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/aceofspades/configuration.nix];
   };
 
@@ -218,7 +236,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/ancientace/configuration.nix];
   };
 
@@ -231,6 +249,9 @@
       inputs.nixos-wsl.nixosModules.default
     ];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
 
   minyx = {
@@ -255,6 +276,9 @@
     features = ["base" "containers" "disko"];
     modules = [../hosts/sledgehammer/configuration.nix];
     hmModules = ["roles.minimal" "shell"];
+    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
+    # only the unconditional skills materialization stays on the surface.
+    hmAi = ["skills"];
   };
 
   demo = {
@@ -337,7 +361,7 @@
     features = ["base" "macos"];
     # darwin has no systemd: the `systemd-policy` feature reads
     # `osConfig.systemd.services`, which is not an option there.
-    hmFeatures = ["shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = ["minimal" "shell" "dev" "ai" "browser" "media" "desktop"];
     modules = [../hosts/cassini/configuration.nix];
   };
 }

@@ -5272,10 +5272,10 @@
     hm-leaf-chain-split = {
       title = "The remaining HM chains: roles.home's minimal hardcode and the user.base/user.ai leaf lists";
       kind = "proposal";
-      status = "PROPOSED";
+      status = "DELIVERED";
       priority = "P3";
       date = "2026-11-24";
-      summary = "After the per-host list split (hmFeatures/hmModules landed 1ce4ac4f), three hardcoded import lists still land multi-host: roles.home's unconditional roles.minimal (12 embedded hosts), roles.minimal's [user.base user.ai] (22 hosts), and the leaf lists inside user.base (7 imports) and user.ai (6). Same shape as the earlier splits: maps stay shared, lists become per-host data.";
+      summary = "After the per-host list split (hmFeatures/hmModules landed 1ce4ac4f), three hardcoded import lists still landed multi-host: roles.home's unconditional roles.minimal (12 embedded hosts), roles.minimal's [user.base user.ai] (22 hosts), and the leaf lists inside user.base (7 imports) and user.ai (6). Same shape as the earlier splits: maps stay shared, lists became per-host data.";
       from = ["eval-cost-ladder"];
       refs = {
         hosts = [
@@ -5328,9 +5328,7 @@
           (aichat, antigravity-cli, skills, freebuff-remote, mainframe-remotes,
           zed-mcp) → the same 22 through minimal. Containers pay the import
           surface then gate it off (noDE: profiles.ai.enable=false).
-        - roles.lean (clanker) and roles.demo (demo): one host each — already
-          per-host. The roles/home features map and system featureModules map
-          are shared by design: a feature is its definition.
+        - roles.lean (clanker) and roles.demo (demo): already per-host.
 
         Plan, consistent with list-per-host / map-shared:
         1. `minimal` becomes a named entry in roles/home's features map; every
@@ -5341,9 +5339,10 @@
         3. user.base / user.ai lists become per-host data (hmBaseFeatures /
            hmAiFeatures) so a container's AI-off is data, not option disables.
 
-        Exit: drv-equality identical on all evaluating hosts; checks:host on
-        delphi + cassini + fern (one per chain); checks:quick green; noDE's
-        profiles.ai disable retired or reduced to one data word.
+        Landed: minimal is a named feature; user.base/user.ai take
+        hmBaseFeatures/hmAiFeatures args via extraSpecialArgs in all four
+        chains; containers carry hmAi=["skills"] (the only unconditional
+        leaf). 30/30 drv-identical; checks:host + checks:quick green.
       '';
     };
   };

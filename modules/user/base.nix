@@ -3,22 +3,27 @@
   self,
   pkgs,
   lib,
+  # Per-host leaf list (`hmBase` in flake/host-inventory.nix). The default
+  # imports the constants file directly — the `user` module arg resolves
+  # through `_module.args`/`config`, which `imports` may not force.
+  hmBaseFeatures ? (import self.modules."global.user").hmBaseFeatures,
   ...
 }: let
   # `#` starts a comment, whole-line or trailing, so a curated list can carry
   # the reason next to the name (lib/pkg-list.nix).
   pkgList = import self.nixFiles.lib."pkg-list.nix" {inherit lib;};
   readPkgList = path: pkgList.resolve {inherit pkgs path;};
+  baseFeatures = {
+    scripts = [self.modules."scripts"];
+    lf = [self.modules."lf"];
+    env = [self.modules."env"];
+    shell = [self.modules."shell"];
+    sops = [self.modules."sops"];
+    helix = [self.modules."helix"];
+    lynx = [self.modules."lynx"];
+  };
 in {
-  imports = [
-    self.modules."scripts"
-    self.modules."lf"
-    self.modules."env"
-    self.modules."shell"
-    self.modules."sops"
-    self.modules."helix"
-    self.modules."lynx"
-  ];
+  imports = lib.concatMap (f: baseFeatures.${f} or []) hmBaseFeatures;
 
   home = {
     stateVersion = "25.05";

@@ -1,8 +1,166 @@
 {
-  "generated": "2026-11-23T23:25:28Z",
+  "generated": "2026-11-23T23:48:34Z",
   "count": 200,
-  "pin": "ee4c53e5cc6bc5c5a38cb6bfc86bf2d7032a8a6a8ba1d4f3bc1db0de51c40119",
+  "pin": "b0b358c8ff3d48b7fb09e76544b5824fe6628c060a8e0b3a9e666864f294f49e",
   "turns": [
+    {
+      "id": "ebddffd0-9caf-4202-bb19-645f30bf3520",
+      "ts": "2026-11-23T23:45:47Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "drove idle pane 0:2.1 (delphi freebuff, ssh TUI): jev picked scout-new@0.99 margin 0.98; pasted job-search task, Enter accepted (fresh thinking... 3s); queued scout of new DevOps/SRE/Platform/Infra openings",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haiwoslogh5saxzv1ch25kx"
+    },
+    {
+      "id": "6339e72f-bfd0-43bf-b818-78908537ea08",
+      "ts": "2026-11-23T23:42:48Z",
+      "source": "delphi-freebuff",
+      "subject": "nixconfig:delphi-record-leads",
+      "action": "recorded 3 leads from scout-2026-11-24 into the delphi apps DB: Karcher CI/CD & OS Engineer (Nix builds, Stuttgart), R&S/LANCOM Senior Platform Engineer (remote Germany), AEB Kubernetes Platform Engineer (Stuttgart hybrid). Skipped employers already applied or tracked (Mittwald, Hospitable, Flox, Supabase) and the removed Wire SRE req. No repo files changed; DB only.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haiw3tinq690c7br5ham1mr"
+    },
+    {
+      "id": "d18e85dd-ef26-48f9-a32a-efa641ccb061",
+      "ts": "2026-11-23T23:41:51Z",
+      "source": "freebuff-agent",
+      "subject": "nixconfig:delphi-record-leads",
+      "action": "landed: delphi(0:2.1 ssh freebuff) idle->record_leads (jev 0.83/0.67 selected); drove pane to record scouted leads (Kärcher/jobware R&S, AEB softgarden, Mittlah, Hospitable, Flox Ashby, Supabase, wire.com) into apps pipeline via apps:add --origin scout-2026-11-24",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haivx4lci0xfoqjp304vzh0"
+    },
+    {
+      "id": "98c13b9a-bfd2-4a2a-99cc-fbbf137ec252",
+      "ts": "2026-11-23T23:41:19Z",
+      "source": "freebuff-agent",
+      "subject": "nixconfig:freebuff-job-followup",
+      "action": "landed: routed freebuff(0:1.1) idle->follow_up_leads (jev 0.99/0.98 decisive); drove pane to work 6 unsubmitted prep packets (Air Apps, Peter Park, Reverion, Abstract Tech, LiveEO, Namespace) + interview replies",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haivtbkwo3ehep5pl819yhd"
+    },
+    {
+      "id": "ae791652-86f1-49b8-b590-a297e153800b",
+      "ts": "2026-11-23T23:36:19Z",
+      "source": "codebuff",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "Published matt.bountystash.com from HEAD: site:check 35/47/17 ok 0 failed; site:links 91 links/17 pages, all 6 PDFs linked, 16 anchors download; rebuild store qcjkcnkr unchanged; deploy b997d77e; /de/ identical custom==deployment==store (dc16e829); live==store 28/28; 6/6 CV PDFs 200 application/pdf both hosts. No new commit: tree clean, HEAD==origin/main | gate: site:check + site:links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haiuu7j68a1slas40fssyvj"
+    },
+    {
+      "id": "43a96895-e633-488e-8837-dd878c6a96a9",
+      "ts": "2026-11-23T23:35:59Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-market-research",
+      "action": "drove idle delphi freebuff pane 0:2.1 over ssh tunnel via jevdecide research p=0.98 margin=0.97 decisive: task scout DevOps/SRE/Platform/Infrastructure job market for new engineering leads — companies hiring, roles that exist, realistic CV match. Pane confirmed working: 4s counter after Enter.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haiurvmqy0fjweiy927dwnu"
+    },
+    {
+      "id": "56c7eb86-4f07-4964-aebc-b5772115b65b",
+      "ts": "2026-11-23T23:35:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-site-lane",
+      "action": "drove idle freebuff pane 0:1.1 via jevdecide publish p=0.88 margin=0.76 decisive: task publish CV site from HEAD — site:check across matt/bountystash/concept, prove /de/ byte-identical custom vs deployment, rebuild matt-site, publish to matt Pages project, verify every shipped CV PDF linked and live serves built store path. Pane confirmed working: thinking 1s then working 25s.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haiup8dghn3i6v2bepw84h0"
+    },
+    {
+      "id": "24f5188b-e065-4095-8416-d652c866fd1d",
+      "ts": "2026-11-23T23:34:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:hm-leaf-chain-split",
+      "action": "drove idle devin pane 0:0.1 via jevdecide chain-change p=0.88 margin=0.82 decisive: approved phase 1 of hm-features split (data-only: name minimal as feature in roles/home map, convert roles.minimal [user.base user.ai] + leaf lists into hmBaseFeatures/hmAiFeatures data so profiles.ai.enable disables AI without import surface; prove drv-identical delphi+cassini+fern, checks:host+quick green, agents-notes-schema builds, push origin/main). Pane working: Thinking 3s.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haiueugejf0tbkugsw0xdtc"
+    },
+    {
+      "id": "aef79495-c531-463f-a1b0-a8657d33dc1b",
+      "ts": "2026-11-23T23:31:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-market-research",
+      "action": "landed: DE/EU DevOps-SRE-Platform market research at docs/history/2026-11-24-devops-sre-platform-market-de-eu.md, claims sourced+read 2026-11-24. German DevOps ads 17% full remote/58.5% hybrid; published median EUR 80k, remote-first EU 110-200k; NixOS 170 postings/90d US-skewed; stack K8s+Terraform+CI/observability+on-call. gate ops:docs:budget PASS; uncommitted by design (job-search content stays off the public repo).",
+      "outcome": "done",
+      "claims": [
+        "docs/history"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haitv9n1czrma29jcyp838g"
+    },
+    {
+      "id": "e98a6bc3-5425-49ee-ace1-fc5e12396556",
+      "ts": "2026-11-23T23:29:02Z",
+      "source": "codebuff",
+      "subject": "nixconfig:cv-site-lane",
+      "action": "site:check exit 0: matt 35/0, bountystash 47/0, concept 17/0. /de/ byte-identical custom vs deployment abffac65 (200, 29679 B). matt-site rebuilt at HEAD gives same store path qcjkcnkr; live 28/28 byte-equal, no redeploy. /cv/matt-ji-cv.pdf is not a route (404 both) - real CVs at /cv*.pdf. No commit: tree clean, HEAD==origin/main | gate: site:check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haitez6sch7vshg9phgupct"
+    },
+    {
+      "id": "9273a436-d0a5-4206-bca9-cf28d87829f9",
+      "ts": "2026-11-23T23:28:38Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane-drive-2026-11-24T0025",
+      "action": "drove 2 idle freebuff panes via jevdecide: 0:1.1 CV/site publish (publish p=0.91 margin=0.84, decisive, working 44s); 0:2.1 delphi job-market research (research p=0.92 margin=0.89, decisive, working 14s). Pure job-search scouting candidate routed needs_review (task-change 0.41/0.02) so not sent; routed distinct grounded research instead.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haitc4kqnehapuc0dvrtcjr"
+    },
+    {
+      "id": "0ef314e1-a5e6-40ec-bdb5-d371d451ac1b",
+      "ts": "2026-11-23T23:25:39Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-leaf-chain-split",
+      "action": "landed: blast radius of remaining HM chains computed via ops:kg:blast + host-inventory join; roles.home->roles.minimal reaches 12 embedded hosts, roles.minimal->user.base+user.ai reaches 22, leaf lists inside user.base/user.ai reach the same 22; split plan documented as note hm-leaf-chain-split (kind=proposal, PROPOSED, P3) | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
+      "branch": "main",
+      "frame": "03haisr5c92mcm78wqpeedcn2"
+    },
     {
       "id": "9ceba656-87f6-4fd6-ade1-703a7c1e0b72",
       "ts": "2026-11-23T23:24:36Z",
@@ -2543,180 +2701,6 @@
       "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
       "branch": "main",
       "frame": "03hacqe4y9flpzfptp3q3ypm7"
-    },
-    {
-      "id": "ca953fda-e7f8-440f-9a9f-5269421a7480",
-      "ts": "2026-11-23T04:43:45Z",
-      "source": "hermes",
-      "subject": "frieren:xs-monitor",
-      "action": "monitor: drove freebuff (job-search scout) and wallpaper-worker (wallpaper gen); delphi rebooted, remote agent down",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03hacplkdcjw10e2p5juqdeao"
-    },
-    {
-      "id": "c29c7ff0-4513-4d29-bbde-05583e609a24",
-      "ts": "2026-11-23T04:12:49Z",
-      "source": "hermes",
-      "subject": "frieren:system-audit-2026-11-23",
-      "action": "audit: 4 boot-time unit races resolved (tailscale-cert, pihole-ftl-setup, samba-nmbd, session-2.scope); downloads-sort needs taxonomy decision (unknown .safetensors); SYSTEM.md updated in-place to gen 306 / kernel 6.12.118 / git 6954ad28 | gate: checks:host frieren MODE=eval PASS (2326 assertions), sops drift PASS, ports PASS, closure OK",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03hacjk0zhiel7vs71xy12ckp"
-    },
-    {
-      "id": "22cbdf64-4cb6-4727-afe7-ddcc1a2e8fd8",
-      "ts": "2026-11-23T02:49:02Z",
-      "source": "delphi-freebuff",
-      "subject": "delphi:steward-0320",
-      "action": "landed: negotiation-script task on delphi freebuff pane 0:3.1 (task-change via jev-decide); re-established broken ssh tunnel first",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03hac36sz57tk54datdl0w15e"
-    },
-    {
-      "id": "f725118a-6e79-4a69-82a2-c31daadd0115",
-      "ts": "2026-11-23T02:48:55Z",
-      "source": "freebuff",
-      "subject": "freebuff:steward-0320",
-      "action": "landed: ricing/site task on freebuff pane 0:1.1 (task-change via jev-decide)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03hac362gf05mpd3mrpwevaom"
-    },
-    {
-      "id": "7e4e801c-8cf8-4602-9ab6-b830a790844b",
-      "ts": "2026-11-23T02:12:22Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:steward-delphi-jobhunt",
-      "action": "landed: delphi freebuff confirmed the ClickHouse EMEA comp band is unpublished by policy — zero ClickHouse-native EMEA engineering reqs carry a EUR figure, levels.fyi/Glassdoor 403 + German-free, no SRE-specific DE data; estimate cannot be upgraded to confirmation",
-      "outcome": "done",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03habw0wda68s4n6t7ir9pio7"
-    },
-    {
-      "id": "f233ac84-8af2-447f-a748-7f7cf57720b3",
-      "ts": "2026-11-23T02:07:46Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:steward-delphi-jobhunt",
-      "action": "landed: steward drove delphi freebuff (0:3.1, ssh-tunneled) to confirm the ClickHouse EMEA compensation band via ATS scan + levels.fyi/Glassdoor; pane now working",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03habv4kna5bdxgbf1zktpyh6"
-    },
-    {
-      "id": "52658729-eb7c-4cdf-84e0-21571ea0478b",
-      "ts": "2026-11-23T02:07:46Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:steward-devin-nixconfig",
-      "action": "landed: steward drove devin (0:2.1) to verify the email-triage-marketing merge (6954ad28) — checks:appflow PASS (605 apps, 52 prep rows, silent-rejection recognition pinned) and checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "flake/checks.nix",
-        "scripts/task/nix-fmt.sh",
-        "modules/services/email-triage.py"
-      ],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03habv4ioil9ls587r2c3neo7"
-    },
-    {
-      "id": "b74082f1-2cef-4d71-9304-d0d0a0976173",
-      "ts": "2026-11-23T02:07:43Z",
-      "source": "freebuff-steward",
-      "subject": "nixconfig:steward-freebuff-ryoku-theme",
-      "action": "landed: steward drove freebuff (0:1.1) to verify the ryoku redesign — every route HTTP 200, cvcheck run, blog post on the redesign; site deployed via Pages",
-      "outcome": "done",
-      "claims": [
-        "shaoyanji.is-a.dev"
-      ],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03habv4fuacavgbv9k8fwtjqd"
-    },
-    {
-      "id": "fe2198d4-3d37-4de7-a6fd-39c24945cb15",
-      "ts": "2026-11-23T01:22:19Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-23: 0 plate(s) kept of 22 spent, 28 roster row(s) waiting, 727 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03habm8zghv19b9i030kvoqa0"
-    },
-    {
-      "id": "dd333a32-0ba7-4b8a-8c26-3b6a4ad588ed",
-      "ts": "2026-11-23T00:58:24Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:steward-devin-nixconfig",
-      "action": "landed: devin merged chore/deadnix-cleanup (4d5cc291) and devin/1795077799-kg-zeck-cache (efb57354 + b8f82351, epoch-scoped Zeckendorf graph cache); now merging freebuff/email-triage-marketing (marketing sender to digest + appflow rejection recognition)",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/checks.nix",
-        "scripts/task/nix-fmt.sh",
-        "modules/services/email-triage.py"
-      ],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03habhkr3vro5b6bndm5tpyfk"
-    },
-    {
-      "id": "1225cb4b-44b2-4013-a184-ed80ec6a732c",
-      "ts": "2026-11-23T00:53:19Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:steward-delphi-jobhunt",
-      "action": "landed: delphi freebuff compared Nix/NixOS evidence across Langfuse/ClickHouse/Flox/n8n (ClickHouse EMEA comp unstated, Langfuse how-we-hire 404s); now verifying ClickHouse EMEA compensation band via ATS scan + levels.fyi/Glassdoor",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "b8f8235141a3a388a2e1cee8dd624841de3af571",
-      "branch": "main",
-      "frame": "03habgkyfdsflyt754ll7uaht"
-    },
-    {
-      "id": "b7fdd786-3691-47cd-b466-5c21da849ea2",
-      "ts": "2026-11-23T00:53:10Z",
-      "source": "freebuff-steward",
-      "subject": "nixconfig:steward-freebuff-ryoku-theme",
-      "action": "landed: freebuff themed the whole shaoyanji.is-a.dev site with the ryoku design system (commits 923a398 base/home/about + 497ea22 remaining page types); now verifying every route HTTP 200 + cvcheck + writing a blog post on the redesign",
-      "outcome": "in_progress",
-      "claims": [
-        "shaoyanji.is-a.dev"
-      ],
-      "files": [],
-      "base_commit": "b8f8235141a3a388a2e1cee8dd624841de3af571",
-      "branch": "main",
-      "frame": "03habgjwsim6fhr1d0n9xrlnb"
     }
   ]
 }

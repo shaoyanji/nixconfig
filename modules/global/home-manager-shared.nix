@@ -19,6 +19,14 @@
     if builtins.isString hostName && builtins.hasAttr hostName hostInventory
     then hostInventory.${hostName}.hmFeatures or user.hmFeatures
     else user.hmFeatures;
+  hostBase =
+    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+    then hostInventory.${hostName}.hmBase or user.hmBaseFeatures
+    else user.hmBaseFeatures;
+  hostAi =
+    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+    then hostInventory.${hostName}.hmAi or user.hmAiFeatures
+    else user.hmAiFeatures;
 in {
   # A second Wayland shell cannot share a session with DMS: whichever starts
   # last owns the bar, lock and notification surfaces. A host that owns its own
@@ -51,7 +59,22 @@ in {
   # mkDefault (1000): above the option default (1500), below an explicit host
   # definition (100). An edit to one host's role is an edit to its inventory
   # entry — it cannot reach the other eleven.
+  # The leaf lists inside `user.base`/`user.ai`: an import decision like
+  # hmUserFeatures, so it is an option + a module argument, never a config read.
+  options.fleet.hmBaseFeatures = lib.mkOption {
+    type = lib.types.listOf (lib.types.enum user.hmBaseFeatures);
+    default = user.hmBaseFeatures;
+    description = "Named leaf modules of user/base.nix.";
+  };
+  options.fleet.hmAiFeatures = lib.mkOption {
+    type = lib.types.listOf (lib.types.enum user.hmAiFeatures);
+    default = user.hmAiFeatures;
+    description = "Named leaf modules of user/ai/default.nix.";
+  };
+
   config.fleet.hmUserFeatures = lib.mkDefault hostFeatures;
+  config.fleet.hmBaseFeatures = lib.mkDefault hostBase;
+  config.fleet.hmAiFeatures = lib.mkDefault hostAi;
 
   config.home-manager = {
     useGlobalPkgs = true;

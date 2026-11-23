@@ -17,6 +17,15 @@ in
       if builtins.isString hostName && builtins.hasAttr hostName hostInventory
       then hostInventory.${hostName}.hmModules or ["roles.demo"]
       else ["roles.demo"];
+    # Leaf lists for user.base/user.ai, resolved the same way as hmModules.
+    hmBase =
+      if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+      then hostInventory.${hostName}.hmBase or (import self.modules."global.user").hmBaseFeatures
+      else (import self.modules."global.user").hmBaseFeatures;
+    hmAi =
+      if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+      then hostInventory.${hostName}.hmAi or (import self.modules."global.user").hmAiFeatures
+      else (import self.modules."global.user").hmAiFeatures;
   in {
     home-manager = {
       useGlobalPkgs = true;
@@ -42,6 +51,8 @@ in
         inherit inputs self;
         hostName = config.networking.hostName;
         fleetHost = config.networking.hostName;
+        hmBaseFeatures = hmBase;
+        hmAiFeatures = hmAi;
       };
     };
   }

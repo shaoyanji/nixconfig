@@ -5,6 +5,10 @@
   pkgs,
   config,
   osConfig ? {},
+  # Per-host leaf list (`hmAi` in flake/host-inventory.nix). Same rule as
+  # user.base: the default reads the constants file, never the `user` module
+  # arg — `imports` may not force `config`.
+  hmAiFeatures ? (import self.modules."global.user").hmAiFeatures,
   ...
 }: let
   hostName = osConfig.networking.hostName or (config.networking.hostName or "");
@@ -36,6 +40,17 @@
   agentTools = [
     pkgs.llm-agents.agent-browser # headless Chrome automation CLI (bundles Chromium ~700MB)
   ];
+
+  # Leaf-name → module set; `dsh-launcher` and `reasonix` stay out of the
+  # canonical list on purpose (retired, see their files).
+  aiFeatures = {
+    aichat = [self.modules."user.ai.aichat"];
+    antigravity-cli = [self.modules."user.ai.antigravity-cli"];
+    skills = [self.modules."user.ai.skills"];
+    freebuff-remote = [self.modules."user.ai.freebuff-remote"];
+    mainframe-remotes = [self.modules."user.ai.mainframe-remotes"];
+    zed-mcp = [self.modules."user.ai.zed-mcp"];
+  };
 in {
   # Fleet-wide gate and tiering for AI CLI tooling.
   # "light" keeps closures small on mobile laptops by excluding heavy Chromium-bundled
@@ -64,16 +79,7 @@ in {
     };
   };
 
-  imports = [
-    self.modules."user.ai.aichat"
-    self.modules."user.ai.antigravity-cli"
-    self.modules."user.ai.skills"
-    self.modules."user.ai.freebuff-remote"
-    # self.modules."user.ai.dsh-launcher"
-    self.modules."user.ai.mainframe-remotes"
-    # self.modules."user.ai.reasonix"
-    self.modules."user.ai.zed-mcp"
-  ];
+  imports = lib.concatMap (f: aiFeatures.${f} or []) hmAiFeatures;
 
   config = lib.mkIf (config.profiles.ai.enable && config.profiles.ai.tier != "none") {
     programs.translate-shell = {

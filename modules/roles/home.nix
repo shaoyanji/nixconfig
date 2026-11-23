@@ -21,6 +21,9 @@
   # fleet's declared feature order is the import order and a name the table
   # lacks contributes nothing (or []).
   features = {
+    # The base+ai floor every embedded host took unconditionally before the
+    # list became data; a host that owns its own floor drops the name.
+    minimal = [self.modules."roles.minimal"];
     systemd-policy = [self.modules."systemd-policy"];
     shell = [self.modules."shell"];
     dev = [self.modules."dev"];
@@ -56,9 +59,7 @@
     selectorDaemon.enable = lib.mkDefault true;
   };
 in {
-  imports =
-    [self.modules."roles.minimal"]
-    ++ lib.concatMap (f: features.${f} or []) hmUserFeatures;
+  imports = lib.concatMap (f: features.${f} or []) hmUserFeatures;
 
   # No resident knowledge-graph sidecar: it answered 25 ms faster than the
   # content-keyed graph file and cost 27 MB of BEAM to do it, so it is gone

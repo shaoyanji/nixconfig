@@ -1,8 +1,118 @@
 {
-  "generated": "2026-11-23T12:43:14Z",
+  "generated": "2026-11-23T13:27:52Z",
   "count": 200,
-  "pin": "1e8dd4f4599cca65f7a7345b7b089bff20a4c546f123a711e31ff5163edcca69",
+  "pin": "8ab42a7f0bfa514ebda8da15d5b5b1fb415f2ccaaff178b7944b18ca80393420",
   "turns": [
+    {
+      "id": "5a29a128-8821-4e0d-9459-840eba821755",
+      "ts": "2026-11-23T13:22:57Z",
+      "source": "freebuff-agent",
+      "subject": "nixconfig:freebuff-push-cv-commit",
+      "action": "landed: pushed CV site fix commit b9442142 to origin/main; CI now running against it (checks:site:links exit 0, 91 links / 17 pages, 6 PDFs downloadable)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/cv-links-check.sh",
+        "scripts/task/site-links.sh",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "b9442142529637c628146c241ed2b68ce32a1ce6",
+      "branch": "main",
+      "frame": "03hafj0og6b64rqla5qh3b8yu"
+    },
+    {
+      "id": "2d7c208a-52e3-4268-89ce-1b532f32b707",
+      "ts": "2026-11-23T13:13:36Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-delphi",
+      "action": "landed: drove idle delphi freebuff pane freebuff:1.1 over ssh tunnel; jev-decide classify -> novel (p=0.70, m=0.60 decisive); pasted submission-packets send task via load-buffer+paste-buffer+Enter; freebuff accepted task and working... counter started",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafh70zhirga7ro6agxat61"
+    },
+    {
+      "id": "ede806a3-4f05-4b44-b36e-19dd2fb54526",
+      "ts": "2026-11-23T13:13:36Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff",
+      "action": "landed: drove idle freebuff pane 0:1.1; jev-decide classify -> task-change via duel (p=0.67, m=0.34 decisive); pasted CV site links gate task via load-buffer+paste-buffer+Enter; freebuff accepted task and working... counter started",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafh6xu0lx174rihl3p6t23"
+    },
+    {
+      "id": "2c5b288c-748f-47fb-b730-7f4aadb8ce55",
+      "ts": "2026-11-23T13:07:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-steward-freebuff",
+      "action": "landed: routed next task via Jev bug-fix (p=0.92, m=0.87); freebuff accepted task and working counter started",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafg0w3acp9u385ltyd3r0e"
+    },
+    {
+      "id": "6e32c169-bee5-4a1e-a30b-a46dcece1585",
+      "ts": "2026-11-23T13:07:37Z",
+      "source": "devin",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "landed: routed next task via Jev chain-change (p=1.00, m=1.00); Devin accepted task and Thinking counter started",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafg0u3abiu6p3h7to7b805"
+    },
+    {
+      "id": "1f5cd50a-332f-4d90-8dab-7b4f4caf246b",
+      "ts": "2026-11-23T13:07:17Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-split",
+      "action": "claim: audit chained-module imports, blast radius, split chain",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/host-inventory.nix modules/profiles modules/global docs/generated"
+      ],
+      "files": [],
+      "base_commit": "d262950a97c0e4ba79cff2f17985ccc1c539499e",
+      "branch": "main",
+      "frame": "03haffyimj2b6rdfst6yt121a"
+    },
+    {
+      "id": "0a628e03-6fdc-427f-b30a-f987e44cfc54",
+      "ts": "2026-11-23T12:49:32Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-freebuff",
+      "action": "landed: drove idle freebuff pane 0:1.1; jev-decide classify -> publish (0.98/0.96 decisive); pasted CV site publish task via load-buffer+paste-buffer+Enter; fresh working... counter confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafchq5gs6hzrvobwbteg47"
+    },
+    {
+      "id": "e3f5b282-5747-4e4d-a396-0f216ef7a7c6",
+      "ts": "2026-11-23T12:43:28Z",
+      "source": "devin",
+      "subject": "nixconfig:images-publish-gate",
+      "action": "landed: image-daily.sh gate subcommand + publish runs it first; fixture pins 470c9034^ (0-of-43 tree) fails, drift refused both ways | gate: checks:quick PASS incl checks:images:publish:test 5/5",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d262950a97c0e4ba79cff2f17985ccc1c539499e",
+      "branch": "main",
+      "frame": "03hafbb3d4m4qvhfaj3ftbc6l"
+    },
     {
       "id": "aeccef9f-5c51-4ede-8469-e652d2f57988",
       "ts": "2026-11-23T12:37:02Z",
@@ -2626,122 +2736,6 @@
       "base_commit": "1f6970e998240b5bcf6d114612a34e1240f99e59",
       "branch": "main",
       "frame": "03ha9sdeotjnn3w40uqwdtobn"
-    },
-    {
-      "id": "688ba70e-4e36-465d-aef7-f6a88f3a1753",
-      "ts": "2026-11-22T19:44:49Z",
-      "source": "hermes",
-      "subject": "nixconfig:hermes",
-      "action": "landed: dropped the paid ollama-cloud lane (402 on every attempt, 71 hits / 23 routes / 0 successes) leaving a 6-lane chain with NIM first and api_max_retries matched to 6 | gate: checks:infron PASS (6 lanes), checks:hermes PASS (25 ok / 0 fail), doctor 78/14/0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1f6970e998240b5bcf6d114612a34e1240f99e59",
-      "branch": "main",
-      "frame": "03ha9sbfxdet6k05ru5w5n8up"
-    },
-    {
-      "id": "3c84ea67-609d-42a3-95ab-0e44d6b196cf",
-      "ts": "2026-11-22T19:27:32Z",
-      "source": "hermes",
-      "subject": "nixconfig:hermes-fallback",
-      "action": "landed: reordered fallback chain to prioritize nvidia, saved 2.23s failover wall-time | gate: checks:infron PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d9e4b4f832e755daec8bb0f03092422f7428f200",
-      "branch": "main",
-      "frame": "03ha9oxx0bjig66qb80nkrj3k"
-    },
-    {
-      "id": "ddd12c7a-0970-4dcd-a313-23e1779093a7",
-      "ts": "2026-11-22T19:21:31Z",
-      "source": "devin",
-      "subject": "nixconfig:skills-align",
-      "action": "landed: frontmatter alignment for all 63 skills — metadata.hermes tags/related_skills normalized, author+license filled; 0 schema warnings, index 63/63 | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8d9e6b3aa7bb2b6772c101c80d8e8f8fd6f4457",
-      "branch": "main",
-      "frame": "03ha9nrlueu26deofqxjsk0x1"
-    },
-    {
-      "id": "9c0f4751-8097-48ed-adcd-9ed89de415a3",
-      "ts": "2026-11-22T19:16:19Z",
-      "source": "devin",
-      "subject": "nixconfig:policies-overflow",
-      "action": "landed: standalone checks:policies task + inventory key (check:verify 124 rows no drift); frieren switched to new generation, resolver answering, zero failed units, hermes-gateway active with TimeoutStopUSec=15s | gate: checks:quick + checks:host HOST=frieren PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1ea01038dba46df8e6b0c418c7543af02be3deee",
-      "branch": "main",
-      "frame": "03ha9mr74gls4sagqyxb3xtf8"
-    },
-    {
-      "id": "b935096b-2077-4082-9e75-5fb63e01a48c",
-      "ts": "2026-11-22T19:06:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:host-check-timeout",
-      "action": "landed: raised checks:host default timeout from 120s to 240s across taskfiles and host-check-sweep | gate: checks:host HOST=frieren PASS",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/checks.yml",
-        "scripts/task/host-check-sweep.sh"
-      ],
-      "files": [
-        "taskfiles/checks.yml",
-        "scripts/task/host-check-sweep.sh"
-      ],
-      "base_commit": "b8f104f41976af26b154670cef25cfdf3d2bc182",
-      "branch": "main",
-      "frame": "03ha9ksp2cucmhbgnqyrq31ml"
-    },
-    {
-      "id": "3b1e8bea-72aa-4b47-bf72-ec715626a4b8",
-      "ts": "2026-11-22T18:59:20Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hermes-cleanup",
-      "action": "landed: cron gate added, opencode_zen override, doctor green | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/hermes-check.sh"
-      ],
-      "files": [
-        "scripts/task/hermes-check.sh"
-      ],
-      "base_commit": "523606547f32806c4f4abe35e36de66cd2d6161e",
-      "branch": "main",
-      "frame": "03ha9jfjz4dkaw7jt6o2u6me7"
-    },
-    {
-      "id": "596e2cd3-1540-4486-be4f-d7d740d0745a",
-      "ts": "2026-11-22T18:57:15Z",
-      "source": "devin",
-      "subject": "nixconfig:policies-overflow",
-      "action": "landed: root cause was lib.hasInfix = builtins.match '.*needle.*' spending a stack frame per byte; image-daily.sh at 97KiB overflowed every scan. Replaced with splitString-based local at 32 sites. Gate then surfaced 3 hidden findings (30 stale prose budgets, comment ceiling, uncited submissions policy) all repaired | gate: checks.x86_64-linux.policies + checks:quick exit 0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "71af7a95e6490d552b7b561dd4817cbc6d33b387",
-      "branch": "main",
-      "frame": "03ha9j0zyxgb8jhw2q3sg1un7"
-    },
-    {
-      "id": "35650539-a89b-4d83-ad29-5b0a56aabb5f",
-      "ts": "2026-11-22T18:42:31Z",
-      "source": "devin",
-      "subject": "nixconfig:policies-overflow",
-      "action": "claim: diagnose stack overflow in checks.policies, fix recursion in flake/policies.nix",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/policies.nix"
-      ],
-      "files": [],
-      "base_commit": "b2ba3876f12b797207dc66e8dc506db44d7c5f0c",
-      "branch": "main",
-      "frame": "03ha9g5fec3xajqitmf9q3nfc"
     }
   ]
 }

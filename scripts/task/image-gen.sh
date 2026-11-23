@@ -66,6 +66,9 @@ gen_one() { # prompt out
     result=$(cpg image --json -s "$SIZE" -o "$out" "$prompt" 2>&1) && [ -s "$out" ] || rc=$?
     if [ -s "$out" ] && printf '%s' "$result" | jq -e '.url' >/dev/null 2>&1; then
       bank=$(upload_bank "$out") || { say "image-gen: upload failed; the render is at $out and a publish sends it"; bank=""; }
+      # Banked is not served: the gallery learns the upload from a manifest row,
+      # which `images:add`/`images:ship` write and `images:adopt` sweeps for.
+      [ -n "$bank" ] && say "image-gen: in the bank, not the gallery — images:add FILE='$out' finishes it (or images:ship does both)"
       printf '%s\n' "$result" | jq -c --arg p "$out" --arg b "$bank" '
         if $b == "" then . + {path: $p, bank: false}
         else . + {path: $p, session_url: .url, url: $b, bank: true} end'

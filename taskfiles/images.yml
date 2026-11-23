@@ -56,16 +56,41 @@ tasks:
   images:gen:
     desc: One image from a prompt — JSON with the Cloudinary delivery URL, optionally detached
     summary: >
-      A prompt in, one JSON object out (`{id,url,prompt,size,path}`) — read the
-      delivery URL with `jq -r .url`. The render is uploaded to Cloudinary as
-      `assets/wall/<day>/<slug>` first, because the CLI's URL is session-gated;
-      `UPLOAD=0` keeps a throwaway local and returns `.session_url`. A failed
-      upload is reported, not fatal — the next publish sends it. The Clerk token
-      is refreshed before the call and once after a 401; a 429 waits the burst
-      window. `DETACH=1` runs under `systemd-run --user` and prints
-      `{unit,log,path}`; `OUT=` overrides `{{.IMAGES_ROOT}}/src/wall/<today>/`.
+      A prompt in, one JSON object out (`{id,url,…}`; `.url` is the delivery
+      URL). The render is uploaded as `assets/wall/<day>/<slug>` first, because
+      the CLI's URL is session-gated; `UPLOAD=0` keeps a throwaway local and
+      returns `.session_url`. A failed upload is reported, not fatal — the next
+      publish sends it. Auth refreshes once after a 401; a 429 waits the window.
+      `DETACH=1` runs under `systemd-run --user` and prints `{unit,log,path}`;
+      `OUT=` overrides `{{.IMAGES_ROOT}}/src/wall/<today>/`. Banked is not
+      served: `images:ship` does both, `images:add` registers a rendered file.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} PROMPT="{{.PROMPT}}" OUT="{{if .OUT}}{{.OUT}}{{end}}" SIZE="{{if .SIZE}}{{.SIZE}}{{else}}1536x1024{{end}}" DETACH="{{if .DETACH}}{{.DETACH}}{{end}}" bash scripts/task/image-gen.sh
+
+  images:ship:
+    desc: One prompt all the way to the gallery — generate, upload, manifest, deploy, verify
+    summary: >
+      The ad-hoc path as one command: renders with `images:gen`, writes the
+      `published/urls.tsv` row, rebuilds `manifest.json`, deploys the Pages
+      frontend, then polls the live manifest and prints `served: true` only
+      when the gallery actually carries the asset — what used to be
+      `images:gen` plus a separate `images:adopt` to remember. `DETACH=1`
+      hands it to a user unit; `PAGES=0` stops after the local rebuild.
+      `SIZE=` and `OUT=` pass through to the generator.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} PROMPT="{{.PROMPT}}" OUT="{{if .OUT}}{{.OUT}}{{end}}" SIZE="{{if .SIZE}}{{.SIZE}}{{else}}1536x1024{{end}}" DETACH="{{if .DETACH}}{{.DETACH}}{{end}}" PAGES="{{if .PAGES}}{{.PAGES}}{{end}}" bash scripts/task/image-ship.sh
+
+  images:add:
+    desc: Put one local file into the gallery — manifest row, manifest rebuild, deploy
+    summary: >
+      The step `images:gen` deliberately does not take: `FILE=` names a PNG
+      under `{{.IMAGES_ROOT}}/src/` or `published/` (anything else registers
+      as `wall/<today>/<name>`), it is staged and uploaded unless `URL=` names
+      the upload already done, then the manifest is rebuilt and deployed.
+      Idempotent; `PAGES=0` writes the row and manifest without deploying.
+      For uploads nobody wrote a row for, `images:adopt` sweeps the account.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh add "{{.FILE}}" "{{if .URL}}{{.URL}}{{end}}"
 
   images:gen:batch:
     desc: A file of prompts, one image each, uploaded, JSON lines appended to an index
@@ -155,16 +180,14 @@ tasks:
       - IMAGES_ROOT={{.IMAGES_ROOT}} REUPLOAD="{{if .REUPLOAD}}{{.REUPLOAD}}{{end}}" FORCE="{{if .FORCE}}{{.FORCE}}{{end}}" DRY="{{if .DRY}}{{.DRY}}{{end}}" bash scripts/task/images-publish.sh
 
   images:adopt:
-    desc: Add a manifest row for every Cloudinary upload that has none, then rebuild and deploy
+    desc: Sweep the Cloudinary account for uploads with no manifest row, then rebuild and deploy
     summary: >
-      The standalone form of the step every publish runs. Cloudinary is the bank, so
-      the gallery is the set of uploads, not the files on whichever machine ran the
-      last round: this reads the account and writes a row for every
-      `assets/{wall,site,blog,fleet}` id `published/urls.tsv` does not name —
-      `assets/repos/*` (README banners, repo art) is referenced by URL and is
-      deliberately outside the gallery. Rows that exist are never rewritten —
-      the URL already being served is the one consumers have. Idempotent;
-      `DRY=1` counts without writing or deploying.
+      The reconciliation sweep for uploads no local row names (a render from
+      another host, a hand-run batch) — `images:add` covers one file you can
+      name without listing the account. Reads the account and writes a row for
+      every `assets/{wall,site,blog,fleet}` id `published/urls.tsv` does not
+      name; `assets/repos/*` stays out of the gallery. Existing rows are never
+      rewritten. Idempotent; `DRY=1` counts without writing or deploying.
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} DRY="{{if .DRY}}{{.DRY}}{{end}}"{{if .PAGES}} PAGES="{{.PAGES}}"{{end}} bash scripts/task/image-daily.sh adopt
 

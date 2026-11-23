@@ -18,6 +18,10 @@
 #                             (DETACH=1 hands the round to a user unit and returns)
 #   image-daily.sh round      ensure a round is running, then stop; `round status`
 #                             is the readout (journal, rows pending, allowance)
+#   image-daily.sh add FILE [URL]
+#                             give one file a manifest row, rebuild, deploy —
+#                             the step between an `images:gen` render and the
+#                             gallery. `images:ship` is the one-command form.
 #   image-daily.sh adopt      add a manifest row for every Cloudinary upload that
 #                             has none — the bank is the account, not this disk
 #   image-daily.sh approve    put a day's kept plates into the wallpaper rotation,
@@ -1037,6 +1041,52 @@ cmd_adopt() {
   deploy_frontend
 }
 
+# One file, one row — the ad-hoc half of the bank. `adopt` sweeps the account
+# for uploads nobody wrote a row for; `add` is the same row written directly,
+# so a render that was just uploaded does not wait for a listing of everything
+# Cloudinary holds. The row, the rebuilt manifest and the deploy are one step:
+# "uploaded" and "in the gallery" used to be two commands a person had to
+# remember (`images:gen`, then `images:adopt`), and a forgotten second step was
+# a plate that existed but served nothing.
+cmd_add() { # FILE [URL]
+  need jq
+  local file=${1:?add needs a file} url=${2:-}
+  [ -f "$file" ] || die "add: no such file: $file"
+  local rel id rows=$IMAGES_ROOT/published/urls.tsv
+  case $file in
+  "$IMAGES_ROOT"/published/*) rel=${file#"$IMAGES_ROOT/published/"} ;;
+  "$IMAGES_ROOT"/src/*) rel=${file#"$IMAGES_ROOT/src/"} ;;
+  *) rel="wall/$(today)/$(basename "$file")" ;;
+  esac
+  id="assets/${rel%.*}"
+  case $rel in badge/*) id="assets/fleet/$(basename "${rel%.*}")" ;; esac
+  # The published tree is the bank's local replica: a file the gallery serves
+  # belongs there, or a later publish holds a row whose file only exists
+  # under src/ and the shrink arithmetic reads it as served-but-absent.
+  if [ ! -f "$IMAGES_ROOT/published/$rel" ]; then
+    mkdir -p "$IMAGES_ROOT/published/$(dirname "$rel")"
+    cp -f "$file" "$IMAGES_ROOT/published/$rel"
+  fi
+  mkdir -p "$IMAGES_ROOT/published"
+  touch "$rows"
+  if awk -F'\t' -v r="$rel" '$1 == r { found = 1 } END { exit !found }' "$rows"; then
+    say "add: $rel already has a row; rebuilding and deploying"
+  else
+    # A URL handed over is the upload that already happened (image-gen uploads
+    # before it reports one); without it the file crosses here, under the same
+    # `assets/<rel>` id publish and adopt derive, so all three stay one path.
+    if [ -z "$url" ]; then
+      url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$file" --public-id "$id") ||
+        die "add: upload failed for $rel"
+    fi
+    printf '%s\t%s\t%s\n' "$rel" "$url" "$(stat -c%s "$file")" >>"$rows"
+    sort -t"$(printf '\t')" -k1,1 -o "$rows" "$rows"
+    say "add: $rel -> $url"
+  fi
+  build_index
+  deploy_frontend
+}
+
 cmd_publish() {
   need jq
   local lane PUBLISH_SHIFTED=0 PUBLISH_GONE=0
@@ -1968,10 +2018,11 @@ case "${1:-plan}" in
   plates) cmd_plates ;;
   round) shift && cmd_round "$@" ;;
   adopt) cmd_adopt ;;
+  add) shift && cmd_add "$@" ;;
   approve) cmd_approve ;;
   # The day's allowance as a number, for a caller that has to divide it: a slot
   # script splits what is left across the slots still to run. Empty stdout when the
   # pool is unreadable is the one answer here that is not a count.
   remaining) remaining ;;
-  *) die "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|adopt|post|gc|blog [--dir PATH]|variants|wallpaper|plates|round [status]|approve|remaining" ;;
+  *) die "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|adopt|add FILE [URL]|post|gc|blog [--dir PATH]|variants|wallpaper|plates|round [status]|approve|remaining" ;;
 esac

@@ -110,6 +110,7 @@
     "checks:services:ports" = "leaf";
     "checks:services:ports:test" = "leaf";
     "checks:sessions:reaper" = "leaf";
+    "checks:site:links" = "leaf";
     "checks:site:links:test" = "leaf";
     "checks:site:path" = "leaf";
     "checks:skills:mirror" = "leaf";

@@ -1,8 +1,55 @@
 {
-  "generated": "2026-11-23T08:44:26Z",
+  "generated": "2026-11-23T08:50:46Z",
   "count": 200,
-  "pin": "82a68d9fb42de69f14101cdd95f85444034b99d06d6dae88614c1f3d77135dce",
+  "pin": "ad6ba695681762dfb73a1607cfdf6736e12e47bad48b07f6394760253e97f99c",
   "turns": [
+    {
+      "id": "1cbd95e7-287e-484f-bd03-77e5f8950ab8",
+      "ts": "2026-11-23T08:49:15Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-pane-0-1-1",
+      "action": "drove idle freebuff pane: matt:build + matt:cv:check task sent — verifying CV PDF links",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b3760b92754f2078472f7f471ccca3114f4a625b",
+      "branch": "main",
+      "frame": "03hae1jzmv6v3kztl9ij7vbi0"
+    },
+    {
+      "id": "d191d0cc-da27-4840-bff6-f5ba0d5b4035",
+      "ts": "2026-11-23T08:49:15Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-pane-0-0-1",
+      "action": "drove idle Devin pane: site:links gate task sent — wiring site:links into checks:quick",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b3760b92754f2078472f7f471ccca3114f4a625b",
+      "branch": "main",
+      "frame": "03hae1jxfko8z47dpgc7xswu7"
+    },
+    {
+      "id": "c7ebf52a-ac0e-4128-9b00-a9463b47fc0f",
+      "ts": "2026-11-23T08:44:40Z",
+      "source": "devin",
+      "subject": "nixconfig:images-ship-guard-fixture",
+      "action": "landed: checks:images:ship:test — tests/image-ship/run.sh proves unset/empty PROMPT and DETACH=1 refuse fast (rc=1, names var), task-level refuses rc=201; wired into checks:quick deps + check-inventory | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "tests/",
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "files": [
+        "tests/image-ship/run.sh",
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "base_commit": "b3760b92754f2078472f7f471ccca3114f4a625b",
+      "branch": "main",
+      "frame": "03hae0nsh66n0kgnkm1uic4ba"
+    },
     {
       "id": "0d08870f-b383-40f1-b1f9-e56bda39bf3c",
       "ts": "2026-11-23T08:43:45Z",
@@ -2709,47 +2756,6 @@
       "base_commit": "687946abfd938e34e48221152b7deb6a0fd36c49",
       "branch": "main",
       "frame": "03ha8i2s08kvkv57np90ziddz"
-    },
-    {
-      "id": "76951dfb-2494-4033-aa9b-30cf1000a228",
-      "ts": "2026-11-22T15:40:15Z",
-      "source": "buffy",
-      "subject": "nixconfig:wall-plates",
-      "action": "claim: round 18, 100 photoreal plates named by scene, judged, published to bountystash-assets",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily scripts/task"
-      ],
-      "files": [],
-      "base_commit": "ba7acc38b824f4197b0e9dbca0e5caa5e21823a5",
-      "branch": "main",
-      "frame": "03ha8gjl28gds7qcchne2b9zy"
-    },
-    {
-      "id": "de14871b-3278-4c52-bce4-c6993cb928db",
-      "ts": "2026-11-22T15:38:45Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-fallback",
-      "action": "landed: CrowLLM dual-lane — nemotron-550b capability-first, qwen3-8-omni-flash same-route backstop (both live-tested, [Crow] OK); api_max_retries 5->6 covers six-lane chain | gate: checks:infron clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ba7acc38b824f4197b0e9dbca0e5caa5e21823a5",
-      "branch": "main",
-      "frame": "03ha8g92v5poblp75tltj6c1j"
-    },
-    {
-      "id": "9b3fed18-a4b2-4e8c-bc80-d9a4e5abb213",
-      "ts": "2026-11-22T15:27:21Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-fallback",
-      "action": "landed: CrowLLM lane pinned to answering model — catalog probe showed declared nemotron-3.5-super-vl:free + 6 popular ids all upstream-5xx, 550b-uncensored was sole responder; key resolves via CROWLLM_API_KEY in .hermes/.env (sops), /v1/models 200, chat completion OK. api_max_retries 4->5 covers the 5-lane chain | gate: checks:infron clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "43181c44c0ae6c1f1b2359ce56e3ed6451bc49aa",
-      "branch": "main",
-      "frame": "03ha8e0x3qyya5dodo9z2fm4n"
     }
   ]
 }

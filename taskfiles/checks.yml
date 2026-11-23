@@ -85,6 +85,11 @@ tasks:
     # last, after the deps have finished and every other task has exited.
     cmds:
       - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.inventory-schema .?submodules=1#checks.{{.SYSTEM}}.inventory-hosts .?submodules=1#checks.{{.SYSTEM}}.inventory-modules .?submodules=1#checks.{{.SYSTEM}}.knobs .?submodules=1#checks.{{.SYSTEM}}.registry-schema .?submodules=1#checks.{{.SYSTEM}}.site-assets .?submodules=1#checks.{{.SYSTEM}}.policies
+      # Derivation-backed, so it sits in the serial leg, not the parallel deps:
+      # it builds both site outputs (store-warm after the first run) and writes
+      # the /tmp out-links `matt:cv:check` reuses. Before `entry`, which owns
+      # the timing budget alone at the end.
+      - task: checks:site:links
       - task: checks:sops:drift
       - task: checks:entry
 
@@ -98,6 +103,22 @@ tasks:
       carries `link-ok: <reason>` on its line. ~0.1 s, no network, no eval.
     cmds:
       - bash scripts/task/docs-links.sh
+
+  checks:site:links:
+    desc: "[gate] Build the Nix sites, resolve every internal href/src, prove every shipped CV PDF is linked"
+    summary: >
+      Builds `.#sites.matt-site` and `.#sites.bountystash-mockup` (the
+      `matt-site` derivation already runs this script inside the build), then
+      `site-links.sh` on each artifact: every root-relative or relative
+      href/src must land on a file the artifact ships, every shipped PDF must
+      be the target of a link, and every PDF anchor must carry `download`.
+      Offline — the only check that sees a stylesheet 404 a 200 hides.
+      `site:links` in the bountystash shard delegates here; in `checks:quick`.
+    cmds:
+      - nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site
+      - nix build --builders "" --out-link /tmp/bountystash-mockup .#sites.bountystash-mockup
+      - bash scripts/task/site-links.sh /tmp/matt-site
+      - bash scripts/task/site-links.sh /tmp/bountystash-mockup
 
   checks:site:links:test:
     desc: Regression fixture for the CV-PDF link gate (linked, unlinked, unshipped, no download, dead target)

@@ -194,10 +194,10 @@ tasks:
   site:links:
     desc: "[gate] build the Nix sites, resolve every internal href/src, and prove every shipped PDF is linked"
     cmds:
-      - nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site
-      - nix build --builders "" --out-link /tmp/bountystash-mockup .#sites.bountystash-mockup
-      - bash scripts/task/site-links.sh /tmp/matt-site
-      - bash scripts/task/site-links.sh /tmp/bountystash-mockup
+      # The gate lives in the checks shard (`checks:site:links`) so
+      # `checks:quick` runs the same build-and-walk; this name is the
+      # operator handle docs and the bountystash skill cite.
+      - task: checks:site:links
 
   # The static gate (`site:links`) proves a PDF anchor still carries `download`;
   # this proves the server turns that click into bytes, which no HTTP check can

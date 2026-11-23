@@ -6,6 +6,7 @@
   pkgsFor,
   self,
   hostInventory,
+  moduleSets,
   skillsCtl,
   agentsNotesCtl,
   policiesCtl,
@@ -70,7 +71,7 @@ lib.genAttrs systems.work (
       notInjected =
         hostInventory
         |> builtins.attrNames
-        |> builtins.filter (name: !(hasInjection hostInventory.${name}.modules));
+        |> builtins.filter (name: !(hasInjection (moduleSets.hostModules hostInventory.${name})));
 
       hostCount = hostInventory |> builtins.attrNames |> builtins.length;
 

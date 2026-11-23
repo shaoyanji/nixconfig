@@ -40,7 +40,7 @@
     moduleFiles = nixRegistry.modules;
   };
   hostInventory = import ./host-inventory.nix {
-    inherit inputs moduleSets self;
+    inherit inputs self;
     moduleFiles = nixRegistry.modules;
   };
   # Fleet-wide gates (per-host eval checks + the all-in-one aggregate). One binding
@@ -60,7 +60,7 @@
   docsGen = import ../lib/docs.nix {
     inherit lib inventory;
     notes = agentsNotesCtl.pages;
-    inherit moduleSets;
+    inherit moduleSets hostInventory;
     tasks = taskList;
   };
   # Skills are compiled the same way the inventory is: parsed once, validated
@@ -176,7 +176,7 @@ in {
   # `checks` is the CHEAP set — it must never force a host configuration (see
   # the budget rule at the top of flake/checks.nix).
   checks = import ./checks.nix {
-    inherit lib systems pkgsFor self hostInventory skillsCtl agentsNotesCtl policiesCtl epistemicsCtl ontologyCtl knowledgeGraphCtl taskList;
+    inherit lib systems pkgsFor self hostInventory moduleSets skillsCtl agentsNotesCtl policiesCtl epistemicsCtl ontologyCtl knowledgeGraphCtl taskList;
   };
 
   # Resident helpers and their Kelly arithmetic: `nix eval --json .#daemons`. The
@@ -257,13 +257,15 @@ in {
   nixosConfigurations = project "nixos" (hostName: host:
     (mkNixosHostWith (host.nixpkgs or nixpkgs)) {
       inherit hostName;
-      inherit (host) system modules;
+      inherit (host) system;
+      modules = moduleSets.hostModules host;
       specialArgs = host.specialArgs or {inherit inputs self;};
     });
 
   darwinConfigurations = project "darwin" (_: host:
     inputs.nix-darwin.lib.darwinSystem {
-      inherit (host) system modules;
+      inherit (host) system;
+      modules = moduleSets.hostModules host;
       specialArgs = host.specialArgs or {inherit inputs self;};
     });
 
@@ -280,7 +282,7 @@ in {
       # Standalone HM hosts build their own pkgs; none needs an overlay, so the
       # package set is the one `legacyPackages` already is.
       pkgs = nixpkgs.legacyPackages.${host.system};
-      inherit (host) modules;
+      modules = moduleSets.hostModules host;
     });
 
   # The generated markdown tree, the skills bundle and the two JSON documents

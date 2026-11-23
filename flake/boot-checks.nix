@@ -23,7 +23,7 @@
 #   machine, so it could not fail for the host being promoted.
 #
 # WHAT IS COVERED
-#   The node imports `<host>.modules` VERBATIM — the same list
+#   The node imports `moduleSets.hostModules <host>` — the same composed list
 #   `nixosConfigurations.<host>` builds — plus one module that moves root onto
 #   the VM's virtio disk, drops the host bootloader, and neutralises sops
 #   activation (host identity, not boot logic). The test asserts
@@ -160,7 +160,7 @@ in
               # pkgs turns those into assertion failures before a single unit runs.
               node.pkgsReadOnly = false;
               nodes.machine = {
-                imports = hostCfg.modules |> moduleSets.appendModules [(bootVm host)];
+                imports = (moduleSets.hostModules hostCfg) |> moduleSets.appendModules [(bootVm host)];
               };
               # The assertion is the SERIAL CONSOLE, not the driver's backdoor shell.
               # Two measured reasons:

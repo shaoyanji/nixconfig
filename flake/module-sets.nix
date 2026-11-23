@@ -113,6 +113,11 @@ in rec {
   # `hosts/*` file kept working unchanged — and `checks:drv-equality` shows the
   # derivation of all 30 configurations did not move.
   featureModules = {
+    # Only the inventory/user/systemdJobs injection — the floor every host
+    # stands on. Hosts that take no chain at all (garnixMachine, netbook, the
+    # microVM guests) name this one feature so `features` is never empty.
+    inventory = inventoryModules;
+
     # inventory injection + configurationRevision + modules/global/global.nix +
     # the nixpkgs overlays (simplex-chat, molly-brown, llm-agents).
     base = globalModules;
@@ -140,8 +145,16 @@ in rec {
     ];
 
     impermanence = [
-      moduleFiles."global.impermanence"
       inputs.impermanence.nixosModules.impermanence
+      inputs.disko.nixosModules.default
+      moduleFiles."global.impermanence"
+    ];
+
+    # disko without impermanence: stark/fern/delphi/sledgehammer partition the
+    # disk but keep a persistent root. Used to be a hand-add on each of them —
+    # four copies of the same input line, which is what a feature exists to
+    # name. impermanence still bundles its own disko entry.
+    disko = [
       inputs.disko.nixosModules.default
     ];
 
@@ -193,6 +206,17 @@ in rec {
     features
     |> lib.concatMap (f: featureModules.${f})
     |> appendModules modules;
+
+  # The one place a host's module list is assembled: `features` is the host's
+  # chain as data, `modules` its own additions. Every consumer (builders,
+  # boot checks, the inventory-injection gate) composes through this so a host
+  # spec is `features = [...]; modules = [...];` — an edit to the list lands on
+  # exactly one host.
+  hostModules = h:
+    mkHost {
+      features = h.features or [];
+      modules = h.modules or [];
+    };
 
   # The seven chain names as DATA: a chain is exactly its features, in order, and
   # the docs table is a projection of this rather than a second copy of it

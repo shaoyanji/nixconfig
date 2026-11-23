@@ -11,6 +11,10 @@
   # copy of the same facts; this renders it instead.
   moduleSets ? null,
   tasks ? {},
+  # flake/host-inventory.nix: each host's `features`/`modules` spec, passed in
+  # so the chains page can project the blast radius — which hosts an edit to a
+  # feature lands on — from the same data the builders compose.
+  hostInventory ? {},
 }: let
   knobs = modules.knobs or {};
   modulesMeta = modules.metadata or {};
@@ -382,6 +386,41 @@
       (mods |> lib.length |> toString)
     ]);
 
+  # The blast radius is data: for each feature, the hosts whose own
+  # `features` list names it — an edit to that feature lands on exactly those
+  # hosts and no others. For each host, its feature list as declared, so the
+  # page answers both directions of "what does this edit touch".
+  featureBlast =
+    moduleSets.featureModules
+    |> lib.attrNames
+    |> map (f:
+      hostInventory
+      |> lib.attrNames
+      |> builtins.filter (h: builtins.elem f (hostInventory.${h}.features or []))
+      |> builtins.sort (a: b: a < b)
+      |> (hs: [f hs]));
+
+  blastRows =
+    featureBlast
+    |> map (row: let
+      f = builtins.elemAt row 0;
+      hs = builtins.elemAt row 1;
+    in [
+      "`${f}`"
+      (hs |> lib.length |> toString)
+      (hs |> lib.concatMapStringsSep " " (h: "`${h}`"))
+    ]);
+
+  chainHostRows =
+    hostInventory
+    |> lib.attrNames
+    |> builtins.sort (a: b: a < b)
+    |> map (h: [
+      "`${h}`"
+      ((hostInventory.${h}.features or []) |> lib.concatMapStringsSep " " (f: "`${f}`"))
+      ((hostInventory.${h}.modules or []) |> lib.length |> toString)
+    ]);
+
   moduleChains =
     header "Fleet Module Chains" "`flake/module-sets.nix`"
     + ''
@@ -399,6 +438,18 @@
       ## Features
 
       ${table ["feature" "modules"] featureRows}
+
+      ## Blast radius
+
+      An edit to a feature lands on exactly the hosts that name it — each
+      host's `features` list is its own data in `flake/host-inventory.nix`, so
+      changing one host's chain touches no other host.
+
+      ${table ["feature" "hosts" "who"] blastRows}
+
+      ## Hosts
+
+      ${table ["host" "features" "own modules"] chainHostRows}
 
       ## Cost
 

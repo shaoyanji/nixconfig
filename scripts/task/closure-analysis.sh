@@ -12,6 +12,8 @@
 #   --host <name>            SSH-resolve that host's deployed /run/current-system,
 #                            then read ITS store DB via `nix path-info
 #                            --store ssh://<name>`. No eval; any reachable host.
+#   --target <store path>    measure THAT path in the local store while --host
+#                            still names the budget entry (CI: no SSH to a host)
 #   <TARGET> (positional)    any store path, e.g. an old generation
 #
 # Subcommands:
@@ -55,9 +57,11 @@ while [ $# -gt 0 ]; do
     --store) STORE_URI="${2:?--store needs a value}"; shift 2 ;;
     --store=*) STORE_URI="${1#*=}"; shift ;;
     --refresh) REFRESH=1; shift ;;
+    --target) MEASURE_TARGET="${2:?--target needs a value}"; shift 2 ;;
+    --target=*) MEASURE_TARGET="${1#*=}"; shift ;;
     --all) ALL=1; shift ;;
     --remote) REMOTE=1; shift ;;
-    --help | -h) sed -n '3,31p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --help | -h) sed -n '3,33p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     --*) echo "unknown flag: $1" >&2; exit 2 ;;
     *) POS+=("$1"); shift ;;
   esac
@@ -68,7 +72,12 @@ SELF_HOST="$(hostname)"
 
 # Remote resolution: SSH-resolve the deployed generation, read its store DB.
 REMOTE_TARGET=""
-if [ -z "$STORE_URI" ] && [ -n "$HOST" ] && [ "$HOST" != "local" ] && [ "$HOST" != "$SELF_HOST" ]; then
+MEASURE_TARGET="${MEASURE_TARGET:-}"
+# An explicit --target is a path in THIS store under the --host budget label.
+# CI builds the host's toplevel on the runner, where `ssh frieren` does not
+# exist; probing anyway failed a check whose measurement was already in hand
+# (run 45131169777, exit 1 on every nixos host).
+if [ -z "$STORE_URI" ] && [ -z "$MEASURE_TARGET" ] && [ -n "$HOST" ] && [ "$HOST" != "local" ] && [ "$HOST" != "$SELF_HOST" ]; then
   REMOTE_TARGET="$(ssh -o BatchMode=yes -o ConnectTimeout=6 "$HOST" 'readlink -f /run/current-system' 2>/dev/null || true)"
   if [ -z "$REMOTE_TARGET" ]; then
     echo "Error: could not resolve /run/current-system on '${HOST}' (offline or no SSH)." >&2
@@ -82,7 +91,9 @@ NIX_ARGS=(--json --json-format 1)
 
 # target: remote generation if --host given, else positional (1-indexed after CMD)
 target() {
-  if [ -n "$REMOTE_TARGET" ]; then printf '%s' "$REMOTE_TARGET"; else printf '%s' "${POS[$1]:-/run/current-system}"; fi
+  if [ -n "${MEASURE_TARGET:-}" ]; then printf '%s' "$MEASURE_TARGET"
+  elif [ -n "$REMOTE_TARGET" ]; then printf '%s' "$REMOTE_TARGET"
+  else printf '%s' "${POS[$1]:-/run/current-system}"; fi
 }
 human() { numfmt --to=iec-i --suffix=B --format="%.1f" "$1" 2>/dev/null || echo "$1"; }
 host_label() { if [ -n "$REMOTE_TARGET" ]; then printf '%s' "$HOST"; else printf '%s' "$SELF_HOST"; fi; }

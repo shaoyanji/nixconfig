@@ -420,12 +420,18 @@ jobs:
       # act (`task dev:closure:budget:adopt`), not CI's. `result` is the single
       # toplevel attr the matrix emits; yq-go is the repo's TOML reader —
       # nixpkgs' python yq rejects these flags (same trap as docs-budget).
+      #
+      # `--target` rather than a bare positional: the runner has no SSH to the
+      # host, so `--host` alone made the script probe `frieren` and exit 1 before
+      # it looked at the path it was handed (run 45131169777). The measurement
+      # stays local; the budget entry stays the host's.
       - name: Closure budget vs closure-budgets.toml
         if: matrix.kind == 'nixos'
         run: |
           set -euo pipefail
+          [ -e result ] || { echo "::error::no 'result' symlink from the build loop; nothing measured"; exit 1; }
           target="$(readlink -f result)"
-          nix shell nixpkgs#yq-go -c bash scripts/task/closure-analysis.sh --host "${{ matrix.host }}" budget "$target"
+          nix shell nixpkgs#yq-go -c bash scripts/task/closure-analysis.sh --host "${{ matrix.host }}" --target "$target" budget
 
   # Boot the host's REAL module graph before a services change can be trusted.
   # Reuses `plan`'s matrix, so only hosts the change reaches boot, and runs after

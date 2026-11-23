@@ -77,6 +77,28 @@ image itself is well made, because it is the wrong subject."
   raw=$(cd "$STAGE" && agy --dangerously-skip-permissions --mode accept-edits \
     --disable-slash-commands "${model_args[@]}" \
     --print-timeout 180s --print "$prompt" --output-format json 2>/dev/null) || rc=$?
+
+  # The account route exhausts its quota for days at a time (measured
+  # 2026-11-23: RESOURCE_EXHAUSTED, ~5 days to reset — two nightly passes spent
+  # 43 generations and kept none, every verdict "agy exited 3"). The provider
+  # route bills the GEMINI.API key's project instead, so a dead account route
+  # costs key calls, not a dead pipeline. The key is read only on this path —
+  # the happy path never touches sops.
+  if [ "$rc" -ne 0 ] || [ -z "$raw" ] ||
+    ! printf '%s' "$raw" | jq -e '(.response // "") | length > 0' >/dev/null 2>&1; then
+    local judge_key
+    . "$here/lib/paths.sh" 2>/dev/null || true
+    judge_key=$(secret_get '["GEMINI"]["API"]["KEY"]' "$(apikeys_file)" 2>/dev/null || true)
+    if [ -n "$judge_key" ]; then
+      rc=0
+      raw=$(cd "$STAGE" && GEMINI_API_KEY=$judge_key agy \
+        --settings '{"modelProvider":"gemini"}' \
+        --model "${JUDGE_MODEL:-gemini-4-hydrogen-high}" \
+        --dangerously-skip-permissions --mode accept-edits \
+        --disable-slash-commands --print-timeout 180s \
+        --print "$prompt" --output-format json 2>/dev/null) || rc=$?
+    fi
+  fi
   if [ "$rc" -ne 0 ] || [ -z "$raw" ]; then
     printf '{"verdict":"unjudged","reason":"agy exited %s","defect":""}' "$rc"
     return 0
@@ -213,7 +235,7 @@ attempt() { # brief id lane size name prompt day [attempt] [rev]
 
 
 run_lane() { # lane budget
-  local lane=$1 budget=$2 day intent spent=0 left=0 v verdict defect expect
+  local lane=$1 budget=$2 day intent spent=0 left=0 v verdict defect expect unjudged_streak=0
   LANE_SPENT=0
   day=$(today)
   intent=$(lane_setting "$lane" intent)
@@ -280,6 +302,17 @@ run_lane() { # lane budget
     fi
 
     say "$id: $verdict"
+    # Two unjudged plates in a row is a dead judge, not a bad image: every
+    # plate past this point spends a generation that can never be kept.
+    if [ "$verdict" = unjudged ]; then
+      unjudged_streak=$((unjudged_streak + 1))
+      if [ "$unjudged_streak" -ge 2 ]; then
+        say "lane $lane: judge unreachable twice — stopping before more allowance burns unjudged"
+        break
+      fi
+    else
+      unjudged_streak=0
+    fi
   done <<<"$rows"
   LANE_SPENT=$spent
 }

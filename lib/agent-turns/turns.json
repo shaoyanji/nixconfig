@@ -1,8 +1,88 @@
 {
-  "generated": "2026-11-23T11:55:40Z",
+  "generated": "2026-11-23T12:14:38Z",
   "count": 200,
-  "pin": "ecd98db7f72713ee8c6bad2232503a5478a70b1dac410e7b8ef861dcd462557f",
+  "pin": "60d43e4028c093a3dff00de80895e726e39f6983be2e66e79f9d18197e21e8f3",
   "turns": [
+    {
+      "id": "1a05d3eb-1775-4489-accd-cc8f144d429d",
+      "ts": "2026-11-23T12:09:18Z",
+      "source": "nixconfig.steward",
+      "subject": "nixconfig:steward-devin-keep-rate",
+      "action": "drove idle devin pane 0:0.1 (claude at scope menu for 'Redesign the Image Publish'); jev-decide classify -> bug-fix (p=0.98, margin=0.96, decisive); moved menu selection to option 2 'Fix the keep rate' and confirmed with Enter; capture shows fresh 'Thinking · 6m 52s' counter confirming submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf4mtpszugnzf2231qp8ah"
+    },
+    {
+      "id": "4e63446d-1ebb-4e8a-aebf-f674ade80d6a",
+      "ts": "2026-11-23T12:03:10Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-delphi",
+      "action": "landed: drove idle delphi freebuff pane over ssh tunnel; job-search scouting task accepted (working... 8s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf3fno16hda28gg8u13p2y"
+    },
+    {
+      "id": "650c21aa-4125-4eb3-baa6-ea210dc54d60",
+      "ts": "2026-11-23T12:03:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-freebuff",
+      "action": "landed: drove idle freebuff pane; job-search scouting task accepted (working... 8s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf3fkbr1cc11vwl14it107"
+    },
+    {
+      "id": "fdf2cb32-202e-4309-8847-eabe59f2be04",
+      "ts": "2026-11-23T12:03:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-devin",
+      "action": "landed: drove idle devin pane; wrote AGENTS.nix verification note for image-publish redesign (Thinking started)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf3fipvkg1q4j056uhktcm"
+    },
+    {
+      "id": "25471393-ecc8-4ef9-9c03-cf7e96307081",
+      "ts": "2026-11-23T11:57:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout",
+      "action": "scouted: 7 lead rows added (0G, HiSolutions, Device Insight, Contabo x2, Nebius, smartclip), 5 sendable after dedupe; packets built to private state",
+      "outcome": "in_progress",
+      "claims": [
+        "/home/devji/.local/state/appflow/submissions"
+      ],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf28e16nlczwdr10ticju3"
+    },
+    {
+      "id": "11c99e07-ff5a-4f82-a432-63911066f3f5",
+      "ts": "2026-11-23T11:55:52Z",
+      "source": "devin",
+      "subject": "nixconfig:images-monolith-split",
+      "action": "landed: image-daily.sh 2028ln monolith -> 34ln dispatcher + lib(274) + engine(681) + 18 per-command scripts; all 55 fns verified, reads identical, publish DRY rebuilds 729-asset manifest | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf20b565iqcrdj42j3jqa5"
+    },
     {
       "id": "a18a1935-c703-4cf9-91f8-639ff8057591",
       "ts": "2026-11-23T11:44:05Z",
@@ -2669,86 +2749,6 @@
       "base_commit": "ec8fd3cae3a31f8aadfc91ab57388398b91b8874",
       "branch": "main",
       "frame": "03ha9bhyspchku037tk7mmww1"
-    },
-    {
-      "id": "bce0eaa5-f013-489e-8e61-c4b80a8c67dd",
-      "ts": "2026-11-22T18:18:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene",
-      "action": "landed: Malt match notices pinned to digest | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/email-triage.py"
-      ],
-      "files": [],
-      "base_commit": "b744d254295550cc74e25cd2cbfa816e6bcefaa8",
-      "branch": "main",
-      "frame": "03ha9bgbyocjogu51e4jp4g3r"
-    },
-    {
-      "id": "4e504986-3f28-4a34-a5c3-d83fcace15ca",
-      "ts": "2026-11-22T18:17:46Z",
-      "source": "devin",
-      "subject": "nixconfig:skills-align",
-      "action": "landed: Truth: line now gated in checks.skills-schema (line must exist + every cited repo path must resolve, proven on both failure modes); skills-cite-truth policy scoped to the Truth line; new submissions-are-private-state predicate; 2 module-side skills got Truth lines | gate: checks:host frieren PASS 104.7s, skills-schema build PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec8fd3cae3a31f8aadfc91ab57388398b91b8874",
-      "branch": "main",
-      "frame": "03ha9bbe504jaq122eb3nhk9o"
-    },
-    {
-      "id": "5797ab51-72fb-4b65-84bd-4f5cb74f607f",
-      "ts": "2026-11-22T18:13:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-gateway-guard",
-      "action": "landed: fix deny-rule count in the checks:hermes assertion output (7 rules, not word count) | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "287370279d8f829106405d74af8de19aed31b45d",
-      "branch": "main",
-      "frame": "03ha9aehg4ijdc7f0b1tnzcpx"
-    },
-    {
-      "id": "99323ace-951b-499c-bbef-a2e30232f03a",
-      "ts": "2026-11-22T18:12:47Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-gateway-guard",
-      "action": "landed: checks:hermes asserts approvals.deny self-unit rules, cron_drain_timeout<=10 and the live deny verdict (negative control: verdict=user-deny exit 3) | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "51a23ffa8da4c428cccfd0b20eee0b18c4f4fb31",
-      "branch": "main",
-      "frame": "03ha9ac9d27s8z8i0x89qaw9u"
-    },
-    {
-      "id": "920d385f-8ee6-4165-998f-aaed6911d8d9",
-      "ts": "2026-11-22T18:10:02Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-gateway-guard",
-      "action": "landed: approvals.deny blocks agent turns from hermes-gateway stop/restart; agent.cron_drain_timeout 30->5 so a stop stays under the 60s watchdog | gate: checks:hermes PASS (stop measured 4s, no watchdog)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0467cde27f61a7f3462ea2a9b41ac5ba0ff1e1f0",
-      "branch": "main",
-      "frame": "03ha99syk97xyllkrx7clnumt"
-    },
-    {
-      "id": "b8d4c51b-0944-4f68-bdbf-a06c4be23310",
-      "ts": "2026-11-22T18:09:35Z",
-      "source": "devin",
-      "subject": "nixconfig:hermes-repair",
-      "action": "landed: adopted lock-pinned node 26.12.1 + ffmpeg 9.0.1 into pm store, patchelf'd for NixOS, honest facts.json; pm installed npm 12.0.2 itself | gate: checks:hermes clean, pm doctor all-ok, no sync warning in PID 4073615 | pin bump re-breaks it; durable fix is nix-side store provisioning",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0467cde27f61a7f3462ea2a9b41ac5ba0ff1e1f0",
-      "branch": "main",
-      "frame": "03ha99pw83paa17ztv03tpr9e"
     }
   ]
 }

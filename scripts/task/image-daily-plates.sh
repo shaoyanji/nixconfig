@@ -117,7 +117,7 @@ cmd_plates() {
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }
 
-  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect row_size size have file v verdict defect sent rc=0 hold_reason retried
+  local day spent=0 left cap=${MAX_GEN:-0} slug prompt expect row_size size have file v verdict defect sent rc=0 hold_reason retried unjudged_streak=0
   local holds_file
   holds_file=$(mktemp)
   local ledger_before=0
@@ -221,6 +221,17 @@ cmd_plates() {
       record "$day" wall "photoreal-$slug" "$file" "$verdict" "$(reason_of "$v")" "$sent" 2 1
     fi
     say "$slug: $verdict"
+    # Two unjudged plates in a row is a dead judge, not a bad image: every
+    # plate past this point spends a generation that can never be kept.
+    if [ "$verdict" = unjudged ]; then
+      unjudged_streak=$((unjudged_streak + 1))
+      if [ "$unjudged_streak" -ge 2 ]; then
+        say "judge unreachable twice — the round stops before more allowance burns unjudged"
+        break
+      fi
+    else
+      unjudged_streak=0
+    fi
     # A refused row is parked, not re-rolled forever: `fail` is terminal on the
     # first look, `reroll` after its correction (or with no defect to correct)
     # is spent too. `unjudged` is NOT held — it is agy being down or out of

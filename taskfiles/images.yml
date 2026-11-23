@@ -163,6 +163,20 @@ tasks:
     cmds:
       - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh blog {{if .DIR}}--dir "{{.DIR}}"{{end}}
 
+  images:gate:
+    desc: "[gate] Publish gate — the image-daily family must be structurally able to ship"
+    summary: >
+      The check `image-daily.sh publish` runs before it rewrites the manifest:
+      every dispatched subcommand has its file and every command file is
+      dispatched, the judge carries a provider fallback for when the account
+      quota is dead (no fallback kept 0 of 43 generations, 2026-11-22–23),
+      both spend loops break after two unjudged plates, and `publish` keeps its
+      shrink guard. Exit 1 names the missing piece; `GATE=0` skips it on the
+      publish path for a deliberate one-off repair. `checks:images:publish:test`
+      pins it against the real past mistake.
+    cmds:
+      - IMAGES_ROOT={{.IMAGES_ROOT}} bash scripts/task/image-daily.sh gate
+
   images:publish:
     desc: Stage kept assets, upload them to Cloudinary, and rebuild the manifest from the account
     summary: >

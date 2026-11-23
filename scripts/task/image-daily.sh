@@ -27,8 +27,8 @@ set -euo pipefail
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 sub=${1:-plan}
 case "$sub" in
-  plan|run|status|today|share|judge|publish|variants|post|gc|blog|wallpaper|plates|round|adopt|add|approve|remaining) ;;
-  *) echo "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|adopt|add FILE [URL]|post|gc|blog [--dir PATH]|variants|wallpaper|plates|round [status]|approve|remaining" >&2; exit 1 ;;
+  plan|run|status|today|share|judge|publish|variants|post|gc|blog|wallpaper|plates|round|adopt|add|approve|remaining|gate) ;;
+  *) echo "usage: image-daily.sh plan|run|status|today|share SLOTS_LEFT|judge PATH|publish|adopt|add FILE [URL]|post|gc|blog [--dir PATH]|variants|wallpaper|plates|round [status]|approve|remaining|gate [DIR]" >&2; exit 1 ;;
 esac
 shift || true
 exec "$here/image-daily-$sub.sh" "$@"

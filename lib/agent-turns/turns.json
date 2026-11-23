@@ -1,8 +1,116 @@
 {
-  "generated": "2026-11-23T12:14:38Z",
+  "generated": "2026-11-23T12:43:14Z",
   "count": 200,
-  "pin": "60d43e4028c093a3dff00de80895e726e39f6983be2e66e79f9d18197e21e8f3",
+  "pin": "1e8dd4f4599cca65f7a7345b7b089bff20a4c546f123a711e31ff5163edcca69",
   "turns": [
+    {
+      "id": "aeccef9f-5c51-4ede-8469-e652d2f57988",
+      "ts": "2026-11-23T12:37:02Z",
+      "source": "steward",
+      "subject": "nixconfig:steward",
+      "action": "landed: jev-decide routed gate-change to devin (0.70/0.53 decisive); sent image-daily.sh publish-gate task via load-buffer+paste-buffer+Enter to pane 0:0.1; verified fresh Thinking counter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03hafa1t36nexrq0q05vbay6e"
+    },
+    {
+      "id": "0c3ef041-9d5d-4e2c-8dca-4c2227b876ad",
+      "ts": "2026-11-23T12:35:16Z",
+      "source": "devin",
+      "subject": "nixconfig:images-publish-gate",
+      "action": "claim: publish gate + e2e subcommand verify + deploy doc",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/image-daily-engine.sh scripts/task/image-daily-plates.sh tests/image-publish docs/ taskfiles/checks.yml flake/check-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "8ecc5f36668f3ac29a8ccec7f56cedeaed47ee6b",
+      "branch": "main",
+      "frame": "03haf9pftjgz00szyyk8z6nve"
+    },
+    {
+      "id": "43fc50e7-4bc9-428a-9156-e243752c6a1d",
+      "ts": "2026-11-23T12:28:46Z",
+      "source": "freebuff",
+      "subject": "frieren:job-search-scout",
+      "action": "landed: freebuff job-search scouting (task-change, decisive margin)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf8fq72ypj7epsfqqbfveo"
+    },
+    {
+      "id": "5ad87c8d-0e3c-4a4f-9c2c-ccb21a8a3425",
+      "ts": "2026-11-23T12:22:47Z",
+      "source": "nixconfig.steward",
+      "subject": "nixconfig:steward-freebuff-search",
+      "action": "drove idle delphi freebuff pane 0:2.1 over ssh tunnel; jev-decide classify -> novel (p=0.51) then duel top two -> task-change (p=0.76, margin=0.52, decisive); pasted job-search scouting task via load-buffer+paste-buffer+Enter; fresh working... counter (13s) confirmed submission - agent searching disk for job brief files",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf79mmdcmaoq8ffzqrqj5q"
+    },
+    {
+      "id": "c383f28d-713b-4e91-adb9-03ae852b493c",
+      "ts": "2026-11-23T12:22:47Z",
+      "source": "nixconfig.steward",
+      "subject": "nixconfig:steward-freebuff-cv",
+      "action": "drove idle freebuff pane 0:1.1; jev-decide classify -> prose-change (p=0.62, margin=0.50, decisive by margin); pasted CV completion task via load-buffer+paste-buffer+Enter; fresh working... counter (44s) confirmed submission - agent translating German CV bullets, site build verify in progress",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf79l5t9xp8jwukx4qtkdp"
+    },
+    {
+      "id": "35f614f7-252c-47f2-a222-d47ee9825257",
+      "ts": "2026-11-23T12:20:35Z",
+      "source": "nixconfig.steward",
+      "subject": "nixconfig:steward-devin-keep-rate",
+      "action": "drove idle devin pane 0:0.1 (claude at scope menu for 'Redesign the Image Publish'); jev-decide classify -> bug-fix (p=0.98, margin=0.96, decisive); moved menu selection to option 2 'Fix the keep rate' and confirmed with Enter; capture shows fresh 'Thinking · 6m 52s' counter confirming submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf6u5xde136ypls5blsvjy"
+    },
+    {
+      "id": "07e50ccc-f2be-4094-8880-2a01626219b4",
+      "ts": "2026-11-23T12:20:35Z",
+      "source": "nixconfig.steward",
+      "subject": "nixconfig:steward-devin-keep-rate",
+      "action": "drove idle devin pane 0:0.1 (claude at scope menu for 'Redesign the Image Publish'); jev-decide classify -> bug-fix (p=0.98, margin=0.96, decisive); moved menu selection to option 2 'Fix the keep rate' and confirmed with Enter; capture shows fresh 'Thinking · 6m 52s' counter confirming submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "lib/matt/cv-software.de.json"
+      ],
+      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
+      "branch": "main",
+      "frame": "03haf6u3gntw752zctyy2nfef"
+    },
+    {
+      "id": "b4262a7f-9ec4-4f70-8103-c5cdf0c9b841",
+      "ts": "2026-11-23T12:14:55Z",
+      "source": "devin",
+      "subject": "nixconfig:images-keep-rate",
+      "action": "landed: judge fallback route (agy account 429 -> GEMINI_API_KEY provider lane) + two-unjudged circuit breaker in run_lane and cmd_plates | gate: checks:quick PASS (policies pass standalone after source-line restructure); live judge returned keep via fallback",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "470c9034f83ec716f4f4f06d1b3f9f47bd2d5de5",
+      "branch": "main",
+      "frame": "03haf5qbjpkj87f3n8m9y8y2l"
+    },
     {
       "id": "1a05d3eb-1775-4489-accd-cc8f144d429d",
       "ts": "2026-11-23T12:09:18Z",
@@ -2634,121 +2742,6 @@
       "base_commit": "b2ba3876f12b797207dc66e8dc506db44d7c5f0c",
       "branch": "main",
       "frame": "03ha9g5fec3xajqitmf9q3nfc"
-    },
-    {
-      "id": "56e2489e-46bd-4f43-af1c-b335b5dbde75",
-      "ts": "2026-11-22T18:41:54Z",
-      "source": "devin",
-      "subject": "nixconfig:docs-build",
-      "action": "landed: docs artifacts rebuilt (187 note pages incl new delphi-postgres-19-upgrade), agents-notes-schema gate repaired (dead checks.toml refs -> flake/check-inventory.nix, 3 bodies re-wrapped); ops doc committed in 841b11fb | gate: agents-notes-schema + docs:build PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b2ba3876f12b797207dc66e8dc506db44d7c5f0c",
-      "branch": "main",
-      "frame": "03ha9g12ff46iqtn6raz2p8jb"
-    },
-    {
-      "id": "227274e6-9f63-4ae9-a9fb-90ab390044b7",
-      "ts": "2026-11-22T18:39:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-cleanup",
-      "action": "landed: slack-platform into plugins.disabled + network.force_ipv4 in the hermes persona config, and cleared 11 root-owned skill_batch scratch dirs so the pruner runs; doctor 23.6s->12.2s, 2 issues->1 (OPENCODE_ZEN_API_KEY present but rejected) | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/user/ai/hermes-persona"
-      ],
-      "files": [
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "base_commit": "fbe6968af1c9a922d7f059ccfcd3f177063981d8",
-      "branch": "main",
-      "frame": "03ha9fis5fisstmde4y6n3r24"
-    },
-    {
-      "id": "26e71657-4fb4-40fb-992b-4444aae01fbf",
-      "ts": "2026-11-22T18:38:13Z",
-      "source": "devin",
-      "subject": "nixconfig:docs-build",
-      "action": "claim: compile docs artifacts + verify generated pages sync with skills/modules/hosts",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/generated",
-        "docs/ops"
-      ],
-      "files": [],
-      "base_commit": "0c7542fd34fd6988798d9ca9e59f08da17091168",
-      "branch": "main",
-      "frame": "03ha9fb3d9s5j1a6anqu0hjbs"
-    },
-    {
-      "id": "b899fc49-779c-4cc3-b6eb-1fa8319dd283",
-      "ts": "2026-11-22T18:22:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-surface",
-      "action": "landed: hermes-gateway TimeoutStopSec 70->15 bounds a stalled teardown before the daemon's 60s watchdog; corrects the earlier turn that named an unrelated commit | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7f60d1d9bdefbe56d5c93ef7410d1169aa538700",
-      "branch": "main",
-      "frame": "03ha9ca4vgb84ruzew0bvib44"
-    },
-    {
-      "id": "e7bc8412-44df-4f06-adb2-e720a9595fb2",
-      "ts": "2026-11-22T18:21:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:hermes-surface",
-      "action": "landed: hermes-gateway TimeoutStopSec 70->15 bounds a stalled teardown before the daemon's 60s watchdog | gate: checks:hermes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec8fd3cae3a31f8aadfc91ab57388398b91b8874",
-      "branch": "main",
-      "frame": "03ha9c485gqlir8hvv2683wyi"
-    },
-    {
-      "id": "88afd34d-c71b-42a6-9d87-40972203c302",
-      "ts": "2026-11-22T18:21:10Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene",
-      "action": "landed: address() bracket fallback + Malt fixture | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/email-triage.py tests/appflow-triage/run.sh"
-      ],
-      "files": [],
-      "base_commit": "0718a386a06ecb73d316149d8f082eee50c8bc12",
-      "branch": "main",
-      "frame": "03ha9bz930qtl474m18v82ubv"
-    },
-    {
-      "id": "e31d34ca-aeb5-4582-82d4-550333bfd040",
-      "ts": "2026-11-22T18:19:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene",
-      "action": "landed: Malt rule corrected to raw-sender match, probe digest/none | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/email-triage.py"
-      ],
-      "files": [],
-      "base_commit": "5949a48089bcddce031495f8e51ca90d37ea0a4e",
-      "branch": "main",
-      "frame": "03ha9bm1k2h8ipdi0lfpdv0ec"
-    },
-    {
-      "id": "fdca4adb-e74e-4946-bae9-ab7fceb433bc",
-      "ts": "2026-11-22T18:18:43Z",
-      "source": "devin",
-      "subject": "nixconfig:skills-align",
-      "action": "landed: enforced strict Truth: gate in lib/skills.nix and submissions anti-sprawl predicate in flake/policies.nix | gate: ops:skills:check and checks:host HOST=frieren PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec8fd3cae3a31f8aadfc91ab57388398b91b8874",
-      "branch": "main",
-      "frame": "03ha9bhyspchku037tk7mmww1"
     }
   ]
 }

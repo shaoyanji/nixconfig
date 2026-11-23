@@ -53,6 +53,7 @@ tasks:
       - task: checks:docs:links:test
       - task: checks:task-shim:test
       - task: checks:images:ship:test
+      - task: checks:images:publish:test
       - task: checks:services:ports
       - task: checks:prose
       - task: checks:infron
@@ -231,6 +232,18 @@ tasks:
       A guard that only ever passed would be no gate.
     cmds:
       - bash tests/image-ship/run.sh
+
+  checks:images:publish:test:
+    desc: Regression fixture for the image-daily publish gate (fails on 470c9034^, the 0-of-43 tree)
+    summary: >
+      Proves `image-daily.sh gate` — the check `publish` runs before rewriting
+      the manifest — fails on a real past mistake: `470c9034^`, the engine
+      with no provider fallback and no unjudged circuit breaker that burned 43
+      generations and kept none. Also holds the dispatch agreement both ways:
+      a dropped command file and an undispatched file each refuse. The current
+      tree must pass.
+    cmds:
+      - bash tests/image-publish/run.sh
 
   checks:toon:surfaces:
     desc: "[gate] Agent-facing docs pipe JSON into toon, never into the reader"

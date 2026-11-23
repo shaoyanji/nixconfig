@@ -81,6 +81,12 @@ merge_served_urls() {
 cmd_publish() {
   need jq
   local lane PUBLISH_SHIFTED=0 PUBLISH_GONE=0
+  # The publish gate runs first: a manifest rewrite from a family that lost a
+  # file or a breaker is the mistake it exists to catch (43 generations, 0
+  # keeps, 2026-11-22–23). GATE=0 skips it for a deliberate one-off repair.
+  if [ "${GATE:-1}" = "1" ]; then
+    bash "$here/image-daily-gate.sh" || die "publish gate failed — refusing to ship (GATE=0 overrides)"
+  fi
   # A publish with no local tree is still a publish: the rows are the manifest and
   # the account completes them. Only an empty manifest beside no ledger is a
   # publish with nothing to say.

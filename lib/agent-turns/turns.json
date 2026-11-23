@@ -1,8 +1,88 @@
 {
-  "generated": "2026-11-23T15:56:46Z",
+  "generated": "2026-11-23T16:38:45Z",
   "count": 200,
-  "pin": "3dbeeea75c14aa6645ab42c668ff1b53dc5c4fc5f738b614827a7287b35e2622",
+  "pin": "6846a0de6fb025b5ccc69c1b6306ec5b11d2e8cb45834d2eb62ee821988d5cce",
   "turns": [
+    {
+      "id": "cd02e077-a97b-4683-b286-2710424b08c4",
+      "ts": "2026-11-23T16:36:35Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-chain-audit",
+      "action": "claim: ChainAudit — enumerate HM chain importers, classify, audit doc only",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/ docs/"
+      ],
+      "files": [],
+      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
+      "branch": "main",
+      "frame": "03hagkugvgeiiewvokyrkbe03"
+    },
+    {
+      "id": "a8d9ccf9-5fa9-4118-84cb-c0dd988b1487",
+      "ts": "2026-11-23T16:21:04Z",
+      "source": "delphi",
+      "subject": "nixconfig:delphi",
+      "action": "landed: dispatched research task (DevOps/SRE/Platform/Infrastructure leads scouting) to delphi freebuff pane 0:2.1 via ssh tunnel",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
+      "branch": "main",
+      "frame": "03haghtecqdmb46vpmjucyikt"
+    },
+    {
+      "id": "f007fe70-9399-4eda-a6ec-6c51fc5c5b7b",
+      "ts": "2026-11-23T16:21:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff",
+      "action": "landed: dispatched publish task (personal site and CV surface) to freebuff pane 0:1.1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
+      "branch": "main",
+      "frame": "03haghtbszg7vqdu78zyqk8l0"
+    },
+    {
+      "id": "994cdc60-68b6-421a-956d-91a50e40c66b",
+      "ts": "2026-11-23T16:20:39Z",
+      "source": "devin",
+      "subject": "nixconfig:devin",
+      "action": "landed: dispatched chain-change refactor (audit home-manager feature-chain blast radius) to devin pane 0:0.1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
+      "branch": "main",
+      "frame": "03haghqgefnj9yr1a2gpjppfp"
+    },
+    {
+      "id": "66fadc2b-ae7b-446c-b0f6-299cb7d6bb49",
+      "ts": "2026-11-23T16:19:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:site-publish-2026-11-23",
+      "action": "Published matt.bountystash.com from this tree: built .#sites.matt-site, checks:site:links passed (91 internal links over 17 pages, 6 PDFs, 16 download anchors), matt:deploy:prod uploaded 28 files to the matt Pages project, and every artifact file now hashes equal to its served URL. matt:cv:check live: 14 ok, 0 failed - all 6 CV PDFs 200 application/pdf and all 8 in-page anchors download the artifact bytes in headless Chrome.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
+      "branch": "main",
+      "frame": "03haghi0qfx3wo63ubnqlhgav"
+    },
+    {
+      "id": "40b18054-d7ea-4514-8e20-a9dd90698d77",
+      "ts": "2026-11-23T15:56:57Z",
+      "source": "devin",
+      "subject": "nixconfig:shell-budget",
+      "action": "landed: flake/script-budget.nix records 141 bloated .sh at ceiling; shell-script-budget policy fails unrecorded bloat + growth + stale; 5 fixture cases in tests/policies | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
+      "branch": "main",
+      "frame": "03hagd3r5822tsim8rs10u68r"
+    },
     {
       "id": "633aee56-b966-4397-a153-63c85dd9ea0d",
       "ts": "2026-11-23T15:55:00Z",
@@ -2652,86 +2732,6 @@
       "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
       "branch": "main",
       "frame": "03haaqzvk91jw6g6jlkeazd09"
-    },
-    {
-      "id": "8108be09-ae9f-4bde-b42f-079dc15dc171",
-      "ts": "2026-11-22T22:41:54Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "claim: audit pass on lib/taskfile.nix — categorize + routing plan, no edits",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/taskfile.nix"
-      ],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haaqwu6d8f4u4ra9hhec4k7"
-    },
-    {
-      "id": "8698816c-17a2-460e-ae95-22cc7f8d867f",
-      "ts": "2026-11-22T22:37:29Z",
-      "source": "freebuff",
-      "subject": "nixconfig:appflow-parloa-followup-gate",
-      "action": "fixed: apps:search filtered inside the FORMAT=text renderer so the default TOON path returned all 605 rows — filter moved onto the JSON, 4 Parloa rows in toon/text/json; checks:appflow now runs tests/apps-typst, which stubs ssh+nix-shell and fails if the frieren delegate is deleted (negative control: exit 1) | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03haaq1qj6ojp68wlpefo6wad"
-    },
-    {
-      "id": "939081d8-72c0-4301-a81f-44180468c9d3",
-      "ts": "2026-11-22T22:36:20Z",
-      "source": "freebuff-frieren",
-      "subject": "shaoyanji.is-a.dev:cvcheck",
-      "action": "landed: steward dispatched the cvcheck task-wrapper fix to the freebuff pane (one 'task cvcheck' builds the site then runs the link check), agent working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haaptoz2g7c49xki3sssn4l"
-    },
-    {
-      "id": "a43f265b-9fad-4386-9d00-89fc42b1bda4",
-      "ts": "2026-11-22T22:35:53Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:ci-closure-budget",
-      "action": "landed: closure budget step in build-machines — measures built toplevel via nix path-info -r, fails on OVER vs closure-budgets.toml; NOT BUDGETED hosts don't fail; note → DELIVERED | gates: agents-notes-schema PASS, yaml valid, local proof run frieren 23.5/30.0GiB OK",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7c3b53495e166c2dd64fe5db66b14eeb616edcf4",
-      "branch": "main",
-      "frame": "03haapqj8ku3gnf94vsiq47p7"
-    },
-    {
-      "id": "9076a11a-2385-440f-9992-db27e8408883",
-      "ts": "2026-11-22T22:35:02Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:ci-closure-budget",
-      "action": "landed: steward dispatched the ci-closure-budget gate task to the devin pane (CI builds a toplevel and fails when a closure exceeds its closure-budgets.toml baseline), agent working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "02b2b7495dac6507a036cd9b26903d8b3512fa42",
-      "branch": "main",
-      "frame": "03haapkkhy6u7atkkxx5n1ovb"
-    },
-    {
-      "id": "11b3670c-73f7-4415-b65a-05eecdd48f30",
-      "ts": "2026-11-22T22:35:02Z",
-      "source": "freebuff-frieren",
-      "subject": "shaoyanji.is-a.dev:cv-typo",
-      "action": "landed: steward dispatched the cv.md grammar fix (this to these) to the freebuff pane, to verify with check-cv-links and a jekyll build",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "02b2b7495dac6507a036cd9b26903d8b3512fa42",
-      "branch": "main",
-      "frame": "03haapkik2pque5k75dm7ccdf"
     }
   ]
 }

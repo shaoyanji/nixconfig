@@ -378,7 +378,7 @@ func runManifest(root, repo string) {
 
 func main() {
 	if len(os.Args) < 2 {
-		die("usage: image-daily manifest [--root DIR] [--repo DIR]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt> [flags]")
 	}
 	switch os.Args[1] {
 	case "manifest":
@@ -390,7 +390,17 @@ func main() {
 			die("manifest needs --root and --repo (or IMAGES_ROOT and REPO)")
 		}
 		runManifest(*root, *repo)
+	case "judge":
+		cmdJudge(os.Args[2:])
+	case "attempt":
+		cmdAttempt(os.Args[2:])
+	case "lane":
+		cmdLane(os.Args[2:])
+	case "stage":
+		cmdStage(os.Args[2:])
+	case "adopt":
+		cmdAdopt(os.Args[2:])
 	default:
-		die("usage: image-daily manifest [--root DIR] [--repo DIR]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt> [flags]")
 	}
 }

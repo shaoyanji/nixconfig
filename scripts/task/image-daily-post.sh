@@ -28,7 +28,8 @@ cmd_post() {
   [ -d "$blog/.git" ] || die "no blog checkout at $blog (BLOG_DIR=...)"
   [ -n "$alt" ] || alt=$title
   [ -n "$prompt" ] || prompt="A blog banner for an engineering post titled \"$title\". One clear subject, realistic photographic style, natural light, shallow depth of field, no text, no lettering, no logos, nothing to read."
-  local day post file verdict defect jpg url card body='' tsv=$IMAGES_ROOT/published/urls.tsv
+  local day post file verdict defect jpg url card body='' tsv=$IMAGES_ROOT/published/urls.tsv cli
+  cli=$(image_daily_cli)
   day=$(today)
   post=$blog/_posts/$day-$slug.md
   if [ -f "$post" ] && [ "${FORCE:-0}" != "1" ]; then
@@ -52,15 +53,15 @@ cmd_post() {
   [ "$(remaining || echo 0)" -gt 0 ] || die "no images left today"
 
   say "$slug: generating a banner"
-  file=$(attempt "blog-$slug" blog 1536x1024 "$slug.png" "$prompt" "$day") || die "generation failed"
-  verdict=$(judge_image "$file" blog "$(lane_setting blog intent)")
+  file=$("$cli" attempt --id "blog-$slug" --lane blog --size 1536x1024 --name "$slug.png" --prompt "$prompt" --day "$day") || die "generation failed"
+  verdict=$("$cli" judge --png "$file" --lane blog --intent "$(lane_setting blog intent)")
   if [ "$(printf '%s' "$verdict" | jq -r '.verdict')" = "reroll" ]; then
     defect=$(printf '%s' "$verdict" | jq -r '.defect // "the composition"')
     say "$slug: reroll — $defect"
     rm -f "$file"
-    file=$(attempt "blog-$slug" blog 1536x1024 "$slug.png" \
-      "$prompt (Change only this: $defect.)" "$day") || die "reroll failed"
-    verdict=$(judge_image "$file" blog "$(lane_setting blog intent)")
+    file=$("$cli" attempt --id "blog-$slug" --lane blog --size 1536x1024 --name "$slug.png" \
+      --prompt "$prompt (Change only this: $defect.)" --day "$day") || die "reroll failed"
+    verdict=$("$cli" judge --png "$file" --lane blog --intent "$(lane_setting blog intent)")
   fi
   say "judge: $(printf '%s' "$verdict" | jq -r '.verdict + " — " + .reason')"
   [ "$(printf '%s' "$verdict" | jq -r '.verdict')" = "keep" ] ||

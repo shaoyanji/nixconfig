@@ -80,7 +80,8 @@ merge_served_urls() {
 
 cmd_publish() {
   need jq
-  local lane PUBLISH_SHIFTED=0 PUBLISH_GONE=0
+  local lane PUBLISH_SHIFTED=0 PUBLISH_GONE=0 cli staged
+  cli=$(image_daily_cli)
   # The publish gate runs first: a manifest rewrite from a family that lost a
   # file or a breaker is the mistake it exists to catch (43 generations, 0
   # keeps, 2026-11-22–23). GATE=0 skips it for a deliberate one-off repair.
@@ -107,7 +108,9 @@ cmd_publish() {
   fi
   for lane in site wall blog badge; do
     [ "$(lane_setting "$lane" publish)" = "true" ] || continue
-    stage_publish
+    staged=$("$cli" stage --lane "$lane")
+    PUBLISH_SHIFTED=$((PUBLISH_SHIFTED + ${staged%%[[:space:]]*}))
+    PUBLISH_GONE=$((PUBLISH_GONE + ${staged##*[[:space:]]}))
   done
   if [ "$PUBLISH_SHIFTED" -gt 0 ] || [ "$PUBLISH_GONE" -gt 0 ]; then
     say "publish: $PUBLISH_SHIFTED keep row(s) already served under another day, $PUBLISH_GONE with no file left"
@@ -115,7 +118,7 @@ cmd_publish() {
   # The manifest this host builds is the update; the one being served is the prior,
   # and the account is the authority both are checked against.
   merge_served_urls
-  adopt_cloudinary
+  "$cli" adopt
   build_index
   say "$(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | wc -l) asset(s) staged"
   publish_shrink_guard

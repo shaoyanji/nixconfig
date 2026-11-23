@@ -42,7 +42,8 @@ cmd_run() {
     rem=0
   fi
 
-  local cap=${CAP:-0} spent_total=0 room
+  local cap=${CAP:-0} spent_total=0 room cli
+  cli=$(image_daily_cli)
   select_lanes
   for lane in "${lane_list[@]}"; do
     budget=$(lane_budget "$lane")
@@ -52,7 +53,7 @@ cmd_run() {
       [ "$room" -gt 0 ] || { say "cap $cap reached; the next slot takes the rest"; break; }
       [ "$budget" -gt "$room" ] && budget=$room
     fi
-    run_lane "$lane" "$budget"
+    LANE_SPENT=$("$cli" lane --lane "$lane" --budget "$budget" || echo 0)
     spent_total=$((spent_total + LANE_SPENT))
     rem=$(remaining || echo 0)
   done

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-23T22:11:50Z",
+  "generated": "2026-11-23T22:24:40Z",
   "count": 200,
-  "pin": "55d6f77954ff6ebb8c2978160ff23b4885be8182f0788d1e32fc29cda7f774b5",
+  "pin": "bf4a2caafedba63ebc6d189bd1c3350d3ef1d0ca92eb7d874b2b84c4c7e54506",
   "turns": [
+    {
+      "id": "8edcc03a-c44d-495e-9254-5946c5071aaa",
+      "ts": "2026-11-23T22:12:15Z",
+      "source": "devin",
+      "subject": "nixconfig:image-engine-go",
+      "action": "landed: image-daily manifest builder ported to tools/image-daily Go CLI (cli.image.daily), byte-identical manifest on live 738-asset bank; engine 714->632; slot PATH carries the binary; also bumped hermes api_max_retries 6->7 for the committed 7-lane chain | gate: checks:quick PASS, checks:host frieren PASS, images:gate ok",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9cb4994af55338e3d151780c0b217280ec099542",
+      "branch": "main",
+      "frame": "03haief2b40y53pl6yo5zwbof"
+    },
     {
       "id": "6d7880cc-7ac5-4aa2-8a00-1d5576c982bc",
       "ts": "2026-11-23T22:08:40Z",
@@ -2711,19 +2724,6 @@
       "base_commit": "4d5cc2916a5a04870877a68b9a51e3a4f7e9c1ef",
       "branch": "main",
       "frame": "03habfrfwf4r6fcxgejsr86b5"
-    },
-    {
-      "id": "ac1e7a9c-8086-48a0-b402-877299dbf097",
-      "ts": "2026-11-23T00:04:02Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:job-hunt-n8n-nix-depth",
-      "action": "landed: steward drove the delphi freebuff pane (0:3.1, ssh-tunneled) to check n8n for Nix depth — does their DevOps stack use Nix/NixOS; read-only, named sources",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ab1439a25af8e5c4e5fb4f2da0c69718311f9045",
-      "branch": "main",
-      "frame": "03hab6yep7r4rhd2i1mhuod5f"
     }
   ]
 }

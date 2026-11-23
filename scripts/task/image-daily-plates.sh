@@ -102,7 +102,8 @@ cmd_plates() {
     launch_round "$roster"
     return 0
   fi
-  local intent
+  local intent cli
+  cli=$(image_daily_cli)
   intent=$(jq -r '.intents.photoreal // empty' "$BRIEFS")
   [ -n "$intent" ] || die "briefs.json carries no .intents.photoreal"
   # A requested round is allowed to wait the burst window out: the alternative is
@@ -188,14 +189,14 @@ cmd_plates() {
     fi
 
     retried=0
-    file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$prompt" "$day" 1 1) || {
+    file=$("$cli" attempt --id "photoreal-$slug" --lane wall --size "$size" --name "$slug.png" --prompt "$prompt" --day "$day" --n 1 --rev 1) || {
       rc=$?
       [ "$rc" -eq 2 ] && { say "burst window closed; the rest of the roster waits for the next round"; break; }
       [ "$rc" -eq 3 ] && { say "allowance spent; the rest of the roster waits for the next slot"; break; }
       continue
     }
     left=$((left - 1))
-    v=$(judge_image "$file" wall "$intent" "$expect")
+    v=$("$cli" judge --png "$file" --lane wall --intent "$intent" --expect "$expect")
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
     defect=$(printf '%s' "$v" | jq -r '.defect // ""')
     spent=$((spent + 1))
@@ -206,14 +207,14 @@ cmd_plates() {
       say "$slug: reroll — $defect"
       rm -f "$file"
       sent="$prompt (Change only this: $defect.)"
-      file=$(attempt "photoreal-$slug" wall "$size" "$slug.png" "$sent" "$day" 2 1) || {
+      file=$("$cli" attempt --id "photoreal-$slug" --lane wall --size "$size" --name "$slug.png" --prompt "$sent" --day "$day" --n 2 --rev 1) || {
         rc=$?
         [ "$rc" -eq 2 ] && { say "burst window closed; the rest of the roster waits for the next round"; break; }
         [ "$rc" -eq 3 ] && { say "allowance spent; the rest of the roster waits for the next slot"; break; }
         continue
       }
       left=$((left - 1))
-      v=$(judge_image "$file" wall "$intent" "$expect")
+      v=$("$cli" judge --png "$file" --lane wall --intent "$intent" --expect "$expect")
       verdict=$(printf '%s' "$v" | jq -r '.verdict')
       defect=$(printf '%s' "$v" | jq -r '.defect // ""')
       spent=$((spent + 1))

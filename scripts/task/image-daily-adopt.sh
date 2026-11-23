@@ -7,7 +7,7 @@ source "$here/image-daily-engine.sh"
 
 cmd_adopt() {
   need jq
-  adopt_cloudinary
+  "$(image_daily_cli)" adopt
   [ "${DRY:-0}" = "1" ] && { say "dry run: nothing added, nothing built"; return 0; }
   build_index
   deploy_frontend

@@ -46,12 +46,16 @@ cmd_gate() {
   done
 
   # Judge resilience: the account route exhausts for days at a time, so the
-  # engine must carry the provider lane or every verdict is unjudged.
-  local engine=$dir/image-daily-engine.sh
+  # engine must carry the provider lane or every verdict is unjudged. The check
+  # looks at the shell AND the Go tool: the functions moved to
+  # tools/image-daily, and a fixture checked out of history still carries them
+  # in the engine — either location holding the contract is the contract held.
+  local engine=$dir/image-daily-engine.sh gotool=$dir/../../tools/image-daily
   [ -f "$engine" ] || die "no engine at $engine"
-  grep -q 'modelProvider' "$engine" && grep -q 'GEMINI_API_KEY' "$engine" ||
+  { grep -q 'modelProvider' "$engine" 2>/dev/null && grep -q 'GEMINI_API_KEY' "$engine" 2>/dev/null; } ||
+    { grep -rq 'modelProvider' "$gotool" 2>/dev/null && grep -rq 'GEMINI_API_KEY' "$gotool" 2>/dev/null; } ||
     { say "gate FAIL: engine has no provider fallback — a dead account route means every plate stays unjudged"; fail=1; }
-  grep -q 'unjudged_streak' "$engine" ||
+  grep -q 'unjudged_streak' "$engine" 2>/dev/null || grep -rq 'unjudged_streak' "$gotool" 2>/dev/null ||
     { say "gate FAIL: run_lane has no unjudged circuit breaker — a dead judge burns the whole allowance"; fail=1; }
   [ -f "$dir/image-daily-plates.sh" ] && grep -q 'unjudged_streak' "$dir/image-daily-plates.sh" ||
     { say "gate FAIL: plates loop has no unjudged circuit breaker"; fail=1; }

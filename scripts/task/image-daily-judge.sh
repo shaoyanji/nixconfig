@@ -9,7 +9,7 @@ cmd_judge() {
   need jq agy
   local path=${1:?usage: image-daily.sh judge PATH [lane]}
   [ -f "$path" ] || die "$path does not exist"
-  judge_image "$(readlink -f "$path")" "${2:-wall}" "$(lane_setting "${2:-wall}" intent)"
+  "$(image_daily_cli)" judge --png "$(readlink -f "$path")" --lane "${2:-wall}" --intent "$(lane_setting "${2:-wall}" intent)"
   echo
 }
 

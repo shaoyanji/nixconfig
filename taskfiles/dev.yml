@@ -589,7 +589,7 @@ tasks:
       `task dev:closure:budget:adopt HOST=<h>`. HEADROOM_PCT=<n> overrides the
       file's headroom for one run (e.g. HEADROOM_PCT=0 to see the raw baseline).
     cmds:
-      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}{{.TARGET}}{{end}}
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}--target {{.TARGET}}{{end}}
 
   dev:closure:budget:adopt:
     desc: Adopt a host's measured deployed closure as its baseline (dynamic budget ratchet)

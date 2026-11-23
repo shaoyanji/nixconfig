@@ -1008,7 +1008,7 @@ tasks:
       ALL=1, TARGET=<store path>; no entry = NOT BUDGETED. Exit 0 = within, 1 =
       over, 2 = no budget file.
     cmds:
-      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}{{.TARGET}}{{end}}
+      - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}--target {{.TARGET}}{{end}}
 
   checks:dns:failover:
     desc: Verify the DNS resolver group answers the wildcard zone and can fail over (HC-3)

@@ -13,11 +13,29 @@
   fleetMenu = import self.modules."scripts.fleet-menu" {inherit pkgs;};
   appimageMenu = import self.modules."scripts.appimage-menu" {inherit pkgs;};
 
+  # The shared config.h is written for dwl 0.9 — it carries the axes[] table and
+  # `snap`, which 0.8 does not compile. A host whose nixpkgs still ships 0.8
+  # (netbook pins c5c4a43 for scripted initrd) grafts the 0.9 source onto its
+  # package, with wlroots_0_20 standing in for the 0.19 input dwl 0.9 moved to.
+  dwlBase =
+    if lib.versionOlder pkgs.dwl.version "0.9"
+    then
+      (pkgs.dwl.override {wlroots_0_19 = pkgs.wlroots_0_20;}).overrideAttrs (_: {
+        version = "0.9";
+        src = pkgs.fetchFromCodeberg {
+          owner = "dwl";
+          repo = "dwl";
+          rev = "v0.9";
+          hash = "sha256-PYBOi/A9n1611XBEaZW9PolSfjwe1KWoI2VbVrS2s0Q=";
+        };
+      })
+    else pkgs.dwl;
+
   # Spliced host entries go first, which is what makes them shadow the fleet bind
   # for the same key (`keybinding()` returns the first entry matching mod + keysym).
   # Handed to `programs.dwl.package`, never added to a PATH: the deploy that shipped
   # a wrapper around `pkgs.dwl` ran stock dwl and answered no keybind.
-  dwl = pkgs.dwl.override {
+  dwl = dwlBase.override {
     configH =
       builtins.replaceStrings
       ["/* @EXTRA_KEYBINDS@ */"]

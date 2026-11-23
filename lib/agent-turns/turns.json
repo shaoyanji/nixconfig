@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-23T19:40:02Z",
+  "generated": "2026-11-23T19:47:32Z",
   "count": 200,
-  "pin": "25f772ccc72b75b8ddadd520bb69ff374c9cf0ce503a8b106aa88e78059c7999",
+  "pin": "90d51cba2c23883631ecabfcc00b0e83bb93103663e8c419b805764ab206c84b",
   "turns": [
+    {
+      "id": "86e8085a-ce14-40be-9bff-d524ee36f1d5",
+      "ts": "2026-11-23T19:40:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:checks-hosts-args",
+      "action": "landed: home-host self.modules judged on every file flake/host-inventory.nix names for that host, hard stop (exit 2) when none resolve; fixture proof re-pinned by pickaxe to the commit that introduced the clanker mistake, 9 cases | gate: checks:hosts:args + checks:hosts:args:test PASS, checks:host HOST=clanker MODE=eval PASS, checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1dd38f0a5e924acd39cfa2411be8b26656d60e97",
+      "branch": "main",
+      "frame": "03hahkpy6hfcmt603sfe8na27"
+    },
     {
       "id": "6a3903e6-2ac9-42d6-80d4-da9b77b8036b",
       "ts": "2026-11-23T18:59:57Z",
@@ -2707,21 +2720,6 @@
       "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
       "branch": "main",
       "frame": "03hab3gesfdik8w7q7jtiuu3m"
-    },
-    {
-      "id": "3f50cb53-2f3a-4064-aafc-7686c3292ca1",
-      "ts": "2026-11-22T23:45:57Z",
-      "source": "devin-frieren",
-      "subject": "nixconfig:comment-audit",
-      "action": "claim: frieren infra-stack/reverse-proxy/dns + remaining host modules",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren/infra-stack.nix hosts/frieren/reverse-proxy.nix hosts/frieren/dns.nix"
-      ],
-      "files": [],
-      "base_commit": "0a5110f44330c328dbc6b0fdfe006e1aa0ca9a1c",
-      "branch": "main",
-      "frame": "03hab3f7dumyi7q11vc3agzpu"
     }
   ]
 }

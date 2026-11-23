@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-23T09:08:07Z",
+  "generated": "2026-11-23T09:17:26Z",
   "count": 200,
-  "pin": "cbc406e9fde1f566c34649a4cd8ecf977e0f2122cd225b45dcd6809b791b54d0",
+  "pin": "ca215dedfd644434c8e0f8f0ed764f22c5f52ed204695d2f2c99344175dfe8e5",
   "turns": [
+    {
+      "id": "a9e7ac22-908d-4bf2-b15a-a1cd95503147",
+      "ts": "2026-11-23T09:16:04Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-23e",
+      "action": "landed: 5 verified DevOps/SRE/platform leads written to the pipeline from the HN Nov-2026 thread plus five feeds (ICEYE x2 Berlin/Espoo, Proxima Fusion Munich, Proofline remote-EU, VictoriaMetrics EMEA); dropped 9 unverifiable or geo-ineligible matches | gate: application-get readback PASS (applyUrl+notes+nextAction on all 5)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hae6sixavwyuwefvw0v2gof"
+    },
+    {
+      "id": "98f68675-678a-4aa7-a87d-23bd121e06d9",
+      "ts": "2026-11-23T09:13:36Z",
+      "source": "devin",
+      "subject": "nixconfig:comment-census",
+      "action": "start: prune stale narrative comments in tracked .nix (AGENTS.nix excluded) per nix-comment-audit note — route, not bulk-delete; census: 6318 header lines, worst files first",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi/configuration.nix hosts/frieren/ lib/ hosts/netbook/ hosts/minyx/ modules/user/ai/hermes-user.nix"
+      ],
+      "files": [],
+      "base_commit": "771ed3ab4a29406f8ec004c8299dfdef6ac6c166",
+      "branch": "main",
+      "frame": "03hae6b7twptal8dwv188396l"
+    },
+    {
+      "id": "9f290f57-92fc-4225-a778-56c5b9b30754",
+      "ts": "2026-11-23T09:13:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-pane-0-2-1",
+      "action": "landed: job-search scouting — DevOps/SRE/Platform/Infrastructure leads on delphi (freebuff over ssh tunnel); Jev routing note-change p=0.76 margin=0.61 (decisive margin on needs_review); paste+Enter cleared the Submit dialog; freebuff accepted — working... 39s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "771ed3ab",
+      "branch": "main",
+      "frame": "03hae68i8p939993ptbjdch4v"
+    },
+    {
+      "id": "f8fb3455-7571-46d3-86c8-7dcfe00ea7eb",
+      "ts": "2026-11-23T09:13:12Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-pane-0-0-1",
+      "action": "landed: comment census + narrative prune across tracked .nix files; Jev routing prose-change p=0.90 margin=0.87 (decisive); devin accepted the task via load-buffer+paste-buffer+Enter — xs claim check clear, reading lib/nix-comments.nix, Thinking 12s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "771ed3ab",
+      "branch": "main",
+      "frame": "03hae68f3zok8021hg6nw8wvl"
+    },
+    {
+      "id": "76334790-3928-46d4-9a46-95e6eae1db70",
+      "ts": "2026-11-23T09:08:18Z",
+      "source": "devin",
+      "subject": "nixconfig:images-pipeline-redesign",
+      "action": "landed: checks:images widened — every urls.tsv row must name the Cloudinary delivery URL of its path-derived public id, never the session-gated URL, and equal the manifest's URL; added to checks:quick deps | gate: checks:quick PASS (771ed3ab)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "771ed3ab4a29406f8ec004c8299dfdef6ac6c166",
+      "branch": "main",
+      "frame": "03hae59xju73sy5reygr7jmpf"
+    },
     {
       "id": "db2cba83-ae52-4d16-ac18-a85a41b3cb96",
       "ts": "2026-11-23T09:06:45Z",
@@ -2683,79 +2750,6 @@
       "base_commit": "544dbf5b154f3b4c98198e8cc2c4a3627486656e",
       "branch": "main",
       "frame": "03ha8uzr8g5bvbizhan0ocpk2"
-    },
-    {
-      "id": "ae2295d3-9ef9-402e-a865-19d24d5ad26c",
-      "ts": "2026-11-22T16:47:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-hygiene-gate",
-      "action": "landed: checks:appflow now fails on undeclared duplicate pairs and prep rows on dead requisitions (604 rows, 0/0 after the cleanup) | gate: checks:appflow PASS, checks:shell-inputs PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4f0d44136ae03fd9b3ee6364da12efd364aceb4c",
-      "branch": "main",
-      "frame": "03ha8tmjyj866xwiyb82p3v8o"
-    },
-    {
-      "id": "11463307-ae02-4337-baf2-3e63e7b92c48",
-      "ts": "2026-11-22T16:35:51Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:check-quick-green",
-      "action": "landed: checks:quick exits 0 on a clean checkout of main at 29dff164 — check:verify 124 rows no drift, checks:infron clean, checks:shell-inputs 0 violations across 37 wrappers, policies and entry both pass. The earlier failures were content (dead TOML table, missing row, keyless-route assertion, prose ceiling) plus one cold-cache timing miss",
-      "outcome": "done",
-      "claims": [
-        "flake/check-inventory.nix scripts/task/infron-check.sh"
-      ],
-      "files": [],
-      "base_commit": "29dff164769a55c0f53793365baf9eed5504a211",
-      "branch": "HEAD",
-      "frame": "03ha8rekbjzyuqjyr8q9ethn4"
-    },
-    {
-      "id": "b1f00cd7-e4e3-464a-b549-97c8e2155a4a",
-      "ts": "2026-11-22T16:34:53Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:check-quick-green",
-      "action": "landed: 29dff164 drops the nine module comment lines that pushed the pointer-policy prose ceiling to 6496/6495. On main, policies, check:verify (124 rows), checks:infron and checks:shell-inputs all pass. checks:quick still exits 1 at checks:entry, a timing gate (leaf iets 196ms vs 75ms budget, 'half the nix floor or the cache is not answering'), not content",
-      "outcome": "done",
-      "claims": [
-        "modules/scripts/dsh-remote.nix modules/scripts/qmd-eisen-embed-sync.nix"
-      ],
-      "files": [],
-      "base_commit": "8db6caa861438585e1f33174377b299dc0055e54",
-      "branch": "main",
-      "frame": "03ha8r7tb513t85kdlxs30ukg"
-    },
-    {
-      "id": "eb626910-4ca1-46f0-8b37-efc42eba7b8d",
-      "ts": "2026-11-22T16:32:27Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:check-quick-green",
-      "action": "landed: 2409ced1 fixes the infron fallback loop (keyless apisfreellm route exempt) and check:verify is clean at 124 rows; checks:quick still does not exit 0 on main — see below for the one gate that remains, named with its reason | gate: checks:infron PASS, check:verify PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/infron-check.sh"
-      ],
-      "files": [],
-      "base_commit": "8db6caa861438585e1f33174377b299dc0055e54",
-      "branch": "main",
-      "frame": "03ha8qqomyy99qnyw5igz4j98"
-    },
-    {
-      "id": "a3fdb374-5f38-40cb-aafb-510464b42a8f",
-      "ts": "2026-11-22T16:30:30Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:check-inventory-row",
-      "action": "corrected: aa51f063 only removed the dead taskfiles/checks.toml (the add failed on that path); 37ddcef0 now puts the checks:shell-inputs row in flake/check-inventory.nix, the table main reads, and check:verify passes there. checks:quick on main still fails one infron assertion: its persona carries fallback model 'free-ai' at a keyless base_url, and that line is a routing decision, not mine to change",
-      "outcome": "done",
-      "claims": [
-        "flake/check-inventory.nix"
-      ],
-      "files": [],
-      "base_commit": "37ddcef05fac80f0aa4b06aecd6fbb87a52e3b8e",
-      "branch": "HEAD",
-      "frame": "03ha8qcy7eagxivxny1d0t4q1"
     }
   ]
 }

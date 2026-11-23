@@ -1,6 +1,5 @@
 # The DeepSeek Harness Web UI as a worker service, published under a path
 # prefix by whatever reverse proxy fronts this host.
-#
 {
   config,
   lib,

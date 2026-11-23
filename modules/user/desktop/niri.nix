@@ -211,7 +211,6 @@ lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
       }
     ];
     binds = {
-      # "Mod+Shift+Slash".action.show-hotkey-overlay = [];
       "Mod+Print".action.screenshot-screen = {
         show-pointer = false;
       };
@@ -263,7 +262,6 @@ lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
       ];
 
       "Mod+Z".action.spawn = "zen-beta";
-      # "Mod+C".action.spawn-sh = "kitty -- task";
       "Mod+C".action.spawn-sh = "tmux display-popup task";
       # Kando radial menu trigger (repeat = false prevents key-repeat avalanche)
       "Mod+B".action.spawn-sh = "kando -m 'Kando Menu'";

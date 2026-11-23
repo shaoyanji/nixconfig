@@ -9,7 +9,6 @@
     self.modules."profiles.nvidia"
   ];
 
-  # extraPackages = with pkgs; [nvidia-vaapi-driver];
   services.xserver.videoDrivers = ["intel"];
   nixpkgs.config.nvidia.acceptLicense = true;
   # nvidia-settings-470 pulls gtk2; nixpkgs marks it broken pending NixOS 27.05

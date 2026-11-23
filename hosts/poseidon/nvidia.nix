@@ -22,10 +22,8 @@
   };
 
   services.ollama = {
-    # package = pkgs.ollama-cuda;
     loadModels = lib.mkForce [
       "lfm2.5:latest"
     ];
   };
-  # boot.kernelParams = ["nvidia.NVreg_EnableGpuFirmware=0"];
 }

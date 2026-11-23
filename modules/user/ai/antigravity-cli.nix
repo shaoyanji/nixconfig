@@ -28,7 +28,6 @@
         artifactReviewPolicy = "always-proceed";
         # Editor: external program via $EDITOR; vim modal editing inside the prompt
         editor = "auto";
-        # editorMode = "vim";
         # Notifications
         notifications = true;
         # Telemetry off

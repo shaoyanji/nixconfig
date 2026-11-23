@@ -6,7 +6,6 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia-mx110.nix
     self.modules."profiles.steam"

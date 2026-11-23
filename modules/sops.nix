@@ -107,13 +107,6 @@ in {
         mode = "0600";
       };
       "gemini/api/key" = {};
-      # "todoist" = {
-      #   sopsFile = ./secrets.json;
-      #   mode = "0600";
-      #   key = "";
-      #   format = "json";
-      # };
-      #"${local_ssh_key}".path = "${ssh_key_path}";
       "ssh_user_ca_private_key" = {
         sopsFile = ./ssh-ca-key.yaml;
         path = "${config.home.homeDirectory}/.ssh/user_ca_key";
@@ -199,7 +192,6 @@ in {
     "nix/nix.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."nix.conf".path}";
     "stormy/stormy.toml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."stormy.toml".path}";
     "geminicommit/config.toml".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.templates."geminicommit".path}";
-    # "todoist/config.json".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.secrets."todoist".path}";
     "neocities/config".source = config.lib.file.mkOutOfStoreSymlink "${config.sops.secrets."neocities".path}";
   };
   home = {

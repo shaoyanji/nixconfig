@@ -100,7 +100,6 @@
       NSWindowResizeTime = 0.001;
     };
     CustomSystemPreferences."com.apple.Accessibility".ReduceMotionEnabled = 1;
-    # universalaccess.reduceMotion = true;
     CustomUserPreferences = {
       NSGlobalDomain.WebKitDeveloperExtras = true;
       AppleLanguages = lib.mkForce (lib.mkDefault ["en-US"]);

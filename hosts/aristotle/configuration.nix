@@ -6,7 +6,6 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"

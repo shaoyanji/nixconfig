@@ -42,7 +42,6 @@ in {
   };
 
   config = {
-    # programs.nixvim.enable = true;
     # `~/.gitconfig` is deliberately NOT deleted on activation: it is where
     # `gh auth setup-git` writes its credential helper, so wiping it made every
     # setup-git run disappear on the next switch. Git config that must be

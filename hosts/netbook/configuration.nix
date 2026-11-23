@@ -101,7 +101,6 @@
 in {
   users.users.root.openssh.authorizedKeys.keys = [deployKey];
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     # Shared profiles instead of copies. `boot.nix` owns the loader switches —
     # this box's firmware variables are read-only, so it opts out through the
@@ -247,14 +246,12 @@ in {
   # path here and already owns the CPU knobs.
   services.thermald.enable = false;
   services.earlyoom.enable = true;
-  networking.hostName = "netbook"; # Define your hostname.
+  networking.hostName = "netbook";
 
-  # Configure network connections interactively with nmcli or nmtui.
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Berlin";
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
   # Firmware TPM (Intel PTT, ACPI MSFT0101) — the netbook's sops identity. The
   # chip is only useful once `tss` owns /dev/tpmrm0, and the sealed identity is
   # generated ON this host as alice, so alice needs the group. Procedure and
@@ -313,7 +310,6 @@ in {
     ];
   };
 
-  # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
     #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.

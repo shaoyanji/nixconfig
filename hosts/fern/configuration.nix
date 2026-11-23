@@ -7,7 +7,6 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     # dwl, forked out of the userland rather than disabled inside it
     # [[flake/policies.nix#desktop-fork-not-disable]]. The Ryoku pilot ran

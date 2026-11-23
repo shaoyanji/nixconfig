@@ -9,7 +9,6 @@
 }: {
   imports = [
     self.modules."config.authorized-keys"
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"
@@ -72,7 +71,6 @@
         enable = true;
         wayland.enable = true;
       };
-      #    xserver.digimend.enable = true;
     };
 
     btrfs.autoScrub = {

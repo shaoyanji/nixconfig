@@ -12,7 +12,6 @@
   programs.lf = {
     enable = true;
     commands = {
-      #      dragon-out = ''%${pkgs.xdragon}/bin/xdragon -a -x "$fx"'';
       editor-open = ''$$EDITOR "$f"'';
       mkdir = ''
         ''${{
@@ -34,8 +33,6 @@
       "`" = "mark-load";
       # ' is mark-load by default; the old "\\'" line mapped \\ then ', not '.
       "<enter>" = "open";
-
-      #     do = "dragon-out";
 
       "g~" = "cd";
       gh = "cd";

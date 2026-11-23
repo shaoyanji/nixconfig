@@ -25,9 +25,6 @@ _: {
     };
   };
 
-  # hardware.nvidia-container-toolkit.enable = true;
-  # virtualisation.docker.enableNvidia = true;
-
   services.ollama = {
     enable = true;
     host = "127.0.0.1";

@@ -125,10 +125,6 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    # dgop = {
-    #   url = "github:AvengeMedia/dgop";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
 
     # DMS 2.0 is Dux Shell: Dank Linux rebranded to Dux Labs on 2026-10-20, and
     # the greeter moved to its own repo in 2026-09 (imported via module-sets as

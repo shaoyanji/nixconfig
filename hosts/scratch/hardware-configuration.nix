@@ -17,8 +17,6 @@
   boot.kernelModules = ["kvm-intel"];
   boot.extraModulePackages = [];
 
-  # Enables DHCP on each ethernet interface. In case of scripted networking
-  # (the default) this is the recommended approach.
   networking.useDHCP = lib.mkDefault true;
 
   fileSystems."/" = {

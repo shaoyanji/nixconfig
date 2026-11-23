@@ -81,7 +81,6 @@ in {
     ];
 
     sessionVariables = {
-      # EDITOR = lib.mkDefault "nvim";
     };
   };
 }

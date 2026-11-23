@@ -5,7 +5,6 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     self.modules."profiles.base-desktop-environment"
     (import ../../modules/profiles/grub-boot.nix {

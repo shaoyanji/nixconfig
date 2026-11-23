@@ -1,7 +1,6 @@
 # ares — Steam Big Picture kiosk (i5-6500 Skylake + GTX 750 Ti).
 {self, ...}: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./nvidia-gt-750-ti.nix
     # Impermanence root rotation + /persist/system persistence.

@@ -4,7 +4,6 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     self.modules."profiles.desktop-client"
     self.modules."profiles.laptop"

@@ -1,5 +1,5 @@
 {
-  "_comment": "Der auf Software und Infrastruktur zugeschnittene Lebenslauf. Jeder Bullet ist ein wörtlich übernommener Satz aus lib/matt/lebenslauf.json; lib/matt-site.nix bricht den Build ab, sobald ein Satz dort nicht steht. Diese Datei wählt aus und ordnet, sie erfindet nichts.",
+  "_comment": "Der auf Software und Infrastruktur zugeschnittene Lebenslauf. Er spiegelt lib/matt/cv-software.json: dieselben drei Rollen in derselben Reihenfolge, dieselben zwei Projekte und dieselbe Zahl an Bullets je Rolle. Jeder Bullet ist wörtlich aus lib/matt/lebenslauf.json übernommen; lib/matt-site.nix bricht den Build ab, sobald ein Satz dort nicht steht. Diese Datei wählt aus und ordnet, sie erfindet nichts. Das deutsche Korpus führt noch keine Übersetzung der beiden Go-Service-Bullets, deshalb trägt die deutsche Fassung an dieser Stelle die Software-Bullets, die es gibt.",
   "lang": "de",
   "title": "Systemingenieur und Softwareentwickler",
   "bio": "Ich baue die Systeme, die die Modelle ausführen: eine NixOS-Flotte aus einem Flake, ein E-Mail-Archiv, das seine Post selbst klassifiziert, und Chat-, Sprach- und Bildmodelle hinter einem einzigen OpenAI-kompatiblen Endpunkt. Davor vier Jahre Asset Management eines Solarportfolios über 100 Mio. USD und Forschung zu Heliostat-Messtechnik am Fraunhofer ISE.",
@@ -11,10 +11,14 @@
     {
       "name": "Bountystash",
       "highlights": [
-        "Baute und betrieb eine NixOS-Flotte, die als ein Flake deklariert ist: jeder Host eine Feature-Liste, jeder Dienst ein Modul, Secrets mit sops verschlüsselt hinter der eigenen SSH-Zertifizierungsstelle der Flotte",
-        "Sicherte Infrastrukturänderungen mit inventargetriebener CI und einem Modul-Check je Host ab, sodass eine fehlerhafte Host-Definition vor dem Deploy scheitert",
-        "Schrieb einen Sentinel-Job, der Job-Status, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten protokolliert und alarmiert, wenn ein Dienst ausfällt",
+        "Entwickelte eine unveränderliche Web-Templating-Sprache, die gegen Skriptangriffe unempfindlich ist.",
         "Betreibt Chat-, Sprach- und Bildmodelle hinter einem einzigen OpenAI-kompatiblen Endpunkt auf einem GPU-Host und deklariert die MCP-Server des Editors im selben Flake"
+      ]
+    },
+    {
+      "name": "O3 Energy",
+      "highlights": [
+        "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
       ]
     },
     {
@@ -23,17 +27,11 @@
         "Schrieb C++-Anwendungssoftware zur Anbindung der Laborgeräte.",
         "Schrieb Python-Werkzeuge für Analyse und 3D-Geometrie."
       ]
-    },
-    {
-      "name": "O3 Energy",
-      "highlights": [
-        "Erstellte Finanzmodelle und betreute 10 MW Solar-PV-Anlagen."
-      ]
     }
   ],
   "projects": [
     "nixconfig",
-    "bountystash"
+    "Risk Calculation Engine (Swirl Engine)"
   ],
   "stack": [
     {
@@ -42,6 +40,7 @@
         "Go",
         "Python",
         "SQL",
+        "Nix",
         "C++",
         "Bash"
       ]
@@ -52,24 +51,18 @@
         "NixOS",
         "Nix Flakes",
         "Linux",
-        "SOPS",
-        "SSH CA",
-        "CI"
+        "systemd",
+        "SSH-Zertifizierungsstelle",
+        "SOPS und age",
+        "GitHub Actions"
       ]
     },
     {
       "category": "Daten",
       "items": [
         "PostgreSQL",
-        "SQL"
-      ]
-    },
-    {
-      "category": "Sicherheit",
-      "items": [
-        "CISA KEV",
-        "CVSS",
-        "Bug Bounty"
+        "Ereignisprotokolle",
+        "Content-Addressing"
       ]
     }
   ]

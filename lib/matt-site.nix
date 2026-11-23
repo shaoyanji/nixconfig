@@ -550,11 +550,10 @@
     c = dataSet.${slug};
     # A case study or a brief offers the CV that argues for its own subject: the
     # solar portfolio hands out the energy variant, a fleet or a vulnerability
-    # programme the software one. German software pages take the German full CV:
-    # there is no German software variant, and an English PDF on a German page is
-    # worse than a general one in the reader's language. Every slug the site
-    # builds is listed, because a PDF no page links fails the build — a new page
-    # has to choose a variant rather than inherit one by accident.
+    # programme the software one. Each language has both variants, so a German
+    # page never hands a German reader an English PDF. Every slug the site builds
+    # is listed, because a PDF no page links fails the build — a new page has to
+    # choose a variant rather than inherit one by accident.
     variant =
       {
         energy-telemetry = "energy";
@@ -644,6 +643,8 @@
         then (
           if variant == "energy"
           then "cv-energy-de.pdf"
+          else if variant == "software"
+          then "cv-software-de.pdf"
           else "cv-de.pdf"
         )
         else (
@@ -797,6 +798,7 @@
   cvEnergyJson = builtins.fromJSON (builtins.readFile ./matt/cv-energy.json);
   cvEnergyDeJson = builtins.fromJSON (builtins.readFile ./matt/cv-energy.de.json);
   cvSoftwareJson = builtins.fromJSON (builtins.readFile ./matt/cv-software.json);
+  cvSoftwareDeJson = builtins.fromJSON (builtins.readFile ./matt/cv-software.de.json);
 
   cvVariantData = json: lang: let
     corpusWork =
@@ -939,6 +941,7 @@
   cvEnergy = cvPdf "energy" (cvVariantData cvEnergyJson "en");
   cvEnergyDe = cvPdf "energy-de" (cvVariantData cvEnergyDeJson "de");
   cvSoftware = cvPdf "software" (cvVariantData cvSoftwareJson "en");
+  cvSoftwareDe = cvPdf "software-de" (cvVariantData cvSoftwareDeJson "de");
 
   # Every CV this build ships. The installs and the link gate both read this
   # list, so a CV added here without a page linking it fails the build, and the
@@ -964,6 +967,10 @@
     {
       name = "cv-software.pdf";
       src = cvSoftware;
+    }
+    {
+      name = "cv-software-de.pdf";
+      src = cvSoftwareDe;
     }
   ];
 
@@ -1089,6 +1096,10 @@ in
     /cv-energy.pdf
       Cache-Control: public, max-age=0, must-revalidate
     /cv-energy-de.pdf
+      Cache-Control: public, max-age=0, must-revalidate
+    /cv-software.pdf
+      Cache-Control: public, max-age=0, must-revalidate
+    /cv-software-de.pdf
       Cache-Control: public, max-age=0, must-revalidate
     EOF
     # Gate: every CV the build ships is reachable from a page by a link that

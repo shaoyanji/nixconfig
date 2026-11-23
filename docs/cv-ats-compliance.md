@@ -49,7 +49,7 @@ grid column meets the reason it was removed.
 
 ## Measurement
 
-Compiled with the pinned typst, from the five `cv.json` payloads the site build
+Compiled with the pinned typst, from the six `cv.json` payloads the site build
 produces, and from the resume corpora for the Lebenslauf. `last` is how far down
 its last page the content reached, in millimetres.
 
@@ -60,6 +60,7 @@ its last page the content reached, in millimetres.
 | `cv-energy.pdf` (tailored) | 1 | 1 page, 270 mm | 1 page, 269 mm |
 | `cv-energy-de.pdf` (tailored) | 1 | 1 page, 273 mm | 1 page, 273 mm |
 | `cv-software.pdf` (tailored, English) | 1 | — | 1 page, 241 mm |
+| `cv-software-de.pdf` (tailored, German) | 1 | — | 1 page, 236 mm |
 | `lebenslauf.pdf`, full corpus, no selection | 1 in a packet | 3 pages, 52 mm | 3 pages, 52 mm |
 | `lebenslauf.pdf`, selected from a job ad | 1 in a packet | 2 pages, 125 mm | 2 pages, 125 mm |
 
@@ -144,12 +145,12 @@ it was relying on ragged setting being hyphenated rarely rather than never.
 
 ## The link gate: a CV the site ships is a CV the site links
 
-The rules above shape the five PDFs; this gate keeps them reachable.
-`lib/matt-site.nix` compiles `cv`, `cvDe`, `cvEnergy`, `cvEnergyDe` and
-`cvSoftware` and lists
+The rules above shape the six PDFs; this gate keeps them reachable.
+`lib/matt-site.nix` compiles `cv`, `cvDe`, `cvEnergy`, `cvEnergyDe`, `cvSoftware`
+and `cvSoftwareDe` and lists
 them once in `cvFiles`. The installs read that list and so does the gate, so a CV
 added there without a page linking it fails the build instead of shipping as a
-file nobody can find, and the five filenames are spelled in one place.
+file nobody can find, and the six filenames are spelled in one place.
 
 The gate runs twice inside the `matt-site` derivation, both times with `cvFiles`
 as the required list: `bash scripts/task/site-links.sh --gap $out …` as a
@@ -166,12 +167,12 @@ that site — the check is in the build rather than in a gate a deploy might ski
 ```bash
 nix build --builders "" --out-link /tmp/matt-site .#sites.matt-site -L   # the gate runs here
 task site:links                                                         # both Nix sites, same script
-bash scripts/task/site-links.sh /tmp/matt-site cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf cv-software.pdf
+bash scripts/task/site-links.sh /tmp/matt-site cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf cv-software.pdf cv-software-de.pdf
 ```
 
-A passing build prints `site-links: no gaps — every target resolves and all 5
+A passing build prints `site-links: no gaps — every target resolves and all 6
 built PDFs have a site link` from the pre-flight and then
-`site-links: every internal link resolves, all 5 PDFs are linked, and all 20 PDF
+`site-links: every internal link resolves, all 6 PDFs are linked, and all 16 PDF
 anchors download`. An orphaned CV fails the build naming it:
 
 ```text
@@ -189,10 +190,10 @@ script, so the gate is known to fail for the reason it claims:
 | an extra PDF no page links (`stray.pdf`) | 1 | `FAIL no page links stray.pdf` — in the full pass and in `--gap` |
 | ` download` deleted from the anchor in `index.html` | 1 | `FAIL index.html: cv.pdf has no download attribute` |
 | `href="cv-energy.pdf"` pointed at a file that is not there | 1 | `FAIL index.html: cv-energy-gone.pdf -> /cv-energy-gone.pdf`, in both modes |
-| `cv-de.pdf` deleted from the artifact | 1 | `FAIL de/index.html: ../cv-de.pdf -> /cv-de.pdf`, and the count drops to `4 PDFs (5 required)` |
+| `cv-de.pdf` deleted from the artifact | 1 | `FAIL de/index.html: ../cv-de.pdf -> /cv-de.pdf`, and the count drops to `5 PDFs (6 required)` |
 
 The deployed artifact agrees with the gate rather than merely with the store:
-all five URLs on `matt.bountystash.com` answer `200 application/pdf` with the
+all six URLs on `matt.bountystash.com` answer `200 application/pdf` with the
 byte count and sha256 of the file this build produced.
 
 `--check` is not a flag on this Nix (`2.35.3`): it errors before building, and

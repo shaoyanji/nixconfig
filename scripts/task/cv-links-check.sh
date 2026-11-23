@@ -33,7 +33,7 @@ say_fail() { echo "FAIL $*"; fail=$((fail + 1)); }
 
 echo "cv-links-check: $BASE"
 echo "== headers (a download needs a PDF type; Pages sends no Content-Disposition) =="
-for f in cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf cv-software.pdf; do
+for f in cv.pdf cv-de.pdf cv-energy.pdf cv-energy-de.pdf cv-software.pdf cv-software-de.pdf; do
   head=$(timeout 30 curl -fsSI "$BASE/$f" | tr -d '\r')
   code=$(printf '%s\n' "$head" | awk 'NR==1{print $2}')
   type=$(printf '%s\n' "$head" | awk 'tolower($1)=="content-type:"{print $2}')
@@ -89,9 +89,9 @@ check /de/ ../cv-de.pdf cv-de.pdf
 check /work/nixos-fleet ../cv-software.pdf cv-software.pdf
 check /work/energy-telemetry ../cv-energy.pdf cv-energy.pdf
 check /brief/platform ../cv-software.pdf cv-software.pdf
-check /de/work/nixos-fleet ../../cv-de.pdf cv-de.pdf
+check /de/work/nixos-fleet ../../cv-software-de.pdf cv-software-de.pdf
 check /de/work/energy-telemetry ../../cv-energy-de.pdf cv-energy-de.pdf
-check /de/brief/platform ../../cv-de.pdf cv-de.pdf
+check /de/brief/platform ../../cv-software-de.pdf cv-software-de.pdf
 
 echo
 echo "cv-links-check: $ok ok, $fail failed"

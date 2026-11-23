@@ -1,8 +1,54 @@
 {
-  "generated": "2026-11-23T00:28:45Z",
+  "generated": "2026-11-23T00:52:13Z",
   "count": 200,
-  "pin": "63e3537e23349f33952475dd77a4662a383d067b16ec99e0e0288259010e934c",
+  "pin": "c0ae2020837fdb22aa1d37af00631661dcd227c3d3a760de8d0f66ef6b901694",
   "turns": [
+    {
+      "id": "d66494bd-2877-48b5-9e9d-15cc1e6ccac8",
+      "ts": "2026-11-23T00:49:35Z",
+      "source": "delphi-steward",
+      "subject": "nixconfig:steward-delphi-jobhunt",
+      "action": "landed: steward drove the delphi freebuff pane (0:3.1, ssh-tunneled) — verified EU-remote shortlist leads still live, researched Flox (D.E. Shaw origin, $25M Series B, Nix packaging), now comparing Nix/NixOS evidence across Langfuse/ClickHouse/Flox/n8n to rank the shortlist",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/"
+      ],
+      "files": [],
+      "base_commit": "4d5cc2916a5a04870877a68b9a51e3a4f7e9c1ef",
+      "branch": "main",
+      "frame": "03habfupb62gi38lrgv5n27gu"
+    },
+    {
+      "id": "d773f0ad-d815-4027-9f2c-8fdd1fc1e176",
+      "ts": "2026-11-23T00:49:21Z",
+      "source": "devin-steward",
+      "subject": "nixconfig:steward-devin-nixconfig",
+      "action": "landed: steward drove the devin pane (0:2.1) — comment header fix for router-labels/task-descs (committed 8d90ab9b), then merged chore/deadnix-cleanup (deadnix gate widened to whole nix tree, committed 4d5cc291), then merging devin/1795077799-kg-zeck-cache (epoch-scoped Zeckendorf graph cache)",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/checks.nix",
+        "scripts/task/nix-fmt.sh"
+      ],
+      "files": [],
+      "base_commit": "4d5cc2916a5a04870877a68b9a51e3a4f7e9c1ef",
+      "branch": "main",
+      "frame": "03habft4m22j26jh5u97d588d"
+    },
+    {
+      "id": "0f332b68-ecb3-4c21-9bd3-521bbae63275",
+      "ts": "2026-11-23T00:49:07Z",
+      "source": "freebuff-steward",
+      "subject": "nixconfig:steward-freebuff-ryoku-theme",
+      "action": "landed: steward drove the freebuff pane (0:1.1) to apply the ryoku design system to the shaoyanji.is-a.dev site — home page themed (--ry-paper present), then theme remaining pages (about, blog, archives, tags, categories); build + HTTP 200 verify + push to origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "shaoyanji.is-a.dev"
+      ],
+      "files": [],
+      "base_commit": "4d5cc2916a5a04870877a68b9a51e3a4f7e9c1ef",
+      "branch": "main",
+      "frame": "03habfrfwf4r6fcxgejsr86b5"
+    },
     {
       "id": "ac1e7a9c-8086-48a0-b402-877299dbf097",
       "ts": "2026-11-23T00:04:02Z",
@@ -2688,45 +2734,6 @@
       "base_commit": "b241262c40104b5843195fa61462b1024004c1fd",
       "branch": "main",
       "frame": "03ha7d905kg0ewdorvboqpoea"
-    },
-    {
-      "id": "7f3ba1d0-8b08-4ca2-862a-9f0ec9ddcb68",
-      "ts": "2026-11-22T12:17:39Z",
-      "source": "devin",
-      "subject": "job-hunt:adyen-platform-observability",
-      "action": "Dedup check before submit: record already shows applied via Greenhouse 7607691 with security-code-verified confirmation (2026-11-22T10:21Z). No re-submission performed — would create a duplicate on the board.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e76bed761b500a132697edd98ef834d22adb8687",
-      "branch": "main",
-      "frame": "03ha7cys18lshlk6g7z0plysx"
-    },
-    {
-      "id": "bc5f9891-81a5-4c25-9832-79b854568281",
-      "ts": "2026-11-22T12:16:43Z",
-      "source": "freebuff",
-      "subject": "nixconfig:nebius",
-      "action": "landed: native English Typst dossier for Nebius Server Infrastructure SRE (Greenhouse 5040922101, commit e76bed76) — CV 2pp/1261w, letter 1pp/481w, 0 warnings, prose exit 0. Four legacy artefacts retired, JD reconstructed, sheet-vs-DB stage conflict documented (sheet said unsent, DB has confirmation; kept applied). GPU telemetry stated as a gap: no nvml/DCGM in repo. | gate: checks:prose PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e76bed761b500a132697edd98ef834d22adb8687",
-      "branch": "main",
-      "frame": "03ha7cs848oewm87fboby6t4n"
-    },
-    {
-      "id": "164234e0-764a-46cb-9c4f-48849ac2b556",
-      "ts": "2026-11-22T12:16:11Z",
-      "source": "devin",
-      "subject": "job-hunt:attio",
-      "action": "Attio Senior Platform Engineer (Ashby 47b583e0): same req already filled headless and blocked on reCAPTCHA at 06:47 UTC today (record attio-senior-platform-engineer). Ashby enforcing Enterprise reCAPTCHA board-wide — n8n hit identical wall. Consolidated attio row to manual with hand-submit URL; no headless re-attempt per recorded guidance + captcha policy.",
-      "outcome": "blocked: reCAPTCHA Enterprise on Ashby submit; hand-submit URL + answers staged for Matt",
-      "claims": [],
-      "files": [],
-      "base_commit": "26d9da95c08a2b0d0577b300cb4cbdf2de6010de",
-      "branch": "main",
-      "frame": "03ha7coiltfdfdh9sry281fpk"
     }
   ]
 }

@@ -302,6 +302,15 @@ tasks:
     cmds:
       - bash scripts/task/kg-query.sh stats --top {{.TOP | default 12}}
 
+  ops:kg:zeck:
+    desc: Inspect the opt-in Zeckendorf graph cache and pending epoch leap
+    summary: >
+      Reports epoch, dirty log length, Fibonacci terms and cached segments.
+      Does not evaluate the graph or target a host. KG_BACKEND=zeck opts graph
+      readers in; bash scripts/task/kg-zeck.sh leap forces a new core.
+    cmds:
+      - bash scripts/task/kg-zeck.sh status | toon -e
+
   ops:kg:speed:
     desc: Measure every read path (graph file, iets eval, nix eval, entry rows)
     summary: >

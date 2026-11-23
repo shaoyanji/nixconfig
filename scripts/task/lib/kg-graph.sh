@@ -65,7 +65,7 @@ kg_eval_graph() {
 }
 
 kg_graph_path() {
-  local refresh="${1:-0}" cache rev path dirty
+  local refresh="${1:-0}" cache rev path
   if [ -n "${KG_GRAPH:-}" ]; then
     printf '%s' "$KG_GRAPH"
     return 0
@@ -74,6 +74,20 @@ kg_graph_path() {
     echo "kg-graph: REPO is not set" >&2
     return 1
   }
+
+  if [ "${KG_BACKEND:-}" = zeck ]; then
+    # shellcheck source=lib/kg-elixir.sh
+    . "${BASH_SOURCE[0]%/*}/kg-elixir.sh"
+    local elixir action=graph
+    [ "$refresh" != 1 ] || action=leap
+    if elixir="$(kg_resolve_elixir)"; then
+      env REPO="$REPO" "$elixir" "$REPO/tools/kg-zeck/cli.exs" "$action"
+      return $?
+    fi
+    # zeck was asked for explicitly: warn so a benchmark never silently
+    # measures the fallback backend and calls it zeck.
+    echo "kg-graph: KG_BACKEND=zeck but no Elixir resolved; using HEAD+diff path instead" >&2
+  fi
 
   cache="${XDG_CACHE_HOME:-$HOME/.cache}/nixconfig"
   rev="$(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo untracked)"

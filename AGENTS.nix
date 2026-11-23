@@ -2,6 +2,34 @@
 {
   schemaVersion = 1;
   notes = {
+    kg-zeck-cache = {
+      title = "Measure an epoch-scoped incremental graph cache";
+      kind = "experiment";
+      status = "IN FLIGHT";
+      date = "2026-11-19";
+      summary = "Opt-in one-shot Elixir fragments preserve the Nix graph across doc edits. Latest VM timings including startup: 589 ms incremental versus 562 ms HEAD+diff miss; 761 ms hit versus 35 ms baseline hit. No daemon; default stays unchanged because this sample does not clear the Kelly gate.";
+      from = ["d4-no-neo4j"];
+      refs = {
+        modules = ["tools/kg-zeck/kg_zeck.exs" "scripts/task/lib/kg-graph.sh"];
+        tasks = ["ops:kg:zeck" "checks:kg:zeck"];
+        docs = ["docs/nix-patterns.md"];
+      };
+      body = ''
+        Hypothesis: doc-only misses can avoid a full graph eval without changing
+        graph semantics. Cache fragments in greedy Fibonacci blocks within an
+        epoch; all other tracked content and citation-set changes rebuild core.
+        Measured on the Ubuntu VM, including BEAM startup: cold leap 2618 ms,
+        incremental doc edit 589 ms, warm hit 761 ms. HEAD+diff was 562 ms on
+        that edit and 35 ms on a hit. An earlier run saved 286 ms per doc-only
+        miss but cost 358 ms warm. The latest run saves nothing on either read.
+        Exit: checks:kg:zeck stays green, measure the doc-only miss fraction p
+        and end-to-end saved ms per dirty-tree read against HEAD+diff on the
+        intended machine. Use flake/daemons.nix's Kelly expression: require
+        save > 0 and ev > 0, including epoch amortisation. The latest sample
+        fails save > 0, so no p clears it. Keep KG_BACKEND=zeck opt-in
+        until that measurement clears; reject it if startup erases the saving.
+      '';
+    };
     agent-vault-rbw-only = {
       title = "Agent credentials go through rbw; agent-access is not installed";
       kind = "decision";

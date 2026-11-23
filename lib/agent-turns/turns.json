@@ -1,8 +1,139 @@
 {
-  "generated": "2026-11-23T08:50:46Z",
+  "generated": "2026-11-23T09:08:07Z",
   "count": 200,
-  "pin": "ad6ba695681762dfb73a1607cfdf6736e12e47bad48b07f6394760253e97f99c",
+  "pin": "cbc406e9fde1f566c34649a4cd8ecf977e0f2122cd225b45dcd6809b791b54d0",
   "turns": [
+    {
+      "id": "db2cba83-ae52-4d16-ac18-a85a41b3cb96",
+      "ts": "2026-11-23T09:06:45Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-pane-0-1-1",
+      "action": "landed: drove idle freebuff pane — job-search scouting: DevOps/SRE/Platform/Infrastructure engineering leads",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae4yzk7ikm5jil71y2kmgk"
+    },
+    {
+      "id": "dd556123-4c9f-43a5-aecd-988530e707e6",
+      "ts": "2026-11-23T09:06:44Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-pane-0-0-1",
+      "action": "landed: drove idle Devin pane — image publish path: wire images:ship into checks:quick as a gate, run checks:quick, report",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae4yxjg52sof2wo0n95moq"
+    },
+    {
+      "id": "4c234dbe-fd55-41e5-9c20-f8151ef98656",
+      "ts": "2026-11-23T08:59:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-23d",
+      "action": "landed: 8 new DevOps/SRE/Platform/Infra leads into the delphi pipeline (origin scout-2026-11-23d); no repo change | gate: apps:overview lead stage grew, rows read back via /api/applications",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hae3jzhyt2juot2qrgvoptq"
+    },
+    {
+      "id": "4dc28a48-694b-497e-bbf0-597fab75dc97",
+      "ts": "2026-11-23T08:56:37Z",
+      "source": "devin",
+      "subject": "nixconfig:cv-site-deploy",
+      "action": "landed: matt:deploy:prod (bc6322f9.matt-9pf.pages.dev, 200 on 2 paths) + mockup:deploy:prod (29f0fb29.bountystash-mockup.pages.dev, 200 on 2 paths); live 200s on matt.bountystash.com, concept.bountystash.com, mockup pages.dev; CV PDFs serve application/pdf bytes | gate: pages-deploy readiness + live curls PASS",
+      "outcome": "done",
+      "claims": [
+        "matt:deploy",
+        "mockup:deploy"
+      ],
+      "files": [],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae2zs2okm2t1n9juoi98f1"
+    },
+    {
+      "id": "7fcd2d80-93f9-4101-be46-45cb8238b79f",
+      "ts": "2026-11-23T08:56:18Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-job-scout-delphi",
+      "action": "landed: scout DevOps/SRE/Platform/Infrastructure leads on delphi freebuff 0:2.1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae2xlnjwoh03z4qcy6poq6"
+    },
+    {
+      "id": "8de65a23-98ba-4b03-9fa5-719d496749f4",
+      "ts": "2026-11-23T08:56:18Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-job-scout",
+      "action": "landed: scout DevOps/SRE/Platform/Infrastructure leads on freebuff 0:1.1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae2xixrbqtyptvilixipcj"
+    },
+    {
+      "id": "717afe32-38fc-41df-aad1-b04a665b59d5",
+      "ts": "2026-11-23T08:56:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-site-publish",
+      "action": "landed: publish rebuilt CV site on freebuff 0:0.1",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae2xfyimakbm7ymshgqi29"
+    },
+    {
+      "id": "c901f562-1d88-4941-82a6-682f5371af0d",
+      "ts": "2026-11-23T08:55:56Z",
+      "source": "devin",
+      "subject": "nixconfig:cv-site-deploy",
+      "action": "start: matt:deploy:prod + mockup:deploy:prod — publish rebuilt CV surfaces",
+      "outcome": "in_progress",
+      "claims": [
+        "matt:deploy",
+        "mockup:deploy"
+      ],
+      "files": [],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae2uzsnebesfkgnlq9yac2"
+    },
+    {
+      "id": "ff1290c0-e6d1-431c-9c78-2b0c655d5cf0",
+      "ts": "2026-11-23T08:50:56Z",
+      "source": "devin",
+      "subject": "nixconfig:site-links-quick-gate",
+      "action": "landed: checks:site:links is the canonical gate (builds matt-site + mockup, site-links.sh both); site:links delegates; wired into checks:quick serial leg | verified: matt-site 95 links/17 pages/5 PDFs linked, mockup clean | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml",
+        "taskfiles/bountystash.yml",
+        "flake/check-inventory.nix"
+      ],
+      "files": [
+        "taskfiles/checks.yml",
+        "taskfiles/bountystash.yml",
+        "flake/check-inventory.nix"
+      ],
+      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
+      "branch": "main",
+      "frame": "03hae1vtt4l8itqh0fspi4ayz"
+    },
     {
       "id": "1cbd95e7-287e-484f-bd03-77e5f8950ab8",
       "ts": "2026-11-23T08:49:15Z",
@@ -2625,137 +2756,6 @@
       "base_commit": "37ddcef05fac80f0aa4b06aecd6fbb87a52e3b8e",
       "branch": "HEAD",
       "frame": "03ha8qcy7eagxivxny1d0t4q1"
-    },
-    {
-      "id": "63808361-c2a8-4bee-93ba-e697c5b1d03d",
-      "ts": "2026-11-22T16:29:56Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:check-inventory-row",
-      "action": "landed: the checks:shell-inputs row now sits in flake/check-inventory.nix, the table main's check.sh actually reads (the TOML table is a local-only refactor), and the dead taskfiles/checks.toml pushed in 15bd0d75 is removed; check:verify passes. checks:quick on main still fails one infron assertion: its persona carries fallback model 'free-ai' with no :free id, a routing line I will not change blind",
-      "outcome": "done",
-      "claims": [
-        "flake/check-inventory.nix taskfiles/checks.toml"
-      ],
-      "files": [],
-      "base_commit": "aa51f0630a443a70099d18aed19168f0522dcb0d",
-      "branch": "HEAD",
-      "frame": "03ha8q8xf160d354og3iujduc"
-    },
-    {
-      "id": "bf49d669-c14e-4b18-be36-3c7374671bc0",
-      "ts": "2026-11-22T16:27:43Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:check-quick-green",
-      "action": "landed: checks:shell-inputs registered in checks.toml (kind leaf) so check:verify passes, and main now carries the current scripts/task/infron-check.sh (77895275 had published it mid-edit; its agent expectation was failing a correct dispatcher) | gate: checks:quick PASS on a clean checkout of main",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/checks.toml scripts/task/infron-check.sh"
-      ],
-      "files": [],
-      "base_commit": "8db6caa861438585e1f33174377b299dc0055e54",
-      "branch": "main",
-      "frame": "03ha8pteyt1irt4vkahepzsb3"
-    },
-    {
-      "id": "7e6d2857-8a80-426e-9f7e-d8573ae89c6c",
-      "ts": "2026-11-22T16:25:10Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:shell-inputs-inline",
-      "action": "landed: checks:shell-inputs reads inline '' bodies (Nix escapes undone, per-wrapper runtimeInputs), judging 37 wrappers instead of 5. It found setsid without util-linux, find without findutils, cat without coreutils, and a regex that read envc= as env. Also api_max_retries 4->5 for the 5-lane chain; with the other pane's uncommitted infron patch the guard is clean | gate: checks:shell-inputs PASS on the landed tree",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/shell-inputs.py modules/profiles/voice-dictate.nix modules/user/ai/hermes-user.nix modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "files": [],
-      "base_commit": "b208ddc61e4868b9a62d9242a8a460a934c68c6b",
-      "branch": "main",
-      "frame": "03ha8pbfrmqwp02awqr995w1s"
-    },
-    {
-      "id": "a2fa18bb-c735-4d07-a02b-64166b19e34d",
-      "ts": "2026-11-22T16:20:07Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:land-classifier-rules",
-      "action": "landed (corrects the previous turn): that push was rejected as non-fast-forward while main advanced to fdd443b2, so its commit claim was wrong. 8bff657f on top of fdd443b2 now carries the marketing classifier rules and the rejection wording; checks:shell-inputs is in checks:quick deps | gate: appflow:triage PASS, nix:lint PASS, shell-inputs PASS (quick still red at infron, identical on untouched main)",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/checks.yml scripts/task/shell-inputs.py"
-      ],
-      "files": [],
-      "base_commit": "9654d2974108e9e08b8ceecf4fab5aadf3f34963",
-      "branch": "main",
-      "frame": "03ha8obzbgvumclz39e1knol9"
-    },
-    {
-      "id": "898e168b-5381-4bdb-9809-4e71f6ecdb59",
-      "ts": "2026-11-22T16:19:14Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:land-classifier-rules",
-      "action": "landed: origin/main 18b3d5b3 -> 696f329b carries the marketing classifier rules and the rejection wording, so tonight's 04:30 autoUpgrade pulls them; checks:shell-inputs is now in checks:quick deps. checks:quick is still red at checks:infron, which fails identically on untouched origin/main (4 FAILs, pre-existing); shell-inputs passes every judged wrapper | gate: checks:shell-inputs PASS, checks:nix:lint PASS on origin base",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/checks.yml scripts/task/shell-inputs.py"
-      ],
-      "files": [],
-      "base_commit": "9654d2974108e9e08b8ceecf4fab5aadf3f34963",
-      "branch": "main",
-      "frame": "03ha8o5ogahyg1qauujzqj3o4"
-    },
-    {
-      "id": "e5a9a238-5d34-4ac4-b92a-fa87d623e64c",
-      "ts": "2026-11-22T16:14:00Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:shell-inputs-gate",
-      "action": "landed: checks:shell-inputs compares a wrapper's external script against its runtimeInputs (bracket-counted list, heredoc bodies blanked, bash builtins exempt) — the xs-notify 127 class. Found and fixed 3: dsh-remote had no gnused, qmd-eisen-embed-sync no git; qmd and the appimage pickers are runtime-detected and carry shell-input-ok reasons | gate: checks:shell-inputs PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/shell-inputs.py taskfiles/checks.yml modules/scripts/dsh-remote.nix modules/scripts/qmd-eisen-embed-sync.nix"
-      ],
-      "files": [],
-      "base_commit": "587c7ff8a0c21badc00e168f686944f201e7e0a9",
-      "branch": "main",
-      "frame": "03ha8n4w6vislvewbr857h7f0"
-    },
-    {
-      "id": "ff758e16-7673-4642-90b0-e1cdcc23df7b",
-      "ts": "2026-11-22T15:54:30Z",
-      "source": "buffy",
-      "subject": "nixconfig:wall-plates",
-      "action": "landed: gallery names/descriptions/hd URL + shape filter; round 18 running | gate: images:publish PASS (661 assets, 651 described)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "acfd2659080572f1c9de5cee29a760a0898932c2",
-      "branch": "main",
-      "frame": "03ha8jbtvklww7ac1d727p10a"
-    },
-    {
-      "id": "9372d448-5b38-43eb-957b-69a665f97ccb",
-      "ts": "2026-11-22T15:53:22Z",
-      "source": "devin",
-      "subject": "nixconfig:context-key",
-      "action": "landed: context.dev key in shared env blob + submodule apikeys; secrets.nu maps CONTEXT and the previously-orphaned CROWLLM; key verified live, 11000 credits | gate: sops decrypt extract",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "acfd2659080572f1c9de5cee29a760a0898932c2",
-      "branch": "main",
-      "frame": "03ha8j3sku3wy7wpurkbywyj2"
-    },
-    {
-      "id": "2a90e8e9-d689-4c76-a79b-3ade1d34b250",
-      "ts": "2026-11-22T15:48:06Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:delphi-serve-lock",
-      "action": "landed: xs-notify gets gawk (unit PATH has no awk, line 49 exited 127 since Nov 21); the generated tailscale-serve mounts take a flock and Restart on-failure, so writers stop losing the etag race. Deploy exit 0, running, 18/18 serve units active, xs-notify status 0, triage 16:47:08 success; that run saw no marketing mail, so the rule's proof stays the store import | gate: checks:host HOST=delphi PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/xs-notify.nix modules/services/service-portal.nix"
-      ],
-      "files": [],
-      "base_commit": "687946abfd938e34e48221152b7deb6a0fd36c49",
-      "branch": "main",
-      "frame": "03ha8i2s08kvkv57np90ziddz"
     }
   ]
 }

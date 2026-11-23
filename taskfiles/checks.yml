@@ -68,6 +68,7 @@ tasks:
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
       # (~3 s) for a parity experiment, and its own summary says so.
       - task: checks:ports:test
+      - task: checks:images
       - task: checks:counts
       - task: checks:counts:test
       - task: checks:nix:lint
@@ -212,11 +213,12 @@ tasks:
   checks:images:
     desc: "[gate] The asset manifest is a projection of urls.tsv, row for row"
     summary: >
-      Every row of the gallery's urls.tsv must appear in the manifest exactly once,
-      and the manifest may carry nothing else. A matching count is not enough: one
-      row dropped while another is counted twice passes the arithmetic, so the
-      paths are compared as sets. External state, so it says so and exits 0 where
-      the asset root is absent instead of failing a repo-only CI run.
+      Every row of the gallery's urls.tsv must appear in the manifest exactly once
+      — paths compared as sets, and each row's URL must be the Cloudinary
+      delivery URL of the public id its path derives (`badge/<x>` →
+      `assets/fleet/<x>`), never the session-gated render URL, and equal to the
+      URL the manifest carries. External state; exits 0 where the asset root is
+      absent rather than failing a repo-only run.
     cmds:
       - bash scripts/task/images-check.sh
 

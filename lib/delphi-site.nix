@@ -466,7 +466,7 @@
     words |> builtins.foldl' step [];
 
   # Prose the page quotes verbatim, folded and indented two columns.
-  termParagraph = text: text |> fold (termWidth - 2) |> map (l: "  ${l}") |> lib.concatStringsSep "\n";
+  termParagraph = text: text |> fold (termWidth - 2) |> lib.concatMapStringsSep "\n" (l: "  ${l}");
 
   # A gutter label and a value folded under it. Colour goes on the label only,
   # so the fold counts visible columns instead of escape bytes.
@@ -478,7 +478,7 @@
       lines = fold (termWidth - 13) value;
       cont =
         lib.optionalString (builtins.length lines > 1)
-        ("\n" + (lines |> lib.tail |> map (l: "             ${l}") |> lib.concatStringsSep "\n"));
+        ("\n" + (lines |> lib.tail |> lib.concatMapStringsSep "\n" (l: "             ${l}")));
     in "  ${dim}${pad}${reset} ${lib.head lines}${cont}";
 
   padRight = width: s: s + ((width - lib.stringLength s) |> lib.max 0 |> lib.genList (_: " ") |> lib.concatStrings);
@@ -532,7 +532,7 @@
         ])
         (termSection "SERVICES" [
           (termRow "cards" "${n cardCount} compiled, ${n withheld} of them tailnet-only")
-          (termRow "names" (cardRegistry |> map (c: c.title) |> lib.concatStringsSep " · "))
+          (termRow "names" (cardRegistry |> lib.concatMapStringsSep " · " (c: c.title)))
         ])
         (termSection "READ" [
           (termRow "public" publicUrl)

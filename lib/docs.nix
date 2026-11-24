@@ -37,8 +37,8 @@
     |> builtins.replaceStrings ["|" "\n"] ["\\|" " "];
 
   table = headers: rows: let
-    row = cells: "| " + (cells |> map esc |> lib.concatStringsSep " | ") + " |";
-    rule = "| " + (headers |> map (_: "---") |> lib.concatStringsSep " | ") + " |";
+    row = cells: "| " + (cells |> lib.concatMapStringsSep " | " esc) + " |";
+    rule = "| " + (headers |> lib.concatMapStringsSep " | " (_: "---")) + " |";
   in
     [(row headers) rule] ++ (rows |> map row) |> lib.concatStringsSep "\n";
 

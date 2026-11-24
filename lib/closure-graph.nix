@@ -291,7 +291,7 @@ in rec {
     + "system = \"${g.rootName}\"\n"
     + "total_bytes = ${toString g.totalBytes}\n"
     + "path_count = ${toString g.pathCount}\n\n"
-    + (g.rollup |> map block |> lib.concatStrings);
+    + (g.rollup |> lib.concatMapStrings block);
 
   toDOT = g: let
     node = s:
@@ -302,6 +302,6 @@ in rec {
     + "  rankdir=LR;\n"
     + "  node [shape=box, fontname=\"monospace\"];\n"
     + "  root [label=\"${g.host}:${g.rootName}\\n${human g.totalBytes}\"];\n"
-    + (g.rollup |> lib.take 16 |> map node |> lib.concatStringsSep "\n")
+    + (g.rollup |> lib.take 16 |> lib.concatMapStringsSep "\n" node)
     + "\n}\n";
 }

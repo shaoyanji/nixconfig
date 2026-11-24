@@ -273,7 +273,7 @@
   # in the site).
   lineageLine = relatedLink: label: xs:
     lib.optionalString (xs != []) (
-      "- **${label}:** " + (xs |> map relatedLink |> lib.concatStringsSep ", ")
+      "- **${label}:** " + (xs |> lib.concatMapStringsSep ", " relatedLink)
     );
 
   lineageRows = e:
@@ -310,7 +310,7 @@
           (refLine linkify "tasks" e.refs.tasks)
           (refLine linkify "docs" e.refs.docs)
           (lib.optionalString (e.links != [])
-            ("- **Related notes:** " + (e.links |> map relatedLink |> lib.concatStringsSep ", ")))
+            ("- **Related notes:** " + (e.links |> lib.concatMapStringsSep ", " relatedLink)))
         ]
         ++ (e |> lineageRows |> map (r: lineageLine relatedLink (capitalize r.label) r.ids)))
       |> builtins.filter (s: s != "")
@@ -333,7 +333,7 @@
     + "| claim | notes | open | evidence |\n| :--- | :--- | :--- | :--- |\n"
     + (claimRows
       |> lib.concatMapStrings (
-        r: "| `${r.claim}` | ${toString r.notes} | ${toString r.open} | ${r.evidence |> map (x: "`${x}`") |> lib.concatStringsSep ","} |\n"
+        r: "| `${r.claim}` | ${toString r.notes} | ${toString r.open} | ${r.evidence |> lib.concatMapStringsSep "," (x: "`${x}`")} |\n"
       ))
     + "\n"
     + (kinds

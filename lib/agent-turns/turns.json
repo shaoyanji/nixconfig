@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-24T18:22:10Z",
+  "generated": "2026-11-24T18:29:43Z",
   "count": 200,
-  "pin": "b677c9905df5c6554b28ceeeee9d5438a3444896e163378d20798116c2a0769b",
+  "pin": "3535e9e72233f2e2d29ef7da24e3e2bb56ae6ae88db052af0e30ff181757670a",
   "turns": [
+    {
+      "id": "ab8b73af-4f7d-414b-9c44-566eb79f5f2c",
+      "ts": "2026-11-24T18:29:35Z",
+      "source": "steward",
+      "subject": "nixconfig:steward:panes",
+      "action": "drove 3 idle coding panes: devin(note-change, image-daily Go port gates + AGENTS.nix note, pending frieren deploy left deferred), freebuff(note-change, fresh SRE/platform lead sweep), delphi(note-change, attention-queue sweep). jev-decide selected all three (devin margin 1.0, freebuff p0.89 m0.78, delphi decisive 0.39). Each pane verified working (spinner/thinking).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "18521db9d5bf6a458dd783a15bdd4a0bb657f1a3",
+      "branch": "main",
+      "frame": "03hap07vxnbq2qrcig7gnu5qv"
+    },
+    {
+      "id": "a9dd8c74-1882-4a49-bc66-5673ed928a7b",
+      "ts": "2026-11-24T18:22:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep",
+      "action": "correction: note job-scout-sre-platform-sweep-2026-11-24 amended — title and exit now say three leads, not two; Dymatrix Platform Architect joined Makersite and Catapult Sports. Earlier turn named b6ad52fd, now 18521db9 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "18521db9d5bf6a458dd783a15bdd4a0bb657f1a3",
+      "branch": "main",
+      "frame": "03haoys0fx56571pwj6jhn6oo"
+    },
     {
       "id": "b1f55fe3-ff0f-4a1f-86d6-e64b47b38125",
       "ts": "2026-11-24T18:21:37Z",
@@ -2727,34 +2753,6 @@
       "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
       "branch": "main",
       "frame": "03halobqav8rzv8t1otvibvt1"
-    },
-    {
-      "id": "3487ffd4-fad9-4c81-a762-6a6467c92b95",
-      "ts": "2026-11-24T08:08:10Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "landed: prose-tells step dropped from CI hygiene (50e7c830); one-os-cli fold-in — tools/os umbrella (argv[0] dispatch + internal/image), cli.image.daily symlinks bin/image-daily->os, goModules ledger + gate accept both locations | gate: checks:kg PASS, checks:tasks PASS, checks:image-daily PASS, check:verify 133 rows no drift, nix build cli.image.daily runs manifest (750 assets)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
-      "branch": "main",
-      "frame": "03halmtsvh9yybzsjy67gd6mx"
-    },
-    {
-      "id": "c55340a9-6c60-4272-bd0f-e900d1a9fcf9",
-      "ts": "2026-11-24T08:07:11Z",
-      "source": "codebuff",
-      "subject": "nixconfig:appflow-scout-2026-11-24j",
-      "action": "landed: 4 new rows (Qonto SRE Platform Berlin-remote, Doctolib Staff SRE Berlin, Deepslate SRE remote/Berlin, Linro SRE/Platform remote DE) + Remote Senior SRE; 6 strong duplicates refused because already live (Kubermatic, Codesphere, ClickHouse, Secunet, FAST LTA, Flox) | gate: apps:dupes PASS ([]), 998 tracked, dirty 26 unchanged",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halmmsz5w8kldcbtyqfz0hz"
     }
   ]
 }

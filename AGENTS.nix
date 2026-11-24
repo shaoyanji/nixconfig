@@ -5679,39 +5679,37 @@
       summary = "Port end state: ~30 verbs in tools/os/internal/image behind .#cli.image.daily (argv[0] on the os umbrella); image-daily-*.sh is dispatch + env glue. Open: cloudinary curl in add/blog/gc, ffprobe in wallpaper, systemd-run detach in plates. Maintenance: image-daily-gate.sh greps symbol names in tools/os — renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
       refs = {
         modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "flake/cli.nix"];
-        tasks = ["checks:image-daily" "checks:images:publish:test" "images:gate"];
+        tasks = ["checks:image-daily" "checks:images:publish:test" "checks:images" "checks:images:ship:test" "images:gate"];
       };
       body = ''
         The port's end state (verified 2026-11-24): the spend, judge and
-        publish machinery lives in tools/os/internal/image — manifest,
-        judge, lane, adopt, remaining, share, pending, shapes, reason,
-        archive, resolve, dimensions, landscape, crop, deploy, publish,
-        post, plates, round, lanes, budget, setting, guard, due, parked,
-        record, index, shrink-guard and friends (~30 verbs). The flake
-        answers it as .#cli.image.daily — a symlink onto the `os` umbrella
-        whose argv[0] dispatch selects the image domain — and
-        image-daily-lib.sh resolves the binary via IMAGE_DAILY_BIN, then
-        PATH, then a one-off `nix build` of that attr (fetches from cachix).
-        Shell keeps ~884 lines of dispatch, env/ledger resolution and
-        command shims; `checks:image-daily` (== `images:gate`) and the
-        `checks:images:publish:test` fixture (pinned at 470c9034^) are green.
+        publish machinery lives in tools/os/internal/image (~30 verbs —
+        manifest through shrink-guard). The flake answers it as
+        .#cli.image.daily — a symlink onto the `os` umbrella whose argv[0]
+        dispatch selects the image domain — and image-daily-lib.sh resolves
+        the binary via IMAGE_DAILY_BIN, then PATH, then a one-off
+        `nix build` of that attr (fetches from cachix). Shell keeps ~884
+        lines of dispatch, env/ledger resolution and command shims.
+
+        Gate state on this tree — four checks, all green:
+        `checks:image-daily` (== `images:gate`): dispatch agreement both
+        ways, judge fallback, both breakers, shrink guard.
+        `checks:images:publish:test`: 5 assertions incl. fail-close on the
+        470c9034^ tree. `checks:images`: 750 urls.tsv rows == 750 manifest
+        assets, same paths and bank URLs. `checks:images:ship:test`:
+        unset/empty PROMPT and DETACH=1 all refuse nonzero.
 
         Open (deliberately still shell — external-process boundaries, not
-        domain logic): Cloudinary curl ops in add/blog/gc go through
-        scripts/task/cloudinary.sh; image-daily-wallpaper.sh keeps one
-        ffprobe shape check; image-daily-plates.sh's DETACH=1 hands the same
-        loop to systemd-run. If a future slice ports these, each file keeps
-        its dispatch slot — the gate checks the case list against the files
-        in both directions.
+        domain logic): cloudinary curl in add/blog/gc via cloudinary.sh,
+        ffprobe in wallpaper, systemd-run DETACH in plates. A future slice
+        ports these; each file keeps its dispatch slot (gate checks both
+        directions).
 
-        Maintenance point: the gate greps symbol NAMES, not behavior —
-        `modelProvider` + `GEMINI_API_KEY` (gen.go), `unjudgedStreak`
-        (plates.go), `shrinkGuard` (briefs.go). A rename or move of those
-        symbols reads as a removed safeguard and fails the gate with a
-        misleading message; whoever refactors tools/os either keeps the
-        names or updates the gate's greps in the same diff. Exit: close when
-        the residual shims are accepted as shell or ported with the gate
-        updated to match.
+        Maintenance: the gate greps symbol NAMES — `modelProvider` +
+        `GEMINI_API_KEY` (gen.go), `unjudgedStreak` (plates.go),
+        `shrinkGuard` (briefs.go). A rename fails the gate with a
+        misleading message; keep the names or update the greps in the
+        same diff. Exit: residual shims accepted as shell or ported.
       '';
     };
   };

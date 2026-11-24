@@ -507,6 +507,55 @@
       exit $rc
     '';
 
+  # The four queue slots as rows — the per-slot values are the time, the
+  # reserve and the description; everything else is the shared wrapper and
+  # job shape. The generated attribute set replaces four hand-written blocks,
+  # so adding a slot is adding a row, not copying ninety lines.
+  imageDailySlots = [
+    {
+      n = 1;
+      at = "01:10";
+      reserve = 0;
+      desc = "Image queue 1/4 (01:10, past the UTC reset): due plates, judge, Cloudinary, manifest";
+    }
+    {
+      n = 2;
+      at = "07:00";
+      reserve = 0;
+      desc = "Image queue 2/4 (07:00): due plates, judge, Cloudinary, manifest";
+    }
+    {
+      n = 3;
+      at = "13:20";
+      reserve = 0;
+      desc = "Image queue 3/4 (13:20): due plates, judge, Cloudinary, manifest";
+    }
+    {
+      n = 4;
+      at = "21:20";
+      reserve = 10;
+      desc = "Image queue 4/4 (21:20, end of the day): queue and roster, reserve 10, Cloudinary, manifest";
+    }
+  ];
+
+  imageDailySlotJobs = builtins.listToAttrs (map (s: {
+      name = "image-daily-slot-${toString s.n}";
+      value = {
+        name = "image-daily-slot-${toString s.n}";
+        description = s.desc;
+        schedule = "*-*-* ${s.at}:00";
+        # Slots run oldest-first; the cap each takes is the day's leftover split
+        # over the slots still to run (the `share` arithmetic in the wrapper).
+        command = imageDailySlot (toString s.n) (builtins.length imageDailySlots) s.reserve;
+        workingDirectory = "${user.home}";
+        lockFile = "/tmp/image-daily.lock";
+        persistent = false;
+        nice = 10;
+        ioSchedulingClass = "best-effort";
+      };
+    })
+    imageDailySlots);
+
   burgernasPoweroff = pkgs.writeShellScript "burgernas-poweroff" ''
     set -u
     NAS=devji@192.168.3.92
@@ -960,80 +1009,35 @@ in {
   # Declarative Agent Scheduler (EXP-016)
   services.agentScheduler = {
     enable = true;
-    jobs = {
-      # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
-      # hosts/frieren/configuration.nix reads its verdict file; stale pages, task ops:health.
-      agy-nightly-system = {
-        name = "agy-nightly-system";
-        description = "Trigger-gated system health audit (Mon-Sat brief check, Sunday full scorecard)";
-        schedule = "*-*-* 05:00:00";
-        command = agySystemRunner;
-        workingDirectory = "${user.home}";
-      };
-      # Four daytime slots, clear of 03:00-05:30, at most 20 images against the
-      # 25-per-hour limit. Why: .agents/deploy/hosts/frieren.md §"Agent scheduler".
-      image-daily-slot-1 = {
-        name = "image-daily-slot-1";
-        description = "Image queue 1/4 (01:10, past the UTC reset): due plates, judge, Cloudinary, manifest";
-        schedule = "*-*-* 01:10:00";
-        command = imageDailySlot "1" 4 0;
-        workingDirectory = "${user.home}";
-        lockFile = "/tmp/image-daily.lock";
-        persistent = false;
-        nice = 10;
-        ioSchedulingClass = "best-effort";
-      };
-      image-daily-slot-2 = {
-        name = "image-daily-slot-2";
-        description = "Image queue 2/4 (07:00): due plates, judge, Cloudinary, manifest";
-        schedule = "*-*-* 07:00:00";
-        command = imageDailySlot "2" 4 0;
-        workingDirectory = "${user.home}";
-        lockFile = "/tmp/image-daily.lock";
-        persistent = false;
-        nice = 10;
-        ioSchedulingClass = "best-effort";
-      };
-      image-daily-slot-3 = {
-        name = "image-daily-slot-3";
-        description = "Image queue 3/4 (13:20): due plates, judge, Cloudinary, manifest";
-        schedule = "*-*-* 13:20:00";
-        command = imageDailySlot "3" 4 0;
-        workingDirectory = "${user.home}";
-        lockFile = "/tmp/image-daily.lock";
-        persistent = false;
-        nice = 10;
-        ioSchedulingClass = "best-effort";
-      };
-      image-daily-slot-4 = {
-        name = "image-daily-slot-4";
-        description = "Image queue 4/4 (21:20, end of the day): queue and roster, reserve 10, Cloudinary, manifest";
-        schedule = "*-*-* 21:20:00";
-        command = imageDailySlot "4" 4 10;
-        workingDirectory = "${user.home}";
-        lockFile = "/tmp/image-daily.lock";
-        persistent = false;
-        nice = 10;
-        ioSchedulingClass = "best-effort";
-      };
-
-      audible-phased-liberation = {
-        name = "audible-phased-liberation";
-        description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 GB limit, 170m timeout)";
-        schedule = "*-*-* 00:00:00";
-        command = makeAudibleBatchLiberation {
-          name = "audible-nightly-liberation";
-          timeoutSecs = 10200; # 170 min, hard cutoff at 02:50 before 03:00 backup window
-          limitGb = 50;
-          windowDesc = "Nightly 00:00-02:50 CEST";
-          nice = null;
+    jobs =
+      {
+        # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
+        # hosts/frieren/configuration.nix reads its verdict file; stale pages, task ops:health.
+        agy-nightly-system = {
+          name = "agy-nightly-system";
+          description = "Trigger-gated system health audit (Mon-Sat brief check, Sunday full scorecard)";
+          schedule = "*-*-* 05:00:00";
+          command = agySystemRunner;
+          workingDirectory = "${user.home}";
         };
-        workingDirectory = "${user.home}";
-        lockFile = "/tmp/audible-liberation.lock";
-        nice = 10;
-        ioSchedulingClass = "best-effort";
-      };
-    };
+        audible-phased-liberation = {
+          name = "audible-phased-liberation";
+          description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 GB limit, 170m timeout)";
+          schedule = "*-*-* 00:00:00";
+          command = makeAudibleBatchLiberation {
+            name = "audible-nightly-liberation";
+            timeoutSecs = 10200; # 170 min, hard cutoff at 02:50 before 03:00 backup window
+            limitGb = 50;
+            windowDesc = "Nightly 00:00-02:50 CEST";
+            nice = null;
+          };
+          workingDirectory = "${user.home}";
+          lockFile = "/tmp/audible-liberation.lock";
+          nice = 10;
+          ioSchedulingClass = "best-effort";
+        };
+      }
+      // imageDailySlotJobs;
   };
 
   # The governor unit. Why: .agents/deploy/hosts/frieren.md §"Agent scheduler".

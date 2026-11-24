@@ -4,4 +4,4 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=image-daily-lib.sh
 source "$here/image-daily-lib.sh"
 
-remaining
+"$(image_daily_cli)" remaining

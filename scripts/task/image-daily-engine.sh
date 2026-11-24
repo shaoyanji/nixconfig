@@ -96,23 +96,8 @@ banner_crop() { # png jpg
 # The manifest is the Go tool's job now (tools/image-daily, .#cli.image.daily):
 # it reads the same urls.tsv, ledger, briefs and roster the jq/awk used to and
 # emits the same manifest byte for byte — verified against the live bank.
-# Resolution order lets a slot's PATH closure supply the binary while a hand
-# run builds it once from the checkout, the way site-target.sh resolves
-# static-serve.
-image_daily_cli() {
-  if [ -n "${IMAGE_DAILY_BIN:-}" ]; then
-    printf '%s\n' "$IMAGE_DAILY_BIN"
-    return 0
-  fi
-  if command -v image-daily >/dev/null 2>&1; then
-    command -v image-daily
-    return 0
-  fi
-  local out
-  out=$(cd "$repo" && nix build --builders "" --no-link --print-out-paths '.?submodules=1#cli.image.daily' 2>/dev/null | tail -1)
-  [ -n "$out" ] || die "image-daily CLI missing: not on PATH and .#cli.image.daily did not build"
-  printf '%s/bin/image-daily\n' "$out"
-}
+# The resolver (IMAGE_DAILY_BIN → PATH → one nix build) lives in
+# image-daily-lib.sh as `image_daily_cli` so read-only scripts reach it too.
 
 
 build_index() {
@@ -237,20 +222,6 @@ resolve_plate() {
 }
 
 
-# Rows with no kept plate: what a round is still waiting for. kept_plate answers
-# per row and re-reads the ledger every time, so a whole-roster answer is one pass
-# over both files instead.
-
-roster_pending() { # roster
-  local all kept
-  all=$(mktemp) && kept=$(mktemp) || return 0
-  awk -F'|' '!/^#/ && NF > 1 && $2 !~ /^hold:/ {print "photoreal-" $1}' "$1" | sort -u >"$all"
-  { [ -f "$LEDGER" ] && jq -r 'select(type == "object") | select(.verdict == "keep") | .brief' "$LEDGER"; } 2>/dev/null | sort -u >"$kept"
-  comm -23 "$all" "$kept" | wc -l | tr -d ' '
-  rm -f "$all" "$kept"
-}
-
-
 # A round is a job, not a call: one plate is about a minute and a closed burst
 # window can add a quarter of an hour. The unit outlives the shell that starts it,
 # and the state file is what a later turn reads instead of a log it must watch.
@@ -281,7 +252,7 @@ launch_round() { # roster
     --setenv=RATE_WAIT_MAX="${RATE_WAIT_MAX:-900}" --setenv=RATE_WAIT_TOTAL="${RATE_WAIT_TOTAL:-3600}" \
     -- bash "$0" plates >/dev/null
   jq -cn --arg unit "$unit" --arg roster "$roster" \
-    --arg started "$(date -u +%FT%TZ)" --arg pending "$(roster_pending "$roster")" \
+    --arg started "$(date -u +%FT%TZ)" --arg pending "$("$(image_daily_cli)" pending --roster "$roster")" \
     --arg left "$(remaining || echo 0)" \
     '{state: "started", unit: $unit, roster: $roster, started: $started,
       pending: (($pending // "0") | tonumber), left: (($left // "0") | tonumber)}' |
@@ -290,18 +261,7 @@ launch_round() { # roster
 
 
 
-# A slot's share of what the day has left: ceil(left / slots_left), clamped to the
-# hourly burst ceiling and to at least one. One implementation, two callers — the
-# slot wrapper in hosts/frieren/infra-stack.nix asks for `share`, and `today` prints
-# what the next slot will take, so the readout cannot drift from the spend.
-
-slot_share() { # left slots_left
-  local left=$1 slots=${2:-1} cap
-  case $left in "" | *[!0-9]*) left=0 ;; esac
-  case $slots in "" | *[!0-9]* | 0) slots=1 ;; esac
-  cap=$(((left + slots - 1) / slots))
-  [ "$cap" -gt 25 ] && cap=25
-  [ "$cap" -lt 1 ] && cap=1
-  printf '%s\n' "$cap"
-}
+# A slot's share is `image-daily share` in tools/image-daily: ceil(left /
+# slots_left) clamped to the burst ceiling, one implementation for the slot
+# wrapper in hosts/frieren/infra-stack.nix and for `today`.
 

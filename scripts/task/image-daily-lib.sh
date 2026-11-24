@@ -272,3 +272,21 @@ remaining() {
   esac
 }
 
+
+# Where the Go tool lives. A slot's PATH closure already carries it; a hand run
+# resolves it from the checkout with a one-off nix build, the way
+# site-target.sh resolves static-serve. IMAGE_DAILY_BIN wins for tests.
+image_daily_cli() {
+  if [ -n "${IMAGE_DAILY_BIN:-}" ]; then
+    printf '%s\n' "$IMAGE_DAILY_BIN"
+    return 0
+  fi
+  if command -v image-daily >/dev/null 2>&1; then
+    command -v image-daily
+    return 0
+  fi
+  local out
+  out=$(cd "$repo" && nix build --builders "" --no-link --print-out-paths '.?submodules=1#cli.image.daily' 2>/dev/null | tail -1)
+  [ -n "$out" ] || die "image-daily CLI missing: not on PATH and .#cli.image.daily did not build"
+  printf '%s/bin/image-daily\n' "$out"
+}

@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-24T00:24:18Z",
+  "generated": "2026-11-24T00:47:14Z",
   "count": 200,
-  "pin": "8a74df2cce531c2fef216028b6d65f4a7eda5d0ff93a5003c29c7aff136871bd",
+  "pin": "6c0de77ee8ff38dafcaf3980b6f86e6ff5e43f4b3a1dd72299e5b83f73ae0fdc",
   "turns": [
+    {
+      "id": "38738867-450a-4584-a5cb-539e156c869b",
+      "ts": "2026-11-24T00:39:05Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "Drove 2 idle freebuff job-search panes: 0:1.1 (EU scout) + 0:2.1/delphi (intl scout); jevdecide route scout-new p1.0 m1.0; both now working...",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
+      "branch": "main",
+      "frame": "03haj73q28mpykg92irv3grbv"
+    },
+    {
+      "id": "3400ec87-4e0a-40fd-9cfb-b737b8314b8b",
+      "ts": "2026-11-24T00:33:59Z",
+      "source": "codebuff",
+      "subject": "nixconfig:freebuff-job-search",
+      "action": "scouted 7 leads: Namespace infra (Zurich), SwissPeak sr platform (Basel), SwissPeak cloud/net/sec (Steinhausen), BSI remote sr cloud ops (Baar), Simple Analytics devops (remote), SonarSource AI systems (Geneva), JFrog PS devops architect (remote). Sources: arbeitnow API, WWR, HN Nov thread. Skipped as already tracked: EPAM, ICEYE x2, Namespace devops, Splash, SonarSource Bochum",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
+      "branch": "main",
+      "frame": "03haj63p4uc7ectwmfd9h5xtl"
+    },
+    {
+      "id": "6ce2f7f1-1bc7-40d2-9cb8-f9b711ef78d1",
+      "ts": "2026-11-24T00:31:31Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-2601",
+      "action": "drove 3 idle panes; jev-decide(type-safe,p1.0) routed freebuff->scout_leads, delphi->scout_leads, devin->continue_refactor; all three confirmed working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
+      "branch": "main",
+      "frame": "03haj5mecfs8mpii8p4qqboxk"
+    },
+    {
+      "id": "8f1af7a8-cfb7-4532-9b2d-5c556d19deda",
+      "ts": "2026-11-24T00:28:34Z",
+      "source": "codebuff",
+      "subject": "nixconfig:freebuff-job-search",
+      "action": "submission attempt on the 5 packets: all 5 blocked, nothing sent. bern = Recruitee form fully filled (name, email, phone +49, CV, Anschreiben, GDPR consent) but Send is covered by hCaptcha; zurich = same ATS, needs Swiss German level + fixed-term openness, answers not in corpus; coni = arbeitnow form has one CV slot, JOIN needs email+reCAPTCHA; proxify x2 = career.proxify.io behind Cloudflare Turnstile + account flow. Next actions recorded per row",
+      "outcome": "blocked: human verification (hCaptcha/Turnstile/reCAPTCHA) and two subjective questions no source answers",
+      "claims": [],
+      "files": [],
+      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
+      "branch": "main",
+      "frame": "03haj51pmijh3zxvrodqn5805"
+    },
+    {
+      "id": "a3c1d9cc-b13e-4293-8e72-5c18aa784e97",
+      "ts": "2026-11-24T00:24:30Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-leaf-chain-split",
+      "action": "landed: containers name floor leaf-by-leaf (user.base+shell+user.ai.skills); user.ai gone from container HM, profiles.ai disable+hmAi plumbing removed; guckloch's dead antigravity-cli import dropped (drv-diff caught its or-true activation). | gate: drv-equality 30/30 identical, checks:host delphi/guckloch/cassini/fern PASS, checks:quick PASS, nix:lint 331 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
+      "branch": "main",
+      "frame": "03haj4936h9xrki2ndr8falqj"
+    },
     {
       "id": "3cc7a74a-074d-48fb-aa21-9b0d2ac30248",
       "ts": "2026-11-24T00:23:30Z",
@@ -2632,71 +2697,6 @@
       "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
       "branch": "main",
       "frame": "03had43ah0uxocmhj0juqgubh"
-    },
-    {
-      "id": "c9bb1641-3d23-4a5d-8f66-a3e3d7142c19",
-      "ts": "2026-11-23T05:55:15Z",
-      "source": "delphi-freebuff",
-      "subject": "nixconfig:delphi-submit",
-      "action": "landed: delphi freebuff pane submitting Helsing SRE application packet",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03had3kbi3pk0mvxp7r890l44"
-    },
-    {
-      "id": "5af7f608-1f97-4e97-8c52-3b360acd05e6",
-      "ts": "2026-11-23T05:55:14Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-scout",
-      "action": "landed: freebuff pane scouting new DevOps/SRE/Platform/Infrastructure leads into the apps pipeline",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03had3k8n9l4z8uv2im2o9arl"
-    },
-    {
-      "id": "f0d00eff-725c-4570-ab7b-08ed896781ff",
-      "ts": "2026-11-23T05:45:46Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-leads-liveness-2026-11-23",
-      "action": "liveness recheck of 26 tracked leads: 4 closed (Doctolib Staff+Senior SRE 404, MAIA 410, req removed), 2 blocked on eligibility (Antithesis London/UK-only, Pragmatike 20 countries no DE), 1 stale (WunderGraph datePosted 2024-04), 1 relinked (InnoCraft e0d9c54a -> 02305284), 18 live. Lead bucket 26 -> 23. Freed 4 rows to other; Qonto Berlin secondary confirmed.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03had1plinyedzd9ydwnh013d"
-    },
-    {
-      "id": "3eead728-6f44-4c54-8615-153db18fb7bf",
-      "ts": "2026-11-23T05:43:27Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-delphi-0633",
-      "action": "Drove idle delphi freebuff pane 0:2.1 (ssh-tunneled): sent lead-liveness task (re-check tracked leads for freshness/reposts/remote/closed); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03had19afqy0kb8sttbbl5kmu"
-    },
-    {
-      "id": "c5e7f388-0d86-4ee4-b71a-657a1e48471c",
-      "ts": "2026-11-23T05:43:26Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-freebuff-0633",
-      "action": "Drove idle freebuff pane 0:1.1: sent build-application task (continue Helsing SRE application: build #2, draft reply, tighten letter); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03had197dmc5u3qk90cn9vzi8"
     }
   ]
 }

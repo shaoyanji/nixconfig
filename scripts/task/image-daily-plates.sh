@@ -271,7 +271,7 @@ cmd_plates() {
     round_keeps=$(tail -n +"$((ledger_before + 1))" "$LEDGER" 2>/dev/null |
       jq -r 'select(type == "object") | select((.brief // "") | startswith("photoreal-")) | select(.verdict == "keep") | .brief' 2>/dev/null |
       wc -l | tr -d ' ')
-    pending=$(roster_pending "$roster")
+    pending=$("$(image_daily_cli)" pending --roster "$roster")
     assets=$(wc -l <"$IMAGES_ROOT/published/urls.tsv" 2>/dev/null | tr -d ' ')
     outcome=in_progress
     [ "${round_keeps:-0}" -gt 0 ] && outcome=done

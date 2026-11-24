@@ -51,14 +51,14 @@ cmd_today() {
       wrapper=$(systemctl --user show -p ExecStart --value "image-daily-slot-$n.service" 2>/dev/null |
         grep -o '/nix/store/[^ "]*image-daily-slot-[0-9][0-9]*' | head -1 || true)
       reserve=$(grep -o 'export RESERVE=[0-9][0-9]*' "$wrapper" 2>/dev/null | head -1 | cut -d= -f2 || true)
-      cap=$(slot_share "$left" "$((total - n + 1))")
+      cap=$("$(image_daily_cli)" share --left "$left" --slots "$((total - n + 1))")
       printf '  next slot   %s of %s at %s -> cap %s' "$n" "$total" "${next_at:-unknown}" "$cap"
       if [ -n "$reserve" ] && [ "$reserve" -gt 0 ]; then printf ', %s held back' "$reserve"; fi
       printf '\n'
     fi
   fi
 
-  pending=$(roster_pending "$roster" 2>/dev/null || printf '?')
+  pending=$("$(image_daily_cli)" pending --roster "$roster" 2>/dev/null || printf '?')
   printf '  roster      %s row(s) waiting in %s\n' "${pending:-?}" "${roster#"$repo"/}"
 }
 

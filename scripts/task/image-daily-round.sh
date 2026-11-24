@@ -14,7 +14,7 @@ cmd_round() { # [status]
   local roster=${ROSTER:-$repo/lib/image-daily/plates.txt}
   local state=$IMAGES_ROOT/.round.json unit active pending left
   if [ "${1:-}" = "status" ]; then
-    pending=$(roster_pending "$roster" 2>/dev/null || echo '?')
+    pending=$("$(image_daily_cli)" pending --roster "$roster" 2>/dev/null || echo '?')
     left=$(remaining 2>/dev/null || echo '?')
     if [ -s "$state" ]; then
       unit=$(jq -r '.unit // empty' "$state" 2>/dev/null)
@@ -33,12 +33,12 @@ cmd_round() { # [status]
   if [ -s "$state" ]; then
     unit=$(jq -r '.unit // empty' "$state" 2>/dev/null)
     if [ -n "$unit" ] && [ "$(systemctl --user is-active "$unit" 2>/dev/null || true)" = "active" ]; then
-      jq -c --arg pending "$(roster_pending "$roster" 2>/dev/null || echo 0)" \
+      jq -c --arg pending "$("$(image_daily_cli)" pending --roster "$roster" 2>/dev/null || echo 0)" \
         '. + {state: "running", pending: (($pending) | tonumber)}' "$state"
       return 0
     fi
   fi
-  pending=$(roster_pending "$roster" 2>/dev/null || echo 0)
+  pending=$("$(image_daily_cli)" pending --roster "$roster" 2>/dev/null || echo 0)
   left=$(remaining 2>/dev/null || echo 0)
   if [ "${pending:-0}" -le 0 ]; then
     jq -cn --arg r "$roster" '{state: "idle", reason: "every roster row has a kept plate", roster: $r}'

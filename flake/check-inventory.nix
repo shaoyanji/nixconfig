@@ -81,6 +81,7 @@
     "checks:nix:lint" = "leaf";
     "checks:nix:shell" = "leaf";
     "checks:nix:style" = "leaf";
+    "checks:nix:style:test" = "leaf";
     "checks:nix:watch" = "leaf";
     "checks:nix:watch:status" = "leaf";
     "checks:nix:watch:stop" = "leaf";

@@ -74,6 +74,7 @@ tasks:
       - task: checks:counts:test
       - task: checks:nix:lint
       - task: checks:nix:style
+      - task: checks:nix:style:test
       - task: checks:hosts:args:test
       - task: checks:nix:shell
       - task: checks:modules:edges
@@ -1212,6 +1213,18 @@ tasks:
       failure names file and function.
     cmds:
       - bash scripts/task/nix-style-check.sh
+
+  checks:nix:style:test:
+    desc: "Regression fixture for the nix-style alias gate (fails on 2fe0c687^, the pre-unification tree)"
+    summary: >
+      Proves `checks:nix:style` fails on the real past mistake: the
+      2fe0c687^ tree, where flake/policies.nix and flake/epistemics.nix
+      carried lib.* minorities against builtins-majority files — the gate
+      must refuse it and name both files while leaving the honest control
+      (lib/nix-files.nix, which mixes no aliases) unblamed. Also proves one
+      minority spelling is enough to fail, and that the current tree passes.
+    cmds:
+      - bash tests/nix-style/run.sh
 
   checks:nix:comments:
     desc: "[gate] Every Nix comment is a pointer that resolves, and prose only falls"

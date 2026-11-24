@@ -12,6 +12,10 @@ fns=(attrNames attrValues catAttrs concatStringsSep elem elemAt filter
   filterAttrs "foldl'" genList getAttr hasAttr head isAttrs isList isString
   length listToAttrs mapAttrs tail throw toJSON toString)
 
+# Roots may be overridden so a fixture can point the gate at a tree checked
+# out of history (tests/nix-style/run.sh does exactly that).
+if [ "$#" -gt 0 ]; then roots=("$@"); else roots=(lib modules flake hosts); fi
+
 fail=0
 # The code roots only — AGENTS.nix is generated data whose note bodies may
 # name either spelling in prose, and modules/secrets is a foreign submodule.
@@ -22,7 +26,7 @@ while IFS= read -r f; do
       fail=1
     fi
   done
-done < <(find lib modules flake hosts -name '*.nix' -not -path 'modules/secrets/*')
+done < <(find "${roots[@]}" -name '*.nix' -not -path 'modules/secrets/*')
 
 if [ "$fail" -eq 0 ]; then
   echo "nix-style ok: no file mixes builtins./lib. spellings of the same pure alias"

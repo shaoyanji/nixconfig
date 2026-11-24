@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-24T19:17:44Z",
+  "generated": "2026-11-24T19:18:35Z",
   "count": 200,
-  "pin": "ad83efc526b7b1cdf7b335d005db73cd4449104514d0c04bb097b1cd0255f4e1",
+  "pin": "70cd12c8319ed84bc7882357f354b828657edf1657353d4feabfd67656f16aec",
   "turns": [
+    {
+      "id": "18ed3cc5-68b6-4d81-972f-daddab7f7634",
+      "ts": "2026-11-24T19:17:52Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-note",
+      "action": "landed: note job-scout-boards-exhausted-2026-11-24 at 96896c8b — nine employers at stage lead from 164af385/7b40455e/c9f09993 with fits (HITS.nrw, Shipzero, Wellis, noris at 4; TecTake, Studytube, Projektron, Rheinmetall, CHECK24 at 3), and the boards that are done: arbeitnow 16 pages, Greenhouse/Lever/Ashby/Personio/Recruitee, remotive; RemoteOK + BA jobsuche 403 | gate: agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "96896c8b2baf84dd51fa9018d5500812c4b33fdb",
+      "branch": "main",
+      "frame": "03hap9nfs0j0gd5mpgayu6y5x"
+    },
     {
       "id": "b0574b1f-d6c3-48dc-a276-033f141422fe",
       "ts": "2026-11-24T19:16:28Z",
@@ -2702,19 +2715,6 @@
       "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03ham2o57j7mgwksgry5kyv4e"
-    },
-    {
-      "id": "e51d4f9c-89cd-4217-b1d7-23cc31c939c9",
-      "ts": "2026-11-24T09:28:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:agents:3.1",
-      "action": "landed: drove idle ssh/freebuff delphi pane agents:3.1; Jev selected research (0.95/0.92); job-search EU-eligible DevOps/SRE/Platform/Infra employer-lead task submitted after second Enter; pane shows working... (4s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham2j6j9np6p4sihe6bj2qy"
     }
   ]
 }

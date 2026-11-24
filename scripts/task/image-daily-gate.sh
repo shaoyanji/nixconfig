@@ -62,7 +62,12 @@ cmd_gate() {
   grep -q 'unjudged_streak' "$lib" 2>/dev/null || grep -rq 'unjudged_streak' "$gotool" 2>/dev/null ||
     grep -rq 'unjudged_streak' "$legacy" 2>/dev/null ||
     { say "gate FAIL: run_lane has no unjudged circuit breaker — a dead judge burns the whole allowance"; fail=1; }
-  [ -f "$dir/image-daily-plates.sh" ] && grep -q 'unjudged_streak' "$dir/image-daily-plates.sh" ||
+  # The plates breaker lives wherever the plates loop does: plates.sh on
+  # historical trees, tools/os/internal/image/plates.go after the port —
+  # grep that file specifically, not the package (run_lane's token there is
+  # a different breaker's proof).
+  { grep -q 'unjudged_streak' "$dir/image-daily-plates.sh" 2>/dev/null; } ||
+    { [ -f "$gotool/internal/image/plates.go" ] && grep -q 'unjudgedStreak' "$gotool/internal/image/plates.go"; } ||
     { say "gate FAIL: plates loop has no unjudged circuit breaker"; fail=1; }
 
   # Publish safety: the manifest is a union, never a snapshot — the shrink

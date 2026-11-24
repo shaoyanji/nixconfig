@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-24T11:01:29Z",
+  "generated": "2026-11-24T11:23:38Z",
   "count": 200,
-  "pin": "2c013d41a855ac6e911cad9f25c8de374e227fb04c30e3e57d7af0bc14afd4f3",
+  "pin": "28d5e2f38c0c0efdaafb83cc3ed60c5867aebae7f1e1a7cf82809ce3e4303738",
   "turns": [
+    {
+      "id": "eae20d7e-c2ee-466e-b99a-85bac09e5911",
+      "ts": "2026-11-24T11:17:43Z",
+      "source": "freebuff",
+      "subject": "nixconfig:site-links",
+      "action": "Idle site check: checks:docs:links PASS (184 md, all links/anchors), checks:site:links PASS (91 links/17 pages/6 PDFs linked), dev:site:build PASS (docs target). dev:blog:cv:check FAIL: published cv.pdf/cv-de.pdf are one build behind the matt-site artifact. No repo files changed; blog re-copy left to operator (CI deploys on push).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ddb18ab29cecd97a4cf86d47b02a0f2efcdecfe5",
+      "branch": "main",
+      "frame": "03hamnuqj4czm6qp922k7pcls"
+    },
+    {
+      "id": "6cce2bce-1b3e-407f-b2f1-0a6da5275ddc",
+      "ts": "2026-11-24T11:15:46Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-2026-11-24-1203",
+      "action": "drove idle devin and freebuff panes; Jev note-change selected for both (devin p=0.92 m=0.89, freebuff p=0.92 m=0.84 after duel); Devin running image-daily verification, freebuff thinking on site/CV task",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ddb18ab29cecd97a4cf86d47b02a0f2efcdecfe5",
+      "branch": "main",
+      "frame": "03hamnh02eghdcv168fo9iqc5"
+    },
+    {
+      "id": "46a74723-fcb4-4439-a2e9-c56fef59bd5c",
+      "ts": "2026-11-24T11:04:28Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "tailored Baseten SRE (baseten-site-reliability-engineer, fit 4, en): fetched the live Ashby JD (630 words, isRemote true, SF), wrote jd + letter, packet built CV 2p + anschreiben 1p (14/32 highlights, 4/10 projects). Coverage 74/256. Not submitted — Ashby is a form, hold 2026-12-07, and Germany eligibility stays unconfirmed. Files listed in receipts/baseten-site-reliability-engineer.md. sweep2 untouched.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ddb18ab29cecd97a4cf86d47b02a0f2efcdecfe5",
+      "branch": "main",
+      "frame": "03haml9n5gb5qije8g6cc4t2q"
+    },
     {
       "id": "ed0c7973-1143-416e-af82-b86d6f9f6b9d",
       "ts": "2026-11-24T11:00:55Z",
@@ -2743,45 +2782,6 @@
       "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
       "branch": "main",
       "frame": "03haitc4kqnehapuc0dvrtcjr"
-    },
-    {
-      "id": "0ef314e1-a5e6-40ec-bdb5-d371d451ac1b",
-      "ts": "2026-11-23T23:25:39Z",
-      "source": "devin",
-      "subject": "nixconfig:hm-leaf-chain-split",
-      "action": "landed: blast radius of remaining HM chains computed via ops:kg:blast + host-inventory join; roles.home->roles.minimal reaches 12 embedded hosts, roles.minimal->user.base+user.ai reaches 22, leaf lists inside user.base/user.ai reach the same 22; split plan documented as note hm-leaf-chain-split (kind=proposal, PROPOSED, P3) | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
-      "branch": "main",
-      "frame": "03haisr5c92mcm78wqpeedcn2"
-    },
-    {
-      "id": "9ceba656-87f6-4fd6-ade1-703a7c1e0b72",
-      "ts": "2026-11-23T23:24:36Z",
-      "source": "codebuff",
-      "subject": "nixconfig:matt-publish",
-      "action": "Published matt.bountystash.com from HEAD 9793a01b: matt:build produced .#sites.matt-site (29 files), matt:deploy:prod uploaded to the matt Pages project (deployment abffac65.matt-9pf.pages.dev), and all 28 served artifacts now hash-equal to the build (_headers is a Pages control file, not a served path) | gate: pages-deploy readiness (200 on every shipped index path) + site:check 0 failed + 28/28 byte comparison PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9793a01b3f98027bb2e7d16366fc689d0938b65b",
-      "branch": "main",
-      "frame": "03haisjtndw1d5obb3j0dj8ez"
-    },
-    {
-      "id": "98e4d1a4-e48b-4a2d-b529-eb8e7a2481df",
-      "ts": "2026-11-23T23:23:12Z",
-      "source": "steward-cron",
-      "subject": "nixconfig:steward-pane-drive",
-      "action": "drove 3 idle panes via jevdecide+labels.json: devin 0:0.1 chain-change 0.99 (chain-split blast-radius audit+note), freebuff 0:1.1 publish 0.98 (CV-site build+deploy to HEAD), delphi 0:2.1 prose-change 1.0 (ryoku DESIGN.md contrast prose); all 3 verified working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9793a01b3f98027bb2e7d16366fc689d0938b65b",
-      "branch": "main",
-      "frame": "03hais9xwo302fbs8v2io2oa3"
     }
   ]
 }

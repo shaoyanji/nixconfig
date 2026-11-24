@@ -75,7 +75,6 @@
     "scripts/task/host-restore.sh" = 281;
     "scripts/task/hosts-args-check.sh" = 121;
     "scripts/task/image-daily-lib.sh" = 131;
-    "scripts/task/image-daily-plates.sh" = 286;
     "scripts/task/image-daily-post.sh" = 167;
     "scripts/task/image-daily-publish.sh" = 179;
     "scripts/task/image-gen.sh" = 138;

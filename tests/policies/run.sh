@@ -71,6 +71,9 @@ in {
   shellShrunk = p.shellScript "scripts/task/kg-check.sh" (builtins.readFile $tmp/shrunk.sh);
   shellSmall = p.shellScript "scripts/task/small.sh" (builtins.readFile $tmp/small.sh);
   shellRecorded = p.shellScript "scripts/task/kg-check.sh" (builtins.readFile $repo/scripts/task/kg-check.sh);
+  goModuleNew = p.goModule "tools/brandnew/go.mod";
+  goModuleRecorded = p.goModule "tools/image-daily/go.mod";
+  goModuleService = p.goModule "modules/services/agent-turns/shim/go.mod";
 }
 EOF
 
@@ -115,6 +118,11 @@ check "a recorded script grown by a line fails" fails shellGrowth
 check "a recorded script shrunk passes" passes shellShrunk
 check "a small unrecorded script passes" passes shellSmall
 check "a recorded script at its ceiling passes" passes shellRecorded
+
+echo "== tools-go-modules-are-recorded"
+check "an unrecorded tools go.mod fails" fails goModuleNew
+check "a recorded tools go.mod passes" passes goModuleRecorded
+check "a service go.mod under modules/ is out of scope" passes goModuleService
 
 echo "== resolver message"
 err="$(NIXCONFIG_ROOT="$tmp" bash -c '. "$1/scripts/task/lib/paths.sh"; secret_get "[\"k\"]"' _ "$repo" 2>&1 >/dev/null)"

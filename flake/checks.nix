@@ -931,7 +931,7 @@ lib.genAttrs systems.work (
 
       # --- living documents have budgets (SCHEMA.md §2) ---------------------
       # One implementation: scripts/task/docs-budget.sh, the same script
-      # `task ops:docs:budget` runs and the same gate the CI `docs-budget` job
+      # `task ops:docs:budget` runs and the same gate the CI `hygiene` job
       # builds on every push. The budgets used to live here *and* in the task,
       # and they disagreed by one line (`wc -l` vs a split); running the script
       # over the flake source removes the second copy, so a document exactly at

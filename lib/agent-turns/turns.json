@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-24T07:49:48Z",
+  "generated": "2026-11-24T07:52:16Z",
   "count": 200,
-  "pin": "c16ff3e914c8cb14d6dba035b5738339023d696ff0d7d6a86923507ba6defb54",
+  "pin": "3f26bbd1cc0b9693ed3d6d814ef4cad9b1b988a071031b2a60dca3ee34fdf893",
   "turns": [
+    {
+      "id": "d79cb3a5-e915-4aac-95f0-69015f9d34d8",
+      "ts": "2026-11-24T07:49:59Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: pull clean, no incoming (hermes-persona left dirty). B1 Systems packet built from the real JD — 2-page German CV, 7/32 highlights, 4/10 projects, linked in submissions; JD imported to hub. LINBIT marked blocked: linbit.com 200s every path but 403s the posting, so no packet faked | gate: checks:kg PASS, checks:tasks PASS, apps:packet rc=0",
+      "outcome": "done",
+      "claims": [
+        ".agents/skills/apps"
+      ],
+      "files": [],
+      "base_commit": "0d385854e98e4464ae5ccfdb684c699707ef3336",
+      "branch": "main",
+      "frame": "03halj9we4njie9in8imyzavh"
+    },
     {
       "id": "5f863cd2-a1a7-450f-865c-846067b3d133",
       "ts": "2026-11-24T07:48:32Z",
@@ -2697,19 +2712,6 @@
       "base_commit": "bb970c58832db4743f626a31a950293c97531772",
       "branch": "main",
       "frame": "03haerln5qrzhsvfkpp2p7t7y"
-    },
-    {
-      "id": "97d7b0c1-fd0e-483b-97cc-cae96ffab5e6",
-      "ts": "2026-11-23T11:02:32Z",
-      "source": "devin",
-      "subject": "nixconfig:pr-cleanup-vercel-detok",
-      "action": "landed: closed legacy #27 + failing #13 (branches deleted); merged 13 green flake bumps (#9-12,14-16,18-22,25); 0 open PRs remain. vercel: removed VERCEL_TOKEN/Edge-Config machinery — public status page only, ops telemetry stays tailnet-only | gate: checks:quick PASS, checks:vercel:test 14/14",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bb970c58832db4743f626a31a950293c97531772",
-      "branch": "main",
-      "frame": "03haerl8lnb22qxa0a0b6lxz8"
     }
   ]
 }

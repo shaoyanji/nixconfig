@@ -748,7 +748,7 @@ tasks:
       neither is visible to `.#modules`. Loads with arguments, asset reads
       (readFile, src, sopsFile) and `nixpkgs.overlays` imports are dependencies,
       not module edges, and stay allowed. ~0.5 s over ~160 files, no eval, no
-      network; the same script the CI docs-budget job runs.
+      network; the same script the CI hygiene job runs.
     cmds:
       - bash scripts/task/modules-edges.sh
 

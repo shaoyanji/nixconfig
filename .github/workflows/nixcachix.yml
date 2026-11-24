@@ -28,7 +28,7 @@ on:
         default: ""
 
 jobs:
-  sops-drift:
+  hygiene:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -69,48 +69,11 @@ jobs:
       - name: Check sops recipient drift
         continue-on-error: true
         run: bash scripts/task/sops-drift-check.sh --repo-only
-
-  # Doc-only changes allocate zero build runners (the detector ignores *.md),
-  # so without this job a runaway living document lands green. The gate is
-  # `checks.<system>.docs-budget`: line counts for AGENTS.md / MANUAL.md and the
-  # four root stubs (SCHEMA.md §2), evaluated at eval time and
-  # building a three-line artifact. It runs on every push, doc-only included.
-  docs-budget:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Install Nix
-        uses: cachix/install-nix-action@v30
-        with:
-          # WAN substituters only; the flake's nixConfig is deliberately not
-          # accepted here. flake.nix lists the LAN Harmonia cache, which a GitHub
-          # runner cannot reach — accepting it spends a connect-timeout per path on
-          # a cache behind this house's LAN, and CI must never depend on that. The
-          # NAS consumes cachix; it is not CI's build or warm path.
-          extra_nix_config: |
-            experimental-features = nix-command flakes pipe-operators
-            substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
-            # A substituter without its key is a source build. This line was
-            # absent while cache.numtide.com was listed, so every numtide path
-            # was fetched, rejected as unsigned, and rebuilt: glibc, gcc, boost
-            # and nix store 2.34.9 itself, on a 16 GiB runner, ending in
-            # `Killed` (run 43835442088) and "the runner has received a shutdown
-            # signal". Keys are copied from flake.nix nixConfig, which CI
-            # deliberately does not accept; numtide's key is niks3's, verified
-            # with `nix store verify --store https://cache.numtide.com`. One line,
-            # because a second trusted-public-keys entry replaces the first.
-            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
-            # Four parallel derivations at four cores each is 16 compiler
-            # processes on 16 GiB; cap the fan-out so a cache miss degrades into
-            # a slower build instead of an OOM kill.
-            max-jobs = 2
-            connect-timeout = 5
-      - name: Sync repository
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          submodules: recursive
-          token: "${{ secrets.GH_PAT }}"
+      # The six cheap gates run here, on every push — doc-only pushes allocate
+      # zero build runners (the detector ignores *.md), so a job with no `if:`
+      # and no path filter is the only place a runaway living document or a
+      # broken task graph can be caught. They were the `docs-budget` job until
+      # 2026-11-24; same steps, one checkout and one Nix install fewer.
       - name: Living documents within budget
         run: nix build -L .?submodules=1#checks.x86_64-linux.docs-budget
       - name: Prose carries no unslop vocabulary

@@ -8,6 +8,12 @@
 # and projects/ are foreign trees.
 {
   argueAbove = 100;
+  # `tools/*/go.mod` the tree may carry — a new one is an unrecorded CLI, not a
+  # port into the OS binary [[flake/policies.nix#tools-go-modules-are-recorded]].
+  goModules = [
+    "tools/image-daily/go.mod"
+    "tools/static-serve/go.mod"
+  ];
   shells = {
     ".agents/skills/atuin/scripts/atuin-audit.sh" = 167;
     ".agents/skills/atuin/scripts/atuin-bootstrap.sh" = 146;

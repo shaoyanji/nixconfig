@@ -1011,7 +1011,7 @@ tasks:
         printf '%s' "$rows" | toon_emit jq -r '.[]? | "\(.sentAt[0:10])  \(.subject[0:70])"'
 
   agents:ci:preflight:
-    desc: "Run the gates the CI docs-budget job runs, locally: no document over budget, task graph clean"
+    desc: "Run the gates the CI hygiene job runs, locally: no document over budget, task graph clean"
     cmds:
       - |
         bash scripts/task/docs-budget.sh

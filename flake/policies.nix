@@ -641,7 +641,7 @@
   # unrecorded bloated script is the thing the gate exists to refuse — it is a
   # Go CLI or a split that never happened.
   scriptBudget = import ./script-budget.nix;
-  shUnder = dir:
+  filesUnder = dir: keep:
     if !builtins.pathExists (root + "/${dir}")
     then []
     else let
@@ -658,9 +658,11 @@
             if rel == "modules/secrets"
             then []
             else walk rel
-          else lib.optional (lib.hasSuffix ".sh" n) rel);
+          else lib.optional (keep n) rel);
     in
       walk dir;
+  shUnder = dir: filesUnder dir (n: lib.hasSuffix ".sh" n);
+  goModUnder = dir: filesUnder dir (n: n == "go.mod");
   productionShell =
     (shUnder "scripts")
     ++ (shUnder "modules")
@@ -681,6 +683,23 @@
     scriptBudget.shells
     |> builtins.attrNames
     |> builtins.filter (p: !(productionShell |> builtins.elem p));
+
+  # The Go-module half of the same budget: a `go.mod` under tools/ is a CLI.
+  # The task surface folds into the one OS binary (one-os-cli); the recorded
+  # set is the gate — an unrecorded module fails, a deleted one leaves a stale
+  # entry that the same commit removes.
+  toolsGoMods = goModUnder "tools";
+  goModUnrecorded =
+    toolsGoMods
+    |> builtins.filter (p: !(scriptBudget.goModules |> builtins.elem p));
+  goModStale =
+    scriptBudget.goModules
+    |> builtins.filter (p: !(toolsGoMods |> builtins.elem p));
+  goModuleProblem = path:
+    lib.optional (lib.hasPrefix "tools/" path
+      && lib.hasSuffix "/go.mod" path
+      && !(scriptBudget.goModules |> builtins.elem path))
+    "${path}: a new Go module under tools/ is another CLI — fold its verbs into the OS binary (one-os-cli), or record a foreign tree";
 
   # Text form for the fixture: a path plus content, the same verdict the tree
   # walk computes. wc -l semantics — the trailing element after the last
@@ -837,6 +856,13 @@
       proof = "flake/script-budget.nix `shells` against line counts of every `.sh` under the four production roots";
       holds = shellUnrecorded == [] && shellGrowth == [] && shellStale == [];
       detail = "production shell ${toString (builtins.length productionShell)} file(s), bloated ${toString (builtins.length shellBloated)}, recorded ${toString scriptBudget.total}\n    unrecorded: ${shellUnrecorded |> lib.concatStringsSep ", "}\n    grown past ceiling: ${shellGrowth |> lib.concatStringsSep ", "}\n    stale: ${shellStale |> lib.concatStringsSep ", "}";
+    };
+
+    tools-go-modules-are-recorded = {
+      rule = "A `go.mod` under `tools/` is a CLI: the task surface folds its verbs into the one OS binary (one-os-cli), so a new module is an unrecorded failure and a recorded one that disappears is a stale entry the same commit removes — the ledger shrinks with the port, the same shape as the shell ceiling. The Go service shims under `modules/` are out of scope: they are derivations, not task-surface CLIs.";
+      proof = "flake/script-budget.nix `goModules` against the go.mod walk under tools/";
+      holds = goModUnrecorded == [] && goModStale == [];
+      detail = "tools/ go.mod files: ${toString (builtins.length toolsGoMods)}\n    unrecorded: ${goModUnrecorded |> lib.concatStringsSep ", "}\n    stale: ${goModStale |> lib.concatStringsSep ", "}";
     };
 
     router-labels-are-routed = {
@@ -1218,16 +1244,16 @@
 
     ci-doc-budget = {
       rule = "A doc-only change still runs the living-document budget, so a runaway manual cannot land green on a push that allocated no build runner.";
-      proof = ".github/workflows/nixcachix.yml (the `docs-budget` job builds `checks.<system>.docs-budget`)";
+      proof = ".github/workflows/nixcachix.yml (the `hygiene` job builds `checks.<system>.docs-budget`)";
       holds =
-        has ".github/workflows/nixcachix.yml" "docs-budget:"
+        has ".github/workflows/nixcachix.yml" "hygiene:"
         && has ".github/workflows/nixcachix.yml" "checks.x86_64-linux.docs-budget";
-      detail = "the workflow lost the docs-budget job; doc-only pushes now allocate nothing and gate nothing";
+      detail = "the workflow lost the hygiene job's docs-budget step; doc-only pushes now allocate nothing and gate nothing";
     };
 
     ci-task-graph = {
       rule = "The task graph is gated on every push, doc-only included: duplicate keys, dangling references, include cycles, orphan shards, MATCH arity and an exit code a summary promises but its script never emits are hard violations, the name set must equal `task --list-all --json`, and the fixture must violate every bucket where it says it does. A shard rewrite that no test covers then cannot ship silent.";
-      proof = ".github/workflows/nixcachix.yml (the `docs-budget` job runs scripts/task/taskfile-graph.sh)";
+      proof = ".github/workflows/nixcachix.yml (the `hygiene` job runs scripts/task/taskfile-graph.sh)";
       holds = has ".github/workflows/nixcachix.yml" "taskfile-graph.sh";
       detail = "the workflow lost the task-graph step; shard drift now reaches a deploy unflagged";
     };
@@ -1555,6 +1581,7 @@ in {
     ciKeys = ciKeyProblems;
     secretsScript = secretsScriptProblems;
     shellScript = shellScriptProblems;
+    goModule = goModuleProblem;
   };
 
   inherit

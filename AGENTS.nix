@@ -1281,14 +1281,14 @@
     one-os-cli = {
       title = "One CLI of the operating system, not a go.mod per domain";
       kind = "proposal";
-      status = "ACCEPTED";
+      status = "IN FLIGHT";
       priority = "P2";
       date = "2026-11-24";
-      summary = "The shell burn-down must not end in a tools/ sprawl of one module per domain. Ports land as internal/<domain> packages inside a single Go binary — a CLI of the operating system — while .#cli.<family>.<tool> and the task names stay the contract callers see.";
+      summary = "The shell burn-down must not end in a tools/ sprawl of one module per domain. Ports land as internal/<domain> packages inside a single Go binary — a CLI of the operating system — while .#cli.<family>.<tool> and the task names stay the contract callers see. The go.mod ledger is landed; the umbrella module is not.";
       from = ["shell-script-budget" "jobby-cli-consolidation"];
       links = ["p4-taskfiles-to-evals" "agent-tools-called-not-declared"];
       refs = {
-        modules = ["flake/cli.nix" "flake/script-budget.nix" "tools/image-daily/main.go"];
+        modules = ["flake/cli.nix" "flake/script-budget.nix" "flake/policies.nix" "tests/policies/run.sh" "tools/image-daily/main.go"];
         tasks = ["checks:policies:fixtures" "checks:tasks"];
         docs = ["docs/task-control-plane.md"];
       };
@@ -1316,9 +1316,13 @@
         of a deploy script is a deployment). Python check helpers shrink
         toward evals per `p4-taskfiles-to-evals`, they are not CLI verbs.
 
+        **Landed** `tools-go-modules-are-recorded` (goModules ledger, probe,
+        fixtures) — a new `tools/*/go.mod` fails unrecorded from today.
+        **Missing** the umbrella module and the image-daily fold-in;
+        static-serve keeps its module until the umbrella serves `.#servers`.
+
         Exit: one go.mod under `tools/` serves the task surface — a second
-        task-surface module fails the policies gate; the script-budget
-        ledger keeps shrinking; `checks:policies:fixtures` stays green.
+        module fails the policies gate; the ledger keeps shrinking.
       '';
     };
     transitive-flake-drift = {

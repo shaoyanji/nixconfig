@@ -5951,5 +5951,46 @@
         Exit: rows hold at lead until 2026-12-07, then the vendor careers pages.
       '';
     };
+    job-lane-queue-delphi-2026-11-24 = {
+      title = "The delphi job lane is consistent, packet-ready and waiting: 82 prep rows and a fit-5 tail";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Lane consistent and idle by design: five duplicate Supabase/Managed Postgres rows closed, the Ashby-applied row standing, DeepL's packet prepared for a CAPTCHA hand-submit, and eleven prep rows plus a fit-5 lead tail waiting out the 2026-12-07 hold. Boards mined out; RemoteOK and BA jobsuche answer 403. Next is tailoring, not another sweep.";
+      from = ["job-scout-boards-exhausted-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:add" "apps:update" "apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        State on 2026-11-24, after the duplicate cleanup. The tracker is
+        consistent: five Supabase/Managed Postgres packet rows are closed as
+        duplicates and supabase-postgres-deployment-engineer-nix stands,
+        applied 2026-11-21 on an Ashby confirmation. Nothing in this lane
+        lives in the repo; the record is the delphi table, and the hold runs
+        to 2026-12-07.
+
+        Packets are prepared and go nowhere on their own. DeepL is closest:
+        the letter is dated 22 Nov and needs re-dating at send, and arbeitnow's
+        CAPTCHA form is the only route, so it is a hand-submit. The prep queue
+        is SingleStore, trivago, EPAM, IP Fabric, plusserver, Docplanner,
+        Dropbox, Bloomreach, Angeheuert, Bechtle, QED.ai.
+
+        At lead, awaiting tailoring: Workidentity, 0G, Wheely, Foundational,
+        LuxusKollektion, iits, Tailscale, Kaluza, SAP, 1GLOBAL, Frontier,
+        HiSolutions — the fit-5 tail of 290 employers, which is inventory
+        rather than queue.
+
+        Boards are drained (see the mined-out note). RemoteOK and BA jobsuche
+        answer 403, so an empty sweep there proves the bot wall, not the market.
+
+        Exit: one packet goes out through its ATS or a hand-submit after the
+        hold, or one fresh DevOps/SRE/Platform/Infrastructure lead is filed
+        from an employer page. No broad sweep.
+      '';
+    };
   };
 }

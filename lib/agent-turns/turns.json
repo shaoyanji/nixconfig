@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-24T20:33:08Z",
+  "generated": "2026-11-24T20:35:44Z",
   "count": 200,
-  "pin": "0b194a63b5dab0219af4fee2716d5b89a5eee1c4297a64f2dcc76cfb319f0fe6",
+  "pin": "4b7c6bccd7a83fdb5b248f6dc8cacfa2d97bb9240f30b712325e38bf6d303224",
   "turns": [
+    {
+      "id": "34f82f84-66a1-4028-a262-390ded7d1932",
+      "ts": "2026-11-24T20:33:16Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: lane-state note now records the boards as mined out (arbeitnow 16 pages, G/L/A/P/R boards, remotive; RemoteOK+BA jobsuche 403; jobicy/nomads/himalayas/interamt dead) and the lane turning from sweeping to tailoring. HITS.nrw — fit 4, Düsseldorf, Linux/K8s app operations, 2 lead rows — is the active target; next action is the CV plus German Anschreiben. | gate: agents-notes-schema PASS, checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "ccfe5ab26f480611c4dc7952b76023efc931bf28",
+      "branch": "main",
+      "frame": "03hapodn25rgbl7ndu4stm5vz"
+    },
     {
       "id": "5a91f0a9-7d99-4bc9-bf7d-cecb77ebf27c",
       "ts": "2026-11-24T20:31:14Z",
@@ -2680,21 +2695,6 @@
       "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hambgk2mhhsxqbqsbpzr4c3"
-    },
-    {
-      "id": "21fa905c-0163-40bf-bd8d-a063982732c8",
-      "ts": "2026-11-24T10:08:59Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "landed: CV surface refreshed, feb6699b, Pages 436dadd9. cv-software.json stack +Azure +Google Cloud (verbatim in resume.cv.json); cv-software.de.json + lebenslauf.json +Kubernetes so the German CV names the term 19 open leads use. cv.typ unchanged, already ATS-shaped. 56 scout leads deduped: 0 employer dupes. Live sha == artifact. gates: build+cv-ats-check 6 PDFs 1pp, cv-links 14 ok/0; cv-blog-check FAILS on pre-existing is-a.dev drift.",
-      "outcome": "done",
-      "claims": [
-        "lib/matt"
-      ],
-      "files": [],
-      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
-      "branch": "main",
-      "frame": "03hamafezmn74csokszsv1hka"
     }
   ]
 }

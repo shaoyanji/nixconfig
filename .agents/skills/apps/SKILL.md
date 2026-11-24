@@ -31,6 +31,14 @@ TOON record pipes in whole (`task apps:upsert -- < record.toon` — decode is th
 shared toon_ingest contract). The mail hub adds rows too (`origin`
 `agent-scan`/`discovered`): `agents:apps:discovered`.
 
+A lead a sweep turned up is not an application already sent, so it goes in
+through `task apps:scout`: `--family devops|sre|platform|infrastructure`
+required, plus `--company`, `--role` and a one-line `--summary`. The family
+becomes `origin` `scout:<family>`, the summary `notes`, and the owner rides the
+status line because the table has no owner column. `--next-action` lands with
+the row, so a lead is never stored without the thing that moves it, and the
+same company plus role updates one row instead of adding a second.
+
 ## Track
 
 ```bash

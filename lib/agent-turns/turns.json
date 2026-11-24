@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-24T07:01:09Z",
+  "generated": "2026-11-24T07:13:34Z",
   "count": 200,
-  "pin": "fbfdabe88c0df9a01feb1eb540279053568acd94176f4ab31482d61d5c082fa4",
+  "pin": "b9e309a8f5521f6293f6570d32595ef4a2c8fe89665f48e8ae372e0b25fa5a3f",
   "turns": [
+    {
+      "id": "d1e22716-5007-43df-9d80-fd6295891f22",
+      "ts": "2026-11-24T07:04:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-2026-11-24-final",
+      "action": "3 remote fleet/infra leads added: Cloudflare Senior SWE Kubernetes platform (Distributed/Hybrid, fit 3); UMB AG Senior System Engineer Linux Kubernetes (Volketswil, remote-tagged, CHF 100-130k, fit 3); MediData AG Platform Engineer (Bern, remote-tagged, fit 3). Rejected as non-remote: DRV Berlin and Mueller Holding (both Hybrid/Onsite). Gate: apps:dupes [] , 929 rows, git dirty 26 unchanged. No repo commit: tracker writes are delphi API only, so the gate is the proof.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halael7k6bzttqf9fnqrbsa"
+    },
+    {
+      "id": "0601749e-fb5c-492b-b98a-d270136b5935",
+      "ts": "2026-11-24T07:02:36Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "verify-only: no checks:image-daily task exists — ran the two real gates at HEAD 3ed3525f (contains 29e5a360 engine.sh deletion): images:gate ok 'dispatch, judge fallback, breakers and shrink guard all present'; checks:images ok '750 row(s), 750 asset(s), same paths and bank URLs' | gate: images:gate PASS, checks:images PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3ed3525f",
+      "branch": "main",
+      "frame": "03hala0p9t0cu6s2in99tp8xu"
+    },
+    {
+      "id": "294b946a-bce0-4425-ae2e-0dda5e1e481e",
+      "ts": "2026-11-24T07:02:25Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "correction: MongoDB InfraSec was closed by agent:apps under the one-employer rule (Storage Layer already applied), so the 3rd lead is Orakl Oncology Senior Platform Engineer (Villejuif, live 2026-11-23); the three carried leads are Swisscom, Schubergphilis and Orakl, each stage=lead with a dated next action; gate: checks:quick PASS, apps:query readback PASS, ads HTTP 200",
+      "outcome": "done",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "3ed3525f58755be38be1ea18b2547c48ec32c460",
+      "branch": "main",
+      "frame": "03hal9zdcczzf3z8lr8ezekw3"
+    },
+    {
+      "id": "d04e8cfb-4d1f-4020-ba41-b3b28cfae16e",
+      "ts": "2026-11-24T07:01:13Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: 3 new leads - MongoDB Senior SRE InfraSec (Dublin), Swisscom Fullstack DevOps Trust+Identity (Rotterdam), Schubergphilis data-resilience platform (NL), each stage=lead with a dated next action; plus apps-scout --next-action so a lead lands with it; gate: checks:quick PASS, apps:query readback PASS, 3 ads HTTP 200",
+      "outcome": "done",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "3ed3525f58755be38be1ea18b2547c48ec32c460",
+      "branch": "main",
+      "frame": "03hal9qxfckh8zy3mitd9sq36"
+    },
     {
       "id": "785f8d61-3bef-42cf-b11e-2729f8f30b8a",
       "ts": "2026-11-24T06:59:45Z",
@@ -2643,58 +2699,6 @@
       "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
       "branch": "flake/transitive-dank-qml-common",
       "frame": "03haefuwd8u8ykxpsj90bkfci"
-    },
-    {
-      "id": "00edc39c-02af-44fe-b107-e29224cc402a",
-      "ts": "2026-11-23T10:01:34Z",
-      "source": "devin",
-      "subject": "nixconfig:dev:flake:update-transitive",
-      "action": "landed: transitive flake drift refactor to devin pane 0:1.1; devin accepted task, working...",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
-      "branch": "main",
-      "frame": "03haefoj18t3gzoixcprjq9dq"
-    },
-    {
-      "id": "72ca22ce-b46e-479c-8588-be3b63b40982",
-      "ts": "2026-11-23T09:57:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-23f",
-      "action": "landed: letters authored for the 4 new leads (letter-{denkweit,group24,vesoma,splash}.json) and packets rebuilt with --letter, so each now carries lebenslauf.pdf + anschreiben.pdf | gate: appflow-packet.sh rc=0 x4, both PDFs present and non-empty",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haeextdyhfb3y7j5w80quqc"
-    },
-    {
-      "id": "cd99ac23-e820-47df-bbe4-bff0db6b874f",
-      "ts": "2026-11-23T09:56:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-23f",
-      "action": "landed: PTB submission confirmed by softgarden receipt (req 26-163-9C, 06:31Z) and row moved to applied; 4 new verified leads added with JD documents and built packets (DENKweit Halle, group24 Hamburg, Vesoma Garching, Splash Tech remote-EU) | gate: apps:gate:packet rc=0 x4 + application-get readback OK",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haeen0iz6q1d0stelskzibb"
-    },
-    {
-      "id": "9dfbf675-52c6-4507-868f-5794f1cc13dc",
-      "ts": "2026-11-23T09:35:04Z",
-      "source": "devin",
-      "subject": "nixconfig:comment-audit-route",
-      "action": "landed: 16 files routed via channel banners to owning notes/docs; frieren-ops-history claims infra-stack.nix; audit note re-measured + distilled (0d437915) | gate: checks:quick PASS, agentsNotes.issues clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d437915f201a296da1c07c47d95760d68809024",
-      "branch": "main",
-      "frame": "03haeai746copjgm6g8cfgiar"
     }
   ]
 }

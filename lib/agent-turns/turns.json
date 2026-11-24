@@ -1,8 +1,88 @@
 {
-  "generated": "2026-11-24T11:23:38Z",
+  "generated": "2026-11-24T11:46:04Z",
   "count": 200,
-  "pin": "28d5e2f38c0c0efdaafb83cc3ed60c5867aebae7f1e1a7cf82809ce3e4303738",
+  "pin": "5ee050d145444953c41b22634773f8b89d61f05d103a4920a82e14accb8a06d3",
   "turns": [
+    {
+      "id": "0abd9c11-2043-4a9a-b205-84aeb64bb592",
+      "ts": "2026-11-24T11:40:57Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-publish-docs",
+      "action": "Published: 6 CVs (cv, cv-de, cv-energy, cv-energy-de, cv-software, cv-software-de) into the blog checkout assets/files with download anchors on /cv/ and /cv/ryoku/; blog _site rebuilt. Gate blind spot closed: cv-blog-check now fails on any artifact PDF the checkout does not publish. Docs site deployed: fleet-docs-site n7p6pwlp -> /var/lib/fleet-docs-site/current, served bytes hash-equal over fleet.frieren.lan. Gates: blog:cv:check PASS, docs:links PASS, site:links PASS, uds:docs PASS.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
+      "branch": "main",
+      "frame": "03hamse5oak3hfhgz50nx3fjq"
+    },
+    {
+      "id": "df46d1d8-1423-4cee-bf11-88229b5f5973",
+      "ts": "2026-11-24T11:40:07Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 5 new leads from LinkedIn EU 7-day (Dataiku, Guidewire, Prima, Implicity, Continia; all live 200, fit 3-4). SmartRecruiters gave only ServiceNow (IN/US), WWR nothing new of fit, Remotive still ignores filters. Follow-ups: 21 overdue (DKRZ 27.04, Codesphere 29.04, Pennylane 26.09), 5 due today (Genesis PHCM ack; Münster, SwissPeak, coni+partner blocked; gridscale ready), 38 in 7d.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hams88fkiz7m8bjl3b9m2ja"
+    },
+    {
+      "id": "af688695-fa56-439e-902f-e97c86f8dee2",
+      "ts": "2026-11-24T11:39:59Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: task sent to delphi freebuff pane; released session recovered with Enter, working... verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
+      "branch": "main",
+      "frame": "03hams7anuuzxivd1yrr61i1y"
+    },
+    {
+      "id": "e7eafde9-fe66-477f-af68-e0d18198b7e2",
+      "ts": "2026-11-24T11:39:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-publish-docs",
+      "action": "landed: task sent to freebuff pane; working... verified after second Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
+      "branch": "main",
+      "frame": "03hams78mhm1sz5kjqpexqbz4"
+    },
+    {
+      "id": "6702b9e3-cf23-431c-8f3f-80dabe95e65a",
+      "ts": "2026-11-24T11:39:58Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-leftovers",
+      "action": "landed: task sent to devin pane; leftovers loop started and Thinking verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
+      "branch": "main",
+      "frame": "03hams76npbrzgqkshgcealw4"
+    },
+    {
+      "id": "a821de88-40a8-4334-86df-d5d98f1a6d4a",
+      "ts": "2026-11-24T11:23:49Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-fold",
+      "action": "landed 83df00b1: plates round ported to Go — cmdPlates in tools/os/internal/image reuses runLane's machinery; plates.sh 286->27 lines, DETACH=1 still routes via round; gate accepts unjudgedStreak in plates.go; budget entry removed | gate: checks:image-daily ok, checks:tasks parity, checks:policies clean, DRY=1 E2E on built artifact",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
+      "branch": "main",
+      "frame": "03hamp1q1ywe3euuymaawrego"
+    },
     {
       "id": "eae20d7e-c2ee-466e-b99a-85bac09e5911",
       "ts": "2026-11-24T11:17:43Z",
@@ -2702,86 +2782,6 @@
       "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
       "branch": "main",
       "frame": "03haiuu7j68a1slas40fssyvj"
-    },
-    {
-      "id": "43a96895-e633-488e-8837-dd878c6a96a9",
-      "ts": "2026-11-23T23:35:59Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-market-research",
-      "action": "drove idle delphi freebuff pane 0:2.1 over ssh tunnel via jevdecide research p=0.98 margin=0.97 decisive: task scout DevOps/SRE/Platform/Infrastructure job market for new engineering leads — companies hiring, roles that exist, realistic CV match. Pane confirmed working: 4s counter after Enter.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
-      "branch": "main",
-      "frame": "03haiurvmqy0fjweiy927dwnu"
-    },
-    {
-      "id": "56c7eb86-4f07-4964-aebc-b5772115b65b",
-      "ts": "2026-11-23T23:35:37Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-site-lane",
-      "action": "drove idle freebuff pane 0:1.1 via jevdecide publish p=0.88 margin=0.76 decisive: task publish CV site from HEAD — site:check across matt/bountystash/concept, prove /de/ byte-identical custom vs deployment, rebuild matt-site, publish to matt Pages project, verify every shipped CV PDF linked and live serves built store path. Pane confirmed working: thinking 1s then working 25s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
-      "branch": "main",
-      "frame": "03haiup8dghn3i6v2bepw84h0"
-    },
-    {
-      "id": "24f5188b-e065-4095-8416-d652c866fd1d",
-      "ts": "2026-11-23T23:34:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:hm-leaf-chain-split",
-      "action": "drove idle devin pane 0:0.1 via jevdecide chain-change p=0.88 margin=0.82 decisive: approved phase 1 of hm-features split (data-only: name minimal as feature in roles/home map, convert roles.minimal [user.base user.ai] + leaf lists into hmBaseFeatures/hmAiFeatures data so profiles.ai.enable disables AI without import surface; prove drv-identical delphi+cassini+fern, checks:host+quick green, agents-notes-schema builds, push origin/main). Pane working: Thinking 3s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
-      "branch": "main",
-      "frame": "03haiueugejf0tbkugsw0xdtc"
-    },
-    {
-      "id": "aef79495-c531-463f-a1b0-a8657d33dc1b",
-      "ts": "2026-11-23T23:31:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-market-research",
-      "action": "landed: DE/EU DevOps-SRE-Platform market research at docs/history/2026-11-24-devops-sre-platform-market-de-eu.md, claims sourced+read 2026-11-24. German DevOps ads 17% full remote/58.5% hybrid; published median EUR 80k, remote-first EU 110-200k; NixOS 170 postings/90d US-skewed; stack K8s+Terraform+CI/observability+on-call. gate ops:docs:budget PASS; uncommitted by design (job-search content stays off the public repo).",
-      "outcome": "done",
-      "claims": [
-        "docs/history"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haitv9n1czrma29jcyp838g"
-    },
-    {
-      "id": "e98a6bc3-5425-49ee-ace1-fc5e12396556",
-      "ts": "2026-11-23T23:29:02Z",
-      "source": "codebuff",
-      "subject": "nixconfig:cv-site-lane",
-      "action": "site:check exit 0: matt 35/0, bountystash 47/0, concept 17/0. /de/ byte-identical custom vs deployment abffac65 (200, 29679 B). matt-site rebuilt at HEAD gives same store path qcjkcnkr; live 28/28 byte-equal, no redeploy. /cv/matt-ji-cv.pdf is not a route (404 both) - real CVs at /cv*.pdf. No commit: tree clean, HEAD==origin/main | gate: site:check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
-      "branch": "main",
-      "frame": "03haitez6sch7vshg9phgupct"
-    },
-    {
-      "id": "9273a436-d0a5-4206-bca9-cf28d87829f9",
-      "ts": "2026-11-23T23:28:38Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-pane-drive-2026-11-24T0025",
-      "action": "drove 2 idle freebuff panes via jevdecide: 0:1.1 CV/site publish (publish p=0.91 margin=0.84, decisive, working 44s); 0:2.1 delphi job-market research (research p=0.92 margin=0.89, decisive, working 14s). Pure job-search scouting candidate routed needs_review (task-change 0.41/0.02) so not sent; routed distinct grounded research instead.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4306d171e6b87c39955cbeb009facc0e9745fd43",
-      "branch": "main",
-      "frame": "03haitc4kqnehapuc0dvrtcjr"
     }
   ]
 }

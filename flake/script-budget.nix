@@ -6,7 +6,7 @@
 # new bloated script fails unrecorded. Scope: scripts/, modules/ (minus the
 # secrets submodule), tools/, .agents/skills/ — tests/ are fixture machinery
 # and projects/ are foreign trees.
-{
+rec {
   argueAbove = 100;
   # `tools/*/go.mod` the tree may carry — a new one is an unrecorded CLI, not a
   # port into the OS binary [[flake/policies.nix#tools-go-modules-are-recorded]].
@@ -74,9 +74,6 @@
     "scripts/task/host-paths-check.sh" = 101;
     "scripts/task/host-restore.sh" = 281;
     "scripts/task/hosts-args-check.sh" = 121;
-    "scripts/task/image-daily-lib.sh" = 131;
-    "scripts/task/image-daily-post.sh" = 167;
-    "scripts/task/image-daily-publish.sh" = 179;
     "scripts/task/image-gen.sh" = 138;
     "scripts/task/image-round.sh" = 165;
     "scripts/task/image-ship.sh" = 114;
@@ -155,5 +152,5 @@
     "tools/bin-farm/farm.sh" = 189;
     "tools/turns-runtime/bench.sh" = 182;
   };
-  total = 142;
+  total = builtins.length (builtins.attrNames shells) + builtins.length goModules;
 }

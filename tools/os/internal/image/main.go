@@ -388,7 +388,7 @@ func manifestJSON(root, repo string) []byte {
 
 func Main(args []string) {
 	if len(args) < 1 {
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|publish|post|plates|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
 	}
 	switch args[0] {
 	case "manifest":
@@ -432,6 +432,12 @@ func Main(args []string) {
 		cmdCrop(args[1:])
 	case "deploy":
 		cmdDeploy(args[1:])
+	case "publish":
+		cmdPublish(args[1:])
+	case "post":
+		cmdPost(args[1:])
+	case "plates":
+		cmdPlates(args[1:])
 	case "round":
 		cmdRound(args[1:])
 	case "lanes":
@@ -453,6 +459,6 @@ func Main(args []string) {
 	case "shrink-guard":
 		cmdShrinkGuard(args[1:])
 	default:
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|publish|post|plates|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
 	}
 }

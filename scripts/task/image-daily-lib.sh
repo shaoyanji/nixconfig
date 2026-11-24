@@ -22,9 +22,6 @@ if [ -z "${IMAGES_ROOT:-}" ]; then
     IMAGES_ROOT=$HOME/Pictures/generated
   fi
 fi
-# Words a slug carries for grammar rather than meaning. Tags are derived from the
-# public id, so this list is the only editorial judgement in the manifest.
-TAG_STOP='["the","and","for","new","post","with","its","this","that","them","they","when","where","which","while","your","you","our","not","one","own","out","from","into","than","then","was","were","have","has","had","can","did","get","got","just","like","more","most","about","after","before","how","what","why","all","but","any","two","via","now","yet","also","still","even","only","such","some","been","being","both","each","here","there","these","those","under","very","will","would","should","much","many","other","over","same","part"]'
 LEDGER=$IMAGES_ROOT/ledger.jsonl
 STAGE=$IMAGES_ROOT/.judge
 
@@ -56,61 +53,16 @@ today() { date +%Y-%m-%d; }
 
 epoch() { date -d "$1" +%s 2>/dev/null; }
 
-# --- ledger -----------------------------------------------------------------
+# --- ledger and queue ---------------------------------------------------------
 # One row per generation attempt. The ledger is append-only: a re-roll is a new
-# row, never an edit, so the re-roll rate is readable later.
-
-# record is `image-daily record` in tools/os.
-
-# The last day a brief was accepted at its current revision, empty when it never
-# was. A rewritten prompt is a new revision: the plate the old sentence made must
-# not count as freshness, or a fixed brief keeps its defect for a whole `every`.
-
-# The last day a brief at this revision spent an image, whatever the verdict.
-
-# Images a brief has spent since its last keep, counting only the verdicts that
-# judge the prompt: `unjudged` and `failed` are the judge or the pool falling
-# over, and repeating those would park a brief for somebody else's outage.
-
-# A brief that never earns a keep is parked: it returns after PARK_DAYS with a
-# clean slate, so a prompt the judge refuses costs a few plates a week instead of
-# every slot. Measured 2026-11-10: eight character briefs, never kept, re-rendered
-# twice per slot for weeks — 16 to 20 images a slot, every slot.
+# row, never an edit, so the re-roll rate is readable later. record, last_keep,
+# last_attempt, strikes and is_parked are `image-daily record`/`due`/`parked`
+# internals in tools/os — the why comments moved with the code.
 PARK_AFTER=${PARK_AFTER:-3}
-PARK_DAYS=${PARK_DAYS:-7}
 
-# last_keep/last_attempt/strikes/is_parked are `image-daily due`/`parked` internals in tools/os — one ledger pass per call.
-
-# --- the queue --------------------------------------------------------------
-# TSV: id, lane, size, name, prompt, every, rev, expect — for the briefs that are
-# due today. `expect` is what the plate must show, and it is the only field the
-# judge can hold a name against: a keep verdict says the image answers the prompt,
-# which it does when the prompt was the weak part. It stays last because tab is
-# IFS whitespace and `read` collapses a run of it: an empty `expect` in any other
-# position shifted every field after it.
-
-# due is `image-daily due` in tools/os.
-
-# A character plate needs the character described, not just named. The generator
-# does not know these people, so `Fern, 4k, realistic, neumorphism` is an
-# instruction to draw the word: on 2026-11-10 seven of eight such briefs came back
-# as a fern leaf, a power symbol, a periodic-table tile, a sky, a dashboard, a
-# devil and a settings row, and every one of them was judged `keep` because the
-# judge was holding the same weak prompt. This refuses to spend on one again.
-
-# briefs_guard is `image-daily guard` in tools/os.
-
-# `LANES="wall site"` narrows any subcommand to a subset of the shard order.
-
-# select_lanes is `image-daily lanes` in tools/os; LANES_ORDER lives there as lanesDefault.
-
-# lane_budget/lane_setting are `image-daily budget` and `image-daily setting` in tools/os.
-
-# The pool answers `remaining: "unlimited"` on a lifetime plan, and the real
-# ceiling is then the hourly burst (429), not a day count. Translate it to a
-# number the arithmetic can use; every caller already treats 0 as "stop".
-
-# remaining is `image-daily remaining` in tools/os — same refresh-once retry, same unlimited translation.
+# due, guard, lanes, budget, setting and remaining are `image-daily due|guard|
+# lanes|budget|setting|remaining` in tools/os; LANES_ORDER lives there as
+# lanesDefault, and `LANES="wall site"` narrows a subcommand the same way.
 
 # Where the Go tool lives. A slot's PATH closure already carries it; a hand run
 # resolves it from the checkout with a one-off nix build, the way

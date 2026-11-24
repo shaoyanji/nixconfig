@@ -71,8 +71,10 @@ cmd_gate() {
     { say "gate FAIL: plates loop has no unjudged circuit breaker"; fail=1; }
 
   # Publish safety: the manifest is a union, never a snapshot — the shrink
-  # guard must be on the publish path.
+  # guard must be on the publish path, wherever publish lives: publish.sh on
+  # historical trees, tools/os after the port.
   grep -q 'publish_shrink_guard' "$dir/image-daily-publish.sh" 2>/dev/null ||
+    grep -q 'shrinkGuard' "$gotool/internal/image/briefs.go" 2>/dev/null ||
     { say "gate FAIL: publish has no shrink guard"; fail=1; }
 
   if [ "$fail" -eq 0 ]; then

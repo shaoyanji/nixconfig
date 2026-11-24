@@ -274,19 +274,25 @@ func cmdShrinkGuard(args []string) {
 	root := fs.String("root", os.Getenv("IMAGES_ROOT"), "image tree root")
 	repo := fs.String("repo", os.Getenv("REPO"), "checkout root")
 	_ = fs.Parse(args)
-	if *backup == "" {
+	shrinkGuard(*root, *repo, *backup)
+}
+
+// shrinkGuard is the guard body, callable from cmdPublish without a flag
+// round-trip.
+func shrinkGuard(root, repo, backup string) {
+	if backup == "" {
 		return
 	}
 	now := 0
 	var m struct {
 		Count int `json:"count"`
 	}
-	if data, err := os.ReadFile(*root + "/published/manifest.json"); err == nil {
+	if data, err := os.ReadFile(root + "/published/manifest.json"); err == nil {
 		_ = json.Unmarshal(data, &m)
 		now = m.Count
 	}
 	served := 0
-	if f, err := os.Open(*backup); err == nil {
+	if f, err := os.Open(backup); err == nil {
 		sc := bufio.NewScanner(f)
 		for sc.Scan() {
 			if len(sc.Text()) > 0 {
@@ -298,9 +304,9 @@ func cmdShrinkGuard(args []string) {
 	if now >= served {
 		return
 	}
-	copyFile(*backup, *root+"/published/urls.tsv")
-	indexBody(*root, *repo)
-	_ = os.Remove(*backup)
+	copyFile(backup, root+"/published/urls.tsv")
+	indexBody(root, repo)
+	_ = os.Remove(backup)
 	die("publish refused: this host sees %d asset(s) but %d are being served — publish where IMAGES_ROOT holds the whole bank (frieren: /Volumes/data/pics/generated), or FORCE=1 to shrink on purpose", now, served)
 }
 

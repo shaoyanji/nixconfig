@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 )
 
 // The upload leg's read half: stage_publish copies kept plates into published/
@@ -289,4 +292,228 @@ func shapesPass(root string) {
 			fmt.Fprintf(f, "%s\t%s\n", rel, dim)
 		}
 	}
+}
+
+// --- publish ---------------------------------------------------------------
+
+// mergeServedURLs is merge_served_urls: a manifest is a union, not a
+// snapshot. Publishing from a host that holds a slice of the bank rewrote the
+// served gallery down to that slice — 2026-11-21 on delphi, 597 assets became
+// 144 with every upload intact — and refusing the shrink only turned that
+// into a blocked publish. The served manifest is the prior: a row that is
+// already being served names an asset, and `path` is what makes two rows one.
+// The rows on this host win, so a re-upload's URL replaces the old one; a
+// path only the served manifest knows is carried forward untouched. An
+// unreachable manifest leaves the local rows to publish alone, and
+// shrinkGuard then decides. FORCE=1 skips the merge, because a deliberate
+// purge is the one publish that means to drop assets.
+func mergeServedURLs(root string) {
+	rows := root + "/published/urls.tsv"
+	if os.Getenv("FORCE") == "1" {
+		say("merge: FORCE=1, publishing this host's rows only")
+		return
+	}
+	if v := os.Getenv("MERGE"); v != "" && v != "1" {
+		say("merge: MERGE=0, publishing this host's rows only")
+		return
+	}
+	local, err := os.ReadFile(rows)
+	if err != nil || len(strings.TrimSpace(string(local))) == 0 {
+		return
+	}
+	from := os.Getenv("MERGE_FROM")
+	if from == "" {
+		from = "https://" + getenvDef("PROJECT", "bountystash-assets") + ".pages.dev/manifest.json"
+	}
+	client := &http.Client{Timeout: 25 * time.Second}
+	resp, err := client.Get(from)
+	if err != nil {
+		say("merge: %s answered nothing — publishing this host's rows only", from)
+		return
+	}
+	defer resp.Body.Close()
+	var m struct {
+		Assets []struct {
+			Path  string `json:"path"`
+			URL   string `json:"url"`
+			Bytes int64  `json:"bytes"`
+		} `json:"assets"`
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil || resp.StatusCode != 200 || json.Unmarshal(body, &m) != nil {
+		say("merge: %s is not a manifest — publishing this host's rows only", from)
+		return
+	}
+	have := map[string]bool{}
+	localN := 0
+	for _, line := range strings.Split(strings.TrimRight(string(local), "\n"), "\n") {
+		if f := strings.SplitN(line, "\t", 2); len(f) == 2 {
+			have[f[0]] = true
+			localN++
+		}
+	}
+	var added []string
+	for _, a := range m.Assets {
+		if a.Path != "" && a.URL != "" && !have[a.Path] {
+			added = append(added, fmt.Sprintf("%s\t%s\t%d", a.Path, a.URL, a.Bytes))
+		}
+	}
+	if len(added) > 0 {
+		merged := append(strings.Split(strings.TrimRight(string(local), "\n"), "\n"), added...)
+		sort.Strings(merged) // sort -t$'\t' -k1,1 — rows are path-prefixed
+		if err := os.WriteFile(rows, []byte(strings.Join(merged, "\n")+"\n"), 0644); err != nil {
+			die("merge: cannot write %s: %v", rows, err)
+		}
+	}
+	total := len(strings.Split(strings.TrimSpace(string(mustRead(rows))), "\n"))
+	say("merge: %d local + %d from the served manifest = %d asset(s)", localN, len(added), total)
+}
+
+func mustRead(path string) []byte {
+	b, _ := os.ReadFile(path)
+	return b
+}
+
+// `image-daily publish` — cmd_publish: gate, stage, union-merge the served
+// manifest, upload every restaged file, shrink-guard, deploy. Cloudinary is
+// the asset plane, not a deployed gallery: the delivery URL carries its own
+// resize (`f_auto,q_auto,w_1200`), so a consumer picks the size it needs from
+// one upload and this tree never becomes a website.
+func cmdPublish(args []string) {
+	fs := flag.NewFlagSet("publish", flag.ExitOnError)
+	root := fs.String("root", os.Getenv("IMAGES_ROOT"), "image tree root")
+	repo := fs.String("repo", os.Getenv("REPO"), "checkout root")
+	_ = fs.Parse(args)
+	if *root == "" || *repo == "" {
+		die("publish needs --root and --repo (or IMAGES_ROOT and REPO)")
+	}
+	// The publish gate runs first: a manifest rewrite from a family that lost
+	// a file or a breaker is the mistake it exists to catch (43 generations,
+	// 0 keeps, 2026-11-22–23). GATE=0 skips it for a deliberate one-off repair.
+	if os.Getenv("GATE") != "0" {
+		if err := exec.Command("bash", *repo+"/scripts/task/image-daily-gate.sh").Run(); err != nil {
+			die("publish gate failed — refusing to ship (GATE=0 overrides)")
+		}
+	}
+	// A publish with no local tree is still a publish: the rows are the
+	// manifest and the account completes them. Only an empty manifest beside
+	// no ledger is a publish with nothing to say.
+	rows := *root + "/published/urls.tsv"
+	_, srcErr := os.Stat(*root + "/src")
+	local, lerr := os.ReadFile(rows)
+	hasRows := lerr == nil && len(strings.TrimSpace(string(local))) > 0
+	if srcErr != nil && !hasRows {
+		die("nothing to publish: no %s/src and no rows in %s", *root, rows)
+	}
+	// A publish on a host that does not hold the bank rewrites the manifest
+	// down to the batch it can see: 2026-11-21 on delphi, 556 assets became
+	// 144 with every upload still intact. Remember what was being served
+	// before staging, and refuse to shrink it without FORCE=1.
+	backup := ""
+	if hasRows && os.Getenv("FORCE") != "1" {
+		backup = *root + "/published/.urls.served"
+		copyFile(rows, backup)
+	}
+	shifted, gone := 0, 0
+	for _, lane := range []string{"site", "wall", "blog", "badge"} {
+		if laneSetting(*repo, lane, "publish") != "true" {
+			continue
+		}
+		s, g := stagePublish(*root, lane)
+		shifted += s
+		gone += g
+	}
+	if shifted > 0 || gone > 0 {
+		say("publish: %d keep row(s) already served under another day, %d with no file left", shifted, gone)
+	}
+	mergeServedURLs(*root)
+	adoptCloudinary(*root, *repo)
+	indexBody(*root, *repo)
+	staged := 0
+	_ = filepath.Walk(*root+"/published", func(p string, fi os.FileInfo, err error) error {
+		if err == nil && !fi.IsDir() && (strings.HasSuffix(p, ".png") || strings.HasSuffix(p, ".jpg")) {
+			staged++
+		}
+		return nil
+	})
+	say("%d asset(s) staged", staged)
+	shrinkGuard(*root, *repo, backup)
+	if os.Getenv("DRY") == "1" {
+		say("dry run: not uploading")
+		return
+	}
+
+	// A public id is derived from the path and a kept plate is never
+	// re-rendered, so a path the manifest already carries is already served.
+	// Uploading it again is the difference between a thirty-second round
+	// publish and a ten-minute one. REUPLOAD=1 puts every staged file back
+	// over the wire, which is what a forced re-render of an existing slug
+	// needs.
+	known := map[string]bool{}
+	if os.Getenv("REUPLOAD") != "1" && hasRows {
+		if b, err := os.ReadFile(rows); err == nil {
+			for _, line := range strings.Split(string(b), "\n") {
+				if f := strings.SplitN(line, "\t", 2); len(f) == 2 {
+					known[f[0]] = true
+				}
+			}
+		}
+	}
+	// A publish replaces only the rows it restaged. Truncating the manifest
+	// deletes every asset whose file is not on this host, so a publish from a
+	// machine that does not hold the bank rewrites the frontend down to that
+	// one batch.
+	var restaged []string
+	_ = filepath.Walk(*root+"/published", func(p string, fi os.FileInfo, err error) error {
+		if err == nil && !fi.IsDir() && (strings.HasSuffix(p, ".png") || strings.HasSuffix(p, ".jpg")) {
+			restaged = append(restaged, p)
+		}
+		return nil
+	})
+	sort.Strings(restaged)
+	current, _ := os.ReadFile(rows)
+	var fresh []string
+	restagedRel := map[string]bool{}
+	for _, file := range restaged {
+		rel := strings.TrimPrefix(file, *root+"/published/")
+		restagedRel[rel] = true
+		id := "assets/" + strings.TrimSuffix(rel, filepath.Ext(rel))
+		if strings.HasPrefix(rel, "badge/") {
+			// A badge is addressed by host, not by day: the site map names
+			// `assets/fleet/<host>`, so a re-render replaces the mark in place.
+			id = "assets/fleet/" + strings.TrimSuffix(filepath.Base(rel), filepath.Ext(rel))
+		}
+		// Copy the existing row forward instead of skipping the file silently:
+		// the merge below would otherwise read the file as restaged-but-
+		// unwritten and delete an asset that is still being served.
+		if known[rel] {
+			for _, line := range strings.Split(string(current), "\n") {
+				if strings.HasPrefix(line, rel+"\t") {
+					fresh = append(fresh, line)
+				}
+			}
+			continue
+		}
+		out, err := exec0("bash", *repo+"/scripts/task/cloudinary.sh", "upload", file, "--public-id", id)
+		if err != nil {
+			say("publish: upload failed for %s", rel)
+			os.Exit(1)
+		}
+		url := strings.TrimSpace(out)
+		fi, _ := os.Stat(file)
+		fresh = append(fresh, fmt.Sprintf("%s\t%s\t%d", rel, url, fi.Size()))
+		say("uploaded %s", rel)
+	}
+	for _, line := range strings.Split(string(current), "\n") {
+		if f := strings.SplitN(line, "\t", 2); len(f) == 2 && !restagedRel[f[0]] {
+			fresh = append(fresh, line)
+		}
+	}
+	if err := os.WriteFile(rows, []byte(strings.Join(fresh, "\n")+"\n"), 0644); err != nil {
+		die("publish: cannot write %s: %v", rows, err)
+	}
+	say("%d asset(s) on Cloudinary", len(fresh))
+	indexBody(*root, *repo)
+	shrinkGuard(*root, *repo, backup)
+	cmdDeploy([]string{"--root", *root, "--repo", *repo})
 }

@@ -5442,6 +5442,59 @@
         reason, and this note goes DELIVERED.
       '';
     };
+    job-scout-boards-exhausted-2026-11-24 = {
+      title = "Nine employers sit at lead and the feeds behind them are mined out, so the lane tailors instead of sweeping";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Nine employers, eleven rows, all stage lead after the 164af385, 7b40455e and c9f09993 sweeps: HITS.nrw, Shipzero, Wellis and noris at fit 4, TecTake, Studytube, Projektron, Rheinmetall and CHECK24 at fit 3. Arbeitnow's sixteen pages, the Greenhouse/Lever/Ashby/Personio/Recruitee boards and remotive are mined out; RemoteOK and BA jobsuche only answer 403.";
+      links = [
+        "job-scout-lane-state-2026-11-24"
+        "job-scout-wide-feed-sweep-2026-11-24"
+        "job-scout-daily-feed-sweep-2026-11-24"
+      ];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "taskfiles/apps.yml"
+        ];
+        tasks = ["apps:scout" "apps:query" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Nine employers, eleven rows, all `stage lead` after the three
+        2026-11-24 sweeps — and the feeds behind them are mined out, so the
+        lane's next move is tailoring, not another pass.
+
+        fit 4  HITS.nrw       Düsseldorf  Linux/K8s app ops     2 rows
+        fit 4  Shipzero       Hamburg     AI platform engineer  2 rows
+        fit 4  Wellis         Rotterdam   DevOps/Platform       on-site NL
+        fit 4  noris network  Nürnberg    OpenStack networking  remote DE
+        fit 3  TecTake        Igersheim   senior infrastructure Microsoft
+        fit 3  Studytube      Amsterdam   cloud engineer        on-site NL
+        fit 3  Projektron     Berlin      cloud engineering     German C1
+        fit 3  Rheinmetall    Düsseldorf  Linux and container   OpenShift
+        fit 3  CHECK24        Hamburg     Ansible and Linux     big estate
+
+        Mined out: arbeitnow's sixteen pages (3,761 postings, four untracked
+        hits, all agencies or non-engineering); the Greenhouse, Lever, Ashby,
+        Personio and Recruitee boards by family; remotive's devops feed (15
+        postings, none EU-eligible). Blocked, not exhausted: RemoteOK and BA
+        jobsuche answer 403 from this host, so an empty result is the bot
+        wall. Dead this round: jobicy, Working Nomads, Himalayas, interamt,
+        stellenblatt, devjobs.de (client-rendered), Berlin Startup Jobs RSS,
+        and the plusserver, secunet cloud, Univention, LINBIT, Open-Xchange,
+        Proxmox, Stackable and B1 careers pages.
+
+        So the next lead comes from an employer page or a search on German
+        role phrasing — what surfaced noris, Rheinmetall and CHECK24.
+
+        Drift: HITS.nrw and Shipzero hold two lead rows each, cloudpunks two
+        more — dupes by the one-row-per-employer rule. Exit: all nine applied
+        with a receipt or closed with a reason, dupes merged, note DELIVERED.
+      '';
+    };
     job-scout-next-sweep-freebuff = {
       title = "The next idle freebuff lane task is one more employer-lead sweep";
       kind = "open";

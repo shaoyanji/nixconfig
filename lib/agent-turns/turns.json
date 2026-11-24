@@ -1,8 +1,86 @@
 {
-  "generated": "2026-11-24T19:09:23Z",
+  "generated": "2026-11-24T19:17:44Z",
   "count": 200,
-  "pin": "04c2ccc457e2043897f05f2dd6c77149ebe04557de1db0b2ebcc4b3c196f5acc",
+  "pin": "ad83efc526b7b1cdf7b335d005db73cd4449104514d0c04bb097b1cd0255f4e1",
   "turns": [
+    {
+      "id": "b0574b1f-d6c3-48dc-a276-033f141422fe",
+      "ts": "2026-11-24T19:16:28Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "drove delphi freebuff pane (agents:3.1, ssh): routed note-change via jev-decide (note-change 0.99); pane now thinking on the job-search tracker note update.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
+      "branch": "main",
+      "frame": "03hap9dlhx9kmc9rx8b1clnj9"
+    },
+    {
+      "id": "fc9af0f4-a24b-48bf-83ea-e5a49156f89c",
+      "ts": "2026-11-24T19:16:28Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "drove freebuff pane (agents:2.1): routed note-change via jev-decide (note-change 0.98); pane now working (curl to applications API) on the job-scout sweep-state AGENTS.nix note.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
+      "branch": "main",
+      "frame": "03hap9dje73grpuwvi5pbstsy"
+    },
+    {
+      "id": "34d08a59-27d8-45dc-8231-7c04625da911",
+      "ts": "2026-11-24T19:16:27Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "drove devin pane (agents:1.1): routed gate-change via jev-decide (gate-change 0.96, margin 0.92); pane now Thinking on the checks:nix:style gate regression-proof task, will land its own xs turn.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
+      "branch": "main",
+      "frame": "03hap9dh5dw7vkp03os642coe"
+    },
+    {
+      "id": "505635df-68e1-42c8-8e6c-1ae8b6fa6144",
+      "ts": "2026-11-24T19:10:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correction to 104d1bae: the note now reads 17e95ec1 — the summary and body agree on about a hundred ATS boards, nine Bundesagentur attempts all refused; lead unchanged: STATWORX Cloud Engineer, Frankfurt, lead fit 3 | gate: nix-instantiate --parse PASS + pre-commit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap84euxsjcl8bp5zalnnpp"
+    },
+    {
+      "id": "a55fbd6c-2211-4eed-b52a-750a3ff2d2ca",
+      "ts": "2026-11-24T19:09:44Z",
+      "source": "devji",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: checks:nix:style gate — per-file builtins/lib alias mixing now fails in checks:quick; tree unified to match (epistemics/policies->builtins, nix-files join collapse) | gate: checks:quick PASS incl. fail-injection proof",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
+      "branch": "main",
+      "frame": "03hap8276d0qvhxa2892bknmd"
+    },
+    {
+      "id": "3bd59244-0b8e-4eb2-9758-b5c1cfd6d8f6",
+      "ts": "2026-11-24T19:09:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correction to d6e43a1b: the sweep note now reads 104d1bae — instrument counts fixed (about a hundred ATS boards, nine Bundesagentur attempts all refused), the lead is unchanged: STATWORX Cloud Engineer, Frankfurt, lead fit 3 | gate: nix-instantiate --parse PASS + pre-commit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "104d1bae0c7f64dd4416a5bcbad1a97195ff7cbf",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap80s4n8tcyxj24ftntb6g"
+    },
     {
       "id": "17613d32-dd17-4e42-9b81-17ab5bec8d1b",
       "ts": "2026-11-24T19:09:02Z",
@@ -2637,90 +2715,6 @@
       "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
       "branch": "main",
       "frame": "03ham2j6j9np6p4sihe6bj2qy"
-    },
-    {
-      "id": "f35abeda-2d78-4bea-a278-29d168779da1",
-      "ts": "2026-11-24T09:28:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:agents:2.1",
-      "action": "landed: drove idle freebuff CV/site pane agents:2.1; Jev selected research (0.92/0.87); job-scout DevOps/SRE/Platform/Infra employer-lead task submitted; pane shows working... (31s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham2j5i1w7cqjyopbi6iugn"
-    },
-    {
-      "id": "de830ce1-aff2-4abb-9e7a-06683978ae40",
-      "ts": "2026-11-24T09:21:41Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-split",
-      "action": "landed: frieren profiles.boot dedup + base-node sops-nix dedup — audit corrected the queued triple: frieren's base-node/desktop-client are load-bearing (desktop.nix is specialisation-only), only boot was a real duplicate; earlier 'done' turn named a hash from a commit the deadnix hook refused, real commit is aa0535f2 | gate: checks:host frieren PASS, drv-equality 30/30 identical",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham16tmwuqw4mmwjzlzwcjv"
-    },
-    {
-      "id": "c499130d-d944-4e5d-97a9-205261c6787b",
-      "ts": "2026-11-24T09:17:02Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove idle agents:1.1 devin/nixconfig duplicate-import cleanup and agents:2.1 freebuff CV-site task-change scouting; both panes accepted task and show Thinking/working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03ham0a0gwd7fbdts7q1xe2fa"
-    },
-    {
-      "id": "d7d90a89-34de-4e92-9891-ea5fbbad7435",
-      "ts": "2026-11-24T09:14:15Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "queued: next lane task is one more DevOps/SRE/Platform/Infrastructure sweep on the idle freebuff pane, prep-only to 2026-12-07. Recorded as AGENTS.nix note job-scout-next-sweep-freebuff (OPEN P3, refs apps:scout/search, taskfiles/apps.yml); no memo task in a shard. Gate: agentsNotes.issues [] + nix-fmt/deadnix clean on AGENTS.nix; checks:quick red on pre-existing unused inputs in staged base-node.nix. Uncommitted.",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halzqmge8ryj5nn59al8263"
-    },
-    {
-      "id": "42580dc5-cb98-4efc-a8e6-514e00b92f6a",
-      "ts": "2026-11-24T09:09:12Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "landed: DACH round — 3 new leads (XITASO Karlsruhe DevOps/Cloud, R+V Wiesbaden Linux platform, Bundesnotarkammer PKI/Berlin), Schwarz Digits refused (STACKIT already applied); 2 letter drafts, 0 sends; intl boards gave no new EU-eligible employer; DACH packet reqs re-checked live | gate: apps:dupes [] PASS",
-      "outcome": "done",
-      "claims": [
-        "~/.config/appflow"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halyqz3l1v4s89k2dz8gl85"
-    },
-    {
-      "id": "50feccd0-0a17-47ec-a2de-7f50b5b37bcf",
-      "ts": "2026-11-24T09:03:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: ranked the 5 prep packets (netcup 1, Eficode 2, mogenius 3, KHS 4, Advantest 5) and wrote the rank into each row's next_action; all stay stage lead, hold 2026-12-07, nothing sent. Reqs live: 4/5 answer 200, jobware 403 is a bot wall not a dead ad. Ranking filed in followups 2026-11-24-scout-devops-de.md. Repo untouched.",
-      "outcome": "done",
-      "claims": [
-        ".local/state/appflow/followups"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halxpdq71a4ffre8th8k63t"
     }
   ]
 }

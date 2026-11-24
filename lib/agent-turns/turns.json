@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-24T21:42:08Z",
+  "generated": "2026-11-24T21:43:51Z",
   "count": 200,
-  "pin": "c955795de17e65c7aad94e1a4d8f1b24c1cc076783c83fd64b3bee60875840dd",
+  "pin": "d754a7b1a8a0d043f5689c9a855d1a06b4f27fa491d0b0c6f36e6b7825b3083d",
   "turns": [
+    {
+      "id": "d333e6bc-edc2-4a45-97ce-2c6b3e4f6d2e",
+      "ts": "2026-11-24T21:43:41Z",
+      "source": "delphi-steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "drove idle delphi freebuff (agents:3.1, ssh) -> research_companies (jev: first pass needs_review research 0.44/margin0.08 -> duel research_companies 0.96 vs scout_more_leads 0.04 margin0.92 selected). Task: verify live status, hiring contact, ATS route and must-have skills for 6 leads (OpenNebula, DeepJudge, SysElektra, Swissquote, Julius Baer, vCluster Labs). Confirmed working... 13s with live web searches.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "92cb2696ece4af363067ff2f1d24270f4e452f94",
+      "branch": "main",
+      "frame": "03haq24vftfl4prenhnnmvgyw"
+    },
+    {
+      "id": "6bdb5eab-021d-4388-9592-9931dd2d6daf",
+      "ts": "2026-11-24T21:42:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: dispatch pass — 41 packets carry To/subject/exact body (5 addressed, 36 portal-only), 123 blocked (122 missing CV, 1 letter); 0 rows marked sent, hold to 2026-12-07 | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "92cb2696ece4af363067ff2f1d24270f4e452f94",
+      "branch": "main",
+      "frame": "03haq1xfzuf4jbvzqvj6r4jby"
+    },
     {
       "id": "7e3880e9-4a59-4ee2-9332-38a8ffd4f564",
       "ts": "2026-11-24T21:38:01Z",
@@ -2657,32 +2683,6 @@
       "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
       "branch": "main",
       "frame": "03hami7zpx7alq98t9od1rm64"
-    },
-    {
-      "id": "70c1fe69-5fc2-4765-a174-c036e21b8eb8",
-      "ts": "2026-11-24T10:48:53Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "re-driven: freebuff (agents:2) idle. jev-decide first pass needs_review (cv_tailor_fresh p=0.78, margin 0.63 decisive >= 0.3): tailor CV for 4 leads from job-scout-fresh. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
-      "branch": "main",
-      "frame": "03hami7ye2nde255zkzcd5ess"
-    },
-    {
-      "id": "bae34df2-80fb-4a00-936e-574593cc9b40",
-      "ts": "2026-11-24T10:47:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-sweep2",
-      "action": "VISPIRON 5, SPECTRUM 4, Livello 4, NDI 3, +1 all carry board/ATS URLs (arbeitnow, ashby, greenhouse, dvinci, HN) and no recruiter_email; only 58 of 1038 rows have one. No packet fabricated and 0 sent rather than inventing an address. Unblock: resolve one application address per employer. Coverage 61->71 of 255 meanwhile.",
-      "outcome": "blocked: none of the five swept leads carries a mail route",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
-      "branch": "main",
-      "frame": "03hami10vditune9658ed469u"
     }
   ]
 }

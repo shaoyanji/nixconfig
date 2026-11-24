@@ -12,15 +12,18 @@ import (
 	"path/filepath"
 
 	"nixconfig/os/internal/image"
+	"nixconfig/os/internal/serve"
 )
 
 var domains = map[string]func([]string){
-	"image":       image.Main,
-	"image-daily": image.Main, // argv[0] alias installed by .#cli.image.daily
+	"image":        image.Main,
+	"image-daily":  image.Main, // argv[0] alias installed by .#cli.image.daily
+	"serve":        serve.Main,
+	"static-serve": serve.Main, // argv[0] alias installed by .#cli.serve.static-serve
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: os <domain> <verb> [flags]  (domains: image)")
+	fmt.Fprintln(os.Stderr, "usage: os <domain> <verb> [flags]  (domains: image, serve)")
 	os.Exit(2)
 }
 

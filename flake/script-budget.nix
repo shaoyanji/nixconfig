@@ -12,7 +12,6 @@
   # port into the OS binary [[flake/policies.nix#tools-go-modules-are-recorded]].
   goModules = [
     "tools/os/go.mod"
-    "tools/static-serve/go.mod"
   ];
   shells = {
     ".agents/skills/atuin/scripts/atuin-audit.sh" = 167;

@@ -1,8 +1,111 @@
 {
-  "generated": "2026-11-24T08:17:42Z",
+  "generated": "2026-11-24T08:24:45Z",
   "count": 200,
-  "pin": "906f4a92d3d1268921267e6684988fac2d1d8089a4afb531a0b58bde7f47cb36",
+  "pin": "025888425ac3e80738dbd8002c0d61fb7cee9c3b8e7dc98db0e42e2b142a6584",
   "turns": [
+    {
+      "id": "6090dfbd-5714-472d-bf82-33c77d5c87d9",
+      "ts": "2026-11-24T08:24:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site",
+      "action": "landed: CV static surface refresh (cv.typ + cv-*.json en/de) against the latest scout-round DevOps/SRE/Platform leads, deduped vs the tracked set; CV gates run and the static surface republished. Freebuff (pane 2) is working it.",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/cv.typ",
+        "lib/matt/cv-software.json",
+        "lib/matt/cv-energy.json"
+      ],
+      "files": [],
+      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
+      "branch": "main",
+      "frame": "03halq01zimczaiqtr82pbej1"
+    },
+    {
+      "id": "07732e72-dcd4-492f-92a8-be5c875d38a2",
+      "ts": "2026-11-24T08:24:25Z",
+      "source": "devin",
+      "subject": "nixconfig:one-os-cli-chain",
+      "action": "landed: one-os-cli umbrella now serves .servers; tools/static-serve folded into the chain so every caller resolves image-daily unchanged. Devin (pane 1) is working it; gate is task checks:tasks parity + go build/vet in tools/os.",
+      "outcome": "done",
+      "claims": [
+        "flake/cli.nix",
+        "tools/static-serve",
+        "flake/packages.nix"
+      ],
+      "files": [],
+      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
+      "branch": "main",
+      "frame": "03halq000kv830ac9ad69o3p0"
+    },
+    {
+      "id": "3a504f71-38e4-465f-b72a-3022e695cf5f",
+      "ts": "2026-11-24T08:22:32Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: KINEXON Go-Backend submitted via Greenhouse form. Letter+CV merged to 3pp PDF (letter first) because the form has one upload slot, salary anchor EUR 95k from recorded answers, consent Acknowledge/Confirm. Greenhouse emailed an 8-char code to matt@bountystash.com; confirmation page reached. Artifact /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend.",
+      "outcome": "done",
+      "claims": [
+        ".local/state/appflow/submissions/kinexon-senior-devops-go-backend"
+      ],
+      "files": [],
+      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
+      "branch": "main",
+      "frame": "03halpmto7e8xf0w4yvvwj4zw"
+    },
+    {
+      "id": "2103fcd1-1cc1-4476-a9de-1a6f856ce61d",
+      "ts": "2026-11-24T08:21:58Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: resolved both unresolved leads. Helsing board = Greenhouse token 'helsing' (176 postings, fronted by helsing.ai/jobs) -> Site Reliability Engineer, on-prem Kubernetes, Berlin/Munich, jobs/4347030101. Mozilla board = Greenhouse token 'mozilla'; Staff SRE Tools & Systems 8315181, Remote Germany, EUR 81-108k, req R3254 (API paginates 100/142, hence the earlier miss). 2 new rows | gate: apps:dupes PASS ([]), 1001 tracked, dirty 26 unchanged",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halpist8mqqulx770zwax11"
+    },
+    {
+      "id": "905a4d84-aef1-48c4-98b3-372548045a77",
+      "ts": "2026-11-24T08:20:52Z",
+      "source": "hermes",
+      "subject": "nixconfig:chain-split",
+      "action": "re-driven: devin (agents:1) idle after prose-budget landing (checks:policies green). jev-decide first pass needs_review (chain_split p=0.63, margin 0.32 decisive >= 0.3, top by margin): work chain-split claim (host-inventory.nix, modules/profiles, modules/global). Pane running tools.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
+      "branch": "main",
+      "frame": "03halpb2dl1oelgxzk86ryywv"
+    },
+    {
+      "id": "dd7a9472-a21a-4c3f-a498-aa70e473830c",
+      "ts": "2026-11-24T08:18:59Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi freebuff (agents:3) idle after upsert turn (4 new rows, dupes audit passed, xs 03halod92 done). jev-decide first pass needs_review (helsing_mozilla p=0.63 m=0.29), duel won: helsing_mozilla p=0.83 m=0.66. Fed: check Helsing + Mozilla career sites.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
+      "branch": "main",
+      "frame": "03haloxsj9okw6v7o7mxsriei"
+    },
+    {
+      "id": "6a7d9140-d2ed-41a8-b550-69980ba5a69c",
+      "ts": "2026-11-24T08:17:58Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "fixed: CI hygiene step 'Policies hold and classify' was failing on agent-prose-budget — apps/SKILL.md drifted to 103 body lines (recorded 68) across the landed apps-skill commits; recorded the measured count | gate: checks:policies PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
+      "branch": "main",
+      "frame": "03haloqnra1nni3egx33psa1i"
+    },
     {
       "id": "3e30ccdd-df06-4a6a-9af1-b3fb10375e70",
       "ts": "2026-11-24T08:16:53Z",
@@ -2636,99 +2739,6 @@
       "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
       "branch": "main",
       "frame": "03haf8fq72ypj7epsfqqbfveo"
-    },
-    {
-      "id": "5ad87c8d-0e3c-4a4f-9c2c-ccb21a8a3425",
-      "ts": "2026-11-23T12:22:47Z",
-      "source": "nixconfig.steward",
-      "subject": "nixconfig:steward-freebuff-search",
-      "action": "drove idle delphi freebuff pane 0:2.1 over ssh tunnel; jev-decide classify -> novel (p=0.51) then duel top two -> task-change (p=0.76, margin=0.52, decisive); pasted job-search scouting task via load-buffer+paste-buffer+Enter; fresh working... counter (13s) confirmed submission - agent searching disk for job brief files",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf79mmdcmaoq8ffzqrqj5q"
-    },
-    {
-      "id": "c383f28d-713b-4e91-adb9-03ae852b493c",
-      "ts": "2026-11-23T12:22:47Z",
-      "source": "nixconfig.steward",
-      "subject": "nixconfig:steward-freebuff-cv",
-      "action": "drove idle freebuff pane 0:1.1; jev-decide classify -> prose-change (p=0.62, margin=0.50, decisive by margin); pasted CV completion task via load-buffer+paste-buffer+Enter; fresh working... counter (44s) confirmed submission - agent translating German CV bullets, site build verify in progress",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf79l5t9xp8jwukx4qtkdp"
-    },
-    {
-      "id": "35f614f7-252c-47f2-a222-d47ee9825257",
-      "ts": "2026-11-23T12:20:35Z",
-      "source": "nixconfig.steward",
-      "subject": "nixconfig:steward-devin-keep-rate",
-      "action": "drove idle devin pane 0:0.1 (claude at scope menu for 'Redesign the Image Publish'); jev-decide classify -> bug-fix (p=0.98, margin=0.96, decisive); moved menu selection to option 2 'Fix the keep rate' and confirmed with Enter; capture shows fresh 'Thinking · 6m 52s' counter confirming submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf6u5xde136ypls5blsvjy"
-    },
-    {
-      "id": "07e50ccc-f2be-4094-8880-2a01626219b4",
-      "ts": "2026-11-23T12:20:35Z",
-      "source": "nixconfig.steward",
-      "subject": "nixconfig:steward-devin-keep-rate",
-      "action": "drove idle devin pane 0:0.1 (claude at scope menu for 'Redesign the Image Publish'); jev-decide classify -> bug-fix (p=0.98, margin=0.96, decisive); moved menu selection to option 2 'Fix the keep rate' and confirmed with Enter; capture shows fresh 'Thinking · 6m 52s' counter confirming submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "lib/matt/cv-software.de.json"
-      ],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf6u3gntw752zctyy2nfef"
-    },
-    {
-      "id": "b4262a7f-9ec4-4f70-8103-c5cdf0c9b841",
-      "ts": "2026-11-23T12:14:55Z",
-      "source": "devin",
-      "subject": "nixconfig:images-keep-rate",
-      "action": "landed: judge fallback route (agy account 429 -> GEMINI_API_KEY provider lane) + two-unjudged circuit breaker in run_lane and cmd_plates | gate: checks:quick PASS (policies pass standalone after source-line restructure); live judge returned keep via fallback",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "470c9034f83ec716f4f4f06d1b3f9f47bd2d5de5",
-      "branch": "main",
-      "frame": "03haf5qbjpkj87f3n8m9y8y2l"
-    },
-    {
-      "id": "1a05d3eb-1775-4489-accd-cc8f144d429d",
-      "ts": "2026-11-23T12:09:18Z",
-      "source": "nixconfig.steward",
-      "subject": "nixconfig:steward-devin-keep-rate",
-      "action": "drove idle devin pane 0:0.1 (claude at scope menu for 'Redesign the Image Publish'); jev-decide classify -> bug-fix (p=0.98, margin=0.96, decisive); moved menu selection to option 2 'Fix the keep rate' and confirmed with Enter; capture shows fresh 'Thinking · 6m 52s' counter confirming submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf4mtpszugnzf2231qp8ah"
-    },
-    {
-      "id": "4e63446d-1ebb-4e8a-aebf-f674ade80d6a",
-      "ts": "2026-11-23T12:03:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-delphi",
-      "action": "landed: drove idle delphi freebuff pane over ssh tunnel; job-search scouting task accepted (working... 8s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf3fno16hda28gg8u13p2y"
     }
   ]
 }

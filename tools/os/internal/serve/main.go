@@ -1,4 +1,5 @@
-// Command static-serve serves a directory over HTTP.
+// Package serve serves a directory over HTTP — the static-serve tool, folded
+// into the one-os-cli umbrella (tools/os).
 //
 // It replaces `python3 -m http.server` in the preview commands. Go's
 // http.FileServer answers Range, HEAD and conditional requests, so a <video>
@@ -8,7 +9,7 @@
 // Stdlib only. An ephemeral port is legitimate (`-addr 127.0.0.1:0`): the
 // bound address is printed before serving, so a caller polls one line instead
 // of probing for a free port and racing every other process to it.
-package main
+package serve
 
 import (
 	"context"
@@ -84,11 +85,14 @@ func newHandler(root string, quiet bool) http.Handler {
 	return logRequests(http.FileServer(http.Dir(root)), quiet)
 }
 
-func main() {
-	dir := flag.String("dir", ".", "directory to serve")
-	addr := flag.String("addr", "127.0.0.1:8000", "host:port to bind; port 0 picks a free port")
-	quiet := flag.Bool("quiet", false, "do not log requests")
-	flag.Parse()
+// Main runs the server; the umbrella reaches it as `os serve` or via the
+// `static-serve` argv[0] alias that .#cli.serve.static-serve installs.
+func Main(args []string) {
+	fs := flag.NewFlagSet("static-serve", flag.ExitOnError)
+	dir := fs.String("dir", ".", "directory to serve")
+	addr := fs.String("addr", "127.0.0.1:8000", "host:port to bind; port 0 picks a free port")
+	quiet := fs.Bool("quiet", false, "do not log requests")
+	_ = fs.Parse(args)
 
 	root, err := filepath.Abs(*dir)
 	if err != nil {

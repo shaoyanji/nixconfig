@@ -177,6 +177,9 @@ in
 
     servers = {
       inherit (pkgs) simplex-chat smp-server;
+      # The umbrella serves this namespace too: the same tools/os derivation
+      # .#cli.serve.static-serve builds, argv[0] name included.
+      static-serve = cli.packages.serve.static-serve;
     };
 
     cli = cli.packages;

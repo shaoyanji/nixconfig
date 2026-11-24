@@ -1281,10 +1281,10 @@
     one-os-cli = {
       title = "One CLI of the operating system, not a go.mod per domain";
       kind = "proposal";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       priority = "P2";
       date = "2026-11-24";
-      summary = "The shell burn-down must not end in a tools/ sprawl of one module per domain. Ports land as internal/<domain> packages inside a single Go binary — a CLI of the operating system — while .#cli.<family>.<tool> and the task names stay the contract callers see. The ledger and the tools/os umbrella with the image fold-in are landed; static-serve's fold waits on .#servers.";
+      summary = "The shell burn-down must not end in a tools/ sprawl of one module per domain. Ports land as internal/<domain> packages inside a single Go binary — a CLI of the operating system — while .#cli.<family>.<tool> and the task names stay the contract callers see. The ledger, the tools/os umbrella (internal/image + internal/serve) and the .#servers.static-serve surface are landed.";
       from = ["shell-script-budget" "jobby-cli-consolidation"];
       links = ["p4-taskfiles-to-evals" "agent-tools-called-not-declared"];
       refs = {
@@ -1317,9 +1317,8 @@
 
         **Landed** `tools-go-modules-are-recorded` (a new `tools/*/go.mod`
         fails unrecorded) and the `tools/os` umbrella: `internal/image`,
-        `bin/image-daily` alias, gate greps both tool locations.
-        **Missing** the static-serve fold — its module stays until the
-        umbrella serves `.#servers`.
+        `internal/serve`, `bin/image-daily` and `bin/static-serve` argv[0]
+        aliases, `.#servers.static-serve` served by the same derivation.
 
         Exit: one go.mod under `tools/` serves the task surface — a second
         module fails the policies gate; the ledger keeps shrinking.

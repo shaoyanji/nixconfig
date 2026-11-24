@@ -243,14 +243,23 @@
     # The preview server every `site-target.sh preview` and the kg-canvas gate
     # run: Go stdlib, so it answers Range (a video can be seeked) and needs no
     # interpreter. It replaced `python3 -m http.server`, which ignores Range.
+    # Folded into the os umbrella (tools/os, internal/serve) — `bin/static-serve`
+    # is the argv[0] alias, so both callers resolve unchanged; the same
+    # derivation also backs `packages.<system>.servers.static-serve`.
     serve = {
-      static-serve.pkg = pkgs.buildGoModule {
-        pname = "static-serve";
-        version = "0.1.0";
-        src = ../tools/static-serve;
-        vendorHash = null;
-        env.CGO_ENABLED = 0;
-        meta.description = "Static file server with Range support (Go stdlib, no dependencies)";
+      static-serve = {
+        bin = "static-serve";
+        pkg = pkgs.buildGoModule {
+          pname = "static-serve";
+          version = "0.1.0";
+          src = ../tools/os;
+          vendorHash = null;
+          env.CGO_ENABLED = 0;
+          postInstall = ''
+            ln -s $out/bin/os $out/bin/static-serve
+          '';
+          meta.description = "static file server with Range support on the os umbrella binary (Go stdlib, no dependencies)";
+        };
       };
     };
   };

@@ -47,7 +47,7 @@
 
   sum = xs: xs |> builtins.foldl' (a: b: a + b) 0;
 
-  hexInt = hex: "v = 0x${hex}" |> builtins.fromTOML |> (t: t.v);
+  hexInt = hex: "v = 0x${hex}" |> builtins.fromTOML |> builtins.getAttr "v";
 
   hashInt = {
     algorithm ? "sha256",

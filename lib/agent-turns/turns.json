@@ -1,8 +1,104 @@
 {
-  "generated": "2026-11-24T12:02:56Z",
+  "generated": "2026-11-24T12:10:37Z",
   "count": 200,
-  "pin": "7eb93ceac19220e946d6e5f8404567b183312c55ffcc867754d5db1a2321dc07",
+  "pin": "550f7eb6a6a9c22f13d515efdcfb56e515b553a372cabf276d2801dcaf5c0d42",
   "turns": [
+    {
+      "id": "18e5a056-f1d0-47ee-abea-c00be9016f5c",
+      "ts": "2026-11-24T12:07:14Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "fix: apps:dupes was red on a SumUp double row (sumup + discovered-sumup); closed the redundant one as duplicate, dupes back to []. Also reverted one over-eager today-mark (coni-partner duplicate row). Today's 5 ACTION rows stand: Genesis PHCM, Münster, SwissPeak, coni+partner lead, gridscale.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "d64803ef387e45a4e9101514ccd6906d5af82ed1",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamxj0jb0escwev7rrmje7g"
+    },
+    {
+      "id": "7dbc39f7-e7ef-4d9f-99d9-3fb1caab9dda",
+      "ts": "2026-11-24T12:06:20Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: fresh EU scout — boards mostly returned tracked employers; filed 5 genuinely new (eBay Cloud SRE Dublin, Miniclip Lisbon, Nordea Helsinki, ORTEC Bucharest, Mammoet NL; fit 3-4, hold 07.12). Note job-scout-fresh-eu-boards-2026-11-24 names DeepL prep as next packet. Marked 5 rows ACTION TODAY: Genesis PHCM, Münster, SwissPeak, coni+partner, gridscale.",
+      "outcome": "done",
+      "claims": [
+        "apps",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d64803ef387e45a4e9101514ccd6906d5af82ed1",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamxclskfk5xnyn4zolvfv5"
+    },
+    {
+      "id": "9dea1532-eb57-452b-814f-5ccb8809496d",
+      "ts": "2026-11-24T12:06:02Z",
+      "source": "hermes",
+      "subject": "nixconfig:code-review-loop",
+      "action": "re-driven: devin (agents:1) idle after review_loop completed. jev-decide selected review_loop p=0.99 margin=0.98: code-review loop over lib/*.nix pipe-operator code. Pane Thinking.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c61483fec6d7ae35eba296e41de3d260268f0a52",
+      "branch": "main",
+      "frame": "03hamxajdyjjffcbwiex4xitk"
+    },
+    {
+      "id": "389c0579-f2fb-4c8c-9867-c4f3ce94b735",
+      "ts": "2026-11-24T12:04:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "tailored 2 of 4 (02:54 sweep): Flink Platform Eng Berlin (14/32) + Pentland Firth Sr Cloud Platform Munich (9/32) — packets carry CV + letter PDFs. Sent: 0. Pentland has an addressed draft to jobs@pentlandfirth.com in Drafts awaiting a human send; Flink is form-only, no mailbox. Maesn/Atlas skipped (backend req / DE C1). Recorded in note apps-lane-has-no-send-task.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c61483fec6d7ae35eba296e41de3d260268f0a52",
+      "branch": "main",
+      "frame": "03hamwz6hsy9siexv0mqwlu3f"
+    },
+    {
+      "id": "88f2e520-b703-4f68-a4f2-b68569577f47",
+      "ts": "2026-11-24T12:03:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-delphi",
+      "action": "landed: drove idle delphi freebuff agents:3.1 over ssh tunnel; Jev duel selected task-change p=0.83 m=0.66; pasted fresh-lead-scout task-change; working... verified (4s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c61483fec6d7ae35eba296e41de3d260268f0a52",
+      "branch": "main",
+      "frame": "03hamwr63gcd3n20ktxhxsh18"
+    },
+    {
+      "id": "e1ea1fd3-5b7f-4bbd-8307-ec1319bdba9b",
+      "ts": "2026-11-24T12:03:16Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff",
+      "action": "landed: drove idle freebuff agents:2.1; Jev classify needs_review with decisive margin 0.69 -> decision; pasted blocked job-scout-fresh decision task; working... verified (4s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c61483fec6d7ae35eba296e41de3d260268f0a52",
+      "branch": "main",
+      "frame": "03hamwr3xzg3wd3vphutf70cv"
+    },
+    {
+      "id": "0b45be3a-4f28-4443-a350-006e3bcc83ae",
+      "ts": "2026-11-24T12:03:12Z",
+      "source": "devin",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: closed the elemAt flip-lambda queue — closure-graph.nix+gemini-portal.nix gained per-file 'at = i: xs: elemAt xs i' helpers (12 sites), singletons took direct calls (knowledge-graph, pkg-list, skills) or lib.last (quotient-hash); zero flips remain, note lib-pipe-elemat-lambdas DELIVERED | gate: drv-equality 30/30, checks:quotient-hash ok, gemini-portal standalone build+page proof, .#agentsNotes.issues=[], checks:tasks parity",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c61483fec6d7ae35eba296e41de3d260268f0a52",
+      "branch": "main",
+      "frame": "03hamwqlrc9au1szx288qf2wd"
+    },
     {
       "id": "aaf655d3-b2f1-4e74-a3cf-d6ac3a369da7",
       "ts": "2026-11-24T12:02:50Z",
@@ -2701,97 +2797,6 @@
       "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
       "branch": "main",
       "frame": "03haj5mecfs8mpii8p4qqboxk"
-    },
-    {
-      "id": "8f1af7a8-cfb7-4532-9b2d-5c556d19deda",
-      "ts": "2026-11-24T00:28:34Z",
-      "source": "codebuff",
-      "subject": "nixconfig:freebuff-job-search",
-      "action": "submission attempt on the 5 packets: all 5 blocked, nothing sent. bern = Recruitee form fully filled (name, email, phone +49, CV, Anschreiben, GDPR consent) but Send is covered by hCaptcha; zurich = same ATS, needs Swiss German level + fixed-term openness, answers not in corpus; coni = arbeitnow form has one CV slot, JOIN needs email+reCAPTCHA; proxify x2 = career.proxify.io behind Cloudflare Turnstile + account flow. Next actions recorded per row",
-      "outcome": "blocked: human verification (hCaptcha/Turnstile/reCAPTCHA) and two subjective questions no source answers",
-      "claims": [],
-      "files": [],
-      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
-      "branch": "main",
-      "frame": "03haj51pmijh3zxvrodqn5805"
-    },
-    {
-      "id": "a3c1d9cc-b13e-4293-8e72-5c18aa784e97",
-      "ts": "2026-11-24T00:24:30Z",
-      "source": "devin",
-      "subject": "nixconfig:hm-leaf-chain-split",
-      "action": "landed: containers name floor leaf-by-leaf (user.base+shell+user.ai.skills); user.ai gone from container HM, profiles.ai disable+hmAi plumbing removed; guckloch's dead antigravity-cli import dropped (drv-diff caught its or-true activation). | gate: drv-equality 30/30 identical, checks:host delphi/guckloch/cassini/fern PASS, checks:quick PASS, nix:lint 331 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
-      "branch": "main",
-      "frame": "03haj4936h9xrki2ndr8falqj"
-    },
-    {
-      "id": "3cc7a74a-074d-48fb-aa21-9b0d2ac30248",
-      "ts": "2026-11-24T00:23:30Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:delphi-submit-packets",
-      "action": "drove idle delphi freebuff pane 0:2.1 (ssh tunnel) via jevdecide duel: submit-ready-packets beat scout-new-leads p=1.0 margin=1.0 (first pass needs_review 0.54/0.29); pasted task to submit the built packets starting with the Almetra packet (CV 2pp + letter 1pp); pane accepted, fresh 'working... 41s' counter confirms start",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7dd9e579e782ea303ef2fe37421baf8869d27001",
-      "branch": "main",
-      "frame": "03haj421dx253zqaa822rmftn"
-    },
-    {
-      "id": "3d12c4d4-d19b-4c93-a1ae-1fddca5a851b",
-      "ts": "2026-11-24T00:23:25Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:freebuff-submit-packets",
-      "action": "drove idle freebuff pane 0:1.1 via jevdecide submit-ready-packets p=1.0 margin=1.0: pasted task to submit the 5 built packets (coni+partner DevOps Bank, SwissPeak Cloud/Platform + Senior Infra, Proxify Azure + GCP) via load-buffer+paste-buffer+Enter; pane accepted, fresh 'working... 17s' counter confirms start",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7dd9e579e782ea303ef2fe37421baf8869d27001",
-      "branch": "main",
-      "frame": "03haj41gnfcshrcda0izuwjtm"
-    },
-    {
-      "id": "0edb4998-8b08-4134-b49d-2403aeb56a9c",
-      "ts": "2026-11-24T00:15:03Z",
-      "source": "codebuff",
-      "subject": "nixconfig:freebuff-job-search",
-      "action": "built 5 packets for the scout leads (coni+partner DevOps Bank, SwissPeak Cloud/Platform + Senior Infra, Proxify Azure + GCP); each is a nix store path with anschreiben.pdf + lebenslauf.pdf + selection.json, symlinked under ~/.local/state/appflow/submissions/<id>; letters honest about gaps; rows still language=en so Swiss packets built with --language de; nothing submitted | gate: pdfinfo 1 page each + pdftotext shows matching letter language and CV headings",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7dd9e579e782ea303ef2fe37421baf8869d27001",
-      "branch": "main",
-      "frame": "03haj2enrlzqhs9uita8x8f0x"
-    },
-    {
-      "id": "dd24c7ae-fc51-4ebd-80f9-2d1d80969fd8",
-      "ts": "2026-11-24T00:13:50Z",
-      "source": "freebuff",
-      "subject": "nixconfig:delphi-job-search",
-      "action": "built Almetra packet: CV (2 pp) + tailored letter (1 p) at ~/.local/state/appflow/submissions/almetra-devops-engineer-edgy-system -> /nix/store/72xwklxc22rpyd53dwvvq0chgkwxmayk-appflow-packet-almetra-devops-engineer-edgy-system | gate: apps:gate:packet PASS | not sent, awaiting review",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haj262ot247pxkkzbjnxs2y"
-    },
-    {
-      "id": "5c91c121-9bde-4830-8e87-94101e656b42",
-      "ts": "2026-11-24T00:11:59Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:delphi-job-search",
-      "action": "drove idle delphi freebuff pane 0:2.1 (ssh tunnel) via jevdecide draft-packet p=1.0 margin=1.0: task build Almetra packet (fallback Gcore sweep); pane accepted (working 4s->16s)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "7dd9e579e782ea303ef2fe37421baf8869d27001",
-      "branch": "main",
-      "frame": "03haj1t2lsangmdmxa8k8aqb6"
     }
   ]
 }

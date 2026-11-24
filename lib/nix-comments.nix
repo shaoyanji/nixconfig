@@ -38,7 +38,7 @@
         && !(lib.hasPrefix "./" t)
         && !(lib.hasPrefix "../" t)
         && hasKnownSuffix t
-        && (lib.splitString "/" t |> builtins.head |> (h: builtins.elem h topDirs))
+        && builtins.elem (lib.splitString "/" t |> builtins.head) topDirs
     )
     |> lib.unique;
 

@@ -21,7 +21,7 @@
   # file itself and can be handed to `imports = [ ... ]` unchanged.
   tree =
     files
-    |> builtins.foldl' (acc: f: acc |> lib.recursiveUpdate (f |> segments |> (p: lib.setAttrByPath p f))) {};
+    |> builtins.foldl' (acc: f: acc |> lib.recursiveUpdate (lib.setAttrByPath (f |> segments) f)) {};
 
   # The one naming rule for the import namespace (`.#modules`), used in both
   # directions: a chain writes the name, the walk reads it back to an edge.

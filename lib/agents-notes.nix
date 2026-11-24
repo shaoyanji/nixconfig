@@ -10,6 +10,7 @@
   raw = notes.notes or {};
 
   kinds = ["decision" "proposal" "open" "experiment" "handoff" "reference"];
+  forNames = f: names: lib.genAttrs names f;
   statuses = [
     "PROPOSED"
     "ACCEPTED"
@@ -242,15 +243,15 @@
 
   counts = {
     total = entryList |> builtins.length;
-    byClaim = claimOf |> builtins.attrValues |> lib.unique |> (names: lib.genAttrs names (k: entryList |> builtins.filter (e: e.claim == k) |> builtins.length));
-    byStatus = statuses |> (names: lib.genAttrs names (s: s |> byStatus |> builtins.length));
-    byKind = kinds |> (names: lib.genAttrs names (k: k |> byKind |> builtins.length));
+    byClaim = claimOf |> builtins.attrValues |> lib.unique |> forNames (k: entryList |> builtins.filter (e: e.claim == k) |> builtins.length);
+    byStatus = statuses |> forNames (s: s |> byStatus |> builtins.length);
+    byKind = kinds |> forNames (k: k |> byKind |> builtins.length);
     open = entryList |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> builtins.length;
     leaves = entryList |> builtins.filter (e: e.leaf) |> builtins.length;
     lineageEdges = noteIds |> lib.concatMap (id: parentsOf raw.${id}) |> builtins.length;
     withLineage = entryList |> builtins.filter (e: e.ancestors != []) |> builtins.length;
   };
-  byStatusIds = statuses |> (names: lib.genAttrs names (s: s |> byStatus |> map (e: e.id)));
+  byStatusIds = statuses |> forNames (s: s |> byStatus |> map (e: e.id));
 
   # --- markdown rendering ----------------------------------------------------
   capitalize = s: (s |> builtins.substring 0 1 |> lib.toUpper) + (s |> builtins.stringLength |> (n: builtins.substring 1 n s));

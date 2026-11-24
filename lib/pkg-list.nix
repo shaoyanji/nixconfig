@@ -64,7 +64,7 @@
   # Dotted paths (`python3Packages.requests`) resolve through the package set,
   # so a list is not limited to top-level attributes.
   lookup = pkgs: name:
-    name |> lib.splitString "." |> (p: lib.attrByPath p null pkgs);
+    lib.attrByPath (name |> lib.splitString ".") null pkgs;
 
   # A list may name things nixpkgs lacks; the leftovers come back by name instead
   # of failing the first one. Why: docs/pkg-list.md.

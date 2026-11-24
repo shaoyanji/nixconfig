@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-24T19:08:55Z",
+  "generated": "2026-11-24T19:10:02Z",
   "count": 200,
-  "pin": "41a9cbb185411e572f7d010f4f92fd25ffe1b926d2e7e21356965ea87517fc06",
+  "pin": "997a40a6850e190132c6577cb27b2ce2b56a77aa14d9dc5f6dfa3eaf0b428d21",
   "turns": [
+    {
+      "id": "a55fbd6c-2211-4eed-b52a-750a3ff2d2ca",
+      "ts": "2026-11-24T19:09:44Z",
+      "source": "devji",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: checks:nix:style gate — per-file builtins/lib alias mixing now fails in checks:quick; tree unified to match (epistemics/policies->builtins, nix-files join collapse) | gate: checks:quick PASS incl. fail-injection proof",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
+      "branch": "main",
+      "frame": "03hap8276d0qvhxa2892bknmd"
+    },
+    {
+      "id": "3bd59244-0b8e-4eb2-9758-b5c1cfd6d8f6",
+      "ts": "2026-11-24T19:09:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correction to d6e43a1b: the sweep note now reads 104d1bae — instrument counts fixed (about a hundred ATS boards, nine Bundesagentur attempts all refused), the lead is unchanged: STATWORX Cloud Engineer, Frankfurt, lead fit 3 | gate: nix-instantiate --parse PASS + pre-commit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "104d1bae0c7f64dd4416a5bcbad1a97195ff7cbf",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap80s4n8tcyxj24ftntb6g"
+    },
+    {
+      "id": "17613d32-dd17-4e42-9b81-17ab5bec8d1b",
+      "ts": "2026-11-24T19:09:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correction to 03hap7tyo2ayuai9650szxxir: the commit is d6e43a1b, not ca0eb847 — the AGENTS.nix note was refused by the pre-commit alejandra gate and landed after formatting; the content is unchanged (STATWORX Cloud Engineer, Frankfurt, lead fit 3) | gate: nix-instantiate --parse PASS + pre-commit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d6e43a1b875fde9d54afc0d43d7bb65776bd544a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap7x7675w76zid6uel5k7o"
+    },
     {
       "id": "7c03b183-db81-4e84-9b32-73045bfcf452",
       "ts": "2026-11-24T19:08:34Z",
@@ -2678,51 +2717,6 @@
       "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
       "branch": "main",
       "frame": "03halzqmge8ryj5nn59al8263"
-    },
-    {
-      "id": "42580dc5-cb98-4efc-a8e6-514e00b92f6a",
-      "ts": "2026-11-24T09:09:12Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "landed: DACH round — 3 new leads (XITASO Karlsruhe DevOps/Cloud, R+V Wiesbaden Linux platform, Bundesnotarkammer PKI/Berlin), Schwarz Digits refused (STACKIT already applied); 2 letter drafts, 0 sends; intl boards gave no new EU-eligible employer; DACH packet reqs re-checked live | gate: apps:dupes [] PASS",
-      "outcome": "done",
-      "claims": [
-        "~/.config/appflow"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halyqz3l1v4s89k2dz8gl85"
-    },
-    {
-      "id": "50feccd0-0a17-47ec-a2de-7f50b5b37bcf",
-      "ts": "2026-11-24T09:03:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: ranked the 5 prep packets (netcup 1, Eficode 2, mogenius 3, KHS 4, Advantest 5) and wrote the rank into each row's next_action; all stay stage lead, hold 2026-12-07, nothing sent. Reqs live: 4/5 answer 200, jobware 403 is a bot wall not a dead ad. Ranking filed in followups 2026-11-24-scout-devops-de.md. Repo untouched.",
-      "outcome": "done",
-      "claims": [
-        ".local/state/appflow/followups"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halxpdq71a4ffre8th8k63t"
-    },
-    {
-      "id": "d97d3d9c-5285-4456-b833-d0f415145e96",
-      "ts": "2026-11-24T09:02:26Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward:pane-drive:freebuff-delphi",
-      "action": "drove idle remote freebuff pane agents:3.1 via Jev task-change (decisive margin 0.42) over ssh tunnel; pasted intl scout/prep task; pane shows working... 4s / Thinking after Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halxfdiebnbuaggzmr0lbkx"
     }
   ]
 }

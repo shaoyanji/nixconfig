@@ -5577,7 +5577,7 @@
       kind = "open";
       priority = "P3";
       status = "OPEN";
-      summary = "Eight sources no earlier sweep touched — Bundesagentur Jobsuche, seventy Greenhouse/Lever/Ashby boards, Personio and Recruitee feeds, BerlinStartupJobs, Remotive, RemoteOK and two LinkedIn queries — left exactly one untracked fit: STATWORX Cloud Engineer in Frankfurt, filed at lead with fit 3.";
+      summary = "Eight sources no earlier sweep touched — Bundesagentur Jobsuche, about a hundred ATS boards, Personio and Recruitee feeds, BerlinStartupJobs, Remotive, RemoteOK and two LinkedIn queries — left exactly one untracked fit: STATWORX Cloud Engineer in Frankfurt, filed at lead with fit 3.";
       from = ["job-scout-linkedin-direct-2026-11-24"];
       refs = {
         tasks = ["apps:add" "apps:dupes"];
@@ -5586,10 +5586,9 @@
         Ran 2026-11-24 against the 1,120-row tracker, 829 normalized
         employers, after the LinkedIn pass of the same day filed three.
         The premise was that the boards were saturated because they were
-        the same boards, so this pass changed the sources instead: seventy
-        ATS slugs (Greenhouse, Lever, Ashby), Personio and Recruitee XML
-        feeds, BerlinStartupJobs, Remotive, RemoteOK, and two
-        Bundesagentur queries.
+        the same boards, so this pass changed the sources instead: about a hundred ATS slugs (Greenhouse, Lever, Ashby), Personio and Recruitee XML
+        feeds, BerlinStartupJobs, Remotive, RemoteOK, and the Bundesagentur Jobsuche API, which refused every
+        query.
 
         What it found: STATWORX, Cloud Engineer, Frankfurt am Main —
         Personio 2589996, created 2026-04-01, still listed. One row. The
@@ -5599,7 +5598,7 @@
 
         Two instruments, two readings worth keeping. The Bundesagentur
         Jobsuche API answers 403 "No match found for request" from this
-        host for every keyword, and one query died on a connection reset,
+        host for every keyword, and two died on a connection reset,
         so the largest German board is unreachable here and the note does
         not pretend to have searched it. And the dedupe compares
         normalized names, so `solarisbank` does not match the tracked row

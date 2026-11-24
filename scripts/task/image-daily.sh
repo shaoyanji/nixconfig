@@ -3,7 +3,7 @@
 #
 #   image-daily.sh <cmd> runs scripts/task/image-daily-<cmd>.sh — one file per
 #   command, the shared vocabulary in image-daily-lib.sh; the generation and
-#   publish machinery is the Go CLI (tools/image-daily, .#cli.image.daily),
+#   publish machinery is the Go CLI (tools/os, .#cli.image.daily),
 #   reached through `image_daily_cli`. The dispatch contract is unchanged, so
 #   the slot timers, sibling scripts and the taskfile keep working untouched.
 #

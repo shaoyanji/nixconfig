@@ -1,4 +1,4 @@
-package main
+package image
 
 // The queue reads that plan, run, status, judge and publish asked of jq in
 // image-daily-lib.sh: which lanes are selected, a lane's budget and settings,

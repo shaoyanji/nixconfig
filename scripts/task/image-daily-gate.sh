@@ -11,8 +11,9 @@
 #      list (lib/engine/gate are not commands). The 2026-11-23 monolith split
 #      is only as good as this agreement; a dropped file is a silent `usage:`.
 #   2. judge fallback — the provider route (modelProvider + GEMINI_API_KEY
-#      + --model) lives in tools/image-daily now, image-daily-engine.sh before
-#      it; the check accepts either so a fixture out of history still gates.
+#      + --model) lives in tools/os (the image domain) now, tools/image-daily
+#      and image-daily-engine.sh before it; the check accepts any of them so a
+#      fixture out of history still gates.
 #      Without it the account quota dying is a dead judge: 2026-11-22–23 spent
 #      43 generations, kept 0, every verdict "agy exited 3".
 #   3. spend circuit breaker — unjudged_streak in the lane loop (Go tool) and
@@ -48,15 +49,18 @@ cmd_gate() {
 
   # Judge resilience: the account route exhausts for days at a time, so the
   # engine must carry the provider lane or every verdict is unjudged. The check
-  # looks at the lib AND the Go tool: the functions moved to
-  # tools/image-daily, and a fixture checked out of history still carries them
-  # in the engine — either location holding the contract is the contract held.
-  local lib=$dir/image-daily-lib.sh gotool=$dir/../../tools/image-daily
+  # looks at the lib AND the Go tool: the functions moved to tools/os in the
+  # one-os-cli fold-in (tools/image-daily before that), and a fixture checked
+  # out of history still carries them in either spot — any location holding
+  # the contract is the contract held.
+  local lib=$dir/image-daily-lib.sh gotool=$dir/../../tools/os legacy=$dir/../../tools/image-daily
   [ -f "$lib" ] || die "no lib at $lib"
   { grep -q 'modelProvider' "$lib" 2>/dev/null && grep -q 'GEMINI_API_KEY' "$lib" 2>/dev/null; } ||
     { grep -rq 'modelProvider' "$gotool" 2>/dev/null && grep -rq 'GEMINI_API_KEY' "$gotool" 2>/dev/null; } ||
+    { grep -rq 'modelProvider' "$legacy" 2>/dev/null && grep -rq 'GEMINI_API_KEY' "$legacy" 2>/dev/null; } ||
     { say "gate FAIL: engine has no provider fallback — a dead account route means every plate stays unjudged"; fail=1; }
   grep -q 'unjudged_streak' "$lib" 2>/dev/null || grep -rq 'unjudged_streak' "$gotool" 2>/dev/null ||
+    grep -rq 'unjudged_streak' "$legacy" 2>/dev/null ||
     { say "gate FAIL: run_lane has no unjudged circuit breaker — a dead judge burns the whole allowance"; fail=1; }
   [ -f "$dir/image-daily-plates.sh" ] && grep -q 'unjudged_streak' "$dir/image-daily-plates.sh" ||
     { say "gate FAIL: plates loop has no unjudged circuit breaker"; fail=1; }

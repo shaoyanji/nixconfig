@@ -72,7 +72,7 @@ in {
   shellSmall = p.shellScript "scripts/task/small.sh" (builtins.readFile $tmp/small.sh);
   shellRecorded = p.shellScript "scripts/task/kg-check.sh" (builtins.readFile $repo/scripts/task/kg-check.sh);
   goModuleNew = p.goModule "tools/brandnew/go.mod";
-  goModuleRecorded = p.goModule "tools/image-daily/go.mod";
+  goModuleRecorded = p.goModule "tools/os/go.mod";
   goModuleService = p.goModule "modules/services/agent-turns/shim/go.mod";
 }
 EOF

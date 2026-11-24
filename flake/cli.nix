@@ -220,16 +220,24 @@
       anki-author.pkg = pkgs.callPackage ./anki-author.nix {};
     };
     image = {
-      # The image-daily pipeline's data leg: `manifest` builds the Pages
-      # manifest from urls.tsv, the ledger, the briefs and the roster —
-      # the jq/awk that used to live in image-daily-engine.sh, byte-identical.
-      daily.pkg = pkgs.buildGoModule {
-        pname = "image-daily";
-        version = "0.1.0";
-        src = ../tools/image-daily;
-        vendorHash = null;
-        env.CGO_ENABLED = 0;
-        meta.description = "image-daily manifest builder (Go stdlib, no dependencies)";
+      # The image-daily pipeline's data leg is folded into the one-os-cli
+      # umbrella (tools/os, internal/image): this package still answers
+      # `bin/image-daily` — a symlink onto the umbrella binary, whose argv[0]
+      # dispatch selects the image domain — so the lib resolver, taskfiles and
+      # frieren's slot closures resolve unchanged.
+      daily = {
+        bin = "image-daily";
+        pkg = pkgs.buildGoModule {
+          pname = "image-daily";
+          version = "0.1.0";
+          src = ../tools/os;
+          vendorHash = null;
+          env.CGO_ENABLED = 0;
+          postInstall = ''
+            ln -s $out/bin/os $out/bin/image-daily
+          '';
+          meta.description = "image-daily verbs on the os umbrella binary (Go stdlib, no dependencies)";
+        };
       };
     };
     # The preview server every `site-target.sh preview` and the kg-canvas gate

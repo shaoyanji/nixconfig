@@ -11,7 +11,7 @@
   # `tools/*/go.mod` the tree may carry — a new one is an unrecorded CLI, not a
   # port into the OS binary [[flake/policies.nix#tools-go-modules-are-recorded]].
   goModules = [
-    "tools/image-daily/go.mod"
+    "tools/os/go.mod"
     "tools/static-serve/go.mod"
   ];
   shells = {

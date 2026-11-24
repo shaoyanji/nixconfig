@@ -14,7 +14,7 @@ source "$here/image-daily-lib.sh"
 # scopes by call dynamic, so an assignment further down the publish path clobbered
 # it and the guard compared against nothing (2026-11-22: "651 asset(s) but  are
 # being served", then `[: : integer expected`, and the deploy was refused).
-# The compare/restore/refuse itself is `image-daily shrink-guard` in tools/image-daily.
+# The compare/restore/refuse itself is `image-daily shrink-guard` in tools/os.
 publish_shrink_guard() {
   "$cli" shrink-guard --backup "${urls_backup:-}"
 }

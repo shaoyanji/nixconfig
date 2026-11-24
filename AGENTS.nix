@@ -1284,11 +1284,11 @@
       status = "IN FLIGHT";
       priority = "P2";
       date = "2026-11-24";
-      summary = "The shell burn-down must not end in a tools/ sprawl of one module per domain. Ports land as internal/<domain> packages inside a single Go binary — a CLI of the operating system — while .#cli.<family>.<tool> and the task names stay the contract callers see. The go.mod ledger is landed; the umbrella module is not.";
+      summary = "The shell burn-down must not end in a tools/ sprawl of one module per domain. Ports land as internal/<domain> packages inside a single Go binary — a CLI of the operating system — while .#cli.<family>.<tool> and the task names stay the contract callers see. The ledger and the tools/os umbrella with the image fold-in are landed; static-serve's fold waits on .#servers.";
       from = ["shell-script-budget" "jobby-cli-consolidation"];
       links = ["p4-taskfiles-to-evals" "agent-tools-called-not-declared"];
       refs = {
-        modules = ["flake/cli.nix" "flake/script-budget.nix" "flake/policies.nix" "tests/policies/run.sh" "tools/image-daily/main.go"];
+        modules = ["flake/cli.nix" "flake/script-budget.nix" "flake/policies.nix" "tests/policies/run.sh" "tools/os/main.go"];
         tasks = ["checks:policies:fixtures" "checks:tasks"];
         docs = ["docs/task-control-plane.md"];
       };
@@ -1298,8 +1298,8 @@
         tool dirs today, forty by the time the ledger is empty. The port
         target is one binary — a CLI of the operating system — with
         `internal/<domain>` packages and a `<os> <family> <verb>` surface.
-        Binary name provisional; `tools/image-daily` is the first domain to
-        fold in.
+        The binary is `os` (`tools/os`, argv[0] aliases back to the tool
+        names); `internal/image` is the first folded domain.
 
         **The surface stays.** `flake/cli.nix` already keys
         `.#cli.<family>.<tool>`; the one binary backs every family through
@@ -1312,14 +1312,14 @@
         its own nested flake, `tools/selector` and `tools/kg-zeck` are
         one-language experiments — foreign trees, not the task surface.
         `scripts/task/*.sh` retire domain by domain in the budget's
-        burn-down order (stdout/JSON first, host-touching last — a Go port
-        of a deploy script is a deployment). Python check helpers shrink
-        toward evals per `p4-taskfiles-to-evals`, they are not CLI verbs.
+        burn-down order; Python check helpers shrink toward evals per
+        `p4-taskfiles-to-evals`, they are not CLI verbs.
 
-        **Landed** `tools-go-modules-are-recorded` (goModules ledger, probe,
-        fixtures) — a new `tools/*/go.mod` fails unrecorded from today.
-        **Missing** the umbrella module and the image-daily fold-in;
-        static-serve keeps its module until the umbrella serves `.#servers`.
+        **Landed** `tools-go-modules-are-recorded` (a new `tools/*/go.mod`
+        fails unrecorded) and the `tools/os` umbrella: `internal/image`,
+        `bin/image-daily` alias, gate greps both tool locations.
+        **Missing** the static-serve fold — its module stays until the
+        umbrella serves `.#servers`.
 
         Exit: one go.mod under `tools/` serves the task surface — a second
         module fails the policies gate; the ledger keeps shrinking.

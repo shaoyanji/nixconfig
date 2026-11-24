@@ -1,4 +1,7 @@
-// Command image-daily is the image-daily pipeline's data leg in Go.
+// Package image is the image-daily pipeline's data leg in Go, folded into the
+// one-os-cli umbrella (tools/os). Its Main runs the image-daily verb set; the
+// umbrella reaches it as `os image <verb>` or via the `image-daily` argv[0]
+// alias that .#cli.image.daily installs.
 //
 // The first extraction is `manifest`: the jq/awk pipeline that used to live in
 // scripts/task/image-daily-engine.sh (plates_description + the build_index jq
@@ -9,7 +12,7 @@
 //
 // Stdlib only. Byte-identical replication is the contract: a manifest that
 // differs from the shell output is a bug in this tool, not a data problem.
-package main
+package image
 
 import (
 	"bufio"
@@ -383,72 +386,72 @@ func manifestJSON(root, repo string) []byte {
 	return buf.Bytes()
 }
 
-func main() {
-	if len(os.Args) < 2 {
+func Main(args []string) {
+	if len(args) < 1 {
 		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
 	}
-	switch os.Args[1] {
+	switch args[0] {
 	case "manifest":
 		fs := flag.NewFlagSet("manifest", flag.ExitOnError)
 		root := fs.String("root", os.Getenv("IMAGES_ROOT"), "image tree root (IMAGES_ROOT)")
 		repo := fs.String("repo", os.Getenv("REPO"), "nixconfig checkout root (REPO)")
-		_ = fs.Parse(os.Args[2:])
+		_ = fs.Parse(args[1:])
 		if *root == "" || *repo == "" {
 			die("manifest needs --root and --repo (or IMAGES_ROOT and REPO)")
 		}
 		runManifest(*root, *repo)
 	case "judge":
-		cmdJudge(os.Args[2:])
+		cmdJudge(args[1:])
 	case "attempt":
-		cmdAttempt(os.Args[2:])
+		cmdAttempt(args[1:])
 	case "lane":
-		cmdLane(os.Args[2:])
+		cmdLane(args[1:])
 	case "stage":
-		cmdStage(os.Args[2:])
+		cmdStage(args[1:])
 	case "adopt":
-		cmdAdopt(os.Args[2:])
+		cmdAdopt(args[1:])
 	case "remaining":
 		cmdRemaining()
 	case "share":
-		cmdShare(os.Args[2:])
+		cmdShare(args[1:])
 	case "pending":
-		cmdPending(os.Args[2:])
+		cmdPending(args[1:])
 	case "shapes":
-		cmdShapes(os.Args[2:])
+		cmdShapes(args[1:])
 	case "reason":
-		cmdReason(os.Args[2:])
+		cmdReason(args[1:])
 	case "archive":
-		cmdArchive(os.Args[2:])
+		cmdArchive(args[1:])
 	case "resolve":
-		cmdResolve(os.Args[2:])
+		cmdResolve(args[1:])
 	case "dimensions":
-		cmdDimensions(os.Args[2:])
+		cmdDimensions(args[1:])
 	case "landscape":
-		cmdLandscape(os.Args[2:])
+		cmdLandscape(args[1:])
 	case "crop":
-		cmdCrop(os.Args[2:])
+		cmdCrop(args[1:])
 	case "deploy":
-		cmdDeploy(os.Args[2:])
+		cmdDeploy(args[1:])
 	case "round":
-		cmdRound(os.Args[2:])
+		cmdRound(args[1:])
 	case "lanes":
-		cmdLanes(os.Args[2:])
+		cmdLanes(args[1:])
 	case "budget":
-		cmdBudget(os.Args[2:])
+		cmdBudget(args[1:])
 	case "setting":
-		cmdSetting(os.Args[2:])
+		cmdSetting(args[1:])
 	case "guard":
-		cmdGuard(os.Args[2:])
+		cmdGuard(args[1:])
 	case "due":
-		cmdDue(os.Args[2:])
+		cmdDue(args[1:])
 	case "parked":
-		cmdParked(os.Args[2:])
+		cmdParked(args[1:])
 	case "record":
-		cmdRecord(os.Args[2:])
+		cmdRecord(args[1:])
 	case "index":
-		cmdIndex(os.Args[2:])
+		cmdIndex(args[1:])
 	case "shrink-guard":
-		cmdShrinkGuard(os.Args[2:])
+		cmdShrinkGuard(args[1:])
 	default:
 		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
 	}

@@ -60,7 +60,7 @@ epoch() { date -d "$1" +%s 2>/dev/null; }
 # One row per generation attempt. The ledger is append-only: a re-roll is a new
 # row, never an edit, so the re-roll rate is readable later.
 
-# record is `image-daily record` in tools/image-daily.
+# record is `image-daily record` in tools/os.
 
 # The last day a brief was accepted at its current revision, empty when it never
 # was. A rewritten prompt is a new revision: the plate the old sentence made must
@@ -79,7 +79,7 @@ epoch() { date -d "$1" +%s 2>/dev/null; }
 PARK_AFTER=${PARK_AFTER:-3}
 PARK_DAYS=${PARK_DAYS:-7}
 
-# last_keep/last_attempt/strikes/is_parked are `image-daily due`/`parked` internals in tools/image-daily — one ledger pass per call.
+# last_keep/last_attempt/strikes/is_parked are `image-daily due`/`parked` internals in tools/os — one ledger pass per call.
 
 # --- the queue --------------------------------------------------------------
 # TSV: id, lane, size, name, prompt, every, rev, expect — for the briefs that are
@@ -89,7 +89,7 @@ PARK_DAYS=${PARK_DAYS:-7}
 # IFS whitespace and `read` collapses a run of it: an empty `expect` in any other
 # position shifted every field after it.
 
-# due is `image-daily due` in tools/image-daily.
+# due is `image-daily due` in tools/os.
 
 # A character plate needs the character described, not just named. The generator
 # does not know these people, so `Fern, 4k, realistic, neumorphism` is an
@@ -98,19 +98,19 @@ PARK_DAYS=${PARK_DAYS:-7}
 # devil and a settings row, and every one of them was judged `keep` because the
 # judge was holding the same weak prompt. This refuses to spend on one again.
 
-# briefs_guard is `image-daily guard` in tools/image-daily.
+# briefs_guard is `image-daily guard` in tools/os.
 
 # `LANES="wall site"` narrows any subcommand to a subset of the shard order.
 
-# select_lanes is `image-daily lanes` in tools/image-daily; LANES_ORDER lives there as lanesDefault.
+# select_lanes is `image-daily lanes` in tools/os; LANES_ORDER lives there as lanesDefault.
 
-# lane_budget/lane_setting are `image-daily budget` and `image-daily setting` in tools/image-daily.
+# lane_budget/lane_setting are `image-daily budget` and `image-daily setting` in tools/os.
 
 # The pool answers `remaining: "unlimited"` on a lifetime plan, and the real
 # ceiling is then the hourly burst (429), not a day count. Translate it to a
 # number the arithmetic can use; every caller already treats 0 as "stop".
 
-# remaining is `image-daily remaining` in tools/image-daily — same refresh-once retry, same unlimited translation.
+# remaining is `image-daily remaining` in tools/os — same refresh-once retry, same unlimited translation.
 
 # Where the Go tool lives. A slot's PATH closure already carries it; a hand run
 # resolves it from the checkout with a one-off nix build, the way

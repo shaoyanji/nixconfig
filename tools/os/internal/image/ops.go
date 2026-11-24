@@ -1,4 +1,4 @@
-package main
+package image
 
 // The remaining engine helpers: verdict-to-reason, prior-render archiving,
 // plate resolution, the ffprobe reads, the blog crop, the frontend deploy and

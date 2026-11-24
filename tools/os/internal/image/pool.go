@@ -1,4 +1,4 @@
-package main
+package image
 
 // The read-only pool/roster helpers: what the day still holds, the share one
 // slot takes, and the roster rows still waiting. These used to be three

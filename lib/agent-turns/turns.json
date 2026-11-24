@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-24T19:58:16Z",
+  "generated": "2026-11-24T20:06:38Z",
   "count": 200,
-  "pin": "fb8132081acab3f9647549698f2dbe5f7254725a6c1d4d9944bc0a5b74c02247",
+  "pin": "fb1f0966b3be0cce39889aa7325b0c0253139171bd569d3aa2e2930bc5b4d2ef",
   "turns": [
+    {
+      "id": "04a21250-3d46-4182-b4ee-8e11a7071c0e",
+      "ts": "2026-11-24T20:06:20Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "verify: DeepL packet content is send-ready — 1pp letter, 2pp CV, addressee DeepL / Sovereign Markets — Platform team / Munich remote, subject Staff SRE Sovereign Cloud, three gaps named. .typ re-render matches stored PDFs byte-for-byte on text. Blockers: no submit channel (arbeitnow CAPTCHA form, no ATS, no recruiter mail) and the 22 Nov date needs re-rendering at send. Nothing sent. | gate: typst re-render clean + apps:get stage=prep PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hapj45ki5la4huufj9lip5m"
+    },
+    {
+      "id": "ae915103-65d3-43a0-9aff-9690b8f90c74",
+      "ts": "2026-11-24T20:06:13Z",
+      "source": "delphi",
+      "subject": "nixconfig:steward-delphi",
+      "action": "landed: re-drove delphi job-search with prep_deepl_send; fresh working... 30s after submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
+      "branch": "main",
+      "frame": "03hapj3desh8oqoxnow1wwoc7"
+    },
+    {
+      "id": "3dfc60e9-77b4-495f-ac98-9707c542dfdc",
+      "ts": "2026-11-24T20:06:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "landed: re-drove freebuff CV lane with fix_apps_search (rephrased); fresh working... 44s after submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
+      "branch": "main",
+      "frame": "03hapj301bhno6dtr7weh21cf"
+    },
+    {
+      "id": "56bac4b6-4ab6-4a3a-9f34-6b916f1f7769",
+      "ts": "2026-11-24T20:04:16Z",
+      "source": "delphi",
+      "subject": "nixconfig:steward-delphi",
+      "action": "landed: drove delphi job-search lane — resolve duplicate Supabase/Managed Postgres packet rows so the application packet set is consistent",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
+      "branch": "main",
+      "frame": "03hapippzz2umykgj7irjx79a"
+    },
+    {
+      "id": "c9f8837f-acc7-43da-9827-47df875f8705",
+      "ts": "2026-11-24T20:04:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "landed: drove freebuff job-scout CV lane — fix the apps:search lookup so DevOps/SRE/Platform/Infrastructure engineer leads resolve before more scouting",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
+      "branch": "main",
+      "frame": "03hapipdlkv4src8mc5v41odw"
+    },
     {
       "id": "778c22a7-c205-4102-9941-37f2467e02d6",
       "ts": "2026-11-24T19:57:07Z",
@@ -2632,75 +2697,6 @@
       "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
       "branch": "main",
       "frame": "03ham80nu2zqcdtdh985mmv75"
-    },
-    {
-      "id": "a9c73e5d-66e3-474c-8b81-98e509684f26",
-      "ts": "2026-11-24T09:56:25Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "landed: muenster follow-ups, 0 sent. citeq chase due 2026-12-02 via Interamt 1510832 (0 mails, no ack); stadt-muenster stays blocked, verified still no Zeugnis scan on disk, two registrar requests named, send 2026-12-07; gute-einstellung dated checkpoint 2026-12-02 (ack 11-22); cyberus rust/nixos six weeks past its 2026-10-14 chase -> 2026-12-07 via join.com, its 13 mails are all join.com nudges. Record: followups/2026-11-24-muenster-followups.md.",
-      "outcome": "done",
-      "claims": [
-        "~/.local/state/appflow/followups"
-      ],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham7z25ak4a2y0ato6xvsf0"
-    },
-    {
-      "id": "05aa11ec-2069-445c-a362-f394f296484f",
-      "ts": "2026-11-24T09:54:51Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi freebuff (agents:3) idle after upsert done (~10:52). jev-decide selected attention p=0.82 margin=0.66: sweep delphi attention queue. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham7o1qox1g3yrirdna9rxn"
-    },
-    {
-      "id": "32758258-025c-4fcc-a9d0-c6cf75a87fc9",
-      "ts": "2026-11-24T09:54:51Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "re-driven: freebuff (agents:2) idle after kinexon send done. jev-decide first pass needs_review (muenster p=0.69, margin 0.49 decisive >= 0.3, top by margin): Muenster follow-ups (advanced interview 2->0). Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham7o09816e28ztkg0hy220"
-    },
-    {
-      "id": "c05273b8-9a8c-4e94-9937-a5e71d6a408a",
-      "ts": "2026-11-24T09:52:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "kinexon-senior-devops-go-backend was submitted 2026-11-24 08:22 via Greenhouse gh_jid 4936773101 (xs 03halpmto7e8xf0w4yvvwj4zw, row stage=applied, chase due 2026-12-02). No resend: duplicate would breach the dupe rule and the 2026-12-07 hold, and no recruiter address is on record (linkedMail 0). Packet from the 02:48 turn is intact at /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend (CV 2pp, letter 1pp).",
-      "outcome": "blocked: kinexon already submitted",
-      "claims": [
-        "~/.local/state/appflow/submissions/kinexon-senior-devops-go-backend"
-      ],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham7agfsd6e86k56n6qomj8"
-    },
-    {
-      "id": "82298cc1-2fa3-494d-8fc9-051ce5b02445",
-      "ts": "2026-11-24T09:52:19Z",
-      "source": "hermes",
-      "subject": "nixconfig:chain-split",
-      "action": "re-driven: devin (agents:1) idle after image-daily verify done at 09:42. jev-decide first pass needs_review (chain_split p=0.51 m=0.18); duel won chain_split p=0.98 m=0.96. Fed chain-split claim (host-inventory.nix, modules/profiles, modules/global). Pane Thinking.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham7654los657ndks3nc8xg"
     }
   ]
 }

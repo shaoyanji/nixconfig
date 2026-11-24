@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-today.sh — the day's allowance, the next slot's share, roster rows waiting
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 # What the day still holds, in one readout: the allowance, the share the next slot
@@ -14,7 +14,7 @@ cmd_today() {
   local day left limit roster pending units total n next_at wrapper reserve cap
   roster=${ROSTER:-$repo/lib/image-daily/plates.txt}
   day=$(today)
-  left=$(remaining)
+  left=$("$(image_daily_cli)" remaining)
   [ -n "$left" ] || die "usage unreadable (401 from cpg) — run cpg refresh, or chatplayground-go login when the session itself is gone"
 
   printf '%s\n' "$day"

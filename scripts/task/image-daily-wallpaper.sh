@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
 # image-daily-wallpaper.sh — set the first in-rotation wallpaper with swaybg
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
+
+# Rotation is a judgement, not a timer: `in` is approval and priority, `out` is a
+# rejection with its reason (lib/image-daily/rotation.json). The first approved id
+# that resolves is the wallpaper, so the order is the operator's to move, not a
+# sort of filenames. A rejected plate never rotates however new it is, and a plate
+# in neither list is unjudged rather than bad, so nothing lands on a screen on the
+# strength of its date alone. With no approval list yet, the newest unrejected
+# plate is used, which is what a lane nobody has looked at gets.
+# A wallpaper is landscape. A square plate under `swaybg -m fill` is cropped to a
+# stripe of itself, which reads on a screen as a broken wallpaper rather than as a
+# wrong request — so the shape is measured where the plate is chosen. The size a
+# generator returns is not the size it was asked for until someone reads it.
 
 
 cmd_wallpaper() {

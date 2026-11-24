@@ -1,8 +1,116 @@
 {
-  "generated": "2026-11-24T01:49:39Z",
+  "generated": "2026-11-24T02:17:56Z",
   "count": 200,
-  "pin": "27a6b2e0fe6c4c39d5d12e2753fad217171ef09e880b7a7240ef19f279b61788",
+  "pin": "3c18a8051a9111903976fba382bb26b83883d693081e2503a60cf87f20535ed2",
   "turns": [
+    {
+      "id": "0c8c147e-0866-4162-85a5-20955640f411",
+      "ts": "2026-11-24T02:11:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-intl",
+      "action": "scouted: intl round 3 over ~150 ATS boards (GH/Ashby/Lever/SR); added Babbel Labs Infra/DX Platform Berlin (Ashby Fit 3, JD + 2pp CV + 1pp letter packet, prep, unsent) and Wolt Staff EU Infra Berlin (GH 8324647, Fit 2 lead, JD only); 108 untracked infra roles, rest need UK/other-EU permits; dupes=0; apps:sent still 12 findings; repo untouched (26)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hajp8tqn86paqwwjnsrbd2r"
+    },
+    {
+      "id": "d730a65a-06f5-43bd-b7c7-681c84983381",
+      "ts": "2026-11-24T02:11:22Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: scouting pass 2026-11-24 added 1 lead — kinexon-senior-devops-go-backend (München, Greenhouse 4936773101, fit 3), lead.md + tracker row, nothing submitted. Sources: Arbeitsagentur API, Remotive, Jobicy, WWR RSS, HN, 20+ Greenhouse/Ashby boards. Rejected as duplicates: isaraerospace (lead 11-23), solarisbank (packet ready), navvis + langdock + celonis (applied), tacto/workerbase (no infra req) | gate: nothing sent, tracker row verified",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.local/state/appflow/submissions/kinexon-senior-devops-go-backend"
+      ],
+      "files": [],
+      "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
+      "branch": "main",
+      "frame": "03hajp4jd4dyygnngf13soxun"
+    },
+    {
+      "id": "cd86be66-a9d3-40f5-b3bb-278c566b2956",
+      "ts": "2026-11-24T02:11:00Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward",
+      "action": "landed: drove 3 idle agent panes (devin 0:0 image-daily publish, freebuff 0:1 job-search, delphi 0:2 job-search) to working; all four panes BUSY",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dafee82d",
+      "branch": "main",
+      "frame": "03hajp1yr3wkps807yom8z4wv"
+    },
+    {
+      "id": "f99afa1a-6652-40af-9e9b-7c563bafb7a6",
+      "ts": "2026-11-24T02:01:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: second sweep (arbeitnow p6-9, 12 Greenhouse, 8 Ashby, 4 Lever, SmartRecruiters) — no genuinely new employer: every infra req already tracked (Catapult applied 11-22, IONOS/1&1/N26/HITS.nrw/ANGEHEUERT on file). Deliverable moved to follow-ups: 5 reply drafts + 1 portal task, none sent; n8n status contradicts archive | gate: nothing sent, appflow rows patched, drafts under ~/.local/state/appflow/followups",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.local/state/appflow/followups"
+      ],
+      "files": [],
+      "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
+      "branch": "main",
+      "frame": "03hajn41fjjs3hydigj8rbixt"
+    },
+    {
+      "id": "488d262b-4f46-438c-ae9f-de515878c126",
+      "ts": "2026-11-24T02:00:57Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-intl",
+      "action": "landed: intl scout r2 — Solaris Senior SRE (GH solarisbank/8585238002, Berlin) added as Fit-2 lead with JD + 2pp CV/1pp letter packet (prep, not sent); 74 ATS boards + WWR/Remotive/Himalayas/Jobicy/Arbeitnow/HN swept, no other EU/UK-eligible infra employer; dupes=0; apps:sent still 12 findings, nothing sent; repo untouched (26)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hajn3c06xsjl24xgme9gy0k"
+    },
+    {
+      "id": "fa24acd2-6581-4e9e-b467-65e15f1d1a21",
+      "ts": "2026-11-24T01:58:10Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove 3 idle panes (02:50 CET). jev-decide classify vs labels.json = needs_review x3, none decisive -> fell back to standing tasks. devin verify image-daily Go port green (images:gate+checks:quick, commit+push if tidy); freebuff EU/DE scout+packets, no send; delphi intl scout+packets, no send. All 3 confirmed working (devin Running tools checks:quick, freebuff working 50s curl-rivia, delphi working 50s scout python).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
+      "branch": "main",
+      "frame": "03hajmjs949wl9v2725sjr69w"
+    },
+    {
+      "id": "f5532366-2072-4d83-a804-e4ad572a8611",
+      "ts": "2026-11-24T01:50:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-intl",
+      "action": "landed: intl scout 2026-11-24 — Railway Infrastructure Engineer (Ashby b8072f95, global remote, Fit 3) added as lead with 2pp CV + 1pp letter packet (prep, not sent); Fastly (UK-only remote) and Odin (US-only, no sponsorship) recorded not eligible; ElevenLabs already tracked (prep); dupe gate re-cleared, 8 rows closed, dupes=0; apps:sent still fails with 12 findings so nothing was sent; repo untouched (26 pre-existing)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hajl0kfuhwhda9ls47zcu8s"
+    },
+    {
+      "id": "8ba8f0e8-df4e-4158-a852-de6e847e0c71",
+      "ts": "2026-11-24T01:49:50Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily",
+      "action": "landed: remaining engine helpers ported to Go ops.go — reason/archive/resolve/dimensions/landscape/crop/deploy/round; engine 256->143 lines, only build_index shell left | gate: images:gate ok, checks:host frieren PASS, checks:quick PASS (budget fixture), drv-equality 30/30",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
+      "branch": "main",
+      "frame": "03hajkx71kszwa9expozz7crm"
+    },
     {
       "id": "85f34072-7ebf-4d1b-b640-a25fbf886ee1",
       "ts": "2026-11-24T01:49:03Z",
@@ -2588,118 +2696,6 @@
       "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
       "branch": "main",
       "frame": "03hadsfu0d5mu4k3rnin999e3"
-    },
-    {
-      "id": "5c214ed3-94d1-498b-a5f7-195b4cbcaff5",
-      "ts": "2026-11-23T07:27:08Z",
-      "source": "devin",
-      "subject": "nixconfig:images-pipeline-redesign",
-      "action": "landed: images:ship (gen->cloudinary->manifest->deploy->served-check) + images:add primitive; image-daily add subcommand; gen stderr hint | gate: checks:tasks PASS + live e2e (served:true on bountystash-assets manifest, 729 assets)",
-      "outcome": "done",
-      "claims": [
-        "scripts/task",
-        "taskfiles/images.yml"
-      ],
-      "files": [
-        "scripts/task/image-ship.sh",
-        "scripts/task/image-daily.sh",
-        "scripts/task/image-gen.sh",
-        "taskfiles/images.yml"
-      ],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hadlifik6zhwjpua2wl5h9h"
-    },
-    {
-      "id": "8713e065-7d26-4c72-aa24-7f588da7b209",
-      "ts": "2026-11-23T07:24:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-ptb-virtual7-2026-11-23",
-      "action": "landed: PTB verified submitted (Eingangsbestätigung 06:31, softgarden msg 231460331) — not resubmitted; virtual7 Kubernetes/Private Cloud packet built (de, 2pp CV + 1pp letter, JD stored, row at prep, held). Scan of arbeitnow p1-8, remoteok, jobicy, WWR, himalayas yielded one viable DE-remote lead. | gate: pdfinfo 2pp/1pp + row state",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadkz2v5lji9vj5u12m3bub"
-    },
-    {
-      "id": "dc67158e-8d2e-4c7c-b7ae-8fb78814d6a0",
-      "ts": "2026-11-23T07:18:05Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-delphi-0814",
-      "action": "Re-drove idle delphi freebuff pane 0:2.1 after it completed the lead-liveness recheck (22 leads: 19 live, 1 stale, 1 repost, 2 blocked, 0 closed): routed build-application via jev-decide (0.87/0.8); sent Flox MTS Infrastructure packet-build task (fit 5, strongest match, lead with NixOS flake); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03hadjquc36gbb4ckguk7xwpp"
-    },
-    {
-      "id": "b24a1f28-f065-4b74-90e5-5d805e87e7f6",
-      "ts": "2026-11-23T07:16:26Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-packet-flox-infrastructure",
-      "action": "landed: Flox MTS Infrastructure & Operations packet (fit 5) — letter leads with the 13-host NixOS flake and names Hydra/cache-at-scale, Rust, macOS builders, AWS/Terraform as gaps; CV 2pp/669w, letter 1pp/422w; JD stored; page budgets passed. Held, not submitted. | gate: nix packet build + pdfinfo 2pp/1pp + row at prep",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadjf8t7gom1oj8h2ngqkug"
-    },
-    {
-      "id": "b0241abe-e5f1-4064-abf0-ba1baf4cfd13",
-      "ts": "2026-11-23T07:11:51Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-23: 0 plate(s) kept of 21 spent, 27 roster row(s) waiting, 728 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hadiiztpy7rh8hwg2h5an3r"
-    },
-    {
-      "id": "f8aa7398-6378-4dc2-abf7-480b891227d3",
-      "ts": "2026-11-23T07:04:32Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-leads-liveness-2026-11-23c",
-      "action": "correct: previous turn claimed a Nebius dedupe that did not apply — jq read apply_url while the API serves applyUrl. Real finding: lead row nebius-senior-sre-data-platform duplicated an ALREADY-APPLIED requisition (GH 5040676101, applied 2026-11-21) and still told a submit pass to apply; now closed as duplicate, canonical applied row untouched. Lead census: 22 live/stale/blocked. | gate: both rows re-queried, appflow-check duplicate pair cleared",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadh3hcf6pwbojwxbsowz2b"
-    },
-    {
-      "id": "abafd742-b177-4ffd-a5ea-0fe3e99aced9",
-      "ts": "2026-11-23T07:04:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-leads-liveness-2026-11-23b",
-      "action": "landed: liveness recheck of 23 tracked leads via ATS APIs — 19 live, 1 stale, 1 repost, 2 blocked (no DE), 1 newly eligible; 0 closed. Also deduped nebius-senior-site-reliability-engineer-data-platform into nebius-senior-sre-data-platform (same GH 5040676101). | gate: appflow-check clean apart from pre-existing discovered-wikimedia-foundation placeholder",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadh1xv5ce1vrkm0qfgaa6h"
-    },
-    {
-      "id": "b5b519dd-9f7e-4393-8b22-3f65bc567f31",
-      "ts": "2026-11-23T07:04:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-leads-liveness-2026-11-23b",
-      "action": "landed: liveness recheck of all 23 tracked leads via ATS APIs (Ashby/Greenhouse/Lever/SmartRecruiters/BambooHR/Zoho/Teamtailor) | 19 live, 1 stale (WunderGraph, 2024-04-10), 1 repost (Hits NRW Apr→Nov), 2 blocked on Germany eligibility (Antithesis UK-only, Pragmatike no DE), 1 newly eligible (Qonto Berlin secondary); 0 closed — Midnight id-26 'closed' reading was a jq string-vs-number error, corrected | gate: per-req API identity + dates, appflow-check clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadh0m88stcdh7g8zjoscxx"
     }
   ]
 }

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-round.sh [status] — ensure a round is running; `status` is the readout
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 # The no-babysitting entry point: ensure a round is running, then stop. Called
@@ -15,7 +15,7 @@ cmd_round() { # [status]
   local state=$IMAGES_ROOT/.round.json unit active pending left
   if [ "${1:-}" = "status" ]; then
     pending=$("$(image_daily_cli)" pending --roster "$roster" 2>/dev/null || echo '?')
-    left=$(remaining 2>/dev/null || echo '?')
+    left=$("$(image_daily_cli)" remaining 2>/dev/null || echo '?')
     if [ -s "$state" ]; then
       unit=$(jq -r '.unit // empty' "$state" 2>/dev/null)
       active=$(systemctl --user is-active "$unit" 2>/dev/null || true)
@@ -39,7 +39,7 @@ cmd_round() { # [status]
     fi
   fi
   pending=$("$(image_daily_cli)" pending --roster "$roster" 2>/dev/null || echo 0)
-  left=$(remaining 2>/dev/null || echo 0)
+  left=$("$(image_daily_cli)" remaining 2>/dev/null || echo 0)
   if [ "${pending:-0}" -le 0 ]; then
     jq -cn --arg r "$roster" '{state: "idle", reason: "every roster row has a kept plate", roster: $r}'
     return 0

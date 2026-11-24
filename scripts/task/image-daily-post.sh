@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-post.sh — SLUG= TITLE= one motion: banner, judge, upload, manifest, front matter
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 # One motion from a title to a post that has a banner. The banner is generated,
@@ -50,24 +50,24 @@ cmd_post() {
     ;;
   esac
   [ -z "$draft" ] || [ -f "$draft" ] || die "no draft at $draft"
-  [ "$(remaining || echo 0)" -gt 0 ] || die "no images left today"
+  [ "$("$cli" remaining || echo 0)" -gt 0 ] || die "no images left today"
 
   say "$slug: generating a banner"
   file=$("$cli" attempt --id "blog-$slug" --lane blog --size 1536x1024 --name "$slug.png" --prompt "$prompt" --day "$day") || die "generation failed"
-  verdict=$("$cli" judge --png "$file" --lane blog --intent "$(lane_setting blog intent)")
+  verdict=$("$cli" judge --png "$file" --lane blog --intent "$("$cli" setting --lane blog --key intent)")
   if [ "$(printf '%s' "$verdict" | jq -r '.verdict')" = "reroll" ]; then
     defect=$(printf '%s' "$verdict" | jq -r '.defect // "the composition"')
     say "$slug: reroll — $defect"
     rm -f "$file"
     file=$("$cli" attempt --id "blog-$slug" --lane blog --size 1536x1024 --name "$slug.png" \
       --prompt "$prompt (Change only this: $defect.)" --day "$day") || die "reroll failed"
-    verdict=$("$cli" judge --png "$file" --lane blog --intent "$(lane_setting blog intent)")
+    verdict=$("$cli" judge --png "$file" --lane blog --intent "$("$cli" setting --lane blog --key intent)")
   fi
   say "judge: $(printf '%s' "$verdict" | jq -r '.verdict + " — " + .reason')"
   [ "$(printf '%s' "$verdict" | jq -r '.verdict')" = "keep" ] ||
     die "the judge did not keep $file; nothing was uploaded"
 
-  record "$day" blog "blog-$slug" "$file" keep "$(printf '%s' "$verdict" | jq -r '.reason')"
+  "$cli" record --day "$day" --lane blog --brief "blog-$slug" --path "$file" --verdict keep --reason "$(printf '%s' "$verdict" | jq -r '.reason')"
   jpg=$IMAGES_ROOT/published/blog/$slug.jpg
   "$cli" crop --png "$file" --jpg "$jpg" || die "could not crop the banner"
   url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$jpg" --public-id "assets/blog/$slug") ||
@@ -80,7 +80,7 @@ cmd_post() {
   [ -f "$tsv" ] && grep -v "^blog/$slug\.jpg	" "$tsv" >"$tsv.new" || true
   printf 'blog/%s.jpg\t%s\t%s\n' "$slug" "$url" "$(stat -c%s "$jpg")" >>"$tsv.new"
   mv -f "$tsv.new" "$tsv"
-  build_index
+  "$cli" index
   "$cli" deploy
 
   card=$(bash "$repo/scripts/task/cloudinary.sh" url "assets/blog/$slug" \

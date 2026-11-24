@@ -13,6 +13,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -272,6 +273,10 @@ func die(format string, args ...any) {
 }
 
 func runManifest(root, repo string) {
+	os.Stdout.Write(manifestJSON(root, repo))
+}
+
+func manifestJSON(root, repo string) []byte {
 	urlsPath := root + "/published/urls.tsv"
 	urls, err := os.Open(urlsPath)
 	if err != nil {
@@ -368,17 +373,19 @@ func runManifest(root, repo string) {
 		Tags:        tags,
 		Assets:      assets,
 	}
-	enc := json.NewEncoder(os.Stdout)
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
 	enc.SetEscapeHTML(false)
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(m); err != nil {
 		die("manifest encode: %v", err)
 	}
+	return buf.Bytes()
 }
 
 func main() {
 	if len(os.Args) < 2 {
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
 	}
 	switch os.Args[1] {
 	case "manifest":
@@ -424,7 +431,25 @@ func main() {
 		cmdDeploy(os.Args[2:])
 	case "round":
 		cmdRound(os.Args[2:])
+	case "lanes":
+		cmdLanes(os.Args[2:])
+	case "budget":
+		cmdBudget(os.Args[2:])
+	case "setting":
+		cmdSetting(os.Args[2:])
+	case "guard":
+		cmdGuard(os.Args[2:])
+	case "due":
+		cmdDue(os.Args[2:])
+	case "parked":
+		cmdParked(os.Args[2:])
+	case "record":
+		cmdRecord(os.Args[2:])
+	case "index":
+		cmdIndex(os.Args[2:])
+	case "shrink-guard":
+		cmdShrinkGuard(os.Args[2:])
 	default:
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard> [flags]")
 	}
 }

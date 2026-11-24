@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-publish.sh — upload kept assets to Cloudinary, write the manifest, deploy the frontend
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 # A publish that rebuilds the manifest smaller than what is being served means the
@@ -10,20 +10,13 @@ source "$here/image-daily-engine.sh"
 # 144 with every upload still intact and the gallery lost the rest. Restore the
 # served manifest and stop. `served` and `urls_backup` are locals of cmd_publish.
 
+# The count comes from the backup rows, not from `cmd_publish`'s variable: bash
+# scopes by call dynamic, so an assignment further down the publish path clobbered
+# it and the guard compared against nothing (2026-11-22: "651 asset(s) but  are
+# being served", then `[: : integer expected`, and the deploy was refused).
+# The compare/restore/refuse itself is `image-daily shrink-guard` in tools/image-daily.
 publish_shrink_guard() {
-  [ -n "${urls_backup:-}" ] || return 0
-  # The count comes from the backup rows, not from `cmd_publish`'s variable: bash
-  # scopes by call dynamic, so an assignment further down the publish path clobbered
-  # it and the guard compared against nothing (2026-11-22: "651 asset(s) but  are
-  # being served", then `[: : integer expected`, and the deploy was refused).
-  local now served
-  now=$(jq -r '.count // 0' "$IMAGES_ROOT/published/manifest.json" 2>/dev/null || echo 0)
-  served=$(grep -c . "$urls_backup" 2>/dev/null || true)
-  [ "${now:-0}" -ge "${served:-0}" ] && return 0
-  cp -f "$urls_backup" "$IMAGES_ROOT/published/urls.tsv"
-  build_index
-  rm -f "$urls_backup"
-  die "publish refused: this host sees $now asset(s) but $served are being served — publish where IMAGES_ROOT holds the whole bank (frieren: /Volumes/data/pics/generated), or FORCE=1 to shrink on purpose"
+  "$cli" shrink-guard --backup "${urls_backup:-}"
 }
 
 
@@ -107,7 +100,7 @@ cmd_publish() {
     cp -f "$IMAGES_ROOT/published/urls.tsv" "$urls_backup"
   fi
   for lane in site wall blog badge; do
-    [ "$(lane_setting "$lane" publish)" = "true" ] || continue
+    [ ""$cli" setting --lane "$lane" --key publish" = "true" ] || continue
     staged=$("$cli" stage --lane "$lane")
     PUBLISH_SHIFTED=$((PUBLISH_SHIFTED + ${staged%%[[:space:]]*}))
     PUBLISH_GONE=$((PUBLISH_GONE + ${staged##*[[:space:]]}))
@@ -119,7 +112,7 @@ cmd_publish() {
   # and the account is the authority both are checked against.
   merge_served_urls
   "$cli" adopt
-  build_index
+  "$cli" index
   say "$(find "$IMAGES_ROOT/published" \( -name '*.png' -o -name '*.jpg' \) | wc -l) asset(s) staged"
   publish_shrink_guard
   if [ "${DRY:-0}" = "1" ]; then
@@ -178,7 +171,7 @@ cmd_publish() {
   mv -f "$fresh" "$rows"
   rm -f "$restaged" "$known"
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
-  build_index
+  "$cli" index
   publish_shrink_guard
   "$cli" deploy
 }

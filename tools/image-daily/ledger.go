@@ -233,9 +233,9 @@ func laneSetting(repo, lane, key string) string {
 }
 
 type dueRow struct {
-	id, size, name, prompt string
-	rev                    int
-	expect                 string
+	id, lane, size, name, prompt string
+	rev                          int
+	expect                       string
 }
 
 // dueRows is `due "$lane"`: briefs in lane order whose freshness promise has
@@ -304,7 +304,7 @@ func dueRows(root, repo, lane string) []dueRow {
 		}
 		if force || lastKeep == "" || lastS == 0 || float64((now-lastS)/86400) >= b.Every {
 			rows = append(rows, dueRow{
-				id: b.ID, size: b.Size, name: b.Name,
+				id: b.ID, lane: b.Lane, size: b.Size, name: b.Name,
 				prompt: b.Prompt, rev: b.Rev, expect: b.Expect,
 			})
 		}

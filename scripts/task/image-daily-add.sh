@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-add.sh FILE [URL] — give one file a manifest row, rebuild, deploy
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 
@@ -49,7 +49,7 @@ cmd_add() { # FILE [URL]
     sort -t"$(printf '\t')" -k1,1 -o "$rows" "$rows"
     say "add: $rel -> $url"
   fi
-  build_index
+  "$(image_daily_cli)" index
   "$(image_daily_cli)" deploy
 }
 

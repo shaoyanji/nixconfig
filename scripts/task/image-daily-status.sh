@@ -9,10 +9,11 @@ cmd_status() {
   need jq
   local stale=0 lane newest age max
   [ -f "$LEDGER" ] || { say "no ledger yet at $LEDGER"; exit 1; }
-  select_lanes
+  cli=$(image_daily_cli)
+  mapfile -t lane_list < <("$cli" lanes)
   for lane in "${lane_list[@]}"; do
     newest=$(jq -r --arg l "$lane" 'select(.verdict == "keep" and .lane == $l) | .day' "$LEDGER" | sort | tail -1)
-    max=$(lane_setting "$lane" max_age_days)
+    max=$("$cli" setting --lane "$lane" --key max_age_days)
     if [ -z "$newest" ]; then
       printf '  %-6s never  stale\n' "$lane"
       stale=1
@@ -28,11 +29,11 @@ cmd_status() {
   done
   local parked=0 id rev
   while IFS=$'\t' read -r id rev; do
-    if is_parked "$id" "$rev"; then parked=$((parked + 1)); fi
+    if "$cli" parked --id "$id" --rev "$rev"; then parked=$((parked + 1)); fi
   done < <(jq -r '.briefs[] | [.id, (.rev // 1)] | @tsv' "$BRIEFS")
   [ "$parked" -eq 0 ] ||
     printf '  %-6s %s brief(s) parked: %s rejections without a keep\n' "" "$parked" "$PARK_AFTER"
-  printf '  remaining today: %s\n' "$(remaining 2>/dev/null || echo '?')"
+  printf '  remaining today: %s\n' "$("$cli" remaining 2>/dev/null || echo '?')"
   exit "$stale"
 }
 

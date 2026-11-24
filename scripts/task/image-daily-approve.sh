@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-approve.sh — a day's kept plates into the wallpaper rotation, newest first
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 

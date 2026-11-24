@@ -30,7 +30,11 @@ func cmdReason(args []string) {
 
 // `image-daily archive --file PATH` — copy a plate into variants/ before a
 // re-render overwrites it; a same-second collision gets a counter so neither
-// copy wins.
+// copy wins. The earlier plate is the one an operator may want back: on
+// 2026-11-16 the second Mortred read worse than the bust it replaced, and the
+// better render survived only as a Cloudinary version — copy the file away
+// before the generator is pointed at its path. Stamped, so a slug can
+// accumulate renders and `variants` lists them oldest first.
 func cmdArchive(args []string) {
 	fs := flag.NewFlagSet("archive", flag.ExitOnError)
 	file := fs.String("file", "", "plate to archive")
@@ -151,9 +155,13 @@ func cmdDeploy(args []string) {
 }
 
 // `image-daily round --roster PATH` — detach a plates round under systemd-run
-// and write .round.json, exactly what launch_round did: the env is passed
-// explicitly because a unit inherits nothing, and the state file is what a
-// later `round status` reads.
+// and write .round.json, exactly what launch_round did: a round is a job, not
+// a call — one plate is about a minute and a closed burst window can add a
+// quarter of an hour, and the unit outlives the shell that starts it. The env
+// is passed explicitly because a unit inherits nothing, the working directory
+// matters (a unit that starts in $HOME cannot find the dispatcher and dies
+// 127 — 2026-11-22, the first detached round of the day), and the state file
+// is what a later `round status` reads instead of a log it must watch.
 func cmdRound(args []string) {
 	fs := flag.NewFlagSet("round", flag.ExitOnError)
 	roster := fs.String("roster", "", "roster file")

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # image-daily-run.sh — generate, judge, keep; every verdict to the ledger
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 cmd_run() {
   need jq cpg agy git
-  briefs_guard || die "briefs: a brief is not bank-ready (see above)"
+  "$(image_daily_cli)" guard || die "briefs: a brief is not bank-ready (see above)"
   mkdir -p "$IMAGES_ROOT" "$STAGE"
   exec 9>"$IMAGES_ROOT/.run.lock"
   flock -n 9 || { say "another run holds the lock"; exit 0; }
@@ -25,7 +25,7 @@ cmd_run() {
   fi
 
   local rem lane budget
-  rem=$(remaining)
+  rem=$("$(image_daily_cli)" remaining)
   [ -n "$rem" ] || die "cpg usage answered nothing — run cpg status --json"
   # Every slot holds a slice back. A plate someone asked for during the day is worth
   # more than the queue's next due entry, and a slot that spends the day at 13:20
@@ -44,9 +44,9 @@ cmd_run() {
 
   local cap=${CAP:-0} spent_total=0 room cli
   cli=$(image_daily_cli)
-  select_lanes
+  mapfile -t lane_list < <("$cli" lanes)
   for lane in "${lane_list[@]}"; do
-    budget=$(lane_budget "$lane")
+    budget=$("$cli" budget --lane "$lane")
     [ "$budget" -gt "$rem" ] && budget=$rem
     if [ "$cap" -gt 0 ]; then
       room=$((cap - spent_total))
@@ -55,7 +55,7 @@ cmd_run() {
     fi
     LANE_SPENT=$("$cli" lane --lane "$lane" --budget "$budget" || echo 0)
     spent_total=$((spent_total + LANE_SPENT))
-    rem=$(remaining || echo 0)
+    rem=$("$cli" remaining || echo 0)
   done
 
   # Whatever is left is discretionary: the storybook project takes it, and the
@@ -64,7 +64,7 @@ cmd_run() {
   # the same style on every page, which is the one thing a 100-image day should
   # not buy; a varied bank is worth more than 32 plates of the same look.
   local left
-  left=$(remaining || echo 0)
+  left=$("$cli" remaining || echo 0)
   if [ "$reserve" -gt 0 ]; then
     left=$((left - reserve))
     [ "$left" -lt 0 ] && left=0

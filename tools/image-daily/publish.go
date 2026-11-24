@@ -214,6 +214,15 @@ func cmdStage(args []string) {
 	fmt.Printf("%d\t%d\n", shifted, gone)
 }
 
+// Cloudinary is the bank. The manifest is a view of the account, not of the
+// disk: an upload with no row is an asset the gallery cannot show, and the
+// ways to get one are ordinary — a publish from a host holding a slice of the
+// tree, or a render written by `images:gen` that no round picked up. Measured
+// 2026-11-21: 796 uploads, 195 with no row, 118 of them real plates that
+// nothing could serve. The id is the path without its extension, so the row
+// is derivable both ways, and a badge is addressed by host rather than by
+// day. Adoption never rewrites a row that exists: the URL already being
+// served is the one consumers have.
 func cmdAdopt(args []string) {
 	fs := flag.NewFlagSet("adopt", flag.ExitOnError)
 	root := fs.String("root", os.Getenv("IMAGES_ROOT"), "image tree root")
@@ -239,7 +248,13 @@ func cmdShapes(args []string) {
 		die("shapes needs --root (or IMAGES_ROOT)")
 	}
 
-	shapesPath := *root + "/published/shapes.tsv"
+	shapesPass(*root)
+}
+
+// shapesPass extends published/shapes.tsv with one row per urls.tsv rel that
+// is not already cached — the shape-cache loop build_index used to run.
+func shapesPass(root string) {
+	shapesPath := root + "/published/shapes.tsv"
 	cached := map[string]bool{}
 	if data, err := os.ReadFile(shapesPath); err == nil {
 		for _, line := range strings.Split(string(data), "\n") {
@@ -254,7 +269,7 @@ func cmdShapes(args []string) {
 	}
 	defer f.Close()
 
-	urls, err := os.ReadFile(*root + "/published/urls.tsv")
+	urls, err := os.ReadFile(root + "/published/urls.tsv")
 	if err != nil {
 		return // the caller guards urls.tsv; nothing cached to extend
 	}
@@ -263,9 +278,9 @@ func cmdShapes(args []string) {
 		if rel == "" || cached[rel] {
 			continue
 		}
-		file := *root + "/published/" + rel
+		file := root + "/published/" + rel
 		if _, err := os.Stat(file); err != nil {
-			file = *root + "/src/" + rel
+			file = root + "/src/" + rel
 		}
 		if _, err := os.Stat(file); err != nil {
 			continue

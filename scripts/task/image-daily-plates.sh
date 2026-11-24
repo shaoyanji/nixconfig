@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-plates.sh — a requested round of photoreal character plates from the roster
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=image-daily-engine.sh
-source "$here/image-daily-engine.sh"
+# shellcheck source=image-daily-lib.sh
+source "$here/image-daily-lib.sh"
 
 
 # A requested character plate is not a brief and cannot be one: a brief is a
@@ -124,7 +124,7 @@ cmd_plates() {
   local ledger_before=0
   [ -f "$LEDGER" ] && ledger_before=$(wc -l <"$LEDGER" | tr -d ' ')
   day=$(today)
-  left=$(remaining)
+  left=$("$cli" remaining)
   [ -n "$left" ] || die "usage unreadable (401 from cpg) — run cpg refresh, or chatplayground-go login when the session itself is gone"
   say "plates: $(grep -vc '^#' "$roster") row(s) in the roster, $left image(s) left${cap:+, cap $cap}"
 
@@ -200,7 +200,7 @@ cmd_plates() {
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
     defect=$(printf '%s' "$v" | jq -r '.defect // ""')
     spent=$((spent + 1))
-    record "$day" wall "photoreal-$slug" "$file" "$verdict" "$("$cli" reason --json "$v")" "$prompt" 1 1
+    "$cli" record --day "$day" --lane wall --brief "photoreal-$slug" --path "$file" --verdict "$verdict" --reason "$("$cli" reason --json "$v")" --prompt "$prompt" --attempt 1 --rev 1
 
     if [ "$verdict" = "reroll" ] && [ -n "$defect" ] && [ "$left" -gt 0 ] &&
       { [ "$cap" -eq 0 ] || [ "$spent" -lt "$cap" ]; }; then
@@ -219,7 +219,7 @@ cmd_plates() {
       defect=$(printf '%s' "$v" | jq -r '.defect // ""')
       spent=$((spent + 1))
       retried=1
-      record "$day" wall "photoreal-$slug" "$file" "$verdict" "$("$cli" reason --json "$v")" "$sent" 2 1
+      "$cli" record --day "$day" --lane wall --brief "photoreal-$slug" --path "$file" --verdict "$verdict" --reason "$("$cli" reason --json "$v")" --prompt "$sent" --attempt 2 --rev 1
     fi
     say "$slug: $verdict"
     # Two unjudged plates in a row is a dead judge, not a bad image: every

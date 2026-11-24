@@ -5524,5 +5524,52 @@
         vendor is either filed at lead or recorded as read with no match.
       '';
     };
+    job-scout-linkedin-direct-2026-11-24 = {
+      title = "A sweep with no aggregator in front of it: three direct employers, and Telekom MMS refused";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Five LinkedIn guest queries over the German seven-day window gave 50 cards; the untracked direct employers that survived the agency filter were CloudFactory (Berlin, Senior SRE, fit 4), SCHUFA (Wiesbaden, Senior AWS Platform Engineer, fit 3) and Markant (Offenburg, SRE, fit 3), filed at lead with the 2026-12-07 hold. Telekom MMS is refused because the Telekom group already holds an applied row.";
+      from = ["job-scout-sre-platform-2026-11-24"];
+      refs = {
+        tasks = ["apps:add" "apps:dupes" "apps:vendors"];
+      };
+      body = ''
+        Sweep 2026-11-24, LinkedIn guest search with no aggregator in front of
+        it: five queries (DevOps, SRE, Platform, Infrastructure, Kubernetes)
+        over the German seven-day window gave 50 cards. Agencies and
+        consultancies were dropped — Trust In SODA, Akkodis, Instaffo — and the
+        untracked direct employers that survived were CloudFactory, SCHUFA and
+        Markant, filed at lead to 2026-12-07 with fit 4, 3 and 3.
+
+        CloudFactory is the one worth a packet after the hold: Berlin, Senior
+        SRE, posted 2026-11-24. SCHUFA wants AWS and Terraform for a Wiesbaden
+        platform team and Markant runs cloud applications for retail from
+        Offenburg — both SRE-shaped, both carrying a language and relocation
+        question. Telekom MMS (Senior Cloud and DevOps, Berlin and Dresden) was
+        refused: the Telekom group already holds an applied row, and a second
+        Telekom application is the live-row rule's business, not fit's.
+
+        Arbeitnow is saturated, and that is the finding. Nine pages, 2700
+        postings, and against the 842-company record the only untracked
+        infrastructure employer left was alphacoders, a partner placement in
+        Cologne — recorded as read, not filed. Every Scalable, Tipico, wabcon
+        and MAIA req this sweep turned up already held a row.
+
+        The dedupe bug is worth naming. `apps-db.sh export` prints TOON
+        (`[1117]{id,company,...}:`), so a json.loads on it raises and an except
+        that swallows the error leaves the known set EMPTY — the first pass of
+        this sweep deduped against nothing but a hardcoded list and reported
+        tracked employers as new. Parse the header for the column order, then
+        the rows.
+
+        Exit: the three rows stay at lead until 2026-12-07. apps:dupes is not
+        empty and was not before this sweep — auteega, Catapult Sports, DHBW
+        Mannheim, Hochschul-IT-Services.nrw, ICF, Shipzero and SourceQ each hold
+        two live rows — and none of the three filed here is among them. The next
+        sweep parses the export before it calls anything new.
+      '';
+    };
   };
 }

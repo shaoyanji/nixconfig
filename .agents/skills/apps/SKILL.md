@@ -63,7 +63,7 @@ page returns CSS and jQuery (`elementor-widget-nav-menu …`), which a packet wi
 gladly project onto; `lynx -dump -nolist -width=110 | awk 'NF'` gives the ad. And
 a 200 is not proof of reachability: `linbit.com/jobs/<anything>` answers 200 and
 `/jobs/` listing text carries the title, yet every direct posting path is 403 to
-a non-browser fetch — so a short JD file is scaffolding, not a description, and
+a non-browser fetch — so a short JD file is a stub, not a description, and
 the row's `next_action` says so instead of a packet built on nav text.
 
 ## Track

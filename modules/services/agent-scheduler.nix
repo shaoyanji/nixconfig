@@ -121,6 +121,7 @@
       };
     };
   });
+  enabledJobs = lib.filterAttrs (_: j: j.enable) cfg.jobs;
 in {
   options.services.agentScheduler = {
     enable = lib.mkEnableOption "declarative autonomous agent scheduler";
@@ -154,14 +155,16 @@ in {
             StandardOutput = "journal";
             StandardError = "journal";
           }
-          // lib.optionalAttrs (job.nice != null) {Nice = job.nice;}
-          // lib.optionalAttrs (job.ioSchedulingClass != null) {IOSchedulingClass = job.ioSchedulingClass;}
-          // lib.optionalAttrs (job.cpuQuota != null) {CPUQuota = job.cpuQuota;}
-          // lib.optionalAttrs (job.cpuWeight != null) {CPUWeight = job.cpuWeight;}
-          // lib.optionalAttrs (job.ioWeight != null) {IOWeight = job.ioWeight;}
+          // lib.filterAttrs (_: v: v != null) {
+            Nice = job.nice;
+            IOSchedulingClass = job.ioSchedulingClass;
+            CPUQuota = job.cpuQuota;
+            CPUWeight = job.cpuWeight;
+            IOWeight = job.ioWeight;
+          }
           // job.extraServiceConfig;
       })
-    (lib.filterAttrs (_: j: j.enable) cfg.jobs);
+    enabledJobs;
 
     systemd.user.timers = lib.mapAttrs' (_: job:
       lib.nameValuePair job.name {
@@ -176,6 +179,6 @@ in {
           };
         wantedBy = ["timers.target"];
       })
-    (lib.filterAttrs (_: j: j.enable) cfg.jobs);
+    enabledJobs;
   };
 }

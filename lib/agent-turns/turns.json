@@ -1,8 +1,63 @@
 {
-  "generated": "2026-11-24T20:57:34Z",
+  "generated": "2026-11-24T21:03:41Z",
   "count": 200,
-  "pin": "2bf5fe14f9d5991bf2c3ed4bca378c42cd10f002746932ff2f5a9ac8e5e8d102",
+  "pin": "a8b45c02b00708ea740adfa90c1b7a03ba747661e70951a2367d44cba57b7fff",
   "turns": [
+    {
+      "id": "beba2d0d-05fb-4e32-af97-a607369a44a7",
+      "ts": "2026-11-24T21:01:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-idle-drive",
+      "action": "drove 2 idle panes: devin(agents:1.1)->chain-change (jev p0.87 m0.75 selected), continue feature-chain refactor on next shared module + gate + commit; delphi(agents:3.1,ssh)->unblock_scouting (jev p0.90 m0.82 selected), diagnose send-path blocker + scout new leads. Both panes confirmed working (Thinking/working...).",
+      "outcome": "done",
+      "claims": [
+        "agents:1.1",
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
+      "branch": "main",
+      "frame": "03haptxbh26aklan0q1zixm77"
+    },
+    {
+      "id": "9a9247c9-71a9-46c1-a03a-7fb9b3404884",
+      "ts": "2026-11-24T20:57:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "scout: 4 live leads from niche sources (origin scout-niche-2026-11-24) — OpenNebula K8s Platform Eng (remote ES, 4), DeepJudge SRE (Zurich, 4), SysEleven SRE Managed K8s (remote DE, 5, resurfaced), BIS SRE (Basel, 4). BIS closes 2026-12-04, before the 2026-12-07 hold — needs a decision. VirtusLab/Luminovo/Parasail already held; Puzzle ITC/Cloud&Heat no infra req; BIT/ZHAW 404. No sends. | gate: agentsNotes.issues [] + docs-budget rc=0 + taskfile-graph rc=0 + pre-push PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hapt5iw8mc02dvr2mkmlwfy"
+    },
+    {
+      "id": "efd3caa7-ddda-435a-9b78-be31ed24febe",
+      "ts": "2026-11-24T20:57:37Z",
+      "source": "devin",
+      "subject": "nixconfig:dsh-free-model-clanker",
+      "action": "proven: plugin installed, dsh web live on clanker:18900, gateway 127.0.0.1:8326 serves 49 models incl deepseek-v4.1-flash-free + kimi-k3.1-pro (live answer via kilo lane; opencode lane quota-capped on clanker egress) | tailscale-on-clanker abandoned per operator; AGENTS.nix note fleet-hygiene-tailscale-creds-stale",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
+      "branch": "main",
+      "frame": "03hapt4xmbsf4718hoqeheyd0"
+    },
+    {
+      "id": "d1f1e5e5-3306-4eef-9af0-4358eb5f6bb4",
+      "ts": "2026-11-24T20:57:37Z",
+      "source": "devin",
+      "subject": "nixconfig:gatus-dns-monitor",
+      "action": "landed: delphi rebuilt, DNS monitor live — NOERROR + BODY==192.168.3.25; url must be the bare resolver IP (gatus dials verbatim + :53); nginx fixed en route via mapHashBucketSize 128 (commonHttpConfig position reads as duplicate)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
+      "branch": "main",
+      "frame": "03hapt4vfhoe80ueu5ktsb58d"
+    },
     {
       "id": "ff520208-c237-4f7c-9509-134b0389c933",
       "ts": "2026-11-24T20:57:29Z",
@@ -2630,60 +2685,6 @@
       "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
       "branch": "main",
       "frame": "03hamepyotp34sorryyuvudmn"
-    },
-    {
-      "id": "b41b44f3-53f7-4019-9999-256044f0135d",
-      "ts": "2026-11-24T10:26:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "resolved: kinexon-senior-devops-go-backend really was submitted. Greenhouse 'Thank you for your application!' at 08:22:19 (20261124082219.93774d39ef67af05@eu.greenhouse-mail.io) after the 08:20 form code, gh_jid 4936773101, one 3pp PDF (letter 1p + CV 2p). Posting re-checked: boards-api 200, updated 2026-09-21. No duplicate send; row stays applied, chase 2026-12-02; receipt written.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
-      "branch": "main",
-      "frame": "03hamdxbqppihmnu2yoknb5er"
-    },
-    {
-      "id": "a1a3eb2a-7490-424a-8490-51e604db361d",
-      "ts": "2026-11-24T10:25:40Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "upsert: 0 new rows. The 09:47 DACH scout's five leads (VISPIRON 5, SPECTRUM 4, Livello 4, NDI 3, hellomed 3) were already written by the 09:57 turn; re-checked against the 1038-row export and all five sit as lead with the 2026-12-07 hold. Nothing re-inserted, apps:dupes PASS.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hamdona5sp7fskil0gdry6e"
-    },
-    {
-      "id": "7709bf88-3423-432c-a425-bf0c093e4eb9",
-      "ts": "2026-11-24T10:25:34Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi freebuff (agents:3) idle after attention sweep done. jev-decide selected upsert p=0.94 margin=0.88: upsert newest scout leads into delphi DB. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
-      "branch": "main",
-      "frame": "03hamdo1xnifrrqf1gc2rc8c7"
-    },
-    {
-      "id": "453a269f-c4f2-46f9-b547-c87ece4ea3ec",
-      "ts": "2026-11-24T10:25:34Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout",
-      "action": "re-driven: freebuff (agents:2) idle after Muenster follow-ups done. jev-decide selected kinexon_blocked p=0.95 margin=0.92: resolve blocked kinexon turn (submitted 08:22 via Greenhouse gh_jid 4936773101). Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
-      "branch": "main",
-      "frame": "03hamdo091m03o4mt1n2k7u28"
     }
   ]
 }

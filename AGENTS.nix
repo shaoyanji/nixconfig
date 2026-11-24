@@ -6137,9 +6137,8 @@
         The real defect: applyUrl held the arbeitnow board page while the
         join.com form was written into nextAction. NDI, VISPIRON, SPECTRUM and
         Livello are repointed at their join.com endpoints, all four answering
-        200. JD not stored: the board page supplies the text when it renders
-        ld+json; where it does not, the posting text has to be pasted into
-        ~/.config/appflow/jd/<id>.txt before the packet build.
+        200. JD stored: the board page's ld+json carries the text, imported
+        into the database, so a packet builds from the row itself.
 
         Livello still needs a decision before any packet: the ad publishes
         EUR 45,000-50,000 a year in Düsseldorf, under a senior infra band, and

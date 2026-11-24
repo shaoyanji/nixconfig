@@ -5312,5 +5312,47 @@
         on the record at all. A person still sends; agents only prep.
       '';
     };
+    job-scout-fresh-eu-boards-2026-11-24 = {
+      title = "Fresh EU scouting on delphi: five new leads, and DeepL to packet first";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "LinkedIn EU 7-day, arbeitnow, WWR, Ashby and Greenhouse mostly returned employers already on record; five genuinely new EU infra leads were filed and the packet to build next is DeepL, whose row is already at prep.";
+      from = ["job-scout-next-sweep-delphi"];
+      refs = {
+        tasks = ["apps:dupes"];
+      };
+      body = ''
+        Lane switched from DB follow-up upserts to fresh scouting on 2026-11-24.
+        Sources: LinkedIn guest search, five keywords over the EU 7-day window
+        (41 cards), arbeitnow pages 1-3, the WWR devops feed, ten live Ashby
+        boards and two live Greenhouse boards. SmartRecruiters ran earlier the
+        same day and yielded only ServiceNow (Bangalore, West Palm Beach).
+
+        Every EU-eligible employer that surfaced already holds a row: Nebius,
+        Treatwell, Blocktech, Catawiki, Coda, Namespace, Tether, Shipzero,
+        Theodo, Elastic, Allica, DeepL, Supabase, Railway and n8n all dedupe
+        against the 1051-row export. The untracked LinkedIn cards were agencies
+        (Aubay, Adentis, Dellent, Devoteam, Neosoft, Jobgether), French-language
+        defence or public bodies, or management, QA and security titles. Five
+        passed that filter and were filed: eBay, Miniclip, Nordea, ORTEC and
+        Mammoet, each held to 2026-12-07 like the rest of the lane.
+
+        The scouting did find live reqs worth a packet on rows that already
+        exist: DeepL Staff SRE - Sovereign Cloud (Munich, remote, prep, fit 4),
+        Railway Senior Infra - Observability (global remote, prep, fit 3) and
+        Supabase SRE plus Platform Engineer, Managed Postgres (remote global,
+        fit 3) - Postgres-on-Kubernetes, the shape the mail archive already runs.
+
+        Today's DB action rows: Genesis PHCM (chase), Stadt Münster (Zeugnis
+        scan missing), SwissPeak and coni+partner (form blockers), gridscale
+        (packet ready, send opens 2026-12-07).
+
+        Exit: packets exist for DeepL then Supabase Managed Postgres, the record
+        shows them at prep with no send before 2026-12-07, and apps:dupes stays
+        []. A person still sends; agents only prep.
+      '';
+    };
   };
 }

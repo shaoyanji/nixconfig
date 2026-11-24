@@ -1,0 +1,82 @@
+name: fleet-nix
+description: The runner's Nix and checkout, in one place.
+# The trust class lives here and nowhere else. A substituter listed without the
+# key that proves its signatures makes CI fetch every path, reject it as
+# unsigned and rebuild glibc, gcc and the agent stack until the runner dies (run
+# 43835442088: 2722 refusals, then `Killed`). Pasted per job, that line went
+# missing in one copy and got fixed in another; this file is the copy.
+#
+# `gok.yml` keeps its own nix.conf on purpose: it derives substituters from the
+# compiled inventory at runtime instead of naming them. That is a different
+# decision, not a duplicate.
+inputs:
+  token:
+    description: Checkout token; the secrets submodule is private, so an anonymous clone fails.
+    default: ""
+  submodules:
+    description: "`recursive` for anything that reads modules/secrets, `false` for a plan-only job."
+    default: "recursive"
+  fetch-depth:
+    description: "`2` to diff against the previous commit, `1` to build."
+    default: "1"
+  nix:
+    description: "`false` for a job that only reads git."
+    default: "true"
+  cachix:
+    description: "`true` to publish to the shaoyanji cache (the build and boot jobs)."
+    default: "false"
+  cachix-token:
+    description: CACHIX_AUTH_TOKEN; empty means substitute but do not publish.
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      if: inputs.nix == 'true'
+      uses: cachix/install-nix-action@v30
+      with:
+        # WAN substituters only. flake.nix lists the LAN Harmonia cache, which a
+        # runner cannot reach, so the flake's nixConfig is deliberately not
+        # accepted: every path behind it would cost a connect timeout first.
+        # `pipe-operators` is load-bearing — the tree uses `|>`, so a runner
+        # without it cannot parse the flake at all.
+        extra_nix_config: |
+          experimental-features = nix-command flakes pipe-operators
+          substituters = https://shaoyanji.cachix.org https://cache.nixos.org/ https://cache.numtide.com https://install.determinate.systems
+          trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk=
+          max-jobs = 2
+          connect-timeout = 5
+
+    # cachix-action writes nix.conf after the install step, and Nix keeps only the
+    # trusted-public-keys line it reads last — so a build that must stay
+    # substitutable carries the set itself. Exported once here, read by the build
+    # loop as `--option trusted-public-keys "$keys"`: the alternative was a
+    # seventh literal copy of the same line.
+    - name: Export the key set for the build command
+      if: inputs.nix == 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        keys="$(sed -n 's/^ *trusted-public-keys[[:space:]]*=[[:space:]]*//p' "$GITHUB_ACTION_PATH/action.yml")"
+        [ -n "$keys" ] || { echo "::error::no trusted-public-keys line in fleet-nix/action.yml"; exit 1; }
+        echo "keys=$keys" >> "$GITHUB_ENV"
+
+    - name: Publish to the cache
+      if: inputs.cachix == 'true' && inputs.cachix-token != ''
+      uses: cachix/cachix-action@v14
+      with:
+        name: shaoyanji
+        authToken: ${{ inputs.cachix-token }}
+        useDaemon: false
+        installCommand: nix profile install nixpkgs#cachix
+
+    - name: Sync repository
+      uses: actions/checkout@v4
+      with:
+        # `persist-credentials: false` keeps the token out of .git/config; the
+        # explicit token is still needed because the submodule is private.
+        persist-credentials: false
+        submodules: ${{ inputs.submodules }}
+        fetch-depth: ${{ inputs.fetch-depth }}
+        token: ${{ inputs.token || github.token }}

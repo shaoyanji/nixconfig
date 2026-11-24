@@ -90,6 +90,43 @@ else
   fail=1
 fi
 
+# 2d. The breaker arms are load-bearing: unjudged_streak lives in plates.sh
+# AND tools/os today, so both must go before the gate can honestly pass — the
+# failure names the circuit breaker the 0-of-43 burn motivated.
+mkdir -p "$tmp/mut2"
+cp -r "$repo/scripts" "$tmp/mut2/" "$repo/tools" "$tmp/mut2/" 2>/dev/null
+chmod -R u+w "$tmp/mut2"
+sed -i '/unjudged_streak/d' "$tmp/mut2/scripts/task/image-daily-plates.sh"
+grep -rl 'unjudged_streak\|unjudgedStreak' "$tmp/mut2/tools/os" |
+  xargs -r sed -i '/unjudged_streak\|unjudgedStreak/d'
+if bash "$gate" "$tmp/mut2/scripts/task" >"$tmp/mut2.out" 2>&1; then
+  echo "FAIL without breakers: gate accepted a lane that burns allowance unjudged"
+  fail=1
+elif grep -q 'circuit breaker' "$tmp/mut2.out"; then
+  echo "ok   breakers stripped from shell+Go fails, naming the circuit breaker"
+else
+  echo "FAIL breakers stripped: fails but not on the circuit breaker"
+  fail=1
+fi
+
+# 2e. The shrink-guard arm is load-bearing: publish_shrink_guard in publish.sh
+# AND shrinkGuard in tools/os briefs.go must both go before it can pass — the
+# failure names the guard the 2026-11-21 556-to-144 shrink motivated.
+mkdir -p "$tmp/mut3"
+cp -r "$repo/scripts" "$tmp/mut3/" "$repo/tools" "$tmp/mut3/" 2>/dev/null
+chmod -R u+w "$tmp/mut3"
+sed -i '/publish_shrink_guard/d' "$tmp/mut3/scripts/task/image-daily-publish.sh"
+sed -i '/shrinkGuard/d' "$tmp/mut3/tools/os/internal/image/briefs.go"
+if bash "$gate" "$tmp/mut3/scripts/task" >"$tmp/mut3.out" 2>&1; then
+  echo "FAIL without shrink guard: gate accepted a publish that can halve the gallery"
+  fail=1
+elif grep -q 'shrink guard' "$tmp/mut3.out"; then
+  echo "ok   shrink guard stripped from shell+Go fails, naming the guard"
+else
+  echo "FAIL shrink guard stripped: fails but not on the shrink guard"
+  fail=1
+fi
+
 # 3. Dispatch drift fails: remove one command file from a copy of the current
 # tree and the agreement check must name it.
 mkdir "$tmp/drift"

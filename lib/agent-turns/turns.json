@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-24T23:32:50Z",
+  "generated": "2026-11-24T23:58:11Z",
   "count": 200,
-  "pin": "87824090143126979c6b8bae69a50a6768b82959271d175fa0d5c37be978cfde",
+  "pin": "8fbb4ac614ac38c4d54a7f434145f4f757d3992b4dc9a0ffd43909c24bb7a50b",
   "turns": [
+    {
+      "id": "8f56c42a-bf32-40a4-bda8-91828c94a9c2",
+      "ts": "2026-11-24T23:57:53Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correct: the post-upsert re-gate found one new employer double the 2026-11-25 sync added, not from this lane's sweep — Bechtle AG carried both the applied Senior Microsoft System Engineer row (2026-11-24, confirmation received, Job ID 83052) and a prep packet for DevOps Engineer Kubernetes; closed the prep row as duplicate under the 180-day employer rule, applied row stays canonical | gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haqsclkdl7y8h9f0fd6z38l"
+    },
+    {
+      "id": "301490fa-1b5b-40a4-af4e-2a31a4fbe463",
+      "ts": "2026-11-24T23:57:02Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: upsert new leads from attention sweep into delphi tracking DB, mark leads needing action today; pane confirmed working (thinking 4s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4961737868b0d526e025e3548baafdf4ed696231",
+      "branch": "main",
+      "frame": "03haqs6kct49mpn6xqot0q7h0"
+    },
+    {
+      "id": "817330ae-1153-4030-bb69-936b8a95574e",
+      "ts": "2026-11-24T23:57:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: fix fleet count followup + clear collision, then scout fresh verified DevOps/SRE/Platform/Infra leads into lead tracker (stage=scouted + nextAction); pane confirmed working (thinking 3s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4961737868b0d526e025e3548baafdf4ed696231",
+      "branch": "main",
+      "frame": "03haqs6it27gf5d85axsqciu0"
+    },
+    {
+      "id": "6ce9b99c-7cec-40c5-b908-7c593c25d890",
+      "ts": "2026-11-24T23:57:01Z",
+      "source": "devin",
+      "subject": "nixconfig:gate-image-daily-port",
+      "action": "landed: verify image-daily Go port gates and fix any that fail; confirm each gate fails on a real past mistake before it passes; pane confirmed working (Thinking 2s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4961737868b0d526e025e3548baafdf4ed696231",
+      "branch": "main",
+      "frame": "03haqs6h45dali4ialzwxo7yr"
+    },
+    {
+      "id": "a080c9e4-66ec-4b0e-b9de-2de35cd26d53",
+      "ts": "2026-11-24T23:48:45Z",
+      "source": "devji",
+      "subject": "nixconfig:wallpaper-heaven-angels-20",
+      "action": "landed: 20 heaven/angel landscape wallpapers generated + published | gate: task images:publish + pages-deploy success | artifacts outside git (data volume + Cloudinary + Pages)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4961737868b0d526e025e3548baafdf4ed696231",
+      "branch": "main",
+      "frame": "03haqqkbwovuaxb21hdrhk7ab"
+    },
     {
       "id": "716cdd19-1be9-4a8f-820c-b36700002150",
       "ts": "2026-11-24T23:29:45Z",
@@ -2595,79 +2660,6 @@
       "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
       "branch": "main",
       "frame": "03han8hd3kpkqhcbis97eh8l8"
-    },
-    {
-      "id": "6851495e-396c-4332-9d86-a7a2369fa2c4",
-      "ts": "2026-11-24T13:01:42Z",
-      "source": "hermes",
-      "subject": "nixconfig:devin-drive",
-      "action": "drove devin pane agents:1: sent gate-change task to verify image-daily Go port gates and remaining gate checks; pane shows Thinking",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03han860omxw0gssadrmgjkq0"
-    },
-    {
-      "id": "f8e508bd-b425-495d-b129-42998df3de2a",
-      "ts": "2026-11-24T12:49:58Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: 9 leads (Toast, Etraveli, Bahnhof fit 4; WebBeds, OANDA, Nasdaq, Fiserv, BeReal, Pigment fit 3; Frontiers refused, live row). Note job-scout-sre-platform-2026-11-24: site needs no copy change, packet order Toast then Etraveli after 12-07. b6398fac",
-      "outcome": "done",
-      "claims": [
-        "apps AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "b6398facf5986a195571bae1e1e9c3bfe93ea862",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03han5vggxxvc74omwl3v27px"
-    },
-    {
-      "id": "95a4424f-5aff-4a76-9581-9f0b6c38a1e2",
-      "ts": "2026-11-24T12:44:59Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:tmux-pane-steward",
-      "action": "drove agents:3.1 delphi freebuff (research); fresh working... gate; agents:1/2 jev needs_review left idle; agents:4 unknown",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03han4wfu5linfac9qktrb6f4"
-    },
-    {
-      "id": "9386fecb-9fc7-46eb-a162-573b4b39dc2a",
-      "ts": "2026-11-24T12:32:39Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward-probe",
-      "action": "pane-steward probe turn",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03han2hog2ruefbuxgoerpovc"
-    },
-    {
-      "id": "da40e686-1397-4a41-9aab-d00cb36b4ca2",
-      "ts": "2026-11-24T12:22:23Z",
-      "source": "hermes",
-      "subject": "nixconfig:freebuff-scout-cv-lane",
-      "action": "landed: drove idle freebuff pane agents:2.1; jev-decide classify needs_review → duel top two → novel won 0.69 vs 0.31 margin 0.38; task pasted via load-buffer+paste-buffer+Enter; pane working...",
-      "outcome": "done",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03han0hgtk6kja653bxo2z43z"
     }
   ]
 }

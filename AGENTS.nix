@@ -5341,11 +5341,12 @@
         pre-sales seat. OX now advertises SRE and platform roles across seven
         EU countries; its live row stays the only application.
 
-        Nix found nothing: the NixOS discourse jobs feed returned general
-        topics, not the jobs category. Tailscale lists no openings and works
-        from Canada, the US and the UK, so it stays rejected. No new FreeBSD
-        role either; the Foundation's row is still at lead. ByteDance's Dublin
-        SRE was left out on purpose, because TikTok already holds a live row.
+        Third pass, 2026-11-24, recorded against the schema: Dataport AoeR is
+        a new lead (`dataport-devops-engineer-anwendungen-databases`, fit 3,
+        two-year term) and gridscale's Ceph row now names its three live reqs.
+        Hetzner's SRE and Famedly's platform reqs are closed on their own
+        boards, Zammad has no engineering opening; BWI's DevSecOps lead is filed
+        at fit 2. Open: the send order above still waits on 2026-12-07.
 
         Exit: packets still go out in the order Toast, Etraveli, then Aiven
         after 2026-12-07, and a person sends. A sweep that reports no new leads

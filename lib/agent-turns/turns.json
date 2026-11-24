@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-24T14:24:06Z",
+  "generated": "2026-11-24T14:44:13Z",
   "count": 200,
-  "pin": "512eeda60dd80629ef216d94d9044c9c2ddc5ceb9369f249c14ed5ef2a1305e2",
+  "pin": "05e89cff60ec20c22fb5b5f0c506c22ad0cc902a911d92992f2708267b4e5eb8",
   "turns": [
+    {
+      "id": "bd681362-2286-47d7-ac47-ff6882e5ea3a",
+      "ts": "2026-11-24T14:24:09Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: upserted 4 attention-sweep leads at lead (Akamai Madrid, Ministry Brands Galway, Continental Lousado, SmartMed Porto) via apps:upsert; reviewFlag action-today on Akamai + Ministry Brands, held on the other two. No follow-up schema exists, so note delphi-leads-followups proposes application_followup + apps:due | gate: checks:kg PASS, agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e063c18e3abbb5cf258d1492278b4cfa29ee1ffc",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hano9tykgsepqgiqc3382b8"
+    },
     {
       "id": "15a2d5d6-b7af-4368-828d-db48652a91ac",
       "ts": "2026-11-24T14:23:53Z",
@@ -2786,19 +2799,6 @@
       "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
       "branch": "main",
       "frame": "03hakmcuaoa20s3s9ode13d9h"
-    },
-    {
-      "id": "2bff4f8c-cd2d-437c-9078-1015ffffae63",
-      "ts": "2026-11-24T05:00:15Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-packet-ipfabric",
-      "action": "Drafted packet for top lead, nothing sent. IP Fabric Senior Infrastructure Operations Engineer, GH 5001750101, Prague or Remote EU. English letter tailored to Hetzner/Proxmox/Puppet-Ansible internal platform, three gaps named; CV 14/36 highlights, 4/10 projects. Packet under ~/.local/state/appflow/submissions/ip-fabric-… (2pp CV, 1pp letter). Row lead->prep; person submits after 2026-12-07. Gates: dupes [] PASS, repo 26, apps:sent 201/12, no mail sent.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hakm49fcibzcbnr7oep3avh"
     }
   ]
 }

@@ -61,7 +61,7 @@ in {
     '';
   };
 
-  config = lib.mkIf (config.programs.zed-mcp.enable && (config.profiles.ai.enable or true)) {
+  config = lib.mkIf config.programs.zed-mcp.enable {
     home.packages = [zed-mcp-merge];
 
     # Reproducible artifact — inspect it, diff it, or merge it manually:

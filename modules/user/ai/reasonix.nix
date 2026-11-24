@@ -7,6 +7,6 @@
   lib,
   ...
 }:
-lib.mkIf (config.profiles.ai.enable && config.profiles.ai.tier == "full") {
+lib.mkIf (config.profiles.ai.tier == "full") {
   home.packages = [pkgs.llm-agents.reasonix];
 }

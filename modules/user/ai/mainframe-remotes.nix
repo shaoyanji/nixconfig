@@ -276,7 +276,7 @@ in {
     description = "Whether to install thin clients for agy and hermes targeting the frieren mainframe.";
   };
 
-  config = lib.mkIf (config.programs.mainframe-remotes.enable && (config.profiles.ai.enable or true)) {
+  config = lib.mkIf config.programs.mainframe-remotes.enable {
     home.packages = [
       agy-remote
       agy-terminal

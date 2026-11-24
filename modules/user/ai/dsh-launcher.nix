@@ -61,7 +61,7 @@
     Keywords=${keywords};
   '';
 in
-  lib.mkIf (config.profiles.ai.enable && isLinux) {
+  lib.mkIf isLinux {
     home.packages = lib.optional (config.profiles.ai.tier == "full") dshLocal;
 
     home.file =

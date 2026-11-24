@@ -1,12 +1,8 @@
-# aichat: model roles and providers, gated by `profiles.ai`.
-{
-  lib,
-  config,
-  ...
-}: {
-  # Gated by profiles.ai.enable (see ./default.nix). `or true` keeps this
-  # module active in chains that don't declare the option.
-  config = lib.mkIf (config.profiles.ai.enable or true) {
+# aichat: model roles and providers, gated by the leaf list (see ./default.nix).
+_: {
+  # Unconditional: being imported is the enable decision (the leaf list), so
+  # there is no profiles.ai.enable flag to read (see ./default.nix).
+  config = {
     programs.aichat = {
       enable = true;
       settings = {

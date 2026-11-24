@@ -12,9 +12,9 @@
   # `ai` on a mac gets agy itself and skips the gemini-route pair.
   agyGemini = (self.packages.${pkgs.stdenv.hostPlatform.system} or {}).cli.ai.agy-gemini or null;
 in {
-  # Gated by profiles.ai.enable (see ./default.nix). `or true` keeps this
-  # module active in chains that don't declare the option.
-  config = lib.mkIf (config.profiles.ai.enable or true) {
+  # Unconditional: being imported is the enable decision (the leaf list), so
+  # there is no profiles.ai.enable flag to read (see ./default.nix).
+  config = {
     programs.antigravity-cli = {
       enable = lib.mkDefault true;
       # Binary is on-demand, not in the profile — the `nix run` convention is

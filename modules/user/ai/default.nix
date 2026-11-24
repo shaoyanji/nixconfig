@@ -52,16 +52,13 @@
     zed-mcp = [self.modules."user.ai.zed-mcp"];
   };
 in {
-  # Fleet-wide gate and tiering for AI CLI tooling.
+  # Tiering for AI CLI tooling. There is no `profiles.ai.enable` flag: under
+  # the leaf-list model a host's AI surface is its `hmAi`/`hmModules` data —
+  # off means the module is not named (containers do exactly that), so the
+  # flag only ever held its default true (chain-polish 2026-11-24).
   # "light" keeps closures small on mobile laptops by excluding heavy Chromium-bundled
   # agents (agent-browser), local vector indexers (qmd), and batched runners.
   options.profiles.ai = {
-    enable =
-      lib.mkEnableOption "AI agent CLI tooling"
-      // {
-        default = true;
-      };
-
     tier = lib.mkOption {
       type = lib.types.enum ["none" "light" "full"];
       default = defaultTier;
@@ -81,7 +78,7 @@ in {
 
   imports = lib.concatMap (f: aiFeatures.${f} or []) hmAiFeatures;
 
-  config = lib.mkIf (config.profiles.ai.enable && config.profiles.ai.tier != "none") {
+  config = lib.mkIf (config.profiles.ai.tier != "none") {
     programs.translate-shell = {
       enable = true;
       settings = {

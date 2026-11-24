@@ -181,7 +181,7 @@ in {
     description = "Whether to install the Plan 9-style thin client for Freebuff on frieren.";
   };
 
-  config = lib.mkIf (config.programs.freebuff-remote.enable && (config.profiles.ai.enable or true)) {
+  config = lib.mkIf config.programs.freebuff-remote.enable {
     home.packages = [
       freebuff-remote
       freebuff-terminal

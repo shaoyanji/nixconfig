@@ -1,8 +1,166 @@
 {
-  "generated": "2026-11-24T10:08:13Z",
+  "generated": "2026-11-24T10:30:43Z",
   "count": 200,
-  "pin": "79d7e73648a6d94bc76f8572ac7d57ee9360d0d0ca66d54f0bcfe06389684834",
+  "pin": "fdd3a5629056fe7ff16be14aa45fde5e375f571df724c22014d12d7d7fbe6b3d",
   "turns": [
+    {
+      "id": "b41b44f3-53f7-4019-9999-256044f0135d",
+      "ts": "2026-11-24T10:26:53Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "resolved: kinexon-senior-devops-go-backend really was submitted. Greenhouse 'Thank you for your application!' at 08:22:19 (20261124082219.93774d39ef67af05@eu.greenhouse-mail.io) after the 08:20 form code, gh_jid 4936773101, one 3pp PDF (letter 1p + CV 2p). Posting re-checked: boards-api 200, updated 2026-09-21. No duplicate send; row stays applied, chase 2026-12-02; receipt written.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
+      "branch": "main",
+      "frame": "03hamdxbqppihmnu2yoknb5er"
+    },
+    {
+      "id": "a1a3eb2a-7490-424a-8490-51e604db361d",
+      "ts": "2026-11-24T10:25:40Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "upsert: 0 new rows. The 09:47 DACH scout's five leads (VISPIRON 5, SPECTRUM 4, Livello 4, NDI 3, hellomed 3) were already written by the 09:57 turn; re-checked against the 1038-row export and all five sit as lead with the 2026-12-07 hold. Nothing re-inserted, apps:dupes PASS.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamdona5sp7fskil0gdry6e"
+    },
+    {
+      "id": "7709bf88-3423-432c-a425-bf0c093e4eb9",
+      "ts": "2026-11-24T10:25:34Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi freebuff (agents:3) idle after attention sweep done. jev-decide selected upsert p=0.94 margin=0.88: upsert newest scout leads into delphi DB. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
+      "branch": "main",
+      "frame": "03hamdo1xnifrrqf1gc2rc8c7"
+    },
+    {
+      "id": "453a269f-c4f2-46f9-b547-c87ece4ea3ec",
+      "ts": "2026-11-24T10:25:34Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout",
+      "action": "re-driven: freebuff (agents:2) idle after Muenster follow-ups done. jev-decide selected kinexon_blocked p=0.95 margin=0.92: resolve blocked kinexon turn (submitted 08:22 via Greenhouse gh_jid 4936773101). Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
+      "branch": "main",
+      "frame": "03hamdo091m03o4mt1n2k7u28"
+    },
+    {
+      "id": "f808c2f2-40f6-4fa3-95e8-7e6e8e18b24f",
+      "ts": "2026-11-24T10:25:34Z",
+      "source": "hermes",
+      "subject": "nixconfig:hm-chain-polish",
+      "action": "re-driven: devin (agents:1) idle after chain-split task done. jev-decide first pass needs_review (hm_chain_polish p=0.79, margin 0.65 decisive >= 0.3, top by margin): reduce leftover profiles.ai.enable=false profile to pure data (hm-leaf). Pane Thinking.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
+      "branch": "main",
+      "frame": "03hamdnyv7yuw0t3gq6vv0qbc"
+    },
+    {
+      "id": "24b69036-3b02-458c-aaa6-cf59ec7c2372",
+      "ts": "2026-11-24T10:16:03Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "final: commit 774b990a holds only AGENTS.nix (job-scout-next-sweep-delphi, open/OPEN/P3). Earlier frames named 8b299c93 then 8c514757, both rewritten locally before any push to drop a pre-staged action.yml and turns.json. Leads unchanged: nine rows, prep-only to 2026-12-07, nothing sent. gate: nix-instantiate parse PASS, apps:dupes PASS.",
+      "outcome": "done",
+      "claims": [
+        "apps AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hambt400rewjsprjmn349w9"
+    },
+    {
+      "id": "d62b7104-336d-458b-9c48-8840801f4e26",
+      "ts": "2026-11-24T10:15:29Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "corrected: commit 8c514757 carries only AGENTS.nix (job-scout-next-sweep-delphi, open/OPEN/P3); the first attempt pulled in a pre-staged .github/actions/fleet-nix/action.yml and was rewritten before any push. Leads unchanged: nine rows, prep-only to 2026-12-07, nothing sent. gate: nix-instantiate parse PASS.",
+      "outcome": "done",
+      "claims": [
+        "apps AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "8c514757595c992c114d22e2a1bea0e3e2bf0ad8",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hambp5f7z46xa4mykwj0no8"
+    },
+    {
+      "id": "5c5dff21-2003-4f3a-8fed-60bef3a2d713",
+      "ts": "2026-11-24T10:15:05Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: stack scout rows plus AGENTS.nix note job-scout-next-sweep-delphi (open/OPEN/P3). Nine leads from both sweeps, nothing sent, prep-only to 2026-12-07; Tiger Data and Klara apply URLs still unconfirmed. gate: nix-instantiate parse + .#agentsNotes counts PASS; apps:dupes PASS.",
+      "outcome": "done",
+      "claims": [
+        "apps AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "8b299c9332eedd64ca642c2de7caaa126f4ec250",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hambmbzqszx3aaf2v163obr"
+    },
+    {
+      "id": "0d357cef-fbfc-43a1-8a3a-3051c5568a04",
+      "ts": "2026-11-24T10:14:45Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward:pane-drive-freebuff-delphi",
+      "action": "landed: drove idle remote freebuff delphi pane agents:3.1 via Jev task-change (selected task-change p=0.9 margin=0.8); pasted scout/upsert job-search task over ssh tunnel; pane shows thinking... 3s and task in input box",
+      "outcome": "done",
+      "claims": [
+        "agents:3.1",
+        "delphi"
+      ],
+      "files": [],
+      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
+      "branch": "main",
+      "frame": "03hambjxqe62dg5p8t8ypflgg"
+    },
+    {
+      "id": "932f3bbe-b035-436d-946e-d2355218371c",
+      "ts": "2026-11-24T10:14:16Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: stack scout 2026-11-24 — 4 new stack-matched leads written (Tiger Data/Postgres 4, Klara FreeBSD 3, HENSOLDT NixOS 3, FreeBSD Foundation 2), prep-only to 2026-12-07, nothing sent. Rejected: Tailscale (US/CA/UK only), atvari (unpaid intern), second roles at Supabase/Mittwald/dtms. Open: Tiger Data and Klara apply URLs unconfirmed; AGENTS.nix note job-scout-next-sweep-delphi OPEN P3. Gate apps:dupes PASS; AGENTS.nix uncommitted.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hambgk2mhhsxqbqsbpzr4c3"
+    },
+    {
+      "id": "21fa905c-0163-40bf-bd8d-a063982732c8",
+      "ts": "2026-11-24T10:08:59Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: CV surface refreshed, feb6699b, Pages 436dadd9. cv-software.json stack +Azure +Google Cloud (verbatim in resume.cv.json); cv-software.de.json + lebenslauf.json +Kubernetes so the German CV names the term 19 open leads use. cv.typ unchanged, already ATS-shaped. 56 scout leads deduped: 0 employer dupes. Live sha == artifact. gates: build+cv-ats-check 6 PDFs 1pp, cv-links 14 ok/0; cv-blog-check FAILS on pre-existing is-a.dev drift.",
+      "outcome": "done",
+      "claims": [
+        "lib/matt"
+      ],
+      "files": [],
+      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
+      "branch": "main",
+      "frame": "03hamafezmn74csokszsv1hka"
+    },
     {
       "id": "3831e990-69d0-497e-888f-333aa8cd5490",
       "ts": "2026-11-24T10:05:35Z",
@@ -2622,149 +2780,6 @@
       "base_commit": "68eaed49500bb58b4a39986e5ddd1d52cd36443a",
       "branch": "main",
       "frame": "03hah8bxg15kg02qy8uxjd34r"
-    },
-    {
-      "id": "000de359-8b70-49b8-95d9-ca2fb38ced69",
-      "ts": "2026-11-23T18:23:09Z",
-      "source": "codebuff",
-      "subject": "nixconfig:site-publish-2026-11-23",
-      "action": "published matt.bountystash.com from HEAD 68eaed49: deploy 3d6601a8.matt-9pf.pages.dev, 28/28 files. site:links PASS (91 links/17 pages/6 PDFs/16 anchors), site:check PASS (matt 35 ok, bountystash 47 ok, concept 17 ok), live sha256 28/28 equal to the HEAD-rev build. No site:changelog task exists in this tree.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68eaed49500bb58b4a39986e5ddd1d52cd36443a",
-      "branch": "main",
-      "frame": "03hah5nw7k5uitatrn14k777a"
-    },
-    {
-      "id": "c9c4bd80-1cc4-4e49-afb6-a2af85d24249",
-      "ts": "2026-11-23T18:22:03Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-publish-2026-11-23",
-      "action": "landed: publish matt.bountystash.com — rebuild .#sites.matt-site from HEAD, prove site:links + site:changelog parity; freebuff 0:1.1 accepted and working (jevdecide publish p=0.94 margin=0.91)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68eaed49500bb58b4a39986e5ddd1d52cd36443a",
-      "branch": "main",
-      "frame": "03hah5g6nw552tnm1v1k0vjff"
-    },
-    {
-      "id": "d7d7ac50-466f-4dff-98c5-fb11ca4a30d9",
-      "ts": "2026-11-23T18:16:55Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-scout-2026-11-23",
-      "action": "scouted devops/sre/platform/infra at 50-500 headcount: 3 new live leads recorded (ControlPlane 46-55 UK/EU remote, Camptocamp 150-156 CH home office, Auterion 197-212 Zurich onsite). Deduped against all 553 tracked companies; Camunda, Kiwigrid, smartclip, Isar, Namespace, Rivia, NavVis, Helsing already there. Skipped Modus Create SRE (PL/RO/PT only).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68eaed49500bb58b4a39986e5ddd1d52cd36443a",
-      "branch": "main",
-      "frame": "03hah4g3znk295x3t3ysndjv3"
-    },
-    {
-      "id": "814a00a5-b26a-40b8-b14f-2d04582b9148",
-      "ts": "2026-11-23T17:25:53Z",
-      "source": "devin",
-      "subject": "nixconfig:hm-chain-b-per-host",
-      "action": "landed: roles.home is per-host data — 12 hosts carry hmFeatures in host-inventory.nix, home-manager-shared resolves via _module.args.hostInventory at mkDefault, fern mkForce dissolved | gate: drv-equality 27/27 identical + checks:host frieren,fern PASS + checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68eaed49500bb58b4a39986e5ddd1d52cd36443a",
-      "branch": "main",
-      "frame": "03haguh5s53gahl91rggrynrd"
-    },
-    {
-      "id": "79b46ae8-d3f6-4d07-b170-422194b58d7a",
-      "ts": "2026-11-23T17:24:44Z",
-      "source": "codebuff",
-      "subject": "nixconfig:blog-mirror-audit-2026-11-23",
-      "action": "audited the is-a.dev CV mirror: DRIFT. dev:blog:cv:check fails on both published CVs (live cv.pdf fd22f041951b vs artifact 3733b9eeab5f, cv-de.pdf 5db000e64088 vs acf12f9e02cc); live copies are the 2026-11-21 07:04 build, three artefact rebuilds behind. checks:site:path cannot answer for is-a.dev (exit 2, no X-Site-Path; it compares .#sites.delphi-site on 127.0.0.1). Prose report only, no edit, no commit.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hagu90pc9le3ute8u4nsmim"
-    },
-    {
-      "id": "5cd213cd-7e9d-41fc-a3ca-c091f70f9646",
-      "ts": "2026-11-23T17:24:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-pane-drive-2026-11-23",
-      "action": "landed two idle freebuff panes: 0:1.1 blog-mirror verification (is-a.dev vs derivation, read-only), 0:2.1 delphi job-search scouting round (apps:scout)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hagu5pbflhu2gzekazkmsvx"
-    },
-    {
-      "id": "09be635a-37b7-4eb1-97d7-d6783234f933",
-      "ts": "2026-11-23T17:21:48Z",
-      "source": "codebuff",
-      "subject": "nixconfig:cv-ats-audit-2026-11-23",
-      "action": "audited the published CV surface at matt.bountystash.com: cv-links-check 14 ok / 0 failed (6 PDFs 200 application/pdf, 8 anchors hash-equal to the artifact) and cv-ats-check 6 passed / 0 failed, each PDF re-read with pdftotext against the exact cv.json payload its matt-cv-* derivation was built from",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hagtoh8lugwi82litm0nkvv"
-    },
-    {
-      "id": "cc03d581-1ec1-48d7-8821-fe204dade002",
-      "ts": "2026-11-23T17:20:09Z",
-      "source": "hermes",
-      "subject": "frieren:pane-steward-2026-11-23",
-      "action": "drove freebuff (0:1.1) with CV downloads + ATS parity re-check at matt.bountystash.com; jevdecide label=publish (0.48, margin 0.31, decisive via margin>=0.3); pane accepted, working... on cv-links-check (cv.pdf/cv-de.pdf 200 application/pdf)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hagtcw0tzxng9cv0fqjcqwa"
-    },
-    {
-      "id": "4626ca03-f8ab-4614-b6e8-a884b7e2e9dc",
-      "ts": "2026-11-23T17:14:47Z",
-      "source": "codebuff",
-      "subject": "nixconfig:site-publish-2026-11-23",
-      "action": "landed: rebuilt .#sites.matt-site from HEAD ce28c2e4 (includes the nixfmt pass on the record helpers) and published matt.bountystash.com at deployment 5ad0dbf6.matt-9pf.pages.dev; 28/29 files sha256-identical to their served URLs",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hagsb2almaxuf75w9r85kv6"
-    },
-    {
-      "id": "976490a2-d2fd-4c2f-9733-23b35023a186",
-      "ts": "2026-11-23T17:13:30Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff",
-      "action": "landed: dispatched publish (rebuild sites.matt-site from HEAD incl nixfmt record-helper pass, publish matt.bountystash.com, prove site:links + site:check) to freebuff pane 0:1.1 via jevdecide publish p=0.96 m=0.93; freebuff accepted, thinking...",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hags22pfpkobo045ftm4x6q"
-    },
-    {
-      "id": "a75e88d5-bc44-4c43-a034-1601a0355b7f",
-      "ts": "2026-11-23T17:13:30Z",
-      "source": "devin",
-      "subject": "nixconfig:devin",
-      "action": "landed: dispatched chain-change refactor (split roles.home to per-host per docs/ops/hm-chain-audit.md) to devin pane 0:0.1 via jevdecide chain-change p=0.93 m=0.90; devin accepted, thinking...",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hags20ooc2uu40mjp2v33st"
     }
   ]
 }

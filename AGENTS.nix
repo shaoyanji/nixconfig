@@ -5393,12 +5393,12 @@
       '';
     };
     job-scout-next-sweep-freebuff = {
-      title = "The next job-scout sweep runs on the idle freebuff lane";
+      title = "The next freebuff lane task is a careers-page sweep, not a third tailoring pass";
       kind = "open";
       status = "OPEN";
       priority = "P3";
       date = "2026-11-24";
-      summary = "The five ranked packets stay prep-only until 2026-12-07, so the lane's next move is another sweep on the idle `agents:2 freebuff` pane: DevOps/SRE/Platform/Infrastructure leads, `apps:search` before each `apps:scout`, and a duplicate or a dead route is a finding rather than a row.";
+      summary = "Decided 2026-11-24: (B), the sweep. Option (A) has no work left — two of the four job-scout-fresh leads already carry published packets, one closed as a backend requisition and one is do-not-packet on German C1. The sweep targets the EU vendors that post only on their own careers pages, prep-only and row-free to 2026-12-07.";
       refs = {
         modules = [
           "taskfiles/apps.yml"
@@ -5409,30 +5409,28 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-        The lane is a queue, not a document: a lead becomes a row through
-        `apps:scout`, a duplicate employer stays one row, and the packet for it
-        is built after the row exists. Nothing here sends anything.
+        Decision: (B) over (A), because (A) is already spent. The four
+        `job-scout-fresh` leads reduce to two applicable employers, and both are
+        tailored, published and waiting on a send step: Flink (rank 1, 14/32)
+        and Pentland Firth (rank 2, 9/32). Maesn closed as a backend requisition;
+        Atlas Titan is do-not-packet on German C1. Re-cutting a finished packet
+        is polish, and the lane's actual block — `apps-lane-has-no-send-task` —
+        is untouched by more tailoring.
 
-        State read back 2026-11-24: five leads ranked from this fleet's own work
-        (netcup 1, Eficode 2, mogenius 3, KHS 4, Advantest 5), all `stage lead`
-        with `rank N/5 this round` in `next_action` and the hold to 2026-12-07;
-        four reqs answer 200, Advantest's jobware path is a 403 bot wall over an
-        ADP portal that no headless fetch fills. The round record, including why
-        each employer sits where it does, is
-        `~/.local/state/appflow/followups/2026-11-24-scout-devops-de.md`.
+        The sweep goes where the last one did not look: LINBIT, B1 Systems,
+        Univention, Open-Xchange and Proxmox post on their own careers pages,
+        where an empty Greenhouse or Ashby feed proves nothing. Giant Swarm and
+        SUSE get a recheck first — both were closed the same day. A duplicate
+        employer stays one row; a dead route is a finding, not a failure.
 
-        Next: one more sweep of the four families on the freebuff pane. Giant
-        Swarm and SUSE were closed earlier the same day and earn a recheck
-        before any new employer. `task apps:search -- <company>` runs first for
-        every candidate, because the dupes gate closes a second row and the lead
-        is lost with it. AVENDIS, EDEKA Bank and ABOUT YOU are mail-scan rows
-        with no packet and no usable posting; they need an artifact, not another
-        note.
+        Prep-only: the 2026-12-07 hold stands, so this sweep mints no
+        `apps:scout` row and sends nothing. Its evidence lands in
+        `~/.local/state/appflow/followups/2026-11-24-scout-careers-pages.md` and
+        the rows are written when the hold lifts.
 
-        Exit: the sweep ends with either a new lead row that carries a real
-        `--family`, a `--summary` and a `next_action` naming its route, or the
-        employers it checked recorded as already tracked or with no live req —
-        and `task checks:quick` green over the note.
+        Exit: each of the five pages read and recorded as a live req with its
+        URL or as having none, the record ranking whatever survives, and
+        `task checks:quick` green over this note.
       '';
     };
     lib-pipe-elemat-lambdas = {
@@ -5475,6 +5473,84 @@
 
         Exit: no `(xs: elemAt xs` lambda remains in lib/, and
         `task checks:drv-equality` reports 30/30 identical.
+      '';
+    };
+    apps-lane-has-no-send-task = {
+      title = "The application lane can draft but cannot send, so escalate rather than sweep";
+      kind = "open";
+      status = "BLOCKED";
+      priority = "P2";
+      date = "2026-11-24";
+      summary = "Decided 2026-11-24: escalate. Flink and Pentland Firth packets carry CV plus letter, and Pentland has an addressed draft to jobs@pentlandfirth.com in Drafts. Nothing can leave: the task plane has no send verb, and Flink's posting is a LinkedIn form with no published mailbox.";
+      links = ["job-scout-next-sweep-freebuff"];
+      refs = {
+        modules = [
+          "modules/plugins/appflow/sync.py"
+          "scripts/task/appflow-sync.sh"
+          "taskfiles/apps.yml"
+        ];
+        tasks = ["agents:apps:draft" "agents:apps:drafts" "apps:gate:packet"];
+        docs = ["docs/email-archive.md" ".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The 02:54 sweep's four leads reduced to two applicable ones. Flink
+        (Platform Eng, Berlin, 14/32 highlights) and Pentland Firth (Sr Cloud
+        Platform, Munich, 9/32) both have packet CVs and tailored letters;
+        Pentland also has an addressed draft held in Drafts. Maesn was closed as
+        a backend requisition and Atlas Titan was do-not-packet on German C1, so
+        re-tailoring them is not a move.
+
+        Why not (b): both packets are complete and their letters name their
+        gaps, so more tailoring is polish, not progress. Why not (a): a re-sweep
+        adds leads that reach the same wall — the missing piece is a send step,
+        not supply. The block is structural: the task plane has no sending task,
+        only `agents:apps:draft`/`drafts` and mail triage verbs, and the draft
+        path prints `to (no recipient)` when given no address. Flink publishes
+        no address (`jobs.goflink.com` is a dead short-link domain, `flink.com`
+        challenge-blocks), so only its form can carry an application.
+
+        Escalated in xs: nixconfig:job-scout-fresh, blocked,
+        03hamwdctdtyjszty0luwo507.
+
+        Exit: a task that transmits a draft, with a gate proving it, or the
+        person sends the Pentland draft and submits Flink through its form; then
+        this note is DELIVERED with both tracker rows showing `applied`.
+      '';
+    };
+    job-scout-fresh-packets-public = {
+      title = "The two tailored packets are public and ranked; the EU careers-page gap is the open lead";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Flink (rank 1, 14/32) and Pentland Firth (rank 2, 9/32) publish as redacted PDFs under assets/files/packets/ with street address and phone stripped; the EU vendors that post only on their own careers pages are the next sweep's target, because only ATS boards were probed today.";
+      links = ["job-scout-next-sweep-freebuff" "apps-lane-has-no-send-task"];
+      refs = {
+        modules = ["modules/plugins/appflow/packet.nix"];
+        tasks = ["apps:gate:packet"];
+        docs = [".agents/skills/apps/SKILL.md" ".agents/skills/neocities/SKILL.md"];
+      };
+      body = ''
+        Order is the fit count, not the sweep order: Flink 14/32 of the JD's
+        highlights and 4/10 projects, Pentland Firth 9/32 and 4/10. Both were
+        re-rendered from the same JD and letter with only the contact block
+        changed — city and email kept, street and phone removed — because the
+        public surface matches `cv.pdf`. The build re-syncs `pii.json` into any
+        fresh config, so a public render needs that file pre-seeded with
+        `{"basics":{}}` or the address comes back.
+
+        Public renders: CV 2 pages, letter 1 page each, zero hits for
+        `Burgerhof|79261|+49 1733` in `pdftotext`. The private packets keep the
+        address and were relinked to their original artifacts (`1v8vjckp…`,
+        `xixyyzf5…`) after the public build took the submission symlinks.
+
+        Gap: only ATS APIs were probed. LINBIT, B1 Systems, Univention,
+        Open-Xchange and Proxmox post on their own careers pages, where an empty
+        Greenhouse or Ashby feed proves nothing. A genuinely new lead is most
+        likely there.
+
+        Exit: `apps:scout` records one of those pages as a lead row after the
+        2026-12-07 hold, or each is recorded as having no live req.
       '';
     };
   };

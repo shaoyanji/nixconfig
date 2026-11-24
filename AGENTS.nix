@@ -5393,12 +5393,12 @@
       '';
     };
     job-scout-next-sweep-freebuff = {
-      title = "The next freebuff lane task is a careers-page sweep, not a third tailoring pass";
+      title = "The next idle freebuff lane task is one more employer-lead sweep";
       kind = "open";
       status = "OPEN";
       priority = "P3";
       date = "2026-11-24";
-      summary = "Decided 2026-11-24: (B), the sweep. Option (A) has no work left — two of the four job-scout-fresh leads already carry published packets, one closed as a backend requisition and one is do-not-packet on German C1. The sweep targets the EU vendors that post only on their own careers pages, prep-only and row-free to 2026-12-07.";
+      summary = "Next idle freebuff lane task: one more employer-lead sweep across the DevOps/SRE/Platform/Infrastructure families, prep-only to 2026-12-07 with nothing sent. The five ranked packets stay untouched and no `apps:scout` row is minted before the hold lifts.";
       refs = {
         modules = [
           "taskfiles/apps.yml"
@@ -5409,28 +5409,27 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-        Decision: (B) over (A), because (A) is already spent. The four
-        `job-scout-fresh` leads reduce to two applicable employers, and both are
-        tailored, published and waiting on a send step: Flink (rank 1, 14/32)
-        and Pentland Firth (rank 2, 9/32). Maesn closed as a backend requisition;
-        Atlas Titan is do-not-packet on German C1. Re-cutting a finished packet
-        is polish, and the lane's actual block — `apps-lane-has-no-send-task` —
-        is untouched by more tailoring.
+        Task: one more employer-lead sweep of the four families — devops, sre,
+        platform, infrastructure — run from the idle freebuff lane.
+        `task apps:search -- <company>` runs before every `apps:scout`, because
+        a duplicate employer stays one row and a second row closes as a dupe,
+        losing the lead. A dead route is a finding, not a failure.
 
-        The sweep goes where the last one did not look: LINBIT, B1 Systems,
-        Univention, Open-Xchange and Proxmox post on their own careers pages,
-        where an empty Greenhouse or Ashby feed proves nothing. Giant Swarm and
-        SUSE get a recheck first — both were closed the same day. A duplicate
-        employer stays one row; a dead route is a finding, not a failure.
+        Prep-only to 2026-12-07: nothing is sent from this lane, and the hold
+        covers row creation too, so the sweep's evidence lands under
+        `~/.local/state/appflow/followups/` and any `apps:scout` row is written
+        only once the hold lifts. The five ranked packets (netcup 1, Eficode 2,
+        mogenius 3, KHS 4, Advantest 5) stay `stage lead` and stay untouched.
 
-        Prep-only: the 2026-12-07 hold stands, so this sweep mints no
-        `apps:scout` row and sends nothing. Its evidence lands in
-        `~/.local/state/appflow/followups/2026-11-24-scout-careers-pages.md` and
-        the rows are written when the hold lifts.
+        Where to look: Giant Swarm and SUSE earn a recheck, both closed on
+        2026-11-24. The last round read ATS APIs only, so the EU vendors posting
+        solely on their own careers pages — LINBIT, B1 Systems, Univention,
+        Open-Xchange, Proxmox — are the likeliest source of a new employer; an
+        empty Greenhouse or Ashby feed proves nothing there.
 
-        Exit: each of the five pages read and recorded as a live req with its
-        URL or as having none, the record ranking whatever survives, and
-        `task checks:quick` green over this note.
+        Exit: every employer checked is recorded as a new lead carrying a real
+        `--family`, a `--summary` and a `next_action` naming its route, or as
+        already tracked or with no live req — and `task checks:quick` green.
       '';
     };
     lib-pipe-elemat-lambdas = {

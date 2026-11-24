@@ -99,8 +99,7 @@
   # defaulted on its own — a file with no [defaults] must still render.
   defaultHeadroom = (budgets.defaults or {}).headroom_pct or 0;
 
-  budgetRow = name: let
-    b = budgetHosts.${name};
+  budgetRow = name: b: let
     baseline = (b.baseline or {}).bytes or null;
     headroom = b.headroom_pct or defaultHeadroom;
     pinned = b.bytes or null;
@@ -115,7 +114,7 @@
     measuredOn = (b.baseline or {}).measured_on or "—";
   };
 
-  budgetRows = budgetHosts |> builtins.attrNames |> map budgetRow |> lib.filter (r: r.bytes != null);
+  budgetRows = budgetHosts |> lib.mapAttrsToList budgetRow |> lib.filter (r: r.bytes != null);
   budgetNames = budgetRows |> map (r: r.name);
 
   # Coverage is judged against the hosts that HAVE a closure to measure. An
@@ -260,9 +259,9 @@
     services = toString serviceCount;
     uncovered = toString (builtins.length uncoveredActive);
     activeNixHosts = toString (builtins.length activeNixNames);
-    kindRow = byKind |> builtins.attrNames |> lib.concatMapStringsSep ", " (k: "${k} (${toString byKind.${k}})");
-    statusRow = byStatus |> builtins.attrNames |> lib.concatMapStringsSep ", " (s: "${s} (${toString byStatus.${s}})");
-    archRow = archCount |> builtins.attrNames |> lib.concatMapStringsSep ", " (a: "${a} (${toString archCount.${a}})");
+    kindRow = byKind |> lib.mapAttrsToList (k: v: "${k} (${toString v})") |> lib.concatStringsSep ", ";
+    statusRow = byStatus |> lib.mapAttrsToList (s: v: "${s} (${toString v})") |> lib.concatStringsSep ", ";
+    archRow = archCount |> lib.mapAttrsToList (a: v: "${a} (${toString v})") |> lib.concatStringsSep ", ";
   };
 
   overviewBody = render ./site/overview.html t;

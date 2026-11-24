@@ -1,8 +1,141 @@
 {
-  "generated": "2026-11-24T16:11:06Z",
+  "generated": "2026-11-24T17:04:57Z",
   "count": 200,
-  "pin": "6772b40ea162b0d40e7028f9b0fff3c1bd08533c363ae1df8373e51b63a3381f",
+  "pin": "14537f7088baa15f53e27c52fffe3eca214cecc745c7bd46fbdc014e07ca6aaf",
   "turns": [
+    {
+      "id": "a22e85e7-e69a-44ea-9f24-1968711c5f6e",
+      "ts": "2026-11-24T17:04:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: upserted the 2 sweep leads into the delphi DB — Sony Interactive Entertainment (SRE Berlin, fit 3) and SAP SE (Sovereign Cloud DevOps Berlin, fit 4); both held to 2026-12-07, nothing due today; when due: DHBW infrastrukturbetrieb needs the missing docs uploaded to the portal today | gate: apps:get read-back PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haojhz4b17nvk2mhuqblizk"
+    },
+    {
+      "id": "e0d3a30a-df30-470a-a962-712c383f324a",
+      "ts": "2026-11-24T17:03:33Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi (agents:3) idle after attention sweep. jev-decide selected upsert p=0.72 margin=0.46 decisive >= 0.3: upsert new leads into tracking DB. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
+      "branch": "main",
+      "frame": "03haojev0ke11c33839z34zek"
+    },
+    {
+      "id": "688e34d8-f0cb-46e5-8fdf-83fafc1291fa",
+      "ts": "2026-11-24T17:03:33Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.79 margin=0.68 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
+      "branch": "main",
+      "frame": "03haojetl2ldz9m274zwwsmv7"
+    },
+    {
+      "id": "d9c1d95c-7c2a-4610-a39d-343d8a351bfc",
+      "ts": "2026-11-24T17:02:17Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: queue sweep (9 items) + SmartRecruiters/WWR/Remotive/LinkedIn sweep — Grafana Labs rejected 2026-11-24, avendis ack, DHBW portal-only; new leads: Sony Interactive Entertainment (SRE Berlin), SAP SE (Sovereign Cloud DevOps Berlin), held to 2026-12-07; STACKIT/Tipico/DWS/Scalable already tracked; nothing sent | gate: apps:get rows PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haoj5vf7n2tso42nfkh52bf"
+    },
+    {
+      "id": "8ced0662-6b55-44c1-b841-279a38496b19",
+      "ts": "2026-11-24T17:00:29Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi (agents:3) idle after upsert completed. jev-decide selected attention p=0.78 margin=0.60 decisive >= 0.3: sweep attention queue for replies/status changes. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
+      "branch": "main",
+      "frame": "03haoitaky838k2ldxhmzrpq5"
+    },
+    {
+      "id": "d4fc4deb-2a41-4d94-9a69-0e41a11cf87f",
+      "ts": "2026-11-24T17:00:29Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.67 margin=0.48 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
+      "branch": "main",
+      "frame": "03haoit94p34sn02g601nygvh"
+    },
+    {
+      "id": "23a606fa-ff32-41b7-b8b0-794526a8a638",
+      "ts": "2026-11-24T17:00:29Z",
+      "source": "hermes",
+      "subject": "nixconfig:code-review-loop",
+      "action": "re-driven: devin (agents:1) idle. jev-decide selected review_loop p=0.99 margin=0.98: code-review loop over lib/*.nix pipe-operator code. Pane Running tools.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
+      "branch": "main",
+      "frame": "03haoit7ndo4td22xydwvzguh"
+    },
+    {
+      "id": "2f8d5209-cabf-450f-ae46-0266ed37995c",
+      "ts": "2026-11-24T16:55:33Z",
+      "source": "hermes",
+      "subject": "nixconfig:hygiene-sops-docsbudget",
+      "action": "start: fixing sops drift + docs budget in hygiene CI",
+      "outcome": "in_progress",
+      "claims": [
+        ".github/workflows",
+        "flake/policies.nix"
+      ],
+      "files": [],
+      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
+      "branch": "main",
+      "frame": "03haohuldsup1qkswxrm5ci2d"
+    },
+    {
+      "id": "77f01606-78c0-4270-a5ea-9b85283040da",
+      "ts": "2026-11-24T16:18:31Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: scout sweep4 — 2 new leads (maxcluster Linux Systems Engineer Monitoring/Observability, NETWAYS System Engineer Cloud), both held to 2026-12-07; tailored German CV per req (10/36 and 13/36 highlights, 4 projects), CV-only packets, no letter; nothing sent | gate: packet build PASS + apps:get rows",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haoam1lingkiamopryj1hwq"
+    },
+    {
+      "id": "83a8998f-2556-435d-8711-d3c726765c75",
+      "ts": "2026-11-24T16:12:03Z",
+      "source": "devin",
+      "subject": "nixconfig:appflow-write-auth",
+      "action": "landed: bearer gate on the two appflow write routes (sops key + rendered map + if/return 403); replica-proven 403/200/reads-open; lib alias unification 29/30 drv-identical | gate: checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
+      "branch": "main",
+      "frame": "03hao9cnimlbir4dyz36ub8iz"
+    },
     {
       "id": "d9c7dc0e-5554-469e-aabc-84c9137a5ae9",
       "ts": "2026-11-24T16:09:38Z",
@@ -2655,150 +2788,6 @@
       "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hale3dgevnn9ehjwwowj88u"
-    },
-    {
-      "id": "24fd4639-148f-4114-96f4-bd8333e93db8",
-      "ts": "2026-11-24T07:17:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "landed: 5 new leads (wabcon DevOps Berlin, Airalo NOC Europe-remote, Laelaps test infra Zürich, Decathlon AI platform Paris, Microsoft AI eval platform London); wabcon + Airalo queued for CV tailoring; apps skill now states the duplicate-employer rule; gate: checks:kg PASS, checks:tasks PASS",
-      "outcome": "done",
-      "claims": [
-        ".agents/skills/apps; submissions/"
-      ],
-      "files": [],
-      "base_commit": "51eb41953ea48f895b02cf3e0caf2676df28afda",
-      "branch": "main",
-      "frame": "03halcvkav64dh7l5pzpfd0ml"
-    },
-    {
-      "id": "f5c385f9-f2fb-499b-b5d6-52b48a3fa5e4",
-      "ts": "2026-11-24T07:16:58Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "landed: checks:image-daily exists now (taskfiles/checks.yml + leaf row in flake/check-inventory.nix) — output 'image-daily: gate ok: dispatch, judge fallback, breakers and shrink guard all present'; go build ./... && go vet ./... clean in tools/image-daily (no go.mod at tools/ root — one-os-cli note) | gate: checks:image-daily PASS, check:verify 133/133, checks:tasks clean, go build PASS",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/checks.yml",
-        "flake/check-inventory.nix"
-      ],
-      "files": [
-        "taskfiles/checks.yml",
-        "flake/check-inventory.nix"
-      ],
-      "base_commit": "acb3481a2d1d180ecbaf7f85d137748a3d125ad4",
-      "branch": "main",
-      "frame": "03halctoegi2dycwgq7l0im5t"
-    },
-    {
-      "id": "f42b73fb-8f29-40bc-a45c-1d82bdb28dd7",
-      "ts": "2026-11-24T07:15:51Z",
-      "source": "frieren-steward",
-      "subject": "delphi:job-search",
-      "action": "idle; jevdecide needs_review (novel p=.55 margin=.28); left undriven (fail-closed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "51925a892b6f278e8baa4bf215b78e009614df0f",
-      "branch": "main",
-      "frame": "03halclvtk4q1dgbprr9sy5u1"
-    },
-    {
-      "id": "4222796d-88ac-4411-9ba5-e4749e6d886c",
-      "ts": "2026-11-24T07:15:51Z",
-      "source": "frieren-steward",
-      "subject": "devin:checks-image-daily",
-      "action": "idle; jevdecide needs_review (note-change p=.31 margin=.05); left undriven (fail-closed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "51925a892b6f278e8baa4bf215b78e009614df0f",
-      "branch": "main",
-      "frame": "03halcltumdl532tfsoq7lrad"
-    },
-    {
-      "id": "422d59f3-d902-4bdf-a95c-ceff1b2aae4e",
-      "ts": "2026-11-24T07:13:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "landed: 5 Nix/fleet leads (Hexagon Robotics Nix build+packaging Zürich, Fediversity NixOS app store EU-remote, Buildkite DevOps support UK/IE/PL, VirtusLab on-prem infra PL, Railway baremetal orchestration global) + Fediversity queued for CV tailoring; apps skill now documents apps:scout; gate: checks:kg PASS, checks:tasks PASS (checks:quick blocked by pre-existing infron retry/fallback-lane defect, unrelated)",
-      "outcome": "done",
-      "claims": [
-        ".agents/skills/apps; submissions/"
-      ],
-      "files": [],
-      "base_commit": "51925a892b6f278e8baa4bf215b78e009614df0f",
-      "branch": "main",
-      "frame": "03halc65gzgipz4ka9tsx2pnc"
-    },
-    {
-      "id": "d1e22716-5007-43df-9d80-fd6295891f22",
-      "ts": "2026-11-24T07:04:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-2026-11-24-final",
-      "action": "3 remote fleet/infra leads added: Cloudflare Senior SWE Kubernetes platform (Distributed/Hybrid, fit 3); UMB AG Senior System Engineer Linux Kubernetes (Volketswil, remote-tagged, CHF 100-130k, fit 3); MediData AG Platform Engineer (Bern, remote-tagged, fit 3). Rejected as non-remote: DRV Berlin and Mueller Holding (both Hybrid/Onsite). Gate: apps:dupes [] , 929 rows, git dirty 26 unchanged. No repo commit: tracker writes are delphi API only, so the gate is the proof.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halael7k6bzttqf9fnqrbsa"
-    },
-    {
-      "id": "0601749e-fb5c-492b-b98a-d270136b5935",
-      "ts": "2026-11-24T07:02:36Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "verify-only: no checks:image-daily task exists — ran the two real gates at HEAD 3ed3525f (contains 29e5a360 engine.sh deletion): images:gate ok 'dispatch, judge fallback, breakers and shrink guard all present'; checks:images ok '750 row(s), 750 asset(s), same paths and bank URLs' | gate: images:gate PASS, checks:images PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3ed3525f",
-      "branch": "main",
-      "frame": "03hala0p9t0cu6s2in99tp8xu"
-    },
-    {
-      "id": "294b946a-bce0-4425-ae2e-0dda5e1e481e",
-      "ts": "2026-11-24T07:02:25Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "correction: MongoDB InfraSec was closed by agent:apps under the one-employer rule (Storage Layer already applied), so the 3rd lead is Orakl Oncology Senior Platform Engineer (Villejuif, live 2026-11-23); the three carried leads are Swisscom, Schubergphilis and Orakl, each stage=lead with a dated next action; gate: checks:quick PASS, apps:query readback PASS, ads HTTP 200",
-      "outcome": "done",
-      "claims": [
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "3ed3525f58755be38be1ea18b2547c48ec32c460",
-      "branch": "main",
-      "frame": "03hal9zdcczzf3z8lr8ezekw3"
-    },
-    {
-      "id": "d04e8cfb-4d1f-4020-ba41-b3b28cfae16e",
-      "ts": "2026-11-24T07:01:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "landed: 3 new leads - MongoDB Senior SRE InfraSec (Dublin), Swisscom Fullstack DevOps Trust+Identity (Rotterdam), Schubergphilis data-resilience platform (NL), each stage=lead with a dated next action; plus apps-scout --next-action so a lead lands with it; gate: checks:quick PASS, apps:query readback PASS, 3 ads HTTP 200",
-      "outcome": "done",
-      "claims": [
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "3ed3525f58755be38be1ea18b2547c48ec32c460",
-      "branch": "main",
-      "frame": "03hal9qxfckh8zy3mitd9sq36"
-    },
-    {
-      "id": "785f8d61-3bef-42cf-b11e-2729f8f30b8a",
-      "ts": "2026-11-24T06:59:45Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-2026-11-24h",
-      "action": "Scout round: 2 new leads added -> Cloudflare Senior Software Engineer - Kuberne (Distributed; Hybrid); Platform.sh Senior Site Reliability Engineer (Remote • Australia, Indi). Gate: apps:dupes [] , apps:overview 923 rows, git dirty 26 unchanged. No repo commit: tracker writes go to the delphi apps API only (no file in the tree), so the gate is the proof. Earlier board passes rejected 4 off-domain rows (space/grid/M365) and settled a MongoDB dupe from a parallel scout.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hal9gn764thg72e6xb0sltu"
     }
   ]
 }

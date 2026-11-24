@@ -49,7 +49,7 @@
   # --- the evaluated model ---------------------------------------------------
   tally = f:
     hostValues
-    |> lib.foldl' (
+    |> builtins.foldl' (
       acc: h: let
         k = f h;
       in
@@ -326,7 +326,7 @@
     nixCount = n nixCount;
     archs = byArch |> builtins.attrNames |> builtins.length |> n;
     kindRow = orderedRow byKind;
-    archRow = byArch |> builtins.attrNames |> lib.concatMapStringsSep " · " (a: "${a} ${n byArch.${a}}");
+    archRow = byArch |> lib.mapAttrsToList (a: v: "${a} ${n v}") |> lib.concatStringsSep " · ";
     graphNodes = n site.graph.nodes;
     graphEdges = n site.graph.edges;
     graphHosts = n site.graph.hosts;

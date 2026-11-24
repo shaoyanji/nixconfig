@@ -397,7 +397,7 @@
       hostInventory
       |> lib.attrNames
       |> lib.filter (h: builtins.elem f (hostInventory.${h}.features or []))
-      |> builtins.sort (a: b: a < b)
+      |> lib.sort lib.lessThan
       |> (hs: [f hs]));
 
   blastRows =
@@ -414,7 +414,7 @@
   chainHostRows =
     hostInventory
     |> lib.attrNames
-    |> builtins.sort (a: b: a < b)
+    |> lib.sort lib.lessThan
     |> map (h: [
       "`${h}`"
       ((hostInventory.${h}.features or []) |> lib.concatMapStringsSep " " (f: "`${f}`"))

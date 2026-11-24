@@ -44,6 +44,12 @@ dupes gate closes the second row and the lead is lost. `task apps:search --
 <company>` before scouting, and treat a second requisition at the same employer
 as a replacement for the tracked row, not an addition.
 
+A job board's employer label is not the employer: arbeitnow's "Coda" is
+`coda.co`, and "Microsoftcorporation" is Microsoft. Read the posting's
+`hiringOrganization` (or the apply host) before writing `--company`, or two rows
+for one employer sit in the table spelling its name differently, which the
+dupes gate cannot see.
+
 ## Track
 
 ```bash

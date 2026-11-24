@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-24T07:17:12Z",
+  "generated": "2026-11-24T07:27:46Z",
   "count": 200,
-  "pin": "6d508938db82103af3add2ba8c0672155a309ee4deb956c1c8d2265bfcab7a65",
+  "pin": "326d323e51ae471255d80af81e0695695239f55935c80b182f877f59ddf88265",
   "turns": [
+    {
+      "id": "2dc2feea-5640-4d1c-b489-49d42164c902",
+      "ts": "2026-11-24T07:27:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-scout-2026-11-24f",
+      "action": "claim: fresh infra scout round — new sources only (Jobicy, Himalayas API, DACH/Swiss feeds, Hetzner, Giant Swarm), dedupe against 944 tracked rows, add only what passes the remote/fleet filter.",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haleshfgk95otoip3gcq3gb"
+    },
+    {
+      "id": "1669aca6-bb3b-4fa9-bd3b-1a1e0fb33ee3",
+      "ts": "2026-11-24T07:25:59Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "verify-only at HEAD 51eb4195: checks:image-daily PASS 'gate ok: dispatch, judge fallback, breakers and shrink guard all present'; go build ./... at tools/ root errors (no top-level go.mod — the sprawl one-os-cli tracks), in tools/image-daily build+vet clean | gate: checks:image-daily PASS, go build (tools/image-daily) PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "51eb4195",
+      "branch": "main",
+      "frame": "03halel41vhg4zssh9h0molby"
+    },
+    {
+      "id": "f231697d-a08d-4daf-8428-436c9dea2d7e",
+      "ts": "2026-11-24T07:23:28Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-scout-2026-11-24e",
+      "action": "Scout: 5 new fleet-infra leads added — Chainguard (remote DE, fit 4, queued for CV tailoring), Coder (remote EU, fit 3), Hostinger (Vilnius, fit 3), Sysdig (IT-scoped, fit 2), Collabora (remote anywhere, fit 2). Settled 2 pre-existing dupes (Railway, VirtusLab) so one live row each. Gate: apps:dupes [] PASS, 944 tracked, dirty 26 unchanged. No repo commit: tracker writes are API-side only.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hale3dgevnn9ehjwwowj88u"
+    },
+    {
+      "id": "24fd4639-148f-4114-96f4-bd8333e93db8",
+      "ts": "2026-11-24T07:17:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: 5 new leads (wabcon DevOps Berlin, Airalo NOC Europe-remote, Laelaps test infra Zürich, Decathlon AI platform Paris, Microsoft AI eval platform London); wabcon + Airalo queued for CV tailoring; apps skill now states the duplicate-employer rule; gate: checks:kg PASS, checks:tasks PASS",
+      "outcome": "done",
+      "claims": [
+        ".agents/skills/apps; submissions/"
+      ],
+      "files": [],
+      "base_commit": "51eb41953ea48f895b02cf3e0caf2676df28afda",
+      "branch": "main",
+      "frame": "03halcvkav64dh7l5pzpfd0ml"
+    },
     {
       "id": "f5c385f9-f2fb-499b-b5d6-52b48a3fa5e4",
       "ts": "2026-11-24T07:16:58Z",
@@ -2650,63 +2706,6 @@
       "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
       "branch": "main",
       "frame": "03haeocq6l90r7v7vz7iq4ynh"
-    },
-    {
-      "id": "5968f0c2-457a-44bb-9c4a-130d188bb340",
-      "ts": "2026-11-23T10:44:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:tmux-pane-steward",
-      "action": "Drove idle freebuff panes 0:1.1 (frieren) and 0:2.1 (delphi over ssh tunnel) with CV-site publish task; Jev classify returned publish p=1.0 margin=1.0 exit 0; load-buffer paste-buffer Enter submitted on both; fresh working counters 5s 7s confirm agents started; steward drove panes only, no code change or commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
-      "branch": "main",
-      "frame": "03haeo03rhwt6p9raztatxwmu"
-    },
-    {
-      "id": "d41b371c-68da-4ca3-860b-beda3dd96f2d",
-      "ts": "2026-11-23T10:41:21Z",
-      "source": "devin",
-      "subject": "nixconfig:vercel-status",
-      "action": "claim: design vercel outlet — public fleet status page + basic-auth /ops zone fed by sentinel status.json via Edge Config",
-      "outcome": "in_progress",
-      "claims": [
-        "vercel/",
-        "scripts/task/vercel-publish.sh",
-        "taskfiles/",
-        "docs/"
-      ],
-      "files": [],
-      "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
-      "branch": "main",
-      "frame": "03haengcvi2ws6qzj14358oqj"
-    },
-    {
-      "id": "daf9acef-c89e-4767-aef5-62d234eed917",
-      "ts": "2026-11-23T10:36:16Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-23g",
-      "action": "landed: scout sweep g — 10 infra leads added from arbeitnow/remotive/wwr/remoteok, 7 live at prep with packets, 3 closed ineligible (Upsun Canada, Prove US, Gemini US); 4 packets carry a tailored DE/EN letter (eleQtron, EPAM, HyPlus, teccle); EPAM's second req refused by the duplicate gate; nothing submitted | gate: application-get readback 10/10 rows + 4 packet dirs with anschreiben.pdf + lebenslauf.pdf",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haemgkxnrsa1p4sj0aqnnbs"
-    },
-    {
-      "id": "a2697b41-3872-4286-8a81-3143a487dee3",
-      "ts": "2026-11-23T10:28:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:matt-site-sre-refresh",
-      "action": "landed: matt.bountystash.com hero + project archive refreshed for SRE/platform — EN/DE title, subtitle, status, target, bio; projects.json weight drives archive order (nixconfig, KEV tools first); og card and alt follow | gate: .#sites.matt-site build (17 pages, 5 PDFs, 95 links, ATS) + site:check + preview and prod deploys 200 with the new role live",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haekugko4000exytv1rwarx"
     }
   ]
 }

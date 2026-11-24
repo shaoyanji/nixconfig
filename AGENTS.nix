@@ -5354,5 +5354,46 @@
         []. A person still sends; agents only prep.
       '';
     };
+    job-scout-sre-platform-2026-11-24 = {
+      title = "SRE and platform scouting: nine leads, and the site that already says it";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Seven LinkedIn queries over a two-week EU window gave 201 unique cards; 64 survived the agency and title filters, and nine were new employers. The CV site needs no prose change for any of them yet — the work is packet order after the 2026-12-07 hold, starting with Toast and Etraveli.";
+      from = ["job-scout-fresh-eu-boards-2026-11-24"];
+      refs = {
+        modules = ["lib/matt-site.nix"];
+        tasks = ["apps:dupes" "matt:cv:check"];
+        docs = ["docs/cv-ats-compliance.md"];
+      };
+      body = ''
+        Ranked by what the fleet is evidence for, not by title. Toast (Dublin,
+        compute and storage platform, fit 4) and Etraveli Group (Gothenburg,
+        OpenStack and Ceph, fit 4) need no translation: block storage and
+        cluster failure is the fleet's own subject. Bahnhof (Gothenburg or
+        Stockholm, Linux on self-built datacentres, fit 4) is the closest
+        cultural match and the biggest language risk. Frontiers' platform role
+        in Madrid is refused by the live-row rule, not by fit: a Frontier row is
+        still at lead, and a better title does not buy a second application.
+
+        The rest are fit 3 until the first three answer: WebBeds, OANDA, Nasdaq,
+        Fiserv, BeReal, Pigment.
+
+        Nothing here changes the site, and that is the point of writing it down.
+        The hero already reads Site Reliability and Platform Engineer and the
+        platform brief already tells the ninety-day story. What was missing was
+        not copy but a ranked list of who to send it to. When the first packet
+        lands the software CV variant ships, and matt:gist:drift plus
+        matt:cv:check stay the gates because the packet compiles from
+        lib/matt/resume.json.
+
+        WWR returned only tracked or closed employers; Remotive still ignores
+        its category parameter.
+
+        Exit: packets for Toast then Etraveli exist at prep with no send before
+        2026-12-07, apps:dupes stays [], and no site prose chased a silent lead.
+      '';
+    };
   };
 }

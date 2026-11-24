@@ -1,8 +1,190 @@
 {
-  "generated": "2026-11-24T12:06:17Z",
+  "generated": "2026-11-24T12:49:55Z",
   "count": 200,
-  "pin": "aaddd513fddc77d35869555e618bb2a4fce5fb197fd3890a723a749f15468ee2",
+  "pin": "32cd2be28fa999b5e4be22466630fb8ef1a151b4b12791ce455dcfc3eddee7e9",
   "turns": [
+    {
+      "id": "95a4424f-5aff-4a76-9581-9f0b6c38a1e2",
+      "ts": "2026-11-24T12:44:59Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward",
+      "action": "drove agents:3.1 delphi freebuff (research); fresh working... gate; agents:1/2 jev needs_review left idle; agents:4 unknown",
+      "outcome": "done",
+      "claims": [
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03han4wfu5linfac9qktrb6f4"
+    },
+    {
+      "id": "9386fecb-9fc7-46eb-a162-573b4b39dc2a",
+      "ts": "2026-11-24T12:32:39Z",
+      "source": "hermes",
+      "subject": "nixconfig:steward-probe",
+      "action": "pane-steward probe turn",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03han2hog2ruefbuxgoerpovc"
+    },
+    {
+      "id": "da40e686-1397-4a41-9aab-d00cb36b4ca2",
+      "ts": "2026-11-24T12:22:23Z",
+      "source": "hermes",
+      "subject": "nixconfig:freebuff-scout-cv-lane",
+      "action": "landed: drove idle freebuff pane agents:2.1; jev-decide classify needs_review → duel top two → novel won 0.69 vs 0.31 margin 0.38; task pasted via load-buffer+paste-buffer+Enter; pane working...",
+      "outcome": "done",
+      "claims": [
+        "agents:2.1"
+      ],
+      "files": [
+        "scripts/task/xs-turn-post.sh"
+      ],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03han0hgtk6kja653bxo2z43z"
+    },
+    {
+      "id": "31c93015-efa3-4e83-90a8-6b98fd8fa4e9",
+      "ts": "2026-11-24T12:19:05Z",
+      "source": "devin",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: alias-consistency sweep — 4 files mixed builtins./lib. for the same fn; each unified to its own majority (matt-site head, delphi-site length, knowledge-graph tail -> builtins.*; docs.nix -> lib.length x9; pkg-list builtins.map -> bare map). delphi-site's lib.head/lib.tail kept: single-form file, consistent | gate: drv-equality 30/30, .#sites.matt-site builds w/ real artifacts, .#modules 166, agentsNotes.counts stable",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03hamzuayap01ux1dh430ezrp"
+    },
+    {
+      "id": "abd3f066-494c-4a05-877c-e8d39cb014c5",
+      "ts": "2026-11-24T12:17:28Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 4 new leads (Akamai Madrid, Continental Lousado, Ministry Brands Galway, SmartMed Porto; fit 3-4, hold 07.12). Sweep: attention 21 rows, Corporate Tools reply present, 0 stage changes; SmartRecruiters 20 tenants no matching titles, WWR nothing new, Remotive filters still ignored, one LinkedIn query 429. 9 candidates reviewed, 5 consultancies rejected.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "d64803ef387e45a4e9101514ccd6906d5af82ed1",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamzivj8shatybj5mu63sdm"
+    },
+    {
+      "id": "fd4e65b1-f53c-4fff-bcc5-2e0969e01d95",
+      "ts": "2026-11-24T12:16:15Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi (agents:3) idle after mail search. jev-decide first pass attention p=0.49 margin=0.14 NOT decisive; duel attention p=0.51 margin=0.02 still NOT decisive — picked top by margin per skill: sweep attention queue. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a44b5940a2828c1a4017875efcc31485e5480bc9",
+      "branch": "main",
+      "frame": "03hamzaeyhud7shpgniuavak6"
+    },
+    {
+      "id": "eb76dae0-c58d-4eed-97d0-a73a6492bc46",
+      "ts": "2026-11-24T12:16:15Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.73 margin=0.59 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a44b5940a2828c1a4017875efcc31485e5480bc9",
+      "branch": "main",
+      "frame": "03hamzacryo2h5tc5ushfmuip"
+    },
+    {
+      "id": "0212517e-25e9-4a05-8c32-ff28bd83429b",
+      "ts": "2026-11-24T12:12:59Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi (agents:3) idle after upsert. jev-decide first pass attention p=0.52 margin=0.08 NOT decisive; duel won db_query p=0.62 margin=0.24 — picked top by margin per skill (no duel spin). Second attempt hit Freebuff anti-automation policy (strike 1); switched to mail search — materially different message accepted. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a44b5940a2828c1a4017875efcc31485e5480bc9",
+      "branch": "main",
+      "frame": "03hamyngudvw7m6621i77gb1g"
+    },
+    {
+      "id": "9e1b4675-2b11-4daf-af00-d3cc853ce1b7",
+      "ts": "2026-11-24T12:12:59Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.73 margin=0.59 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a44b5940a2828c1a4017875efcc31485e5480bc9",
+      "branch": "main",
+      "frame": "03hamynf87h9rsbrwo4c2kxnv"
+    },
+    {
+      "id": "69f51ad8-a665-4609-88ce-f2b1611e27c9",
+      "ts": "2026-11-24T12:10:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-publish",
+      "action": "landed: drove freebuff (agents:2.1) to publish dragoncourt.neocities.org via task neocities:deploy; pane accepted task and is working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a44b5940a2828c1a4017875efcc31485e5480bc9",
+      "branch": "main",
+      "frame": "03hamy87ufmvrjwpndmizqtpn"
+    },
+    {
+      "id": "8c932016-f255-430b-af07-692e04933e21",
+      "ts": "2026-11-24T12:10:48Z",
+      "source": "devin",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: second bridge-lambda sweep — agents-notes.nix gained forNames (4 genAttrs flips), nix-files/pkg-list/nix-comments singletons took direct calls, quotient-hash uses pipe-native builtins.getAttr 'v' | gate: drv-equality 30/30, agentsNotes.counts value-identical vs HEAD (delta = operator's own new note), checks:quotient-hash ok, checks:nix:comments all pointers resolve, .#modules 166 names, checks:tasks parity",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a44b5940a2828c1a4017875efcc31485e5480bc9",
+      "branch": "main",
+      "frame": "03hamy853jowq4ibncutvjtcv"
+    },
+    {
+      "id": "18e5a056-f1d0-47ee-abea-c00be9016f5c",
+      "ts": "2026-11-24T12:07:14Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "fix: apps:dupes was red on a SumUp double row (sumup + discovered-sumup); closed the redundant one as duplicate, dupes back to []. Also reverted one over-eager today-mark (coni-partner duplicate row). Today's 5 ACTION rows stand: Genesis PHCM, Münster, SwissPeak, coni+partner lead, gridscale.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "d64803ef387e45a4e9101514ccd6906d5af82ed1",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamxj0jb0escwev7rrmje7g"
+    },
+    {
+      "id": "7dbc39f7-e7ef-4d9f-99d9-3fb1caab9dda",
+      "ts": "2026-11-24T12:06:20Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: fresh EU scout — boards mostly returned tracked employers; filed 5 genuinely new (eBay Cloud SRE Dublin, Miniclip Lisbon, Nordea Helsinki, ORTEC Bucharest, Mammoet NL; fit 3-4, hold 07.12). Note job-scout-fresh-eu-boards-2026-11-24 names DeepL prep as next packet. Marked 5 rows ACTION TODAY: Genesis PHCM, Münster, SwissPeak, coni+partner, gridscale.",
+      "outcome": "done",
+      "claims": [
+        "apps",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d64803ef387e45a4e9101514ccd6906d5af82ed1",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamxclskfk5xnyn4zolvfv5"
+    },
     {
       "id": "9dea1532-eb57-452b-814f-5ccb8809496d",
       "ts": "2026-11-24T12:06:02Z",
@@ -2617,181 +2799,6 @@
       "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
       "branch": "main",
       "frame": "03hajkx71kszwa9expozz7crm"
-    },
-    {
-      "id": "85f34072-7ebf-4d1b-b640-a25fbf886ee1",
-      "ts": "2026-11-24T01:49:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: 4 new EU/DE leads + packets — gridscale Senior SRE Ceph (Köln, f3), Nebius Sr/Staff SRE server-infra (Berlin|remote, f3), ElevenLabs Core Platform (remote EU, f2), eleQtron IT Systems (Siegen, f2); gate: appflow-packet.sh rc=0 x4, CV 2pp + letter 1pp, nothing sent; note: no apps:sent gate exists, checks:appflow fails on pre-existing role=undiscovered rows",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
-      "branch": "main",
-      "frame": "03hajkrnz3cmg88a1906gfpkv"
-    },
-    {
-      "id": "74fbfff2-1b1c-460d-8bb9-fb51a9c85cc4",
-      "ts": "2026-11-24T01:42:24Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove 3 idle panes (02:40 CET). jev-decide classify vs router labels.json = needs_review x3 (devin novel p.45, freebuff task-change p.46, delphi task-change p.45) -> fell back to each pane's standing task. devin 0:0.1 continue image-daily engine Go refactor (gate task images:gate+checks:quick, commit origin/main); freebuff 0:1.1 EU/DE job-search scout+packets, no send (apps:sent gate to 12-07); delphi 0:2.1 intl scout+packets, no send. All 3 confirmed working.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
-      "branch": "main",
-      "frame": "03hajjgunb5po6u1p3owptkm0"
-    },
-    {
-      "id": "a530c5fb-f292-4673-a77c-13f20322fe01",
-      "ts": "2026-11-24T01:28:55Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "landed (private state, no commit): 3 German leads + 7 packets; gate appflow-packet.sh rc=0 x7, CV 2pp letter 1pp, repo clean; done-outcome refused because submissions/ is gitignored so there is no hash",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
-      "branch": "main",
-      "frame": "03hajgu3oushmmnvi4u2qo55m"
-    },
-    {
-      "id": "18bb1e82-7b28-4046-9772-aa430a20e0c3",
-      "ts": "2026-11-24T01:28:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "claim: job scout — Germany-only pass + 7 packets (n8n, trivago, DeepL, Enpal, Supabase, Dropbox, Docplanner); leads in submissions/ (gitignored), packets in private appflow state",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/"
-      ],
-      "files": [],
-      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
-      "branch": "main",
-      "frame": "03hajgtabd7781twfcafrvxxj"
-    },
-    {
-      "id": "0621ce21-b98d-472b-9659-42729a870fa1",
-      "ts": "2026-11-24T01:16:39Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove two idle job-search panes (freebuff 0:1.1, delphi 0:2.1) — freebuff runs Germany-only pass + packet build at working...35s, delphi scouting + Pliant packet + dupes gate at working...21s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
-      "branch": "main",
-      "frame": "03hajefqqrtwl2migwab5i2fu"
-    },
-    {
-      "id": "45d7c288-5639-48b6-b8d9-e572fd3d3cce",
-      "ts": "2026-11-24T01:11:57Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily",
-      "action": "landed: build_index shape-cache loop ported to image-daily shapes subcommand (published->src fallback, append-only cache, exact-key skip); engine 267->256 | gate: drv-equality 30/30, checks:host frieren PASS, images:gate ok, checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
-      "branch": "main",
-      "frame": "03hajdis50py8cd27bkpljc3i"
-    },
-    {
-      "id": "060a9112-d20a-4a82-9a06-60e5083876fa",
-      "ts": "2026-11-24T01:04:47Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "drove 3 idle panes (2026-11-24 01:54): devin 0:0.1->continue_refactor (image-daily build_index ffprobe shape-cache), freebuff 0:1.1->scout-new-leads, delphi 0:2.1->lead-liveness; all 3 confirmed working (fresh Thinking/working counters)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5c732b8bc4f9e7e6e83354dd8663372f22c953b7",
-      "branch": "main",
-      "frame": "03hajc4c8im20v7oic5326p0p"
-    },
-    {
-      "id": "9ada3a1d-fffd-4426-bf0f-9ed452e0a51f",
-      "ts": "2026-11-24T00:47:27Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily",
-      "action": "landed: imageDailySlots data table + listToAttrs replaces 4 hand-written scheduler blocks (jobs table diff identical); image-daily gains remaining/share/pending subcommands, slot_share+roster_pending gone from engine (307->267) | gate: drv-equality 30/30, checks:host frieren PASS, images:gate ok, checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5c732b8bc4f9e7e6e83354dd8663372f22c953b7",
-      "branch": "main",
-      "frame": "03haj8qfn7rdxpx0e4bkb61yl"
-    },
-    {
-      "id": "38738867-450a-4584-a5cb-539e156c869b",
-      "ts": "2026-11-24T00:39:05Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "Drove 2 idle freebuff job-search panes: 0:1.1 (EU scout) + 0:2.1/delphi (intl scout); jevdecide route scout-new p1.0 m1.0; both now working...",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
-      "branch": "main",
-      "frame": "03haj73q28mpykg92irv3grbv"
-    },
-    {
-      "id": "3400ec87-4e0a-40fd-9cfb-b737b8314b8b",
-      "ts": "2026-11-24T00:33:59Z",
-      "source": "codebuff",
-      "subject": "nixconfig:freebuff-job-search",
-      "action": "scouted 7 leads: Namespace infra (Zurich), SwissPeak sr platform (Basel), SwissPeak cloud/net/sec (Steinhausen), BSI remote sr cloud ops (Baar), Simple Analytics devops (remote), SonarSource AI systems (Geneva), JFrog PS devops architect (remote). Sources: arbeitnow API, WWR, HN Nov thread. Skipped as already tracked: EPAM, ICEYE x2, Namespace devops, Splash, SonarSource Bochum",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
-      "branch": "main",
-      "frame": "03haj63p4uc7ectwmfd9h5xtl"
-    },
-    {
-      "id": "6ce2f7f1-1bc7-40d2-9cb8-f9b711ef78d1",
-      "ts": "2026-11-24T00:31:31Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-2601",
-      "action": "drove 3 idle panes; jev-decide(type-safe,p1.0) routed freebuff->scout_leads, delphi->scout_leads, devin->continue_refactor; all three confirmed working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
-      "branch": "main",
-      "frame": "03haj5mecfs8mpii8p4qqboxk"
-    },
-    {
-      "id": "8f1af7a8-cfb7-4532-9b2d-5c556d19deda",
-      "ts": "2026-11-24T00:28:34Z",
-      "source": "codebuff",
-      "subject": "nixconfig:freebuff-job-search",
-      "action": "submission attempt on the 5 packets: all 5 blocked, nothing sent. bern = Recruitee form fully filled (name, email, phone +49, CV, Anschreiben, GDPR consent) but Send is covered by hCaptcha; zurich = same ATS, needs Swiss German level + fixed-term openness, answers not in corpus; coni = arbeitnow form has one CV slot, JOIN needs email+reCAPTCHA; proxify x2 = career.proxify.io behind Cloudflare Turnstile + account flow. Next actions recorded per row",
-      "outcome": "blocked: human verification (hCaptcha/Turnstile/reCAPTCHA) and two subjective questions no source answers",
-      "claims": [],
-      "files": [],
-      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
-      "branch": "main",
-      "frame": "03haj51pmijh3zxvrodqn5805"
-    },
-    {
-      "id": "a3c1d9cc-b13e-4293-8e72-5c18aa784e97",
-      "ts": "2026-11-24T00:24:30Z",
-      "source": "devin",
-      "subject": "nixconfig:hm-leaf-chain-split",
-      "action": "landed: containers name floor leaf-by-leaf (user.base+shell+user.ai.skills); user.ai gone from container HM, profiles.ai disable+hmAi plumbing removed; guckloch's dead antigravity-cli import dropped (drv-diff caught its or-true activation). | gate: drv-equality 30/30 identical, checks:host delphi/guckloch/cassini/fern PASS, checks:quick PASS, nix:lint 331 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b128999d60e97c63a989f4d4b80209192e8dbfaa",
-      "branch": "main",
-      "frame": "03haj4936h9xrki2ndr8falqj"
     }
   ]
 }

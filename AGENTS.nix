@@ -5079,6 +5079,44 @@
         green on the next pass over the dossier.
       '';
     };
+    delphi-leads-followups = {
+      title = "Leads-DB follow-ups have no record: a dated row, counted from one route";
+      kind = "proposal";
+      status = "PROPOSED";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "No follow-up schema exists: the board page defers it to `sql/application-due.sql` and an `agents:apps:due` task, neither present, so `next_action` prose is the only record and the pipeline counts 22 where 5 are due. The proposal is a dated `application_followup` row; this sweep's four leads are upserted with two marked action-today.";
+      refs = {
+        hosts = ["delphi"];
+        docs = ["docs/appflow-board.md"];
+        modules = ["modules/plugins/appflow/sql/application-pipeline.sql"];
+        tasks = ["apps:overview" "apps:upsert"];
+      };
+      body = ''
+        `docs/appflow-board.md` says it: there is no derived follow-up date, and it
+        names the home one should have — `sql/application-due.sql` and an
+        `agents:apps:due` task. Neither exists, so a follow-up is prose in
+        `next_action`, and `application-pipeline` counts every non-empty next
+        action as if it were due. That is the 22 → 5 correction: 21 overdue plus 5
+        due on 2026-11-24, all off one column (xs turns 03hamwllq/03hamv56c).
+
+        Proposed record: a follow-up is a row, not a sentence.
+        - `application_followup(id, application_id, due_on, kind, channel,
+          state, answered_by, note, created_at)`.
+        - `kind` is chase | ack | docs | thanks; `channel` is the thread it stays
+          in; `state` is due | sent | done | dropped.
+        - Written by `apps:followup:add`; closed by the mail that answers it
+          (`answered_by` holds the message id) or by a person marking it dropped.
+        - Counted by `application-due` — `state = 'due' and due_on <= today` — so
+          the board and `task apps:due` cannot apply two clocks.
+
+        This sweep, 2026-11-24: the four attention-sweep leads are upserted at
+        lead — Akamai Madrid, Ministry Brands Galway, Continental Lousado,
+        SmartMed Porto. Akamai (fit 4, no JD body on the aggregator page) and
+        Ministry Brands (hybrid, 200+ applicants in five days) are marked
+        `action-today`; the other two stay `held` to 2026-12-07.
+      '';
+    };
     delphi-postgres-19-upgrade = {
       title = "Upgrade delphi's PostgreSQL 17 → 19 at the next nixpkgs epoch";
       kind = "open";

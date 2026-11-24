@@ -372,6 +372,7 @@
       "level": "Grundkenntnisse",
       "keywords": [
         "NixOS",
+        "Kubernetes",
         "AWS Lambda (kleines Agenten-Projekt)"
       ]
     },

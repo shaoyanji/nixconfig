@@ -54,6 +54,8 @@
         "Linux",
         "Kubernetes",
         "AWS",
+        "Azure",
+        "Google Cloud",
         "systemd",
         "Nix flakes",
         "SSH certificate authority",

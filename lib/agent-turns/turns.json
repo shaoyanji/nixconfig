@@ -1,8 +1,357 @@
 {
-  "generated": "2026-11-24T09:21:22Z",
+  "generated": "2026-11-24T10:08:13Z",
   "count": 200,
-  "pin": "fb1cee68e1f69a03fa9c5272f2f22bdd58a33a633bcc887d9fe50c934e4d844f",
+  "pin": "79d7e73648a6d94bc76f8572ac7d57ee9360d0d0ca66d54f0bcfe06389684834",
   "turns": [
+    {
+      "id": "3831e990-69d0-497e-888f-333aa8cd5490",
+      "ts": "2026-11-24T10:05:35Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: scout sweep 2026-11-24 — 5 new leads written (Contensi fit5, HMS Analytical 4, PPC 4, FourEnergy 3, auteega 3), 3 shortlisted; already tracked and not re-added: Mittwald (applied), TransnetBW, inovex, smartclip, Contabo, Qonto, Codesphere, AEB, DACHS, HiSolutions. Gate apps:dupes PASS. No repo change; prep-only to 2026-12-07, nothing sent.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03ham9rhzb8iekby2otewo7p4"
+    },
+    {
+      "id": "bb252d90-b3cb-44f2-a098-84f6778b4e2e",
+      "ts": "2026-11-24T10:04:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive-freebuff-delphi",
+      "action": "drove delphi freebuff agents:3.1 over ssh tunnel with job-search task; pane accepted task and is working; leads + xs pending",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham9is90ujy5dfdg6puwlrf"
+    },
+    {
+      "id": "7a328679-1960-47af-ac36-1e19b208d22e",
+      "ts": "2026-11-24T10:04:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive-freebuff-local",
+      "action": "drove freebuff agents:2.1 with publish task; pane accepted task and is thinking; CV sync + CV gates + xs pending",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham9iq33jpikpx6wff9zur9"
+    },
+    {
+      "id": "61a8ce37-8038-4986-9da0-394d654a1438",
+      "ts": "2026-11-24T10:04:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive-devin",
+      "action": "drove devin agents:1.1 with task-change refactor task; pane reports task already landed at aa0535f2, chain-split closed; gate checks:host HOST=frieren PASS, drv-equality 30/30 identical; no new commit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham9io4x4w04sd8e0f5opdc"
+    },
+    {
+      "id": "a817caae-30e6-4789-abe9-5abb487fa624",
+      "ts": "2026-11-24T09:57:02Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: sweep-2 upsert verified — 5 leads on record, 0 re-inserted (VISPIRON 5, SPECTRUM 4, Livello 4, NDI 3, hellomed 3); attention queue: 3 status changes (GoCardless rejected, INIT email refused, ISGUS consent pending); Postman ack has no row. Gate apps:dupes PASS. No repo change; prep-only to 2026-12-07, nothing sent. Closes hermes dispatch 09:54.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03ham83cqd4ck9v08d50ekf9h"
+    },
+    {
+      "id": "da7d1cf8-2e51-49be-bc83-9a004be034dd",
+      "ts": "2026-11-24T09:56:39Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-split",
+      "action": "claim complete: profiles/global chain audit closed — split dell-dock+battery-charge-limit to 3 setters, deduped sops-nix/boot/xs-notify (9389785c, aa0535f2); kept honest composites (base-node floor, desktop-client, steamos, hm-shared) | gate: drv-equality 30/30 identical, checks:tasks parity",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham80nu2zqcdtdh985mmv75"
+    },
+    {
+      "id": "a9c73e5d-66e3-474c-8b81-98e509684f26",
+      "ts": "2026-11-24T09:56:25Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: muenster follow-ups, 0 sent. citeq chase due 2026-12-02 via Interamt 1510832 (0 mails, no ack); stadt-muenster stays blocked, verified still no Zeugnis scan on disk, two registrar requests named, send 2026-12-07; gute-einstellung dated checkpoint 2026-12-02 (ack 11-22); cyberus rust/nixos six weeks past its 2026-10-14 chase -> 2026-12-07 via join.com, its 13 mails are all join.com nudges. Record: followups/2026-11-24-muenster-followups.md.",
+      "outcome": "done",
+      "claims": [
+        "~/.local/state/appflow/followups"
+      ],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham7z25ak4a2y0ato6xvsf0"
+    },
+    {
+      "id": "05aa11ec-2069-445c-a362-f394f296484f",
+      "ts": "2026-11-24T09:54:51Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi freebuff (agents:3) idle after upsert done (~10:52). jev-decide selected attention p=0.82 margin=0.66: sweep delphi attention queue. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham7o1qox1g3yrirdna9rxn"
+    },
+    {
+      "id": "32758258-025c-4fcc-a9d0-c6cf75a87fc9",
+      "ts": "2026-11-24T09:54:51Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "re-driven: freebuff (agents:2) idle after kinexon send done. jev-decide first pass needs_review (muenster p=0.69, margin 0.49 decisive >= 0.3, top by margin): Muenster follow-ups (advanced interview 2->0). Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham7o09816e28ztkg0hy220"
+    },
+    {
+      "id": "c05273b8-9a8c-4e94-9937-a5e71d6a408a",
+      "ts": "2026-11-24T09:52:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "kinexon-senior-devops-go-backend was submitted 2026-11-24 08:22 via Greenhouse gh_jid 4936773101 (xs 03halpmto7e8xf0w4yvvwj4zw, row stage=applied, chase due 2026-12-02). No resend: duplicate would breach the dupe rule and the 2026-12-07 hold, and no recruiter address is on record (linkedMail 0). Packet from the 02:48 turn is intact at /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend (CV 2pp, letter 1pp).",
+      "outcome": "blocked: kinexon already submitted",
+      "claims": [
+        "~/.local/state/appflow/submissions/kinexon-senior-devops-go-backend"
+      ],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham7agfsd6e86k56n6qomj8"
+    },
+    {
+      "id": "82298cc1-2fa3-494d-8fc9-051ce5b02445",
+      "ts": "2026-11-24T09:52:19Z",
+      "source": "hermes",
+      "subject": "nixconfig:chain-split",
+      "action": "re-driven: devin (agents:1) idle after image-daily verify done at 09:42. jev-decide first pass needs_review (chain_split p=0.51 m=0.18); duel won chain_split p=0.98 m=0.96. Fed chain-split claim (host-inventory.nix, modules/profiles, modules/global). Pane Thinking.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham7654los657ndks3nc8xg"
+    },
+    {
+      "id": "1a3f8976-23d4-4b0f-a231-41fd8216ce92",
+      "ts": "2026-11-24T09:52:18Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi freebuff (agents:3) idle after job-search task done at 09:40. jev-decide selected upsert p=1.0 margin=1.0: upsert 5 new rows from scout sweep 2 (09:47) into delphi DB. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham763qs1myi70fhqvfowqc"
+    },
+    {
+      "id": "c5de9550-a557-49df-b2c3-fe2561343eb4",
+      "ts": "2026-11-24T09:52:18Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout",
+      "action": "re-driven: freebuff (agents:2) idle after scout sweep 2 done (09:47). jev-decide selected kinexon_send p=0.97 margin=0.94: send built kinexon packet. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham762bfpuz6y1hyi63snm7"
+    },
+    {
+      "id": "f6ebcd24-5fab-403b-bba2-40e6d2c24ca3",
+      "ts": "2026-11-24T09:47:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "scout sweep 2 (freebuff): arbeitnow 46 pages saturated for DACH devops/sre/platform. 5 new rows: VISPIRON fit5, SPECTRUM AG 4, Livello 4, NDI 3, hellomed 3, all lead with 2026-12-07 hold. Findings: Open-Xchange carries a newer Senior DevOps req than its row; K-tronik needs 10y C++; apps:search is a no-op (toon=all rows, text=0 rows).",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.local/state/appflow/followups"
+      ],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham65xjmhychwn1mxdnvhbp"
+    },
+    {
+      "id": "c82e5f1f-f94e-477e-b957-f334c29c07bc",
+      "ts": "2026-11-24T09:44:42Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-scout-intl",
+      "action": "landed: scout-2026-11-24 added Capgemini (Senior DevOps, Ratingen hybrid) and LVM (System Engineer Scheduling, Münster); findings: apps:search filter broken (returns all 1022 rows for any query, direct jq returns 0), Advantest/PSI-Software/KHS already lead from an earlier pass today, netgo applied, Bechtle packed, WWR feed mostly US/manager, swissdevjobs CH-permit | prep-only to 2026-12-07, no sends | gate: apps:dupes [] PASS",
+      "outcome": "done",
+      "claims": [
+        "~/.config/appflow"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03ham5ono3jy46kgzlk7erq0g"
+    },
+    {
+      "id": "c9b803ff-091c-4824-883c-ef5a311eb13f",
+      "ts": "2026-11-24T09:42:23Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "verified: Go-port gates all green at HEAD aa0535f2 — checks:image-daily gate ok, checks:tasks 801 tasks parity exact, go build+vet+test clean in tools/os (serve tests ok), artifacts: image-daily manifest emits 750 assets, static-serve alias answers Range 206/GET 200 — no failures found",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham58cpz8sdjtwk4n95mj95"
+    },
+    {
+      "id": "a85bd445-558b-4495-bfde-5b490316405f",
+      "ts": "2026-11-24T09:41:59Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:steward:pane-drive:devin",
+      "action": "drove idle devin pane agents:1.1 via Jev gate-change (duel decisive 0.99/0.98); pasted image-daily Go port gate verification task; Devin shows Running tools · 5s spinner after second composer Enter",
+      "outcome": "done",
+      "claims": [
+        "agents:1.1"
+      ],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham55il04bv06yhnan227ua"
+    },
+    {
+      "id": "0cc1b7b4-e97e-455c-bfb5-3d1f2a87a9b3",
+      "ts": "2026-11-24T09:40:54Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-scout-intl",
+      "action": "claim: scout round 2026-11-24 — apps:search dedupe per candidate, prep-only to 2026-12-07, no sends",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.config/appflow"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03ham4xx5ybtzgo6m62zc2mgx"
+    },
+    {
+      "id": "86ece8a0-80dd-49bb-a724-84dff7091c3e",
+      "ts": "2026-11-24T09:40:40Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:steward:pane-drive:freebuff-delphi",
+      "action": "drove idle remote freebuff pane agents:3.1 via Jev note-change (decisive margin 0.43) over the ssh tunnel; pasted delphi job-search task; pane shows thinking... 4s / Add to the current task after Enter",
+      "outcome": "done",
+      "claims": [
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham4w86nmfobcfoqh9pideb"
+    },
+    {
+      "id": "9508e281-8932-4e79-a505-c0850e653220",
+      "ts": "2026-11-24T09:40:39Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:steward:pane-drive:freebuff-local",
+      "action": "drove idle freebuff pane agents:2.1 via Jev note-change (decisive margin 0.31); pasted EU/DE job-scout sweep task; pane shows thinking... 4s / Add to the current task after Enter",
+      "outcome": "done",
+      "claims": [
+        "agents:2.1"
+      ],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham4w66cnj354q4ses1q2ja"
+    },
+    {
+      "id": "9075980e-fdb2-4ee6-b379-6539632288d9",
+      "ts": "2026-11-24T09:30:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "scouted: DACH/CH feed sweep (germantechjobs, swissdevjobs, arbeitnow API, devjobs.at). Six new leads as rows via apps:scout - PSI Software SE, Optimus sea, arveo, ONZACK AG, Intelliact AG, mesoneer AG - each with location, ad-stated sponsorship, source URL, hold 2026-12-07. Record: followups/2026-11-24-scout-dach-feeds.md plus the dead/dupe verdicts. No packet, nothing sent.",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.local/state/appflow/followups"
+      ],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham2wqjiytl2z185e200ex5"
+    },
+    {
+      "id": "66a9578e-9bc7-4526-b9ad-db843e0a7f5b",
+      "ts": "2026-11-24T09:29:17Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-scout-intl",
+      "action": "landed: remote-first EU sweep — CWA added (AWS hosting ops, home office option, fit 3); Tether row re-pointed at its 100% remote Senior DevOps/Infra ad; excluded NetKnights, Scheer, Mecklenburgische, AND-E, Allegion, SimonsVoss as relocation-bound and all Swiss roles for permit; BAMF remote ad already covered by bamf-devops | gate: apps:dupes [] PASS",
+      "outcome": "done",
+      "claims": [
+        "~/.config/appflow"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03ham2o57j7mgwksgry5kyv4e"
+    },
+    {
+      "id": "e51d4f9c-89cd-4217-b1d7-23cc31c939c9",
+      "ts": "2026-11-24T09:28:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:agents:3.1",
+      "action": "landed: drove idle ssh/freebuff delphi pane agents:3.1; Jev selected research (0.95/0.92); job-search EU-eligible DevOps/SRE/Platform/Infra employer-lead task submitted after second Enter; pane shows working... (4s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham2j6j9np6p4sihe6bj2qy"
+    },
+    {
+      "id": "f35abeda-2d78-4bea-a278-29d168779da1",
+      "ts": "2026-11-24T09:28:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:agents:2.1",
+      "action": "landed: drove idle freebuff CV/site pane agents:2.1; Jev selected research (0.92/0.87); job-scout DevOps/SRE/Platform/Infra employer-lead task submitted; pane shows working... (31s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham2j5i1w7cqjyopbi6iugn"
+    },
+    {
+      "id": "de830ce1-aff2-4abb-9e7a-06683978ae40",
+      "ts": "2026-11-24T09:21:41Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-split",
+      "action": "landed: frieren profiles.boot dedup + base-node sops-nix dedup — audit corrected the queued triple: frieren's base-node/desktop-client are load-bearing (desktop.nix is specialisation-only), only boot was a real duplicate; earlier 'done' turn named a hash from a commit the deadnix hook refused, real commit is aa0535f2 | gate: checks:host frieren PASS, drv-equality 30/30 identical",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
+      "branch": "main",
+      "frame": "03ham16tmwuqw4mmwjzlzwcjv"
+    },
     {
       "id": "c499130d-d944-4e5d-97a9-205261c6787b",
       "ts": "2026-11-24T09:17:02Z",
@@ -2416,343 +2765,6 @@
       "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
       "branch": "main",
       "frame": "03hags20ooc2uu40mjp2v33st"
-    },
-    {
-      "id": "e3611748-ab56-478d-9f83-45d3d5a0b8fd",
-      "ts": "2026-11-23T17:08:38Z",
-      "source": "steward",
-      "subject": "steward:18:00",
-      "action": "landed: freebuff=nixfmt commit, delphi=job-search scouting",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hagr3wdzj36cqufogqt4o8b"
-    },
-    {
-      "id": "9c5e7c3b-024b-4c2f-ba53-9489aadda621",
-      "ts": "2026-11-23T17:08:09Z",
-      "source": "codebuff",
-      "subject": "nixconfig:matt-site-fmt",
-      "action": "landed: nixfmt pass committed and pushed for lib/matt-site.nix (alejandra rewrap of articleRecord/articleVariant/cvFileName; -w diff shows only line breaks and expanded interpolations, no token change). Pre-commit hook also refreshed the agent-turns pin in the same commit; hermes-persona config.yaml left unstaged.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ce28c2e451039a1c3c0a447191f33bcbce56049c",
-      "branch": "main",
-      "frame": "03hagr0fogsv6jdx2f54kbg3p"
-    },
-    {
-      "id": "d77c1a39-29a2-4b6b-af3a-4c069eeadc66",
-      "ts": "2026-11-23T16:51:09Z",
-      "source": "devin",
-      "subject": "nixconfig:apps-scout-pipeline",
-      "action": "landed: drove devin to stage taskfiles/apps.yml, verify apps-scout.sh --dry, commit apps:scout task",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/apps.yml",
-        "scripts/task/apps-scout.sh"
-      ],
-      "files": [
-        "taskfiles/apps.yml",
-        "scripts/task/apps-scout.sh"
-      ],
-      "base_commit": "50c87f316d79085b07d158d0be21cc96e6fd301e",
-      "branch": "main",
-      "frame": "03hagnoxc0yk47m0jtek7brmi"
-    },
-    {
-      "id": "297c25aa-2c33-46aa-9aa1-8f2420a6a583",
-      "ts": "2026-11-23T16:51:07Z",
-      "source": "devin",
-      "subject": "nixconfig:apps-scout",
-      "action": "landed: apps:scout task + apps-scout.sh — --dry verified both ways (rc=2 bad input, rc=0 prints row); check:verify 130/130 no drift",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "50c87f316d79085b07d158d0be21cc96e6fd301e",
-      "branch": "main",
-      "frame": "03hagnom9ce18lwy7ga2wmtm6"
-    },
-    {
-      "id": "0aa7a3e8-d8e3-4aa4-a92d-901c19f6483c",
-      "ts": "2026-11-23T16:44:11Z",
-      "source": "codebuff",
-      "subject": "nixconfig:site-publish-2026-11-23",
-      "action": "landed: republished matt.bountystash.com from this tree (deployment f2442965.matt-9pf.pages.dev, 28 files, 0 new uploads -> live content already equalled the build); CV surface proven live: 6 PDFs 200 application/pdf, 8 anchors sha256-equal to the artifact",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "789a5e56258ddbddd018eff4ca461100bd6b0828",
-      "branch": "main",
-      "frame": "03hagmbyrtv1nupude2a97bsq"
-    },
-    {
-      "id": "862192c7-9c3f-4d5b-9c2f-e7c396e078a1",
-      "ts": "2026-11-23T16:44:09Z",
-      "source": "steward",
-      "subject": "nixconfig:steward",
-      "action": "landed: drove 3 idle panes (devin=chain-change, freebuff=apps-scout, wallpaper=generate)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "789a5e56258ddbddd018eff4ca461100bd6b0828",
-      "branch": "main",
-      "frame": "03hagmbmk0umbf8zt6r9pqms4"
-    },
-    {
-      "id": "21201080-3afb-4c9e-bec6-aa3bd7467858",
-      "ts": "2026-11-23T16:38:56Z",
-      "source": "devin",
-      "subject": "nixconfig:hm-chain-audit",
-      "action": "landed: docs/ops/hm-chain-audit.md — 3 chains enumerated, 12 role-chain hosts classified, fern fork + cassini eval risk flagged, per-edit verify table; NO host edits",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "789a5e56258ddbddd018eff4ca461100bd6b0828",
-      "branch": "main",
-      "frame": "03haglb22bxdlm4juutlnj5om"
-    },
-    {
-      "id": "cd02e077-a97b-4683-b286-2710424b08c4",
-      "ts": "2026-11-23T16:36:35Z",
-      "source": "devin",
-      "subject": "nixconfig:hm-chain-audit",
-      "action": "claim: ChainAudit — enumerate HM chain importers, classify, audit doc only",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/ docs/"
-      ],
-      "files": [],
-      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
-      "branch": "main",
-      "frame": "03hagkugvgeiiewvokyrkbe03"
-    },
-    {
-      "id": "a8d9ccf9-5fa9-4118-84cb-c0dd988b1487",
-      "ts": "2026-11-23T16:21:04Z",
-      "source": "delphi",
-      "subject": "nixconfig:delphi",
-      "action": "landed: dispatched research task (DevOps/SRE/Platform/Infrastructure leads scouting) to delphi freebuff pane 0:2.1 via ssh tunnel",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
-      "branch": "main",
-      "frame": "03haghtecqdmb46vpmjucyikt"
-    },
-    {
-      "id": "f007fe70-9399-4eda-a6ec-6c51fc5c5b7b",
-      "ts": "2026-11-23T16:21:04Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff",
-      "action": "landed: dispatched publish task (personal site and CV surface) to freebuff pane 0:1.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
-      "branch": "main",
-      "frame": "03haghtbszg7vqdu78zyqk8l0"
-    },
-    {
-      "id": "994cdc60-68b6-421a-956d-91a50e40c66b",
-      "ts": "2026-11-23T16:20:39Z",
-      "source": "devin",
-      "subject": "nixconfig:devin",
-      "action": "landed: dispatched chain-change refactor (audit home-manager feature-chain blast radius) to devin pane 0:0.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
-      "branch": "main",
-      "frame": "03haghqgefnj9yr1a2gpjppfp"
-    },
-    {
-      "id": "66fadc2b-ae7b-446c-b0f6-299cb7d6bb49",
-      "ts": "2026-11-23T16:19:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:site-publish-2026-11-23",
-      "action": "Published matt.bountystash.com from this tree: built .#sites.matt-site, checks:site:links passed (91 internal links over 17 pages, 6 PDFs, 16 download anchors), matt:deploy:prod uploaded 28 files to the matt Pages project, and every artifact file now hashes equal to its served URL. matt:cv:check live: 14 ok, 0 failed - all 6 CV PDFs 200 application/pdf and all 8 in-page anchors download the artifact bytes in headless Chrome.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
-      "branch": "main",
-      "frame": "03haghi0qfx3wo63ubnqlhgav"
-    },
-    {
-      "id": "40b18054-d7ea-4514-8e20-a9dd90698d77",
-      "ts": "2026-11-23T15:56:57Z",
-      "source": "devin",
-      "subject": "nixconfig:shell-budget",
-      "action": "landed: flake/script-budget.nix records 141 bloated .sh at ceiling; shell-script-budget policy fails unrecorded bloat + growth + stale; 5 fixture cases in tests/policies | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1068ec79609cc98b328feb67a60bb80722e23b5c",
-      "branch": "main",
-      "frame": "03hagd3r5822tsim8rs10u68r"
-    },
-    {
-      "id": "633aee56-b966-4397-a153-63c85dd9ea0d",
-      "ts": "2026-11-23T15:55:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-23-c",
-      "action": "Correction to this round: FACT-Finder senior SRE row closed, not landed. Its Personio req 404s and the FactFinder board now lists only 3 roles, so the fit-5 row was written off a search snippet and is now stage=other with status 'closed (req removed ... 2026-11-23)'. Re-checked the other five with curl: Westernacher, Brainlab, KNIME, Xempus, EMnify all 200 on the employer ATS.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
-      "branch": "main",
-      "frame": "03hagcq2pvltspaofaix9d18a"
-    },
-    {
-      "id": "149ee865-ab73-4fc4-b8c8-6a2b7d7fab22",
-      "ts": "2026-11-23T15:53:41Z",
-      "source": "devin",
-      "subject": "nixconfig:shell-budget",
-      "action": "claim: 100-line shell budget — ledger + policy gate + fixture",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/ tests/policies/ AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
-      "branch": "main",
-      "frame": "03hagcgqqom7fht3bpt4umshw"
-    },
-    {
-      "id": "00187546-ddc3-45e8-a432-74c5a49118fc",
-      "ts": "2026-11-23T15:52:11Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-23-c",
-      "action": "Scout round 3: 6 new leads at stage=lead, fit 5/4 - FACT-Finder senior SRE (own hardware, Harvester/KubeVirt, Ceph, Argo/Flux), KNIME team-lead SRE, Xempus senior platform SRE, EMnify senior platform engineer K8s, Westernacher senior K8s platform (remote), Brainlab SRE VMware Cloud. Skipped as already tracked: Doctolib, gridscale, Miaplaza, Kubernauts, Mittwald, evoila, Steadforce, InnoCraft.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
-      "branch": "main",
-      "frame": "03hagc68pu72ouh9oxzxsmly1"
-    },
-    {
-      "id": "f163ca4f-95d6-468b-b955-f86942d77a55",
-      "ts": "2026-11-23T15:51:02Z",
-      "source": "devin",
-      "subject": "nixconfig:images-publish-module",
-      "action": "landed: reverted the services.image-publish module — slots stay inline in frieren's infra-stack; image-publish is one host's business | gate: checks:host frieren PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f88c3ecb43e35272fd2d70219ddd7b8ae5b2d538",
-      "branch": "main",
-      "frame": "03hagby62tvu1virh5xq6vphl"
-    },
-    {
-      "id": "b5b18078-92b0-41a1-acf0-cecf20908ec7",
-      "ts": "2026-11-23T15:48:09Z",
-      "source": "frieren",
-      "subject": "nixconfig:idle-pane-steward",
-      "action": "landed: drove freebuff (0:1.1) and delphi (0:2.1) — both idle, routed through jevdecide classify (note-change selected decisively), tasks sent via load-buffer+paste-buffer+Enter, both panes verified working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
-      "branch": "main",
-      "frame": "03hagbdtzhq92kj8mmmaotyfm"
-    },
-    {
-      "id": "a4814fda-c09e-4b63-84e0-b36e1d0ea886",
-      "ts": "2026-11-23T15:24:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-23-b",
-      "action": "Scouted 7 new leads into the pipeline via apps:scout (stage=lead, fit 5/4): Orcrist Infrastructure/Systems (bare metal, PXE, Ceph, BGP), Diehl Defence OpenShift, Codesphere SRE, dtms STACKIT platform, EGroup Linux infra, Kaufland Kafka/K8s devops, Modaxo infra/SRE. Screened out as already tracked: Device Insight, smartclip, envelio, evoila, Upvest, Mozilla, Orbem, Onebrief, Wikimedia, Kiwigrid.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
-      "branch": "main",
-      "frame": "03hag6tccya24f2wzny817u67"
-    },
-    {
-      "id": "38d9a3b9-0fa6-4b8f-ac12-49cb0c9aeaee",
-      "ts": "2026-11-23T15:22:17Z",
-      "source": "steward",
-      "subject": "nixconfig:steward",
-      "action": "landed: freebuff and delphi — job search work",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
-      "branch": "main",
-      "frame": "03hag6byrgup5xzr7lmez03j2"
-    },
-    {
-      "id": "a2334c6d-234f-40e9-a4b3-31292a72441b",
-      "ts": "2026-11-23T14:49:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-23",
-      "action": "Scouted 5 leads into the pipeline through apps:scout (origin scout:<family>), readback 5/5 at stage=lead: Uniper Platform DevOps (devops), Redcare Platform Engineer 2 and Kubernauts Kubernetes Engineer (platform), trivago Platform/SRE (sre), finanzen.net Cloud-Infrastructure (infrastructure). Dropped as dead or already tracked: mogenius, Mittwald, DG-i, InnoCraft, inovex, Doctolib, Exoscale.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
-      "branch": "main",
-      "frame": "03hafzucdybb5iilrwiyjbtng"
-    },
-    {
-      "id": "81774c83-69b5-4c18-803c-db1cda6bb412",
-      "ts": "2026-11-23T14:45:43Z",
-      "source": "delphi",
-      "subject": "nixconfig:delphi",
-      "action": "landed: scout-leads on delphi pane 0:2.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
-      "branch": "main",
-      "frame": "03hafz6sp05rm9btsb3p7w0cz"
-    },
-    {
-      "id": "336e52df-b647-4ac5-9402-1c2061c394f8",
-      "ts": "2026-11-23T14:45:42Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff",
-      "action": "landed: scout-leads on freebuff pane 0:1.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
-      "branch": "main",
-      "frame": "03hafz6prflt71w02p19vmoba"
-    },
-    {
-      "id": "8fda5501-03a1-452c-a68d-fe1a96c1359c",
-      "ts": "2026-11-23T14:39:38Z",
-      "source": "devin",
-      "subject": "nixconfig:images-publish-module",
-      "action": "landed: modules/services/image-publish.nix carries the 4 agentScheduler slots; frieren imports self.modules.\"services.image-publish\" + enables it; slot drvs byte-identical modulo repo path | gate: checks:host frieren + checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "03e4d583063d053e033620a70263017bdf306504",
-      "branch": "main",
-      "frame": "03hafy01irjbyk86jd99ufglv"
-    },
-    {
-      "id": "cd00e1a4-94fa-463d-8fe9-a09a2fc610df",
-      "ts": "2026-11-23T14:24:21Z",
-      "source": "devin",
-      "subject": "nixconfig:images-publish-module",
-      "action": "claim: wire the image-publish module into the flake projection",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/ hosts/frieren/ modules/services/"
-      ],
-      "files": [],
-      "base_commit": "862b48d159f5544143539095f947f700ba616d02",
-      "branch": "main",
-      "frame": "03hafv0jxq5r2ji4cbjlm8wyl"
     }
   ]
 }

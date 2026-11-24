@@ -686,6 +686,7 @@ in {
     # variable is read by the public vhost's root location, which is why the
     # match list above is host-level and not location-level.
     commonHttpConfig = ''
+      map_hash_bucket_size 128;
       map $http_user_agent $delphi_terminal {
         default 0;
         "${terminalUa}" 1;

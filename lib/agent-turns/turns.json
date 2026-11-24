@@ -1,8 +1,23 @@
 {
-  "generated": "2026-11-24T19:56:53Z",
+  "generated": "2026-11-24T19:58:16Z",
   "count": 200,
-  "pin": "db9472e5adba065e9cc36e199c21f444ec2aa1e177849bcef8428cad8cdd72e6",
+  "pin": "fb8132081acab3f9647549698f2dbe5f7254725a6c1d4d9944bc0a5b74c02247",
   "turns": [
+    {
+      "id": "778c22a7-c205-4102-9941-37f2467e02d6",
+      "ts": "2026-11-24T19:57:07Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: apps:search returned all 1125 rows for every query — apps-db.sh filtered inside the text renderer while toon_emit printed its stdin. It now filters before emitting, matching every word (AND) over id/company/role/status/next: linbit/b1/univention/open-xchange/noris/rheinmetall/check24 -> 1 row each, proxmox/giant swarm/suse -> []. Sweep rechecks closed: SUSE 33/34 postings, no infra req; Giant Swarm boardless. | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "a72819018a90e59fb198589bb32ce11314d1cabe",
+      "branch": "main",
+      "frame": "03haphbf4myxaz3aokakxzgsy"
+    },
     {
       "id": "205600aa-d773-4955-9e9e-3fc85ea275e3",
       "ts": "2026-11-24T19:55:44Z",
@@ -2686,19 +2701,6 @@
       "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
       "branch": "main",
       "frame": "03ham7654los657ndks3nc8xg"
-    },
-    {
-      "id": "1a3f8976-23d4-4b0f-a231-41fd8216ce92",
-      "ts": "2026-11-24T09:52:18Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi freebuff (agents:3) idle after job-search task done at 09:40. jev-decide selected upsert p=1.0 margin=1.0: upsert 5 new rows from scout sweep 2 (09:47) into delphi DB. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham763qs1myi70fhqvfowqc"
     }
   ]
 }

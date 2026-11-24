@@ -65,9 +65,10 @@ usage() {
 usage: apps-db.sh <verb> [args]
 
   list                     every tracked application, newest activity first
-  search <words…>          case-insensitive match over id, company, role, status,
-                           next action — every word must appear, so "giant swarm"
-                           finds the row and "swarm giant" finds it too
+  search <company|words…>  an employer name resolves against `company` first, so a
+                           legal suffix or a city ("B1 Systems GmbH") still finds
+                           the row; a free-text query falls back to every word
+                           appearing over id, company, role, status, next action
   get <id>                 one record and the mail linked to it
   update <id> --status S [--next-action N]
   add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
@@ -107,8 +108,14 @@ case "$verb" in
     # text branch answered every query with the whole table (measured
     # 2026-11-24: 1125 rows for `zzzznomatch`). Filter, then emit what is left.
     #
-    # Every word must appear (AND), because a two-word employer or role is the
-    # ordinary query and phrase matching silently found nothing.
+    # Two resolutions, because this is asked "does this employer already have a
+    # row?" and a false `[]` is what mints a duplicate. An employer name carries
+    # words the row does not hold — a legal suffix, a city ("CHECK24
+    # Vergleichsportal", "Rheinmetall GmbH") — so a word-AND over the whole row
+    # answered `[]` for a company that was tracked. Legal, place, industry and
+    # role words are struck, and what is left must be the brand: rows whose
+    # `company` holds one come back ranked by how many they hold. A query with no
+    # brand word left (a role, a status) keeps the whole-row AND.
     render() {
       jq -r "$stage"'["stage","updated","company","role","status","next"],
           (.[] | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status,
@@ -116,10 +123,39 @@ case "$verb" in
     }
     curl -fsS -G "$api/api/applications" --data-urlencode "lim=5000" \
       | jq -c --arg q "$q" '
-          ($q | ascii_downcase | split(" ") | map(select(. != ""))) as $words
-          | [ .[]
-              | ([.id, .company, .role, .status, (.nextAction // "")] | join(" ") | ascii_downcase) as $hay
-              | select([$words[] as $w | ($hay | contains($w))] | all) ]' \
+          ($q | ascii_downcase | gsub("[^a-z0-9]+"; " ") | split(" ")
+           | map(select(length >= 2)) | unique) as $all
+          | ["gmbh", "mbh", "ag", "se", "kg", "ug", "gbr", "ev", "inc",
+             "ltd", "llc", "bv", "nv", "plc", "corp", "sa", "srl", "sas",
+             "sarl", "oy", "ab", "aps", "the", "and", "of", "co", "company",
+             "group", "holding", "holdings", "international", "germany",
+             "deutschland", "austria", "schweiz", "switzerland",
+             "software", "solutions", "solution", "systems", "system",
+             "technologies", "technology", "tech", "services", "service",
+             "consulting", "digital", "data", "cloud", "labs", "media",
+             "network", "networks", "security", "global", "it", "ai",
+             "engineer", "engineering", "developer", "devops", "sre",
+             "platform", "infrastructure", "sysadmin", "administrator",
+             "architect", "consultant", "manager", "lead", "senior",
+             "junior", "principal", "staff", "kubernetes", "linux", "ops",
+             "operations", "reliability", "site", "analyst", "specialist",
+             "director", "head", "intern", "working", "student"] as $stop
+          | ($all - $stop) as $brand
+          | if ($brand | length) > 0 then
+              ( [ .[]
+                  | (.company // "" | ascii_downcase
+                     | gsub("[^a-z0-9]+"; " ")) as $co
+                  | [$brand[] as $w | select($co | contains($w))] as $hit
+                  | select(($hit | length) > 0)
+                  | {row: ., hits: ($hit | length)} ]
+                | sort_by([-.hits, .row.updatedAt])
+                | map(.row) )
+            elif ($all | length) == 0 then []
+            else [ .[]
+                   | ([.id, .company, .role, .status, (.nextAction // "")]
+                      | join(" ") | ascii_downcase) as $hay
+                   | select([$all[] as $w | ($hay | contains($w))] | all) ]
+            end' \
       | toon_emit render
     ;;
 

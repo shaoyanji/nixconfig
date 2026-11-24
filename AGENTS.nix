@@ -5827,21 +5827,22 @@
       };
       body = ''
         The port's end state (verified 2026-11-24): the spend, judge and
-        publish machinery lives in tools/os/internal/image (~30 verbs —
-        manifest through shrink-guard). The flake answers it as
-        .#cli.image.daily — a symlink onto the `os` umbrella whose argv[0]
-        dispatch selects the image domain — and image-daily-lib.sh resolves
-        the binary via IMAGE_DAILY_BIN, then PATH, then a one-off
-        `nix build` of that attr (fetches from cachix). Shell keeps ~884
-        lines of dispatch, env/ledger resolution and command shims.
+        publish machinery lives in tools/os/internal/image (~30 verbs). The
+        flake answers it as .#cli.image.daily — a symlink onto the `os`
+        umbrella whose argv[0] dispatch selects the image domain — and
+        image-daily-lib.sh resolves the binary via IMAGE_DAILY_BIN, then
+        PATH, then a one-off `nix build` of that attr (fetches from cachix).
+        Shell keeps ~884 lines of dispatch, env/ledger resolution and
+        command shims.
 
-        Gate state on this tree — four checks, all green:
-        `checks:image-daily` (== `images:gate`): dispatch agreement both
-        ways, judge fallback, both breakers, shrink guard.
-        `checks:images:publish:test`: 5 assertions incl. fail-close on the
-        470c9034^ tree. `checks:images`: 750 urls.tsv rows == 750 manifest
-        assets, same paths and bank URLs. `checks:images:ship:test`:
-        unset/empty PROMPT and DETACH=1 all refuse nonzero.
+        Gate state on this tree — all green (re-verified post-commit):
+        `checks:image-daily` (== `images:gate`): dispatch both ways, judge
+        fallback, both breakers, shrink guard. `checks:images:publish:test`:
+        5 assertions incl. fail-close on 470c9034^. `checks:images`: 750
+        urls.tsv rows == 750 manifest assets, same paths/URLs.
+        `checks:images:ship:test`: unset/empty PROMPT, DETACH=1 refuse.
+        Chain-module check `checks:hosts delphi frieren` (service-portal
+        importers): delphi eval 2132 assertions, frieren module-system rc=0.
 
         Open (deliberately still shell — external-process boundaries, not
         domain logic): cloudinary curl in add/blog/gc via cloudinary.sh,

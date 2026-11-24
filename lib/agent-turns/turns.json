@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-24T18:53:28Z",
+  "generated": "2026-11-24T18:53:50Z",
   "count": 200,
-  "pin": "cc31b2d155e3248a9ec59c4995df8cdfc519c46ff883339f0c958128dcebc405",
+  "pin": "445faf8e5fd09b15513ce6be837f32fd5a0aae0967e4c77183a0aad20717858d",
   "turns": [
+    {
+      "id": "d7ff6857-5293-4987-a32e-c73e4e64924f",
+      "ts": "2026-11-24T18:53:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-note",
+      "action": "landed: sweep state note job-scout-lane-state-2026-11-24 — six employers at stage lead after 164af385 and 7b40455e, HITS.nrw fit 4 first, plus the HITS.nrw/Shipzero duplicate-row drift | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9f09993d561a65dadea76d9c764e96bb974011f",
+      "branch": "main",
+      "frame": "03hap4wwvv0lwbw1xzkv29u5q"
+    },
     {
       "id": "293580c7-44a5-4a6d-849c-45d95717147d",
       "ts": "2026-11-24T18:52:06Z",
@@ -2720,19 +2733,6 @@
       "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
       "branch": "main",
       "frame": "03halrzjj4welt1t9e71wji1m"
-    },
-    {
-      "id": "23e88336-dc3e-46ef-ab4a-d318c87f0f1c",
-      "ts": "2026-11-24T08:33:35Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-split",
-      "action": "landed: drove idle devin pane (agents:1.1) with the chain-split claim; devin now working (fresh spinner). jev-decide needs_review, margin 0.53 decisive so applied decisive-margin rule.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
-      "branch": "main",
-      "frame": "03halrsgvaacrlpr2a9z68nip"
     }
   ]
 }

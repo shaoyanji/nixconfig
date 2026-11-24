@@ -1,8 +1,358 @@
 {
-  "generated": "2026-11-24T02:17:56Z",
+  "generated": "2026-11-24T05:58:55Z",
   "count": 200,
-  "pin": "3c18a8051a9111903976fba382bb26b83883d693081e2503a60cf87f20535ed2",
+  "pin": "f357ad800488d90fd9843096cd52876a1932b54df46ece92dcc22f5280a38b7d",
   "turns": [
+    {
+      "id": "73f97562-a44c-403f-888e-417fe56dcfee",
+      "ts": "2026-11-24T05:53:33Z",
+      "source": "steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove idle freebuff CV agents:2.1 onto job-scout lane (sweep EU career pages + close JD coverage) via load-buffer/paste-buffer/Enter; now working (cv/appflow scripts, working 23s+); devin agents:1.1 BUSY, delphi ssh agents:3.1 BUSY, wallpaper agents:4.1 raw shell daily-done (UNKNOWN, not driveable)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakwj4xbdpo3ssd7rvnq1n5"
+    },
+    {
+      "id": "9f7a4351-d5ce-46dc-a020-cbda5c6f68ac",
+      "ts": "2026-11-24T05:41:01Z",
+      "source": "steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove delphi freebuff agents:3.1 via ssh tunnel on job-scout (jevdecide duel novel p=0.86 m=0.72 -> now thinking/working); left freebuff CV agents:2.1 idle (classify novel 0.53, duel task-change 0.64/0.28 = needs_review)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03haku2y1nxjxu1d6xtck3opj"
+    },
+    {
+      "id": "e481476b-1b53-47f9-b7fe-61c713406de3",
+      "ts": "2026-11-24T05:27:18Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-2026-11-24c",
+      "action": "Scouted fresh infra leads from ATS boards (Greenhouse/Ashby/Lever/Workable/Personio), Remotive, WWR, Arbeitnow, HN Nov+Oct threads; 617 employers already tracked. Added 3 new leads: Cloudflare Senior SWE Kubernetes platform (fit 4), E2B Platform Engineer Prague (3), Buoyant K8s control plane Go/Rust (3). Notes carry years/stack from JD. Closed 7 duplicate live rows (EPAM/Grafana/Scaleway/Flix/Smartclip/SVA) to clear apps-dupes; gate now [], repo 26, nothing sent.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hakreexccdcwkf16hgq4zeh"
+    },
+    {
+      "id": "ee2a5075-a7b7-4d79-9b82-32d27c80450e",
+      "ts": "2026-11-24T05:25:11Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-24",
+      "action": "Round 3 scout, 1706 postings across 18 sources (remoteok, remotive, jobicy, himalayas, workingnomads, WWR, Greenhouse/Ashby/Lever career pages; YC blocked 406, Wellfound payload empty). 7 new leads at stage=lead, all with JD text stored: Grafana Labs Databases SRE DE (5), Scaleway Principal SRE / SRE Compute / K8s Specialist (4), EPAM Croatia (4), Trade Republic, Knack (3). Nothing sent; apps:sent still gated.",
+      "outcome": "done",
+      "claims": [
+        "pipeline db lead rows; ~/.config/appflow/jd"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakqzmy78hc86hcj7obyzhx"
+    },
+    {
+      "id": "1acebe00-d741-4636-bf88-a1508b7aaafe",
+      "ts": "2026-11-24T05:23:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-steward",
+      "action": "landed: drove both idle freebuff job-scout panes to scout_leads (Jev classify p=1.0 margin=1.0); 2.1 local freebuff + 3.1 delphi-ssh now working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakqomd3a4ujxtjk2ih3co7"
+    },
+    {
+      "id": "4e6d64b9-524f-4001-a200-2de4ff9a7a03",
+      "ts": "2026-11-24T05:21:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-24",
+      "action": "Round 3 of the scout lane: wellfound, YC, company ATS career pages, remote-only boards (remoteok, remotive, jobicy, himalayas, workingnomads, WWR) for senior infra/Nix roles; remote-friendly prioritised. No sends, apps:sent still gated.",
+      "outcome": "in_progress",
+      "claims": [
+        "pipeline db lead rows; ~/.config/appflow/jd"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakq6boa5at1xw8qokvoldo"
+    },
+    {
+      "id": "8b966fd5-92c7-442f-a06f-d462aa73b5ad",
+      "ts": "2026-11-24T05:01:28Z",
+      "source": "steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "follow-up: delphi pane agents:3.1 re-driven on draft_application (now working, drafting an application for the top shortlisted lead); freebuff pane agents:2.1 routed to pause (lane complete, next auto-send 12-07) after its review_current pass",
+      "outcome": "done",
+      "claims": [
+        "agents:2.1",
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakmcuaoa20s3s9ode13d9h"
+    },
+    {
+      "id": "2bff4f8c-cd2d-437c-9078-1015ffffae63",
+      "ts": "2026-11-24T05:00:15Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-packet-ipfabric",
+      "action": "Drafted packet for top lead, nothing sent. IP Fabric Senior Infrastructure Operations Engineer, GH 5001750101, Prague or Remote EU. English letter tailored to Hetzner/Proxmox/Puppet-Ansible internal platform, three gaps named; CV 14/36 highlights, 4/10 projects. Packet under ~/.local/state/appflow/submissions/ip-fabric-… (2pp CV, 1pp letter). Row lead->prep; person submits after 2026-12-07. Gates: dupes [] PASS, repo 26, apps:sent 201/12, no mail sent.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hakm49fcibzcbnr7oep3avh"
+    },
+    {
+      "id": "42b71ef4-41cb-4a4a-8986-1b21c9615b35",
+      "ts": "2026-11-24T04:55:07Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-review-leads",
+      "action": "Lead review, no sends. 155 leads at stage lead re-checked: 100 live URLs, 44 live-behind-JS, 3 dead?/3 gone/1 unreachable -> 7 closed; 15 dropped as off-discipline (lead/manager, architect, security, backend-first, sysadmin). 133 survive; 40 are in-scope, fit>=4, verified live, with no employer already in play. 19 rows got concrete next actions incl. 5 Tier A (IP Fabric, Orcrist, Qdrant, Proton, SE3). apps-dupes [] PASS, repo 26, apps:sent untouched (12 findings).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hakl43wfkpubu4dk61aa7mq"
+    },
+    {
+      "id": "5f0a641d-cc51-4d9f-a2ab-6bf1ef8d83f6",
+      "ts": "2026-11-24T04:54:03Z",
+      "source": "steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove freebuff pane agents:2.1 and delphi remote freebuff agents:3.1 (ssh tunnel) on review_current via jevdecide lane criteria; both panes accepted and show fresh working... counters",
+      "outcome": "done",
+      "claims": [
+        "agents:2.1",
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakkwnj7knmsotqwqethzmo"
+    },
+    {
+      "id": "12a0d80a-34a7-42ee-82ef-e22b6a1b70db",
+      "ts": "2026-11-24T04:32:45Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-intl-2",
+      "action": "Second intl scouting pass (15 LinkedIn 7d pairs x3 pages = 152 fresh cards; 200 ATS slug guesses, 27 boards, 0 hits). Added 3 verified leads: Proton Senior DevOps Platform (Geneva/Paris/Barcelona, fit 3, 51-76k EUR Paris band), SE3 Labs Senior Systems/Infra Munich (fit 3, defence clearance gate), Tenstorrent Infra Ops SRE Warsaw/Gdansk (fit 2). JDs read in full; lead.md + JD per id. Gates: apps-dupes [] PASS, repo 26 unchanged, nothing sent (apps:sent still 12 findings).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hakgqswoez04h4eghmu72nr"
+    },
+    {
+      "id": "721dd064-c0c1-4dd7-9373-290b0ae9c16b",
+      "ts": "2026-11-24T04:21:19Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-24",
+      "action": "Round 2 scout: 384 postings (Arbeitnow 20 pages, Ashby, Greenhouse, Personio search.json, Remotive, WWR) -> 5 new leads: Enactintelligence (4, Zürich, Nix+K8s+Ray), Shipzero (4, Hamburg AI platform), Graphcore (3, Cambridge Linux distro), Wellis (3, Rotterdam greenfield platform), Tether (2, 100% remote). JDs saved to ~/.config/appflow/jd. Nothing sent.",
+      "outcome": "done",
+      "claims": [
+        "pipeline db: 5 lead rows; ~/.config/appflow/jd"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakeig9zdpwiihbmf9rqkk6"
+    },
+    {
+      "id": "0010d5b9-e7e3-45ec-b7c1-c85d7d705c79",
+      "ts": "2026-11-24T04:15:18Z",
+      "source": "steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove 2 idle panes (freebuff CV 2.1 + delphi remote freebuff:1.1) on continue_scout via jevdecide 0.97/0.98; both accepted and working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakdc711nlm4isa7rg1ptlt"
+    },
+    {
+      "id": "3a8654ce-e7df-4fbc-bca8-fecf6318fd05",
+      "ts": "2026-11-24T04:14:11Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-24",
+      "action": "Round 2 of the scout lane: wider board coverage (Arbeitnow pages, Remotive other categories, WWR devops feed, Personio via search.json, Workable) plus fresh LinkedIn geo/offset queries; new leads only, deduped against the now-617 tracked employers.",
+      "outcome": "in_progress",
+      "claims": [
+        "pipeline db lead rows; /tmp/scout"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakd48haquf4hae14hqyvyd"
+    },
+    {
+      "id": "4c2e6f3f-713e-4fe1-acab-63717bcdf7a3",
+      "ts": "2026-11-24T04:04:42Z",
+      "source": "antigravity",
+      "subject": "frieren:system-audit",
+      "action": "landed: daily health audit & SYSTEM.md refined in-place | gate: checks:closure:budget PASS (21.5G/30G); checks:ports STRICT=0 PASS; checks:dns:resolver-health PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakb9kz0np62ebdmwsfqfyi"
+    },
+    {
+      "id": "56a9b07e-7892-417d-833d-59c7b921a78a",
+      "ts": "2026-11-24T04:01:22Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-intl",
+      "action": "Scouted intl boards (121 ATS boards, WWR, Remotive, LinkedIn 7d). Added 5 fresh leads: Intercom AI Infra London (fit 3, packet: 2pp EN CV + 1pp EN letter + JD projection), Legora Senior SRE Stockholm, Mangopay Senior SRE Luxembourg, Tiqets Senior Platform Amsterdam, Neo4j Go/K8s sharding London. Nothing sent: apps:sent still 12 findings. Gates: apps:dupes [] PASS, repo 26 unchanged (no commit, material is private state).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hakam5h3vlcaf6a8ex1okru"
+    },
+    {
+      "id": "bd2073f0-6ec2-4699-a64b-ad767ab41bd1",
+      "ts": "2026-11-24T04:00:29Z",
+      "source": "antigravity",
+      "subject": "frieren:system-audit",
+      "action": "start: daily health audit and SYSTEM.md refinement",
+      "outcome": "in_progress",
+      "claims": [
+        "SYSTEM.md"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakafz7k92nsbb8e725er25"
+    },
+    {
+      "id": "32001a41-96bf-4eac-b455-b28675cc7ce3",
+      "ts": "2026-11-24T03:59:58Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-24",
+      "action": "Swept 8 boards (Greenhouse, Ashby, Lever, SmartRecruiters, Arbeitnow, Remotive, WWR RSS, LinkedIn 7d) = 567 postings; 374 dropped as tracked, 29 dupes -> 8 new leads: plusserver (fit 5), R+V (4), CompuGroup Medical (4), dwpbank (3), JAKALA (3), HOLOPLOT (3), Exxeta (3), Concat AG (2). Plusserver packet built: 2pp EN CV + 1pp EN letter + JD projection, ATS PASS. Not sent — gate 12-07.",
+      "outcome": "done",
+      "claims": [
+        "pipeline db: 8 lead rows; ~/.config/appflow/jd",
+        "~/.config/appflow/letters; ~/.local/state/appflow/submissions/plusserver-devops-engineer-kubernetes"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hakac9u84qt7insjzrjzxsi"
+    },
+    {
+      "id": "e9404eb0-21eb-493f-991b-e13fef40fa92",
+      "ts": "2026-11-24T03:55:43Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "tmux server dead after 03:11 (no socket; host up 1d, not a reboot). Rebuilt session 'agents' (4 windows: devin, freebuff, delphi-ssh, wallpaper-worker), relaunched all 4. Drove the 3 idle TUIs on standing tasks (jev-decide needs_review x3 -> fallback, no invented label): devin image-daily Go-port verify (images:gate+checks:quick, commit+push); freebuff+delphi job-scout CV lane (scout, packets, no send). All 3 working; wallpaper-worker finished today's Qwen generation.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hak9ifz4qx4sy4bfcaa5zvi"
+    },
+    {
+      "id": "923155d9-13fa-4972-84dd-8ab09b155cdf",
+      "ts": "2026-11-24T02:54:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "fresh sweep (posted >=15 Nov) — corrected turn: 4 leads added (Flink Platform Eng Berlin 65-80k; Pentland Firth Sr Cloud Platform Munich; Maesn Sr Platform+Reliability Berlin/DUS remote; Atlas Titan Platform Ops Lead Berlin, DE C1 gap). Talon.One refused by employer guard (Adyen live 2026-11-22). AWS ESC dropped (EU-national requirement). dupes 0; nothing sent; repo 26",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.local/state/appflow/submissions"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hajxmqhsyrlhj689ddxwjej"
+    },
+    {
+      "id": "dbe3230e-f55f-46ea-8f02-7b8f3467f225",
+      "ts": "2026-11-24T02:52:59Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "fresh sweep (>=15 Nov): 127 ATS boards, Arbeitnow, Personio, Remotive, WWR RSS, LinkedIn 7-day. Added 3 new leads — Flink Platform Eng Berlin (65-80k, Fit 2), Talon.One TechOps Berlin (Adyen, Fit 2), Pentland Firth Senior Cloud Platform Munich (Fit 2). 6 candidates deduped (Ashby applied; Scout24/trawa/Upvest/Helsing/Langdock tracked). dupes 0; nothing sent; repo 26",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.local/state/appflow/submissions"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hajx97twt41kbsoaz218hmd"
+    },
+    {
+      "id": "0d493117-e13f-4f31-bb1c-f693c2759a65",
+      "ts": "2026-11-24T02:48:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "packet built for kinexon-senior-devops-go-backend: 2-page EN CV + 1-page EN letter, JD projection 11/32 highlights 4/10 projects, artifact /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend, linked at ~/.local/state/appflow/submissions/kinexon-senior-devops-go-backend; nothing sent, tracker moved lead->prep",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/kinexon-senior-devops-go-backend"
+      ],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hajwe6hww4c0d0eplbm0dsg"
+    },
+    {
+      "id": "08ea7bf2-d085-42f2-9af7-c510412fb6cd",
+      "ts": "2026-11-24T02:47:11Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: delphi freebuff pane 0:2.1 re-attached after ssh tunnel reset (unset TMUX to de-nest) and driven to scout fresh DevOps/SRE/Platform/Infra leads; next task routed scout-new-leads via jev-decide (typesafe, p1.0)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hajw4i9s3q2n44b8vnv4138"
+    },
+    {
+      "id": "3ed7ceef-2ee0-4e5e-8c24-4983f9970ece",
+      "ts": "2026-11-24T02:47:03Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: freebuff pane 0:1.1 driven to build the KINEXON application packet (apps:packet, tailored CV+letter); next task routed build-application via jev-decide (typesafe, p0.99)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hajw3ipofl4eqk4pibigjl9"
+    },
+    {
+      "id": "fb3b1669-5864-4039-b527-bed6633cfe8a",
+      "ts": "2026-11-24T02:18:08Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily",
+      "action": "landed: Go port complete — briefs.go adds index/shrink-guard/record/due/parked/lanes/budget/setting/guard; engine.sh deleted (build_index was its last fn), lib 292->131 | gate: images:gate ok, checks:host frieren PASS, checks:quick PASS, drv-equality deferred to 03:00 window (uninformative for this class)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
+      "branch": "main",
+      "frame": "03hajqg5jius7xfjr3sh79uko"
+    },
     {
       "id": "0c8c147e-0866-4162-85a5-20955640f411",
       "ts": "2026-11-24T02:11:58Z",
@@ -2336,366 +2686,6 @@
       "base_commit": "771ed3ab",
       "branch": "main",
       "frame": "03hae68f3zok8021hg6nw8wvl"
-    },
-    {
-      "id": "76334790-3928-46d4-9a46-95e6eae1db70",
-      "ts": "2026-11-23T09:08:18Z",
-      "source": "devin",
-      "subject": "nixconfig:images-pipeline-redesign",
-      "action": "landed: checks:images widened — every urls.tsv row must name the Cloudinary delivery URL of its path-derived public id, never the session-gated URL, and equal the manifest's URL; added to checks:quick deps | gate: checks:quick PASS (771ed3ab)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "771ed3ab4a29406f8ec004c8299dfdef6ac6c166",
-      "branch": "main",
-      "frame": "03hae59xju73sy5reygr7jmpf"
-    },
-    {
-      "id": "db2cba83-ae52-4d16-ac18-a85a41b3cb96",
-      "ts": "2026-11-23T09:06:45Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-pane-0-1-1",
-      "action": "landed: drove idle freebuff pane — job-search scouting: DevOps/SRE/Platform/Infrastructure engineering leads",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae4yzk7ikm5jil71y2kmgk"
-    },
-    {
-      "id": "dd556123-4c9f-43a5-aecd-988530e707e6",
-      "ts": "2026-11-23T09:06:44Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-pane-0-0-1",
-      "action": "landed: drove idle Devin pane — image publish path: wire images:ship into checks:quick as a gate, run checks:quick, report",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae4yxjg52sof2wo0n95moq"
-    },
-    {
-      "id": "4c234dbe-fd55-41e5-9c20-f8151ef98656",
-      "ts": "2026-11-23T08:59:30Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-23d",
-      "action": "landed: 8 new DevOps/SRE/Platform/Infra leads into the delphi pipeline (origin scout-2026-11-23d); no repo change | gate: apps:overview lead stage grew, rows read back via /api/applications",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hae3jzhyt2juot2qrgvoptq"
-    },
-    {
-      "id": "4dc28a48-694b-497e-bbf0-597fab75dc97",
-      "ts": "2026-11-23T08:56:37Z",
-      "source": "devin",
-      "subject": "nixconfig:cv-site-deploy",
-      "action": "landed: matt:deploy:prod (bc6322f9.matt-9pf.pages.dev, 200 on 2 paths) + mockup:deploy:prod (29f0fb29.bountystash-mockup.pages.dev, 200 on 2 paths); live 200s on matt.bountystash.com, concept.bountystash.com, mockup pages.dev; CV PDFs serve application/pdf bytes | gate: pages-deploy readiness + live curls PASS",
-      "outcome": "done",
-      "claims": [
-        "matt:deploy",
-        "mockup:deploy"
-      ],
-      "files": [],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae2zs2okm2t1n9juoi98f1"
-    },
-    {
-      "id": "7fcd2d80-93f9-4101-be46-45cb8238b79f",
-      "ts": "2026-11-23T08:56:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-job-scout-delphi",
-      "action": "landed: scout DevOps/SRE/Platform/Infrastructure leads on delphi freebuff 0:2.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae2xlnjwoh03z4qcy6poq6"
-    },
-    {
-      "id": "8de65a23-98ba-4b03-9fa5-719d496749f4",
-      "ts": "2026-11-23T08:56:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-job-scout",
-      "action": "landed: scout DevOps/SRE/Platform/Infrastructure leads on freebuff 0:1.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae2xixrbqtyptvilixipcj"
-    },
-    {
-      "id": "717afe32-38fc-41df-aad1-b04a665b59d5",
-      "ts": "2026-11-23T08:56:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-site-publish",
-      "action": "landed: publish rebuilt CV site on freebuff 0:0.1",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae2xfyimakbm7ymshgqi29"
-    },
-    {
-      "id": "c901f562-1d88-4941-82a6-682f5371af0d",
-      "ts": "2026-11-23T08:55:56Z",
-      "source": "devin",
-      "subject": "nixconfig:cv-site-deploy",
-      "action": "start: matt:deploy:prod + mockup:deploy:prod — publish rebuilt CV surfaces",
-      "outcome": "in_progress",
-      "claims": [
-        "matt:deploy",
-        "mockup:deploy"
-      ],
-      "files": [],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae2uzsnebesfkgnlq9yac2"
-    },
-    {
-      "id": "ff1290c0-e6d1-431c-9c78-2b0c655d5cf0",
-      "ts": "2026-11-23T08:50:56Z",
-      "source": "devin",
-      "subject": "nixconfig:site-links-quick-gate",
-      "action": "landed: checks:site:links is the canonical gate (builds matt-site + mockup, site-links.sh both); site:links delegates; wired into checks:quick serial leg | verified: matt-site 95 links/17 pages/5 PDFs linked, mockup clean | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/checks.yml",
-        "taskfiles/bountystash.yml",
-        "flake/check-inventory.nix"
-      ],
-      "files": [
-        "taskfiles/checks.yml",
-        "taskfiles/bountystash.yml",
-        "flake/check-inventory.nix"
-      ],
-      "base_commit": "5e74ffd6fafb7aab67c1ad97232d41883b7b6b71",
-      "branch": "main",
-      "frame": "03hae1vtt4l8itqh0fspi4ayz"
-    },
-    {
-      "id": "1cbd95e7-287e-484f-bd03-77e5f8950ab8",
-      "ts": "2026-11-23T08:49:15Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-pane-0-1-1",
-      "action": "drove idle freebuff pane: matt:build + matt:cv:check task sent — verifying CV PDF links",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b3760b92754f2078472f7f471ccca3114f4a625b",
-      "branch": "main",
-      "frame": "03hae1jzmv6v3kztl9ij7vbi0"
-    },
-    {
-      "id": "d191d0cc-da27-4840-bff6-f5ba0d5b4035",
-      "ts": "2026-11-23T08:49:15Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-pane-0-0-1",
-      "action": "drove idle Devin pane: site:links gate task sent — wiring site:links into checks:quick",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b3760b92754f2078472f7f471ccca3114f4a625b",
-      "branch": "main",
-      "frame": "03hae1jxfko8z47dpgc7xswu7"
-    },
-    {
-      "id": "c7ebf52a-ac0e-4128-9b00-a9463b47fc0f",
-      "ts": "2026-11-23T08:44:40Z",
-      "source": "devin",
-      "subject": "nixconfig:images-ship-guard-fixture",
-      "action": "landed: checks:images:ship:test — tests/image-ship/run.sh proves unset/empty PROMPT and DETACH=1 refuse fast (rc=1, names var), task-level refuses rc=201; wired into checks:quick deps + check-inventory | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "tests/",
-        "taskfiles/checks.yml",
-        "flake/check-inventory.nix"
-      ],
-      "files": [
-        "tests/image-ship/run.sh",
-        "taskfiles/checks.yml",
-        "flake/check-inventory.nix"
-      ],
-      "base_commit": "b3760b92754f2078472f7f471ccca3114f4a625b",
-      "branch": "main",
-      "frame": "03hae0nsh66n0kgnkm1uic4ba"
-    },
-    {
-      "id": "0d08870f-b383-40f1-b1f9-e56bda39bf3c",
-      "ts": "2026-11-23T08:43:45Z",
-      "source": "devin",
-      "subject": "nixconfig:refactoring",
-      "action": "landed: gate-change assertion that image-ship.sh fails fast when PROMPT is unset, wired into checks:quick",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hae0hbll5y27zj4yn64jx9u"
-    },
-    {
-      "id": "85a5f7cf-8eb0-43e1-99cb-55734543d057",
-      "ts": "2026-11-23T08:31:26Z",
-      "source": "delphi",
-      "subject": "nixconfig:pane-steward-delphi-0930",
-      "action": "Drove idle delphi freebuff pane 0:2.1 (remote agent TUI via ssh tunnel): routed EU-remote NixOS/DevOps job shortlist research via jev-decide (research 0.99/0.98); sent read-only research task - check n8n, Langfuse, Supabase, ClickHouse and Mondoo for Nix depth, re-rank by fit, record named sources; no repo writes; pane accepted task, working... 7s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hady2pxhcc6kjbb2twxzcz9"
-    },
-    {
-      "id": "d1ee7a3b-f14d-4e13-965f-02db055a399c",
-      "ts": "2026-11-23T08:31:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-steward-freebuff-0930",
-      "action": "Drove idle freebuff pane 0:1.1: routed CV/Pages publish task via jev-decide (publish 0.91/0.83); sent ryoku-cv branch merge into main, push to origin/main so Pages deploys, then verify /cv/ryoku serves and all CV links resolve via local HTTP checks; pane accepted task, working... 7s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hady2mwpy9593q8t2g29wud"
-    },
-    {
-      "id": "558c0018-f702-416c-9c0f-7bba4bdaeade",
-      "ts": "2026-11-23T08:24:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-flox-submit-2026-11-23",
-      "action": "blocked: Flox MTS packet filled in headless Chromium (all 6 fields + 2 PDFs attached) but Ashby Submit is gated by an image-grid CAPTCHA; solving it would bypass the employer's human-verification control. Nothing submitted; archive has 0 Flox/Ashby mail. Row left at prep with the attempt recorded and a manual-submit next action.",
-      "outcome": "blocked: CAPTCHA gates Ashby submit; needs a human pass",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadwr52owkfrq58eykuahgb"
-    },
-    {
-      "id": "57767d0a-52dd-4b0d-8b73-3ad6e77c4b3f",
-      "ts": "2026-11-23T08:22:09Z",
-      "source": "devin",
-      "subject": "nixconfig:fleet-hygiene",
-      "action": "landed: hygiene gates all clean — checks:tasks (792, parity exact), inventory:compiled (3 drvs built), nix:format + nix:lint (329 files), sops:drift (8 files/40 recipients), checks:quick incl. entry gate | gate: checks:quick PASS | zero drift, no commit needed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hadw9fa4xmzbsoyojeg4dn1"
-    },
-    {
-      "id": "aaeefb96-4c38-48c3-9b3f-fa2cf2d6188d",
-      "ts": "2026-11-23T08:21:36Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-devin-0915",
-      "action": "Re-drove idle devin pane 0:0.1 after it completed the kg-zeck init (epoch 4037fd6a, checks:kg:zeck PASS): routed fleet-hygiene via jev-decide (near-tie with nix-comment-audit, 0.55/0.1 duel); sent fleet-hygiene pass task (checks:tasks, inventory:compiled, nix:format, nix:lint, sops:drift, fix drift, commit); confirmed Running tools counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hadw5kb3ar2kk6zkmtze5dl"
-    },
-    {
-      "id": "008f8e70-1c75-4981-9417-8162af9f816f",
-      "ts": "2026-11-23T08:21:20Z",
-      "source": "devin",
-      "subject": "nixconfig:fleet-hygiene",
-      "action": "start: hygiene gates — tasks, inventory:compiled, nix:format, nix:lint, sops:drift; then checks:quick",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/",
-        "flake/",
-        "modules/",
-        "inventory.toml"
-      ],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hadw3o3qhinqk12tyx1mg57"
-    },
-    {
-      "id": "3269b224-702a-46ff-9fe4-1f2cdb7ebbfc",
-      "ts": "2026-11-23T08:15:41Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-delphi-0909",
-      "action": "Re-drove idle delphi freebuff pane 0:2.1 after it built the Flox packet: routed submit-ready-packet via jev-decide (0.75/0.5, decisive margin); sent Flox submission task (fit 5, Ashby, upload lebenslauf+anschreiben); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03haduzvdq0p56ttamppwg83o"
-    },
-    {
-      "id": "01fc7088-f19c-4b7f-b2ea-c636f1415f12",
-      "ts": "2026-11-23T08:15:30Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-freebuff-0909",
-      "action": "Re-drove idle freebuff pane 0:1.1 after it hit the Orbem reCAPTCHA blocker (documented, form-answers.md ready): routed submit-ready-packet via jev-decide (0.94/0.91); sent InnoCraft/gridscale submission task (fit 4 each, Lever/Arbeitnow); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03haduyoc7uknqzineuwmngdd"
-    },
-    {
-      "id": "cc977c2c-f0ba-41cf-bcc7-aad05c620ee5",
-      "ts": "2026-11-23T08:05:26Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-devin-0830",
-      "action": "Drove idle devin pane 0:0.1 after it completed the images-pipeline-redesign (2fed6b51): routed kg-zeck-init via jev-decide (0.98/0.96); sent kg-zeck cache initialization task (leap new core, verify checks:kg:zeck gate); confirmed Running tools counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hadszt4l3slcjsrnosuvmeq"
-    },
-    {
-      "id": "3cb6a420-bb43-4678-b4b9-b9292b3db078",
-      "ts": "2026-11-23T08:05:20Z",
-      "source": "devin",
-      "subject": "nixconfig:kg-zeck-init",
-      "action": "landed: zeck epoch initialized via kg-zeck.sh leap (4037fd6a); checks:kg:zeck PASS (14 ExUnit + worktree parity/leaps); ops:kg + ops:kg:host + kg-check verified under KG_BACKEND=zeck | gate: checks:kg:zeck PASS | nothing to commit — cache lives in XDG_CACHE_HOME",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/kg-zeck.sh",
-        "tools/kg-zeck",
-        "taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hadsz9joj5ye7fkh8v7z0wk"
-    },
-    {
-      "id": "d9e39fff-78f5-4e09-9cba-6f72079c1525",
-      "ts": "2026-11-23T08:02:35Z",
-      "source": "devin",
-      "subject": "nixconfig:kg-zeck-init",
-      "action": "start: initialize zeck epoch (leap), run checks:kg:zeck, verify KG_BACKEND=zeck readers",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/kg-zeck.sh",
-        "tools/kg-zeck",
-        "taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "2fed6b5157537232b0813e3f49022dc97a42a6a4",
-      "branch": "main",
-      "frame": "03hadsfu0d5mu4k3rnin999e3"
     }
   ]
 }

@@ -161,6 +161,14 @@ tasks:
     cmds:
       - bash scripts/task/appflow-docs.sh show {{.CLI_ARGS}}
 
+  # The gap `apps:docs:import` fills, for a whole stage at once. Packet builds
+  # fail one application at a time on missing text, which hides how many rows
+  # are in that state; this is the count and the list (FAIL_ON_MISSING=1 gates).
+  apps:docs:coverage:
+    desc: Which rows of a stage still have no stored text (STAGE=, FAIL_ON_MISSING=1)
+    cmds:
+      - bash scripts/task/appflow-docs.sh coverage {{.CLI_ARGS}}
+
   # The other half of the deletion gate: a packet whose description came from
   # the database, not from `$APPFLOW_CONFIG/jd`. A task because building one is a
   # nix build; `checks:appflow:gate` is the read-only half.

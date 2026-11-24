@@ -24,7 +24,7 @@
     "scripts/task/activate-host.sh" = 332;
     "scripts/task/agent-lane.sh" = 160;
     "scripts/task/appflow-check.sh" = 198;
-    "scripts/task/appflow-docs.sh" = 169;
+    "scripts/task/appflow-docs.sh" = 197;
     "scripts/task/appflow-gate.sh" = 202;
     "scripts/task/appflow-packet.sh" = 223;
     "scripts/task/apps-db.sh" = 429;

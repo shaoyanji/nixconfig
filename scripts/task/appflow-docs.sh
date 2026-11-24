@@ -4,6 +4,7 @@
 #   appflow-docs.sh import [DIR]     upsert DIR/<id>.txt as the `jd` document
 #   appflow-docs.sh list             what the database holds, no bodies
 #   appflow-docs.sh show ID [KIND]   one document's text
+#   appflow-docs.sh coverage [STAGE] which rows of a stage have no text yet
 #
 # The files are the old home of a job description: `$APPFLOW_JD_DIR/<id>.txt`,
 # one per application. This moves them where the rest of the row lives, so a
@@ -29,7 +30,7 @@ jd_dir=${APPFLOW_JD_DIR:-${HOME}/.config/appflow/jd}
 kind=${APPFLOW_KIND:-jd}
 
 usage() {
-  echo "usage: appflow-docs.sh import [DIR] | list | show ID [KIND]" >&2
+  echo "usage: appflow-docs.sh import [DIR] | list | show ID [KIND] | coverage [STAGE]" >&2
   exit 2
 }
 
@@ -47,6 +48,7 @@ case "$mode" in
   import) ;;
   list) ;;
   show) ;;
+  coverage) ;;
   *) usage ;;
 esac
 
@@ -82,6 +84,32 @@ case "$mode" in
   list)
     api_json /api/application-documents |
       jq -r 'if length == 0 then "no documents" else (.[] | [.applicationId, .kind, "\(.chars) chars", .updatedAt] | @tsv) end'
+    ;;
+
+  # A row without a `jd` document cannot build a packet, and the failure is
+  # reported one application at a time by `apps:gate:packet`. This answers the
+  # question for the whole stage instead: the rows that still need an ad saved.
+  # `import` is the only thing that fills it, so the two are read together.
+  coverage)
+    stage=${1:-lead}
+    tmp=$(mktemp -d)
+    trap 'rm -rf "$tmp"' EXIT
+    api_json "/api/applications?lim=5000" |
+      jq -r --arg s "$stage" '.[] | select(.stage == $s) | [.id, (.company // "")] | @tsv' |
+      LC_ALL=C sort >"$tmp/rows"
+    api_json /api/application-documents |
+      jq -r --arg k "$kind" '.[] | select(.kind == $k) | .applicationId' |
+      LC_ALL=C sort -u >"$tmp/have"
+    total=$(wc -l <"$tmp/rows" | tr -d ' ')
+    covered=$(cut -f1 "$tmp/rows" | LC_ALL=C comm -12 - "$tmp/have" | wc -l | tr -d ' ')
+    missing=$((total - covered))
+    printf '%s: %s rows, %s with %s text, %s without\n' "$stage" "$total" "$covered" "$kind" "$missing"
+    if [ "$missing" -ne 0 ]; then
+      LC_ALL=C join -t$'\t' -v1 -1 1 -2 1 "$tmp/rows" "$tmp/have" |
+        cut -f1,2 | sed 's/^/  without /'
+    fi
+    # Report by default so a sync can call it; a gate sets FAIL_ON_MISSING=1.
+    [ "${FAIL_ON_MISSING:-0}" = 1 ] && [ "$missing" -ne 0 ] && exit 1
     ;;
 
   show)

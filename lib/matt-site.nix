@@ -539,7 +539,7 @@
         else "en_US";
       inherit (p) handle;
       inherit (p) status;
-      location = lib.head (lib.splitString " · " (p.location or ""));
+      location = builtins.head (lib.splitString " · " (p.location or ""));
       inherit (p) name;
       role = p.title;
       inherit (p) subtitle;

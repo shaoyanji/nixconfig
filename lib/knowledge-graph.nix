@@ -256,7 +256,7 @@
     else
       takeUntil (l: l == "---") (
         if builtins.length lines > 1
-        then lib.tail lines
+        then builtins.tail lines
         else []
       );
 

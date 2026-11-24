@@ -462,7 +462,7 @@
   taskSurface = let
     names = tasks |> builtins.attrNames |> lib.sort (a: b: a < b);
     aliasOf = n: tasks.${n}.aliasOf or "";
-    aliasCount = names |> builtins.filter (n: aliasOf n != "") |> builtins.length;
+    aliasCount = names |> builtins.filter (n: aliasOf n != "") |> lib.length;
     description = n: let
       d = tasks.${n}.desc or "";
     in
@@ -487,7 +487,7 @@
 
     Generated from `taskfiles/*.yml` — a task that exists is a task this page
     lists, with the description `task help` prints (a summary where a desc is
-    deliberately absent). The same ${names |> builtins.length |> toString}
+    deliberately absent). The same ${names |> lib.length |> toString}
     names are `task` nodes in `.#knowledgeGraph`, ${toString aliasCount} of them
     aliases carrying the canonical name; each playbook row that runs one is a
     `routes` edge carrying the row's label.
@@ -551,15 +551,15 @@
       answers on this host, and the unit and reach prose in `MANUAL.md` remains the map
       of what each one is for.
 
-      ## Registry services (${portRows |> builtins.length |> toString})
+      ## Registry services (${portRows |> lib.length |> toString})
 
       ${table ["service" "port" "hosts" "module"] portRows}
 
-      ## Host-declared endpoints (${endpointRows |> builtins.length |> toString})
+      ## Host-declared endpoints (${endpointRows |> lib.length |> toString})
 
       ${table ["host" "service" "port" "note"] endpointRows}
 
-      ## Host services (${serviceRows |> builtins.length |> toString})
+      ## Host services (${serviceRows |> lib.length |> toString})
 
       Declared per host in `software.services`: the record half of `key_services`.
       Unlike an endpoint, a service need not listen — `port` is empty where none is

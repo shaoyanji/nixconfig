@@ -477,7 +477,7 @@
       pad = padRight 11 label;
       lines = fold (termWidth - 13) value;
       cont =
-        lib.optionalString (lib.length lines > 1)
+        lib.optionalString (builtins.length lines > 1)
         ("\n" + (lines |> lib.tail |> map (l: "             ${l}") |> lib.concatStringsSep "\n"));
     in "  ${dim}${pad}${reset} ${lib.head lines}${cont}";
 

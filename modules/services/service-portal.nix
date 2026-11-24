@@ -218,7 +218,7 @@
   # and declares neither `vhost` nor `external`, is a card with no owner.
   knownKeys = exposedKeys ++ builtins.attrNames cfg.mounts;
   standaloneKeys =
-    builtins.filter
+    lib.filter
     (n: !(builtins.elem n knownKeys) && (cfg.entries.${n}.vhost != null || cfg.entries.${n}.external))
     (builtins.attrNames cfg.entries);
   standaloneCards =
@@ -535,7 +535,7 @@ in {
                   lib.optional e.external (
                     if m == null
                     then 0
-                    else lib.toInt (builtins.head m)
+                    else lib.toInt (lib.head m)
                   )
               ) (builtins.attrNames cfg.entries);
               served = mountPorts ++ map (s: s.port) (builtins.attrValues exposed) ++ externalPorts;

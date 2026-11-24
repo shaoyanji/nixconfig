@@ -5910,5 +5910,48 @@
         same diff. Exit: residual shims accepted as shell or ported.
       '';
     };
+    job-scout-boards-url-checked-2026-11-24 = {
+      title = "The swept boards, URL-checked: six employers answer, ZenDiS has none";
+      date = "2026-11-24";
+      kind = "open";
+      priority = "P3";
+      status = "OPEN";
+      summary = "Nine sources swept and every employer they surfaced now carries a live board URL and the tracker's own fit: six answer with an infrastructure req, ZenDiS has no board to apply through, and STATWORX stays the one untracked lead.";
+      from = ["job-scout-sre-platform-sweep-2026-11-24"];
+      refs = {
+        tasks = ["apps:add" "apps:export"];
+      };
+      body = ''
+        Swept 2026-11-24 with new sources rather than the usual boards: the
+        Bundesagentur Jobsuche API, ~100 Greenhouse/Lever/Ashby slugs, Personio
+        and Recruitee feeds, BerlinStartupJobs, Remotive, RemoteOK, LinkedIn.
+        Against the 1,125-row export it left one untracked fit.
+
+        Every employer it surfaced, with the board that answers and the tracker's
+        own fit — a display name is not a URL:
+
+          STATWORX        personio/statworx    200  132 reqs  fit 3  filed
+                          Cloud Engineer, Frankfurt am Main
+          Helsing         gh/helsing           200  176 reqs  fit 4  tracked
+          Isar Aerospace  gh/isaraerospace     200  142 reqs  fit 3  tracked
+          Scout24         gh/scout24           200   13 reqs  fit 3  tracked
+          SumUp           gh/sumup             200  325 reqs  fit 3  applied
+          Solaris         gh/solarisbank       200   19 reqs  fit 2  tracked
+
+        No board, so not a lead: ZenDiS answers 200 on zendis.de/karriere but
+        renders client-side with no Personio or Greenhouse board (both 404), so
+        nothing to apply through. AutoScout24 answers with 31 reqs and no infra
+        title; Univention is down to 3 reqs, none infra, its PM req refused.
+
+        Exhausted, not to be swept again: Arbeitnow (2,700 postings), Jobicy,
+        Himalayas, Remotive, RemoteOK, BerlinStartupJobs, the Personio and
+        Recruitee feeds, the ~100 ATS slugs. Jobsuche is unreachable, not
+        exhausted: nine attempts, two resets, seven 403 "No match found".
+
+        Dedupe reads normalized names, so `solarisbank` missed the tracked
+        `Solaris` row and a Berlin SRE surfaced as new: grep the name first.
+        Exit: rows hold at lead until 2026-12-07, then the vendor careers pages.
+      '';
+    };
   };
 }

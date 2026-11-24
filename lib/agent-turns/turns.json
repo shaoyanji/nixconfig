@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-24T19:18:35Z",
+  "generated": "2026-11-24T19:20:07Z",
   "count": 200,
-  "pin": "70cd12c8319ed84bc7882357f354b828657edf1657353d4feabfd67656f16aec",
+  "pin": "0bc89fc054aa9ab8a2cf2684fb988b80b64a31b83b5d12154c17cbd8bc4da1cf",
   "turns": [
+    {
+      "id": "6a315f1b-b840-4d6a-9fba-7c2a467c1615",
+      "ts": "2026-11-24T19:18:46Z",
+      "source": "devin",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: tests/nix-style fixture — gate refuses 2fe0c687^ (names policies+epistemics), spares honest control, passes current tree | gate: checks:nix:style:test PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "41f90211909b931352ff147550c9513cb3f6e799",
+      "branch": "main",
+      "frame": "03hap9tnryl8fcmczfh2l02f5"
+    },
     {
       "id": "18ed3cc5-68b6-4d81-972f-daddab7f7634",
       "ts": "2026-11-24T19:17:52Z",
@@ -2700,21 +2713,6 @@
       "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
       "branch": "main",
       "frame": "03ham2wqjiytl2z185e200ex5"
-    },
-    {
-      "id": "66a9578e-9bc7-4526-b9ad-db843e0a7f5b",
-      "ts": "2026-11-24T09:29:17Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "landed: remote-first EU sweep — CWA added (AWS hosting ops, home office option, fit 3); Tether row re-pointed at its 100% remote Senior DevOps/Infra ad; excluded NetKnights, Scheer, Mecklenburgische, AND-E, Allegion, SimonsVoss as relocation-bound and all Swiss roles for permit; BAMF remote ad already covered by bamf-devops | gate: apps:dupes [] PASS",
-      "outcome": "done",
-      "claims": [
-        "~/.config/appflow"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03ham2o57j7mgwksgry5kyv4e"
     }
   ]
 }

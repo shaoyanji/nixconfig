@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 10
+  api_max_retries: 11
   # A stop waits this long for a running cron job before tearing down. The
   # default (30 s) plus adapter teardown crossed the 60 s shutdown watchdog on
   # every stop here, because pane-idle-watch runs for most of its 2-minute
@@ -194,6 +194,14 @@ fallback_providers:
     model: free-ai
     base_url: https://api.apisfreellm.com/v1
     api_key: free
+  # ExperientialLabs (xpl) — declared free lane. Probed 2026-11-24:
+  # `GET /v1/models` answers 200 with a 305-model catalog including
+  # deepseek-v4.1-flash-uncensored-fast; every model's cost fields are null.
+  # Keyed but unbilled — EXPLABS_API_KEY in sops ai-services-shared-env.
+  - provider: custom
+    model: deepseek-v4.1-flash-uncensored-fast
+    base_url: https://api.experientiallabs.ai/v1
+    key_env: EXPLABS_API_KEY
   # Sail Research — last resort fallback. SAIL_API_KEY lives in sops
   # ai-services-shared-env. Probed separately before trusting.
   - provider: custom

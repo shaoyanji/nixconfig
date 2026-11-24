@@ -231,6 +231,11 @@ else
       *cantrustai.xyz*deepseek/deepseek-v4.1-flash)
         ok "fallback $fb_provider/$fb_model is the declared paid lane (cantrustai)"
         continue ;;
+      # ExperientialLabs is keyed but bills nothing: `GET /v1/models` (2026-11-24)
+      # returns a 305-model catalog whose per-model cost fields are all null.
+      *experientiallabs.ai*deepseek-v4.1-flash-uncensored-fast)
+        ok "fallback $fb_provider/$fb_model is the declared free lane (xpl)"
+        continue ;;
     esac
     case "$fb_provider" in
       custom | openrouter)

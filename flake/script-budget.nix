@@ -77,7 +77,7 @@ rec {
     "scripts/task/image-gen.sh" = 138;
     "scripts/task/image-round.sh" = 165;
     "scripts/task/image-ship.sh" = 114;
-    "scripts/task/infron-check.sh" = 491;
+    "scripts/task/infron-check.sh" = 496;
     "scripts/task/instabox.sh" = 227;
     "scripts/task/invalidation.sh" = 137;
     "scripts/task/inventory-menu.sh" = 238;

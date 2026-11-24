@@ -22,7 +22,7 @@
         "username": "Shaoyan_Ji"
       }
     ],
-    "summary": "Engineer and risk analyst, ten years across renewable energy and software. Builds the models and the systems that run them: options and hedging models for energy portfolios, Go services, a NixOS fleet, an email archive that classifies its own mail. Headed asset management for a USD 100M+ solar portfolio and researched heliostat metrology at Fraunhofer ISE.",
+    "summary": "Engineer and risk analyst, ten years across renewable energy and software. Builds the models and the systems that run them: options and hedging models for energy portfolios, Go services, a NixOS fleet, an email archive that classifies its own mail. Headed asset management for a USD 100M+ solar portfolio and researched heliostat metrology at Fraunhofer ISE. US citizen with German permanent residence; no sponsorship required.",
     "url": "https://www.bountystash.com"
   },
   "education": [
@@ -71,34 +71,6 @@
   },
   "projects": [
     {
-      "description": "A polyglot risk calculation engine implementing Green's Theorem (Shoelace Formula) for stochastic shape analysis.",
-      "endDate": "2026-03-18",
-      "entity": "Personal Research",
-      "highlights": [
-        "Architected a 'Swirl Engine' using Green's Theorem to calculate polygon areas from random geometric data.",
-        "Implemented a Go-based shape fuzzer generating stochastic polygons to stress-test the calculation engine.",
-        "Orchestrated the pipeline using Nushell and Awk, bypassing compiler limitations for high-performance math.",
-        "Containerized the environment using Nix Flakes for reproducible Go 1.16+ development."
-      ],
-      "keywords": [
-        "Go",
-        "Nushell",
-        "Awk",
-        "Green's Theorem",
-        "Risk Analysis",
-        "NixOS",
-        "Polyglot Programming"
-      ],
-      "name": "Risk Calculation Engine (Swirl Engine)",
-      "roles": [
-        "Lead Developer",
-        "Researcher"
-      ],
-      "startDate": "2026-03-15",
-      "type": "open_source",
-      "url": "https://github.com/shaoyanji/risk-calc"
-    },
-    {
       "description": "Artificial Intelligence applied to weather prediction",
       "endDate": "2014-02-24",
       "entity": "Meteorological Institute of Freiburg",
@@ -145,6 +117,12 @@
       "description": "One flake declares thirteen NixOS hosts, an SSH certificate authority, SOPS-encrypted secrets and a taskfile as the operator interface. CI runs the same module gate the machines run.",
       "endDate": "",
       "entity": "Personal",
+      "highlights": [
+        "Declared the whole fleet in one flake: each host a feature list, each service a module, so option surface stays a gate instead of a copy-paste",
+        "Encrypted every secret with sops and issued host keys from the fleet's own SSH certificate authority",
+        "Served rebuilds from a shared binary cache; every server generation rolls back with one command",
+        "Ran the same per-host module gate in CI that the machines run, alongside a sentinel ledger of job status, generation age, disk and PSI pressure"
+      ],
       "keywords": [
         "Nix",
         "NixOS",
@@ -243,6 +221,34 @@
       "startDate": "2026-11-01",
       "type": "site",
       "url": "https://matt.bountystash.com"
+    },
+    {
+      "description": "A polyglot risk calculation engine implementing Green's Theorem (Shoelace Formula) for stochastic shape analysis.",
+      "endDate": "2026-03-18",
+      "entity": "Personal Research",
+      "highlights": [
+        "Architected a 'Swirl Engine' using Green's Theorem to calculate polygon areas from random geometric data.",
+        "Implemented a Go-based shape fuzzer generating stochastic polygons to stress-test the calculation engine.",
+        "Orchestrated the pipeline using Nushell and Awk, bypassing compiler limitations for high-performance math.",
+        "Containerized the environment using Nix Flakes for reproducible Go 1.16+ development."
+      ],
+      "keywords": [
+        "Go",
+        "Nushell",
+        "Awk",
+        "Green's Theorem",
+        "Risk Analysis",
+        "NixOS",
+        "Polyglot Programming"
+      ],
+      "name": "Risk Calculation Engine (Swirl Engine)",
+      "roles": [
+        "Lead Developer",
+        "Researcher"
+      ],
+      "startDate": "2026-03-15",
+      "type": "open_source",
+      "url": "https://github.com/shaoyanji/risk-calc"
     }
   ],
   "skills": [
@@ -337,7 +343,11 @@
         "Architected a covered-call hedging strategy for client portfolios",
         "Developed a Fibonacci binary tree algorithm for computational scientists",
         "Developed an LLM-based knowledge base for consulting work",
-        "Audited bug bounty programmes"
+        "Audited bug bounty programmes",
+        "Built and operated a NixOS fleet declared as one flake: each host a feature list, each service a module, secrets encrypted with sops behind the fleet's own SSH certificate authority",
+        "Made rebuilds reproducible through a shared binary cache and remote builders, with every server generation rollback-able by a single command",
+        "Gated infrastructure changes with inventory-driven CI and a per-host module check, so a broken host definition fails before it reaches a machine",
+        "Wrote a sentinel job that records job status, generation age, disk and PSI pressure every fifteen minutes and alerts when a service stops reporting"
       ],
       "keywords": [
         "risk",
@@ -350,7 +360,15 @@
         "web security",
         "LLM",
         "bug bounty",
-        "portfolio strategy"
+        "portfolio strategy",
+        "NixOS",
+        "Nix flakes",
+        "binary cache",
+        "CI",
+        "monitoring",
+        "Tailscale",
+        "Cloudflare",
+        "SOPS"
       ],
       "location": "Freiburg, DE",
       "name": "Bountystash",

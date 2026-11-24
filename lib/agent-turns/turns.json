@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-24T21:03:41Z",
+  "generated": "2026-11-24T21:04:46Z",
   "count": 200,
-  "pin": "a8b45c02b00708ea740adfa90c1b7a03ba747661e70951a2367d44cba57b7fff",
+  "pin": "09ccd51f58a9b212f074b0f574e0c4c8be7a91034f18b22c6eb481517353561b",
   "turns": [
+    {
+      "id": "a8fb37f2-42d9-4529-bd4a-417fbd602d09",
+      "ts": "2026-11-24T21:04:01Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-change",
+      "action": "landed: agent-scheduler dedup — enabledJobs extracted once (was 2x filter), 5x optionalAttrs chain -> filtered table | gate: checks:hosts delphi frieren PASS (delphi 2132 assertions, frieren rc=0), checks:nix:style PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "27521275983829b9e48f1f705b97dc7302c04b0c",
+      "branch": "main",
+      "frame": "03hapuduu1ourv11x8mxrtcc9"
+    },
     {
       "id": "beba2d0d-05fb-4e32-af97-a607369a44a7",
       "ts": "2026-11-24T21:01:40Z",
@@ -2672,19 +2685,6 @@
       "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
       "branch": "main",
       "frame": "03hamgp03bnco4i557ex27vnk"
-    },
-    {
-      "id": "f0940c81-8ff9-4b19-90b3-17e2beb5e95b",
-      "ts": "2026-11-24T10:30:58Z",
-      "source": "devin",
-      "subject": "nixconfig:hm-chain-polish",
-      "action": "landed dfb839b9: profiles.ai.enable removed; leaf list is the only gate, tier stays | gate: drv-equality 30/30 identical + checks:host eisen PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
-      "branch": "main",
-      "frame": "03hamepyotp34sorryyuvudmn"
     }
   ]
 }

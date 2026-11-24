@@ -6109,5 +6109,51 @@
         SysEleven and VirtusLab are the strongest Nix-adjacent targets.
       '';
     };
+    job-scout-send-unblocked-2026-11-24 = {
+      title = "Sweep 2 was blocked by board URLs, not by the send path";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "The sweep-2 block was ATS URL handling: four rows stored the arbeitnow board page as applyUrl while the join.com form sat in nextAction. All four now point at the form. himalaya, the API and apps:sent all work here; what remains is the 2026-12-07 hold, a packet build that delegates to frieren, and a pay-band decision on Livello.";
+      from = ["job-scout-niche-boards-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/apps-db.sh" "scripts/task/appflow-docs.sh"];
+        tasks = ["apps:add" "apps:sent" "apps:docs:import"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Sweep 2 (nixconfig:job-scout-sweep2) claimed five leads were blocked
+        with board/ATS URLs. The block is URL handling, not the send path.
+
+        Diagnosis, each part tested on 2026-11-24. himalaya is configured here
+        with two accounts and apps:sent reads the Sent folder, exiting 0 with
+        two bcc-blast findings over the last day — the mailbox is readable.
+        The archive API answers and apps:docs:import ran (41 imported, 110
+        unchanged). typst has no checkout here, so packet builds delegate to
+        frieren over ssh, which is a capability limit, not a blocked send.
+
+        The real defect: applyUrl held the arbeitnow board page while the
+        join.com form was written into nextAction. NDI, VISPIRON, SPECTRUM and
+        Livello are repointed at their join.com endpoints, all four answering
+        200. JD not stored: the board page supplies the text when it renders
+        ld+json; where it does not, the posting text has to be pasted into
+        ~/.config/appflow/jd/<id>.txt before the packet build.
+
+        Livello still needs a decision before any packet: the ad publishes
+        EUR 45,000-50,000 a year in Düsseldorf, under a senior infra band, and
+        requires a German work permit with no sponsorship.
+
+        New leads from boards this lane had not read (karriere.at, ictcareer.ch,
+        SIX careers): SIX Group Kubernetes Platform Engineer, Zurich, fit 5;
+        Aargauische Kantonalbank ICT Cloud Platform Engineer, Aarau, fit 4;
+        x-tention DevOps Engineer, Wels or Vienna, fit 4. 50Hertz was already
+        held; zkb.ch and eurofunk careers paths 404, so those stay unfetched.
+
+        Next: the hold to 2026-12-07 is the only thing between these rows and a
+        submission — build the packet on frieren, then submit at join.com.
+      '';
+    };
   };
 }

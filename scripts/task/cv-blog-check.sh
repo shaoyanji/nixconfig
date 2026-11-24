@@ -10,6 +10,9 @@
 # Two assertions, both about the CVs and nothing else:
 #   - every PDF the checkout publishes hashes equal to the artifact this tree
 #     built, so "linked" cannot be satisfied by an older copy;
+#   - every PDF this tree builds is published by the checkout at all, because the
+#     published set is the only thing the loop above can see. Without this, a new
+#     variant is invisible: nothing is stale, nothing is unlinked, gate green.
 #   - inside the built `_site`, every published CV is the target of an anchor, that
 #     anchor carries `download` (GitHub Pages serves a PDF inline without it), and
 #     the href resolves to a file.
@@ -99,6 +102,17 @@ for name in published:
     if got != want:
         problems.append(
             f"{name} is a different build: published {got[:12]}, artifact {want[:12]}"
+        )
+
+# The other direction. `published` comes from the checkout, so a CV added to the
+# build and never copied there leaves no trace in any loop above.
+for base, _, names in os.walk(artifact):
+    for name in sorted(names):
+        if not name.lower().endswith(".pdf") or name in published:
+            continue
+        problems.append(
+            f"{name} is built here but the checkout does not publish it "
+            f"(copy into {files} and link it from the CV page)"
         )
 
 linked = {}

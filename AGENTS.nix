@@ -5123,7 +5123,7 @@
       status = "OPEN";
       priority = "P3";
       date = "2026-11-24";
-      summary = "`nixconfig:job-scout-fresh` cannot finish: `task --list-all` carries no `apps:send` verb and Flink publishes no mailbox, so a person is still the only sender. Prep continues as a held DevOps/SRE/Platform/Infrastructure lead sweep to 2026-12-07; the EU careers-page gap and the packet order stay cited from their own records.";
+      summary = "`nixconfig:job-scout-fresh` cannot finish: `task --list-all` carries no `apps:send` verb and Flink publishes no mailbox, so a person is still the only sender. The prep-only sweep ran on 2026-11-24 and added no row, because every employer the boards surfaced already holds one; the hold stays 2026-12-07.";
       from = ["job-scout-fresh-eu-boards-2026-11-24"];
       refs = {
         modules = ["taskfiles/apps.yml"];
@@ -5142,6 +5142,12 @@
         Platform and Infrastructure employers, every new row at `lead` with
         `next_action` naming the 2026-12-07 hold and `apps:dupes` empty after it.
         Nothing is sent, no site prose changes, and nothing is deployed.
+
+        The sweep ran 2026-11-24 and added no row: Mittwald (two), Makersite,
+        Xempus, Contabo, Nebius, Doctolib, IONOS and Exoscale all hold one,
+        Contentful is Salesforce now and carries no infrastructure req, and the
+        Greenhouse slugs for Supermetrics, Tyk, Pipedrive and Back Market are
+        gone. Coverage is what a sweep checks, not a market.
 
         The two follow-ups already have records, so they are cited, not restated:
         `job-scout-eu-vendor-pages-gap-2026-11-24` holds the EU careers pages no

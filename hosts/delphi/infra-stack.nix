@@ -346,11 +346,9 @@ in {
       # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
       # hosts/delphi/infra-stack.nix reads its verdict file; stale pages, task ops:health.
       agy-nightly-system = {
-        name = "agy-nightly-system";
         description = "Trigger-gated system health audit (probes stay local; LLM hop prefers a clanker job, local cascade fallback)";
         schedule = "*-*-* 05:30:00";
         command = agySystemRunner;
-        workingDirectory = "${user.home}";
         nice = 5;
         cpuWeight = 300;
         ioWeight = 300;

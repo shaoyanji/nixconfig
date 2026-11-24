@@ -541,13 +541,11 @@
   imageDailySlotJobs = builtins.listToAttrs (map (s: {
       name = "image-daily-slot-${toString s.n}";
       value = {
-        name = "image-daily-slot-${toString s.n}";
         description = s.desc;
         schedule = "*-*-* ${s.at}:00";
         # Slots run oldest-first; the cap each takes is the day's leftover split
         # over the slots still to run (the `share` arithmetic in the wrapper).
         command = imageDailySlot (toString s.n) (builtins.length imageDailySlots) s.reserve;
-        workingDirectory = "${user.home}";
         lockFile = "/tmp/image-daily.lock";
         persistent = false;
         nice = 10;
@@ -1014,14 +1012,11 @@ in {
         # KEEP (deep-slash review): load-bearing — fleetSentinel.auditRecord in
         # hosts/frieren/configuration.nix reads its verdict file; stale pages, task ops:health.
         agy-nightly-system = {
-          name = "agy-nightly-system";
           description = "Trigger-gated system health audit (Mon-Sat brief check, Sunday full scorecard)";
           schedule = "*-*-* 05:00:00";
           command = agySystemRunner;
-          workingDirectory = "${user.home}";
         };
         audible-phased-liberation = {
-          name = "audible-phased-liberation";
           description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 GB limit, 170m timeout)";
           schedule = "*-*-* 00:00:00";
           command = makeAudibleBatchLiberation {
@@ -1031,7 +1026,6 @@ in {
             windowDesc = "Nightly 00:00-02:50 CEST";
             nice = null;
           };
-          workingDirectory = "${user.home}";
           lockFile = "/tmp/audible-liberation.lock";
           nice = 10;
           ioSchedulingClass = "best-effort";

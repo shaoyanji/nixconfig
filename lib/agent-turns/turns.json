@@ -1,8 +1,125 @@
 {
-  "generated": "2026-11-24T19:20:07Z",
+  "generated": "2026-11-24T19:56:53Z",
   "count": 200,
-  "pin": "0bc89fc054aa9ab8a2cf2684fb988b80b64a31b83b5d12154c17cbd8bc4da1cf",
+  "pin": "db9472e5adba065e9cc36e199c21f444ec2aa1e177849bcef8428cad8cdd72e6",
   "turns": [
+    {
+      "id": "205600aa-d773-4955-9e9e-3fc85ea275e3",
+      "ts": "2026-11-24T19:55:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "dupes: Supabase had two live rows (applied 2026-11-21 canonical, prep Managed Postgres packet). Closed the packet row as duplicate (stage other), copied its 3 files to ~/.local/state/appflow/materials/ so store GC cannot drop them, pointed the canonical folderPath there, fixed its stale 2026-05-05 status. Nothing sent. | gate: apps:dupes Supabase 0, stages prep/other/applied PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haph1nb5x3n2atbhzt438rd"
+    },
+    {
+      "id": "b6e489a9-3735-4d7b-8540-1b6c84221f76",
+      "ts": "2026-11-24T19:43:58Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "drove devin pane (agents:1.1): routed deploy via jev-decide (deploy 0.85, margin 0.80, selected); pane now Thinking on the delphi gatus-dns-monitor activation deploy (infra:deploy:host:delphi)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b97924653494701ce0ee2704f624e4ae913d04bb",
+      "branch": "main",
+      "frame": "03hapeqxfx2sgo0qrj8dn8h2i"
+    },
+    {
+      "id": "3befbdf5-3751-4b45-906b-0745c633eb53",
+      "ts": "2026-11-24T19:43:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep",
+      "action": "landed: EU vendor sweep — Proxmox IT Infrastructure Allrounder (Vienna on-site, Debian/Proxmox VE/Ansible, fit 3) the one new candidate; LINBIT, B1 Systems, Univention, Open-Xchange already tracked; Giant Swarm no reachable board (all ATS 404), SUSE Workday 34 postings but devops=0 then 400s. No row written, nothing sent; evidence in ~/.local/state/appflow/followups/2026-11-24-eu-vendor-careers-sweep.md. Found apps:search unfiltered | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b97924653494701ce0ee2704f624e4ae913d04bb",
+      "branch": "main",
+      "frame": "03hapeka7xw9evw94mn29pd9p"
+    },
+    {
+      "id": "5917573f-f608-44ab-a160-3cd0ec5e2e47",
+      "ts": "2026-11-24T19:40:17Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "prep: Supabase Managed Postgres packet built through nix (crg7yml7ck24jmzi8yk3r0kc4cmg00ws-appflow-packet..., 2pp CV + 1pp letter, JD from the Ashby board, 13/36 highlights) and linked; DeepL Sovereign Cloud packet verified (1pp letter, 2pp CV, gaps named). Both rows stage=prep, nothing sent, sends held to 2026-12-07. | gate: packet build exit 0 + pdfinfo 2pp/1pp + apps:get stage=prep PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hape11ia5yi65fjr28mn905"
+    },
+    {
+      "id": "5c2d910c-8455-4304-84a7-2f56989278ee",
+      "ts": "2026-11-24T19:38:26Z",
+      "source": "devin",
+      "subject": "nixconfig:gatus-dns-monitor",
+      "action": "landed: dns://100.97.61.65:53 — gatus dialed udp///host with no port, monitor reported null; eval-mode gate green (2132 assertions) | next: task infra:deploy:host:delphi to activate",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b97924653494701ce0ee2704f624e4ae913d04bb",
+      "branch": "main",
+      "frame": "03hapdo0beaslhwmclkz28ff7"
+    },
+    {
+      "id": "03b4984f-bf26-4411-8adb-3ee9657abb60",
+      "ts": "2026-11-24T19:38:11Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "drove delphi freebuff pane (agents:3.1, ssh): routed note-change via jev-decide (note-change 0.87, margin 0.76); pane now working on the DeepL/Supabase packet prep (no send, hold 2026-12-07).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
+      "branch": "HEAD",
+      "frame": "03hapdmbqtirozfs4htbxsmeq"
+    },
+    {
+      "id": "e168b8f7-f174-4a47-869d-5dcb608b776e",
+      "ts": "2026-11-24T19:38:11Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "drove freebuff pane (agents:2.1): routed note-change via jev-decide (note-change 0.91, margin 0.83); pane now thinking on the EU-vendor employer-lead sweep (prep-only, hold 2026-12-07).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
+      "branch": "HEAD",
+      "frame": "03hapdm9dg9mhtlzx15a0d36l"
+    },
+    {
+      "id": "1da7ad1f-1742-4f71-b476-c6046b143d99",
+      "ts": "2026-11-24T19:38:07Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "drove devin pane (agents:1.1): routed host-change via jev-decide (needs_review, host-change 0.78, margin 0.64 — decisive, drove per the steward margin rule); pane now Thinking on the Gatus DNS endpoint fix (hosts/delphi/configuration.nix dns://100.97.61.65 -> :53).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
+      "branch": "HEAD",
+      "frame": "03hapdlqym2c0328acq21x93b"
+    },
+    {
+      "id": "36eae351-2969-4aca-93c0-f4a37f7a06ed",
+      "ts": "2026-11-24T19:20:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: curated job-scout note on main (00dd5fdd) — six swept employers each carry a live ATS board URL and the tracker's own fit; ZenDiS dropped, no Personio/Greenhouse board behind its client-rendered careers page; drained sources listed so no later sweep repeats them | gate: agentsNotes.issues=[] + nix-instantiate --parse PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
+      "branch": "note/job-scout-boards-2026-11-24",
+      "frame": "03hapa40u8lkjk5ohqefzhh3v"
+    },
     {
       "id": "6a315f1b-b840-4d6a-9fba-7c2a467c1615",
       "ts": "2026-11-24T19:18:46Z",
@@ -2582,137 +2699,6 @@
       "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
       "branch": "main",
       "frame": "03ham763qs1myi70fhqvfowqc"
-    },
-    {
-      "id": "c5de9550-a557-49df-b2c3-fe2561343eb4",
-      "ts": "2026-11-24T09:52:18Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout",
-      "action": "re-driven: freebuff (agents:2) idle after scout sweep 2 done (09:47). jev-decide selected kinexon_send p=0.97 margin=0.94: send built kinexon packet. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham762bfpuz6y1hyi63snm7"
-    },
-    {
-      "id": "f6ebcd24-5fab-403b-bba2-40e6d2c24ca3",
-      "ts": "2026-11-24T09:47:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "scout sweep 2 (freebuff): arbeitnow 46 pages saturated for DACH devops/sre/platform. 5 new rows: VISPIRON fit5, SPECTRUM AG 4, Livello 4, NDI 3, hellomed 3, all lead with 2026-12-07 hold. Findings: Open-Xchange carries a newer Senior DevOps req than its row; K-tronik needs 10y C++; apps:search is a no-op (toon=all rows, text=0 rows).",
-      "outcome": "in_progress",
-      "claims": [
-        "~/.local/state/appflow/followups"
-      ],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham65xjmhychwn1mxdnvhbp"
-    },
-    {
-      "id": "c82e5f1f-f94e-477e-b957-f334c29c07bc",
-      "ts": "2026-11-24T09:44:42Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "landed: scout-2026-11-24 added Capgemini (Senior DevOps, Ratingen hybrid) and LVM (System Engineer Scheduling, Münster); findings: apps:search filter broken (returns all 1022 rows for any query, direct jq returns 0), Advantest/PSI-Software/KHS already lead from an earlier pass today, netgo applied, Bechtle packed, WWR feed mostly US/manager, swissdevjobs CH-permit | prep-only to 2026-12-07, no sends | gate: apps:dupes [] PASS",
-      "outcome": "done",
-      "claims": [
-        "~/.config/appflow"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03ham5ono3jy46kgzlk7erq0g"
-    },
-    {
-      "id": "c9b803ff-091c-4824-883c-ef5a311eb13f",
-      "ts": "2026-11-24T09:42:23Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "verified: Go-port gates all green at HEAD aa0535f2 — checks:image-daily gate ok, checks:tasks 801 tasks parity exact, go build+vet+test clean in tools/os (serve tests ok), artifacts: image-daily manifest emits 750 assets, static-serve alias answers Range 206/GET 200 — no failures found",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham58cpz8sdjtwk4n95mj95"
-    },
-    {
-      "id": "a85bd445-558b-4495-bfde-5b490316405f",
-      "ts": "2026-11-24T09:41:59Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:steward:pane-drive:devin",
-      "action": "drove idle devin pane agents:1.1 via Jev gate-change (duel decisive 0.99/0.98); pasted image-daily Go port gate verification task; Devin shows Running tools · 5s spinner after second composer Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:1.1"
-      ],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham55il04bv06yhnan227ua"
-    },
-    {
-      "id": "0cc1b7b4-e97e-455c-bfb5-3d1f2a87a9b3",
-      "ts": "2026-11-24T09:40:54Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "claim: scout round 2026-11-24 — apps:search dedupe per candidate, prep-only to 2026-12-07, no sends",
-      "outcome": "in_progress",
-      "claims": [
-        "~/.config/appflow"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03ham4xx5ybtzgo6m62zc2mgx"
-    },
-    {
-      "id": "86ece8a0-80dd-49bb-a724-84dff7091c3e",
-      "ts": "2026-11-24T09:40:40Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:steward:pane-drive:freebuff-delphi",
-      "action": "drove idle remote freebuff pane agents:3.1 via Jev note-change (decisive margin 0.43) over the ssh tunnel; pasted delphi job-search task; pane shows thinking... 4s / Add to the current task after Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham4w86nmfobcfoqh9pideb"
-    },
-    {
-      "id": "9508e281-8932-4e79-a505-c0850e653220",
-      "ts": "2026-11-24T09:40:39Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:steward:pane-drive:freebuff-local",
-      "action": "drove idle freebuff pane agents:2.1 via Jev note-change (decisive margin 0.31); pasted EU/DE job-scout sweep task; pane shows thinking... 4s / Add to the current task after Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham4w66cnj354q4ses1q2ja"
-    },
-    {
-      "id": "9075980e-fdb2-4ee6-b379-6539632288d9",
-      "ts": "2026-11-24T09:30:30Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "scouted: DACH/CH feed sweep (germantechjobs, swissdevjobs, arbeitnow API, devjobs.at). Six new leads as rows via apps:scout - PSI Software SE, Optimus sea, arveo, ONZACK AG, Intelliact AG, mesoneer AG - each with location, ad-stated sponsorship, source URL, hold 2026-12-07. Record: followups/2026-11-24-scout-dach-feeds.md plus the dead/dupe verdicts. No packet, nothing sent.",
-      "outcome": "in_progress",
-      "claims": [
-        "~/.local/state/appflow/followups"
-      ],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham2wqjiytl2z185e200ex5"
     }
   ]
 }

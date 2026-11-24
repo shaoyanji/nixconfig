@@ -65,7 +65,9 @@ usage() {
 usage: apps-db.sh <verb> [args]
 
   list                     every tracked application, newest activity first
-  search <words…>          substring over id, company, role, status, next action
+  search <words…>          case-insensitive match over id, company, role, status,
+                           next action — every word must appear, so "giant swarm"
+                           finds the row and "swarm giant" finds it too
   get <id>                 one record and the mail linked to it
   update <id> --status S [--next-action N]
   add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
@@ -100,12 +102,24 @@ case "$verb" in
   search)
     q=${*:-}
     if [ -z "$q" ]; then usage; exit 2; fi
+    # The filter runs before the emit, not inside a text renderer: `toon_emit`
+    # with no renderer prints its stdin, so a search that filtered only in the
+    # text branch answered every query with the whole table (measured
+    # 2026-11-24: 1125 rows for `zzzznomatch`). Filter, then emit what is left.
+    #
+    # Every word must appear (AND), because a two-word employer or role is the
+    # ordinary query and phrase matching silently found nothing.
     render() {
-      jq -r --arg q "$(printf '%s' "$q" | tr '[:upper:]' '[:lower:]')" "$stage"'
-          .[] | select(([.id, .company, .role, .status, (.nextAction // "")] | join(" ") | ascii_downcase) | contains($q))
-          | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status, (.nextAction // "")] | @tsv' | rows
+      jq -r "$stage"'["stage","updated","company","role","status","next"],
+          (.[] | [.stage, ((.updatedAt // "")[0:10]), .company, .role, .status,
+                  (.nextAction // "")]) | @tsv' | rows
     }
     curl -fsS -G "$api/api/applications" --data-urlencode "lim=5000" \
+      | jq -c --arg q "$q" '
+          ($q | ascii_downcase | split(" ") | map(select(. != ""))) as $words
+          | [ .[]
+              | ([.id, .company, .role, .status, (.nextAction // "")] | join(" ") | ascii_downcase) as $hay
+              | select([$words[] as $w | ($hay | contains($w))] | all) ]' \
       | toon_emit render
     ;;
 

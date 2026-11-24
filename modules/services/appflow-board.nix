@@ -22,6 +22,13 @@
     proxy_http_version 1.1;
     add_header Cache-Control "no-store" always;
   '';
+
+  # The write routes need one credential: `$appflow_write_ok` comes from the map
+  # the sops template renders, and `return` inside `if` is the one `if` nginx
+  # guarantees — the key itself never enters the store.
+  writeGuard = ''
+    if ($appflow_write_ok = 0) { return 403; }
+  '';
 in {
   options.services.appflowBoard = {
     enable = lib.mkEnableOption "the job pipeline board (delphi) — five reads plus the two write routes";
@@ -41,7 +48,33 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    # One shared bearer per the auth decision (AGENTS.nix
+    # devin-lane-appflow-write-auth): the secret lives only under /run/secrets,
+    # and the rendered map turns `Authorization: Bearer <key>` into a flag the
+    # two write locations test. Reads stay open — the flag gates nothing else.
+    sops.secrets."appflow-board-bearer" = {
+      sopsFile = ../../modules/secrets.yaml;
+      owner = "nginx";
+      group = "nginx";
+      mode = "0400";
+      restartUnits = ["nginx.service"];
+    };
+    sops.templates."appflow-board-write-auth.conf" = {
+      owner = "nginx";
+      group = "nginx";
+      mode = "0440";
+      content = ''
+        map $http_authorization $appflow_write_ok {
+          default 0;
+          "Bearer ${config.sops.placeholder."appflow-board-bearer"}" 1;
+        }
+      '';
+    };
+
     services.nginx = {
+      appendHttpConfig = ''
+        include ${config.sops.templates."appflow-board-write-auth.conf".path};
+      '';
       enable = true;
       virtualHosts."appflow-board" = {
         listen = [
@@ -80,13 +113,14 @@ in {
             extraConfig = proxyTo "application-mail";
           };
           # The two write routes: update status/stage/next_action by id, or
-          # insert/update a full record. POST through to the same upstream —
-          # the vhost is a proxy, the SQL files own the write contract.
+          # insert/update a full record. Bearer-gated, then POST through to the
+          # same upstream — the vhost is a proxy, the SQL files own the write
+          # contract.
           "= /api/application-update" = {
-            extraConfig = proxyTo "application-update";
+            extraConfig = writeGuard + proxyTo "application-update";
           };
           "= /api/application-upsert" = {
-            extraConfig = proxyTo "application-upsert";
+            extraConfig = writeGuard + proxyTo "application-upsert";
           };
         };
       };

@@ -1,8 +1,77 @@
 {
-  "generated": "2026-11-24T15:46:29Z",
+  "generated": "2026-11-24T16:11:06Z",
   "count": 200,
-  "pin": "5a496488232e4c1cf7da3b5f7ca366f54cebe2fdace0cb410980c9418a38ac03",
+  "pin": "6772b40ea162b0d40e7028f9b0fff3c1bd08533c363ae1df8373e51b63a3381f",
   "turns": [
+    {
+      "id": "d9c7dc0e-5554-469e-aabc-84c9137a5ae9",
+      "ts": "2026-11-24T16:09:38Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "claim: scout sweep for new DevOps/SRE/Platform/Infra roles, then tailor a CV per new lead (prep only, no send)",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hao8vkswjqodioerg0ugq2n"
+    },
+    {
+      "id": "a606b6db-9ac5-4122-9297-b26c047ae255",
+      "ts": "2026-11-24T15:50:53Z",
+      "source": "freebuff-delphi",
+      "subject": "nixconfig:delphi-sweep",
+      "action": "landed: novel task sent to freebuff delphi — run prep-only lead sweep to 2026-12-07 hold, commit and push",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
+      "branch": "main",
+      "frame": "03hao57sub88veieqzy5w5p20"
+    },
+    {
+      "id": "dd8a465e-8c14-4e1c-a822-c83181255829",
+      "ts": "2026-11-24T15:50:52Z",
+      "source": "freebuff-cv",
+      "subject": "nixconfig:cv-publish",
+      "action": "landed: publish gate task sent to freebuff CV lane — commit AGENTS.nix and run cv-blog-check.sh",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
+      "branch": "main",
+      "frame": "03hao57pugncapg50i7t8l4wq"
+    },
+    {
+      "id": "40493af9-05f9-4b08-b876-4c5fba19d9f9",
+      "ts": "2026-11-24T15:50:38Z",
+      "source": "devin",
+      "subject": "nixconfig:gate-change",
+      "action": "landed: gate-change task sent to devin — bearer gate for delphi rebuild, checks:infron fix",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
+      "branch": "main",
+      "frame": "03hao560lj9ee3olfa6939yvb"
+    },
+    {
+      "id": "32e46a06-d495-4b46-94c6-c85206256de6",
+      "ts": "2026-11-24T15:49:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-publish-gate",
+      "action": "landed: agents:cv:publish-check records the measured CV publish state; cv-blog-check now also fails on a built PDF the checkout does not publish | gate: taskfile-graph PASS (802 tasks, no hard violations), cv-blog-check PASS (6 CVs)",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/agents.yml scripts/task/cv-blog-check.sh"
+      ],
+      "files": [],
+      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
+      "branch": "main",
+      "frame": "03hao4ydcsiklq1jsr5x3xi0l"
+    },
     {
       "id": "584ca2bc-6579-421b-905b-92d280236325",
       "ts": "2026-11-24T15:32:01Z",
@@ -2730,80 +2799,6 @@
       "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hal9gn764thg72e6xb0sltu"
-    },
-    {
-      "id": "e49ff025-dd7c-42cb-ab2c-84e41ece8a99",
-      "ts": "2026-11-24T06:41:09Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-2026-11-24d",
-      "action": "Followups: (1) DATATRONiQ email drafted (205 w, remote-terms question + 13-host NixOS fleet pitch) at ~/.local/state/appflow/drafts/ - not sent. (2) Claranet Italia rejected: JD requires Italian residency; Next Digital flagged Spain-only. (3) Swiss boards: swissdevjobs RSS (362 items) added MediData Platform Eng, UMB Sr Linux/K8s, Vitodata DevOps (all remote-tagged); devjobs.de hit is SEW-Eurodrive hybrid; GermanTechJobs is JS-only. apps:dupes []; 915 tracked.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hal5tteekcamr6jy796asya"
-    },
-    {
-      "id": "5696a556-f7b8-46c8-b987-922dc1955adf",
-      "ts": "2026-11-24T06:40:12Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "landed: verified Go port green, deleted retired engine.sh, pointed dispatcher/lib/gate comments at tools/image-daily; also landed one-os-cli note (ports fold into one binary, internal/<domain>, argv[0] aliases keep .#cli.<family>.<tool>) | gate: images:gate ok, checks:quick PASS, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "scripts/task/image-daily-engine.sh",
-        "scripts/task/image-daily.sh",
-        "scripts/task/image-daily-lib.sh",
-        "scripts/task/image-daily-gate.sh",
-        "AGENTS.nix"
-      ],
-      "base_commit": "451f69dfec95a871a3a664c3a0e31a4951536f71",
-      "branch": "main",
-      "frame": "03hal5n5abl86rxaehq4496ln"
-    },
-    {
-      "id": "99855cb5-ffc6-4be2-b9bc-b035a8d9e7de",
-      "ts": "2026-11-24T06:37:15Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "claim: verify Go port ships green — images:gate + checks:quick, then commit engine.sh deletion and push",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/image-daily-engine.sh",
-        "tools/image-daily"
-      ],
-      "files": [],
-      "base_commit": "fc9589c62541e6c3a27291eada0bd19b106bd5a9",
-      "branch": "main",
-      "frame": "03hal52ezgir748hqpdwia1mp"
-    },
-    {
-      "id": "a634717a-f327-45ca-8f91-1c6eeac1c5e0",
-      "ts": "2026-11-24T06:18:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-2026-11-24c",
-      "action": "Scout c: fresh-feed sweep (Remotive, Jobicy, RemoteOK, WWR, Arbeitnow 12pp, Himalayas 600, Berlin Startup Jobs, HN Nov26) vs 908 tracked. Added 3 leads: Claranet Italia Cloud Engineer (Full Remote, Italy), Next Digital Cloud Engineer (remote Spain), DATATRONiQ Cloud&DevOps K8s/Edge (Berlin, apply work@datatroniq.com). Skipped: Doctrine SRE internship, Optiverus+Remanence postings already 410, LINKIT Mendix hybrid. apps:dupes []; 911 tracked.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hal1ffmjjgz3zkme98qqosk"
-    },
-    {
-      "id": "fd2dfef3-fd03-40ba-b8f9-6f2f0cdc42b8",
-      "ts": "2026-11-24T06:16:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-scout-20261124",
-      "action": "landed: scout DevOps/SRE/Platform/Infrastructure engineer roles for delphi job-search pipeline (jev scout_roles 0.99)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fc9589c62541e6c3a27291eada0bd19b106bd5a9",
-      "branch": "main",
-      "frame": "03hal100yd6dzsg3z9ae9ocpk"
     }
   ]
 }

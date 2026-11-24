@@ -5552,5 +5552,79 @@
         2026-12-07 hold, or each is recorded as having no live req.
       '';
     };
+    devin-lane-handoff-2026-11-24 = {
+      title = "Devin lane: image-daily pool helpers landed; two uncommitted gate files; jev routes idle panes";
+      kind = "handoff";
+      status = "DELIVERED";
+      date = "2026-11-24";
+      summary = "pool.go carries the read-only pool verbs (remaining/share/pending), shell rewired to the CLI, budget ledger shrunk, gates green. Uncommitted: cv-blog-check.sh (ceiling entry moves in its owner's diff) and hermes-persona config.yaml (fallback chain + sail goal_judge + retries 9). Idle-pane routing: jev-decide --provider typesafe; goal_judge is out of tmux-pane-steward.";
+      refs = {
+        modules = [
+          "tools/os/internal/image/pool.go"
+          "tools/os/internal/image/briefs.go"
+          "scripts/task/cv-blog-check.sh"
+          "modules/user/ai/hermes-persona/config.yaml"
+          "scripts/task/infron-check.sh"
+        ];
+        tasks = ["checks:quick" "checks:host" "checks:image-daily" "checks:drv-equality" "checks:infron"];
+        docs = [".agents/skills/jevdecide/SKILL.md"];
+      };
+      body = ''
+        image-daily port: the read-only pool helpers (remaining, share,
+        pending) live in pool.go, the shell calls the CLI, the budget ledger
+        shrank with each port. Green: checks:quick, checks:host frieren,
+        checks:image-daily, drv-equality 30/30. Engine glue still in shell:
+        build_index's ffprobe shape-cache loop, deploy_frontend (wrangler),
+        launch_round (systemd-run), resolve_plate, banner_crop,
+        dimensions/landscape — mostly external-process wrappers. The natural
+        next slice is build_index's shape cache: data, measurable.
+
+        Uncommitted: scripts/task/cv-blog-check.sh (CV/publish consistency
+        gate, grew 158->172 — its owner bumps the ceiling entry in the same
+        diff). modules/user/ai/hermes-persona/config.yaml (codebuff's file:
+        fallback-chain edits + goal_judge pinned to the sail/deepseek lane +
+        api_max_retries 9 for 9 lanes). Whoever commits it takes the bump in
+        the same diff. SAIL_API_KEY still must be added to sops
+        ai-services-shared-env — it is in neither the blob nor ~/.hermes/.env.
+
+        Routing: idle-pane direction decisions route through
+        `jev-decide decide --provider typesafe`; goal_judge is removed from
+        tmux-pane-steward routing.
+      '';
+    };
+    devin-lane-appflow-write-auth = {
+      title = "Appflow write routes shipped open; a bearer gate must land before delphi rebuilds";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-24";
+      summary = "The POST write routes (application-update, application-upsert) shipped in 7571daca, and the bearer gate now lands with them: `appflow-board-bearer` in sops, a rendered `map $http_authorization` included via appendHttpConfig, `if`/`return 403` on the two write locations only. Proven on a replica vhost: unauth POST 403, keyed POST 200, reads stay open. Remaining exit: the live proof on delphi's real vhost after rebuild.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/services/appflow-board.nix" "hosts/delphi/configuration.nix"];
+        tasks = ["checks:host"];
+        docs = ["docs/appflow-board.md"];
+      };
+      body = ''
+        The board's nginx has no auth anywhere; the write routes widen tailnet
+        read exposure into arbitrary overwrite of status/stage/next_action on
+        any application record. The intended gate (from the code-review
+        comments on the routes): one shared bearer key in sops
+        (ai-services-shared-env or a dedicated secret), wired to nginx via
+        auth_request or a `map $http_authorization` gate applied only to the
+        two write locations — reads stay open as they are today.
+
+        Landed: `appflow-board-bearer` in modules/secrets.yaml, the map via
+        `sops.templates."appflow-board-write-auth.conf"` included from
+        `services.nginx.appendHttpConfig`, and `if ($appflow_write_ok = 0) {
+        return 403; }` on the two write locations. The key never enters the
+        store. Verified on a replica nginx: unauth POST -> 403 on both routes,
+        `Bearer <key>` POST -> 200, wrong key -> 403, unauth GET read -> 200.
+
+        Exit: after the delphi rebuild, repeat the curl pair against
+        https://delphi.cloudforest-kardashev.ts.net:8463 and see the same
+        403/200 split, then this note can close.
+      '';
+    };
   };
 }

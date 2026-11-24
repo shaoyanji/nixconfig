@@ -1,8 +1,107 @@
 {
-  "generated": "2026-11-24T13:33:16Z",
+  "generated": "2026-11-24T13:57:33Z",
   "count": 200,
-  "pin": "580196bf686c4c60cd2cbeaec0e9af1038078d52ec94ba4dbec7dd2921e9f510",
+  "pin": "2046c0c6d52e70a854a7198f56952bed09592aff858a5713621d3d17b1e8f5ac",
   "turns": [
+    {
+      "id": "d85bd3cf-3918-4c72-a814-a6c37d9aa871",
+      "ts": "2026-11-24T13:54:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "Note job-scout-next-sweep-freebuff restated: next idle freebuff lane task is one more DevOps/SRE/Platform/Infrastructure employer-lead sweep, prep-only to 2026-12-07, nothing sent. OPEN/P3, refs+links unchanged. gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bde0abd2d1c9c0f739a63e6e66d93a0a2847014c",
+      "branch": "main",
+      "frame": "03hanihwm8468t9ob555h854r"
+    },
+    {
+      "id": "b5067967-d2f0-4c09-84de-07db2d6cb8f5",
+      "ts": "2026-11-24T13:54:14Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive:freebuff-local2",
+      "action": "drove idle freebuff pane agents:2.1 via Jev task_change; pasted CV/site note-update task; pane shows working... 25s / BUSY",
+      "outcome": "done",
+      "claims": [
+        "agents:2.1"
+      ],
+      "files": [],
+      "base_commit": "1e9bd28871cffa30d7812b0ca6f7fb3057e4d79f",
+      "branch": "main",
+      "frame": "03hanifeqf1w14yexu5l383dx"
+    },
+    {
+      "id": "89849aac-3de8-4b0b-8e2c-a54dd836264f",
+      "ts": "2026-11-24T13:54:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive:devin",
+      "action": "drove idle devin pane agents:1.1 via Jev task_change duel p=0.81 margin=0.62; pasted image-daily Go port gate task; second Enter required; pane shows Typing spinner/BUSY",
+      "outcome": "done",
+      "claims": [
+        "agents:1.1"
+      ],
+      "files": [],
+      "base_commit": "1e9bd28871cffa30d7812b0ca6f7fb3057e4d79f",
+      "branch": "main",
+      "frame": "03hanifcrs8hae1pq8us2xfuk"
+    },
+    {
+      "id": "ae592d57-6e44-4c33-a5ce-18b48bccc1bb",
+      "ts": "2026-11-24T13:50:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "Decided next freebuff lane task = (B) employer sweep, not (A) tailoring: 2 of the 4 job-scout-fresh leads already have published packets, Maesn closed, Atlas Titan do-not-packet, so (A) has no work. Sweep targets LINBIT, B1, Univention, Open-Xchange, Proxmox careers pages; prep-only, no scout rows before 2026-12-07, no sends. gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e9bd28871cffa30d7812b0ca6f7fb3057e4d79f",
+      "branch": "main",
+      "frame": "03hanhs3t5jmoa9izgato2dbz"
+    },
+    {
+      "id": "37e1d318-b12e-4e25-8427-d8044ee020c1",
+      "ts": "2026-11-24T13:50:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive:freebuff-delphi",
+      "action": "drove idle ssh/freebuff delphi pane agents:3.1 via Jev decision label margin 0.39; pasted delphi sweep/note task; pane shows thinking... after Enter",
+      "outcome": "done",
+      "claims": [
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03hanhrj8ctmgpvka9s2s5x4k"
+    },
+    {
+      "id": "49575b5a-a9fa-4392-b363-d0c684ea2998",
+      "ts": "2026-11-24T13:50:49Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive:freebuff-local",
+      "action": "drove idle freebuff pane agents:2.1 via Jev decision label margin 0.39; pasted decision/note task; pane shows thinking... after Enter",
+      "outcome": "done",
+      "claims": [
+        "agents:2.1"
+      ],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03hanhrhc015vhdodosx27zsw"
+    },
+    {
+      "id": "da8659f1-996a-4b30-b54a-d49b98b35f5e",
+      "ts": "2026-11-24T13:33:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: promoted job-scout-sre-platform-2026-11-24 to handoff/DELIVERED: nine DevOps/SRE/platform leads ranked, packet order Toast then Etraveli after the 2026-12-07 hold, site prose unchanged; the gap note links the five unread EU vendor pages via apps:vendors | gate: checks:kg PASS, agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd6fb0889614c41fcaa83fbfb0b9f3acd35dc86d",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hanec99tj11qhxdyrn6q1si"
+    },
     {
       "id": "317a33fc-9199-4df1-bc97-004f89cf7ada",
       "ts": "2026-11-24T13:32:53Z",
@@ -2707,108 +2806,6 @@
       "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
       "branch": "main",
       "frame": "03hakb9kz0np62ebdmwsfqfyi"
-    },
-    {
-      "id": "56a9b07e-7892-417d-833d-59c7b921a78a",
-      "ts": "2026-11-24T04:01:22Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-intl",
-      "action": "Scouted intl boards (121 ATS boards, WWR, Remotive, LinkedIn 7d). Added 5 fresh leads: Intercom AI Infra London (fit 3, packet: 2pp EN CV + 1pp EN letter + JD projection), Legora Senior SRE Stockholm, Mangopay Senior SRE Luxembourg, Tiqets Senior Platform Amsterdam, Neo4j Go/K8s sharding London. Nothing sent: apps:sent still 12 findings. Gates: apps:dupes [] PASS, repo 26 unchanged (no commit, material is private state).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hakam5h3vlcaf6a8ex1okru"
-    },
-    {
-      "id": "bd2073f0-6ec2-4699-a64b-ad767ab41bd1",
-      "ts": "2026-11-24T04:00:29Z",
-      "source": "antigravity",
-      "subject": "frieren:system-audit",
-      "action": "start: daily health audit and SYSTEM.md refinement",
-      "outcome": "in_progress",
-      "claims": [
-        "SYSTEM.md"
-      ],
-      "files": [],
-      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
-      "branch": "main",
-      "frame": "03hakafz7k92nsbb8e725er25"
-    },
-    {
-      "id": "32001a41-96bf-4eac-b455-b28675cc7ce3",
-      "ts": "2026-11-24T03:59:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-24",
-      "action": "Swept 8 boards (Greenhouse, Ashby, Lever, SmartRecruiters, Arbeitnow, Remotive, WWR RSS, LinkedIn 7d) = 567 postings; 374 dropped as tracked, 29 dupes -> 8 new leads: plusserver (fit 5), R+V (4), CompuGroup Medical (4), dwpbank (3), JAKALA (3), HOLOPLOT (3), Exxeta (3), Concat AG (2). Plusserver packet built: 2pp EN CV + 1pp EN letter + JD projection, ATS PASS. Not sent — gate 12-07.",
-      "outcome": "done",
-      "claims": [
-        "pipeline db: 8 lead rows; ~/.config/appflow/jd",
-        "~/.config/appflow/letters; ~/.local/state/appflow/submissions/plusserver-devops-engineer-kubernetes"
-      ],
-      "files": [],
-      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
-      "branch": "main",
-      "frame": "03hakac9u84qt7insjzrjzxsi"
-    },
-    {
-      "id": "e9404eb0-21eb-493f-991b-e13fef40fa92",
-      "ts": "2026-11-24T03:55:43Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "tmux server dead after 03:11 (no socket; host up 1d, not a reboot). Rebuilt session 'agents' (4 windows: devin, freebuff, delphi-ssh, wallpaper-worker), relaunched all 4. Drove the 3 idle TUIs on standing tasks (jev-decide needs_review x3 -> fallback, no invented label): devin image-daily Go-port verify (images:gate+checks:quick, commit+push); freebuff+delphi job-scout CV lane (scout, packets, no send). All 3 working; wallpaper-worker finished today's Qwen generation.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
-      "branch": "main",
-      "frame": "03hak9ifz4qx4sy4bfcaa5zvi"
-    },
-    {
-      "id": "923155d9-13fa-4972-84dd-8ab09b155cdf",
-      "ts": "2026-11-24T02:54:54Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "fresh sweep (posted >=15 Nov) — corrected turn: 4 leads added (Flink Platform Eng Berlin 65-80k; Pentland Firth Sr Cloud Platform Munich; Maesn Sr Platform+Reliability Berlin/DUS remote; Atlas Titan Platform Ops Lead Berlin, DE C1 gap). Talon.One refused by employer guard (Adyen live 2026-11-22). AWS ESC dropped (EU-national requirement). dupes 0; nothing sent; repo 26",
-      "outcome": "in_progress",
-      "claims": [
-        "~/.local/state/appflow/submissions"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hajxmqhsyrlhj689ddxwjej"
-    },
-    {
-      "id": "dbe3230e-f55f-46ea-8f02-7b8f3467f225",
-      "ts": "2026-11-24T02:52:59Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "fresh sweep (>=15 Nov): 127 ATS boards, Arbeitnow, Personio, Remotive, WWR RSS, LinkedIn 7-day. Added 3 new leads — Flink Platform Eng Berlin (65-80k, Fit 2), Talon.One TechOps Berlin (Adyen, Fit 2), Pentland Firth Senior Cloud Platform Munich (Fit 2). 6 candidates deduped (Ashby applied; Scout24/trawa/Upvest/Helsing/Langdock tracked). dupes 0; nothing sent; repo 26",
-      "outcome": "in_progress",
-      "claims": [
-        "~/.local/state/appflow/submissions"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hajx97twt41kbsoaz218hmd"
-    },
-    {
-      "id": "0d493117-e13f-4f31-bb1c-f693c2759a65",
-      "ts": "2026-11-24T02:48:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "packet built for kinexon-senior-devops-go-backend: 2-page EN CV + 1-page EN letter, JD projection 11/32 highlights 4/10 projects, artifact /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend, linked at ~/.local/state/appflow/submissions/kinexon-senior-devops-go-backend; nothing sent, tracker moved lead->prep",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions/kinexon-senior-devops-go-backend"
-      ],
-      "files": [],
-      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
-      "branch": "main",
-      "frame": "03hajwe6hww4c0d0eplbm0dsg"
     }
   ]
 }

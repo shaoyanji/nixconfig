@@ -60,10 +60,11 @@ tasks:
     summary: >
       LINBIT, B1 Systems, Univention, Open-Xchange and Proxmox are the EU vendors
       whose work is closest to this fleet — DRBD and block storage, Linux
-      infrastructure, identity, groupware, virtualisation — and none of them is in
-      the record, because no pass fetched their careers pages. This prints the
-      five entry points and the rule that counts a page as fetched. Prints only:
-      a row from any of them waits for the 2026-12-07 hold to lift.
+      infrastructure, identity, groupware, virtualisation — and no sweep had read
+      their careers pages. All five were read on 2026-11-24: four already held a
+      live row, and Proxmox, the only one absent, has no EU engineering opening.
+      This prints the five entry points and the rule that counts a page as
+      fetched. Prints only: a row from any of them waits for the hold to lift.
     cmds:
       - |
         printf '%s\t%s\t%s\t%s\n' \

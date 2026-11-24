@@ -5275,41 +5275,43 @@
       '';
     };
     job-scout-next-sweep-delphi = {
-      title = "A stack-focused job scout for delphi, and the two leads it cannot yet trust";
+      title = "A stack-focused job scout for delphi: twelve more leads, and the vendor pages read";
       kind = "open";
       status = "OPEN";
       priority = "P3";
       date = "2026-11-24";
-      summary = "Two sweeps added nine employer leads to the delphi record with no applications sent. Six match the fleet's own stack (Nix, Kubernetes, Postgres, FreeBSD); two carry an unconfirmed apply target and one an expired deadline, so the next sweep verifies those before anyone preps a packet.";
+      summary = "Second 2026-11-24 sweep filed twelve stack leads at lead with the 2026-12-07 hold, 1069 to 1081 rows. The five EU vendor pages were read: four already held a live row, Proxmox has no EU engineering opening, and Nix, FreeBSD and Tailscale produced nothing new.";
       refs = {
-        tasks = ["apps:dupes"];
+        tasks = ["apps:vendors" "apps:add" "apps:dupes"];
       };
       body = ''
-        Swept 2026-11-24 against the live 1034-row export, deduped before every
-        write. Nine rows landed as `lead` with a prep-only hold to 2026-12-07:
-        Contensi 5, HMS Analytical 4, Power Plus Communications 4, Tiger Data 4,
-        FourEnergy 3, HENSOLDT/ESG 3, Klara 3, auteega 3, FreeBSD Foundation 2.
-        Mittwald's bare-metal Kubernetes role was refused, not skipped: an
-        `applied` row for that employer already exists.
+        Second sweep, 2026-11-24, after the first wrote nine rows: five stack
+        keywords (nixos, kubernetes, postgresql, freebsd, tailscale) over the
+        two-week EU LinkedIn window gave 170 cards, 165 of them new company
+        pairs. Twelve landed as `lead` at origin scout-2026-11-24-stack, all
+        held to 2026-12-07: Aiven 4 (Postgres platform, Helsinki), Fides 3
+        (remote Italy), MariaDB 3, McAfee 3, NEOXX 3 (Bratislava hosting),
+        Numberly 3 (Paris), then Adform, Frekuent, Frequentis, Fronius, Realta
+        and Squarespace at 2. The record went 1069 to 1081 and apps:dupes
+        stayed [].
 
-        Stack-specific finds worth a packet: Tiger Data runs stateful Postgres
-        and Timescale fleets on Kubernetes, remote in the EU; HENSOLDT names
-        NixOS first in its IaC line but is on-site and German-cleared; Klara and
-        the FreeBSD Foundation are the only FreeBSD-native roles found, and both
-        are kernel or admin work rather than operations.
+        The vendor pages are now read, and that is the correction worth keeping.
+        Four of the five already held a live row: LINBIT, B1 Systems and
+        Univention at prep, Open-Xchange at lead, so the gap note's "none of
+        them is in the record" was wrong. Proxmox was the only one absent and
+        has no EU engineering role: Kingston, Canada on-site, plus a Vienna
+        pre-sales seat. OX now advertises SRE and platform roles across seven
+        EU countries; its live row stays the only application.
 
-        Open: Tiger Data's Greenhouse board 404s and the req is only confirmed
-        through an aggregator, so its apply URL is the careers page. Klara's
-        LinkedIn copy showed a 30 Oct close while its own careers page still
-        lists the role, so liveness is unproven. Rejected outright: Tailscale
-        (every engineering req is US, Canada or UK), atvari (unpaid internship
-        only), and second roles at Supabase, Mittwald and dtms, all of which
-        already hold a live row.
+        Nix found nothing: the NixOS discourse jobs feed returned general
+        topics, not the jobs category. Tailscale lists no openings and works
+        from Canada, the US and the UK, so it stays rejected. No new FreeBSD
+        role either; the Foundation's row is still at lead. ByteDance's Dublin
+        SRE was left out on purpose, because TikTok already holds a live row.
 
-        Exit: the two soft URLs are confirmed against the employer's own board
-        or dropped, and one more sweep covers Tailscale-adjacent EU-eligible
-        networking roles — the zero-trust mesh skill the fleet runs has no lead
-        on the record at all. A person still sends; agents only prep.
+        Exit: packets still go out in the order Toast, Etraveli, then Aiven
+        after 2026-12-07, and a person sends. A sweep that reports no new leads
+        runs apps:vendors first, or it is reporting its own coverage.
       '';
     };
     job-scout-fresh-eu-boards-2026-11-24 = {
@@ -5404,7 +5406,7 @@
       status = "DELIVERED";
       priority = "P3";
       date = "2026-11-24";
-      summary = "LINBIT, B1 Systems, Univention, Open-Xchange and Proxmox have careers pages no pass in this lane read; `task apps:vendors` now prints the five entry points, so their absence is unfetched coverage rather than a closed market. Packet order stays Toast then Etraveli after the 2026-12-07 hold, behind matt:gist:drift and matt:cv:check, with no apps:scout row added before it.";
+      summary = "LINBIT, B1 Systems, Univention, Open-Xchange and Proxmox have careers pages no pass in this lane read; `task apps:vendors` prints the five entry points, so a missing vendor is unfetched coverage rather than a closed market. Packet order stays Toast then Etraveli after the 2026-12-07 hold, behind matt:gist:drift and matt:cv:check, with no apps:scout row added before it.";
       from = ["job-scout-sre-platform-2026-11-24"];
       refs = {
         modules = ["taskfiles/apps.yml"];
@@ -5416,9 +5418,13 @@
         Workday return zero for an employer nobody onboarded, and this lane polls
         only aggregators. So five EU open-source vendors — LINBIT (Linz, DRBD),
         B1 Systems (Munich), Univention (Bremen), Open-Xchange (Bremen/Cologne),
-        Proxmox (Vienna) — were absent from the record because nobody asked, and
-        a pass reporting "no new leads" while leaving those pages unread reports
-        its own coverage as the market.
+        Proxmox (Vienna) — were missing from the lane's coverage, and a pass
+        reporting "no new leads" while leaving those pages unread reports its own
+        coverage as the market.
+
+        Corrected 2026-11-24 after reading all five: LINBIT, B1 Systems and
+        Univention already held a prep row and Open-Xchange a lead, so Proxmox was
+        the only vendor absent, and it has no EU engineering opening.
 
         `task apps:vendors` is the promotion: it prints the five entry points,
         verified reachable on 2026-11-24, and the rule that a page needing

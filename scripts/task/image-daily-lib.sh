@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # image-daily-lib.sh — shared vocabulary for the image-daily command family:
 # environment resolution, the ledger, the brief book. Sourced, never run —
-# every image-daily-<cmd>.sh sources this first (image-daily-engine.sh does
-# it for the commands that spend or publish).
+# every image-daily-<cmd>.sh sources this first, and `image_daily_cli` here is
+# how they reach the Go tool the spend/publish machinery lives in now.
 set -euo pipefail
 
 # A checkout resolves its own root. A store-baked copy of this one file has no

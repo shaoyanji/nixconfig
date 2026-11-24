@@ -10,13 +10,14 @@
 #      image-daily-<cmd>.sh and every image-daily-*.sh command file is in the
 #      list (lib/engine/gate are not commands). The 2026-11-23 monolith split
 #      is only as good as this agreement; a dropped file is a silent `usage:`.
-#   2. judge fallback — image-daily-engine.sh carries the provider route
-#      (modelProvider + GEMINI_API_KEY + --model). Without it the account
-#      quota dying is a dead judge: 2026-11-22–23 spent 43 generations, kept 0,
-#      every verdict "agy exited 3".
-#   3. spend circuit breaker — unjudged_streak in run_lane (engine) and in
-#      image-daily-plates.sh, so two consecutive unjudged plates stop the lane
-#      instead of burning allowance that can never be kept.
+#   2. judge fallback — the provider route (modelProvider + GEMINI_API_KEY
+#      + --model) lives in tools/image-daily now, image-daily-engine.sh before
+#      it; the check accepts either so a fixture out of history still gates.
+#      Without it the account quota dying is a dead judge: 2026-11-22–23 spent
+#      43 generations, kept 0, every verdict "agy exited 3".
+#   3. spend circuit breaker — unjudged_streak in the lane loop (Go tool) and
+#      in image-daily-plates.sh, so two consecutive unjudged plates stop the
+#      lane instead of burning allowance that can never be kept.
 #   4. publish shrink guard — cmd_publish calls publish_shrink_guard: on
 #      2026-11-21 delphi republished a slice of the bank and the served gallery
 #      dropped 556 assets to 144 with every upload intact.

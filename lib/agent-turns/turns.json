@@ -1,8 +1,78 @@
 {
-  "generated": "2026-11-24T05:58:55Z",
+  "generated": "2026-11-24T06:39:09Z",
   "count": 200,
-  "pin": "f357ad800488d90fd9843096cd52876a1932b54df46ece92dcc22f5280a38b7d",
+  "pin": "087097d5e4b285f2283043998a3996e9bc964fe9c920382215af813ae8b20df7",
   "turns": [
+    {
+      "id": "99855cb5-ffc6-4be2-b9bc-b035a8d9e7de",
+      "ts": "2026-11-24T06:37:15Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "claim: verify Go port ships green — images:gate + checks:quick, then commit engine.sh deletion and push",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/image-daily-engine.sh",
+        "tools/image-daily"
+      ],
+      "files": [],
+      "base_commit": "fc9589c62541e6c3a27291eada0bd19b106bd5a9",
+      "branch": "main",
+      "frame": "03hal52ezgir748hqpdwia1mp"
+    },
+    {
+      "id": "a634717a-f327-45ca-8f91-1c6eeac1c5e0",
+      "ts": "2026-11-24T06:18:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-2026-11-24c",
+      "action": "Scout c: fresh-feed sweep (Remotive, Jobicy, RemoteOK, WWR, Arbeitnow 12pp, Himalayas 600, Berlin Startup Jobs, HN Nov26) vs 908 tracked. Added 3 leads: Claranet Italia Cloud Engineer (Full Remote, Italy), Next Digital Cloud Engineer (remote Spain), DATATRONiQ Cloud&DevOps K8s/Edge (Berlin, apply work@datatroniq.com). Skipped: Doctrine SRE internship, Optiverus+Remanence postings already 410, LINKIT Mendix hybrid. apps:dupes []; 911 tracked.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hal1ffmjjgz3zkme98qqosk"
+    },
+    {
+      "id": "fd2dfef3-fd03-40ba-b8f9-6f2f0cdc42b8",
+      "ts": "2026-11-24T06:16:26Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-scout-20261124",
+      "action": "landed: scout DevOps/SRE/Platform/Infrastructure engineer roles for delphi job-search pipeline (jev scout_roles 0.99)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fc9589c62541e6c3a27291eada0bd19b106bd5a9",
+      "branch": "main",
+      "frame": "03hal100yd6dzsg3z9ae9ocpk"
+    },
+    {
+      "id": "07790a72-73ec-4f66-bab2-ce486183c07d",
+      "ts": "2026-11-24T05:59:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-scout-2026-11-24",
+      "action": "Round 4: EU sweep over arbeitnow (2150 postings) plus 27 EU ATS tokens; 6 new leads at stage=lead (gridscale Ceph SRE fit5, Nebius, Blocktech, GetYourGuide, Coda, virtual7). JD gap: apps:docs:coverage added and 38 ads recovered from the ATS APIs the rows point at; lead coverage 23 -> 61 of 161. Gate checks:quick PASS. Nothing sent.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/appflow-docs.sh; taskfiles/apps.yml; flake/script-budget.nix"
+      ],
+      "files": [],
+      "base_commit": "fc9589c62541e6c3a27291eada0bd19b106bd5a9",
+      "branch": "main",
+      "frame": "03hakxn6fnfj6z57lgi20uywk"
+    },
+    {
+      "id": "205ac4ca-1a2c-4b17-8e48-6cadcf014f1a",
+      "ts": "2026-11-24T05:59:02Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-2026-11-24b",
+      "action": "Scout round 2: swept GH/Ashby/Lever/Workable, Personio, Teamtailor, Himalayas, Remotive, WWR, Arbeitnow, RemoteOK, HN Oct+Nov, NixOS Discourse against 892 tracked rows (620+ employers). Net-new after review: 2 leads — Nord Security DevOps Infra (Nix in JD, Warsaw/Vilnius hybrid), Arden University Platform Engineer (remote UK). Closed 12 junk/mislocated rows; repaired a dupe sweep that over-closed, restored 264 rows; apps:dupes [] again. Nothing sent.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hakxlnpo7tpopc9xppxv9xn"
+    },
     {
       "id": "73f97562-a44c-403f-888e-417fe56dcfee",
       "ts": "2026-11-24T05:53:33Z",
@@ -2619,73 +2689,6 @@
       "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
       "branch": "main",
       "frame": "03hae978j7ecplb9tsclmyf9k"
-    },
-    {
-      "id": "0a752946-57b2-4d38-9581-97f6d80fdc5c",
-      "ts": "2026-11-23T09:17:40Z",
-      "source": "devin",
-      "subject": "nixconfig:comment-census",
-      "action": "landed: 116 stale lines pruned across 38 files + alejandra reformat (generate-config boilerplate + dead commented config); kept all why/trap narrative per nix-comment-audit routing rule | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
-      "branch": "main",
-      "frame": "03hae73rye70ronij1nudvpu7"
-    },
-    {
-      "id": "a9e7ac22-908d-4bf2-b15a-a1cd95503147",
-      "ts": "2026-11-23T09:16:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-23e",
-      "action": "landed: 5 verified DevOps/SRE/platform leads written to the pipeline from the HN Nov-2026 thread plus five feeds (ICEYE x2 Berlin/Espoo, Proxima Fusion Munich, Proofline remote-EU, VictoriaMetrics EMEA); dropped 9 unverifiable or geo-ineligible matches | gate: application-get readback PASS (applyUrl+notes+nextAction on all 5)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hae6sixavwyuwefvw0v2gof"
-    },
-    {
-      "id": "98f68675-678a-4aa7-a87d-23bd121e06d9",
-      "ts": "2026-11-23T09:13:36Z",
-      "source": "devin",
-      "subject": "nixconfig:comment-census",
-      "action": "start: prune stale narrative comments in tracked .nix (AGENTS.nix excluded) per nix-comment-audit note — route, not bulk-delete; census: 6318 header lines, worst files first",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi/configuration.nix hosts/frieren/ lib/ hosts/netbook/ hosts/minyx/ modules/user/ai/hermes-user.nix"
-      ],
-      "files": [],
-      "base_commit": "771ed3ab4a29406f8ec004c8299dfdef6ac6c166",
-      "branch": "main",
-      "frame": "03hae6b7twptal8dwv188396l"
-    },
-    {
-      "id": "9f290f57-92fc-4225-a778-56c5b9b30754",
-      "ts": "2026-11-23T09:13:13Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-pane-0-2-1",
-      "action": "landed: job-search scouting — DevOps/SRE/Platform/Infrastructure leads on delphi (freebuff over ssh tunnel); Jev routing note-change p=0.76 margin=0.61 (decisive margin on needs_review); paste+Enter cleared the Submit dialog; freebuff accepted — working... 39s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "771ed3ab",
-      "branch": "main",
-      "frame": "03hae68i8p939993ptbjdch4v"
-    },
-    {
-      "id": "f8fb3455-7571-46d3-86c8-7dcfe00ea7eb",
-      "ts": "2026-11-23T09:13:12Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-pane-0-0-1",
-      "action": "landed: comment census + narrative prune across tracked .nix files; Jev routing prose-change p=0.90 margin=0.87 (decisive); devin accepted the task via load-buffer+paste-buffer+Enter — xs claim check clear, reading lib/nix-comments.nix, Thinking 12s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "771ed3ab",
-      "branch": "main",
-      "frame": "03hae68f3zok8021hg6nw8wvl"
     }
   ]
 }

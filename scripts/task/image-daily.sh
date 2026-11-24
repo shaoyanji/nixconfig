@@ -2,10 +2,10 @@
 # image-daily.sh — dispatch for the image-daily command family:
 #
 #   image-daily.sh <cmd> runs scripts/task/image-daily-<cmd>.sh — one file per
-#   command, the shared vocabulary in image-daily-lib.sh, and the
-#   generation/publish machinery in image-daily-engine.sh. The dispatch
-#   contract is unchanged, so the slot timers, sibling scripts and the
-#   taskfile keep working untouched.
+#   command, the shared vocabulary in image-daily-lib.sh; the generation and
+#   publish machinery is the Go CLI (tools/image-daily, .#cli.image.daily),
+#   reached through `image_daily_cli`. The dispatch contract is unchanged, so
+#   the slot timers, sibling scripts and the taskfile keep working untouched.
 #
 # WHY THIS EXISTS: the allowance is 100 images per day and it does not carry
 # over, so a day nobody spends is a day thrown away — and a queue kept in a

@@ -5908,6 +5908,34 @@
         same diff. Exit: residual shims accepted as shell or ported.
       '';
     };
+    fleet-hygiene-tailscale-creds-stale = {
+      title = "Both stored tailscale credentials are dead — mint fresh auth material";
+      date = "2026-11-24";
+      kind = "open";
+      priority = "P3";
+      status = "OPEN";
+      summary = "The sops tailscale material no longer joins a node: gokrazy.gok.tailscale_auth_key (modules/secrets.yaml) is a consumed single-use key (invalid key), and the TAILSCALE.CLIENT OAuth pair (apikeys.yaml) mints a token but lacks key-creation scope (calling actor does not have enough permissions).";
+      body = ''
+        Found 2026-11-24 while trying to join clanker (instabox) to the
+        tailnet. Both stored creds fail:
+
+        - `gokrazy_gok_tailscale_auth_key` → `invalid key: unable to
+          validate API key`. Almost certainly a single-use key already
+          consumed by the gokrazy image bring-up.
+        - `TAILSCALE.CLIENT.{ID,SECRET}` (apikeys.yaml) → OAuth token
+          mints and reads `/devices` fine (33 devices; tags in use:
+          `tag:extagent`, `tag:experimental`), but `POST /tailnet/-/keys`
+          is denied. The OAuth client's scopes need `devices:write`.
+
+        A third pair, `tailscale.client.{id,secret}` in
+        modules/secrets.yaml, is fully dead (`API token invalid`).
+
+        Exit: mint a fresh reusable auth key (or re-scope the OAuth client
+        with devices:write) in the tailnet admin console, replace the sops
+        entries via the normal secrets:sync path, and prove it with one
+        throwaway `tailscale up --authkey` on a test box.
+      '';
+    };
     job-scout-boards-url-checked-2026-11-24 = {
       title = "The swept boards, URL-checked: six employers answer, ZenDiS has none";
       date = "2026-11-24";

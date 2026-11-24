@@ -5117,6 +5117,45 @@
         `action-today`; the other two stay `held` to 2026-12-07.
       '';
     };
+    delphi-job-scout-send-blocked = {
+      title = "The job lane is blocked on sending, not on finding work";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "`nixconfig:job-scout-fresh` cannot finish: `task --list-all` carries no `apps:send` verb and Flink publishes no mailbox, so a person is still the only sender. Prep continues as a held DevOps/SRE/Platform/Infrastructure lead sweep to 2026-12-07; the EU careers-page gap and the packet order stay cited from their own records.";
+      from = ["job-scout-fresh-eu-boards-2026-11-24"];
+      refs = {
+        modules = ["taskfiles/apps.yml"];
+        docs = ["docs/appflow-board.md"];
+        tasks = ["apps:add" "apps:dupes" "apps:vendors"];
+      };
+      body = ''
+        `nixconfig:job-scout-fresh` is blocked on the send half, not on finding
+        work. `task --list-all` carries no `apps:send` verb — the only
+        send-shaped task in the plane is `bountystash:secret:resend` — so nothing
+        can take a finished packet to an employer, and Flink publishes no mailbox
+        to fall back on. A person remains the only sender, and no mail left on
+        2026-11-24.
+
+        Prep is not blocked. Next step: one prep-only sweep over DevOps, SRE,
+        Platform and Infrastructure employers, every new row at `lead` with
+        `next_action` naming the 2026-12-07 hold and `apps:dupes` empty after it.
+        Nothing is sent, no site prose changes, and nothing is deployed.
+
+        The two follow-ups already have records, so they are cited, not restated:
+        `job-scout-eu-vendor-pages-gap-2026-11-24` holds the EU careers pages no
+        pass had fetched (`task apps:vendors` prints the five entry points, and a
+        page needing JavaScript or a mailto form is unfetched, not empty) and the
+        packet order behind the hold — Toast, then Etraveli, then Aiven, behind
+        `matt:cv:check` and `matt:gist:drift`.
+
+        Exit: either an `apps:send` verb exists and is gated by `apps:dupes`, or a
+        person sends from the quarter — and 2026-12-07 is the earliest date
+        either way. A row whose send date lands before 2026-12-07 means this note
+        was ignored.
+      '';
+    };
     delphi-postgres-19-upgrade = {
       title = "Upgrade delphi's PostgreSQL 17 → 19 at the next nixpkgs epoch";
       kind = "open";

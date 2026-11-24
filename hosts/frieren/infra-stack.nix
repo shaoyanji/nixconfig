@@ -538,19 +538,26 @@
     }
   ];
 
+  # Batch jobs yield to interactive and IO-bound work — one profile, stated
+  # once, shared by the image-daily slots and the Audible window.
+  lowImpactJob = {
+    nice = 10;
+    ioSchedulingClass = "best-effort";
+  };
+
   imageDailySlotJobs = builtins.listToAttrs (map (s: {
       name = "image-daily-slot-${toString s.n}";
-      value = {
-        description = s.desc;
-        schedule = "*-*-* ${s.at}:00";
-        # Slots run oldest-first; the cap each takes is the day's leftover split
-        # over the slots still to run (the `share` arithmetic in the wrapper).
-        command = imageDailySlot (toString s.n) (builtins.length imageDailySlots) s.reserve;
-        lockFile = "/tmp/image-daily.lock";
-        persistent = false;
-        nice = 10;
-        ioSchedulingClass = "best-effort";
-      };
+      value =
+        {
+          description = s.desc;
+          schedule = "*-*-* ${s.at}:00";
+          # Slots run oldest-first; the cap each takes is the day's leftover split
+          # over the slots still to run (the `share` arithmetic in the wrapper).
+          command = imageDailySlot (toString s.n) (builtins.length imageDailySlots) s.reserve;
+          lockFile = "/tmp/image-daily.lock";
+          persistent = false;
+        }
+        // lowImpactJob;
     })
     imageDailySlots);
 
@@ -1016,20 +1023,20 @@ in {
           schedule = "*-*-* 05:00:00";
           command = agySystemRunner;
         };
-        audible-phased-liberation = {
-          description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 GB limit, 170m timeout)";
-          schedule = "*-*-* 00:00:00";
-          command = makeAudibleBatchLiberation {
-            name = "audible-nightly-liberation";
-            timeoutSecs = 10200; # 170 min, hard cutoff at 02:50 before 03:00 backup window
-            limitGb = 50;
-            windowDesc = "Nightly 00:00-02:50 CEST";
-            nice = null;
-          };
-          lockFile = "/tmp/audible-liberation.lock";
-          nice = 10;
-          ioSchedulingClass = "best-effort";
-        };
+        audible-phased-liberation =
+          {
+            description = "Scheduled nightly batch Audible liberation (00:00-02:50 CEST, 50 GB limit, 170m timeout)";
+            schedule = "*-*-* 00:00:00";
+            command = makeAudibleBatchLiberation {
+              name = "audible-nightly-liberation";
+              timeoutSecs = 10200; # 170 min, hard cutoff at 02:50 before 03:00 backup window
+              limitGb = 50;
+              windowDesc = "Nightly 00:00-02:50 CEST";
+              nice = null;
+            };
+            lockFile = "/tmp/audible-liberation.lock";
+          }
+          // lowImpactJob;
       }
       // imageDailySlotJobs;
   };

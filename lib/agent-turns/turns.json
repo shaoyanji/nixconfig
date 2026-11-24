@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-24T22:04:50Z",
+  "generated": "2026-11-24T22:19:05Z",
   "count": 200,
-  "pin": "0ca5357682975ed18d47fc784600c637c7075080c5a3a3e4f48252b4b98446c6",
+  "pin": "39b56733d7d623ed8e8617f973e0c4b9661667602acb0f857c7a21d5ab461c65",
   "turns": [
+    {
+      "id": "f73a7574-dbca-4dcf-a227-ecfec1624e31",
+      "ts": "2026-11-24T22:15:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:chain-change",
+      "action": "landed: routed chain-change task to devin (agents:1) - verify infra-stack agentScheduler defaults refactor on delphi+frieren, then drop next stated default; drive confirmed by Thinking spinner",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a4ae52b9055859520afb6cfccb65c144865263ec",
+      "branch": "main",
+      "frame": "03haq8ec9b33oqlz2v05g16ve"
+    },
+    {
+      "id": "f90e197e-b1b7-45af-a97a-90f541c117ff",
+      "ts": "2026-11-24T22:14:55Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: continue delphi job-search scout for DevOps/SRE/Platform/Infra roles into lead tracker, novel routing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a4ae52b9055859520afb6cfccb65c144865263ec",
+      "branch": "main",
+      "frame": "03haq88g6rsgjagv83kan3hgo"
+    },
+    {
+      "id": "56ffaa15-0e14-4a35-ac05-3a2511305680",
+      "ts": "2026-11-24T22:07:23Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: scouted ~9.4k postings across arbeitnow/remotive/remoteok/WWR/germantechjobs/Greenhouse+Personio, recorded 6 new leads (Grafana Labs, gridscale OPCP, virtual7, NetKnights, PALTRON, HAURATON) and closed 4 duplicates/ineligible (Camunda, BFL, Catapult, Radiant-UK) | gate: every row re-read from the tracker after write",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a4ae52b9055859520afb6cfccb65c144865263ec",
+      "branch": "main",
+      "frame": "03haq6rgxbj9ytqd3z1b0wzcw"
+    },
     {
       "id": "7d5dbef4-7cc3-4ed7-90d3-5c83d9e638aa",
       "ts": "2026-11-24T22:03:33Z",
@@ -2640,45 +2679,6 @@
       "base_commit": "ddb18ab29cecd97a4cf86d47b02a0f2efcdecfe5",
       "branch": "main",
       "frame": "03hamnuqj4czm6qp922k7pcls"
-    },
-    {
-      "id": "6cce2bce-1b3e-407f-b2f1-0a6da5275ddc",
-      "ts": "2026-11-24T11:15:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-2026-11-24-1203",
-      "action": "drove idle devin and freebuff panes; Jev note-change selected for both (devin p=0.92 m=0.89, freebuff p=0.92 m=0.84 after duel); Devin running image-daily verification, freebuff thinking on site/CV task",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ddb18ab29cecd97a4cf86d47b02a0f2efcdecfe5",
-      "branch": "main",
-      "frame": "03hamnh02eghdcv168fo9iqc5"
-    },
-    {
-      "id": "46a74723-fcb4-4439-a2e9-c56fef59bd5c",
-      "ts": "2026-11-24T11:04:28Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "tailored Baseten SRE (baseten-site-reliability-engineer, fit 4, en): fetched the live Ashby JD (630 words, isRemote true, SF), wrote jd + letter, packet built CV 2p + anschreiben 1p (14/32 highlights, 4/10 projects). Coverage 74/256. Not submitted — Ashby is a form, hold 2026-12-07, and Germany eligibility stays unconfirmed. Files listed in receipts/baseten-site-reliability-engineer.md. sweep2 untouched.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ddb18ab29cecd97a4cf86d47b02a0f2efcdecfe5",
-      "branch": "main",
-      "frame": "03haml9n5gb5qije8g6cc4t2q"
-    },
-    {
-      "id": "ed0c7973-1143-416e-af82-b86d6f9f6b9d",
-      "ts": "2026-11-24T11:00:55Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-freebuff",
-      "action": "routed next task via Jev task-change duel (p=0.89, m=0.78); pasted CV packet task to freebuff and Enter submitted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
-      "branch": "main",
-      "frame": "03hamkkmycw48mogfhyaqq6rf"
     }
   ]
 }

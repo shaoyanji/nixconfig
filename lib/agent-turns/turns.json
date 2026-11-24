@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-24T21:57:59Z",
+  "generated": "2026-11-24T22:04:50Z",
   "count": 200,
-  "pin": "abbb957c8f350ce898b16a0639c6459281350a37290688b61b585ffe356b3cdf",
+  "pin": "0ca5357682975ed18d47fc784600c637c7075080c5a3a3e4f48252b4b98446c6",
   "turns": [
+    {
+      "id": "7d5dbef4-7cc3-4ed7-90d3-5c83d9e638aa",
+      "ts": "2026-11-24T22:03:33Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: continue delphi job-search scout for DevOps/SRE/Platform/Infra roles into lead tracker, novel routing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4a4dcce116b71f8e2b93475cc967ca4bd867357",
+      "branch": "main",
+      "frame": "03haq60l88uj88gump9j624ku"
+    },
+    {
+      "id": "1dde64c8-574c-49ed-9c58-49c47317e4c8",
+      "ts": "2026-11-24T22:03:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-cv-lane",
+      "action": "landed: continue DevOps/SRE/Platform/Infra engineer lead scouting into tracker, research routing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4a4dcce116b71f8e2b93475cc967ca4bd867357",
+      "branch": "main",
+      "frame": "03haq60j4bhj6qllcj692jm9n"
+    },
+    {
+      "id": "6342377e-cf88-4086-b012-6b5a2e81aeb2",
+      "ts": "2026-11-24T22:03:32Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port-gates",
+      "action": "landed: verify image-daily Go port gates fail on real past regression (drv-equality proved delphi 2128->2132) before they pass, gate-change routing",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4a4dcce116b71f8e2b93475cc967ca4bd867357",
+      "branch": "main",
+      "frame": "03haq60gug08r89vq5ulz9iot"
+    },
+    {
+      "id": "0bc41960-12fe-4a0b-8044-5bf8ccd51b72",
+      "ts": "2026-11-24T21:58:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: sent NETWAYS (jobs@netways.de) and noris (alicia.hanna@noris.de) via Resend, both delivered; Proofline held — posting requires a PR link, packet has none | gate: checks:quick pass, Resend last_event=delivered",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4a4dcce116b71f8e2b93475cc967ca4bd867357",
+      "branch": "main",
+      "frame": "03haq4yhfvavfgjltt1eec3t9"
+    },
     {
       "id": "4fe05059-f818-4009-9d27-579c7904c031",
       "ts": "2026-11-24T21:52:19Z",
@@ -2627,62 +2679,6 @@
       "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
       "branch": "main",
       "frame": "03hamkkmycw48mogfhyaqq6rf"
-    },
-    {
-      "id": "dcc26a09-ff3c-4721-8e35-3f66448d93f1",
-      "ts": "2026-11-24T11:00:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "routed next task via Jev note-change (p=0.80, m=0.60); pasted note task to Devin and Enter submitted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
-      "branch": "main",
-      "frame": "03hamkk3odjl7arbpp1wpt6ax"
-    },
-    {
-      "id": "6796ab2b-1902-45ed-9c99-9d3ca68b0bef",
-      "ts": "2026-11-24T10:50:39Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "tailored 2 of 4: Flink Platform Eng (14/32 highlights) and Pentland Firth Sr Cloud Platform (9/32) now have packets + JD text, recovered via LinkedIn's guest endpoint since the pages carried no JSON-LD. Maesn closed (backend req), Atlas Titan do-not-packet by review. 0 mailed: no address exists — jobs.goflink.com and pentlandfirth.com/careers are forms, no mailto on any page. Letters: 0\n0 built (packet emits CV only). JD coverage 61->73 of 256.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
-      "branch": "main",
-      "frame": "03hamikcyv4wg83yz3sx3de4z"
-    },
-    {
-      "id": "259870d7-bc65-4490-b36e-534ab750fe20",
-      "ts": "2026-11-24T10:50:04Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "followups: 1039 rows queried, pending actions only — 21 overdue, 5 due today, 38 within 7 days. Oldest overdue: Deutsches Klimarechenzentrum (DKRZ)|Codesphere|Max Planck Computing and Data Facility (MPCDF). Today's live item: Genesis PHCM ack follow-up. Prep-only, nothing sent.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hamigab50tqmbkg57unh343"
-    },
-    {
-      "id": "e9213516-a833-4e60-a901-647c98a7a5fc",
-      "ts": "2026-11-24T10:50:04Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: international/remote scout — 1 genuinely new lead, Baseten Site Reliability Engineer (Ashby, remote flag, fit 4, filed en, hold 2026-12-07). Everything else on WWR/Remotive/Ashby boards is already tracked or US-only. Packet built from the JD projection: CV 2p, letter 1p; nothing sent.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hamig8v6tlg8l9nhgknaetv"
     }
   ]
 }

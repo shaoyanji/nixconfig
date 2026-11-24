@@ -5229,5 +5229,88 @@
         "Gap B"/"Gap D" in comments number a retired feature-gap list.
       '';
     };
+
+    next-task-selection-via-jev = {
+      title = "Next-task selection is a jev-decide lane pick, never a free-form judgement";
+      kind = "decision";
+      status = "DELIVERED";
+      priority = "P2";
+      date = "2026-11-23";
+      summary = "Every next-task pick runs through jev-decide on TypeSafe Jev (min-probability 0.8, min-margin 0.15): margin ≥0.3 dispatches straight, anything above the floor duels the top two, and Laya is reached only by transport failure. Jev picks a lane, never the provider for a turn.";
+      from = ["agent-lane-plane"];
+      refs = {
+        modules = ["scripts/task/agent-lane.sh"];
+        tasks = ["agents:lane" "agents:lane:corpus"];
+        docs = [".agents/skills/jevdecide/SKILL.md"];
+      };
+      body = ''
+        Decided 2026-11-23. Every next-task pick is a classified lane pick, not
+        an agent's free-form judgement: `jev-decide classify --provider typesafe
+        --min-probability 0.8 --min-margin 0.15`, the instrument the plane gate
+        already runs. The thresholds are agent-lane.sh's LANE_MIN_PROBABILITY
+        and LANE_MIN_MARGIN, so one knob pair governs both callers.
+
+        Two tiers above the floor. A margin of 0.3 or more is decisive: dispatch
+        the lane and do not ask a second model. A pick that clears 0.15 but not
+        0.3 is `needs_review`: duel the top two candidates only, take the
+        winner, record the loser — two candidates, never a tournament. Under
+        the floor the residue exits 2 and earns a reasoner, unchanged.
+
+        TypeSafe Jev answers first and foremost: the better model (0.966 macro
+        on the public benchmark) is the default and the provider named on the
+        call. Laya is the only local lane — 512-token ceiling, confidence is
+        1−entropy, so these thresholds do not transfer — and only a transport
+        failure reaches it; a 4xx is TypeSafe's own answer, never re-asked of a
+        weaker model. The repo's `local` CLI scores lexical overlap, an offline
+        fallback rather than a lane; Kev-4B has no endpoint by decision.
+
+        Jev picks a lane, never the provider that answers an agent turn — that
+        hook does not exist. Which model runs the classifier is a different
+        question, and it is TypeSafe.
+
+        Exit: `agents:lane` answers a next-task pick with no model call and
+        `agents:lane:corpus` prints decisive/duelled/unresolved. A pick that
+        asks jev for a provider, or a threshold moved to make a corpus look
+        good, means this note is being ignored — re-read it first.
+      '';
+    };
+    job-scout-next-sweep-delphi = {
+      title = "A stack-focused job scout for delphi, and the two leads it cannot yet trust";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Two sweeps added nine employer leads to the delphi record with no applications sent. Six match the fleet's own stack (Nix, Kubernetes, Postgres, FreeBSD); two carry an unconfirmed apply target and one an expired deadline, so the next sweep verifies those before anyone preps a packet.";
+      refs = {
+        tasks = ["apps:dupes"];
+      };
+      body = ''
+        Swept 2026-11-24 against the live 1034-row export, deduped before every
+        write. Nine rows landed as `lead` with a prep-only hold to 2026-12-07:
+        Contensi 5, HMS Analytical 4, Power Plus Communications 4, Tiger Data 4,
+        FourEnergy 3, HENSOLDT/ESG 3, Klara 3, auteega 3, FreeBSD Foundation 2.
+        Mittwald's bare-metal Kubernetes role was refused, not skipped: an
+        `applied` row for that employer already exists.
+
+        Stack-specific finds worth a packet: Tiger Data runs stateful Postgres
+        and Timescale fleets on Kubernetes, remote in the EU; HENSOLDT names
+        NixOS first in its IaC line but is on-site and German-cleared; Klara and
+        the FreeBSD Foundation are the only FreeBSD-native roles found, and both
+        are kernel or admin work rather than operations.
+
+        Open: Tiger Data's Greenhouse board 404s and the req is only confirmed
+        through an aggregator, so its apply URL is the careers page. Klara's
+        LinkedIn copy showed a 30 Oct close while its own careers page still
+        lists the role, so liveness is unproven. Rejected outright: Tailscale
+        (every engineering req is US, Canada or UK), atvari (unpaid internship
+        only), and second roles at Supabase, Mittwald and dtms, all of which
+        already hold a live row.
+
+        Exit: the two soft URLs are confirmed against the employer's own board
+        or dropped, and one more sweep covers Tailscale-adjacent EU-eligible
+        networking roles — the zero-trust mesh skill the fleet runs has no lead
+        on the record at all. A person still sends; agents only prep.
+      '';
+    };
   };
 }

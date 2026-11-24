@@ -22,41 +22,35 @@
     };
   };
 
+  orElse = value: fallback:
+    if value != null
+    then value
+    else fallback;
+
   # gatus requires at least one condition per endpoint. If none are specified,
   # supply type-appropriate defaults based on the URL scheme.
   defaultConditions = url:
-    if lib.hasPrefix "tcp://" url
-    then ["[CONNECTED] == true"]
-    else if lib.hasPrefix "icmp://" url
+    if lib.any (prefix: lib.hasPrefix prefix url) ["tcp://" "icmp://"]
     then ["[CONNECTED] == true"]
     else ["[STATUS] < 400"];
 
   toEndpoint = e:
     {
       inherit (e) name url;
-      interval =
-        if e.interval != null
-        then e.interval
-        else cfg.interval;
-      conditions =
-        if e.conditions != null
-        then e.conditions
-        else defaultConditions e.url;
-      alerts =
-        if e.alerts != null
-        then e.alerts
-        else [
-          {
-            type = "custom";
-            failure-threshold = 3;
-            description = "Health check failed (3 consecutive failures)";
-            send-on-resolved = true;
-          }
-        ];
+      interval = orElse e.interval cfg.interval;
+      conditions = orElse e.conditions (defaultConditions e.url);
+      alerts = orElse e.alerts [
+        {
+          type = "custom";
+          failure-threshold = 3;
+          description = "Health check failed (3 consecutive failures)";
+          send-on-resolved = true;
+        }
+      ];
     }
-    // lib.optionalAttrs (e.group != null) {inherit (e) group;}
-    // lib.optionalAttrs (e.headers != null) {inherit (e) headers;}
-    // lib.optionalAttrs (e.dns != null) {inherit (e) dns;};
+    // lib.filterAttrs (_: v: v != null) {
+      inherit (e) group headers dns;
+    };
 in {
   options.services.fleetMonitors = {
     enable = lib.mkEnableOption "config-declared fleet monitors (gatus backend)";
@@ -223,10 +217,7 @@ in {
         };
         alerting = lib.mkIf cfg.alerting.enable {
           custom = {
-            url =
-              if cfg.alerting.url != null
-              then cfg.alerting.url
-              else "http://127.0.0.1:" + toString cfg.alerting.port + "/alert";
+            url = orElse cfg.alerting.url "http://127.0.0.1:${toString cfg.alerting.port}/alert";
             method = "POST";
             body = "{\"endpoint\": \"[ENDPOINT_NAME]\", \"group\": \"[ENDPOINT_GROUP]\", \"description\": \"[ALERT_DESCRIPTION]\"}";
           };

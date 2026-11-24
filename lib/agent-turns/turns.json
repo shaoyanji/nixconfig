@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-24T21:04:46Z",
+  "generated": "2026-11-24T21:12:10Z",
   "count": 200,
-  "pin": "09ccd51f58a9b212f074b0f574e0c4c8be7a91034f18b22c6eb481517353561b",
+  "pin": "d724d06e5f9595fb456ee54cb334909b9925a313121aa1f5fc1a405c3febd014",
   "turns": [
+    {
+      "id": "3ac9dbc3-2e85-4c45-a3de-fc6dd1710b57",
+      "ts": "2026-11-24T21:11:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: drove idle freebuff pane (agents:2.1) -> build_norway_noris_proofline_packets (jev needs_review p0.59 margin0.19 -> duel send_vs_build selected p1.0 margin1.0, reversible no-send); build JD->Anschreiben->packet for NETWAYS/noris/Proofline unsent; fresh working... counter confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "27521275983829b9e48f1f705b97dc7302c04b0c",
+      "branch": "main",
+      "frame": "03hapvr5dw3tumqbtyuwbv1eq"
+    },
+    {
+      "id": "7856f048-f713-4881-b304-71364047d1a1",
+      "ts": "2026-11-24T21:11:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:chain-change",
+      "action": "landed: drove idle devin pane (agents:1.1) -> continue_feature_chain_refactor (jev needs_review p0.79 margin0.61 decisive>=0.3, top by margin); refactor next shared infra-chain module + gate checks:hosts delphi frieren + commit/push; fresh Thinking spinner confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "27521275983829b9e48f1f705b97dc7302c04b0c",
+      "branch": "main",
+      "frame": "03hapvr3849uhtshspfjybu20"
+    },
+    {
+      "id": "b89eb5e7-97f9-498d-818d-597db42767e5",
+      "ts": "2026-11-24T21:06:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-sweep2",
+      "action": "unblocked: sweep2 was ATS URL handling, not the send path. 4 rows repointed from arbeitnow pages to their join.com forms (all 200); JDs imported for them; Livello needs a EUR 45-50k decision. himalaya/API/apps:sent all work; typst absent so packets build on frieren; the 2026-12-07 hold is the only real gate. New leads: SIX 5, AKB 4, x-tention 4. | gate: issues [] + docs-budget 0 + taskfile-graph 0 + pre-push PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hapus5omj6a6vv23libdzng"
+    },
     {
       "id": "a8fb37f2-42d9-4529-bd4a-417fbd602d09",
       "ts": "2026-11-24T21:04:01Z",
@@ -2646,45 +2685,6 @@
       "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
       "branch": "main",
       "frame": "03hamgwt2xdy0r7ly7uvbtlfx"
-    },
-    {
-      "id": "1223068b-3b36-41b5-8674-08b0b0f22e91",
-      "ts": "2026-11-24T10:42:10Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "re-driven: freebuff (agents:2) idle after kinexon resolved (10:26). jev-decide first pass needs_review (cv_tailor_fresh p=0.58, margin 0.26 NOT decisive <0.3); duel won cv_tailor_fresh p=0.98 margin=0.96: tailor CV + cover letter for 4 leads from job-scout-fresh. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
-      "branch": "main",
-      "frame": "03hamgwrke81fbv3aemkgrzbk"
-    },
-    {
-      "id": "3d522a46-5bb6-4d14-a552-57cfc00df7f6",
-      "ts": "2026-11-24T10:42:10Z",
-      "source": "hermes",
-      "subject": "nixconfig:image-daily-fold",
-      "action": "re-driven: devin (agents:1) idle after hm-chain-polish done (10:30). jev-decide first pass needs_review (static_serve p=0.72, margin 0.44 decisive >= 0.3, top by margin): fold static-serve into tools/os umbrella. Pane Thinking.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
-      "branch": "main",
-      "frame": "03hamgwq4g0t4yaruttc79t1j"
-    },
-    {
-      "id": "931552ad-d5be-4d5f-891b-999f6db2b833",
-      "ts": "2026-11-24T10:41:04Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-fold",
-      "action": "landed 8eed237a (prior turn): static-serve folded into tools/os umbrella as internal/serve; serve/static-serve domains + argv[0] alias; .#servers now carries static-serve | gate: nix build .#cli.serve.static-serve Range 206/GET 200, checks:tasks parity, go vet/test",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
-      "branch": "main",
-      "frame": "03hamgp03bnco4i557ex27vnk"
     }
   ]
 }

@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-24T06:39:09Z",
+  "generated": "2026-11-24T07:01:09Z",
   "count": 200,
-  "pin": "087097d5e4b285f2283043998a3996e9bc964fe9c920382215af813ae8b20df7",
+  "pin": "fbfdabe88c0df9a01feb1eb540279053568acd94176f4ab31482d61d5c082fa4",
   "turns": [
+    {
+      "id": "785f8d61-3bef-42cf-b11e-2729f8f30b8a",
+      "ts": "2026-11-24T06:59:45Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-2026-11-24h",
+      "action": "Scout round: 2 new leads added -> Cloudflare Senior Software Engineer - Kuberne (Distributed; Hybrid); Platform.sh Senior Site Reliability Engineer (Remote • Australia, Indi). Gate: apps:dupes [] , apps:overview 923 rows, git dirty 26 unchanged. No repo commit: tracker writes go to the delphi apps API only (no file in the tree), so the gate is the proof. Earlier board passes rejected 4 off-domain rows (space/grid/M365) and settled a MongoDB dupe from a parallel scout.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hal9gn764thg72e6xb0sltu"
+    },
+    {
+      "id": "e49ff025-dd7c-42cb-ab2c-84e41ece8a99",
+      "ts": "2026-11-24T06:41:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-scout-2026-11-24d",
+      "action": "Followups: (1) DATATRONiQ email drafted (205 w, remote-terms question + 13-host NixOS fleet pitch) at ~/.local/state/appflow/drafts/ - not sent. (2) Claranet Italia rejected: JD requires Italian residency; Next Digital flagged Spain-only. (3) Swiss boards: swissdevjobs RSS (362 items) added MediData Platform Eng, UMB Sr Linux/K8s, Vitodata DevOps (all remote-tagged); devjobs.de hit is SEW-Eurodrive hybrid; GermanTechJobs is JS-only. apps:dupes []; 915 tracked.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hal5tteekcamr6jy796asya"
+    },
+    {
+      "id": "5696a556-f7b8-46c8-b987-922dc1955adf",
+      "ts": "2026-11-24T06:40:12Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "landed: verified Go port green, deleted retired engine.sh, pointed dispatcher/lib/gate comments at tools/image-daily; also landed one-os-cli note (ports fold into one binary, internal/<domain>, argv[0] aliases keep .#cli.<family>.<tool>) | gate: images:gate ok, checks:quick PASS, agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "scripts/task/image-daily-engine.sh",
+        "scripts/task/image-daily.sh",
+        "scripts/task/image-daily-lib.sh",
+        "scripts/task/image-daily-gate.sh",
+        "AGENTS.nix"
+      ],
+      "base_commit": "451f69dfec95a871a3a664c3a0e31a4951536f71",
+      "branch": "main",
+      "frame": "03hal5n5abl86rxaehq4496ln"
+    },
     {
       "id": "99855cb5-ffc6-4be2-b9bc-b035a8d9e7de",
       "ts": "2026-11-24T06:37:15Z",
@@ -2650,45 +2695,6 @@
       "base_commit": "0d437915f201a296da1c07c47d95760d68809024",
       "branch": "main",
       "frame": "03haeai746copjgm6g8cfgiar"
-    },
-    {
-      "id": "3e477b87-9508-4e27-a49b-40c1c4de49d8",
-      "ts": "2026-11-23T09:29:15Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-pane-0-0-1",
-      "action": "landed: comment-audit follow-up (route durable whys to notes/docs + checks:quick); devin 0:0.1 accepted the task (Thinking line confirmed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
-      "branch": "main",
-      "frame": "03hae9da30smcerknqo70x6b6"
-    },
-    {
-      "id": "4beac870-7033-4109-a22e-17dfb6ce33eb",
-      "ts": "2026-11-23T09:28:42Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-pane-0-2-1",
-      "action": "landed: images publish surface verify + no-spend guard; delphi freebuff 0:2.1 over ssh tunnel accepted the task (working line confirmed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
-      "branch": "main",
-      "frame": "03hae99fabbsmlm79p0rkqvw6"
-    },
-    {
-      "id": "1e1d4609-fe66-4837-9fee-d67fea5b7dc2",
-      "ts": "2026-11-23T09:28:24Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-pane-0-1-1",
-      "action": "landed: docs site build + site:links gate; freebuff 0:1.1 accepted the task (thinking line confirmed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "61a1f1ba0204bf7bd1d451299c93b4916a2b726e",
-      "branch": "main",
-      "frame": "03hae978j7ecplb9tsclmyf9k"
     }
   ]
 }

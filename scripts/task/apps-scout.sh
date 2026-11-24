@@ -23,7 +23,8 @@ db="$root/scripts/task/apps-db.sh"
 usage() {
   cat >&2 <<'EOF'
 usage: apps-scout.sh --family F --company C --role R --summary S
-                     [--owner O] [--status S] [--url U] [--fit 1-5] [--id ID] [--dry]
+                     [--owner O] [--status S] [--url U] [--fit 1-5] [--next-action N]
+                     [--id ID] [--dry]
 
   --family   devops | sre | platform | infrastructure (required; case-insensitive)
   --company  employer as it writes it (required)
@@ -33,13 +34,14 @@ usage: apps-scout.sh --family F --company C --role R --summary S
   --status   override the derived status; the stage still follows it
   --url      application URL
   --fit      1-5, the same scale the tracker uses
+  --next-action  the one thing this lead needs next; lands with the row, not after it
   --id       reuse a scan's slug instead of the company+role default
   --dry      print the record and write nothing
 EOF
 }
 
 family=""; company=""; role=""; summary=""
-owner="agent:apps"; status=""; url=""; fit=""; id=""; dry=0
+owner="agent:apps"; status=""; url=""; fit=""; id=""; next_action=""; dry=0
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -51,6 +53,7 @@ while [ "$#" -gt 0 ]; do
     --status) status=${2:-}; shift 2 ;;
     --url) url=${2:-}; shift 2 ;;
     --fit) fit=${2:-}; shift 2 ;;
+    --next-action) next_action=${2:-}; shift 2 ;;
     --id) id=${2:-}; shift 2 ;;
     --dry) dry=1; shift ;;
     -h | --help) usage; exit 0 ;;
@@ -88,6 +91,9 @@ args=(--company "$company" --role "$role" --status "$status" --notes "$summary"
   --origin "scout:$family")
 [ -n "$url" ] && args+=(--apply-url "$url")
 [ -n "$fit" ] && args+=(--fit "$fit")
+# The next action rides the same write: a lead with no next action is a row
+# nobody will move, and a second call is a window where it sits without one.
+[ -n "$next_action" ] && args+=(--next-action "$next_action")
 [ -n "$id" ] && args+=(--id "$id")
 [ "$dry" = 1 ] && args+=(--dry)
 

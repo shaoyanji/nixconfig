@@ -46,15 +46,15 @@ tasks:
   # the one-line summary is the notes, and the owner rides the status line
   # because the table has none — where list and search can see it.
   apps:scout:
-    desc: Record one scouted lead — --family, --company, --role, --summary required (--owner, --status, --url, --fit, --id, --dry)
+    desc: Record one scouted lead — --family, --company, --role, --summary required (--owner, --status, --url, --fit, --next-action, --id, --dry)
     summary: >
       One lead a sweep found. `--family devops|sre|platform|infrastructure`,
       `--company`, `--role` and `--summary` are required; `--owner` defaults to
-      `agent:apps`; `--status`, `--url`, `--fit 1-5` and `--id` are optional.
-      Summary goes to `notes`, family to `origin` `scout:<family>`, and the status
-      defaults to `lead (scout <family>, owner <owner>)` — the table has no owner
-      column, so it rides the status line where list and search show it. The same
-      company and role updates one row. Exit 2 = bad input; `--dry` prints only.
+      `agent:apps`; `--status`, `--url`, `--fit 1-5`, `--next-action` and `--id`
+      are optional. Summary goes to `notes`, family to `origin` `scout:<family>`;
+      the status defaults to `lead (scout <family>, owner <owner>)` — no owner
+      column, so it rides the status line where list and search show it. The
+      same company and role updates one row. Exit 2 = bad input; `--dry` prints only.
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" bash scripts/task/apps-scout.sh {{.CLI_ARGS}}
 

@@ -160,20 +160,10 @@ fallback_providers:
   # handshake plus a rejection before reaching the lane that actually answers —
   # a 3-hop failover for a one-word reply. The near, unthrottled lane belongs
   # where the throttle fires.
-  # DeepSeek-v4-flash is the first fallback on the CrowLLM route. Probed
-  # 2026-11-23: `GET <base>/models` lists `deepseek-v4-flash:free`; chat
-  # completions returned 503 (temporary overload) on two attempts, so the lane
-  # stays in the chain and is skipped at runtime until the provider recovers —
-  # it is not removed. The next CrowLLM lanes remain the 550b nemotron and the
-  # qwen omni flash; if deepseek also 5xx's, re-probe before blaming the key.
-  - provider: custom
-    model: deepseek-v4-flash:free
-    base_url: https://crowllm.com/v1
-    key_env: CROWLLM_API_KEY
-  - provider: custom
-    model: minimax-m3.1-flash:free
-    base_url: https://crowllm.com/v1
-    key_env: CROWLLM_API_KEY
+  # CrowLLM free lanes (probed 2026-11-24). The live /models catalog lists
+  # only three surviving :free models: the 550b nemotron, crow-roleplay, and
+  # laguna-xs-2.1-uncensored. deepseek-v4-flash / minimax-m3.1-flash were
+  # decommissioned; qwen3-8-omni-flash no longer answers — all dropped.
   - provider: nvidia
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: openrouter
@@ -187,7 +177,11 @@ fallback_providers:
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
   - provider: custom
-    model: qwen3-8-omni-flash:free
+    model: crow-roleplay:free
+    base_url: https://crowllm.com/v1
+    key_env: CROWLLM_API_KEY
+  - provider: custom
+    model: laguna-xs-2.1-uncensored:free
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
   - provider: custom

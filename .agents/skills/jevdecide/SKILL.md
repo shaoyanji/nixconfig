@@ -27,6 +27,14 @@ Do not use it to write, summarise, plan or explain: it returns a label.
 transport failure (HTTP/dns/tls/timeout/connection/missing key) retries once on
 the other provider. Request-side errors never retry.
 
+The **openrouter fallback lane uses `perplexity/pplx-decider-v1.3:free`**
+(probed 2026-11-24: exit 0, selected @ 0.87, ~0.35 s, zero cost). When the
+primary (typesafe) fails and the retry lands on openrouter, the wrapper pins
+that model unless the caller passed `--model` explicitly. Override the model
+with `JEV_OPENROUTER_MODEL`; an explicit `--model` in argv always wins. The
+missing-key error string is `Set <NAME>_API_KEY …` (underscore) — the wrapper
+matches `Set *API*` so a missing primary key triggers the openrouter retry.
+
 ```bash
 # 1. Classify one text against described labels
 jev-decide classify --provider typesafe --text "…" --criteria /tmp/labels.json

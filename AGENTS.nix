@@ -5393,53 +5393,51 @@
       '';
     };
     job-scout-lane-state-2026-11-24 = {
-      title = "Six employers sit at stage lead after the 2026-11-24 sweeps; HITS.nrw takes the German letter";
+      title = "The boards are mined out, so the lane tailors HITS.nrw's CV and German letter";
       kind = "open";
       status = "OPEN";
       priority = "P3";
       date = "2026-11-24";
-      summary = "Lane state after the three 2026-11-24 sweeps (164af385, 7b40455e): HITS.nrw, Shipzero and Wellis at fit 4, TecTake, Studytube and Projektron at fit 3, every row still stage lead. HITS.nrw goes first as the only fit 4 German role on own-fleet Linux; Wellis and Studytube wait on the NL call, not on tailoring.";
+      summary = "The lane turns from sweeping to tailoring: arbeitnow's sixteen pages, the Greenhouse/Lever/Ashby/Personio/Recruitee boards and remotive are exhausted, RemoteOK and BA jobsuche answer 403, jobicy/nomads/himalayas/interamt are dead. HITS.nrw (fit 4, Düsseldorf, Linux/K8s app operations, 2 lead rows) is the active target.";
       links = [
+        "job-scout-boards-exhausted-2026-11-24"
         "job-scout-wide-feed-sweep-2026-11-24"
         "job-scout-daily-feed-sweep-2026-11-24"
-        "job-scout-sre-platform-sweep-2026-11-24"
       ];
       refs = {
         modules = [
           "scripts/task/apps-scout.sh"
           "taskfiles/apps.yml"
         ];
-        tasks = ["apps:scout" "apps:get" "apps:query"];
+        tasks = ["apps:scout" "apps:update" "checks:quick"];
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-        Eight rows, six employers, every one at `stage lead`: the 164af385
-        daily sweep added Shipzero, Wellis and Projektron, and the 7b40455e
-        wide sweep added HITS.nrw, TecTake and Studytube on top.
+        The boards are mined out, so this lane stops sweeping and tailors.
 
-        HITS.nrw   Düsseldorf  Linux and K8s app operations   fit 4
-        Shipzero   Hamburg     AI Platform Engineer           fit 4
-        Wellis     Rotterdam   DevOps/Platform, on-site NL    fit 4
-        TecTake    Igersheim   Senior Infrastructure          fit 3
-        Studytube  Amsterdam   Cloud Engineer, on-site NL     fit 3
-        Projektron Berlin      Cloud Engineering, German C1   fit 3
+        Exhausted: arbeitnow's sixteen pages, the Greenhouse, Lever,
+        Ashby, Personio and Recruitee boards by family, and remotive's
+        devops feed. Blocked, not empty: RemoteOK and BA jobsuche answer
+        403 from this host. Dead: jobicy, Working Nomads, Himalayas,
+        interamt. A further pass would re-read the same postings.
 
-        HITS.nrw goes first: the only fit 4 in Germany whose day is
-        own-fleet Linux and Kubernetes, and the German ad wants a German
-        letter. Shipzero's packet is built and waits on the employer ATS
-        behind join.com. Wellis and Studytube wait on the Netherlands call,
-        not on tailoring. TecTake's centre is Microsoft identity, and
-        Projektron is gated on C1.
+        Active target: HITS.nrw — Hochschul-IT-Services.nrw, Düsseldorf,
+        Application Operator / DevOps Engineer, Linux and Kubernetes,
+        fit 4. It is the only fit-4 German role whose day is own-fleet
+        Linux and Kubernetes rather than a vendor estate, and the ad is
+        German, so the application wants a German Anschreiben.
 
-        Drift to close: HITS.nrw and Shipzero each carry two lead rows
-        (`hits-nrw-application-operator-devops` beside the truncated slug,
-        `shipzero-ai-platform-engineer` beside `-f-m-d`), which the
-        one-row-per-employer rule calls a dupe, not a second lead.
+        Next action: tailor the CV to that req and write the German
+        letter. No board sweep runs behind it.
+
+        Drift: HITS.nrw holds two lead rows,
+        `hits-nrw-application-operator-devops` beside the truncated slug —
+        one employer, so one row once the merge lands.
 
         Nothing sends before 2026-12-07, and the lane has no send verb.
 
-        Exit: every row is `applied` with a receipt or closed with a
-        reason, and this note goes DELIVERED.
+        Exit: HITS.nrw is `applied` with a receipt, the duplicate merged,
+        and this note goes DELIVERED.
       '';
     };
     job-scout-boards-exhausted-2026-11-24 = {

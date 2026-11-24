@@ -1,8 +1,88 @@
 {
-  "generated": "2026-11-24T20:06:38Z",
+  "generated": "2026-11-24T20:33:08Z",
   "count": 200,
-  "pin": "fb1f0966b3be0cce39889aa7325b0c0253139171bd569d3aa2e2930bc5b4d2ef",
+  "pin": "0b194a63b5dab0219af4fee2716d5b89a5eee1c4297a64f2dcc76cfb319f0fe6",
   "turns": [
+    {
+      "id": "5a91f0a9-7d99-4bc9-bf7d-cecb77ebf27c",
+      "ts": "2026-11-24T20:31:14Z",
+      "source": "delphi",
+      "subject": "nixconfig:steward-delphi",
+      "action": "landed: drove idle delphi freebuff pane (agents:3.1, ssh) — jev-decide classify needs_review note-change p=0.78 margin=0.64 (decisive >=0.3, top by margin); pasted note-change task to record delphi job-search lane state; fresh thinking... 2s verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "118315676e142447181668d2c55a744157d9143d",
+      "branch": "main",
+      "frame": "03hapnzcqb590qmji2nf43vo3"
+    },
+    {
+      "id": "445cfffc-e0ac-45b9-b5d3-e3e12580ba2b",
+      "ts": "2026-11-24T20:30:39Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "landed: drove idle freebuff CV lane (agents:2.1) — jev-decide classify needs_review note-change p=0.67 margin=0.46 (decisive >=0.3, top by margin); pasted note-change task to record HITS.nrw as active tailoring target; fresh thinking... 1s verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "118315676e142447181668d2c55a744157d9143d",
+      "branch": "main",
+      "frame": "03hapnv9e2vdfalupafxbqiz2"
+    },
+    {
+      "id": "08ec6443-363c-49e2-b863-c3a14bcf1d65",
+      "ts": "2026-11-24T20:23:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "fix: the curation turn's Treatwell lead was a duplicate — treatwell already holds a hand-submit-ready row; closed treatwell-senior-platform-engineer, so 32 closes stand and 2 leads were added (Workidentity, alphacoders). Fit fill 50/51, LITEF role 'unknown' left null. | gate: dupes exit 1 unchanged, null-fit query n=1 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hapmitg27aaflqw90t5hsdz"
+    },
+    {
+      "id": "a2b15e73-fbad-46cf-879a-03e8c86abd40",
+      "ts": "2026-11-24T20:23:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "curate: 615 live rows / 501 distinct URLs swept; 32 dead lead+prep rows closed (404/410/expired/filled); 49 live fits filled and 11 corrected by role family; 3 verified leads added (Workidentity, alphacoders, Treatwell). Unverifiable (429/403/000) reported, not closed. | gate: query stage=other n=32 for the close set, apps:dupes unchanged PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hapmgk50wit86fcj1000i3q"
+    },
+    {
+      "id": "31b4f58e-79f6-48e3-aa7e-fc8a9ab88481",
+      "ts": "2026-11-24T20:15:54Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "landed: drove delphi freebuff pane (agents:3.1, ssh) — jev-decide routed curate_tracker (initial scout_new_leads 0.41/margin 0.08 → duel curate_tracker 0.65/margin 0.30 decisive); pane now working... on job-search tracker curation",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "118315676e142447181668d2c55a744157d9143d",
+      "branch": "main",
+      "frame": "03hapkzjsv12lvdoerramo1w0"
+    },
+    {
+      "id": "dd2249fd-a825-4da7-8520-a7257d0203b9",
+      "ts": "2026-11-24T20:10:07Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: apps:search could not resolve an employer name. It now strikes legal/place/industry/role words and matches the brand token against the company column, ranked by hits; a brandless query keeps the whole-row AND. 'CHECK24 Vergleichsportal', 'Rheinmetall GmbH', 'b1 systems gmbh', 'Univention GmbH' resolve to one row; 'SUSE Software Solutions Germany GmbH', 'giant swarm', proxmox stay empty. netcup, Eficode, mogenius prove search->get. | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "118315676e142447181668d2c55a744157d9143d",
+      "branch": "main",
+      "frame": "03hapjutnorcbk8zrn611smoo"
+    },
     {
       "id": "04a21250-3d46-4182-b4ee-8e11a7071c0e",
       "ts": "2026-11-24T20:06:20Z",
@@ -2615,88 +2695,6 @@
       "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
       "branch": "main",
       "frame": "03hamafezmn74csokszsv1hka"
-    },
-    {
-      "id": "3831e990-69d0-497e-888f-333aa8cd5490",
-      "ts": "2026-11-24T10:05:35Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: scout sweep 2026-11-24 — 5 new leads written (Contensi fit5, HMS Analytical 4, PPC 4, FourEnergy 3, auteega 3), 3 shortlisted; already tracked and not re-added: Mittwald (applied), TransnetBW, inovex, smartclip, Contabo, Qonto, Codesphere, AEB, DACHS, HiSolutions. Gate apps:dupes PASS. No repo change; prep-only to 2026-12-07, nothing sent.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03ham9rhzb8iekby2otewo7p4"
-    },
-    {
-      "id": "bb252d90-b3cb-44f2-a098-84f6778b4e2e",
-      "ts": "2026-11-24T10:04:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward:pane-drive-freebuff-delphi",
-      "action": "drove delphi freebuff agents:3.1 over ssh tunnel with job-search task; pane accepted task and is working; leads + xs pending",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham9is90ujy5dfdg6puwlrf"
-    },
-    {
-      "id": "7a328679-1960-47af-ac36-1e19b208d22e",
-      "ts": "2026-11-24T10:04:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward:pane-drive-freebuff-local",
-      "action": "drove freebuff agents:2.1 with publish task; pane accepted task and is thinking; CV sync + CV gates + xs pending",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham9iq33jpikpx6wff9zur9"
-    },
-    {
-      "id": "61a8ce37-8038-4986-9da0-394d654a1438",
-      "ts": "2026-11-24T10:04:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward:pane-drive-devin",
-      "action": "drove devin agents:1.1 with task-change refactor task; pane reports task already landed at aa0535f2, chain-split closed; gate checks:host HOST=frieren PASS, drv-equality 30/30 identical; no new commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham9io4x4w04sd8e0f5opdc"
-    },
-    {
-      "id": "a817caae-30e6-4789-abe9-5abb487fa624",
-      "ts": "2026-11-24T09:57:02Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: sweep-2 upsert verified — 5 leads on record, 0 re-inserted (VISPIRON 5, SPECTRUM 4, Livello 4, NDI 3, hellomed 3); attention queue: 3 status changes (GoCardless rejected, INIT email refused, ISGUS consent pending); Postman ack has no row. Gate apps:dupes PASS. No repo change; prep-only to 2026-12-07, nothing sent. Closes hermes dispatch 09:54.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03ham83cqd4ck9v08d50ekf9h"
-    },
-    {
-      "id": "da7d1cf8-2e51-49be-bc83-9a004be034dd",
-      "ts": "2026-11-24T09:56:39Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-split",
-      "action": "claim complete: profiles/global chain audit closed — split dell-dock+battery-charge-limit to 3 setters, deduped sops-nix/boot/xs-notify (9389785c, aa0535f2); kept honest composites (base-node floor, desktop-client, steamos, hm-shared) | gate: drv-equality 30/30 identical, checks:tasks parity",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aa0535f2c06da48bac4108f8d1cec51fdbc9f522",
-      "branch": "main",
-      "frame": "03ham80nu2zqcdtdh985mmv75"
     }
   ]
 }

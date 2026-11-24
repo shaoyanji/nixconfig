@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-24T17:24:10Z",
+  "generated": "2026-11-24T18:22:10Z",
   "count": 200,
-  "pin": "750ad80c78dff9d0b1e925851013b65988310c40fd42db216e1a79b689833c9c",
+  "pin": "b677c9905df5c6554b28ceeeee9d5438a3444896e163378d20798116c2a0769b",
   "turns": [
+    {
+      "id": "b1f55fe3-ff0f-4a1f-86d6-e64b47b38125",
+      "ts": "2026-11-24T18:21:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep",
+      "action": "landed: SRE/platform sweep — 3 fresh leads scouted: Makersite Senior SRE (remote DE, EUR 80-100k, Recruitee form), Catapult Sports Senior DevOps (Cologne, self-hosted + AWS Kubernetes, Greenhouse), Dymatrix Platform Architect (Stuttgart/Hamburg/Karlsruhe, employer form). Orbem, Enpal, n8n, Nebius, Attio, ClickHouse already on file. Note job-scout-sre-platform-sweep-2026-11-24 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6ad52fde61b7e9b72a6f325a9a055ed61e94957",
+      "branch": "main",
+      "frame": "03haoynvcjrfe3zb0oge9csdy"
+    },
+    {
+      "id": "e3b236e7-dc39-46bd-82cc-1c30f32794b2",
+      "ts": "2026-11-24T18:15:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward:delphi-jobsearch",
+      "action": "landed: delphi freebuff lane driven — scout 2-3 new DevOps/SRE/Platform/Infra openings with links (routed novel via jev-decide)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "723c6c53bde43b32712f11cf36df58d580365264",
+      "branch": "main",
+      "frame": "03haoxhohzaa21bhxxu377ifu"
+    },
+    {
+      "id": "5652dfe5-cc71-4b81-a54e-403b5d02e795",
+      "ts": "2026-11-24T18:15:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward:freebuff-cv",
+      "action": "landed: freebuff CV lane driven — scout 2-3 DevOps/SRE/Platform/Infra leads and note them (routed note-change via jev-decide)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "723c6c53bde43b32712f11cf36df58d580365264",
+      "branch": "main",
+      "frame": "03haoxhln5d0w6y9xtgdzwc02"
+    },
+    {
+      "id": "89d378a1-29cf-463c-ad0d-b00ad7b1e18e",
+      "ts": "2026-11-24T18:15:35Z",
+      "source": "devin",
+      "subject": "nixconfig:steward:devin",
+      "action": "landed: devin driven — continue image-daily Go port verification + AGENTS.nix note (routed note-change via jev-decide)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "723c6c53bde43b32712f11cf36df58d580365264",
+      "branch": "main",
+      "frame": "03haoxhils3hjszi5b88w6qi1"
+    },
+    {
+      "id": "8710674d-6ae1-4715-ae3c-24ca9785a2fe",
+      "ts": "2026-11-24T17:24:30Z",
+      "source": "devji",
+      "subject": "nixconfig:hygiene-sops-docsbudget",
+      "action": "landed: sops mirror drift healed (adopted mirror into submodule 32a5f94 — sail/cantrustai/bearer keys); script-budget ceilings cv-blog-check 158->172, infron-check 476->491 | gate: task checks:quick PASS (sops-drift 8/8, policies clean)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "723c6c53bde43b32712f11cf36df58d580365264",
+      "branch": "main",
+      "frame": "03haoni45tdu1x5xcx1goqhh3"
+    },
     {
       "id": "b75a1065-023b-47fc-8156-5820e00edb94",
       "ts": "2026-11-24T17:15:55Z",
@@ -2690,75 +2755,6 @@
       "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03halmmsz5w8kldcbtyqfz0hz"
-    },
-    {
-      "id": "d246b810-1c83-422d-9188-e2925187d05c",
-      "ts": "2026-11-24T08:07:05Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi freebuff (pane 3.1, remote over ssh) idle after a job-search task. jev-decide routed research (16-label needs_review task-change=0.5, duel research-vs-task-change -> research 1.0 margin 1.0 exit 0). Pasted delphi job-search task (scout DevOps/SRE/Platform leads via apps:add, Nix/K8s/Postgres/FreeBSD/Tailscale) via load-buffer/paste-buffer tunnel + Enter; confirmed thinking counter, box in append mode. gate: delphi 3.1 BUSY",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
-      "branch": "main",
-      "frame": "03halmm6zxek9txlcu1848j3b"
-    },
-    {
-      "id": "1035d41d-070d-42be-be0f-ecc43f6d2b74",
-      "ts": "2026-11-24T08:07:05Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:image-daily-fold",
-      "action": "re-driven: devin (1.1) idle after image-daily task, had auto-started an unslop/prose-tells task, so my one-os-cli fold-in paste merged in. jev-decide routed flake-change (16-label selected flake-change 0.99 margin 0.98 exit 0). Task: complete one-os-cli umbrella module + image-daily fold-in (go.mod ledger 68415984). Confirmed BUSY (thinking 1m42s, reading tools/image-daily, modules.toml, nix-registry.nix). gate: devin 1.1 BUSY",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
-      "branch": "main",
-      "frame": "03halmm4sby7ztzbxutsxa89c"
-    },
-    {
-      "id": "23b04e6b-7de7-4a61-b751-f636c8fcca9c",
-      "ts": "2026-11-24T07:59:33Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:job-scout-2026-11-24",
-      "action": "re-driven: CV lane was idle after a prior 2m51s job-scout turn (Muenster follow-ups; advanced interview 2->0, lead 202->212). jev-decide routed the follow-up as research (16-label needs_review note-change=0.37, duel research-vs-task-change -> research 0.99 margin 0.98 exit 0). Pasted pipeline-triage task (work screening 7, triage low-fit leads, prep 12-07 sends) via load-buffer/paste-buffer/Enter; confirmed fresh thinking counter, box in append mode. gate: pane 2.1 BUSY (thinking)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
-      "branch": "main",
-      "frame": "03hall55u0f4rd22e33wcaxso"
-    },
-    {
-      "id": "34f33c15-ef48-4eea-b5f6-04570783d9f8",
-      "ts": "2026-11-24T07:55:52Z",
-      "source": "codebuff",
-      "subject": "nixconfig:appflow-scout-2026-11-24i",
-      "action": "landed: 10 fresh leads — Scalable, Integral De, ARX Robotics, Rocket Factory, Roland Berger, Blackbird Collective, Avelios, Agile Robots, Bertelsmann, IFS; top 3 queued for CV tailoring (Scalable, Integral De, ARX Robotics) | gate: apps:dupes PASS ([]), 994 tracked, dirty paths unchanged",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halkf9mc3fbq1kozruu9y8r"
-    },
-    {
-      "id": "42633f6c-20d8-4e21-9b52-0ae6317bfcc6",
-      "ts": "2026-11-24T07:53:56Z",
-      "source": "codebuff",
-      "subject": "nixconfig:appflow-scout-2026-11-24i",
-      "action": "claim: scout round i, 10 fresh remote DevOps/SRE/Platform leads, dedupe against 984 tracked, queue top 3 for CV tailoring",
-      "outcome": "in_progress",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halk1lm4twjmgl06oobb91d"
     }
   ]
 }

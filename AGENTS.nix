@@ -5432,6 +5432,49 @@
         already tracked or with no live req — and `task checks:quick` green.
       '';
     };
+    job-scout-sre-platform-sweep-2026-11-24 = {
+      title = "Three fresh SRE/platform leads landed; the tracked set already owns the rest";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Evening sweep of devops/sre/platform/infrastructure: Makersite (remote Germany, EUR 80-100k), Catapult Sports Cologne (self-hosted K8s) and Dymatrix Platform Architect are new rows; Orbem, Enpal, n8n, Nebius, Attio, ClickHouse and workidentity were checked and already carry a row, so they close as duplicates rather than being scouted twice.";
+      links = ["job-scout-next-sweep-freebuff"];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "taskfiles/apps.yml"
+        ];
+        tasks = ["apps:scout" "apps:search" "checks:quick"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Swept the four families on 2026-11-24 evening: Greenhouse, Ashby,
+        Lever, Personio and Recruitee boards for employers not yet on file,
+        plus the arbeitnow feed and the employer careers pages of the EU
+        vendors the earlier notes named.
+
+        New rows: Makersite (remote-first within Germany, Berlin/Stuttgart,
+        EUR 80-100k, ISO compliance plus backup RTO/RPO and on-call
+        ownership); Catapult Sports Cologne (Kubernetes across self-hosted
+        clusters and AWS, Terraform/Ansible with GitOps, GitLab CI, GPU
+        clusters — the closest shape to a fleet-shaped Linux platform job
+        this lane has found); and Dymatrix Platform Architect, which is
+        architecture of a marketing-data platform rather than SRE
+        operations.
+
+        Checked and already on file, so closed as duplicates rather than
+        re-scouted: Orbem and Enpal rejected, n8n applied, Nebius, Attio,
+        ClickHouse, Qonto, Swile, workidentity, Xempus and DeepL tracked.
+
+        Route: all three are ATS forms (Recruitee, Greenhouse, the
+        employer's own form), not mailboxes, so a packet cannot leave by
+        mail and the 2026-12-07 hold still governs the sends.
+
+        Exit: all three rows reach `applied` with a receipt, or are closed
+        with a reason; `checks:quick` green.
+      '';
+    };
     lib-pipe-elemat-lambdas = {
       title = "elemAt flip-lambdas in lib/*.nix want an `at` helper or direct calls";
       kind = "open";
@@ -5624,6 +5667,51 @@
         Exit: after the delphi rebuild, repeat the curl pair against
         https://delphi.cloudforest-kardashev.ts.net:8463 and see the same
         403/200 split, then this note can close.
+      '';
+    };
+    devin-lane-image-daily-go-port = {
+      title = "image-daily Go port: ~30 verbs live in tools/os; shell keeps only dispatch, env glue and external-tool shims";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-24";
+      from = ["one-os-cli" "devin-lane-handoff-2026-11-24"];
+      summary = "Port end state: ~30 verbs in tools/os/internal/image behind .#cli.image.daily (argv[0] on the os umbrella); image-daily-*.sh is dispatch + env glue. Open: cloudinary curl in add/blog/gc, ffprobe in wallpaper, systemd-run detach in plates. Maintenance: image-daily-gate.sh greps symbol names in tools/os — renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
+      refs = {
+        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "flake/cli.nix"];
+        tasks = ["checks:image-daily" "checks:images:publish:test" "images:gate"];
+      };
+      body = ''
+        The port's end state (verified 2026-11-24): the spend, judge and
+        publish machinery lives in tools/os/internal/image — manifest,
+        judge, lane, adopt, remaining, share, pending, shapes, reason,
+        archive, resolve, dimensions, landscape, crop, deploy, publish,
+        post, plates, round, lanes, budget, setting, guard, due, parked,
+        record, index, shrink-guard and friends (~30 verbs). The flake
+        answers it as .#cli.image.daily — a symlink onto the `os` umbrella
+        whose argv[0] dispatch selects the image domain — and
+        image-daily-lib.sh resolves the binary via IMAGE_DAILY_BIN, then
+        PATH, then a one-off `nix build` of that attr (fetches from cachix).
+        Shell keeps ~884 lines of dispatch, env/ledger resolution and
+        command shims; `checks:image-daily` (== `images:gate`) and the
+        `checks:images:publish:test` fixture (pinned at 470c9034^) are green.
+
+        Open (deliberately still shell — external-process boundaries, not
+        domain logic): Cloudinary curl ops in add/blog/gc go through
+        scripts/task/cloudinary.sh; image-daily-wallpaper.sh keeps one
+        ffprobe shape check; image-daily-plates.sh's DETACH=1 hands the same
+        loop to systemd-run. If a future slice ports these, each file keeps
+        its dispatch slot — the gate checks the case list against the files
+        in both directions.
+
+        Maintenance point: the gate greps symbol NAMES, not behavior —
+        `modelProvider` + `GEMINI_API_KEY` (gen.go), `unjudgedStreak`
+        (plates.go), `shrinkGuard` (briefs.go). A rename or move of those
+        symbols reads as a removed safeguard and fails the gate with a
+        misleading message; whoever refactors tools/os either keeps the
+        names or updates the gate's greps in the same diff. Exit: close when
+        the residual shims are accepted as shell or ported with the gate
+        updated to match.
       '';
     };
   };

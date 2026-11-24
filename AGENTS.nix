@@ -5571,5 +5571,56 @@
         sweep parses the export before it calls anything new.
       '';
     };
+    job-scout-ats-direct-2026-11-24 = {
+      title = "The ATS sweep: one direct employer left, and the boards are drained";
+      date = "2026-11-24";
+      kind = "open";
+      priority = "P3";
+      status = "OPEN";
+      summary = "Eight sources no earlier sweep touched — Bundesagentur Jobsuche, seventy Greenhouse/Lever/Ashby boards, Personio and Recruitee feeds, BerlinStartupJobs, Remotive, RemoteOK and two LinkedIn queries — left exactly one untracked fit: STATWORX Cloud Engineer in Frankfurt, filed at lead with fit 3.";
+      from = ["job-scout-linkedin-direct-2026-11-24"];
+      refs = {
+        tasks = ["apps:add" "apps:dupes"];
+      };
+      body = ''
+        Ran 2026-11-24 against the 1,120-row tracker, 829 normalized
+        employers, after the LinkedIn pass of the same day filed three.
+        The premise was that the boards were saturated because they were
+        the same boards, so this pass changed the sources instead: seventy
+        ATS slugs (Greenhouse, Lever, Ashby), Personio and Recruitee XML
+        feeds, BerlinStartupJobs, Remotive, RemoteOK, and two
+        Bundesagentur queries.
+
+        What it found: STATWORX, Cloud Engineer, Frankfurt am Main —
+        Personio 2589996, created 2026-04-01, still listed. One row. The
+        matches were otherwise all employers that already hold a row:
+        Helsing and Isar Aerospace (defence and launch, both tracked),
+        SumUp (applied), AutoScout24 (the tracked Scout24 row).
+
+        Two instruments, two readings worth keeping. The Bundesagentur
+        Jobsuche API answers 403 "No match found for request" from this
+        host for every keyword, and one query died on a connection reset,
+        so the largest German board is unreachable here and the note does
+        not pretend to have searched it. And the dedupe compares
+        normalized names, so `solarisbank` does not match the tracked row
+        for `Solaris`: a Greenhouse SRE at Solaris Berlin survived the
+        filter as "new" and was caught by grepping the tracker, not by the
+        script. Grep the employer name before filing, not just the export.
+
+        Refused, with the reason on the row: AutoScout24 Senior System
+        Engineer macOS is endpoint management rather than service
+        reliability, and Univention's Senior IT-Projektmanager
+        Infrastruktur is project management over that same openDesk
+        ecosystem. ZenDiS would be the good one — sovereign openDesk
+        infrastructure in Berlin — but its careers page is a client-side
+        render with no feed and no Personio board, so it stays in the gap
+        note rather than being guessed at.
+
+        Exit: the others stay at lead until the 2026-12-07 hold. The next
+        pass adds sources, not keywords — the German board gap is the BA
+        API and ZenDiS' JS-only page, and a keyword sweep over the same
+        ATS list will keep returning the same drained pool.
+      '';
+    };
   };
 }

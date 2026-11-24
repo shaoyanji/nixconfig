@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-24T20:51:11Z",
+  "generated": "2026-11-24T20:57:34Z",
   "count": 200,
-  "pin": "158ab218290c30334003942648e87f5c7a981938b9327d0b4d78a7f6625817f4",
+  "pin": "2bf5fe14f9d5991bf2c3ed4bca378c42cd10f002746932ff2f5a9ac8e5e8d102",
   "turns": [
+    {
+      "id": "ff520208-c237-4f7c-9509-134b0389c933",
+      "ts": "2026-11-24T20:57:29Z",
+      "source": "devin",
+      "subject": "nixconfig:explabs-fallback",
+      "action": "landed: xpl lane committed+pushed (submodule + mirror + config + infron allowlist + budget) | pending: frieren deploy + hermes-gateway restart (queued next)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
+      "branch": "main",
+      "frame": "03hapt3zgyf1w8oh7nb3s2sgw"
+    },
+    {
+      "id": "24295c78-89a9-4249-a8da-d9a4e647e16b",
+      "ts": "2026-11-24T20:55:51Z",
+      "source": "tmux-steward",
+      "subject": "nixconfig:steward-idle-drive",
+      "action": "drove 2 idle job-search lanes (post-20:46 drive): freebuff agents:2.1 -> follow_up_leads (jev needs_review p0.62 margin0.30 decisive>=0.3, top by margin); delphi agents:3.1 ssh -> new_board_sweep (jev needs_review p0.60 margin0.34 decisive>=0.3, top by margin). Both verified working: freebuff working...13s, delphi working...14s.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9f7a1501e7485f8598a969fa117f5db38d91e3a",
+      "branch": "main",
+      "frame": "03hapssfvit7ubpgpmxj4pqmq"
+    },
+    {
+      "id": "721150a5-07c3-4fbb-bc66-679742269d7c",
+      "ts": "2026-11-24T20:51:20Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "scout: filed 5 leads on delphi (origin scout-2026-11-24) — Swissquote SRE Cloud Ops, Julius Baer K8s Platform Eng, vCluster Labs AI Infra Eng at fit 4; Cloudflight SRE and PORR Sr Platform Eng at fit 3. Marquee names already held; GitLab/Canonical/Maze/Flox closed by application or rejection; FiveSquare/INWX/SerNet/Scarf/Hornetsecurity careers pages unfetched, not empty. No sends. | gate: agentsNotes.issues [] + docs-budget rc=0 + taskfile-graph rc=0 + pre-push PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haprwmb9wd4xf6iq5levfcm"
+    },
     {
       "id": "454cf942-28d9-4d30-9879-773217d66bb8",
       "ts": "2026-11-24T20:46:54Z",
@@ -2645,49 +2684,6 @@
       "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
       "branch": "main",
       "frame": "03hamdo091m03o4mt1n2k7u28"
-    },
-    {
-      "id": "f808c2f2-40f6-4fa3-95e8-7e6e8e18b24f",
-      "ts": "2026-11-24T10:25:34Z",
-      "source": "hermes",
-      "subject": "nixconfig:hm-chain-polish",
-      "action": "re-driven: devin (agents:1) idle after chain-split task done. jev-decide first pass needs_review (hm_chain_polish p=0.79, margin 0.65 decisive >= 0.3, top by margin): reduce leftover profiles.ai.enable=false profile to pure data (hm-leaf). Pane Thinking.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
-      "branch": "main",
-      "frame": "03hamdnyv7yuw0t3gq6vv0qbc"
-    },
-    {
-      "id": "24b69036-3b02-458c-aaa6-cf59ec7c2372",
-      "ts": "2026-11-24T10:16:03Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "final: commit 774b990a holds only AGENTS.nix (job-scout-next-sweep-delphi, open/OPEN/P3). Earlier frames named 8b299c93 then 8c514757, both rewritten locally before any push to drop a pre-staged action.yml and turns.json. Leads unchanged: nine rows, prep-only to 2026-12-07, nothing sent. gate: nix-instantiate parse PASS, apps:dupes PASS.",
-      "outcome": "done",
-      "claims": [
-        "apps AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hambt400rewjsprjmn349w9"
-    },
-    {
-      "id": "d62b7104-336d-458b-9c48-8840801f4e26",
-      "ts": "2026-11-24T10:15:29Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "corrected: commit 8c514757 carries only AGENTS.nix (job-scout-next-sweep-delphi, open/OPEN/P3); the first attempt pulled in a pre-staged .github/actions/fleet-nix/action.yml and was rewritten before any push. Leads unchanged: nine rows, prep-only to 2026-12-07, nothing sent. gate: nix-instantiate parse PASS.",
-      "outcome": "done",
-      "claims": [
-        "apps AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "8c514757595c992c114d22e2a1bea0e3e2bf0ad8",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hambp5f7z46xa4mykwj0no8"
     }
   ]
 }

@@ -6064,5 +6064,50 @@
         stay held to 2026-12-07.
       '';
     };
+    job-scout-niche-boards-2026-11-24 = {
+      title = "Four employers from the niche boards, one with a deadline before the hold lifts";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Niche sources the lane had not drained — the NixOS jobs board, fossjobs, jobs.ch and vendor careers pages — turned four employers into live leads: OpenNebula Systems, DeepJudge, SysEleven and the BIS. The BIS deadline of 2026-12-04 falls before the 2026-12-07 hold, so it needs a decision rather than a packet.";
+      from = ["job-scout-funnel-widened-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:add" "apps:scout"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Origin scout-niche-2026-11-24. These sources had never been drained:
+        the NixOS jobs board, fossjobs, jobs.ch and developerjobs.ch, and the
+        vendors' own Teamtailor, Personio and Ashby pages.
+
+        OpenNebula Systems — Kubernetes Platform Engineer, remote from Spain
+        only, fit 4, posting open to 2026-12-09. Open-source cloud and edge,
+        RKE2, Go, Terraform, CSI.
+
+        DeepJudge — Site Reliability Engineer, Zurich on-site, fit 4. AI legal
+        search across public and private clouds, Go/Python, GitOps, SLOs.
+
+        SysEleven — SRE Managed Kubernetes, Berlin or 100% remote in Germany,
+        fit 5. Go and Terraform operators, Prometheus/Loki, on-call, German B2.
+        The 2026-11-23 drop recorded no SRE req on the board; there is one now,
+        so this is the same employer resurfacing rather than a new one.
+
+        Bank for International Settlements — SRE, Automation & Resilience,
+        Basel hybrid, fit 4, three-year fixed term, applications close
+        2026-12-04.
+
+        Not new, checked: VirtusLab's Nix Wizard was already a manual lead;
+        Luminovo applied; Parasail holds a live lead; Puzzle ITC's only open
+        role is backend; Cloud&Heat lists nothing infrastructure; the BIT and
+        ZHAW job URLs 404; Rocken and Avacone are agencies, not employers.
+
+        Next: the BIS closes 2026-12-04, three days before the hold lifts, so
+        the hold needs an explicit decision for that one row. Otherwise
+        SysEleven and VirtusLab are the strongest Nix-adjacent targets.
+      '';
+    };
   };
 }

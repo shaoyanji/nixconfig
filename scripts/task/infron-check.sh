@@ -130,6 +130,9 @@ if [ -f "$persona" ]; then
     while IFS= read -r id; do
       case "$id" in
         *:free) ok "persona id $id is :free" ;;
+        # The declared paid lanes carry metered ids — the (route, id) binding
+        # is checked in the fallback loop below; this grep cannot see routes.
+        deepseek/deepseek-v4.1-flash) ok "persona id $id is the declared paid lane (cantrustai)" ;;
         *) bad "persona id $id is not :free — the route bills that id" ;;
       esac
     done <<<"$ids"
@@ -215,6 +218,18 @@ else
     case "$fb_base" in
       *apisfreellm.com*)
         ok "fallback $fb_provider/$fb_model on keyless ${fb_base#https://} — no key, no billing"
+        continue ;;
+    esac
+    # A paid lane is allowed only when the exact (route, id) pair is declared
+    # here — the entry IS the spend decision, like the script-budget ledger.
+    # Sail Research is the designated paid last resort: $5/mo free credit,
+    # deepseek flash at ~$0.05-0.30/M (2026-11-24 pricing).
+    case "$fb_base|$fb_model" in
+      *sailresearch.com*deepseek-ai/DeepSeek-V4.1-Flash-1017)
+        ok "fallback $fb_provider/$fb_model is the declared paid lane (sail, ~$0.30/M out)"
+        continue ;;
+      *cantrustai.xyz*deepseek/deepseek-v4.1-flash)
+        ok "fallback $fb_provider/$fb_model is the declared paid lane (cantrustai)"
         continue ;;
     esac
     case "$fb_provider" in

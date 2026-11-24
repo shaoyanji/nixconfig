@@ -1,8 +1,81 @@
 {
-  "generated": "2026-11-24T15:27:55Z",
+  "generated": "2026-11-24T15:46:29Z",
   "count": 200,
-  "pin": "efc71728bbac991a853009c2083b628f53ebc268b60cc07c63f73721730e0509",
+  "pin": "5a496488232e4c1cf7da3b5f7ca366f54cebe2fdace0cb410980c9418a38ac03",
   "turns": [
+    {
+      "id": "584ca2bc-6579-421b-905b-92d280236325",
+      "ts": "2026-11-24T15:32:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: note delphi-job-scout-send-blocked in AGENTS.nix under the delphi notes. nixconfig:job-scout-fresh is blocked on the send half — task --list-all has no apps:send verb and Flink publishes no mailbox — so a person sends; next is a prep-only DevOps/SRE/Platform/Infra lead sweep held to 2026-12-07, nothing sent. EU careers-page gap + packet order cited from job-scout-eu-vendor-pages-gap-2026-11-24 | gate: checks:kg PASS, agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c47ee74342b601fb734366c9c9481fe5ace1d383",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hao1j3hubquz3t6wuujzsyt"
+    },
+    {
+      "id": "ac79b0a2-7e8f-4f9d-853d-1397cf5ef4c5",
+      "ts": "2026-11-24T15:31:43Z",
+      "source": "vesper",
+      "subject": "job-search:avendis-portal",
+      "action": "Avendis portal application for (Senior) Systems Engineer (w/m/d) Platform, Storage & Backup submitted for Shaoyan Ji. Confirmation 'Wir haben die Bewerbung erhalten. Vielen Dank.' Email confirmation expected at matt@bountystash.com.",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "~/memory/2026-11-24.md"
+      ],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hao1hwqhmsl9nw6g78b58sw"
+    },
+    {
+      "id": "71a017f4-a6a3-44ac-8561-4eec573ac36d",
+      "ts": "2026-11-24T15:31:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive:devin",
+      "action": "drove idle agents:1.1 (devin): Jev classify needs_review; duel margin 0.12 <0.15; drove top-label auth-gate note task; pane shows Typing 8s/BUSY",
+      "outcome": "done",
+      "claims": [
+        "agents:1.1"
+      ],
+      "files": [],
+      "base_commit": "7571dacae3572760d492d6548899de9f75348524",
+      "branch": "main",
+      "frame": "03hao1h7v60dcv4hb5ooelivw"
+    },
+    {
+      "id": "72f567e7-4970-4980-b0d8-f04664c6f31b",
+      "ts": "2026-11-24T15:31:19Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive:freebuff",
+      "action": "drove idle agents:2.1 (freebuff): Jev classify needs_review decision vs task-change; duel task-change p=0.82 margin=0.64 -> drove task-change CV/publish consistency task; pane shows working.../BUSY",
+      "outcome": "done",
+      "claims": [
+        "agents:2.1"
+      ],
+      "files": [],
+      "base_commit": "7571dacae3572760d492d6548899de9f75348524",
+      "branch": "main",
+      "frame": "03hao1e8nu9qwx9l617fd7wwm"
+    },
+    {
+      "id": "d182527e-b8d0-4288-bfda-264e414e7add",
+      "ts": "2026-11-24T15:30:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward:pane-drive:delphi",
+      "action": "drove idle agents:3.1 (delphi freebuff over ssh): Jev classify decisive note-change p=0.6 margin=0.41 -> drove note-change task; first Enter hit released-session dialog, second Enter retried; pane shows thinking.../BUSY",
+      "outcome": "done",
+      "claims": [
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "7571dacae3572760d492d6548899de9f75348524",
+      "branch": "main",
+      "frame": "03hao1b0p6j6hc18kwydc1bj5"
+    },
     {
       "id": "a26b3403-05c2-4c50-a63b-2599801feaf1",
       "ts": "2026-11-24T15:17:46Z",
@@ -2731,73 +2804,6 @@
       "base_commit": "fc9589c62541e6c3a27291eada0bd19b106bd5a9",
       "branch": "main",
       "frame": "03hal100yd6dzsg3z9ae9ocpk"
-    },
-    {
-      "id": "07790a72-73ec-4f66-bab2-ce486183c07d",
-      "ts": "2026-11-24T05:59:15Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-24",
-      "action": "Round 4: EU sweep over arbeitnow (2150 postings) plus 27 EU ATS tokens; 6 new leads at stage=lead (gridscale Ceph SRE fit5, Nebius, Blocktech, GetYourGuide, Coda, virtual7). JD gap: apps:docs:coverage added and 38 ads recovered from the ATS APIs the rows point at; lead coverage 23 -> 61 of 161. Gate checks:quick PASS. Nothing sent.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/appflow-docs.sh; taskfiles/apps.yml; flake/script-budget.nix"
-      ],
-      "files": [],
-      "base_commit": "fc9589c62541e6c3a27291eada0bd19b106bd5a9",
-      "branch": "main",
-      "frame": "03hakxn6fnfj6z57lgi20uywk"
-    },
-    {
-      "id": "205ac4ca-1a2c-4b17-8e48-6cadcf014f1a",
-      "ts": "2026-11-24T05:59:02Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-2026-11-24b",
-      "action": "Scout round 2: swept GH/Ashby/Lever/Workable, Personio, Teamtailor, Himalayas, Remotive, WWR, Arbeitnow, RemoteOK, HN Oct+Nov, NixOS Discourse against 892 tracked rows (620+ employers). Net-new after review: 2 leads — Nord Security DevOps Infra (Nix in JD, Warsaw/Vilnius hybrid), Arden University Platform Engineer (remote UK). Closed 12 junk/mislocated rows; repaired a dupe sweep that over-closed, restored 264 rows; apps:dupes [] again. Nothing sent.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hakxlnpo7tpopc9xppxv9xn"
-    },
-    {
-      "id": "73f97562-a44c-403f-888e-417fe56dcfee",
-      "ts": "2026-11-24T05:53:33Z",
-      "source": "steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove idle freebuff CV agents:2.1 onto job-scout lane (sweep EU career pages + close JD coverage) via load-buffer/paste-buffer/Enter; now working (cv/appflow scripts, working 23s+); devin agents:1.1 BUSY, delphi ssh agents:3.1 BUSY, wallpaper agents:4.1 raw shell daily-done (UNKNOWN, not driveable)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
-      "branch": "main",
-      "frame": "03hakwj4xbdpo3ssd7rvnq1n5"
-    },
-    {
-      "id": "9f7a4351-d5ce-46dc-a020-cbda5c6f68ac",
-      "ts": "2026-11-24T05:41:01Z",
-      "source": "steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove delphi freebuff agents:3.1 via ssh tunnel on job-scout (jevdecide duel novel p=0.86 m=0.72 -> now thinking/working); left freebuff CV agents:2.1 idle (classify novel 0.53, duel task-change 0.64/0.28 = needs_review)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
-      "branch": "main",
-      "frame": "03haku2y1nxjxu1d6xtck3opj"
-    },
-    {
-      "id": "e481476b-1b53-47f9-b7fe-61c713406de3",
-      "ts": "2026-11-24T05:27:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-2026-11-24c",
-      "action": "Scouted fresh infra leads from ATS boards (Greenhouse/Ashby/Lever/Workable/Personio), Remotive, WWR, Arbeitnow, HN Nov+Oct threads; 617 employers already tracked. Added 3 new leads: Cloudflare Senior SWE Kubernetes platform (fit 4), E2B Platform Engineer Prague (3), Buoyant K8s control plane Go/Rust (3). Notes carry years/stack from JD. Closed 7 duplicate live rows (EPAM/Grafana/Scaleway/Flix/Smartclip/SVA) to clear apps-dupes; gate now [], repo 26, nothing sent.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hakreexccdcwkf16hgq4zeh"
     }
   ]
 }

@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 9
+  api_max_retries: 10
   # A stop waits this long for a running cron job before tearing down. The
   # default (30 s) plus adapter teardown crossed the 60 s shutdown watchdog on
   # every stop here, because pane-idle-watch runs for most of its 2-minute

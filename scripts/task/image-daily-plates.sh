@@ -99,7 +99,7 @@ cmd_plates() {
   local roster=${ROSTER:-$repo/lib/image-daily/plates.txt} def_size=${SIZE:-1536x1024}
   [ -f "$roster" ] || die "no roster at $roster"
   if [ "${DETACH:-0}" = "1" ]; then
-    launch_round "$roster"
+    "$(image_daily_cli)" round --roster "$roster"
     return 0
   fi
   local intent cli
@@ -200,7 +200,7 @@ cmd_plates() {
     verdict=$(printf '%s' "$v" | jq -r '.verdict')
     defect=$(printf '%s' "$v" | jq -r '.defect // ""')
     spent=$((spent + 1))
-    record "$day" wall "photoreal-$slug" "$file" "$verdict" "$(reason_of "$v")" "$prompt" 1 1
+    record "$day" wall "photoreal-$slug" "$file" "$verdict" "$("$cli" reason --json "$v")" "$prompt" 1 1
 
     if [ "$verdict" = "reroll" ] && [ -n "$defect" ] && [ "$left" -gt 0 ] &&
       { [ "$cap" -eq 0 ] || [ "$spent" -lt "$cap" ]; }; then
@@ -219,7 +219,7 @@ cmd_plates() {
       defect=$(printf '%s' "$v" | jq -r '.defect // ""')
       spent=$((spent + 1))
       retried=1
-      record "$day" wall "photoreal-$slug" "$file" "$verdict" "$(reason_of "$v")" "$sent" 2 1
+      record "$day" wall "photoreal-$slug" "$file" "$verdict" "$("$cli" reason --json "$v")" "$sent" 2 1
     fi
     say "$slug: $verdict"
     # Two unjudged plates in a row is a dead judge, not a bad image: every
@@ -238,9 +238,9 @@ cmd_plates() {
     # is spent too. `unjudged` is NOT held — it is agy being down or out of
     # quota, and parking the whole roster for a judge outage is the worse bug.
     case $verdict in
-    fail) printf '%s\t%s\n' "$slug" "$(reason_of "$v")" >>"$holds_file" ;;
+    fail) printf '%s\t%s\n' "$slug" "$("$cli" reason --json "$v")" >>"$holds_file" ;;
     reroll) { [ "$retried" -eq 1 ] || [ -z "$defect" ]; } &&
-      printf '%s\t%s\n' "$slug" "$(reason_of "$v")" >>"$holds_file" ;;
+      printf '%s\t%s\n' "$slug" "$("$cli" reason --json "$v")" >>"$holds_file" ;;
     esac
   done <"$roster"
   if [ -s "$holds_file" ]; then

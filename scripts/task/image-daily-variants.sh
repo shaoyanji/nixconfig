@@ -37,7 +37,7 @@ cmd_variants() {
   # chosen render aside first: archiving writes into the same folder it came from.
   local hold=$file.hold.$$
   cp -f "$file" "$hold" || die "could not read $file"
-  archive_prior "$IMAGES_ROOT/published/$rel"
+  "$(image_daily_cli)" archive --file "$IMAGES_ROOT/published/$rel"
   mkdir -p "$(dirname "$IMAGES_ROOT/published/$rel")" "$(dirname "$IMAGES_ROOT/src/$rel")"
   mv -f "$hold" "$IMAGES_ROOT/published/$rel"
   cp -f "$IMAGES_ROOT/published/$rel" "$IMAGES_ROOT/src/$rel"

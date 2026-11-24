@@ -69,7 +69,7 @@ cmd_post() {
 
   record "$day" blog "blog-$slug" "$file" keep "$(printf '%s' "$verdict" | jq -r '.reason')"
   jpg=$IMAGES_ROOT/published/blog/$slug.jpg
-  banner_crop "$file" "$jpg" || die "could not crop the banner"
+  "$cli" crop --png "$file" --jpg "$jpg" || die "could not crop the banner"
   url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$jpg" --public-id "assets/blog/$slug") ||
     die "upload failed"
   say "cloudinary: $url"
@@ -81,7 +81,7 @@ cmd_post() {
   printf 'blog/%s.jpg\t%s\t%s\n' "$slug" "$url" "$(stat -c%s "$jpg")" >>"$tsv.new"
   mv -f "$tsv.new" "$tsv"
   build_index
-  deploy_frontend
+  "$cli" deploy
 
   card=$(bash "$repo/scripts/task/cloudinary.sh" url "assets/blog/$slug" \
     --transform 'f_jpg,q_auto,w_1200,h_630,c_fill')

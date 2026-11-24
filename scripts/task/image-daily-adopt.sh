@@ -10,7 +10,7 @@ cmd_adopt() {
   "$(image_daily_cli)" adopt
   [ "${DRY:-0}" = "1" ] && { say "dry run: nothing added, nothing built"; return 0; }
   build_index
-  deploy_frontend
+  "$(image_daily_cli)" deploy
 }
 
 cmd_adopt "$@"

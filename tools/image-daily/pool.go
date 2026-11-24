@@ -65,30 +65,5 @@ func cmdPending(args []string) {
 		die("pending needs --roster")
 	}
 
-	want := map[string]bool{}
-	if data, err := os.ReadFile(*roster); err == nil {
-		for _, line := range strings.Split(string(data), "\n") {
-			if strings.HasPrefix(line, "#") {
-				continue
-			}
-			f := strings.Split(line, "|")
-			if len(f) < 2 || strings.HasPrefix(f[1], "hold:") {
-				continue
-			}
-			want["photoreal-"+f[0]] = true
-		}
-	}
-	kept := map[string]bool{}
-	for _, e := range readLedger(*root) {
-		if e.Verdict == "keep" {
-			kept[e.Brief] = true
-		}
-	}
-	n := 0
-	for id := range want {
-		if !kept[id] {
-			n++
-		}
-	}
-	fmt.Println(n)
+	fmt.Println(pendingCount(*root, *roster))
 }

@@ -378,7 +378,7 @@ func runManifest(root, repo string) {
 
 func main() {
 	if len(os.Args) < 2 {
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round> [flags]")
 	}
 	switch os.Args[1] {
 	case "manifest":
@@ -408,7 +408,23 @@ func main() {
 		cmdPending(os.Args[2:])
 	case "shapes":
 		cmdShapes(os.Args[2:])
+	case "reason":
+		cmdReason(os.Args[2:])
+	case "archive":
+		cmdArchive(os.Args[2:])
+	case "resolve":
+		cmdResolve(os.Args[2:])
+	case "dimensions":
+		cmdDimensions(os.Args[2:])
+	case "landscape":
+		cmdLandscape(os.Args[2:])
+	case "crop":
+		cmdCrop(os.Args[2:])
+	case "deploy":
+		cmdDeploy(os.Args[2:])
+	case "round":
+		cmdRound(os.Args[2:])
 	default:
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|round> [flags]")
 	}
 }

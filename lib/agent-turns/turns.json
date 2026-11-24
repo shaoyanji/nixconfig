@@ -1,8 +1,92 @@
 {
-  "generated": "2026-11-24T01:11:45Z",
+  "generated": "2026-11-24T01:49:39Z",
   "count": 200,
-  "pin": "8944404bbb436df16c8981c24b796f19d62549672dea58d6d569740beddc00f8",
+  "pin": "27a6b2e0fe6c4c39d5d12e2753fad217171ef09e880b7a7240ef19f279b61788",
   "turns": [
+    {
+      "id": "85f34072-7ebf-4d1b-b640-a25fbf886ee1",
+      "ts": "2026-11-24T01:49:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: 4 new EU/DE leads + packets — gridscale Senior SRE Ceph (Köln, f3), Nebius Sr/Staff SRE server-infra (Berlin|remote, f3), ElevenLabs Core Platform (remote EU, f2), eleQtron IT Systems (Siegen, f2); gate: appflow-packet.sh rc=0 x4, CV 2pp + letter 1pp, nothing sent; note: no apps:sent gate exists, checks:appflow fails on pre-existing role=undiscovered rows",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/"
+      ],
+      "files": [],
+      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
+      "branch": "main",
+      "frame": "03hajkrnz3cmg88a1906gfpkv"
+    },
+    {
+      "id": "74fbfff2-1b1c-460d-8bb9-fb51a9c85cc4",
+      "ts": "2026-11-24T01:42:24Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove 3 idle panes (02:40 CET). jev-decide classify vs router labels.json = needs_review x3 (devin novel p.45, freebuff task-change p.46, delphi task-change p.45) -> fell back to each pane's standing task. devin 0:0.1 continue image-daily engine Go refactor (gate task images:gate+checks:quick, commit origin/main); freebuff 0:1.1 EU/DE job-search scout+packets, no send (apps:sent gate to 12-07); delphi 0:2.1 intl scout+packets, no send. All 3 confirmed working.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
+      "branch": "main",
+      "frame": "03hajjgunb5po6u1p3owptkm0"
+    },
+    {
+      "id": "a530c5fb-f292-4673-a77c-13f20322fe01",
+      "ts": "2026-11-24T01:28:55Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed (private state, no commit): 3 German leads + 7 packets; gate appflow-packet.sh rc=0 x7, CV 2pp letter 1pp, repo clean; done-outcome refused because submissions/ is gitignored so there is no hash",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/"
+      ],
+      "files": [],
+      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
+      "branch": "main",
+      "frame": "03hajgu3oushmmnvi4u2qo55m"
+    },
+    {
+      "id": "18bb1e82-7b28-4046-9772-aa430a20e0c3",
+      "ts": "2026-11-24T01:28:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "claim: job scout — Germany-only pass + 7 packets (n8n, trivago, DeepL, Enpal, Supabase, Dropbox, Docplanner); leads in submissions/ (gitignored), packets in private appflow state",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions/"
+      ],
+      "files": [],
+      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
+      "branch": "main",
+      "frame": "03hajgtabd7781twfcafrvxxj"
+    },
+    {
+      "id": "0621ce21-b98d-472b-9659-42729a870fa1",
+      "ts": "2026-11-24T01:16:39Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove two idle job-search panes (freebuff 0:1.1, delphi 0:2.1) — freebuff runs Germany-only pass + packet build at working...35s, delphi scouting + Pliant packet + dupes gate at working...21s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
+      "branch": "main",
+      "frame": "03hajefqqrtwl2migwab5i2fu"
+    },
+    {
+      "id": "45d7c288-5639-48b6-b8d9-e572fd3d3cce",
+      "ts": "2026-11-24T01:11:57Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily",
+      "action": "landed: build_index shape-cache loop ported to image-daily shapes subcommand (published->src fallback, append-only cache, exact-key skip); engine 267->256 | gate: drv-equality 30/30, checks:host frieren PASS, images:gate ok, checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e1648b074b5472b0e74bab6650614ed9e8259b7",
+      "branch": "main",
+      "frame": "03hajdis50py8cd27bkpljc3i"
+    },
     {
       "id": "060a9112-d20a-4a82-9a06-60e5083876fa",
       "ts": "2026-11-24T01:04:47Z",
@@ -2616,84 +2700,6 @@
       "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
       "branch": "main",
       "frame": "03hadh0m88stcdh7g8zjoscxx"
-    },
-    {
-      "id": "2c71fb13-1abd-47a8-bb87-081fa0a3a2d5",
-      "ts": "2026-11-23T07:03:45Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-delphi-0800",
-      "action": "Re-drove idle delphi freebuff pane 0:2.1 after it built the Kestra packet (prep, held): routed lead-liveness via jev-decide duel (0.75/0.5, decisive margin); sent lead-liveness recheck task (verify live/closed/stale, remote-eligibility, update rows); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03hadgy0q7j534podujltz6p4"
-    },
-    {
-      "id": "3211e8ac-cf45-478e-9567-c3af835017d9",
-      "ts": "2026-11-23T07:03:14Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-freebuff-0800",
-      "action": "Re-drove idle freebuff pane 0:1.1 after it completed the Mittwald submission (applied, confirmed via Recruitee): routed submit-ready-packet via jev-decide duel (0.87/0.74); sent Orbem/Kubermatic submission task (resolve Orbem letter ambiguity, submit, update to applied); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03hadgufyu9mfueppoowncmts"
-    },
-    {
-      "id": "5d10b9de-7a71-4009-afe5-7db70bd1c080",
-      "ts": "2026-11-23T06:33:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-packets-2026-11-23",
-      "action": "landed: scouted 2 new leads (Action1 Staff DevOps, CoachHub DevOps) and built both packets (letter 1p + CV 2p each, JD stored); smartclip and Makersite already had packets, no duplicates | gate: typst 0 warnings + pdfinfo page counts",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadb3rmatllsv1tthp0sus2"
-    },
-    {
-      "id": "566ae639-2db5-4764-9f68-0ec67b5a65c1",
-      "ts": "2026-11-23T06:31:55Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-ptb-kestra-2026-11-23",
-      "action": "landed: PTB HPC application submitted via Softgarden (headful Chromium/Xvfb; Eingangsbestätigung 07:31, msg 311173) and Kestra Lead Tech SRE packet built (letter 1p, CV 2p, JD stored, held unsubmitted) | gate: confirmation mail 311173 + typst 0 warnings",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03hadaq6nelv57o70ls799vle"
-    },
-    {
-      "id": "eb99db52-109c-41b8-9779-92cf6e6e54bc",
-      "ts": "2026-11-23T06:24:16Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-delphi-0705",
-      "action": "Drove idle delphi freebuff pane 0:2.1 (ssh-tunneled): routed build-application via jev-decide (near-tie with lead-liveness, 0.57/0.14 duel); sent Kestra Lead Tech SRE packet-build task (fit 4, strongest new match); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03had98epesnl18n4lkhce74z"
-    },
-    {
-      "id": "cf15e060-83c9-4d04-98e2-7c7cff72e497",
-      "ts": "2026-11-23T06:23:51Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward-freebuff-0705",
-      "action": "Drove idle freebuff pane 0:1.1: routed submit-ready-packet via jev-decide (0.95/0.92); sent Mittwald bare-metal submission task (Recruitee form, attach anschreiben+lebenslauf, name earlier DevOps app); confirmed fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03had95eiavu1epd02dq0dgwf"
     }
   ]
 }

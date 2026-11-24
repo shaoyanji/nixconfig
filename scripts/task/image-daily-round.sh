@@ -49,7 +49,7 @@ cmd_round() { # [status]
       '{state: "idle", reason: "allowance spent; the rows wait for the reset", pending: $p}'
     return 0
   fi
-  launch_round "$roster"
+  "$(image_daily_cli)" round --roster "$roster"
 }
 
 cmd_round "$@"

@@ -8,8 +8,9 @@ source "$here/image-daily-engine.sh"
 cmd_wallpaper() {
   local rotation=$repo/lib/image-daily/rotation.json
   local taste_root=${IMAGES_ROOT%/generated}/taste-test
-  local id reason pick=""
+  local id reason pick="" cli
   local -a approved ids
+  cli=$(image_daily_cli)
   mapfile -t approved < <(jq -r '.wall.in[]?' "$rotation" 2>/dev/null || true)
   command -v ffprobe >/dev/null || die "ffprobe is required to check a plate's shape (pkgs.ffmpeg)"
 
@@ -19,9 +20,9 @@ cmd_wallpaper() {
     for id in "${approved[@]}"; do
       reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
       if [ -n "$reason" ]; then say "skipping $id: $reason"; continue; fi
-      pick=$(resolve_plate "$taste_root" "$id") || { say "skipping $id: no such plate"; continue; }
-      if ! landscape "$pick"; then
-        say "skipping $id: $(dimensions "$pick" || echo unknown) is not landscape"
+      pick=$("$cli" resolve --id "$id" --taste-root "$taste_root") || { say "skipping $id: no such plate"; continue; }
+      if ! "$cli" landscape --file "$pick"; then
+        say "skipping $id: $("$cli" dimensions --file "$pick" || echo unknown) is not landscape"
         pick=""
         continue
       fi
@@ -38,9 +39,9 @@ cmd_wallpaper() {
     for id in "${ids[@]}"; do
       reason=$(jq -r --arg id "$id" '.wall.out[$id] // ""' "$rotation" 2>/dev/null || true)
       [ -n "$reason" ] && continue
-      pick=$(resolve_plate "$taste_root" "$id") || continue
-      if ! landscape "$pick"; then
-        say "skipping $id: $(dimensions "$pick" || echo unknown) is not landscape"
+      pick=$("$cli" resolve --id "$id" --taste-root "$taste_root") || continue
+      if ! "$cli" landscape --file "$pick"; then
+        say "skipping $id: $("$cli" dimensions --file "$pick" || echo unknown) is not landscape"
         pick=""
         continue
       fi

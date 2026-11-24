@@ -50,7 +50,7 @@ cmd_add() { # FILE [URL]
     say "add: $rel -> $url"
   fi
   build_index
-  deploy_frontend
+  "$(image_daily_cli)" deploy
 }
 
 cmd_add "$@"

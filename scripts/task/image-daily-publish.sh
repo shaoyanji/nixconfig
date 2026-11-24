@@ -180,7 +180,7 @@ cmd_publish() {
   say "$(wc -l <"$IMAGES_ROOT/published/urls.tsv") asset(s) on Cloudinary"
   build_index
   publish_shrink_guard
-  deploy_frontend
+  "$cli" deploy
 }
 
 cmd_publish "$@"

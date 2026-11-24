@@ -6196,5 +6196,45 @@
         0 with `[]` (was nine employers); the table holds 1148 rows.
       '';
     };
+    job-scout-dispatch-pass-2026-11-24 = {
+      title = "A send-pending pass exits as dispatches plus one honest refusal: nothing is `sent`";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-24";
+      summary = "41 open rows carry a complete packet and a dispatch file (To, subject, exact body) in ~/.local/state/appflow/dispatch: 5 have a published address, 36 are portal-only. 123 open rows are blocked on a missing artifact, 122 of them the CV. Every row reads UNSENT, because the hold runs to 2026-12-07 and the plane has no send verb — `applied` would assert a mail that does not exist.";
+      from = ["job-scout-send-unblocked-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/apps-db.sh" "scripts/task/appflow-packet.sh"];
+        tasks = ["apps:query" "apps:update" "apps:upsert" "apps:gate:packet"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        A request to mark completed packets `sent` met two facts: the stage is
+        derived from status (`applied` is the only bucket that means "a mail
+        left"), and no mail leaves before 2026-12-07. Writing `applied` with a
+        date would have been a fabricated submission in the fleet's pipeline,
+        so the pass stops one step short and says so.
+
+        What it produced per row: the recipient (row notes, apply_url, and the
+        packet's lead/sheet lines only — matt@ addresses excluded), a subject
+        (letter.json's own, else `Bewerbung als <role>` / `Application —
+        <role>` by language), and the body verbatim from letter.json or the
+        rendered PDF. Status is `Packet ready — dispatch prepared|portal only`,
+        which stages as `prep`; next_action names the address, the 2026-12-07
+        date, the dispatch ref and the file.
+
+        Addresses are the scarce thing: netways (jobs@netways.de), two StackIT
+        rows (recruiting@mail.schwarz) and two Telekom rows
+        (thomas.arbeit@t-systems.com). The other 36 apply through a portal, so
+        their dispatch file points at the URL instead of inventing a mailbox.
+
+        Exit: after 2026-12-07 each row either flips to `applied` on the same
+        day its mail leaves, or the lane records why the address could not be
+        confirmed. The 122 missing CVs are a build backlog, one host per
+        process, not a send problem.
+      '';
+    };
   };
 }

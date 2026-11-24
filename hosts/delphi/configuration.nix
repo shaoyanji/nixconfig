@@ -552,7 +552,7 @@ in {
       # tailnet address, so a wrong zone or a dead daemon both go red here.
       {
         name = "frieren resolver (tailnet)";
-        url = "dns://100.97.61.65:53";
+        url = "100.97.61.65";
         group = "frieren";
         dns = {
           query-name = "dns-probe.frieren.lan";

@@ -493,7 +493,7 @@ in {
   inherit overrides;
   # The precedence as a function, so the gate applies it rather than re-deriving
   # "is this overridden" in a second place.
-  overturns = ids: ids |> lib.filter (id: !(overrides ? ${id}));
+  overturns = ids: ids |> builtins.filter (id: !(overrides ? ${id}));
   overturnedBy = id: overrides.${id} or null;
   overturned = overrides |> builtins.attrNames;
   all = samples |> map review;

@@ -73,6 +73,7 @@ tasks:
       - task: checks:counts
       - task: checks:counts:test
       - task: checks:nix:lint
+      - task: checks:nix:style
       - task: checks:hosts:args:test
       - task: checks:nix:shell
       - task: checks:modules:edges
@@ -1199,6 +1200,18 @@ tasks:
       warning fires on the house style).
     cmds:
       - bash scripts/task/nix-fmt.sh --check --all --tools deadnix,statix
+
+  checks:nix:style:
+    desc: "[gate] No .nix file mixes builtins./lib. spellings of the same pure alias"
+    summary: >
+      For the pure-alias set (builtins.filter == lib.filter, builtins.hasAttr ==
+      lib.hasAttr, …) a file spells one vocabulary — carrying both reads as an
+      unfinished unification. The 2026-11-24 sweep unified every file under
+      lib/, modules/, flake/ and hosts/ per-file-majority; this keeps a refactor
+      from re-introducing a minority spelling. grep only, ~1 s, no eval; a
+      failure names file and function.
+    cmds:
+      - bash scripts/task/nix-style-check.sh
 
   checks:nix:comments:
     desc: "[gate] Every Nix comment is a pointer that resolves, and prose only falls"

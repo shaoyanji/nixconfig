@@ -91,7 +91,7 @@
   nameRefs = text: let
     # Comments name things too, and a name in prose is not an edge. Dropping them
     # also keeps an example in a header from looking like a real import.
-    code = text |> lib.splitString "\n" |> map (l: l |> builtins.split "#" |> builtins.head) |> lib.concatStringsSep "\n";
+    code = text |> lib.splitString "\n" |> lib.concatMapStringsSep "\n" (l: l |> builtins.split "#" |> builtins.head);
     # Both vocabularies: a chain names a module as `moduleFiles."x"` before any
     # `self` exists, a module as `self.modules."x"`.
     chunks = code |> builtins.split ''self\.modules\.|moduleFiles\.'' |> builtins.filter builtins.isString;

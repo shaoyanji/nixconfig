@@ -1,8 +1,151 @@
 {
-  "generated": "2026-11-24T18:53:50Z",
+  "generated": "2026-11-24T19:09:23Z",
   "count": 200,
-  "pin": "445faf8e5fd09b15513ce6be837f32fd5a0aae0967e4c77183a0aad20717858d",
+  "pin": "04c2ccc457e2043897f05f2dd6c77149ebe04557de1db0b2ebcc4b3c196f5acc",
   "turns": [
+    {
+      "id": "17613d32-dd17-4e42-9b81-17ab5bec8d1b",
+      "ts": "2026-11-24T19:09:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correction to 03hap7tyo2ayuai9650szxxir: the commit is d6e43a1b, not ca0eb847 — the AGENTS.nix note was refused by the pre-commit alejandra gate and landed after formatting; the content is unchanged (STATWORX Cloud Engineer, Frankfurt, lead fit 3) | gate: nix-instantiate --parse PASS + pre-commit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d6e43a1b875fde9d54afc0d43d7bb65776bd544a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap7x7675w76zid6uel5k7o"
+    },
+    {
+      "id": "7c03b183-db81-4e84-9b32-73045bfcf452",
+      "ts": "2026-11-24T19:08:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "ats sweep: 8 sources no earlier pass touched (BA jobsuche, 70 greenhouse/lever/ashby boards, personio+recruitee feeds, bsj, remotive, remoteok, 2 linkedin queries) left one untracked fit — STATWORX Cloud Engineer, Frankfurt, filed at lead fit 3; BA 403s from here and solarisbank was a dedupe false positive against the tracked Solaris row | gate: nix-instantiate --parse PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ca0eb847ee535b8ccaafae8b18fcfe0b8aae2d39",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap7tyo2ayuai9650szxxir"
+    },
+    {
+      "id": "8974cc68-cf67-4a4a-9f63-c92ef6d2a9c8",
+      "ts": "2026-11-24T19:07:47Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-note",
+      "action": "landed: 3 new employers in the tracker — noris network AG Senior Cloud Native Engineer (OpenStack/networking, Nürnberg or remote, fit 4), Rheinmetall IT Solutions Senior Platform Engineer Linux & Container (Düsseldorf +5 sites, fit 3), CHECK24 Senior DevOps Ansible/Linux (Hamburg, fit 3). Already tracked, not re-scouted: DATATRONiQ, mittwald (applied), cloudpunks, INFORM, DRV Bund dupe closed | gate: every link 200 + rows read back from the API",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
+      "branch": "main",
+      "frame": "03hap7oi3mov6dcr1pr018n2k"
+    },
+    {
+      "id": "bea103ca-2c12-44ce-a0ec-7ad510fd9f9f",
+      "ts": "2026-11-24T19:04:07Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "drove delphi freebuff pane (agents:3.1, ssh): routed job-search scout via jev-decide (scout_leads 1.00); pane now thinking.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
+      "branch": "main",
+      "frame": "03hap6ynycd71cgyl1voqzl01"
+    },
+    {
+      "id": "42a8ea22-555e-4388-944a-9ef3e9bfb3d1",
+      "ts": "2026-11-24T19:04:05Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "drove devin pane (agents:1.1): routed nixconfig check/lint gate review via jev-decide (duel review_checks 0.73 vs commit_pending 0.27); pane now Thinking.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
+      "branch": "main",
+      "frame": "03hap6yhfxe8faqs7b2r5y6vy"
+    },
+    {
+      "id": "e8e8a6f6-c663-436a-ba43-929cfee7f71e",
+      "ts": "2026-11-24T19:04:04Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "drove freebuff pane (agents:2.1): routed job-scout / CV lane via jev-decide (scout_leads 1.00); pane now working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
+      "branch": "main",
+      "frame": "03hap6yax63p2auq9g9dvh2b0"
+    },
+    {
+      "id": "1095bd12-cc8e-459d-8b93-abb743f40545",
+      "ts": "2026-11-24T18:56:33Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "steward cycle closed: freebuff (agents:2.1) completed the job-scout sweep-state AGENTS.nix note, committed c9f09993 and pushed; note posted nixconfig:job-scout-note OUTCOME=done.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f79cda3",
+      "branch": "main",
+      "frame": "03hap5hje0wrpxw64lm5yewx0"
+    },
+    {
+      "id": "23110028-42f1-4cc3-a812-885b32fcfea8",
+      "ts": "2026-11-24T18:56:29Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "steward cycle closed: devin (agents:1.1) completed the image-daily Go port gate verification, amended the devin-lane-image-daily-go-port note, committed 5f79cda3 and pushed; local == origin at 5f79cda3.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f79cda3",
+      "branch": "main",
+      "frame": "03hap5gz8100010j2q8itveyu"
+    },
+    {
+      "id": "3ee0f590-be0f-4338-9bd1-92ab7677ba2b",
+      "ts": "2026-11-24T18:56:03Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "steward drove freebuff pane (agents:2.1): routed sweep-state AGENTS.nix note task via jev-decide (note-change 0.81); pane now working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "7b40455e",
+      "branch": "main",
+      "frame": "03hap5dyixemhwxov7cgl8frx"
+    },
+    {
+      "id": "874eca83-f20d-4752-8673-797d713d329b",
+      "ts": "2026-11-24T18:55:59Z",
+      "source": "steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "steward drove devin pane (agents:1.1): submitted image-daily Go port gate verification; pane now Thinking, will land its own xs turn.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "7b40455e",
+      "branch": "main",
+      "frame": "03hap5dizz18ip9xxbnn5kcvq"
+    },
+    {
+      "id": "20a7342b-537b-4fac-8f98-c6ae18ea5380",
+      "ts": "2026-11-24T18:54:00Z",
+      "source": "devji",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: image-daily gate state recorded green on ported tree — 4 image gates + chain-module check | gate: checks:hosts delphi+frieren PASS (delphi eval 2132 assertions, frieren module-system rc=0 45s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
+      "branch": "main",
+      "frame": "03hap4zj8yc4ot7avk7zt5715"
+    },
     {
       "id": "d7ff6857-5293-4987-a32e-c73e4e64924f",
       "ts": "2026-11-24T18:53:38Z",
@@ -2578,161 +2721,6 @@
       "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
       "branch": "main",
       "frame": "03halxpdq71a4ffre8th8k63t"
-    },
-    {
-      "id": "d97d3d9c-5285-4456-b833-d0f415145e96",
-      "ts": "2026-11-24T09:02:26Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward:pane-drive:freebuff-delphi",
-      "action": "drove idle remote freebuff pane agents:3.1 via Jev task-change (decisive margin 0.42) over ssh tunnel; pasted intl scout/prep task; pane shows working... 4s / Thinking after Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halxfdiebnbuaggzmr0lbkx"
-    },
-    {
-      "id": "e7ddcaff-353c-40ee-b732-fa624620e70a",
-      "ts": "2026-11-24T09:02:26Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward:pane-drive:freebuff-local",
-      "action": "drove idle freebuff pane agents:2.1 via Jev task-change (decisive margin 0.46); pasted EU/DE scout/prep task; pane shows working... 3s / Thinking after Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halxfch6k5hvhm68a7612y8"
-    },
-    {
-      "id": "b5788d25-be61-46a7-aa13-85529e7cd4bd",
-      "ts": "2026-11-24T09:01:43Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward:pane-drive:freebuff-delphi",
-      "action": "start: drive idle remote freebuff pane agents:3.1 via Jev task-change (decisive margin); intl scout/prep task to paste",
-      "outcome": "in_progress",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halxablufl2uadtwlreyqxb"
-    },
-    {
-      "id": "7088422c-bcd9-4b62-9079-3556cc7cbee9",
-      "ts": "2026-11-24T09:01:43Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward:pane-drive:freebuff-local",
-      "action": "start: drive idle freebuff pane agents:2.1 via Jev task-change (decisive margin); scout/prep task to paste",
-      "outcome": "in_progress",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halxaai1pexu2fqrphsw7l4"
-    },
-    {
-      "id": "a7065b25-e49a-4ba5-abee-46e23b4fe38a",
-      "ts": "2026-11-24T08:56:09Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-split",
-      "action": "landed: sops-nix dedup in base-node — all 18 chain consumers already get it via nixos/containers/demo features; one file, zero host edits | gate: drv-equality 30/30 identical, checks:tasks parity exact",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halw77vc7vo68ub8b9aeb9k"
-    },
-    {
-      "id": "d887114a-0122-4309-9941-e401cf11f92f",
-      "ts": "2026-11-24T08:52:20Z",
-      "source": "hermes",
-      "subject": "nixconfig:steward:pane-drive",
-      "action": "drove idle devin pane agents:1.1; Jev selected chain-change (0.71/0.57); task accepted, pane shows Thinking · 4s",
-      "outcome": "done",
-      "claims": [
-        "agents:1.1"
-      ],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halvgdrg6oubdnflorsxt3g"
-    },
-    {
-      "id": "9a572abc-a6bd-45a3-889a-cd9d0199855c",
-      "ts": "2026-11-24T08:50:06Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: EU/DE scout, prep only, nothing sent. 15 checked, 10 already tracked (Doctolib, Codesphere, STACKIT, Exoscale, Contabo, DeepL, timocom...). 5 new, each 2pp CV from its own JD + 1pp letter: mogenius devops, Eficode devops (en), netcup infra, KHS platform, Advantest platform (en). Giant Swarm/SUSE dropped: no live req. Rows lead, next_action set, hold 2026-12-07. appflow roundtrip PASS 1012 rows; no drafts, no mail. Repo untouched.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03halv0mnmxax7lxwaocug5k7"
-    },
-    {
-      "id": "ab5c6722-5ec8-4efd-89a3-899af03238b6",
-      "ts": "2026-11-24T08:49:09Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "landed: intl scout round — 6 new leads (SingleStore SRE Portugal, Consensys Sr Systems Admin EMEA, Percona AWS Practice Lead worldwide, Docker Staff Infra, 1Password Sr Staff Cloud Platform, Tailscale Security Infra) + 3 prep packets CV+letter; rows 1001->1012 (5 concurrent from other agents), no repo change | gate: apps:dupes [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halutyo0bmm9agtaq5tf34o"
-    },
-    {
-      "id": "e15ace40-5d69-4965-995d-6f61736bf516",
-      "ts": "2026-11-24T08:44:48Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-split",
-      "action": "landed: chain audit + split — dell-dock/battery-charge-limit left base-node for the 3 setter hosts (poseidon/fern/frieren), redundant boot + unused xs-notify imports dropped from base-desktop-environment and dwl-desktop (delphi keeps direct xs-notify), netbook sops kept + comment fixed; kept honest composites (base-node floor, desktop-client, steamos) | gate: checks:drv-equality 30/30 identical, checks:tasks PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9389785c92a8d56dee924d76f26305e5c476e71d",
-      "branch": "main",
-      "frame": "03haltzdojsgd55f5f28rfzgh"
-    },
-    {
-      "id": "6c2875f6-20ce-404e-b123-1579c5dbc46e",
-      "ts": "2026-11-24T08:43:59Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove 2 idle panes (09:36 CET). jev-decide classify vs labels.json = needs_review x2 (freebuff task-change 0.51 m0.07, delphi note-change 0.53 m0.16), none decisive -> fell back to standing tasks. freebuff EU/DE scout+packets working (agents:2.1), delphi intl scout+packets working (freebuff:1.1 via ssh tunnel). All confirmed working; commit ace277bc pushed to origin/main.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
-      "branch": "main",
-      "frame": "03halttn2uzzqy2ad0y9yn5jp"
-    },
-    {
-      "id": "f854e5a0-3dd2-4de2-9dfa-13c775adb343",
-      "ts": "2026-11-24T08:34:35Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-split",
-      "action": "resuming devin claim: audit done — base-node drags dell-dock+battery-charge-limit (only poseidon/frieren set them), base-desktop-environment re-imports boot and carries xs-notify surface nobody sets (delphi imports it direct), dwl-desktop same; desktop-client/steamos/base-node-core are semantic composites and stay",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/profiles/base-node.nix modules/profiles/base-desktop-environment.nix modules/profiles/dwl-desktop.nix hosts/frieren/desktop.nix hosts/poseidon/configuration.nix hosts/netbook/configuration.nix"
-      ],
-      "files": [],
-      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
-      "branch": "main",
-      "frame": "03halrzjj4welt1t9e71wji1m"
     }
   ]
 }

@@ -80,6 +80,7 @@
     "checks:nix:format" = "leaf";
     "checks:nix:lint" = "leaf";
     "checks:nix:shell" = "leaf";
+    "checks:nix:style" = "leaf";
     "checks:nix:watch" = "leaf";
     "checks:nix:watch:status" = "leaf";
     "checks:nix:watch:stop" = "leaf";

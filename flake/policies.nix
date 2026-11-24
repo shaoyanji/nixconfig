@@ -334,7 +334,7 @@
       |> builtins.attrNames
       |> map (n: "${secretsDir}/${n}")
     else [];
-  unregisteredSops = encryptedInSecretsDir |> builtins.filter (f: !(sopsFiles |> lib.elem f));
+  unregisteredSops = encryptedInSecretsDir |> builtins.filter (f: !(sopsFiles |> builtins.elem f));
   # A clone without the submodule checked out must still evaluate: the files that
   # are here are scanned, the ones that are not are reported by the registry gate
   # the moment they appear.
@@ -396,7 +396,7 @@
         (code |> hasInfix "modules/secrets.yaml")
         || (code |> builtins.match ".*modules/secrets/[A-Za-z0-9_.-]+\\.yaml.*" |> (m: m != null)));
   secretsPathOffenders =
-    scriptFiles |> builtins.filter (p: !(secretsPathExempt |> lib.elem p) && spellsSecretsPath p);
+    scriptFiles |> builtins.filter (p: !(secretsPathExempt |> builtins.elem p) && spellsSecretsPath p);
   # The task plane has its own spelling — `{{.SECRETS}}`, fed from the same helper —
   # so a task bypasses it when it runs sops on a secrets file named any other way.
   # A `desc:` or a comment that mentions the file is not a command: only the text
@@ -445,7 +445,7 @@
   # Name and text, so the gate reads tree files and the fixture reads history
   # through one implementation.
   secretsScriptProblems = name: text:
-    lib.optional (readsSecrets text && !(sourcesResolver text) && !(secretsReaderExempt |> lib.elem name))
+    lib.optional (readsSecrets text && !(sourcesResolver text) && !(secretsReaderExempt |> builtins.elem name))
     "reads secrets without the resolver — source the shared paths helper and take the location from secret_get";
   secretsResolverOffenders = scriptFiles |> builtins.filter (p: secretsScriptProblems p (read p) != []);
 
@@ -626,11 +626,11 @@
     if lib.hasSuffix "/SKILL.md" page
     then lineCount (root + "/${page}") - frontmatterLines (root + "/${page}")
     else lineCount (root + "/${page}");
-  budgetMissing = budgetedPages |> builtins.filter (pg: !(proseBudget.pages |> lib.hasAttr pg));
+  budgetMissing = budgetedPages |> builtins.filter (pg: !(proseBudget.pages |> builtins.hasAttr pg));
   budgetStale = proseBudget.pages |> builtins.attrNames |> builtins.filter (pg: !(budgetedPages |> builtins.elem pg));
   budgetDrift = budgetedPages |> builtins.filter (pg: (proseBudget.pages.${pg} or (-1)) != budgetMeasured pg);
   budgetUnargued =
-    budgetedPages |> builtins.filter (pg: budgetMeasured pg > proseBudget.argueAbove && !(proseBudget.notes |> lib.hasAttr pg));
+    budgetedPages |> builtins.filter (pg: budgetMeasured pg > proseBudget.argueAbove && !(proseBudget.notes |> builtins.hasAttr pg));
 
   # The shell budget as data (flake/script-budget.nix): one recorded ceiling
   # per production `.sh` over `argueAbove` lines. Production scope is scripts/,
@@ -674,11 +674,11 @@
     |> builtins.filter (p: shellLines p > scriptBudget.argueAbove);
   shellUnrecorded =
     shellBloated
-    |> builtins.filter (p: !(scriptBudget.shells |> lib.hasAttr p));
+    |> builtins.filter (p: !(scriptBudget.shells |> builtins.hasAttr p));
   shellGrowth =
     productionShell
     |> builtins.filter (p:
-      (scriptBudget.shells |> lib.hasAttr p) && shellLines p > scriptBudget.shells.${p});
+      (scriptBudget.shells |> builtins.hasAttr p) && shellLines p > scriptBudget.shells.${p});
   shellStale =
     scriptBudget.shells
     |> builtins.attrNames
@@ -707,9 +707,9 @@
   shellScriptProblems = path: text: let
     n = (text |> lib.splitString "\n" |> builtins.length) - 1;
   in
-    (lib.optional (n > scriptBudget.argueAbove && !(scriptBudget.shells |> lib.hasAttr path))
+    (lib.optional (n > scriptBudget.argueAbove && !(scriptBudget.shells |> builtins.hasAttr path))
       "${path}: ${toString n} lines over ${toString scriptBudget.argueAbove} and unrecorded — a Go CLI or a split, not a budget entry")
-    ++ (lib.optional ((scriptBudget.shells |> lib.hasAttr path) && n > scriptBudget.shells.${path})
+    ++ (lib.optional ((scriptBudget.shells |> builtins.hasAttr path) && n > scriptBudget.shells.${path})
       "${path}: ${toString n} lines over a recorded ceiling of ${toString scriptBudget.shells.${path}}");
 
   # The documents, not the skills: `skills-cite-truth` already requires a skill to
@@ -731,13 +731,13 @@
   citedPaths = p:
     p
     |> builtins.split "`"
-    |> lib.filter (s: builtins.isString s && (repoRefPrefixes |> lib.any (pre: lib.hasPrefix pre s)));
+    |> builtins.filter (s: builtins.isString s && (repoRefPrefixes |> lib.any (pre: lib.hasPrefix pre s)));
   citesTruth = p: let
     truthText =
       p
       |> builtins.readFile
       |> lib.splitString "\n"
-      |> lib.filter (l: l |> lib.hasPrefix "Truth:")
+      |> builtins.filter (l: l |> lib.hasPrefix "Truth:")
       |> lib.concatStringsSep "\n";
   in
     truthText

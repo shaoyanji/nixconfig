@@ -11,8 +11,10 @@
     {
       "name": "Bountystash",
       "highlights": [
-        "Built a Go service, still in development; no external users yet: Postgres work_versions, exact hashes over canonical JSON, a quotient hash over the fields a reviewer sees, append-only events, and Go tests (github.com/shaoyanji/bountystash)",
-        "Rendered HTML, JSON and a keyboard-driven TUI from one binary with no frontend build"
+        "Built and runs a thirteen-host NixOS fleet as one flake: a feature list per host, a module per service, secrets encrypted with sops behind the fleet's own SSH certificate authority",
+        "Gated infrastructure changes with inventory-driven CI and a per-host module check, so a broken host definition fails before a deploy",
+        "Wrote a sentinel that logs job status, generation age, disk and memory pressure every 15 minutes and pages when a service fails",
+        "Built a Go service, still in development; no external users yet: Postgres work_versions, exact hashes over canonical JSON, a quotient hash over the fields a reviewer sees, append-only events, and Go tests (github.com/shaoyanji/bountystash)"
       ]
     },
     {
@@ -49,12 +51,17 @@
       "category": "Systems and infrastructure",
       "items": [
         "NixOS",
-        "Nix flakes",
         "Linux",
+        "Kubernetes",
+        "AWS",
         "systemd",
+        "Nix flakes",
         "SSH certificate authority",
         "SOPS and age",
-        "GitHub Actions"
+        "GitHub Actions",
+        "inventory-driven CI",
+        "binary cache",
+        "remote builder"
       ]
     },
     {

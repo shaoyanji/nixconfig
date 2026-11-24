@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-24T08:24:45Z",
+  "generated": "2026-11-24T08:27:09Z",
   "count": 200,
-  "pin": "025888425ac3e80738dbd8002c0d61fb7cee9c3b8e7dc98db0e42e2b142a6584",
+  "pin": "63d547c1ff400420bbef5be19303eea5d8d01e2e4d71e709b85c039b1ad4d265",
   "turns": [
+    {
+      "id": "8d593415-04d3-4d53-a34b-e005dba574c5",
+      "ts": "2026-11-24T08:26:54Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: both leads already had rows, so no new rows. Mozilla staff-sre-tools-systems is applied 2026-11-21 (Greenhouse 8315181). Helsing SRE row had been closed as a dupe of the weaker avionics systems seat; reopened it as the lead with helsing.ai/jobs/4347030101 and closed the avionics row. Board findings: Greenhouse tokens mozilla and helsing (100/142 pagination explains the earlier miss) | gate: apps:dupes PASS ([]), 1001 tracked, dirty 26",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halqhhzmi9a934qcmwv6k5u"
+    },
+    {
+      "id": "aac74e89-6350-407a-a494-b39e3fc05d29",
+      "ts": "2026-11-24T08:24:57Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "landed: static-serve folded into tools/os (internal/serve, FlagSet Main), cli.serve.static-serve symlinks bin/static-serve->os, packages.<system>.servers.static-serve served by the umbrella — goModules ledger down to one module, one-os-cli DELIVERED | gate: checks:tasks PASS (parity exact), go build+vet+test clean, policies fixtures PASS, nix artifact serves Range 206",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8eed237a7004f9e5a32fef026ee52e2d552a1e5f",
+      "branch": "main",
+      "frame": "03halq3u6bfo6blylz0q8eb8b"
+    },
     {
       "id": "6090dfbd-5714-472d-bf82-33c77d5c87d9",
       "ts": "2026-11-24T08:24:25Z",
@@ -2711,34 +2739,6 @@
       "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
       "branch": "main",
       "frame": "03hafa1t36nexrq0q05vbay6e"
-    },
-    {
-      "id": "0c3ef041-9d5d-4e2c-8dca-4c2227b876ad",
-      "ts": "2026-11-23T12:35:16Z",
-      "source": "devin",
-      "subject": "nixconfig:images-publish-gate",
-      "action": "claim: publish gate + e2e subcommand verify + deploy doc",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/image-daily-engine.sh scripts/task/image-daily-plates.sh tests/image-publish docs/ taskfiles/checks.yml flake/check-inventory.nix"
-      ],
-      "files": [],
-      "base_commit": "8ecc5f36668f3ac29a8ccec7f56cedeaed47ee6b",
-      "branch": "main",
-      "frame": "03haf9pftjgz00szyyk8z6nve"
-    },
-    {
-      "id": "43fc50e7-4bc9-428a-9156-e243752c6a1d",
-      "ts": "2026-11-23T12:28:46Z",
-      "source": "freebuff",
-      "subject": "frieren:job-search-scout",
-      "action": "landed: freebuff job-search scouting (task-change, decisive margin)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf8fq72ypj7epsfqqbfveo"
     }
   ]
 }

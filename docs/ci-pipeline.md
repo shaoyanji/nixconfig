@@ -76,9 +76,10 @@ in a host config.
 One `hygiene` job (the `sops-drift` and `docs-budget` jobs folded together
 2026-11-24 — one checkout and one Nix install instead of two) runs on every
 push: `scripts/task/sops-drift-check.sh --repo-only` with `continue-on-error`,
-so recipient drift is reported without failing a build, then the six cheap
-gates — `checks.x86_64-linux.docs-budget`, `prose-tells`, the task graph,
-nix-comments, module edges and `checks.policies`.
+so recipient drift is reported without failing a build, then the cheap
+gates — `checks.x86_64-linux.docs-budget`, the task graph,
+nix-comments, module edges and `checks.policies` (`prose-tells` failed CI
+and was dropped 2026-11-24; `checks:prose` still gates it locally).
 
 The docs-budget step builds
 `checks.x86_64-linux.docs-budget` — the same gate as `task ops:docs:budget` and

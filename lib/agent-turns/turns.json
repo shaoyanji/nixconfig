@@ -1,8 +1,159 @@
 {
-  "generated": "2026-11-24T07:52:16Z",
+  "generated": "2026-11-24T08:07:32Z",
   "count": 200,
-  "pin": "3f26bbd1cc0b9693ed3d6d814ef4cad9b1b988a071031b2a60dca3ee34fdf893",
+  "pin": "9affd62f7ba2e1e0a10c74b4b1b34a9bdd37d21f0ac5403a3a6dfa48be866fed",
   "turns": [
+    {
+      "id": "c55340a9-6c60-4272-bd0f-e900d1a9fcf9",
+      "ts": "2026-11-24T08:07:11Z",
+      "source": "codebuff",
+      "subject": "nixconfig:appflow-scout-2026-11-24j",
+      "action": "landed: 4 new rows (Qonto SRE Platform Berlin-remote, Doctolib Staff SRE Berlin, Deepslate SRE remote/Berlin, Linro SRE/Platform remote DE) + Remote Senior SRE; 6 strong duplicates refused because already live (Kubermatic, Codesphere, ClickHouse, Secunet, FAST LTA, Flox) | gate: apps:dupes PASS ([]), 998 tracked, dirty 26 unchanged",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halmmsz5w8kldcbtyqfz0hz"
+    },
+    {
+      "id": "d246b810-1c83-422d-9188-e2925187d05c",
+      "ts": "2026-11-24T08:07:05Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi freebuff (pane 3.1, remote over ssh) idle after a job-search task. jev-decide routed research (16-label needs_review task-change=0.5, duel research-vs-task-change -> research 1.0 margin 1.0 exit 0). Pasted delphi job-search task (scout DevOps/SRE/Platform leads via apps:add, Nix/K8s/Postgres/FreeBSD/Tailscale) via load-buffer/paste-buffer tunnel + Enter; confirmed thinking counter, box in append mode. gate: delphi 3.1 BUSY",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
+      "branch": "main",
+      "frame": "03halmm6zxek9txlcu1848j3b"
+    },
+    {
+      "id": "1035d41d-070d-42be-be0f-ecc43f6d2b74",
+      "ts": "2026-11-24T08:07:05Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:image-daily-fold",
+      "action": "re-driven: devin (1.1) idle after image-daily task, had auto-started an unslop/prose-tells task, so my one-os-cli fold-in paste merged in. jev-decide routed flake-change (16-label selected flake-change 0.99 margin 0.98 exit 0). Task: complete one-os-cli umbrella module + image-daily fold-in (go.mod ledger 68415984). Confirmed BUSY (thinking 1m42s, reading tools/image-daily, modules.toml, nix-registry.nix). gate: devin 1.1 BUSY",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
+      "branch": "main",
+      "frame": "03halmm4sby7ztzbxutsxa89c"
+    },
+    {
+      "id": "23b04e6b-7de7-4a61-b751-f636c8fcca9c",
+      "ts": "2026-11-24T07:59:33Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "re-driven: CV lane was idle after a prior 2m51s job-scout turn (Muenster follow-ups; advanced interview 2->0, lead 202->212). jev-decide routed the follow-up as research (16-label needs_review note-change=0.37, duel research-vs-task-change -> research 0.99 margin 0.98 exit 0). Pasted pipeline-triage task (work screening 7, triage low-fit leads, prep 12-07 sends) via load-buffer/paste-buffer/Enter; confirmed fresh thinking counter, box in append mode. gate: pane 2.1 BUSY (thinking)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
+      "branch": "main",
+      "frame": "03hall55u0f4rd22e33wcaxso"
+    },
+    {
+      "id": "34f33c15-ef48-4eea-b5f6-04570783d9f8",
+      "ts": "2026-11-24T07:55:52Z",
+      "source": "codebuff",
+      "subject": "nixconfig:appflow-scout-2026-11-24i",
+      "action": "landed: 10 fresh leads — Scalable, Integral De, ARX Robotics, Rocket Factory, Roland Berger, Blackbird Collective, Avelios, Agile Robots, Bertelsmann, IFS; top 3 queued for CV tailoring (Scalable, Integral De, ARX Robotics) | gate: apps:dupes PASS ([]), 994 tracked, dirty paths unchanged",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halkf9mc3fbq1kozruu9y8r"
+    },
+    {
+      "id": "42633f6c-20d8-4e21-9b52-0ae6317bfcc6",
+      "ts": "2026-11-24T07:53:56Z",
+      "source": "codebuff",
+      "subject": "nixconfig:appflow-scout-2026-11-24i",
+      "action": "claim: scout round i, 10 fresh remote DevOps/SRE/Platform leads, dedupe against 984 tracked, queue top 3 for CV tailoring",
+      "outcome": "in_progress",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halk1lm4twjmgl06oobb91d"
+    },
+    {
+      "id": "c6ff413b-b450-4aa9-b43a-d1d72eb01849",
+      "ts": "2026-11-24T07:53:53Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "verify-only at HEAD 68415984: checks:image-daily PASS 'gate ok: dispatch, judge fallback, breakers and shrink guard all present'; go build ./... at tools/ root still no-module (by design until one-os-cli umbrella), tools/image-daily builds clean; ops:notes top followup = one-os-cli IN FLIGHT (go.mod ledger landed, umbrella missing) | gate: checks:image-daily PASS, go build (tools/image-daily) PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "68415984",
+      "branch": "main",
+      "frame": "03halk1d77sn95wj82o3qytz0"
+    },
+    {
+      "id": "56dfd3e9-0fe6-44cf-ab27-b2cbe2dee252",
+      "ts": "2026-11-24T07:53:35Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: pane-steward drove idle freebuff 2.1 (CV lane). jev-decide routed CV job-scout to research (16-label classify needs_review research=0.40 margin 0.07, two-way duel vs task-change -> research 1.0 margin 1.0 exit 0). Pasted job-scout + pipeline-queue task (scout DevOps/SRE/Platform leads via apps:add; work 2 interview + 7 screening) via load-buffer/paste-buffer/Enter; confirmed fresh working counter. gate: freebuff 2.1 BUSY (working 2s); devin 1.1 + delphi 3.1 BUSY; wallpaper 4.1 live",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
+      "branch": "main",
+      "frame": "03haljz5zz0sz987p2xznuls9"
+    },
+    {
+      "id": "cfbbd012-b9ac-45fc-a9eb-78723485b453",
+      "ts": "2026-11-24T07:52:29Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "landed: docs-budget CI job folded into hygiene (sops-drift renamed, same six gates every push) + tools-go-modules-are-recorded guard (goModules ledger, probe, 3 fixtures; note one-os-cli -> IN FLIGHT); checks:image-daily re-verified green, go build clean in tools/image-daily | gate: checks:image-daily PASS, tests/policies/run.sh PASS, ci-doc-budget/ci-task-graph/goMods holds true; checks:policies red only on codebuff's uncommitted apps/SKILL.md drift",
+      "outcome": "done",
+      "claims": [
+        ".github/workflows/nixcachix.yml",
+        "flake/policies.nix"
+      ],
+      "files": [
+        ".github/workflows/nixcachix.yml",
+        "flake/policies.nix",
+        "flake/script-budget.nix",
+        "tests/policies/run.sh",
+        "AGENTS.nix",
+        "docs/ci-pipeline.md",
+        "flake/checks.nix",
+        "taskfiles/agents.yml",
+        "taskfiles/checks.yml"
+      ],
+      "base_commit": "684159845aead1f28c3530d0d2b6b4e46274c9b0",
+      "branch": "main",
+      "frame": "03haljrf0uw9qovdhwp2rvde8"
+    },
+    {
+      "id": "4b77cb1e-48d6-447b-a814-270149d57dc5",
+      "ts": "2026-11-24T07:52:22Z",
+      "source": "codebuff",
+      "subject": "nixconfig:appflow-scout-2026-11-24h",
+      "action": "landed: 10 fresh leads — Mondoo, Langdock, Mirelo, RepRisk, Rewire, Tipico, TOMRA, cloudpunks, technoly, Herbrand; top 3 queued for CV tailoring (Mondoo, Langdock, Mirelo); eGroup/Airapps/Onebrief refused as existing rows | gate: apps:dupes PASS ([]), 984 tracked, dirty paths unchanged",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haljql2ty1fh77obsf25w3g"
+    },
     {
       "id": "d79cb3a5-e915-4aac-95f0-69015f9d34d8",
       "ts": "2026-11-24T07:49:59Z",
@@ -2576,142 +2727,6 @@
       "base_commit": "9ac5e75e8e725337944013cdaebbf73ea51073f0",
       "branch": "main",
       "frame": "03haezph83433yowojsjghjcc"
-    },
-    {
-      "id": "e7231cec-75a8-4b1a-8a86-f77bf8ea1d45",
-      "ts": "2026-11-23T11:42:08Z",
-      "source": "freebuff-agent",
-      "subject": "nixconfig:freebuff",
-      "action": "steward: drove delphi freebuff pane 0:2.1 — jev-decide classify -> novel (0.65/0.48, decisive); pasted teccle-group Senior Network Engineer submission task; freebuff accepted, fresh working counter 1s -> 14s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a6ea1387835658ae17a543d9cd4ab7accb5eb38e",
-      "branch": "main",
-      "frame": "03haezbprjeq4cw83ysj85ow3"
-    },
-    {
-      "id": "369d3b6b-b89e-4975-b59a-777d80b1cdd0",
-      "ts": "2026-11-23T11:35:48Z",
-      "source": "devin-agent",
-      "subject": "nixconfig:devin",
-      "action": "steward: drove devin pane 0:0.1 — jev-decide classify -> publish (0.80/0.71, decisive); pasted 'Redesign and Implement the Image Publish', Devin accepted (Thinking)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a6ea1387835658ae17a543d9cd4ab7accb5eb38e",
-      "branch": "main",
-      "frame": "03haey381szjmhvc6qpzu1qhu"
-    },
-    {
-      "id": "b596cc96-e556-4b2e-a9fe-efd92126baf5",
-      "ts": "2026-11-23T11:34:46Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-publish-cv",
-      "action": "landed: freebuff pane 0:1.1 driven; jev-decide -> publish (0.99/0.98, typesafe); CV-site-to-vercel task accepted and executing (fresh thinking counter verified)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a6ea1387835658ae17a543d9cd4ab7accb5eb38e",
-      "branch": "main",
-      "frame": "03haexvvzhfbpsj865a15rom4"
-    },
-    {
-      "id": "58145f0a-5f3d-4068-b0b3-5a982645df91",
-      "ts": "2026-11-23T11:27:58Z",
-      "source": "devin",
-      "subject": "nixconfig:vercel-removal-wisp-blog",
-      "action": "landed: removed vercel/ outlet + ops:status:public + checks:vercel:test (efd6d9d4); wisp-blog restored via clanker — Node 20 EOL caused FUNCTION_INVOCATION_TIMEOUT, wisp-blog commit e7c2961 pins Node 22 + bounds CMS calls at 8s; live 200 on / /blog/wisp-is-cool /tag /rss | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a6ea1387835658ae17a543d9cd4ab7accb5eb38e",
-      "branch": "main",
-      "frame": "03haewk5yuvzx4z84fh37b5rz"
-    },
-    {
-      "id": "25582b44-15c8-4e15-b36e-f28c3f638b51",
-      "ts": "2026-11-23T11:23:12Z",
-      "source": "freebuff-agent",
-      "subject": "nixconfig:tmux-pane-steward",
-      "action": "landed: drove idle freebuff pane 0:1.1 — German cv-software.de CV task sent; jev classify needs_review (exit 2) but decisive margin publish 0.55 vs novel 0.18 (margin 0.37) → proceeded; pane accepted: Thinking + working... 2m 17s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3bf6a6412a078dee48aefd5f5c6fa6317dee78e7",
-      "branch": "main",
-      "frame": "03haevmlxkgmgl5s2yyw01a7g"
-    },
-    {
-      "id": "bb2af0b6-86ce-4c23-a909-abf40c3ec7e4",
-      "ts": "2026-11-23T11:22:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-dupes",
-      "action": "audit: apps:sent gate added (Sent folder via himalaya) + apps:add now refuses a rejected employer inside 180d (a rejected row is not live; AWO was re-added same day). Tracker: 10 rows updated from the 21-23 Nov batch, AWO/EDEKA Bank refusals recorded, adorsys duplicate closed to 2027-04-20; dupes 39->36 employers",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haevenld97ibuov7r1bxz7v"
-    },
-    {
-      "id": "f9ec7435-9aff-4768-a601-220a3ff0c745",
-      "ts": "2026-11-23T11:18:47Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-vercel",
-      "action": "correction: supersedes commit in the previous turn — the CV gate had a duplicate /de/ check and asserted no energy routing; it now checks 13 links including /work/energy-telemetry -> cv-energy.pdf and the German equivalent. Live: 26/26 routes 200, site:check 35 ok/0 failed, cv gate 13 ok/0 | gate: cv-links-check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3bf6a6412a078dee48aefd5f5c6fa6317dee78e7",
-      "branch": "main",
-      "frame": "03haeurknfaevf3ztwx1l5irl"
-    },
-    {
-      "id": "7d0cebef-21f9-4349-a082-ae38b9cc5a1c",
-      "ts": "2026-11-23T11:18:20Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-vercel",
-      "action": "landed: CV routing fixed — one header CV per locale, energy variant only on the solar case, software on fleet/bountystash/fibtransponder/all briefs, German pages take the German CV; deployed to Pages (project matt) and verified 26/26 live routes 200 at their own URL, site:check 35 ok/0 failed, cv-links gate rewritten to the new routing and passing 13 ok/0 | gate: cv-links-check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8e26ab727914417bd55285edf5569f578ee6b349",
-      "branch": "main",
-      "frame": "03haeuogp8oys1f72xtnu9e36"
-    },
-    {
-      "id": "64274e5e-b0aa-416c-8f19-633f1ebcf396",
-      "ts": "2026-11-23T11:15:29Z",
-      "source": "devin",
-      "subject": "nixconfig:vercel-removal-wisp-blog",
-      "action": "claim: remove pulled vercel/ outlet; fix wisp-blog-jade.vercel.app 504 FUNCTION_INVOCATION_TIMEOUT via redeploy trigger",
-      "outcome": "in_progress",
-      "claims": [
-        "vercel/",
-        "taskfiles/ops.yml",
-        "taskfiles/checks.yml",
-        "docs/vercel-status.md",
-        "tests/vercel-status/"
-      ],
-      "files": [],
-      "base_commit": "0df16744d1d7992296cab63ba02ac6c84abe95c6",
-      "branch": "main",
-      "frame": "03haeu4ab6lngfsmqbgppj9o2"
-    },
-    {
-      "id": "3c6c6159-8c83-4431-8e0b-c4391fc252dc",
-      "ts": "2026-11-23T11:02:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-vercel",
-      "action": "blocked: artifact and routes proven, publish needs a Vercel credential — 43/43 routes 200 through the deploy's own rewrites (17 pages extensionless+.html, 5 PDFs, assets; vercel.json is config and excluded); no VERCEL_TOKEN in env, no CLI state, zero vercel keys in the decrypted sops corpus; vercel/ outlet is claimed by devin detok and a freebuff pane holds freebuff-publish-cv, so nothing here writes vercel/.",
-      "outcome": "blocked: no vercel credential on any reachable store",
-      "claims": [],
-      "files": [],
-      "base_commit": "bb970c58832db4743f626a31a950293c97531772",
-      "branch": "main",
-      "frame": "03haerln5qrzhsvfkpp2p7t7y"
     }
   ]
 }

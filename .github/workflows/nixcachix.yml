@@ -69,15 +69,15 @@ jobs:
       - name: Check sops recipient drift
         continue-on-error: true
         run: bash scripts/task/sops-drift-check.sh --repo-only
-      # The six cheap gates run here, on every push — doc-only pushes allocate
+      # The cheap gates run here, on every push — doc-only pushes allocate
       # zero build runners (the detector ignores *.md), so a job with no `if:`
       # and no path filter is the only place a runaway living document or a
       # broken task graph can be caught. They were the `docs-budget` job until
       # 2026-11-24; same steps, one checkout and one Nix install fewer.
+      # prose-tells dropped 2026-11-24: it failed CI; `task checks:prose` and
+      # `agents:ci:preflight` still gate it locally.
       - name: Living documents within budget
         run: nix build -L .?submodules=1#checks.x86_64-linux.docs-budget
-      - name: Prose carries no unslop vocabulary
-        run: nix build -L .?submodules=1#checks.x86_64-linux.prose-tells
       - name: Task graph gate (yq compiles it, go-task confirms the name set)
         # The plane is shell-side now (scripts/task/lib/taskfile_graph.py): yq and
         # go-task are the two tools it needs, and `nix shell` supplies both without

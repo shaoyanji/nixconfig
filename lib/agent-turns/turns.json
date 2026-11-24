@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-24T20:35:44Z",
+  "generated": "2026-11-24T20:51:11Z",
   "count": 200,
-  "pin": "4b7c6bccd7a83fdb5b248f6dc8cacfa2d97bb9240f30b712325e38bf6d303224",
+  "pin": "158ab218290c30334003942648e87f5c7a981938b9327d0b4d78a7f6625817f4",
   "turns": [
+    {
+      "id": "454cf942-28d9-4d30-9879-773217d66bb8",
+      "ts": "2026-11-24T20:46:54Z",
+      "source": "tmux-steward",
+      "subject": "nixconfig:steward-idle-drive",
+      "action": "drove two idle job-search lanes: freebuff(agents:2) -> unblock_scouting+jovenetpackets (jev needs_review, margin 0.39 decisive); delphi(agents:3, ssh) -> scout_leads (jev selected p0.91 margin0.86). Both verified working: freebuff thinking..., delphi working... 3s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9f7a1501e7485f8598a969fa117f5db38d91e3a",
+      "branch": "main",
+      "frame": "03hapr1grynrnr874r1yoeau8"
+    },
+    {
+      "id": "74884e4a-3997-4681-8dde-1161d84febbb",
+      "ts": "2026-11-24T20:40:21Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-freebuff",
+      "action": "landed: drove idle freebuff CV lane (agents:2.1) — jev-decide classify needs_review decision p=0.61 margin=0.40 (decisive >=0.3, top by margin); pasted decision task: rank live employer leads by application priority via jev-decide, top-5 shortlist deliverable; fresh working... 8s after Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ccfe5ab26f480611c4dc7952b76023efc931bf28",
+      "branch": "main",
+      "frame": "03happrhxjwezck9eitwxopca"
+    },
+    {
+      "id": "91a84591-0c53-4371-b78c-fcd4e72de5d5",
+      "ts": "2026-11-24T20:36:04Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "note: landed job-lane-queue-delphi-2026-11-24 on main — tracker consistent after 5 Supabase/Managed Postgres dupe rows closed with the Ashby-applied row standing, DeepL packet prepared (CAPTCHA hand-submit only), boards mined out (RemoteOK + BA jobsuche 403), prep queue and fit-5 lead tail listed, next action named. No sweep started. | gate: agentsNotes.issues [] + docs-budget rc=0 + taskfile-graph rc=0 + pre-push PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hapoxcdm74jxjrao7ted7j6"
+    },
     {
       "id": "34f82f84-66a1-4028-a262-390ded7d1932",
       "ts": "2026-11-24T20:33:16Z",
@@ -2649,52 +2688,6 @@
       "base_commit": "8c514757595c992c114d22e2a1bea0e3e2bf0ad8",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hambp5f7z46xa4mykwj0no8"
-    },
-    {
-      "id": "5c5dff21-2003-4f3a-8fed-60bef3a2d713",
-      "ts": "2026-11-24T10:15:05Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: stack scout rows plus AGENTS.nix note job-scout-next-sweep-delphi (open/OPEN/P3). Nine leads from both sweeps, nothing sent, prep-only to 2026-12-07; Tiger Data and Klara apply URLs still unconfirmed. gate: nix-instantiate parse + .#agentsNotes counts PASS; apps:dupes PASS.",
-      "outcome": "done",
-      "claims": [
-        "apps AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "8b299c9332eedd64ca642c2de7caaa126f4ec250",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hambmbzqszx3aaf2v163obr"
-    },
-    {
-      "id": "0d357cef-fbfc-43a1-8a3a-3051c5568a04",
-      "ts": "2026-11-24T10:14:45Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward:pane-drive-freebuff-delphi",
-      "action": "landed: drove idle remote freebuff delphi pane agents:3.1 via Jev task-change (selected task-change p=0.9 margin=0.8); pasted scout/upsert job-search task over ssh tunnel; pane shows thinking... 3s and task in input box",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1",
-        "delphi"
-      ],
-      "files": [],
-      "base_commit": "feb6699b46e5ac2c6ab8871a230ce538e083df65",
-      "branch": "main",
-      "frame": "03hambjxqe62dg5p8t8ypflgg"
-    },
-    {
-      "id": "932f3bbe-b035-436d-946e-d2355218371c",
-      "ts": "2026-11-24T10:14:16Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: stack scout 2026-11-24 — 4 new stack-matched leads written (Tiger Data/Postgres 4, Klara FreeBSD 3, HENSOLDT NixOS 3, FreeBSD Foundation 2), prep-only to 2026-12-07, nothing sent. Rejected: Tailscale (US/CA/UK only), atvari (unpaid intern), second roles at Supabase/Mittwald/dtms. Open: Tiger Data and Klara apply URLs unconfirmed; AGENTS.nix note job-scout-next-sweep-delphi OPEN P3. Gate apps:dupes PASS; AGENTS.nix uncommitted.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hambgk2mhhsxqbqsbpzr4c3"
     }
   ]
 }

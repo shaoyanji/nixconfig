@@ -5992,5 +5992,49 @@
         from an employer page. No broad sweep.
       '';
     };
+    job-scout-funnel-widened-2026-11-24 = {
+      title = "Five employers no board sweep reaches, filed after the marquee names turned out to be held";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Five employers the record did not hold were filed live on 2026-11-24 — Swissquote, Julius Baer, vCluster Labs, Cloudflight, PORR — after a sweep of Swiss and DACH banks plus AI-infra vendors. The marquee names were already held or closed by rule 1, and five careers pages stayed unfetched rather than empty.";
+      from = ["job-lane-queue-delphi-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:add" "apps:scout"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Five employers the record did not hold were filed on 2026-11-24, all
+        live and all published off the aggregators this lane already drains:
+        Swissquote (SRE, Cloud Operations, Gland), Julius Baer (Kubernetes
+        Platform Engineer, Zurich), vCluster Labs (AI Infrastructure Engineer,
+        remote), Cloudflight (SRE, Vienna plus six AT sites) and PORR (Senior
+        Platform Engineer, Vienna). Fit 4 on the first three, 3 on the last two.
+
+        Why these: the marquee names a broad search returns are already held —
+        Flox, Nebius, Mirantis, Resend, Second Front, WunderGraph, Upvest,
+        Unikraft, Wikimedia, STACKIT, Hetzner, IONOS, Scaleway, Contabo,
+        noris, Mittwald, Adfinis, Aykua, Tweag. Widening meant the employers
+        no board sweep reaches: Swiss and DACH banks on Workday and
+        SmartRecruiters, and an AI-infrastructure vendor whose req lives only
+        on its own careers page.
+
+        What closed rather than opened: GitLab applied 2026-11-22 and its
+        second req was not pursued; Canonical rejected 2026-11-22, so it is
+        shut for 180 days; Maze applied 2026-10-04; Flox already applied, so
+        four fresh Flox reqs are duplicates by rule 1.
+
+        Unfetched, not empty: FiveSquare's careers URL 404s, INWX and SerNet
+        careers paths 404, Scarf's careers redirects to its about page, and
+        Hornetsecurity lists no infrastructure role. None of the five is
+        evidence of a closed market.
+
+        Next: tailor Swissquote or Julius Baer first, then vCluster. Sends
+        stay held to 2026-12-07.
+      '';
+    };
   };
 }

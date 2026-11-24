@@ -1278,6 +1278,49 @@
         saying so.
       '';
     };
+    one-os-cli = {
+      title = "One CLI of the operating system, not a go.mod per domain";
+      kind = "proposal";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-24";
+      summary = "The shell burn-down must not end in a tools/ sprawl of one module per domain. Ports land as internal/<domain> packages inside a single Go binary — a CLI of the operating system — while .#cli.<family>.<tool> and the task names stay the contract callers see.";
+      from = ["shell-script-budget" "jobby-cli-consolidation"];
+      links = ["p4-taskfiles-to-evals" "agent-tools-called-not-declared"];
+      refs = {
+        modules = ["flake/cli.nix" "flake/script-budget.nix" "tools/image-daily/main.go"];
+        tasks = ["checks:policies:fixtures" "checks:tasks"];
+        docs = ["docs/task-control-plane.md"];
+      };
+      body = ''
+        **The rule.** The `shell-script-budget` ladder ends at Go, but "a Go
+        CLI" per domain is how `tools/` becomes the next `scripts/` — six
+        tool dirs today, forty by the time the ledger is empty. The port
+        target is one binary — a CLI of the operating system — with
+        `internal/<domain>` packages and a `<os> <family> <verb>` surface.
+        Binary name provisional; `tools/image-daily` is the first domain to
+        fold in.
+
+        **The surface stays.** `flake/cli.nix` already keys
+        `.#cli.<family>.<tool>`; the one binary backs every family through
+        argv[0]/alias dispatch (the busybox shape), so `cli.image.daily`,
+        `image_daily_cli` and frieren's slot closures keep resolving while
+        there is one module to build, vet and vendor. Taskfiles keep their
+        task names — they exec the binary, same contract (jobby M6).
+
+        **What does not fold in.** `tools/turns-runtime` is a benchmark with
+        its own nested flake, `tools/selector` and `tools/kg-zeck` are
+        one-language experiments — foreign trees, not the task surface.
+        `scripts/task/*.sh` retire domain by domain in the budget's
+        burn-down order (stdout/JSON first, host-touching last — a Go port
+        of a deploy script is a deployment). Python check helpers shrink
+        toward evals per `p4-taskfiles-to-evals`, they are not CLI verbs.
+
+        Exit: one go.mod under `tools/` serves the task surface — a second
+        task-surface module fails the policies gate; the script-budget
+        ledger keeps shrinking; `checks:policies:fixtures` stays green.
+      '';
+    };
     transitive-flake-drift = {
       title = "Transitive flake drift";
       kind = "open";

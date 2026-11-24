@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-24T12:49:55Z",
+  "generated": "2026-11-24T13:04:42Z",
   "count": 200,
-  "pin": "32cd2be28fa999b5e4be22466630fb8ef1a151b4b12791ce455dcfc3eddee7e9",
+  "pin": "83a5087a912a84dd9b96951f8bdf9e5e87b95fb2a5f87520326fbd8812bf9ff6",
   "turns": [
+    {
+      "id": "2d55a871-df8a-445e-8fd6-eb8e03c5c75b",
+      "ts": "2026-11-24T13:03:52Z",
+      "source": "hermes",
+      "subject": "nixconfig:delphi-drive",
+      "action": "drove delphi freebuff pane agents:3 over ssh: sent note-change task for AGENTS.nix EU careers-page gap and packet order; pane shows thinking...",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03han8l821a4nj8a9xhr64wn7"
+    },
+    {
+      "id": "9917113e-8fae-440f-8205-89ab7505480f",
+      "ts": "2026-11-24T13:03:19Z",
+      "source": "hermes",
+      "subject": "nixconfig:freebuff-drive",
+      "action": "drove freebuff pane agents:2: sent bug-fix task to fix apps:sent failing on Solaris packet Greenhouse 8585238002; pane shows thinking...",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03han8hd3kpkqhcbis97eh8l8"
+    },
+    {
+      "id": "6851495e-396c-4332-9d86-a7a2369fa2c4",
+      "ts": "2026-11-24T13:01:42Z",
+      "source": "hermes",
+      "subject": "nixconfig:devin-drive",
+      "action": "drove devin pane agents:1: sent gate-change task to verify image-daily Go port gates and remaining gate checks; pane shows Thinking",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03han860omxw0gssadrmgjkq0"
+    },
+    {
+      "id": "f8e508bd-b425-495d-b129-42998df3de2a",
+      "ts": "2026-11-24T12:49:58Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 9 leads (Toast, Etraveli, Bahnhof fit 4; WebBeds, OANDA, Nasdaq, Fiserv, BeReal, Pigment fit 3; Frontiers refused, live row). Note job-scout-sre-platform-2026-11-24: site needs no copy change, packet order Toast then Etraveli after 12-07. b6398fac",
+      "outcome": "done",
+      "claims": [
+        "apps AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "b6398facf5986a195571bae1e1e9c3bfe93ea862",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03han5vggxxvc74omwl3v27px"
+    },
     {
       "id": "95a4424f-5aff-4a76-9581-9f0b6c38a1e2",
       "ts": "2026-11-24T12:44:59Z",
@@ -2747,58 +2801,6 @@
       "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
       "branch": "main",
       "frame": "03hajn41fjjs3hydigj8rbixt"
-    },
-    {
-      "id": "488d262b-4f46-438c-ae9f-de515878c126",
-      "ts": "2026-11-24T02:00:57Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "landed: intl scout r2 — Solaris Senior SRE (GH solarisbank/8585238002, Berlin) added as Fit-2 lead with JD + 2pp CV/1pp letter packet (prep, not sent); 74 ATS boards + WWR/Remotive/Himalayas/Jobicy/Arbeitnow/HN swept, no other EU/UK-eligible infra employer; dupes=0; apps:sent still 12 findings, nothing sent; repo untouched (26)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hajn3c06xsjl24xgme9gy0k"
-    },
-    {
-      "id": "fa24acd2-6581-4e9e-b467-65e15f1d1a21",
-      "ts": "2026-11-24T01:58:10Z",
-      "source": "pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "landed: drove 3 idle panes (02:50 CET). jev-decide classify vs labels.json = needs_review x3, none decisive -> fell back to standing tasks. devin verify image-daily Go port green (images:gate+checks:quick, commit+push if tidy); freebuff EU/DE scout+packets, no send; delphi intl scout+packets, no send. All 3 confirmed working (devin Running tools checks:quick, freebuff working 50s curl-rivia, delphi working 50s scout python).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
-      "branch": "main",
-      "frame": "03hajmjs949wl9v2725sjr69w"
-    },
-    {
-      "id": "f5532366-2072-4d83-a804-e4ad572a8611",
-      "ts": "2026-11-24T01:50:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-intl",
-      "action": "landed: intl scout 2026-11-24 — Railway Infrastructure Engineer (Ashby b8072f95, global remote, Fit 3) added as lead with 2pp CV + 1pp letter packet (prep, not sent); Fastly (UK-only remote) and Odin (US-only, no sponsorship) recorded not eligible; ElevenLabs already tracked (prep); dupe gate re-cleared, 8 rows closed, dupes=0; apps:sent still fails with 12 findings so nothing was sent; repo untouched (26 pre-existing)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hajl0kfuhwhda9ls47zcu8s"
-    },
-    {
-      "id": "8ba8f0e8-df4e-4158-a852-de6e847e0c71",
-      "ts": "2026-11-24T01:49:50Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily",
-      "action": "landed: remaining engine helpers ported to Go ops.go — reason/archive/resolve/dimensions/landscape/crop/deploy/round; engine 256->143 lines, only build_index shell left | gate: images:gate ok, checks:host frieren PASS, checks:quick PASS (budget fixture), drv-equality 30/30",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
-      "branch": "main",
-      "frame": "03hajkx71kszwa9expozz7crm"
     }
   ]
 }

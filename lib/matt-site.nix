@@ -25,7 +25,7 @@
     text = file |> builtins.readFile;
     names = values |> builtins.attrNames;
     out = text |> lib.replaceStrings (names |> map (n: "{{${n}}}")) (names |> map (n: toString values.${n}));
-    unbound = out |> lib.splitString "{{" |> lib.last |> lib.splitString "}}" |> lib.head;
+    unbound = out |> lib.splitString "{{" |> lib.last |> lib.splitString "}}" |> builtins.head;
   in
     if lib.hasInfix "{{" out
     then throw "template ${toString file}: unbound placeholder {{${unbound}}}"
@@ -816,7 +816,7 @@
           # that argue for a systems role.
           (joinProjects
             |> lib.sort (a: b: projectRank a > projectRank b)
-            |> lib.filter (e:
+            |> builtins.filter (e:
               builtins.elem (e.resumeName or e.name) [
                 "nixconfig"
                 "fibtransponder"

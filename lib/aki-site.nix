@@ -228,7 +228,7 @@
     text = file |> builtins.readFile;
     names = values |> builtins.attrNames;
     out = text |> lib.replaceStrings (names |> map (n: "{{${n}}}")) (names |> map (n: toString values.${n}));
-    unbound = out |> lib.splitString "{{" |> lib.last |> lib.splitString "}}" |> lib.head;
+    unbound = out |> lib.splitString "{{" |> lib.last |> lib.splitString "}}" |> builtins.head;
   in
     if lib.hasInfix "{{" out
     then throw "template ${toString file}: unbound placeholder {{${unbound}}}"
@@ -260,9 +260,9 @@
     services = toString serviceCount;
     uncovered = toString (builtins.length uncoveredActive);
     activeNixHosts = toString (builtins.length activeNixNames);
-    kindRow = byKind |> lib.attrNames |> lib.concatMapStringsSep ", " (k: "${k} (${toString byKind.${k}})");
-    statusRow = byStatus |> lib.attrNames |> lib.concatMapStringsSep ", " (s: "${s} (${toString byStatus.${s}})");
-    archRow = archCount |> lib.attrNames |> lib.concatMapStringsSep ", " (a: "${a} (${toString archCount.${a}})");
+    kindRow = byKind |> builtins.attrNames |> lib.concatMapStringsSep ", " (k: "${k} (${toString byKind.${k}})");
+    statusRow = byStatus |> builtins.attrNames |> lib.concatMapStringsSep ", " (s: "${s} (${toString byStatus.${s}})");
+    archRow = archCount |> builtins.attrNames |> lib.concatMapStringsSep ", " (a: "${a} (${toString archCount.${a}})");
   };
 
   overviewBody = render ./site/overview.html t;
@@ -424,7 +424,7 @@
             lib.optionalString ((l.note or "") != "") " &middot; "
           }<code>${toString l.port}</code></td></tr>''
       )
-      ((net.links or []) |> builtins.filter (l: (l.url or null) != null));
+      ((net.links or []) |> lib.filter (l: (l.url or null) != null));
 
     statusBadge =
       if (info.status or "") == "active"
@@ -898,8 +898,8 @@
   # Doc and skill nodes carry their own text into their slice: read from the
   # repo at eval time and rendered by the build step, so "open the note" is a
   # transition inside the site, never a forge link (Story: note aki-site-design).
-  docNodes = kg.graph.nodes |> builtins.filter (n: n.type == "doc");
-  skillNodes = kg.graph.nodes |> builtins.filter (n: n.type == "skill");
+  docNodes = kg.graph.nodes |> lib.filter (n: n.type == "doc");
+  skillNodes = kg.graph.nodes |> lib.filter (n: n.type == "skill");
   noteNodes = docNodes ++ skillNodes;
   # A skill node's `path` is its directory (`.agents/skills/<name>`); its note is
   # the SKILL.md inside it. `lib/knowledge-graph.nix` deliberately projects the
@@ -932,7 +932,7 @@
       path = noteFile n;
       text = root + "/${noteFile n}" |> builtins.readFile |> stripFrontmatter;
     })
-    (builtins.filter (n: n ? path) noteNodes)
+    (lib.filter (n: n ? path) noteNodes)
     ++ lib.mapAttrsToList (id: _: {
       slice = "data/agents-notes/${id}.json";
       path = "AGENTS.nix#${id}";
@@ -979,7 +979,7 @@
     {}
     kg.graph.edges; # Tag nodes have no stat of their own; derive the count so the chip can
   # never disagree with the data it filters.
-  tagCount = kg.graph.nodes |> builtins.filter (n: n.type == "tag") |> builtins.length;
+  tagCount = kg.graph.nodes |> lib.filter (n: n.type == "tag") |> builtins.length;
 
   siteNodes =
     map

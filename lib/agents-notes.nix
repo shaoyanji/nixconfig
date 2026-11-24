@@ -343,7 +343,7 @@
             "## ${capitalize k}\n\n"
             + "| id | title | status | claim | refs |\n| :--- | :--- | :--- | :--- | :--- |\n"
             + (ordered
-              |> lib.filter (e: e.kind == k)
+              |> builtins.filter (e: e.kind == k)
               |> lib.concatMapStringsSep "\n" (
                 e:
                   "| [\`${e.id}\`](${base}agents-notes/${e.id}.md) | ${e.title} | ${statusBadge e} | "

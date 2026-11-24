@@ -194,7 +194,7 @@
   # Only a DECLARED policy becomes a node: a template like `#<id>` in a doc is
   # prose about the convention, and a citation to an unknown id is a
   # `checks.ontology` failure, not a node the graph should invent.
-    text |> citedIds |> lib.filter (id: (policies |> builtins.hasAttr id) && (id |> builtins.match "[a-z0-9][a-z0-9-]*") != null);
+    text |> citedIds |> builtins.filter (id: (policies |> builtins.hasAttr id) && (id |> builtins.match "[a-z0-9][a-z0-9-]*") != null);
 
   # Every path that will become a doc node, so a link resolves before nodes exist.
   docPaths = files |> map rel;

@@ -396,7 +396,7 @@
     |> map (f:
       hostInventory
       |> lib.attrNames
-      |> builtins.filter (h: builtins.elem f (hostInventory.${h}.features or []))
+      |> lib.filter (h: builtins.elem f (hostInventory.${h}.features or []))
       |> builtins.sort (a: b: a < b)
       |> (hs: [f hs]));
 
@@ -460,9 +460,9 @@
     + "\n";
 
   taskSurface = let
-    names = tasks |> builtins.attrNames |> lib.sort (a: b: a < b);
+    names = tasks |> lib.attrNames |> lib.sort (a: b: a < b);
     aliasOf = n: tasks.${n}.aliasOf or "";
-    aliasCount = names |> builtins.filter (n: aliasOf n != "") |> lib.length;
+    aliasCount = names |> lib.filter (n: aliasOf n != "") |> lib.length;
     description = n: let
       d = tasks.${n}.desc or "";
     in

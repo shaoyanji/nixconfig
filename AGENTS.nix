@@ -5341,8 +5341,9 @@
 
         Landed: minimal is a named feature; user.base/user.ai take
         hmBaseFeatures/hmAiFeatures args via extraSpecialArgs in all four
-        chains; containers carry hmAi=["skills"] (the only unconditional
-        leaf). 30/30 drv-identical; checks:host + checks:quick green.
+        chains. Containers then dropped user.ai entirely — hmModules names
+        user.base + shell + user.ai.skills, and noDE's profiles.ai enable
+        went with the surface it gated. 30/30 drv-identical both times.
       '';
     };
   };

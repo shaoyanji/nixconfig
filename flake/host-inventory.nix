@@ -37,10 +37,11 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/mtfuji/configuration.nix];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
 
   kellerbench = {
@@ -48,10 +49,11 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/kellerbench/configuration.nix];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
 
   deckstation = {
@@ -59,10 +61,11 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/deckstation/configuration.nix];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
 
   delphi = {
@@ -81,10 +84,11 @@
       # wipes the device it is given.
       (import ../hosts/delphi/disko.nix {device = "/dev/sda";})
     ];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
   eisen = {
     kind = "nixos";
@@ -102,10 +106,11 @@
       inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
       ../hosts/applevalley/configuration.nix
     ];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
 
   frieren = {
@@ -131,10 +136,11 @@
       ../hosts/ares/configuration.nix
       (import ../hosts/common/disko.nix {device = "/dev/sda";})
     ];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
 
   stark = {
@@ -248,10 +254,11 @@
       ../hosts/guckloch/configuration.nix
       inputs.nixos-wsl.nixosModules.default
     ];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
 
   minyx = {
@@ -275,10 +282,11 @@
     system = "x86_64-linux";
     features = ["base" "containers" "disko"];
     modules = [../hosts/sledgehammer/configuration.nix];
-    hmModules = ["roles.minimal" "shell"];
-    # AI leaf list for user.ai: containers run profiles.ai.enable=false, so
-    # only the unconditional skills materialization stays on the surface.
-    hmAi = ["skills"];
+    # The container floor, named leaf by leaf: base toolbox + shell + the
+    # skills materialization (the only unconditional piece of user.ai).
+    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
+    # surface to disable.
+    hmModules = ["user.base" "shell" "user.ai.skills"];
   };
 
   demo = {

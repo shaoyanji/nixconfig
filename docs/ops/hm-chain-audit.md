@@ -75,7 +75,7 @@ now `hmModules` in each host's inventory entry, resolved per host inside
 
 | hosts | via | `hmModules` |
 |---|---|---|
-| applevalley, ares, deckstation, delphi, guckloch, kellerbench, mtfuji, sledgehammer | `containers` → `global.noDE` | `roles.minimal` + `shell`, `hmAi = ["skills"]` + `profiles.ai` off — the AI leaf imports are gone, only the unconditional skills materialization stays; the enable=false option surface still exists. delphi adds `mail-agent` import + hermes units; guckloch adds `ai.skills`/`antigravity-cli` + an atuin mkForce — additive imports merge on top |
+| applevalley, ares, deckstation, delphi, guckloch, kellerbench, mtfuji, sledgehammer | `containers` → `global.noDE` | `user.base` + `shell` + `user.ai.skills` — the container floor names its leaves directly; `user.ai` is not imported, so `profiles.ai` has no surface and noDE sets no disable. delphi adds `mail-agent` import + hermes units; guckloch adds `ai.skills`/`antigravity-cli` + an atuin mkForce — additive imports merge on top |
 | demo | `demo` → `global.demo` | `roles.demo` |
 
 An edit to the `inputs.home-manager` flake pin reaches all of chains A–C plus

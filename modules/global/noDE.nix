@@ -16,18 +16,14 @@
     if builtins.isString hostName && builtins.hasAttr hostName hostInventory
     then hostInventory.${hostName}.hmModules or ["roles.minimal" "shell"]
     else ["roles.minimal" "shell"];
-  # The same per-host resolution for the leaf lists inside user.base/user.ai:
-  # containers carry `hmAi = ["skills"]` so `profiles.ai.enable = false`
-  # disables the stack without paying its import surface. Passed through
-  # extraSpecialArgs because `imports` may not read `config`.
+  # The per-host leaf list inside user.base: containers' hmModules name it
+  # directly, and `hmBase` data rides extraSpecialArgs because `imports`
+  # may not read `config`. user.ai is not imported on containers at all —
+  # profiles.ai has no surface to disable.
   hmBase =
     if builtins.isString hostName && builtins.hasAttr hostName hostInventory
     then hostInventory.${hostName}.hmBase or user.hmBaseFeatures
     else user.hmBaseFeatures;
-  hmAi =
-    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.hmAi or user.hmAiFeatures
-    else user.hmAiFeatures;
 in {
   home-manager = {
     useGlobalPkgs = true;
@@ -35,9 +31,6 @@ in {
     backupFileExtension = "hm-backup";
     users.${user.name} = {
       imports = map (m: self.modules.${m}) hmModules;
-      # Headless container hosts: skip the AI CLI stack (freebuff, qmd, agy,
-      # aichat, ...) to keep closures small.
-      profiles.ai.enable = false;
       home.username = user.name;
       home.homeDirectory = user.home;
     };
@@ -54,7 +47,6 @@ in {
       inherit (config.networking) hostName;
       fleetHost = config.networking.hostName;
       hmBaseFeatures = hmBase;
-      hmAiFeatures = hmAi;
     };
   };
 }

@@ -32,9 +32,9 @@
     "desktop"
   ];
   # The leaf lists inside `user.base` and `user.ai`, one name per import so a
-  # host can trim the option surface its HM eval pays for. A container that
-  # runs `profiles.ai.enable = false` keeps only the unconditional skills
-  # materialization (`hmAi = ["skills"]`); the default is every leaf.
+  # host can trim the option surface its HM eval pays for. Containers skip
+  # user.ai entirely (hmModules names user.ai.skills directly); the default
+  # is every leaf.
   hmBaseFeatures = [
     "scripts"
     "lf"

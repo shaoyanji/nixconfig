@@ -41,11 +41,6 @@
   ];
 
   home-manager.users.${user.name} = {
-    imports = [
-      self.modules."user.ai.skills"
-      self.modules."user.ai.antigravity-cli"
-    ];
-
     # The fleet syncs shell history over the tailnet, which this host is not on
     # (inventory.toml: guckloch network.tailscale = false), so the shared
     # address is unroutable here and atuin reports `invalid credentials` — the

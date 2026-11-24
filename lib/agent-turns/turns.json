@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-24T13:54:33Z",
+  "generated": "2026-11-24T14:08:29Z",
   "count": 200,
-  "pin": "d80f800aac7b0c71e7c184e6d006296277a34c3185531159a9a81c96b01cae79",
+  "pin": "39b3cdab69906e3cd8e9a38d9c16b3cbf04049c3ebfbca73f0e7b38ba3c6af44",
   "turns": [
+    {
+      "id": "fc7816b0-58a0-43be-8dc9-f1cc35a225c4",
+      "ts": "2026-11-24T13:57:36Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: stack sweep filed 12 leads at lead (Aiven 4, Fides/MariaDB/McAfee/NEOXX/Numberly 3) with the 2026-12-07 hold, DB 1069 to 1081, apps:dupes []; read all five vendor pages: four already live rows, Proxmox only absent and no EU engineering role | gate: checks:kg PASS, agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "88f2fcf8e0c8e1335de65ee3303306ceacaa4436",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hanj34g76ic0fqmku3kykxw"
+    },
+    {
+      "id": "d85bd3cf-3918-4c72-a814-a6c37d9aa871",
+      "ts": "2026-11-24T13:54:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "Note job-scout-next-sweep-freebuff restated: next idle freebuff lane task is one more DevOps/SRE/Platform/Infrastructure employer-lead sweep, prep-only to 2026-12-07, nothing sent. OPEN/P3, refs+links unchanged. gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bde0abd2d1c9c0f739a63e6e66d93a0a2847014c",
+      "branch": "main",
+      "frame": "03hanihwm8468t9ob555h854r"
+    },
     {
       "id": "b5067967-d2f0-4c09-84de-07db2d6cb8f5",
       "ts": "2026-11-24T13:54:14Z",
@@ -2780,32 +2806,6 @@
       "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
       "branch": "main",
       "frame": "03hakd48haquf4hae14hqyvyd"
-    },
-    {
-      "id": "4c2e6f3f-713e-4fe1-acab-63717bcdf7a3",
-      "ts": "2026-11-24T04:04:42Z",
-      "source": "antigravity",
-      "subject": "frieren:system-audit",
-      "action": "landed: daily health audit & SYSTEM.md refined in-place | gate: checks:closure:budget PASS (21.5G/30G); checks:ports STRICT=0 PASS; checks:dns:resolver-health PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "72e571ed770b9f0bda891baf3b0b5483cdfbf747",
-      "branch": "main",
-      "frame": "03hakb9kz0np62ebdmwsfqfyi"
-    },
-    {
-      "id": "56a9b07e-7892-417d-833d-59c7b921a78a",
-      "ts": "2026-11-24T04:01:22Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-scout-intl",
-      "action": "Scouted intl boards (121 ATS boards, WWR, Remotive, LinkedIn 7d). Added 5 fresh leads: Intercom AI Infra London (fit 3, packet: 2pp EN CV + 1pp EN letter + JD projection), Legora Senior SRE Stockholm, Mangopay Senior SRE Luxembourg, Tiqets Senior Platform Amsterdam, Neo4j Go/K8s sharding London. Nothing sent: apps:sent still 12 findings. Gates: apps:dupes [] PASS, repo 26 unchanged (no commit, material is private state).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hakam5h3vlcaf6a8ex1okru"
     }
   ]
 }

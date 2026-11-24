@@ -28,7 +28,7 @@ providers:
     api: https://llm.onerouter.pro/v1
     key_env: INFRON_API_KEY
     api_mode: openai
-    default_model: deepseek/deepseek-v4-flash-0731:free
+    default_model: qwen/qwen3.8-27b:free
     # Picker pin, both halves needed: `models:` as a LIST is an allowlist (a
     # dict is per-model metadata, not a catalog narrow — hermes_cli's
     # `_models_config_is_allowlist`), and `discover_models: false` stops the
@@ -36,11 +36,11 @@ providers:
     # probe is how a billed `nemotron-3.5-super` was one pick away (2026-11-19).
     discover_models: false
     models:
-      - deepseek/deepseek-v4-flash-0731:free
       - qwen/qwen3.8-27b:free
+      # - deepseek/deepseek-v4-flash-0731:free
 model:
   provider: custom
-  default: deepseek/deepseek-v4-flash-0731:free
+  default: qwen/qwen3.8-27b:free
   base_url: https://llm.onerouter.pro/v1
 agent:
   max_turns: 150
@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 7
+  api_max_retries: 8
   # A stop waits this long for a running cron job before tearing down. The
   # default (30 s) plus adapter teardown crossed the 60 s shutdown watchdog on
   # every stop here, because pane-idle-watch runs for most of its 2-minute
@@ -164,28 +164,18 @@ fallback_providers:
     model: deepseek-v4-flash:free
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
-  - provider: openrouter
-    model: baidu/ernie-5.5-flash-preview:free
+  - provider: custom
+    model: minimax-m3.1-flash:free
+    base_url: https://crowllm.com/v1
+    key_env: CROWLLM_API_KEY
   - provider: nvidia
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
+  - provider: openrouter
+    model: baidu/ernie-5.5-flash-preview:free
   - provider: custom
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
     key_env: INFRON_API_KEY
-  # CrowLLM is a keyed route whose catalog is `:free` ids only: the key comes
-  # from the shared sops blob, so the entry names the env var and never the
-  # value. `key_env` is the only form hermes resolves — `api_key: ${VAR}` was
-  # sent literally (fallback_config.resolve_entry_api_key reads an inline
-  # literal or key_env, and never expandvars), which is a 401 with a key that
-  # was present the whole time.
-  # Two adjacent lanes on the same route, ordered capability-first:
-  # the 550b nemotron is unpopular enough to stay unsaturated and is the
-  # strongest free model in the catalog; the qwen omni flash is the fast
-  # backstop for when the 550b 5xx's. Measured 2026-11-22 — both returned
-  # content while nemotron-3.5-super-vl:free, deepseek-v4-flash,
-  # llama-3.3-70b and qwen4-max 5xx'd ("upstream unavailable" / "high
-  # demand"); the popular :free ids saturate first. If both lanes start
-  # answering 5xx, re-probe the catalog before blaming the key.
   - provider: custom
     model: nemotron-3-ultra-550b-a55b-uncensored:free
     base_url: https://crowllm.com/v1
@@ -194,20 +184,16 @@ fallback_providers:
     model: qwen3-8-omni-flash:free
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
-  # Keyless terminal lane: api.apisfreellm.com takes no key and can never
-  # bill, so it is the true last resort after every quota is spent.
   - provider: custom
     model: free-ai
     base_url: https://api.apisfreellm.com/v1
     api_key: free
-# chatplayground is deliberately NOT a provider here. Its chat endpoint takes
-# exactly one message of at most 15,000 characters, while a hermes turn sends
-# ~29,000 characters of system prompt and tool schemas, so every
-# `--provider chatplayground` turn did the work and then fell back. It is used
-# as a CLI advice lane instead: `.agents/skills/cpg` (skill) over
-# `cpg chat`, a self-contained client that needs no unit and no shim.
-# The loopback shim on 127.0.0.1:8799 still exists for aichat's
-# `openai-compatible` client (`programs.hermes-user.chatplayground`).
+  # Sail Research — last resort fallback. SAIL_API_KEY lives in sops
+  # ai-services-shared-env. Probed separately before trusting.
+  - provider: custom
+    model: deepseek-ai/DeepSeek-V4.1-Flash-1017
+    base_url: https://api.sailresearch.com/v1
+    key_env: SAIL_API_KEY
 tts:
   primary: speechify
   speechify:
@@ -232,6 +218,15 @@ stt:
 # that still has no explicit destination.
 auxiliary:
   free_only: true
+  # Unset, the goal judge resolves a built-in `deepseek`/`deepseek-flash`
+  # default that no `providers:` entry declares — every verdict errors.
+  # infron is daily-capped (1000 req/day, hit 2026-11-24); free-ai is the
+  # keyless lane that answered a live probe same-day — zero quota cost.
+  goal_judge:
+    provider: custom
+    model: free-ai
+    base_url: https://api.apisfreellm.com/v1
+    api_key: free
 
 # Titles and summaries use their own model lane, pinned to hydrogen so aux
 # work never burns the `:free` ids on the main chat route.

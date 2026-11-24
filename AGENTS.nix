@@ -5392,6 +5392,56 @@
         went with the surface it gated. 30/30 drv-identical both times.
       '';
     };
+    job-scout-lane-state-2026-11-24 = {
+      title = "Six employers sit at stage lead after the 2026-11-24 sweeps; HITS.nrw takes the German letter";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Lane state after the three 2026-11-24 sweeps (164af385, 7b40455e): HITS.nrw, Shipzero and Wellis at fit 4, TecTake, Studytube and Projektron at fit 3, every row still stage lead. HITS.nrw goes first as the only fit 4 German role on own-fleet Linux; Wellis and Studytube wait on the NL call, not on tailoring.";
+      links = [
+        "job-scout-wide-feed-sweep-2026-11-24"
+        "job-scout-daily-feed-sweep-2026-11-24"
+        "job-scout-sre-platform-sweep-2026-11-24"
+      ];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "taskfiles/apps.yml"
+        ];
+        tasks = ["apps:scout" "apps:get" "apps:query"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Eight rows, six employers, every one at `stage lead`: the 164af385
+        daily sweep added Shipzero, Wellis and Projektron, and the 7b40455e
+        wide sweep added HITS.nrw, TecTake and Studytube on top.
+
+        HITS.nrw   Düsseldorf  Linux and K8s app operations   fit 4
+        Shipzero   Hamburg     AI Platform Engineer           fit 4
+        Wellis     Rotterdam   DevOps/Platform, on-site NL    fit 4
+        TecTake    Igersheim   Senior Infrastructure          fit 3
+        Studytube  Amsterdam   Cloud Engineer, on-site NL     fit 3
+        Projektron Berlin      Cloud Engineering, German C1   fit 3
+
+        HITS.nrw goes first: the only fit 4 in Germany whose day is
+        own-fleet Linux and Kubernetes, and the German ad wants a German
+        letter. Shipzero's packet is built and waits on the employer ATS
+        behind join.com. Wellis and Studytube wait on the Netherlands call,
+        not on tailoring. TecTake's centre is Microsoft identity, and
+        Projektron is gated on C1.
+
+        Drift to close: HITS.nrw and Shipzero each carry two lead rows
+        (`hits-nrw-application-operator-devops` beside the truncated slug,
+        `shipzero-ai-platform-engineer` beside `-f-m-d`), which the
+        one-row-per-employer rule calls a dupe, not a second lead.
+
+        Nothing sends before 2026-12-07, and the lane has no send verb.
+
+        Exit: every row is `applied` with a receipt or closed with a
+        reason, and this note goes DELIVERED.
+      '';
+    };
     job-scout-next-sweep-freebuff = {
       title = "The next idle freebuff lane task is one more employer-lead sweep";
       kind = "open";

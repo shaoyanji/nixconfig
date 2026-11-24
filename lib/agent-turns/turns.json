@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-24T18:45:42Z",
+  "generated": "2026-11-24T18:53:28Z",
   "count": 200,
-  "pin": "de8332d4260cd9178869eb8c04585a972f527513253af59dabc3759ba01ae4dc",
+  "pin": "cc31b2d155e3248a9ec59c4995df8cdfc519c46ff883339f0c958128dcebc405",
   "turns": [
+    {
+      "id": "293580c7-44a5-4a6d-849c-45d95717147d",
+      "ts": "2026-11-24T18:52:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correct: ca0eb847 supersedes 316fc5f0 and 499fc469 — the commit carries AGENTS.nix plus the repo's regenerated turns.json (every prior lane commit does, f9d9ee1e included), and apps:dupes is pre-existing, never empty: auteega, Catapult, DHBW, Hochschul-IT, ICF, Shipzero, SourceQ — none of the three new rows is a dupe | gate: nix-instantiate --parse PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ca0eb847ee535b8ccaafae8b18fcfe0b8aae2d39",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap4m6379swh3wtyq85bfr9"
+    },
+    {
+      "id": "c2b5b3c9-e310-456f-8398-530e6529470e",
+      "ts": "2026-11-24T18:50:57Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correct: commit rewritten locally as 316fc5f0 (unpushed) to drop a pre-staged lib/agent-turns/turns.json churn — the sweep commit is AGENTS.nix only, note job-scout-linkedin-direct-2026-11-24; three leads CloudFactory 4, SCHUFA 3, Markant 3 at lead to 2026-12-07; Telekom MMS refused | gate: nix-instantiate --parse PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "316fc5f0aa5cd767f325e8c0e7591bb0c598c859",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap4e1tyekk7x6sl7f4umh4"
+    },
+    {
+      "id": "a1ec6ffe-1924-4dd7-9da2-8e6ecd67725a",
+      "ts": "2026-11-24T18:50:36Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 3 direct leads from the LinkedIn guest sweep — CloudFactory Berlin SRE 4, SCHUFA Wiesbaden AWS platform 3, Markant Offenburg SRE 3, all at lead held to 2026-12-07; Telekom MMS refused (Telekom group already applied); note job-scout-linkedin-direct-2026-11-24; dedupe now parses the TOON export | gate: nix-instantiate --parse PASS; checks:quick blocked on pre-existing checks:tasks",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "499fc46933b065feb0027b88966171eb62b4d37a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap4bmeag31ljv36zloymgz"
+    },
+    {
+      "id": "08925ea4-f438-4012-8ca7-d2c1a0aacb21",
+      "ts": "2026-11-24T18:45:59Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-wide-feed",
+      "action": "landed: widened sweep to 16 arbeitnow pages (3,767 postings) — 3 new rows: Hochschul-IT-Services.nrw Düsseldorf (Linux/K8s app operations, fit 4), TecTake Igersheim (senior infra, fit 3), Studytube Amsterdam (cloud engineer, fit 3). trawa (prep) and Biz Factory (applied) already on file. Note job-scout-wide-feed-sweep-2026-11-24 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7b40455ecfe53678967728d370ed2e99d9c10bbb",
+      "branch": "main",
+      "frame": "03hap3f5us58lfe5gxz4el9wp"
+    },
+    {
+      "id": "5b7e1dd9-60a9-445a-9736-736412acbec2",
+      "ts": "2026-11-24T18:45:58Z",
+      "source": "devji",
+      "subject": "nixconfig:code-review-loop",
+      "action": "landed: appflow-board locations generated from route lists + service-portal builtins/lib aliases unified | gate: checks:hosts delphi+frieren PASS (2132 assertions, frieren module-system rc=0)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d21ce272d15cd9946517dfaec492418ce68a51bf",
+      "branch": "main",
+      "frame": "03hap3f42txt8gbfhltxxukwn"
+    },
     {
       "id": "1b333781-333e-4a99-9c57-3d4d171818fc",
       "ts": "2026-11-24T18:44:36Z",
@@ -2668,83 +2733,6 @@
       "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
       "branch": "main",
       "frame": "03halrsgvaacrlpr2a9z68nip"
-    },
-    {
-      "id": "740bb885-0134-4654-af82-76bff10c79a2",
-      "ts": "2026-11-24T08:27:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-site",
-      "action": "landed: software CV (en+de) now leads with the fleet, CI-gate and sentinel bullets plus DevOps keywords, all verbatim from the corpus; scout-2026-11-24 round asked for exactly those. Commit ace277bc, matt-site rebuilt (29 files, 1pp budget held, ATS ok both langs), published matt.bountystash.com deployment ceb42aa9. cv-links-check 14 ok/0 failed, live sha == artifact. cv-blog-check FAILS on pre-existing is-a.dev drift (cv.pdf fd22f041 vs 3733b9ee), untouched.",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/cv-software.json lib/matt/cv-software.de.json"
-      ],
-      "files": [],
-      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
-      "branch": "main",
-      "frame": "03halqke8in3cjlper05gfpnj"
-    },
-    {
-      "id": "8d593415-04d3-4d53-a34b-e005dba574c5",
-      "ts": "2026-11-24T08:26:54Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: both leads already had rows, so no new rows. Mozilla staff-sre-tools-systems is applied 2026-11-21 (Greenhouse 8315181). Helsing SRE row had been closed as a dupe of the weaker avionics systems seat; reopened it as the lead with helsing.ai/jobs/4347030101 and closed the avionics row. Board findings: Greenhouse tokens mozilla and helsing (100/142 pagination explains the earlier miss) | gate: apps:dupes PASS ([]), 1001 tracked, dirty 26",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halqhhzmi9a934qcmwv6k5u"
-    },
-    {
-      "id": "aac74e89-6350-407a-a494-b39e3fc05d29",
-      "ts": "2026-11-24T08:24:57Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "landed: static-serve folded into tools/os (internal/serve, FlagSet Main), cli.serve.static-serve symlinks bin/static-serve->os, packages.<system>.servers.static-serve served by the umbrella — goModules ledger down to one module, one-os-cli DELIVERED | gate: checks:tasks PASS (parity exact), go build+vet+test clean, policies fixtures PASS, nix artifact serves Range 206",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8eed237a7004f9e5a32fef026ee52e2d552a1e5f",
-      "branch": "main",
-      "frame": "03halq3u6bfo6blylz0q8eb8b"
-    },
-    {
-      "id": "6090dfbd-5714-472d-bf82-33c77d5c87d9",
-      "ts": "2026-11-24T08:24:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-site",
-      "action": "landed: CV static surface refresh (cv.typ + cv-*.json en/de) against the latest scout-round DevOps/SRE/Platform leads, deduped vs the tracked set; CV gates run and the static surface republished. Freebuff (pane 2) is working it.",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/cv.typ",
-        "lib/matt/cv-software.json",
-        "lib/matt/cv-energy.json"
-      ],
-      "files": [],
-      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
-      "branch": "main",
-      "frame": "03halq01zimczaiqtr82pbej1"
-    },
-    {
-      "id": "07732e72-dcd4-492f-92a8-be5c875d38a2",
-      "ts": "2026-11-24T08:24:25Z",
-      "source": "devin",
-      "subject": "nixconfig:one-os-cli-chain",
-      "action": "landed: one-os-cli umbrella now serves .servers; tools/static-serve folded into the chain so every caller resolves image-daily unchanged. Devin (pane 1) is working it; gate is task checks:tasks parity + go build/vet in tools/os.",
-      "outcome": "done",
-      "claims": [
-        "flake/cli.nix",
-        "tools/static-serve",
-        "flake/packages.nix"
-      ],
-      "files": [],
-      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
-      "branch": "main",
-      "frame": "03halq000kv830ac9ad69o3p0"
     }
   ]
 }

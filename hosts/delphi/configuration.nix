@@ -315,6 +315,7 @@ in {
     self.modules."services.agent-turns"
     self.modules."services.appflow-board"
     self.modules."services.dsh-web"
+    self.modules."services.dsh-free-models"
     self.modules."services.fleet-monitors"
     self.modules."services.mataroa-console"
     self.modules."services.media-relay"
@@ -338,6 +339,17 @@ in {
   # Five reads plus the two write routes over the archive's tables; consumer of
   # the appflow-single-writer cutover.
   services.appflowBoard.enable = true;
+
+  # --- the free-model relay, durable ---
+  # The clanker proof in a unit instead of a tmux: the plugin fronts free lanes
+  # (DeepSeek V4.1 Flash, Kimi K3) behind an OpenAI-compatible gateway on
+  # loopback :8326, exposed on the tailnet by the `free-models` mount below.
+  services.dshFreeModels = {
+    enable = true;
+    user = user.name;
+    trustedHosts = ["${tailnetHost}:8443" "${tailnetHost}:8327"];
+    environmentFile = config.sops.templates."dsh-web.env".path;
+  };
 
   # One half of the failover group; frieren runs the same module and the same /32
   # (setting only `.address` does nothing — the bind is behind `enable`).
@@ -1394,6 +1406,25 @@ in {
           title = "Job pipeline";
           description = "Applications and their mail, read and written through the archive database.";
           requires = ["nginx.service"];
+        };
+        # The dsh dashboard, back on its retired port — hosts/delphi/dsh-web.shadow.nix
+        # named 8443 the harness's home and nothing else has taken it.
+        dsh = {
+          port = 8443;
+          upstream = "http://127.0.0.1:${toString config.services.dshFreeModels.webPort}";
+          title = "Free models";
+          description = "dsh dashboard for the free-model roster (DeepSeek V4.1 Flash, Kimi K3, ...).";
+          requires = ["dsh-free-models.service"];
+        };
+        # Machine-facing: OpenAI-compatible /v1, api-key gated (minted at first
+        # run under ~/.dsh/openai-gateway/). No card — a client reads this, not a browser.
+        free-models = {
+          port = 8327;
+          upstream = "http://127.0.0.1:${toString config.services.dshFreeModels.gatewayPort}";
+          title = "Free-model gateway";
+          description = "OpenAI-compatible relay; the bearer key lives in ~/.dsh/openai-gateway/api-key.";
+          requires = ["dsh-free-models.service"];
+          hideCard = true;
         };
       }
       // lib.optionalAttrs (lib.hasAttr "zettelGraph" config.services) {

@@ -317,6 +317,9 @@ in {
       {unit = "systemone-decision-serve.service";}
       {unit = "nginx.service";}
       {unit = "tailscaled.service";}
+      {unit = "dsh-free-models.service";}
+      {unit = "tailscale-serve-dsh.service";}
+      {unit = "tailscale-serve-free-models.service";}
     ];
     # User units are where the 2026-11-15 outages lived: a vdirsyncer timer that
     # failed every 15 minutes for three days and a keepalive that failed 104

@@ -1,8 +1,86 @@
 {
-  "generated": "2026-11-24T22:19:05Z",
+  "generated": "2026-11-24T22:30:28Z",
   "count": 200,
-  "pin": "39b56733d7d623ed8e8617f973e0c4b9661667602acb0f857c7a21d5ab461c65",
+  "pin": "10d3dce1238769ebef1cc309e5e7da59bcd9e26d874ec5905f117e0593a952b7",
   "turns": [
+    {
+      "id": "2559db55-2dae-4947-9516-896853b7058d",
+      "ts": "2026-11-24T22:26:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: +1 genuinely new lead (True Talent bare-metal platform), 4 rows reconciled (Nebius closed duplicate, trawa/Upvest/Ledgy merged into pre-existing 11-21 rows with notes replaced - annotated). Outreach verified live: NETWAYS+noris delivered 21:54, Proofline held pending prooflinedev PR | gate: rows re-read after write",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
+      "branch": "main",
+      "frame": "03haqaelgjp6hcvbepfyfcubb"
+    },
+    {
+      "id": "90e2819a-a012-49d9-b6a6-050a5ee07b03",
+      "ts": "2026-11-24T22:25:56Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:host-change",
+      "action": "landed: routed durable_clanker to devin (agents:1) - create delphi NixOS module to make clanker proof durable instead of a tmux proof dying on auto-suspend; drive confirmed by Thinking spinner",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
+      "branch": "main",
+      "frame": "03haqadzcakz5l7z8cl14yx8o"
+    },
+    {
+      "id": "6c4e6cf8-f7e8-46ae-802f-8fe12b5314b1",
+      "ts": "2026-11-24T22:25:26Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: recorded 5 new leads (Nebius SRE-Berlin closed as duplicate, trawa/Upvest/TrueTalent/Ledgy lead), outreach re-verified: NETWAYS+ noris delivered 21:54 by Resend API, Proofline held pending a PR to prooflinedev | gate: every row re-read from the tracker after write",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
+      "branch": "main",
+      "frame": "03haqaahm1nntsos558ictt97"
+    },
+    {
+      "id": "d50c0a84-dee3-42b9-a48e-a4171dd1feac",
+      "ts": "2026-11-24T22:25:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-site-lane",
+      "action": "landed: routed scout_leads to freebuff (agents:2) - continue scouting DevOps/SRE/Platform/Infrastructure engineer leads into CV site lead tracker; drive confirmed by working counter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
+      "branch": "main",
+      "frame": "03haqa9ox05kjoymhkq0djv3m"
+    },
+    {
+      "id": "4173ff66-dbd0-4d23-94d4-f438bb134517",
+      "ts": "2026-11-24T22:25:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: routed job_search to delphi (agents:3) - continue scouting DevOps/SRE/Platform/Infrastructure job leads into lead tracker; drive confirmed by working counter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
+      "branch": "main",
+      "frame": "03haqa9bv9jl087s9ihjyo6w5"
+    },
+    {
+      "id": "6a2a48c6-8627-441e-b77d-14407b38b243",
+      "ts": "2026-11-24T22:25:16Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:chain-change",
+      "action": "landed: routed verify_refactor to devin (agents:1) - run checks:host on delphi+frieren to confirm infra-stack refactor passes module-system checks; drive confirmed by Running tools spinner",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
+      "branch": "main",
+      "frame": "03haqa981c7r7m5m9gyqxsy5z"
+    },
     {
       "id": "f73a7574-dbca-4dcf-a227-ecfec1624e31",
       "ts": "2026-11-24T22:15:45Z",
@@ -2599,86 +2677,6 @@
       "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
       "branch": "main",
       "frame": "03hamse5oak3hfhgz50nx3fjq"
-    },
-    {
-      "id": "df46d1d8-1423-4cee-bf11-88229b5f5973",
-      "ts": "2026-11-24T11:40:07Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: 5 new leads from LinkedIn EU 7-day (Dataiku, Guidewire, Prima, Implicity, Continia; all live 200, fit 3-4). SmartRecruiters gave only ServiceNow (IN/US), WWR nothing new of fit, Remotive still ignores filters. Follow-ups: 21 overdue (DKRZ 27.04, Codesphere 29.04, Pennylane 26.09), 5 due today (Genesis PHCM ack; Münster, SwissPeak, coni+partner blocked; gridscale ready), 38 in 7d.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hams88fkiz7m8bjl3b9m2ja"
-    },
-    {
-      "id": "af688695-fa56-439e-902f-e97c86f8dee2",
-      "ts": "2026-11-24T11:39:59Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: task sent to delphi freebuff pane; released session recovered with Enter, working... verified",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
-      "branch": "main",
-      "frame": "03hams7anuuzxivd1yrr61i1y"
-    },
-    {
-      "id": "e7eafde9-fe66-477f-af68-e0d18198b7e2",
-      "ts": "2026-11-24T11:39:58Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-publish-docs",
-      "action": "landed: task sent to freebuff pane; working... verified after second Enter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
-      "branch": "main",
-      "frame": "03hams78mhm1sz5kjqpexqbz4"
-    },
-    {
-      "id": "6702b9e3-cf23-431c-8f3f-80dabe95e65a",
-      "ts": "2026-11-24T11:39:58Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-leftovers",
-      "action": "landed: task sent to devin pane; leftovers loop started and Thinking verified",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
-      "branch": "main",
-      "frame": "03hams76npbrzgqkshgcealw4"
-    },
-    {
-      "id": "a821de88-40a8-4334-86df-d5d98f1a6d4a",
-      "ts": "2026-11-24T11:23:49Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-fold",
-      "action": "landed 83df00b1: plates round ported to Go — cmdPlates in tools/os/internal/image reuses runLane's machinery; plates.sh 286->27 lines, DETACH=1 still routes via round; gate accepts unjudgedStreak in plates.go; budget entry removed | gate: checks:image-daily ok, checks:tasks parity, checks:policies clean, DRY=1 E2E on built artifact",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "83df00b151e9b3df9600e9b05bcbc007fd711113",
-      "branch": "main",
-      "frame": "03hamp1q1ywe3euuymaawrego"
-    },
-    {
-      "id": "eae20d7e-c2ee-466e-b99a-85bac09e5911",
-      "ts": "2026-11-24T11:17:43Z",
-      "source": "freebuff",
-      "subject": "nixconfig:site-links",
-      "action": "Idle site check: checks:docs:links PASS (184 md, all links/anchors), checks:site:links PASS (91 links/17 pages/6 PDFs linked), dev:site:build PASS (docs target). dev:blog:cv:check FAIL: published cv.pdf/cv-de.pdf are one build behind the matt-site artifact. No repo files changed; blog re-copy left to operator (CI deploys on push).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ddb18ab29cecd97a4cf86d47b02a0f2efcdecfe5",
-      "branch": "main",
-      "frame": "03hamnuqj4czm6qp922k7pcls"
     }
   ]
 }

@@ -196,6 +196,11 @@ ssh_alias = "delphi"
 # service portal asserts each port is a mount on this host. Descriptions stay in
 # `key_services` below; this list is only what a reader clicks.
 [[hosts.delphi.network.links]]
+label = "Free models"
+port = 8443
+note = "dsh dashboard for the free-model roster; the OpenAI relay is :8327, no card"
+
+[[hosts.delphi.network.links]]
 label = "System One decisions"
 port = 8444
 note = "POST /v1/systemone"

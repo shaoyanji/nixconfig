@@ -1,4 +1,4 @@
-# appflow-board — the job pipeline as a page over the archive's read routes.
+# appflow-board — the job pipeline as a page over the archive's routes.
 # Why it has no snapshot and why the proxy allowlist is exact:
 # `docs/appflow-board.md`.
 {
@@ -14,7 +14,7 @@
     install -m 0644 ${../../lib/appflow-board/index.html} $out/index.html
   '';
 
-  # One exact location per read, so the proxied surface is this list and not the
+  # One exact location per route, so the proxied surface is this list and not the
   # plugin's route table.
   proxyTo = name: ''
     proxy_pass ${cfg.upstream}/api/${name};
@@ -24,7 +24,7 @@
   '';
 in {
   options.services.appflowBoard = {
-    enable = lib.mkEnableOption "the read-only job pipeline board (delphi)";
+    enable = lib.mkEnableOption "the job pipeline board (delphi) — five reads plus the two write routes";
 
     port = lib.mkOption {
       type = lib.types.port;
@@ -36,7 +36,7 @@ in {
     upstream = lib.mkOption {
       type = lib.types.str;
       default = "http://127.0.0.1:8080";
-      description = "The archive API the board reads. Four read-only routes are proxied; nothing else is reachable through this vhost.";
+      description = "The archive API the board fronts. Five GET reads plus the two POST write routes are proxied; nothing else is reachable through this vhost.";
     };
   };
 
@@ -78,6 +78,15 @@ in {
           };
           "= /api/application-mail" = {
             extraConfig = proxyTo "application-mail";
+          };
+          # The two write routes: update status/stage/next_action by id, or
+          # insert/update a full record. POST through to the same upstream —
+          # the vhost is a proxy, the SQL files own the write contract.
+          "= /api/application-update" = {
+            extraConfig = proxyTo "application-update";
+          };
+          "= /api/application-upsert" = {
+            extraConfig = proxyTo "application-upsert";
           };
         };
       };

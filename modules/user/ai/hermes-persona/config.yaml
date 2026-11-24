@@ -146,6 +146,12 @@ display:
 # the NIM lane, not the custom endpoint: the billed pick that cost the Infron
 # balance (2026-11-19) was this model resolved through a metered route.
 fallback_providers:
+  # CanTrustAI — first fallback. Model: deepseek/deepseek-v4.1-flash on
+  # https://cantrustai.xyz/v1. Key: CANTRUSTAI_API_KEY (sops ai-services-shared-env).
+  - provider: custom
+    model: deepseek/deepseek-v4.1-flash
+    base_url: https://cantrustai.xyz/v1
+    key_env: CANTRUSTAI_API_KEY
   # NIM leads (2026-11-22), ahead of the two lanes that used to. Order is cost,
   # not preference: `GET <base>/models` measured 0.107 s for NIM (connect
   # 0.016 s, against a 0.066 s github baseline) where openrouter was 0.984 s and

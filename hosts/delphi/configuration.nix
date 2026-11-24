@@ -335,8 +335,8 @@ in {
   services.media-relay.r2.enable = true;
 
   # --- the job pipeline as a page ---
-  # Read-only over the mail hub's tables; consumer of the appflow-single-writer
-  # cutover, and a writer of nothing.
+  # Five reads plus the two write routes over the archive's tables; consumer of
+  # the appflow-single-writer cutover.
   services.appflowBoard.enable = true;
 
   # One half of the failover group; frieren runs the same module and the same /32
@@ -1380,17 +1380,18 @@ in {
           description = "Posts as markdown files; publish and unpublish against mataroa.blog.";
           requires = ["mataroa-console.service"];
         };
-        # The pipeline, read from the archive: stage counts, a search over company,
-        # role and next action, and the record behind a click. Read-only by
-        # construction — the vhost proxies four GET routes and nothing else, so the
-        # plugin's write endpoints are not reachable through this mount.
+        # The pipeline, from the archive: stage counts, a search over company,
+        # role and next action, and the record behind a click. The vhost proxies
+        # five GET reads plus the two POST write routes (application-update,
+        # application-upsert) so agents can write records through the tailnet
+        # mount — no auth on any of it.
         appflow = {
           # The tailnet port is not the vhost's: `tailscale serve` and nginx both
           # bind, and sharing a number puts them on the same socket.
           port = 8463;
           upstream = "http://127.0.0.1:${toString config.services.appflowBoard.port}";
           title = "Job pipeline";
-          description = "Applications and their mail, read from the archive database.";
+          description = "Applications and their mail, read and written through the archive database.";
           requires = ["nginx.service"];
         };
       }

@@ -5475,6 +5475,54 @@
         with a reason; `checks:quick` green.
       '';
     };
+    job-scout-wide-feed-sweep-2026-11-24 = {
+      title = "Widened feed sweep: HITS.nrw, TecTake and Studytube are new; trawa and Biz Factory already carry rows";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Third 2026-11-24 sweep, sixteen arbeitnow pages (3,767 postings) filtered on title and a German location or remote: Hochschul-IT-Services.nrw (Düsseldorf, Linux/Kubernetes application operations, fit 4), TecTake (Igersheim, senior infrastructure, fit 3) and Studytube (Amsterdam, cloud engineer, fit 3) are new rows.";
+      links = ["job-scout-daily-feed-sweep-2026-11-24"];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "taskfiles/apps.yml"
+        ];
+        tasks = ["apps:scout" "apps:get"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Went to sixteen feed pages (3,767 postings) instead of the six the
+        earlier sweeps used, then filtered on a devops/SRE/platform title
+        with a German location or remote. Three rows, all untracked:
+
+        Hochschul-IT-Services.nrw, Düsseldorf (Application Operator /
+        DevOps Engineer, Linux and Kubernetes) — the newly founded central
+        IT provider for NRW's public universities: HISinOne, Moodle and
+        ILIAS on Linux application servers and Kubernetes, Puppet, CI/CD,
+        monitoring and 2nd/3rd-level incidents. Fit 4, the closest to
+        own-fleet operations this lane has found in Germany.
+
+        TecTake, Igersheim (Senior Infrastructure Engineer) — e-commerce
+        central infrastructure across on-prem, Azure and Google; Windows
+        and Linux, virtualisation, backup and storage, M365 and AD,
+        scripting. Fit 3: the Linux and automation half fits, but the
+        centre of gravity is Microsoft.
+
+        Studytube, Amsterdam (Cloud Engineer) — owns its AWS estate,
+        Terraform, CI/CD, security and monitoring. Fit 3: right shape and
+        English-language, but Amsterdam on-site, so it waits on the same
+        relocation question as Wellis.
+
+        Closed as already on file: trawa (Senior Platform Engineer, prep)
+        and Biz Factory (applied) reappeared under their tracked titles,
+        and IONOS, gridscale, DENKweit, eleQtron, virtual7, wabcon,
+        Projektron, Shipzero and Wellis were in the feed again.
+
+        Route: all three apply through their own forms; the 2026-12-07
+        hold governs the sends.
+      '';
+    };
     job-scout-daily-feed-sweep-2026-11-24 = {
       title = "Daily-feed sweep: Shipzero, Wellis and Projektron are new; the rest of the day's feed was already on file";
       kind = "open";

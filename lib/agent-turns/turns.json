@@ -1,8 +1,77 @@
 {
-  "generated": "2026-11-24T08:07:32Z",
+  "generated": "2026-11-24T08:17:42Z",
   "count": 200,
-  "pin": "9affd62f7ba2e1e0a10c74b4b1b34a9bdd37d21f0ac5403a3a6dfa48be866fed",
+  "pin": "906f4a92d3d1268921267e6684988fac2d1d8089a4afb531a0b58bde7f47cb36",
   "turns": [
+    {
+      "id": "3e30ccdd-df06-4a6a-9af1-b3fb10375e70",
+      "ts": "2026-11-24T08:16:53Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "blocked: KINEXON Go-Backend not sent. Packet final and verified, CV 2pp + letter 1pp, artifact /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend. No recipient: row has no recruiter or gmail address, ad names none, archive has no KINEXON mail, site publishes only info@ and compliance@. Route is the Greenhouse form gh_jid 4936773101; operator choice pending.",
+      "outcome": "blocked: no recipient address for the mail lane; Greenhouse portal form is the only application route",
+      "claims": [
+        ".local/state/appflow/submissions/kinexon-senior-devops-go-backend"
+      ],
+      "files": [],
+      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
+      "branch": "main",
+      "frame": "03haloj299ad6mwx0lzbxlr9q"
+    },
+    {
+      "id": "83c792f5-64f5-49e9-b87d-7b1f9b6db045",
+      "ts": "2026-11-24T08:16:04Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: scout upsert — 3 new rows (finmid Platform Engineer, iits Senior DevOps/Cloud 100% remote, Neura Robotics Cloud Architect) plus refreshed Ashby Staff Platform Engineer EU and 0G Senior DevOps; 8 further leads refused as already tracked (Supabase, Babbel, ElevenLabs, n8n, Pliant, Enpal, CoachHub, gridscale) | gate: apps:dupes PASS ([]), 1001 tracked, dirty 26 unchanged",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halod92r4d23evcceli8x6l"
+    },
+    {
+      "id": "e60ad398-f910-41d0-a039-7deb1564d016",
+      "ts": "2026-11-24T08:15:51Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi freebuff (agents:3) idle since 08:07. jev-decide routed upsert p=0.84 margin=0.69 (selected): upsert newest scout-round leads into DB. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
+      "branch": "main",
+      "frame": "03halobrqnz57hdnrfd64ysq6"
+    },
+    {
+      "id": "4e8aa998-8d72-4cbc-8581-7111076c98c7",
+      "ts": "2026-11-24T08:15:50Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout",
+      "action": "re-driven: freebuff (agents:2) idle after mail-to-Todoist turn. jev-decide routed kinexon_send p=0.78 margin=0.64 (decisive via margin, needs_review on probability): send built kinexon packet. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
+      "branch": "main",
+      "frame": "03halobqav8rzv8t1otvibvt1"
+    },
+    {
+      "id": "3487ffd4-fad9-4c81-a762-6a6467c92b95",
+      "ts": "2026-11-24T08:08:10Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "landed: prose-tells step dropped from CI hygiene (50e7c830); one-os-cli fold-in — tools/os umbrella (argv[0] dispatch + internal/image), cli.image.daily symlinks bin/image-daily->os, goModules ledger + gate accept both locations | gate: checks:kg PASS, checks:tasks PASS, checks:image-daily PASS, check:verify 133 rows no drift, nix build cli.image.daily runs manifest (750 assets)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
+      "branch": "main",
+      "frame": "03halmtsvh9yybzsjy67gd6mx"
+    },
     {
       "id": "c55340a9-6c60-4272-bd0f-e900d1a9fcf9",
       "ts": "2026-11-24T08:07:11Z",
@@ -2660,73 +2729,6 @@
       "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
       "branch": "main",
       "frame": "03haf3fno16hda28gg8u13p2y"
-    },
-    {
-      "id": "650c21aa-4125-4eb3-baa6-ea210dc54d60",
-      "ts": "2026-11-23T12:03:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-freebuff",
-      "action": "landed: drove idle freebuff pane; job-search scouting task accepted (working... 8s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf3fkbr1cc11vwl14it107"
-    },
-    {
-      "id": "fdf2cb32-202e-4309-8847-eabe59f2be04",
-      "ts": "2026-11-23T12:03:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-devin",
-      "action": "landed: drove idle devin pane; wrote AGENTS.nix verification note for image-publish redesign (Thinking started)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf3fipvkg1q4j056uhktcm"
-    },
-    {
-      "id": "25471393-ecc8-4ef9-9c03-cf7e96307081",
-      "ts": "2026-11-23T11:57:01Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout",
-      "action": "scouted: 7 lead rows added (0G, HiSolutions, Device Insight, Contabo x2, Nebius, smartclip), 5 sendable after dedupe; packets built to private state",
-      "outcome": "in_progress",
-      "claims": [
-        "/home/devji/.local/state/appflow/submissions"
-      ],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf28e16nlczwdr10ticju3"
-    },
-    {
-      "id": "11c99e07-ff5a-4f82-a432-63911066f3f5",
-      "ts": "2026-11-23T11:55:52Z",
-      "source": "devin",
-      "subject": "nixconfig:images-monolith-split",
-      "action": "landed: image-daily.sh 2028ln monolith -> 34ln dispatcher + lib(274) + engine(681) + 18 per-command scripts; all 55 fns verified, reads identical, publish DRY rebuilds 729-asset manifest | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03haf20b565iqcrdj42j3jqa5"
-    },
-    {
-      "id": "a18a1935-c703-4cf9-91f8-639ff8057591",
-      "ts": "2026-11-23T11:44:05Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-vercel",
-      "action": "landed: three followups — redesign post exported to the blog checkout (445 words, uncommitted there); German software CV shipped and live (six PDFs, 26->27 routes 200, cv gate 14/0); submission checkout ported to standard headings + heading elements + no hyphenation, rebuilt 55 folders/110 docs, audit 0 violations | gate: cv-links-check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9ac5e75e8e725337944013cdaebbf73ea51073f0",
-      "branch": "main",
-      "frame": "03haezph83433yowojsjghjcc"
     }
   ]
 }

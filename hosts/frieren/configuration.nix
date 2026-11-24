@@ -150,8 +150,10 @@ in {
     self.modules."profiles.laptop"
     # desktop-client is infrastructure, not the desktop: it owns avahi/resolved/
     # tailscale/fuse and the NAS mounts. The graphical stack lives in desktop.nix,
-    # which only the `desktop` specialisation imports.
-    self.modules."profiles.boot"
+    # which only the `desktop` specialisation imports. base-node and
+    # desktop-client are therefore load-bearing here, not chain duplicates;
+    # profiles.boot was the one true duplicate — base-node already carries it
+    # (chain-split 2026-11-24).
     self.modules."profiles.desktop-client"
     ./dns.nix
     ./media-stack.nix

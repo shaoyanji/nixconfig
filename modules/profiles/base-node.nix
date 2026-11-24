@@ -4,7 +4,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   user,
   ...
 }: {
@@ -12,7 +11,11 @@
     self.modules."config.authorized-keys"
     self.modules."services.flake-gc-root"
     self.modules."ssh-ca"
-    inputs.sops-nix.nixosModules.sops
+    # sops-nix is not imported here: every host on this chain already gets
+    # inputs.sops-nix.nixosModules.sops from its features (nixos / containers /
+    # demo in flake/module-sets.nix). The line only duplicated the injection
+    # (chain-split 2026-11-24); a host with no such feature must name the
+    # input itself, the way netbook does.
     self.modules."profiles.firewall-baseline"
     self.modules."profiles.boot"
     # Host-hardware leaves used to ride this chain for ~18 hosts — containers

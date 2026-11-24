@@ -19,6 +19,61 @@ tasks:
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} search {{.CLI_ARGS}}
 
+  # Scouting is a lane, not a scan: no source list is compiled anywhere, so the
+  # verifiable half is the one against the record — what these families already
+  # hold, because re-adding a live or rejected employer is the failure rule 1
+  # exists to prevent, and a rejected employer is closed for the same 180 days.
+  apps:scout:
+    desc: Employers the record already holds for DevOps/SRE/Platform/Infra, before a sweep (FAMILY=regex, STAGE=live|lead)
+    summary: >
+      Purpose: the scout lane for DevOps, SRE, Platform and Infrastructure roles.
+      A sweep starts here rather than at a job board, because every row below is
+      an employer the pipeline has already answered — `apps:add` refuses a second
+      live row, and a rejected employer stays closed for 180 days. Read-only; the
+      only network is the archive API. A new lead is written with `apps:add --
+      --origin scout-<date>`, never by editing a file. Owner: the operator
+      (shaoyanji); an agent runs this before any scout write. Status: active —
+      the 2026-11-23 sweeps wrote `scout-2026-11-23*` origins.
+    vars:
+      FAMILY: '{{.FAMILY | default "devops|sre|site reliability|platform|infra"}}'
+      STAGE: '{{.STAGE | default "live"}}'
+      FORMAT: '{{.FORMAT | default "toon"}}'
+    cmds:
+      - |
+        FORMAT="{{.FORMAT}}"; . scripts/task/toon-io.sh
+        rows="$(LIM=5000 FORMAT=json {{.APPS_DB}} list)" || exit $?
+        printf '%s' "$rows" | jq --arg fam "{{.FAMILY}}" --arg stage "{{.STAGE}}" '
+          [ .[] | select((.role // "") | test($fam; "i"))
+                | select(if $stage == "lead" then .stage == "lead"
+                         else (.stage | IN("lead","prep","applied","screening","interview","contacted")) end)
+                | {stage, updated: ((.updatedAt // "")[0:10]), company, role, status} ]
+          | sort_by(.company)' | toon_emit jq -r '.[] | [.stage, .updated, .company, .role, .status] | @tsv'
+
+  # Scouting's blind half. These five EU open-source vendors publish openings on
+  # their own pages and never on the aggregators this lane polls, so silence in
+  # the record is unfetched coverage, not a closed market: an empty ATS feed means
+  # nobody onboarded that employer, not that it is not hiring. Read-only and
+  # network-free; the 2026-12-07 hold forbids writes, and `apps:add` stays the
+  # only write path once it lifts.
+  apps:vendors:
+    desc: EU open-source vendor careers pages no sweep has read (read-only, adds no rows)
+    summary: >
+      LINBIT, B1 Systems, Univention, Open-Xchange and Proxmox are the EU vendors
+      whose work is closest to this fleet — DRBD and block storage, Linux
+      infrastructure, identity, groupware, virtualisation — and none of them is in
+      the record, because no pass fetched their careers pages. This prints the
+      five entry points and the rule that counts a page as fetched. Prints only:
+      a row from any of them waits for the 2026-12-07 hold to lift.
+    cmds:
+      - |
+        printf '%s\t%s\t%s\t%s\n' \
+          'LINBIT' 'Linz, AT' 'DRBD, block storage' 'https://www.linbit.com/en/careers/' \
+          'B1 Systems' 'Munich, DE' 'Linux infrastructure' 'https://www.b1-systems.de/jobs' \
+          'Univention' 'Bremen, DE' 'identity, UCS' 'https://www.univention.de/karriere/' \
+          'Open-Xchange' 'Bremen/Cologne, DE' 'mail, groupware' 'https://careers.open-xchange.com/' \
+          'Proxmox' 'Vienna, AT' 'virtualisation, Ceph' 'https://www.proxmox.com/en/careers'
+        printf '\nA page that needs JavaScript or a mailto application is unfetched, not empty.\n'
+
   apps:get:
     desc: View one application and the mail linked to it
     cmds:
@@ -40,6 +95,36 @@ tasks:
       `apps:upsert` takes the object on stdin or from a file.
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} add {{.CLI_ARGS}}
+
+  # The duplicate audit is a gate, not a report: it exits 1 while any employer
+  # carries two live rows. Every application and every emailed application runs
+  # it first — the adorsys double application had to be apologised for.
+  apps:dupes:
+    desc: Employers with more than one live application (exits 1 if any — run before applying)
+    summary: >
+      One live application per employer. A live row is `lead`, `prep`, `applied`,
+      `screening`, `interview` or `contacted`. Prints company, count and ids for
+      every employer with more than one, and exits 1 so a `&&` chain stops.
+      `apps:add` enforces the same rule and refuses a second live row unless
+      `--force --notes "why a different role"` is given.
+    cmds:
+      - FORMAT="{{.FORMAT | default "toon"}}" {{.APPS_DB}} dupes {{.CLI_ARGS}}
+
+  # The row audit cannot see what the employer received: a row says one
+  # application, the Sent folder can hold three. 
+  apps:sent:
+    desc: Audit the Sent folder for duplicate applications and blasts (exits 1 if any)
+    summary: >
+      The send-side half of one application per employer. Reads one mailbox
+      (`SENT_MAILBOX`, default `Sent`) through himalaya over the last `DAYS`
+      (default 14, `LIMIT` newest 400), and fails on a second application send
+      to one address, one subject sent to several addresses, a send addressed to
+      the sender with the employers BCC'd, and the same subject resent to the
+      same address. `apps:dupes` checks the rows, this checks the mailbox;
+      neither implies the other, and a draft is checked with both before it is
+      sent.
+    cmds:
+      - DAYS="{{.DAYS | default "14"}}" LIMIT="{{.LIMIT | default "400"}}" FORMAT="{{.FORMAT | default "toon"}}" bash scripts/task/apps-sent-audit.sh
 
   apps:upsert:
     desc: Add or refresh one application record — JSON or TOON (CLI_ARGS is a file, or pipe stdin; FORMAT=toon for the row back)

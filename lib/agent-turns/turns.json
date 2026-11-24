@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-24T13:04:42Z",
+  "generated": "2026-11-24T13:25:23Z",
   "count": 200,
-  "pin": "83a5087a912a84dd9b96951f8bdf9e5e87b95fb2a5f87520326fbd8812bf9ff6",
+  "pin": "00e513d5abc0799ae94a759df901c6c49131ac392c7de7885b48d3a734a07525",
   "turns": [
+    {
+      "id": "8756b678-c026-4c03-85ee-8d8b75eea69e",
+      "ts": "2026-11-24T13:25:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-drive",
+      "action": "drove devin pane agents:1: sent gate-change task to verify image-daily Go port gate fires on every host and fails on a real past misconfiguration before passing; pane shows Thinking 2s",
+      "outcome": "done",
+      "claims": [
+        "agents:1.1"
+      ],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03hancryvhy1z4lz76v1jbli9"
+    },
+    {
+      "id": "81d4e89f-27ee-4f79-be83-5d0ae656018b",
+      "ts": "2026-11-24T13:06:07Z",
+      "source": "hermes",
+      "subject": "nixconfig:devin-drive",
+      "action": "re-drove devin pane agents:1: sent task-change task to run image-daily Go port gate verification and checks:tasks parity now; pane shows Thinking · 1s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
+      "branch": "main",
+      "frame": "03han914osz0w38063rzf60lf"
+    },
     {
       "id": "2d55a871-df8a-445e-8fd6-eb8e03c5c75b",
       "ts": "2026-11-24T13:03:52Z",
@@ -2773,34 +2801,6 @@
       "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
       "branch": "main",
       "frame": "03hajp4jd4dyygnngf13soxun"
-    },
-    {
-      "id": "cd86be66-a9d3-40f5-b3bb-278c566b2956",
-      "ts": "2026-11-24T02:11:00Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:tmux-pane-steward",
-      "action": "landed: drove 3 idle agent panes (devin 0:0 image-daily publish, freebuff 0:1 job-search, delphi 0:2 job-search) to working; all four panes BUSY",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dafee82d",
-      "branch": "main",
-      "frame": "03hajp1yr3wkps807yom8z4wv"
-    },
-    {
-      "id": "f99afa1a-6652-40af-9e9b-7c563bafb7a6",
-      "ts": "2026-11-24T02:01:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: second sweep (arbeitnow p6-9, 12 Greenhouse, 8 Ashby, 4 Lever, SmartRecruiters) — no genuinely new employer: every infra req already tracked (Catapult applied 11-22, IONOS/1&1/N26/HITS.nrw/ANGEHEUERT on file). Deliverable moved to follow-ups: 5 reply drafts + 1 portal task, none sent; n8n status contradicts archive | gate: nothing sent, appflow rows patched, drafts under ~/.local/state/appflow/followups",
-      "outcome": "in_progress",
-      "claims": [
-        "~/.local/state/appflow/followups"
-      ],
-      "files": [],
-      "base_commit": "dafee82d6defe4e2633abd34fe86e09dfebcc881",
-      "branch": "main",
-      "frame": "03hajn41fjjs3hydigj8rbixt"
     }
   ]
 }

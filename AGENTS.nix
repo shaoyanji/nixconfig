@@ -5397,35 +5397,38 @@
     };
     job-scout-eu-vendor-pages-gap-2026-11-24 = {
       title = "The EU vendor careers pages nobody fetched, and the packet order that survives the hold";
-      kind = "open";
-      status = "OPEN";
+      kind = "reference";
+      status = "DELIVERED";
       priority = "P3";
       date = "2026-11-24";
-      summary = "LINBIT, B1 Systems, Univention, Open-Xchange and Proxmox have careers pages no pass in this lane has read, so their absence is an unfetched source, not a closed market. Packet order stays Toast then Etraveli after the 2026-12-07 hold, behind matt:gist:drift and matt:cv:check, with no apps:scout row added before it.";
+      summary = "LINBIT, B1 Systems, Univention, Open-Xchange and Proxmox have careers pages no pass in this lane read; `task apps:vendors` now prints the five entry points, so their absence is unfetched coverage rather than a closed market. Packet order stays Toast then Etraveli after the 2026-12-07 hold, behind matt:gist:drift and matt:cv:check, with no apps:scout row added before it.";
       from = ["job-scout-sre-platform-2026-11-24"];
       refs = {
-        tasks = ["matt:cv:check" "matt:gist:drift" "apps:dupes"];
+        modules = ["taskfiles/apps.yml"];
+        tasks = ["apps:vendors" "apps:dupes" "matt:cv:check" "matt:gist:drift"];
         docs = ["docs/cv-ats-compliance.md"];
       };
       body = ''
-        An empty ATS feed is not "no openings". Greenhouse, Lever, Personio and
-        Workday return zero for an employer nobody onboarded, and this lane has
-        read only the aggregators: LinkedIn, WWR, Remotive, SmartRecruiters. The
-        five EU open-source vendors whose work is closest to this fleet — LINBIT
-        (DRBD, Linz), B1 Systems (Munich), Univention (Bremen), Open-Xchange
-        (Bremen/Cologne), Proxmox (Vienna) — were never fetched. They are absent
-        from the record because nobody asked, and a pass that reports "no new
-        leads" while leaving those pages unread reports its own coverage as the
-        market.
+        An empty ATS feed is not "no openings": Greenhouse, Lever, Personio and
+        Workday return zero for an employer nobody onboarded, and this lane polls
+        only aggregators. So five EU open-source vendors — LINBIT (Linz, DRBD),
+        B1 Systems (Munich), Univention (Bremen), Open-Xchange (Bremen/Cologne),
+        Proxmox (Vienna) — were absent from the record because nobody asked, and
+        a pass reporting "no new leads" while leaving those pages unread reports
+        its own coverage as the market.
 
-        The todo is therefore a read, not a filing run: fetch each careers page,
-        and count a page needing JavaScript or a mailto application as unfetched
-        rather than empty.
+        `task apps:vendors` is the promotion: it prints the five entry points,
+        verified reachable on 2026-11-24, and the rule that a page needing
+        JavaScript or a mailto application is unfetched rather than empty. It
+        reads nothing and writes nothing.
 
         Packet order outranks the gap and does not move: Toast, then Etraveli,
         after the 2026-12-07 hold, gated by matt:gist:drift and matt:cv:check. No
         apps:scout row is added during the hold, so the five pages get read and
         ranked while the record stays still.
+
+        Exit: the next sweep runs `apps:vendors` before it reports, and each
+        vendor is either filed at lead or recorded as read with no match.
       '';
     };
   };

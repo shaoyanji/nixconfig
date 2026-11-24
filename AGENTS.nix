@@ -5395,7 +5395,7 @@
     job-scout-lane-state-2026-11-24 = {
       title = "The boards are mined out, so the lane tailors HITS.nrw's CV and German letter";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P3";
       date = "2026-11-24";
       summary = "The lane turns from sweeping to tailoring: arbeitnow's sixteen pages, the Greenhouse/Lever/Ashby/Personio/Recruitee boards and remotive are exhausted, RemoteOK and BA jobsuche answer 403, jobicy/nomads/himalayas/interamt are dead. HITS.nrw (fit 4, Düsseldorf, Linux/K8s app operations, 2 lead rows) is the active target.";
@@ -5413,31 +5413,44 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-        The boards are mined out, so this lane stops sweeping and tailors.
+         The boards are mined out, so this lane stops sweeping and tailors.
 
-        Exhausted: arbeitnow's sixteen pages, the Greenhouse, Lever,
-        Ashby, Personio and Recruitee boards by family, and remotive's
-        devops feed. Blocked, not empty: RemoteOK and BA jobsuche answer
-        403 from this host. Dead: jobicy, Working Nomads, Himalayas,
-        interamt. A further pass would re-read the same postings.
+         Exhausted: arbeitnow's sixteen pages, the Greenhouse, Lever,
+         Ashby, Personio and Recruitee boards by family, and remotive's
+         devops feed. Blocked, not empty: RemoteOK and BA jobsuche answer
+         403 from this host. Dead: jobicy, Working Nomads, Himalayas,
+         interamt. A further pass would re-read the same postings.
 
-        Active target: HITS.nrw — Hochschul-IT-Services.nrw, Düsseldorf,
-        Application Operator / DevOps Engineer, Linux and Kubernetes,
-        fit 4. It is the only fit-4 German role whose day is own-fleet
-        Linux and Kubernetes rather than a vendor estate, and the ad is
-        German, so the application wants a German Anschreiben.
+         Active target: HITS.nrw — Hochschul-IT-Services.nrw, Düsseldorf,
+         Application Operator / DevOps Engineer, Linux and Kubernetes,
+         fit 4. It is the only fit-4 German role whose day is own-fleet
+         Linux and Kubernetes rather than a vendor estate, and the ad is
+         German, so the application wants a German Anschreiben.
 
-        Next action: tailor the CV to that req and write the German
-        letter. No board sweep runs behind it.
+         Next action: tailor the CV to that req and write the German
+         letter. No board sweep runs behind it.
 
-        Drift: HITS.nrw holds two lead rows,
-        `hits-nrw-application-operator-devops` beside the truncated slug —
-        one employer, so one row once the merge lands.
+         Drift: HITS.nrw holds two lead rows,
+         `hits-nrw-application-operator-devops` beside the truncated slug —
+         one employer, so one row once the merge lands.
 
-        Nothing sends before 2026-12-07, and the lane has no send verb.
+         Nothing sends before 2026-12-07, and the lane has no send verb.
 
-        Exit: HITS.nrw is `applied` with a receipt, the duplicate merged,
-        and this note goes DELIVERED.
+         Exit: HITS.nrw is `applied` with a receipt, the duplicate merged,
+         and this note goes DELIVERED.
+
+         Delivered 2026-11-24 as a prep packet, not a send: the canonical
+         row carries a German CV projected onto the ad (15 of 39 highlights,
+         4 of 10 projects) and an Anschreiben to Heather Baumgarten, at
+         `~/.local/state/appflow/submissions/hits-nrw-application-operator-devops`.
+         The duplicate row is merged into it, the boards stay mined out, and
+         the 2026-12-07 hold still owns the send.
+
+         A second lead was prepped the same day: HiSolutions AG (German ad,
+         remote Germany, fit 5), whose row now carries a curated CV and an
+         Anschreiben at `~/.local/state/appflow/submissions/hisolutions-ag-
+         senior-kubernetes-expert-devops-engineer`. Its stored JD was remotive
+        's scrape; the employer's own ad text replaced it before the build.
       '';
     };
     job-scout-boards-exhausted-2026-11-24 = {

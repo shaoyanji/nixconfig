@@ -52,7 +52,7 @@ agent:
   # when they run out, so `1` (the value that sat dead under `fallback:`)
   # would have capped the chain at its first hop — measured 2026-11-19, when
   # the qwen failover worked and the turn died activating the next lane.
-  api_max_retries: 8
+  api_max_retries: 9
   # A stop waits this long for a running cron job before tearing down. The
   # default (30 s) plus adapter teardown crossed the 60 s shutdown watchdog on
   # every stop here, because pane-idle-watch runs for most of its 2-minute
@@ -220,13 +220,14 @@ auxiliary:
   free_only: true
   # Unset, the goal judge resolves a built-in `deepseek`/`deepseek-flash`
   # default that no `providers:` entry declares — every verdict errors.
-  # infron is daily-capped (1000 req/day, hit 2026-11-24); free-ai is the
-  # keyless lane that answered a live probe same-day — zero quota cost.
+  # infron is daily-capped (1000 req/day, hit 2026-11-24); the sail lane is
+  # billed per request and answers — SAIL_API_KEY comes from sops
+  # ai-services-shared-env, the same env the fallback lanes read.
   goal_judge:
     provider: custom
-    model: free-ai
-    base_url: https://api.apisfreellm.com/v1
-    api_key: free
+    model: deepseek-ai/DeepSeek-V4.1-Flash-1017
+    base_url: https://api.sailresearch.com/v1
+    key_env: SAIL_API_KEY
 
 # Titles and summaries use their own model lane, pinned to hydrogen so aux
 # work never burns the `:free` ids on the main chat route.

@@ -15,6 +15,8 @@
     self.modules."profiles.dwl-desktop"
     self.modules."profiles.laptop"
     self.modules."profiles.base-node"
+    # Dock hardware — used to ride base-node for every host (chain-split).
+    self.modules."profiles.dell-dock"
   ];
 
   # --- Tailscale: keep the native LAN path ---

@@ -87,8 +87,9 @@
     ) &
   '';
 in {
-  imports = [self.modules."services.xs-notify"];
-
+  # `services.xs-notify` rode this chain for option surface nobody on
+  # netbook/fern/scratch sets; delphi, the one setter, imports it directly
+  # (chain-split 2026-11-24).
   options.profiles.dwlDesktop = {
     enable = lib.mkEnableOption "a dwl session with launcher and wallpaper";
 

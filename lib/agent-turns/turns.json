@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-24T08:27:09Z",
+  "generated": "2026-11-24T08:44:36Z",
   "count": 200,
-  "pin": "63d547c1ff400420bbef5be19303eea5d8d01e2e4d71e709b85c039b1ad4d265",
+  "pin": "b65f27fa27c36f79937ab8f38362a1933e2c46586ef47400a99ddc349e49f546",
   "turns": [
+    {
+      "id": "6c2875f6-20ce-404e-b123-1579c5dbc46e",
+      "ts": "2026-11-24T08:43:59Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "landed: drove 2 idle panes (09:36 CET). jev-decide classify vs labels.json = needs_review x2 (freebuff task-change 0.51 m0.07, delphi note-change 0.53 m0.16), none decisive -> fell back to standing tasks. freebuff EU/DE scout+packets working (agents:2.1), delphi intl scout+packets working (freebuff:1.1 via ssh tunnel). All confirmed working; commit ace277bc pushed to origin/main.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
+      "branch": "main",
+      "frame": "03halttn2uzzqy2ad0y9yn5jp"
+    },
+    {
+      "id": "f854e5a0-3dd2-4de2-9dfa-13c775adb343",
+      "ts": "2026-11-24T08:34:35Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-split",
+      "action": "resuming devin claim: audit done — base-node drags dell-dock+battery-charge-limit (only poseidon/frieren set them), base-desktop-environment re-imports boot and carries xs-notify surface nobody sets (delphi imports it direct), dwl-desktop same; desktop-client/steamos/base-node-core are semantic composites and stay",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/profiles/base-node.nix modules/profiles/base-desktop-environment.nix modules/profiles/dwl-desktop.nix hosts/frieren/desktop.nix hosts/poseidon/configuration.nix hosts/netbook/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
+      "branch": "main",
+      "frame": "03halrzjj4welt1t9e71wji1m"
+    },
+    {
+      "id": "23e88336-dc3e-46ef-ab4a-d318c87f0f1c",
+      "ts": "2026-11-24T08:33:35Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-split",
+      "action": "landed: drove idle devin pane (agents:1.1) with the chain-split claim; devin now working (fresh spinner). jev-decide needs_review, margin 0.53 decisive so applied decisive-margin rule.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
+      "branch": "main",
+      "frame": "03halrsgvaacrlpr2a9z68nip"
+    },
+    {
+      "id": "740bb885-0134-4654-af82-76bff10c79a2",
+      "ts": "2026-11-24T08:27:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site",
+      "action": "landed: software CV (en+de) now leads with the fleet, CI-gate and sentinel bullets plus DevOps keywords, all verbatim from the corpus; scout-2026-11-24 round asked for exactly those. Commit ace277bc, matt-site rebuilt (29 files, 1pp budget held, ATS ok both langs), published matt.bountystash.com deployment ceb42aa9. cv-links-check 14 ok/0 failed, live sha == artifact. cv-blog-check FAILS on pre-existing is-a.dev drift (cv.pdf fd22f041 vs 3733b9ee), untouched.",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/cv-software.json lib/matt/cv-software.de.json"
+      ],
+      "files": [],
+      "base_commit": "ace277bc952d9d11b7ca0dd3cf6e39f8a88c9d3a",
+      "branch": "main",
+      "frame": "03halqke8in3cjlper05gfpnj"
+    },
     {
       "id": "8d593415-04d3-4d53-a34b-e005dba574c5",
       "ts": "2026-11-24T08:26:54Z",
@@ -2685,60 +2741,6 @@
       "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
       "branch": "main",
       "frame": "03hafg0u3abiu6p3h7to7b805"
-    },
-    {
-      "id": "1f5cd50a-332f-4d90-8dab-7b4f4caf246b",
-      "ts": "2026-11-23T13:07:17Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-split",
-      "action": "claim: audit chained-module imports, blast radius, split chain",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/host-inventory.nix modules/profiles modules/global docs/generated"
-      ],
-      "files": [],
-      "base_commit": "d262950a97c0e4ba79cff2f17985ccc1c539499e",
-      "branch": "main",
-      "frame": "03haffyimj2b6rdfst6yt121a"
-    },
-    {
-      "id": "0a628e03-6fdc-427f-b30a-f987e44cfc54",
-      "ts": "2026-11-23T12:49:32Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-freebuff",
-      "action": "landed: drove idle freebuff pane 0:1.1; jev-decide classify -> publish (0.98/0.96 decisive); pasted CV site publish task via load-buffer+paste-buffer+Enter; fresh working... counter confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03hafchq5gs6hzrvobwbteg47"
-    },
-    {
-      "id": "e3f5b282-5747-4e4d-a396-0f216ef7a7c6",
-      "ts": "2026-11-23T12:43:28Z",
-      "source": "devin",
-      "subject": "nixconfig:images-publish-gate",
-      "action": "landed: image-daily.sh gate subcommand + publish runs it first; fixture pins 470c9034^ (0-of-43 tree) fails, drift refused both ways | gate: checks:quick PASS incl checks:images:publish:test 5/5",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d262950a97c0e4ba79cff2f17985ccc1c539499e",
-      "branch": "main",
-      "frame": "03hafbb3d4m4qvhfaj3ftbc6l"
-    },
-    {
-      "id": "aeccef9f-5c51-4ede-8469-e652d2f57988",
-      "ts": "2026-11-23T12:37:02Z",
-      "source": "steward",
-      "subject": "nixconfig:steward",
-      "action": "landed: jev-decide routed gate-change to devin (0.70/0.53 decisive); sent image-daily.sh publish-gate task via load-buffer+paste-buffer+Enter to pane 0:0.1; verified fresh Thinking counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4aaa6135760446fdeed4610ac5ce11a3dcd72f1",
-      "branch": "main",
-      "frame": "03hafa1t36nexrq0q05vbay6e"
     }
   ]
 }

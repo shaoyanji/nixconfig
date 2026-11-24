@@ -7,7 +7,11 @@
   user,
   ...
 }: {
-  imports = [self.modules."profiles.base-desktop-environment"];
+  imports = [
+    self.modules."profiles.base-desktop-environment"
+    # Dock hardware — used to ride base-node for every host (chain-split).
+    self.modules."profiles.dell-dock"
+  ];
 
   # nixpkgs' graphical-desktop module mkDefault-enables speechd for any desktop,
   # which drags in speech-dispatcher -> mbrola voices (~650 MiB, measured

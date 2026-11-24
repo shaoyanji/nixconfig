@@ -119,9 +119,11 @@ in {
     # build and the Groq key is decrypted from the fleet sops plane at use time
     # with this host's TPM identity, instead of a plaintext file in $HOME.
     self.modules."profiles.voice-dictate"
-    # Declares the `sops` options dwl-desktop's xs-notify import defines under
-    # mkIf — the option must exist even disabled. No sops-nix secrets plane is
-    # wired here: zero secrets are declared, so activation creates nothing.
+    # sops-nix stays after the chain-split dropped dwl-desktop's xs-notify
+    # import (the last sops option writer here): the module is kept for the
+    # option surface and because removing it changes the host's drv. No
+    # secrets plane is wired: zero secrets are declared, activation creates
+    # nothing.
     inputs.sops-nix.nixosModules.sops
   ];
 

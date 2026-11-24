@@ -8,11 +8,11 @@
 }: {
   imports = [
     self.modules."profiles.desktop-client"
-    self.modules."profiles.boot"
-    # The xs turn notifier is available to every host on this profile, but it is
-    # enabled by the client hosts themselves: eisen and frieren also land here and
-    # are not clients. A host that does not set the option gets no unit at all.
-    self.modules."services.xs-notify"
+    # `profiles.boot` used to repeat here — it already arrives through
+    # desktop-client -> base-node, so the line only duplicated the import.
+    # `services.xs-notify` rode the chain for option surface nobody on these
+    # hosts sets; delphi, the one setter, imports it directly (chain-split
+    # 2026-11-24).
   ];
 
   services = {

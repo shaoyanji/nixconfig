@@ -23,6 +23,10 @@ in {
     # replaced it from 2026-11-02 to 2026-11-11 is retired.
     self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"
+    # Dock + battery ceiling — host-hardware leaves that used to ride
+    # base-node for every host (chain-split).
+    self.modules."profiles.dell-dock"
+    self.modules."profiles.battery-charge-limit"
   ];
 
   ssh.ca.enableClient = true;

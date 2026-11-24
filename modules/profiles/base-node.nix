@@ -15,8 +15,9 @@
     inputs.sops-nix.nixosModules.sops
     self.modules."profiles.firewall-baseline"
     self.modules."profiles.boot"
-    self.modules."profiles.dell-dock"
-    self.modules."profiles.battery-charge-limit"
+    # Host-hardware leaves used to ride this chain for ~18 hosts — containers
+    # and an aarch64 cloud box included — while only poseidon/fern/frieren set
+    # the options. They are direct host imports now (chain-split 2026-11-24).
   ];
 
   boot = {

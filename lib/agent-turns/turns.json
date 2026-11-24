@@ -1,8 +1,112 @@
 {
-  "generated": "2026-11-24T18:33:16Z",
+  "generated": "2026-11-24T18:45:42Z",
   "count": 200,
-  "pin": "a6fcff96f14626a4b51a566169ae4dea567786c0a733fd11e982e617853ba9d8",
+  "pin": "de8332d4260cd9178869eb8c04585a972f527513253af59dabc3759ba01ae4dc",
   "turns": [
+    {
+      "id": "1b333781-333e-4a99-9c57-3d4d171818fc",
+      "ts": "2026-11-24T18:44:36Z",
+      "source": "steward",
+      "subject": "nixconfig:steward:delphi",
+      "action": "landed: drove idle delphi pane (agents:3, ssh) — jev-decide note-change p1.0/m1.0; scout 2-3 new openings and land sweep note; pane confirmed working (working... 15s; first Enter ignored, resent)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
+      "branch": "main",
+      "frame": "03hap35gu184xhozvq374tx4j"
+    },
+    {
+      "id": "8feb8d59-79da-4213-ba0f-c4e800810db3",
+      "ts": "2026-11-24T18:44:36Z",
+      "source": "steward",
+      "subject": "nixconfig:steward:freebuff",
+      "action": "landed: drove idle freebuff pane (agents:2) — jev-decide note-change p1.0/m1.0; scout 2-3 new DevOps/SRE/Platform/Infra leads and land sweep note; pane confirmed working (working... 7s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
+      "branch": "main",
+      "frame": "03hap35ehueo54nm9gwbr7l2a"
+    },
+    {
+      "id": "88b64d14-b0b9-4b19-8596-d441f4b166cd",
+      "ts": "2026-11-24T18:44:35Z",
+      "source": "steward",
+      "subject": "nixconfig:steward:devin",
+      "action": "landed: drove idle devin pane (agents:1) — jev-decide chain-change p0.83/m0.70; continue nixconfig refactor on next shared module in the chain; pane confirmed working (Thinking 3s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
+      "branch": "main",
+      "frame": "03hap35cenjd3d64g9l5ym2iz"
+    },
+    {
+      "id": "026a024d-9d2c-487c-927a-cdb9adf9c18c",
+      "ts": "2026-11-24T18:36:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correct: sweep8 found no new employer — Projektron was already tracked as projektron-gmbh-cloud-engineering (lead) and is now updated with the verified posting URL and the 2026-12-07 hold; only Abnormal Security EMEA was newly recorded (fit 2, end-user platform); rejected Intelerad US, synava MS-only, Jobgether aggregator | gate: apps:get readback",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap1h1xc9qry4vhqxqwxjac"
+    },
+    {
+      "id": "eed1eb1c-df2b-4544-afcc-225d3ba40fb4",
+      "ts": "2026-11-24T18:35:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: sweep8 (arbeitnow p1-2, SmartRecruiters x6, LinkedIn x3, Remotive) — 1 genuinely new lead: Projektron GmbH, Cloud Engineering, Berlin, fit 4; recorded Abnormal Security EMEA at fit 2 (end-user platform, not infra) for completeness; rejected Intelerad (US), synava (MS-only), Jobgether (aggregator); nothing sent | gate: apps:get readback PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap1f991sgv5fetmqxjnyz3"
+    },
+    {
+      "id": "2b56c109-291e-45af-9669-3bca9775e409",
+      "ts": "2026-11-24T18:35:07Z",
+      "source": "delphi",
+      "subject": "nixconfig:delphi-lane",
+      "action": "landed: scout_roles direction via jev-decide (p1.0/m1.0); delphi now working... 8s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
+      "branch": "main",
+      "frame": "03hap1askixaf9qg4gm6u4foi"
+    },
+    {
+      "id": "842b1008-2b3f-43f1-a0e3-4f80a1196bcd",
+      "ts": "2026-11-24T18:35:05Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: refactor_nixconfig direction via jev-decide (p0.93/m0.89); pane now Typing 4s, working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
+      "branch": "main",
+      "frame": "03hap1aiqqm1sw0cknt1vyfpv"
+    },
+    {
+      "id": "fda7818c-a8c9-4838-b0ba-134e06541991",
+      "ts": "2026-11-24T18:33:18Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-daily-feed",
+      "action": "landed: same-day arbeitnow sweep — 3 new rows (Shipzero AI Platform Engineer Hamburg fit 4, packet tailored+build; Wellis DevOps/Platform Rotterdam fit 4; Projektron Cloud Engineering Berlin fit 3). DENKweit, eleQtron, wabcon, virtual7, Treatwell, Blocktech, Namespace, Enact, gridscale closed as already on file. Note job-scout-daily-feed-sweep-2026-11-24 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
+      "branch": "main",
+      "frame": "03hap0xyxjdhzoj2f782dormu"
+    },
     {
       "id": "0e9a3f9a-9c1a-4340-9392-b6812eb6ef21",
       "ts": "2026-11-24T18:31:50Z",
@@ -2641,118 +2745,6 @@
       "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
       "branch": "main",
       "frame": "03halq000kv830ac9ad69o3p0"
-    },
-    {
-      "id": "3a504f71-38e4-465f-b72a-3022e695cf5f",
-      "ts": "2026-11-24T08:22:32Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: KINEXON Go-Backend submitted via Greenhouse form. Letter+CV merged to 3pp PDF (letter first) because the form has one upload slot, salary anchor EUR 95k from recorded answers, consent Acknowledge/Confirm. Greenhouse emailed an 8-char code to matt@bountystash.com; confirmation page reached. Artifact /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend.",
-      "outcome": "done",
-      "claims": [
-        ".local/state/appflow/submissions/kinexon-senior-devops-go-backend"
-      ],
-      "files": [],
-      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
-      "branch": "main",
-      "frame": "03halpmto7e8xf0w4yvvwj4zw"
-    },
-    {
-      "id": "2103fcd1-1cc1-4476-a9de-1a6f856ce61d",
-      "ts": "2026-11-24T08:21:58Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: resolved both unresolved leads. Helsing board = Greenhouse token 'helsing' (176 postings, fronted by helsing.ai/jobs) -> Site Reliability Engineer, on-prem Kubernetes, Berlin/Munich, jobs/4347030101. Mozilla board = Greenhouse token 'mozilla'; Staff SRE Tools & Systems 8315181, Remote Germany, EUR 81-108k, req R3254 (API paginates 100/142, hence the earlier miss). 2 new rows | gate: apps:dupes PASS ([]), 1001 tracked, dirty 26 unchanged",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halpist8mqqulx770zwax11"
-    },
-    {
-      "id": "905a4d84-aef1-48c4-98b3-372548045a77",
-      "ts": "2026-11-24T08:20:52Z",
-      "source": "hermes",
-      "subject": "nixconfig:chain-split",
-      "action": "re-driven: devin (agents:1) idle after prose-budget landing (checks:policies green). jev-decide first pass needs_review (chain_split p=0.63, margin 0.32 decisive >= 0.3, top by margin): work chain-split claim (host-inventory.nix, modules/profiles, modules/global). Pane running tools.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
-      "branch": "main",
-      "frame": "03halpb2dl1oelgxzk86ryywv"
-    },
-    {
-      "id": "dd7a9472-a21a-4c3f-a498-aa70e473830c",
-      "ts": "2026-11-24T08:18:59Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi freebuff (agents:3) idle after upsert turn (4 new rows, dupes audit passed, xs 03halod92 done). jev-decide first pass needs_review (helsing_mozilla p=0.63 m=0.29), duel won: helsing_mozilla p=0.83 m=0.66. Fed: check Helsing + Mozilla career sites.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
-      "branch": "main",
-      "frame": "03haloxsj9okw6v7o7mxsriei"
-    },
-    {
-      "id": "6a7d9140-d2ed-41a8-b550-69980ba5a69c",
-      "ts": "2026-11-24T08:17:58Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "fixed: CI hygiene step 'Policies hold and classify' was failing on agent-prose-budget — apps/SKILL.md drifted to 103 body lines (recorded 68) across the landed apps-skill commits; recorded the measured count | gate: checks:policies PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f516df038e82c72727e63781db9c05dd480557c0",
-      "branch": "main",
-      "frame": "03haloqnra1nni3egx33psa1i"
-    },
-    {
-      "id": "3e30ccdd-df06-4a6a-9af1-b3fb10375e70",
-      "ts": "2026-11-24T08:16:53Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "blocked: KINEXON Go-Backend not sent. Packet final and verified, CV 2pp + letter 1pp, artifact /nix/store/d1qdqy6kn5gis7pc4d0qf9anizl1hhb5-appflow-packet-kinexon-senior-devops-go-backend. No recipient: row has no recruiter or gmail address, ad names none, archive has no KINEXON mail, site publishes only info@ and compliance@. Route is the Greenhouse form gh_jid 4936773101; operator choice pending.",
-      "outcome": "blocked: no recipient address for the mail lane; Greenhouse portal form is the only application route",
-      "claims": [
-        ".local/state/appflow/submissions/kinexon-senior-devops-go-backend"
-      ],
-      "files": [],
-      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
-      "branch": "main",
-      "frame": "03haloj299ad6mwx0lzbxlr9q"
-    },
-    {
-      "id": "83c792f5-64f5-49e9-b87d-7b1f9b6db045",
-      "ts": "2026-11-24T08:16:04Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: scout upsert — 3 new rows (finmid Platform Engineer, iits Senior DevOps/Cloud 100% remote, Neura Robotics Cloud Architect) plus refreshed Ashby Staff Platform Engineer EU and 0G Senior DevOps; 8 further leads refused as already tracked (Supabase, Babbel, ElevenLabs, n8n, Pliant, Enpal, CoachHub, gridscale) | gate: apps:dupes PASS ([]), 1001 tracked, dirty 26 unchanged",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03halod92r4d23evcceli8x6l"
-    },
-    {
-      "id": "e60ad398-f910-41d0-a039-7deb1564d016",
-      "ts": "2026-11-24T08:15:51Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi freebuff (agents:3) idle since 08:07. jev-decide routed upsert p=0.84 margin=0.69 (selected): upsert newest scout-round leads into DB. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
-      "branch": "main",
-      "frame": "03halobrqnz57hdnrfd64ysq6"
     }
   ]
 }

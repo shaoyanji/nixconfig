@@ -14,8 +14,12 @@
     install -m 0644 ${../../lib/appflow-board/index.html} $out/index.html
   '';
 
-  # One exact location per route, so the proxied surface is this list and not the
-  # plugin's route table.
+  # One exact location per route, so the proxied surface is these two lists and
+  # not the plugin's route table: reads plus, gated, the two writes — update
+  # status/stage/next_action by id, or insert/update a full record.
+  readRoutes = ["applications" "application-pipeline" "application-get" "applications-discovered" "application-mail"];
+  writeRoutes = ["application-update" "application-upsert"];
+
   proxyTo = name: ''
     proxy_pass ${cfg.upstream}/api/${name};
     proxy_set_header Host 127.0.0.1;
@@ -29,6 +33,10 @@
   writeGuard = ''
     if ($appflow_write_ok = 0) { return 403; }
   '';
+
+  # The proxy boilerplate is the same for every route; only the guard differs.
+  mkApiLocation = guard: name:
+    lib.nameValuePair "= /api/${name}" {extraConfig = guard + proxyTo name;};
 in {
   options.services.appflowBoard = {
     enable = lib.mkEnableOption "the job pipeline board (delphi) — five reads plus the two write routes";
@@ -84,45 +92,23 @@ in {
           }
         ];
         root = page;
-        locations = {
-          # The same two-location shape the media library needed: `/` is answered
-          # by the index module rewriting to `/index.html`, and the alias works
-          # only where the URI does not end in `/`.
-          "= /" = {
-            root = page;
-          };
-          "= /index.html" = {
-            alias = "${page}/index.html";
-            extraConfig = ''
-              add_header Cache-Control "no-store";
-            '';
-          };
-          "= /api/applications" = {
-            extraConfig = proxyTo "applications";
-          };
-          "= /api/application-pipeline" = {
-            extraConfig = proxyTo "application-pipeline";
-          };
-          "= /api/application-get" = {
-            extraConfig = proxyTo "application-get";
-          };
-          "= /api/applications-discovered" = {
-            extraConfig = proxyTo "applications-discovered";
-          };
-          "= /api/application-mail" = {
-            extraConfig = proxyTo "application-mail";
-          };
-          # The two write routes: update status/stage/next_action by id, or
-          # insert/update a full record. Bearer-gated, then POST through to the
-          # same upstream — the vhost is a proxy, the SQL files own the write
-          # contract.
-          "= /api/application-update" = {
-            extraConfig = writeGuard + proxyTo "application-update";
-          };
-          "= /api/application-upsert" = {
-            extraConfig = writeGuard + proxyTo "application-upsert";
-          };
-        };
+        locations =
+          {
+            # The same two-location shape the media library needed: `/` is answered
+            # by the index module rewriting to `/index.html`, and the alias works
+            # only where the URI does not end in `/`.
+            "= /" = {
+              root = page;
+            };
+            "= /index.html" = {
+              alias = "${page}/index.html";
+              extraConfig = ''
+                add_header Cache-Control "no-store";
+              '';
+            };
+          }
+          // builtins.listToAttrs (map (mkApiLocation "") readRoutes)
+          // builtins.listToAttrs (map (mkApiLocation writeGuard) writeRoutes);
       };
     };
   };

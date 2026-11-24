@@ -99,7 +99,7 @@
         in
           if m == null
           then acc
-          else acc // {"${m |> builtins.head}" = m |> (xs: builtins.elemAt xs 1);}
+          else acc // {"${m |> builtins.head}" = builtins.elemAt m 1;}
       ) {};
     body = lines |> dropN (fm |> builtins.length |> (n: n + 2));
     bodyFirst =

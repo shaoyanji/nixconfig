@@ -5438,7 +5438,7 @@
     lib-pipe-elemat-lambdas = {
       title = "elemAt flip-lambdas in lib/*.nix want an `at` helper or direct calls";
       kind = "open";
-      status = "OPEN";
+      status = "DELIVERED";
       priority = "P5";
       date = "2026-11-24";
       summary = "Code-review sweep of `|>` across lib/*.nix (~600 uses, 19 files): 18 `(xs: builtins.elemAt xs i)` flip-lambdas in 8 files — elemAt's (list, index) order fights the pipe while builtins.elem pipes natively. 7301202c landed the two exact twins (builtins.head, lib.last); 14 remain.";

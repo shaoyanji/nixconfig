@@ -471,7 +471,7 @@
     |> builtins.length
     |> lib.range 0
     |> builtins.filter (i: i * 2 + 1 < builtins.length parts)
-    |> map (i: parts |> (xs: builtins.elemAt xs (i * 2 + 1)));
+    |> map (i: builtins.elemAt parts (i * 2 + 1));
   rowWords = line: line |> lineSpans |> map (s: s |> lib.removePrefix "task " |> lib.splitString " " |> builtins.head);
   rowLabel = line: let
     m = builtins.match "\\|[[:space:]]*`([a-z]+(-[a-z]+)*)`.*" line;

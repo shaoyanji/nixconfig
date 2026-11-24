@@ -10,7 +10,7 @@
   largestFib = n: let
     fs = fibs n;
   in
-    fs |> (xs: builtins.elemAt xs (xs |> builtins.length |> (n: n - 1)));
+    lib.last fs;
 
   zeckendorf = n: let
     go = m: acc:

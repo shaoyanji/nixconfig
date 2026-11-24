@@ -43,7 +43,7 @@
     |> (m:
       if m == null
       then line
-      else m |> (xs: builtins.elemAt xs 1));
+      else builtins.elemAt m 1);
 
   # Marker and checkbox can nest (`- [x] fd`), so unwrap twice: marker, box,
   # marker again. A single pass left `[x] fd` as an entry name.

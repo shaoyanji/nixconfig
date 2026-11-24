@@ -16,6 +16,7 @@
     tail
     toString
     ;
+  at = i: xs: elemAt xs i;
 
   # "…/<hash>-<name>" -> "<name>"
   # Mirrors the shell's `sub(/^[^-]*-/, "", n)`: the "/nix/store/" + hash prefix
@@ -44,9 +45,9 @@
       if i >= n
       then lib.reverseList acc
       else let
-        path = lines |> (xs: elemAt xs i);
-        narSize = lines |> (xs: elemAt xs (i + 2)) |> fromJSON;
-        refCount = lines |> (xs: elemAt xs (i + 4)) |> fromJSON;
+        path = lines |> at i;
+        narSize = lines |> at (i + 2) |> fromJSON;
+        refCount = lines |> at (i + 4) |> fromJSON;
       in
         go (i + 5 + refCount) (
           [
@@ -162,15 +163,15 @@
       1125899906842624
     ];
     pick = i:
-      if i + 1 < length divisors && bytes >= (divisors |> (xs: elemAt xs (i + 1)))
+      if i + 1 < length divisors && bytes >= (divisors |> at (i + 1))
       then pick (i + 1)
       else i;
     idx = pick 0;
-    d = divisors |> (xs: elemAt xs idx);
+    d = divisors |> at idx;
     scaled = div (bytes * 10 + d - 1) d; # ceil(bytes*10/d)
     whole = div scaled 10;
     frac = scaled - whole * 10;
-  in "${toString whole}.${toString frac}${units |> (xs: elemAt xs idx)}";
+  in "${toString whole}.${toString frac}${units |> at idx}";
 
   rollupOf = entries: let
     annotated = entries |> map (e: e // {sub = e.name |> subsystemOf;});

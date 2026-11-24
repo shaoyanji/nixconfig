@@ -13,6 +13,7 @@
 }: let
   shared = import ./bountystash/shared.nix {inherit lib;};
   inherit (shared) slug;
+  at = i: xs: builtins.elemAt xs i;
 
   locales = {
     en = data;
@@ -51,7 +52,7 @@
     v = t lang;
     work =
       x.projects
-      |> lib.imap0 (i: pr: link "${root lang}work/${slugs |> (xs: builtins.elemAt xs i)}.gmi" "${pr.title} — ${pr.period}");
+      |> lib.imap0 (i: pr: link "${root lang}work/${slugs |> at i}.gmi" "${pr.title} — ${pr.period}");
     stack = x.skills |> lib.concatMap (cat: ["" (heading 3 cat.category) "" (cat.items |> lib.concatStringsSep " · ")]);
     principles = x.philosophy |> lib.concatMap (q: ["" (heading 3 q.title) "" q.body]);
     education = p.education |> map (e: "${e.degree} — ${e.school} (${e.period})") |> bullets;
@@ -103,7 +104,7 @@
   projectDoc = lang: i: let
     x = d lang;
     v = t lang;
-    pr = x.projects |> (xs: builtins.elemAt xs i);
+    pr = x.projects |> at i;
   in
     join (
       ["# ${pr.title}" "" "${pr.role} · ${pr.period}" "" pr.description]
@@ -145,8 +146,8 @@ in
 
     ${data.projects
       |> lib.imap0 (i: _: ''
-        install -m 0644 ${page "work-${slugs |> (xs: builtins.elemAt xs i)}.gmi" (projectDoc "en" i)} $out/work/${slugs |> (xs: builtins.elemAt xs i)}.gmi
-        install -m 0644 ${page "de-work-${slugs |> (xs: builtins.elemAt xs i)}.gmi" (projectDoc "de" i)} $out/de/work/${slugs |> (xs: builtins.elemAt xs i)}.gmi
+        install -m 0644 ${page "work-${slugs |> at i}.gmi" (projectDoc "en" i)} $out/work/${slugs |> at i}.gmi
+        install -m 0644 ${page "de-work-${slugs |> at i}.gmi" (projectDoc "de" i)} $out/de/work/${slugs |> at i}.gmi
       '')
       |> lib.concatStringsSep "\n"}
 

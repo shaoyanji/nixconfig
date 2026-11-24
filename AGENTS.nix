@@ -5475,6 +5475,52 @@
         with a reason; `checks:quick` green.
       '';
     };
+    job-scout-daily-feed-sweep-2026-11-24 = {
+      title = "Daily-feed sweep: Shipzero, Wellis and Projektron are new; the rest of the day's feed was already on file";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Second 2026-11-24 sweep, over arbeitnow's same-day feed rather than ATS boards: Shipzero Hamburg (AI Platform Engineer, fit 4, packet tailored), Wellis Rotterdam (DevOps/Platform, fit 4, NL on-site) and Projektron Berlin (Cloud Engineering, fit 3, German C1) are new rows; nine employers in the same feed were already on file.";
+      links = ["job-scout-sre-platform-sweep-2026-11-24"];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "taskfiles/apps.yml"
+        ];
+        tasks = ["apps:scout" "agents:apps:packet"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Swept arbeitnow's Germany, Netherlands and Switzerland feeds on
+        2026-11-24 evening rather than the ATS boards again, because the
+        roles posted that day are what the boards do not yet carry. Three
+        new rows, all posted the same day:
+
+        Shipzero, Hamburg (AI Platform Engineer) — the LLM-agent platform
+        on top of a logistics-emissions data platform: orchestration,
+        evals, tracing, agent governance, plus the existing DevOps estate.
+        Fit 4, and the only Germany-based agent-shaped role the sweep
+        found; packet tailored and built.
+
+        Wellis, Rotterdam (DevOps/Platform Engineer) — first dedicated
+        infrastructure hire at a healthtech scale-up, multi-cloud, manual
+        provisioning, no production visibility. Fit 4 on shape, on-site in
+        NL, so relocation cost decides it.
+
+        Projektron, Berlin (Cloud Engineering) — 230 VMs, containerisation
+        of the hosting estate, Nginx/HAProxy, Ansible/Puppet; German C1 is
+        the gate.
+
+        Closed as already on file, not re-scouted: DENKweit, eleQtron,
+        wabcon, virtual7, Treatwell, Blocktech, Namespace (applied), Enact
+        and gridscale all reappeared in the same-day feed.
+
+        Route: Shipzero is brokered through join.com, so the employer ATS
+        still has to be found before the packet leaves; the 2026-12-07
+        hold governs the sends.
+      '';
+    };
     lib-pipe-elemat-lambdas = {
       title = "elemAt flip-lambdas in lib/*.nix want an `at` helper or direct calls";
       kind = "open";

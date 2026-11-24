@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-24T18:29:43Z",
+  "generated": "2026-11-24T18:33:16Z",
   "count": 200,
-  "pin": "3535e9e72233f2e2d29ef7da24e3e2bb56ae6ae88db052af0e30ff181757670a",
+  "pin": "a6fcff96f14626a4b51a566169ae4dea567786c0a733fd11e982e617853ba9d8",
   "turns": [
+    {
+      "id": "0e9a3f9a-9c1a-4340-9392-b6812eb6ef21",
+      "ts": "2026-11-24T18:31:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: attention queue empty (0 items); resolved 4 held leads to real apply endpoints — VISPIRON, SPECTRUM, Livello, NDI are live join.com postings, none has a packet or JD, per-row blockers recorded, hold to 2026-12-07 unchanged; due today: Genesis chase undrafted, Muenster still missing the Zeugnis, DHBW portal docs; nothing sent | gate: apps:get readback + live 200 on all four",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hap0nmqs3im8f9ky2now7kh"
+    },
     {
       "id": "ab8b73af-4f7d-414b-9c44-566eb79f5f2c",
       "ts": "2026-11-24T18:29:35Z",
@@ -2740,19 +2753,6 @@
       "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
       "branch": "main",
       "frame": "03halobrqnz57hdnrfd64ysq6"
-    },
-    {
-      "id": "4e8aa998-8d72-4cbc-8581-7111076c98c7",
-      "ts": "2026-11-24T08:15:50Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout",
-      "action": "re-driven: freebuff (agents:2) idle after mail-to-Todoist turn. jev-decide routed kinexon_send p=0.78 margin=0.64 (decisive via margin, needs_review on probability): send built kinexon packet. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f3eac7b168262a0b497501039395bdbacdf13817",
-      "branch": "main",
-      "frame": "03halobqav8rzv8t1otvibvt1"
     }
   ]
 }

@@ -6154,5 +6154,47 @@
         submission — build the packet on frieren, then submit at join.com.
       '';
     };
+    job-scout-tracker-curation-2026-11-24 = {
+      title = "The tracker merges duplicate employers into one canonical row";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "Nine employers held two live rows each; every pair is now one canonical row, with the other closed at `other` and its evidence copied into notes. Packet contradictions were fixed only where the data disagrees with itself: two `lead` rows with built packets moved to `prep`, Proxify back to `lead` on a dead URL, litef given a portal URL. `apps:dupes` exits 0.";
+      from = ["job-scout-send-unblocked-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/apps-db.sh" "scripts/task/appflow-packet.sh"];
+        tasks = ["apps:dupes" "apps:add"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The tracker carried nine employers with two live rows each. Curation
+        2026-11-24 folded each pair into one canonical row and closed the other
+        at stage `other` with a "Merged into <id>" status — the convention the
+        table already used for scouted duplicate leads.
+
+        Canonical choice was the row holding the further stage or the richer
+        record: auteega (recruiter form plus the received mail), catapult
+        (applied, mail linked, now pointing at Greenhouse 8329716), dhbw
+        (infrastructure req, fit 5), globallogic (TPM interview), hits-nrw,
+        icf (senior requisition), shipzero (packet tailored), sourceq (fit 5)
+        and ucs (interview, two linked mails). Nothing was deleted: the API has
+        no delete route, so a closed row keeps its evidence and its notes were
+        copied onto the canonical row.
+
+        Packets were reconciled only where the contradiction is in the data.
+        gridscale and maxcluster carried a built packet at stage `lead` and
+        moved to `prep` with statuses that say so; Proxify went back to `lead`
+        because its requisition is dead on re-check. litef claimed a ready
+        packet with no applyUrl, and now names www.litef.com/karriere.
+
+        One thing this pass did not do: check the artifacts. Packets build on
+        frieren and this host has no submissions directory, so thirty-odd
+        "packet ready" claims stayed as written rather than being downgraded on
+        a filesystem fact that cannot be read from here. `apps:dupes` now exits
+        0 with `[]` (was nine employers); the table holds 1148 rows.
+      '';
+    };
   };
 }

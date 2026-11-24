@@ -1,8 +1,86 @@
 {
-  "generated": "2026-11-24T21:12:10Z",
+  "generated": "2026-11-24T21:36:38Z",
   "count": 200,
-  "pin": "d724d06e5f9595fb456ee54cb334909b9925a313121aa1f5fc1a405c3febd014",
+  "pin": "1342ad815e2fd99efde856906cd405b48821d6ed8c098c5ca94d01d60d251273",
   "turns": [
+    {
+      "id": "7cb046e1-d92b-4d63-bc34-0ae020f77845",
+      "ts": "2026-11-24T21:33:11Z",
+      "source": "delphi-steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "drove idle delphi freebuff (agents:3.1, ssh): jev-decide duel curate_tracker 0.58 vs tailor_and_send 0.42 margin=0.16 — dedupe tracker rows and reconcile packet consistency, commit+push",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
+      "branch": "main",
+      "frame": "03haq030zzsu7oyatpehjx03s"
+    },
+    {
+      "id": "a191b059-f2b9-4bb9-8d21-1f602732ad8d",
+      "ts": "2026-11-24T21:33:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-send",
+      "action": "drove idle freebuff (agents:2.1): jev-decide selected send_pending p=0.82 margin=0.70 — prepare and dispatch complete-packet applications, list blocked, commit+push tracker",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
+      "branch": "main",
+      "frame": "03haq02yva8we99fszulqd9ih"
+    },
+    {
+      "id": "2b99b709-c1d3-4f43-948f-88f6290e45b5",
+      "ts": "2026-11-24T21:17:48Z",
+      "source": "delphi-steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "drove idle delphi freebuff pane (agents:3.1, remote ssh): scout new DevOps/SRE/Platform/Infra engineer listings (research pass); jev-decide research 0.91",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
+      "branch": "main",
+      "frame": "03hapx2ryozfjxtytqaug94zg"
+    },
+    {
+      "id": "ca764925-dda1-49c4-a2da-6ececa130461",
+      "ts": "2026-11-24T21:17:47Z",
+      "source": "devin-steward",
+      "subject": "nixconfig:steward-devin",
+      "action": "drove idle devin pane (agents:1.1): finish image-daily Go port engine glue (build_index shape cache + deploy leg), re-run checks:quick/host frieren/images:gate/drv-equality; jev-decide flake-change 0.93",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
+      "branch": "main",
+      "frame": "03hapx2pc25mnz67q9rym9bpo"
+    },
+    {
+      "id": "4a1cb25b-eda8-440c-823c-a839b6907f7b",
+      "ts": "2026-11-24T21:15:28Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: built unsent packets for NETWAYS/noris/Proofline | gate: packets verified send-ready, nothing sent",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
+      "branch": "main",
+      "frame": "03hapwmfqxcj5wuumtp3ldsls"
+    },
+    {
+      "id": "1c71a417-a59c-4a43-a721-0f8913974e7d",
+      "ts": "2026-11-24T21:12:34Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-change",
+      "action": "landed: fleet-monitors dedup — orElse helper for 4x null-fallback, toEndpoint optionalAttrs -> filtered table, defaultConditions tcp/icmp collapse | gate: checks:hosts delphi frieren + checks:nix:style",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
+      "branch": "main",
+      "frame": "03hapw1zrft8t4l9aou76bwdq"
+    },
     {
       "id": "3ac9dbc3-2e85-4c45-a3de-fc6dd1710b57",
       "ts": "2026-11-24T21:11:01Z",
@@ -2605,86 +2683,6 @@
       "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
       "branch": "main",
       "frame": "03hamht76t2ph3lxrghmu2s9r"
-    },
-    {
-      "id": "c990c539-3607-453a-84d5-cc09c01561dc",
-      "ts": "2026-11-24T10:45:04Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi (agents:3) idle (task text unsubmitted). Fed attention sweep: check replies/status changes on applied leads, dedupe new leads. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
-      "branch": "main",
-      "frame": "03hamhh66p57yek1j3yx3w6c1"
-    },
-    {
-      "id": "134efa22-4f6e-49d1-8f28-ccd91e608854",
-      "ts": "2026-11-24T10:45:04Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-sweep2",
-      "action": "re-driven: freebuff (agents:2) idle after cv_tailor_fresh completed. jev-decide: tailoring CV for 5 DACH rows from sweep 2. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
-      "branch": "main",
-      "frame": "03hamhh4skkcl8r17nzvz7jl8"
-    },
-    {
-      "id": "7ee73840-fc87-4288-97f2-bc307fb959c3",
-      "ts": "2026-11-24T10:44:38Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward",
-      "action": "drove idle agent panes devin, freebuff and delphi; next tasks submitted and confirmed working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
-      "branch": "main",
-      "frame": "03hamhe3jbwb6lznvrhagirl2"
-    },
-    {
-      "id": "7c9b27ad-ae04-4cdc-a056-2ad0fb13ab6c",
-      "ts": "2026-11-24T10:43:03Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "sweep: attention queue read, 21 rows. 2 status changes on tracked leads — INIT (init SE) applied→screening, recruiter asks Karlsruhe relocation (hybrid, no full remote); SOLCOM contacted→screening, holding acknowledgement. 5 other job replies already reflected in their rows. apps:dupes PASS.",
-      "outcome": "done",
-      "claims": [
-        "apps"
-      ],
-      "files": [],
-      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hamh2yqpqh2q195kcqmfgbs"
-    },
-    {
-      "id": "0b91e7ed-a537-491a-b4db-2c35777c2abe",
-      "ts": "2026-11-24T10:42:46Z",
-      "source": "hermes",
-      "subject": "nixconfig:image-daily-fold",
-      "action": "re-driven: devin (agents:1) idle after static_serve fold completed and landed. jev-decide selected review_loop p=1.0 margin=1.0: code-review loop over lib/*.nix pipe-operator code. Pane Thinking.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
-      "branch": "main",
-      "frame": "03hamh0z8n35kr12cs13rsolv"
-    },
-    {
-      "id": "e2e750bf-7841-46cb-91ea-cfbd0fb3257e",
-      "ts": "2026-11-24T10:42:10Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi freebuff (agents:3) idle after upsert done (10:25). jev-decide selected attention p=0.87 margin=0.75: sweep delphi attention queue. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "dfb839b9b27d6164abdc0d46afb29575afb67b22",
-      "branch": "main",
-      "frame": "03hamgwt2xdy0r7ly7uvbtlfx"
     }
   ]
 }

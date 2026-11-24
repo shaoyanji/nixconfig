@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-24T00:47:14Z",
+  "generated": "2026-11-24T01:11:45Z",
   "count": 200,
-  "pin": "6c0de77ee8ff38dafcaf3980b6f86e6ff5e43f4b3a1dd72299e5b83f73ae0fdc",
+  "pin": "8944404bbb436df16c8981c24b796f19d62549672dea58d6d569740beddc00f8",
   "turns": [
+    {
+      "id": "060a9112-d20a-4a82-9a06-60e5083876fa",
+      "ts": "2026-11-24T01:04:47Z",
+      "source": "pane-steward",
+      "subject": "nixconfig:pane-steward",
+      "action": "drove 3 idle panes (2026-11-24 01:54): devin 0:0.1->continue_refactor (image-daily build_index ffprobe shape-cache), freebuff 0:1.1->scout-new-leads, delphi 0:2.1->lead-liveness; all 3 confirmed working (fresh Thinking/working counters)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5c732b8bc4f9e7e6e83354dd8663372f22c953b7",
+      "branch": "main",
+      "frame": "03hajc4c8im20v7oic5326p0p"
+    },
+    {
+      "id": "9ada3a1d-fffd-4426-bf0f-9ed452e0a51f",
+      "ts": "2026-11-24T00:47:27Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily",
+      "action": "landed: imageDailySlots data table + listToAttrs replaces 4 hand-written scheduler blocks (jobs table diff identical); image-daily gains remaining/share/pending subcommands, slot_share+roster_pending gone from engine (307->267) | gate: drv-equality 30/30, checks:host frieren PASS, images:gate ok, checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5c732b8bc4f9e7e6e83354dd8663372f22c953b7",
+      "branch": "main",
+      "frame": "03haj8qfn7rdxpx0e4bkb61yl"
+    },
     {
       "id": "38738867-450a-4584-a5cb-539e156c869b",
       "ts": "2026-11-24T00:39:05Z",
@@ -2668,35 +2694,6 @@
       "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
       "branch": "main",
       "frame": "03had95eiavu1epd02dq0dgwf"
-    },
-    {
-      "id": "7b6fe4fb-249b-4910-9288-9be5bc492590",
-      "ts": "2026-11-23T06:21:59Z",
-      "source": "devin",
-      "subject": "nixconfig:images-pipeline-redesign",
-      "action": "start: redesign cpg->cloudinary->pages image pipeline into fewer steps",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "taskfiles/images.yml"
-      ],
-      "files": [],
-      "base_commit": "6954ad2801009981883d27902cfb0bd0994e3515",
-      "branch": "main",
-      "frame": "03had8sb2vq7b6ictrieovvp4"
-    },
-    {
-      "id": "5dbe6290-1fe5-41ac-9f60-74cb24489590",
-      "ts": "2026-11-23T05:57:57Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-submit-sinc-2026-11-23",
-      "action": "landed: submitted sinc-devops via the advert-allowed email route (bewerbung@sinc.de, Anschreiben+Lebenslauf PDFs, Sent copy 85.9 KiB verified); all browser routes blocked on delphi (no chromium/firefox). Mail-to-pipeline reconcile: 2 Canonical rejections recorded, mittwald prep->applied on ack, Muenster/SVA acknowledgements relabelled from follow-up-required. | gate: apps:doctor PASS, no git change",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11496ea05c514eec9eb332c4223169d3f470c444",
-      "branch": "main",
-      "frame": "03had43ah0uxocmhj0juqgubh"
     }
   ]
 }

@@ -378,7 +378,7 @@ func runManifest(root, repo string) {
 
 func main() {
 	if len(os.Args) < 2 {
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes> [flags]")
 	}
 	switch os.Args[1] {
 	case "manifest":
@@ -406,7 +406,9 @@ func main() {
 		cmdShare(os.Args[2:])
 	case "pending":
 		cmdPending(os.Args[2:])
+	case "shapes":
+		cmdShapes(os.Args[2:])
 	default:
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes> [flags]")
 	}
 }

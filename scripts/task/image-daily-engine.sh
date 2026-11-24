@@ -109,20 +109,9 @@ build_index() {
   mkdir -p "$dist"
   # Shape travels with the manifest so the gallery can offer a phone filter: a
   # portrait plate cropped into a 1200x630 card is a stripe of itself. Measured
-  # once per file and cached, because ffprobe over the whole tree on every
-  # publish is the difference between a quick publish and a slow one. The tool
-  # reads this cache, so it stays the shell's side of the contract.
-  local shapes=$IMAGES_ROOT/published/shapes.tsv rel file dim
-  [ -f "$shapes" ] || : >"$shapes"
-  while IFS=$'\t' read -r rel _ _; do
-    [ -n "$rel" ] || continue
-    grep -qF -- "$rel"$'\t' "$shapes" && continue
-    file=$IMAGES_ROOT/published/$rel
-    [ -f "$file" ] || file=$IMAGES_ROOT/src/$rel
-    [ -f "$file" ] || continue
-    dim=$(dimensions "$file" 2>/dev/null) || continue
-    [ -n "$dim" ] && printf '%s\t%s\n' "$rel" "$dim" >>"$shapes"
-  done <"$IMAGES_ROOT/published/urls.tsv"
+  # once per file and cached in published/shapes.tsv — the tool owns the loop
+  # now (`image-daily shapes`), ffprobe per uncached rel, published before src.
+  "$(image_daily_cli)" shapes --root "$IMAGES_ROOT"
 
   # Written beside and moved into place: a redirect that fails truncates its
   # target, and a truncated manifest.json reads as "0 assets served", which the

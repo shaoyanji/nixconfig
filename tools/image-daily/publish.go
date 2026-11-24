@@ -224,3 +224,54 @@ func cmdAdopt(args []string) {
 	}
 	adoptCloudinary(*root, *repo)
 }
+
+// `image-daily shapes` — the ffprobe shape-cache loop build_index used to run:
+// every urls.tsv rel gets one `rel\tWxH` row in published/shapes.tsv, measured
+// once and cached. Published wins over src for the same rel; a file that is
+// gone contributes nothing, and a rel already in the cache is never re-probed
+// (exact-key match — the shell's substring grep could false-positive on a
+// prefix collision).
+func cmdShapes(args []string) {
+	fs := flag.NewFlagSet("shapes", flag.ExitOnError)
+	root := fs.String("root", os.Getenv("IMAGES_ROOT"), "image tree root")
+	_ = fs.Parse(args)
+	if *root == "" {
+		die("shapes needs --root (or IMAGES_ROOT)")
+	}
+
+	shapesPath := *root + "/published/shapes.tsv"
+	cached := map[string]bool{}
+	if data, err := os.ReadFile(shapesPath); err == nil {
+		for _, line := range strings.Split(string(data), "\n") {
+			if f := strings.SplitN(line, "\t", 2); f[0] != "" {
+				cached[f[0]] = true
+			}
+		}
+	}
+	f, err := os.OpenFile(shapesPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		die("shapes.tsv: %v", err)
+	}
+	defer f.Close()
+
+	urls, err := os.ReadFile(*root + "/published/urls.tsv")
+	if err != nil {
+		return // the caller guards urls.tsv; nothing cached to extend
+	}
+	for _, line := range strings.Split(string(urls), "\n") {
+		rel := strings.SplitN(line, "\t", 2)[0]
+		if rel == "" || cached[rel] {
+			continue
+		}
+		file := *root + "/published/" + rel
+		if _, err := os.Stat(file); err != nil {
+			file = *root + "/src/" + rel
+		}
+		if _, err := os.Stat(file); err != nil {
+			continue
+		}
+		if dim := dimensions(file); dim != "" {
+			fmt.Fprintf(f, "%s\t%s\n", rel, dim)
+		}
+	}
+}

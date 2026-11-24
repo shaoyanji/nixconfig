@@ -5356,15 +5356,15 @@
     };
     job-scout-sre-platform-2026-11-24 = {
       title = "SRE and platform scouting: nine leads, and the site that already says it";
-      kind = "open";
-      status = "OPEN";
+      kind = "handoff";
+      status = "DELIVERED";
       priority = "P3";
       date = "2026-11-24";
-      summary = "Seven LinkedIn queries over a two-week EU window gave 201 unique cards; 64 survived the agency and title filters, and nine were new employers. The CV site needs no prose change for any of them yet — the work is packet order after the 2026-12-07 hold, starting with Toast and Etraveli.";
+      summary = "Seven LinkedIn queries over a two-week EU window gave 201 unique cards; 64 survived the agency and title filters, and nine were new employers. The ranking is the record and packet order is Toast then Etraveli after the 2026-12-07 hold; no site prose changes until one converts.";
       from = ["job-scout-fresh-eu-boards-2026-11-24"];
       refs = {
         modules = ["lib/matt-site.nix"];
-        tasks = ["apps:dupes" "matt:cv:check"];
+        tasks = ["apps:vendors" "apps:dupes" "matt:cv:check" "matt:gist:drift"];
         docs = ["docs/cv-ats-compliance.md"];
       };
       body = ''
@@ -5389,10 +5389,13 @@
         lib/matt/resume.json.
 
         WWR returned only tracked or closed employers; Remotive still ignores
-        its category parameter.
+        its category parameter. The five EU vendor careers pages this lane never
+        fetched are their own record, job-scout-eu-vendor-pages-gap-2026-11-24
+        and `task apps:vendors`: an empty ATS feed is not no openings.
 
-        Exit: packets for Toast then Etraveli exist at prep with no send before
-        2026-12-07, apps:dupes stays [], and no site prose chased a silent lead.
+        Exit met: the ranking and the packet order are the handoff. apps:dupes
+        stays [] and one live row per employer holds it; packets go out from a
+        person, Toast then Etraveli, after 2026-12-07.
       '';
     };
     job-scout-eu-vendor-pages-gap-2026-11-24 = {

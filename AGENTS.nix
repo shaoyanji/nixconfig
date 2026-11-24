@@ -5392,5 +5392,90 @@
         went with the surface it gated. 30/30 drv-identical both times.
       '';
     };
+    job-scout-next-sweep-freebuff = {
+      title = "The next job-scout sweep runs on the idle freebuff lane";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-24";
+      summary = "The five ranked packets stay prep-only until 2026-12-07, so the lane's next move is another sweep on the idle `agents:2 freebuff` pane: DevOps/SRE/Platform/Infrastructure leads, `apps:search` before each `apps:scout`, and a duplicate or a dead route is a finding rather than a row.";
+      refs = {
+        modules = [
+          "taskfiles/apps.yml"
+          "taskfiles/bountystash.yml"
+          "scripts/task/apps-scout.sh"
+        ];
+        tasks = ["apps:scout" "apps:search" "apps:query" "matt:cv:check"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The lane is a queue, not a document: a lead becomes a row through
+        `apps:scout`, a duplicate employer stays one row, and the packet for it
+        is built after the row exists. Nothing here sends anything.
+
+        State read back 2026-11-24: five leads ranked from this fleet's own work
+        (netcup 1, Eficode 2, mogenius 3, KHS 4, Advantest 5), all `stage lead`
+        with `rank N/5 this round` in `next_action` and the hold to 2026-12-07;
+        four reqs answer 200, Advantest's jobware path is a 403 bot wall over an
+        ADP portal that no headless fetch fills. The round record, including why
+        each employer sits where it does, is
+        `~/.local/state/appflow/followups/2026-11-24-scout-devops-de.md`.
+
+        Next: one more sweep of the four families on the freebuff pane. Giant
+        Swarm and SUSE were closed earlier the same day and earn a recheck
+        before any new employer. `task apps:search -- <company>` runs first for
+        every candidate, because the dupes gate closes a second row and the lead
+        is lost with it. AVENDIS, EDEKA Bank and ABOUT YOU are mail-scan rows
+        with no packet and no usable posting; they need an artifact, not another
+        note.
+
+        Exit: the sweep ends with either a new lead row that carries a real
+        `--family`, a `--summary` and a `next_action` naming its route, or the
+        employers it checked recorded as already tracked or with no live req —
+        and `task checks:quick` green over the note.
+      '';
+    };
+    lib-pipe-elemat-lambdas = {
+      title = "elemAt flip-lambdas in lib/*.nix want an `at` helper or direct calls";
+      kind = "open";
+      status = "OPEN";
+      priority = "P5";
+      date = "2026-11-24";
+      summary = "Code-review sweep of `|>` across lib/*.nix (~600 uses, 19 files): 18 `(xs: builtins.elemAt xs i)` flip-lambdas in 8 files — elemAt's (list, index) order fights the pipe while builtins.elem pipes natively. 7301202c landed the two exact twins (builtins.head, lib.last); 14 remain.";
+      refs = {
+        modules = [
+          "lib/closure-graph.nix"
+          "lib/gemini-portal.nix"
+          "lib/knowledge-graph.nix"
+          "lib/skills.nix"
+          "lib/quotient-hash.nix"
+          "lib/pkg-list.nix"
+        ];
+        tasks = ["checks:drv-equality"];
+      };
+      body = ''
+        The sweep's finding is one asymmetry: `builtins.elem e list` is already
+        pipe-shaped (`list |> builtins.elem t` works), while
+        `builtins.elemAt list i` puts the list last, so every piped index grew
+        an `(xs: builtins.elemAt xs i)` lambda whose only job is flipping args.
+
+        Landed in 7301202c (drv-equality 30/30 identical): systemd-policy.nix
+        took `builtins.head` for index 0 and a direct call for index 1;
+        nix-files.nix took `lib.last` for `n - 1` and a direct call for `n - 2`.
+
+        Remaining 14, by file: closure-graph.nix 6, gemini-portal.nix 4, and
+        one each in knowledge-graph.nix, skills.nix, quotient-hash.nix,
+        pkg-list.nix.
+
+        Suggested shape for the next loop, not yet decided: a per-file
+        `let at = i: xs: builtins.elemAt xs i;` where the count justifies it
+        (closure-graph, gemini-portal), direct `builtins.elemAt xs i` calls
+        for the singletons. A shared `at` helper is not worth a new lib file —
+        these are per-domain imports, not a common prelude.
+
+        Exit: no `(xs: elemAt xs` lambda remains in lib/, and
+        `task checks:drv-equality` reports 30/30 identical.
+      '';
+    };
   };
 }

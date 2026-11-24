@@ -1,8 +1,116 @@
 {
-  "generated": "2026-11-24T10:48:53Z",
+  "generated": "2026-11-24T11:01:29Z",
   "count": 200,
-  "pin": "f852e2a08b399ce0f9fc90082fa417042d18d4f86d10d7dd3755ea24565f05f7",
+  "pin": "2c013d41a855ac6e911cad9f25c8de374e227fb04c30e3e57d7af0bc14afd4f3",
   "turns": [
+    {
+      "id": "ed0c7973-1143-416e-af82-b86d6f9f6b9d",
+      "ts": "2026-11-24T11:00:55Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-freebuff",
+      "action": "routed next task via Jev task-change duel (p=0.89, m=0.78); pasted CV packet task to freebuff and Enter submitted",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
+      "branch": "main",
+      "frame": "03hamkkmycw48mogfhyaqq6rf"
+    },
+    {
+      "id": "dcc26a09-ff3c-4721-8e35-3f66448d93f1",
+      "ts": "2026-11-24T11:00:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "routed next task via Jev note-change (p=0.80, m=0.60); pasted note task to Devin and Enter submitted",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
+      "branch": "main",
+      "frame": "03hamkk3odjl7arbpp1wpt6ax"
+    },
+    {
+      "id": "6796ab2b-1902-45ed-9c99-9d3ca68b0bef",
+      "ts": "2026-11-24T10:50:39Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "tailored 2 of 4: Flink Platform Eng (14/32 highlights) and Pentland Firth Sr Cloud Platform (9/32) now have packets + JD text, recovered via LinkedIn's guest endpoint since the pages carried no JSON-LD. Maesn closed (backend req), Atlas Titan do-not-packet by review. 0 mailed: no address exists — jobs.goflink.com and pentlandfirth.com/careers are forms, no mailto on any page. Letters: 0\n0 built (packet emits CV only). JD coverage 61->73 of 256.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
+      "branch": "main",
+      "frame": "03hamikcyv4wg83yz3sx3de4z"
+    },
+    {
+      "id": "259870d7-bc65-4490-b36e-534ab750fe20",
+      "ts": "2026-11-24T10:50:04Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "followups: 1039 rows queried, pending actions only — 21 overdue, 5 due today, 38 within 7 days. Oldest overdue: Deutsches Klimarechenzentrum (DKRZ)|Codesphere|Max Planck Computing and Data Facility (MPCDF). Today's live item: Genesis PHCM ack follow-up. Prep-only, nothing sent.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamigab50tqmbkg57unh343"
+    },
+    {
+      "id": "e9213516-a833-4e60-a901-647c98a7a5fc",
+      "ts": "2026-11-24T10:50:04Z",
+      "source": "codebuff",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: international/remote scout — 1 genuinely new lead, Baseten Site Reliability Engineer (Ashby, remote flag, fit 4, filed en, hold 2026-12-07). Everything else on WWR/Remotive/Ashby boards is already tracked or US-only. Packet built from the JD projection: CV 2p, letter 1p; nothing sent.",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hamig8v6tlg8l9nhgknaetv"
+    },
+    {
+      "id": "bc091825-2c1c-4cea-a901-d58980befff3",
+      "ts": "2026-11-24T10:49:14Z",
+      "source": "devin",
+      "subject": "nixconfig:code-review-loop",
+      "action": "reviewed |> across lib/*.nix: ~600 uses/19 files, pipe-operators-declared policy, zero reverse-pipe. One smell: 18 (xs: elemAt xs i) flip-lambdas in 8 files — elemAt's arg order fights the pipe. Landed 7301202c: head/last twins. Suggest: local at=i:xs:elemAt xs i helper in closure-graph/gemini-portal (5/4 uses) or direct calls | gate: drv-equality 30/30",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
+      "branch": "main",
+      "frame": "03hamiaey23fz5vowvkk4tika"
+    },
+    {
+      "id": "04266a22-911e-471c-acd6-91e744a56369",
+      "ts": "2026-11-24T10:49:03Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-fold",
+      "action": "verified at HEAD e4368754+: checks:image-daily gate ok, checks:images 750/750, checks:quick green except checks:infron — fails ONLY on worktree: codebuff's uncommitted config.yaml adds an 8th fallback lane, api_max_retries still 7. HEAD clean (verified on temp worktree). Also fixed prose tell e4368754 | gate: checks:image-daily+images PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
+      "branch": "main",
+      "frame": "03hami96f8f5x7181wo3vgxpk"
+    },
+    {
+      "id": "0453bf27-b122-497b-989b-4bb4f092d1f6",
+      "ts": "2026-11-24T10:48:53Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "re-driven: delphi (agents:3) idle. jev-decide first pass needs_review (db_query p=0.56, margin 0.28 NOT decisive); duel won db_query p=0.89 margin=0.78: query leads DB for follow-ups. Pane working.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
+      "branch": "main",
+      "frame": "03hami7zpx7alq98t9od1rm64"
+    },
     {
       "id": "70c1fe69-5fc2-4765-a174-c036e21b8eb8",
       "ts": "2026-11-24T10:48:53Z",
@@ -2674,112 +2782,6 @@
       "base_commit": "9793a01b3f98027bb2e7d16366fc689d0938b65b",
       "branch": "main",
       "frame": "03hais9xwo302fbs8v2io2oa3"
-    },
-    {
-      "id": "9d158940-8b0d-46bd-a932-8f35344902eb",
-      "ts": "2026-11-23T22:24:50Z",
-      "source": "devin",
-      "subject": "nixconfig:image-engine-go",
-      "action": "landed: generation orchestration (run_lane/attempt/judge_image) and upload leg (stage_publish/adopt_cloudinary) ported to tools/image-daily — judge/attempt/lane/stage/adopt subcommands; engine 632 -> 307 | gate: checks:quick PASS, images:gate PASS, checks:host frieren PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9793a01b3f98027bb2e7d16366fc689d0938b65b",
-      "branch": "main",
-      "frame": "03haigvi8lllq932thj1ud6p5"
-    },
-    {
-      "id": "8edcc03a-c44d-495e-9254-5946c5071aaa",
-      "ts": "2026-11-23T22:12:15Z",
-      "source": "devin",
-      "subject": "nixconfig:image-engine-go",
-      "action": "landed: image-daily manifest builder ported to tools/image-daily Go CLI (cli.image.daily), byte-identical manifest on live 738-asset bank; engine 714->632; slot PATH carries the binary; also bumped hermes api_max_retries 6->7 for the committed 7-lane chain | gate: checks:quick PASS, checks:host frieren PASS, images:gate ok",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9cb4994af55338e3d151780c0b217280ec099542",
-      "branch": "main",
-      "frame": "03haief2b40y53pl6yo5zwbof"
-    },
-    {
-      "id": "6d7880cc-7ac5-4aa2-8a00-1d5576c982bc",
-      "ts": "2026-11-23T22:08:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-23d",
-      "action": "correction: Collibra + Buynomics reqs are dead (Greenhouse board has no such job; page 200 is a redirect) so both retired to stage other with a do-not-apply note. Live new leads: Poolside Infrastructure (remote EMEA), DeepL Staff SRE Sovereign Cloud (Munich), n8n Staff Platform Engineer (Berlin), Onebrief Staff SRE (Wiesbaden), Nebius Senior SRE Data Platform (Berlin/remote) — 5 rows, each with JD saved | gate: ATS API + page probe PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9f86d9c7e9c14918aafdab0a6d34ae59c4f8b83e",
-      "branch": "main",
-      "frame": "03haidpuu9uw15a5ejqk8scgd"
-    },
-    {
-      "id": "9a607522-4b04-46d8-8206-a9f4ba3b1891",
-      "ts": "2026-11-23T22:07:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-23o",
-      "action": "correction: apps:dupes exits 1 on two pre-existing pairs (HyPlus, Nebius: nebius-senior-sre-data-platform + nebius-senior-staff-site-reliability-engineer-server-infrast) — not created by this sweep. The five new rows are one per employer and none duplicate a live or rejected row. Nothing was sent.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haidgb7i908e9iytx3h7j3l"
-    },
-    {
-      "id": "be24ac8a-b3a9-4633-8dac-751e9f8579b4",
-      "ts": "2026-11-23T22:07:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-23o",
-      "action": "landed: 5 new leads recorded (Tweag, SAP, constellr, 1GLOBAL, Digital Turbine), none in the record before; nothing sent | gate: apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haidevlpahp7tkwjr9eseg4"
-    },
-    {
-      "id": "32210921-8701-493c-a8be-2b80b2d908cc",
-      "ts": "2026-11-23T22:06:40Z",
-      "source": "steward-cron",
-      "subject": "steward:pane-drive",
-      "action": "drove 3 idle panes (devin image-publish, freebuff job-search, delphi job-search) to continue_task via jevdecide; all BUSY",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9f86d9c7e9c14918aafdab0a6d34ae59c4f8b83e",
-      "branch": "main",
-      "frame": "03haidbqdjerny2dwu8dkbkmo"
-    },
-    {
-      "id": "c35db452-1900-4397-aebf-3252d0591fe9",
-      "ts": "2026-11-23T22:06:36Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-23d",
-      "action": "landed: scouted 3 new leads via live ATS feeds (Greenhouse/Nebius/Ashby/Arbeitnow/Working Nomads/HN) after dedupe against 790 rows: Collibra Staff Platform Engineer (remote UK/EU), Buynomics Lead Platform Engineer (remote EU, Cologne HQ), Nebius Senior SRE Data Platform (Berlin/remote). Leads 102->105, tracked 793 | gate: apps:query counts PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9f86d9c7e9c14918aafdab0a6d34ae59c4f8b83e",
-      "branch": "main",
-      "frame": "03haidbakbyvgdzbbn7id0n3i"
-    },
-    {
-      "id": "093aa182-d67c-471d-a571-15cf4c808b74",
-      "ts": "2026-11-23T22:05:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-23o",
-      "action": "claim: scout DevOps/SRE/Platform/Infra leads; audit the record before any write",
-      "outcome": "in_progress",
-      "claims": [
-        "none (read-only sweep)"
-      ],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haid3cqb98s9fx8wcob1ja3"
     }
   ]
 }

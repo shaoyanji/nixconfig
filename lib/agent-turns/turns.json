@@ -1,8 +1,27 @@
 {
-  "generated": "2026-11-24T07:16:37Z",
+  "generated": "2026-11-24T07:17:12Z",
   "count": 200,
-  "pin": "4f1a83c92cb417ff2ae46ec912ac6b0e61356076e5e0e611ac1269c53e88adc0",
+  "pin": "6d508938db82103af3add2ba8c0672155a309ee4deb956c1c8d2265bfcab7a65",
   "turns": [
+    {
+      "id": "f5c385f9-f2fb-499b-b5d6-52b48a3fa5e4",
+      "ts": "2026-11-24T07:16:58Z",
+      "source": "devin",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "landed: checks:image-daily exists now (taskfiles/checks.yml + leaf row in flake/check-inventory.nix) — output 'image-daily: gate ok: dispatch, judge fallback, breakers and shrink guard all present'; go build ./... && go vet ./... clean in tools/image-daily (no go.mod at tools/ root — one-os-cli note) | gate: checks:image-daily PASS, check:verify 133/133, checks:tasks clean, go build PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "files": [
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "base_commit": "acb3481a2d1d180ecbaf7f85d137748a3d125ad4",
+      "branch": "main",
+      "frame": "03halctoegi2dycwgq7l0im5t"
+    },
     {
       "id": "f42b73fb-8f29-40bc-a45c-1d82bdb28dd7",
       "ts": "2026-11-24T07:15:51Z",
@@ -2688,19 +2707,6 @@
       "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haekugko4000exytv1rwarx"
-    },
-    {
-      "id": "e7f4e9e2-bf0a-49b3-9a16-a00e607f484a",
-      "ts": "2026-11-23T10:27:01Z",
-      "source": "freebuff",
-      "subject": "nixconfig:tmux-pane-steward",
-      "action": "landed: publish CV site update on delphi freebuff pane 0:2.1 — Jev routed label publish (0.64 vs prose-change 0.28, margin 0.36 ≥ 0.3 decisive), task pasted via load-buffer+paste-buffer, fresh 'thinking...' counter confirms submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
-      "branch": "flake/firefox-addons",
-      "frame": "03haeknikwogc7cvd2y1ugy6q"
     }
   ]
 }

@@ -39,6 +39,11 @@ status line because the table has no owner column. `--next-action` lands with
 the row, so a lead is never stored without the thing that moves it, and the
 same company plus role updates one row instead of adding a second.
 
+An employer that already has a live row is a duplicate whatever the title: the
+dupes gate closes the second row and the lead is lost. `task apps:search --
+<company>` before scouting, and treat a second requisition at the same employer
+as a replacement for the tracked row, not an addition.
+
 ## Track
 
 ```bash

@@ -6236,5 +6236,50 @@
         process, not a send problem.
       '';
     };
+    job-scout-outreach-sent-2026-11-24 = {
+      title = "Two outreach packets left the building before the hold: NETWAYS and noris, on an explicit operator instruction";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P1";
+      date = "2026-11-24";
+      summary = "NETWAYS GmbH (jobs@netways.de) and noris network AG (alicia.hanna@noris.de) were dispatched 2026-11-24 21:54 UTC from matt@bountystash.com through Resend; both read last_event=delivered at the API. Proofline was held: its posting requires a pull request before contact and the packet has none. The 2026-12-07 hold still stands for every other row.";
+      from = ["job-scout-dispatch-pass-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:get" "apps:upsert" "apps:query"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The send-pending pass had refused to write `sent` because nothing had
+        left and the hold ran to 2026-12-07. This turn the operator asked for
+        three rows by name, so the hold is overridden for those three only and
+        nothing else changes: the other 39 dispatch files stay UNSENT.
+
+        The plane still has no send verb, so dispatch is the Resend API with the
+        account whose domain is verified for sending, and the receipt is the
+        message id. Two left:
+
+          netways-system-engineer-schwerpunkt-cloud  jobs@netways.de
+            01a20f8d-7fe8-7d59-b219-ad35adc40bf9  delivered
+          noris-network-ag-senior-cloud-native-engineer-openstack-networking
+            alicia.hanna@noris.de  01a20f8d-822a-7840-8820-a68c0fe41c5f  delivered
+
+        Both addresses were confirmed on the live postings rather than taken
+        from the packet (the netways jobs page names jobs@netways.de; the noris
+        posting lists Alicia Hanna, HR Manager, with that address). Bodies were
+        rebuilt from the letter PDFs, because no letter.json exists for these
+        packets and a naive extraction leaves soft hyphens inside words.
+
+        Proofline stayed home: proofline.sh/careers asks for a pull request to a
+        prooflinedev repository before anyone reads a CV, and "documentation-only
+        changes do not meet this requirement". An email without that link is the
+        low-effort spam their filter exists to drop, so the row is `prep` with a
+        next action that names the PR, not `applied`.
+
+        Exit: the other rows wait for 2026-12-07; a row flips to `applied` only
+        with a message id that answers delivered at the provider.
+      '';
+    };
   };
 }

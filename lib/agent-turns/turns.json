@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-24T21:43:51Z",
+  "generated": "2026-11-24T21:57:59Z",
   "count": 200,
-  "pin": "d754a7b1a8a0d043f5689c9a855d1a06b4f27fa491d0b0c6f36e6b7825b3083d",
+  "pin": "abbb957c8f350ce898b16a0639c6459281350a37290688b61b585ffe356b3cdf",
   "turns": [
+    {
+      "id": "4fe05059-f818-4009-9d27-579c7904c031",
+      "ts": "2026-11-24T21:52:19Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi",
+      "action": "landed: drove idle delphi freebuff pane (agents:3.1, remote ssh) -> curate_tracker; dedupe and reconcile job tracker rows, merge duplicates, correct status fields against scout results, reconcile pending/follow-up rows to live leads (OpenNebula K8s Platform Eng, DeepJudge SRE Zurich and niche finds); report open-lead count vs last scout pass",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "837651f67b1550620aaf3311b672c94883da427d",
+      "branch": "main",
+      "frame": "03haq3tki7zvh1bqfgcnb7vpf"
+    },
+    {
+      "id": "93fe5b4c-1f06-46e9-b618-cc1104985001",
+      "ts": "2026-11-24T21:51:46Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: drove idle freebuff pane (agents:2.1) -> send_packets; NETWAYS/noris/Proofline outreach packets verified send-ready at 21:15 but nothing sent; re-verified each packet, dispatched all three, updated tracker rows to reflect the send",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "837651f67b1550620aaf3311b672c94883da427d",
+      "branch": "main",
+      "frame": "03haq3pq7ypspfbystabfw6y6"
+    },
+    {
+      "id": "f9133a09-ae59-4bce-96eb-6ee921392a5b",
+      "ts": "2026-11-24T21:48:30Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-change",
+      "action": "landed: infra-stack stated-defaults dedup — name/workingDirectory restated the module's own defaults in all 3 job defs incl. generated image-daily slots | gate: checks:hosts delphi frieren + drv-equality compare 30/30 identical",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "837651f67b1550620aaf3311b672c94883da427d",
+      "branch": "main",
+      "frame": "03haq32qcyth2wkq2c4qdn3ke"
+    },
     {
       "id": "d333e6bc-edc2-4a45-97ce-2c6b3e4f6d2e",
       "ts": "2026-11-24T21:43:41Z",
@@ -2644,45 +2683,6 @@
       "base_commit": "774b990abf9ea78b2ddc83ca7582d4122c208a12",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hamig8v6tlg8l9nhgknaetv"
-    },
-    {
-      "id": "bc091825-2c1c-4cea-a901-d58980befff3",
-      "ts": "2026-11-24T10:49:14Z",
-      "source": "devin",
-      "subject": "nixconfig:code-review-loop",
-      "action": "reviewed |> across lib/*.nix: ~600 uses/19 files, pipe-operators-declared policy, zero reverse-pipe. One smell: 18 (xs: elemAt xs i) flip-lambdas in 8 files — elemAt's arg order fights the pipe. Landed 7301202c: head/last twins. Suggest: local at=i:xs:elemAt xs i helper in closure-graph/gemini-portal (5/4 uses) or direct calls | gate: drv-equality 30/30",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
-      "branch": "main",
-      "frame": "03hamiaey23fz5vowvkk4tika"
-    },
-    {
-      "id": "04266a22-911e-471c-acd6-91e744a56369",
-      "ts": "2026-11-24T10:49:03Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-fold",
-      "action": "verified at HEAD e4368754+: checks:image-daily gate ok, checks:images 750/750, checks:quick green except checks:infron — fails ONLY on worktree: codebuff's uncommitted config.yaml adds an 8th fallback lane, api_max_retries still 7. HEAD clean (verified on temp worktree). Also fixed prose tell e4368754 | gate: checks:image-daily+images PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7301202c1e5e336f7b305a1b001d7d86a2693005",
-      "branch": "main",
-      "frame": "03hami96f8f5x7181wo3vgxpk"
-    },
-    {
-      "id": "0453bf27-b122-497b-989b-4bb4f092d1f6",
-      "ts": "2026-11-24T10:48:53Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi (agents:3) idle. jev-decide first pass needs_review (db_query p=0.56, margin 0.28 NOT decisive); duel won db_query p=0.89 margin=0.78: query leads DB for follow-ups. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4368754347ec1cf8ecaade575ec20bcc260055e",
-      "branch": "main",
-      "frame": "03hami7zpx7alq98t9od1rm64"
     }
   ]
 }

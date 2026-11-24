@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-24T07:44:14Z",
+  "generated": "2026-11-24T07:49:48Z",
   "count": 200,
-  "pin": "16208d2ca9ea00d891899f926a8cdc3085b0dac114d63b21089e5b390127147c",
+  "pin": "c16ff3e914c8cb14d6dba035b5738339023d696ff0d7d6a86923507ba6defb54",
   "turns": [
+    {
+      "id": "5f863cd2-a1a7-450f-865c-846067b3d133",
+      "ts": "2026-11-24T07:48:32Z",
+      "source": "codebuff",
+      "subject": "nixconfig:appflow-scout-2026-11-24h",
+      "action": "claim: scout round h, 10 fresh remote DevOps/SRE/Platform leads, dedupe against 972 tracked, queue top 3 for CV tailoring",
+      "outcome": "in_progress",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halizp1w5v8zwihnkqpcntb"
+    },
+    {
+      "id": "b84b7bcf-b67b-4fb5-bee8-1d5fb6c3555e",
+      "ts": "2026-11-24T07:46:48Z",
+      "source": "codebuff",
+      "subject": "nixconfig:appflow-scout-2026-11-24g",
+      "action": "landed: 8 fresh leads — Surfshark, Kong, Smartly, Kaluza, Supercell, Cabify, Deliveroo, Socket; top 3 queued for CV tailoring (Surfshark, Kong, Smartly); closed coni+partner dupe | gate: apps:dupes PASS ([]), 972 tracked, repo dirty paths unchanged",
+      "outcome": "done",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halinfqu4sqiboi5kjis4nu"
+    },
+    {
+      "id": "d2904969-136f-4ba3-9b20-ed1e77e043ad",
+      "ts": "2026-11-24T07:44:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: 8 new leads, 4 DACH Linux shops (B1 Systems Entwickler Linux/OSS remote-DE ft4, LINBIT DRBD/LINSTOR Linux SWE Vienna ft4, Univention OSS engineer Bremen ft3, Open-Xchange email security Bremen ft3) + Datadog Paris LLM infra ft3 + Linkit platform NL ft2 + Callista/coni+partner Zurich ft2; top 3 queued for CV tailoring (B1 + LINBIT due 11-27, Univention 11-28) | gate: checks:kg PASS, checks:tasks PASS",
+      "outcome": "done",
+      "claims": [
+        ".agents/skills/apps"
+      ],
+      "files": [],
+      "base_commit": "b32a26f58bee40a5fdf5b418e88691d400296e3b",
+      "branch": "main",
+      "frame": "03hali5w2u1xo8jnf8hrzx7tc"
+    },
     {
       "id": "c2aafe0f-41d0-44f8-8cf7-2547a8cb7dfb",
       "ts": "2026-11-24T07:37:08Z",
@@ -2665,51 +2710,6 @@
       "base_commit": "bb970c58832db4743f626a31a950293c97531772",
       "branch": "main",
       "frame": "03haerl8lnb22qxa0a0b6lxz8"
-    },
-    {
-      "id": "047bccde-4b15-48a1-bca9-75efec574d66",
-      "ts": "2026-11-23T11:00:56Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-publish-cv",
-      "action": "landed: freebuff pane 0:1.1 driven; jev-decide -> publish (0.99/0.98, typesafe); CV-site-to-vercel task accepted and executing (fresh thinking counter verified)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "39e584297b0b2649d973a67ffdf4ea77c16c8edd",
-      "branch": "main",
-      "frame": "03haer9xzzf3fqqsrblf6a72h"
-    },
-    {
-      "id": "b5bd5605-5673-4c53-8e2d-7352f9f2b6fd",
-      "ts": "2026-11-23T11:00:52Z",
-      "source": "buffy",
-      "subject": "nixconfig:ci-deslop",
-      "action": "deslop: one fleet-nix action replaces 6 copies of the runner nix.conf (+1 keys literal, now exported); permissions contents:read on 3 workflows; dead NIXCACHE_SIGNING_KEY env and Log Target step gone; gok cache key drops run_id (never hit); policy reads action+workflow as one text and is comment-blind; ci docs corrected. Gates: actionlint 0, policies+fixture PASS, prose 0, docs-budget 0",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haer9jzuqwa8hbafwcq0aer"
-    },
-    {
-      "id": "f6e6a5da-d078-432e-a481-5e2762e8a9d8",
-      "ts": "2026-11-23T10:52:29Z",
-      "source": "devin",
-      "subject": "nixconfig:pr-cleanup-vercel-detok",
-      "action": "claim: triage chatgpt-connector PRs (merge reasonable, close legacy nixpkgs bumps); remove VERCEL_TOKEN/Edge-Config dependency from vercel/ outlet",
-      "outcome": "in_progress",
-      "claims": [
-        "vercel/",
-        "scripts/task/vercel-publish.sh",
-        "taskfiles/ops.yml",
-        "docs/vercel-status.md",
-        ".github/"
-      ],
-      "files": [],
-      "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
-      "branch": "main",
-      "frame": "03haepmn5n2c9sgodslo4dog9"
     }
   ]
 }

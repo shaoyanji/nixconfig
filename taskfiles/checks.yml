@@ -212,6 +212,18 @@ tasks:
     cmds:
       - bash scripts/task/prose-tells.sh
 
+  checks:image-daily:
+    desc: "[gate] The image-daily command family is structurally able to ship"
+    summary: >
+      Runs `image-daily.sh gate` on the live tree — the checks:-family spelling
+      of `images:gate` so the gate the Go port answers to sits with the rest of
+      the gates: dispatch agreement both ways, the judge's provider fallback
+      (the 0-of-43 account-quota mistake), both unjudged circuit breakers, and
+      the publish shrink guard. `checks:images:publish:test` proves it fails on
+      the real past tree.
+    cmds:
+      - bash scripts/task/image-daily.sh gate
+
   checks:images:
     desc: "[gate] The asset manifest is a projection of urls.tsv, row for row"
     summary: >

@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-24T07:13:34Z",
+  "generated": "2026-11-24T07:16:37Z",
   "count": 200,
-  "pin": "b9e309a8f5521f6293f6570d32595ef4a2c8fe89665f48e8ae372e0b25fa5a3f",
+  "pin": "4f1a83c92cb417ff2ae46ec912ac6b0e61356076e5e0e611ac1269c53e88adc0",
   "turns": [
+    {
+      "id": "f42b73fb-8f29-40bc-a45c-1d82bdb28dd7",
+      "ts": "2026-11-24T07:15:51Z",
+      "source": "frieren-steward",
+      "subject": "delphi:job-search",
+      "action": "idle; jevdecide needs_review (novel p=.55 margin=.28); left undriven (fail-closed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "51925a892b6f278e8baa4bf215b78e009614df0f",
+      "branch": "main",
+      "frame": "03halclvtk4q1dgbprr9sy5u1"
+    },
+    {
+      "id": "4222796d-88ac-4411-9ba5-e4749e6d886c",
+      "ts": "2026-11-24T07:15:51Z",
+      "source": "frieren-steward",
+      "subject": "devin:checks-image-daily",
+      "action": "idle; jevdecide needs_review (note-change p=.31 margin=.05); left undriven (fail-closed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "51925a892b6f278e8baa4bf215b78e009614df0f",
+      "branch": "main",
+      "frame": "03halcltumdl532tfsoq7lrad"
+    },
+    {
+      "id": "422d59f3-d902-4bdf-a95c-ceff1b2aae4e",
+      "ts": "2026-11-24T07:13:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: 5 Nix/fleet leads (Hexagon Robotics Nix build+packaging Zürich, Fediversity NixOS app store EU-remote, Buildkite DevOps support UK/IE/PL, VirtusLab on-prem infra PL, Railway baremetal orchestration global) + Fediversity queued for CV tailoring; apps skill now documents apps:scout; gate: checks:kg PASS, checks:tasks PASS (checks:quick blocked by pre-existing infron retry/fallback-lane defect, unrelated)",
+      "outcome": "done",
+      "claims": [
+        ".agents/skills/apps; submissions/"
+      ],
+      "files": [],
+      "base_commit": "51925a892b6f278e8baa4bf215b78e009614df0f",
+      "branch": "main",
+      "frame": "03halc65gzgipz4ka9tsx2pnc"
+    },
     {
       "id": "d1e22716-5007-43df-9d80-fd6295891f22",
       "ts": "2026-11-24T07:04:35Z",
@@ -2660,45 +2701,6 @@
       "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
       "branch": "flake/firefox-addons",
       "frame": "03haeknikwogc7cvd2y1ugy6q"
-    },
-    {
-      "id": "1913f96a-21fb-4a84-ad04-f2e15d8f25eb",
-      "ts": "2026-11-23T10:18:26Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-mail-batch-2026-11-23",
-      "action": "landed: 2026-11-22/23 mail batch applied to the tracker — 13 rows updated (7 rejections, 2 portal-only refusals, 3 acks, 1 review flag) and 10 rows added from the 08:49 email blast incl. 2 bounces; duplicate protection shipped: apps:add refuses a second live row per employer, new apps:dupes gate (39 clusters found), 6 hard rules in the apps skill | gate: task apps:dupes exit 1 + gate rc=2 + application-get readback of all 23 rows",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haeiz4vpz3fk1qioea0jq9z"
-    },
-    {
-      "id": "6763ab6e-6d8f-4e56-a1a0-5d4a7c99e228",
-      "ts": "2026-11-23T10:14:16Z",
-      "source": "freebuff-agent",
-      "subject": "nixconfig:steward-freebuff-publish-cv-site",
-      "action": "landed: freebuff pane 0:1.1 tasked with publishing the static CV site to vercel and verifying all routes return HTTP 200; submission confirmed via fresh working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
-      "branch": "main",
-      "frame": "03haei5vha8vqn65lsbybs2ux"
-    },
-    {
-      "id": "caac1af9-05f4-4f8c-a461-bdbedce97448",
-      "ts": "2026-11-23T10:02:28Z",
-      "source": "devin",
-      "subject": "nixconfig:ci-closure-budget",
-      "action": "landed: removed 'Closure budget vs closure-budgets.toml' step from build-machines in nixcachix.yml; it SSH-resolved /run/current-system on frieren which runners cannot reach; corrected ci-closure-budget note | gate: gh run 45150967684 all jobs green (build-machines frieren 8m58s, docs-budget, sops-drift, site-cv-links); pages run green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "711f8546df43e3baa15946a186582628e57c967a",
-      "branch": "flake/transitive-dank-qml-common",
-      "frame": "03haefuwd8u8ykxpsj90bkfci"
     }
   ]
 }

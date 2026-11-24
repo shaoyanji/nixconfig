@@ -5598,7 +5598,7 @@
       status = "OPEN";
       priority = "P2";
       date = "2026-11-24";
-      summary = "The POST write routes (application-update, application-upsert) shipped in 7571daca, and the bearer gate now lands with them: `appflow-board-bearer` in sops, a rendered `map $http_authorization` included via appendHttpConfig, `if`/`return 403` on the two write locations only. Proven on a replica vhost: unauth POST 403, keyed POST 200, reads stay open. Remaining exit: the live proof on delphi's real vhost after rebuild.";
+      summary = "Write routes (7571daca) are now bearer-gated: `appflow-board-bearer` in sops renders a `map $http_authorization`, and `if`/`return 403` guards the two write locations only — replica-proven 403/200/reads-open. Remaining exit: the same curl pair on delphi's live vhost after rebuild.";
       refs = {
         hosts = ["delphi"];
         modules = ["modules/services/appflow-board.nix" "hosts/delphi/configuration.nix"];

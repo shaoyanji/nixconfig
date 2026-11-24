@@ -23,8 +23,8 @@
       if m == null
       then defaultDelayMs
       else let
-        n = m |> (xs: builtins.elemAt xs 0) |> lib.toInt;
-        unit = m |> (xs: builtins.elemAt xs 1);
+        n = m |> builtins.head |> lib.toInt;
+        unit = builtins.elemAt m 1;
       in
         if unit == "ms"
         then n

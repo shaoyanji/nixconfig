@@ -32,9 +32,9 @@
   nameOf = p: let
     parts = p |> lib.removeSuffix ".nix" |> lib.removePrefix "modules/" |> lib.splitString "/";
     n = parts |> builtins.length;
-    stem = parts |> (xs: builtins.elemAt xs (n - 1));
+    stem = parts |> lib.last;
   in
-    if n > 1 && (stem == "default" || stem == (parts |> (xs: builtins.elemAt xs (n - 2))))
+    if n > 1 && (stem == "default" || stem == builtins.elemAt parts (n - 2))
     then parts |> lib.init |> lib.concatStringsSep "."
     else parts |> lib.concatStringsSep ".";
   # `listToAttrs` keeps the last of a collision silently; `checks.<system>.nix-registry`

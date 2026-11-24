@@ -50,6 +50,14 @@ A job board's employer label is not the employer: arbeitnow's "Coda" is
 for one employer sit in the table spelling its name differently, which the
 dupes gate cannot see.
 
+An empty ATS feed is not an employer without openings: the EU open-source
+vendors (LINBIT, B1 Systems, Univention, Open-Xchange, Proxmox) post only on
+their own careers page or a Personio/join.com widget, so a guessed greenhouse
+slug answers `[]` and reads like "no roles". Fetch the careers page before
+writing a vendor off — `linbit.com/jobs`, `b1-systems.de/jobs-karriere` and
+`open-xchange.com/careers` all list live engineering reqs that no aggregator
+in this lane carries.
+
 ## Track
 
 ```bash

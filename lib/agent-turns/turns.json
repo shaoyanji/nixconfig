@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-24T07:27:46Z",
+  "generated": "2026-11-24T07:44:14Z",
   "count": 200,
-  "pin": "326d323e51ae471255d80af81e0695695239f55935c80b182f877f59ddf88265",
+  "pin": "16208d2ca9ea00d891899f926a8cdc3085b0dac114d63b21089e5b390127147c",
   "turns": [
+    {
+      "id": "c2aafe0f-41d0-44f8-8cf7-2547a8cb7dfb",
+      "ts": "2026-11-24T07:37:08Z",
+      "source": "codebuff",
+      "subject": "nixconfig:appflow-scout-2026-11-24g",
+      "action": "claim: scout round g, 8 fresh remote DevOps/SRE/Platform leads, dedupe against 956 tracked, queue top 3 for CV tailoring",
+      "outcome": "in_progress",
+      "claims": [
+        "apps"
+      ],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halgrgxakpj4b7mcpzuqvks"
+    },
+    {
+      "id": "12f57be2-2cda-43dc-b1a6-938b83cbff70",
+      "ts": "2026-11-24T07:31:09Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-scout-2026-11-24f",
+      "action": "Scout: 8 new infra leads added — Tide, saas.group, AlphaSense (top 3 queued for CV tailoring), Astronomer, Inato, Zopa, Lyceum, LemFi. Remanence refused (live row already covers it); settled a Blocktech dupe pair mid-run. Gate: apps:dupes [] PASS, 956 tracked, dirty 26 unchanged. No repo commit: tracker writes are API-side only.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03halflg84gicjfc7vo1hnotm"
+    },
+    {
+      "id": "e2395c31-8400-4192-a47b-ef0142626caa",
+      "ts": "2026-11-24T07:27:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-24",
+      "action": "landed: 5 new leads (Blocktech SRE bare-metal trading fleet Amsterdam ft4, Catawiki platform Amsterdam ft4, Remanence MTS platform/deploy tooling Paris ft4, Coda Payments infra ops Amsterdam ft3, Dawn Technology platform Hilversum ft3); Blocktech + Remanence queued for CV tailoring (due 11-27 / 11-28); Aykua re-scout closed as duplicate of the live applied row | gate: checks:kg PASS, checks:tasks PASS",
+      "outcome": "done",
+      "claims": [
+        ".agents/skills/apps"
+      ],
+      "files": [],
+      "base_commit": "d48864a9614d4c144229681642118d64eff836cc",
+      "branch": "main",
+      "frame": "03haley3bhhunvzppt68itzwr"
+    },
     {
       "id": "2dc2feea-5640-4d1c-b489-49d42164c902",
       "ts": "2026-11-24T07:27:02Z",
@@ -2667,45 +2710,6 @@
       "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
       "branch": "main",
       "frame": "03haepmn5n2c9sgodslo4dog9"
-    },
-    {
-      "id": "9b8b8c7b-0d75-49d4-9c49-38ba2595ae34",
-      "ts": "2026-11-23T10:48:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-vercel",
-      "action": "blocked: CV site verified, not deployed — 28/28 files 200 from a fresh .#sites.matt-site build (19 HTML + 5 PDFs + assets, missing path 404), 21/21 live routes 200 on the current host; post drafted at ideas/cv-site-redesign.md (staged) but the is-a.dev blog checkout is absent; Vercel needs VERCEL_TOKEN — no CLI, token or sops key exists here; also corrected the apps SKILL prose budget (68 -> 105)",
-      "outcome": "blocked: no Vercel credential on this host",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd6ab06a58ff4f7ac52e7fa765b3844d461ef4eb",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haeovdoepiqdupymb1k6coy"
-    },
-    {
-      "id": "f6d7d2f2-801f-462c-88e6-d9377cd2aa15",
-      "ts": "2026-11-23T10:46:05Z",
-      "source": "devin",
-      "subject": "nixconfig:vercel-status",
-      "action": "correction: landed commits after rebase onto c455266c (flake-update merge) are 9cd416c6 + 41d50e9f",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
-      "branch": "main",
-      "frame": "03haeodkgsuej0vhqmg4m1tri"
-    },
-    {
-      "id": "87be8509-d931-4cfe-bdf8-73597a034c4a",
-      "ts": "2026-11-23T10:45:58Z",
-      "source": "devin",
-      "subject": "nixconfig:vercel-status",
-      "action": "landed: vercel/ two-zone status outlet — public probe allowlist + basic-auth /ops fed by sentinel status.json via Edge Config; vercel-publish.sh + ops:status:publish; docs/vercel-status.md; also committed foreign ideas/cv-site-redesign.md (kg drift) | gate: checks:quick PASS incl checks:vercel:test 14 cases",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41d50e9f113d67a96c982df52963701bc69225cb",
-      "branch": "main",
-      "frame": "03haeocq6l90r7v7vz7iq4ynh"
     }
   ]
 }

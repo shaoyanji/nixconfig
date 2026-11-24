@@ -53,7 +53,7 @@ rec {
     "scripts/task/cpg-loop.sh" = 352;
     "scripts/task/cpg-review.sh" = 439;
     "scripts/task/cv-ats-check.sh" = 261;
-    "scripts/task/cv-blog-check.sh" = 158;
+    "scripts/task/cv-blog-check.sh" = 172;
     "scripts/task/data-ops.sh" = 183;
     "scripts/task/deploy-netbook.sh" = 321;
     "scripts/task/dns-failover-check.sh" = 179;
@@ -77,7 +77,7 @@ rec {
     "scripts/task/image-gen.sh" = 138;
     "scripts/task/image-round.sh" = 165;
     "scripts/task/image-ship.sh" = 114;
-    "scripts/task/infron-check.sh" = 476;
+    "scripts/task/infron-check.sh" = 491;
     "scripts/task/instabox.sh" = 227;
     "scripts/task/invalidation.sh" = 137;
     "scripts/task/inventory-menu.sh" = 238;

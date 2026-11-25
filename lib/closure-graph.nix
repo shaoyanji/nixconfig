@@ -175,7 +175,7 @@
 
   rollupOf = entries: let
     annotated = entries |> map (e: e // {sub = e.name |> subsystemOf;});
-    subs = annotated |> map (e: e.sub) |> lib.unique;
+    subs = annotated |> builtins.catAttrs "sub" |> lib.unique;
     oneSub = sub: let
       sel = annotated |> builtins.filter (e: e.sub == sub);
     in {

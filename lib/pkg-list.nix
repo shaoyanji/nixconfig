@@ -95,8 +95,8 @@
       });
   in {
     inherit label;
-    packages = resolved |> builtins.filter (r: r.value != null) |> map (r: r.value);
-    missing = resolved |> builtins.filter (r: r.value == null) |> map (r: r.name);
+    packages = resolved |> builtins.filter (r: r.value != null) |> builtins.catAttrs "value";
+    missing = resolved |> builtins.filter (r: r.value == null) |> builtins.catAttrs "name";
   };
 
   # Strict resolve: [ derivation ], throwing with the file and the entry, because

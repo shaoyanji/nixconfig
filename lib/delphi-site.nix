@@ -205,7 +205,7 @@
 
   cardGrid = mode: cs:
     cs
-    |> map (c: c.group)
+    |> builtins.catAttrs "group"
     |> lib.unique
     |> lib.concatMapStringsSep "\n" (g: ''
       <h3 class="svc-group">${esc g}</h3>

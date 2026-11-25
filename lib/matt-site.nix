@@ -69,7 +69,7 @@
   # One role, one prose entry, matched on the organisation the resume names.
   joinWork = corpus: d: nowLabel: let
     prose = d.work |> builtins.filter (w: (w.org or "") != "") |> map (w: lib.nameValuePair w.org w) |> lib.listToAttrs;
-    missing = corpus |> map (w: w.name) |> builtins.filter (n: !(prose |> builtins.hasAttr n));
+    missing = corpus |> builtins.catAttrs "name" |> builtins.filter (n: !(prose |> builtins.hasAttr n));
   in
     if missing != []
     then throw "matt-site: no prose for resume role(s): ${lib.concatStringsSep ", " missing}"
@@ -99,8 +99,8 @@
   # the resume, projected — not a list that can grow by editing a second file.
   joinProjects = let
     claimed = projects.entries |> builtins.filter (p: (p.resumeName or "") != "") |> map (p: lib.nameValuePair p.resumeName p) |> lib.listToAttrs;
-    missing = resumeProjects |> map (p: p.name) |> builtins.filter (n: !(claimed |> builtins.hasAttr n));
-    invented = projects.entries |> builtins.filter (p: (p.resumeName or "") == "") |> map (p: p.name);
+    missing = resumeProjects |> builtins.catAttrs "name" |> builtins.filter (n: !(claimed |> builtins.hasAttr n));
+    invented = projects.entries |> builtins.filter (p: (p.resumeName or "") == "") |> builtins.catAttrs "name";
   in
     if missing != []
     then throw "matt-site: no project entry for resume project(s): ${lib.concatStringsSep ", " missing}"
@@ -262,7 +262,7 @@
   unshippedVariants =
     declaredVariants
     |> builtins.filter (
-      v: !(builtins.elem (cvFileName v "en") (map (c: c.name) cvFiles)) || !(builtins.elem (cvFileName v "de") (map (c: c.name) cvFiles))
+      v: !(builtins.elem (cvFileName v "en") (builtins.catAttrs "name" cvFiles)) || !(builtins.elem (cvFileName v "de") (builtins.catAttrs "name" cvFiles))
     );
 
   # Measurement, off until an endpoint exists. Cloudflare Pages counts pageviews
@@ -437,7 +437,7 @@
     # profile.json cannot point the structured data at the wrong site.
     contactHref = label: (p.contacts |> builtins.filter (c: c.label == label) |> builtins.head).href;
 
-    sameAs = p.contacts |> builtins.filter (c: c.label != "email") |> map (c: c.href);
+    sameAs = p.contacts |> builtins.filter (c: c.label != "email") |> builtins.catAttrs "href";
 
     jsonld =
       builtins.replaceStrings ["<"] ["\\u003c"]
@@ -795,7 +795,7 @@
       );
       projects =
         if untranslated != []
-        then throw "matt-site: no German project title for: ${lib.concatStringsSep ", " (map (e: e.name) untranslated)}"
+        then throw "matt-site: no German project title for: ${lib.concatStringsSep ", " (builtins.catAttrs "name" untranslated)}"
         else
           map (
             e:
@@ -862,8 +862,8 @@
       |> builtins.filter (w: (w.org or "") != "")
       |> map (w: lib.nameValuePair w.org w)
       |> lib.listToAttrs;
-    knownRoles = corpusWork |> map (w: w.name);
-    named = json.work |> map (w: w.name);
+    knownRoles = corpusWork |> builtins.catAttrs "name";
+    named = json.work |> builtins.catAttrs "name";
     highlightsOf = n: (lib.findFirst (w: w.name == n) {highlights = [];} corpusWork).highlights or [];
     unknownRoles = named |> builtins.filter (n: !(knownRoles |> builtins.elem n));
     invented =
@@ -1140,10 +1140,10 @@ in
       # at the subject the record chose. Why: docs/cv-ats-compliance.md.
       bash ${../scripts/task/site-routing.sh} $out ${./matt/cases.json} ${./matt/cases.de.json} ${./matt/briefs.json} ${./matt/briefs.de.json}
       bash ${../scripts/task/site-links.sh} --gap $out ${
-        lib.concatStringsSep " " (map (c: c.name) cvFiles)
+        lib.concatStringsSep " " (builtins.catAttrs "name" cvFiles)
       }
       bash ${../scripts/task/site-links.sh} $out ${
-        lib.concatStringsSep " " (map (c: c.name) cvFiles)
+        lib.concatStringsSep " " (builtins.catAttrs "name" cvFiles)
       }
       echo "matt-site: $(find $out -type f | wc -l) files, $(du -sb $out | cut -f1) bytes"
     ''

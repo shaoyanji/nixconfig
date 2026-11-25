@@ -66,14 +66,16 @@ tasks:
   apps:scout:sweep:
     desc: The next scout sweep — id, the boards in read order and the write rules (SWEEP, FAMILY)
     summary: >
-      Sweep id `2026-11-25p`, the next DevOps/SRE/Platform/Infrastructure pass
-      after 25o. Prints the boards in read order with the trap each one hides,
-      then the lane's write rules. Read-only and network-free: a sweep still
-      dedupes through `apps:scout`/`apps:search` and files with `apps:scout`,
-      never a second writer. The 2026-12-07 send hold stands over every row
-      found, and no row is filed from a listing alone.
+      Sweep id `2026-11-25s`, the pass after 25p. Prints the boards in read
+      order with the trap each one hides, then the lane's write rules. The 25s
+      read took Stepstone's six lane queries to two pages each: 256 unique
+      cards, 85 of them at employers the ledger already holds, six rows filed
+      and three parked on an expiry inside the hold. Read-only and network-free:
+      a sweep still dedupes through `apps:scout`/`apps:search` and files with
+      `apps:scout`, never a second writer. The 2026-12-07 send hold stands over
+      every row found, and no row is filed from a listing alone.
     vars:
-      SWEEP: '{{.SWEEP | default "2026-11-25p"}}'
+      SWEEP: '{{.SWEEP | default "2026-11-25s"}}'
       FAMILY: '{{.FAMILY | default "devops|sre|platform|infrastructure"}}'
     cmds:
       - |
@@ -97,11 +99,11 @@ tasks:
   # the send window. The date is the reason to look again, so it is carried here
   # — a parked lead with no date is a lead nobody rechecks.
   apps:scout:parked:
-    desc: The leads parked on a posting's expiry — validThrough first, none filed (2026-11-25o)
+    desc: The leads parked on a posting's expiry — validThrough first, none filed (2026-11-25s)
     summary: >
-      Eleven Stepstone ads from the 2026-11-25o read, parked on expiry rather
-      than merit and never filed as rows because their validThrough falls inside
-      the 2026-12-07 send hold. Each line carries the date the posting closes;
+      Fourteen Stepstone ads — eleven from the 2026-11-25o read and three from
+      25s — parked on expiry rather than merit and never filed as rows because
+      their validThrough falls inside the 2026-12-07 send hold. Each line carries the date the posting closes;
       when it passes the recheck is one read — gone, so it is dropped, or
       reposted, so it is filed with that cycle's origin. Prints only.
     vars:
@@ -115,11 +117,14 @@ tasks:
           '2026-11-28' 'LAIQON' 'parked on expiry' \
           '2026-11-28' 'Liebherr-Digital' 'parked on expiry' \
           '2026-11-29' 'STULZ' 'parked on expiry' \
+          '2026-11-29' 'grinnberg' 'parked in the 25s read' \
           '2026-11-30' 'BIOTRONIK' 'parked on expiry' \
+          '2026-12-01' 'meinestadt.de' 'parked in the 25s read' \
           '2026-12-03' 'Liebherr-Digital' 'second posting' \
           '2026-12-03' 'ZaGoTec' 'parked on expiry' \
           '2026-12-04' 'EWE NETZ' 'parked on expiry' \
           '2026-12-05' 'novomind' 'parked on expiry' \
+          '2026-12-05' 'S Rating & Risikosysteme' 'parked in the 25s read' \
           '2026-12-07' 'HxGN' 'parked on expiry'
         printf '\nrecheck: read the posting once after its date; gone = drop, reposted = file at scout-{{.SWEEP}}.\n'
 

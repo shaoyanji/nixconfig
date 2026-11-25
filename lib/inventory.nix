@@ -340,8 +340,8 @@
     (lib.mapAttrsToList
       (name: host: let
         svcs = host.software.services;
-        names = svcs |> map (s: s.name);
-        ports = svcs |> lib.filter (s: s.port != null) |> map (s: s.port);
+        names = svcs |> builtins.catAttrs "name";
+        ports = svcs |> lib.filter (s: s.port != null) |> builtins.catAttrs "port";
       in
         lib.optional (builtins.any (s: s.name == "") svcs)
         "hosts.${name}: a software.services entry has an empty name"

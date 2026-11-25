@@ -7225,6 +7225,51 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25s = {
+      title = "Six of 256 cards survive the hold, and the dedupe is the finding";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Stepstone's six lane queries at two pages each gave 256 unique ads; 85 sat at employers the ledger already holds, including one only a house-token match caught (Xempus AG against the held Xempus Deutschland GmbH). Six rows outlive the 2026-12-07 hold and are filed at scout-2026-11-25s; three are parked on an expiry inside it. The German feed was byte-identical for the fourth cycle.";
+      from = ["job-lane-scout-2026-11-25"];
+      refs = {
+        modules = ["scripts/task/apps-scout.sh"];
+        tasks = ["apps:scout" "apps:scout:sweep" "apps:scout:parked"];
+        docs = [".agents/skills/apps/SKILL.md" "docs/task-control-plane.md"];
+      };
+      body = ''
+        Read on 2026-11-25 in the four families. The 25r id was already claimed in the turn log
+        by another lane, so this pass reads the boards itself and files under its own origin,
+        scout-2026-11-25s, where two lanes cannot write one cycle.
+
+        What each board answered. germantechjobs rss.xml: 4.4 MB, 586 items, sha256 cf313395 —
+        the same hash for the fourth cycle, so the feed is flat, not empty. Stepstone: six lane
+        queries at two pages each, 25 cards a page, 256 unique ads. arbeitnow page one returned
+        300 rows and remoteok 101; both are US-weighted and neither added an employer the
+        ledger lacks.
+
+        The dedupe is the finding. 85 of 256 cards sat at employers already on the ledger, which
+        is why the page reads like a market and is not one. One card proves the house-token
+        rule: Xempus AG carries the same posting as the held Xempus Deutschland GmbH, and an
+        exact-name match would have filed it twice. plusserver, Interhyp, Upvest, KNIME, Diehl
+        Defence, ABOUT YOU and Bundesdruckerei fell to the same read.
+
+        Filed at scout-2026-11-25s, each posting outliving the hold: Delos Cloud SRE (Walldorf,
+        12-15), Next Kraftwerke Team Lead IT Infrastructure (Köln, 12-12), KubeOps DevOps
+        Kubernetes (Balingen, 12-12), Quantum-Systems IT Infrastructure & Security (Gilching,
+        12-21), Trianel Cloud Engineer Azure (Aachen, 12-25), HDI Agentic Platform Engineer
+        (Hannover, 2027-01-02). Fits 5, 5, 4, 4, 4, 4; nothing sends before 2026-12-07.
+
+        Parked, not filed, expiry inside the hold: grinnberg, meinestadt.de, S Rating.
+        Taskfile: apps:scout:sweep carries 25s as its cycle and this pass's numbers,
+        apps:scout:parked the three new dates beside the eleven from 25o.
+
+        Gate: task --list-all parses the shard, apps:scout:sweep prints 25s, apps:scout:parked
+        prints fourteen rows, and the six rows read back from the ledger at origin
+        scout-2026-11-25s.
+      '';
+    };
     job-lane-scout-2026-11-25 = {
       title = "The four lanes were already on the ledger; the site now says them the way the ads do";
       kind = "decision";

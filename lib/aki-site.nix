@@ -115,7 +115,7 @@
   };
 
   budgetRows = budgetHosts |> lib.mapAttrsToList budgetRow |> lib.filter (r: r.bytes != null);
-  budgetNames = budgetRows |> map (r: r.name);
+  budgetNames = budgetRows |> builtins.catAttrs "name";
 
   # Coverage is judged against the hosts that HAVE a closure to measure. An
   # external device (Windows, FreeBSD, Android, a NAS) has no Nix store, so
@@ -761,7 +761,7 @@
       })
       agentsNotes.notes;
     expected = agentsNotes.notes |> builtins.attrNames |> map (id: "data/agents-notes/${id}.json");
-    produced = slices |> map (s: s.name);
+    produced = slices |> builtins.catAttrs "name";
     drift = lib.subtractLists expected produced ++ lib.subtractLists produced expected;
     shared = lib.subtractLists (produced |> lib.unique) produced;
   in

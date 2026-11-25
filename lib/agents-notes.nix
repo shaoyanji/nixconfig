@@ -251,7 +251,7 @@
     lineageEdges = noteIds |> lib.concatMap (id: parentsOf raw.${id}) |> builtins.length;
     withLineage = entryList |> lib.count (e: e.ancestors != []);
   };
-  byStatusIds = statuses |> forNames (s: s |> byStatus |> map (e: e.id));
+  byStatusIds = statuses |> forNames (s: s |> byStatus |> builtins.catAttrs "id");
 
   # --- markdown rendering ----------------------------------------------------
   capitalize = s: (s |> builtins.substring 0 1 |> lib.toUpper) + (s |> builtins.stringLength |> (n: builtins.substring 1 n s));
@@ -394,7 +394,7 @@
       });
     origins = noteIds |> builtins.filter (id: entries.${id}.ancestors == []);
     frontier = noteIds |> builtins.filter (id: entries.${id}.descendants == []);
-    open = ordered |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> map (e: e.id);
+    open = ordered |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> builtins.catAttrs "id";
   };
 in {
   inherit api;

@@ -5991,7 +5991,6 @@
         at close: 7259 comment lines, 519 pointers, all 54 task cites
         resolving; prose budget untouched — docs/ and .agents/deploy/ sit
         outside it.
-
         Open tail → mostly closed same day. The 404's root cause was NOT a
         pre-existing archive answer: the board's allowlist named
         `/api/applications` and `/api/applications-discovered`, and the
@@ -7226,6 +7225,51 @@ LearnWise (a training course, not a job), and RockQ, alphacaps, sino as refused 
 Exit: the boards are not exhausted - Stepstone moved while the feed stayed flat, so the next sweep reads
 Stepstone first and treats a germantechjobs hash match as no evidence either way. The 2026-12-07 hold
 stands over all six, and nothing was sent.
+      '';
+    };
+
+    job-scout-sweep-2026-11-25n = {
+      title = "The 2026-11-25n sweep: the feed flat by hash again, and three employers 25m counted as held";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Germantechjobs answered byte-identical and the Stepstone listing set did not change, but the re-read showed 25m had recorded three unheld employers as already in the ledger and left its ninth listing without a verdict; three rows land at scouted and Randstad Digital is refused on the live Randstad contact.";
+      from = ["job-scout-sweep-2026-11-25m"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+Sweep 2026-11-25n: the feed flat by hash again, and three employers 25m had counted as held
+germantechjobs /rss.xml answered at sha256 cf313395 with 586 items, byte-identical to 25m, so flat is a hash
+again and not a judgement: 55 in-lane titles by title text, 27 unheld rows at 27 employers, all in-house
+Windows, VMware and team-lead administration the h and l sweeps had already refused.
+Stepstone answered 200 at sha dc2db6c6, 1,246,727 bytes against 1,247,904 in 25m: the bytes moved and the
+listing set did not, the same 24 employers in the same roles. The other boards held their 25m counts -
+berlinstartupjobs 12, We Work Remotely 77, RemoteOK 101 (US-only), arbeitnow 300 on page one, Ashby camunda
+56 and kubermatic 9, Personio 1KOMMA5GRAD 339, SmartRecruiters DeliveryHero 100.
+What the re-read exposed is an error in 25m's own note. It recorded ten of the 24 Stepstone employers as
+already in the ledger, naming Ehrhardt + Partner, Randstad Digital and Medical AI among them. They were not.
+The board had nine unheld employers, 25m judged six and refused Bertrandt and Bank11, and left devops
+excellence without a verdict, so the ninth sat unaccounted for. Three rows land now, origin
+scout-2026-11-25n, all at scouted, each after its own detail-page read:
+Ehrhardt + Partner Group, DevOps, Boppard or Koblenz or Hamburg or Koeln or Dortmund or Alzenau with home
+office, band 4 - Terraform, OpenTofu or Ansible across Oracle Cloud and on-premises, GitLab CI, containerised
+services beside the classic applications, monitoring; a supply-chain software house with 1,600 customers.
+Medical AI Analytics, DevOps, Berlin-Neukoelln, hybrid, band 4 - a cloud-native platform kept entirely as
+code, several Kubernetes clusters including GPU workloads for the models, managed databases and messaging.
+devops excellence, DevOps, Schwaig bei Nuernberg, up to 90% remote, band 3 - container-based Java
+applications through development, test and production, the build and integration system, Kubernetes
+container platforms including the platform itself; service work for clients rather than a product seat.
+Refused: Randstad Digital (a mandant search, and the ledger already holds Randstad Professional at
+contacted, which the 180-day rule extends to the group), Ratbacher (agency, already on the skip list),
+Bertrandt and Bank11 as 25m refused them.
+Dedupe lesson: subset matching on name tokens missed Randstad Digital because the ledger entry carries a
+different second word. The house name has to be tested on its own, not only the full token set.
+Exit: the boards are not exhausted, they did not move - the 25m gap was bookkeeping, not supply. The
+2026-12-07 hold covers all three rows and nothing was sent.
       '';
     };
   };

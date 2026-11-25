@@ -6294,5 +6294,46 @@
         with a message id that answers delivered at the provider.
       '';
     };
+    job-scout-scouted-decided-2026-11-25 = {
+      title = "Five scouted leads decided: one packet, four parks, and two calls still owed";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Five scouted leads were read and decided 2026-11-25: 21bitcoin (Munich) becomes the one packet — AWS multi-account IaC, DevSecOps, English, hybrid, on-call, EUR 75-120k — while gridscale OPCP, CBTW, ProcuVia and Little John Bikes park with a reopen trigger each. Still owed: a tailor order (Swissquote or Julius Baer, then vCluster) and a BIS ruling before the hold lifts.";
+      links = ["job-scout-niche-boards-2026-11-24" "job-scout-outreach-sent-2026-11-24"];
+      refs = {
+        hosts = ["delphi"];
+        modules = ["modules/plugins/appflow/sync.py" "scripts/task/apps-db.sh"];
+        tasks = ["apps:overview" "apps:query" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Five scouted leads were read in full on 2026-11-25 and decided; every
+        row now carries a status and a next action and `scouted` is empty.
+
+        Packet: 21bitcoin (Munich) — AWS Organizations/Control Tower,
+        CDK/OpenTofu/Terraform, GitHub Actions, Snyk/Semgrep, Bedrock agent
+        platforms, English ad, hybrid, on-call explicit, EUR 75-120k. Build
+        from the stored join.com JD by 2026-11-28, naming the AWS/CDK depth
+        and reframing on-call as the fleet's sentinel and gatus paging.
+
+        Parked with a reopen trigger each: gridscale OPCP (Ceph wins — fit 5
+        with a ready packet, and one employer is one live thread; reopen if
+        Ceph is silent by 2026-12-12), CBTW (MLOps lifecycle, LangChain, ETL,
+        negotiation German), ProcuVia (React/TS product delivery), Little John
+        Bikes (Windows/Entra/Citrix plus 2nd-level helpdesk, below senior).
+        `parked` is a new stage in both status mirrors.
+
+        Two calls are still owed. Tailor order: Swissquote or Julius Baer
+        first, then vCluster — all three live at fit 3 to 4, no packet yet. And
+        the BIS SRE closes 2026-12-04, before the hold lifts on 2026-12-07, so
+        that row needs an explicit ruling: send it early as the one exception,
+        or record the posting as missed.
+
+        Exit: `scouted` stays at zero and each parked row keeps its reopen
+        date, or the BIS row carries a written hold ruling.
+      '';
+    };
   };
 }

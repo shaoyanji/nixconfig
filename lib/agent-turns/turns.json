@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-25T00:17:23Z",
+  "generated": "2026-11-25T00:35:54Z",
   "count": 200,
-  "pin": "fe6aca3d2222f94435e6971651ad00b8debd0f2f025744bf1b7fba7c1979ca59",
+  "pin": "db3e02a935ff48121f142704ca70aa0aef271cec55419cdf6b6618d707d6d956",
   "turns": [
+    {
+      "id": "36b5fac4-5a73-4bba-add0-791d44c00de1",
+      "ts": "2026-11-25T00:34:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "claim: promote the 2026-11-25 scouted-lead decision into a job-scout note in AGENTS.nix (21bitcoin packet, four parks, plus the pending tailor order and the BIS 2026-12-04 hold ruling)",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "bb07c64be349aaa8e1660a57552165e84f0bffbd",
+      "branch": "main",
+      "frame": "03haqzlbj8zbf1vlbzedk446j"
+    },
+    {
+      "id": "5d40bc6b-8a1b-4dde-a517-cea67f83a277",
+      "ts": "2026-11-25T00:20:30Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "scout 2026-11-25: arbeitnow+6 ATS+personio+devjobs, 3723 postings in 10d window, 63 title matches, 31 employers already tracked; added 8 leads airbus-deutschland-gmbh-ml-data-infrastructure-engineer, cosinex-system-administrator, esqlabs-gmbh-principal-platform-engineer, sew-eurodrive-gmbh-co-kg-ciam-platform-engineer, 50hertz-transmission-gmbh-platform-engineer, k-s-akt (fit 50-85 in status, 1 merged) | gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haqwrn2qy83509ebmq4mb6e"
+    },
+    {
+      "id": "2ca1354c-0142-4314-8123-cb0f3d2fc3cc",
+      "ts": "2026-11-25T00:19:53Z",
+      "source": "devji",
+      "subject": "nixconfig:ci-hygiene-cvlinks",
+      "action": "landed: pushed modules/secrets 046d717, CI hygiene+site-cv-links green | gate: gh run 45515494029 (nixcachix) + 45515494007 (pages) success",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bb07c64be349aaa8e1660a57552165e84f0bffbd",
+      "branch": "main",
+      "frame": "03haqwn8yg4l8x5jdvrn3b3qs"
+    },
+    {
+      "id": "1d5856ca-82c2-4420-9586-443c5c5618bc",
+      "ts": "2026-11-25T00:17:32Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "decided 5 scouted leads after reading each ad: packet = 21bitcoin Munich (AWS multi-account/IaC, DevSecOps, AI agents, English ad, hybrid, on-call, 75-120k; CDK/Terraform gap to state). parked = gridscale OPCP (Ceph wins the employer thread; reopen if Ceph silent by 12-12), CBTW (MLOps/LangChain + negotiation German), ProcuVia (full-stack product), Little John (Windows admin). scouted now empty, parked stage added. | gate: apps:overview parked 4/4 + 0 scouted rows without a decision",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bb07c64be349aaa8e1660a57552165e84f0bffbd",
+      "branch": "main",
+      "frame": "03haqw6tm8f66axlfv4xpnebo"
+    },
     {
       "id": "f08d3326-ec06-4d93-9114-ab643fb39cb0",
       "ts": "2026-11-25T00:17:22Z",
@@ -2593,64 +2647,6 @@
       "base_commit": "1e9bd28871cffa30d7812b0ca6f7fb3057e4d79f",
       "branch": "main",
       "frame": "03hanifeqf1w14yexu5l383dx"
-    },
-    {
-      "id": "89849aac-3de8-4b0b-8e2c-a54dd836264f",
-      "ts": "2026-11-24T13:54:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward:pane-drive:devin",
-      "action": "drove idle devin pane agents:1.1 via Jev task_change duel p=0.81 margin=0.62; pasted image-daily Go port gate task; second Enter required; pane shows Typing spinner/BUSY",
-      "outcome": "done",
-      "claims": [
-        "agents:1.1"
-      ],
-      "files": [],
-      "base_commit": "1e9bd28871cffa30d7812b0ca6f7fb3057e4d79f",
-      "branch": "main",
-      "frame": "03hanifcrs8hae1pq8us2xfuk"
-    },
-    {
-      "id": "ae592d57-6e44-4c33-a5ce-18b48bccc1bb",
-      "ts": "2026-11-24T13:50:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "Decided next freebuff lane task = (B) employer sweep, not (A) tailoring: 2 of the 4 job-scout-fresh leads already have published packets, Maesn closed, Atlas Titan do-not-packet, so (A) has no work. Sweep targets LINBIT, B1, Univention, Open-Xchange, Proxmox careers pages; prep-only, no scout rows before 2026-12-07, no sends. gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1e9bd28871cffa30d7812b0ca6f7fb3057e4d79f",
-      "branch": "main",
-      "frame": "03hanhs3t5jmoa9izgato2dbz"
-    },
-    {
-      "id": "37e1d318-b12e-4e25-8427-d8044ee020c1",
-      "ts": "2026-11-24T13:50:50Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward:pane-drive:freebuff-delphi",
-      "action": "drove idle ssh/freebuff delphi pane agents:3.1 via Jev decision label margin 0.39; pasted delphi sweep/note task; pane shows thinking... after Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03hanhrj8ctmgpvka9s2s5x4k"
-    },
-    {
-      "id": "49575b5a-a9fa-4392-b363-d0c684ea2998",
-      "ts": "2026-11-24T13:50:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward:pane-drive:freebuff-local",
-      "action": "drove idle freebuff pane agents:2.1 via Jev decision label margin 0.39; pasted decision/note task; pane shows thinking... after Enter",
-      "outcome": "done",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03hanhrhc015vhdodosx27zsw"
     }
   ]
 }

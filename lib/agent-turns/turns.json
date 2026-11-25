@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-25T00:40:37Z",
+  "generated": "2026-11-25T00:51:33Z",
   "count": 200,
-  "pin": "4174f36316594a7552ee139f85f5c53ac933b2962fbe59276bc0ea2fab3f5bae",
+  "pin": "efed7dc799620079a125b0287797a7a784bfe3c6470b9e21b4f2d75a3df24bac",
   "turns": [
+    {
+      "id": "755e5dea-cdee-4ae0-8e60-939e39611213",
+      "ts": "2026-11-25T00:50:57Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "drove idle delphi (agents:3.1 ssh remote freebuff) with job-search scout task — classify needs_review (task-change p=0.50 m=0.26) then duel task-change p=0.94 m=0.88; pasted, confirmed working... on first Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
+      "branch": "main",
+      "frame": "03har2ptv0nb4lkqkblewiwa0"
+    },
+    {
+      "id": "5efb6346-4588-4a53-8247-2980fce43cc8",
+      "ts": "2026-11-25T00:50:57Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "drove idle freebuff (agents:2.1) with job-scout CV-lane task — classify needs_review (note-change p=0.57 m=0.28) then duel novel p=0.89 m=0.78; pasted, confirmed working... 15s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
+      "branch": "main",
+      "frame": "03har2psaysrri5arfoi2no32"
+    },
+    {
+      "id": "cefe8e1a-19aa-4d73-8895-e8947dfdcffb",
+      "ts": "2026-11-25T00:50:56Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "drove idle devin (agents:1.1) with gate-tests task — jev-decide classify gate-change p=0.85 margin=0.79 (selected, exit 0); cleared stale composer draft, pasted, confirmed BUSY Typing spinner",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
+      "branch": "main",
+      "frame": "03har2pqsl3q8uozp29wcr401"
+    },
+    {
+      "id": "79cb5921-099c-4f01-ac0e-fd5ff28d0c12",
+      "ts": "2026-11-25T00:40:45Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: job-scout-dated-sweep-2026-11-25 note on main + 8 rows upserted at scouted (fit still 500s) | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03har0pz1cdzuwsx99bu2i8m5"
+    },
     {
       "id": "d4ad5815-0ba8-4cb9-8c36-18797b72d252",
       "ts": "2026-11-25T00:36:21Z",
@@ -2593,58 +2645,6 @@
       "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
       "branch": "main",
       "frame": "03hano7z0f8lws0c1mjzyew50"
-    },
-    {
-      "id": "099f4fa4-4595-4983-85c0-edf17c721e93",
-      "ts": "2026-11-24T14:23:53Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-pane-drive",
-      "action": "drove idle agents:2.1 (freebuff): jev-decide classify needs_review (publish 0.40) then duel publish 0.9 vs decision 0.1, margin 0.8 -> selected publish. Task: publish - fix CV publish drift on is-a.dev site, copy built CVs into blog assets/files with matching hashes, add download anchors on /cv/ page, run cv-blog-check.sh to exit 0. Pane working... 42s, gate run in progress.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
-      "branch": "main",
-      "frame": "03hano7xdc0t0cbvv6ai8afax"
-    },
-    {
-      "id": "8df267b2-d171-4773-90df-abf33835ee76",
-      "ts": "2026-11-24T14:23:52Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-pane-drive",
-      "action": "drove idle agents:1.1 (devin): jev-decide classify needs_review (note-change 0.39) then duel note-change 0.57 vs novel 0.43, margin 0.14 <0.15 -> drove top choice note-change. Task: write AGENTS.nix handoff note for devin lane - image-daily Go port status, cv-blog-check.sh plus codebuff lane file with goal_judge pin left uncommitted, idle-pane routing via jev-decide/typesafe with goal_judge removed. Pane shows Running tools, task accepted.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
-      "branch": "main",
-      "frame": "03hano7vy55w3sw9n8qoblafy"
-    },
-    {
-      "id": "02c6ba79-144b-4eb6-9a9c-089578101748",
-      "ts": "2026-11-24T14:20:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "No send: the task plane has no apps:send verb (only apps:packet/draft), Flink publishes no mailbox (LinkedIn form, recruiterEmail null), and the prep-only hold to 2026-12-07 stands. Nothing new to tailor: Flink 14/32 and Pentland 9/32 packets built 2026-11-24, Maesn closed, Atlas Titan Fit 2 do-not-packet.",
-      "outcome": "blocked: no send path exists and the prep-only hold is in force; needs the operator to send or to lift the hold",
-      "claims": [],
-      "files": [],
-      "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
-      "branch": "main",
-      "frame": "03hannm7o2e2tdl6auuzf7tky"
-    },
-    {
-      "id": "850eea1e-13c0-4c3d-bb6f-1fbdc991a20d",
-      "ts": "2026-11-24T14:19:17Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi (agents:3) idle after attention sweep. jev-decide selected upsert p=0.73 margin=0.48 decisive >= 0.3: upsert new leads into tracking DB. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
-      "branch": "main",
-      "frame": "03hannbl0t758i3lohkcyvm1u"
     }
   ]
 }

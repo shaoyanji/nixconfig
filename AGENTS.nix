@@ -7787,6 +7787,44 @@
         Exit: decide the eight before 2026-12-07 and recheck the parked four as they expire.
       '';
     };
+    job-scout-sweep-2026-11-25p-supplement = {
+      title = "The p date was already worked; the mirror pass adds Almedia and four holds the shard pass cannot see";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "The p date was already worked from the shard side; this mirror pass adds one row those eight do not name: Almedia Staff Platform Engineer, live on the employer's own Ashby board while Arbeitnow served the same ad as removed. It also records berlinstartupjobs now answering Cloudflare 403, and an acronym hole in exact-name dedupe.";
+      from = ["job-scout-sweep-2026-11-25p"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:add" "apps:scout"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        job-scout-sweep-2026-11-25p landed first, from a shard driving Stepstone, and its eight rows are not
+        refiled here. This pass read the mirrors instead - germantechjobs RSS, WWR, RemoteOK, Arbeitnow and
+        the Ashby boards - and the only survivor is one the eight do not name: Almedia Staff Platform
+        Engineer, Berlin, on-site five days, published 2026-11-17 among 40 live requisitions on the
+        employer's own Ashby board. It is filed at lead under origin scout-2026-11-25p, the same date label
+        the shard pass used, with a prep-only next action and nothing sent before 2026-12-07.
+        Arbeitnow listed that same role as removed (410). An aggregator mirror's death closes nothing: the
+        employer ATS is the authority and the mirror is a pointer, so reading 410 as "gone" would have thrown
+        away the pass's one verified lead. The reverse error is what filed dive solutions unverified last
+        cycle, and both are the same mistake about which source decides.
+        GitHub was checked as an employer signal, not a person's profile: almedia-tm is the real org - eight
+        public repos, C#, Swift and Android SDKs, last push 2026-11-16 - and holds no infrastructure code, so
+        it corroborates a live engineering team and says nothing about the platform stack. It does publish
+        platform-engineer-case-26-q2, likely their platform case study, which belongs in the prep.
+        Exact normalized name is not knowing the employer: the germantechjobs BAMF row looked new only
+        because the record says "Bundesamt fuer Migration und Fluechtlinge (BAMF)" and normalization cannot
+        bridge an acronym - apps:search with the full name is the check. Cisco rows are field pre-sales,
+        Airbus and Cognizant are support or delivery leads, and KIND, WALDNER and alphacaps return through
+        the aggregator still refused for the reasons 25o recorded.
+        Two sources stayed unread rather than empty: berlinstartupjobs answers Cloudflare 403 on the page and
+        on three feed paths, so its two Kubernetes postings are unfetched, and SmartRecruiters still needs a
+        company slug before any query. Neither is evidence the market is closed.
+      '';
+    };
 
     job-scout-sweep-2026-11-25q-parallel = {
       title = "The 2026-11-25q sweep: a third flat feed, eight rows of my own, and the pane lane's three under the same cycle";

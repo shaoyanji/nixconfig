@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T03:21:01Z",
+  "generated": "2026-11-25T03:28:31Z",
   "count": 200,
-  "pin": "2a1a6a8689d42a67233659640c14f08d6b8bbcbd0d5904103b895e4a0353b91e",
+  "pin": "14431a43d64e3fc956a02c653ede21bea47566b8a1012d90e489ebb880542e33",
   "turns": [
+    {
+      "id": "8627f68c-9be8-4ddf-81fb-b60dcc36d9a4",
+      "ts": "2026-11-25T03:21:21Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: sweep 2026-11-25i — 5 leads at scouted from six vendor careers pages (germantechjobs feed flat: 99 family titles, 67 unheld, all in-house admin); 2 packets (JACOB Karlsruhe, NT-ware Bad Iburg: 1-page German letter + 2-page CV in ad order), 3 parked (IPB ISP routing, MIWE IoT/PM, Proxmox Vienna on-site); nothing sent, held to 2026-12-07 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b185e13fbcea2a9dd9eadd29e59c006dd8e31c94",
+      "branch": "main",
+      "frame": "03harw3h3i0vkq2nredj91j4j"
+    },
+    {
+      "id": "c2871d46-887a-45f1-8975-9971e33201c0",
+      "ts": "2026-11-25T03:21:03Z",
+      "source": "devin",
+      "subject": "nixconfig:note-image-daily-port",
+      "action": "verified: image-daily Go port green end-to-end, zero failures — go build/vet/test ok, gate scripts all pass; engine.sh refs remaining are historical record only; port commits already on origin/main | gate: checks:image-daily + checks:images:publish:test 9/9 + checks:images:ship:test 4/4 + checks:images 771/771 + checks:host frieren rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ffd5d578fd02ccd1648f0d916659f7c019a3b3cb",
+      "branch": "main",
+      "frame": "03harw1bky4rv4a8tusbxcgip"
+    },
     {
       "id": "ecb13f9c-25a9-4c61-bb46-c4f826a662c0",
       "ts": "2026-11-25T03:18:34Z",
@@ -2604,32 +2630,6 @@
       "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
       "branch": "main",
       "frame": "03hap6yhfxe8faqs7b2r5y6vy"
-    },
-    {
-      "id": "e8e8a6f6-c663-436a-ba43-929cfee7f71e",
-      "ts": "2026-11-24T19:04:04Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "drove freebuff pane (agents:2.1): routed job-scout / CV lane via jev-decide (scout_leads 1.00); pane now working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
-      "branch": "main",
-      "frame": "03hap6yax63p2auq9g9dvh2b0"
-    },
-    {
-      "id": "1095bd12-cc8e-459d-8b93-abb743f40545",
-      "ts": "2026-11-24T18:56:33Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "steward cycle closed: freebuff (agents:2.1) completed the job-scout sweep-state AGENTS.nix note, committed c9f09993 and pushed; note posted nixconfig:job-scout-note OUTCOME=done.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5f79cda3",
-      "branch": "main",
-      "frame": "03hap5hje0wrpxw64lm5yewx0"
     }
   ]
 }

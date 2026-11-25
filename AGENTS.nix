@@ -5960,6 +5960,47 @@
         same diff.
       '';
     };
+    devin-lane-refactoring-2026-11-25 = {
+      title = "Devin lane close-out: image-daily port + comment audit CLOSED; one refactoring tail open";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      from = ["devin-lane-image-daily-go-port" "devin-lane-appflow-write-auth" "nix-comment-audit" "devin-lane-handoff-2026-11-24"];
+      summary = "Lane record: image-daily Go port CLOSED (engine.sh retired, gates green end-to-end) and nix-comment-audit CLOSED (every Story:/Trap:/Fact: pointer resolves; tail sweep clean). Open tail: appflow /api/applications upstream-404 plus residual .nix flake-wiring and gate-check cleanup.";
+      refs = {
+        hosts = ["delphi" "frieren" "netbook"];
+        modules = ["tools/os/internal/image/main.go" "modules/services/appflow-board.nix" "lib/nix-comments.nix" "hosts/netbook/configuration.nix"];
+        tasks = ["checks:image-daily" "checks:nix:comments" "checks:policies" "ops:docs:budget"];
+        docs = ["docs/delphi-runtime.md" ".agents/deploy/hosts/netbook.md" "docs/appflow-board.md"];
+      };
+      body = ''
+        Lane close-out 2026-11-25 (devin, nixconfig refactoring): the two
+        threads the lane carried are CLOSED; one refactoring tail remains.
+
+        image-daily Go port — CLOSED. Every external-process boundary lives
+        in tools/os/internal/image behind .#cli.image.daily; engine.sh is
+        retired (deleted with its budget line — the family's last curl).
+        Verified green end-to-end the same day: go build/vet/test,
+        checks:image-daily, the 9-assert publish fixture, ship 4/4,
+        images-check 771/771, checks:host frieren rc=0.
+
+        nix-comment-audit — CLOSED. Every Story:/Trap:/Fact: pointer in the
+        heaviest .nix files resolves; the tail sweep (netbook, outputs.nix,
+        hermes-user) found one dangling cite, fixed at its doc home. Census
+        at close: 7259 comment lines, 519 pointers, all 54 task cites
+        resolving; prose budget untouched — docs/ and .agents/deploy/ sit
+        outside it.
+
+        Open tail: appflow write-auth module closure — the bearer gate is
+        verified live but /api/applications still answers upstream 404 while
+        application-pipeline 200s (pre-existing archive answer, recorded in
+        devin-lane-appflow-write-auth) — and residual .nix flake-wiring /
+        gate-check cleanup the census keeps surfacing. Exit: the 404
+        explained or fixed, and the census steady under ceiling with
+        checks:policies green.
+      '';
+    };
     fleet-hygiene-tailscale-creds-stale = {
       title = "Both stored tailscale credentials are dead — mint fresh auth material";
       date = "2026-11-24";

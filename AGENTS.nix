@@ -5975,8 +5975,7 @@
         docs = ["docs/delphi-runtime.md" ".agents/deploy/hosts/netbook.md" "docs/appflow-board.md"];
       };
       body = ''
-        Lane close-out 2026-11-25 (devin, nixconfig refactoring): the two
-        threads the lane carried are CLOSED; one refactoring tail remains.
+        Lane close-out 2026-11-25 (devin, nixconfig refactoring): the two threads the lane carried are CLOSED; one refactoring tail remains.
 
         image-daily Go port — CLOSED. Every external-process boundary lives
         in tools/os/internal/image behind .#cli.image.daily; engine.sh is
@@ -7183,6 +7182,53 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25n = {
+      title = "The 2026-11-25n sweep: the feed flat by hash a second time, Stepstone the only live surface";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Germantechjobs answered byte-identical to 25m after a www-to-apex redirect, so flat was a hash again and Stepstone carried the cycle: six lane queries gave 140 cards, 96 unheld employers and 30 ads read in full, of which seven survive the 2026-12-07 window, one is held by employer dedupe and eleven park on expiry.";
+      from = ["job-scout-sweep-2026-11-25m"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Scout 2026-11-25n. germantechjobs moved www to apex: /rss.xml answers 301, -L lands on
+        germantechjobs.de at sha256 cf313395, 586 items, byte-identical to 25m. Flat by hash again, and the
+        redirect is the trap — a sweep that does not follow it reads a 167-byte 301 body as the feed and
+        reports a live board empty.
+        Stepstone answered 200 on six lane queries: 25 cards each, 140 unique, 96 unheld by exact-name diff
+        against the 1,265-row ledger and the 81 rows of a..m. Its result page has no JobPosting JSON-LD and no
+        anchor hrefs — cards sit in an embedded JSON blob keyed by companyName — and a detail page needs a
+        Referer header or the connection resets. Thirty detail pages were read, each with its own validThrough.
+        Seven rows filed at scouted, origin scout-2026-11-25n, every one inside the 2026-12-07 window. ZEIT
+        Verlagsgruppe, Cloud Engineer, Hamburg, band 5: zeit.de on Kubernetes, Terraform self-service, Vault,
+        cert-manager, Envoy, Flux, Prometheus and Honeycomb, 35h tariff, a monitoring or PostgreSQL specialism.
+        Talon.One (Adyen), Senior SRE, Berlin, band 5: reliability owned end to end — observability, SLOs,
+        incident management, production standards, toil automation, EUR 115k. DIGOOH Media, Linux admin, Koeln,
+        band 5: Linux cloud and on-prem, a Proxmox cluster with storage and backup, OPNsense, NGINX, Redis, SQL.
+        CAS Software, Linux admin, Karlsruhe, band 4: campus and on-prem RZ, Proxmox, Samba, Ansible, pfSense,
+        Nextcloud, Docker. Die Autobahn GmbH, Linux admin, Berlin/Essen/Dresden, band 4: HA Linux under BSI
+        IT-Grundschutz, hardening, recovery drills, Python and Ansible, PostgreSQL, 2nd-level support. Bank11,
+        DevOps/KI-Ops, Neuss, band 4: owns productive AI infrastructure, GPU planning, on-prem serving, MCP, DR,
+        GitLab CD, DORA — 25m refused a junior Bank11 ad, this is the ownership seat, one employer one thread.
+        ituma, Linux admin, Hilden, band 4: Linux servers, VMware and KVM, firewall and routing, python, on-call.
+        Held by dedupe: GMX/WEB.DE Kubernetes Platform Engineer, Karlsruhe — the cycle's closest stack match at
+        85,000 bare-metal cores, but it is 1&1 Mail & Media and the ledger holds United Internet. Refused on
+        shape: SCHIFFL (VMware/Windows MSP), SUSS MicroTec (HCI, Veeam, MS-SQL), Quantum-Systems twice
+        (Entra/Intune at Gilching, robotics networks at Rostock), Delos Cloud (Microsoft hyperscaler under BSI),
+        GOLDBECK and Trianel (Azure), GMX Network, CSL Computer (AD/Entra core), Constellation Academy (group IT
+        strategy, no platform). Parked on the window, not merit: STULZ 11-29, AUGENTIC 11-28, EWE NETZ 12-04,
+        BIOTRONIK 11-30, novomind 12-05, HxGN 12-07, LAIQON 11-28, Liebherr-Digital 11-28 and 12-03, ZaGoTec
+        12-03, Pradtke expired 11-25. A parallel pane pass filed three more 25n rows at 04:03 (Ehrhardt +
+        Partner, Medical AI Analytics, devops excellence), different employers, so the ledger holds ten. Exit:
+        decide these seven before 2026-12-07 while the eleven above expire inside it, Stepstone read first.
+      '';
+    };
+
     job-scout-sweep-2026-11-25m = {
       title = "The 2026-11-25m sweep: the feed was flat by hash and Stepstone carried six German leads";
       kind = "decision";
@@ -7197,34 +7243,34 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Scout 2026-11-25m: the German feed flat by hash, Stepstone's own result page the live source
-germantechjobs /rss.xml answered at sha256 cf313395, 586 items, byte-identical to the 25i read, so flat is
-a hash this time and not a judgement: 81 devops/SRE/platform/infrastructure titles left 35 unheld rows at
-32 employers, nearly all in-house Windows and VMware administration the h and l sweeps had already refused.
-The other boards answered and carried nothing in lane: berlinstartupjobs 12 items, We Work Remotely 77,
-RemoteOK 101 (both US-only), arbeitnow 300 on page one, and the ATS families only held employers - Ashby
-camunda 56 and kubermatic 9, Personio 1KOMMA5GRAD 339, SmartRecruiters DeliveryHero 100.
-Stepstone answered 200 this time, and its result page parsed from the embedded JSON rather than the markup
-carried 24 listings: ten employers the ledger already holds (BAMF, Bundesdruckerei, plusserver, EOS, DACHS,
-Ehrhardt + Partner, PSI, PRODYNA, EWE NETZ, Randstad) and nine it did not. Each detail page was read before
-any row was written, and six survived. Origin scout-2026-11-25m, all at scouted:
-epostbox epb, Cloud Platform/DevOps, bundesweit home office, band 5 - Terraform with remote state and
-environment separation, production Kubernetes, self-hosted GitLab, GitOps with Argo CD; closest match today.
-Deichmann, Senior DevOps, Essen, band 4 - Cloudflare bot protection, WAF and access rules, Azure
-hub-and-spoke with RBAC, AKS, Terraform modules and Python.
-Allguth, DevOps/Platform, Graefelfing, band 4 - runs the group's own platforms, Docker and Kubernetes,
-CI/CD, cloud and on-prem, digital team building on an AI foundation.
-Deutsche Kautionskasse, Senior DevOps/Backend, Starnberg, band 4 - orchestration platform, the migration to
-Kubernetes, GitHub Actions pipelines and GitOps; the ad is in English and asks eight years.
-Kufer Software, DevOps, Muehldorf am Inn, band 4 - SaaS and on-prem Kubernetes, Azure DevOps pipelines,
-release and rollout support for the .NET teams.
-Hamburger Energienetze, Azure DevOps, Hamburg-Bramfeld, band 4 - 70,100 EUR named, Azure AI target
-architectures with governance, security and central cost ownership.
-Refused on shape: Bertrandt (client placement), Bank11 (first experience, junior), Ratbacher (agency),
-LearnWise (a training course, not a job), and RockQ, alphacaps, sino as refused by earlier sweeps.
-Exit: the boards are not exhausted - Stepstone moved while the feed stayed flat, so the next sweep reads
-Stepstone first and treats a germantechjobs hash match as no evidence either way. The 2026-12-07 hold
-stands over all six, and nothing was sent.
+        Scout 2026-11-25m: the German feed flat by hash, Stepstone's own result page the live source
+        germantechjobs /rss.xml answered at sha256 cf313395, 586 items, byte-identical to the 25i read, so flat is
+        a hash this time and not a judgement: 81 devops/SRE/platform/infrastructure titles left 35 unheld rows at
+        32 employers, nearly all in-house Windows and VMware administration the h and l sweeps had already refused.
+        The other boards answered and carried nothing in lane: berlinstartupjobs 12 items, We Work Remotely 77,
+        RemoteOK 101 (both US-only), arbeitnow 300 on page one, and the ATS families only held employers - Ashby
+        camunda 56 and kubermatic 9, Personio 1KOMMA5GRAD 339, SmartRecruiters DeliveryHero 100.
+        Stepstone answered 200 this time, and its result page parsed from the embedded JSON rather than the markup
+        carried 24 listings: ten employers the ledger already holds (BAMF, Bundesdruckerei, plusserver, EOS, DACHS,
+        Ehrhardt + Partner, PSI, PRODYNA, EWE NETZ, Randstad) and nine it did not. Each detail page was read before
+        any row was written, and six survived. Origin scout-2026-11-25m, all at scouted:
+        epostbox epb, Cloud Platform/DevOps, bundesweit home office, band 5 - Terraform with remote state and
+        environment separation, production Kubernetes, self-hosted GitLab, GitOps with Argo CD; closest match today.
+        Deichmann, Senior DevOps, Essen, band 4 - Cloudflare bot protection, WAF and access rules, Azure
+        hub-and-spoke with RBAC, AKS, Terraform modules and Python.
+        Allguth, DevOps/Platform, Graefelfing, band 4 - runs the group's own platforms, Docker and Kubernetes,
+        CI/CD, cloud and on-prem, digital team building on an AI foundation.
+        Deutsche Kautionskasse, Senior DevOps/Backend, Starnberg, band 4 - orchestration platform, the migration to
+        Kubernetes, GitHub Actions pipelines and GitOps; the ad is in English and asks eight years.
+        Kufer Software, DevOps, Muehldorf am Inn, band 4 - SaaS and on-prem Kubernetes, Azure DevOps pipelines,
+        release and rollout support for the .NET teams.
+        Hamburger Energienetze, Azure DevOps, Hamburg-Bramfeld, band 4 - 70,100 EUR named, Azure AI target
+        architectures with governance, security and central cost ownership.
+        Refused on shape: Bertrandt (client placement), Bank11 (first experience, junior), Ratbacher (agency),
+        LearnWise (a training course, not a job), and RockQ, alphacaps, sino as refused by earlier sweeps.
+        Exit: the boards are not exhausted - Stepstone moved while the feed stayed flat, so the next sweep reads
+        Stepstone first and treats a germantechjobs hash match as no evidence either way. The 2026-12-07 hold
+        stands over all six, and nothing was sent.
       '';
     };
 

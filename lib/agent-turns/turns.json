@@ -1,8 +1,104 @@
 {
-  "generated": "2026-11-25T04:02:15Z",
+  "generated": "2026-11-25T04:06:47Z",
   "count": 200,
-  "pin": "b8a14abbb0ed6fd8d3834c8b103311bfa63851489ff1f4145e0b72b45b60adea",
+  "pin": "beff46c89e3ffa2506d5aa211b635bb57625778d4e5e79db7f4e0cd50ea74f3f",
   "turns": [
+    {
+      "id": "b2b778e4-576a-4268-b6a9-8a6ce0f2be54",
+      "ts": "2026-11-25T04:05:41Z",
+      "source": "hermes",
+      "subject": "nixconfig:wallpaper-worker",
+      "action": "landed: image-daily wallpaper publish — frieren-winter-path 1536x1024 generated via cpg (seedream-5.5), recorded via image-daily-add + image-daily.sh publish clean; served manifest 770->771, public tree published/wall/2026-11-25/frieren-winter-path.png (2682856 B, valid PNG)",
+      "outcome": "done",
+      "claims": [
+        "pics/generated/wall/2026-11-25/frieren-winter-path",
+        "image-daily wall lane"
+      ],
+      "files": [],
+      "base_commit": "31e65f97",
+      "branch": "main",
+      "frame": "03has4r8sgiro2xl1ftkr6rod"
+    },
+    {
+      "id": "eca2e3f3-4578-48ca-9d73-44cc87daf992",
+      "ts": "2026-11-25T04:04:06Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: 2026-11-25n — germantechjobs sha cf313395 unchanged (flat); Stepstone 24 listings, same set; 3 filed scouted (Ehrhardt+Partner 4, Medical AI 4, devops excellence 3); Randstad Digital refused (mandant search + live Randstad contact) | gate: parse + issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has4g2v7sew3ax6vxg0jy1f"
+    },
+    {
+      "id": "0ea1289e-478c-429b-8722-7dc8da7a72dd",
+      "ts": "2026-11-25T04:03:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:note-image-daily-port",
+      "action": "routed publish (classify selected p=0.94 margin=0.90) to agents:4.1 (wallpaper hermes TUI) - land image-daily xs turn for todays frieren-winter-path publish (manifest 771, ledger.jsonl skip noted) + prep tomorrow brief; Working... 46s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "31e65f971896d7af0e76854a442c21ba281c12f0",
+      "branch": "main",
+      "frame": "03has4aialxqqb9fye3q9svz5"
+    },
+    {
+      "id": "598ed231-01ea-4a74-b8a4-af3a9a3ce3ff",
+      "ts": "2026-11-25T04:03:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "routed note-change (classify needs_review, top p=0.76 margin=0.55 decisive>=0.3, pick top) to agents:3.1 (delphi ssh) - sweep 2026-11-25n: Stepstone verdicts on 9 unheld, gtj sha check vs cf313395, dedupe + file rows, land note job-scout-sweep-2026-11-25n; working... 11s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "31e65f971896d7af0e76854a442c21ba281c12f0",
+      "branch": "main",
+      "frame": "03has4agq95h7ohzo7nqqpw5t"
+    },
+    {
+      "id": "1b6d9522-69e4-4f07-8a8d-efded41bcf9b",
+      "ts": "2026-11-25T04:03:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "routed note-change (classify needs_review, top p=0.75 margin=0.60 decisive>=0.3, pick top) to agents:2.1 (freebuff) - sweep 2026-11-25n: re-read gtj+Stepstone, dedupe vs ledger, file rows, land note job-scout-sweep-2026-11-25n; working... 15s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "31e65f971896d7af0e76854a442c21ba281c12f0",
+      "branch": "main",
+      "frame": "03has4af6yn98fhseekaqx6z1"
+    },
+    {
+      "id": "6927aa37-cd94-4587-8220-f82266eca535",
+      "ts": "2026-11-25T04:02:39Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "bisected+landed: /api/applications 404 = deployed npgsqlrest lacked the .sql files (committed since 86bdb73b; a tree-missing-files build); fix = eval assertion that every proxied route has sql/<name>.sql + stale 8461 comment | gate: checks:host delphi rc=0, notes/census clean; note OPEN on live-verify",
+      "outcome": "blocked: tailnet ssh browser check — delphi 04:30 autoUpgrade lands it",
+      "claims": [],
+      "files": [],
+      "base_commit": "31e65f971896d7af0e76854a442c21ba281c12f0",
+      "branch": "main",
+      "frame": "03has45v8psfylmnr5lunl1f0"
+    },
+    {
+      "id": "3683b957-a89b-4917-b80b-916852d185f4",
+      "ts": "2026-11-25T04:02:30Z",
+      "source": "antigravity",
+      "subject": "frieren:system-audit",
+      "action": "start: daily health audit and SYSTEM.md refinement",
+      "outcome": "in_progress",
+      "claims": [
+        "SYSTEM.md"
+      ],
+      "files": [],
+      "base_commit": "31e65f971896d7af0e76854a442c21ba281c12f0",
+      "branch": "main",
+      "frame": "03has44uxknyd0g3cm8id5jxu"
+    },
     {
       "id": "4c5ba71c-4c13-4649-b64e-8c2eed492814",
       "ts": "2026-11-25T04:01:37Z",
@@ -2559,99 +2655,6 @@
       "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
       "branch": "main",
       "frame": "03hapj301bhno6dtr7weh21cf"
-    },
-    {
-      "id": "56bac4b6-4ab6-4a3a-9f34-6b916f1f7769",
-      "ts": "2026-11-24T20:04:16Z",
-      "source": "delphi",
-      "subject": "nixconfig:steward-delphi",
-      "action": "landed: drove delphi job-search lane — resolve duplicate Supabase/Managed Postgres packet rows so the application packet set is consistent",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
-      "branch": "main",
-      "frame": "03hapippzz2umykgj7irjx79a"
-    },
-    {
-      "id": "c9f8837f-acc7-43da-9827-47df875f8705",
-      "ts": "2026-11-24T20:04:13Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "landed: drove freebuff job-scout CV lane — fix the apps:search lookup so DevOps/SRE/Platform/Infrastructure engineer leads resolve before more scouting",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
-      "branch": "main",
-      "frame": "03hapipdlkv4src8mc5v41odw"
-    },
-    {
-      "id": "778c22a7-c205-4102-9941-37f2467e02d6",
-      "ts": "2026-11-24T19:57:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: apps:search returned all 1125 rows for every query — apps-db.sh filtered inside the text renderer while toon_emit printed its stdin. It now filters before emitting, matching every word (AND) over id/company/role/status/next: linbit/b1/univention/open-xchange/noris/rheinmetall/check24 -> 1 row each, proxmox/giant swarm/suse -> []. Sweep rechecks closed: SUSE 33/34 postings, no infra req; Giant Swarm boardless. | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "a72819018a90e59fb198589bb32ce11314d1cabe",
-      "branch": "main",
-      "frame": "03haphbf4myxaz3aokakxzgsy"
-    },
-    {
-      "id": "205600aa-d773-4955-9e9e-3fc85ea275e3",
-      "ts": "2026-11-24T19:55:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "dupes: Supabase had two live rows (applied 2026-11-21 canonical, prep Managed Postgres packet). Closed the packet row as duplicate (stage other), copied its 3 files to ~/.local/state/appflow/materials/ so store GC cannot drop them, pointed the canonical folderPath there, fixed its stale 2026-05-05 status. Nothing sent. | gate: apps:dupes Supabase 0, stages prep/other/applied PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haph1nb5x3n2atbhzt438rd"
-    },
-    {
-      "id": "b6e489a9-3735-4d7b-8540-1b6c84221f76",
-      "ts": "2026-11-24T19:43:58Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-devin",
-      "action": "drove devin pane (agents:1.1): routed deploy via jev-decide (deploy 0.85, margin 0.80, selected); pane now Thinking on the delphi gatus-dns-monitor activation deploy (infra:deploy:host:delphi)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b97924653494701ce0ee2704f624e4ae913d04bb",
-      "branch": "main",
-      "frame": "03hapeqxfx2sgo0qrj8dn8h2i"
-    },
-    {
-      "id": "3befbdf5-3751-4b45-906b-0745c633eb53",
-      "ts": "2026-11-24T19:43:01Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep",
-      "action": "landed: EU vendor sweep — Proxmox IT Infrastructure Allrounder (Vienna on-site, Debian/Proxmox VE/Ansible, fit 3) the one new candidate; LINBIT, B1 Systems, Univention, Open-Xchange already tracked; Giant Swarm no reachable board (all ATS 404), SUSE Workday 34 postings but devops=0 then 400s. No row written, nothing sent; evidence in ~/.local/state/appflow/followups/2026-11-24-eu-vendor-careers-sweep.md. Found apps:search unfiltered | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b97924653494701ce0ee2704f624e4ae913d04bb",
-      "branch": "main",
-      "frame": "03hapeka7xw9evw94mn29pd9p"
-    },
-    {
-      "id": "5917573f-f608-44ab-a160-3cd0ec5e2e47",
-      "ts": "2026-11-24T19:40:17Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "prep: Supabase Managed Postgres packet built through nix (crg7yml7ck24jmzi8yk3r0kc4cmg00ws-appflow-packet..., 2pp CV + 1pp letter, JD from the Ashby board, 13/36 highlights) and linked; DeepL Sovereign Cloud packet verified (1pp letter, 2pp CV, gaps named). Both rows stage=prep, nothing sent, sends held to 2026-12-07. | gate: packet build exit 0 + pdfinfo 2pp/1pp + apps:get stage=prep PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hape11ia5yi65fjr28mn905"
     }
   ]
 }

@@ -7259,6 +7259,53 @@
       '';
     };
 
+    employer-lead-sweep-2026-11-25t-freebuff = {
+      title = "Five untracked employers carry a live req, and the tracked vendors posted second reqs";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Ran the open note as cycle 2026-11-25t, prep-only. Giant Swarm has no live req; SUSE moved to Workday with one German seat; LINBIT's board is placeholder copy above a no-openings notice. The four tracked vendors each posted a second req. Of Stepstone's 138 page-one ads, five untracked employers carry a live req past the hold and Fabasoft parks on a 12-05 expiry; no row minted.";
+      from = ["job-scout-next-sweep-freebuff"];
+      links = ["job-scout-next-sweep-freebuff"];
+      refs = {
+        modules = ["taskfiles/apps.yml" "scripts/task/apps-scout.sh"];
+        tasks = ["apps:search" "apps:scout" "checks:quick"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Ran the open note as cycle 2026-11-25t, prep-only: no row minted, nothing sent, evidence in
+        ~/.local/state/appflow/followups/2026-11-25-employer-lead-sweep-freebuff.md.
+
+        Vendor pages first, since the last round read ATS APIs only. Giant Swarm states that it has
+        no open positions, so that recheck is a finding. SUSE is on Workday
+        (suse.wd3.myworkdayjobs.com/Jobsatsuse; suse.com/careers is a landing page and
+        jobs.jobvite.com/suse is Jobvite's own vendor page): 17 postings, one in Germany — Premium
+        Support Engineer, posted 2026-11-20. LINBIT's /jobs/ is a stub, two lorem-ipsum cards above
+        a no-openings notice, so the prep row blocked on that JD chases placeholder copy.
+
+        The four tracked vendors each answered with a second req, not a new employer: B1 Systems
+        still lists its Entwickler role alongside Senior Admin Linux/Open Source; Univention's
+        tracked Open Source Software Engineer is gone and IT Consultant replaces it; Open-Xchange
+        publishes Senior DevOps Engineer; Proxmox's new kernel, SDN and support seats are Vienna
+        on-site, the place rule that already parked its Allrounder.
+
+        Stepstone, six lanes one page each: 138 unique ads, 26 at employers the ledger holds by
+        house token (plusserver, Bundesdruckerei, Interhyp, GMX/WEB.DE as the 1&1 mail subsidiary,
+        HxGN, Diehl Defence, ABOUT YOU, Upvest, novomind, STULZ, EWE NETZ, LAIQON, AUGENTIC,
+        BIOTRONIK, Claranet, Pradtke, grinnberg, meinestadt.de, S Rating), plus 17 cards that are
+        staffing firms naming someone else's client.
+
+        New, read in full, minted at scout-2026-11-25t once the hold lifts: GOLDBECK Technologies
+        Platform Engineer (Azure/Kubernetes/Terraform, fit 4, 12-08), EDEKABANK (Senior) DevOps
+        (GCP/Helm/ArgoCD, fit 4, 12-20), SUSS MicroTec Infrastructure & Platform Engineer
+        (HCI/Veeam/MS-SQL, fit 2, 12-17), SCHIFFL IT Cloud Infrastructure Engineer
+        (vSphere/Windows, fit 2, 12-23), SUSE (fit 3). Fabasoft's Kubernetes Consultant is the
+        pass's closest stack match and closes 12-05, inside the hold.
+
+        Exit: checks:quick green on this commit; the rows land after 2026-12-07.
+      '';
+    };
     job-scout-sweep-2026-11-25s = {
       title = "Six of 256 cards survive the hold, and the dedupe is the finding";
       kind = "decision";

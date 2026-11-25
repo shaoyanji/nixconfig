@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-25T05:53:41Z",
+  "generated": "2026-11-25T05:58:48Z",
   "count": 200,
-  "pin": "36eb5da5ba5698d84685a7f057e579dc2c8b34ca3a62454b484e4707dc7dfc62",
+  "pin": "a7b081e6f8cf8a13ca1235653470294da7d8cdb27862b2f9d8b4988153e67416",
   "turns": [
+    {
+      "id": "d48bb3ba-4b8b-4716-b9a7-cf4a367eddd3",
+      "ts": "2026-11-25T05:58:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25s",
+      "action": "correction: f8c50728 never landed (rebase blocked by an unstaged note, push rejected); the note is now on d20c6929 after reset to origin and splice — same read, 1 row Core-Backbone at scout-2026-11-25s | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d20c6929116150c05d1a34282d1dc361599006ca",
+      "branch": "HEAD",
+      "frame": "03hasqu8g3jvqyl5a5tdn6mei"
+    },
+    {
+      "id": "4970714d-0e35-4c84-86ee-e37030b3dd13",
+      "ts": "2026-11-25T05:58:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25s",
+      "action": "landed: fresh families (Himalayas measured wall, Jobicy 104 all in-cut, HN Nov 19 lane all in-cut, GH/Lever 0 of 360, Workable unread, Recruitee 5 boards/48 offers) — 1 row: Core-Backbone GmbH Linux IT-Systemadministrator, band 3, origin scout-2026-11-25s | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f8c50728ad11ced564ff7a21a34859d3ec1eb0ed",
+      "branch": "HEAD",
+      "frame": "03hasqrimptoif5c5nkp8p5yv"
+    },
+    {
+      "id": "32eb8438-d6fd-45a5-9433-86443e38046d",
+      "ts": "2026-11-25T05:53:52Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: tail gate-check re-sweep — checks:policies rc=0, nix:comments 54/54 cites rc=0, image-daily gate ok, drv-equality 30/30 identical; note re-logged OPEN, sole open item = appflow /api/applications+/api/applications-discovered live re-verify after delphi 04:30 CET autoUpgrade 2026-11-26 | gate: drv-equality 30/30",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d20c6929116150c05d1a34282d1dc361599006ca",
+      "branch": "main",
+      "frame": "03haspvypxgjv0hypifla4vl6"
+    },
     {
       "id": "6c50c82e-16d7-4485-9ffe-8bf1ca825a48",
       "ts": "2026-11-25T05:50:17Z",
@@ -2635,45 +2676,6 @@
       "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
       "branch": "main",
       "frame": "03haqaelgjp6hcvbepfyfcubb"
-    },
-    {
-      "id": "90e2819a-a012-49d9-b6a6-050a5ee07b03",
-      "ts": "2026-11-24T22:25:56Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:host-change",
-      "action": "landed: routed durable_clanker to devin (agents:1) - create delphi NixOS module to make clanker proof durable instead of a tmux proof dying on auto-suspend; drive confirmed by Thinking spinner",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
-      "branch": "main",
-      "frame": "03haqadzcakz5l7z8cl14yx8o"
-    },
-    {
-      "id": "6c4e6cf8-f7e8-46ae-802f-8fe12b5314b1",
-      "ts": "2026-11-24T22:25:26Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: recorded 5 new leads (Nebius SRE-Berlin closed as duplicate, trawa/Upvest/TrueTalent/Ledgy lead), outreach re-verified: NETWAYS+ noris delivered 21:54 by Resend API, Proofline held pending a PR to prooflinedev | gate: every row re-read from the tracker after write",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
-      "branch": "main",
-      "frame": "03haqaahm1nntsos558ictt97"
-    },
-    {
-      "id": "d50c0a84-dee3-42b9-a48e-a4171dd1feac",
-      "ts": "2026-11-24T22:25:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-site-lane",
-      "action": "landed: routed scout_leads to freebuff (agents:2) - continue scouting DevOps/SRE/Platform/Infrastructure engineer leads into CV site lead tracker; drive confirmed by working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
-      "branch": "main",
-      "frame": "03haqa9ox05kjoymhkq0djv3m"
     }
   ]
 }

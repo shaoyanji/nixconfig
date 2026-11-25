@@ -32,7 +32,7 @@ The **openrouter fallback lane uses `perplexity/pplx-decider-v1.3:free`**
 primary (typesafe) fails and the retry lands on openrouter, the wrapper pins
 that model unless the caller passed `--model` explicitly. Override the model
 with `JEV_OPENROUTER_MODEL`; an explicit `--model` in argv always wins. The
-missing-key error string is `Set <NAME>_API_KEY …` (underscore) — the wrapper
+missing-key error string is `Set <NAME>_API_KEY …` (underscore) — the wrapper prose-tell-ok: names the character
 matches `Set *API*` so a missing primary key triggers the openrouter retry.
 
 ```bash

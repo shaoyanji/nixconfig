@@ -7050,5 +7050,48 @@
         Exit: nothing sent, nothing read past the requirement block, held to 2026-12-07.
       '';
     };
+
+    job-scout-sweep-2026-11-25j = {
+      title = "Sweep 2026-11-25i, pass two: Stepstone came back and carried six leads";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "A second read of the boards found Stepstone newly reachable and six unheld German infrastructure employers behind exact-name dedupe, while germantechjobs stayed identical and the remote boards held nothing in lane.";
+      from = ["job-scout-sweep-2026-11-25i"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+Scout 2026-11-25i, second pass, filed as note j because the i label was already taken earlier
+today by a gtg pass that filed IPB, JACOB, MIWE, NT-ware and Proxmox. This pass read the boards again
+and Stepstone answered for the first time in the lane: its listing pages render normally (25 inline ads
+per query page), while detail pages only load with a Referer header and otherwise reset the connection
+in 60 ms. Germantechjobs came back identical for a third time: 1,291 postings, zero new since g, and its
+ten tag pages are still 6.4 KB with zero items. Berlinstartupjobs produced 28 engineering links and one
+infra title; WeWorkRemotely 25 US-remote devops roles; RemoteOK 19 mostly US SaaS listings; 20 slug
+probes across Personio, SmartRecruiters and Ashby, built from the 94 unfiled employers, returned 3
+postings and 1 infra title.
+Stepstone: twelve search pages over six infra queries gave 228 unique cards, about 100 unheld
+direct-employer ads parsed through JobPosting JSON-LD, and six new rows at scouted on origin
+scout-2026-11-25i, whose other five rows belong to the earlier i pass:
+DENIC Ops Engineer Kubernetes/CI-CD/Security (Frankfurt), band 5;
+Schwarz Digits STACKIT control-plane Platform Engineer (Bad Friedrichshall), band 5;
+Rheinmetall Senior Platform Engineer Linux and Container (Düsseldorf), band 5;
+Viridium Cloud and Systems Engineer (Neu-Isenburg), band 5;
+mgm Linux Systemadministrator Cloud Infrastructure (Aachen), band 5;
+PROTOS Senior DevOps Engineer Cloud/Kubernetes (Berlin), band 5.
+Dedupe caught Testo (held as Testo SE & Co. KGaA) and SEW-EURODRIVE (held as SEW-Eurodrive), and KubeOps
+was refused because its ad body is Bechtle boilerplate while both KubeOps and Bechtle sit on the ledger.
+Agencies skipped: Amadeus Fire, FERCHAU, Brunel, Akkodis, Ratbacher, Instaffo, OMNIGENA, TECCON.
+Shape refusals: Bauingenieur and Projektleiter infrastructure, solution architects, LLMOps, SAP DevOps.
+Caveats: Stepstone publishes no salary on any of these ads, so every band is stack coverage only, and
+all six land on band 5 because the requirement blocks are dense enough to saturate the matcher;
+Rheinmetall carries on-call and travel; Viridium requires C2 German; PROTOS is consultancy delivery.
+Exit: nothing sent, nothing past the requirement block, held to 2026-12-07.
+      '';
+    };
   };
 }

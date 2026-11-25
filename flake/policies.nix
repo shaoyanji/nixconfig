@@ -890,7 +890,7 @@
         && nixCommentsCtl.unresolvedPaths == [];
       detail = let
         hotspots = nixCommentsCtl.worst |> lib.take 5 |> builtins.filter (w: w.lines > 0);
-      in "${toString nixCommentsCtl.comments} comment lines in ${toString nixCommentsCtl.files} files: ${toString nixCommentsCtl.pointers} pointers (${toString nixCommentsCtl.kinds.task} task, ${toString nixCommentsCtl.kinds.policy} policy, ${toString nixCommentsCtl.kinds.path} path), header ${toString nixCommentsCtl.header}/${toString nixCommentsCtl.ceiling}, dated ${toString nixCommentsCtl.dated}/${toString nixCommentsCtl.datedCeiling}, rule lines ${toString nixCommentsCtl.rules}\n    unresolved paths: ${nixCommentsCtl.unresolvedPaths |> map (c: "${c.file}:${toString c.line} -> ${c.path}") |> lib.concatStringsSep ", "}\n    heaviest prose: ${hotspots |> map (w: "${w.path} (${toString w.lines})") |> lib.concatStringsSep ", "}";
+      in "${toString nixCommentsCtl.comments} comment lines in ${toString nixCommentsCtl.files} files: ${toString nixCommentsCtl.pointers} pointers (${toString nixCommentsCtl.kinds.task} task, ${toString nixCommentsCtl.kinds.policy} policy, ${toString nixCommentsCtl.kinds.path} path), header ${toString nixCommentsCtl.header}/${toString nixCommentsCtl.ceiling}, dated ${toString nixCommentsCtl.dated}/${toString nixCommentsCtl.datedCeiling}, rule lines ${toString nixCommentsCtl.rules}\n    unresolved paths: ${nixCommentsCtl.unresolvedPaths |> lib.concatMapStringsSep ", " (c: "${c.file}:${toString c.line} -> ${c.path}")}\n    heaviest prose: ${hotspots |> lib.concatMapStringsSep ", " (w: "${w.path} (${toString w.lines})")}";
     };
 
     rebuild-flags-are-finite = {

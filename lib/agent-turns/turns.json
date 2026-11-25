@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-25T08:49:10Z",
+  "generated": "2026-11-25T08:52:31Z",
   "count": 200,
-  "pin": "529bf2bf79481b0264e9f3549eab13a7874f52052ac8e2603a86104e3c11f0ec",
+  "pin": "2c3622d1af35f486ea6d9d43927cec8da4f4fcd07650983d4b4d9e6a93d19c10",
   "turns": [
+    {
+      "id": "37206a97-d096-4506-9228-addc7983429e",
+      "ts": "2026-11-25T08:49:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25t",
+      "action": "landed: sweep 25t — 6 leads filed on scout-2026-11-25t (Luerssen, novomind, SUSS MicroTec, eddyson, PPI, SCHIFFL), freenet DLS parked on validThrough 2026-11-26, AGENTS.nix note landed, sheet re-exported to 1320 rows | gate: apps:audit PASS, #agentsNotes.ok PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2d1d8a21c35a29e895d8053b96399f59c58950f9",
+      "branch": "main",
+      "frame": "03hato56umkvkc18t2vlukark"
+    },
     {
       "id": "74dc6625-9de0-473c-9254-2fa61bcb5771",
       "ts": "2026-11-25T08:48:41Z",
@@ -2662,21 +2675,6 @@
       "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
       "branch": "main",
       "frame": "03haqzsywfbu32xqa0982r2f9"
-    },
-    {
-      "id": "36b5fac4-5a73-4bba-add0-791d44c00de1",
-      "ts": "2026-11-25T00:34:58Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "claim: promote the 2026-11-25 scouted-lead decision into a job-scout note in AGENTS.nix (21bitcoin packet, four parks, plus the pending tailor order and the BIS 2026-12-04 hold ruling)",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "bb07c64be349aaa8e1660a57552165e84f0bffbd",
-      "branch": "main",
-      "frame": "03haqzlbj8zbf1vlbzedk446j"
     }
   ]
 }

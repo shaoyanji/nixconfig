@@ -450,7 +450,7 @@
   dim = sgr "2";
   reset = sgr "0";
   termWidth = 76;
-  rule = termWidth |> lib.genList (_: "─") |> lib.concatStrings;
+  rule = "─" |> lib.strings.replicate termWidth;
 
   # Fold words to `max` columns. A word longer than the line overflows rather
   # than being cut, because a model name or a URL broken mid-token is worse.
@@ -481,7 +481,7 @@
         ("\n" + (lines |> lib.tail |> lib.concatMapStringsSep "\n" (l: "             ${l}")));
     in "  ${dim}${pad}${reset} ${lib.head lines}${cont}";
 
-  padRight = width: s: s + ((width - lib.stringLength s) |> lib.max 0 |> lib.genList (_: " ") |> lib.concatStrings);
+  padRight = width: s: s + (" " |> lib.strings.replicate ((width - lib.stringLength s) |> lib.max 0));
   termSection = title: rows: "\n${bold}${title}${reset}\n${rows |> lib.filter (r: r != "") |> lib.concatStringsSep "\n"}";
 
   statusDot =

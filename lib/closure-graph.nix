@@ -129,7 +129,7 @@
     len = lib.stringLength s;
   in
     if width > len
-    then (width - len) |> lib.genList (_: " ") |> lib.concatStrings |> (pad: pad + s)
+    then " " |> lib.strings.replicate (width - len) |> (pad: pad + s)
     else s;
 
   # --- human-readable sizes ---------------------------------------------------
@@ -270,8 +270,7 @@ in rec {
       # it is a quirk of the baseline, not a design choice.
       rows =
         s.top
-        |> map (e: "  { name = \"${e.name}\", bytes = ${toString e.narSize} },")
-        |> lib.concatStringsSep "\n";
+        |> lib.concatMapStringsSep "\n" (e: "  { name = \"${e.name}\", bytes = ${toString e.narSize} },");
     in
       "[closure.subsystems.${s.name}]\n"
       + "bytes = ${toString s.bytes}\n"

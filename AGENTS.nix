@@ -5928,6 +5928,33 @@
         .#knowledgeGraph.evidence evals through the new count.
       '';
     };
+    lib-pipe-cmssep-replicate = {
+      title = "Residual lib |> classes: map |> concatStringsSep to concatMapStringsSep, genList-pad to strings.replicate";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-count-findfirst-flake"];
+      summary = "Pass 8: two more residual classes. `xs |> map f |> concatStringsSep sep` folds to `lib.concatMapStringsSep sep f` (closure-graph rows, agents-notes refLine+kinds join, policies detail x2). `n |> genList (_: c) |> concatStrings` is `lib.strings.replicate n c` — not `lib.replicate`, which is the LIST version and returns [c c ...].";
+      refs = {
+        modules = ["lib/closure-graph.nix" "lib/agents-notes.nix" "lib/delphi-site.nix" "lib/gemini-portal.nix" "flake/policies.nix"];
+        tasks = ["checks:drv-equality" "checks:policies"];
+      };
+      body = ''
+        The replicate class had a namespace trap worth recording: `lib.replicate`
+        is `lists.replicate` (n: a: [a]) — `lib.replicate 3 "x"` yields
+        ["x","x","x"], and a consumer concatenating it gets a type error, not a
+        pad. The string version is `lib.strings.replicate :: int -> string ->
+        string`, and since its first arg is n, the count cannot pipe in on the
+        left — write `" " |> lib.strings.replicate n`, piping the string into
+        the second arg. First draft wrote `lib.replicate`; eval caught it.
+        concatMapStringsSep is the literal expansion of map-then-join, so every
+        site is identity-safe; the agents-notes kinds join already used the
+        combinator one binding up (the in-file idiom).
+        Gate: drv-equality 30/30 identical, .#checks.policies builds,
+        fleet-docs-site resolves, all five files parse.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

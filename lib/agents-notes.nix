@@ -261,11 +261,10 @@
     lib.optionalString (xs != []) (
       "- **${label}:** "
       + (xs
-        |> map (x:
+        |> lib.concatMapStringsSep ", " (x:
           if label == "hosts" || label == "tasks"
           then "`${x}`"
-          else linkify x)
-        |> lib.concatStringsSep ", ")
+          else linkify x))
     );
 
   # Lineage renders like a ref line but every entry is a note, so it goes through
@@ -337,7 +336,7 @@
       ))
     + "\n"
     + (kinds
-      |> map (
+      |> lib.concatMapStringsSep "\n" (
         k:
           lib.optionalString (byKind k != []) (
             "## ${capitalize k}\n\n"
@@ -354,8 +353,7 @@
               ))
             + "\n"
           )
-      )
-      |> lib.concatStringsSep "\n");
+      ));
 
   # Paths inside the `.#artifacts.docs` derivation. `base` is the relative prefix back to
   # the repository root, so a ref renders as a working link in the markdown tree.

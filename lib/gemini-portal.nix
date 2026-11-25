@@ -31,7 +31,7 @@
 
   slugs = data.projects |> map (p: p.title |> slug);
 
-  heading = level: text: "${level |> lib.genList (_: "#") |> lib.concatStringsSep ""} ${text}";
+  heading = level: text: "${"#" |> lib.strings.replicate level} ${text}";
   # A gemtext link is a line of its own, and needs a label: clients do not
   # auto-link a bare URL.
   link = url: label: "=> ${url} ${label}";

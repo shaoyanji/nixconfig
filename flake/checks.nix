@@ -564,7 +564,7 @@ lib.genAttrs systems.work (
               |> builtins.filter (t: !(builtins.elem t noteIds))
               |> map (t: "note ${n.id} links '${t}', which has no slice — the lineage button on its page would 404")
           );
-        recordedCount = g.edges |> builtins.filter (e: e ? evidence) |> builtins.length;
+        recordedCount = g.edges |> lib.count (e: e ? evidence);
         recordIssues = lib.optional (recordedCount == 0) "no edge records its own evidence — the per-edge tier is declared but nothing uses it";
         citationIssues = knowledgeGraphCtl.unresolvedCitations |> map (c: "citation ${c} names a policy id flake/policies.nix does not declare — the graph drops the edge, so name the rule or drop the citation");
         tierIssues =
@@ -848,7 +848,7 @@ lib.genAttrs systems.work (
         declaredPort = id: knobs.${id}.port or null;
         prosePorts = ids |> builtins.filter (id: prosePort id != null);
         allPorts = ids |> map declaredPort |> builtins.filter (p: p != null);
-        duplicated = allPorts |> builtins.filter (p: (allPorts |> builtins.filter (q: q == p) |> builtins.length) > 1);
+        duplicated = allPorts |> builtins.filter (p: (allPorts |> lib.count (q: q == p)) > 1);
         portProblems =
           (
             prosePorts
@@ -870,7 +870,7 @@ lib.genAttrs systems.work (
           |> lib.unique;
         duplicateRows =
           checkNames
-          |> builtins.filter (n: (checkNames |> builtins.filter (m: m == n) |> builtins.length) > 1)
+          |> builtins.filter (n: (checkNames |> lib.count (m: m == n)) > 1)
           |> lib.unique;
         familyProblems =
           (
@@ -884,7 +884,7 @@ lib.genAttrs systems.work (
           hostNames
           |> builtins.filter (h: hosts.${h} ? managed && builtins.typeOf hosts.${h}.managed != "bool")
           |> map (h: "${h}: managed must be a boolean when present, got ${builtins.typeOf hosts.${h}.managed}");
-        managedAbsent = hostNames |> builtins.filter (h: !(hosts.${h} ? managed)) |> builtins.length;
+        managedAbsent = hostNames |> lib.count (h: !(hosts.${h} ? managed));
 
         # .sops.yaml — the fourth registry; exceptions: lib/registry-schema.nix
         sopsYaml = ../.sops.yaml |> builtins.readFile;

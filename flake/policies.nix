@@ -265,11 +265,11 @@
     cut = lines |> indexOf (l: lib.hasPrefix "sops:" l);
     body = lines |> lib.take cut;
     meta = lines |> lib.drop cut;
-    suffixHits = meta |> builtins.filter (l: l |> lib.trim |> lib.hasPrefix "unencrypted_suffix:");
+    suffixHit = meta |> lib.findFirst (l: l |> lib.trim |> lib.hasPrefix "unencrypted_suffix:") null;
     suffix =
-      if suffixHits == []
+      if suffixHit == null
       then null
-      else suffixHits |> builtins.head |> lib.trim |> lib.removePrefix "unencrypted_suffix:" |> lib.trim; # Return the KEY, never the value: a gate error must not echo a secret.
+      else suffixHit |> lib.trim |> lib.removePrefix "unencrypted_suffix:" |> lib.trim; # Return the KEY, never the value: a gate error must not echo a secret.
     plainKey = l: let
       t = l |> lib.trim;
       m = t |> builtins.match "([A-Za-z0-9_.-]+):[[:space:]]+(.+)";
@@ -457,7 +457,7 @@
   buildAnchor = "\".#\${attr}\"";
   ciKeyProblems = text: let
     lines = text |> lib.splitString "\n";
-    count = needle: lines |> builtins.filter (l: l |> hasInfix needle) |> builtins.length;
+    count = needle: lines |> lib.count (l: l |> hasInfix needle);
     builds = lines |> builtins.filter (l: l |> hasInfix buildAnchor);
     keyed = l: (l |> hasInfix "--option trusted-public-keys") && (l |> hasInfix "\"$keys\"");
   in
@@ -763,8 +763,8 @@
     if root + "/${ledger}" |> builtins.pathExists
     then ledger |> read |> lib.splitString "\n"
     else [];
-  agreeCount = ledgerLines |> builtins.filter (l: l |> lib.replaceStrings [" "] [""] |> hasInfix "\"agree\":true") |> builtins.length;
-  totalJudged = ledgerLines |> builtins.filter (l: l |> hasInfix "\"target\"") |> builtins.length;
+  agreeCount = ledgerLines |> lib.count (l: l |> lib.replaceStrings [" "] [""] |> hasInfix "\"agree\":true");
+  totalJudged = ledgerLines |> lib.count (l: l |> hasInfix "\"target\"");
   disagreeCount = totalJudged - agreeCount;
 
   # Every tracked .nix / .md file, walked once.

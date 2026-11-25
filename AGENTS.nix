@@ -5898,6 +5898,36 @@
         site drv resolves, inventory.derived evals, drv-equality identical.
       '';
     };
+    lib-pipe-count-findfirst-flake = {
+      title = "Residual lib.count / lib.findFirst in flake/*.nix; modules/ audited, one site skipped by design";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-count-findfirst"];
+      summary = "Pass 7: the residual classes extended past lib/. Eight `filter |> length` sites in flake/checks.nix, outputs.nix, policies.nix collapse to `lib.count`; policies.nix sops-meta `suffixHits`-then-head folds into `lib.findFirst ... null`. modules/ was audited — gravatar-profile is an arg-free data file, so giving it lib for one findFirst is signature change, not refinement.";
+      refs = {
+        modules = ["flake/checks.nix" "flake/outputs.nix" "flake/policies.nix" "modules/config/gravatar-profile.nix"];
+        tasks = ["checks:quick" "checks:host"];
+      };
+      body = ''
+        Same classes as pass 6, one directory up. All eight count sites are the
+        literal composition; the findFirst site (unencrypted_suffix probe in
+        sopsYaml) drops the plural `suffixHits` binding that pretended to care
+        about a list when only the first matters.
+        Audited and refused: epistemics `permitted |> head` is sort-then-head
+        with a second consumer, not the class; policies `sibling |> head` feeds
+        +1 arithmetic on the hit, which breaks the fold; gravatar-profile's
+        manual found-then-head is the class but the file takes no args — `lib`
+        would mean a signature change plus a call-site edit in himalaya for a
+        one-line gain. Not warranted.
+        Incidental drift fixed in-tree: the sibling's 72335824 added
+        scripts/task/appflow-send.sh at 137 lines with no script-budget record;
+        the entry is recorded (its own small commit) or checks:quick stays red.
+        Gate: checks:quick green end-to-end, checks:host frieren rc=0,
+        .#knowledgeGraph.evidence evals through the new count.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

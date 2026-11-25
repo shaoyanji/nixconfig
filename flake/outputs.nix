@@ -374,7 +374,7 @@ in {
     inherit (knowledgeGraphCtl) graph cypher;
     evidence = let
       edges = knowledgeGraphCtl.graph.edges;
-      count = p: builtins.length (builtins.filter p edges);
+      count = p: lib.count p edges;
     in {
       total = builtins.length edges;
       recorded = count (e: e ? evidence);

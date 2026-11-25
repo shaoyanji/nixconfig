@@ -7200,7 +7200,7 @@ RemoteOK 101 (both US-only), arbeitnow 300 on page one, and the ATS families onl
 camunda 56 and kubermatic 9, Personio 1KOMMA5GRAD 339, SmartRecruiters DeliveryHero 100.
 Stepstone answered 200 this time, and its result page parsed from the embedded JSON rather than the markup
 carried 24 listings: ten employers the ledger already holds (BAMF, Bundesdruckerei, plusserver, EOS, DACHS,
-Ehrhardt + Partner, PSI, PRODNYA, EWE NETZ, Randstad) and nine it did not. Each detail page was read before
+Ehrhardt + Partner, PSI, PRODYNA, EWE NETZ, Randstad) and nine it did not. Each detail page was read before
 any row was written, and six survived. Origin scout-2026-11-25m, all at scouted:
 epostbox epb, Cloud Platform/DevOps, bundesweit home office, band 5 - Terraform with remote state and
 environment separation, production Kubernetes, self-hosted GitLab, GitOps with Argo CD; closest match today.

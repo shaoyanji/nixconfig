@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-25T02:26:47Z",
+  "generated": "2026-11-25T02:37:57Z",
   "count": 200,
-  "pin": "309214147ccd4f9a67cb82c1e87bda28859f87a368c92fc2d8cb1e4076b0baad",
+  "pin": "93365ce6a587c52f9d6c85cd61b6e2c6231c10a7bc554576f2cae75846b72da3",
   "turns": [
+    {
+      "id": "589d4beb-4615-4a45-bcfb-b20b78f73947",
+      "ts": "2026-11-25T02:36:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "re-drove freebuff (agents:2.1) after the 25f five landed (1 packet: brose) with build-the-brose-application-packet task (tailor CV + letter, store under appflow submissions, update lead row, land note) — classify needs_review note-change 0.59 margin 0.43 (decisive top pick); working... 10s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
+      "branch": "main",
+      "frame": "03harnckagqs1i1n8fipd5ygk"
+    },
+    {
+      "id": "2ec01760-235e-4e57-a29e-f1639a245b92",
+      "ts": "2026-11-25T02:36:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "re-drove devin (agents:1.1) after the closed image-daily port landed (note CLOSED, 64906cfc) with devin-lane-appflow-write-auth verify+close (curl pair on delphi live vhost :8463, 403/200 split, close note when live) — classify needs_review (note-change 0.43 m 0.08), re-class 0.48 m 0.16, duel note/gate decisive 0.72 vs 0.28 m 0.44; Thinking confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
+      "branch": "main",
+      "frame": "03harnciqvatwp9edyll586kg"
+    },
+    {
+      "id": "9aea4b64-ae85-4634-a1cd-43fc4cd231c4",
+      "ts": "2026-11-25T02:32:39Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "re-drove idle delphi (agents:3.1 ssh) with sweep batch 2026-11-25g (widened boards: germantechjobsmirrors, berlinstartupjobs, WeWorkRemotely, RemoteOK, Ashby, Personio, SmartRecruiters, stepstone; dedupe vs helo + a..f, FIT_MAP banding, upsert scouted, land note job-scout-sweep-2026-11-25g) — classify needs_review (note-change 0.49 margin 0.23), duel note/task decisive 0.65 vs 0.35 margin 0.30; ssh tunnel reset mid-paste, re-attached via attach-session -t freebuff, working... 10s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
+      "branch": "main",
+      "frame": "03harmkyouwn2zv5aqhthnxd3"
+    },
+    {
+      "id": "30008779-05c2-44f4-9ba6-bb6046fec577",
+      "ts": "2026-11-25T02:32:26Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "claim: 2026-11-25g sweep — germantechjobs mirrors, berlinstartupjobs, WWR, RemoteOK, Ashby, Personio, SmartRecruiters, Stepstone; dedupe vs ledger + a..f; one note, prep only",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03harmjgeg5681uglc8vlbemn"
+    },
+    {
+      "id": "49e47566-e2e4-4daa-aac7-a9792e2e3ee6",
+      "ts": "2026-11-25T02:26:59Z",
+      "source": "devin",
+      "subject": "nixconfig:note-image-daily-port",
+      "action": "landed: image-gen cpg auth dance + upload_bank + batch + detach ported (gen/gen-batch/gen-detach in imagegen.go); image-gen.sh is a shim; cloudinary.sh deleted with its budget line — last curl out; note devin-lane-image-daily-go-port CLOSED | gate: go test 28/28, checks:image-daily ok, checks:images:publish:test 9/9, checks:images:ship:test 4/4, agentsNotes.issues=[]",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
+      "branch": "main",
+      "frame": "03harlh641h1p6w6q4cg05bvr"
+    },
     {
       "id": "7cb18fb8-d3c6-49f4-9c56-dd165fdb454c",
       "ts": "2026-11-25T02:24:24Z",
@@ -2559,71 +2626,6 @@
       "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hap1f991sgv5fetmqxjnyz3"
-    },
-    {
-      "id": "2b56c109-291e-45af-9669-3bca9775e409",
-      "ts": "2026-11-24T18:35:07Z",
-      "source": "delphi",
-      "subject": "nixconfig:delphi-lane",
-      "action": "landed: scout_roles direction via jev-decide (p1.0/m1.0); delphi now working... 8s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
-      "branch": "main",
-      "frame": "03hap1askixaf9qg4gm6u4foi"
-    },
-    {
-      "id": "842b1008-2b3f-43f1-a0e3-4f80a1196bcd",
-      "ts": "2026-11-24T18:35:05Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: refactor_nixconfig direction via jev-decide (p0.93/m0.89); pane now Typing 4s, working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
-      "branch": "main",
-      "frame": "03hap1aiqqm1sw0cknt1vyfpv"
-    },
-    {
-      "id": "fda7818c-a8c9-4838-b0ba-134e06541991",
-      "ts": "2026-11-24T18:33:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-daily-feed",
-      "action": "landed: same-day arbeitnow sweep — 3 new rows (Shipzero AI Platform Engineer Hamburg fit 4, packet tailored+build; Wellis DevOps/Platform Rotterdam fit 4; Projektron Cloud Engineering Berlin fit 3). DENKweit, eleQtron, wabcon, virtual7, Treatwell, Blocktech, Namespace, Enact, gridscale closed as already on file. Note job-scout-daily-feed-sweep-2026-11-24 | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
-      "branch": "main",
-      "frame": "03hap0xyxjdhzoj2f782dormu"
-    },
-    {
-      "id": "0e9a3f9a-9c1a-4340-9392-b6812eb6ef21",
-      "ts": "2026-11-24T18:31:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: attention queue empty (0 items); resolved 4 held leads to real apply endpoints — VISPIRON, SPECTRUM, Livello, NDI are live join.com postings, none has a packet or JD, per-row blockers recorded, hold to 2026-12-07 unchanged; due today: Genesis chase undrafted, Muenster still missing the Zeugnis, DHBW portal docs; nothing sent | gate: apps:get readback + live 200 on all four",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap0nmqs3im8f9ky2now7kh"
-    },
-    {
-      "id": "ab8b73af-4f7d-414b-9c44-566eb79f5f2c",
-      "ts": "2026-11-24T18:29:35Z",
-      "source": "steward",
-      "subject": "nixconfig:steward:panes",
-      "action": "drove 3 idle coding panes: devin(note-change, image-daily Go port gates + AGENTS.nix note, pending frieren deploy left deferred), freebuff(note-change, fresh SRE/platform lead sweep), delphi(note-change, attention-queue sweep). jev-decide selected all three (devin margin 1.0, freebuff p0.89 m0.78, delphi decisive 0.39). Each pane verified working (spinner/thinking).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "18521db9d5bf6a458dd783a15bdd4a0bb657f1a3",
-      "branch": "main",
-      "frame": "03hap07vxnbq2qrcig7gnu5qv"
     }
   ]
 }

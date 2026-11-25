@@ -5878,12 +5878,12 @@
       '';
     };
     devin-lane-appflow-write-auth = {
-      title = "Appflow write routes shipped open; a bearer gate must land before delphi rebuilds";
+      title = "Appflow write routes: bearer gate landed and verified on delphi's live vhost";
       kind = "open";
-      status = "OPEN";
+      status = "CLOSED";
       priority = "P2";
-      date = "2026-11-24";
-      summary = "Write routes (7571daca) are now bearer-gated: `appflow-board-bearer` in sops renders a `map $http_authorization`, and `if`/`return 403` guards the two write locations only — replica-proven 403/200/reads-open. Remaining exit: the same curl pair on delphi's live vhost after rebuild.";
+      date = "2026-11-25";
+      summary = "Write routes (7571daca) are bearer-gated and verified live on delphi: unauth and wrong-key POST 403 on both routes, the right bearer passes through to the upstream, reads stay open (application-pipeline 200).";
       refs = {
         hosts = ["delphi"];
         modules = ["modules/services/appflow-board.nix" "hosts/delphi/configuration.nix"];
@@ -5906,9 +5906,19 @@
         store. Verified on a replica nginx: unauth POST -> 403 on both routes,
         `Bearer <key>` POST -> 200, wrong key -> 403, unauth GET read -> 200.
 
+        Verified live 2026-11-25 against
+        https://delphi.cloudforest-kardashev.ts.net:8463 after the rebuild:
+        unauth POST 403 on both write routes, wrong key 403 on both,
+        `Bearer <key>` passes through — the upstream's own answers come
+        back (404 on a dead-id update and a param-less upsert; a real 200
+        needs a real row). Unauth GET read open: application-pipeline 200.
+        Side observation, unrelated to this gate: /api/applications
+        answers upstream 404 while application-pipeline 200s — the
+        archive's empty-result answer, pre-existing.
+
         Exit: after the delphi rebuild, repeat the curl pair against
         https://delphi.cloudforest-kardashev.ts.net:8463 and see the same
-        403/200 split, then this note can close.
+        403/200 split — met 2026-11-25.
       '';
     };
     devin-lane-image-daily-go-port = {

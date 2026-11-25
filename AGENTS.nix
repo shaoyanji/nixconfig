@@ -7093,5 +7093,41 @@ Rheinmetall carries on-call and travel; Viridium requires C2 German; PROTOS is c
 Exit: nothing sent, nothing past the requirement block, held to 2026-12-07.
       '';
     };
+
+    job-scout-sweep-2026-11-25k = {
+      title = "Dedupe of the six 2026-11-25i rows: two were already answered, four stand";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Re-matching the six filed rows against the whole ledger by employer token found Rheinmetall's and Schwarz Digits' postings already carried by live rows, so those two are parked with their band-5 evidence intact and four stand at scouted.";
+      from = ["job-scout-sweep-2026-11-25j"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+Second pass over the six rows filed in job-scout-sweep-2026-11-25j. Dedupe ran over the whole ledger
+(1,253 rows, 972 employers) with token matching as well as exact names, and two of the six were already
+answered. Rheinmetall's Senior Platform Engineer - Linux & Container is the requisition already carried
+by rheinmetall-it-solutions-senior-platform-engineer-linux-container, a live lead at band 3; parent and
+subsidiary count as one employer under the 180-day rule, so band 5 cannot make it a second application.
+Schwarz Digits' (Senior) Platform Engineer - STACKIT Control Plane Platform is GT1923, and that row was
+already closed as a duplicate of stackit-iac, which is applied as of 2026-11-22: nothing at Schwarz
+Digits reopens before 2027-05-21.
+Both are parked, not deleted. The posting, the band-5 fit and the URL stay, the status names the row
+that blocks it, and the next action says what would reopen it.
+Four rows stand, all band 5 and all in lane: DENIC eG (Frankfurt, Kubernetes and CI/CD for the .de
+registry), mgm technology partners (Aachen, managed cloud and virtualisation), PROTOS TECHNOLOGIE
+(Berlin, consultancy DevOps), Viridium Gruppe (Neu-Isenburg, OpenStack and Azure, C2 German). Each
+keeps the Referer-header caveat and the 2026-12-07 hold in its next action.
+The finding is the dedupe, not the rows: exact-name comparison cannot reach an employer that sits on
+the ledger as "STACKIT / Schwarz Digits" or "Rheinmetall IT Solutions". Matching the distinctive word
+of the employer name caught both. The next sweep runs that match before filing and parks any row whose
+employer already holds a live application.
+Exit: no sends, nothing read past the requirement block, hold to 2026-12-07.
+      '';
+    };
   };
 }

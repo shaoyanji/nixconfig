@@ -6498,6 +6498,53 @@
         window after the hold, and none of them is a send.
       '';
     };
+    job-scout-sweep-2026-11-25e = {
+      title = "The 2026-11-25e sweep files five German leads and learns datePosted is the only age signal";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Thirty arbeitnow pages (5,765 listings, 2026-11-18 to 2026-11-25) plus four Greenhouse boards left 130 family matches and 79 place-eligible rows; 74 were already held and five were filed at scouted — spotixx 68, QAVION 65, VCE 62, Amber 50, hubside 45.";
+      from = ["job-scout-sweep-2026-11-25d"];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "scripts/task/apps-db.sh"
+        ];
+        tasks = ["apps:scout" "apps:update" "apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Sweep 2026-11-25e, prep only: arbeitnow's job-board API over thirty pages
+        (5,765 unique listings, 2026-11-18 to 2026-11-25) plus the Greenhouse
+        boards for GitLab, Grafana Labs, Cloudflare and Tigera. 130 titles matched
+        the family, 79 were place-eligible, 74 of those were already held (927
+        names) and five were filed at `scouted`. The dups were label noise —
+        Artefact under three spellings, Microsoftcorporation, gridscale twice in
+        one page — and `hiringOrganization` settles each one.
+
+        Scored 0-100, banded by the route: spotixx 68 (3) · QAVION 65 (3) ·
+        VCE 62 (3) · Amber 50 (2) · hubside 45 (2).
+
+        spotixx (Frankfurt, 60-80k) is the one worth a look: DevSecOps over IaC,
+        keyless CI/CD attestation, IAM and secrets, ISO 27001/SOC 2/PCI evidence,
+        home office inside Germany, GCP the single fixed requirement. VCE
+        (Dortmund) is the closest hands-on match the lane has had — self-managed
+        kubeadm, microk8s and k3s clusters, Linux, PostgreSQL, Prometheus/Grafana,
+        GitOps — at lab scale. QAVION is fully remote at 80k plus profit share and
+        reads evergreen. Amber (Aachen, three days on site) and hubside (Munich,
+        recruiter) are security ownership and Nutanix/Azure admin: the weak pair.
+
+        Staleness is the finding: three of five carry datePosted of 2026-01-24,
+        2025-12-17 and 2026-06-19 while validThrough runs into 2027, so
+        `datePosted` is the only age signal. Remotive was tried and dropped —
+        its `?search=` is ignored and the same fifteen unrelated jobs came back
+        for all four queries.
+
+        Exit: the five stay scouted, nothing sends before 2026-12-07, and the
+        next sweep reads `datePosted` before the ad.
+      '';
+    };
     job-scout-sweep-2026-11-25d = {
       title = "Four leads after the boards went quiet: Whitecircle, Alan, Vitestro, Univé";
       kind = "open";

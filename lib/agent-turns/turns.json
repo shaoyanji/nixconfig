@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-25T01:50:20Z",
+  "generated": "2026-11-25T01:54:00Z",
   "count": 200,
-  "pin": "69d5731650675c447031aeac1ceedca989697d638f67366c1ede9d0bd0e6c35a",
+  "pin": "a4cb0c46ea97f10fc43cd3a497407d2c133ac050fdc7e284d7df9c0843c4e1d2",
   "turns": [
+    {
+      "id": "31c80831-159d-4ca6-a760-8c1d05cbc2bc",
+      "ts": "2026-11-25T01:51:04Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-worker",
+      "action": "drove idle wallpaper-worker (agents:4.1, UNKNOWN to pane-watch but live python TUI at clean prompt) with daily wallpaper generation task — produce asset, verify on disk, record artifact for manifest",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
+      "branch": "main",
+      "frame": "03hareghlmntogp1quwcsuihx"
+    },
+    {
+      "id": "35b7f8ec-08fb-4946-8a00-50b351b6addb",
+      "ts": "2026-11-25T01:51:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "drove idle delphi (agents:3.1 ssh remote freebuff) with 2026-11-25e sweep task — dedupe vs helo, FIT_MAP 1..5, upsert scouted, land note job-scout-sweep-2026-11-25e, verify rebase before claiming",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
+      "branch": "main",
+      "frame": "03haregg2baqu1r6dy4oaha6v"
+    },
+    {
+      "id": "64561d68-a985-4436-b159-0743857c3f52",
+      "ts": "2026-11-25T01:51:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "drove idle freebuff (agents:2.1) with 2026-11-25e job-scout sweep task — read JSON-LD in full, dedupe vs helo, FIT_MAP banding, upsert scouted, land note job-scout-sweep-2026-11-25e",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
+      "branch": "main",
+      "frame": "03haregeathwpd6lbi8v9hz24"
+    },
+    {
+      "id": "a760a834-975b-41fe-9461-205f454355f4",
+      "ts": "2026-11-25T01:51:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "drove idle devin (agents:1.1) with image-daily port gate-note extension task (30-line body stays OPEN, open slices: cloudinary curls, ffprobe check, cpg auth)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
+      "branch": "main",
+      "frame": "03haregco6op185vksdjaskwc"
+    },
+    {
+      "id": "ed98d952-8073-4d62-8644-78abe2ee495a",
+      "ts": "2026-11-25T01:50:37Z",
+      "source": "devji",
+      "subject": "nixconfig:note-image-daily-port",
+      "action": "landed: extended devin-lane-image-daily-go-port — verified gates recorded (unit tests + 9-assert fixture, deploy_frontend PAGES gate), next slices ordered (cloudinary curls, ffprobe check, cpg auth); also renamed duplicate job-scout-sweep-2026-11-25d to -parked — it made AGENTS.nix unevaluable on origin/main | gate: agents-notes-schema PASS (issues [])",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
+      "branch": "main",
+      "frame": "03haredf6mwk19jwwao8pffo3"
+    },
     {
       "id": "0f8bee2d-22bd-433d-a9aa-70aeb7c9b51d",
       "ts": "2026-11-25T01:45:12Z",
@@ -2559,71 +2624,6 @@
       "base_commit": "bcce4b6a87ab76c1ee2a756bb3f07d5df155c179",
       "branch": "main",
       "frame": "03haojt8wkr52vbqjv7hey1zg"
-    },
-    {
-      "id": "d7bd5e2e-d21b-4d3c-85c4-b88a96b6902d",
-      "ts": "2026-11-24T17:05:36Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.78 margin=0.67 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bcce4b6a87ab76c1ee2a756bb3f07d5df155c179",
-      "branch": "main",
-      "frame": "03haojt7fet06cuk795fjw8wm"
-    },
-    {
-      "id": "8d68bc00-63db-4ba1-a9b2-d4c23b730bad",
-      "ts": "2026-11-24T17:05:09Z",
-      "source": "devin",
-      "subject": "nixconfig:code-review-loop",
-      "action": "landed: attrNames+relookup pipes -> lib.mapAttrsToList (aki-site budgetRow + 3 count rows, delphi-site archRow); last alias strays (docs builtins.sort->lib.sort lib.lessThan x2, delphi-site lib.foldl'->builtins) | gate: fleet-docs-site+docs build w/ identical rows, drv-equality 29/30 (delphi=bearer-gate delta) PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bcce4b6a87ab76c1ee2a756bb3f07d5df155c179",
-      "branch": "main",
-      "frame": "03haojq1fpuqpwx1pysi80e3m"
-    },
-    {
-      "id": "24b52e4a-bc4c-4fb7-8db3-26419514a324",
-      "ts": "2026-11-24T17:05:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: Pentland Firth Sr Cloud Platform Engineer (Munich) tailored CV 2p + Anschreiben 1p, VERIFIED SENT 2026-11-24 14:07 CET to jobs@pentlandfirth.com (Sent id 8859); Flink Platform Engineer (Berlin) tailored + packet ready but no mail path (no jobs address, req absent from Flink3 ATS); Maesn closed, Atlas Titan dropped | gate: himalaya Sent read-back + apps:get PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03haojp1eculb7tp2yk2zbaw7"
-    },
-    {
-      "id": "a22e85e7-e69a-44ea-9f24-1968711c5f6e",
-      "ts": "2026-11-24T17:04:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: upserted the 2 sweep leads into the delphi DB — Sony Interactive Entertainment (SRE Berlin, fit 3) and SAP SE (Sovereign Cloud DevOps Berlin, fit 4); both held to 2026-12-07, nothing due today; when due: DHBW infrastrukturbetrieb needs the missing docs uploaded to the portal today | gate: apps:get read-back PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haojhz4b17nvk2mhuqblizk"
-    },
-    {
-      "id": "e0d3a30a-df30-470a-a962-712c383f324a",
-      "ts": "2026-11-24T17:03:33Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi (agents:3) idle after attention sweep. jev-decide selected upsert p=0.72 margin=0.46 decisive >= 0.3: upsert new leads into tracking DB. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03haojev0ke11c33839z34zek"
     }
   ]
 }

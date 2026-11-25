@@ -7753,7 +7753,7 @@
       status = "ACCEPTED";
       priority = "P2";
       date = "2026-11-25";
-      summary = "The o cycle had already landed (seven rows at scout-2026-11-25n plus a pane's three) before this pass read the record, so nothing was refiled. It adds two employers the seven do not name — gematik and ELAC SONAR, each verified on the employer's own page — refuses KIND and WALDNER after reading theirs, downgrades dive solutions to unverified inside the same pass, and corrects the Stepstone 403 to a missing Referer header.";
+      summary = "The o cycle had already landed before this pass read the record, so nothing was refiled. It adds gematik and ELAC SONAR, both verified on employer pages, refuses KIND and WALDNER after reading theirs, withholds dive solutions as unverified, and corrects my Stepstone 403 to a missing Referer header.";
       from = [ "job-scout-sweep-2026-11-25o" ];
       refs = {
         modules = [ "scripts/task/apps-db.sh" ];

@@ -6006,6 +6006,48 @@
         2026-12-07 hold, or each is recorded as having no live req.
       '';
     };
+    job-scout-sweep-2026-11-25t = {
+      title = "Sweep 25t: six leads off Stepstone, and the boards that answer nothing";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Stepstone's three lanes at two pages gave 143 cards, 91 in-family, 25 at employers the ledger does not hold and nine detail reads; six filed on scout-2026-11-25t, one parked inside the hold. Arbeitnow is exhausted at six pages, germantechjobs carries no items, berlinstartupjobs sits behind Cloudflare, the Arbeitsagentur API answers empty.";
+      links = ["job-scout-fresh-packets-public" "apps-lane-has-no-send-task"];
+      refs = {
+        modules = ["scripts/task/apps-scout.sh" "taskfiles/apps.yml"];
+        tasks = ["apps:scout" "apps:scout:sweep" "apps:scout:parked"];
+      };
+      body = ''
+        The 25t read took Stepstone's platform, site-reliability and
+        infrastructure lanes at two pages each: 143 cards after dedupe by ad URL,
+        91 in the devops family, 25 after the employer-token dedupe against the
+        1,025 names already held, and nine detail pages read before a verdict.
+        Filed six on `scout-2026-11-25t`, all at stage `lead`: Luerssen Werft
+        (DevOps/Platform, Lemwerder, 4), novomind (Platform, Hamburg, 4), SUSS
+        MicroTec (Infrastructure & Platform, Garching, 4 — its ad carries Nix),
+        eddyson (SRE/DevOps, Goettingen, 3), PPI (Senior Platform, GitLab and
+        Artifactory, 3) and SCHIFFL group (Cloud Infrastructure, Frankfurt, 3).
+        Each carries its ad's validThrough and a next action gated on 2026-12-07.
+
+        Parked, not filed: freenet DLS Cloud/Platform-Engineer DataOps, Hamburg,
+        validThrough 2026-11-26 — one day out and inside the hold. Liebherr-Aerospace
+        (2026-12-05) and Hilti (2027-01-20) were read and left for the recheck;
+        Amadeus Fire and Bertrandt were skipped as agencies.
+
+        What the boards returned: arbeitnow's six pages held nine in-family German
+        cards, none new; germantechjobs answers 301 on the bare host and its followed
+        feed carries no items; berlinstartupjobs returns Cloudflare's challenge; the
+        Arbeitsagentur API answers with no result envelope; Kubermatic is sales and
+        GTM only; 1KOMMA5GRAD has one Edge & Cloud role; DeliveryHero has no family
+        match; Himalayas page one is US only. Stepstone carried the yield, so the
+        card parser matters more than the aggregators.
+
+        Exit: each of the six is tailed into `prep` after 2026-12-07 with a packet,
+        or dropped with the row saying why; freenet DLS is rechecked on 2026-11-26
+        and filed only if reposted.
+      '';
+    };
     devin-lane-handoff-2026-11-24 = {
       title = "Devin lane: image-daily pool helpers landed; two uncommitted gate files; jev routes idle panes";
       kind = "handoff";

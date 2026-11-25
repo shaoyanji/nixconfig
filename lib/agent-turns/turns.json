@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-25T08:37:32Z",
+  "generated": "2026-11-25T08:49:10Z",
   "count": 200,
-  "pin": "049b9348bf557d5b75fe94d1e60eed5d3c1fae1d7cac5f23956f158ef622bc82",
+  "pin": "529bf2bf79481b0264e9f3549eab13a7874f52052ac8e2603a86104e3c11f0ec",
   "turns": [
+    {
+      "id": "74dc6625-9de0-473c-9254-2fa61bcb5771",
+      "ts": "2026-11-25T08:48:41Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25t",
+      "action": "landed: sweep 25t — Stepstone platform/SRE/infra lanes 2 pages each, 143 cards, 91 in-family, 25 new after dedupe, 9 detail reads; filed 6 leads (Luerssen, novomind, SUSS MicroTec, eddyson, PPI, SCHIFFL) on scout-2026-11-25t, parked freenet DLS on validThrough 2026-11-26; AGENTS.nix note job-scout-sweep-2026-11-25t, sheet re-exported | gate: apps:audit PASS, #agentsNotes.ok PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0678e1e5a2c3da6b2119990dbc868dc2bfba7297",
+      "branch": "main",
+      "frame": "03hato1dz60ht2nilo84bz049"
+    },
+    {
+      "id": "788fe94b-a0ac-4bca-b4c6-c7953f6be2b2",
+      "ts": "2026-11-25T08:44:56Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward",
+      "action": "drove idle panes: agents:1.1 devin verify image-daily Go port gates and fixtures (jev-decide verify-image-daily-gates p=0.99), agents:2.1 freebuff CV scout DevOps/SRE/Platform/Infrastructure leads (cv-scout-leads p=0.97), agents:3.1 delphi job-search scouting (delphi-job-search p=0.97); all three confirmed thinking after load-buffer+paste-buffer+Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0678e1e5a2c3da6b2119990dbc868dc2bfba7297",
+      "branch": "main",
+      "frame": "03hatnb2an5713pctt326mqe7"
+    },
+    {
+      "id": "fff25dec-412e-4aa9-b41b-9e7740e61897",
+      "ts": "2026-11-25T08:44:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25r",
+      "action": "claim: second sweep same day, germantechjobs tag pages + BSJ retry + Stepstone widen; upsert verified new leads, skip dupes, note validation failures",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hatn7ntgeth3qrwevzn7fue"
+    },
+    {
+      "id": "b0d7b2e4-09ee-4607-9855-871febcfcae2",
+      "ts": "2026-11-25T08:38:07Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: residual pipe sweep pass 7 — flake/*.nix: 8x filter|>length to lib.count (checks recordedCount/duplicated/duplicateRows/managedAbsent, outputs kg-count, policies ciKey+agree/totalJudged), 1x suffixHits to findFirst. modules audited: gravatar skipped (arg-free data file), epistemics/policies sites documented as not-the-class. Also fixed sibling drift: appflow-send.sh budget record | gate: checks:quick green e2e, checks:host frieren rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0678e1e5a2c3da6b2119990dbc868dc2bfba7297",
+      "branch": "main",
+      "frame": "03hatlz2qswbiiwlq66wdyijg"
+    },
     {
       "id": "2778ce8d-d561-4820-938f-74575f9ca9fe",
       "ts": "2026-11-25T08:35:24Z",
@@ -2623,58 +2677,6 @@
       "base_commit": "bb07c64be349aaa8e1660a57552165e84f0bffbd",
       "branch": "main",
       "frame": "03haqzlbj8zbf1vlbzedk446j"
-    },
-    {
-      "id": "5d40bc6b-8a1b-4dde-a517-cea67f83a277",
-      "ts": "2026-11-25T00:20:30Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "scout 2026-11-25: arbeitnow+6 ATS+personio+devjobs, 3723 postings in 10d window, 63 title matches, 31 employers already tracked; added 8 leads airbus-deutschland-gmbh-ml-data-infrastructure-engineer, cosinex-system-administrator, esqlabs-gmbh-principal-platform-engineer, sew-eurodrive-gmbh-co-kg-ciam-platform-engineer, 50hertz-transmission-gmbh-platform-engineer, k-s-akt (fit 50-85 in status, 1 merged) | gate: apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haqwrn2qy83509ebmq4mb6e"
-    },
-    {
-      "id": "2ca1354c-0142-4314-8123-cb0f3d2fc3cc",
-      "ts": "2026-11-25T00:19:53Z",
-      "source": "devji",
-      "subject": "nixconfig:ci-hygiene-cvlinks",
-      "action": "landed: pushed modules/secrets 046d717, CI hygiene+site-cv-links green | gate: gh run 45515494029 (nixcachix) + 45515494007 (pages) success",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bb07c64be349aaa8e1660a57552165e84f0bffbd",
-      "branch": "main",
-      "frame": "03haqwn8yg4l8x5jdvrn3b3qs"
-    },
-    {
-      "id": "1d5856ca-82c2-4420-9586-443c5c5618bc",
-      "ts": "2026-11-25T00:17:32Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "decided 5 scouted leads after reading each ad: packet = 21bitcoin Munich (AWS multi-account/IaC, DevSecOps, AI agents, English ad, hybrid, on-call, 75-120k; CDK/Terraform gap to state). parked = gridscale OPCP (Ceph wins the employer thread; reopen if Ceph silent by 12-12), CBTW (MLOps/LangChain + negotiation German), ProcuVia (full-stack product), Little John (Windows admin). scouted now empty, parked stage added. | gate: apps:overview parked 4/4 + 0 scouted rows without a decision",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bb07c64be349aaa8e1660a57552165e84f0bffbd",
-      "branch": "main",
-      "frame": "03haqw6tm8f66axlfv4xpnebo"
-    },
-    {
-      "id": "f08d3326-ec06-4d93-9114-ab643fb39cb0",
-      "ts": "2026-11-25T00:17:22Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "scout 2026-11-25 dated sweep: arbeitnow 3397 + 90 ATS boards 2401 postings, 3723 in the 10-day window, 48 title/location matches across 35 employers, 31 employers already tracked; added none (fit 25, merged 0 duplicate listing) | gate: apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haqw5mjbvqnvb15xri613bc"
     }
   ]
 }

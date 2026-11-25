@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T02:23:46Z",
+  "generated": "2026-11-25T02:26:47Z",
   "count": 200,
-  "pin": "ad0e8143a650d233cd5362517fd2f6c31314f485ce2ce025ec10582eeef4f3ad",
+  "pin": "309214147ccd4f9a67cb82c1e87bda28859f87a368c92fc2d8cb1e4076b0baad",
   "turns": [
+    {
+      "id": "7cb18fb8-d3c6-49f4-9c56-dd165fdb454c",
+      "ts": "2026-11-25T02:24:24Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "correction: the 2026-11-25f decision commit was rebased onto origin/main (85da6711 had moved) before it pushed, so the landed hash is bb3b732e, not 52e4e735; origin/main == HEAD now. Same content: brose to packet, majori and alten parked on expiries inside the window, scheer and uka on fit. Note job-scout-decisions-2026-11-25f | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bb3b732e3dc9db574bc1ffa37dad9b88cf529e50",
+      "branch": "main",
+      "frame": "03harkyxdxwebqw60kd5510ho"
+    },
+    {
+      "id": "99507d70-47fb-4415-b363-8dafc6da57cf",
+      "ts": "2026-11-25T02:23:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: decided the 2026-11-25f five from full stepstone JSON-LD reads at source. 1 packet: brose AWS landing zone (multi-account, IaC, FinOps, fit 66). 4 parked: majori (validThrough 2026-12-05) and alten (2026-11-29) expire inside the 2026-12-07 window — the window's first real cost — plus scheer (network-first) and uka (Microsoft-first). Note job-scout-decisions-2026-11-25f | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "52e4e73507ca23882ce5597db3fe177b17672b28",
+      "branch": "main",
+      "frame": "03harkvpl6h0h6tu9l61b4b3p"
+    },
     {
       "id": "e83b8d92-378b-4913-9575-d5f341ab016e",
       "ts": "2026-11-25T02:23:22Z",
@@ -2598,32 +2624,6 @@
       "base_commit": "18521db9d5bf6a458dd783a15bdd4a0bb657f1a3",
       "branch": "main",
       "frame": "03hap07vxnbq2qrcig7gnu5qv"
-    },
-    {
-      "id": "a9dd8c74-1882-4a49-bc66-5673ed928a7b",
-      "ts": "2026-11-24T18:22:13Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep",
-      "action": "correction: note job-scout-sre-platform-sweep-2026-11-24 amended — title and exit now say three leads, not two; Dymatrix Platform Architect joined Makersite and Catapult Sports. Earlier turn named b6ad52fd, now 18521db9 | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "18521db9d5bf6a458dd783a15bdd4a0bb657f1a3",
-      "branch": "main",
-      "frame": "03haoys0fx56571pwj6jhn6oo"
-    },
-    {
-      "id": "b1f55fe3-ff0f-4a1f-86d6-e64b47b38125",
-      "ts": "2026-11-24T18:21:37Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep",
-      "action": "landed: SRE/platform sweep — 3 fresh leads scouted: Makersite Senior SRE (remote DE, EUR 80-100k, Recruitee form), Catapult Sports Senior DevOps (Cologne, self-hosted + AWS Kubernetes, Greenhouse), Dymatrix Platform Architect (Stuttgart/Hamburg/Karlsruhe, employer form). Orbem, Enpal, n8n, Nebius, Attio, ClickHouse already on file. Note job-scout-sre-platform-sweep-2026-11-24 | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6ad52fde61b7e9b72a6f325a9a055ed61e94957",
-      "branch": "main",
-      "frame": "03haoynvcjrfe3zb0oge9csdy"
     }
   ]
 }

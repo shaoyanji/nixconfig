@@ -47,7 +47,6 @@ rec {
     "scripts/task/closure-graph-diff.sh" = 136;
     "scripts/task/closure-graph.sh" = 201;
     "scripts/task/closure-menu.sh" = 417;
-    "scripts/task/cloudinary.sh" = 170;
     "scripts/task/codespace.sh" = 257;
     "scripts/task/codespace-sync-test.sh" = 165;
     "scripts/task/cpg-loop.sh" = 352;

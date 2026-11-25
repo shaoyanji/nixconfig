@@ -4926,7 +4926,7 @@
         hosts = ["frieren"];
         modules = [
           "scripts/task/image-daily.sh"
-          "scripts/task/cloudinary.sh"
+          "tools/os/internal/image/cloudinary.go"
           "lib/image-daily/briefs.json"
           "lib/image-daily/site/index.html"
           "hosts/frieren/infra-stack.nix"
@@ -5912,37 +5912,39 @@
       '';
     };
     devin-lane-image-daily-go-port = {
-      title = "image-daily Go port: ~30 verbs live in tools/os; shell keeps only dispatch, env glue and external-tool shims";
+      title = "image-daily Go port: every external-process boundary lives in tools/os; shell keeps dispatch and env glue";
       kind = "open";
-      status = "OPEN";
+      status = "CLOSED";
       priority = "P2";
       date = "2026-11-25";
       from = ["one-os-cli" "devin-lane-handoff-2026-11-24"];
-      summary = "~30 verbs in tools/os/internal/image behind .#cli.image.daily; 23 unit tests plus a 9-assert fixture pin every gate arm; ship-detach, served, cloudinary and the ffprobe presence check are Go. Open: image-gen's cpg auth and upload_bank. stash@{0} parked. Renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
+      summary = "~30 verbs in tools/os/internal/image behind .#cli.image.daily; 28 unit tests plus a 9-assert fixture pin every gate arm. Closed with image-gen's cpg auth dance, upload_bank, batch and detach as gen/gen-batch/gen-detach; cloudinary.sh deleted — the family's last curl. stash@{0} parked. Renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
       refs = {
-        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/ship.go" "tools/os/internal/image/cloudinary.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "scripts/task/image-ship.sh" "flake/cli.nix"];
+        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/ship.go" "tools/os/internal/image/cloudinary.go" "tools/os/internal/image/imagegen.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "scripts/task/image-ship.sh" "scripts/task/image-gen.sh" "flake/cli.nix"];
         tasks = ["checks:image-daily" "checks:images:publish:test" "checks:images" "checks:images:ship:test" "images:gate"];
       };
       body = ''
-        The port's end state (verified 2026-11-24): the spend, judge and
-        publish machinery lives in tools/os/internal/image behind
-        .#cli.image.daily — a symlink onto the `os` umbrella whose argv[0]
-        dispatch selects the image domain — and image-daily-lib.sh resolves
-        the binary via IMAGE_DAILY_BIN, PATH, or a one-off `nix build`.
-        Shell keeps ~880 lines of dispatch, env resolution and shims.
+        The port's end state (verified 2026-11-25): the spend, judge,
+        publish and front-end machinery lives in tools/os/internal/image
+        behind .#cli.image.daily — a symlink onto the `os` umbrella whose
+        argv[0] dispatch selects the image domain — and image-daily-lib.sh
+        resolves the binary via IMAGE_DAILY_BIN, PATH, or a one-off
+        `nix build`. Shell keeps dispatch, env resolution and shims only;
+        cloudinary.sh is deleted with its budget line, the last curl.
 
-        Coverage 2026-11-25 (a4ae52b9 through 71169d3e, plus this slice):
-        the publish fixture is 9 assertions — every gate arm proven on
-        470c9034^ and strip mutations; 23 unit tests pin the urls.tsv
-        projection, skipReason's burn vocabulary, the ffprobe cache loop,
-        deploy_frontend's PAGES gate, ship-detach's systemd-run vector,
-        the served poll, cloudinary.go's wire contract against httptest,
-        and dimensions' die on a missing ffprobe (the wallpaper script's
-        last shell check, moved into the one place the probe runs).
+        Coverage: the publish fixture is 9 assertions — every gate arm
+        proven on 470c9034^ and strip mutations; 28 unit tests pin the
+        urls.tsv projection, skipReason's burn vocabulary, the ffprobe
+        cache loop and its missing-probe die, deploy_frontend's PAGES
+        gate, both systemd-run vectors (ship-detach, gen-detach), the
+        served poll, cloudinary.go's wire contract against httptest, and
+        genRetry's 401-refresh/429-backoff table plus the gen_once merge
+        contract under a stub cpg (bank=false keeps the session URL).
 
-        Next slice (external-process boundary still shell): image-gen.sh's
-        cpg auth dance — refresh, the 401/429 backoff, upload_bank's
-        cloudinary.sh call. That port ends the family's shell curls.
+        Ported last: image-gen.sh's cpg auth dance and upload_bank —
+        verbs gen, gen-batch, gen-detach; image-gen.sh is a shim over the
+        lib. The bank id derivation (src-relative vs wall/<day>/basename)
+        moved with it.
 
         Loose thread: stash@{0} "On main: pre-existing changes" is parked
         from an aborted concurrent-lane rebase — not mine to pop or drop.
@@ -5951,7 +5953,7 @@
         `GEMINI_API_KEY` (gen.go), `unjudgedStreak` (plates.go),
         `shrinkGuard` (briefs.go). A rename fails the gate with a
         misleading message; keep the names or update the greps in the
-        same diff. Exit: residual shims accepted as shell or ported.
+        same diff.
       '';
     };
     fleet-hygiene-tailscale-creds-stale = {
@@ -6727,34 +6729,34 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Scout 2026-11-25f: the mined pool, one Berlin systems admin, prep only.
-Sources the a-e sweeps had not used: 115 ATS slugs across Greenhouse,
-Ashby and Lever in a second batch (37 boards answered, 1,631 postings, 77
-platform-family titles), remotive, Working Nomads, Himalayas (120 of
-116k), Landing.jobs, RemoteOK, We Work Remotely, Berlin Startup Jobs'
-engineering and nine skill boards, 1KOMMA5GRAD's Personio XML (339
-positions) and only the freshest Arbeitnow page.
+        Scout 2026-11-25f: the mined pool, one Berlin systems admin, prep only.
+        Sources the a-e sweeps had not used: 115 ATS slugs across Greenhouse,
+        Ashby and Lever in a second batch (37 boards answered, 1,631 postings, 77
+        platform-family titles), remotive, Working Nomads, Himalayas (120 of
+        116k), Landing.jobs, RemoteOK, We Work Remotely, Berlin Startup Jobs'
+        engineering and nine skill boards, 1KOMMA5GRAD's Personio XML (339
+        positions) and only the freshest Arbeitnow page.
 
-The new boards were the dedupe test rather than the source: 59 of the 77
-family titles sit at employers already on record — enpal's Staff Platform
-Engineer (Berlin), Kubermatic's Senior Cloud Native Consultant (CET +-4),
-IONOS Linux administrators, Camunda SRE, ClickHouse EMEA remote, Adyen
-platform engineers, Scaleway SREs (Paris), Celonis Head of IT Platform
-(Munich). The other 18 were US, India, Australia or Costa Rica.
+        The new boards were the dedupe test rather than the source: 59 of the 77
+        family titles sit at employers already on record — enpal's Staff Platform
+        Engineer (Berlin), Kubermatic's Senior Cloud Native Consultant (CET +-4),
+        IONOS Linux administrators, Camunda SRE, ClickHouse EMEA remote, Adyen
+        platform engineers, Scaleway SREs (Paris), Celonis Head of IT Platform
+        (Munich). The other 18 were US, India, Australia or Costa Rica.
 
-German leads that cleared the ledger were refused on shape or evidence:
-DATATRONiQ is already held, Proact's presales architect and Accenture's
-1st/2nd-level support are not engineering, and Wyden's Lead Platform
-Engineer (AWS) is remote from a Zurich entity with no EU contract stated.
+        German leads that cleared the ledger were refused on shape or evidence:
+        DATATRONiQ is already held, Proact's presales architect and Accenture's
+        1st/2nd-level support are not engineering, and Wyden's Lead Platform
+        Engineer (AWS) is remote from a Zurich entity with no EU contract stated.
 
-One row: Jonas und der Wolf, (Senior) Systems Administrator, Berlin-
-Moabit, fit 82 band 4. German ad, 50-70k at 40h (30h possible):
-Linux with Docker/Portainer, Ansible, GitLab CI, Grafana/InfluxDB/
-Telegraf, Sentry, BorgBackup and WireGuard, ISO 27001, C1 German. It
-excludes customer infrastructure, so the DevOps share is support.
+        One row: Jonas und der Wolf, (Senior) Systems Administrator, Berlin-
+        Moabit, fit 82 band 4. German ad, 50-70k at 40h (30h possible):
+        Linux with Docker/Portainer, Ansible, GitLab CI, Grafana/InfluxDB/
+        Telegraf, Sentry, BorgBackup and WireGuard, ISO 27001, C1 German. It
+        excludes customer infrastructure, so the DevOps share is support.
 
-Origin scout-2026-11-25f; five rows of another turn share it. Exit:
-nothing read past the requirement block, nothing sent, held to 2026-12-07.
+        Origin scout-2026-11-25f; five rows of another turn share it. Exit:
+        nothing read past the requirement block, nothing sent, held to 2026-12-07.
       '';
     };
   };

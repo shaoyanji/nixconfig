@@ -691,3 +691,143 @@ func TestDimensionsRequiresFfprobe(t *testing.T) {
 		t.Fatalf("death should name ffprobe, got: %s", out)
 	}
 }
+
+// genRetry is gen_one's case table: a 401 buys one refresh and one retry, a
+// 429 is the burst window with 60 s per attempt and three tries out, both on
+// the one counter — anything else is a plain failure.
+func TestGenRetry(t *testing.T) {
+	cases := []struct {
+		result string
+		tries  int
+		action genAction
+		wait   int
+	}{
+		{"401 Unauthorized", 0, genRefresh, 0},
+		{"UNAUTHENTICATED", 0, genRefresh, 0},
+		{"Sign in to continue", 0, genRefresh, 0},
+		{"401 again", 1, genFail, 0},
+		{"429 Too Many", 0, genBackoff, 60},
+		{"RATE_LIMITED", 1, genBackoff, 120},
+		{"429", 2, genBackoff, 180},
+		{"429", 3, genFail, 0},
+		{"VALIDATION_FAILED: size", 0, genFail, 0},
+		{"something else broke", 0, genFail, 0},
+	}
+	for _, c := range cases {
+		action, wait := genRetry(c.result, c.tries)
+		if action != c.action || wait != c.wait {
+			t.Fatalf("genRetry(%q,%d) = (%d,%d), want (%d,%d)",
+				c.result, c.tries, action, wait, c.action, c.wait)
+		}
+	}
+}
+
+// bankRel is upload_bank's id derivation: under src/ the render banks as its
+// tree-relative path; anywhere else it joins today's wall/ folder by basename.
+func TestBankRel(t *testing.T) {
+	if got := bankRel("/root", "/root/src/wall/2026-11-25/x.png", "2026-11-25"); got != "wall/2026-11-25/x.png" {
+		t.Fatalf("src-relative rel: got %q", got)
+	}
+	if got := bankRel("/root", "/tmp/elsewhere/x.png", "2026-11-25"); got != "wall/2026-11-25/x.png" {
+		t.Fatalf("outside rel joins today's wall: got %q", got)
+	}
+}
+
+// genDetachArgs is launch_detached's vector: the unit re-runs image-gen.sh
+// with every variable the pipeline needs because a detached run inherits
+// nothing — PROMPT is the argument, not whatever the caller's env held.
+func TestGenDetachArgs(t *testing.T) {
+	t.Setenv("UPLOAD", "0")
+	got := genDetachArgs("image-gen-a-fox", "/repo", "/root", "a fox", "/root/x.png", "1024x1024", "/repo/scripts/task/image-gen.sh")
+	want := []string{
+		"--user", "--unit", "image-gen-a-fox", "--collect",
+		"--setenv=PROMPT=a fox",
+		"--setenv=OUT=/root/x.png",
+		"--setenv=SIZE=1024x1024",
+		"--setenv=IMAGES_ROOT=/root",
+		"--setenv=DETACH=0",
+		"--setenv=UPLOAD=0",
+		"--setenv=REPO=/repo",
+		"--", "bash", "/repo/scripts/task/image-gen.sh",
+	}
+	if !slices.Equal(got, want) {
+		t.Fatalf("genDetachArgs = %v, want %v", got, want)
+	}
+}
+
+// cpgStub installs a fake `cpg` on PATH: status answers authenticated,
+// refresh exits 0, image writes the -o file and prints one JSON row.
+func cpgStub(t *testing.T, imageOut string) {
+	t.Helper()
+	dir := t.TempDir()
+	stub := `#!/bin/sh
+case "$1" in
+  status) echo '{"authenticated":true}' ;;
+  refresh) exit 0 ;;
+  image)
+    while [ $# -gt 0 ]; do
+      case "$1" in -o) out=$2; shift 2 ;; *) shift ;; esac
+    done
+    printf 'x' > "$out"
+    printf '%s\n' '` + imageOut + `'
+    ;;
+esac
+`
+	if err := os.WriteFile(filepath.Join(dir, "cpg"), []byte(stub), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", dir)
+}
+
+// The whole gen_one merge under a stub cpg: the file on disk plus .url in the
+// JSON is success, UPLOAD=0 keeps .url as the session URL and reports
+// bank=false — a session-gated URL must never pass as a delivery URL.
+func TestGenOnceMerge(t *testing.T) {
+	cpgStub(t, `{"id":"i1","url":"https://session.example/r.png","size":"1536x1024","prompt":"a fox"}`)
+	t.Setenv("UPLOAD", "0")
+	out := filepath.Join(t.TempDir(), "x.png")
+	payload, err := genOnce("/repo", t.TempDir(), "1536x1024", "a fox", out)
+	if err != nil {
+		t.Fatalf("genOnce: %v", err)
+	}
+	if payload["path"] != out || payload["bank"] != false || payload["url"] != "https://session.example/r.png" {
+		t.Fatalf("merge contract broke: %v", payload)
+	}
+	if _, has := payload["session_url"]; has {
+		t.Fatalf("an unbanked render must not invent session_url: %v", payload)
+	}
+}
+
+// The batch loop: one prompt per line, comments and empty lines skipped,
+// NNN-slug.png per render, one merged JSON row per success appended to
+// index.jsonl, and the index path on stdout.
+func TestGenBatch(t *testing.T) {
+	cpgStub(t, `{"id":"i","url":"https://session.example/x.png","size":"s","prompt":"p"}`)
+	t.Setenv("UPLOAD", "0")
+	root := t.TempDir()
+	outdir := filepath.Join(root, "out")
+	prompts := filepath.Join(root, "prompts.txt")
+	if err := os.WriteFile(prompts, []byte("a fox\n# a comment\n\na second fox\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cmdGenBatch([]string{"--prompts", prompts, "--repo", "/repo", "--root", root, "--outdir", outdir})
+	rows, err := os.ReadFile(filepath.Join(outdir, "index.jsonl"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(strings.TrimRight(string(rows), "\n"), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("two prompts should index two rows, got %d: %s", len(lines), rows)
+	}
+	for _, l := range lines {
+		var m map[string]any
+		if err := json.Unmarshal([]byte(l), &m); err != nil || m["bank"] != false {
+			t.Fatalf("each index row is the merged JSON: %s (err %v)", l, err)
+		}
+	}
+	for _, want := range []string{"001-a-fox.png", "002-a-second-fox.png"} {
+		if _, err := os.Stat(filepath.Join(outdir, want)); err != nil {
+			t.Fatalf("missing batch render %s: %v", want, err)
+		}
+	}
+}

@@ -66,12 +66,14 @@
     "checks:images:ship:test" = "leaf";
     "checks:images:test" = "leaf";
     "checks:infron" = "leaf";
+    "checks:infron:test" = "leaf";
     "checks:invalidation" = "cache";
     "checks:inventory:compiled" = "leaf";
     "checks:inventory:compiled:test" = "leaf";
     "checks:kg" = "leaf";
     "checks:kg:canvas" = "leaf";
     "checks:kg:iets" = "leaf";
+    "checks:kg:test" = "leaf";
     "checks:kg:zeck" = "leaf";
     "checks:kernel:collision" = "leaf";
     "checks:kernel:collision:test" = "leaf";

@@ -60,6 +60,7 @@ tasks:
       - task: checks:prose
       - task: checks:prose:test
       - task: checks:infron
+      - task: checks:infron:test
       - task: checks:yaml:lint
       - task: checks:yaml:lint:test
       - task: checks:toon
@@ -74,6 +75,7 @@ tasks:
       - task: checks:skills:mirror
       - task: checks:skills:mirror:test
       - task: checks:kg
+      - task: checks:kg:test
       - task: checks:kernel:collision
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
       # (~3 s) for a parity experiment, and its own summary says so.
@@ -921,6 +923,30 @@ tasks:
       Exit 0 = clean.
     cmds:
       - bash scripts/task/infron-check.sh
+
+  checks:infron:test:
+    desc: "Regression fixture for checks:infron (seeded undeclared -free lane id)"
+    summary: >
+      The real mistake is on record: the persona's tokenrouter lane carried
+      `deepseek/deepseek-v4.1-flash-1017-free` — a `-free` suffix, not the
+      `:free` contract — before any declaration, and the gate refused it. It
+      never lived on a committed tree, so a worktree seeds the same shape: a
+      `-free` id with no declaration (the model-bump that drops the contract),
+      then a marker-less id. Both must refuse, id named; HEAD stays clean.
+    cmds:
+      - bash tests/infron/run.sh
+
+  checks:kg:test:
+    desc: "Regression fixture for checks:kg (mutated graph via KG_GRAPH)"
+    summary: >
+      kg-check.sh's own resolver accepts KG_GRAPH=<file> and judges that copy
+      instead of evaluating — the fixture mutates the real compiled graph into
+      each drift class the gate exists for: a one-sided rename leaves an edge
+      endpoint no node carries, and a projection that stopped reading files
+      trips the non-trivial floor. Both must refuse, check named; the real
+      graph stays clean.
+    cmds:
+      - bash tests/kg/run.sh
 
   checks:build:route:
     desc: "[gate] This host must not compile its own closure — report derivations that would build locally (EXP-107)"

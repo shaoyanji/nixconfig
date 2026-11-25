@@ -1,8 +1,136 @@
 {
-  "generated": "2026-11-25T22:26:26Z",
+  "generated": "2026-11-25T23:42:22Z",
   "count": 200,
-  "pin": "06279cb6b3988d865d3027fd22ffb3742b0c5c58572504fa0a312e50a81deb4b",
+  "pin": "0b19e22b78f6d70544e04b78e7c120c6d7dec7a103df672d0cde5c6b0cacc12d",
   "turns": [
+    {
+      "id": "9968c71b-2e42-4cd9-96b8-2368c1826e56",
+      "ts": "2026-11-25T23:35:06Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-checks-quick",
+      "action": "gate-change: checks:quick hardening routed to devin agents:1.1; task text pasted and accepted, pane thinking",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
+      "branch": "HEAD",
+      "frame": "03hayh70rgnitr334zuc8ekdh"
+    },
+    {
+      "id": "944881b4-3e44-4653-ae99-f4836eb7a1fc",
+      "ts": "2026-11-25T23:34:45Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-lane",
+      "action": "start: harden checks:quick — audit gates vs fail-on-real-mistake fixtures",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/",
+        "scripts/task/",
+        "tests/"
+      ],
+      "files": [],
+      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
+      "branch": "main",
+      "frame": "03hayh4llpycngw51sm6ebx7t"
+    },
+    {
+      "id": "920371b9-9e2e-49d5-9115-23cb77fec8d8",
+      "ts": "2026-11-25T22:55:07Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-hm-shared",
+      "action": "hm-shared fold done: commit 1a8c28dd, tree clean, synced with origin",
+      "outcome": "done",
+      "claims": [
+        "modules/global/demo.nix",
+        "lib/hm-shared.nix"
+      ],
+      "files": [],
+      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
+      "branch": "main",
+      "frame": "03hay9dwqm7ugeqn6jn2dn1ml"
+    },
+    {
+      "id": "ec5016bd-90ee-4e6e-b1a8-56fda846c6a4",
+      "ts": "2026-11-25T22:54:26Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-publish",
+      "action": "publish verified, nothing to push: six CVs hash-equal to origin/main e2e1f3d3, every anchor resolves, live bytes identical — my stale-branch build was reverted",
+      "outcome": "done",
+      "claims": [
+        "sites/matt-site"
+      ],
+      "files": [],
+      "base_commit": "e2e1f3d3",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hay992a45lmgmdqu7yi9tgc"
+    },
+    {
+      "id": "10931f3e-41bc-4afe-8011-504e187f6a2b",
+      "ts": "2026-11-25T22:48:36Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-publish",
+      "action": "publish: CVs hash-equal + anchors resolve + push",
+      "outcome": "in_progress",
+      "claims": [
+        "sites/matt-site"
+      ],
+      "files": [],
+      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
+      "branch": "main",
+      "frame": "03hay841sptcbekjfo78phiud"
+    },
+    {
+      "id": "44481e3b-b1ec-4c09-aa2b-b4ee712f821a",
+      "ts": "2026-11-25T22:38:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-dup-services",
+      "action": "delphi agents:3.1 flake-change p=0.91 m=0.86: complete migrations offloading duplicate services; working line confirmed task started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
+      "branch": "main",
+      "frame": "03hay648s4nxsrvrlppwqj64o"
+    },
+    {
+      "id": "00735d6e-3886-4cc4-a1ea-8bc293086cb7",
+      "ts": "2026-11-25T22:38:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-hm-shared",
+      "action": "devin agents:1.1 flake-change p=0.92 m=0.84: fold hmShared.dankShell into sharedModules, git add -N new lib file; Thinking spinner confirmed task started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
+      "branch": "main",
+      "frame": "03hay647erfdtffln4gbdedyi"
+    },
+    {
+      "id": "7864a8e3-05b7-4d75-93fb-7b412f8992ea",
+      "ts": "2026-11-25T22:37:57Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-refactor-2",
+      "action": "done: already landed — demo.nix uses ++ hmShared.dankShell concat; lib/hm-shared.nix tracked (add -N applied pre-commit) | gate: drv-equality 4/4 + nix:lint 332 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
+      "branch": "main",
+      "frame": "03hay6158tbwu95rbpgihmah1"
+    },
+    {
+      "id": "ff9edfcf-6a88-416f-9a22-230425783f7e",
+      "ts": "2026-11-25T22:26:43Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-refactor-2",
+      "action": "landed: HM sharedModules name-resolution single-sourced in lib/hm-shared.nix (embedded/noDE/demo sites compose their own order) | gate: checks:drv-equality 4 hosts identical + nix:lint 332 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
+      "branch": "main",
+      "frame": "03hay3u4rxfcs586ekaddocsa"
+    },
     {
       "id": "ae8ff0d1-88a5-4160-8f02-ded6ac726142",
       "ts": "2026-11-25T22:18:39Z",
@@ -2614,131 +2742,6 @@
       "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hau0s4d0xra6fxdyignr4ba"
-    },
-    {
-      "id": "8aaf058e-e5f0-461a-91e2-3a38501297d0",
-      "ts": "2026-11-25T09:52:57Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-upsert-2026-11-25",
-      "action": "claim: reconcile the 25u/25v sweep leads against the tracker, upsert only genuinely new ones",
-      "outcome": "in_progress",
-      "claims": [
-        "apps-db"
-      ],
-      "files": [],
-      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hau0la7ak7edqqy1bbiay65"
-    },
-    {
-      "id": "df797c9d-cfc1-49e9-b176-7f32d5a6199b",
-      "ts": "2026-11-25T09:40:35Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: checks:registry:compiled:test — seeded worktree fixture for knobs/registry-schema/site-assets (missing knob path, string managed, broken site JS); serial-leg drv coverage now complete | gate: checks:quick PASS + check:verify 154/154",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cf210f02a9f74cdd521ac76e33c7106ad4f29ae7",
-      "branch": "main",
-      "frame": "03haty6d79h3acg34xn6joz34"
-    },
-    {
-      "id": "2f94a442-123f-4838-a2c8-78297f0da37d",
-      "ts": "2026-11-25T09:40:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-25q-reread",
-      "action": "landed: 25q re-read filed AKDB, Sunrise Medical, SimonsVoss, Seghorn at fit 3 with letters+packets; Airbus deduped, Personio now 200 | gate: apps:audit PASS, .#agentsNotes.ok=true",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "cf210f02a9f74cdd521ac76e33c7106ad4f29ae7",
-      "branch": "main",
-      "frame": "03haty5i9oxbo7b4zp6xjdcfu"
-    },
-    {
-      "id": "9582c8b3-56ad-4e5c-b6b5-3aaff02bef00",
-      "ts": "2026-11-25T09:40:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-promote-2026-11-25",
-      "action": "correction: the previous done frame named 17e95ec1 because the commit was rejected on option order; the landed commit is 89dc6caa (AGENTS.nix note + trimmed 11-24 notes) | gate: nix eval .#agentsNotes.issues -> []",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haty4gehtrokrqgicq8siy3"
-    },
-    {
-      "id": "57b59ff1-b563-4839-9f84-7e09c5ee6d81",
-      "ts": "2026-11-25T09:39:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-promote-2026-11-25",
-      "action": "landed: AGENTS.nix note job-scout-boards-not-drained-2026-11-25 (ranked next leads, open todos, open questions); trimmed the two 11-24 job-scout notes under 30 lines | gate: nix eval .#agentsNotes.issues -> [] (agents-notes-schema not buildable on aarch64)",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haty0duiprepb8k8yzilmez"
-    },
-    {
-      "id": "a3312c0b-ce58-4841-9923-5df0aae4df33",
-      "ts": "2026-11-25T09:36:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: AGENTS.nix note promotion on delphi freebuff (note-change via jev-decide duel, 0.71/0.29)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
-      "branch": "main",
-      "frame": "03hatxcufb4owbkrj142m5phd"
-    },
-    {
-      "id": "590d68e9-7c73-4c23-b96b-e176f251442f",
-      "ts": "2026-11-25T09:36:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-lane",
-      "action": "landed: CV lead-scout task on freebuff (novel via jev-decide duel, 0.53/0.47)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
-      "branch": "main",
-      "frame": "03hatxcsw63bzuboe0h6b7hxj"
-    },
-    {
-      "id": "ab67521b-9ca3-4e48-a76d-355b820feff4",
-      "ts": "2026-11-25T09:36:22Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: gate-hardening task on devin (gate-change via jev-decide, p=0.77 margin=0.68)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
-      "branch": "main",
-      "frame": "03hatxcrdhgkbn4wnwizatas3"
-    },
-    {
-      "id": "1962e92a-ee9b-416e-ab56-000c9f93f94e",
-      "ts": "2026-11-25T09:35:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-promote-2026-11-25",
-      "action": "claim: promote the 2026-11-25u/25v delphi scouting findings into one AGENTS.nix note (todos, next leads, open questions)",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hatx87ikzhgpgbyyl9o1lab"
     }
   ]
 }

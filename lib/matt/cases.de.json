@@ -2,7 +2,7 @@
   "nixos-fleet": {
     "cv": "software",
     "title": "Eine Flotte, die ein Commit beschreibt",
-    "standfirst": "Dreizehn NixOS-Maschinen aus einem Flake. Ein Host lässt sich allein aus dem Repository neu bauen, prüfen und übergeben.",
+    "standfirst": "Fünfundzwanzig NixOS-Maschinen aus einem Flake. Ein Host lässt sich allein aus dem Repository neu bauen, prüfen und übergeben.",
     "period": "2023 — heute",
     "role": "Autor und Betreiber",
     "facts": [

@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T05:15:49Z",
+  "generated": "2026-11-25T05:17:28Z",
   "count": 200,
-  "pin": "4b8335d4c4b332d904db18b5b65ac866dbd4475d464118d609834c7654579495",
+  "pin": "7315635c60bb69d57eaeb0c01b54a18d15abdcb44e57ff456245bf837ec94515",
   "turns": [
+    {
+      "id": "ab788cce-89de-44ee-a0f9-c662c63b3c5b",
+      "ts": "2026-11-25T05:16:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-cv-freebuff",
+      "action": "landed: routed task-change (classify needs_review p=0.26 m=0.04 -> duel task-change/publish, task-change 0.9/0.80 pick top) to agents:2.1 (freebuff): continue job-scout/CV lane - scout DevOps/SRE/Platform/Infra leads, dedupe, refresh six CVs on matt.bountystash.com within checks:images; freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "468e540a23fcaa7bc2d128f3d399f3b0c92a9b22",
+      "branch": "main",
+      "frame": "03hasimyf0mxkbz98t4l4564c"
+    },
+    {
+      "id": "214a1e70-c967-4a65-bab8-9d7bc7f320f5",
+      "ts": "2026-11-25T05:16:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: routed note-change (classify needs_review p=0.76 m=0.57 -> decisive, pick top) to agents:1.1 (devin): finish devin-lane-refactoring-2026-11-25 tail - run checks:nix:comments/policies/images + checks:host, confirm flake-wiring/gate-check cleanup green; appflow 404 verify waits delphi 04:30 11-26; devin working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "468e540a23fcaa7bc2d128f3d399f3b0c92a9b22",
+      "branch": "main",
+      "frame": "03hasimwtlkmic4m0mkhq5thd"
+    },
+    {
+      "id": "593e3387-852a-4bcf-bf62-bde667ae9be5",
+      "ts": "2026-11-25T05:16:04Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: lane tail gate suite all green — comments 54/54 cites, policies PASS after recording apps-scout.sh=117 (sibling lane's unrecorded script), images 772/772 bank URLs, checks:host delphi+frieren+netbook all rc=0; note stays OPEN on the single remaining item: /api/applications + applications-discovered live re-verify after delphi 04:30 CET 2026-11-26 autoUpgrade",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "468e540a23fcaa7bc2d128f3d399f3b0c92a9b22",
+      "branch": "main",
+      "frame": "03hasii9l31hs04ivzzarshu6"
+    },
     {
       "id": "5ca84d54-8479-4619-8257-c14e2b273992",
       "ts": "2026-11-25T05:05:13Z",
@@ -2635,45 +2674,6 @@
       "base_commit": "92cb2696ece4af363067ff2f1d24270f4e452f94",
       "branch": "main",
       "frame": "03haq24vftfl4prenhnnmvgyw"
-    },
-    {
-      "id": "6bdb5eab-021d-4388-9592-9931dd2d6daf",
-      "ts": "2026-11-24T21:42:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: dispatch pass — 41 packets carry To/subject/exact body (5 addressed, 36 portal-only), 123 blocked (122 missing CV, 1 letter); 0 rows marked sent, hold to 2026-12-07 | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "92cb2696ece4af363067ff2f1d24270f4e452f94",
-      "branch": "main",
-      "frame": "03haq1xfzuf4jbvzqvj6r4jby"
-    },
-    {
-      "id": "7e3880e9-4a59-4ee2-9332-38a8ffd4f564",
-      "ts": "2026-11-24T21:38:01Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:steward-devin",
-      "action": "drove idle devin pane (agents:1.1) -> continue_feature_chain_refactor (jev duel: continue 0.84 vs apply_pending_xpl_deploy 0.16, margin 0.68, selected); refactor: next shared module optionalAttrs/null-fallback -> helper+filtered table, gate checks:hosts delphi frieren + drv-equality MODE=compare, commit+push origin/main",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
-      "branch": "main",
-      "frame": "03haq10zezugcx0px5fim6d1e"
-    },
-    {
-      "id": "02d126cd-720c-440a-b3cc-09049d2c4298",
-      "ts": "2026-11-24T21:36:47Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-tracker-curation",
-      "action": "curated: 9 employer pairs merged into one canonical row each (18 rows touched, 0 deleted, closed rows keep evidence in notes); packet rows reconciled — gridscale+maxcluster lead->prep, proxify prep->lead on a dead req, litef applyUrl -> litef.com/karriere. apps:dupes now [] (was 9). Artifacts not verified: packets build on frieren and this host has no submissions dir. | gate: agentsNotes.issues [] + docs-budget 0 + taskfile-graph 0 + pre-push PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haq0s9br8lqqun1cik0732s"
     }
   ]
 }

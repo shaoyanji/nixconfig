@@ -2,7 +2,7 @@
   "nixos-fleet": {
     "cv": "software",
     "title": "A fleet that one commit describes",
-    "standfirst": "Thirteen NixOS machines built from one flake. A host can be rebuilt, audited and handed over from the repository alone.",
+    "standfirst": "Twenty-five NixOS machines built from one flake. A host can be rebuilt, audited and handed over from the repository alone.",
     "period": "2023 — now",
     "role": "Author and operator",
     "facts": [

@@ -7,8 +7,8 @@
     "subtitle": "Go · NixOS-Flotten · Betriebsdaten · Energieinfrastruktur",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
     "status": "Offen für Senior- und Lead-Rollen",
-    "target": "Ziel: Plattform-Engineering mit Kubernetes oder OpenShift, Cloud-Plattformarbeit auf GCP oder Azure, Site Reliability oder die KI- und Rechenzentrums-Infrastruktur darunter; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
-    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Zwischen Anstellungen habe ich ein dreimonatiges PPA-Mandat für die EWE Trading abgeschlossen und eine NixOS-Flotte mit dreizehn Hosts aus einem Flake gebaut — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, ein Sentinel für Disk, Speicher und Generation-Alter — dazu lokale Sprach-, Sprech- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt. Ich suche Systemarbeit, in der Betriebsdaten vertrauenswürdig sein müssen.",
+    "target": "Ziel: DevOps-, SRE-, Plattform- und Infrastruktur-Engineering — Kubernetes oder OpenShift, Terraform und GitOps auf GCP oder Azure, Linux-Umgebungen vor Ort oder in der Cloud; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
+    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Zwischen Anstellungen habe ich ein dreimonatiges PPA-Mandat für die EWE Trading abgeschlossen und eine NixOS-Flotte mit fünfundzwanzig Hosts aus einem Flake gebaut — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, ein Sentinel für Disk, Speicher und Generation-Alter — dazu lokale Sprach-, Sprech- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt. Ich suche Systemarbeit, in der Betriebsdaten vertrauenswürdig sein müssen.",
     "contacts": [
       {
         "label": "email",
@@ -83,7 +83,7 @@
   "focus": [
     {
       "title": "Reproduzierbare Flotten",
-      "body": "Dreizehn Maschinen, ein Repository. Eine Maschine neu bauen, prüfen oder übergeben braucht einen Commit, keinen Ordner mit Installationsnotizen."
+      "body": "Fünfundzwanzig Maschinen, ein Repository. Eine Maschine neu bauen, prüfen oder übergeben braucht einen Commit, keinen Ordner mit Installationsnotizen."
     },
     {
       "title": "Go-Dienste mit begrenzter Arbeit",
@@ -96,9 +96,9 @@
   ],
   "work": [
     {
-      "title": "NixOS-Flotte über dreizehn Maschinen",
+      "title": "NixOS-Flotte über fünfundzwanzig Maschinen",
       "role": "Autor und Betreiber",
-      "description": "Ich habe dreizehn Maschinen von Installationsnotizen pro Host auf ein Repository umgestellt. Eine Maschine neu bauen, prüfen oder übergeben heißt jetzt: Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, die Zertifikate rotieren nach Zeitplan. Dieselbe Flotte betreibt selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
+      "description": "Ich habe fünfundzwanzig Maschinen von Installationsnotizen pro Host auf ein Repository umgestellt. Eine Maschine neu bauen, prüfen oder übergeben heißt jetzt: Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, die Zertifikate rotieren nach Zeitplan. Dieselbe Flotte betreibt selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
       "link": "https://github.com/shaoyanji/nixconfig",
       "caseStudy": "nixos-fleet",
       "keywords": [
@@ -264,7 +264,7 @@
   ],
   "hire": {
     "title": "Was ich suche",
-    "body": "Eine Senior- oder Lead-Rolle im Systemengineering, in der Infrastruktur, Automatisierung und Betriebsdaten zusammenkommen: Plattform-Engineering mit Kubernetes, GitOps und Infrastructure as Code, Cloud-Plattformarbeit auf GCP oder Azure, Site Reliability oder die Rechenzentrums- und KI-Infrastruktur darunter. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
+    "body": "Eine Senior- oder Lead-Rolle in DevOps, SRE, Plattform und Infrastruktur: Kubernetes mit GitOps und Infrastructure as Code, Cloud-Plattformarbeit auf GCP oder Azure oder die Linux-, Rechenzentrums- und KI-Umgebungen darunter. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
     "briefsNote": "Notizen dazu, was ich in den ersten neunzig Tagen tun würde:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS — und gewohnt, einen Dienst von Anfang bis Ende zu verantworten",

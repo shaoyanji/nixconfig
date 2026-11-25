@@ -7,8 +7,8 @@
     "subtitle": "Go · NixOS fleets · operational data · energy infrastructure",
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
     "status": "Open to senior and lead roles",
-    "target": "Target: platform engineering on Kubernetes or OpenShift, cloud platform work on GCP or Azure, site reliability, or the AI and datacenter infrastructure underneath; remote from a CET base or on site in Freiburg.",
-    "bio": "Most of my working life has gone into making operational data usable: four years of asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture and telemetry reconciliation when sensors went missing. Between roles I completed a three-month PPA engagement for EWE Trading and built a thirteen-host NixOS fleet from one flake — SSH certificate authority, per-host encrypted secrets, a sentinel watching disk, memory and generation age — alongside local language, speech and image models behind one OpenAI-compatible endpoint. I am looking for systems work where operational data has to be trusted.",
+    "target": "Target: DevOps, SRE, platform and infrastructure engineering — Kubernetes or OpenShift, Terraform and GitOps on GCP or Azure, Linux estates on-prem or in the cloud; remote from a CET base or on site in Freiburg.",
+    "bio": "Most of my working life has gone into making operational data usable: four years of asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture and telemetry reconciliation when sensors went missing. Between roles I completed a three-month PPA engagement for EWE Trading and built a twenty-five-host NixOS fleet from one flake — SSH certificate authority, per-host encrypted secrets, a sentinel watching disk, memory and generation age — alongside local language, speech and image models behind one OpenAI-compatible endpoint. I am looking for systems work where operational data has to be trusted.",
     "contacts": [
       {
         "label": "email",
@@ -83,7 +83,7 @@
   "focus": [
     {
       "title": "Reproducible fleets",
-      "body": "Thirteen machines, one repository. Rebuilding a host, auditing it or handing it to someone else takes the commit, not a folder of install notes."
+      "body": "Twenty-five machines, one repository. Rebuilding a host, auditing it or handing it to someone else takes the commit, not a folder of install notes."
     },
     {
       "title": "Go services with bounded work",
@@ -98,7 +98,7 @@
     {
       "title": "Multi-host NixOS fleet",
       "role": "Author and operator",
-      "description": "I moved thirteen machines off per-host install notes and onto one repository. Rebuilding, auditing or handing over a host is now the commit plus one command; secrets are encrypted per host and certificates rotate on a schedule. The same fleet runs self-hosted services and scheduled sync agents for job search and data sync.",
+      "description": "I moved twenty-five machines off per-host install notes and onto one repository. Rebuilding, auditing or handing over a host is now the commit plus one command; secrets are encrypted per host and certificates rotate on a schedule. The same fleet runs self-hosted services and scheduled sync agents for job search and data sync.",
       "link": "https://github.com/shaoyanji/nixconfig",
       "caseStudy": "nixos-fleet",
       "keywords": [
@@ -264,7 +264,7 @@
   ],
   "hire": {
     "title": "What I am looking for",
-    "body": "A senior or lead systems role where infrastructure, automation and operational data meet: platform engineering on Kubernetes with GitOps and infrastructure as code, cloud platform work on GCP or Azure, site reliability, or the datacenter and AI infrastructure underneath. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
+    "body": "A senior or lead systems role across DevOps, SRE, platform and infrastructure: Kubernetes with GitOps and infrastructure as code, cloud platform work on GCP or Azure, or the Linux, datacenter and AI estates underneath. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
     "briefsNote": "Notes on what I would do in the first ninety days:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS; comfortable owning a service end to end",

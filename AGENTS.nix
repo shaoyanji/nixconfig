@@ -7225,6 +7225,50 @@
       '';
     };
 
+    job-lane-scout-2026-11-25 = {
+      title = "The four lanes were already on the ledger; the site now says them the way the ads do";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Reading the ledger for the four lanes returns 78 live leads — platform 26, devops 24, infrastructure 20, sre 8 — with devops carrying most fit-5 rows and no employer holding two live rows. The site and every CV now name those lanes and the stack the ads lead with, and the published fleet count is twenty-five, not thirteen.";
+      from = ["job-cv-refresh-2026-11-25"];
+      refs = {
+        modules = ["lib/matt-site.nix"];
+        tasks = ["matt:build" "apps:scout" "checks:images"];
+        docs = ["docs/cv-ats-compliance.md" ".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Read, not re-swept. The 25r network pass was already claimed in the turn log by another
+        lane, so this turn asked the ledger instead of the boards: family and status ride on the
+        row, which makes the lane set queryable without touching a feed twice.
+
+        What the ledger says: 78 rows with a live lead status across the four families — platform
+        26, devops 24, infrastructure 20, sre 8. At fit 5 devops carries eight against platform's
+        three, so DevOps is where the ads and this profile already agree. Kubernetes, Linux,
+        Azure, Terraform and GitOps are the asks that recur in the role strings.
+
+        Dedupe: every employer with more than one row is already settled — the superseded row says
+        Duplicate, Merged or Closed and names the survivor — so the live set has no employer twice,
+        and nothing was merged here. No row was filed from a listing alone.
+
+        What changed, both locales in step: the target line every CV prints names DevOps, SRE,
+        platform and infrastructure with Kubernetes or OpenShift, Terraform and GitOps on GCP or
+        Azure, Linux estates on-prem or in the cloud; the hire section says the same in prose. The
+        published fleet count moved from thirteen to twenty-five, the NixOS count in the
+        inventory, and the stale figure sat in seven files at once — site, cases, project and both
+        CV records.
+
+        The lead list stayed out. Counts and lane shape are what this note carries; no company name
+        reaches a page, because a public target page listing who is hiring is a list of who you are
+        writing to.
+
+        Gate: nix build .#sites.matt-site — six CVs at 2/2/1/1/1 pages against their budgets and
+        cv-ats-check green on all six; task checks:images — 772 rows, 772 assets, same paths and
+        bank URLs. Publishing is not in this turn: matt:deploy:prod is the destructive step, and
+        agents:cv:publish-check is the gate that runs after it.
+      '';
+    };
     job-cv-refresh-2026-11-25 = {
       title = "The search target moved to the lanes the ledger actually shows";
       kind = "decision";

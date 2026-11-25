@@ -6144,6 +6144,48 @@
         after their dates and filed only if reposted.
       '';
     };
+    job-scout-sweep-2026-11-25q-supplement-2 = {
+      title = "Sweep 25q re-read: Personio answers 200, Airbus deduped, four fit-3 rows";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Same-day re-read of the six 25q boards once Personio answered 200: 88 in-family rows against 1,081 held names, 32 unheld and almost all Mittelstand. Airbus deduped against the held house. Four fit-3 rows filed, four packets built, no newcomer clears fit 4.";
+      links = ["job-scout-sweep-2026-11-25q-supplement" "job-scout-sweep-2026-11-25u"];
+      refs = {
+        modules = ["scripts/task/apps-scout.sh" "scripts/task/appflow-packet.sh" "taskfiles/apps.yml"];
+        tasks = ["apps:scout" "apps:scout:sweep" "apps:scout:parked"];
+      };
+      body = ''
+        Boards, as they answered: gtj 586 items, WWR 79, RemoteOK 101, Ashby 9
+        Kubermatic and 56 Camunda, BSJ 12, and Personio 1KOMMA5GRAD 200 with 2.4 MB
+        of XML — the 401 from the earlier 25q read did not repeat.
+
+        88 in-family rows against 1,081 held names left 32 unheld, and almost all of
+        them were Mittelstand: Mitarbeiter IT-Infrastruktur, Systemadministrator,
+        Citrix, Netzwerk. Nine had a platform or cloud title; the best of those, E
+        Airbus Defence and Space IT Operations & Cloud Platform Specialist (70-100k),
+        is the house the ledger already holds as Airbus Deutschland GmbH, so
+        house-token dedupe dropped it instead of opening a second thread.
+
+        Filed on scout-2026-11-25q, all fit 3: AKDB Senior IT-Systemarchitekt
+        Infrastruktur & Cloud (45-74k, Munich), Sunrise Medical IT Infrastructure
+        Specialist (65-75k, Malsch), SimonsVoss IT Infrastructure Operations Lead
+        (39-76k) and Seghorn Teamleitung IT-Infrastruktur (60-75k, Hamburg).
+
+        Why 3 and not 4: three are Microsoft-estate operations roles where the CV's
+        centre is Linux, storage and declarative provisioning, and two ask for
+        leadership held so far by direction rather than by title. No row clears 4.
+
+        Letters ran 301-318 words, each in the ad's own vocabulary and each naming
+        its gaps in the third paragraph. Only Sunrise publishes an application
+        address (candidate@sunrisemedical.de); the other three are portal-only, so
+        their next action is a submission, not a send.
+
+        Exit: send Sunrise after 2026-12-07, portal-submit the other three on the
+        same date, and re-read gtj only for DevOps- or SRE-titled ads.
+      '';
+    };
     job-scout-sweep-2026-11-25q-supplement = {
       title = "Sweep 25q supplement: four packets from six boards, and gtj is not a platform board";
       kind = "open";

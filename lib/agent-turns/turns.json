@@ -1,8 +1,122 @@
 {
-  "generated": "2026-11-25T09:26:20Z",
+  "generated": "2026-11-25T09:40:22Z",
   "count": 200,
-  "pin": "231095335f981ec4d7d17b912774b697777e7ed696b5b8c9c360a49f8728ff34",
+  "pin": "4e8e7909adf659786f6630f51efa2b852032e9f2aadf50b350144dfb73f2556f",
   "turns": [
+    {
+      "id": "9582c8b3-56ad-4e5c-b6b5-3aaff02bef00",
+      "ts": "2026-11-25T09:40:19Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-promote-2026-11-25",
+      "action": "correction: the previous done frame named 17e95ec1 because the commit was rejected on option order; the landed commit is 89dc6caa (AGENTS.nix note + trimmed 11-24 notes) | gate: nix eval .#agentsNotes.issues -> []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haty4gehtrokrqgicq8siy3"
+    },
+    {
+      "id": "57b59ff1-b563-4839-9f84-7e09c5ee6d81",
+      "ts": "2026-11-25T09:39:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-promote-2026-11-25",
+      "action": "landed: AGENTS.nix note job-scout-boards-not-drained-2026-11-25 (ranked next leads, open todos, open questions); trimmed the two 11-24 job-scout notes under 30 lines | gate: nix eval .#agentsNotes.issues -> [] (agents-notes-schema not buildable on aarch64)",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haty0duiprepb8k8yzilmez"
+    },
+    {
+      "id": "a3312c0b-ce58-4841-9923-5df0aae4df33",
+      "ts": "2026-11-25T09:36:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: AGENTS.nix note promotion on delphi freebuff (note-change via jev-decide duel, 0.71/0.29)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
+      "branch": "main",
+      "frame": "03hatxcufb4owbkrj142m5phd"
+    },
+    {
+      "id": "590d68e9-7c73-4c23-b96b-e176f251442f",
+      "ts": "2026-11-25T09:36:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-lane",
+      "action": "landed: CV lead-scout task on freebuff (novel via jev-decide duel, 0.53/0.47)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
+      "branch": "main",
+      "frame": "03hatxcsw63bzuboe0h6b7hxj"
+    },
+    {
+      "id": "ab67521b-9ca3-4e48-a76d-355b820feff4",
+      "ts": "2026-11-25T09:36:22Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: gate-hardening task on devin (gate-change via jev-decide, p=0.77 margin=0.68)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
+      "branch": "main",
+      "frame": "03hatxcrdhgkbn4wnwizatas3"
+    },
+    {
+      "id": "1962e92a-ee9b-416e-ab56-000c9f93f94e",
+      "ts": "2026-11-25T09:35:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-promote-2026-11-25",
+      "action": "claim: promote the 2026-11-25u/25v delphi scouting findings into one AGENTS.nix note (todos, next leads, open questions)",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hatx87ikzhgpgbyyl9o1lab"
+    },
+    {
+      "id": "6dcd48d1-a24d-4fb7-85e4-649a99a3a6b8",
+      "ts": "2026-11-25T09:35:10Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "start: gate-hardening pass — re-audit checks:quick leaf coverage post-inventory-compiled, add next seeded fixture",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/",
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
+      "branch": "main",
+      "frame": "03hatx4baeaa9gy20qag86d2m"
+    },
+    {
+      "id": "d97e195a-df2e-465e-8cb6-8e405f358ede",
+      "ts": "2026-11-25T09:26:31Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: checks:inventory:compiled:test — seeded worktree fixture (is_nix contradiction on burgernas + phantom nixos row) refuses schema/coverage drift; last unfixedtured checks:quick leaf closed | gate: checks:quick PASS + check:verify 152/152",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
+      "branch": "main",
+      "frame": "03hatvfgog2cuqgeo4m88e8tf"
+    },
     {
       "id": "005a5895-b3c0-4255-95f6-e40f1d92b28e",
       "ts": "2026-11-25T09:25:08Z",
@@ -2573,110 +2687,6 @@
       "base_commit": "41802a713c1962a8c5e9f2e82c5a90c1a1a1fe99",
       "branch": "main",
       "frame": "03harb3fgk0q32uizvw1wqgnq"
-    },
-    {
-      "id": "f95a2408-76f7-442e-9ff4-cd601cdc72af",
-      "ts": "2026-11-25T01:29:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: ten 2026-11-25c leads read in full from each page's JobPosting JSON-LD (the rendered arbeitnow page times out; curl works). Packet: Oxoia, Baden, German — device fleet, IaC, coding agents. Nine parks: seven on place (Paris, London, Nantes, UK sites, 60-80% on site), two on skill. Note job-scout-lane-2026-11-25d: German ad or EU-remote before a read. Nothing sent, hold 2026-12-07 | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41802a713c1962a8c5e9f2e82c5a90c1a1a1fe99",
-      "branch": "main",
-      "frame": "03hara9ftoog228u4545zymzf"
-    },
-    {
-      "id": "20c96c91-bddd-409b-ad30-3c910658ab45",
-      "ts": "2026-11-25T01:24:40Z",
-      "source": "devji",
-      "subject": "nixconfig:note-image-daily-port",
-      "action": "landed: extended note devin-lane-image-daily-go-port — 13 unit tests + 9-assert fixture recorded, ffprobe shape-cache loop + deploy_frontend PAGES gate pinned under test, open curl/detach slices named, stash@{0} parked for operator | gate: agents-notes-schema PASS (issues [])",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7bfb39d320fe5667950089f0b1ad194d94d7cee5",
-      "branch": "main",
-      "frame": "03har9ava42ccmot8gp4y4vg0"
-    },
-    {
-      "id": "12307cc3-2c36-411f-8625-771dbdf6d5c1",
-      "ts": "2026-11-25T01:23:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "drove idle freebuff (agents:2.1) with 2026-11-25d lane-note task for the ten 2026-11-25c leads — classify needs_review (novel p=0.34 m=0.07) then duel needs_review note-change p=0.76 m=0.52 (margin >= 0.3, decisive, top by margin); working 15s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "30435eafab9f2122dbd7697fb9a10ca63f2f9d73",
-      "branch": "main",
-      "frame": "03har94g5borbyl0cv0qyt0se"
-    },
-    {
-      "id": "eb48c8c6-7b76-4f5c-b638-79b9c2ee8f3e",
-      "ts": "2026-11-25T01:23:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "drove idle devin (agents:1.1) with image-daily port note task — classify needs_review (note-change p=0.34 m=0.06) then duel selected note-change p=0.92 m=0.84 exit 0; Running tools 4s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "30435eafab9f2122dbd7697fb9a10ca63f2f9d73",
-      "branch": "main",
-      "frame": "03har94emn1znrv9fdcx8dqu6"
-    },
-    {
-      "id": "bfe45f8b-d4d2-4490-96f8-6086caa40044",
-      "ts": "2026-11-25T01:20:23Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correction: the 2026-11-25c sweep commit was pushed after a rebase (remote main moved); real landing is 9ee5a02c with note job-scout-sweep-2026-11-25c, 10 rows at scouted / fit 4-3, nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03har8gpmx5h7is3ajflvspcm"
-    },
-    {
-      "id": "b84c103f-9993-461e-a339-5f88acc47226",
-      "ts": "2026-11-25T01:20:05Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: 2026-11-25c sweep - 10 new employers filed at scouted (origin scout-2026-11-25c, fit 4/3 banded via FIT_MAP, upsert no 500); dedupe vs 920 held names, ATS+arbeitnow 94 matches; note job-scout-sweep-2026-11-25c; nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03har8eobrzxe4y5ket29lo69"
-    },
-    {
-      "id": "b03dcb01-d4e7-486b-bce0-748feb552acd",
-      "ts": "2026-11-25T01:15:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "drove idle delphi (agents:3.1 ssh remote freebuff) with sweep 2026-11-25c scout task — classify needs_review (task-change p=0.41 m=0.07) then duel selected task-change p=0.88 m=0.76 exit 0; working 9s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6916f4c73db14f75ebc7182a7e10bc006f0c3333",
-      "branch": "HEAD",
-      "frame": "03har7l0mnld477w344mdjs2z"
-    },
-    {
-      "id": "84a3ab56-5aa1-4267-9b0f-2c25b84a7497",
-      "ts": "2026-11-25T01:15:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "drove idle devin (agents:1.1) with deploy_frontend port-slice task — classify needs_review (task-change p=0.47 m=0.11) then duel task-change p=0.79 m=0.58 decisive; Thinking spinner confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6916f4c73db14f75ebc7182a7e10bc006f0c3333",
-      "branch": "HEAD",
-      "frame": "03har7k91xfi3p16mni3gpyxe"
     }
   ]
 }

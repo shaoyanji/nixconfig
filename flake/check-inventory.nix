@@ -112,6 +112,8 @@
     "checks:quick" = "leaf";
     "checks:quotient-hash" = "leaf";
     "checks:rebuild" = "leaf";
+    "checks:registry:compiled" = "leaf";
+    "checks:registry:compiled:test" = "leaf";
     "checks:remotes" = "leaf";
     "checks:repo:blobs" = "leaf";
     "checks:repo:hostpaths" = "leaf";

@@ -82,6 +82,7 @@ tasks:
       - task: checks:counts
       - task: checks:counts:test
       - task: checks:inventory:compiled:test
+      - task: checks:registry:compiled:test
       - task: checks:nix:lint
       - task: checks:nix:lint:test
       - task: checks:nix:style
@@ -991,6 +992,37 @@ tasks:
       check out the secrets gitlink, and these drvs force nothing in it.
     cmds:
       - bash tests/inventory-compiled/run.sh
+
+  checks:registry:compiled:
+    desc: "The compiled registries agree with the tree: modules.toml knobs, lib/registry-schema, site JS"
+    summary: >
+      The remaining serial-leg drvs of `checks:quick` under one handle:
+      `knobs` — every modules.toml entry names a real file, a real inventory
+      host, and a matching total; `registry-schema` — knob paths stay inside
+      the recorded roots, option leaves are kebab, no port is claimed twice,
+      `managed` is a boolean, and every .sops.yaml anchor is referenced;
+      `site-assets` — the three site JS files pass `node --check`. Eval-only,
+      a few seconds each.
+      {{.SYSTEM}} is the host's flake system because the checks live per-system
+      and the task must answer on darwin too.
+    vars:
+      SYSTEM:
+        sh: nix eval --impure --raw --expr builtins.currentSystem
+    cmds:
+      - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.knobs .?submodules=1#checks.{{.SYSTEM}}.registry-schema .?submodules=1#checks.{{.SYSTEM}}.site-assets
+
+  checks:registry:compiled:test:
+    desc: "Regression fixture for the registry drvs: seeded missing knob path, string managed, broken site JS"
+    summary: >
+      `tests/registry-compiled/run.sh` worktrees HEAD and seeds one drift
+      class per drv: a modules.toml knob `path` that names no file must fail
+      `knobs` naming the id, a non-boolean `managed` must fail
+      `registry-schema` naming the host, and a syntax error in
+      `lib/site/aki.js` must fail `site-assets` naming the file. HEAD builds
+      all three. No `?submodules=1` — a worktree does not check out the
+      secrets gitlink, and these drvs force nothing in it.
+    cmds:
+      - bash tests/registry-compiled/run.sh
 
   checks:counts:
     desc: "[gate] Every hand-typed count matches its compiled source"

@@ -306,5 +306,6 @@ command_allowlist:
   - execute_code
   - script execution via -e/-c flag
   - script execution via heredoc
+  - shell command via -c/-lc flag
 memory:
   write_approval: true

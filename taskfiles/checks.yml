@@ -21,14 +21,13 @@ tasks:
     summary: >
       Bounded repo hygiene — "is the repo internally consistent", not "does host
       X evaluate": compiled inventory, task graph, knowledge graph and sidecar
-      parity, skill task-mirrors, nix lint, sops drift, wrapper PATH, modules.toml. The
-      one host attr forced is `checks:kernel:collision`'s `boot.kernelPackages`
-      merge per host (~35 s serial); a full eval is `checks:host HOST=<h>`.
+      parity, skill task-mirrors, nix lint, sops drift, wrapper PATH, modules.toml. One
+      host attr is forced — `checks:kernel:collision`'s `boot.kernelPackages`
+      merge (~14 s at -P4); a full eval is `checks:host HOST=<h>`.
 
       Not `nix flake check`: 23 configs, 6078 MiB, SIGKILL 137 here. Shape:
-      parallel `deps`, one serial flake eval, then the timing gate `entry` —
-      ~80 s total on frieren since kernel:collision joined the deps.
-      Exit 0 = clean.
+      parallel `deps`, one serial flake eval, then `entry` — ~50–80 s on
+      frieren (the tail is builds/sops, not the sweep). Exit 0 = clean.
     vars:
       # These checks are per-system and the flake has them for aarch64-linux too,
       # but the attribute was pinned to x86_64-linux — so on delphi (aarch64, the
@@ -497,9 +496,9 @@ tasks:
       one base-node line: `mkOverride 1500` tied the option default and broke
       every baseline host (eisen, to 2026-10-19); raspberry-pi/3's `mkDefault`
       hit an earlier baseline for minyx — AGENTS.nix#dormant-host-gates. The
-      fix is `mkOverride 1200`. One host per oom-guard'd nix process, ~35 s
-      serial. 0 clean, 1 collision (names both files), 2 cannot tell;
-      `:test` fails on `45dde4c9^`.
+      fix is `mkOverride 1200`. oom-guard'd per host, -P4 over a warmed flake
+      source, ~14 s. 0 clean, 1 collision, 2 cannot tell; `:test` fails on
+      `45dde4c9^`.
     cmds:
       - bash scripts/task/kernel-collision-check.sh
 

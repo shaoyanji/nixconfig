@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T06:08:54Z",
+  "generated": "2026-11-25T06:23:54Z",
   "count": 200,
-  "pin": "3044cb5175e964c37d254b6fc6bff7cb53a96341531e7b4d7c2884b88b6a3fd9",
+  "pin": "19a44b7ec0f3ef535c91e0b0bb528179354c512f7167ee04511a956df40303ea",
   "turns": [
+    {
+      "id": "bd52fbb2-001f-4c27-bff5-3bc55d2282b2",
+      "ts": "2026-11-25T06:19:05Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: routed idle devin (agents:1.1) — jev-decide classify (typesafe) exit 0: perf p0.97 m0.95; task = parallelize the checks:quick kernel-collision sweep via xargs -P4 (serial sweep raised the gate ~22s→~80s), keep oom-guard semantics, verify checks:quick green + check:verify 137/137 + checks:tasks clean + fixture refuses 45dde4c9^; commit + push to origin/main",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f743ad67e83150a2272238a01fbcbd524049345d",
+      "branch": "main",
+      "frame": "03hasutkn8wqdcuau9o99562z"
+    },
+    {
+      "id": "e5e8760a-c650-4894-a18c-4b1b87917a86",
+      "ts": "2026-11-25T06:09:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-mail-2026-11-25",
+      "action": "landed: 25p verified at 11 rows / 0 inserted (no attention-sweep artifact; parked four are policy-not-rows) and two applied rows closed on mail evidence — Canonical six we-regret notices, Adyen not-to-move-forward — note job-mail-attention-2026-11-25 on 16d758c1 | gate: nix-instantiate --parse OK + .#agentsNotes.issues additive-free PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16d758c1660eec8835cd8cca88c11ec62ce4a2de",
+      "branch": "HEAD",
+      "frame": "03hast0prh9ka2dieuv070bkf"
+    },
+    {
+      "id": "87012949-c8b2-4030-8c96-9dbc4e71e415",
+      "ts": "2026-11-25T06:09:09Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: checks:kernel:collision leaf gate — sweeps 25 nixosConfigurations' boot.kernelPackages merge serially under oom-guard; fixture refuses 45dde4c9^ (eisen COLLIDE names both files, minyx clean — flags ties, not weaker defs); wired into checks:quick deps + leaf rows, quick summary updated | gate: checks:quick green incl. new dep, check:verify 137/137, checks:tasks clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f743ad67e83150a2272238a01fbcbd524049345d",
+      "branch": "main",
+      "frame": "03hassvgp65mau1cd74zd2k9j"
+    },
     {
       "id": "f10df0f3-0b0d-4f40-b1b6-148c890186d7",
       "ts": "2026-11-25T06:06:19Z",
@@ -2635,47 +2674,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haqhi4zhlf8imx2140l45gr"
-    },
-    {
-      "id": "3f859568-b82c-4696-89f8-ccd5a8f7dc70",
-      "ts": "2026-11-24T22:57:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: HiSolutions AG prep packet — JD replaced with the employer's own ad text (remotive scrape dropped), CV curated from the German corpus (fleet, CI gate, sentinel, Go service; nixconfig, bountystash, Swirl, kev-time), German Anschreiben written, row hisolutions-ag-senior-kubernetes-expert-devops-engineer now prep with both PDF URLs; HITS.nrw lane note committed DELIVERED | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "330a1b4fc79032b1d21e38ec941cd5a5e5dd9e04",
-      "branch": "main",
-      "frame": "03haqginkk4s4i7sxw66eu3g8"
-    },
-    {
-      "id": "43ca2b7d-2795-4398-9c87-103969fb32d6",
-      "ts": "2026-11-24T22:56:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-tracker",
-      "action": "landed: scout pass — 5 new leads (Interhyp, Dynatrace, BAWAG, Haspa Next, blackshark.ai); tracker-only change, no repo commit | gate: apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haqget9orz06hlzww0z7qi7"
-    },
-    {
-      "id": "ef5a24ff-cb59-4430-b287-b5fc563bdfe4",
-      "ts": "2026-11-24T22:55:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-tracker",
-      "action": "claim: scout pass — gate candidates, add verified new leads",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi:applications"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haqg4f56r6wzqx5k0x2k0f8"
     }
   ]
 }

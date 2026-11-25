@@ -921,7 +921,7 @@
       priority = "P4";
       date = "2026-11-25";
       from = ["dormant-host-gates"];
-      summary = "New leaf gate sweeps every nixosConfiguration's boot.kernelPackages merge (~35 s serial, one host per oom-guard'd nix process). The tied-definition class that broke minyx and eisen now fails checks:quick; the fixture proves the gate refuses 45dde4c9^ — eisen COLLIDEs, minyx stays clean.";
+      summary = "New leaf gate sweeps every nixosConfiguration's boot.kernelPackages merge (~14 s at xargs -P4 over a warmed flake source, one host per oom-guard'd nix process). The tied-definition class that broke minyx and eisen now fails checks:quick; the fixture proves the gate refuses 45dde4c9^ — eisen COLLIDEs, minyx stays clean.";
       refs = {
         hosts = ["minyx" "eisen"];
         modules = ["scripts/task/kernel-collision-check.sh" "tests/kernel-collision/run.sh" "modules/profiles/base-node.nix" "flake/check-inventory.nix"];
@@ -937,15 +937,17 @@
         sits strictly between and survives both directions.
 
         The gate forces `kernelPackages.kernel.version` per host — the
-        merge itself, ~1.3 s each, serial under oom-guard; a preserved
-        host's unrelated eval break is a warning, an active one is
-        cannot-tell. Exits 0/1/2 per the scripted-checks convention.
-        `REV=`/`HOSTS=` envs serve the fixture: at `45dde4c9^` eisen
-        COLLIDEs naming kernel.nix and base-node.nix while minyx stays
-        clean — `mkDefault` wins outright, so the gate flags ties, not
-        weaker definitions. checks:quick's summary was updated honestly:
-        it is the first dep to force a nixosConfiguration attribute, and
-        the suite floor moved to it (~80 s measured on frieren).
+        merge itself, ~1.3 s each, `xargs -P4` over a warmed flake source
+        (~14 s; without the warm eval the 25 git+file fetches serialize on
+        the store and parallelism gains nothing). A preserved host's
+        unrelated eval break is a warning, an active one is cannot-tell.
+        Exits 0/1/2 per the scripted-checks convention. `REV=`/`HOSTS=`
+        envs serve the fixture: at `45dde4c9^` eisen COLLIDEs naming
+        kernel.nix and base-node.nix while minyx stays clean — `mkDefault`
+        wins outright, so the gate flags ties, not weaker definitions.
+        checks:quick's summary was updated honestly: it is the first dep
+        to force a nixosConfiguration attribute; ~50–80 s measured on
+        frieren (the tail is build/sops/site work, not this gate).
 
         Exit: gate live in checks:quick, `check:leaf
         NAME=checks:kernel:collision` resolves, check:verify 137/137,

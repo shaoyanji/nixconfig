@@ -6098,6 +6098,37 @@
         intact, counts.total 270, issues [].
       '';
     };
+    lib-pipe-sweep-closed = {
+      title = "The |> refactor sweep is closed: every foldable class is folded or a documented non-class";
+      kind = "decision";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-sorton"];
+      summary = "Thirteen passes audited lib/, flake/, modules/ and hosts/: catAttrs both spellings, count, findFirst, concatMapStringsSep, strings.replicate, concatMap, mapAttrsToList, attrValues, sortOn. What remains is either a documented non-class or a combinator nixpkgs does not ship (filterMap, lib.sum, a descending sortOn). hosts/ has zero sort calls; modules/ one scalar identity. Loop stops here.";
+      refs = {
+        modules = ["lib/agents-notes.nix" "flake/epistemics.nix" "modules/profiles/service-exposure.nix" "modules/services/service-portal.nix"];
+        tasks = ["checks:drv-equality" "checks:quick" "checks:nix:style"];
+      };
+      body = ''
+        The audit floor, so no future pass retries it: `map f |> filter (x !=
+        null)` is canonical (no `lib.filterMap` on the pin); `map
+        (nameValuePair n v) |> listToAttrs` cannot be genAttrs (fn gets the
+        name only); `foldl'` is the canonical field-sum (no `lib.sum`);
+        `split |> head` is a different idiom; descending `>` comparators have
+        no sortOn; `a < b` on scalars has nothing to project; `filter |>
+        map` with the filter as gate stays two steps.
+        The lone modules/ comparator — service-exposure `portsOf` sorting
+        port ints `a < b` — is scalar identity, refused.
+        Evidence trail: drv-equality 30/30 identical on every refactor
+        commit (314c6e95, f7ebdb87+0678e1e5, 3f214204, c3986055,
+        7ad46d58, 83df611b, 8350ac74); checks:host frieren rc=0 where a
+        module was touched; checks:quick green on HEAD. `nix flake check`
+        remains memory-gated off on this host — the equivalents stand.
+        Next value in this lane is a different class: toString chains,
+        mkIf/optionalAttrs idioms, or non-pipe patterns.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

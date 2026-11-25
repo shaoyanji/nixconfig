@@ -44,7 +44,7 @@
     inherit hostInventory;
   };
   hostInventory = import ./host-inventory.nix {
-    inherit inputs;
+    inherit lib inputs inventory;
     moduleFiles = nixRegistry.modules;
   };
   # Fleet-wide gates (per-host eval checks + the all-in-one aggregate). One binding

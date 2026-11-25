@@ -7303,7 +7303,7 @@
       '';
     };
 
-    job-scout-sweep-2026-11-25q = {
+    job-scout-sweep-2026-11-25q-parallel = {
       title = "The 2026-11-25q sweep: a third flat feed, eight rows of my own, and the pane lane's three under the same cycle";
       kind = "decision";
       status = "ACCEPTED";

@@ -1,8 +1,25 @@
 {
-  "generated": "2026-11-25T04:07:38Z",
+  "generated": "2026-11-25T04:14:02Z",
   "count": 200,
-  "pin": "5d06c0dae0acb672143719515d14c5a59b2ac5b41cd7a46f86d0b01d214e91fe",
+  "pin": "8675433048c2330cc4a33d706dbd1b58c1eb1f7b5768a92abb0b2ed1e5d2d10d",
   "turns": [
+    {
+      "id": "beb7e2ce-d54e-4c7b-9590-b5ee02f4c5dc",
+      "ts": "2026-11-25T04:08:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed (corrects prior turn): my note is job-scout-sweep-2026-11-25o, not n — the pane lane owns n and landed first, and two notes on one id left main unparseable for one commit. Pushed tree parses, ids distinct. Substance unchanged: gtj www 301s to apex, sha cf313395 (flat by hash), Stepstone 6 queries/140 cards/96 unheld/30 ads read, 7 rows at scouted, GMX held on United Internet, 11 parked on validThrough | gate: agents-notes-schema PASS, issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "7ddea410709573c9016820c127487e32760101f3",
+      "branch": "main",
+      "frame": "03has57pdg365kmtwzhfti1th"
+    },
     {
       "id": "d863735c-bd3a-40c6-81d6-ffb0b21a2508",
       "ts": "2026-11-25T04:07:01Z",
@@ -2646,19 +2663,6 @@
       "base_commit": "118315676e142447181668d2c55a744157d9143d",
       "branch": "main",
       "frame": "03hapjutnorcbk8zrn611smoo"
-    },
-    {
-      "id": "04a21250-3d46-4182-b4ee-8e11a7071c0e",
-      "ts": "2026-11-24T20:06:20Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "verify: DeepL packet content is send-ready — 1pp letter, 2pp CV, addressee DeepL / Sovereign Markets — Platform team / Munich remote, subject Staff SRE Sovereign Cloud, three gaps named. .typ re-render matches stored PDFs byte-for-byte on text. Blockers: no submit channel (arbeitnow CAPTCHA form, no ATS, no recruiter mail) and the 22 Nov date needs re-rendering at send. Nothing sent. | gate: typst re-render clean + apps:get stage=prep PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hapj45ki5la4huufj9lip5m"
     }
   ]
 }

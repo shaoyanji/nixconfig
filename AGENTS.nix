@@ -6006,6 +6006,48 @@
         after it, then this note closes.
       '';
     };
+    shared-worktree-commit-race = {
+      title = "One checkout, many lanes: git commit records the index, not the author's intent";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      from = ["devin-lane-refactoring-2026-11-25"];
+      summary = "Three hits in one lane on the same day: a sibling's uncommitted note swept into an amend, a transient worktree deletion of 13 appflow .sql files nearly shipping a wrong diagnosis, and origin/main moving between commit and push. Proposed rule: one git worktree per agent lane, never add -A in a shared tree.";
+      refs = {
+        modules = ["AGENTS.nix" "scripts/task/xs-turn-post.sh"];
+        tasks = ["agents:xs:list" "agents:xs:post"];
+        docs = ["docs/agent-turns.md"];
+      };
+      body = ''
+        The mechanism is one sentence: `git commit` records the INDEX, not
+        the author's intent, so in a shared checkout every lane's staged
+        and unstaged state sits inside the blast radius. Three hits in one
+        lane on 2026-11-25:
+
+        1. `git add -A` before an amend swept the sibling's uncommitted
+           `job-scout-sweep-2026-11-25j` note into my commit; they committed
+           it themselves as 92c0f6dd — same content committed twice, once
+           under the wrong message.
+        2. A transient worktree deletion of 13 appflow .sql files (present
+           in HEAD, absent from the tree) almost shipped a "missing
+           endpoint" diagnosis; the live cause was the deployed tree's
+           `endpointsDir`, not the repo.
+        3. A sweep note landed mid-turn twice, moving origin/main between
+           commit and push — every commit this lane made needed a rebase.
+
+        The earlier cousin: a sibling `git commit` recorded my staged Go
+        port under their message (content correct, attribution theirs).
+
+        Proposed rule — worktree per lane: `git worktree add` one checkout
+        per agent lane and let xs CLAIMS name the lane's tree path, not
+        just files. In a tree that is not exclusively yours: stage named
+        paths only, never `add -A`/`commit -a`, and treat `git stash` as
+        stashing somebody else's work. Exit: the rule is written into the
+        agent contract (HOME-PREAMBLE or xs-turns) and the shared-tree
+        incident count for the next lane is zero.
+      '';
+    };
     fleet-hygiene-tailscale-creds-stale = {
       title = "Both stored tailscale credentials are dead — mint fresh auth material";
       date = "2026-11-24";

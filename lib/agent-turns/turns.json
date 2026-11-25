@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T03:06:31Z",
+  "generated": "2026-11-25T03:11:25Z",
   "count": 200,
-  "pin": "38de78919a2f88957564506e03735566d10bd13e0b537148e012a9074085747b",
+  "pin": "ebf9bcc752b2718ed8a4788ac2d94bccc34d9e1c4b8500154e2725d8acabc284",
   "turns": [
+    {
+      "id": "030feb3b-50bf-4957-955e-0c5ccaf734f9",
+      "ts": "2026-11-25T03:06:41Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: sweep 2026-11-25g read at source — 5 packets built (porsche, enrichment, signal-iduna, netcologne, ra-radiology): 1-page German letter + 2-page CV in each ad's order, gaps in the letter; 3 rows without packet (fonds-finanz and vonovia skipped on Azure architect depth, psi-grid duplicate of psi-software-se-devops-engineer-m-w-d). Nothing sent; held to 2026-12-07 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a71a0c8d70de66f584ab62e717ef0aac3137f59",
+      "branch": "main",
+      "frame": "03hart89pqxagxfj4tih0wmts"
+    },
+    {
+      "id": "34af628a-0345-40b9-aca7-d04a83578fe9",
+      "ts": "2026-11-25T03:06:39Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "landed: drove idle devin (agents:1.1) with the nix-comment-audit tail sweep — jev-decide classify (typesafe) exit 0: prose-change 0.88, margin 0.83; pointer-form pass on hosts/netbook/configuration.nix (176), flake/outputs.nix (155), modules/user/ai/hermes-user.nix (141); nix-comments.sh + checks:policies gate, note CLOSED or residual recorded, commit + push to origin/main",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a71a0c8d70de66f584ab62e717ef0aac3137f59",
+      "branch": "main",
+      "frame": "03hart851c5gs19xcevbzaofo"
+    },
     {
       "id": "c52abacf-6769-404d-9bbc-75807620b6d5",
       "ts": "2026-11-25T02:55:44Z",
@@ -2602,32 +2628,6 @@
       "base_commit": "c9f09993d561a65dadea76d9c764e96bb974011f",
       "branch": "main",
       "frame": "03hap4wwvv0lwbw1xzkv29u5q"
-    },
-    {
-      "id": "293580c7-44a5-4a6d-849c-45d95717147d",
-      "ts": "2026-11-24T18:52:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correct: ca0eb847 supersedes 316fc5f0 and 499fc469 — the commit carries AGENTS.nix plus the repo's regenerated turns.json (every prior lane commit does, f9d9ee1e included), and apps:dupes is pre-existing, never empty: auteega, Catapult, DHBW, Hochschul-IT, ICF, Shipzero, SourceQ — none of the three new rows is a dupe | gate: nix-instantiate --parse PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ca0eb847ee535b8ccaafae8b18fcfe0b8aae2d39",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap4m6379swh3wtyq85bfr9"
-    },
-    {
-      "id": "c2b5b3c9-e310-456f-8398-530e6529470e",
-      "ts": "2026-11-24T18:50:57Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correct: commit rewritten locally as 316fc5f0 (unpushed) to drop a pre-staged lib/agent-turns/turns.json churn — the sweep commit is AGENTS.nix only, note job-scout-linkedin-direct-2026-11-24; three leads CloudFactory 4, SCHUFA 3, Markant 3 at lead to 2026-12-07; Telekom MMS refused | gate: nix-instantiate --parse PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "316fc5f0aa5cd767f325e8c0e7591bb0c598c859",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap4e1tyekk7x6sl7f4umh4"
     }
   ]
 }

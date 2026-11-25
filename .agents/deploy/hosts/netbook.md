@@ -41,6 +41,25 @@ Nothing here proves `linuxPackages_latest`; the comment that blamed "newer kerne
 predates the measurement. If nixpkgs drops the LTS line, boot-test that with the same
 staged procedure, not by deploying straight across.
 
+## `pti=off` black-panels this machine
+
+A 2026-10-22 boot-params pass tried `pti=off` as a free-speed knob (the Celeron
+N3060 pays for page-table isolation in CPU it does not have). Two generations
+carried it — 60 and 62 — and both came back unusable: black panel, no serial
+console, no journal to read. Generation 61, identical minus the param, booted
+fine, so the param is what is out — not the kernel, not the initrd question
+above.
+
+What "unusable" means is unproven: nobody watched a failing boot, so the verdict
+is correlation, not a mechanism. A re-test needs someone at the screen — boot a
+scratch generation, write down what the console says, then decide. The dormant
+candidates beside it in `boot.kernelParams` (`fsck.mode=skip`, `nomodeset`,
+`console=tty1`, `quiet`/`loglevel=3`) were never enabled and are not implicated.
+
+Baseline for the re-test on the proven kernel: 3000 fork+exec calls = 22.7 s
+(7.6 ms each). If `pti=off` cannot beat that by a margin a kitchen laptop can
+feel, the panel risk is not worth paying.
+
 ## Deploy
 
 ```bash

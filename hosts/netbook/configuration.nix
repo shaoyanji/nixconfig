@@ -1,6 +1,6 @@
-# Alice's travel netbook — fleet nixpkgs, LTS kernel (newer initrds could not
-# mount this eMMC root), no global chain, deployed by push. Rationale and the
-# boot test: `.agents/deploy/hosts/netbook.md`.
+# Alice's travel netbook — fleet nixpkgs, scripted stage-1 (systemd-initrd
+# never reached stage-2 on this eMMC), no global chain, deployed by push.
+# Rationale and the boot test: `.agents/deploy/hosts/netbook.md`.
 {
   self,
   lib,
@@ -163,15 +163,15 @@ in {
   # 12.1 s instead of 0.3 s. Same total, less predictable.
 
   boot.kernelParams = [
-    # pti=off was tried here on 2026-10-22 (gens 60 and 62) and both boots came
-    # back unusable while gen 61 booted fine, so it is out until someone watches
-    # a boot with it and can say what actually failed. Baseline for a re-test on
-    # the proven kernel: 3000 fork+exec = 22.7 s (7.6 ms each).
+    # pti=off was tried here on 2026-10-22 (gens 60 and 62): both boots came
+    # back unusable, gen 61 without it was fine — out until a watched boot says
+    # what failed (Story: .agents/deploy/hosts/netbook.md §"`pti=off`
+    # black-panels this machine"; the re-test baseline lives there). The rest of
+    # the block is dormant candidates from the same pass, never enabled.
     # "fsck.mode=skip"
     # "nomodeset"
     # "console=tty1"
     # "quiet" "loglevel=3"
-    # Home: .agents/deploy/hosts/netbook.md §"`pti=off` black-panels this machine".
   ];
   boot.kernel.sysctl = {
     "vm.swappiness" = 100;
@@ -231,14 +231,13 @@ in {
   };
   # `settings.Journal` is the new spelling; this host's nixpkgs pin predates it.
   services.journald.extraConfig = "SystemMaxUse=50M";
-  # LTS, not latest: the newest kernel (`linuxPackages_latest`) could not mount
-  # the f2fs root on this eMMC — the failure that pinned the whole host to 25.11.
+  # `pkgs.linuxPackages` follows the fleet nixpkgs, it is not a pinned LTS: the
+  # fatal boot failure was the initrd implementation, never the kernel (Story:
+  # .agents/deploy/hosts/netbook.md §"What is pinned, and what is not").
   boot.kernelPackages = pkgs.linuxPackages;
-  # NixOS 26.11 defaults `boot.initrd.systemd.enable` to TRUE, so following the
-  # fleet nixpkgs silently swapped the scripted busybox stage-1 this box has
-  # booted for a year for systemd-initrd. Generation 50 (systemd-initrd +
-  # 6.18.56) produced no journal entry at all: it never reached stage-2. The
-  # scripted stage-1 is the variant generation 49 proves on this hardware.
+  # Scripted stage-1, not the systemd-initrd NixOS 26.11 defaults to: gen 50 on
+  # 6.18.56 + systemd-initrd wrote no journal at all — it never reached stage-2,
+  # and gen 49 proves the scripted variant on this hardware (Story: same section).
   boot.initrd.systemd.enable = false;
 
   zramSwap = {

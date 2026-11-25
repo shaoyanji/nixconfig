@@ -2964,46 +2964,40 @@
     nix-comment-audit = {
       title = "Prose in .nix files: categorize, then route each kind to its channel";
       kind = "open";
-      status = "OPEN";
+      status = "CLOSED";
       priority = "P3";
-      date = "2026-10-21";
-      summary = "4169 comment lines sit in tracked .nix files (AGENTS.nix excluded); qmd already retrieves them, so the fix is pruning narrative, not adding an index. Every Story:/Trap:/Fact: pointer in the heavy files now resolves — the port map is docs/delphi-runtime.md's mount table.";
+      date = "2026-11-25";
+      summary = "4169→7259 comment lines in tracked .nix files (AGENTS.nix excluded) swept to pointer form: every Story:/Trap:/Fact: resolves, and the two dangling cites (port map, pti=off) got real homes in docs/. Residual mass is inline explanation, the accepted end state.";
       refs = {
-        hosts = ["delphi" "frieren"];
-        modules = ["hosts/delphi/configuration.nix" "hosts/frieren/configuration.nix" "hosts/frieren/infra-stack.nix" "lib/aki-site.nix"];
+        hosts = ["delphi" "frieren" "netbook"];
+        modules = ["hosts/delphi/configuration.nix" "hosts/frieren/configuration.nix" "hosts/frieren/infra-stack.nix" "lib/aki-site.nix" "hosts/netbook/configuration.nix" "flake/outputs.nix" "modules/user/ai/hermes-user.nix"];
         tasks = ["dev:qmd:refresh"];
-        docs = ["docs/delphi-runtime.md" ".agents/deploy/hosts/frieren.md"];
+        docs = ["docs/delphi-runtime.md" ".agents/deploy/hosts/frieren.md" ".agents/deploy/hosts/netbook.md"];
       };
       body = ''
         **The goal is routing, not deletion.** A comment is not slop because it
         is long; it is out of place when its kind belongs to another channel.
-        Deleting it loses the reasoning that made a fix correct, which is the
-        expensive thing to reconstruct.
+        Deleting it loses the reasoning that made a fix correct.
 
-        **Categories, and the channel that owns each.** A *policy or trap*
-        ("80/443 belong to nginx", "a resolver must not resolve through the
-        address it serves") goes to `flake/policies.nix` as a predicate, or to
-        an option assertion; discovery is `checks.policies` failing a build. A
-        *fleet fact* (addresses, roles, hardware) goes to `inventory.toml`, read
-        with `task dev:inventory:feed`. A *why/history* narrative goes to an
-        AGENTS.nix note, found with `ops:notes:search`. A *procedure* becomes a
-        task (`taskfiles/*.yml`) or a `writeShellApplication`; the prose keeps a
-        pointer. A *durable explanation* goes to `docs/`, served by the site.
+        **Categories, and the channel that owns each.** Policy/trap →
+        `flake/policies.nix` predicate or an option assertion; fleet fact →
+        `inventory.toml` (`dev:inventory:feed`); why/history → an AGENTS.nix
+        note; procedure → `taskfiles/*.yml` or `writeShellApplication`; durable
+        explanation → `docs/` (prose keeps a pointer).
 
-        **Measured** 2026-10-21 at 4169 lines (delphi, frieren, aki-site,
-        eisen's llm-server, checks.nix heaviest); 7014 by 2026-11-23, when
-        61a1f1ba took the boilerplate and a banner pass routed durable-why.
+        **Measured** 4169 comment lines 2026-10-21; 7014 by 2026-11-23 when
+        61a1f1ba pruned boilerplate and banners routed durable-why.
 
         **Cite sweep 2026-11-25**: every `Story:`/`Trap:`/`Fact:` pointer in
-        the heavy files resolves. `Fact: port map` was dangling — the mount
-        table in `docs/delphi-runtime.md` is it now; infra-stack's uncited
-        blocks moved to its deploy doc and `image-daily-queue`. Residual
-        mass is inline explanation, the accepted end state.
+        the five heavy files resolves; `Fact: port map` was dangling — the
+        mount table in `docs/delphi-runtime.md` is it now, and infra-stack's
+        uncited blocks moved to its deploy doc + `image-daily-queue`.
 
-        **Discovery is already solved** — qmd indexes the .nix tree; probe
-        with one distinctive token. **Pipeline rule, enforced:**
-        `channels-have-a-task` — inventory → `dev:inventory:feed`, notes →
-        `ops:notes`, policies → `checks:policies`, docs → `docs:build`.
+        **Tail sweep, same day** (netbook, outputs.nix, hermes-user): already
+        pointer-form. One dangling cite — netbook's `§"pti=off"…` — got its
+        section in the deploy doc; the stale "newest kernel" claim beside it
+        was corrected to the measured initrd story. Gates: nix-comments rc=0
+        (519 pointers, all task cites resolve), checks:policies PASS. CLOSED.
       '';
     };
     open-minyx-2611 = {

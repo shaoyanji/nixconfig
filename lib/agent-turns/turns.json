@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-25T08:14:11Z",
+  "generated": "2026-11-25T08:37:32Z",
   "count": 200,
-  "pin": "996cafafcc4f7137d3c5b7e687469f76dbecf9d399f83da75735d595f6b358f4",
+  "pin": "049b9348bf557d5b75fe94d1e60eed5d3c1fae1d7cac5f23956f158ef622bc82",
   "turns": [
+    {
+      "id": "2778ce8d-d561-4820-938f-74575f9ca9fe",
+      "ts": "2026-11-25T08:35:24Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25q",
+      "action": "done: 5-board sweep. Stepstone only source with new cards (germantechjobs feed byte-identical to 25p; BSJ 200 shell; WWR/RemoteOK nothing usable). 71 Stepstone role rows -> 46 dup, 25 new; 10 filed at lead origin scout-2026-11-25q; 4 blocked by ledger (Telekom MMS group live, Testo rejected, Interhyp/PSI lead); recruiters + consultancies excluded. gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hatlfyzhldx52do3t7kyz9o"
+    },
+    {
+      "id": "f9a1fec7-e2de-43ac-a72d-5e9d0d03a058",
+      "ts": "2026-11-25T08:34:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "routed flake-change refactor task into devin pane agents:1.1; pane accepted (Thinking spinner)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "314c6e955f9687add1e7cfc602bc808d668aee8f",
+      "branch": "main",
+      "frame": "03hatl72z83qk7f5pisdxg1xn"
+    },
+    {
+      "id": "dbe5b79d-fe59-4b5c-a340-e8c1bf821fea",
+      "ts": "2026-11-25T08:14:35Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: lib |> sweep pass 6 — residual classes: 2x filter|>length to lib.count (docs aliasCount, inventory count), 2x filter|>head to lib.findFirst with named throw (matt-site contactHref, quotient-hash fibIndex). Deliberately skipped: split|>head, filterAttrs|>attrNames, map|>unique. Loop effectively dry — remaining sites are renames not refinements | gate: drv-equality 30/30 identical, quotient-hash green, checks:host frieren rc=0, agentsNotes.issues=[]",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "314c6e955f9687add1e7cfc602bc808d668aee8f",
+      "branch": "main",
+      "frame": "03hathdnicaxdw9l9ssxuh5w1"
+    },
     {
       "id": "f8f54502-293d-4bcd-96e0-ce4919487c67",
       "ts": "2026-11-25T08:12:37Z",
@@ -2634,48 +2675,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haqw5mjbvqnvb15xri613bc"
-    },
-    {
-      "id": "82a545ba-88af-429e-8108-f84cfd85fcca",
-      "ts": "2026-11-25T00:16:48Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: routed delphi pane (agents:3.1, ssh remote freebuff) to a fresh DevOps/SRE/Platform/Infra employer-lead sweep — Arbeitnow + career pages, 10-day window, dedupe vs appflow, new leads stage=scouted with fit + next action, one-line sweep summary at the end | gate: jev-decide duel task-change 0.89 (margin 0.78); fresh working counter (15s) confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8ca74cf22e2570bead6304e66d29c3c775ca63a",
-      "branch": "main",
-      "frame": "03haqw1lf8p970fusi7sugsow"
-    },
-    {
-      "id": "060aa47b-e27b-46b4-9021-a693ed89959f",
-      "ts": "2026-11-25T00:16:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: routed freebuff pane (agents:2.1) to work the 5 scouted-lead next actions — read each ad, confirm stack/vendor/on-call/location, packet-or-park, apps:update rows (gridscale OPCP-vs-Ceph explicit), decide-and-record no sends, deadline 2026-11-28 | gate: jev-decide duel task-change 0.90 (margin 0.80); fresh working counter (20s) confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8ca74cf22e2570bead6304e66d29c3c775ca63a",
-      "branch": "main",
-      "frame": "03haqw1jto6328vkk7fnr4na2"
-    },
-    {
-      "id": "2c1eebdf-32c8-4b5f-a27f-bf34a8aa2640",
-      "ts": "2026-11-25T00:16:44Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "claim: reading the 5 scouted ads (arbeitnow API + stored JD) and deciding packet-or-park per lead; records only, no packets, no sends",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "modules/plugins/appflow/sync.py"
-      ],
-      "files": [],
-      "base_commit": "e8ca74cf22e2570bead6304e66d29c3c775ca63a",
-      "branch": "main",
-      "frame": "03haqw15ly7fukfyn1k7qucg4"
     }
   ]
 }

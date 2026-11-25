@@ -7,6 +7,7 @@
   hostInventory,
   ...
 }: let
+  hmShared = import self.nixFiles.lib."hm-shared.nix" {inherit self inputs;};
   # The container's own HM imports, declared next to its `features`/`modules`
   # in flake/host-inventory.nix — an edit to one container's user role lands on
   # that host only. `networking.hostName` resolves on every NixOS container;
@@ -35,12 +36,12 @@ in {
       home.homeDirectory = user.home;
     };
     sharedModules = [
-      self.modules."global.hm-user"
-      inputs.sops-nix.homeManagerModules.sops
-      inputs.kickstart-nixvim.homeManagerModules.default
-      inputs.nix-index-database.homeModules.nix-index
+      hmShared.hmUser
+      hmShared.sops
+      hmShared.nixvim
+      hmShared.nixIndex
       # Per-host ~/AGENTS.md from `.#homeAgents.<host>`.
-      self.modules."user.ai.home-agents"
+      hmShared.homeAgents
     ];
     extraSpecialArgs = {
       inherit inputs self;

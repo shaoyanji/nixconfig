@@ -23,6 +23,7 @@ in
     # Leaf lists for user.base/user.ai, resolved the same way as hmModules.
     hmBase = hostField "hmBase" (import self.modules."global.user").hmBaseFeatures;
     hmAi = hostField "hmAi" (import self.modules."global.user").hmAiFeatures;
+    hmShared = import self.nixFiles.lib."hm-shared.nix" {inherit self inputs;};
   in {
     home-manager = {
       useGlobalPkgs = true;
@@ -34,16 +35,17 @@ in
         home.homeDirectory = userHome;
         home.stateVersion = config.system.stateVersion;
       };
-      sharedModules = [
-        self.modules."global.hm-user"
-        inputs.kickstart-nixvim.homeManagerModules.default
-        inputs.nix-index-database.homeModules.nix-index
-        inputs.niri.homeModules.niri
-        inputs.dms.homeModules.dank-material-shell
-        inputs.dms.homeModules.niri
-        # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (user "user").
-        self.modules."user.ai.home-agents"
-      ];
+      sharedModules =
+        [
+          hmShared.hmUser
+          hmShared.nixvim
+          hmShared.nixIndex
+        ]
+        ++ hmShared.dankShell
+        ++ [
+          # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (user "user").
+          hmShared.homeAgents
+        ];
       extraSpecialArgs = {
         inherit inputs self;
         hostName = config.networking.hostName;

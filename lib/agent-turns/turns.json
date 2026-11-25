@@ -1,8 +1,257 @@
 {
-  "generated": "2026-11-25T21:31:24Z",
+  "generated": "2026-11-25T22:26:26Z",
   "count": 200,
-  "pin": "f68d1023e0d62633d71c67679b9ac6c3cf7dc4080904ff0c579ee31764b4e004",
+  "pin": "06279cb6b3988d865d3027fd22ffb3742b0c5c58572504fa0a312e50a81deb4b",
   "turns": [
+    {
+      "id": "ae8ff0d1-88a5-4160-8f02-ded6ac726142",
+      "ts": "2026-11-25T22:18:39Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-cv-prep",
+      "action": "note-change: CV packets prep for Stepstone rows, no send (hold) - nine rows at prep; apps:dupes and apps:sent still red; job data stays in private state, never the repo",
+      "outcome": "in_progress",
+      "claims": [
+        "nixconfig:job-scout-fresh-tailor"
+      ],
+      "files": [],
+      "base_commit": "97d0ae05",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hay29e5gay82qvt6mibnyu7"
+    },
+    {
+      "id": "a6c1b37c-b981-40c9-98fa-bb7ce0a34ef0",
+      "ts": "2026-11-25T22:17:35Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-refactor-2",
+      "action": "start: survey duplicated imports across modules/",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/"
+      ],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03hay21yk0uqnxnbo65ilq8ng"
+    },
+    {
+      "id": "ea28327b-d0ec-4958-9869-6bdf461193f3",
+      "ts": "2026-11-25T22:16:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-cv-prep",
+      "action": "note-change: CV packets prep for Stepstone rows, no send (hold)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03hay1wruhq2rxcaikhji8gpp"
+    },
+    {
+      "id": "3b28c2ae-592e-424b-814e-1362879ee25d",
+      "ts": "2026-11-25T22:16:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-refactor-2",
+      "action": "chain-change: consolidate duplicated feature-chain imports in modules/",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03hay1wqawa4n4nwa2xtfhahp"
+    },
+    {
+      "id": "1f8fc156-7e41-4eb2-ba00-152234698ea5",
+      "ts": "2026-11-25T22:08:58Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-scope-trap",
+      "action": "brief accepted (jev p=0.99 m=0.98, agents:3.1): scope-trap bug-fix written and verified in scripts/task/hermes-check.sh — user-unit scope named on every line, FAIL when the unit exists only at system scope; 18+/3-, uncommitted",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/hermes-check.sh"
+      ],
+      "files": [
+        "scripts/task/hermes-check.sh"
+      ],
+      "base_commit": "97d0ae05",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hay0dd9ri41hbc6ecv8gqfi"
+    },
+    {
+      "id": "035c7d9e-4d60-4714-b086-94ae2fc609bf",
+      "ts": "2026-11-25T22:08:07Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-scope-trap",
+      "action": "drove delphi agents:3.1 scope-trap bug-fix p=0.99 m=0.98",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03hay07df7o31rbsskm6p5d3s"
+    },
+    {
+      "id": "2fd23a62-3781-467e-a873-4f010897e294",
+      "ts": "2026-11-25T21:57:15Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-inventory-audit",
+      "action": "landed: inventory audit at e8c7865a (unchanged since run) — kind/system 30/30 single-sourced from inventory.toml (0 literals left, minyx aarch64), 0 globalModules aliases, feature-chains-only composition | gate: drv-equality 30/30 identical, nix:lint 331 clean — no drift remains",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxy2zkodwicobwrbhkaa1n"
+    },
+    {
+      "id": "82214445-027d-47a0-a81f-0ce01eb14ea8",
+      "ts": "2026-11-25T21:56:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-scope-trap",
+      "action": "drive delphi: gateway scope-trap (bug-fix)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxxxjsom1uz6181ja3dqkx"
+    },
+    {
+      "id": "efa6c9e6-6745-44b2-a5cf-789d912f4a25",
+      "ts": "2026-11-25T21:56:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-inventory-audit",
+      "action": "drive devin: inventory audit (flake-change)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/",
+        "inventory.toml",
+        "flake.nix"
+      ],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxxxiphrc11eokola7kph1"
+    },
+    {
+      "id": "84aa3dfa-be41-424f-99c0-466fb7ed8d52",
+      "ts": "2026-11-25T21:51:53Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "audit at e8c7865a: kind/system 30/30 single-sourced (0 literals, minyx aarch64), 0 globalModules aliases, lint 331 clean, drv-equality 30/30 — no drift remains",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxx16t64g4uolr7wh9s6z9"
+    },
+    {
+      "id": "deb4228a-9b2c-487b-a1a3-11a9061c765a",
+      "ts": "2026-11-25T21:50:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-incident",
+      "action": "incident closed: hermes-check.sh now resolves hermes-gateway at --user scope, names the scope in every line, and FAILS when the unit is loaded only at SYSTEM scope; a same-name system unit raises a NOTE. Proved with a systemctl stub: A user-running+system-unit -> ok+NOTE, B system-only -> rc=1 FAIL, C no unit -> rc=0 skip. Live run rc=0, surface clean, gateway active/running NRestarts=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "scripts/task/hermes-check.sh"
+      ],
+      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haxwsygkib9luu517z678wv"
+    },
+    {
+      "id": "c2e18b0e-7eef-4292-926e-3de204d684bc",
+      "ts": "2026-11-25T21:48:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-scope-trap",
+      "action": "drive delphi: gateway scope-trap fix (bug-fix)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai"
+      ],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxwgnv8r95z5xpo9xragcd"
+    },
+    {
+      "id": "25568b41-1030-449a-9342-c2fe05d541af",
+      "ts": "2026-11-25T21:48:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-inventory-audit",
+      "action": "drive devin: nixconfig inventory audit (flake-change)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/",
+        "inventory.toml",
+        "flake.nix"
+      ],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxwgnbssrbrpfaowiddvjp"
+    },
+    {
+      "id": "0d4e4f5c-08b7-4cdc-b170-16ccab6d8262",
+      "ts": "2026-11-25T21:34:30Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-incident",
+      "action": "incident: re-verified delphi gateway + xs endpoint on-site; followups: check steward mirror, fix scope trap (user-unit scope probe), record incident; no commit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxtmwptw15ih8r9mad51qt"
+    },
+    {
+      "id": "06eb541b-3eb7-47cf-960d-cd4da0228a32",
+      "ts": "2026-11-25T21:33:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-incident",
+      "action": "incident: re-check — gateway active/running NRestarts=0, hermes-check rc=0, xs 401 unauth / 200 authed, listeners 127.0.0.1:8093 100.123.145.53%tailscale0:8449 [fd7a:115c:a1e0::d230:9136]%tailscale0:8449",
+      "outcome": "done",
+      "claims": [
+        "modules/user/ai",
+        "scripts/task/xs-turn-post.sh"
+      ],
+      "files": [],
+      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haxte48bjmnphtna6qscko1"
+    },
+    {
+      "id": "5d01e4cc-1c10-48bc-9407-b09ae07a2834",
+      "ts": "2026-11-25T21:33:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-incident",
+      "action": "incident: re-check",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai",
+        "scripts/task/xs-turn-post.sh"
+      ],
+      "files": [],
+      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haxtd9qwczu5w9cwo92hy5d"
+    },
+    {
+      "id": "28adf7e1-d6c2-424b-a5b9-0b5089c85dcc",
+      "ts": "2026-11-25T21:31:37Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-flake-change",
+      "action": "landed: kind/system single-sourced from inventory.toml via mapAttrs — 60 stale literals deleted, minyx x86_64 bug found+fixed by construction (30/30 agree, minyx aarch64) | gate: drv-equality 30/30 identical, nix:lint 331 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
+      "branch": "main",
+      "frame": "03haxt2ovv0sif4e0y0akoj6k"
+    },
     {
       "id": "b8deabec-391f-45bb-9fa0-f405bdc0250a",
       "ts": "2026-11-25T21:30:37Z",
@@ -2490,233 +2739,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hatx87ikzhgpgbyyl9o1lab"
-    },
-    {
-      "id": "6dcd48d1-a24d-4fb7-85e4-649a99a3a6b8",
-      "ts": "2026-11-25T09:35:10Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "start: gate-hardening pass — re-audit checks:quick leaf coverage post-inventory-compiled, add next seeded fixture",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/",
-        "taskfiles/checks.yml",
-        "flake/check-inventory.nix"
-      ],
-      "files": [],
-      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
-      "branch": "main",
-      "frame": "03hatx4baeaa9gy20qag86d2m"
-    },
-    {
-      "id": "d97e195a-df2e-465e-8cb6-8e405f358ede",
-      "ts": "2026-11-25T09:26:31Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: checks:inventory:compiled:test — seeded worktree fixture (is_nix contradiction on burgernas + phantom nixos row) refuses schema/coverage drift; last unfixedtured checks:quick leaf closed | gate: checks:quick PASS + check:verify 152/152",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bea5006357f64e084c69bfc300da709473054fb5",
-      "branch": "main",
-      "frame": "03hatvfgog2cuqgeo4m88e8tf"
-    },
-    {
-      "id": "005a5895-b3c0-4255-95f6-e40f1d92b28e",
-      "ts": "2026-11-25T09:25:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25v",
-      "action": "done: board sweep germantechjobs/WWR/RemoteOK/Stepstone(22 metro pages)/BSJ -> 1838 raw, 182 role rows, 122 ledger dups, 26 blocked (17 agency, 8 consultancy, 1 in-sweep), 16 filed (15 + Funk after name-filter false positive), 1 validation failure (Advantest feed stub, no employer URL); ranked by GitHub org activity + posting freshness into ~/.local/state/appflow/outreach/2026-11-25/ranked-25v.md. gate: apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hatv5nrrmhl4oabnpsu87we"
-    },
-    {
-      "id": "9ce3fc70-8b07-430a-9e6e-eb8cac593e40",
-      "ts": "2026-11-25T09:22:19Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: drive agents:1.1 devin lane — gate-change: continue nixconfig gate hardening, run checks:quick + check:verify, add seeded-tree fixture for next leaf gate lacking one, re-run gates, commit with gate evidence",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3f21420483974b1a849f136eeccd249081f9a099",
-      "branch": "main",
-      "frame": "03hatum2xp0v7lzsjhs9heczi"
-    },
-    {
-      "id": "547855ab-7f39-4421-9f75-f2f664c0283c",
-      "ts": "2026-11-25T09:17:30Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: lib |> pass 9 — the audit floor. 1 real fold (nix-registry concatLists-of-map to builtins.concatMap); the rest is documented non-classes: lib.filterMap is a phantom in nixpkgs (5 sites reverted), genAttrs cant recover element values, no lib.sum, netbook genList maps a lambda. Loop exhausted in lib/, flake/, modules/ | gate: nix-registry+registry-schema drvs build",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3f21420483974b1a849f136eeccd249081f9a099",
-      "branch": "main",
-      "frame": "03hatto0psh8v8688pbrq6f5y"
-    },
-    {
-      "id": "22795506-a027-4873-9bd1-5cfd898aa54a",
-      "ts": "2026-11-25T09:16:49Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25v",
-      "action": "claim: board sweep germantechjobs, WWR, RemoteOK, Stepstone, BSJ; verify, dedupe vs ledger, upsert fresh leads, rank by GitHub activity + live posting",
-      "outcome": "in_progress",
-      "claims": [
-        "/tmp/25v"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hattj8q2v5uaaf9d97jyfj2"
-    },
-    {
-      "id": "ec157d45-04fe-47d5-90eb-441f25ffec56",
-      "ts": "2026-11-25T09:13:53Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25q-supplement",
-      "action": "landed: 25q supplement — 6 boards (gtj 586, WWR 79, RemoteOK 101, Ashby 65, BSJ 12, Personio 401), 842 rows, 147 in-family, 89 not held; 4 filed (GWDG fit 4, RockQ 3, WWK 2, alphacaps 2) and 4 packets built with per-app letters + JDs; note landed, sheet re-exported | gate: apps:audit PASS, #agentsNotes.ok PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2c36e25bb690af804bc5e2141a2191b1aaa393a3",
-      "branch": "main",
-      "frame": "03hatsyo67lpxugqfwsbartci"
-    },
-    {
-      "id": "d66e1a85-cf69-471e-a34f-daf6a8fe52af",
-      "ts": "2026-11-25T09:09:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-drive-2026-11-25",
-      "action": "Drove idle freebuff agents:2.1 with job-scout/CV sweep task sweep id 2026-11-25q; agent confirmed working... 12s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "661a07458e0b669f3b9ff696b144d7476d50b26b",
-      "branch": "main",
-      "frame": "03hats5u6ssykdj9m3snfj97e"
-    },
-    {
-      "id": "d12839f6-65e8-4de5-9bc5-299c1259b29e",
-      "ts": "2026-11-25T09:06:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25u",
-      "action": "done: 25o replies checked (3 rows, 0 linked mail, 0 from gematik/ELAC/dive, no stage change). ATS sweep: SmartRecruiters keyword search 24 queries (1050 global devops hits), Ashby 17 orgs 581 jobs, Personio 4 boards 345 positions -> 67 role+geo rows, 38 ledger dups, 26 blocked (SAP role already lead, Devoteam consultancy, PostHog US-only/404); 1 filed (Thalia, Münster, lead). 3 held outreach drafts written + next actions set; no sends before 2026-12-07. gate: apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hatrflb8plo0f4tdlwfa9r8"
-    },
-    {
-      "id": "c80a5e6b-8de7-4c2f-9cdb-e78e81e03f02",
-      "ts": "2026-11-25T09:05:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25u",
-      "action": "landed: sweep 25u — devops p1-3 + 3 lanes p3-4, 216 cards, 165 in-family, 86 not held, 16 detail reads; 10 leads filed on scout-2026-11-25u (Ascent, Bijou, EOS, LivEye, Paychex, TÜV NORD, S-Management/DSV, POLIPOL, moysies, Diehl Aerospace), 5 parked on expiry inside the hold, Hotzone dropped for a 2029 validThrough; note + sheet | gate: apps:audit PASS, #agentsNotes.ok PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "661a07458e0b669f3b9ff696b144d7476d50b26b",
-      "branch": "main",
-      "frame": "03hatraerrmp9792bcvhxrb8m"
-    },
-    {
-      "id": "a57fbb3c-79ad-4493-9998-1d4a529e14fa",
-      "ts": "2026-11-25T09:04:14Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verified: image-daily port gates all green — go test+vet clean, image-daily gate ok, publish/ship/images fixtures refuse every seeded case, images 772/772. replicate sweep complete: only remaining genList is netbook's index-mapping (not the pad class) | gate: checks:quick PASS e2e, checks:policies PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c398605517d1162442e6836b57af047b16b9278c",
-      "branch": "main",
-      "frame": "03hatr2pygk3jcj8fs3o2j5wr"
-    },
-    {
-      "id": "a5e3c49b-0da9-49ad-af16-dc417978de9b",
-      "ts": "2026-11-25T09:02:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: drove idle delphi freebuff over ssh agents:3.1 — jev-decide classify needs_review task-change 0.63 vs novel 0.23 m=0.4 >= 0.3 decisive so top choice task-change driven, no duel; task = continue DevOps SRE Platform Infrastructure engineer lead sweep, check 2026-11-25o board sweep replies (germantechjobs Stepstone bsj WWR RemoteOK Ashby Personio SmartRecruiters), upsert new leads into tracking CV notes, draft outreach to fresh leads; freebuff thinking line confirmed submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c398605517d1162442e6836b57af047b16b9278c",
-      "branch": "main",
-      "frame": "03hatqst09kwqgpidem6a7dkh"
-    },
-    {
-      "id": "33a46663-540d-43ac-a019-afe28384fefd",
-      "ts": "2026-11-25T09:02:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: re-drove idle devin pane agents:1.1 — jev-decide classify flake-change p=0.99 m=0.98 decisive via typesafe; task = verify image-daily Go port gates, finish remaining lib.strings.replicate conversions across the codebase, run checks:quick and checks:policies and report which gates pass or fail; devin working spinner Connection failed attempt 1 retrying confirmed submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c398605517d1162442e6836b57af047b16b9278c",
-      "branch": "main",
-      "frame": "03hatqsrbi7lzl2kcj0ih48tx"
-    },
-    {
-      "id": "4e0253eb-90aa-4590-a904-82c7f77853ea",
-      "ts": "2026-11-25T09:01:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: drove idle devin pane agents:1.1 — jev-decide classify needs_review flake-change 0.34 vs note-change 0.27 m=0.07; duel 0.5/0.5 m=0.0 below 0.15 so top choice flake-change driven per steward skill, no third call; task = nix flake check plus flake.nix outputs host inventory and module registry consistency across hosts; devin Thinking spinner confirmed submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c398605517d1162442e6836b57af047b16b9278c",
-      "branch": "main",
-      "frame": "03hatqh1p1d52858sxk5vmspd"
-    },
-    {
-      "id": "3f36e86e-f9ad-4b23-a4aa-a49be89d315c",
-      "ts": "2026-11-25T09:01:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: drove idle freebuff pane agents:2.1 — jev-decide classify note-change p=0.99 m=0.98 decisive via typesafe; task = fix job-scout-sweep-2026-11-25t AGENTS.nix note to agentsNotes schema summary ≤400 chars body ≤30 lines then continue scouting DevOps SRE Platform Infrastructure leads; freebuff thinking line confirmed submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c398605517d1162442e6836b57af047b16b9278c",
-      "branch": "main",
-      "frame": "03hatqgzxe3furn64zj0ob5v6"
-    },
-    {
-      "id": "301e5912-c308-497b-875d-d9935f8870a5",
-      "ts": "2026-11-25T09:00:59Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verified: flake consistency (flake check memory-gated off; bounded equivalents). 38 hosts = 25 nixos + 1 darwin + 4 home + 8 external, zero orphans. .#modules 167/167, all output surfaces enumerate. check:verify 151/151, hosts:args 102 clean, drv-equality 30/30 | gate: check:verify PASS, hosts:args PASS. Advisory: sibling note 25t violates schema, not gated",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c398605517d1162442e6836b57af047b16b9278c",
-      "branch": "main",
-      "frame": "03hatqfx7xxf4yhncdokrooo1"
-    },
-    {
-      "id": "66a51215-d003-403c-9f8e-c126e813e468",
-      "ts": "2026-11-25T09:00:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25r",
-      "action": "done: 2nd sweep (10 Stepstone metros, BSJ back, WWR/RemoteOK). 195 cards -> 20 new vs 1314-row ledger; 19 live-verified (needs Referer header, h2 resets otherwise); 11 filed at lead origin scout-2026-11-25r; 3 collided with concurrent scout-2026-11-25t (Lurssen refused, novomind/PPI upserted, statuses restored); 5 recruiter/consultancy excluded, 1 validation fail (LivEye 200, no title). gate: apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hatqdro8susqoaj7v1duy1f"
     }
   ]
 }

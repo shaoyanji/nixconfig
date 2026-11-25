@@ -8,6 +8,7 @@
   hostInventory,
   ...
 }: let
+  hmShared = import self.nixFiles.lib."hm-shared.nix" {inherit self inputs;};
   # The host's own role list, declared next to its `features`/`modules` in
   # flake/host-inventory.nix. A host without the field takes the full set —
   # the same value it had before the list became data. nix-darwin leaves
@@ -97,20 +98,16 @@ in {
       [
         # The constants module takes `user` as an argument; HM is a nested eval, so
         # the value is injected there too (the file says why).
-        self.modules."global.hm-user"
-        inputs.sops-nix.homeManagerModules.sops
-        inputs.kickstart-nixvim.homeManagerModules.default
-        inputs.nix-index-database.homeModules.nix-index
+        hmShared.hmUser
+        hmShared.sops
+        hmShared.nixvim
+        hmShared.nixIndex
         # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (lib/home-agents.nix).
         # Shared by every embedded NixOS/darwin HM config; needs self + fleetHost
         # in that host's extraSpecialArgs (modules/global/{nixos,macos}.nix).
-        self.modules."user.ai.home-agents"
-        self.modules."user.task-shim"
+        hmShared.homeAgents
+        hmShared.taskShim
       ]
-      ++ lib.optionals config.fleet.dankShell.enable [
-        inputs.niri.homeModules.niri
-        inputs.dms.homeModules.dank-material-shell
-        inputs.dms.homeModules.niri
-      ];
+      ++ lib.optionals config.fleet.dankShell.enable hmShared.dankShell;
   };
 }

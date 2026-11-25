@@ -5653,5 +5653,51 @@
         source no earlier one used.
       '';
     };
+    job-scout-sweep-2026-11-25j = {
+      title = "Sweep 2026-11-25j: three Stepstone rows, and the aggregator that never hands over the ad";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Stepstone's 24 metro pages gave three unheld infrastructure employers after exact-name dedupe; germantechjobs offered nine more, but every one hands its apply hop to talent.com and lands on a generic search page, so the two in-lane ones could not be verified or filed.";
+      from = ["job-scout-boards-not-drained-2026-11-25"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Stepstone answered for all 24 metro pages (devops, platform, SRE,
+        cloud, infrastructure, kubernetes over twelve cities), 600 cards;
+        germantechjobs RSS 1,046 postings, Berlinstartupjobs 23,
+        WeWorkRemotely 79, RemoteOK 100. Title filter 467; exact-name dedupe
+        against the 1,372-row ledger and the held lists of d..i removed 293 and
+        blocked 112 (49 consultancy, 36 agency, 18 in-sweep, 7 off-profile, 2
+        refused); 53 of the 62 left were Windows/M365/DATEV ERP admins.
+
+        The label was already taken: origin j held three rows from the 04:33
+        second read of i. This pass added three, so it holds six. Bands are
+        triage.fit_small over FIT_MAP on the full ad body; Stepstone publishes
+        no salary, so a band is stack coverage, not pay.
+
+        Filed, band 5: TKMS GmbH, IT System Specialist - DevOps Release &
+        Deployment (Kiel), fit 88, GitLab CI, Argo CD, Helm, Kubernetes;
+        Kontron AIS, Linux / DevOps & IoT (Dresden), fit 90; GGW Group, AI
+        Platform Engineer - Azure, Cloud Infrastructure & DevOps (Hamburg,
+        Koeln, Muenchen), fit 100, posted that morning.
+
+        Refused on shape: binaroo is a Uzuner Competence Group consultancy
+        selling SAP transformation; EWE NETZ' DevOps ad is PHP 8 and Symfony;
+        Juelich wants a research software engineer for data catalogues.
+
+        Failed validation: DRK-Blutspendedienst (DevOps Azure, band 4) and
+        KIRCHHOFF Witte (Cloud Infrastructure Expert, band 4) are in lane, but
+        every germantechjobs page embeds partnerName neuvoo and its apply hop
+        lands on de.talent.com/jobs, a generic search with no employer target -
+        same class as Advantest. Open todo: DRK's own careers page.
+
+        Exit: nothing sent, all held to 2026-12-07.
+      '';
+    };
   };
 }

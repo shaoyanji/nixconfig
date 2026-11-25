@@ -103,6 +103,34 @@
         checkLinkTargets guard. frieren sets `firecrawl.enable`; every other host keeps the defaults.
       '';
     };
+    firecrawl-local-dragoncourt = {
+      title = "firecrawl-local remote egress on dragoncourt (alwaysdata) — plain-HTTP scrape service";
+      kind = "decision";
+      status = "DELIVERED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "A firecrawl-local instance is live on dragoncourt at http://services-dragoncourt.alwaysdata.net:8330, serving the v2 API (/v2/scrape, /v2/map, /v2/crawl) behind a bearer token. Verified end to end: a real scrape and a map call both worked through the public URL.";
+      refs = {
+        modules = [
+          "modules/user/ai/hermes-user.nix"
+        ];
+        tasks = ["dragoncourt:services"];
+      };
+      body = ''
+        Remote egress alternative to frieren's loopback firecrawl-local (port 3002, which has Chrome and
+        renders JS). The alwaysdata instance has no Chrome, so JavaScript-rendered pages return
+        header-only or empty. Use it when the loopback is down or for plain-HTML targets.
+
+        Plain HTTP only (no TLS on alwaysdata), plain HTML only. Token also at
+        ~/firecrawl-local/token on the server; runbook in alwaysdata's ~/AGENTS.md.
+
+        The bearer token is not stored in the repo: it lives on the server and was communicated out
+        of band. The alwaysdata API token was used once to provision the service and is in the vault.
+
+        To use it as a hermes extract backend, set FIRECRAWL_API_URL to the URL above and pass the
+        token in the Authorization header. No host rebuild needed, since it is a remote service.
+      '';
+    };
     config-registry-schema = {
       title = "The config registries have no schema, and four conventions nothing checks";
       kind = "open";
@@ -7976,6 +8004,52 @@
         known-employer population and not the market.
         Zero rows filed, no origin written. Exit: the untried families are flat too, so the next live source
         is a board outside these five, or the eight 25p rows once 2026-12-07 lifts.
+      '';
+    };
+    job-scout-sweep-2026-11-25w = {
+      title = "A sixth board pass on a spent id: 1,058 postings read, six fresh leads, four packets";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Asked for sweep 2026-11-25q, which is spent (note q, 18 rows). Landed as 25w: germantechjobs, WWR, RemoteOK, BSJ, Ashby and Personio answered 1,058 postings, 129 lane-titled, 122 unique, 104 already ledger rows. Six filed at fit 3-4, four packets built, nothing sent.";
+      from = ["job-scout-sweep-2026-11-25s"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh" "scripts/task/appflow-packet.sh"];
+        tasks = ["apps:scout" "apps:scout:sweep" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Requested as 2026-11-25q, which is spent: note q plus 18 rows at origin scout-2026-11-25q.
+        So this pass lands as 25w rather than giving an accepted cycle a second meaning.
+
+        Boards, 2026-11-25: germantechjobs 586, WeWorkRemotely 79, RemoteOK 101, Berlin Startup
+        Jobs 12, Ashby 14 boards and 933 postings, Personio 5 boards and 360. That is 1,058.
+        129 carried a lane title, 122 survived name plus title dedupe, 104 matched an existing
+        ledger row by exact normalised name, three were US-only, fifteen employers were unseen.
+
+        Two unseen were not postings and were not filed: LearnWise sells AWS DevOps retraining,
+        Peakwork a dual-study programme. Seven stayed unfiled on merit: team lead, ERP, avionics,
+        network and generalist administrator titles, none platform work.
+
+        Six filed at origin scout-2026-11-25w: CYCAP (4, Azure platform, Personio 2542744),
+        Airbus Defence and Space (4, OpenShift and Kubernetes beside vSphere, 70-100k),
+        DATAGROUP Operations (3, Citrix), Bechtle Bremen (3, network and security), dot-change
+        (3, senior administrator), MUEGGE (3, generalist).
+
+        Four packets, German letters because every ad is German and three require fluency, gaps
+        stated, the same 72,000 EUR ask, the ad copied beside the id, the CV projected onto it.
+        Verified by pdftotext on the store artifacts: letter one page, CV two, subject and
+        closing present.
+
+        Traps. The germantechjobs detail page is a JavaScript shell, 28 to 45 words and no
+        ld+json, so the ad is the feed description CDATA, 262 to 350 words with requirements
+        intact; the detail fetch is the wrong instrument. A Personio row carries the position
+        id, not a URL. Dedupe: a first pass matched the first four-letter token and dropped 108
+        of 122, so the house token is a candidate signal, never a verdict.
+
+        No send: the 2026-12-07 hold stands and none of the six carries an email address.
+        Gate: nix-instantiate --parse, nix eval .#agentsNotes.ok, apps:audit.
       '';
     };
     job-scout-sweep-2026-11-25q = {

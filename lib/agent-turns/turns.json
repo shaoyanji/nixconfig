@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T10:12:01Z",
+  "generated": "2026-11-25T10:19:32Z",
   "count": 200,
-  "pin": "556a8383409075fd30778d972899271ea829563c2876b42850362be975427b02",
+  "pin": "519965aaab7c6fad418d910c100862ad75d8c2ab54395fc438be4996b52b0fbc",
   "turns": [
+    {
+      "id": "69b7c65a-f1ca-429c-a369-7d0cfa28dfb2",
+      "ts": "2026-11-25T10:14:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "Drove idle delphi freebuff pane agents:3.1 with scout sweep 2026-11-25j (jev-decide note-change, margin 0.51); fresh 'thinking' line confirmed submission.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "34f416c9a94332adf7807f9c6d8e9b15420b99cd",
+      "branch": "main",
+      "frame": "03hau4s2d1nlojerfc2w5yqla"
+    },
+    {
+      "id": "adf188e8-5ba3-461d-bc0c-9f88eac58682",
+      "ts": "2026-11-25T10:12:15Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: wired services:ports:test into checks:quick deps — last unwired fixture (7 seeded temp-inventory cases, 0.28s, no documented exclusion); every quick leaf now runs its refusal or names why it cannot | gate: checks:quick PASS (fixture ran inside), check:verify 154/154",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "34f416c9a94332adf7807f9c6d8e9b15420b99cd",
+      "branch": "main",
+      "frame": "03hau4d496pu92bpk34ags0za"
+    },
     {
       "id": "d9a4b04f-aa48-4751-98ed-89206099b30b",
       "ts": "2026-11-25T10:08:23Z",
@@ -2663,32 +2689,6 @@
       "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
       "branch": "main",
       "frame": "03haregg2baqu1r6dy4oaha6v"
-    },
-    {
-      "id": "64561d68-a985-4436-b159-0743857c3f52",
-      "ts": "2026-11-25T01:51:03Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "drove idle freebuff (agents:2.1) with 2026-11-25e job-scout sweep task — read JSON-LD in full, dedupe vs helo, FIT_MAP banding, upsert scouted, land note job-scout-sweep-2026-11-25e",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
-      "branch": "main",
-      "frame": "03haregeathwpd6lbi8v9hz24"
-    },
-    {
-      "id": "a760a834-975b-41fe-9461-205f454355f4",
-      "ts": "2026-11-25T01:51:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "drove idle devin (agents:1.1) with image-daily port gate-note extension task (30-line body stays OPEN, open slices: cloudinary curls, ffprobe check, cpg auth)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
-      "branch": "main",
-      "frame": "03haregco6op185vksdjaskwc"
     }
   ]
 }

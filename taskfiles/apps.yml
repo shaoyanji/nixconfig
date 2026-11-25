@@ -58,6 +58,70 @@ tasks:
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" bash scripts/task/apps-scout.sh {{.CLI_ARGS}}
 
+  # A sweep is a cycle, not a scan: the lane's durable state is the record, and
+  # the boards move independently — a flat german feed says nothing about
+  # Stepstone. This carries the next cycle's id and read order so a pass starts
+  # where the last one ended instead of re-deriving it.
+  apps:scout:sweep:
+    desc: The next scout sweep — id, the boards in read order and the write rules (SWEEP, FAMILY)
+    summary: >
+      Sweep id `2026-11-25p`, the next DevOps/SRE/Platform/Infrastructure pass
+      after 25o. Prints the boards in read order with the trap each one hides,
+      then the lane's write rules. Read-only and network-free: a sweep still
+      dedupes through `apps:scout`/`apps:search` and files with `apps:scout`,
+      never a second writer. The 2026-12-07 send hold stands over every row
+      found, and no row is filed from a listing alone.
+    vars:
+      SWEEP: '{{.SWEEP | default "2026-11-25p"}}'
+      FAMILY: '{{.FAMILY | default "devops|sre|platform|infrastructure"}}'
+    cmds:
+      - |
+        printf 'sweep %s\n' '{{.SWEEP}}'
+        printf 'families: %s\n\n' '{{.FAMILY}}'
+        printf '%s\t%s\n' 'board' 'trap that makes it read wrong'
+        printf '%s\t%s\n' \
+          'germantechjobs.de/rss.xml' 'www answers 301; a 167-byte 301 body reads as an empty feed' \
+          'stepstone.de, six lane queries' 'detail pages need Referer: https://www.stepstone.de/jobs/devops-engineer; cards sit in an embedded companyName JSON' \
+          'berlinstartupjobs /engineering/feed/' 'a listing is not a posting' \
+          'weworkremotely remote-devops-sysadmin' 'US-only unless the ad says otherwise' \
+          'remoteok /api' 'US-only unless the ad says otherwise' \
+          'arbeitnow /api/job-board-api?page=1' '300 per page; page one is not the board' \
+          'ashby camunda/kubermatic, personio 1KOMMA5GRAD, smartrecruiters DeliveryHero' 'employer feeds, not the market'
+        printf '\nrules: dedupe by exact name and by house token before filing; read the detail page before a verdict;\n'
+        printf 'band 1-5 from FIT_MAP, never 0 or 100; origin scout-{{.SWEEP}}, stage scouted; nothing sends before 2026-12-07.\n'
+        printf 'exit: AGENTS.nix note job-scout-sweep-{{.SWEEP}} plus one xs turn naming the commit and the gate.\n'
+
+  # The eleven Stepstone ads 25o read and parked on expiry are not rows: seven
+  # leads from that cycle were filed and these waited on a validThrough inside
+  # the send window. The date is the reason to look again, so it is carried here
+  # — a parked lead with no date is a lead nobody rechecks.
+  apps:scout:parked:
+    desc: The leads parked on a posting's expiry — validThrough first, none filed (2026-11-25o)
+    summary: >
+      Eleven Stepstone ads from the 2026-11-25o read, parked on expiry rather
+      than merit and never filed as rows because their validThrough falls inside
+      the 2026-12-07 send hold. Each line carries the date the posting closes;
+      when it passes the recheck is one read — gone, so it is dropped, or
+      reposted, so it is filed with that cycle's origin. Prints only.
+    vars:
+      SWEEP: '{{.SWEEP | default "2026-11-25p"}}'
+    cmds:
+      - |
+        printf '%s\t%s\t%s\n' 'validThrough' 'employer' 'note'
+        printf '%s\t%s\t%s\n' \
+          '2026-11-25' 'Pradtke' 'expired in the 25o read' \
+          '2026-11-28' 'AUGENTIC' 'parked on expiry' \
+          '2026-11-28' 'LAIQON' 'parked on expiry' \
+          '2026-11-28' 'Liebherr-Digital' 'parked on expiry' \
+          '2026-11-29' 'STULZ' 'parked on expiry' \
+          '2026-11-30' 'BIOTRONIK' 'parked on expiry' \
+          '2026-12-03' 'Liebherr-Digital' 'second posting' \
+          '2026-12-03' 'ZaGoTec' 'parked on expiry' \
+          '2026-12-04' 'EWE NETZ' 'parked on expiry' \
+          '2026-12-05' 'novomind' 'parked on expiry' \
+          '2026-12-07' 'HxGN' 'parked on expiry'
+        printf '\nrecheck: read the posting once after its date; gone = drop, reposted = file at scout-{{.SWEEP}}.\n'
+
   apps:upsert:
     desc: Add or refresh one application record — JSON or TOON (CLI_ARGS is a file, or pipe stdin; FORMAT=toon for the row back)
     summary: >

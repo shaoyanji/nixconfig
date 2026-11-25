@@ -6509,6 +6509,48 @@
         window after the hold, and none of them is a send.
       '';
     };
+    job-scout-packet-brose-2026-11-25f = {
+      title = "The Brose packet is built, honest about the AWS gap, and held for the 2026-12-07 send";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "A German letter and CV tailored to the landing-zone brief, built to the ad's own vocabulary and stating the three gaps — no production AWS landing zone, no Terraform or CloudFormation estate, no AWS certification — before the interview rather than in it; stored outside the repo and held for the send window.";
+      from = ["job-scout-decisions-2026-11-25f"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:get" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The packet is two Typst sources and their PDFs under
+        submissions/brose-aws-system-engineer-bamberg: a one-page German letter
+        and a two-page CV that follows the ad's own order — landing zone,
+        permissions, infrastructure as code, change discipline, monitoring, DR,
+        cost — instead of the corpus order the base resume uses.
+
+        The tailoring rule was one sentence of the ad per line of the CV. Where
+        the ad says Organizations and Control Tower the packet says module
+        boundaries and a registry check; where it says IAM it says a short-lived
+        SSH certificate authority and per-host secrets; where it says ITIL change
+        it says one gate that runs identically in CI and on the host. That
+        analogy is a claim, so it is stated as one — translated onto the task,
+        not dressed as AWS experience.
+
+        The gaps are in the letter, in a paragraph of their own: no production
+        landing zone, no Terraform or CloudFormation estate, no AWS
+        certification. A German employer reads three honest sentences as
+        preparation; it reads a discovered gap in month two as a problem.
+
+        Nothing sends before 2026-12-07. The letter carries that date rather than
+        the build date, the row stays at prep, and the ad runs to 2026-12-18, so
+        the window and the advert now agree.
+
+        Exit: send 2026-12-07 through the Brose form, log the send on the row and
+        set the follow-up for 2026-12-21; re-date the letter if the send slips
+        past the advert's validThrough.
+      '';
+    };
     job-scout-decisions-2026-11-25f = {
       title = "Of the 2026-11-25f five, Brose gets the packet and four park — two on the calendar";
       kind = "decision";

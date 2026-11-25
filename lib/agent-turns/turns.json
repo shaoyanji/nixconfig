@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-25T02:37:57Z",
+  "generated": "2026-11-25T02:40:39Z",
   "count": 200,
-  "pin": "93365ce6a587c52f9d6c85cd61b6e2c6231c10a7bc554576f2cae75846b72da3",
+  "pin": "a9903a51333fee4a1bf1cca1fd6dc8113ee30115946009a35fea11bb396a7fc5",
   "turns": [
+    {
+      "id": "1afedc97-e228-4577-b77c-5938a102f3d7",
+      "ts": "2026-11-25T02:39:02Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: 2026-11-25g — 8 boards read (gtg 1,291 + 10 tags, bsj, WWR 120, RemoteOK 100, Ashby 48 slugs/973 postings, Personio 2/343, SmartRecruiters 1/100, Stepstone blocked); 198 family titles, 90 held, 53 US/UK/APAC; 8 rows scouted (bands 5x6, 4x2): Enrichment, PSI, SIGNAL IDUNA, NetCologne, Fonds Finanz, Porsche, Vonovia, RA Radiology; prep only | gate: parse + issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03harnttvy047ijurhiosfi4g"
+    },
     {
       "id": "589d4beb-4615-4a45-bcfb-b20b78f73947",
       "ts": "2026-11-25T02:36:34Z",
@@ -2613,19 +2626,6 @@
       "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hap1h1xc9qry4vhqxqwxjac"
-    },
-    {
-      "id": "eed1eb1c-df2b-4544-afcc-225d3ba40fb4",
-      "ts": "2026-11-24T18:35:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: sweep8 (arbeitnow p1-2, SmartRecruiters x6, LinkedIn x3, Remotive) — 1 genuinely new lead: Projektron GmbH, Cloud Engineering, Berlin, fit 4; recorded Abnormal Security EMEA at fit 2 (end-user platform, not infra) for completeness; rejected Intelerad (US), synava (MS-only), Jobgether (aggregator); nothing sent | gate: apps:get readback PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap1f991sgv5fetmqxjnyz3"
     }
   ]
 }

@@ -58,9 +58,9 @@ in {
 
   config = lib.mkIf cfg.enable {
     # Every proxied name must be an endpoint the plugin actually publishes:
-    # `applications` 404'd on the live vhost for weeks because the allowlist
-    # named a route nobody had written. A route without a .sql file fails the
-    # host eval now, not a request later.
+    # `/api/applications` 404'd on the live vhost while the file sat in this
+    # repo — the deployed npgsqlrest was built from a tree that lacked it. A
+    # route without a .sql file fails the host eval now, not a request later.
     assertions =
       map (name: {
         assertion = builtins.pathExists (../plugins/appflow/sql + "/${name}.sql");

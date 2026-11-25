@@ -1,8 +1,97 @@
 {
-  "generated": "2026-11-25T03:46:28Z",
+  "generated": "2026-11-25T04:02:15Z",
   "count": 200,
-  "pin": "9c073f23d02b57f350636ba60c658219473285caedec9952ae8babafdcf6c932",
+  "pin": "b8a14abbb0ed6fd8d3834c8b103311bfa63851489ff1f4145e0b72b45b60adea",
   "turns": [
+    {
+      "id": "4c5ba71c-4c13-4649-b64e-8c2eed492814",
+      "ts": "2026-11-25T04:01:37Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "claim: 2026-11-25n board re-read, germantechjobs sha compare vs cf313395, verdicts on the 9 unheld Stepstone listings, dedupe and file",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has3ynvqp66es5lm4spstu8"
+    },
+    {
+      "id": "a89daa4e-e401-4a72-a21f-a93894ed0693",
+      "ts": "2026-11-25T04:01:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "claim: sweep 2026-11-25n — re-read gtj feed (record sha, flat-by-hash if cf313395) and Stepstone listings, exact-name dedupe against ledger plus 25a..m rows, file new scouted rows, land AGENTS.nix note job-scout-sweep-2026-11-25n + xs done. No sends.",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix",
+        "scripts/task/apps-scout.sh"
+      ],
+      "files": [],
+      "base_commit": "92c0f6dd9c0c8da9d10290a9841be062fc99d409",
+      "branch": "main",
+      "frame": "03has3vnukqz9x0lmigmipc0l"
+    },
+    {
+      "id": "25f220e6-b258-45c9-9ee1-420228e53aa0",
+      "ts": "2026-11-25T03:52:42Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: 2026-11-25m board re-read — germantechjobs byte-identical (sha cf313395); Stepstone served 24 listings, 9 unheld, 6 filed scouted (epostbox 5; Deichmann, Allguth, Kautionskasse, Kufer, Energienetze 4); Bertrandt/Bank11/Ratbacher/LearnWise refused on shape | gate: parse + issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has27yewhqtfc4ncbfqkatx"
+    },
+    {
+      "id": "e747a213-3953-471e-a90d-c009f058674b",
+      "ts": "2026-11-25T03:52:05Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "claim: 2026-11-25m board re-read, Stepstone detail-page verdicts and six new scouted rows",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has23inqt7uuwj7yvhfuf86"
+    },
+    {
+      "id": "5151e37a-bd5c-4e23-b671-f1d4dfae5b3c",
+      "ts": "2026-11-25T03:50:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "routed note-change (classify needs_review, top p=0.63 margin=0.44 decisive>=0.3, pick top) to agents:3.1 (delphi ssh) - scout sweep 2026-11-25j: dedupe vs ledger + sweeps a..i, band rows FIT_MAP 1..5, land note job-scout-sweep-2026-11-25j; thinking... confirmed, composer dropped to Add-to-task",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "92c0f6dd9c0c8da9d10290a9841be062fc99d409",
+      "branch": "main",
+      "frame": "03has1sdi9tns0l3zs2t57hld"
+    },
+    {
+      "id": "b4c6601e-2893-4475-8cf9-930a6038d64c",
+      "ts": "2026-11-25T03:49:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: AGENTS.nix job-scout-sweep-2026-11-25l (decision, ACCEPTED) — gtj feed byte-identical to 25i (sha cf313395, 586 items, sha256 in note), 155 family titles/129 firms, exact dedupe vs 972-firm ledger leaves 80 unheld (in-house admin), ATS only held employers; 3 rows on origin scout-2026-11-25j (EOS, WinValue packets; AND-E parked), both 1p+2p built in ad order, nothing sent, held 2026-12-07 | gate: agents-notes-schema PASS, issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "92c0f6dd9c0c8da9d10290a9841be062fc99d409",
+      "branch": "main",
+      "frame": "03has1n039i6v5yi5fwerd6zs"
+    },
     {
       "id": "c4275a71-1b09-4553-8b35-cca5f6d37efe",
       "ts": "2026-11-25T03:42:42Z",
@@ -2563,84 +2652,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hape11ia5yi65fjr28mn905"
-    },
-    {
-      "id": "5c2d910c-8455-4304-84a7-2f56989278ee",
-      "ts": "2026-11-24T19:38:26Z",
-      "source": "devin",
-      "subject": "nixconfig:gatus-dns-monitor",
-      "action": "landed: dns://100.97.61.65:53 — gatus dialed udp///host with no port, monitor reported null; eval-mode gate green (2132 assertions) | next: task infra:deploy:host:delphi to activate",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b97924653494701ce0ee2704f624e4ae913d04bb",
-      "branch": "main",
-      "frame": "03hapdo0beaslhwmclkz28ff7"
-    },
-    {
-      "id": "03b4984f-bf26-4411-8adb-3ee9657abb60",
-      "ts": "2026-11-24T19:38:11Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-delphi",
-      "action": "drove delphi freebuff pane (agents:3.1, ssh): routed note-change via jev-decide (note-change 0.87, margin 0.76); pane now working on the DeepL/Supabase packet prep (no send, hold 2026-12-07).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
-      "branch": "HEAD",
-      "frame": "03hapdmbqtirozfs4htbxsmeq"
-    },
-    {
-      "id": "e168b8f7-f174-4a47-869d-5dcb608b776e",
-      "ts": "2026-11-24T19:38:11Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "drove freebuff pane (agents:2.1): routed note-change via jev-decide (note-change 0.91, margin 0.83); pane now thinking on the EU-vendor employer-lead sweep (prep-only, hold 2026-12-07).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
-      "branch": "HEAD",
-      "frame": "03hapdm9dg9mhtlzx15a0d36l"
-    },
-    {
-      "id": "1da7ad1f-1742-4f71-b476-c6046b143d99",
-      "ts": "2026-11-24T19:38:07Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-devin",
-      "action": "drove devin pane (agents:1.1): routed host-change via jev-decide (needs_review, host-change 0.78, margin 0.64 — decisive, drove per the steward margin rule); pane now Thinking on the Gatus DNS endpoint fix (hosts/delphi/configuration.nix dns://100.97.61.65 -> :53).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
-      "branch": "HEAD",
-      "frame": "03hapdlqym2c0328acq21x93b"
-    },
-    {
-      "id": "36eae351-2969-4aca-93c0-f4a37f7a06ed",
-      "ts": "2026-11-24T19:20:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: curated job-scout note on main (00dd5fdd) — six swept employers each carry a live ATS board URL and the tracker's own fit; ZenDiS dropped, no Personio/Greenhouse board behind its client-rendered careers page; drained sources listed so no later sweep repeats them | gate: agentsNotes.issues=[] + nix-instantiate --parse PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "00dd5fdde48173b902db9a9c2fddae7e3de18f62",
-      "branch": "note/job-scout-boards-2026-11-24",
-      "frame": "03hapa40u8lkjk5ohqefzhh3v"
-    },
-    {
-      "id": "6a315f1b-b840-4d6a-9fba-7c2a467c1615",
-      "ts": "2026-11-24T19:18:46Z",
-      "source": "devin",
-      "subject": "nixconfig:code-review-loop",
-      "action": "landed: tests/nix-style fixture — gate refuses 2fe0c687^ (names policies+epistemics), spares honest control, passes current tree | gate: checks:nix:style:test PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41f90211909b931352ff147550c9513cb3f6e799",
-      "branch": "main",
-      "frame": "03hap9tnryl8fcmczfh2l02f5"
     }
   ]
 }

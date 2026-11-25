@@ -5992,13 +5992,20 @@
         resolving; prose budget untouched — docs/ and .agents/deploy/ sit
         outside it.
 
-        Open tail: appflow write-auth module closure — the bearer gate is
-        verified live but /api/applications still answers upstream 404 while
-        application-pipeline 200s (pre-existing archive answer, recorded in
-        devin-lane-appflow-write-auth) — and residual .nix flake-wiring /
-        gate-check cleanup the census keeps surfacing. Exit: the 404
-        explained or fixed, and the census steady under ceiling with
-        checks:policies green.
+        Open tail → mostly closed same day. The 404's root cause was NOT a
+        pre-existing archive answer: the board's allowlist named
+        `/api/applications` and `/api/applications-discovered`, and the
+        deployed npgsqlrest lacked both .sql files — they have been committed
+        since 86bdb73b, so the live generation was built from a tree missing
+        them (a dirty-checkout build: delphi folds uncommitted state into its
+        snapshot). Landed: `appflow-board.nix` now asserts at eval that every
+        proxied route has a `sql/<name>.sql` (fails `checks:host`, proven
+        firing), the stale "8461 archive front" comment corrected (it is the
+        media relay; the API is loopback-only), and the census stays under
+        ceiling with checks:policies green. Commit a487f3d4.
+        Remainder: tailnet ssh needs a browser check, so the activation is
+        delphi's 04:30 autoUpgrade off `github:` — verify the two routes live
+        after it, then this note closes.
       '';
     };
     fleet-hygiene-tailscale-creds-stale = {

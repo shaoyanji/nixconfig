@@ -24,9 +24,9 @@ git -C "$repo" worktree add --detach "$tmp/wt" HEAD >/dev/null 2>&1 ||
 fail=0
 
 # 1. A missing inventory row must fail, the orphaned task named.
-grep -v '"checks:repo:paths"' "$tmp/wt/flake/check-inventory.nix" >"$tmp/wt/inv.tmp" &&
+grep -v '"checks:repo:paths" = ' "$tmp/wt/flake/check-inventory.nix" >"$tmp/wt/inv.tmp" &&
   mv "$tmp/wt/inv.tmp" "$tmp/wt/flake/check-inventory.nix"
-grep -q 'repo:paths' "$tmp/wt/flake/check-inventory.nix" &&
+grep -q '"checks:repo:paths" = ' "$tmp/wt/flake/check-inventory.nix" &&
   { echo "fixture: row removal did not take" >&2; exit 2; }
 out=$(cd "$tmp/wt" && bash scripts/task/check.sh verify 2>&1); rc=$?
 if [ $rc -eq 1 ] && echo "$out" | grep -q 'repo:paths'; then

@@ -63,7 +63,9 @@ tasks:
       - task: checks:yaml:lint:test
       - task: checks:toon
       - task: checks:toon:surfaces
+      - task: checks:toon:surfaces:test
       - task: checks:toon:tasks
+      - task: checks:toon:tasks:test
       - task: checks:tasks
       - task: checks:policies:fixtures
       - task: checks:nix:comments
@@ -303,6 +305,17 @@ tasks:
     cmds:
       - bash scripts/task/toon-surfaces.sh
 
+  checks:toon:surfaces:test:
+    desc: "Regression fixture for checks:toon:surfaces (crafted bare --json command)"
+    summary: >
+      The script takes its file list as arguments for exactly this: a
+      crafted file with a bare `nix eval --json` line on its own line
+      must refuse, file named; the toon-piped and `json-ok:` spellings
+      must pass, as must the live file set. The judge exempts any piped
+      command, so the mistake is the unpiped one.
+    cmds:
+      - bash tests/toon-surfaces/run.sh
+
   checks:toon:
     desc: "[gate] TOON array lengths are counted, and every tracked .toon strict-decodes"
     summary: >
@@ -311,6 +324,16 @@ tasks:
       the gate proves the repair path instead of the author's arithmetic: a wrong
       under-count and a wrong over-count are both repaired to the counted value,
       then every tracked `.toon` document must strict-decode. ~0.2 s, no host.
+    cmds:
+      - bash scripts/task/toon-check.sh
+
+  checks:toon:test:
+    desc: "Self-fixtured — check_repair seeds under/over-count rows and check_refusal seeds uncountable input; see scripts/task/toon-check.sh"
+    summary: >
+      No separate fixture: the gate itself runs the seeded mistakes every
+      invocation — toon-fix must rewrite a wrong `[n]` to the counted rows
+      and must refuse JSON or prose without mangling it. Listed so the
+      coverage table stays honest.
     cmds:
       - bash scripts/task/toon-check.sh
 
@@ -325,6 +348,17 @@ tasks:
       ~0.1 s, no host.
     cmds:
       - bash scripts/task/toon-tasks.sh
+
+  checks:toon:tasks:test:
+    desc: "Regression fixture for checks:toon:tasks (seeded bare toon -e and hand-cased FORMAT)"
+    summary: >
+      A worktree's checks.yml gains a cmds line piping to `toon -e`
+      directly — toon_emit's job, not a task's — and, restored, a
+      hand-cased `{{.FORMAT}}`. Both refusal shapes must fire, file
+      named; HEAD stays clean. Only cmds blocks are scanned, so the
+      seed is a real cmd entry.
+    cmds:
+      - bash tests/toon-tasks/run.sh
 
   checks:fusion:
     desc: "[gate] turns-fusion projection on frieren: tables non-empty, notes loaded, lag within one timer period"

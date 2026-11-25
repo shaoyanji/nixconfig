@@ -961,7 +961,7 @@
       priority = "P3";
       date = "2026-11-25";
       from = ["kernel-collision-gate"];
-      summary = "Twelve checks:* gates lacked a fail-on-real-mistake fixture; each now has a tests/<name>/run.sh proving the refusal, wired as checks:X:test (leaf rows, quick deps). Four replay real trees, eight seed the mistake on a scratch worktree. checks:entry stays unfixtured — a timing budget has no mistake to seed.";
+      summary = "Every checks:quick leaf gate now has a fail-on-real-mistake proof: 14 tests/<name>/run.sh fixtures (4 real-tree replays, 10 worktree-seeded or crafted), the toon plane closed in round 2. checks:entry stays unfixtured — a timing budget has no mistake; infron/kg/tasks/toon self-fixture inside their scripts.";
       refs = {
         modules = ["tests/shell-inputs/run.sh" "tests/repo-paths/run.sh" "tests/images-check/run.sh" "flake/check-inventory.nix" "taskfiles/checks.yml"];
         tasks = ["checks:quick" "check:verify" "checks:shell-inputs:test" "checks:sops:drift:test"];
@@ -977,24 +977,26 @@
         prose tell (`delve`), three desc-restating skill rows (the
         >=3 hard-verdict threshold, a lone row is WARN by design), a
         malformed workflow yaml, a deadnix unused formal, a
-        `${x:-y}`-in-indented-string interpolation, a dropped
+        shell-expansion-in-indented-string interpolation, a dropped
         check-inventory row, and a dropped sops age recipient.
 
-        Two traps cost a cycle each: check:verify:test must not carry
-        an inventory row — the gate only sees checks:* names, so the
-        meta-task's fixture lives without one (check:verify itself is
-        rowless). And a taskfile summary may not spell
-        modules/secrets*.yaml on a `sops` line — the
-        secrets-path-is-resolved-in-one-place policy grep counts
-        summary text as code.
+        Two traps: check:verify:test must not carry an inventory row —
+        the gate only sees checks:* names (check:verify is rowless
+        itself), and a taskfile summary may not spell
+        modules/secrets*.yaml on a `sops` line — the secrets-path
+        policy grep counts summary text as code. checks:entry stays
+        unfixtured: a timing budget has no mistake to seed.
 
-        checks:entry stays unfixtured on purpose: it gates min-of-3
-        timing budgets, and a performance gate has no mistake class
-        to replay.
+        Round 2 closed the toon plane: toon:tasks:test seeds a bare
+        `toon -e` cmd and a hand-cased FORMAT in a worktree;
+        toon:surfaces:test crafts a bare `nix eval --json` line (the
+        script's file-args exist for negative control); checks:toon
+        needs no fixture — it self-seeds under/over-count and refusal
+        cases every run, and infron/kg/tasks self-fixture the same
+        way. The sweep is complete.
 
-        Exit: checks:quick green end-to-end (~92 s on frieren, +~15 s
-        for the sweep), check:verify 148/148, checks:tasks clean,
-        every fixture refuses its seeded tree and passes HEAD.
+        Exit: checks:quick green (~82 s), check:verify 151/151,
+        checks:tasks clean, every fixture refuses then passes HEAD.
       '';
     };
     dns-second-resolver = {
@@ -7437,9 +7439,9 @@
       date = "2026-11-25";
       summary = "The 2026-11-25 verification pass on kelvion-holding-gmbh-cloud-platform-engineer-gcp-m-w-d found the requisition open on Kelvion's own softgarden board and on kelvion.com, not just the Bundesagentur mirror, with requirements that match the row. The onsite share is published as Hybrid with no day count, so it stays unknown rather than assumed. The lead holds to 2026-12-07 on the prep-only rule.";
       refs = {
-        modules = [ "scripts/task/apps-db.sh" ];
-        tasks = [ "apps:update" "apps:scout:parked" ];
-        docs = [ ".agents/skills/apps/SKILL.md" ];
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:update" "apps:scout:parked"];
+        docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
         The row asked for verification only, and named two things to settle: the employer's own
@@ -7840,11 +7842,11 @@
       priority = "P2";
       date = "2026-11-25";
       summary = "The o cycle had already landed before this pass read the record, so nothing was refiled. It adds gematik and ELAC SONAR, both verified on employer pages, refuses KIND and WALDNER after reading theirs, withholds dive solutions as unverified, and corrects my Stepstone 403 to a missing Referer header.";
-      from = [ "job-scout-sweep-2026-11-25o" ];
+      from = ["job-scout-sweep-2026-11-25o"];
       refs = {
-        modules = [ "scripts/task/apps-db.sh" ];
-        tasks = [ "apps:add" "apps:scout" "apps:update" ];
-        docs = [ ".agents/skills/apps/SKILL.md" ];
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:add" "apps:scout" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
         This pass ran the o boards before reading the record, which is the mistake worth recording first: the

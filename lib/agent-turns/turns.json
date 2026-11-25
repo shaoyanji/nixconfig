@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T06:55:06Z",
+  "generated": "2026-11-25T07:20:43Z",
   "count": 200,
-  "pin": "dd7cb03eca2061addfc5d1b2a3bd8798f5afc9bc8eefc7ac51c7b49b0bf7f6cb",
+  "pin": "92c808cd368c8e79ff48ebedcfbaa872fee63abc3e756dc9ce2539fdf59da813",
   "turns": [
+    {
+      "id": "7130e983-9c30-4b4b-8ed0-4d7a66de0a6a",
+      "ts": "2026-11-25T07:16:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: routed idle devin (agents:1.1) — jev-decide classify (typesafe) exit 0: gate-change p0.99 m0.98; task = Continue nixconfig gate hardening on the devin lane. Run checks:quick and check:verify end-to-end; if green, select the next leaf gate lacking a fail-on-mistake fixture and add a seeded-tree fixture, then re-run gates. Land with commit + gate evidence.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "338ef8aae1c46c02b548381d76519b400c92a0fc",
+      "branch": "main",
+      "frame": "03hat5zqm5scubdwdauoxabvs"
+    },
+    {
+      "id": "4500cf84-d355-45ab-85e3-13aef9900fdf",
+      "ts": "2026-11-25T06:55:25Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: fixture sweep — 12 leaf gates now proven to refuse a mistake (4 real-tree replays, 8 worktree-seeded); entry unfixtured by design | gate: checks:quick PASS (~92s), check:verify 148/148, every fixture fails on its seeded tree",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "338ef8aae1c46c02b548381d76519b400c92a0fc",
+      "branch": "main",
+      "frame": "03hat1x5qq924r0ui67trib28"
+    },
     {
       "id": "84a6afbb-0017-4e29-bc58-c5dfd65ffc74",
       "ts": "2026-11-25T06:43:43Z",
@@ -2642,34 +2668,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haqlch76kbdsgurktomv7aj"
-    },
-    {
-      "id": "9b43fb59-001d-443c-a1f3-4145eabff261",
-      "ts": "2026-11-24T23:22:01Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "claim: DevOps/SRE/Platform/Infra scout 2026-11-25 — verified postings only, hold-aware leads, no sends",
-      "outcome": "in_progress",
-      "claims": [
-        "delphi:applications"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haqlcd6kmi7fpzfbsbloojh"
-    },
-    {
-      "id": "3f7e8aaa-6677-4805-8cec-53ebab58530b",
-      "ts": "2026-11-24T23:21:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: trivago Senior Platform packet reviewed against JD, rebuilt: 13→25 hosts fixed in CV+letter, DevOps skills raised with systemd/CI-CD/Tailscale/Gatus/DNS, benchmark claim moved to the detector it refuted; row stage=prep status='packet ready, awaiting review' language=de, reviewFlag 'Ready to send', nextAction 'Send application'; nothing sent | gate: pdftotext CV 2 pp/letter 1 pp, apps:get PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d0ee54cf994647765873aca99521ad2fbbd5ae28",
-      "branch": "main",
-      "frame": "03haqlar4sa0yp2jk1ygzkhxq"
     }
   ]
 }

@@ -146,7 +146,10 @@
     "checks:toolcall" = "leaf";
     "checks:toon" = "leaf";
     "checks:toon:surfaces" = "leaf";
+    "checks:toon:surfaces:test" = "leaf";
     "checks:toon:tasks" = "leaf";
+    "checks:toon:tasks:test" = "leaf";
+    "checks:toon:test" = "leaf";
     "checks:typeset" = "leaf";
     "checks:uds:docs" = "leaf";
     "checks:units" = "host";

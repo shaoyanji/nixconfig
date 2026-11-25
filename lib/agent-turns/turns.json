@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-25T12:12:57Z",
+  "generated": "2026-11-25T12:13:14Z",
   "count": 200,
-  "pin": "c3446dfb4c510b40f588d9ae9399cb3c426864a7ccbd5c907b6ce7c30e9f6c27",
+  "pin": "056d93665e220a62421dad6ddafbc2ea8c0afd3b12d91ae3fee122eb65a97e06",
   "turns": [
+    {
+      "id": "21986faa-be49-4b29-8846-988a15ccba82",
+      "ts": "2026-11-25T12:13:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-fresh-2026-11-25",
+      "action": "landed: note job-scout-eu-widened-2026-11-25 — 1 row scouted at origin scout-2026-11-25 (tk accelis, Essen, band 3, 60); 57 new employers, 56 outside DACH, refused on geography; Stepstone AT 403 | gate: apps:dupes [] PASS, agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "83d68122cd95450667e9e66ae0909fe55527bd5e",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haurz6j9gvkrbqxhyw8gx67"
+    },
     {
       "id": "e0421a30-e28b-4592-9a20-a2777a57a19d",
       "ts": "2026-11-25T12:12:53Z",
@@ -2684,19 +2697,6 @@
       "base_commit": "1e6a862a11c976717f3674d9b5a805beed5b5290",
       "branch": "main",
       "frame": "03harqbxpdcfw61s9y6qekyha"
-    },
-    {
-      "id": "a6ce3085-b5f1-4c27-8d78-e3bebc7142e3",
-      "ts": "2026-11-25T02:50:54Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: 2026-11-25h — gtg re-read identical (1,291, 0 new, tags add no links); exact-name dedupe vs 955 employers exposed 94 unfiled; 6 rows scouted: Mecklenburgische b5, Fresenius b5, Vivantes b4, Röchling Industrial b4, Stadt Mannheim b4, Waldemar Link b3; refused ELAC, Röchling Medical, intersoft, Zech, alphacaps, Sunrise, SimonsVoss, sino, Allegion; prep only | gate: parse + issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03harq5ajcbiol5umhl6zvy0j"
     }
   ]
 }

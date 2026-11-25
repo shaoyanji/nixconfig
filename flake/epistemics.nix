@@ -331,7 +331,7 @@
   # missing-attribute error at the sort would hide that message.
   preferredRoute = src: let
     ranked =
-      (src.routes |> builtins.attrNames |> map (n: src.routes.${n} // {name = n;}))
+      (src.routes |> lib.mapAttrsToList (n: v: v // {name = n;}))
       |> lib.sort (a: b: let
         ka = (meteredTier.${a.metered} or 99) * 10000 + a.cost;
         kb = (meteredTier.${b.metered} or 99) * 10000 + b.cost;

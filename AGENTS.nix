@@ -6041,6 +6041,36 @@
         imported there and by delphi.
       '';
     };
+    lib-pipe-mapattrstolist-attrvalues = {
+      title = "Pipe sweep pass 11: attrNames-then-lookup is mapAttrsToList, genAttrs-to-list is attrValues";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-catattrs-inline"];
+      summary = "Two lookup-idiom folds the earlier passes missed: epistemics `preferredRoute` ranked `attrNames |> map (n: routes.\${n} // {name = n;})` — `lib.mapAttrsToList` is that loop verbatim. agents-notes `entryList` mapped noteIds back into the genAttrs it had just built — `builtins.attrValues` is exact because noteIds is attrNames-sorted and `ordered` re-sorts anyway.";
+      refs = {
+        modules = ["flake/epistemics.nix" "lib/agents-notes.nix"];
+        tasks = ["checks:drv-equality"];
+      };
+      body = ''
+        The class is `attrNames |> map (n: set.''${n} ...)` — walking a set's
+        names to look each value back up. `mapAttrsToList` carries name and
+        value together. Refused sites: `map (m: self.modules.''${m})` in
+        noDE/demo/hm-inventory-role is a lookup into a DIFFERENT set keyed by
+        a name list — attrValues cannot express it. `attrNames |> map
+        (id: "data/.../''${id}.json")` in aki-site projects the NAME, not the
+        value. `cache-policy` urlOf/keysOf map names into registry fields —
+        same non-class.
+        The attrValues fold only holds because noteIds = attrNames raw
+        (sorted) and entries = genAttrs noteIds, so the value order matches
+        the name order; `ordered` re-sorts on id immediately after, so even
+        that constraint is belt-and-braces.
+        Gates: epistemics spend/table eval through preferredRoute (cost/
+        metered/why rows intact), agentsNotes.counts total 269 through
+        attrValues, drv-equality 30/30 identical.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

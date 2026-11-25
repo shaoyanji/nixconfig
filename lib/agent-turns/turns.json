@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T10:19:32Z",
+  "generated": "2026-11-25T10:24:06Z",
   "count": 200,
-  "pin": "519965aaab7c6fad418d910c100862ad75d8c2ab54395fc438be4996b52b0fbc",
+  "pin": "d50440c30702ed26cce06ef896d347c108bcbac1683b5042871525c155c57a41",
   "turns": [
+    {
+      "id": "91c68a3b-05d1-4bd6-925f-ac186b87d575",
+      "ts": "2026-11-25T10:22:36Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "verified: image-daily Go port gates all green — go build+vet+test(-count=1, 5.6s) on tools/os/internal/image, checks:image-daily dispatch/fallback/breakers/shrink-guard, all 3 refusal fixtures (publish/ship/images) fire, checks:images 772/772; nothing broken, no fix applied | gate: 8/8 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "496ab9cebc0aab622b839f25ab73abf3207cb6c4",
+      "branch": "main",
+      "frame": "03hau6du8is28mw7u9wj53qfz"
+    },
+    {
+      "id": "9b821c54-2233-4c45-8d16-c09f977c0454",
+      "ts": "2026-11-25T10:22:31Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "Drove idle devin pane agents:1.1 with a gate-change task: verify image-daily Go port gates and fix (jev-decide gate-change p=0.81 margin=0.70). Fresh Thinking line confirmed submission; Devin now running task checks:image-daily and checks:images:publish:test.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "496ab9cebc0aab622b839f25ab73abf3207cb6c4",
+      "branch": "main",
+      "frame": "03hau6dax5cz0gn21p0kqjk02"
+    },
+    {
+      "id": "4658bb2c-19ce-4cd4-aef5-89ae9badf45b",
+      "ts": "2026-11-25T10:19:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-25w",
+      "action": "landed: six boards read (1,058 postings), six rows filed at scout-2026-11-25w, four packets built for CYCAP/Airbus/DATAGROUP/Bechtle, PDFs verified | gate: nix-instantiate --parse AGENTS.nix PASS, agentsNotes.ok PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "496ab9cebc0aab622b839f25ab73abf3207cb6c4",
+      "branch": "main",
+      "frame": "03hau5soe2mahc35aus7j1jcu"
+    },
     {
       "id": "69b7c65a-f1ca-429c-a369-7d0cfa28dfb2",
       "ts": "2026-11-25T10:14:23Z",
@@ -2650,45 +2689,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03harg9vc7a37l9hh6h2nkg4n"
-    },
-    {
-      "id": "e21b917b-4f80-49f1-a8df-a6a578ae0d81",
-      "ts": "2026-11-25T01:54:22Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: 2026-11-25e sweep — arbeitnow API pages 1-30 (5,765 listings) + GitLab/Grafana/Cloudflare/Tigera boards. 130 family matches, 79 place-eligible, 74 already held, 5 filed at scouted: spotixx 68 (Frankfurt DevSecOps, GCP, hybrid DE), QAVION 65 (remote, 10-month ad), VCE 62 (Dortmund self-managed k8s), Amber 50 (Aachen 3 days onsite), hubside 45 (recruiter). Note job-scout-sweep-2026-11-25e; nothing sends before 2026-12-07 | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d9fbb240c1f8f7b20e14251ceef386748ddec4b",
-      "branch": "main",
-      "frame": "03harf3syfr0i7mjggttncipe"
-    },
-    {
-      "id": "31c80831-159d-4ca6-a760-8c1d05cbc2bc",
-      "ts": "2026-11-25T01:51:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-worker",
-      "action": "drove idle wallpaper-worker (agents:4.1, UNKNOWN to pane-watch but live python TUI at clean prompt) with daily wallpaper generation task — produce asset, verify on disk, record artifact for manifest",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
-      "branch": "main",
-      "frame": "03hareghlmntogp1quwcsuihx"
-    },
-    {
-      "id": "35b7f8ec-08fb-4946-8a00-50b351b6addb",
-      "ts": "2026-11-25T01:51:03Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "drove idle delphi (agents:3.1 ssh remote freebuff) with 2026-11-25e sweep task — dedupe vs helo, FIT_MAP 1..5, upsert scouted, land note job-scout-sweep-2026-11-25e, verify rebase before claiming",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
-      "branch": "main",
-      "frame": "03haregg2baqu1r6dy4oaha6v"
     }
   ]
 }

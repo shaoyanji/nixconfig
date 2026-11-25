@@ -6001,9 +6001,10 @@
         firing), the stale "8461 archive front" comment corrected (it is the
         media relay; the API is loopback-only), and the census stays under
         ceiling with checks:policies green. Commit a487f3d4.
-        Remainder: tailnet ssh needs a browser check, so the activation is
-        delphi's 04:30 autoUpgrade off `github:` — verify the two routes live
-        after it, then this note closes.
+        Remainder: tailnet ssh needs a browser check, so activation is
+        delphi's 04:30 autoUpgrade off `github:` — verify both routes live
+        after it, then this note closes. 05:29 CET 2026-11-25: still 404;
+        the 04:30 run predated a487f3d4 (04:48). Next window 04:30 CET 11-26.
       '';
     };
     shared-worktree-commit-race = {

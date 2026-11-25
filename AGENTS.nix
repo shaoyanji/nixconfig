@@ -6671,5 +6671,50 @@
         concurrent turn, so it holds eight and the stage twelve. Nothing is a send.
       '';
     };
+
+    job-scout-sweep-2026-11-25f = {
+      title = "The 2026-11-25f sweep: a second ATS batch and the German boards, one systems admin";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "A second ATS batch of 115 slugs, five aggregators, Berlin Startup Jobs and 1KOMMA5GRAD's Personio feed produced 77 platform-family titles, 59 already held and 18 outside German or EU-remote scope; Jonas und der Wolf survived at scouted with fit 82 band 4 on origin scout-2026-11-25f.";
+      from = ["job-scout-sweep-2026-11-25e-boards"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+Scout 2026-11-25f: the mined pool, one Berlin systems admin, prep only.
+Sources the a-e sweeps had not used: 115 ATS slugs across Greenhouse,
+Ashby and Lever in a second batch (37 boards answered, 1,631 postings, 77
+platform-family titles), remotive, Working Nomads, Himalayas (120 of
+116k), Landing.jobs, RemoteOK, We Work Remotely, Berlin Startup Jobs'
+engineering and nine skill boards, 1KOMMA5GRAD's Personio XML (339
+positions) and only the freshest Arbeitnow page.
+
+The new boards were the dedupe test rather than the source: 59 of the 77
+family titles sit at employers already on record — enpal's Staff Platform
+Engineer (Berlin), Kubermatic's Senior Cloud Native Consultant (CET +-4),
+IONOS Linux administrators, Camunda SRE, ClickHouse EMEA remote, Adyen
+platform engineers, Scaleway SREs (Paris), Celonis Head of IT Platform
+(Munich). The other 18 were US, India, Australia or Costa Rica.
+
+German leads that cleared the ledger were refused on shape or evidence:
+DATATRONiQ is already held, Proact's presales architect and Accenture's
+1st/2nd-level support are not engineering, and Wyden's Lead Platform
+Engineer (AWS) is remote from a Zurich entity with no EU contract stated.
+
+One row: Jonas und der Wolf, (Senior) Systems Administrator, Berlin-
+Moabit, fit 82 band 4. German ad, 50-70k at 40h (30h possible):
+Linux with Docker/Portainer, Ansible, GitLab CI, Grafana/InfluxDB/
+Telegraf, Sentry, BorgBackup and WireGuard, ISO 27001, C1 German. It
+excludes customer infrastructure, so the DevOps share is support.
+
+Origin scout-2026-11-25f; five rows of another turn share it. Exit:
+nothing read past the requirement block, nothing sent, held to 2026-12-07.
+      '';
+    };
   };
 }

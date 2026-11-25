@@ -5545,11 +5545,9 @@
 
         CloudFactory is the one worth a packet after the hold: Berlin, Senior
         SRE, posted 2026-11-24. SCHUFA wants AWS and Terraform for a Wiesbaden
-        platform team and Markant runs cloud applications for retail from
-        Offenburg — both SRE-shaped, both carrying a language and relocation
-        question. Telekom MMS (Senior Cloud and DevOps, Berlin and Dresden) was
-        refused: the Telekom group already holds an applied row, and a second
-        Telekom application is the live-row rule's business, not fit's.
+        platform team, Markant runs cloud for retail from Offenburg — both
+        SRE-shaped, both carrying a language and relocation question. Telekom MMS
+        was refused: the Telekom group already holds an applied row.
 
         Arbeitnow is saturated, and that is the finding. Nine pages, 2700
         postings, and against the 842-company record the only untracked
@@ -5557,12 +5555,10 @@
         Cologne — recorded as read, not filed. Every Scalable, Tipico, wabcon
         and MAIA req this sweep turned up already held a row.
 
-        The dedupe bug is worth naming. `apps-db.sh export` prints TOON
-        (`[1117]{id,company,...}:`), so a json.loads on it raises and an except
-        that swallows the error leaves the known set EMPTY — the first pass of
-        this sweep deduped against nothing but a hardcoded list and reported
-        tracked employers as new. Parse the header for the column order, then
-        the rows.
+        The dedupe bug is worth naming. `apps-db.sh export` prints TOON, so a
+        json.loads raises, and an except that swallows the error leaves the known
+        set EMPTY — the first pass deduped against nothing and reported tracked
+        employers as new. Parse the header for the column order, then the rows.
 
         Exit: the three rows stay at lead until 2026-12-07. apps:dupes is not
         empty and was not before this sweep — auteega, Catapult Sports, DHBW
@@ -5583,12 +5579,10 @@
         tasks = ["apps:add" "apps:dupes"];
       };
       body = ''
-        Ran 2026-11-24 against the 1,120-row tracker, 829 normalized
-        employers, after the LinkedIn pass of the same day filed three.
-        The premise was that the boards were saturated because they were
-        the same boards, so this pass changed the sources instead: about a hundred ATS slugs (Greenhouse, Lever, Ashby), Personio and Recruitee XML
-        feeds, BerlinStartupJobs, Remotive, RemoteOK, and the Bundesagentur Jobsuche API, which refused every
-        query.
+        Ran 2026-11-24 against the 1,120-row tracker, 829 normalized employers,
+        after the LinkedIn pass filed three that day. The boards looked saturated
+        because they were the same boards, so this pass changed sources: ~100 ATS
+        slugs, Personio and Recruitee feeds, BerlinStartupJobs, Remotive, RemoteOK.
 
         What it found: STATWORX, Cloud Engineer, Frankfurt am Main —
         Personio 2589996, created 2026-04-01, still listed. One row. The
@@ -5596,29 +5590,67 @@
         Helsing and Isar Aerospace (defence and launch, both tracked),
         SumUp (applied), AutoScout24 (the tracked Scout24 row).
 
-        Two instruments, two readings worth keeping. The Bundesagentur
-        Jobsuche API answers 403 "No match found for request" from this
-        host for every keyword, and two died on a connection reset,
-        so the largest German board is unreachable here and the note does
-        not pretend to have searched it. And the dedupe compares
-        normalized names, so `solarisbank` does not match the tracked row
-        for `Solaris`: a Greenhouse SRE at Solaris Berlin survived the
-        filter as "new" and was caught by grepping the tracker, not by the
-        script. Grep the employer name before filing, not just the export.
+        Two instruments, two readings worth keeping. The Bundesagentur Jobsuche
+        API answers 403 from this host for every keyword, so the largest German
+        board is unreachable and this note does not pretend otherwise. And the
+        dedupe compares normalized names, so `solarisbank` does not match the
+        tracked `Solaris`: a Greenhouse SRE survived as "new" and was caught by
+        grepping the tracker. Grep the employer name before filing.
 
-        Refused, with the reason on the row: AutoScout24 Senior System
-        Engineer macOS is endpoint management rather than service
-        reliability, and Univention's Senior IT-Projektmanager
-        Infrastruktur is project management over that same openDesk
-        ecosystem. ZenDiS would be the good one — sovereign openDesk
-        infrastructure in Berlin — but its careers page is a client-side
-        render with no feed and no Personio board, so it stays in the gap
-        note rather than being guessed at.
+        Refused, with the reason on the row: AutoScout24 Senior System Engineer
+        macOS is endpoint management rather than service reliability, and
+        Univention's Senior IT-Projektmanager Infrastruktur is project management.
+        ZenDiS would be the good one - sovereign openDesk infrastructure in Berlin -
+        but its careers page is a client-side render with no feed and no Personio
+        board, so it stays in the gap note rather than being guessed at.
 
         Exit: the others stay at lead until the 2026-12-07 hold. The next
         pass adds sources, not keywords — the German board gap is the BA
         API and ZenDiS' JS-only page, and a keyword sweep over the same
         ATS list will keep returning the same drained pool.
+      '';
+    };
+    job-scout-boards-not-drained-2026-11-25 = {
+      title = "Two sweeps, seventeen leads, and the instruments that lie";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "A second ATS round and a five-board sweep of a 1362-row tracker added 17 leads, ranked with Mobidrom first. It also reversed the previous note's premise: Stepstone's metro pages are not drained, germantechjobs is RSS-only, and the normalizer hides subsidiaries.";
+      from = ["job-scout-ats-direct-2026-11-24"];
+      links = ["job-scout-fresh-eu-boards-2026-11-24"];
+      refs = {
+        tasks = ["apps:list" "apps:dupes"];
+      };
+      body = ''
+        Run 2026-11-25 after the ATS note called the boards drained. That held
+        for the ATS boards - 24 SmartRecruiters queries, 17 Ashby orgs, 4
+        Personio boards gave one new employer, Thalia Bücher in Münster - and
+        failed for Stepstone, whose 22 metro pages gave 182 role rows and 16
+        employers new to a 1362-row tracker.
+
+        Decided next leads, ranked (GitHub 50, freshness 35, live 15):
+        NRW.Mobidrom (own org, pushed 0.3 d), procilon, Multi Leiterplatten,
+        Funk, Geneon, Telespazio Germany, spanflug, then Energy2market last.
+        The table sits outside the repo under ~/.local/state/appflow/outreach.
+
+        Open todos. Draft Mobidrom then procilon packets and set next_action
+        on both rows; update refuses without --status. Resolve Advantest's
+        careers URL, because a germantechjobs stub at 2 KB cannot verify a
+        posting and the row stays unfiled. Let the agency filter read the role
+        and not the registered name: Funk lost a round to "und Risk
+        Consultant" and is an insurance broker.
+
+        Open questions. Six of 16 employers have a public GitHub org, so the
+        score is freshness for the rest and a missing org says nothing. The
+        normalizer strips gmbh, ag, systems and services, so Telekom MMS, HxGN
+        and SAP IT Business Systeme read as new - grep the tracker for the bare
+        name before filing. And 122 of 182 rows were already on record: add
+        sources, not keywords, next pass.
+
+        Exit: packets for Mobidrom and procilon exist at prep, nothing sends
+        before 2026-12-07, apps:dupes stays [], and the next sweep names a
+        source no earlier one used.
       '';
     };
   };

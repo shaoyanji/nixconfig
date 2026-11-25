@@ -7262,9 +7262,9 @@
         hides behind a Claranet Italia rejection inside 180 days; Liebherr-Aerospace sits under the parked
         Liebherr-Digital thread. Three rows at the same origin (BarmeniaGothaer, Stadler Mannheim, essendi it)
         came from a parallel pane, so the ledger holds eleven at 25p.
-        Follow-ups: nine nudge flags went to review_flag (Pennylane, Solar and Clean, Vivid, both g2 threads,
-        SYSTEMTEC, GlassFlow, Data Society, EggAI, Genesis PHCM); 13 rows sit overdue by their own date and 30
-        fall due inside the next fortnight.
+        Follow-ups: ten nudge flags went to review_flag (Pennylane, Solar and Clean, Vivid, both g2 threads,
+        SYSTEMTEC, GlassFlow, Data Society, EggAI, Genesis PHCM); 13 live rows carry a past date in their next
+        action and 30 fall due inside the next fortnight.
         Exit: decide the eight before 2026-12-07 and recheck the parked four as they expire.
       '';
     };

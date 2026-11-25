@@ -15,18 +15,15 @@
   # standalone chains have no `networking` at all — either way the shared
   # default degrades rather than erroring the eval.
   hostName = config.networking.hostName or "";
-  hostFeatures =
+  # One predicate behind all three fields: the host's own value when its
+  # inventory entry names it, the shared default when it does not.
+  hostField = field: default:
     if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.hmFeatures or user.hmFeatures
-    else user.hmFeatures;
-  hostBase =
-    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.hmBase or user.hmBaseFeatures
-    else user.hmBaseFeatures;
-  hostAi =
-    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.hmAi or user.hmAiFeatures
-    else user.hmAiFeatures;
+    then hostInventory.${hostName}.${field} or default
+    else default;
+  hostFeatures = hostField "hmFeatures" user.hmFeatures;
+  hostBase = hostField "hmBase" user.hmBaseFeatures;
+  hostAi = hostField "hmAi" user.hmAiFeatures;
 in {
   # A second Wayland shell cannot share a session with DMS: whichever starts
   # last owns the bar, lock and notification surfaces. A host that owns its own

@@ -74,7 +74,7 @@ usage: apps-db.sh <verb> [args]
   get <id>                 one record and the mail linked to it
   update <id> --status S [--next-action N]
   add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
-                             [--notes N] [--category C] [--language L] [--origin O] [--fit N]
+                             [--notes N] [--category C] [--language L] [--origin O] [--fit 0-100|1-5]
   upsert [file|-]          upsert an application record (JSON or TOON on stdin or in a file)
   overview                 stage counts
   queue                    messages waiting for agent:apps (the sync drains them hourly)
@@ -354,6 +354,21 @@ case "$verb" in
     # export is snake_case and the API is camelCase, and the caller should not
     # have to remember which side of that line it is on.
     payload=$(printf '%s' "$body" | jq -c "$stage"'
+      # `fit` is a 1-5 band in the table (applications_fit_check) while the
+      # pipeline scores 0-100 (triage.py FIT_MAP). A raw score used to reach
+      # Postgres, violate the CHECK and come back as a 500; band it here so the
+      # column and the score agree, and keep the drift in view: FIT_MAP is the
+      # other half of this ladder.
+      def fitband:
+        if . == null or . == "" then null
+        elif type == "string" then (tonumber | fitband)
+        elif . >= 1 and . <= 5 then floor
+        elif . >= 85 then 5
+        elif . >= 70 then 4
+        elif . >= 55 then 3
+        elif . >= 40 then 2
+        elif . >= 0 then 1
+        else error("apps-db: fit must be a 0-100 score or a 1-5 band") end;
       def f($camel; $snake): (.[$camel] // .[$snake]);
       {
         id: .id,
@@ -361,7 +376,7 @@ case "$verb" in
         role: (.role // "unknown"),
         category: (.category // "other"),
         language: (.language // "en"),
-        fit: (.fit // null),
+        fit: (.fit | fitband),
         status: (.status // ""),
         # An export carries no stage, and "" would land as `other` in the row:
         # a record without one derives it from the status, as the sync does.

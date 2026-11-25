@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T01:06:05Z",
+  "generated": "2026-11-25T01:09:27Z",
   "count": 200,
-  "pin": "47f30a61a4b7f6e85460463eb1067cb48a9570bbc9c24ee622330b9868279745",
+  "pin": "c711a961e247cb6af55c1bd5f5f11b0321a81096d5fa10d1558cb05ab21dd85e",
   "turns": [
+    {
+      "id": "aff36129-a1da-4c07-9805-28183192acb8",
+      "ts": "2026-11-25T01:06:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "drove idle delphi (agents:3.1 ssh) with fit-500 application-upsert bug fix — classify selected bug-fix p=0.83 m=0.72 exit 0; working... 15s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
+      "branch": "main",
+      "frame": "03har5tn1zm0pdwpmvapszsqm"
+    },
+    {
+      "id": "77649581-52b4-43a9-a41f-7cb9b2fc9e85",
+      "ts": "2026-11-25T01:06:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "drove idle freebuff (agents:2.1) with eight-lead JD packet-or-park task — classify needs_review (decision p=0.71 m=0.58, top pick); working... 18s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
+      "branch": "main",
+      "frame": "03har5tl5bvtylsok1bo9g626"
+    },
+    {
+      "id": "aafba5c4-3e5a-4751-8d2f-d6d198238a60",
+      "ts": "2026-11-25T01:06:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "drove idle devin (agents:1.1) with image-daily shape-cache port task — classify needs_review (decision p=0.65 m=0.52, decisive, top pick); paste landed, Thinking confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
+      "branch": "main",
+      "frame": "03har5tje50pzgc56lw2sv58o"
+    },
     {
       "id": "c985b5cd-626d-48b3-9428-f27d23965721",
       "ts": "2026-11-25T00:58:48Z",
@@ -2600,51 +2639,6 @@
       "base_commit": "7571dacae3572760d492d6548899de9f75348524",
       "branch": "main",
       "frame": "03hao1b0p6j6hc18kwydc1bj5"
-    },
-    {
-      "id": "a26b3403-05c2-4c50-a63b-2599801feaf1",
-      "ts": "2026-11-24T15:17:46Z",
-      "source": "vesper",
-      "subject": "job-search:dhbw-infrastrukturbetrieb-portal",
-      "action": "DHBW portal application for IT-Systemingenieur Infrastrukturbetrieb (ZWR, Verfahrensnummer 25IT/26) completed and submitted for Shaoyan Ji. Filled fresh (July saved form could not be resumed, no link); CV uploaded; confirmation 'Bewerbung versendet!', no reference number.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "~/memory/2026-11-24.md"
-      ],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hanyrmkqijo95r1k3sv11ex"
-    },
-    {
-      "id": "abacd7ab-0741-4a43-9cf6-649eec9a1a02",
-      "ts": "2026-11-24T15:06:14Z",
-      "source": "vesper",
-      "subject": "job-search:email-run-through-2026-11-24",
-      "action": "Email run-through via Mail Atlas API: read 100 recent mails, triaged the 22-item attention list, read 18 full bodies. Found the outstanding topics and prepared the triage for Joiu.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "~/memory/2026-11-24.md"
-      ],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hanwj21xegmnjmhj570pc2o"
-    },
-    {
-      "id": "9abf7b73-8a59-4911-ad48-9a901ddd0b9e",
-      "ts": "2026-11-24T15:00:59Z",
-      "source": "vesper",
-      "subject": "job-search:pipeline-board-verify",
-      "action": "Verified the Delphi job pipeline board (8463) and Mail Atlas (8452) endpoints via the tailnet tunnel proxy and checked pipeline records for DHBW Cloud, DHBW Infrastrukturbetrieb, Freudenstadt IT-Security, and Testo SRE.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "~/memory/2026-11-24.md"
-      ],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hanvhzanfwc8i996r35d6dn"
     }
   ]
 }

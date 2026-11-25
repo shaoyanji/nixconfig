@@ -110,7 +110,7 @@ The port map — every tailnet mount and its loopback upstream, compiled in
 | 8445 | Stirling PDF | `stirling-pdf.service` | `127.0.0.1:7351` |
 | 8446 | Service console (the compiled tailnet portal) | `nginx.service` | `127.0.0.1:8082` |
 | 8447 | SearXNG | `searx.service` | `127.0.0.1:8888` |
-| 8448 | Uptime Kuma | `uptime-kuma.service` | `127.0.0.1:3001` |
+| 8448 | **free** — uptime-kuma retired 2026-11-26 (zero monitors; the checks are `services.fleetMonitors` on 8181) | — | — |
 | 8449 | Agent turns (xs) — POST/GET `/v1/events`, bearer | `agent-turns-shim.service` | agent-turns port |
 | 8450 | Email archive (NpgsqlRest; machine-facing, no `/` page) | `npgsqlrest.service` | `127.0.0.1:8080` |
 | 8451 | **reserved** — the archive's document benchmark | — | — |

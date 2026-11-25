@@ -208,6 +208,17 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    # One monitor backend per host. gatus is the fleet's; an uptime-kuma beside
+    # it is a second dashboard nobody configured (zero monitors on frieren until
+    # 2026-11-04 and on delphi until 2026-11-26). The gate is the assertion, not
+    # the comment: a host that turns both on fails its own evaluation.
+    assertions = [
+      {
+        assertion = !config.services.uptime-kuma.enable;
+        message = "services.fleetMonitors and services.uptime-kuma are two monitor backends on one host; the fleet keeps gatus, and uptime-kuma was retired for having zero monitors (docs/service-offload.md).";
+      }
+    ];
+
     services.gatus = lib.mkIf cfg.gatus.enable {
       enable = true;
       inherit (cfg) openFirewall;

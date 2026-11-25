@@ -67,7 +67,7 @@ Ask in this order; the first "no" usually decides.
 | home-assistant | 117 MiB | Zigbee radio | stays: the USB stick is in the NAS |
 | influxdb2 / scrutiny | 77 MiB | SMART + local history | stays: the data is the NAS's own disks |
 | gatus | 24 MiB | 10 endpoint definitions | **moved** — the checks are delphi's `services.fleetMonitors` since 2026-11-04; frieren keeps only the alert bridge |
-| uptime-kuma | 37 MiB | zero monitors on **either** host | **retired** on frieren 2026-11-04 — an empty dashboard, not a monitoring service |
+| uptime-kuma | 37 MiB | zero monitors on **either** host | **retired** on frieren 2026-11-04 and on delphi 2026-11-26 — an empty dashboard on both, not a monitoring service |
 
 ## Cutover, in order
 

@@ -160,11 +160,6 @@
                 url = "https://delphi.cloudforest-kardashev.ts.net:8445";
                 position = 2000;
               };
-              "Uptime Kuma" = {
-                id = "d1a10001-0000-4000-8000-000000000003";
-                url = "https://delphi.cloudforest-kardashev.ts.net:8448";
-                position = 3000;
-              };
               "Service Portal" = {
                 id = "d1a10001-0000-4000-8000-000000000004";
                 url = "https://delphi.cloudforest-kardashev.ts.net:8446";

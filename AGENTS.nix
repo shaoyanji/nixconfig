@@ -3221,6 +3221,12 @@
         (stirling 633, paperless ~480, uptime-kuma 137, vaultwarden 58, gatus 42, anki 6 MiB). Nothing movable
         remains: the rest is library (immich, jellyfin, plex, *arr, audiobookshelf), the SimpleX identity, or
         hermes by decision.
+
+        **Finished 2026-11-26.** The last duplicate was delphi's own uptime-kuma: still enabled and
+        listening on :8448 while `kuma.db` held zero monitors — the same empty dashboard retired on
+        frieren on 2026-11-04. The service, its :8448 portal card and its `fleetSentinel` watch entry
+        are gone, and `services.fleetMonitors` now asserts that no host runs gatus and uptime-kuma
+        together, so the duplicate fails an evaluation instead of shipping.
       '';
     };
     exp-114 = {

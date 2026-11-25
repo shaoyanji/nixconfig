@@ -318,7 +318,6 @@ in {
       {unit = "nixos-upgrade.service";}
       {unit = "stirling-pdf.service";}
       {unit = "searx.service";}
-      {unit = "uptime-kuma.service";}
       {unit = "crab-hole.service";}
       {unit = "systemone-decision-serve.service";}
       {unit = "nginx.service";}

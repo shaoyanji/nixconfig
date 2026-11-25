@@ -218,10 +218,6 @@ note = "this host's portal: every tailnet service, one page"
 label = "SearXNG"
 port = 8447
 
-[[hosts.delphi.network.links]]
-label = "Uptime Kuma"
-port = 8448
-
 # The archive on :8450 is NpgsqlRest — an API with no page at `/` (404), so it is
 # not a clickable card. Mail atlas is the browsing surface over the same database.
 [[hosts.delphi.network.links]]

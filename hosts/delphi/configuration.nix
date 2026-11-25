@@ -927,14 +927,9 @@ in {
     };
   };
 
-  # External Fleet & WAN Status Monitor (Uptime Kuma on Tailnet)
-  services.uptime-kuma = {
-    enable = true;
-    settings = {
-      HOST = "127.0.0.1";
-      PORT = "3001";
-    };
-  };
+  # uptime-kuma retired 2026-11-26: zero monitors, a second empty dashboard
+  # beside `services.fleetMonitors`, which is where the checks live. The :8448
+  # mount went with it (Story: docs/service-offload.md, docs/delphi-runtime.md).
 
   # --- Miniflux: the reading, not the mail queue -----------------------------
   # Every newsletter that publishes a feed belongs here instead of the inbox:
@@ -1302,13 +1297,6 @@ in {
           title = "SearXNG";
           description = "Private, ad-free meta-search engine on the tailnet.";
           requires = ["searx.service"];
-        };
-        kuma = {
-          port = 8448;
-          upstream = "http://127.0.0.1:3001";
-          title = "Uptime Kuma";
-          description = "External fleet and home WAN status monitor.";
-          requires = ["uptime-kuma.service"];
         };
         miniflux = {
           port = 8455;

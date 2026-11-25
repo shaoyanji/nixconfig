@@ -7309,6 +7309,45 @@
         while the inventory now declares 38. Left for its own pass with the CV budgets re-run.
       '';
     };
+    job-scout-sweep-2026-11-25r = {
+      title = "The untried boards, read: 192 ATS boards, 10,417 postings, and no employer the ledger lacks";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Asked to read the boards 25q named: the vendor careers pages and the Ashby, Personio and SmartRecruiters families. Five vendor pages read, all five already rows. The ATS families answered 192 boards and 10,417 postings, 511 of them lane-titled, from 97 employers — every employer already on the 1,283-row ledger. Zero rows filed, so no origin was written.";
+      from = ["job-scout-sweep-2026-11-25q"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:vendors" "apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The correction first: apps:vendors is a printer, not a market board. It names five EU vendors whose
+        work is closest to this fleet and prints their careers URLs; the three ATS families are employer
+        feeds reached by slug. Both were read.
+        Vendors: LINBIT, B1 Systems, Univention and Open-Xchange are rows already (Open-Xchange lead, the
+        other three prep); Proxmox is parked. Proxmox's page now carries an IT Infrastructure Allrounder
+        (Linux/Debian, 3+ years) — the one lane ad sitting on a parked row, held by exact name and worth a
+        recheck when the hold lifts, not a row under this cycle.
+        Ashby: 113 boards, 5,102 postings. SmartRecruiters: 48 boards, 5,304 postings, paginated to the end of
+        each board. Personio: 31 boards and 320 postings on the first pass over the full 1,343-name set, none
+        of them lane-titled. The follow-up over the 355 employers not on the ledger answered 429 on every
+        request, so its silence there is rate limiting and not an empty family: that retry is owed, not done.
+        511 postings carried a lane title. 250 fell outside Europe, 122 were posted after 2026-10-11 and so
+        are younger than the 45-day cut, nine asked for less than two years. The rest name 97 employers —
+        ICEYE, Supabase, Legora, Parasail, Mondoo, NetBird, Nord Security, Gcore, Mirantis, Doctolib,
+        GetYourGuide, Langdock and the rest — and every one is already a row. The false-hold audit printed
+        the matched ledger row for each, so no lead hides behind a suffix-stripped key.
+        Traps recorded: SmartRecruiters capped at page one reads 100 of DeliveryHero's 795 and 100 of
+        BoschGroup's 5,181, and the first read of this sweep did exactly that. Personio rate-limits a burst
+        with 429, which a naive read files as an empty board. And a slug is a guess: an empty family proves
+        the employer was never onboarded to it, not that it is not hiring, so this flat verdict covers a
+        known-employer population and not the market.
+        Zero rows filed, no origin written. Exit: the untried families are flat too, so the next live source
+        is a board outside these five, or the eight 25p rows once 2026-12-07 lifts.
+      '';
+    };
     job-scout-sweep-2026-11-25q = {
       title = "The 2026-11-25j request: five boards flat, zero new rows, and an id already spent";
       kind = "decision";

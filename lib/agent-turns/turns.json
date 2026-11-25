@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-25T09:55:37Z",
+  "generated": "2026-11-25T10:12:01Z",
   "count": 200,
-  "pin": "1890cce86d675b2c173df68a2374de7458c7bd1b8c1bccf487c08651830820b6",
+  "pin": "556a8383409075fd30778d972899271ea829563c2876b42850362be975427b02",
   "turns": [
+    {
+      "id": "d9a4b04f-aa48-4751-98ed-89206099b30b",
+      "ts": "2026-11-25T10:08:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward-delphi-2026-11-25",
+      "action": "landed: drove agents:3 (delphi freebuff over ssh tunnel) with job-search AGENTS.nix note promotion task (record open todos, decided next leads, open questions from DevOps/SRE/Platform/Infrastructure scouting); jev-decide label=task-change (selected 0.84/0.68); pane confirmed BUSY working 28s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7ad46d58ca6284288ad1fc95e8fd03811cf3060c",
+      "branch": "main",
+      "frame": "03hau3luoqa9thg0deqxcz8cs"
+    },
+    {
+      "id": "ca81735a-21d9-454a-b6f8-c7aefdf28c38",
+      "ts": "2026-11-25T10:08:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward-freebuff-2026-11-25",
+      "action": "landed: drove agents:2 (freebuff) with job-scout CV task (sweep id 2026-11-25q across germantechjobs/WWR/RemoteOK/Ashby/Personio/BSJ, file top rows into tracking ledger, build top-four CV and cover-letter packets); jev-decide label=novel; pane confirmed BUSY working 28s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7ad46d58ca6284288ad1fc95e8fd03811cf3060c",
+      "branch": "main",
+      "frame": "03hau3ltawn4luglp42t33dku"
+    },
+    {
+      "id": "999268db-11c1-4fbd-9a14-472e95bbcf70",
+      "ts": "2026-11-25T10:08:16Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward-devin-2026-11-25",
+      "action": "landed: drove agents:1 (devin) with nixconfig gate-hardening task (run checks:quick and check:verify end-to-end, add seeded-tree fixture for next leaf gate, re-run gates); jev-decide label=flake-change; pane confirmed BUSY Typing 1s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7ad46d58ca6284288ad1fc95e8fd03811cf3060c",
+      "branch": "main",
+      "frame": "03hau3l1l16vq4v7rkloxxi3v"
+    },
+    {
+      "id": "7302b702-463b-4936-bd8f-d151c72a1470",
+      "ts": "2026-11-25T09:55:49Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: pipe pass 10 — inline-lambda spelling of catAttrs, 6 sites (checks nodeTypes/edgeTypes, policies citedIds, agents-notes evidence, epistemics unsettleable/persistable, service-portal shown) to builtins.catAttrs | gate: drv-equality 30/30, ontology drv builds, epistemics+issues [], checks:host frieren rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7ad46d58ca6284288ad1fc95e8fd03811cf3060c",
+      "branch": "main",
+      "frame": "03hau15ki56u4jtlii2v0ma7q"
+    },
     {
       "id": "e95aa932-de8a-4ab1-8584-32d6e09e3dee",
       "ts": "2026-11-25T09:55:09Z",
@@ -2637,58 +2689,6 @@
       "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
       "branch": "main",
       "frame": "03haregco6op185vksdjaskwc"
-    },
-    {
-      "id": "ed98d952-8073-4d62-8644-78abe2ee495a",
-      "ts": "2026-11-25T01:50:37Z",
-      "source": "devji",
-      "subject": "nixconfig:note-image-daily-port",
-      "action": "landed: extended devin-lane-image-daily-go-port — verified gates recorded (unit tests + 9-assert fixture, deploy_frontend PAGES gate), next slices ordered (cloudinary curls, ffprobe check, cpg auth); also renamed duplicate job-scout-sweep-2026-11-25d to -parked — it made AGENTS.nix unevaluable on origin/main | gate: agents-notes-schema PASS (issues [])",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6f4738b0753e4d4fe8ffd828bac25e99f755748",
-      "branch": "main",
-      "frame": "03haredf6mwk19jwwao8pffo3"
-    },
-    {
-      "id": "0f8bee2d-22bd-433d-a9aa-70aeb7c9b51d",
-      "ts": "2026-11-25T01:45:12Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "correction: the 2026-11-25d park commit was rebased onto origin/main before the push, so the landed commit is 2a425a1b, not the 41489b00 the previous turn named. Sweep note job-scout-sweep-2026-11-25d, four rows parked, nothing sent | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a425a1b1ca4d450fb16977c6b77cf203ad0627c",
-      "branch": "main",
-      "frame": "03hardb9hyg56616hq1a4qvzp"
-    },
-    {
-      "id": "997d89ab-de9f-43ae-8b08-c0959e070551",
-      "ts": "2026-11-25T01:45:05Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: four 2026-11-25d leads read at source — Whitecircle (Paris/London hybrid, GPU K8s, 100-150k USD), Alan (Ashby: remote in FR/BE/ES only, eligibility clause), Vitestro (Utrecht 3 days), Univé (Dutch ad, Zwolle, regie not building). All four parked on place, language or eligibility; no packet, which is the 25d lane rule's first evidence. Note job-scout-sweep-2026-11-25d; nothing sends before 2026-12-07 | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2a425a1b1ca4d450fb16977c6b77cf203ad0627c",
-      "branch": "main",
-      "frame": "03hardaffyi2mqz49wz8mfei6"
-    },
-    {
-      "id": "6d4c221a-9385-46fd-9695-a13559d8221a",
-      "ts": "2026-11-25T01:42:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "drove idle freebuff (agents:2.1) with 2026-11-25d read-in-full + decide packet-vs-park task for the 4 scouted leads (Whitecircle MLE/MLOps, Alan Platform Eng, Vitestro Cloud Architect, Univé Frontend Platform) — classify selected note-change p=0.95 m=0.93 exit 0; working... 14s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "71169d3eedebd750b34036d44d7480be25a8f3f9",
-      "branch": "main",
-      "frame": "03harcuij03gl4i3m46r0rt4w"
     }
   ]
 }

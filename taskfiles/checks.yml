@@ -56,6 +56,7 @@ tasks:
       - task: checks:images:ship:test
       - task: checks:images:publish:test
       - task: checks:services:ports
+      - task: checks:services:ports:test
       - task: checks:prose
       - task: checks:prose:test
       - task: checks:infron

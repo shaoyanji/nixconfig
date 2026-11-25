@@ -5745,5 +5745,51 @@
         before 2026-12-07, and apps:dupes stays [].
       '';
     };
+    job-scout-fresh-2026-11-25 = {
+      title = "Fresh sources, not more keywords: thirteen leads and the LinkedIn endpoint that answers";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "A pass switched from DB follow-ups to sourcing: LinkedIn guest search plus seven EU boards gave 355 role rows and 36 employers new to the 1,383-row ledger, 13 filed at scouted. Personio, Axel Springer Tech and Onventis are the packet order; LinkedIn only yields bodies through the guest jobPosting endpoint, not /jobs/view/.";
+      from = ["job-scout-sweep-followup-2026-11-25"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Sources the lane had not walked this week, not another keyword pass.
+        LinkedIn guest search (5 in-lane queries, Germany, seven-day window,
+        8 of 10 pages before the throttle) gave 80 cards; Stepstone 8 metro
+        pages 163; germantechjobs 1,046; BerlinStartupJobs 32; WeWorkRemotely
+        79; RemoteOK 100; Jobicy EU 50; Arbeitnow 300. 355 role rows, 36
+        employers new to the 1,383-row ledger, 13 filed at origin
+        scout-2026-11-25-fresh.
+
+        Filed at scouted, band/score: WSCAD 100, Axel Springer Tech 100,
+        Jochen Bloecher 100, Personio 100, Peraton 100, Onventis 100, MSA
+        Safety 93, telent 93, GIATA 93, DNS:NET 90, ventx 90, Applied
+        Intuition 82, STRABAG 68.
+
+        Two dedupe traps. Real Garant by Zurich holds an applied row under
+        "Real Garant Vers. AG", so exact-name matching missed it; Telekom MMS
+        is the Telekom group, refused 2026-11-24 for its applied row. Both
+        were caught by grepping the tracker, not by the normalizer.
+
+        LinkedIn needs the guest jobPosting endpoint: /jobs/view/ answers 999
+        to curl, jobPosting/<id> returns the body at ~4 s pacing and 429s
+        faster. 12 of 12 bodies validated that way after one retry round.
+
+        Packets next, in order: Personio (Berlin, platform infra, a real
+        platform team), Axel Springer Tech (Berlin, AWS platform), Onventis
+        (Stuttgart, senior infrastructure). Then Applied Intuition if the
+        SWE-leaning ad is acceptable. telent and GIATA lead teams, so they
+        wait on leadership being the target. Nothing sends before 2026-12-07.
+
+        Exit: those three packets exist at prep, apps:dupes stays [], and the
+        next sweep reaches LinkedIn through jobPosting, not /jobs/view/.
+      '';
+    };
   };
 }

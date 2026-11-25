@@ -1,8 +1,64 @@
 {
-  "generated": "2026-11-25T11:26:21Z",
+  "generated": "2026-11-25T11:37:36Z",
   "count": 200,
-  "pin": "17db350caaed3c4fe8d47f14b0059b3384eff936c874b88c4e1b4d69e9bc1d45",
+  "pin": "30fda28ab30bf8af34e0f4e39bbd3e367161066c81da0d54d3721c54cb985b4e",
   "turns": [
+    {
+      "id": "3115a330-2b2d-4b04-a5eb-bc1cfdd62614",
+      "ts": "2026-11-25T11:37:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-fresh-2026-11-25",
+      "action": "claim: fresh sourcing pass — LinkedIn guest + 7 EU boards, file new leads, note with packet order",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "c172f95536373b7367952d1048c4dfbff15eb49a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haul0z15bgtp7rbd6z2c9xj"
+    },
+    {
+      "id": "2a648682-e1b2-476f-9271-398b108539f7",
+      "ts": "2026-11-25T11:37:07Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-freebuff-lane",
+      "action": "landed: tasked freebuff CV/site work via agents:2.1 with task-change — continue job-scout / CV lane: scout DevOps, SRE, Platform and Infrastructure engineer leads on LinkedIn and EU job boards; load-buffer + paste-buffer + Enter; fresh thinking line confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
+      "branch": "main",
+      "frame": "03haukxtqlihxbch0ihmj3xh9"
+    },
+    {
+      "id": "5b1db51d-f554-4194-97d9-878adb6af401",
+      "ts": "2026-11-25T11:31:30Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: tasked delphi freebuff via agents:3.1 ssh tunnel with task-change - switch from lead-DB follow-up upserts to fresh DevOps/SRE/Platform/Infrastructure lead scouting on LinkedIn and EU job boards; classified task-change p=0.88 m=0.79 via jev-decide classify (typesafe, 0.8/0.15 met); load-buffer + paste-buffer + Enter; fresh thinking line confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
+      "branch": "main",
+      "frame": "03haujudfr4n5d56qf5iwotm1"
+    },
+    {
+      "id": "ac0f31da-0cbd-4ad9-9ca4-a85b0f3406a6",
+      "ts": "2026-11-25T11:26:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-25f",
+      "action": "landed: AGENTS.nix note job-scout-sweep-followup-2026-11-25 — buffy's 10:35Z pass, 6 rows at origin scout-2026-11-25j (TKMS 88, Kontron AIS 90, GGW 100 scouted; EOS Inkasso + WinValue prep; AND-E parked), DRK + KIRCHHOFF unfiled behind the talent.com hop, next source is BA Jobsuche | gate: agentsNotes.issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "c172f95536373b7367952d1048c4dfbff15eb49a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hauiufxwgcr9gzgshalv7l6"
+    },
     {
       "id": "f6d95f3f-6018-4d6c-badd-d5cf66f04b59",
       "ts": "2026-11-25T11:25:53Z",
@@ -2639,60 +2695,6 @@
       "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
       "branch": "main",
       "frame": "03harnciqvatwp9edyll586kg"
-    },
-    {
-      "id": "9aea4b64-ae85-4634-a1cd-43fc4cd231c4",
-      "ts": "2026-11-25T02:32:39Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "re-drove idle delphi (agents:3.1 ssh) with sweep batch 2026-11-25g (widened boards: germantechjobsmirrors, berlinstartupjobs, WeWorkRemotely, RemoteOK, Ashby, Personio, SmartRecruiters, stepstone; dedupe vs helo + a..f, FIT_MAP banding, upsert scouted, land note job-scout-sweep-2026-11-25g) — classify needs_review (note-change 0.49 margin 0.23), duel note/task decisive 0.65 vs 0.35 margin 0.30; ssh tunnel reset mid-paste, re-attached via attach-session -t freebuff, working... 10s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
-      "branch": "main",
-      "frame": "03harmkyouwn2zv5aqhthnxd3"
-    },
-    {
-      "id": "30008779-05c2-44f4-9ba6-bb6046fec577",
-      "ts": "2026-11-25T02:32:26Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "claim: 2026-11-25g sweep — germantechjobs mirrors, berlinstartupjobs, WWR, RemoteOK, Ashby, Personio, SmartRecruiters, Stepstone; dedupe vs ledger + a..f; one note, prep only",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03harmjgeg5681uglc8vlbemn"
-    },
-    {
-      "id": "49e47566-e2e4-4daa-aac7-a9792e2e3ee6",
-      "ts": "2026-11-25T02:26:59Z",
-      "source": "devin",
-      "subject": "nixconfig:note-image-daily-port",
-      "action": "landed: image-gen cpg auth dance + upload_bank + batch + detach ported (gen/gen-batch/gen-detach in imagegen.go); image-gen.sh is a shim; cloudinary.sh deleted with its budget line — last curl out; note devin-lane-image-daily-go-port CLOSED | gate: go test 28/28, checks:image-daily ok, checks:images:publish:test 9/9, checks:images:ship:test 4/4, agentsNotes.issues=[]",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
-      "branch": "main",
-      "frame": "03harlh641h1p6w6q4cg05bvr"
-    },
-    {
-      "id": "7cb18fb8-d3c6-49f4-9c56-dd165fdb454c",
-      "ts": "2026-11-25T02:24:24Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "correction: the 2026-11-25f decision commit was rebased onto origin/main (85da6711 had moved) before it pushed, so the landed hash is bb3b732e, not 52e4e735; origin/main == HEAD now. Same content: brose to packet, majori and alten parked on expiries inside the window, scheer and uka on fit. Note job-scout-decisions-2026-11-25f | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bb3b732e3dc9db574bc1ffa37dad9b88cf529e50",
-      "branch": "main",
-      "frame": "03harkyxdxwebqw60kd5510ho"
     }
   ]
 }

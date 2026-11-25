@@ -7225,6 +7225,46 @@
       '';
     };
 
+    job-cv-refresh-2026-11-25 = {
+      title = "The search target moved to the lanes the ledger actually shows";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "The twenty-five-p sweep filed eleven rows whose common thread is a lane, not an employer: DevSecOps and OpenShift platform, AI platform, datacenter infrastructure, Azure Local and managed-service cloud. The site hire section and the target line every CV prints now name those lanes. No work entry changed: a lead is a prospect, not an employer, and the lead list stays off the public page.";
+      from = ["job-scout-sweep-2026-11-25q"];
+      refs = {
+        modules = ["lib/matt-site.nix"];
+        tasks = ["matt:build" "apps:scout" "career:export:en"];
+        docs = ["docs/cv-ats-compliance.md" ".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Read against the scout ledger on 2026-11-25. The input is the eleven rows under origin
+        scout-2026-11-25p; there is no 25r yet, the ledger's newest origin is still p, so nothing
+        newer existed to read.
+
+        Treated as evidence of a market, not of a career. What the eleven rows share is a lane, not
+        an employer: DevSecOps platform (ALDB), OpenShift platform (Creditreform), AI platform (DZ
+        HYP, BarmeniaGothaer, BMW), datacenter infrastructure (adesso), managed-service cloud
+        (valantic), Azure Local and backup (BEW), Azure cloud (Elevion), system administration
+        (essendi). That is the shape the hire section and every CV's target line now state.
+
+        What changed is profile.json and profile.de.json, the target paragraph and the hire body,
+        two locales kept in step. The CV is a projection of those files, so the narrative moved
+        without touching cv.typ, the variants or the JSON Resume pin.
+
+        What deliberately did not change: the work section. The ledger holds prospects; a work
+        entry is an employer, and none was added. Publishing the lead list would also show every
+        company being courted, which is a leak rather than a feature.
+
+        Gate, before the commit: nix build .#sites.matt-site — six CVs at 2/2/1/1/1 pages against
+        their budgets, cv-ats-check green on all six (headings in reading order, name in the first
+        three lines, visible URLs, no hyphenated line end). The longer target grew no page.
+
+        Open, not silently closed: the profile, cases and projects copy says thirteen machines
+        while the inventory now declares 38. Left for its own pass with the CV budgets re-run.
+      '';
+    };
     job-scout-sweep-2026-11-25q = {
       title = "The 2026-11-25j request: five boards flat, zero new rows, and an id already spent";
       kind = "decision";

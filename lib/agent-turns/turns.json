@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T04:53:49Z",
+  "generated": "2026-11-25T05:04:39Z",
   "count": 200,
-  "pin": "a896a251c6f799d980d56d0fecc0af8f8988b19acd7dbffda701fdc787d9fb01",
+  "pin": "a47e6bff9ebeb8d0ec226c6a519081d08e99a102b0250d8e3806879197fb1fa3",
   "turns": [
+    {
+      "id": "e6061bb5-6784-4a1b-a63b-d532396efc51",
+      "ts": "2026-11-25T05:03:12Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-cv-freebuff",
+      "action": "landed: drive CV/site refresh from current scout ledger; freebuff working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "02df66ee5fc5512c4833106227538beec61ae1fc",
+      "branch": "main",
+      "frame": "03hasfzoljavuitmntbfybe1h"
+    },
+    {
+      "id": "9ce417f2-8f97-4505-9aa3-7dbcf80c50ba",
+      "ts": "2026-11-25T05:03:11Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: drive 25r untried-boards scout sweep (apps:vendors EU + Ashby/Personio/SmartRecruiters); delphi working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "02df66ee5fc5512c4833106227538beec61ae1fc",
+      "branch": "main",
+      "frame": "03hasfzn0q413l38q3ij46hvd"
+    },
     {
       "id": "c7403024-0dae-4c5b-be9e-d5e3ed86edbc",
       "ts": "2026-11-25T04:51:28Z",
@@ -2646,32 +2672,6 @@
       "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
       "branch": "main",
       "frame": "03haq02yva8we99fszulqd9ih"
-    },
-    {
-      "id": "2b99b709-c1d3-4f43-948f-88f6290e45b5",
-      "ts": "2026-11-24T21:17:48Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:steward-delphi",
-      "action": "drove idle delphi freebuff pane (agents:3.1, remote ssh): scout new DevOps/SRE/Platform/Infra engineer listings (research pass); jev-decide research 0.91",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
-      "branch": "main",
-      "frame": "03hapx2ryozfjxtytqaug94zg"
-    },
-    {
-      "id": "ca764925-dda1-49c4-a2da-6ececa130461",
-      "ts": "2026-11-24T21:17:47Z",
-      "source": "devin-steward",
-      "subject": "nixconfig:steward-devin",
-      "action": "drove idle devin pane (agents:1.1): finish image-daily Go port engine glue (build_index shape cache + deploy leg), re-run checks:quick/host frieren/images:gate/drv-equality; jev-decide flake-change 0.93",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
-      "branch": "main",
-      "frame": "03hapx2pc25mnz67q9rym9bpo"
     }
   ]
 }

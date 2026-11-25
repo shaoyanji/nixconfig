@@ -7872,43 +7872,6 @@
         Hold: everything here is prep-only, nothing is sent before 2026-12-07.
       '';
     };
-    job-scout-sweep-2026-11-25p = {
-      title = "One verified lead out of the 25p boards, and a 410 that meant the mirror died, not the role";
-      kind = "decision";
-      status = "ACCEPTED";
-      priority = "P2";
-      date = "2026-11-25";
-      summary = "One verified lead: Almedia's Staff Platform Engineer, live on the employer's own Ashby board while Arbeitnow served the same posting as removed. The reusable finding is that an aggregator mirror's 410 closes nothing, because the employer ATS decides. Berlin on-site five days is the gate; filed at lead, hold to 2026-12-07.";
-      from = ["job-scout-sweep-2026-11-25o"];
-      refs = {
-        modules = ["scripts/task/apps-db.sh"];
-        tasks = ["apps:add" "apps:scout"];
-        docs = [".agents/skills/apps/SKILL.md"];
-      };
-      body = ''
-        A sweep is supposed to end in rows; this one ends in one. Almedia's Staff Platform Engineer, Berlin,
-        on-site five days a week, is filed at lead with a prep-only next action under the hold to 2026-12-07.
-        The JD is the closest the boards have offered this week - an internal developer portal, reliability
-        and security owned by Platform with no separate AppSec team, and the servers they run themselves.
-        The on-site requirement sits in the status, not the notes, because it is what most likely kills it.
-        The general finding is smaller: Arbeitnow served that posting as "This job posting has been removed"
-        (410) while the employer's own Ashby board carried it, published 2026-11-17 among 40 live
-        requisitions. An aggregator mirror's death closes nothing; the employer ATS decides. Reading 410 as
-        "gone" would have discarded the only verified lead of the pass.
-        GitHub was checked as an employer signal. The real org is almedia-tm - eight public repos, SDKs in
-        C#, Swift and Android, last push 2026-11-16 - with no infrastructure code: it corroborates a live
-        engineering team and says nothing about the platform stack. It does publish
-        platform-engineer-case-26-q2, which reads like their platform case study and belongs in the prep.
-        Exact normalized name is not knowing the employer: the germantechjobs BAMF row looked new only
-        because the record says "Bundesamt fuer Migration und Fluechtlinge (BAMF)", and normalization cannot
-        bridge an acronym. apps:search with the full name is the check. The Cisco rows are field pre-sales,
-        Airbus and Cognizant are support leads, and KIND, WALDNER and alphacaps return through the
-        aggregator still refused for yesterday's reasons.
-        Two sources stayed unread rather than empty: berlinstartupjobs answers Cloudflare 403 on the page and
-        on three feed paths, so its two Kubernetes postings are unfetched, and SmartRecruiters still needs a
-        company slug. Neither is evidence the market is closed.
-      '';
-    };
     job-scout-sweep-2026-11-25o = {
       title = "The 2026-11-25o sweep: the flat hash, the redirect trap, and the seven window-safe rows";
       kind = "decision";

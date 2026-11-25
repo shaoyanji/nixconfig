@@ -12,18 +12,18 @@
   # that host only. `networking.hostName` resolves on every NixOS container;
   # the fallback keeps a host with no field on the original floor.
   hostName = config.networking.hostName or "";
-  hmModules =
+  # One predicate behind both fields: the host's own value when its inventory
+  # entry names it, the fallback when it does not.
+  hostField = field: default:
     if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.hmModules or ["roles.minimal" "shell"]
-    else ["roles.minimal" "shell"];
+    then hostInventory.${hostName}.${field} or default
+    else default;
+  hmModules = hostField "hmModules" ["roles.minimal" "shell"];
   # The per-host leaf list inside user.base: containers' hmModules name it
   # directly, and `hmBase` data rides extraSpecialArgs because `imports`
   # may not read `config`. user.ai is not imported on containers at all —
   # profiles.ai has no surface to disable.
-  hmBase =
-    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.hmBase or user.hmBaseFeatures
-    else user.hmBaseFeatures;
+  hmBase = hostField "hmBase" user.hmBaseFeatures;
 in {
   home-manager = {
     useGlobalPkgs = true;

@@ -1,8 +1,101 @@
 {
-  "generated": "2026-11-25T15:11:13Z",
+  "generated": "2026-11-25T15:27:46Z",
   "count": 200,
-  "pin": "13f8dcd863e113707824e911cf6a08ac247b6341adc08ef506f3b4a25d5facaf",
+  "pin": "689c0e58724ea13aec2989521c01c5fe75d8630681cdb0abc154622edf4f211c",
   "turns": [
+    {
+      "id": "3718b5c4-13bc-4c64-b13d-49688913f0ab",
+      "ts": "2026-11-25T15:26:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:wallpaper-worker",
+      "action": "no-op CV publish: jekyll production build PASS (JEKYLL_ENV=production, rc=0); six CVs byte-identical across assets/files, _site and live (cv 3733b9eeab5f, cv-de acf12f9e02cc, cv-energy 76933eee76e8, cv-energy-de b6a618618f11, cv-software 3360f38430d3, cv-software-de d9ef78dcd2c0); check-cv-links PASS 6/6; 73 html pages, 3552 internal href/src, 0 broken; blog was 7 behind, fast-forwarded to be17747, no CV changed so no commit, no push, no republish",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03havttaxa48h9lnzkoga6kj1"
+    },
+    {
+      "id": "4b2740f1-e6ff-49d3-930a-5693fe5ff34b",
+      "ts": "2026-11-25T15:24:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "landed: drove delphi freebuff pane agents:3.1 over ssh with CV site publish task; jev-decide classify needs_review margin=0.41 decisive -> publish p=0.65; paste re-sent after first miss, Enter re-sent; confirmed working 32s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
+      "branch": "main",
+      "frame": "03havtawjx08is9ywo8nnc0z9"
+    },
+    {
+      "id": "7655d10e-b902-47a7-9cd2-964516b2da73",
+      "ts": "2026-11-25T15:24:11Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: drove devin pane agents:1.1 with chain-change refactor task; jev-decide classify exit 0 selected chain-change p=0.99 margin=0.98; load-buffer + paste-buffer + Enter; confirmed Running tools 16s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
+      "branch": "main",
+      "frame": "03havtau82fq3adkkqhfh9pgv"
+    },
+    {
+      "id": "53ada18b-fc84-411a-b7db-342890da4c2a",
+      "ts": "2026-11-25T15:18:46Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25j-note",
+      "action": "no new note: the 25j freebuff record already exists as job-scout-sweep-2026-11-25j-freebuff (AGENTS.nix:8097, ACCEPTED/P2, commit 8bb4d61c) and carries the boards, dedupe, ranked leads and the 2026-12-07 hold; 6 leads filed at origin scout-2026-11-25w. The cited id job-scout-boards-not-drained-2026-11-25 does not exist; 'Boards are not drained' is this note. A second note on a closed cycle would duplicate it.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
+      "branch": "main",
+      "frame": "03havs8pq4dxt9tsv3cytu2im"
+    },
+    {
+      "id": "ddef86ef-f798-4541-99a7-fceb91908de3",
+      "ts": "2026-11-25T15:15:27Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:isadev-cv-note",
+      "action": "drove idle freebuff pane agents:2.1: jev-decide classify needs_review, duel note-change 0.77 vs publish 0.23 (margin 0.54) -> note-change; task pasted via load-buffer+paste-buffer, pane working... 9s; AGENTS.nix handoff note for completed isadev CV audit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
+      "branch": "main",
+      "frame": "03havrlaq7avxmwkmxnen1kc8"
+    },
+    {
+      "id": "47269738-d720-4909-8c53-a2adac0bc75f",
+      "ts": "2026-11-25T15:14:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:wallpaper-worker",
+      "action": "blocked: next wall brief (wall-char-frieren-cyberpunk, rev 3, 1536x1024) generated nothing — cpg image answers 502 on 7 passes plus one direct call between 15:08 and 15:15Z, catalog resolves seedream-5.5, allowance stayed 84/100; Eisen fallback has no DNS (http=000); no file written, no publish, no approve",
+      "outcome": "blocked: image provider 502 on every call, Eisen DNS dead",
+      "claims": [
+        "pics/generated/wall/2026-11-25/frieren-cyberpunk"
+      ],
+      "files": [],
+      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03havrey6qw4z71yzu7ii3slh"
+    },
+    {
+      "id": "04bd26de-455b-428a-8517-60e0b48be635",
+      "ts": "2026-11-25T15:11:48Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "chain refactor: hostField helper collapses 3 verbatim inventory-fallback copies in home-manager-shared (12 hosts via nixos+macos) + unblocked the tree: blobs --index now diffs vs HEAD instead of scanning all index blobs (639bf360's wallpaper had dead-blocked every commit) | gate: drv-equality 30/30, checks:quick PASS, seeded-blob refusal proven",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
+      "branch": "main",
+      "frame": "03havqvp3uu5eyplkd4twoiwd"
+    },
     {
       "id": "9af610ac-22b6-465a-88c1-b4781cc2f46d",
       "ts": "2026-11-25T15:06:54Z",
@@ -2559,102 +2652,6 @@
       "base_commit": "33fc9b7292469fc73b574f268807aee969570d7c",
       "branch": "main",
       "frame": "03hasdp5616oyhfvzshms4u75"
-    },
-    {
-      "id": "222b11d4-dbc1-4594-9cfb-f37d892ebb4b",
-      "ts": "2026-11-25T04:51:19Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: lib pipe pass 4 — filter|>length -> lib.count, 12 sites/5 files | gates: drv-equality 30/30, checks:host delphi rc=0, census green + root-fixed pre-push blocker: cloudinaryCreds ate YAML (sops --extract on a map), so every bankUpload since the port failed silently -> secretGetJSON + numeric KEY; add treats session URL as no URL; lake-bridge uploaded, row banked, checks:images 772/772",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "33fc9b7292469fc73b574f268807aee969570d7c",
-      "branch": "main",
-      "frame": "03hasdo3r6j4dd3zc5mtifrp4"
-    },
-    {
-      "id": "572302a2-781d-4844-935e-cb3c9340acde",
-      "ts": "2026-11-25T04:42:22Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: routed note-change (classify p=0.92 m=0.85 exit0) to agents:3.1 (delphi ssh) - scout sweep 2026-11-25j, dedupe vs apps-db ledger, file new leads, land note job-scout-sweep-2026-11-25j + push origin/main",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fb83a3aee8b981ca011ed515ca80fad236cbcf6e",
-      "branch": "main",
-      "frame": "03hasbx7li2fzd3t82w6eok7x"
-    },
-    {
-      "id": "cd4a28dc-89ea-4adf-9378-0566e910d20c",
-      "ts": "2026-11-25T04:41:49Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: sweep requested as 2026-11-25j recorded as 2026-11-25q — j is a closed cycle (note j, 25k, origin scout-2026-11-25j); five boards flat (gtj sha cf313395 sixth time, Stepstone same 150 ads as 25p, bsj/WWR/RemoteOK all held), zero rows filed | gate: agentsNotes.issues=[] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a6be28ee7dc9db3b164d4948ffb94a337f706c8d",
-      "branch": "HEAD",
-      "frame": "03hasbt9v6k9xchq72238dllp"
-    },
-    {
-      "id": "91619cc4-99fa-4a54-b3ff-0f6f9ba12c75",
-      "ts": "2026-11-25T04:40:50Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "claim: sweep 2026-11-25j request — six Stepstone queries plus gtj/berlinstartupjobs/WWR/RemoteOK; id 2026-11-25j is already a closed cycle, so verify the record before writing provenance",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hasbmdacg3dpa44v1mesxl4"
-    },
-    {
-      "id": "d553dc5d-3128-4858-9c5e-95a9f14677ce",
-      "ts": "2026-11-25T04:40:05Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25p",
-      "action": "corrects prior frame: note is job-scout-sweep-2026-11-25q, commit fb83a3ae — the pane lane landed and pushed note p first, and two notes on one id break main; eight rows of mine over five shared keys, 11 unique under origin, six parked in window, other boards held only. gates: parse 0, alejandra 0, notes issues [], agents-notes-schema PASS",
-      "outcome": "failed: pre-push images-check — wall/2026-11-26/frieren-lake-bridge.png carries a session-gated URL (image lane); fb83a3ae local, retry after task images:publish",
-      "claims": [],
-      "files": [],
-      "base_commit": "fb83a3aee8b981ca011ed515ca80fad236cbcf6e",
-      "branch": "main",
-      "frame": "03hasbh4vx7gcvqf5932tm534"
-    },
-    {
-      "id": "d574c368-5e47-4537-be75-3958489263d2",
-      "ts": "2026-11-25T04:37:36Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25p",
-      "action": "2026-11-25p — gtj cf313395 flat again (www 301s to apex); Stepstone 6 queries/143 cards/101 unheld/22 detail reads; 8 rows filed scout-2026-11-25p (Creditreform+BMW 5; Barmenia, DZ HYP, adesso, Stadler 4; essendi, valantic 3); 6 parked inside the 12-07 window (meinestadt=Schwarz Digits held); other boards held only known employers. gate: agents-notes-schema PASS",
-      "outcome": "failed: pre-push images-check — wall/2026-11-26/frieren-lake-bridge.png carries a session-gated URL (image lane); commit d20e1576 is local, needs retry after task images:publish",
-      "claims": [],
-      "files": [],
-      "base_commit": "d20e1576dac4c68c1bf3c153209b850bf94eef61",
-      "branch": "main",
-      "frame": "03hasaznhd68yqbcyyuv1fmo6"
-    },
-    {
-      "id": "fcbbc8ef-4c83-4797-95d9-69f4436e9ba5",
-      "ts": "2026-11-25T04:37:26Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wallpaper-worker",
-      "action": "landed: frieren-lake-bridge 1536x1024 generated via cpg (seedream-5.5, 2nd attempt after a transient 502), recorded via image-daily-add + image-daily.sh publish clean; manifest 771->772, public tree published/wall/2026-11-26/frieren-lake-bridge.png (2418548 B, valid PNG)",
-      "outcome": "done",
-      "claims": [
-        "pics/generated/wall/2026-11-26/frieren-lake-bridge",
-        "image-daily wall lane"
-      ],
-      "files": [],
-      "base_commit": "d20e1576",
-      "branch": "main",
-      "frame": "03hasayiig8ts9femo92a14ht"
     }
   ]
 }

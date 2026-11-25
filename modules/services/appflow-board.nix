@@ -43,7 +43,8 @@ in {
 
     port = lib.mkOption {
       type = lib.types.port;
-      # 8094 is the media library, 8080 the archive API, 8461 its tailnet front.
+      # 8080 is the archive API; it is loopback-only, so this board is its only
+      # tailnet surface (the appflow portal mount on 8463).
       default = 8462;
       description = "Loopback port for the board. Nothing opens it in the firewall; the tailnet front is a portal mount.";
     };
@@ -56,6 +57,17 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    # Every proxied name must be an endpoint the plugin actually publishes:
+    # `applications` 404'd on the live vhost for weeks because the allowlist
+    # named a route nobody had written. A route without a .sql file fails the
+    # host eval now, not a request later.
+    assertions =
+      map (name: {
+        assertion = builtins.pathExists (../plugins/appflow/sql + "/${name}.sql");
+        message = "appflow-board proxies /api/${name} but modules/plugins/appflow/sql/${name}.sql does not exist";
+      }) (readRoutes
+        ++ writeRoutes);
+
     # One shared bearer per the auth decision (AGENTS.nix
     # devin-lane-appflow-write-auth): the secret lives only under /run/secrets,
     # and the rendered map turns `Authorization: Bearer <key>` into a flag the

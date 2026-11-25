@@ -1,8 +1,136 @@
 {
-  "generated": "2026-11-25T03:29:25Z",
+  "generated": "2026-11-25T03:46:28Z",
   "count": 200,
-  "pin": "ed58a463c185c9aa13674d98737a2aebeb58161f09a2fb4c06d8716ade3fc71d",
+  "pin": "9c073f23d02b57f350636ba60c658219473285caedec9952ae8babafdcf6c932",
   "turns": [
+    {
+      "id": "c4275a71-1b09-4553-8b35-cca5f6d37efe",
+      "ts": "2026-11-25T03:42:42Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: dedupe of the six 2026-11-25i rows — Rheinmetall (same req as rheinmetall-it-solutions lead) and Schwarz Digits (GT1923 = dup of stackit-iac, applied 11-22) parked with band-5 evidence; DENIC, mgm, PROTOS, Viridium stand scouted | gate: parse + issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has09lshzldeqkx220wjsbf"
+    },
+    {
+      "id": "c2f325a3-0925-439d-a93e-820aeb26281e",
+      "ts": "2026-11-25T03:42:34Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "claim: dedupe verdict and note for the six scout-2026-11-25i rows",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has08ow9araxn29orstd5j3"
+    },
+    {
+      "id": "03b5a355-bbbd-488e-9a7a-7091a37d4415",
+      "ts": "2026-11-25T03:42:11Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "claim: dedupe verdict and note for the six scout-2026-11-25i rows",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has05wmhgp7vs6rqcv5wfw6"
+    },
+    {
+      "id": "b6b5bdf3-14fa-48c9-949b-2985d9ecad6a",
+      "ts": "2026-11-25T03:41:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: routed novel direction (duel) to agents:3.1 (delphi ssh) - file the six unheld rows of scout-2026-11-25i, dedupe vs apps-db ledger, scout-or-hold per FIT_MAP, no sends",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
+      "branch": "main",
+      "frame": "03harzy038e4y5dom57bto13n"
+    },
+    {
+      "id": "3ea73b51-93e7-46f3-8209-eb012b7ad832",
+      "ts": "2026-11-25T03:41:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: routed novel direction to agents:2.1 (freebuff) - start job-scout sweep 2026-11-25j: fresh vendor-board leads, dedupe vs ledger sweeps a-i, packet-or-park, no sends",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
+      "branch": "main",
+      "frame": "03harzxyexfffkog2dr8x1lc1"
+    },
+    {
+      "id": "adbb8959-f169-444a-ad8d-8cfd7da8aec6",
+      "ts": "2026-11-25T03:41:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: routed bug-fix direction to agents:1.1 (devin) - fix appflow /api/applications upstream-404 on delphi, then residual appflow-board.nix wiring cleanup, promote lane note if green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
+      "branch": "main",
+      "frame": "03harzxwxm0fgasgs3oz7n7kz"
+    },
+    {
+      "id": "b4f9cc3c-12d9-4927-914a-fba460f9a9dd",
+      "ts": "2026-11-25T03:40:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "claim: sweep 2026-11-25j — eight boards (germantechjobs RSS+tags, berlinstartupjobs, WWR, RemoteOK, Ashby, Personio, SmartRecruiters, Stepstone), exact-name dedupe against the 965-firm ledger, packet-or-park per fresh lead; no sends this cycle",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix",
+        "scripts/task/apps-scout.sh"
+      ],
+      "files": [],
+      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
+      "branch": "main",
+      "frame": "03harztrotsidyrk64da1mvag"
+    },
+    {
+      "id": "a9709c24-6921-485e-a50d-cc4d215d3f24",
+      "ts": "2026-11-25T03:33:42Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: 2026-11-25i pass 2 (note j) — Stepstone reachable (listings plain, details need Referer); 228 cards, 6 unheld rows on origin scout-2026-11-25i; gtg identical 1,291/0; bsj 28 links/1 infra, WWR+ROK US-only, ATS 3 postings; dedupe caught Testo+SEW, KubeOps=Bechtle refused | gate: parse + issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haryi85pa4k9tb1mnoyruvt"
+    },
+    {
+      "id": "ff5aa6ac-025b-4a1c-8705-0c94e0b18cfd",
+      "ts": "2026-11-25T03:29:49Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-todo-2026-11-25i",
+      "action": "landed: AGENTS.nix note job-scout-todo-2026-11-25i (kind open, OPEN, P2, from job-scout-sweep-2026-11-25i) lists the two held packets (JACOB, NT-ware) and the three parked rows as todos, all held to 2026-12-07 with 2026-12-21 follow-ups; nothing sent | gate: checks.x86_64-linux.agents-notes-schema PASS, agentsNotes.issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
+      "branch": "main",
+      "frame": "03harxqz5yipwf97ud984lzqv"
+    },
     {
       "id": "0f418a49-0ac8-4ea8-8d90-fd0c368c1c2e",
       "ts": "2026-11-25T03:29:09Z",
@@ -2513,123 +2641,6 @@
       "base_commit": "41f90211909b931352ff147550c9513cb3f6e799",
       "branch": "main",
       "frame": "03hap9tnryl8fcmczfh2l02f5"
-    },
-    {
-      "id": "18ed3cc5-68b6-4d81-972f-daddab7f7634",
-      "ts": "2026-11-24T19:17:52Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-note",
-      "action": "landed: note job-scout-boards-exhausted-2026-11-24 at 96896c8b — nine employers at stage lead from 164af385/7b40455e/c9f09993 with fits (HITS.nrw, Shipzero, Wellis, noris at 4; TecTake, Studytube, Projektron, Rheinmetall, CHECK24 at 3), and the boards that are done: arbeitnow 16 pages, Greenhouse/Lever/Ashby/Personio/Recruitee, remotive; RemoteOK + BA jobsuche 403 | gate: agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "96896c8b2baf84dd51fa9018d5500812c4b33fdb",
-      "branch": "main",
-      "frame": "03hap9nfs0j0gd5mpgayu6y5x"
-    },
-    {
-      "id": "b0574b1f-d6c3-48dc-a276-033f141422fe",
-      "ts": "2026-11-24T19:16:28Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-delphi",
-      "action": "drove delphi freebuff pane (agents:3.1, ssh): routed note-change via jev-decide (note-change 0.99); pane now thinking on the job-search tracker note update.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
-      "branch": "main",
-      "frame": "03hap9dlhx9kmc9rx8b1clnj9"
-    },
-    {
-      "id": "fc9af0f4-a24b-48bf-83ea-e5a49156f89c",
-      "ts": "2026-11-24T19:16:28Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "drove freebuff pane (agents:2.1): routed note-change via jev-decide (note-change 0.98); pane now working (curl to applications API) on the job-scout sweep-state AGENTS.nix note.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
-      "branch": "main",
-      "frame": "03hap9dje73grpuwvi5pbstsy"
-    },
-    {
-      "id": "34d08a59-27d8-45dc-8231-7c04625da911",
-      "ts": "2026-11-24T19:16:27Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-devin",
-      "action": "drove devin pane (agents:1.1): routed gate-change via jev-decide (gate-change 0.96, margin 0.92); pane now Thinking on the checks:nix:style gate regression-proof task, will land its own xs turn.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
-      "branch": "main",
-      "frame": "03hap9dh5dw7vkp03os642coe"
-    },
-    {
-      "id": "505635df-68e1-42c8-8e6c-1ae8b6fa6144",
-      "ts": "2026-11-24T19:10:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correction to 104d1bae: the note now reads 17e95ec1 — the summary and body agree on about a hundred ATS boards, nine Bundesagentur attempts all refused; lead unchanged: STATWORX Cloud Engineer, Frankfurt, lead fit 3 | gate: nix-instantiate --parse PASS + pre-commit PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap84euxsjcl8bp5zalnnpp"
-    },
-    {
-      "id": "a55fbd6c-2211-4eed-b52a-750a3ff2d2ca",
-      "ts": "2026-11-24T19:09:44Z",
-      "source": "devji",
-      "subject": "nixconfig:code-review-loop",
-      "action": "landed: checks:nix:style gate — per-file builtins/lib alias mixing now fails in checks:quick; tree unified to match (epistemics/policies->builtins, nix-files join collapse) | gate: checks:quick PASS incl. fail-injection proof",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2fe0c687d7eb3ac9bc1cdf50d74bc3bc51d40742",
-      "branch": "main",
-      "frame": "03hap8276d0qvhxa2892bknmd"
-    },
-    {
-      "id": "3bd59244-0b8e-4eb2-9758-b5c1cfd6d8f6",
-      "ts": "2026-11-24T19:09:32Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correction to d6e43a1b: the sweep note now reads 104d1bae — instrument counts fixed (about a hundred ATS boards, nine Bundesagentur attempts all refused), the lead is unchanged: STATWORX Cloud Engineer, Frankfurt, lead fit 3 | gate: nix-instantiate --parse PASS + pre-commit PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "104d1bae0c7f64dd4416a5bcbad1a97195ff7cbf",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap80s4n8tcyxj24ftntb6g"
-    },
-    {
-      "id": "17613d32-dd17-4e42-9b81-17ab5bec8d1b",
-      "ts": "2026-11-24T19:09:02Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correction to 03hap7tyo2ayuai9650szxxir: the commit is d6e43a1b, not ca0eb847 — the AGENTS.nix note was refused by the pre-commit alejandra gate and landed after formatting; the content is unchanged (STATWORX Cloud Engineer, Frankfurt, lead fit 3) | gate: nix-instantiate --parse PASS + pre-commit PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d6e43a1b875fde9d54afc0d43d7bb65776bd544a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap7x7675w76zid6uel5k7o"
-    },
-    {
-      "id": "7c03b183-db81-4e84-9b32-73045bfcf452",
-      "ts": "2026-11-24T19:08:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "ats sweep: 8 sources no earlier pass touched (BA jobsuche, 70 greenhouse/lever/ashby boards, personio+recruitee feeds, bsj, remotive, remoteok, 2 linkedin queries) left one untracked fit — STATWORX Cloud Engineer, Frankfurt, filed at lead fit 3; BA 403s from here and solarisbank was a dedupe false positive against the tracked Solaris row | gate: nix-instantiate --parse PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ca0eb847ee535b8ccaafae8b18fcfe0b8aae2d39",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap7tyo2ayuai9650szxxir"
     }
   ]
 }

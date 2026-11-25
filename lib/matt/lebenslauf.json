@@ -184,7 +184,7 @@
     {
       "name": "nixconfig",
       "resumeName": "nixconfig",
-      "description": "Ein Flake deklariert dreizehn NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
+      "description": "Ein Flake deklariert 25 NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
       "url": "https://github.com/shaoyanji/nixconfig",
       "startDate": "2023-01-01",
       "endDate": "",

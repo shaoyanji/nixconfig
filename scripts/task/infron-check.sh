@@ -133,6 +133,10 @@ if [ -f "$persona" ]; then
         # The declared paid lanes carry metered ids — the (route, id) binding
         # is checked in the fallback loop below; this grep cannot see routes.
         deepseek/deepseek-v4.1-flash) ok "persona id $id is the declared paid lane (cantrustai)" ;;
+        # Tokenrouter carries its zero-billing contract inside the id as a
+        # `-free` suffix, not a `:free` suffix — the same weights are the paid
+        # lane on sailresearch without it. Exact id, like the paid lanes above.
+        deepseek/deepseek-v4.1-flash-1017-free) ok "persona id $id is the declared free lane (tokenrouter)" ;;
         *) bad "persona id $id is not :free — the route bills that id" ;;
       esac
     done <<<"$ids"
@@ -169,6 +173,10 @@ else
   persona_default="$(yq -r '.model.default // ""' "$persona")"
   case "$persona_default" in
     *:free) ok "model.default $persona_default is :free" ;;
+    # The one declared non-`:free` primary: tokenrouter's free contract is the
+    # `-free` suffix inside the id (their catalog convention — the same weights
+    # are a paid id on sailresearch without it). Exact id only.
+    deepseek/deepseek-v4.1-flash-1017-free) ok "model.default $persona_default is the declared free lane (tokenrouter)" ;;
     *) bad "model.default '$persona_default' is not :free — the primary bills on every turn" ;;
   esac
   case "$(yq -r '.model.provider // ""' "$persona")" in
@@ -198,6 +206,8 @@ else
       [ -n "$id" ] || continue
       case "$id" in
         *:free) ;;
+        # tokenrouter's free ids carry `-free` inside the id; exact id only.
+        deepseek/deepseek-v4.1-flash-1017-free) ;;
         *) bad "providers.$pname names paid id '$id'" ;;
       esac
     done < <(yq -r "$id_src, .providers.$pname.default_model? // \"\"" "$persona")

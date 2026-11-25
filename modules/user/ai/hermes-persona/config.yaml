@@ -38,10 +38,18 @@ providers:
     models:
       - qwen/qwen3.8-27b:free
       # - deepseek/deepseek-v4-flash-0731:free
+  tokenrouter:
+    api: https://api.tokenrouter.com/v1
+    key_env: TOKENROUTER_API_KEY
+    api_mode: openai
+    default_model: deepseek/deepseek-v4.1-flash-1017-free
+    discover_models: false
+    models:
+      - deepseek/deepseek-v4.1-flash-1017-free
 model:
   provider: custom
-  default: qwen/qwen3.8-27b:free
-  base_url: https://llm.onerouter.pro/v1
+  default: deepseek/deepseek-v4.1-flash-1017-free
+  base_url: https://api.tokenrouter.com/v1
 agent:
   max_turns: 150
   reasoning_effort: medium
@@ -169,10 +177,6 @@ fallback_providers:
   - provider: openrouter
     model: baidu/ernie-5.5-flash-preview:free
   - provider: custom
-    model: qwen/qwen3.8-27b:free
-    base_url: https://llm.onerouter.pro/v1
-    key_env: INFRON_API_KEY
-  - provider: custom
     model: nemotron-3-ultra-550b-a55b-uncensored:free
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
@@ -184,6 +188,10 @@ fallback_providers:
     model: laguna-xs-2.1-uncensored:free
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
+  - provider: custom
+    model: qwen/qwen3.8-27b:free
+    base_url: https://llm.onerouter.pro/v1
+    key_env: INFRON_API_KEY
   - provider: custom
     model: free-ai
     base_url: https://api.apisfreellm.com/v1
@@ -240,10 +248,10 @@ auxiliary:
 # Titles and summaries use their own model lane, pinned to hydrogen so aux
 # work never burns the `:free` ids on the main chat route.
 title_generation:
-  model: gemini-4-hydrogen
+  model: gemini-4-hydrogen-high
 
 summary:
-  model: gemini-4-hydrogen
+  model: gemini-4-hydrogen-high
 skills:
   trusted_project_dirs:
     - /Volumes/data/projects/nixconfig
@@ -303,9 +311,11 @@ approvals:
     - hermes gateway restart
     - hermes gateway stop
 command_allowlist:
+  - delete in root path
   - execute_code
   - script execution via -e/-c flag
   - script execution via heredoc
   - shell command via -c/-lc flag
+  - upload a secret or credential file via curl/wget (possible exfiltration)
 memory:
   write_approval: true

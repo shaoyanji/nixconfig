@@ -42,7 +42,7 @@ cmd_add() { # FILE [URL]
     # before it reports one); without it the file crosses here, under the same
     # `assets/<rel>` id publish and adopt derive, so all three stay one path.
     if [ -z "$url" ]; then
-      url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$file" --public-id "$id") ||
+      url=$("$(image_daily_cli)" cloudinary upload "$file" --public-id "$id" --repo "$repo") ||
         die "add: upload failed for $rel"
     fi
     printf '%s\t%s\t%s\n' "$rel" "$url" "$(stat -c%s "$file")" >>"$rows"

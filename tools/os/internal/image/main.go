@@ -462,7 +462,9 @@ func Main(args []string) {
 		cmdShipDetach(args[1:])
 	case "served":
 		cmdServed(args[1:])
+	case "cloudinary":
+		cmdCloudinary(args[1:])
 	default:
-		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|publish|post|plates|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard|ship-detach|served> [flags]")
+		die("usage: image-daily <manifest|judge|attempt|lane|stage|adopt|remaining|share|pending|shapes|reason|archive|resolve|dimensions|landscape|crop|deploy|publish|post|plates|round|lanes|budget|setting|guard|due|parked|record|index|shrink-guard|ship-detach|served|cloudinary> [flags]")
 	}
 }

@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T01:54:00Z",
+  "generated": "2026-11-25T02:05:37Z",
   "count": 200,
-  "pin": "a4cb0c46ea97f10fc43cd3a497407d2c133ac050fdc7e284d7df9c0843c4e1d2",
+  "pin": "8d6305a6fe6f3bbc95510735a4cdbcf6162ddad8bfaccd3fbde5e2dd6e6371db",
   "turns": [
+    {
+      "id": "fa17f366-aa71-486b-ba88-065456074c03",
+      "ts": "2026-11-25T02:05:19Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-go-port",
+      "action": "drove idle devin (agents:1.1) with image-daily cloudinary-curl Go port (add/blog/gc via cloudinary.sh) — jev-decide classify needs_review (task-change 0.38 / publish 0.32) then duel selected task-change p=0.80 m=0.60 exit 0; Typing spinner confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d9fbb240c1f8f7b20e14251ceef386748ddec4b",
+      "branch": "main",
+      "frame": "03harh8qm5ntf98cs7r6mz4ov"
+    },
+    {
+      "id": "2f724fce-5b0d-4ea0-9bda-4f2219f8276b",
+      "ts": "2026-11-25T02:00:22Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 2026-11-25e boards pass — 15 arbeitnow pages (3,516 listings, 11 read, none platform), 60 ATS boards (2,080 postings, 86 family titles all held), HN Nov thread, germantechjobs (21 new, 5 read); 3 rows at scouted (DIN 4, Bonnier 3, Vetter 3, fit sent as band 1-5), PSI and netgo dropped as held; note id -boards because job-scout-sweep-2026-11-25e was taken by the concurrent five-row turn | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03harg9vc7a37l9hh6h2nkg4n"
+    },
+    {
+      "id": "e21b917b-4f80-49f1-a8df-a6a578ae0d81",
+      "ts": "2026-11-25T01:54:22Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: 2026-11-25e sweep — arbeitnow API pages 1-30 (5,765 listings) + GitLab/Grafana/Cloudflare/Tigera boards. 130 family matches, 79 place-eligible, 74 already held, 5 filed at scouted: spotixx 68 (Frankfurt DevSecOps, GCP, hybrid DE), QAVION 65 (remote, 10-month ad), VCE 62 (Dortmund self-managed k8s), Amber 50 (Aachen 3 days onsite), hubside 45 (recruiter). Note job-scout-sweep-2026-11-25e; nothing sends before 2026-12-07 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d9fbb240c1f8f7b20e14251ceef386748ddec4b",
+      "branch": "main",
+      "frame": "03harf3syfr0i7mjggttncipe"
+    },
     {
       "id": "31c80831-159d-4ca6-a760-8c1d05cbc2bc",
       "ts": "2026-11-25T01:51:04Z",
@@ -2585,45 +2624,6 @@
       "base_commit": "bcce4b6a87ab76c1ee2a756bb3f07d5df155c179",
       "branch": "main",
       "frame": "03haoknam7wi2k5gv9s3j8lya"
-    },
-    {
-      "id": "a390654e-9f2a-4763-ad72-f8e4d8d80096",
-      "ts": "2026-11-24T17:09:52Z",
-      "source": "hermes",
-      "subject": "nixconfig:code-review-loop",
-      "action": "re-driven: devin (agents:1) idle. jev-decide selected review_loop p=0.99 margin=0.98: code-review loop over lib/*.nix pipe-operator code. Pane Thinking.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bcce4b6a87ab76c1ee2a756bb3f07d5df155c179",
-      "branch": "main",
-      "frame": "03haokn97hg6ebrlr15a008uh"
-    },
-    {
-      "id": "b3e81016-7bee-414c-bdd9-70219257906f",
-      "ts": "2026-11-24T17:06:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: second sweep — queue empty (no new replies), 4 sources re-pulled; added SWK AG (Senior Cloud & Infrastructure Engineer, Krefeld, fit 4) and Drees & Sommer (Cloud Engineer, Berlin, fit 3), both held to 2026-12-07; SAP re-hit deduped to the existing row, Vesterling/Jobgether rejected as recruiters, synava/Accesa/Intelerad on fit or location | gate: apps:get PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haojyqgix5pl8ez4ttvdpd8"
-    },
-    {
-      "id": "717afc74-3135-4b64-9ce6-71d628fbe30a",
-      "ts": "2026-11-24T17:05:36Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi (agents:3) idle after upsert. jev-decide selected attention p=0.76 margin=0.55 decisive >= 0.3: sweep attention queue. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bcce4b6a87ab76c1ee2a756bb3f07d5df155c179",
-      "branch": "main",
-      "frame": "03haojt8wkr52vbqjv7hey1zg"
     }
   ]
 }

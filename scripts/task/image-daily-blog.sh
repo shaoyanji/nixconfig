@@ -24,8 +24,8 @@ cmd_blog() { # [--dir PATH]
     fi
     url=$(awk -F'\t' -v k="blog/$slug.jpg" '$1 == k { print $2 }' \
       "$IMAGES_ROOT/published/urls.tsv" 2>/dev/null)
-    [ -n "$url" ] || url=$(bash "$repo/scripts/task/cloudinary.sh" upload "$f" \
-      --public-id "shaoyanji/banners/$slug")
+    [ -n "$url" ] || url=$("$(image_daily_cli)" cloudinary upload "$f" \
+      --public-id "shaoyanji/banners/$slug" --repo "$repo")
     printf 'image:\n  path: %s\n  alt: %s\n\n' "$url" "${alt:-$slug}"
   done
 }

@@ -5918,9 +5918,9 @@
       priority = "P2";
       date = "2026-11-25";
       from = ["one-os-cli" "devin-lane-handoff-2026-11-24"];
-      summary = "~30 verbs in tools/os/internal/image behind .#cli.image.daily; 18 unit tests plus a 9-assert fixture pin every gate arm; ship-detach and served moved the last image-ship.sh snippets to Go. Open: cloudinary curl in add/blog/gc, ffprobe check in wallpaper, image-gen's cpg auth; stash@{0} parked. Renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
+      summary = "~30 verbs in tools/os/internal/image behind .#cli.image.daily; 22 unit tests plus a 9-assert fixture pin every gate arm; ship-detach, served and the cloudinary client moved the last curls to Go. Open: ffprobe check in wallpaper, image-gen's cpg auth; stash@{0} parked. Renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
       refs = {
-        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/ship.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "scripts/task/image-ship.sh" "flake/cli.nix"];
+        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/ship.go" "tools/os/internal/image/cloudinary.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "scripts/task/image-ship.sh" "flake/cli.nix"];
         tasks = ["checks:image-daily" "checks:images:publish:test" "checks:images" "checks:images:ship:test" "images:gate"];
       };
       body = ''
@@ -5931,19 +5931,19 @@
         the binary via IMAGE_DAILY_BIN, PATH, or a one-off `nix build`.
         Shell keeps ~880 lines of dispatch, env resolution and shims.
 
-        Coverage 2026-11-25 (a4ae52b9, efe7901b, d17b7a69, 68b14291,
-        30435eaf, and the ship legs): the publish fixture is 9 assertions —
-        every gate arm proven on 470c9034^ and strip mutations; 18 unit
-        tests pin the urls.tsv projection, skipReason's burn vocabulary,
-        the ffprobe cache loop, deploy_frontend's PAGES gate, ship-detach's
-        systemd-run vector and the served manifest poll plus exit code.
+        Coverage 2026-11-25 (a4ae52b9 through 71169d3e, plus this slice):
+        the publish fixture is 9 assertions — every gate arm proven on
+        470c9034^ and strip mutations; 22 unit tests pin the urls.tsv
+        projection, skipReason's burn vocabulary, the ffprobe cache loop,
+        deploy_frontend's PAGES gate, ship-detach's systemd-run vector,
+        the served poll, and cloudinary.go's signing, upload, paged list
+        and destroy against httptest.
 
         Next slices, in order (external-process boundaries still shell):
-        (1) cloudinary curls in add/blog/gc via cloudinary.sh — the last
-            curl slice in the family; (2) ffprobe's presence check in
-            image-daily-wallpaper.sh — the probe itself is Go's
-            dimensions; (3) image-gen.sh's cpg auth dance. Each file
-            keeps its dispatch slot — the gate checks both ways.
+        (1) ffprobe's presence check in image-daily-wallpaper.sh — the
+            probe itself is Go's dimensions; (2) image-gen.sh's cpg auth
+            dance — upload_bank keeps cloudinary.sh until that slice.
+            Each file keeps its dispatch slot — the gate checks both ways.
 
         Loose thread: stash@{0} "On main: pre-existing changes" is parked
         from an aborted concurrent-lane rebase — not mine to pop or drop.
@@ -6496,6 +6496,46 @@
 
         Exit: `apps:scout STAGE=lead` lists the ten for the first prep
         window after the hold, and none of them is a send.
+      '';
+    };
+    job-scout-decisions-2026-11-25e = {
+      title = "The 2026-11-25e five are decided: spotixx and VCE get packets, three hold";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Every posting still answers with its JobPosting intact, so liveness does not discriminate and datePosted does: spotixx (two days) and VCE (eleven months, refreshed) move to prep, QAVION, Amber and hubside stay held on evidence, and the 2026-12-07 send window is intact.";
+      from = ["job-scout-sweep-2026-11-25e"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:get" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Read each ad live before deciding, and the read answered a different
+        question than the sweep did. All five return 200 with their JobPosting
+        intact, so "live" is not the discriminator: datePosted is. spotixx is two
+        days old (2026-11-23, validThrough 2027-01-04); VCE is eleven months old
+        but its validThrough was refreshed to 2027-01-03 with the text unchanged,
+        which is a re-upped listing rather than a dead one. QAVION, Amber and
+        hubside run 2026-01-24, 2026-09-28 and 2026-06-19.
+
+        spotixx gets a packet: two days old, 60-80k, GCP the only hard
+        requirement, and the seat is IaC plus attested CI/CD plus automated audit
+        evidence — this fleet's shape pointed at provable controls. VCE gets the
+        second: the closest hands-on match on the board, self-managed kubeadm,
+        microk8s and k3s, and no salary to anchor on is a question, not a
+        refusal.
+
+        The three holds are holds on evidence, not on fit. QAVION pays 80k-150k
+        for an unnamed client ten months after posting; Amber wants three days on
+        site for a secops seat behind the same security direction as spotixx;
+        hubside is a recruiter with no client, no salary and a Nutanix admin
+        core. Each costs one mail at the window, no packet.
+
+        Exit: spotixx and VCE prep now and send 2026-12-07, the hold is intact,
+        and a lead earns a packet only when datePosted is inside three months or
+        the employer answers a question.
       '';
     };
     job-scout-sweep-2026-11-25e = {

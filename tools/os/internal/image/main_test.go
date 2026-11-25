@@ -1,10 +1,13 @@
 package image
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"image"
 	"image/png"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -496,5 +499,175 @@ func TestServedExitCode(t *testing.T) {
 	}
 	if out, code := run(miss.URL); out != "false" || code != 1 {
 		t.Fatalf("absent row: got %q rc=%d, want false rc=1", out, code)
+	}
+}
+
+// cloudSign pins the shell's sha1 contract verbatim — the vector is the
+// string cloudinary.sh fed sha1sum, so a reorder or a stray param shows up
+// as a signature Cloudinary would refuse.
+func TestCloudSign(t *testing.T) {
+	params := map[string]string{"public_id": "assets/wall/x", "timestamp": "1700000000"}
+	if got := cloudSign("SECRET", params); got != "5be00799e337bf075d3c603bc1e57d1923bef87a" {
+		t.Fatalf("cloudSign: got %s", got)
+	}
+	// map order is invisible — the sorted join makes insertion order moot.
+	if got := cloudSign("SECRET", map[string]string{"timestamp": "1700000000"}); got != "b4356e7c744cae717f1b865b9d19bef0c0e8ebab" {
+		t.Fatalf("cloudSign timestamp-only: got %s", got)
+	}
+}
+
+// A fixture credential set; the httptest handlers below verify the wire
+// independently of cloudSign so a signing bug is caught by the test, not
+// shared with it.
+var testCreds = cloudCreds{"nm", "key", "sec"}
+
+func testSign(t *testing.T, fields map[string]string, wantSig string) {
+	t.Helper()
+	ts := fields["timestamp"]
+	var signed []string
+	for _, k := range []string{"folder", "public_id", "timestamp"} {
+		if v, ok := fields[k]; ok {
+			signed = append(signed, k+"="+v)
+		}
+	}
+	_ = ts
+	sum := sha1.Sum([]byte(strings.Join(signed, "&") + "sec"))
+	if got := hex.EncodeToString(sum[:]); got != wantSig {
+		t.Errorf("signature = %s, want sha1 of %q+sec", wantSig, strings.Join(signed, "&"))
+	}
+}
+
+// cloudUpload writes the file field plus the signed params; a refusal in
+// {error:{message}} is the error, and a missing secure_url is one too.
+func TestCloudUpload(t *testing.T) {
+	old := cloudBase
+	defer func() { cloudBase = old }()
+	var gotFields map[string]string
+	var gotFile string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasSuffix(r.URL.Path, "/v1_1/nm/image/upload") {
+			t.Errorf("upload went to %s", r.URL.Path)
+		}
+		if err := r.ParseMultipartForm(1 << 20); err != nil {
+			t.Errorf("body is not multipart: %v", err)
+			return
+		}
+		gotFields = map[string]string{}
+		for k := range r.MultipartForm.Value {
+			gotFields[k] = r.MultipartForm.Value[k][0]
+		}
+		if f, fh, err := r.FormFile("file"); err == nil {
+			b, _ := io.ReadAll(f)
+			f.Close()
+			gotFile = fh.Filename + ":" + string(b)
+		}
+		fmt.Fprint(w, `{"secure_url":"https://res.cloudinary.com/nm/image/upload/v1/id.png"}`)
+	}))
+	defer srv.Close()
+	cloudBase = srv.URL
+
+	dir := t.TempDir()
+	png := filepath.Join(dir, "plate.png")
+	if err := os.WriteFile(png, []byte("PNGDATA"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err := cloudUpload(testCreds, png, "", "assets/wall/x")
+	if err != nil {
+		t.Fatalf("cloudUpload: %v", err)
+	}
+	if got != "https://res.cloudinary.com/nm/image/upload/v1/id.png" {
+		t.Fatalf("secure_url: %s", got)
+	}
+	if gotFields["api_key"] != "key" || gotFields["public_id"] != "assets/wall/x" || gotFields["timestamp"] == "" {
+		t.Fatalf("form fields: %v", gotFields)
+	}
+	testSign(t, gotFields, gotFields["signature"])
+	if gotFile != "plate.png:PNGDATA" {
+		t.Fatalf("file part: %q", gotFile)
+	}
+
+	// A refusal is an error with the API's own message.
+	srv2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprint(w, `{"error":{"message":"Invalid Signature"}}`)
+	}))
+	defer srv2.Close()
+	cloudBase = srv2.URL
+	if _, err := cloudUpload(testCreds, png, "", "assets/wall/x"); err == nil || !strings.Contains(err.Error(), "Invalid Signature") {
+		t.Fatalf("refusal must surface its message, got %v", err)
+	}
+}
+
+// cloudListAll follows next_cursor to exhaustion with basic auth — the same
+// read the admin API contract gives cloudinary.sh's curl -u loop.
+func TestCloudListAll(t *testing.T) {
+	old := cloudBase
+	defer func() { cloudBase = old }()
+	var pages []string
+	var gotUser, gotPass string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUser, gotPass, _ = r.BasicAuth()
+		q := r.URL.Query()
+		pages = append(pages, q.Get("next_cursor"))
+		if q.Get("prefix") != "shaoyanji/" {
+			t.Errorf("prefix=%q", q.Get("prefix"))
+		}
+		if q.Get("next_cursor") == "" {
+			fmt.Fprint(w, `{"resources":[{"public_id":"a"},{"public_id":"b"}],"next_cursor":"c2"}`)
+		} else {
+			fmt.Fprint(w, `{"resources":[{"public_id":"c"}]}`)
+		}
+	}))
+	defer srv.Close()
+	cloudBase = srv.URL
+
+	res, err := cloudListAll(testCreds, "shaoyanji/", 500)
+	if err != nil {
+		t.Fatalf("cloudListAll: %v", err)
+	}
+	if len(res) != 3 || res[0].PublicID != "a" || res[2].PublicID != "c" {
+		t.Fatalf("pages not joined: %+v", res)
+	}
+	if len(pages) != 2 || pages[1] != "c2" {
+		t.Fatalf("cursor not followed: %v", pages)
+	}
+	if gotUser != "key" || gotPass != "sec" {
+		t.Fatalf("basic auth: %s:***", gotUser)
+	}
+}
+
+// cloudDestroy posts the same four signed fields as the shell and wants
+// {result:ok} — "not found" is a refusal, not a success.
+func TestCloudDestroy(t *testing.T) {
+	old := cloudBase
+	defer func() { cloudBase = old }()
+	var gotFields map[string]string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseMultipartForm(1 << 20); err != nil {
+			t.Errorf("destroy body is not multipart: %v", err)
+			return
+		}
+		gotFields = map[string]string{}
+		for k := range r.MultipartForm.Value {
+			gotFields[k] = r.MultipartForm.Value[k][0]
+		}
+		fmt.Fprint(w, `{"result":"ok"}`)
+	}))
+	defer srv.Close()
+	cloudBase = srv.URL
+	if err := cloudDestroy(testCreds, "assets/wall/x"); err != nil {
+		t.Fatalf("cloudDestroy: %v", err)
+	}
+	if gotFields["public_id"] != "assets/wall/x" || gotFields["api_key"] != "key" {
+		t.Fatalf("destroy fields: %v", gotFields)
+	}
+	testSign(t, gotFields, gotFields["signature"])
+
+	srv2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprint(w, `{"result":"not found"}`)
+	}))
+	defer srv2.Close()
+	cloudBase = srv2.URL
+	if err := cloudDestroy(testCreds, "gone"); err == nil || !strings.Contains(err.Error(), "not found") {
+		t.Fatalf("a non-ok result must refuse, got %v", err)
 	}
 }

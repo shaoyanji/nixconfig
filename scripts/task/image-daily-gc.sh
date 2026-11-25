@@ -12,7 +12,7 @@ source "$here/image-daily-lib.sh"
 # GC_PREFIX is garbage. `DRY=1` prints the list instead of destroying it.
 
 cmd_gc() {
-  need jq curl git
+  need jq git
   local prefix=${GC_PREFIX:-shaoyanji/} blog=${BLOG_DIR:-$HOME/Documents/shaoyanji.is-a.dev}
   local keep=$IMAGES_ROOT/.gc-keep ids id n=0 gone=0
   [ -s "$IMAGES_ROOT/published/urls.tsv" ] || die "no urls.tsv yet — run images:publish first"
@@ -25,7 +25,7 @@ cmd_gc() {
     fi
   } | sort -u >"$keep"
   say "references: $(wc -l <"$keep") public id(s)"
-  ids=$(bash "$repo/scripts/task/cloudinary.sh" list --prefix "$prefix") || die "could not list $prefix"
+  ids=$("$(image_daily_cli)" cloudinary list --prefix "$prefix" --repo "$repo") || die "could not list $prefix"
   while IFS= read -r id; do
     [ -n "$id" ] || continue
     n=$((n + 1))
@@ -37,7 +37,7 @@ cmd_gc() {
       gone=$((gone + 1))
       continue
     fi
-    bash "$repo/scripts/task/cloudinary.sh" destroy "$id" >/dev/null &&
+    "$(image_daily_cli)" cloudinary destroy "$id" --repo "$repo" >/dev/null &&
       { say "destroyed $id"; gone=$((gone + 1)); }
   done <<<"$ids"
   say "$n under $prefix, $gone orphan(s)"

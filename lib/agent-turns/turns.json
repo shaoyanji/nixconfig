@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T02:51:19Z",
+  "generated": "2026-11-25T03:06:31Z",
   "count": 200,
-  "pin": "04ed18bcf20e708285f7171955ae403cd9e85e7b0f1cfa8863da936beaaecf8c",
+  "pin": "38de78919a2f88957564506e03735566d10bd13e0b537148e012a9074085747b",
   "turns": [
+    {
+      "id": "c52abacf-6769-404d-9bbc-75807620b6d5",
+      "ts": "2026-11-25T02:55:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: drove idle freebuff (agents:2.1) with read+decide+packet the 2026-11-25g sweep rows (latest completed; 25h still in progress on delphi); initial classify needs_review (margin 0.20) -> sanctioned duel decisive task-change (margin 0.48); task pasted via load-buffer/paste-buffer, Enter confirmed fresh working line",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e6a862a11c976717f3674d9b5a805beed5b5290",
+      "branch": "main",
+      "frame": "03harr3ajdnzc8axwcv1voxjf"
+    },
+    {
+      "id": "28c33928-31ab-44bd-b6b5-a89065beb75d",
+      "ts": "2026-11-25T02:51:50Z",
+      "source": "devin",
+      "subject": "nixconfig:nix-comment-audit",
+      "action": "landed: cite sweep of the five heaviest .nix files — all Story:/Trap:/Fact: pointers resolve; 'Fact: port map' got a real target (docs/delphi-runtime.md full mounts table); infra-stack's uncited narratives routed to the deploy doc + image-daily-queue; stale cloudinary.sh ref fixed; apps-db.sh budget renumbered for sibling drift | gate: agentsNotes.issues=[], checks:policies PASS, parse ok",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1e6a862a11c976717f3674d9b5a805beed5b5290",
+      "branch": "main",
+      "frame": "03harqbxpdcfw61s9y6qekyha"
+    },
     {
       "id": "a6ce3085-b5f1-4c27-8d78-e3bebc7142e3",
       "ts": "2026-11-25T02:50:54Z",
@@ -2602,32 +2628,6 @@
       "base_commit": "316fc5f0aa5cd767f325e8c0e7591bb0c598c859",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hap4e1tyekk7x6sl7f4umh4"
-    },
-    {
-      "id": "a1ec6ffe-1924-4dd7-9da2-8e6ecd67725a",
-      "ts": "2026-11-24T18:50:36Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: 3 direct leads from the LinkedIn guest sweep — CloudFactory Berlin SRE 4, SCHUFA Wiesbaden AWS platform 3, Markant Offenburg SRE 3, all at lead held to 2026-12-07; Telekom MMS refused (Telekom group already applied); note job-scout-linkedin-direct-2026-11-24; dedupe now parses the TOON export | gate: nix-instantiate --parse PASS; checks:quick blocked on pre-existing checks:tasks",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "499fc46933b065feb0027b88966171eb62b4d37a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap4bmeag31ljv36zloymgz"
-    },
-    {
-      "id": "08925ea4-f438-4012-8ca7-d2c1a0aacb21",
-      "ts": "2026-11-24T18:45:59Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-wide-feed",
-      "action": "landed: widened sweep to 16 arbeitnow pages (3,767 postings) — 3 new rows: Hochschul-IT-Services.nrw Düsseldorf (Linux/K8s app operations, fit 4), TecTake Igersheim (senior infra, fit 3), Studytube Amsterdam (cloud engineer, fit 3). trawa (prep) and Biz Factory (applied) already on file. Note job-scout-wide-feed-sweep-2026-11-24 | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7b40455ecfe53678967728d370ed2e99d9c10bbb",
-      "branch": "main",
-      "frame": "03hap3f5us58lfe5gxz4el9wp"
     }
   ]
 }

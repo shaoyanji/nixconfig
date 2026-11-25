@@ -6812,6 +6812,48 @@
       '';
     };
 
+    job-scout-packets-2026-11-25g = {
+      title = "Sweep 2026-11-25g read at source: five packets, three rows that should not become one";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "All eight 25g rows were fetched at source (six needed a browser because the board renders client-side) and read in full: five German ads became one-page letters with two-page ad-ordered CVs, while two Azure architect roles and one duplicate employer did not.";
+      from = ["job-scout-sweep-2026-11-25g"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:get" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Sweep 2026-11-25g was the first German batch after the ATS pool ran dry,
+        and its eight rows sat unread until this pass. All eight were fetched at
+        source: six germantechjobs pages render only in a browser, so a plain
+        fetch returned a cookie banner and the ad needed an open, a wait and a
+        text dump; the other two slugs redirect to a board index, so their ad
+        body came from the feed item that carries salary, requirements and
+        responsibilities.
+
+        Five rows became packets under submissions/: porsche, enrichment,
+        signal-iduna, netcologne and ra-radiology. Each is a one-page German
+        letter and a two-page CV in its own ad's order, with the gaps in the
+        letter rather than in the interview. Porsche is the one where a quiet
+        fact reorders everything: the ad makes a master's mandatory and he has
+        one, so the row is a real application, not a long shot.
+
+        Three rows did not become packets. fonds-finanz and vonovia ask for
+        Azure enterprise architecture as the substance of the job — landing
+        zones, Entra ID and PIM, FinOps, steering providers — and a Nix fleet is
+        not an answer to that. psi-grid is the same employer as
+        psi-software-se-devops-engineer-m-w-d, so the older row keeps the thread.
+
+        That duplicate is the rule working, not a loss: one employer, one live
+        thread. Everything is held to 2026-12-07 and nothing was sent.
+
+        Exit: send the five on 2026-12-07, log each send on its row, follow up
+        2026-12-21; a packet whose ad expires first is dropped, not sent late.
+      '';
+    };
     job-scout-sweep-2026-11-25g = {
       title = "The 2026-11-25g sweep: eight boards in full and the German inventory behind them";
       kind = "open";
@@ -6869,29 +6911,29 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Scout 2026-11-25h: germantechjobs re-read in full and unchanged — 1,291 postings, zero new
-since g, and its ten tag pages carry no job link the feed lacks. The other seven boards were not
-re-read: g proved Stepstone unreachable and Personio, SmartRecruiters and Ashby empty of unheld
-infra titles.
-The lead source this pass was the dedupe, not the feed: g's held check was a loose substring match,
-so 94 employers inside the same 1,291 postings had never been filed. Exact-name dedupe against all
-955 ledger employers leaves 213 family postings at 33 held employers and those 94.
-Six of them became rows at scouted, origin scout-2026-11-25h:
-Mecklenburgische Linux System Engineer, 55-75k, band 5;
-Fresenius Medical Care Infrastructure Datacenter, 60-82k, band 5;
-Vivantes Storage/Backup/Exchange engineer, Berlin 53-66k, band 4;
-Röchling Industrial System Engineer Infrastructure & Security, 60-85k, band 5;
-Stadt Mannheim Managed Datacenter/Server specialist, 40-60k, band 4;
-Waldemar Link Senior IT Systems Engineer, Hamburg 60-85k, band 3.
-Refused from the residual on shape or evidence: ELAC SONAR (multi-year local-LLM operations),
-Röchling Medical and intersoft (client management, 1st/2nd level), Zech (connectivity only),
-alphacaps, Sunrise Medical and SimonsVoss (M365 administration), sino AG (25-person allrounder
-shop), Allegion (the same ad template as SimonsVoss), plus Werkstudent, dual-study, Ausbildung and
-municipal trainee titles.
-Caveats: no city in the feed entry for Mecklenburgische, Fresenius or Röchling Industrial; Vivantes
-requires measles immunisation proof; Stadt Mannheim pays TVoD, so the band is indicative; Waldemar
-Link's 67 is a Microsoft/identity ad against a Linux-weighted resume.
-Exit: nothing sent, nothing read past the requirement block, held to 2026-12-07.
+        Scout 2026-11-25h: germantechjobs re-read in full and unchanged — 1,291 postings, zero new
+        since g, and its ten tag pages carry no job link the feed lacks. The other seven boards were not
+        re-read: g proved Stepstone unreachable and Personio, SmartRecruiters and Ashby empty of unheld
+        infra titles.
+        The lead source this pass was the dedupe, not the feed: g's held check was a loose substring match,
+        so 94 employers inside the same 1,291 postings had never been filed. Exact-name dedupe against all
+        955 ledger employers leaves 213 family postings at 33 held employers and those 94.
+        Six of them became rows at scouted, origin scout-2026-11-25h:
+        Mecklenburgische Linux System Engineer, 55-75k, band 5;
+        Fresenius Medical Care Infrastructure Datacenter, 60-82k, band 5;
+        Vivantes Storage/Backup/Exchange engineer, Berlin 53-66k, band 4;
+        Röchling Industrial System Engineer Infrastructure & Security, 60-85k, band 5;
+        Stadt Mannheim Managed Datacenter/Server specialist, 40-60k, band 4;
+        Waldemar Link Senior IT Systems Engineer, Hamburg 60-85k, band 3.
+        Refused from the residual on shape or evidence: ELAC SONAR (multi-year local-LLM operations),
+        Röchling Medical and intersoft (client management, 1st/2nd level), Zech (connectivity only),
+        alphacaps, Sunrise Medical and SimonsVoss (M365 administration), sino AG (25-person allrounder
+        shop), Allegion (the same ad template as SimonsVoss), plus Werkstudent, dual-study, Ausbildung and
+        municipal trainee titles.
+        Caveats: no city in the feed entry for Mecklenburgische, Fresenius or Röchling Industrial; Vivantes
+        requires measles immunisation proof; Stadt Mannheim pays TVoD, so the band is indicative; Waldemar
+        Link's 67 is a Microsoft/identity ad against a Linux-weighted resume.
+        Exit: nothing sent, nothing read past the requirement block, held to 2026-12-07.
       '';
     };
   };

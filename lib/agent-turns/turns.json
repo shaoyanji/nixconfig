@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T01:44:55Z",
+  "generated": "2026-11-25T01:50:20Z",
   "count": 200,
-  "pin": "b6a89e5583ad662eb38a2876943320b32b86eb6a5520383ace78fa78dd62eebd",
+  "pin": "69d5731650675c447031aeac1ceedca989697d638f67366c1ede9d0bd0e6c35a",
   "turns": [
+    {
+      "id": "0f8bee2d-22bd-433d-a9aa-70aeb7c9b51d",
+      "ts": "2026-11-25T01:45:12Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "correction: the 2026-11-25d park commit was rebased onto origin/main before the push, so the landed commit is 2a425a1b, not the 41489b00 the previous turn named. Sweep note job-scout-sweep-2026-11-25d, four rows parked, nothing sent | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2a425a1b1ca4d450fb16977c6b77cf203ad0627c",
+      "branch": "main",
+      "frame": "03hardb9hyg56616hq1a4qvzp"
+    },
+    {
+      "id": "997d89ab-de9f-43ae-8b08-c0959e070551",
+      "ts": "2026-11-25T01:45:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: four 2026-11-25d leads read at source — Whitecircle (Paris/London hybrid, GPU K8s, 100-150k USD), Alan (Ashby: remote in FR/BE/ES only, eligibility clause), Vitestro (Utrecht 3 days), Univé (Dutch ad, Zwolle, regie not building). All four parked on place, language or eligibility; no packet, which is the 25d lane rule's first evidence. Note job-scout-sweep-2026-11-25d; nothing sends before 2026-12-07 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2a425a1b1ca4d450fb16977c6b77cf203ad0627c",
+      "branch": "main",
+      "frame": "03hardaffyi2mqz49wz8mfei6"
+    },
     {
       "id": "6d4c221a-9385-46fd-9695-a13559d8221a",
       "ts": "2026-11-25T01:42:49Z",
@@ -2598,32 +2624,6 @@
       "base_commit": "366e1015528d56b961966a6a515303b94f442135",
       "branch": "main",
       "frame": "03haojev0ke11c33839z34zek"
-    },
-    {
-      "id": "688e34d8-f0cb-46e5-8fdf-83fafc1291fa",
-      "ts": "2026-11-24T17:03:33Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.79 margin=0.68 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03haojetl2ldz9m274zwwsmv7"
-    },
-    {
-      "id": "d9c1d95c-7c2a-4610-a39d-343d8a351bfc",
-      "ts": "2026-11-24T17:02:17Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: queue sweep (9 items) + SmartRecruiters/WWR/Remotive/LinkedIn sweep — Grafana Labs rejected 2026-11-24, avendis ack, DHBW portal-only; new leads: Sony Interactive Entertainment (SRE Berlin), SAP SE (Sovereign Cloud DevOps Berlin), held to 2026-12-07; STACKIT/Tipico/DWS/Scalable already tracked; nothing sent | gate: apps:get rows PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haoj5vf7n2tso42nfkh52bf"
     }
   ]
 }

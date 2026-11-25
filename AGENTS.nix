@@ -5938,11 +5938,12 @@
         the ffprobe cache loop, deploy_frontend's PAGES gate, ship-detach's
         systemd-run vector and the served manifest poll plus exit code.
 
-        Open (deliberately still shell — external-process boundaries):
-        cloudinary curl in add/blog/gc via cloudinary.sh, ffprobe's
-        presence check in image-daily-wallpaper.sh (the probe itself is
-        Go's dimensions), and image-gen.sh's cpg auth dance. Each file
-        keeps its dispatch slot — the gate checks both ways.
+        Next slices, in order (external-process boundaries still shell):
+        (1) cloudinary curls in add/blog/gc via cloudinary.sh — the last
+            curl slice in the family; (2) ffprobe's presence check in
+            image-daily-wallpaper.sh — the probe itself is Go's
+            dimensions; (3) image-gen.sh's cpg auth dance. Each file
+            keeps its dispatch slot — the gate checks both ways.
 
         Loose thread: stash@{0} "On main: pre-existing changes" is parked
         from an aborted concurrent-lane rebase — not mine to pop or drop.
@@ -6412,7 +6413,7 @@
         the next sweep fixes the fit upload before it adds rows.
       '';
     };
-    job-scout-sweep-2026-11-25d = {
+    job-scout-sweep-2026-11-25d-parked = {
       title = "The 2026-11-25d sweep parks all four: place, language and a work-eligibility clause";
       kind = "open";
       status = "OPEN";

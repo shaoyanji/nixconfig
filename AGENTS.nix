@@ -6769,5 +6769,48 @@
         nothing read past the requirement block, nothing sent, held to 2026-12-07.
       '';
     };
+
+    job-scout-sweep-2026-11-25g = {
+      title = "The 2026-11-25g sweep: eight boards in full and the German inventory behind them";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Eight named boards read in full produced 198 platform-family titles, 90 held and 53 outside German or EU-remote scope; eight German rows sit at scouted on origin scout-2026-11-25g (six band 5, two band 4), with germantechjobs the only board still yielding fresh employers.";
+      from = ["job-scout-sweep-2026-11-25f"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+Scout 2026-11-25g: eight boards read in full, the first German batch after the ATS pool ran dry.
+Boards and what answered: germantechjobs RSS (1,291 postings) plus ten tag pages,
+berlinstartupjobs feed and engineering pages, WeWorkRemotely three feeds (120), RemoteOK base
+and devops tag, Ashby 48 slugs (17 boards, 973 postings), Personio 18 slugs (2 feeds, 343
+positions), SmartRecruiters 23 slugs (DeliveryHero, 100 rows); Stepstone refused every request.
+Dedupe: 198 platform-family titles, 90 at employers already on record, 53 US, UK or APAC. The six
+German or EU-remote Ashby titles are all held — enpal, 1komma5grad, Camunda, Kubermatic — and
+WWR plus RemoteOK's 35 family roles are all outside scope, so the fresh German inventory sits on
+germantechjobs.
+Eight rows at scouted, origin scout-2026-11-25g:
+Enrichment Technology Linux Platform Engineer, Jülich 60-80k, band 5;
+PSI Software DevOps Engineer, Neuburg 45-75k, band 5;
+SIGNAL IDUNA Public Cloud Engineer, Dortmund 65-95k, band 5;
+NetCologne System Engineer Infrastructure, Cologne 62.4k, band 5;
+Fonds Finanz Cloud & Infrastructure Architect 50-70k, band 5;
+Porsche Consulting AI & Cloud Platform Engineer, remote 64-104k, band 5;
+Vonovia Cloud Architect Azure/AWS 60-85k, band 4;
+RA Radiology Head of Infrastructure 60-95k, band 4.
+The 100s are corpus coverage of a dense requirement block, not a ranking: the matcher normalizes
+against 60 points and saturates, so band 5 means the ad names the stack.
+Refused on shape or evidence: WALDNER (SAP Basis), CAL Consult (8+ years, contract-shaped),
+Starnberger Kliniken (network only), Amazon (location unstated, consulting), Trellix (manager,
+28-68k), KIND (release manager, 30-55k), plus Werkstudent, dual-study and 1st-level titles.
+Caveats: germantechjobs carries the requirement block, not the full ad, and no city for Vonovia,
+Fonds Finanz or RA Radiology; Porsche's ad makes a master's mandatory.
+Exit: nothing sent, nothing read past the block, held to 2026-12-07.
+      '';
+    };
   };
 }

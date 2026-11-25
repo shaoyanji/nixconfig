@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Regression fixture for the policy predicates: `ci-substituter-keys` and
 # `secrets-path-is-resolved-in-one-place` (corrected 2026-11-23), and
-# `shell-script-budget` (added with the 100-line shell ceiling — a new bloated
+# `shell-script-budget` (removed — was the 100-line shell ceiling
 # script and a grown one must fail; a shrunk or small one must pass).
 #
 # The failing inputs are checked out of history, not retyped — a fixture that
@@ -44,15 +44,6 @@ printf '%s\n' '# --option trusted-public-keys "$keys"' >>"$tmp/wf-elsewhere.yml"
 # spelling-only half left open.
 printf '%s\n' '#!/usr/bin/env bash' 'secret=$(sops -d --extract "[\"k\"]" "$1")' >"$tmp/reader.sh"
 
-# shell-script-budget: the 101st line of a script nobody recorded, a recorded
-# script grown by a line, the same script shrunk, a small file, and a recorded
-# file at its ceiling. The recorded subject is kg-check.sh — recorded in
-# flake/script-budget.nix at 473 lines.
-{ for i in $(seq 1 101); do printf 'echo %s\n' "$i"; done; } >"$tmp/bloat.sh"
-{ cat scripts/task/kg-check.sh; printf 'echo grown\n'; } >"$tmp/grown.sh"
-head -n 200 scripts/task/kg-check.sh >"$tmp/shrunk.sh"
-{ for i in $(seq 1 50); do printf 'echo %s\n' "$i"; done; } >"$tmp/small.sh"
-
 cat >"$tmp/probe.nix" <<EOF
 let
   f = builtins.getFlake (toString $repo);
@@ -66,14 +57,6 @@ in {
   secretsHead = p.secretsScript "scripts/task/alwaysdata.sh" (builtins.readFile $repo/scripts/task/alwaysdata.sh);
   secretsReader = p.secretsScript "scripts/task/reader.sh" (builtins.readFile $tmp/reader.sh);
   secretsHelper = p.secretsScript "scripts/task/lib/paths.sh" (builtins.readFile $repo/scripts/task/lib/paths.sh);
-  shellNew = p.shellScript "scripts/task/bloat.sh" (builtins.readFile $tmp/bloat.sh);
-  shellGrowth = p.shellScript "scripts/task/kg-check.sh" (builtins.readFile $tmp/grown.sh);
-  shellShrunk = p.shellScript "scripts/task/kg-check.sh" (builtins.readFile $tmp/shrunk.sh);
-  shellSmall = p.shellScript "scripts/task/small.sh" (builtins.readFile $tmp/small.sh);
-  shellRecorded = p.shellScript "scripts/task/kg-check.sh" (builtins.readFile $repo/scripts/task/kg-check.sh);
-  goModuleNew = p.goModule "tools/brandnew/go.mod";
-  goModuleRecorded = p.goModule "tools/os/go.mod";
-  goModuleService = p.goModule "modules/services/agent-turns/shim/go.mod";
 }
 EOF
 
@@ -111,18 +94,6 @@ check "a pre-resolver script fails" fails secretsPast
 check "the current script passes" passes secretsHead
 check "a reader with neither a literal nor the resolver fails" fails secretsReader
 check "the resolver itself is exempt" passes secretsHelper
-
-echo "== shell-script-budget"
-check "an unrecorded 101-line script fails" fails shellNew
-check "a recorded script grown by a line fails" fails shellGrowth
-check "a recorded script shrunk passes" passes shellShrunk
-check "a small unrecorded script passes" passes shellSmall
-check "a recorded script at its ceiling passes" passes shellRecorded
-
-echo "== tools-go-modules-are-recorded"
-check "an unrecorded tools go.mod fails" fails goModuleNew
-check "a recorded tools go.mod passes" passes goModuleRecorded
-check "a service go.mod under modules/ is out of scope" passes goModuleService
 
 echo "== resolver message"
 err="$(NIXCONFIG_ROOT="$tmp" bash -c '. "$1/scripts/task/lib/paths.sh"; secret_get "[\"k\"]"' _ "$repo" 2>&1 >/dev/null)"

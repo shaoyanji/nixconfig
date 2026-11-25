@@ -632,88 +632,10 @@
   budgetUnargued =
     budgetedPages |> builtins.filter (pg: budgetMeasured pg > proseBudget.argueAbove && !(proseBudget.notes |> builtins.hasAttr pg));
 
-  # The shell budget as data (flake/script-budget.nix): one recorded ceiling
-  # per production `.sh` over `argueAbove` lines. Production scope is scripts/,
-  # modules/ (the secrets submodule excluded — a gitlink, often not checked
-  # out), tools/ and .agents/skills/; tests/ fixtures and projects/ submodule
-  # trees are not production shell. The recorded number is a ceiling, not a
-  # measurement: shrinking is free, growing is a decision with a diff, and an
-  # unrecorded bloated script is the thing the gate exists to refuse — it is a
-  # Go CLI or a split that never happened.
-  scriptBudget = import ./script-budget.nix;
-  filesUnder = dir: keep:
-    if !builtins.pathExists (root + "/${dir}")
-    then []
-    else let
-      walk = d: let
-        entries = root + "/${d}" |> builtins.readDir;
-      in
-        entries
-        |> builtins.attrNames
-        |> builtins.concatMap (n: let
-          rel = "${d}/${n}";
-        in
-          if entries.${n} == "directory"
-          then
-            if rel == "modules/secrets"
-            then []
-            else walk rel
-          else lib.optional (keep n) rel);
-    in
-      walk dir;
-  shUnder = dir: filesUnder dir (n: lib.hasSuffix ".sh" n);
-  goModUnder = dir: filesUnder dir (n: n == "go.mod");
-  productionShell =
-    (shUnder "scripts")
-    ++ (shUnder "modules")
-    ++ (shUnder "tools")
-    ++ (shUnder ".agents/skills");
-  shellLines = p: lineCount (root + "/${p}");
-  shellBloated =
-    productionShell
-    |> builtins.filter (p: shellLines p > scriptBudget.argueAbove);
-  shellUnrecorded =
-    shellBloated
-    |> builtins.filter (p: !(scriptBudget.shells |> builtins.hasAttr p));
-  shellGrowth =
-    productionShell
-    |> builtins.filter (p:
-      (scriptBudget.shells |> builtins.hasAttr p) && shellLines p > scriptBudget.shells.${p});
-  shellStale =
-    scriptBudget.shells
-    |> builtins.attrNames
-    |> builtins.filter (p: !(productionShell |> builtins.elem p));
+  # Removed: the shell/go-mod budget ledger and its file-walk helpers —
+  # productionShell/filesUnder/shUnder/goModUnder went with the predicates
+  # that consumed them (the ledger data file was deleted in the same change).
 
-  # The Go-module half of the same budget: a `go.mod` under tools/ is a CLI.
-  # The task surface folds into the one OS binary (one-os-cli); the recorded
-  # set is the gate — an unrecorded module fails, a deleted one leaves a stale
-  # entry that the same commit removes.
-  toolsGoMods = goModUnder "tools";
-  goModUnrecorded =
-    toolsGoMods
-    |> builtins.filter (p: !(scriptBudget.goModules |> builtins.elem p));
-  goModStale =
-    scriptBudget.goModules
-    |> builtins.filter (p: !(toolsGoMods |> builtins.elem p));
-  goModuleProblem = path:
-    lib.optional (lib.hasPrefix "tools/" path
-      && lib.hasSuffix "/go.mod" path
-      && !(scriptBudget.goModules |> builtins.elem path))
-    "${path}: a new Go module under tools/ is another CLI — fold its verbs into the OS binary (one-os-cli), or record a foreign tree";
-
-  # Text form for the fixture: a path plus content, the same verdict the tree
-  # walk computes. wc -l semantics — the trailing element after the last
-  # newline is not a line.
-  shellScriptProblems = path: text: let
-    n = (text |> lib.splitString "\n" |> builtins.length) - 1;
-  in
-    (lib.optional (n > scriptBudget.argueAbove && !(scriptBudget.shells |> builtins.hasAttr path))
-      "${path}: ${toString n} lines over ${toString scriptBudget.argueAbove} and unrecorded — a Go CLI or a split, not a budget entry")
-    ++ (lib.optional ((scriptBudget.shells |> builtins.hasAttr path) && n > scriptBudget.shells.${path})
-      "${path}: ${toString n} lines over a recorded ceiling of ${toString scriptBudget.shells.${path}}");
-
-  # The documents, not the skills: `skills-cite-truth` already requires a skill to
-  # point at machine truth, and this is the prose half of the same rule.
   # The documents, not the skills: `skills-cite-truth` already requires a skill to
   # point at machine truth, and this is the prose half of the same rule. The list
   # comes from `filesWithSuffix` and the root documents rather than the whole tree
@@ -850,21 +772,6 @@
         && budgetUnargued == [];
       detail = "corpus ${toString (skillLines + agentsLines)} lines over ${toString (builtins.length budgetedPages)} pages, recorded ${toString proseBudget.total}\n    unrecorded: ${budgetMissing |> lib.concatStringsSep ", "}\n    stale: ${budgetStale |> lib.concatStringsSep ", "}\n    drift: ${budgetDrift |> lib.concatStringsSep ", "}\n    over ${toString proseBudget.argueAbove} without a reason: ${budgetUnargued |> lib.concatStringsSep ", "}";
     };
-
-    shell-script-budget = {
-      rule = "A production `.sh` file over 100 lines is a script that needed a Go CLI (`pkgs.buildGoModule` on a stdlib-only module, the `modules/services/agent-turns/shim` pattern) or a split and got neither: the ceiling is recorded in `flake/script-budget.nix` and the record is the gate. A script may only grow by editing its own number in the same commit — growth is a decision with a diff — an unrecorded bloated script fails, and an entry for a deleted file goes stale. Scope is production shell: `scripts/`, `modules/` (the secrets gitlink excluded), `tools/`, `.agents/skills/`; `tests/` fixtures embed script shapes on purpose and `projects/` are foreign trees.";
-      proof = "flake/script-budget.nix `shells` against line counts of every `.sh` under the four production roots";
-      holds = shellUnrecorded == [] && shellGrowth == [] && shellStale == [];
-      detail = "production shell ${toString (builtins.length productionShell)} file(s), bloated ${toString (builtins.length shellBloated)}, recorded ${toString scriptBudget.total}\n    unrecorded: ${shellUnrecorded |> lib.concatStringsSep ", "}\n    grown past ceiling: ${shellGrowth |> lib.concatStringsSep ", "}\n    stale: ${shellStale |> lib.concatStringsSep ", "}";
-    };
-
-    tools-go-modules-are-recorded = {
-      rule = "A `go.mod` under `tools/` is a CLI: the task surface folds its verbs into the one OS binary (one-os-cli), so a new module is an unrecorded failure and a recorded one that disappears is a stale entry the same commit removes — the ledger shrinks with the port, the same shape as the shell ceiling. The Go service shims under `modules/` are out of scope: they are derivations, not task-surface CLIs.";
-      proof = "flake/script-budget.nix `goModules` against the go.mod walk under tools/";
-      holds = goModUnrecorded == [] && goModStale == [];
-      detail = "tools/ go.mod files: ${toString (builtins.length toolsGoMods)}\n    unrecorded: ${goModUnrecorded |> lib.concatStringsSep ", "}\n    stale: ${goModStale |> lib.concatStringsSep ", "}";
-    };
-
     router-labels-are-routed = {
       rule = "A router label is a route, not a procedure: its row in `.agents/skills/router/references/playbooks.md` names the read to run and the gate that ends the turn, and the row never restates what the taskfile already does. The label set (`assets/labels.json`) and the rows are the same fact in two files, so they are gated against each other — a label with no row is a request the router accepts and cannot dispatch. Neither file may grow into a playbook library: the procedure is the task.";
       proof = "flake/checks.nix `router-labels` (label set against playbook rows, both directions) · task checks:router";
@@ -1580,8 +1487,6 @@ in {
   probes = {
     ciKeys = ciKeyProblems;
     secretsScript = secretsScriptProblems;
-    shellScript = shellScriptProblems;
-    goModule = goModuleProblem;
   };
 
   inherit

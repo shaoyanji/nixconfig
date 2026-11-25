@@ -221,7 +221,8 @@ else
         continue ;;
     esac
     # A paid lane is allowed only when the exact (route, id) pair is declared
-    # here — the entry IS the spend decision, like the script-budget ledger.
+    # here — the entry IS the spend decision, the same shape the script-budget
+    # ledger carried before it was removed.
     # Sail Research is the designated paid last resort: $5/mo free credit,
     # deepseek flash at ~$0.05-0.30/M (2026-11-24 pricing).
     case "$fb_base|$fb_model" in

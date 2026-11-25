@@ -5444,6 +5444,49 @@
         its stored JD replaced by the employer's own text after remotive's scrape.
       '';
     };
+    job-scout-lane-2026-11-25d = {
+      title = "One packet from the 2026-11-25c sweep, and place filtered before the next read";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "The ten 2026-11-25c leads were read at source: Oxoia (Baden) is the packet — German ad, Linux fleet operations, IaC and coding agents as the daily standard. The other nine park, seven on place (Paris, London, Nantes, UK client sites, 60-80% on site) and two on skill.";
+      links = ["job-scout-lane-state-2026-11-24"];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "taskfiles/apps.yml"
+        ];
+        tasks = ["apps:scout" "apps:update" "checks:quick"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Ten rows say `Sweep 2026-11-25c`; four more share the origin string
+        from the earlier p5 pass (DAM, ICG, MY Humancapital,
+        headhunter.digital) and are still at scouted.
+
+        Packet: Oxoia (Baden, Aargau) — a growing fleet of devices in customer
+        buildings, Linux in operation, IaC, Git, Python and Bash, coding
+        agents named as the working standard, German. Build the German packet
+        once the 2026-08-26 listing is confirmed open.
+
+        Parked on place: Artefact and Doctrine (Paris, French), Optiverus and
+        Signal AI (London), Opencast (UK client sites), S-quaar (Nantes, one
+        remote day), Talmatch (60-80% on site). Parked on skill: Alta Ares
+        (ground-station networking for a defence prime) and OBRO (Windows and
+        M365 generalist with helpdesk, posted 2025-04).
+
+        Rule for the next pass: a lead resolves only if the ad is
+        German-language or EU-remote. Nine of ten reads ended in the same
+        verdict, so place is filtered before the read, not after it.
+
+        Read the ad from the page's JobPosting JSON-LD over curl: the rendered
+        arbeitnow page times out at 20 s, and `employmentType` there reports
+        permanent Swiss roles as TEMPORARY.
+
+        Nothing sends before 2026-12-07.
+      '';
+    };
     job-scout-boards-exhausted-2026-11-24 = {
       title = "Nine employers sit at lead and the feeds behind them are mined out, so the lane tailors instead of sweeping";
       kind = "open";

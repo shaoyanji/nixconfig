@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-25T01:24:21Z",
+  "generated": "2026-11-25T01:29:31Z",
   "count": 200,
-  "pin": "0e243f32fe4a5205a124dd5938d725f28d44829345ff11c57261b8c9f91e7d43",
+  "pin": "6cf54786f0e09e168e55c60f0bb55d71b28fb7c2895ba6fc2f75d363056da02a",
   "turns": [
+    {
+      "id": "20c96c91-bddd-409b-ad30-3c910658ab45",
+      "ts": "2026-11-25T01:24:40Z",
+      "source": "devji",
+      "subject": "nixconfig:note-image-daily-port",
+      "action": "landed: extended note devin-lane-image-daily-go-port — 13 unit tests + 9-assert fixture recorded, ffprobe shape-cache loop + deploy_frontend PAGES gate pinned under test, open curl/detach slices named, stash@{0} parked for operator | gate: agents-notes-schema PASS (issues [])",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7bfb39d320fe5667950089f0b1ad194d94d7cee5",
+      "branch": "main",
+      "frame": "03har9ava42ccmot8gp4y4vg0"
+    },
     {
       "id": "12307cc3-2c36-411f-8625-771dbdf6d5c1",
       "ts": "2026-11-25T01:23:45Z",
@@ -2616,19 +2629,6 @@
       "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hao8vkswjqodioerg0ugq2n"
-    },
-    {
-      "id": "a606b6db-9ac5-4122-9297-b26c047ae255",
-      "ts": "2026-11-24T15:50:53Z",
-      "source": "freebuff-delphi",
-      "subject": "nixconfig:delphi-sweep",
-      "action": "landed: novel task sent to freebuff delphi — run prep-only lead sweep to 2026-12-07 hold, commit and push",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
-      "branch": "main",
-      "frame": "03hao57sub88veieqzy5w5p20"
     }
   ]
 }

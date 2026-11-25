@@ -7747,6 +7747,43 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25o-supplement = {
+      title = "The 25o cycle was already filed; this pass adds gematik and ELAC and corrects my Stepstone block";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "The o cycle had already landed (seven rows at scout-2026-11-25n plus a pane's three) before this pass read the record, so nothing was refiled. It adds two employers the seven do not name — gematik and ELAC SONAR, each verified on the employer's own page — refuses KIND and WALDNER after reading theirs, downgrades dive solutions to unverified inside the same pass, and corrects the Stepstone 403 to a missing Referer header.";
+      from = [ "job-scout-sweep-2026-11-25o" ];
+      refs = {
+        modules = [ "scripts/task/apps-db.sh" ];
+        tasks = [ "apps:add" "apps:scout" "apps:update" ];
+        docs = [ ".agents/skills/apps/SKILL.md" ];
+      };
+      body = ''
+        This pass ran the o boards before reading the record, which is the mistake worth recording first: the
+        cycle had already landed as job-scout-sweep-2026-11-25o — seven rows at origin scout-2026-11-25n plus
+        three from a parallel pane — so none of that set was refiled and that note stands untouched. This is
+        the supplement, not a rerun.
+        Two employers the seven do not name survived verification. gematik runs its software factory's GCP
+        estate with Kubernetes, Helm and Terraform, in Berlin, on a one-year fixed term stated in the title.
+        ELAC SONAR wants internal LLM and GPU infrastructure under classified-work rules in Kiel, where German
+        and defence are gates rather than preferences. Both were read on the employer's own page and filed at
+        lead with prep-only next actions.
+        Three apparent fits died on employer pages rather than on the boards: KIND is a .NET and Azure
+        release-management role demanding C1 German, WALDNER is SAP Basis over S/4HANA and BTP, alphacaps is
+        Microsoft-only. VP-Systeme is temp staffing and operational services is an admin title. The ledger
+        already holds Kubernauts, EMnify and Datatroniq at lead, BAMF and EOS at prep, FACT-Finder at other and
+        a Cisco Isovalent row; Reddit and Render matched titles but are US-only.
+        dive solutions was filed and downgraded within the same pass: its Personio job 2785181 and the tenant
+        feed both answer 404 and only mirrors claim the role, so the row now says unverified instead of live
+        and its next action is to find the real requisition or withdraw.
+        The Stepstone correction matters more than any row. This pass called the board unreadable on a 403;
+        the cycle's note has it answering 200 on the same host. Re-testing that page with a Referer header still answered 000 0 here, so the difference deserves one probe before any cycle calls the board closed. A board that refuses an anonymous curl is not a
+        board that cannot be read, and the seven rows already filed from it are the proof.
+        Hold: everything here is prep-only, nothing is sent before 2026-12-07.
+      '';
+    };
     job-scout-sweep-2026-11-25o = {
       title = "The 2026-11-25o sweep: the flat hash, the redirect trap, and the seven window-safe rows";
       kind = "decision";

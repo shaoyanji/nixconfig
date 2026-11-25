@@ -5791,5 +5791,51 @@
         next sweep reaches LinkedIn through jobPosting, not /jobs/view/.
       '';
     };
+    job-scout-eu-widened-2026-11-25 = {
+      title = "EU-widened re-read: one lead, and the geography that decides the rest";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "A second pass of the day re-read LinkedIn EU-wide and Stepstone's six skipped DE metros against 1,416 rows: 57 employers were new, but only tk accelis is in lane, filed at origin scout-2026-11-25. Stepstone AT answers 403 to every request.";
+      from = ["job-scout-fresh-2026-11-25"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The day's second read, widened past Germany: LinkedIn guest search
+        with location=European Union (six queries, twelve pages, three
+        refetched after 429) 120 cards; six skipped DE metros 128 cards;
+        germantechjobs 1,046; WeWorkRemotely 79; RemoteOK 100; Jobicy EU 50.
+        1,523 items, 325 role rows, deduped against 1,416 ledger rows and the
+        thirteen employers of scout-2026-11-25-fresh: 225 dups, 43 blocked,
+        57 new.
+
+        Stepstone AT is not a source: five pages answered 403 to a bare GET,
+        a cookie jar, de-AT Accept-Language and a same-origin Referer, so
+        Austrian coverage came only from LinkedIn.
+
+        Geography decided it. Of 57 new employers two were DACH: Acuity
+        Analytics (Graz) and a Jobster repost. The rest is what EU-wide
+        returns - Porto, Paris, Lisbon, Rotterdam, Dublin, Aarhus - and the
+        lane is a German search, so it was refused on location, not filed.
+
+        Filed, origin scout-2026-11-25: tk accelis GmbH, Lead Architect
+        Infrastructure & Platform Services (Essen), band 3, fit 60. It is the
+        rebranded thyssenkrupp Materials Services; no thyssenkrupp row
+        existed, so the rename hid no duplicate. That origin already held
+        seven lead rows from the 06:25 pass; this is its only scouted row.
+
+        Refused: Acuity Analytics bands 5 at 100 but sells customer-project
+        delivery, so it is a consultancy; Jobster is a Jobbird repost;
+        Fyld is a Portuguese consultancy; Neosoft's ad is Sophia Antipolis.
+
+        Next: a packet decision for tk accelis after the 2026-12-07 hold,
+        behind Personio, Axel Springer Tech and Onventis. The fresh pool is
+        now EU, so widening to EU-remote or relocation is a lane decision.
+      '';
+    };
   };
 }

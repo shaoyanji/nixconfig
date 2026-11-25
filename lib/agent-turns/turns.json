@@ -1,8 +1,103 @@
 {
-  "generated": "2026-11-25T11:37:36Z",
+  "generated": "2026-11-25T12:12:57Z",
   "count": 200,
-  "pin": "30fda28ab30bf8af34e0f4e39bbd3e367161066c81da0d54d3721c54cb985b4e",
+  "pin": "c3446dfb4c510b40f588d9ae9399cb3c426864a7ccbd5c907b6ce7c30e9f6c27",
   "turns": [
+    {
+      "id": "e0421a30-e28b-4592-9a20-a2777a57a19d",
+      "ts": "2026-11-25T12:12:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward-devin-sorton-2026-11-25",
+      "action": "landed: re-tasked devin via agents:1 with note-change — continue attr-projection lib.sortOn pipe pass in modules/, run nix flake check, report result; de inm Thinking after submit, agents:1 BUSY",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
+      "branch": "main",
+      "frame": "03haurxgr87rulqoetu7l64ja"
+    },
+    {
+      "id": "ef5d6a4e-91f1-4b6a-b39a-8faf2f2a1ad5",
+      "ts": "2026-11-25T12:12:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward-freebuff-2026-11-25",
+      "action": "landed: tasked freebuff via agents:2 with task-change — continue the job-scout CV lane: scout DevOps, SRE, Platform and Infrastructure leads on LinkedIn and EU job boards; log leads with name, company, role, link; fold into CV job-search page",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
+      "branch": "main",
+      "frame": "03haurxe4ag8t46mce590pec2"
+    },
+    {
+      "id": "cc182dbb-b9e7-4d62-8281-d9079a46e8bf",
+      "ts": "2026-11-25T12:12:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward-devin-2026-11-25",
+      "action": "landed: tasked devin via agents:1 with note-change — commit the turns.json pre-commit pin refresh on main; devin checked git status/log, tree clean, 39d0f946 already on origin/main, nothing to commit, nothing pushed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
+      "branch": "main",
+      "frame": "03haurwnvrv3e0e93sjr9l9fa"
+    },
+    {
+      "id": "dac2bf9e-72c6-465b-ab14-97c11bcf5d08",
+      "ts": "2026-11-25T12:04:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-fresh-2026-11-25",
+      "action": "claim: fresh sourcing pass, EU+AT widened — LinkedIn guest, Stepstone DE/AT, germantechjobs, RemoteOK, WWR; file new leads at origin scout-2026-11-25",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "637d6589641621352695eb7c656636c7b39f8939",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hauq9fw18fzy4qk7u2tgd8w"
+    },
+    {
+      "id": "184e31d5-71a6-43f1-9ac8-53a2b83b92e1",
+      "ts": "2026-11-25T12:03:36Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward-delphi-2026-11-25",
+      "action": "landed: tasked delphi freebuff via agents:3.1 ssh tunnel with task-change — finish fresh DevOps/SRE/Platform/Infrastructure sourcing pass, dedupe against ledger and nixconfig:job-scout-fresh-2026-11-25, file new leads at scout-2026-11-25, write AGENTS.nix note (jev-decide task-change p=0.90 margin=0.85)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
+      "branch": "main",
+      "frame": "03hauq46rak2p95d834hqgb56"
+    },
+    {
+      "id": "f4302bde-cda0-4c6f-bcda-7d3aca20d36a",
+      "ts": "2026-11-25T11:42:13Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-25x",
+      "action": "landed: 19 leads filed at scout-2026-11-25x (LinkedIn DE/AT 6, Stepstone 13) and folded into the blog CV page; gate: apps:audit 0 violations, page rows 19/19, cv-blog-check still 1 (pre-existing drift) | gate: apps:audit PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
+      "branch": "main",
+      "frame": "03haulxquueb1bu6x9tfalu0b"
+    },
+    {
+      "id": "7c3e4e0f-f13b-46cb-b2d9-ef304b738768",
+      "ts": "2026-11-25T11:37:39Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-fresh-2026-11-25",
+      "action": "landed: note job-scout-fresh-2026-11-25 — 13 rows at scouted, origin scout-2026-11-25-fresh (WSCAD 100, Axel Springer 100, Bloecher 100, Personio 100, Peraton 100, Onventis 100, MSA 93, telent 93, GIATA 93, DNS:NET 90, ventx 90, Applied Intuition 82, STRABAG 68); packet order Personio > Axel Springer > Onventis; apps:dupes [] | gate: agentsNotes.issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "637d6589641621352695eb7c656636c7b39f8939",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haul1o7i4j68dalj1nienp7"
+    },
     {
       "id": "3115a330-2b2d-4b04-a5eb-bc1cfdd62614",
       "ts": "2026-11-25T11:37:33Z",
@@ -2602,99 +2697,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03harq5ajcbiol5umhl6zvy0j"
-    },
-    {
-      "id": "285fe541-871c-418f-b565-22ee62909814",
-      "ts": "2026-11-25T02:46:53Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "claim: 2026-11-25h fresh-lead sweep — germantechjobs in full (RSS + 10 tags, paged) diffed against g's 1,291, ledger + 8 g rows for dedupe, FIT_MAP banding, note job-scout-sweep-2026-11-25h",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03harpcztq0631mk973kzcvx9"
-    },
-    {
-      "id": "b1801bf8-be36-4b15-95d2-8496a1f21f30",
-      "ts": "2026-11-25T02:46:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: drove idle delphi (agents:3.1 ssh) with scout sweep 2026-11-25h — fresh DevOps/SRE/Platform/Infra leads, dedupe vs ledger + sweeps a..g, FIT_MAP banding, land note job-scout-sweep-2026-11-25h",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5071d2a995147d75eac1b196e91f46ea9d4fbd05",
-      "branch": "main",
-      "frame": "03harpcyzsq3xx0ot5uzchqo7"
-    },
-    {
-      "id": "aaf175dd-6430-431e-bb5a-a75160d23952",
-      "ts": "2026-11-25T02:46:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "landed: drove idle devin (agents:1.1) with the nix-comment-audit task — route the 4169 comment lines in tracked .nix files to their owning channels (policies to flake/policies.nix, fleet facts to inventory.toml, why/history to AGENTS.nix notes, procedures to taskfiles, durable explanations to docs/), heaviest files first",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5071d2a995147d75eac1b196e91f46ea9d4fbd05",
-      "branch": "main",
-      "frame": "03harpcxffxufa9zmwsorbmqz"
-    },
-    {
-      "id": "2932424b-b4e0-4119-901b-f2982deda24f",
-      "ts": "2026-11-25T02:41:12Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: brose packet in submissions/brose-aws-system-engineer-bamberg — 1-page German letter + 2-page CV in the ad's own order (landing zone, permissions, IaC, change, monitoring, DR, FinOps), gaps stated up front (no production landing zone, no Terraform/CloudFormation, no AWS cert). Letter dated 2026-12-07, row stays prep, nothing sent | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5071d2a995147d75eac1b196e91f46ea9d4fbd05",
-      "branch": "main",
-      "frame": "03haro930v5s3ruta6qjqdwy6"
-    },
-    {
-      "id": "1afedc97-e228-4577-b77c-5938a102f3d7",
-      "ts": "2026-11-25T02:39:02Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: 2026-11-25g — 8 boards read (gtg 1,291 + 10 tags, bsj, WWR 120, RemoteOK 100, Ashby 48 slugs/973 postings, Personio 2/343, SmartRecruiters 1/100, Stepstone blocked); 198 family titles, 90 held, 53 US/UK/APAC; 8 rows scouted (bands 5x6, 4x2): Enrichment, PSI, SIGNAL IDUNA, NetCologne, Fonds Finanz, Porsche, Vonovia, RA Radiology; prep only | gate: parse + issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03harnttvy047ijurhiosfi4g"
-    },
-    {
-      "id": "589d4beb-4615-4a45-bcfb-b20b78f73947",
-      "ts": "2026-11-25T02:36:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "re-drove freebuff (agents:2.1) after the 25f five landed (1 packet: brose) with build-the-brose-application-packet task (tailor CV + letter, store under appflow submissions, update lead row, land note) — classify needs_review note-change 0.59 margin 0.43 (decisive top pick); working... 10s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
-      "branch": "main",
-      "frame": "03harnckagqs1i1n8fipd5ygk"
-    },
-    {
-      "id": "2ec01760-235e-4e57-a29e-f1639a245b92",
-      "ts": "2026-11-25T02:36:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "re-drove devin (agents:1.1) after the closed image-daily port landed (note CLOSED, 64906cfc) with devin-lane-appflow-write-auth verify+close (curl pair on delphi live vhost :8463, 403/200 split, close note when live) — classify needs_review (note-change 0.43 m 0.08), re-class 0.48 m 0.16, duel note/gate decisive 0.72 vs 0.28 m 0.44; Thinking confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "64906cfced1d7fe15fd59d12ae12dc81819fae2a",
-      "branch": "main",
-      "frame": "03harnciqvatwp9edyll586kg"
     }
   ]
 }

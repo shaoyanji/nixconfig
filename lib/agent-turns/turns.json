@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-24T23:58:11Z",
+  "generated": "2026-11-25T00:02:40Z",
   "count": 200,
-  "pin": "8fbb4ac614ac38c4d54a7f434145f4f757d3992b4dc9a0ffd43909c24bb7a50b",
+  "pin": "a2d8766d1fbf4453946268b1b6079947931b4bed259495aa43b899fd52014aec",
   "turns": [
+    {
+      "id": "161c10ee-c9c3-49a9-89fc-c6c52a5f3963",
+      "ts": "2026-11-25T00:01:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: drove idle delphi (agents:3.1) with scout-fresh task — jev-decide selected p=0.81 margin=0.72; scout fresh verified DevOps/SRE/Platform/Infra leads 2026-11-25, hold-aware, no sends; freebuff accepted, thinking... confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "efe7901b38202c5084e39bfecc7624bef96b90a6",
+      "branch": "main",
+      "frame": "03haqt4ns9kxmrtuorxq7omyp"
+    },
+    {
+      "id": "b28560d5-f035-4872-9a5e-addd0136b488",
+      "ts": "2026-11-25T00:01:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "landed: drove idle devin (agents:1.1) with gate-tests task — jev-decide selected p=1.0 margin=1.0; add unit tests for ported internal/image domain (no *_test.go today), gate must fail on a real past mistake; Devin accepted, Thinking spinner confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "efe7901b38202c5084e39bfecc7624bef96b90a6",
+      "branch": "main",
+      "frame": "03haqt4m7ge2vuk9vdbwyb3tv"
+    },
+    {
+      "id": "0944462d-0e39-4435-b2f8-50b332e57af5",
+      "ts": "2026-11-24T23:58:23Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correct the prior turn 03haqmrmrpyw7n34yzup7x09d's gate claim: it said apps:dupes PASS but the Bechtle prep row was still live — my closure status contained the word packet, so the stage program (draft|packet|\\bjd\\b) re-derived prep instead of other. Rewritten with keyword-free status and explicit stage=other; Bechtle AG now carries one live row (the 2026-11-24 submission) | gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haqsg27wzgf5juzez4ijpdy"
+    },
+    {
+      "id": "b3a63ece-82cb-4499-9951-fe70660dcb0b",
+      "ts": "2026-11-24T23:58:23Z",
+      "source": "devin",
+      "subject": "nixconfig:gate-image-daily-port",
+      "action": "verified: image-daily-gate (7->9 fixture asserts — all arms proven load-bearing on real past tree 470c9034^ + mutations: provider fallback, breakers, shrink guard, dispatch both ways) | images-check projection gate fails synthetic row-drift + session-URL, passes consistent | image-ship no-spend guard refuses unset/empty/DETACH fast | go test tools/os serve pkg + build + vet clean | gate: checks:image-daily + checks:images:publish:test + checks:images:ship:test + checks:images PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "efe7901b38202c5084e39bfecc7624bef96b90a6",
+      "branch": "main",
+      "frame": "03haqsg268tykpgw95etz50yy"
+    },
     {
       "id": "8f56c42a-bf32-40a4-bda8-91828c94a9c2",
       "ts": "2026-11-24T23:57:53Z",
@@ -2606,60 +2658,6 @@
       "base_commit": "8578664a7c11a667b5df30561d70a9f245a9936e",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hancsyiufaqimhdha2wim42"
-    },
-    {
-      "id": "8756b678-c026-4c03-85ee-8d8b75eea69e",
-      "ts": "2026-11-24T13:25:18Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-drive",
-      "action": "drove devin pane agents:1: sent gate-change task to verify image-daily Go port gate fires on every host and fails on a real past misconfiguration before passing; pane shows Thinking 2s",
-      "outcome": "done",
-      "claims": [
-        "agents:1.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03hancryvhy1z4lz76v1jbli9"
-    },
-    {
-      "id": "81d4e89f-27ee-4f79-be83-5d0ae656018b",
-      "ts": "2026-11-24T13:06:07Z",
-      "source": "hermes",
-      "subject": "nixconfig:devin-drive",
-      "action": "re-drove devin pane agents:1: sent task-change task to run image-daily Go port gate verification and checks:tasks parity now; pane shows Thinking · 1s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03han914osz0w38063rzf60lf"
-    },
-    {
-      "id": "2d55a871-df8a-445e-8fd6-eb8e03c5c75b",
-      "ts": "2026-11-24T13:03:52Z",
-      "source": "hermes",
-      "subject": "nixconfig:delphi-drive",
-      "action": "drove delphi freebuff pane agents:3 over ssh: sent note-change task for AGENTS.nix EU careers-page gap and packet order; pane shows thinking...",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03han8l821a4nj8a9xhr64wn7"
-    },
-    {
-      "id": "9917113e-8fae-440f-8205-89ab7505480f",
-      "ts": "2026-11-24T13:03:19Z",
-      "source": "hermes",
-      "subject": "nixconfig:freebuff-drive",
-      "action": "drove freebuff pane agents:2: sent bug-fix task to fix apps:sent failing on Solaris packet Greenhouse 8585238002; pane shows thinking...",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03han8hd3kpkqhcbis97eh8l8"
     }
   ]
 }

@@ -93,6 +93,24 @@ correct one row with `update`, not `add`.
 drain; `task apps:queue:resolve` closes what rules prove (auto rules-only
 off-loopback); `task agents:apps:pipeline` is the stage report plus open mail.
 
+## Before a send
+
+One employer is one live thread. Read the record before the mail goes out:
+`task apps:get -- <id>` prints the mail linked to the row, `task apps:query --
+"select id, subject, sender, sent_at from emails where subject ilike
+'%<employer>%' or sender ilike '%<employer>%'"` finds a thread the mail loop has
+not attributed yet, `task apps:emails` shows what the hourly sync still holds,
+and `task apps:followups` prints the legacy workflow's drafted notes — the place
+a second nudge to the same recruiter hides.
+
+What each answer forbids: a message already sent means the next mail is a
+follow-up, not another application, and it goes only when the row's
+`next_action` names a date that has passed; a row still awaiting a reply gets no
+follow-up; a reply in the archive means answer that thread and never open a new
+one. Two rows at one employer are a duplicate, not two applications — `task
+apps:search -- <company>` first. A packet is ready to send when status, language
+and both document URLs agree; the send itself is still the operator's click.
+
 ## Documents
 
 `task apps:docs` lists stored text, `apps:docs:show -- <id>` prints it,

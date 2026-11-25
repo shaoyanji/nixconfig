@@ -105,6 +105,10 @@ def stage_of(status: str) -> str:
         return "applied"
     if text.startswith("lead") or text.startswith("rezi"):
         return "lead"
+    # A row a sweep found and a packet has not started: "Scouted 2026-11-25 — …"
+    # is its own bucket, so the tracker can separate supply from work in flight.
+    if text.startswith("scout"):
+        return "scouted"
     if "screening" in text or "follow-up required" in text:
         return "screening"
     # `manual` and `contacted` are stages a person sets, and the status text says
@@ -461,7 +465,7 @@ def notify_question(company: str, subject: str) -> None:
 # the last write won. A status only moves forward, and `rejected` is terminal
 # until a human says otherwise.
 EVENT_RANK = {"received": 1, "action": 2, "interview": 3, "rejected": 4}
-STAGE_RANK = {"lead": 0, "prep": 0, "other": 1, "applied": 1, "screening": 2, "interview": 3, "rejected": 4}
+STAGE_RANK = {"scouted": 0, "lead": 0, "prep": 0, "other": 1, "applied": 1, "screening": 2, "interview": 3, "rejected": 4}
 
 
 def sync(api: str, apply: bool, limit: int, ledger_path: str, only: str = "") -> int:

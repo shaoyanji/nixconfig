@@ -1,8 +1,101 @@
 {
-  "generated": "2026-11-25T04:14:02Z",
+  "generated": "2026-11-25T04:20:07Z",
   "count": 200,
-  "pin": "8675433048c2330cc4a33d706dbd1b58c1eb1f7b5768a92abb0b2ed1e5d2d10d",
+  "pin": "515aea00cd0037a63a21c9e5eeb369ca1ee32c7bc2ac26089dfa986078b10ac2",
   "turns": [
+    {
+      "id": "83e24371-94e0-471a-b598-e4334f3e6e10",
+      "ts": "2026-11-25T04:19:43Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: re-driven freebuff after its sweep task finished; routed via typesafe jev-decide (task-change 0.75/0.50 decisive); task = reconcile the job-search taskfile shard against ledger sweeps 25j-25o, the complementary slice that avoids delphi's in-flight 25p work; working spinner verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "73523a854729d803c5682d89fab94816c681b122",
+      "branch": "main",
+      "frame": "03has7hxdi691irlq1ggn2u34"
+    },
+    {
+      "id": "15737ac0-0c8a-4621-8ef6-caa93ab3498d",
+      "ts": "2026-11-25T04:19:43Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: re-driven devin after it finished the worktree-race note (gate PASS, committed); routed via typesafe jev-decide (needs_review margin 0.23 -> duel top-2, note-change 0.64/0.28 decisive); task = adopt the note's named-path-staging rule into HOME-PREAMBLE or the xs-turns skill per its exit criterion; Thinking spinner verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "73523a854729d803c5682d89fab94816c681b122",
+      "branch": "main",
+      "frame": "03has7hvsjij7tj9o8c382nl3"
+    },
+    {
+      "id": "8daccae7-3882-4c10-b9aa-911d37c137a1",
+      "ts": "2026-11-25T04:18:58Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: apps:scout:sweep (id 2026-11-25p, boards in read order + write rules) and apps:scout:parked (the eleven 25o expiry-parked ads with validThrough 11-25..12-07) in taskfiles/apps.yml | gate: checks:tasks PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/apps.yml"
+      ],
+      "files": [],
+      "base_commit": "4cc45c88ced94b1b568be9f30aaa9347c8b289ef",
+      "branch": "HEAD",
+      "frame": "03has7cnae6nf3djeo3l39t4d"
+    },
+    {
+      "id": "3af584b2-6b01-426d-9b5f-5ce02febbba1",
+      "ts": "2026-11-25T04:15:04Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-lane",
+      "action": "landed: routed via typesafe jev-decide (needs_review margin 0.19 -> duel top-2, publish 0.71/0.42); drove wallpaper-worker to run the frieren-lake-bridge brief (generate, verify on disk, add+publish); Working spinner verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "73523a854729d803c5682d89fab94816c681b122",
+      "branch": "main",
+      "frame": "03has6l77u49jyxiddkwr48t9"
+    },
+    {
+      "id": "cdcb1ab9-3465-4a9f-9a5f-b18f7e23baab",
+      "ts": "2026-11-25T04:15:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: routed via typesafe jev-decide (needs_review margin 0.03 -> duel top-2, task-change 0.70/0.40); drove delphi over ssh to add sweep 2026-11-25p + parked-row validThrough summaries; thinking spinner verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "73523a854729d803c5682d89fab94816c681b122",
+      "branch": "main",
+      "frame": "03has6l5nhc01c5fjpyvj9rx2"
+    },
+    {
+      "id": "d6224cd9-51e2-42d5-8cd4-ee79ab29f6e3",
+      "ts": "2026-11-25T04:15:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: routed via typesafe jev-decide (note-change 0.89/0.84, exit 0); drove devin to file the AGENTS.nix worktree-race note + worktree-per-lane proposal; Typing spinner verified",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "73523a854729d803c5682d89fab94816c681b122",
+      "branch": "main",
+      "frame": "03has6l3pluwofck73t1j5gho"
+    },
+    {
+      "id": "fcc779ca-ec26-44a1-af6e-0bf035abfa77",
+      "ts": "2026-11-25T04:14:17Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: note shared-worktree-commit-race — 3 hits on one lane (swept sibling note in amend, transient sql deletion → near-miss diagnosis, mid-turn remote moves); mechanism = commit records the index not intent; rule = worktree-per-lane, xs CLAIMS names tree path, named-path staging only | gate: agentsNotes.issues [] ",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "73523a854729d803c5682d89fab94816c681b122",
+      "branch": "main",
+      "frame": "03has6fqbgg4sxiaj7w01qvrf"
+    },
     {
       "id": "beb7e2ce-d54e-4c7b-9590-b5ee02f4c5dc",
       "ts": "2026-11-25T04:08:02Z",
@@ -2568,101 +2661,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hapoxcdm74jxjrao7ted7j6"
-    },
-    {
-      "id": "34f82f84-66a1-4028-a262-390ded7d1932",
-      "ts": "2026-11-24T20:33:16Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: lane-state note now records the boards as mined out (arbeitnow 16 pages, G/L/A/P/R boards, remotive; RemoteOK+BA jobsuche 403; jobicy/nomads/himalayas/interamt dead) and the lane turning from sweeping to tailoring. HITS.nrw — fit 4, Düsseldorf, Linux/K8s app operations, 2 lead rows — is the active target; next action is the CV plus German Anschreiben. | gate: agents-notes-schema PASS, checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "ccfe5ab26f480611c4dc7952b76023efc931bf28",
-      "branch": "main",
-      "frame": "03hapodn25rgbl7ndu4stm5vz"
-    },
-    {
-      "id": "5a91f0a9-7d99-4bc9-bf7d-cecb77ebf27c",
-      "ts": "2026-11-24T20:31:14Z",
-      "source": "delphi",
-      "subject": "nixconfig:steward-delphi",
-      "action": "landed: drove idle delphi freebuff pane (agents:3.1, ssh) — jev-decide classify needs_review note-change p=0.78 margin=0.64 (decisive >=0.3, top by margin); pasted note-change task to record delphi job-search lane state; fresh thinking... 2s verified",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "118315676e142447181668d2c55a744157d9143d",
-      "branch": "main",
-      "frame": "03hapnzcqb590qmji2nf43vo3"
-    },
-    {
-      "id": "445cfffc-e0ac-45b9-b5d3-e3e12580ba2b",
-      "ts": "2026-11-24T20:30:39Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "landed: drove idle freebuff CV lane (agents:2.1) — jev-decide classify needs_review note-change p=0.67 margin=0.46 (decisive >=0.3, top by margin); pasted note-change task to record HITS.nrw as active tailoring target; fresh thinking... 1s verified",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "118315676e142447181668d2c55a744157d9143d",
-      "branch": "main",
-      "frame": "03hapnv9e2vdfalupafxbqiz2"
-    },
-    {
-      "id": "08ec6443-363c-49e2-b863-c3a14bcf1d65",
-      "ts": "2026-11-24T20:23:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "fix: the curation turn's Treatwell lead was a duplicate — treatwell already holds a hand-submit-ready row; closed treatwell-senior-platform-engineer, so 32 closes stand and 2 leads were added (Workidentity, alphacoders). Fit fill 50/51, LITEF role 'unknown' left null. | gate: dupes exit 1 unchanged, null-fit query n=1 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hapmitg27aaflqw90t5hsdz"
-    },
-    {
-      "id": "a2b15e73-fbad-46cf-879a-03e8c86abd40",
-      "ts": "2026-11-24T20:23:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "curate: 615 live rows / 501 distinct URLs swept; 32 dead lead+prep rows closed (404/410/expired/filled); 49 live fits filled and 11 corrected by role family; 3 verified leads added (Workidentity, alphacoders, Treatwell). Unverifiable (429/403/000) reported, not closed. | gate: query stage=other n=32 for the close set, apps:dupes unchanged PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hapmgk50wit86fcj1000i3q"
-    },
-    {
-      "id": "31b4f58e-79f6-48e3-aa7e-fc8a9ab88481",
-      "ts": "2026-11-24T20:15:54Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-delphi",
-      "action": "landed: drove delphi freebuff pane (agents:3.1, ssh) — jev-decide routed curate_tracker (initial scout_new_leads 0.41/margin 0.08 → duel curate_tracker 0.65/margin 0.30 decisive); pane now working... on job-search tracker curation",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "118315676e142447181668d2c55a744157d9143d",
-      "branch": "main",
-      "frame": "03hapkzjsv12lvdoerramo1w0"
-    },
-    {
-      "id": "dd2249fd-a825-4da7-8520-a7257d0203b9",
-      "ts": "2026-11-24T20:10:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: apps:search could not resolve an employer name. It now strikes legal/place/industry/role words and matches the brand token against the company column, ranked by hits; a brandless query keeps the whole-row AND. 'CHECK24 Vergleichsportal', 'Rheinmetall GmbH', 'b1 systems gmbh', 'Univention GmbH' resolve to one row; 'SUSE Software Solutions Germany GmbH', 'giant swarm', proxmox stay empty. netcup, Eficode, mogenius prove search->get. | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "118315676e142447181668d2c55a744157d9143d",
-      "branch": "main",
-      "frame": "03hapjutnorcbk8zrn611smoo"
     }
   ]
 }

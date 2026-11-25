@@ -98,6 +98,12 @@ task agents:xs:post SUBJECT=<repo>:<task-id> ACTION="landed: ... | gate: checks:
   - `failed: <why>` — gate failed; needs retry.
 - **Consumption:** `task agents:xs:list` emits TOON by default (`FORMAT=toon`), keeping context cheap.
 - **Transport:** Summaries only (no secrets or transcripts). If unreachable, the task automatically queues locally (`~/.local/state/agent-turns/queue.jsonl`) and replays oldest-first by UUID.
+- **Shared checkout discipline:** `git commit` records the index, not the author.
+  In a tree that is not exclusively yours, stage named paths only — never
+  `git add -A` or `git commit -a` — and treat `git stash` as stashing somebody
+  else's work. A lane with sustained repo work gets its own `git worktree add`.
+  A shared-tree incident is an xs turn on `SUBJECT=<repo>:worktree-race`;
+  `xs:list` on that subject is the running count.
 
 ## Closed loop (run this before blaming the config)
 

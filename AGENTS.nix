@@ -6007,9 +6007,9 @@
       '';
     };
     shared-worktree-commit-race = {
-      title = "One checkout, many lanes: git commit records the index, not the author's intent";
+      title = "One checkout, many lanes: git commit records the index, not the author's intent — rule adopted in HOME-PREAMBLE";
       kind = "open";
-      status = "OPEN";
+      status = "CLOSED";
       priority = "P3";
       date = "2026-11-25";
       from = ["devin-lane-refactoring-2026-11-25"];
@@ -6017,7 +6017,7 @@
       refs = {
         modules = ["AGENTS.nix" "scripts/task/xs-turn-post.sh"];
         tasks = ["agents:xs:list" "agents:xs:post"];
-        docs = ["docs/agent-turns.md"];
+        docs = ["docs/agent-turns.md" "docs/agent-context/HOME-PREAMBLE.md"];
       };
       body = ''
         The mechanism is one sentence: `git commit` records the INDEX, not
@@ -6039,13 +6039,13 @@
         The earlier cousin: a sibling `git commit` recorded my staged Go
         port under their message (content correct, attribution theirs).
 
-        Proposed rule — worktree per lane: `git worktree add` one checkout
-        per agent lane and let xs CLAIMS name the lane's tree path, not
-        just files. In a tree that is not exclusively yours: stage named
-        paths only, never `add -A`/`commit -a`, and treat `git stash` as
-        stashing somebody else's work. Exit: the rule is written into the
-        agent contract (HOME-PREAMBLE or xs-turns) and the shared-tree
-        incident count for the next lane is zero.
+        Adopted (same day, HOME-PREAMBLE §Agent turns): in a tree that is
+        not exclusively yours, stage named paths only — never `add -A` or
+        `commit -a` — treat `git stash` as stashing somebody else's work,
+        and a lane with sustained repo work gets its own `git worktree
+        add`. The incident count is xs itself: a shared-tree incident is a
+        turn on `SUBJECT=<repo>:worktree-race`, so `xs:list` on that
+        subject is the running count — zero at adoption.
       '';
     };
     fleet-hygiene-tailscale-creds-stale = {

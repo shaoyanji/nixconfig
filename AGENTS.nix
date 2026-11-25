@@ -8063,6 +8063,49 @@
         is a board outside these five, or the eight 25p rows once 2026-12-07 lifts.
       '';
     };
+    job-scout-sweep-2026-11-25j-freebuff = {
+      title = "Boards are not drained: 20 new Stepstone employers from nine metro reads";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "25j is a closed cycle, so the freebuff pass re-read instead: nine Stepstone metro pages gave 164 unique cards, 98 lane-titled, 78 ledger dupes, 20 new employers all still live, plus gtj, BSJ, WWR and RemoteOK (15 unseen, 6 filed at 25w). Open: the 2026-12-07 hold and no email on any fresh row.";
+      from = ["job-scout-next-sweep-freebuff" "job-scout-sweep-2026-11-25j"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh" "scripts/task/appflow-send.sh"];
+        tasks = ["apps:scout" "apps:send" "apps:scout:sweep"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Sweep id 25j is a closed cycle with its own note and origin, so this freebuff-lane pass
+        re-read the boards rather than mint a second meaning onto it.
+
+        Stepstone metro pages: nine fetches, devops, platform and site-reliability across Berlin,
+        Munich and Hamburg, 25 cards each. After URL dedupe 164 unique cards, 98 lane-titled by
+        title, 78 matching the 1,376-row ledger by exact normalised company name. Twenty employers
+        are new, and every one carries a publishToDate after today, so none is an expired ghost.
+
+        Ranked next leads, unfiled until a detail page is read: BridgingIT Team Lead Cloud and
+        DevOps (5, closes 2027-01-02), Deutsche Telekom MMS Senior Cloud and DevOps (5, 12-19),
+        EDEKABANK (Senior) DevOps (5, 12-20), Interhyp Senior SRE (5, 12-20), Soley Senior Software
+        and DevOps (5, 12-09), XALT Senior DevOps (5, 12-09), eos.uptrade (Senior) DevOps (5, 12-02),
+        grinnberg Senior Kubernetes and Linux Platform (5, 12-12). Then Amadeus Fire twice, ICT
+        Digital, Instaffo Azure Platform, Randstad Digital, Ratbacher, TECCON and operational
+        services at 4. ADAC Werkstudent and Reply (Junior) drop to 3 and are not leads.
+
+        The other four boards the same day: germantechjobs 586 items, BSJ 12, WWR 79, RemoteOK 101.
+        That pass held 122 unique lane titles, 104 already ledger rows, 15 unseen, and filed six at
+        origin scout-2026-11-25w: CYCAP, Airbus, DATAGROUP, Bechtle, dot-change and MUEGGE. Two of
+        the unseen were not postings, a retraining course and a dual-study programme.
+
+        Open. The 2026-12-07 apps:send hold blocks all fifteen fresh-tailor letters: nine Stepstone
+        packets from 25q and six from 25w sit at prep and the send verb refuses each on the row's own
+        date. The hold is not the only blocker: none of the fifteen carries an email address, so
+        these are portal applications. Also open: the Personio 429 retry over non-ledger employers
+        has still not run, eight Stepstone rows say language de while their letters are English,
+        and the twenty employers above are the standing proof that the boards are not drained.
+      '';
+    };
     job-scout-sweep-2026-11-25w = {
       title = "A sixth board pass on a spent id: 1,058 postings read, six fresh leads, four packets";
       kind = "decision";

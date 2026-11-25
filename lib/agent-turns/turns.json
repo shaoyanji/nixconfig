@@ -1,8 +1,99 @@
 {
-  "generated": "2026-11-25T14:49:36Z",
+  "generated": "2026-11-25T15:11:13Z",
   "count": 200,
-  "pin": "846e331075c18f10016cd74f4a488aa1ed1645501213e33e4b3be86d1aa11a10",
+  "pin": "13f8dcd863e113707824e911cf6a08ac247b6341adc08ef506f3b4a25d5facaf",
   "turns": [
+    {
+      "id": "9af610ac-22b6-465a-88c1-b4781cc2f46d",
+      "ts": "2026-11-25T15:06:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:isadev-cv-audit",
+      "action": "audit (read-only, no deploy): check-cv-links rc=0 6/6 CVs resolve; internal link scan 0 broken over 73 html pages; stale artifacts 0/119 (fresh out-of-tree build reproduces file set exactly); 8 files drift timestamp-only (swconf cacheName epoch, dateModified, sitemap lastmod); htmlproofer unavailable locally (ffi libcurl missing) so CI remains the external-link gate | gate: jekyll production build PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
+      "branch": "main",
+      "frame": "03havpx7ybaak24u1swikddq4"
+    },
+    {
+      "id": "c40554c0-f659-43b0-a195-8c0f670157cd",
+      "ts": "2026-11-25T15:06:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-lane",
+      "action": "landed: drove delphi freebuff pane agents:3.1 over ssh with wallpaper task-change task; jev-decide duel task-change p=0.76 margin=0.52 over novel; load-buffer + paste-buffer + Enter + 2nd Enter; working... confirmed generating wallpaper",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
+      "branch": "main",
+      "frame": "03havpt6goq2ji93wlgjaolhb"
+    },
+    {
+      "id": "83bfd7c6-3e54-46c6-b58e-0073284c6585",
+      "ts": "2026-11-25T15:06:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "landed: drove freebuff pane agents:2.1 with CV-site audit task; jev-decide classify needs_review margin=0.33 → novel p=0.62; load-buffer + paste-buffer + Enter; working... confirmed running check-cv-links (6 CVs resolving, rc=0)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
+      "branch": "main",
+      "frame": "03havpt53rw3sh8qlkoj9bm1u"
+    },
+    {
+      "id": "9fc5444a-9f27-4cff-8dbc-1d4a263a09d0",
+      "ts": "2026-11-25T15:06:19Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: drove devin pane agents:1.1 with chain-change refactor task; jev-decide classify exit 0 selected chain-change p=0.90 margin=0.86; load-buffer + paste-buffer + Enter; fresh Thinking spinner confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
+      "branch": "main",
+      "frame": "03havpt3v46b6x0g0cla4pjfn"
+    },
+    {
+      "id": "30235d88-f470-493c-b6ca-ccdccf1ee04b",
+      "ts": "2026-11-25T14:52:39Z",
+      "source": "freebuff",
+      "subject": "nixconfig:isadev-cv-publish-check-4",
+      "action": "no publish (re-check 4): 6/6 CVs byte-identical src vs _site vs live, changed=0; HEAD=origin=be17747 clean; unchanged output not republished, no push | gate: jekyll build + check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
+      "branch": "main",
+      "frame": "03havn4zh03yjcp56yhhk1vy7"
+    },
+    {
+      "id": "4bf2e312-41af-4705-b397-811e74b58457",
+      "ts": "2026-11-25T14:52:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "landed: drove freebuff pane agents:2.1 with CV-site publish task; jev-decide classify exit 0 selected publish p=0.90 margin=0.86; load-buffer + paste-buffer + Enter; fresh 'working... 13s' line confirms submission",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
+      "branch": "main",
+      "frame": "03havn33yg9djb1acnmi0zxi3"
+    },
+    {
+      "id": "b3c4ac32-9d2a-43e1-9d27-af5ee68a27b1",
+      "ts": "2026-11-25T14:50:05Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "corrects prior done: nixosSupport refactor landed as 9710bdf1 after rebase onto sibling 639bf360 (turns.json pin conflict resolved via agents:pins:refresh; resume.json pin rode along — hook-owned) | gate: drv-equality 30/30 + checks:quick PASS pre-rebase, module-sets diff unchanged, PARSE-OK on origin",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
+      "branch": "main",
+      "frame": "03havmmvv8eaerzor0njyljtn"
+    },
     {
       "id": "38ba698e-83fd-477e-97e8-e63a3ed8157e",
       "ts": "2026-11-25T14:49:20Z",
@@ -2564,106 +2655,6 @@
       "base_commit": "d20e1576",
       "branch": "main",
       "frame": "03hasayiig8ts9femo92a14ht"
-    },
-    {
-      "id": "9758eabc-12ca-4dc3-b622-b9ebe7bd1175",
-      "ts": "2026-11-25T04:36:28Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "correction: 2026-11-25p wrote ten review_flag nudges, not nine — the list was ten, the sentence said nine; fixed in 8f44b09a (all other 25p verdicts unchanged) | gate: agentsNotes.issues=[] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8f44b09ac1fc27b3e59f33ae6b02949b1d66085a",
-      "branch": "HEAD",
-      "frame": "03hasarqg3ncvd08dq6yv4f3e"
-    },
-    {
-      "id": "2e191e3a-6660-4743-acaa-db1f15c27b5a",
-      "ts": "2026-11-25T04:36:01Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: sweep 2026-11-25p — gtj flat (sha cf313395, 586 items), Stepstone 150 cards / 73 held / 32 read, 8 rows at scout-2026-11-25p (ALDB 5, Creditreform 5, BMW 4, DZ HYP 4, adesso 4, valantic 4, Elevion 3, BEW 3), 4 parked on expiry, 4 house-token holds refused, 9 review_flag nudges (13 overdue, 30 upcoming) | gate: agentsNotes.issues=[] and 0 live-employer dupes PASS",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "0789d9e82a153e7c864fc8725bb4f5d095fb2a8a",
-      "branch": "HEAD",
-      "frame": "03hasaoia8mtwqhxpq5oq44hw"
-    },
-    {
-      "id": "416fad0b-cd04-46f5-bacc-487432452f8b",
-      "ts": "2026-11-25T04:31:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "routed note-change (classify needs_review p=0.32 margin 0.06 -> duel top-2, note-change 0.73/0.46, pick duel top) to agents:3.1 (delphi ssh) - run sweep 2026-11-25p from the delphi lane: Stepstone board re-read, germantechjobs sha compare vs cf313395, verdicts and filing under origin scout-2026-11-25p",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "249aae174f128130e04194a1509b8feb8a95afb1",
-      "branch": "main",
-      "frame": "03has9qe08lrgcesvovjsy030"
-    },
-    {
-      "id": "52476589-7854-47ad-9053-c4b17d140171",
-      "ts": "2026-11-25T04:31:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "routed task-change (classify needs_review p=0.37 margin 0.01 -> duel top-2, task-change 0.62/0.24, pick duel top) to agents:2.1 (freebuff) - run scout sweep 2026-11-25p: read the boards in read order, dedupe against the ledger and 25a..25o, file leads with origin scout-2026-11-25p, close with note job-scout-sweep-2026-11-25p",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "249aae174f128130e04194a1509b8feb8a95afb1",
-      "branch": "main",
-      "frame": "03has9qc6bb43dv1kxh0cjn9r"
-    },
-    {
-      "id": "3f5f7c12-68ea-4c46-9de9-7f87dfcb2398",
-      "ts": "2026-11-25T04:31:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "routed note-change (classify needs_review p=0.41 margin 0.22 -> duel top-2, note-change 0.61/0.22, pick duel top) to agents:1.1 (devin) - verify the two appflow-board routes are live after delphi's 04:30 autoUpgrade, then close the devin-lane-refactoring note and land an xs turn",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "249aae174f128130e04194a1509b8feb8a95afb1",
-      "branch": "main",
-      "frame": "03has9qamexft20marv9w0u5q"
-    },
-    {
-      "id": "ac331b13-188b-4cf2-8f9a-9e4f9c654ad2",
-      "ts": "2026-11-25T04:30:24Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "claim: sweep 2026-11-25p — DevOps/SRE/Platform/Infra via the new apps:scout:sweep manifest; gtj sha check vs cf313395, Stepstone re-read with Referer, dedupe 25a..25o before filing at scout-2026-11-25p",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/apps.yml",
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03has9l1584sfcmybiy4s0r05"
-    },
-    {
-      "id": "21543a42-dd15-4867-9c75-7d3956873621",
-      "ts": "2026-11-25T04:22:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: reconciling the job-search shard — apps:scout:cycles closes 25j..25o off the archive (j 3 filed, k 0 dedupe, l note-id only, m 6, n 10 from two lanes, o note-id only) with a live drift count; apps:scout gains --sweep so a cycle origin is expressible (dry run: scout-2026-11-25p, malformed id exits 2); CV publish-gate summary refreshed off today's run (exit 0, 6/6 hash-equal, 6/6 anchors) | gate: checks:tasks PASS 807 tasks, cv-blog-check exit 0",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/apps.yml taskfiles/agents.yml scripts/task/apps-scout.sh"
-      ],
-      "files": [
-        "taskfiles/apps.yml taskfiles/agents.yml scripts/task/apps-scout.sh"
-      ],
-      "base_commit": "b4b8cf3d039766e458bb488094078a1f319c5d6b",
-      "branch": "main",
-      "frame": "03has802ze1fsfbci5tep0orr"
     }
   ]
 }

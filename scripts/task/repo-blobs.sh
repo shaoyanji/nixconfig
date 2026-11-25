@@ -78,8 +78,20 @@ list_blobs() {
 }
 
 if [ "$mode" = index ]; then
-  # Index objects, not working-tree files: what would be committed.
-  rows=$(git ls-files -s -- | awk '$1=="120000" || $1=="160000"{next} {print $4"\t"$2}' | sizeof_blobs)
+  # Blobs ENTERING the index, not the whole index: a blob already committed is
+  # history's problem (--history stays red for it), and scanning every staged
+  # object refuses every commit after one large file lands — the wallpaper in
+  # 639bf360 blocked all subsequent commits until this diff. `diff-index`
+  # reports each staged path whose object differs from HEAD's: new files and
+  # modified ones alike, which is exactly "what would be committed".
+  if git rev-parse -q --verify HEAD >/dev/null; then
+    rows=$(git diff-index --cached -r HEAD |
+      awk -F'\t' '{split($1, a, " "); if (a[2] != "120000" && a[2] != "160000" && a[5] ~ /^[AMT]/) print $2"\t"a[4]}' |
+      sizeof_blobs)
+  else
+    # No HEAD yet: every index blob is new, which is the old whole-index scan.
+    rows=$(git ls-files -s -- | awk '$1=="120000" || $1=="160000"{next} {print $4"\t"$2}' | sizeof_blobs)
+  fi
   label="index"
 elif [ "$mode" = push ]; then
   # One line per ref, as git sends them. A deleted ref (local sha all zeros)

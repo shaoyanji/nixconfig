@@ -11,7 +11,17 @@
 # `moduleSets.hostModules` — so editing one host's feature list lands on
 # that host alone; the `globalModules*` names live only as `chainFeatures`
 # data, not something a host composes from.
-{
+let
+  # The container floor, named leaf by leaf: base toolbox + shell + the
+  # skills materialization (the only unconditional piece of user.ai) —
+  # eight `containers` hosts share it. roles.minimal's user.ai wrapper is
+  # skipped, so profiles.ai has no surface to disable.
+  hmContainerFloor = ["user.base" "shell" "user.ai.skills"];
+
+  # The desktop HM chain — ten `nixos`+`dms` desktops share it; fern and
+  # cassini deliberately fork a leaf each and spell their own.
+  hmDesktop = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+in {
   garnixMachine = {
     kind = "nixos";
     system = "x86_64-linux";
@@ -28,7 +38,7 @@
     # The fleet desktop chain. The host imports base-desktop-environment itself;
     # the Ryoku tier it ran from 2026-11-02 to 2026-11-11 is retired.
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/poseidon/configuration.nix];
   };
 
@@ -37,11 +47,7 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/mtfuji/configuration.nix];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
 
   kellerbench = {
@@ -49,11 +55,7 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/kellerbench/configuration.nix];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
 
   deckstation = {
@@ -61,11 +63,7 @@
     system = "x86_64-linux";
     features = ["base" "containers"];
     modules = [../hosts/deckstation/configuration.nix];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
 
   delphi = {
@@ -84,17 +82,13 @@
       # wipes the device it is given.
       (import ../hosts/delphi/disko.nix {device = "/dev/sda";})
     ];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
   eisen = {
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/eisen/configuration.nix];
   };
 
@@ -106,11 +100,7 @@
       inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
       ../hosts/applevalley/configuration.nix
     ];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
 
   frieren = {
@@ -124,7 +114,7 @@
     # nothing started. The bridge and NAT the canary needs come from
     # modules/profiles/microvm-host.nix, which infra-stack.nix imports directly.
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/frieren/configuration.nix];
   };
 
@@ -136,18 +126,14 @@
       ../hosts/ares/configuration.nix
       (import ../hosts/common/disko.nix {device = "/dev/sda";})
     ];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
 
   stark = {
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms" "disko"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [
       ../hosts/stark/configuration.nix
       (import ../hosts/stark/disko.nix {
@@ -178,7 +164,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms" "impermanence"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [
       ../hosts/schneeeule/configuration.nix
       (import ../hosts/common/disko.nix {device = "/dev/sda";})
@@ -189,7 +175,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/scratch/configuration.nix];
   };
 
@@ -197,7 +183,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/aristotle/configuration.nix];
   };
 
@@ -205,7 +191,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/diogenes/configuration.nix];
   };
 
@@ -234,7 +220,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/aceofspades/configuration.nix];
   };
 
@@ -242,7 +228,7 @@
     kind = "nixos";
     system = "x86_64-linux";
     features = ["base" "nixos" "dms"];
-    hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+    hmFeatures = hmDesktop;
     modules = [../hosts/ancientace/configuration.nix];
   };
 
@@ -254,11 +240,7 @@
       ../hosts/guckloch/configuration.nix
       inputs.nixos-wsl.nixosModules.default
     ];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
 
   minyx = {
@@ -282,11 +264,7 @@
     system = "x86_64-linux";
     features = ["base" "containers" "disko"];
     modules = [../hosts/sledgehammer/configuration.nix];
-    # The container floor, named leaf by leaf: base toolbox + shell + the
-    # skills materialization (the only unconditional piece of user.ai).
-    # roles.minimal's user.ai wrapper is skipped, so profiles.ai has no
-    # surface to disable.
-    hmModules = ["user.base" "shell" "user.ai.skills"];
+    hmModules = hmContainerFloor;
   };
 
   demo = {

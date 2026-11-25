@@ -1,8 +1,90 @@
 {
-  "generated": "2026-11-25T17:17:06Z",
+  "generated": "2026-11-25T18:32:39Z",
   "count": 200,
-  "pin": "479d933e6e970efd5f4d28670dc6715ec840b65f76586463a1349cd0e4a852c0",
+  "pin": "d3048874c713bbaca11dcbdf1a354071d516cb2f78ed6054a8de75dc7e1bd9ba",
   "turns": [
+    {
+      "id": "c4c9c090-e17c-48de-9bc8-adac41f67390",
+      "ts": "2026-11-25T18:30:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:flake-change-devin",
+      "action": "drove agents:1 devin pane: refactor nixconfig host modules and clean up shared flake wiring",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
+      "branch": "HEAD",
+      "frame": "03hawtpfhmk3lzl49emn8exk5"
+    },
+    {
+      "id": "651fb046-098b-412e-8102-e5c30069d7a6",
+      "ts": "2026-11-25T17:57:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-publish-2026-11-25",
+      "action": "re-ran the is-a.dev publish lane at nixconfig f544ffb9: artifact unchanged, six PDFs byte-identical to blog assets/files (tree clean at 64eaf48 so no commit/deploy needed), page prose and PDF text agree on twenty-five hosts | gate: agents:cv:publish-check PASS 0 problems, live 6/6 hashes match, /cv/ 6 anchors with download",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "_tabs/cv.md _tabs/cv-ryoku.html assets/files/*.pdf"
+      ],
+      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
+      "branch": "main",
+      "frame": "03hawnb9czzss7atj0ja36ctu"
+    },
+    {
+      "id": "f73ca63d-e108-4e4d-8c27-fa1c1d0081ff",
+      "ts": "2026-11-25T17:57:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-publish",
+      "action": "publish CV builds — gate: publish-check",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
+      "branch": "main",
+      "frame": "03hawn6edzgmfz2dot5chilov"
+    },
+    {
+      "id": "7f7cc187-9be7-43ae-909c-38b0e617b40e",
+      "ts": "2026-11-25T17:44:49Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-publish-2026-11-25",
+      "action": "re-published the is-a.dev CV surface from the freebuff lane: built .#sites.matt-site at f544ffb9, all six PDFs byte-identical to the blog checkout so no copy was needed, _site rebuilt from 64eaf48 | gate: agents:cv:publish-check PASS 0 problems (6/6 match + linked with download), live hashes match",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "_tabs/cv.md assets/files/*.pdf"
+      ],
+      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
+      "branch": "main",
+      "frame": "03hawkrpze15x4d7tij2eonsz"
+    },
+    {
+      "id": "c3b25e48-46b6-4873-abbf-602a81e78e2e",
+      "ts": "2026-11-25T17:43:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-publish",
+      "action": "drove freebuff agents:2.1 publish p=0.97 m=0.96",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
+      "branch": "main",
+      "frame": "03hawkgxsl4s9t968ero2v7jy"
+    },
+    {
+      "id": "e69dd8a2-b3a9-4184-a93e-80966296dd5f",
+      "ts": "2026-11-25T17:17:18Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "chain refactor: dropped six dead globalModules* aliases — hosts compose only via hostModules(features+modules); chainFeatures keeps the names as docs data | gate: drv-equality 30/30 identical, nix:lint 331 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
+      "branch": "main",
+      "frame": "03hawfe7n81dgdoe39kuv3e8c"
+    },
     {
       "id": "471cf0fd-e8e9-47d7-a8bb-001eefb0c046",
       "ts": "2026-11-25T17:13:07Z",
@@ -2589,84 +2671,6 @@
       "base_commit": "16d758c1660eec8835cd8cca88c11ec62ce4a2de",
       "branch": "HEAD",
       "frame": "03hast0prh9ka2dieuv070bkf"
-    },
-    {
-      "id": "87012949-c8b2-4030-8c96-9dbc4e71e415",
-      "ts": "2026-11-25T06:09:09Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: checks:kernel:collision leaf gate — sweeps 25 nixosConfigurations' boot.kernelPackages merge serially under oom-guard; fixture refuses 45dde4c9^ (eisen COLLIDE names both files, minyx clean — flags ties, not weaker defs); wired into checks:quick deps + leaf rows, quick summary updated | gate: checks:quick green incl. new dep, check:verify 137/137, checks:tasks clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f743ad67e83150a2272238a01fbcbd524049345d",
-      "branch": "main",
-      "frame": "03hassvgp65mau1cd74zd2k9j"
-    },
-    {
-      "id": "f10df0f3-0b0d-4f40-b1b6-148c890186d7",
-      "ts": "2026-11-25T06:06:19Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "routed novel (classify selected p=0.94 margin=0.91 exit 0) to agents:3.1 (delphi ssh): upsert 25p sweep leads into tracking DB, mail search for replies/rejections, land xs turn",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ab4a8105349cf019baba71a9c573b8f640eeaa90",
-      "branch": "main",
-      "frame": "03hassbmmoghug9j49811j01x"
-    },
-    {
-      "id": "851f298d-2692-4619-bc6c-cdbc8b42c78e",
-      "ts": "2026-11-25T06:06:19Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "routed novel (classify selected p=0.95 margin=0.93 exit 0) to agents:2.1 (freebuff): tailor CV + cover letter for 4 fresh job-scout leads from job-scout-fresh (02:54), send, update ledger, land xs turn",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ab4a8105349cf019baba71a9c573b8f640eeaa90",
-      "branch": "main",
-      "frame": "03hassbkjn21vg9r54tx2i9ue"
-    },
-    {
-      "id": "3b38a535-a68a-468c-8496-0f065eca8ecd",
-      "ts": "2026-11-25T06:06:13Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-25: 5 plate(s) kept of 10 spent, 2 roster row(s) waiting, 772 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hassawou0i4m75fsy3papo0"
-    },
-    {
-      "id": "3af5db83-b6ef-4b74-9d1d-96d756721d4a",
-      "ts": "2026-11-25T05:59:42Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25s",
-      "action": "accuracy fix on the correction: the pre-existing notes issue is devin-lane-refactoring-2026-11-25 (body 32 lines), not ats-direct/linkedin-direct — origin moved again during the pass. My note is job-scout-sweep-2026-11-25s-parallel (28-line body) on ab4a8105; parse OK; no new issue from it. One row: Core-Backbone at scout-2026-11-25s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hasr11npkghr9ebenlr0ckm"
-    },
-    {
-      "id": "710aaff9-172a-4fa6-87af-3aba47c7f74f",
-      "ts": "2026-11-25T05:59:32Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: gate-change task dispatched — add checks:kernel:collision gate for minyx boot.kernelPackages collision (mkOverride 1200 fix per 2026-11-19 note); jev-decide routed gate-change @ 0.52/0.33 margin",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "285c36b82cdc3440fcb21bd99550d1cc557ec0b2",
-      "branch": "main",
-      "frame": "03hasqzvzb0wkhj68q2y9lt7j"
     }
   ]
 }

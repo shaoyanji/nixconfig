@@ -7182,24 +7182,24 @@
       '';
     };
 
-    job-scout-sweep-2026-11-25n = {
-      title = "The 2026-11-25n sweep: the feed flat by hash a second time, Stepstone the only live surface";
+    job-scout-sweep-2026-11-25o = {
+      title = "The 2026-11-25o sweep: the flat hash, the redirect trap, and the seven window-safe rows";
       kind = "decision";
       status = "ACCEPTED";
       priority = "P2";
       date = "2026-11-25";
       summary = "Germantechjobs answered byte-identical to 25m after a www-to-apex redirect, so flat was a hash again and Stepstone carried the cycle: six lane queries gave 140 cards, 96 unheld employers and 30 ads read in full, of which seven survive the 2026-12-07 window, one is held by employer dedupe and eleven park on expiry.";
-      from = ["job-scout-sweep-2026-11-25m"];
+      from = ["job-scout-sweep-2026-11-25n"];
       refs = {
         modules = ["scripts/task/apps-db.sh"];
         tasks = ["apps:scout" "apps:search"];
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-        Scout 2026-11-25n. germantechjobs moved www to apex: /rss.xml answers 301, -L lands on
-        germantechjobs.de at sha256 cf313395, 586 items, byte-identical to 25m. Flat by hash again, and the
-        redirect is the trap — a sweep that does not follow it reads a 167-byte 301 body as the feed and
-        reports a live board empty.
+        Scout 2026-11-25o, the same cycle continued from note n. germantechjobs moved www to apex: /rss.xml
+        answers 301, -L lands on germantechjobs.de at sha256 cf313395, 586 items, byte-identical to 25m, so
+        flat is a hash again and the redirect is the trap — a sweep that ignores it reads a 167-byte 301
+        body as the feed and reports a live board empty.
         Stepstone answered 200 on six lane queries: 25 cards each, 140 unique, 96 unheld by exact-name diff
         against the 1,265-row ledger and the 81 rows of a..m. Its result page has no JobPosting JSON-LD and no
         anchor hrefs — cards sit in an embedded JSON blob keyed by companyName — and a detail page needs a
@@ -7223,7 +7223,7 @@
         GOLDBECK and Trianel (Azure), GMX Network, CSL Computer (AD/Entra core), Constellation Academy (group IT
         strategy, no platform). Parked on the window, not merit: STULZ 11-29, AUGENTIC 11-28, EWE NETZ 12-04,
         BIOTRONIK 11-30, novomind 12-05, HxGN 12-07, LAIQON 11-28, Liebherr-Digital 11-28 and 12-03, ZaGoTec
-        12-03, Pradtke expired 11-25. A parallel pane pass filed three more 25n rows at 04:03 (Ehrhardt +
+        12-03, Pradtke expired 11-25. The parallel pane pass filed three more rows at 04:03 and owns note n (Ehrhardt +
         Partner, Medical AI Analytics, devops excellence), different employers, so the ledger holds ten. Exit:
         decide these seven before 2026-12-07 while the eleven above expire inside it, Stepstone read first.
       '';
@@ -7288,34 +7288,34 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Sweep 2026-11-25n: the feed flat by hash again, and three employers 25m had counted as held
-germantechjobs /rss.xml answered at sha256 cf313395 with 586 items, byte-identical to 25m, so flat is a hash
-again and not a judgement: 55 in-lane titles by title text, 27 unheld rows at 27 employers, all in-house
-Windows, VMware and team-lead administration the h and l sweeps had already refused.
-Stepstone answered 200 at sha dc2db6c6, 1,246,727 bytes against 1,247,904 in 25m: the bytes moved and the
-listing set did not, the same 24 employers in the same roles. The other boards held their 25m counts -
-berlinstartupjobs 12, We Work Remotely 77, RemoteOK 101 (US-only), arbeitnow 300 on page one, Ashby camunda
-56 and kubermatic 9, Personio 1KOMMA5GRAD 339, SmartRecruiters DeliveryHero 100.
-What the re-read exposed is an error in 25m's own note. It recorded ten of the 24 Stepstone employers as
-already in the ledger, naming Ehrhardt + Partner, Randstad Digital and Medical AI among them. They were not.
-The board had nine unheld employers, 25m judged six and refused Bertrandt and Bank11, and left devops
-excellence without a verdict, so the ninth sat unaccounted for. Three rows land now, origin
-scout-2026-11-25n, all at scouted, each after its own detail-page read:
-Ehrhardt + Partner Group, DevOps, Boppard or Koblenz or Hamburg or Koeln or Dortmund or Alzenau with home
-office, band 4 - Terraform, OpenTofu or Ansible across Oracle Cloud and on-premises, GitLab CI, containerised
-services beside the classic applications, monitoring; a supply-chain software house with 1,600 customers.
-Medical AI Analytics, DevOps, Berlin-Neukoelln, hybrid, band 4 - a cloud-native platform kept entirely as
-code, several Kubernetes clusters including GPU workloads for the models, managed databases and messaging.
-devops excellence, DevOps, Schwaig bei Nuernberg, up to 90% remote, band 3 - container-based Java
-applications through development, test and production, the build and integration system, Kubernetes
-container platforms including the platform itself; service work for clients rather than a product seat.
-Refused: Randstad Digital (a mandant search, and the ledger already holds Randstad Professional at
-contacted, which the 180-day rule extends to the group), Ratbacher (agency, already on the skip list),
-Bertrandt and Bank11 as 25m refused them.
-Dedupe lesson: subset matching on name tokens missed Randstad Digital because the ledger entry carries a
-different second word. The house name has to be tested on its own, not only the full token set.
-Exit: the boards are not exhausted, they did not move - the 25m gap was bookkeeping, not supply. The
-2026-12-07 hold covers all three rows and nothing was sent.
+        Sweep 2026-11-25n: the feed flat by hash again, and three employers 25m had counted as held
+        germantechjobs /rss.xml answered at sha256 cf313395 with 586 items, byte-identical to 25m, so flat is a hash
+        again and not a judgement: 55 in-lane titles by title text, 27 unheld rows at 27 employers, all in-house
+        Windows, VMware and team-lead administration the h and l sweeps had already refused.
+        Stepstone answered 200 at sha dc2db6c6, 1,246,727 bytes against 1,247,904 in 25m: the bytes moved and the
+        listing set did not, the same 24 employers in the same roles. The other boards held their 25m counts -
+        berlinstartupjobs 12, We Work Remotely 77, RemoteOK 101 (US-only), arbeitnow 300 on page one, Ashby camunda
+        56 and kubermatic 9, Personio 1KOMMA5GRAD 339, SmartRecruiters DeliveryHero 100.
+        What the re-read exposed is an error in 25m's own note. It recorded ten of the 24 Stepstone employers as
+        already in the ledger, naming Ehrhardt + Partner, Randstad Digital and Medical AI among them. They were not.
+        The board had nine unheld employers, 25m judged six and refused Bertrandt and Bank11, and left devops
+        excellence without a verdict, so the ninth sat unaccounted for. Three rows land now, origin
+        scout-2026-11-25n, all at scouted, each after its own detail-page read:
+        Ehrhardt + Partner Group, DevOps, Boppard or Koblenz or Hamburg or Koeln or Dortmund or Alzenau with home
+        office, band 4 - Terraform, OpenTofu or Ansible across Oracle Cloud and on-premises, GitLab CI, containerised
+        services beside the classic applications, monitoring; a supply-chain software house with 1,600 customers.
+        Medical AI Analytics, DevOps, Berlin-Neukoelln, hybrid, band 4 - a cloud-native platform kept entirely as
+        code, several Kubernetes clusters including GPU workloads for the models, managed databases and messaging.
+        devops excellence, DevOps, Schwaig bei Nuernberg, up to 90% remote, band 3 - container-based Java
+        applications through development, test and production, the build and integration system, Kubernetes
+        container platforms including the platform itself; service work for clients rather than a product seat.
+        Refused: Randstad Digital (a mandant search, and the ledger already holds Randstad Professional at
+        contacted, which the 180-day rule extends to the group), Ratbacher (agency, already on the skip list),
+        Bertrandt and Bank11 as 25m refused them.
+        Dedupe lesson: subset matching on name tokens missed Randstad Digital because the ledger entry carries a
+        different second word. The house name has to be tested on its own, not only the full token set.
+        Exit: the boards are not exhausted, they did not move - the 25m gap was bookkeeping, not supply. The
+        2026-12-07 hold covers all three rows and nothing was sent.
       '';
     };
   };

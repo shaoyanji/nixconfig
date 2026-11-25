@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-25T04:06:47Z",
+  "generated": "2026-11-25T04:07:38Z",
   "count": 200,
-  "pin": "beff46c89e3ffa2506d5aa211b635bb57625778d4e5e79db7f4e0cd50ea74f3f",
+  "pin": "5d06c0dae0acb672143719515d14c5a59b2ac5b41cd7a46f86d0b01d214e91fe",
   "turns": [
+    {
+      "id": "d863735c-bd3a-40c6-81d6-ffb0b21a2508",
+      "ts": "2026-11-25T04:07:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: 2026-11-25n — gtj www 301s to apex, feed sha cf313395 with -L, 586 items, flat by hash vs 25m; Stepstone 6 lane queries 140 cards/96 unheld/30 ads read (details need Referer); 7 rows at scouted origin scout-2026-11-25n (ZEIT 5, Talon.One 5, DIGOOH 5, CAS 4, Autobahn 4, Bank11 4, ituma 4); GMX k8s held on the United Internet thread; 11 parked on validThrough; 3 parallel-pane rows noted | gate: agents-notes-schema PASS, issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "5faa78b8cdafb4e343b1dbdc2181dec63065cfdd",
+      "branch": "main",
+      "frame": "03has50jpdn4pw4pt4sqlcpbg"
+    },
+    {
+      "id": "f1e9e0c9-cbc0-4a4a-861d-077d603994e2",
+      "ts": "2026-11-25T04:06:48Z",
+      "source": "antigravity",
+      "subject": "frieren:system-audit",
+      "action": "landed: daily health audit & SYSTEM.md refined in-place | gate: checks:closure:budget PASS (21.5G/30G); checks:ports STRICT=0 PASS; checks:dns:resolver-health PASS; checks:sops:drift PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "31e65f971896d7af0e76854a442c21ba281c12f0",
+      "branch": "main",
+      "frame": "03has4z2g6iypmy66ns46c32z"
+    },
     {
       "id": "b2b778e4-576a-4268-b6a9-8a6ce0f2be54",
       "ts": "2026-11-25T04:05:41Z",
@@ -2629,32 +2659,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hapj45ki5la4huufj9lip5m"
-    },
-    {
-      "id": "ae915103-65d3-43a0-9aff-9690b8f90c74",
-      "ts": "2026-11-24T20:06:13Z",
-      "source": "delphi",
-      "subject": "nixconfig:steward-delphi",
-      "action": "landed: re-drove delphi job-search with prep_deepl_send; fresh working... 30s after submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
-      "branch": "main",
-      "frame": "03hapj3desh8oqoxnow1wwoc7"
-    },
-    {
-      "id": "3dfc60e9-77b4-495f-ac98-9707c542dfdc",
-      "ts": "2026-11-24T20:06:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "landed: re-drove freebuff CV lane with fix_apps_search (rephrased); fresh working... 44s after submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "149e7ddbac7d0e236c4a229ec52b7b25379ffe36",
-      "branch": "main",
-      "frame": "03hapj301bhno6dtr7weh21cf"
     }
   ]
 }

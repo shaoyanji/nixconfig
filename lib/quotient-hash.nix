@@ -24,11 +24,7 @@
     go n [];
 
   fibIndex = fs: term:
-    fs
-    |> builtins.length
-    |> lib.range 1
-    |> builtins.filter (i: builtins.elemAt fs (i - 1) == term)
-    |> builtins.head;
+    lib.findFirst (i: builtins.elemAt fs (i - 1) == term) (throw "fibIndex: ${toString term} not in the series") (lib.range 1 (builtins.length fs));
 
   indicesOf = n: let
     fs = fibs n;

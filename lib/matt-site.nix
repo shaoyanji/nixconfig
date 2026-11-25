@@ -435,7 +435,7 @@
 
     # Contact links are looked up by label rather than by position, so reordering
     # profile.json cannot point the structured data at the wrong site.
-    contactHref = label: (p.contacts |> builtins.filter (c: c.label == label) |> builtins.head).href;
+    contactHref = label: (lib.findFirst (c: c.label == label) (throw "profile contacts lacks label '${label}'") p.contacts).href;
 
     sameAs = p.contacts |> builtins.filter (c: c.label != "email") |> builtins.catAttrs "href";
 

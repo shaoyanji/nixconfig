@@ -286,7 +286,7 @@
   nixHosts = hosts |> lib.filterAttrs (_: isNixHost);
   externalHosts = hosts |> lib.filterAttrs (_: host: !isNixHost host);
 
-  count = pred: hosts |> lib.attrValues |> lib.filter pred |> lib.length;
+  count = pred: hosts |> lib.attrValues |> lib.count pred;
 
   # The single source of truth for fleet size and composition.
   derived = {

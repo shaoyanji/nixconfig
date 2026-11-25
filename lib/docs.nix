@@ -462,7 +462,7 @@
   taskSurface = let
     names = tasks |> lib.attrNames |> lib.sort (a: b: a < b);
     aliasOf = n: tasks.${n}.aliasOf or "";
-    aliasCount = names |> lib.filter (n: aliasOf n != "") |> lib.length;
+    aliasCount = names |> lib.count (n: aliasOf n != "");
     description = n: let
       d = tasks.${n}.desc or "";
     in

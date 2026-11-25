@@ -5870,6 +5870,34 @@
         intact (catAttrs counts match), attribution theirs.
       '';
     };
+    lib-pipe-count-findfirst = {
+      title = "Residual lib |> classes: filter |> length to lib.count, filter |> head to lib.findFirst";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-catattrs"];
+      summary = "Pass 6 of the lib |> sweep: the residual classes. `xs |> filter p |> length` collapses to `lib.count p` (docs.nix aliasCount, inventory.nix count); `xs |> filter p |> head` becomes `lib.findFirst p (throw \"named\")` (matt-site contactHref, quotient-hash fibIndex) — same hit semantics, named error replaces list index out of bounds.";
+      refs = {
+        modules = ["lib/docs.nix" "lib/inventory.nix" "lib/matt-site.nix" "lib/quotient-hash.nix"];
+        tasks = ["checks:drv-equality" "checks:quotient-hash" "checks:host"];
+      };
+      body = ''
+        The sweep is down to residuals: 776 pipe sites in 20 files, and the
+        remaining classes are two sites each. `lib.count` is `length (filter p
+        xs)` verbatim — zero semantic risk. `lib.findFirst` is `head (filter p
+        xs)` when a match exists and a lazy default otherwise: passing a `throw`
+        keeps the fail-on-miss contract but names it, which is strictly better
+        than head's unhelpful index error.
+        Not rewritten on purpose: `split |> head` (first segment of a split is
+        a different idiom), `filterAttrs |> attrNames` (already the canonical
+        spelling), and `map |> unique` (unique preserves order; the attrNames
+        trick would sort). The loop is effectively dry — further passes would be
+        renames, not refinements.
+        Gate: checks:quotient-hash green (fibIndex exercised end-to-end), matt
+        site drv resolves, inventory.derived evals, drv-equality identical.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

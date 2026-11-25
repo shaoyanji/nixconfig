@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-25T10:35:46Z",
+  "generated": "2026-11-25T11:23:54Z",
   "count": 200,
-  "pin": "eab64a6ef0e27f0a0007dd9f05710aad7fd2b55075386c7c04de9bd1a0d5ed32",
+  "pin": "44eeeeb26eac454fdd31e83b590ad316ea7dc9f78fbdc118f7655b9117ce62f6",
   "turns": [
+    {
+      "id": "9b9f25ec-b740-4866-bd96-5e42411fdab5",
+      "ts": "2026-11-25T11:16:32Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: tasked devin with note-change - commit the AGENTS.nix edit for job-scout sweep 2026-11-25j-freebuff (jev-decide classify note-change p=0.88 margin=0.83 via typesafe, thresholds 0.8/0.15 met); drove agents:1.1 via load-buffer + paste-buffer + Enter; confirmed fresh 'Thinking · 2s' spinner - task started",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
+      "branch": "main",
+      "frame": "03haugx5kr8dduyt3z7gvfrip"
+    },
+    {
+      "id": "37ccb159-fc9c-46c1-99df-88baebe5028f",
+      "ts": "2026-11-25T10:58:25Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "landed: tasked freebuff to run the CV publish gate cv-blog-check.sh; classified gate-change p=0.93 margin=0.87 via jev-decide classify thresholds 0.8/0.15 met; freebuff BUSY thinking 11s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8bb4d61c",
+      "branch": "main",
+      "frame": "03hauddp5gmzz3lgmhvw4h74t"
+    },
+    {
+      "id": "e3986046-2909-43af-9bae-4e60fe15c709",
+      "ts": "2026-11-25T10:40:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: tasked devin to verify image-daily Go port gates and fix failures; classified p=0.81 margin=0.70 via jev-decide classify (thresholds 0.8/0.15 met); devin BUSY running gate verification",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
+      "branch": "main",
+      "frame": "03hau9t5wa66fp9tihg27tqe3"
+    },
+    {
+      "id": "583d9d9a-a922-40e7-8baa-0248181d35c7",
+      "ts": "2026-11-25T10:38:44Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "verified: image-daily Go port gates all green again — go build+vet+test(-count=1) tools/os/internal/image, checks:image-daily dispatch/fallback/breakers/shrink-guard, publish/ship/images refusal fixtures fire, checks:images 772/772; nothing broken, no fix | gate: 8/8 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
+      "branch": "main",
+      "frame": "03hau9jd6c367h3vg0sw8pcmb"
+    },
+    {
+      "id": "dc969aba-ca3a-4019-a52d-373db7efec8e",
+      "ts": "2026-11-25T10:35:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-2026-11-25j-freebuff",
+      "action": "landed: note job-scout-sweep-2026-11-25j-freebuff, 9 metro reads / 164 cards / 20 new employers / 6 leads filed at 25w | gate: parse PASS, agentsNotes.ok PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
+      "branch": "main",
+      "frame": "03hau8yr3ajmoza9wrygsjyc4"
+    },
     {
       "id": "6b9b4422-b58f-4e60-922f-38aa1d0f7bf8",
       "ts": "2026-11-25T10:34:11Z",
@@ -2626,71 +2691,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hark0npnzuhpgyg45a1cng9"
-    },
-    {
-      "id": "e6686bc8-0f15-412f-bee4-b1a62b5ebdce",
-      "ts": "2026-11-25T02:17:27Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: widened the scout boards past arbeitnow + Greenhouse — germantechjobs RSS, berlinstartupjobs, WeWorkRemotely JSON-LD, RemoteOK, Ashby, Personio, SmartRecruiters, stepstone: 74 place-eligible names after dedupe against 934 held employers, 5 rows at scouted under scout-2026-11-25f (brose 66, majori 60, alten 58, scheer 55, uka 52). germantechjobs has no JobPosting JSON-LD, so ads were read on their stepstone mirrors | gate: dupes-sql PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aed4f0bb7e0c7f798a93ae5fc87f08f188ef0740",
-      "branch": "main",
-      "frame": "03harjm46chqxfd52cyy7b9oj"
-    },
-    {
-      "id": "abebde0d-b1e7-486d-b3f9-828e0600b6b7",
-      "ts": "2026-11-25T02:15:19Z",
-      "source": "devji",
-      "subject": "nixconfig:note-image-daily-port",
-      "action": "landed: ffprobe presence check moved into dimensions() — the probe is a host dependency, not a per-file outcome, so it dies naming ffprobe; wallpaper script loses its last shell check, cmdDimensions/shapesPass stop failing silently on broken PATH. Open list: image-gen cpg auth + upload_bank | gate: go test 23/23 + checks:image-daily + publish fixture 9/9 + nix-fmt",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "aed4f0bb7e0c7f798a93ae5fc87f08f188ef0740",
-      "branch": "main",
-      "frame": "03harj725y1i7392qjxf9mnhu"
-    },
-    {
-      "id": "aa2c5371-121b-4759-82db-ca4411f7cacb",
-      "ts": "2026-11-25T02:13:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "re-drove idle devin (agents:1.1) with image-daily ffprobe presence-check slice (last shell dep in image-daily-wallpaper.sh) — classify decisive gate-change p=0.59 m=0.48; Typing spinner confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "673a3cdadf47bc951d25ae123b2fe4233b34d0a9",
-      "branch": "main",
-      "frame": "03hariuq1h1uofuw9fpwpz4bu"
-    },
-    {
-      "id": "fc2e07b8-b85b-445c-998b-9888e5c7db40",
-      "ts": "2026-11-25T02:11:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "re-drove idle delphi (agents:3.1 ssh) with fresh-scout-batch (dedupe vs helo + sweeps 2026-11-25a..e, FIT_MAP banding, land note job-scout-sweep-2026-11-25f) — classify needs_review then duel top-by-margin note-change p=0.59 m=0.18; working 10s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "673a3cdadf47bc951d25ae123b2fe4233b34d0a9",
-      "branch": "main",
-      "frame": "03harijiooyb5shtabekqed5w"
-    },
-    {
-      "id": "f04d2b25-373c-4116-a647-32d4788340d3",
-      "ts": "2026-11-25T02:11:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "re-drove idle freebuff (agents:2.1) with widen-boards scout (new DevOps/SRE/Platform/Infra sources beyond sweep 2026-11-25e) — classify needs_review then duel selected task-change p=0.85 m=0.70; working 13s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "673a3cdadf47bc951d25ae123b2fe4233b34d0a9",
-      "branch": "main",
-      "frame": "03harijh1g9n6kz1z8seq4sfe"
     }
   ]
 }

@@ -10,7 +10,7 @@
     ".agents/skills/ai-memory/SKILL.md" = 68;
     ".agents/skills/antigravity/SKILL.md" = 185;
     ".agents/skills/apisfreellm/SKILL.md" = 147;
-    ".agents/skills/apps/SKILL.md" = 103;
+    ".agents/skills/apps/SKILL.md" = 121;
     ".agents/skills/atuin/SKILL.md" = 155;
     ".agents/skills/bountystash/SKILL.md" = 73;
     ".agents/skills/brainstorm/SKILL.md" = 81;
@@ -36,7 +36,7 @@
     ".agents/skills/infra/SKILL.md" = 61;
     ".agents/skills/instabox/SKILL.md" = 106;
     ".agents/skills/iventoy/SKILL.md" = 110;
-    ".agents/skills/jevdecide/SKILL.md" = 148;
+    ".agents/skills/jevdecide/SKILL.md" = 156;
     ".agents/skills/knowledge-base/SKILL.md" = 197;
     ".agents/skills/mail-alias/SKILL.md" = 83;
     ".agents/skills/mail-archive/SKILL.md" = 169;

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-25T00:02:40Z",
+  "generated": "2026-11-25T00:06:41Z",
   "count": 200,
-  "pin": "a2d8766d1fbf4453946268b1b6079947931b4bed259495aa43b899fd52014aec",
+  "pin": "3fee76d2e0f43df89ea2af7b8141775502c4ff309deb2bda134f59354fb008b4",
   "turns": [
+    {
+      "id": "9d8ccbf9-d93e-41da-a4cc-768d599c7e37",
+      "ts": "2026-11-25T00:05:38Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: added 2 scouted lead(s) on 2026-11-25 — codecentric-ag-senior-cloud-engineer-and-consultant, knowway-gmbh-ai-data-platform-engineer-gcp-all-levels — each verified HTTP 200 with a full JD before the write, deduped against 895 tracked employers, next actions hold-aware to 2026-12-07 (no sends) | gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haqtv29zqcyg3xh5oeu30om"
+    },
+    {
+      "id": "ed955f24-45fb-4dd9-8c68-a375d7682229",
+      "ts": "2026-11-25T00:03:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: fleet count fixed to 25 NixOS hosts in both corpus languages (career rows + exports; Flink packet rebuilt 2pp/1p, zero 'thirteen'); tracker now has stage=scouted and 5 verified leads carry it with next actions: Collaboration Betters The World Berlin, ProcuVia Düsseldorf, Little John Bikes Dresden, 21bitcoin Munich, gridscale OPCP Köln. Collision clear. | gate: checks:career PASS + 5/5 rows read back",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "829f89693000415d964013827c146ad470b913eb",
+      "branch": "main",
+      "frame": "03haqtj1o1tuubhvi78yx3njg"
+    },
     {
       "id": "161c10ee-c9c3-49a9-89fc-c6c52a5f3963",
       "ts": "2026-11-25T00:01:52Z",
@@ -2628,36 +2654,6 @@
       "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
       "branch": "main",
       "frame": "03hancy7pcmyws2npm9rn4pys"
-    },
-    {
-      "id": "03c673db-497c-4170-b97a-ef7488d8f665",
-      "ts": "2026-11-24T13:25:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-drive",
-      "action": "drove freebuff pane agents:2.1: sent publish task to deploy tailored CV packets for job-scout-fresh leads as static surfaces with EU careers-page gap noted; pane shows working... 56s",
-      "outcome": "done",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03hancvaqyd5njh8abu8fjkpp"
-    },
-    {
-      "id": "f1d7a466-b7b3-4e4e-8f66-d2be9aa5c0a9",
-      "ts": "2026-11-24T13:25:26Z",
-      "source": "codebuff",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: note job-scout-eu-vendor-pages-gap-2026-11-24 promoted OPEN/open -> DELIVERED/reference; task apps:vendors prints LINBIT, B1 Systems, Univention, Open-Xchange, Proxmox careers URLs (all 200), writes no rows. Toast then Etraveli after 12-07 behind matt:gist:drift + matt:cv:check. 8578664a",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix apps"
-      ],
-      "files": [],
-      "base_commit": "8578664a7c11a667b5df30561d70a9f245a9936e",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hancsyiufaqimhdha2wim42"
     }
   ]
 }

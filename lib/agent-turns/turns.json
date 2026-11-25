@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T00:51:33Z",
+  "generated": "2026-11-25T01:06:05Z",
   "count": 200,
-  "pin": "efed7dc799620079a125b0287797a7a784bfe3c6470b9e21b4f2d75a3df24bac",
+  "pin": "47f30a61a4b7f6e85460463eb1067cb48a9570bbc9c24ee622330b9868279745",
   "turns": [
+    {
+      "id": "c985b5cd-626d-48b3-9428-f27d23965721",
+      "ts": "2026-11-25T00:58:48Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "left idle: devin (agents:1.1) idle after image-daily gate-tests landed (internal/image unit tests, checks:host frieren rc=0); classify needs_review flake-change p=0.61 m=0.46 (exit 2), no open claim in ledger — next cycle may duel flake-change vs gate-change",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d17b7a69166f1c9134387e26aa3c8ff148029bde",
+      "branch": "main",
+      "frame": "03har48zde3l74t0byp3spcmw"
+    },
+    {
+      "id": "b73731c3-66fe-4f18-9efd-1208d00759c8",
+      "ts": "2026-11-25T00:57:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: CV lane. First scouted lead (50Hertz Platform Engineer, Grid Construction) FAILED on duplication, not fit — 50hertz-elia-group-...-grid-construction-platform applied 2026-11-22, five jobs@elia.be acks; closed the scouted row as merged, dropped its packet. Next lead HUK-COBURG Platform Engineer Linux+Ansible (SDE-126255) confirmed live and passed: CV 2 pages + German Anschreiben built in the private store, unsent. | gate: pdfinfo 2p/1p + selection 9/39 + row prep",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d17b7a69166f1c9134387e26aa3c8ff148029bde",
+      "branch": "main",
+      "frame": "03har3yd3gd8rcoejpcfdm7c6"
+    },
+    {
+      "id": "28c4c40b-049c-42a1-bd61-3a3ad33c0557",
+      "ts": "2026-11-25T00:55:30Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 2026-11-25 sweep (Arbeitnow 3,397 postings + ~90 ATS boards) -> 4 new leads at scouted (DAM, ICG, MHC, headhunter.digital), contacts MX-verified | gate: apps:dupes [] + scouted total 11 | no repo commit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03har3lqokbt08lvevtgpp71x"
+    },
     {
       "id": "755e5dea-cdee-4ae0-8e60-939e39611213",
       "ts": "2026-11-25T00:50:57Z",
@@ -2606,45 +2645,6 @@
       "base_commit": null,
       "branch": null,
       "frame": "03hanvhzanfwc8i996r35d6dn"
-    },
-    {
-      "id": "0f032f64-fd0b-469e-b776-ede9d9e77dfc",
-      "ts": "2026-11-24T14:44:15Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: sweep recorded — 1 new lead (Dataport AoeR DevOps, fit 3, Altenholz/Bremen/Hamburg, 2-yr term; id dataport-devops-engineer-anwendungen-databases), gridscale Ceph lead status refreshed to three live reqs with its packet action kept. Not filed: Hetzner SRE + Famedly platform (closed on own boards), Zammad (no engineering req), BWI (already applied, Concludis 64059). Open: send order waits on 2026-12-07 | gate: checks:kg PASS, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4ad6885fcf5c7fd5042a7b61d727f63fde49e21b",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hans782790xnowjhamy6rx8"
-    },
-    {
-      "id": "bd681362-2286-47d7-ac47-ff6882e5ea3a",
-      "ts": "2026-11-24T14:24:09Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: upserted 4 attention-sweep leads at lead (Akamai Madrid, Ministry Brands Galway, Continental Lousado, SmartMed Porto) via apps:upsert; reviewFlag action-today on Akamai + Ministry Brands, held on the other two. No follow-up schema exists, so note delphi-leads-followups proposes application_followup + apps:due | gate: checks:kg PASS, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e063c18e3abbb5cf258d1492278b4cfa29ee1ffc",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hano9tykgsepqgiqc3382b8"
-    },
-    {
-      "id": "15a2d5d6-b7af-4368-828d-db48652a91ac",
-      "ts": "2026-11-24T14:23:53Z",
-      "source": "delphi",
-      "subject": "nixconfig:delphi-pane-drive",
-      "action": "drove idle agents:3.1 (delphi freebuff over ssh): jev-decide classify needs_review (decision 0.49) then duel novel 0.92 vs decision 0.08, margin 0.84 -> selected novel. Task: novel - define leads-DB follow-up recording schema against the design record and log this sweep's outcome. Pane working... 3m24s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
-      "branch": "main",
-      "frame": "03hano7z0f8lws0c1mjzyew50"
     }
   ]
 }

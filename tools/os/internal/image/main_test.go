@@ -2,6 +2,8 @@ package image
 
 import (
 	"encoding/json"
+	"image"
+	"image/png"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -111,6 +113,84 @@ func TestManifestDiesWithoutUrlsTsv(t *testing.T) {
 	}
 	if !strings.Contains(string(out), "urls.tsv") {
 		t.Fatalf("death should name urls.tsv, got: %s", out)
+	}
+}
+
+// writePNG materializes a real WxH image for the ffprobe read — the shape
+// cache measures the file, not the request.
+func writePNG(t *testing.T, file string, w, h int) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(file), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	img := image.NewRGBA(image.Rect(0, 0, w, h))
+	f, err := os.Create(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if err := png.Encode(f, img); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDimensions(t *testing.T) {
+	if _, err := exec.LookPath("ffprobe"); err != nil {
+		t.Skip("ffprobe not on PATH")
+	}
+	f := filepath.Join(t.TempDir(), "p.png")
+	writePNG(t, f, 6, 3)
+	if got := dimensions(f); got != "6x3" {
+		t.Fatalf("dimensions: %q", got)
+	}
+	if got := dimensions(filepath.Join(t.TempDir(), "absent.png")); got != "" {
+		t.Fatalf("dimensions on a missing file: %q", got)
+	}
+}
+
+// shapesPass is the ffprobe cache loop from build_index: a cached rel is never
+// re-probed, published/ wins over src/, a missing file leaves no row, and each
+// new measurement appends rel\tWxH.
+func TestShapesPass(t *testing.T) {
+	if _, err := exec.LookPath("ffprobe"); err != nil {
+		t.Skip("ffprobe not on PATH")
+	}
+	root, _ := writeTree(t,
+		"wall/a.png\tu\t1\nwall/b.png\tu\t1\nwall/c.png\tu\t1\nwall/d.png\tu\t1\n")
+	writePNG(t, filepath.Join(root, "published", "wall", "a.png"), 4, 2)
+	writePNG(t, filepath.Join(root, "src", "wall", "b.png"), 3, 3)
+	// wall/c.png exists nowhere: no row. wall/d.png is already cached.
+	shapes := filepath.Join(root, "published", "shapes.tsv")
+	if err := os.WriteFile(shapes, []byte("wall/d.png\t9x9\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	shapesPass(root)
+
+	data, err := os.ReadFile(shapes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(data)), "\n")
+	if len(lines) != 3 {
+		t.Fatalf("expected 3 cache rows, got %v", lines)
+	}
+	for _, want := range []string{"wall/d.png\t9x9", "wall/a.png\t4x2", "wall/b.png\t3x3"} {
+		found := false
+		for _, l := range lines {
+			if l == want {
+				found = true
+			}
+		}
+		if !found {
+			t.Fatalf("cache missing %q: %v", want, lines)
+		}
+	}
+	// A second pass appends nothing: the cache is the cache.
+	shapesPass(root)
+	again, _ := os.ReadFile(shapes)
+	if string(again) != string(data) {
+		t.Fatalf("second pass rewrote the cache: %q", again)
 	}
 }
 

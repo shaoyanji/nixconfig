@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-25T05:04:39Z",
+  "generated": "2026-11-25T05:15:49Z",
   "count": 200,
-  "pin": "a47e6bff9ebeb8d0ec226c6a519081d08e99a102b0250d8e3806879197fb1fa3",
+  "pin": "4b8335d4c4b332d904db18b5b65ac866dbd4475d464118d609834c7654579495",
   "turns": [
+    {
+      "id": "5ca84d54-8479-4619-8257-c14e2b273992",
+      "ts": "2026-11-25T05:05:13Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25r",
+      "action": "claim: sweep 2026-11-25r — probe the five vendor careers pages and the Ashby/Personio/SmartRecruiters boards, dedupe vs 1283 rows",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "02df66ee5fc5512c4833106227538beec61ae1fc",
+      "branch": "HEAD",
+      "frame": "03hasgdubrpu4dp6m176rg55a"
+    },
+    {
+      "id": "faa06943-75f0-4be5-b7ea-cb3e9ab95e76",
+      "ts": "2026-11-25T05:04:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-cv-refresh-2026-11-25",
+      "action": "landed: CV and site target refreshed from the scout ledger — the 11 rows under scout-2026-11-25p share one lane shape (DevSecOps, OpenShift and AI platform, datacenter, Azure Local), so profile.json and profile.de.json target and hire now name it; no 25r existed and no work entry changed, a lead is not an employer | gate: nix build .#sites.matt-site PASS (6 CVs at 2/2/1/1/1 pages, cv-ats-check green x6), agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5519edb1a79bf50336996d2af8163dc0650d9fad",
+      "branch": "main",
+      "frame": "03hasgbcsrfuycu810oy2rrq4"
+    },
     {
       "id": "e6061bb5-6784-4a1b-a63b-d532396efc51",
       "ts": "2026-11-25T05:03:12Z",
@@ -2646,32 +2674,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haq0s9br8lqqun1cik0732s"
-    },
-    {
-      "id": "7cb046e1-d92b-4d63-bc34-0ae020f77845",
-      "ts": "2026-11-24T21:33:11Z",
-      "source": "delphi-steward",
-      "subject": "nixconfig:steward-delphi",
-      "action": "drove idle delphi freebuff (agents:3.1, ssh): jev-decide duel curate_tracker 0.58 vs tailor_and_send 0.42 margin=0.16 — dedupe tracker rows and reconcile packet consistency, commit+push",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
-      "branch": "main",
-      "frame": "03haq030zzsu7oyatpehjx03s"
-    },
-    {
-      "id": "a191b059-f2b9-4bb9-8d21-1f602732ad8d",
-      "ts": "2026-11-24T21:33:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-send",
-      "action": "drove idle freebuff (agents:2.1): jev-decide selected send_pending p=0.82 margin=0.70 — prepare and dispatch complete-packet applications, list blocked, commit+push tracker",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
-      "branch": "main",
-      "frame": "03haq02yva8we99fszulqd9ih"
     }
   ]
 }

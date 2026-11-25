@@ -33,6 +33,7 @@ rec {
     "scripts/task/appflow-gate.sh" = 202;
     "scripts/task/appflow-packet.sh" = 223;
     "scripts/task/apps-db.sh" = 496;
+    "scripts/task/apps-scout.sh" = 117;
     "scripts/task/bitwarden-ssh-test.sh" = 179;
     "scripts/task/blog-draft.sh" = 138;
     "scripts/task/blog-export.sh" = 113;

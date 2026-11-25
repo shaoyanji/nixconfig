@@ -5993,18 +5993,18 @@
         Open tail → mostly closed same day. The 404's root cause was NOT a
         pre-existing archive answer: the board's allowlist named
         `/api/applications` and `/api/applications-discovered`, and the
-        deployed npgsqlrest lacked both .sql files — they have been committed
-        since 86bdb73b, so the live generation was built from a tree missing
-        them (a dirty-checkout build: delphi folds uncommitted state into its
-        snapshot). Landed: `appflow-board.nix` now asserts at eval that every
-        proxied route has a `sql/<name>.sql` (fails `checks:host`, proven
-        firing), the stale "8461 archive front" comment corrected (it is the
-        media relay; the API is loopback-only), and the census stays under
-        ceiling with checks:policies green. Commit a487f3d4.
-        Remainder: tailnet ssh needs a browser check, so activation is
-        delphi's 04:30 autoUpgrade off `github:` — verify both routes live
-        after it, then this note closes. 05:29 CET 2026-11-25: still 404;
-        the 04:30 run predated a487f3d4 (04:48). Next window 04:30 CET 11-26.
+        deployed npgsqlrest lacked both .sql files — committed since
+        86bdb73b, so the live generation was built from a tree missing them
+        (a dirty-checkout build: delphi folds uncommitted state into its
+        snapshot). Landed (a487f3d4): `appflow-board.nix` asserts at eval
+        that every proxied route has a `sql/<name>.sql` (fails checks:host,
+        proven firing); the stale "8461 archive front" comment corrected.
+        Remainder: delphi's 04:30 autoUpgrade (tailnet ssh needs a browser
+        check) — verify both routes live after it, then this note closes.
+        05:29 CET still 404, the run predated a487f3d4 (04:48); next window
+        04:30 CET 2026-11-26. Tail gates all green: comments 54/54 cites,
+        policies (apps-scout.sh recorded), images 772/772, host
+        delphi+frieren+netbook.
       '';
     };
     shared-worktree-commit-race = {

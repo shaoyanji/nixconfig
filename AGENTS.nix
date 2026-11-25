@@ -7427,11 +7427,11 @@
       priority = "P3";
       date = "2026-11-25";
       summary = "No 25p attention-sweep artifact exists: 25p was a Stepstone board pass, its eleven rows are all in the ledger, and the four it parked are not rows on purpose. The mail did have news — Canonical's six \"we regret\" updates and Adyen's \"not to move forward\" close two applied rows, and the remaining decision mail is acknowledgements.";
-      from = [ "job-scout-sweep-2026-11-25p" ];
+      from = ["job-scout-sweep-2026-11-25p"];
       refs = {
-        modules = [ "scripts/task/apps-db.sh" ];
-        tasks = [ "apps:update" "apps:emails" "agents:mail:attention" "apps:scout:parked" ];
-        docs = [ ".agents/skills/apps/SKILL.md" ".agents/skills/mail-archive/SKILL.md" ];
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:update" "apps:emails" "agents:mail:attention" "apps:scout:parked"];
+        docs = [".agents/skills/apps/SKILL.md" ".agents/skills/mail-archive/SKILL.md"];
       };
       body = ''
         The brief asked for the new leads of a 25p attention sweep. There is no such artifact, and the
@@ -7655,6 +7655,49 @@
       '';
     };
 
+    job-scout-packets-2026-11-25t = {
+      title = "Four 2026-11-25p leads now carry packets, and none of them can leave the lane";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Built packets for the four highest-fit 25p rows: ALDB (5), Creditreform (5), BMW (4), DZ HYP (4). Each ad was re-read in its full JobPosting before writing, so the letter rests on the posting and not the sweep note. Routes differ — ALDB takes email, three publish portals only — and every gap is stated in the letter. Nothing sent: the hold runs to 2026-12-07 and the lane still has no send verb.";
+      from = ["job-scout-sweep-2026-11-25p" "apps-lane-has-no-send-task"];
+      refs = {
+        modules = ["modules/plugins/appflow/packet.nix"];
+        tasks = ["apps:update" "agents:apps:packet" "apps:gate:packet"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The four are ALDB (band 5, Berlin), Creditreform (band 5, Neuss), BMW Group (band 4, Munich)
+        and DZ HYP (band 4, Hamburg). The other four 25p rows stay at lead: adesso and valantic are a
+        band lower, and Elevion and BEW are Azure seats whose text is thinner than the four built.
+
+        Validity, read from each posting: ALDB 2026-12-16, BMW 2026-12-19, Creditreform 2026-12-23,
+        DZ HYP 2027-01-05. All four pass the 2026-12-07 window with room for one follow-up.
+
+        Language follows the ad, not the row: German for ALDB, Creditreform and DZ HYP, English for
+        BMW, whose posting is English. Each packet is its own Typst source under
+        submissions/<id>/ — letter at one page, CV at two, plus job-description.txt, lead.md and
+        submission-sheet.md, so the JD a packet was built from travels with it.
+
+        The route is part of the packet because it differs. ALDB applies by email
+        (bewerbung@aldb.org, CV in German, Zeugnisse); Creditreform, BMW and DZ HYP publish portals
+        and no mailbox, and BMW states that email applications cannot be considered, so its letter
+        names the portal and reference 194262.
+
+        Gaps sit in the letter, not in the interview: no Kubernetes or OpenShift ownership, no RHEL,
+        Satellite or Ansible, no Azure, Databricks or AKS, no GPU cluster or CUDA/NCCL/InfiniBand
+        work, no Terraform (IaC is Nix), no AWS estate. Each CV footer repeats the short version.
+
+        Nothing sent. The hold runs to 2026-12-07, and the second block is structural: the task plane
+        has no send verb, so a packet becomes a mailbox draft at best. Rows moved from lead to prep
+        with the send date in next_action.
+
+        Exit: on 2026-12-07 the four rows go applied with the sent date and a follow-up lands for
+        2026-12-21; ALDB closes 2026-12-16, so its follow-up is the last move, not a second letter.
+      '';
+    };
     job-scout-sweep-2026-11-25p = {
       title = "The 2026-11-25p sweep: a flat feed again, eight window-safe rows, and four holds exact names miss";
       kind = "decision";

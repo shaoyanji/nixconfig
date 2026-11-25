@@ -2,13 +2,18 @@ package image
 
 import (
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/png"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
+	"time"
 )
 
 // writeTree makes the minimal IMAGES_ROOT + REPO manifestJSON reads: only
@@ -326,5 +331,170 @@ func TestTagsFor(t *testing.T) {
 	got = tagsFor("badge/delphi", "badge")
 	if strings.Join(got, ",") != "delphi" {
 		t.Fatalf("tagsFor badge: %v", got)
+	}
+}
+
+// slugify is the shell's tr/sed/cut chain: lower, non-[a-z0-9] runs to one
+// dash, edges trimmed, capped at 48 — and the cap runs after the trim, so a
+// slug can still end on a dash the way `cut -c1-48` leaves one.
+func TestSlugify(t *testing.T) {
+	for _, tc := range []struct{ in, want string }{
+		{"Hello World", "hello-world"},
+		{"---a--b---", "a-b"},
+		{"A Plate: the Second!", "a-plate-the-second"},
+		{"résumé café", "r-sum-caf"},
+		{"wall 2026", "wall-2026"},
+		{strings.Repeat("x", 60), strings.Repeat("x", 48)},
+		{"a" + strings.Repeat("b", 46) + " c", "a" + strings.Repeat("b", 46) + "-"},
+		{"", ""},
+	} {
+		if got := slugify(tc.in); got != tc.want {
+			t.Errorf("slugify(%q) = %q, want %q", tc.in, got, tc.want)
+		}
+	}
+}
+
+// shipRunArgs is the whole launch_detached contract in one vector: the unit
+// name, --collect, the checkout as working directory, DETACH=0 so the unit
+// runs the pipeline instead of detaching again, and an absolute script path.
+func TestShipRunArgs(t *testing.T) {
+	t.Setenv("PATH", "/p")
+	t.Setenv("PROMPT", "a plate")
+	t.Setenv("OUT", "")
+	t.Setenv("SIZE", "")
+	t.Setenv("PROJECT", "")
+	t.Setenv("PAGES", "")
+	got := shipRunArgs("image-ship-x", "/repo", "/root", "/repo/scripts/task/image-ship.sh")
+	want := []string{
+		"--user", "--unit", "image-ship-x", "--collect",
+		"--working-directory=/repo",
+		"--setenv=PATH=/p",
+		"--setenv=PROMPT=a plate", "--setenv=OUT=", "--setenv=SIZE=1536x1024",
+		"--setenv=IMAGES_ROOT=/root",
+		"--setenv=PROJECT=bountystash-assets", "--setenv=PAGES=1",
+		"--setenv=DETACH=0", "--setenv=REPO=/repo",
+		"--", "bash", "/repo/scripts/task/image-ship.sh",
+	}
+	if !slices.Equal(got, want) {
+		t.Fatalf("shipRunArgs:\n got %q\nwant %q", got, want)
+	}
+}
+
+// Without PROMPT the detach dies — the unit would re-run the ship and die on
+// its own `${PROMPT:?}`; subprocess because die() is os.Exit.
+func TestShipDetachRequiresPrompt(t *testing.T) {
+	if os.Getenv("IMGTEST_DIE") == "1" {
+		os.Unsetenv("PROMPT")
+		cmdShipDetach([]string{"--repo", "/r", "--root", "/x"})
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run", "TestShipDetachRequiresPrompt")
+	cmd.Env = append(os.Environ(), "IMGTEST_DIE=1")
+	out, err := cmd.CombinedOutput()
+	exit, _ := err.(*exec.ExitError)
+	if exit == nil || exit.ExitCode() != 1 {
+		t.Fatalf("expected exit 1 without PROMPT, got err=%v out=%s", err, out)
+	}
+	if !strings.Contains(string(out), "PROMPT") {
+		t.Fatalf("death should name PROMPT, got: %s", out)
+	}
+}
+
+// manifestServes polls: a row that lands on the second fetch is found, and a
+// missing row, a non-200, and malformed JSON are all "not served".
+func TestManifestServes(t *testing.T) {
+	rel := "wall/2026-11-24/001.png"
+	manifest := func(paths ...string) http.HandlerFunc {
+		return func(w http.ResponseWriter, _ *http.Request) {
+			var rows []string
+			for _, p := range paths {
+				rows = append(rows, `{"path":"`+p+`"}`)
+			}
+			fmt.Fprintf(w, `{"assets":[%s]}`, strings.Join(rows, ","))
+		}
+	}
+	t.Run("present", func(t *testing.T) {
+		srv := httptest.NewServer(manifest(rel, "other/x.png"))
+		defer srv.Close()
+		if !manifestServes(srv.URL, rel, 3, time.Millisecond) {
+			t.Fatal("manifest carries the row; must serve true")
+		}
+	})
+	t.Run("appears on retry", func(t *testing.T) {
+		n := 0
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			n++
+			if n < 2 {
+				fmt.Fprint(w, `{"assets":[]}`)
+				return
+			}
+			manifest(rel)(w, r)
+		}))
+		defer srv.Close()
+		if !manifestServes(srv.URL, rel, 3, time.Millisecond) {
+			t.Fatal("a row that lands mid-poll must still serve true")
+		}
+		if n != 2 {
+			t.Fatalf("expected the poll to retry, got %d request(s)", n)
+		}
+	})
+	t.Run("missing", func(t *testing.T) {
+		srv := httptest.NewServer(manifest("other/x.png"))
+		defer srv.Close()
+		if manifestServes(srv.URL, rel, 2, time.Millisecond) {
+			t.Fatal("a manifest without the row must serve false")
+		}
+	})
+	t.Run("not ok and malformed", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}))
+		defer srv.Close()
+		if manifestServes(srv.URL, rel, 2, time.Millisecond) {
+			t.Fatal("a non-200 manifest must serve false")
+		}
+		srv2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			fmt.Fprint(w, "not json")
+		}))
+		defer srv2.Close()
+		if manifestServes(srv2.URL, rel, 2, time.Millisecond) {
+			t.Fatal("a malformed manifest must serve false")
+		}
+	})
+}
+
+// served's exit code is the contract image-ship.sh's `if` reads: 0 prints
+// true, absent-after-poll prints false and exits 1. Subprocess for the exit.
+func TestServedExitCode(t *testing.T) {
+	if os.Getenv("IMGTEST_DIE") == "1" {
+		cmdServed([]string{"--rel", "wall/x.png", "--from", os.Getenv("IMGTEST_URL"), "--tries", "1"})
+		return
+	}
+	run := func(url string) (string, int) {
+		cmd := exec.Command(os.Args[0], "-test.run", "TestServedExitCode")
+		cmd.Env = append(os.Environ(), "IMGTEST_DIE=1", "IMGTEST_URL="+url)
+		out, err := cmd.CombinedOutput()
+		code := 0
+		if exit, _ := err.(*exec.ExitError); exit != nil {
+			code = exit.ExitCode()
+		} else if err != nil {
+			t.Fatalf("served subprocess: %v", err)
+		}
+		first, _, _ := strings.Cut(strings.TrimSpace(string(out)), "\n")
+		return first, code
+	}
+	hit := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprint(w, `{"assets":[{"path":"wall/x.png"}]}`)
+	}))
+	defer hit.Close()
+	miss := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprint(w, `{"assets":[]}`)
+	}))
+	defer miss.Close()
+	if out, code := run(hit.URL); out != "true" || code != 0 {
+		t.Fatalf("served row: got %q rc=%d, want true rc=0", out, code)
+	}
+	if out, code := run(miss.URL); out != "false" || code != 1 {
+		t.Fatalf("absent row: got %q rc=%d, want false rc=1", out, code)
 	}
 }

@@ -21,44 +21,22 @@
 set -euo pipefail
 
 repo=${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}
-if [ -z "${IMAGES_ROOT:-}" ]; then
-  if [ -d /Volumes/data/pics ]; then
-    IMAGES_ROOT=/Volumes/data/pics/generated
-  else
-    IMAGES_ROOT=$HOME/Pictures/generated
-  fi
-fi
+# shellcheck source=image-daily-lib.sh
+source "$repo/scripts/task/image-daily-lib.sh"
 PROJECT=${PROJECT:-bountystash-assets}
 SIZE=${SIZE:-1536x1024}
 PAGES=${PAGES:-1}
 
 say() { printf '%s\n' "$*" >&2; }
 
-slugify() {
-  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' |
-    sed -e 's/^-*//' -e 's/-*$//' | cut -c1-48
-}
-
+: "${PROMPT:?PROMPT is required}"
 # A detached ship runs the whole pipeline in the unit — gen, row, deploy and
 # the served check — because a gen-only detach would still leave the manifest
-# step to whoever reads the log.
-launch_detached() { # slug log
-  local slug=$1 log=$2 unit
-  unit="image-ship-$slug"
-  systemctl --user stop "$unit" 2>/dev/null || true
-  systemd-run --user --unit "$unit" --collect \
-    --working-directory="$repo" \
-    --setenv=PATH="$PATH" \
-    --setenv=PROMPT="$PROMPT" --setenv=OUT="${OUT:-}" --setenv=SIZE="$SIZE" \
-    --setenv=IMAGES_ROOT="$IMAGES_ROOT" --setenv=PROJECT="$PROJECT" \
-    --setenv=PAGES="$PAGES" --setenv=DETACH=0 --setenv=REPO="$repo" \
-    -- bash "$0" >"$log" 2>&1
-  jq -cn --arg unit "$unit" --arg log "$log" '{unit: $unit, log: $log}'
-}
-
-: "${PROMPT:?PROMPT is required}"
+# step to whoever reads the log. ship-detach in tools/os owns the systemd-run.
 if [ "${DETACH:-0}" = "1" ]; then
-  launch_detached "$(slugify "$PROMPT")" "${LOG:-$IMAGES_ROOT/$(slugify "$PROMPT").ship.log}"
+  args=(--repo "$repo" --root "$IMAGES_ROOT")
+  [ -n "${LOG:-}" ] && args+=(--log "$LOG")
+  "$(image_daily_cli)" ship-detach "${args[@]}"
   exit 0
 fi
 
@@ -93,18 +71,11 @@ esac
 # frontend attached, not that this asset is on it.
 served=false
 if [ "$PAGES" = "1" ]; then
-  tries=0
-  while [ "$tries" -lt 24 ]; do
-    if curl -fsS --max-time 10 "https://$PROJECT.pages.dev/manifest.json" 2>/dev/null |
-      jq -e --arg p "$rel" '.assets[]? | select(.path == $p)' >/dev/null 2>&1; then
-      served=true
-      break
-    fi
-    tries=$((tries + 1))
-    sleep 5
-  done
-  [ "$served" = "true" ] ||
+  if "$(image_daily_cli)" served --rel "$rel" --project "$PROJECT" >/dev/null; then
+    served=true
+  else
     say "image-ship: deploy finished but $rel is not on the served manifest yet — check https://$PROJECT.pages.dev/manifest.json"
+  fi
 fi
 
 jq -cn --arg path "$path" --arg url "$url" --arg rel "$rel" \

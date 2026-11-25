@@ -5918,33 +5918,31 @@
       priority = "P2";
       date = "2026-11-25";
       from = ["one-os-cli" "devin-lane-handoff-2026-11-24"];
-      summary = "Port end state: ~30 verbs in tools/os/internal/image behind .#cli.image.daily; 13 unit tests plus a 9-assert fixture now pin every gate arm. Open: cloudinary curl in add/blog/gc, systemd-run detach in plates, ffprobe check in wallpaper; stash@{0} parked for the operator. The gate greps symbol names — renaming unjudgedStreak/shrinkGuard/modelProvider fails it by name.";
+      summary = "~30 verbs in tools/os/internal/image behind .#cli.image.daily; 18 unit tests plus a 9-assert fixture pin every gate arm; ship-detach and served moved the last image-ship.sh snippets to Go. Open: cloudinary curl in add/blog/gc, ffprobe check in wallpaper, image-gen's cpg auth; stash@{0} parked. Renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
       refs = {
-        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "flake/cli.nix"];
+        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/ship.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "scripts/task/image-ship.sh" "flake/cli.nix"];
         tasks = ["checks:image-daily" "checks:images:publish:test" "checks:images" "checks:images:ship:test" "images:gate"];
       };
       body = ''
         The port's end state (verified 2026-11-24): the spend, judge and
-        publish machinery lives in tools/os/internal/image (~30 verbs). The
-        flake answers it as .#cli.image.daily — a symlink onto the `os`
-        umbrella whose argv[0] dispatch selects the image domain — and
-        image-daily-lib.sh resolves the binary via IMAGE_DAILY_BIN, then
-        PATH, then a one-off `nix build` of that attr (fetches from cachix).
-        Shell keeps ~884 lines of dispatch, env/ledger resolution and
-        command shims.
+        publish machinery lives in tools/os/internal/image behind
+        .#cli.image.daily — a symlink onto the `os` umbrella whose argv[0]
+        dispatch selects the image domain — and image-daily-lib.sh resolves
+        the binary via IMAGE_DAILY_BIN, PATH, or a one-off `nix build`.
+        Shell keeps ~880 lines of dispatch, env resolution and shims.
 
-        Coverage landed 2026-11-25 (a4ae52b9, efe7901b, d17b7a69,
-        68b14291, 30435eaf): the publish fixture is 9 assertions — every
-        gate arm proven on 470c9034^ and strip mutations. 13 unit tests
-        in main_test.go pin the urls.tsv projection, skipReason's burn
-        vocabulary, the description cascade, the ffprobe cache loop
-        (TestShapesPass) and deploy_frontend's PAGES gate.
+        Coverage 2026-11-25 (a4ae52b9, efe7901b, d17b7a69, 68b14291,
+        30435eaf, and the ship legs): the publish fixture is 9 assertions —
+        every gate arm proven on 470c9034^ and strip mutations; 18 unit
+        tests pin the urls.tsv projection, skipReason's burn vocabulary,
+        the ffprobe cache loop, deploy_frontend's PAGES gate, ship-detach's
+        systemd-run vector and the served manifest poll plus exit code.
 
         Open (deliberately still shell — external-process boundaries):
-        cloudinary curl in add/blog/gc via cloudinary.sh, systemd-run
-        DETACH behind cmdRound in plates.go, ffprobe's presence check in
-        image-daily-wallpaper.sh (the probe itself is Go's dimensions).
-        Each file keeps its dispatch slot — the gate checks both ways.
+        cloudinary curl in add/blog/gc via cloudinary.sh, ffprobe's
+        presence check in image-daily-wallpaper.sh (the probe itself is
+        Go's dimensions), and image-gen.sh's cpg auth dance. Each file
+        keeps its dispatch slot — the gate checks both ways.
 
         Loose thread: stash@{0} "On main: pre-existing changes" is parked
         from an aborted concurrent-lane rebase — not mine to pop or drop.

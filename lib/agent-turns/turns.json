@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T01:29:31Z",
+  "generated": "2026-11-25T01:37:35Z",
   "count": 200,
-  "pin": "6cf54786f0e09e168e55c60f0bb55d71b28fb7c2895ba6fc2f75d363056da02a",
+  "pin": "883c96202d703c24126bd9a29710b2675e15dd48779e50e5bfd3d3ea1b4d24af",
   "turns": [
+    {
+      "id": "b4dddbb4-e28b-4ef6-88f8-0b35b2914792",
+      "ts": "2026-11-25T01:33:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "drove idle delphi (agents:3.1 ssh remote freebuff) with 2026-11-25d job-scout sweep task — classify selected note-change p=0.89 m=0.83 exit 0; working... counter confirmed, C-m resend absorbed while working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "41802a713c1962a8c5e9f2e82c5a90c1a1a1fe99",
+      "branch": "main",
+      "frame": "03harb3gxf14u2nv897sfyq5y"
+    },
+    {
+      "id": "b90796d0-0547-4176-9fe7-121c123c9f26",
+      "ts": "2026-11-25T01:33:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "drove idle devin (agents:1.1) with image-daily curl/detach Go port-slice task — classify needs_review (task-change p=0.40 m=0.13) then duel task-change p=0.77 m=0.54 (margin decisive, top pick, no third call); Typing spinner confirmed after first Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "41802a713c1962a8c5e9f2e82c5a90c1a1a1fe99",
+      "branch": "main",
+      "frame": "03harb3fgk0q32uizvw1wqgnq"
+    },
+    {
+      "id": "f95a2408-76f7-442e-9ff4-cd601cdc72af",
+      "ts": "2026-11-25T01:29:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: ten 2026-11-25c leads read in full from each page's JobPosting JSON-LD (the rendered arbeitnow page times out; curl works). Packet: Oxoia, Baden, German — device fleet, IaC, coding agents. Nine parks: seven on place (Paris, London, Nantes, UK sites, 60-80% on site), two on skill. Note job-scout-lane-2026-11-25d: German ad or EU-remote before a read. Nothing sent, hold 2026-12-07 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "41802a713c1962a8c5e9f2e82c5a90c1a1a1fe99",
+      "branch": "main",
+      "frame": "03hara9ftoog228u4545zymzf"
+    },
     {
       "id": "20c96c91-bddd-409b-ad30-3c910658ab45",
       "ts": "2026-11-25T01:24:40Z",
@@ -2588,47 +2627,6 @@
       "base_commit": "366e1015528d56b961966a6a515303b94f442135",
       "branch": "main",
       "frame": "03haohuldsup1qkswxrm5ci2d"
-    },
-    {
-      "id": "77f01606-78c0-4270-a5ea-9b85283040da",
-      "ts": "2026-11-24T16:18:31Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: scout sweep4 — 2 new leads (maxcluster Linux Systems Engineer Monitoring/Observability, NETWAYS System Engineer Cloud), both held to 2026-12-07; tailored German CV per req (10/36 and 13/36 highlights, 4 projects), CV-only packets, no letter; nothing sent | gate: packet build PASS + apps:get rows",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haoam1lingkiamopryj1hwq"
-    },
-    {
-      "id": "83a8998f-2556-435d-8711-d3c726765c75",
-      "ts": "2026-11-24T16:12:03Z",
-      "source": "devin",
-      "subject": "nixconfig:appflow-write-auth",
-      "action": "landed: bearer gate on the two appflow write routes (sops key + rendered map + if/return 403); replica-proven 403/200/reads-open; lib alias unification 29/30 drv-identical | gate: checks:host HOST=delphi PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03hao9cnimlbir4dyz36ub8iz"
-    },
-    {
-      "id": "d9c7dc0e-5554-469e-aabc-84c9137a5ae9",
-      "ts": "2026-11-24T16:09:38Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "claim: scout sweep for new DevOps/SRE/Platform/Infra roles, then tailor a CV per new lead (prep only, no send)",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hao8vkswjqodioerg0ugq2n"
     }
   ]
 }

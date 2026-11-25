@@ -6586,5 +6586,51 @@
         the next sweep spends its budget on sources that still refuse us.
       '';
     };
+
+    job-scout-sweep-2026-11-25e-boards = {
+      title = "The 2026-11-25e boards pass: three German platform leads, every other board held";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Fifteen Arbeitnow pages, 60 ATS boards, the November HN thread and germantechjobs yielded 21 untracked infra employers after the 934-name filter; DIN, Bonnier Media and Vetter Pharma survived at scouted with origin scout-2026-11-25e, fit 76/66/62 banded 4/3/3, while PSI Software and netgo dropped out as already held.";
+      from = ["job-scout-sweep-2026-11-25e"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+Sweep 2026-11-25e, boards pass, prep only, from delphi: Arbeitnow, the
+ATS boards, the November HN thread and germantechjobs, deduped against the
+934-name ledger, on the post-d rule — German ad or EU-remote.
+
+Arbeitnow: 15 of 16 pages, 3,516 listings, 134 family titles; 11 left
+after the ledger and place filters, all read, none a platform role
+(smart-hands networking, first/second-level support, a 20-hour
+generalist, ERP and M365 administration, construction planning).
+
+60 ATS boards: 2,080 postings, 86 family titles, every one held. The slug
+`grafanalabs` does not normalise to `Grafana Labs`, and `solarisbank` is
+the Solaris row already on record. The HN thread's 26 infra-plus-Europe
+comments named Simple Analytics, Namespace, Splash Tech and Proxima
+Fusion, all held; the rest were onsite or US/Canada/LATAM.
+
+germantechjobs was the only source with new employers: 21 after the
+filter, five read through the feed's requirement block because the pages
+are JS shells. PSI Software SE and netgo proved held, leaving three rows
+at scouted, origin scout-2026-11-25e, fit sent as the band because the
+column's CHECK is 1-5: DIN 76/4 (Azure, AKS, Terraform at a standards
+body), Bonnier Media 66/3 (Azure and IaC), Vetter Pharma 62/3 (OT DevOps,
+GitLab and Ansible in GxP). Held to 2026-12-07.
+
+Refused on eligibility: Amazon (EU-member-state nationality), Airbus
+Defence and Space, Teledyne, ELAC SONAR, Enrichment Technology; on shape:
+Porsche Consulting, ALTEN, KIND, Scheer.
+
+The five rows of job-scout-sweep-2026-11-25e share this origin from a
+concurrent turn, so it holds eight and the stage twelve. Nothing is a send.
+      '';
+    };
   };
 }

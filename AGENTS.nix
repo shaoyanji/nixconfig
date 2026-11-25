@@ -6891,6 +6891,50 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25i = {
+      title = "The 2026-11-25i sweep: the feed was flat, the vendors' own careers pages were not";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Germantechjobs re-read in full gave 99 platform-family titles and 67 employers the ledger lacks, nearly all in-house Windows administration; the fresh engineering came from six vendor careers pages, where two ads became packets (JACOB Karlsruhe, NT-ware Bad Iburg) and three were parked on craft or place.";
+      from = ["job-scout-sweep-2026-11-25h"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Scout 2026-11-25i: germantechjobs /rss.xml under a browser user agent answered 586 items with 99
+        devops/SRE/platform/infrastructure titles; 67 of those employers are not among the 954 the ledger
+        holds, and nearly all are in-house Windows administration for a mid-sized firm, so none was filed.
+        The fresh engineering came from the vendor pages the apps skill names as aggregator-free: LINBIT,
+        B1 Systems, Open-Xchange, Univention, Proxmox and Hetzner, read as text and deduped against the
+        ledger. Open-Xchange, B1, LINBIT, Univention, Hetzner and Mittwald already hold rows, so one
+        employer keeps one thread and none was re-filed.
+        Five rows were filed at scouted, origin scout-2026-11-25i:
+        JACOB Elektronik Senior Linux Systems Engineer, Karlsruhe, 33-67k, band 5;
+        NT-ware Linux-Systemadministrator, Bad Iburg, 62.4k plus bonus, band 4;
+        IPB Senior Network Engineer Juniper/Automation, Berlin 50-80k, band 3;
+        MIWE Systemarchitekt/Projektleiter Cloud/Kubernetes, near Wuerzburg 36-60k, band 3;
+        Proxmox IT Infrastructure Allrounder, Vienna on-site, band 3.
+        Two packets were built, a one-page German letter and a two-page CV in each ad's own order: JACOB
+        around on-prem and AWS Kubernetes as one source, migration with a return path, databases and
+        logging, with Ceph and Proxmox named as the gap; NT-ware around Linux administration, containers,
+        fault and performance work and monitoring, with NixOS-not-Debian and no-ELK stated.
+        Three were parked: IPB is senior ISP routing at backbone scale, MIWE is IoT edge architecture and
+        project leadership rather than platform work, Proxmox is Vienna on-site at Allrounder level despite
+        the closest stack match of the sweep.
+        Refused on shape: RockQ ML platform (product ML and UX), WWK (F5 BIG-IP, Cisco, Palo Alto),
+        Zentraler IT-Betrieb Niedersaechsische Justiz (Microsoft, Citrix, MSSQL), LearnWise (a training
+        ad), BALLY WULFF and the remaining MSP sysadmin rows.
+        Caveat: germantechjobs detail pages redirect to the board index, so the ad text is the feed item's
+        own requirement and responsibility block; the Proxmox ad was read on proxmox.com, and NT-ware's
+        two on-site days are why the letter offers a move.
+        Exit: five rows decided, two packets held to 2026-12-07, nothing sent.
+      '';
+    };
+
     job-scout-sweep-2026-11-25h = {
       title = "The 2026-11-25h sweep: the feed was exhausted, the unfiled employers were not";
       kind = "open";

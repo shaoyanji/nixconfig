@@ -7011,6 +7011,53 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25l = {
+      title = "The 2026-11-25j sweep: the feed was flat by hash, and the fresh engineering was three German ads";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Germantechjobs answered byte-identical to the 25i read, the other boards and the ATS families only held employers, so the sweep's fresh engineering was three German ads: EOS and WinValue became ad-ordered packets and AND-E was parked on DR governance.";
+      from = ["job-scout-sweep-2026-11-25i"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Scout 2026-11-25j: germantechjobs /rss.xml under a browser user agent came back byte-identical to the
+        25i read (sha256 cf313395, 586 items), so flat is a hash, not a judgement: 155 devops/SRE/platform/
+        infrastructure titles at 129 employers, and exact-name dedupe against the 972-firm ledger leaves 80
+        unheld employers, nearly all in-house Windows or VMware administration.
+        The other boards answered and carried nothing fresh: berlinstartupjobs engineering 12 items (all dev,
+        ML or data, DATATRONiQ already held), We Work Remotely devops 77 (US and EU-remote big tech, four
+        Grafana Labs manager seats, EPAM Croatia and Central Asia, Upsun Canada), RemoteOK 101 with only an
+        Atlassian Cloud administrator inside Europe, and the ATS families only held employers — Ashby camunda
+        56, enpal 186, kubermatic 9, Personio 1komma5grad 339, SmartRecruiters DeliveryHero 794.
+        Stepstone answered this sweep's request with a 301 and no rows came from it; the pass-two read that
+        did query it and filed six rows is a separate note, so nothing here rests on Stepstone.
+        Three rows were filed at scouted, origin scout-2026-11-25j:
+        EOS Deutscher Inkasso-Dienst DevOps Engineer, Hamburg, 60-80k, band 4;
+        WinValue IT-Administrator und IT-Sicherheitsbeauftragter, Muenster, 65-80k, band 4;
+        AND-E Lead Infrastructure Engineer Backup und Disaster Recovery, 48-88k, band 3.
+        Two packets were built, a one-page German letter and a two-page CV in each ad's own order. EOS follows
+        its ad: operating the estate and the software lifecycle, introducing the new core system while the old
+        one is shut down, configuration as code, the cross-cutting team and stakeholder work — with
+        Graylog/Kibana, an Ansible estate, a grown Kubernetes cluster and the AWS surface named as gaps, and
+        the two-year term accepted in writing. WinValue follows its ad: the whole infrastructure administered
+        remotely, Proxmox and RHEL plus architecture, HA with storage and backup, vulnerability and patch with
+        SIEM and incident response, hardening, ISO 27001 and SOC 2 readiness, dev advice on CI/CD — with RHEL
+        by name, a Proxmox cluster, OPNsense and FreeIPA and an ISO lead named as gaps.
+        AND-E was parked: it owns DR governance, BIA, RTO/RPO and exercise running, not building the fleet.
+        Refused on shape: EOS Senior IT Security Engineer (assessment and advice, no operational ownership),
+        ProBioGen (Azure, Entra, Fortinet), 11880 (support plus Fortinet), GELITA (VMware, global LAN/WAN),
+        ante Holding (IT/OT and team lead), plus the rows earlier sweeps already refused.
+        Nothing was sent. Both packets hold to 2026-12-07 with 2026-12-21 follow-ups, joining the 25i todo.
+        Exit: send both on 2026-12-07, close AND-E on its condition, and let the next sweep prove or drop the
+        flat-feed claim by hash.
+      '';
+    };
+
     job-scout-sweep-2026-11-25h = {
       title = "The 2026-11-25h sweep: the feed was exhausted, the unfiled employers were not";
       kind = "open";
@@ -7065,32 +7112,32 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Scout 2026-11-25i, second pass, filed as note j because the i label was already taken earlier
-today by a gtg pass that filed IPB, JACOB, MIWE, NT-ware and Proxmox. This pass read the boards again
-and Stepstone answered for the first time in the lane: its listing pages render normally (25 inline ads
-per query page), while detail pages only load with a Referer header and otherwise reset the connection
-in 60 ms. Germantechjobs came back identical for a third time: 1,291 postings, zero new since g, and its
-ten tag pages are still 6.4 KB with zero items. Berlinstartupjobs produced 28 engineering links and one
-infra title; WeWorkRemotely 25 US-remote devops roles; RemoteOK 19 mostly US SaaS listings; 20 slug
-probes across Personio, SmartRecruiters and Ashby, built from the 94 unfiled employers, returned 3
-postings and 1 infra title.
-Stepstone: twelve search pages over six infra queries gave 228 unique cards, about 100 unheld
-direct-employer ads parsed through JobPosting JSON-LD, and six new rows at scouted on origin
-scout-2026-11-25i, whose other five rows belong to the earlier i pass:
-DENIC Ops Engineer Kubernetes/CI-CD/Security (Frankfurt), band 5;
-Schwarz Digits STACKIT control-plane Platform Engineer (Bad Friedrichshall), band 5;
-Rheinmetall Senior Platform Engineer Linux and Container (Düsseldorf), band 5;
-Viridium Cloud and Systems Engineer (Neu-Isenburg), band 5;
-mgm Linux Systemadministrator Cloud Infrastructure (Aachen), band 5;
-PROTOS Senior DevOps Engineer Cloud/Kubernetes (Berlin), band 5.
-Dedupe caught Testo (held as Testo SE & Co. KGaA) and SEW-EURODRIVE (held as SEW-Eurodrive), and KubeOps
-was refused because its ad body is Bechtle boilerplate while both KubeOps and Bechtle sit on the ledger.
-Agencies skipped: Amadeus Fire, FERCHAU, Brunel, Akkodis, Ratbacher, Instaffo, OMNIGENA, TECCON.
-Shape refusals: Bauingenieur and Projektleiter infrastructure, solution architects, LLMOps, SAP DevOps.
-Caveats: Stepstone publishes no salary on any of these ads, so every band is stack coverage only, and
-all six land on band 5 because the requirement blocks are dense enough to saturate the matcher;
-Rheinmetall carries on-call and travel; Viridium requires C2 German; PROTOS is consultancy delivery.
-Exit: nothing sent, nothing past the requirement block, held to 2026-12-07.
+        Scout 2026-11-25i, second pass, filed as note j because the i label was already taken earlier
+        today by a gtg pass that filed IPB, JACOB, MIWE, NT-ware and Proxmox. This pass read the boards again
+        and Stepstone answered for the first time in the lane: its listing pages render normally (25 inline ads
+        per query page), while detail pages only load with a Referer header and otherwise reset the connection
+        in 60 ms. Germantechjobs came back identical for a third time: 1,291 postings, zero new since g, and its
+        ten tag pages are still 6.4 KB with zero items. Berlinstartupjobs produced 28 engineering links and one
+        infra title; WeWorkRemotely 25 US-remote devops roles; RemoteOK 19 mostly US SaaS listings; 20 slug
+        probes across Personio, SmartRecruiters and Ashby, built from the 94 unfiled employers, returned 3
+        postings and 1 infra title.
+        Stepstone: twelve search pages over six infra queries gave 228 unique cards, about 100 unheld
+        direct-employer ads parsed through JobPosting JSON-LD, and six new rows at scouted on origin
+        scout-2026-11-25i, whose other five rows belong to the earlier i pass:
+        DENIC Ops Engineer Kubernetes/CI-CD/Security (Frankfurt), band 5;
+        Schwarz Digits STACKIT control-plane Platform Engineer (Bad Friedrichshall), band 5;
+        Rheinmetall Senior Platform Engineer Linux and Container (Düsseldorf), band 5;
+        Viridium Cloud and Systems Engineer (Neu-Isenburg), band 5;
+        mgm Linux Systemadministrator Cloud Infrastructure (Aachen), band 5;
+        PROTOS Senior DevOps Engineer Cloud/Kubernetes (Berlin), band 5.
+        Dedupe caught Testo (held as Testo SE & Co. KGaA) and SEW-EURODRIVE (held as SEW-Eurodrive), and KubeOps
+        was refused because its ad body is Bechtle boilerplate while both KubeOps and Bechtle sit on the ledger.
+        Agencies skipped: Amadeus Fire, FERCHAU, Brunel, Akkodis, Ratbacher, Instaffo, OMNIGENA, TECCON.
+        Shape refusals: Bauingenieur and Projektleiter infrastructure, solution architects, LLMOps, SAP DevOps.
+        Caveats: Stepstone publishes no salary on any of these ads, so every band is stack coverage only, and
+        all six land on band 5 because the requirement blocks are dense enough to saturate the matcher;
+        Rheinmetall carries on-call and travel; Viridium requires C2 German; PROTOS is consultancy delivery.
+        Exit: nothing sent, nothing past the requirement block, held to 2026-12-07.
       '';
     };
 
@@ -7108,25 +7155,25 @@ Exit: nothing sent, nothing past the requirement block, held to 2026-12-07.
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Second pass over the six rows filed in job-scout-sweep-2026-11-25j. Dedupe ran over the whole ledger
-(1,253 rows, 972 employers) with token matching as well as exact names, and two of the six were already
-answered. Rheinmetall's Senior Platform Engineer - Linux & Container is the requisition already carried
-by rheinmetall-it-solutions-senior-platform-engineer-linux-container, a live lead at band 3; parent and
-subsidiary count as one employer under the 180-day rule, so band 5 cannot make it a second application.
-Schwarz Digits' (Senior) Platform Engineer - STACKIT Control Plane Platform is GT1923, and that row was
-already closed as a duplicate of stackit-iac, which is applied as of 2026-11-22: nothing at Schwarz
-Digits reopens before 2027-05-21.
-Both are parked, not deleted. The posting, the band-5 fit and the URL stay, the status names the row
-that blocks it, and the next action says what would reopen it.
-Four rows stand, all band 5 and all in lane: DENIC eG (Frankfurt, Kubernetes and CI/CD for the .de
-registry), mgm technology partners (Aachen, managed cloud and virtualisation), PROTOS TECHNOLOGIE
-(Berlin, consultancy DevOps), Viridium Gruppe (Neu-Isenburg, OpenStack and Azure, C2 German). Each
-keeps the Referer-header caveat and the 2026-12-07 hold in its next action.
-The finding is the dedupe, not the rows: exact-name comparison cannot reach an employer that sits on
-the ledger as "STACKIT / Schwarz Digits" or "Rheinmetall IT Solutions". Matching the distinctive word
-of the employer name caught both. The next sweep runs that match before filing and parks any row whose
-employer already holds a live application.
-Exit: no sends, nothing read past the requirement block, hold to 2026-12-07.
+        Second pass over the six rows filed in job-scout-sweep-2026-11-25j. Dedupe ran over the whole ledger
+        (1,253 rows, 972 employers) with token matching as well as exact names, and two of the six were already
+        answered. Rheinmetall's Senior Platform Engineer - Linux & Container is the requisition already carried
+        by rheinmetall-it-solutions-senior-platform-engineer-linux-container, a live lead at band 3; parent and
+        subsidiary count as one employer under the 180-day rule, so band 5 cannot make it a second application.
+        Schwarz Digits' (Senior) Platform Engineer - STACKIT Control Plane Platform is GT1923, and that row was
+        already closed as a duplicate of stackit-iac, which is applied as of 2026-11-22: nothing at Schwarz
+        Digits reopens before 2027-05-21.
+        Both are parked, not deleted. The posting, the band-5 fit and the URL stay, the status names the row
+        that blocks it, and the next action says what would reopen it.
+        Four rows stand, all band 5 and all in lane: DENIC eG (Frankfurt, Kubernetes and CI/CD for the .de
+        registry), mgm technology partners (Aachen, managed cloud and virtualisation), PROTOS TECHNOLOGIE
+        (Berlin, consultancy DevOps), Viridium Gruppe (Neu-Isenburg, OpenStack and Azure, C2 German). Each
+        keeps the Referer-header caveat and the 2026-12-07 hold in its next action.
+        The finding is the dedupe, not the rows: exact-name comparison cannot reach an employer that sits on
+        the ledger as "STACKIT / Schwarz Digits" or "Rheinmetall IT Solutions". Matching the distinctive word
+        of the employer name caught both. The next sweep runs that match before filing and parks any row whose
+        employer already holds a live application.
+        Exit: no sends, nothing read past the requirement block, hold to 2026-12-07.
       '';
     };
   };

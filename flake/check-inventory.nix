@@ -64,6 +64,7 @@
     "checks:images" = "leaf";
     "checks:images:publish:test" = "leaf";
     "checks:images:ship:test" = "leaf";
+    "checks:images:test" = "leaf";
     "checks:infron" = "leaf";
     "checks:invalidation" = "cache";
     "checks:inventory:compiled" = "leaf";
@@ -76,12 +77,16 @@
     "checks:kiwix:watchdog" = "leaf";
     "checks:media-relay" = "leaf";
     "checks:modules:edges" = "leaf";
+    "checks:modules:edges:test" = "leaf";
     "checks:modules:validate" = "leaf";
     "checks:nix:comments" = "leaf";
+    "checks:nix:comments:test" = "leaf";
     "checks:nix:fix" = "leaf";
     "checks:nix:format" = "leaf";
     "checks:nix:lint" = "leaf";
+    "checks:nix:lint:test" = "leaf";
     "checks:nix:shell" = "leaf";
+    "checks:nix:shell:test" = "leaf";
     "checks:nix:style" = "leaf";
     "checks:nix:style:test" = "leaf";
     "checks:nix:watch" = "leaf";
@@ -100,6 +105,7 @@
     "checks:postgres:drill" = "leaf";
     "checks:postgres:vector" = "leaf";
     "checks:prose" = "leaf";
+    "checks:prose:test" = "leaf";
     "checks:qmd:docs" = "leaf";
     "checks:qmd:vault" = "leaf";
     "checks:quick" = "leaf";
@@ -110,6 +116,7 @@
     "checks:repo:hostpaths" = "leaf";
     "checks:repo:hostpaths:test" = "leaf";
     "checks:repo:paths" = "leaf";
+    "checks:repo:paths:test" = "leaf";
     "checks:shell-inputs" = "leaf";
     "checks:restic:drill" = "leaf";
     "checks:router" = "leaf";
@@ -118,11 +125,14 @@
     "checks:services:ports" = "leaf";
     "checks:services:ports:test" = "leaf";
     "checks:sessions:reaper" = "leaf";
+    "checks:shell-inputs:test" = "leaf";
     "checks:site:links" = "leaf";
     "checks:site:links:test" = "leaf";
     "checks:site:path" = "leaf";
     "checks:skills:mirror" = "leaf";
+    "checks:skills:mirror:test" = "leaf";
     "checks:sops:drift" = "leaf";
+    "checks:sops:drift:test" = "leaf";
     "checks:sqlite:maintenance" = "leaf";
     "checks:ssh:bitwarden" = "leaf";
     "checks:ssh:modes" = "leaf";
@@ -142,5 +152,6 @@
     "checks:units" = "host";
     "checks:ups:drill" = "leaf";
     "checks:yaml:lint" = "leaf";
+    "checks:yaml:lint:test" = "leaf";
   };
 }

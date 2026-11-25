@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T06:42:28Z",
+  "generated": "2026-11-25T06:55:06Z",
   "count": 200,
-  "pin": "dc01a6623a307af8bae27459e559373777cdde6e2b0127d6adec4b87996b83b7",
+  "pin": "dd7cb03eca2061addfc5d1b2a3bd8798f5afc9bc8eefc7ac51c7b49b0bf7f6cb",
   "turns": [
+    {
+      "id": "84a6afbb-0017-4e29-bc58-c5dfd65ffc74",
+      "ts": "2026-11-25T06:43:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25o",
+      "action": "corrected again: the prior turn claimed .#agentsNotes.issues [] while the gate reported the supplement summary over 400 chars. Summary trimmed in fb440977, gate now genuinely clean on origin. Rows unchanged: gematik + ELAC filed as leads, dive unverified (Personio + feed 404), all prep-only to 2026-12-07. Stepstone still 000 here even with Referer, so its 200 remains the other lane's reading | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haszmjntwm24uc40ibtvxp4"
+    },
+    {
+      "id": "34d15db3-de45-46bb-afe5-6bf013573ef4",
+      "ts": "2026-11-25T06:43:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25o",
+      "action": "corrected: the earlier turn on this subject claimed a landed note and a clean gate while the splice asserted and no commit happened. The supplement job-scout-sweep-2026-11-25o-supplement now lands in 622c70d9: the 25o cycle note already existed (7 rows at scout-2026-11-25n), this pass added gematik + ELAC SONAR, withheld dive (Personio 404), and my Stepstone 403 was a missing Referer header | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hasziytlzts2v4dbyr3tbfa"
+    },
+    {
+      "id": "665ccc47-18c7-423d-ba8f-fcaf7d42024b",
+      "ts": "2026-11-25T06:42:46Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-packets-2026-11-25t",
+      "action": "correction: the earlier done turn named 0d4d2d97, which was HEAD because the pre-commit formatting hook refused the first commit (AGENTS.nix at HEAD was unformatted). The note is on 6129a8ca after alejandra normalised the file; checks:quick PASS, rc=0.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6129a8ca2c560998340b9456ef3e738b52781d5c",
+      "branch": "main",
+      "frame": "03haszfx1q2a3qgz54zb1pyc9"
+    },
     {
       "id": "ff7cd61b-9950-4b79-8cbb-aab011bd2208",
       "ts": "2026-11-25T06:41:57Z",
@@ -2631,45 +2670,6 @@
       "base_commit": "d0ee54cf994647765873aca99521ad2fbbd5ae28",
       "branch": "main",
       "frame": "03haqlar4sa0yp2jk1ygzkhxq"
-    },
-    {
-      "id": "c3bdc716-ede8-453e-a83c-9d10edd7a1f0",
-      "ts": "2026-11-24T23:20:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: scout new DevOps/SRE/Platform/Infra roles into lead tracker (stage=scouted + nextAction)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d0ee54cf994647765873aca99521ad2fbbd5ae28",
-      "branch": "main",
-      "frame": "03haqkz2lxtvvpmvva5mhrm8h"
-    },
-    {
-      "id": "25d7d683-f5a1-4dcb-8615-9dc91451f707",
-      "ts": "2026-11-24T23:20:07Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: review trivago Senior Platform packet against JD (CV 2pp + German letter 1pp), fix gaps, mark ready-to-send; nothing sent",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d0ee54cf994647765873aca99521ad2fbbd5ae28",
-      "branch": "main",
-      "frame": "03haqkz12nbnwg17jyoeoejh2"
-    },
-    {
-      "id": "695df780-5431-499d-9ab2-907b4f1f5e7c",
-      "ts": "2026-11-24T23:12:41Z",
-      "source": "delphi",
-      "subject": "nixconfig:apps-tracker",
-      "action": "landed: curation follow-up — cleared next action on the remaining rejected rows (rule 7: a rejection clears it); gate: apps:dupes PASS, 0 rejected/terminal rows with actions",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haqjipeuy9w8ywn53cnvofv"
     }
   ]
 }

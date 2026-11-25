@@ -44,7 +44,9 @@ tasks:
     # cores; the floor is a shared eval, not more concurrency.
     deps:
       - task: checks:repo:paths
+      - task: checks:repo:paths:test
       - task: checks:shell-inputs
+      - task: checks:shell-inputs:test
       - task: checks:repo:hostpaths
       - task: checks:repo:hostpaths:test
       - task: checks:docs:links
@@ -55,32 +57,41 @@ tasks:
       - task: checks:images:publish:test
       - task: checks:services:ports
       - task: checks:prose
+      - task: checks:prose:test
       - task: checks:infron
       - task: checks:yaml:lint
+      - task: checks:yaml:lint:test
       - task: checks:toon
       - task: checks:toon:surfaces
       - task: checks:toon:tasks
       - task: checks:tasks
       - task: checks:policies:fixtures
       - task: checks:nix:comments
+      - task: checks:nix:comments:test
       - task: checks:skills:mirror
+      - task: checks:skills:mirror:test
       - task: checks:kg
       - task: checks:kernel:collision
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
       # (~3 s) for a parity experiment, and its own summary says so.
       - task: checks:ports:test
       - task: checks:images
+      - task: checks:images:test
       - task: checks:counts
       - task: checks:counts:test
       - task: checks:nix:lint
+      - task: checks:nix:lint:test
       - task: checks:nix:style
       - task: checks:nix:style:test
       - task: checks:hosts:args:test
       - task: checks:nix:shell
+      - task: checks:nix:shell:test
       - task: checks:modules:edges
+      - task: checks:modules:edges:test
       # The check inventory (flake/check-inventory.nix): every checks:* task has
       # a key and every key names a task, so the three verbs cannot drift.
       - task: check:verify
+      - task: check:verify:test
     # Serial on purpose, in this order. The build leg is ONE flake eval (`policies`
     # is ~7.5 s of it, the other attrs are ~1 s together); `knobs` rides along in
     # that same process for ~0.1 s and is the compiled registry gate, strictly
@@ -96,6 +107,7 @@ tasks:
       # the timing budget alone at the end.
       - task: checks:site:links
       - task: checks:sops:drift
+      - task: checks:sops:drift:test
       - task: checks:entry
 
   checks:docs:links:
@@ -214,6 +226,16 @@ tasks:
     cmds:
       - bash scripts/task/prose-tells.sh
 
+  checks:prose:test:
+    desc: "Regression fixture for checks:prose (seeded gate-row tell in tracked markdown)"
+    summary: >
+      A worktree's MANUAL.md gains one sentence carrying `delve`, a `gate` row
+      in modules/config/prose-tells.tsv. The gate must refuse, file:line
+      named; HEAD stays clean. Seeded, not replayed — each unslop sweep
+      deletes the word before it ships.
+    cmds:
+      - bash tests/prose/run.sh
+
   checks:image-daily:
     desc: "[gate] The image-daily command family is structurally able to ship"
     summary: >
@@ -237,6 +259,16 @@ tasks:
       absent rather than failing a repo-only run.
     cmds:
       - bash scripts/task/images-check.sh
+
+  checks:images:test:
+    desc: "Regression fixture for checks:images (session-gated bank URL + missing manifest row)"
+    summary: >
+      A synthesized IMAGES_ROOT proves the two refusal paths: a urls.tsv row
+      carrying a session-gated chatplayground URL (the real 2026-11-26
+      pre-push blocker) and a row with no manifest asset. Both refuse, named;
+      a clean root passes. No Cloudinary, no network.
+    cmds:
+      - bash tests/images-check/run.sh
 
   checks:images:ship:test:
     desc: Regression fixture for the image-ship no-spend guard (unset PROMPT fails fast)
@@ -345,6 +377,17 @@ tasks:
     cmds:
       - bash scripts/task/repo-paths.sh
 
+  checks:repo:paths:test:
+    desc: "Regression fixture for checks:repo:paths (fails on 7059c0a2^, the pre-fix hardcoded-paths tree)"
+    summary: >
+      The 7059c0a2^ tree carried literal checkout paths in atuin-bootstrap.sh,
+      Taskfile.yml, hosts/delphi/configuration.nix and
+      modules/nixoshmsymlinks.nix — paths only the author's machine resolved.
+      A detached worktree runs the gate against it: refuse, files named. HEAD
+      passes. Git only, ~1 s.
+    cmds:
+      - bash tests/repo-paths/run.sh
+
   checks:shell-inputs:
     desc: "[gate] A wrapper's script only calls commands its runtimeInputs install"
     summary: >
@@ -358,6 +401,16 @@ tasks:
       ~0.4 s, no eval, no network.
     cmds:
       - python3 scripts/task/shell-inputs.py
+
+  checks:shell-inputs:test:
+    desc: "Regression fixture for checks:shell-inputs (fails on 0e46552e, the xs-notify no-awk tree)"
+    summary: >
+      0e46552e shipped xs-notify with runtimeInputs [coreutils curl jq] while
+      its script piped sha1sum through awk — exit 127 every minute until
+      c3d1447a. The current checker copied into a worktree of that rev must
+      refuse, xs-notify named; HEAD passes.
+    cmds:
+      - bash tests/shell-inputs/run.sh
 
 
   checks:repo:blobs:
@@ -400,6 +453,16 @@ tasks:
       mirrors the surface, 2 = the task list or the skills tree is unreadable.
     cmds:
       - python3 scripts/task/skills-task-mirror.py
+
+  checks:skills:mirror:test:
+    desc: "Regression fixture for checks:skills:mirror (three desc-restating rows = the hard verdict)"
+    summary: >
+      A worktree's checks SKILL.md gains three table rows whose cells restate
+      live task descs verbatim — the >=3 threshold that flips a WARN into a
+      refusal. Descs come from `task --list-all --json` at run time so the
+      seed tracks the surface. HEAD stays clean.
+    cmds:
+      - bash tests/skills-mirror/run.sh
 
   checks:tasks:
     desc: "[gate] Task graph: yq compiles it, Python applies the rules, go-task confirms the name set"
@@ -781,6 +844,16 @@ tasks:
       network; the same script the CI hygiene job runs.
     cmds:
       - bash scripts/task/modules-edges.sh
+
+  checks:modules:edges:test:
+    desc: "Regression fixture for checks:modules:edges (seeded relative-path import)"
+    summary: >
+      A worktree module gains `import ../lib/seeded-edge.nix;` — the
+      reach-by-path edge the 2026-11 conversion chased across 24 files, valid
+      at eval time and broken by a rename. The awk gate must name the
+      file:line; HEAD stays clean.
+    cmds:
+      - bash tests/modules-edges/run.sh
 
   checks:hermes:
     desc: "[gate] hermes surface: call-site flags, gateway, secret bridge, config version"
@@ -1219,6 +1292,16 @@ tasks:
     cmds:
       - bash scripts/task/sops-drift-check.sh
 
+  checks:sops:drift:test:
+    desc: "Regression fixture for checks:sops:drift (seeded dropped age recipient)"
+    summary: >
+      A worktree's repo sops file loses its first .sops.age[] recipient via
+      yq — valid yaml, drifted recipient set, the un-rekeyed file the gate
+      exists to catch. Refusal names the file; HEAD stays clean. Metadata
+      only — nothing is decrypted.
+    cmds:
+      - bash tests/sops-drift/run.sh
+
   checks:nix:lint:
     desc: Run deadnix (hard gate) and statix (advisory) on all Nix files
     summary: >
@@ -1229,6 +1312,15 @@ tasks:
       warning fires on the house style).
     cmds:
       - bash scripts/task/nix-fmt.sh --check --all --tools deadnix,statix
+
+  checks:nix:lint:test:
+    desc: "Regression fixture for checks:nix:lint (seeded deadnix unused lambda formal)"
+    summary: >
+      A worktree gains one untracked .nix file with an unused lambda formal —
+      deadnix's hard verdict. `nix-fmt.sh --all` scans `git ls-files
+      --others`, so no staging; the file must be named. HEAD stays clean.
+    cmds:
+      - bash tests/nix-lint/run.sh
 
   checks:nix:style:
     desc: "[gate] No .nix file mixes builtins./lib. spellings of the same pure alias"
@@ -1267,6 +1359,16 @@ tasks:
     cmds:
       - bash scripts/task/nix-comments.sh
 
+  checks:nix:comments:test:
+    desc: "Regression fixture for checks:nix:comments (seeded dangling task pointer)"
+    summary: >
+      A worktree's check-inventory.nix gains a comment citing `nope:zzz`
+      — a pointer to a recipe the task plane never had. The worktree's own
+      census must refuse it, pointer named; HEAD stays clean. No such break is
+      on record, so the mistake is seeded on a tracked file.
+    cmds:
+      - bash tests/nix-comments/run.sh
+
   checks:nix:shell:
     desc: "[gate] Shell inside Nix strings: no expansion read as interpolation, shellcheck clean"
     summary: >
@@ -1279,6 +1381,16 @@ tasks:
       writeShellApplication never had. ~0.4 s, no host eval, no network.
     cmds:
       - bash scripts/task/nix-shell-lint.sh
+
+  checks:nix:shell:test:
+    desc: "Regression fixture for checks:nix:shell (seeded ${x:-y} interpolation trap)"
+    summary: >
+      A worktree gains a staged writeShellScript whose string carries
+      `${greeting:-hello}` — Nix reads it as interpolation of the URI literal
+      `greeting:-hello`, so the script ships a literal, no eval error. The
+      lint must name the file; HEAD stays clean.
+    cmds:
+      - bash tests/nix-shell/run.sh
 
   checks:nix:fix:
     desc: Auto-fix the Nix hard gates (deadnix + alejandra) on all Nix files
@@ -1396,6 +1508,16 @@ tasks:
         done
         if [ "$fail" -ne 0 ]; then exit 1; fi
         echo "PASS: $count YAML files parse."
+
+  checks:yaml:lint:test:
+    desc: "Regression fixture for checks:yaml:lint (seeded malformed workflow yaml)"
+    summary: >
+      A worktree's nixcachix.yml gains an unclosed flow sequence — the
+      parse failure a yaml edit leaves when no consumer reads the file. The
+      task's own ls-files + yq loop must refuse, file named; HEAD stays
+      clean.
+    cmds:
+      - bash tests/yaml-lint/run.sh
 
   checks:toml:lint:
     desc: Validate that every tracked TOML file parses — the guard for tool-written TOML edits

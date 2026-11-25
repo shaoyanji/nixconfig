@@ -39,6 +39,16 @@ tasks:
     cmds:
       - bash scripts/task/check.sh verify
 
+  check:verify:test:
+    desc: "Regression fixture for check:verify (seeded missing inventory row)"
+    summary: >
+      A worktree's check-inventory.nix loses the `checks:repo:paths` row,
+      leaving a task no row classifies — the drift a rename or a careless
+      delete produces. `check.sh verify` must refuse, orphaned task named;
+      HEAD stays clean.
+    cmds:
+      - bash tests/check-verify/run.sh
+
   check:leaf:
     desc: Run one leaf check by name (NAME=checks:<verb>); `check:list KIND=leaf` lists them
     summary: >

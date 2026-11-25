@@ -954,6 +954,49 @@
         fixture green both directions.
       '';
     };
+    quick-fixture-audit = {
+      title = "checks:quick fixture sweep — every leaf gate now fails on a real or seeded mistake before it may pass";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P3";
+      date = "2026-11-25";
+      from = ["kernel-collision-gate"];
+      summary = "Twelve checks:* gates lacked a fail-on-real-mistake fixture; each now has a tests/<name>/run.sh proving the refusal, wired as checks:X:test (leaf rows, quick deps). Four replay real trees, eight seed the mistake on a scratch worktree. checks:entry stays unfixtured — a timing budget has no mistake to seed.";
+      refs = {
+        modules = ["tests/shell-inputs/run.sh" "tests/repo-paths/run.sh" "tests/images-check/run.sh" "flake/check-inventory.nix" "taskfiles/checks.yml"];
+        tasks = ["checks:quick" "check:verify" "checks:shell-inputs:test" "checks:sops:drift:test"];
+      };
+      body = ''
+        The audit split the uncovered gates in two. Replayable past
+        mistakes got worktree fixtures: repo:paths at 7059c0a2^ (five
+        files spelled checkout paths), shell-inputs at 0e46552e (the
+        xs-notify awk 127, checker copied into the old tree), and
+        images against a synthesized IMAGES_ROOT carrying the real
+        2026-11-26 session-gated URL row. The rest seed the class on a
+        HEAD worktree: a dangling `task` cite, a path-edge import, a
+        prose tell (`delve`), three desc-restating skill rows (the
+        >=3 hard-verdict threshold, a lone row is WARN by design), a
+        malformed workflow yaml, a deadnix unused formal, a
+        `${x:-y}`-in-indented-string interpolation, a dropped
+        check-inventory row, and a dropped sops age recipient.
+
+        Two traps cost a cycle each: check:verify:test must not carry
+        an inventory row — the gate only sees checks:* names, so the
+        meta-task's fixture lives without one (check:verify itself is
+        rowless). And a taskfile summary may not spell
+        modules/secrets*.yaml on a `sops` line — the
+        secrets-path-is-resolved-in-one-place policy grep counts
+        summary text as code.
+
+        checks:entry stays unfixtured on purpose: it gates min-of-3
+        timing budgets, and a performance gate has no mistake class
+        to replay.
+
+        Exit: checks:quick green end-to-end (~92 s on frieren, +~15 s
+        for the sweep), check:verify 148/148, checks:tasks clean,
+        every fixture refuses its seeded tree and passes HEAD.
+      '';
+    };
     dns-second-resolver = {
       title = "DNS failover — a second always-on resolver";
       kind = "open";

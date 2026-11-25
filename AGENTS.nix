@@ -7386,6 +7386,41 @@
         should either finish or drop Workable rather than time out on it.
       '';
     };
+    kelvion-gcp-lead-verified-2026-11-25 = {
+      title = "Kelvion's GCP role is live on the employer's own board, so the lead holds — not because the posting is in doubt";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "The 2026-11-25 verification pass on kelvion-holding-gmbh-cloud-platform-engineer-gcp-m-w-d found the requisition open on Kelvion's own softgarden board and on kelvion.com, not just the Bundesagentur mirror, with requirements that match the row. The onsite share is published as Hybrid with no day count, so it stays unknown rather than assumed. The lead holds to 2026-12-07 on the prep-only rule.";
+      from = [ "job-scout-sweep-2026-11-25" ];
+      refs = {
+        modules = [ "scripts/task/apps-db.sh" ];
+        tasks = [ "apps:update" "apps:scout:parked" ];
+        docs = [ ".agents/skills/apps/SKILL.md" ];
+      };
+      body = ''
+        The row asked for verification only, and named two things to settle: the employer's own
+        requisition, and the Herne onsite share. Both are settled, one comfortably and one not.
+        The Bundesagentur listing still resolves and was edited six days ago, but a mirror proves
+        little, so the employer's board was read directly: softgarden 67879872 and the kelvion.com
+        detail page both answered 200 on 2026-11-25 with the same body — Von-der-Heydt-Strasse 2 in
+        Herne, full or part time, posted 12.11.26, apply button live. The GCP duties match the row
+        line for line: run GCP inside a hybrid estate, cloud-native on Kubernetes and Cloud Run,
+        Terraform as the IaC tool, CI/CD, integration with on-prem and Azure Entra ID, IAM and audit
+        work, migrations, FinOps. The profile asks three years of cloud engineering, one scripting
+        language, and excellent English; German is nowhere in it.
+        The onsite share is the part that does not resolve. The board says Hybrid, the address is the
+        Herne head office, and no days per week are published anywhere in the listing, so the row's
+        Herne hybrid stays accurate and the share stays unknown. It is not a reason to hold, and it is
+        reason enough to ask early once a conversation starts.
+        One thing the row did not know: a sibling Cloud Platform Engineer Microsoft Azure req
+        (BA 19663-0067880677-S) went up five days ago at the same Herne address. One application per
+        employer means these are one decision, not two shots.
+        Verdict: the lead is real and prep can start, but nothing is sent before 2026-12-07. The row
+        now carries the verification date, the employer-board evidence and the hold date.
+      '';
+    };
     job-mail-attention-2026-11-25 = {
       title = "The 25p sweep had nothing left to file, and the mail says Canonical and Adyen are closed";
       kind = "decision";

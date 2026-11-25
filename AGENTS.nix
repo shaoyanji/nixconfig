@@ -5699,5 +5699,51 @@
         Exit: nothing sent, all held to 2026-12-07.
       '';
     };
+    job-scout-sweep-followup-2026-11-25 = {
+      title = "Six rows from twenty employers, and the two that verify nowhere";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Buffy's 10:35Z pass put 20 employers new to the tracker through exact-name dedupe and left six rows at origin scout-2026-11-25j: three band-5 Stepstone leads plus the three the earlier read of i parked. Two in-lane employers stay unfiled because germantechjobs hides the posting behind talent.com.";
+      from = ["job-scout-sweep-2026-11-25j"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        20 employers new to the 1,372-row ledger went through exact-name
+        dedupe against the held lists of d..j; six rows stand at origin
+        scout-2026-11-25j and nothing was sent.
+
+        Filed at 10:35Z, band 5, all scouted with the score in status: TKMS
+        GmbH, DevOps Release & Deployment (Kiel, 88, GitLab CI, Argo CD,
+        Helm, Kubernetes); Kontron AIS, Linux / DevOps & IoT (Dresden, 90);
+        GGW Group, AI Platform Engineer - Azure (Hamburg, Koeln, Muenchen,
+        100, posted that morning). The earlier read of i left three on the
+        same origin: EOS Deutscher Inkasso-Dienst and WinValue at prep,
+        AND-E Backup & DR parked.
+
+        The rest of the pool was walked, not waved at. binaroo is a Uzuner
+        Competence Group consultancy, EWE NETZ' ad is PHP 8 and Symfony,
+        Juelich wants a research software engineer for data catalogues, and
+        the remaining in-lane candidates banded 2-4, below the cut. DRK-
+        Blutspendedienst (77) and
+        KIRCHHOFF Witte (70) are in lane and validate nowhere: every
+        germantechjobs page embeds partnerName neuvoo and its apply hop lands
+        on de.talent.com search, the Advantest class.
+
+        Next scouting steps. Resolve DRK's own careers URL before its row is
+        worth filing; a germantechjobs stub is not a posting. Next source is
+        the BA Jobsuche API, unused since it answered 403 - retry with a key
+        before spending another Stepstone pass. Keep the Referer header on
+        Stepstone's metro pages or they answer with an empty shell, and do
+        not re-read label j: it is spent, and a re-run returns its own rows.
+
+        Exit: packets for the three band-5 rows exist at prep, nothing sends
+        before 2026-12-07, and apps:dupes stays [].
+      '';
+    };
   };
 }

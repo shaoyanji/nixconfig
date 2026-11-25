@@ -276,6 +276,16 @@ tasks:
     cmds:
       - bash scripts/task/appflow-gate.sh packet {{.CLI_ARGS}}
 
+  # The lane could draft and build a packet but not transmit — sync.py says so
+  # in its own header, and `apps-lane-has-no-send-task` recorded the cost of it.
+  # This is that step, and the only verb in the lane that leaves the host, so it
+  # is dry unless --send. The hold comes back out of the row's next action, so
+  # the verb fires on its day without an operator and refuses before it.
+  apps:send:
+    desc: Transmit a staged packet over SMTP, then write the row (-- <id> [--send])
+    cmds:
+      - bash scripts/task/appflow-send.sh {{.CLI_ARGS}}
+
   # The career corpus is the database's now: the JSON Resume files are exports,
   # so a role is added here and the artifact is rebuilt from the rows. `set`
   # changes only the flags it is given; `rm` needs --yes because prose does not

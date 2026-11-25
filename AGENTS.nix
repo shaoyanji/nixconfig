@@ -7306,6 +7306,48 @@
         Exit: checks:quick green on this commit; the rows land after 2026-12-07.
       '';
     };
+    job-scout-sweep-2026-11-25s-parallel = {
+      title = "The fresh families, read: four feeds, one Nürnberg carrier, and a wall where a board should be";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "A fresh board set after 25r: Himalayas, Jobicy, the two November HN threads, and the Greenhouse/Lever/Recruitee/Workable employer feeds over 360 non-ledger names. One ad survived the 45-day rule — Core-Backbone GmbH, Linux IT-Systemadministrator, band 3 — and is filed at scout-2026-11-25s. The rest is two measured walls and three archives too young to qualify.";
+      from = ["job-scout-sweep-2026-11-25r"];
+      refs = {
+        modules = ["scripts/task/apps-scout.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        The 25s id was claimed by the Stepstone lane while this pass ran, so this is the parallel
+        note for the same cycle: my one row shares origin scout-2026-11-25s with that lane's six.
+        The brief was a fresh board set after 25r, and the honest answer is that this market does not
+        have a sixth feed waiting: the four families read here are either archive-poor or archive-huge,
+        and only one ad survived the 45-day rule.
+        Himalayas is the huge one, and a wall rather than a board. It ignores sort, order, q, search,
+        category and title, so there is no server-side lane filter; it publishes about 1,277 postings a
+        day (offset 0 to 1,000 spans 18.8 hours); and the rule keeps ads older than 45 days, so the
+        eligible set is every posting past roughly 57,000 — a 2,850-page traversal. A hundred pages were
+        read as a measurement, none eligible, at about one page a second under 429 backoff. That is not a
+        sweep and it is not repeated.
+        Jobicy's whole europe/engineering archive is 104 postings across three cursor pages, newest
+        2026-11-21: every one is inside the cut. The two November HN hiring threads hold 238 comments and
+        19 lane posts, all filed on 2026-11-02, also inside the cut; Algolia's index has no October 2026
+        thread to read for the older window.
+        The employer feeds were the flat half: 0 of the 360 non-ledger seed names answered on Greenhouse
+        or Lever in either slug form, and Workable's probe hit the ten-minute wall after two accounts
+        answered with empty job lists — unread, not proven empty. Recruitee answered five boards (change
+        26, corebackbone 9, liqmatic 7, memo 4, neptune 2) and 48 offers, one of them in the window.
+        That one is Core-Backbone GmbH, a Nürnberg carrier: Linux IT-Systemadministrator, posted
+        2026-08-28, several years of Debian and Red Hat administration, patch management, firewalls and
+        virtualisation behind it, German ad and onsite. Band 3 through FIT_MAP (58), filed at
+        scout-2026-11-25s with the Recruitee portal as the next action after 2026-12-07. The SQL on
+        `%backbone%` came back empty, so rule 1 is not in play.
+        Exit: one row and one note. The next sweep should not repeat Himalayas without a filter, and
+        should either finish or drop Workable rather than time out on it.
+      '';
+    };
     job-scout-sweep-2026-11-25s = {
       title = "Six of 256 cards survive the hold, and the dedupe is the finding";
       kind = "decision";

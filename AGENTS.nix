@@ -7224,6 +7224,39 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25q = {
+      title = "The 2026-11-25j request: five boards flat, zero new rows, and an id already spent";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Asked for as 2026-11-25j, which is a closed cycle with its own note and origin, so the pass landed as 25q. All five boards were re-read and none carried a new lead: germantechjobs was byte-identical for the sixth time, Stepstone returned the same 150 ad URLs as 25p, and bsj, WeWorkRemotely and RemoteOK held only employers already on the 1,283-row ledger.";
+      from = ["job-scout-sweep-2026-11-25p"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search" "apps:scout:sweep"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Requested as 2026-11-25j. That id is a closed cycle — note j, its 25k second pass, rows at origin
+        scout-2026-11-25j — so this pass lands as 25q instead of overwriting accepted history, the same rename
+        25n took when it collided with the pane lane. No rows were filed, so no origin was written either.
+        germantechjobs answered sha256 cf313395, 586 items, byte-identical to 25i through 25p: a sixth flat hash.
+        Stepstone answered all six lane queries at the same byte lengths as the 25p fetch but different hashes;
+        parsing its 150 cards returned the same 150 ad URLs, so the board rotated content without adding an ad.
+        berlinstartupjobs: 12 feed items, one in lane (DATATRONiQ, Cloud and DevOps, Kubernetes and Edge) and it
+        is already a lead from scout-2026-11-24c; the live listing page's 25 links hold that same single ad.
+        WeWorkRemotely: 77 items, 27 in lane by title, six EU-eligible, and every employer is already on the
+        ledger — Grafana Labs, Wrike, Bloomreach at prep, Smartsheet, Upsun and Platform.sh.
+        RemoteOK: 101 items, almost all US-only; the one Europe in-lane ad is Dropbox's Atlassian Cloud
+        administrator, already a prep row.
+        Zero rows filed. Nothing reached a detail page because exact-name plus house-token dedupe against the
+        1,283-row ledger held every candidate first; no refusal on shape was owed.
+        Exit: the lane is flat for a sixth cycle. The next pass should read a board none of the five has, or
+        wait for the 2026-12-07 hold to lift and work the eight rows from 25p.
+      '';
+    };
+
     job-scout-sweep-2026-11-25p = {
       title = "The 2026-11-25p sweep: a flat feed again, eight window-safe rows, and four holds exact names miss";
       kind = "decision";

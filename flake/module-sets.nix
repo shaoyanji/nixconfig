@@ -224,7 +224,10 @@ in rec {
 
   # The seven chain names as DATA: a chain is exactly its features, in order, and
   # the docs table is a projection of this rather than a second copy of it
-  # (`task docs:build`, [[flake/policies.nix#generated-not-tracked]]).
+  # (`task docs:build`, [[flake/policies.nix#generated-not-tracked]]). A host
+  # never imports a chain by name — `mkHost`/`hostModules` is the only
+  # composer; the keys exist so `docs:build` and inventory `module_chain`
+  # strings have a real row to name.
   chainFeatures = {
     globalModulesNixos = ["base" "nixos" "dms"];
     globalModulesImpermanence = ["base" "nixos" "dms" "impermanence"];
@@ -233,11 +236,4 @@ in rec {
     globalModulesDemo = ["base" "demo"];
     globalModulesHome = ["home"];
   };
-
-  globalModulesNixos = mkHost {features = chainFeatures.globalModulesNixos;};
-  globalModulesImpermanence = mkHost {features = chainFeatures.globalModulesImpermanence;};
-  globalModulesMacos = mkHost {features = chainFeatures.globalModulesMacos;};
-  globalModulesContainers = mkHost {features = chainFeatures.globalModulesContainers;};
-  globalModulesDemo = mkHost {features = chainFeatures.globalModulesDemo;};
-  globalModulesHome = mkHost {features = chainFeatures.globalModulesHome;};
 }

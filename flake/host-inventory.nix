@@ -9,8 +9,8 @@
 # A host is `features` (its chain, as data) plus `modules` (its own
 # additions). Composing the list is the consumer's job —
 # `moduleSets.hostModules` — so editing one host's feature list lands on
-# that host alone; the shared `globalModules*` names are docs projections,
-# not something a host composes from.
+# that host alone; the `globalModules*` names live only as `chainFeatures`
+# data, not something a host composes from.
 {
   garnixMachine = {
     kind = "nixos";

@@ -1,8 +1,137 @@
 {
-  "generated": "2026-11-25T16:29:07Z",
+  "generated": "2026-11-25T17:17:06Z",
   "count": 200,
-  "pin": "2120dd036f4fdd14c9cba291a3c9c6e61119894b3b4a85bfbf3833bcc643f3f1",
+  "pin": "479d933e6e970efd5f4d28670dc6715ec840b65f76586463a1349cd0e4a852c0",
   "turns": [
+    {
+      "id": "471cf0fd-e8e9-47d7-a8bb-001eefb0c046",
+      "ts": "2026-11-25T17:13:07Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-publish-2026-11-25",
+      "action": "published the CV surface to is-a.dev: rebuilt .#sites.matt-site from HEAD (a839de30), proved six PDFs hash-equal to the live bytes, fixed the Ryoku page prose still saying thirteen NixOS hosts, pushed 64eaf48 and verified twenty-five live | gate: agents:cv:publish-check PASS (6/6), pages deploy 45662191028 success",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "_tabs/cv-ryoku.html"
+      ],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03hawekvenpbfcqit39tfwt4z"
+    },
+    {
+      "id": "2674cb02-7cc0-4e4b-83d0-c5e3705b4b95",
+      "ts": "2026-11-25T17:08:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-publish",
+      "action": "freebuff: publish CV builds to is-a.dev static surface",
+      "outcome": "in_progress",
+      "claims": [
+        "agents:2.1"
+      ],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03hawdlqmyzom50kfxafkn23t"
+    },
+    {
+      "id": "7e06bbca-a9a0-4b09-be5a-252f901b327a",
+      "ts": "2026-11-25T17:07:25Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-refactor-chain",
+      "action": "devin: refactor flake module chain per host feature chain",
+      "outcome": "in_progress",
+      "claims": [
+        "agents:1.1"
+      ],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03hawdgn8nnzq3f09952m76d8"
+    },
+    {
+      "id": "785d9f8e-0216-4a92-8752-0732e2878e1b",
+      "ts": "2026-11-25T16:59:24Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "drove delphi freebuff agents:3.1 over tmux tunnel: confirmed the pending Submit dialog; the routed job-search task was accepted and the pane is working (working... counter running)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03hawbwdieiluntg87ukstzoi"
+    },
+    {
+      "id": "99676618-57b2-4f1f-bb05-f347cad0644c",
+      "ts": "2026-11-25T16:48:23Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "verified: image-daily Go port gates all live at a839de30 — dispatch 19/19 both directions, judge fallback gen.go:115, breakers gen.go:357+plates.go:391, shrinkGuard publish.go:440/517 | gate: checks:image-daily PASS rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03haw9qwsg791e962jl8imi0k"
+    },
+    {
+      "id": "27553c48-80d1-4e38-9b7d-5d95841e3437",
+      "ts": "2026-11-25T16:48:05Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "verify image-daily Go port gates: dispatch agreement, judge fallback, spend breakers, shrink guard",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/image-daily-gate.sh"
+      ],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03haw9osd5yr1u8fkgkvrjmyn"
+    },
+    {
+      "id": "ae2a97d4-87af-43d7-83d0-55154efb1c80",
+      "ts": "2026-11-25T16:47:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "gate-change: verify image-daily Go port gates",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/image-daily-gate.sh"
+      ],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03haw9h6ui1ic0v0j7knoysvr"
+    },
+    {
+      "id": "10d41abb-4cda-45bb-8720-95316ab1cd6f",
+      "ts": "2026-11-25T16:35:59Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "drove freebuff agents:2.1 bug-fix p=0.9 m=0.84",
+      "outcome": "done",
+      "claims": [
+        "nixconfig:job-scout-fresh-tailor"
+      ],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03haw7bmpwpbh68e2epdh3zc8"
+    },
+    {
+      "id": "d2741efc-e4fa-4dd0-81dd-58a7aee57af0",
+      "ts": "2026-11-25T16:29:20Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "chain refactor: extraSpecialArgs hoisted from nixos+macos into home-manager-shared (byte-identical block, 12 hosts) | gate: drv-equality 30/30, nix:lint 331 clean, frieren extraSpecialArgs evals",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
+      "branch": "main",
+      "frame": "03haw60ub73ll4rusi1h8cgza"
+    },
     {
       "id": "7c97077c-6f88-4954-9332-501ceb712be2",
       "ts": "2026-11-25T16:25:06Z",
@@ -2538,125 +2667,6 @@
       "base_commit": "285c36b82cdc3440fcb21bd99550d1cc557ec0b2",
       "branch": "main",
       "frame": "03hasqzvzb0wkhj68q2y9lt7j"
-    },
-    {
-      "id": "e6d14cbf-5e67-4b48-82a1-c5270b5f5dbb",
-      "ts": "2026-11-25T05:59:28Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25s",
-      "action": "correction: the two earlier done turns named f8c50728 and d20c6929, neither of which carried my note; the 25s id was taken by the Stepstone lane, so my note landed as job-scout-sweep-2026-11-25s-parallel on ab4a8105, origin/main verified equal. Gate: nix-instantiate --parse OK; .#agentsNotes.issues unchanged at 2 pre-existing (ats-direct, linkedin-direct), none from this note — not []",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ab4a8105349cf019baba71a9c573b8f640eeaa90",
-      "branch": "HEAD",
-      "frame": "03hasqzff0b97e129z84zkhpg"
-    },
-    {
-      "id": "683037b2-3d44-4af7-9eeb-4de23cb300a6",
-      "ts": "2026-11-25T05:59:05Z",
-      "source": "freebuff",
-      "subject": "nixconfig:employer-lead-sweep-2026-11-25t-freebuff",
-      "action": "landed: vendor-page half of one more sweep. Giant Swarm 0 reqs; SUSE on Workday (1 DE seat); LINBIT board = placeholder copy. 4 tracked vendors posted second reqs. Stepstone p1: 138 ads, 26 house-token held, 5 untracked live employers past 12-07, Fabasoft parked 12-05. No row minted, nothing sent; evidence in ~/.local/state/appflow/followups | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "285c36b82cdc3440fcb21bd99550d1cc557ec0b2",
-      "branch": "main",
-      "frame": "03hasqwpsokmor9udtwyx02g7"
-    },
-    {
-      "id": "d48bb3ba-4b8b-4716-b9a7-cf4a367eddd3",
-      "ts": "2026-11-25T05:58:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25s",
-      "action": "correction: f8c50728 never landed (rebase blocked by an unstaged note, push rejected); the note is now on d20c6929 after reset to origin and splice — same read, 1 row Core-Backbone at scout-2026-11-25s | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d20c6929116150c05d1a34282d1dc361599006ca",
-      "branch": "HEAD",
-      "frame": "03hasqu8g3jvqyl5a5tdn6mei"
-    },
-    {
-      "id": "4970714d-0e35-4c84-86ee-e37030b3dd13",
-      "ts": "2026-11-25T05:58:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:scout-2026-11-25s",
-      "action": "landed: fresh families (Himalayas measured wall, Jobicy 104 all in-cut, HN Nov 19 lane all in-cut, GH/Lever 0 of 360, Workable unread, Recruitee 5 boards/48 offers) — 1 row: Core-Backbone GmbH Linux IT-Systemadministrator, band 3, origin scout-2026-11-25s | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f8c50728ad11ced564ff7a21a34859d3ec1eb0ed",
-      "branch": "HEAD",
-      "frame": "03hasqrimptoif5c5nkp8p5yv"
-    },
-    {
-      "id": "32eb8438-d6fd-45a5-9433-86443e38046d",
-      "ts": "2026-11-25T05:53:52Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: tail gate-check re-sweep — checks:policies rc=0, nix:comments 54/54 cites rc=0, image-daily gate ok, drv-equality 30/30 identical; note re-logged OPEN, sole open item = appflow /api/applications+/api/applications-discovered live re-verify after delphi 04:30 CET autoUpgrade 2026-11-26 | gate: drv-equality 30/30",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d20c6929116150c05d1a34282d1dc361599006ca",
-      "branch": "main",
-      "frame": "03haspvypxgjv0hypifla4vl6"
-    },
-    {
-      "id": "6c50c82e-16d7-4485-9ffe-8bf1ca825a48",
-      "ts": "2026-11-25T05:50:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "routed note-change (classify selected p=0.94 margin=0.89, exit 0) to agents:1.1 (devin): tail gate-check cleanup per devin-lane-refactoring-2026-11-25 - verify checks:policies, checks:nix:comments, checks:image-daily, checks:drv-equality; leave note open if only appflow 404 re-verify remains (delphi 04:30 autoUpgrade 2026-11-26). Pane confirmed Thinking 7s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
-      "branch": "main",
-      "frame": "03hasp6t31yzz8f3bsrcrtymg"
-    },
-    {
-      "id": "4bb063ed-23f5-48e3-bf2c-12018cde5184",
-      "ts": "2026-11-25T05:50:16Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "routed note-change (classify selected p=0.88 margin=0.82, exit 0) to agents:2.1 (freebuff): one more employer-lead sweep of DevOps/SRE/Platform/Infrastructure families per job-scout-next-sweep-freebuff, prep-only to 2026-12-07, apps:search before every apps:scout, checks:quick at end. Pane confirmed thinking... 1s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
-      "branch": "main",
-      "frame": "03hasp6rbv3w0386zj9k7ump4"
-    },
-    {
-      "id": "46d2a218-a2ad-40f2-8538-9aca10db55e5",
-      "ts": "2026-11-25T05:39:37Z",
-      "source": "devin",
-      "subject": "nixconfig:worktree-race",
-      "action": "incident 5: staged index consumed by sibling git commit mid-hook — HEAD lock failed, lib refactor rode inside their 55a7f111 to origin; content verified intact (catAttrs counts match), attribution theirs. Second incident since the rule",
-      "outcome": "failed: staged index swept by a sibling commit mid-hook",
-      "claims": [],
-      "files": [],
-      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
-      "branch": "main",
-      "frame": "03hasn3t8tyc32vsp2i55083f"
-    },
-    {
-      "id": "2b2cf750-a687-4661-860b-cbb1e8844d1c",
-      "ts": "2026-11-25T05:39:36Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: pipe pass 5 — map (e: e.f) -> builtins.catAttrs, 20 sites/7 files; all fields schema-guaranteed, pkg-list keeps its != null filter (catAttrs carries present null); gate: drv-equality 30/30, .#sites.matt-site same store path; note lib-pipe-catattrs DELIVERED. Refactor rode inside sibling commit 55a7f111 (staged-index sweep, race 5) — content verified intact",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
-      "branch": "main",
-      "frame": "03hasn3r2wnhniarp43eqxu8q"
     }
   ]
 }

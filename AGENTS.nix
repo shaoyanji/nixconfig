@@ -5753,6 +5753,38 @@
         `task checks:drv-equality` reports 30/30 identical.
       '';
     };
+    lib-pipe-catattrs = {
+      title = "map (e: e.field) projection pipes in lib/*.nix belong to builtins.catAttrs";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-elemat-lambdas"];
+      summary = "Pass 5 of the lib |> sweep: 20 `map (e: e.f)` single-field projections in 7 files collapse to `builtins.catAttrs \"f\"` — one name instead of a lambda. Every site projects a schema-guaranteed field; drv-equality 30/30 identical.";
+      refs = {
+        modules = ["lib/matt-site.nix" "lib/pkg-list.nix" "lib/inventory.nix" "lib/delphi-site.nix" "lib/closure-graph.nix" "lib/aki-site.nix" "lib/agents-notes.nix"];
+        tasks = ["checks:drv-equality"];
+      };
+      body = ''
+        The pattern and its one subtlety: `xs |> map (e: e.f)` throws when a
+        record lacks `f`; `builtins.catAttrs "f"` skips it — so the rewrite is
+        for schema-guaranteed fields only (every site here is). The other
+        edge: catAttrs carries a present null, so pkg-list keeps its
+        `r.value != null` filter ahead of the projection.
+
+        Sites: matt-site 10 (cvFiles name x4, corpus/json work name,
+        untranslated in a throw, resumeProjects + invented, contacts href),
+        pkg-list 2, inventory 2 (services name + port), delphi-site cardGrid
+        group, closure-graph sub (set one line up), aki-site 2,
+        agents-notes id x2.
+
+        Gate: drv-equality 30/30 identical, .#sites.matt-site resolves to the
+        same store path. Race incident 5 in passing: the staged index was
+        consumed by a sibling `git commit` mid-hook (HEAD lock failed), so
+        the diff rode to origin inside their 55a7f111 — content verified
+        intact (catAttrs counts match), attribution theirs.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

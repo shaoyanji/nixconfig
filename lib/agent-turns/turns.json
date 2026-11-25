@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-25T05:38:32Z",
+  "generated": "2026-11-25T05:39:26Z",
   "count": 200,
-  "pin": "24a4116077dc6307dd426a50e438a6c339f3e45e288cf7d6fc8a6dd2ab9044b8",
+  "pin": "87bdd3a3eab4b4df31fee25edeed76927d6969602686f20435f9451b7f809362",
   "turns": [
+    {
+      "id": "6eb3e6e0-74ec-4ef9-a39d-d66733659b30",
+      "ts": "2026-11-25T05:39:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25s",
+      "action": "landed: read Stepstone's six lane queries x2 pages (256 unique ads), 85 at held employers — Xempus AG only fell to a house-token match — and filed 6 rows at scout-2026-11-25s whose postings outlive the 2026-12-07 hold; 3 parked on an expiry inside it; gtj feed flat by hash a 4th cycle. apps:scout:sweep now carries 25s | gate: 6 rows read back from the ledger, task --list-all + apps:scout:sweep PASS, agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "55a7f11163a7d26981d1906f20f0493e8f42a52f",
+      "branch": "main",
+      "frame": "03hasn0j1yy9g5tvhu4gjtbmb"
+    },
     {
       "id": "02b07594-b9f4-4e73-8330-8e61cb9f5300",
       "ts": "2026-11-25T05:37:15Z",
@@ -2661,19 +2674,6 @@
       "base_commit": "a4ae52b9055859520afb6cfccb65c144865263ec",
       "branch": "main",
       "frame": "03haq88g6rsgjagv83kan3hgo"
-    },
-    {
-      "id": "56ffaa15-0e14-4a35-ac05-3a2511305680",
-      "ts": "2026-11-24T22:07:23Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: scouted ~9.4k postings across arbeitnow/remotive/remoteok/WWR/germantechjobs/Greenhouse+Personio, recorded 6 new leads (Grafana Labs, gridscale OPCP, virtual7, NetKnights, PALTRON, HAURATON) and closed 4 duplicates/ineligible (Camunda, BFL, Catapult, Radiant-UK) | gate: every row re-read from the tracker after write",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a4ae52b9055859520afb6cfccb65c144865263ec",
-      "branch": "main",
-      "frame": "03haq6rgxbj9ytqd3z1b0wzcw"
     }
   ]
 }

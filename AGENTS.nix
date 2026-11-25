@@ -6976,6 +6976,41 @@
       '';
     };
 
+    job-scout-todo-2026-11-25i = {
+      title = "Five 2026-11-25i rows held to 2026-12-07: two packets to send, three todos to re-read";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Two packets stand built under submissions/ and send on 2026-12-07 (JACOB via its application route, NT-ware via its form); IPB, MIWE and Proxmox are open todos on the same hold date, each revisiting only on the condition its row names.";
+      from = ["job-scout-sweep-2026-11-25i"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:update" "apps:scout"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Nothing from 2026-11-25i has been sent. Send day and follow-up day are one date for all five
+        rows: 2026-12-07, then 2026-12-21.
+        Complete packets, a one-page German letter and a two-page CV in each ad's own order, each with
+        a submission-sheet.md carrying page counts and hashes:
+        jacob-elektronik-senior-linux-systems-engineer — send through the JACOB application route;
+        nt-ware-linux-systemadministrator — send through the NT-ware form; the ad wants two on-site days
+        in Bad Iburg, so the letter offers a move.
+        Three rows are open todos on the same hold date, not live applications. A revisit starts by
+        reading the full ad at source, not the ledger row, and only on the condition the row names:
+        ipb-internet-provider-berlin-senior-network-engineer-juniper-automation — senior ISP routing
+        (Juniper, BGP/OSPF at backbone scale); only if IPB opens a systems or platform role.
+        miwe-systemarchitekt-projektleiter-cloud-kubernetes — IoT edge architecture and cross-department
+        project leadership at 36-60k; only on a pure platform or SRE role.
+        proxmox-it-infrastructure-allrounder — closest stack match (Debian, Proxmox VE, KVM/LXC,
+        firewalls) but Vienna on-site at Allrounder level; only on a remote or Germany-based role.
+        One employer keeps one thread, and an ad that expires before 2026-12-07 is dropped, not sent late.
+        Exit: both sends recorded on their rows with 2026-12-21 follow-ups, and each parked row either
+        revisited or closed with its reason, so this note moves to DELIVERED.
+      '';
+    };
+
     job-scout-sweep-2026-11-25h = {
       title = "The 2026-11-25h sweep: the feed was exhausted, the unfiled employers were not";
       kind = "open";

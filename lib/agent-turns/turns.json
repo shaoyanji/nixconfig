@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T03:28:31Z",
+  "generated": "2026-11-25T03:29:25Z",
   "count": 200,
-  "pin": "14431a43d64e3fc956a02c653ede21bea47566b8a1012d90e489ebb880542e33",
+  "pin": "ed58a463c185c9aa13674d98737a2aebeb58161f09a2fb4c06d8716ade3fc71d",
   "turns": [
+    {
+      "id": "0f418a49-0ac8-4ea8-8d90-fd0c368c1c2e",
+      "ts": "2026-11-25T03:29:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: routed note-change direction to agents:2.1 (freebuff) - promote AGENTS.nix open-todo handoff note for sweep 2026-11-25i (5 scouted, 2 packets JACOB+NT-ware, 3 parked IPB/MIWE/Proxmox held to 2026-12-07, nothing sent); pane now working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0250ace4eb5d315cce03121e879a12dc0a68b6f4",
+      "branch": "main",
+      "frame": "03harxmbjhtfas1zn4nxy8k1b"
+    },
+    {
+      "id": "90af5bb8-31b1-4b9b-9c1c-03805e96f72d",
+      "ts": "2026-11-25T03:29:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: routed note-change direction to agents:1.1 (devin) - promote AGENTS.nix note recording the image-daily Go port as CLOSED + nix-comment-audit cite-sweep outcome, with an open-todo pointer for the remaining nixconfig refactoring follow-ups; pane now working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0250ace4eb5d315cce03121e879a12dc0a68b6f4",
+      "branch": "main",
+      "frame": "03harxma1pzu36o0vc4s7w3rc"
+    },
+    {
+      "id": "0e618cc6-a5f1-40fa-9df9-3395680187ba",
+      "ts": "2026-11-25T03:28:43Z",
+      "source": "devin",
+      "subject": "nixconfig:note-devin-lane-refactoring",
+      "action": "landed: devin-lane-refactoring-2026-11-25 — lane close-out note: image-daily Go port + nix-comment-audit recorded CLOSED, one open tail (appflow upstream-404 + residual flake-wiring/gate checks) | gate: agentsNotes.issues=[], ops:docs:budget all under ceiling, checks:nix:comments rc=0 (519 pointers, 54/54 task cites resolve)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0250ace4eb5d315cce03121e879a12dc0a68b6f4",
+      "branch": "main",
+      "frame": "03harxjarx1ucdtbsy9np3a0f"
+    },
     {
       "id": "8627f68c-9be8-4ddf-81fb-b60dcc36d9a4",
       "ts": "2026-11-25T03:21:21Z",
@@ -2591,45 +2630,6 @@
       "base_commit": "ca0eb847ee535b8ccaafae8b18fcfe0b8aae2d39",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hap7tyo2ayuai9650szxxir"
-    },
-    {
-      "id": "8974cc68-cf67-4a4a-9f63-c92ef6d2a9c8",
-      "ts": "2026-11-24T19:07:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-note",
-      "action": "landed: 3 new employers in the tracker — noris network AG Senior Cloud Native Engineer (OpenStack/networking, Nürnberg or remote, fit 4), Rheinmetall IT Solutions Senior Platform Engineer Linux & Container (Düsseldorf +5 sites, fit 3), CHECK24 Senior DevOps Ansible/Linux (Hamburg, fit 3). Already tracked, not re-scouted: DATATRONiQ, mittwald (applied), cloudpunks, INFORM, DRV Bund dupe closed | gate: every link 200 + rows read back from the API",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
-      "branch": "main",
-      "frame": "03hap7oi3mov6dcr1pr018n2k"
-    },
-    {
-      "id": "bea103ca-2c12-44ce-a0ec-7ad510fd9f9f",
-      "ts": "2026-11-24T19:04:07Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-delphi",
-      "action": "drove delphi freebuff pane (agents:3.1, ssh): routed job-search scout via jev-decide (scout_leads 1.00); pane now thinking.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
-      "branch": "main",
-      "frame": "03hap6ynycd71cgyl1voqzl01"
-    },
-    {
-      "id": "42a8ea22-555e-4388-944a-9ef3e9bfb3d1",
-      "ts": "2026-11-24T19:04:05Z",
-      "source": "steward",
-      "subject": "nixconfig:steward-devin",
-      "action": "drove devin pane (agents:1.1): routed nixconfig check/lint gate review via jev-decide (duel review_checks 0.73 vs commit_pending 0.27); pane now Thinking.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5f79cda35fab3d1d3f035382e7bcfd4a22efe6e7",
-      "branch": "main",
-      "frame": "03hap6yhfxe8faqs7b2r5y6vy"
     }
   ]
 }

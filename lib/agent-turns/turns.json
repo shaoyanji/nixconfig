@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T09:05:16Z",
+  "generated": "2026-11-25T09:13:50Z",
   "count": 200,
-  "pin": "9fd14abe35cd998ad99692cc29cd2597742b1f100d682eb184e3c925db136c99",
+  "pin": "d9e3b5884bac2f57fbab89e77c177ddab7b197bd0c686f5a6afe27808d7513e2",
   "turns": [
+    {
+      "id": "d66e1a85-cf69-471e-a34f-daf6a8fe52af",
+      "ts": "2026-11-25T09:09:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-drive-2026-11-25",
+      "action": "Drove idle freebuff agents:2.1 with job-scout/CV sweep task sweep id 2026-11-25q; agent confirmed working... 12s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "661a07458e0b669f3b9ff696b144d7476d50b26b",
+      "branch": "main",
+      "frame": "03hats5u6ssykdj9m3snfj97e"
+    },
+    {
+      "id": "d12839f6-65e8-4de5-9bc5-299c1259b29e",
+      "ts": "2026-11-25T09:06:04Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25u",
+      "action": "done: 25o replies checked (3 rows, 0 linked mail, 0 from gematik/ELAC/dive, no stage change). ATS sweep: SmartRecruiters keyword search 24 queries (1050 global devops hits), Ashby 17 orgs 581 jobs, Personio 4 boards 345 positions -> 67 role+geo rows, 38 ledger dups, 26 blocked (SAP role already lead, Devoteam consultancy, PostHog US-only/404); 1 filed (Thalia, Münster, lead). 3 held outreach drafts written + next actions set; no sends before 2026-12-07. gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hatrflb8plo0f4tdlwfa9r8"
+    },
+    {
+      "id": "c80a5e6b-8de7-4c2f-9cdb-e78e81e03f02",
+      "ts": "2026-11-25T09:05:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25u",
+      "action": "landed: sweep 25u — devops p1-3 + 3 lanes p3-4, 216 cards, 165 in-family, 86 not held, 16 detail reads; 10 leads filed on scout-2026-11-25u (Ascent, Bijou, EOS, LivEye, Paychex, TÜV NORD, S-Management/DSV, POLIPOL, moysies, Diehl Aerospace), 5 parked on expiry inside the hold, Hotzone dropped for a 2029 validThrough; note + sheet | gate: apps:audit PASS, #agentsNotes.ok PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "661a07458e0b669f3b9ff696b144d7476d50b26b",
+      "branch": "main",
+      "frame": "03hatraerrmp9792bcvhxrb8m"
+    },
     {
       "id": "a57fbb3c-79ad-4493-9998-1d4a529e14fa",
       "ts": "2026-11-25T09:04:14Z",
@@ -2636,45 +2675,6 @@
       "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
       "branch": "main",
       "frame": "03har5tje50pzgc56lw2sv58o"
-    },
-    {
-      "id": "c985b5cd-626d-48b3-9428-f27d23965721",
-      "ts": "2026-11-25T00:58:48Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "left idle: devin (agents:1.1) idle after image-daily gate-tests landed (internal/image unit tests, checks:host frieren rc=0); classify needs_review flake-change p=0.61 m=0.46 (exit 2), no open claim in ledger — next cycle may duel flake-change vs gate-change",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d17b7a69166f1c9134387e26aa3c8ff148029bde",
-      "branch": "main",
-      "frame": "03har48zde3l74t0byp3spcmw"
-    },
-    {
-      "id": "b73731c3-66fe-4f18-9efd-1208d00759c8",
-      "ts": "2026-11-25T00:57:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: CV lane. First scouted lead (50Hertz Platform Engineer, Grid Construction) FAILED on duplication, not fit — 50hertz-elia-group-...-grid-construction-platform applied 2026-11-22, five jobs@elia.be acks; closed the scouted row as merged, dropped its packet. Next lead HUK-COBURG Platform Engineer Linux+Ansible (SDE-126255) confirmed live and passed: CV 2 pages + German Anschreiben built in the private store, unsent. | gate: pdfinfo 2p/1p + selection 9/39 + row prep",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d17b7a69166f1c9134387e26aa3c8ff148029bde",
-      "branch": "main",
-      "frame": "03har3yd3gd8rcoejpcfdm7c6"
-    },
-    {
-      "id": "28c4c40b-049c-42a1-bd61-3a3ad33c0557",
-      "ts": "2026-11-25T00:55:30Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: 2026-11-25 sweep (Arbeitnow 3,397 postings + ~90 ATS boards) -> 4 new leads at scouted (DAM, ICG, MHC, headhunter.digital), contacts MX-verified | gate: apps:dupes [] + scouted total 11 | no repo commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03har3lqokbt08lvevtgpp71x"
     }
   ]
 }

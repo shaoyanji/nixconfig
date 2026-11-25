@@ -6116,6 +6116,49 @@
         after their dates and filed only if reposted.
       '';
     };
+    job-scout-sweep-2026-11-25q-supplement = {
+      title = "Sweep 25q supplement: four packets from six boards, and gtj is not a platform board";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "The six-board pass under cycle id 25q read germantechjobs, WWR, RemoteOK, two Ashby boards and BSJ: 842 rows, 147 in-family, 89 not held, four filed and four packets built. gtj is Mittelstand systemadministration, the remote boards were already held, Personio answered 401 and Ashby had no in-family seat.";
+      links = ["job-scout-sweep-2026-11-25u" "job-scout-fresh-packets-public"];
+      refs = {
+        modules = ["scripts/task/apps-scout.sh" "scripts/task/appflow-packet.sh" "taskfiles/apps.yml"];
+        tasks = ["apps:scout" "apps:scout:sweep" "apps:scout:parked"];
+      };
+      body = ''
+        Boards, as they answered: germantechjobs 586 feed items, weworkremotely 79,
+        RemoteOK 101, Ashby 65 across Kubermatic and Camunda, BSJ 12, and Personio
+        1KOMMA5GRAD 401 — no XML, so nothing to read there this pass.
+
+        Filtering: 842 rows, 147 in-family after dropping sales, Ausbildung and
+        junior variants and any ad whose location is United States only, 89 at
+        employers the 1,061-name ledger does not hold, six of those with a genuinely
+        platform-shaped title. Four were filed on `scout-2026-11-25q` and four
+        packets built: GWDG Storage Expert (Göttingen, fit 4), RockQ ML Platform
+        Engineer (3), WWK Lead System Engineer (Munich, 2) and alphacaps Microsoft
+        Cloud & Infrastructure (Augustdorf, 2).
+
+        What the boards actually contain: gtj is Mittelstand IT-Systemadministration,
+        not platform engineering — of 586 items only six were DevOps, SRE or
+        platform-shaped, and its job pages are JavaScript shells, so the ad text has
+        to come from the RSS description rather than the page. WWR and RemoteOK
+        carried real infra roles, but nearly all at employers already in the ledger:
+        Grafana Labs, JFrog, EPAM, Dropbox, Prove, Smartsheet, Upsun, Knack, Wrike.
+        Kubermatic's Ashby board is nine sales and GTM seats; Camunda's 56 had no
+        in-family opening. BSJ's twelve items were ML, backend and product.
+
+        Each packet carries its own letter and JD: the builder still defaults to one
+        `$CONFIG/letter.json` and silently builds a CV-only packet otherwise, so both
+        paths are passed explicitly. Selected highlights ran 11/36, 11/36, 9/36 and
+        10/36.
+
+        Exit: send the four after 2026-12-07, or drop the two fit-2 rows once the F5
+        and Intune gaps are judged; re-read gtj only for DevOps-titled ads.
+      '';
+    };
     devin-lane-handoff-2026-11-24 = {
       title = "Devin lane: image-daily pool helpers landed; two uncommitted gate files; jev routes idle panes";
       kind = "handoff";

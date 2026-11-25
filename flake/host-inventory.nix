@@ -1,6 +1,5 @@
 {
   inputs,
-  self,
   # Names for the module files a host adds outside a chain
   # (flake/nix-registry.nix). A host's own config stays a path: it is not under
   # modules/ and no other host imports it.
@@ -304,7 +303,6 @@ in {
   penguin = {
     kind = "home";
     system = "x86_64-linux";
-    extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/penguin.nix];
     hmModules = ["shell" "env" "lf" "sops" "scripts"];
@@ -313,7 +311,6 @@ in {
   alarm = {
     kind = "home";
     system = "aarch64-linux";
-    extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/alarm.nix];
     hmModules = ["roles.minimal"];
@@ -322,7 +319,6 @@ in {
   kali = {
     kind = "home";
     system = "aarch64-linux";
-    extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/kali.nix];
     hmModules = ["shell.starship" "roles.minimal"];
@@ -335,7 +331,6 @@ in {
   clanker = {
     kind = "home";
     system = "x86_64-linux";
-    extraSpecialArgs = {inherit inputs self;};
     features = ["home"];
     modules = [../hosts/clanker.nix];
     hmModules = ["roles.lean"];

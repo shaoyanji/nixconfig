@@ -1,8 +1,167 @@
 {
-  "generated": "2026-11-25T18:32:39Z",
+  "generated": "2026-11-25T19:32:59Z",
   "count": 200,
-  "pin": "d3048874c713bbaca11dcbdf1a354071d516cb2f78ed6054a8de75dc7e1bd9ba",
+  "pin": "fbae7a1717751bdc34571c00a95a0b55d7036f8f3396f91f8808b00d4ff59cde",
   "turns": [
+    {
+      "id": "e3ae0ae1-40a2-4096-88d7-47f16fd1d9a1",
+      "ts": "2026-11-25T19:28:21Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-flake-refactor-1",
+      "action": "start: refactor flake outputs structure for host modules — surveying outputs.nix projection",
+      "outcome": "in_progress",
+      "claims": [
+        "flake.nix",
+        "modules/"
+      ],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hax4zs834u5uxlcemkcgssn"
+    },
+    {
+      "id": "1184c79b-a157-45ef-a4d0-d449d5b305ad",
+      "ts": "2026-11-25T19:26:32Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-flake-refactor-1",
+      "action": "refactor flake outputs structure for host modules",
+      "outcome": "in_progress",
+      "claims": [
+        "flake.nix",
+        "modules/"
+      ],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hax4n1qrjw7zu9nndravzo5"
+    },
+    {
+      "id": "adf61237-e4ba-4b06-befc-8a66209a1830",
+      "ts": "2026-11-25T19:14:04Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "gate-change: verify image-daily Go port gates — done, nothing new landed",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/image-daily-gate.sh"
+      ],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hax27b4b9jj936yzlfjeufe"
+    },
+    {
+      "id": "e47f1021-ac6c-431c-b3f2-86e3769c5f83",
+      "ts": "2026-11-25T19:14:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:gate-change",
+      "action": "gate-change: image-daily Go port gates verified — all checks pass, nothing new landed",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/image-daily-gate.sh"
+      ],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hax279t81xpf3o6tgivj1g3"
+    },
+    {
+      "id": "ba342a36-98b3-4fb9-8dfb-98a9791932c1",
+      "ts": "2026-11-25T19:07:31Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "verified: image-daily gate fails on real regression 470c9034^ (the 0-of-43 tree) — 3 named FAILs by hand worktree run; fixture checks:images:publish:test 9/9 green; live gate rc=0; nothing to commit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hax0xb3mxydpz9blztbp6so"
+    },
+    {
+      "id": "fd9143f9-0db0-42f3-b452-9c667aa4f2f1",
+      "ts": "2026-11-25T19:06:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:gate-change",
+      "action": "drove devin agents:1.1: image-daily Go port gate regression check submitted; devin Thinking reading scripts/task/image-daily-gate.sh; gate-change p=0.99 m=0.98 via jev-decide typesafe",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/image-daily-gate.sh"
+      ],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hax0s3qxjrap766n0c36il0"
+    },
+    {
+      "id": "1e068b2a-3e7e-4ed4-8ef1-669f1bf4a200",
+      "ts": "2026-11-25T18:52:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-refactor-chain",
+      "action": "devin refactor chain landed: 20 hosts identical, lint 331 clean | gate: checks:drv-equality + checks:nix:lint PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hawxynfcwvqhv6sjcv47vx2"
+    },
+    {
+      "id": "c9a935d9-84c2-465b-a570-f2c733f1d415",
+      "ts": "2026-11-25T18:49:27Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "novel | gate: exit-criterion note",
+      "outcome": "in_progress",
+      "claims": [
+        "submissions"
+      ],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hawxe8hx6ldwhflovexncbi"
+    },
+    {
+      "id": "76d10300-1c4f-4b37-9e34-92f1385b588a",
+      "ts": "2026-11-25T18:49:27Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-publish",
+      "action": "publish | gate: agents:cv:publish-check",
+      "outcome": "in_progress",
+      "claims": [
+        "_site"
+      ],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hawxe781pw675c0ljx7ce6s"
+    },
+    {
+      "id": "39b20ba3-a952-49a9-a05a-424d765fa6cc",
+      "ts": "2026-11-25T18:49:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:flake-change-devin",
+      "action": "devin flake refactor landed: 20 hosts identical, lint 331 clean | gate: checks:drv-equality + checks:nix:lint PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hawxb9p0gri4i3lbgid7zs1"
+    },
+    {
+      "id": "c1554ae7-a8c1-4fb7-b190-3e415ddfe818",
+      "ts": "2026-11-25T18:32:52Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "chain refactor: hmContainerFloor+hmDesktop let-bound in host-inventory — 8 container floor + 10 desktop copies named once, forks stay literal | gate: drv-equality 20/20 on touched hosts identical, nix:lint 331 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
+      "branch": "main",
+      "frame": "03hawu5n4jqtryllnvp7qgft3"
+    },
     {
       "id": "c4c9c090-e17c-48de-9bc8-adac41f67390",
       "ts": "2026-11-25T18:30:34Z",
@@ -2528,149 +2687,6 @@
       "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hasza6psqhogvaxd9158jni"
-    },
-    {
-      "id": "df72f9b0-43c8-4cc4-8d12-6f9477d97138",
-      "ts": "2026-11-25T06:41:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: routed idle devin (agents:1.1) — jev-decide classify (typesafe) exit 0: gate-change p0.98 m0.96; task = harden checks:quick gate end-to-end + add missing fail-on-real-mistake fixtures",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4d2d971e20229cc59777c40a7e85b5bcedb6b3",
-      "branch": "main",
-      "frame": "03hasz4liohofy7lrcxcmyzo1"
-    },
-    {
-      "id": "feccdce1-5c03-4c5a-9d77-84914bddb3f0",
-      "ts": "2026-11-25T06:40:30Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-packets-2026-11-25t",
-      "action": "landed: four packets for the highest-fit 25p rows — ALDB, Creditreform, BMW, DZ HYP — each letter+CV rebuilt from its own JobPosting at source, route per ad (ALDB email, three portals), gaps stated. Rows at prep, send date 2026-12-07 in next_action. Nothing sent: hold + no send verb | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4d2d971e20229cc59777c40a7e85b5bcedb6b3",
-      "branch": "main",
-      "frame": "03hasyzxn9gf88wks0rgmuusq"
-    },
-    {
-      "id": "6abc5743-53f8-4b14-8c52-a222ebbcadf2",
-      "ts": "2026-11-25T06:37:23Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verified: image-daily port's three slices already landed — cloudinary uploads (4 httptest wire tests, cloudinary.sh deleted = last curl gone), ffprobe checks (TestDimensions + missing-probe die; ledger/gen/ops sites), shape cache (TestShapesPass, wired into index + shapes verbs). 28 unit tests + vet green, gate ok, images 772/772 | gate: checks:quick green; no new commits — port note already CLOSED",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4d2d971e20229cc59777c40a7e85b5bcedb6b3",
-      "branch": "main",
-      "frame": "03hasye41dkclwsp6je1agwx4"
-    },
-    {
-      "id": "09142a5f-77fc-487e-a052-9b0737d4e8f1",
-      "ts": "2026-11-25T06:37:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: drove delphi ssh freebuff (agents:3.1) with 2026-11-25o board sweep (germantechjobs, Stepstone, bsj, WWR, RemoteOK, Ashby, Personio, SmartRecruiters) - jev-decide decisive margin 0.36",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4d2d971e20229cc59777c40a7e85b5bcedb6b3",
-      "branch": "main",
-      "frame": "03hasyblort5axit5p9ws8yws"
-    },
-    {
-      "id": "069ccffc-ce7c-4f82-a7fb-79ed76b6f587",
-      "ts": "2026-11-25T06:36:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: drove devin (agents:1.1) with image-daily remaining slices task (cloudinary curl, ffprobe, shape cache) - jev-decide decisive margin 0.36",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4d2d971e20229cc59777c40a7e85b5bcedb6b3",
-      "branch": "main",
-      "frame": "03hasyb2hllewqhdktq7n2ogx"
-    },
-    {
-      "id": "1282fd2a-c4e9-427b-a998-a7d58cc871d5",
-      "ts": "2026-11-25T06:36:57Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: confirmed freebuff Submit dialog (agents:2.1) - pane now writing lead.md + submission-sheets for ALDB / Creditreform / BMW / DZ HYP 25p rows (working 7m22s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4d2d971e20229cc59777c40a7e85b5bcedb6b3",
-      "branch": "main",
-      "frame": "03hasyazqv4ay289r3j62hfao"
-    },
-    {
-      "id": "54887c90-fae5-4ffb-8e16-dfe343a0c6e4",
-      "ts": "2026-11-25T06:26:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:kelvion-gcp-verify-2026-11-25",
-      "action": "corrected: the earlier turn on this subject claimed a clean gate while the note's from pointer named a non-note (job-scout-sweep-2026-11-25); from dropped in fbe1f8b2, row kelvion-...-gcp-m-w-d carries verified 2026-11-25 nextAction and holds to 2026-12-07 | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hasw6g1je9k3aya6v9ct7i5"
-    },
-    {
-      "id": "a31737df-a70c-4beb-9f38-8f7a736bb07c",
-      "ts": "2026-11-25T06:25:28Z",
-      "source": "buffy",
-      "subject": "nixconfig:kelvion-gcp-verify-2026-11-25",
-      "action": "landed: kelvion-holding-gmbh-cloud-platform-engineer-gcp-m-w-d verified live on Kelvion's own board (softgarden 67879872 + kelvion.com 200) and BA 19663-0067880042-S; requirements match, hybrid Herne with onsite days unpublished, Azure sibling req open; nextAction updated, hold to 2026-12-07 unchanged | gate: nix-instantiate --parse OK + .#agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hasw28g4vn22w4rqpkf9qeb"
-    },
-    {
-      "id": "5b70995e-b2c2-4439-a867-c9ed4d0cd01c",
-      "ts": "2026-11-25T06:24:08Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: kernel:collision sweep parallelized — xargs -P4 over a once-warmed flake source (cold git+file fetches serialize on the store; the warm eval is what makes -P4 real); oom-guard per host intact, ~4x200MiB peak; 35s -> 14s standalone, checks:quick ~50-80s | gate: checks:quick green, check:verify 137/137, checks:tasks clean, fixture still refuses 45dde4c9^",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4d2d971e20229cc59777c40a7e85b5bcedb6b3",
-      "branch": "main",
-      "frame": "03hasvsvbtgor7h14ip0de87e"
-    },
-    {
-      "id": "bd52fbb2-001f-4c27-bff5-3bc55d2282b2",
-      "ts": "2026-11-25T06:19:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: routed idle devin (agents:1.1) — jev-decide classify (typesafe) exit 0: perf p0.97 m0.95; task = parallelize the checks:quick kernel-collision sweep via xargs -P4 (serial sweep raised the gate ~22s→~80s), keep oom-guard semantics, verify checks:quick green + check:verify 137/137 + checks:tasks clean + fixture refuses 45dde4c9^; commit + push to origin/main",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f743ad67e83150a2272238a01fbcbd524049345d",
-      "branch": "main",
-      "frame": "03hasutkn8wqdcuau9o99562z"
-    },
-    {
-      "id": "e5e8760a-c650-4894-a18c-4b1b87917a86",
-      "ts": "2026-11-25T06:09:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-mail-2026-11-25",
-      "action": "landed: 25p verified at 11 rows / 0 inserted (no attention-sweep artifact; parked four are policy-not-rows) and two applied rows closed on mail evidence — Canonical six we-regret notices, Adyen not-to-move-forward — note job-mail-attention-2026-11-25 on 16d758c1 | gate: nix-instantiate --parse OK + .#agentsNotes.issues additive-free PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "16d758c1660eec8835cd8cca88c11ec62ce4a2de",
-      "branch": "HEAD",
-      "frame": "03hast0prh9ka2dieuv070bkf"
     }
   ]
 }

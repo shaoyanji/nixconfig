@@ -44,7 +44,7 @@
     inherit hostInventory;
   };
   hostInventory = import ./host-inventory.nix {
-    inherit inputs self;
+    inherit inputs;
     moduleFiles = nixRegistry.modules;
   };
   # Fleet-wide gates (per-host eval checks + the all-in-one aggregate). One binding
@@ -288,7 +288,7 @@ in {
       extraSpecialArgs =
         (host.extraSpecialArgs or {})
         // {
-          inherit self hostInventory;
+          inherit inputs self hostInventory;
           fleetHost = name;
           # Leaf lists for user.base/user.ai — the same per-host data the
           # embedded and container chains resolve, so a standalone host's

@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-25T04:38:25Z",
+  "generated": "2026-11-25T04:45:15Z",
   "count": 200,
-  "pin": "ddc384e6cede0d2704f05307308c53a5239ea128ce5b191fc45fb2f6c1288a7f",
+  "pin": "0770e3d4f1eedce624666fc5eff44d26a6269ace5dca74c545f821bf985f87ff",
   "turns": [
+    {
+      "id": "572302a2-781d-4844-935e-cb3c9340acde",
+      "ts": "2026-11-25T04:42:22Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: routed note-change (classify p=0.92 m=0.85 exit0) to agents:3.1 (delphi ssh) - scout sweep 2026-11-25j, dedupe vs apps-db ledger, file new leads, land note job-scout-sweep-2026-11-25j + push origin/main",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fb83a3aee8b981ca011ed515ca80fad236cbcf6e",
+      "branch": "main",
+      "frame": "03hasbx7li2fzd3t82w6eok7x"
+    },
+    {
+      "id": "cd4a28dc-89ea-4adf-9378-0566e910d20c",
+      "ts": "2026-11-25T04:41:49Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: sweep requested as 2026-11-25j recorded as 2026-11-25q — j is a closed cycle (note j, 25k, origin scout-2026-11-25j); five boards flat (gtj sha cf313395 sixth time, Stepstone same 150 ads as 25p, bsj/WWR/RemoteOK all held), zero rows filed | gate: agentsNotes.issues=[] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a6be28ee7dc9db3b164d4948ffb94a337f706c8d",
+      "branch": "HEAD",
+      "frame": "03hasbt9v6k9xchq72238dllp"
+    },
+    {
+      "id": "91619cc4-99fa-4a54-b3ff-0f6f9ba12c75",
+      "ts": "2026-11-25T04:40:50Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "claim: sweep 2026-11-25j request — six Stepstone queries plus gtj/berlinstartupjobs/WWR/RemoteOK; id 2026-11-25j is already a closed cycle, so verify the record before writing provenance",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hasbmdacg3dpa44v1mesxl4"
+    },
+    {
+      "id": "d553dc5d-3128-4858-9c5e-95a9f14677ce",
+      "ts": "2026-11-25T04:40:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25p",
+      "action": "corrects prior frame: note is job-scout-sweep-2026-11-25q, commit fb83a3ae — the pane lane landed and pushed note p first, and two notes on one id break main; eight rows of mine over five shared keys, 11 unique under origin, six parked in window, other boards held only. gates: parse 0, alejandra 0, notes issues [], agents-notes-schema PASS",
+      "outcome": "failed: pre-push images-check — wall/2026-11-26/frieren-lake-bridge.png carries a session-gated URL (image lane); fb83a3ae local, retry after task images:publish",
+      "claims": [],
+      "files": [],
+      "base_commit": "fb83a3aee8b981ca011ed515ca80fad236cbcf6e",
+      "branch": "main",
+      "frame": "03hasbh4vx7gcvqf5932tm534"
+    },
     {
       "id": "d574c368-5e47-4537-be75-3958489263d2",
       "ts": "2026-11-25T04:37:36Z",
@@ -2618,58 +2672,6 @@
       "base_commit": "30e59ad78946aef88cb464f129f7ee0518004f56",
       "branch": "main",
       "frame": "03hapw1zrft8t4l9aou76bwdq"
-    },
-    {
-      "id": "3ac9dbc3-2e85-4c45-a3de-fc6dd1710b57",
-      "ts": "2026-11-24T21:11:01Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: drove idle freebuff pane (agents:2.1) -> build_norway_noris_proofline_packets (jev needs_review p0.59 margin0.19 -> duel send_vs_build selected p1.0 margin1.0, reversible no-send); build JD->Anschreiben->packet for NETWAYS/noris/Proofline unsent; fresh working... counter confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27521275983829b9e48f1f705b97dc7302c04b0c",
-      "branch": "main",
-      "frame": "03hapvr5dw3tumqbtyuwbv1eq"
-    },
-    {
-      "id": "7856f048-f713-4881-b304-71364047d1a1",
-      "ts": "2026-11-24T21:11:01Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:chain-change",
-      "action": "landed: drove idle devin pane (agents:1.1) -> continue_feature_chain_refactor (jev needs_review p0.79 margin0.61 decisive>=0.3, top by margin); refactor next shared infra-chain module + gate checks:hosts delphi frieren + commit/push; fresh Thinking spinner confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27521275983829b9e48f1f705b97dc7302c04b0c",
-      "branch": "main",
-      "frame": "03hapvr3849uhtshspfjybu20"
-    },
-    {
-      "id": "b89eb5e7-97f9-498d-818d-597db42767e5",
-      "ts": "2026-11-24T21:06:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-sweep2",
-      "action": "unblocked: sweep2 was ATS URL handling, not the send path. 4 rows repointed from arbeitnow pages to their join.com forms (all 200); JDs imported for them; Livello needs a EUR 45-50k decision. himalaya/API/apps:sent all work; typst absent so packets build on frieren; the 2026-12-07 hold is the only real gate. New leads: SIX 5, AKB 4, x-tention 4. | gate: issues [] + docs-budget 0 + taskfile-graph 0 + pre-push PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hapus5omj6a6vv23libdzng"
-    },
-    {
-      "id": "a8fb37f2-42d9-4529-bd4a-417fbd602d09",
-      "ts": "2026-11-24T21:04:01Z",
-      "source": "devin",
-      "subject": "nixconfig:chain-change",
-      "action": "landed: agent-scheduler dedup — enabledJobs extracted once (was 2x filter), 5x optionalAttrs chain -> filtered table | gate: checks:hosts delphi frieren PASS (delphi 2132 assertions, frieren rc=0), checks:nix:style PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "27521275983829b9e48f1f705b97dc7302c04b0c",
-      "branch": "main",
-      "frame": "03hapuduu1ourv11x8mxrtcc9"
     }
   ]
 }

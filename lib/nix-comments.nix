@@ -114,8 +114,7 @@
   occurrences = pat: text:
     text
     |> builtins.split pat
-    |> builtins.filter builtins.isString
-    |> builtins.length
+    |> lib.count builtins.isString
     |> (n: n - 1);
 
   # A line inside a multi-line string is content, not a comment: the toggle is the
@@ -192,7 +191,7 @@
 
   entries = paths |> lib.concatMap scanFile;
 
-  countOf = k: entries |> builtins.filter (e: e.kind == k) |> builtins.length;
+  countOf = k: entries |> lib.count (e: e.kind == k);
 
   # Where the prose actually sits, so a cleanup has an address instead of a total.
   headerPerFile =
@@ -200,7 +199,7 @@
     |> map (
       p: {
         name = p;
-        value = entries |> builtins.filter (e: e.file == p && e.kind == "header") |> builtins.length;
+        value = entries |> lib.count (e: e.file == p && e.kind == "header");
       }
     )
     |> builtins.listToAttrs;

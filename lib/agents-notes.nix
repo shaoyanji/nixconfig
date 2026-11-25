@@ -221,7 +221,7 @@
         xs = entryList |> builtins.filter (e: e.claim == c);
       in {
         notes = builtins.length xs;
-        open = xs |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> builtins.length;
+        open = xs |> lib.count (e: openStatuses |> builtins.elem e.status);
         evidence = xs |> map (e: e.evidence) |> lib.unique;
       }));
   claimRows =
@@ -243,13 +243,13 @@
 
   counts = {
     total = entryList |> builtins.length;
-    byClaim = claimOf |> builtins.attrValues |> lib.unique |> forNames (k: entryList |> builtins.filter (e: e.claim == k) |> builtins.length);
+    byClaim = claimOf |> builtins.attrValues |> lib.unique |> forNames (k: entryList |> lib.count (e: e.claim == k));
     byStatus = statuses |> forNames (s: s |> byStatus |> builtins.length);
     byKind = kinds |> forNames (k: k |> byKind |> builtins.length);
-    open = entryList |> builtins.filter (e: openStatuses |> builtins.elem e.status) |> builtins.length;
-    leaves = entryList |> builtins.filter (e: e.leaf) |> builtins.length;
+    open = entryList |> lib.count (e: openStatuses |> builtins.elem e.status);
+    leaves = entryList |> lib.count (e: e.leaf);
     lineageEdges = noteIds |> lib.concatMap (id: parentsOf raw.${id}) |> builtins.length;
-    withLineage = entryList |> builtins.filter (e: e.ancestors != []) |> builtins.length;
+    withLineage = entryList |> lib.count (e: e.ancestors != []);
   };
   byStatusIds = statuses |> forNames (s: s |> byStatus |> map (e: e.id));
 

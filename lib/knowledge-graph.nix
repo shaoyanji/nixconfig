@@ -636,7 +636,7 @@
       policies = policyIds |> builtins.length;
       tasks = taskIds |> builtins.length;
       edges = edges |> builtins.length;
-      recordedEdges = edges |> builtins.filter (e: e ? evidence) |> builtins.length;
+      recordedEdges = edges |> lib.count (e: e ? evidence);
     };
   };
 

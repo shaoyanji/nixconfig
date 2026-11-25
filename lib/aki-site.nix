@@ -47,7 +47,7 @@
   # by lib/inventory.nix, but recomputing keeps the site correct even in the
   # standalone TOML fallback.
   totalHosts = hostNames |> builtins.length;
-  countWhere = p: hostValues |> lib.filter p |> builtins.length;
+  countWhere = p: hostValues |> lib.count p;
   externalCount = countWhere (h: (h.kind or "") == "external");
   nixHostCount = totalHosts - externalCount;
   activeNix = countWhere (h: (h.status or "") == "active" && (h.kind or "") != "external");
@@ -978,7 +978,7 @@
     {}
     kg.graph.edges; # Tag nodes have no stat of their own; derive the count so the chip can
   # never disagree with the data it filters.
-  tagCount = kg.graph.nodes |> lib.filter (n: n.type == "tag") |> builtins.length;
+  tagCount = kg.graph.nodes |> lib.count (n: n.type == "tag");
 
   siteNodes =
     map

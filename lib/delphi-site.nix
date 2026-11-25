@@ -58,7 +58,7 @@
 
   byKind = tally (h: h.kind or "unknown");
   byArch = tally (h: h.arch or "unknown");
-  countWhere = p: hostValues |> lib.filter p |> builtins.length;
+  countWhere = p: hostValues |> lib.count p;
 
   devices = builtins.length hostValues;
   externalCount = countWhere (h: (h.kind or "") == "external");

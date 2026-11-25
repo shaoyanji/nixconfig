@@ -1,8 +1,63 @@
 {
-  "generated": "2026-11-25T00:06:41Z",
+  "generated": "2026-11-25T00:17:23Z",
   "count": 200,
-  "pin": "3fee76d2e0f43df89ea2af7b8141775502c4ff309deb2bda134f59354fb008b4",
+  "pin": "fe6aca3d2222f94435e6971651ad00b8debd0f2f025744bf1b7fba7c1979ca59",
   "turns": [
+    {
+      "id": "f08d3326-ec06-4d93-9114-ab643fb39cb0",
+      "ts": "2026-11-25T00:17:22Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "scout 2026-11-25 dated sweep: arbeitnow 3397 + 90 ATS boards 2401 postings, 3723 in the 10-day window, 48 title/location matches across 35 employers, 31 employers already tracked; added none (fit 25, merged 0 duplicate listing) | gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03haqw5mjbvqnvb15xri613bc"
+    },
+    {
+      "id": "82a545ba-88af-429e-8108-f84cfd85fcca",
+      "ts": "2026-11-25T00:16:48Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: routed delphi pane (agents:3.1, ssh remote freebuff) to a fresh DevOps/SRE/Platform/Infra employer-lead sweep — Arbeitnow + career pages, 10-day window, dedupe vs appflow, new leads stage=scouted with fit + next action, one-line sweep summary at the end | gate: jev-decide duel task-change 0.89 (margin 0.78); fresh working counter (15s) confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8ca74cf22e2570bead6304e66d29c3c775ca63a",
+      "branch": "main",
+      "frame": "03haqw1lf8p970fusi7sugsow"
+    },
+    {
+      "id": "060aa47b-e27b-46b4-9021-a693ed89959f",
+      "ts": "2026-11-25T00:16:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: routed freebuff pane (agents:2.1) to work the 5 scouted-lead next actions — read each ad, confirm stack/vendor/on-call/location, packet-or-park, apps:update rows (gridscale OPCP-vs-Ceph explicit), decide-and-record no sends, deadline 2026-11-28 | gate: jev-decide duel task-change 0.90 (margin 0.80); fresh working counter (20s) confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e8ca74cf22e2570bead6304e66d29c3c775ca63a",
+      "branch": "main",
+      "frame": "03haqw1jto6328vkk7fnr4na2"
+    },
+    {
+      "id": "2c1eebdf-32c8-4b5f-a27f-bf34a8aa2640",
+      "ts": "2026-11-25T00:16:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "claim: reading the 5 scouted ads (arbeitnow API + stored JD) and deciding packet-or-park per lead; records only, no packets, no sends",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "modules/plugins/appflow/sync.py"
+      ],
+      "files": [],
+      "base_commit": "e8ca74cf22e2570bead6304e66d29c3c775ca63a",
+      "branch": "main",
+      "frame": "03haqw15ly7fukfyn1k7qucg4"
+    },
     {
       "id": "9d8ccbf9-d93e-41da-a4cc-768d599c7e37",
       "ts": "2026-11-25T00:05:38Z",
@@ -2596,64 +2651,6 @@
       "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
       "branch": "main",
       "frame": "03hanhrhc015vhdodosx27zsw"
-    },
-    {
-      "id": "da8659f1-996a-4b30-b54a-d49b98b35f5e",
-      "ts": "2026-11-24T13:33:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: promoted job-scout-sre-platform-2026-11-24 to handoff/DELIVERED: nine DevOps/SRE/platform leads ranked, packet order Toast then Etraveli after the 2026-12-07 hold, site prose unchanged; the gap note links the five unread EU vendor pages via apps:vendors | gate: checks:kg PASS, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd6fb0889614c41fcaa83fbfb0b9f3acd35dc86d",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hanec99tj11qhxdyrn6q1si"
-    },
-    {
-      "id": "317a33fc-9199-4df1-bc97-004f89cf7ada",
-      "ts": "2026-11-24T13:32:53Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-drive",
-      "action": "re-drove delphi freebuff pane agents:3.1 over ssh tunnel: sent note-change task for AGENTS.nix job-scout lead outcomes and EU careers-page gap; pane shows working... 18s",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03hane9c5w16xd6dx1qd9wwra"
-    },
-    {
-      "id": "65d105b9-c0f8-4da8-ac49-16662c2321c2",
-      "ts": "2026-11-24T13:32:53Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-drive",
-      "action": "re-drove devin pane agents:1: sent gate-change task to verify flake module-system gate on every host; pane shows Thinking 3s",
-      "outcome": "done",
-      "claims": [
-        "agents:1.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03hane9a5l2ac6jb8wzhn7t4h"
-    },
-    {
-      "id": "d9f790b3-9521-48ed-91bb-6a692a40623a",
-      "ts": "2026-11-24T13:26:11Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-drive",
-      "action": "drove delphi freebuff pane agents:3.1 over ssh tunnel: sent note-change task for AGENTS.nix EU careers-page gap and packet order; pane shows working... 57s",
-      "outcome": "done",
-      "claims": [
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "91233bcf5ef3f002d0c8aa44858cb66c4f8ed701",
-      "branch": "main",
-      "frame": "03hancy7pcmyws2npm9rn4pys"
     }
   ]
 }

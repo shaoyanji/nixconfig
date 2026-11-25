@@ -34,6 +34,7 @@ stage='def stage:
     elif (($s | startswith("applied")) or ($s | startswith("application received"))) then "applied"
     elif (($s | startswith("lead")) or ($s | startswith("rezi"))) then "lead"
     elif ($s | startswith("scout")) then "scouted"
+    elif ($s | startswith("park")) then "parked"
     elif (($s | test("screening")) or ($s | test("follow-up required"))) then "screening"
     elif ($s | test("draft|packet|\\bjd\\b")) then "prep"
     else "other" end;'

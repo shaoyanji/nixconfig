@@ -7302,6 +7302,53 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25q = {
+      title = "The 2026-11-25q sweep: a third flat feed, eight rows of my own, and the pane lane's three under the same cycle";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "Germantechjobs answered byte-identical at cf313395 for the third cycle running, so Stepstone was the live board again: six lane queries gave 143 unique cards and 22 detail reads, eight rows close after the 2026-12-07 window, six park inside it, and every other board turned up only employers the ledger already holds. A parallel pane pass read the same cycle first and filed three more rows under it.";
+      from = ["job-scout-sweep-2026-11-25p"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Sweep 2026-11-25p: the feed flat a third time, Stepstone carried the slate, and two boards returned
+        only employers the record already holds.
+        germantechjobs /rss.xml answered 301 at www and byte-identical at the apex: sha256 cf313395, 586 items,
+        the same hash as 25m, n and o. A hash match is still no evidence either way, and the six Stepstone lane
+        queries were the live source again: 143 unique cards, 101 unheld by exact name against the 1,272-row
+        ledger, 22 detail pages read. Eight rows filed by this read at scouted, origin scout-2026-11-25p, each closing after
+        the 2026-12-07 window. Creditreform, OpenShift Platform Engineer, Neuss, band 5: the on-prem OpenShift
+        estate for 128 offices owned end to end, automation and architecture, standards in reach. BMW Group, AI
+        Infrastructure Engineer, Munich, band 5: GPU and accelerator capacity, storage and networking for
+        agentic AI and industry foundation models. BarmeniaGothaer, Cloud Platform Engineer Data & AI, Cologne,
+        band 4: the group Data & AI platform on Azure Databricks and AI Foundry. DZ HYP, Senior KI Platform
+        Engineer, Hamburg, band 4: the AI platform business units ship on, IT compliance in the room. adesso,
+        Senior Datacenter Infrastructure Engineer, Aachen, band 4: client-facing infrastructure engineering,
+        no ticket operations. Stadler Mannheim, Lead DevOps, band 4: CI/CD and platform for rail signalling
+        software, the leadership seat the gap. essendi it, Systemadministrator, band 3: a certificate-management
+        house, nationwide home office. valantic, Cloud Specialist Managed Service, Eschborn, band 3.
+        A parallel pane pass read this cycle first and filed its eight over the same keys: eleven unique rows, three of them only there (ALDB, BEW, Elevion) and three only here (Barmenia, essendi, Stadler).
+        Parked on the window, not merit: S Rating 12-05, Fabasoft 12-05, HDI AG 12-01, IQTIG 11-29,
+        Liebherr-Aerospace 12-05, and the meinestadt.de Kubernetes seat at Schwarz Digits 12-01, which employer
+        dedupe holds outright. Refused on shape: SEW-EURODRIVE three times (CIAM platform, Entra and Windows
+        3rd level), Allgeier (client placement), the staffing houses (Akkodis, Amadeus Fire, Instaffo,
+        expertplace, grinnberg, OMNIGENA), the plant-engineering and inspection ads (ADM, Etteplan, Roehm, SMC,
+        Sunfire, TrustJobs, TUEV twice, YNCORIS), the Windows-first seats (Heimerle + Meule, Hilti, Imperial
+        Auto) and the generic small-MSP admin ads.
+        What the other boards added is a dedupe result. berlinstartupjobs 12 items, We Work Remotely 100 (UK and
+        US), RemoteOK 100 (US and Canada), arbeitnow 300 on page one: eleven in-lane titles came to five German
+        employers - gridscale, CloudFactory, ZEAL, KnowWay, DATATRONiQ - and every one is already a row, the
+        rest London, Paris, Basel or a student seat. camunda 56, kubermatic 9 (sales only), DeliveryHero 100 of
+        794. Personio answered 302, so its zero positions is a redirect, not an empty board.
+        Exit: eight to decide before 2026-12-07 while six above expire inside it. Nothing was sent.
+      '';
+    };
+
     job-scout-sweep-2026-11-25o = {
       title = "The 2026-11-25o sweep: the flat hash, the redirect trap, and the seven window-safe rows";
       kind = "decision";

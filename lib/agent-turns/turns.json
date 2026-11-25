@@ -1,8 +1,137 @@
 {
-  "generated": "2026-11-25T04:22:10Z",
+  "generated": "2026-11-25T04:38:25Z",
   "count": 200,
-  "pin": "3cf2e6be8dc4a585de23de228312e9f9707248e495a96407c2fd9a1e6cdc3bdf",
+  "pin": "ddc384e6cede0d2704f05307308c53a5239ea128ce5b191fc45fb2f6c1288a7f",
   "turns": [
+    {
+      "id": "d574c368-5e47-4537-be75-3958489263d2",
+      "ts": "2026-11-25T04:37:36Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25p",
+      "action": "2026-11-25p — gtj cf313395 flat again (www 301s to apex); Stepstone 6 queries/143 cards/101 unheld/22 detail reads; 8 rows filed scout-2026-11-25p (Creditreform+BMW 5; Barmenia, DZ HYP, adesso, Stadler 4; essendi, valantic 3); 6 parked inside the 12-07 window (meinestadt=Schwarz Digits held); other boards held only known employers. gate: agents-notes-schema PASS",
+      "outcome": "failed: pre-push images-check — wall/2026-11-26/frieren-lake-bridge.png carries a session-gated URL (image lane); commit d20e1576 is local, needs retry after task images:publish",
+      "claims": [],
+      "files": [],
+      "base_commit": "d20e1576dac4c68c1bf3c153209b850bf94eef61",
+      "branch": "main",
+      "frame": "03hasaznhd68yqbcyyuv1fmo6"
+    },
+    {
+      "id": "fcbbc8ef-4c83-4797-95d9-69f4436e9ba5",
+      "ts": "2026-11-25T04:37:26Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wallpaper-worker",
+      "action": "landed: frieren-lake-bridge 1536x1024 generated via cpg (seedream-5.5, 2nd attempt after a transient 502), recorded via image-daily-add + image-daily.sh publish clean; manifest 771->772, public tree published/wall/2026-11-26/frieren-lake-bridge.png (2418548 B, valid PNG)",
+      "outcome": "done",
+      "claims": [
+        "pics/generated/wall/2026-11-26/frieren-lake-bridge",
+        "image-daily wall lane"
+      ],
+      "files": [],
+      "base_commit": "d20e1576",
+      "branch": "main",
+      "frame": "03hasayiig8ts9femo92a14ht"
+    },
+    {
+      "id": "9758eabc-12ca-4dc3-b622-b9ebe7bd1175",
+      "ts": "2026-11-25T04:36:28Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "correction: 2026-11-25p wrote ten review_flag nudges, not nine — the list was ten, the sentence said nine; fixed in 8f44b09a (all other 25p verdicts unchanged) | gate: agentsNotes.issues=[] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8f44b09ac1fc27b3e59f33ae6b02949b1d66085a",
+      "branch": "HEAD",
+      "frame": "03hasarqg3ncvd08dq6yv4f3e"
+    },
+    {
+      "id": "2e191e3a-6660-4743-acaa-db1f15c27b5a",
+      "ts": "2026-11-25T04:36:01Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: sweep 2026-11-25p — gtj flat (sha cf313395, 586 items), Stepstone 150 cards / 73 held / 32 read, 8 rows at scout-2026-11-25p (ALDB 5, Creditreform 5, BMW 4, DZ HYP 4, adesso 4, valantic 4, Elevion 3, BEW 3), 4 parked on expiry, 4 house-token holds refused, 9 review_flag nudges (13 overdue, 30 upcoming) | gate: agentsNotes.issues=[] and 0 live-employer dupes PASS",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "0789d9e82a153e7c864fc8725bb4f5d095fb2a8a",
+      "branch": "HEAD",
+      "frame": "03hasaoia8mtwqhxpq5oq44hw"
+    },
+    {
+      "id": "416fad0b-cd04-46f5-bacc-487432452f8b",
+      "ts": "2026-11-25T04:31:10Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "routed note-change (classify needs_review p=0.32 margin 0.06 -> duel top-2, note-change 0.73/0.46, pick duel top) to agents:3.1 (delphi ssh) - run sweep 2026-11-25p from the delphi lane: Stepstone board re-read, germantechjobs sha compare vs cf313395, verdicts and filing under origin scout-2026-11-25p",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "249aae174f128130e04194a1509b8feb8a95afb1",
+      "branch": "main",
+      "frame": "03has9qe08lrgcesvovjsy030"
+    },
+    {
+      "id": "52476589-7854-47ad-9053-c4b17d140171",
+      "ts": "2026-11-25T04:31:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "routed task-change (classify needs_review p=0.37 margin 0.01 -> duel top-2, task-change 0.62/0.24, pick duel top) to agents:2.1 (freebuff) - run scout sweep 2026-11-25p: read the boards in read order, dedupe against the ledger and 25a..25o, file leads with origin scout-2026-11-25p, close with note job-scout-sweep-2026-11-25p",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "249aae174f128130e04194a1509b8feb8a95afb1",
+      "branch": "main",
+      "frame": "03has9qc6bb43dv1kxh0cjn9r"
+    },
+    {
+      "id": "3f5f7c12-68ea-4c46-9de9-7f87dfcb2398",
+      "ts": "2026-11-25T04:31:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "routed note-change (classify needs_review p=0.41 margin 0.22 -> duel top-2, note-change 0.61/0.22, pick duel top) to agents:1.1 (devin) - verify the two appflow-board routes are live after delphi's 04:30 autoUpgrade, then close the devin-lane-refactoring note and land an xs turn",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "249aae174f128130e04194a1509b8feb8a95afb1",
+      "branch": "main",
+      "frame": "03has9qamexft20marv9w0u5q"
+    },
+    {
+      "id": "ac331b13-188b-4cf2-8f9a-9e4f9c654ad2",
+      "ts": "2026-11-25T04:30:24Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "claim: sweep 2026-11-25p — DevOps/SRE/Platform/Infra via the new apps:scout:sweep manifest; gtj sha check vs cf313395, Stepstone re-read with Referer, dedupe 25a..25o before filing at scout-2026-11-25p",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/apps.yml",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03has9l1584sfcmybiy4s0r05"
+    },
+    {
+      "id": "21543a42-dd15-4867-9c75-7d3956873621",
+      "ts": "2026-11-25T04:22:18Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: reconciling the job-search shard — apps:scout:cycles closes 25j..25o off the archive (j 3 filed, k 0 dedupe, l note-id only, m 6, n 10 from two lanes, o note-id only) with a live drift count; apps:scout gains --sweep so a cycle origin is expressible (dry run: scout-2026-11-25p, malformed id exits 2); CV publish-gate summary refreshed off today's run (exit 0, 6/6 hash-equal, 6/6 anchors) | gate: checks:tasks PASS 807 tasks, cv-blog-check exit 0",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/apps.yml taskfiles/agents.yml scripts/task/apps-scout.sh"
+      ],
+      "files": [
+        "taskfiles/apps.yml taskfiles/agents.yml scripts/task/apps-scout.sh"
+      ],
+      "base_commit": "b4b8cf3d039766e458bb488094078a1f319c5d6b",
+      "branch": "main",
+      "frame": "03has802ze1fsfbci5tep0orr"
+    },
     {
       "id": "f7167d18-0c81-4bdb-979f-b3daa24903d6",
       "ts": "2026-11-25T04:20:24Z",
@@ -2541,126 +2670,6 @@
       "base_commit": "27521275983829b9e48f1f705b97dc7302c04b0c",
       "branch": "main",
       "frame": "03hapuduu1ourv11x8mxrtcc9"
-    },
-    {
-      "id": "beba2d0d-05fb-4e32-af97-a607369a44a7",
-      "ts": "2026-11-24T21:01:40Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-idle-drive",
-      "action": "drove 2 idle panes: devin(agents:1.1)->chain-change (jev p0.87 m0.75 selected), continue feature-chain refactor on next shared module + gate + commit; delphi(agents:3.1,ssh)->unblock_scouting (jev p0.90 m0.82 selected), diagnose send-path blocker + scout new leads. Both panes confirmed working (Thinking/working...).",
-      "outcome": "done",
-      "claims": [
-        "agents:1.1",
-        "agents:3.1"
-      ],
-      "files": [],
-      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
-      "branch": "main",
-      "frame": "03haptxbh26aklan0q1zixm77"
-    },
-    {
-      "id": "9a9247c9-71a9-46c1-a03a-7fb9b3404884",
-      "ts": "2026-11-24T20:57:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "scout: 4 live leads from niche sources (origin scout-niche-2026-11-24) — OpenNebula K8s Platform Eng (remote ES, 4), DeepJudge SRE (Zurich, 4), SysEleven SRE Managed K8s (remote DE, 5, resurfaced), BIS SRE (Basel, 4). BIS closes 2026-12-04, before the 2026-12-07 hold — needs a decision. VirtusLab/Luminovo/Parasail already held; Puzzle ITC/Cloud&Heat no infra req; BIT/ZHAW 404. No sends. | gate: agentsNotes.issues [] + docs-budget rc=0 + taskfile-graph rc=0 + pre-push PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hapt5iw8mc02dvr2mkmlwfy"
-    },
-    {
-      "id": "efd3caa7-ddda-435a-9b78-be31ed24febe",
-      "ts": "2026-11-24T20:57:37Z",
-      "source": "devin",
-      "subject": "nixconfig:dsh-free-model-clanker",
-      "action": "proven: plugin installed, dsh web live on clanker:18900, gateway 127.0.0.1:8326 serves 49 models incl deepseek-v4.1-flash-free + kimi-k3.1-pro (live answer via kilo lane; opencode lane quota-capped on clanker egress) | tailscale-on-clanker abandoned per operator; AGENTS.nix note fleet-hygiene-tailscale-creds-stale",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
-      "branch": "main",
-      "frame": "03hapt4xmbsf4718hoqeheyd0"
-    },
-    {
-      "id": "d1f1e5e5-3306-4eef-9af0-4358eb5f6bb4",
-      "ts": "2026-11-24T20:57:37Z",
-      "source": "devin",
-      "subject": "nixconfig:gatus-dns-monitor",
-      "action": "landed: delphi rebuilt, DNS monitor live — NOERROR + BODY==192.168.3.25; url must be the bare resolver IP (gatus dials verbatim + :53); nginx fixed en route via mapHashBucketSize 128 (commonHttpConfig position reads as duplicate)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
-      "branch": "main",
-      "frame": "03hapt4vfhoe80ueu5ktsb58d"
-    },
-    {
-      "id": "ff520208-c237-4f7c-9509-134b0389c933",
-      "ts": "2026-11-24T20:57:29Z",
-      "source": "devin",
-      "subject": "nixconfig:explabs-fallback",
-      "action": "landed: xpl lane committed+pushed (submodule + mirror + config + infron allowlist + budget) | pending: frieren deploy + hermes-gateway restart (queued next)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f8fe84da1cef5836c3bd0aae1732c84e9045d838",
-      "branch": "main",
-      "frame": "03hapt3zgyf1w8oh7nb3s2sgw"
-    },
-    {
-      "id": "24295c78-89a9-4249-a8da-d9a4e647e16b",
-      "ts": "2026-11-24T20:55:51Z",
-      "source": "tmux-steward",
-      "subject": "nixconfig:steward-idle-drive",
-      "action": "drove 2 idle job-search lanes (post-20:46 drive): freebuff agents:2.1 -> follow_up_leads (jev needs_review p0.62 margin0.30 decisive>=0.3, top by margin); delphi agents:3.1 ssh -> new_board_sweep (jev needs_review p0.60 margin0.34 decisive>=0.3, top by margin). Both verified working: freebuff working...13s, delphi working...14s.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c9f7a1501e7485f8598a969fa117f5db38d91e3a",
-      "branch": "main",
-      "frame": "03hapssfvit7ubpgpmxj4pqmq"
-    },
-    {
-      "id": "721150a5-07c3-4fbb-bc66-679742269d7c",
-      "ts": "2026-11-24T20:51:20Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "scout: filed 5 leads on delphi (origin scout-2026-11-24) — Swissquote SRE Cloud Ops, Julius Baer K8s Platform Eng, vCluster Labs AI Infra Eng at fit 4; Cloudflight SRE and PORR Sr Platform Eng at fit 3. Marquee names already held; GitLab/Canonical/Maze/Flox closed by application or rejection; FiveSquare/INWX/SerNet/Scarf/Hornetsecurity careers pages unfetched, not empty. No sends. | gate: agentsNotes.issues [] + docs-budget rc=0 + taskfile-graph rc=0 + pre-push PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haprwmb9wd4xf6iq5levfcm"
-    },
-    {
-      "id": "454cf942-28d9-4d30-9879-773217d66bb8",
-      "ts": "2026-11-24T20:46:54Z",
-      "source": "tmux-steward",
-      "subject": "nixconfig:steward-idle-drive",
-      "action": "drove two idle job-search lanes: freebuff(agents:2) -> unblock_scouting+jovenetpackets (jev needs_review, margin 0.39 decisive); delphi(agents:3, ssh) -> scout_leads (jev selected p0.91 margin0.86). Both verified working: freebuff thinking..., delphi working... 3s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c9f7a1501e7485f8598a969fa117f5db38d91e3a",
-      "branch": "main",
-      "frame": "03hapr1grynrnr874r1yoeau8"
-    },
-    {
-      "id": "74884e4a-3997-4681-8dde-1161d84febbb",
-      "ts": "2026-11-24T20:40:21Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-freebuff",
-      "action": "landed: drove idle freebuff CV lane (agents:2.1) — jev-decide classify needs_review decision p=0.61 margin=0.40 (decisive >=0.3, top by margin); pasted decision task: rank live employer leads by application priority via jev-decide, top-5 shortlist deliverable; fresh working... 8s after Enter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ccfe5ab26f480611c4dc7952b76023efc931bf28",
-      "branch": "main",
-      "frame": "03happrhxjwezck9eitwxopca"
     }
   ]
 }

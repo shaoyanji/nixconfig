@@ -1,8 +1,39 @@
 {
-  "generated": "2026-11-25T15:58:19Z",
+  "generated": "2026-11-25T16:01:14Z",
   "count": 200,
-  "pin": "989a6aa1de50b534b22c76db80b1bb62a6bf4f4cd676b253f8e8a94a9ac5fe31",
+  "pin": "cb4cf3fb2c00b36f257f900afc99971325673ba2cc9c73f2b89db57883c63a91",
   "turns": [
+    {
+      "id": "8fff6f50-d8e1-4946-9319-3bf38c3b0945",
+      "ts": "2026-11-25T16:00:34Z",
+      "source": "micro-turn",
+      "subject": "nixconfig:micro-turn-scheme",
+      "action": "route: xs micro-turns live — panes read the ledger",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jev-route.sh",
+        "scripts/task/xs-micro-turn.sh",
+        "scripts/task/pane-nudge.sh",
+        "scripts/task/pane-poll.sh"
+      ],
+      "files": [],
+      "base_commit": "f25eeec0772802c3204162fdc51587dccd05c4e7",
+      "branch": "main",
+      "frame": "03haw0ene7sb9wo9nt3tht97d"
+    },
+    {
+      "id": "cffeb598-7e80-4de1-a074-fa055ce3d983",
+      "ts": "2026-11-25T15:58:30Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "hostField idiom done: demo.nix collapsed (last copy; 1 host) — all three chain files now spell the inventory fallback once each | gate: drv-equality 30/30, nix:lint 331 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f25eeec0772802c3204162fdc51587dccd05c4e7",
+      "branch": "main",
+      "frame": "03haw003xhdh16ubpsxcgp935"
+    },
     {
       "id": "ef7437a8-e476-4a80-92a5-e9ba788a1644",
       "ts": "2026-11-25T15:54:53Z",
@@ -2626,32 +2657,6 @@
       "base_commit": "f63541e8d731c3254a40c3c6daa7b130cd684d9f",
       "branch": "HEAD",
       "frame": "03hask0cr4ij55b0urtw39zoo"
-    },
-    {
-      "id": "0ce4be0b-cd23-4d4e-9f6e-20cad8f22708",
-      "ts": "2026-11-25T05:21:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: re-driven devin (agents:1.1) after it finished the refactoring tail (checks:policies fix 468e540a pushed, note left OPEN pending delphi 11-26); routed note-change (classify needs_review p=0.33 m=0.03 -> duel incident/note-change, note-change 0.61/0.39 m=0.22) - close the live nixconfig:worktree-race claim: verify 33fc9b72 pushed + one-worktree-per-lane rule, land claim done; devin working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9f259f0f9c8ee91ff5819ffd1806167e1e98f914",
-      "branch": "main",
-      "frame": "03hasjmaw7cr85pk9ima227mu"
-    },
-    {
-      "id": "c90eefdf-43da-4e81-a09f-1a97889f383e",
-      "ts": "2026-11-25T05:21:15Z",
-      "source": "devin",
-      "subject": "nixconfig:worktree-race",
-      "action": "closed: incident 4 recovered — orphan object 9885e31b cherry-picked to 33fc9b72, verified ancestor of origin/main; shared-checkout rule in force: HOME-PREAMBLE §Agent turns + compiled .#homeAgents card | gate: git merge-base --is-ancestor, homeAgents eval greps the rule",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9f259f0f9c8ee91ff5819ffd1806167e1e98f914",
-      "branch": "main",
-      "frame": "03hasjinusd6vk5ivvj3ed05l"
     }
   ]
 }

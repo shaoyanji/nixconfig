@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-25T00:35:54Z",
+  "generated": "2026-11-25T00:40:37Z",
   "count": 200,
-  "pin": "db3e02a935ff48121f142704ca70aa0aef271cec55419cdf6b6618d707d6d956",
+  "pin": "4174f36316594a7552ee139f85f5c53ac933b2962fbe59276bc0ea2fab3f5bae",
   "turns": [
+    {
+      "id": "d4ad5815-0ba8-4cb9-8c36-18797b72d252",
+      "ts": "2026-11-25T00:36:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "left idle: devin (agents:1.1) idle after 23:58 image-daily gate verification; jev-decide classify needs_review — gate-change p=0.70 margin=0.44, no clear label, pane left for next cycle",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
+      "branch": "main",
+      "frame": "03haqzv4txpk80tj7oo2w5nvm"
+    },
+    {
+      "id": "5118edab-2ca8-4d8e-9a7a-461a3f487ca1",
+      "ts": "2026-11-25T00:36:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: routed delphi pane (agents:3.1, ssh) to AGENTS.nix sweep-note task — jev-decide classify selected note-change p=0.88 margin=0.80; pane confirmed thinking 1s after Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
+      "branch": "main",
+      "frame": "03haqzv3crrfbhtt541vum5dr"
+    },
+    {
+      "id": "ce4134fb-7993-46e8-971d-1d79afc407fd",
+      "ts": "2026-11-25T00:36:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "landed: routed freebuff pane (agents:2.1) to AGENTS.nix job-scout note task — jev-decide classify selected note-change p=0.95 margin=0.92; pane confirmed thinking 1s after Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
+      "branch": "main",
+      "frame": "03haqzv1vwr0kit3mrgxca4py"
+    },
+    {
+      "id": "16dc5957-4fd9-4ee3-a217-9992dbe62eaf",
+      "ts": "2026-11-25T00:36:03Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: job-scout-scouted-decided-2026-11-25 (OPEN P2) — 21bitcoin is the one packet (AWS multi-account IaC, DevSecOps, English, hybrid, on-call, 75-120k); gridscale OPCP (Ceph wins), CBTW, ProcuVia, Little John parked with reopen triggers; kept open for the tailor order (Swissquote/Julius Baer, then vCluster) and the BIS 2026-12-04 ruling before the hold lifts. | gate: agentsNotes.issues = only the pre-existing lane-state body length; nix parse PASS; pushed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "aaa7f0abded6673c43ee8b4495ead27c7d6c14c0",
+      "branch": "main",
+      "frame": "03haqzsywfbu32xqa0982r2f9"
+    },
     {
       "id": "36b5fac4-5a73-4bba-add0-791d44c00de1",
       "ts": "2026-11-25T00:34:58Z",
@@ -2593,60 +2645,6 @@
       "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
       "branch": "main",
       "frame": "03hannbl0t758i3lohkcyvm1u"
-    },
-    {
-      "id": "991ca951-91c1-4b2f-bd33-c9c050807603",
-      "ts": "2026-11-24T14:19:14Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.73 margin=0.58 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9a2f9f48ee35a35b4d8c54d8297de1cd8a9a8133",
-      "branch": "main",
-      "frame": "03hannbjkpj1vcisqzm7mykrl"
-    },
-    {
-      "id": "fc7816b0-58a0-43be-8dc9-f1cc35a225c4",
-      "ts": "2026-11-24T13:57:36Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: stack sweep filed 12 leads at lead (Aiven 4, Fides/MariaDB/McAfee/NEOXX/Numberly 3) with the 2026-12-07 hold, DB 1069 to 1081, apps:dupes []; read all five vendor pages: four already live rows, Proxmox only absent and no EU engineering role | gate: checks:kg PASS, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "88f2fcf8e0c8e1335de65ee3303306ceacaa4436",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hanj34g76ic0fqmku3kykxw"
-    },
-    {
-      "id": "d85bd3cf-3918-4c72-a814-a6c37d9aa871",
-      "ts": "2026-11-24T13:54:35Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "Note job-scout-next-sweep-freebuff restated: next idle freebuff lane task is one more DevOps/SRE/Platform/Infrastructure employer-lead sweep, prep-only to 2026-12-07, nothing sent. OPEN/P3, refs+links unchanged. gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bde0abd2d1c9c0f739a63e6e66d93a0a2847014c",
-      "branch": "main",
-      "frame": "03hanihwm8468t9ob555h854r"
-    },
-    {
-      "id": "b5067967-d2f0-4c09-84de-07db2d6cb8f5",
-      "ts": "2026-11-24T13:54:14Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward:pane-drive:freebuff-local2",
-      "action": "drove idle freebuff pane agents:2.1 via Jev task_change; pasted CV/site note-update task; pane shows working... 25s / BUSY",
-      "outcome": "done",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [],
-      "base_commit": "1e9bd28871cffa30d7812b0ca6f7fb3057e4d79f",
-      "branch": "main",
-      "frame": "03hanifeqf1w14yexu5l383dx"
     }
   ]
 }

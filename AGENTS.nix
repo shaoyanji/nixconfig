@@ -5413,44 +5413,35 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-         The boards are mined out, so this lane stops sweeping and tailors.
+        The boards are mined out, so this lane stops sweeping and tailors.
 
-         Exhausted: arbeitnow's sixteen pages, the Greenhouse, Lever,
-         Ashby, Personio and Recruitee boards by family, and remotive's
-         devops feed. Blocked, not empty: RemoteOK and BA jobsuche answer
-         403 from this host. Dead: jobicy, Working Nomads, Himalayas,
-         interamt. A further pass would re-read the same postings.
+        Exhausted: arbeitnow's sixteen pages, the Greenhouse, Lever, Ashby,
+        Personio and Recruitee boards by family, remotive's devops feed.
+        Blocked, not empty: RemoteOK and BA jobsuche answer 403 from this
+        host. Dead: jobicy, Working Nomads, Himalayas, interamt; a further
+        pass would re-read the same postings.
 
-         Active target: HITS.nrw — Hochschul-IT-Services.nrw, Düsseldorf,
-         Application Operator / DevOps Engineer, Linux and Kubernetes,
-         fit 4. It is the only fit-4 German role whose day is own-fleet
-         Linux and Kubernetes rather than a vendor estate, and the ad is
-         German, so the application wants a German Anschreiben.
+        Active target: HITS.nrw — Hochschul-IT-Services.nrw, Düsseldorf,
+        Application Operator / DevOps Engineer, Linux and Kubernetes, fit 4,
+        the only fit-4 German role whose day is own-fleet Linux rather than a
+        vendor estate, so the German ad wants a German Anschreiben. Next
+        action: tailor the CV and write that letter, with no sweep behind it.
+        Drift: HITS.nrw holds two lead rows, `hits-nrw-application-operator-
+        devops` beside a truncated slug, one employer to one row once merged.
 
-         Next action: tailor the CV to that req and write the German
-         letter. No board sweep runs behind it.
+        Nothing sends before 2026-12-07; the lane has no send verb.
 
-         Drift: HITS.nrw holds two lead rows,
-         `hits-nrw-application-operator-devops` beside the truncated slug —
-         one employer, so one row once the merge lands.
+        Exit: HITS.nrw is `applied` with a receipt and the duplicate merged.
 
-         Nothing sends before 2026-12-07, and the lane has no send verb.
-
-         Exit: HITS.nrw is `applied` with a receipt, the duplicate merged,
-         and this note goes DELIVERED.
-
-         Delivered 2026-11-24 as a prep packet, not a send: the canonical
-         row carries a German CV projected onto the ad (15 of 39 highlights,
-         4 of 10 projects) and an Anschreiben to Heather Baumgarten, at
-         `~/.local/state/appflow/submissions/hits-nrw-application-operator-devops`.
-         The duplicate row is merged into it, the boards stay mined out, and
-         the 2026-12-07 hold still owns the send.
-
-         A second lead was prepped the same day: HiSolutions AG (German ad,
-         remote Germany, fit 5), whose row now carries a curated CV and an
-         Anschreiben at `~/.local/state/appflow/submissions/hisolutions-ag-
-         senior-kubernetes-expert-devops-engineer`. Its stored JD was remotive
-        's scrape; the employer's own ad text replaced it before the build.
+        Delivered 2026-11-24 as a prep packet, not a send: a German CV
+        projected onto the ad (15 of 39 highlights, 4 of 10 projects) and an
+        Anschreiben to Heather Baumgarten live under
+        `~/.local/state/appflow/submissions/hits-nrw-application-operator-devops`;
+        the duplicate is merged and the 2026-12-07 hold owns the send.
+        HiSolutions AG followed (German ad, remote, fit 5) with a curated CV
+        and Anschreiben under
+        `~/.local/state/appflow/submissions/hisolutions-ag-senior-kubernetes-expert-devops-engineer`,
+        its stored JD replaced by the employer's own text after remotive's scrape.
       '';
     };
     job-scout-boards-exhausted-2026-11-24 = {
@@ -6333,6 +6324,50 @@
 
         Exit: `scouted` stays at zero and each parked row keeps its reopen
         date, or the BIS row carries a written hold ruling.
+      '';
+    };
+    job-scout-dated-sweep-2026-11-25 = {
+      title = "The dated sweep: 3,723 postings, eight rows at scouted, and a fit upload that still 500s";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Arbeitnow, 90 ATS boards, eight Personio XML feeds and devjobs over the 2026-11-15 cutoff returned 3,723 postings and 63 title matches, with 31 employers already on record; eight new German platform leads were filed as the first rows at `scouted`, each held to 2026-12-07 with a next action naming the JD question, while a fit value still answers 500 on the upsert route.";
+      from = ["job-scout-scouted-decided-2026-11-25"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:add" "apps:upsert" "apps:dupes"];
+      };
+      body = ''
+        Sweep 2026-11-25, dated only: arbeitnow 30 pages (3,397 postings),
+        90 ATS boards (2,401), eight Personio XML feeds and 40 devjobs links
+        gave 3,723 postings inside the ten-day window (cutoff 2026-11-15); 63
+        title matches across 35 employers, 31 of them already holding a row
+        and skipped. Eight landed at origin scout-2026-11-25b, one Airbus
+        listing merged into its better-fit sibling, and apps:dupes stayed [].
+        Every posting was fetched live and read; nothing was sent.
+
+        Filed at `scouted` and held to 2026-12-07, each next action naming the
+        JD question: K+S Cloud & Platform Engineer (85, the GCP share) ·
+        Cosinex System Administrator (85, same) · Airbus ML Data &
+        Infrastructure (80, GCP versus on-prem) · ESQlabs Principal Platform
+        (70) · SEW-Eurodrive CIAM Platform (70) · 50Hertz Platform (60,
+        cluster stack and on-call) · HUK-COBURG Platform Linux/Ansible (60,
+        same) · ZF Compute Platform Engineering Lead (55, GCP).
+
+        These are the first eight rows at `scouted`: the status begins
+        "Scouted 2026-11-25", which both stage mirrors map to the new bucket,
+        and apps:upsert wrote the stage explicitly so the hourly sync agrees.
+        The `fit` column is still null — a fit value answers 500 on
+        /api/application-upsert — so the score lives in the status text.
+
+        Sources that refuse this host: Bundesagentur 403, The Muse 404,
+        germantechjobs deprecated, devjobs /api/jobs 404. Personio is the only
+        German feed with a real createdAt; its hits were stale (eitco
+        2026-11-10, Lumenaza May, synaos June, Reverion 2024).
+
+        Exit: the eight stay scouted until 2026-12-07 and a person sends;
+        the next sweep fixes the fit upload before it adds rows.
       '';
     };
   };

@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-25T01:37:35Z",
+  "generated": "2026-11-25T01:44:55Z",
   "count": 200,
-  "pin": "883c96202d703c24126bd9a29710b2675e15dd48779e50e5bfd3d3ea1b4d24af",
+  "pin": "b6a89e5583ad662eb38a2876943320b32b86eb6a5520383ace78fa78dd62eebd",
   "turns": [
+    {
+      "id": "6d4c221a-9385-46fd-9695-a13559d8221a",
+      "ts": "2026-11-25T01:42:49Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "drove idle freebuff (agents:2.1) with 2026-11-25d read-in-full + decide packet-vs-park task for the 4 scouted leads (Whitecircle MLE/MLOps, Alan Platform Eng, Vitestro Cloud Architect, Univé Frontend Platform) — classify selected note-change p=0.95 m=0.93 exit 0; working... 14s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "71169d3eedebd750b34036d44d7480be25a8f3f9",
+      "branch": "main",
+      "frame": "03harcuij03gl4i3m46r0rt4w"
+    },
+    {
+      "id": "b1f4206d-eaef-45a2-b370-6906c2c56c94",
+      "ts": "2026-11-25T01:38:55Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correction: the 2026-11-25d note commit needed a rebase onto a moved main; the real landing is 72e2d61a, note job-scout-sweep-2026-11-25d, 4 rows at scouted (fit band 4 x3, 3 x1), nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03harc32v5lmusxv4ar8ij0qb"
+    },
+    {
+      "id": "6775cbc0-0cd4-4f25-88ef-6c10dda06943",
+      "ts": "2026-11-25T01:38:26Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 2026-11-25d sweep - 4 new employers at scouted (Whitecircle 80, Alan 70, Vitestro 70 -> band 4; Univé 64 -> band 3), origin scout-2026-11-25d, upsert no 500; 152 family matches / 112 held / 40 read; note job-scout-sweep-2026-11-25d; nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03harbzq3drdmoccx4b9myf9q"
+    },
+    {
+      "id": "1ea17d8f-1098-44f0-b7a8-4aa160e8c139",
+      "ts": "2026-11-25T01:37:48Z",
+      "source": "devji",
+      "subject": "nixconfig:image-daily-port-ship-slices",
+      "action": "landed: ship-detach (systemd-run vector) + served (remote manifest poll, exit-code contract) ported from image-ship.sh to tools/os/internal/image/ship.go; 5 tests incl. httptest poll and arg-vector pin; note devin-lane-image-daily-go-port stays OPEN (cloudinary curl, ffprobe check, cpg auth remain shell) | gate: go test 18/18 + checks:image-daily + checks:images:ship:test + checks:host frieren rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "71169d3eedebd750b34036d44d7480be25a8f3f9",
+      "branch": "main",
+      "frame": "03harbv8i1allkj56zqbiyteq"
+    },
     {
       "id": "b4dddbb4-e28b-4ef6-88f8-0b35b2914792",
       "ts": "2026-11-25T01:33:51Z",
@@ -2572,61 +2624,6 @@
       "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haoj5vf7n2tso42nfkh52bf"
-    },
-    {
-      "id": "8ced0662-6b55-44c1-b841-279a38496b19",
-      "ts": "2026-11-24T17:00:29Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "re-driven: delphi (agents:3) idle after upsert completed. jev-decide selected attention p=0.78 margin=0.60 decisive >= 0.3: sweep attention queue for replies/status changes. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03haoitaky838k2ldxhmzrpq5"
-    },
-    {
-      "id": "d4fc4deb-2a41-4d94-9a69-0e41a11cf87f",
-      "ts": "2026-11-24T17:00:29Z",
-      "source": "hermes",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "re-driven: freebuff (agents:2) idle. jev-decide selected cv_tailor_fresh p=0.67 margin=0.48 decisive >= 0.3: tailor CV for 4 leads from job-scout-fresh. Pane working.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03haoit94p34sn02g601nygvh"
-    },
-    {
-      "id": "23a606fa-ff32-41b7-b8b0-794526a8a638",
-      "ts": "2026-11-24T17:00:29Z",
-      "source": "hermes",
-      "subject": "nixconfig:code-review-loop",
-      "action": "re-driven: devin (agents:1) idle. jev-decide selected review_loop p=0.99 margin=0.98: code-review loop over lib/*.nix pipe-operator code. Pane Running tools.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03haoit7ndo4td22xydwvzguh"
-    },
-    {
-      "id": "2f8d5209-cabf-450f-ae46-0266ed37995c",
-      "ts": "2026-11-24T16:55:33Z",
-      "source": "hermes",
-      "subject": "nixconfig:hygiene-sops-docsbudget",
-      "action": "start: fixing sops drift + docs budget in hygiene CI",
-      "outcome": "in_progress",
-      "claims": [
-        ".github/workflows",
-        "flake/policies.nix"
-      ],
-      "files": [],
-      "base_commit": "366e1015528d56b961966a6a515303b94f442135",
-      "branch": "main",
-      "frame": "03haohuldsup1qkswxrm5ci2d"
     }
   ]
 }

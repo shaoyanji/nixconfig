@@ -6412,6 +6412,52 @@
         the next sweep fixes the fit upload before it adds rows.
       '';
     };
+    job-scout-sweep-2026-11-25d = {
+      title = "The 2026-11-25d sweep parks all four: place, language and a work-eligibility clause";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Delphi filed four 2026-11-25d leads at scouted — Whitecircle, Alan, Vitestro, Univé — and all four were read at source and parked: three on place alone, Univé also on language and on a governance-shaped role. No packet, which is the first evidence for the lane's own 25d rule: reads that end this way were never worth starting.";
+      from = ["job-scout-lane-2026-11-25d"];
+      refs = {
+        modules = [
+          "scripts/task/apps-scout.sh"
+          "scripts/task/apps-db.sh"
+        ];
+        tasks = ["apps:scout" "apps:update" "apps:dupes"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Four rows, read in full on 2026-11-25 from the employer's own text:
+        arbeitnow's JobPosting JSON-LD for Whitecircle, Vitestro and Univé, and
+        Ashby's posting-api job board for Alan.
+
+        Whitecircle (Paris, 100-150k USD): GPU Kubernetes, the Nomad-to-K8s
+        move and the canary/rollback release process are the best infra match
+        the lane has seen, and it is still an office in London or Paris on a
+        hybrid setup with relocation. Park on place.
+
+        Alan (remote within France, Belgium and Spain, published 2026-09-10):
+        Terraform/Terramate over AWS and GCP, Kubernetes, Datadog, incident.io,
+        FinOps and AI-augmented ops, English enough and French not required —
+        behind a clause requiring legal eligibility in those three countries.
+        Park on place and eligibility.
+
+        Vitestro (Utrecht): AWS direction, IaC as the source of truth, cost
+        control and regulated medical-device readiness in English — three days
+        a week in Utrecht, no remote route. Park on place alone.
+
+        Univé (Zwolle, 57.5-81.2k EUR): Dutch ad, NL home days, continuity and
+        MSP management over Azure/AKS rather than building it. Park on place,
+        language and skill.
+
+        Four reads changed no verdict, so the lane rule — German ad or EU-remote
+        before a read — was adopted one sweep too late. The scout that filed
+        these ran before it existed; the next sweep applies it at the filter,
+        not after the read. Nothing sends before 2026-12-07.
+      '';
+    };
     job-scout-sweep-2026-11-25c = {
       title = "A ten-lead sweep on the fixed fit route: arbeitnow and the ATS boards, deduped against 920 employers";
       kind = "open";

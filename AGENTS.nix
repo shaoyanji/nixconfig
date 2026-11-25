@@ -7384,6 +7384,40 @@
         should either finish or drop Workable rather than time out on it.
       '';
     };
+    job-mail-attention-2026-11-25 = {
+      title = "The 25p sweep had nothing left to file, and the mail says Canonical and Adyen are closed";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "No 25p attention-sweep artifact exists: 25p was a Stepstone board pass, its eleven rows are all in the ledger, and the four it parked are not rows on purpose. The mail did have news — Canonical's six \"we regret\" updates and Adyen's \"not to move forward\" close two applied rows, and the remaining decision mail is acknowledgements.";
+      from = [ "job-scout-sweep-2026-11-25p" ];
+      refs = {
+        modules = [ "scripts/task/apps-db.sh" ];
+        tasks = [ "apps:update" "apps:emails" "agents:mail:attention" "apps:scout:parked" ];
+        docs = [ ".agents/skills/apps/SKILL.md" ".agents/skills/mail-archive/SKILL.md" ];
+      };
+      body = ''
+        The brief asked for the new leads of a 25p attention sweep. There is no such artifact, and the
+        ledger says why: 25p was a Stepstone board pass whose note filed eight rows, a parallel pane added
+        three, and origin scout-2026-11-25p now holds eleven rows over eleven distinct companies. Nothing
+        was inserted, because re-upserting a filed row nulls the columns a sparse record omits.
+        The four the p note parked — Heimerle + Meule, HDI, Fabasoft, S Rating — are not rows by design:
+        apps:scout:parked carries them by validThrough and files none inside the 2026-12-07 hold. Heimerle,
+        Fabasoft and S Rating are absent from the ledger; HDI exists already from the 25s pane.
+        Mail is the half with news. The archive links 455 messages to rows and application-attention is
+        empty, but the replies that decide a row sit unlinked, so the search was employer token against
+        emails since 2026-10-15. Ten decision mails came back: six Canonical "we regret" notices on
+        2026-11-22 and 2026-11-23, Adyen's "not to move forward", freicon already rejected, a Call for
+        Papers verdict, and acknowledgements from Bechtle, NETWAYS, GlobalLogic, Mittwald and others.
+        Closed: the applied Canonical row and the applied Adyen row, both at Rejected 2026-11-23 with no
+        next action, which keeps both employers out for 180 days. Nothing else moved; an acknowledgement is
+        not a decision and a stage is not changed to look tidy.
+        Open: roughly two hundred applied rows have an acknowledgement and no verdict, and the sync queue
+        stays empty because the mail never linked, so the next pass searches by employer name, not by queue.
+        Exit: two rows closed, zero leads inserted, zero sends.
+      '';
+    };
     job-scout-sweep-2026-11-25s = {
       title = "Six of 256 cards survive the hold, and the dedupe is the finding";
       kind = "decision";

@@ -6497,6 +6497,47 @@
         window after the hold, and none of them is a send.
       '';
     };
+    job-scout-decisions-2026-11-25f = {
+      title = "Of the 2026-11-25f five, Brose gets the packet and four park — two on the calendar";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "All five ads answer 200 with the full stepstone JobPosting, so the read decided on content: Brose's AWS landing-zone seat is the only end-to-end platform ownership and goes to packet, while Majori and ALTEN park because their validThrough lands before the 2026-12-07 window and Scheer and UKA park on a network-first and a Microsoft-first core.";
+      from = ["job-scout-decisions-2026-11-25e"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:get" "apps:update"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Read all five ads in full at source before deciding, and the stepstone
+        JobPosting carried the whole text the germantechjobs blob had abridged:
+        responsibilities, profile, benefits and the apply route.
+
+        Brose gets the packet. An AWS landing zone on Organizations and Control
+        Tower, the core services, IaC in Terraform or CloudFormation, governance
+        and DR, FinOps, ITIL incident work across Europe, North America and Asia —
+        the only one of the five that is platform ownership end to end, and the
+        freshest at 2026-11-18 with a 2026-12-18 window.
+
+        Four park, and two of them on the calendar rather than on fit: Majori's
+        validThrough is 2026-12-05 and ALTEN's is 2026-11-29, both before the
+        2026-12-07 send window, so a packet cannot be spent on either. That is the
+        window's price, paid for the first time on something worth having —
+        ALTEN's GPU Kubernetes brief is the closest ad of the lane to this
+        fleet's accelerator work.
+
+        Scheer and UKA park on fit: Scheer is routing, switching, firewall and VPN
+        with automation only desirable, and UKA is Microsoft administration —
+        M365, Hyper-V, Entra ID, Exchange Hybrid, SQL Server, PRTG, Veeam — with
+        Linux and Proxmox desirable but not the job.
+
+        Exit: Brose preps now and sends 2026-12-07, the four stay parked, and an
+        ad whose validThrough falls inside the window is parked at the read
+        instead of carried to prep.
+      '';
+    };
     job-scout-decisions-2026-11-25e = {
       title = "The 2026-11-25e five are decided: spotixx and VCE get packets, three hold";
       kind = "decision";

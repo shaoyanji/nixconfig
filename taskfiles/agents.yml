@@ -285,13 +285,12 @@ tasks:
   agents:cv:publish-check:
     desc: "[gate] CV lane: the is-a.dev site publishes this build's CVs and links every one"
     summary: >
-      scripts/task/cv-blog-check.sh: six PDFs must hash equal to
+      scripts/task/cv-blog-check.sh: the six published PDFs — cv, cv-de,
+      cv-energy, cv-energy-de, cv-software, cv-software-de — must hash equal to
       `.#sites.matt-site` and, in `_site`, be the target of an anchor with
-      `download` that resolves. Measured 2026-11-24: exit 0, 6/6 hash-equal in
-      checkout and `_site`, 6/6 anchors resolving. The lane note claiming the
-      copies and four variant anchors outstanding, a permanent failure and an
-      outdated German fleet did not reproduce: "dreizehn Hosts" matches the 13
-      active NixOS hosts. Env: BLOG_REPO, ARTIFACT, SITE, REQUIRED. Exit 0
+      `download` that resolves. Measured 2026-11-25: exit 0, 6/6 hash-equal and
+      6/6 anchors resolving; the German CV's "dreizehn Hosts" still matches the
+      13 active NixOS hosts. Env: BLOG_REPO, ARTIFACT, SITE, REQUIRED. Exit 0
       linked, 1 drift, 2 cannot tell. Deploys, sends and commits nothing.
     cmds:
       - bash scripts/task/cv-blog-check.sh

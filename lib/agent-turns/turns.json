@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-25T04:20:07Z",
+  "generated": "2026-11-25T04:22:10Z",
   "count": 200,
-  "pin": "515aea00cd0037a63a21c9e5eeb369ca1ee32c7bc2ac26089dfa986078b10ac2",
+  "pin": "3cf2e6be8dc4a585de23de228312e9f9707248e495a96407c2fd9a1e6cdc3bdf",
   "turns": [
+    {
+      "id": "f7167d18-0c81-4bdb-979f-b3daa24903d6",
+      "ts": "2026-11-25T04:20:24Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: shared checkout discipline adopted in HOME-PREAMBLE §Agent turns (named-path staging, no add -A/commit -a, stash = somebody else's work, worktree-per-lane); incident count = xs turns on <repo>:worktree-race, zero at adoption; note CLOSED | gate: .#homeAgents.frieren card contains rule, agentsNotes.issues []",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "effb77aab9cc27aa821288af1cd43976feae2591",
+      "branch": "main",
+      "frame": "03has7mp36a9cj2n4ml3towze"
+    },
     {
       "id": "83e24371-94e0-471a-b598-e4334f3e6e10",
       "ts": "2026-11-25T04:19:43Z",
@@ -2648,19 +2661,6 @@
       "base_commit": "ccfe5ab26f480611c4dc7952b76023efc931bf28",
       "branch": "main",
       "frame": "03happrhxjwezck9eitwxopca"
-    },
-    {
-      "id": "91a84591-0c53-4371-b78c-fcd4e72de5d5",
-      "ts": "2026-11-24T20:36:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "note: landed job-lane-queue-delphi-2026-11-24 on main — tracker consistent after 5 Supabase/Managed Postgres dupe rows closed with the Ashby-applied row standing, DeepL packet prepared (CAPTCHA hand-submit only), boards mined out (RemoteOK + BA jobsuche 403), prep queue and fit-5 lead tail listed, next action named. No sweep started. | gate: agentsNotes.issues [] + docs-budget rc=0 + taskfile-graph rc=0 + pre-push PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hapoxcdm74jxjrao7ted7j6"
     }
   ]
 }

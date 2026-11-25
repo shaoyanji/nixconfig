@@ -46,15 +46,16 @@ tasks:
   # the one-line summary is the notes, and the owner rides the status line
   # because the table has none — where list and search can see it.
   apps:scout:
-    desc: Record one scouted lead — --family, --company, --role, --summary required (--owner, --status, --url, --fit, --next-action, --id, --dry)
+    desc: Record one scouted lead — --family, --company, --role, --summary required (--owner, --status, --url, --fit, --next-action, --sweep, --id, --dry)
     summary: >
       One lead a sweep found. `--family devops|sre|platform|infrastructure`,
       `--company`, `--role` and `--summary` are required; `--owner` defaults to
-      `agent:apps`; `--status`, `--url`, `--fit 1-5`, `--next-action` and `--id`
-      are optional. Summary goes to `notes`, family to `origin` `scout:<family>`;
-      the status defaults to `lead (scout <family>, owner <owner>)` — no owner
-      column, so it rides the status line where list and search show it. The
-      same company and role updates one row. Exit 2 = bad input; `--dry` prints only.
+      `agent:apps`; `--status`, `--url`, `--fit 1-5`, `--next-action`, `--sweep`
+      and `--id` are optional. Summary goes to `notes`, family to `origin`
+      `scout:<family>`, or `scout-2026-11-25p` with `--sweep`, the provenance
+      25a..o carry. Status defaults to `lead (sweep <cycle>, <family>, owner
+      <owner>)` — no owner column, so it rides the status line. Same company and
+      role updates one row. Exit 2 = bad input; `--dry` prints only.
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" bash scripts/task/apps-scout.sh {{.CLI_ARGS}}
 
@@ -121,6 +122,35 @@ tasks:
           '2026-12-05' 'novomind' 'parked on expiry' \
           '2026-12-07' 'HxGN' 'parked on expiry'
         printf '\nrecheck: read the posting once after its date; gone = drop, reposted = file at scout-{{.SWEEP}}.\n'
+
+  # A closed cycle is a fact the next pass should not re-derive: 25j through
+  # 25o each read the boards and either filed rows or proved them flat. The
+  # static half is that closure; the live half counts the archive by origin,
+  # because a note id and the origin its rows carry are not the same number —
+  # 25j's note landed as l, 25o's rows sit under n, and only the ledger says so.
+  apps:scout:cycles:
+    desc: Closed sweep cycles 25j..25o — rows at close, then live drift per origin (PREFIX)
+    summary: >
+      Six cycles, closed. `25k` was a dedupe pass, and `25l`/`25o` are note ids
+      whose rows live under an earlier origin, so a zero-row cycle is closed and
+      never missing. The static half is the closure record; the live half counts
+      the archive per origin `scout-<cycle>` and prints beside it, where a
+      difference is drift to reconcile and never a reason to re-file. Read-only:
+      the query is the only network, and it needs the tailnet SQL transport.
+    vars:
+      PREFIX: '{{.PREFIX | default "scout-2026-11-25"}}'
+    cmds:
+      - |
+        printf '%s\t%s\t%s\n' 'cycle' 'rows at close' 'state'
+        printf '%s\t%s\t%s\n' \
+          '25j' '3' 'filed: feed flat by hash, three German ads (note l)' \
+          '25k' '0' 'dedupe pass over the 25i rows, no writes by design' \
+          '25l' '0' 'note id only: the 25j sweep rows sit under j' \
+          '25m' '6' 'filed: six German platform leads' \
+          '25n' '10' 'filed by two lanes: three first, seven after' \
+          '25o' '0' 'note id only: seven rows filed under n'
+        printf '\nlive, rows per origin in the archive\n'
+        {{.APPS_DB}} query "select origin, count(*) as rows from applications where origin like '{{.PREFIX}}%' group by origin order by origin" || printf 'query unavailable: the static closure above still stands\n'
 
   apps:upsert:
     desc: Add or refresh one application record — JSON or TOON (CLI_ARGS is a file, or pipe stdin; FORMAT=toon for the row back)

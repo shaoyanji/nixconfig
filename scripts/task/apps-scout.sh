@@ -5,6 +5,9 @@
 # table has no family column and no owner column, so a lead maps onto what does
 # exist, the same way the mail hub maps the employers it discovers:
 #   family  -> origin `scout:<family>` (indexed, and the provenance it is)
+#   sweep   -> origin `scout-<sweep>` when --sweep is given: a sweep's rows
+#              carry the cycle, not the family, and the family stays on the
+#              status line — which is what sweeps 25a..o already wrote
 #   summary -> notes (the row's one free-text column)
 #   owner   -> the status line, where apps:list and apps:search show it
 #   status  -> `lead (scout <family>, owner <owner>)`, which stages as `lead`
@@ -24,9 +27,10 @@ usage() {
   cat >&2 <<'EOF'
 usage: apps-scout.sh --family F --company C --role R --summary S
                      [--owner O] [--status S] [--url U] [--fit 1-5] [--next-action N]
-                     [--id ID] [--dry]
+                     [--sweep ID] [--id ID] [--dry]
 
   --family   devops | sre | platform | infrastructure (required; case-insensitive)
+  --sweep    the cycle the row belongs to (2026-11-25p): origin `scout-<sweep>`
   --company  employer as it writes it (required)
   --role     the title on the ad (required)
   --summary  one line: why this role is worth a packet (stored as notes)
@@ -41,7 +45,7 @@ EOF
 }
 
 family=""; company=""; role=""; summary=""
-owner="agent:apps"; status=""; url=""; fit=""; id=""; next_action=""; dry=0
+owner="agent:apps"; status=""; url=""; fit=""; id=""; next_action=""; dry=0; sweep=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -54,6 +58,7 @@ while [ "$#" -gt 0 ]; do
     --url) url=${2:-}; shift 2 ;;
     --fit) fit=${2:-}; shift 2 ;;
     --next-action) next_action=${2:-}; shift 2 ;;
+    --sweep) sweep=${2:-}; shift 2 ;;
     --id) id=${2:-}; shift 2 ;;
     --dry) dry=1; shift ;;
     -h | --help) usage; exit 0 ;;
@@ -85,10 +90,22 @@ if [ -n "$fit" ] && ! [[ "$fit" =~ ^[1-5]$ ]]; then
   exit 2
 fi
 
-[ -n "$status" ] || status="lead (scout $family, owner $owner)"
+if [ -n "$sweep" ] && ! [[ "$sweep" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z]?$ ]]; then
+  echo "apps-scout: --sweep must look like 2026-11-25p" >&2
+  exit 2
+fi
+
+origin="scout:$family"
+if [ -n "$sweep" ]; then
+  origin="scout-$sweep"
+fi
+
+if [ -z "$status" ]; then
+  if [ -n "$sweep" ]; then status="lead (sweep $sweep, $family, owner $owner)"; else status="lead (scout $family, owner $owner)"; fi
+fi
 
 args=(--company "$company" --role "$role" --status "$status" --notes "$summary"
-  --origin "scout:$family")
+  --origin "$origin")
 [ -n "$url" ] && args+=(--apply-url "$url")
 [ -n "$fit" ] && args+=(--fit "$fit")
 # The next action rides the same write: a lead with no next action is a row

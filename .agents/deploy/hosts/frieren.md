@@ -286,3 +286,11 @@ slots instead of being spent twice. The last slot keeps RESERVE=10 back, so an
 evening batch does not find the day already swept. `persistent =
 false`, because catching up three missed slots at boot would burst into the
 limit the spacing avoids.
+
+The audit's outcome is state, not prose: `agy-nightly-system` writes its record
+to `/var/lib/agy-system` — tmpfiles makes it owned by the unit's user so the
+user-unit write and the root sentinel read the same file — and `SYSTEM.md`
+keeps its one owner (the agent run asked to refine it, or the human). It cannot
+live under `$HOME`: the sentinel collector runs with `ProtectHome`. A regex
+substitution into the hand-authored SYSTEM.md failed silently when the wording
+moved or the path was read-only; a file write fails where it happened.

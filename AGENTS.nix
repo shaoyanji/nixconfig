@@ -2967,11 +2967,12 @@
       status = "OPEN";
       priority = "P3";
       date = "2026-10-21";
-      summary = "4169 comment lines sit in tracked .nix files (AGENTS.nix excluded); qmd already retrieves them, so the fix is pruning narrative, not adding an index.";
+      summary = "4169 comment lines sit in tracked .nix files (AGENTS.nix excluded); qmd already retrieves them, so the fix is pruning narrative, not adding an index. Every Story:/Trap:/Fact: pointer in the heavy files now resolves — the port map is docs/delphi-runtime.md's mount table.";
       refs = {
         hosts = ["delphi" "frieren"];
-        modules = ["hosts/delphi/configuration.nix" "hosts/frieren/configuration.nix" "lib/aki-site.nix"];
+        modules = ["hosts/delphi/configuration.nix" "hosts/frieren/configuration.nix" "hosts/frieren/infra-stack.nix" "lib/aki-site.nix"];
         tasks = ["dev:qmd:refresh"];
+        docs = ["docs/delphi-runtime.md" ".agents/deploy/hosts/frieren.md"];
       };
       body = ''
         **The goal is routing, not deletion.** A comment is not slop because it
@@ -2989,21 +2990,20 @@
         task (`taskfiles/*.yml`) or a `writeShellApplication`; the prose keeps a
         pointer. A *durable explanation* goes to `docs/`, served by the site.
 
-        **Measured 2026-10-21** (scale, not a verdict): 4169 comment lines; the
-        heaviest were delphi, frieren, aki-site, eisen's llm-server, checks.nix.
+        **Measured** 2026-10-21 at 4169 lines (delphi, frieren, aki-site,
+        eisen's llm-server, checks.nix heaviest); 7014 by 2026-11-23, when
+        61a1f1ba took the boilerplate and a banner pass routed durable-why.
 
-        **Re-measured 2026-11-23**: 7014 lines, 6217 header-class. Prune 61a1f1ba
-        took the boilerplate slice; a banner pass routed every durable-why file
-        to its note or docs page. Remaining: per-block `Story:`/`Trap:` cites.
+        **Cite sweep 2026-11-25**: every `Story:`/`Trap:`/`Fact:` pointer in
+        the heavy files resolves. `Fact: port map` was dangling — the mount
+        table in `docs/delphi-runtime.md` is it now; infra-stack's uncited
+        blocks moved to its deploy doc and `image-daily-queue`. Residual
+        mass is inline explanation, the accepted end state.
 
-        **Discovery is already solved.** qmd indexes the .nix tree (2052 files):
-        `qmd search disko` → `flake/host-inventory.nix` at 91 %. Probe with one
-        distinctive token: BM25 matches tokens, not quoted sentences.
-
-        **Pipeline rule, enforced.** `channels-have-a-task` asserts every channel
-        still has an entry point, so a category cannot be orphaned by removing a
-        task: inventory → `dev:inventory:feed`, notes → `ops:notes`, policies →
-        `checks:policies`, docs → `docs:build`.
+        **Discovery is already solved** — qmd indexes the .nix tree; probe
+        with one distinctive token. **Pipeline rule, enforced:**
+        `channels-have-a-task` — inventory → `dev:inventory:feed`, notes →
+        `ops:notes`, policies → `checks:policies`, docs → `docs:build`.
       '';
     };
     open-minyx-2611 = {
@@ -6826,32 +6826,32 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Scout 2026-11-25g: eight boards read in full, the first German batch after the ATS pool ran dry.
-Boards and what answered: germantechjobs RSS (1,291 postings) plus ten tag pages,
-berlinstartupjobs feed and engineering pages, WeWorkRemotely three feeds (120), RemoteOK base
-and devops tag, Ashby 48 slugs (17 boards, 973 postings), Personio 18 slugs (2 feeds, 343
-positions), SmartRecruiters 23 slugs (DeliveryHero, 100 rows); Stepstone refused every request.
-Dedupe: 198 platform-family titles, 90 at employers already on record, 53 US, UK or APAC. The six
-German or EU-remote Ashby titles are all held — enpal, 1komma5grad, Camunda, Kubermatic — and
-WWR plus RemoteOK's 35 family roles are all outside scope, so the fresh German inventory sits on
-germantechjobs.
-Eight rows at scouted, origin scout-2026-11-25g:
-Enrichment Technology Linux Platform Engineer, Jülich 60-80k, band 5;
-PSI Software DevOps Engineer, Neuburg 45-75k, band 5;
-SIGNAL IDUNA Public Cloud Engineer, Dortmund 65-95k, band 5;
-NetCologne System Engineer Infrastructure, Cologne 62.4k, band 5;
-Fonds Finanz Cloud & Infrastructure Architect 50-70k, band 5;
-Porsche Consulting AI & Cloud Platform Engineer, remote 64-104k, band 5;
-Vonovia Cloud Architect Azure/AWS 60-85k, band 4;
-RA Radiology Head of Infrastructure 60-95k, band 4.
-The 100s are corpus coverage of a dense requirement block, not a ranking: the matcher normalizes
-against 60 points and saturates, so band 5 means the ad names the stack.
-Refused on shape or evidence: WALDNER (SAP Basis), CAL Consult (8+ years, contract-shaped),
-Starnberger Kliniken (network only), Amazon (location unstated, consulting), Trellix (manager,
-28-68k), KIND (release manager, 30-55k), plus Werkstudent, dual-study and 1st-level titles.
-Caveats: germantechjobs carries the requirement block, not the full ad, and no city for Vonovia,
-Fonds Finanz or RA Radiology; Porsche's ad makes a master's mandatory.
-Exit: nothing sent, nothing read past the block, held to 2026-12-07.
+        Scout 2026-11-25g: eight boards read in full, the first German batch after the ATS pool ran dry.
+        Boards and what answered: germantechjobs RSS (1,291 postings) plus ten tag pages,
+        berlinstartupjobs feed and engineering pages, WeWorkRemotely three feeds (120), RemoteOK base
+        and devops tag, Ashby 48 slugs (17 boards, 973 postings), Personio 18 slugs (2 feeds, 343
+        positions), SmartRecruiters 23 slugs (DeliveryHero, 100 rows); Stepstone refused every request.
+        Dedupe: 198 platform-family titles, 90 at employers already on record, 53 US, UK or APAC. The six
+        German or EU-remote Ashby titles are all held — enpal, 1komma5grad, Camunda, Kubermatic — and
+        WWR plus RemoteOK's 35 family roles are all outside scope, so the fresh German inventory sits on
+        germantechjobs.
+        Eight rows at scouted, origin scout-2026-11-25g:
+        Enrichment Technology Linux Platform Engineer, Jülich 60-80k, band 5;
+        PSI Software DevOps Engineer, Neuburg 45-75k, band 5;
+        SIGNAL IDUNA Public Cloud Engineer, Dortmund 65-95k, band 5;
+        NetCologne System Engineer Infrastructure, Cologne 62.4k, band 5;
+        Fonds Finanz Cloud & Infrastructure Architect 50-70k, band 5;
+        Porsche Consulting AI & Cloud Platform Engineer, remote 64-104k, band 5;
+        Vonovia Cloud Architect Azure/AWS 60-85k, band 4;
+        RA Radiology Head of Infrastructure 60-95k, band 4.
+        The 100s are corpus coverage of a dense requirement block, not a ranking: the matcher normalizes
+        against 60 points and saturates, so band 5 means the ad names the stack.
+        Refused on shape or evidence: WALDNER (SAP Basis), CAL Consult (8+ years, contract-shaped),
+        Starnberger Kliniken (network only), Amazon (location unstated, consulting), Trellix (manager,
+        28-68k), KIND (release manager, 30-55k), plus Werkstudent, dual-study and 1st-level titles.
+        Caveats: germantechjobs carries the requirement block, not the full ad, and no city for Vonovia,
+        Fonds Finanz or RA Radiology; Porsche's ad makes a master's mandatory.
+        Exit: nothing sent, nothing read past the block, held to 2026-12-07.
       '';
     };
 

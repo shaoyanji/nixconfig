@@ -73,7 +73,8 @@
       import websockets
 
       # delphi's gatus answers here since frieren's own was retired on
-      # 2026-11-04; loopback on this host now has no monitor UI behind it.
+      # 2026-11-04 (Story: note frieren-ops-history); loopback on this host
+      # now has no monitor UI behind it.
       endpoint = "http://100.123.145.53:8181/api/v1/endpoints/statuses"
       try:
           req = urllib.request.Request(endpoint, headers={"User-Agent": "FleetGatusReporter/1.0"})
@@ -287,14 +288,10 @@
       exit 0
     fi
 
-    # The outcome of an audit is state, not prose. This unit no longer rewrites a
-    # line inside SYSTEM.md — the document has one owner (the agent run that is
-    # asked to refine it, or the human), and the machine keeps its own record in
-    # /var/lib/agy-system, which tmpfiles creates owned by this user so the
-    # user-unit write and root's sentinel read the same file. It cannot live
-    # under $HOME: the sentinel collector runs with ProtectHome. A regex
-    # substitution into a hand-authored file failed silently when the wording
-    # moved or the path was read-only; a file write fails where it happened.
+    # The outcome of an audit is state, not prose: the unit writes its record
+    # to /var/lib/agy-system (not $HOME — the sentinel runs ProtectHome), and
+    # SYSTEM.md keeps its one human/agent owner. Why:
+    # .agents/deploy/hosts/frieren.md §"Agent scheduler".
     STATE_DIR="''${AGY_STATE_DIR:-/var/lib/agy-system}"
     if ! mkdir -p "$STATE_DIR" 2>/dev/null; then
       echo "=== [$(date)] WARN: cannot create $STATE_DIR; recording to the journal only ===" >&2
@@ -424,18 +421,12 @@
     fi
   '';
 
-  # The allowance is 100 images a day and the generator's burst limit is 25 an
-  # hour, so one nightly pass spends the day in minutes and then answers 429 for
-  # the rest of the hour. Four slots 6h20 apart each take an even share of what the
-  # day has left — 25 at 01:10 on a fresh day, less when a hand-run batch already
-  # spent some — which is the same 100 without the burst and cannot be spent twice.
-  # Every slot republishes the Cloudinary manifest, so the asset frontend follows
-  # the queue through the day, and each takes the roster's next unkept row with its
-  # leftover, which is what makes "more wallpapers" a roster edit rather than a
-  # supervised run. The last slot keeps 10 images back so an evening batch does not
-  # start by finding the day already swept. Tools are prepended to PATH: cpg still
-  # lives in the user profile, agy no longer does — the judge needs it from the
-  # closure or every slot fails its verdict step.
+  # Four daytime slots clear of the 03:00-05:30 window, each an even share of
+  # the day's remaining allowance (25/hour burst); a missed slot is not caught
+  # up. Design: .agents/deploy/hosts/frieren.md §"Agent scheduler" + note
+  # image-daily-queue. Tools are prepended to PATH: cpg still lives in the user
+  # profile, agy no longer does — the judge needs it from the closure or every
+  # slot fails its verdict step.
   imageDailySlot = slot: total: reserve:
     pkgs.writeShellScript "image-daily-slot-${slot}" ''
       set -uo pipefail
@@ -458,24 +449,21 @@
         ]
       }:"$PATH"
       export IMAGES_ROOT=/Volumes/data/pics/generated
-      # The Cloudinary and xs helpers read secrets through lib/paths.sh, which takes
-      # this as its repo root. The store copy of the source cannot carry it: the
-      # apikeys plane has no committed mirror, so `modules/secrets/` only exists in
-      # the checkout (and only with the submodule fetched). Pointing here is what
-      # lets `publish` sign an upload from a store-baked script.
+      # The Go verbs' secretGet and the xs helper resolve credentials through
+      # paths.sh, whose nixconfig_root() reads this. The apikeys plane has no
+      # committed mirror, so `modules/secrets/apikeys.yaml` only exists in the
+      # checkout — pointing here is what lets `publish` sign an upload from a
+      # store-baked script.
       export NIXCONFIG_ROOT=${user.home}/Documents/nixconfig
       export STORYBOOK_DIR=${user.home}/Documents/storybook/lantern
       export SLOT=${slot}
       export RESERVE=${toString reserve}
-      # A slot spends the queue first, then the standing character roster with what
-      # the slot's cap has left, and publishes once. The roster skips a row the
-      # judge already kept, so a round cut short by the hourly burst resumes on the
-      # next slot for free instead of waiting for someone to start it again. Neither
-      # phase publishes alone: one publish at the end is one manifest rewrite, and
-      # paths the manifest already serves are not uploaded twice.
+      # A slot spends the queue first, then the standing roster with what the
+      # cap has left, and publishes once: one manifest rewrite, and paths the
+      # manifest already serves are not uploaded twice (note image-daily-queue).
       # The whole source root, not the one file: the script resolves its own
-      # `../..` for the briefs, the roster, the Cloudinary and Pages helpers and
-      # the asset frontend, and a lone store-baked script resolves to `/`.
+      # `../..` for the briefs and roster, and a lone store-baked script
+      # resolves to `/`.
       daily=${../../.}/scripts/task/image-daily.sh
       ledger=$IMAGES_ROOT/ledger.jsonl
       rc=0

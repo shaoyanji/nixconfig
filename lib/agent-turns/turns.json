@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-25T02:40:39Z",
+  "generated": "2026-11-25T02:51:19Z",
   "count": 200,
-  "pin": "a9903a51333fee4a1bf1cca1fd6dc8113ee30115946009a35fea11bb396a7fc5",
+  "pin": "04ed18bcf20e708285f7171955ae403cd9e85e7b0f1cfa8863da936beaaecf8c",
   "turns": [
+    {
+      "id": "a6ce3085-b5f1-4c27-8d78-e3bebc7142e3",
+      "ts": "2026-11-25T02:50:54Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: 2026-11-25h — gtg re-read identical (1,291, 0 new, tags add no links); exact-name dedupe vs 955 employers exposed 94 unfiled; 6 rows scouted: Mecklenburgische b5, Fresenius b5, Vivantes b4, Röchling Industrial b4, Stadt Mannheim b4, Waldemar Link b3; refused ELAC, Röchling Medical, intersoft, Zech, alphacaps, Sunrise, SimonsVoss, sino, Allegion; prep only | gate: parse + issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03harq5ajcbiol5umhl6zvy0j"
+    },
+    {
+      "id": "285fe541-871c-418f-b565-22ee62909814",
+      "ts": "2026-11-25T02:46:53Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "claim: 2026-11-25h fresh-lead sweep — germantechjobs in full (RSS + 10 tags, paged) diffed against g's 1,291, ledger + 8 g rows for dedupe, FIT_MAP banding, note job-scout-sweep-2026-11-25h",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03harpcztq0631mk973kzcvx9"
+    },
+    {
+      "id": "b1801bf8-be36-4b15-95d2-8496a1f21f30",
+      "ts": "2026-11-25T02:46:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-delphi-lane",
+      "action": "landed: drove idle delphi (agents:3.1 ssh) with scout sweep 2026-11-25h — fresh DevOps/SRE/Platform/Infra leads, dedupe vs ledger + sweeps a..g, FIT_MAP banding, land note job-scout-sweep-2026-11-25h",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5071d2a995147d75eac1b196e91f46ea9d4fbd05",
+      "branch": "main",
+      "frame": "03harpcyzsq3xx0ot5uzchqo7"
+    },
+    {
+      "id": "aaf175dd-6430-431e-bb5a-a75160d23952",
+      "ts": "2026-11-25T02:46:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "landed: drove idle devin (agents:1.1) with the nix-comment-audit task — route the 4169 comment lines in tracked .nix files to their owning channels (policies to flake/policies.nix, fleet facts to inventory.toml, why/history to AGENTS.nix notes, procedures to taskfiles, durable explanations to docs/), heaviest files first",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5071d2a995147d75eac1b196e91f46ea9d4fbd05",
+      "branch": "main",
+      "frame": "03harpcxffxufa9zmwsorbmqz"
+    },
+    {
+      "id": "2932424b-b4e0-4119-901b-f2982deda24f",
+      "ts": "2026-11-25T02:41:12Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "landed: brose packet in submissions/brose-aws-system-engineer-bamberg — 1-page German letter + 2-page CV in the ad's own order (landing zone, permissions, IaC, change, monitoring, DR, FinOps), gaps stated up front (no production landing zone, no Terraform/CloudFormation, no AWS cert). Letter dated 2026-12-07, row stays prep, nothing sent | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5071d2a995147d75eac1b196e91f46ea9d4fbd05",
+      "branch": "main",
+      "frame": "03haro930v5s3ruta6qjqdwy6"
+    },
     {
       "id": "1afedc97-e228-4577-b77c-5938a102f3d7",
       "ts": "2026-11-25T02:39:02Z",
@@ -2561,71 +2628,6 @@
       "base_commit": "7b40455ecfe53678967728d370ed2e99d9c10bbb",
       "branch": "main",
       "frame": "03hap3f5us58lfe5gxz4el9wp"
-    },
-    {
-      "id": "5b7e1dd9-60a9-445a-9736-736412acbec2",
-      "ts": "2026-11-24T18:45:58Z",
-      "source": "devji",
-      "subject": "nixconfig:code-review-loop",
-      "action": "landed: appflow-board locations generated from route lists + service-portal builtins/lib aliases unified | gate: checks:hosts delphi+frieren PASS (2132 assertions, frieren module-system rc=0)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d21ce272d15cd9946517dfaec492418ce68a51bf",
-      "branch": "main",
-      "frame": "03hap3f42txt8gbfhltxxukwn"
-    },
-    {
-      "id": "1b333781-333e-4a99-9c57-3d4d171818fc",
-      "ts": "2026-11-24T18:44:36Z",
-      "source": "steward",
-      "subject": "nixconfig:steward:delphi",
-      "action": "landed: drove idle delphi pane (agents:3, ssh) — jev-decide note-change p1.0/m1.0; scout 2-3 new openings and land sweep note; pane confirmed working (working... 15s; first Enter ignored, resent)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
-      "branch": "main",
-      "frame": "03hap35gu184xhozvq374tx4j"
-    },
-    {
-      "id": "8feb8d59-79da-4213-ba0f-c4e800810db3",
-      "ts": "2026-11-24T18:44:36Z",
-      "source": "steward",
-      "subject": "nixconfig:steward:freebuff",
-      "action": "landed: drove idle freebuff pane (agents:2) — jev-decide note-change p1.0/m1.0; scout 2-3 new DevOps/SRE/Platform/Infra leads and land sweep note; pane confirmed working (working... 7s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
-      "branch": "main",
-      "frame": "03hap35ehueo54nm9gwbr7l2a"
-    },
-    {
-      "id": "88b64d14-b0b9-4b19-8596-d441f4b166cd",
-      "ts": "2026-11-24T18:44:35Z",
-      "source": "steward",
-      "subject": "nixconfig:steward:devin",
-      "action": "landed: drove idle devin pane (agents:1) — jev-decide chain-change p0.83/m0.70; continue nixconfig refactor on next shared module in the chain; pane confirmed working (Thinking 3s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "164af385d553fc459c856f1f8de4a1698b6f2410",
-      "branch": "main",
-      "frame": "03hap35cenjd3d64g9l5ym2iz"
-    },
-    {
-      "id": "026a024d-9d2c-487c-927a-cdb9adf9c18c",
-      "ts": "2026-11-24T18:36:01Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correct: sweep8 found no new employer — Projektron was already tracked as projektron-gmbh-cloud-engineering (lead) and is now updated with the verified posting URL and the 2026-12-07 hold; only Abnormal Security EMEA was newly recorded (fit 2, end-user platform); rejected Intelerad US, synava MS-only, Jobgether aggregator | gate: apps:get readback",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9d9ee1ea4a5a94b0955d99aae957632dd4cbb58",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hap1h1xc9qry4vhqxqwxjac"
     }
   ]
 }

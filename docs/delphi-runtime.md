@@ -99,13 +99,37 @@ visible only inside the tailnet.
 Everything reachable from the tailnet is a loopback listener plus a `tailscale
 serve` mount, never a public vhost; tailscaled terminates TLS, so no cert per service.
 
-| Port | Service | Unit | Upstream |
+The port map — every tailnet mount and its loopback upstream, compiled in
+`services.servicePortal.mounts` (`hosts/delphi/configuration.nix`):
+
+| Port | Service | Required unit | Upstream |
 | :--- | :--- | :--- | :--- |
-| 8443 | DeepSeek Harness | `tailscale-serve-dsh` | `127.0.0.1:3080` |
-| 8444 | System One decisions (`/v1/systemone`) | `tailscale-serve-systemone` | `127.0.0.1:8091` |
-| 8445 | Stirling PDF | `tailscale-serve-pdf` | `127.0.0.1:7351` |
-| 8446 | Service console (the compiled tailnet portal) | `tailscale-serve-portal` | `127.0.0.1:8082` |
-| 8461 | Media relay (browse page + fuzzy search, range-served library) | `tailscale-serve-media` | `127.0.0.1:8094` |
+| 8327 | Free-model gateway (OpenAI-compatible relay, bearer key under `~/.dsh/openai-gateway/`) | `dsh-free-models.service` | gateway port |
+| 8443 | Free models dashboard (dsh's retired port, reused) | `dsh-free-models.service` | web port |
+| 8444 | System One decisions (`/v1/systemone`) | `systemone-decision-serve.service` | `127.0.0.1:8091` |
+| 8445 | Stirling PDF | `stirling-pdf.service` | `127.0.0.1:7351` |
+| 8446 | Service console (the compiled tailnet portal) | `nginx.service` | `127.0.0.1:8082` |
+| 8447 | SearXNG | `searx.service` | `127.0.0.1:8888` |
+| 8448 | Uptime Kuma | `uptime-kuma.service` | `127.0.0.1:3001` |
+| 8449 | Agent turns (xs) — POST/GET `/v1/events`, bearer | `agent-turns-shim.service` | agent-turns port |
+| 8450 | Email archive (NpgsqlRest; machine-facing, no `/` page) | `npgsqlrest.service` | `127.0.0.1:8080` |
+| 8451 | **reserved** — the archive's document benchmark | — | — |
+| 8452 | Mail atlas | `nginx.service` | mail-atlas port (`8085`) |
+| 8453 | Zettel graph | `zettel-graph.service` | `127.0.0.1:8083` |
+| 8454 | Mataroa console | `mataroa-console.service` | `127.0.0.1:8095` |
+| 8455 | Miniflux | `miniflux.service` | `127.0.0.1:8098` |
+| 8456 | Umami | `umami.service` | `127.0.0.1:8061` |
+| 8457 | Radicale (CalDAV/CardDAV) | `radicale.service` | `127.0.0.1:5232` |
+| 8458 | ntfy push | `ntfy.service` | `127.0.0.1:8096` |
+| 8459 | Vikunja tasks | `vikunja.service` | `127.0.0.1:8097` |
+| 8460 | Agent turns dashboard | `turns-dashboard.service` | `127.0.0.1:8099` |
+| 8461 | Media relay (browse page + fuzzy search, range-served library) | `nginx.service` | `127.0.0.1:8094` |
+| 8463 | Job pipeline board (appflow) | `nginx.service` | `127.0.0.1:8462` |
+
+8462 is the board's loopback vhost, not a mount — `tailscale serve` and nginx
+both bind, so a mount and its upstream never share a number. Mounts are a
+sequential namespace: a retired mount's number stays free until a new service
+argues for it, and collisions that happened are in note `delphi-ops-traps`.
 
 Both the mounts and the console are compiled from `services.servicePortal`, and
 `modules/services/service-portal.nix` fails the build when a mount has no card, no

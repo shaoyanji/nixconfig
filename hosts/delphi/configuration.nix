@@ -662,7 +662,7 @@ in {
 
   # No client can prelogin at the vault's own port: cli refuses http, the
   # *.frieren.lan cert lives on frieren's nginx, and crab-hole has no zone —
-  # so the name gets a static answer: frieren's tailnet IP (Fact: port map).
+  # so the name gets a static answer: frieren's tailnet IP (Fact: inventory.toml).
   # rbw is the vault client; bw survives for passkeys only.
   networking.hosts."100.97.61.65" = ["vault.frieren.lan"];
 
@@ -884,7 +884,7 @@ in {
   services.systemoneDecision = {
     enable = true;
     defaultModel = "julia-1";
-    # 8091 — 8090 is eisen's Laya; one port per mount (Fact: port map).
+    # 8091 — 8090 is eisen's Laya; one port per mount (Fact: inventory.toml).
     serve = {
       enable = true;
       port = 8091;
@@ -960,9 +960,9 @@ in {
     enable = true;
     config = {
       # 8093 is the agent-turns shim — miniflux lost it once (EADDRINUSE, 2026-11-06);
-      # 8098 is the next free port (Fact: port map; Story: note delphi-ops-traps).
+      # 8098 is the next free port (Fact: docs/delphi-runtime.md; Story: note delphi-ops-traps).
       LISTEN_ADDR = "127.0.0.1:8098";
-      # mounts are a sequential namespace — 8453/8454 zettel+mataroa (Fact: port map).
+      # mounts are a sequential namespace — 8453/8454 zettel+mataroa (Fact: docs/delphi-runtime.md).
       BASE_URL = "https://${tailnetHost}:8455";
     };
     adminCredentialsFile = config.sops.templates."miniflux-admin.env".path;
@@ -1355,7 +1355,7 @@ in {
           # browsed through `mail-atlas`, and the endpoint is machine-facing.
           hideCard = true;
         };
-        # 8451 — reserved for the archive's document benchmark (Fact: port map).
+        # 8451 — reserved for the archive's document benchmark (Fact: docs/delphi-runtime.md).
         mail-atlas = {
           port = 8452;
           upstream = "http://127.0.0.1:${toString config.services.mailAtlas.port}";

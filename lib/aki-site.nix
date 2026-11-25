@@ -704,7 +704,7 @@
               <td>${toString (builtins.length (e.refs.hosts ++ e.refs.modules ++ e.refs.tasks ++ e.refs.docs))}</td>
             </tr>
           '')
-          (lib.sort (a: b: a.id < b.id) (lib.attrValues agentsNotes.notes))}
+          (lib.sortOn (x: x.id) (lib.attrValues agentsNotes.notes))}
           </tbody>
         </table>
       '';

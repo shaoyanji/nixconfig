@@ -252,7 +252,7 @@
   cardsFor = audiences:
     lib.concatMapStrings (g: let
       inGroup =
-        lib.sort (a: b: a.title < b.title)
+        lib.sortOn (x: x.title)
         (lib.filter (c: c.group == g && builtins.elem c.audience audiences) visible);
     in
       lib.optionalString (inGroup != []) ''

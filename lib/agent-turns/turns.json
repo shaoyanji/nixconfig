@@ -1,8 +1,62 @@
 {
-  "generated": "2026-11-25T10:24:06Z",
+  "generated": "2026-11-25T10:33:25Z",
   "count": 200,
-  "pin": "d50440c30702ed26cce06ef896d347c108bcbac1683b5042871525c155c57a41",
+  "pin": "55e5894c992430ef5cb649b03499e879660821cf39e286c193d8ecde77b1727f",
   "turns": [
+    {
+      "id": "0f7c7bd2-bde1-490b-a67f-cc940b8e88e3",
+      "ts": "2026-11-25T10:32:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25j",
+      "action": "corrected: the earlier done frame named 89dc6caa, which was the previous head — the note was not committed then because git commit had the pathspec before -m. Note job-scout-sweep-2026-11-25j is now landed in 8d01c957; agentsNotes.issues [] and task apps:dupes PASS still hold",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8d01c95713c18aa42305723eff44c26019c8f53e",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hau886hbpmwrq4ncssvd6d3"
+    },
+    {
+      "id": "f9a38f18-1200-4ed6-bf67-9a7d2f70d129",
+      "ts": "2026-11-25T10:31:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25j",
+      "action": "landed: sweep 2026-11-25j — 3 new rows at scouted on origin scout-2026-11-25j, band 5 (TKMS fit 88, Kontron AIS 90, GGW Group 100); DRK-Blutspendedienst and KIRCHHOFF Witte in lane but failed validation (germantechjobs -> de.talent.com redirect lands on a generic search); note job-scout-sweep-2026-11-25j, 30-line body, schema clean | gate: task apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hau8644cxs2qpnp46h9iko3"
+    },
+    {
+      "id": "81cfdf03-424a-43f7-8815-f6d2919c975c",
+      "ts": "2026-11-25T10:26:09Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25j",
+      "action": "claim: sweep 2026-11-25j — re-read Stepstone metro pages, germantechjobs RSS, BSJ, WWR, RemoteOK; exact-name dedupe against 1372-row ledger and prior sweeps; band new rows FIT_MAP 1..5; land note job-scout-sweep-2026-11-25j",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hau72uw1na5eepc5vczui5r"
+    },
+    {
+      "id": "9961f6e3-834b-48a3-a1eb-0832cc29daaf",
+      "ts": "2026-11-25T10:24:17Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: pipe pass 11 — epistemics preferredRoute attrNames-lookup to lib.mapAttrsToList, agents-notes entryList to builtins.attrValues (exact: noteIds attrNames-sorted, ordered re-sorts); note records refused sites | gate: drv-equality 30/30, epistemics spend/table eval, counts total 269",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "83df611b8415aa7b4276f93ead1e5aaf7af24b0b",
+      "branch": "main",
+      "frame": "03hau6ppv7cs8bm4pbpunsf8v"
+    },
     {
       "id": "91c68a3b-05d1-4bd6-925f-ac186b87d575",
       "ts": "2026-11-25T10:22:36Z",
@@ -2637,58 +2691,6 @@
       "base_commit": "673a3cdadf47bc951d25ae123b2fe4233b34d0a9",
       "branch": "main",
       "frame": "03harht8m05gsgihvonz0rqqp"
-    },
-    {
-      "id": "fde6aadb-208c-4b53-a796-261699a6a3e2",
-      "ts": "2026-11-25T02:05:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "drove idle freebuff (agents:2.1) with decide-the-five held leads from sweep 2026-11-25e (send now vs hold, record verdicts) — jev-decide classify needs_review (novel 0.40 / decision 0.25) then duel selected novel p=0.83 m=0.66 exit 0; working... 17s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "673a3cdadf47bc951d25ae123b2fe4233b34d0a9",
-      "branch": "main",
-      "frame": "03harhdcxblqovyvoewg6m5lt"
-    },
-    {
-      "id": "a8c8780b-70fb-4944-a8bd-289d7c7cf831",
-      "ts": "2026-11-25T02:05:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: decided the 2026-11-25e five from live JSON-LD reads — all five answer 200, so datePosted separates them. Packets: spotixx (2 days old, GCP, 60-80k) and VCE (11 months but re-upped to 2027-01-03, closest hands-on match). Held on evidence: QAVION (evergreen, unnamed client), Amber (3 days on site, secops), hubside (recruiter, Nutanix). Send window 2026-12-07 intact | gate: agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "673a3cdadf47bc951d25ae123b2fe4233b34d0a9",
-      "branch": "main",
-      "frame": "03harhd070pwzy4yowpp4tjca"
-    },
-    {
-      "id": "fa17f366-aa71-486b-ba88-065456074c03",
-      "ts": "2026-11-25T02:05:19Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-go-port",
-      "action": "drove idle devin (agents:1.1) with image-daily cloudinary-curl Go port (add/blog/gc via cloudinary.sh) — jev-decide classify needs_review (task-change 0.38 / publish 0.32) then duel selected task-change p=0.80 m=0.60 exit 0; Typing spinner confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d9fbb240c1f8f7b20e14251ceef386748ddec4b",
-      "branch": "main",
-      "frame": "03harh8qm5ntf98cs7r6mz4ov"
-    },
-    {
-      "id": "2f724fce-5b0d-4ea0-9bda-4f2219f8276b",
-      "ts": "2026-11-25T02:00:22Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: 2026-11-25e boards pass — 15 arbeitnow pages (3,516 listings, 11 read, none platform), 60 ATS boards (2,080 postings, 86 family titles all held), HN Nov thread, germantechjobs (21 new, 5 read); 3 rows at scouted (DIN 4, Bonnier 3, Vetter 3, fit sent as band 1-5), PSI and netgo dropped as held; note id -boards because job-scout-sweep-2026-11-25e was taken by the concurrent five-row turn | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03harg9vc7a37l9hh6h2nkg4n"
     }
   ]
 }

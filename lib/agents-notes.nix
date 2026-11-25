@@ -193,7 +193,7 @@
 
   entries = lib.genAttrs noteIds (id: entry id raw.${id});
   entryList = builtins.attrValues entries;
-  ordered = entryList |> lib.sort (a: b: a.id < b.id);
+  ordered = entryList |> lib.sortOn (x: x.id);
 
   # Two whole-corpus rules, not per-note ones: a cycle in `from` has no single
   # guilty note, and SCHEMA §3's "SUPERSEDED links the replacement" is only

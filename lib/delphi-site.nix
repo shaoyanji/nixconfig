@@ -92,7 +92,7 @@
   tailnetCards =
     cardRegistry
     |> lib.filter (c: c.audience == "tailnet")
-    |> lib.sort (a: b: a.title < b.title);
+    |> lib.sortOn (x: x.title);
   publicCards = byAudience "public";
   lanCards = byAudience "lan";
   withheld = builtins.length tailnetCards;

@@ -6071,6 +6071,33 @@
         attrValues, drv-equality 30/30 identical.
       '';
     };
+    lib-pipe-sorton = {
+      title = "Pipe sweep pass 12: ascending single-attr sort comparators are sortOn, five sites";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-mapattrstolist-attrvalues"];
+      summary = "`lib.sort (a: b: a.f < b.f)` is `lib.sortOn (x: x.f)` — verified the combinator exists on the pin first (the filterMap lesson). Five sites: agents-notes ordered (id), epistemics permitted (key), service-portal inGroup (title), delphi-site tailnetCards (title), aki-site note table (id). Descending `>` sites and complex comparators stay — sortOn is ascending-only.";
+      refs = {
+        modules = ["lib/agents-notes.nix" "flake/epistemics.nix" "modules/services/service-portal.nix" "lib/delphi-site.nix" "lib/aki-site.nix"];
+        tasks = ["checks:drv-equality" "checks:host"];
+      };
+      body = ''
+        `lib.sortOn f` decorates, sorts, undecorates — O(n) key calls instead
+        of O(n log n), and the comparator name now says what the sort is
+        FOR. Refused sites: every `a.f > b.f` comparator (matt-site sortKey/
+        start/projectRank, aki-site bytes, nix-comments lines) — no
+        descending sortOn exists and `sort |> reverse` is a documented
+        non-class; `a < b` on scalars (docs.nix names, service-exposure)
+        has nothing to project; epistemics's ranked sort carries a let-bound
+        tier computation — real comparator logic, not a projection.
+        Gates: fleet-docs-site builds (aki-site renders every note row
+        through sortOn id), drv-equality 30/30 identical, checks:host
+        frieren rc=0 (service-portal), epistemics.table verdict rows
+        intact, counts.total 270, issues [].
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

@@ -395,7 +395,7 @@
     permitted =
       verdicts
       |> builtins.filter (v: v.go)
-      |> lib.sort (a: b: a.key < b.key);
+      |> lib.sortOn (x: x.key);
     strip = v: {
       inherit (v) name cost why offline metered fanout ev;
     };

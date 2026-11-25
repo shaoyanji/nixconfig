@@ -1,8 +1,164 @@
 {
-  "generated": "2026-11-25T12:49:50Z",
+  "generated": "2026-11-25T13:45:14Z",
   "count": 200,
-  "pin": "34812ed8063b2a26fc61cecac58d732b934d65c352e4d97633859009d3b1a642",
+  "pin": "82b599a7c6892ff8ec5fa2e2bcc0133745cbe9b90f95391643aa4bbe2f241792",
   "turns": [
+    {
+      "id": "e0ac6db2-6f7f-475a-b4fb-76acc2325973",
+      "ts": "2026-11-25T13:39:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-2026-11-25a",
+      "action": "corrected commit: page folded at 9b73fa3 (amend of 876893b, acronym casing only); 30 rows filed fit 5:17 4:4 3:9, table 99 rows, nothing sent | gate: jekyll production build + check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav8vcyysp2iify0jm1f1g9"
+    },
+    {
+      "id": "f1729f09-225e-4153-b8e1-16246621e405",
+      "ts": "2026-11-25T13:39:08Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-2026-11-25a",
+      "action": "landed: 30 new employers filed (sweep 25a: 6 LinkedIn role/city pages DE/NL/AT/CH 200, 1 429; 6 Stepstone pages 200; 48 cards, 18 already in ledger); CV job-search table 99 rows, fit 5:38 4:28 3:33 | gate: jekyll production build + check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav8ry69mwa7qrzd241m1bt"
+    },
+    {
+      "id": "520032c0-1453-42a1-b6ee-73aa689364b2",
+      "ts": "2026-11-25T13:36:59Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-cv-lane",
+      "action": "landed: drove freebuff pane (agents:2.1) to continue the job-scout / CV lane scouting DevOps SRE Platform Infrastructure leads; thinking... confirmed after Enter",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav8cseffi5r88qw1c72o0l"
+    },
+    {
+      "id": "915b0dab-13fb-440a-a1da-429091f9cdb5",
+      "ts": "2026-11-25T13:36:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-gate",
+      "action": "landed: drove devin pane (agents:1.1) to verify the image-daily publish gate; gate check running, fresh Thinking spinner confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav8byz4hjsvk9uvtd3lgdt"
+    },
+    {
+      "id": "ebb6c0a8-9421-48c8-a141-a891480a3457",
+      "ts": "2026-11-25T13:30:12Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-publish-2026-11-25",
+      "action": "landed: published CV + personal site — pushed 8e7c54b (3 commits) to shaoyanji/shaoyanji.is-a.dev, Pages run 45623920503 build+deploy success; live /cv/ serves 71 tr / 69 ad links, 6 PDFs byte-identical to repo | gate: jekyll production build + check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav718v4abaytif1fjx4low"
+    },
+    {
+      "id": "3e73c073-ddda-416f-8cd0-09d1ed3a85cf",
+      "ts": "2026-11-25T13:27:39Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-search-freebuff-lane",
+      "action": "landed: publish CV site task to freebuff pane",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav6j7jsn77rhw36t7o3h41"
+    },
+    {
+      "id": "d8d123eb-e0ec-4667-a001-f6aab77c5923",
+      "ts": "2026-11-25T13:13:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward",
+      "action": "landed: drove IDLE pane agents:1.1 (devin / nixconfig refactoring) with a publish task. Routed via jev-decide classify --provider typesafe -> publish, p=0.89 margin=0.84 (decisive, exit 0). Sent via tmux load-buffer -b + paste-buffer + Enter; fresh 'Thinking · 1s' counter confirmed acceptance. Task: publish-check nixconfig (git status vs origin/main; push if pending).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav3tzbym98mcsywx4wsftl"
+    },
+    {
+      "id": "185899e8-f48e-4f5f-a3b5-0a7015a706a1",
+      "ts": "2026-11-25T13:07:21Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "matt-site publish: built 17 pages + 6 CVs, deployed preview + prod (77a48904); live was stale (thirteen->twenty-five + DevOps/SRE copy now live) | gate: matt:cv:check 14/0, site-links green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav2kif7b38c7gw3tmqp7bg"
+    },
+    {
+      "id": "5bdfed9d-b0c3-4a6d-afc3-88260f288ef7",
+      "ts": "2026-11-25T13:04:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:tmux-pane-steward",
+      "action": "drove idle panes: agents:1.1 freebuff CV-site publish task (Thinking 2s); agents:3.1 wallpaper-worker wallpaper task (working 22s)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav22twk91mguoe4dmynw4c"
+    },
+    {
+      "id": "dfe0daa1-1acb-45ea-8b54-aef0274a13eb",
+      "ts": "2026-11-25T13:02:03Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-2026-11-25z",
+      "action": "landed: 24 new employers filed (third pass, 7 LinkedIn pages DE/AT/NL + 8 Stepstone role pages, 17 dropped as ledger duplicates); CV job-search table 69 rows, sorted by fit | gate: jekyll build + check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hav1j5lfgb0mysunvi8wucz"
+    },
+    {
+      "id": "3b679de7-6925-4382-9bb6-6d306b6ac960",
+      "ts": "2026-11-25T12:50:08Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: lib-pipe-sweep-closed decision note — records the audit floor across lib/flake/modules/hosts so future passes skip the non-classes (filterMap, lib.sum, descending sortOn, scalar identity) | gate: agentsNotes.issues=[], ok=true",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hauz7dbeo60ac3fyb1x734f"
+    },
+    {
+      "id": "d9bbab6f-58bb-4760-9c13-333ba078078a",
+      "ts": "2026-11-25T12:49:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-2026-11-25z",
+      "action": "corrected: table rebuilt from the ledger after the first dump used a non-existent column; 69 rows across x/y/z reduce to 68 table rows | gate: blog build + check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
+      "branch": "main",
+      "frame": "03hauz5ruayer8dvph7b2kc3o"
+    },
     {
       "id": "a160df53-a56e-4128-964f-74ce651e9cb1",
       "ts": "2026-11-25T12:49:31Z",
@@ -2524,177 +2680,6 @@
       "base_commit": "92c0f6dd9c0c8da9d10290a9841be062fc99d409",
       "branch": "main",
       "frame": "03has1sdi9tns0l3zs2t57hld"
-    },
-    {
-      "id": "b4c6601e-2893-4475-8cf9-930a6038d64c",
-      "ts": "2026-11-25T03:49:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: AGENTS.nix job-scout-sweep-2026-11-25l (decision, ACCEPTED) — gtj feed byte-identical to 25i (sha cf313395, 586 items, sha256 in note), 155 family titles/129 firms, exact dedupe vs 972-firm ledger leaves 80 unheld (in-house admin), ATS only held employers; 3 rows on origin scout-2026-11-25j (EOS, WinValue packets; AND-E parked), both 1p+2p built in ad order, nothing sent, held 2026-12-07 | gate: agents-notes-schema PASS, issues []",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [
-        "AGENTS.nix"
-      ],
-      "base_commit": "92c0f6dd9c0c8da9d10290a9841be062fc99d409",
-      "branch": "main",
-      "frame": "03has1n039i6v5yi5fwerd6zs"
-    },
-    {
-      "id": "c4275a71-1b09-4553-8b35-cca5f6d37efe",
-      "ts": "2026-11-25T03:42:42Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: dedupe of the six 2026-11-25i rows — Rheinmetall (same req as rheinmetall-it-solutions lead) and Schwarz Digits (GT1923 = dup of stackit-iac, applied 11-22) parked with band-5 evidence; DENIC, mgm, PROTOS, Viridium stand scouted | gate: parse + issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03has09lshzldeqkx220wjsbf"
-    },
-    {
-      "id": "c2f325a3-0925-439d-a93e-820aeb26281e",
-      "ts": "2026-11-25T03:42:34Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "claim: dedupe verdict and note for the six scout-2026-11-25i rows",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03has08ow9araxn29orstd5j3"
-    },
-    {
-      "id": "03b5a355-bbbd-488e-9a7a-7091a37d4415",
-      "ts": "2026-11-25T03:42:11Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "claim: dedupe verdict and note for the six scout-2026-11-25i rows",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03has05wmhgp7vs6rqcv5wfw6"
-    },
-    {
-      "id": "b6b5bdf3-14fa-48c9-949b-2985d9ecad6a",
-      "ts": "2026-11-25T03:41:03Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: routed novel direction (duel) to agents:3.1 (delphi ssh) - file the six unheld rows of scout-2026-11-25i, dedupe vs apps-db ledger, scout-or-hold per FIT_MAP, no sends",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
-      "branch": "main",
-      "frame": "03harzy038e4y5dom57bto13n"
-    },
-    {
-      "id": "3ea73b51-93e7-46f3-8209-eb012b7ad832",
-      "ts": "2026-11-25T03:41:03Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: routed novel direction to agents:2.1 (freebuff) - start job-scout sweep 2026-11-25j: fresh vendor-board leads, dedupe vs ledger sweeps a-i, packet-or-park, no sends",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
-      "branch": "main",
-      "frame": "03harzxyexfffkog2dr8x1lc1"
-    },
-    {
-      "id": "adbb8959-f169-444a-ad8d-8cfd7da8aec6",
-      "ts": "2026-11-25T03:41:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: routed bug-fix direction to agents:1.1 (devin) - fix appflow /api/applications upstream-404 on delphi, then residual appflow-board.nix wiring cleanup, promote lane note if green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
-      "branch": "main",
-      "frame": "03harzxwxm0fgasgs3oz7n7kz"
-    },
-    {
-      "id": "b4f9cc3c-12d9-4927-914a-fba460f9a9dd",
-      "ts": "2026-11-25T03:40:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "claim: sweep 2026-11-25j — eight boards (germantechjobs RSS+tags, berlinstartupjobs, WWR, RemoteOK, Ashby, Personio, SmartRecruiters, Stepstone), exact-name dedupe against the 965-firm ledger, packet-or-park per fresh lead; no sends this cycle",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix",
-        "scripts/task/apps-scout.sh"
-      ],
-      "files": [],
-      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
-      "branch": "main",
-      "frame": "03harztrotsidyrk64da1mvag"
-    },
-    {
-      "id": "a9709c24-6921-485e-a50d-cc4d215d3f24",
-      "ts": "2026-11-25T03:33:42Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: 2026-11-25i pass 2 (note j) — Stepstone reachable (listings plain, details need Referer); 228 cards, 6 unheld rows on origin scout-2026-11-25i; gtg identical 1,291/0; bsj 28 links/1 infra, WWR+ROK US-only, ATS 3 postings; dedupe caught Testo+SEW, KubeOps=Bechtle refused | gate: parse + issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haryi85pa4k9tb1mnoyruvt"
-    },
-    {
-      "id": "ff5aa6ac-025b-4a1c-8705-0c94e0b18cfd",
-      "ts": "2026-11-25T03:29:49Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-todo-2026-11-25i",
-      "action": "landed: AGENTS.nix note job-scout-todo-2026-11-25i (kind open, OPEN, P2, from job-scout-sweep-2026-11-25i) lists the two held packets (JACOB, NT-ware) and the three parked rows as todos, all held to 2026-12-07 with 2026-12-21 follow-ups; nothing sent | gate: checks.x86_64-linux.agents-notes-schema PASS, agentsNotes.issues []",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [
-        "AGENTS.nix"
-      ],
-      "base_commit": "a027db1ed640afa0a251020f57a6a6863b3e901b",
-      "branch": "main",
-      "frame": "03harxqz5yipwf97ud984lzqv"
-    },
-    {
-      "id": "0f418a49-0ac8-4ea8-8d90-fd0c368c1c2e",
-      "ts": "2026-11-25T03:29:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "landed: routed note-change direction to agents:2.1 (freebuff) - promote AGENTS.nix open-todo handoff note for sweep 2026-11-25i (5 scouted, 2 packets JACOB+NT-ware, 3 parked IPB/MIWE/Proxmox held to 2026-12-07, nothing sent); pane now working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0250ace4eb5d315cce03121e879a12dc0a68b6f4",
-      "branch": "main",
-      "frame": "03harxmbjhtfas1zn4nxy8k1b"
-    },
-    {
-      "id": "90af5bb8-31b1-4b9b-9c1c-03805e96f72d",
-      "ts": "2026-11-25T03:29:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: routed note-change direction to agents:1.1 (devin) - promote AGENTS.nix note recording the image-daily Go port as CLOSED + nix-comment-audit cite-sweep outcome, with an open-todo pointer for the remaining nixconfig refactoring follow-ups; pane now working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0250ace4eb5d315cce03121e879a12dc0a68b6f4",
-      "branch": "main",
-      "frame": "03harxma1pzu36o0vc4s7w3rc"
     }
   ]
 }

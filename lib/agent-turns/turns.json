@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-25T09:17:20Z",
+  "generated": "2026-11-25T09:26:20Z",
   "count": 200,
-  "pin": "3e8c7d4d3ad3fd61e9f312352cbc82b0f2c1ea5ab3aa6752bd33a82aabd319a5",
+  "pin": "231095335f981ec4d7d17b912774b697777e7ed696b5b8c9c360a49f8728ff34",
   "turns": [
+    {
+      "id": "005a5895-b3c0-4255-95f6-e40f1d92b28e",
+      "ts": "2026-11-25T09:25:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25v",
+      "action": "done: board sweep germantechjobs/WWR/RemoteOK/Stepstone(22 metro pages)/BSJ -> 1838 raw, 182 role rows, 122 ledger dups, 26 blocked (17 agency, 8 consultancy, 1 in-sweep), 16 filed (15 + Funk after name-filter false positive), 1 validation failure (Advantest feed stub, no employer URL); ranked by GitHub org activity + posting freshness into ~/.local/state/appflow/outreach/2026-11-25/ranked-25v.md. gate: apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hatv5nrrmhl4oabnpsu87we"
+    },
+    {
+      "id": "9ce3fc70-8b07-430a-9e6e-eb8cac593e40",
+      "ts": "2026-11-25T09:22:19Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: drive agents:1.1 devin lane — gate-change: continue nixconfig gate hardening, run checks:quick + check:verify, add seeded-tree fixture for next leaf gate lacking one, re-run gates, commit with gate evidence",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3f21420483974b1a849f136eeccd249081f9a099",
+      "branch": "main",
+      "frame": "03hatum2xp0v7lzsjhs9heczi"
+    },
+    {
+      "id": "547855ab-7f39-4421-9f75-f2f664c0283c",
+      "ts": "2026-11-25T09:17:30Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: lib |> pass 9 — the audit floor. 1 real fold (nix-registry concatLists-of-map to builtins.concatMap); the rest is documented non-classes: lib.filterMap is a phantom in nixpkgs (5 sites reverted), genAttrs cant recover element values, no lib.sum, netbook genList maps a lambda. Loop exhausted in lib/, flake/, modules/ | gate: nix-registry+registry-schema drvs build",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3f21420483974b1a849f136eeccd249081f9a099",
+      "branch": "main",
+      "frame": "03hatto0psh8v8688pbrq6f5y"
+    },
     {
       "id": "22795506-a027-4873-9bd1-5cfd898aa54a",
       "ts": "2026-11-25T09:16:49Z",
@@ -2638,45 +2677,6 @@
       "base_commit": "6916f4c73db14f75ebc7182a7e10bc006f0c3333",
       "branch": "HEAD",
       "frame": "03har7k91xfi3p16mni3gpyxe"
-    },
-    {
-      "id": "12ad4ebd-b721-4cae-bbad-3af6ae82b92c",
-      "ts": "2026-11-25T01:10:49Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "landed: 2026-11-25b sweep, all 8 rows decided. None had a stored JD (0 application_document rows) — each ad was read at source. packet: Airbus ML Data & Infra (JR10459530, air-gapped sovereign GPU clusters), ESQlabs Principal Platform (hermetic builds, SBOM, 100% remote). park: K+S 12-month term entry-level, Cosinex app-server ops, SEW CIAM identity pivot, ZF CCU hardware people-lead, 50Hertz duplicate. No packets, no sends. gate: 8 rows updated, stages re-counted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
-      "branch": "main",
-      "frame": "03har6licbq9ouq75qp19fu9l"
-    },
-    {
-      "id": "d58a3c81-e178-435a-b80e-506cbf0eac42",
-      "ts": "2026-11-25T01:09:35Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: fit 500 root cause = applications.fit CHECK 1..5 vs 0-100 scores; banded in apps-db.sh payload (FIT_MAP ladder); fit 70 upserts as 4, row intact | gate: shell-inputs + bash -n PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03har6cquzh0zy3l8rfmbq8pp"
-    },
-    {
-      "id": "aff36129-a1da-4c07-9805-28183192acb8",
-      "ts": "2026-11-25T01:06:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "drove idle delphi (agents:3.1 ssh) with fit-500 application-upsert bug fix — classify selected bug-fix p=0.83 m=0.72 exit 0; working... 15s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
-      "branch": "main",
-      "frame": "03har5tn1zm0pdwpmvapszsqm"
     }
   ]
 }

@@ -68,6 +68,7 @@
     "checks:infron" = "leaf";
     "checks:invalidation" = "cache";
     "checks:inventory:compiled" = "leaf";
+    "checks:inventory:compiled:test" = "leaf";
     "checks:kg" = "leaf";
     "checks:kg:canvas" = "leaf";
     "checks:kg:iets" = "leaf";

@@ -6451,5 +6451,46 @@
         window after the hold, and none of them is a send.
       '';
     };
+    job-scout-sweep-2026-11-25d = {
+      title = "Four leads after the boards went quiet: Whitecircle, Alan, Vitestro, Univé";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Hours after the c sweep, 14 Arbeitnow pages (3,181 listings) and 36 ATS boards left 152 family matches, 112 of them held; the 40 untracked names were mostly the c refusals and off-lane roles, and four survived at scouted with origin scout-2026-11-25d, fit banded 3-4 through FIT_MAP.";
+      from = ["job-scout-sweep-2026-11-25c"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:search"];
+      };
+      body = ''
+        Sweep 2026-11-25d, prep only, from delphi, 25 hours after c:
+        fourteen arbeitnow pages (3,181 listings) and 36 ATS boards (19 in
+        the first tier, 17 EU-heavy in the second) gave 152 family matches.
+        112 belonged to an employer already held (929 names, 1,209 rows);
+        the second tier's only unheld name was Alan.
+
+        The 40 untracked arbeitnow names were read one by one. Most were
+        the c refusals still standing (Accenture, capco's three listings,
+        Quantexa's VP seat, Phenogyag, Screeningeagle, EXCO's graduate
+        EE/OT req) or roles outside the lane: backend platform at Manychat,
+        DPG and BLP, Imc's first-line IT support, Quandela's hardware
+        systems engineer, Falu's freelance PLC contract, Trainline's
+        security seat and Agon's simulation software.
+
+        Filed at `scouted`, origin scout-2026-11-25d, held to 2026-12-07:
+        Whitecircle 80 (GPU Kubernetes, Paris) · Alan 70 (multi-cloud IaC,
+        remote FR/BE/ES) · Vitestro 70 (AWS architect, Utrecht) at band 4,
+        Univé 64 (Azure/AKS platform, Zwolle) at band 3. Alan's
+        work-eligibility rule is the first question; nothing is a send.
+
+        c's ten rows were read in and moved on before this sweep started
+        (nine parked, Oxoia at prep), so they were held, not re-filed.
+
+        Exit: `apps:scout STAGE=lead` lists the four. The small yield is
+        the finding: at this dedupe depth these boards are exhausted, so
+        the next sweep spends its budget on sources that still refuse us.
+      '';
+    };
   };
 }

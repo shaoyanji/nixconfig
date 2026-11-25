@@ -5873,11 +5873,11 @@
       kind = "open";
       status = "OPEN";
       priority = "P2";
-      date = "2026-11-24";
+      date = "2026-11-25";
       from = ["one-os-cli" "devin-lane-handoff-2026-11-24"];
-      summary = "Port end state: ~30 verbs in tools/os/internal/image behind .#cli.image.daily (argv[0] on the os umbrella); image-daily-*.sh is dispatch + env glue. Open: cloudinary curl in add/blog/gc, ffprobe in wallpaper, systemd-run detach in plates. Maintenance: image-daily-gate.sh greps symbol names in tools/os — renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
+      summary = "Port end state: ~30 verbs in tools/os/internal/image behind .#cli.image.daily; 13 unit tests plus a 9-assert fixture now pin every gate arm. Open: cloudinary curl in add/blog/gc, systemd-run detach in plates, ffprobe check in wallpaper; stash@{0} parked for the operator. The gate greps symbol names — renaming unjudgedStreak/shrinkGuard/modelProvider fails it by name.";
       refs = {
-        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "flake/cli.nix"];
+        modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "flake/cli.nix"];
         tasks = ["checks:image-daily" "checks:images:publish:test" "checks:images" "checks:images:ship:test" "images:gate"];
       };
       body = ''
@@ -5890,20 +5890,21 @@
         Shell keeps ~884 lines of dispatch, env/ledger resolution and
         command shims.
 
-        Gate state on this tree — all green (re-verified post-commit):
-        `checks:image-daily` (== `images:gate`): dispatch both ways, judge
-        fallback, both breakers, shrink guard. `checks:images:publish:test`:
-        5 assertions incl. fail-close on 470c9034^. `checks:images`: 750
-        urls.tsv rows == 750 manifest assets, same paths/URLs.
-        `checks:images:ship:test`: unset/empty PROMPT, DETACH=1 refuse.
-        Chain-module check `checks:hosts delphi frieren` (service-portal
-        importers): delphi eval 2132 assertions, frieren module-system rc=0.
+        Coverage landed 2026-11-25 (a4ae52b9, efe7901b, d17b7a69,
+        68b14291, 30435eaf): the publish fixture is 9 assertions — every
+        gate arm proven on 470c9034^ and strip mutations. 13 unit tests
+        in main_test.go pin the urls.tsv projection, skipReason's burn
+        vocabulary, the description cascade, the ffprobe cache loop
+        (TestShapesPass) and deploy_frontend's PAGES gate.
 
-        Open (deliberately still shell — external-process boundaries, not
-        domain logic): cloudinary curl in add/blog/gc via cloudinary.sh,
-        ffprobe in wallpaper, systemd-run DETACH in plates. A future slice
-        ports these; each file keeps its dispatch slot (gate checks both
-        directions).
+        Open (deliberately still shell — external-process boundaries):
+        cloudinary curl in add/blog/gc via cloudinary.sh, systemd-run
+        DETACH behind cmdRound in plates.go, ffprobe's presence check in
+        image-daily-wallpaper.sh (the probe itself is Go's dimensions).
+        Each file keeps its dispatch slot — the gate checks both ways.
+
+        Loose thread: stash@{0} "On main: pre-existing changes" is parked
+        from an aborted concurrent-lane rebase — not mine to pop or drop.
 
         Maintenance: the gate greps symbol NAMES — `modelProvider` +
         `GEMINI_API_KEY` (gen.go), `unjudgedStreak` (plates.go),

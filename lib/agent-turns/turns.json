@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-25T01:19:59Z",
+  "generated": "2026-11-25T01:24:21Z",
   "count": 200,
-  "pin": "95de858ed69080fd2f8666df4c52d0c77e43e20b6b8632177e0cb7a337434887",
+  "pin": "0e243f32fe4a5205a124dd5938d725f28d44829345ff11c57261b8c9f91e7d43",
   "turns": [
+    {
+      "id": "12307cc3-2c36-411f-8625-771dbdf6d5c1",
+      "ts": "2026-11-25T01:23:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "drove idle freebuff (agents:2.1) with 2026-11-25d lane-note task for the ten 2026-11-25c leads — classify needs_review (novel p=0.34 m=0.07) then duel needs_review note-change p=0.76 m=0.52 (margin >= 0.3, decisive, top by margin); working 15s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30435eafab9f2122dbd7697fb9a10ca63f2f9d73",
+      "branch": "main",
+      "frame": "03har94g5borbyl0cv0qyt0se"
+    },
+    {
+      "id": "eb48c8c6-7b76-4f5c-b638-79b9c2ee8f3e",
+      "ts": "2026-11-25T01:23:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin",
+      "action": "drove idle devin (agents:1.1) with image-daily port note task — classify needs_review (note-change p=0.34 m=0.06) then duel selected note-change p=0.92 m=0.84 exit 0; Running tools 4s confirmed",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "30435eafab9f2122dbd7697fb9a10ca63f2f9d73",
+      "branch": "main",
+      "frame": "03har94emn1znrv9fdcx8dqu6"
+    },
+    {
+      "id": "bfe45f8b-d4d2-4490-96f8-6086caa40044",
+      "ts": "2026-11-25T01:20:23Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "correction: the 2026-11-25c sweep commit was pushed after a rebase (remote main moved); real landing is 9ee5a02c with note job-scout-sweep-2026-11-25c, 10 rows at scouted / fit 4-3, nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03har8gpmx5h7is3ajflvspcm"
+    },
+    {
+      "id": "b84c103f-9993-461e-a339-5f88acc47226",
+      "ts": "2026-11-25T01:20:05Z",
+      "source": "delphi",
+      "subject": "nixconfig:job-search-delphi",
+      "action": "landed: 2026-11-25c sweep - 10 new employers filed at scouted (origin scout-2026-11-25c, fit 4/3 banded via FIT_MAP, upsert no 500); dedupe vs 920 held names, ATS+arbeitnow 94 matches; note job-scout-sweep-2026-11-25c; nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03har8eobrzxe4y5ket29lo69"
+    },
     {
       "id": "b03dcb01-d4e7-486b-bce0-748feb552acd",
       "ts": "2026-11-25T01:15:52Z",
@@ -2577,60 +2629,6 @@
       "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
       "branch": "main",
       "frame": "03hao57sub88veieqzy5w5p20"
-    },
-    {
-      "id": "dd8a465e-8c14-4e1c-a822-c83181255829",
-      "ts": "2026-11-24T15:50:52Z",
-      "source": "freebuff-cv",
-      "subject": "nixconfig:cv-publish",
-      "action": "landed: publish gate task sent to freebuff CV lane — commit AGENTS.nix and run cv-blog-check.sh",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
-      "branch": "main",
-      "frame": "03hao57pugncapg50i7t8l4wq"
-    },
-    {
-      "id": "40493af9-05f9-4b08-b876-4c5fba19d9f9",
-      "ts": "2026-11-24T15:50:38Z",
-      "source": "devin",
-      "subject": "nixconfig:gate-change",
-      "action": "landed: gate-change task sent to devin — bearer gate for delphi rebuild, checks:infron fix",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
-      "branch": "main",
-      "frame": "03hao560lj9ee3olfa6939yvb"
-    },
-    {
-      "id": "32e46a06-d495-4b46-94c6-c85206256de6",
-      "ts": "2026-11-24T15:49:33Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-publish-gate",
-      "action": "landed: agents:cv:publish-check records the measured CV publish state; cv-blog-check now also fails on a built PDF the checkout does not publish | gate: taskfile-graph PASS (802 tasks, no hard violations), cv-blog-check PASS (6 CVs)",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/agents.yml scripts/task/cv-blog-check.sh"
-      ],
-      "files": [],
-      "base_commit": "2cd75ebbf4f7f615d290c1627e53f3facecf1f78",
-      "branch": "main",
-      "frame": "03hao4ydcsiklq1jsr5x3xi0l"
-    },
-    {
-      "id": "584ca2bc-6579-421b-905b-92d280236325",
-      "ts": "2026-11-24T15:32:01Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: note delphi-job-scout-send-blocked in AGENTS.nix under the delphi notes. nixconfig:job-scout-fresh is blocked on the send half — task --list-all has no apps:send verb and Flink publishes no mailbox — so a person sends; next is a prep-only DevOps/SRE/Platform/Infra lead sweep held to 2026-12-07, nothing sent. EU careers-page gap + packet order cited from job-scout-eu-vendor-pages-gap-2026-11-24 | gate: checks:kg PASS, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c47ee74342b601fb734366c9c9481fe5ace1d383",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hao1j3hubquz3t6wuujzsyt"
     }
   ]
 }

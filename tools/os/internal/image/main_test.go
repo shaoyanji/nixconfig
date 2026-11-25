@@ -194,6 +194,16 @@ func TestShapesPass(t *testing.T) {
 	}
 }
 
+// cmdDeploy's first gate is PAGES: anything but unset-or-1 returns before the
+// root check, before the nix-shell wrangler exec — so a publish on a host that
+// must not deploy skips the leg entirely and in-process.
+func TestDeployPagesGate(t *testing.T) {
+	t.Setenv("PAGES", "0")
+	// No --root, no nix-shell, no network: if the gate were not first this
+	// would die() and kill the test binary.
+	cmdDeploy([]string{})
+}
+
 // skipReason's reject list is the 0-of-43 burn's vocabulary: the verdicts the
 // judge emitted while the account route was quota-dead. Removing one of these
 // strings re-admits the burn's own verdict rows as real judge output.

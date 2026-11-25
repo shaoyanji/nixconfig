@@ -41,6 +41,11 @@ cmd_add() { # FILE [URL]
     # A URL handed over is the upload that already happened (image-gen uploads
     # before it reports one); without it the file crosses here, under the same
     # `assets/<rel>` id publish and adopt derive, so all three stay one path.
+    # A session-gated render URL is not delivery — it answers 401 to anyone
+    # but its maker, so it counts as no upload and the file crosses here too.
+    case $url in
+    *chatplayground* | */api/files/*) url="" ;;
+    esac
     if [ -z "$url" ]; then
       url=$("$(image_daily_cli)" cloudinary upload "$file" --public-id "$id" --repo "$repo") ||
         die "add: upload failed for $rel"

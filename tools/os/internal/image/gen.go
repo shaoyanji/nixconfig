@@ -161,6 +161,16 @@ func secretGet(repo, key string) string {
 	return strings.TrimSpace(string(out))
 }
 
+// secretGetJSON is the same read for a structured value: `sops --extract`
+// prints YAML for a map, and this package has no YAML parser — --output-type
+// json makes the extract machine-readable for a key like ["CLOUDINARY"].
+func secretGetJSON(repo, key string) string {
+	script := fmt.Sprintf(`. '%s' 2>/dev/null || true; sops -d --output-type json --extract '%s' "$(apikeys_file)" 2>/dev/null || true`,
+		repo+"/scripts/task/lib/paths.sh", key)
+	out, _ := exec.Command("bash", "-c", script).Output()
+	return strings.TrimSpace(string(out))
+}
+
 // attempt is `attempt`: one generation call, one plate. rc carries the shell's
 // contract — 0 ok, 1 failed, 2 burst window closed, 3 allowance spent.
 func attempt(root, id, lane, size, name, prompt, day string, n, rev int) (string, int) {

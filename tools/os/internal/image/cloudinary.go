@@ -38,18 +38,19 @@ func cloudinaryCreds(repo string) (cloudCreds, error) {
 	var c struct {
 		Name string `json:"NAME"`
 		API  struct {
-			Key    string `json:"KEY"`
-			Secret string `json:"SECRET"`
+			// The apikeys file stores KEY unquoted — a number, not a string.
+			Key    json.Number `json:"KEY"`
+			Secret string      `json:"SECRET"`
 		} `json:"API"`
 	}
-	raw := secretGet(repo, `["CLOUDINARY"]`)
+	raw := secretGetJSON(repo, `["CLOUDINARY"]`)
 	if err := json.Unmarshal([]byte(raw), &c); err != nil {
 		return cloudCreds{}, errors.New("CLOUDINARY not in the apikeys file (is the modules/secrets submodule checked out?)")
 	}
 	if c.Name == "" || c.API.Key == "" || c.API.Secret == "" {
 		return cloudCreds{}, errors.New("CLOUDINARY.NAME, CLOUDINARY.API.KEY and CLOUDINARY.API.SECRET are all required")
 	}
-	return cloudCreds{c.Name, c.API.Key, c.API.Secret}, nil
+	return cloudCreds{c.Name, c.API.Key.String(), c.API.Secret}, nil
 }
 
 // cloudSign is the shell's sha1 of the alphabetical signed-param string with

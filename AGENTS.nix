@@ -6075,6 +6075,47 @@
         and filed only if reposted.
       '';
     };
+    job-scout-sweep-2026-11-25u = {
+      title = "Sweep 25u: ten leads, five expiries inside the hold, and an expiry only on detail pages";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Cycle 25u read devops pages 1-3 and the other three lanes at pages 3-4: 216 cards, 165 in-family, 86 at employers the ledger does not hold, 41 after construction and agency trims, 16 detail reads. Ten filed on scout-2026-11-25u, five parked on an expiry inside the hold, one dropped for a 2029 validThrough.";
+      links = ["job-scout-sweep-2026-11-25t" "job-scout-fresh-packets-public"];
+      refs = {
+        modules = ["scripts/task/apps-scout.sh" "taskfiles/apps.yml"];
+        tasks = ["apps:scout" "apps:scout:sweep" "apps:scout:parked"];
+      };
+      body = ''
+        Read: devops pages 1-3, then platform, site-reliability and infrastructure at
+        pages 3-4. Nine pages, 216 unique cards, 165 in-family, 86 employers absent
+        from the 1,050-name ledger, 41 after the construction and agency trim —
+        Stepstone's infrastructure lane is mostly Bauingenieur work — and 16 detail
+        pages read before a verdict.
+
+        Filed ten on `scout-2026-11-25u`, all at stage `lead`: Ascent Digital
+        (München/Graz, 4), Bijou Brigitte (Hamburg, 4), EOS Technology (Hamburg
+        team lead, 4), LivEye (Föhren, 4), Paychex Europe (Rostock, 4), TÜV NORD
+        SERVICE (Essen, 4), S-Management/DSV (Stuttgart, 4), POLIPOL (Diepenau, 3),
+        moysies & partners (Hamburg, 3) and Diehl Aerospace (Frankfurt, 3).
+
+        Parked on an expiry inside the hold: Anexia netcup (2026-12-01), Compliance
+        Solutions (12-05), MRH TROWE (11-28), GEMA (11-29), TUM Campus Heilbronn
+        (12-04). Hotzone was dropped — its card claims validThrough 2029, a feed
+        artefact rather than a live ad.
+
+        Held already: BMW Group, BWI, Bank11, Deutsche Telekom, Diehl Defence, and
+        DHBW under its acronym, which is why exact-name dedupe needs the house token.
+
+        This cycle put validThrough only on detail pages: all 216 listing cards came
+        back with the field empty, so an expiry read from the card would have been a guess.
+
+        Exit: each of the ten is tailed into `prep` after 2026-12-07 with a tailored
+        packet, or dropped with the row saying why; the five parked are rechecked
+        after their dates and filed only if reposted.
+      '';
+    };
     devin-lane-handoff-2026-11-24 = {
       title = "Devin lane: image-daily pool helpers landed; two uncommitted gate files; jev routes idle panes";
       kind = "handoff";

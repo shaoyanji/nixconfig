@@ -26,7 +26,7 @@ in {
     );
     dangling = lib.unique (
       builtins.filter (p: !(builtins.elem p paths)) (
-        builtins.concatLists (map nixFilesCtl.importsOfPath paths)
+        builtins.concatMap nixFilesCtl.importsOfPath paths
       )
     );
   };

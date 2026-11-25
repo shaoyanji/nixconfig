@@ -5955,6 +5955,34 @@
         fleet-docs-site resolves, all five files parse.
       '';
     };
+    lib-pipe-loop-exhausted = {
+      title = "The lib |> loop is audited to exhaustion; one concatMap fold, and the folds that do not exist";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-cmssep-replicate"];
+      summary = "Pass 9: `concatLists (map f xs)` in nix-registry folds to `builtins.concatMap` (one site; the file's other leg already spelled it). The bigger finding is the audit's floor: `lib.filterMap` does not exist in nixpkgs — `map f |> filter (x != null)` IS the canonical spelling, and five candidate sites were reverted when eval proved it.";
+      refs = {
+        modules = ["flake/nix-registry.nix" "flake/checks.nix" "lib/nix-files.nix" "flake/policies.nix"];
+        tasks = ["checks:nix-registry" "checks:policies"];
+      };
+      body = ''
+        What was tried and refused, recorded so the next pass does not retry:
+        `lib.filterMap` is a phantom — not in `lib`, not in `lib.lists`, on this
+        pin; `map f |> filter (!= null)` stays. `lib.genAttrs` cannot replace
+        `map (nameValuePair n v) |> listToAttrs` when the value needs the whole
+        element — genAttrs's fn receives the name only. `foldl' (a: b: a + e.f)
+        0` is the canonical field-sum; nixpkgs ships no `lib.sum`. `sort |>
+        reverse` is worse than a flipped comparator but no site exists. The
+        netbook `genList` maps a non-constant lambda — index-grouping, not the
+        pad class.
+        One fold did land: nix-registry's `concatLists (map importsOfPath
+        paths)` to `builtins.concatMap`, matching the concatMap already used
+        for the same file's dangling check.
+        Gate: nix-registry and registry-schema drvs build, all edits parse.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

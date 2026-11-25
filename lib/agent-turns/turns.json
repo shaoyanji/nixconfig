@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-25T09:13:50Z",
+  "generated": "2026-11-25T09:17:20Z",
   "count": 200,
-  "pin": "d9e3b5884bac2f57fbab89e77c177ddab7b197bd0c686f5a6afe27808d7513e2",
+  "pin": "3e8c7d4d3ad3fd61e9f312352cbc82b0f2c1ea5ab3aa6752bd33a82aabd319a5",
   "turns": [
+    {
+      "id": "22795506-a027-4873-9bd1-5cfd898aa54a",
+      "ts": "2026-11-25T09:16:49Z",
+      "source": "buffy",
+      "subject": "nixconfig:scout-2026-11-25v",
+      "action": "claim: board sweep germantechjobs, WWR, RemoteOK, Stepstone, BSJ; verify, dedupe vs ledger, upsert fresh leads, rank by GitHub activity + live posting",
+      "outcome": "in_progress",
+      "claims": [
+        "/tmp/25v"
+      ],
+      "files": [],
+      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hattj8q2v5uaaf9d97jyfj2"
+    },
+    {
+      "id": "ec157d45-04fe-47d5-90eb-441f25ffec56",
+      "ts": "2026-11-25T09:13:53Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-sweep-2026-11-25q-supplement",
+      "action": "landed: 25q supplement — 6 boards (gtj 586, WWR 79, RemoteOK 101, Ashby 65, BSJ 12, Personio 401), 842 rows, 147 in-family, 89 not held; 4 filed (GWDG fit 4, RockQ 3, WWK 2, alphacaps 2) and 4 packets built with per-app letters + JDs; note landed, sheet re-exported | gate: apps:audit PASS, #agentsNotes.ok PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2c36e25bb690af804bc5e2141a2191b1aaa393a3",
+      "branch": "main",
+      "frame": "03hatsyo67lpxugqfwsbartci"
+    },
     {
       "id": "d66e1a85-cf69-471e-a34f-daf6a8fe52af",
       "ts": "2026-11-25T09:09:47Z",
@@ -2649,32 +2677,6 @@
       "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
       "branch": "main",
       "frame": "03har5tn1zm0pdwpmvapszsqm"
-    },
-    {
-      "id": "77649581-52b4-43a9-a41f-7cb9b2fc9e85",
-      "ts": "2026-11-25T01:06:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-lane",
-      "action": "drove idle freebuff (agents:2.1) with eight-lead JD packet-or-park task — classify needs_review (decision p=0.71 m=0.58, top pick); working... 18s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
-      "branch": "main",
-      "frame": "03har5tl5bvtylsok1bo9g626"
-    },
-    {
-      "id": "aafba5c4-3e5a-4751-8d2f-d6d198238a60",
-      "ts": "2026-11-25T01:06:50Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "drove idle devin (agents:1.1) with image-daily shape-cache port task — classify needs_review (decision p=0.65 m=0.52, decisive, top pick); paste landed, Thinking confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "68b1429160ca0ce35573b80206829f1eb23f637e",
-      "branch": "main",
-      "frame": "03har5tje50pzgc56lw2sv58o"
     }
   ]
 }

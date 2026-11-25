@@ -92,6 +92,19 @@
         ];
       }
     ];
+  # The Linux plumbing every NixOS-assembly feature shares: systemd policy,
+  # Determinate Nix (one Nix binary for every NixOS host — see the module
+  # header for the priority and registry traps), HM integration, sops and
+  # nix-index. `nixos` and `containers` differ only in the kernel module that
+  # precedes it; `demo` opts out of sops/nix-index and spells its own.
+  nixosSupport = [
+    moduleFiles."global.linux-systemd"
+    moduleFiles."global.determinate-nix"
+    inputs.home-manager.nixosModules.default
+    inputs.sops-nix.nixosModules.sops
+    inputs.nix-index-database.nixosModules.nix-index
+  ];
+
   # Minimal sharedModules for home-manager-only (standalone) configs.
   hmSharedModulesHome =
     inventoryModules
@@ -129,17 +142,8 @@ in rec {
     # the nixpkgs overlays (simplex-chat, molly-brown, llm-agents).
     base = globalModules;
 
-    # The NixOS kernel of a desktop or VM host.
-    nixos = [
-      moduleFiles."global.nixos"
-      moduleFiles."global.linux-systemd"
-      # Determinate Nix: one Nix binary for every NixOS host (rollback = the
-      # generation). See the module header for the priority and registry traps.
-      moduleFiles."global.determinate-nix"
-      inputs.home-manager.nixosModules.default
-      inputs.sops-nix.nixosModules.sops
-      inputs.nix-index-database.nixosModules.nix-index
-    ];
+    # The NixOS kernel of a desktop or VM host, over the shared support list.
+    nixos = [moduleFiles."global.nixos"] ++ nixosSupport;
 
     # Dux shell: the compositor, greeter and Quickshell session every desktop
     # host runs. Imported as a unit — a host that owns its own shell would be a
@@ -167,14 +171,7 @@ in rec {
 
     # A container/WSL host: home-manager without a shell, and no
     # modules/global/nixos.nix.
-    containers = [
-      moduleFiles."global.noDE"
-      moduleFiles."global.linux-systemd"
-      moduleFiles."global.determinate-nix"
-      inputs.sops-nix.nixosModules.sops
-      inputs.home-manager.nixosModules.default
-      inputs.nix-index-database.nixosModules.nix-index
-    ];
+    containers = [moduleFiles."global.noDE"] ++ nixosSupport;
 
     demo = [
       moduleFiles."global.demo"

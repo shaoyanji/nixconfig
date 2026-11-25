@@ -313,8 +313,13 @@ func dueRows(root, repo, lane string) []dueRow {
 }
 
 // dimensions is the ffprobe read: the size in the request is not the size in
-// the file, so the plate is measured before it counts.
+// the file, so the plate is measured before it counts. The probe itself is a
+// host dependency, not a per-file outcome — its absence is a broken PATH, so
+// name it rather than reading every plate as shapeless.
 func dimensions(file string) string {
+	if _, err := exec.LookPath("ffprobe"); err != nil {
+		die("ffprobe is required to check a plate's shape (pkgs.ffmpeg)")
+	}
 	out, err := exec.Command("ffprobe", "-v", "error",
 		"-select_streams", "v:0", "-show_entries", "stream=width,height",
 		"-of", "csv=p=0", file).Output()

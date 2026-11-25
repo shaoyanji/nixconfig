@@ -5918,7 +5918,7 @@
       priority = "P2";
       date = "2026-11-25";
       from = ["one-os-cli" "devin-lane-handoff-2026-11-24"];
-      summary = "~30 verbs in tools/os/internal/image behind .#cli.image.daily; 22 unit tests plus a 9-assert fixture pin every gate arm; ship-detach, served and the cloudinary client moved the last curls to Go. Open: ffprobe check in wallpaper, image-gen's cpg auth; stash@{0} parked. Renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
+      summary = "~30 verbs in tools/os/internal/image behind .#cli.image.daily; 23 unit tests plus a 9-assert fixture pin every gate arm; ship-detach, served, cloudinary and the ffprobe presence check are Go. Open: image-gen's cpg auth and upload_bank. stash@{0} parked. Renaming unjudgedStreak/shrinkGuard/modelProvider fails the gate by name.";
       refs = {
         modules = ["tools/os/internal/image/main.go" "tools/os/internal/image/main_test.go" "tools/os/internal/image/ship.go" "tools/os/internal/image/cloudinary.go" "tools/os/internal/image/pool.go" "tools/os/internal/image/plates.go" "tools/os/internal/image/briefs.go" "scripts/task/image-daily.sh" "scripts/task/image-daily-lib.sh" "scripts/task/image-daily-gate.sh" "scripts/task/image-ship.sh" "flake/cli.nix"];
         tasks = ["checks:image-daily" "checks:images:publish:test" "checks:images" "checks:images:ship:test" "images:gate"];
@@ -5933,17 +5933,16 @@
 
         Coverage 2026-11-25 (a4ae52b9 through 71169d3e, plus this slice):
         the publish fixture is 9 assertions — every gate arm proven on
-        470c9034^ and strip mutations; 22 unit tests pin the urls.tsv
+        470c9034^ and strip mutations; 23 unit tests pin the urls.tsv
         projection, skipReason's burn vocabulary, the ffprobe cache loop,
         deploy_frontend's PAGES gate, ship-detach's systemd-run vector,
-        the served poll, and cloudinary.go's signing, upload, paged list
-        and destroy against httptest.
+        the served poll, cloudinary.go's wire contract against httptest,
+        and dimensions' die on a missing ffprobe (the wallpaper script's
+        last shell check, moved into the one place the probe runs).
 
-        Next slices, in order (external-process boundaries still shell):
-        (1) ffprobe's presence check in image-daily-wallpaper.sh — the
-            probe itself is Go's dimensions; (2) image-gen.sh's cpg auth
-            dance — upload_bank keeps cloudinary.sh until that slice.
-            Each file keeps its dispatch slot — the gate checks both ways.
+        Next slice (external-process boundary still shell): image-gen.sh's
+        cpg auth dance — refresh, the 401/429 backoff, upload_bank's
+        cloudinary.sh call. That port ends the family's shell curls.
 
         Loose thread: stash@{0} "On main: pre-existing changes" is parked
         from an aborted concurrent-lane rebase — not mine to pop or drop.
@@ -6641,35 +6640,35 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-Sweep 2026-11-25e, boards pass, prep only, from delphi: Arbeitnow, the
-ATS boards, the November HN thread and germantechjobs, deduped against the
-934-name ledger, on the post-d rule — German ad or EU-remote.
+        Sweep 2026-11-25e, boards pass, prep only, from delphi: Arbeitnow, the
+        ATS boards, the November HN thread and germantechjobs, deduped against the
+        934-name ledger, on the post-d rule — German ad or EU-remote.
 
-Arbeitnow: 15 of 16 pages, 3,516 listings, 134 family titles; 11 left
-after the ledger and place filters, all read, none a platform role
-(smart-hands networking, first/second-level support, a 20-hour
-generalist, ERP and M365 administration, construction planning).
+        Arbeitnow: 15 of 16 pages, 3,516 listings, 134 family titles; 11 left
+        after the ledger and place filters, all read, none a platform role
+        (smart-hands networking, first/second-level support, a 20-hour
+        generalist, ERP and M365 administration, construction planning).
 
-60 ATS boards: 2,080 postings, 86 family titles, every one held. The slug
-`grafanalabs` does not normalise to `Grafana Labs`, and `solarisbank` is
-the Solaris row already on record. The HN thread's 26 infra-plus-Europe
-comments named Simple Analytics, Namespace, Splash Tech and Proxima
-Fusion, all held; the rest were onsite or US/Canada/LATAM.
+        60 ATS boards: 2,080 postings, 86 family titles, every one held. The slug
+        `grafanalabs` does not normalise to `Grafana Labs`, and `solarisbank` is
+        the Solaris row already on record. The HN thread's 26 infra-plus-Europe
+        comments named Simple Analytics, Namespace, Splash Tech and Proxima
+        Fusion, all held; the rest were onsite or US/Canada/LATAM.
 
-germantechjobs was the only source with new employers: 21 after the
-filter, five read through the feed's requirement block because the pages
-are JS shells. PSI Software SE and netgo proved held, leaving three rows
-at scouted, origin scout-2026-11-25e, fit sent as the band because the
-column's CHECK is 1-5: DIN 76/4 (Azure, AKS, Terraform at a standards
-body), Bonnier Media 66/3 (Azure and IaC), Vetter Pharma 62/3 (OT DevOps,
-GitLab and Ansible in GxP). Held to 2026-12-07.
+        germantechjobs was the only source with new employers: 21 after the
+        filter, five read through the feed's requirement block because the pages
+        are JS shells. PSI Software SE and netgo proved held, leaving three rows
+        at scouted, origin scout-2026-11-25e, fit sent as the band because the
+        column's CHECK is 1-5: DIN 76/4 (Azure, AKS, Terraform at a standards
+        body), Bonnier Media 66/3 (Azure and IaC), Vetter Pharma 62/3 (OT DevOps,
+        GitLab and Ansible in GxP). Held to 2026-12-07.
 
-Refused on eligibility: Amazon (EU-member-state nationality), Airbus
-Defence and Space, Teledyne, ELAC SONAR, Enrichment Technology; on shape:
-Porsche Consulting, ALTEN, KIND, Scheer.
+        Refused on eligibility: Amazon (EU-member-state nationality), Airbus
+        Defence and Space, Teledyne, ELAC SONAR, Enrichment Technology; on shape:
+        Porsche Consulting, ALTEN, KIND, Scheer.
 
-The five rows of job-scout-sweep-2026-11-25e share this origin from a
-concurrent turn, so it holds eight and the stage twelve. Nothing is a send.
+        The five rows of job-scout-sweep-2026-11-25e share this origin from a
+        concurrent turn, so it holds eight and the stage twelve. Nothing is a send.
       '';
     };
   };

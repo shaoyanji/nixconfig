@@ -24,7 +24,6 @@ cmd_wallpaper() {
   local -a approved ids
   cli=$(image_daily_cli)
   mapfile -t approved < <(jq -r '.wall.in[]?' "$rotation" 2>/dev/null || true)
-  command -v ffprobe >/dev/null || die "ffprobe is required to check a plate's shape (pkgs.ffmpeg)"
 
   if [ "${#approved[@]}" -gt 0 ]; then
     # List order is priority: the first id that resolves is the wallpaper, so

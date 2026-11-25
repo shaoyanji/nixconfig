@@ -671,3 +671,23 @@ func TestCloudDestroy(t *testing.T) {
 		t.Fatalf("a non-ok result must refuse, got %v", err)
 	}
 }
+
+// Without ffprobe the measurement names the missing tool instead of reading
+// every plate as shapeless — subprocess because die() is os.Exit.
+func TestDimensionsRequiresFfprobe(t *testing.T) {
+	if os.Getenv("IMGTEST_DIE") == "1" {
+		os.Setenv("PATH", t.TempDir())
+		dimensions("whatever.png")
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run", "TestDimensionsRequiresFfprobe")
+	cmd.Env = append(os.Environ(), "IMGTEST_DIE=1")
+	out, err := cmd.CombinedOutput()
+	exit, _ := err.(*exec.ExitError)
+	if exit == nil || exit.ExitCode() != 1 {
+		t.Fatalf("expected exit 1 without ffprobe, got err=%v out=%s", err, out)
+	}
+	if !strings.Contains(string(out), "ffprobe") {
+		t.Fatalf("death should name ffprobe, got: %s", out)
+	}
+}

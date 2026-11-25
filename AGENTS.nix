@@ -6370,5 +6370,44 @@
         the next sweep fixes the fit upload before it adds rows.
       '';
     };
+    job-scout-sweep-2026-11-25c = {
+      title = "A ten-lead sweep on the fixed fit route: arbeitnow and the ATS boards, deduped against 920 employers";
+      kind = "open";
+      status = "OPEN";
+      priority = "P3";
+      date = "2026-11-25";
+      summary = "Arbeitnow's 2,855 in-window listings and fifteen ATS boards left 94 family matches and 29 untracked employers; ten survived the duplicate and non-fit filters and were filed at scouted with origin scout-2026-11-25c, fit banded 3-4 through FIT_MAP on the upsert route 6916f4c7 fixed.";
+      from = ["job-scout-dated-sweep-2026-11-25"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:dupes"];
+      };
+      body = ''
+        Sweep 2026-11-25c, prep only, from delphi: twelve arbeitnow pages
+        (2,855 listings) plus fifteen ATS boards (Greenhouse, Ashby, Lever)
+        covered the 2026-11-15 cutoff. 94 postings matched the family; 65
+        belonged to an employer already held (920 names, 312 rows at
+        scouted). The ATS half returned one fit, PostHog's SRE, which is
+        US-Pacific and refused on geography.
+
+        The 29 untracked names still carried duplicates and non-fits, and
+        each was read before it was dropped: Artefact under three company
+        strings, Decathlontechnology against the tracked Decathlon, Capco's
+        double listing, Accenture support, Quantexa's VP role, EXCO's
+        graduate EE/OT req, IT-High's first-line support, got IT's M365
+        admin, Screeningeagle's product owner and Phenogyag's project
+        manager.
+
+        Filed at `scouted`, origin scout-2026-11-25c, held to 2026-12-07:
+        Doctrine 74 · Artefact 72 · Oxoia 70 (band 4) · Optiverus 68 ·
+        Signal AI 66 · Opencast 62 · Alta Ares 58 · OBRO 58 · Talmatch 55 ·
+        S-quaar 55 (band 3). The scores are 0-100 at the source and the
+        route bands them, so the column holds 4 and 3: the 500 reported by
+        job-scout-dated-sweep-2026-11-25 is closed by 6916f4c7.
+
+        Exit: `apps:scout STAGE=lead` lists the ten for the first prep
+        window after the hold, and none of them is a send.
+      '';
+    };
   };
 }

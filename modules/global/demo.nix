@@ -13,19 +13,16 @@ in
     # Same inventory-data role list as global.noDE — `hmModules` on the demo
     # host's entry, the original role as the no-field fallback.
     hostName = config.networking.hostName or "";
-    hmModules =
+    # One predicate behind all three fields: the host's own value when its
+    # inventory entry names it, the fallback when it does not.
+    hostField = field: default:
       if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-      then hostInventory.${hostName}.hmModules or ["roles.demo"]
-      else ["roles.demo"];
+      then hostInventory.${hostName}.${field} or default
+      else default;
+    hmModules = hostField "hmModules" ["roles.demo"];
     # Leaf lists for user.base/user.ai, resolved the same way as hmModules.
-    hmBase =
-      if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-      then hostInventory.${hostName}.hmBase or (import self.modules."global.user").hmBaseFeatures
-      else (import self.modules."global.user").hmBaseFeatures;
-    hmAi =
-      if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-      then hostInventory.${hostName}.hmAi or (import self.modules."global.user").hmAiFeatures
-      else (import self.modules."global.user").hmAiFeatures;
+    hmBase = hostField "hmBase" (import self.modules."global.user").hmBaseFeatures;
+    hmAi = hostField "hmAi" (import self.modules."global.user").hmAiFeatures;
   in {
     home-manager = {
       useGlobalPkgs = true;

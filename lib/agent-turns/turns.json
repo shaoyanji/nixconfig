@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-25T15:40:49Z",
+  "generated": "2026-11-25T15:58:19Z",
   "count": 200,
-  "pin": "fba3a2a1072bf01d180c02decd6dce285ac5733675ecd24141f991a1d2ebe934",
+  "pin": "989a6aa1de50b534b22c76db80b1bb62a6bf4f4cd676b253f8e8a94a9ac5fe31",
   "turns": [
+    {
+      "id": "ef7437a8-e476-4a80-92a5-e9ba788a1644",
+      "ts": "2026-11-25T15:54:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "drove delphi freebuff pane agents:3.1 over tmux tunnel with CV-site research task; jev-decide classify exit 2 needs_review but decisive margin: research p=0.58 margin=0.39 >= 0.3 -> drove top label; load-buffer + paste-buffer + Enter; pane shows thinking BUSY spinner 1s, link audit running",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
+      "branch": "main",
+      "frame": "03havzalv9tkz9a69gc49sr31"
+    },
+    {
+      "id": "428d60a6-9f89-4427-8a0c-576943dad1c9",
+      "ts": "2026-11-25T15:54:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-lane",
+      "action": "drove freebuff pane agents:2.1 with CV-site research task; jev-decide classify exit 2 needs_review but decisive margin: research p=0.49 margin=0.31 >= 0.3 -> drove top label; load-buffer + paste-buffer + Enter; pane shows working BUSY spinner 5s, link audit running",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
+      "branch": "main",
+      "frame": "03havzakl3f5m15vn6vyvmcro"
+    },
+    {
+      "id": "0c6d1c64-b9c3-40d3-b42c-9cdc3a6f984b",
+      "ts": "2026-11-25T15:54:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "drove devin pane agents:1.1 with flake-change refactor task; jev-decide classify exit 2 needs_review flake-change p=0.20 margin=0.02 below gate; valid duel could not run (stale on-disk criteria), fell back to top label and drove; load-buffer + paste-buffer + Enter; pane shows Typing BUSY spinner, refactor running",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
+      "branch": "main",
+      "frame": "03havzaja07js6z7a27n6dlpb"
+    },
+    {
+      "id": "fc21ec31-59e8-4752-b226-21e52c059ec4",
+      "ts": "2026-11-25T15:41:00Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "completed sibling's in-flight shell-script-budget removal: dropped dead walk helpers + fixture goModule probes + doubled comment + dead path pointer in policies.nix; staged exactly policies.nix/script-budget.nix(D)/AGENTS.nix/policies-run.sh/infron-comment; secrets.yaml+config.yaml untouched | gate: nix:lint 331, policies:fixtures PASS, policies drv clean except sibling's secrets-mirror+infron reds",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
+      "branch": "main",
+      "frame": "03havwl1cbziglm4l45xzcdjp"
+    },
     {
       "id": "3b3008aa-91cd-4dea-a4a2-7bd582d15a93",
       "ts": "2026-11-25T15:37:48Z",
@@ -2600,58 +2652,6 @@
       "base_commit": "9f259f0f9c8ee91ff5819ffd1806167e1e98f914",
       "branch": "main",
       "frame": "03hasjinusd6vk5ivvj3ed05l"
-    },
-    {
-      "id": "76ebf473-12c2-49c0-9589-cd5070faf3a1",
-      "ts": "2026-11-25T05:17:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-lane-scout-2026-11-25",
-      "action": "landed: read the ledger for the four lanes instead of re-sweeping (25r was already claimed) — 78 live leads, platform 26/devops 24/infra 20/sre 8, no employer holds two live rows, nothing merged. Site target and hire now name the four families; published fleet count 13 -> 25 across seven files, both locales; no lead on the site | gate: nix build .#sites.matt-site PASS (6 CVs 2/2/1/1/1 pages, cv-ats-check x6), checks:images PASS 772/772, agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9f259f0f9c8ee91ff5819ffd1806167e1e98f914",
-      "branch": "main",
-      "frame": "03hasiub5lvypplwruety1ths"
-    },
-    {
-      "id": "ab788cce-89de-44ee-a0f9-c662c63b3c5b",
-      "ts": "2026-11-25T05:16:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-cv-freebuff",
-      "action": "landed: routed task-change (classify needs_review p=0.26 m=0.04 -> duel task-change/publish, task-change 0.9/0.80 pick top) to agents:2.1 (freebuff): continue job-scout/CV lane - scout DevOps/SRE/Platform/Infra leads, dedupe, refresh six CVs on matt.bountystash.com within checks:images; freebuff working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "468e540a23fcaa7bc2d128f3d399f3b0c92a9b22",
-      "branch": "main",
-      "frame": "03hasimyf0mxkbz98t4l4564c"
-    },
-    {
-      "id": "214a1e70-c967-4a65-bab8-9d7bc7f320f5",
-      "ts": "2026-11-25T05:16:44Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: routed note-change (classify needs_review p=0.76 m=0.57 -> decisive, pick top) to agents:1.1 (devin): finish devin-lane-refactoring-2026-11-25 tail - run checks:nix:comments/policies/images + checks:host, confirm flake-wiring/gate-check cleanup green; appflow 404 verify waits delphi 04:30 11-26; devin working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "468e540a23fcaa7bc2d128f3d399f3b0c92a9b22",
-      "branch": "main",
-      "frame": "03hasimwtlkmic4m0mkhq5thd"
-    },
-    {
-      "id": "593e3387-852a-4bcf-bf62-bde667ae9be5",
-      "ts": "2026-11-25T05:16:04Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: lane tail gate suite all green — comments 54/54 cites, policies PASS after recording apps-scout.sh=117 (sibling lane's unrecorded script), images 772/772 bank URLs, checks:host delphi+frieren+netbook all rc=0; note stays OPEN on the single remaining item: /api/applications + applications-discovered live re-verify after delphi 04:30 CET 2026-11-26 autoUpgrade",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "468e540a23fcaa7bc2d128f3d399f3b0c92a9b22",
-      "branch": "main",
-      "frame": "03hasii9l31hs04ivzzarshu6"
     }
   ]
 }

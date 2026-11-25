@@ -456,8 +456,8 @@ lib.genAttrs systems.work (
       # flake/ontology.nix
       ontology = let
         g = knowledgeGraphCtl.graph;
-        nodeTypes = g.nodes |> map (n: n.type) |> lib.unique;
-        edgeTypes = g.edges |> map (e: e.type) |> lib.unique;
+        nodeTypes = g.nodes |> builtins.catAttrs "type" |> lib.unique;
+        edgeTypes = g.edges |> builtins.catAttrs "type" |> lib.unique;
         declaredEntities = ontologyCtl.entityIds;
         declaredRelations = ontologyCtl.relationIds;
         nodeTypeIssues =

@@ -500,8 +500,8 @@ in {
   # The resource ladder, independent of any claim: which transports exist, what
   # they spend, and whether they may be asked many times at once.
   routes = sources |> lib.mapAttrs (_: s: s.routes |> lib.mapAttrs (_: r: r));
-  unsettleable = table |> builtins.attrValues |> builtins.filter (k: k.order == []) |> map (k: k.kind);
+  unsettleable = table |> builtins.attrValues |> builtins.filter (k: k.order == []) |> builtins.catAttrs "kind";
   # A kind that can be settled but whose answer has nowhere to live is researched
   # forever; this is empty by construction, and the check keeps it that way.
-  persistable = table |> builtins.attrValues |> builtins.filter (k: k.persist == "") |> map (k: k.kind);
+  persistable = table |> builtins.attrValues |> builtins.filter (k: k.persist == "") |> builtins.catAttrs "kind";
 }

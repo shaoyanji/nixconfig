@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-25T09:40:22Z",
+  "generated": "2026-11-25T09:55:37Z",
   "count": 200,
-  "pin": "4e8e7909adf659786f6630f51efa2b852032e9f2aadf50b350144dfb73f2556f",
+  "pin": "1890cce86d675b2c173df68a2374de7458c7bd1b8c1bccf487c08651830820b6",
   "turns": [
+    {
+      "id": "e95aa932-de8a-4ab1-8584-32d6e09e3dee",
+      "ts": "2026-11-25T09:55:09Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-fresh-tailor",
+      "action": "blocked: 9 fresh Stepstone rows tailored (letter+CV packets at prep, 200-260 word letters); apps:send refuses every one on the 2026-12-07 hold and no row carries an email — portal-only. Nothing sent, nothing landed.",
+      "outcome": "blocked: send hold to 2026-12-07 and no email channel on nine Stepstone rows",
+      "claims": [],
+      "files": [],
+      "base_commit": "cf210f02a9f74cdd521ac76e33c7106ad4f29ae7",
+      "branch": "main",
+      "frame": "03hau10v13woj12lqj3kwivhz"
+    },
+    {
+      "id": "24c2fb44-3ba3-412b-a9f9-dd28432945ee",
+      "ts": "2026-11-25T09:53:55Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout-upsert-2026-11-25",
+      "action": "audited: 25v 16/16 filed and still live (200, Referer), 25u 11/11 filed; 0 new rows to write — SAP IT Business Systeme duplicates live SAP SE req, MRH TROWE Azure is a second role at a live employer, PostHog is US-remote-only, Advantest URL unresolvable (aggregator shell, careers host NXDOMAIN, Workday 422). No commit: the tracker already held every lead. | gate: task apps:dupes PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hau0s4d0xra6fxdyignr4ba"
+    },
+    {
+      "id": "8aaf058e-e5f0-461a-91e2-3a38501297d0",
+      "ts": "2026-11-25T09:52:57Z",
+      "source": "hermes",
+      "subject": "nixconfig:job-scout-upsert-2026-11-25",
+      "action": "claim: reconcile the 25u/25v sweep leads against the tracker, upsert only genuinely new ones",
+      "outcome": "in_progress",
+      "claims": [
+        "apps-db"
+      ],
+      "files": [],
+      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hau0la7ak7edqqy1bbiay65"
+    },
+    {
+      "id": "df797c9d-cfc1-49e9-b176-7f32d5a6199b",
+      "ts": "2026-11-25T09:40:35Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: checks:registry:compiled:test — seeded worktree fixture for knobs/registry-schema/site-assets (missing knob path, string managed, broken site JS); serial-leg drv coverage now complete | gate: checks:quick PASS + check:verify 154/154",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cf210f02a9f74cdd521ac76e33c7106ad4f29ae7",
+      "branch": "main",
+      "frame": "03haty6d79h3acg34xn6joz34"
+    },
+    {
+      "id": "2f94a442-123f-4838-a2c8-78297f0da37d",
+      "ts": "2026-11-25T09:40:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-25q-reread",
+      "action": "landed: 25q re-read filed AKDB, Sunrise Medical, SimonsVoss, Seghorn at fit 3 with letters+packets; Airbus deduped, Personio now 200 | gate: apps:audit PASS, .#agentsNotes.ok=true",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cf210f02a9f74cdd521ac76e33c7106ad4f29ae7",
+      "branch": "main",
+      "frame": "03haty5i9oxbo7b4zp6xjdcfu"
+    },
     {
       "id": "9582c8b3-56ad-4e5c-b6b5-3aaff02bef00",
       "ts": "2026-11-25T09:40:19Z",
@@ -2622,71 +2689,6 @@
       "base_commit": "71169d3eedebd750b34036d44d7480be25a8f3f9",
       "branch": "main",
       "frame": "03harcuij03gl4i3m46r0rt4w"
-    },
-    {
-      "id": "b1f4206d-eaef-45a2-b370-6906c2c56c94",
-      "ts": "2026-11-25T01:38:55Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "correction: the 2026-11-25d note commit needed a rebase onto a moved main; the real landing is 72e2d61a, note job-scout-sweep-2026-11-25d, 4 rows at scouted (fit band 4 x3, 3 x1), nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03harc32v5lmusxv4ar8ij0qb"
-    },
-    {
-      "id": "6775cbc0-0cd4-4f25-88ef-6c10dda06943",
-      "ts": "2026-11-25T01:38:26Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi",
-      "action": "landed: 2026-11-25d sweep - 4 new employers at scouted (Whitecircle 80, Alan 70, Vitestro 70 -> band 4; Univé 64 -> band 3), origin scout-2026-11-25d, upsert no 500; 152 family matches / 112 held / 40 read; note job-scout-sweep-2026-11-25d; nothing sent | gate: nix-instantiate --parse + agentsNotes.issues [] PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "17e95ec192b514c8bcc3563b7be585d96e365a7a",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03harbzq3drdmoccx4b9myf9q"
-    },
-    {
-      "id": "1ea17d8f-1098-44f0-b7a8-4aa160e8c139",
-      "ts": "2026-11-25T01:37:48Z",
-      "source": "devji",
-      "subject": "nixconfig:image-daily-port-ship-slices",
-      "action": "landed: ship-detach (systemd-run vector) + served (remote manifest poll, exit-code contract) ported from image-ship.sh to tools/os/internal/image/ship.go; 5 tests incl. httptest poll and arg-vector pin; note devin-lane-image-daily-go-port stays OPEN (cloudinary curl, ffprobe check, cpg auth remain shell) | gate: go test 18/18 + checks:image-daily + checks:images:ship:test + checks:host frieren rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "71169d3eedebd750b34036d44d7480be25a8f3f9",
-      "branch": "main",
-      "frame": "03harbv8i1allkj56zqbiyteq"
-    },
-    {
-      "id": "b4dddbb4-e28b-4ef6-88f8-0b35b2914792",
-      "ts": "2026-11-25T01:33:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "drove idle delphi (agents:3.1 ssh remote freebuff) with 2026-11-25d job-scout sweep task — classify selected note-change p=0.89 m=0.83 exit 0; working... counter confirmed, C-m resend absorbed while working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41802a713c1962a8c5e9f2e82c5a90c1a1a1fe99",
-      "branch": "main",
-      "frame": "03harb3gxf14u2nv897sfyq5y"
-    },
-    {
-      "id": "b90796d0-0547-4176-9fe7-121c123c9f26",
-      "ts": "2026-11-25T01:33:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin",
-      "action": "drove idle devin (agents:1.1) with image-daily curl/detach Go port-slice task — classify needs_review (task-change p=0.40 m=0.13) then duel task-change p=0.77 m=0.54 (margin decisive, top pick, no third call); Typing spinner confirmed after first Enter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41802a713c1962a8c5e9f2e82c5a90c1a1a1fe99",
-      "branch": "main",
-      "frame": "03harb3fgk0q32uizvw1wqgnq"
     }
   ]
 }

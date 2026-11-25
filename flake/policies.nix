@@ -1573,7 +1573,7 @@
   };
 
   ids = policies |> builtins.attrNames;
-  citedIds = citations |> map (c: c.id) |> lib.unique;
+  citedIds = citations |> builtins.catAttrs "id" |> lib.unique;
 in {
   # The two predicates a fixture drives on text that is not in the tree
   # (tests/policies/run.sh): the gate and its proof read one implementation.

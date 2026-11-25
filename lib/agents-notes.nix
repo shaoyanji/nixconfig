@@ -222,7 +222,7 @@
       in {
         notes = builtins.length xs;
         open = xs |> lib.count (e: openStatuses |> builtins.elem e.status);
-        evidence = xs |> map (e: e.evidence) |> lib.unique;
+        evidence = xs |> builtins.catAttrs "evidence" |> lib.unique;
       }));
   claimRows =
     (claimStats |> builtins.attrNames)

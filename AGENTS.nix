@@ -5983,6 +5983,36 @@
         Gate: nix-registry and registry-schema drvs build, all edits parse.
       '';
     };
+    lib-pipe-catattrs-inline = {
+      title = "Pipe sweep pass 10: the inline-lambda spelling of catAttrs, six sites";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P5";
+      date = "2026-11-25";
+      from = ["lib-pipe-loop-exhausted"];
+      summary = "The catAttrs pass missed a second spelling: `xs |> map (e: e.attr)` is the same fold written as an inline lambda, and six sites survived the earlier sweep — checks.nix (nodeTypes/edgeTypes), policies.nix (citedIds), agents-notes.nix (evidence), epistemics.nix (unsettleable/persistable), service-portal.nix (shown ports). All convert to `builtins.catAttrs`, the in-tree idiom.";
+      refs = {
+        modules = ["flake/checks.nix" "flake/policies.nix" "flake/epistemics.nix" "lib/agents-notes.nix" "modules/services/service-portal.nix"];
+        tasks = ["checks:host" "checks:drv-equality"];
+      };
+      body = ''
+        `builtins.catAttrs "a" xs` is `builtins.map (v: v.a) xs` verbatim —
+        byte-identical derivations. The earlier sweep grepped for
+        `builtins.catAttrs`-adjacent shapes and `map` feeding `elemAt`; the
+        `map (x: x.attr)` lambda feeding `unique`/`all` was a second spelling
+        of the same class. `catAttrs` also beats the lambda on the miss:
+        an attrless element errors naming the attr, same as the lambda, but
+        the combinator name says the intent.
+        Deliberately not folded: `filter |> map` in epistemics stays two
+        steps (catAttrs takes the tail, the filter stays the gate);
+        `nameRefsOf |> filter |> map` in nix-files needs the filter before
+        the projection.
+        Gates: ontology drv builds (the checks.nix pair evals), epistemics
+        unsettleable/persistable and agentsNotes.issues all [], drv-equality
+        30/30 identical, checks:host frieren rc=0 — service-portal is
+        imported there and by delphi.
+      '';
+    };
     apps-lane-has-no-send-task = {
       title = "The application lane can draft but cannot send, so escalate rather than sweep";
       kind = "open";

@@ -565,7 +565,7 @@ in {
                 cfg.mounts
                 |> lib.filterAttrs (_: m: !m.hideCard)
                 |> builtins.attrValues
-                |> map (m: m.port);
+                |> builtins.catAttrs "port";
             in
               builtins.all (p: builtins.elem p linked) shown
           );

@@ -6036,7 +6036,9 @@
         05:29 CET still 404, the run predated a487f3d4 (04:48); next window
         04:30 CET 2026-11-26. Tail gates all green: comments 54/54 cites,
         policies (apps-scout.sh recorded), images 772/772, host
-        delphi+frieren+netbook.
+        delphi+frieren+netbook. Re-swept 06:49: policies, comments,
+        image-daily and drv-equality 30/30 all green — appflow 404 re-verify
+        remains the single open item.
       '';
     };
     shared-worktree-commit-race = {

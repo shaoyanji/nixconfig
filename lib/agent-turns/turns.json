@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-25T05:39:26Z",
+  "generated": "2026-11-25T05:53:41Z",
   "count": 200,
-  "pin": "87bdd3a3eab4b4df31fee25edeed76927d6969602686f20435f9451b7f809362",
+  "pin": "36eb5da5ba5698d84685a7f057e579dc2c8b34ca3a62454b484e4707dc7dfc62",
   "turns": [
+    {
+      "id": "6c50c82e-16d7-4485-9ffe-8bf1ca825a48",
+      "ts": "2026-11-25T05:50:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "routed note-change (classify selected p=0.94 margin=0.89, exit 0) to agents:1.1 (devin): tail gate-check cleanup per devin-lane-refactoring-2026-11-25 - verify checks:policies, checks:nix:comments, checks:image-daily, checks:drv-equality; leave note open if only appflow 404 re-verify remains (delphi 04:30 autoUpgrade 2026-11-26). Pane confirmed Thinking 7s.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
+      "branch": "main",
+      "frame": "03hasp6t31yzz8f3bsrcrtymg"
+    },
+    {
+      "id": "4bb063ed-23f5-48e3-bf2c-12018cde5184",
+      "ts": "2026-11-25T05:50:16Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout-lane",
+      "action": "routed note-change (classify selected p=0.88 margin=0.82, exit 0) to agents:2.1 (freebuff): one more employer-lead sweep of DevOps/SRE/Platform/Infrastructure families per job-scout-next-sweep-freebuff, prep-only to 2026-12-07, apps:search before every apps:scout, checks:quick at end. Pane confirmed thinking... 1s.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
+      "branch": "main",
+      "frame": "03hasp6rbv3w0386zj9k7ump4"
+    },
+    {
+      "id": "46d2a218-a2ad-40f2-8538-9aca10db55e5",
+      "ts": "2026-11-25T05:39:37Z",
+      "source": "devin",
+      "subject": "nixconfig:worktree-race",
+      "action": "incident 5: staged index consumed by sibling git commit mid-hook — HEAD lock failed, lib refactor rode inside their 55a7f111 to origin; content verified intact (catAttrs counts match), attribution theirs. Second incident since the rule",
+      "outcome": "failed: staged index swept by a sibling commit mid-hook",
+      "claims": [],
+      "files": [],
+      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
+      "branch": "main",
+      "frame": "03hasn3t8tyc32vsp2i55083f"
+    },
+    {
+      "id": "2b2cf750-a687-4661-860b-cbb1e8844d1c",
+      "ts": "2026-11-25T05:39:36Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: pipe pass 5 — map (e: e.f) -> builtins.catAttrs, 20 sites/7 files; all fields schema-guaranteed, pkg-list keeps its != null filter (catAttrs carries present null); gate: drv-equality 30/30, .#sites.matt-site same store path; note lib-pipe-catattrs DELIVERED. Refactor rode inside sibling commit 55a7f111 (staged-index sweep, race 5) — content verified intact",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e71020cb1e5b6abecc74711e5428b3581fdf64b4",
+      "branch": "main",
+      "frame": "03hasn3r2wnhniarp43eqxu8q"
+    },
     {
       "id": "6eb3e6e0-74ec-4ef9-a39d-d66733659b30",
       "ts": "2026-11-25T05:39:09Z",
@@ -2622,58 +2674,6 @@
       "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
       "branch": "main",
       "frame": "03haqa9ox05kjoymhkq0djv3m"
-    },
-    {
-      "id": "4173ff66-dbd0-4d23-94d4-f438bb134517",
-      "ts": "2026-11-24T22:25:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: routed job_search to delphi (agents:3) - continue scouting DevOps/SRE/Platform/Infrastructure job leads into lead tracker; drive confirmed by working counter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
-      "branch": "main",
-      "frame": "03haqa9bv9jl087s9ihjyo6w5"
-    },
-    {
-      "id": "6a2a48c6-8627-441e-b77d-14407b38b243",
-      "ts": "2026-11-24T22:25:16Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:chain-change",
-      "action": "landed: routed verify_refactor to devin (agents:1) - run checks:host on delphi+frieren to confirm infra-stack refactor passes module-system checks; drive confirmed by Running tools spinner",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "128d0e074add306d60ecc11ec61f0b31ab05ca64",
-      "branch": "main",
-      "frame": "03haqa981c7r7m5m9gyqxsy5z"
-    },
-    {
-      "id": "f73a7574-dbca-4dcf-a227-ecfec1624e31",
-      "ts": "2026-11-24T22:15:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:chain-change",
-      "action": "landed: routed chain-change task to devin (agents:1) - verify infra-stack agentScheduler defaults refactor on delphi+frieren, then drop next stated default; drive confirmed by Thinking spinner",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a4ae52b9055859520afb6cfccb65c144865263ec",
-      "branch": "main",
-      "frame": "03haq8ec9b33oqlz2v05g16ve"
-    },
-    {
-      "id": "f90e197e-b1b7-45af-a97a-90f541c117ff",
-      "ts": "2026-11-24T22:14:55Z",
-      "source": "delphi",
-      "subject": "nixconfig:job-search-delphi-lane",
-      "action": "landed: continue delphi job-search scout for DevOps/SRE/Platform/Infra roles into lead tracker, novel routing",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a4ae52b9055859520afb6cfccb65c144865263ec",
-      "branch": "main",
-      "frame": "03haq88g6rsgjagv83kan3hgo"
     }
   ]
 }

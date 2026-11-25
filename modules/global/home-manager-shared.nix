@@ -77,6 +77,21 @@ in {
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
+    # `self` gives home modules the flake's compiled artifacts (homeAgents,
+    # agentSkills, …) without re-reading the repo at activation time. The
+    # passthrough of the fleet options is an extraSpecialArgs, not a config
+    # read: an import decision, taken before `config` exists inside the HM
+    # module system — resolving it through `_module.args` forces `config`
+    # inside `imports`, the recursion trap (see `roles/home.nix`). This block
+    # used to be spelled identically in global.nixos and global.macos.
+    extraSpecialArgs = {
+      inherit inputs self;
+      fleetHost = config.networking.hostName;
+      dankShell = config.fleet.dankShell.enable;
+      hmUserFeatures = config.fleet.hmUserFeatures;
+      hmBaseFeatures = config.fleet.hmBaseFeatures;
+      hmAiFeatures = config.fleet.hmAiFeatures;
+    };
     users.${user.name}.imports = config.fleet.hmUserModules;
     sharedModules =
       [

@@ -71,6 +71,8 @@
     "checks:kg:canvas" = "leaf";
     "checks:kg:iets" = "leaf";
     "checks:kg:zeck" = "leaf";
+    "checks:kernel:collision" = "leaf";
+    "checks:kernel:collision:test" = "leaf";
     "checks:kiwix:watchdog" = "leaf";
     "checks:media-relay" = "leaf";
     "checks:modules:edges" = "leaf";

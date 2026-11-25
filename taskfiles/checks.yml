@@ -16,19 +16,19 @@ tasks:
   # not a config gate. `checks:build:route` is the one that forces a whole
   # toplevel and is CI/operator-only — it is no longer wired into any switch.
   checks:quick:
-    desc: Run narrow repo checks (repo HYGIENE — evaluates no host config)
+    desc: Run narrow repo checks (repo HYGIENE — forces only boot.kernelPackages per host)
     aliases: [check]
     summary: >
       Bounded repo hygiene — "is the repo internally consistent", not "does host
       X evaluate": compiled inventory, task graph, knowledge graph and sidecar
-      parity, skill task-mirrors, nix lint, sops drift, wrapper PATH, modules.toml. No
-      nixosConfiguration is forced; that is `checks:host HOST=<h>` (~13 s / 720
-      MiB) or `checks:hosts HOSTS="a b"`.
+      parity, skill task-mirrors, nix lint, sops drift, wrapper PATH, modules.toml. The
+      one host attr forced is `checks:kernel:collision`'s `boot.kernelPackages`
+      merge per host (~35 s serial); a full eval is `checks:host HOST=<h>`.
 
       Not `nix flake check`: 23 configs, 6078 MiB, SIGKILL 137 here. Shape:
-      independent gates are parallel `deps` (12.8 s -> 8.2 s on delphi), then
-      one serial flake eval (8 s, `policies` 7.5 s of it), then the timing gate
-      `entry` alone — ~22 s total. Exit 0 = clean.
+      parallel `deps`, one serial flake eval, then the timing gate `entry` —
+      ~80 s total on frieren since kernel:collision joined the deps.
+      Exit 0 = clean.
     vars:
       # These checks are per-system and the flake has them for aarch64-linux too,
       # but the attribute was pinned to x86_64-linux — so on delphi (aarch64, the
@@ -66,6 +66,7 @@ tasks:
       - task: checks:nix:comments
       - task: checks:skills:mirror
       - task: checks:kg
+      - task: checks:kernel:collision
       # `checks:kg:iets` stays out on purpose: it is two uncached full evals
       # (~3 s) for a parity experiment, and its own summary says so.
       - task: checks:ports:test
@@ -486,6 +487,34 @@ tasks:
       full evals, no cache on either side), so not in `checks:quick`.
     cmds:
       - bash scripts/task/kg-iets-check.sh
+
+  checks:kernel:collision:
+    desc: "[gate] No host's boot.kernelPackages is a tied merge — the 'defined multiple times' class"
+    summary: >
+      Forces every nixosConfiguration's `boot.kernelPackages.kernel.version` —
+      a tied merge cannot survive forcing: two definitions at the winning
+      priority are a hard "defined multiple times" error. It bit twice behind
+      one base-node line: `mkOverride 1500` tied the option default and broke
+      every baseline host (eisen, to 2026-10-19); raspberry-pi/3's `mkDefault`
+      hit an earlier baseline for minyx — AGENTS.nix#dormant-host-gates. The
+      fix is `mkOverride 1200`. One host per oom-guard'd nix process, ~35 s
+      serial. 0 clean, 1 collision (names both files), 2 cannot tell;
+      `:test` fails on `45dde4c9^`.
+    cmds:
+      - bash scripts/task/kernel-collision-check.sh
+
+  checks:kernel:collision:test:
+    desc: "Regression fixture for checks:kernel:collision (fails on 45dde4c9^, the mkOverride-1500 tree)"
+    summary: >
+      Proves the gate refuses a real past tree: `45dde4c9^` carries base-node's
+      `mkOverride 1500`, a tie with the option default that broke every
+      baseline host without its own override. eisen must COLLIDE with both
+      definition files named; minyx stays clean on the same tree because
+      raspberry-pi/3's `mkDefault` wins outright — the gate flags ties, not
+      weaker definitions. Not in `checks:quick`: the old rev's pinned inputs
+      are a cold fetch on a fresh store.
+    cmds:
+      - bash tests/kernel-collision/run.sh
 
   checks:ontology:
     desc: "[gate] The graph's types are declared, and every declared type is populated"

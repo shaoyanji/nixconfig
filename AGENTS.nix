@@ -914,6 +914,44 @@
         of a dormant host is the owner's call, never an agent's drive-by eval.
       '';
     };
+    kernel-collision-gate = {
+      title = "checks:kernel:collision — a tied boot.kernelPackages merge now fails a leaf gate, not a host eval";
+      kind = "open";
+      status = "DELIVERED";
+      priority = "P4";
+      date = "2026-11-25";
+      from = ["dormant-host-gates"];
+      summary = "New leaf gate sweeps every nixosConfiguration's boot.kernelPackages merge (~35 s serial, one host per oom-guard'd nix process). The tied-definition class that broke minyx and eisen now fails checks:quick; the fixture proves the gate refuses 45dde4c9^ — eisen COLLIDEs, minyx stays clean.";
+      refs = {
+        hosts = ["minyx" "eisen"];
+        modules = ["scripts/task/kernel-collision-check.sh" "tests/kernel-collision/run.sh" "modules/profiles/base-node.nix" "flake/check-inventory.nix"];
+        tasks = ["checks:kernel:collision" "checks:kernel:collision:test" "checks:quick" "check:leaf"];
+      };
+      body = ''
+        The class: two definitions tied at the winning priority with
+        different values are a hard "defined multiple times" error that
+        kills the whole configuration's eval. base-node.nix carried it
+        twice — `mkOverride 1500` tied the option default and broke every
+        baseline host (eisen until 2026-10-19), and an earlier baseline
+        tied raspberry-pi/3's `mkDefault` for minyx. `mkOverride 1200`
+        sits strictly between and survives both directions.
+
+        The gate forces `kernelPackages.kernel.version` per host — the
+        merge itself, ~1.3 s each, serial under oom-guard; a preserved
+        host's unrelated eval break is a warning, an active one is
+        cannot-tell. Exits 0/1/2 per the scripted-checks convention.
+        `REV=`/`HOSTS=` envs serve the fixture: at `45dde4c9^` eisen
+        COLLIDEs naming kernel.nix and base-node.nix while minyx stays
+        clean — `mkDefault` wins outright, so the gate flags ties, not
+        weaker definitions. checks:quick's summary was updated honestly:
+        it is the first dep to force a nixosConfiguration attribute, and
+        the suite floor moved to it (~80 s measured on frieren).
+
+        Exit: gate live in checks:quick, `check:leaf
+        NAME=checks:kernel:collision` resolves, check:verify 137/137,
+        fixture green both directions.
+      '';
+    };
     dns-second-resolver = {
       title = "DNS failover — a second always-on resolver";
       kind = "open";
@@ -6033,12 +6071,10 @@
         proven firing); the stale "8461 archive front" comment corrected.
         Remainder: delphi's 04:30 autoUpgrade (tailnet ssh needs a browser
         check) — verify both routes live after it, then this note closes.
-        05:29 CET still 404, the run predated a487f3d4 (04:48); next window
-        04:30 CET 2026-11-26. Tail gates all green: comments 54/54 cites,
-        policies (apps-scout.sh recorded), images 772/772, host
-        delphi+frieren+netbook. Re-swept 06:49: policies, comments,
-        image-daily and drv-equality 30/30 all green — appflow 404 re-verify
-        remains the single open item.
+        05:29 still 404 (the run predated a487f3d4); next window 04:30 CET
+        2026-11-26. Tail gates green twice: comments 54/54, policies,
+        images 772/772, hosts delphi+frieren+netbook, 06:49 image-daily +
+        drv-equality 30/30. Appflow re-verify is the sole open item.
       '';
     };
     shared-worktree-commit-race = {

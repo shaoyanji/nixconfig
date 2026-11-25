@@ -7393,7 +7393,6 @@
       priority = "P3";
       date = "2026-11-25";
       summary = "The 2026-11-25 verification pass on kelvion-holding-gmbh-cloud-platform-engineer-gcp-m-w-d found the requisition open on Kelvion's own softgarden board and on kelvion.com, not just the Bundesagentur mirror, with requirements that match the row. The onsite share is published as Hybrid with no day count, so it stays unknown rather than assumed. The lead holds to 2026-12-07 on the prep-only rule.";
-      from = [ "job-scout-sweep-2026-11-25" ];
       refs = {
         modules = [ "scripts/task/apps-db.sh" ];
         tasks = [ "apps:update" "apps:scout:parked" ];

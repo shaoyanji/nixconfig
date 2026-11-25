@@ -7224,6 +7224,51 @@
       '';
     };
 
+    job-scout-sweep-2026-11-25p = {
+      title = "The 2026-11-25p sweep: a flat feed again, eight window-safe rows, and four holds exact names miss";
+      kind = "decision";
+      status = "ACCEPTED";
+      priority = "P2";
+      date = "2026-11-25";
+      summary = "First pass run from the shard instead of a note: germantechjobs was byte-identical again (sha256 cf313395) so Stepstone carried the cycle, six lane queries gave 150 cards and 73 held, and of 32 ads read in full eight survive the 2026-12-07 window, four park on expiry, and four house-token holds exact-name matching cannot see were refused.";
+      from = ["job-scout-sweep-2026-11-25o"];
+      refs = {
+        modules = ["scripts/task/apps-db.sh"];
+        tasks = ["apps:scout" "apps:scout:sweep" "apps:scout:parked" "apps:search"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Sweep 2026-11-25p, the first run driven by apps:scout:sweep rather than by rereading a note.
+        germantechjobs answered sha256 cf313395, 586 items, byte-identical to 25i through 25o after the
+        www-to-apex redirect, so the feed stayed flat by hash and Stepstone carried the cycle again.
+        Six lane queries gave 150 cards, 150 unique. Exact-name plus house-token dedupe against the 1,272-row
+        ledger held 73 and left 77 unheld; 33 survived the shape filter and 32 detail pages were read
+        (Amadeus Fire answered 410 Gone, which is a closed ad, not an empty board).
+        Eight rows filed at scouted, origin scout-2026-11-25p, every one valid past the 2026-12-07 hold.
+        ALDB, Berlin, band 5: DevSecOps platform on the BOS digital-radio and Netze des Bundes estate —
+        GitLab CI, Argo, Helm, Harbor, Rancher, Terraform and Pulumi, Istio, Prometheus, Keycloak, Kafka.
+        Creditreform, Neuss, band 5: on-prem OpenShift owned end to end across 128 sites. BMW Group, Munich,
+        band 4: enterprise AI infrastructure, IaC, observability, secrets, hardening, four years asked.
+        DZ HYP, Hamburg, band 4: the central AI platform on Docker and Kubernetes, Terraform, IAM. adesso,
+        Aachen, band 4: datacenter engineering across server, storage, virtualisation, backup and recovery.
+        valantic, Eschborn, band 4: managed-service cloud ops, Linux and databases, containers, incidents.
+        Elevion, Jena, band 3: Azure cloud inside a 60-company energy group. BEW, Berlin, band 3: KRITIS
+        district heat, Azure Local and enterprise backup.
+        Parked on the window, not merit: Heimerle + Meule 11-27, HDI AG 12-01, Fabasoft 12-05, S Rating 12-05.
+        Refused: Amadeus Fire (410); the masked-employer recruiters grinnberg, OMNIGENA, Randstad, Ratbacher,
+        FERCHAU and Bertrandt; Hilti on shape, onsite workplace support rather than platform.
+        Three house-token holds exact-name matching cannot see: meinestadt.de runs for Schwarz Digits, where
+        STACKIT already holds an applied row; Interhyp Gruppe sits on the ledger as Interhyp AG; Claranet GmbH
+        hides behind a Claranet Italia rejection inside 180 days; Liebherr-Aerospace sits under the parked
+        Liebherr-Digital thread. Three rows at the same origin (BarmeniaGothaer, Stadler Mannheim, essendi it)
+        came from a parallel pane, so the ledger holds eleven at 25p.
+        Follow-ups: nine nudge flags went to review_flag (Pennylane, Solar and Clean, Vivid, both g2 threads,
+        SYSTEMTEC, GlassFlow, Data Society, EggAI, Genesis PHCM); 13 rows sit overdue by their own date and 30
+        fall due inside the next fortnight.
+        Exit: decide the eight before 2026-12-07 and recheck the parked four as they expire.
+      '';
+    };
+
     job-scout-sweep-2026-11-25o = {
       title = "The 2026-11-25o sweep: the flat hash, the redirect trap, and the seven window-safe rows";
       kind = "decision";

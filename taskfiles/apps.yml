@@ -120,7 +120,7 @@ tasks:
           'arbeitnow /api/job-board-api?page=1' '300 per page; page one is not the board' \
           'ashby camunda/kubermatic, personio 1KOMMA5GRAD, smartrecruiters DeliveryHero' 'employer feeds, not the market'
         printf '\nrules: dedupe by exact name and by house token before filing; read the detail page before a verdict;\n'
-        printf 'band 1-5 from FIT_MAP, never 0 or 100; origin scout-{{.SWEEP}}, stage scouted; nothing sends before 2026-12-07.\n'
+        printf 'band 1-5 from FIT_MAP, never 0 or 100; origin scout-{{.SWEEP}}, stage lead (the family rides the status line); nothing sends before 2026-12-07.\n'
         printf 'exit: AGENTS.nix note job-scout-sweep-{{.SWEEP}} plus one xs turn naming the commit and the gate.\n'
 
   # The eleven Stepstone ads 25o read and parked on expiry are not rows: seven

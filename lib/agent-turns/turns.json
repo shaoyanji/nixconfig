@@ -1,8 +1,63 @@
 {
-  "generated": "2026-11-26T18:19:14Z",
+  "generated": "2026-11-26T18:26:11Z",
   "count": 200,
-  "pin": "106f9bed6300e76111d552a4ae38b541c19f75edf5131f81a2e819262f704cf2",
+  "pin": "c6fb00e73dfd432c7558a4428e830810a2e70e6e375b0747672e3384d13ee91c",
   "turns": [
+    {
+      "id": "a32d25fa-1b46-400a-a256-983336b28b1d",
+      "ts": "2026-11-26T18:20:39Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-pass-and-deals-ingest",
+      "action": "claim: run a scout pass and a deals ingest, then fix small rough edges in scripts/task or tests (no modules/services/link-vault*)",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task",
+        "tests"
+      ],
+      "files": [],
+      "base_commit": "70311198c5434d651a8c28f9b8aa6d5d4cd1fbfc",
+      "branch": "main",
+      "frame": "03hb4l2gwaf9djfnrfbe4xral"
+    },
+    {
+      "id": "35b2e31f-18ee-4a6b-945f-c9e19b2d54ff",
+      "ts": "2026-11-26T18:19:35Z",
+      "source": "devin",
+      "subject": "nixconfig:gemini-api-cli-package",
+      "action": "landed: gemini-api 0.5.0 in cli.ai and x86_64-linux env home.packages | gate: checks:hosts aristotle+clanker PASS",
+      "outcome": "done",
+      "claims": [
+        "flake/cli.nix",
+        "modules/env.nix"
+      ],
+      "files": [
+        "flake/cli.nix",
+        "modules/env.nix",
+        "lib/agent-turns/turns.json"
+      ],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb4kuz4w4y1tq7b75mhju6l"
+    },
+    {
+      "id": "df07ee1f-3bb8-48d1-b839-e90e8e87713b",
+      "ts": "2026-11-26T18:19:24Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-hygiene-and-remote-browser-smoke",
+      "action": "landed: --clanker-browser sends open/eval to clanker via scripts/task/clanker-browser.sh (double-quoted argv: %q arrives as a shell syntax error), tests 52 OK | gate: unittest 52, py_compile, checks:tasks, checks:prose, budget 275/400, checks:docs:links PASS; live: real link-vault UI on clanker via stub, dom read '#metrics = 3bookmarks...' | clanker: / 92% 1.2G before and after, GC -d freed 0 KiB (8.5G store fully live), /data 6.8G free, no zombies, agent-browser 0.45.0",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/clanker-browser.sh",
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke",
+        "taskfiles/agents.yml",
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "70311198c5434d651a8c28f9b8aa6d5d4cd1fbfc",
+      "branch": "main",
+      "frame": "03hb4ktlhyqcp760ow2sclutf"
+    },
     {
       "id": "a2c4f41f-acbb-4103-93d0-999493df603a",
       "ts": "2026-11-26T18:08:50Z",
@@ -2992,54 +3047,6 @@
       "base_commit": "a68dc8915b2abd6b23196c7769cee87cd4001a1c",
       "branch": "main",
       "frame": "03hb31nbxy8fss8u6zy9dl6b2"
-    },
-    {
-      "id": "42f86f91-2475-4b9d-8680-eb89d2c97f34",
-      "ts": "2026-11-26T13:28:51Z",
-      "source": "devin",
-      "subject": "nixconfig:job-db-scraper-service",
-      "action": "claim: design and build tailnet-exposed job-db-scraper service for delphi",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/job-db-scraper",
-        "modules/services/job-db-scraper.nix",
-        "hosts/delphi/configuration.nix"
-      ],
-      "files": [],
-      "base_commit": "f89886c42b7fab8653daabecacf57f0a8ca60be3",
-      "branch": "main",
-      "frame": "03hb302cvg8rr3irbejgs3r4b"
-    },
-    {
-      "id": "54a4d455-2cde-4c96-8b41-98301da56208",
-      "ts": "2026-11-26T13:23:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "claim: job-scout pass 2026-11-26e — deepen Stepstone to page two, fix the unencoded city that drops Frankfurt, file linked in-lane leads via apps:scout, fold the pass into the is-a.dev CV job-search page with new framing",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "f89886c42b7fab8653daabecacf57f0a8ca60be3",
-      "branch": "main",
-      "frame": "03hb2yz9s47516femjy4puz6k"
-    },
-    {
-      "id": "9fd9a970-7512-4c1b-9c3a-1873fa430f0d",
-      "ts": "2026-11-26T13:22:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: sweep 2026-11-26d — six boards, 3603 postings, 110 fresh in lane, 11 new employers at 1670 held; 10 filed via apps:scout, 5 off-lane closed (2 internships, PM, freelance, feed artifact); 3 German leads folded into the is-a.dev CV job-search page (blog commit 5707a12); Arbeitnow is now a board. LinkedIn guest search 429, unread. | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py",
-        ".agents/skills/jobsearch-pipeline"
-      ],
-      "files": [],
-      "base_commit": "f89886c42b7fab8653daabecacf57f0a8ca60be3",
-      "branch": "main",
-      "frame": "03hb2yvjlfocr5ulwya9rwn00"
     }
   ]
 }

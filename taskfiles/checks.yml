@@ -1173,16 +1173,19 @@ tasks:
       - bash tests/port-audit/run.sh
 
   checks:appflow:
-    desc: Appflow gates — CV selector, tracker status, packet store
+    desc: Appflow gates — CV selector, tracker status, packet store, scout writer
     summary: >
-      Three offline fixtures plus a read-only API pass: the selector over a
+      Four offline fixtures plus a read-only API pass: the selector over a
       fictional corpus (caps hold, German via glossary.json, identical
       reruns, a missing corpus exits 2); the tracker via the API (no
       ambiguous company/role pair, no `prep` row on a closed req, no shared
-      mail); the packet store (a row is a copy at 600, a dead link is refused).
+      mail); the packet store (a row is a copy at 600, a dead link is refused);
+      the scout writer's dry records (sweep vs family origin, the owner on the
+      status line, the refusals).
     cmds:
       - bash tests/appflow-select/run.sh
       - bash tests/appflow-status/run.sh
+      - bash tests/apps-scout/run.sh
       - bash tests/appflow-packet/run.sh
       - bash tests/appflow-resolve/apps-db-guard.sh
       - bash tests/appflow-resolve/sync-guard.sh

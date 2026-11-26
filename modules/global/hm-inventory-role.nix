@@ -9,15 +9,17 @@
 # which is the imports-position recursion trap).
 {
   self,
+  inputs,
   hostInventory,
   fleetHost ? "",
   ...
 }: {
   imports = let
+    hmShared = import self.nixFiles.lib."hm-shared.nix" {inherit self inputs;};
     entry =
       if builtins.isString fleetHost && builtins.hasAttr fleetHost hostInventory
       then hostInventory.${fleetHost} or {}
       else {};
   in
-    map (m: self.modules.${m}) (entry.hmModules or []);
+    hmShared.modulePaths (entry.hmModules or []);
 }

@@ -17,4 +17,15 @@
     inputs.dms.homeModules.dank-material-shell
     inputs.dms.homeModules.niri
   ];
+
+  # Name → module path resolution for inventory hmModules lists — the same
+  # map in global.noDE, global.demo and global.hm-inventory-role.
+  modulePaths = map (m: self.modules.${m});
+
+  # One predicate behind the per-host inventory fields: the host's own value
+  # when its inventory entry names it, the fallback when it does not.
+  forHost = hostInventory: hostName: field: default:
+    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
+    then hostInventory.${hostName}.${field} or default
+    else default;
 }

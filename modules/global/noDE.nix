@@ -13,12 +13,9 @@
   # that host only. `networking.hostName` resolves on every NixOS container;
   # the fallback keeps a host with no field on the original floor.
   hostName = config.networking.hostName or "";
-  # One predicate behind both fields: the host's own value when its inventory
-  # entry names it, the fallback when it does not.
-  hostField = field: default:
-    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.${field} or default
-    else default;
+  # One predicate behind both fields (lib/hm-shared.nix): the host's own value
+  # when its inventory entry names it, the fallback when it does not.
+  hostField = hmShared.forHost hostInventory hostName;
   hmModules = hostField "hmModules" ["roles.minimal" "shell"];
   # The per-host leaf list inside user.base: containers' hmModules name it
   # directly, and `hmBase` data rides extraSpecialArgs because `imports`
@@ -31,7 +28,7 @@ in {
     useUserPackages = true;
     backupFileExtension = "hm-backup";
     users.${user.name} = {
-      imports = map (m: self.modules.${m}) hmModules;
+      imports = hmShared.modulePaths hmModules;
       home.username = user.name;
       home.homeDirectory = user.home;
     };

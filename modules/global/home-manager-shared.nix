@@ -16,12 +16,9 @@
   # standalone chains have no `networking` at all — either way the shared
   # default degrades rather than erroring the eval.
   hostName = config.networking.hostName or "";
-  # One predicate behind all three fields: the host's own value when its
-  # inventory entry names it, the shared default when it does not.
-  hostField = field: default:
-    if builtins.isString hostName && builtins.hasAttr hostName hostInventory
-    then hostInventory.${hostName}.${field} or default
-    else default;
+  # One predicate behind all three fields (lib/hm-shared.nix): the host's own
+  # value when its inventory entry names it, the shared default when it does not.
+  hostField = hmShared.forHost hostInventory hostName;
   hostFeatures = hostField "hmFeatures" user.hmFeatures;
   hostBase = hostField "hmBase" user.hmBaseFeatures;
   hostAi = hostField "hmAi" user.hmAiFeatures;

@@ -12,6 +12,11 @@
 # mixes no aliases — the map|>concatStringsSep it carried is a different class
 # this gate does not lint, and the fixture asserts the gate leaves it alone.)
 #
+# A second rule locks the filter|>length → lib.count class (763eaa83): case 4
+# seeds the converted shape and must fail naming the rule; case 5 seeds the
+# honest controls (length inside a filter predicate, length on a non-filter
+# source) and must pass — the line-end anchor is what tells them apart.
+#
 # Exit: 0 every case behaves, 2 the fixture cannot run.
 set -uo pipefail
 
@@ -71,6 +76,40 @@ if bash "$gate" "$tmp/just-mixed" >/dev/null 2>&1; then
   fail=1
 else
   echo "ok   one minority spelling fails the gate"
+fi
+
+# 4. The filter|>length rule fires on the converted shape: a line that
+# filters and ends in `|> ...length` is lib.count spelled long (the class
+# 763eaa83 unified out of lib/).
+mkdir -p "$tmp/piped"
+cat >"$tmp/piped/seeded.nix" <<'EOF'
+{ xs, p }: xs |> builtins.filter p |> builtins.length;
+EOF
+out="$(bash "$gate" "$tmp/piped" 2>&1)"
+if [ "$?" -eq 0 ]; then
+  echo "FAIL filter|>length: gate accepted the long spelling of lib.count"
+  fail=1
+else
+  echo "ok   filter|>length fails the gate"
+  grep -q 'pipes filter |> length' <<<"$out" \
+    && echo "ok   the failure names the rule" \
+    || { echo "FAIL the failure does not name the filter|>length rule"; fail=1; }
+fi
+
+# 5. Honest controls stay green: `length` inside a filter predicate and
+# `|> length` on a non-filter source are not lib.count cases.
+mkdir -p "$tmp/controls"
+cat >"$tmp/controls/predicate.nix" <<'EOF'
+{ xs }: xs |> builtins.filter (n: (n |> builtins.length) > 2);
+EOF
+cat >"$tmp/controls/plain.nix" <<'EOF'
+{ xs }: xs |> builtins.map (x: x + 1) |> builtins.length;
+EOF
+if bash "$gate" "$tmp/controls" >/dev/null 2>&1; then
+  echo "ok   predicate-length and non-filter length pass"
+else
+  echo "FAIL gate over-fired on honest length uses"
+  fail=1
 fi
 
 exit "$fail"

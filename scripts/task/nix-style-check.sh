@@ -26,10 +26,21 @@ while IFS= read -r f; do
       fail=1
     fi
   done
+
+  # A line that filters and then ends in `|> ...length` is `lib.count`
+  # spelled the long way — 12 sites unified 2026-11-25 (763eaa83). The
+  # line-end anchor is what keeps the honest controls free: `length`
+  # inside a filter predicate or on a non-filter source never ends the
+  # line this way.
+  if grep -nE '(builtins|lib)\.filter\b.*\|>[[:space:]]*(builtins|lib)\.length[[:space:]]*;?[[:space:]]*$' "$f" | grep -q .; then
+    echo "nix-style FAIL: $f pipes filter |> length — spell it lib.count" >&2
+    grep -nE '(builtins|lib)\.filter\b.*\|>[[:space:]]*(builtins|lib)\.length[[:space:]]*;?[[:space:]]*$' "$f" >&2
+    fail=1
+  fi
 done < <(find "${roots[@]}" -name '*.nix' -not -path 'modules/secrets/*')
 
 if [ "$fail" -eq 0 ]; then
-  echo "nix-style ok: no file mixes builtins./lib. spellings of the same pure alias"
+  echo "nix-style ok: no file mixes builtins./lib. spellings of the same pure alias, no filter|>length pipes"
 else
   exit 1
 fi

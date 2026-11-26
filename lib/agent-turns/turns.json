@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-26T06:38:39Z",
+  "generated": "2026-11-26T06:52:09Z",
   "count": 200,
-  "pin": "966ca607325fdb11ad5ef230eca8a117b54cbc1521abe94c553393c1be45233a",
+  "pin": "9886e9adbcd48aa96cdd050006dfbb9540bd7aa9b768bf8d64f2c1759ea1b6b9",
   "turns": [
+    {
+      "id": "a10f9ec3-0e6e-4fd5-a43c-0f63741acc84",
+      "ts": "2026-11-26T06:48:54Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "start: continue lib/*.nix pipe-operator review — survey remaining |>, check blast radius",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/"
+      ],
+      "files": [],
+      "base_commit": "404e3da57327397be9c341336a951a50c37ca407",
+      "branch": "main",
+      "frame": "03hb0txpnhnyct5t1q96nop6z"
+    },
+    {
+      "id": "231187a9-28b3-419a-83f4-3032b0558b92",
+      "ts": "2026-11-26T06:47:16Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-publish",
+      "action": "publish | gate: agents:cv:publish-check PASS 0 problems - built .#sites.matt-site at nixconfig f544ffb9, six CVs hash-equal to blog assets/files at 64eaf48, _site rebuilt from that checkout, 6/6 anchors carry download, live is-a.dev hashes match. Closes the _site claim tmux-pane-steward left in_progress at 18:49",
+      "outcome": "done",
+      "claims": [
+        "_site"
+      ],
+      "files": [
+        "_site assets/files"
+      ],
+      "base_commit": "404e3da57327397be9c341336a951a50c37ca407",
+      "branch": "main",
+      "frame": "03hb0tm81535m3tvt8ro8nskr"
+    },
+    {
+      "id": "080a1d0a-cd06-4cb3-ba65-ec767994dbf4",
+      "ts": "2026-11-26T06:39:04Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-0725",
+      "action": "landed: dropped redundant sopsFile (base-node defaultSopsFile covers it — verified eval); same residual noted in 3 sibling modules for a later pass | gate: drv-equality delphi + nix:lint 333 + sops:drift 8/8",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "404e3da57327397be9c341336a951a50c37ca407",
+      "branch": "main",
+      "frame": "03hb0s0kap50aahez96838vxd"
+    },
     {
       "id": "a6283290-f3eb-4965-9f34-2a03d67a6661",
       "ts": "2026-11-26T06:37:29Z",
@@ -2790,48 +2835,6 @@
       "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
       "branch": "main",
       "frame": "03havaqdl9nxevpq8m5646m2b"
-    },
-    {
-      "id": "3a54066f-e82f-44e5-a0e3-3cf4c1cd58b6",
-      "ts": "2026-11-25T13:49:03Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25k",
-      "action": "landed: sweep k — 6 LinkedIn guest pages (AT/DE/NL/BE/CH) 200/200, 8 Stepstone city pages (Stuttgart, Düsseldorf, Leipzig, Dresden, Nürnberg, Hannover, Bremen, Bonn) 200/200; 60 cards, 57 unique, 36 already in ledger, 2 junk dropped, 19 filed (fit 5:7 4:0 3:12); CV table now 118-ish rows | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havapp8ea3wux4ybw9vb6qg"
-    },
-    {
-      "id": "4e5ee062-f977-42be-ac13-3e52a590fae9",
-      "ts": "2026-11-25T13:48:43Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25k",
-      "action": "claim: sweep k — 6 LinkedIn guest pages (AT/DE/NL/BE/CH) + 8 Stepstone city pages, then fold into CV job-search table",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "~/Documents/shaoyanji.is-a.dev/_tabs"
-      ],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havand932prmtvwlrnrv829"
-    },
-    {
-      "id": "8c2d8611-5c2d-4c6e-a4d8-6ade2e5db324",
-      "ts": "2026-11-25T13:48:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-2026-11-25b",
-      "action": "landed: freebuff scout_leads — scouting DevOps/SRE/Platform/Infrastructure engineer leads for CV site (working 1m 33s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03havak2i5tfqithwrm8y0os9"
     }
   ]
 }

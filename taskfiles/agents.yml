@@ -368,16 +368,17 @@ tasks:
       - 'bash scripts/task/edge-sidecar.sh "{{.CMD | default "status"}}"'
 
   agents:portfolio:smoke:
-    desc: "Smoke the portfolio services end to end: health, stats, page, search"
+    desc: "Smoke the portfolio services end to end: health, stats, analytics, page, search"
     summary: >
       scripts/task/portfolio-smoke.py — one run over job-db-scraper,
-      private-deals and inventory-site: health must answer `ok` with its own
-      service name, stats a non-empty object, `/` the HTML element its JS fills,
-      and the search route rows for `q=`. An empty answer passes (nothing matched
-      is an answer); `--expect-hit` makes it a failure. `--format toon` renders
-      it, `--browser` adds the DOM half via agent-browser (missing binary = skip,
-      not a pass). Defaults are delphi's loopback ports; `--jobs`, `--deals`,
-      `--inventory` take the tailnet mounts. Exit 1 names the service that failed.
+      private-deals, inventory-site and clanker-runner: health answers `ok` with
+      its own name, stats a non-empty object, `/api/analytics` a report naming its
+      window, `/` the element its JS fills, search rows for `q=`, inventory-site a
+      QR label for its first asset (skipped when empty), clanker `/api/machines`,
+      `/api/presets`, `/api/schedules`. Empty answers pass; `--expect-hit` fails
+      them. `--format toon`, `--browser` (DOM half, missing binary = skip),
+      `--jobs/--deals/--inventory/--clanker` for the mounts. Exit 1 names the
+      failure.
     cmds:
       - python3 scripts/task/portfolio-smoke.py {{.CLI_ARGS}}
 

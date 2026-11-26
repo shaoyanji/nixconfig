@@ -1,8 +1,71 @@
 {
-  "generated": "2026-11-26T17:20:46Z",
+  "generated": "2026-11-26T17:29:20Z",
   "count": 200,
-  "pin": "0611779248901f6e97353bcbfc4d87c4a4e47a2980f59445a1b95f6d91dbcdec",
+  "pin": "6b5e423151cbd718e2ff4f3b8262661d3d26005c1991d495d80f41c2a493b43f",
   "turns": [
+    {
+      "id": "be336de7-5a7a-471d-a32a-ffab867781e1",
+      "ts": "2026-11-26T17:28:59Z",
+      "source": "devin",
+      "subject": "nixconfig:link-vault-service",
+      "action": "claim: tailnet link archive with FTS, extraction, collections, exports, UI, and API",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/link-vault",
+        "modules/services/link-vault.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "da12d15c52d9143fc41458bac38fbb6cc4647425",
+      "branch": "main",
+      "frame": "03hb4az0khrvxxkinxgg8zn38"
+    },
+    {
+      "id": "6a54b292-1ba5-4663-8003-43727b87dd42",
+      "ts": "2026-11-26T17:26:31Z",
+      "source": "devin",
+      "subject": "nixconfig:service-portal-live-telemetry",
+      "action": "landed: loopback telemetry aggregator, nginx proxy, live service cards | gates: go test+vet PASS, node --check PASS, alejandra PASS, checks:host delphi rc=0, delphi toplevel rc=0, live store-binary smoke all four online",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "da12d15c52d9143fc41458bac38fbb6cc4647425",
+      "branch": "main",
+      "frame": "03hb4ahq4o38dnkt7keu9idby"
+    },
+    {
+      "id": "e7a75557-047d-4e0d-8218-c09e5268bdcb",
+      "ts": "2026-11-26T17:22:40Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-smoke-clanker-analytics",
+      "action": "claim: extend the smoke to clanker-runner, the three /api/analytics routes and the QR label, with unit tests that fail when a surface stops answering",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke"
+      ],
+      "files": [],
+      "base_commit": "2abeaf61007eb0cf3a86ab9970c78b634201967d",
+      "branch": "main",
+      "frame": "03hb49qp7f3pdy6swa6sc5ri1"
+    },
+    {
+      "id": "3e2cff04-f3af-43cc-9d31-940e50f48989",
+      "ts": "2026-11-26T17:21:05Z",
+      "source": "buffy",
+      "subject": "nixconfig:inventory-site-analytics",
+      "action": "GET /api/analytics?days=&limit=: value by category and location (value_cents*quantity, share), warranty book in fixed expired/30d/healthy/none buckets with count+value, top tags, events by kind + window count. Panel: 5 figures, category/location rows drive the existing form filter (only /api/meta names are buttons), meta first. Test caught GROUP BY name hitting items.name.| gate: go vet, go test, node --check, live smoke + browser (0 console, 0 errors, click 4->1), server stopped, /tmp clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2abeaf61007eb0cf3a86ab9970c78b634201967d",
+      "branch": "main",
+      "frame": "03hb49fimgymjjiwow9rlr127"
+    },
     {
       "id": "9e5dd3b6-cba5-4ca6-8204-09d1b87e6b79",
       "ts": "2026-11-26T17:16:19Z",
@@ -2964,67 +3027,6 @@
       "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
       "branch": "main",
       "frame": "03hb2sxcegke1qaffp0bkt4gd"
-    },
-    {
-      "id": "701ca99e-daec-45fa-97aa-bdbd672a7a98",
-      "ts": "2026-11-26T12:52:18Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-26e",
-      "action": "gate-change: audit apps-db.sh guards + tests, run checks:appflow",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2sxalr0nawmu4h71k9k6b"
-    },
-    {
-      "id": "7604d820-9690-4688-bc43-86f88304226e",
-      "ts": "2026-11-26T12:52:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-26f",
-      "action": "bug-fix: fix fold_umlauts in jobsearch-sweep.py, push main, post done",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2sx8v0k4k23s9a8m0t9nh"
-    },
-    {
-      "id": "483a3218-abb8-4442-a012-9e1e7c6af05f",
-      "ts": "2026-11-26T12:47:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-26e",
-      "action": "freebuff tmux input not submitting",
-      "outcome": "blocked: freebuff tmux input not submitting",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2ryfw0j9bj9f6ypkdb3fj"
-    },
-    {
-      "id": "739606c3-33f1-469e-b134-fc3eb9e6be08",
-      "ts": "2026-11-26T12:41:38Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-26e",
-      "action": "note-change: appflow guard review",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2qubw2g1gh2ytux5u5nyj"
     }
   ]
 }

@@ -192,8 +192,22 @@ class DomTest(unittest.TestCase):
             return SimpleNamespace(returncode=0, stdout='""', stderr="")
 
         with mock.patch.object(smoke.shutil, "which", return_value="/bin/agent-browser"):
-            ok, detail = smoke.check_dom(BASE, "#stats", run=run)
+            ok, detail = smoke.check_dom(BASE, "#stats", attempts=1, run=run)
         self.assertFalse(ok)
+        self.assertIn("missing or empty", detail)
+
+    def test_a_container_the_js_fills_a_beat_late_is_waited_for(self):
+        answers = iter(["", '"1 machine"'])
+
+        def run(argv, **_kw):
+            if "open" in argv:
+                return SimpleNamespace(returncode=0, stdout="opened", stderr="")
+            return SimpleNamespace(returncode=0, stdout=next(answers), stderr="")
+
+        with mock.patch.object(smoke.shutil, "which", return_value="/bin/agent-browser"):
+            ok, detail = smoke.check_dom(BASE, "#machines", run=run, sleep=lambda _s: None)
+        self.assertTrue(ok)
+        self.assertIn("1 machine", detail)
 
     def test_a_failing_open_fails(self):
         def run(argv, **_kw):
@@ -214,11 +228,81 @@ class DomTest(unittest.TestCase):
         self.assertIn("did not finish", detail)
 
 
+class AnalyticsTest(unittest.TestCase):
+    def test_a_real_report_passes_and_counts_its_buckets(self):
+        fetch = responder({"/api/analytics": (200, "application/json", body(
+            {"generated_at": "2026-11-26T00:00:00Z", "window_days": 30,
+             "categories": [{"name": "computing"}], "locations": []}))})
+        ok, detail = smoke.check_analytics(BASE, fetch=fetch)
+        self.assertTrue(ok)
+        self.assertIn("1 bucket row(s)", detail)
+
+    def test_an_empty_object_fails(self):
+        fetch = responder({"/api/analytics": (200, "application/json", "{}")})
+        self.assertFalse(smoke.check_analytics(BASE, fetch=fetch)[0])
+
+    def test_a_report_without_a_window_fails(self):
+        fetch = responder({"/api/analytics": (200, "application/json", body({"items": []}))})
+        ok, detail = smoke.check_analytics(BASE, fetch=fetch)
+        self.assertFalse(ok)
+        self.assertIn("names no window", detail)
+
+    def test_a_500_is_reported_with_its_path(self):
+        fetch = responder({"/api/analytics": (500, "application/json", body({"error": "boom"}))})
+        ok, detail = smoke.check_analytics(BASE, fetch=fetch)
+        self.assertFalse(ok)
+        self.assertIn("/api/analytics answered 500", detail)
+
+
+class EndpointTest(unittest.TestCase):
+    def test_an_items_wrapper_passes(self):
+        fetch = responder({"/api/presets": (200, "application/json", body({"items": [1, 2], "total": 2}))})
+        ok, detail = smoke.check_endpoint(BASE, "/api/presets", fetch=fetch)
+        self.assertTrue(ok)
+        self.assertIn("2 item(s)", detail)
+
+    def test_an_object_without_items_passes(self):
+        fetch = responder({"/api/schedules": (200, "application/json", body({"total": 0}))})
+        self.assertTrue(smoke.check_endpoint(BASE, "/api/schedules", fetch=fetch)[0])
+
+    def test_an_html_answer_fails(self):
+        fetch = responder({"/api/machines": (200, "text/html", "<html>")})
+        self.assertFalse(smoke.check_endpoint(BASE, "/api/machines", fetch=fetch)[0])
+
+
+class QrTest(unittest.TestCase):
+    def test_an_svg_label_passes(self):
+        fetch = responder({"/api/items/7/qr.svg": (200, "image/svg+xml; charset=utf-8",
+                                                         '<svg xmlns="http://www.w3.org/2000/svg"></svg>')})
+        ok, detail = smoke.check_qr(BASE, 7, fetch=fetch)
+        self.assertTrue(ok)
+        self.assertIn("item 7", detail)
+
+    def test_json_with_200_is_not_a_label(self):
+        fetch = responder({"/api/items/7/qr.svg": (200, "application/json", "{}")})
+        ok, detail = smoke.check_qr(BASE, 7, fetch=fetch)
+        self.assertFalse(ok)
+        self.assertIn("served application/json", detail)
+
+    def test_html_that_is_not_svg_fails(self):
+        fetch = responder({"/api/items/7/qr.svg": (200, "image/svg+xml", "<html>")})
+        self.assertFalse(smoke.check_qr(BASE, 7, fetch=fetch)[0])
+
+    def test_the_first_item_is_read_from_the_register(self):
+        fetch = responder({"/api/items?limit=1": (200, "application/json", body({"items": [{"id": 12}]}))})
+        self.assertEqual(smoke.first_item_id(BASE, fetch=fetch), 12)
+
+    def test_an_empty_register_has_no_item_to_label(self):
+        fetch = responder({"/api/items?limit=1": (200, "application/json", body({"items": []}))})
+        self.assertIsNone(smoke.first_item_id(BASE, fetch=fetch))
+
+
 class ServiceTest(unittest.TestCase):
     ARGS = SimpleNamespace(
         jobs=BASE,
         deals=BASE,
         inventory=BASE,
+        clanker=BASE,
         timeout=5.0,
         query="",
         expect_hit=False,
@@ -226,17 +310,37 @@ class ServiceTest(unittest.TestCase):
         browser_cmd="agent-browser",
     )
 
-    def test_all_four_checks_run_and_pass(self):
+    def test_every_check_runs_and_passes(self):
         fetch = responder({
             "/api/health": (200, "application/json", body({"ok": True, "service": "job-db-scraper"})),
             "/api/stats": (200, "application/json", body({"postings": 1})),
+            "/api/analytics": (200, "application/json", body({"generated_at": "now", "companies": []})),
             "/api/postings": (200, "application/json", body({"items": []})),
             "/": (200, "text/html", '<html><div id="metric-jobs"></div>'),
         })
         result = smoke.smoke_service("jobs", smoke.SERVICES["jobs"], self.ARGS, fetch=fetch)
         self.assertTrue(result["ok"])
-        self.assertEqual([c["check"] for c in result["checks"]], ["health", "stats", "page", "search"])
+        self.assertEqual(
+            [c["check"] for c in result["checks"]],
+            ["health", "stats", "analytics", "page", "search"],
+        )
         self.assertEqual(result["base"], BASE)
+
+    def test_clanker_runs_its_endpoints_and_no_search(self):
+        fetch = responder({
+            "/api/health": (200, "application/json", body({"ok": True, "service": "clanker-runner"})),
+            "/api/stats": (200, "application/json", body({"jobs": 0})),
+            "/api/machines": (200, "application/json", body({"items": []})),
+            "/api/presets": (200, "application/json", body({"items": []})),
+            "/api/schedules": (200, "application/json", body({"items": []})),
+            "/": (200, "text/html", '<html><div id="machines"></div>'),
+        })
+        result = smoke.smoke_service("clanker", smoke.SERVICES["clanker"], self.ARGS, fetch=fetch)
+        self.assertTrue(result["ok"])
+        self.assertEqual(
+            [c["check"] for c in result["checks"]],
+            ["health", "stats", "page", "machines", "presets", "schedules"],
+        )
 
     def test_an_unreachable_service_fails_once_without_hiding_it(self):
         def fetch(url, timeout=10.0):
@@ -250,6 +354,8 @@ class ServiceTest(unittest.TestCase):
         return responder({
             "/api/health": (200, "application/json", body({"ok": True, "service": "inventory-site"})),
             "/api/stats": (200, "application/json", body({"items": 0})),
+            "/api/analytics": (200, "application/json", body(
+                {"generated_at": "now", "window_days": 30, "categories": [], "warranty": []})),
             "/api/items": (200, "application/json", body({"items": []})),
             "/": (200, "text/html", '<html><div id="stats"></div>'),
         })
@@ -260,8 +366,38 @@ class ServiceTest(unittest.TestCase):
             "inventory", smoke.SERVICES["inventory"], self.ARGS, self.inventory_routes(), run
         )
         self.assertTrue(result["ok"])
-        self.assertEqual([c["check"] for c in result["checks"]], ["health", "stats", "page", "search"])
+        self.assertEqual(
+            [c["check"] for c in result["checks"]],
+            ["health", "stats", "analytics", "page", "search", "qr"],
+        )
         run.assert_not_called()
+
+    def test_an_empty_register_marks_the_qr_check_skipped_not_silent(self):
+        result = smoke.smoke_service(
+            "inventory", smoke.SERVICES["inventory"], self.ARGS, self.inventory_routes()
+        )
+        qr = [c for c in result["checks"] if c["check"] == "qr"][0]
+        self.assertTrue(qr["ok"])
+        self.assertTrue(qr.get("skipped"))
+        self.assertIn("no item to label", qr["detail"])
+
+    def test_a_real_item_is_labelled(self):
+        routes = {
+            "/api/items/12/qr.svg": (200, "image/svg+xml", '<svg xmlns="http://www.w3.org/2000/svg"/>'),
+            "/api/items?limit=1": (200, "application/json", body({"items": [{"id": 12}]})),
+            "/api/items": (200, "application/json", body({"items": [{"id": 12}], "total": 1})),
+            "/api/health": (200, "application/json", body({"ok": True, "service": "inventory-site"})),
+            "/api/stats": (200, "application/json", body({"items": 1})),
+            "/api/analytics": (200, "application/json", body({"generated_at": "now", "items": 1})),
+            "/": (200, "text/html", '<html><div id="stats"></div>'),
+        }
+        result = smoke.smoke_service(
+            "inventory", smoke.SERVICES["inventory"], self.ARGS, responder(routes)
+        )
+        self.assertTrue(result["ok"])
+        qr = [c for c in result["checks"] if c["check"] == "qr"][0]
+        self.assertNotIn("skipped", qr)
+        self.assertIn("item 12", qr["detail"])
 
     def test_with_the_flag_a_missing_browser_is_a_skip_not_a_pass(self):
         args = SimpleNamespace(**{**vars(self.ARGS), "browser": True})
@@ -276,7 +412,12 @@ class ServiceTest(unittest.TestCase):
 
 
 class MainTest(unittest.TestCase):
-    PORTS = {"8501": "job-db-scraper", "8502": "private-deals", "8503": "inventory-site"}
+    PORTS = {
+        "8501": "job-db-scraper",
+        "8502": "private-deals",
+        "8503": "inventory-site",
+        "8504": "clanker-runner",
+    }
 
     def fake_fetch(self, stats_status=200):
         def fetch(url, timeout=10.0):
@@ -287,9 +428,11 @@ class MainTest(unittest.TestCase):
                 if stats_status != 200:
                     return stats_status, "text/plain", "boom"
                 return 200, "application/json", body({"n": 1})
+            if "/api/analytics" in url:
+                return 200, "application/json", body({"generated_at": "now", "items": []})
             if "/api/" in url:
                 return 200, "application/json", body({"items": []})
-            return 200, "text/html", '<html><div id="stats"></div><div id="metric-jobs"></div>'
+            return 200, "text/html", '<html><div id="stats"></div><div id="metric-jobs"></div><div id="machines"></div>'
 
         return fetch
 
@@ -300,6 +443,7 @@ class MainTest(unittest.TestCase):
             "--jobs", "http://127.0.0.1:8501",
             "--deals", "http://127.0.0.1:8502",
             "--inventory", "http://127.0.0.1:8503",
+            "--clanker", "http://127.0.0.1:8504",
             *argv_extra,
         ]
         with mock.patch.object(sys, "argv", argv), \
@@ -313,14 +457,14 @@ class MainTest(unittest.TestCase):
         summary = json.loads(out)
         self.assertEqual(code, 0)
         self.assertTrue(summary["ok"])
-        self.assertEqual(sorted(summary["services"]), ["deals", "inventory", "jobs"])
+        self.assertEqual(sorted(summary["services"]), ["clanker", "deals", "inventory", "jobs"])
 
     def test_a_red_run_exits_one_and_names_the_service(self):
         code, out = self.run_main(self.fake_fetch(stats_status=500))
         summary = json.loads(out)
         self.assertEqual(code, 1)
         self.assertFalse(summary["ok"])
-        self.assertEqual(sorted(summary["failed"]), ["deals", "inventory", "jobs"])
+        self.assertEqual(sorted(summary["failed"]), ["clanker", "deals", "inventory", "jobs"])
         self.assertTrue(all(not s["ok"] for s in summary["services"].values()))
 
     def test_toon_is_read_back_as_toon(self):

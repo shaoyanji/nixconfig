@@ -29,10 +29,12 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import json
 import os
 import re
 import subprocess
+import time
 import sys
 import urllib.error
 import urllib.parse
@@ -112,6 +114,82 @@ STAGE_HISTORY = re.compile(
     r"(?:previous|prior|earlier)\s+(?:stage|status|bucket)\b[^.;:!?]{0,120}"
     r"|(?:stage|status)\s+(?:came|comes|was)\s+from\b[^.;:!?]{0,120}"
 )
+
+
+WRITE_LOG = os.path.expanduser("~/.local/state/appflow/apps-db-writes.log")
+WRITE_MAX = 50
+
+
+def write_fingerprint(status: str) -> str:
+    """The 12 hex a caller passes as --if-status; the text only, no newline."""
+    return hashlib.sha256((status or "").encode("utf-8")).hexdigest()[:12]
+
+
+def recent_writes(log: str) -> int:
+    try:
+        cutoff = time.time() - 600
+        with open(log, encoding="utf-8") as fh:
+            return sum(1 for line in fh
+                       if (parts := line.split()) and parts[0].isdigit() and int(parts[0]) >= cutoff)
+    except OSError:
+        return 0
+
+
+def record_write(log: str, ident: str) -> None:
+    try:
+        os.makedirs(os.path.dirname(log), exist_ok=True)
+        with open(log, "a", encoding="utf-8") as fh:
+            fh.write(f"{int(time.time())} {ident}\n")
+    except OSError:
+        pass
+
+
+def guard_write(api: str, ident: str, expect_stage: str, expect_hash: str, force: bool) -> int:
+    """0 to proceed, else the exit code `--update` must return.
+
+    `agents:apps:set` reaches the table through this function, not through
+    apps-db.sh, so the expectation lives here as well: the write must name the
+    row it believes it is writing over.
+    """
+    log = os.environ.get("APPS_DB_WRITE_LOG") or WRITE_LOG
+    if force:
+        return 0
+    ceiling = int(os.environ.get("APPS_DB_WRITE_MAX", WRITE_MAX))
+    if recent_writes(log) >= ceiling:
+        print(f"appflow-sync: refusing {ident} — {ceiling}+ writes in ten minutes: a loop, not a decision",
+              file=sys.stderr)
+        return 5
+    row = None
+    fixture = os.environ.get("APPFLOW_ROWS")
+    if fixture and os.path.exists(fixture):
+        try:
+            rows = json.load(open(fixture, encoding="utf-8"))
+            row = next((r for r in rows if r.get("id") == ident), None)
+        except (OSError, ValueError):
+            row = None
+    else:
+        try:
+            row = (get(f"{api}/api/application-get?id={urllib.parse.quote(ident)}") or [None])[0]
+        except Exception:
+            row = None
+    if not row:
+        print(f"appflow-sync: refusing {ident} — no such row; --force if you are sure", file=sys.stderr)
+        return 2
+    current_hash = write_fingerprint(row.get("status") or "")
+    current_stage = row.get("stage") or ""
+    if expect_hash and expect_hash != current_hash:
+        print(f"appflow-sync: refusing {ident} — the status changed since you read it "
+              f"(now {current_hash}, you gave {expect_hash})", file=sys.stderr)
+        return 4
+    if expect_stage and expect_stage != current_stage:
+        print(f"appflow-sync: refusing {ident} — the row is in '{current_stage}', "
+              f"you asked to write only '{expect_stage}'", file=sys.stderr)
+        return 4
+    if not expect_stage and not expect_hash:
+        print(f"appflow-sync: refusing {ident} — name what the row is now: "
+              f"--expect-stage {current_stage}, --if-status {current_hash}, or --force", file=sys.stderr)
+        return 2
+    return 0
 
 
 def stage_of(status: str) -> str:
@@ -1100,6 +1178,12 @@ def main() -> int:
         default=os.path.expanduser("~/.local/state/email-archive/apps-sync.jsonl"),
     )
     parser.add_argument("--update", default="", help="application id whose status changes")
+    parser.add_argument("--expect-stage", default="",
+                        help="with --update: refuse unless the row is in this stage")
+    parser.add_argument("--if-status", default="",
+                        help="with --update: refuse unless sha256(status)[:12] matches")
+    parser.add_argument("--force", action="store_true",
+                        help="with --update: skip the expectation and the run ceiling")
     parser.add_argument("--status", default="", help="with --update: the new status text")
     parser.add_argument("--next", default="", help="with --update: the next action")
     parser.add_argument("--draft", default="", help="application id to draft a reply for")
@@ -1153,6 +1237,9 @@ def main() -> int:
         if not args.status:
             print("appflow-sync: --update needs --status", file=sys.stderr)
             return 2
+        refusal = guard_write(api, args.update, args.expect_stage, args.if_status, args.force)
+        if refusal:
+            return refusal
         stage = stage_of(args.status)
         post(
             f"{api}/api/application-update",
@@ -1163,6 +1250,7 @@ def main() -> int:
                 "nextAction": args.next,
             },
         )
+        record_write(os.environ.get("APPS_DB_WRITE_LOG") or WRITE_LOG, args.update)
         if args.json:
             print(json.dumps({"id": args.update, "status": args.status, "stage": stage}))
         else:

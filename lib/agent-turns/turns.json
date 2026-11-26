@@ -1,8 +1,59 @@
 {
-  "generated": "2026-11-26T12:12:52Z",
+  "generated": "2026-11-26T12:19:02Z",
   "count": 200,
-  "pin": "0bb1fb6c465ca9be074ed55353fcb983a543f0793da2aac9fc06f58acb72dd09",
+  "pin": "f17323f64623fe2b64cf4302df0df034dfb51e5582e92bc50e0bf60b51ccfffe",
   "turns": [
+    {
+      "id": "6783c2aa-7dc7-4d02-a984-81a948d9809d",
+      "ts": "2026-11-26T12:15:49Z",
+      "source": "agy",
+      "subject": "nixconfig:appflow-settle-8",
+      "action": "bug-fix: settle last 8 appflow rows + BridgingIT, check appflow",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow/sync.py",
+        "scripts/task/appflow-check.sh",
+        "tests/appflow-triage"
+      ],
+      "files": [],
+      "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
+      "branch": "main",
+      "frame": "03hb2lsus459z8vj1moisw53d"
+    },
+    {
+      "id": "433e63d8-5def-4e0f-be2e-4fe6f5710a52",
+      "ts": "2026-11-26T12:13:56Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-clear-13",
+      "action": "4 roles named, GitLab stub declared duplicate of its canonical row, upsert guarded (+6 offline cases). Flagged rows 13 -> 8; those threads name no requisition.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/appflow-check.sh",
+        "tests/appflow-packet"
+      ],
+      "files": [],
+      "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
+      "branch": "main",
+      "frame": "03hb2lfiitjoec30qfrq9ogxb"
+    },
+    {
+      "id": "7d93a52b-0d7e-4f0e-82e5-e39a30ecb00b",
+      "ts": "2026-11-26T12:13:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-clear-13",
+      "action": "Clear the last placeholders from their threads and guard upsert the way update is guarded",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/appflow-check.sh",
+        "tests/appflow-packet"
+      ],
+      "files": [],
+      "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
+      "branch": "main",
+      "frame": "03hb2ldru5utvf39scrj3a6ba"
+    },
     {
       "id": "76255add-5b45-4217-a5e0-24a010fc0420",
       "ts": "2026-11-26T12:11:15Z",
@@ -2925,51 +2976,6 @@
       "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haxte48bjmnphtna6qscko1"
-    },
-    {
-      "id": "5d01e4cc-1c10-48bc-9407-b09ae07a2834",
-      "ts": "2026-11-25T21:33:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: re-check",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxtd9qwczu5w9cwo92hy5d"
-    },
-    {
-      "id": "28adf7e1-d6c2-424b-a5b9-0b5089c85dcc",
-      "ts": "2026-11-25T21:31:37Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-flake-change",
-      "action": "landed: kind/system single-sourced from inventory.toml via mapAttrs — 60 stale literals deleted, minyx x86_64 bug found+fixed by construction (30/30 agree, minyx aarch64) | gate: drv-equality 30/30 identical, nix:lint 331 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxt2ovv0sif4e0y0akoj6k"
-    },
-    {
-      "id": "b8deabec-391f-45bb-9fa0-f405bdc0250a",
-      "ts": "2026-11-25T21:30:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: check — gateway active, hermes-check rc=0 surface clean, xs 401 unauth / 200 authed, listeners loopback 8093 + tailnet 8449 only",
-      "outcome": "done",
-      "claims": [
-        "modules/user/ai",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxsvm3nl5y0p2c6q4nb91h"
     }
   ]
 }

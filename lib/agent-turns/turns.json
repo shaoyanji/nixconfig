@@ -1,8 +1,109 @@
 {
-  "generated": "2026-11-26T05:55:24Z",
+  "generated": "2026-11-26T06:24:39Z",
   "count": 200,
-  "pin": "660d0d925bd867cb329071c5461f2880f5f11794765c63a80cfe2e416aa43a96",
+  "pin": "e5815417fb1efb072f613a95fce376321ebfb2328b08403a2a0c1e01f7095491",
   "turns": [
+    {
+      "id": "4c5d8eca-630a-433b-bff6-9f792d66439a",
+      "ts": "2026-11-26T06:23:24Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-0719",
+      "action": "start: extend modules-edges fixture with allowed-case lock",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/modules-edges/run.sh",
+        "scripts/task/modules-edges.sh"
+      ],
+      "files": [],
+      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
+      "branch": "main",
+      "frame": "03hb0oydugvxxzthlcb9cb8pi"
+    },
+    {
+      "id": "91b3dd00-98fa-4ea7-880a-6e372a1b94bc",
+      "ts": "2026-11-26T06:22:54Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0719",
+      "action": "gate-change: extend modules-edges fixture with allowed-case lock",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/modules-edges/run.sh",
+        "scripts/task/modules-edges.sh"
+      ],
+      "files": [],
+      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
+      "branch": "main",
+      "frame": "03hb0ouvnlcel6b7tesjz6ynz"
+    },
+    {
+      "id": "19d9853d-7e03-4f26-bc2b-6f3fadb7a894",
+      "ts": "2026-11-26T06:17:04Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0657-done",
+      "action": "devin verified image-daily Go port gates: nothing red, no fix needed, nothing committed (gate-change)",
+      "outcome": "done",
+      "claims": [
+        "modules/"
+      ],
+      "files": [],
+      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
+      "branch": "main",
+      "frame": "03hb0npxvcpr386qnrvh0fwh7"
+    },
+    {
+      "id": "d3e60957-cfa4-4fa5-93e1-569fe3b5c8db",
+      "ts": "2026-11-26T06:16:00Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0657",
+      "action": "devin: verify image-daily Go port gates and fix (gate-change)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/"
+      ],
+      "files": [],
+      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
+      "branch": "main",
+      "frame": "03hb0nifajgkkis7t5xgxnfqj"
+    },
+    {
+      "id": "0166cad1-e21a-45f2-93d8-eecb425993da",
+      "ts": "2026-11-26T06:05:18Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-0617",
+      "action": "done: image-daily gates re-verified on 3910aa30 — checks:image-daily rc=0 (dispatch+fallback+breakers+shrinkGuard), images:publish:test 9/9 incl. real-rev 470c9034^ refusal; nothing red, nothing to fix",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
+      "branch": "main",
+      "frame": "03hb0lf3plt04t3afe66aq5nj"
+    },
+    {
+      "id": "3df990ae-9827-43c0-8f41-52e2931fccd6",
+      "ts": "2026-11-26T06:00:22Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-26: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 772 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hb0kggqaqzqvmq71biwspuh"
+    },
+    {
+      "id": "5d6e8582-ca60-42c3-88ba-5417929bb9d1",
+      "ts": "2026-11-26T05:55:46Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-0638",
+      "action": "landed: modules-edges refused the path imports — both sites now reach config.nginx-static-ui by name (self.modules; +self arg on appflow-board) | gate: modules:edges 168 modules every edge by name + drv-equality delphi + nix:lint 333",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
+      "branch": "main",
+      "frame": "03hb0jk2wtvdyf4cmmdk3bh2u"
+    },
     {
       "id": "7c8fc094-e181-417e-865d-5447a32e8b61",
       "ts": "2026-11-26T05:51:38Z",
@@ -2729,97 +2830,6 @@
       "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
       "branch": "main",
       "frame": "03hav8ry69mwa7qrzd241m1bt"
-    },
-    {
-      "id": "520032c0-1453-42a1-b6ee-73aa689364b2",
-      "ts": "2026-11-25T13:36:59Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-cv-lane",
-      "action": "landed: drove freebuff pane (agents:2.1) to continue the job-scout / CV lane scouting DevOps SRE Platform Infrastructure leads; thinking... confirmed after Enter",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav8cseffi5r88qw1c72o0l"
-    },
-    {
-      "id": "915b0dab-13fb-440a-a1da-429091f9cdb5",
-      "ts": "2026-11-25T13:36:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-gate",
-      "action": "landed: drove devin pane (agents:1.1) to verify the image-daily publish gate; gate check running, fresh Thinking spinner confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav8byz4hjsvk9uvtd3lgdt"
-    },
-    {
-      "id": "ebb6c0a8-9421-48c8-a141-a891480a3457",
-      "ts": "2026-11-25T13:30:12Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-publish-2026-11-25",
-      "action": "landed: published CV + personal site — pushed 8e7c54b (3 commits) to shaoyanji/shaoyanji.is-a.dev, Pages run 45623920503 build+deploy success; live /cv/ serves 71 tr / 69 ad links, 6 PDFs byte-identical to repo | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav718v4abaytif1fjx4low"
-    },
-    {
-      "id": "3e73c073-ddda-416f-8cd0-09d1ed3a85cf",
-      "ts": "2026-11-25T13:27:39Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-search-freebuff-lane",
-      "action": "landed: publish CV site task to freebuff pane",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav6j7jsn77rhw36t7o3h41"
-    },
-    {
-      "id": "d8d123eb-e0ec-4667-a001-f6aab77c5923",
-      "ts": "2026-11-25T13:13:50Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:tmux-pane-steward",
-      "action": "landed: drove IDLE pane agents:1.1 (devin / nixconfig refactoring) with a publish task. Routed via jev-decide classify --provider typesafe -> publish, p=0.89 margin=0.84 (decisive, exit 0). Sent via tmux load-buffer -b + paste-buffer + Enter; fresh 'Thinking · 1s' counter confirmed acceptance. Task: publish-check nixconfig (git status vs origin/main; push if pending).",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav3tzbym98mcsywx4wsftl"
-    },
-    {
-      "id": "185899e8-f48e-4f5f-a3b5-0a7015a706a1",
-      "ts": "2026-11-25T13:07:21Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "matt-site publish: built 17 pages + 6 CVs, deployed preview + prod (77a48904); live was stale (thirteen->twenty-five + DevOps/SRE copy now live) | gate: matt:cv:check 14/0, site-links green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav2kif7b38c7gw3tmqp7bg"
-    },
-    {
-      "id": "5bdfed9d-b0c3-4a6d-afc3-88260f288ef7",
-      "ts": "2026-11-25T13:04:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:tmux-pane-steward",
-      "action": "drove idle panes: agents:1.1 freebuff CV-site publish task (Thinking 2s); agents:3.1 wallpaper-worker wallpaper task (working 22s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav22twk91mguoe4dmynw4c"
     }
   ]
 }

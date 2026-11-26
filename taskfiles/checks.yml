@@ -885,12 +885,15 @@ tasks:
       - bash scripts/task/modules-edges.sh
 
   checks:modules:edges:test:
-    desc: "Regression fixture for checks:modules:edges (seeded relative-path import)"
+    desc: "Regression fixture for checks:modules:edges (seeded relative-path import + allowed-case lock)"
     summary: >
       A worktree module gains `import ../lib/seeded-edge.nix;` — the
       reach-by-path edge the 2026-11 conversion chased across 24 files, valid
       at eval time and broken by a rename. The awk gate must name the
-      file:line; HEAD stays clean.
+      file:line; HEAD stays clean. The allowed-case lock then seeds each
+      documented non-edge (import with arguments, asset readFile, derivation
+      src, overlay import) and the gate must stay green — a regex that
+      over-reaches fails here, not on a real file.
     cmds:
       - bash tests/modules-edges/run.sh
 

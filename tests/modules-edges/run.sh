@@ -33,7 +33,29 @@ else
   echo "FAIL seeded tree: rc=$rc — expected an edge refusal"; echo "$out" | tail -6; fail=1
 fi
 
-# 2. The current tree passes.
+# 2. The allowed shapes stay allowed — the lock that keeps the gate from
+# over-reaching: a path edge is only a violation WITHOUT an argument or a
+# derivation context. Each documented allowed line is seeded; the gate must
+# stay green on all of them.
+git -C "$tmp/wt" checkout -- modules/global/user.nix
+cat >>"$tmp/wt/modules/global/user.nix" <<'SEED'
+# allowed: a load with arguments is a dependency, not an edge
+allowedWithArgs = import ../scripts/x.nix {inherit pkgs;};
+# allowed: an asset read, not a Nix module
+allowedAsset = builtins.readFile ../config/nu/x.nu;
+# allowed: a derivation path, inside src
+allowedSrc = ../scripts/x.sh;
+# allowed: an overlay import is not a module
+allowedOverlay = nixpkgs.overlays = [(import ../../overlays/x.nix)];
+SEED
+out=$(cd "$tmp/wt" && bash scripts/task/modules-edges.sh 2>&1); rc=$?
+if [ $rc -eq 0 ]; then
+  echo "ok   allowed-case lock: all four shapes pass, none flagged"
+else
+  echo "FAIL allowed case: rc=$rc — gate refused a documented allowed shape"; echo "$out" | tail -8; fail=1
+fi
+
+# 3. The current tree passes.
 if bash "$repo/scripts/task/modules-edges.sh" >/dev/null 2>&1; then
   echo "ok   HEAD passes"
 else

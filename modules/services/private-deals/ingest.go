@@ -38,6 +38,7 @@ type ingester struct {
 	store  *Store
 	client *http.Client
 	cfg    providerConfig
+	alerts *alertManager
 
 	mu      sync.Mutex
 	running bool
@@ -162,6 +163,11 @@ func (s *ingester) run(ctx context.Context, sources []string) {
 	}
 	expired, _ := s.store.MarkExpiredDeals(ctx)
 	message := fmt.Sprintf("fetched %d, inserted %d, updated %d, expired %d", totalFetched, totalInserted, totalUpdated, expired)
+	if s.alerts != nil {
+		if alerts, alertErr := s.alerts.evaluate(ctx, true); alertErr == nil && alerts.Matched > 0 {
+			message += fmt.Sprintf(", alerts %d new/%d sent/%d failed", alerts.Created, alerts.Notified, alerts.Failed)
+		}
+	}
 	if len(failures) > 0 {
 		message += "; " + strings.Join(failures, " | ")
 	}

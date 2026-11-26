@@ -24,6 +24,7 @@ var webFiles embed.FS
 type server struct {
 	store          *Store
 	ingester       *ingester
+	alerts         *alertManager
 	adminToken     string
 	expectedOrigin string
 	started        time.Time
@@ -44,6 +45,7 @@ func main() {
 	jsonFlag := flag.String("json-feeds", "", "comma-separated JSON feed URLs; PRIVATE_DEALS_JSON_FEEDS is the fallback")
 	scrapeFlag := flag.String("scrape-urls", "", "comma-separated URLs to scrape through providers; PRIVATE_DEALS_SCRAPE_URLS is the fallback")
 	queriesFlag := flag.String("search-queries", "", "comma-separated web-search queries; PRIVATE_DEALS_SEARCH_QUERIES is the fallback")
+	ntfyFlag := flag.String("ntfy-url", "", "ntfy/webhook URL for watchlist alerts; PRIVATE_DEALS_NTFY_URL is the fallback")
 	adminToken := flag.String("admin-token-env", "PRIVATE_DEALS_ADMIN_TOKEN", "environment variable naming the optional write bearer token")
 	expectedOrigin := flag.String("origin", "", "expected browser Origin for state-changing requests; empty disables the check")
 	flag.Parse()
@@ -73,9 +75,12 @@ func main() {
 		AllowKeyless:  os.Getenv("PRIVATE_DEALS_ALLOW_KEYLESS") == "1",
 	}
 	ingest := newIngester(store, cfg)
+	alerts := newAlertManager(store, firstNonEmpty(*ntfyFlag, os.Getenv("PRIVATE_DEALS_NTFY_URL")))
+	ingest.alerts = alerts
 	s := &server{
 		store:          store,
 		ingester:       ingest,
+		alerts:         alerts,
 		adminToken:     strings.TrimSpace(os.Getenv(*adminToken)),
 		expectedOrigin: strings.TrimRight(*expectedOrigin, "/"),
 		started:        time.Now().UTC(),
@@ -92,6 +97,7 @@ func main() {
 	mux.HandleFunc("GET /api/sources", s.sources)
 	mux.HandleFunc("GET /api/deals", s.deals)
 	mux.HandleFunc("POST /api/deals", s.createDeal)
+	mux.HandleFunc("POST /api/deals/batch", s.batchDeals)
 	mux.HandleFunc("GET /api/deals/{id}", s.deal)
 	mux.HandleFunc("GET /api/products", s.products)
 	mux.HandleFunc("POST /api/products", s.createProduct)
@@ -106,6 +112,8 @@ func main() {
 	mux.HandleFunc("POST /api/ingest", s.triggerIngest)
 	mux.HandleFunc("GET /api/runs", s.runs)
 	mux.HandleFunc("GET /api/export.csv", s.exportCSV)
+	mux.HandleFunc("GET /api/alerts", s.alertList)
+	mux.HandleFunc("POST /api/alerts/evaluate", s.evaluateAlerts)
 
 	sources := splitCSV(*sourcesFlag)
 	if *ingestOnStart {
@@ -122,7 +130,7 @@ func main() {
 	}
 
 	log.Printf("private-deals: listening on %s, db %s, sources %s", *addr, *dbPath, strings.Join(sources, ","))
-	log.Printf("private-deals: providers firecrawl=%t tavily=%t context=%t rss_feeds=%d json_feeds=%d scrape_urls=%d", cfg.FirecrawlKey != "", cfg.TavilyKey != "", cfg.ContextKey != "", len(cfg.RSSFeeds), len(cfg.JSONFeeds), len(cfg.ScrapeURLs))
+	log.Printf("private-deals: providers firecrawl=%t tavily=%t context=%t rss_feeds=%d json_feeds=%d scrape_urls=%d alerts=%t", cfg.FirecrawlKey != "", cfg.TavilyKey != "", cfg.ContextKey != "", len(cfg.RSSFeeds), len(cfg.JSONFeeds), len(cfg.ScrapeURLs), alerts.enabled())
 	if err := http.ListenAndServe(*addr, mux); err != nil {
 		log.Fatalf("private-deals: %v", err)
 	}
@@ -298,7 +306,99 @@ func (s *server) createDeal(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
+	if s.alerts != nil {
+		go s.alerts.evaluate(context.Background(), true)
+	}
 	writeJSON(w, map[bool]int{true: http.StatusCreated, false: http.StatusOK}[created], map[string]any{"id": id, "created": created})
+}
+
+func (s *server) batchDeals(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	var payload struct {
+		Deals []dealInput `json:"deals"`
+		Items []dealInput `json:"items"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	inputs := payload.Deals
+	if len(inputs) == 0 {
+		inputs = payload.Items
+	}
+	if len(inputs) == 0 {
+		writeError(w, http.StatusBadRequest, errors.New("batch must contain at least one deal"))
+		return
+	}
+	if len(inputs) > 500 {
+		writeError(w, http.StatusBadRequest, errors.New("batch is limited to 500 deals"))
+		return
+	}
+	response := batchDealsResponse{Total: len(inputs)}
+	seen := map[string]bool{}
+	for index, input := range inputs {
+		normalized := newDeal(input)
+		if strings.TrimSpace(input.Title) == "" && strings.TrimSpace(input.URL) == "" && strings.TrimSpace(input.Description) == "" {
+			response.Skipped++
+			continue
+		}
+		priceKey := "none"
+		if normalized.Price != nil {
+			priceKey = fmt.Sprintf("%.2f", *normalized.Price)
+		}
+		dedupeKey := normalized.Fingerprint + ":" + normalized.Currency + ":" + priceKey
+		if seen[dedupeKey] {
+			response.Skipped++
+			continue
+		}
+		seen[dedupeKey] = true
+		_, created, err := s.store.UpsertDeal(r.Context(), input)
+		if err != nil {
+			response.Failed++
+			if len(response.Errors) < 25 {
+				response.Errors = append(response.Errors, batchDealError{Index: index, Error: err.Error()})
+			}
+			continue
+		}
+		if created {
+			response.Created++
+		} else {
+			response.Updated++
+		}
+	}
+	if response.Created+response.Updated > 0 && s.alerts != nil {
+		if summary, err := s.alerts.evaluate(r.Context(), true); err == nil {
+			response.Alerts = &summary
+		}
+	}
+	status := http.StatusOK
+	if response.Created > 0 {
+		status = http.StatusCreated
+	}
+	writeJSON(w, status, response)
+}
+
+func (s *server) alertList(w http.ResponseWriter, r *http.Request) {
+	items, err := s.store.ListAlerts(r.Context(), intQuery(r, "limit"), r.URL.Query().Get("status"))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": items, "total": len(items), "enabled": s.alerts.enabled()})
+}
+
+func (s *server) evaluateAlerts(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	summary, err := s.alerts.evaluate(r.Context(), true)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, summary)
 }
 
 func (s *server) products(w http.ResponseWriter, r *http.Request) {

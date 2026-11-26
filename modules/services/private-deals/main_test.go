@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -240,5 +241,99 @@ func TestProviderSearchAndScrapeClients(t *testing.T) {
 	text, err = ing.contextScrape(context.Background(), "https://example.com/deal")
 	if err != nil || !strings.Contains(text, "Context deal") {
 		t.Fatalf("contextScrape %q err=%v", text, err)
+	}
+}
+
+func TestWatchlistAlertsAreDedupedAndNotifyNtfy(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	current := 999.0
+	target := 850.0
+	productID, _, err := store.UpsertProduct(ctx, productInput{Source: "manual", Merchant: "Shop", Name: "Example Laptop", URL: "https://shop.example/x1", CurrentPrice: &current, TargetPrice: &target})
+	if err != nil {
+		t.Fatalf("UpsertProduct: %v", err)
+	}
+	watchlistID, err := store.CreateWatchlist(ctx, "Hardware", "")
+	if err != nil {
+		t.Fatalf("CreateWatchlist: %v", err)
+	}
+	if err := store.AddWatchlistItem(ctx, watchlistID, productID, ""); err != nil {
+		t.Fatalf("AddWatchlistItem: %v", err)
+	}
+	price := 799.0
+	if _, _, err := store.UpsertDeal(ctx, dealInput{Source: "manual", Merchant: "Shop", Title: "Example Laptop sale", URL: "https://shop.example/x1", Price: &price}); err != nil {
+		t.Fatalf("UpsertDeal: %v", err)
+	}
+
+	posts := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		posts++
+		if r.Header.Get("Title") == "" {
+			t.Error("missing ntfy title")
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	manager := newAlertManager(store, server.URL)
+	first, err := manager.evaluate(ctx, true)
+	if err != nil {
+		t.Fatalf("first evaluate: %v", err)
+	}
+	if first.Matched != 1 || first.Created != 1 || first.Notified != 1 || first.Failed != 0 {
+		t.Fatalf("first summary %#v", first)
+	}
+	second, err := manager.evaluate(ctx, true)
+	if err != nil {
+		t.Fatalf("second evaluate: %v", err)
+	}
+	if second.Matched != 1 || second.Created != 0 || second.Existing != 1 || second.Notified != 0 {
+		t.Fatalf("second summary %#v", second)
+	}
+	if posts != 1 {
+		t.Fatalf("posts %d, want deduped single notification", posts)
+	}
+
+	price = 749.0
+	if _, _, err := store.UpsertDeal(ctx, dealInput{Source: "manual", Merchant: "Shop", Title: "Example Laptop sale", URL: "https://shop.example/x1", Price: &price}); err != nil {
+		t.Fatalf("price-change UpsertDeal: %v", err)
+	}
+	third, err := manager.evaluate(ctx, true)
+	if err != nil {
+		t.Fatalf("third evaluate: %v", err)
+	}
+	if third.Created != 1 || third.Notified != 1 || posts != 2 {
+		t.Fatalf("third summary %#v posts=%d, want new price notification", third, posts)
+	}
+	alerts, err := store.ListAlerts(ctx, 10, "")
+	if err != nil || len(alerts) != 2 {
+		t.Fatalf("alerts %#v err=%v", alerts, err)
+	}
+	if alerts[0].Reason != "target-price" || alerts[0].Status != "sent" {
+		t.Fatalf("unexpected alert %#v", alerts[0])
+	}
+}
+
+func TestBatchDealsEndpointAccountsForOutcomes(t *testing.T) {
+	store := testStore(t)
+	s := &server{store: store, alerts: newAlertManager(store, "")}
+	body := `{"deals":[
+		{"title":"SSD sale","source":"manual","merchant":"Shop","price":89},
+		{"title":"SSD sale","source":"manual","merchant":"Shop","price":89},
+		{"title":"SSD sale","source":"manual","merchant":"Shop","price":79},
+		{}
+	]}`
+	req := httptest.NewRequest(http.MethodPost, "/api/deals/batch", strings.NewReader(body))
+	recorder := httptest.NewRecorder()
+	s.batchDeals(recorder, req)
+	if recorder.Code != http.StatusCreated {
+		t.Fatalf("status %d body %s", recorder.Code, recorder.Body.String())
+	}
+	var response batchDealsResponse
+	if err := json.NewDecoder(recorder.Body).Decode(&response); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if response.Created != 1 || response.Updated != 1 || response.Skipped != 2 || response.Failed != 0 || response.Total != 4 {
+		t.Fatalf("response %#v", response)
 	}
 }

@@ -45,6 +45,8 @@
     (lib.concatStringsSep "," cfg.searchQueries)
     "-origin"
     "https://${cfg.tailnetHost}:${toString cfg.tailnetPort}"
+    "-ntfy-url"
+    cfg.ntfyUrl
   ];
 in {
   options.services.privateDeals = {
@@ -120,6 +122,12 @@ in {
       type = lib.types.listOf lib.types.str;
       default = [];
       description = "Provider web-search queries. Empty means the service's default deal queries.";
+    };
+
+    ntfyUrl = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "ntfy or webhook endpoint used for deduped watchlist price alerts. Prefer PRIVATE_DEALS_NTFY_URL in environmentFile when the URL contains a private topic.";
     };
 
     environmentFile = lib.mkOption {

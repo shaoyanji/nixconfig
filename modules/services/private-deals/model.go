@@ -131,6 +131,56 @@ type productInput struct {
 	Tags         []string `json:"tags"`
 }
 
+type DealAlert struct {
+	ID          int64      `json:"id"`
+	DealID      int64      `json:"deal_id"`
+	ProductID   int64      `json:"product_id"`
+	WatchlistID int64      `json:"watchlist_id"`
+	Reason      string     `json:"reason"`
+	Price       float64    `json:"price"`
+	Currency    string     `json:"currency"`
+	Title       string     `json:"title"`
+	Message     string     `json:"message"`
+	Status      string     `json:"status"`
+	Attempts    int        `json:"attempts"`
+	NotifyError string     `json:"notify_error,omitempty"`
+	FirstSeen   time.Time  `json:"first_seen"`
+	LastSeen    time.Time  `json:"last_seen"`
+	NotifiedAt  *time.Time `json:"notified_at,omitempty"`
+	Watchlist   string     `json:"watchlist,omitempty"`
+	ProductName string     `json:"product_name,omitempty"`
+}
+
+type alertEvaluation struct {
+	Matched  int         `json:"matched"`
+	Created  int         `json:"created"`
+	Existing int         `json:"existing"`
+	Alerts   []DealAlert `json:"alerts,omitempty"`
+}
+
+type notifySummary struct {
+	Matched  int `json:"matched"`
+	Created  int `json:"created"`
+	Existing int `json:"existing"`
+	Notified int `json:"notified"`
+	Failed   int `json:"failed"`
+}
+
+type batchDealsResponse struct {
+	Created int              `json:"created"`
+	Updated int              `json:"updated"`
+	Skipped int              `json:"skipped"`
+	Failed  int              `json:"failed"`
+	Total   int              `json:"total"`
+	Errors  []batchDealError `json:"errors,omitempty"`
+	Alerts  *notifySummary   `json:"alerts,omitempty"`
+}
+
+type batchDealError struct {
+	Index int    `json:"index"`
+	Error string `json:"error"`
+}
+
 type ingestResult struct {
 	Deals    []dealInput `json:"deals"`
 	Warnings []string    `json:"warnings"`

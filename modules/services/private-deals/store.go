@@ -137,6 +137,24 @@ func (s *Store) migrate() error {
 			added_at TEXT NOT NULL,
 			PRIMARY KEY (watchlist_id, product_id)
 		)`,
+		`CREATE TABLE IF NOT EXISTS deal_alerts (
+			id INTEGER PRIMARY KEY,
+			fingerprint TEXT NOT NULL UNIQUE,
+			deal_id INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+			product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+			watchlist_id INTEGER NOT NULL REFERENCES watchlists(id) ON DELETE CASCADE,
+			reason TEXT NOT NULL,
+			price REAL NOT NULL,
+			currency TEXT NOT NULL DEFAULT 'EUR',
+			title TEXT NOT NULL,
+			message TEXT NOT NULL,
+			status TEXT NOT NULL DEFAULT 'pending',
+			attempts INTEGER NOT NULL DEFAULT 0,
+			notify_error TEXT NOT NULL DEFAULT '',
+			first_seen TEXT NOT NULL,
+			last_seen TEXT NOT NULL,
+			notified_at TEXT
+		)`,
 		`CREATE TABLE IF NOT EXISTS ingest_runs (
 			id INTEGER PRIMARY KEY,
 			source TEXT NOT NULL,
@@ -168,6 +186,8 @@ func (s *Store) migrate() error {
 		`CREATE INDEX IF NOT EXISTS idx_products_merchant ON products(merchant)`,
 		`CREATE INDEX IF NOT EXISTS idx_history_product ON price_history(product_id, captured_at DESC)`,
 		`CREATE INDEX IF NOT EXISTS idx_history_deal ON price_history(deal_id, captured_at DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_alerts_status ON deal_alerts(status,last_seen DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_alerts_deal ON deal_alerts(deal_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_runs_started ON ingest_runs(started_at DESC)`,
 	}
 	for _, statement := range statements {
@@ -803,6 +823,143 @@ func (s *Store) WatchlistItems(ctx context.Context, watchlistID int64) ([]Watchl
 	return items, rows.Err()
 }
 
+func alertFingerprint(dealID int64, currency string, price float64) string {
+	return fmt.Sprintf("%d:%s:%.2f", dealID, normalizeCurrency(currency), price)
+}
+
+func alertReason(price float64, current, target *float64) string {
+	if target != nil && price <= *target {
+		return "target-price"
+	}
+	if current != nil && price < *current*0.95 {
+		return "price-drop"
+	}
+	return "watchlist-match"
+}
+
+func (s *Store) EvaluateWatchlistAlerts(ctx context.Context, limit int) (alertEvaluation, error) {
+	if limit <= 0 || limit > 500 {
+		limit = 200
+	}
+	rows, err := s.db.QueryContext(ctx, `SELECT d.id,d.title,d.price,d.currency,p.id,p.name,p.current_price,p.target_price,min(w.id),w.name
+		FROM deals d
+		JOIN products p ON p.id=d.product_id
+		JOIN watchlist_items i ON i.product_id=p.id
+		JOIN watchlists w ON w.id=i.watchlist_id
+		WHERE d.active=1 AND p.active=1 AND d.price IS NOT NULL
+		GROUP BY d.id
+		ORDER BY d.last_seen DESC LIMIT ?`, limit)
+	if err != nil {
+		return alertEvaluation{}, err
+	}
+	candidates := []DealAlert{}
+	for rows.Next() {
+		var alert DealAlert
+		var current, target sql.NullFloat64
+		if err := rows.Scan(&alert.DealID, &alert.Title, &alert.Price, &alert.Currency, &alert.ProductID, &alert.ProductName, &current, &target, &alert.WatchlistID, &alert.Watchlist); err != nil {
+			rows.Close()
+			return alertEvaluation{}, err
+		}
+		currentPtr, targetPtr := floatPtr(current), floatPtr(target)
+		alert.Reason = alertReason(alert.Price, currentPtr, targetPtr)
+		alert.Message = fmt.Sprintf("%s is %.2f %s at %s", alert.ProductName, alert.Price, alert.Currency, alert.Title)
+		if alert.Reason == "target-price" && targetPtr != nil {
+			alert.Message = fmt.Sprintf("%s hit target %.2f %s: %.2f %s", alert.ProductName, *targetPtr, alert.Currency, alert.Price, alert.Currency)
+		}
+		candidates = append(candidates, alert)
+	}
+	if err := rows.Close(); err != nil {
+		return alertEvaluation{}, err
+	}
+	if err := rows.Err(); err != nil {
+		return alertEvaluation{}, err
+	}
+
+	result := alertEvaluation{Alerts: []DealAlert{}}
+	for _, alert := range candidates {
+		fingerprint := alertFingerprint(alert.DealID, alert.Currency, alert.Price)
+		now := nowString()
+		res, err := s.db.ExecContext(ctx, `INSERT OR IGNORE INTO deal_alerts (fingerprint,deal_id,product_id,watchlist_id,reason,price,currency,title,message,status,first_seen,last_seen) VALUES (?,?,?,?,?,?,?,?,?,'pending',?,?)`, fingerprint, alert.DealID, alert.ProductID, alert.WatchlistID, alert.Reason, alert.Price, alert.Currency, alert.Title, alert.Message, now, now)
+		if err != nil {
+			return result, err
+		}
+		if n, _ := res.RowsAffected(); n > 0 {
+			result.Created++
+			alert.ID, _ = res.LastInsertId()
+			alert.Status = "pending"
+			alert.FirstSeen = parseTime(now)
+			alert.LastSeen = parseTime(now)
+		} else {
+			result.Existing++
+			if _, err := s.db.ExecContext(ctx, `UPDATE deal_alerts SET last_seen=?,title=?,message=?,reason=? WHERE fingerprint=?`, now, alert.Title, alert.Message, alert.Reason, fingerprint); err != nil {
+				return result, err
+			}
+			var firstSeen, lastSeen string
+			var notified sql.NullString
+			err := s.db.QueryRowContext(ctx, `SELECT id,status,attempts,notify_error,first_seen,last_seen,notified_at FROM deal_alerts WHERE fingerprint=?`, fingerprint).Scan(&alert.ID, &alert.Status, &alert.Attempts, &alert.NotifyError, &firstSeen, &lastSeen, &notified)
+			if err != nil {
+				return result, err
+			}
+			alert.FirstSeen = parseTime(firstSeen)
+			alert.LastSeen = parseTime(lastSeen)
+			if notified.Valid {
+				t := parseTime(notified.String)
+				alert.NotifiedAt = &t
+			}
+		}
+		result.Matched++
+		result.Alerts = append(result.Alerts, alert)
+	}
+	return result, nil
+}
+
+func (s *Store) ListAlerts(ctx context.Context, limit int, status string) ([]DealAlert, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 50
+	}
+	where, args := "1=1", []any{}
+	if status != "" {
+		where += " AND a.status=?"
+		args = append(args, status)
+	}
+	rows, err := s.db.QueryContext(ctx, `SELECT a.id,a.deal_id,a.product_id,a.watchlist_id,a.reason,a.price,a.currency,a.title,a.message,a.status,a.attempts,a.notify_error,a.first_seen,a.last_seen,COALESCE(a.notified_at,''),w.name,p.name
+		FROM deal_alerts a JOIN watchlists w ON w.id=a.watchlist_id JOIN products p ON p.id=a.product_id
+		WHERE `+where+` ORDER BY a.last_seen DESC LIMIT ?`, append(args, limit)...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	alerts := []DealAlert{}
+	for rows.Next() {
+		var alert DealAlert
+		var firstSeen, lastSeen, notified string
+		if err := rows.Scan(&alert.ID, &alert.DealID, &alert.ProductID, &alert.WatchlistID, &alert.Reason, &alert.Price, &alert.Currency, &alert.Title, &alert.Message, &alert.Status, &alert.Attempts, &alert.NotifyError, &firstSeen, &lastSeen, &notified, &alert.Watchlist, &alert.ProductName); err != nil {
+			return nil, err
+		}
+		alert.FirstSeen = parseTime(firstSeen)
+		alert.LastSeen = parseTime(lastSeen)
+		if notified != "" {
+			t := parseTime(notified)
+			alert.NotifiedAt = &t
+		}
+		alerts = append(alerts, alert)
+	}
+	return alerts, rows.Err()
+}
+
+func (s *Store) MarkAlertNotification(ctx context.Context, id int64, sent bool, notifyError string) error {
+	status := "failed"
+	if sent {
+		status = "sent"
+	}
+	notified := ""
+	if sent {
+		notified = nowString()
+	}
+	_, err := s.db.ExecContext(ctx, `UPDATE deal_alerts SET status=?,attempts=attempts+1,notify_error=?,notified_at=?,last_seen=? WHERE id=?`, status, notifyError, notified, nowString(), id)
+	return err
+}
+
 func (s *Store) Stats(ctx context.Context) (map[string]any, error) {
 	stats := map[string]any{}
 	for key, query := range map[string]string{
@@ -814,6 +971,9 @@ func (s *Store) Stats(ctx context.Context) (map[string]any, error) {
 		"discount_avg":   `SELECT COALESCE(round(avg(discount_pct),1),0) FROM deals WHERE active=1 AND discount_pct>0`,
 		"discount_max":   `SELECT COALESCE(max(discount_pct),0) FROM deals WHERE active=1`,
 		"price_drops_7d": `SELECT count(*) FROM price_history WHERE captured_at>=?`,
+		"alerts":         `SELECT count(*) FROM deal_alerts`,
+		"alerts_sent":    `SELECT count(*) FROM deal_alerts WHERE status='sent'`,
+		"alerts_pending": `SELECT count(*) FROM deal_alerts WHERE status='pending'`,
 	} {
 		if key == "price_drops_7d" {
 			var value int

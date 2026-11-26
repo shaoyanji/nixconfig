@@ -18,8 +18,8 @@ function toast(message) {
 async function refreshStats() {
   const stats = await api('/api/stats');
   $('#stats').innerHTML = [
-    ['deals','Active deals'],['products','Tracked products'],['price_points','Price points'],['discount_max','Best discount %']
-  ].map(([key,label]) => `<div class="stat"><strong>${esc(stats[key] ?? 0)}${key==='discount_max'?'%':''}</strong><span>${label}</span></div>`).join('');
+    ['deals','Active deals'],['products','Tracked products'],['price_points','Price points'],['alerts_sent','Alerts sent']
+  ].map(([key,label]) => `<div class="stat"><strong>${esc(stats[key] ?? 0)}</strong><span>${label}</span></div>`).join('');
 }
 function filterParams() {
   const data = new FormData($('#filters'));
@@ -55,11 +55,18 @@ async function showDeal(id) {
   const prices = history.filter(p => p.price != null).slice().reverse();
   const max = Math.max(...prices.map(p => p.price), 1);
   const bars = prices.map(p => `<span class="bar" title="${money(p.price,p.currency)} · ${new Date(p.captured_at).toLocaleString()}" style="height:${Math.max(8,(p.price/max)*100)}%"></span>`).join('');
+  const first = prices[0], latest = prices[prices.length-1];
+  const change = first && latest ? latest.price - first.price : 0;
+  const trendClass = change < 0 ? 'down' : change > 0 ? 'up' : 'flat';
+  const trend = prices.length > 1 ? `<span class="chip trend ${trendClass}">${change<0?'▼':change>0?'▲':'■'} ${money(Math.abs(change),latest.currency)} since first point</span>` : '';
+  const low = prices.length ? Math.min(...prices.map(p => p.price)) : null;
+  const high = prices.length ? Math.max(...prices.map(p => p.price)) : null;
+  const range = prices.length ? `<div class="trendline"><span>low ${money(low,latest.currency)}</span><span>latest ${money(latest.price,latest.currency)}</span><span>high ${money(high,latest.currency)}</span></div>` : '';
   $('#detail').innerHTML = `<p class="eyebrow">${esc(deal.merchant || deal.source)}</p><h2>${esc(deal.title)}</h2>
-    <div class="priceblock">${deal.price!=null?`<span class="price">${money(deal.price,deal.currency)}</span>`:''}${deal.list_price!=null?`<span class="list">${money(deal.list_price,deal.currency)}</span>`:''}${deal.discount_pct?`<span class="discount">−${deal.discount_pct}%</span>`:''}</div>
+    <div class="priceblock">${deal.price!=null?`<span class="price">${money(deal.price,deal.currency)}</span>`:''}${deal.list_price!=null?`<span class="list">${money(deal.list_price,deal.currency)}</span>`:''}${deal.discount_pct?`<span class="discount">−${deal.discount_pct}%</span>`:''}${trend}</div>
     <p>${esc(deal.description || 'No description indexed.')}</p>
     <div class="meta"><span class="chip">seen ${deal.seen_count}×</span><span class="chip">last ${new Date(deal.last_seen).toLocaleString()}</span>${deal.expires_at?`<span class="chip">expires ${esc(deal.expires_at)}</span>`:''}</div>
-    <h3>Price history</h3><div class="history">${bars || '<span class="muted">no price points yet</span>'}</div>
+    <h3>Price history</h3><div class="history">${bars || '<span class="muted">no price points yet</span>'}</div>${range}
     ${deal.url?`<a class="primary ghost" target="_blank" rel="noreferrer" href="${esc(deal.url)}">Open source</a>`:''}`;
   $('#detailDialog').showModal();
 }
@@ -90,6 +97,12 @@ async function showWatchlist(id) {
   const page = await api(`/api/watchlists/${id}/items`);
   $('#detail').innerHTML = `<p class="eyebrow">watchlist</p><h2>${page.total} tracked product(s)</h2>` + (page.items || []).map(item => `<div class="product"><b>${esc(item.product.name)}</b><span class="small">${esc(item.product.merchant)} · ${item.product.current_price!=null?money(item.product.current_price,item.product.currency):'no price'}</span><p>${esc(item.notes || '')}</p></div>`).join('');
   $('#detailDialog').showModal();
+}
+async function loadAlerts() {
+  const page = await api('/api/alerts?limit=8');
+  const alerts = page.items || [];
+  $('#alerts').innerHTML = alerts.map(alert => `<button class="alert detail-button" data-id="${alert.deal_id}"><span class="status ${esc(alert.status)}">${esc(alert.status)}</span><b>${esc(alert.product_name || alert.title)}</b><span class="small">${money(alert.price,alert.currency)} · ${esc(alert.reason)} · ${esc(alert.watchlist)}</span><span class="small">${alert.attempts} attempt(s)${alert.notify_error?' · '+esc(alert.notify_error):''}</span></button>`).join('') || '<p class="muted">No watchlist alerts yet.</p>';
+  $$('#alerts .detail-button').forEach(btn => btn.onclick = () => showDeal(btn.dataset.id));
 }
 async function loadSources() {
   const payload = await api('/api/sources');
@@ -133,10 +146,14 @@ $('#productForm').addEventListener('submit', async event => {
   try { await api('/api/products',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}); f.reset(); toast('Product tracked'); refreshStats(); loadProducts(); }
   catch(err) { toast(err.message); }
 });
+$('#evaluateAlerts').onclick = async () => {
+  try { const result = await api('/api/alerts/evaluate',{method:'POST',headers:{'content-type':'application/json'},body:'{}'}); toast(`Alerts: ${result.created} new, ${result.notified} sent, ${result.failed} failed`); loadAlerts(); }
+  catch(err) { toast(err.message); }
+};
 $('#newListButton').onclick = () => $('#watchlistForm').classList.toggle('hidden');
 $('#watchlistForm').addEventListener('submit', async event => {
   event.preventDefault();
   try { await api('/api/watchlists',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:event.target.name.value})}); event.target.reset(); loadWatchlists(); }
   catch(err) { toast(err.message); }
 });
-Promise.all([refreshStats(),loadDeals(),loadProducts(),loadWatchlists(),loadSources()]).catch(err => toast(err.message));
+Promise.all([refreshStats(),loadDeals(),loadProducts(),loadWatchlists(),loadSources(),loadAlerts()]).catch(err => toast(err.message));

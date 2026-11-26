@@ -1,8 +1,40 @@
 {
-  "generated": "2026-11-26T15:15:22Z",
+  "generated": "2026-11-26T15:16:41Z",
   "count": 200,
-  "pin": "2baeee1af02241c5fd6b8d3e069c3fc327ad1a7c09a814477c51713946cb26bd",
+  "pin": "17ce30cc4238477b339021c6be3317d78d1d6828df175d0a32c86a6062f8932e",
   "turns": [
+    {
+      "id": "61baefaa-f695-4261-9935-897f9db6a501",
+      "ts": "2026-11-26T15:15:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-dewin-intents-push",
+      "action": "drove dewin: intents commit+push; flake-change 0.82/0.78; Thinking",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/intents/run.sh",
+        "docs/intents.md",
+        "flake/intents.nix"
+      ],
+      "files": [
+        "scripts/task/xs-turn-post.sh"
+      ],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3kzpc3nwlgr9gbahap7oj"
+    },
+    {
+      "id": "d89c4112-c271-4756-ae79-b8db37f03728",
+      "ts": "2026-11-26T15:15:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-ui-graph-polish",
+      "action": "mail-atlas: f filters to sender (reader + focused row, raw sender so <addr> survives plain()), t filters to first tag, sender/tag buttons in the reader, Home/End, click the query node clears q, header tagged% (1536/2050) with counts in tooltip. Browser test on clanker vs canned API: f -> ?q=billing%40acme.test, reader button -> same after close, t -> ?q=invoice. node --check, 46/46 ids, css balanced, drain unit, docs-links 189, prose 174.| gate: node --check + browser smoke + docs PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b761e41a60d7d40aba10194390bc225fa9f9dcdd",
+      "branch": "main",
+      "frame": "03hb3kx8z5wtqgmw3zmdznqsb"
+    },
     {
       "id": "4aa23cc2-0b1a-4fa0-a91b-3b7c87a72df6",
       "ts": "2026-11-26T15:10:41Z",
@@ -3016,32 +3048,6 @@
       "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
       "branch": "main",
       "frame": "03hb10nyrpwyzae760ycid12d"
-    },
-    {
-      "id": "6745b082-7029-4934-bf26-b54ba2d7e1e7",
-      "ts": "2026-11-26T07:17:26Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-drive-20261126-0801",
-      "action": "publish: write CV site content and push static site",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "80ff2372c16b30491a857442f2234c7bbd11df94",
-      "branch": "main",
-      "frame": "03hb0ziffucywuatzctoquxip"
-    },
-    {
-      "id": "5703b8aa-a80f-40dc-9603-15b86f280c88",
-      "ts": "2026-11-26T07:17:26Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-0801",
-      "action": "publish: update CV and static site and deploy",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "80ff2372c16b30491a857442f2234c7bbd11df94",
-      "branch": "main",
-      "frame": "03hb0zidsr560eqhgpgrigxct"
     }
   ]
 }

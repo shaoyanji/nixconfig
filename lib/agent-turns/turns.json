@@ -1,8 +1,58 @@
 {
-  "generated": "2026-11-26T17:50:42Z",
+  "generated": "2026-11-26T17:55:22Z",
   "count": 200,
-  "pin": "dc14bcef6240d0a0269f7c59a1a88078ea04a51e0a489e2144fcd692e729cd21",
+  "pin": "2e95b33bd88f9a9587fbd5c88c3fd2a0d69a34645763ffcfb97b2e4fd4965628",
   "turns": [
+    {
+      "id": "3742b76b-43de-497b-a54f-85e5900bd841",
+      "ts": "2026-11-26T17:53:04Z",
+      "source": "buffy",
+      "subject": "nixconfig:web-research-firecrawl-v2",
+      "action": "claim: firecrawl /v1/search -> /v2/search + --format markdown cited report in web-research",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/web-research.py",
+        "tests/web-research"
+      ],
+      "files": [],
+      "base_commit": "0943e026ed96e81b0b06aae5da394f396326515d",
+      "branch": "main",
+      "frame": "03hb4foequ8b07z5p2u0uotrl"
+    },
+    {
+      "id": "87b112f8-7ac0-4e35-a071-9a8e245e8f4d",
+      "ts": "2026-11-26T17:51:34Z",
+      "source": "devin",
+      "subject": "nixconfig:link-vault-portal-telemetry",
+      "action": "claim: show link-vault status and bookmarks/read/tags metrics on live portal cards",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi/configuration.nix",
+        "lib/delphi-site.nix",
+        "lib/delphi/juno.js",
+        "lib/delphi/tailnet.html",
+        "modules/services/service-portal/telemetry"
+      ],
+      "files": [],
+      "base_commit": "0943e026ed96e81b0b06aae5da394f396326515d",
+      "branch": "main",
+      "frame": "03hb4fdw4w4575hli4x1t9g3n"
+    },
+    {
+      "id": "b3528992-f78e-4272-b4c3-9a75d25b2e83",
+      "ts": "2026-11-26T17:50:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-docs-seed",
+      "action": "landed: agents:portfolio:seed documented in the verbs table + a paragraph (lanes, --jobs/--deals vs --jobs-from/--deals-from, --api-*, --inventory-hosts/--inventory-from, --only, --dry-run, --format toon, zero-page = zero, refusal exits 1) | gate: checks:prose PASS, ops:docs:budget PASS 243/400, checks:docs:links PASS; first commit refused mid-flight by devin landing link-vault (26186e27), retried on the new HEAD",
+      "outcome": "done",
+      "claims": [
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "0943e026ed96e81b0b06aae5da394f396326515d",
+      "branch": "main",
+      "frame": "03hb4f8s4pm20lb3i4knue4dn"
+    },
     {
       "id": "02af2d2b-e991-4c59-b4a4-edea0dee5de0",
       "ts": "2026-11-26T17:50:33Z",
@@ -2985,52 +3035,6 @@
       "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
       "branch": "main",
       "frame": "03hb2u18fz9kdcv1mj9dka8xc"
-    },
-    {
-      "id": "ee447bef-16bd-4ae2-b2f2-4d8d1c06f005",
-      "ts": "2026-11-26T12:57:42Z",
-      "source": "freebuff",
-      "subject": "nixconfig:frieren-ops-health",
-      "action": "verified: ops:health exits 0 (zero reasons, ledger ok at 12:29/12:44). Sorter fix proven: dry run resolves all 3 unknowns (unknown 0, rc 0) — next apply 14:01 clears it. Caveat, do not read as proof: burgernas + sorter show Result=success beside ExecMainStatus 130/1 because the agy audit resets failed units (hosts/frieren/infra-stack.nix:333-338); burgernas has not run since 04:20, its 02:45 window lands tomorrow.",
-      "outcome": "done",
-      "claims": [
-        "hosts/frieren",
-        "modules/services"
-      ],
-      "files": [],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2tz9m1d2fz0s15lt88u5t"
-    },
-    {
-      "id": "a6022f18-5933-40bf-a402-9d77a3b967f7",
-      "ts": "2026-11-26T12:56:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-colocated-audit",
-      "action": "claim: taking over from tmux-pane-steward 12:56 — audit :8450 pg/xs-export surface and sync delphi checkout | found: /pg/xs-export 404 on tailnet and loopback, no route in tree",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hb2trca3bbdbc6wssg82g9u"
-    },
-    {
-      "id": "bb949b57-08b2-42ae-a1f2-ab828bacc58b",
-      "ts": "2026-11-26T12:56:01Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-colocated-audit",
-      "action": "incident|0.55|0.42: audit :8450/pg/xs-export & sync delphi repo",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2tnflw07b8ul4l80dw4an"
     }
   ]
 }

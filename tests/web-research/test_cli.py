@@ -51,12 +51,46 @@ CONTEXT = {
         },
     ]
 }
+# The v2 answer: `data` is an object of source arrays, and `warning` is a single
+# optional string at the top level. v1 returned a flat `data` list instead.
 FIRECRAWL = {
     "success": True,
-    "data": [
-        {"url": "https://news.ycombinator.com/item?id=32169454", "title": "About using Nix in my workflow", "description": "Flakes provide a consistent entry point."}
+    "data": {
+        "web": [
+            {
+                "url": "https://news.ycombinator.com/item?id=32169454",
+                "title": "About using Nix in my workflow",
+                "description": "Flakes provide a consistent entry point.",
+                "position": 1,
+            }
+        ]
+    },
+}
+
+SEARCH_DOC = {
+    "mode": "search",
+    "query": "nix flake devshell",
+    "providers": ["firecrawl", "tavily"],
+    "count": 2,
+    "results": [
+        {
+            "id": "s1",
+            "title": "Nix flake: devShell [draft]",
+            "url": "https://discourse.nixos.org/t/devshell/67351",
+            "snippet": "mkShell in devShells.output",
+        },
+        {"id": "s2", "title": "", "url": "https://example.com/a(b)", "snippet": ""},
     ],
-    "warnings": ["/v1/search is deprecated, use v2"],
+    "sources": [
+        {
+            "id": "s1",
+            "url": "https://discourse.nixos.org/t/devshell/67351",
+            "title": "Nix flake: devShell [draft]",
+            "accessed": "2026-11-26T00:00:00Z",
+        },
+        {"id": "s2", "url": "https://example.com/a(b)", "title": "", "accessed": "2026-11-26T00:00:00Z"},
+    ],
+    "warnings": ["tavily: TAVILY_API_KEY is not set"],
 }
 
 
@@ -85,10 +119,13 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(found[0]["snippet"].startswith("I am currently defining shells"), True)
         self.assertEqual(found[0]["score"], "medium")
 
-    def test_firecrawl_accepts_a_list_and_a_web_dict(self):
+    def test_firecrawl_reads_the_v2_web_array_and_a_flat_list(self):
         self.assertEqual(len(research.from_firecrawl(FIRECRAWL)), 1)
-        wrapped = {"data": {"web": FIRECRAWL["data"], "news": []}}
-        self.assertEqual(len(research.from_firecrawl(wrapped)), 1)
+        self.assertEqual(research.from_firecrawl(FIRECRAWL)[0]["snippet"], "Flakes provide a consistent entry point.")
+        flat = {"data": FIRECRAWL["data"]["web"]}
+        self.assertEqual(len(research.from_firecrawl(flat)), 1)
+        with_news = {"data": {"web": [], "news": FIRECRAWL["data"]["web"]}}
+        self.assertEqual(len(research.from_firecrawl(with_news)), 1)
 
     def test_results_without_a_url_are_dropped(self):
         self.assertEqual(research.from_tavily({"results": [{"title": "x"}]}), [])
@@ -133,13 +170,32 @@ class ProviderCallTest(unittest.TestCase):
             research.search_provider("tavily", "q", 3, {}, 10)
         self.assertIn("TAVILY_API_KEY", str(caught.exception))
 
-    def test_search_marks_the_provider_and_flags_deprecation(self):
-        keys = {"FIRECRAWL_API_KEY": "k"}
-        with mock.patch.object(research, "post_json", return_value=FIRECRAWL):
-            results, warnings = research.search_provider("firecrawl", "q", 3, keys, 10)
+    def test_firecrawl_search_posts_to_v2(self):
+        seen = {}
+
+        def fake_post(url, body, **_kwargs):
+            seen["url"] = url
+            seen["body"] = body
+            return FIRECRAWL
+
+        with mock.patch.object(research, "post_json", fake_post):
+            results, warnings = research.search_provider(
+                "firecrawl", "nix flake", 4, {"FIRECRAWL_API_KEY": "k"}, 10
+            )
+        self.assertEqual(seen["url"], "https://api.firecrawl.dev/v2/search")
+        self.assertEqual(seen["body"], {"query": "nix flake", "limit": 4})
         self.assertEqual(results[0]["provider"], "firecrawl")
+        self.assertEqual(warnings, [])
+
+    def test_a_firecrawl_warning_is_surfaced(self):
+        payload = dict(FIRECRAWL, warning="the free tier rate-limits at 10 requests a minute")
+        with mock.patch.object(research, "post_json", return_value=payload):
+            _, warnings = research.search_provider(
+                "firecrawl", "q", 3, {"FIRECRAWL_API_KEY": "k"}, 10
+            )
         self.assertEqual(len(warnings), 1)
-        self.assertIn("deprecated", warnings[0])
+        self.assertIn("rate-limits", warnings[0])
+        self.assertTrue(warnings[0].startswith("firecrawl: "))
 
     def test_context_key_falls_back_to_the_dev_name(self):
         self.assertEqual(research.context_key({"CONTEXT_DEV_API_KEY": "k"}), "k")
@@ -227,6 +283,93 @@ class OutputTest(unittest.TestCase):
             self.assertIn("mode: search", research.to_toon({"mode": "search"}))
 
 
+class MarkdownTest(unittest.TestCase):
+    def test_the_report_leads_with_the_query_and_counts(self):
+        text = research.markdown_report(SEARCH_DOC)
+        self.assertTrue(text.startswith("# nix flake devshell\n"))
+        self.assertIn("2 results · providers: firecrawl, tavily", text)
+
+    def test_every_hit_cites_an_id_that_is_a_link(self):
+        text = research.markdown_report(SEARCH_DOC)
+        self.assertIn("[s1](https://discourse.nixos.org/t/devshell/67351)", text)
+        self.assertIn("[s2](https://example.com/a%28b%29)", text)
+
+    def test_a_title_cannot_break_its_own_link(self):
+        text = research.markdown_report(SEARCH_DOC)
+        self.assertIn("[Nix flake: devShell \\[draft\\]](https://discourse.nixos.org/t/devshell/67351)", text)
+
+    def test_sources_resolve_every_id_with_a_title_or_a_host(self):
+        text = research.markdown_report(SEARCH_DOC)
+        self.assertIn("## Sources", text)
+        self.assertIn("- **[s1](https://discourse.nixos.org/t/devshell/67351)** — Nix flake: devShell \\[draft\\], accessed 2026-11-26T00:00:00Z", text)
+        self.assertIn("- **[s2](https://example.com/a%28b%29)** — example.com", text)
+
+    def test_a_snippet_loses_its_fences_and_extra_lines(self):
+        text = research.md_snippet("`# flake.nix`\n\n\\[ inputs \\]\n" + "x" * 400)
+        self.assertNotIn("`", text)
+        self.assertNotIn("\n", text)
+        self.assertLessEqual(len(text), 201)
+        self.assertTrue(text.endswith("…"))
+
+    def test_warnings_are_part_of_the_report(self):
+        self.assertIn("_Warnings_", research.markdown_report(SEARCH_DOC))
+        self.assertIn("TAVILY_API_KEY is not set", research.markdown_report(SEARCH_DOC))
+
+    def test_an_empty_answer_still_says_so(self):
+        empty = dict(SEARCH_DOC, count=0, results=[], sources=[], warnings=[])
+        text = research.markdown_report(empty)
+        self.assertIn("No page was found", text)
+        self.assertIn("## Sources", text)
+
+    def test_extract_keeps_the_page_body_below_its_citation(self):
+        document = {
+            "mode": "extract",
+            "count": 1,
+            "results": [
+                {
+                    "id": "s1",
+                    "url": "https://nixos.org/manual/nix/stable/",
+                    "title": "Nix manual",
+                    "provider": "firecrawl",
+                    "chars": 42,
+                    "markdown": "# Nix manual\n\n`nix develop` opens a devshell.",
+                }
+            ],
+            "sources": [
+                {"id": "s1", "url": "https://nixos.org/manual/nix/stable/", "title": "Nix manual", "accessed": "T"}
+            ],
+            "warnings": [],
+        }
+        text = research.markdown_report(document)
+        self.assertIn("## [Nix manual](https://nixos.org/manual/nix/stable/) [s1](https://nixos.org/manual/nix/stable/)", text)
+        self.assertIn("`nix develop` opens a devshell.", text)
+        self.assertIn("_42 chars via firecrawl_", text)
+
+    def test_health_marks_each_page_and_names_the_problem(self):
+        document = {
+            "mode": "health",
+            "via": "clanker",
+            "count": 2,
+            "healthy": 1,
+            "pages": [
+                {"url": "https://a.example", "ok": True, "title": "A", "text_chars": 900, "links": 12, "http_status": 200, "problems": []},
+                {"url": "https://b.example", "ok": False, "title": "", "text_chars": 20, "links": 0, "http_status": 403, "problems": ["http 403", "no title"]},
+            ],
+            "warnings": [],
+        }
+        text = research.markdown_report(document)
+        self.assertIn("1 of 2 rendered (via clanker)", text)
+        self.assertIn("**ok** [A](https://a.example)", text)
+        self.assertIn("**FAIL** [b.example](https://b.example)", text)
+        self.assertIn("http 403; no title", text)
+
+    def test_emit_prints_markdown_without_a_json_fence(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            research.emit(SEARCH_DOC, "markdown")
+        self.assertTrue(out.getvalue().startswith("# nix flake devshell"))
+
+
 class KeysTest(unittest.TestCase):
     def test_keys_come_from_the_env_file_and_the_environment(self):
         with tempfile.NamedTemporaryFile("w", suffix=".env", delete=False) as handle:
@@ -265,6 +408,26 @@ class SearchModeTest(unittest.TestCase):
         self.assertEqual(document["providers"], ["tavily"])
         self.assertEqual(document["results"][0]["id"], "s1")
         self.assertEqual(len(document["warnings"]), 2)
+
+    def test_the_cli_can_answer_in_markdown(self):
+        def fake(provider, *a, **k):
+            found = research.from_tavily(TAVILY)
+            for item in found:
+                item["provider"] = provider
+            return found, []
+
+        out = io.StringIO()
+        with mock.patch.object(
+            sys, "argv", ["web-research", "search", "nix flake devshell", "--provider", "tavily", "--format", "markdown"]
+        ), mock.patch.object(research, "load_keys", return_value={"TAVILY_API_KEY": "k"}), mock.patch.object(
+            research, "search_provider", fake
+        ), contextlib.redirect_stdout(out):
+            code = research.main()
+        text = out.getvalue()
+        self.assertEqual(code, 0)
+        self.assertTrue(text.startswith("# nix flake devshell"))
+        self.assertIn("[s1](https://discourse.nixos.org/t/devshell/67351)", text)
+        self.assertIn("## Sources", text)
 
     def test_no_provider_answer_exits_one(self):
         with mock.patch.object(research, "search_provider", side_effect=research.Unavailable("down")):

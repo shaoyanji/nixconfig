@@ -14,7 +14,9 @@ overlap; extraction walks the layers until one returns text.
 
 Every result carries a citation id (`s1`, `s2`, …) and a `sources` list with
 URL, title and access time, and duplicates are collapsed by canonical URL so a
-page two providers found is one source with two witnesses.
+page two providers found is one source with two witnesses. `--format markdown`
+renders that as a report: linked titles, `[sN]` citations in the text, and the
+same ids resolved again under `## Sources`.
 """
 
 from __future__ import annotations
@@ -36,6 +38,9 @@ from datetime import datetime, timezone
 UA = "nixconfig-web-research/1.0"
 KEYS_FILE = "~/.hermes/.env"
 KEY_NAMES = ("FIRECRAWL_API_KEY", "TAVILY_API_KEY", "CONTEXT_API_KEY", "CONTEXT_DEV_API_KEY")
+# v2 answers `{success, data: {web: [...]}}`; v1's flat `data` list is what the
+# deprecated endpoint returned, and its parser is kept so an older key still works.
+FIRECRAWL_SEARCH = "https://api.firecrawl.dev/v2/search"
 
 # Pages that answer 200 and still say nothing: a shell that needs JavaScript.
 MIN_RENDERED_CHARS = 200
@@ -214,14 +219,17 @@ def search_provider(provider: str, query: str, limit: int, keys: dict, timeout: 
         if not key:
             raise Unavailable("FIRECRAWL_API_KEY is not set")
         payload = post_json(
-            "https://api.firecrawl.dev/v1/search", {"query": query, "limit": limit}, key=key, timeout=timeout
+            FIRECRAWL_SEARCH, {"query": query, "limit": limit}, key=key, timeout=timeout
         )
     results = PARSERS[provider](payload)
     for result in results:
         result["provider"] = provider
     warnings = []
-    if provider == "firecrawl" and any("deprecat" in str(w) for w in payload.get("warnings") or []):
-        warnings.append("firecrawl: /v1/search reports itself deprecated")
+    if provider == "firecrawl":
+        notes = list(payload.get("warnings") or [])
+        if payload.get("warning"):
+            notes.append(payload["warning"])
+        warnings.extend(f"firecrawl: {clean(note, 200)}" for note in notes if str(note).strip())
     return results, warnings
 
 
@@ -413,8 +421,120 @@ def fallback_toon(value, indent: int = 0) -> str:
     return json.dumps(value)
 
 
+MD_ESCAPE = {"\\": "\\\\", "[": "\\[", "]": "\\]"}
+
+
+def md_text(value, limit: int = 240) -> str:
+    """Text that cannot break the link it is printed inside."""
+    return "".join(MD_ESCAPE.get(char, char) for char in clean(value, limit))
+
+
+def md_snippet(value, limit: int = 200) -> str:
+    """A one-line teaser: fences and escapes lifted from page text are noise."""
+    text = clean(value, limit * 3).replace("`", "").replace("\\", "")
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:limit].rstrip() + ("…" if len(text) > limit else "")
+
+
+def md_url(url: str) -> str:
+    return (url or "").replace("(", "%28").replace(")", "%29").replace(" ", "%20")
+
+
+def md_link(title: str, url: str) -> str:
+    label = md_text(title, 200) or md_text(host_of(url), 200) or md_url(url)
+    return f"[{label}]({md_url(url)})"
+
+
+def md_cite(entry: dict) -> str:
+    return f"[{entry.get('id') or 's?'}]({md_url(entry.get('url') or '')})"
+
+
+def sources_markdown(sources: list) -> list:
+    lines = ["## Sources", ""]
+    for source in sources:
+        url = source.get("url") or ""
+        title = md_text(source.get("title") or "")
+        label = f" — {title}" if title else f" — {md_text(host_of(url))}"
+        stamp = f", accessed {source['accessed']}" if source.get("accessed") else ""
+        lines.append(f"- **[{source.get('id')}]({md_url(url)})**{label}{stamp}")
+    return lines
+
+
+def warnings_markdown(warnings: list) -> list:
+    if not warnings:
+        return []
+    return ["_Warnings_", ""] + [f"- {md_text(warning, 300)}" for warning in warnings] + [""]
+
+
+def search_markdown(document: dict) -> list:
+    count = document.get("count") or 0
+    providers = ", ".join(document.get("providers") or []) or "none answered"
+    lines = [f"# {md_text(document.get('query') or 'search', 200)}", ""]
+    lines += [f"{count} result{'' if count == 1 else 's'} · providers: {providers}", ""]
+    if not document.get("results"):
+        lines += ["_No page was found; the warnings below say which layer refused._", ""]
+    for entry in document.get("results") or []:
+        snippet = md_snippet(entry.get("snippet") or "")
+        tail = f" — {snippet}" if snippet else ""
+        lines.append(f"- {md_link(entry.get('title'), entry.get('url'))} {md_cite(entry)}{tail}")
+    lines.append("")
+    lines += warnings_markdown(document.get("warnings") or [])
+    lines += sources_markdown(document.get("sources") or [])
+    return lines
+
+
+def extract_report_markdown(document: dict) -> list:
+    count = document.get("count") or 0
+    lines = ["# Extract", "", f"{count} page{'' if count == 1 else 's'}", ""]
+    for entry in document.get("results") or []:
+        chars = entry.get("chars") or 0
+        lines += [
+            f"## {md_link(entry.get('title'), entry.get('url'))} {md_cite(entry)}",
+            "",
+            f"_{chars} chars via {entry.get('provider') or 'unknown'}_",
+            "",
+            (entry.get("markdown") or "").strip(),
+            "",
+        ]
+    lines += warnings_markdown(document.get("warnings") or [])
+    if document.get("sources"):
+        lines += sources_markdown(document["sources"])
+    return lines
+
+
+def health_report_markdown(document: dict) -> list:
+    healthy = document.get("healthy") or 0
+    count = document.get("count") or 0
+    lines = ["# Health", "", f"{healthy} of {count} rendered (via {document.get('via') or 'unknown'})", ""]
+    for page in document.get("pages") or []:
+        verdict = "ok" if page.get("ok") else "FAIL"
+        facts = [f"{page.get('text_chars')} chars", f"{page.get('links')} links", f"http {page.get('http_status')}"]
+        problems = "; ".join(page.get("problems") or [])
+        line = f"- **{verdict}** {md_link(page.get('title'), page.get('url'))} — {', '.join(facts)}"
+        lines.append(line + (f" · {md_text(problems, 300)}" if problems else ""))
+    lines.append("")
+    lines += warnings_markdown(document.get("warnings") or [])
+    return lines
+
+
+def markdown_report(document: dict) -> str:
+    """A cited report: each hit names its source id, and every id resolves below."""
+    mode = document.get("mode")
+    if mode == "search":
+        lines = search_markdown(document)
+    elif mode == "extract":
+        lines = extract_report_markdown(document)
+    elif mode == "health":
+        lines = health_report_markdown(document)
+    else:
+        lines = [f"# {mode or 'report'}", "", "```json", json.dumps(document, indent=2), "```"]
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def emit(document: dict, fmt: str) -> None:
-    if fmt == "toon":
+    if fmt == "markdown":
+        print(markdown_report(document), end="")
+    elif fmt == "toon":
         print(to_toon(document))
     else:
         print(json.dumps(document, indent=2))
@@ -534,7 +654,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Search, extract and health-check the web.")
     sub = parser.add_subparsers(dest="mode", required=True)
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--format", choices=("json", "toon"), default="json")
+    common.add_argument("--format", choices=("json", "toon", "markdown"), default="json")
     common.add_argument("--timeout", type=int, default=90)
     common.add_argument("--via", choices=("local", "clanker"), default="clanker", help="where agent-browser runs")
     common.add_argument("--agent-browser", default="agent-browser")

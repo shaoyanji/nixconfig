@@ -52,6 +52,63 @@
       <p id="form-message" class="message" role="status"></p>
     </section>
 
+    <section class="panel feeds-panel">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">watchlist</p>
+          <h2>RSS and Atom feeds</h2>
+        </div>
+        <button id="poll-feeds" class="button ghost" type="button">Poll feeds now</button>
+      </div>
+      <form id="feed-form" class="grid-form compact-form">
+        <label class="wide">Feed URL <input id="feed-url" type="url" required placeholder="https://example.com/rss.xml"></label>
+        <label>Title <input id="feed-title" type="text" placeholder="Optional label"></label>
+        <label>Collection <input id="feed-collection" type="text" list="collection-list" placeholder="watched research"></label>
+        <label>Tags <input id="feed-tags" type="text" placeholder="feed, research"></label>
+        <label>Provider
+          <select id="feed-provider">
+            <option value="auto">auto</option>
+            <option value="http">http</option>
+            <option value="firecrawl">firecrawl</option>
+            <option value="tavily">tavily</option>
+            <option value="context">context</option>
+          </select>
+        </label>
+        <label class="check"><input id="feed-extract" type="checkbox"> Extract new items</label>
+        <button class="button primary" type="submit">Watch feed</button>
+      </form>
+      <p id="feed-message" class="message" role="status"></p>
+      <div id="feed-list" class="feed-list"></div>
+    </section>
+
+    <section class="panel analytics-panel">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">analytics</p>
+          <h2>Archive shape</h2>
+        </div>
+        <span id="analytics-state" class="pill">reading progress</span>
+      </div>
+      <div class="analytics-grid">
+        <section>
+          <h3>Top domains</h3>
+          <div id="analytics-domains" class="bar-list"></div>
+        </section>
+        <section>
+          <h3>Top tags</h3>
+          <div id="analytics-tags" class="bar-list"></div>
+        </section>
+        <section>
+          <h3>Collections</h3>
+          <div id="analytics-collections" class="bar-list"></div>
+        </section>
+        <section>
+          <h3>Extraction providers</h3>
+          <div id="analytics-providers" class="bar-list"></div>
+        </section>
+      </div>
+    </section>
+
     <section class="layout">
       <aside class="panel filters">
         <p class="eyebrow">filters</p>

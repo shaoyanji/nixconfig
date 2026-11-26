@@ -67,6 +67,7 @@ func (s *Store) migrate() error {
 			collection_id INTEGER REFERENCES collections(id) ON DELETE SET NULL,
 			extraction_status TEXT NOT NULL DEFAULT 'never',
 			extraction_error TEXT NOT NULL DEFAULT '',
+			extraction_provider TEXT NOT NULL DEFAULT '',
 			extracted_at TEXT NOT NULL DEFAULT '',
 			created_at TEXT NOT NULL,
 			updated_at TEXT NOT NULL
@@ -76,13 +77,67 @@ func (s *Store) migrate() error {
 		`CREATE INDEX IF NOT EXISTS idx_links_collection ON links(collection_id, updated_at DESC)`,
 		`CREATE INDEX IF NOT EXISTS idx_links_source ON links(source)`,
 		`CREATE INDEX IF NOT EXISTS idx_links_updated ON links(updated_at DESC)`,
+		`CREATE TABLE IF NOT EXISTS feeds (
+			id INTEGER PRIMARY KEY,
+			url TEXT NOT NULL UNIQUE,
+			title TEXT NOT NULL DEFAULT '',
+			collection TEXT NOT NULL DEFAULT '',
+			tags TEXT NOT NULL DEFAULT '[]',
+			extract INTEGER NOT NULL DEFAULT 0,
+			provider TEXT NOT NULL DEFAULT 'auto',
+			enabled INTEGER NOT NULL DEFAULT 1,
+			last_polled_at TEXT NOT NULL DEFAULT '',
+			last_success_at TEXT NOT NULL DEFAULT '',
+			last_error TEXT NOT NULL DEFAULT '',
+			last_item_count INTEGER NOT NULL DEFAULT 0,
+			created_at TEXT NOT NULL,
+			updated_at TEXT NOT NULL
+		)`,
+		`CREATE TABLE IF NOT EXISTS feed_items (
+			feed_id INTEGER NOT NULL REFERENCES feeds(id) ON DELETE CASCADE,
+			item_key TEXT NOT NULL,
+			link_id INTEGER REFERENCES links(id) ON DELETE SET NULL,
+			first_seen_at TEXT NOT NULL,
+			last_seen_at TEXT NOT NULL,
+			PRIMARY KEY(feed_id, item_key)
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_feed_items_link ON feed_items(link_id)`,
 	}
 	for _, statement := range statements {
 		if _, err := s.db.Exec(statement); err != nil {
 			return fmt.Errorf("migrate: %w", err)
 		}
 	}
+	exists, err := s.hasColumn("links", "extraction_provider")
+	if err != nil {
+		return err
+	}
+	if !exists {
+		if _, err := s.db.Exec(`ALTER TABLE links ADD COLUMN extraction_provider TEXT NOT NULL DEFAULT ''`); err != nil {
+			return fmt.Errorf("add links.extraction_provider: %w", err)
+		}
+	}
 	return nil
+}
+
+func (s *Store) hasColumn(table, column string) (bool, error) {
+	rows, err := s.db.Query(`PRAGMA table_info(` + table + `)`)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cid, notNull, pk int
+		var name, kind string
+		var defaultValue any
+		if err := rows.Scan(&cid, &name, &kind, &notNull, &defaultValue, &pk); err != nil {
+			return false, err
+		}
+		if name == column {
+			return true, rows.Err()
+		}
+	}
+	return false, rows.Err()
 }
 
 func nowString() string { return time.Now().UTC().Format(time.RFC3339Nano) }
@@ -188,7 +243,7 @@ func scanLink(row interface{ Scan(...any) error }) (Link, error) {
 	var tags, created, updated string
 	var collectionID sql.NullInt64
 	var collectionName sql.NullString
-	err := row.Scan(&link.ID, &link.URL, &link.CanonicalURL, &link.Title, &link.Description, &link.Content, &link.Excerpt, &link.SiteName, &link.Source, &link.State, &tags, &collectionID, &collectionName, &link.ExtractionStatus, &link.ExtractionError, &link.ExtractedAt, &created, &updated)
+	err := row.Scan(&link.ID, &link.URL, &link.CanonicalURL, &link.Title, &link.Description, &link.Content, &link.Excerpt, &link.SiteName, &link.Source, &link.State, &tags, &collectionID, &collectionName, &link.ExtractionStatus, &link.ExtractionError, &link.ExtractionProvider, &link.ExtractedAt, &created, &updated)
 	if err != nil {
 		return Link{}, err
 	}
@@ -204,7 +259,7 @@ func scanLink(row interface{ Scan(...any) error }) (Link, error) {
 	return link, nil
 }
 
-const linkSelect = `SELECT l.id,l.url,l.canonical_url,l.title,l.description,l.content,l.excerpt,l.site_name,l.source,l.state,l.tags,l.collection_id,c.name,l.extraction_status,l.extraction_error,l.extracted_at,l.created_at,l.updated_at FROM links l LEFT JOIN collections c ON c.id=l.collection_id`
+const linkSelect = `SELECT l.id,l.url,l.canonical_url,l.title,l.description,l.content,l.excerpt,l.site_name,l.source,l.state,l.tags,l.collection_id,c.name,l.extraction_status,l.extraction_error,l.extraction_provider,l.extracted_at,l.created_at,l.updated_at FROM links l LEFT JOIN collections c ON c.id=l.collection_id`
 
 func (s *Store) Link(ctx context.Context, id int64) (Link, error) {
 	return scanLink(s.db.QueryRowContext(ctx, linkSelect+` WHERE l.id=?`, id))
@@ -297,7 +352,7 @@ func (s *Store) UpdateExtraction(ctx context.Context, id int64, result Extractio
 		status = "ok"
 	}
 	if result.Title != "" || result.Content != "" {
-		_, err := s.db.ExecContext(ctx, `UPDATE links SET title=CASE WHEN ?!='' THEN ? ELSE title END, description=CASE WHEN ?!='' THEN ? ELSE description END, content=CASE WHEN ?!='' THEN ? ELSE content END, excerpt=CASE WHEN ?!='' THEN ? ELSE excerpt END, site_name=CASE WHEN ?!='' THEN ? ELSE site_name END, extraction_status=?, extraction_error=?, extracted_at=?, updated_at=? WHERE id=?`, result.Title, result.Title, result.Description, result.Description, result.Content, result.Content, result.Excerpt, result.Excerpt, result.SiteName, result.SiteName, status, errText, nowString(), nowString(), id)
+		_, err := s.db.ExecContext(ctx, `UPDATE links SET title=CASE WHEN ?!='' THEN ? ELSE title END, description=CASE WHEN ?!='' THEN ? ELSE description END, content=CASE WHEN ?!='' THEN ? ELSE content END, excerpt=CASE WHEN ?!='' THEN ? ELSE excerpt END, site_name=CASE WHEN ?!='' THEN ? ELSE site_name END, extraction_status=?, extraction_error=?, extraction_provider=?, extracted_at=?, updated_at=? WHERE id=?`, result.Title, result.Title, result.Description, result.Description, result.Content, result.Content, result.Excerpt, result.Excerpt, result.SiteName, result.SiteName, status, errText, result.Provider, nowString(), nowString(), id)
 		if err != nil {
 			return err
 		}

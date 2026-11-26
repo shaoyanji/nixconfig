@@ -2,7 +2,9 @@ const state = {
   links: [],
   collections: [],
   tags: [],
-  stats: {}
+  stats: {},
+  feeds: [],
+  analytics: null
 };
 
 const $ = (id) => document.getElementById(id);
@@ -98,6 +100,67 @@ async function loadStats() {
   $('provider-summary').textContent = `http + ${['firecrawl', 'tavily', 'context'].filter((name) => providers[name]).join(' + ') || 'no provider keys'}`;
 }
 
+function renderBarRows(elementId, rows, labeler) {
+  const element = $(elementId);
+  if (!rows || !rows.length) {
+    element.innerHTML = '<p class="empty-note">Nothing archived here yet.</p>';
+    return;
+  }
+  const maximum = Math.max(...rows.map((row) => row.count || 0), 1);
+  element.innerHTML = rows.map((row) => {
+    const width = Math.max(5, Math.round(((row.count || 0) / maximum) * 100));
+    return `<div class="bar-row">
+      <div class="bar-meta"><span>${escapeHTML(labeler(row))}</span><strong>${row.count}</strong></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderAnalytics() {
+  const analytics = state.analytics;
+  if (!analytics) return;
+  const states = analytics.states || {};
+  const percent = states.total ? Math.round((states.read / states.total) * 100) : 0;
+  $('analytics-state').textContent = `${states.read || 0}/${states.total || 0} read · ${percent}%`;
+  renderBarRows('analytics-domains', analytics.top_domains, (row) => row.name);
+  renderBarRows('analytics-tags', analytics.top_tags, (row) => `#${row.name}`);
+  renderBarRows('analytics-collections', analytics.collections, (row) => `${row.name} · ${row.read || 0} read`);
+  renderBarRows('analytics-providers', analytics.extraction_providers, (row) => row.name);
+}
+
+function renderFeeds() {
+  if (!state.feeds.length) {
+    $('feed-list').innerHTML = '<p class="empty-note">No feeds watched yet.</p>';
+    return;
+  }
+  $('feed-list').innerHTML = state.feeds.map((feed) => {
+    const title = feed.title || feed.url;
+    const tags = (feed.tags || []).map((tag) => `<span class="tag">#${escapeHTML(tag)}</span>`).join('');
+    const error = feed.last_error ? `<p class="meta feed-error">${escapeHTML(feed.last_error)}</p>` : '';
+    const last = feed.last_success_at ? `last success ${escapeHTML(feed.last_success_at.slice(0, 16).replace('T', ' '))}` : 'not polled successfully yet';
+    return `<article class="feed-row">
+      <div>
+        <strong>${escapeHTML(title)}</strong>
+        <p class="meta">${escapeHTML(feed.url)} · ${feed.last_item_count || 0} item${feed.last_item_count === 1 ? '' : 's'} · ${last}</p>
+        ${error}
+        <div class="tag-cloud">${tags}${feed.extract ? '<span class="tag">extract</span>' : ''}${feed.collection ? `<span class="tag">${escapeHTML(feed.collection)}</span>` : ''}</div>
+      </div>
+      <button class="button small ghost" data-feed-delete="${feed.id}" type="button">Remove</button>
+    </article>`;
+  }).join('');
+}
+
+async function loadAnalytics() {
+  state.analytics = await api('/api/analytics');
+  renderAnalytics();
+}
+
+async function loadFeeds() {
+  const data = await api('/api/feeds');
+  state.feeds = data.feeds || [];
+  renderFeeds();
+}
+
 async function loadFacets() {
   const [collections, tags] = await Promise.all([api('/api/collections'), api('/api/tags')]);
   state.collections = collections.collections || [];
@@ -122,12 +185,17 @@ async function loadLinks() {
 }
 
 async function refreshAll() {
-  await Promise.all([loadStats(), loadFacets(), loadLinks()]);
+  await Promise.all([loadStats(), loadFacets(), loadLinks(), loadFeeds(), loadAnalytics()]);
 }
 
 function formMessage(text, isError = false) {
   $('form-message').textContent = text;
   $('form-message').classList.toggle('error', isError);
+}
+
+function feedMessage(text, isError = false) {
+  $('feed-message').textContent = text;
+  $('feed-message').classList.toggle('error', isError);
 }
 
 async function submitLink(event) {
@@ -148,6 +216,50 @@ async function submitLink(event) {
     await refreshAll();
   } catch (error) {
     formMessage(error.message, true);
+  }
+}
+
+async function submitFeed(event) {
+  event.preventDefault();
+  const input = {
+    url: $('feed-url').value.trim(),
+    title: $('feed-title').value.trim(),
+    collection: $('feed-collection').value.trim(),
+    tags: $('feed-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean),
+    provider: $('feed-provider').value,
+    extract: $('feed-extract').checked
+  };
+  try {
+    const result = await api('/api/feeds', { method: 'POST', body: JSON.stringify(input) });
+    feedMessage(result.created ? 'Feed added to the watchlist.' : 'Existing feed updated.');
+    $('feed-form').reset();
+    await Promise.all([loadFeeds(), loadAnalytics()]);
+  } catch (error) {
+    feedMessage(error.message, true);
+  }
+}
+
+async function pollFeeds() {
+  $('poll-feeds').disabled = true;
+  try {
+    const result = await api('/api/feeds/poll', { method: 'POST', body: '{}' });
+    feedMessage(`Poll complete: ${result.created || 0} new, ${result.updated || 0} updated, ${result.skipped || 0} already seen.`);
+    await refreshAll();
+  } catch (error) {
+    feedMessage(error.message, true);
+  } finally {
+    $('poll-feeds').disabled = false;
+  }
+}
+
+async function removeFeed(id) {
+  if (!confirm('Remove this feed from the watchlist? Captured links stay archived.')) return;
+  try {
+    await api(`/api/feeds/${id}`, { method: 'DELETE' });
+    feedMessage('Feed removed.');
+    await Promise.all([loadFeeds(), loadAnalytics()]);
+  } catch (error) {
+    feedMessage(error.message, true);
   }
 }
 
@@ -187,6 +299,12 @@ async function cardAction(button) {
 
 function bind() {
   $('link-form').addEventListener('submit', submitLink);
+  $('feed-form').addEventListener('submit', submitFeed);
+  $('poll-feeds').addEventListener('click', pollFeeds);
+  $('feed-list').addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-feed-delete]');
+    if (button) removeFeed(button.dataset.feedDelete);
+  });
   $('refresh').addEventListener('click', refreshAll);
   for (const id of ['q', 'state', 'collection-filter', 'tag-filter']) {
     $(id).addEventListener(id === 'q' ? 'input' : 'change', () => {

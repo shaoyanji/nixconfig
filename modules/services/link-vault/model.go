@@ -15,24 +15,25 @@ import (
 var whitespaceRE = regexp.MustCompile(`\s+`)
 
 type Link struct {
-	ID               int64     `json:"id"`
-	URL              string    `json:"url"`
-	CanonicalURL     string    `json:"canonical_url"`
-	Title            string    `json:"title"`
-	Description      string    `json:"description"`
-	Content          string    `json:"content,omitempty"`
-	Excerpt          string    `json:"excerpt"`
-	SiteName         string    `json:"site_name"`
-	Source           string    `json:"source"`
-	State            string    `json:"state"`
-	Tags             []string  `json:"tags"`
-	CollectionID     int64     `json:"collection_id,omitempty"`
-	CollectionName   string    `json:"collection_name,omitempty"`
-	ExtractionStatus string    `json:"extraction_status"`
-	ExtractionError  string    `json:"extraction_error,omitempty"`
-	ExtractedAt      string    `json:"extracted_at,omitempty"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	ID                 int64     `json:"id"`
+	URL                string    `json:"url"`
+	CanonicalURL       string    `json:"canonical_url"`
+	Title              string    `json:"title"`
+	Description        string    `json:"description"`
+	Content            string    `json:"content,omitempty"`
+	Excerpt            string    `json:"excerpt"`
+	SiteName           string    `json:"site_name"`
+	Source             string    `json:"source"`
+	State              string    `json:"state"`
+	Tags               []string  `json:"tags"`
+	CollectionID       int64     `json:"collection_id,omitempty"`
+	CollectionName     string    `json:"collection_name,omitempty"`
+	ExtractionStatus   string    `json:"extraction_status"`
+	ExtractionError    string    `json:"extraction_error,omitempty"`
+	ExtractionProvider string    `json:"extraction_provider,omitempty"`
+	ExtractedAt        string    `json:"extracted_at,omitempty"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
 }
 
 type LinkInput struct {
@@ -48,6 +49,32 @@ type LinkInput struct {
 	Collection  string   `json:"collection"`
 	Extract     bool     `json:"extract"`
 	Provider    string   `json:"provider"`
+}
+
+type Feed struct {
+	ID            int64     `json:"id"`
+	URL           string    `json:"url"`
+	Title         string    `json:"title"`
+	Collection    string    `json:"collection"`
+	Tags          []string  `json:"tags"`
+	Extract       bool      `json:"extract"`
+	Provider      string    `json:"provider"`
+	Enabled       bool      `json:"enabled"`
+	LastPolledAt  string    `json:"last_polled_at,omitempty"`
+	LastSuccessAt string    `json:"last_success_at,omitempty"`
+	LastError     string    `json:"last_error,omitempty"`
+	LastItemCount int64     `json:"last_item_count"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type FeedInput struct {
+	URL        string   `json:"url"`
+	Title      string   `json:"title"`
+	Collection string   `json:"collection"`
+	Tags       []string `json:"tags"`
+	Extract    bool     `json:"extract"`
+	Provider   string   `json:"provider"`
 }
 
 type Collection struct {
@@ -161,4 +188,25 @@ func validateInput(input *LinkInput) error {
 	input.SiteName = cleanSpace(input.SiteName)
 	input.Collection = cleanSpace(input.Collection)
 	return nil
+}
+
+func validateFeedInput(input *FeedInput) error {
+	canonical, err := canonicalURL(input.URL)
+	if err != nil {
+		return err
+	}
+	input.URL = canonical
+	input.Title = cleanSpace(input.Title)
+	input.Collection = cleanSpace(input.Collection)
+	input.Tags = normalizeTags(input.Tags)
+	input.Provider = strings.ToLower(cleanSpace(input.Provider))
+	if input.Provider == "" {
+		input.Provider = "auto"
+	}
+	switch input.Provider {
+	case "auto", "http", "direct", "firecrawl", "tavily", "context":
+		return nil
+	default:
+		return fmt.Errorf("provider must be auto, http, firecrawl, tavily or context")
+	}
 }

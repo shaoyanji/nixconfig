@@ -8,7 +8,7 @@
 
   package = pkgs.buildGoModule {
     pname = "link-vault";
-    version = "0.1.0";
+    version = "0.2.0";
     src = ./link-vault;
     vendorHash = "sha256-n+WU7qcF6NauBw9DFU4VG1fnDQ387+nibJ/uzApqehk=";
     env.CGO_ENABLED = 0;
@@ -30,6 +30,8 @@
     "-db"
     "${stateDir}/links.sqlite"
     ("-extract-on-add=" + (bool cfg.extractOnAdd))
+    "-feed-interval"
+    cfg.feedPollInterval
     "-origin"
     "https://${cfg.tailnetHost}:${toString cfg.tailnetPort}"
   ];
@@ -71,6 +73,12 @@ in {
       type = lib.types.bool;
       default = false;
       description = "Extract readable page text automatically when a newly created link is saved. API callers can still request extraction per link.";
+    };
+
+    feedPollInterval = lib.mkOption {
+      type = lib.types.str;
+      default = "15m";
+      description = "Go duration between background RSS/Atom feed polls, for example 15m or 1h. Set to 0 to leave polling manual through POST /api/feeds/poll.";
     };
 
     environmentFile = lib.mkOption {

@@ -15,6 +15,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -24,6 +25,8 @@ var webFiles embed.FS
 type server struct {
 	store          *Store
 	extractor      *extractor
+	feedClient     *http.Client
+	feedMu         sync.Mutex
 	adminToken     string
 	expectedOrigin string
 	extractOnAdd   bool
@@ -41,6 +44,7 @@ func main() {
 	extractOnAdd := flag.Bool("extract-on-add", false, "extract page text when a new link is saved")
 	adminTokenEnv := flag.String("admin-token-env", "LINK_VAULT_ADMIN_TOKEN", "environment variable naming the optional write bearer token")
 	expectedOrigin := flag.String("origin", "", "expected browser Origin for state-changing requests; empty disables the check")
+	feedInterval := flag.Duration("feed-interval", 15*time.Minute, "background feed poll interval; 0 disables automatic polling")
 	flag.Parse()
 
 	if *envFile != "" {
@@ -65,15 +69,19 @@ func main() {
 	s := &server{
 		store:          store,
 		extractor:      newExtractor(cfg),
+		feedClient:     &http.Client{Timeout: 15 * time.Second},
 		adminToken:     strings.TrimSpace(os.Getenv(*adminTokenEnv)),
 		expectedOrigin: strings.TrimRight(*expectedOrigin, "/"),
 		extractOnAdd:   *extractOnAdd,
 		started:        time.Now().UTC(),
 	}
 
+	if *feedInterval > 0 {
+		go s.feedLoop(*feedInterval)
+	}
 	mux := s.routes()
 	log.Printf("link-vault: listening on %s, db %s", *addr, *dbPath)
-	log.Printf("link-vault: providers firecrawl=%t tavily=%t context=%t extract_on_add=%t", cfg.FirecrawlKey != "", cfg.TavilyKey != "", cfg.ContextKey != "", *extractOnAdd)
+	log.Printf("link-vault: providers firecrawl=%t tavily=%t context=%t extract_on_add=%t feed_interval=%s", cfg.FirecrawlKey != "", cfg.TavilyKey != "", cfg.ContextKey != "", *extractOnAdd, feedInterval.String())
 	if err := http.ListenAndServe(*addr, mux); err != nil {
 		log.Fatalf("link-vault: %v", err)
 	}
@@ -100,6 +108,11 @@ func (s *server) routes() http.Handler {
 	mux.HandleFunc("GET /api/collections", s.collections)
 	mux.HandleFunc("POST /api/collections", s.createCollection)
 	mux.HandleFunc("GET /api/tags", s.tags)
+	mux.HandleFunc("GET /api/feeds", s.feeds)
+	mux.HandleFunc("POST /api/feeds", s.createFeed)
+	mux.HandleFunc("DELETE /api/feeds/{id}", s.deleteFeed)
+	mux.HandleFunc("POST /api/feeds/poll", s.pollFeedsEndpoint)
+	mux.HandleFunc("GET /api/analytics", s.analytics)
 	mux.HandleFunc("POST /api/import", s.importLinks)
 	mux.HandleFunc("GET /api/export.json", s.exportJSON)
 	mux.HandleFunc("GET /api/export.md", s.exportMarkdown)

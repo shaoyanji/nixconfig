@@ -15,9 +15,8 @@ telegram:
   reactions: false
 # Infron (llm.onerouter.pro) holds a prepaid $5 and nothing tops it up, so the
 # only models this file may name on a metered route are the `:free` ids — the
-# suffix is what the route bills at zero. The sole exception is ollama-cloud
-# below: its catalog is a closed free list, never a paid SKU. A paid id
-# anywhere else spends the balance that keeps the free ones working.
+# suffix is what the route bills at zero. A paid id anywhere else spends the
+# balance that keeps the free ones working.
 #
 # The key is never written in this file: the provider entry names the env var and
 # INFRON_API_KEY comes from the shared sops blob (ai-services-shared-env), so a
@@ -38,15 +37,6 @@ providers:
     models:
       - qwen/qwen3.8-27b:free
       # - deepseek/deepseek-v4-flash-0731:free
-  # Tokenrouter returned 403 IP_NOT_ALLOWED (auth failure, 2026-11-26) — commented out; free lanes only.
-  # tokenrouter:
-  #   api: https://api.tokenrouter.com/v1
-  #   key_env: TOKENROUTER_API_KEY
-  #   api_mode: openai
-  #   default_model: deepseek/deepseek-v4.1-flash-1017-free
-  #   discover_models: false
-  #   models:
-  #     - deepseek/deepseek-v4.1-flash-1017-free
 model:
   provider: infron
   default: qwen/qwen3.8-27b:free
@@ -73,8 +63,8 @@ agent:
 # only warns on KNOWN pricing — silent on a custom route, and a billed pick is
 # one keypress past a quiet row. The metered vendors are hidden here (slug or
 # alias, case-insensitive; the CLI picker, the TUI and the gateway slash
-# commands all read it). What stays visible cannot bill: ollama-cloud (closed
-# free catalog), lmstudio (local) and the pinned infron row — nous is excluded
+# commands all read it). What stays visible cannot bill: lmstudio (local) and
+# the pinned infron row — nous is excluded
 # too, because a paid plan's portal models bill the same way a paid SKU does.
 # The limit of the guard: this narrows pickers only — a typed
 # `/model x --provider nvidia` still resolves — so billed provider keys stay
@@ -139,12 +129,13 @@ web:
 display:
   interface: cli
   tool_progress: all
-# Fallback chain: the first lane shares the Infron route's account-scoped
-# daily quota with the main model, so it covers a per-model failure (limit,
-# delisting) but dies with the main model on a quota outage — the lanes
-# behind it are the quota-independent ones: nvidia, ollama-cloud and the
-# keyless apisfreellm terminal. Infron's daily allowance is account-scoped:
-# a quota outage ended a turn instead of degrading it (2026-11-19).
+# Fallback chain: NIM leads because it is near and unthrottled (measured
+# 2026-11-22); the qwen lane mid-chain shares the Infron route's
+# account-scoped daily quota with the main model, so it covers a per-model
+# failure (limit, delisting) but dies with the main model on a quota outage —
+# the keyless apisfreellm terminal behind it does not. Infron's daily
+# allowance is account-scoped: a quota outage ended a turn instead of
+# degrading it (2026-11-19).
 # Each entry's free contract is structural, not a remembered price: `:free` is
 # the suffix the Infron route bills at zero, `nvidia` is NIM's free dev tier
 # on integrate.api.nvidia.com (a build.nvidia.com key, no wallet exists to
@@ -155,11 +146,6 @@ display:
 # the NIM lane, not the custom endpoint: the billed pick that cost the Infron
 # balance (2026-11-19) was this model resolved through a metered route.
 fallback_providers:
-  # CanTrustAI (paid custom lane; also returned 405 on 2026-11-26) — commented out; free fallbacks only.
-  # - provider: custom
-  #   model: deepseek/deepseek-v4.1-flash
-  #   base_url: https://cantrustai.xyz/v1
-  #   key_env: CANTRUSTAI_API_KEY
   # NIM leads (2026-11-22), ahead of the two lanes that used to. Order is cost,
   # not preference: `GET <base>/models` measured 0.107 s for NIM (connect
   # 0.016 s, against a 0.066 s github baseline) where openrouter was 0.984 s and

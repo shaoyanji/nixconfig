@@ -224,7 +224,7 @@ else
     # deepseek flash at ~$0.05-0.30/M (2026-11-24 pricing).
     case "$fb_base|$fb_model" in
       *sailresearch.com*deepseek-ai/DeepSeek-V4.1-Flash-1017)
-        ok "fallback $fb_provider/$fb_model is the declared paid lane (sail, ~$0.30/M out)"
+        ok "fallback $fb_provider/$fb_model is the declared paid lane (sail, ~\$0.30/M out)"
         continue ;;
       # ExperientialLabs is keyed but bills nothing: `GET /v1/models` (2026-11-24)
       # returns a 305-model catalog whose per-model cost fields are all null.

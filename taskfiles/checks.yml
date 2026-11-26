@@ -1491,6 +1491,19 @@ tasks:
       - bash tests/mail-atlas-api/run.sh
       - python3 -m unittest discover -s modules/services/mail-atlas -p 'test_*.py'
 
+  checks:portfolio-ui:
+    desc: "UI smoke assertions for the jobs and deals pages without a browser (BROWSER_STUB payloads)"
+    summary: >
+      Runs `tests/portfolio-ui/browser-stub/run.sh`, which feeds the real
+      verifier canned probe answers: the good payload passes, zeroed metric
+      cards fail, and a missing stage PATCH fails. The live lane is not gated —
+      `CLANKER_BROWSER=1 bash tests/portfolio-ui/run.sh` copies both pages and
+      their stub APIs to clanker, drives its Chrome, and kills the stubs and the
+      copy on exit. Covers stage save, note add, packet export links, the
+      sparkline, price-drop rows and both watchlist poll buttons.
+    cmds:
+      - bash tests/portfolio-ui/browser-stub/run.sh
+
   checks:inventory:sync:
     desc: "Fixture for inventory-sync's host mapping, endpoint audit and drift report (no eval, no server)"
     summary: >

@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T14:43:50Z",
+  "generated": "2026-11-26T14:46:26Z",
   "count": 200,
-  "pin": "7f22bd2a2ae8ec55edd15cb9198d33f5987d8a1d884d40a9ee90bc30a7d35543",
+  "pin": "431e6da2f142f46fcd624e178298eb285ca56dbcaa2735d0e703c246faea9c7b",
   "turns": [
+    {
+      "id": "d09e8c0b-0261-4e7c-ae1a-fa3692fd87d9",
+      "ts": "2026-11-26T14:45:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-ingest-pipeline",
+      "action": "claim: pipe deals-page-scrape JSON into private-deals over its HTTP API, mirroring jobs-ingest, verified against a local instance with an FTS5 query",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/deals-ingest.py tests/deals-ingest"
+      ],
+      "files": [],
+      "base_commit": "016f15c2554e461681a190d3c7fa203db0d26a5f",
+      "branch": "main",
+      "frame": "03hb3exwnxl10h3obe77griz5"
+    },
+    {
+      "id": "f4e0f46e-a671-4998-8325-c80a9396476b",
+      "ts": "2026-11-26T14:44:05Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-deals-scraper-cli",
+      "action": "deals-page-scrape.py: card-level extraction (title/price/original/discount/merchant/url/category) over agent-browser, firecrawl, context, tavily, http. DE/US/CHF prices; two-amount cards are deals, -NN% marker computes the original, single prices dropped, coupon thresholds refused. Live: techbargains 18.99<-49.99 (62%) via firecrawl/context/http; clanker browser on dealnews 4 deals incl 68.49<-299.99 (77%). 34 tests + py_compile.| gate: python3 -m unittest discover tests/deals-page-scrape PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "016f15c2554e461681a190d3c7fa203db0d26a5f",
+      "branch": "main",
+      "frame": "03hb3erevuzje6mgn9ualon0g"
+    },
     {
       "id": "78122a6a-0d7e-4548-a42b-c30e8d8aa2d7",
       "ts": "2026-11-26T14:42:21Z",
@@ -3004,38 +3032,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hb0ir1rmz323cjwawwmbahr"
-    },
-    {
-      "id": "6ef4cdd1-d18f-4858-87f3-ad06948ad5ee",
-      "ts": "2026-11-26T05:50:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0638",
-      "action": "gate-change: modules-edges name imports appflow-board media-relay",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/appflow-board.nix",
-        "modules/services/media-relay.nix"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0ignnl5ch1lydwhva7k1d"
-    },
-    {
-      "id": "82edd383-3f44-49ab-bd46-1922b743ef9b",
-      "ts": "2026-11-26T05:36:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "chain-change survey done: no refactor surface remains; tree clean @3346ea27; open red gate checks:modules:edges (appflow-board, media-relay)",
-      "outcome": "done",
-      "claims": [
-        "modules/",
-        "hosts/"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0fpats8futeatmk646x5p"
     }
   ]
 }

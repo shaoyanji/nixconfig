@@ -1477,6 +1477,20 @@ tasks:
     cmds:
       - bash tests/ops-health/run.sh
 
+  checks:mail-atlas:
+    desc: "Mail-atlas probe fixture + the drain unit tests (stub archive, no delphi)"
+    summary: >
+      Runs `tests/mail-atlas-api/run.sh` against a stub that behaves like
+      NpgsqlRest where it bites: an undeclared query parameter is a 404. Ten
+      cases cover a healthy pass, stale mail, a stuck queue, an empty archive, a
+      route refusal, `search` sending `q` alone, an encoded ampersand query,
+      `recent`'s default and its non-number refusal, `routes`, and an
+      unreachable mount. Then the mail-atlas drain unit tests, which had no gate
+      before this — ten cases on the search token and date windows.
+    cmds:
+      - bash tests/mail-atlas-api/run.sh
+      - python3 -m unittest discover -s modules/services/mail-atlas -p 'test_*.py'
+
   checks:sops:drift:test:
     desc: "Regression fixture for checks:sops:drift (seeded dropped age recipient)"
     summary: >

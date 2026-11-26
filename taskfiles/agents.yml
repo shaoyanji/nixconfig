@@ -861,6 +861,19 @@ tasks:
           mail-atlas-reconcile --dry-run
         fi
 
+  agents:mail:atlas:probe:
+    desc: "Is the mailbox still moving? probe|stats|recent|search|routes over the archive API (CLI_ARGS; EMAIL_ARCHIVE_API overrides the mount)"
+    summary: >
+      `bash scripts/task/mail-atlas.sh probe` fails when the newest letter is
+      older than 48h, when a queued letter waited past 30m, or when the archive
+      holds nothing — the three ways the reader looks fine while the loop is
+      dead. `stats` is the counters, `recent N` the newest letters, `search Q`
+      full-text (`--fuzzy` for typos), `routes` the deployed contract. Read-only.
+      It never appends `lim` to search: an undeclared parameter is a 404 on this
+      API, which reads as a route that is not deployed.
+    cmds:
+      - bash scripts/task/mail-atlas.sh {{.CLI_ARGS}}
+
   agents:ci:queue:
     desc: "Unresolved CI and robot mail an agent owns — the loop's own inbox (TOON; FORMAT=text for a table, LIM=50)"
     vars:

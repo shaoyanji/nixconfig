@@ -128,6 +128,8 @@
     notes = agentsNotesCtl;
     inherit (policiesCtl) policies;
     tasks = taskList;
+    intents = intentsCtl;
+    turns = lib.importJSON ../lib/agent-turns/turns.json;
   };
   # The rules the docs state, as predicates (flake/policies.nix). Compiled once
   # and asserted by `checks.policies`; docs cite an id instead of explaining it.
@@ -142,6 +144,14 @@
   ontologyCtl = import ./ontology.nix {
     inherit lib;
     epistemics = epistemicsCtl;
+  };
+  # The request side of a turn: intent kinds, lane capabilities, and the admit
+  # verdict between them (flake/intents.nix). Pure data — the gate field names
+  # taskList ids so an intent's ending check is always resolvable.
+  intentsCtl = import ./intents.nix {
+    inherit lib;
+    epistemics = epistemicsCtl;
+    taskIds = taskList |> builtins.attrNames;
   };
   # nixFilesCtl / nixRegistry are bound above the chains: `flake/nix-registry.nix`
   # is the walk's naming layer, shared with the knowledge graph.
@@ -195,6 +205,11 @@ in {
 
   # flake/ontology.nix
   ontology = ontologyCtl;
+
+  # flake/intents.nix — the request side of a turn: kind vocabulary, lane
+  # capabilities, the admit verdict, and the quotient class two identical
+  # dispatches share. `nix eval --json .#intents.gateReport | toon -e`.
+  intents = intentsCtl;
 
   # The rules as data, looked up by id — the output IS the attrset, so an id with
   # a dash needs quotes: `nix eval .#policies."<id>".holds`, and the id list is

@@ -8524,5 +8524,51 @@
         2026-12-07 hold covers all three rows and nothing was sent.
       '';
     };
+    intent-capability-spec = {
+      title = "Intent and capability are declared types: the request side of a turn, as data";
+      kind = "proposal";
+      status = "DELIVERED";
+      priority = "P2";
+      date = "2026-11-26";
+      summary = "v0.0.1 spec landed as v1.0.0rc: flake/intents.nix declares the six intent kinds (each with a resolvable ending gate), lane capabilities keyed by xs `source`, and the admit() verdict between them. The graph carries capability/intent nodes and serves edges; checks:intents gates it; lib/quotient-hash.nix gets its first production consumer as the dedup class for re-sent dispatches.";
+      from = ["agent-lane-plane" "kg-zeck-cache"];
+      refs = {
+        hosts = ["delphi" "frieren" "eisen"];
+        modules = ["flake/intents.nix" "flake/ontology.nix" "flake/outputs.nix" "lib/knowledge-graph.nix" "lib/quotient-hash.nix" "scripts/task/intents-check.sh" "taskfiles/checks.yml"];
+        tasks = ["checks:intents" "checks:ontology" "checks:quotient-hash"];
+        docs = ["docs/agent-turns.md" "docs/selector-daemon-predesign.md"];
+      };
+      body = ''
+        The gap `agent-lane-plane` measured: xs subjects are coordination
+        labels, not intents — jev-decide selected 0/15 on them because nothing
+        declared what an intent is. The spec makes the request side first-class
+        data: an intent is `subject` + `kind` + `claims` + `gate` (resolved
+        against the task list — an intent cannot promise a gate that does not
+        exist); a capability is `provides` + `claims` radius + evidence `floor`
+        + `via`; `admit` composes them. The canonical refusal is
+        tmux-pane-steward admitting a chain-change — "route, do not execute"
+        is now a predicate, not a paragraph.
+
+        Options weighed: **A. quotient-class intent dedup — ADOPTED.** `classOf`
+        keys an intent canonically (kind + sorted claims); two dispatches
+        spelling the same work share a class — the duplicate-dispatch class
+        this lane answered five times in one session, and the lib's first
+        production consumer. Exact-match only: the class advises ("have I sent
+        this"), never refuses. **B. Zeckendorf epoch ordering — DEFERRED:**
+        `kg-zeck-cache` ran it and failed Kelly (589 ms vs 562 ms miss, 761 ms
+        vs 35 ms hit) — a numbering in search of a table; revive only if a real
+        epoch sequence appears (flake.lock update epochs). **C. Cassini
+        identity as ledger checksum — DEFERRED, rides with B:** the three-window
+        identity is meaningful only on a Fibonacci-partitioned table, and the
+        turn ledger is not one; if B's table lands, C is its free integrity
+        check.
+
+        Fleet fit: delphi holds the ledger (`lib/agent-turns/turns.json` is its
+        committed snapshot), frieren runs the gate, eisen is untouched —
+        routing stays jev-decide's; this spec classifies what it routes TO.
+        `checks:intents` gates the schema; `checks:ontology` proves the two new
+        entity types and `serves`. 60 intent + 6 capability nodes project.
+      '';
+    };
   };
 }

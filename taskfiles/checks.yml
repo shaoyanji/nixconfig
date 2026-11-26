@@ -95,6 +95,7 @@ tasks:
       - task: checks:nix:shell:test
       - task: checks:modules:edges
       - task: checks:modules:edges:test
+      - task: checks:intents
       # The check inventory (flake/check-inventory.nix): every checks:* task has
       # a key and every key names a task, so the three verbs cannot drift.
       - task: check:verify
@@ -633,6 +634,21 @@ tasks:
         sh: nix eval --impure --raw --expr builtins.currentSystem
     cmds:
       - nix build --no-link --builders "" .?submodules=1#checks.{{.SYSTEM}}.ontology
+
+  checks:intents:
+    desc: "[gate] The intent/capability schema holds against the declared vocabulary and the xs snapshot"
+    summary: >
+      flake/intents.nix declares the request side of a turn: six intent kinds
+      each carrying a resolvable ending gate, lane capabilities keyed by their
+      xs `source` string, and the admit verdict between them. The gate proves:
+      every kind's `gate` names a real task, every capability provides only
+      declared kinds and a declared floor, the admit() samples land their
+      intended verdict, and every xs source in the committed snapshot is
+      declared. ACTION-prefix coverage is reported, not gated.
+
+      Cost: one .#intents eval (~3 s), no build. Exit 0 = clean, 1 = drift.
+    cmds:
+      - bash scripts/task/intents-check.sh
 
   checks:router:
     desc: "[gate] Every router label has one playbook section, and no section lacks a label"

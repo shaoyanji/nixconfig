@@ -67,6 +67,7 @@
     "checks:images:test" = "leaf";
     "checks:infron" = "leaf";
     "checks:infron:test" = "leaf";
+    "checks:intents" = "leaf";
     "checks:invalidation" = "cache";
     "checks:inventory:compiled" = "leaf";
     "checks:inventory:compiled:test" = "leaf";

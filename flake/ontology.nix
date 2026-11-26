@@ -76,6 +76,20 @@
       fields = ["label" "host" "port" "note"];
       claims = ["fleet-fact"];
     };
+    capability = {
+      what = "a lane's declared provides — the intent kinds it may admit, the paths it may touch";
+      identity = "the xs `source` string it posts turns under";
+      member = "flake/intents.nix capabilities";
+      fields = ["label" "provides"];
+      claims = ["decision"];
+    };
+    intent = {
+      what = "the request side of a turn arc: a subject, its kind, the paths it claimed, its outcome";
+      identity = "the xs subject string, which is the arc's coordination key";
+      member = "the xs turn log, projected from lib/agent-turns/turns.json";
+      fields = ["label" "source" "outcome"];
+      claims = ["model-label" "project-fact"];
+    };
   };
 
   relations = {
@@ -158,6 +172,14 @@
       evidence = "the tags list of SKILL.md, parsed by lib/skills.nix";
       tier = "asserted";
       cannot = "that a skill sharing the tag is related, or that the tag names a topic anyone maintains";
+    };
+    serves = {
+      what = "a capability lane posted the turns carrying an intent's subject";
+      from = ["capability"];
+      to = ["intent"];
+      evidence = "the `source` field of turns carrying the subject, resolved against flake/intents.nix capabilities";
+      tier = "resolved";
+      cannot = "that the lane did the work or did it well — the outcome field is the arc's record, the edge only says whose name was on the posts";
     };
   };
 

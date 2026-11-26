@@ -89,8 +89,8 @@ check "edge endpoints resolve to nodes" \
   '(.nodes | map({(.id): true}) | add) as $n
    | all(.edges[]; (.from as $f | .to as $t | $n[$f] != null and $n[$t] != null))'
 
-check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes|routes|runs-on" \
-  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes" or .type == "routes" or .type == "runs-on")'
+check "edge types are mentions|tagged|references|about|imports|cites|derives|supersedes|routes|runs-on|serves" \
+  'all(.edges[]; .type == "mentions" or .type == "tagged" or .type == "references" or .type == "about" or .type == "imports" or .type == "cites" or .type == "derives" or .type == "supersedes" or .type == "routes" or .type == "runs-on" or .type == "serves")'
 
 check "routes layer is populated (>=17 edges)" \
   '([.edges[] | select(.type == "routes")] | length) >= 17'
@@ -219,6 +219,21 @@ check "about: idea -> (doc|host|skill)" \
                | $t[$f] == "idea"
                  and ($t[$to] == "doc" or $t[$to] == "host" or $t[$to] == "skill"))
          end)'
+
+# `serves` ties a capability lane to the intents it posted under: the xs
+# `source` field resolved against flake/intents.nix. Both ends typed so an
+# emitter change cannot silently re-point the layer at a different pair.
+check "serves: capability -> intent" \
+  '(.nodes | map({(.id): .type}) | add) as $t
+   | all(.edges[];
+         if .type != "serves" then true
+         else (.from as $f | .to as $to | $t[$f] == "capability" and $t[$to] == "intent")
+         end)'
+
+# The layer is populated by construction — every posting lane is declared — so
+# zero edges means the projection stopped reading the turn snapshot.
+check "serves layer is populated (>=6 edges)" \
+  '([.edges[] | select(.type == "serves")] | length) >= 6'
 
 # A draft with no entities is a file the projection read and got nothing out of —
 # exactly the failure the frontmatter parser has. It is not a style opinion:

@@ -8,6 +8,10 @@
   # into the graph, so a policy is a node whose `rule` is readable without prose.
   policies ? {},
   tasks ? {},
+  # flake/intents.nix (capabilities) and the xs snapshot (subjects): the two
+  # sources of the request-side projection — capability/intent nodes, serves edges.
+  intents ? {},
+  turns ? {},
 }: let
   root = ../.;
 
@@ -516,12 +520,54 @@
     |> lib.concatMap (line: line |> rowWords |> builtins.filter (t: (t |> taskShaped) && !(t |> resolves)))
     |> lib.unique;
 
+  capabilityNodes =
+    (intents.capabilityIds or [])
+    |> map (c: {
+      id = "capability:${c}";
+      type = "capability";
+      label = c;
+      provides = intents.capabilities.${c}.provides;
+    });
+
+  # One intent node per distinct xs subject; `outcome` is the last post's word,
+  # `serves` edges name every declared lane that posted under the subject.
+  turnList = turns.turns or [];
+  subjectOf = t: t.subject or "";
+  intentSubjects = turnList |> map subjectOf |> builtins.filter (s: s != "") |> lib.unique;
+  latestFor = subject: lib.last (turnList |> builtins.filter (t: subjectOf t == subject));
+  intentNodes =
+    intentSubjects
+    |> map (s: let
+      last = latestFor s;
+    in {
+      id = "intent:${s}";
+      type = "intent";
+      label = s;
+      source = last.source or "";
+      outcome = last.outcome or "";
+    });
+  servesEdges =
+    intentSubjects
+    |> lib.concatMap (s:
+      turnList
+      |> builtins.filter (t: subjectOf t == s)
+      |> map (t: t.source)
+      |> lib.unique
+      |> builtins.filter (src: (intents.capabilityIds or []) |> builtins.elem src)
+      |> map (src: {
+        from = "capability:${src}";
+        to = "intent:${s}";
+        type = "serves";
+      }));
+
   nodes =
     hostNodes
     ++ skillNodes
     ++ serviceNodes
     ++ policyNodes
     ++ noteNodes
+    ++ capabilityNodes
+    ++ intentNodes
     ++ (docs
       |> map (d: {
         inherit (d) id type label path cites;
@@ -609,7 +655,8 @@
         })))
     ++ routeEdges
     ++ serviceEdges
-    ++ noteEdges;
+    ++ noteEdges
+    ++ servesEdges;
 
   tagNodes = (skills.skills |> builtins.attrNames) |> lib.concatMap (n: skills.skills.${n}.tags) |> lib.unique;
 
@@ -635,6 +682,8 @@
       services = serviceNodes |> builtins.length;
       policies = policyIds |> builtins.length;
       tasks = taskIds |> builtins.length;
+      capabilities = capabilityNodes |> builtins.length;
+      intents = intentNodes |> builtins.length;
       edges = edges |> builtins.length;
       recordedEdges = edges |> lib.count (e: e ? evidence);
     };
@@ -663,6 +712,10 @@
         then "Task"
         else if n.type == "service"
         then "Service"
+        else if n.type == "capability"
+        then "Capability"
+        else if n.type == "intent"
+        then "Intent"
         else "Tag";
     in ''
       MERGE (${"n_${builtins.hashString "md5" n.id}"}:${label} {id: ${q n.id}})
@@ -688,6 +741,8 @@
         then "ROUTES"
         else if e.type == "runs-on"
         then "RUNS_ON"
+        else if e.type == "serves"
+        then "SERVES"
         else "MENTIONS";
     in ''
       MATCH (${a}), (${b}) MERGE (${a})-[r:${rel}]->(${b})${lib.optionalString (e ? evidence) " SET r.evidence = ${q e.evidence}"};

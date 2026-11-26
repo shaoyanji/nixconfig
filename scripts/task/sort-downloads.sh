@@ -568,7 +568,7 @@ classify() {
       place "$file" "$APPLIANCE_DIR/$(basename "$file")" 0644 other
       return 0
       ;;
-    *.gguf)
+    *.gguf | *.safetensors)
       # Model weights, not an installer. Without this rule the classifier is the
       # only thing left, and it answers "software" for a 40 GB shard — which is
       # how a live download job once had its shards moved out of staging
@@ -620,6 +620,14 @@ classify() {
       place "$file" "$SOFTWARE_DIR/$(basename "$file")" 0644 other
       ;;
     *)
+      # A hash-named download carries no extension — its magic bytes still
+      # name the kind, and weights land by content the same as by name.
+      case "$(head -c4 "$file" 2>/dev/null)" in
+        GGUF)
+          place "$file" "$MODELS_DIR/$(basename "$file").gguf" 0644 other
+          return 0
+          ;;
+      esac
       if label=$(model_kind "$file"); then
         say "MODEL    $(basename "$file") — no extension rule; model says $label"
         model_place "$file" "$label" && return 0

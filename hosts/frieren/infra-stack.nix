@@ -920,8 +920,11 @@ in {
 
   # --- restic cold vault backup to BurgerNAS ---
   # Pushes encrypted & deduplicated snapshots of Sandy, user documents, and stateful databases
-  # to BurgerNAS during its daily scheduled uptime window (DSM hardware RTC powers on at 03:25, shuts off at 04:00).
-  # Frieren acts as the push client so BurgerNAS (512MB RAM) only runs sftp-server and avoids OOM.
+  # to BurgerNAS inside a window frieren itself opens: DSM's power-off is fixed at 04:00, so
+  # the unit wakes the NAS over WoL at 02:45 instead of waiting for the 03:25 schedule wake —
+  # the 32 minutes that gave the backup shrank it out of its own window on 2026-11-26
+  # (52min run, SSH 255 mid-flight at the 04:00 poweroff). Frieren acts as the push client
+  # so BurgerNAS (512MB RAM) only runs sftp-server and avoids OOM.
   services.restic.backups.frieren-burgernas = {
     initialize = true;
     repository = "sftp:devji@192.168.3.92:/volume1/backup/frieren/restic";
@@ -944,7 +947,7 @@ in {
       "/srv/backup/offload"
     ];
     timerConfig = {
-      OnCalendar = "*-*-* 03:28:00";
+      OnCalendar = "*-*-* 02:45:00";
       Persistent = true;
     };
     pruneOpts = [
@@ -954,12 +957,20 @@ in {
       "--keep-yearly 2"
     ];
     backupPrepareCommand = ''
-      # Verify BurgerNAS is reachable within its daily 03:25-04:00 DSM power window
+      # Wake the vault over WoL — this unit fires at 02:45, ahead of the DSM
+      # 03:25 schedule wake, so a run that outgrew the old 32-minute window
+      # still lands before the fixed 04:00 power-off.
+      ${pkgs.wakeonlan}/bin/wakeonlan -i 192.168.3.255 90:09:D0:06:C1:EE 2>/dev/null \
+        || ${pkgs.wakeonlan}/bin/wakeonlan 90:09:D0:06:C1:EE 2>/dev/null \
+        || echo "WoL send failed — relying on the NAS's own 03:25 wake"
+
+      # Verify BurgerNAS is reachable — a cold DS220j boot takes minutes, so
+      # the wait is longer than the schedule-wake probe this used to be.
       echo "Waiting for BurgerNAS SSH (192.168.3.92:22) to become reachable..."
       # NOTE: this runs inside the restic unit, whose PATH carries openssh and
       # coreutils but NOT `bash`. Invoke bash by absolute path.
       ONLINE=0
-      for i in $(seq 1 60); do
+      for i in $(seq 1 150); do
         if timeout 3 ${pkgs.bash}/bin/bash -c 'cat < /dev/null > /dev/tcp/192.168.3.92/22' 2>/dev/null; then
           echo "BurgerNAS SSH port 22 open after $((i * 2))s."
           ONLINE=1
@@ -969,7 +980,7 @@ in {
       done
 
       if [ "$ONLINE" -ne 1 ]; then
-        echo "ERROR: BurgerNAS SSH unreachable within 120s (DSM scheduled power-on at 03:25 missed?)" >&2
+        echo "ERROR: BurgerNAS SSH unreachable within 300s (WoL missed and the NAS did not wake itself?)" >&2
         exit 1
       fi
 

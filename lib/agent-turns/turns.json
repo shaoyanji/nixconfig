@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-26T01:13:15Z",
+  "generated": "2026-11-26T01:58:44Z",
   "count": 200,
-  "pin": "a5977b2945074110be2b3e24f1d9a40293a293c8a271e475de34b98dcf9b6e70",
+  "pin": "b7f0f1431695f2cf856c84d7ab02561abe48b97349ae5366ccc3310cdd3359c3",
   "turns": [
+    {
+      "id": "4c095474-1fd3-4931-b36e-e84eab79aaba",
+      "ts": "2026-11-26T01:40:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-drive-2026-11-26",
+      "action": "steward drive closed: delphi pane finished its driven dup-services migration and returned to idle (gate: delphi deployed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9627873ed1b5af5f8650122888513566328af36",
+      "branch": "main",
+      "frame": "03haz5mymtcj1kczeaov22qkh"
+    },
+    {
+      "id": "3a46c7bf-cf68-402e-894d-a787b201dfaa",
+      "ts": "2026-11-26T01:40:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-2026-11-26",
+      "action": "steward drive closed: devin pane finished its driven refactor/image-daily task and returned to idle; lane clean, no open diffs (gate: drv-equality delphi identical + nix:lint 333 + image-daily rc=0)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9627873ed1b5af5f8650122888513566328af36",
+      "branch": "main",
+      "frame": "03haz5my63tkl6ey7m7l5m7i4"
+    },
+    {
+      "id": "1f38c489-d680-4746-8aa8-038d53bd9505",
+      "ts": "2026-11-26T01:15:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-2026-11-26",
+      "action": "note-change: rebased the dup-services work onto bed96105, distilled open-frieren-offload, added open-frieren-burgernas-window",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix",
+        "hosts/delphi/configuration.nix",
+        "modules/services/fleet-monitors.nix"
+      ],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "bed96105",
+      "branch": "delphi-dup-services-note",
+      "frame": "03haz0tyopvbk3wz15013msc4"
+    },
+    {
+      "id": "3c68a251-d02b-46ce-8a02-cdce4cc5ca60",
+      "ts": "2026-11-26T01:13:33Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-2026-11-26",
+      "action": "landed: nginx-static-ui.nix now owns the -ui page derivation too (package + locations); both sites trimmed to name+path | gate: drv-equality delphi identical + nix:lint 333 + image-daily rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f9627873ed1b5af5f8650122888513566328af36",
+      "branch": "main",
+      "frame": "03haz0fhjefr1asn7gp4bzalt"
+    },
     {
       "id": "13af270b-5782-4c8a-94e4-76bc9ff0cc1a",
       "ts": "2026-11-26T01:11:53Z",
@@ -2723,58 +2781,6 @@
       "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
       "branch": "main",
       "frame": "03hauihawt57ovv7t33yvfja6"
-    },
-    {
-      "id": "0ca7ea1f-4b4f-4e92-96af-ac91a1226c80",
-      "ts": "2026-11-25T11:24:27Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: tasked freebuff with gate-change - re-run scripts/task/cv-blog-check.sh on the job-scout CV and report PASS or FAIL with exit code; read-only, no publish; classified gate-change p=0.85 m=0.79 via jev-decide classify (typesafe, thresholds 0.8/0.15 met); drove agents:2.1 via load-buffer + paste-buffer + Enter; confirmed fresh thinking ... ■ Esc line - task started",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
-      "branch": "main",
-      "frame": "03hauigrmdzpeab9vn5hzurgl"
-    },
-    {
-      "id": "021fb1ae-3ff4-491e-9def-8ca7a374d49e",
-      "ts": "2026-11-25T11:24:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: tasked devin with note-change - commit lib/agent-turns/turns.json pre-commit pin rewrite on main (pins:refresh, pins: 1 stale) and push to origin/main; classified note-change p=0.98 m=0.96 via jev-decide classify (typesafe, thresholds 0.8/0.15 met); drove agents:1.1 via load-buffer + paste-buffer + Enter; confirmed fresh Thinking · 2s spinner - task started",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "39d0f94617f0bd9dcd24182ccaf8aec88e065a0a",
-      "branch": "main",
-      "frame": "03hauigcgvjjj2s0lqu192qgl"
-    },
-    {
-      "id": "9b9f25ec-b740-4866-bd96-5e42411fdab5",
-      "ts": "2026-11-25T11:16:32Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: tasked devin with note-change - commit the AGENTS.nix edit for job-scout sweep 2026-11-25j-freebuff (jev-decide classify note-change p=0.88 margin=0.83 via typesafe, thresholds 0.8/0.15 met); drove agents:1.1 via load-buffer + paste-buffer + Enter; confirmed fresh 'Thinking · 2s' spinner - task started",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
-      "branch": "main",
-      "frame": "03haugx5kr8dduyt3z7gvfrip"
-    },
-    {
-      "id": "37ccb159-fc9c-46c1-99df-88baebe5028f",
-      "ts": "2026-11-25T10:58:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: tasked freebuff to run the CV publish gate cv-blog-check.sh; classified gate-change p=0.93 margin=0.87 via jev-decide classify thresholds 0.8/0.15 met; freebuff BUSY thinking 11s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8bb4d61c",
-      "branch": "main",
-      "frame": "03hauddp5gmzz3lgmhvw4h74t"
     }
   ]
 }

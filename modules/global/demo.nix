@@ -22,33 +22,32 @@ in
     hmAi = hostField "hmAi" (import self.modules."global.user").hmAiFeatures;
     hmShared = import self.nixFiles.lib."hm-shared.nix" {inherit self inputs;};
   in {
-    home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      backupFileExtension = "hm-backup";
-      users.${userName} = {
-        imports = hmShared.modulePaths hmModules;
-        home.username = userName;
-        home.homeDirectory = userHome;
-        home.stateVersion = config.system.stateVersion;
+    home-manager =
+      hmShared.baseline
+      // {
+        users.${userName} = {
+          imports = hmShared.modulePaths hmModules;
+          home.username = userName;
+          home.homeDirectory = userHome;
+          home.stateVersion = config.system.stateVersion;
+        };
+        sharedModules =
+          [
+            hmShared.hmUser
+            hmShared.nixvim
+            hmShared.nixIndex
+          ]
+          ++ hmShared.dankShell
+          ++ [
+            # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (user "user").
+            hmShared.homeAgents
+          ];
+        extraSpecialArgs = {
+          inherit inputs self;
+          hostName = config.networking.hostName;
+          fleetHost = config.networking.hostName;
+          hmBaseFeatures = hmBase;
+          hmAiFeatures = hmAi;
+        };
       };
-      sharedModules =
-        [
-          hmShared.hmUser
-          hmShared.nixvim
-          hmShared.nixIndex
-        ]
-        ++ hmShared.dankShell
-        ++ [
-          # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (user "user").
-          hmShared.homeAgents
-        ];
-      extraSpecialArgs = {
-        inherit inputs self;
-        hostName = config.networking.hostName;
-        fleetHost = config.networking.hostName;
-        hmBaseFeatures = hmBase;
-        hmAiFeatures = hmAi;
-      };
-    };
   }

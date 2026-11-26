@@ -71,40 +71,39 @@ in {
   config.fleet.hmBaseFeatures = lib.mkDefault hostBase;
   config.fleet.hmAiFeatures = lib.mkDefault hostAi;
 
-  config.home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "hm-backup";
-    # `self` gives home modules the flake's compiled artifacts (homeAgents,
-    # agentSkills, …) without re-reading the repo at activation time. The
-    # passthrough of the fleet options is an extraSpecialArgs, not a config
-    # read: an import decision, taken before `config` exists inside the HM
-    # module system — resolving it through `_module.args` forces `config`
-    # inside `imports`, the recursion trap (see `roles/home.nix`). This block
-    # used to be spelled identically in global.nixos and global.macos.
-    extraSpecialArgs = {
-      inherit inputs self;
-      fleetHost = config.networking.hostName;
-      dankShell = config.fleet.dankShell.enable;
-      hmUserFeatures = config.fleet.hmUserFeatures;
-      hmBaseFeatures = config.fleet.hmBaseFeatures;
-      hmAiFeatures = config.fleet.hmAiFeatures;
+  config.home-manager =
+    hmShared.baseline
+    // {
+      # `self` gives home modules the flake's compiled artifacts (homeAgents,
+      # agentSkills, …) without re-reading the repo at activation time. The
+      # passthrough of the fleet options is an extraSpecialArgs, not a config
+      # read: an import decision, taken before `config` exists inside the HM
+      # module system — resolving it through `_module.args` forces `config`
+      # inside `imports`, the recursion trap (see `roles/home.nix`). This block
+      # used to be spelled identically in global.nixos and global.macos.
+      extraSpecialArgs = {
+        inherit inputs self;
+        fleetHost = config.networking.hostName;
+        dankShell = config.fleet.dankShell.enable;
+        hmUserFeatures = config.fleet.hmUserFeatures;
+        hmBaseFeatures = config.fleet.hmBaseFeatures;
+        hmAiFeatures = config.fleet.hmAiFeatures;
+      };
+      users.${user.name}.imports = config.fleet.hmUserModules;
+      sharedModules =
+        [
+          # The constants module takes `user` as an argument; HM is a nested eval, so
+          # the value is injected there too (the file says why).
+          hmShared.hmUser
+          hmShared.sops
+          hmShared.nixvim
+          hmShared.nixIndex
+          # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (lib/home-agents.nix).
+          # Shared by every embedded NixOS/darwin HM config; needs self + fleetHost
+          # in that host's extraSpecialArgs (modules/global/{nixos,macos}.nix).
+          hmShared.homeAgents
+          hmShared.taskShim
+        ]
+        ++ lib.optionals config.fleet.dankShell.enable hmShared.dankShell;
     };
-    users.${user.name}.imports = config.fleet.hmUserModules;
-    sharedModules =
-      [
-        # The constants module takes `user` as an argument; HM is a nested eval, so
-        # the value is injected there too (the file says why).
-        hmShared.hmUser
-        hmShared.sops
-        hmShared.nixvim
-        hmShared.nixIndex
-        # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (lib/home-agents.nix).
-        # Shared by every embedded NixOS/darwin HM config; needs self + fleetHost
-        # in that host's extraSpecialArgs (modules/global/{nixos,macos}.nix).
-        hmShared.homeAgents
-        hmShared.taskShim
-      ]
-      ++ lib.optionals config.fleet.dankShell.enable hmShared.dankShell;
-  };
 }

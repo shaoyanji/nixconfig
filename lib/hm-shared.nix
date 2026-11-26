@@ -18,6 +18,14 @@
     inputs.dms.homeModules.niri
   ];
 
+  # The embedded-HM baseline knobs every site spells (noDE, demo,
+  # home-manager-shared): global pkgs/user packages and the collision suffix.
+  baseline = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    backupFileExtension = "hm-backup";
+  };
+
   # Name → module path resolution for inventory hmModules lists — the same
   # map in global.noDE, global.demo and global.hm-inventory-role.
   modulePaths = map (m: self.modules.${m});

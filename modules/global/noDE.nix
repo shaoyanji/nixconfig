@@ -23,28 +23,27 @@
   # profiles.ai has no surface to disable.
   hmBase = hostField "hmBase" user.hmBaseFeatures;
 in {
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "hm-backup";
-    users.${user.name} = {
-      imports = hmShared.modulePaths hmModules;
-      home.username = user.name;
-      home.homeDirectory = user.home;
+  home-manager =
+    hmShared.baseline
+    // {
+      users.${user.name} = {
+        imports = hmShared.modulePaths hmModules;
+        home.username = user.name;
+        home.homeDirectory = user.home;
+      };
+      sharedModules = [
+        hmShared.hmUser
+        hmShared.sops
+        hmShared.nixvim
+        hmShared.nixIndex
+        # Per-host ~/AGENTS.md from `.#homeAgents.<host>`.
+        hmShared.homeAgents
+      ];
+      extraSpecialArgs = {
+        inherit inputs self;
+        inherit (config.networking) hostName;
+        fleetHost = config.networking.hostName;
+        hmBaseFeatures = hmBase;
+      };
     };
-    sharedModules = [
-      hmShared.hmUser
-      hmShared.sops
-      hmShared.nixvim
-      hmShared.nixIndex
-      # Per-host ~/AGENTS.md from `.#homeAgents.<host>`.
-      hmShared.homeAgents
-    ];
-    extraSpecialArgs = {
-      inherit inputs self;
-      inherit (config.networking) hostName;
-      fleetHost = config.networking.hostName;
-      hmBaseFeatures = hmBase;
-    };
-  };
 }

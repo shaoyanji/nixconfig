@@ -24,7 +24,7 @@ func remoteStartCommand(id, command string) string {
 	wrapperEncoded := base64.StdEncoding.EncodeToString([]byte(remoteWrapper))
 	return `set -eu
 dir=/data/jobs/` + id + `
-mkdir -p "$dir"
+mkdir -p "$dir" "$dir/artifacts"
 printf '%s' '` + encoded + `' | base64 -d > "$dir/cmd.sh"
 printf '%s' '` + wrapperEncoded + `' | base64 -d > "$dir/wrap.sh"
 chmod +x "$dir/cmd.sh" "$dir/wrap.sh"
@@ -44,6 +44,16 @@ func remoteStderrCommand(id string) string {
 	return `tail -c 131072 /data/jobs/` + id + `/stderr 2>/dev/null || true`
 }
 
+func remoteArtifactArchiveCommand(id string) string {
+	return `dir=/data/jobs/` + id + `/artifacts
+if [ ! -d "$dir" ]; then exit 0; fi
+size=$(du -sb "$dir" 2>/dev/null | cut -f1 || echo 0)
+if [ "$size" -eq 0 ]; then exit 0; fi
+if [ "$size" -gt 2097152 ]; then echo artifact-archive-too-large; exit 0; fi
+tar -czf - -C /data/jobs/` + id + ` artifacts 2>/dev/null | base64 -w0 2>/dev/null || tar -czf - -C /data/jobs/` + id + ` artifacts 2>/dev/null | base64 | tr -d '\n'
+`
+}
+
 func firstOutputLine(raw string) string {
 	for _, line := range strings.Split(raw, "\n") {
 		line = strings.TrimSpace(line)
@@ -52,6 +62,33 @@ func firstOutputLine(raw string) string {
 		}
 	}
 	return ""
+}
+
+func decodeArtifactArchive(raw string) ([]byte, error) {
+	text := strings.TrimSpace(raw)
+	if text == "" || strings.Contains(text, "too-large") {
+		return nil, nil
+	}
+	return base64.StdEncoding.DecodeString(text)
+}
+
+func (s *server) captureArtifacts(ctx context.Context, machine Machine, id, stdout, stderr string) {
+	artifacts := []artifactInput{}
+	if stdout != "" {
+		artifacts = append(artifacts, artifactInput{Name: "stdout.txt", Kind: "stdout", Mime: "text/plain; charset=utf-8", Content: []byte(stdout)})
+	}
+	if stderr != "" {
+		artifacts = append(artifacts, artifactInput{Name: "stderr.txt", Kind: "stderr", Mime: "text/plain; charset=utf-8", Content: []byte(stderr)})
+	}
+	archiveResult, err := s.client.Exec(ctx, machine.ID, remoteArtifactArchiveCommand(id))
+	if err == nil && archiveResult.ExitCode == 0 {
+		if archive, decodeErr := decodeArtifactArchive(archiveResult.Stdout); decodeErr == nil && len(archive) > 0 {
+			artifacts = append(artifacts, artifactInput{Name: "artifacts.tar.gz", Kind: "archive", Mime: "application/gzip", Content: archive})
+		}
+	}
+	for _, artifact := range artifacts {
+		_ = s.store.CreateArtifact(ctx, id, artifact)
+	}
 }
 
 func (s *server) startRemoteJob(ctx context.Context, machine Machine, id, command string) error {

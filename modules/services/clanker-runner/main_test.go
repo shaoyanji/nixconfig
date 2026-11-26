@@ -122,6 +122,8 @@ func TestJobRunsThroughInstaboxAndPersistsLogsAndFTS(t *testing.T) {
 				writeExec(w, "built agent-browser smoke\n", "", 0)
 			case strings.Contains(body.Command, "/stderr"):
 				writeExec(w, "", "", 0)
+			case strings.Contains(body.Command, "/artifacts"):
+				writeExec(w, "", "", 0)
 			default:
 				t.Errorf("unexpected exec command %q", body.Command)
 				writeExec(w, "", "unexpected", 1)
@@ -170,6 +172,14 @@ func TestJobRunsThroughInstaboxAndPersistsLogsAndFTS(t *testing.T) {
 	if err != nil || stats.TotalJobs != 1 || stats.Successful != 1 || stats.FailedJobs != 0 {
 		t.Fatalf("stats %#v err=%v", stats, err)
 	}
+	artifacts, err := store.ListArtifacts(context.Background(), accepted.ID)
+	if err != nil || len(artifacts) != 1 || artifacts[0].Name != "stdout.txt" || artifacts[0].SHA256 == "" || artifacts[0].Size == 0 {
+		t.Fatalf("artifacts %#v err=%v", artifacts, err)
+	}
+	artifact, content, err := store.GetArtifact(context.Background(), accepted.ID, artifacts[0].ID)
+	if err != nil || string(content) != job.Stdout || artifact.Mime == "" {
+		t.Fatalf("artifact download %#v %q err=%v", artifact, content, err)
+	}
 }
 
 func TestJobFailurePersistsExitAndError(t *testing.T) {
@@ -194,6 +204,8 @@ func TestJobFailurePersistsExitAndError(t *testing.T) {
 				writeExec(w, "", "", 0)
 			case strings.Contains(body.Command, "/stderr"):
 				writeExec(w, "nix eval failed\n", "", 0)
+			case strings.Contains(body.Command, "/artifacts"):
+				writeExec(w, "", "", 0)
 			default:
 				t.Errorf("unexpected exec command %q", body.Command)
 				writeExec(w, "", "unexpected", 1)
@@ -245,10 +257,10 @@ func TestWriteGateRejectsWrongOriginAndMissingBearer(t *testing.T) {
 }
 
 func TestPresetValidationAndBuilders(t *testing.T) {
-	if len(jobPresets) != 4 {
+	if len(jobPresets) != 10 {
 		t.Fatalf("presets %#v", jobPresets)
 	}
-	for _, id := range []string{"agent-browser-dom-check", "nix-profile-status", "clanker-disk-hygiene", "nix-run-tool"} {
+	for _, id := range []string{"agent-browser-dom-check", "agent-browser-screenshot", "nix-flake-check", "nix-flake-build", "nix-profile-status", "nix-store-hygiene", "clanker-disk-hygiene", "go-cli-build", "rust-cli-build", "nix-run-tool"} {
 		if _, ok := presetByID(id); !ok {
 			t.Fatalf("missing preset %s", id)
 		}
@@ -276,6 +288,21 @@ func TestPresetValidationAndBuilders(t *testing.T) {
 	diskJob, err := buildPresetJob("clanker-disk-hygiene", presetInput{})
 	if err != nil || !strings.Contains(diskJob.Command, "--dry-run") {
 		t.Fatalf("disk job %#v err=%v", diskJob, err)
+	}
+	if _, err := buildPresetJob("go-cli-build", presetInput{Dir: "/etc/passwd"}); err == nil {
+		t.Fatal("outside-/data go build dir accepted")
+	}
+	goJob, err := buildPresetJob("go-cli-build", presetInput{Dir: "/data/demo", Target: "./cmd/demo"})
+	if err != nil || !strings.Contains(goJob.Command, "go test ./cmd/demo") || !strings.Contains(goJob.Command, "artifacts/cli.bin") {
+		t.Fatalf("go job %#v err=%v", goJob, err)
+	}
+	flakeJob, err := buildPresetJob("nix-flake-build", presetInput{Attr: ".#packages.x86_64-linux.demo"})
+	if err != nil || !strings.Contains(flakeJob.Command, "nix build -L") || !strings.Contains(flakeJob.Command, "--no-link") {
+		t.Fatalf("flake job %#v err=%v", flakeJob, err)
+	}
+	shotJob, err := buildPresetJob("agent-browser-screenshot", presetInput{URL: "https://example.com"})
+	if err != nil || !strings.Contains(shotJob.Args, "artifacts/page.png") || !strings.Contains(shotJob.Args, "dom-probe.json") {
+		t.Fatalf("screenshot job %#v err=%v", shotJob, err)
 	}
 }
 
@@ -335,6 +362,37 @@ func waitForJobTerminal(t *testing.T, store *Store, id string) Job {
 	}
 	t.Fatalf("job %s did not finish", id)
 	return Job{}
+}
+
+func TestArtifactEndpoints(t *testing.T) {
+	store := openTestStore(t)
+	ctx := context.Background()
+	if err := store.CreateJob(ctx, "job-artifacts", "clanker", "m_clanker", "shell", "printf hi"); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.CreateArtifact(ctx, "job-artifacts", artifactInput{Name: "stdout.txt", Kind: "stdout", Mime: "text/plain; charset=utf-8", Content: []byte("hello artifact\n")}); err != nil {
+		t.Fatal(err)
+	}
+	s := &server{store: store}
+	req := httptest.NewRequest(http.MethodGet, "/api/jobs/job-artifacts/artifacts", nil)
+	req.SetPathValue("id", "job-artifacts")
+	recorder := httptest.NewRecorder()
+	s.artifactList(recorder, req)
+	if recorder.Code != http.StatusOK || !strings.Contains(recorder.Body.String(), "stdout.txt") || !strings.Contains(recorder.Body.String(), "sha256") {
+		t.Fatalf("artifact list %d %s", recorder.Code, recorder.Body.String())
+	}
+	items, err := store.ListArtifacts(ctx, "job-artifacts")
+	if err != nil || len(items) != 1 {
+		t.Fatal(err)
+	}
+	req = httptest.NewRequest(http.MethodGet, "/api/jobs/job-artifacts/artifacts/1?preview=1", nil)
+	req.SetPathValue("id", "job-artifacts")
+	req.SetPathValue("artifact_id", "1")
+	recorder = httptest.NewRecorder()
+	s.artifactDownload(recorder, req)
+	if recorder.Code != http.StatusOK || recorder.Body.String() != "hello artifact\n" || recorder.Header().Get("X-Artifact-SHA256") != items[0].SHA256 {
+		t.Fatalf("artifact download %d %q headers %#v", recorder.Code, recorder.Body.String(), recorder.Header())
+	}
 }
 
 func TestScheduleCRUDValidationAndDueRun(t *testing.T) {

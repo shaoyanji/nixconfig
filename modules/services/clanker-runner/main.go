@@ -82,6 +82,8 @@ func main() {
 	mux.HandleFunc("GET /api/jobs", s.jobList)
 	mux.HandleFunc("POST /api/jobs", s.createJob)
 	mux.HandleFunc("GET /api/jobs/{id}", s.jobDetail)
+	mux.HandleFunc("GET /api/jobs/{id}/artifacts", s.artifactList)
+	mux.HandleFunc("GET /api/jobs/{id}/artifacts/{artifact_id}", s.artifactDownload)
 	mux.HandleFunc("GET /api/presets", s.presetList)
 	mux.HandleFunc("POST /api/presets/{id}/run", s.runPreset)
 	mux.HandleFunc("GET /api/schedules", s.scheduleList)
@@ -157,7 +159,7 @@ func (s *server) static(path, contentType string) http.HandlerFunc {
 
 func (s *server) health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
-		"ok": true, "service": "clanker-runner", "version": "0.2.0", "instabox_configured": s.client.configured(),
+		"ok": true, "service": "clanker-runner", "version": "0.3.0", "instabox_configured": s.client.configured(),
 		"uptime_seconds": int(time.Since(s.started).Seconds()), "time": time.Now().UTC().Format(time.RFC3339),
 	})
 }
@@ -373,9 +375,11 @@ func (s *server) runJob(id, machineName string) {
 	}
 	var result execResponse
 	var exitCode *int
+	remoteStarted := false
 	if err == nil {
 		_ = s.store.AppendJobLog(ctx, id, "control", "detached remote job starting through InstaBox API")
 		err = s.startRemoteJob(ctx, machine, id, mustJobCommand(ctx, s.store, id))
+		remoteStarted = err == nil
 	}
 	if err == nil {
 		_ = s.store.AppendJobLog(ctx, id, "control", "remote job started; polling exit marker and log")
@@ -392,6 +396,9 @@ func (s *server) runJob(id, machineName string) {
 			status = "failed"
 			runErr = fmt.Sprintf("remote command exited %d", result.ExitCode)
 		}
+	}
+	if remoteStarted {
+		s.captureArtifacts(ctx, machine, id, result.Stdout, result.Stderr)
 	}
 	if result.Stdout != "" {
 		_ = s.store.AppendJobLog(ctx, id, "stdout", result.Stdout)
@@ -418,6 +425,36 @@ func (s *server) jobDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"job": job, "logs": logs})
+}
+
+func (s *server) artifactList(w http.ResponseWriter, r *http.Request) {
+	items, err := s.store.ListArtifacts(r.Context(), r.PathValue("id"))
+	if err != nil {
+		writeError(w, http.StatusNotFound, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": items, "total": len(items)})
+}
+
+func (s *server) artifactDownload(w http.ResponseWriter, r *http.Request) {
+	artifactID, err := strconv.ParseInt(r.PathValue("artifact_id"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, errors.New("artifact id must be numeric"))
+		return
+	}
+	artifact, content, err := s.store.GetArtifact(r.Context(), r.PathValue("id"), artifactID)
+	if err != nil {
+		writeError(w, http.StatusNotFound, err)
+		return
+	}
+	w.Header().Set("Content-Type", artifact.Mime)
+	w.Header().Set("Content-Length", strconv.Itoa(len(content)))
+	w.Header().Set("Content-Disposition", "attachment; filename="+strconv.Quote(artifact.Name))
+	w.Header().Set("X-Artifact-SHA256", artifact.SHA256)
+	if r.URL.Query().Get("preview") == "1" && strings.HasPrefix(artifact.Mime, "text/") {
+		w.Header().Set("Content-Disposition", "inline; filename="+strconv.Quote(artifact.Name))
+	}
+	_, _ = w.Write(content)
 }
 
 func (s *server) scheduleLoop() {

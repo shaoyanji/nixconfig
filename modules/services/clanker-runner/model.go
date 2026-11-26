@@ -58,6 +58,25 @@ type Job struct {
 	Snippet    string     `json:"snippet,omitempty"`
 }
 
+type Artifact struct {
+	ID        int64     `json:"id"`
+	JobID     string    `json:"job_id"`
+	Name      string    `json:"name"`
+	Kind      string    `json:"kind"`
+	Mime      string    `json:"mime"`
+	Size      int64     `json:"size"`
+	SHA256    string    `json:"sha256"`
+	Excerpt   string    `json:"excerpt,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type artifactInput struct {
+	Name    string
+	Kind    string
+	Mime    string
+	Content []byte
+}
+
 type logEntry struct {
 	Seq       int       `json:"seq"`
 	Stream    string    `json:"stream"`

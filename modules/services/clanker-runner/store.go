@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"time"
@@ -86,6 +88,20 @@ func (s *Store) migrate() error {
 			updated_at TEXT NOT NULL
 		)`,
 		`CREATE INDEX IF NOT EXISTS schedules_due_idx ON schedules(enabled,next_run_at)`,
+		`CREATE TABLE IF NOT EXISTS job_artifacts (
+			id INTEGER PRIMARY KEY,
+			job_rowid INTEGER NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+			name TEXT NOT NULL,
+			kind TEXT NOT NULL,
+			mime TEXT NOT NULL,
+			size INTEGER NOT NULL,
+			sha256 TEXT NOT NULL,
+			excerpt TEXT NOT NULL DEFAULT '',
+			content BLOB NOT NULL,
+			created_at TEXT NOT NULL,
+			UNIQUE(job_rowid,name)
+		)`,
+		`CREATE INDEX IF NOT EXISTS job_artifacts_job_idx ON job_artifacts(job_rowid,id)`,
 		`CREATE VIRTUAL TABLE IF NOT EXISTS jobs_fts USING fts5(
 			public_id UNINDEXED, machine, kind, command, stdout, stderr, error,
 			content='jobs', content_rowid='id'
@@ -285,6 +301,68 @@ func (s *Store) GetJob(ctx context.Context, publicID string) (Job, []logEntry, e
 		logs = append(logs, entry)
 	}
 	return job, logs, rows.Err()
+}
+
+func artifactExcerpt(content []byte) string {
+	const limit = 512
+	text := strings.Map(func(r rune) rune {
+		if r == '\n' || r == '\r' || r == '\t' || r >= 32 && r != 0x7f {
+			return r
+		}
+		return -1
+	}, string(content))
+	if len(text) > limit {
+		return text[:limit] + "…"
+	}
+	return text
+}
+
+func (s *Store) CreateArtifact(ctx context.Context, publicID string, input artifactInput) error {
+	if len(input.Content) > 8<<20 {
+		return fmt.Errorf("artifact %s exceeds 8 MiB capture bound", input.Name)
+	}
+	sum := sha256.Sum256(input.Content)
+	_, err := s.db.ExecContext(ctx, `
+		INSERT INTO job_artifacts (job_rowid,name,kind,mime,size,sha256,excerpt,content,created_at)
+		SELECT j.id,?,?,?,?,?,?,?,? FROM jobs j WHERE j.public_id=?
+		ON CONFLICT(job_rowid,name) DO UPDATE SET kind=excluded.kind,mime=excluded.mime,size=excluded.size,sha256=excluded.sha256,excerpt=excluded.excerpt,content=excluded.content,created_at=excluded.created_at`,
+		input.Name, input.Kind, input.Mime, len(input.Content), hex.EncodeToString(sum[:]), artifactExcerpt(input.Content), input.Content, time.Now().UTC().Format(time.RFC3339), publicID)
+	return err
+}
+
+func (s *Store) ListArtifacts(ctx context.Context, publicID string) ([]Artifact, error) {
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT a.id,j.public_id,a.name,a.kind,a.mime,a.size,a.sha256,a.excerpt,a.created_at
+		FROM job_artifacts a JOIN jobs j ON j.id=a.job_rowid WHERE j.public_id=? ORDER BY a.id`, publicID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Artifact{}
+	for rows.Next() {
+		var item Artifact
+		var created string
+		if err := rows.Scan(&item.ID, &item.JobID, &item.Name, &item.Kind, &item.Mime, &item.Size, &item.SHA256, &item.Excerpt, &created); err != nil {
+			return nil, err
+		}
+		item.CreatedAt, _ = time.Parse(time.RFC3339, created)
+		items = append(items, item)
+	}
+	return items, rows.Err()
+}
+
+func (s *Store) GetArtifact(ctx context.Context, publicID string, artifactID int64) (Artifact, []byte, error) {
+	row := s.db.QueryRowContext(ctx, `
+		SELECT a.id,j.public_id,a.name,a.kind,a.mime,a.size,a.sha256,a.excerpt,a.created_at,a.content
+		FROM job_artifacts a JOIN jobs j ON j.id=a.job_rowid WHERE j.public_id=? AND a.id=?`, publicID, artifactID)
+	var item Artifact
+	var created string
+	var content []byte
+	if err := row.Scan(&item.ID, &item.JobID, &item.Name, &item.Kind, &item.Mime, &item.Size, &item.SHA256, &item.Excerpt, &created, &content); err != nil {
+		return item, nil, err
+	}
+	item.CreatedAt, _ = time.Parse(time.RFC3339, created)
+	return item, content, nil
 }
 
 func (s *Store) Stats(ctx context.Context) (statsResponse, error) {

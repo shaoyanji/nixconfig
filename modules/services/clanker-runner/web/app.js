@@ -97,6 +97,8 @@ async function loadJobs() {
 }
 async function showDetail(id) {
   const payload = await api(`/api/jobs/${encodeURIComponent(id)}`);
+  const artifactsPayload = await api(`/api/jobs/${encodeURIComponent(id)}/artifacts`).catch(() => ({items: []}));
+  const artifacts = artifactsPayload.items || [];
   const job = payload.job;
   const logs = payload.logs || [];
   $('#detail-body').innerHTML = `
@@ -104,6 +106,8 @@ async function showDetail(id) {
     <div class="detail-meta"><span class="badge ${esc(job.status)}">${esc(job.status)}</span><span>${esc(job.id)}</span><span>${age(job.created_at)}</span>${job.exit_code !== undefined && job.exit_code !== null ? `<span>exit ${job.exit_code}</span>` : ''}</div>
     <div class="panel-heading">Command</div><pre class="command">${esc(job.command)}</pre>
     ${job.error ? `<div class="panel-heading">Error</div><pre class="error">${esc(job.error)}</pre>` : ''}
+    <div class="panel-heading">Artifacts</div>
+    <div class="artifacts">${artifacts.map((artifact) => `<a class="artifact" href="/api/jobs/${encodeURIComponent(id)}/artifacts/${artifact.id}${artifact.mime.startsWith('text/') ? '?preview=1' : ''}" target="_blank" rel="noreferrer"><b>${esc(artifact.name)}</b><span>${esc(artifact.kind)} · ${artifact.size} bytes</span><code>${esc(artifact.sha256.slice(0, 16))}</code>${artifact.excerpt ? `<small>${esc(artifact.excerpt)}</small>` : ''}</a>`).join('') || '<span class="muted">No artifacts captured yet.</span>'}</div>
     <div class="panel-heading">Persisted log</div>
     <div class="log">${logs.map((line) => `<div><span>${esc(line.stream)}</span><code>${esc(line.line)}</code></div>`).join('') || '<span class="muted">No log rows yet.</span>'}</div>
     <div class="output-grid"><section><div class="panel-heading">stdout</div><pre>${esc(job.stdout || '—')}</pre></section><section><div class="panel-heading">stderr</div><pre>${esc(job.stderr || '—')}</pre></section></div>`;
@@ -120,7 +124,11 @@ function presetParams() {
     url: $('#preset-url').value.trim(),
     selector: $('#preset-selector').value.trim(),
     package: $('#preset-package').value.trim(),
-    args: $('#preset-args').value.trim()
+    args: $('#preset-args').value.trim(),
+    flake: $('#preset-flake').value.trim(),
+    dir: $('#preset-dir').value.trim(),
+    target: $('#preset-target').value.trim(),
+    attr: $('#preset-target').value.trim()
   };
 }
 async function runPreset(id) {
@@ -132,7 +140,7 @@ async function runPreset(id) {
 async function loadPresets() {
   const payload = await api('/api/presets');
   const items = payload.items || [];
-  $('#presets').innerHTML = items.map((preset) => `<article class="preset"><strong>${esc(preset.name)}</strong><p>${esc(preset.description)}</p><p><code>${esc(preset.id)}</code></p><div class="preset-actions"><button data-preset="${esc(preset.id)}">Run</button>${preset.required?.length?`<small>needs ${esc(preset.required.join(', '))}</small>`:''}</div></article>`).join('');
+  $('#presets').innerHTML = items.map((preset) => `<article class="preset"><strong>${esc(preset.name)}</strong><p>${esc(preset.description)}</p><p><code>${esc(preset.id)}</code></p>${preset.params?.length?`<div class="param-list">${preset.params.map((param) => `<span>${esc(param.name)}<small>${esc(param.type)}${param.required ? ' · required' : ''}</small></span>`).join('')}</div>`:''}<div class="preset-actions"><button data-preset="${esc(preset.id)}">Run</button>${preset.required?.length?`<small>needs ${esc(preset.required.join(', '))}</small>`:''}</div></article>`).join('');
   const select = $('#schedule-preset');
   const current = select.value;
   select.innerHTML = items.map((preset) => `<option value="${esc(preset.id)}">${esc(preset.name)}</option>`).join('');
@@ -140,16 +148,12 @@ async function loadPresets() {
   document.querySelectorAll('[data-preset]').forEach((button) => button.addEventListener('click', () => runPreset(button.dataset.preset)));
 }
 function scheduleParamsFor(presetID) {
-  const params = {};
   const values = presetParams();
-  if (presetID === 'agent-browser-dom-check') {
-    params.url = values.url;
-    if (values.selector) params.selector = values.selector;
+  const params = {};
+  for (const key of ['url', 'selector', 'package', 'args', 'flake', 'dir', 'target']) {
+    if (values[key]) params[key] = values[key];
   }
-  if (presetID === 'nix-run-tool') {
-    params.package = values.package;
-    if (values.args) params.args = values.args;
-  }
+  if (presetID === 'nix-flake-build' && values.target) params.attr = values.target;
   return params;
 }
 async function loadSchedules() {

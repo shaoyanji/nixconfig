@@ -8,7 +8,7 @@
 
   package = pkgs.buildGoModule {
     pname = "clanker-runner";
-    version = "0.2.0";
+    version = "0.3.0";
     src = ./clanker-runner;
     vendorHash = "sha256-n+WU7qcF6NauBw9DFU4VG1fnDQ387+nibJ/uzApqehk=";
     env.CGO_ENABLED = 0;

@@ -1139,6 +1139,26 @@ tasks:
     cmds:
       - HOST="{{.HOST | default ""}}" IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
 
+  checks:delphi:endpoints:
+    desc: "[gate] Every tailnet mount on delphi answers — probe the mounts, not the units"
+    summary: >
+      scripts/task/endpoints-smoke.py — reads `services.servicePortal.mounts` from
+      the compiled delphi config and asks each mount for its page over the tailnet
+      (`https://<host>:<port>/`). A 5xx, a refusal or a timeout fails: that is a
+      live unit behind a broken mount, the state `services:validate:host` cannot
+      see because it only asks systemd. 4xx counts as answering — auth-gated mounts
+      refuse `/` by design — and `--expect` narrows that. Vars: HOST=, TIMEOUT=,
+      EXPECT=, FORMAT=json|toon; exit 1 names every mount that did not answer.
+    cmds:
+      - |
+        nix eval --json .#nixosConfigurations.delphi.config.services.servicePortal.mounts \
+          --apply 'ms: builtins.mapAttrs (_: m: {inherit (m) port upstream;}) ms' |
+          python3 scripts/task/endpoints-smoke.py \
+            --host "{{.HOST | default "delphi.cloudforest-kardashev.ts.net"}}" \
+            --timeout {{.TIMEOUT | default "8"}} \
+            --expect "{{.EXPECT | default ""}}" \
+            --format {{.FORMAT | default "json"}}
+
   checks:ports:test:
     desc: Regression fixture for checks:ports (fake host, listeners and serve state)
     summary: >

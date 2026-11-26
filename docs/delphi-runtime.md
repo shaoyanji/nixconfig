@@ -96,6 +96,21 @@ visible only inside the tailnet.
 
 ## Tailnet service mounts (one port per service)
 
+**Prove they answer, not that their units are up.** `services:validate:host:delphi`
+asks systemd for the host's state, so a unit can be `active` behind a mount that
+returns 502 — that is the failure this page's port table exists to notice:
+
+```bash
+task checks:delphi:endpoints                  # one line per mount, exit 1 on any refusal
+task checks:delphi:endpoints FORMAT=toon
+task checks:delphi:endpoints EXPECT=200        # strict: a 4xx becomes a failure
+```
+
+The list comes from `services.servicePortal.mounts`, so it cannot drift from the
+config; the probe is the tailnet URL a person clicks. A 5xx, a refused connection
+or a timeout fails, and a 4xx passes because auth-gated mounts (`radicale`) and
+machine-facing ones (`email-archive`) refuse `/` by design.
+
 Everything reachable from the tailnet is a loopback listener plus a `tailscale
 serve` mount, never a public vhost; tailscaled terminates TLS, so no cert per service.
 

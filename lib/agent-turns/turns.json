@@ -1,8 +1,71 @@
 {
-  "generated": "2026-11-26T14:36:45Z",
+  "generated": "2026-11-26T14:43:50Z",
   "count": 200,
-  "pin": "e00a5c53223f65b2a7b4eea7240347aa985da6ab8935d713cd072e448531d139",
+  "pin": "7f22bd2a2ae8ec55edd15cb9198d33f5987d8a1d884d40a9ee90bc30a7d35543",
   "turns": [
+    {
+      "id": "78122a6a-0d7e-4548-a42b-c30e8d8aa2d7",
+      "ts": "2026-11-26T14:42:21Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "landed: packet builder defaults to letters/<id>.json (was a letter.json that never existed, so packets came out CV-only); rebuilt 13 prep packets whose entry was a dangling store link; published matt CV site (deploy 8d85fdf8) | gate: checks:quick PASS, checks:appflow PASS, matt:cv:check 14/14, site:check PASS, cv:publish-check 6/6",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "92948702269fc56e1b10675b8b620c23d396ffd9",
+      "branch": "main",
+      "frame": "03hb3ef8h8lh3lhwwf7fef1si"
+    },
+    {
+      "id": "6545a181-d542-4838-b85d-e4bf84ab4751",
+      "ts": "2026-11-26T14:38:28Z",
+      "source": "devin",
+      "subject": "nixconfig:inventory-site-service",
+      "action": "claim: build inventory-site tailnet service: SQLite/FTS5 asset inventory with locations/categories/tags/serials/warranties/value, JSON+CSV import/export, optional inventory.toml host seed, API+UI, delphi loopback+tailnet wiring",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/inventory-site",
+        "modules/services/inventory-site.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "0f4f3d3443243819e23f5557707e39db11688fbb",
+      "branch": "main",
+      "frame": "03hb3dnvjffx9wvt7j32xl6g7"
+    },
+    {
+      "id": "0b0378e9-b379-493c-89b2-54b75ce0d0e7",
+      "ts": "2026-11-26T14:37:19Z",
+      "source": "devin",
+      "subject": "nixconfig:private-deals-service",
+      "action": "landed private-deals: Go SQLite/FTS5 deals/products/watchlists/price-history service, RSS+JSON+manual+provider ingestion, API+UI, delphi mount 8465 -> 127.0.0.1:8102 | gates: go test/vet PASS, aarch64 nix build PASS, checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "base_commit": "e958d546",
+      "branch": "main",
+      "frame": "03hb3dfsi6hsnvlxd09v5zkpt"
+    },
     {
       "id": "3f82f9e9-5f4c-4a00-bd9b-b3c9592e443f",
       "ts": "2026-11-26T14:36:43Z",
@@ -2973,48 +3036,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hb0fpats8futeatmk646x5p"
-    },
-    {
-      "id": "eba89cdc-eb26-43c5-b5a6-492665e6a8ec",
-      "ts": "2026-11-26T05:22:56Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "done: hosts/+modules/ surveyed — every host's own-import set unique post chain-split; 0 repeated 5-line config blocks across host files; no repeated module surface remains (all single-sourced through 3346ea27) | gate: drv-equality 30/30 identical",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0d5824gnmx0yla4sld9vy"
-    },
-    {
-      "id": "c0266549-0b2f-4f54-bbac-ba7c98f8deba",
-      "ts": "2026-11-26T05:22:56Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-gates",
-      "action": "done: boundaries verified (all in internal/image; main.go dispatch-only), checks:image-daily rc=0, drv-equality 30/30 identical post-window | gate: checks:image-daily + drv-equality green on 3346ea27",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0d560lqufl95ky6rjumwl"
-    },
-    {
-      "id": "21b3105c-513c-43c4-864c-49fae4dd2b21",
-      "ts": "2026-11-26T05:22:25Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "start: chain-change — survey hosts/ for remaining repeated module surface",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "hosts/"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0d1lgw5fb76eu0hfk1kjq"
     }
   ]
 }

@@ -29,7 +29,15 @@ store=${APPFLOW_SUBMISSIONS:-${XDG_STATE_HOME:-$HOME/.local/state}/appflow/submi
 
 die() { printf 'appflow-send: %s\n' "$*" >&2; exit 1; }
 
+# `-- <id>` is the documented form, but bash does not strip `--` for a script:
+# it arrives as $1, so a parser that only rejects dashed arguments refuses the
+# call the usage line itself teaches (measured 2026-11-26: every packet died on
+# `usage`). Consume it here, and only here.
 id=${1:-}
+if [ "$id" = -- ]; then
+  shift
+  id=${1:-}
+fi
 if [ -z "$id" ] || [ "${id#--}" != "$id" ]; then
   die "usage: appflow-send.sh -- <id> [--to ADDR] [--send]"
 fi

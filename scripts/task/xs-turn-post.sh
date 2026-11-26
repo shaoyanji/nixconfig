@@ -78,6 +78,21 @@ cap outcome "$outcome" 300
   fail 2 "OUTCOME must be done, in_progress, blocked: <why> or failed: <why>: $outcome"
 [[ $id =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]] ||
   fail 2 "ID must be a client-generated UUID: $id"
+
+# COMMITS is a list, and its separator is the comma. "abc1234 def5678" is one
+# element to the shim, whose commits array of hashes then fails validation with a
+# 400 — and a 400 is poison in the queue replay, so the turn is parked in
+# queue.rejected.jsonl and never sent (measured 2026-11-26: a devin turn lost
+# that way). Refuse it here, where the caller still holds the values.
+if [ -n "${commits//[[:space:]]/}" ]; then
+  while IFS= read -r entry; do
+    entry=${entry#"${entry%%[![:space:]]*}"}
+    entry=${entry%"${entry##*[![:space:]]}"}
+    [ -n "$entry" ] || continue
+    [[ $entry =~ ^[0-9a-fA-F]{7,40}$ ]] ||
+      fail 2 "COMMITS is comma-separated hashes: write COMMITS=abc1234,def5678, not '$entry'"
+  done < <(printf '%s\n' "$commits" | tr ',' '\n')
+fi
 [[ $ts =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] ||
   fail 2 "TS must look like 2026-10-31T09:00:00Z: $ts"
 

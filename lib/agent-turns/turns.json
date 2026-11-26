@@ -1,8 +1,77 @@
 {
-  "generated": "2026-11-26T20:44:37Z",
+  "generated": "2026-11-26T21:20:05Z",
   "count": 200,
-  "pin": "5d450316d6cfd5a7144e14ae062bee77ba8f750ab83dc0822319c5f17fe5ef6a",
+  "pin": "4abc3f57cd67f084182f76afe2705c104352abe14a1a0d0754e0c068803dedbf",
   "turns": [
+    {
+      "id": "a436fafa-070c-47ae-be19-9a4e186202d8",
+      "ts": "2026-11-26T21:18:04Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-wallpaper",
+      "action": "publish nixconfig-dark wallpaper to Cloudinary, commit image-daily briefs/rotation, push origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "wallpapers/nixconfig-dark.png",
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5jq4ehqvduwg1hjtn1dm6"
+    },
+    {
+      "id": "05ce94de-560a-45f9-8dd7-b5fd1fce50b1",
+      "ts": "2026-11-26T20:58:24Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:agy-standing-eisen-strata-research",
+      "action": "research: strata-inkling-mini-2-eisen exceeds 62.7 GiB ceiling alongside IQ1_M; stop strata.service :8085 to test",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix hosts/eisen/strata.nix hosts/eisen/llm-server.nix"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5fvtss69yyd4vfrm92kw6"
+    },
+    {
+      "id": "62efa369-558a-4efb-aa07-a677e995afde",
+      "ts": "2026-11-26T20:56:35Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:agy-standing-eisen-strata-research",
+      "action": "research eisen strata-inkling-mini-2-eisen page-cache fit",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix hosts/eisen/strata.nix hosts/eisen/llm-server.nix"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5fj0yhe3ufnr6ic06rfdh"
+    },
+    {
+      "id": "cc8d7eca-9c5e-4830-8bc2-0fdce74a31d4",
+      "ts": "2026-11-26T20:46:07Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wallpaper",
+      "action": "landed: wallpapers/nixconfig-dark.png + lib/image-daily/{briefs,rotation}.json (b5920ed6) and AGENTS.nix note wallpaper-nixconfig-dark-publish-blocked (d76fd440) on origin/main | gate: pre-commit + pre-push + agentsNotes.index PASS",
+      "outcome": "done",
+      "claims": [
+        "wallpapers/nixconfig-dark.png",
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json"
+      ],
+      "files": [
+        "wallpapers/nixconfig-dark.png",
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json",
+        "AGENTS.nix"
+      ],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5dhe1wxc6tnui5342c1wg"
+    },
     {
       "id": "3f126b08-c6df-434b-a69d-b05010d3015c",
       "ts": "2026-11-26T20:44:29Z",
@@ -3035,62 +3104,6 @@
       "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
       "branch": "main",
       "frame": "03hb3fnqjd8xcz2yps7x7doq7"
-    },
-    {
-      "id": "abdba80a-d464-450e-acfb-f7df281eac12",
-      "ts": "2026-11-26T14:47:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:deals-scraper-merchant-fix",
-      "action": "claim: resolve merchant past redirect hosts (cc.techbargains.com) from query/path/known tokens instead of filing every deal under cc",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/deals-page-scrape.py tests/deals-page-scrape"
-      ],
-      "files": [],
-      "base_commit": "3b0bf87e088265fe87e6968918bc0599b06dfd9b",
-      "branch": "main",
-      "frame": "03hb3feoorw74br3bihv3cvno"
-    },
-    {
-      "id": "deb22032-a5b7-4ca1-a0a8-ca2311989428",
-      "ts": "2026-11-26T14:46:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:deals-ingest-pipeline",
-      "action": "deals-ingest.py: scrape JSON -> POST /api/deals, original_price mapped to list_price, board host as source (not the cc.* redirect), canonical URL so re-runs update, unpriced cards refused. Live e2e on /tmp binary :8472: firecrawl techbargains 5 deals created, FTS q=knife hit with snippet, q=cleaner&min_discount=50 1, re-run 0 created/5 updated. 17 tests + py_compile.| gate: python3 -m unittest discover tests/deals-ingest PASS + live /api/deals FTS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3b0bf87e088265fe87e6968918bc0599b06dfd9b",
-      "branch": "main",
-      "frame": "03hb3f8wl0st1ylwzkvre6s7q"
-    },
-    {
-      "id": "d09e8c0b-0261-4e7c-ae1a-fa3692fd87d9",
-      "ts": "2026-11-26T14:45:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:deals-ingest-pipeline",
-      "action": "claim: pipe deals-page-scrape JSON into private-deals over its HTTP API, mirroring jobs-ingest, verified against a local instance with an FTS5 query",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/deals-ingest.py tests/deals-ingest"
-      ],
-      "files": [],
-      "base_commit": "016f15c2554e461681a190d3c7fa203db0d26a5f",
-      "branch": "main",
-      "frame": "03hb3exwnxl10h3obe77griz5"
-    },
-    {
-      "id": "f4e0f46e-a671-4998-8325-c80a9396476b",
-      "ts": "2026-11-26T14:44:05Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-deals-scraper-cli",
-      "action": "deals-page-scrape.py: card-level extraction (title/price/original/discount/merchant/url/category) over agent-browser, firecrawl, context, tavily, http. DE/US/CHF prices; two-amount cards are deals, -NN% marker computes the original, single prices dropped, coupon thresholds refused. Live: techbargains 18.99<-49.99 (62%) via firecrawl/context/http; clanker browser on dealnews 4 deals incl 68.49<-299.99 (77%). 34 tests + py_compile.| gate: python3 -m unittest discover tests/deals-page-scrape PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "016f15c2554e461681a190d3c7fa203db0d26a5f",
-      "branch": "main",
-      "frame": "03hb3erevuzje6mgn9ualon0g"
     }
   ]
 }

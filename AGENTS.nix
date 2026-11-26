@@ -8636,12 +8636,12 @@
       '';
     };
     wallpaper-nixconfig-dark-publish-blocked = {
-      title = "nixconfig-dark wallpaper rotation landed; Cloudinary publish blocked by quota";
+      title = "nixconfig-dark wallpaper rotation and Cloudinary publish landed";
       kind = "open";
-      status = "BLOCKED";
+      status = "CLOSED";
       priority = "P3";
       date = "2026-11-26";
-      summary = "wallpapers/nixconfig-dark.png, lib/image-daily/briefs.json, and lib/image-daily/rotation.json are committed and pushed to origin/main (b5920ed6); Cloudinary publish is blocked by an individual quota resetting in ~25 minutes — do not retry publish yet.";
+      summary = "wallpapers/nixconfig-dark.png, lib/image-daily/briefs.json, and lib/image-daily/rotation.json landed on origin/main (b5920ed6), and task images:publish + task checks:images completed cleanly (784 assets on Cloudinary and 07b3aa80.bountystash-assets.pages.dev).";
       from = ["image-daily-queue"];
       refs = {
         hosts = ["frieren"];
@@ -8661,12 +8661,10 @@
         - `lib/image-daily/rotation.json` (`2026-11-26/nixconfig-dark.png` and
           `2026-11-26/catwoman-dc.png` prepended to `wall.in`)
 
-        Blocker: `task images:publish` (Cloudinary upload and gallery manifest deploy)
-        is blocked by an individual quota resetting in ~25 minutes from
-        2026-11-26T21:42+01:00. Do not retry `images:publish` until after the reset.
-
-        Exit: after the quota resets, run `task images:publish` and
-        `task checks:images`, confirm exit 0, and mark this note CLOSED.
+        Resolved 2026-11-26T22:19+01:00: `task images:publish` succeeded (784/784
+        assets on Cloudinary, including `wall/2026-11-26/nixconfig-dark.png` at
+        `v1795720865`, deployed to `https://07b3aa80.bountystash-assets.pages.dev`
+        with HTTP 200) and `task checks:images` passed (`784 row(s), 784 asset(s)`).
       '';
     };
   };

@@ -384,10 +384,12 @@ upstream project: the JSON is a data source, and documents are a Nix build —
 The token is state, not sops: rotating it is `rclone config reconnect` with no
 rebuild, and `rm` of the conf plus a remote stop returns the unit to *skipped*.
 
+## Backup
+
+`hosts/delphi/backups.nix` dumps at 02:50 into `/var/backup/postgresql`, pushed to frieren at 03:10 and carried off the fleet by its 03:30 restic snapshot; Sunday's drill restores each dump and fails below 14 tables.
+
 ## Not done here
 
-- **No backup of `email_archive` yet.** `services.postgresBackupDrill` and
-  `services.postgresqlBackup` are opt-in; a database that matters needs one.
 - **No auth on the API.** Tailnet membership is the only gate; the generated
   endpoints are open to any tailnet peer.
 - **Only the inbox is imported.** `importer.mailbox` is one folder; sent mail and

@@ -289,6 +289,7 @@ in {
   imports = [
     self.modules."services.fleet-sentinel"
     self.modules."services.agent-scheduler"
+    ./backups.nix
   ];
 
   # The audit is a user unit and the sentinel collector reads as root with

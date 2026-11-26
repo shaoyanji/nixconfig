@@ -1,8 +1,160 @@
 {
-  "generated": "2026-11-26T15:58:07Z",
+  "generated": "2026-11-26T16:07:45Z",
   "count": 200,
-  "pin": "6f6b99b03a279398a5dc0de714acd6c9735372544976c29e982308d09e827827",
+  "pin": "141036dfaea8df74dae149586c51a9ceab7e7375e248e87605f0bbd5c3944507",
   "turns": [
+    {
+      "id": "759153b1-91d7-4d04-8a7d-a9f606fe803c",
+      "ts": "2026-11-26T16:06:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:frieren-burgernas-fix",
+      "action": "landed: the audit now counts backup/upgrade failures BEFORE reset-failed (a reset sets Result to success, so the count always read 0 and the quiet path called a lost burgernas backup clean). Proven on a probe unit: failed -> reset -> inactive | gate: checks:host HOST=frieren PASS (86s)",
+      "outcome": "done",
+      "claims": [
+        "hosts/frieren"
+      ],
+      "files": [],
+      "base_commit": "383573b7667afa2a115ae181c71879f6992f4e03",
+      "branch": "main",
+      "frame": "03hb3uwc09dsbfi7asiskesqu"
+    },
+    {
+      "id": "5db75939-6d85-4056-876e-5d34c3b41e4d",
+      "ts": "2026-11-26T16:04:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:frieren-burgernas-fix",
+      "action": "claim: take over from tmux-pane-steward — the audit resets failed units before it counts backup failures, so a failed night is unreadable; fix the order",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren"
+      ],
+      "files": [],
+      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
+      "branch": "main",
+      "frame": "03hb3uf49up4q2pscgdxah6tp"
+    },
+    {
+      "id": "2a8568ee-77bc-42dc-bba1-fafebe8663a6",
+      "ts": "2026-11-26T16:04:06Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:intents-test-green",
+      "action": "bug-fix|0.7|0.47: fix_checks_intents_test (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/intents.nix",
+        "tests/intents/run.sh",
+        "docs/intents.md"
+      ],
+      "files": [],
+      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
+      "branch": "main",
+      "frame": "03hb3ue65lfq6v7xcghuznnlh"
+    },
+    {
+      "id": "85faaa96-b264-4bca-b466-430b59611760",
+      "ts": "2026-11-26T16:03:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:frieren-burgernas-fix",
+      "action": "bug-fix|0.44|0.07: frieren_restic_burgernas_silent (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren",
+        "modules/services"
+      ],
+      "files": [],
+      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
+      "branch": "main",
+      "frame": "03hb3ubcn7tq2pxgb0edizmz1"
+    },
+    {
+      "id": "dc19a7eb-7420-4986-802e-6c0f7a0f93ff",
+      "ts": "2026-11-26T16:03:11Z",
+      "source": "devin",
+      "subject": "nixconfig:pane-nudge-gate",
+      "action": "landed: tests/pane-nudge fixture (11 cases, stub tmux — C-u before paste, named buffer deleted after, one Enter, no Escape, send-keys carries only C-u/Enter, line shape with CLAIM=none degradation, missing input rc=2, unknown window rc=1), wired checks:pane-nudge:test into checks:quick + leaf row in check-inventory | gates: checks:pane-nudge:test 11/11, check:verify 159 rows no drift — flag: checks:intents:test fails on clean HEAD, pre-existing, not this change",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
+      "branch": "main",
+      "frame": "03hb3u7owv4itrowbn3ly2hqr"
+    },
+    {
+      "id": "035c8ae8-3307-4a36-ae4a-60b7dce9a0c6",
+      "ts": "2026-11-26T16:02:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:jobsearch-sweep-26e",
+      "action": "closed stale subject: 26e landed 13:36 under nixconfig:job-scout, but this row was left in_progress. Re-verified now: 7 rows carry origin scout-2026-11-26e (6 lead, 1 agency other), py_compile ok, self-test 20/20, read-only pipeline exit 0 (1401 parsed, 115 fresh, 0 new at 1706 held; 38 Stepstone cards unnameable by design) | gate: apps:sweep:pipeline dry run + sweep self-test",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/jobsearch-pipeline.sh",
+        "scripts/task/apps-scout.sh"
+      ],
+      "files": [],
+      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
+      "branch": "main",
+      "frame": "03hb3tzkai7wbnodze8x6m89p"
+    },
+    {
+      "id": "8c3910ac-b4f4-4544-b810-4ab18980ab6f",
+      "ts": "2026-11-26T15:59:48Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:jobsearch-sweep-26e",
+      "action": "task-change|0.39|0.15000000000000002: jobsearch_sweep_26e (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-pipeline.sh",
+        "scripts/task/apps-scout.sh"
+      ],
+      "files": [],
+      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
+      "branch": "main",
+      "frame": "03hb3tjxmq0d1q9x4irpt6km7"
+    },
+    {
+      "id": "0e489d74-d6dd-48d9-b40a-5ac4eda07581",
+      "ts": "2026-11-26T15:58:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:frieren-ops-health",
+      "action": "verified: ops:health ok, hermes-check clean, downloads-sort/sentinel/local restic exit 0. BurgerNAS restic repo is an empty skeleton (28K, config only, 0 snapshots/index/data); nightly runs die at the fixed 04:00 NAS poweroff (exit 130, 272G read, 1.2G sent), timer fired 03:28 not 02:45; local repo has 33 snapshots (latest 2026-11-26, 32.7G). NAS powered back off.",
+      "outcome": "blocked: no off-host snapshot exists; re-seed needs an approved hours-long window",
+      "claims": [
+        "hosts/frieren"
+      ],
+      "files": [],
+      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
+      "branch": "main",
+      "frame": "03hb3tc3dyc0b0jdkoyljhrc7"
+    },
+    {
+      "id": "15402a1e-3f28-45b7-93dc-8c3d101ea51f",
+      "ts": "2026-11-26T15:58:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-reconcile-tests",
+      "action": "reconcile.py guards: doc without envelopes is a failed read ({} used to archive the whole inbox), empty walk over a non-empty archive aborts (--allow-empty overrides), multi-page walk re-reads page-1 head and refuses if it moved, himalaya timeout -> ok:false exit 2, box-list failure aborts before the walk, --limit reports truncated. box-set upsert is idempotent. tests/mail-atlas-reconcile 25.| gate: unittest 25 + test_drain 10 + py_compile PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d6203e48a89db2403a2659d794f309e34f0c2ffe",
+      "branch": "main",
+      "frame": "03hb3t9vpaecvhlr8x9l1b4rx"
+    },
+    {
+      "id": "702e965f-37d0-4ab5-9ead-26ccbfac0ffd",
+      "ts": "2026-11-26T15:58:17Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-pg-backup-gap",
+      "action": "claim: taking over from tmux-pane-steward per operator; bug-fix|0.7|0.51 delphi_postgres_backup_gap — email_archive has no backup (62MB db + 24MB attachments, single copy on delphi)",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi",
+        "modules/services/email-archive.nix"
+      ],
+      "files": [],
+      "base_commit": "d6203e48a89db2403a2659d794f309e34f0c2ffe",
+      "branch": "main",
+      "frame": "03hb3t979r39c6n9z47joxudw"
+    },
     {
       "id": "d304fff9-9afc-46a7-a103-6ed29e8390a0",
       "ts": "2026-11-26T15:55:53Z",
@@ -2937,144 +3089,6 @@
       "base_commit": "87e69ac53c76a8c74c823ca49c760ff98f43ad97",
       "branch": "main",
       "frame": "03hb2esjfzw7snhkr1hkp7z8b"
-    },
-    {
-      "id": "8ebd0d8e-0ee0-488c-beda-e2fe632877cd",
-      "ts": "2026-11-26T10:34:43Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "correction: clanker.sh offload fixes now land cleanly at 87e69ac5 — freebuff reverted the accidental inclusion from 38252abc in f64d893f; live proof stands (policies gate built on clanker rc0, bogus attr exits 1) | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "87e69ac53c76a8c74c823ca49c760ff98f43ad97",
-      "branch": "main",
-      "frame": "03hb2esilm7kf7s56dyoe752i"
-    },
-    {
-      "id": "32fe4c6a-b0cf-4c06-8cc0-211ba8558f3f",
-      "ts": "2026-11-26T10:27:56Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "fix(jobsearch)+fix(appflow): Stepstone city stripped from employer names; negated stage words no longer set interview. Commits 4ea9b608, 38252abc (+f64d893f reverting an unrelated file the hook staged). checks:quick PASS, triage 34/34, self-test 18/18",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f64d893fc7c375f0f55fb9ba202f75387fad8b54",
-      "branch": "main",
-      "frame": "03hb2eshnach1tvul2y2jotcm"
-    },
-    {
-      "id": "0b387aba-58b9-47db-888e-17bc3fa77df1",
-      "ts": "2026-11-26T10:20:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin",
-      "action": "commit and push intents changes (devin pane 1)",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/intents/run.sh",
-        "docs/intents.md",
-        "flake/intents.nix"
-      ],
-      "files": [],
-      "base_commit": "45a9c2a5adb3b56c19b738bc5c35ae9144f630af",
-      "branch": "main",
-      "frame": "03hb2esh7n3k4tbm111jqyfja"
-    },
-    {
-      "id": "875d2b55-4be4-4d52-8b01-f29247a82987",
-      "ts": "2026-11-26T10:19:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin",
-      "action": "commit and push intents changes (devin pane 1)",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/intents/run.sh",
-        "docs/intents.md",
-        "flake/intents.nix"
-      ],
-      "files": [],
-      "base_commit": "45a9c2a5adb3b56c19b738bc5c35ae9144f630af",
-      "branch": "main",
-      "frame": "03hb2esgp3y8r7j23luegkczh"
-    },
-    {
-      "id": "ab99d836-ac15-4153-a7a7-670b5b44349f",
-      "ts": "2026-11-26T10:13:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "6 due leads: 5 packets built and ATS-verified (fediversity, wabcon, blocktech, tide, remanence); smartly closed as a 404 req; proofline PR target yek#270 chosen. Nothing sent, no form submitted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8547694206e7a7371b4cb3102c5980d0b6de1781",
-      "branch": "main",
-      "frame": "03hb2esg0i2eaxjqshi1a2e3r"
-    },
-    {
-      "id": "69e34e46-33a4-4560-afac-77513494a5de",
-      "ts": "2026-11-26T10:10:13Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: place layer — .#intents.places closed vocabulary (eval|local-gate|nix-tool|delphi|clanker), per-kind+per-capability place, admit reach refusal, capReachMisses invariant; devji capability un-reds checks:intents; prose-budget records 3 skills; policy work-places-where-it-costs; fixture 17 cases | gate: checks:intents PASS, checks:policies PASS, checks:prose PASS, checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8547694206e7a7371b4cb3102c5980d0b6de1781",
-      "branch": "main",
-      "frame": "03hb1x9j74fxg31b14pcsegz5"
-    },
-    {
-      "id": "a620fc6b-e890-447a-9484-da9aaa5723b9",
-      "ts": "2026-11-26T10:03:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "ATS 10/10 on the ten packets; DB audit corrected 3 rows; nothing sent, no form submitted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
-      "branch": "main",
-      "frame": "03hb1w11zobart3ziydklxwxx"
-    },
-    {
-      "id": "22f38fc1-01ab-4cfb-92d2-831dafa4b2a3",
-      "ts": "2026-11-26T10:03:33Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "ATS 1/10 passed, 0 failed — supersedes the two earlier 0/10 entries, whose cause was my reading selection.json wrong",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
-      "branch": "main",
-      "frame": "03hb1vylle4gtduc6u43rlb3i"
-    },
-    {
-      "id": "3ddae157-1905-40f3-a674-85841e66498a",
-      "ts": "2026-11-26T10:03:12Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "ATS 0/10 passed, 10 failed, 0 skipped — corrects the previous 'failed: ATS gate 0/10' entry, which was my extraction bug (selection.json stores projects as an object, not an array)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
-      "branch": "main",
-      "frame": "03hb1vw3tp0d7h0z7hbvvh2ey"
-    },
-    {
-      "id": "dae78bdf-d28c-4a48-9eee-8a3ec2601902",
-      "ts": "2026-11-26T10:02:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "Audit+packets: 3 DB rows corrected, 10 packets built, ATS 0/10 passed — nothing sent and no portal form submitted",
-      "outcome": "failed: ATS gate 0/10 passed",
-      "claims": [],
-      "files": [],
-      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
-      "branch": "main",
-      "frame": "03hb1vt10srebrpezemdp9ijw"
     }
   ]
 }

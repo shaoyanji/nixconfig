@@ -9,10 +9,8 @@
 }: let
   cfg = config.services.appflowBoard;
 
-  page = pkgs.runCommand "appflow-board-ui" {} ''
-    mkdir -p $out
-    install -m 0644 ${../../lib/appflow-board/index.html} $out/index.html
-  '';
+  staticUi = import ../config/nginx-static-ui.nix;
+  page = staticUi.package pkgs "appflow-board" ../../lib/appflow-board/index.html;
 
   # One exact location per route, so the proxied surface is these two lists and
   # not the plugin's route table: reads plus, gated, the two writes — update
@@ -108,7 +106,7 @@ in {
           # The static-UI pair is the same shape the media library serves
           # (modules/config/nginx-static-ui.nix); the board adds a no-store on
           # the page itself plus its proxied routes.
-          lib.recursiveUpdate (import ../config/nginx-static-ui.nix page) {
+          lib.recursiveUpdate (staticUi.locations page) {
             "= /index.html".extraConfig = ''
               add_header Cache-Control "no-store";
             '';

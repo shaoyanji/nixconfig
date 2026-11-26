@@ -1,8 +1,63 @@
 {
-  "generated": "2026-11-26T01:03:58Z",
+  "generated": "2026-11-26T01:13:15Z",
   "count": 200,
-  "pin": "626b9e2b6ce61ad064d2bd6a6d6203d2c7e486c61e5033d3006502e7fbea4dcd",
+  "pin": "a5977b2945074110be2b3e24f1d9a40293a293c8a271e475de34b98dcf9b6e70",
   "turns": [
+    {
+      "id": "13af270b-5782-4c8a-94e4-76bc9ff0cc1a",
+      "ts": "2026-11-26T01:11:53Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-2026-11-26",
+      "action": "start: continue refactor on media-relay/nginx-static-ui + image-daily gate verify",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/config/nginx-static-ui.nix",
+        "modules/services/media-relay.nix"
+      ],
+      "files": [],
+      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
+      "branch": "main",
+      "frame": "03haz03qb35lii7nqo581kq1i"
+    },
+    {
+      "id": "51227c46-5cdb-4d71-a3a7-47d14f2d1feb",
+      "ts": "2026-11-26T01:10:30Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-2026-11-26",
+      "action": "note-change continue delphi duplicate-service migration",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
+      "branch": "main",
+      "frame": "03hayztyp33rfnz2ewcfc6w0k"
+    },
+    {
+      "id": "6212508f-69e9-441f-842c-5a3e39d7ad63",
+      "ts": "2026-11-26T01:10:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-2026-11-26",
+      "action": "note-change continue nixconfig refactoring + image-daily gates",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
+      "branch": "main",
+      "frame": "03hayztvomnejw1fbnjv03zmk"
+    },
+    {
+      "id": "10d5034a-b5e5-4ab7-aaf7-d8e82e47d25c",
+      "ts": "2026-11-26T01:04:15Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
+      "action": "landed: nix-comments extractRefs consolidation (census byte-identical outside file) + nginx-static-ui.nix location pair shared by appflow-board/media-relay | gate: drv-equality delphi identical + nix:lint 333 + nix:comments 0 rules",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
+      "branch": "main",
+      "frame": "03hayylzwalipmsl84iec0jm5"
+    },
     {
       "id": "39ec6de0-1574-4720-b4cd-5f8973ddbf74",
       "ts": "2026-11-26T00:58:53Z",
@@ -2720,58 +2775,6 @@
       "base_commit": "8bb4d61c",
       "branch": "main",
       "frame": "03hauddp5gmzz3lgmhvw4h74t"
-    },
-    {
-      "id": "e3986046-2909-43af-9bae-4e60fe15c709",
-      "ts": "2026-11-25T10:40:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: tasked devin to verify image-daily Go port gates and fix failures; classified p=0.81 margin=0.70 via jev-decide classify (thresholds 0.8/0.15 met); devin BUSY running gate verification",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
-      "branch": "main",
-      "frame": "03hau9t5wa66fp9tihg27tqe3"
-    },
-    {
-      "id": "583d9d9a-a922-40e7-8baa-0248181d35c7",
-      "ts": "2026-11-25T10:38:44Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verified: image-daily Go port gates all green again — go build+vet+test(-count=1) tools/os/internal/image, checks:image-daily dispatch/fallback/breakers/shrink-guard, publish/ship/images refusal fixtures fire, checks:images 772/772; nothing broken, no fix | gate: 8/8 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
-      "branch": "main",
-      "frame": "03hau9jd6c367h3vg0sw8pcmb"
-    },
-    {
-      "id": "dc969aba-ca3a-4019-a52d-373db7efec8e",
-      "ts": "2026-11-25T10:35:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-2026-11-25j-freebuff",
-      "action": "landed: note job-scout-sweep-2026-11-25j-freebuff, 9 metro reads / 164 cards / 20 new employers / 6 leads filed at 25w | gate: parse PASS, agentsNotes.ok PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8bb4d61c6ebfdf0040ee935b896e46140e9dc99f",
-      "branch": "main",
-      "frame": "03hau8yr3ajmoza9wrygsjyc4"
-    },
-    {
-      "id": "6b9b4422-b58f-4e60-922f-38aa1d0f7bf8",
-      "ts": "2026-11-25T10:34:11Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:tmux-pane-steward-freebuff-2026-11-25",
-      "action": "landed: drove idle freebuff pane agents:2.1 with a note-change task — write AGENTS.nix note for job-scout sweep 2026-11-25j (jev-decide note-change margin 0.71); fresh 'working...' line confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8350ac742c912071f92b8b412ce6b364c98ea361",
-      "branch": "main",
-      "frame": "03hau8nc5npqy7sqs0bv6wb9k"
     }
   ]
 }

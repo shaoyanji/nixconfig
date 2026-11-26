@@ -490,10 +490,8 @@
 
   # One immutable page: the listing is data, and the page is fed the manifest at
   # `= /index.json`, so nothing is generated into the store per request.
-  mediaUi = pkgs.runCommand "media-relay-ui" {} ''
-    mkdir -p $out
-    install -m 0644 ${../../lib/media-relay/index.html} $out/index.html
-  '';
+  staticUi = import ../config/nginx-static-ui.nix;
+  mediaUi = staticUi.package pkgs "media-relay" ../../lib/media-relay/index.html;
 
   # The page's write half. Loopback only: the vhost's `/api/` proxy is the whole
   # surface, because a fetch is an outbound request this host makes on someone
@@ -751,7 +749,7 @@ in {
           # The browse page owns the root via the shared static-UI pair; a
           # directory URL still gets the plain listing, so a bookmark taken
           # before the page existed keeps working.
-          // import ../config/nginx-static-ui.nix mediaUi
+          // staticUi.locations mediaUi
           // {
             "= /index.json" = {
               alias = "${cfg.mediaDir}/.index.json";

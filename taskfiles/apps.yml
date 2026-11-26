@@ -481,3 +481,114 @@ tasks:
             echo "Exited."
             ;;
         esac
+
+  # The lane as one entry point: every stage below already has its own verb, and
+  # this task is the order, the argument each verb needs, and the refusal that
+  # proves a stage did not silently pass. It sends nothing by itself — STAGE=send
+  # is a dry run unless SEND=1, and even then the row's hold date and recipient
+  # decide. Written for an agent that has read none of this shard.
+  apps:lane:
+    desc: Job-scout lane end to end — sweep, dedupe, JD, tailor, packet, send, reply poll, CV publish (STAGE=plan|sweep|file|jd|tailor|packet|send|replies|cv)
+    summary: >
+      Scout-to-send in one task. STAGE picks the step, and the step delegates to
+      the verb that owns it: sweep -> apps:scout:sweep, file -> apps:scout,
+      jd -> ~/.config/appflow/jd/<id>.txt, tailor -> agents:apps:select,
+      packet -> appflow-packet.sh, send -> appflow-send.sh, replies -> apps:get
+      and agents:apps:sync, cv -> agents:cv:publish-check and site:check. The
+      per-lead stages need ID=<row id>. Nothing sends unless SEND=1, and the
+      row's own hold date and recipient still refuse. STAGE=plan prints the
+      chain and writes nothing.
+    vars:
+      STAGE: '{{.STAGE | default "plan"}}'
+      ID: '{{.ID | default ""}}'
+      SWEEP: '{{.SWEEP | default "2026-11-26b"}}'
+      LANGUAGE: '{{.LANGUAGE | default "de"}}'
+      SEND: '{{.SEND | default "0"}}'
+    cmds:
+      - |
+        set -euo pipefail
+        stage='{{.STAGE}}'; id='{{.ID}}'; sweep='{{.SWEEP}}'
+        language='{{.LANGUAGE}}'; send='{{.SEND}}'
+        api=${EMAIL_ARCHIVE_API:-https://delphi.cloudforest-kardashev.ts.net:8450}
+        cfg=${APPFLOW_CONFIG:-$HOME/.config/appflow}
+        ua='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36'
+        plan() {
+          printf '%s\t%s\n' 'stage' 'the verb it runs, and what that proves'
+          printf '%s\t%s\n' \
+            'sweep'   'apps:scout:sweep — boards in read order, the trap each hides, the write rules' \
+            'file'    'apps:scout — one row per live role, deduped by company first' \
+            'jd'      'the posting text into $APPFLOW_CONFIG/jd/<id>.txt; under 40 lines is a gate, not an ad' \
+            'tailor'  'agents:apps:select ID=<id> — which lines the ad keeps, which fall back' \
+            'packet'  'appflow-packet.sh — PDFs plus selection.json, page budget enforced' \
+            'send'    'appflow-send.sh — stage, hold date and recipient must all agree' \
+            'replies' 'apps:get, apps:emails, agents:apps:sync DRY=1 — what the archive holds' \
+            'cv'      'agents:cv:publish-check and site:check — the published CV is this build' 
+          printf '\nlead stages need ID=<row id>; LANGUAGE=%s; a send needs SEND=1\n' "$language"
+        }
+        need_id() { [ -n "$id" ] || { printf 'apps:lane: STAGE=%s needs ID=<row id>\n' "$stage" >&2; exit 2; }; }
+        case "$stage" in
+          plan) plan ;;
+          sweep) task apps:scout:sweep SWEEP="$sweep" ;;
+          file)
+            printf 'dedupe first:  task apps:search -- "<company>"\n'
+            printf 'file one lead: task apps:scout -- --family <devops|sre|platform|infrastructure> --company "<C>" --role "<R>" --summary "<one line>" --sweep %s\n' "$sweep"
+            printf 'a second requisition at a tracked employer replaces that row, it is not a second row\n'
+            ;;
+          jd)
+            need_id
+            url=$(curl -fsS --max-time 20 "$api/api/application-get?id=$id" | jq -r '.[0].applyUrl // empty')
+            [ -n "$url" ] || { printf 'apps:lane: %s carries no applyUrl\n' "$id" >&2; exit 2; }
+            tmp=$(mktemp); trap 'rm -f "$tmp"' EXIT
+            curl -fsSL -A "$ua" -H 'Referer: https://www.stepstone.de/jobs/devops-engineer' -o "$tmp" "$url" \
+              || { printf 'apps:lane: fetch failed: %s\n' "$url" >&2; exit 2; }
+            mkdir -p "$cfg/jd"
+            lynx -dump -nolist -width=110 "$tmp" | awk 'NF' > "$cfg/jd/$id.txt"
+            lines=$(wc -l <"$cfg/jd/$id.txt" | tr -d ' ')
+            if [ "$lines" -lt 40 ]; then
+              rm -f "$cfg/jd/$id.txt"
+              printf 'apps:lane: %s returned %s lines — a JS gate or a stub, not an ad; read it in a browser\n' "$id" "$lines" >&2
+              exit 3
+            fi
+            printf 'jd        %s/%s.txt (%s lines)\n' "$cfg/jd" "$id" "$lines"
+            ;;
+          tailor)
+            need_id
+            [ -s "$cfg/jd/$id.txt" ] || { printf 'apps:lane: no ad text for %s — run STAGE=jd ID=%s first\n' "$id" "$id" >&2; exit 2; }
+            task agents:apps:select ID="$id" FORMAT=text
+            if [ -s "$cfg/letters/$id.json" ]; then
+              printf 'letter    %s/letters/%s.json\n' "$cfg" "$id"
+            else
+              printf 'letter    MISSING — write %s/letters/%s.json with salutation, subject, paragraphs, closing\n' "$cfg" "$id"
+            fi
+            ;;
+          packet)
+            need_id
+            [ -s "$cfg/jd/$id.txt" ] || { printf 'apps:lane: no ad text for %s — run STAGE=jd\n' "$id" >&2; exit 2; }
+            [ -s "$cfg/letters/$id.json" ] || { printf 'apps:lane: no letter for %s — run STAGE=tailor\n' "$id" >&2; exit 2; }
+            bash scripts/task/appflow-packet.sh --id "$id" --jd "$cfg/jd/$id.txt" \
+              --letter "$cfg/letters/$id.json" --language "$language"
+            ;;
+          send)
+            need_id
+            args=("$id")
+            [ "$send" = 1 ] && args+=(--send)
+            bash scripts/task/appflow-send.sh "${args[@]}"
+            ;;
+          replies)
+            task apps:emails || true
+            task agents:apps:sync DRY=1 || true
+            if [ -n "$id" ]; then
+              FORMAT=json task apps:get -- "$id" | jq -r '"linked mail: \(.mail | length)"'
+            fi
+            printf 'search one thread: task apps:query -- "select sent_at, sender, subject from emails where sender ilike '\''%%<employer>%%'\'' or subject ilike '\''%%<role>%%'\''"\n'
+            ;;
+          cv)
+            task agents:cv:publish-check
+            task site:check
+            ;;
+          *)
+            printf 'apps:lane: unknown STAGE=%s\n' "$stage" >&2
+            plan
+            exit 2
+            ;;
+        esac

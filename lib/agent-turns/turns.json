@@ -1,8 +1,60 @@
 {
-  "generated": "2026-11-26T08:40:40Z",
+  "generated": "2026-11-26T08:55:10Z",
   "count": 200,
-  "pin": "2b2bf1a38f085de324fbf2cdf16c5564f61301c2d98f75b1adc3e27b7326cc2e",
+  "pin": "13f7b02360d286f806ee756fefa1568c7259d40a5a9cb137673005d50cc440a5",
   "turns": [
+    {
+      "id": "8935ea71-a77d-43f3-bf1b-7d74b9c54015",
+      "ts": "2026-11-26T08:54:46Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-lane-tool",
+      "action": "landed apps:lane + skill job-scout-lane: one STAGE entry point over the scout-to-send chain (sweep, file, jd with a 40-line stub gate, tailor projection, packet, dry send, reply poll, cv check), delegating each stage to its own verb; the task graph, prose gate and skill schema are the checks",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
+      "branch": "main",
+      "frame": "03hb1iiv5inqbkzvt9ad6qafi"
+    },
+    {
+      "id": "35a9d513-7783-4bf1-8120-9a0c98c3abdb",
+      "ts": "2026-11-26T08:50:39Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "no-op: pipe-loop re-survey on 523a855d — tree identical to prior pass, all locked classes zero, gate green; standing state holds",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
+      "branch": "main",
+      "frame": "03hb1hpwrh4yv05b0qq1jsvdb"
+    },
+    {
+      "id": "35119569-4cab-4d7e-bc34-98e9bbbc5c3f",
+      "ts": "2026-11-26T08:44:06Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "no-op: pipe-loop re-survey on 523a855d — all locked classes zero (filter|>length, map (x: x.f), attrValues|>map, map|>concatLists); 13 elemAt sites all idiomatic (index predicates, tuple destructuring, existing at-helpers); 1109 |> sites, gate green | gate: checks:nix:style PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
+      "branch": "main",
+      "frame": "03hb1gfx8e5afjuxkltss6xh8"
+    },
+    {
+      "id": "74cc8103-8722-4805-b285-e66adacf445d",
+      "ts": "2026-11-26T08:41:07Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-epistemics-validate",
+      "action": "landed: validated 1a1729cc (gate green, kg 6cap+58intent+86serves consistent, spec shape, classOf dedup) + extended — flake/philosophy.nix lenses with frieren re-measure, affects_intents pre-commit gate ran in own commit, tests/intents 14/14, docs/intents.md | gate: checks:intents:test PASS, checks:kg PASS, checks:tasks PASS (832)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
+      "branch": "main",
+      "frame": "03hb1fuy8vdt8k5tkr17338kl"
+    },
     {
       "id": "3f150860-7c79-4646-a04f-ae4d5c97ce6f",
       "ts": "2026-11-26T08:40:04Z",
@@ -2818,60 +2870,6 @@
       "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
       "branch": "main",
       "frame": "03havs8pq4dxt9tsv3cytu2im"
-    },
-    {
-      "id": "ddef86ef-f798-4541-99a7-fceb91908de3",
-      "ts": "2026-11-25T15:15:27Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:isadev-cv-note",
-      "action": "drove idle freebuff pane agents:2.1: jev-decide classify needs_review, duel note-change 0.77 vs publish 0.23 (margin 0.54) -> note-change; task pasted via load-buffer+paste-buffer, pane working... 9s; AGENTS.nix handoff note for completed isadev CV audit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
-      "branch": "main",
-      "frame": "03havrlaq7avxmwkmxnen1kc8"
-    },
-    {
-      "id": "47269738-d720-4909-8c53-a2adac0bc75f",
-      "ts": "2026-11-25T15:14:33Z",
-      "source": "buffy",
-      "subject": "nixconfig:wallpaper-worker",
-      "action": "blocked: next wall brief (wall-char-frieren-cyberpunk, rev 3, 1536x1024) generated nothing — cpg image answers 502 on 7 passes plus one direct call between 15:08 and 15:15Z, catalog resolves seedream-5.5, allowance stayed 84/100; Eisen fallback has no DNS (http=000); no file written, no publish, no approve",
-      "outcome": "blocked: image provider 502 on every call, Eisen DNS dead",
-      "claims": [
-        "pics/generated/wall/2026-11-25/frieren-cyberpunk"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03havrey6qw4z71yzu7ii3slh"
-    },
-    {
-      "id": "04bd26de-455b-428a-8517-60e0b48be635",
-      "ts": "2026-11-25T15:11:48Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "chain refactor: hostField helper collapses 3 verbatim inventory-fallback copies in home-manager-shared (12 hosts via nixos+macos) + unblocked the tree: blobs --index now diffs vs HEAD instead of scanning all index blobs (639bf360's wallpaper had dead-blocked every commit) | gate: drv-equality 30/30, checks:quick PASS, seeded-blob refusal proven",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
-      "branch": "main",
-      "frame": "03havqvp3uu5eyplkd4twoiwd"
-    },
-    {
-      "id": "9af610ac-22b6-465a-88c1-b4781cc2f46d",
-      "ts": "2026-11-25T15:06:54Z",
-      "source": "freebuff",
-      "subject": "nixconfig:isadev-cv-audit",
-      "action": "audit (read-only, no deploy): check-cv-links rc=0 6/6 CVs resolve; internal link scan 0 broken over 73 html pages; stale artifacts 0/119 (fresh out-of-tree build reproduces file set exactly); 8 files drift timestamp-only (swconf cacheName epoch, dateModified, sitemap lastmod); htmlproofer unavailable locally (ffi libcurl missing) so CI remains the external-link gate | gate: jekyll production build PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
-      "branch": "main",
-      "frame": "03havpx7ybaak24u1swikddq4"
     }
   ]
 }

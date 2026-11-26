@@ -319,4 +319,4 @@ Related: `jevdecide` (the grader and the router), `image-generate` (the local
 Qwen endpoint, when the allowance is spent), `tmux` (a run that outlives the
 shell).
 
-Truth: `scripts/task/cloudinary.sh`, `taskfiles/images.yml` — the client and the publish lane; this page is the procedure.
+Truth: `scripts/task/images-check.sh`, `taskfiles/images.yml` — the publish lane; this page is the procedure.

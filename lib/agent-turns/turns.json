@@ -1,8 +1,203 @@
 {
-  "generated": "2026-11-26T12:52:48Z",
+  "generated": "2026-11-26T12:59:34Z",
   "count": 200,
-  "pin": "1487ee9ba02656d06110eb4cd42941b878993ab235e5f63695da2c8c9385cda8",
+  "pin": "9203146eb1afe215ee486ff45c0d8ba4bd1c853bcc6645a0f0f91e88ba78df9e",
   "turns": [
+    {
+      "id": "7670e6d1-5d3a-4c70-a276-a3bde01bcb22",
+      "ts": "2026-11-26T12:57:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-fresh-tailor",
+      "action": "claim: diagnose apps:send refusal on the 9 tailored Stepstone prep rows, fix the send path, send",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/appflow-send.sh"
+      ],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2u18fz9kdcv1mj9dka8xc"
+    },
+    {
+      "id": "ee447bef-16bd-4ae2-b2f2-4d8d1c06f005",
+      "ts": "2026-11-26T12:57:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:frieren-ops-health",
+      "action": "verified: ops:health exits 0 (zero reasons, ledger ok at 12:29/12:44). Sorter fix proven: dry run resolves all 3 unknowns (unknown 0, rc 0) — next apply 14:01 clears it. Caveat, do not read as proof: burgernas + sorter show Result=success beside ExecMainStatus 130/1 because the agy audit resets failed units (hosts/frieren/infra-stack.nix:333-338); burgernas has not run since 04:20, its 02:45 window lands tomorrow.",
+      "outcome": "done",
+      "claims": [
+        "hosts/frieren",
+        "modules/services"
+      ],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2tz9m1d2fz0s15lt88u5t"
+    },
+    {
+      "id": "a6022f18-5933-40bf-a402-9d77a3b967f7",
+      "ts": "2026-11-26T12:56:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-colocated-audit",
+      "action": "claim: taking over from tmux-pane-steward 12:56 — audit :8450 pg/xs-export surface and sync delphi checkout | found: /pg/xs-export 404 on tailnet and loopback, no route in tree",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hb2trca3bbdbc6wssg82g9u"
+    },
+    {
+      "id": "bb949b57-08b2-42ae-a1f2-ab828bacc58b",
+      "ts": "2026-11-26T12:56:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-colocated-audit",
+      "action": "incident|0.55|0.42: audit :8450/pg/xs-export & sync delphi repo",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2tnflw07b8ul4l80dw4an"
+    },
+    {
+      "id": "31ac5040-2278-4c9e-8a10-72419aec796a",
+      "ts": "2026-11-26T12:55:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-26f",
+      "action": "landed: delphi dup-services verified live, closed 03hb2tewb/03hb2tfgl",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2tlu4vr3pv4ii4q9tutn1"
+    },
+    {
+      "id": "c13e0a53-9c23-4217-a425-b760ad9b6ddf",
+      "ts": "2026-11-26T12:55:44Z",
+      "source": "freebuff",
+      "subject": "nixconfig:frieren-ops-health",
+      "action": "claim: take over from tmux-pane-steward — verify ops:health on frieren (restic-burgernas, downloads-sort) and close",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren",
+        "modules/services"
+      ],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2tli0ohtn0futl4ewc1n4"
+    },
+    {
+      "id": "74352c93-f41d-4b46-a386-7a0125e7cffd",
+      "ts": "2026-11-26T12:55:25Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:frieren-ops-health",
+      "action": "incident|0.94|0.92: run ops:health on frieren, fix/verify, post done",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren",
+        "modules/services",
+        "modules/profiles"
+      ],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2tj7w6eb10j6fnn86jpba"
+    },
+    {
+      "id": "035e202e-8aa1-4ee9-8c34-b11591ae774e",
+      "ts": "2026-11-26T12:54:53Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-dup-services",
+      "action": "landed: dup-service offload confirmed on live delphi — gen 323 (533f5edf, carries 0984b91a) has no kuma unit and :8448 is closed; :8449/:8450 healthy, 0 failed units, gatus sentinel green; ~/Documents/nixconfig is 25/299 vs origin/main and still declares kuma | gate: checks:host HOST=delphi MODE=eval PASS (2141 assertions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hb2tfglvi3oa8jcck7rluyc"
+    },
+    {
+      "id": "7468a065-bc6c-46ca-ba98-a1e5902b50bb",
+      "ts": "2026-11-26T12:54:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-dup-services",
+      "action": "landed: verified on live delphi — gen 323 built from /tmp/nix-switch @ 533f5edf (carries 0984b91a): kuma unit absent, :8448 closed, 0 failed units, :8449 xs and :8450 /health 200, sentinel ok on both hosts; ~/Documents/nixconfig is 25/299 vs origin/main and still enables uptime-kuma, so it must not be deployed | gate: checks:host HOST=delphi MODE=eval PASS (2141 assertions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hb2tewb042i1qb8aisoawfh"
+    },
+    {
+      "id": "70f0504d-ecf5-4d41-ad0c-c89a9e4da545",
+      "ts": "2026-11-26T12:54:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-freebuff-26e",
+      "action": "audited: apps-db.sh update/upsert write guards hold (unarmed write exit 2, stage/hash mismatch exit 4, >50 writes/10min exit 5, --dry appends no entry) and the offline fixtures cover every path — 19 apps-db cases, 10 sync-guard cases; checks:appflow PASS (6 steps, exit 0, tracker 1670 rows/125 prep, shellcheck clean). One open gap, not fixed here: 'add --id <existing>' posts to application-upsert with no existence guard, so apps:scout re-filing an id clobbers the row.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2td5vczx35tc0h479sh9x"
+    },
+    {
+      "id": "377a0afa-6b72-4233-91a4-773a521d495e",
+      "ts": "2026-11-26T12:54:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:hosts-args-test-fix",
+      "action": "task-change|0.61|0.25: fix checks:hosts:args:test in checks:quick",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2tasqkesl2v2cgkjs1hrs"
+    },
+    {
+      "id": "32198f96-d59e-4fe6-8bbf-5238a6d43200",
+      "ts": "2026-11-26T12:53:56Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-26f",
+      "action": "landed: e4dd1d26 fix(jobsearch) fold_umlauts in norm | gate: --self-test 20/20 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2t8vq7ur38tfys28cx285"
+    },
+    {
+      "id": "21e4726f-b0f3-47d2-8e1b-6df5095f287d",
+      "ts": "2026-11-26T12:53:14Z",
+      "source": "devin",
+      "subject": "nixconfig:jobsearch-umlaut-fold",
+      "action": "landed: fold_umlauts call moved from unreachable clean() tail into norm() before the non-alnum strip; dedupe now keys für=fuer | gate: python3 scripts/task/jobsearch-sweep.py --self-test 20/20 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2t3wsjyoffuanczjj6ubl"
+    },
     {
       "id": "5f6720b4-c39d-4517-8247-58452a03b0a7",
       "ts": "2026-11-26T12:52:18Z",
@@ -2797,190 +2992,6 @@
       "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
       "branch": "main",
       "frame": "03hayh4llpycngw51sm6ebx7t"
-    },
-    {
-      "id": "920371b9-9e2e-49d5-9115-23cb77fec8d8",
-      "ts": "2026-11-25T22:55:07Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-hm-shared",
-      "action": "hm-shared fold done: commit 1a8c28dd, tree clean, synced with origin",
-      "outcome": "done",
-      "claims": [
-        "modules/global/demo.nix",
-        "lib/hm-shared.nix"
-      ],
-      "files": [],
-      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
-      "branch": "main",
-      "frame": "03hay9dwqm7ugeqn6jn2dn1ml"
-    },
-    {
-      "id": "ec5016bd-90ee-4e6e-b1a8-56fda846c6a4",
-      "ts": "2026-11-25T22:54:26Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-publish",
-      "action": "publish verified, nothing to push: six CVs hash-equal to origin/main e2e1f3d3, every anchor resolves, live bytes identical — my stale-branch build was reverted",
-      "outcome": "done",
-      "claims": [
-        "sites/matt-site"
-      ],
-      "files": [],
-      "base_commit": "e2e1f3d3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hay992a45lmgmdqu7yi9tgc"
-    },
-    {
-      "id": "10931f3e-41bc-4afe-8011-504e187f6a2b",
-      "ts": "2026-11-25T22:48:36Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-publish",
-      "action": "publish: CVs hash-equal + anchors resolve + push",
-      "outcome": "in_progress",
-      "claims": [
-        "sites/matt-site"
-      ],
-      "files": [],
-      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
-      "branch": "main",
-      "frame": "03hay841sptcbekjfo78phiud"
-    },
-    {
-      "id": "44481e3b-b1ec-4c09-aa2b-b4ee712f821a",
-      "ts": "2026-11-25T22:38:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-dup-services",
-      "action": "delphi agents:3.1 flake-change p=0.91 m=0.86: complete migrations offloading duplicate services; working line confirmed task started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
-      "branch": "main",
-      "frame": "03hay648s4nxsrvrlppwqj64o"
-    },
-    {
-      "id": "00735d6e-3886-4cc4-a1ea-8bc293086cb7",
-      "ts": "2026-11-25T22:38:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-hm-shared",
-      "action": "devin agents:1.1 flake-change p=0.92 m=0.84: fold hmShared.dankShell into sharedModules, git add -N new lib file; Thinking spinner confirmed task started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
-      "branch": "main",
-      "frame": "03hay647erfdtffln4gbdedyi"
-    },
-    {
-      "id": "7864a8e3-05b7-4d75-93fb-7b412f8992ea",
-      "ts": "2026-11-25T22:37:57Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-2",
-      "action": "done: already landed — demo.nix uses ++ hmShared.dankShell concat; lib/hm-shared.nix tracked (add -N applied pre-commit) | gate: drv-equality 4/4 + nix:lint 332 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
-      "branch": "main",
-      "frame": "03hay6158tbwu95rbpgihmah1"
-    },
-    {
-      "id": "ff9edfcf-6a88-416f-9a22-230425783f7e",
-      "ts": "2026-11-25T22:26:43Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-2",
-      "action": "landed: HM sharedModules name-resolution single-sourced in lib/hm-shared.nix (embedded/noDE/demo sites compose their own order) | gate: checks:drv-equality 4 hosts identical + nix:lint 332 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
-      "branch": "main",
-      "frame": "03hay3u4rxfcs586ekaddocsa"
-    },
-    {
-      "id": "ae8ff0d1-88a5-4160-8f02-ded6ac726142",
-      "ts": "2026-11-25T22:18:39Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-cv-prep",
-      "action": "note-change: CV packets prep for Stepstone rows, no send (hold) - nine rows at prep; apps:dupes and apps:sent still red; job data stays in private state, never the repo",
-      "outcome": "in_progress",
-      "claims": [
-        "nixconfig:job-scout-fresh-tailor"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hay29e5gay82qvt6mibnyu7"
-    },
-    {
-      "id": "a6c1b37c-b981-40c9-98fa-bb7ce0a34ef0",
-      "ts": "2026-11-25T22:17:35Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-2",
-      "action": "start: survey duplicated imports across modules/",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03hay21yk0uqnxnbo65ilq8ng"
-    },
-    {
-      "id": "ea28327b-d0ec-4958-9869-6bdf461193f3",
-      "ts": "2026-11-25T22:16:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-cv-prep",
-      "action": "note-change: CV packets prep for Stepstone rows, no send (hold)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03hay1wruhq2rxcaikhji8gpp"
-    },
-    {
-      "id": "3b28c2ae-592e-424b-814e-1362879ee25d",
-      "ts": "2026-11-25T22:16:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-refactor-2",
-      "action": "chain-change: consolidate duplicated feature-chain imports in modules/",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03hay1wqawa4n4nwa2xtfhahp"
-    },
-    {
-      "id": "1f8fc156-7e41-4eb2-ba00-152234698ea5",
-      "ts": "2026-11-25T22:08:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-scope-trap",
-      "action": "brief accepted (jev p=0.99 m=0.98, agents:3.1): scope-trap bug-fix written and verified in scripts/task/hermes-check.sh — user-unit scope named on every line, FAIL when the unit exists only at system scope; 18+/3-, uncommitted",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/hermes-check.sh"
-      ],
-      "files": [
-        "scripts/task/hermes-check.sh"
-      ],
-      "base_commit": "97d0ae05",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hay0dd9ri41hbc6ecv8gqfi"
-    },
-    {
-      "id": "035c7d9e-4d60-4714-b086-94ae2fc609bf",
-      "ts": "2026-11-25T22:08:07Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-scope-trap",
-      "action": "drove delphi agents:3.1 scope-trap bug-fix p=0.99 m=0.98",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03hay07df7o31rbsskm6p5d3s"
     }
   ]
 }

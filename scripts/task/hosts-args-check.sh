@@ -97,19 +97,34 @@ if ! "$DEADNIX" --fail "${FILES[@]}"; then
   fail=1
 fi
 
+# statix' JSON report is the stable read — the human header has already
+# renamed W10's tag once (`[10] Warning:` → `[empty_pattern] Warning:`).
+# rc stays 1 for warnings and files it cannot parse; severity tells them apart.
 for f in "${FILES[@]}"; do
-  out="$("$STATIX" check "$f" 2>&1)"
+  out="$("$STATIX" check -o json "$f" 2>&1)"
   rc=$?
-  case "$out" in
-    *"[10] Warning:"*)
-      printf '%s\n' "$out" >&2
-      echo "hosts-args: $f has an empty argument pattern — write _ instead." >&2
-      fail=1
-      ;;
-  esac
   if [ "$rc" -gt 1 ]; then
     printf '%s\n' "$out" >&2
     echo "hosts-args: statix could not check $f (exit $rc)." >&2
+    fail=1
+    continue
+  fi
+  [ "$rc" -eq 0 ] && continue
+  if ! printf '%s' "$out" | "$YQ" -p json -e '.report' >/dev/null 2>&1; then
+    printf '%s\n' "$out" >&2
+    echo "hosts-args: statix could not check $f (no report)." >&2
+    fail=1
+    continue
+  fi
+  if printf '%s' "$out" | "$YQ" -p json -e '.report[] | select(.severity == "Error")' >/dev/null 2>&1; then
+    "$STATIX" check "$f" >&2 || true
+    echo "hosts-args: statix could not check $f." >&2
+    fail=1
+    continue
+  fi
+  if printf '%s' "$out" | "$YQ" -p json -e '.report[] | select(.name == "empty_pattern")' >/dev/null 2>&1; then
+    "$STATIX" check "$f" >&2 || true
+    echo "hosts-args: $f has an empty argument pattern — write _ instead." >&2
     fail=1
   fi
 done

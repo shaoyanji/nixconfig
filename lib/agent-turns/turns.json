@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T15:05:01Z",
+  "generated": "2026-11-26T15:08:36Z",
   "count": 200,
-  "pin": "3b25e06153ec551cc496f37c02c4dc81c2c52770f77382d3ba03063b4d2c6f6b",
+  "pin": "74c4bd9b2429a5430be45263e399b5b1b9caff56b633e28b813c774a1d00d9a8",
   "turns": [
+    {
+      "id": "a4f84314-616a-45e7-9091-f974271905ba",
+      "ts": "2026-11-26T15:06:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-services-doc",
+      "action": "claim: document delphi's tailnet portfolio services (job-db-scraper, private-deals, inventory-site) and the five CLI verbs over clanker/agent-browser/providers",
+      "outcome": "in_progress",
+      "claims": [
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "89eee1d1856f989468cedbcf9531de19afe2fc1c",
+      "branch": "main",
+      "frame": "03hb3j5e8zucddvm273rkxyro"
+    },
+    {
+      "id": "adbe3cb3-9ff9-40b2-832a-0f64c5dfeea7",
+      "ts": "2026-11-26T15:05:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:e2e-task-verbs-and-clanker",
+      "action": "e2e all 6 verbs: agents:web search 3 providers (s1,s3 witnessed twice), extract firecrawl 'Nix 2.34.9 Reference Manual' 7731, health --via clanker 200 ok/404 fail; apps:page greenhouse 50 -> apps:ingest :8481 created 50, FTS 'account executive' 10; deals:page firecrawl 4 (merchants amazon) -> deals:ingest :8482 created 4, q=knife 1, re-run 0 new/4 updated. Fixed: glued Greenhouse label split + jobLocation. 33/… tests + checks:tasks exit 0. Servers stopped.| gate: unittest + checks:tasks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "89eee1d1856f989468cedbcf9531de19afe2fc1c",
+      "branch": "main",
+      "frame": "03hb3ivhlwn0pfy0gzcaxni1j"
+    },
     {
       "id": "aac2d222-c7f1-4682-941c-d756f8397773",
       "ts": "2026-11-26T15:04:07Z",
@@ -3018,36 +3046,6 @@
       "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
       "branch": "main",
       "frame": "03hb0xt4z9qv24mdww9c6jw1x"
-    },
-    {
-      "id": "3cc5b9f6-ff3f-4d78-b35e-4b1b22fb5b16",
-      "ts": "2026-11-26T07:01:52Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-drive-20261126-0751",
-      "action": "incident: delphi is healthy by every unit and sentinel signal, but the ledger is blind twice — the 04:30 autoUpgrade rebuilt main and resurrected the retired uptime-kuma, and the sentinel push has 404d every 15 min since the ingest route landed",
-      "outcome": "blocked: uptime-kuma duplicate is live again; the fix needs delphi-dup-services-note pushed to main before the next 04:30 autoUpgrade",
-      "claims": [
-        "hosts/delphi/"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hb0wgx3p3g2ondosryivpo7"
-    },
-    {
-      "id": "285dc9fe-bd60-475e-aef2-0fe4a672c131",
-      "ts": "2026-11-26T06:56:40Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-drive-20261126-0751",
-      "action": "incident: verify delphi host services health",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi/"
-      ],
-      "files": [],
-      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
-      "branch": "main",
-      "frame": "03hb0vgdzbl63p0ba9l33nlfh"
     }
   ]
 }

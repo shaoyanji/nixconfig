@@ -1,8 +1,40 @@
 {
-  "generated": "2026-11-26T17:29:20Z",
+  "generated": "2026-11-26T17:34:53Z",
   "count": 200,
-  "pin": "6b5e423151cbd718e2ff4f3b8262661d3d26005c1991d495d80f41c2a493b43f",
+  "pin": "129ceeb11205caecca4366a341c24404e552b57f07d721de9f5a35b566bc11ea",
   "turns": [
+    {
+      "id": "f516c8ff-be64-4280-b4ec-c2de605f58d8",
+      "ts": "2026-11-26T17:30:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-docs-analytics-telemetry",
+      "action": "claim: document /api/analytics + UI panels on jobs/deals/inventory, clanker presets+schedules, service-portal /api/telemetry badges, and the 4-service smoke in docs/portfolio-services.md",
+      "outcome": "in_progress",
+      "claims": [
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "cfa5113da8159ef216655657587a8d3f2db5d374",
+      "branch": "main",
+      "frame": "03hb4bbw4dsy7mzstgf6vmrxw"
+    },
+    {
+      "id": "f0ca6c7d-ba5a-4e9e-9bd3-c0c356c78eb3",
+      "ts": "2026-11-26T17:29:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-smoke-clanker-analytics",
+      "action": "landed: smoke covers clanker-runner (health, stats, page, machines, presets, schedules), /api/analytics on jobs/deals/inventory, and inventory's QR label (said skipped when the register is empty); DOM check re-reads a JS-filled container before calling it empty | gate: checks:tasks PASS, unittest 47 OK, py_compile, live run on 4 temp instances exit 0 plain and with --browser",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke",
+        "taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "cfa5113da8159ef216655657587a8d3f2db5d374",
+      "branch": "main",
+      "frame": "03hb4b2p6xbs4vk9k13n4nzv2"
+    },
     {
       "id": "be336de7-5a7a-471d-a32a-ffab867781e1",
       "ts": "2026-11-26T17:28:59Z",
@@ -2997,36 +3029,6 @@
       "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
       "branch": "main",
       "frame": "03hb2t8vq7ur38tfys28cx285"
-    },
-    {
-      "id": "21e4726f-b0f3-47d2-8e1b-6df5095f287d",
-      "ts": "2026-11-26T12:53:14Z",
-      "source": "devin",
-      "subject": "nixconfig:jobsearch-umlaut-fold",
-      "action": "landed: fold_umlauts call moved from unreachable clean() tail into norm() before the non-alnum strip; dedupe now keys für=fuer | gate: python3 scripts/task/jobsearch-sweep.py --self-test 20/20 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2t3wsjyoffuanczjj6ubl"
-    },
-    {
-      "id": "5f6720b4-c39d-4517-8247-58452a03b0a7",
-      "ts": "2026-11-26T12:52:18Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-26f",
-      "action": "incident: verify delphi dup-services, :8449/:8450, dirty tree",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2sxcegke1qaffp0bkt4gd"
     }
   ]
 }

@@ -25,6 +25,13 @@ query; `POST /api/postings` files one; `GET /api/stats` counts postings,
 companies and locations; `GET /api/scrape` and `POST /api/scrape` read and
 trigger the service's own sweep, which is off by default on this host.
 
+`GET /api/analytics?days=&limit=` is the board's shape rather than its rows:
+active, remote, `avg_score` and unscored counts, then companies (postings and
+mean score), lanes (postings and best score), locations, boards and score bands.
+The "Board analytics" panel draws the first four as bars and the bands as a
+histogram, and a company or lane bar is a filter rather than a label — clicking
+one narrows the list below.
+
 `POST /api/postings/batch` files up to 500 at once (`{postings: […]}` or
 `{items: […]}`), drops duplicates inside the batch and answers
 `created`/`updated`/`skipped`/`failed` with up to 25 per-item errors, so one bad
@@ -47,6 +54,11 @@ The batch evaluates alerts before it answers.
 rest. Deals carry `price` and `list_price` — the struck-through original — plus
 `discount_pct`.
 
+`GET /api/analytics?window=&limit=` reads that window as figures and movement:
+`top_discounts`, `biggest_drops`, `merchants`, `categories`, and
+`history.daily` — the average price per day behind the panel's sparkline. The
+panel's heading carries the window and the mean price the report computed.
+
 `POST /api/deals/batch` is the same contract for deals. Watchlists are what an
 alert is about: a deal enters `deal_alerts` as `target-price` (at or below the
 product's `target_price`), `price-drop` (under 95% of its current price) or
@@ -61,6 +73,12 @@ where a match goes.
 and value. `GET /api/items?q=` searches; `POST /api/items`, `PUT /api/items/{id}`
 and `DELETE /api/items/{id}` write; `GET /api/meta/{kind}` lists the vocabularies
 (rooms, categories, owners); `GET /api/export.json` dumps everything.
+
+`GET /api/analytics?days=&limit=` values the register rather than counting it:
+items, quantity, `value_cents` in their currency, archived, value by category and
+location, warranty buckets, tags, and the event trail (`events`, `events_total`,
+`events_recent`). The "Analytics & valuation" panel renders it, and its category
+and location rows filter the list the same way the board's bars do.
 
 `asset_events` is the custody trail: `POST /api/items/{id}/events` records a
 `checkout`, a `checkin` or a `note` with actor, from/to location and a note,
@@ -83,6 +101,36 @@ history of Nix and agent-browser jobs. `GET /api/machines` lists them,
 shape as the three indexes, but the data is a runner's state rather than an index
 you read with a query.
 
+Presets are code, not rows: four jobs — an agent-browser DOM check, a Nix profile
+status, a clanker disk hygiene report, and one validated nixpkgs tool run — each
+pinned to `clanker` and naming the parameters it needs. `GET /api/presets` lists
+them and `POST /api/presets/{id}/run` runs one with overrides for machine, URL,
+selector, package and args. `GET /api/schedules` reads the recurring half: a
+schedule names a preset, a machine, its params and an `interval_seconds` between
+15 and a week, and carries `next_run_at`, `last_run_at`, `last_job_id` and
+`last_error`. `POST /api/schedules` creates one (`start_immediately` for the
+first run), `DELETE /api/schedules/{id}` removes it, and the service's own loop
+runs what is due — the UI's schedules panel is that list, not a second source.
+
+## The portal's live badges
+
+The portal's service cards are compiled from the flake; the badge beside one is
+the only live part. `service-portal-telemetry` (`127.0.0.1:8105`, proxied by nginx
+at `/api/telemetry`, no mount or firewall port of its own) polls the targets under
+`services.servicePortal.telemetry.targets` — `job-db`, `private-deals`,
+`inventory-site` and `clanker-runner` among them — every 10 s with a 750 ms
+timeout per request, and answers `{generated_at, services}`, each service carrying
+`status`, `latency_ms`, `checked_at`, `health`, `stats` and the metrics its target
+declares.
+
+Status is `offline` when `/api/health` does not answer, `degraded` when it answers
+`ok: false` or `/api/stats` fails, `online` otherwise; `unknown` is a target the
+first poll has not reached. A card carries `data-live-for="<target>"` and
+`lib/delphi/juno.js` fills it with a dot, the status word and the first three
+metrics, with the check time or the error in the tooltip. A failing aggregate
+removes the decoration and nothing else: the card's structure is compiled truth,
+it stays readable, and `telemetry unavailable` says which half broke.
+
 ## The verbs that fill them
 
 Reading a page happens in the CLI scripts, not in the services, so a sweep needs
@@ -97,8 +145,8 @@ no credentials on `delphi`:
 | `agents:web` | `scripts/task/web-research.py` | the three hosted providers at once, or agent-browser | stdout only |
 | `dev:inventory:site` | `scripts/task/inventory-sync.py` | `nix eval .#inventory.hosts`, or `--in` a JSON dump | `POST /api/items` on inventory-site |
 
-One verb proves the three index services end to end, and is the one to run after
-a deploy or a schema change:
+One verb proves all four services end to end, and is the one to run after a
+deploy or a schema change:
 
 ```bash
 task agents:portfolio:smoke                      # loopback defaults on delphi
@@ -108,10 +156,16 @@ task agents:portfolio:smoke -- --browser         # adds the rendered-DOM check
 ```
 
 It asks each service for `/api/health` (which must name the service it thinks it
-is), `/api/stats`, `/` as HTML carrying the element the JS fills, and one search.
-An empty result passes — "nothing matched" is an answer — so the check works on a
-fresh database; `--expect-hit` is for when the data should be there. Exit 1 names
-the service that failed.
+is), `/api/stats`, `/api/analytics` where one exists (JSON that still names its
+window), `/` as HTML carrying the element the JS fills, and one search.
+inventory-site also renders the QR label for its first asset — on an empty register
+the check reports itself skipped and says why instead of passing as though it had
+looked — and clanker-runner answers `/api/machines`, `/api/presets` and
+`/api/schedules`. An empty result passes — "nothing matched" is an answer — so
+the check works on a fresh database; `--expect-hit` is for when the data should be
+there. Each base is overridable — `--jobs`, `--deals`, `--inventory`, `--clanker`
+— so the same verb can point at the tailnet mounts. Exit 1 names the service that
+failed.
 
 ```bash
 task apps:page -- --backend http https://boards.greenhouse.io/acme > jobs.json

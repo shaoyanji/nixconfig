@@ -2,18 +2,20 @@
   "entries": [
     {
       "name": "nixconfig",
+      "weight": 9,
       "entity": "Personal",
       "type": "open source",
       "start": "2023-01",
       "end": "",
-      "summary": "Moved a single-operator fleet of thirteen machines off per-host install notes onto one repository: rebuilding, auditing, rolling back or handing over a host is the commit plus one command, secrets are encrypted per host, certificates rotate on a schedule, and the same check runs in CI and before a deploy. It also runs a sentinel that logs job status, disk and memory pressure every 15 minutes, and self-hosted chat, speech and image models behind one OpenAI-compatible endpoint.",
-      "summaryDe": "Dreizehn persönliche NixOS-Hosts, neu gebaut aus einem Repository: Zertifikate, Secrets pro Host und die Bedienbefehle kommen von derselben Stelle, und derselbe Check läuft in der CI und vor einem Deploy. Ein Sentinel protokolliert Job-Status, Disk- und Speicherdruck alle 15 Minuten; dazu laufen selbst gehostete Chat-, Sprach- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt.",
+      "summary": "Thirteen hosts, one flake: rebuilding, auditing, rolling back or handing over a machine is the commit plus one command. Secrets are encrypted per host, certificates come from the fleet's own SSH CA, rebuilds share a binary cache, and the same per-host check runs in CI and before a deploy. A sentinel records job status, disk and memory pressure and generation age every fifteen minutes, and the alert fires when a service stops reporting.",
+      "summaryDe": "Dreizehn Hosts, ein Flake: neu bauen, prüfen, zurückrollen oder übergeben heißt Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, Zertifikate kommen aus der eigenen SSH-Zertifizierungsstelle, Rebuilds teilen einen Binary-Cache, und derselbe Check je Host läuft in der CI und vor einem Deploy. Ein Sentinel protokolliert Job-Status, Disk- und Speicherdruck sowie Generation-Alter alle 15 Minuten; der Alarm kommt, wenn ein Dienst nicht mehr meldet.",
       "keywords": [
-        "Nix",
         "NixOS",
-        "systemd",
+        "flakes",
+        "rollback",
+        "alerting",
         "SOPS",
-        "Tailscale"
+        "CI gate"
       ],
       "url": "https://github.com/shaoyanji/nixconfig",
       "resumeName": "nixconfig"
@@ -38,6 +40,7 @@
     },
     {
       "name": "Bountystash work engine",
+      "weight": 2,
       "entity": "Founder",
       "type": "product",
       "start": "2020-06",
@@ -55,6 +58,7 @@
     },
     {
       "name": "fibtransponder",
+      "weight": 1,
       "entity": "Personal research",
       "type": "research",
       "start": "2026-01",
@@ -72,6 +76,7 @@
     },
     {
       "name": "kev-time",
+      "weight": 8,
       "entity": "KEV lab",
       "type": "tool",
       "start": "2026-02",
@@ -88,6 +93,7 @@
     },
     {
       "name": "kelly-svg",
+      "weight": 8,
       "entity": "KEV lab",
       "type": "tool",
       "start": "2026-03",
@@ -104,6 +110,7 @@
     },
     {
       "name": "Vulnerability operations concept",
+      "weight": 7,
       "entity": "bountystash",
       "type": "concept",
       "start": "2026-11",

@@ -127,7 +127,12 @@
           ))
         ++ (projects.entries |> builtins.filter (p: (p.resumeName or "") == ""))
       )
-      |> lib.sort (a: b: a.start > b.start);
+      # The archive is ordered by focus, not by date: a project may carry a
+      # `weight` in projects.json, and everything else keeps newest-first. The
+      # list is what a reader sees first, and a 2023 fleet outranks a 2026 toy.
+      |> lib.sort (
+        a: b: (a.weight or 0) > (b.weight or 0) || ((a.weight or 0) == (b.weight or 0) && a.start > b.start)
+      );
 
   education =
     resumeEducation
@@ -508,8 +513,8 @@
       }";
       ogImageAlt =
         if lang == "de"
-        then "Matt Ji, Systemingenieur für Infrastruktur und Sicherheit: Go, NixOS-Flotten, Schwachstellendaten. Auf der Suche nach einer Senior-Rolle."
-        else "Matt Ji, systems and security engineer: Go, NixOS fleets, vulnerability data. Looking for a senior role.";
+        then "Matt Ji, Site-Reliability- und Plattform-Ingenieur: NixOS-Flotten, Alarmierung, Go-Dienste. Auf der Suche nach einer Senior-Rolle."
+        else "Matt Ji, site reliability and platform engineer: NixOS fleets, alerting, Go services. Looking for a senior role.";
       cssHref = "${root}style.css";
       footer = "${privacy ui d.analytics} ${ui.footer}";
       analytics = mkAnalytics d.analytics;
@@ -972,8 +977,8 @@
         -pointsize 28 -fill '#1c5f4d' -annotate +80+566 'matt.bountystash.com' \
         "$dest"
     }
-    card $out/og.png 'MATT JI' 'Systems and security engineer' 'Go · NixOS fleets · vulnerability data' 'Looking for a senior or lead role — remote, CET'
-    card $out/og-de.png 'MATT JI' 'Systemingenieur, Infrastruktur' 'Go · NixOS-Flotten · Schwachstellendaten' 'Auf der Suche nach einer Senior-Rolle — remote, MEZ'
+    card $out/og.png 'MATT JI' 'Site reliability and platform engineer' 'NixOS fleets · alerting · Go services' 'Looking for a senior SRE or platform role — remote, CET'
+    card $out/og-de.png 'MATT JI' 'Site Reliability und Plattform' 'NixOS-Flotten · Alarmierung · Go-Dienste' 'Auf der Suche nach einer Senior-Rolle in SRE — remote, MEZ'
   '';
 
   sitemapUrls =

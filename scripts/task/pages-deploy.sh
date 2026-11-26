@@ -40,20 +40,37 @@ fi
 
 # A fresh deployment answers 404 for a while: the asset manifest attaches per
 # path, so `/` can serve while `/contact/thanks/` is still missing. Wait for every
-# page the artifact carries — derived from the tree, not a list that goes stale
+# file the artifact carries — derived from the tree, not a list that goes stale
 # the moment a section is added. 120 s is generous for a static site and still
 # short enough that a broken deploy fails the task.
+#
+# Every file, not only the pages: on 2026-11-26 a deploy reported "live (200 on
+# 2 path(s))" while the five CV PDFs on the custom domain were still the previous
+# build's bytes — the pages had attached, the PDFs had not. A probe that reads
+# only index.html cannot see the one file a CV site exists to serve.
 paths=()
 while IFS= read -r file; do
   rel=${file#"$dir"}
-  page=${rel%/index.html}
-  paths+=("${page:-}/")
+  # The URL Pages serves for each file, not the path on disk: `x.html` is served
+  # as `x` (the .html form answers 308), and `_headers`/`_redirects` are config
+  # Pages consumes, so probing them 404s a deployment that is fine. `404.html` is
+  # the error handler and is reachable as no URL of its own.
+  case "$rel" in
+    */index.html) paths+=("${rel%/index.html}/") ;;
+    /404.html | /_headers | /_redirects) ;;
+    *.html) paths+=("${rel%.html}") ;;
+    *) paths+=("$rel") ;;
+  esac
 # -L because $dir is the `nix build --out-link` symlink: find does not descend a
 # symlink given as its own argument, so without it this counted zero pages and
 # refused a deployment that had already succeeded.
-done < <(find -L "$dir" -name index.html | sort)
-[ "${#paths[@]}" -gt 0 ] || {
+done < <(find -L "$dir" -type f | sort)
+if ! find -L "$dir" -name index.html -print -quit | grep -q .; then
   echo "pages-deploy: $dir carries no index.html — refusing to deploy an empty artifact" >&2
+  exit 1
+fi
+[ "${#paths[@]}" -gt 0 ] || {
+  echo "pages-deploy: $dir carries no files — refusing to deploy an empty artifact" >&2
   exit 1
 }
 

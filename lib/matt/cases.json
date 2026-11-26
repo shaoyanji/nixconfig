@@ -31,6 +31,13 @@
         ]
       },
       {
+        "heading": "Does it page?",
+        "body": [
+          "A fleet that can be rebuilt is not the same as a fleet that is running. A sentinel writes job status, disk and memory pressure and generation age every fifteen minutes; the monitor pages when the reported state changes, and a peer that stops reporting at all is a finding rather than a silence. Every host rolls back to its previous generation with one command, so the answer to a bad deploy is a command and not a rebuild.",
+          "The failure that taught me the most was a monitor that stayed green while the thing it watched came back: a host rebuilt itself from a branch that still declared a service I had retired, and the ledger counted that service as a healthy job because it was still on the watch list. A monitor is a claim about what should exist, and it needs the same review as the thing it watches."
+        ]
+      },
+      {
         "heading": "What I would do differently",
         "body": [
           "I treated evaluation as free for a year. A fleet-wide check takes 340 seconds and 6 GB on an 11 GB laptop, so it is now refused below a memory floor and hosts are checked one at a time. The cost of a gate belongs in the design, not in a note about why the gate is red."

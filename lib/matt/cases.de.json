@@ -31,6 +31,13 @@
         ]
       },
       {
+        "heading": "Meldet es sich?",
+        "body": [
+          "Eine Flotte, die sich neu bauen lässt, ist nicht dasselbe wie eine Flotte, die läuft. Ein Sentinel schreibt Job-Status, Disk- und Speicherdruck sowie Generation-Alter alle 15 Minuten; der Alarm kommt, wenn sich der gemeldete Zustand ändert, und ein Peer, der gar nicht mehr meldet, ist ein Befund und kein Schweigen. Jeder Host rollt mit einem Befehl auf seine vorige Generation zurück, die Antwort auf einen schlechten Deploy ist also ein Befehl und kein Rebuild.",
+          "Am meisten gelernt habe ich aus einem Monitor, der grün blieb, während das Beobachtete zurückkam: Ein Host hatte sich aus einem Branch neu gebaut, der noch einen Dienst deklarierte, den ich stillgelegt hatte, und das Ledger zählte den Dienst als gesunden Job, weil er noch auf der Watch-Liste stand. Ein Monitor ist eine Behauptung darüber, was existieren soll, und braucht dieselbe Prüfung wie das, was er beobachtet."
+        ]
+      },
+      {
         "heading": "Was ich anders machen würde",
         "body": [
           "Ein Jahr lang habe ich die Evaluation als kostenlos behandelt. Ein flottenweiter Check braucht 340 Sekunden und 6 GB auf einem Laptop mit 11 GB, deshalb läuft er unterhalb einer Speichergrenze gar nicht erst, und Hosts werden einzeln geprüft. Die Kosten eines Gates gehören in den Entwurf, nicht in eine Notiz darüber, warum das Gate rot ist."

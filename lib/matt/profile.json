@@ -3,12 +3,12 @@
     "name": "Matt Ji",
     "url": "https://matt.bountystash.com",
     "handle": "matt@bountystash.com",
-    "title": "Systems Engineer",
-    "subtitle": "Go · NixOS fleets · operational data · energy infrastructure",
+    "title": "Site Reliability and Platform Engineer",
+    "subtitle": "NixOS fleets · alerting and rollback · Go services · operational data",
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
-    "status": "Open to senior and lead roles",
-    "target": "Target: platform, infrastructure or technical operations work; remote from a CET base or on site in Freiburg.",
-    "bio": "Most of my working life has gone into making operational data usable: four years of asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture and telemetry reconciliation when sensors went missing. Between roles I completed a three-month PPA engagement for EWE Trading and built a thirteen-host NixOS fleet from one flake — SSH certificate authority, per-host encrypted secrets, a sentinel watching disk, memory and generation age — alongside local language, speech and image models behind one OpenAI-compatible endpoint. I am looking for systems work where operational data has to be trusted.",
+    "status": "Open to senior SRE and platform roles",
+    "target": "Target: site reliability, platform engineering or infrastructure operations; remote from a CET base or on site in Freiburg.",
+    "bio": "I build the systems and the evidence that they are still working. One NixOS flake declares thirteen hosts — SSH certificate authority, per-host encrypted secrets, a shared binary cache and a one-command rollback for every generation — gated by the same per-host check in CI and before a deploy. A sentinel records job status, disk and memory pressure and generation age every fifteen minutes, and the alert fires when a service stops reporting. Alongside the fleet: Go services with bounded work, an email archive that classifies its own mail, and local models behind one OpenAI-compatible endpoint. Before that, four years of asset management on a USD 100M+ solar portfolio and hedging models for energy traders.",
     "contacts": [
       {
         "label": "email",
@@ -94,6 +94,10 @@
     {
       "title": "Operational data that ends in action",
       "body": "CISA's exploited list as a time series and as clusters a team can finish this week. The output is a patch order, not another dashboard."
+    },
+    {
+      "title": "Alerting that reaches a person",
+      "body": "A sentinel records job status, disk and memory pressure and generation age every fifteen minutes, and the monitor pages on a change of state instead of on every interval. A host that stops reporting is itself a finding, and every generation rolls back with one command."
     }
   ],
   "work": [
@@ -266,7 +270,7 @@
   ],
   "hire": {
     "title": "What I am looking for",
-    "body": "A senior or lead systems role where infrastructure, automation and operational data meet: platform engineering, site reliability or IT operations. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
+    "body": "A senior site reliability or platform role where infrastructure, automation and operational data meet. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
     "briefsNote": "Notes on what I would do in the first ninety days:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS; comfortable owning a service end to end",

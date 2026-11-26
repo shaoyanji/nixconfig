@@ -3,12 +3,12 @@
     "name": "Matt Ji",
     "url": "https://matt.bountystash.com",
     "handle": "matt@bountystash.com",
-    "title": "Systemingenieur",
-    "subtitle": "Go · NixOS-Flotten · Betriebsdaten · Energieinfrastruktur",
+    "title": "Site-Reliability- und Plattform-Ingenieur",
+    "subtitle": "NixOS-Flotten · Alarmierung und Rollback · Go-Dienste · Betriebsdaten",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
-    "status": "Offen für Senior- und Lead-Rollen",
-    "target": "Ziel: Plattform, Infrastruktur oder technischer Betrieb; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
-    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Zwischen Anstellungen habe ich ein dreimonatiges PPA-Mandat für die EWE Trading abgeschlossen und eine NixOS-Flotte mit dreizehn Hosts aus einem Flake gebaut — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, ein Sentinel für Disk, Speicher und Generation-Alter — dazu lokale Sprach-, Sprech- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt. Ich suche Systemarbeit, in der Betriebsdaten vertrauenswürdig sein müssen.",
+    "status": "Offen für Senior-Rollen in SRE und Plattform",
+    "target": "Ziel: Site Reliability, Plattform-Engineering oder Infrastruktur-Betrieb; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
+    "bio": "Ich baue die Systeme und den Nachweis, dass sie noch laufen. Ein einziges NixOS-Flake deklariert dreizehn Hosts — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, gemeinsamer Binary-Cache und Ein-Befehl-Rollback für jede Generation — abgesichert durch denselben Check je Host in der CI und vor jedem Deploy. Ein Sentinel schreibt Job-Status, Disk- und Speicherdruck sowie Generation-Alter alle 15 Minuten, und der Alarm kommt, wenn ein Dienst nicht mehr meldet. Dazu Go-Dienste mit begrenzter Arbeit, ein E-Mail-Archiv, das seine Post selbst klassifiziert, und lokale Modelle hinter einem OpenAI-kompatiblen Endpunkt. Davor: vier Jahre Asset Management für ein Solarportfolio über 100 Mio. USD und Hedging-Modelle für Energiehändler.",
     "contacts": [
       {
         "label": "email",
@@ -94,6 +94,10 @@
     {
       "title": "Betriebsdaten, die in Handlung enden",
       "body": "CISAs KEV-Katalog als Zeitreihe und als Cluster, die ein Team diese Woche abarbeiten kann. Das Ergebnis ist eine Patch-Reihenfolge, kein weiteres Dashboard."
+    },
+    {
+      "title": "Alarmierung, die einen Menschen erreicht",
+      "body": "Ein Sentinel schreibt Job-Status, Disk- und Speicherdruck sowie Generation-Alter alle 15 Minuten, und der Alarm kommt bei einer Zustandsänderung statt bei jedem Intervall. Ein Host, der nicht mehr meldet, ist selbst ein Befund, und jede Generation lässt sich mit einem Befehl zurückrollen."
     }
   ],
   "work": [
@@ -266,7 +270,7 @@
   ],
   "hire": {
     "title": "Was ich suche",
-    "body": "Eine Senior- oder Lead-Rolle im Systemengineering, in der Infrastruktur, Automatisierung und Betriebsdaten zusammenkommen: Plattform-Engineering, Site Reliability oder IT-Betrieb. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
+    "body": "Eine Senior-Rolle in Site Reliability oder Plattform-Engineering, in der Infrastruktur, Automatisierung und Betriebsdaten zusammenkommen. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
     "briefsNote": "Notizen dazu, was ich in den ersten neunzig Tagen tun würde:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS — und gewohnt, einen Dienst von Anfang bis Ende zu verantworten",

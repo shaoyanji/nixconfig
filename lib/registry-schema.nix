@@ -10,6 +10,7 @@
     "services.jobDbScraper.enable"
     "services.privateDeals.enable"
     "services.inventorySite.enable"
+    "services.clankerRunner.enable"
   ];
   umbrellaFamilies = ["checks:appflow"];
   sopsAnchorExceptions = ["garnix"];

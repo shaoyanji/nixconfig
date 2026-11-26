@@ -1,8 +1,56 @@
 {
-  "generated": "2026-11-26T16:07:45Z",
+  "generated": "2026-11-26T16:11:50Z",
   "count": 200,
-  "pin": "141036dfaea8df74dae149586c51a9ceab7e7375e248e87605f0bbd5c3944507",
+  "pin": "cb2e91970f9fa74ab8d77aeb4c84c1631edfbdaa8153b537eb597cab79906eb3",
   "turns": [
+    {
+      "id": "770d190e-60f3-4db2-8aff-c883174a4671",
+      "ts": "2026-11-26T16:08:56Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-ui-smoke-suite",
+      "action": "claim: one smoke verb over job-db-scraper/private-deals/inventory-site — health, stats, HTML root, FTS search, optional agent-browser DOM check, JSON/TOON pass/fail; verified live against three local instances",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke"
+      ],
+      "files": [],
+      "base_commit": "100418d12ec25330340df4e8c67ca45c9d34a54f",
+      "branch": "main",
+      "frame": "03hb3vc4sjkcvf26vdl59vcww"
+    },
+    {
+      "id": "620b165e-9a4c-446c-b50f-ab968194b420",
+      "ts": "2026-11-26T16:08:07Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-pg-backup-gap",
+      "action": "Landed hosts/delphi/backups.nix: postgresqlBackup for email_archive+umami+miniflux at 02:50, offloadBridge set delphi-postgres -> /var/backup/postgresql (frieren 03:10 push, restic 03:30), Sunday drill floor 14 tables (measured 18/30/14); docs updated. checks:host delphi eval 2184 assertions; hand pg_dump restores 18 tables / 3530 letters. NOT activated: tree still holds another pane's staged clanker-runner, a deploy now would switch it in.| gate: checks:host delphi MODE=eval + pg_dump restore",
+      "outcome": "done",
+      "claims": [
+        "hosts/delphi",
+        "docs/email-archive.md"
+      ],
+      "files": [],
+      "base_commit": "100418d12ec25330340df4e8c67ca45c9d34a54f",
+      "branch": "main",
+      "frame": "03hb3v6fiwgs1pflcbksehx2l"
+    },
+    {
+      "id": "08d9672f-560a-4776-b716-df23f00f427f",
+      "ts": "2026-11-26T16:07:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:appflow-guard-followups",
+      "action": "task-change|0.6|0.38: appflow_guard_followups (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "383573b7667afa2a115ae181c71879f6992f4e03",
+      "branch": "main",
+      "frame": "03hb3v4n8f3gs0pridv73mwo4"
+    },
     {
       "id": "759153b1-91d7-4d04-8a7d-a9f606fe803c",
       "ts": "2026-11-26T16:06:41Z",
@@ -3036,59 +3084,6 @@
       "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
       "branch": "main",
       "frame": "03hb2esl3saboasw4ozw7tjnl"
-    },
-    {
-      "id": "688305c3-c3db-4818-8a2a-c5b7954a7e63",
-      "ts": "2026-11-26T10:59:22Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "yek#270 fixed locally on fix/yek-270-newline (9e7ef04): text mode resolves template escapes before substituting content. cargo test 401 passed, 0 failed. Nothing pushed, no PR opened.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
-      "branch": "main",
-      "frame": "03hb2eskl3o57xzjzv59tg9jp"
-    },
-    {
-      "id": "8f314003-1bff-4016-83ac-094bb99919b0",
-      "ts": "2026-11-26T10:48:20Z",
-      "source": "agy",
-      "subject": "nixconfig:wallpaper-publish",
-      "action": "published 7 kept wall plates (2026-11-26/catwoman-dc.png + 6 from 2026-11-25) to bountystash-assets.pages.dev (772->779); fixed Go publish/adopt + laneSetting at 49d9be9f | gate: checks:quick + checks:images PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/image-daily-publish.sh",
-        "scripts/task/image-daily-wallpaper.sh",
-        "tools/os/internal/image"
-      ],
-      "files": [
-        "scripts/task/image-daily-lib.sh",
-        "tools/os/internal/image/briefs.go",
-        "tools/os/internal/image/ledger.go",
-        "tools/os/internal/image/main_test.go",
-        "tools/os/internal/image/post.go",
-        "tools/os/internal/image/publish.go"
-      ],
-      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
-      "branch": "main",
-      "frame": "03hb2esk333fh9o1czkkyr9co"
-    },
-    {
-      "id": "ef67483c-33a7-42c9-b8f4-8f96984283e5",
-      "ts": "2026-11-26T10:35:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-publish",
-      "action": "publish wallpaper to static site",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/image-daily-publish.sh",
-        "scripts/task/image-daily-wallpaper.sh"
-      ],
-      "files": [],
-      "base_commit": "87e69ac53c76a8c74c823ca49c760ff98f43ad97",
-      "branch": "main",
-      "frame": "03hb2esjfzw7snhkr1hkp7z8b"
     }
   ]
 }

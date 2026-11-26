@@ -241,6 +241,16 @@
       "rev": 3
     },
     {
+      "id": "wall-nixconfig-dark",
+      "lane": "wall",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "nixconfig-dark.png",
+      "prompt": "Frieren, the silver-haired elf mage from the anime Frieren: Beyond Journey's End, seated on a dark basalt ridge beneath an obsidian midnight sky contemplating a glowing constellation of geometric server nodes linked by fine cyan and amber starlight filaments, dark obsidian and deep slate background palette for a dark-themed desktop wallpaper, cel-shaded anime illustration, one clear focal point, no text.",
+      "expect": "Frieren at night contemplating a glowing constellation of connected nodes in a dark sky, never a bright daytime meadow or UI panel",
+      "rev": 1
+    },
+    {
       "id": "fleet-docs-hero",
       "lane": "fleet",
       "every": 60,

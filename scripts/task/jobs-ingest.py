@@ -19,6 +19,12 @@ than one not filed.
 
 Nothing here writes the database directly, so the server stays the only writer
 and the ingest cannot desynchronise the FTS index from the rows.
+
+A run posts in chunks to `POST /api/postings/batch`, which dedupes inside the
+chunk, stores the deterministic role-match score and lane per posting, and
+answers with `created`/`updated`/`skipped`/`failed` plus per-index errors. A
+server that predates that route answers 404 or 405, and the run falls back to
+one `POST /api/postings` per posting rather than failing the sweep.
 """
 
 from __future__ import annotations
@@ -33,6 +39,9 @@ import urllib.request
 from datetime import datetime, timezone
 
 UA = "nixconfig-jobs-ingest/1.0"
+# The server refuses a larger batch than this; a chunk size above it would be a
+# 400 for every chunk rather than a shorter run.
+BATCH_LIMIT = 500
 
 # The board API behind a host is the useful source label: `lever` says more than
 # `jobs.lever.co`, and the server stores it as a column the UI groups on.
@@ -68,6 +77,10 @@ STOP_SEGMENTS = {
 
 class IngestError(RuntimeError):
     """The server refused a posting; the run reports it and keeps going."""
+
+
+class BatchUnsupported(IngestError):
+    """The route is not there (404/405): post one posting at a time instead."""
 
 
 def canonical(url: str) -> str:
@@ -199,6 +212,86 @@ def post_posting(api: str, posting: dict, token: str = "", timeout: int = 30):
         raise IngestError(f"api unreachable: {exc.reason}") from exc
 
 
+def post_batch(api: str, payloads: list, token: str = "", timeout: int = 30) -> dict:
+    """One request for a chunk of postings, so a sweep is not one round trip each."""
+    body = json.dumps({"postings": list(payloads)}).encode()
+    headers = {"Content-Type": "application/json", "User-Agent": UA}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(
+        f"{api.rstrip('/')}/api/postings/batch", data=body, headers=headers, method="POST"
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", "replace")[:300]
+        if exc.code in (404, 405):
+            raise BatchUnsupported(f"{exc.code} {detail}") from exc
+        raise IngestError(f"{exc.code} {detail}") from exc
+    except urllib.error.URLError as exc:
+        raise IngestError(f"api unreachable: {exc.reason}") from exc
+
+
+def post_singles(api: str, payloads, token: str = "", timeout: int = 30):
+    """The pre-batch path: one request each, so one refusal cannot lose the rest."""
+    created = updated = 0
+    failed = []
+    for posting in payloads:
+        try:
+            answer = post_posting(api, posting, token=token, timeout=timeout)
+            if answer.get("created"):
+                created += 1
+            else:
+                updated += 1
+        except IngestError as exc:
+            failed.append({"url": posting["url"], "error": str(exc)[:300]})
+    return created, updated, failed
+
+
+def post_chunks(api: str, payloads, batch_size: int, token: str = "", timeout: int = 30):
+    """Send in chunks, fall back to singles on the first 404/405, count the answer."""
+    created = updated = skipped = 0
+    failed = []
+    batched = True
+    start = 0
+    while start < len(payloads):
+        chunk = payloads[start : start + batch_size]
+        start += len(chunk)
+        if batched:
+            try:
+                answer = post_batch(api, chunk, token=token, timeout=timeout)
+            except BatchUnsupported:
+                batched = False
+            except IngestError as exc:
+                failed.extend({"url": p["url"], "error": str(exc)[:300]} for p in chunk)
+                continue
+            else:
+                created += int(answer.get("created") or 0)
+                updated += int(answer.get("updated") or 0)
+                skipped += int(answer.get("skipped") or 0)
+                errors = answer.get("errors") or []
+                for error in errors:
+                    index = error.get("index")
+                    url = (
+                        chunk[index]["url"]
+                        if isinstance(index, int) and 0 <= index < len(chunk)
+                        else chunk[0]["url"]
+                    )
+                    failed.append({"url": url, "error": str(error.get("error", ""))[:300]})
+                undetailed = int(answer.get("failed") or 0) - len(errors)
+                if undetailed > 0:
+                    failed.append({"url": "", "error": f"{undetailed} more refused without detail"})
+                continue
+        one_created, one_updated, one_failed = post_singles(
+            api, chunk, token=token, timeout=timeout
+        )
+        created += one_created
+        updated += one_updated
+        failed.extend(one_failed)
+    return created, updated, skipped, failed, batched
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Feed job-page-scrape JSON into job-db-scraper's /api/postings."
@@ -214,8 +307,16 @@ def main() -> int:
         help="environment variable holding the write bearer token",
     )
     parser.add_argument("--timeout", type=int, default=30)
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=100,
+        help=f"postings per /api/postings/batch request (1-{BATCH_LIMIT}); a 404/405 falls back to single POSTs",
+    )
     parser.add_argument("--dry-run", action="store_true", help="print payloads, POST nothing")
     args = parser.parse_args()
+    if not 1 <= args.batch_size <= BATCH_LIMIT:
+        parser.error(f"--batch-size must be between 1 and {BATCH_LIMIT}")
 
     try:
         raw = open(args.input_path, encoding="utf-8").read() if args.input_path else sys.stdin.read()
@@ -233,20 +334,16 @@ def main() -> int:
     )
     token = os.environ.get(args.token_env, "").strip()
 
-    created = updated = 0
-    failed = []
-    for posting in postings:
-        if args.dry_run:
+    if args.dry_run:
+        for posting in postings:
             print(json.dumps({"would_post": posting}, sort_keys=True), file=sys.stderr)
-            continue
-        try:
-            answer = post_posting(args.api, posting, token=token, timeout=args.timeout)
-            if answer.get("created"):
-                created += 1
-            else:
-                updated += 1
-        except IngestError as exc:
-            failed.append({"url": posting["url"], "error": str(exc)[:300]})
+        created = updated = skipped = 0
+        failed = []
+        batched = False
+    else:
+        created, updated, skipped, failed, batched = post_chunks(
+            args.api, postings, args.batch_size, token=token, timeout=args.timeout
+        )
 
     summary = {
         "run": "jobs-ingest",
@@ -254,8 +351,11 @@ def main() -> int:
         "api": args.api,
         "jobs_seen": len(jobs),
         "postings": len(postings),
+        "batch": batched,
+        "batch_size": args.batch_size,
         "created": created,
         "updated": updated,
+        "skipped": skipped,
         "failed": failed,
         "warnings": warnings,
         "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),

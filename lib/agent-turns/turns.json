@@ -1,8 +1,72 @@
 {
-  "generated": "2026-11-26T15:49:23Z",
+  "generated": "2026-11-26T15:53:24Z",
   "count": 200,
-  "pin": "3bbc5798b111f2fde4a1428ffed9fc6eea7286214820c694f7de33bd398030cf",
+  "pin": "bf42e6a5a16fb2ee7f48270e88ec078ffce2f4886b3b6d9aaa44a9551773e123",
   "turns": [
+    {
+      "id": "d5dec741-e1d3-481a-96de-78e0423d96f7",
+      "ts": "2026-11-26T15:51:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:hermes-explabs-cleanup",
+      "action": "host-change|0.54|0.32000000000000006: hermes_explabs_429_cleanup (tak…",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai/hermes-persona/config.yaml",
+        "tests/infron"
+      ],
+      "files": [],
+      "base_commit": "711506e027fefe39261db15ccd2f0fcc04666f95",
+      "branch": "main",
+      "frame": "03hb3rxg12ngmkux4sgt1ibnb"
+    },
+    {
+      "id": "5933e307-3370-45d9-99e1-43acbd223192",
+      "ts": "2026-11-26T15:50:28Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-free-fallback",
+      "action": "landed: stale ollama-cloud narrative fixed in 3 places (removed 2026-11-22, file contradicted itself), fallback-chain comment re-described for the post-reorder NIM-led chain, dead commented lanes deleted (tokenrouter 403, cantrustai paid — facts here not in commented config), infron-check.sh sail label $0 interpolation fixed | gates: infron-check clean, tests/infron all cases pass",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "711506e027fefe39261db15ccd2f0fcc04666f95",
+      "branch": "main",
+      "frame": "03hb3rqa1mkrlk7e6bt73e9i6"
+    },
+    {
+      "id": "dd7c88b2-63a3-49cf-8645-83a185f31391",
+      "ts": "2026-11-26T15:50:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:ingest-batch-endpoints",
+      "action": "claim: batch POST for deals-ingest (/api/deals/batch, --batch-size, 404/405 fallback to single) and jobs-ingest (/api/postings/batch), verified with unittest + live local service smoke, commit --only",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/deals-ingest.py",
+        "scripts/task/jobs-ingest.py",
+        "tests/deals-ingest",
+        "tests/jobs-ingest"
+      ],
+      "files": [],
+      "base_commit": "814fcbf8cab82a88af05b831b499925fcb25b8e6",
+      "branch": "main",
+      "frame": "03hb3rq6zydi3my9z2zkq7y26"
+    },
+    {
+      "id": "c2f802b1-7419-4d8b-999a-fd55d43fcf7c",
+      "ts": "2026-11-26T15:49:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-mail-archive-audit",
+      "action": "Audit (takeover): mail loop healthy — Healthy, 53 routes, newest mail 0.9h, triage pending 0, queue-health 0 person/9 action/0 unmatched (limits 25/40/5), importer/triage/appflow-sync success, delphi eval clean (2172 assertions). Gaps: gdrive attachment mirror skipped 55x (no rclone.conf) yet reports success; no postgres backup (62MB db + 24MB attachments, single copy). Fixed skill route counts 23/52 -> 53.| gate: live probes + checks:host delphi + ops:skills:check PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow",
+        "hosts/delphi",
+        ".agents/skills/mail-archive"
+      ],
+      "files": [],
+      "base_commit": "814fcbf8cab82a88af05b831b499925fcb25b8e6",
+      "branch": "main",
+      "frame": "03hb3rkcah6l71xbdqz7ob85q"
+    },
     {
       "id": "28254db2-cf8f-437a-bb76-c115173e5164",
       "ts": "2026-11-26T15:49:01Z",
@@ -3004,63 +3068,6 @@
       "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
       "branch": "main",
       "frame": "03hb1rzom03lnj81z6jptu88k"
-    },
-    {
-      "id": "67823ee3-ff45-4e42-ab08-3cdf34cc4c21",
-      "ts": "2026-11-26T09:41:11Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-1033",
-      "action": "jev publish p=0.81 m=0.69: publish CV site from repo",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1rlazm4r2g21x3e6hphbm"
-    },
-    {
-      "id": "e38d8f22-ae32-4c49-b867-c7316ed96b32",
-      "ts": "2026-11-26T09:39:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "Sweep 2026-11-26c: five boards, 1442 postings parsed, 56 new, 25 filed via apps:scout — 18 declared duplicates, 3 closed, 4 live leads; the reply poll on the 11 preps returned zero responses",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1rabkftqri7stqj3wzg6o"
-    },
-    {
-      "id": "d5a3ae17-663c-459f-85c5-63f1098661b5",
-      "ts": "2026-11-26T09:35:38Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-pipeloop-dogfood",
-      "action": "landed: dogfooded dev:review:pipe-loop cold — discovery (task find:pipe + .#agentSkills), full run, judgment of hits all worked; two gaps found+fixed: missing rg printed false-clean 'none' (now exit 2), SKILL.md never passed ops:skills:check (435-char desc >240 cap, no Truth: line); task re-run clean post-fix | gate: dev:review:pipe-loop PASS, ops:skills:check PASS 65/65, checks:skills:mirror PASS, checks:nix:style PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1qib9j5xbtar00fru5jgk"
-    },
-    {
-      "id": "b09d1de2-4de8-457c-90e3-6ec07fbf0384",
-      "ts": "2026-11-26T09:34:20Z",
-      "source": "devji",
-      "subject": "nixconfig:job-scout",
-      "action": "Landed apps:sweep:pipeline + the jobsearch-pipeline skill on main: five boards, lane filter, dedupe against the whole record, name validation, rank, write through apps:scout, mail read, turn post.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "taskfiles/apps.yml",
-        "scripts/task/jobsearch-pipeline.sh",
-        "scripts/task/jobsearch-sweep.py",
-        ".agents/skills/jobsearch-pipeline/SKILL.md"
-      ],
-      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hb1q96awye58biodteka390"
     }
   ]
 }

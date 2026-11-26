@@ -187,12 +187,138 @@ class FailureReportingTest(unittest.TestCase):
             sys, "stdin", io.StringIO(json.dumps([page(
                 {"title": "A", "url": LEVER}, {"title": "B", "url": ASHBY}
             )]))
+        ), mock.patch.object(
+            ingest, "post_batch", side_effect=ingest.BatchUnsupported("405 no route")
         ), mock.patch.object(ingest, "post_posting", half_fail), contextlib.redirect_stdout(out):
             code = ingest.main()
         summary = json.loads(out.getvalue())
         self.assertEqual(code, 1)
         self.assertEqual(len(summary["failed"]), 1)
         self.assertEqual(summary["created"], 1)
+        self.assertFalse(summary["batch"])
+
+
+class FakeResponse(io.BytesIO):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_exc):
+        return False
+
+
+def http_error(code: int):
+    return urllib.error.HTTPError(
+        "http://x/api/postings/batch", code, "no", {}, io.BytesIO(b'{"error":"nope"}')
+    )
+
+
+class BatchRequestTest(unittest.TestCase):
+    def test_the_batch_route_gets_a_postings_array(self):
+        seen = {}
+
+        def fake(request, timeout=30):
+            seen["url"] = request.full_url
+            seen["body"] = json.loads(request.data.decode())
+            return FakeResponse(b'{"created":1,"updated":1,"skipped":0,"failed":0,"total":2}')
+
+        payloads = [{"url": LEVER, "title": "A"}, {"url": ASHBY, "title": "B"}]
+        with mock.patch("urllib.request.urlopen", fake):
+            answer = ingest.post_batch("http://x", payloads)
+        self.assertTrue(seen["url"].endswith("/api/postings/batch"))
+        self.assertEqual(seen["body"], {"postings": payloads})
+        self.assertEqual(answer["updated"], 1)
+
+    def test_404_and_405_are_unsupported_not_failed(self):
+        for code in (404, 405):
+            with mock.patch("urllib.request.urlopen", side_effect=http_error(code)):
+                with self.assertRaises(ingest.BatchUnsupported):
+                    ingest.post_batch("http://x", [{"url": LEVER}])
+
+    def test_a_bad_request_is_a_plain_error(self):
+        with mock.patch("urllib.request.urlopen", side_effect=http_error(400)):
+            with self.assertRaises(ingest.IngestError) as caught:
+                ingest.post_batch("http://x", [{"url": LEVER}])
+        self.assertNotIsInstance(caught.exception, ingest.BatchUnsupported)
+
+
+class ChunkTest(unittest.TestCase):
+    def run_chunks(self, payloads, batch_size, batch=None, single=None):
+        batch = batch or (lambda api, chunk, **kw: {"created": len(chunk)})
+        single = single or (lambda api, payload, **kw: {"created": True})
+        with mock.patch.object(ingest, "post_batch", batch), mock.patch.object(
+            ingest, "post_posting", single
+        ):
+            return ingest.post_chunks("http://x", payloads, batch_size)
+
+    def test_chunks_cover_every_posting_once(self):
+        payloads = [{"url": f"{LEVER}/{i}"} for i in range(5)]
+        sizes = []
+
+        def batch(api, chunk, **kw):
+            sizes.append(len(chunk))
+            return {"created": len(chunk)}
+
+        created, updated, skipped, failed, batched = self.run_chunks(payloads, 2, batch=batch)
+        self.assertEqual(sizes, [2, 2, 1])
+        self.assertEqual((created, updated, skipped, failed, batched), (5, 0, 0, [], True))
+
+    def test_the_answer_decides_the_counts_and_names_the_refused_url(self):
+        payloads = [{"url": f"{LEVER}/{i}"} for i in range(3)]
+
+        def batch(api, chunk, **kw):
+            return {"created": 2, "updated": 0, "skipped": 1, "failed": 0, "errors": []}
+
+        created, updated, skipped, failed, _ = self.run_chunks(payloads, 10, batch=batch)
+        self.assertEqual((created, updated, skipped, failed), (2, 0, 1, []))
+
+    def test_an_indexed_error_names_its_posting(self):
+        payloads = [{"url": f"{LEVER}/{i}"} for i in range(2)]
+
+        def batch(api, chunk, **kw):
+            return {"failed": 1, "errors": [{"index": 1, "error": "company is empty"}]}
+
+        _c, _u, _s, failed, _b = self.run_chunks(payloads, 10, batch=batch)
+        self.assertEqual(failed, [{"url": f"{LEVER}/1", "error": "company is empty"}])
+
+    def test_a_404_falls_back_to_one_post_per_posting(self):
+        payloads = [{"url": f"{LEVER}/{i}"} for i in range(3)]
+        singles = []
+
+        def batch(api, chunk, **kw):
+            raise ingest.BatchUnsupported("405 method not allowed")
+
+        def single(api, payload, **kw):
+            singles.append(payload["url"])
+            return {"created": len(singles) != 2}
+
+        created, updated, _skipped, failed, batched = self.run_chunks(
+            payloads, 2, batch=batch, single=single
+        )
+        self.assertFalse(batched)
+        self.assertEqual(singles, [p["url"] for p in payloads])
+        self.assertEqual((created, updated, failed), (2, 1, []))
+
+    def test_dry_run_never_reaches_the_batch_route(self):
+        out = io.StringIO()
+        with mock.patch.object(
+            sys, "argv", ["jobs-ingest", "--dry-run"]
+        ), mock.patch.object(
+            sys, "stdin", io.StringIO(json.dumps([page({"title": "A", "url": LEVER})]))
+        ), mock.patch.object(
+            ingest, "post_batch", side_effect=AssertionError("batched in dry run")
+        ), contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = ingest.main()
+        summary = json.loads(out.getvalue())
+        self.assertEqual(code, 0)
+        self.assertFalse(summary["batch"])
+        self.assertEqual(summary["skipped"], 0)
+
+    def test_batch_size_is_validated_against_the_server_limit(self):
+        with mock.patch.object(sys, "argv", ["jobs-ingest", "--batch-size", "0"]), mock.patch.object(
+            sys, "stdin", io.StringIO("[]")
+        ), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as caught:
+            ingest.main()
+        self.assertEqual(caught.exception.code, 2)
 
 
 if __name__ == "__main__":

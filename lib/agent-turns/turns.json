@@ -1,8 +1,57 @@
 {
-  "generated": "2026-11-26T14:48:24Z",
+  "generated": "2026-11-26T14:54:02Z",
   "count": 200,
-  "pin": "3917ea931e863c427a7d261004015e16c095fb711dfd7b6eaf5bb000af724299",
+  "pin": "e298de0f958a6b6c19a5ac09b55b925864bedc2396b934b4cba4778f7982fbc9",
   "turns": [
+    {
+      "id": "c27c377e-8044-4e58-af3d-019361bdf30f",
+      "ts": "2026-11-26T14:49:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-web-research-cli",
+      "action": "claim: one CLI for search+extract+rendered-page health over context/tavily/firecrawl/clanker agent-browser with cited, deduped JSON/TOON output",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/web-research.py tests/web-research"
+      ],
+      "files": [],
+      "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
+      "branch": "main",
+      "frame": "03hb3fwelu2d5rp942zw95x6t"
+    },
+    {
+      "id": "c6433e5f-ce5e-455e-b29a-41bb14f1f555",
+      "ts": "2026-11-26T14:49:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-1538",
+      "action": "drive devin: inventory-site-service (flake-change)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/inventory-site",
+        "modules/services/inventory-site.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "92948702269fc56e1b10675b8b620c23d396ffd9",
+      "branch": "main",
+      "frame": "03hb3fv9emloqbrtv9w67b2rm"
+    },
+    {
+      "id": "3d7cb445-6b36-4546-93e3-c906a8dd3202",
+      "ts": "2026-11-26T14:48:40Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-scraper-merchant-fix",
+      "action": "merchant_from unwraps click trackers (url/u/target/dest/goto/*_url, 2 hops) before reading the host, alias map amzn->amazon, shop.samsung.com->samsung, shortener with no target -> ''. Live firecrawl techbargains: merchants now amazon x4 + walmart x1 (was 'cc' x5); ingest to local private-deals :8473 created 5, q=JBL -> walmart, list_price 39.95, 50%; ?merchant=walmart 1. 40 tests + py_compile.| gate: python3 -m unittest discover tests/deals-page-scrape PASS + local ingest/FTS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
+      "branch": "main",
+      "frame": "03hb3fnqjd8xcz2yps7x7doq7"
+    },
     {
       "id": "abdba80a-d464-450e-acfb-f7df281eac12",
       "ts": "2026-11-26T14:47:23Z",
@@ -2990,47 +3039,6 @@
       "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
       "branch": "main",
       "frame": "03hb0npxvcpr386qnrvh0fwh7"
-    },
-    {
-      "id": "d3e60957-cfa4-4fa5-93e1-569fe3b5c8db",
-      "ts": "2026-11-26T06:16:00Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0657",
-      "action": "devin: verify image-daily Go port gates and fix (gate-change)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0nifajgkkis7t5xgxnfqj"
-    },
-    {
-      "id": "0166cad1-e21a-45f2-93d8-eecb425993da",
-      "ts": "2026-11-26T06:05:18Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "done: image-daily gates re-verified on 3910aa30 — checks:image-daily rc=0 (dispatch+fallback+breakers+shrinkGuard), images:publish:test 9/9 incl. real-rev 470c9034^ refusal; nothing red, nothing to fix",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0lf3plt04t3afe66aq5nj"
-    },
-    {
-      "id": "3df990ae-9827-43c0-8f41-52e2931fccd6",
-      "ts": "2026-11-26T06:00:22Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-26: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 772 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hb0kggqaqzqvmq71biwspuh"
     }
   ]
 }

@@ -24,6 +24,12 @@ const state = {
   selected: new Set(),
   queued: new Map(),
   reader: { messageId: null, actions: [] },
+  // The page as the archive answered it, and the slice of it on screen: an
+  // untagged view filters what is loaded, it does not ask a second question.
+  rows: [],
+  untagged: false,
+  suggestions: [],
+  recent: [],
 };
 
 const el = {
@@ -248,6 +254,8 @@ const field = (() => {
   let height = 0;
   let alpha = 0;
   let hovered = null;
+  // The node whose cluster is lit: a tag-hub and the letters and gate around it.
+  let focus = null;
   let openMail = null;
   let onTag = null;
   let onCategory = null;
@@ -303,6 +311,29 @@ const field = (() => {
         node.y = a.y;
       }
     }
+  }
+
+  // One link away from the focused node, plus itself. A tag-hub answers with its
+  // letters and the gate that owns it; a letter answers with the path it came
+  // by. Anything outside the set is drawn back rather than removed, so the shape
+  // of the whole field stays visible around the part being read.
+  function clusterIds() {
+    if (!focus) return null;
+    const ids = new Set([focus]);
+    for (const link of links) {
+      if (link.from === focus) ids.add(link.to);
+      else if (link.to === focus) ids.add(link.from);
+    }
+    return ids;
+  }
+
+  function setFocus(id) {
+    if (focus === id) return;
+    focus = id;
+    const ids = clusterIds();
+    canvas.dataset.focus = id || "";
+    canvas.dataset.cluster = ids ? String(ids.size) : "";
+    kick();
   }
 
   // Stable identity: a node keeps its position across keystrokes and only its
@@ -637,10 +668,12 @@ const field = (() => {
       }
     }
 
+    const cluster = clusterIds();
     // Links: bowed, and the hotter the link the brighter the current in it.
     for (const link of links) {
       const c = curve(link, byId);
       if (!c) continue;
+      ctx.globalAlpha = cluster && !(cluster.has(link.from) && cluster.has(link.to)) ? 0.16 : 1;
       const heat = link.heat;
       const strong = link.from === "query";
       ctx.strokeStyle = strong
@@ -663,9 +696,11 @@ const field = (() => {
         ctx.fill();
         ctx.shadowBlur = 0;
       }
+      ctx.globalAlpha = 1;
     }
 
     for (const node of nodes) {
+      ctx.globalAlpha = cluster && !cluster.has(node.id) ? 0.16 : 1;
       const heat = node.heat;
       const breathe = 0.5 + 0.5 * Math.sin(elapsed * 1.7 + hash(node.id) * 6.28);
       if (node.kind === "category") {
@@ -787,14 +822,17 @@ const field = (() => {
           ctx.shadowBlur = 0;
         }
       }
+      ctx.globalAlpha = 1;
     }
 
-    // A faint second ring around the hovered node, so the pointer has an anchor.
-    if (hovered) {
-      ctx.strokeStyle = "rgba(62, 240, 221, 0.5)";
+    // A second ring around the hovered or focused node: the pointer's anchor, and
+    // the thing the rail is talking about when the pointer is elsewhere.
+    const ringed = hovered || (focus ? byId.get(focus) : null);
+    if (ringed) {
+      ctx.strokeStyle = focus ? "rgba(240, 201, 135, 0.85)" : "rgba(62, 240, 221, 0.5)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(hovered.x, hovered.y, 11, 0, 6.283185);
+      ctx.arc(ringed.x, ringed.y, focus ? 12.5 : 11, 0, 6.283185);
       ctx.stroke();
     }
   }
@@ -862,6 +900,7 @@ const field = (() => {
   canvas.addEventListener("mousemove", (event) => {
     const node = hit(event);
     hovered = node;
+    setFocus(node ? node.id : null);
     const rect = canvas.getBoundingClientRect();
     if (node) {
       el.graphTip.style.display = "block";
@@ -878,6 +917,7 @@ const field = (() => {
 
   canvas.addEventListener("mouseleave", () => {
     hovered = null;
+    setFocus(null);
     el.graphTip.style.display = "none";
   });
 
@@ -907,6 +947,9 @@ const field = (() => {
     },
     onClear(fn) {
       onClear = fn;
+    },
+    focusTag(tag) {
+      setFocus(tag ? `tag:${tag}` : null);
     },
   };
 })();
@@ -1121,7 +1164,11 @@ function renderResults() {
   if (!state.results.length) {
     const li = document.createElement("li");
     li.className = "empty";
-    li.textContent = state.q ? "nothing in the sea answers to that" : "the archive is quiet";
+    li.textContent = state.untagged
+      ? "every letter on this page carries a tag · page for more, or clear the chip"
+      : state.q
+        ? "nothing in the sea answers to that"
+        : "the archive is quiet";
     el.results.append(li);
     return;
   }
@@ -1385,64 +1432,141 @@ function renderViewTags() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "vt";
+    button.title = `letters tagged ${tag} · hover or focus to light the cluster`;
     button.innerHTML = `${esc(tag)} <span class="n">${count}</span>`;
     button.addEventListener("click", () => {
       el.q.value = tag;
       runSearch({ inhale: true });
     });
+    // The rail is the keyboard path into the graph: the same hub the pointer
+    // can hover is the one a tab stop can focus.
+    button.addEventListener("mouseenter", () => field.focusTag(tag));
+    button.addEventListener("focus", () => field.focusTag(tag));
+    button.addEventListener("mouseleave", () => field.focusTag(null));
+    button.addEventListener("blur", () => field.focusTag(null));
     el.viewTags.append(button);
   }
 }
 
-function renderChips(suggestions = []) {
-  el.chips.textContent = "";
-  const items = suggestions
-    .filter((s) => s.id !== state.q)
-    .slice(0, 7)
-    .map((s) => ({ id: s.id, count: s.mailCount, fuzzy: true }));
+const RECENT_KEY = "atlas.recent";
+const RECENT_MAX = 5;
 
-  const fallback = () => {
-    const seen = [];
-    for (const cat of state.taxonomy) {
-      for (const tag of cat.tags || []) {
-        if (tag.count > 0) seen.push({ id: tag.id, count: tag.count, fuzzy: false });
-      }
-    }
-    return seen.sort((a, b) => b.count - a.count).slice(0, 7);
+// The last few things asked, kept in the browser: the archive has no opinion
+// about what you were looking for an hour ago, and a shortcut that survives a
+// reload is worth more than one that only lives in the tab.
+function recentQueries() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]");
+    return Array.isArray(raw) ? raw.filter((item) => typeof item === "string" && item) : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberQuery(q) {
+  const next = [q, ...recentQueries().filter((item) => item !== q)].slice(0, RECENT_MAX);
+  state.recent = next;
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* no storage: the chips still work for this tab */
+  }
+}
+
+function renderChips() {
+  el.chips.textContent = "";
+
+  const label = (text) => {
+    const span = document.createElement("span");
+    span.className = "label";
+    span.textContent = text;
+    el.chips.append(span);
   };
+
+  const chip = (text, count, onClick, { gold = false, on = false, title = "" } = {}) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `chip${gold ? " gold" : ""}${on ? " on" : ""}`;
+    if (title) button.title = title;
+    if (on) button.setAttribute("aria-pressed", "true");
+    button.innerHTML = `${esc(text)}${count == null ? "" : ` <span class="n">${count}</span>`}`;
+    button.addEventListener("click", onClick);
+    el.chips.append(button);
+  };
+
+  // Triage first: how much of this page the taxonomy never placed. It is a view
+  // over rows already fetched — the API pages, so "untagged" can only mean
+  // "untagged among these" — and the chip stays visible while it is on so the
+  // way back is never the thing that disappeared.
+  if (state.rows.length || state.untagged) {
+    const loose = state.rows.filter((mail) => !mail.tags.length).length;
+    chip(
+      state.untagged ? "× untagged" : "untagged",
+      state.rows.length && !state.untagged ? loose : null,
+      () => {
+        state.untagged = !state.untagged;
+        renderChips();
+        runSearch({ inhale: true });
+      },
+      {
+        on: state.untagged,
+        title: state.untagged
+          ? "showing only letters with no tag · click to show the whole page"
+          : "letters on this page the taxonomy never placed · page for more",
+      },
+    );
+  }
 
   // With no query there is no suggestion to make: the inbox is the inbox, and a
   // row of "most worn" tags above it is noise in the one view that is not about
-  // searching.
-  if (!state.q) return;
+  // searching. Recent queries are the exception, because they are yours.
+  const suggestions = state.suggestions.filter((s) => s.id !== state.q && s.mailCount > 0).slice(0, 5);
+  if (suggestions.length) {
+    label("did you mean");
+    for (const item of suggestions) {
+      chip(
+        item.id,
+        item.mailCount,
+        () => {
+          el.q.value = item.id;
+          runSearch();
+        },
+        { gold: true },
+      );
+    }
+  } else if (state.q) {
+    const seen = [];
+    for (const cat of state.taxonomy) {
+      for (const tag of cat.tags || []) if (tag.count > 0) seen.push({ id: tag.id, count: tag.count });
+    }
+    const list = seen
+      .sort((a, b) => b.count - a.count)
+      .filter((item) => item.id !== state.q)
+      .slice(0, 5);
+    if (list.length) {
+      label("also in the sea");
+      for (const item of list) {
+        chip(item.id, item.count, () => {
+          el.q.value = item.id;
+          runSearch();
+        });
+      }
+    }
+  }
 
-  const list = items.length ? items : fallback();
-  if (!list.length) return;
-
-  const label = document.createElement("span");
-  label.className = "label";
-  label.textContent = items.length ? "did you mean" : state.q ? "also in the sea" : "most worn";
-  el.chips.append(label);
-
-  for (const item of list) {
-    const chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = `chip${item.fuzzy ? " gold" : ""}`;
-    chip.innerHTML = `${esc(item.id)} <span class="n">${item.count}</span>`;
-    chip.addEventListener("click", () => {
-      el.q.value = item.id;
-      runSearch();
-    });
-    el.chips.append(chip);
+  const recent = state.recent.filter((item) => item !== state.q).slice(0, state.q ? 3 : RECENT_MAX);
+  if (recent.length) {
+    label("recent");
+    for (const item of recent) {
+      chip(item, null, () => {
+        el.q.value = item;
+        runSearch({ inhale: true });
+      }, { title: `search again for ${item}` });
+    }
   }
 
   if (state.cat) {
-    const clear = document.createElement("button");
-    clear.type = "button";
-    clear.className = "chip";
-    clear.textContent = `× ${state.cat}`;
-    clear.addEventListener("click", () => setCategory(""));
-    el.chips.append(clear);
+    chip(`× ${state.cat}`, null, () => setCategory(""));
   }
 }
 
@@ -1497,8 +1621,10 @@ async function runSearch({ updateURL = true, inhale = false, append = false } = 
     if (mine !== request) return;
     const elapsed = Math.round(performance.now() - started);
     const page = (Array.isArray(rows) ? rows : []).map(normalize);
-    state.results = append ? [...state.results, ...page] : page;
+    state.rows = append ? [...state.rows, ...page] : page;
+    state.results = state.untagged ? state.rows.filter((mail) => !mail.tags.length) : state.rows;
     state.offset += page.length;
+    if (q.length >= 2) rememberQuery(q);
     // A full page means the cap, not the end: the list says so instead of
     // pretending forty-eight is the whole inbox.
     el.more.hidden = page.length < LIMIT;
@@ -1547,13 +1673,14 @@ async function runSearch({ updateURL = true, inhale = false, append = false } = 
   if (q.length >= 2) {
     try {
       const suggestions = await getJSON(`${API}/atlas-tags?q=${encodeURIComponent(q)}&lim=7`);
-      renderChips(Array.isArray(suggestions) ? suggestions : []);
+      state.suggestions = Array.isArray(suggestions) ? suggestions : [];
     } catch {
-      renderChips([]);
+      state.suggestions = [];
     }
   } else {
-    renderChips([]);
+    state.suggestions = [];
   }
+  renderChips();
 }
 
 function setCategory(cat) {
@@ -2265,7 +2392,8 @@ field.onClear(() => {
     el.dot.className = "dot live";
     el.link.textContent = "linked";
     renderCategories();
-    renderChips([]);
+    state.recent = recentQueries();
+    renderChips();
     try {
       if (localStorage.getItem("atlas.field") === "folded") setField(true);
     } catch {

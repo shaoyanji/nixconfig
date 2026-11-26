@@ -535,6 +535,24 @@ body[data-void="1"] .ro-hits {
   background: rgba(240, 201, 135, 0.18);
 }
 
+/* A filter that is on, not a chip that is merely hot: filled, so it reads as
+   state rather than as another thing to press. */
+.chip.on {
+  color: #04100e;
+  background: var(--jade);
+  border-color: var(--jade);
+}
+
+.chip.on .n {
+  color: rgba(4, 16, 14, 0.62);
+}
+
+.chip.on:hover {
+  color: #04100e;
+  background: #a6fbf0;
+  border-color: #a6fbf0;
+}
+
 .hint {
   margin: 0 0 0 auto;
   font-size: 0.64rem;
@@ -709,6 +727,14 @@ body[data-void="1"] .ro-hits {
 .vt:hover {
   color: var(--jade);
   border-color: rgba(62, 240, 221, 0.45);
+}
+
+/* A tag in the rail is a keyboard door into the graph: focus has to be as
+   visible as hover, since it lights the cluster too. */
+.vt:focus-visible {
+  color: var(--jade);
+  border-color: var(--jade);
+  outline: none;
 }
 
 .vt .n {

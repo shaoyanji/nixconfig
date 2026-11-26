@@ -48,11 +48,28 @@ SENDERS = [
      "oldest": "2026-05-12T16:04:15Z", "newest": "2026-11-25T15:11:48Z"},
 ]
 
+# Two letter with tags and one the taxonomy never placed: the untagged chip needs
+# both kinds in the same page, and the graph needs a tag-hub with neighbours.
+ROWS = [
+    {"id": 1, "messageId": "m1", "sender": "GitHub <noreply@github.com>",
+     "subject": "CI failure on main", "sentAt": "2026-11-26T09:00:00Z",
+     "snippet": "build failed", "score": 0.9, "box": "inbox",
+     "tags": ["ci", "github"], "categories": []},
+    {"id": 2, "messageId": "m2", "sender": "Kleinanzeigen <noreply@mail.kleinanzeigen.de>",
+     "subject": "your ad expires today", "sentAt": "2026-11-25T09:00:00Z",
+     "snippet": "renew it", "score": 0.5, "box": "inbox",
+     "tags": ["market"], "categories": []},
+    {"id": 3, "messageId": "m3", "sender": "Someone <hello@example.com>",
+     "subject": "no tag at all", "sentAt": "2026-11-24T09:00:00Z",
+     "snippet": "hello", "score": 0.2, "box": "inbox",
+     "tags": [], "categories": []},
+]
+
 ANSWERS = {
     "/api/atlas-senders": SENDERS,
     "/api/atlas-taxonomy": [],
     "/api/atlas-stats": {"letters": 1178, "inbox": 1178, "queued": 0, "tagged": 1100, "commands": 0},
-    "/api/atlas-search": {"total": 0, "hits": []},
+    "/api/atlas-search": ROWS,
     "/api/atlas-tags": [],
     "/api/atlas-actions": [],
 }
@@ -116,6 +133,48 @@ cat >"$work/probe.js" <<'JS'
     }
     return false;
   };
+  // Triage and cluster first, so the drawer's query does not colour the state
+  // these assertions read.
+  const chips = () => [...document.querySelectorAll("#chips .chip")];
+  const chipFor = (text) => chips().find((chip) => chip.textContent.trim().startsWith(text));
+  const letters = () => [...document.querySelectorAll("#results li.letter")];
+  await until(() => letters().length === 3);
+  out.loaded = letters().length;
+  out.untaggedChip = chipFor("untagged")?.textContent.trim() || "";
+  chipFor("untagged")?.click();
+  await until(() => letters().length === 1);
+  out.untaggedRows = letters().map((li) => li.textContent.trim());
+  out.untaggedPressed = chipFor("× untagged")?.getAttribute("aria-pressed") || "";
+  chipFor("× untagged")?.click();
+  await until(() => letters().length === 3);
+  out.afterClear = letters().length;
+
+  const canvas = document.getElementById("atlas-graph");
+  const hub = document.querySelector("#view-tags .vt");
+  out.hub = hub?.textContent.trim() || "";
+  if (hub) {
+    hub.dispatchEvent(new MouseEvent("mouseenter"));
+    await new Promise((r) => setTimeout(r, 150));
+    out.focus = canvas?.dataset.focus || "";
+    out.cluster = canvas?.dataset.cluster || "";
+    hub.dispatchEvent(new MouseEvent("mouseleave"));
+    await new Promise((r) => setTimeout(r, 80));
+    out.focusAfter = canvas?.dataset.focus || "";
+  }
+
+  const form = document.getElementById("search-form");
+  const q = document.getElementById("q");
+  q.value = "invoices";
+  form.requestSubmit();
+  // The chip for the query in flight is filtered out (a suggestion of what you
+  // already typed is noise), so the stored list is what proves the search ran.
+  await until(() => (localStorage.getItem("atlas.recent") || "").includes("invoices"));
+  q.value = "";
+  form.requestSubmit();
+  await until(() => chips().some((c) => c.textContent.trim() === "invoices"));
+  out.chipLabels = [...document.querySelectorAll("#chips .label")].map((l) => l.textContent.trim());
+  out.recent = chips().map((c) => c.textContent.trim());
+
   const button = document.getElementById("sources-open");
   out.button = !!button;
   if (!button) return JSON.stringify(out);
@@ -160,6 +219,28 @@ except ValueError:
     sys.exit(1)
 
 fails = []
+if data.get("loaded") != 3:
+    fails.append(f"expected 3 letters on the first page, saw {data.get('loaded')}")
+if "untagged" not in (data.get("untaggedChip") or ""):
+    fails.append(f"no untagged chip: {data.get('untaggedChip')!r}")
+if data.get("untaggedRows") and len(data["untaggedRows"]) != 1:
+    fails.append(f"the untagged view kept {len(data['untaggedRows'])} rows: {data['untaggedRows']}")
+elif data.get("untaggedRows") and "no tag at all" not in " ".join(data["untaggedRows"]):
+    fails.append(f"the untagged view kept the wrong row: {data['untaggedRows']}")
+if data.get("untaggedPressed") != "true":
+    fails.append(f"the untagged chip does not read as pressed: {data.get('untaggedPressed')!r}")
+if data.get("afterClear") != 3:
+    fails.append(f"clearing the untagged chip did not restore the page: {data.get('afterClear')}")
+if not (data.get("focus") or "").startswith("tag:"):
+    fails.append(f"a rail tag did not focus its cluster: {data.get('focus')!r}")
+if int(data.get("cluster") or 0) < 2:
+    fails.append(f"the focused cluster has no neighbours: {data.get('cluster')!r}")
+if data.get("focusAfter") != "":
+    fails.append(f"the cluster stayed lit after the pointer left: {data.get('focusAfter')!r}")
+if "recent" not in (data.get("chipLabels") or []):
+    fails.append(f"no recent-queries row: chips {data.get('recent')} labels {data.get('chipLabels')}")
+if "invoices" not in (data.get("recent") or []):
+    fails.append(f"the last query is not offered back: {data.get('recent')}")
 if not data.get("button"):
     fails.append("#sources-open is missing")
 if not data.get("open"):
@@ -181,5 +262,11 @@ if fails:
     for line in fails:
         print(f"FAIL {line}", file=sys.stderr)
     sys.exit(1)
-print(f"PASS sources drawer: {data['rows']} rows, first {data['domains'][0]}, click searched {data['q']}")
+print(
+    f"PASS sources drawer: {data['rows']} rows, first {data['domains'][0]}, click searched {data['q']}"
+)
+print(
+    f"PASS triage + cluster: untagged kept {len(data['untaggedRows'])} of {data['loaded']}, "
+    f"hub {data['hub']} lit {data['cluster']} nodes, recent {data['recent']}"
+)
 PY

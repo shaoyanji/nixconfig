@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-26T17:34:53Z",
+  "generated": "2026-11-26T17:40:13Z",
   "count": 200,
-  "pin": "129ceeb11205caecca4366a341c24404e552b57f07d721de9f5a35b566bc11ea",
+  "pin": "b849c557f21b8314be6ad8685131cb8f0a80e9bfbcf7c0c20049f270f458b3f1",
   "turns": [
+    {
+      "id": "c39f262b-f061-41c4-b5e3-85ccba1a2c0f",
+      "ts": "2026-11-26T17:35:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-graph-clustering",
+      "action": "claim: relation-graph clustering (tag-hub highlight on hover/focus) + triage quick chips (untagged-only, recent queries) in mail-atlas site",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/mail-atlas/site"
+      ],
+      "files": [],
+      "base_commit": "febdaf8a672d1a24f2d9aacfd67087f295212d0f",
+      "branch": "main",
+      "frame": "03hb4c9gkeavqmhycxm9dn3g5"
+    },
+    {
+      "id": "d7375a3e-b62c-4827-906a-e96627168c9b",
+      "ts": "2026-11-26T17:34:59Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-docs-analytics-telemetry",
+      "action": "landed: docs/portfolio-services.md now names the /api/analytics report behind each panel and what the panel does with it (jobs bars filter the list), clanker-runner presets + schedules (4 code-declared presets, interval 15-604800), service-portal-telemetry /api/telemetry live badges (online/degraded/offline, decoration only), and the four-service smoke with the skipped-on-empty QR | gate: checks:prose PASS, ops:docs:budget PASS (223/400), checks:docs:links PASS",
+      "outcome": "done",
+      "claims": [
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "febdaf8a672d1a24f2d9aacfd67087f295212d0f",
+      "branch": "main",
+      "frame": "03hb4c5asawawl3bibpq863bz"
+    },
     {
       "id": "f516c8ff-be64-4280-b4ec-c2de605f58d8",
       "ts": "2026-11-26T17:30:48Z",
@@ -2998,37 +3028,6 @@
       "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
       "branch": "main",
       "frame": "03hb2td5vczx35tc0h479sh9x"
-    },
-    {
-      "id": "377a0afa-6b72-4233-91a4-773a521d495e",
-      "ts": "2026-11-26T12:54:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:hosts-args-test-fix",
-      "action": "task-change|0.61|0.25: fix checks:hosts:args:test in checks:quick",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/checks.yml",
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2tasqkesl2v2cgkjs1hrs"
-    },
-    {
-      "id": "32198f96-d59e-4fe6-8bbf-5238a6d43200",
-      "ts": "2026-11-26T12:53:56Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-26f",
-      "action": "landed: e4dd1d26 fix(jobsearch) fold_umlauts in norm | gate: --self-test 20/20 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2t8vq7ur38tfys28cx285"
     }
   ]
 }

@@ -259,7 +259,7 @@ class EndpointTest(unittest.TestCase):
         fetch = responder({"/api/presets": (200, "application/json", body({"items": [1, 2], "total": 2}))})
         ok, detail = smoke.check_endpoint(BASE, "/api/presets", fetch=fetch)
         self.assertTrue(ok)
-        self.assertIn("2 item(s)", detail)
+        self.assertIn("2 row(s)", detail)
 
     def test_an_object_without_items_passes(self):
         fetch = responder({"/api/schedules": (200, "application/json", body({"total": 0}))})
@@ -303,6 +303,7 @@ class ServiceTest(unittest.TestCase):
         deals=BASE,
         inventory=BASE,
         clanker=BASE,
+        link_vault=BASE,
         timeout=5.0,
         query="",
         expect_hit=False,
@@ -341,6 +342,26 @@ class ServiceTest(unittest.TestCase):
             [c["check"] for c in result["checks"]],
             ["health", "stats", "page", "machines", "presets", "schedules"],
         )
+
+    def test_link_vault_searches_links_and_tags(self):
+        fetch = responder({
+            "/api/health": (200, "application/json", body({"ok": True, "service": "link-vault"})),
+            "/api/stats": (200, "application/json", body({"bookmarks": 0})),
+            "/api/links": (200, "application/json", body({"links": [{"id": 1}], "count": 1})),
+            "/api/tags": (200, "application/json", body({"tags": ["nix"], "count": 1})),
+            "/": (200, "text/html", '<html><section id="metrics"></section>'),
+        })
+        result = smoke.smoke_service("link_vault", smoke.SERVICES["link_vault"], self.ARGS, fetch=fetch)
+        self.assertTrue(result["ok"])
+        self.assertEqual(
+            [c["check"] for c in result["checks"]],
+            ["health", "stats", "page", "search", "tags"],
+        )
+        self.assertIn("1 row(s)", [c["detail"] for c in result["checks"] if c["check"] == "tags"][0])
+
+    def test_a_links_wrapper_is_rows(self):
+        self.assertEqual(smoke.rows_of({"links": [{"id": 1}], "count": 1}), [{"id": 1}])
+        self.assertEqual(smoke.rows_of({"tags": ["nix"], "count": 1}), ["nix"])
 
     def test_an_unreachable_service_fails_once_without_hiding_it(self):
         def fetch(url, timeout=10.0):
@@ -417,6 +438,7 @@ class MainTest(unittest.TestCase):
         "8502": "private-deals",
         "8503": "inventory-site",
         "8504": "clanker-runner",
+        "8506": "link-vault",
     }
 
     def fake_fetch(self, stats_status=200):
@@ -432,7 +454,10 @@ class MainTest(unittest.TestCase):
                 return 200, "application/json", body({"generated_at": "now", "items": []})
             if "/api/" in url:
                 return 200, "application/json", body({"items": []})
-            return 200, "text/html", '<html><div id="stats"></div><div id="metric-jobs"></div><div id="machines"></div>'
+            return 200, "text/html", (
+                '<html><div id="stats"></div><div id="metric-jobs"></div>'
+                '<div id="machines"></div><section id="metrics"></section>'
+            )
 
         return fetch
 
@@ -444,6 +469,7 @@ class MainTest(unittest.TestCase):
             "--deals", "http://127.0.0.1:8502",
             "--inventory", "http://127.0.0.1:8503",
             "--clanker", "http://127.0.0.1:8504",
+            "--link-vault", "http://127.0.0.1:8506",
             *argv_extra,
         ]
         with mock.patch.object(sys, "argv", argv), \
@@ -457,14 +483,18 @@ class MainTest(unittest.TestCase):
         summary = json.loads(out)
         self.assertEqual(code, 0)
         self.assertTrue(summary["ok"])
-        self.assertEqual(sorted(summary["services"]), ["clanker", "deals", "inventory", "jobs"])
+        self.assertEqual(
+            sorted(summary["services"]), ["clanker", "deals", "inventory", "jobs", "link_vault"]
+        )
 
     def test_a_red_run_exits_one_and_names_the_service(self):
         code, out = self.run_main(self.fake_fetch(stats_status=500))
         summary = json.loads(out)
         self.assertEqual(code, 1)
         self.assertFalse(summary["ok"])
-        self.assertEqual(sorted(summary["failed"]), ["clanker", "deals", "inventory", "jobs"])
+        self.assertEqual(
+            sorted(summary["failed"]), ["clanker", "deals", "inventory", "jobs", "link_vault"]
+        )
         self.assertTrue(all(not s["ok"] for s in summary["services"].values()))
 
     def test_toon_is_read_back_as_toon(self):

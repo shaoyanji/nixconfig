@@ -1,8 +1,41 @@
 {
-  "generated": "2026-11-26T18:01:05Z",
+  "generated": "2026-11-26T18:07:08Z",
   "count": 200,
-  "pin": "aefd7dc187cf832ac31e6220822b44d4602a38453bba718e61dd1c756ef4da51",
+  "pin": "73a78feaadb96e804a29f1ebddf16bc24d6e48148807ea0ff0bca905148d97b6",
   "turns": [
+    {
+      "id": "04aa4a75-01ce-4d4e-88af-e63d4095338f",
+      "ts": "2026-11-26T18:02:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-smoke-link-vault",
+      "action": "claim: cover link-vault (8106: health/stats/links/tags/page) in portfolio-smoke, its --link-vault flag, task summary and docs",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke",
+        "taskfiles/agents.yml",
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "53eda1adbe3ead1a7888b413d824d114ad573a14",
+      "branch": "main",
+      "frame": "03hb4hhznklbcd4g27j7cctja"
+    },
+    {
+      "id": "5d67a017-3811-4bd1-a07f-a7b5cf72f966",
+      "ts": "2026-11-26T18:01:19Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-docs-link-vault",
+      "action": "landed: docs/portfolio-services.md covers link-vault (8106/8468, FTS5 over title/description/content/excerpt/site/tags, unread-read-archived, firecrawl /v2/scrape -> tavily -> context -> http, collections, tags, import, export.json/.md), the five telemetry targets (bookmarks/read/tags on the badge), and agents:web firecrawl /v2/search + --format markdown | gate: checks:prose PASS, ops:docs:budget 270/400, checks:docs:links PASS after rewording a literal [title](url) the gate read as a link",
+      "outcome": "done",
+      "claims": [
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "53eda1adbe3ead1a7888b413d824d114ad573a14",
+      "branch": "main",
+      "frame": "03hb4hafmp1f7mgmvdtics9cs"
+    },
     {
       "id": "3979eb7e-478b-4b96-8b2f-18e16ac5b712",
       "ts": "2026-11-26T18:00:02Z",
@@ -2997,40 +3030,6 @@
       "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
       "branch": "main",
       "frame": "03hb2yeyevhpuripmm7u48bj0"
-    },
-    {
-      "id": "580ecae1-6113-4e50-af6e-173e5c57f268",
-      "ts": "2026-11-26T13:18:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:appflow-guard-audit",
-      "action": "landed: appflow guard audit, no code change. checks:quick PASS (rc 0, 286 ok lines, 51 steps) and check:list KIND=host PASS (rc 0, 6 gates). No failing gate. guards are not in checks:quick: apps-db-guard + sync-guard only run under checks:appflow, which also PASSES rc 0",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/appflow-gate.sh",
-        "scripts/task/appflow-send.sh"
-      ],
-      "files": [
-        "scripts/task/appflow-gate.sh"
-      ],
-      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
-      "branch": "main",
-      "frame": "03hb2y03me21fhn6e9q1d4l4m"
-    },
-    {
-      "id": "2254f878-fa97-4e6b-80ba-2992ef67809e",
-      "ts": "2026-11-26T13:17:43Z",
-      "source": "freebuff",
-      "subject": "nixconfig:appflow-guard-audit",
-      "action": "claim: audit appflow guard scripts — run checks:quick + check:list KIND=host, report failing gates",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/appflow-gate.sh",
-        "scripts/task/appflow-send.sh"
-      ],
-      "files": [],
-      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
-      "branch": "main",
-      "frame": "03hb2xw1fxzss7bo04ygnu55b"
     }
   ]
 }

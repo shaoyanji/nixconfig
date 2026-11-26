@@ -186,9 +186,8 @@ nothing, and `--format toon` renders the summary an agent reads. A page with no
 postings is a zero rather than a failure; a refused record exits 1 with the first
 error named, while the lanes that succeeded still report what landed.
 
-One verb proves four of the five end to end — the three indexes and
-clanker-runner; `link-vault` has Go tests but no task-level smoke yet — and is
-the one to run after a deploy or a schema change:
+One verb proves all five services end to end, and is the one to run after a
+deploy or a schema change:
 
 ```bash
 task agents:portfolio:smoke                      # loopback defaults on delphi
@@ -202,11 +201,12 @@ is), `/api/stats`, `/api/analytics` where one exists (JSON that still names its
 window), `/` as HTML carrying the element the JS fills, and one search.
 inventory-site also renders the QR label for its first asset — on an empty register
 the check reports itself skipped and says why instead of passing as though it had
-looked — and clanker-runner answers `/api/machines`, `/api/presets` and
-`/api/schedules`. An empty result passes — "nothing matched" is an answer — so
-the check works on a fresh database; `--expect-hit` is for when the data should be
-there. Each base is overridable — `--jobs`, `--deals`, `--inventory`, `--clanker`
-— so the same verb can point at the tailnet mounts. Exit 1 names the service that
+looked — clanker-runner answers `/api/machines`, `/api/presets` and
+`/api/schedules`, and link-vault searches `/api/links` and reads `/api/tags`. An
+empty result passes — "nothing matched" is an answer — so the check works on a
+fresh database; `--expect-hit` is for when the data should be there. Each base is
+overridable — `--jobs`, `--deals`, `--inventory`, `--clanker`, `--link-vault` — so
+the same verb can point at the tailnet mounts. Exit 1 names the service that
 failed.
 
 ```bash

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""One smoke run over the four portfolio services.
+"""One smoke run over the five portfolio services.
 
-`job-db-scraper` (:8464), `private-deals` (:8465), `inventory-site` (:8466) and
-`clanker-runner` (:8467) each serve a Go HTML reader and a JSON API from the same
-binary over SQLite with an FTS5 index. They fail in ways a `systemctl is-active`
+`job-db-scraper` (:8464), `private-deals` (:8465), `inventory-site` (:8466),
+`clanker-runner` (:8467) and `link-vault` (:8468) each serve a Go HTML reader and
+a JSON API from the same binary over SQLite with an FTS5 index. They fail in ways a `systemctl is-active`
 cannot see: the process answers, the page renders, and the query behind it is
 broken — an index that never got built, a stats query against a renamed column, a
 shell whose JS throws before it draws. This runs the things a person actually
@@ -69,6 +69,16 @@ SERVICES = {
         "endpoints": ("/api/machines", "/api/presets", "/api/schedules"),
         "query": "",
     },
+    # The key stays a Python name; the flag is the service's own spelling.
+    "link_vault": {
+        "label": "link-vault",
+        "flag": "link-vault",
+        "api": "http://127.0.0.1:8106",
+        "search": "/api/links",
+        "id": "metrics",
+        "endpoints": ("/api/tags",),
+        "query": "nix",
+    },
 }
 
 
@@ -112,7 +122,7 @@ def rows_of(payload):
     if isinstance(payload, list):
         return payload
     if isinstance(payload, dict):
-        for key in ("items", "rows", "results"):
+        for key in ("items", "rows", "results", "links", "tags"):
             if isinstance(payload.get(key), list):
                 return payload[key]
     return None
@@ -192,14 +202,11 @@ def check_endpoint(base, path, timeout=10.0, fetch=fetch):
         payload = json.loads(body)
     except json.JSONDecodeError as exc:
         return False, f"{path} is not JSON: {exc}"
-    if isinstance(payload, list):
-        return True, f"{path} -> {len(payload)} row(s)"
-    if isinstance(payload, dict):
-        rows = payload.get("items")
-        if isinstance(rows, list):
-            return True, f"{path} -> {len(rows)} item(s)"
-        if payload:
-            return True, f"{path} -> {len(payload)} keys"
+    rows = rows_of(payload)
+    if rows is not None:
+        return True, f"{path} -> {len(rows)} row(s)"
+    if isinstance(payload, dict) and payload:
+        return True, f"{path} -> {len(payload)} keys"
     return False, f"{path} answered neither rows nor an object: {body[:80]!r}"
 
 
@@ -345,9 +352,11 @@ def smoke_service(key, spec, args, fetch=fetch, run=subprocess.run):
 def main() -> int:
     parser = argparse.ArgumentParser(description="Smoke the four portfolio services end to end.")
     for key, spec in SERVICES.items():
-        parser.add_argument(f"--{key}", default=spec["api"], help=f"{spec['label']} base URL")
+        parser.add_argument(
+            f"--{spec.get('flag', key)}", dest=key, default=spec["api"], help=f"{spec['label']} base URL"
+        )
     parser.add_argument("--timeout", type=float, default=10.0, help="seconds per HTTP request")
-    parser.add_argument("--query", default="", help="search term for all three (default: per service)")
+    parser.add_argument("--query", default="", help="one search term for every service (default: per service)")
     parser.add_argument("--expect-hit", action="store_true", help="a search with no rows fails")
     parser.add_argument("--browser", action="store_true", help="also check the rendered DOM")
     parser.add_argument("--browser-cmd", default="agent-browser")

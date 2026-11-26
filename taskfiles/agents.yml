@@ -371,14 +371,14 @@ tasks:
     desc: "Smoke the portfolio services end to end: health, stats, analytics, page, search"
     summary: >
       scripts/task/portfolio-smoke.py — one run over job-db-scraper,
-      private-deals, inventory-site and clanker-runner: health answers `ok` with
-      its own name, stats a non-empty object, `/api/analytics` a report naming its
-      window, `/` the element its JS fills, search rows for `q=`, inventory-site a
-      QR label for its first asset (skipped when empty), clanker `/api/machines`,
-      `/api/presets`, `/api/schedules`. Empty answers pass; `--expect-hit` fails
-      them. `--format toon`, `--browser` (DOM half, missing binary = skip),
-      `--jobs/--deals/--inventory/--clanker` for the mounts. Exit 1 names the
-      failure.
+      private-deals, inventory-site, clanker-runner and link-vault: health answers
+      `ok` with its own name, stats a non-empty object, `/api/analytics` a windowed
+      report, `/` the element its JS fills, search rows for `q=`, a QR label for
+      one asset (skipped when empty), clanker's machines/presets/schedules,
+      link-vault's `/api/tags`. Empty answers pass; `--expect-hit` fails them.
+      `--format toon`, `--browser` (DOM half, missing binary = skip),
+      `--jobs/--deals/--inventory/--clanker/--link-vault` for the mounts. Exit 1
+      names the failure.
     cmds:
       - python3 scripts/task/portfolio-smoke.py {{.CLI_ARGS}}
 

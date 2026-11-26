@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-26T10:09:59Z",
+  "generated": "2026-11-26T11:39:53Z",
   "count": 200,
-  "pin": "811697422a2a0f638146b261bcadfc3090dde042467840646a72e195a55f28d5",
+  "pin": "61d0f6b87bddeaa736c8a66673a2488b87e569eb8716d4b0ec45eb35be62c7d2",
   "turns": [
+    {
+      "id": "69e34e46-33a4-4560-afac-77513494a5de",
+      "ts": "2026-11-26T10:10:13Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: place layer — .#intents.places closed vocabulary (eval|local-gate|nix-tool|delphi|clanker), per-kind+per-capability place, admit reach refusal, capReachMisses invariant; devji capability un-reds checks:intents; prose-budget records 3 skills; policy work-places-where-it-costs; fixture 17 cases | gate: checks:intents PASS, checks:policies PASS, checks:prose PASS, checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8547694206e7a7371b4cb3102c5980d0b6de1781",
+      "branch": "main",
+      "frame": "03hb1x9j74fxg31b14pcsegz5"
+    },
     {
       "id": "a620fc6b-e890-447a-9484-da9aaa5723b9",
       "ts": "2026-11-26T10:03:54Z",
@@ -2868,21 +2881,6 @@
       "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
       "branch": "main",
       "frame": "03haw9qwsg791e962jl8imi0k"
-    },
-    {
-      "id": "27553c48-80d1-4e38-9b7d-5d95841e3437",
-      "ts": "2026-11-25T16:48:05Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verify image-daily Go port gates: dispatch agreement, judge fallback, spend breakers, shrink guard",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/image-daily-gate.sh"
-      ],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03haw9osd5yr1u8fkgkvrjmyn"
     }
   ]
 }

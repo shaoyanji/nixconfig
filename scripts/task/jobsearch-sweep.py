@@ -459,6 +459,7 @@ def main() -> int:
             rejected.append(dict(company=company, title=row["title"], board=row["board"],
                                  url=row["url"], reason="agency or consultancy"))
             continue
+        folded = norm(strip_place_prefix(company))
         candidates.setdefault(folded, []).append(row)
 
     ranked = []

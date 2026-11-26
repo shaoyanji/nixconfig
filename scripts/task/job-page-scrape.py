@@ -190,12 +190,22 @@ def split_bullets(title: str):
     return parts[0], location[:80] if location else None
 
 
+# Greenhouse cards glue the work type to the name — `CommercialRemote - Germany`
+# — because the label is two spans with no space between them.
+GLUED_LOCATION = re.compile(
+    r"(?<=[a-z\)])\s*((?:Remote|Hybrid|On-?site|In-?office)(?:\s*[-–]\s*[A-Z][^,•|]{1,60})?)\s*$"
+)
+
+
 def split_title_location(text: str):
     """A rendered card label into title and location."""
     title = clean_title(text)
     bullet = split_bullets(title)
     if bullet:
         return bullet
+    glued = GLUED_LOCATION.search(title)
+    if glued and glued.start() >= 3:
+        return title[: glued.start()].strip(" ,&|-–—"), re.sub(r"\s+", " ", glued.group(1))[:80]
     for word in re.finditer(r"\S+", title):
         start = word.start()
         if start < 3:
@@ -329,6 +339,24 @@ JSONLD = re.compile(
 )
 
 
+def jsonld_location(item: dict) -> str | None:
+    """The place a JobPosting names, when it names one."""
+    place = item.get("jobLocation")
+    if isinstance(place, list):
+        place = place[0] if place else None
+    address = (place or {}).get("address") if isinstance(place, dict) else None
+    if isinstance(address, str):
+        return address.strip()[:80] or None
+    if isinstance(address, dict):
+        parts = [str(address.get(key) or "").strip() for key in ("addressLocality", "addressRegion")]
+        joined = ", ".join(part for part in parts if part)
+        if joined:
+            return joined[:80]
+    if str(item.get("jobLocationType") or "").upper() in {"TELECOMMUTE", "REMOTE"}:
+        return "Remote"
+    return None
+
+
 def from_jsonld(html: str):
     jobs = []
     for blob in JSONLD.findall(html):
@@ -341,10 +369,10 @@ def from_jsonld(html: str):
                 continue
             if item.get("@type") != "JobPosting":
                 continue
-            title = clean_title(str(item.get("title") or ""))
+            title, derived = split_title_location(str(item.get("title") or ""))
             url = item.get("url") or item.get("@id") or ""
             if title and url:
-                jobs.append({"title": title, "url": canon(url), "location": None})
+                jobs.append({"title": title, "url": canon(url), "location": jsonld_location(item) or derived})
     return jobs
 
 

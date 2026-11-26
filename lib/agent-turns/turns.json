@@ -1,8 +1,94 @@
 {
-  "generated": "2026-11-26T15:01:21Z",
+  "generated": "2026-11-26T15:05:01Z",
   "count": 200,
-  "pin": "c6d7d36f8ce672a0864e0e85e9b2a4e5dcc055a3b5805f0c4bdb80dc5cd662a3",
+  "pin": "3b25e06153ec551cc496f37c02c4dc81c2c52770f77382d3ba03063b4d2c6f6b",
   "turns": [
+    {
+      "id": "aac2d222-c7f1-4682-941c-d756f8397773",
+      "ts": "2026-11-26T15:04:07Z",
+      "source": "devin",
+      "subject": "nixconfig:private-deals-batch-alerts",
+      "action": "claim: upgrade private-deals with POST /api/deals/batch, watchlist-match alert evaluation, optional ntfy/webhook notifications deduped per deal+price, price-history/trend and alert UI polish; scoped only to modules/services/private-deals*",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix"
+      ],
+      "files": [],
+      "base_commit": "4960effb92e8e9f98795b7606fa5c39b38982505",
+      "branch": "main",
+      "frame": "03hb3io9kbx6z3sl6fink2jkt"
+    },
+    {
+      "id": "463474c7-014b-49e4-9052-d046f82867b1",
+      "ts": "2026-11-26T15:03:10Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "landed: published matt CV site origin (root 61cc526f22f453ed == artifact), appflow guard audit green (checks:appflow + roundtrip, 380 docs) | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3ihpemnanl3uau7uqzkb2"
+    },
+    {
+      "id": "26099aa7-ace7-4a8e-9266-0362f4bf07c1",
+      "ts": "2026-11-26T15:02:22Z",
+      "source": "buffy",
+      "subject": "nixconfig:e2e-task-verbs-and-clanker",
+      "action": "claim: exercise agents:web, apps:page+apps:ingest, deals:page+deals:ingest end to end against local test instances and fix what breaks",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task tests"
+      ],
+      "files": [],
+      "base_commit": "4960effb92e8e9f98795b7606fa5c39b38982505",
+      "branch": "main",
+      "frame": "03hb3ibzxoixy1k9h08pxl39l"
+    },
+    {
+      "id": "57f27219-c17d-4299-ad57-0bc75fe68805",
+      "ts": "2026-11-26T15:01:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:checks-tasks-apps-summary",
+      "action": "apps:sweep:pipeline summary 648 -> 534 chars, same facts (six boards, lane filter, dedupe, not-filed rule, APPLY/MAIL/XS); task checks:tasks now 'hard violations: none' exit 0. Health: sentinel ok, clanker running, delphi disk 87G/195G (48%, 98G free), mem 4.7Gi/11Gi used 6.9Gi avail, zram 1G/5.8G, 0 failed units, running, load 2.19.| gate: task checks:tasks exit 0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4960effb92e8e9f98795b7606fa5c39b38982505",
+      "branch": "main",
+      "frame": "03hb3i65rd4n53fioopvz3cu2"
+    },
+    {
+      "id": "ccd5d718-3594-403f-94ef-f548d5d8949c",
+      "ts": "2026-11-26T15:01:29Z",
+      "source": "devin",
+      "subject": "nixconfig:inventory-site-service",
+      "action": "landed inventory-site: Go SQLite/FTS5 asset register with items, locations, categories, tags, serials, warranties, value, JSON+CSV import/export, inventory.toml host seed, API+UI; delphi mount 8466 -> 127.0.0.1:8103 | gates: go test PASS, go vet PASS, aarch64 nix build PASS, alejandra PASS, checks:registry:compiled PASS, checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/inventory-site",
+        "modules/services/inventory-site.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [
+        "modules/services/inventory-site",
+        "modules/services/inventory-site.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "base_commit": "0a7e5995",
+      "branch": "main",
+      "frame": "03hb3i5r0vb8pbbr3qfq0t8a1"
+    },
     {
       "id": "f77e1a67-42bc-4e76-b1f0-9b4608b96bb0",
       "ts": "2026-11-26T15:01:16Z",
@@ -2962,77 +3048,6 @@
       "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
       "branch": "main",
       "frame": "03hb0vgdzbl63p0ba9l33nlfh"
-    },
-    {
-      "id": "1bfc9c3f-486a-404c-a296-5cdb52f6fe81",
-      "ts": "2026-11-26T06:53:28Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-fresh",
-      "action": "tailored and sent the one sendable lead from the 25t/u/q sweeps: Sunrise Medical IT Infrastructure Specialist - English letter to Ms Pawlik + English CV built into submissions via agents:apps:packet, sent to candidate@sunrisemedical.de with EARLY=1 over the 2026-12-07 hold; ledger flipped to applied, follow-up 2026-12-10. 35 rows remain: 7 have JD text but no mailbox (portal-only), 28 have no stored JD, none carries recruiter_email | gate: apps:send exit 0 + row stage applied",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
-      "branch": "main",
-      "frame": "03hb0utx031oe8syy1oirkixs"
-    },
-    {
-      "id": "b7ba3a89-3175-41c8-a04e-7aa75c9adc9a",
-      "ts": "2026-11-26T06:52:24Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: pipe loop found 0 remaining filter|>length sites (class closed at 763eaa83); turned the class into a nix-style rule so it cannot regress + fixture seeded-case/controls | gate: nix-style 9/9 fixture, tasks, yaml:lint, check:verify 156 | checks:host n/a — script-only, no host closure surface",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
-      "branch": "main",
-      "frame": "03hb0umdztat3ias3duzxkwqg"
-    },
-    {
-      "id": "a10f9ec3-0e6e-4fd5-a43c-0f63741acc84",
-      "ts": "2026-11-26T06:48:54Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "start: continue lib/*.nix pipe-operator review — survey remaining |>, check blast radius",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/"
-      ],
-      "files": [],
-      "base_commit": "404e3da57327397be9c341336a951a50c37ca407",
-      "branch": "main",
-      "frame": "03hb0txpnhnyct5t1q96nop6z"
-    },
-    {
-      "id": "231187a9-28b3-419a-83f4-3032b0558b92",
-      "ts": "2026-11-26T06:47:16Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "publish | gate: agents:cv:publish-check PASS 0 problems - built .#sites.matt-site at nixconfig f544ffb9, six CVs hash-equal to blog assets/files at 64eaf48, _site rebuilt from that checkout, 6/6 anchors carry download, live is-a.dev hashes match. Closes the _site claim tmux-pane-steward left in_progress at 18:49",
-      "outcome": "done",
-      "claims": [
-        "_site"
-      ],
-      "files": [
-        "_site assets/files"
-      ],
-      "base_commit": "404e3da57327397be9c341336a951a50c37ca407",
-      "branch": "main",
-      "frame": "03hb0tm81535m3tvt8ro8nskr"
-    },
-    {
-      "id": "080a1d0a-cd06-4cb3-ba65-ec767994dbf4",
-      "ts": "2026-11-26T06:39:04Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0725",
-      "action": "landed: dropped redundant sopsFile (base-node defaultSopsFile covers it — verified eval); same residual noted in 3 sibling modules for a later pass | gate: drv-equality delphi + nix:lint 333 + sops:drift 8/8",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "404e3da57327397be9c341336a951a50c37ca407",
-      "branch": "main",
-      "frame": "03hb0s0kap50aahez96838vxd"
     }
   ]
 }

@@ -93,6 +93,28 @@ class TitleCleanTest(unittest.TestCase):
         )
 
 
+class GluedLabelTest(unittest.TestCase):
+    """Greenhouse cards put two spans together with no space between them."""
+
+    def test_glued_work_type_becomes_the_location(self):
+        self.assertEqual(
+            scrape.split_title_location("Account Executive, CommercialRemote - Germany"),
+            ("Account Executive, Commercial", "Remote - Germany"),
+        )
+
+    def test_glued_hybrid_with_a_city(self):
+        self.assertEqual(
+            scrape.split_title_location("Account Executive, StartupsHybrid - San Francisco"),
+            ("Account Executive, Startups", "Hybrid - San Francisco"),
+        )
+
+    def test_a_spaced_work_type_still_splits_once(self):
+        self.assertEqual(
+            scrape.split_title_location("Senior Backend Engineer Remote"),
+            ("Senior Backend Engineer", "Remote"),
+        )
+
+
 class PostingShapeTest(unittest.TestCase):
     def test_board_shapes_are_postings(self):
         for url in (LEVER_JOB, ASHBY, GREENHOUSE, WORKDAY):
@@ -232,6 +254,31 @@ class JsonLdTest(unittest.TestCase):
         html = f'<html><body><a href="{GREENHOUSE}">Data Engineer</a></body></html>'
         jobs = scrape.from_html(html, LEVER)
         self.assertEqual([job["title"] for job in jobs], ["Data Engineer"])
+
+
+class JsonLdLocationTest(unittest.TestCase):
+    def test_address_locality_and_region(self):
+        item = {"jobLocation": {"address": {"addressLocality": "Berlin", "addressRegion": "BE"}}}
+        self.assertEqual(scrape.jsonld_location(item), "Berlin, BE")
+
+    def test_a_list_of_places_takes_the_first(self):
+        item = {"jobLocation": [{"address": {"addressLocality": "London"}}]}
+        self.assertEqual(scrape.jsonld_location(item), "London")
+
+    def test_telecommute_is_remote(self):
+        self.assertEqual(scrape.jsonld_location({"jobLocationType": "TELECOMMUTE"}), "Remote")
+
+    def test_no_place_is_no_location(self):
+        self.assertIsNone(scrape.jsonld_location({}))
+
+    def test_a_posting_carries_the_place_it_names(self):
+        html = (
+            '<script type="application/ld+json">{"@type": "JobPosting", "title": "SRE", '
+            '"url": "https://job-boards.greenhouse.io/acme/jobs/1", '
+            '"jobLocation": {"address": {"addressLocality": "Berlin"}}}</script>'
+        )
+        jobs = scrape.from_jsonld(html)
+        self.assertEqual((jobs[0]["title"], jobs[0]["location"]), ("SRE", "Berlin"))
 
 
 class KeyLoadingTest(unittest.TestCase):

@@ -2,7 +2,8 @@
 
 Three Go services hold the portfolio's own data on `delphi`: scraped job
 postings, watched products with price history, and the household inventory. A
-fourth, `clanker-runner`, runs the InstaBox jobs beside them and shares their
+fourth, `clanker-runner`, runs the InstaBox jobs beside them, and a fifth,
+`link-vault`, keeps what was read and filed from the web; both share the same
 shape. Each binds loopback only, and each is published by a `tailscale serve`
 mount — nothing opens a port in the firewall, so the mount is the whole exposure
 (`modules/services/service-portal.nix` is the pattern). Each one serves an HTML
@@ -16,6 +17,7 @@ tailnet origin, so a service cannot start without the name it expects.
 | private-deals | `services.privateDeals.enable` | `modules/services/private-deals.nix` | `127.0.0.1:8102` | `:8465` |
 | inventory-site | `services.inventorySite.enable` | `modules/services/inventory-site.nix` | `127.0.0.1:8103` | `:8466` |
 | clanker-runner | `services.clankerRunner.enable` | `modules/services/clanker-runner.nix` | `127.0.0.1:8104` | `:8467` |
+| link-vault | `services.linkVault.enable` | `modules/services/link-vault.nix` | `127.0.0.1:8106` | `:8468` |
 
 ## What each one holds
 
@@ -112,16 +114,35 @@ schedule names a preset, a machine, its params and an `interval_seconds` between
 first run), `DELETE /api/schedules/{id}` removes it, and the service's own loop
 runs what is due — the UI's schedules panel is that list, not a second source.
 
+**link-vault** — links worth keeping, with the page text behind them.
+`GET /api/links?q=` searches title, description, content, excerpt, site name and
+tags through one FTS5 index; `POST /api/links` files one and `POST /api/links/batch`
+files many, both keyed on the canonical URL so a second add updates instead of
+duplicating. A link is `unread`, `read` or `archived` (`POST /api/links/{id}/state`),
+carries tags and an optional collection, and `DELETE /api/links/{id}` removes it.
+
+Extraction is layered and named rather than hidden: `POST /api/links/{id}/extract`
+(or `POST /api/extract` for a preview that stores nothing) tries Firecrawl
+(`/v2/scrape`), Tavily (`/extract`), Context.dev and then a plain HTTP read, and
+`GET /api/extraction/providers` says which of them a configured key enables.
+`GET /api/collections` and `POST /api/collections` are the shelves, `GET /api/tags`
+is the vocabulary actually in use, and `POST /api/import` takes a batch of URLs.
+`GET /api/export.json` and `GET /api/export.md` are the way out: the markdown one
+opens `# Link vault export` and gives each link a second-level heading whose
+title is linked to the URL, followed by its state, source, collection and tags.
+
 ## The portal's live badges
 
 The portal's service cards are compiled from the flake; the badge beside one is
 the only live part. `service-portal-telemetry` (`127.0.0.1:8105`, proxied by nginx
 at `/api/telemetry`, no mount or firewall port of its own) polls the targets under
-`services.servicePortal.telemetry.targets` — `job-db`, `private-deals`,
-`inventory-site` and `clanker-runner` among them — every 10 s with a 750 ms
-timeout per request, and answers `{generated_at, services}`, each service carrying
-`status`, `latency_ms`, `checked_at`, `health`, `stats` and the metrics its target
-declares.
+`services.servicePortal.telemetry.targets` — five of them today: `job-db`,
+`private-deals`, `inventory-site`, `clanker-runner` and `link-vault` — every 10 s
+with a 750 ms timeout per request, and answers `{generated_at, services}`, each
+service carrying `status`, `latency_ms`, `checked_at`, `health`, `stats` and the
+metrics its target declares. A target names up to three stats keys for its badge;
+`link-vault` reads `bookmarks`, `read` and `tags`, which are exactly the keys
+`GET /api/stats` answers with.
 
 Status is `offline` when `/api/health` does not answer, `degraded` when it answers
 `ok: false` or `/api/stats` fails, `online` otherwise; `unknown` is a target the
@@ -142,7 +163,7 @@ no credentials on `delphi`:
 | `apps:ingest` | `scripts/task/jobs-ingest.py` | stdin or `--in` | `POST /api/postings/batch` on job-db-scraper |
 | `deals:page` | `scripts/task/deals-page-scrape.py` | agent-browser, Firecrawl, Context.dev, Tavily, plain GET | stdout JSON, one object per URL |
 | `deals:ingest` | `scripts/task/deals-ingest.py` | stdin or `--in` | `POST /api/deals/batch` on private-deals |
-| `agents:web` | `scripts/task/web-research.py` | the three hosted providers at once, or agent-browser | stdout only |
+| `agents:web` | `scripts/task/web-research.py` | Firecrawl `/v2/search`, Tavily and Context at once, or agent-browser | stdout JSON, TOON, or a cited markdown report |
 | `dev:inventory:site` | `scripts/task/inventory-sync.py` | `nix eval .#inventory.hosts`, or `--in` a JSON dump | `POST /api/items` on inventory-site |
 | `agents:portfolio:seed` | `scripts/task/portfolio-seed.py` | the scrapers and ingesters above, or `--jobs-from` / `--deals-from` | the batch routes and `POST /api/items`, one lane at a time |
 
@@ -165,8 +186,9 @@ nothing, and `--format toon` renders the summary an agent reads. A page with no
 postings is a zero rather than a failure; a refused record exits 1 with the first
 error named, while the lanes that succeeded still report what landed.
 
-One verb proves all four services end to end, and is the one to run after a
-deploy or a schema change:
+One verb proves four of the five end to end — the three indexes and
+clanker-runner; `link-vault` has Go tests but no task-level smoke yet — and is
+the one to run after a deploy or a schema change:
 
 ```bash
 task agents:portfolio:smoke                      # loopback defaults on delphi
@@ -195,11 +217,16 @@ task deals:page -- --backend firecrawl --max 5 https://www.techbargains.com/ > d
 task deals:ingest -- --api https://delphi.cloudforest-kardashev.ts.net:8465 --in deals.json
 
 task agents:web -- search "nix flake devshell" --max 5
+task agents:web -- search "nix flake devshell" --max 4 --format markdown
 task agents:web -- health https://nixos.org/ --via clanker
 
 task dev:inventory:site DRY=1                        # what would be filed
 task dev:inventory:site DRY=0 ONLY=delphi,frieren    # write two hosts
 ```
+
+`--format markdown` on `agents:web` renders the same answer as a report: linked
+titles, `[sN]` citations in the text, and those ids resolved again under
+`## Sources`, which is the half that gets pasted into a document.
 
 Every ingester prints a summary of what it filed, and exits 1 when the server
 refused a record. A refusal inside a batch is counted and named by index (25 per

@@ -23,6 +23,7 @@ wired into `checks:quick` and the pre-commit hook.
 | Composition | `admit {intent, capability}` → `{ok, why}` — kind declared, lane provides it, lane reaches the kind's place, every claim inside radius | `admit` |
 | Route | `route.<kind>` → `{place, tier, io, gate, cmd}` — the Tier-0 query an agent asks before choosing eval, nix-tool, delphi or clanker | `route`, `planOf` |
 | Dedup | `classOf intent` — quotient hash of `kind | sorted claims`; subject does not participate | `keyOf`, `classOf` |
+| Verb | the xs ACTION vocabulary — 15 canonical verbs, tense/morphology `verbAliases`, and artifact classes (actor tags, kind-prefixed dispatches) so the gate's residual is true prose | `verbs`, `verbAliases`, `verbActorArtifacts`, `verbKindArtifacts` |
 
 The refusal classes are the point: a `drive` lane admitting a `chain-change` is
 "route, do not execute" made a predicate; a claim outside the declared radius

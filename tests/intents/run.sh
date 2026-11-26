@@ -17,6 +17,11 @@
 #
 # classOf: two dispatches with the same kind over the same claims share one
 # quotient class — subject does not participate; kind does.
+#
+# verb audit: the snapshot's unmapped ACTION prefixes sort three ways —
+# actor tags (capability ids + lane shorthands), kind-prefixed dispatches,
+# and tense/morphology aliases folding into canonical verbs — leaving only
+# true prose undeclared.
 set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
@@ -126,6 +131,23 @@ in { inherit a b c; }' 2>/dev/null)"
 check "$classes" "same kind+claims share a class (subject, claim order ignored)" '.a == .b' 'true'
 check "$classes" "a different kind is a different class"                         '.a == .c' 'false'
 check "$classes" "the class is a quotient hash (a number)"                       '.a | type == "number"' 'true'
+
+# --- 6. verb audit — the 37-prefix census over the committed snapshot -----------
+vaudit="$(nix eval --json .#intents --apply 'i: {
+  actors = i.verbActorArtifacts;
+  kinds = i.verbKindArtifacts;
+  undeclared = i.undeclaredVerbs;
+  declared = i.verbIds;
+}' 2>/dev/null)"
+
+check "$vaudit" "actor tags sort into artifacts, not verbs"      '.actors | index("devin") != null and index("jev") != null' 'true'
+check "$vaudit" "kind prefixes are dispatches, not verbs"        '.kinds | index("gate-change") != null' 'true'
+check "$vaudit" "no actor tag remains undeclared"                '.undeclared | index("devin") == null and index("steward") == null' 'true'
+check "$vaudit" "no kind id remains undeclared"                  '.undeclared | index("gate-change") == null' 'true'
+check "$vaudit" "aliases canonicalize (verify is not left raw)"  '.undeclared | index("verify") == null' 'true'
+check "$vaudit" "aliases canonicalize (no-op folds into no)"     '.undeclared | index("no-op") == null' 'true'
+check "$vaudit" "the audit declared the verify verb"             '.declared | index("verified") != null' 'true'
+check "$vaudit" "the residual is prose, not convention"          '.undeclared | index("tailored") != null' 'true'
 
 if [ "$fail" -eq 0 ]; then
   echo "intents fixture: all cases ok"

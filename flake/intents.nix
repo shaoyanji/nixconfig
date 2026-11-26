@@ -127,8 +127,34 @@
     publish = "a surface was pushed live";
     blocked = "a hard stop: a credential or an operator action, named";
     "no" = "a refusal or a no-op reported honestly";
+    verified = "a gate or claim re-proved; names what passed";
+    deployed = "went live on the target and was seen healthy there";
+    amended = "the record itself was corrected in place";
+    audit = "a read-only sweep; the verdict is the turn";
+    review = "a read pass over work; the verdict is the turn";
+    refactor = "a shape change with no behavior intended";
   };
   verbIds = builtins.attrNames verbs;
+
+  # Observed spellings to canonical verb ids — the audit lives in tests/intents/run.sh §6.
+  verbAliases = {
+    verify = "verified";
+    "re-verified" = "verified";
+    "boundary-verified" = "verified";
+    "re-ran" = "verified";
+    "read-only" = "verified";
+    published = "publish";
+    "re-published" = "publish";
+    deploy = "deployed";
+    check = "audit";
+    checks = "audit";
+    commit = "landed";
+    move = "refactor";
+    "no-op" = "no";
+  };
+
+  # An ACTION opening with who, not what — capability ids + shorthands from lib/agent-turns/turns.json.
+  actorShorthands = ["jev" "steward" "delphi"];
 
   # --- the capability record --------------------------------------------------
   # A capability is a lane's declared provides: the intent kinds it may admit,
@@ -269,7 +295,12 @@
       then "?"
       else builtins.head m)
     |> lib.unique;
-  undeclaredVerbs = observedVerbs |> builtins.filter (v: !(builtins.elem v verbIds));
+  verbActorArtifacts = observedVerbs |> builtins.filter (v: builtins.elem v (capabilityIds ++ actorShorthands));
+  verbKindArtifacts = observedVerbs |> builtins.filter (v: builtins.elem v kindIds);
+  undeclaredVerbs =
+    (map (v: verbAliases.${v} or v) observedVerbs)
+    |> builtins.filter (v: !(builtins.elem v verbIds) && !(builtins.elem v kindIds) && !(builtins.elem v (capabilityIds ++ actorShorthands)))
+    |> lib.unique;
 
   # The self-check the gate asserts: every declared kind's gate resolves to a
   # real task, every capability provides only declared kinds, the ledger's
@@ -349,11 +380,11 @@
       ++ (undeclaredSources |> map (s: "xs source '${s}' has no capability declaration"));
   in {
     inherit kindGateMisses capKindMisses capFloorMisses kindPlaceMisses capPlaceMisses capReachMisses;
-    inherit sampleMisses undeclaredSources undeclaredVerbs verdicts failures;
+    inherit sampleMisses undeclaredSources undeclaredVerbs verbActorArtifacts verbKindArtifacts verdicts failures;
     ok = failures == [];
   };
 in {
-  inherit intentFields kinds kindIds verbs verbIds capabilities capabilityIds;
+  inherit intentFields kinds kindIds verbs verbIds verbAliases actorShorthands capabilities capabilityIds;
   inherit places placeIds admit keyOf classOf gateReport runCmd planOf route;
-  inherit observedSources undeclaredSources observedVerbs undeclaredVerbs;
+  inherit observedSources undeclaredSources observedVerbs undeclaredVerbs verbActorArtifacts verbKindArtifacts;
 }

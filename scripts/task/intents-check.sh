@@ -21,10 +21,12 @@ fi
 ok="$(jq -r '.ok' <<<"$report")"
 failures="$(jq -r '.failures | length' <<<"$report")"
 verbs="$(jq -r '.undeclaredVerbs | length' <<<"$report")"
+actors="$(jq -r '(.verbActorArtifacts // []) | length' <<<"$report")"
+kindverbs="$(jq -r '(.verbKindArtifacts // []) | length' <<<"$report")"
 sources="$(jq -r '.undeclaredSources | length' <<<"$report")"
 
 if [ "$ok" = "true" ]; then
-  echo "intents ok: ${failures} failures — kinds' gates resolve, capabilities declared, admit verdicts as intended, all xs sources declared (${verbs} ACTION prefixes observed outside the verb table — reported, not gated)"
+  echo "intents ok: ${failures} failures — kinds' gates resolve, capabilities declared, admit verdicts as intended, all xs sources declared (${verbs} ACTION prefixes outside the verb table after alias/actor/kind normalization: ${actors} actor tags, ${kindverbs} kind-prefixed dispatches — reported, not gated)"
 else
   echo "intents FAIL (${failures} failure(s), ${sources} undeclared source(s)):" >&2
   jq -r '.failures[] | "  - \(.)"' <<<"$report" >&2

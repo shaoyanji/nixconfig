@@ -5,11 +5,12 @@
   config,
   lib,
   pkgs,
+  self,
   ...
 }: let
   cfg = config.services.appflowBoard;
 
-  staticUi = import ../config/nginx-static-ui.nix;
+  staticUi = import self.modules."config.nginx-static-ui";
   page = staticUi.package pkgs "appflow-board" ../../lib/appflow-board/index.html;
 
   # One exact location per route, so the proxied surface is these two lists and

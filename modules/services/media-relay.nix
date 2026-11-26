@@ -490,7 +490,7 @@
 
   # One immutable page: the listing is data, and the page is fed the manifest at
   # `= /index.json`, so nothing is generated into the store per request.
-  staticUi = import ../config/nginx-static-ui.nix;
+  staticUi = import self.modules."config.nginx-static-ui";
   mediaUi = staticUi.package pkgs "media-relay" ../../lib/media-relay/index.html;
 
   # The page's write half. Loopback only: the vhost's `/api/` proxy is the whole

@@ -446,9 +446,10 @@ class VaultStub:
     the vault already holds, and anything else is a refusal with a JSON reason.
     """
 
-    def __init__(self, statuses=None):
+    def __init__(self, statuses=None, extractions=None):
         self.requests = []
         self.statuses = list(statuses or [])
+        self.extractions = list(extractions or [])
         stub = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -467,6 +468,10 @@ class VaultStub:
                     payload = {"error": "the vault refused this one"}
                 else:
                     payload = {"link": {"id": len(stub.requests), "url": body.get("url")}, "created": status == 201}
+                    if stub.extractions:
+                        payload["extraction"] = stub.extractions.pop(0)
+                    elif body.get("extract"):
+                        payload["extraction"] = {"requested": True, "ok": True, "provider": "firecrawl"}
                 data = json.dumps(payload).encode()
                 self.send_response(status)
                 self.send_header("content-type", "application/json")
@@ -612,14 +617,116 @@ class VaultPushTest(unittest.TestCase):
         document = self.search(["search", "q", "--provider", "tavily", "--link-vault", self.vault.base])
         text = research.markdown_report(document)
         self.assertIn("_Link vault http://127.0.0.1:", text)
-        self.assertIn("1 pushed, 0 skipped, 0 failed_", text)
+        self.assertIn("1 pushed, 0 skipped, 0 failed, 0 extracted, 0 extract-failed_", text)
 
     def test_markdown_lists_what_the_vault_refused(self):
         self.vault.statuses = [400]
         document = self.search(["search", "q", "--provider", "tavily", "--link-vault", self.vault.base])
         text = research.markdown_report(document)
-        self.assertIn("0 pushed, 0 skipped, 1 failed_", text)
+        self.assertIn("0 pushed, 0 skipped, 1 failed, 0 extracted, 0 extract-failed_", text)
         self.assertIn("https://discourse.nixos.org/t/devshell/67351: HTTP 400", text)
+
+
+class ExtractOnPushTest(unittest.TestCase):
+    def setUp(self):
+        self.vault = VaultStub()
+        self.addCleanup(self.vault.close)
+
+    def search(self, argv, hits=None):
+        args = research.build_parser().parse_args(argv)
+        with mock.patch.object(research, "search_provider", side_effect=hits or one_hit):
+            return research.do_search(args, {"TAVILY_API_KEY": "k"})
+
+    def two_hits(self, *_args, **_kwargs):
+        return (
+            [
+                {"title": "A", "url": "https://a.example/x", "snippet": "a", "provider": "tavily"},
+                {"title": "B", "url": "https://b.example/y", "snippet": "b", "provider": "tavily"},
+            ],
+            [],
+        )
+
+    def test_extract_on_push_rides_the_same_request(self):
+        document = self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base, "--extract-on-push"]
+        )
+        self.assertEqual(len(self.vault.requests), 1)
+        self.assertIs(self.vault.requests[0]["body"]["extract"], True)
+        self.assertNotIn("provider", self.vault.requests[0]["body"])
+        self.assertEqual(document["link_vault"]["pushed"], 1)
+        self.assertEqual(document["link_vault"]["extracted"], 1)
+        self.assertEqual(document["link_vault"]["extract_failed"], 0)
+
+    def test_the_extraction_provider_is_forwarded(self):
+        self.search(
+            [
+                "search",
+                "q",
+                "--provider",
+                "tavily",
+                "--link-vault",
+                self.vault.base,
+                "--extract-on-push",
+                "--extract-provider",
+                "tavily",
+            ]
+        )
+        self.assertEqual(self.vault.requests[0]["body"]["provider"], "tavily")
+
+    def test_without_the_flag_the_body_carries_no_extract_key(self):
+        self.search(["search", "q", "--provider", "tavily", "--link-vault", self.vault.base])
+        self.assertNotIn("extract", self.vault.requests[0]["body"])
+        self.assertNotIn("provider", self.vault.requests[0]["body"])
+
+    def test_a_page_text_that_refuses_keeps_its_link_and_is_counted_apart(self):
+        self.vault.extractions = [
+            {"requested": True, "ok": False, "error": "firecrawl: 403 from the origin"},
+            {"requested": True, "ok": True, "provider": "firecrawl"},
+        ]
+        document = self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base, "--extract-on-push"],
+            hits=self.two_hits,
+        )
+        counts = document["link_vault"]
+        self.assertEqual((counts["pushed"], counts["failed"]), (2, 0))
+        self.assertEqual((counts["extracted"], counts["extract_failed"]), (1, 1))
+        self.assertEqual(len(counts["errors"]), 1)
+        self.assertEqual(counts["errors"][0]["url"], "https://a.example/x")
+        self.assertIn("extract: firecrawl: 403 from the origin", counts["errors"][0]["error"])
+
+    def test_an_upsert_still_counts_as_a_skip_while_it_extracts(self):
+        self.vault.statuses = [200]
+        document = self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base, "--extract-on-push"]
+        )
+        self.assertEqual(document["link_vault"]["skipped"], 1)
+        self.assertEqual(document["link_vault"]["pushed"], 0)
+        self.assertEqual(document["link_vault"]["extracted"], 1)
+
+    def test_an_answer_without_an_extraction_is_a_named_failure(self):
+        self.vault.extractions = [{"requested": True}]
+        document = self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base, "--extract-on-push"]
+        )
+        self.assertEqual(document["link_vault"]["extract_failed"], 1)
+        self.assertIn("no extraction", document["link_vault"]["errors"][0]["error"])
+
+    def test_extract_without_a_vault_is_refused(self):
+        with mock.patch.object(sys, "argv", ["web-research", "search", "q", "--extract-on-push"]), contextlib.redirect_stdout(
+            io.StringIO()
+        ), contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(research.main(), 2)
+        self.assertIn("need --link-vault", err.getvalue())
+        self.assertEqual(self.vault.requests, [])
+
+    def test_markdown_shows_extraction_counts(self):
+        self.vault.extractions = [{"requested": True, "ok": False, "error": "tavily: 429"}]
+        document = self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base, "--extract-on-push"]
+        )
+        text = research.markdown_report(document)
+        self.assertIn("1 pushed, 0 skipped, 0 failed, 0 extracted, 1 extract-failed_", text)
+        self.assertIn("extract: tavily: 429", text)
 
 
 if __name__ == "__main__":

@@ -239,7 +239,12 @@ titles, `[sN]` citations in the text, and those ids resolved again under
 it is found, and reports `pushed`, `skipped` and `failed` with a reason per URL.
 The vault upserts on the canonical URL, so a page already filed is a skip and
 re-running the same search is safe; a refusal exits 1 without hiding the
-results and their sources.
+results and their sources. `--extract-on-push` adds `extract: true` to that same
+request, so the vault fetches the page text while it files the link and the
+counts gain `extracted` and `extract_failed` — a page whose text refuses still
+leaves a saved link. The extraction is asked for on every run, so on a rerun the
+link is a `skipped` hit that is fetched again; drop the flag when filing a page
+already in the vault.
 
 Every ingester prints a summary of what it filed, and exits 1 when the server
 refused a record. A refusal inside a batch is counted and named by index (25 per

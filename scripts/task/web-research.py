@@ -20,8 +20,11 @@ same ids resolved again under `## Sources`.
 
 `search --link-vault <base>` pushes the merged hits into link-vault's
 `POST /api/links` as they are found, and reports `pushed` (created), `skipped`
-(already in the vault) and `failed` with a reason per URL. A link-vault instance
-on loopback needs no token; a remote one takes `--link-vault-token` or
+(already in the vault) and `failed` with a reason per URL. `--extract-on-push`
+adds `extract: true` to the same request, so the vault fetches the page text
+while it files the link, and reports `extracted` and `extract_failed` separately
+— a page whose text refused still leaves a saved link. A link-vault instance on
+loopback needs no token; a remote one takes `--link-vault-token` or
 `LINK_VAULT_TOKEN`.
 """
 
@@ -240,13 +243,33 @@ def post_vault_link(base: str, body: dict, token: str, timeout: int) -> dict:
         raise Unavailable(f"unparsable answer: {exc}") from exc
 
 
-def push_to_vault(document: dict, base: str, collection: str, tags: str, token: str, timeout: int) -> dict:
+def push_to_vault(
+    document: dict,
+    base: str,
+    collection: str,
+    tags: str,
+    token: str,
+    timeout: int,
+    extract: bool = False,
+    provider: str = "",
+) -> dict:
     """Every merged hit into the vault, one request each, counted honestly.
 
     `created: false` is not a failure — link-vault upserts on the canonical URL,
     so a page already saved is a skip, and re-running the same search is safe.
+    `extract: true` is the vault's own enrichment, inline in the same request:
+    when the page text refuses, the link is still saved, so the two outcomes are
+    counted apart rather than folding one into the other.
     """
-    counts = {"base": base, "pushed": 0, "skipped": 0, "failed": 0, "errors": []}
+    counts = {
+        "base": base,
+        "pushed": 0,
+        "skipped": 0,
+        "failed": 0,
+        "extracted": 0,
+        "extract_failed": 0,
+        "errors": [],
+    }
     tag_list = vault_tags(tags)
     for entry in document.get("results") or []:
         url = (entry.get("url") or "").strip()
@@ -264,6 +287,10 @@ def push_to_vault(document: dict, base: str, collection: str, tags: str, token: 
             body["collection"] = collection
         if tag_list:
             body["tags"] = tag_list
+        if extract:
+            body["extract"] = True
+        if extract and provider:
+            body["provider"] = provider
         try:
             answer = post_vault_link(base, body, token, timeout)
         except Unavailable as exc:
@@ -274,6 +301,15 @@ def push_to_vault(document: dict, base: str, collection: str, tags: str, token: 
             counts["pushed"] += 1
         else:
             counts["skipped"] += 1
+        if not extract:
+            continue
+        extraction = answer.get("extraction") or {}
+        if extraction.get("ok"):
+            counts["extracted"] += 1
+        else:
+            counts["extract_failed"] += 1
+            reason = extraction.get("error") or "the vault reported no extraction"
+            counts["errors"].append({"url": url, "error": f"extract: {reason}"})
     return counts
 
 
@@ -569,7 +605,8 @@ def search_markdown(document: dict) -> list:
         lines += [
             "",
             f"_Link vault {md_text(vault.get('base'), 160)}: {vault.get('pushed', 0)} pushed, "
-            f"{vault.get('skipped', 0)} skipped, {vault.get('failed', 0)} failed_",
+            f"{vault.get('skipped', 0)} skipped, {vault.get('failed', 0)} failed, "
+            f"{vault.get('extracted', 0)} extracted, {vault.get('extract_failed', 0)} extract-failed_",
         ]
         for error in vault.get("errors") or []:
             lines.append(f"- {md_text(error.get('url') or '(no URL)', 120)}: {md_text(error.get('error'), 200)}")
@@ -671,7 +708,14 @@ def do_search(args, keys: dict) -> dict:
     if getattr(args, "link_vault", ""):
         token = getattr(args, "link_vault_token", "") or os.environ.get("LINK_VAULT_TOKEN", "")
         document["link_vault"] = push_to_vault(
-            document, args.link_vault, args.collection, args.tags, token, args.timeout
+            document,
+            args.link_vault,
+            args.collection,
+            args.tags,
+            token,
+            args.timeout,
+            extract=getattr(args, "extract_on_push", False),
+            provider=getattr(args, "extract_provider", ""),
         )
     return document
 
@@ -770,6 +814,17 @@ def build_parser() -> argparse.ArgumentParser:
     search.add_argument("--collection", default="", help="vault collection for the pushed links")
     search.add_argument("--tags", default="", help="comma-separated tags for the pushed links")
     search.add_argument("--link-vault-token", default="", help="bearer token when the vault checks writes")
+    search.add_argument(
+        "--extract-on-push",
+        action="store_true",
+        help="ask link-vault to fetch the page text while it files the link",
+    )
+    search.add_argument(
+        "--extract-provider",
+        choices=("firecrawl", "tavily", "context"),
+        default="",
+        help="extraction provider for --extract-on-push; default is the vault's own order",
+    )
 
     extract = sub.add_parser("extract", parents=[common], help="page text, first provider that answers")
     extract.add_argument("urls", nargs="+")
@@ -789,6 +844,9 @@ def main() -> int:
         except ValueError as exc:
             print(f"web-research: {exc}", file=sys.stderr)
             return 2
+    if args.mode == "search" and (args.extract_on_push or args.extract_provider) and not args.link_vault:
+        print("web-research: --extract-on-push and --extract-provider need --link-vault", file=sys.stderr)
+        return 2
     keys = load_keys()
     if args.mode == "search":
         document = do_search(args, keys)

@@ -696,13 +696,12 @@ tasks:
     summary: >
       `web-research.py`: search, extract and health-check the web. `search` asks
       Tavily, Context and Firecrawl together and merges by canonical URL, so one
-      page is one source (`s1`, `s2`). `--link-vault BASE` pushes the hits into
-      link-vault as they are found and reports pushed, skipped and failed;
-      `--collection` and `--tags` label them, `LINK_VAULT_TOKEN` authenticates.
-      `extract` walks firecrawl → context → tavily → browser → http and names
-      every layer that refused. `health` opens a page in agent-browser, here or
-      on clanker, and fails a 404, an unhydrated shell, or under 200 rendered
-      characters.
+      page is one source (`s1`, `s2`). `--link-vault BASE` files the hits into
+      link-vault and reports pushed, skipped and failed; `--extract-on-push`
+      also fetches the page text there and counts extracted and extract-failed
+      apart; `--collection`, `--tags`, `LINK_VAULT_TOKEN`. `extract` walks
+      firecrawl → context → tavily → browser → http. `health` judges what
+      agent-browser rendered, here or on clanker.
     cmds:
       - python3 scripts/task/web-research.py {{.CLI_ARGS}}
 

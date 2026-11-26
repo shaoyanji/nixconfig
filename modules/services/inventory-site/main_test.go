@@ -342,3 +342,157 @@ func TestQRLabelEndpointReturnsPrintableSVG(t *testing.T) {
 		t.Fatalf("events status=%d body=%s", recorder.Code, recorder.Body.String())
 	}
 }
+
+func analyticsSeed(t *testing.T, store *Store) map[string]int64 {
+	t.Helper()
+	ctx := context.Background()
+	expiring := time.Now().UTC().AddDate(0, 0, 10).Format("2006-01-02")
+	inputs := map[string]itemInput{
+		"laptop": {Source: "manual", SourceKey: "analytics/laptop", Name: "Laptop", Category: "computing", Location: "office",
+			ValueCents: 100000, Currency: "EUR", Quantity: 2, WarrantyUntil: "2099-01-15", Tags: []string{"fleet", "laptop"}},
+		"headset": {Source: "manual", SourceKey: "analytics/headset", Name: "Headset", Category: "audio", Location: "lounge",
+			ValueCents: 50000, Currency: "EUR", Quantity: 1, WarrantyUntil: "2020-01-01", Tags: []string{"audio"}},
+		"cable": {Source: "manual", SourceKey: "analytics/cable", Name: "Cable", Category: "misc", Location: "",
+			ValueCents: 0, Currency: "EUR", Quantity: 1, WarrantyUntil: expiring, Tags: []string{"fleet"}},
+		"desk": {Source: "manual", SourceKey: "analytics/desk", Name: "Desk", Category: "misc", Location: "office",
+			ValueCents: 25000, Currency: "EUR", Quantity: 1, WarrantyUntil: ""},
+	}
+	ids := map[string]int64{}
+	for key, input := range inputs {
+		id, created, err := store.UpsertItem(ctx, input)
+		if err != nil || !created {
+			t.Fatalf("UpsertItem %s created=%v err=%v", key, created, err)
+		}
+		ids[key] = id
+	}
+	for _, event := range []struct {
+		item int64
+		in   assetEventInput
+	}{
+		{ids["laptop"], assetEventInput{Kind: "checkout", Actor: "buffy", Location: "office", Note: "lent out"}},
+		{ids["laptop"], assetEventInput{Kind: "checkin", Actor: "buffy", Note: "returned"}},
+		{ids["desk"], assetEventInput{Kind: "note", Note: "assembled"}},
+	} {
+		if _, err := store.AddAssetEvent(ctx, event.item, event.in); err != nil {
+			t.Fatalf("AddAssetEvent %s: %v", event.in.Kind, err)
+		}
+	}
+	return ids
+}
+
+func bucketByName(rows []valueBucket, name string) (valueBucket, bool) {
+	for _, row := range rows {
+		if row.Name == name {
+			return row, true
+		}
+	}
+	return valueBucket{}, false
+}
+
+func TestAnalyticsValuesTheRegisterByCategoryAndLocation(t *testing.T) {
+	store := testStore(t)
+	analyticsSeed(t, store)
+
+	report, err := store.Analytics(context.Background(), 30, 8)
+	if err != nil {
+		t.Fatalf("Analytics: %v", err)
+	}
+	if report.Items != 4 || report.Quantity != 5 || report.ValueCents != 275000 {
+		t.Fatalf("totals %#v, want 4 items, 5 units, 275000 cents", report)
+	}
+	if report.Currency != "EUR" || report.Archived != 0 {
+		t.Fatalf("currency/archived %#v", report)
+	}
+
+	if len(report.Categories) != 3 {
+		t.Fatalf("categories %#v, want computing, audio, misc", report.Categories)
+	}
+	if report.Categories[0].Name != "computing" || report.Categories[0].ValueCents != 200000 || report.Categories[0].Quantity != 2 {
+		t.Fatalf("top category %#v, want computing at 200000 over two units", report.Categories[0])
+	}
+	if report.Categories[0].Share != 72.7 {
+		t.Fatalf("computing share %v, want 72.7", report.Categories[0].Share)
+	}
+	if last := report.Categories[len(report.Categories)-1]; last.Name != "misc" || last.ValueCents != 25000 {
+		t.Fatalf("last category %#v, want misc at 25000", last)
+	}
+
+	office, ok := bucketByName(report.Locations, "office")
+	if !ok || office.ValueCents != 225000 || office.Share != 81.8 {
+		t.Fatalf("office bucket %#v ok=%v, want 225000 and 81.8%%", office, ok)
+	}
+	if unplaced, ok := bucketByName(report.Locations, "unplaced"); !ok || unplaced.Items != 1 || unplaced.ValueCents != 0 {
+		t.Fatalf("unplaced bucket %#v ok=%v, want the zero-value cable", unplaced, ok)
+	}
+}
+
+func TestAnalyticsWarrantyTagsAndEvents(t *testing.T) {
+	store := testStore(t)
+	analyticsSeed(t, store)
+
+	report, err := store.Analytics(context.Background(), 30, 8)
+	if err != nil {
+		t.Fatalf("Analytics: %v", err)
+	}
+	if len(report.Warranty) != 4 {
+		t.Fatalf("warranty %#v, want four buckets always", report.Warranty)
+	}
+	want := map[string]struct {
+		items int
+		value int64
+	}{
+		"expired":      {1, 50000},
+		"expiring_30d": {1, 0},
+		"healthy":      {1, 200000},
+		"none":         {1, 25000},
+	}
+	for i, key := range []string{"expired", "expiring_30d", "healthy", "none"} {
+		bucket := report.Warranty[i]
+		if bucket.Key != key || bucket.Items != want[key].items || bucket.ValueCents != want[key].value {
+			t.Fatalf("warranty bucket %d %#v, want %s %+v", i, bucket, key, want[key])
+		}
+	}
+
+	if len(report.Tags) != 3 || report.Tags[0].Name != "fleet" || report.Tags[0].Items != 2 {
+		t.Fatalf("tags %#v, want fleet leading with two items", report.Tags)
+	}
+	if len(report.Events) == 0 || report.Events[0].Kind != "create" || report.Events[0].Events != 4 {
+		t.Fatalf("events %#v, want create leading with four", report.Events)
+	}
+	if report.EventsTotal != 7 || report.EventsRecent != 7 {
+		t.Fatalf("event totals total=%d recent=%d, want 7/7", report.EventsTotal, report.EventsRecent)
+	}
+	for _, bucket := range report.Events {
+		if bucket.Kind == "checkout" && (bucket.Events != 1 || bucket.Items != 1 || bucket.LastAt.IsZero()) {
+			t.Fatalf("checkout bucket %#v", bucket)
+		}
+	}
+}
+
+func TestAnalyticsHandlerDefaultsAndLimits(t *testing.T) {
+	store := testStore(t)
+	analyticsSeed(t, store)
+	s := &server{store: store}
+
+	rec := httptest.NewRecorder()
+	s.analytics(rec, httptest.NewRequest(http.MethodGet, "/api/analytics", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status %d: %s", rec.Code, rec.Body.String())
+	}
+	var report inventoryAnalytics
+	if err := json.Unmarshal(rec.Body.Bytes(), &report); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if report.Days != 30 || len(report.Warranty) != 4 || report.Items != 4 {
+		t.Fatalf("defaults %#v, want a 30-day window over four items", report)
+	}
+
+	rec = httptest.NewRecorder()
+	s.analytics(rec, httptest.NewRequest(http.MethodGet, "/api/analytics?limit=1&days=900", nil))
+	if err := json.Unmarshal(rec.Body.Bytes(), &report); err != nil {
+		t.Fatalf("decode second: %v", err)
+	}
+	if len(report.Categories) != 1 || len(report.Locations) != 1 || report.Days != 365 {
+		t.Fatalf("limit/days not applied: %#v", report)
+	}
+}

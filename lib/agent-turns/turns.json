@@ -1,8 +1,52 @@
 {
-  "generated": "2026-11-26T17:13:35Z",
+  "generated": "2026-11-26T17:20:46Z",
   "count": 200,
-  "pin": "2bbd81c9201a9a7c92d62c64dea2e20ed7e60d0548791cbb19a7f59287a87aae",
+  "pin": "0611779248901f6e97353bcbfc4d87c4a4e47a2980f59445a1b95f6d91dbcdec",
   "turns": [
+    {
+      "id": "9e5dd3b6-cba5-4ca6-8204-09d1b87e6b79",
+      "ts": "2026-11-26T17:16:19Z",
+      "source": "devin",
+      "subject": "nixconfig:gemini-api-cli-package",
+      "action": "claim: package gemini-api in cli output and shared env packages",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/cli.nix",
+        "modules/env.nix"
+      ],
+      "files": [],
+      "base_commit": "82571921e8f8a94e73c1741f0c5183bb1d89baa8",
+      "branch": "main",
+      "frame": "03hb48i2jo7eh1sf7b2b3hvoo"
+    },
+    {
+      "id": "ca95ffbc-eae3-4930-ab4c-fc2845134067",
+      "ts": "2026-11-26T17:15:38Z",
+      "source": "buffy",
+      "subject": "nixconfig:inventory-site-analytics",
+      "action": "claim: valuation by category and location, warranty buckets, tag and event counts from the store's own tables; a panel whose rows narrow the list; tests on a temp SQLite before a live smoke",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/inventory-site"
+      ],
+      "files": [],
+      "base_commit": "6cd2c020463ab9ad6f3e79c554d257d320ed27b2",
+      "branch": "main",
+      "frame": "03hb48d7n9ujshy7ngh61q9oo"
+    },
+    {
+      "id": "b3035875-b4d7-4183-a4c3-171d5a6395a3",
+      "ts": "2026-11-26T17:13:59Z",
+      "source": "buffy",
+      "subject": "nixconfig:analytics-browser-verify",
+      "action": "agent-browser on seeded temp servers, both pages: 0 console messages, 0 page errors. Found the jobs panel was dead (handler bound to #analytics, section had only a class -> threw, boot never finished) and the deals sparkline letterboxed in an 844 column; fixed both, plus plurals and the heading scope. Re-verified: spark 844x46 with a path, 5 columns one row, company 6->2, lane 1, chips clear.| gate: go vet+test both, node --check, browser rerun, no servers or /tmp left",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6cd2c020463ab9ad6f3e79c554d257d320ed27b2",
+      "branch": "main",
+      "frame": "03hb481ngfadsokltpnmukq8b"
+    },
     {
       "id": "a536cacc-efdf-4ace-9e28-9bf8b4ee0948",
       "ts": "2026-11-26T17:07:29Z",
@@ -2981,52 +3025,6 @@
       "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
       "branch": "main",
       "frame": "03hb2qubw2g1gh2ytux5u5nyj"
-    },
-    {
-      "id": "0eee4a88-f89f-4186-b6d5-5b02911a91e9",
-      "ts": "2026-11-26T12:23:22Z",
-      "source": "agy",
-      "subject": "nixconfig:jobsearch-sweep-26e",
-      "action": "novel: run live-deduped 5-board job sweep + build tailored packets",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/jobsearch-pipeline.sh",
-        "scripts/task/apps-scout.sh"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2na548kijxqi0e88yvk05"
-    },
-    {
-      "id": "25de07e1-9aa1-4b74-a99b-af103a965574",
-      "ts": "2026-11-26T12:20:24Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-26: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 779 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hb2mp01h7qo2um8egptkhro"
-    },
-    {
-      "id": "4a078921-d2e9-4308-8b75-bc3c06888334",
-      "ts": "2026-11-26T12:19:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-settle-8",
-      "action": "checks:appflow green: all six tracker rules pass on 1670 rows. Last 8 settled with explicit markers, BridgingIT names both roles, sync.py write path guarded (+10 offline cases).",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow/sync.py",
-        "scripts/task/appflow-check.sh",
-        "tests/appflow-triage"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2mk84xwp300we4reyaywc"
     }
   ]
 }

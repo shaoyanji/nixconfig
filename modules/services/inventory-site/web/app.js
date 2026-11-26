@@ -1,6 +1,6 @@
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
-const state = { items: [], meta: {categories: [], locations: [], tags: []} };
+const state = { items: [], meta: {categories: [], locations: [], tags: []}, analytics: null };
 
 async function api(path, opts={}) {
   const res = await fetch(path, opts);
@@ -33,6 +33,53 @@ async function refreshStats() {
   $('#stats').innerHTML = [
     ['items','Assets'], ['quantity','Units'], ['value_cents','Tracked value'], ['warranty_expiring_90d','Warranty ≤90d']
   ].map(([key,label]) => `<div class="stat"><strong>${key==='value_cents'?cents(stats[key]||0):esc(stats[key] ?? 0)}</strong><span>${label}</span></div>`).join('');
+}
+const WARRANTY_LABELS = { expired: 'Expired', expiring_30d: '≤30 days', healthy: 'Healthy', none: 'No warranty' };
+function valuationRows(rows, kind, currency) {
+  if (!rows.length) return '<p class="muted">nothing yet</p>';
+  const names = new Set(((kind === 'category' ? state.meta.categories : state.meta.locations) || []).map((entry) => entry.name));
+  const max = Math.max(1, ...rows.map((row) => row.value_cents));
+  return rows.map((row) => {
+    const filterable = names.has(row.name);
+    const tag = filterable ? 'button' : 'div';
+    const attrs = filterable ? `data-filter="${kind}" data-name="${esc(row.name)}" type="button"` : '';
+    return `<${tag} class="valrow${filterable ? ' clickable' : ''}" ${attrs}>
+      <span class="valname">${esc(row.name)}</span>
+      <span class="valbar"><i style="width:${Math.max(3, row.value_cents / max * 100)}%"></i></span>
+      <span class="valnum"><b>${cents(row.value_cents, currency)}</b><em>${row.items} · ${row.share}%</em></span>
+    </${tag}>`;
+  }).join('');
+}
+async function loadAnalytics() {
+  const report = await api('/api/analytics?limit=8&days=30');
+  state.analytics = report;
+  const currency = report.currency || 'EUR';
+  const expired = (report.warranty || []).find((bucket) => bucket.key === 'expired') || { items: 0 };
+  const figures = [
+    [cents(report.value_cents, currency), 'tracked value'],
+    [report.quantity, 'units'],
+    [report.items, 'assets'],
+    [`${report.events_recent}`, `audit events · ${report.days} d`],
+    [`${expired.items}`, 'warranty expired'],
+  ].map(([value, label]) => `<div><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`).join('');
+  const warranty = (report.warranty || []).map((bucket) => `
+    <div class="warrantybar warranty-${bucket.key}"><span>${esc(WARRANTY_LABELS[bucket.key] || bucket.key)}</span><b>${bucket.items}</b><em>${cents(bucket.value_cents, currency)}</em></div>
+  `).join('');
+  const tags = (report.tags || []).map((tag) => `<div class="tagrow"><span>#${esc(tag.name)}</span><b>${tag.items}</b></div>`).join('') || '<p class="muted">no tags yet</p>';
+  const events = (report.events || []).map((event) => `<div class="tagrow"><span>${esc(event.kind)}</span><b>${event.events} · ${event.items} item(s)</b></div>`).join('') || '<p class="muted">no audit events yet</p>';
+  $('#analyticsScope').textContent = `${report.items} assets · ${report.archived} archived · ${report.events_total} events on record`;
+  $('#analytics').innerHTML = `<div class="analytics-figures">${figures}</div>
+    <div class="analytics-grid">
+      <div><h4>Value by category</h4>${valuationRows(report.categories || [], 'category', currency)}</div>
+      <div><h4>Value by location</h4>${valuationRows(report.locations || [], 'location', currency)}</div>
+      <div><h4>Warranty health</h4>${warranty}</div>
+      <div><h4>Top tags</h4>${tags}</div>
+      <div><h4>Audit events</h4>${events}</div>
+    </div>`;
+  $$('#analytics [data-filter]').forEach((row) => {
+    const select = $(`#filters [name="${row.dataset.filter}"]`);
+    if (select && select.value === row.dataset.name) row.classList.add('active');
+  });
 }
 function filterParams() {
   const data = new FormData($('#filters'));
@@ -172,8 +219,20 @@ async function evaluateAlerts() {
     await loadAlerts();
   } catch(err) { toast(err.message); }
 }
+$('#analytics').addEventListener('click', (event) => {
+  const row = event.target.closest('[data-filter]');
+  if (!row) return;
+  const select = $(`#filters [name="${row.dataset.filter}"]`);
+  if (!select) return;
+  select.value = row.dataset.name;
+  loadItems().catch(err => toast(err.message));
+  loadAnalytics().catch(err => toast(err.message));
+});
 async function refreshAll() {
+  // Meta first: a valuation row is only a filter when its name is an option in
+  // the form, and the options come from /api/meta.
   await Promise.all([refreshStats(), loadItems(), loadMeta(), loadAlerts()]);
+  await loadAnalytics();
 }
 async function importFile(input, path, type) {
   const file = input.files && input.files[0];

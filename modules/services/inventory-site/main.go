@@ -86,6 +86,7 @@ func main() {
 	mux.HandleFunc("GET /favicon.svg", s.static("web/favicon.svg", "image/svg+xml"))
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/stats", s.stats)
+	mux.HandleFunc("GET /api/analytics", s.analytics)
 	mux.HandleFunc("GET /api/items", s.items)
 	mux.HandleFunc("POST /api/items", s.createItem)
 	mux.HandleFunc("GET /api/items/{id}", s.item)
@@ -178,6 +179,15 @@ func (s *server) health(w http.ResponseWriter, r *http.Request) {
 		"uptime_seconds": int(time.Since(s.started).Seconds()), "time": time.Now().UTC().Format(time.RFC3339),
 		"warranty_warn_days": s.warrantyWarn, "ntfy_configured": s.alerts != nil && s.alerts.enabled(),
 	})
+}
+
+func (s *server) analytics(w http.ResponseWriter, r *http.Request) {
+	report, err := s.store.Analytics(r.Context(), intQuery(r, "days"), intQuery(r, "limit"))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, report)
 }
 
 func (s *server) stats(w http.ResponseWriter, r *http.Request) {

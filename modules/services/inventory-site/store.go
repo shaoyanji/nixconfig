@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"strings"
 	"time"
@@ -579,6 +580,200 @@ func (s *Store) ExportBundle(ctx context.Context) (exportBundle, error) {
 		return exportBundle{}, err
 	}
 	return exportBundle{Version: 1, ExportedAt: time.Now().UTC(), Items: allItems, Categories: categories, Locations: locations, Tags: tags}, nil
+}
+
+type valueBucket struct {
+	Name       string  `json:"name"`
+	Items      int     `json:"items"`
+	Quantity   int     `json:"quantity"`
+	ValueCents int64   `json:"value_cents"`
+	Share      float64 `json:"share"`
+}
+
+type warrantyBucket struct {
+	Key        string `json:"key"`
+	Items      int    `json:"items"`
+	ValueCents int64  `json:"value_cents"`
+}
+
+type tagBucket struct {
+	Name  string `json:"name"`
+	Items int    `json:"items"`
+}
+
+type eventBucket struct {
+	Kind   string    `json:"kind"`
+	Events int       `json:"events"`
+	Items  int       `json:"items"`
+	LastAt time.Time `json:"last_at"`
+}
+
+type inventoryAnalytics struct {
+	GeneratedAt  time.Time        `json:"generated_at"`
+	Days         int              `json:"days"`
+	Items        int              `json:"items"`
+	Quantity     int              `json:"quantity"`
+	ValueCents   int64            `json:"value_cents"`
+	Currency     string           `json:"currency"`
+	Archived     int              `json:"archived"`
+	Categories   []valueBucket    `json:"categories"`
+	Locations    []valueBucket    `json:"locations"`
+	Warranty     []warrantyBucket `json:"warranty"`
+	Tags         []tagBucket      `json:"tags"`
+	Events       []eventBucket    `json:"events"`
+	EventsTotal  int              `json:"events_total"`
+	EventsRecent int              `json:"events_recent"`
+}
+
+func share1(part, total int64) float64 {
+	if total <= 0 {
+		return 0
+	}
+	return math.Round(float64(part)/float64(total)*1000) / 10
+}
+
+// Analytics is the register read as a portfolio: what it is worth where, how much
+// of the warranty book has already lapsed, which tags and which audit events
+// carry it. Value is value_cents * quantity, the same sum Stats reports, so the
+// two surfaces cannot disagree.
+func (s *Store) Analytics(ctx context.Context, days, limit int) (inventoryAnalytics, error) {
+	if limit <= 0 {
+		limit = 8
+	}
+	if limit > 50 {
+		limit = 50
+	}
+	if days <= 0 {
+		days = 30
+	}
+	if days > 365 {
+		days = 365
+	}
+	report := inventoryAnalytics{
+		GeneratedAt: time.Now().UTC(), Days: days, Currency: "EUR",
+		Categories: []valueBucket{}, Locations: []valueBucket{}, Warranty: []warrantyBucket{},
+		Tags: []tagBucket{}, Events: []eventBucket{},
+	}
+	if err := s.db.QueryRowContext(ctx, `SELECT count(*), COALESCE(sum(quantity),0), COALESCE(sum(value_cents*quantity),0), COALESCE(sum(archived),0) FROM items`).
+		Scan(&report.Items, &report.Quantity, &report.ValueCents, &report.Archived); err != nil {
+		return report, err
+	}
+	if currency := ""; s.db.QueryRowContext(ctx, `SELECT currency FROM items WHERE value_cents>0
+		GROUP BY currency ORDER BY sum(value_cents*quantity) DESC, currency ASC LIMIT 1`).Scan(&currency) == nil && currency != "" {
+		report.Currency = currency
+	}
+
+	// The bucket name is computed in a subquery on purpose: `items` has a `name`
+	// column, and SQLite resolves GROUP BY against a real column before an output
+	// alias, so grouping in the same SELECT would group by item name and answer
+	// one row per asset.
+	buckets := func(field string) ([]valueBucket, error) {
+		rows, err := s.db.QueryContext(ctx, `SELECT name, count(*), COALESCE(sum(quantity),0),
+			COALESCE(sum(value_cents*quantity),0)
+			FROM (SELECT `+field+` AS name, quantity, value_cents FROM items)
+			GROUP BY name ORDER BY 4 DESC, 2 DESC, name ASC LIMIT ?`, limit)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		out := []valueBucket{}
+		for rows.Next() {
+			var bucket valueBucket
+			if err := rows.Scan(&bucket.Name, &bucket.Items, &bucket.Quantity, &bucket.ValueCents); err != nil {
+				return nil, err
+			}
+			bucket.Share = share1(bucket.ValueCents, report.ValueCents)
+			out = append(out, bucket)
+		}
+		return out, rows.Err()
+	}
+	var err error
+	if report.Categories, err = buckets(`CASE WHEN category='' THEN 'uncategorised' ELSE category END`); err != nil {
+		return report, err
+	}
+	if report.Locations, err = buckets(`CASE WHEN location='' THEN 'unplaced' ELSE location END`); err != nil {
+		return report, err
+	}
+
+	warranty, err := s.db.QueryContext(ctx, `SELECT CASE
+			WHEN warranty_until='' THEN 'none'
+			WHEN date(warranty_until) < date('now') THEN 'expired'
+			WHEN date(warranty_until) <= date('now','+30 days') THEN 'expiring_30d'
+			ELSE 'healthy' END AS bucket,
+		count(*), COALESCE(sum(value_cents*quantity),0)
+		FROM items GROUP BY bucket`)
+	if err != nil {
+		return report, err
+	}
+	found := map[string]warrantyBucket{}
+	for warranty.Next() {
+		var bucket warrantyBucket
+		if err := warranty.Scan(&bucket.Key, &bucket.Items, &bucket.ValueCents); err != nil {
+			warranty.Close()
+			return report, err
+		}
+		found[bucket.Key] = bucket
+	}
+	if err := warranty.Err(); err != nil {
+		warranty.Close()
+		return report, err
+	}
+	warranty.Close()
+	// Fixed order and fixed membership: the page draws four bars whether or not a
+	// bucket has rows, and a missing bucket must read as zero rather than vanish.
+	for _, key := range []string{"expired", "expiring_30d", "healthy", "none"} {
+		bucket := found[key]
+		bucket.Key = key
+		report.Warranty = append(report.Warranty, bucket)
+	}
+
+	tags, err := s.db.QueryContext(ctx, `SELECT tag, count(*) FROM item_tags GROUP BY tag ORDER BY count(*) DESC, tag ASC LIMIT ?`, limit)
+	if err != nil {
+		return report, err
+	}
+	for tags.Next() {
+		var bucket tagBucket
+		if err := tags.Scan(&bucket.Name, &bucket.Items); err != nil {
+			tags.Close()
+			return report, err
+		}
+		report.Tags = append(report.Tags, bucket)
+	}
+	if err := tags.Err(); err != nil {
+		tags.Close()
+		return report, err
+	}
+	tags.Close()
+
+	events, err := s.db.QueryContext(ctx, `SELECT kind, count(*), count(DISTINCT item_id), COALESCE(max(created_at),'') FROM asset_events
+		GROUP BY kind ORDER BY count(*) DESC, kind ASC LIMIT ?`, limit)
+	if err != nil {
+		return report, err
+	}
+	for events.Next() {
+		var bucket eventBucket
+		var last string
+		if err := events.Scan(&bucket.Kind, &bucket.Events, &bucket.Items, &last); err != nil {
+			events.Close()
+			return report, err
+		}
+		if parsed, err := time.Parse(time.RFC3339, last); err == nil {
+			bucket.LastAt = parsed
+		}
+		report.Events = append(report.Events, bucket)
+	}
+	if err := events.Err(); err != nil {
+		events.Close()
+		return report, err
+	}
+	events.Close()
+
+	since := time.Now().UTC().AddDate(0, 0, -days).Format(time.RFC3339)
+	if err := s.db.QueryRowContext(ctx, `SELECT count(*), COALESCE(sum(CASE WHEN created_at>=? THEN 1 ELSE 0 END),0) FROM asset_events`, since).
+		Scan(&report.EventsTotal, &report.EventsRecent); err != nil {
+		return report, err
+	}
+	return report, nil
 }
 
 func (s *Store) Stats(ctx context.Context) (map[string]any, error) {

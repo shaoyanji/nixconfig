@@ -367,6 +367,20 @@ tasks:
     cmds:
       - 'bash scripts/task/edge-sidecar.sh "{{.CMD | default "status"}}"'
 
+  agents:portfolio:smoke:
+    desc: "Smoke the portfolio services end to end: health, stats, page, search"
+    summary: >
+      scripts/task/portfolio-smoke.py — one run over job-db-scraper,
+      private-deals and inventory-site: health must answer `ok` with its own
+      service name, stats a non-empty object, `/` the HTML element its JS fills,
+      and the search route rows for `q=`. An empty answer passes (nothing matched
+      is an answer); `--expect-hit` makes it a failure. `--format toon` renders
+      it, `--browser` adds the DOM half via agent-browser (missing binary = skip,
+      not a pass). Defaults are delphi's loopback ports; `--jobs`, `--deals`,
+      `--inventory` take the tailnet mounts. Exit 1 names the service that failed.
+    cmds:
+      - python3 scripts/task/portfolio-smoke.py {{.CLI_ARGS}}
+
   agents:ledger:record:
     desc: "Record one classified issue in the running ledger (CLASS, EVIDENCE, FIX)"
     summary: >

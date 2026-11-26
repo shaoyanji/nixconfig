@@ -329,6 +329,16 @@
     FAILED_SYS=$( (systemctl --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
     FAILED_USER=$( (systemctl --user --failed --no-pager --plain --quiet | grep -v "0 loaded" || true) | wc -l)
 
+    # Read the backup and upgrade failures BEFORE reset-failed. A reset sets the
+    # unit's Result back to success, so a count taken afterwards reads 0 and the
+    # quiet path calls a lost backup clean — measured 2026-11-26: burgernas died
+    # at 04:20 with exit 130 and the same audit reported "backups clean".
+    BACKUP_FAILS=$( (systemctl is-failed postgresqlBackup-immich.service restic-backups-frieren-local.service restic-backups-frieren-burgernas.service backup-vaultwarden.service 2>/dev/null | grep failed || true) | wc -l)
+    UPGRADE_FAILED=0
+    if systemctl is-failed nixos-upgrade.service >/dev/null 2>&1; then
+      UPGRADE_FAILED=1
+    fi
+
     if [ "$FAILED_SYS" -gt 0 ]; then
       echo "Detected failed system units. Attempting reset-failed..."
       systemctl reset-failed || true
@@ -339,11 +349,6 @@
     fi
 
     BTRFS_ERRS=$(btrfs device stats / 2>/dev/null | awk '{s+=$2} END {print s}' || echo 0)
-    BACKUP_FAILS=$( (systemctl is-failed postgresqlBackup-immich.service restic-backups-frieren-local.service restic-backups-frieren-burgernas.service backup-vaultwarden.service 2>/dev/null | grep failed || true) | wc -l)
-    UPGRADE_FAILED=0
-    if systemctl is-failed nixos-upgrade.service >/dev/null 2>&1; then
-      UPGRADE_FAILED=1
-    fi
 
     # --- STEP 1b: Gatus Fleet Monitoring & 5:00 AM SimpleX Dispatch ---
     echo "=== [$(date)] Step 1b: Running Gatus 5:00 AM fleet scorecard & SimpleX dispatch ==="

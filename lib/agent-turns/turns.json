@@ -1,8 +1,119 @@
 {
-  "generated": "2026-11-26T08:00:54Z",
+  "generated": "2026-11-26T08:40:40Z",
   "count": 200,
-  "pin": "96adbd6e7f8e535efa8b1653ab5395f135a8a93449cfc202cec8fcaf7684ef1f",
+  "pin": "2b2bf1a38f085de324fbf2cdf16c5564f61301c2d98f75b1adc3e27b7326cc2e",
   "turns": [
+    {
+      "id": "3f150860-7c79-4646-a04f-ae4d5c97ce6f",
+      "ts": "2026-11-26T08:40:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-sweep-26a-26b-tailor",
+      "action": "tailored 11 leads from sweeps 26a (7) and 26b (4 of 6 unique): JD read off Stepstone, per-ad letter in ~/.config/appflow/letters, packets built (1p letter + 2p CV) into submissions, rows at prep. Bertrandt + DRK ads JS-gated. No send: 2026-12-07 hold, then no recipient — all portal-only | gate: 11/11 packets, checks:appflow fails only pre-existing rows",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
+      "branch": "main",
+      "frame": "03hb1fnhmdewu6gty8ds6kr28"
+    },
+    {
+      "id": "4a4ace28-2961-4114-bf3a-19a4d6c0190d",
+      "ts": "2026-11-26T08:39:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-sweep-26a-26b-tailor",
+      "action": "claim: tailoring CV + letter for the 11 mail-able leads of sweeps 2026-11-26a (7) and 2026-11-26b (4 of 6 unique; 2 JD pages are JS-gated), packets built into submissions",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/appflow-packet.sh taskfiles/apps.yml"
+      ],
+      "files": [],
+      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
+      "branch": "main",
+      "frame": "03hb1fi0wo38kpratsflnx2l3"
+    },
+    {
+      "id": "e82bb16c-a634-4c3a-9e57-8cfb4987fc19",
+      "ts": "2026-11-26T08:31:37Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-epistemics-validate",
+      "action": "start: validate 1a1729cc on HEAD da5bc77f, then extend — philosophy layer, commit-time admit gate + fixture, schema README",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/intents.nix",
+        "scripts/task/intents-check.sh",
+        "tests/intents",
+        "docs/"
+      ],
+      "files": [],
+      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
+      "branch": "main",
+      "frame": "03hb1e03sewuag2dzgtcjbmcb"
+    },
+    {
+      "id": "37c3460e-201a-4e2d-9a0c-234a981729b0",
+      "ts": "2026-11-26T08:26:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0823",
+      "action": "chain-change refactor complete — catAttrs unification, checks:nix:style gate green, da5bc77f",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "da5bc77f",
+      "branch": "main",
+      "frame": "03hb1cxpltip22u42kci8e3zm"
+    },
+    {
+      "id": "63c7e590-be3d-4618-9800-e354591fa96c",
+      "ts": "2026-11-26T08:19:05Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "Sweep 2026-11-26b: five boards, 9 new leads filed at scout-2026-11-26b",
+      "outcome": "done",
+      "claims": [
+        "apps-db rows: origin scout-2026-11-26b"
+      ],
+      "files": [],
+      "base_commit": "333cde34b2d5bb55169b6a7d8170ad126e0e5983",
+      "branch": "cv-site-2026-11-26",
+      "frame": "03hb1bjywlgpm5lxmfzlgoe6g"
+    },
+    {
+      "id": "501479dd-b685-43f5-a466-f495f152dbb9",
+      "ts": "2026-11-26T08:16:40Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-delphi-drive-20261126-0801",
+      "action": "publish: CV site content committed, pushed and deployed live",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/",
+        "scripts/task/pages-deploy.sh"
+      ],
+      "files": [
+        "lib/matt-site.nix",
+        "lib/matt/profile.json",
+        "lib/matt/profile.de.json",
+        "lib/matt/cases.json",
+        "lib/matt/cases.de.json",
+        "lib/matt/projects.json",
+        "scripts/task/pages-deploy.sh"
+      ],
+      "base_commit": "333cde34b2d5bb55169b6a7d8170ad126e0e5983",
+      "branch": "cv-site-2026-11-26",
+      "frame": "03hb1b2z32w1qmkqobrrw5wtm"
+    },
+    {
+      "id": "da1e330c-422c-47e3-a1f4-94722be07d0a",
+      "ts": "2026-11-26T08:01:05Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: third nix-style rule — map (x: x.f) projection locked to catAttrs, knowledge-graph emitter converted; pipe class closed | gate: checks:nix:style:test PASS (12/12), checks:kg PASS, checks:tasks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
+      "branch": "main",
+      "frame": "03hb181claj3jd25uzct09jak"
+    },
     {
       "id": "b7ecc68d-46a3-41cd-8593-ad30f59905ff",
       "ts": "2026-11-26T07:57:42Z",
@@ -2761,97 +2872,6 @@
       "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
       "branch": "main",
       "frame": "03havpx7ybaak24u1swikddq4"
-    },
-    {
-      "id": "c40554c0-f659-43b0-a195-8c0f670157cd",
-      "ts": "2026-11-25T15:06:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-lane",
-      "action": "landed: drove delphi freebuff pane agents:3.1 over ssh with wallpaper task-change task; jev-decide duel task-change p=0.76 margin=0.52 over novel; load-buffer + paste-buffer + Enter + 2nd Enter; working... confirmed generating wallpaper",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
-      "branch": "main",
-      "frame": "03havpt6goq2ji93wlgjaolhb"
-    },
-    {
-      "id": "83bfd7c6-3e54-46c6-b58e-0073284c6585",
-      "ts": "2026-11-25T15:06:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: drove freebuff pane agents:2.1 with CV-site audit task; jev-decide classify needs_review margin=0.33 → novel p=0.62; load-buffer + paste-buffer + Enter; working... confirmed running check-cv-links (6 CVs resolving, rc=0)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
-      "branch": "main",
-      "frame": "03havpt53rw3sh8qlkoj9bm1u"
-    },
-    {
-      "id": "9fc5444a-9f27-4cff-8dbc-1d4a263a09d0",
-      "ts": "2026-11-25T15:06:19Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: drove devin pane agents:1.1 with chain-change refactor task; jev-decide classify exit 0 selected chain-change p=0.90 margin=0.86; load-buffer + paste-buffer + Enter; fresh Thinking spinner confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
-      "branch": "main",
-      "frame": "03havpt3v46b6x0g0cla4pjfn"
-    },
-    {
-      "id": "30235d88-f470-493c-b6ca-ccdccf1ee04b",
-      "ts": "2026-11-25T14:52:39Z",
-      "source": "freebuff",
-      "subject": "nixconfig:isadev-cv-publish-check-4",
-      "action": "no publish (re-check 4): 6/6 CVs byte-identical src vs _site vs live, changed=0; HEAD=origin=be17747 clean; unchanged output not republished, no push | gate: jekyll build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
-      "branch": "main",
-      "frame": "03havn4zh03yjcp56yhhk1vy7"
-    },
-    {
-      "id": "4bf2e312-41af-4705-b397-811e74b58457",
-      "ts": "2026-11-25T14:52:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: drove freebuff pane agents:2.1 with CV-site publish task; jev-decide classify exit 0 selected publish p=0.90 margin=0.86; load-buffer + paste-buffer + Enter; fresh 'working... 13s' line confirms submission",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
-      "branch": "main",
-      "frame": "03havn33yg9djb1acnmi0zxi3"
-    },
-    {
-      "id": "b3c4ac32-9d2a-43e1-9d27-af5ee68a27b1",
-      "ts": "2026-11-25T14:50:05Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "corrects prior done: nixosSupport refactor landed as 9710bdf1 after rebase onto sibling 639bf360 (turns.json pin conflict resolved via agents:pins:refresh; resume.json pin rode along — hook-owned) | gate: drv-equality 30/30 + checks:quick PASS pre-rebase, module-sets diff unchanged, PARSE-OK on origin",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9710bdf1ea66f35bbc5ef081097f190d59ceca84",
-      "branch": "main",
-      "frame": "03havmmvv8eaerzor0njyljtn"
-    },
-    {
-      "id": "38ba698e-83fd-477e-97e8-e63a3ed8157e",
-      "ts": "2026-11-25T14:49:20Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "feature-chain refactor: nixosSupport let-binding shares the 5-module tail across nixos+containers (19 hosts blast radius mapped first) | gate: drv-equality 30/30, checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fc1a5f98c3cd4bc1e9127cb8fb2033747dcb9c98",
-      "branch": "main",
-      "frame": "03havmhntyiu3nakerzeh4vm0"
     }
   ]
 }

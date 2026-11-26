@@ -211,6 +211,10 @@ in {
   # dispatches share. `nix eval --json .#intents.gateReport | toon -e`.
   intents = intentsCtl;
 
+  # flake/philosophy.nix — the mathematical lenses, each with the measurement
+  # that adopted or deferred it. `nix eval --json .#philosophy | toon -e`.
+  philosophy = import ./philosophy.nix {};
+
   # The rules as data, looked up by id — the output IS the attrset, so an id with
   # a dash needs quotes: `nix eval .#policies."<id>".holds`, and the id list is
   # `nix eval --json .#policies --apply builtins.attrNames`. The derived

@@ -24,6 +24,7 @@
 #   blobs     HARD      a staged blob over 512 KiB is refused
 #                       (scripts/task/repo-blobs.sh --index)
 #   checks:kg HARD      graph schema + all patterns, when they are affected
+#   checks:intents HARD the intent/capability contract, when spec or evidence moved
 #   census    HARD      `.nix` prose lines may not exceed the recorded ceiling
 #   task-descs HARD     a task added to a taskfile must be visible somewhere
 #
@@ -67,6 +68,22 @@ affects_graph() {
       lib/knowledge-graph.nix | lib/skills.nix | lib/inventory.nix) return 0 ;;
       scripts/task/kg-*.sh | scripts/task/lib/kg-graph.sh) return 0 ;;
       flake/outputs.nix | taskfiles/*.yml) return 0 ;;
+    esac
+  done <<<"${1:-}"
+  return 1
+}
+
+# The intents gate (flake/intents.nix -> task checks:intents) proves the
+# request-side contract still holds at commit time: every kind's gate resolves
+# to a real task, every capability provides declared kinds, the admit verdict
+# samples land as intended, and every xs source in the pinned snapshot has a
+# declaration. It costs one eval and can only be wrong when the spec, its
+# script, its fixture, or the snapshot moved — so it is scoped to those files.
+affects_intents() {
+  local f
+  while IFS= read -r f; do
+    case "$f" in
+      flake/intents.nix | flake/philosophy.nix | scripts/task/intents-check.sh | lib/agent-turns/turns.json | tests/intents/*) return 0 ;;
     esac
   done <<<"${1:-}"
   return 1
@@ -186,6 +203,17 @@ if affects_graph "$STAGED"; then
   fi
 
   echo "Graph checks passed."
+fi
+
+if affects_intents "$STAGED"; then
+  echo "Checking the intent/capability contract (staged changes touch the spec or its evidence)..."
+  if ! bash "$REPO_ROOT/scripts/task/intents-check.sh"; then
+    echo
+    echo "Commit refused: the intents gate failed."
+    echo "  Run it alone: task checks:intents"
+    exit 1
+  fi
+  echo "Intents checks passed."
 fi
 
 if affects_ontology "$STAGED"; then

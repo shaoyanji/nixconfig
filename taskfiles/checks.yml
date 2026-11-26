@@ -96,6 +96,7 @@ tasks:
       - task: checks:modules:edges
       - task: checks:modules:edges:test
       - task: checks:intents
+      - task: checks:intents:test
       # The check inventory (flake/check-inventory.nix): every checks:* task has
       # a key and every key names a task, so the three verbs cannot drift.
       - task: check:verify
@@ -649,6 +650,19 @@ tasks:
       Cost: one .#intents eval (~3 s), no build. Exit 0 = clean, 1 = drift.
     cmds:
       - bash scripts/task/intents-check.sh
+
+  checks:intents:test:
+    desc: "Fixture for checks:intents — seeded reports refuse, live admit proves the three verdict classes"
+    summary: >
+      Proves the gate refuses what the schema declares broken — a seeded
+      report with an undeclared xs source and one with an admit-verdict miss
+      both fail and name the failure — and proves the verdict classes live:
+      devin admits an in-radius chain-change, tmux-pane-steward is refused
+      with "route, do not execute", freebuff is refused out of radius, an
+      undeclared capability refuses. classOf is shown to ignore subject and
+      claim order while a different kind is a different class.
+    cmds:
+      - bash tests/intents/run.sh
 
   checks:router:
     desc: "[gate] Every router label has one playbook section, and no section lacks a label"

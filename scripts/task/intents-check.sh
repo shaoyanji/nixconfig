@@ -5,10 +5,18 @@
 # the admit() samples land their intended verdicts, and every xs source in the
 # committed snapshot has a capability declaration. ACTION-verb coverage is
 # reported, not gated — the field is free prose. ~3 s, eval only.
+#
+# With one argument, judges that file's JSON instead of evaluating — the
+# fixture's seeded reports. Judgment is identical either way: ok means
+# failures == [].
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
-report="$(nix eval --json .#intents.gateReport 2>/dev/null)"
+if [ $# -ge 1 ]; then
+  report="$(cat "$1")"
+else
+  report="$(nix eval --json .#intents.gateReport 2>/dev/null)"
+fi
 
 ok="$(jq -r '.ok' <<<"$report")"
 failures="$(jq -r '.failures | length' <<<"$report")"

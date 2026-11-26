@@ -1,8 +1,24 @@
 {
-  "generated": "2026-11-26T12:01:06Z",
+  "generated": "2026-11-26T12:02:30Z",
   "count": 200,
-  "pin": "d2fb41c2f3b7d7445d62be5dde9e344265bda18f79496c4688543c6ead75b1d9",
+  "pin": "227994121e0c5da455f08ccbd170b5a62010f3162407bb21bef3d3d5522e71a1",
   "turns": [
+    {
+      "id": "dcf8c13a-139a-4e57-b929-176b2229de71",
+      "ts": "2026-11-26T12:01:20Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-db-bulk-guard",
+      "action": "Addendum: the unguarded refusal now reads the row and quotes --expect-stage <stage> --if-status <hash>, so the message is the recipe. Two commits, 14 fixture cases.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "0b92af91d5ce01665b86060324b91e6124229f53",
+      "branch": "main",
+      "frame": "03hb2iywqzko2wze4wqjd4btn"
+    },
     {
       "id": "15f663e2-738e-40c6-992e-54bd417e824a",
       "ts": "2026-11-26T12:00:07Z",
@@ -2951,19 +2967,6 @@
       "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haxnpcmy3frt34llzzczj1z"
-    },
-    {
-      "id": "e71ac47b-c87f-457c-9ec3-89bba294c0f5",
-      "ts": "2026-11-25T21:03:49Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-lane",
-      "action": "re-verified at a262147a (dup dispatch): gate rc=0, fixture 9/9 incl. 470c9034^ refusal; origin synced, tree clean, nothing to fix",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxnn8wbu0ol76gny8lnnif"
     }
   ]
 }

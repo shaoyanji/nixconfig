@@ -20,7 +20,11 @@ The vhost proxies five GET routes of the mail hub's NpgsqlRest
 
 Parameter names are the endpoint's, not the SQL's: the plugin writes
 `:application_id` and NpgsqlRest exposes `applicationId`, which is why a
-snake_case query is a 404 and not an empty list.
+snake_case query is a 404 and not an empty list. A bare route is the same 404 —
+NpgsqlRest answers "not found" for a parametrized endpoint called without its
+required params, so a verify curl that drops `?lim=`/`?id=`/`?applicationId=`
+reads a deployed endpoint as missing. Every probe of this vhost carries its
+params.
 
 There is no snapshot job and no second copy of the data. The board is a viewer,
 which is why it cannot disagree with the CLI: both read the same rows.

@@ -6473,13 +6473,13 @@
       '';
     };
     devin-lane-refactoring-2026-11-25 = {
-      title = "Devin lane close-out: image-daily port + comment audit CLOSED; one refactoring tail open";
+      title = "Devin lane close-out: image-daily port + comment audit CLOSED; appflow re-verify CLOSED (bare-route 404 was the param contract, not a missing deployment)";
       kind = "open";
-      status = "OPEN";
+      status = "CLOSED";
       priority = "P3";
       date = "2026-11-25";
       from = ["devin-lane-image-daily-go-port" "devin-lane-appflow-write-auth" "nix-comment-audit" "devin-lane-handoff-2026-11-24"];
-      summary = "Lane record: image-daily Go port CLOSED (engine.sh retired, gates green end-to-end) and nix-comment-audit CLOSED (every Story:/Trap:/Fact: pointer resolves; tail sweep clean). Open tail: appflow /api/applications upstream-404 plus residual .nix flake-wiring and gate-check cleanup.";
+      summary = "Lane record: image-daily Go port CLOSED (engine.sh retired, gates green end-to-end) and nix-comment-audit CLOSED (every Story:/Trap:/Fact: pointer resolves; tail sweep clean). Appflow tail CLOSED 2026-11-26: all five board read routes answer 200 on delphi when called with their params — the bare-GET 404 was NpgsqlRest refusing an unparametrized endpoint, not a missing .sql in the deployed tree.";
       refs = {
         hosts = ["delphi" "frieren" "netbook"];
         modules = ["tools/os/internal/image/main.go" "modules/services/appflow-board.nix" "lib/nix-comments.nix" "hosts/netbook/configuration.nix"];
@@ -6511,12 +6511,20 @@
         snapshot). Landed (a487f3d4): `appflow-board.nix` asserts at eval
         that every proxied route has a `sql/<name>.sql` (fails checks:host,
         proven firing); the stale "8461 archive front" comment corrected.
-        Remainder: delphi's 04:30 autoUpgrade (tailnet ssh needs a browser
-        check) — verify both routes live after it, then this note closes.
-        05:29 still 404 (the run predated a487f3d4); next window 04:30 CET
-        2026-11-26. Tail gates green twice: comments 54/54, policies,
+        Remainder — CLOSED 2026-11-26: re-verified live on delphi after its
+        04:30 autoUpgrade (sentinel generation_age_h 8.4 at the probe). All
+        five read routes answer 200: applications?lim=5 and
+        applications-discovered?lim=5 return real rows, application-pipeline
+        200, application-get?id= 200, application-mail?applicationId= 200.
+        The bare-GET 404s that seeded the incident were never a missing
+        deployment: NpgsqlRest answers "not found" for a parametrized
+        endpoint called with no params, so `/api/applications` bare 404s
+        while `?lim=5` serves. The missing-.sql diagnosis held only for the
+        Nov-25 dirty-tree generation; the persistent 404 was the param
+        contract. docs/appflow-board.md now names the bare-route trap.
+        Tail gates green twice: comments 54/54, policies,
         images 772/772, hosts delphi+frieren+netbook, 06:49 image-daily +
-        drv-equality 30/30. Appflow re-verify is the sole open item.
+        drv-equality 30/30.
       '';
     };
     shared-worktree-commit-race = {

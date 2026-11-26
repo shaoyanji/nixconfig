@@ -5467,6 +5467,57 @@
         went with the surface it gated. 30/30 drv-identical both times.
       '';
     };
+    desktop-facts-one-module = {
+      title = "One shared desktop module owns the six duplicated facts; overrides are data";
+      kind = "proposal";
+      status = "PROPOSED";
+      priority = "P2";
+      date = "2026-11-26";
+      summary = "The chain split is done; the remaining blast radius is facts duplicated verbatim across hosts/*.nix — dms-greeter x4, tailscale flags x4, an NFS mount racing nas-client x2, Haswell i965 x3, ssh.ca client x4, laptop power trio x3-4. One shared desktop module owns them; per-host overrides are data, the global.nix cache-policy pattern.";
+      from = ["hm-leaf-chain-split"];
+      refs = {
+        hosts = ["aristotle" "diogenes" "poseidon" "stark" "fern" "eisen" "delphi" "frieren"];
+        modules = [
+          "modules/profiles/base-desktop-environment.nix"
+          "modules/global/dms.nix"
+          "modules/profiles/nas-client.nix"
+          "flake/host-inventory.nix"
+        ];
+        tasks = ["checks:drv-equality" "checks:host"];
+      };
+      body = ''
+        Audit 2026-11-26 (all 23 host files; count = distinct hosts carrying
+        the same verbatim block). The chain layer is healthy — features are
+        data and mkHost composes — but these facts live below it, in hosts:
+        - programs.dms-greeter {enable, niri, configHome}: identical in
+          aristotle, diogenes, poseidon, stark; fern forks (dwl). The dms
+          feature module owns only the sddm verdict.
+        - tailscale extraSetFlags mkForce [accept-dns accept-routes=false]:
+          aristotle, diogenes, fern, poseidon identical; eisen (dns=false)
+          and delphi (the resolver itself — policy) are the real overrides.
+        - fileSystems."/Volumes/data" inline in aristotle and diogenes beside
+          the nas-client their chain already imports — the option lists
+          concatenate into a Frankenmount neither file describes.
+        - Haswell i965 graphics + LIBVA_DRIVER_NAME + libva-utils verbatim
+          in aristotle, diogenes, stark; ssh.ca.enableClient in aristotle,
+          diogenes, frieren, poseidon; thermald x4, fstrim x3, logind
+          lid-ignore x3 — the laptop power trio.
+        A semantic change is N edits and the fleet drifts one host at a time.
+        Proposal: extend profiles.base-desktop-environment — the one module
+        every desktop host already imports — to own the six facts, each behind
+        a knob defaulting to the fleet value (the global.nix cache-policy
+        pattern: shared module reads per-host data, host file carries at most
+        one line). Greeter joins modules/global/dms.nix so fern's fork is data
+        beside its hmFeatures fork; tailscale acceptDns/acceptRoutes default
+        true/false with eisen and delphi overriding in one line; nas-client
+        gains an automount knob and the two inline mounts are deleted, not
+        edited; i965 becomes a haswell-graphics leaf (hardware is a leaf, not
+        a knob); ssh.ca client becomes mkDefault true on the desktop chain.
+        Exit: checks:drv-equality MODE=compare clean across the migration,
+        checks:host green on one desktop per chain, and no host file carrying
+        any of the six blocks verbatim.
+      '';
+    };
     job-scout-lane-state-2026-11-24 = {
       title = "The boards are mined out, so the lane tailors HITS.nrw's CV and German letter";
       kind = "open";

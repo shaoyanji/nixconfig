@@ -73,7 +73,9 @@ records.
 
 The `blocky` path was validated before it had a host: `blocky --config … validate`
 accepted the rendered YAML, and that config served the zone, the custom records and
-the two blocklists on a spare port. minyx declares it now (*Current state*).
+the two blocklists on a spare port. minyx declares that role (*Current state*), but it is not a second home today:
+`192.168.3.3` answers nothing (measured 2026-11-26) and the inventory carries no
+LAN address for the host, so the peer address is a reservation, not a service.
 
 fern briefly ran the same stack as `role = "secondary"`; `55c1477c` (2026-10-15)
 removed pihole-ftl, unbound and dns-failover from it, so a roaming laptop stops
@@ -81,11 +83,12 @@ carrying a resolver it cannot serve.
 
 delphi answers DNS at the fleet's shared address (`10.99.0.53` / `100.97.61.65`),
 but with crab-hole, which has no static-record or zone support: it resolves the
-internet and NXDOMAINs every `.lan` name, so it fails over public DNS only.
-`hosts/delphi/configuration.nix` lists the three ways to close that gap; replicating
-this zone on an always-on host is the one that makes failover real, and minyx does
-that — deliberately in a different shape (blocky, not crab-hole) precisely because
-crab-hole cannot carry the zone.
+internet and answers every `.lan` name with NOERROR and no records — measured
+2026-11-26, `eisen.lan`, `laya.lan` and `frieren.lan` all came back empty while
+`one.one.one.one` resolved. It fails public names over and nothing else. Closing
+that gap means a front on delphi that holds the zone and forwards the rest,
+because crab-hole cannot; that is a change to the host every tailnet client
+resolves through, not a config tweak.
 
 ### The 2026-10-27 outage
 

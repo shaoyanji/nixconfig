@@ -10,6 +10,7 @@ set -euo pipefail
 # this resolved to `/` and every `$repo/lib/...` became `//lib/...`. Measured
 # 2026-11-15..17: four slots, twenty passes, every one dead in four seconds.
 repo=${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}
+export REPO="$repo"
 BRIEFS=${BRIEFS:-$repo/lib/image-daily/briefs.json}
 # The pool's media tree is root:root 0770 (/Volumes/data/media), so a generated
 # asset cannot live there without sudo. pics/generated is the writable, devji-owned

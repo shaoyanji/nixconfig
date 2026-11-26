@@ -228,8 +228,16 @@ func laneSetting(repo, lane, key string) string {
 	if !ok {
 		return ""
 	}
-	s, _ := l[key].(string)
-	return s
+	switch x := l[key].(type) {
+	case string:
+		return x
+	case bool:
+		return strconv.FormatBool(x)
+	case float64:
+		return jqNum(x)
+	default:
+		return ""
+	}
 }
 
 type dueRow struct {

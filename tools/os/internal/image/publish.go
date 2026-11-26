@@ -1,7 +1,6 @@
 package image
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -92,67 +91,17 @@ func stagePublish(root, lane string) (shifted, gone int) {
 	return shifted, gone
 }
 
-// adoptCloudinary is adopt_cloudinary: a manifest row for every upload that
-// has none. Adoption never rewrites a row that exists — the URL already being
-// served is the one consumers have — and never deletes from the account.
-func adoptCloudinary(root, repo string) {
-	rows := root + "/published/urls.tsv"
-	existing, err := os.ReadFile(rows)
-	if err != nil || len(existing) == 0 {
-		return
-	}
-
-	prefix := os.Getenv("ADOPT_PREFIX")
-	if prefix == "" {
-		prefix = "assets/"
-	}
-	cmd := exec.Command("bash", repo+"/scripts/task/cloudinary.sh",
-		"list", "--prefix", prefix, "--json")
-	var outBuf, errBuf bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &outBuf, &errBuf
-	if cmd.Run() != nil {
-		first := strings.SplitN(errBuf.String(), "\n", 2)[0]
-		say("adopt: Cloudinary listing unreadable (%s); the rows stay the manifest", first)
-		return
-	}
-	list := outBuf.String()
-
+// adoptMissingRows returns the merged urls.tsv lines for uploads missing a row,
+// plus how many rows were added. Existing rows stay untouched.
+func adoptMissingRows(existing []byte, resources []cloudResource, skipRe *regexp.Regexp) ([]byte, int) {
 	have := map[string]bool{}
 	for _, line := range strings.Split(string(existing), "\n") {
 		if i := strings.Index(line, "\t"); i >= 0 {
 			have[line[:i]] = true
 		}
 	}
-
-	// The id is the path without its extension: wall|site|blog keep the
-	// relative id, fleet/<host> adopts as badge/<host>. Everything else is not
-	// gallery work and stays off the manifest.
-	var skipRe *regexp.Regexp
-	if skip, ok := os.LookupEnv("ADOPT_SKIP"); ok && skip == "" {
-		skipRe = nil // ADOPT_SKIP= (empty) adopts everything
-	} else if ok {
-		skipRe = regexp.MustCompile(skip)
-	} else {
-		skipRe = regexp.MustCompile(`wallpaper-[0-9]+`)
-	}
-
-	n := 0
 	var add []string
-	for _, line := range strings.Split(list, "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-		n++
-		var r struct {
-			PublicID  string `json:"public_id"`
-			SecureURL string `json:"secure_url"`
-			Bytes     int64  `json:"bytes"`
-			Format    string `json:"format"`
-		}
-		if err := json.Unmarshal([]byte(line), &r); err != nil {
-			continue
-		}
+	for _, r := range resources {
 		if r.PublicID == "" || r.SecureURL == "" {
 			continue
 		}
@@ -174,35 +123,79 @@ func adoptCloudinary(root, repo string) {
 		if have[path] || (skipRe != nil && skipRe.MatchString(path)) {
 			continue
 		}
+		have[path] = true
 		add = append(add, fmt.Sprintf("%s\t%s\t%d", path, r.SecureURL, r.Bytes))
 	}
-
-	if len(add) > 0 && os.Getenv("DRY") != "1" {
-		merged := strings.Split(string(existing), "\n")
-		if len(merged) > 0 && merged[len(merged)-1] == "" {
-			merged = merged[:len(merged)-1]
+	if len(add) == 0 {
+		return nil, 0
+	}
+	merged := strings.Split(string(existing), "\n")
+	if len(merged) > 0 && merged[len(merged)-1] == "" {
+		merged = merged[:len(merged)-1]
+	}
+	merged = append(merged, add...)
+	sort.Slice(merged, func(i, j int) bool {
+		a, b := merged[i], merged[j]
+		ka, kb := a, b
+		if t := strings.Index(ka, "\t"); t >= 0 {
+			ka = ka[:t]
 		}
-		merged = append(merged, add...)
-		sort.Slice(merged, func(i, j int) bool {
-			a, b := merged[i], merged[j]
-			ka, kb := a, b
-			if t := strings.Index(ka, "\t"); t >= 0 {
-				ka = ka[:t]
-			}
-			if t := strings.Index(kb, "\t"); t >= 0 {
-				kb = kb[:t]
-			}
-			if ka != kb {
-				return ka < kb
-			}
-			return a < b // sort's last-resort whole-line compare on equal keys
-		})
+		if t := strings.Index(kb, "\t"); t >= 0 {
+			kb = kb[:t]
+		}
+		if ka != kb {
+			return ka < kb
+		}
+		return a < b
+	})
+	return []byte(strings.Join(merged, "\n") + "\n"), len(add)
+}
+
+// adoptCloudinary is adopt_cloudinary: a manifest row for every upload that
+// has none. Adoption never rewrites a row that exists — the URL already being
+// served is the one consumers have — and never deletes from the account.
+func adoptCloudinary(root, repo string) {
+	rows := root + "/published/urls.tsv"
+	existing, err := os.ReadFile(rows)
+	if err != nil || len(existing) == 0 {
+		return
+	}
+
+	prefix := os.Getenv("ADOPT_PREFIX")
+	if prefix == "" {
+		prefix = "assets/"
+	}
+	c, err := cloudinaryCreds(repo)
+	if err != nil {
+		say("adopt: Cloudinary credentials unreadable (%v); the rows stay the manifest", err)
+		return
+	}
+	resources, err := cloudListAll(c, prefix, 500)
+	if err != nil {
+		say("adopt: Cloudinary listing unreadable (%v); the rows stay the manifest", err)
+		return
+	}
+
+	// The id is the path without its extension: wall|site|blog keep the
+	// relative id, fleet/<host> adopts as badge/<host>. Everything else is not
+	// gallery work and stays off the manifest.
+	var skipRe *regexp.Regexp
+	if skip, ok := os.LookupEnv("ADOPT_SKIP"); ok && skip == "" {
+		skipRe = nil // ADOPT_SKIP= (empty) adopts everything
+	} else if ok {
+		skipRe = regexp.MustCompile(skip)
+	} else {
+		skipRe = regexp.MustCompile(`wallpaper-[0-9]+`)
+	}
+
+	merged, added := adoptMissingRows(existing, resources, skipRe)
+	if added > 0 && os.Getenv("DRY") != "1" {
 		tmp := rows + ".merged"
-		if err := os.WriteFile(tmp, []byte(strings.Join(merged, "\n")+"\n"), 0644); err == nil {
+		if err := os.WriteFile(tmp, merged, 0644); err == nil {
 			_ = os.Rename(tmp, rows)
 		}
 	}
-	say("adopt: %d upload(s) with no row, out of %d on Cloudinary", len(add), n)
+	say("adopt: %d upload(s) with no row, out of %d on Cloudinary", added, len(resources))
 }
 
 func cmdStage(args []string) {
@@ -473,6 +466,7 @@ func cmdPublish(args []string) {
 	sort.Strings(restaged)
 	current, _ := os.ReadFile(rows)
 	var fresh []string
+	var creds *cloudCreds
 	restagedRel := map[string]bool{}
 	for _, file := range restaged {
 		rel := strings.TrimPrefix(file, *root+"/published/")
@@ -494,12 +488,19 @@ func cmdPublish(args []string) {
 			}
 			continue
 		}
-		out, err := exec0("bash", *repo+"/scripts/task/cloudinary.sh", "upload", file, "--public-id", id)
+		if creds == nil {
+			c, err := cloudinaryCreds(*repo)
+			if err != nil {
+				say("publish: upload failed for %s: %v", rel, err)
+				os.Exit(1)
+			}
+			creds = &c
+		}
+		url, err := cloudUpload(*creds, file, "", id)
 		if err != nil {
-			say("publish: upload failed for %s", rel)
+			say("publish: upload failed for %s: %v", rel, err)
 			os.Exit(1)
 		}
-		url := strings.TrimSpace(out)
 		fi, _ := os.Stat(file)
 		fresh = append(fresh, fmt.Sprintf("%s\t%s\t%d", rel, url, fi.Size()))
 		say("uploaded %s", rel)

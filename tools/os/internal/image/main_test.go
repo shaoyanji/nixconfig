@@ -831,3 +831,54 @@ func TestGenBatch(t *testing.T) {
 		}
 	}
 }
+
+// laneSetting must stringify booleans and numbers as well as strings; otherwise
+// cmdPublish skips every lane with "publish": true and status loses max_age_days.
+func TestLaneSettingTypes(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("BRIEFS", filepath.Join(dir, "briefs.json"))
+	const cfg = `{"lanes":{"wall":{"publish":true,"max_age_days":4,"budget":56,"intent":"wallpaper"},"fleet":{"publish":false}}}`
+	if err := os.WriteFile(filepath.Join(dir, "briefs.json"), []byte(cfg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cases := []struct {
+		lane, key, want string
+	}{
+		{"wall", "publish", "true"},
+		{"fleet", "publish", "false"},
+		{"wall", "max_age_days", "4"},
+		{"wall", "budget", "56"},
+		{"wall", "intent", "wallpaper"},
+		{"wall", "missing", ""},
+	}
+	for _, tc := range cases {
+		if got := laneSetting(dir, tc.lane, tc.key); got != tc.want {
+			t.Errorf("laneSetting(%q, %q) = %q, want %q", tc.lane, tc.key, got, tc.want)
+		}
+	}
+}
+
+// adoptMissingRows reconciles uploads returned by cloudListAll without touching
+// existing rows or adopting skipped/unrelated public ids.
+func TestAdoptMissingRows(t *testing.T) {
+	existing := []byte("wall/2026-11-26/existing.png\thttps://example.com/old\t10\n")
+	res := []cloudResource{
+		{PublicID: "assets/wall/2026-11-26/existing", SecureURL: "https://example.com/new", Bytes: 20, Format: "png"},
+		{PublicID: "assets/wall/2026-11-26/catwoman-dc", SecureURL: "https://example.com/catwoman", Bytes: 30, Format: "png"},
+		{PublicID: "assets/fleet/frieren", SecureURL: "https://example.com/frieren", Bytes: 40, Format: "png"},
+		{PublicID: "assets/repos/ignored", SecureURL: "https://example.com/ignored", Bytes: 50, Format: "png"},
+	}
+	merged, added := adoptMissingRows(existing, res, nil)
+	if added != 2 {
+		t.Fatalf("added = %d, want 2 (%s)", added, merged)
+	}
+	s := string(merged)
+	if strings.Contains(s, "https://example.com/new") || !strings.Contains(s, "https://example.com/old") {
+		t.Fatalf("existing row mutated: %s", s)
+	}
+	if !strings.Contains(s, "wall/2026-11-26/catwoman-dc.png\thttps://example.com/catwoman\t30") ||
+		!strings.Contains(s, "badge/frieren.png\thttps://example.com/frieren\t40") ||
+		strings.Contains(s, "ignored") {
+		t.Fatalf("unexpected adopted rows: %s", s)
+	}
+}

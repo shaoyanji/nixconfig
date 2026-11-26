@@ -51,19 +51,14 @@ func cmdBudget(args []string) {
 	fmt.Println(v.Lanes[*lane].Budget)
 }
 
-// `image-daily setting --lane L --key K` — .lanes[L][K] // empty.
+// `image-daily setting --lane L --key K [--repo PATH]` — .lanes[L][K] // empty.
 func cmdSetting(args []string) {
 	fs := flag.NewFlagSet("setting", flag.ExitOnError)
 	lane := fs.String("lane", "", "lane name")
 	key := fs.String("key", "", "setting key")
+	repo := fs.String("repo", os.Getenv("REPO"), "checkout root")
 	_ = fs.Parse(args)
-	var v struct {
-		Lanes map[string]map[string]any `json:"lanes"`
-	}
-	if data, err := os.ReadFile(briefsPath(os.Getenv("REPO"))); err == nil {
-		_ = json.Unmarshal(data, &v)
-	}
-	if s, ok := v.Lanes[*lane][*key]; ok {
+	if s := laneSetting(*repo, *lane, *key); s != "" {
 		fmt.Println(s)
 	}
 }

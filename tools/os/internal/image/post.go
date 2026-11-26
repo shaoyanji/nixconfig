@@ -170,11 +170,14 @@ func cmdPost(args []string) {
 	if !bannerCrop(file, jpg) {
 		die("could not crop the banner")
 	}
-	out, err := exec0("bash", *repo+"/scripts/task/cloudinary.sh", "upload", jpg, "--public-id", "assets/blog/"+slug)
+	c, err := cloudinaryCreds(*repo)
 	if err != nil {
-		die("upload failed")
+		die("cloudinary credentials: %v", err)
 	}
-	url := strings.TrimSpace(out)
+	url, err := cloudUpload(c, jpg, "", "assets/blog/"+slug)
+	if err != nil {
+		die("upload failed: %v", err)
+	}
 	say("cloudinary: %s", url)
 
 	// The manifest is the reference list: a new upload of the same slug
@@ -198,12 +201,11 @@ func cmdPost(args []string) {
 	indexBody(*root, *repo)
 	cmdDeploy([]string{"--root", *root, "--repo", *repo})
 
-	card, _ := exec0("bash", *repo+"/scripts/task/cloudinary.sh", "url",
-		"assets/blog/"+slug, "--transform", "f_jpg,q_auto,w_1200,h_630,c_fill")
 	// The public id carries no extension; the delivery URL names the format
 	// anyway, and the other fifteen posts are `.jpg`, so a scraper never has
 	// to guess.
-	card = strings.TrimSpace(card) + ".jpg"
+	card := fmt.Sprintf("https://res.cloudinary.com/%s/image/upload/f_jpg,q_auto,w_1200,h_630,c_fill/assets/blog/%s.jpg",
+		c.name, slug)
 
 	// Two sources for the metadata: a draft (a promotion) or an existing post
 	// (`FORCE=1`). The body is everything after the second fence either way.

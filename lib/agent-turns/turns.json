@@ -1,8 +1,81 @@
 {
-  "generated": "2026-11-26T14:03:27Z",
+  "generated": "2026-11-26T14:07:10Z",
   "count": 200,
-  "pin": "237d4fbb53c40526b34684b4123c4b2f699821881530586bd23b501038b374fe",
+  "pin": "7d0f7ef3920b38520ccc09bc10c9161aff8b3c8244a2c1815c13d7e9ea479c5e",
   "turns": [
+    {
+      "id": "b6f927ac-db39-486b-bee7-eea145fe218f",
+      "ts": "2026-11-26T14:06:45Z",
+      "source": "devin",
+      "subject": "nixconfig:private-deals-service",
+      "action": "claim: build private-deals tailnet service — Go SQLite/FTS5 deals/watchlists/price history, provider+RSS/JSON/manual ingestion, API and UI on delphi",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "base_commit": "f2e3ec95",
+      "branch": "main",
+      "frame": "03hb37gxj36r65f6jffalfggz"
+    },
+    {
+      "id": "27c0f131-bdfa-46c4-8d14-3dd68bc3964a",
+      "ts": "2026-11-26T14:04:32Z",
+      "source": "devin",
+      "subject": "nixconfig:job-db-scraper-service",
+      "action": "landed job-db-scraper: Go scraper/dedupe/SQLite FTS5 API+UI, delphi servicePortal mount 8464 -> 127.0.0.1:8101 | gate: checks:host HOST=delphi PASS; native aarch64 nix build+go test PASS; live arbeitnow scrape 895 rows, FTS query 445 hits, UI 200",
+      "outcome": "done",
+      "claims": [
+        "modules/services/job-db-scraper",
+        "modules/services/job-db-scraper.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [
+        "modules/services/job-db-scraper",
+        "modules/services/job-db-scraper.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "base_commit": "9401d481",
+      "branch": "main",
+      "frame": "03hb3719e76kh0di1sih5qm2x"
+    },
+    {
+      "id": "eb57ba13-02bd-4280-9182-7e83b2517e8e",
+      "ts": "2026-11-26T14:04:11Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-drain-fixes",
+      "action": "claim: guard dismiss with a bounded recent scan, fix scan page-cap miss and stopword tokens, make move-then-close idempotent on retry, surface queue age in atlas-stats + page, unit tests",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/mail-atlas"
+      ],
+      "files": [],
+      "base_commit": "f2e3ec9500b5ed6f696cd60517970187ab1488f5",
+      "branch": "main",
+      "frame": "03hb36ytjlk907vzfrvdgncwc"
+    },
     {
       "id": "a9792bd2-da35-4b7d-821c-93c77663d3d5",
       "ts": "2026-11-26T14:01:57Z",
@@ -2944,54 +3017,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hazjbnbhali30h51jspprua"
-    },
-    {
-      "id": "ca81c0ab-4dbb-4e1f-8566-07ea1cb50072",
-      "ts": "2026-11-26T02:21:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-agents-3",
-      "action": "amended the record commit: the note body tripped its own 30-line gate",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [
-        "AGENTS.nix"
-      ],
-      "base_commit": "3346ea27",
-      "branch": "delphi-dup-services-note",
-      "frame": "03hazdqfxvs3vd5re9au4tz7e"
-    },
-    {
-      "id": "1673b684-517e-450d-bfa7-83ddac5c1608",
-      "ts": "2026-11-26T02:21:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-agents-3",
-      "action": "deployed the duplicate-monitor retirement to delphi and verified the services come up clean",
-      "outcome": "done",
-      "claims": [
-        "hosts/delphi/configuration.nix",
-        "modules/services/fleet-monitors.nix"
-      ],
-      "files": [
-        "AGENTS.nix"
-      ],
-      "base_commit": "3346ea27",
-      "branch": "delphi-dup-services-note",
-      "frame": "03hazdnar5624styd4wa9onfa"
-    },
-    {
-      "id": "c289f461-6356-4064-b92f-12436e00be3c",
-      "ts": "2026-11-26T02:16:00Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-agents-3",
-      "action": "deploy: offload duplicate services → run deploy gate",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hazcmlmk2ecy6p5cexpses7"
     }
   ]
 }

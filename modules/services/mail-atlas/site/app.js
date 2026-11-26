@@ -1569,6 +1569,13 @@ function setBox(box) {
 function renderCounts() {
   el.inbox.textContent = String(state.counts.inbox ?? 0);
   el.queuedStat.textContent = String(state.counts.queued ?? 0);
+  // A queue that stopped draining and an empty queue show the same count; the
+  // age is the honest signal, so it rides in the tooltip.
+  const mins = Number(state.counts.oldestQueuedMin ?? 0);
+  el.queuedStat.title =
+    state.counts.queued && mins
+      ? `oldest decision waiting ${mins >= 60 ? `${Math.round(mins / 60)}h` : `${mins}m`}`
+      : "";
 }
 
 // A decision takes the letter out of the working set the moment it is asked
@@ -2026,6 +2033,7 @@ field.onCategory((cat) => setCategory(cat));
     state.counts.inbox = Number(headline?.inbox ?? 0);
     state.counts.queued = Number(headline?.queued ?? 0);
     state.counts.commands = Number(headline?.commands ?? 0);
+    state.counts.oldestQueuedMin = Number(headline?.oldest_queued_min ?? 0);
     renderCounts();
     renderBoxTabs();
     renderSelection();

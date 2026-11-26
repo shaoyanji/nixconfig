@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-26T18:30:11Z",
+  "generated": "2026-11-26T18:42:00Z",
   "count": 200,
-  "pin": "b7383a5bb29f368f739560ba5f54071be118ad2d8be896edfc28bd2cfaafc376",
+  "pin": "17b363df15c007c1974da25f0d4ffb1aad9217281b6198a3c4c3172a197e7b3b",
   "turns": [
+    {
+      "id": "739af2ed-a2b7-4b19-89ce-a3c0752a4aa7",
+      "ts": "2026-11-26T18:32:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-service-health-and-resource-audit",
+      "action": "claim: read-only delphi audit (disk/RAM/PSI/journald/failed units/7 tailnet endpoints/sentinel), fix a broken probe only if one shows",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task",
+        "taskfiles/ops.yml"
+      ],
+      "files": [],
+      "base_commit": "f0ca528efb24cf38bdbc1038b68679bb529125c3",
+      "branch": "main",
+      "frame": "03hb4nczlgh8ams4288jg60n4"
+    },
+    {
+      "id": "3f276fc5-4fdb-4023-9d34-d9104adc47e8",
+      "ts": "2026-11-26T18:31:43Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:closure-budget-coverage",
+      "action": "task-change: baseline all host closures; checks:closure:budget ALL=1",
+      "outcome": "in_progress",
+      "claims": [
+        "closure-budgets.toml"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb4n88a31tt1wcbxljki0o6"
+    },
+    {
+      "id": "e4f62920-f7db-4994-a1b1-c66fa5bac262",
+      "ts": "2026-11-26T18:30:19Z",
+      "source": "hermes",
+      "subject": "nixconfig:security-hardening",
+      "action": "start: steer panes toward security hardening (sops/age-key audit, host hardening review, cert expiry, fallback liveness)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/secrets/",
+        "modules/profiles/",
+        "modules/config/"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb4myfivaorsxsvwd1k0rbw"
+    },
+    {
+      "id": "47be0a1f-f344-441d-9262-07cea796a20e",
+      "ts": "2026-11-26T18:30:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-apps-scout-dynamic-sweep-cycle-and-dedupe",
+      "action": "landed: apps:scout:sweep SWEEP defaults to (now | date \"2006-01-02\") in UTC (2026-11-26 today), prints the next-letter rule, override still wins; apps-scout refuses a relative/mailto: --url (trims first); jobs-ingest skips a non-http(s) url by name so --company cannot file one | gate: checks:tasks, checks:prose, checks:appflow (13 scout cases), jobs-ingest 31 tests",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/apps.yml",
+        "scripts/task/apps-scout.sh",
+        "scripts/task/jobs-ingest.py",
+        "tests/apps-scout",
+        "tests/jobs-ingest"
+      ],
+      "files": [],
+      "base_commit": "f0ca528efb24cf38bdbc1038b68679bb529125c3",
+      "branch": "main",
+      "frame": "03hb4myb4szil1airyc12bv6j"
+    },
     {
       "id": "b051ebf1-cc76-4fad-8cc4-79becfce5182",
       "ts": "2026-11-26T18:30:02Z",
@@ -2996,67 +3063,6 @@
       "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
       "branch": "main",
       "frame": "03hb34443ib2kd1u0ej1anka6"
-    },
-    {
-      "id": "172a7d14-2423-4882-82e4-51da7ad8b0fb",
-      "ts": "2026-11-26T13:48:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: sweep 2026-11-26g — LinkedIn retries a 429 three times instead of dropping the query; widened to Luxembourg/Kubernetes/cloud/systems at depth 2. 4158 postings, 333 fresh, 29 new at 1694 held; 8 filed (LU grid operator, 2 banks, LIST, CMS, Deloitte, NSI, Uni Zurich), staffing firms refused. Page: is-a.dev (blog 8 leads). Gate: self-test 22/22, py_compile, bash -n; checks:quick unbuildable here (aarch64 vs x86_64).",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "d1cd1e26e3a7b68bb0a6722e0284076f92334dae",
-      "branch": "main",
-      "frame": "03hb33xo4zro770pyihf1me9a"
-    },
-    {
-      "id": "477ac8d0-4f0d-4e55-b8d5-9fb8d9b4c8b6",
-      "ts": "2026-11-26T13:47:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-site-publish",
-      "action": "publish | rebuilt .#sites.matt-site, deployed to Pages project matt. gates: checks:site:links PASS (91 links, 6 PDFs, 16 anchors), matt:cv:check PASS (14 ok 0 failed, live bytes == artifact), site:check PASS (35/47/17 ok). Live ce3d0fab, 28 assets already current",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "lib/matt"
-      ],
-      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
-      "branch": "main",
-      "frame": "03hb33ow5o8knc4lws1upvs26"
-    },
-    {
-      "id": "f2132a73-e2b6-42ef-b16a-09d888dac002",
-      "ts": "2026-11-26T13:46:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-1436",
-      "action": "drive freebuff: publish CV and static site (publish)",
-      "outcome": "in_progress",
-      "claims": [
-        "site",
-        "cv"
-      ],
-      "files": [],
-      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
-      "branch": "main",
-      "frame": "03hb33fhk98f56dqrsxe2fp88"
-    },
-    {
-      "id": "34745aeb-2c68-4ff2-a547-ddd75a94ec01",
-      "ts": "2026-11-26T13:46:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-1436",
-      "action": "drive devin: refactor shared host module chain (chain-change)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/hosts"
-      ],
-      "files": [],
-      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
-      "branch": "main",
-      "frame": "03hb33fexgxr6gfmfj24t74qu"
     }
   ]
 }

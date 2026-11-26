@@ -1466,6 +1466,17 @@ tasks:
     cmds:
       - bash scripts/task/sops-drift-check.sh
 
+  checks:ops:health:
+    desc: "Fixture for ops:health's freshness rule (a stale ok is the failure)"
+    summary: >
+      Drives the gate through temp verdict files, never this host's: a fresh `ok`
+      passes and reports its age, an `ok` older than the 45-minute ceiling fails
+      as stale, a caller can move that ceiling, a degraded verdict prints every
+      reason from status.json, a missing file is a failure rather than an empty
+      pass, and a nonsense ceiling exits 2.
+    cmds:
+      - bash tests/ops-health/run.sh
+
   checks:sops:drift:test:
     desc: "Regression fixture for checks:sops:drift (seeded dropped age recipient)"
     summary: >

@@ -8,9 +8,9 @@
 
   package = pkgs.buildGoModule {
     pname = "inventory-site";
-    version = "0.1.0";
+    version = "0.2.0";
     src = ./inventory-site;
-    vendorHash = "sha256-hlz2xD64cCm6nOmpv55WYliMXf/GFLwXn21Ky2+hOFU=";
+    vendorHash = "sha256-I3wqEtCYDR8+31GO1eQF5pupapM7q0bDKEzpwfV+rMs=";
     env.CGO_ENABLED = 0;
     meta = {
       description = "Private asset and fleet inventory with SQLite FTS5 search";
@@ -26,6 +26,14 @@
       "127.0.0.1:${toString cfg.port}"
       "-db"
       "${stateDir}/inventory.sqlite"
+      "-ntfy-url"
+      (
+        if cfg.ntfyUrl == null
+        then ""
+        else cfg.ntfyUrl
+      )
+      "-warranty-warn-days"
+      (toString cfg.warrantyWarnDays)
       "-origin"
       "https://${cfg.tailnetHost}:${toString cfg.tailnetPort}"
     ]
@@ -73,10 +81,22 @@ in {
       description = "Optional inventory.toml copied into the closure and imported idempotently at startup as fleet-host asset rows.";
     };
 
+    ntfyUrl = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Optional ntfy/webhook URL notified once for each asset at a given warranty expiry date. Keep this null or point at a secret-rendered endpoint; the URL is not a secret itself.";
+    };
+
+    warrantyWarnDays = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 30;
+      description = "Number of days before warranty expiry that enters the deduped alert ledger.";
+    };
+
     environmentFile = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      description = "Optional systemd EnvironmentFile containing INVENTORY_SITE_ADMIN_TOKEN. Render it from sops; never put keys in the Nix store.";
+      description = "Optional systemd EnvironmentFile containing INVENTORY_SITE_ADMIN_TOKEN or INVENTORY_SITE_NTFY_URL. Render secrets from sops; never put keys in the Nix store.";
     };
   };
 
@@ -85,6 +105,10 @@ in {
       {
         assertion = cfg.tailnetHost != null;
         message = "services.inventorySite.tailnetHost is required: POST writes are limited to the configured tailnet origin.";
+      }
+      {
+        assertion = cfg.warrantyWarnDays > 0;
+        message = "services.inventorySite.warrantyWarnDays must be positive.";
       }
     ];
 

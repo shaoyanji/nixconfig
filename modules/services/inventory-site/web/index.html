@@ -42,7 +42,7 @@
 
       <div class="sectionbar">
         <div><p class="eyebrow">live register</p><h2>Assets</h2></div>
-        <p id="assetCount" class="muted"></p>
+        <div class="sectionactions"><button id="expiringSoon" class="ghost" type="button">Warranty ≤30d</button><p id="assetCount" class="muted"></p></div>
       </div>
       <div id="items" class="dealgrid inventory-grid" aria-live="polite"></div>
     </section>
@@ -78,6 +78,11 @@
           <div id="importResult" class="small"></div>
         </div>
       </details>
+
+      <section class="panel" id="alertsPanel">
+        <div class="panelhead"><h3>Warranty alerts</h3><button id="evaluateAlerts" class="ghost smallbutton" type="button">Evaluate</button></div>
+        <div id="warrantyAlerts" class="alertlist"></div>
+      </section>
 
       <section class="panel">
         <div class="panelhead"><h3>Categories</h3><span id="categoryCount" class="muted"></span></div>

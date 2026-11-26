@@ -7,8 +7,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 )
 
 func testStore(t *testing.T) *Store {
@@ -213,5 +216,129 @@ model = "Test Machine"
 	}
 	if result.Inserted != 1 {
 		t.Fatalf("import result %#v", result)
+	}
+}
+
+func TestAssetEventsAutomaticAndManualCheckout(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	input := sampleInput()
+	id, _, err := store.UpsertItem(ctx, input)
+	if err != nil {
+		t.Fatalf("UpsertItem: %v", err)
+	}
+	input.Location = "workshop"
+	input.Notes = "moved for repair"
+	if err := store.UpdateItem(ctx, id, input); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+	event, err := store.AddAssetEvent(ctx, id, assetEventInput{Kind: "checkout", Actor: "dev", Location: "field kit", Note: "weekend diagnostics"})
+	if err != nil {
+		t.Fatalf("AddAssetEvent: %v", err)
+	}
+	if event.Kind != "checkout" || event.FromLocation != "workshop" || event.ToLocation != "field kit" {
+		t.Fatalf("manual event %#v", event)
+	}
+	item, err := store.GetItem(ctx, id)
+	if err != nil || item.Location != "field kit" {
+		t.Fatalf("location after checkout %#v err=%v", item, err)
+	}
+	events, err := store.ListAssetEvents(ctx, id, 20)
+	if err != nil {
+		t.Fatalf("ListAssetEvents: %v", err)
+	}
+	kinds := map[string]int{}
+	for _, event := range events {
+		kinds[event.Kind]++
+	}
+	if kinds["create"] != 1 || kinds["location-move"] != 1 || kinds["update"] != 1 || kinds["checkout"] != 1 {
+		t.Fatalf("event kinds %#v events=%#v", kinds, events)
+	}
+}
+
+func TestWarrantyAlertEvaluationIsDedupedAndNotifies(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	input := sampleInput()
+	input.WarrantyUntil = time.Now().UTC().AddDate(0, 0, 9).Format("2006-01-02")
+	if _, _, err := store.UpsertItem(ctx, input); err != nil {
+		t.Fatalf("UpsertItem: %v", err)
+	}
+	var calls atomic.Int32
+	ntfy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		if r.Header.Get("Title") == "" {
+			t.Errorf("missing ntfy title")
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ntfy.Close()
+	manager := newWarrantyAlertManager(store, ntfy.URL, 30)
+	first, err := manager.evaluate(ctx, true)
+	if err != nil {
+		t.Fatalf("first evaluate: %v", err)
+	}
+	if first.Matched != 1 || first.Created != 1 || first.Notified != 1 || first.Failed != 0 {
+		t.Fatalf("first summary %#v", first)
+	}
+	second, err := manager.evaluate(ctx, true)
+	if err != nil {
+		t.Fatalf("second evaluate: %v", err)
+	}
+	if second.Matched != 1 || second.Created != 0 || second.Existing != 1 || second.Notified != 0 {
+		t.Fatalf("second summary %#v", second)
+	}
+	if calls.Load() != 1 {
+		t.Fatalf("ntfy calls %d", calls.Load())
+	}
+	alerts, err := store.ListWarrantyAlerts(ctx, 10)
+	if err != nil || len(alerts) != 1 || alerts[0].Status != "sent" || alerts[0].NotifyCount != 1 {
+		t.Fatalf("alerts %#v err=%v", alerts, err)
+	}
+}
+
+func TestWarrantyEvaluationFailureIsRecorded(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	input := sampleInput()
+	input.WarrantyUntil = time.Now().UTC().AddDate(0, 0, 2).Format("2006-01-02")
+	if _, _, err := store.UpsertItem(ctx, input); err != nil {
+		t.Fatalf("UpsertItem: %v", err)
+	}
+	ntfy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadGateway)
+	}))
+	defer ntfy.Close()
+	manager := newWarrantyAlertManager(store, ntfy.URL, 30)
+	summary, err := manager.evaluate(ctx, true)
+	if err != nil || summary.Failed != 1 {
+		t.Fatalf("summary %#v err=%v", summary, err)
+	}
+	alerts, err := store.ListWarrantyAlerts(ctx, 10)
+	if err != nil || len(alerts) != 1 || alerts[0].Status != "failed" || alerts[0].LastError == "" {
+		t.Fatalf("alerts %#v err=%v", alerts, err)
+	}
+}
+
+func TestQRLabelEndpointReturnsPrintableSVG(t *testing.T) {
+	store := testStore(t)
+	id, _, err := store.UpsertItem(context.Background(), sampleInput())
+	if err != nil {
+		t.Fatalf("UpsertItem: %v", err)
+	}
+	s := &server{store: store, expectedOrigin: "https://delphi.example:8466"}
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/items/{id}/qr.svg", s.itemQRLabel)
+	mux.HandleFunc("GET /api/items/{id}/events", s.itemEvents)
+	recorder := httptest.NewRecorder()
+	mux.ServeHTTP(recorder, httptest.NewRequest("GET", "/api/items/"+strconv.FormatInt(id, 10)+"/qr.svg", nil))
+	body := recorder.Body.String()
+	if recorder.Code != http.StatusOK || !strings.Contains(body, "<svg") || !strings.Contains(body, "<rect") || !strings.Contains(body, "ThinkPad X1 Carbon") {
+		t.Fatalf("qr status=%d type=%s body=%.300s", recorder.Code, recorder.Header().Get("content-type"), body)
+	}
+	recorder = httptest.NewRecorder()
+	mux.ServeHTTP(recorder, httptest.NewRequest("GET", "/api/items/"+strconv.FormatInt(id, 10)+"/events", nil))
+	if recorder.Code != http.StatusOK || !strings.Contains(recorder.Body.String(), "asset created") {
+		t.Fatalf("events status=%d body=%s", recorder.Code, recorder.Body.String())
 	}
 }

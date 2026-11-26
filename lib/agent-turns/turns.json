@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T16:36:36Z",
+  "generated": "2026-11-26T16:36:46Z",
   "count": 200,
-  "pin": "5acc8487305abd9f6412289954ab06e5ca21761fb3b702d79ae39a18fec302fb",
+  "pin": "b5d9378326e2cb750e38da7a448d2379d946152207b6e19fc8974bb591d7aab9",
   "turns": [
+    {
+      "id": "593c6b7c-1b64-46d3-81a0-269b95de2df2",
+      "ts": "2026-11-26T16:36:45Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-endpoints-smoke",
+      "action": "claim: taking over from tmux-pane-steward; task-change|0.27 delphi services endpoints smoke — reading the runtime page and what already exists before writing a new verb",
+      "outcome": "in_progress",
+      "claims": [
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "46e401129415e0f79b19af06a7b93b3e7fe52634",
+      "branch": "main",
+      "frame": "03hb40rt2bycvinxv92xz0hk2"
+    },
+    {
+      "id": "a38581d1-c362-45d2-adcb-5b4a03f58a9c",
+      "ts": "2026-11-26T16:36:45Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-smoke-taskfile",
+      "action": "agents:portfolio:smoke wired to portfolio-smoke.py (summary 587 chars, not internal); docs/portfolio-services.md gains clanker-runner (loopback 8104 / tailnet 8467, machine + job routes) and the verb, with what it calls a pass. Inventory-site untouched; committed through a temp GIT_INDEX_FILE so Pane 3's staged work stayed staged.| gate: checks:tasks 842 tasks no hard violations, unittest 31 OK, task agents:portfolio:smoke -- --help prints usage",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "46e401129415e0f79b19af06a7b93b3e7fe52634",
+      "branch": "main",
+      "frame": "03hb40rqxgxjzb97ij0q7pcfp"
+    },
     {
       "id": "5422230b-2f20-410f-b2a2-476acdd67eca",
       "ts": "2026-11-26T16:35:27Z",
@@ -3036,40 +3064,6 @@
       "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
       "branch": "main",
       "frame": "03hb2hzk2a1oe32qyqqbf1nt2"
-    },
-    {
-      "id": "f1efb47d-7a2c-46d5-8848-78a6cbaed956",
-      "ts": "2026-11-26T11:55:30Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-db-remediate",
-      "action": "185 bare, 4 twins, 4 dead prep fixed. I clobbered 125 prep rows with a bad loop and restored all 125 from the pre-write snapshot (0 status, 0 nextAction diffs). Gate 5 rules -> 2.",
-      "outcome": "blocked: 55 rows need a role named or a twin picked; the 8 mail rows need delphi's loopback engines",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/apps-resolve.sh",
-        "modules/plugins/appflow"
-      ],
-      "files": [],
-      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
-      "branch": "main",
-      "frame": "03hb2htw9xjulumo974dwclhz"
-    },
-    {
-      "id": "51ab5fa3-cb37-42b8-9f04-568cd7321c55",
-      "ts": "2026-11-26T11:55:28Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-db-remediate",
-      "action": "Mechanical appflow debt: backfill bare statuses, declare twins, re-derive dead prep rows",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/apps-resolve.sh",
-        "modules/plugins/appflow"
-      ],
-      "files": [],
-      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
-      "branch": "main",
-      "frame": "03hb2htta8ft3x00solb1le1l"
     }
   ]
 }

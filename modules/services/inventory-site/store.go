@@ -110,6 +110,34 @@ func (s *Store) migrate() error {
 		`CREATE INDEX IF NOT EXISTS idx_items_serial ON items(serial)`,
 		`CREATE INDEX IF NOT EXISTS idx_items_warranty ON items(warranty_until)`,
 		`CREATE INDEX IF NOT EXISTS idx_items_updated ON items(updated_at)`,
+		`CREATE TABLE IF NOT EXISTS asset_events (
+			id INTEGER PRIMARY KEY,
+			item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+			kind TEXT NOT NULL,
+			summary TEXT NOT NULL,
+			actor TEXT NOT NULL DEFAULT '',
+			from_location TEXT NOT NULL DEFAULT '',
+			to_location TEXT NOT NULL DEFAULT '',
+			note TEXT NOT NULL DEFAULT '',
+			created_at TEXT NOT NULL
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_asset_events_item ON asset_events(item_id, id DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_asset_events_kind ON asset_events(kind)`,
+		`CREATE TABLE IF NOT EXISTS warranty_alerts (
+			id INTEGER PRIMARY KEY,
+			item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+			warranty_until TEXT NOT NULL,
+			item_name TEXT NOT NULL,
+			status TEXT NOT NULL DEFAULT 'pending',
+			notify_count INTEGER NOT NULL DEFAULT 0,
+			last_notified_at TEXT NOT NULL DEFAULT '',
+			last_error TEXT NOT NULL DEFAULT '',
+			created_at TEXT NOT NULL,
+			updated_at TEXT NOT NULL,
+			UNIQUE(item_id, warranty_until)
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_warranty_alerts_status ON warranty_alerts(status)`,
+		`CREATE INDEX IF NOT EXISTS idx_warranty_alerts_warranty ON warranty_alerts(warranty_until)`,
 	}
 	for _, statement := range statements {
 		if _, err := s.db.Exec(statement); err != nil {
@@ -296,7 +324,13 @@ func (s *Store) UpsertItem(ctx context.Context, input itemInput) (int64, bool, e
 		return 0, false, err
 	}
 	var id int64
+	var before itemInput
 	if found {
+		current, getErr := s.GetItem(ctx, existing)
+		if getErr != nil {
+			return 0, false, getErr
+		}
+		before = inputFromItem(current)
 		id = existing
 		_, err = s.db.ExecContext(ctx, `UPDATE items SET name=?, category=?, location=?, description=?, manufacturer=?, model=?, serial=?,
 			purchase_date=?, warranty_until=?, value_cents=?, currency=?, quantity=?, url=?, notes=?, archived=?, updated_at=? WHERE id=?`,
@@ -328,6 +362,7 @@ func (s *Store) UpsertItem(ctx context.Context, input itemInput) (int64, bool, e
 	if input.Location != "" {
 		_ = s.UpsertMeta(ctx, "locations", input.Location, "")
 	}
+	s.logAutomaticEvents(ctx, id, !found, before, input)
 	return id, !found, nil
 }
 
@@ -384,6 +419,7 @@ func (s *Store) UpdateItem(ctx context.Context, id int64, input itemInput) error
 	if err != nil {
 		return err
 	}
+	before := inputFromItem(current)
 	if input.Source == "" {
 		input.Source = current.Source
 	}
@@ -411,6 +447,7 @@ func (s *Store) UpdateItem(ctx context.Context, id int64, input itemInput) error
 	if input.Location != "" {
 		_ = s.UpsertMeta(ctx, "locations", input.Location, "")
 	}
+	s.logAutomaticEvents(ctx, id, false, before, input)
 	return nil
 }
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"embed"
 	"encoding/json"
 	"errors"
@@ -23,6 +24,8 @@ type server struct {
 	store          *Store
 	adminToken     string
 	expectedOrigin string
+	alerts         *warrantyAlertManager
+	warrantyWarn   int
 	started        time.Time
 }
 
@@ -36,6 +39,8 @@ func main() {
 	inventorySeed := flag.String("inventory-seed", "", "optional inventory.toml file to seed fleet hosts on startup")
 	adminTokenEnv := flag.String("admin-token-env", "INVENTORY_SITE_ADMIN_TOKEN", "environment variable naming the optional write bearer token")
 	expectedOrigin := flag.String("origin", "", "expected browser Origin for state-changing requests; empty disables the check")
+	ntfyURLFlag := flag.String("ntfy-url", "", "optional ntfy/webhook URL for deduped warranty-expiry notifications")
+	warrantyWarnDays := flag.Int("warranty-warn-days", 30, "number of days before warranty expiry that enters the alert ledger")
 	flag.Parse()
 
 	store, err := OpenStore(*dbPath)
@@ -60,12 +65,18 @@ func main() {
 		log.Printf("inventory-site: inventory.toml seed inserted=%d updated=%d skipped=%d", result.Inserted, result.Updated, result.Skipped)
 	}
 
+	ntfyURL := strings.TrimSpace(*ntfyURLFlag)
+	if ntfyURL == "" {
+		ntfyURL = strings.TrimSpace(os.Getenv("INVENTORY_SITE_NTFY_URL"))
+	}
 	s := &server{
 		store:          store,
 		adminToken:     strings.TrimSpace(os.Getenv(*adminTokenEnv)),
 		expectedOrigin: strings.TrimRight(*expectedOrigin, "/"),
+		warrantyWarn:   *warrantyWarnDays,
 		started:        time.Now().UTC(),
 	}
+	s.alerts = newWarrantyAlertManager(store, ntfyURL, *warrantyWarnDays)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", s.index)
@@ -80,6 +91,11 @@ func main() {
 	mux.HandleFunc("GET /api/items/{id}", s.item)
 	mux.HandleFunc("PUT /api/items/{id}", s.updateItem)
 	mux.HandleFunc("DELETE /api/items/{id}", s.deleteItem)
+	mux.HandleFunc("GET /api/items/{id}/events", s.itemEvents)
+	mux.HandleFunc("POST /api/items/{id}/events", s.createItemEvent)
+	mux.HandleFunc("GET /api/items/{id}/qr.svg", s.itemQRLabel)
+	mux.HandleFunc("GET /api/alerts", s.warrantyAlerts)
+	mux.HandleFunc("POST /api/alerts/evaluate", s.evaluateWarrantyAlerts)
 	mux.HandleFunc("GET /api/meta/{kind}", s.meta)
 	mux.HandleFunc("POST /api/meta/{kind}", s.createMeta)
 	mux.HandleFunc("DELETE /api/meta/{kind}/{name}", s.deleteMeta)
@@ -89,10 +105,31 @@ func main() {
 	mux.HandleFunc("POST /api/import/csv", s.importCSV)
 	mux.HandleFunc("POST /api/import/inventory-toml", s.importFleetTOML)
 
+	go func() {
+		time.Sleep(8 * time.Second)
+		if _, err := s.alerts.evaluate(context.Background(), true); err != nil {
+			log.Printf("inventory-site: initial warranty evaluation: %v", err)
+		}
+		ticker := time.NewTicker(6 * time.Hour)
+		defer ticker.Stop()
+		for range ticker.C {
+			if _, err := s.alerts.evaluate(context.Background(), true); err != nil {
+				log.Printf("inventory-site: warranty evaluation: %v", err)
+			}
+		}
+	}()
+
 	log.Printf("inventory-site: listening on %s, db %s", *addr, *dbPath)
 	if err := http.ListenAndServe(*addr, mux); err != nil {
 		log.Fatalf("inventory-site: %v", err)
 	}
+}
+
+func (s *server) alertManager() *warrantyAlertManager {
+	if s.alerts != nil {
+		return s.alerts
+	}
+	return newWarrantyAlertManager(s.store, "", s.warrantyWarn)
 }
 
 func writeJSON(w http.ResponseWriter, status int, value any) {
@@ -137,8 +174,9 @@ func (s *server) static(path, contentType string) http.HandlerFunc {
 
 func (s *server) health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
-		"ok": true, "service": "inventory-site", "version": "0.1.0",
+		"ok": true, "service": "inventory-site", "version": "0.2.0",
 		"uptime_seconds": int(time.Since(s.started).Seconds()), "time": time.Now().UTC().Format(time.RFC3339),
+		"warranty_warn_days": s.warrantyWarn, "ntfy_configured": s.alerts != nil && s.alerts.enabled(),
 	})
 }
 
@@ -258,6 +296,102 @@ func (s *server) deleteItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
+}
+
+func (s *server) itemEvents(w http.ResponseWriter, r *http.Request) {
+	id, err := parseID(r, "item")
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if _, err := s.store.GetItem(r.Context(), id); err != nil {
+		writeError(w, http.StatusNotFound, err)
+		return
+	}
+	events, err := s.store.ListAssetEvents(r.Context(), id, intQuery(r, "limit"))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"events": events, "total": len(events)})
+}
+
+func (s *server) createItemEvent(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	id, err := parseID(r, "item")
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	var input assetEventInput
+	decoder := json.NewDecoder(io.LimitReader(r.Body, 1<<20))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&input); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	event, err := s.store.AddAssetEvent(r.Context(), id, input)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			writeError(w, http.StatusNotFound, err)
+		} else {
+			writeError(w, http.StatusBadRequest, err)
+		}
+		return
+	}
+	writeJSON(w, http.StatusCreated, event)
+}
+
+func (s *server) itemQRLabel(w http.ResponseWriter, r *http.Request) {
+	id, err := parseID(r, "item")
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	item, err := s.store.GetItem(r.Context(), id)
+	if err != nil {
+		writeError(w, http.StatusNotFound, err)
+		return
+	}
+	origin := s.expectedOrigin
+	if origin == "" {
+		origin = "http://" + r.Host
+	}
+	svg, err := renderQRLabelSVG(item, qrLabelTarget(origin, id))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")
+	w.Header().Set("Cache-Control", "private, max-age=300")
+	_, _ = w.Write(svg)
+}
+
+func (s *server) warrantyAlerts(w http.ResponseWriter, r *http.Request) {
+	alerts, err := s.store.ListWarrantyAlerts(r.Context(), intQuery(r, "limit"))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"alerts": alerts, "total": len(alerts), "warranty_warn_days": s.warrantyWarn,
+		"ntfy_configured": s.alerts != nil && s.alerts.enabled(),
+	})
+}
+
+func (s *server) evaluateWarrantyAlerts(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	notify := r.URL.Query().Get("notify") != "0"
+	summary, err := s.alertManager().evaluate(r.Context(), notify)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, summary)
 }
 
 func validMetaKind(kind string) bool {

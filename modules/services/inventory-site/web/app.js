@@ -66,8 +66,9 @@ function card(item) {
   </article>`;
 }
 async function showItem(id) {
-  const item = await api(`/api/items/${id}`);
+  const [item,eventPayload] = await Promise.all([api(`/api/items/${id}`), api(`/api/items/${id}/events`)]);
   const [wclass,wtext] = warrantyState(item);
+  const events = eventPayload.events || [];
   $('#detail').innerHTML = `<p class="eyebrow">${esc(item.category || 'asset')}</p><h2>${esc(item.name)}</h2>
     <p>${esc(item.description || 'No description recorded.')}</p>
     <div class="detail-specs">
@@ -79,9 +80,27 @@ async function showItem(id) {
       <div><span>warranty</span><b class="warranty-${wclass}">${dateText(item.warranty_until)} · ${esc(wtext)}</b></div>
     </div>
     <div class="meta">${(item.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}<span class="chip">${esc(item.source)}</span>${item.archived?'<span class="chip">archived</span>':''}</div>
+    <div class="qrlabel"><a href="/api/items/${item.id}/qr.svg" target="_blank" rel="noreferrer" title="Open printable SVG label"><img src="/api/items/${item.id}/qr.svg" alt="Printable QR asset label"></a><a class="ghost" href="/api/items/${item.id}/qr.svg" target="_blank" rel="noreferrer">Print QR label</a></div>
+    <div class="checkoutbox" data-item="${item.id}">
+      <strong>Checkout / audit event</strong>
+      <input name="actor" placeholder="Actor" value="manual">
+      <input name="location" placeholder="Move to location (optional)" list="locationList">
+      <input name="note" placeholder="Note (optional)">
+      <div class="checkoutbuttons"><button class="secondary" data-event-kind="checkout" type="button">Checkout</button><button class="secondary" data-event-kind="checkin" type="button">Check in</button><button class="ghost" data-event-kind="note" type="button">Add note</button></div>
+    </div>
+    <h3>Audit timeline</h3><div class="timeline">${events.map(event => `<div class="timeline-event"><b>${esc(event.summary)}</b><small>${esc(event.kind)} · ${new Date(event.created_at).toLocaleString()} · ${esc(event.actor || 'system')}${event.from_location||event.to_location?` · ${esc(event.from_location||'unplaced')} → ${esc(event.to_location||'unplaced')}`:''}</small>${event.note?`<p>${esc(event.note)}</p>`:''}</div>`).join('') || '<p class="muted">No audit events yet.</p>'}</div>
     ${item.notes?`<h3>Notes</h3><p>${esc(item.notes).replaceAll('\n','<br>')}</p>`:''}
     ${item.url?`<a class="primary ghost" target="_blank" rel="noreferrer" href="${esc(item.url)}">Open linked record</a>`:''}`;
-  $('#detailDialog').showModal();
+  $$('.checkoutbuttons button', $('#detail')).forEach(btn => btn.onclick = () => postItemEvent(id, btn.dataset.eventKind));
+  if (!$('#detailDialog').open) $('#detailDialog').showModal();
+}
+async function postItemEvent(id, kind) {
+  const box = $('.checkoutbox', $('#detail'));
+  const body = {kind, actor: $('[name="actor"]', box).value, location: $('[name="location"]', box).value, note: $('[name="note"]', box).value};
+  try {
+    await api(`/api/items/${id}/events`, {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+    toast('Audit event recorded'); await Promise.all([showItem(id), refreshAll()]);
+  } catch(err) { toast(err.message); }
 }
 function fillForm(item={}) {
   const f = $('#itemForm');
@@ -141,8 +160,20 @@ async function loadMeta() {
     if (select) { select.value = btn.dataset.name; loadItems().catch(err => toast(err.message)); }
   });
 }
+async function loadAlerts() {
+  const payload = await api('/api/alerts?limit=20');
+  const alerts = payload.alerts || [];
+  $('#warrantyAlerts').innerHTML = alerts.map(alert => `<div class="alertrow"><b>${esc(alert.item_name)}</b><span>${dateText(alert.warranty_until)} · ${esc(alert.status)}${alert.notify_count?` · notified ${alert.notify_count}×`:''}</span>${alert.last_error?`<span class="warranty-bad"><br>${esc(alert.last_error)}</span>`:''}</div>`).join('') || '<span class="muted">No warranty alerts evaluated yet.</span>';
+}
+async function evaluateAlerts() {
+  try {
+    const result = await api('/api/alerts/evaluate', {method:'POST'});
+    toast(`Warranty scan: ${result.matched} matched, ${result.notified} notified`);
+    await loadAlerts();
+  } catch(err) { toast(err.message); }
+}
 async function refreshAll() {
-  await Promise.all([refreshStats(), loadItems(), loadMeta()]);
+  await Promise.all([refreshStats(), loadItems(), loadMeta(), loadAlerts()]);
 }
 async function importFile(input, path, type) {
   const file = input.files && input.files[0];
@@ -162,4 +193,9 @@ $('#newItemButton').onclick = () => fillForm();
 $('#jsonImport').addEventListener('change', event => importFile(event.target,'/api/import/json','application/json'));
 $('#csvImport').addEventListener('change', event => importFile(event.target,'/api/import/csv','text/csv'));
 $('#tomlImport').addEventListener('change', event => importFile(event.target,'/api/import/inventory-toml','application/toml'));
-refreshAll().catch(err => toast(err.message));
+$('#evaluateAlerts').onclick = evaluateAlerts;
+$('#expiringSoon').onclick = () => { $('#filters').warranty_within.value = '30'; loadItems().catch(err => toast(err.message)); };
+refreshAll().then(() => {
+  const item = new URLSearchParams(location.search).get('item');
+  if (item) showItem(item).catch(err => toast(err.message));
+}).catch(err => toast(err.message));

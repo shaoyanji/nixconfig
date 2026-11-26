@@ -21,8 +21,13 @@ in {
       # .agents/skills/antigravity/SKILL.md. null keeps HM managing settings,
       # commands and GEMINI.md; the subagent wrappers below carry their own copy.
       package = null;
-      # Fast Gemini model, set via $GEMINI_MODEL (HM module behavior).
-      defaultModel = "gemini-3.8-flash";
+      # Main model, set via $GEMINI_MODEL (HM module behavior). Hydrogen is a
+      # Gemini 4 id, so it resolves only on the key route — a `modelProvider`
+      # of `gemini` plus GEMINI_API_KEY — which `agy-gemini`/`agy-subagent` set
+      # for one session instead of writing it into settings.json: a provider
+      # there would replace the account route for every keyless run on the host
+      # (the nightly cascades load no key), not just the one that wants Gemini 4.
+      defaultModel = "gemini-4-hydrogen-high";
 
       settings = {
         # Display

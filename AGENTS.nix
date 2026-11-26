@@ -8635,5 +8635,39 @@
         entity types and `serves`. 60 intent + 6 capability nodes project.
       '';
     };
+    wallpaper-nixconfig-dark-publish-blocked = {
+      title = "nixconfig-dark wallpaper rotation landed; Cloudinary publish blocked by quota";
+      kind = "open";
+      status = "BLOCKED";
+      priority = "P3";
+      date = "2026-11-26";
+      summary = "wallpapers/nixconfig-dark.png, lib/image-daily/briefs.json, and lib/image-daily/rotation.json are committed and pushed to origin/main (b5920ed6); Cloudinary publish is blocked by an individual quota resetting in ~25 minutes — do not retry publish yet.";
+      from = ["image-daily-queue"];
+      refs = {
+        hosts = ["frieren"];
+        modules = [
+          "lib/image-daily/rotation.json"
+          "lib/image-daily/briefs.json"
+          "wallpapers/nixconfig-dark.png"
+          "scripts/task/images-publish.sh"
+        ];
+        tasks = ["images:publish" "images:wallpaper" "checks:images"];
+        docs = ["taskfiles/images.yml"];
+      };
+      body = ''
+        Landed in commit b5920ed6 on origin/main:
+        - `wallpapers/nixconfig-dark.png` (1536x1024 dark Frieren constellation wallpaper)
+        - `lib/image-daily/briefs.json` (`wall-nixconfig-dark` brief)
+        - `lib/image-daily/rotation.json` (`2026-11-26/nixconfig-dark.png` and
+          `2026-11-26/catwoman-dc.png` prepended to `wall.in`)
+
+        Blocker: `task images:publish` (Cloudinary upload and gallery manifest deploy)
+        is blocked by an individual quota resetting in ~25 minutes from
+        2026-11-26T21:42+01:00. Do not retry `images:publish` until after the reset.
+
+        Exit: after the quota resets, run `task images:publish` and
+        `task checks:images`, confirm exit 0, and mark this note CLOSED.
+      '';
+    };
   };
 }

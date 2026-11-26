@@ -1,4 +1,3 @@
-# Boot configuration profile
 {
   config,
   lib,

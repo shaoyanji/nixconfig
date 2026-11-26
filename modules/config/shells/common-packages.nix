@@ -1,6 +1,5 @@
 # Common package sets shared across devShells
 {pkgs}: {
-  # Core utilities - used by most shells
   core = with pkgs; [
     git
     zoxide
@@ -15,14 +14,12 @@
     btop
   ];
 
-  # AI tools
   ai = with pkgs; [
     tgpt
     aichat
     mods
   ];
 
-  # UI/UX tools
   ui = with pkgs; [
     gum
     pop
@@ -31,7 +28,6 @@
     lolcat
   ];
 
-  # Productivity tools
   productivity = with pkgs; [
     go-task
     yq-go
@@ -40,19 +36,16 @@
     pandoc
   ];
 
-  # Common shell greeting
   greeting = with pkgs; [
     cowsay
     lolcat
   ];
 
-  # Ruby/Jekyll stack
   jekyll = with pkgs; [
     jekyll
     bundler
   ];
 
-  # PDF tooling
   pdf = with pkgs; [
     texlive.combined.scheme-small
     pdfcpu
@@ -62,12 +55,10 @@
     ghostscript
   ];
 
-  # Node.js/Yarn stack
   yarn = with pkgs; [
     yarn
   ];
 
-  # Media/download tools
   media = with pkgs; [
     yt-dlp
     mpv
@@ -75,7 +66,6 @@
     spotube
   ];
 
-  # Editor tools
   editors = with pkgs; [
     helix
     neovim
@@ -90,7 +80,6 @@
       python-dotenv
     ]);
 
-  # Terminal extras
   terminal-extras = with pkgs; [
     htop
     tldr
@@ -126,7 +115,6 @@
     haredoc
   ];
 
-  # Replit-specific tools
   replit = with pkgs; [
     tmux
     marksman

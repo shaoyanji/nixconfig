@@ -100,6 +100,11 @@
         type = lib.types.nullOr lib.types.str;
         default = null;
       };
+      kind = lib.mkOption {
+        type = lib.types.str;
+        default = "link";
+        description = "Where the card comes from: `nginx`, `mount` or `external`.";
+      };
     };
   };
 
@@ -178,6 +183,7 @@
         then e.badge
         else "${s.proxy.name} :${toString s.port}";
       vhost = s.proxy.name;
+      kind = "nginx";
     })
     exposedKeys;
 
@@ -211,6 +217,7 @@
       else "${cfg.tailnetHost}:${toString m.port}";
     inherit (m) requires;
     vhost = null;
+    kind = "mount";
   }) (cfg.mounts |> lib.filterAttrs (_: m: !m.hideCard) |> builtins.attrNames);
 
   # 3. Standalone cards: renames (`entries.paste` → `frieren.lan`) and things a
@@ -243,11 +250,14 @@
         then e.vhost
         else "";
       inherit (e) vhost;
+      kind = "external";
     })
     standaloneKeys;
 
   allCards = exposureCards ++ mountCards ++ standaloneCards;
   visible = allCards;
+
+  cardSearch = c: lib.toLower "${c.title} ${c.description} ${c.badge} ${c.group} ${c.name}";
 
   cardsFor = audiences:
     lib.concatMapStrings (g: let
@@ -256,17 +266,24 @@
         (lib.filter (c: c.group == g && builtins.elem c.audience audiences) visible);
     in
       lib.optionalString (inGroup != []) ''
-        <h2>${esc g}</h2>
-        <div class="grid">
-        ${lib.concatMapStrings (c: ''
-            <a class="card" href="${esc c.href}">
+        <section class="group" data-group="${esc g}">
+          <h2>${esc g} <span class="gn">${toString (builtins.length inGroup)}</span></h2>
+          <div class="grid">
+          ${lib.concatMapStrings (c: ''
+            <a class="card" href="${esc c.href}" data-group="${esc c.group}"
+               data-audience="${esc c.audience}" data-kind="${esc (c.kind or "link")}"
+               data-search="${esc (cardSearch c)}">
               <div class="title">${esc c.title}</div>
               <div class="desc">${esc c.description}</div>
-              ${lib.optionalString (c.badge != "") ''<div class="badge">${esc c.badge}</div>''}
+              <div class="foot">
+                ${lib.optionalString (c.badge != "") ''<span class="badge">${esc c.badge}</span>''}
+                <span class="kind">${esc (c.kind or "link")}</span>
+              </div>
             </a>
           '')
           inGroup}
-        </div>
+          </div>
+        </section>
       '')
     cfg.groups;
 
@@ -277,6 +294,7 @@
   cardsJson = audiences:
     builtins.toJSON (map (c: {
       inherit (c) name title description group audience href badge;
+      kind = c.kind or "link";
       requires = c.requires or [];
     }) (lib.filter (c: builtins.elem c.audience audiences) visible));
 
@@ -307,13 +325,99 @@
             .card:hover { border-color:var(--accent); }
             .title { color:var(--accent); font-weight:600; }
             .desc { color:#8b949e; font-size:.875rem; line-height:1.4; }
-            .badge { margin-top:auto; padding-top:.5rem; color:#58a6ff; font-size:.7rem; }
+            .card .foot { margin-top:auto; display:flex; gap:.5rem; align-items:baseline; padding-top:.5rem; }
+            .badge { color:#58a6ff; font-size:.7rem; }
+            .kind { margin-left:auto; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
+                    color:#8b949e; border:1px solid var(--border); border-radius:4px; padding:.05rem .3rem; }
+            .gn { font-weight:400; color:#484f58; }
+            .toolbar { width:100%; max-width:60rem; display:flex; flex-wrap:wrap; gap:.5rem;
+                       align-items:center; margin:0 0 1rem; }
+            .toolbar input { flex:1 1 16rem; min-width:12rem; padding:.55rem .75rem; border-radius:6px;
+                             border:1px solid var(--border); background:var(--card); color:var(--text);
+                             font-size:.9rem; }
+            .toolbar input:focus { outline:none; border-color:var(--accent); }
+            .chips { display:flex; flex-wrap:wrap; gap:.35rem; }
+            .chip { font:inherit; font-size:.75rem; padding:.3rem .6rem; border-radius:999px;
+                    border:1px solid var(--border); background:transparent; color:#8b949e; cursor:pointer; }
+            .chip[aria-pressed="true"] { border-color:var(--accent); color:var(--accent); }
+            .meta { color:#8b949e; font-size:.75rem; margin-left:auto; }
+            #none { color:#8b949e; margin:1.5rem 0 0; }
+            footer { width:100%; max-width:60rem; color:#484f58; font-size:.7rem; margin-top:2rem; }
+            [hidden] { display:none !important; }
           </style>
         </head>
         <body>
           <h1>${esc cfg.title}</h1>
           <p class="sub">${esc cfg.subtitle}</p>
+          <div class="toolbar">
+            <input id="search" type="search" placeholder="filter services — name, group, address"
+                   autocomplete="off" spellcheck="false" aria-label="Filter services">
+            <div class="chips" id="chips">
+              <button class="chip" data-filter="all" aria-pressed="true">all</button>
+              ${lib.concatMapStrings (g: ''<button class="chip" data-filter="${esc g}" aria-pressed="false">${esc g}</button>'')
+        cfg.groups}
+            </div>
+            <span class="meta" id="count"></span>
+          </div>
           ${body}
+          <p id="none" hidden>nothing matches that filter</p>
+          <footer><a href="data/services.json">data/services.json</a> · one registry, every renderer</footer>
+          <script>
+            (function () {
+              var search = document.getElementById("search");
+              var count = document.getElementById("count");
+              var none = document.getElementById("none");
+              var cards = Array.prototype.slice.call(document.querySelectorAll(".card"));
+              var groups = Array.prototype.slice.call(document.querySelectorAll("section.group"));
+              var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
+              var active = "all";
+              function apply() {
+                var words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
+                var shown = 0;
+                cards.forEach(function (card) {
+                  var hay = card.getAttribute("data-search") || "";
+                  var okGroup = active === "all" || card.getAttribute("data-group") === active;
+                  var okWords = words.every(function (word) { return hay.indexOf(word) !== -1; });
+                  var ok = okGroup && okWords;
+                  card.hidden = !ok;
+                  if (ok) shown += 1;
+                });
+                groups.forEach(function (group) {
+                  group.hidden = !group.querySelector(".card:not([hidden])");
+                });
+                count.textContent = shown === cards.length
+                  ? cards.length + " services"
+                  : shown + " of " + cards.length + " services";
+                none.hidden = shown > 0;
+              }
+              chips.forEach(function (chip) {
+                chip.addEventListener("click", function () {
+                  var next = chip.getAttribute("data-filter");
+                  active = next === active ? "all" : next;
+                  chips.forEach(function (other) {
+                    other.setAttribute(
+                      "aria-pressed",
+                      String(other.getAttribute("data-filter") === active)
+                    );
+                  });
+                  apply();
+                });
+              });
+              search.addEventListener("input", apply);
+              document.addEventListener("keydown", function (event) {
+                if (event.key === "/" && document.activeElement !== search) {
+                  event.preventDefault();
+                  search.focus();
+                  search.select();
+                } else if (event.key === "Escape" && document.activeElement === search) {
+                  search.value = "";
+                  apply();
+                  search.blur();
+                }
+              });
+              apply();
+            })();
+          </script>
         </body>
       </html>
     '';
@@ -435,6 +539,7 @@ in {
     services.servicePortal.cards =
       map (c: {
         inherit (c) name title description group audience href badge vhost;
+        kind = c.kind or "link";
         requires = c.requires or [];
       })
       visible;

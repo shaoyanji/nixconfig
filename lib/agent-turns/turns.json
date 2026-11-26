@@ -1,8 +1,154 @@
 {
-  "generated": "2026-11-26T15:28:12Z",
+  "generated": "2026-11-26T15:42:26Z",
   "count": 200,
-  "pin": "f30acf4bd1e4ed5c2dd61a40c44bbc3da5df68c72bf7e597e789cfe83263341b",
+  "pin": "455572f4deca33f39bb9813c8670818241122e59f921ad4e57e676070c45001f",
   "turns": [
+    {
+      "id": "a1e3f424-edd7-40e3-9f0b-634cc2bf338e",
+      "ts": "2026-11-26T15:41:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:service-portal-portfolio-cards",
+      "action": "service-portal.nix: client-side filter on cards (title/desc/group/address/name, multi-word AND), group chips with toggle-to-all and per-heading counts, / focus + Escape clear, empty-state instead of blank sections, kind pill + kind in services.json. Verified: delphi tailnet page builds 19 cards, alejandra clean, browser run on a local HTTP copy (no JS errors, 19 -> 18 of 19 for delphi, 0 of 19 hides sections, chips toggle).| gate: nix build pages.tailnet PASS + browser filter PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "954332df80434617a58e7eefaea5d9f7b3eb9066",
+      "branch": "main",
+      "frame": "03hb3q1d9zdt8yw46r4crgjix"
+    },
+    {
+      "id": "35b47a25-7393-476d-8dea-42823046fc09",
+      "ts": "2026-11-26T15:40:17Z",
+      "source": "buffy",
+      "subject": "nixconfig:pane-nudge-tmux38",
+      "action": "landed: pane-nudge uses a named buffer on load-buffer (its -t is a target client, not a pane) and no longer sends Escape; proven in a scratch pane — line arrived intact, partial input cleared, buffer deleted, exits 1/2 correct | gate: checks:quick PASS (+shellcheck, tmux probe)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/pane-nudge.sh"
+      ],
+      "files": [],
+      "base_commit": "d0720272c3b44e3878415f1a19cf9cb02856e37e",
+      "branch": "main",
+      "frame": "03hb3pqugw9qljooue3fk1he1"
+    },
+    {
+      "id": "5a7ef7cb-27f2-4517-9952-449056ac09e3",
+      "ts": "2026-11-26T15:36:58Z",
+      "source": "buffy",
+      "subject": "nixconfig:pane-nudge-tmux38",
+      "action": "claim: taking over from tmux-pane-steward per operator — fix load-buffer target and the Escape keystroke in pane-nudge.sh",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/pane-nudge.sh"
+      ],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3p3dgoj82ym4de4boyj12"
+    },
+    {
+      "id": "d7bc7b1f-8069-44c0-b1e8-5eb7993408bc",
+      "ts": "2026-11-26T15:36:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-nudge-tmux38",
+      "action": "bug-fix|0.88|0.77: fix load-buffer -t + Escape in pane-nudge.sh",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/pane-nudge.sh"
+      ],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3p0wz61ytabtezhs9nr1q"
+    },
+    {
+      "id": "01173aa7-d2c8-466b-be34-fcdcd529bc39",
+      "ts": "2026-11-26T15:35:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "published hisolutions-ag Senior Kubernetes Expert packet: German letter 1p + CV 2p, 11/39 highlights, 4/10 projects, 3 files 76KB mode 700; site rebuilt (29 files, root 61cc526f22f453ed) and deployed to Pages project matt (https://e4ebb756.matt-9pf.pages.dev), live matt.bountystash.com 200 with matching hash; guard audit PASS (1706 apps, 124 prep, no dead prep/dupes/mail conflicts) | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/appflow-packet.sh"
+      ],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3or6i3vd6povbhf08r0dr"
+    },
+    {
+      "id": "4af922ef-3a12-43ef-ad12-ada52e8e4920",
+      "ts": "2026-11-26T15:35:12Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-config-verify",
+      "action": "host-change|0.90|0.80: fix job-db-scraper + checks:host HOST=delphi",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi",
+        "modules/services"
+      ],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3oqvwx7bzlbe9si3200yi"
+    },
+    {
+      "id": "e4cf8a21-851f-4b77-96b1-deab4b112354",
+      "ts": "2026-11-26T15:34:24Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-drive",
+      "action": "drove idle freebuff pane agents:2.1: publish hisolutions-ag cover letter packet (jev publish p=0.98/m=0.96); pane now thinking and working",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3ola7aojxaf8hst5z6dxe"
+    },
+    {
+      "id": "36467b5a-07be-4710-8590-48a6fbc3871d",
+      "ts": "2026-11-26T15:30:16Z",
+      "source": "buffy",
+      "subject": "nixconfig:service-portal-portfolio-cards",
+      "action": "claim: add search/filter, portfolio cards and health summary to the tailnet service portal, verified with go test, node --check and a live local HTTP smoke test",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/service-portal"
+      ],
+      "files": [],
+      "base_commit": "954332df80434617a58e7eefaea5d9f7b3eb9066",
+      "branch": "main",
+      "frame": "03hb3ns5czuhi2ex06weahrli"
+    },
+    {
+      "id": "c9b05fb6-5f85-438e-bdc6-dc18f693b597",
+      "ts": "2026-11-26T15:28:53Z",
+      "source": "devin",
+      "subject": "nixconfig:job-db-scraper-batch-scoring",
+      "action": "claim: upgrade job-db-scraper with batch posting upsert, deterministic role-match score/lane persistence and sorting, score UI, and deduped high-score ntfy alerts",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/job-db-scraper",
+        "modules/services/job-db-scraper.nix"
+      ],
+      "files": [],
+      "base_commit": "954332df80434617a58e7eefaea5d9f7b3eb9066",
+      "branch": "main",
+      "frame": "03hb3nii8m3n74gmqnebl71fw"
+    },
+    {
+      "id": "ae8fca2f-a20a-4247-aab9-7ddc95262b4c",
+      "ts": "2026-11-26T15:28:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:inventory-sync-cli",
+      "action": "inventory-sync.py: hosts JSON/eval -> POST /api/items with the service's own identity (source=inventory.toml, source_key=host/<name>), mapping matched to its inventory-toml import (hardware->notes, traits->tags, model word->manufacturer, tailnet/lan->location), --dry-run/--only/--format toon. Live: 38 hosts created 38, rerun 0/38 updated, FTS q=ryzen 3 hosts, q=delphi finds delphi. 20 tests + py_compile.| gate: unittest discover tests/inventory-sync PASS + local FTS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "954332df80434617a58e7eefaea5d9f7b3eb9066",
+      "branch": "main",
+      "frame": "03hb3ng4b4le1ve0ypiz2g9jj"
+    },
     {
       "id": "a6ca4bb9-ecb7-4801-aefc-5cb135e72545",
       "ts": "2026-11-26T15:27:21Z",
@@ -2904,156 +3050,6 @@
       "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
       "branch": "main",
       "frame": "03hb1iiv5inqbkzvt9ad6qafi"
-    },
-    {
-      "id": "35a9d513-7783-4bf1-8120-9a0c98c3abdb",
-      "ts": "2026-11-26T08:50:39Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "no-op: pipe-loop re-survey on 523a855d — tree identical to prior pass, all locked classes zero, gate green; standing state holds",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
-      "branch": "main",
-      "frame": "03hb1hpwrh4yv05b0qq1jsvdb"
-    },
-    {
-      "id": "35119569-4cab-4d7e-bc34-98e9bbbc5c3f",
-      "ts": "2026-11-26T08:44:06Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "no-op: pipe-loop re-survey on 523a855d — all locked classes zero (filter|>length, map (x: x.f), attrValues|>map, map|>concatLists); 13 elemAt sites all idiomatic (index predicates, tuple destructuring, existing at-helpers); 1109 |> sites, gate green | gate: checks:nix:style PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
-      "branch": "main",
-      "frame": "03hb1gfx8e5afjuxkltss6xh8"
-    },
-    {
-      "id": "74cc8103-8722-4805-b285-e66adacf445d",
-      "ts": "2026-11-26T08:41:07Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-epistemics-validate",
-      "action": "landed: validated 1a1729cc (gate green, kg 6cap+58intent+86serves consistent, spec shape, classOf dedup) + extended — flake/philosophy.nix lenses with frieren re-measure, affects_intents pre-commit gate ran in own commit, tests/intents 14/14, docs/intents.md | gate: checks:intents:test PASS, checks:kg PASS, checks:tasks PASS (832)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
-      "branch": "main",
-      "frame": "03hb1fuy8vdt8k5tkr17338kl"
-    },
-    {
-      "id": "3f150860-7c79-4646-a04f-ae4d5c97ce6f",
-      "ts": "2026-11-26T08:40:04Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-sweep-26a-26b-tailor",
-      "action": "tailored 11 leads from sweeps 26a (7) and 26b (4 of 6 unique): JD read off Stepstone, per-ad letter in ~/.config/appflow/letters, packets built (1p letter + 2p CV) into submissions, rows at prep. Bertrandt + DRK ads JS-gated. No send: 2026-12-07 hold, then no recipient — all portal-only | gate: 11/11 packets, checks:appflow fails only pre-existing rows",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
-      "branch": "main",
-      "frame": "03hb1fnhmdewu6gty8ds6kr28"
-    },
-    {
-      "id": "4a4ace28-2961-4114-bf3a-19a4d6c0190d",
-      "ts": "2026-11-26T08:39:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-sweep-26a-26b-tailor",
-      "action": "claim: tailoring CV + letter for the 11 mail-able leads of sweeps 2026-11-26a (7) and 2026-11-26b (4 of 6 unique; 2 JD pages are JS-gated), packets built into submissions",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/appflow-packet.sh taskfiles/apps.yml"
-      ],
-      "files": [],
-      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
-      "branch": "main",
-      "frame": "03hb1fi0wo38kpratsflnx2l3"
-    },
-    {
-      "id": "e82bb16c-a634-4c3a-9e57-8cfb4987fc19",
-      "ts": "2026-11-26T08:31:37Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-epistemics-validate",
-      "action": "start: validate 1a1729cc on HEAD da5bc77f, then extend — philosophy layer, commit-time admit gate + fixture, schema README",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/intents.nix",
-        "scripts/task/intents-check.sh",
-        "tests/intents",
-        "docs/"
-      ],
-      "files": [],
-      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
-      "branch": "main",
-      "frame": "03hb1e03sewuag2dzgtcjbmcb"
-    },
-    {
-      "id": "37c3460e-201a-4e2d-9a0c-234a981729b0",
-      "ts": "2026-11-26T08:26:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0823",
-      "action": "chain-change refactor complete — catAttrs unification, checks:nix:style gate green, da5bc77f",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "da5bc77f",
-      "branch": "main",
-      "frame": "03hb1cxpltip22u42kci8e3zm"
-    },
-    {
-      "id": "63c7e590-be3d-4618-9800-e354591fa96c",
-      "ts": "2026-11-26T08:19:05Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "Sweep 2026-11-26b: five boards, 9 new leads filed at scout-2026-11-26b",
-      "outcome": "done",
-      "claims": [
-        "apps-db rows: origin scout-2026-11-26b"
-      ],
-      "files": [],
-      "base_commit": "333cde34b2d5bb55169b6a7d8170ad126e0e5983",
-      "branch": "cv-site-2026-11-26",
-      "frame": "03hb1bjywlgpm5lxmfzlgoe6g"
-    },
-    {
-      "id": "501479dd-b685-43f5-a466-f495f152dbb9",
-      "ts": "2026-11-26T08:16:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-delphi-drive-20261126-0801",
-      "action": "publish: CV site content committed, pushed and deployed live",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/",
-        "scripts/task/pages-deploy.sh"
-      ],
-      "files": [
-        "lib/matt-site.nix",
-        "lib/matt/profile.json",
-        "lib/matt/profile.de.json",
-        "lib/matt/cases.json",
-        "lib/matt/cases.de.json",
-        "lib/matt/projects.json",
-        "scripts/task/pages-deploy.sh"
-      ],
-      "base_commit": "333cde34b2d5bb55169b6a7d8170ad126e0e5983",
-      "branch": "cv-site-2026-11-26",
-      "frame": "03hb1b2z32w1qmkqobrrw5wtm"
-    },
-    {
-      "id": "da1e330c-422c-47e3-a1f4-94722be07d0a",
-      "ts": "2026-11-26T08:01:05Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: third nix-style rule — map (x: x.f) projection locked to catAttrs, knowledge-graph emitter converted; pipe class closed | gate: checks:nix:style:test PASS (12/12), checks:kg PASS, checks:tasks PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
-      "branch": "main",
-      "frame": "03hb181claj3jd25uzct09jak"
     }
   ]
 }

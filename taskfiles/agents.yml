@@ -382,6 +382,19 @@ tasks:
     cmds:
       - python3 scripts/task/portfolio-smoke.py {{.CLI_ARGS}}
 
+  agents:portfolio:seed:
+    desc: "Seed the portfolio indexes in one pass: scrape, batch-ingest, inventory sync"
+    summary: >
+      scripts/task/portfolio-seed.py — the three lanes in one run: a page through
+      job-page-scrape into `POST /api/postings/batch`, one through
+      deals-page-scrape into `POST /api/deals/batch`, and inventory-sync by
+      `--eval`. `--jobs` and `--deals` take URLs, `--jobs-from` and `--deals-from`
+      reuse a saved scrape, `--only jobs,deals,inventory` picks lanes, `--dry-run`
+      shapes without posting, `--format toon` renders it. A page with no hits is
+      a zero, not a failure; a refusal exits 1 with the first error named.
+    cmds:
+      - python3 scripts/task/portfolio-seed.py {{.CLI_ARGS}}
+
   agents:ledger:record:
     desc: "Record one classified issue in the running ledger (CLASS, EVIDENCE, FIX)"
     summary: >

@@ -1,8 +1,54 @@
 {
-  "generated": "2026-11-26T17:40:13Z",
+  "generated": "2026-11-26T17:48:20Z",
   "count": 200,
-  "pin": "b849c557f21b8314be6ad8685131cb8f0a80e9bfbcf7c0c20049f270f458b3f1",
+  "pin": "7aa0466f7a208c1c4d2f9d7d9e896a432ba5e2a3c29dc4a409c6952e04da566b",
   "turns": [
+    {
+      "id": "99c41a5d-6647-459a-9c65-f9b7d39e5eec",
+      "ts": "2026-11-26T17:44:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-batch-seed-cli",
+      "action": "claim: one orchestrator (page-scrape -> ingest --batch per lane, inventory-sync) with --dry-run, --only, --format json|toon for the portfolio seed",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/portfolio-seed.py",
+        "tests/portfolio-seed",
+        "taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "d0660910c3cae431538dfc26bbe275b25cbec060",
+      "branch": "main",
+      "frame": "03hb4e2buw3w078tk0rcg4x8p"
+    },
+    {
+      "id": "d69f20f1-4cf6-4925-be5d-29736ffe6bbc",
+      "ts": "2026-11-26T17:43:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-regression-health-audit",
+      "action": "verified: 256 unittests green in 9 suites (portfolio-smoke 47, deals-page 40, deals-ingest 26, job-page 33, jobs-ingest 28, web-research 28, inventory-sync 20, atlas-reconcile 25, archive-import 9; 0 failures); checks:tasks PASS (843 tasks/31 files, no hard violations); ops:health ok on delphi (sentinel ok, no reasons, generation age 1.1h, disk 49%, psi io 0.11); clanker suspended, runtime.ready=false (idle); xs live 17 claims, stale none; read-only, no repo or index changes",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "d0660910c3cae431538dfc26bbe275b25cbec060",
+      "branch": "main",
+      "frame": "03hb4dsdm4ppf0la1lf6hdk9q"
+    },
+    {
+      "id": "c8e763dc-2817-4d2e-b6d2-2466aef63260",
+      "ts": "2026-11-26T17:40:25Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-graph-clustering",
+      "action": "landed: hover/focus a node lights its cluster (rail tag = keyboard hub) and dims the rest; chip row gains untagged view over the loaded page + last 5 remembered queries; smoke drives untagged toggle, hub cluster size, recent chip | gate: node --check PASS, site derivation built, tests/mail-atlas-site/run.sh PASS (sources drawer + triage/cluster)",
+      "outcome": "done",
+      "claims": [
+        "modules/services/mail-atlas/site",
+        "tests/mail-atlas-site"
+      ],
+      "files": [],
+      "base_commit": "d0660910c3cae431538dfc26bbe275b25cbec060",
+      "branch": "main",
+      "frame": "03hb4d7hwaqh9shj4eublxr50"
+    },
     {
       "id": "c39f262b-f061-41c4-b5e3-85ccba1a2c0f",
       "ts": "2026-11-26T17:35:35Z",
@@ -2986,48 +3032,6 @@
       "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
       "branch": "main",
       "frame": "03hb2tj7w6eb10j6fnn86jpba"
-    },
-    {
-      "id": "035e202e-8aa1-4ee9-8c34-b11591ae774e",
-      "ts": "2026-11-26T12:54:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-dup-services",
-      "action": "landed: dup-service offload confirmed on live delphi — gen 323 (533f5edf, carries 0984b91a) has no kuma unit and :8448 is closed; :8449/:8450 healthy, 0 failed units, gatus sentinel green; ~/Documents/nixconfig is 25/299 vs origin/main and still declares kuma | gate: checks:host HOST=delphi MODE=eval PASS (2141 assertions)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hb2tfglvi3oa8jcck7rluyc"
-    },
-    {
-      "id": "7468a065-bc6c-46ca-ba98-a1e5902b50bb",
-      "ts": "2026-11-26T12:54:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-dup-services",
-      "action": "landed: verified on live delphi — gen 323 built from /tmp/nix-switch @ 533f5edf (carries 0984b91a): kuma unit absent, :8448 closed, 0 failed units, :8449 xs and :8450 /health 200, sentinel ok on both hosts; ~/Documents/nixconfig is 25/299 vs origin/main and still enables uptime-kuma, so it must not be deployed | gate: checks:host HOST=delphi MODE=eval PASS (2141 assertions)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hb2tewb042i1qb8aisoawfh"
-    },
-    {
-      "id": "70f0504d-ecf5-4d41-ad0c-c89a9e4da545",
-      "ts": "2026-11-26T12:54:33Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-freebuff-26e",
-      "action": "audited: apps-db.sh update/upsert write guards hold (unarmed write exit 2, stage/hash mismatch exit 4, >50 writes/10min exit 5, --dry appends no entry) and the offline fixtures cover every path — 19 apps-db cases, 10 sync-guard cases; checks:appflow PASS (6 steps, exit 0, tracker 1670 rows/125 prep, shellcheck clean). One open gap, not fixed here: 'add --id <existing>' posts to application-upsert with no existence guard, so apps:scout re-filing an id clobbers the row.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2td5vczx35tc0h479sh9x"
     }
   ]
 }

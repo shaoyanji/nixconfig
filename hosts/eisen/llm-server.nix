@@ -261,26 +261,7 @@
   # llama.cpp" (stock binary exits "unknown model architecture: 'kolibri1'").
 
   # Idempotent, resumable weight fetch — runs only when the GGUF is absent.
-  mkFetch = {
-    file,
-    url,
-  }: {
-    description = "Fetch ${file} if missing";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    unitConfig.ConditionPathExists = "!${file}";
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = pkgs.writeShellScript "fetch-${baseNameOf file}" ''
-        set -euo pipefail
-        ${pkgs.coreutils}/bin/echo "Fetching ${url}"
-        ${pkgs.curl}/bin/curl -fL --retry 5 --retry-delay 5 -C - \
-          -o "${file}.part" "${url}"
-        ${pkgs.coreutils}/bin/mv -f "${file}.part" "${file}"
-      '';
-    };
-  };
+  mkFetch = import ../../modules/config/fetch-unit.nix {inherit pkgs lib;};
 in {
   imports = [
     self.modules."profiles.nixbuild-client"

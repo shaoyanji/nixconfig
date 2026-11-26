@@ -48,28 +48,12 @@
   # absent-only. These are the fallback path — the bytes are expected to arrive
   # from frieren's aria2 job at ~110 MB/s over the LAN, because the HF CDN served
   # eisen at 1.45 MB/s (2026-11-03) and this payload is 60.7 GB.
-  mkFetch = {
-    file,
-    path,
-    exec ? false,
-  }: {
-    description = "Fetch ${baseNameOf file} if missing";
-    after = ["network-online.target" "mnt-storage.mount"];
-    wants = ["network-online.target" "mnt-storage.mount"];
-    unitConfig.ConditionPathExists = "!${file}";
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = pkgs.writeShellScript "fetch-${baseNameOf file}" ''
-        set -euo pipefail
-        echo "Fetching ${hf}/${path}"
-        ${pkgs.curl}/bin/curl -fL --retry 5 --retry-delay 5 -C - \
-          -o "${file}.part" "${hf}/${path}"
-        ${pkgs.coreutils}/bin/mv -f "${file}.part" "${file}"
-        ${lib.optionalString exec "${pkgs.coreutils}/bin/chmod +x '${file}'"}
-      '';
+  mkFetch = f:
+    (import ../../modules/config/fetch-unit.nix {inherit pkgs lib;}) {
+      inherit (f) file exec;
+      url = "${hf}/${f.path}";
+      requires = ["network-online.target" "mnt-storage.mount"];
     };
-  };
 
   fetches = lib.filter (f: !(f.skip or false)) payload;
 in {

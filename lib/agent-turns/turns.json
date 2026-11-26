@@ -1,8 +1,82 @@
 {
-  "generated": "2026-11-26T08:56:01Z",
+  "generated": "2026-11-26T09:20:39Z",
   "count": 200,
-  "pin": "9957759dc16f8fd90af621fd5a2b424d93c6dbeeec40f91eb14f2fb6dde5e4b0",
+  "pin": "dae89a5cee11b62c39b22d21ce925cf9b05025de14365c9e3acf5c4af7be1e18",
   "turns": [
+    {
+      "id": "68796194-391b-4ce9-b853-d41b90a9fb85",
+      "ts": "2026-11-26T09:10:56Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-drive-20261126-1009",
+      "action": "jev incident p=0.75 m=0.53: delphi uptime-kuma dup fix",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi/configuration.nix",
+        "modules/services/fleet-monitors.nix",
+        "modules/services/home-assistant.nix"
+      ],
+      "files": [],
+      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
+      "branch": "main",
+      "frame": "03hb1losx9bnp6lpd4qmfcdug"
+    },
+    {
+      "id": "0f375f62-7ff8-48fa-a6ad-e4d2f01b4e26",
+      "ts": "2026-11-26T08:59:14Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-drive-20261126-0855",
+      "action": "jev publish p=0.99 m=0.98: publish CV and static site",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
+      "branch": "main",
+      "frame": "03hb1jebuefly27tb2fr6zubg"
+    },
+    {
+      "id": "2f9b058c-23ab-4d6d-b934-f1be0e18b029",
+      "ts": "2026-11-26T08:59:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0855",
+      "action": "jev chain-change p=0.97 m=0.95: refactor shared module chain",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
+      "branch": "main",
+      "frame": "03hb1je9msz9o24853ryczfyw"
+    },
+    {
+      "id": "e76dd41a-4f27-480d-85af-e7d41ada8e65",
+      "ts": "2026-11-26T08:56:57Z",
+      "source": "devji",
+      "subject": "nixconfig:job-scout",
+      "action": "Landed apps:sweep:pipeline (ff89ed19): sweep, dedupe, validate, rank, gated file, mail read, turn post as one task",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "taskfiles/apps.yml",
+        "scripts/task/jobsearch-sweep.py",
+        "scripts/task/jobsearch-pipeline.sh",
+        ".agents/skills/jobsearch-pipeline/SKILL.md"
+      ],
+      "base_commit": "ff89ed195d540cfd8cfff75a6f85df2051199285",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hb1iy6utuqvalle687hjfjp"
+    },
+    {
+      "id": "a8dc16b3-4070-492d-81fd-de85948097f8",
+      "ts": "2026-11-26T08:56:12Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: pipe-loop packaged — dev:review:pipe-loop runs locked tier (gate verbatim) + survey tier (attrValues|>map, map|>concatLists, elemAt flips, head-of-filter, listToAttrs census); first run caught policies.nix elemAt flips, converted to head/elemAt direct; pipe-loop skill mirrors the task and carries the PCRE/anchor traps | gate: checks:nix:style PASS, checks:policies:fixtures PASS, checks:skills:mirror PASS (65), checks:tasks PASS (834)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
+      "branch": "main",
+      "frame": "03hb1isxe2gg2pt5l9gixstcd"
+    },
     {
       "id": "8f0c6749-b38e-4403-82a3-26e0e9ee8e9a",
       "ts": "2026-11-26T08:55:48Z",
@@ -2805,71 +2879,6 @@
       "base_commit": "e2e1f3d369171d6db3c1006aea4bf7234d6c8664",
       "branch": "main",
       "frame": "03havup5bjax7qio0d7045nsq"
-    },
-    {
-      "id": "0a1b9ce6-4974-4de8-b94e-8c7196e133b7",
-      "ts": "2026-11-25T15:31:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: drove freebuff pane agents:2.1 with CV site publish task; jev-decide classify typesafe selected publish p=0.95 margin=0.92; working 3s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e2e1f3d369171d6db3c1006aea4bf7234d6c8664",
-      "branch": "main",
-      "frame": "03havup42vl4m6q6hvvsvzicg"
-    },
-    {
-      "id": "e53b3ea1-c30c-4dc3-91a9-37c2ffc615d7",
-      "ts": "2026-11-25T15:28:02Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "chain refactor 3/3 for the hostField idiom: noDE.nix hmModules+hmBase collapsed (8 container hosts); demo.nix is the last copy | gate: drv-equality 30/30, nix:lint 332 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e2e1f3d369171d6db3c1006aea4bf7234d6c8664",
-      "branch": "main",
-      "frame": "03havu1tm1gibhgzxcyguh9zg"
-    },
-    {
-      "id": "3718b5c4-13bc-4c64-b13d-49688913f0ab",
-      "ts": "2026-11-25T15:26:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:wallpaper-worker",
-      "action": "no-op CV publish: jekyll production build PASS (JEKYLL_ENV=production, rc=0); six CVs byte-identical across assets/files, _site and live (cv 3733b9eeab5f, cv-de acf12f9e02cc, cv-energy 76933eee76e8, cv-energy-de b6a618618f11, cv-software 3360f38430d3, cv-software-de d9ef78dcd2c0); check-cv-links PASS 6/6; 73 html pages, 3552 internal href/src, 0 broken; blog was 7 behind, fast-forwarded to be17747, no CV changed so no commit, no push, no republish",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03havttaxa48h9lnzkoga6kj1"
-    },
-    {
-      "id": "4b2740f1-e6ff-49d3-930a-5693fe5ff34b",
-      "ts": "2026-11-25T15:24:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: drove delphi freebuff pane agents:3.1 over ssh with CV site publish task; jev-decide classify needs_review margin=0.41 decisive -> publish p=0.65; paste re-sent after first miss, Enter re-sent; confirmed working 32s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
-      "branch": "main",
-      "frame": "03havtawjx08is9ywo8nnc0z9"
-    },
-    {
-      "id": "7655d10e-b902-47a7-9cd2-964516b2da73",
-      "ts": "2026-11-25T15:24:11Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: drove devin pane agents:1.1 with chain-change refactor task; jev-decide classify exit 0 selected chain-change p=0.99 margin=0.98; load-buffer + paste-buffer + Enter; confirmed Running tools 16s",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
-      "branch": "main",
-      "frame": "03havtau82fq3adkkqhfh9pgv"
     }
   ]
 }

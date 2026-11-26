@@ -598,23 +598,6 @@ in {
     options = ["bind" "x-systemd.requires=srv-data.mount"];
   };
 
-  # Bind mounts for /export
-  fileSystems."/export/data" = {
-    device = "/srv/data";
-    fsType = "none";
-    options = ["bind"];
-  };
-  fileSystems."/export/private" = {
-    device = "/srv/private";
-    fsType = "none";
-    options = ["bind"];
-  };
-  fileSystems."/export/public" = {
-    device = "/srv/public";
-    fsType = "none";
-    options = ["bind"];
-  };
-
   # BurgerNAS cold vault: the mount, the automount and the fail-fast NFS options
   # all live in profiles/burgernas-client.nix, so any host that mounts the vault
   # inherits them instead of rediscovering that `mount.nfs` retries for 2 minutes.

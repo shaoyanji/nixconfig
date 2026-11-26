@@ -142,7 +142,11 @@ display:
 # bill), and apisfreellm takes no key at all. ollama-cloud was removed
 # 2026-11-22: its nemotron-3-ultra lane answers 402 "Add usage credits" on
 # every attempt — 71 in one boot, routed to 23 times with zero successes — so
-# it is a payment wall, not a quota that resets. Nemotron's first failover is
+# it is a payment wall, not a quota that resets. xpl (experientiallabs) went
+# the same way 2026-11-26: its /models answers 200 with null cost fields —
+# what the 2026-11-24 probe trusted — but a completion answers
+# insufficient_credits with a $5 top-up wall, so a catalog probe proves
+# nothing and a completion is the only proof. Nemotron's first failover is
 # the NIM lane, not the custom endpoint: the billed pick that cost the Infron
 # balance (2026-11-19) was this model resolved through a metered route.
 fallback_providers:
@@ -182,14 +186,6 @@ fallback_providers:
     model: free-ai
     base_url: https://api.apisfreellm.com/v1
     api_key: free
-  # ExperientialLabs (xpl) — declared free lane. Probed 2026-11-24:
-  # `GET /v1/models` answers 200 with a 305-model catalog including
-  # deepseek-v4.1-flash-uncensored-fast; every model's cost fields are null.
-  # Keyed but unbilled — EXPLABS_API_KEY in sops ai-services-shared-env.
-  - provider: custom
-    model: deepseek-v4.1-flash-uncensored-fast
-    base_url: https://api.experientiallabs.ai/v1
-    key_env: EXPLABS_API_KEY
   # Sail Research — last resort fallback. SAIL_API_KEY lives in sops
   # ai-services-shared-env. Probed separately before trusting.
   - provider: custom

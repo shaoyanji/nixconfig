@@ -44,7 +44,51 @@ else
   echo "FAIL marker-less id: rc=$rc — expected refusal naming the id"; echo "$out" | tail -6; fail=1
 fi
 
-# 3. The current tree passes.
+# 3. A re-added xpl lane refuses: the lane measured a payment wall
+# (insufficient_credits, $5 top-up, 2026-11-26) after passing the catalog
+# probe, so the gate must never wave it through again. Its provider is
+# `custom` and the id carries no :free — the refusal needs no special case.
+git -C "$tmp/wt" checkout -- modules/user/ai/hermes-persona/config.yaml
+python3 - "$persona" <<'EOF'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+lane = """  - provider: custom
+    model: deepseek-v4.1-flash-uncensored-fast
+    base_url: https://api.experientiallabs.ai/v1
+    key_env: EXPLABS_API_KEY
+"""
+s = s.replace("fallback_providers:\n", "fallback_providers:\n" + lane, 1)
+open(p, "w").write(s)
+EOF
+out=$(cd "$tmp/wt" && bash scripts/task/infron-check.sh 2>&1); rc=$?
+if [ $rc -eq 1 ] && echo "$out" | grep -q 'deepseek-v4.1-flash-uncensored-fast'; then
+  echo "ok   re-added xpl lane refused, id named"
+else
+  echo "FAIL xpl lane: rc=$rc — expected refusal naming the lane"; echo "$out" | tail -6; fail=1
+fi
+
+# 4. An ollama-cloud lane refuses too: measured a payment wall (402 on every
+# one of 71 attempts, 2026-11-22), so its provider carries no free contract.
+git -C "$tmp/wt" checkout -- modules/user/ai/hermes-persona/config.yaml
+python3 - "$persona" <<'EOF'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+lane = """  - provider: ollama-cloud
+    model: nemotron-3-ultra
+"""
+s = s.replace("fallback_providers:\n", "fallback_providers:\n" + lane, 1)
+open(p, "w").write(s)
+EOF
+out=$(cd "$tmp/wt" && bash scripts/task/infron-check.sh 2>&1); rc=$?
+if [ $rc -eq 1 ] && echo "$out" | grep -q 'ollama-cloud'; then
+  echo "ok   re-added ollama-cloud lane refused, provider named"
+else
+  echo "FAIL ollama-cloud lane: rc=$rc — expected refusal naming the provider"; echo "$out" | tail -6; fail=1
+fi
+
+# 5. The current tree passes.
 if bash "$repo/scripts/task/infron-check.sh" >/dev/null 2>&1; then
   echo "ok   HEAD passes"
 else

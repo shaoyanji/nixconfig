@@ -1,8 +1,68 @@
 {
-  "generated": "2026-11-26T15:50:15Z",
+  "generated": "2026-11-26T15:54:45Z",
   "count": 200,
-  "pin": "6202131ddd4ff50838ce98776f60a25eec6a42f213c32ebbcc35834b30a4094c",
+  "pin": "7e8795c55c3800de41cec6bb96ccc72bd0372524722b2d8963ea20cd3475e5a1",
   "turns": [
+    {
+      "id": "da37042e-78d8-4fce-9b3e-288d26d09c02",
+      "ts": "2026-11-26T15:53:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:ingest-batch-endpoints",
+      "action": "deals-ingest + jobs-ingest chunk to /api/deals/batch and /api/postings/batch (--batch-size default 100, cap 500), fall back to per-record POST on 404/405 with batch:false, count skipped, map per-index errors to URLs. Live: deals 3 created then 3 updated, duplicate pair total 2/created 1/skipped 1; postings 3 created then 3 updated; sort=score 55/43/0 with lanes; 405 stub batch:false created 1.| gate: unittest deals 26 + jobs 28 PASS, py_compile, live smoke PASS (servers stopped)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "314641a2a2d488ece03b94dcd61958526f65732d",
+      "branch": "main",
+      "frame": "03hb3sc0krjfwcl2u29p7crx3"
+    },
+    {
+      "id": "d5dec741-e1d3-481a-96de-78e0423d96f7",
+      "ts": "2026-11-26T15:51:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:hermes-explabs-cleanup",
+      "action": "host-change|0.54|0.32000000000000006: hermes_explabs_429_cleanup (tak…",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai/hermes-persona/config.yaml",
+        "tests/infron"
+      ],
+      "files": [],
+      "base_commit": "711506e027fefe39261db15ccd2f0fcc04666f95",
+      "branch": "main",
+      "frame": "03hb3rxg12ngmkux4sgt1ibnb"
+    },
+    {
+      "id": "5933e307-3370-45d9-99e1-43acbd223192",
+      "ts": "2026-11-26T15:50:28Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-free-fallback",
+      "action": "landed: stale ollama-cloud narrative fixed in 3 places (removed 2026-11-22, file contradicted itself), fallback-chain comment re-described for the post-reorder NIM-led chain, dead commented lanes deleted (tokenrouter 403, cantrustai paid — facts here not in commented config), infron-check.sh sail label $0 interpolation fixed | gates: infron-check clean, tests/infron all cases pass",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "711506e027fefe39261db15ccd2f0fcc04666f95",
+      "branch": "main",
+      "frame": "03hb3rqa1mkrlk7e6bt73e9i6"
+    },
+    {
+      "id": "dd7c88b2-63a3-49cf-8645-83a185f31391",
+      "ts": "2026-11-26T15:50:27Z",
+      "source": "buffy",
+      "subject": "nixconfig:ingest-batch-endpoints",
+      "action": "claim: batch POST for deals-ingest (/api/deals/batch, --batch-size, 404/405 fallback to single) and jobs-ingest (/api/postings/batch), verified with unittest + live local service smoke, commit --only",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/deals-ingest.py",
+        "scripts/task/jobs-ingest.py",
+        "tests/deals-ingest",
+        "tests/jobs-ingest"
+      ],
+      "files": [],
+      "base_commit": "814fcbf8cab82a88af05b831b499925fcb25b8e6",
+      "branch": "main",
+      "frame": "03hb3rq6zydi3my9z2zkq7y26"
+    },
     {
       "id": "c2f802b1-7419-4d8b-999a-fd55d43fcf7c",
       "ts": "2026-11-26T15:49:37Z",
@@ -3005,61 +3065,6 @@
       "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
       "branch": "main",
       "frame": "03hb1tc3c0qr0ns7k4vbalycm"
-    },
-    {
-      "id": "2267a1a5-8afa-4080-9c49-ed9e7b0fb8f6",
-      "ts": "2026-11-26T09:43:13Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "claim: chain-change refactor pass — sddm/displayManager dup survey, hosts->modules",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/",
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1rzom03lnj81z6jptu88k"
-    },
-    {
-      "id": "67823ee3-ff45-4e42-ab08-3cdf34cc4c21",
-      "ts": "2026-11-26T09:41:11Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-1033",
-      "action": "jev publish p=0.81 m=0.69: publish CV site from repo",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1rlazm4r2g21x3e6hphbm"
-    },
-    {
-      "id": "e38d8f22-ae32-4c49-b867-c7316ed96b32",
-      "ts": "2026-11-26T09:39:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "Sweep 2026-11-26c: five boards, 1442 postings parsed, 56 new, 25 filed via apps:scout — 18 declared duplicates, 3 closed, 4 live leads; the reply poll on the 11 preps returned zero responses",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1rabkftqri7stqj3wzg6o"
-    },
-    {
-      "id": "d5a3ae17-663c-459f-85c5-63f1098661b5",
-      "ts": "2026-11-26T09:35:38Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-pipeloop-dogfood",
-      "action": "landed: dogfooded dev:review:pipe-loop cold — discovery (task find:pipe + .#agentSkills), full run, judgment of hits all worked; two gaps found+fixed: missing rg printed false-clean 'none' (now exit 2), SKILL.md never passed ops:skills:check (435-char desc >240 cap, no Truth: line); task re-run clean post-fix | gate: dev:review:pipe-loop PASS, ops:skills:check PASS 65/65, checks:skills:mirror PASS, checks:nix:style PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1qib9j5xbtar00fru5jgk"
     }
   ]
 }

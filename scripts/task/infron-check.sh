@@ -147,7 +147,7 @@ echo "== hermes spend guard"
 #
 #   1. on a metered route (custom endpoint, openrouter) an id may only be
 #      named with its `:free` suffix — that suffix is the zero-billing contract
-#   2. nvidia/ollama-cloud/ollama/lmstudio/nous are closed free lanes — NIM's
+#   2. nvidia/ollama/lmstudio/nous are closed free lanes — NIM's
 #      integrate.api.nvidia.com key has no wallet to bill, and the rest are
 #      free catalogs; any id there is unbilled
 #   3. every providers.<name> row must be pinned: discover_models: false plus a
@@ -201,8 +201,8 @@ else
   done
 
   # The chain: at least two independent free quotas. Metered-route entries need
-  # :free; closed-lane providers (nvidia's no-wallet NIM tier, ollama-cloud,
-  # ollama, lmstudio, nous) carry their free contract in the provider, not the
+  # :free; closed-lane providers (nvidia's no-wallet NIM tier, ollama,
+  # lmstudio, nous) carry their free contract in the provider, not the
   # id. Openrouter stays metered even for :free ids — the account can hold a
   # wallet, so nemotron belongs on the NIM lane instead (2026-11-19).
   fb_count="$(yq '.fallback_providers | length' "$persona" 2>/dev/null || echo 0)"
@@ -226,11 +226,6 @@ else
       *sailresearch.com*deepseek-ai/DeepSeek-V4.1-Flash-1017)
         ok "fallback $fb_provider/$fb_model is the declared paid lane (sail, ~\$0.30/M out)"
         continue ;;
-      # ExperientialLabs is keyed but bills nothing: `GET /v1/models` (2026-11-24)
-      # returns a 305-model catalog whose per-model cost fields are all null.
-      *experientiallabs.ai*deepseek-v4.1-flash-uncensored-fast)
-        ok "fallback $fb_provider/$fb_model is the declared free lane (xpl)"
-        continue ;;
     esac
     case "$fb_provider" in
       custom | openrouter)
@@ -239,7 +234,7 @@ else
           *) bad "fallback $fb_provider/$fb_model — a metered-route id without :free spends the balance" ;;
         esac
         ;;
-      nvidia | ollama-cloud | ollama | lmstudio | nous)
+      nvidia | ollama | lmstudio | nous)
         ok "fallback $fb_provider/$fb_model is on a closed free lane"
         ;;
       *)

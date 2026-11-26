@@ -9,7 +9,7 @@
 
   package = pkgs.buildGoModule {
     pname = "job-db-scraper";
-    version = "0.1.0";
+    version = "0.2.0";
     src = ./job-db-scraper;
     vendorHash = "sha256-n+WU7qcF6NauBw9DFU4VG1fnDQ387+nibJ/uzApqehk=";
     env.CGO_ENABLED = 0;

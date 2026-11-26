@@ -144,3 +144,5 @@ dialog::backdrop { background: rgba(2, 6, 23, 0.72); backdrop-filter: blur(8px);
 .analytics-panel > .panel-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 #analytics-scope { text-transform: none; letter-spacing: 0.01em; font-weight: 600; font-size: 0.74rem; }
 .band-row { grid-template-columns: 4.4rem 1fr 2.2rem; gap: 10px; }
+
+.badge.stage{border-color:#79b8ff}.badge.duplicate{border-color:#f2cc60;color:#f2cc60}.stage-editor,.note-form{display:flex;gap:.6rem;margin:1rem 0;flex-wrap:wrap}.journal-row{display:flex;gap:.7rem;justify-content:space-between;border-top:1px solid rgba(255,255,255,.08);padding:.45rem 0}.exports{display:flex;gap:.7rem;font-size:.85rem}

@@ -8,9 +8,21 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
+
+func testStore(t *testing.T) *Store {
+	t.Helper()
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatalf("OpenStore: %v", err)
+	}
+	t.Cleanup(func() { _ = store.Close() })
+	return store
+}
 
 func TestNormalizeCompanyAndFingerprint(t *testing.T) {
 	if got := normalizeCompany("Kältemaschinen GmbH"); got != normalizeCompany("Kaeltemaschinen") {
@@ -356,6 +368,9 @@ func TestStoreMigratesLegacySchemaAndBackfillsScores(t *testing.T) {
 	if posting.Score < 80 || len(posting.Lanes) == 0 {
 		t.Fatalf("legacy row was not backfilled: %+v", posting)
 	}
+	if posting.CanonicalKey == "" || posting.Stage != "saved" || len(posting.MergedSources) != 1 {
+		t.Fatalf("legacy row missing canonical/stage merge metadata: %+v", posting)
+	}
 	if _, _, err := store.UpsertPosting(context.Background(), postingInput{Source: "test", URL: "https://example.com/legacy", Company: "Acme", Title: "DevOps Engineer", Location: "Germany", Remote: true, Description: "Kubernetes cloud Linux Go NixOS with platform ownership"}); err != nil {
 		t.Fatalf("update migrated row: %v", err)
 	}
@@ -537,5 +552,98 @@ func TestAnalyticsWindowClampsAndHandlerAnswers(t *testing.T) {
 	}
 	if len(report.ScoreBands) != 5 || report.Active != 4 {
 		t.Fatalf("report %#v, want five bands over four postings", report)
+	}
+}
+
+func TestCrossSourceCanonicalDedupeMergesSources(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	first, created, err := store.UpsertPosting(ctx, postingInput{Source: "board-a", Company: "Example GmbH", Title: "Platform Engineer", Location: "Remote", URL: "https://a.example/job/1?utm_source=x"})
+	if err != nil || !created {
+		t.Fatalf("first created=%v err=%v", created, err)
+	}
+	second, created, err := store.UpsertPosting(ctx, postingInput{Source: "board-b", Company: "Example", Title: "Platform Engineer (m/w/d)", Location: "Germany", URL: "https://b.example/posting/42"})
+	if err != nil {
+		t.Fatalf("second err=%v", err)
+	}
+	if created || second != first {
+		t.Fatalf("second id=%d created=%v want merge into %d", second, created, first)
+	}
+	p, _, err := store.GetPosting(ctx, first)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.DuplicateCount != 1 || len(p.MergedSources) != 2 {
+		t.Fatalf("merge %#v", p)
+	}
+	if p.FirstSeen.After(time.Now()) {
+		t.Fatalf("bad first_seen %v", p.FirstSeen)
+	}
+}
+
+func TestStageNotesJournalAndStageFilter(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	id, _, err := store.UpsertPosting(ctx, postingInput{Source: "manual", Company: "Example", Title: "DevOps Engineer", Location: "Remote"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.UpdateStage(ctx, id, "applied", "sent packet", "", ""); err != nil {
+		t.Fatalf("stage: %v", err)
+	}
+	if _, err := store.AddNote(ctx, id, "recruiter confirmed receipt"); err != nil {
+		t.Fatalf("note: %v", err)
+	}
+	p, _, err := store.GetPosting(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.Stage != "applied" || p.AppliedAt == "" {
+		t.Fatalf("posting stage %#v", p)
+	}
+	notes, history, err := store.PostingJournal(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(notes) != 1 || len(history) != 1 || history[0].FromStage != "saved" || history[0].ToStage != "applied" {
+		t.Fatalf("journal %#v %#v", notes, history)
+	}
+	page, err := store.QueryPostings(ctx, queryOptions{Stage: "applied", Active: true, Limit: 10})
+	if err != nil || page.Total != 1 {
+		t.Fatalf("stage page %#v err=%v", page, err)
+	}
+	stats, err := store.Stats(ctx)
+	if err != nil || len(stats.Stages) == 0 {
+		t.Fatalf("stats %#v err=%v", stats, err)
+	}
+}
+
+func TestPostingExportFormatsAndHandlers(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	id, _, _ := store.UpsertPosting(ctx, postingInput{Source: "manual", Company: "Example", Title: "Kubernetes Platform Engineer", Location: "Remote", Description: "kubernetes nixos linux platform role"})
+	_ = store.UpdateStage(ctx, id, "interview", "technical round", "", "2026-12-01T10:00:00Z")
+	s := &server{store: store}
+	for _, format := range []string{"json", "csv", "markdown"} {
+		req := httptest.NewRequest(http.MethodGet, "/api/postings/export?format="+format, nil)
+		rec := httptest.NewRecorder()
+		s.exportPostings(rec, req)
+		if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "Kubernetes") {
+			t.Fatalf("%s code=%d body=%s", format, rec.Code, rec.Body.String())
+		}
+	}
+	req := httptest.NewRequest(http.MethodPatch, "/api/postings/1/stage", strings.NewReader(`{"stage":"offer","note":"offer call"}`))
+	req.SetPathValue("id", strconv.FormatInt(id, 10))
+	rec := httptest.NewRecorder()
+	s.updatePostingStage(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("stage endpoint %d %s", rec.Code, rec.Body.String())
+	}
+	req = httptest.NewRequest(http.MethodPost, "/api/postings/1/notes", strings.NewReader(`{"note":"packet export sent"}`))
+	req.SetPathValue("id", strconv.FormatInt(id, 10))
+	rec = httptest.NewRecorder()
+	s.addPostingNote(rec, req)
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("note endpoint %d %s", rec.Code, rec.Body.String())
 	}
 }

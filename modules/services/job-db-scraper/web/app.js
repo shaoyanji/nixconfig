@@ -1,4 +1,4 @@
-const state = { q: '', source: '', location: '', company: '', companyLabel: '', lane: '', days: 7, remote: false, sort: 'latest', offset: 0, limit: 20, total: 0 };
+const state = { q: '', source: '', location: '', company: '', companyLabel: '', lane: '', days: 7, remote: false, sort: 'latest', stage: '', offset: 0, limit: 20, total: 0 };
 const $ = (sel) => document.querySelector(sel);
 
 function esc(value) {
@@ -34,6 +34,7 @@ function params() {
   if (state.location) p.set('location', state.location);
   if (state.company) p.set('company', state.company);
   if (state.lane) p.set('lane', state.lane);
+  if (state.stage) p.set('stage', state.stage);
   if (state.days) p.set('days', state.days);
   if (state.remote) p.set('remote', '1');
   if (state.sort === 'score') p.set('sort', 'score');
@@ -111,6 +112,8 @@ function renderJobs(items) {
           ${job.remote ? '<span class="badge">remote</span>' : ''}
           ${(job.lanes || []).slice(0, 5).map((lane) => `<span class="badge lane">${esc(lane)}</span>`).join('')}
           <span class="badge source">${esc(job.source)}</span>
+          ${(job.merged_sources||[]).length>1?`<span class="badge duplicate">${job.merged_sources.length} sources · ${job.duplicate_count} dupe</span>`:''}
+          <span class="badge stage">${esc(job.stage||'saved')}</span>
           ${(job.tags || []).slice(0, 4).map((t) => `<span class="badge">${esc(t)}</span>`).join('')}
         </div>
         <p class="snippet">${job.snippet || esc((job.description || '').slice(0, 260))}${(job.description || '').length > 260 && !job.snippet ? '…' : ''}</p>
@@ -150,11 +153,25 @@ async function showDetail(id) {
       ${job.remote ? '<span class="badge">remote</span>' : ''}
       ${(job.lanes || []).map((lane) => `<span class="badge lane">${esc(lane)}</span>`).join('')}
       <span class="badge">seen ${job.seen_count}×</span><span>${fmtDate(job.posted_at)}</span>
+      ${(job.merged_sources||[]).length>1?`<span class="badge duplicate">merged: ${esc(job.merged_sources.join(', '))}</span>`:''}
     </div>
+    <div class="stage-editor"><label>Stage <select id="stageSelect">${['saved','applied','interview','offer','rejected','archived'].map(x=>`<option ${x===job.stage?'selected':''}>${x}</option>`).join('')}</select></label><input id="followUp" type="datetime-local" aria-label="follow up"><button id="saveStage" class="secondary">Save stage</button><a class="api-link" href="/api/postings/export?format=markdown&id=${id}">packet export ↗</a></div>
+    <form id="noteForm" class="note-form"><input id="noteText" placeholder="Interview or application note…" required><button class="secondary">Add note</button></form>
+    <div id="journal" class="journal"><div class="panel-heading">Application journal</div>${(payload.stage_history||[]).map(x=>`<div class="journal-row"><b>${esc(x.from_stage)} → ${esc(x.to_stage)}</b><span>${esc(x.note||'')}</span><span>${age(x.created_at)}</span></div>`).join('')}${(payload.notes||[]).map(x=>`<div class="journal-row"><b>note</b><span>${esc(x.note)}</span><span>${age(x.created_at)}</span></div>`).join('')||'<span class="muted">No notes yet.</span>'}</div>
     <a class="open" href="${esc(job.url)}" target="_blank" rel="noreferrer">Open original posting ↗</a>
     <div class="description">${esc(job.description || 'No description captured yet.')}</div>
     <div class="similar"><div class="panel-heading">Similar rows</div>${(payload.similar || []).map((x) => `<a href="${esc(x.url)}" target="_blank" rel="noreferrer">${esc(x.title)} · ${esc(x.company)}</a>`).join('') || '<span class="muted">No close rows.</span>'}</div>
   `;
+  if (job.follow_up_at) $('#followUp').value = job.follow_up_at.slice(0,16);
+  $('#saveStage').onclick = async () => {
+    try { await api(`/api/postings/${id}/stage`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({stage:$('#stageSelect').value,follow_up_at:$('#followUp').value})}); showDetail(id); loadJobs(); }
+    catch(err){ alert(err.message); }
+  };
+  $('#noteForm').onsubmit = async (ev) => {
+    ev.preventDefault();
+    try { await api(`/api/postings/${id}/notes`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({note:$('#noteText').value})}); showDetail(id); }
+    catch(err){ alert(err.message); }
+  };
   $('#detail').showModal();
 }
 async function loadScrapeState() {
@@ -195,10 +212,11 @@ $('#source').addEventListener('change', () => { state.source = $('#source').valu
 $('#location').addEventListener('input', () => { state.location = $('#location').value.trim(); state.offset = 0; clearTimeout(window.locTimer); window.locTimer = setTimeout(loadJobs, 250); });
 $('#days').addEventListener('change', () => { state.days = Number($('#days').value); state.offset = 0; loadJobs(); });
 $('#remote').addEventListener('change', () => { state.remote = $('#remote').checked; state.offset = 0; loadJobs(); });
+$('#stage').addEventListener('change', (event) => { state.stage = event.target.value; state.offset = 0; loadJobs(); });
 $('#sort').addEventListener('change', (event) => { state.sort = event.target.value; state.offset = 0; loadJobs(); });
 $('#reset').addEventListener('click', () => {
-  state.q = ''; state.source = ''; state.location = ''; state.company = ''; state.companyLabel = ''; state.lane = ''; state.days = 7; state.remote = false; state.sort = 'latest'; state.offset = 0;
-  $('#q').value = ''; $('#source').value = ''; $('#location').value = ''; $('#days').value = '7'; $('#remote').checked = false; $('#sort').value = 'latest';
+  state.q = ''; state.source = ''; state.location = ''; state.company = ''; state.companyLabel = ''; state.lane = ''; state.days = 7; state.stage=''; state.remote = false; state.sort = 'latest'; state.offset = 0;
+  $('#q').value = ''; $('#source').value = ''; $('#location').value = ''; $('#days').value = '7'; $('#remote').checked = false; $('#sort').value = 'latest'; $('#stage').value='';
   loadJobs();
   loadAnalytics();
 });

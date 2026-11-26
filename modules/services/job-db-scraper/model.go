@@ -13,29 +13,51 @@ import (
 )
 
 type Posting struct {
-	ID           int64     `json:"id"`
-	Fingerprint  string    `json:"fingerprint"`
-	CanonicalURL string    `json:"canonical_url"`
-	URL          string    `json:"url"`
-	Source       string    `json:"source"`
-	Company      string    `json:"company"`
-	CompanyKey   string    `json:"company_key"`
-	Title        string    `json:"title"`
-	Location     string    `json:"location"`
-	Remote       bool      `json:"remote"`
-	Employment   string    `json:"employment,omitempty"`
-	Description  string    `json:"description"`
-	Tags         []string  `json:"tags"`
-	PostedAt     string    `json:"posted_at,omitempty"`
-	FirstSeen    time.Time `json:"first_seen"`
-	LastSeen     time.Time `json:"last_seen"`
-	SeenCount    int       `json:"seen_count"`
-	Active       bool      `json:"active"`
-	Salary       string    `json:"salary,omitempty"`
-	Score        int       `json:"score"`
-	SearchScore  float64   `json:"search_score,omitempty"`
-	Lanes        []string  `json:"lanes"`
-	Snippet      string    `json:"snippet,omitempty"`
+	ID             int64     `json:"id"`
+	Fingerprint    string    `json:"fingerprint"`
+	CanonicalURL   string    `json:"canonical_url"`
+	CanonicalKey   string    `json:"canonical_key"`
+	URL            string    `json:"url"`
+	Source         string    `json:"source"`
+	Company        string    `json:"company"`
+	CompanyKey     string    `json:"company_key"`
+	Title          string    `json:"title"`
+	Location       string    `json:"location"`
+	Remote         bool      `json:"remote"`
+	Employment     string    `json:"employment,omitempty"`
+	Description    string    `json:"description"`
+	Tags           []string  `json:"tags"`
+	PostedAt       string    `json:"posted_at,omitempty"`
+	FirstSeen      time.Time `json:"first_seen"`
+	LastSeen       time.Time `json:"last_seen"`
+	SeenCount      int       `json:"seen_count"`
+	Active         bool      `json:"active"`
+	Salary         string    `json:"salary,omitempty"`
+	Score          int       `json:"score"`
+	SearchScore    float64   `json:"search_score,omitempty"`
+	Lanes          []string  `json:"lanes"`
+	MergedSources  []string  `json:"merged_sources"`
+	DuplicateCount int       `json:"duplicate_count"`
+	Stage          string    `json:"stage"`
+	AppliedAt      string    `json:"applied_at,omitempty"`
+	FollowUpAt     string    `json:"follow_up_at,omitempty"`
+	Snippet        string    `json:"snippet,omitempty"`
+}
+
+type JobNote struct {
+	ID        int64     `json:"id"`
+	PostingID int64     `json:"posting_id"`
+	Note      string    `json:"note"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type StageEvent struct {
+	ID        int64     `json:"id"`
+	PostingID int64     `json:"posting_id"`
+	FromStage string    `json:"from_stage"`
+	ToStage   string    `json:"to_stage"`
+	Note      string    `json:"note,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type postingInput struct {
@@ -261,21 +283,24 @@ func newPosting(in postingInput) Posting {
 	}
 	remote := in.Remote || strings.Contains(strings.ToLower(in.Location+" "+in.Title), "remote")
 	posting := Posting{
-		Fingerprint:  postingFingerprint(in.Company, in.Title, in.Location),
-		CanonicalURL: canonicalURL(in.URL),
-		URL:          in.URL,
-		Source:       in.Source,
-		Company:      in.Company,
-		CompanyKey:   normalizeCompany(in.Company),
-		Title:        in.Title,
-		Location:     in.Location,
-		Remote:       remote,
-		Employment:   strings.TrimSpace(in.Employment),
-		Description:  spaceRE.ReplaceAllString(in.Description, " "),
-		Tags:         in.Tags,
-		PostedAt:     in.PostedAt,
-		Active:       true,
-		Salary:       strings.TrimSpace(in.Salary),
+		Fingerprint:   postingFingerprint(in.Company, in.Title, in.Location),
+		CanonicalURL:  canonicalURL(in.URL),
+		CanonicalKey:  canonicalPostingKey(in.Company, in.Title),
+		URL:           in.URL,
+		Source:        in.Source,
+		Company:       in.Company,
+		CompanyKey:    normalizeCompany(in.Company),
+		Title:         in.Title,
+		Location:      in.Location,
+		Remote:        remote,
+		Employment:    strings.TrimSpace(in.Employment),
+		Description:   spaceRE.ReplaceAllString(in.Description, " "),
+		Tags:          in.Tags,
+		PostedAt:      in.PostedAt,
+		Active:        true,
+		MergedSources: []string{in.Source},
+		Stage:         "saved",
+		Salary:        strings.TrimSpace(in.Salary),
 	}
 	posting.Score, posting.Lanes = scorePosting(posting)
 	return posting
@@ -327,6 +352,17 @@ func joblike(text string) bool {
 		if strings.Contains(text, word) {
 			return true
 		}
+	}
+	return false
+}
+
+func canonicalPostingKey(company, title string) string {
+	return normalizeCompany(company) + "|" + compactKey(genderRE.ReplaceAllString(title, " "))
+}
+func validStage(stage string) bool {
+	switch stage {
+	case "saved", "applied", "interview", "offer", "rejected", "archived":
+		return true
 	}
 	return false
 }

@@ -26,6 +26,7 @@ type queryOptions struct {
 	Company  string
 	Location string
 	Lane     string
+	Stage    string
 	Remote   bool
 	Active   bool
 	Days     int
@@ -105,6 +106,7 @@ type jobAnalytics struct {
 	Lanes       []laneRow    `json:"lanes"`
 	Sources     []countRow   `json:"sources"`
 	ScoreBands  []scoreBand  `json:"score_bands"`
+	Stages      []countRow   `json:"stages"`
 }
 
 type statsPayload struct {
@@ -118,6 +120,8 @@ type statsPayload struct {
 	TopCompanies   []countRow `json:"top_companies"`
 	Locations      []countRow `json:"locations"`
 	LatestRun      *runRecord `json:"latest_run,omitempty"`
+	Stages         []countRow `json:"stages"`
+	Duplicates     int        `json:"duplicates"`
 	GeneratedAt    time.Time  `json:"generated_at"`
 }
 
@@ -162,7 +166,13 @@ func (s *Store) migrate() error {
 			active INTEGER NOT NULL DEFAULT 1,
 			salary TEXT NOT NULL DEFAULT '',
 			score INTEGER NOT NULL DEFAULT 0,
-			lanes TEXT NOT NULL DEFAULT '[]'
+			lanes TEXT NOT NULL DEFAULT '[]',
+			canonical_key TEXT NOT NULL DEFAULT '',
+			merged_sources TEXT NOT NULL DEFAULT '[]',
+			duplicate_count INTEGER NOT NULL DEFAULT 0,
+			stage TEXT NOT NULL DEFAULT 'saved',
+			applied_at TEXT NOT NULL DEFAULT '',
+			follow_up_at TEXT NOT NULL DEFAULT ''
 		)`,
 		`CREATE INDEX IF NOT EXISTS postings_source_idx ON postings(source)`,
 		`CREATE INDEX IF NOT EXISTS postings_company_idx ON postings(company_key)`,
@@ -187,6 +197,20 @@ func (s *Store) migrate() error {
 			INSERT INTO postings_fts(rowid, title, company, location, description, tags)
 			VALUES (new.id, new.title, new.company, new.location, new.description, new.tags);
 		END`,
+		`CREATE TABLE IF NOT EXISTS job_notes (
+			id INTEGER PRIMARY KEY,
+			posting_id INTEGER NOT NULL REFERENCES postings(id) ON DELETE CASCADE,
+			note TEXT NOT NULL,
+			created_at TEXT NOT NULL
+		)`,
+		`CREATE TABLE IF NOT EXISTS job_stage_history (
+			id INTEGER PRIMARY KEY,
+			posting_id INTEGER NOT NULL REFERENCES postings(id) ON DELETE CASCADE,
+			from_stage TEXT NOT NULL,
+			to_stage TEXT NOT NULL,
+			note TEXT NOT NULL DEFAULT '',
+			created_at TEXT NOT NULL
+		)`,
 		`CREATE TABLE IF NOT EXISTS job_score_alerts (
 			id INTEGER PRIMARY KEY,
 			fingerprint TEXT NOT NULL UNIQUE,
@@ -202,6 +226,8 @@ func (s *Store) migrate() error {
 			last_seen TEXT NOT NULL,
 			notified_at TEXT
 		)`,
+		`CREATE INDEX IF NOT EXISTS job_notes_posting_idx ON job_notes(posting_id,created_at DESC)`,
+		`CREATE INDEX IF NOT EXISTS job_stage_history_posting_idx ON job_stage_history(posting_id,created_at DESC)`,
 		`CREATE INDEX IF NOT EXISTS job_score_alerts_status_idx ON job_score_alerts(status,last_seen DESC)`,
 		`CREATE TABLE IF NOT EXISTS scrape_runs (
 			id INTEGER PRIMARY KEY,
@@ -236,6 +262,12 @@ func (s *Store) migrate() error {
 	}{
 		{"score", `ALTER TABLE postings ADD COLUMN score INTEGER NOT NULL DEFAULT 0`},
 		{"lanes", `ALTER TABLE postings ADD COLUMN lanes TEXT NOT NULL DEFAULT '[]'`},
+		{"canonical_key", `ALTER TABLE postings ADD COLUMN canonical_key TEXT NOT NULL DEFAULT ''`},
+		{"merged_sources", `ALTER TABLE postings ADD COLUMN merged_sources TEXT NOT NULL DEFAULT '[]'`},
+		{"duplicate_count", `ALTER TABLE postings ADD COLUMN duplicate_count INTEGER NOT NULL DEFAULT 0`},
+		{"stage", `ALTER TABLE postings ADD COLUMN stage TEXT NOT NULL DEFAULT 'saved'`},
+		{"applied_at", `ALTER TABLE postings ADD COLUMN applied_at TEXT NOT NULL DEFAULT ''`},
+		{"follow_up_at", `ALTER TABLE postings ADD COLUMN follow_up_at TEXT NOT NULL DEFAULT ''`},
 	}
 	missing := []string{}
 	for _, column := range columns {
@@ -311,6 +343,16 @@ func (s *Store) migrate() error {
 	if _, err := s.db.Exec(`CREATE INDEX IF NOT EXISTS postings_score_idx ON postings(score DESC,last_seen DESC)`); err != nil {
 		return fmt.Errorf("postings score index: %w", err)
 	}
+	if _, err := s.db.Exec(`CREATE INDEX IF NOT EXISTS postings_canonical_key_idx ON postings(canonical_key)`); err != nil {
+		return fmt.Errorf("postings canonical key index: %w", err)
+	}
+	if _, err := s.db.Exec(`CREATE INDEX IF NOT EXISTS postings_stage_idx ON postings(stage)`); err != nil {
+		return fmt.Errorf("postings stage index: %w", err)
+	}
+	if err := s.backfillCanonicalKeys(); err != nil {
+		return fmt.Errorf("backfill canonical keys: %w", err)
+	}
+	_, _ = s.db.Exec(`UPDATE postings SET merged_sources=json_array(source) WHERE merged_sources='[]' OR merged_sources=''`)
 	if err := s.rescorePostings(); err != nil {
 		return fmt.Errorf("rescore postings: %w", err)
 	}
@@ -337,6 +379,36 @@ func (s *Store) hasColumn(table, column string) (bool, error) {
 		}
 	}
 	return false, rows.Err()
+}
+
+func (s *Store) backfillCanonicalKeys() error {
+	rows, err := s.db.Query(`SELECT id,company,title FROM postings WHERE canonical_key='' OR canonical_key IS NULL`)
+	if err != nil {
+		return err
+	}
+	type row struct {
+		id  int64
+		key string
+	}
+	updates := []row{}
+	for rows.Next() {
+		var id int64
+		var company, title string
+		if err := rows.Scan(&id, &company, &title); err != nil {
+			rows.Close()
+			return err
+		}
+		updates = append(updates, row{id, canonicalPostingKey(company, title)})
+	}
+	if err := rows.Close(); err != nil {
+		return err
+	}
+	for _, update := range updates {
+		if _, err := s.db.Exec(`UPDATE postings SET canonical_key=? WHERE id=?`, update.key, update.id); err != nil {
+			return err
+		}
+	}
+	return rows.Err()
 }
 
 func (s *Store) rescorePostings() error {
@@ -391,24 +463,25 @@ func (s *Store) UpsertPosting(ctx context.Context, in postingInput) (int64, bool
 	defer tx.Rollback()
 
 	var id, seen int64
-	var existingDescription string
+	var existingDescription, mergedRaw, existingSource string
+	var duplicateCount int
 	row := tx.QueryRowContext(ctx, `
-		SELECT id, seen_count, description FROM postings
-		WHERE fingerprint = ? OR (canonical_url != '' AND canonical_url = ?)
+		SELECT id, seen_count, description, merged_sources, source, duplicate_count FROM postings
+		WHERE fingerprint = ? OR (canonical_url != '' AND canonical_url = ?) OR (canonical_key != '' AND canonical_key = ?)
 		ORDER BY CASE WHEN canonical_url = ? THEN 0 ELSE 1 END
-		LIMIT 1`, p.Fingerprint, p.CanonicalURL, p.CanonicalURL)
-	err = row.Scan(&id, &seen, &existingDescription)
+		LIMIT 1`, p.Fingerprint, p.CanonicalURL, p.CanonicalKey, p.CanonicalURL)
+	err = row.Scan(&id, &seen, &existingDescription, &mergedRaw, &existingSource, &duplicateCount)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return 0, false, err
 	}
 	if errors.Is(err, sql.ErrNoRows) {
 		res, err := tx.ExecContext(ctx, `
 			INSERT INTO postings (fingerprint, canonical_url, url, source, company, company_key, title, location,
-				remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary, score, lanes)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+				remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary, score, lanes, canonical_key, merged_sources, stage)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
 			p.Fingerprint, p.CanonicalURL, p.URL, p.Source, p.Company, p.CompanyKey, p.Title, p.Location,
 			boolInt(p.Remote), p.Employment, p.Description, tagsJSON(p.Tags), p.PostedAt,
-			now.Format(time.RFC3339), now.Format(time.RFC3339), 1, 1, p.Salary, p.Score, tagsJSON(p.Lanes))
+			now.Format(time.RFC3339), now.Format(time.RFC3339), 1, 1, p.Salary, p.Score, tagsJSON(p.Lanes), p.CanonicalKey, tagsJSON(p.MergedSources), p.Stage)
 		if err != nil {
 			return 0, false, err
 		}
@@ -423,17 +496,24 @@ func (s *Store) UpsertPosting(ctx context.Context, in postingInput) (int64, bool
 	if len(existingDescription) > len(description) {
 		description = existingDescription
 	}
+	merged := parseTagsJSON(mergedRaw)
+	duplicate := duplicateCount
+	if !slices.Contains(merged, p.Source) {
+		merged = append(merged, p.Source)
+		slices.Sort(merged)
+		duplicate++
+	}
 	scored := p
 	scored.Description = description
 	scored.Score, scored.Lanes = scorePosting(scored)
 	_, err = tx.ExecContext(ctx, `
 		UPDATE postings SET canonical_url=?, url=?, source=?, company=?, company_key=?, title=?, location=?,
 			remote=?, employment=?, description=?, tags=?, posted_at=COALESCE(NULLIF(?, ''), posted_at),
-			last_seen=?, seen_count=?, active=1, salary=COALESCE(NULLIF(?, ''), salary), score=?, lanes=?
+			last_seen=?, seen_count=?, active=1, salary=COALESCE(NULLIF(?, ''), salary), score=?, lanes=?, canonical_key=?, merged_sources=?, duplicate_count=?
 		WHERE id=?`,
 		p.CanonicalURL, p.URL, p.Source, p.Company, p.CompanyKey, p.Title, p.Location,
 		boolInt(p.Remote), p.Employment, description, tagsJSON(p.Tags), p.PostedAt,
-		now.Format(time.RFC3339), seen+1, p.Salary, scored.Score, tagsJSON(scored.Lanes), id)
+		now.Format(time.RFC3339), seen+1, p.Salary, scored.Score, tagsJSON(scored.Lanes), p.CanonicalKey, tagsJSON(merged), duplicate, id)
 	if err != nil {
 		return 0, false, err
 	}
@@ -515,6 +595,10 @@ func (s *Store) QueryPostings(ctx context.Context, opt queryOptions) (postingsPa
 		where = append(where, "EXISTS (SELECT 1 FROM json_each(p.lanes) WHERE json_each.value = ?)")
 		args = append(args, opt.Lane)
 	}
+	if opt.Stage != "" {
+		where = append(where, "p.stage = ?")
+		args = append(args, opt.Stage)
+	}
 	if opt.Remote {
 		where = append(where, "p.remote = 1")
 	}
@@ -542,6 +626,7 @@ func (s *Store) QueryPostings(ctx context.Context, opt queryOptions) (postingsPa
 	query := `
 		SELECT p.id, p.fingerprint, p.canonical_url, p.url, p.source, p.company, p.company_key, p.title, p.location,
 			p.remote, p.employment, p.description, p.tags, p.posted_at, p.first_seen, p.last_seen, p.seen_count, p.active, p.salary, p.score, p.lanes,
+			p.canonical_key, p.merged_sources, p.duplicate_count, p.stage, p.applied_at, p.follow_up_at,
 			` + selectSnippet + `
 		FROM postings p` + join + predicate + `
 		ORDER BY ` + order + `
@@ -571,12 +656,12 @@ func scanPosting(row rowScanner) (Posting, error) {
 	var p Posting
 	var remote, active int
 	var tags, first, last string
-	var lanes string
+	var lanes, merged string
 	var searchScore sql.NullFloat64
 	var snippet sql.NullString
 	err := row.Scan(&p.ID, &p.Fingerprint, &p.CanonicalURL, &p.URL, &p.Source, &p.Company, &p.CompanyKey,
 		&p.Title, &p.Location, &remote, &p.Employment, &p.Description, &tags, &p.PostedAt,
-		&first, &last, &p.SeenCount, &active, &p.Salary, &p.Score, &lanes, &snippet, &searchScore)
+		&first, &last, &p.SeenCount, &active, &p.Salary, &p.Score, &lanes, &p.CanonicalKey, &merged, &p.DuplicateCount, &p.Stage, &p.AppliedAt, &p.FollowUpAt, &snippet, &searchScore)
 	if err != nil {
 		return p, err
 	}
@@ -584,6 +669,10 @@ func scanPosting(row rowScanner) (Posting, error) {
 	p.Active = active == 1
 	p.Tags = parseTagsJSON(tags)
 	p.Lanes = parseTagsJSON(lanes)
+	p.MergedSources = parseTagsJSON(merged)
+	if p.Stage == "" {
+		p.Stage = "saved"
+	}
 	p.FirstSeen, _ = time.Parse(time.RFC3339, first)
 	p.LastSeen, _ = time.Parse(time.RFC3339, last)
 	p.Snippet = snippet.String
@@ -597,6 +686,7 @@ func (s *Store) GetPosting(ctx context.Context, id int64) (Posting, []Posting, e
 	row := s.db.QueryRowContext(ctx, `
 		SELECT id, fingerprint, canonical_url, url, source, company, company_key, title, location,
 			remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary, score, lanes,
+			canonical_key, merged_sources, duplicate_count, stage, applied_at, follow_up_at,
 			'' AS snippet, 0.0 AS search_score
 		FROM postings WHERE id=?`, id)
 	p, err := scanPosting(row)
@@ -606,6 +696,7 @@ func (s *Store) GetPosting(ctx context.Context, id int64) (Posting, []Posting, e
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT id, fingerprint, canonical_url, url, source, company, company_key, title, location,
 			remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary, score, lanes,
+			canonical_key, merged_sources, duplicate_count, stage, applied_at, follow_up_at,
 			'' AS snippet, 0.0 AS search_score
 		FROM postings WHERE id != ? AND active = 1 AND (company_key = ? OR lower(title) LIKE ?)
 		ORDER BY last_seen DESC LIMIT 6`, id, p.CompanyKey, "%"+strings.ToLower(firstWords(p.Title, 3))+"%")
@@ -630,6 +721,81 @@ func firstWords(s string, n int) string {
 		parts = parts[:n]
 	}
 	return strings.Join(parts, " ")
+}
+
+func (s *Store) UpdateStage(ctx context.Context, id int64, stage, note, appliedAt, followUpAt string) error {
+	if !validStage(stage) {
+		return errors.New("invalid stage")
+	}
+	var old string
+	if err := s.db.QueryRowContext(ctx, `SELECT stage FROM postings WHERE id=?`, id).Scan(&old); err != nil {
+		return err
+	}
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	now := time.Now().UTC().Format(time.RFC3339)
+	if stage == "applied" && appliedAt == "" {
+		appliedAt = now
+	}
+	_, err = tx.ExecContext(ctx, `UPDATE postings SET stage=?, applied_at=COALESCE(NULLIF(?,''),applied_at), follow_up_at=? WHERE id=?`, stage, appliedAt, followUpAt, id)
+	if err != nil {
+		return err
+	}
+	if old != stage {
+		_, err = tx.ExecContext(ctx, `INSERT INTO job_stage_history (posting_id,from_stage,to_stage,note,created_at) VALUES (?,?,?,?,?)`, id, old, stage, note, now)
+		if err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+func (s *Store) AddNote(ctx context.Context, id int64, note string) (int64, error) {
+	note = strings.TrimSpace(note)
+	if len(note) < 2 {
+		return 0, errors.New("note is too short")
+	}
+	res, err := s.db.ExecContext(ctx, `INSERT INTO job_notes (posting_id,note,created_at) VALUES (?,?,?)`, id, note, time.Now().UTC().Format(time.RFC3339))
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
+}
+func (s *Store) PostingJournal(ctx context.Context, id int64) ([]JobNote, []StageEvent, error) {
+	notes := []JobNote{}
+	rows, err := s.db.QueryContext(ctx, `SELECT id,posting_id,note,created_at FROM job_notes WHERE posting_id=? ORDER BY created_at DESC`, id)
+	if err != nil {
+		return nil, nil, err
+	}
+	for rows.Next() {
+		var n JobNote
+		var ts string
+		if err := rows.Scan(&n.ID, &n.PostingID, &n.Note, &ts); err != nil {
+			rows.Close()
+			return nil, nil, err
+		}
+		n.CreatedAt, _ = time.Parse(time.RFC3339, ts)
+		notes = append(notes, n)
+	}
+	rows.Close()
+	events := []StageEvent{}
+	rows, err = s.db.QueryContext(ctx, `SELECT id,posting_id,from_stage,to_stage,note,created_at FROM job_stage_history WHERE posting_id=? ORDER BY created_at DESC`, id)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var e StageEvent
+		var ts string
+		if err := rows.Scan(&e.ID, &e.PostingID, &e.FromStage, &e.ToStage, &e.Note, &ts); err != nil {
+			return nil, nil, err
+		}
+		e.CreatedAt, _ = time.Parse(time.RFC3339, ts)
+		events = append(events, e)
+	}
+	return notes, events, rows.Err()
 }
 
 func (s *Store) BeginRun(ctx context.Context, source string) (int64, error) {
@@ -862,6 +1028,10 @@ func (s *Store) Stats(ctx context.Context) (statsPayload, error) {
 	if st.Locations, err = s.counts(ctx, `SELECT CASE WHEN location='' THEN 'unspecified' ELSE location END,count(*) FROM postings WHERE active=1 GROUP BY location ORDER BY count(*) DESC, location LIMIT 10`); err != nil {
 		return st, err
 	}
+	if st.Stages, err = s.counts(ctx, `SELECT stage,count(*) FROM postings GROUP BY stage ORDER BY count(*) DESC, stage`); err != nil {
+		return st, err
+	}
+	_ = s.db.QueryRowContext(ctx, `SELECT COALESCE(sum(duplicate_count),0) FROM postings`).Scan(&st.Duplicates)
 	if runs, err := s.RecentRuns(ctx, 1); err == nil && len(runs) > 0 {
 		latest := runs[0]
 		st.LatestRun = &latest
@@ -951,6 +1121,9 @@ func (s *Store) Analytics(ctx context.Context, days, limit int) (jobAnalytics, e
 		return report, err
 	}
 	if report.Sources, err = counts(`source`); err != nil {
+		return report, err
+	}
+	if report.Stages, err = counts(`stage`); err != nil {
 		return report, err
 	}
 

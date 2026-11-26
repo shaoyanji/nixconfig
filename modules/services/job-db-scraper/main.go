@@ -109,6 +109,9 @@ func main() {
 	mux.HandleFunc("GET /api/postings/{id}", s.posting)
 	mux.HandleFunc("POST /api/postings", s.createPosting)
 	mux.HandleFunc("POST /api/postings/batch", s.batchPostings)
+	mux.HandleFunc("PATCH /api/postings/{id}/stage", s.updatePostingStage)
+	mux.HandleFunc("POST /api/postings/{id}/notes", s.addPostingNote)
+	mux.HandleFunc("GET /api/postings/export", s.exportPostings)
 	mux.HandleFunc("GET /api/scrape", s.scrapeStatus)
 	mux.HandleFunc("POST /api/scrape", s.triggerScrape)
 	mux.HandleFunc("GET /api/runs", s.runs)
@@ -222,7 +225,7 @@ func (s *server) static(path, contentType string) http.HandlerFunc {
 
 func (s *server) health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
-		"ok": true, "service": "job-db-scraper", "version": "0.1.0",
+		"ok": true, "service": "job-db-scraper", "version": "0.2.0",
 		"uptime_seconds": int(time.Since(s.started).Seconds()), "time": time.Now().UTC().Format(time.RFC3339),
 	})
 }
@@ -260,7 +263,7 @@ func (s *server) postings(w http.ResponseWriter, r *http.Request) {
 	offset, _ := strconv.Atoi(q.Get("offset"))
 	days, _ := strconv.Atoi(q.Get("days"))
 	page, err := s.store.QueryPostings(r.Context(), queryOptions{
-		Q: q.Get("q"), Source: q.Get("source"), Company: q.Get("company"), Location: q.Get("location"), Lane: q.Get("lane"),
+		Q: q.Get("q"), Source: q.Get("source"), Company: q.Get("company"), Location: q.Get("location"), Lane: q.Get("lane"), Stage: q.Get("stage"),
 		Remote: q.Get("remote") == "1" || q.Get("remote") == "true", Active: q.Get("active") != "0",
 		Days: days, Limit: limit, Offset: offset, Sort: q.Get("sort"),
 	})
@@ -293,7 +296,12 @@ func (s *server) posting(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, err)
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"posting": p, "similar": similar})
+	notes, history, journalErr := s.store.PostingJournal(r.Context(), id)
+	if journalErr != nil {
+		writeError(w, http.StatusInternalServerError, journalErr)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"posting": p, "similar": similar, "notes": notes, "stage_history": history})
 }
 
 func (s *server) runs(w http.ResponseWriter, r *http.Request) {
@@ -416,6 +424,56 @@ func (s *server) batchPostings(w http.ResponseWriter, r *http.Request) {
 		status = http.StatusCreated
 	}
 	writeJSON(w, status, response)
+}
+
+func (s *server) updatePostingStage(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, errors.New("posting id must be numeric"))
+		return
+	}
+	var body struct {
+		Stage      string `json:"stage"`
+		Note       string `json:"note"`
+		AppliedAt  string `json:"applied_at"`
+		FollowUpAt string `json:"follow_up_at"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if err := s.store.UpdateStage(r.Context(), id, body.Stage, body.Note, body.AppliedAt, body.FollowUpAt); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
+}
+
+func (s *server) addPostingNote(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, errors.New("posting id must be numeric"))
+		return
+	}
+	var body struct {
+		Note string `json:"note"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	noteID, err := s.store.AddNote(r.Context(), id, body.Note)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]any{"id": noteID})
 }
 
 func (s *server) alertList(w http.ResponseWriter, r *http.Request) {

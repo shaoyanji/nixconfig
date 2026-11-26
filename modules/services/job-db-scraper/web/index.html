@@ -29,6 +29,7 @@
           <div id="scrape-state" class="scrape-state">idle</div>
           <button id="scrape-button" class="secondary">Run scrape</button>
           <a class="api-link" href="/api/postings?limit=5">JSON API ↗</a>
+          <div class="exports"><a href="/api/postings/export?format=csv">CSV</a><a href="/api/postings/export?format=json">JSON</a><a href="/api/postings/export?format=markdown">Markdown packet</a></div>
         </div>
       </section>
     </header>
@@ -71,6 +72,9 @@
             </select>
           </label>
           <label class="check"><input id="remote" type="checkbox"> remote only</label>
+          <label>Stage
+            <select id="stage"><option value="">all stages</option><option>saved</option><option>applied</option><option>interview</option><option>offer</option><option>rejected</option><option>archived</option></select>
+          </label>
           <label>Ordering
             <select id="sort">
               <option value="latest" selected>latest first</option>

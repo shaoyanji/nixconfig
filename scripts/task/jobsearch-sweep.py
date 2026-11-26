@@ -25,6 +25,7 @@ import re
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -219,11 +220,15 @@ def recency(value: str) -> int | None:
     if not value:
         return None
     if re.match(r"^\d{4}-\d\d-\d\d", value):
-        try:
-            stamp = datetime.strptime(value[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
-            return (datetime.now(timezone.utc) - stamp).days
-        except ValueError:
-            return None
+        # LinkedIn's `<time datetime>` is date-only: without this branch the age
+        # is unknown and a two-month-old ad passes every `--max-age` window.
+        for fmt, width in (("%Y-%m-%dT%H:%M:%S", 19), ("%Y-%m-%d", 10)):
+            try:
+                stamp = datetime.strptime(value[:width], fmt).replace(tzinfo=timezone.utc)
+                return (datetime.now(timezone.utc) - stamp).days
+            except ValueError:
+                continue
+        return None
     if re.match(r"^(today|heute)\b", value, re.I):
         return 0
     if re.match(r"^(last|this)\s+week", value, re.I):
@@ -252,7 +257,12 @@ def recency(value: str) -> int | None:
 
 
 def parse_boards(
-    boards: set[str], stepstone_searches: list[tuple[str, str]], stepstone_depth: int = 1
+    boards: set[str],
+    stepstone_searches: list[tuple[str, str]],
+    stepstone_depth: int = 1,
+    jobsch_depth: int = 2,
+    linkedin_searches: list[tuple[str, str]] | None = None,
+    linkedin_depth: int = 1,
 ) -> tuple[list[dict], list[dict]]:
     rows: list[dict] = []
     unnameable: list[dict] = []
@@ -327,13 +337,52 @@ def parse_boards(
             if oldest and (time.time() - oldest) > 10 * 86400:
                 break
             time.sleep(0.4)
+    if "linkedin" in boards:
+        # The guest search is the one surface the original 25 November rows came
+        # from, and it refuses in bursts (429) rather than per query: a refusal
+        # is printed and ends that query, never counted as an empty market.
+        for query, location in linkedin_searches or []:
+            for start in range(0, 25 * linkedin_depth, 25):
+                try:
+                    listing = fetch(
+                        "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
+                        f"?keywords={quote(query)}&location={quote(location)}&start={start}"
+                    ).decode("utf-8", "replace")
+                except Exception as exc:
+                    print(
+                        f"jobsearch-sweep: linkedin {query}/{location} start {start}: {exc}",
+                        file=sys.stderr,
+                    )
+                    time.sleep(10)
+                    break
+                cards = listing.split("<li>")[1:]
+                if not cards:
+                    break
+                for chunk in cards:
+                    chunk = chunk[:12000]
+                    href = re.search(r'base-card__full-link[^"]*"[^>]*href="([^"]+)"', chunk)
+                    title = re.search(r'base-search-card__title[^>]*>(.*?)</h3>', chunk, re.S)
+                    company = re.search(
+                        r'base-search-card__subtitle[^>]*>(.*?)</h4>', chunk, re.S
+                    )
+                    if not (href and title and company):
+                        continue
+                    loc = re.search(r'job-search-card__location[^>]*>(.*?)</span>', chunk, re.S)
+                    when = re.search(r'<time[^>]*datetime="([^"]+)"', chunk)
+                    add("linkedin", company.group(1), title.group(1),
+                        loc.group(1) if loc else "", href.group(1).split("?")[0],
+                        when.group(1) if when else "")
+                # The guest API throttles at a couple of requests a second and
+                # answers 429 for the rest of that query; a pause between pages
+                # is cheaper than losing the market for the pass.
+                time.sleep(4)
     if "jobsch" in boards:
         # jobs.ch is the Swiss market, which no German board carries: the card is
         # server-rendered, with the age first, the advertised title on the link,
         # the city under "Place of work" and the employer after the contract
         # type. 22 cards a page, so depth matters here too.
         for query in ("devops", "sre", "platform", "infrastructure", "kubernetes", "cloud"):
-            for depth in range(1, 3):
+            for depth in range(1, jobsch_depth + 1):
                 try:
                     listing = fetch(
                         f"https://www.jobs.ch/en/vacancies/?term={quote(query)}&page={depth}"
@@ -513,6 +562,8 @@ def self_test() -> int:
     check("umlauts: Kältemaschinen folds onto Kaeltemaschinen",
           norm("Kältemaschinen"), norm("Kaeltemaschinen"))
     check("umlauts: für and fuer agree", norm("für"), norm("fuer"))
+    check("age: a date-only stamp parses (LinkedIn emits this)", recency("2026-11-19") is not None, True)
+    check("age: last week counts as seven days", recency("Last week"), 7)
     print(f"{total - failures}/{total} passed")
     return 1 if failures else 0
 
@@ -528,6 +579,10 @@ def main() -> int:
     ap.add_argument("--stepstone-queries", default="devops,platform,sre,cloud,infrastructure,kubernetes")
     ap.add_argument("--stepstone-cities", default="Berlin,Muenchen,Hamburg,Koeln")
     ap.add_argument("--stepstone-depth", type=int, default=1, help="pages per query/city (26 cards each)")
+    ap.add_argument("--jobsch-depth", type=int, default=2, help="pages per jobs.ch query (22 cards each)")
+    ap.add_argument("--linkedin-queries", default="devops,sre,platform engineer,infrastructure engineer")
+    ap.add_argument("--linkedin-locations", default="Germany,Switzerland,Austria,Netherlands")
+    ap.add_argument("--linkedin-depth", type=int, default=1, help="pages per query/location (25 cards each)")
     ap.add_argument("--gh", action="store_true", help="attribute GitHub activity (bounded gh api calls)")
     args = ap.parse_args()
     if args.self_test:
@@ -542,7 +597,15 @@ def main() -> int:
         for c in args.stepstone_cities.split(",")
     ] if "stepstone" in boards else []
 
-    rows, unnameable = parse_boards(boards, pages, args.stepstone_depth)
+    linkedin_searches = [
+        (q.strip(), l.strip())
+        for q in args.linkedin_queries.split(",")
+        for l in args.linkedin_locations.split(",")
+    ] if "linkedin" in boards else []
+    rows, unnameable = parse_boards(
+        boards, pages, args.stepstone_depth, args.jobsch_depth,
+        linkedin_searches, args.linkedin_depth,
+    )
     held = {norm(line.strip()) for line in open(args.held, encoding="utf-8") if line.strip()}
 
     def in_lane(row: dict) -> bool:

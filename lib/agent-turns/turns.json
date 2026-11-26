@@ -1,8 +1,39 @@
 {
-  "generated": "2026-11-26T13:36:48Z",
+  "generated": "2026-11-26T13:41:38Z",
   "count": 200,
-  "pin": "1ef5097635300cca58a90666228281a4fdbfd333940124686708991aac7d61d4",
+  "pin": "f17f8d6e54be36c37245f15778e6023bef19c3834d2e543d2725bb69205e805f",
   "turns": [
+    {
+      "id": "bb3536d3-12c9-4d80-95c1-ab117a710ec4",
+      "ts": "2026-11-26T13:37:25Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "claim: job-scout pass 2026-11-26f — probe LinkedIn guest search and jobs.ch depth, file linked in-lane leads via apps:scout, fold into the is-a.dev CV page with framing distinct from the 26d and 26e passes",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "a68dc8915b2abd6b23196c7769cee87cd4001a1c",
+      "branch": "main",
+      "frame": "03hb31qjlrmohl373jlay3jjy"
+    },
+    {
+      "id": "ddda12da-9821-4712-9a74-ace04068557b",
+      "ts": "2026-11-26T13:36:57Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: sweep 2026-11-26e — Stepstone paged to depth 2 with the city quoted (Frankfurt was being dropped), jobs.ch added as a board; 3733 postings, 220 fresh, 9 new at 1680 held, 7 filed (6 Swiss), 1 agency closed. 6 leads folded into the is-a.dev CV page (blog f0d93b6b). Gate: py_compile + self-test 20/20 + live pass; checks:quick cannot build task-list.json on this aarch64 host (x86_64 pin).",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py",
+        ".agents/skills/jobsearch-pipeline"
+      ],
+      "files": [],
+      "base_commit": "a68dc8915b2abd6b23196c7769cee87cd4001a1c",
+      "branch": "main",
+      "frame": "03hb31nbxy8fss8u6zy9dl6b2"
+    },
     {
       "id": "42f86f91-2475-4b9d-8680-eb89d2c97f34",
       "ts": "2026-11-26T13:28:51Z",
@@ -2975,32 +3006,6 @@
       "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
       "branch": "main",
       "frame": "03hayu8jgrkz79jo6a0lfqvyn"
-    },
-    {
-      "id": "a36b8c65-2ffb-4abf-9771-555f07399707",
-      "ts": "2026-11-26T00:41:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26",
-      "action": "drove idle devin pane; refactor task classified flake-change via jev-decide duel; pane Thinking running image-daily gate",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
-      "branch": "main",
-      "frame": "03hayu8gtdeuxh0ot0sb0dbox"
-    },
-    {
-      "id": "7fadff2d-8196-47c8-9aec-8e1034cc03c0",
-      "ts": "2026-11-26T00:40:53Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-lane",
-      "action": "done: refactor lane clean — no open diffs in tree (HEAD=origin/main=290a0ecb); stashes left untouched (pre-existing/kg2-rot, not refactor work); image-daily gate re-verified on HEAD | gate: checks:image-daily rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
-      "branch": "main",
-      "frame": "03hayu1nwxp9traei52n11b47"
     }
   ]
 }

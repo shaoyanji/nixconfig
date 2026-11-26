@@ -551,7 +551,7 @@
     |> lib.concatMap (s:
       turnList
       |> builtins.filter (t: subjectOf t == s)
-      |> map (t: t.source)
+      |> builtins.catAttrs "source"
       |> lib.unique
       |> builtins.filter (src: (intents.capabilityIds or []) |> builtins.elem src)
       |> map (src: {

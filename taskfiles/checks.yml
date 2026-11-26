@@ -1454,10 +1454,10 @@ tasks:
       lib.hasAttr, …) a file spells one vocabulary — carrying both reads as an
       unfinished unification. The 2026-11-24 sweep unified every file under
       lib/, modules/, flake/ and hosts/ per-file-majority; this keeps a refactor
-      from re-introducing a minority spelling. A second rule refuses a line
-      that filters and ends in `|> ...length` — that is lib.count spelled long
-      (12 sites unified 2026-11-25, 763eaa83). grep only, ~1 s, no eval; a
-      failure names file and function.
+      from re-introducing a minority spelling. Two more rules refuse pipe
+      idioms spelled long: a line that filters and ends in `|> ...length`
+      (lib.count, 763eaa83) and a `map (x: x.f)` projection (catAttrs "f").
+      grep only, ~1 s, no eval; a failure names file and function.
     cmds:
       - bash scripts/task/nix-style-check.sh
 
@@ -1468,10 +1468,10 @@ tasks:
       2fe0c687^ tree, where flake/policies.nix and flake/epistemics.nix
       carried lib.* minorities against builtins-majority files — the gate
       must refuse it and name both files while leaving the honest control
-      (lib/nix-files.nix, which mixes no aliases) unblamed. Also proves one
-      minority spelling is enough to fail, that a seeded filter|>length line
-      fails naming the lib.count rule while the honest length uses (inside a
-      predicate, on a non-filter source) pass, and that the current tree passes.
+      (lib/nix-files.nix) unblamed. Also proves one minority spelling fails,
+      a seeded filter|>length line fails naming lib.count while honest
+      length uses pass, a seeded map (x: x.f) fails naming catAttrs while
+      nested/computed/record maps pass, and the current tree passes.
     cmds:
       - bash tests/nix-style/run.sh
 

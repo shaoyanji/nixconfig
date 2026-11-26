@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-26T07:52:01Z",
+  "generated": "2026-11-26T08:00:54Z",
   "count": 200,
-  "pin": "146ed416e0af3b4d06e19ace3472f0f9c3cc0d1fd7e195e59e43a1eeb0f804b6",
+  "pin": "96adbd6e7f8e535efa8b1653ab5395f135a8a93449cfc202cec8fcaf7684ef1f",
   "turns": [
+    {
+      "id": "b7ecc68d-46a3-41cd-8593-ad30f59905ff",
+      "ts": "2026-11-26T07:57:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-drive-20261126-0801",
+      "action": "publish: write CV site content and push static site",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "1a1729cc01e314f22407e09d36a329bd910cbce2",
+      "branch": "main",
+      "frame": "03hb17djgg1kxuz5d2u0nxks6"
+    },
+    {
+      "id": "b499ae8c-1929-4f74-8f9e-b03f95985c58",
+      "ts": "2026-11-26T07:55:34Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "start: pipe loop pass — elemAt flip-lambdas (14 sites per note lib-pipe-elemat-lambdas) + resurvey",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/"
+      ],
+      "files": [],
+      "base_commit": "1a1729cc01e314f22407e09d36a329bd910cbce2",
+      "branch": "main",
+      "frame": "03hb16yj8zbt8fe7xutzq9stv"
+    },
+    {
+      "id": "16de7c23-7f6f-46a0-88cc-439c7e3d16a7",
+      "ts": "2026-11-26T07:54:02Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-epistemics",
+      "action": "landed v1.0.0rc: flake/intents.nix (6 kinds + 6 capabilities + admit + classOf via quotient-hash, first consumer); ontology +2 entities +serves; kg projects 6 caps/60 intents; checks:intents in quick; note intent-capability-spec carries the memo (dedup adopted, epoch+cassini deferred on kg-zeck Kelly fail) | gates: intents+ontology+kg(+test)+notes-schema+tasks831+verify157+lint334+shell80",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1a1729cc01e314f22407e09d36a329bd910cbce2",
+      "branch": "main",
+      "frame": "03hb16nstc7b9h107t26z1y2n"
+    },
     {
       "id": "295d3893-3568-4a74-87ee-c74fda5b5828",
       "ts": "2026-11-26T07:42:41Z",
@@ -2811,45 +2852,6 @@
       "base_commit": "fc1a5f98c3cd4bc1e9127cb8fb2033747dcb9c98",
       "branch": "main",
       "frame": "03havmhntyiu3nakerzeh4vm0"
-    },
-    {
-      "id": "89a02c85-570d-4013-b847-4ccb6cd4a018",
-      "ts": "2026-11-25T14:45:43Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: publish task to freebuff pane — diff six CVs src vs _site vs live, run jekyll build gate, stage publish only for changed CVs, log unchanged output if none changed; freebuff working confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havmhnivbthnfc9m9odiuzk"
-    },
-    {
-      "id": "92b1284d-2ab6-4de4-8546-a7a073ef6858",
-      "ts": "2026-11-25T14:45:42Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: chain-change task to devin pane — refactor shared feature chains, map host blast radius, simplify one chain where safe, validate with nix flake check and checks:registry gates; devin Thinking confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havmhn7xlnyej7bonj2tdxk"
-    },
-    {
-      "id": "dde847ec-bd46-4ac6-b581-e874d312e754",
-      "ts": "2026-11-25T14:39:41Z",
-      "source": "freebuff",
-      "subject": "nixconfig:isadev-cv-publish-check-3",
-      "action": "no publish (re-check 3): 6/6 CVs byte-identical src=assets/files vs _site vs live, changed=none; PDFs last touched by aca9622 (2026-11-24), no generator in repo; HEAD=origin=be17747, tree clean; unchanged output not republished, nothing staged, no push | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havklsitv57thtfz69cc2pe"
     }
   ]
 }

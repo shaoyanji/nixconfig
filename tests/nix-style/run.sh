@@ -16,6 +16,10 @@
 # seeds the converted shape and must fail naming the rule; case 5 seeds the
 # honest controls (length inside a filter predicate, length on a non-filter
 # source) and must pass — the line-end anchor is what tells them apart.
+# A third rule locks map (x: x.f) → catAttrs "f" (lib-pipe-catattrs): case 6
+# seeds the projection and must fail; case 7's honest lambdas (nested path,
+# computed body, record body) must pass — the one-dot backreference shape is
+# what tells them apart.
 #
 # Exit: 0 every case behaves, 2 the fixture cannot run.
 set -uo pipefail
@@ -109,6 +113,40 @@ if bash "$gate" "$tmp/controls" >/dev/null 2>&1; then
   echo "ok   predicate-length and non-filter length pass"
 else
   echo "FAIL gate over-fired on honest length uses"
+  fail=1
+fi
+
+# 6. The catAttrs rule fires on a single-field projection lambda — the class
+# pass 5 of the lib sweep unified. Seeded, since the tree carries none.
+mkdir -p "$tmp/projected"
+cat >"$tmp/projected/seeded.nix" <<'EOF'
+{ xs }: xs |> builtins.map (t: t.source);
+EOF
+out="$(bash "$gate" "$tmp/projected" 2>&1)"
+if [ "$?" -eq 0 ]; then
+  echo "FAIL field-projection map: gate accepted map (x: x.f)"
+  fail=1
+else
+  echo "ok   field-projection map fails the gate"
+  grep -q 'catAttrs' <<<"$out" \
+    && echo "ok   the failure names catAttrs" \
+    || { echo "FAIL the failure does not name catAttrs"; fail=1; }
+fi
+
+# 7. Honest lambdas stay green: a nested path, a computed body, and a
+# multi-field attrset are not catAttrs cases.
+mkdir -p "$tmp/honest-maps"
+cat >"$tmp/honest-maps/controls.nix" <<'EOF'
+{
+  nested = xs: xs |> builtins.map (t: t.a.b);
+  computed = xs: xs |> builtins.map (t: t.a + 1);
+  record = xs: xs |> builtins.map (t: {name = t.a; value = t.b;});
+}
+EOF
+if bash "$gate" "$tmp/honest-maps" >/dev/null 2>&1; then
+  echo "ok   nested, computed and record maps pass"
+else
+  echo "FAIL gate over-fired on honest map lambdas"
   fail=1
 fi
 

@@ -231,10 +231,6 @@ case "$verb" in
     # built from the wrong filter from stamping every row it matched: on
     # 2026-11-26 a loop meant for three dead requisitions rewrote 125 live ones,
     # because nothing asked what each row currently said.
-    if [ "$force" = 0 ] && [ -z "$expect_stage" ] && [ -z "$expect_hash" ]; then
-      echo "apps-db: refusing update $id — name what the row is now: --expect-stage <stage>, --if-status <12 hex of sha256(status)>, or --force" >&2
-      exit 2
-    fi
     # The runaway guard: more than APPS_DB_WRITE_MAX writes in ten minutes is a
     # loop, not a decision. The log counts across invocations because each write
     # is its own process.
@@ -256,6 +252,15 @@ case "$verb" in
     if [ -z "$current" ]; then
       echo "apps-db: no application $id" >&2
       exit 1
+    fi
+    # The refusal quotes what the row is right now, so nobody has to reconstruct
+    # the fingerprint from `get` output — the recipe that got this wrong once.
+    if [ "$force" = 0 ] && [ -z "$expect_stage" ] && [ -z "$expect_hash" ]; then
+      now_status=$(printf '%s' "$current" | jq -r '.status // ""')
+      now_stage=$(printf '%s' "$current" | jq -r '.stage // ""')
+      now_hash=$(printf '%s' "$now_status" | sha256sum | cut -c1-12)
+      echo "apps-db: refusing update $id — name what the row is now: --expect-stage $now_stage, --if-status $now_hash, or --force" >&2
+      exit 2
     fi
     if [ "$force" = 0 ]; then
       row_stage=$(printf '%s' "$current" | jq -r '.stage // ""')

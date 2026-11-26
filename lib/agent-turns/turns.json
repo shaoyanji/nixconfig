@@ -1,8 +1,40 @@
 {
-  "generated": "2026-11-26T12:00:04Z",
+  "generated": "2026-11-26T12:01:06Z",
   "count": 200,
-  "pin": "a44e9e652563d65d0316b4b0482a5fa282da4dd8eea47e103b0672414652ec68",
+  "pin": "d2fb41c2f3b7d7445d62be5dde9e344265bda18f79496c4688543c6ead75b1d9",
   "turns": [
+    {
+      "id": "15f663e2-738e-40c6-992e-54bd417e824a",
+      "ts": "2026-11-26T12:00:07Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-db-bulk-guard",
+      "action": "apps-db.sh update now refuses an unguarded write (exit 2), a stale fingerprint (exit 4) and >50 writes in 10 min (exit 5); 13-case offline fixture wired into checks:appflow, checks:tasks pass.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "f43af3e8b7e148e4138b00186b36a276201cd961",
+      "branch": "main",
+      "frame": "03hb2iqbg9j3ury6o03v6tdjz"
+    },
+    {
+      "id": "0f502c1d-e46e-432c-a3f6-c0524a6e8823",
+      "ts": "2026-11-26T12:00:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-db-bulk-guard",
+      "action": "Guard a bulk appflow write: name the expected stage or status fingerprint, refuse a runaway loop",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "f43af3e8b7e148e4138b00186b36a276201cd961",
+      "branch": "main",
+      "frame": "03hb2iq90rpvkv568q6s6b9ni"
+    },
     {
       "id": "cf20291b-452a-4a11-bd99-9f0ba3c22a56",
       "ts": "2026-11-26T11:57:31Z",
@@ -2932,32 +2964,6 @@
       "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
       "branch": "main",
       "frame": "03haxnn8wbu0ol76gny8lnnif"
-    },
-    {
-      "id": "7e4a905b-5487-45ce-bd42-d35526eb6a84",
-      "ts": "2026-11-25T21:02:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: check delphi gateway + xs endpoint p=0.96 m=0.95",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxnee8iw46lx9637mxb9hc"
-    },
-    {
-      "id": "8c5a272c-3e58-4893-9ec1-f0137f9e8781",
-      "ts": "2026-11-25T21:02:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-lane",
-      "action": "gate-change: verify image-daily Go port gates p=0.98 m=0.96",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxneczv6bl29igngri79a9"
     }
   ]
 }

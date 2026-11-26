@@ -28,7 +28,8 @@ run() { set +e; out=$("$db" update "$@" 2>&1); rc=$?; set -e; }
 
 run open-row --status "Closed 2026-11-24"
 check "an unguarded write is refused" "$rc" 2
-case $out in *--expect-stage*) note ok "the refusal names the guard" ;; *) note FAIL "the refusal names the guard" ; fail=1 ;; esac
+case $out in *--expect-stage*--if-status*) note ok "the refusal names both guards" ;; *) note FAIL "the refusal names both guards: $out" ; fail=1 ;; esac
+case $out in *--expect-stage\ prep*) note ok "the refusal quotes the row's stage" ;; *) note FAIL "the refusal quotes the row's stage: $out" ; fail=1 ;; esac
 
 run open-row --status "Closed" --expect-stage other
 check "a stage mismatch is refused" "$rc" 4

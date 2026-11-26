@@ -9,11 +9,60 @@
 }: let
   cfg = config.services.servicePortal;
 
+  telemetryPackage = pkgs.buildGoModule {
+    pname = "service-portal-telemetry";
+    version = "0.1.0";
+    src = ./service-portal/telemetry;
+    vendorHash = null;
+    env.CGO_ENABLED = 0;
+    meta = {
+      description = "Loopback health and stats aggregator for service portal cards";
+      mainProgram = "service-portal-telemetry";
+    };
+  };
+
   esc = s:
     builtins.replaceStrings
     ["&" "<" ">" "\"" "'"]
     ["&amp;" "&lt;" "&gt;" "&quot;" "&#39;"]
     (toString s);
+
+  metricType = lib.types.submodule {
+    options = {
+      key = lib.mkOption {
+        type = lib.types.str;
+        description = "Stats JSON key copied onto the card.";
+      };
+      label = lib.mkOption {
+        type = lib.types.str;
+        description = "Short human-readable metric label.";
+      };
+    };
+  };
+
+  telemetryTargetType = lib.types.submodule {
+    options = {
+      baseUrl = lib.mkOption {
+        type = lib.types.str;
+        description = "Loopback base URL for the service being sampled.";
+      };
+      healthPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/api/health";
+        description = "Health endpoint path below `baseUrl`.";
+      };
+      statsPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/api/stats";
+        description = "Stats endpoint path below `baseUrl`.";
+      };
+      metrics = lib.mkOption {
+        type = lib.types.listOf metricType;
+        default = [];
+        description = "Stats keys surfaced on the card, in display order.";
+      };
+    };
+  };
 
   entryType = lib.types.submodule {
     options = {
@@ -272,13 +321,14 @@
           ${lib.concatMapStrings (c: ''
             <a class="card" href="${esc c.href}" data-group="${esc c.group}"
                data-audience="${esc c.audience}" data-kind="${esc (c.kind or "link")}"
-               data-search="${esc (cardSearch c)}">
+               data-service="${esc c.name}" data-search="${esc (cardSearch c)}">
               <div class="title">${esc c.title}</div>
               <div class="desc">${esc c.description}</div>
               <div class="foot">
                 ${lib.optionalString (c.badge != "") ''<span class="badge">${esc c.badge}</span>''}
                 <span class="kind">${esc (c.kind or "link")}</span>
               </div>
+              <span class="live" data-live-for="${esc c.name}" hidden></span>
             </a>
           '')
           inGroup}
@@ -329,6 +379,18 @@
             .badge { color:#58a6ff; font-size:.7rem; }
             .kind { margin-left:auto; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
                     color:#8b949e; border:1px solid var(--border); border-radius:4px; padding:.05rem .3rem; }
+            .live { display:flex; flex-wrap:wrap; gap:.3rem .45rem; align-items:center; margin-top:.45rem;
+                    padding-top:.45rem; border-top:1px solid var(--border); color:#8b949e;
+                    font-size:.68rem; letter-spacing:.04em; }
+            .live::before { content:""; width:.42rem; height:.42rem; border-radius:50%; background:#8b949e; }
+            .live[data-status="online"]::before { background:#3fb950; }
+            .live[data-status="online"] .live-status { color:#3fb950; }
+            .live[data-status="degraded"]::before { background:#d29922; }
+            .live[data-status="degraded"] .live-status { color:#d29922; }
+            .live[data-status="offline"]::before { background:#f85149; }
+            .live[data-status="offline"] .live-status { color:#f85149; }
+            .live-status { font-weight:600; text-transform:uppercase; letter-spacing:.08em; }
+            .live-metric { color:var(--text); }
             .gn { font-weight:400; color:#484f58; }
             .toolbar { width:100%; max-width:60rem; display:flex; flex-wrap:wrap; gap:.5rem;
                        align-items:center; margin:0 0 1rem; }
@@ -416,6 +478,63 @@
                 }
               });
               apply();
+
+              var liveSlots = Array.prototype.slice.call(document.querySelectorAll("[data-live-for]"));
+              function metricText(value) {
+                if (typeof value === "number") return Number.isInteger(value) ? String(value) : value.toFixed(1);
+                if (typeof value === "boolean") return value ? "yes" : "no";
+                return String(value == null ? "—" : value);
+              }
+              function renderLive(slot, state) {
+                slot.textContent = "";
+                slot.hidden = false;
+                slot.setAttribute("data-telemetry-active", "1");
+                slot.setAttribute("data-status", state.status || "unknown");
+                var status = document.createElement("span");
+                status.className = "live-status";
+                status.textContent = state.status || "unknown";
+                slot.appendChild(status);
+                (state.metrics || []).slice(0, 3).forEach(function (metric) {
+                  var item = document.createElement("span");
+                  item.className = "live-metric";
+                  item.textContent = metricText(metric.value) + " " + (metric.label || metric.key || "metric");
+                  slot.appendChild(item);
+                });
+                slot.title = state.error || "live service telemetry";
+              }
+              function loadTelemetry() {
+                if (!liveSlots.length || !window.fetch) return;
+                fetch("/api/telemetry", {headers: {Accept: "application/json"}, cache: "no-store"})
+                  .then(function (response) {
+                    if (!response.ok) throw new Error("telemetry HTTP " + response.status);
+                    return response.json();
+                  })
+                  .then(function (payload) {
+                    var services = payload.services || {};
+                    liveSlots.forEach(function (slot) {
+                      var state = services[slot.getAttribute("data-live-for")];
+                      if (!state) {
+                        slot.hidden = true;
+                        return;
+                      }
+                      renderLive(slot, state);
+                    });
+                  })
+                  .catch(function () {
+                    liveSlots.forEach(function (slot) {
+                      if (slot.getAttribute("data-telemetry-active") !== "1") return;
+                      slot.textContent = "";
+                      slot.hidden = false;
+                      slot.setAttribute("data-status", "unknown");
+                      var status = document.createElement("span");
+                      status.className = "live-status";
+                      status.textContent = "telemetry unavailable";
+                      slot.appendChild(status);
+                    });
+                  });
+              }
+              loadTelemetry();
+              setInterval(loadTelemetry, 15000);
             })();
           </script>
         </body>
@@ -433,6 +552,23 @@
   serve = args: "${pkgs.util-linux}/bin/flock ${serveLock} ${config.services.tailscale.package}/bin/tailscale ${args}";
 
   mountPorts = map (m: m.port) (builtins.attrValues cfg.mounts);
+
+  telemetryConfigFile = pkgs.writeText "service-portal-telemetry.json" (builtins.toJSON {
+    targets = map (name: let
+      target = cfg.telemetry.targets.${name};
+    in {
+      inherit name;
+      base_url = target.baseUrl;
+      health_path = target.healthPath;
+      stats_path = target.statsPath;
+      metrics =
+        map (metric: {
+          inherit (metric) key label;
+        })
+        target.metrics;
+    }) (builtins.attrNames cfg.telemetry.targets);
+  });
+
   # Prefix test, not a regex: POSIX ERE rejected the bracket form of `[::1]`
   # at eval (measured on delphi, 2026-10-21), and a mount upstream is a literal
   # loopback URL in every case this registry will ever hold.
@@ -508,6 +644,34 @@ in {
       '';
     };
 
+    telemetry = {
+      enable = lib.mkEnableOption "loopback health and stats telemetry for portal cards";
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8105;
+        description = "Loopback port for the telemetry aggregator. It is proxied by nginx; no tailnet mount or firewall port is opened.";
+      };
+
+      intervalSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 10;
+        description = "Seconds between target polls.";
+      };
+
+      timeoutMilliseconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 1500;
+        description = "Per-request timeout for a target health or stats read.";
+      };
+
+      targets = lib.mkOption {
+        type = lib.types.attrsOf telemetryTargetType;
+        default = {};
+        description = "Telemetry targets keyed by the service card/mount name.";
+      };
+    };
+
     cards = lib.mkOption {
       type = lib.types.listOf cardType;
       readOnly = true;
@@ -551,45 +715,77 @@ in {
     };
     services.servicePortal.json = pkgs.writeText "service-portal.json" (cardsJson ["public" "lan" "tailnet"]);
 
-    systemd.services = lib.mapAttrs' (n: m:
-      lib.nameValuePair "tailscale-serve-${n}" {
-        description = "Tailnet-only HTTPS front for ${m.title}";
-        after = ["tailscaled.service"] ++ m.requires;
-        wants = ["tailscaled.service"] ++ m.requires;
-        # `After=` is ordering, not readiness: at boot tailscaled is still
-        # NoState, `tailscale serve` exits 1 exactly once, and the unit then
-        # stays failed with no retry — every mount on delphi was down until a
-        # manual restart (2026-10-26). Wait for BackendState=Running, and
-        # re-assert the mount when tailscaled restarts, because serve
-        # configuration is per-process state rather than a file.
-        partOf = ["tailscaled.service"];
-        wantedBy = ["multi-user.target"];
-        unitConfig.StartLimitIntervalSec = 0;
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          TimeoutStartSec = 150;
-          Restart = "on-failure";
-          RestartSec = 5;
-          ExecStartPre = pkgs.writeShellScript "tailscale-serve-wait" ''
-            set -euo pipefail
-            state=NoState
-            for _ in $(seq 1 60); do
-              state=$(${config.services.tailscale.package}/bin/tailscale status --json 2>/dev/null |
-                ${pkgs.jq}/bin/jq -r '.BackendState // "NoState"' 2>/dev/null || echo NoState)
-              if [ "$state" = Running ]; then
-                exit 0
-              fi
-              sleep 2
-            done
-            echo "tailscale serve: tailscaled not Running after 120s (last: $state)" >&2
-            exit 1
-          '';
-          ExecStart = serve "serve --bg --https=${toString m.port} ${m.upstream}";
-          ExecStop = serve "serve --https=${toString m.port} off";
+    systemd.services =
+      lib.mapAttrs' (n: m:
+        lib.nameValuePair "tailscale-serve-${n}" {
+          description = "Tailnet-only HTTPS front for ${m.title}";
+          after = ["tailscaled.service"] ++ m.requires;
+          wants = ["tailscaled.service"] ++ m.requires;
+          # `After=` is ordering, not readiness: at boot tailscaled is still
+          # NoState, `tailscale serve` exits 1 exactly once, and the unit then
+          # stays failed with no retry — every mount on delphi was down until a
+          # manual restart (2026-10-26). Wait for BackendState=Running, and
+          # re-assert the mount when tailscaled restarts, because serve
+          # configuration is per-process state rather than a file.
+          partOf = ["tailscaled.service"];
+          wantedBy = ["multi-user.target"];
+          unitConfig.StartLimitIntervalSec = 0;
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            TimeoutStartSec = 150;
+            Restart = "on-failure";
+            RestartSec = 5;
+            ExecStartPre = pkgs.writeShellScript "tailscale-serve-wait" ''
+              set -euo pipefail
+              state=NoState
+              for _ in $(seq 1 60); do
+                state=$(${config.services.tailscale.package}/bin/tailscale status --json 2>/dev/null |
+                  ${pkgs.jq}/bin/jq -r '.BackendState // "NoState"' 2>/dev/null || echo NoState)
+                if [ "$state" = Running ]; then
+                  exit 0
+                fi
+                sleep 2
+              done
+              echo "tailscale serve: tailscaled not Running after 120s (last: $state)" >&2
+              exit 1
+            '';
+            ExecStart = serve "serve --bg --https=${toString m.port} ${m.upstream}";
+            ExecStop = serve "serve --https=${toString m.port} off";
+          };
+        })
+      cfg.mounts
+      // lib.optionalAttrs cfg.telemetry.enable {
+        service-portal-telemetry = {
+          description = "Loopback health and stats aggregator for service portal cards";
+          wantedBy = ["multi-user.target"];
+          unitConfig.X-Fleet-Role = "daemon";
+          serviceConfig = {
+            Type = "simple";
+            DynamicUser = true;
+            ExecStart = lib.escapeShellArgs [
+              (lib.getExe telemetryPackage)
+              "-addr"
+              "127.0.0.1:${toString cfg.telemetry.port}"
+              "-config"
+              telemetryConfigFile
+              "-interval"
+              "${toString cfg.telemetry.intervalSeconds}s"
+              "-timeout"
+              "${toString cfg.telemetry.timeoutMilliseconds}ms"
+            ];
+            Restart = "always";
+            RestartSec = 3;
+            TimeoutStopSec = 10;
+            PrivateTmp = true;
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            NoNewPrivileges = true;
+            RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+            MemoryMax = "128M";
+          };
         };
-      })
-    cfg.mounts;
+      };
 
     assertions = [
       {
@@ -603,6 +799,14 @@ in {
       {
         assertion = builtins.all (m: isLoopback m.upstream) (builtins.attrValues cfg.mounts);
         message = "services.servicePortal.mounts: an upstream must be loopback — a mount to 0.0.0.0 or a LAN address proxies past the tailnet fence.";
+      }
+      {
+        assertion = !cfg.telemetry.enable || cfg.telemetry.targets != {};
+        message = "services.servicePortal.telemetry: enable it only with at least one target.";
+      }
+      {
+        assertion = builtins.all (target: isLoopback target.baseUrl) (builtins.attrValues cfg.telemetry.targets);
+        message = "services.servicePortal.telemetry.targets: baseUrl must be loopback; the aggregator is not a LAN probe.";
       }
       {
         assertion = builtins.all (m: builtins.all (u: builtins.hasAttr (lib.removeSuffix ".service" u) config.systemd.services) m.requires) (builtins.attrValues cfg.mounts);

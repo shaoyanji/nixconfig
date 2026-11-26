@@ -164,6 +164,21 @@
     };
   };
 
+  telemetryLocations = withGate: {
+    "= /api/telemetry" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.servicePortal.telemetry.port}";
+      extraConfig =
+        gate withGate
+        + ''
+          proxy_http_version 1.1;
+          proxy_set_header Host $host;
+          proxy_connect_timeout 1s;
+          proxy_read_timeout 2s;
+          add_header Cache-Control "no-store";
+        '';
+    };
+  };
+
   # Guest removed — A1 has no KVM (Fact: inventory.toml); the dummy keeps
   # dependents evaluating (Story: note delphi-ops-traps).
   microvmGuest = {
@@ -757,7 +772,8 @@ in {
               };
             }
             // hashedAssets tailnetPage
-            // dataLocation false;
+            // dataLocation false
+            // telemetryLocations false;
         };
 
         # The console's TLS entry point is the :8446 mount, and this vhost adds the
@@ -800,6 +816,7 @@ in {
             // sentinelLocations true
             // hashedAssets tailnetPage
             // dataLocation true
+            // telemetryLocations true
             // microvmProxyLocations true
             // stirlingProxyLocations
             // lib.optionalAttrs slidesEnabled (slideshowLocations true);
@@ -1272,6 +1289,79 @@ in {
     # names, while the cards here are the `tailscale serve` mounts. Different
     # audiences, so no card is derived from the registry.
     includeExposure = false;
+    telemetry = {
+      enable = true;
+      targets = {
+        job-db = {
+          baseUrl = "http://127.0.0.1:${toString config.services.jobDbScraper.port}";
+          metrics = [
+            {
+              key = "active_postings";
+              label = "active postings";
+            }
+            {
+              key = "companies";
+              label = "companies";
+            }
+            {
+              key = "remote";
+              label = "remote";
+            }
+          ];
+        };
+        private-deals = {
+          baseUrl = "http://127.0.0.1:${toString config.services.privateDeals.port}";
+          metrics = [
+            {
+              key = "deals";
+              label = "deals";
+            }
+            {
+              key = "products";
+              label = "products";
+            }
+            {
+              key = "alerts_pending";
+              label = "alerts pending";
+            }
+          ];
+        };
+        inventory-site = {
+          baseUrl = "http://127.0.0.1:${toString config.services.inventorySite.port}";
+          metrics = [
+            {
+              key = "items";
+              label = "items";
+            }
+            {
+              key = "locations";
+              label = "locations";
+            }
+            {
+              key = "warranty_expiring_90d";
+              label = "warranty ≤90d";
+            }
+          ];
+        };
+        clanker-runner = {
+          baseUrl = "http://127.0.0.1:${toString config.services.clankerRunner.port}";
+          metrics = [
+            {
+              key = "total_jobs";
+              label = "jobs";
+            }
+            {
+              key = "running_jobs";
+              label = "running";
+            }
+            {
+              key = "failed_jobs";
+              label = "failed";
+            }
+          ];
+        };
+      };
+    };
     mounts =
       {
         # dsh card retired with the harness — hosts/delphi/dsh-web.shadow.nix (note delphi-ops-traps).

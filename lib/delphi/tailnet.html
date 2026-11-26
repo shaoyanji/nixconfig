@@ -29,9 +29,10 @@
     that does not exist on this host.
   </p>
   <p>
-    It shows structure, not liveness. A card says where a service is, never that
-    it is up &mdash; those are different claims, and the monitors on the tailnet
-    are the ones allowed to make the second. Nothing here is sampled from a
-    running process, so nothing here can be stale in a way that looks live.
+    Structure and liveness are labelled separately. The card, address and unit
+    are compiled truth; the small status row on the four portfolio services is
+    sampled by a loopback telemetry aggregate with a short bounded timeout. When a
+    service or the aggregate is offline, the row says so or disappears rather
+    than freezing into a false green badge.
   </p>
 </section>

@@ -270,6 +270,28 @@ a.svc:hover .svc-title { color: var(--accent); }
 .svc-desc { font-size: 0.82rem; line-height: 1.5; color: var(--muted); }
 .svc-meta { display: grid; gap: 0.15rem; margin-top: 0.2rem; font-size: 0.7rem; letter-spacing: 0.04em; color: var(--structural); word-break: break-all; }
 .svc-waits { color: var(--muted); }
+.svc-live {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.5rem;
+  margin-top: 0.45rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.live-dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--structural); flex: 0 0 auto; }
+.live-status { font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; }
+.live-metric { color: var(--ink); }
+.live-online .live-dot { background: #3fb950; box-shadow: 0 0 0 0.18rem color-mix(in srgb, #3fb950 16%, transparent); }
+.live-online .live-status { color: #3fb950; }
+.live-degraded .live-dot { background: #d29922; box-shadow: 0 0 0 0.18rem color-mix(in srgb, #d29922 16%, transparent); }
+.live-degraded .live-status { color: #d29922; }
+.live-offline .live-dot { background: #f85149; box-shadow: 0 0 0 0.18rem color-mix(in srgb, #f85149 16%, transparent); }
+.live-offline .live-status { color: #f85149; }
+.live-unknown .live-status { color: var(--muted); }
 
 /* chips + panels ---------------------------------------------------------- */
 ul.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }

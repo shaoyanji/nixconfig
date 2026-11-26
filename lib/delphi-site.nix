@@ -196,10 +196,10 @@
     # together (measured in the built console).
     hrefAttr = lib.optionalString console " href=\"${esc c.href}\"";
   in ''
-    <${tag} class="svc" data-title="${esc (lib.toLower c.title)}"${hrefAttr}>
+    <${tag} class="svc" data-title="${esc (lib.toLower c.title)}" data-service="${esc c.name}"${hrefAttr}>
       <span class="svc-title">${esc c.title}</span>
       <span class="svc-desc">${esc c.description}</span>
-      ${lib.optionalString console ''<span class="svc-meta">${esc c.badge}${waits}</span>''}
+      ${lib.optionalString console ''<span class="svc-meta">${esc c.badge}${waits}</span><span class="svc-live" data-live-for="${esc c.name}" hidden></span>''}
     </${tag}>
   '';
 

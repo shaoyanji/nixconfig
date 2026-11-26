@@ -76,6 +76,78 @@ TRUNCATED = re.compile(
 )
 FEED_MOJIBAKE = {"Wrttemberg": "Württemberg", "Allgaeuer": "Allgäuer", "Muenchingen": "Münchingen"}
 
+# Stepstone prints the city beside the employer ("Berlin Upvest GmbH") and its
+# slug repeats the pair (…-Berlin-Upvest-GmbH--123-inline). A city word is not
+# part of a company name: left in, it folds to a key the record does not hold, and
+# sweep 2026-11-26c filed `Berlin Upvest GmbH`, `Porz plusserver gmbh` and
+# `Lohne Rosenxt Group` as leads for three employers that were already tracked.
+# Folded spellings only (umlauts expanded, no punctuation), because the token
+# arrives as the board spelled it.
+PLACES = frozenset(
+    """
+    berlin hamburg muenchen munich koeln cologne frankfurt stuttgart duesseldorf
+    leipzig dresden nuernberg nurnberg hannover bremen essen dortmund bonn
+    mannheim augsburg karlsruhe wiesbaden muenster kiel freiburg mainz erfurt
+    potsdam rostock kassel saarbruecken ludwigshafen oldenburg osnabrueck
+    leverkusen darmstadt heidelberg regensburg wuerzburg ingolstadt ulm aachen
+    moenchengladbach krefeld duisburg bochum wuppertal bielefeld gelsenkirchen
+    porz lohne ismaning neuss neubiberg garching unterschleissheim
+    wien vienna graz linz salzburg innsbruck zuerich zurich basel bern genf
+    geneva lausanne luzern
+    """.split()
+)
+
+
+def fold_place(text: str) -> str:
+    """The spelling PLACES uses, so `München`, `Muenchen` and `muenchen` are one token."""
+    folded = (text or "").lower()
+    for bad, good in (("ä", "ae"), ("ö", "oe"), ("ü", "ue"), ("ß", "ss")):
+        folded = folded.replace(bad, good)
+    return re.sub(r"[^a-z0-9]+", "", folded)
+
+
+def tokens_of(text: str) -> list[str]:
+    """The word tokens of a name, keeping internal capitals the board supplied."""
+    return [token for token in re.split(r"[^0-9A-Za-zÄÖÜäöüß&]+", text or "") if token]
+
+
+def strip_place_prefix(company: str) -> str:
+    """`Berlin Upvest GmbH` -> `Upvest GmbH`: a leading city token belongs to the
+    board, not the employer. A two-token name is left alone, because `Berlin
+    Upvest` is as likely the employer's own wording as the board's prefix."""
+    parts = tokens_of(company)
+    if len(parts) > 2 and fold_place(parts[0]) in PLACES:
+        return " ".join(parts[1:])
+    return company
+
+
+def company_from_slug(slug: str) -> str:
+    """The employer words after the last city token of a Stepstone slug, or "" when
+    the slug names no city: then it carries role words only and cannot name an
+    employer, so the row is reported instead of being filed under an invented one
+    (`split("-")[-3:]` turned …-DevOps-Engineer-Berlin-Upvest-GmbH into `Berlin
+    Upvest GmbH`, gluing the city onto the name)."""
+    parts = [part for part in slug.split("-") if part]
+    boundary = None
+    for index, part in enumerate(parts):
+        if fold_place(part) in PLACES:
+            boundary = index
+    if boundary is None or boundary >= len(parts) - 1:
+        return ""
+    return " ".join(parts[boundary + 1:])
+
+
+def held_match(company: str, held: set[str]) -> bool:
+    """True when the record already holds this employer whatever prefix the board
+    glued on: the full name, the brand token alone, or any trailing run of its
+    tokens — `plusserver gmbh` inside `Porz plusserver gmbh`."""
+    parts = tokens_of(company)
+    if not parts:
+        return False
+    if norm(company) in held or norm(parts[0]) in held:
+        return True
+    return any(norm(" ".join(parts[index:])) in held for index in range(1, len(parts)))
+
 
 def fetch(url: str, referer: str | None = None, timeout: int = 60) -> bytes:
     headers = {"User-Agent": UA}
@@ -156,8 +228,11 @@ def recency(value: str) -> int | None:
         return None
 
 
-def parse_boards(boards: set[str], stepstone_pages: list[tuple[str, str]]) -> list[dict]:
+def parse_boards(
+    boards: set[str], stepstone_pages: list[tuple[str, str]]
+) -> tuple[list[dict], list[dict]]:
     rows: list[dict] = []
+    unnameable: list[dict] = []
 
     def add(board, company, title, loc, url, date):
         title, company = clean(title), fix_mojibake(clean(company))
@@ -165,6 +240,11 @@ def parse_boards(boards: set[str], stepstone_pages: list[tuple[str, str]]) -> li
             rows.append(
                 dict(board=board, company=company, title=title, loc=clean(loc),
                      url=url or "", date=date or "")
+            )
+        elif board == "stepstone" and not company and title and "{" not in title:
+            unnameable.append(
+                dict(company="", title=clean(title)[:80], board=board, url=url or "",
+                     reason="employer missing from the card markup and not derivable from the slug")
             )
 
     if "germantechjobs" in boards:
@@ -235,12 +315,13 @@ def parse_boards(boards: set[str], stepstone_pages: list[tuple[str, str]]) -> li
                         company = clean(found.group(1))
                 if not company:
                     slug = re.search(r"stellenangebote--(.+?)--\d+-inline", link.group(1))
-                    company = " ".join((slug.group(1) if slug else "").split("-")[-3:])
+                    company = company_from_slug(slug.group(1)) if slug else ""
+                company = strip_place_prefix(company)
                 add("stepstone", company, link.group(2),
                     clean(loc.group(1)) if loc else "", link.group(1),
                     clean(when.group(1)) if when else "")
             time.sleep(0.8)
-    return rows
+    return rows, unnameable
 
 
 def gh_activity(company: str) -> dict | None:
@@ -281,9 +362,52 @@ def gh_activity(company: str) -> dict | None:
     return None
 
 
+def self_test() -> int:
+    """Offline proof of the two name rules, over the shapes sweep 2026-11-26c
+    produced and the slug spellings Stepstone emits. No board is fetched."""
+    failures = 0
+    total = 0
+
+    def check(label: str, got, want) -> None:
+        nonlocal failures, total
+        total += 1
+        if got != want:
+            print(f"FAIL  {label}: got {got!r}, want {want!r}")
+            failures += 1
+        else:
+            print(f"ok    {label}")
+
+    check("city prefix: Berlin Upvest GmbH", strip_place_prefix("Berlin Upvest GmbH"), "Upvest GmbH")
+    check("city prefix: Porz plusserver gmbh", strip_place_prefix("Porz plusserver gmbh"), "plusserver gmbh")
+    check("city prefix: Lohne Rosenxt Group", strip_place_prefix("Lohne Rosenxt Group"), "Rosenxt Group")
+    check("city prefix: Muenchen Acme AG", strip_place_prefix("Muenchen Acme AG"), "Acme AG")
+    check("city prefix: München Acme AG folds too", strip_place_prefix("München Acme AG"), "Acme AG")
+    check("clean name untouched", strip_place_prefix("Rosenxt Group"), "Rosenxt Group")
+    check("two-token name untouched", strip_place_prefix("Berlin Upvest"), "Berlin Upvest")
+    check("non-place first token untouched", strip_place_prefix("Zalando SE"), "Zalando SE")
+    check("slug: role, city, employer", company_from_slug("DevOps-Engineer-Berlin-Upvest-GmbH"), "Upvest GmbH")
+    check("slug: SRE Muenchen", company_from_slug("Senior-SRE-Muenchen-Acme-AG"), "Acme AG")
+    check("slug: no city is not a name", company_from_slug("DevOps-Engineer"), "")
+    check("slug: city alone is not a name", company_from_slug("Berlin"), "")
+    held = {norm("Upvest GmbH"), norm("plusserver gmbh"), norm("Rosenxt Group")}
+    check("held: city-prefixed name matches", held_match(strip_place_prefix("Berlin Upvest GmbH"), held), True)
+    check("held: prefixed name matches by suffix", held_match("Porz plusserver gmbh", held), True)
+    check("held: brand token alone matches", held_match("plusserver", held), True)
+    check("held: a new employer does not", held_match("Zalando SE", held), False)
+    check("key: prefixed and clean names fold alike", norm(strip_place_prefix("Berlin Upvest GmbH")), norm("Upvest GmbH"))
+    check(
+        "key: the three sweep 2026-11-26c duplicates fold onto their held rows",
+        [norm(strip_place_prefix(n)) for n in ("Berlin Upvest GmbH", "Porz plusserver gmbh", "Lohne Rosenxt Group")],
+        [norm(n) for n in ("Upvest GmbH", "plusserver gmbh", "Rosenxt Group")],
+    )
+    print(f"{total - failures}/{total} passed")
+    return 1 if failures else 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--held", required=True, help="file of employer names the record already holds")
+    ap.add_argument("--held", help="file of employer names the record already holds (needed unless --self-test)")
+    ap.add_argument("--self-test", action="store_true", help="prove the name rules offline and exit")
     ap.add_argument("--out", help="write the ranked JSON here instead of stdout")
     ap.add_argument("--max-age", type=int, default=7, help="days a posting may be old")
     ap.add_argument("--limit", type=int, default=25, help="employers to report")
@@ -292,6 +416,10 @@ def main() -> int:
     ap.add_argument("--stepstone-cities", default="Berlin,Muenchen,Hamburg,Koeln")
     ap.add_argument("--gh", action="store_true", help="attribute GitHub activity (bounded gh api calls)")
     args = ap.parse_args()
+    if args.self_test:
+        return self_test()
+    if not args.held:
+        ap.error("--held is required outside --self-test")
 
     boards = {b.strip() for b in args.boards.split(",") if b.strip()}
     pages = [
@@ -300,7 +428,7 @@ def main() -> int:
         for c in args.stepstone_cities.split(",")
     ] if "stepstone" in boards else []
 
-    rows = parse_boards(boards, pages)
+    rows, unnameable = parse_boards(boards, pages)
     held = {norm(line.strip()) for line in open(args.held, encoding="utf-8") if line.strip()}
 
     def in_lane(row: dict) -> bool:
@@ -318,11 +446,10 @@ def main() -> int:
     ]
 
     candidates: dict[str, list[dict]] = {}
-    rejected: list[dict] = []
+    rejected: list[dict] = list(unnameable)
     for row in fresh:
         company = row["company"]
-        folded = norm(company)
-        if folded in held or norm(company.split()[0]) in held:
+        if held_match(company, held):
             continue
         if not company or len(company) < 4 or TRUNCATED.search(company):
             rejected.append(dict(company=company, title=row["title"], board=row["board"],

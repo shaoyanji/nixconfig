@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T14:25:44Z",
+  "generated": "2026-11-26T14:32:30Z",
   "count": 200,
-  "pin": "26dc171c5ffc776cb0e142ae5390f30cb7a7513eb8a727b1562f05f959b804c3",
+  "pin": "9080ba8dbbe94d980e77845b8f16ae7cf5643246def3ed28ad5921f7ebf8bb08",
   "turns": [
+    {
+      "id": "27bb3a14-e3ff-4c46-a558-65b370cccfa4",
+      "ts": "2026-11-26T14:28:07Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-db-tavily-context-ingest",
+      "action": "claim: exercise job-page-scrape on real boards via tavily/context/firecrawl, add an ingest path into job-db-scraper's API/SQLite, verify with a local instance + FTS5 query",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "55fd912a17f64184dae1ef261bcf8ec9e64f4b37",
+      "branch": "main",
+      "frame": "03hb3bn5cqclwg566y9dshr31"
+    },
+    {
+      "id": "119927fc-5f41-42a7-acdc-4f305ffc802b",
+      "ts": "2026-11-26T14:26:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-archive-catchup",
+      "action": "cause: --max-pages 20 silenced pages_for(); 3516 archived > 20x100 meant every hourly run reread the same 2000 known envelopes, imported 0, exited 0. Fix: a window shorter than the archive widens to the derived one (logged), default maxPages=0, --start-page + resume hint. 9 unittest cases, py_compile + nix parse clean. Live dry-run widened to 38 pages and found unseen mail at page 36. Units run the old build until rebuild.| gate: python3 -m unittest discover tests/email-archive-import PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "55fd912a17f64184dae1ef261bcf8ec9e64f4b37",
+      "branch": "main",
+      "frame": "03hb3b8aaobtu2l129s1njy24"
+    },
     {
       "id": "b86c771c-7ab7-41c6-b6f3-d5d05d3a962c",
       "ts": "2026-11-26T14:23:35Z",
@@ -2991,32 +3019,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hb03depuf56tcgflnx71c92"
-    },
-    {
-      "id": "d760b1b3-4b4c-471d-91ed-13b86002da1a",
-      "ts": "2026-11-26T04:11:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26-6",
-      "action": "gate-change: verify image-daily Go port gates green on commit",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hazz78yicoegxc7iwckmx4n"
-    },
-    {
-      "id": "3c1267a4-c09f-44ab-a8f7-045b0fc84947",
-      "ts": "2026-11-26T04:10:12Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "boundary-verified: all exec/net boundaries in tools/os/internal/image (umbrella main.go = pure dispatch, 0 boundary calls; internal/serve is a separate folded tool); checks:image-daily rc=0 on 3346ea27; drv-equality queued for 06:00 (eval window)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hazyxpoxi5g5nsdezze3vnh"
     }
   ]
 }

@@ -56,6 +56,18 @@ class TitleCleanTest(unittest.TestCase):
             ),
         )
 
+    def test_ashby_bullet_meta_is_split_off(self):
+        self.assertEqual(
+            scrape.split_title_location(
+                "Account Executive, Enterprise GTM • Singapore • Full time • Hybrid"
+            ),
+            ("Account Executive, Enterprise GTM", "Singapore"),
+        )
+        self.assertEqual(
+            scrape.split_title_location("Staff Engineer • Remote • Full time"),
+            ("Staff Engineer", "Remote"),
+        )
+
     def test_card_line_breaks_are_not_part_of_the_title(self):
         self.assertEqual(
             scrape.split_title_location(

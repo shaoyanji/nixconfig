@@ -73,6 +73,21 @@ tasks:
     cmds:
       - python3 scripts/task/job-page-scrape.py {{.CLI_ARGS}}
 
+  apps:ingest:
+    desc: Feed job-page-scrape JSON into job-db-scraper (task apps:ingest -- --api http://127.0.0.1:8101 --in pages.json [--dry-run])
+    summary: >
+      `jobs-ingest.py` is the pipe between reading a board and indexing it:
+      stdin or `--in` takes the JSON `apps:page` prints, and each posting goes
+      to `POST /api/postings`, which owns the SQLite FTS5 index. The company is
+      read from the ATS URL (`jobs.lever.co/<co>/…`), the URL stays the identity
+      the server dedupes on, and a page whose employer cannot be read is skipped
+      and named rather than filed under a guess. `--source` and `--company`
+      override, `--tag` adds tags, `--dry-run` prints the payloads and posts
+      nothing. Exit 1 when the server refused a posting; one refusal never stops
+      the rest.
+    cmds:
+      - python3 scripts/task/jobs-ingest.py {{.CLI_ARGS}}
+
   # A sweep is a cycle, not a scan: the lane's durable state is the record, and
   # the boards move independently — a flat german feed says nothing about
   # Stepstone. This carries the next cycle's id and read order so a pass starts

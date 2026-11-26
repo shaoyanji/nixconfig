@@ -8,6 +8,7 @@ that browser, chosen by cost and falling through when a layer cannot answer:
 
   browser    agent-browser (headless Chrome): open, read the anchors, close
   firecrawl  POST /v1/scrape, markdown back (a hosted browser, no local Chrome)
+  context    POST /v1/web/scrape on api.context.dev, markdown back
   tavily     POST /extract, raw content back
   http       a plain GET plus JSON-LD — the page's own JobPosting data
 
@@ -170,9 +171,31 @@ ROLE_WORDS = frozenset(
 )
 
 
+BULLET_META = re.compile(r"\s+•\s+")
+# Work type, not place: `Remote` and `Hybrid` are the location when a card
+# carries no city, so only the employment words are skipped.
+META_SEGMENT = re.compile(
+    r"^(full|part)[ -]time$|contract|internship|temporary|permanent", re.I
+)
+
+
+def split_bullets(title: str):
+    """Ashby cards: `Title • City • Full time • Hybrid`."""
+    parts = [part.strip() for part in BULLET_META.split(title) if part.strip()]
+    if len(parts) < 2:
+        return None
+    location = next(
+        (part for part in parts[1:] if not META_SEGMENT.search(part)), None
+    )
+    return parts[0], location[:80] if location else None
+
+
 def split_title_location(text: str):
     """A rendered card label into title and location."""
     title = clean_title(text)
+    bullet = split_bullets(title)
+    if bullet:
+        return bullet
     for word in re.finditer(r"\S+", title):
         start = word.start()
         if start < 3:
@@ -456,14 +479,40 @@ def fetch_tavily(url: str, timeout: int, key: str) -> str:
     return content
 
 
-BACKENDS = ("auto", "browser", "firecrawl", "tavily", "http")
+def fetch_context(url: str, timeout: int, key: str) -> str:
+    if not key:
+        raise Unavailable("CONTEXT_API_KEY is not set")
+    body = json.dumps(
+        {
+            "url": url,
+            "formats": {"markdown": True},
+            "sharedParams": {"mainContentOnly": True},
+        }
+    )
+    request = urllib.request.Request(
+        "https://api.context.dev/v1/web/scrape",
+        data=body.encode(),
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        payload = json.load(response)
+    # A 200 can still carry a failed format: check success before the data.
+    block = payload.get("markdown") or {}
+    markdown = block.get("data") or ""
+    if not markdown:
+        raise Unavailable(f"context.dev returned no markdown ({block.get('success')})")
+    return markdown
+
+
+BACKENDS = ("auto", "browser", "firecrawl", "context", "tavily", "http")
 
 
 def collect(url: str, backend: str, args, keys: dict):
     order = {
-        "auto": ["browser", "firecrawl", "http"],
+        "auto": ["browser", "firecrawl", "context", "http"],
         "browser": ["browser"],
         "firecrawl": ["firecrawl"],
+        "context": ["context"],
         "tavily": ["tavily"],
         "http": ["http"],
     }[backend]
@@ -477,6 +526,9 @@ def collect(url: str, backend: str, args, keys: dict):
                 )
             elif name == "firecrawl":
                 jobs = from_markdown(fetch_firecrawl(url, args.timeout, keys.get("FIRECRAWL_API_KEY", "")), url)
+            elif name == "context":
+                context_key = keys.get("CONTEXT_API_KEY", "") or keys.get("CONTEXT_DEV_API_KEY", "")
+                jobs = from_markdown(fetch_context(url, args.timeout, context_key), url)
             elif name == "tavily":
                 jobs = from_markdown(fetch_tavily(url, args.timeout, keys.get("TAVILY_API_KEY", "")), url)
             else:
@@ -512,7 +564,10 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="JSON even when a terminal")
     args = parser.parse_args()
 
-    keys = load_keys(args.env_file, ("FIRECRAWL_API_KEY", "TAVILY_API_KEY"))
+    keys = load_keys(
+        args.env_file,
+        ("FIRECRAWL_API_KEY", "TAVILY_API_KEY", "CONTEXT_API_KEY", "CONTEXT_DEV_API_KEY"),
+    )
     results = []
     for url in args.url:
         jobs, used, warnings = collect(url, args.backend, args, keys)

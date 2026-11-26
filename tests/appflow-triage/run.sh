@@ -157,12 +157,46 @@ for name, text, want in cases:
         print(f"ok    {name}")
 
 # The stage a rejection lands in is the other half: a status the sync writes is
-# only useful if `applications.stage` agrees with it.
-if sync.stage_of("Rejected (email 2026-10-23)") != "rejected":
-    print("FAIL  stage_of(Rejected …) is not rejected")
-    failed += 1
-else:
-    print("ok    stage_of(Rejected …)")
+# only useful if `applications.stage` agrees with it. A stage word in prose is not
+# a stage: on 2026-11-26 a lead whose status explained that no mail existed sat at
+# `interview` for an afternoon because "interview" appeared inside "no interview".
+stages = [
+    ("stage_of(Rejected …)", "Rejected (email 2026-10-23)", "rejected"),
+    ("stage_of(Interview …)", "Interview am 3. Dezember, 13:30", "interview"),
+    (
+        "stage_of(no interview)",
+        "lead — the archive holds no mail from this employer; there is no interview",
+        "lead",
+    ),
+    (
+        "stage_of(previous stage came from)",
+        "lead — the previous stage came from another company's receipt, so this row is a plain lead",
+        "lead",
+    ),
+    (
+        "stage_of(keine Einladung zum Interview)",
+        "lead — keine Einladung zum Interview erhalten, die Bewerbung liegt nicht vor",
+        "lead",
+    ),
+    ("stage_of(packet ready)", "Packet ready — ATS-checked, nothing sent", "prep"),
+    (
+        "stage_of(a real invitation after a negation keeps its stage)",
+        "Keine Sorge wir laden dich gerne zu einem Interview ein",
+        "interview",
+    ),
+    (
+        "stage_of(an invitation with a distant negation keeps its stage)",
+        "Not only did we receive your documents, we would like to invite you to an interview",
+        "interview",
+    ),
+]
+for name, status, want in stages:
+    got = sync.stage_of(status)
+    if got != want:
+        print(f"FAIL  {name}: stage_of={got!r}, want {want!r}")
+        failed += 1
+    else:
+        print(f"ok    {name}")
 
 # Discovery: Personio puts the employer before " //", which none of the
 # "Bewerbung … bei …" patterns can see. The acknowledgement of a real
@@ -233,7 +267,7 @@ if not verdict or verdict[:2] != ("digest", "none"):
 else:
     print("ok    Malt opportunity match is digest")
 
-total = len(cases) + 3 + len(questions) + 2
+total = len(cases) + len(stages) + 1 + len(questions) + 1 + 1 + 1
 print(f"{total - failed}/{total} passed")
 sys.exit(1 if failed else 0)
 PY

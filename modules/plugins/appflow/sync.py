@@ -91,10 +91,34 @@ LEGAL_SUFFIXES = {
 }
 
 
+# A status is prose, so a stage word appears in it at least as often as something
+# the row is *not*: "lead — no mail from Liquid Reply exists … the previous stage
+# came from a Seesaw receipt". Searching the bare word put that row at interview
+# on 2026-11-26, and it only left the queue once the status was reworded by hand.
+# These two patterns subtract the negated and the historical mention before the
+# interview rule reads the text, the way `detect_event` subtracts its boilerplate.
+STAGE_NEGATION = re.compile(
+    r"\b(?:no|not|never|without|kein(?:e|en|er|em|es)?|ohne|nicht)\b"
+    # The window is three words, not a clause: German splits the phrase
+    # ("keine Einladung zum Vorstellungsgespräch"), while a real invitation
+    # that happens to open with a negation ("Keine Sorge, wir laden dich zum
+    # Vorstellungsgespräch ein") keeps more than three words between.
+    r"(?:\s+[^\s.;:!?]+){0,3}\s+"
+    r"(?:interview\w*|vorstellungsgespr\w*|einladung\w*|invit\w*|trial\w*|warteliste|probearbeit)"
+)
+# "the previous stage came from …" states provenance, not the current stage, so
+# the clause cannot be evidence of an interview even when the word appears in it.
+STAGE_HISTORY = re.compile(
+    r"(?:previous|prior|earlier)\s+(?:stage|status|bucket)\b[^.;:!?]{0,120}"
+    r"|(?:stage|status)\s+(?:came|comes|was)\s+from\b[^.;:!?]{0,120}"
+)
+
+
 def stage_of(status: str) -> str:
     """The bucket `task apps:overview` prints, lowercased for a stable column."""
     text = (status or "").lower()
-    if re.search(r"interview|trial|warteliste", text):
+    prose = STAGE_HISTORY.sub(" ", STAGE_NEGATION.sub(" ", text))
+    if re.search(r"\binterview|\btrial\b|\bwarteliste", prose):
         return "interview"
     if text.startswith("rejected"):
         return "rejected"

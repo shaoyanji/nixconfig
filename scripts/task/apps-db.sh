@@ -27,15 +27,27 @@ delphi_host=${DELPHI_HOST:-delphi.cloudforest-kardashev.ts.net}
 verb=${1:-help}
 if [ "$#" -gt 0 ]; then shift; fi
 
+# The twin of `stage_of` in modules/plugins/appflow/sync.py, including its guard:
+# a status is prose, so the stage word appears as often as the thing the row is
+# not ("lead — … there is no interview"). Negated and historical clauses are
+# subtracted before the interview rule reads the text; changing one without the
+# other is the drift this header warns about.
 stage='def stage:
   ( . // "" | ascii_downcase ) as $s
-  | if ($s | test("interview|trial|warteliste")) then "interview"
+  | ( $s
+      | gsub("\\b(no|not|never|without|kein(e|en|er|em|es)?|ohne|nicht)\\b(\\s+[^\\s.;:!?]+){0,3}\\s+(interview\\w*|vorstellungsgespr\\w*|einladung\\w*|invit\\w*|trial\\w*|warteliste|probearbeit)"; " ")
+      | gsub("(previous|prior|earlier) (stage|status|bucket)\\b[^.;:!?]{0,120}"; " ")
+      | gsub("(stage|status) (came|comes|was) from\\b[^.;:!?]{0,120}"; " ")
+    ) as $p
+  | if ($p | test("\\binterview|\\btrial\\b|\\bwarteliste")) then "interview"
     elif ($s | startswith("rejected")) then "rejected"
     elif (($s | startswith("applied")) or ($s | startswith("application received"))) then "applied"
     elif (($s | startswith("lead")) or ($s | startswith("rezi"))) then "lead"
     elif ($s | startswith("scout")) then "scouted"
     elif ($s | startswith("park")) then "parked"
     elif (($s | test("screening")) or ($s | test("follow-up required"))) then "screening"
+    elif ($s | startswith("manual")) then "manual"
+    elif ($s | startswith("contacted")) then "contacted"
     elif ($s | test("draft|packet|\\bjd\\b")) then "prep"
     else "other" end;'
 

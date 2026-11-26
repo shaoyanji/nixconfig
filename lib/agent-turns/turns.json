@@ -1,8 +1,54 @@
 {
-  "generated": "2026-11-26T09:28:19Z",
+  "generated": "2026-11-26T09:34:11Z",
   "count": 200,
-  "pin": "b8d6565eea879ee978a3be4d6619a562697ed9c3f3fbdbe3247b9a1e22304abb",
+  "pin": "adce381530518a734cf3025ecdaf79ed6c3c30851c75000128425929bcd5433a",
   "turns": [
+    {
+      "id": "d9d6f6a9-3022-4fff-baaf-67cad4472495",
+      "ts": "2026-11-26T09:33:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:apps-reply-poll",
+      "action": "reply poll on the 11 leads tailored for sweeps 2026-11-26a/b: zero responses — every row still prep with the send hold at 2026-12-07, Stepstone portal-only, so nothing was sent and no employer mail exists (archive 0 hits; All Mail newest matching message 2026-11-20 marketplace, none job mail); no row written",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
+      "branch": "main",
+      "frame": "03hb1pzrpac7bka3015a2rh7j"
+    },
+    {
+      "id": "b2b4ae9c-f902-42c5-956b-74bbf78a876a",
+      "ts": "2026-11-26T09:30:27Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-pipeloop-dogfood",
+      "action": "start: dogfooding dev:review:pipe-loop end-to-end — run the packaged loop cold, verify task+skill self-explain, fix gaps",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/dev.yml",
+        "scripts/task/pipe-loop.sh",
+        ".agents/skills/pipe-loop"
+      ],
+      "files": [],
+      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
+      "branch": "main",
+      "frame": "03hb1phtnqbq7kzz40kme00jh"
+    },
+    {
+      "id": "8302bd8c-e1aa-4c69-a4d8-36057f4db316",
+      "ts": "2026-11-26T09:28:45Z",
+      "source": "devji",
+      "subject": "nixconfig:delphi-sentinel",
+      "action": "Sentinel 404 fixed: push to frieren.lan (the vhost owning /sentinel/ingest) with the name pinned in /etc/hosts, and ha-stack's uptime-kuma default flipped to opt-in. Landed on main as 3fd4a347.",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "hosts/delphi/infra-stack.nix",
+        "modules/services/home-assistant.nix"
+      ],
+      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hb1p5u0g68s8zxtk534i3sp"
+    },
     {
       "id": "2fe5a0f7-1a3d-4a3e-a4b7-cf21635f8634",
       "ts": "2026-11-26T09:25:58Z",
@@ -2838,45 +2884,6 @@
       "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
       "branch": "main",
       "frame": "03havzakl3f5m15vn6vyvmcro"
-    },
-    {
-      "id": "0c6d1c64-b9c3-40d3-b42c-9cdc3a6f984b",
-      "ts": "2026-11-25T15:54:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "drove devin pane agents:1.1 with flake-change refactor task; jev-decide classify exit 2 needs_review flake-change p=0.20 margin=0.02 below gate; valid duel could not run (stale on-disk criteria), fell back to top label and drove; load-buffer + paste-buffer + Enter; pane shows Typing BUSY spinner, refactor running",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
-      "branch": "main",
-      "frame": "03havzaja07js6z7a27n6dlpb"
-    },
-    {
-      "id": "fc21ec31-59e8-4752-b226-21e52c059ec4",
-      "ts": "2026-11-25T15:41:00Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "completed sibling's in-flight shell-script-budget removal: dropped dead walk helpers + fixture goModule probes + doubled comment + dead path pointer in policies.nix; staged exactly policies.nix/script-budget.nix(D)/AGENTS.nix/policies-run.sh/infron-comment; secrets.yaml+config.yaml untouched | gate: nix:lint 331, policies:fixtures PASS, policies drv clean except sibling's secrets-mirror+infron reds",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
-      "branch": "main",
-      "frame": "03havwl1cbziglm4l45xzcdjp"
-    },
-    {
-      "id": "3b3008aa-91cd-4dea-a4a2-7bd582d15a93",
-      "ts": "2026-11-25T15:37:48Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "drove devin pane agents:1.1 with flake-change refactor task; jev-decide classify selected flake-change p=0.96 margin=0.94; pane shows Typing BUSY spinner, task accepted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e2e1f3d369171d6db3c1006aea4bf7234d6c8664",
-      "branch": "main",
-      "frame": "03havvyhf76tr4ioi2zlbk163"
     }
   ]
 }

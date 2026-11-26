@@ -1,8 +1,146 @@
 {
-  "generated": "2026-11-26T13:49:23Z",
+  "generated": "2026-11-26T14:03:27Z",
   "count": 200,
-  "pin": "2b60261de0962b68857c47d5614dc2370e17cd4c02ae62279cf553c87f316a57",
+  "pin": "237d4fbb53c40526b34684b4123c4b2f699821881530586bd23b501038b374fe",
   "turns": [
+    {
+      "id": "a9792bd2-da35-4b7d-821c-93c77663d3d5",
+      "ts": "2026-11-26T14:01:57Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-health-and-atlas-audit",
+      "action": "delphi: sentinel ok, 0 failed units, disk 47% (87/195G), mem 4.4/11.9G, PSI cpu some 99% (agent concurrency on 2 OCPU; mem/io <0.2). clanker auto-suspended 13:58Z, 0 OOM. xs LIVE=1: 26 claims, 0 stale, 6 blocked — incl delphi-pane 'tailnet unreachable', false (we are on delphi). mail-atlas timers green; archive has 3510 of 7379 inbox envelopes, 100/h = ~39h backlog. Fixes: stale queued -> inbox; dismiss only after recent-page scan; queue age in atlas-stats; log atlas-boxes 20k cap.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
+      "branch": "main",
+      "frame": "03hb36j4ctqz068mtps39lnru"
+    },
+    {
+      "id": "6ba783f0-46a6-49fb-b66b-ee478746d595",
+      "ts": "2026-11-26T13:59:12Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "verified post-deploy: checks:site:links PASS (91 links/17 pages/6 PDFs, all anchors download); live matt.bountystash.com 17/17 pages 200, 6/6 CV sha256 equal to built artifact, root 200, 404 probe 404",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
+      "branch": "main",
+      "frame": "03hb35zrcygixvxarcyswr1mr"
+    },
+    {
+      "id": "579288a8-b3ca-4aa2-ad10-50ef358499d5",
+      "ts": "2026-11-26T13:58:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-drive-20261126-1449",
+      "action": "novel: verify CV site live + site:links gate",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
+      "branch": "main",
+      "frame": "03hb35x80w4f9vu9f8hka1ds2"
+    },
+    {
+      "id": "240db69b-c53f-4d49-9a7b-cc8d86ba82f9",
+      "ts": "2026-11-26T13:58:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "corrects the previous entry's count: the pass parsed 5415 postings across three reads (1881 Upper Rhine + linkedin/jobsch, 1240 small towns, 2294 German metros), not 3355. Finding unchanged: no new employer from either region; 3 filed from LinkedIn, Lexware closed as a duplicate of the open Haufe-Lexware row.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
+      "branch": "main",
+      "frame": "03hb35rpk3dx3z1p9px0a2lkg"
+    },
+    {
+      "id": "d8bd7ba8-1dfc-4d8c-bc3c-221e4db8a55c",
+      "ts": "2026-11-26T13:57:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: sweep 2026-11-26h — read the Upper Rhine (Freiburg, Karlsruhe, Basel, Offenburg, Loerrach) plus eight German metros; 3355 postings, both spent, 0 new there. 3 leads filed from LinkedIn: ZKB PostgreSQL platform, Kanton Zuerich Finanzdirektion KI, Viseca Azure. Lexware closed as a duplicate of the open Haufe-Lexware application. 3 rows in the is-a.dev CV page (blog f75ad19). No code change. Gate: self-test 22/22, 3 links 200, 165 rows 0 malformed; checks:quick unbuildable on aarch64.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
+      "branch": "main",
+      "frame": "03hb35qmlv2my2dqh7ll4fmgu"
+    },
+    {
+      "id": "6c315171-0ba8-4b80-9b0a-f32b6f1f52ab",
+      "ts": "2026-11-26T13:53:48Z",
+      "source": "devin",
+      "subject": "nixconfig:desktop-facts-one-module",
+      "action": "landed: blast-radius audit + proposal note desktop-facts-one-module (PROPOSED, P2) — six facts duplicated verbatim across hosts/*.nix; one shared desktop module owns them, overrides as data | gate: nix eval .#agentsNotes.issues clean for the note",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
+      "branch": "main",
+      "frame": "03hb34xunphxpe0lwmyt4u6qk"
+    },
+    {
+      "id": "9247884a-260b-4662-9a48-0a1d2d3c0279",
+      "ts": "2026-11-26T13:51:37Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "claim: job-scout pass 2026-11-26h — read the Upper Rhine (Freiburg, Karlsruhe, Basel) that no pass has covered, plus LinkedIn and jobs.ch one page deeper, file linked leads via apps:scout, fold into the is-a.dev CV page with framing distinct from 26d/26e/26f/26g",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
+      "branch": "main",
+      "frame": "03hb34ieoeb6wovswuf6rvxm0"
+    },
+    {
+      "id": "f97d5827-d03b-4f55-adc9-f0941d37dae8",
+      "ts": "2026-11-26T13:51:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-config-verify",
+      "action": "checks:host HOST=delphi MODE=eval FAILED on the working tree (rc=1): attribute \"services.job-db-scraper\" missing — hosts/delphi/configuration.nix imports self.modules.\"services.job-db-scraper\" but the uncommitted modules.toml registers it under [knobs.job-db-scraper]. Same gate on a clean worktree at HEAD 9401d481 PASSES: 2141 assertions, registry 38, 6.92s. Those failing edits are another lane's and were left untouched.",
+      "outcome": "failed: delphi host check fails on the uncommitted job-db-scraper module; HEAD is green, tree needs retry after that lane lands",
+      "claims": [],
+      "files": [],
+      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
+      "branch": "main",
+      "frame": "03hb34eta7cxzk2gtt3eyggf6"
+    },
+    {
+      "id": "31892012-a74b-4f68-8a0a-aa2936046464",
+      "ts": "2026-11-26T13:50:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-config-verify",
+      "action": "claim: run checks:host HOST=delphi, read the delphi inventory entry, report status, post the done turn naming gate and result",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
+      "branch": "main",
+      "frame": "03hb347qkpoo7knwzyywd2n5t"
+    },
+    {
+      "id": "3ca60c4b-7d07-4ba1-af19-dc99f558b0ea",
+      "ts": "2026-11-26T13:49:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "corrects the previous entry, which named d1cd1e26: the LinkedIn retry landed as 9401d481, after the hook refused a commit that had another lane's staged job-db-scraper files. Sweep 2026-11-26g: 4158 parsed, 333 fresh, 29 new at 1694 held; 8 filed (Enovos, Banque de Luxembourg, LUXHUB, LIST, CMS, Deloitte, NSI, Uni Zurich), staffing firms refused; 8 rows in the is-a.dev CV page (blog acf8780). Gate: self-test 22/22, py_compile, bash -n; checks:quick unbuildable on aarch64.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
+      "branch": "main",
+      "frame": "03hb34443ib2kd1u0ej1anka6"
+    },
     {
       "id": "172a7d14-2423-4882-82e4-51da7ad8b0fb",
       "ts": "2026-11-26T13:48:40Z",
@@ -2854,153 +2992,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hazcmlmk2ecy6p5cexpses7"
-    },
-    {
-      "id": "ec845f61-504d-4e8b-8f00-40594334681a",
-      "ts": "2026-11-26T02:01:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:frieren-burgernas-window",
-      "action": "move the BurgerNAS restic run to 03:10 and give it its own Wake-on-LAN",
-      "outcome": "done",
-      "claims": [
-        "hosts/frieren/infra-stack.nix",
-        "inventory.toml"
-      ],
-      "files": [
-        "hosts/frieren/infra-stack.nix",
-        "inventory.toml",
-        ".agents/skills/burgernas/SKILL.md",
-        "AGENTS.nix"
-      ],
-      "base_commit": "91b5ddc9",
-      "branch": "frieren-burgernas-window",
-      "frame": "03haz9t8ho3vy6eoq9yrr8q83"
-    },
-    {
-      "id": "b8ea2a0e-0af8-470a-9884-cb754be6bc50",
-      "ts": "2026-11-26T01:59:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-drive-2026-11-26",
-      "action": "delphi: BurgerNAS backup retime task submitted, working",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03haz9ck98pahcgtsmsz9iqzo"
-    },
-    {
-      "id": "4c3ed1b4-707e-47e9-abf4-dd18845ffe5e",
-      "ts": "2026-11-26T01:58:56Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: embedded-HM baseline knobs (useGlobalPkgs/useUserPackages/backupFileExtension) single-sourced as hmShared.baseline — spliced by // in noDE/demo/home-manager-shared | gate: drv-equality 4/4 identical + nix:lint 333",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03haz9ajff04fjxhsosyb1oyq"
-    },
-    {
-      "id": "aee5c1fb-ea41-4684-9c0f-bbfb888df42d",
-      "ts": "2026-11-26T01:58:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26",
-      "action": "devin: nixconfig refactor single-sourcing task submitted, Thinking",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9627873ed1b5af5f8650122888513566328af36",
-      "branch": "main",
-      "frame": "03haz998j6lxlqbnthwovkfxr"
-    },
-    {
-      "id": "4c095474-1fd3-4931-b36e-e84eab79aaba",
-      "ts": "2026-11-26T01:40:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-drive-2026-11-26",
-      "action": "steward drive closed: delphi pane finished its driven dup-services migration and returned to idle (gate: delphi deployed)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9627873ed1b5af5f8650122888513566328af36",
-      "branch": "main",
-      "frame": "03haz5mymtcj1kczeaov22qkh"
-    },
-    {
-      "id": "3a46c7bf-cf68-402e-894d-a787b201dfaa",
-      "ts": "2026-11-26T01:40:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26",
-      "action": "steward drive closed: devin pane finished its driven refactor/image-daily task and returned to idle; lane clean, no open diffs (gate: drv-equality delphi identical + nix:lint 333 + image-daily rc=0)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9627873ed1b5af5f8650122888513566328af36",
-      "branch": "main",
-      "frame": "03haz5my63tkl6ey7m7l5m7i4"
-    },
-    {
-      "id": "1f38c489-d680-4746-8aa8-038d53bd9505",
-      "ts": "2026-11-26T01:15:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-2026-11-26",
-      "action": "note-change: rebased the dup-services work onto bed96105, distilled open-frieren-offload, added open-frieren-burgernas-window",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix",
-        "hosts/delphi/configuration.nix",
-        "modules/services/fleet-monitors.nix"
-      ],
-      "files": [
-        "AGENTS.nix"
-      ],
-      "base_commit": "bed96105",
-      "branch": "delphi-dup-services-note",
-      "frame": "03haz0tyopvbk3wz15013msc4"
-    },
-    {
-      "id": "3c68a251-d02b-46ce-8a02-cdce4cc5ca60",
-      "ts": "2026-11-26T01:13:33Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-2026-11-26",
-      "action": "landed: nginx-static-ui.nix now owns the -ui page derivation too (package + locations); both sites trimmed to name+path | gate: drv-equality delphi identical + nix:lint 333 + image-daily rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f9627873ed1b5af5f8650122888513566328af36",
-      "branch": "main",
-      "frame": "03haz0fhjefr1asn7gp4bzalt"
-    },
-    {
-      "id": "13af270b-5782-4c8a-94e4-76bc9ff0cc1a",
-      "ts": "2026-11-26T01:11:53Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-2026-11-26",
-      "action": "start: continue refactor on media-relay/nginx-static-ui + image-daily gate verify",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/config/nginx-static-ui.nix",
-        "modules/services/media-relay.nix"
-      ],
-      "files": [],
-      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
-      "branch": "main",
-      "frame": "03haz03qb35lii7nqo581kq1i"
-    },
-    {
-      "id": "51227c46-5cdb-4d71-a3a7-47d14f2d1feb",
-      "ts": "2026-11-26T01:10:30Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-2026-11-26",
-      "action": "note-change continue delphi duplicate-service migration",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
-      "branch": "main",
-      "frame": "03hayztyp33rfnz2ewcfc6w0k"
     }
   ]
 }

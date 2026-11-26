@@ -7,6 +7,7 @@
     "profiles.dwlDesktop.enable"
     "services.zettelGraph.enable"
     "services.mataroaConsole.enable"
+    "services.jobDbScraper.enable"
   ];
   umbrellaFamilies = ["checks:appflow"];
   sopsAnchorExceptions = ["garnix"];

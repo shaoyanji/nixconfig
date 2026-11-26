@@ -1,7 +1,8 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -9,179 +10,189 @@ import (
 	"testing"
 )
 
-func testDB(t *testing.T) string {
-	t.Helper()
-	return filepath.Join(t.TempDir(), "test.db")
-}
-
-func TestScoringDeterministic(t *testing.T) {
-	in := Posting{Title: "DevOps Engineer (m/w/d)", Employer: "Muster GmbH", Location: "Freiburg, Germany"}
-	lane1, score1, reasons1 := scorePosting(in)
-	lane2, score2, reasons2 := scorePosting(in)
-	if lane1 != lane2 || score1 != score2 || strings.Join(reasons1, ",") != strings.Join(reasons2, ",") {
-		t.Fatal("scoring must be deterministic")
+func TestNormalizeCompanyAndFingerprint(t *testing.T) {
+	if got := normalizeCompany("Kältemaschinen GmbH"); got != normalizeCompany("Kaeltemaschinen") {
+		t.Fatalf("umlaut/company folding mismatch: %q", got)
 	}
-	if lane1 != "in" {
-		t.Fatalf("DevOps Engineer in Germany must be in-lane, got %q", lane1)
-	}
-	// base 50 + lane 30 + goodloc 10 = 90
-	if score1 != 90 {
-		t.Fatalf("score want 90 got %d (%v)", score1, reasons1)
-	}
-	// OUT wins over LANE: an apprenticeship with lane words is out.
-	out := Posting{Title: "Ausbildung DevOps Engineer", Employer: "x", Location: "berlin"}
-	lane, score, _ := scorePosting(out)
-	if lane != "out" {
-		t.Fatalf("Ausbildung must be out, got %q score %d", lane, score)
-	}
-	// Software developer is out of lane.
-	sw := Posting{Title: "Backend Softwareentwickler", Employer: "x"}
-	if lane, _, _ := scorePosting(sw); lane != "out" {
-		t.Fatalf("backend developer must be out, got %q", lane)
-	}
-	// US-only is penalised below the Germany score.
-	us := Posting{Title: "DevOps Engineer", Employer: "x", Location: "US only"}
-	_, usScore, _ := scorePosting(us)
-	if usScore >= score1-30 {
-		t.Fatalf("us-only penalty missing: %d", usScore)
+	a := postingFingerprint("Upvest GmbH", "DevOps Engineer (m/w/d)", "Berlin")
+	b := postingFingerprint("upvest", "DevOps Engineer", "berlin")
+	if a != b {
+		t.Fatalf("fingerprints differ: %s != %s", a, b)
 	}
 }
 
-func TestDedupeKeyNormalization(t *testing.T) {
-	cases := [][2]string{
-		{"Muster GmbH", "muster"},
-		{"muster gmbh", "muster"},
-		{"Müller AG", "mueller"},
-		{"plusserver GmbH", "plusserver"},
+func TestCanonicalURLStripsTracking(t *testing.T) {
+	got := canonicalURL("HTTPS://WWW.Example.com/jobs/one/?utm_source=x&ref=board&id=42#section")
+	want := "https://example.com/jobs/one?id=42"
+	if got != want {
+		t.Fatalf("canonical url: got %q want %q", got, want)
 	}
-	for _, c := range cases {
-		if got := normName(c[0]); got != c[1] {
-			t.Fatalf("normName(%q) = %q, want %q", c[0], got, c[1])
+}
+
+func TestUpsertDedupesAndFTSFinds(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	ctx := context.Background()
+	first := postingInput{
+		Source: "test", URL: "https://example.com/jobs/1?utm_source=x", Company: "Acme GmbH",
+		Title: "Platform Engineer (m/w/d)", Location: "Berlin", Description: "Kubernetes Terraform cloud platform",
+	}
+	id, created, err := store.UpsertPosting(ctx, first)
+	if err != nil || !created {
+		t.Fatalf("first upsert created=%v err=%v", created, err)
+	}
+	second := first
+	second.URL = "https://example.com/different-board-copy"
+	_, created, err = store.UpsertPosting(ctx, second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created {
+		t.Fatal("second copy was inserted instead of deduplicated")
+	}
+	page, err := store.QueryPostings(ctx, queryOptions{Q: "kubernetes terraform", Active: true, Limit: 10})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if page.Total != 1 || len(page.Items) != 1 || page.Items[0].ID != id {
+		t.Fatalf("fts page: total=%d items=%+v", page.Total, page.Items)
+	}
+	if !strings.Contains(page.Items[0].Snippet, "<mark>") {
+		t.Fatalf("snippet has no highlight: %q", page.Items[0].Snippet)
+	}
+}
+
+func TestGermanTechJobsTitleShape(t *testing.T) {
+	m := germanTitleRE.FindStringSubmatch("Senior DevOps Engineer @ Example GmbH [Berlin]")
+	if len(m) != 4 || m[1] != "Senior DevOps Engineer" || m[2] != "Example GmbH" || m[3] != "Berlin" {
+		t.Fatalf("unexpected parse: %#v", m)
+	}
+}
+
+func TestInferCompany(t *testing.T) {
+	if got := inferCompany("Platform Engineer at Example GmbH - Berlin", "https://example.com/job/123"); got != "Example GmbH" {
+		t.Fatalf("at pattern: %q", got)
+	}
+	if got := inferCompany("Example GmbH: Platform Engineer", "https://example.com/job/123"); got != "Example GmbH" {
+		t.Fatalf("colon pattern: %q", got)
+	}
+}
+
+func TestSearchResultHeuristicsUseDetailPagesOnly(t *testing.T) {
+	for _, raw := range []string{
+		"https://www.devjobsscanner.com/devops-engineer-jobs-in-germany",
+		"https://englishjobs.de/jobs/devops",
+		"https://www.indeed.com/q-devops-germany-jobs.html",
+		"https://dailyremote.com/remote-devops-engineer-jobs-in-germany",
+	} {
+		if isSearchDetailURL(raw) {
+			t.Fatalf("listing accepted as detail: %s", raw)
 		}
 	}
-	// Same employer+role spelled two ways is one dedupe key.
-	k1 := dedupeKey("Muster GmbH", "DevOps Engineer")
-	k2 := dedupeKey("muster", "DevOps Engineer")
-	if k1 != k2 {
-		t.Fatalf("dedupe keys differ: %q vs %q", k1, k2)
-	}
-	if dedupeKey("", "x") != "" || dedupeKey("x", "") != "" {
-		t.Fatal("empty side must yield empty key")
-	}
-}
-
-func TestUpsertDedupesReposting(t *testing.T) {
-	db, err := openStore(testDB(t))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-	id1, fresh1, err := upsertPosting(db, Posting{Title: "Platform Engineer", Employer: "Upvest GmbH", URL: "http://a"})
-	if err != nil || !fresh1 {
-		t.Fatalf("first: %v fresh=%v", err, fresh1)
-	}
-	// The reposting, spelled differently, updates the same row.
-	id2, fresh2, err := upsertPosting(db, Posting{Title: "platform engineer", Employer: "upvest", Location: "Berlin"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if fresh2 || id2 != id1 {
-		t.Fatalf("reposting must update: id %d vs %d fresh %v", id1, id2, fresh2)
-	}
-	got, err := listPostings(db, 0, "", 10)
-	if err != nil || len(got) != 1 {
-		t.Fatalf("want 1 row, got %v len=%d", err, len(got))
-	}
-	if got[0].Location != "Berlin" {
-		t.Fatalf("update lost: %q", got[0].Location)
-	}
-	if got[0].URL != "http://a" {
-		t.Fatalf("empty url must not erase the first fact: %q", got[0].URL)
+	for _, raw := range []string{
+		"https://www.linuxcareers.com/jobs/senior-devops-engineer-f-m-d-ed1fa19f707f",
+		"https://join.com/companies/xalt/16977895-senior-devops-engineer",
+		"https://careers.sap.com/job/Berlin-DevOps-Engineer-10557/1456971233/",
+		"https://magazino.jobs.personio.com/job/2905493",
+	} {
+		if !isSearchDetailURL(raw) {
+			t.Fatalf("detail rejected: %s", raw)
+		}
 	}
 }
 
-func TestScoreSortedSurface(t *testing.T) {
-	db, err := openStore(testDB(t))
-	if err != nil {
-		t.Fatal(err)
+func TestSearchCompanyAndTitleCleanup(t *testing.T) {
+	if got := inferCompany("Senior DevOps Engineer (f/m/d) at Zeal Network, Hamburg, Germany", "https://www.linuxcareers.com/jobs/x-ed1fa19f707f"); got != "Zeal Network" {
+		t.Fatalf("zeal company: %q", got)
 	}
-	defer db.Close()
-	upsertPosting(db, Posting{Title: "DevOps Engineer", Employer: "a", Location: "germany"})  // 90
-	upsertPosting(db, Posting{Title: "Helpdesk Support", Employer: "b"})                       // 10
-	upsertPosting(db, Posting{Title: "Office Manager", Employer: "c"})                         // 50
-	got, _ := listPostings(db, 0, "", 10)
-	if len(got) != 3 || got[0].Score < got[1].Score || got[1].Score < got[2].Score {
-		t.Fatalf("not sorted by score desc: %v", []int{got[0].Score, got[1].Score, got[2].Score})
+	if got := inferCompany("Senior DevOps Engineer - XALT Business Consulting (Munich)", "https://join.com/companies/xalt/16977895-senior-devops-engineer"); got != "XALT Business Consulting" {
+		t.Fatalf("xalt company: %q", got)
 	}
-	// min_score filters the surface.
-	high, _ := listPostings(db, 60, "", 10)
-	if len(high) != 1 || high[0].Employer != "a" {
-		t.Fatalf("min_score 60: %+v", high)
+	if got := inferCompany("DevOps Engineer Job Details", "https://careers.sap.com/job/Berlin-DevOps-Engineer-10557/1456971233/"); got != "SAP" {
+		t.Fatalf("sap company: %q", got)
 	}
-	// lane filter.
-	in, _ := listPostings(db, 0, "in", 10)
-	if len(in) != 1 {
-		t.Fatalf("lane in: len=%d", len(in))
+	if got := cleanSearchTitle("Senior DevOps Engineer (f/m/d) at Zeal Network, Hamburg, Germany"); got != "Senior DevOps Engineer (f/m/d)" {
+		t.Fatalf("clean at title: %q", got)
 	}
-	// FTS still orders by score.
-	sr, err := searchPostings(db, "engineer", 0, 10)
-	if err != nil || len(sr) != 1 {
-		t.Fatalf("fts: %v len=%d", err, len(sr))
+	if got := cleanSearchTitle("Senior DevOps Engineer - XALT Business Consulting (Munich)"); got != "Senior DevOps Engineer" {
+		t.Fatalf("clean hyphen title: %q", got)
 	}
 }
 
-func TestBatchAPI(t *testing.T) {
-	db, err := openStore(testDB(t))
+func TestSourceStatesAndStats(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
-	srv := httptest.NewServer((&server{db: db}).mux())
-	defer srv.Close()
+	defer store.Close()
+	ctx := context.Background()
+	_, _, err = store.UpsertPosting(ctx, postingInput{Source: "test", URL: "https://example.com/1", Company: "Acme", Title: "SRE", Location: "Remote", Remote: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	runID, err := store.BeginRun(ctx, "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.FinishRun(ctx, runID, "test", "ok", 1, 1, 0, ""); err != nil {
+		t.Fatal(err)
+	}
+	states, err := store.SourceStates(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(states) != 1 || states[0].Source != "test" || states[0].Postings != 1 {
+		t.Fatalf("states: %+v", states)
+	}
+	stats, err := store.Stats(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stats.TotalPostings != 1 || stats.Remote != 1 || stats.LatestRun == nil {
+		t.Fatalf("stats: %+v", stats)
+	}
+}
 
-	batch := `{"postings":[
-	  {"title":"SRE","employer":"A GmbH","location":"remote"},
-	  {"title":"SRE","employer":"a gmbh","location":"remote"},
-	  {"title":"Cloud Engineer","employer":"B AG","location":"Munich"},
-	  {"title":"","employer":"bad row"}
-	]}`
-	resp, err := http.Post(srv.URL+"/api/postings/batch", "application/json", strings.NewReader(batch))
+func TestProviderClientsAgainstMockAPIs(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	var out struct {
-		Inserted int `json:"inserted"`
-		Updated  int `json:"updated"`
-		Failed   int `json:"failed"`
-	}
-	json.NewDecoder(resp.Body).Decode(&out)
-	resp.Body.Close()
-	// Two spellings of one employer+role: one insert, one update; the empty-title row fails.
-	if out.Inserted != 2 || out.Updated != 1 || out.Failed != 1 {
-		t.Fatalf("batch: %+v", out)
-	}
-
-	// GET list with min_score.
-	r, err := http.Get(srv.URL + "/api/postings?min_score=70")
+	defer store.Close()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer test-token" {
+			http.Error(w, "missing auth", http.StatusUnauthorized)
+			return
+		}
+		fmt.Fprint(w, `{"results":[{"title":"Platform Engineer at Example GmbH","url":"https://example.com/job/123","content":"Kubernetes platform engineer job","score":0.9}]}`)
+	})
+	mux.HandleFunc("/scrape", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `{"success":true,"data":{"markdown":"A long markdown job description with Kubernetes, Terraform and platform operations detail. This is intentionally long enough to be useful."}}`)
+	})
+	mux.HandleFunc("/web/scrape/markdown", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/markdown")
+		fmt.Fprint(w, "A long Context markdown job description with enough words to pass the enrichment length check and index usefully.")
+	})
+	api := httptest.NewServer(mux)
+	defer api.Close()
+	sc := newScraper(store, providerConfig{TavilyKey: "test-token", TavilyBase: api.URL, FirecrawlKey: "test-token", FirecrawlBase: api.URL, ContextKey: "test-token", ContextBase: api.URL})
+	postings, err := sc.tavilySearch(context.Background(), "platform engineer")
 	if err != nil {
 		t.Fatal(err)
 	}
-	var lst struct {
-		Count int `json:"count"`
+	if len(postings) != 1 || postings[0].Company != "Example GmbH" {
+		t.Fatalf("tavily postings: %+v", postings)
 	}
-	json.NewDecoder(r.Body).Decode(&lst)
-	r.Body.Close()
-	// SRE remote: 50+30+10=90; Cloud Munich: 90 — both pass 70.
-	if lst.Count != 2 {
-		t.Fatalf("min_score surface: %d", lst.Count)
+	text, err := sc.firecrawlScrape(context.Background(), "https://example.com/job/123")
+	if err != nil || !strings.Contains(text, "Kubernetes") {
+		t.Fatalf("firecrawl text %q err %v", text, err)
 	}
-
-	hr, err := http.Get(srv.URL + "/healthz")
-	if err != nil {
-		t.Fatal(err)
-	}
-	hr.Body.Close()
-	if hr.StatusCode != 200 {
-		t.Fatalf("healthz %d", hr.StatusCode)
+	text, err = sc.contextScrape(context.Background(), "https://example.com/job/123")
+	if err != nil || !strings.Contains(text, "Context markdown") {
+		t.Fatalf("context text %q err %v", text, err)
 	}
 }

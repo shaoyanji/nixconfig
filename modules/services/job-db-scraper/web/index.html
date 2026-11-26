@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Job DB · tailnet search</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <nav class="topline" aria-label="Service">
+        <div class="brand"><span class="mark">JD</span><span>job-db-scraper</span></div>
+        <div class="status-pill" id="health"><span class="pulse"></span>connecting</div>
+      </nav>
+      <section class="hero-grid">
+        <div>
+          <p class="eyebrow">tailnet job intelligence</p>
+          <h1>Scraped, deduplicated, searchable.</h1>
+          <p class="lede">A SQLite FTS5 index of infrastructure, platform, DevOps and cloud roles — refreshed on delphi, searchable as JSON and readable here.</p>
+          <form class="searchbar" id="search-form">
+            <input id="q" type="search" placeholder="Search title, company, stack, location…" autocomplete="off">
+            <button type="submit">Search</button>
+          </form>
+        </div>
+        <div class="command-card">
+          <div class="card-label">scrape control</div>
+          <div id="scrape-state" class="scrape-state">idle</div>
+          <button id="scrape-button" class="secondary">Run scrape</button>
+          <a class="api-link" href="/api/postings?limit=5">JSON API ↗</a>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="metrics" aria-label="Index statistics">
+        <article><span id="metric-jobs">—</span><small>active postings</small></article>
+        <article><span id="metric-companies">—</span><small>companies</small></article>
+        <article><span id="metric-remote">—</span><small>remote roles</small></article>
+        <article><span id="metric-fresh">—</span><small>seen this week</small></article>
+      </section>
+
+      <section class="workspace">
+        <aside class="filters">
+          <div class="panel-heading">Refine</div>
+          <label>Source
+            <select id="source"><option value="">all sources</option></select>
+          </label>
+          <label>Location
+            <input id="location" placeholder="Berlin, remote, Germany…">
+          </label>
+          <label>Freshness
+            <select id="days">
+              <option value="0">any age</option>
+              <option value="1">24 hours</option>
+              <option value="7" selected>7 days</option>
+              <option value="30">30 days</option>
+            </select>
+          </label>
+          <label class="check"><input id="remote" type="checkbox"> remote only</label>
+          <button id="reset" class="ghost">Reset filters</button>
+
+          <div class="panel-heading sources-heading">Sources</div>
+          <div id="source-list" class="source-list"></div>
+        </aside>
+
+        <section class="results-panel">
+          <div class="results-header">
+            <div><strong id="result-count">0</strong> postings</div>
+            <div class="muted" id="query-echo">latest first</div>
+          </div>
+          <div id="results" class="results"></div>
+          <div class="pager">
+            <button id="prev" class="ghost">← Previous</button>
+            <span id="page-label">page 1</span>
+            <button id="next" class="ghost">Next →</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel">
+          <div class="panel-heading">Top companies</div>
+          <div id="companies" class="bars"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-heading">Run ledger</div>
+          <div id="runs" class="runs"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="detail">
+    <button class="close" id="close-detail" aria-label="Close">×</button>
+    <div id="detail-body"></div>
+  </dialog>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

@@ -202,6 +202,14 @@
       via = "freebuff-headless dispatch";
       place = ["eval" "local-gate"];
     };
+    agy = {
+      what = "the delegated antigravity lane (agy CLI; Tier 1 cascade)";
+      provides = ["chain-change" "gate-change" "note-change"];
+      claims = ["tools/" "scripts/" "tests/"];
+      floor = "resolved";
+      via = "agy dispatch (the antigravity skill)";
+      place = ["eval" "local-gate"];
+    };
     image-daily = {
       what = "the image pipeline's own cron lane — it closes its own gate";
       provides = ["gate-change"];

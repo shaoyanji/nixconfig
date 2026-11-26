@@ -882,3 +882,304 @@ func TestAdoptMissingRows(t *testing.T) {
 		t.Fatalf("unexpected adopted rows: %s", s)
 	}
 }
+
+// --- publish.go -------------------------------------------------------------
+
+// writeLedger materializes ledger.jsonl rows the way record() would — one
+// JSON object per line — so stagePublish's read side is exercised end to end.
+func writeLedger(t *testing.T, root string, rows []ledgerEntry) {
+	t.Helper()
+	f, err := os.Create(ledgerPath(root))
+	if err != nil {
+		t.Fatal(err)
+	}
+	enc := json.NewEncoder(f)
+	for _, r := range rows {
+		if err := enc.Encode(r); err != nil {
+			t.Fatal(err)
+		}
+	}
+	_ = f.Close()
+}
+
+// stagePublish copies a keep row's file into published/ under its src-relative
+// path, dedupes a repeated row, peels a log line off a legacy path, and counts
+// a stale path that resolves under another day as shifted while one that
+// resolves nowhere is gone. Other lanes and other verdicts stay out.
+func TestStagePublish(t *testing.T) {
+	root := t.TempDir()
+	good := root + "/src/wall/2026-11-26/a.png"
+	if err := os.MkdirAll(filepath.Dir(good), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(good, []byte("PLATE"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(root+"/published/wall/2026-11-20", 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(root+"/published/wall/2026-11-20/b.png", []byte("OLD"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	writeLedger(t, root, []ledgerEntry{
+		{Lane: "wall", Path: good, Verdict: "keep"},
+		{Lane: "wall", Path: good, Verdict: "keep"},                             // the same row twice is one copy
+		{Lane: "wall", Path: "log line\n" + good, Verdict: "keep"},               // legacy: the path is the last line
+		{Lane: "wall", Path: root + "/src/wall/2026-11-21/b.png", Verdict: "keep"}, // moved: lives under another day
+		{Lane: "wall", Path: root + "/src/wall/2026-11-21/c.png", Verdict: "keep"}, // nowhere: gone
+		{Lane: "wall", Path: good, Verdict: "discard"},
+		{Lane: "site", Path: good, Verdict: "keep"},
+	})
+	shifted, gone := stagePublish(root, "wall")
+	if shifted != 1 || gone != 1 {
+		t.Fatalf("shifted,gone = %d,%d, want 1,1", shifted, gone)
+	}
+	data, err := os.ReadFile(root + "/published/wall/2026-11-26/a.png")
+	if err != nil || string(data) != "PLATE" {
+		t.Fatalf("staged copy: %v %q", err, data)
+	}
+}
+
+// A blog keep is a 3:2 render that ships as the 1200x630 banner: bannerCrop
+// does the transform, so the lane is gated on ffmpeg the way dimensions() is
+// on ffprobe.
+func TestStagePublishBlogCrop(t *testing.T) {
+	if _, err := exec.LookPath("ffmpeg"); err != nil {
+		t.Skip("ffmpeg not on PATH")
+	}
+	root := t.TempDir()
+	src := root + "/src/blog/2026-11-26/hero.png"
+	writePNG(t, src, 1536, 1024)
+	writeLedger(t, root, []ledgerEntry{{Lane: "blog", Path: src, Verdict: "keep"}})
+	stagePublish(root, "blog")
+	jpg := root + "/published/blog/hero.jpg"
+	data, err := os.ReadFile(jpg)
+	if err != nil || len(data) < 3 || data[0] != 0xFF || data[1] != 0xD8 {
+		t.Fatalf("banner crop did not land a JPEG at %s: %v", jpg, err)
+	}
+}
+
+// mergeServedURLs unions the served manifest into urls.tsv — a host that holds
+// a slice of the bank must not rewrite the manifest down to that slice. Local
+// rows win a shared path, a served-only path is adopted, half-formed assets
+// are skipped, and the result sorts by path.
+func TestMergeServedURLs(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprint(w, `{"assets":[
+			{"path":"wall/2026-11-24/old.png","url":"https://res.example/old","bytes":10},
+			{"path":"wall/2026-11-26/local.png","url":"https://res.example/stale","bytes":1},
+			{"path":"","url":"https://res.example/no-path","bytes":1},
+			{"path":"wall/half.png","url":"","bytes":1}
+		]}`)
+	}))
+	defer srv.Close()
+	t.Setenv("FORCE", "")
+	t.Setenv("MERGE", "")
+	t.Setenv("MERGE_FROM", srv.URL)
+
+	root, _ := writeTree(t, "wall/2026-11-26/local.png\thttps://res.example/local\t9\n")
+	mergeServedURLs(root)
+	got := string(mustRead(root + "/published/urls.tsv"))
+	if !strings.Contains(got, "wall/2026-11-24/old.png\thttps://res.example/old\t10") {
+		t.Fatalf("served-only asset not adopted: %s", got)
+	}
+	if !strings.Contains(got, "wall/2026-11-26/local.png\thttps://res.example/local\t9") ||
+		strings.Contains(got, "res.example/stale") {
+		t.Fatalf("local row must win the shared path: %s", got)
+	}
+	if strings.Contains(got, "no-path") || strings.Contains(got, "half.png") {
+		t.Fatalf("half-formed assets adopted: %s", got)
+	}
+	lines := strings.Split(strings.TrimSpace(got), "\n")
+	if !slices.IsSorted(lines) || len(lines) != 2 {
+		t.Fatalf("merged rows not sorted or duplicated: %v", lines)
+	}
+}
+
+// The merge's three refusals to fetch — FORCE=1, MERGE=0 and an unreachable or
+// non-manifest answer — each leave urls.tsv exactly as the host wrote it.
+func TestMergeServedURLsSkips(t *testing.T) {
+	local := "wall/2026-11-26/local.png\thttps://res.example/local\t9\n"
+
+	hits := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		hits++
+		fmt.Fprint(w, `{"assets":[{"path":"wall/x.png","url":"https://res.example/x","bytes":1}]}`)
+	}))
+	defer srv.Close()
+
+	for _, env := range [][2]string{{"FORCE", "1"}, {"MERGE", "0"}} {
+		t.Setenv("FORCE", "")
+		t.Setenv("MERGE", "")
+		t.Setenv("MERGE_FROM", srv.URL)
+		t.Setenv(env[0], env[1])
+		root, _ := writeTree(t, local)
+		mergeServedURLs(root)
+		if got := string(mustRead(root + "/published/urls.tsv")); got != local {
+			t.Fatalf("%s=%s rewrote urls.tsv: %s", env[0], env[1], got)
+		}
+	}
+	if hits != 0 {
+		t.Fatalf("the skip paths still fetched the manifest %d time(s)", hits)
+	}
+
+	// Unreachable and non-manifest answers are the same verdict: publish this
+	// host's rows only.
+	t.Setenv("FORCE", "")
+	t.Setenv("MERGE", "")
+	t.Setenv("MERGE_FROM", "http://127.0.0.1:1/")
+	root, _ := writeTree(t, local)
+	mergeServedURLs(root)
+	if got := string(mustRead(root + "/published/urls.tsv")); got != local {
+		t.Fatalf("unreachable manifest rewrote urls.tsv: %s", got)
+	}
+	bad := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(500)
+		fmt.Fprint(w, "not json")
+	}))
+	defer bad.Close()
+	t.Setenv("MERGE_FROM", bad.URL)
+	root, _ = writeTree(t, local)
+	mergeServedURLs(root)
+	if got := string(mustRead(root + "/published/urls.tsv")); got != local {
+		t.Fatalf("non-manifest answer rewrote urls.tsv: %s", got)
+	}
+}
+
+// shrinkGuard's pass path: the rebuilt manifest serves at least as many rows
+// as the backup names, so urls.tsv is left alone and nothing rebuilds.
+func TestShrinkGuardPass(t *testing.T) {
+	root, repo := writeTree(t, "wall/a.png\thttps://res.example/a\t1\n")
+	if err := os.WriteFile(root+"/published/manifest.json", []byte(`{"count":5}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(root+"/published/.urls.served", []byte("x\tu\t1\ny\tu\t2\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	shrinkGuard(root, repo, root+"/published/.urls.served")
+	if got := string(mustRead(root + "/published/urls.tsv")); got != "wall/a.png\thttps://res.example/a\t1\n" {
+		t.Fatalf("urls.tsv mutated on the pass path: %s", got)
+	}
+	// An empty backup name is no guard at all.
+	shrinkGuard(root, repo, "")
+}
+
+// The refusal: a manifest that would serve fewer rows than the backup names is
+// the sliced-bank publish the guard exists to catch — restore the backup,
+// rebuild the index, die naming the refusal. Subprocess because die() is
+// os.Exit; the child shares the parent's tree through env so the restore is
+// verifiable.
+func TestShrinkGuardRefusesShrink(t *testing.T) {
+	if os.Getenv("IMGTEST_DIE") == "1" {
+		shrinkGuard(os.Getenv("IMGTEST_ROOT"), os.Getenv("IMGTEST_REPO"),
+			os.Getenv("IMGTEST_ROOT")+"/published/.urls.served")
+		return
+	}
+	root, repo := writeTree(t, "wall/a.png\thttps://res.example/a\t1\n")
+	if err := os.WriteFile(root+"/published/manifest.json", []byte(`{"count":1}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	served := "x/1.png\tu\t1\ny/2.png\tu\t2\nz/3.png\tu\t3\n"
+	if err := os.WriteFile(root+"/published/.urls.served", []byte(served), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(repo+"/lib/image-daily/site", 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(repo+"/lib/image-daily/site/index.html", []byte("<html>"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command(os.Args[0], "-test.run", "TestShrinkGuardRefusesShrink")
+	cmd.Env = append(os.Environ(), "IMGTEST_DIE=1",
+		"IMGTEST_ROOT="+root, "IMGTEST_REPO="+repo)
+	out, err := cmd.CombinedOutput()
+	exit, _ := err.(*exec.ExitError)
+	if exit == nil || exit.ExitCode() != 1 {
+		t.Fatalf("expected the refusal exit 1, got err=%v out=%s", err, out)
+	}
+	if !strings.Contains(string(out), "publish refused") {
+		t.Fatalf("death should name the refusal, got: %s", out)
+	}
+	if got := string(mustRead(root + "/published/urls.tsv")); got != served {
+		t.Fatalf("the backup was not restored: %s", got)
+	}
+}
+
+// --- post.go ----------------------------------------------------------------
+
+// fmField reads one front-matter field from a draft — the first fenced block
+// only, unquoted — so a promotion inherits description/author/toc without the
+// generator asking for them.
+func TestFmField(t *testing.T) {
+	draft := "---\ntitle: \"The Title\"\ndescription: \"the desc\"\ntoc: false\nauthor: devji\n---\nbody\ntoc: true\n"
+	f := filepath.Join(t.TempDir(), "draft.md")
+	if err := os.WriteFile(f, []byte(draft), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := fmField(f, "description"); got != "the desc" {
+		t.Fatalf("description = %q", got)
+	}
+	if got := fmField(f, "title"); got != "The Title" {
+		t.Fatalf("quoted title = %q", got)
+	}
+	if got := fmField(f, "toc"); got != "false" {
+		t.Fatalf("toc = %q — the body's toc:true must not be seen", got)
+	}
+	if got := fmField(f, "missing"); got != "" {
+		t.Fatalf("missing field = %q", got)
+	}
+	if got := fmField(filepath.Join(t.TempDir(), "absent.md"), "title"); got != "" {
+		t.Fatalf("missing file = %q", got)
+	}
+}
+
+// fmBody is everything after the second fence with leading blanks dropped —
+// the `n>=2` awk plus `sed '/./,$!d'` the shell used.
+func TestFmBody(t *testing.T) {
+	draft := "---\ntitle: x\n---\n\n\nfirst line\n\nsecond para\n"
+	f := filepath.Join(t.TempDir(), "draft.md")
+	if err := os.WriteFile(f, []byte(draft), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := fmBody(f); got != "first line\n\nsecond para\n" {
+		t.Fatalf("body = %q", got)
+	}
+	short := filepath.Join(t.TempDir(), "nofence.md")
+	if err := os.WriteFile(short, []byte("no front matter\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := fmBody(short); got != "" {
+		t.Fatalf("unfenced file should yield no body: %q", got)
+	}
+}
+
+// verdictParts is cmd_post's read of the judge JSON: all three fields when the
+// verdict is a reroll, empty strings on anything unparseable.
+func TestVerdictParts(t *testing.T) {
+	v, d, r := verdictParts(`{"verdict":"reroll","defect":"the composition","reason":"crowded"}`)
+	if v != "reroll" || d != "the composition" || r != "crowded" {
+		t.Fatalf("verdictParts = %q %q %q", v, d, r)
+	}
+	if v, d, r := verdictParts("not json"); v != "" || d != "" || r != "" {
+		t.Fatalf("garbage JSON must not parse: %q %q %q", v, d, r)
+	}
+}
+
+// cmd_post refuses before spending when SLUG is unset — the same fast-die the
+// shell's `${SLUG:?}` had. Subprocess because die() is os.Exit.
+func TestPostRequiresSlug(t *testing.T) {
+	if os.Getenv("IMGTEST_DIE") == "1" {
+		cmdPost([]string{"--root", t.TempDir(), "--repo", t.TempDir()})
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run", "TestPostRequiresSlug")
+	cmd.Env = append(os.Environ(), "IMGTEST_DIE=1", "SLUG=", "TITLE=", "BLOG_DIR=")
+	out, err := cmd.CombinedOutput()
+	exit, _ := err.(*exec.ExitError)
+	if exit == nil || exit.ExitCode() != 1 {
+		t.Fatalf("expected exit 1 without SLUG, got err=%v out=%s", err, out)
+	}
+	if !strings.Contains(string(out), "SLUG") {
+		t.Fatalf("death should name SLUG, got: %s", out)
+	}
+}

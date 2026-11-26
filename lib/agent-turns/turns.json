@@ -1,8 +1,123 @@
 {
-  "generated": "2026-11-26T11:44:12Z",
+  "generated": "2026-11-26T11:56:00Z",
   "count": 200,
-  "pin": "fdc996f4c0172bafd2029b26f8f8c0edca422d426b48bae10e994ca250ae0e97",
+  "pin": "d17d48cb80a15e1625bd3a62112ba12caf74d12a262c774e2bcf723a1e666965",
   "turns": [
+    {
+      "id": "f1efb47d-7a2c-46d5-8848-78a6cbaed956",
+      "ts": "2026-11-26T11:55:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-db-remediate",
+      "action": "185 bare, 4 twins, 4 dead prep fixed. I clobbered 125 prep rows with a bad loop and restored all 125 from the pre-write snapshot (0 status, 0 nextAction diffs). Gate 5 rules -> 2.",
+      "outcome": "blocked: 55 rows need a role named or a twin picked; the 8 mail rows need delphi's loopback engines",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/apps-resolve.sh",
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
+      "branch": "main",
+      "frame": "03hb2htw9xjulumo974dwclhz"
+    },
+    {
+      "id": "51ab5fa3-cb37-42b8-9f04-568cd7321c55",
+      "ts": "2026-11-26T11:55:28Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-db-remediate",
+      "action": "Mechanical appflow debt: backfill bare statuses, declare twins, re-derive dead prep rows",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/apps-resolve.sh",
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
+      "branch": "main",
+      "frame": "03hb2htta8ft3x00solb1le1l"
+    },
+    {
+      "id": "c3eda81a-8b25-4366-8de5-023c7b23f126",
+      "ts": "2026-11-26T11:52:56Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-db-remediate",
+      "action": "Clear the mechanical appflow debt: bare statuses backfilled, twins declared, dead prep rows re-derived",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/apps-resolve.sh",
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
+      "branch": "main",
+      "frame": "03hb2hckeb8quqeisvs7hgkyv"
+    },
+    {
+      "id": "d9699404-a83b-4132-8ac4-624bd43d6f35",
+      "ts": "2026-11-26T11:47:59Z",
+      "source": "devin",
+      "subject": "nixconfig:image-go-tests",
+      "action": "claim: httptest coverage for publish/post; agy's 49d9be9f landed the publish rework, tests still absent — taking the lane",
+      "outcome": "in_progress",
+      "claims": [
+        "tools/os/internal/image/main_test.go",
+        "tools/os/internal/image/publish.go",
+        "tools/os/internal/image/post.go"
+      ],
+      "files": [],
+      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
+      "branch": "main",
+      "frame": "03hb2gcz6lyuk1jmprghqg8ny"
+    },
+    {
+      "id": "de80e00f-7592-4a51-a60f-0fd76ddeb386",
+      "ts": "2026-11-26T11:47:07Z",
+      "source": "agy",
+      "subject": "nixconfig:image-go-tests",
+      "action": "gate-change: add httptest coverage for Go publish/post + verify image…",
+      "outcome": "in_progress",
+      "claims": [
+        "tools/os/internal/image/main_test.go",
+        "tools/os/internal/image/publish.go",
+        "tools/os/internal/image/post.go"
+      ],
+      "files": [],
+      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
+      "branch": "main",
+      "frame": "03hb2g6x0mbg65izqjv1qh44c"
+    },
+    {
+      "id": "d9c644d0-01d2-41d1-9c2c-cf90688322ca",
+      "ts": "2026-11-26T11:47:06Z",
+      "source": "agy",
+      "subject": "nixconfig:appflow-db-remediate",
+      "action": "incident: resolve appflow queue + fix live checks:appflow DB debt",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/apps-resolve.sh",
+        "modules/plugins/appflow"
+      ],
+      "files": [],
+      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
+      "branch": "main",
+      "frame": "03hb2g6rqqouphmy5lu3u78s0"
+    },
+    {
+      "id": "8dc90c56-56e1-4a47-8984-9388f0633343",
+      "ts": "2026-11-26T11:44:35Z",
+      "source": "devin",
+      "subject": "nixconfig:nix-comments-headroom",
+      "action": "landed: banner trim — 18 pure-label # --- lines cut across fleet-sentinel/qwen-tts/steam-cache/multimedia/suite/mainframe-remotes; purpose-bearing labels kept; census 6495->6485 | gate: checks:nix:comments PASS, checks:nix:lint PASS, checks:host frieren+eisen PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4bff2cf640e64e71aaaafcc70e996bd832e8214f",
+      "branch": "main",
+      "frame": "03hb2fp5pa5t99pfkn5ttct0d"
+    },
     {
       "id": "7c2c9c52-2498-4ccb-bf04-0545096eeca3",
       "ts": "2026-11-26T11:43:41Z",
@@ -2838,104 +2953,6 @@
       "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
       "branch": "main",
       "frame": "03haxhri3iuwy4n03skwn1w3z"
-    },
-    {
-      "id": "f4a02464-7433-4de3-8b33-f5c90658022a",
-      "ts": "2026-11-25T20:33:43Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-lane",
-      "action": "gate-change: verify image-daily Go port gates and fix",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "modules"
-      ],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxhrh012gynddi4tbvupjt"
-    },
-    {
-      "id": "f10c8ade-8222-4e97-84d0-2353e4799974",
-      "ts": "2026-11-25T20:23:20Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-1",
-      "action": "landed: hermes-persona diffs committed under devin-lane as a262147a (tokenrouter primary + gate declarations) — verified end-to-end: key in ai-services-shared-env, profiles/hermes renders it, envFile->hermes-env-sync, config.yaml seeded verbatim; hermes-user.nix needs no provider wiring | gate: checks:quick rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxfqhvrlec18ugm5hyph4v"
-    },
-    {
-      "id": "491d21d8-daef-4aca-af80-4fb4e985e26f",
-      "ts": "2026-11-25T20:22:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "gate-change: check delphi gateway + xs endpoint — detail on the ledger",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai/hermes-user.nix"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxfltypuut5us2jn0kzevt"
-    },
-    {
-      "id": "53d905c1-da02-4c4e-977d-658006cb8d82",
-      "ts": "2026-11-25T20:22:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-refactor-1",
-      "action": "refactor: commit hermes-persona diffs + config review",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxfhrsel60plvxjx8g23rl"
-    },
-    {
-      "id": "db8e38aa-dcef-46b7-83fe-ded15cb7ba1e",
-      "ts": "2026-11-25T20:21:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "gate-change: check delphi gateway + xs endpoint",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxfg44mi1nowu1f7wkm6sq"
-    },
-    {
-      "id": "455eaaa4-a19f-4a69-a9ce-432cfc3720f9",
-      "ts": "2026-11-25T20:21:29Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-25: 0 plate(s) kept of 1 spent, 1 roster row(s) waiting, 772 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03haxfdeygdfagi3nxrk1f8fm"
-    },
-    {
-      "id": "2202e5e5-0da2-4252-8053-5f78ce9a1ba2",
-      "ts": "2026-11-25T20:11:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "gate-change: analyzed delphi hermes-user.nix claim worktree; no commit; followups: rebase branch, write gate change",
-      "outcome": "done",
-      "claims": [
-        "modules/user/ai/hermes-user.nix"
-      ],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxdbys2blo47u3ssbeeg94"
     }
   ]
 }

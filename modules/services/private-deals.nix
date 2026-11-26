@@ -1,5 +1,4 @@
-# private-deals: SQLite/FTS5 deals and price history on the tailnet; the Go
-# service beside this file is shaped like modules/services/agent-turns.nix.
+# private-deals: SQLite/FTS5 deals and price history; shaped like modules/services/agent-turns.nix.
 {
   config,
   lib,

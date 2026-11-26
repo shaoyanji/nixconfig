@@ -132,22 +132,42 @@ check "$classes" "same kind+claims share a class (subject, claim order ignored)"
 check "$classes" "a different kind is a different class"                         '.a == .c' 'false'
 check "$classes" "the class is a quotient hash (a number)"                       '.a | type == "number"' 'true'
 
-# --- 6. verb audit — the 37-prefix census over the committed snapshot -----------
-vaudit="$(nix eval --json .#intents --apply 'i: {
-  actors = i.verbActorArtifacts;
-  kinds = i.verbKindArtifacts;
-  undeclared = i.undeclaredVerbs;
-  declared = i.verbIds;
-}' 2>/dev/null)"
+# --- 6. verb audit — a controlled corpus, not the rolling snapshot ---------------
+# The committed snapshot is a rolling 200-turn window the pre-commit hook
+# re-pins on nearly every commit, so an assertion pinned to one turn's
+# wording rots the next time the window moves — exactly how "jev" and
+# "tailored" broke 2026-11-26. The logic is what the fixture pins, against a
+# corpus that never moves: actor tags sort as actors, kind prefixes as kinds,
+# aliases canonicalize away, and true prose is the residual.
+cat >"$tmp/corpus.json" <<'EOF'
+[
+  {"source":"devin","action":"jev: routed the lane"},
+  {"source":"devin","action":"devin: chain-change landed"},
+  {"source":"devin","action":"gate-change|0.9|0.8: fixture work"},
+  {"source":"devin","action":"verify: the gate re-proved"},
+  {"source":"devin","action":"no-op: nothing to do"},
+  {"source":"devin","action":"tailored cv and letter for the packet"},
+  {"source":"devin","action":"steward: dispatched the pane"}
+]
+EOF
+vaudit="$(nix eval --json --impure --expr \
+  "let f = builtins.getFlake (toString ./.); c = builtins.fromJSON (builtins.readFile $tmp/corpus.json); in f.intents.verbAuditOf c" 2>/dev/null)"
+declared="$(nix eval --json .#intents.verbIds 2>/dev/null)"
 
-check "$vaudit" "actor tags sort into artifacts, not verbs"      '.actors | index("devin") != null and index("jev") != null' 'true'
-check "$vaudit" "kind prefixes are dispatches, not verbs"        '.kinds | index("gate-change") != null' 'true'
-check "$vaudit" "no actor tag remains undeclared"                '.undeclared | index("devin") == null and index("steward") == null' 'true'
-check "$vaudit" "no kind id remains undeclared"                  '.undeclared | index("gate-change") == null' 'true'
-check "$vaudit" "aliases canonicalize (verify is not left raw)"  '.undeclared | index("verify") == null' 'true'
-check "$vaudit" "aliases canonicalize (no-op folds into no)"     '.undeclared | index("no-op") == null' 'true'
-check "$vaudit" "the audit declared the verify verb"             '.declared | index("verified") != null' 'true'
-check "$vaudit" "the residual is prose, not convention"          '.undeclared | index("tailored") != null' 'true'
+check "$vaudit"   "actor tags sort into artifacts, not verbs"      '.actors | index("devin") != null and index("jev") != null' 'true'
+check "$vaudit"   "kind prefixes are dispatches, not verbs"        '.kinds | index("gate-change") != null' 'true'
+check "$vaudit"   "no actor tag remains undeclared"                '.undeclared | index("devin") == null and index("steward") == null' 'true'
+check "$vaudit"   "no kind id remains undeclared"                  '.undeclared | index("gate-change") == null' 'true'
+check "$vaudit"   "aliases canonicalize (verify is not left raw)"  '.undeclared | index("verify") == null' 'true'
+check "$vaudit"   "aliases canonicalize (no-op folds into no)"     '.undeclared | index("no-op") == null' 'true'
+check "$declared" "the audit declared the verify verb"             '. | index("verified") != null' 'true'
+check "$vaudit"   "the residual is prose, not convention"          '.undeclared | index("tailored") != null' 'true'
+
+# The live snapshot is still asserted, but structurally: nothing the sort
+# classifies may reappear in the residual, whatever the window holds.
+live="$(nix eval --json .#intents --apply 'i: { actors = i.verbActorArtifacts; kinds = i.verbKindArtifacts; undeclared = i.undeclaredVerbs; }' 2>/dev/null)"
+check "$live" "live residual carries no actor artifact"  '[.undeclared[] as $u | .actors[] | select(. == $u)] | length == 0' 'true'
+check "$live" "live residual carries no kind artifact"   '[.undeclared[] as $u | .kinds[] | select(. == $u)] | length == 0' 'true'
 
 if [ "$fail" -eq 0 ]; then
   echo "intents fixture: all cases ok"

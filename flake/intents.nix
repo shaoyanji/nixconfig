@@ -294,21 +294,34 @@
   # coverage, not a closed vocabulary it never had.
   observedSources = (turns.turns or []) |> map (t: t.source) |> lib.unique;
   undeclaredSources = observedSources |> builtins.filter (s: !(builtins.elem s capabilityIds));
+  censusVerbOf = action: let
+    m = builtins.match "^([a-z-]+)(\\|[0-9.]+\\|[0-9.]+)?[: ].*" action;
+  in
+    if m == null
+    then "?"
+    else builtins.head m;
+
   observedVerbs =
     (turns.turns or [])
-    |> map (t: let
-      m = builtins.match "^([a-z-]+)[: ].*" t.action;
-    in
-      if m == null
-      then "?"
-      else builtins.head m)
+    |> map (t: censusVerbOf t.action)
     |> lib.unique;
-  verbActorArtifacts = observedVerbs |> builtins.filter (v: builtins.elem v (capabilityIds ++ actorShorthands));
-  verbKindArtifacts = observedVerbs |> builtins.filter (v: builtins.elem v kindIds);
-  undeclaredVerbs =
-    (map (v: verbAliases.${v} or v) observedVerbs)
-    |> builtins.filter (v: !(builtins.elem v verbIds) && !(builtins.elem v kindIds) && !(builtins.elem v (capabilityIds ++ actorShorthands)))
-    |> lib.unique;
+  verbAuditOf = corpusTurns: let
+    corpusVerbs =
+      corpusTurns
+      |> map (t: censusVerbOf t.action)
+      |> lib.unique;
+  in {
+    actors = corpusVerbs |> builtins.filter (v: builtins.elem v (capabilityIds ++ actorShorthands));
+    kinds = corpusVerbs |> builtins.filter (v: builtins.elem v kindIds);
+    undeclared =
+      (map (v: verbAliases.${v} or v) corpusVerbs)
+      |> builtins.filter (v: !(builtins.elem v verbIds) && !(builtins.elem v kindIds) && !(builtins.elem v (capabilityIds ++ actorShorthands)))
+      |> lib.unique;
+  };
+  snapshotAudit = verbAuditOf (turns.turns or []);
+  verbActorArtifacts = snapshotAudit.actors;
+  verbKindArtifacts = snapshotAudit.kinds;
+  undeclaredVerbs = snapshotAudit.undeclared;
 
   # The self-check the gate asserts: every declared kind's gate resolves to a
   # real task, every capability provides only declared kinds, the ledger's
@@ -394,5 +407,5 @@
 in {
   inherit intentFields kinds kindIds verbs verbIds verbAliases actorShorthands capabilities capabilityIds;
   inherit places placeIds admit keyOf classOf gateReport runCmd planOf route;
-  inherit observedSources undeclaredSources observedVerbs undeclaredVerbs verbActorArtifacts verbKindArtifacts;
+  inherit observedSources undeclaredSources observedVerbs undeclaredVerbs verbActorArtifacts verbKindArtifacts verbAuditOf;
 }

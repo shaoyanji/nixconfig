@@ -1,5 +1,4 @@
-# inventory-site: SQLite/FTS5 asset inventory on the tailnet; the Go service
-# beside this file is shaped like modules/services/agent-turns.nix.
+# inventory-site: SQLite/FTS5 asset inventory; shaped like modules/services/agent-turns.nix.
 {
   config,
   lib,
@@ -22,7 +21,6 @@
 
   stateDir = "/var/lib/${cfg.stateDirectory}";
 
-  # Eval-time projection of config.fleet.inventory.hosts; the service seeds an empty store.
   fleetSeed = pkgs.writeText "inventory-site-hosts.json" (builtins.toJSON (
     lib.mapAttrsToList (name: h: {
       inherit name;

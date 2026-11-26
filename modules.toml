@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 17
+total_knobs = 18
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -190,5 +190,16 @@ option = "services.mataroaConsole.enable"
 path = "modules/services/mataroa-console.nix"
 description = "A mataroa.blog blog as markdown files (:8454): ledger, editor, publish and unpublish"
 port = 8454
+default = false
+hosts = ["delphi"]
+
+[knobs.private-deals]
+name = "Private Deals"
+type = "service"
+category = "knowledge"
+option = "services.private-deals.enable"
+path = "modules/services/private-deals.nix"
+description = "Deals, watchlists and price history in SQLite/FTS5 (:8462): RSS ingestion, JSON API and a one-page tailnet UI"
+port = 8462
 default = false
 hosts = ["delphi"]

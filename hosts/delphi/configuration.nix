@@ -321,6 +321,7 @@ in {
     self.modules."services.media-relay"
     self.modules."services.offload-bridge"
     self.modules."services.paperless-watchdog"
+    self.modules."services.private-deals"
     self.modules."services.service-portal"
     self.modules."services.systemone-decision"
     self.modules."services.turns-dashboard"
@@ -1143,6 +1144,8 @@ in {
   # is the entire exposed surface, and the bearer token comes from sops. The
   # endpoint is coordination state, not a chat relay and not a merge authority.
   services.agentTurns.enable = true;
+  # Loopback only; the servicePortal mount is the whole exposure.
+  services.private-deals.enable = true;
   # The outcome lane out of the log: a minutely watcher pushes changed turn
   # outcomes to the operator on Telegram (token is the `hermes` sops key,
   # aliased for this service — delphi's own bot keeps its `delphi-telegram`).
@@ -1439,6 +1442,16 @@ in {
           title = "Media relay";
           description = "Fetched media, range-served: fuzzy search over the library, YouTube search with thumbnails, and a field that queues a fetch.";
           requires = ["nginx.service"];
+        };
+      }
+      // {
+        # The port is the module's, so the mount and the module cannot disagree.
+        private-deals = {
+          port = config.services.private-deals.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.private-deals.port}";
+          title = "Private deals";
+          description = "Watched products, their price history, and the feeds that report them.";
+          requires = ["private-deals.service"];
         };
       };
     entries.gatus = {

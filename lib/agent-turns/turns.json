@@ -1,8 +1,83 @@
 {
-  "generated": "2026-11-26T15:53:24Z",
+  "generated": "2026-11-26T15:58:07Z",
   "count": 200,
-  "pin": "bf42e6a5a16fb2ee7f48270e88ec078ffce2f4886b3b6d9aaa44a9551773e123",
+  "pin": "6f6b99b03a279398a5dc0de714acd6c9735372544976c29e982308d09e827827",
   "turns": [
+    {
+      "id": "d304fff9-9afc-46a7-a103-6ed29e8390a0",
+      "ts": "2026-11-26T15:55:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-nudge-gate",
+      "action": "gate-change|0.99|0.98: pane_nudge_test_gate (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/pane-nudge.sh",
+        "tests/pane-nudge",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
+      "branch": "main",
+      "frame": "03hb3ssfh7nto6e08q86dg4x4"
+    },
+    {
+      "id": "f095e85d-a818-483b-a553-ea6f01150b4d",
+      "ts": "2026-11-26T15:55:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-reconcile-tests",
+      "action": "claim: audit reconcile.py pagination/error/empty-mailbox/retry guards, fix what is wrong, add tests/mail-atlas-reconcile/test_reconcile.py, gate on unittest + py_compile",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/mail-atlas",
+        "tests/mail-atlas-reconcile"
+      ],
+      "files": [],
+      "base_commit": "314641a2a2d488ece03b94dcd61958526f65732d",
+      "branch": "main",
+      "frame": "03hb3spk37p4uriahfzktioe8"
+    },
+    {
+      "id": "a65db229-a437-4b9b-a1c1-a6e61fadd6f9",
+      "ts": "2026-11-26T15:55:22Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-pg-backup-gap",
+      "action": "bug-fix|0.7|0.51: delphi_postgres_backup_gap (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi",
+        "modules/services/email-archive.nix"
+      ],
+      "files": [],
+      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
+      "branch": "main",
+      "frame": "03hb3sooqj8uqm6qd0r8tuzlw"
+    },
+    {
+      "id": "1604e990-645c-45c6-bbb7-361507935ecd",
+      "ts": "2026-11-26T15:55:07Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-explabs-cleanup",
+      "action": "landed: xpl lane removed — measured completion answers insufficient_credits with $5 top-up wall while /models returns 200 null-cost (the 2026-11-24 probe's mistake: catalog proves nothing, completion is the only proof); gate updated: xpl exception out, ollama-cloud out of closed-lane exemptions (402 x71); fixture pins both refusals, 5/5 cases pass | gates: infron-check clean (8 lanes), tests/infron all pass",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
+      "branch": "main",
+      "frame": "03hb3smymrbh4onme0fnl7ptv"
+    },
+    {
+      "id": "da37042e-78d8-4fce-9b3e-288d26d09c02",
+      "ts": "2026-11-26T15:53:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:ingest-batch-endpoints",
+      "action": "deals-ingest + jobs-ingest chunk to /api/deals/batch and /api/postings/batch (--batch-size default 100, cap 500), fall back to per-record POST on 404/405 with batch:false, count skipped, map per-index errors to URLs. Live: deals 3 created then 3 updated, duplicate pair total 2/created 1/skipped 1; postings 3 created then 3 updated; sort=score 55/43/0 with lanes; 405 stub batch:false created 1.| gate: unittest deals 26 + jobs 28 PASS, py_compile, live smoke PASS (servers stopped)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "314641a2a2d488ece03b94dcd61958526f65732d",
+      "branch": "main",
+      "frame": "03hb3sc0krjfwcl2u29p7crx3"
+    },
     {
       "id": "d5dec741-e1d3-481a-96de-78e0423d96f7",
       "ts": "2026-11-26T15:51:29Z",
@@ -3000,74 +3075,6 @@
       "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
       "branch": "main",
       "frame": "03hb1vt10srebrpezemdp9ijw"
-    },
-    {
-      "id": "3619bc97-2f10-49c8-a83b-75c64bdb2478",
-      "ts": "2026-11-26T09:58:07Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: greeter policy into the dms feature — modules/global/dms.nix (sddm mkDefault off + wayland mkDefault on); off-5 hosts dropped the verbatim block, on-2 shrank to sddm.enable=true, none-4 flip an inert wayland flag | gate: checks:host PASS x11 dms hosts (one loop, ALLOW_PRESERVED=1), checks:nix:lint PASS 337, modules:edges 170, comments census 6495/6495",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
-      "branch": "main",
-      "frame": "03hb1uwcrb7k7o27yrsjblafl"
-    },
-    {
-      "id": "03e25682-ae3e-4cfa-b9e3-8233b95da0f2",
-      "ts": "2026-11-26T09:55:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-fresh-tailor9",
-      "action": "Send requested for the tailored Stepstone preps: refused on two independent gates. The row holds to 2026-12-07 (today 2026-11-26; EARLY=1 is the audited override), and with the hold lifted it names no recipient — recruiterEmail is null, applyUrl is the Stepstone posting, the ad carries no address. Nothing sent, no row edited.",
-      "outcome": "blocked: no recipient — the Stepstone preps have no mailbox, and the 2026-12-07 hold is the operator's own gate",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1ugsyjn4dtvpqi66b9gx1"
-    },
-    {
-      "id": "5564d75b-dee4-4dd6-a0ea-b676217b1bc3",
-      "ts": "2026-11-26T09:55:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-fresh-tailor",
-      "action": "freebuff CV lane: apps:send refuses 9 tailored Stepstone packets; diagnose the refusal, fix it, send the packets out",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1ub7y9ik9phbosaql7t34"
-    },
-    {
-      "id": "d2d0d451-b751-495d-ac70-8d7f6c4fee90",
-      "ts": "2026-11-26T09:50:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "Tailored 16 leads from sweep 2026-11-26c: per-ad letters filed in ~/.config/appflow/letters in the packet schema, each naming one real gap; 2 requisitions untailorable (no ad text), nothing sent — the 2026-12-07 hold stands",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1tc3c0qr0ns7k4vbalycm"
-    },
-    {
-      "id": "2267a1a5-8afa-4080-9c49-ed9e7b0fb8f6",
-      "ts": "2026-11-26T09:43:13Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "claim: chain-change refactor pass — sddm/displayManager dup survey, hosts->modules",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/",
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "bafb0f66492d1b451af449381a8dc5696b0f8d7c",
-      "branch": "main",
-      "frame": "03hb1rzom03lnj81z6jptu88k"
     }
   ]
 }

@@ -127,6 +127,7 @@ The port map — every tailnet mount and its loopback upstream, compiled in
 | 8463 | Job pipeline board (appflow) | `nginx.service` | `127.0.0.1:8462` |
 | 8464 | Private deals (SQLite/FTS5 watchlist, price history) | `private-deals.service` | `127.0.0.1:8100` |
 | 8465 | Inventory site (assets, warranties, value; fleet-host seed) | `inventory-site.service` | `127.0.0.1:8101` |
+| 8466 | Job DB scraper (lane-scored postings, batch upsert) | `job-db-scraper.service` | `127.0.0.1:8102` |
 
 8462 is the board's loopback vhost, not a mount — `tailscale serve` and nginx
 both bind, so a mount and its upstream never share a number. Mounts are a

@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 19
+total_knobs = 20
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -212,5 +212,16 @@ option = "services.inventory-site.enable"
 path = "modules/services/inventory-site.nix"
 description = "Asset inventory in SQLite/FTS5 (:8465): locations, categories, tags, serials, warranties, value, JSON/CSV import-export, fleet-host seed"
 port = 8465
+default = false
+hosts = ["delphi"]
+
+[knobs.job-db-scraper]
+name = "Job DB Scraper"
+type = "service"
+category = "knowledge"
+option = "services.job-db-scraper.enable"
+path = "modules/services/job-db-scraper.nix"
+description = "Job postings in SQLite/FTS5 (:8466): deterministic lane scoring, batch upsert, deduped score-sorted surface"
+port = 8466
 default = false
 hosts = ["delphi"]

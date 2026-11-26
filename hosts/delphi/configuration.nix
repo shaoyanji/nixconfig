@@ -318,6 +318,7 @@ in {
     self.modules."services.dsh-free-models"
     self.modules."services.fleet-monitors"
     self.modules."services.inventory-site"
+    self.modules."services.job-db-scraper"
     self.modules."services.mataroa-console"
     self.modules."services.media-relay"
     self.modules."services.offload-bridge"
@@ -1148,6 +1149,7 @@ in {
   # Loopback only; the servicePortal mount is the whole exposure.
   services.private-deals.enable = true;
   services.inventory-site.enable = true;
+  services.job-db-scraper.enable = true;
   # The outcome lane out of the log: a minutely watcher pushes changed turn
   # outcomes to the operator on Telegram (token is the `hermes` sops key,
   # aliased for this service — delphi's own bot keeps its `delphi-telegram`).
@@ -1461,6 +1463,13 @@ in {
           title = "Inventory";
           description = "Assets with locations, categories, tags, serials, warranties and value; the fleet seeded in.";
           requires = ["inventory-site.service"];
+        };
+        job-db-scraper = {
+          port = config.services.job-db-scraper.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.job-db-scraper.port}";
+          title = "Job scraper";
+          description = "Postings with deterministic lane scores, batch-filed by the sweep, sorted by score.";
+          requires = ["job-db-scraper.service"];
         };
       };
     entries.gatus = {

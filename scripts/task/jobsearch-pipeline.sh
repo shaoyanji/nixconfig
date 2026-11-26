@@ -23,7 +23,7 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 root=$(cd "$here/../.." && pwd) || exit 1
 cd "$root" || exit 1
 
-boards="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone,arbeitnow"
+boards="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone,arbeitnow,jobsch"
 sweep="$(date +%F)"
 days=7
 limit=25
@@ -31,12 +31,14 @@ apply=0
 mail=0
 xs=0
 gh=0
+depth=
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --boards) boards=${2:-}; shift 2 ;;
     --sweep) sweep=${2:-}; shift 2 ;;
     --days) days=${2:-7}; shift 2 ;;
+    --depth) depth=${2:-1}; shift 2 ;;
     --limit) limit=${2:-25}; shift 2 ;;
     --apply) apply=1; shift ;;
     --mail) mail=1; shift ;;
@@ -83,6 +85,7 @@ if [ "$held_count" -lt 100 ]; then
 fi
 
 sweep_args=(--held "$held" --out "$ranked" --max-age "$days" --limit "$limit" --boards "$boards")
+[ -n "$depth" ] && sweep_args+=(--stepstone-depth "$depth")
 [ "$gh" = 1 ] && sweep_args+=(--gh)
 python3 "$here/jobsearch-sweep.py" "${sweep_args[@]}" || exit 1
 

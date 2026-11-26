@@ -30,6 +30,7 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
+from urllib.parse import quote
 
 UA = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -225,6 +226,10 @@ def recency(value: str) -> int | None:
             return None
     if re.match(r"^(today|heute)\b", value, re.I):
         return 0
+    if re.match(r"^(last|this)\s+week", value, re.I):
+        return 7
+    if re.match(r"^(last|this)\s+month", value, re.I):
+        return 30
     if re.match(r"^(gestern|yesterday)\b", value, re.I):
         return 1
     match = re.match(
@@ -247,7 +252,7 @@ def recency(value: str) -> int | None:
 
 
 def parse_boards(
-    boards: set[str], stepstone_pages: list[tuple[str, str]]
+    boards: set[str], stepstone_searches: list[tuple[str, str]], stepstone_depth: int = 1
 ) -> tuple[list[dict], list[dict]]:
     rows: list[dict] = []
     unnameable: list[dict] = []
@@ -322,50 +327,110 @@ def parse_boards(
             if oldest and (time.time() - oldest) > 10 * 86400:
                 break
             time.sleep(0.4)
+    if "jobsch" in boards:
+        # jobs.ch is the Swiss market, which no German board carries: the card is
+        # server-rendered, with the age first, the advertised title on the link,
+        # the city under "Place of work" and the employer after the contract
+        # type. 22 cards a page, so depth matters here too.
+        for query in ("devops", "sre", "platform", "infrastructure", "kubernetes", "cloud"):
+            for depth in range(1, 3):
+                try:
+                    listing = fetch(
+                        f"https://www.jobs.ch/en/vacancies/?term={quote(query)}&page={depth}"
+                    ).decode("utf-8", "replace")
+                except Exception as exc:
+                    print(f"jobsearch-sweep: jobs.ch {query} p{depth}: {exc}", file=sys.stderr)
+                    break
+                cards = listing.split('data-cy="vacancy-serp-item"')[1:]
+                if not cards:
+                    break
+                for chunk in cards:
+                    chunk = chunk[:20000]
+                    title = re.search(r'data-cy="job-link"[^>]*title="([^"]*)"', chunk)
+                    href = re.search(r'data-cy="job-link"[^>]*href="([^"]*)"', chunk)
+                    if not title or not href:
+                        continue
+                    plain = re.sub(r"<[^>]+>", "\n", chunk)
+                    lines = [html.unescape(x).strip() for x in plain.split("\n") if x.strip()]
+                    city = ""
+                    if "Place of work" in lines:
+                        at = lines.index("Place of work")
+                        city = next((x for x in lines[at + 1: at + 3] if x != ":"), "")
+                    company = ""
+                    if "Contract type" in lines:
+                        at = lines.index("Contract type")
+                        after = [x for x in lines[at + 1: at + 4] if x != ":"]
+                        if len(after) >= 2:
+                            company = after[1]
+                    if company in ("Promoted", "Is this job relevant to you?"):
+                        company = ""
+                    # The chunk starts mid-tag, so its first "line" is attribute
+                    # soup; the age is the first head line that parses as a date.
+                    stamps = [x for x in lines[:6] if recency(x) is not None]
+                    age = stamps[0] if stamps else ""
+                    add("jobsch", company, title.group(1), city,
+                        "https://www.jobs.ch" + href.group(1), age)
+                time.sleep(0.5)
     if "stepstone" in boards:
         seen: set[str] = set()
-        for query, city in stepstone_pages:
-            try:
-                page = fetch(
-                    f"https://www.stepstone.de/jobs/{query}?radius=30&where={city}",
-                    referer="https://www.stepstone.de/",
-                ).decode("utf-8", "replace")
-            except Exception as exc:
-                print(f"jobsearch-sweep: stepstone {query}/{city}: {exc}", file=sys.stderr)
-                continue
-            for block in page.split('data-at="job-item"')[1:]:
-                block = block[:24000]
-                link = re.search(
-                    r'data-at="job-item-title"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', block, re.S
-                )
-                if not link or link.group(1) in seen:
-                    continue
-                seen.add(link.group(1))
-                loc = re.search(r'data-at="job-item-location"[^>]*>(.*?)</', block, re.S)
-                when = re.search(r'data-at="job-item-timeago"[^>]*>(.*?)</', block, re.S)
-                company = ""
-                for pattern in (
-                    r'data-at="company-logo"[^>]*alt="([^"]+)"',
-                    r'data-at="company-logo"[^>]*title="([^"]+)"',
-                ):
-                    found = re.search(pattern, block)
-                    if found:
-                        company = clean(found.group(1))
-                        break
-                if not company:
-                    found = re.search(
-                        r'data-at="job-item-company-name"[^>]*>(.*?)</(?:span|div|p|a)>', block, re.S
+        for query, city in stepstone_searches:
+            # `&page=` is the board's own paging and each page carries 26 cards,
+            # so depth 1 sees a twentieth of a metro search. The city is quoted:
+            # `where=Frankfurt am Main` is rejected as a control character and
+            # the search was silently skipped until 2026-11-26e.
+            for depth in range(1, stepstone_depth + 1):
+                try:
+                    page = fetch(
+                        f"https://www.stepstone.de/jobs/{query}"
+                        f"?radius=30&where={quote(city)}&page={depth}",
+                        referer="https://www.stepstone.de/",
+                    ).decode("utf-8", "replace")
+                except Exception as exc:
+                    print(
+                        f"jobsearch-sweep: stepstone {query}/{city} p{depth}: {exc}",
+                        file=sys.stderr,
                     )
-                    if found:
-                        company = clean(found.group(1))
-                if not company:
-                    slug = re.search(r"stellenangebote--(.+?)--\d+-inline", link.group(1))
-                    company = company_from_slug(slug.group(1)) if slug else ""
-                company = strip_place_prefix(company)
-                add("stepstone", company, link.group(2),
-                    clean(loc.group(1)) if loc else "", link.group(1),
-                    clean(when.group(1)) if when else "")
-            time.sleep(0.8)
+                    break
+                cards = page.split('data-at="job-item"')[1:]
+                if not cards:
+                    break
+                fresh_cards = 0
+                for block in cards:
+                    block = block[:24000]
+                    link = re.search(
+                        r'data-at="job-item-title"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', block, re.S
+                    )
+                    if not link or link.group(1) in seen:
+                        continue
+                    seen.add(link.group(1))
+                    fresh_cards += 1
+                    loc = re.search(r'data-at="job-item-location"[^>]*>(.*?)</', block, re.S)
+                    when = re.search(r'data-at="job-item-timeago"[^>]*>(.*?)</', block, re.S)
+                    company = ""
+                    for pattern in (
+                        r'data-at="company-logo"[^>]*alt="([^"]+)"',
+                        r'data-at="company-logo"[^>]*title="([^"]+)"',
+                    ):
+                        found = re.search(pattern, block)
+                        if found:
+                            company = clean(found.group(1))
+                            break
+                    if not company:
+                        found = re.search(
+                            r'data-at="job-item-company-name"[^>]*>(.*?)</(?:span|div|p|a)>', block, re.S
+                        )
+                        if found:
+                            company = clean(found.group(1))
+                    if not company:
+                        slug = re.search(r"stellenangebote--(.+?)--\d+-inline", link.group(1))
+                        company = company_from_slug(slug.group(1)) if slug else ""
+                    company = strip_place_prefix(company)
+                    add("stepstone", company, link.group(2),
+                        clean(loc.group(1)) if loc else "", link.group(1),
+                        clean(when.group(1)) if when else "")
+                if not fresh_cards:
+                    break
+                time.sleep(0.8)
     return rows, unnameable
 
 
@@ -459,9 +524,10 @@ def main() -> int:
     ap.add_argument("--out", help="write the ranked JSON here instead of stdout")
     ap.add_argument("--max-age", type=int, default=7, help="days a posting may be old")
     ap.add_argument("--limit", type=int, default=25, help="employers to report")
-    ap.add_argument("--boards", default="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone,arbeitnow")
+    ap.add_argument("--boards", default="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone,arbeitnow,jobsch")
     ap.add_argument("--stepstone-queries", default="devops,platform,sre,cloud,infrastructure,kubernetes")
     ap.add_argument("--stepstone-cities", default="Berlin,Muenchen,Hamburg,Koeln")
+    ap.add_argument("--stepstone-depth", type=int, default=1, help="pages per query/city (26 cards each)")
     ap.add_argument("--gh", action="store_true", help="attribute GitHub activity (bounded gh api calls)")
     args = ap.parse_args()
     if args.self_test:
@@ -476,7 +542,7 @@ def main() -> int:
         for c in args.stepstone_cities.split(",")
     ] if "stepstone" in boards else []
 
-    rows, unnameable = parse_boards(boards, pages)
+    rows, unnameable = parse_boards(boards, pages, args.stepstone_depth)
     held = {norm(line.strip()) for line in open(args.held, encoding="utf-8") if line.strip()}
 
     def in_lane(row: dict) -> bool:

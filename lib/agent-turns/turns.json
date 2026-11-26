@@ -1,8 +1,56 @@
 {
-  "generated": "2026-11-26T13:21:17Z",
+  "generated": "2026-11-26T13:36:48Z",
   "count": 200,
-  "pin": "9104ee25ce50634aacd6141201dc56c282449ff4b4b110edaa32f4fdb1d93f8a",
+  "pin": "1ef5097635300cca58a90666228281a4fdbfd333940124686708991aac7d61d4",
   "turns": [
+    {
+      "id": "42f86f91-2475-4b9d-8680-eb89d2c97f34",
+      "ts": "2026-11-26T13:28:51Z",
+      "source": "devin",
+      "subject": "nixconfig:job-db-scraper-service",
+      "action": "claim: design and build tailnet-exposed job-db-scraper service for delphi",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/job-db-scraper",
+        "modules/services/job-db-scraper.nix",
+        "hosts/delphi/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "f89886c42b7fab8653daabecacf57f0a8ca60be3",
+      "branch": "main",
+      "frame": "03hb302cvg8rr3irbejgs3r4b"
+    },
+    {
+      "id": "54a4d455-2cde-4c96-8b41-98301da56208",
+      "ts": "2026-11-26T13:23:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "claim: job-scout pass 2026-11-26e — deepen Stepstone to page two, fix the unencoded city that drops Frankfurt, file linked in-lane leads via apps:scout, fold the pass into the is-a.dev CV job-search page with new framing",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "f89886c42b7fab8653daabecacf57f0a8ca60be3",
+      "branch": "main",
+      "frame": "03hb2yz9s47516femjy4puz6k"
+    },
+    {
+      "id": "9fd9a970-7512-4c1b-9c3a-1873fa430f0d",
+      "ts": "2026-11-26T13:22:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: sweep 2026-11-26d — six boards, 3603 postings, 110 fresh in lane, 11 new employers at 1670 held; 10 filed via apps:scout, 5 off-lane closed (2 internships, PM, freelance, feed artifact); 3 German leads folded into the is-a.dev CV job-search page (blog commit 5707a12); Arbeitnow is now a board. LinkedIn guest search 429, unread. | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py",
+        ".agents/skills/jobsearch-pipeline"
+      ],
+      "files": [],
+      "base_commit": "f89886c42b7fab8653daabecacf57f0a8ca60be3",
+      "branch": "main",
+      "frame": "03hb2yvjlfocr5ulwya9rwn00"
+    },
     {
       "id": "23383d81-8d1b-486a-8c26-10e8c796d035",
       "ts": "2026-11-26T13:20:30Z",
@@ -2953,48 +3001,6 @@
       "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
       "branch": "main",
       "frame": "03hayu1nwxp9traei52n11b47"
-    },
-    {
-      "id": "8fd6f7f9-1b7a-4025-a1cb-b7b96a57c2ed",
-      "ts": "2026-11-26T00:15:16Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
-      "action": "landed: hostField predicate + hmModules name->path map single-sourced in lib/hm-shared.nix (forHost, modulePaths); 5 sites rewired incl. hm-inventory-role (+inputs arg) | gate: drv-equality 5/5 identical + nix:lint 332 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
-      "branch": "main",
-      "frame": "03hayp1iosfxnbz14c6aj7b5u"
-    },
-    {
-      "id": "4736ca8f-5420-4b05-af76-602524370c32",
-      "ts": "2026-11-26T00:11:29Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-26: 1 plate(s) kept of 2 spent, 0 roster row(s) waiting, 772 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hayoaw83dn8ibfk34tnhpgy"
-    },
-    {
-      "id": "96b90cad-7606-4c3b-9696-99e0812b1a3a",
-      "ts": "2026-11-26T00:10:44Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
-      "action": "start: consolidate hostField + self.modules resolver into lib",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "lib/"
-      ],
-      "files": [],
-      "base_commit": "a77fe37e86f6fdb563e4957e5050fc7673830ed7",
-      "branch": "main",
-      "frame": "03hayo5oht4iuo789vjxq5d51"
     }
   ]
 }

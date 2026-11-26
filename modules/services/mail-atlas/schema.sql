@@ -287,6 +287,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+-- Saved views are operator state, not taxonomy: a named filter combination the
+-- reader can pin, replay and delete. The query fields deliberately mirror the
+-- search surface (`q`, `cat`, `box`) while `sender` and `tier` remember the
+-- sharper operator intent even when a replay has to translate them into the
+-- archive's one ranked query language.
+CREATE TABLE IF NOT EXISTS saved_view (
+  id         bigserial PRIMARY KEY,
+  name       text UNIQUE NOT NULL,
+  q          text NOT NULL DEFAULT '',
+  cat        text NOT NULL DEFAULT '',
+  box        text NOT NULL DEFAULT 'inbox'
+    CHECK (box IN ('inbox', 'queued', 'done', 'all')),
+  sender     text NOT NULL DEFAULT '',
+  tier       text NOT NULL DEFAULT ''
+    CHECK (tier IN ('', 'person', 'action', 'digest', 'robot', 'review', 'ignore')),
+  pinned     boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS saved_view_pinned_idx
+  ON saved_view (pinned, name);
+
 -- What a person decided about a message they just read: archive it, queue it for
 -- deletion, or hand it to Hermes with an instruction in their own words.
 --

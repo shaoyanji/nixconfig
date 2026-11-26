@@ -24,6 +24,8 @@ const state = {
   selected: new Set(),
   queued: new Map(),
   reader: { messageId: null, actions: [] },
+  views: [],
+  activeView: null,
   // The page as the archive answered it, and the slice of it on screen: an
   // untagged view filters what is loaded, it does not ask a second question.
   rows: [],
@@ -36,6 +38,14 @@ const el = {
   q: document.getElementById("q"),
   form: document.getElementById("search-form"),
   chips: document.getElementById("chips"),
+  savedViews: document.getElementById("saved-views"),
+  savedViewChips: document.getElementById("saved-view-chips"),
+  saveView: document.getElementById("save-view"),
+  analytics: document.getElementById("analytics"),
+  analyticsOpen: document.getElementById("analytics-open"),
+  analyticsClose: document.getElementById("analytics-close"),
+  analyticsBody: document.getElementById("analytics-body"),
+  threadTimeline: document.getElementById("thread-timeline"),
   hint: document.getElementById("hint"),
   categories: document.getElementById("categories"),
   results: document.getElementById("results"),
@@ -115,6 +125,16 @@ async function getJSON(path) {
 async function postJSON(path, body) {
   const response = await fetch(path, {
     method: "POST",
+    headers: { accept: "application/json", "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status} on ${path}`);
+  return response.json();
+}
+
+async function deleteJSON(path, body = {}) {
+  const response = await fetch(path, {
+    method: "DELETE",
     headers: { accept: "application/json", "content-type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -1571,6 +1591,156 @@ function renderChips() {
 }
 
 /* ------------------------------------------------------------------ */
+/* saved views + archive analytics                                     */
+/* ------------------------------------------------------------------ */
+
+function renderSavedViews() {
+  el.savedViewChips.textContent = "";
+  for (const view of state.views) {
+    const wrap = document.createElement("span");
+    wrap.className = `saved-view${state.activeView === view.id ? " on" : ""}`;
+
+    const apply = document.createElement("button");
+    apply.type = "button";
+    apply.className = "chip gold";
+    apply.title = [view.q && `query: ${view.q}`, view.cat && `gate: ${view.cat}`, view.box && `box: ${view.box}`, view.sender && `sender: ${view.sender}`, view.tier && `triage: ${view.tier}`]
+      .filter(Boolean)
+      .join(" · ");
+    apply.textContent = view.name;
+    apply.addEventListener("click", () => runSavedView(view));
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "saved-view-delete";
+    remove.textContent = "×";
+    remove.title = `delete saved view ${view.name}`;
+    remove.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      try {
+        await deleteJSON(`${API}/atlas-view-delete`, { id: view.id });
+        state.views = state.views.filter((item) => item.id !== view.id);
+        if (state.activeView === view.id) state.activeView = null;
+        renderSavedViews();
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    wrap.append(apply, remove);
+    el.savedViewChips.append(wrap);
+  }
+}
+
+async function loadSavedViews() {
+  try {
+    const rows = await getJSON(`${API}/atlas-views?lim=40`);
+    state.views = (Array.isArray(rows) ? rows : []).map((view) => ({
+      ...view,
+      id: Number(view.id),
+      q: view.q || "",
+      cat: view.cat || "",
+      box: view.box || "inbox",
+      sender: view.sender || "",
+      tier: view.tier || "",
+    }));
+    renderSavedViews();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function runSavedView(view) {
+  state.activeView = view.id;
+  state.untagged = false;
+  el.q.value = view.q || "";
+  state.cat = view.cat || "";
+  renderCategories();
+  state.box = view.box || "inbox";
+  renderBoxTabs();
+  runSearch({ inhale: true });
+}
+
+el.saveView.addEventListener("click", async () => {
+  const fallback = el.q.value.trim() || state.cat || `${state.box} mail`;
+  const name = window.prompt("name this view", fallback);
+  if (!name || !name.trim()) return;
+  try {
+    const rows = await postJSON(`${API}/atlas-view-save`, {
+      name: name.trim(),
+      q: el.q.value.trim(),
+      cat: state.cat,
+      box: state.box,
+      sender: "",
+      tier: "",
+      pinned: true,
+    });
+    const saved = Array.isArray(rows) ? rows[0] : rows;
+    if (saved) {
+      state.views = [...state.views.filter((view) => view.id !== Number(saved.id)), { ...saved, id: Number(saved.id) }];
+      state.views.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+      renderSavedViews();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+function metricList(title, rows, labelKey, countKey, emptyText) {
+  const items = (Array.isArray(rows) ? rows : []).slice(0, 8);
+  const max = Math.max(1, ...items.map((row) => Number(row[countKey] || 0)));
+  return `<section class="analytics-section"><h3>${esc(title)}</h3>${
+    items.length
+      ? items
+          .map((row) => {
+            const count = Number(row[countKey] || 0);
+            const width = Math.max(3, Math.round((count / max) * 100));
+            return `<div class="analytics-row"><span class="analytics-label">${esc(row[labelKey] ?? "unknown")}</span><span class="analytics-bar"><i style="width:${width}%"></i></span><b>${count}</b></div>`;
+          })
+          .join("")
+      : `<p class="dim">${esc(emptyText)}</p>`
+  }</section>`;
+}
+
+async function loadAnalytics() {
+  el.analyticsBody.innerHTML = '<p class="dim">listening…</p>';
+  try {
+    const rows = await getJSON(`${API}/atlas-analytics?days=90&lim=12`);
+    const data = Array.isArray(rows) ? rows[0] : rows;
+    const totals = typeof data.totals === "string" ? JSON.parse(data.totals) : data.totals || {};
+    const timeline = toArray(data.timeline);
+    const recent = timeline.slice(-14);
+    const maxDay = Math.max(1, ...recent.map((row) => Number(row.letters || 0)));
+    el.analyticsBody.innerHTML = `
+      <div class="analytics-total">
+        <span><b>${Number(totals.letters || 0)}</b> letters</span>
+        <span><b>${Number(totals.threads || 0)}</b> threads</span>
+        <span><b>${Number(totals.attachments || 0)}</b> attachments</span>
+        <span><b>${Number(totals.senders || 0)}</b> senders</span>
+      </div>
+      <section class="analytics-section"><h3>last fourteen days</h3><div class="analytics-days">${recent
+        .map((row) => `<span title="${esc(row.day)} · ${Number(row.letters || 0)} letters"><i style="height:${Math.max(4, Math.round((Number(row.letters || 0) / maxDay) * 44))}px"></i></span>`)
+        .join("")}</div></section>
+      <div class="analytics-grid">
+        ${metricList("domains", toArray(data.domains), "domain", "letters", "no domains in this window")}
+        ${metricList("tags", toArray(data.tags), "tag", "letters", "no tags in this window")}
+        ${metricList("triage", toArray(data.triage), "tier", "verdicts", "no verdicts in this window")}
+      </div>`;
+  } catch (error) {
+    console.error(error);
+    el.analyticsBody.innerHTML = '<p class="dim">the archive did not answer</p>';
+  }
+}
+
+el.analyticsOpen.addEventListener("click", () => {
+  el.analytics.showModal();
+  loadAnalytics();
+});
+el.analyticsClose.addEventListener("click", () => el.analytics.close());
+el.analytics.addEventListener("click", (event) => {
+  if (event.target === el.analytics) el.analytics.close();
+});
+
+/* ------------------------------------------------------------------ */
 /* search                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -1611,9 +1781,11 @@ async function runSearch({ updateURL = true, inhale = false, append = false } = 
   el.readoutHits.textContent = "—";
   el.readoutMs.textContent = "…";
 
-  const url = `${API}/atlas-search?q=${encodeURIComponent(q)}&cat=${encodeURIComponent(
-    state.cat,
-  )}&box=${encodeURIComponent(state.box)}&off=${state.offset}&lim=${LIMIT}`;
+  const url = state.activeView
+    ? `${API}/atlas-view-run?id=${encodeURIComponent(state.activeView)}&off=${state.offset}&lim=${LIMIT}`
+    : `${API}/atlas-search?q=${encodeURIComponent(q)}&cat=${encodeURIComponent(
+        state.cat,
+      )}&box=${encodeURIComponent(state.box)}&off=${state.offset}&lim=${LIMIT}`;
 
   const mine = ++request;
   try {
@@ -1684,6 +1856,8 @@ async function runSearch({ updateURL = true, inhale = false, append = false } = 
 }
 
 function setCategory(cat) {
+  state.activeView = null;
+  renderSavedViews();
   state.cat = state.cat === cat ? "" : cat;
   renderCategories();
   runSearch({ inhale: true });
@@ -1704,6 +1878,8 @@ function renderBoxTabs() {
 
 function setBox(box) {
   if (state.box === box) return;
+  state.activeView = null;
+  renderSavedViews();
   state.box = box;
   renderBoxTabs();
   runSearch({ inhale: true });
@@ -1985,11 +2161,46 @@ async function openReader(id) {
       .filter(Boolean)
       .join("");
     renderBody(plain(mail.bodyPlain ?? mail.body_plain ?? "", { lines: true }));
+    loadThreadTimeline(id, mail.messageId);
     el.reader.showModal();
   } catch (error) {
     console.error(error);
   }
 }
+
+document.getElementById("reader-close").addEventListener("click", () => el.reader.close());
+async function loadThreadTimeline(id, currentMessageId) {
+  el.threadTimeline.hidden = true;
+  el.threadTimeline.textContent = "";
+  try {
+    const rows = await getJSON(`${API}/atlas-thread?id=${encodeURIComponent(id)}&lim=80`);
+    const letters = (Array.isArray(rows) ? rows : []).map(normalize);
+    if (!letters.length) return;
+    const first = rows[0];
+    const participants = toArray(first.participants).filter(Boolean);
+    el.threadTimeline.innerHTML = [
+      `<div class="thread-head"><b>${letters.length}</b> letter${letters.length === 1 ? "" : "s"} in thread · ${participants.length || 1} participant${participants.length === 1 ? "" : "s"}</div>`,
+      ...letters.map((mail) => {
+        const current = mail.messageId === currentMessageId;
+        return `<button type="button" class="thread-letter${current ? " current" : ""}" data-id="${esc(mail.id)}" ${current ? "disabled" : ""}>
+          <span class="thread-when">${esc(when(mail.sentAt) || "undated")}</span>
+          <span class="thread-sender">${esc(mail.sender || "unknown")}</span>
+          <span class="thread-subject">${esc(mail.subject)}</span>
+          ${mail.attachmentPath ? '<span class="thread-attachment">attachment</span>' : ""}
+        </button>`;
+      }),
+    ].join("");
+    el.threadTimeline.hidden = false;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+el.threadTimeline.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-id]");
+  if (!button || button.disabled) return;
+  openReader(button.dataset.id);
+});
 
 document.getElementById("reader-close").addEventListener("click", () => el.reader.close());
 el.reader.addEventListener("click", (event) => {
@@ -2018,6 +2229,8 @@ el.form.addEventListener("submit", (event) => {
 el.q.addEventListener(
   "input",
   debounce(() => {
+    state.activeView = null;
+    renderSavedViews();
     const point = searchPoint();
     if (qi) qi.caret(point.x, point.y);
     runSearch();
@@ -2394,6 +2607,7 @@ field.onClear(() => {
     renderCategories();
     state.recent = recentQueries();
     renderChips();
+    loadSavedViews();
     try {
       if (localStorage.getItem("atlas.field") === "folded") setField(true);
     } catch {

@@ -1491,6 +1491,17 @@ tasks:
       - bash tests/mail-atlas-api/run.sh
       - python3 -m unittest discover -s modules/services/mail-atlas -p 'test_*.py'
 
+  checks:mail-atlas:site:
+    desc: "Drawer smoke assertions without a browser (BROWSER_STUB payloads), plus the clanker lane's contract"
+    summary: >
+      Runs `tests/mail-atlas-site/browser-stub/run.sh`, which feeds the real
+      verifier a canned payload through `BROWSER_STUB`: the good payload passes,
+      a two-row page and a missing `#sources-open` fail. The live lane is not
+      gated — `CLANKER_BROWSER=1 bash tests/mail-atlas-site/run.sh` copies the
+      site and stub to clanker, drives its browser, and cleans both up.
+    cmds:
+      - bash tests/mail-atlas-site/browser-stub/run.sh
+
   checks:sops:drift:test:
     desc: "Regression fixture for checks:sops:drift (seeded dropped age recipient)"
     summary: >

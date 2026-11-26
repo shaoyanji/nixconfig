@@ -6,16 +6,60 @@
 # subset built in Nix, and the graph loads a wasm module — a smoke over `site/`
 # would pass while the packaged page showed tofu and a missing module.
 #
-# Needs `agent-browser` on PATH (the `full` AI tier, or
-# `nix shell github:numtide/llm-agents.nix#agent-browser -c tests/mail-atlas-site/run.sh`).
+# Browser backend:
+#   default            `agent-browser` on this host; exit 2 when it is missing
+#   CLANKER_BROWSER=1  agent-browser on InstaBox clanker through
+#                      `scripts/task/clanker-browser.sh`; the site and the stub
+#                      are copied there and served on its loopback
+#   CLANKER_BROWSER=0  force the local backend, even inside a clanker shell
+#   BROWSER_STUB=path  replace the browser with a script (the fixture in
+#                      `browser-stub/run.sh`); no browser is needed at all
+#
+# Exit: 0 the assertions pass, 1 they do not, 2 the fixture cannot run.
 set -uo pipefail
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo" || exit 2
 
-command -v agent-browser >/dev/null || {
-  echo "mail-atlas-site: agent-browser not on PATH — install it, do not skip silently" >&2
-  exit 2
+mode=local
+case "${CLANKER_BROWSER:-}" in
+  1) mode=clanker ;;
+  0 | "") ;;
+  *)
+    echo "mail-atlas-site: CLANKER_BROWSER takes 0 or 1, not $CLANKER_BROWSER" >&2
+    exit 2
+    ;;
+esac
+
+browser() {
+  if [ -n "${BROWSER_STUB:-}" ]; then
+    bash "$BROWSER_STUB" "$@"
+  elif [ "$mode" = clanker ]; then
+    bash "$repo/scripts/task/clanker-browser.sh" "$@"
+  else
+    agent-browser "$@"
+  fi
+}
+
+if [ -z "${BROWSER_STUB:-}" ] && [ "$mode" = local ]; then
+  command -v agent-browser >/dev/null || {
+    echo "mail-atlas-site: agent-browser not on PATH — install it, do not skip silently" >&2
+    echo "mail-atlas-site: or run with CLANKER_BROWSER=1 to use clanker's browser" >&2
+    exit 2
+  }
+fi
+
+if [ "$mode" = clanker ]; then
+  command -v bash >/dev/null
+  [ -f "$repo/scripts/task/instabox.sh" ] || {
+    echo "mail-atlas-site: scripts/task/instabox.sh is missing" >&2
+    exit 2
+  }
+fi
+
+# reach <command...> — run on clanker over instabox's ssh.
+reach() {
+  bash "$repo/scripts/task/instabox.sh" ssh clanker "$@"
 }
 
 echo "== building the site derivation"
@@ -26,8 +70,14 @@ site="$(nix build --no-link --print-out-paths \
 }
 
 work="$(mktemp -d /tmp/mail-atlas-smoke.XXXXXX)"
+remote_dir=""
 cleanup() {
   [ -n "${stub_pid:-}" ] && kill "$stub_pid" 2>/dev/null
+  # The pidfile the starter wrote, never a pattern: a `pkill -f` here matches
+  # the cleanup command's own argv and kills the shell running it.
+  if [ -n "$remote_dir" ]; then
+    reach "p=\$(cat '$remote_dir/stub.pid' 2>/dev/null); [ -n \"\$p\" ] && kill \"\$p\" 2>/dev/null; chmod -R u+w '$remote_dir' 2>/dev/null; rm -rf '$remote_dir'" >/dev/null 2>&1
+  fi
   rm -rf "$work"
 }
 trap cleanup EXIT
@@ -103,22 +153,69 @@ class Handler(SimpleHTTPRequestHandler):
 ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
 PY
 
+if [ "$mode" = clanker ]; then
+  # clanker needs the bytes and the page; its browser cannot see this host's
+  # loopback, and this host is not on clanker's tailnet.
+  remote_dir="$(reach 'd=$(mktemp -d /data/tmp/mail-atlas-smoke.XXXXXX) && mkdir -p "$d/site" && printf %s "$d"' 2>/dev/null)" || {
+    echo "mail-atlas-site: could not make a work dir on clanker" >&2
+    exit 1
+  }
+  [ -n "$remote_dir" ] || {
+    echo "mail-atlas-site: clanker returned no work dir" >&2
+    exit 1
+  }
+  # A starter that records its own pid: `setsid -f` returns at once, so `$!` on
+  # this side is the fork that already exited, and a `pkill -f` cleanup would
+  # match the cleanup command itself. The pidfile is the only name that is true.
+  cat >"$work/start.sh" <<'SH'
+#!/usr/bin/env bash
+here=$(cd "$(dirname "$0")" && pwd)
+echo $$ >"$here/stub.pid"
+exec python3 "$here/stub.py" "$here/site" "$1" </dev/null >"$here/stub.log" 2>&1
+SH
+
+  echo "== copying the site + stub to clanker:$remote_dir"
+  tar -C "$site" -cf - . | reach "tar -C '$remote_dir/site' -xf -" || {
+    echo "mail-atlas-site: the site did not copy to clanker" >&2
+    exit 1
+  }
+  # The store's files are read-only and would be undeletable there; a copy owes
+  # the host a writable directory it can clean up.
+  reach "chmod -R u+w '$remote_dir'" >/dev/null 2>&1
+  reach "cat > '$remote_dir/stub.py'" <"$work/stub.py" || {
+    echo "mail-atlas-site: the stub did not copy to clanker" >&2
+    exit 1
+  }
+  reach "cat > '$remote_dir/start.sh' && chmod +x '$remote_dir/start.sh'" <"$work/start.sh" || {
+    echo "mail-atlas-site: the starter did not copy to clanker" >&2
+    exit 1
+  }
+fi
+
 port="$(python3 - <<'PY'
-import socket
-s = socket.socket()
-s.bind(("127.0.0.1", 0))
-print(s.getsockname()[1])
-s.close()
+import random
+print(random.randint(30000, 39000))
 PY
 )"
 
-python3 "$work/stub.py" "$site" "$port" &
-stub_pid=$!
-
-for _ in $(seq 1 40); do
-  curl -sf -o /dev/null "http://127.0.0.1:$port/api/atlas-stats" && break
-  sleep 0.1
-done
+if [ "$mode" = clanker ]; then
+  # A plain `&` keeps the ssh channel open until the stub dies (the session
+  # waits on it), which reads as a hang; `setsid -f` forks and returns.
+  reach "setsid -f bash '$remote_dir/start.sh' $port" >/dev/null 2>&1
+  # One remote wait, not forty round trips: each instabox call costs ~2s.
+  if ! reach "for i in \$(seq 1 40); do curl -sf -o /dev/null 'http://127.0.0.1:$port/api/atlas-stats' && exit 0; sleep 0.25; done; exit 1" >/dev/null 2>&1; then
+    echo "mail-atlas-site: the stub on clanker did not answer on $port" >&2
+    reach "cat '$remote_dir/stub.log' 2>/dev/null" >&2
+    exit 1
+  fi
+else
+  python3 "$work/stub.py" "$site" "$port" &
+  stub_pid=$!
+  for _ in $(seq 1 40); do
+    curl -sf -o /dev/null "http://127.0.0.1:$port/api/atlas-stats" && break
+    sleep 0.1
+  done
+fi
 
 cat >"$work/probe.js" <<'JS'
 (async () => {
@@ -197,9 +294,21 @@ cat >"$work/probe.js" <<'JS'
 })()
 JS
 
-echo "== driving a browser against $site"
-agent-browser open "http://127.0.0.1:$port/" >/dev/null 2>&1
-got="$(agent-browser eval --stdin <"$work/probe.js" 2>/dev/null | tail -1)"
+if [ -z "${BROWSER_STUB:-}" ]; then
+  echo "== driving a browser against $site"
+else
+  echo "== driving the stub browser against $site"
+fi
+browser open "http://127.0.0.1:$port/" >/dev/null 2>&1
+if [ -n "${BROWSER_STUB:-}" ] || [ "$mode" = clanker ]; then
+  # `instabox.sh exec` hands the command to an API, so nothing can be piped
+  # into it: the script travels as one argv, which the wrapper quotes.
+  got="$(browser eval "$(cat "$work/probe.js")" 2>/dev/null)"
+else
+  got="$(browser eval --stdin <"$work/probe.js" 2>/dev/null)"
+fi
+# An answer ends with a blank line; taking `tail -1` would read that blank.
+got="$(printf '%s\n' "$got" | awk 'NF' | tail -1)"
 
 python3 - "$got" <<'PY'
 import json, sys

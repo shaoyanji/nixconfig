@@ -328,6 +328,12 @@ drawer, and asserts three rows in volume order, the untagged badge, the summary
 line and that a row click searches its domain. Absent `agent-browser` it exits 2
 rather than passing quietly.
 
+On a host without a browser, `CLANKER_BROWSER=1` runs the same probe through
+`scripts/task/clanker-browser.sh`: the site and the stub are copied to clanker
+and served on its loopback, and the run kills the stub and deletes the copy when
+it exits. `tests/mail-atlas-site/browser-stub/run.sh` checks the assertions with
+no browser at all.
+
 The last line should end in a number: rows added. `0` means the archive is fully
 tagged against the current rules.
 

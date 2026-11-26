@@ -272,6 +272,102 @@ class EndpointTest(unittest.TestCase):
         self.assertFalse(smoke.check_endpoint(BASE, "/api/machines", fetch=fetch)[0])
 
 
+class ExportTest(unittest.TestCase):
+    def test_a_csv_packet_passes_with_its_header(self):
+        fetch = responder({"format=csv": (200, "text/csv; charset=utf-8", "id,company\n1,ACME\n")})
+        ok, detail = smoke.check_export(BASE, "/api/postings/export?format=csv", "text/csv", fetch=fetch)
+        self.assertTrue(ok)
+        self.assertIn("bytes of text/csv", detail)
+
+    def test_a_markdown_packet_passes(self):
+        fetch = responder({"format=markdown": (200, "text/markdown; charset=utf-8", "# Job posting packet\n")})
+        self.assertTrue(
+            smoke.check_export(BASE, "/api/postings/export?format=markdown", "text/markdown", fetch=fetch)[0]
+        )
+
+    def test_an_rss_feed_is_a_document(self):
+        fetch = responder({"feed.rss": (200, "application/rss+xml", "<rss><channel/></rss>")})
+        ok, detail = smoke.check_export(BASE, "/api/deals/feed.rss", "xml", fetch=fetch)
+        self.assertTrue(ok)
+        self.assertIn("application/rss+xml", detail)
+
+    def test_a_json_export_has_to_parse(self):
+        fetch = responder({"/api/deals/export": (200, "application/json", body({"items": [{"id": 1}]}))})
+        ok, detail = smoke.check_export(BASE, "/api/deals/export", "json", fetch=fetch)
+        self.assertTrue(ok)
+        self.assertIn("1 row(s)", detail)
+        broken = responder({"/api/deals/export": (200, "application/json", "<html>")})
+        self.assertFalse(smoke.check_export(BASE, "/api/deals/export", "json", fetch=broken)[0])
+
+    def test_json_served_where_csv_was_asked_for_fails(self):
+        fetch = responder({"format=csv": (200, "application/json", "{}")})
+        ok, detail = smoke.check_export(BASE, "/api/postings/export?format=csv", "text/csv", fetch=fetch)
+        self.assertFalse(ok)
+        self.assertIn("served application/json", detail)
+
+    def test_an_empty_document_fails(self):
+        fetch = responder({"format=csv": (200, "text/csv", "  \n")})
+        ok, detail = smoke.check_export(BASE, "/api/postings/export?format=csv", "text/csv", fetch=fetch)
+        self.assertFalse(ok)
+        self.assertIn("empty", detail)
+
+    def test_a_500_is_reported_with_its_path(self):
+        fetch = responder({"export.csv": (500, "application/json", body({"error": "boom"}))})
+        ok, detail = smoke.check_export(BASE, "/api/export.csv", "text/csv", fetch=fetch)
+        self.assertFalse(ok)
+        self.assertIn("/api/export.csv answered 500", detail)
+
+
+def prober(allows: dict, status=405):
+    """A fake OPTIONS probe: path tail -> the Allow header the server sends."""
+
+    def fake(url, timeout=10.0):
+        for tail, allow in allows.items():
+            if url.endswith(tail):
+                return status, allow, ""
+        return 405, "GET, HEAD", ""
+
+    return fake
+
+
+class RouteTest(unittest.TestCase):
+    def test_an_advertised_method_proves_the_route_is_deployed(self):
+        probe = prober({"/api/postings/1/stage": "GET, HEAD, PATCH"})
+        ok, detail = smoke.check_route(BASE, "/api/postings/1/stage", "PATCH", probe=probe)
+        self.assertTrue(ok)
+        self.assertIn("GET, HEAD, PATCH", detail)
+
+    def test_a_404_is_reported_as_not_deployed(self):
+        probe = prober({"/api/postings/1/notes": ""}, status=404)
+        ok, detail = smoke.check_route(BASE, "/api/postings/1/notes", "POST", probe=probe)
+        self.assertFalse(ok)
+        self.assertIn("not deployed", detail)
+
+    def test_a_path_that_only_advertises_get_is_named_as_missing_its_method(self):
+        probe = prober({"/api/watchlists/1/poll": "GET, HEAD"})
+        ok, detail = smoke.check_route(BASE, "/api/watchlists/1/poll", "POST", probe=probe)
+        self.assertFalse(ok)
+        self.assertIn("POST is missing", detail)
+
+    def test_an_answers_allow_list_is_read_case_insensitively(self):
+        probe = prober({"/api/watchlists/1/poll": "get,head,post"}, status=200)
+        self.assertTrue(smoke.check_route(BASE, "/api/watchlists/1/poll", "POST", probe=probe)[0])
+
+    def test_the_real_probe_reads_allow_from_a_405(self):
+        class Answer:
+            status = 405
+            headers = {"Allow": "GET, HEAD, PATCH"}
+
+            def read(self):
+                return b"Method Not Allowed"
+
+        def opener(_request, timeout=10.0):
+            raise urllib.error.HTTPError(BASE, 405, "no", Answer.headers, io.BytesIO(b"no body"))
+
+        status, allow, _body = smoke.probe_method(f"{BASE}/api/postings/1/stage", opener=opener)
+        self.assertEqual((status, allow), (405, "GET, HEAD, PATCH"))
+
+
 class QrTest(unittest.TestCase):
     def test_an_svg_label_passes(self):
         fetch = responder({"/api/items/7/qr.svg": (200, "image/svg+xml; charset=utf-8",
@@ -318,14 +414,21 @@ class ServiceTest(unittest.TestCase):
             "/api/health": (200, "application/json", body({"ok": True, "service": "job-db-scraper"})),
             "/api/stats": (200, "application/json", body({"postings": 1})),
             "/api/analytics": (200, "application/json", body({"generated_at": "now", "companies": []})),
+            # The export and writing-route keys come before `/api/postings`,
+            # which is a prefix of both of them.
+            "format=csv": (200, "text/csv; charset=utf-8", "id,company\n"),
+            "format=markdown": (200, "text/markdown; charset=utf-8", "# Job posting packet\n"),
+            "/api/postings/1/stage": (405, "text/plain", "Method Not Allowed"),
+            "/api/postings/1/notes": (405, "text/plain", "Method Not Allowed"),
             "/api/postings": (200, "application/json", body({"items": []})),
             "/": (200, "text/html", '<html><div id="metric-jobs"></div>'),
         })
-        result = smoke.smoke_service("jobs", smoke.SERVICES["jobs"], self.ARGS, fetch=fetch)
+        probe = prober({"/stage": "GET, HEAD, PATCH", "/notes": "GET, HEAD, POST"})
+        result = smoke.smoke_service("jobs", smoke.SERVICES["jobs"], self.ARGS, fetch=fetch, probe=probe)
         self.assertTrue(result["ok"])
         self.assertEqual(
             [c["check"] for c in result["checks"]],
-            ["health", "stats", "analytics", "page", "search"],
+            ["health", "stats", "analytics", "page", "search", "export-csv", "export-markdown", "patch stage", "post notes"],
         )
         self.assertEqual(result["base"], BASE)
 
@@ -351,15 +454,56 @@ class ServiceTest(unittest.TestCase):
             "/api/stats": (200, "application/json", body({"bookmarks": 0})),
             "/api/links": (200, "application/json", body({"links": [{"id": 1}], "count": 1})),
             "/api/tags": (200, "application/json", body({"tags": ["nix"], "count": 1})),
+            "/api/feeds": (200, "application/json", body({"items": [], "total": 0})),
+            "/api/analytics": (200, "application/json", body({"generated_at": "now", "tags": []})),
             "/": (200, "text/html", '<html><section id="metrics"></section>'),
         })
         result = smoke.smoke_service("link_vault", smoke.SERVICES["link_vault"], self.ARGS, fetch=fetch)
         self.assertTrue(result["ok"])
         self.assertEqual(
             [c["check"] for c in result["checks"]],
-            ["health", "stats", "page", "search", "tags"],
+            ["health", "stats", "analytics", "page", "search", "tags", "feeds"],
         )
         self.assertIn("1 row(s)", [c["detail"] for c in result["checks"] if c["check"] == "tags"][0])
+
+    def test_deals_runs_its_exports_and_the_watchlist_poll_route(self):
+        fetch = responder({
+            "/api/health": (200, "application/json", body({"ok": True, "service": "private-deals"})),
+            "/api/stats": (200, "application/json", body({"deals": 0})),
+            "/api/analytics": (200, "application/json", body({"generated_at": "now", "sources": []})),
+            "/api/deals/feed.rss": (200, "application/rss+xml", "<rss><channel/></rss>"),
+            "/api/deals/export": (200, "application/json", body({"items": []})),
+            "/api/export.csv": (200, "text/csv; charset=utf-8", "id,title\n"),
+            "/api/watchlists/1/poll": (405, "text/plain", "Method Not Allowed"),
+            "/api/deals": (200, "application/json", body({"items": []})),
+            "/": (200, "text/html", '<html><div id="stats"></div>'),
+        })
+        probe = prober({"/api/watchlists/1/poll": "GET, HEAD, POST"})
+        result = smoke.smoke_service("deals", smoke.SERVICES["deals"], self.ARGS, fetch=fetch, probe=probe)
+        self.assertTrue(result["ok"])
+        self.assertEqual(
+            [c["check"] for c in result["checks"]],
+            ["health", "stats", "analytics", "page", "search", "export-json", "feed-rss", "export-csv", "post watchlist-poll"],
+        )
+
+    def test_a_missing_writing_route_fails_the_service(self):
+        fetch = responder({
+            "/api/health": (200, "application/json", body({"ok": True, "service": "private-deals"})),
+            "/api/stats": (200, "application/json", body({"deals": 0})),
+            "/api/analytics": (200, "application/json", body({"generated_at": "now"})),
+            "/api/deals/feed.rss": (200, "application/rss+xml", "<rss/>"),
+            "/api/deals/export": (200, "application/json", body({"items": []})),
+            "/api/export.csv": (200, "text/csv", "id\n"),
+            "/api/watchlists/1/poll": (404, "text/plain", "404 page not found"),
+            "/api/deals": (200, "application/json", body({"items": []})),
+            "/": (200, "text/html", '<html><div id="stats"></div>'),
+        })
+        probe = prober({"/api/watchlists/1/poll": ""}, status=404)
+        result = smoke.smoke_service("deals", smoke.SERVICES["deals"], self.ARGS, fetch=fetch, probe=probe)
+        self.assertFalse(result["ok"])
+        failed = [c for c in result["checks"] if not c["ok"]]
+        self.assertEqual([c["check"] for c in failed], ["post watchlist-poll"])
+        self.assertIn("not deployed", failed[0]["detail"])
 
     def test_a_links_wrapper_is_rows(self):
         self.assertEqual(smoke.rows_of({"links": [{"id": 1}], "count": 1}), [{"id": 1}])
@@ -482,6 +626,15 @@ class MainTest(unittest.TestCase):
                 return 200, "application/json", body({"n": 1})
             if "/api/analytics" in url:
                 return 200, "application/json", body({"generated_at": "now", "items": []})
+            # A writing route answers the smoke's GET with 405, as Go's mux does.
+            if any(url.split("?")[0].endswith(tail) for tail in ("/stage", "/notes", "/poll")):
+                return 405, "text/plain", "Method Not Allowed"
+            if "format=csv" in url or url.endswith("/api/export.csv"):
+                return 200, "text/csv; charset=utf-8", "id,company\n"
+            if "format=markdown" in url:
+                return 200, "text/markdown; charset=utf-8", "# Job posting packet\n"
+            if url.endswith("/feed.rss"):
+                return 200, "application/rss+xml", "<rss><channel/></rss>"
             if "/api/" in url:
                 return 200, "application/json", body({"items": []})
             return 200, "text/html", (
@@ -502,8 +655,10 @@ class MainTest(unittest.TestCase):
             "--link-vault", "http://127.0.0.1:8506",
             *argv_extra,
         ]
+        probe = prober({"/stage": "GET, HEAD, PATCH", "/notes": "GET, HEAD, POST", "/poll": "GET, HEAD, POST"})
         with mock.patch.object(sys, "argv", argv), \
             mock.patch.object(smoke, "fetch", fetch), \
+            mock.patch.object(smoke, "probe_method", probe), \
             contextlib.redirect_stdout(out):
             code = smoke.main()
         return code, out.getvalue()

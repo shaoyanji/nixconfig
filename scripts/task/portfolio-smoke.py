@@ -7,8 +7,9 @@ a JSON API from the same binary over SQLite with an FTS5 index. They fail in way
 cannot see: the process answers, the page renders, and the query behind it is
 broken — an index that never got built, a stats query against a renamed column, a
 shell whose JS throws before it draws. This runs the things a person actually
-does — health, stats, the analytics report, the page, one search, a printable
-label — and says which one broke.
+does — health, stats, the analytics report, the page, one search, a packet
+export, the advertised method of a writing route, a printable label — and says
+which one broke.
 
     task agents:portfolio:smoke                # local loopback defaults
     task agents:portfolio:smoke -- --deals http://127.0.0.1:8502 --format toon
@@ -48,6 +49,17 @@ SERVICES = {
         "analytics": "/api/analytics",
         "id": "metric-jobs",
         "query": "engineer",
+        # A packet and a label are downloads, not JSON, and the stage/notes
+        # routes only answer another method — a GET that comes back 405 is how a
+        # read-only smoke proves a writing route is deployed instead of guessing.
+        "exports": (
+            ("/api/postings/export?format=csv", "text/csv", "export-csv"),
+            ("/api/postings/export?format=markdown", "text/markdown", "export-markdown"),
+        ),
+        "routes": (
+            ("/api/postings/1/stage", "PATCH", "stage"),
+            ("/api/postings/1/notes", "POST", "notes"),
+        ),
     },
     "deals": {
         "label": "private-deals",
@@ -56,6 +68,12 @@ SERVICES = {
         "analytics": "/api/analytics",
         "id": "stats",
         "query": "deals",
+        "exports": (
+            ("/api/deals/export", "json", "export-json"),
+            ("/api/deals/feed.rss", "xml", "feed-rss"),
+            ("/api/export.csv", "text/csv", "export-csv"),
+        ),
+        "routes": (("/api/watchlists/1/poll", "POST", "watchlist-poll"),),
     },
     "inventory": {
         "label": "inventory-site",
@@ -79,8 +97,9 @@ SERVICES = {
         "flag": "link-vault",
         "api": "http://127.0.0.1:8106",
         "search": "/api/links",
+        "analytics": "/api/analytics",
         "id": "metrics",
-        "endpoints": ("/api/tags",),
+        "endpoints": ("/api/tags", "/api/feeds"),
         "query": "nix",
     },
 }
@@ -214,6 +233,80 @@ def check_endpoint(base, path, timeout=10.0, fetch=fetch):
     return False, f"{path} answered neither rows nor an object: {body[:80]!r}"
 
 
+def check_export(base, path, expect, timeout=10.0, fetch=fetch):
+    """A download that is a document, not a JSON error served with 200.
+
+    `expect` is a substring of the content type — `text/csv`, `text/markdown`,
+    `xml` — or the exact word `json`, whose document then has to parse.
+    """
+    status, ctype, body = fetch(f"{base}{path}", timeout)
+    if status != 200:
+        return False, f"{path} answered {status}"
+    kind = (ctype or "").lower()
+    if expect == "json":
+        try:
+            payload = json.loads(body)
+        except json.JSONDecodeError as exc:
+            return False, f"{path} is not JSON: {exc}"
+        rows = rows_of(payload)
+        if rows is not None:
+            return True, f"{path} -> {len(rows)} row(s)"
+        if isinstance(payload, dict):
+            return True, f"{path} -> {len(payload)} keys"
+        return False, f"{path} is neither rows nor an object: {body[:80]!r}"
+    if expect not in kind:
+        return False, f"{path} served {ctype or 'no content type'}, expected {expect}"
+    if not body.strip():
+        return False, f"{path} is empty"
+    return True, f"{len(body)} bytes of {kind.split(';')[0]}"
+
+
+def probe_method(url, timeout=10.0, opener=None):
+    """One OPTIONS request: status, and the methods the server advertises.
+
+    `fetch` is a GET, and a GET cannot tell a writing route from one that is not
+    there: every one of these services registers `GET /`, so a GET on a PATCH
+    path falls through to the index handler and answers 404 either way. Measured
+    on the tree build, OPTIONS answers 405 with `Allow: GET, HEAD, PATCH` for the
+    real route and `Allow: GET, HEAD` for a path nobody registered — the header
+    is the difference, not the code.
+    """
+    opener = opener or urllib.request.urlopen
+    request = urllib.request.Request(url, headers={"User-Agent": UA}, method="OPTIONS")
+    try:
+        with opener(request, timeout=timeout) as response:
+            return (
+                response.status,
+                response.headers.get("Allow", "") or "",
+                response.read().decode("utf-8", "replace")[:200],
+            )
+    except urllib.error.HTTPError as exc:
+        allow = (exc.headers.get("Allow", "") if exc.headers else "") or ""
+        return exc.code, allow, exc.read().decode("utf-8", "replace")[:200]
+    except urllib.error.URLError as exc:
+        raise FetchError(f"unreachable: {exc.reason}") from exc
+    except OSError as exc:
+        raise FetchError(f"unreachable: {exc}") from exc
+
+
+def check_route(base, path, method, timeout=10.0, probe=probe_method):
+    """A writing route, proved by the methods it advertises to OPTIONS.
+
+    Nothing is written and nothing is read: the advertised method list is what a
+    deployed PATCH or POST looks like from outside, and it is absent when the
+    deployed generation predates the route.
+    """
+    status, allow, body = probe(f"{base}{path}", timeout)
+    advertised = {part.strip().upper() for part in allow.split(",") if part.strip()}
+    if method.upper() in advertised:
+        return True, f"{path} advertises {', '.join(sorted(advertised))}"
+    if status == 404:
+        return False, f"{path} is not deployed (404)"
+    if status == 405:
+        return False, f"{path} advertises {', '.join(sorted(advertised)) or 'nothing'}; {method} is missing"
+    return False, f"{path} answered {status} to OPTIONS: {body[:80]!r}"
+
+
 def first_item_id(base, timeout=10.0, fetch=fetch):
     """One asset id, or None when the register is still empty."""
     status, _ctype, body = fetch(f"{base}/api/items?limit=1", timeout)
@@ -300,7 +393,7 @@ def check_dom(
     return False, f"{marker} is missing or empty in the rendered page"
 
 
-def smoke_service(key, spec, args, fetch=fetch, run=subprocess.run):
+def smoke_service(key, spec, args, fetch=fetch, run=subprocess.run, probe=probe_method):
     base = getattr(args, key) or spec["api"]
     name = spec["label"]
     checks = []
@@ -328,6 +421,10 @@ def smoke_service(key, spec, args, fetch=fetch, run=subprocess.run):
             )
         for path in spec.get("endpoints", ()):
             record(path.rsplit("/", 1)[-1], check_endpoint(base, path, args.timeout, fetch))
+        for path, expect, name in spec.get("exports", ()):
+            record(name, check_export(base, path, expect, args.timeout, fetch))
+        for path, method, name in spec.get("routes", ()):
+            record(f"{method.lower()} {name}", check_route(base, path, method, args.timeout, probe))
         if spec.get("qr"):
             item_id = first_item_id(base, args.timeout, fetch)
             if item_id is None:
@@ -381,7 +478,8 @@ def main() -> int:
     args = apply_browser_flags(parser.parse_args())
 
     services = {
-        key: smoke_service(key, spec, args, fetch, subprocess.run) for key, spec in SERVICES.items()
+        key: smoke_service(key, spec, args, fetch, subprocess.run, probe_method)
+        for key, spec in SERVICES.items()
     }
     failed = [name for name, result in services.items() if not result["ok"]]
     summary = {

@@ -7,6 +7,16 @@
 # writer), the mail read is the archive API, the turn is `agents:xs:post`. This
 # file only sequences them and reports what each one proved, so a sweep cannot
 # skip the dedupe or claim a lead it never filed.
+#
+# There is no local fallback for the held list, on purpose. apps-db.sh caches
+# nothing — it asks the API on every call — so when delphi is down the only
+# local material is the row filenames under ~/.local/state/appflow/submissions.
+# Measured 2026-11-26: a 149-name proxy cut from those slugs (employer part,
+# role words trimmed) reported 93 new employers where the record reported 1, and
+# that one, `Bundesamt fuer Migration und Fluechtlinge`, was the already-tracked
+# `bamf-devops` row under its full name. A slug is not an employer name, so
+# dedupe against one manufactures the duplicates apps:add exists to refuse; the
+# sweep refuses instead.
 set -uo pipefail
 
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)

@@ -1,8 +1,514 @@
 {
-  "generated": "2026-11-26T11:39:53Z",
+  "generated": "2026-11-26T11:43:38Z",
   "count": 200,
-  "pin": "61d0f6b87bddeaa736c8a66673a2488b87e569eb8716d4b0ec45eb35be62c7d2",
+  "pin": "ba54b9145df4e4fb4af8b3c70f512098fba6e38a3abbe12ebc27038df4a980ec",
   "turns": [
+    {
+      "id": "b71c5b9b-7e26-4b0c-9dc7-93a97998d40a",
+      "ts": "2026-11-26T11:43:27Z",
+      "source": "agy",
+      "subject": "nixconfig:delphi-dup-services",
+      "action": "incident: restore delphi :8449/:8450 + finish dup-service offload",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "3bf9da0bb89b55372d7a24dd3380950e469b4471",
+      "branch": "main",
+      "frame": "03hb2fhebj59bt0btm3xxuj7j"
+    },
+    {
+      "id": "903aa083-cedb-4e3b-8e91-fcfbf14c0ba8",
+      "ts": "2026-11-26T11:42:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "docs-budget gate: shrink longSummary, re-verify appflow check",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "3bf9da0bb89b55372d7a24dd3380950e469b4471",
+      "branch": "main",
+      "frame": "03hb2fhdrxpweu72h41tq31z4"
+    },
+    {
+      "id": "d1d92220-b18a-4dce-a418-abb2392933cc",
+      "ts": "2026-11-26T11:42:16Z",
+      "source": "buffy",
+      "subject": "nixconfig:jobsearch-sweep-26d",
+      "action": "Record is back: sweep re-run against 1670 held employers gives 1 new, not the proxy's 93. Nothing filed.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3bf9da0bb89b55372d7a24dd3380950e469b4471",
+      "branch": "main",
+      "frame": "03hb2fhd6d7bhwqw2c2en5xus"
+    },
+    {
+      "id": "3277f2ad-2816-41bc-a608-f54da0f8d6ed",
+      "ts": "2026-11-26T11:40:01Z",
+      "source": "buffy",
+      "subject": "nixconfig:jobsearch-sweep-26d",
+      "action": "Sweep runs: 1406 parsed, 93 new vs proxy, 40 rejected. 11/19 Dec-07 rows have a live ad URL; 8 none. One-line crash fix committed; nothing filed.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py",
+        "scripts/task/jobsearch-pipeline.sh"
+      ],
+      "files": [],
+      "base_commit": "3bf9da0bb89b55372d7a24dd3380950e469b4471",
+      "branch": "main",
+      "frame": "03hb2esz8tgvgzxxlkmos26el"
+    },
+    {
+      "id": "62811747-9e85-48f5-b7f7-e19892c5a9e4",
+      "ts": "2026-11-26T11:39:56Z",
+      "source": "buffy",
+      "subject": "nixconfig:jobsearch-sweep-26d",
+      "action": "5-board sweep + Dec-07 packet URL verification; sweep crashes on NameError, fixing",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py",
+        "scripts/task/jobsearch-pipeline.sh"
+      ],
+      "files": [],
+      "base_commit": "3bf9da0bb89b55372d7a24dd3380950e469b4471",
+      "branch": "main",
+      "frame": "03hb2eswnb8e0cfoucxdndvtr"
+    },
+    {
+      "id": "a5224461-9d2f-4df1-a660-6abf00d00d4e",
+      "ts": "2026-11-26T11:35:01Z",
+      "source": "agy",
+      "subject": "nixconfig:jobsearch-sweep-26d",
+      "action": "novel: run fresh 5-board job sweep + verify Dec-07 packet URLs",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py",
+        "scripts/task/jobsearch-pipeline.sh"
+      ],
+      "files": [],
+      "base_commit": "6baedc19ff73c96c948d2a3cbcb883ddc2d8e4cf",
+      "branch": "main",
+      "frame": "03hb2esw0ofrk11kuhkheslpb"
+    },
+    {
+      "id": "1c4aff20-1ba4-4bb3-976e-86e72ced141e",
+      "ts": "2026-11-26T11:34:29Z",
+      "source": "agy",
+      "subject": "nixconfig:nix-comments-headroom",
+      "action": "prose-change: trim restating nix comments below 6495 ceiling",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services",
+        "modules/user",
+        "flake/policies.nix"
+      ],
+      "files": [],
+      "base_commit": "6baedc19ff73c96c948d2a3cbcb883ddc2d8e4cf",
+      "branch": "main",
+      "frame": "03hb2esv96nin67pz0xmma1w6"
+    },
+    {
+      "id": "e10ec656-e828-4da9-9b1d-c49aaa5ae926",
+      "ts": "2026-11-26T11:31:52Z",
+      "source": "devin",
+      "subject": "nixconfig:intents-verbs",
+      "action": "landed: verb audit — 37 unmapped ACTION prefixes sorted: 5 actor tags (capabilityIds + jev/steward/delphi shorthands), 6 kind-prefixed dispatches, 13 spellings via verbAliases, 6 verbs declared (verified deployed amended audit review refactor); residual 8 prose, reported not gated | gate: checks:intents PASS + fixture §6 32 cases",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6baedc19ff73c96c948d2a3cbcb883ddc2d8e4cf",
+      "branch": "main",
+      "frame": "03hb2esu7ihfkwk7g6q6sx8lh"
+    },
+    {
+      "id": "9a429f08-15cc-459c-a889-4ab4973292d3",
+      "ts": "2026-11-26T11:29:55Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-packet-budget",
+      "action": "desc 89->57 chars, summary 776->337; checks:tasks, checks:quick and ops:docs:budget pass. Three files committed.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/appflow-packet.sh",
+        "taskfiles/checks.yml",
+        "tests/appflow-packet"
+      ],
+      "files": [],
+      "base_commit": "3a9fb0be0ffc272d00a122dc4e18b262b34dc19c",
+      "branch": "main",
+      "frame": "03hb2estfkalfqtrxm2w7b8q8"
+    },
+    {
+      "id": "3df220fc-e022-4e70-a07c-1002a1043bce",
+      "ts": "2026-11-26T11:29:00Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "task-change: docs-budget gate on taskfiles/checks.yml:checks:appflow — shrink longSummary under cap, re-verify appflow check",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2esswf1zo65nrwrctfwfu"
+    },
+    {
+      "id": "4fc1ceff-588e-4da3-8abd-ed71a5298e9d",
+      "ts": "2026-11-26T11:26:34Z",
+      "source": "agy",
+      "subject": "nixconfig:delphi-pane",
+      "action": "blocked: delphi tailnet unreachable post-switch",
+      "outcome": "blocked: operator interactive SSH required to restore delphi tailnet",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2essc7r6g4wz1j1suwuo6"
+    },
+    {
+      "id": "ec224dc8-9196-4fd4-95be-2e452010ec16",
+      "ts": "2026-11-26T11:26:04Z",
+      "source": "agy",
+      "subject": "nixconfig:intents-verbs",
+      "action": "gate-change: audit 37 unmapped xs ACTION verbs in flake/intents.nix",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/intents.nix",
+        "scripts/task/intents-check.sh",
+        "tests/intents"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2esrtdo4wzzfomfcxf9dr"
+    },
+    {
+      "id": "283c441c-66ac-43b5-ade1-a78dcefeb7fa",
+      "ts": "2026-11-26T11:25:32Z",
+      "source": "agy",
+      "subject": "nixconfig:appflow-packet-budget",
+      "action": "task-change: shrink checks:appflow desc for docs-budget and commit 3 …",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/appflow-packet.sh",
+        "taskfiles/checks.yml",
+        "tests/appflow-packet"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2esr8pyqgnzk42fcto6nw"
+    },
+    {
+      "id": "502e38c7-0459-4849-bcb5-d7f439ea9f1b",
+      "ts": "2026-11-26T11:23:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-scout-1126",
+      "action": "CV surface published and verified (6/6 hashes, all linked). Sweep 7d refused at the held-list fetch; nothing filed.",
+      "outcome": "blocked: delphi:8450 unreachable — the record answered 0 employers, so dedupe and filing cannot run",
+      "claims": [
+        "lib/matt",
+        "scripts/task/jobsearch-pipeline.sh"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2esqotlne5o95bxq77xvx"
+    },
+    {
+      "id": "06f92cd1-9de3-47ec-b68d-1e60e334aff7",
+      "ts": "2026-11-26T11:21:16Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-dup-services",
+      "action": "delphi 3.1: finish dup-service offload, run host gate",
+      "outcome": "in_progress",
+      "claims": [
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2esq89jk0j4i9v3g6077c"
+    },
+    {
+      "id": "decf6f56-c608-4818-9245-a405cb26dd0a",
+      "ts": "2026-11-26T11:20:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-scout-1126",
+      "action": "CV lane: scout 7d DevOps/SRE leads, publish CV surface",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt",
+        "scripts/task/jobsearch-pipeline.sh"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2espsgts0qwijmck2d3r1"
+    },
+    {
+      "id": "5a4b7dd3-ee04-40c7-8bca-0be2a5021091",
+      "ts": "2026-11-26T11:20:02Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-packets-gc",
+      "action": "packets are copies not store symlinks; 23 recovered, 139 already GC-dead and named. tests/appflow-packet + checks:quick pass (checks:appflow API half unreachable).",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow",
+        "scripts/task/apps-scout.sh",
+        "tests/appflow-triage"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2esp3uxxkgjw5uyi9xngh"
+    },
+    {
+      "id": "4026c256-d5cd-4311-aef1-db76a925f4d7",
+      "ts": "2026-11-26T11:16:41Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-scout-1126",
+      "action": "CV lane: scout 7d DevOps/SRE leads, publish CV surface",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt",
+        "scripts/task/jobsearch-pipeline.sh"
+      ],
+      "files": [],
+      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
+      "branch": "main",
+      "frame": "03hb2esolk53bj5cvnoj5utmg"
+    },
+    {
+      "id": "9331bc6a-4755-4e6e-b15f-31115e56934d",
+      "ts": "2026-11-26T11:07:57Z",
+      "source": "agy",
+      "subject": "nixconfig:appflow-packets-gc",
+      "action": "bug-fix: stop appflow submission symlinks dangling after GC",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow",
+        "scripts/task/apps-scout.sh",
+        "tests/appflow-triage"
+      ],
+      "files": [],
+      "base_commit": "bc05770c093626cbaec6067c82fd122b5eb55c12",
+      "branch": "main",
+      "frame": "03hb2eso6z67xvvmevr8le63t"
+    },
+    {
+      "id": "7417f36c-e099-4c42-9849-82ef978dca28",
+      "ts": "2026-11-26T11:06:35Z",
+      "source": "agy",
+      "subject": "nixconfig:hermes-fallback",
+      "action": "commented out 403 tokenrouter and 405 cantrustai in hermes config; switched default to infron qwen3.8-27b:free at bc05770c | gate: checks:infron+test+hermes PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/user/ai/hermes-persona/config.yaml",
+        "scripts/task/infron-check.sh",
+        "tests/infron/run.sh"
+      ],
+      "files": [
+        "modules/user/ai/hermes-persona/config.yaml",
+        "scripts/task/infron-check.sh",
+        "tests/infron/run.sh"
+      ],
+      "base_commit": "bc05770c093626cbaec6067c82fd122b5eb55c12",
+      "branch": "main",
+      "frame": "03hb2esnnu5g985xmc2hai410"
+    },
+    {
+      "id": "c3833c27-0cc9-4456-b36f-9a2c22518808",
+      "ts": "2026-11-26T11:06:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:proofline-packet",
+      "action": "proofline packet rebuilt with the yek#270 fix in the letter; ATS PASS; 4 files in the packet dir. Nothing sent.",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow",
+        "scripts/task/apps-scout.sh",
+        "scripts/task/cv-ats-check.sh"
+      ],
+      "files": [],
+      "base_commit": "bc05770c093626cbaec6067c82fd122b5eb55c12",
+      "branch": "main",
+      "frame": "03hb2esn2vibncr6mfg3r5iuw"
+    },
+    {
+      "id": "3c5f65ea-c0f7-4a21-a10c-9af59c66ac61",
+      "ts": "2026-11-26T11:04:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:proofline-packet",
+      "action": "novel: rebuild proofline CV packet with yek#270 + ATS check",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow",
+        "scripts/task/apps-scout.sh",
+        "scripts/task/cv-ats-check.sh"
+      ],
+      "files": [],
+      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
+      "branch": "main",
+      "frame": "03hb2esmdt7vyrcg3bffbn1g1"
+    },
+    {
+      "id": "2f15b167-11c6-4840-b339-5d5c0c47e520",
+      "ts": "2026-11-26T11:02:27Z",
+      "source": "agy",
+      "subject": "nixconfig:proofline-packet",
+      "action": "novel: rebuild proofline CV packet with yek#270 + ATS check",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow",
+        "scripts/task/apps-scout.sh",
+        "scripts/task/cv-ats-check.sh"
+      ],
+      "files": [],
+      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
+      "branch": "main",
+      "frame": "03hb2esltgg7nyi2rowtha8dj"
+    },
+    {
+      "id": "3f67e724-192e-45dc-86c6-365602f8da0c",
+      "ts": "2026-11-26T11:01:49Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "devin antigravity-cli.nix chain-change refactor started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
+      "branch": "main",
+      "frame": "03hb2esl3saboasw4ozw7tjnl"
+    },
+    {
+      "id": "688305c3-c3db-4818-8a2a-c5b7954a7e63",
+      "ts": "2026-11-26T10:59:22Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "yek#270 fixed locally on fix/yek-270-newline (9e7ef04): text mode resolves template escapes before substituting content. cargo test 401 passed, 0 failed. Nothing pushed, no PR opened.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
+      "branch": "main",
+      "frame": "03hb2eskl3o57xzjzv59tg9jp"
+    },
+    {
+      "id": "8f314003-1bff-4016-83ac-094bb99919b0",
+      "ts": "2026-11-26T10:48:20Z",
+      "source": "agy",
+      "subject": "nixconfig:wallpaper-publish",
+      "action": "published 7 kept wall plates (2026-11-26/catwoman-dc.png + 6 from 2026-11-25) to bountystash-assets.pages.dev (772->779); fixed Go publish/adopt + laneSetting at 49d9be9f | gate: checks:quick + checks:images PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/image-daily-publish.sh",
+        "scripts/task/image-daily-wallpaper.sh",
+        "tools/os/internal/image"
+      ],
+      "files": [
+        "scripts/task/image-daily-lib.sh",
+        "tools/os/internal/image/briefs.go",
+        "tools/os/internal/image/ledger.go",
+        "tools/os/internal/image/main_test.go",
+        "tools/os/internal/image/post.go",
+        "tools/os/internal/image/publish.go"
+      ],
+      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
+      "branch": "main",
+      "frame": "03hb2esk333fh9o1czkkyr9co"
+    },
+    {
+      "id": "ef67483c-33a7-42c9-b8f4-8f96984283e5",
+      "ts": "2026-11-26T10:35:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-publish",
+      "action": "publish wallpaper to static site",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/image-daily-publish.sh",
+        "scripts/task/image-daily-wallpaper.sh"
+      ],
+      "files": [],
+      "base_commit": "87e69ac53c76a8c74c823ca49c760ff98f43ad97",
+      "branch": "main",
+      "frame": "03hb2esjfzw7snhkr1hkp7z8b"
+    },
+    {
+      "id": "8ebd0d8e-0ee0-488c-beda-e2fe632877cd",
+      "ts": "2026-11-26T10:34:43Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "correction: clanker.sh offload fixes now land cleanly at 87e69ac5 — freebuff reverted the accidental inclusion from 38252abc in f64d893f; live proof stands (policies gate built on clanker rc0, bogus attr exits 1) | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "87e69ac53c76a8c74c823ca49c760ff98f43ad97",
+      "branch": "main",
+      "frame": "03hb2esilm7kf7s56dyoe752i"
+    },
+    {
+      "id": "32fe4c6a-b0cf-4c06-8cc0-211ba8558f3f",
+      "ts": "2026-11-26T10:27:56Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "fix(jobsearch)+fix(appflow): Stepstone city stripped from employer names; negated stage words no longer set interview. Commits 4ea9b608, 38252abc (+f64d893f reverting an unrelated file the hook staged). checks:quick PASS, triage 34/34, self-test 18/18",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f64d893fc7c375f0f55fb9ba202f75387fad8b54",
+      "branch": "main",
+      "frame": "03hb2eshnach1tvul2y2jotcm"
+    },
+    {
+      "id": "0b387aba-58b9-47db-888e-17bc3fa77df1",
+      "ts": "2026-11-26T10:20:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin",
+      "action": "commit and push intents changes (devin pane 1)",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/intents/run.sh",
+        "docs/intents.md",
+        "flake/intents.nix"
+      ],
+      "files": [],
+      "base_commit": "45a9c2a5adb3b56c19b738bc5c35ae9144f630af",
+      "branch": "main",
+      "frame": "03hb2esh7n3k4tbm111jqyfja"
+    },
+    {
+      "id": "875d2b55-4be4-4d52-8b01-f29247a82987",
+      "ts": "2026-11-26T10:19:10Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin",
+      "action": "commit and push intents changes (devin pane 1)",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/intents/run.sh",
+        "docs/intents.md",
+        "flake/intents.nix"
+      ],
+      "files": [],
+      "base_commit": "45a9c2a5adb3b56c19b738bc5c35ae9144f630af",
+      "branch": "main",
+      "frame": "03hb2esgp3y8r7j23luegkczh"
+    },
+    {
+      "id": "ab99d836-ac15-4153-a7a7-670b5b44349f",
+      "ts": "2026-11-26T10:13:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "6 due leads: 5 packets built and ATS-verified (fediversity, wabcon, blocktech, tide, remanence); smartly closed as a 404 req; proofline PR target yek#270 chosen. Nothing sent, no form submitted",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8547694206e7a7371b4cb3102c5980d0b6de1781",
+      "branch": "main",
+      "frame": "03hb2esg0i2eaxjqshi1a2e3r"
+    },
     {
       "id": "69e34e46-33a4-4560-afac-77513494a5de",
       "ts": "2026-11-26T10:10:13Z",
@@ -2432,455 +2938,6 @@
       "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haxco2pn1kuf0gm7xwszvqh"
-    },
-    {
-      "id": "47e44428-220e-432f-be16-ac9fb7f6d083",
-      "ts": "2026-11-25T20:06:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "gate-change: check delphi hermes gateway + xs endpoint",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai/hermes-user.nix"
-      ],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxcijml100kasyl87kvqde"
-    },
-    {
-      "id": "142bd587-c677-44a7-8318-8ea2a26a37ce",
-      "ts": "2026-11-25T20:06:02Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: reviewed+completed sibling's tokenrouter lane — secrets key adopted to submodule b47709a+pushed, mirror synced, gate declares the (route,id) pair at all 3 sites | gate: checks:quick rc=0 (infron clean, sops-drift ok, yaml 48, lint 331)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxccvtusb42f3bb9hay8dt"
-    },
-    {
-      "id": "c7e11046-bcdc-4905-8ea8-faabaa47040e",
-      "ts": "2026-11-25T20:01:12Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-ops-verify",
-      "action": "read-only verify on delphi: hermes-gateway active (30 free-tier 429s today, route dead until ~01:00 local), xs :8449 401 unauth / 200 authed with 3 events, single tmux pane freebuff:1.1 up 2d15h, 4 in_progress claims with no live pane behind them",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxber7ta2d19aqr39zzzx3"
-    },
-    {
-      "id": "d047230e-9172-4b28-bbb9-e0ab1ca403d1",
-      "ts": "2026-11-25T19:59:40Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "start: review sops re-encrypt + hermes-persona config diff, run module checks, commit",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/secrets.yaml",
-        "modules/user/ai/hermes-persona/config.yaml"
-      ],
-      "files": [],
-      "base_commit": "6fec3549f9a869dc402372c8cead1069e77c4dcd",
-      "branch": "main",
-      "frame": "03haxb42oaoaayz7tmzun2rli"
-    },
-    {
-      "id": "7eff66f6-fc8e-4738-9001-64f90a781e3f",
-      "ts": "2026-11-25T19:59:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "check delphi hermes gateway + xs endpoint",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "6fec3549f9a869dc402372c8cead1069e77c4dcd",
-      "branch": "main",
-      "frame": "03haxb38cpu7j1za7qz2qygwa"
-    },
-    {
-      "id": "28d1d7f8-0ef7-4f1d-ae70-ad37456f6c0c",
-      "ts": "2026-11-25T19:59:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-refactor-1",
-      "action": "review secrets.yaml + hermes-persona diffs, commit refactor",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "6fec3549f9a869dc402372c8cead1069e77c4dcd",
-      "branch": "main",
-      "frame": "03haxb36yw72bf1gbfpsxhjz9"
-    },
-    {
-      "id": "8d155be7-9f7f-4a4d-b784-a94e0bc2e701",
-      "ts": "2026-11-25T19:44:53Z",
-      "source": "devin",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "landed: is-a.dev publishes this build — fresh matt:build hash-equals all 6 published PDFs (nothing to copy), _site anchors carry download | gate: agents:cv:publish-check PASS rc=0 (6/6)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6fec3549f9a869dc402372c8cead1069e77c4dcd",
-      "branch": "main",
-      "frame": "03hax882db1fcws9ivsiikkho"
-    },
-    {
-      "id": "4571c917-445d-4c9c-a770-f3e13f11182d",
-      "ts": "2026-11-25T19:44:10Z",
-      "source": "devin",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "start: publish CV build to is-a.dev checkout + gate cv-blog-check (freebuff pane idle at bash; devin executes)",
-      "outcome": "in_progress",
-      "claims": [
-        "_site"
-      ],
-      "files": [],
-      "base_commit": "6fec3549f9a869dc402372c8cead1069e77c4dcd",
-      "branch": "main",
-      "frame": "03hax8327sdutoi1o1jckhrck"
-    },
-    {
-      "id": "5fe58112-5856-4ca9-b59e-6844d27519a2",
-      "ts": "2026-11-25T19:41:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "publish | gate: agents:cv:publish-check",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "6fec3549f9a869dc402372c8cead1069e77c4dcd",
-      "branch": "main",
-      "frame": "03hax7m2tdie7cqptwojotirh"
-    },
-    {
-      "id": "2e0a92ac-bae8-45c4-a385-314527b74b99",
-      "ts": "2026-11-25T19:33:18Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-flake-refactor-1",
-      "action": "landed: extraSpecialArgs folded into home assembler — 4 verbatim copies in host-inventory deleted, dead self arg trimmed (call site + lambda) | gate: drv-equality 6/6 identical, nix:lint 331 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6fec3549f9a869dc402372c8cead1069e77c4dcd",
-      "branch": "main",
-      "frame": "03hax5ynn3felyxd05rz9flwc"
-    },
-    {
-      "id": "e3ae0ae1-40a2-4096-88d7-47f16fd1d9a1",
-      "ts": "2026-11-25T19:28:21Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-flake-refactor-1",
-      "action": "start: refactor flake outputs structure for host modules — surveying outputs.nix projection",
-      "outcome": "in_progress",
-      "claims": [
-        "flake.nix",
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hax4zs834u5uxlcemkcgssn"
-    },
-    {
-      "id": "1184c79b-a157-45ef-a4d0-d449d5b305ad",
-      "ts": "2026-11-25T19:26:32Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-flake-refactor-1",
-      "action": "refactor flake outputs structure for host modules",
-      "outcome": "in_progress",
-      "claims": [
-        "flake.nix",
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hax4n1qrjw7zu9nndravzo5"
-    },
-    {
-      "id": "adf61237-e4ba-4b06-befc-8a66209a1830",
-      "ts": "2026-11-25T19:14:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "gate-change: verify image-daily Go port gates — done, nothing new landed",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/image-daily-gate.sh"
-      ],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hax27b4b9jj936yzlfjeufe"
-    },
-    {
-      "id": "e47f1021-ac6c-431c-b3f2-86e3769c5f83",
-      "ts": "2026-11-25T19:14:03Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:gate-change",
-      "action": "gate-change: image-daily Go port gates verified — all checks pass, nothing new landed",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/image-daily-gate.sh"
-      ],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hax279t81xpf3o6tgivj1g3"
-    },
-    {
-      "id": "ba342a36-98b3-4fb9-8dfb-98a9791932c1",
-      "ts": "2026-11-25T19:07:31Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verified: image-daily gate fails on real regression 470c9034^ (the 0-of-43 tree) — 3 named FAILs by hand worktree run; fixture checks:images:publish:test 9/9 green; live gate rc=0; nothing to commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hax0xb3mxydpz9blztbp6so"
-    },
-    {
-      "id": "fd9143f9-0db0-42f3-b452-9c667aa4f2f1",
-      "ts": "2026-11-25T19:06:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:gate-change",
-      "action": "drove devin agents:1.1: image-daily Go port gate regression check submitted; devin Thinking reading scripts/task/image-daily-gate.sh; gate-change p=0.99 m=0.98 via jev-decide typesafe",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/image-daily-gate.sh"
-      ],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hax0s3qxjrap766n0c36il0"
-    },
-    {
-      "id": "1e068b2a-3e7e-4ed4-8ef1-669f1bf4a200",
-      "ts": "2026-11-25T18:52:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-refactor-chain",
-      "action": "devin refactor chain landed: 20 hosts identical, lint 331 clean | gate: checks:drv-equality + checks:nix:lint PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hawxynfcwvqhv6sjcv47vx2"
-    },
-    {
-      "id": "c9a935d9-84c2-465b-a570-f2c733f1d415",
-      "ts": "2026-11-25T18:49:27Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "novel | gate: exit-criterion note",
-      "outcome": "in_progress",
-      "claims": [
-        "submissions"
-      ],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hawxe8hx6ldwhflovexncbi"
-    },
-    {
-      "id": "76d10300-1c4f-4b37-9e34-92f1385b588a",
-      "ts": "2026-11-25T18:49:27Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "publish | gate: agents:cv:publish-check",
-      "outcome": "in_progress",
-      "claims": [
-        "_site"
-      ],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hawxe781pw675c0ljx7ce6s"
-    },
-    {
-      "id": "39b20ba3-a952-49a9-a05a-424d765fa6cc",
-      "ts": "2026-11-25T18:49:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:flake-change-devin",
-      "action": "devin flake refactor landed: 20 hosts identical, lint 331 clean | gate: checks:drv-equality + checks:nix:lint PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hawxb9p0gri4i3lbgid7zs1"
-    },
-    {
-      "id": "c1554ae7-a8c1-4fb7-b190-3e415ddfe818",
-      "ts": "2026-11-25T18:32:52Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "chain refactor: hmContainerFloor+hmDesktop let-bound in host-inventory — 8 container floor + 10 desktop copies named once, forks stay literal | gate: drv-equality 20/20 on touched hosts identical, nix:lint 331 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7d5fdb3c07a00b3f4abb0f9012dc5cc18b76c8ff",
-      "branch": "main",
-      "frame": "03hawu5n4jqtryllnvp7qgft3"
-    },
-    {
-      "id": "c4c9c090-e17c-48de-9bc8-adac41f67390",
-      "ts": "2026-11-25T18:30:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:flake-change-devin",
-      "action": "drove agents:1 devin pane: refactor nixconfig host modules and clean up shared flake wiring",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03hawtpfhmk3lzl49emn8exk5"
-    },
-    {
-      "id": "651fb046-098b-412e-8102-e5c30069d7a6",
-      "ts": "2026-11-25T17:57:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-publish-2026-11-25",
-      "action": "re-ran the is-a.dev publish lane at nixconfig f544ffb9: artifact unchanged, six PDFs byte-identical to blog assets/files (tree clean at 64eaf48 so no commit/deploy needed), page prose and PDF text agree on twenty-five hosts | gate: agents:cv:publish-check PASS 0 problems, live 6/6 hashes match, /cv/ 6 anchors with download",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "_tabs/cv.md _tabs/cv-ryoku.html assets/files/*.pdf"
-      ],
-      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
-      "branch": "main",
-      "frame": "03hawnb9czzss7atj0ja36ctu"
-    },
-    {
-      "id": "f73ca63d-e108-4e4d-8c27-fa1c1d0081ff",
-      "ts": "2026-11-25T17:57:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "publish CV builds — gate: publish-check",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
-      "branch": "main",
-      "frame": "03hawn6edzgmfz2dot5chilov"
-    },
-    {
-      "id": "7f7cc187-9be7-43ae-909c-38b0e617b40e",
-      "ts": "2026-11-25T17:44:49Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-publish-2026-11-25",
-      "action": "re-published the is-a.dev CV surface from the freebuff lane: built .#sites.matt-site at f544ffb9, all six PDFs byte-identical to the blog checkout so no copy was needed, _site rebuilt from 64eaf48 | gate: agents:cv:publish-check PASS 0 problems (6/6 match + linked with download), live hashes match",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "_tabs/cv.md assets/files/*.pdf"
-      ],
-      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
-      "branch": "main",
-      "frame": "03hawkrpze15x4d7tij2eonsz"
-    },
-    {
-      "id": "c3b25e48-46b6-4873-abbf-602a81e78e2e",
-      "ts": "2026-11-25T17:43:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "drove freebuff agents:2.1 publish p=0.97 m=0.96",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
-      "branch": "main",
-      "frame": "03hawkgxsl4s9t968ero2v7jy"
-    },
-    {
-      "id": "e69dd8a2-b3a9-4184-a93e-80966296dd5f",
-      "ts": "2026-11-25T17:17:18Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "chain refactor: dropped six dead globalModules* aliases — hosts compose only via hostModules(features+modules); chainFeatures keeps the names as docs data | gate: drv-equality 30/30 identical, nix:lint 331 clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f544ffb9f498d14e3863c76293c4908315aed6d5",
-      "branch": "main",
-      "frame": "03hawfe7n81dgdoe39kuv3e8c"
-    },
-    {
-      "id": "471cf0fd-e8e9-47d7-a8bb-001eefb0c046",
-      "ts": "2026-11-25T17:13:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-publish-2026-11-25",
-      "action": "published the CV surface to is-a.dev: rebuilt .#sites.matt-site from HEAD (a839de30), proved six PDFs hash-equal to the live bytes, fixed the Ryoku page prose still saying thirteen NixOS hosts, pushed 64eaf48 and verified twenty-five live | gate: agents:cv:publish-check PASS (6/6), pages deploy 45662191028 success",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "_tabs/cv-ryoku.html"
-      ],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03hawekvenpbfcqit39tfwt4z"
-    },
-    {
-      "id": "2674cb02-7cc0-4e4b-83d0-c5e3705b4b95",
-      "ts": "2026-11-25T17:08:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-publish",
-      "action": "freebuff: publish CV builds to is-a.dev static surface",
-      "outcome": "in_progress",
-      "claims": [
-        "agents:2.1"
-      ],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03hawdlqmyzom50kfxafkn23t"
-    },
-    {
-      "id": "7e06bbca-a9a0-4b09-be5a-252f901b327a",
-      "ts": "2026-11-25T17:07:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-refactor-chain",
-      "action": "devin: refactor flake module chain per host feature chain",
-      "outcome": "in_progress",
-      "claims": [
-        "agents:1.1"
-      ],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03hawdgn8nnzq3f09952m76d8"
-    },
-    {
-      "id": "785d9f8e-0216-4a92-8752-0732e2878e1b",
-      "ts": "2026-11-25T16:59:24Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "drove delphi freebuff agents:3.1 over tmux tunnel: confirmed the pending Submit dialog; the routed job-search task was accepted and the pane is working (working... counter running)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03hawbwdieiluntg87ukstzoi"
-    },
-    {
-      "id": "99676618-57b2-4f1f-bb05-f347cad0644c",
-      "ts": "2026-11-25T16:48:23Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verified: image-daily Go port gates all live at a839de30 — dispatch 19/19 both directions, judge fallback gen.go:115, breakers gen.go:357+plates.go:391, shrinkGuard publish.go:440/517 | gate: checks:image-daily PASS rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03haw9qwsg791e962jl8imi0k"
     }
   ]
 }

@@ -813,14 +813,16 @@
               }
           )
           # The archive keeps every project; the two-page CV shows the four
-          # that argue for a systems role.
+          # that argue for a systems role, and the two newest replace the
+          # product one the founder role already covers.
           (joinProjects
             |> lib.sort (a: b: projectRank a > projectRank b)
             |> builtins.filter (e:
               builtins.elem (e.resumeName or e.name) [
                 "nixconfig"
+                "Vulnerability operations concept"
+                "kev-time"
                 "fibtransponder"
-                "bountystash"
               ]));
     };
 

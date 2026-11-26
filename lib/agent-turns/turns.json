@@ -1,8 +1,80 @@
 {
-  "generated": "2026-11-26T06:52:09Z",
+  "generated": "2026-11-26T07:12:34Z",
   "count": 200,
-  "pin": "9886e9adbcd48aa96cdd050006dfbb9540bd7aa9b768bf8d64f2c1759ea1b6b9",
+  "pin": "d9a010bc0d7aa9a0fe75f38c9719a145d8c99099a3ef23e7845eec2c5ea4fec6",
   "turns": [
+    {
+      "id": "00a28483-84c7-4d5f-9a07-1d60be23a6d1",
+      "ts": "2026-11-26T07:08:43Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "start: resurvey hosts/ module chains for per-host duplication beyond import-set uniqueness",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/",
+        "flake/host-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
+      "branch": "main",
+      "frame": "03hb0xt4z9qv24mdww9c6jw1x"
+    },
+    {
+      "id": "3cc5b9f6-ff3f-4d78-b35e-4b1b22fb5b16",
+      "ts": "2026-11-26T07:01:52Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-drive-20261126-0751",
+      "action": "incident: delphi is healthy by every unit and sentinel signal, but the ledger is blind twice — the 04:30 autoUpgrade rebuilt main and resurrected the retired uptime-kuma, and the sentinel push has 404d every 15 min since the ingest route landed",
+      "outcome": "blocked: uptime-kuma duplicate is live again; the fix needs delphi-dup-services-note pushed to main before the next 04:30 autoUpgrade",
+      "claims": [
+        "hosts/delphi/"
+      ],
+      "files": [],
+      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hb0wgx3p3g2ondosryivpo7"
+    },
+    {
+      "id": "285dc9fe-bd60-475e-aef2-0fe4a672c131",
+      "ts": "2026-11-26T06:56:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-drive-20261126-0751",
+      "action": "incident: verify delphi host services health",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi/"
+      ],
+      "files": [],
+      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
+      "branch": "main",
+      "frame": "03hb0vgdzbl63p0ba9l33nlfh"
+    },
+    {
+      "id": "1bfc9c3f-486a-404c-a296-5cdb52f6fe81",
+      "ts": "2026-11-26T06:53:28Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-fresh",
+      "action": "tailored and sent the one sendable lead from the 25t/u/q sweeps: Sunrise Medical IT Infrastructure Specialist - English letter to Ms Pawlik + English CV built into submissions via agents:apps:packet, sent to candidate@sunrisemedical.de with EARLY=1 over the 2026-12-07 hold; ledger flipped to applied, follow-up 2026-12-10. 35 rows remain: 7 have JD text but no mailbox (portal-only), 28 have no stored JD, none carries recruiter_email | gate: apps:send exit 0 + row stage applied",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
+      "branch": "main",
+      "frame": "03hb0utx031oe8syy1oirkixs"
+    },
+    {
+      "id": "b7ba3a89-3175-41c8-a04e-7aa75c9adc9a",
+      "ts": "2026-11-26T06:52:24Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: pipe loop found 0 remaining filter|>length sites (class closed at 763eaa83); turned the class into a nix-style rule so it cannot regress + fixture seeded-case/controls | gate: nix-style 9/9 fixture, tasks, yaml:lint, check:verify 156 | checks:host n/a — script-only, no host closure surface",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
+      "branch": "main",
+      "frame": "03hb0umdztat3ias3duzxkwqg"
+    },
     {
       "id": "a10f9ec3-0e6e-4fd5-a43c-0f63741acc84",
       "ts": "2026-11-26T06:48:54Z",
@@ -2770,71 +2842,6 @@
       "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03havbzokvyyt8lxscyrbpw5w"
-    },
-    {
-      "id": "9b2d7601-4b4e-49b8-899e-898e3ecc3858",
-      "ts": "2026-11-25T13:53:28Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25k",
-      "action": "published: pushed ea28d81 (8e7c54b..ea28d81), Pages run 45628020371 build+deploy success; live /cv/ serves 119 tr / 117 ad links incl. sweep-k leads, 6 PDFs 200 | gate: jekyll production build + check-cv-links PASS + live byte-identical",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havbkrriyrhn2trh23o94dx"
-    },
-    {
-      "id": "8c88d1c9-5512-4d74-ada0-a83a5ee4af47",
-      "ts": "2026-11-25T13:52:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-publish-2026-11-25",
-      "action": "landed: freebuff site_publish — jekyll production build + check-cv-links gate, deploy static surface (working 6s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03havbcfpq68brhlz5b8hbeu5"
-    },
-    {
-      "id": "6cecdc2b-97a0-4599-9044-cbb458616e8f",
-      "ts": "2026-11-25T13:51:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout-delphi-2026-11-25",
-      "action": "landed: delphi scout_leads — scouting DevOps/SRE/Platform/Infrastructure leads on delphi (working 25s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03havb408zdigsxw0b2v99ee1"
-    },
-    {
-      "id": "850be651-767d-4856-88ad-9250e027dd47",
-      "ts": "2026-11-25T13:51:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:flake-change-2026-11-25",
-      "action": "landed: devin flake_change — reviewing flake.nix/flake.lock consistency, host outputs defined, reporting inconsistencies (Thinking 3s)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03havb3z2g7sxzkmxid19jogg"
-    },
-    {
-      "id": "039c240d-5fdf-44de-94dc-0c2cba62f6ae",
-      "ts": "2026-11-25T13:49:09Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25k",
-      "action": "correction: 19 rows filed across 18 distinct new employers (Rocken® posted two platform ads, one row kept); CV job-search table = 117 rows, fit 5:45 4:28 3:44, nothing sent | gate: jekyll production build + check-cv-links PASS at ea28d81",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havaqdl9nxevpq8m5646m2b"
     }
   ]
 }

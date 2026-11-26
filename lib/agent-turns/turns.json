@@ -1,8 +1,50 @@
 {
-  "generated": "2026-11-26T07:12:34Z",
+  "generated": "2026-11-26T07:22:41Z",
   "count": 200,
-  "pin": "d9a010bc0d7aa9a0fe75f38c9719a145d8c99099a3ef23e7845eec2c5ea4fec6",
+  "pin": "bbe2abe2f0e1a1d2a8ef6459f09f98d68f07213bd719916d5649b7d103171f3d",
   "turns": [
+    {
+      "id": "6745b082-7029-4934-bf26-b54ba2d7e1e7",
+      "ts": "2026-11-26T07:17:26Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-drive-20261126-0801",
+      "action": "publish: write CV site content and push static site",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "80ff2372c16b30491a857442f2234c7bbd11df94",
+      "branch": "main",
+      "frame": "03hb0ziffucywuatzctoquxip"
+    },
+    {
+      "id": "5703b8aa-a80f-40dc-9603-15b86f280c88",
+      "ts": "2026-11-26T07:17:26Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-drive-20261126-0801",
+      "action": "publish: update CV and static site and deploy",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "80ff2372c16b30491a857442f2234c7bbd11df94",
+      "branch": "main",
+      "frame": "03hb0zidsr560eqhgpgrigxct"
+    },
+    {
+      "id": "b72477dc-8090-4893-ac2d-a5dbdd95a45e",
+      "ts": "2026-11-26T07:17:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0801",
+      "action": "chain-change: refactor shared nixconfig module chain",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/",
+        "hosts/"
+      ],
+      "files": [],
+      "base_commit": "80ff2372c16b30491a857442f2234c7bbd11df94",
+      "branch": "main",
+      "frame": "03hb0zgh442t737fq4t66pdv1"
+    },
     {
       "id": "00a28483-84c7-4d5f-9a07-1d60be23a6d1",
       "ts": "2026-11-26T07:08:43Z",
@@ -2800,48 +2842,6 @@
       "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
       "branch": "main",
       "frame": "03havczf6xzwe0zq9a1l600eu"
-    },
-    {
-      "id": "bf0d8e8b-9dfb-4fd8-a2cd-b97d53c20474",
-      "ts": "2026-11-25T13:58:41Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25l",
-      "action": "claim: sweep l — 6 LinkedIn seniority-weighted pages + 8 Stepstone metro pages, file and fold into CV job-search table",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "~/Documents/shaoyanji.is-a.dev/_tabs"
-      ],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havcliieorel1k0to25lx0d"
-    },
-    {
-      "id": "4ca49d8f-ef2c-4f46-9c5a-131bfd8f65fa",
-      "ts": "2026-11-25T13:56:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-fresh-2026-11-25",
-      "action": "correction to 03havbzokvyyt8lxscyrbpw5w: apps:dupes exits 1 on two pre-existing groups (Nebius, Rocken at scout-2026-11-25k), neither from my rows; origin scout-2026-11-25b held 8 rows before my 8 scouted; all 8 links fetched 200 before filing | gate: scouted count 8 PASS, apps:dupes FAIL pre-existing",
-      "outcome": "failed: apps:dupes has 2 pre-existing employer groups, not from this pass",
-      "claims": [],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03havc3fh14hjatr5tive354y"
-    },
-    {
-      "id": "fe29afb7-14c2-4983-942d-8fd49a2fe2ce",
-      "ts": "2026-11-25T13:55:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-fresh-2026-11-25",
-      "action": "landed: 8 scouted rows at origin scout-2026-11-25b (BAMF, DRK-BaWue, dtms, HDI, Icertis, Real Garant, SozialBank, WIBU) from LinkedIn DE + Stepstone metros + germantechjobs slugs + arbeitnow 1-12; every link fetched 200 before filing | gate: apps:dupes [] PASS, origin count 8",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03havbzokvyyt8lxscyrbpw5w"
     }
   ]
 }

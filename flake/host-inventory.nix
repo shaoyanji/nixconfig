@@ -29,13 +29,22 @@ let
 in
   # `kind` and `system` come from the compiled inventory — a registered host
   # must have an inventory.toml row, and its fields cannot drift from this
-  # file's view of the same fact.
+  # file's view of the same fact. `hmModules`/`hmFeatures` default from the
+  # feature list for the same reason — every "containers" host took the floor
+  # and every "dms" host the desktop chain, so the field survives only where
+  # a host diverges (fern, cassini, the "home" hosts, demo).
   lib.mapAttrs (
     name: spec:
       spec
       // {
         kind = inventory.hosts.${name}.kind;
         system = inventory.hosts.${name}.arch;
+      }
+      // lib.optionalAttrs (!(spec ? hmModules) && lib.elem "containers" (spec.features or [])) {
+        hmModules = hmContainerFloor;
+      }
+      // lib.optionalAttrs (!(spec ? hmFeatures) && lib.elem "dms" (spec.features or [])) {
+        hmFeatures = hmDesktop;
       }
   ) {
     garnixMachine = {
@@ -50,26 +59,22 @@ in
       # The fleet desktop chain. The host imports base-desktop-environment itself;
       # the Ryoku tier it ran from 2026-11-02 to 2026-11-11 is retired.
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/poseidon/configuration.nix];
     };
 
     mtfuji = {
       features = ["base" "containers"];
       modules = [../hosts/mtfuji/configuration.nix];
-      hmModules = hmContainerFloor;
     };
 
     kellerbench = {
       features = ["base" "containers"];
       modules = [../hosts/kellerbench/configuration.nix];
-      hmModules = hmContainerFloor;
     };
 
     deckstation = {
       features = ["base" "containers"];
       modules = [../hosts/deckstation/configuration.nix];
-      hmModules = hmContainerFloor;
     };
 
     delphi = {
@@ -86,11 +91,9 @@ in
         # wipes the device it is given.
         (import ../hosts/delphi/disko.nix {device = "/dev/sda";})
       ];
-      hmModules = hmContainerFloor;
     };
     eisen = {
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/eisen/configuration.nix];
     };
 
@@ -100,7 +103,6 @@ in
         inputs.nixos-hardware.nixosModules.lenovo-thinkpad-t420
         ../hosts/applevalley/configuration.nix
       ];
-      hmModules = hmContainerFloor;
     };
 
     frieren = {
@@ -112,7 +114,6 @@ in
       # nothing started. The bridge and NAT the canary needs come from
       # modules/profiles/microvm-host.nix, which infra-stack.nix imports directly.
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/frieren/configuration.nix];
     };
 
@@ -122,12 +123,10 @@ in
         ../hosts/ares/configuration.nix
         (import ../hosts/common/disko.nix {device = "/dev/sda";})
       ];
-      hmModules = hmContainerFloor;
     };
 
     stark = {
       features = ["base" "nixos" "dms" "disko"];
-      hmFeatures = hmDesktop;
       modules = [
         ../hosts/stark/configuration.nix
         (import ../hosts/stark/disko.nix {
@@ -154,7 +153,6 @@ in
 
     schneeeule = {
       features = ["base" "nixos" "dms" "impermanence"];
-      hmFeatures = hmDesktop;
       modules = [
         ../hosts/schneeeule/configuration.nix
         (import ../hosts/common/disko.nix {device = "/dev/sda";})
@@ -163,19 +161,16 @@ in
 
     scratch = {
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/scratch/configuration.nix];
     };
 
     aristotle = {
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/aristotle/configuration.nix];
     };
 
     diogenes = {
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/diogenes/configuration.nix];
     };
 
@@ -200,13 +195,11 @@ in
 
     aceofspades = {
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/aceofspades/configuration.nix];
     };
 
     ancientace = {
       features = ["base" "nixos" "dms"];
-      hmFeatures = hmDesktop;
       modules = [../hosts/ancientace/configuration.nix];
     };
 
@@ -216,7 +209,6 @@ in
         ../hosts/guckloch/configuration.nix
         inputs.nixos-wsl.nixosModules.default
       ];
-      hmModules = hmContainerFloor;
     };
 
     minyx = {
@@ -236,7 +228,6 @@ in
     sledgehammer = {
       features = ["base" "containers" "disko"];
       modules = [../hosts/sledgehammer/configuration.nix];
-      hmModules = hmContainerFloor;
     };
 
     demo = {

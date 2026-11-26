@@ -1,8 +1,117 @@
 {
-  "generated": "2026-11-26T00:14:52Z",
+  "generated": "2026-11-26T01:03:58Z",
   "count": 200,
-  "pin": "56348eda23955c409296444e73dbb955066a32580cbfc5bd15e2c3de67a55ece",
+  "pin": "626b9e2b6ce61ad064d2bd6a6d6203d2c7e486c61e5033d3006502e7fbea4dcd",
   "turns": [
+    {
+      "id": "39ec6de0-1574-4720-b4cd-5f8973ddbf74",
+      "ts": "2026-11-26T00:58:53Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
+      "action": "start: refactor pass on appflow-board + nix-comments lib",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/appflow-board.nix",
+        "lib/nix-comments.nix"
+      ],
+      "files": [],
+      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
+      "branch": "main",
+      "frame": "03hayxk8br0zgfaz5z7usqj7j"
+    },
+    {
+      "id": "00ae5e42-a2b5-40b5-a39b-3858bf6b82aa",
+      "ts": "2026-11-26T00:56:38Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
+      "action": "flake-change: refactor lane tail + gate",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
+      "branch": "main",
+      "frame": "03hayx4hnfhfxgl2o6vbscshr"
+    },
+    {
+      "id": "b6d7bdf7-aea3-4c64-be58-75c06ec647aa",
+      "ts": "2026-11-26T00:43:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:steward-delphi-dup-services",
+      "action": "Re-confirm the dup-services retirement on live delphi, fix the ha-stack default that would hand out a second monitor backend, gate and commit",
+      "outcome": "done",
+      "claims": [
+        "hosts/delphi/configuration.nix",
+        "modules/services/fleet-monitors.nix",
+        "modules/services/home-assistant.nix"
+      ],
+      "files": [
+        "modules/services/home-assistant.nix",
+        "MANUAL.md",
+        "modules/services/fleet-monitors.nix",
+        "hosts/delphi/configuration.nix",
+        "hosts/delphi/infra-stack.nix",
+        "modules/zen.nix",
+        "inventory.toml",
+        "docs/service-offload.md",
+        "docs/delphi-runtime.md",
+        "AGENTS.nix"
+      ],
+      "base_commit": "e2e1f3d3",
+      "branch": "retire-dup-monitors",
+      "frame": "03hayulnv4bjoltagvq4zg8ua"
+    },
+    {
+      "id": "a2404f10-613c-4034-a241-6948902ae1aa",
+      "ts": "2026-11-26T00:41:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-drive-2026-11-26",
+      "action": "drove idle delphi freebuff pane over ssh; dup-services migration task classified deploy by margin 0.50; pane working 14s",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
+      "branch": "main",
+      "frame": "03hayu8jgrkz79jo6a0lfqvyn"
+    },
+    {
+      "id": "a36b8c65-2ffb-4abf-9771-555f07399707",
+      "ts": "2026-11-26T00:41:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-2026-11-26",
+      "action": "drove idle devin pane; refactor task classified flake-change via jev-decide duel; pane Thinking running image-daily gate",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
+      "branch": "main",
+      "frame": "03hayu8gtdeuxh0ot0sb0dbox"
+    },
+    {
+      "id": "7fadff2d-8196-47c8-9aec-8e1034cc03c0",
+      "ts": "2026-11-26T00:40:53Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-lane",
+      "action": "done: refactor lane clean — no open diffs in tree (HEAD=origin/main=290a0ecb); stashes left untouched (pre-existing/kg2-rot, not refactor work); image-daily gate re-verified on HEAD | gate: checks:image-daily rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
+      "branch": "main",
+      "frame": "03hayu1nwxp9traei52n11b47"
+    },
+    {
+      "id": "8fd6f7f9-1b7a-4025-a1cb-b7b96a57c2ed",
+      "ts": "2026-11-26T00:15:16Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
+      "action": "landed: hostField predicate + hmModules name->path map single-sourced in lib/hm-shared.nix (forHost, modulePaths); 5 sites rewired incl. hm-inventory-role (+inputs arg) | gate: drv-equality 5/5 identical + nix:lint 332 clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
+      "branch": "main",
+      "frame": "03hayp1iosfxnbz14c6aj7b5u"
+    },
     {
       "id": "4736ca8f-5420-4b05-af76-602524370c32",
       "ts": "2026-11-26T00:11:29Z",
@@ -2663,99 +2772,6 @@
       "base_commit": "8350ac742c912071f92b8b412ce6b364c98ea361",
       "branch": "main",
       "frame": "03hau8nc5npqy7sqs0bv6wb9k"
-    },
-    {
-      "id": "d6e0b370-c560-4c55-b0f2-2ea2420ce0a7",
-      "ts": "2026-11-25T10:33:38Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: pipe pass 12 — 5 ascending attr-projection sorts to lib.sortOn (agents-notes ordered, epistemics permitted, service-portal inGroup, delphi-site tailnetCards, aki-site note table); descending/complex comparators documented non-class | gate: drv-equality 30/30, fleet-docs-site builds all note rows, checks:host frieren rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8350ac742c912071f92b8b412ce6b364c98ea361",
-      "branch": "main",
-      "frame": "03hau8jiacja73shedh4olwmc"
-    },
-    {
-      "id": "0f7c7bd2-bde1-490b-a67f-cc940b8e88e3",
-      "ts": "2026-11-25T10:32:02Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25j",
-      "action": "corrected: the earlier done frame named 89dc6caa, which was the previous head — the note was not committed then because git commit had the pathspec before -m. Note job-scout-sweep-2026-11-25j is now landed in 8d01c957; agentsNotes.issues [] and task apps:dupes PASS still hold",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8d01c95713c18aa42305723eff44c26019c8f53e",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hau886hbpmwrq4ncssvd6d3"
-    },
-    {
-      "id": "f9a38f18-1200-4ed6-bf67-9a7d2f70d129",
-      "ts": "2026-11-25T10:31:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25j",
-      "action": "landed: sweep 2026-11-25j — 3 new rows at scouted on origin scout-2026-11-25j, band 5 (TKMS fit 88, Kontron AIS 90, GGW Group 100); DRK-Blutspendedienst and KIRCHHOFF Witte in lane but failed validation (germantechjobs -> de.talent.com redirect lands on a generic search); note job-scout-sweep-2026-11-25j, 30-line body, schema clean | gate: task apps:dupes PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hau8644cxs2qpnp46h9iko3"
-    },
-    {
-      "id": "81cfdf03-424a-43f7-8815-f6d2919c975c",
-      "ts": "2026-11-25T10:26:09Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25j",
-      "action": "claim: sweep 2026-11-25j — re-read Stepstone metro pages, germantechjobs RSS, BSJ, WWR, RemoteOK; exact-name dedupe against 1372-row ledger and prior sweeps; band new rows FIT_MAP 1..5; land note job-scout-sweep-2026-11-25j",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "89dc6caa70045c0893b088b834854c4c300afec7",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hau72uw1na5eepc5vczui5r"
-    },
-    {
-      "id": "9961f6e3-834b-48a3-a1eb-0832cc29daaf",
-      "ts": "2026-11-25T10:24:17Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: pipe pass 11 — epistemics preferredRoute attrNames-lookup to lib.mapAttrsToList, agents-notes entryList to builtins.attrValues (exact: noteIds attrNames-sorted, ordered re-sorts); note records refused sites | gate: drv-equality 30/30, epistemics spend/table eval, counts total 269",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "83df611b8415aa7b4276f93ead1e5aaf7af24b0b",
-      "branch": "main",
-      "frame": "03hau6ppv7cs8bm4pbpunsf8v"
-    },
-    {
-      "id": "91c68a3b-05d1-4bd6-925f-ac186b87d575",
-      "ts": "2026-11-25T10:22:36Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "verified: image-daily Go port gates all green — go build+vet+test(-count=1, 5.6s) on tools/os/internal/image, checks:image-daily dispatch/fallback/breakers/shrink-guard, all 3 refusal fixtures (publish/ship/images) fire, checks:images 772/772; nothing broken, no fix applied | gate: 8/8 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "496ab9cebc0aab622b839f25ab73abf3207cb6c4",
-      "branch": "main",
-      "frame": "03hau6du8is28mw7u9wj53qfz"
-    },
-    {
-      "id": "9b821c54-2233-4c45-8d16-c09f977c0454",
-      "ts": "2026-11-25T10:22:31Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "Drove idle devin pane agents:1.1 with a gate-change task: verify image-daily Go port gates and fix (jev-decide gate-change p=0.81 margin=0.70). Fresh Thinking line confirmed submission; Devin now running task checks:image-daily and checks:images:publish:test.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "496ab9cebc0aab622b839f25ab73abf3207cb6c4",
-      "branch": "main",
-      "frame": "03hau6dax5cz0gn21p0kqjk02"
     }
   ]
 }

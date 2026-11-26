@@ -105,19 +105,13 @@ in {
         ];
         root = page;
         locations =
-          {
-            # The same two-location shape the media library needed: `/` is answered
-            # by the index module rewriting to `/index.html`, and the alias works
-            # only where the URI does not end in `/`.
-            "= /" = {
-              root = page;
-            };
-            "= /index.html" = {
-              alias = "${page}/index.html";
-              extraConfig = ''
-                add_header Cache-Control "no-store";
-              '';
-            };
+          # The static-UI pair is the same shape the media library serves
+          # (modules/config/nginx-static-ui.nix); the board adds a no-store on
+          # the page itself plus its proxied routes.
+          lib.recursiveUpdate (import ../config/nginx-static-ui.nix page) {
+            "= /index.html".extraConfig = ''
+              add_header Cache-Control "no-store";
+            '';
           }
           // builtins.listToAttrs (map (mkApiLocation "") readRoutes)
           // builtins.listToAttrs (map (mkApiLocation writeGuard) writeRoutes);

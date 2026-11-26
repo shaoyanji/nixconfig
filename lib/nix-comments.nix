@@ -42,74 +42,51 @@
     )
     |> lib.unique;
 
+  # Every ref class extracts the same way: split on the marker, drop the text
+  # before it, take each following chunk's first token, keep real refs. The
+  # marker, the token pick and any tail filter are the only per-class deltas.
+  extractRefs = marker: pick: body:
+    body
+    |> builtins.split marker
+    |> builtins.filter builtins.isString
+    |> builtins.tail
+    |> map pick
+    |> builtins.filter (r: r != null);
+
+  firstToken = pat: chunk: let
+    m = builtins.match pat chunk;
+  in
+    if m == null
+    then null
+    else builtins.head m;
+
   # `flake/policies.nix#agent-prose-budget` in a comment is a citation, the same
   # relation a document writes in brackets; `flake/policies.nix` alone is a path.
   # `#<id>` and `#id` write the convention down; they are not citations of a rule.
   placeholderIds = ["id" "policy-id"];
-  policyRefs = body: let
-    parts =
-      body
-      |> builtins.split "flake/policies\\.nix#"
-      |> builtins.filter builtins.isString;
-  in
-    if builtins.length parts <= 1
-    then []
-    else
-      parts
-      |> builtins.tail
-      |> map (
-        chunk: let
-          m = builtins.match "([a-z0-9][a-z0-9-]*).*" chunk;
-        in
-          if m == null
-          then null
-          else builtins.head m
-      )
-      |> builtins.filter (id: id != null && !(builtins.elem id placeholderIds))
-      |> lib.unique;
+  policyRefs = body:
+    extractRefs "flake/policies\\.nix#" (firstToken "([a-z0-9][a-z0-9-]*).*") body
+    |> builtins.filter (id: !(builtins.elem id placeholderIds))
+    |> lib.unique;
 
   # `task <name>` is a pointer into the recipe book; the name set lives in
   # `taskfiles/*.yml`, so resolution is a script's job (`checks:nix:comments`).
-  taskRefs = body: let
-    parts =
-      body
-      |> builtins.split "task "
-      |> builtins.filter builtins.isString;
-    pick = chunk:
-      chunk
-      |> builtins.split "[^A-Za-z0-9:_*/-]"
-      |> builtins.head
-      |> lib.removeSuffix ":"
-      |> lib.removeSuffix ","
-      |> lib.removeSuffix ".";
-  in
-    parts
-    |> builtins.tail
-    |> map pick
+  taskRefs = body:
+    extractRefs "task " (
+      chunk:
+        chunk
+        |> builtins.split "[^A-Za-z0-9:_*/-]"
+        |> builtins.head
+        |> lib.removeSuffix ":"
+        |> lib.removeSuffix ","
+        |> lib.removeSuffix "."
+    )
+    body
     |> builtins.filter (
       n: builtins.match "[a-z0-9][a-z0-9:_*/-]*:[A-Za-z0-9*][A-Za-z0-9:_*/-]*" n != null
     );
 
-  attrRefs = body: let
-    parts =
-      body
-      |> builtins.split "\\.#"
-      |> builtins.filter builtins.isString;
-  in
-    if builtins.length parts <= 1
-    then []
-    else
-      parts
-      |> builtins.tail
-      |> map (
-        chunk: let
-          m = builtins.match "([A-Za-z0-9_-]+).*" chunk;
-        in
-          if m == null
-          then null
-          else builtins.head m
-      )
-      |> builtins.filter (a: a != null);
+  attrRefs = body: extractRefs "\\.#" (firstToken "([A-Za-z0-9_-]+).*") body;
 
   occurrences = pat: text:
     text

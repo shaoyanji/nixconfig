@@ -735,52 +735,47 @@ in {
           }
         ];
         root = cfg.mediaDir;
-        locations = {
-          "/" = {
-            extraConfig = ''
-              autoindex on;
-              autoindex_exact_size off;
-              autoindex_localtime on;
-              add_header Cache-Control "public, max-age=86400";
-              # nginx already emits `Accept-Ranges: bytes` for static files; an
-              # explicit header here is a second copy of the same line.
-            '';
+        locations =
+          {
+            "/" = {
+              extraConfig = ''
+                autoindex on;
+                autoindex_exact_size off;
+                autoindex_localtime on;
+                add_header Cache-Control "public, max-age=86400";
+                # nginx already emits `Accept-Ranges: bytes` for static files; an
+                # explicit header here is a second copy of the same line.
+              '';
+            };
+          }
+          # The browse page owns the root via the shared static-UI pair; a
+          # directory URL still gets the plain listing, so a bookmark taken
+          # before the page existed keeps working.
+          // import ../config/nginx-static-ui.nix mediaUi
+          // {
+            "= /index.json" = {
+              alias = "${cfg.mediaDir}/.index.json";
+              extraConfig = ''
+                # Regenerated on a timer and after every fetch: a cached manifest is
+                # a library missing the file you just downloaded.
+                add_header Cache-Control "no-store";
+              '';
+            };
+            # The page's write half: search YouTube, queue a fetch. Proxied with its
+            # path intact (`/api/` on both sides), and `no-store` because it
+            # describes a queue that moves.
+            "/api/" = {
+              proxyPass = "http://127.0.0.1:${toString cfg.apiPort}/api/";
+              extraConfig = ''
+                proxy_http_version 1.1;
+                proxy_set_header Host 127.0.0.1;
+                # A search runs yt-dlp for a few seconds; a POST answers at once.
+                proxy_read_timeout 90s;
+                client_max_body_size 8k;
+                add_header Cache-Control "no-store" always;
+              '';
+            };
           };
-          # The browse page owns the root. A directory URL still gets the plain
-          # listing, so a bookmark taken before the page existed keeps working.
-          # `/` is answered by nginx's index module, which rewrites the request to
-          # `/index.html` and matches again — so that path needs its own exact
-          # location, or the rewrite lands on the library's `location /` and 404s.
-          # An alias to a file works only where the URI does not end in `/`.
-          "= /" = {
-            root = mediaUi;
-          };
-          "= /index.html" = {
-            alias = "${mediaUi}/index.html";
-          };
-          "= /index.json" = {
-            alias = "${cfg.mediaDir}/.index.json";
-            extraConfig = ''
-              # Regenerated on a timer and after every fetch: a cached manifest is
-              # a library missing the file you just downloaded.
-              add_header Cache-Control "no-store";
-            '';
-          };
-          # The page's write half: search YouTube, queue a fetch. Proxied with its
-          # path intact (`/api/` on both sides), and `no-store` because it
-          # describes a queue that moves.
-          "/api/" = {
-            proxyPass = "http://127.0.0.1:${toString cfg.apiPort}/api/";
-            extraConfig = ''
-              proxy_http_version 1.1;
-              proxy_set_header Host 127.0.0.1;
-              # A search runs yt-dlp for a few seconds; a POST answers at once.
-              proxy_read_timeout 90s;
-              client_max_body_size 8k;
-              add_header Cache-Control "no-store" always;
-            '';
-          };
-        };
       };
     };
 

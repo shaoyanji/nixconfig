@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-26T14:20:39Z",
+  "generated": "2026-11-26T14:25:44Z",
   "count": 200,
-  "pin": "9333727c2063d5ae8baaf54dd7aeff0e2ea7620c5ee287532489082f5164f3a0",
+  "pin": "26dc171c5ffc776cb0e142ae5390f30cb7a7513eb8a727b1562f05f959b804c3",
   "turns": [
+    {
+      "id": "b86c771c-7ab7-41c6-b6f3-d5d05d3a962c",
+      "ts": "2026-11-26T14:23:35Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-1512",
+      "action": "continue private-deals-service + delphi host check",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "6a292f2b6acdb6b44d0e5345822980f13fa99d95",
+      "branch": "main",
+      "frame": "03hb3ar9x96nbg8affe1nts92"
+    },
+    {
+      "id": "3ad1cb19-d8a6-4be0-967c-952cbd45ff37",
+      "ts": "2026-11-26T14:23:04Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-archive-catchup",
+      "action": "claim: diagnose why the archive holds 3.5k of 7.5k inbox letters, fix the importer window/paging or add a bounded catch-up path, unit tests + dry-run",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/email-archive-import.py"
+      ],
+      "files": [],
+      "base_commit": "12b09d596faba39dbc27c54852df08a7aabd902c",
+      "branch": "main",
+      "frame": "03hb3anlvsi5iltk8q0gb7vih"
+    },
+    {
+      "id": "22a85ec3-2e64-49fa-8fbf-019b9a3fc19f",
+      "ts": "2026-11-26T14:23:01Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-1512",
+      "action": "claim: continue private-deals-service + delphi host check — Go SQLite/FTS5 deals service in tools/os, module + delphi wiring, gate checks:host HOST=delphi",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix",
+        "hosts/delphi/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "6a292f2b6acdb6b44d0e5345822980f13fa99d95",
+      "branch": "main",
+      "frame": "03hb3ancbj41r58050ijb1q50"
+    },
+    {
+      "id": "fd78b0f4-ff69-455a-b113-52e500c0d978",
+      "ts": "2026-11-26T14:20:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-agent-browser-job-cli",
+      "action": "apps:page reads a JS-rendered career page via agent-browser -> firecrawl -> tavily -> http+JSON-LD, every refusal named. Live on clanker (agent-browser 0.45.0): leverdemo, ashby/linear, greenhouse/anthropic -> 3 clean titles each, greenhouse city list split into location. On delphi the browser is absent, so auto fell to firecrawl with the warning kept. 24 unittest cases + py_compile pass; wired as task apps:page.| gate: python3 -m unittest discover tests/job-page-scrape PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "12b09d596faba39dbc27c54852df08a7aabd902c",
+      "branch": "main",
+      "frame": "03hb3a7vqp7ipz510cl6yxqle"
+    },
     {
       "id": "afc3ca62-4c72-48c6-be52-91ec3a0591c5",
       "ts": "2026-11-26T14:17:10Z",
@@ -2959,63 +3017,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hazyxpoxi5g5nsdezze3vnh"
-    },
-    {
-      "id": "8b818b1e-314f-49c8-89c0-d7971f085feb",
-      "ts": "2026-11-26T04:01:31Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26-5",
-      "action": "done: already landed — hmModules name->path resolution is hmShared.modulePaths at all 3 sites (noDE, demo, hm-inventory-role); 0 raw map(m:self.modules) left; per-host hmModules lists single-sourced in host-inventory lets since 7d5fdb3c | gate: drv-equality + nix:lint green on each commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hazx8oy9dh6lxmabc9oh3d9"
-    },
-    {
-      "id": "f24b3155-903b-413c-83fb-9fd4afbded3c",
-      "ts": "2026-11-26T04:00:19Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26-5",
-      "action": "chain-change: single-source hmModules imports, drv-equality + nix lint",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "lib/"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hazx05j1543c9ohj9zkgzpe"
-    },
-    {
-      "id": "4ac2b333-3810-4956-aed5-effc79d70090",
-      "ts": "2026-11-26T03:51:22Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26-4",
-      "action": "done: already landed — lib/hm-shared.nix is the single source (entries, modulePaths, forHost, baseline); all 4 sites rewired; HEAD=origin/main=3346ea27 clean | gate: drv-equality 4/4 + nix:lint 333 on the commits",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hazv9bgliciupsdu5tvj18b"
-    },
-    {
-      "id": "d3d9030d-7c82-48af-98d3-44f6742eedff",
-      "ts": "2026-11-26T03:50:41Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26-4",
-      "action": "chain-change: lib/hm-shared single-source + drv-equality + nix lint",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/hm-shared.nix"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hazv4goon3daqif160bvd56"
     }
   ]
 }

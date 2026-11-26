@@ -401,9 +401,15 @@ in {
       };
 
       maxPages = lib.mkOption {
-        type = lib.types.ints.positive;
-        default = 20;
-        description = "Envelope pages a run may scan before giving up.";
+        type = lib.types.ints.nonnegative;
+        default = 0;
+        description = ''
+          Envelope pages a run may scan. 0 derives the window from the archive
+          size, which is the only value that keeps reaching past the frontier as
+          the archive grows: a fixed window shorter than the archive makes every
+          run re-read known mail and stop short of the frontier, and the
+          importer therefore widens such a window back to the derived one.
+        '';
       };
 
       pageSize = lib.mkOption {

@@ -26,7 +26,7 @@ persona="$tmp/wt/modules/user/ai/hermes-persona/config.yaml"
 fail=0
 
 # 1. An undeclared `-free` id (the tokenrouter mistake's exact shape) refuses.
-sed -i 's/deepseek\/deepseek-v4.1-flash-1017-free/deepseek\/deepseek-v4.2-flash-1017-free/g' "$persona"
+sed -i 's/qwen\/qwen3.8-27b:free/deepseek\/deepseek-v4.2-flash-1017-free/g' "$persona"
 out=$(cd "$tmp/wt" && bash scripts/task/infron-check.sh 2>&1); rc=$?
 if [ $rc -eq 1 ] && echo "$out" | grep -q 'deepseek/deepseek-v4.2-flash-1017-free'; then
   echo "ok   undeclared -free id refused, id named"
@@ -36,7 +36,7 @@ fi
 
 # 2. An id with no billing marker at all (a typo'd upgrade) refuses too.
 git -C "$tmp/wt" checkout -- modules/user/ai/hermes-persona/config.yaml
-sed -i 's/deepseek\/deepseek-v4.1-flash-1017-free/deepseek\/deepseek-v4.1-flash/g' "$persona"
+sed -i 's/qwen\/qwen3.8-27b:free/deepseek\/deepseek-v4.1-flash/g' "$persona"
 out=$(cd "$tmp/wt" && bash scripts/task/infron-check.sh 2>&1); rc=$?
 if [ $rc -eq 1 ] && echo "$out" | grep -q 'deepseek/deepseek-v4.1-flash'; then
   echo "ok   marker-less id refused, id named"

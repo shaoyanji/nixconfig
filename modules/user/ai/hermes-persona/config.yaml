@@ -38,18 +38,19 @@ providers:
     models:
       - qwen/qwen3.8-27b:free
       # - deepseek/deepseek-v4-flash-0731:free
-  tokenrouter:
-    api: https://api.tokenrouter.com/v1
-    key_env: TOKENROUTER_API_KEY
-    api_mode: openai
-    default_model: deepseek/deepseek-v4.1-flash-1017-free
-    discover_models: false
-    models:
-      - deepseek/deepseek-v4.1-flash-1017-free
+  # Tokenrouter returned 403 IP_NOT_ALLOWED (auth failure, 2026-11-26) — commented out; free lanes only.
+  # tokenrouter:
+  #   api: https://api.tokenrouter.com/v1
+  #   key_env: TOKENROUTER_API_KEY
+  #   api_mode: openai
+  #   default_model: deepseek/deepseek-v4.1-flash-1017-free
+  #   discover_models: false
+  #   models:
+  #     - deepseek/deepseek-v4.1-flash-1017-free
 model:
-  provider: custom
-  default: deepseek/deepseek-v4.1-flash-1017-free
-  base_url: https://api.tokenrouter.com/v1
+  provider: infron
+  default: qwen/qwen3.8-27b:free
+  base_url: https://llm.onerouter.pro/v1
 agent:
   max_turns: 150
   reasoning_effort: medium
@@ -154,12 +155,11 @@ display:
 # the NIM lane, not the custom endpoint: the billed pick that cost the Infron
 # balance (2026-11-19) was this model resolved through a metered route.
 fallback_providers:
-  # CanTrustAI — first fallback. Model: deepseek/deepseek-v4.1-flash on
-  # https://cantrustai.xyz/v1. Key: CANTRUSTAI_API_KEY (sops ai-services-shared-env).
-  - provider: custom
-    model: deepseek/deepseek-v4.1-flash
-    base_url: https://cantrustai.xyz/v1
-    key_env: CANTRUSTAI_API_KEY
+  # CanTrustAI (paid custom lane; also returned 405 on 2026-11-26) — commented out; free fallbacks only.
+  # - provider: custom
+  #   model: deepseek/deepseek-v4.1-flash
+  #   base_url: https://cantrustai.xyz/v1
+  #   key_env: CANTRUSTAI_API_KEY
   # NIM leads (2026-11-22), ahead of the two lanes that used to. Order is cost,
   # not preference: `GET <base>/models` measured 0.107 s for NIM (connect
   # 0.016 s, against a 0.066 s github baseline) where openrouter was 0.984 s and

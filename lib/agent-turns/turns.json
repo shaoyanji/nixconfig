@@ -1,8 +1,43 @@
 {
-  "generated": "2026-11-26T21:20:05Z",
+  "generated": "2026-11-26T21:39:29Z",
   "count": 200,
-  "pin": "4abc3f57cd67f084182f76afe2705c104352abe14a1a0d0754e0c068803dedbf",
+  "pin": "94225456b9e22b1c175395d7e829663ded93f16bb6290cf7b928444f89eb6a0d",
   "turns": [
+    {
+      "id": "ef913cff-efca-4b91-977d-ebcd499a4fe8",
+      "ts": "2026-11-26T21:37:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-wallpaper",
+      "action": "tmux-pane-steward drove idle pane agents:5 (wallpaper-worker/agy Gemini 4 Hydrogen); jev classify duel selected publish over task-change (0.54 vs 0.46, margin 0.08, driven by margin); pasted image-daily wallpaper round task via load-buffer+paste-buffer+Enter; pane now working with tool-run spinner.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5nhy4izns3ndo2v7td3bz"
+    },
+    {
+      "id": "c7850e97-a24d-4ec9-8eef-46e476ea6c13",
+      "ts": "2026-11-26T21:20:28Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wallpaper",
+      "action": "published: nixconfig-dark.png on Cloudinary + bountystash-assets.pages.dev (784/784); closed AGENTS.nix note (0327134d) on origin/main | gate: images:publish + checks:images PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json",
+        "wallpapers/nixconfig-dark.png"
+      ],
+      "files": [
+        "AGENTS.nix",
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json",
+        "wallpapers/nixconfig-dark.png"
+      ],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5k6z0d3d37vdcpnddkqck"
+    },
     {
       "id": "a436fafa-070c-47ae-be19-9a4e186202d8",
       "ts": "2026-11-26T21:18:04Z",
@@ -3070,40 +3105,6 @@
       "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
       "branch": "main",
       "frame": "03hb3fwelu2d5rp942zw95x6t"
-    },
-    {
-      "id": "c6433e5f-ce5e-455e-b29a-41bb14f1f555",
-      "ts": "2026-11-26T14:49:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-1538",
-      "action": "drive devin: inventory-site-service (flake-change)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/inventory-site",
-        "modules/services/inventory-site.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "files": [],
-      "base_commit": "92948702269fc56e1b10675b8b620c23d396ffd9",
-      "branch": "main",
-      "frame": "03hb3fv9emloqbrtv9w67b2rm"
-    },
-    {
-      "id": "3d7cb445-6b36-4546-93e3-c906a8dd3202",
-      "ts": "2026-11-26T14:48:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:deals-scraper-merchant-fix",
-      "action": "merchant_from unwraps click trackers (url/u/target/dest/goto/*_url, 2 hops) before reading the host, alias map amzn->amazon, shop.samsung.com->samsung, shortener with no target -> ''. Live firecrawl techbargains: merchants now amazon x4 + walmart x1 (was 'cc' x5); ingest to local private-deals :8473 created 5, q=JBL -> walmart, list_price 39.95, 50%; ?merchant=walmart 1. 40 tests + py_compile.| gate: python3 -m unittest discover tests/deals-page-scrape PASS + local ingest/FTS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
-      "branch": "main",
-      "frame": "03hb3fnqjd8xcz2yps7x7doq7"
     }
   ]
 }

@@ -158,6 +158,48 @@ class IdentityTest(unittest.TestCase):
         self.assertEqual(deals.merchant_from("https://www.mediamarkt.de/de/product"), "mediamarkt")
         self.assertEqual(deals.merchant_from("https://geizhals.de/x"), "geizhals")
 
+    def test_merchant_survives_a_click_tracker(self):
+        # The live shape from techbargains: the shop is only in `url=`.
+        tracked = (
+            "https://cc.techbargains.com/v1/otc/06LJoHfGQoCuYdVtZVoTdgY"
+            "?merchant=05kie42h3YvHwjr4G1w80Qq"
+            "&url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB0CYLQR5NL"
+            "&item=deal_description&module=deals_list"
+        )
+        self.assertEqual(deals.merchant_from(tracked), "amazon")
+        self.assertEqual(
+            deals.merchant_from(
+                "https://cc.techbargains.com/v1/otc/x?merchant=02zL&url=https%3A%2F%2Fwww.walmart.com%2Fip%2F16221054826"
+            ),
+            "walmart",
+        )
+
+    def test_other_tracker_parameter_names_work(self):
+        self.assertEqual(
+            deals.merchant_from("https://links.example.com/go?u=https%3A%2F%2Fwww.newegg.com%2Fp%2FN82E16"),
+            "newegg",
+        )
+        self.assertEqual(
+            deals.merchant_from("https://r.example.com/x?target=https%3A%2F%2Fwww.otto.de%2Fp%2F1"),
+            "otto",
+        )
+
+    def test_nested_redirects_resolve_to_the_shop(self):
+        inner = "https%3A%2F%2Flinks.example.com%2Fgo%3Fu%3Dhttps%253A%252F%252Fwww.bestbuy.com%252Fsite%252F1"
+        self.assertEqual(
+            deals.merchant_from(f"https://go.example.com/x?url={inner}"), "bestbuy"
+        )
+
+    def test_an_opaque_shortener_is_not_a_merchant(self):
+        self.assertEqual(deals.merchant_from("https://bit.ly/3xYzAbC"), "")
+        self.assertEqual(deals.merchant_from("https://t.co/abc"), "")
+
+    def test_a_tracker_parameter_that_is_not_a_url_is_ignored(self):
+        self.assertEqual(deals.merchant_from("https://shop.example/p/1?url=not-a-url"), "shop")
+
+    def test_shop_prefix_belongs_to_a_real_host(self):
+        self.assertEqual(deals.merchant_from("https://shop.samsung.com/de/x"), "samsung")
+
     def test_category_from_title(self):
         self.assertEqual(deals.category_of("Lenovo IdeaPad 5 Pro"), "laptop")
         self.assertEqual(deals.category_of("GeForce RTX 4070 Super"), "gpu")

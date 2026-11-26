@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T14:46:26Z",
+  "generated": "2026-11-26T14:48:24Z",
   "count": 200,
-  "pin": "431e6da2f142f46fcd624e178298eb285ca56dbcaa2735d0e703c246faea9c7b",
+  "pin": "3917ea931e863c427a7d261004015e16c095fb711dfd7b6eaf5bb000af724299",
   "turns": [
+    {
+      "id": "abdba80a-d464-450e-acfb-f7df281eac12",
+      "ts": "2026-11-26T14:47:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-scraper-merchant-fix",
+      "action": "claim: resolve merchant past redirect hosts (cc.techbargains.com) from query/path/known tokens instead of filing every deal under cc",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/deals-page-scrape.py tests/deals-page-scrape"
+      ],
+      "files": [],
+      "base_commit": "3b0bf87e088265fe87e6968918bc0599b06dfd9b",
+      "branch": "main",
+      "frame": "03hb3feoorw74br3bihv3cvno"
+    },
+    {
+      "id": "deb22032-a5b7-4ca1-a0a8-ca2311989428",
+      "ts": "2026-11-26T14:46:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-ingest-pipeline",
+      "action": "deals-ingest.py: scrape JSON -> POST /api/deals, original_price mapped to list_price, board host as source (not the cc.* redirect), canonical URL so re-runs update, unpriced cards refused. Live e2e on /tmp binary :8472: firecrawl techbargains 5 deals created, FTS q=knife hit with snippet, q=cleaner&min_discount=50 1, re-run 0 created/5 updated. 17 tests + py_compile.| gate: python3 -m unittest discover tests/deals-ingest PASS + live /api/deals FTS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3b0bf87e088265fe87e6968918bc0599b06dfd9b",
+      "branch": "main",
+      "frame": "03hb3f8wl0st1ylwzkvre6s7q"
+    },
     {
       "id": "d09e8c0b-0261-4e7c-ae1a-fa3692fd87d9",
       "ts": "2026-11-26T14:45:00Z",
@@ -3003,35 +3031,6 @@
       "base_commit": null,
       "branch": null,
       "frame": "03hb0kggqaqzqvmq71biwspuh"
-    },
-    {
-      "id": "5d6e8582-ca60-42c3-88ba-5417929bb9d1",
-      "ts": "2026-11-26T05:55:46Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0638",
-      "action": "landed: modules-edges refused the path imports — both sites now reach config.nginx-static-ui by name (self.modules; +self arg on appflow-board) | gate: modules:edges 168 modules every edge by name + drv-equality delphi + nix:lint 333",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0jk2wtvdyf4cmmdk3bh2u"
-    },
-    {
-      "id": "7c8fc094-e181-417e-865d-5447a32e8b61",
-      "ts": "2026-11-26T05:51:38Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0638",
-      "action": "start: check modules-edges sees the new config.nginx-static-ui import edges",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/appflow-board.nix",
-        "modules/services/media-relay.nix"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0ir1rmz323cjwawwmbahr"
     }
   ]
 }

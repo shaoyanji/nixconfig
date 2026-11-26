@@ -175,12 +175,57 @@ def percent_off(text: str) -> int | None:
 # -- identity --------------------------------------------------------------
 
 
+# Boards do not link the shop, they link their own click tracker, and the shop
+# survives only inside a query parameter: `cc.techbargains.com/...?url=https%3A
+# %2F%2Fwww.amazon.com%2F...`. Reading the host alone files every deal under
+# `cc`.
+REDIRECT_PARAMS = {
+    "url", "u", "target", "tgt", "dest", "destination", "redirect", "redirect_url",
+    "redirect_uri", "redir", "r", "goto", "go", "link", "to", "out", "offer",
+    "offer_url", "deeplink", "deep_link", "deepl", "lo", "dl",
+}
+
+# Names that are not shops even after unwrapping: shorteners with no target.
+LINK_SHORTENERS = {"bit.ly", "bitly.com", "t.co", "ow.ly", "tinyurl.com", "lnk.to", "is.gd", "buff.ly", "rb.gy"}
+
+# A host label is not always the shop's name in the text a person would use.
+MERCHANT_ALIASES = {
+    "amzn": "amazon", "amazon": "amazon", "amzn.to": "amazon", "ebay": "ebay", "ebay.us": "ebay",
+    "walmart": "walmart", "bestbuy": "bestbuy", "newegg": "newegg", "target": "target",
+    "aliexpress": "aliexpress", "otto": "otto", "mediamarkt": "mediamarkt", "saturn": "saturn",
+    "notebooksbilliger": "notebooksbilliger", "cyberport": "cyberport", "alternate": "alternate",
+    "idealo": "idealo", "geizhals": "geizhals", "kaufda": "kaufda", "coolblue": "coolblue",
+}
+
+
+def unwrap_redirect(url: str, hops: int = 2) -> str:
+    """The shop URL a click tracker points at, when it carries one."""
+    current = (url or "").strip()
+    for _ in range(hops + 1):
+        query = urllib.parse.parse_qsl(urllib.parse.urlsplit(current).query, keep_blank_values=False)
+        target = ""
+        for key, value in query:
+            if not value.lower().startswith(("http://", "https://")):
+                continue
+            if key.lower() in REDIRECT_PARAMS or key.lower().endswith("_url"):
+                target = value
+                break
+        if not target or target == current:
+            break
+        current = target
+    return current
+
+
 def merchant_from(url: str) -> str:
-    host = urllib.parse.urlsplit(url).netloc.lower().removeprefix("www.")
-    if not host:
+    host = urllib.parse.urlsplit(unwrap_redirect(url)).netloc.lower().removeprefix("www.")
+    if not host or host in LINK_SHORTENERS:
         return ""
-    label = host.split(".")[0]
-    return label if label not in {"deals", "deal", "www", "m"} else host.split(".")[1]
+    labels = host.split(".")
+    label = labels[0]
+    # `shop.samsung.com` is Samsung; `shop.example` has one label and stays.
+    if label in {"deals", "deal", "shop", "shopping", "store"} and len(labels) > 2:
+        label = labels[1]
+    return MERCHANT_ALIASES.get(label, label)
 
 
 def category_of(title: str, url: str = "") -> str:

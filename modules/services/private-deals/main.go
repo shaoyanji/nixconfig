@@ -94,6 +94,7 @@ func main() {
 	mux.HandleFunc("GET /favicon.svg", s.static("web/favicon.svg", "image/svg+xml"))
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/stats", s.stats)
+	mux.HandleFunc("GET /api/analytics", s.analytics)
 	mux.HandleFunc("GET /api/sources", s.sources)
 	mux.HandleFunc("GET /api/deals", s.deals)
 	mux.HandleFunc("POST /api/deals", s.createDeal)
@@ -235,6 +236,18 @@ func (s *server) stats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, stats)
+}
+
+func (s *server) analytics(w http.ResponseWriter, r *http.Request) {
+	report, err := s.store.Analytics(r.Context(), analyticsQuery{
+		Window: intQuery(r, "window"),
+		Limit:  intQuery(r, "limit"),
+	})
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, report)
 }
 
 func (s *server) sources(w http.ResponseWriter, r *http.Request) {

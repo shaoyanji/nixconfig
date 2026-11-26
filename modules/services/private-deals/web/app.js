@@ -1,6 +1,6 @@
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
-const state = { deals: [], products: [], watchlists: [] };
+const state = { deals: [], products: [], watchlists: [], analytics: null };
 
 async function api(path, opts={}) {
   const res = await fetch(path, opts);
@@ -20,6 +20,44 @@ async function refreshStats() {
   $('#stats').innerHTML = [
     ['deals','Active deals'],['products','Tracked products'],['price_points','Price points'],['alerts_sent','Alerts sent']
   ].map(([key,label]) => `<div class="stat"><strong>${esc(stats[key] ?? 0)}</strong><span>${label}</span></div>`).join('');
+}
+function sparkline(days, currency) {
+  const points = (days || []).filter(day => day.min_price != null);
+  if (points.length < 2) return '';
+  const width = 240, height = 46, pad = 4;
+  const values = points.map(day => day.min_price);
+  const low = Math.min(...values), high = Math.max(...values), span = high - low || 1;
+  const step = (width - pad * 2) / (points.length - 1);
+  const coords = values.map((value, i) => [pad + i * step, height - pad - ((value - low) / span) * (height - pad * 2)]);
+  const line = coords.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const area = `${line} L${(width - pad).toFixed(1)} ${height} L${pad} ${height} Z`;
+  const [lastX, lastY] = coords[coords.length - 1];
+  const label = `lowest price per day: ${money(low, currency)} to ${money(high, currency)}`;
+  return `<svg class="spark" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title><path class="spark-area" d="${area}"></path><path class="spark-line" d="${line}"></path><circle class="spark-dot" cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="2.6"></circle></svg>`;
+}
+async function loadAnalytics() {
+  const report = await api('/api/analytics?window=30&limit=5');
+  state.analytics = report;
+  const history = report.history || {};
+  const currency = history.currency || 'EUR';
+  const drop = (report.biggest_drops || [])[0];
+  const figure = (value, label) => `<div><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`;
+  const figures = [
+    figure(`${history.points || 0}`, `price points · ${report.window_days || 30} d`),
+    figure(`${history.fell || 0}`, 'products falling'),
+    figure(`${history.rose || 0}`, 'products rising'),
+    figure(drop ? `−${drop.drop_pct}%` : '—', drop ? drop.name : 'no drop yet'),
+  ].join('');
+  const rows = (items, detail) => items.length ? items.map(item => `<div class="analytics-row"><b>${esc(item.name || item.title)}</b><span>${detail(item)}</span></div>`).join('') : '<p class="muted">nothing yet</p>';
+  const lists = [
+    ['Top discounts', rows(report.top_discounts || [], deal => `−${deal.discount_pct}%${deal.price != null ? ' · ' + money(deal.price, deal.currency) : ''}`)],
+    ['Merchants', rows(report.merchants || [], row => `${row.deals} deal(s) · ⌀−${row.avg_discount}%`)],
+    ['Categories', rows(report.categories || [], row => `${row.deals} deal(s) · max −${row.max_discount}%`)],
+  ].map(([title, body]) => `<div><h4>${title}</h4>${body}</div>`).join('');
+  $('#analyticsWindow').textContent = `last ${report.window_days || 30} days · avg ${history.avg_price != null ? money(history.avg_price, currency) : '—'}`;
+  $('#analytics').innerHTML = `<div class="analytics-figures">${figures}</div>${sparkline(history.daily, currency)}` +
+    (drop ? `<p class="muted">${esc(drop.name)} ${money(drop.from, drop.currency)} → ${money(drop.to, drop.currency)} over ${drop.points} point(s)</p>` : '') +
+    `<div class="analytics-lists">${lists}</div>`;
 }
 function filterParams() {
   const data = new FormData($('#filters'));
@@ -116,7 +154,7 @@ async function pollIngest() {
   const status = await api('/api/ingest');
   $('#ingestState').textContent = status.running ? 'running' : 'idle';
   if (status.running) setTimeout(pollIngest, 1200);
-  else { refreshStats(); loadDeals(); loadSources(); }
+  else { refreshStats(); loadAnalytics(); loadDeals(); loadSources(); }
 }
 function formNumbers(form, keys) {
   const out = {};
@@ -156,4 +194,4 @@ $('#watchlistForm').addEventListener('submit', async event => {
   try { await api('/api/watchlists',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:event.target.name.value})}); event.target.reset(); loadWatchlists(); }
   catch(err) { toast(err.message); }
 });
-Promise.all([refreshStats(),loadDeals(),loadProducts(),loadWatchlists(),loadSources(),loadAlerts()]).catch(err => toast(err.message));
+Promise.all([refreshStats(),loadAnalytics(),loadDeals(),loadProducts(),loadWatchlists(),loadSources(),loadAlerts()]).catch(err => toast(err.message));

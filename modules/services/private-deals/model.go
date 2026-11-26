@@ -553,3 +553,74 @@ func parseTagsJSON(raw string) []string {
 	}
 	return tags
 }
+
+type analyticsQuery struct {
+	Window int
+	Limit  int
+}
+
+type analyticsDeal struct {
+	ID          int64     `json:"id"`
+	Title       string    `json:"title"`
+	Merchant    string    `json:"merchant,omitempty"`
+	Category    string    `json:"category,omitempty"`
+	Price       *float64  `json:"price,omitempty"`
+	ListPrice   *float64  `json:"list_price,omitempty"`
+	DiscountPct float64   `json:"discount_pct"`
+	Currency    string    `json:"currency"`
+	URL         string    `json:"url,omitempty"`
+	LastSeen    time.Time `json:"last_seen"`
+}
+
+type analyticsBucket struct {
+	Name        string   `json:"name"`
+	Deals       int      `json:"deals"`
+	AvgDiscount float64  `json:"avg_discount"`
+	MaxDiscount float64  `json:"max_discount"`
+	MinPrice    *float64 `json:"min_price,omitempty"`
+}
+
+type analyticsMovement struct {
+	ProductID   int64     `json:"product_id"`
+	Name        string    `json:"name"`
+	Merchant    string    `json:"merchant,omitempty"`
+	Currency    string    `json:"currency"`
+	From        float64   `json:"from"`
+	To          float64   `json:"to"`
+	DropPct     float64   `json:"drop_pct"`
+	Points      int       `json:"points"`
+	TargetPrice *float64  `json:"target_price,omitempty"`
+	FirstAt     time.Time `json:"first_seen"`
+	LastAt      time.Time `json:"last_seen"`
+}
+
+type historyDay struct {
+	Day      string   `json:"day"`
+	Points   int      `json:"points"`
+	AvgPrice *float64 `json:"avg_price,omitempty"`
+	MinPrice *float64 `json:"min_price,omitempty"`
+}
+
+type historySummary struct {
+	WindowDays int          `json:"window_days"`
+	Points     int          `json:"points"`
+	Products   int          `json:"products"`
+	Fell       int          `json:"fell"`
+	Rose       int          `json:"rose"`
+	Flat       int          `json:"flat"`
+	AvgPrice   *float64     `json:"avg_price,omitempty"`
+	MinPrice   *float64     `json:"min_price,omitempty"`
+	MaxPrice   *float64     `json:"max_price,omitempty"`
+	Currency   string       `json:"currency"`
+	Daily      []historyDay `json:"daily"`
+}
+
+type analyticsReport struct {
+	GeneratedAt  time.Time           `json:"generated_at"`
+	WindowDays   int                 `json:"window_days"`
+	TopDiscounts []analyticsDeal     `json:"top_discounts"`
+	BiggestDrops []analyticsMovement `json:"biggest_drops"`
+	Merchants    []analyticsBucket   `json:"merchants"`
+	Categories   []analyticsBucket   `json:"categories"`
+	History      historySummary      `json:"history"`
+}

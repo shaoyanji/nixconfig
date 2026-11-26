@@ -337,3 +337,174 @@ func TestBatchDealsEndpointAccountsForOutcomes(t *testing.T) {
 		t.Fatalf("response %#v", response)
 	}
 }
+
+func seedAnalytics(t *testing.T, store *Store) (dealA, dealB, dealC, productA, productB int64) {
+	t.Helper()
+	ctx := context.Background()
+
+	target := 800.0
+	a, _, err := store.UpsertProduct(ctx, productInput{
+		URL: "https://shop.example/laptop", Source: "manual", Merchant: "ShopA", Name: "Example Laptop",
+		Category: "computing", Currency: "EUR", TargetPrice: &target,
+	})
+	if err != nil {
+		t.Fatalf("UpsertProduct a: %v", err)
+	}
+	b, _, err := store.UpsertProduct(ctx, productInput{
+		URL: "https://shop.example/headset", Source: "manual", Merchant: "ShopB", Name: "Example Headset",
+		Category: "audio", Currency: "EUR",
+	})
+	if err != nil {
+		t.Fatalf("UpsertProduct b: %v", err)
+	}
+	for _, price := range []float64{999, 899, 799} {
+		value := price
+		if err := store.RecordPrice(ctx, &a, nil, &value, nil, 0, "EUR", "test", ""); err != nil {
+			t.Fatalf("RecordPrice a %v: %v", price, err)
+		}
+	}
+	for _, price := range []float64{100, 120} {
+		value := price
+		if err := store.RecordPrice(ctx, &b, nil, &value, nil, 0, "EUR", "test", ""); err != nil {
+			t.Fatalf("RecordPrice b %v: %v", price, err)
+		}
+	}
+
+	dealA, _, err = store.UpsertDeal(ctx, dealInput{
+		URL: "https://shop.example/laptop-deal", Source: "rss", Merchant: "ShopA", Title: "Example Laptop deal",
+		Category: "computing", Price: floatPtrOf(799), ListPrice: floatPtrOf(999),
+	})
+	if err != nil {
+		t.Fatalf("UpsertDeal a: %v", err)
+	}
+	dealB, _, err = store.UpsertDeal(ctx, dealInput{
+		URL: "https://shop.example/headset-deal", Source: "rss", Merchant: "ShopB", Title: "Example Headset deal",
+		Category: "audio", Price: floatPtrOf(45), ListPrice: floatPtrOf(50),
+	})
+	if err != nil {
+		t.Fatalf("UpsertDeal b: %v", err)
+	}
+	dealC, _, err = store.UpsertDeal(ctx, dealInput{
+		URL: "https://shop.example/speaker-deal", Source: "rss", Merchant: "ShopA", Title: "Example Speaker deal",
+		Category: "audio", Price: floatPtrOf(40), ListPrice: floatPtrOf(50),
+	})
+	if err != nil {
+		t.Fatalf("UpsertDeal c: %v", err)
+	}
+	return dealA, dealB, dealC, a, b
+}
+
+func floatPtrOf(value float64) *float64 { return &value }
+
+func TestAnalyticsRanksDiscountsDropsAndBreakdowns(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	dealA, dealB, dealC, productA, productB := seedAnalytics(t, store)
+
+	report, err := store.Analytics(ctx, analyticsQuery{Window: 30, Limit: 5})
+	if err != nil {
+		t.Fatalf("Analytics: %v", err)
+	}
+
+	if len(report.TopDiscounts) != 3 {
+		t.Fatalf("top discounts %#v, want 3 active discounted deals", report.TopDiscounts)
+	}
+	if report.TopDiscounts[0].ID != dealC || report.TopDiscounts[2].ID != dealB {
+		t.Fatalf("top discount order %#v, want cheapest of the tied lead then the smallest", report.TopDiscounts)
+	}
+	if report.TopDiscounts[0].DiscountPct <= report.TopDiscounts[2].DiscountPct {
+		t.Fatalf("discounts not descending: %#v", report.TopDiscounts)
+	}
+
+	if len(report.Merchants) != 2 || report.Merchants[0].Name != "ShopA" || report.Merchants[0].Deals != 2 {
+		t.Fatalf("merchants %#v, want ShopA leading with two deals", report.Merchants)
+	}
+	if len(report.Categories) != 2 || report.Categories[0].Name != "audio" || report.Categories[0].Deals != 2 {
+		t.Fatalf("categories %#v, want audio leading", report.Categories)
+	}
+
+	if len(report.BiggestDrops) != 1 {
+		t.Fatalf("drops %#v, want only the product that fell", report.BiggestDrops)
+	}
+	drop := report.BiggestDrops[0]
+	if drop.ProductID != productA || drop.DropPct != 20 || drop.From != 999 || drop.To != 799 || drop.Points != 3 {
+		t.Fatalf("drop %#v, want %d from 999 to 799 (20%%, 3 points)", drop, productA)
+	}
+	if drop.TargetPrice == nil || *drop.TargetPrice != 800 {
+		t.Fatalf("drop target %#v, want 800", drop.TargetPrice)
+	}
+
+	history := report.History
+	if history.Fell != 1 || history.Rose != 1 || history.Flat != 0 {
+		t.Fatalf("movement counts %#v, want one falling and one rising product", history)
+	}
+	if history.Points < 8 || history.Products < 2 {
+		t.Fatalf("history totals %#v, want at least the seeded points", history)
+	}
+	if history.Currency != "EUR" || len(history.Daily) == 0 {
+		t.Fatalf("history shape %#v, want EUR with daily buckets", history)
+	}
+	if history.MinPrice == nil || *history.MinPrice > 40 || history.MaxPrice == nil || *history.MaxPrice < 999 {
+		t.Fatalf("price range %#v", history)
+	}
+	_ = dealA
+	_ = dealB
+	_ = productB
+}
+
+func TestAnalyticsWindowAndLimitAreClamped(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	seedAnalytics(t, store)
+
+	wide, err := store.Analytics(ctx, analyticsQuery{Window: 9999, Limit: 9999})
+	if err != nil {
+		t.Fatalf("Analytics wide: %v", err)
+	}
+	if wide.WindowDays != 365 {
+		t.Fatalf("window %d, want 365", wide.WindowDays)
+	}
+
+	narrow, err := store.Analytics(ctx, analyticsQuery{Window: 1, Limit: 1})
+	if err != nil {
+		t.Fatalf("Analytics narrow: %v", err)
+	}
+	if narrow.WindowDays != 1 || len(narrow.TopDiscounts) != 1 {
+		t.Fatalf("narrow report %#v, want one row", narrow)
+	}
+	if len(narrow.History.Daily) > 1 {
+		t.Fatalf("daily buckets %#v, want at most today inside a one-day window", narrow.History.Daily)
+	}
+}
+
+func TestAnalyticsEndpointAnswersJSONOnAnEmptyIndex(t *testing.T) {
+	store := testStore(t)
+	s := &server{store: store}
+
+	rec := httptest.NewRecorder()
+	s.analytics(rec, httptest.NewRequest(http.MethodGet, "/api/analytics", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status %d: %s", rec.Code, rec.Body.String())
+	}
+	var report analyticsReport
+	if err := json.Unmarshal(rec.Body.Bytes(), &report); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if report.WindowDays != 30 || report.History.WindowDays != 30 {
+		t.Fatalf("defaults %#v, want a 30-day window", report)
+	}
+	for _, fragment := range []string{`"top_discounts": []`, `"biggest_drops": []`, `"merchants": []`, `"categories": []`, `"daily": []`} {
+		if !strings.Contains(rec.Body.String(), fragment) {
+			t.Fatalf("empty index should answer %s, got %s", fragment, rec.Body.String())
+		}
+	}
+
+	rec = httptest.NewRecorder()
+	s.analytics(rec, httptest.NewRequest(http.MethodGet, "/api/analytics?window=7&limit=2", nil))
+	if err := json.Unmarshal(rec.Body.Bytes(), &report); err != nil {
+		t.Fatalf("decode second: %v", err)
+	}
+	if report.WindowDays != 7 {
+		t.Fatalf("window %d, want 7", report.WindowDays)
+	}
+}

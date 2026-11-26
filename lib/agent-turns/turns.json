@@ -1,8 +1,52 @@
 {
-  "generated": "2026-11-26T16:55:20Z",
+  "generated": "2026-11-26T17:01:07Z",
   "count": 200,
-  "pin": "bfc0a9a6bd8bcb616ce6d4dea20a8d2620056f09f974cf4721353096c99635c4",
+  "pin": "bf64dcc7545f76152b11ada129f868ed736f83ec99fea6bca8633642c692cfdf",
   "turns": [
+    {
+      "id": "96fa230a-1c36-42fa-a13b-07c63f8fc44e",
+      "ts": "2026-11-26T16:57:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:private-deals-analytics-sparklines",
+      "action": "claim: analytics endpoint from the store's own queries + a sparkline in the reader, tested against a temp SQLite, then a live smoke; commit only this directory through a temp index",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/private-deals"
+      ],
+      "files": [],
+      "base_commit": "74b8018a3fe51284fc8bc4448899120e605ebcb5",
+      "branch": "main",
+      "frame": "03hb44uyq86wx3240epcaroyc"
+    },
+    {
+      "id": "c6099051-cb2d-4f46-a072-e0f0b95a147f",
+      "ts": "2026-11-26T16:56:06Z",
+      "source": "devin",
+      "subject": "nixconfig:service-portal-live-telemetry",
+      "action": "claim: live telemetry aggregation for delphi service portal cards",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/service-portal.nix",
+        "hosts/delphi/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "74b8018a3fe51284fc8bc4448899120e605ebcb5",
+      "branch": "main",
+      "frame": "03hb44jvt6gz1zmm0bqxq1psj"
+    },
+    {
+      "id": "d274bc2a-42e6-486e-83fb-b14f265e27e2",
+      "ts": "2026-11-26T16:55:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-and-atlas-docs",
+      "action": "portfolio-services: /batch routes (500, per-item errors), deterministic 0-100 score + minAlertScore -> retried job_score_alerts, deal_alerts reasons (target-price, price-drop<95%, watchlist-match), asset_events trail, qr.svg label, warranty queue at start + 6-hourly; ingest rows name /batch. mail-atlas: atlas-senders row, S drawer bullet (f is the one-sender form), curl + smoke in Verify. Claims read off the handlers.| gate: checks:prose, docs:budget 169/400 + 345/400, docs:links",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "74b8018a3fe51284fc8bc4448899120e605ebcb5",
+      "branch": "main",
+      "frame": "03hb44h590pm1b2gwuom1lljt"
+    },
     {
       "id": "6dfdc1bc-ea8b-4b31-bba3-c71fcf42d94a",
       "ts": "2026-11-26T16:54:12Z",
@@ -2994,55 +3038,6 @@
       "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
       "branch": "main",
       "frame": "03hb2ldru5utvf39scrj3a6ba"
-    },
-    {
-      "id": "76255add-5b45-4217-a5e0-24a010fc0420",
-      "ts": "2026-11-26T12:11:15Z",
-      "source": "agy",
-      "subject": "nixconfig:appflow-clear-13",
-      "action": "bug-fix: resolve last 13 mail + 6 unnamed rows, guard upsert",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/appflow-check.sh",
-        "tests/appflow-packet"
-      ],
-      "files": [],
-      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
-      "branch": "main",
-      "frame": "03hb2kwmoztq1t92a2rdila5m"
-    },
-    {
-      "id": "594922be-084f-4807-954b-df0e52ba50a7",
-      "ts": "2026-11-26T12:07:49Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-placeholder-resolve",
-      "action": "27 placeholder roles named from their own mail, the exposed duplicate pair declared, 2 mangled roles corrected. Unnamed 20->6, unresolved-mail 35->13. Nothing emailed.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/appflow-check.sh"
-      ],
-      "files": [],
-      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
-      "branch": "main",
-      "frame": "03hb2k8k6c1r8p89jbkempkcq"
-    },
-    {
-      "id": "d4ef42ef-ad17-4641-bac1-3e761f4821d5",
-      "ts": "2026-11-26T12:07:32Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-placeholder-resolve",
-      "action": "Read the 44 threads and name the roles they prove; leave the ambiguous ones",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/appflow-check.sh"
-      ],
-      "files": [],
-      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
-      "branch": "main",
-      "frame": "03hb2k6iw33iawgasmhlmcapd"
     }
   ]
 }

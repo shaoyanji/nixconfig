@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -994,6 +996,221 @@ func (s *Store) Stats(ctx context.Context) (map[string]any, error) {
 		}
 	}
 	return stats, nil
+}
+
+func roundMoney(value float64) float64 { return math.Round(value*100) / 100 }
+
+// Analytics is the page's other reading: not one deal at a time but the shape of
+// them. Every figure is over active deals, and every ordering has a tiebreak so
+// two runs over the same rows answer the same way.
+func (s *Store) Analytics(ctx context.Context, opts analyticsQuery) (analyticsReport, error) {
+	window := opts.Window
+	if window <= 0 {
+		window = 30
+	}
+	if window > 365 {
+		window = 365
+	}
+	limit := opts.Limit
+	if limit <= 0 {
+		limit = 5
+	}
+	if limit > 50 {
+		limit = 50
+	}
+	sinceText := time.Now().UTC().AddDate(0, 0, -window).Format(time.RFC3339Nano)
+	report := analyticsReport{
+		GeneratedAt:  time.Now().UTC(),
+		WindowDays:   window,
+		TopDiscounts: []analyticsDeal{},
+		BiggestDrops: []analyticsMovement{},
+		Merchants:    []analyticsBucket{},
+		Categories:   []analyticsBucket{},
+	}
+	report.History = historySummary{WindowDays: window, Currency: "EUR", Daily: []historyDay{}}
+
+	discounts, err := s.db.QueryContext(ctx, `SELECT id,title,merchant,category,price,list_price,discount_pct,currency,url,last_seen
+		FROM deals WHERE active=1 AND discount_pct>0
+		ORDER BY discount_pct DESC, COALESCE(price,1e18) ASC, id ASC LIMIT ?`, limit)
+	if err != nil {
+		return report, err
+	}
+	for discounts.Next() {
+		var deal analyticsDeal
+		var price, list sql.NullFloat64
+		var seen string
+		if err := discounts.Scan(&deal.ID, &deal.Title, &deal.Merchant, &deal.Category, &price, &list, &deal.DiscountPct, &deal.Currency, &deal.URL, &seen); err != nil {
+			discounts.Close()
+			return report, err
+		}
+		deal.Price = floatPtr(price)
+		deal.ListPrice = floatPtr(list)
+		deal.LastSeen = parseTime(seen)
+		report.TopDiscounts = append(report.TopDiscounts, deal)
+	}
+	if err := discounts.Err(); err != nil {
+		discounts.Close()
+		return report, err
+	}
+	discounts.Close()
+
+	buckets := func(query string) ([]analyticsBucket, error) {
+		rows, err := s.db.QueryContext(ctx, query, limit)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		out := []analyticsBucket{}
+		for rows.Next() {
+			var bucket analyticsBucket
+			var minPrice sql.NullFloat64
+			if err := rows.Scan(&bucket.Name, &bucket.Deals, &bucket.AvgDiscount, &bucket.MaxDiscount, &minPrice); err != nil {
+				return nil, err
+			}
+			bucket.MinPrice = floatPtr(minPrice)
+			out = append(out, bucket)
+		}
+		return out, rows.Err()
+	}
+	if report.Merchants, err = buckets(`SELECT CASE WHEN merchant='' THEN source ELSE merchant END AS name,
+		count(*), COALESCE(round(avg(discount_pct),1),0), COALESCE(max(discount_pct),0), min(price)
+		FROM deals WHERE active=1 GROUP BY name
+		ORDER BY count(*) DESC, avg(discount_pct) DESC, name ASC LIMIT ?`); err != nil {
+		return report, err
+	}
+	if report.Categories, err = buckets(`SELECT CASE WHEN category='' THEN 'uncategorised' ELSE category END AS name,
+		count(*), COALESCE(round(avg(discount_pct),1),0), COALESCE(max(discount_pct),0), min(price)
+		FROM deals WHERE active=1 GROUP BY name
+		ORDER BY count(*) DESC, avg(discount_pct) DESC, name ASC LIMIT ?`); err != nil {
+		return report, err
+	}
+
+	// First and last price per product inside the window, one pass: the drop list
+	// and the fell/rose counts are the same rows read two ways.
+	movements, err := s.db.QueryContext(ctx, `WITH pts AS (
+			SELECT product_id, price, captured_at,
+				ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY captured_at ASC, id ASC) AS first_rank,
+				ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY captured_at DESC, id DESC) AS last_rank,
+				COUNT(*) OVER (PARTITION BY product_id) AS points
+			FROM price_history
+			WHERE product_id IS NOT NULL AND price IS NOT NULL AND price>0 AND captured_at>=?
+		)
+		SELECT f.product_id, p.name, p.merchant, p.currency, p.target_price,
+			f.price, l.price, f.captured_at, l.captured_at, l.points
+		FROM pts f
+		JOIN pts l ON l.product_id=f.product_id AND l.last_rank=1
+		JOIN products p ON p.id=f.product_id
+		WHERE f.first_rank=1 AND l.points>=2
+		LIMIT 2000`, sinceText)
+	if err != nil {
+		return report, err
+	}
+	for movements.Next() {
+		var row struct {
+			productID            int64
+			name, merchant, curr string
+			target               sql.NullFloat64
+			first, last          float64
+			firstAt, lastAt      string
+			points               int
+		}
+		if err := movements.Scan(&row.productID, &row.name, &row.merchant, &row.curr, &row.target, &row.first, &row.last, &row.firstAt, &row.lastAt, &row.points); err != nil {
+			movements.Close()
+			return report, err
+		}
+		switch {
+		case row.last < row.first:
+			report.History.Fell++
+		case row.last > row.first:
+			report.History.Rose++
+		default:
+			report.History.Flat++
+		}
+		if row.last >= row.first || row.first <= 0 {
+			continue
+		}
+		report.BiggestDrops = append(report.BiggestDrops, analyticsMovement{
+			ProductID: row.productID, Name: row.name, Merchant: row.merchant, Currency: normalizeCurrency(row.curr),
+			From: roundMoney(row.first), To: roundMoney(row.last),
+			DropPct: round1((row.first - row.last) / row.first * 100), Points: row.points,
+			TargetPrice: floatPtr(row.target), FirstAt: parseTime(row.firstAt), LastAt: parseTime(row.lastAt),
+		})
+	}
+	if err := movements.Err(); err != nil {
+		movements.Close()
+		return report, err
+	}
+	movements.Close()
+	sort.SliceStable(report.BiggestDrops, func(i, j int) bool {
+		if report.BiggestDrops[i].DropPct != report.BiggestDrops[j].DropPct {
+			return report.BiggestDrops[i].DropPct > report.BiggestDrops[j].DropPct
+		}
+		if !report.BiggestDrops[i].LastAt.Equal(report.BiggestDrops[j].LastAt) {
+			return report.BiggestDrops[i].LastAt.After(report.BiggestDrops[j].LastAt)
+		}
+		return report.BiggestDrops[i].ProductID < report.BiggestDrops[j].ProductID
+	})
+	if len(report.BiggestDrops) > limit {
+		report.BiggestDrops = report.BiggestDrops[:limit]
+	}
+
+	var points, products int
+	var avgPrice, minPrice, maxPrice sql.NullFloat64
+	if err := s.db.QueryRowContext(ctx, `SELECT count(*), count(DISTINCT product_id), avg(price), min(price), max(price)
+		FROM price_history WHERE price IS NOT NULL AND price>0 AND captured_at>=?`, sinceText).
+		Scan(&points, &products, &avgPrice, &minPrice, &maxPrice); err != nil {
+		return report, err
+	}
+	report.History.Points = points
+	report.History.Products = products
+	if avgPrice.Valid {
+		value := roundMoney(avgPrice.Float64)
+		report.History.AvgPrice = &value
+	}
+	if minPrice.Valid {
+		value := roundMoney(minPrice.Float64)
+		report.History.MinPrice = &value
+	}
+	if maxPrice.Valid {
+		value := roundMoney(maxPrice.Float64)
+		report.History.MaxPrice = &value
+	}
+
+	daily, err := s.db.QueryContext(ctx, `SELECT substr(captured_at,1,10) AS day, count(*), avg(price), min(price)
+		FROM price_history WHERE price IS NOT NULL AND price>0 AND captured_at>=?
+		GROUP BY day ORDER BY day ASC`, sinceText)
+	if err != nil {
+		return report, err
+	}
+	for daily.Next() {
+		var day historyDay
+		var avg, min sql.NullFloat64
+		if err := daily.Scan(&day.Day, &day.Points, &avg, &min); err != nil {
+			daily.Close()
+			return report, err
+		}
+		if avg.Valid {
+			value := roundMoney(avg.Float64)
+			day.AvgPrice = &value
+		}
+		if min.Valid {
+			value := roundMoney(min.Float64)
+			day.MinPrice = &value
+		}
+		report.History.Daily = append(report.History.Daily, day)
+	}
+	if err := daily.Err(); err != nil {
+		daily.Close()
+		return report, err
+	}
+	daily.Close()
+
+	if currency := ""; s.db.QueryRowContext(ctx, `SELECT currency FROM price_history
+		WHERE price IS NOT NULL AND price>0 AND captured_at>=?
+		GROUP BY currency ORDER BY count(*) DESC, currency ASC LIMIT 1`, sinceText).Scan(&currency) == nil && currency != "" {
+		report.History.Currency = normalizeCurrency(currency)
+	}
+	return report, nil
 }
 
 func (s *Store) BeginRun(ctx context.Context, source string) (int64, error) {

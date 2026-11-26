@@ -13,7 +13,10 @@
     <nav class="topline" aria-label="service">
       <div class="brand"><span class="mark">◆</span><span>Private Deals</span></div>
       <div class="navactions">
-        <a class="ghost" href="/api/export.csv">Export CSV</a>
+        <a class="ghost" href="/api/export.csv">CSV</a>
+        <a class="ghost" href="/api/deals/export">JSON</a>
+        <a class="ghost" href="/api/deals/feed.rss">RSS</a>
+        <a class="ghost" href="/api/deals/feed.atom">Atom</a>
         <button id="ingestButton" class="primary">Run ingestion</button>
       </div>
     </nav>
@@ -77,7 +80,7 @@
       </details>
 
       <section class="panel">
-        <div class="panelhead"><h3>Watchlists</h3><button id="newListButton" class="tiny">New</button></div>
+        <div class="panelhead"><h3>Watchlists</h3><div><button id="pollWatchlists" class="tiny">Poll all</button><button id="newListButton" class="tiny">New</button></div></div>
         <form id="watchlistForm" class="stack hidden"><input name="name" required placeholder="List name"><button class="primary" type="submit">Create</button></form>
         <select id="watchlistPicker" aria-label="watchlist target"></select>
         <div id="watchlists" class="watchlists"></div>
@@ -86,6 +89,7 @@
       <section class="panel">
         <div class="panelhead"><h3>Alerts</h3><button id="evaluateAlerts" class="tiny">Evaluate</button></div>
         <div id="alerts" class="alerts"></div>
+        <h4>Price movement</h4><div id="priceEvents" class="alerts price-events"></div>
       </section>
 
       <section class="panel">

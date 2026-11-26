@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 func testStore(t *testing.T) *Store {
@@ -506,5 +508,147 @@ func TestAnalyticsEndpointAnswersJSONOnAnEmptyIndex(t *testing.T) {
 	}
 	if report.WindowDays != 7 {
 		t.Fatalf("window %d, want 7", report.WindowDays)
+	}
+}
+
+func TestPriceEventsRecordDropAndIncrease(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	oldPrice, newPrice, highPrice := 199.0, 149.0, 179.0
+	input := dealInput{Source: "rss", Merchant: "Shop", Title: "NVMe SSD sale", URL: "https://shop.example/ssd", Price: &oldPrice, Currency: "EUR"}
+	if _, created, err := store.UpsertDeal(ctx, input); err != nil || !created {
+		t.Fatalf("first upsert created=%v err=%v", created, err)
+	}
+	input.Price = &newPrice
+	if _, created, err := store.UpsertDeal(ctx, input); err != nil || created {
+		t.Fatalf("drop upsert created=%v err=%v", created, err)
+	}
+	input.Price = &highPrice
+	if _, created, err := store.UpsertDeal(ctx, input); err != nil || created {
+		t.Fatalf("increase upsert created=%v err=%v", created, err)
+	}
+	events, err := store.ListPriceEvents(ctx, 10, "")
+	if err != nil {
+		t.Fatalf("ListPriceEvents: %v", err)
+	}
+	if len(events) != 2 || events[1].Kind != "price-drop" || events[0].Kind != "price-increase" {
+		t.Fatalf("events %#v", events)
+	}
+	if events[1].PreviousPrice == nil || *events[1].PreviousPrice != oldPrice || events[1].Price == nil || *events[1].Price != newPrice {
+		t.Fatalf("drop event prices %#v", events[1])
+	}
+}
+
+func TestDealExportFeeds(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	price := 49.0
+	if _, _, err := store.UpsertDeal(ctx, dealInput{Source: "rss", Merchant: "Shop", Title: "Headphones <sale>", URL: "https://shop.example/h", Price: &price, Currency: "EUR", Tags: []string{"audio"}}); err != nil {
+		t.Fatalf("upsert: %v", err)
+	}
+	s := &server{store: store}
+	for path, want := range map[string]string{
+		"/api/deals/feed.rss":  "application/rss+xml",
+		"/api/deals/feed.atom": "application/atom+xml",
+		"/api/deals/export":    "application/json",
+	} {
+		req := httptest.NewRequest(http.MethodGet, path, nil)
+		rec := httptest.NewRecorder()
+		switch path {
+		case "/api/deals/feed.rss":
+			s.exportDealsRSS(rec, req)
+		case "/api/deals/feed.atom":
+			s.exportDealsAtom(rec, req)
+		default:
+			s.exportDealsJSON(rec, req)
+		}
+		if rec.Code != http.StatusOK || !strings.Contains(rec.Header().Get("content-type"), want) {
+			t.Fatalf("%s status=%d content-type=%q body=%s", path, rec.Code, rec.Header().Get("content-type"), rec.Body.String())
+		}
+		if !strings.Contains(rec.Body.String(), "Headphones") {
+			t.Fatalf("%s missing deal: %s", path, rec.Body.String())
+		}
+	}
+	if rec := httptest.NewRecorder(); true {
+		req := httptest.NewRequest(http.MethodGet, "/api/deals/feed.rss", nil)
+		s.exportDealsRSS(rec, req)
+		if strings.Contains(rec.Body.String(), "&lt;sale&gt;") && strings.Contains(rec.Body.String(), "&amp;lt;") {
+			t.Fatalf("rss double escaped: %s", rec.Body.String())
+		}
+	}
+}
+
+func TestWatchlistPollEndpointRunsConfiguredRSS(t *testing.T) {
+	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/rss+xml")
+		_, _ = w.Write([]byte(`<?xml version="1.0"?><rss version="2.0"><channel><item><title>SSD deal now €89 was €129</title><link>https://shop.example/ssd-deal</link><description>NVMe sale</description></item></channel></rss>`))
+	}))
+	defer feed.Close()
+	ctx := context.Background()
+	store := testStore(t)
+	watchlistID, err := store.CreateWatchlist(ctx, "Storage", "")
+	if err != nil {
+		t.Fatalf("CreateWatchlist: %v", err)
+	}
+	ing := newIngester(store, providerConfig{RSSFeeds: []string{feed.URL}, SearchQueries: []string{}, JSONFeeds: []string{}, ScrapeURLs: []string{}, AllowKeyless: true})
+	s := &server{store: store, ingester: ing}
+	req := httptest.NewRequest(http.MethodPost, "/api/watchlists/"+strconv.FormatInt(watchlistID, 10)+"/poll", strings.NewReader(`{"sources":["rss"]}`))
+	req.SetPathValue("id", strconv.FormatInt(watchlistID, 10))
+	rec := httptest.NewRecorder()
+	s.pollWatchlist(rec, req)
+	if rec.Code != http.StatusAccepted {
+		t.Fatalf("poll status=%d body=%s", rec.Code, rec.Body.String())
+	}
+	var response watchlistPollResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &response); err != nil || !response.Accepted || response.WatchlistID != watchlistID {
+		t.Fatalf("poll response %#v err=%v body=%s", response, err, rec.Body.String())
+	}
+	deadline := time.Now().Add(3 * time.Second)
+	for ing.status().Running && time.Now().Before(deadline) {
+		time.Sleep(20 * time.Millisecond)
+	}
+	page, err := store.QueryDeals(ctx, dealQueryOptions{Q: "SSD", Active: true, Limit: 10})
+	if err != nil || page.Total != 1 {
+		t.Fatalf("polled deals %#v err=%v ingest=%+v", page, err, ing.status())
+	}
+	if len(page.Items) == 0 || page.Items[0].Price == nil || *page.Items[0].Price != 89 {
+		t.Fatalf("unexpected deal %#v", page.Items)
+	}
+}
+
+func TestPriceDropEventProducesDedupedWatchlistAlert(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	target := 100.0
+	productID, _, err := store.UpsertProduct(ctx, productInput{Source: "manual", Merchant: "Shop", Name: "Laptop", URL: "https://shop.example/laptop", TargetPrice: &target})
+	if err != nil {
+		t.Fatalf("product: %v", err)
+	}
+	watchlistID, err := store.CreateWatchlist(ctx, "Machines", "")
+	if err != nil || store.AddWatchlistItem(ctx, watchlistID, productID, "") != nil {
+		t.Fatalf("watchlist: %v", err)
+	}
+	oldPrice, newPrice := 200.0, 180.0
+	input := dealInput{ProductID: &productID, Source: "rss", Merchant: "Shop", Title: "Laptop deal", URL: "https://shop.example/laptop", Price: &oldPrice}
+	if _, _, err := store.UpsertDeal(ctx, input); err != nil {
+		t.Fatalf("first deal: %v", err)
+	}
+	input.Price = &newPrice
+	if _, _, err := store.UpsertDeal(ctx, input); err != nil {
+		t.Fatalf("drop deal: %v", err)
+	}
+	first, err := store.EvaluateWatchlistAlerts(ctx, 10)
+	if err != nil {
+		t.Fatalf("evaluate: %v", err)
+	}
+	if first.Created != 1 || len(first.Alerts) != 1 || first.Alerts[0].Reason != "price-drop" {
+		t.Fatalf("first evaluation %#v", first)
+	}
+	second, err := store.EvaluateWatchlistAlerts(ctx, 10)
+	if err != nil {
+		t.Fatalf("second evaluate: %v", err)
+	}
+	if second.Created != 0 || second.Existing != 1 {
+		t.Fatalf("dedupe evaluation %#v", second)
 	}
 }

@@ -88,6 +88,28 @@ type Watchlist struct {
 	ItemCount   int       `json:"item_count"`
 }
 
+type PriceEvent struct {
+	ID            int64     `json:"id"`
+	ProductID     int64     `json:"product_id,omitempty"`
+	DealID        int64     `json:"deal_id,omitempty"`
+	Kind          string    `json:"kind"`
+	PreviousPrice *float64  `json:"previous_price,omitempty"`
+	Price         *float64  `json:"price,omitempty"`
+	Currency      string    `json:"currency"`
+	Source        string    `json:"source"`
+	Message       string    `json:"message"`
+	CreatedAt     time.Time `json:"created_at"`
+}
+
+type watchlistPollResponse struct {
+	Accepted    bool          `json:"accepted"`
+	Running     bool          `json:"running"`
+	WatchlistID int64         `json:"watchlist_id,omitempty"`
+	Watchlists  int           `json:"watchlists"`
+	Message     string        `json:"message"`
+	Ingest      ingestSummary `json:"ingest"`
+}
+
 type WatchlistItem struct {
 	WatchlistID int64     `json:"watchlist_id"`
 	ProductID   int64     `json:"product_id"`

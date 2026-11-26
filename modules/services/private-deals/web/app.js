@@ -123,8 +123,9 @@ async function loadWatchlists() {
   const page = await api('/api/watchlists');
   state.watchlists = page.items || [];
   $('#watchlistPicker').innerHTML = state.watchlists.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('') || '<option value="">no watchlist</option>';
-  $('#watchlists').innerHTML = state.watchlists.map(w => `<div class="watchlist"><button class="tiny" data-list="${w.id}">items</button><b>${esc(w.name)}</b><span class="small">${w.item_count} product(s)</span></div>`).join('') || '<p class="muted">No watchlists yet.</p>';
-  $$('#watchlists button').forEach(btn => btn.onclick = () => showWatchlist(btn.dataset.list));
+  $('#watchlists').innerHTML = state.watchlists.map(w => `<div class="watchlist"><div class="watch-actions"><button class="tiny" data-list="${w.id}">items</button><button class="tiny poll-list" data-list="${w.id}">poll</button></div><b>${esc(w.name)}</b><span class="small">${w.item_count} product(s)</span></div>`).join('') || '<p class="muted">No watchlists yet.</p>';
+  $$('#watchlists button:not(.poll-list)').forEach(btn => btn.onclick = () => showWatchlist(btn.dataset.list));
+  $$('#watchlists .poll-list').forEach(btn => btn.onclick = () => pollWatchlist(btn.dataset.list));
 }
 async function addProductToList(productID) {
   const watchlistID = $('#watchlistPicker').value;
@@ -140,6 +141,22 @@ async function showWatchlist(id) {
   $('#detail').innerHTML = `<p class="eyebrow">watchlist</p><h2>${page.total} tracked product(s)</h2>` + (page.items || []).map(item => `<div class="product"><b>${esc(item.product.name)}</b><span class="small">${esc(item.product.merchant)} · ${item.product.current_price!=null?money(item.product.current_price,item.product.currency):'no price'}</span><p>${esc(item.notes || '')}</p></div>`).join('');
   $('#detailDialog').showModal();
 }
+
+async function pollWatchlist(id) {
+  const path = id ? `/api/watchlists/${id}/poll` : '/api/watchlists/poll';
+  try {
+    const result = await api(path,{method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+    toast(result.accepted ? 'Watchlist poll started' : 'Watchlist poll already running');
+    pollIngest();
+  } catch(err) { toast(err.message); }
+}
+async function loadPriceEvents() {
+  const page = await api('/api/price-events?kind=price-drop&limit=8');
+  const events = page.items || [];
+  state.priceEvents = events;
+  $('#priceEvents').innerHTML = events.map(event => `<div class="alert price-drop"><span class="status sent">drop</span><b>${money(event.previous_price,event.currency)} → ${money(event.price,event.currency)}</b><span class="small">${esc(event.message)}</span><span class="small">${new Date(event.created_at).toLocaleString()}</span></div>`).join('') || '<p class="muted">No recorded price drops yet.</p>';
+}
+
 async function loadAlerts() {
   const page = await api('/api/alerts?limit=8');
   const alerts = page.items || [];
@@ -158,7 +175,7 @@ async function pollIngest() {
   const status = await api('/api/ingest');
   $('#ingestState').textContent = status.running ? 'running' : 'idle';
   if (status.running) setTimeout(pollIngest, 1200);
-  else { refreshStats(); loadAnalytics(); loadDeals(); loadSources(); }
+  else { refreshStats(); loadAnalytics(); loadDeals(); loadSources(); loadPriceEvents(); }
 }
 function formNumbers(form, keys) {
   const out = {};
@@ -192,10 +209,11 @@ $('#evaluateAlerts').onclick = async () => {
   try { const result = await api('/api/alerts/evaluate',{method:'POST',headers:{'content-type':'application/json'},body:'{}'}); toast(`Alerts: ${result.created} new, ${result.notified} sent, ${result.failed} failed`); loadAlerts(); }
   catch(err) { toast(err.message); }
 };
+$('#pollWatchlists').onclick = () => pollWatchlist();
 $('#newListButton').onclick = () => $('#watchlistForm').classList.toggle('hidden');
 $('#watchlistForm').addEventListener('submit', async event => {
   event.preventDefault();
   try { await api('/api/watchlists',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:event.target.name.value})}); event.target.reset(); loadWatchlists(); }
   catch(err) { toast(err.message); }
 });
-Promise.all([refreshStats(),loadAnalytics(),loadDeals(),loadProducts(),loadWatchlists(),loadSources(),loadAlerts()]).catch(err => toast(err.message));
+Promise.all([refreshStats(),loadAnalytics(),loadDeals(),loadProducts(),loadWatchlists(),loadSources(),loadAlerts(),loadPriceEvents()]).catch(err => toast(err.message));

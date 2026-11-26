@@ -9,7 +9,7 @@
 
   package = pkgs.buildGoModule {
     pname = "private-deals";
-    version = "0.1.0";
+    version = "0.2.0";
     src = ./private-deals;
     vendorHash = "sha256-n+WU7qcF6NauBw9DFU4VG1fnDQ387+nibJ/uzApqehk=";
     env.CGO_ENABLED = 0;
@@ -32,6 +32,8 @@
     "${stateDir}/deals.sqlite"
     "-interval"
     cfg.interval
+    "-poll-interval"
+    cfg.pollInterval
     "-sources"
     (lib.concatStringsSep "," cfg.sources)
     ("-ingest-on-start=" + (bool cfg.ingestOnStart))
@@ -86,6 +88,12 @@ in {
       type = lib.types.str;
       default = "6h";
       description = "Go duration between automatic ingestion runs; use 0s to disable the timer.";
+    };
+
+    pollInterval = lib.mkOption {
+      type = lib.types.str;
+      default = "1h";
+      description = "Go duration between watchlist polling passes over the configured RSS, JSON, provider-search and scrape sources; use 0s to disable the watchlist ticker.";
     };
 
     ingestOnStart = lib.mkOption {

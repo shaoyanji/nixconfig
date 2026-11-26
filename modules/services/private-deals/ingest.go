@@ -95,6 +95,50 @@ func (s *ingester) startAsync(ctx context.Context, sources []string) (bool, inge
 	return true, s.status()
 }
 
+func (s *ingester) startWatchlistAsync(ctx context.Context, sources []string, queries, scrapeURLs []string) (bool, ingestSummary) {
+	s.mu.Lock()
+	if s.running {
+		status := ingestSummary{Running: true, Started: s.started, Message: s.last}
+		s.mu.Unlock()
+		return false, status
+	}
+	base := s.cfg
+	custom := base
+	custom.SearchQueries = limitedStrings(append(append([]string{}, base.SearchQueries...), queries...), 16)
+	custom.ScrapeURLs = limitedStrings(append(append([]string{}, base.ScrapeURLs...), scrapeURLs...), 16)
+	s.cfg = custom
+	s.running = true
+	s.started = time.Now().UTC()
+	s.last = "watchlist ingestion queued"
+	s.mu.Unlock()
+	go func() {
+		message := s.runCore(ctx, sources)
+		s.mu.Lock()
+		s.cfg = base
+		s.running = false
+		s.last = message
+		s.mu.Unlock()
+	}()
+	return true, s.status()
+}
+
+func limitedStrings(values []string, limit int) []string {
+	seen := map[string]bool{}
+	out := []string{}
+	for _, value := range values {
+		value = strings.TrimSpace(value)
+		if value == "" || seen[value] {
+			continue
+		}
+		seen[value] = true
+		out = append(out, value)
+		if len(out) >= limit {
+			break
+		}
+	}
+	return out
+}
+
 func (s *ingester) progress(message string) {
 	s.mu.Lock()
 	s.last = message
@@ -109,6 +153,10 @@ func (s *ingester) finishStatus(message string) {
 }
 
 func (s *ingester) run(ctx context.Context, sources []string) {
+	s.finishStatus(s.runCore(ctx, sources))
+}
+
+func (s *ingester) runCore(ctx context.Context, sources []string) string {
 	if len(sources) == 0 {
 		sources = defaultSources
 	}
@@ -171,7 +219,7 @@ func (s *ingester) run(ctx context.Context, sources []string) {
 	if len(failures) > 0 {
 		message += "; " + strings.Join(failures, " | ")
 	}
-	s.finishStatus(message)
+	return message
 }
 
 func (s *ingester) ingestSource(ctx context.Context, source string) (ingestResult, error) {

@@ -39,6 +39,7 @@ func main() {
 	dbPath := flag.String("db", "deals.sqlite", "SQLite database path")
 	envFile := flag.String("env-file", "", "optional KEY=VALUE file for provider credentials (never logged)")
 	interval := flag.Duration("interval", 6*time.Hour, "automatic ingestion interval; 0 disables the timer")
+	pollInterval := flag.Duration("poll-interval", time.Hour, "watchlist polling interval; 0 disables the timer")
 	ingestOnStart := flag.Bool("ingest-on-start", true, "run one ingestion after startup")
 	sourcesFlag := flag.String("sources", strings.Join(defaultSources, ","), "comma-separated ingestion sources")
 	rssFlag := flag.String("rss-feeds", "", "comma-separated RSS/Atom feed URLs; PRIVATE_DEALS_RSS_FEEDS is the fallback")
@@ -109,10 +110,16 @@ func main() {
 	mux.HandleFunc("GET /api/watchlists/{id}/items", s.watchlistItems)
 	mux.HandleFunc("POST /api/watchlists/{id}/items", s.addWatchlistItem)
 	mux.HandleFunc("DELETE /api/watchlists/{id}/items/{product}", s.removeWatchlistItem)
+	mux.HandleFunc("POST /api/watchlists/poll", s.pollWatchlists)
+	mux.HandleFunc("POST /api/watchlists/{id}/poll", s.pollWatchlist)
 	mux.HandleFunc("GET /api/ingest", s.ingestStatus)
 	mux.HandleFunc("POST /api/ingest", s.triggerIngest)
 	mux.HandleFunc("GET /api/runs", s.runs)
 	mux.HandleFunc("GET /api/export.csv", s.exportCSV)
+	mux.HandleFunc("GET /api/deals/export", s.exportDealsJSON)
+	mux.HandleFunc("GET /api/deals/feed.rss", s.exportDealsRSS)
+	mux.HandleFunc("GET /api/deals/feed.atom", s.exportDealsAtom)
+	mux.HandleFunc("GET /api/price-events", s.priceEvents)
 	mux.HandleFunc("GET /api/alerts", s.alertList)
 	mux.HandleFunc("POST /api/alerts/evaluate", s.evaluateAlerts)
 
@@ -129,8 +136,25 @@ func main() {
 			}
 		}()
 	}
+	if *pollInterval > 0 {
+		go func() {
+			ticker := time.NewTicker(*pollInterval)
+			defer ticker.Stop()
+			for range ticker.C {
+				_, queries, scrapeURLs, err := s.watchlistTargets(context.Background(), 0)
+				if err != nil {
+					log.Printf("private-deals: watchlist poll targets: %v", err)
+					continue
+				}
+				started, _ := ingest.startWatchlistAsync(context.Background(), sources, queries, scrapeURLs)
+				if started {
+					log.Printf("private-deals: watchlist poll queued configured sources")
+				}
+			}
+		}()
+	}
 
-	log.Printf("private-deals: listening on %s, db %s, sources %s", *addr, *dbPath, strings.Join(sources, ","))
+	log.Printf("private-deals: listening on %s, db %s, sources %s, watchlist_poll_interval %s", *addr, *dbPath, strings.Join(sources, ","), pollInterval.String())
 	log.Printf("private-deals: providers firecrawl=%t tavily=%t context=%t rss_feeds=%d json_feeds=%d scrape_urls=%d alerts=%t", cfg.FirecrawlKey != "", cfg.TavilyKey != "", cfg.ContextKey != "", len(cfg.RSSFeeds), len(cfg.JSONFeeds), len(cfg.ScrapeURLs), alerts.enabled())
 	if err := http.ListenAndServe(*addr, mux); err != nil {
 		log.Fatalf("private-deals: %v", err)
@@ -224,7 +248,7 @@ func (s *server) static(path, contentType string) http.HandlerFunc {
 
 func (s *server) health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
-		"ok": true, "service": "private-deals", "version": "0.1.0",
+		"ok": true, "service": "private-deals", "version": "0.2.0",
 		"uptime_seconds": int(time.Since(s.started).Seconds()), "time": time.Now().UTC().Format(time.RFC3339),
 	})
 }
@@ -575,6 +599,105 @@ func (s *server) removeWatchlistItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
+}
+
+func (s *server) priceEvents(w http.ResponseWriter, r *http.Request) {
+	events, err := s.store.ListPriceEvents(r.Context(), intQuery(r, "limit"), r.URL.Query().Get("kind"))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": events, "total": len(events)})
+}
+
+func (s *server) watchlistTargets(ctx context.Context, watchlistID int64) (int, []string, []string, error) {
+	lists, err := s.store.Watchlists(ctx)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+	return watchlistTargetDetails(lists, s.store, ctx, watchlistID)
+}
+
+func watchlistTargetDetails(lists []Watchlist, store *Store, ctx context.Context, watchlistID int64) (int, []string, []string, error) {
+	matched := len(lists)
+	if watchlistID != 0 {
+		matched = 0
+		for _, list := range lists {
+			if list.ID == watchlistID {
+				matched = 1
+				break
+			}
+		}
+		if matched == 0 {
+			return 0, nil, nil, errors.New("watchlist not found")
+		}
+	}
+	queries := []string{}
+	scrapeURLs := []string{}
+	for _, list := range lists {
+		if watchlistID != 0 && list.ID != watchlistID {
+			continue
+		}
+		items, err := store.WatchlistItems(ctx, list.ID)
+		if err != nil {
+			return 0, nil, nil, err
+		}
+		for _, item := range items {
+			if item.Product == nil {
+				continue
+			}
+			if item.Product.Name != "" {
+				queries = append(queries, item.Product.Name+" deal price")
+			}
+			if strings.HasPrefix(item.Product.URL, "http://") || strings.HasPrefix(item.Product.URL, "https://") {
+				scrapeURLs = append(scrapeURLs, item.Product.URL)
+			}
+		}
+	}
+	return matched, queries, scrapeURLs, nil
+}
+
+func (s *server) startWatchlistPoll(w http.ResponseWriter, r *http.Request, watchlistID int64) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	lists, err := s.store.Watchlists(r.Context())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	matched, queries, scrapeURLs, err := watchlistTargetDetails(lists, s.store, r.Context(), watchlistID)
+	if err != nil {
+		writeError(w, http.StatusNotFound, err)
+		return
+	}
+	var body struct {
+		Sources []string `json:"sources"`
+	}
+	if r.Body != nil {
+		_ = json.NewDecoder(r.Body).Decode(&body)
+	}
+	accepted, status := s.ingester.startWatchlistAsync(context.Background(), body.Sources, queries, scrapeURLs)
+	message := "watchlist poll queued; configured RSS/JSON feeds, provider search queries and product scrape URLs will refresh deals and price history"
+	if !accepted {
+		message = "watchlist poll already running"
+	}
+	writeJSON(w, http.StatusAccepted, watchlistPollResponse{
+		Accepted: accepted, Running: true, WatchlistID: watchlistID, Watchlists: matched, Message: message, Ingest: status,
+	})
+}
+
+func (s *server) pollWatchlists(w http.ResponseWriter, r *http.Request) {
+	s.startWatchlistPoll(w, r, 0)
+}
+
+func (s *server) pollWatchlist(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, errors.New("watchlist id must be numeric"))
+		return
+	}
+	s.startWatchlistPoll(w, r, id)
 }
 
 func (s *server) ingestStatus(w http.ResponseWriter, r *http.Request) {

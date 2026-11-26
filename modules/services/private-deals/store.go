@@ -157,6 +157,18 @@ func (s *Store) migrate() error {
 			last_seen TEXT NOT NULL,
 			notified_at TEXT
 		)`,
+		`CREATE TABLE IF NOT EXISTS price_events (
+			id INTEGER PRIMARY KEY,
+			product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+			deal_id INTEGER REFERENCES deals(id) ON DELETE CASCADE,
+			kind TEXT NOT NULL,
+			previous_price REAL,
+			price REAL,
+			currency TEXT NOT NULL DEFAULT 'EUR',
+			source TEXT NOT NULL,
+			message TEXT NOT NULL DEFAULT '',
+			created_at TEXT NOT NULL
+		)`,
 		`CREATE TABLE IF NOT EXISTS ingest_runs (
 			id INTEGER PRIMARY KEY,
 			source TEXT NOT NULL,
@@ -188,6 +200,8 @@ func (s *Store) migrate() error {
 		`CREATE INDEX IF NOT EXISTS idx_products_merchant ON products(merchant)`,
 		`CREATE INDEX IF NOT EXISTS idx_history_product ON price_history(product_id, captured_at DESC)`,
 		`CREATE INDEX IF NOT EXISTS idx_history_deal ON price_history(deal_id, captured_at DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_price_events_created ON price_events(created_at DESC)`,
+		`CREATE INDEX IF NOT EXISTS idx_price_events_deal ON price_events(deal_id,created_at DESC)`,
 		`CREATE INDEX IF NOT EXISTS idx_alerts_status ON deal_alerts(status,last_seen DESC)`,
 		`CREATE INDEX IF NOT EXISTS idx_alerts_deal ON deal_alerts(deal_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_runs_started ON ingest_runs(started_at DESC)`,
@@ -344,6 +358,15 @@ func (s *Store) UpsertDeal(ctx context.Context, input dealInput) (int64, bool, e
 		if err := s.RecordPrice(ctx, intPtr(nullInt(deal.ProductID)), &id, deal.Price, deal.ListPrice, deal.DiscountPct, deal.Currency, deal.Source, "deal upsert"); err != nil {
 			return 0, false, err
 		}
+		if !created && oldPrice.Valid && deal.Price != nil && !sameMoney(oldPrice, nullFloat(deal.Price)) {
+			kind := "price-increase"
+			if *deal.Price < oldPrice.Float64 {
+				kind = "price-drop"
+			}
+			if err := s.RecordPriceEvent(ctx, intPtr(nullInt(deal.ProductID)), &id, kind, floatPtr(oldPrice), deal.Price, deal.Currency, deal.Source, fmt.Sprintf("%s %.2f → %.2f %s", kind, oldPrice.Float64, *deal.Price, normalizeCurrency(deal.Currency))); err != nil {
+				return 0, false, err
+			}
+		}
 		if deal.ProductID != nil && deal.Price != nil {
 			_, _ = s.db.ExecContext(ctx, `UPDATE products SET current_price=?, list_price=COALESCE(?,list_price), discount_pct=?, last_seen=?, updated_at=? WHERE id=?`,
 				nullFloat(deal.Price), nullFloat(deal.ListPrice), deal.DiscountPct, now, now, *deal.ProductID)
@@ -361,6 +384,48 @@ func sameMoney(a, b sql.NullFloat64) bool {
 	}
 	diff := a.Float64 - b.Float64
 	return diff < 0.005 && diff > -0.005
+}
+
+func (s *Store) RecordPriceEvent(ctx context.Context, productID, dealID *int64, kind string, previous, price *float64, currency, source, message string) error {
+	if kind == "" || price == nil {
+		return nil
+	}
+	if currency == "" {
+		currency = "EUR"
+	}
+	_, err := s.db.ExecContext(ctx, `INSERT INTO price_events (product_id,deal_id,kind,previous_price,price,currency,source,message,created_at) VALUES (?,?,?,?,?,?,?,?,?)`,
+		nullInt(productID), nullInt(dealID), kind, nullFloat(previous), nullFloat(price), normalizeCurrency(currency), source, message, nowString())
+	return err
+}
+
+func (s *Store) ListPriceEvents(ctx context.Context, limit int, kind string) ([]PriceEvent, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 50
+	}
+	where, args := "1=1", []any{}
+	if kind != "" {
+		where += " AND kind=?"
+		args = append(args, kind)
+	}
+	rows, err := s.db.QueryContext(ctx, `SELECT id,COALESCE(product_id,0),COALESCE(deal_id,0),kind,previous_price,price,currency,source,message,created_at FROM price_events WHERE `+where+` ORDER BY created_at DESC LIMIT ?`, append(args, limit)...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	events := []PriceEvent{}
+	for rows.Next() {
+		var event PriceEvent
+		var previous, price sql.NullFloat64
+		var created string
+		if err := rows.Scan(&event.ID, &event.ProductID, &event.DealID, &event.Kind, &previous, &price, &event.Currency, &event.Source, &event.Message, &created); err != nil {
+			return nil, err
+		}
+		event.PreviousPrice = floatPtr(previous)
+		event.Price = floatPtr(price)
+		event.CreatedAt = parseTime(created)
+		events = append(events, event)
+	}
+	return events, rows.Err()
 }
 
 func (s *Store) UpsertProduct(ctx context.Context, input productInput) (int64, bool, error) {
@@ -825,6 +890,24 @@ func (s *Store) WatchlistItems(ctx context.Context, watchlistID int64) ([]Watchl
 	return items, rows.Err()
 }
 
+func (s *Store) LatestPriceDrop(ctx context.Context, dealID int64) (*PriceEvent, error) {
+	var event PriceEvent
+	var previous, price sql.NullFloat64
+	var created string
+	err := s.db.QueryRowContext(ctx, `SELECT id,COALESCE(product_id,0),COALESCE(deal_id,0),kind,previous_price,price,currency,source,message,created_at FROM price_events WHERE deal_id=? AND kind='price-drop' ORDER BY created_at DESC LIMIT 1`, dealID).Scan(
+		&event.ID, &event.ProductID, &event.DealID, &event.Kind, &previous, &price, &event.Currency, &event.Source, &event.Message, &created)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	event.PreviousPrice = floatPtr(previous)
+	event.Price = floatPtr(price)
+	event.CreatedAt = parseTime(created)
+	return &event, nil
+}
+
 func alertFingerprint(dealID int64, currency string, price float64) string {
 	return fmt.Sprintf("%d:%s:%.2f", dealID, normalizeCurrency(currency), price)
 }
@@ -875,6 +958,20 @@ func (s *Store) EvaluateWatchlistAlerts(ctx context.Context, limit int) (alertEv
 	}
 	if err := rows.Err(); err != nil {
 		return alertEvaluation{}, err
+	}
+	for i := range candidates {
+		alert := &candidates[i]
+		if alert.Reason == "target-price" {
+			continue
+		}
+		drop, err := s.LatestPriceDrop(ctx, alert.DealID)
+		if err != nil {
+			return alertEvaluation{}, err
+		}
+		if drop != nil && drop.PreviousPrice != nil && alert.Price <= *drop.PreviousPrice*0.95 {
+			alert.Reason = "price-drop"
+			alert.Message = fmt.Sprintf("%s dropped %.2f → %.2f %s", alert.ProductName, *drop.PreviousPrice, alert.Price, alert.Currency)
+		}
 	}
 
 	result := alertEvaluation{Alerts: []DealAlert{}}
